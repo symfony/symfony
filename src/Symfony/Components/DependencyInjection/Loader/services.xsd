@@ -1,0 +1,113 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<xs:schema xmlns:xs="http://www.w3.org/2001/XMLSchema" xmlns="http://symfony-project.org/2.0/container" targetNamespace="http://symfony-project.org/2.0/container" elementFormDefault="qualified">
+  <xs:element name="container" type="container" />
+
+  <xs:complexType name="container">
+    <xs:sequence>
+      <xs:element name="imports" type="imports" minOccurs="0" maxOccurs="1" />
+      <xs:element name="parameters" type="parameters" minOccurs="0" maxOccurs="1" />
+      <xs:element name="services" type="services" minOccurs="0" maxOccurs="1" />
+      <xs:any namespace="##any" processContents="skip" minOccurs="0" maxOccurs="unbounded" />
+    </xs:sequence>
+  </xs:complexType>
+
+  <xs:complexType name="services">
+    <xs:sequence>
+      <xs:element name="service" type="service" minOccurs="1" maxOccurs="unbounded" />
+    </xs:sequence>
+  </xs:complexType>
+
+  <xs:complexType name="imports">
+    <xs:sequence>
+      <xs:element name="import" type="import" minOccurs="1" maxOccurs="unbounded" />
+    </xs:sequence>
+  </xs:complexType>
+
+  <xs:complexType name="import">
+    <xs:attribute name="resource" type="xs:string" use="required" />
+    <xs:attribute name="class" type="xs:string" />
+  </xs:complexType>
+
+  <xs:complexType name="configurator">
+    <xs:attribute name="id" type="xs:string" />
+    <xs:attribute name="service" type="xs:string" />
+    <xs:attribute name="class" type="xs:string" />
+    <xs:attribute name="method" type="xs:string" />
+    <xs:attribute name="function" type="xs:string" />
+  </xs:complexType>
+
+  <xs:complexType name="service">
+    <xs:choice maxOccurs="unbounded">
+      <xs:element name="file" type="xs:string" minOccurs="0" maxOccurs="1" />
+      <xs:element name="argument" type="argument" minOccurs="0" maxOccurs="unbounded" />
+      <xs:element name="configurator" type="configurator" minOccurs="0" maxOccurs="1" />
+      <xs:element name="call" type="call" minOccurs="0" maxOccurs="unbounded" />
+    </xs:choice>
+    <xs:attribute name="id" type="xs:string" />
+    <xs:attribute name="class" type="xs:string" />
+    <xs:attribute name="shared" type="boolean" />
+    <xs:attribute name="constructor" type="xs:string" />
+    <xs:attribute name="alias" type="xs:string" />
+  </xs:complexType>
+
+  <xs:complexType name="parameters">
+    <xs:sequence>
+      <xs:element name="parameter" type="parameter" minOccurs="1" maxOccurs="unbounded" />
+    </xs:sequence>
+    <xs:attribute name="type" type="parameter_type" />
+    <xs:attribute name="key" type="xs:string" />
+  </xs:complexType>
+
+  <xs:complexType name="parameter" mixed="true">
+    <xs:sequence>
+      <xs:element name="parameter" type="parameter" minOccurs="0" maxOccurs="unbounded" />
+    </xs:sequence>
+    <xs:attribute name="type" type="parameter_type" />
+    <xs:attribute name="id" type="xs:string" />
+    <xs:attribute name="key" type="xs:string" />
+    <xs:attribute name="on-invalid" type="xs:string" />
+  </xs:complexType>
+
+  <xs:complexType name="argument" mixed="true">
+    <xs:choice maxOccurs="unbounded">
+      <xs:element name="argument" type="argument" minOccurs="0" maxOccurs="unbounded" />
+      <xs:element name="service" type="service" />
+    </xs:choice>
+    <xs:attribute name="type" type="argument_type" />
+    <xs:attribute name="id" type="xs:string" />
+    <xs:attribute name="key" type="xs:string" />
+    <xs:attribute name="on-invalid" type="xs:string" />
+  </xs:complexType>
+
+  <xs:complexType name="call" mixed="true">
+    <xs:choice maxOccurs="unbounded">
+      <xs:element name="argument" type="argument" minOccurs="0" maxOccurs="unbounded" />
+      <xs:element name="service" type="service" />
+    </xs:choice>
+    <xs:attribute name="method" type="xs:string" />
+  </xs:complexType>
+
+  <xs:simpleType name="parameter_type">
+    <xs:restriction base="xs:string">
+      <xs:enumeration value="collection" />
+      <xs:enumeration value="service" />
+      <xs:enumeration value="string" />
+      <xs:enumeration value="constant" />
+    </xs:restriction>
+  </xs:simpleType>
+
+  <xs:simpleType name="argument_type">
+    <xs:restriction base="xs:string">
+      <xs:enumeration value="collection" />
+      <xs:enumeration value="service" />
+      <xs:enumeration value="string" />
+      <xs:enumeration value="constant" />
+    </xs:restriction>
+  </xs:simpleType>
+
+  <xs:simpleType name="boolean">
+    <xs:restriction base="xs:string">
+      <xs:pattern value="(%.+%|true|false)" />
+    </xs:restriction>
+  </xs:simpleType>
+</xs:schema>

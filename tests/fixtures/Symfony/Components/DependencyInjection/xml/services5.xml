@@ -1,0 +1,16 @@
+<?xml version="1.0" ?>
+
+<container xmlns="http://symfony-project.org/2.0/container">
+  <services>
+    <service id="foo" class="FooClass">
+      <argument type="service">
+        <service class="BarClass">
+          <argument type="service">
+            <service class="BazClass">
+            </service>
+          </argument>
+        </service>
+      </argument>
+    </service>
+  </services>
+</container>

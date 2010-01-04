@@ -1,0 +1,11 @@
+<?xml version="1.0" ?>
+
+<container xmlns="http://symfony-project.org/2.0/container">
+  <parameters>
+    <parameter key="foo">foo</parameter>
+    <parameter key="values" type="collection">
+      <parameter>true</parameter>
+      <parameter>false</parameter>
+    </parameter>
+  </parameters>
+</container>

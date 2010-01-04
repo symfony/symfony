@@ -1,0 +1,45 @@
+<?xml version="1.0" ?>
+
+<container xmlns="http://symfony-project.org/2.0/container">
+  <services>
+    <service id="foo" class="FooClass" />
+    <service id="baz" class="BazClass" />
+    <service id="shared" class="FooClass" shared="true" />
+    <service id="non_shared" class="FooClass" shared="false" />
+    <service id="constructor" class="FooClass" constructor="getInstance" />
+    <service id="file" class="FooClass">
+      <file>%path%/foo.php</file>
+    </service>
+    <service id="arguments" class="FooClass">
+      <argument>foo</argument>
+      <argument type="service" id="foo" />
+      <argument type="collection">
+        <argument>true</argument>
+        <argument>false</argument>
+      </argument>
+    </service>
+    <service id="configurator1" class="FooClass">
+      <configurator function="sc_configure" />
+    </service>
+    <service id="configurator2" class="FooClass">
+      <configurator service="baz" method="configure" />
+    </service>
+    <service id="configurator3" class="FooClass">
+      <configurator class="BazClass" method="configureStatic" />
+    </service>
+    <service id="method_call1" class="FooClass">
+      <call method="setBar" />
+    </service>
+    <service id="method_call2" class="FooClass">
+      <call method="setBar">
+        <argument>foo</argument>
+        <argument type="service" id="foo" />
+        <argument type="collection">
+          <argument>true</argument>
+          <argument>false</argument>
+        </argument>
+      </call>
+    </service>
+    <service id="alias_for_foo" alias="foo" />
+  </services>
+</container>

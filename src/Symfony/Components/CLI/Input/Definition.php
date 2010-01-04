@@ -94,9 +94,9 @@ class Definition
   }
 
   /**
-   * Add a Argument objects.
+   * Add an Argument object.
    *
-   * @param Argument $argument A Argument object
+   * @param Argument $argument An Argument object
    */
   public function addArgument(Argument $argument)
   {
@@ -133,9 +133,9 @@ class Definition
   }
 
   /**
-   * Returns an argument by name or by position.
+   * Returns an Argument by name or by position.
    *
-   * @param string|integer $name The argument name or position
+   * @param string|integer $name The Argument name or position
    *
    * @return Argument An Argument object
    */
@@ -152,11 +152,11 @@ class Definition
   }
 
   /**
-   * Returns true if an argument object exists by name or position.
+   * Returns true if an Argument object exists by name or position.
    *
-   * @param string|integer $name The argument name or position
+   * @param string|integer $name The Argument name or position
    *
-   * @return Boolean true if the argument object exists, false otherwise
+   * @return Boolean true if the Argument object exists, false otherwise
    */
   public function hasArgument($name)
   {
@@ -176,9 +176,9 @@ class Definition
   }
 
   /**
-   * Returns the number of arguments.
+   * Returns the number of Arguments.
    *
-   * @return integer The number of arguments
+   * @return integer The number of Arguments
    */
   public function getArgumentCount()
   {
@@ -186,9 +186,9 @@ class Definition
   }
 
   /**
-   * Returns the number of required arguments.
+   * Returns the number of required Arguments.
    *
-   * @return integer The number of required arguments
+   * @return integer The number of required Arguments
    */
   public function getArgumentRequiredCount()
   {
@@ -237,9 +237,9 @@ class Definition
   }
 
   /**
-   * Add a Option objects.
+   * Add an Option object.
    *
-   * @param Option $option A Option object
+   * @param Option $option An Option object
    */
   public function addOption(Option $option)
   {
@@ -260,9 +260,9 @@ class Definition
   }
 
   /**
-   * Returns an option by name.
+   * Returns an Option by name.
    *
-   * @param string $name The option name
+   * @param string $name The Option name
    *
    * @return Option A Option object
    */
@@ -277,11 +277,11 @@ class Definition
   }
 
   /**
-   * Returns true if an option object exists by name.
+   * Returns true if an Option object exists by name.
    *
-   * @param string $name The option name
+   * @param string $name The Option name
    *
-   * @return Boolean true if the option object exists, false otherwise
+   * @return Boolean true if the Option object exists, false otherwise
    */
   public function hasOption($name)
   {
@@ -299,11 +299,11 @@ class Definition
   }
 
   /**
-   * Returns true if an option object exists by shortcut.
+   * Returns true if an Option object exists by shortcut.
    *
-   * @param string $name The option shortcut
+   * @param string $name The Option shortcut
    *
-   * @return Boolean true if the option object exists, false otherwise
+   * @return Boolean true if the Option object exists, false otherwise
    */
   public function hasShortcut($name)
   {
@@ -311,9 +311,9 @@ class Definition
   }
 
   /**
-   * Gets an option by shortcut.
+   * Gets an Option by shortcut.
    *
-   * @return Option A Option object
+   * @return Option An Option object
    */
   public function getOptionForShortcut($shortcut)
   {
@@ -337,11 +337,11 @@ class Definition
   }
 
   /**
-   * Returns the option name given a shortcut.
+   * Returns the Option name given a shortcut.
    *
    * @param string $shortcut The shortcut
    *
-   * @return string The option name
+   * @return string The Option name
    */
   protected function shortcutToName($shortcut)
   {
@@ -381,7 +381,7 @@ class Definition
   }
 
   /**
-   * Returns a text representation the Definition.
+   * Returns a textual representation of the Definition.
    *
    * @return string A string representing the Definition
    */

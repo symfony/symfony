@@ -145,12 +145,12 @@ class Application
   {
     $name = $input->getFirstArgument('task');
 
-    if (false !== $input->hasParameterOption(array('--color', '-c')))
+    if (true === $input->hasParameterOption(array('--color', '-c')))
     {
       $output->setDecorated(true);
     }
 
-    if (false !== $input->hasParameterOption(array('--help', '-H')))
+    if (true === $input->hasParameterOption(array('--help', '-H')))
     {
       if (!$name)
       {
@@ -163,21 +163,21 @@ class Application
       }
     }
 
-    if (false !== $input->hasParameterOption(array('--no-interaction', '-n')))
+    if (true === $input->hasParameterOption(array('--no-interaction', '-n')))
     {
       $input->setInteractive(false);
     }
 
-    if (false !== $input->hasParameterOption(array('--quiet', '-q')))
+    if (true === $input->hasParameterOption(array('--quiet', '-q')))
     {
       $output->setVerbosity(Output::VERBOSITY_QUIET);
     }
-    elseif (false !== $input->hasParameterOption(array('--verbose', '-v')))
+    elseif (true === $input->hasParameterOption(array('--verbose', '-v')))
     {
       $output->setVerbosity(Output::VERBOSITY_VERBOSE);
     }
 
-    if (false !== $input->hasParameterOption(array('--version', '-V')))
+    if (true === $input->hasParameterOption(array('--version', '-V')))
     {
       $output->write($this->getLongVersion());
 

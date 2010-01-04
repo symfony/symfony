@@ -1,9 +1,9 @@
 <comment>Usage:</comment>
- UNKNOWN namespace:name [-h|--help] [-q|--quiet] [-v|--verbose] [-V|--version] [-c|--color] [-n|--no-interaction] task
+ UNKNOWN namespace:name [-h|--help] [-q|--quiet] [-v|--verbose] [-V|--version] [-c|--color] [-n|--no-interaction] command
 
 <comment>Aliases:</comment> <info>name</info>
 <comment>Arguments:</comment>
- <info>task             </info> The task to execute
+ <info>command          </info> The command to execute
 
 <comment>Options:</comment>
  <info>--help</info> (-h) Display this help message.

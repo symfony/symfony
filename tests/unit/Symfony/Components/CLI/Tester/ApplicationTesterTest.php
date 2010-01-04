@@ -19,13 +19,13 @@ $t = new LimeTest(6);
 $application = new Application();
 $application->setAutoExit(false);
 $application->register('foo')
-  ->addArgument('task')
+  ->addArgument('command')
   ->addArgument('foo')
   ->setCode(function ($input, $output) { $output->write('foo'); })
 ;
 
 $tester = new ApplicationTester($application);
-$tester->run(array('task' => 'foo', 'foo' => 'bar'), array('interactive' => false, 'decorated' => false, 'verbosity' => Output::VERBOSITY_VERBOSE));
+$tester->run(array('command' => 'foo', 'foo' => 'bar'), array('interactive' => false, 'decorated' => false, 'verbosity' => Output::VERBOSITY_VERBOSE));
 
 // ->run()
 $t->diag('->run()');

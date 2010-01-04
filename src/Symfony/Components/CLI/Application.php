@@ -11,9 +11,9 @@ use Symfony\Components\CLI\Input\Argument;
 use Symfony\Components\CLI\Output\OutputInterface;
 use Symfony\Components\CLI\Output\Output;
 use Symfony\Components\CLI\Output\ConsoleOutput;
-use Symfony\Components\CLI\Task\Task;
-use Symfony\Components\CLI\Task\HelpTask;
-use Symfony\Components\CLI\Task\ListTask;
+use Symfony\Components\CLI\Command\Command;
+use Symfony\Components\CLI\Command\HelpCommand;
+use Symfony\Components\CLI\Command\ListCommand;
 
 /*
  * This file is part of the symfony framework.
@@ -25,7 +25,7 @@ use Symfony\Components\CLI\Task\ListTask;
  */
 
 /**
- * An Application is the container for a collection of tasks.
+ * An Application is the container for a collection of commands.
  *
  * It is the main entry point of a CLI application.
  *
@@ -34,7 +34,7 @@ use Symfony\Components\CLI\Task\ListTask;
  * Usage:
  *
  *     $app = new Application('myapp', '1.0 (stable)');
- *     $app->addTask(new SimpleTask());
+ *     $app->addCommand(new SimpleCommand());
  *     $app->run();
  *
  * @package    symfony
@@ -43,11 +43,11 @@ use Symfony\Components\CLI\Task\ListTask;
  */
 class Application
 {
-  protected $tasks;
+  protected $commands;
   protected $aliases;
   protected $application;
   protected $wantHelps = false;
-  protected $runningTask;
+  protected $runningCommand;
   protected $name;
   protected $version;
   protected $catchExceptions;
@@ -66,14 +66,14 @@ class Application
     $this->version = $version;
     $this->catchExceptions = true;
     $this->autoExit = true;
-    $this->tasks = array();
+    $this->commands = array();
     $this->aliases = array();
 
-    $this->addTask(new HelpTask());
-    $this->addTask(new ListTask());
+    $this->addCommand(new HelpCommand());
+    $this->addCommand(new ListCommand());
 
     $this->definition = new Definition(array(
-      new Argument('task', Argument::REQUIRED, 'The task to execute'),
+      new Argument('command', Argument::REQUIRED, 'The command to execute'),
 
       new Option('--help',           '-h', Option::PARAMETER_NONE, 'Display this help message.'),
       new Option('--quiet',          '-q', Option::PARAMETER_NONE, 'Do not output any message.'),
@@ -143,7 +143,7 @@ class Application
    */
   public function doRun(InputInterface $input, OutputInterface $output)
   {
-    $name = $input->getFirstArgument('task');
+    $name = $input->getFirstArgument('command');
 
     if (true === $input->hasParameterOption(array('--color', '-c')))
     {
@@ -155,7 +155,7 @@ class Application
       if (!$name)
       {
         $name = 'help';
-        $input = new ArrayInput(array('task' => 'help'));
+        $input = new ArrayInput(array('command' => 'help'));
       }
       else
       {
@@ -187,15 +187,15 @@ class Application
     if (!$name)
     {
       $name = 'list';
-      $input = new ArrayInput(array('task' => 'list'));
+      $input = new ArrayInput(array('command' => 'list'));
     }
 
-    // the task name MUST be the first element of the input
-    $task = $this->findTask($name);
+    // the command name MUST be the first element of the input
+    $command = $this->findCommand($name);
 
-    $this->runningTask = $task;
-    $statusCode = $task->run($input, $output);
-    $this->runningTask = null;
+    $this->runningCommand = $command;
+    $statusCode = $command->run($input, $output);
+    $this->runningCommand = null;
 
     return is_numeric($statusCode) ? $statusCode : 0;
   }
@@ -221,7 +221,7 @@ class Application
       $this->getLongVersion(),
       '',
       '<comment>Usage:</comment>',
-      sprintf("  %s [options] task [arguments]\n", $this->getName()),
+      sprintf("  %s [options] command [arguments]\n", $this->getName()),
       '<comment>Options:</comment>',
     );
 
@@ -238,9 +238,9 @@ class Application
   }
 
   /**
-   * Sets whether to catch exceptions or not during tasks execution.
+   * Sets whether to catch exceptions or not during commands execution.
    *
-   * @param Boolean $boolean Whether to catch exceptions or not during tasks execution
+   * @param Boolean $boolean Whether to catch exceptions or not during commands execution
    */
   public function setCatchExceptions($boolean)
   {
@@ -248,9 +248,9 @@ class Application
   }
 
   /**
-   * Sets whether to automatically exit after a task execution or not.
+   * Sets whether to automatically exit after a command execution or not.
    *
-   * @param Boolean $boolean Whether to automatically exit after a task execution or not
+   * @param Boolean $boolean Whether to automatically exit after a command execution or not
    */
   public function setAutoExit($boolean)
   {
@@ -308,96 +308,96 @@ class Application
   }
 
   /**
-   * Registers a new task.
+   * Registers a new command.
    *
-   * @param string $name The task name
+   * @param string $name The command name
    *
-   * @return Task The newly created task
+   * @return Command The newly created command
    */
   public function register($name)
   {
-    return $this->addTask(new Task($name));
+    return $this->addCommand(new Command($name));
   }
 
   /**
-   * Adds an array of task objects.
+   * Adds an array of command objects.
    *
-   * @param array  $tasks  An array of tasks
+   * @param array  $commands  An array of commands
    */
-  public function addTasks(array $tasks)
+  public function addCommands(array $commands)
   {
-    foreach ($tasks as $task)
+    foreach ($commands as $command)
     {
-      $this->addTask($task);
+      $this->addCommand($command);
     }
   }
 
   /**
-   * Adds a task object.
+   * Adds a command object.
    *
-   * If a task with the same name already exists, it will be overridden.
+   * If a command with the same name already exists, it will be overridden.
    *
-   * @param Task $task A Task object
+   * @param Command $command A Command object
    *
-   * @return Task The registered task
+   * @return Command The registered command
    */
-  public function addTask(Task $task)
+  public function addCommand(Command $command)
   {
-    $task->setApplication($this);
+    $command->setApplication($this);
 
-    $this->tasks[$task->getFullName()] = $task;
+    $this->commands[$command->getFullName()] = $command;
 
-    foreach ($task->getAliases() as $alias)
+    foreach ($command->getAliases() as $alias)
     {
-      $this->aliases[$alias] = $task;
+      $this->aliases[$alias] = $command;
     }
 
-    return $task;
+    return $command;
   }
 
   /**
-   * Returns a registered task by name or alias.
+   * Returns a registered command by name or alias.
    *
-   * @param string $name The task name or alias
+   * @param string $name The command name or alias
    *
-   * @return Task A Task object
+   * @return Command A Command object
    */
-  public function getTask($name)
+  public function getCommand($name)
   {
-    if (!isset($this->tasks[$name]) && !isset($this->aliases[$name]))
+    if (!isset($this->commands[$name]) && !isset($this->aliases[$name]))
     {
-      throw new \InvalidArgumentException(sprintf('The task "%s" does not exist.', $name));
+      throw new \InvalidArgumentException(sprintf('The command "%s" does not exist.', $name));
     }
 
-    $task = isset($this->tasks[$name]) ? $this->tasks[$name] : $this->aliases[$name];
+    $command = isset($this->commands[$name]) ? $this->commands[$name] : $this->aliases[$name];
 
     if ($this->wantHelps)
     {
       $this->wantHelps = false;
 
-      $helpTask = $this->getTask('help');
-      $helpTask->setTask($task);
+      $helpCommand = $this->getCommand('help');
+      $helpCommand->setCommand($command);
 
-      return $helpTask;
+      return $helpCommand;
     }
 
-    return $task;
+    return $command;
   }
 
   /**
-   * Returns true if the task exists, false otherwise
+   * Returns true if the command exists, false otherwise
    *
-   * @param string $name The task name or alias
+   * @param string $name The command name or alias
    *
-   * @return Boolean true if the task exists, false otherwise
+   * @return Boolean true if the command exists, false otherwise
    */
-  public function hasTask($name)
+  public function hasCommand($name)
   {
-    return isset($this->tasks[$name]) || isset($this->aliases[$name]);
+    return isset($this->commands[$name]) || isset($this->aliases[$name]);
   }
 
   /**
-   * Returns an array of all unique namespaces used by currently registered tasks.
+   * Returns an array of all unique namespaces used by currently registered commands.
    *
    * It does not returns the global namespace which always exists.
    *
@@ -406,11 +406,11 @@ class Application
   public function getNamespaces()
   {
     $namespaces = array();
-    foreach ($this->tasks as $task)
+    foreach ($this->commands as $command)
     {
-      if ($task->getNamespace())
+      if ($command->getNamespace())
       {
-        $namespaces[$task->getNamespace()] = true;
+        $namespaces[$command->getNamespace()] = true;
       }
     }
 
@@ -428,7 +428,7 @@ class Application
 
     if (!isset($abbrevs[$namespace]))
     {
-      throw new \InvalidArgumentException(sprintf('There are no tasks defined in the "%s" namespace.', $namespace));
+      throw new \InvalidArgumentException(sprintf('There are no commands defined in the "%s" namespace.', $namespace));
     }
 
     if (count($abbrevs[$namespace]) > 1)
@@ -440,16 +440,16 @@ class Application
   }
 
   /**
-   * Finds a task by name or alias.
+   * Finds a command by name or alias.
    *
-   * Contrary to getTask, this task tries to find the best
+   * Contrary to getCommand, this command tries to find the best
    * match if you give it an abbreviation of a name or alias.
    *
-   * @param  string $name A task name or a task alias
+   * @param  string $name A command name or a command alias
    *
-   * @return Task A Task instance
+   * @return Command A Command instance
    */
-  public function findTask($name)
+  public function findCommand($name)
   {
     // namespace
     $namespace = '';
@@ -462,69 +462,69 @@ class Application
     $fullName = $namespace ? $namespace.':'.$name : $name;
 
     // name
-    $tasks = array();
-    foreach ($this->tasks as $task)
+    $commands = array();
+    foreach ($this->commands as $command)
     {
-      if ($task->getNamespace() == $namespace)
+      if ($command->getNamespace() == $namespace)
       {
-        $tasks[] = $task->getName();
+        $commands[] = $command->getName();
       }
     }
 
-    $abbrevs = static::getAbbreviations($tasks);
+    $abbrevs = static::getAbbreviations($commands);
     if (isset($abbrevs[$name]) && 1 == count($abbrevs[$name]))
     {
-      return $this->getTask($namespace ? $namespace.':'.$abbrevs[$name][0] : $abbrevs[$name][0]);
+      return $this->getCommand($namespace ? $namespace.':'.$abbrevs[$name][0] : $abbrevs[$name][0]);
     }
 
     if (isset($abbrevs[$name]) && count($abbrevs[$name]) > 1)
     {
-      $suggestions = $this->getAbbreviationSuggestions(array_map(function ($task) use ($namespace) { return $namespace.':'.$task; }, $abbrevs[$name]));
+      $suggestions = $this->getAbbreviationSuggestions(array_map(function ($command) use ($namespace) { return $namespace.':'.$command; }, $abbrevs[$name]));
 
-      throw new \InvalidArgumentException(sprintf('Task "%s" is ambiguous (%s).', $fullName, $suggestions));
+      throw new \InvalidArgumentException(sprintf('Command "%s" is ambiguous (%s).', $fullName, $suggestions));
     }
 
     // aliases
     $abbrevs = static::getAbbreviations(array_keys($this->aliases));
     if (!isset($abbrevs[$fullName]))
     {
-      throw new \InvalidArgumentException(sprintf('Task "%s" is not defined.', $fullName));
+      throw new \InvalidArgumentException(sprintf('Command "%s" is not defined.', $fullName));
     }
 
     if (count($abbrevs[$fullName]) > 1)
     {
-      throw new \InvalidArgumentException(sprintf('Task "%s" is ambiguous (%s).', $fullName, $this->getAbbreviationSuggestions($abbrevs[$fullName])));
+      throw new \InvalidArgumentException(sprintf('Command "%s" is ambiguous (%s).', $fullName, $this->getAbbreviationSuggestions($abbrevs[$fullName])));
     }
 
-    return $this->getTask($abbrevs[$fullName][0]);
+    return $this->getCommand($abbrevs[$fullName][0]);
   }
 
   /**
-   * Gets the tasks (registered in the given namespace if provided).
+   * Gets the commands (registered in the given namespace if provided).
    *
-   * The array keys are the full names and the values the task instances.
+   * The array keys are the full names and the values the command instances.
    *
    * @param  string  $namespace A namespace name
    *
-   * @return array An array of Task instances
+   * @return array An array of Command instances
    */
-  public function getTasks($namespace = null)
+  public function getCommands($namespace = null)
   {
     if (null === $namespace)
     {
-      return $this->tasks;
+      return $this->commands;
     }
 
-    $tasks = array();
-    foreach ($this->tasks as $name => $task)
+    $commands = array();
+    foreach ($this->commands as $name => $command)
     {
-      if ($namespace === $task->getNamespace())
+      if ($namespace === $command->getNamespace())
       {
-        $tasks[$name] = $task;
+        $commands[$name] = $command;
       }
     }
 
-    return $tasks;
+    return $commands;
   }
 
   /**
@@ -571,38 +571,38 @@ class Application
    */
   public function asText($namespace = null)
   {
-    $tasks = $namespace ? $this->getTasks($this->findNamespace($namespace)) : $this->tasks;
+    $commands = $namespace ? $this->getCommands($this->findNamespace($namespace)) : $this->commands;
 
     $messages = array($this->getHelp(), '');
     if ($namespace)
     {
-      $messages[] = sprintf("<comment>Available tasks for the \"%s\" namespace:</comment>", $namespace);
+      $messages[] = sprintf("<comment>Available commands for the \"%s\" namespace:</comment>", $namespace);
     }
     else
     {
-      $messages[] = '<comment>Available tasks:</comment>';
+      $messages[] = '<comment>Available commands:</comment>';
     }
 
     $width = 0;
-    foreach ($tasks as $task)
+    foreach ($commands as $command)
     {
-      $width = strlen($task->getName()) > $width ? strlen($task->getName()) : $width;
+      $width = strlen($command->getName()) > $width ? strlen($command->getName()) : $width;
     }
     $width += 2;
 
-    // add tasks by namespace
-    foreach ($this->sortTasks($tasks) as $space => $tasks)
+    // add commands by namespace
+    foreach ($this->sortCommands($commands) as $space => $commands)
     {
       if (!$namespace && '_global' !== $space)
       {
         $messages[] = '<comment>'.$space.'</comment>';
       }
 
-      foreach ($tasks as $task)
+      foreach ($commands as $command)
       {
-        $aliases = $task->getAliases() ? '<comment> ('.implode(', ', $task->getAliases()).')</comment>' : '';
+        $aliases = $command->getAliases() ? '<comment> ('.implode(', ', $command->getAliases()).')</comment>' : '';
 
-        $messages[] = sprintf("  <info>%-${width}s</info> %s%s", ($task->getNamespace() ? ':' : '').$task->getName(), $task->getDescription(), $aliases);
+        $messages[] = sprintf("  <info>%-${width}s</info> %s%s", ($command->getNamespace() ? ':' : '').$command->getName(), $command->getDescription(), $aliases);
       }
     }
 
@@ -619,25 +619,25 @@ class Application
    */
   public function asXml($namespace = null, $asDom = false)
   {
-    $tasks = $namespace ? $this->getTasks($this->findNamespace($namespace)) : $this->tasks;
+    $commands = $namespace ? $this->getCommands($this->findNamespace($namespace)) : $this->commands;
 
     $dom = new \DOMDocument('1.0', 'UTF-8');
     $dom->formatOutput = true;
     $dom->appendChild($xml = $dom->createElement('symfony'));
 
-    $xml->appendChild($tasksXML = $dom->createElement('tasks'));
+    $xml->appendChild($commandsXML = $dom->createElement('commands'));
 
     if ($namespace)
     {
-      $tasksXML->setAttribute('namespace', $namespace);
+      $commandsXML->setAttribute('namespace', $namespace);
     }
     else
     {
       $xml->appendChild($namespacesXML = $dom->createElement('namespaces'));
     }
 
-    // add tasks by namespace
-    foreach ($this->sortTasks($tasks) as $space => $tasks)
+    // add commands by namespace
+    foreach ($this->sortCommands($commands) as $space => $commands)
     {
       if (!$namespace)
       {
@@ -645,21 +645,21 @@ class Application
         $namespaceArrayXML->setAttribute('id', $space);
       }
 
-      foreach ($tasks as $task)
+      foreach ($commands as $command)
       {
         if (!$namespace)
         {
-          $namespaceArrayXML->appendChild($taskXML = $dom->createElement('task'));
-          $taskXML->appendChild($dom->createTextNode($task->getName()));
+          $namespaceArrayXML->appendChild($commandXML = $dom->createElement('command'));
+          $commandXML->appendChild($dom->createTextNode($command->getName()));
         }
 
-        $taskXML = new \DOMDocument('1.0', 'UTF-8');
-        $taskXML->formatOutput = true;
-        $taskXML->loadXML($task->asXml());
-        $node = $taskXML->getElementsByTagName('task')->item(0);
+        $commandXML = new \DOMDocument('1.0', 'UTF-8');
+        $commandXML->formatOutput = true;
+        $commandXML->loadXML($command->asXml());
+        $node = $commandXML->getElementsByTagName('command')->item(0);
         $node = $dom->importNode($node, true);
 
-        $tasksXML->appendChild($node);
+        $commandsXML->appendChild($node);
       }
     }
 
@@ -704,9 +704,9 @@ class Application
     }
     $output->write("\n");
 
-    if (null !== $this->runningTask)
+    if (null !== $this->runningCommand)
     {
-      $output->write(sprintf('<info>%s</info>', sprintf($this->runningTask->getSynopsis(), $this->getName())));
+      $output->write(sprintf('<info>%s</info>', sprintf($this->runningCommand->getSynopsis(), $this->getName())));
       $output->write("\n");
     }
 
@@ -738,28 +738,28 @@ class Application
     }
   }
 
-  private function sortTasks($tasks)
+  private function sortCommands($commands)
   {
-    $namespacedTasks = array();
-    foreach ($tasks as $name => $task)
+    $namespacedCommands = array();
+    foreach ($commands as $name => $command)
     {
-      $key = $task->getNamespace() ? $task->getNamespace() : '_global';
+      $key = $command->getNamespace() ? $command->getNamespace() : '_global';
 
-      if (!isset($namespacedTasks[$key]))
+      if (!isset($namespacedCommands[$key]))
       {
-        $namespacedTasks[$key] = array();
+        $namespacedCommands[$key] = array();
       }
 
-      $namespacedTasks[$key][$name] = $task;
+      $namespacedCommands[$key][$name] = $command;
     }
-    ksort($namespacedTasks);
+    ksort($namespacedCommands);
 
-    foreach ($namespacedTasks as $name => &$tasks)
+    foreach ($namespacedCommands as $name => &$commands)
     {
-      ksort($tasks);
+      ksort($commands);
     }
 
-    return $namespacedTasks;
+    return $namespacedCommands;
   }
 
   private function getAbbreviationSuggestions($abbrevs)

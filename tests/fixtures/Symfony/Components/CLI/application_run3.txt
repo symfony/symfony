@@ -8,11 +8,11 @@ Options:
  --xml To output help as XML
 
 Help:
- The list task lists all tasks:
+ The list command lists all commands:
  
    ./symfony list
  
- You can also display the tasks for a specific namespace:
+ You can also display the commands for a specific namespace:
  
    ./symfony list test
  

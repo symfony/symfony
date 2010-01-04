@@ -2,13 +2,13 @@
 
 namespace Symfony\Components\CLI\Tester;
 
-use Symfony\Components\CLI\Task\Task;
+use Symfony\Components\CLI\Command\Command;
 use Symfony\Components\CLI\Input\ArrayInput;
 use Symfony\Components\CLI\Output\StreamOutput;
 
-class TaskTester
+class CommandTester
 {
-  protected $task;
+  protected $command;
   protected $display;
   protected $input;
   protected $output;
@@ -16,15 +16,15 @@ class TaskTester
   /**
    * Constructor.
    *
-   * @param Task $task A Task instance to test.
+   * @param Command $command A Command instance to test.
    */
-  public function __construct(Task $task)
+  public function __construct(Command $command)
   {
-    $this->task = $task;
+    $this->command = $command;
   }
 
   /**
-   * Executes the task.
+   * Executes the command.
    *
    * Available options:
    *
@@ -37,7 +37,7 @@ class TaskTester
    */
   public function execute(array $input, array $options = array())
   {
-    $this->input = new ArrayInput(array_merge($input, array('task' => $this->task->getFullName())));
+    $this->input = new ArrayInput(array_merge($input, array('command' => $this->command->getFullName())));
     if (isset($options['interactive']))
     {
       $this->input->setInteractive($options['interactive']);
@@ -53,7 +53,7 @@ class TaskTester
       $this->output->setVerbosity($options['verbosity']);
     }
 
-    $ret = $this->task->run($this->input, $this->output);
+    $ret = $this->command->run($this->input, $this->output);
 
     rewind($this->output->getStream());
 
@@ -61,7 +61,7 @@ class TaskTester
   }
 
   /**
-   * Gets the display returned by the last execution of the task.
+   * Gets the display returned by the last execution of the command.
    *
    * @return string The display
    */
@@ -71,7 +71,7 @@ class TaskTester
   }
 
   /**
-   * Gets the input instance used by the last execution of the task.
+   * Gets the input instance used by the last execution of the command.
    *
    * @return InputInterface The current input instance
    */
@@ -81,7 +81,7 @@ class TaskTester
   }
 
   /**
-   * Gets the output instance used by the last execution of the task.
+   * Gets the output instance used by the last execution of the command.
    *
    * @return OutputInterface The current output instance
    */

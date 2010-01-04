@@ -6,6 +6,6 @@
                                       
 
 
-UNKNOWN list [--xml] [-h|--help] [-q|--quiet] [-v|--verbose] [-V|--version] [-c|--color] [-n|--no-interaction] task [namespace]
+UNKNOWN list [--xml] [-h|--help] [-q|--quiet] [-v|--verbose] [-V|--version] [-c|--color] [-n|--no-interaction] command [namespace]
 
 

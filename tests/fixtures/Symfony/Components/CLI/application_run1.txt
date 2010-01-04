@@ -1,7 +1,7 @@
 UNKNOWN version UNKNOWN
 
 Usage:
-  UNKNOWN [options] task [arguments]
+  UNKNOWN [options] command [arguments]
 
 Options:
   --help      -h  Display this help message.
@@ -11,6 +11,6 @@ Options:
   --color     -c  Force ANSI color output.
   --no-interaction -n  Do not ask any interactive question.
 
-Available tasks:
-  help   Displays help for a task
-  list   Lists tasks
+Available commands:
+  help   Displays help for a command
+  list   Lists commands

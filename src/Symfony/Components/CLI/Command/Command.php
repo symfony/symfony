@@ -1,6 +1,6 @@
 <?php
 
-namespace Symfony\Components\CLI\Task;
+namespace Symfony\Components\CLI\Command;
 
 use Symfony\Components\CLI\Input\Definition;
 use Symfony\Components\CLI\Input\Option;
@@ -20,13 +20,13 @@ use Symfony\Components\CLI\Application;
  */
 
 /**
- * Base class for all tasks.
+ * Base class for all commands.
  *
  * @package    symfony
  * @subpackage cli
  * @author     Fabien Potencier <fabien.potencier@symfony-project.com>
  */
-class Task
+class Command
 {
   protected $name;
   protected $namespace;
@@ -60,12 +60,12 @@ class Task
 
     if (!$this->name)
     {
-      throw new \LogicException('The task name cannot be empty.');
+      throw new \LogicException('The command name cannot be empty.');
     }
   }
 
   /**
-   * Sets the application instance for this task.
+   * Sets the application instance for this command.
    *
    * @param Application $application An Application instance
    */
@@ -75,14 +75,14 @@ class Task
   }
 
   /**
-   * Configures the current task.
+   * Configures the current command.
    */
   protected function configure()
   {
   }
 
   /**
-   * Executes the current task.
+   * Executes the current command.
    *
    * @param InputInterface  $input  An InputInterface instance
    * @param OutputInterface $output An OutputInterface instance
@@ -91,7 +91,7 @@ class Task
    */
   protected function execute(InputInterface $input, OutputInterface $output)
   {
-    throw new \LogicException('You must override the execute() method in the concrete task class.');
+    throw new \LogicException('You must override the execute() method in the concrete command class.');
   }
 
   /**
@@ -109,7 +109,7 @@ class Task
     // add the application arguments and options
     $this->mergeApplicationDefinition();
 
-    // bind the input against the task specific arguments/options
+    // bind the input against the command specific arguments/options
     try
     {
       $input->bind($this->definition);
@@ -140,11 +140,11 @@ class Task
   }
 
   /**
-   * Sets the code to execute when running this task.
+   * Sets the code to execute when running this command.
    *
    * @param \Closure $code A \Closure
    *
-   * @return Task The current instance
+   * @return Command The current instance
    */
   public function setCode(\Closure $code)
   {
@@ -154,7 +154,7 @@ class Task
   }
 
   /**
-   * Merges the application definition with the task definition.
+   * Merges the application definition with the command definition.
    */
   protected function mergeApplicationDefinition()
   {
@@ -178,7 +178,7 @@ class Task
    *
    * @param array|Definition $definition An array of argument and option instances or a definition instance
    *
-   * @return Task The current instance
+   * @return Command The current instance
    */
   public function setDefinition($definition)
   {
@@ -204,7 +204,7 @@ class Task
    * @param string  $description A description text
    * @param mixed   $default     The default value (for Argument::OPTIONAL mode only)
    *
-   * @return Task The current instance
+   * @return Command The current instance
    */
   public function addArgument($name, $mode = null, $description = '', $default = null)
   {
@@ -222,7 +222,7 @@ class Task
    * @param string  $description A description text
    * @param mixed   $default     The default value (must be null for self::PARAMETER_REQUIRED or self::PARAMETER_NONE)
    *
-   * @return Task The current instance
+   * @return Command The current instance
    */
   public function addOption($name, $shortcut = null, $mode = null, $description = '', $default = null)
   {
@@ -232,16 +232,16 @@ class Task
   }
 
   /**
-   * Sets the name of the task.
+   * Sets the name of the command.
    *
    * This method can set both the namespace and the name if
    * you separate them by a colon (:)
    *
-   *     $task->setName('foo:bar');
+   *     $command->setName('foo:bar');
    *
-   * @param string $name The task name
+   * @param string $name The command name
    *
-   * @return Task The current instance
+   * @return Command The current instance
    */
   public function setName($name)
   {
@@ -257,7 +257,7 @@ class Task
 
     if (!$name)
     {
-      throw new \InvalidArgumentException('A task name cannot be empty');
+      throw new \InvalidArgumentException('A command name cannot be empty');
     }
 
     $this->namespace = $namespace;
@@ -267,9 +267,9 @@ class Task
   }
 
   /**
-   * Returns the task namespace.
+   * Returns the command namespace.
    *
-   * @return string The task namespace
+   * @return string The command namespace
    */
   public function getNamespace()
   {
@@ -277,9 +277,9 @@ class Task
   }
 
   /**
-   * Returns the task name
+   * Returns the command name
    *
-   * @return string The task name
+   * @return string The command name
    */
   public function getName()
   {
@@ -287,9 +287,9 @@ class Task
   }
 
   /**
-   * Returns the fully qualified task name.
+   * Returns the fully qualified command name.
    *
-   * @return string The fully qualified task name
+   * @return string The fully qualified command name
    */
   public function getFullName()
   {
@@ -297,11 +297,11 @@ class Task
   }
 
   /**
-   * Sets the description for the task.
+   * Sets the description for the command.
    *
-   * @param string $description The description for the task
+   * @param string $description The description for the command
    *
-   * @return Task The current instance
+   * @return Command The current instance
    */
   public function setDescription($description)
   {
@@ -311,9 +311,9 @@ class Task
   }
 
   /**
-   * Returns the description for the task.
+   * Returns the description for the command.
    *
-   * @return string The description for the task
+   * @return string The description for the command
    */
   public function getDescription()
   {
@@ -321,11 +321,11 @@ class Task
   }
 
   /**
-   * Sets the help for the task.
+   * Sets the help for the command.
    *
-   * @param string $help The help for the task
+   * @param string $help The help for the command
    *
-   * @return Task The current instance
+   * @return Command The current instance
    */
   public function setHelp($help)
   {
@@ -335,9 +335,9 @@ class Task
   }
 
   /**
-   * Returns the help for the task.
+   * Returns the help for the command.
    *
-   * @return string The help for the task
+   * @return string The help for the command
    */
   public function getHelp()
   {
@@ -345,11 +345,11 @@ class Task
   }
 
   /**
-   * Sets the aliases for the task.
+   * Sets the aliases for the command.
    *
-   * @param array $aliases An array of aliases for the task
+   * @param array $aliases An array of aliases for the command
    *
-   * @return Task The current instance
+   * @return Command The current instance
    */
   public function setAliases($aliases)
   {
@@ -359,9 +359,9 @@ class Task
   }
 
   /**
-   * Returns the aliases for the task.
+   * Returns the aliases for the command.
    *
-   * @return array An array of aliases for the task
+   * @return array An array of aliases for the command
    */
   public function getAliases()
   {
@@ -369,7 +369,7 @@ class Task
   }
 
   /**
-   * Returns the synopsis for the task.
+   * Returns the synopsis for the command.
    *
    * @return string The synopsis
    */
@@ -466,9 +466,9 @@ class Task
   }
 
   /**
-   * Returns a text representation of the task.
+   * Returns a text representation of the command.
    *
-   * @return string A string representing the task
+   * @return string A string representing the command
    */
   public function asText()
   {
@@ -495,32 +495,32 @@ class Task
   }
 
   /**
-   * Returns an XML representation of the task.
+   * Returns an XML representation of the command.
    *
    * @param Boolean $asDom Whether to return a DOM or an XML string
    *
-   * @return string|DOMDocument An XML string representing the task
+   * @return string|DOMDocument An XML string representing the command
    */
   public function asXml($asDom = false)
   {
     $dom = new \DOMDocument('1.0', 'UTF-8');
     $dom->formatOutput = true;
-    $dom->appendChild($taskXML = $dom->createElement('task'));
-    $taskXML->setAttribute('id', $this->getFullName());
-    $taskXML->setAttribute('namespace', $this->getNamespace() ? $this->getNamespace() : '_global');
-    $taskXML->setAttribute('name', $this->getName());
+    $dom->appendChild($commandXML = $dom->createElement('command'));
+    $commandXML->setAttribute('id', $this->getFullName());
+    $commandXML->setAttribute('namespace', $this->getNamespace() ? $this->getNamespace() : '_global');
+    $commandXML->setAttribute('name', $this->getName());
 
-    $taskXML->appendChild($usageXML = $dom->createElement('usage'));
+    $commandXML->appendChild($usageXML = $dom->createElement('usage'));
     $usageXML->appendChild($dom->createTextNode(sprintf($this->getSynopsis(), '')));
 
-    $taskXML->appendChild($descriptionXML = $dom->createElement('description'));
+    $commandXML->appendChild($descriptionXML = $dom->createElement('description'));
     $descriptionXML->appendChild($dom->createTextNode(implode("\n ", explode("\n", $this->getDescription()))));
 
-    $taskXML->appendChild($helpXML = $dom->createElement('help'));
+    $commandXML->appendChild($helpXML = $dom->createElement('help'));
     $help = $this->help;
     $helpXML->appendChild($dom->createTextNode(implode("\n ", explode("\n", $help))));
 
-    $taskXML->appendChild($aliasesXML = $dom->createElement('aliases'));
+    $commandXML->appendChild($aliasesXML = $dom->createElement('aliases'));
     foreach ($this->getAliases() as $alias)
     {
       $aliasesXML->appendChild($aliasXML = $dom->createElement('alias'));
@@ -528,8 +528,8 @@ class Task
     }
 
     $definition = $this->definition->asXml(true);
-    $taskXML->appendChild($dom->importNode($definition->getElementsByTagName('arguments')->item(0), true));
-    $taskXML->appendChild($dom->importNode($definition->getElementsByTagName('options')->item(0), true));
+    $commandXML->appendChild($dom->importNode($definition->getElementsByTagName('arguments')->item(0), true));
+    $commandXML->appendChild($dom->importNode($definition->getElementsByTagName('options')->item(0), true));
 
     return $asDom ? $dom : $dom->saveXml();
   }

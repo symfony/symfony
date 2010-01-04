@@ -1,10 +1,10 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <symfony>
-  <tasks>
-    <task id="help" namespace="_global" name="help">
-  <usage> help [--xml] [task_name]</usage>
-  <description>Displays help for a task</description>
-  <help>The &lt;info&gt;help&lt;/info&gt; task displays help for a given task:
+  <commands>
+    <command id="help" namespace="_global" name="help">
+  <usage> help [--xml] [command_name]</usage>
+  <description>Displays help for a command</description>
+  <help>The &lt;info&gt;help&lt;/info&gt; command displays help for a given command:
  
    &lt;info&gt;./symfony help test:all&lt;/info&gt;
  
@@ -13,8 +13,8 @@
    &lt;info&gt;./symfony help --xml test:all&lt;/info&gt;</help>
   <aliases/>
   <arguments>
-    <argument name="task_name" is_required="0" is_array="0">
-      <description>The task name</description>
+    <argument name="command_name" is_required="0" is_array="0">
+      <description>The command name</description>
       <defaults>
         <default>help</default>
       </defaults>
@@ -25,15 +25,15 @@
       <description>To output help as XML</description>
     </option>
   </options>
-</task>
-    <task id="list" namespace="_global" name="list">
+</command>
+    <command id="list" namespace="_global" name="list">
   <usage> list [--xml] [namespace]</usage>
-  <description>Lists tasks</description>
-  <help>The &lt;info&gt;list&lt;/info&gt; task lists all tasks:
+  <description>Lists commands</description>
+  <help>The &lt;info&gt;list&lt;/info&gt; command lists all commands:
  
    &lt;info&gt;./symfony list&lt;/info&gt;
  
- You can also display the tasks for a specific namespace:
+ You can also display the commands for a specific namespace:
  
    &lt;info&gt;./symfony list test&lt;/info&gt;
  
@@ -52,25 +52,25 @@
       <description>To output help as XML</description>
     </option>
   </options>
-</task>
-    <task id="foo:bar" namespace="foo" name="bar">
+</command>
+    <command id="foo:bar" namespace="foo" name="bar">
   <usage> foo:bar </usage>
-  <description>The foo:bar task</description>
+  <description>The foo:bar command</description>
   <help/>
   <aliases>
     <alias>afoobar</alias>
   </aliases>
   <arguments/>
   <options/>
-</task>
-  </tasks>
+</command>
+  </commands>
   <namespaces>
     <namespace id="_global">
-      <task>help</task>
-      <task>list</task>
+      <command>help</command>
+      <command>list</command>
     </namespace>
     <namespace id="foo">
-      <task>bar</task>
+      <command>bar</command>
     </namespace>
   </namespaces>
 </symfony>

@@ -10,18 +10,18 @@
 
 require_once __DIR__.'/../../../../bootstrap.php';
 
-use Symfony\Components\CLI\Task\Task;
+use Symfony\Components\CLI\Command\Command;
 use Symfony\Components\CLI\Output\Output;
-use Symfony\Components\CLI\Tester\TaskTester;
+use Symfony\Components\CLI\Tester\CommandTester;
 
 $t = new LimeTest(6);
 
-$task = new Task('foo');
-$task->addArgument('task');
-$task->addArgument('foo');
-$task->setCode(function ($input, $output) { $output->write('foo'); });
+$command = new Command('foo');
+$command->addArgument('command');
+$command->addArgument('foo');
+$command->setCode(function ($input, $output) { $output->write('foo'); });
 
-$tester = new TaskTester($task);
+$tester = new CommandTester($command);
 $tester->execute(array('foo' => 'bar'), array('interactive' => false, 'decorated' => false, 'verbosity' => Output::VERBOSITY_VERBOSE));
 
 // ->execute()

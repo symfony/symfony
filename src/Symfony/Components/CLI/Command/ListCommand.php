@@ -1,6 +1,6 @@
 <?php
 
-namespace Symfony\Components\CLI\Task;
+namespace Symfony\Components\CLI\Command;
 
 use Symfony\Components\CLI\Input\Definition;
 use Symfony\Components\CLI\Input\Argument;
@@ -8,7 +8,7 @@ use Symfony\Components\CLI\Input\Option;
 use Symfony\Components\CLI\Input\InputInterface;
 use Symfony\Components\CLI\Output\OutputInterface;
 use Symfony\Components\CLI\Output\Output;
-use Symfony\Components\CLI\Task\Task;
+use Symfony\Components\CLI\Command\Command;
 
 /*
  * This file is part of the symfony framework.
@@ -20,16 +20,16 @@ use Symfony\Components\CLI\Task\Task;
  */
 
 /**
- * ListTask displays the list of all available tasks for the application.
+ * ListCommand displays the list of all available commands for the application.
  *
  * @package    symfony
  * @subpackage cli
  * @author     Fabien Potencier <fabien.potencier@symfony-project.com>
  */
-class ListTask extends Task
+class ListCommand extends Command
 {
   /**
-   * @see Task
+   * @see Command
    */
   protected function configure()
   {
@@ -39,13 +39,13 @@ class ListTask extends Task
         new Option('xml', null, Option::PARAMETER_NONE, 'To output help as XML'),
       ))
       ->setName('list')
-      ->setDescription('Lists tasks')
+      ->setDescription('Lists commands')
       ->setHelp(<<<EOF
-The <info>list</info> task lists all tasks:
+The <info>list</info> command lists all commands:
 
   <info>./symfony list</info>
 
-You can also display the tasks for a specific namespace:
+You can also display the commands for a specific namespace:
 
   <info>./symfony list test</info>
 
@@ -57,7 +57,7 @@ EOF
   }
 
   /**
-   * @see Task
+   * @see Command
    */
   protected function execute(InputInterface $input, OutputInterface $output)
   {

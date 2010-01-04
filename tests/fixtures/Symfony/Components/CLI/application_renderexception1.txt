@@ -1,8 +1,8 @@
 
 
-                              
-  [InvalidArgumentException]  
-  Task "foo" is not defined.  
-                              
+                                 
+  [InvalidArgumentException]     
+  Command "foo" is not defined.  
+                                 
 
 

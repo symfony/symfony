@@ -1,14 +1,14 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<task id="namespace:name" namespace="namespace" name="name">
-  <usage> namespace:name [-h|--help] [-q|--quiet] [-v|--verbose] [-V|--version] [-c|--color] [-n|--no-interaction] task</usage>
+<command id="namespace:name" namespace="namespace" name="name">
+  <usage> namespace:name [-h|--help] [-q|--quiet] [-v|--verbose] [-V|--version] [-c|--color] [-n|--no-interaction] command</usage>
   <description>description</description>
   <help>help</help>
   <aliases>
     <alias>name</alias>
   </aliases>
   <arguments>
-    <argument name="task" is_required="1" is_array="0">
-      <description>The task to execute</description>
+    <argument name="command" is_required="1" is_array="0">
+      <description>The command to execute</description>
       <defaults/>
     </argument>
   </arguments>
@@ -32,4 +32,4 @@
       <description>Do not ask any interactive question.</description>
     </option>
   </options>
-</task>
+</command>

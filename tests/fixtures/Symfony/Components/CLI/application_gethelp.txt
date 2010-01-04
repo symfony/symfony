@@ -1,7 +1,7 @@
 <info>UNKNOWN</info> version <comment>UNKNOWN</comment>
 
 <comment>Usage:</comment>
-  UNKNOWN [options] task [arguments]
+  UNKNOWN [options] command [arguments]
 
 <comment>Options:</comment>
   <info>--help</info>      <info>-h</info>  Display this help message.

@@ -1,9 +1,9 @@
 Usage:
- UNKNOWN help [--xml] [-h|--help] [-q|--quiet] [-v|--verbose] [-V|--version] [-c|--color] [-n|--no-interaction] task [task_name]
+ UNKNOWN help [--xml] [-h|--help] [-q|--quiet] [-v|--verbose] [-V|--version] [-c|--color] [-n|--no-interaction] command [command_name]
 
 Arguments:
- task              The task to execute
- task_name         The task name (default: help)
+ command           The command to execute
+ command_name      The command name (default: help)
 
 Options:
  --xml To output help as XML
@@ -15,7 +15,7 @@ Options:
  --no-interaction (-n) Do not ask any interactive question.
 
 Help:
- The help task displays help for a given task:
+ The help command displays help for a given command:
  
    ./symfony help test:all
  

@@ -1,10 +1,10 @@
 <?php
 
-use Symfony\Components\CLI\Task\Task;
+use Symfony\Components\CLI\Command\Command;
 use Symfony\Components\CLI\Input\InputInterface;
 use Symfony\Components\CLI\Output\OutputInterface;
 
-class TestTask extends Task
+class TestCommand extends Command
 {
   protected function configure()
   {

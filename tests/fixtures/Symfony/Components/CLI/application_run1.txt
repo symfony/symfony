@@ -1,0 +1,16 @@
+UNKNOWN version UNKNOWN
+
+Usage:
+  UNKNOWN [options] task [arguments]
+
+Options:
+  --help      -h  Display this help message.
+  --quiet     -q  Do not output any message.
+  --verbose   -v  Increase verbosity of messages.
+  --version   -V  Display this program version.
+  --color     -c  Force ANSI color output.
+  --no-interaction -n  Do not ask any interactive question.
+
+Available tasks:
+  help   Displays help for a task
+  list   Lists tasks

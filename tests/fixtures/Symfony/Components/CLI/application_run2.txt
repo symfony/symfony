@@ -1,0 +1,25 @@
+Usage:
+ UNKNOWN help [--xml] [-h|--help] [-q|--quiet] [-v|--verbose] [-V|--version] [-c|--color] [-n|--no-interaction] task [task_name]
+
+Arguments:
+ task              The task to execute
+ task_name         The task name (default: help)
+
+Options:
+ --xml To output help as XML
+ --help (-h) Display this help message.
+ --quiet (-q) Do not output any message.
+ --verbose (-v) Increase verbosity of messages.
+ --version (-V) Display this program version.
+ --color (-c) Force ANSI color output.
+ --no-interaction (-n) Do not ask any interactive question.
+
+Help:
+ The help task displays help for a given task:
+ 
+   ./symfony help test:all
+ 
+ You can also output the help as XML by using the --xml option:
+ 
+   ./symfony help --xml test:all
+

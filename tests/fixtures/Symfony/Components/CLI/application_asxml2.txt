@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<symfony>
+  <tasks namespace="foo">
+    <task id="foo:bar" namespace="foo" name="bar">
+  <usage> foo:bar </usage>
+  <description>The foo:bar task</description>
+  <help/>
+  <aliases>
+    <alias>afoobar</alias>
+  </aliases>
+  <arguments/>
+  <options/>
+</task>
+  </tasks>
+</symfony>

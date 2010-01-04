@@ -1,0 +1,22 @@
+Usage:
+ UNKNOWN list [--xml] [namespace]
+
+Arguments:
+ namespace  The namespace name
+
+Options:
+ --xml To output help as XML
+
+Help:
+ The list task lists all tasks:
+ 
+   ./symfony list
+ 
+ You can also display the tasks for a specific namespace:
+ 
+   ./symfony list test
+ 
+ You can also output the information as XML by using the --xml option:
+ 
+   ./symfony list --xml
+

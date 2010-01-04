@@ -1,0 +1,11 @@
+
+
+                                      
+  [RuntimeException]                  
+  The "--foo" option does not exist.  
+                                      
+
+
+UNKNOWN list [--xml] [-h|--help] [-q|--quiet] [-v|--verbose] [-V|--version] [-c|--color] [-n|--no-interaction] task [namespace]
+
+

@@ -16,7 +16,6 @@ namespace Symfony\Components\YAML;
  * @package    symfony
  * @subpackage yaml
  * @author     Fabien Potencier <fabien.potencier@symfony-project.com>
- * @version    SVN: $Id: Yaml.class.php 8988 2008-05-15 20:24:26Z fabien $
  */
 class YAML
 {

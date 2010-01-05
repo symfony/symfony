@@ -16,7 +16,6 @@ namespace Symfony\Components\YAML;
  * @package    symfony
  * @subpackage yaml
  * @author     Fabien Potencier <fabien.potencier@symfony-project.com>
- * @version    SVN: $Id: Parser.class.php 10832 2008-08-13 07:46:08Z fabien $
  */
 class Parser
 {

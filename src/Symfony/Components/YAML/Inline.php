@@ -16,7 +16,6 @@ namespace Symfony\Components\YAML;
  * @package    symfony
  * @subpackage yaml
  * @author     Fabien Potencier <fabien.potencier@symfony-project.com>
- * @version    SVN: $Id: Inline.class.php 16177 2009-03-11 08:32:48Z fabien $
  */
 class Inline
 {

@@ -25,7 +25,6 @@ use Symfony\Components\YAML\YAML;
  * @package    symfony
  * @subpackage dependency_injection
  * @author     Fabien Potencier <fabien.potencier@symfony-project.com>
- * @version    SVN: $Id: sfServiceContainerLoaderFileYaml.php 269 2009-03-26 20:39:16Z fabien $
  */
 class YamlFileLoader extends FileLoader
 {

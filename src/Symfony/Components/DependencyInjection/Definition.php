@@ -17,7 +17,6 @@ namespace Symfony\Components\DependencyInjection;
  * @package    symfony
  * @subpackage dependency_injection
  * @author     Fabien Potencier <fabien.potencier@symfony-project.com>
- * @version    SVN: $Id: Definition.php 269 2009-03-26 20:39:16Z fabien $
  */
 class Definition
 {

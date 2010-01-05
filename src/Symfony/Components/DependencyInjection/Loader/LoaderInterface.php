@@ -23,7 +23,6 @@ namespace Symfony\Components\DependencyInjection\Loader;
  * @package    symfony
  * @subpackage dependency_injection
  * @author     Fabien Potencier <fabien.potencier@symfony-project.com>
- * @version    SVN: $Id$
  */
 interface LoaderInterface
 {

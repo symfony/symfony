@@ -17,7 +17,6 @@ namespace Symfony\Components\DependencyInjection;
  * @package    symfony
  * @subpackage dependency_injection
  * @author     Fabien Potencier <fabien.potencier@symfony-project.com>
- * @version    SVN: $Id: Reference.php 267 2009-03-26 19:56:18Z fabien $
  */
 class Parameter
 {

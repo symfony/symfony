@@ -22,7 +22,6 @@ use Symfony\Components\DependencyInjection\SimpleXMLElement;
  * @package    symfony
  * @subpackage dependency_injection
  * @author     Fabien Potencier <fabien.potencier@symfony-project.com>
- * @version    SVN: $Id: LoaderFileXml.php 267 2009-03-26 19:56:18Z fabien $
  */
 class XmlFileLoader extends FileLoader
 {

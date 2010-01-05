@@ -20,7 +20,6 @@ require_once __DIR__.'/escaping_helpers.php';
  * @subpackage output_escaper
  * @author     Fabien Potencier <fabien.potencier@symfony-project.com>
  * @author     Mike Squire <mike@somosis.co.uk>
- * @version    SVN: $Id: Escaper.class.php 21908 2009-09-11 12:06:21Z fabien $
  */
 abstract class Escaper
 {

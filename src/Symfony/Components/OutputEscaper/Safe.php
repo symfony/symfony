@@ -17,7 +17,6 @@ namespace Symfony\Components\OutputEscaper;
  * @package    symfony
  * @subpackage output_escaper
  * @author     Fabien Potencier <fabien.potencier@symfony-project.com>
- * @version    SVN: $Id: Safe.class.php 16553 2009-03-24 16:49:06Z Kris.Wallsmith $
  */
 class Safe extends \ArrayIterator
 {

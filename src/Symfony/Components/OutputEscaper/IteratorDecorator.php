@@ -22,7 +22,6 @@ namespace Symfony\Components\OutputEscaper;
  * @subpackage output_escaper
  * @author     Fabien Potencier <fabien.potencier@symfony-project.com>
  * @author     Mike Squire <mike@somosis.co.uk>
- * @version    SVN: $Id: IteratorDecorator.class.php 15624 2009-02-19 10:53:30Z fabien $
  */
 class IteratorDecorator extends ObjectDecorator implements \Iterator, \Countable, \ArrayAccess
 {

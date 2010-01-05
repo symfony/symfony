@@ -18,7 +18,6 @@ namespace Symfony\Components\EventDispatcher;
  * @package    symfony
  * @subpackage event_dispatcher
  * @author     Fabien Potencier <fabien.potencier@symfony-project.com>
- * @version    SVN: $Id: EventDispatcher.class.php 10631 2008-08-03 16:50:47Z fabien $
  */
 class EventDispatcher
 {

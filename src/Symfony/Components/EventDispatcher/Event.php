@@ -16,7 +16,6 @@ namespace Symfony\Components\EventDispatcher;
  * @package    symfony
  * @subpackage event_dispatcher
  * @author     Fabien Potencier <fabien.potencier@symfony-project.com>
- * @version    SVN: $Id: Event.class.php 8698 2008-04-30 16:35:28Z fabien $
  */
 class Event implements \ArrayAccess
 {

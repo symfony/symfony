@@ -21,7 +21,6 @@ use Symfony\Components\Templating\Renderer\PhpRenderer;
  * @package    symfony
  * @subpackage templating
  * @author     Fabien Potencier <fabien.potencier@symfony-project.com>
- * @version    SVN: $Id$
  */
 class Engine
 {

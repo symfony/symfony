@@ -21,7 +21,6 @@ use Symfony\Components\Templating\Storage\StringStorage;
  * @package    symfony
  * @subpackage templating
  * @author     Fabien Potencier <fabien.potencier@symfony-project.com>
- * @version    SVN: $Id$
  */
 class PhpRenderer extends Renderer
 {

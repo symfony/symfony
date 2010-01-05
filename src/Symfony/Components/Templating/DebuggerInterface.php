@@ -18,7 +18,6 @@ namespace Symfony\Components\Templating;
  * @package    symfony
  * @subpackage templating
  * @author     Fabien Potencier <fabien.potencier@symfony-project.com>
- * @version    SVN: $Id$
  */
 interface DebuggerInterface
 {

@@ -19,7 +19,6 @@ use Symfony\Components\Templating\DebuggerInterface;
  * @package    symfony
  * @subpackage templating
  * @author     Fabien Potencier <fabien.potencier@symfony-project.com>
- * @version    SVN: $Id$
  */
 abstract class Loader implements LoaderInterface
 {

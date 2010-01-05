@@ -23,7 +23,6 @@ namespace Symfony\Components\Templating\Helper;
  * @package    symfony
  * @subpackage templating
  * @author     Fabien Potencier <fabien.potencier@symfony-project.com>
- * @version    SVN: $Id$
  */
 class AssetsHelper extends Helper
 {

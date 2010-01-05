@@ -20,7 +20,6 @@ use Symfony\Components\Templating\Storage\Storage;
  * @package    symfony
  * @subpackage templating
  * @author     Fabien Potencier <fabien.potencier@symfony-project.com>
- * @version    SVN: $Id$
  */
 interface RendererInterface
 {

@@ -1,4 +1,4 @@
-<info>UNKNOWN</info> version <comment>UNKNOWN</comment>
+<info>CLI Tool</info>
 
 <comment>Usage:</comment>
   UNKNOWN [options] command [arguments]

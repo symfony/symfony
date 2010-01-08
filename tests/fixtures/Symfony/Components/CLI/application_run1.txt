@@ -1,4 +1,4 @@
-UNKNOWN version UNKNOWN
+CLI Tool
 
 Usage:
   UNKNOWN [options] command [arguments]

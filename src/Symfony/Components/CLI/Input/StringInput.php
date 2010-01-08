@@ -31,9 +31,9 @@ class StringInput extends ArgvInput
    * Constructor.
    *
    * @param string     $input An array of parameters from the CLI (in the argv format)
-   * @param Definition $definition A Definition instance
+   * @param InputDefinition $definition A InputDefinition instance
    */
-  public function __construct($input, Definition $definition = null)
+  public function __construct($input, InputDefinition $definition = null)
   {
     parent::__construct(array(), $definition);
 

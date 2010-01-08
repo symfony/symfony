@@ -34,13 +34,13 @@ abstract class Input implements InputInterface
   /**
    * Constructor.
    *
-   * @param Definition $definition A Definition instance
+   * @param InputDefinition $definition A InputDefinition instance
    */
-  public function __construct(Definition $definition = null)
+  public function __construct(InputDefinition $definition = null)
   {
     if (null === $definition)
     {
-      $this->definition = new Definition();
+      $this->definition = new InputDefinition();
     }
     else
     {
@@ -52,9 +52,9 @@ abstract class Input implements InputInterface
   /**
    * Binds the current Input instance with the given arguments and options.
    *
-   * @param Definition $definition A Definition instance
+   * @param InputDefinition $definition A InputDefinition instance
    */
-  public function bind(Definition $definition)
+  public function bind(InputDefinition $definition)
   {
     $this->arguments = array();
     $this->options = array();

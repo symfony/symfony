@@ -42,9 +42,9 @@ interface InputInterface
   /**
    * Binds the current Input instance with the given arguments and options.
    *
-   * @param Definition $definition A Definition instance
+   * @param InputDefinition $definition A InputDefinition instance
    */
-  function bind(Definition $definition);
+  function bind(InputDefinition $definition);
 
   function validate();
 

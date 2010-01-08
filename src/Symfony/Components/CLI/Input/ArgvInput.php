@@ -47,9 +47,9 @@ class ArgvInput extends Input
    * Constructor.
    *
    * @param array      $argv An array of parameters from the CLI (in the argv format)
-   * @param Definition $definition A Definition instance
+   * @param InputDefinition $definition A InputDefinition instance
    */
-  public function __construct(array $argv = null, Definition $definition = null)
+  public function __construct(array $argv = null, InputDefinition $definition = null)
   {
     if (null === $argv)
     {

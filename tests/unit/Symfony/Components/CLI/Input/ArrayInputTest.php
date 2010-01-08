@@ -11,9 +11,9 @@
 require_once __DIR__.'/../../../../bootstrap.php';
 
 use Symfony\Components\CLI\Input\ArrayInput;
-use Symfony\Components\CLI\Input\Definition;
-use Symfony\Components\CLI\Input\Argument;
-use Symfony\Components\CLI\Input\Option;
+use Symfony\Components\CLI\Input\InputDefinition;
+use Symfony\Components\CLI\Input\InputArgument;
+use Symfony\Components\CLI\Input\InputOption;
 
 $t = new LimeTest(15);
 
@@ -37,12 +37,12 @@ $t->ok($input->hasParameterOption('--foo'), '->hasParameterOption() returns true
 
 // ->parse()
 $t->diag('->parse()');
-$input = new ArrayInput(array('name' => 'foo'), new Definition(array(new Argument('name'))));
+$input = new ArrayInput(array('name' => 'foo'), new InputDefinition(array(new InputArgument('name'))));
 $t->is($input->getArguments(), array('name' => 'foo'), '->parse() parses required arguments');
 
 try
 {
-  $input = new ArrayInput(array('foo' => 'foo'), new Definition(array(new Argument('name'))));
+  $input = new ArrayInput(array('foo' => 'foo'), new InputDefinition(array(new InputArgument('name'))));
   $t->fail('->parse() throws an \InvalidArgumentException exception if an invalid argument is passed');
 }
 catch (\RuntimeException $e)
@@ -50,18 +50,18 @@ catch (\RuntimeException $e)
   $t->pass('->parse() throws an \InvalidArgumentException exception if an invalid argument is passed');
 }
 
-$input = new ArrayInput(array('--foo' => 'bar'), new Definition(array(new Option('foo'))));
+$input = new ArrayInput(array('--foo' => 'bar'), new InputDefinition(array(new InputOption('foo'))));
 $t->is($input->getOptions(), array('foo' => 'bar'), '->parse() parses long options');
 
-$input = new ArrayInput(array('--foo' => 'bar'), new Definition(array(new Option('foo', 'f', Option::PARAMETER_OPTIONAL, '', 'default'))));
+$input = new ArrayInput(array('--foo' => 'bar'), new InputDefinition(array(new InputOption('foo', 'f', InputOption::PARAMETER_OPTIONAL, '', 'default'))));
 $t->is($input->getOptions(), array('foo' => 'bar'), '->parse() parses long options with a default value');
 
-$input = new ArrayInput(array('--foo' => null), new Definition(array(new Option('foo', 'f', Option::PARAMETER_OPTIONAL, '', 'default'))));
+$input = new ArrayInput(array('--foo' => null), new InputDefinition(array(new InputOption('foo', 'f', InputOption::PARAMETER_OPTIONAL, '', 'default'))));
 $t->is($input->getOptions(), array('foo' => 'default'), '->parse() parses long options with a default value');
 
 try
 {
-  $input = new ArrayInput(array('--foo' => null), new Definition(array(new Option('foo', 'f', Option::PARAMETER_REQUIRED))));
+  $input = new ArrayInput(array('--foo' => null), new InputDefinition(array(new InputOption('foo', 'f', InputOption::PARAMETER_REQUIRED))));
   $t->fail('->parse() throws an \InvalidArgumentException exception if a required option is passed without a value');
 }
 catch (\RuntimeException $e)
@@ -71,7 +71,7 @@ catch (\RuntimeException $e)
 
 try
 {
-  $input = new ArrayInput(array('--foo' => 'foo'), new Definition());
+  $input = new ArrayInput(array('--foo' => 'foo'), new InputDefinition());
   $t->fail('->parse() throws an \InvalidArgumentException exception if an invalid option is passed');
 }
 catch (\RuntimeException $e)
@@ -79,12 +79,12 @@ catch (\RuntimeException $e)
   $t->pass('->parse() throws an \InvalidArgumentException exception if an invalid option is passed');
 }
 
-$input = new ArrayInput(array('-f' => 'bar'), new Definition(array(new Option('foo', 'f'))));
+$input = new ArrayInput(array('-f' => 'bar'), new InputDefinition(array(new InputOption('foo', 'f'))));
 $t->is($input->getOptions(), array('foo' => 'bar'), '->parse() parses short options');
 
 try
 {
-  $input = new ArrayInput(array('-o' => 'foo'), new Definition());
+  $input = new ArrayInput(array('-o' => 'foo'), new InputDefinition());
   $t->fail('->parse() throws an \InvalidArgumentException exception if an invalid option is passed');
 }
 catch (\RuntimeException $e)

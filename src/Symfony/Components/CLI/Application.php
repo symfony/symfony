@@ -5,9 +5,9 @@ namespace Symfony\Components\CLI;
 use Symfony\Components\CLI\Input\InputInterface;
 use Symfony\Components\CLI\Input\ArgvInput;
 use Symfony\Components\CLI\Input\ArrayInput;
-use Symfony\Components\CLI\Input\Definition;
-use Symfony\Components\CLI\Input\Option;
-use Symfony\Components\CLI\Input\Argument;
+use Symfony\Components\CLI\Input\InputDefinition;
+use Symfony\Components\CLI\Input\InputOption;
+use Symfony\Components\CLI\Input\InputArgument;
 use Symfony\Components\CLI\Output\OutputInterface;
 use Symfony\Components\CLI\Output\Output;
 use Symfony\Components\CLI\Output\ConsoleOutput;
@@ -72,15 +72,15 @@ class Application
     $this->addCommand(new HelpCommand());
     $this->addCommand(new ListCommand());
 
-    $this->definition = new Definition(array(
-      new Argument('command', Argument::REQUIRED, 'The command to execute'),
+    $this->definition = new InputDefinition(array(
+      new InputArgument('command', InputArgument::REQUIRED, 'The command to execute'),
 
-      new Option('--help',           '-h', Option::PARAMETER_NONE, 'Display this help message.'),
-      new Option('--quiet',          '-q', Option::PARAMETER_NONE, 'Do not output any message.'),
-      new Option('--verbose',        '-v', Option::PARAMETER_NONE, 'Increase verbosity of messages.'),
-      new Option('--version',        '-V', Option::PARAMETER_NONE, 'Display this program version.'),
-      new Option('--color',          '-c', Option::PARAMETER_NONE, 'Force ANSI color output.'),
-      new Option('--no-interaction', '-n', Option::PARAMETER_NONE, 'Do not ask any interactive question.'),
+      new InputOption('--help',           '-h', InputOption::PARAMETER_NONE, 'Display this help message.'),
+      new InputOption('--quiet',          '-q', InputOption::PARAMETER_NONE, 'Do not output any message.'),
+      new InputOption('--verbose',        '-v', InputOption::PARAMETER_NONE, 'Increase verbosity of messages.'),
+      new InputOption('--version',        '-V', InputOption::PARAMETER_NONE, 'Display this program version.'),
+      new InputOption('--color',          '-c', InputOption::PARAMETER_NONE, 'Force ANSI color output.'),
+      new InputOption('--no-interaction', '-n', InputOption::PARAMETER_NONE, 'Do not ask any interactive question.'),
     ));
   }
 
@@ -201,9 +201,9 @@ class Application
   }
 
   /**
-   * Gets the Definition related to this Application.
+   * Gets the InputDefinition related to this Application.
    *
-   * @return Definition The Definition instance
+   * @return InputDefinition The InputDefinition instance
    */
   public function getDefinition()
   {

@@ -12,20 +12,20 @@ namespace Symfony\Components\CLI\Input;
  */
 
 /**
- * A Definition represents a set of valid command line arguments and options.
+ * A InputDefinition represents a set of valid command line arguments and options.
  *
  * Usage:
  *
- *     $definition = new Definition(array(
- *       new Argument('name', Argument::REQUIRED),
- *       new Option('foo', 'f', Option::PARAMETER_REQUIRED),
+ *     $definition = new InputDefinition(array(
+ *       new InputArgument('name', InputArgument::REQUIRED),
+ *       new InputOption('foo', 'f', InputOption::PARAMETER_REQUIRED),
  *     ));
  *
  * @package    symfony
  * @subpackage cli
  * @author     Fabien Potencier <fabien.potencier@symfony-project.com>
  */
-class Definition
+class InputDefinition
 {
   protected $arguments;
   protected $requiredCount;
@@ -37,7 +37,7 @@ class Definition
   /**
    * Constructor.
    *
-   * @param array $definition An array of Argument and Option instance
+   * @param array $definition An array of InputArgument and InputOption instance
    */
   public function __construct(array $definition = array())
   {
@@ -50,7 +50,7 @@ class Definition
     $options = array();
     foreach ($definition as $item)
     {
-      if ($item instanceof Option)
+      if ($item instanceof InputOption)
       {
         $options[] = $item;
       }
@@ -65,9 +65,9 @@ class Definition
   }
 
   /**
-   * Sets the Argument objects.
+   * Sets the InputArgument objects.
    *
-   * @param array $arguments An array of Argument objects
+   * @param array $arguments An array of InputArgument objects
    */
   public function setArguments($arguments = array())
   {
@@ -78,9 +78,9 @@ class Definition
   }
 
   /**
-   * Add an array of Argument objects.
+   * Add an array of InputArgument objects.
    *
-   * @param array $arguments An array of Argument objects
+   * @param array $arguments An array of InputArgument objects
    */
   public function addArguments($arguments = array())
   {
@@ -94,11 +94,11 @@ class Definition
   }
 
   /**
-   * Add an Argument object.
+   * Add an InputArgument object.
    *
-   * @param Argument $argument An Argument object
+   * @param InputArgument $argument An InputArgument object
    */
-  public function addArgument(Argument $argument)
+  public function addArgument(InputArgument $argument)
   {
     if (isset($this->arguments[$argument->getName()]))
     {
@@ -133,11 +133,11 @@ class Definition
   }
 
   /**
-   * Returns an Argument by name or by position.
+   * Returns an InputArgument by name or by position.
    *
-   * @param string|integer $name The Argument name or position
+   * @param string|integer $name The InputArgument name or position
    *
-   * @return Argument An Argument object
+   * @return InputArgument An InputArgument object
    */
   public function getArgument($name)
   {
@@ -152,11 +152,11 @@ class Definition
   }
 
   /**
-   * Returns true if an Argument object exists by name or position.
+   * Returns true if an InputArgument object exists by name or position.
    *
-   * @param string|integer $name The Argument name or position
+   * @param string|integer $name The InputArgument name or position
    *
-   * @return Boolean true if the Argument object exists, false otherwise
+   * @return Boolean true if the InputArgument object exists, false otherwise
    */
   public function hasArgument($name)
   {
@@ -166,9 +166,9 @@ class Definition
   }
 
   /**
-   * Gets the array of Argument objects.
+   * Gets the array of InputArgument objects.
    *
-   * @return array An array of Argument objects
+   * @return array An array of InputArgument objects
    */
   public function getArguments()
   {
@@ -176,9 +176,9 @@ class Definition
   }
 
   /**
-   * Returns the number of Arguments.
+   * Returns the number of InputArguments.
    *
-   * @return integer The number of Arguments
+   * @return integer The number of InputArguments
    */
   public function getArgumentCount()
   {
@@ -186,9 +186,9 @@ class Definition
   }
 
   /**
-   * Returns the number of required Arguments.
+   * Returns the number of required InputArguments.
    *
-   * @return integer The number of required Arguments
+   * @return integer The number of required InputArguments
    */
   public function getArgumentRequiredCount()
   {
@@ -212,9 +212,9 @@ class Definition
   }
 
   /**
-   * Sets the Option objects.
+   * Sets the InputOption objects.
    *
-   * @param array $options An array of Option objects
+   * @param array $options An array of InputOption objects
    */
   public function setOptions($options = array())
   {
@@ -224,9 +224,9 @@ class Definition
   }
 
   /**
-   * Add an array of Option objects.
+   * Add an array of InputOption objects.
    *
-   * @param array $options An array of Option objects
+   * @param array $options An array of InputOption objects
    */
   public function addOptions($options = array())
   {
@@ -237,11 +237,11 @@ class Definition
   }
 
   /**
-   * Add an Option object.
+   * Add an InputOption object.
    *
-   * @param Option $option An Option object
+   * @param InputOption $option An InputOption object
    */
-  public function addOption(Option $option)
+  public function addOption(InputOption $option)
   {
     if (isset($this->options[$option->getName()]))
     {
@@ -260,11 +260,11 @@ class Definition
   }
 
   /**
-   * Returns an Option by name.
+   * Returns an InputOption by name.
    *
-   * @param string $name The Option name
+   * @param string $name The InputOption name
    *
-   * @return Option A Option object
+   * @return InputOption A InputOption object
    */
   public function getOption($name)
   {
@@ -277,11 +277,11 @@ class Definition
   }
 
   /**
-   * Returns true if an Option object exists by name.
+   * Returns true if an InputOption object exists by name.
    *
-   * @param string $name The Option name
+   * @param string $name The InputOption name
    *
-   * @return Boolean true if the Option object exists, false otherwise
+   * @return Boolean true if the InputOption object exists, false otherwise
    */
   public function hasOption($name)
   {
@@ -289,9 +289,9 @@ class Definition
   }
 
   /**
-   * Gets the array of Option objects.
+   * Gets the array of InputOption objects.
    *
-   * @return array An array of Option objects
+   * @return array An array of InputOption objects
    */
   public function getOptions()
   {
@@ -299,11 +299,11 @@ class Definition
   }
 
   /**
-   * Returns true if an Option object exists by shortcut.
+   * Returns true if an InputOption object exists by shortcut.
    *
-   * @param string $name The Option shortcut
+   * @param string $name The InputOption shortcut
    *
-   * @return Boolean true if the Option object exists, false otherwise
+   * @return Boolean true if the InputOption object exists, false otherwise
    */
   public function hasShortcut($name)
   {
@@ -311,9 +311,9 @@ class Definition
   }
 
   /**
-   * Gets an Option by shortcut.
+   * Gets an InputOption by shortcut.
    *
-   * @return Option An Option object
+   * @return InputOption An InputOption object
    */
   public function getOptionForShortcut($shortcut)
   {
@@ -337,11 +337,11 @@ class Definition
   }
 
   /**
-   * Returns the Option name given a shortcut.
+   * Returns the InputOption name given a shortcut.
    *
    * @param string $shortcut The shortcut
    *
-   * @return string The Option name
+   * @return string The InputOption name
    */
   protected function shortcutToName($shortcut)
   {
@@ -381,9 +381,9 @@ class Definition
   }
 
   /**
-   * Returns a textual representation of the Definition.
+   * Returns a textual representation of the InputDefinition.
    *
-   * @return string A string representing the Definition
+   * @return string A string representing the InputDefinition
    */
   public function asText()
   {
@@ -447,11 +447,11 @@ class Definition
   }
 
   /**
-   * Returns an XML representation of the Definition.
+   * Returns an XML representation of the InputDefinition.
    *
    * @param Boolean $asDom Whether to return a DOM or an XML string
    *
-   * @return string|DOMDocument An XML string representing the Definition
+   * @return string|DOMDocument An XML string representing the InputDefinition
    */
   public function asXml($asDom = false)
   {

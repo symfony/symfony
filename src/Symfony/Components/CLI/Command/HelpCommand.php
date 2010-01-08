@@ -2,9 +2,8 @@
 
 namespace Symfony\Components\CLI\Command;
 
-use Symfony\Components\CLI\Input\Definition;
-use Symfony\Components\CLI\Input\Argument;
-use Symfony\Components\CLI\Input\Option;
+use Symfony\Components\CLI\Input\InputArgument;
+use Symfony\Components\CLI\Input\InputOption;
 use Symfony\Components\CLI\Input\InputInterface;
 use Symfony\Components\CLI\Output\OutputInterface;
 use Symfony\Components\CLI\Output\Output;
@@ -39,8 +38,8 @@ class HelpCommand extends Command
 
     $this
       ->setDefinition(array(
-        new Argument('command_name', Argument::OPTIONAL, 'The command name', 'help'),
-        new Option('xml', null, Option::PARAMETER_NONE, 'To output help as XML'),
+        new InputArgument('command_name', InputArgument::OPTIONAL, 'The command name', 'help'),
+        new InputOption('xml', null, InputOption::PARAMETER_NONE, 'To output help as XML'),
       ))
       ->setName('help')
       ->setDescription('Displays help for a command')

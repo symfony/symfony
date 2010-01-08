@@ -2,9 +2,8 @@
 
 namespace Symfony\Components\CLI\Command;
 
-use Symfony\Components\CLI\Input\Definition;
-use Symfony\Components\CLI\Input\Argument;
-use Symfony\Components\CLI\Input\Option;
+use Symfony\Components\CLI\Input\InputArgument;
+use Symfony\Components\CLI\Input\InputOption;
 use Symfony\Components\CLI\Input\InputInterface;
 use Symfony\Components\CLI\Output\OutputInterface;
 use Symfony\Components\CLI\Output\Output;
@@ -35,8 +34,8 @@ class ListCommand extends Command
   {
     $this
       ->setDefinition(array(
-        new Argument('namespace', Argument::OPTIONAL, 'The namespace name'),
-        new Option('xml', null, Option::PARAMETER_NONE, 'To output help as XML'),
+        new InputArgument('namespace', InputArgument::OPTIONAL, 'The namespace name'),
+        new InputOption('xml', null, InputOption::PARAMETER_NONE, 'To output help as XML'),
       ))
       ->setName('list')
       ->setDescription('Lists commands')

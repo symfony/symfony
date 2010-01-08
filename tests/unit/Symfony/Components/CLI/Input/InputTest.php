@@ -11,27 +11,27 @@
 require_once __DIR__.'/../../../../bootstrap.php';
 
 use Symfony\Components\CLI\Input\ArrayInput;
-use Symfony\Components\CLI\Input\Definition;
-use Symfony\Components\CLI\Input\Argument;
-use Symfony\Components\CLI\Input\Option;
+use Symfony\Components\CLI\Input\InputDefinition;
+use Symfony\Components\CLI\Input\InputArgument;
+use Symfony\Components\CLI\Input\InputOption;
 
 $t = new LimeTest(19);
 
 // __construct()
 $t->diag('__construct()');
-$input = new ArrayInput(array('name' => 'foo'), new Definition(array(new Argument('name'))));
-$t->is($input->getArgument('name'), 'foo', '->__construct() takes a Definition as an argument');
+$input = new ArrayInput(array('name' => 'foo'), new InputDefinition(array(new InputArgument('name'))));
+$t->is($input->getArgument('name'), 'foo', '->__construct() takes a InputDefinition as an argument');
 
 // ->getOption() ->setOption() ->getOptions()
 $t->diag('->getOption() ->setOption() ->getOptions()');
-$input = new ArrayInput(array('--name' => 'foo'), new Definition(array(new Option('name'))));
+$input = new ArrayInput(array('--name' => 'foo'), new InputDefinition(array(new InputOption('name'))));
 $t->is($input->getOption('name'), 'foo', '->getOption() returns the value for the given option');
 
 $input->setOption('name', 'bar');
 $t->is($input->getOption('name'), 'bar', '->setOption() sets the value for a given option');
 $t->is($input->getOptions(), array('name' => 'bar'), '->getOptions() returns all option values');
 
-$input = new ArrayInput(array('--name' => 'foo'), new Definition(array(new Option('name'), new Option('bar', '', Option::PARAMETER_OPTIONAL, '', 'default'))));
+$input = new ArrayInput(array('--name' => 'foo'), new InputDefinition(array(new InputOption('name'), new InputOption('bar', '', InputOption::PARAMETER_OPTIONAL, '', 'default'))));
 $t->is($input->getOption('bar'), 'default', '->getOption() returns the default value for optional options');
 $t->is($input->getOptions(), array('name' => 'foo', 'bar' => 'default'), '->getOptions() returns all option values, even optional ones');
 
@@ -57,14 +57,14 @@ catch (\InvalidArgumentException $e)
 
 // ->getArgument() ->setArgument() ->getArguments()
 $t->diag('->getArgument() ->setArgument() ->getArguments()');
-$input = new ArrayInput(array('name' => 'foo'), new Definition(array(new Argument('name'))));
+$input = new ArrayInput(array('name' => 'foo'), new InputDefinition(array(new InputArgument('name'))));
 $t->is($input->getArgument('name'), 'foo', '->getArgument() returns the value for the given argument');
 
 $input->setArgument('name', 'bar');
 $t->is($input->getArgument('name'), 'bar', '->setArgument() sets the value for a given argument');
 $t->is($input->getArguments(), array('name' => 'bar'), '->getArguments() returns all argument values');
 
-$input = new ArrayInput(array('name' => 'foo'), new Definition(array(new Argument('name'), new Argument('bar', Argument::OPTIONAL, '', 'default'))));
+$input = new ArrayInput(array('name' => 'foo'), new InputDefinition(array(new InputArgument('name'), new InputArgument('bar', InputArgument::OPTIONAL, '', 'default'))));
 $t->is($input->getArgument('bar'), 'default', '->getArgument() returns the default value for optional arguments');
 $t->is($input->getArguments(), array('name' => 'foo', 'bar' => 'default'), '->getArguments() returns all argument values, even optional ones');
 
@@ -91,7 +91,7 @@ catch (\InvalidArgumentException $e)
 // ->validate()
 $t->diag('->validate()');
 $input = new ArrayInput(array());
-$input->bind(new Definition(array(new Argument('name', Argument::REQUIRED))));
+$input->bind(new InputDefinition(array(new InputArgument('name', InputArgument::REQUIRED))));
 
 try
 {
@@ -104,7 +104,7 @@ catch (\RuntimeException $e)
 }
 
 $input = new ArrayInput(array('name' => 'foo'));
-$input->bind(new Definition(array(new Argument('name', Argument::REQUIRED))));
+$input->bind(new InputDefinition(array(new InputArgument('name', InputArgument::REQUIRED))));
 
 try
 {

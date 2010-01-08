@@ -18,7 +18,7 @@ namespace Symfony\Components\CLI\Input;
  * @subpackage cli
  * @author     Fabien Potencier <fabien.potencier@symfony-project.com>
  */
-class Option
+class InputOption
 {
   const PARAMETER_NONE     = 1;
   const PARAMETER_REQUIRED = 2;

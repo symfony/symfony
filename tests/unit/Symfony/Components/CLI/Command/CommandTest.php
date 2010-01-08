@@ -12,9 +12,9 @@ require_once __DIR__.'/../../../../bootstrap.php';
 
 use Symfony\Components\CLI\Command\Command;
 use Symfony\Components\CLI\Application;
-use Symfony\Components\CLI\Input\Definition;
-use Symfony\Components\CLI\Input\Argument;
-use Symfony\Components\CLI\Input\Option;
+use Symfony\Components\CLI\Input\InputDefinition;
+use Symfony\Components\CLI\Input\InputArgument;
+use Symfony\Components\CLI\Input\InputOption;
 use Symfony\Components\CLI\Input\InputInterface;
 use Symfony\Components\CLI\Input\StringInput;
 use Symfony\Components\CLI\Output\OutputInterface;
@@ -52,13 +52,13 @@ $t->is($command->getApplication(), $application, '->setApplication() sets the cu
 
 // ->setDefinition()
 $t->diag('->setDefinition()');
-$ret = $command->setDefinition($definition = new Definition());
+$ret = $command->setDefinition($definition = new InputDefinition());
 $t->is($ret, $command, '->setDefinition() implements a fluent interface');
-$t->is($command->getDefinition(), $definition, '->setDefinition() sets the current Definition instance');
-$command->setDefinition(array(new Argument('foo'), new Option('bar')));
-$t->ok($command->getDefinition()->hasArgument('foo'), '->setDefinition() also takes an array of Arguments and Options as an argument');
-$t->ok($command->getDefinition()->hasOption('bar'), '->setDefinition() also takes an array of Arguments and Options as an argument');
-$command->setDefinition(new Definition());
+$t->is($command->getDefinition(), $definition, '->setDefinition() sets the current InputDefinition instance');
+$command->setDefinition(array(new InputArgument('foo'), new InputOption('bar')));
+$t->ok($command->getDefinition()->hasArgument('foo'), '->setDefinition() also takes an array of InputArguments and InputOptions as an argument');
+$t->ok($command->getDefinition()->hasOption('bar'), '->setDefinition() also takes an array of InputArguments and InputOptions as an argument');
+$command->setDefinition(new InputDefinition());
 
 // ->addArgument()
 $t->diag('->addArgument()');
@@ -137,11 +137,11 @@ $t->is($command->getSynopsis(), '%s foobar:bar [--foo] [foo]', '->getSynopsis() 
 // ->mergeApplicationDefinition()
 $t->diag('->mergeApplicationDefinition()');
 $application1 = new Application();
-$application1->getDefinition()->addArguments(array(new Argument('foo')));
-$application1->getDefinition()->addOptions(array(new Option('bar')));
+$application1->getDefinition()->addArguments(array(new InputArgument('foo')));
+$application1->getDefinition()->addOptions(array(new InputOption('bar')));
 $command = new TestCommand();
 $command->setApplication($application1);
-$command->setDefinition($definition = new Definition(array(new Argument('bar'), new Option('foo'))));
+$command->setDefinition($definition = new InputDefinition(array(new InputArgument('bar'), new InputOption('foo'))));
 $command->mergeApplicationDefinition();
 $t->ok($command->getDefinition()->hasArgument('foo'), '->mergeApplicationDefinition() merges the application arguments and the command arguments');
 $t->ok($command->getDefinition()->hasArgument('bar'), '->mergeApplicationDefinition() merges the application arguments and the command arguments');
@@ -163,11 +163,11 @@ $tester = new CommandTester($command);
 try
 {
   $tester->execute(array('--bar' => true));
-  $t->fail('->run() throws a \RuntimeException when the input does not validate the current Definition');
+  $t->fail('->run() throws a \RuntimeException when the input does not validate the current InputDefinition');
 }
 catch (\RuntimeException $e)
 {
-  $t->pass('->run() throws a \RuntimeException when the input does not validate the current Definition');
+  $t->pass('->run() throws a \RuntimeException when the input does not validate the current InputDefinition');
 }
 
 $t->is($tester->execute(array(), array('interactive' => true)), "interact called\nexecute called\n", '->run() calls the interact() method if the input is interactive');

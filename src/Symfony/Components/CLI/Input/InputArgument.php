@@ -18,7 +18,7 @@ namespace Symfony\Components\CLI\Input;
  * @subpackage cli
  * @author     Fabien Potencier <fabien.potencier@symfony-project.com>
  */
-class Argument
+class InputArgument
 {
   const REQUIRED = 1;
   const OPTIONAL = 2;

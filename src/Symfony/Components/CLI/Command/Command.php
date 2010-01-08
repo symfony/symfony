@@ -2,9 +2,9 @@
 
 namespace Symfony\Components\CLI\Command;
 
-use Symfony\Components\CLI\Input\Definition;
-use Symfony\Components\CLI\Input\Option;
-use Symfony\Components\CLI\Input\Argument;
+use Symfony\Components\CLI\Input\InputDefinition;
+use Symfony\Components\CLI\Input\InputOption;
+use Symfony\Components\CLI\Input\InputArgument;
 use Symfony\Components\CLI\Input\InputInterface;
 use Symfony\Components\CLI\Output\OutputInterface;
 use Symfony\Components\CLI\Output\Formatter;
@@ -45,7 +45,7 @@ class Command
    */
   public function __construct($name = null)
   {
-    $this->definition = new Definition();
+    $this->definition = new InputDefinition();
     $this->ignoreValidationErrors = false;
     $this->applicationDefinitionMerged = false;
     $this->formatter = new Formatter();
@@ -182,7 +182,7 @@ class Command
    */
   public function setDefinition($definition)
   {
-    if ($definition instanceof Definition)
+    if ($definition instanceof InputDefinition)
     {
       $this->definition = $definition;
     }
@@ -200,15 +200,15 @@ class Command
    * Adds an argument.
    *
    * @param string  $name        The argument name
-   * @param integer $mode        The argument mode: Argument::REQUIRED or Argument::OPTIONAL
+   * @param integer $mode        The argument mode: InputArgument::REQUIRED or InputArgument::OPTIONAL
    * @param string  $description A description text
-   * @param mixed   $default     The default value (for Argument::OPTIONAL mode only)
+   * @param mixed   $default     The default value (for InputArgument::OPTIONAL mode only)
    *
    * @return Command The current instance
    */
   public function addArgument($name, $mode = null, $description = '', $default = null)
   {
-    $this->definition->addArgument(new Argument($name, $mode, $description, $default));
+    $this->definition->addArgument(new InputArgument($name, $mode, $description, $default));
 
     return $this;
   }
@@ -226,7 +226,7 @@ class Command
    */
   public function addOption($name, $shortcut = null, $mode = null, $description = '', $default = null)
   {
-    $this->definition->addOption(new Option($name, $shortcut, $mode, $description, $default));
+    $this->definition->addOption(new InputOption($name, $shortcut, $mode, $description, $default));
 
     return $this;
   }

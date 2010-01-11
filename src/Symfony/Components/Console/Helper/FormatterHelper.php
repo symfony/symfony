@@ -21,14 +21,6 @@ namespace Symfony\Components\Console\Helper;
 class FormatterHelper extends Helper
 {
   /**
-   * Returns the helper's canonical name
-   */
-  public function getName()
-  {
-    return 'formatter';
-  }
-
-  /**
    * Formats a message within a section.
    *
    * @param string  $section The section name
@@ -95,4 +87,3 @@ class FormatterHelper extends Helper
     return 'formatter';
   }
 }
-

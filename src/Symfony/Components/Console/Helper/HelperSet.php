@@ -5,19 +5,19 @@ namespace Symfony\Components\Console\Helper;
 use Symfony\Components\Console\Command\Command;
 
 /*
- * This file is part of the symfony package.
+ * This file is part of the symfony framework.
  *
  * (c) Fabien Potencier <fabien.potencier@symfony-project.com>
  *
- * For the full copyright and license information, please view the LICENSE
- * file that was distributed with this source code.
+ * This source file is subject to the MIT license that is bundled
+ * with this source code in the file LICENSE.
  */
 
 /**
  * HelperSet represents a set of helpers to be used with a command.
  *
  * @package    symfony
- * @subpackage templating
+ * @subpackage console
  * @author     Fabien Potencier <fabien.potencier@symfony-project.com>
  */
 class HelperSet
@@ -102,4 +102,3 @@ class HelperSet
     return $this->command;
   }
 }
-

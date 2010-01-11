@@ -22,7 +22,7 @@ use Symfony\Components\Console\Application;
  * Base class for all commands.
  *
  * @package    symfony
- * @subpackage cli
+ * @subpackage console
  * @author     Fabien Potencier <fabien.potencier@symfony-project.com>
  */
 class Command

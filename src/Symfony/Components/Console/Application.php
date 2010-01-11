@@ -41,7 +41,7 @@ use Symfony\Components\Console\Helper\DialogHelper;
  *     $app->run();
  *
  * @package    symfony
- * @subpackage cli
+ * @subpackage console
  * @author     Fabien Potencier <fabien.potencier@symfony-project.com>
  */
 class Application

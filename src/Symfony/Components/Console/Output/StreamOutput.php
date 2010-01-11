@@ -23,7 +23,7 @@ namespace Symfony\Components\Console\Output;
  * $output = new StreamOutput(fopen('/path/to/output.log', 'a', false));
  *
  * @package    symfony
- * @subpackage cli
+ * @subpackage console
  * @author     Fabien Potencier <fabien.potencier@symfony-project.com>
  */
 class StreamOutput extends Output

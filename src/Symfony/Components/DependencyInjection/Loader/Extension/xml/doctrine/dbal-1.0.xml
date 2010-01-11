@@ -1,0 +1,35 @@
+<?xml version="1.0" ?>
+
+<container xmlns="http://www.symfony-project.org/schema/services"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xsi:schemaLocation="http://www.symfony-project.org/schema/services http://www.symfony-project.org/schema/services/services-1.0.xsd">
+
+  <parameters>
+    <parameter key="doctrine.dbal.user">root</parameter>
+    <parameter key="doctrine.dbal.password"></parameter>
+    <parameter key="doctrine.dbal.host">localhost</parameter>
+    <parameter key="doctrine.dbal.driver_class">Doctrine\DBAL\Driver\PDOMySql\Driver</parameter>
+    <parameter key="doctrine.dbal.wrapper_class">Doctrine\DBAL\Connection</parameter>
+    <parameter key="doctrine.dbal.configuration_class">Doctrine\DBAL\Configuration</parameter>
+    <parameter key="doctrine.dbal.event_manager_class">Doctrine\Common\EventManager</parameter>
+  </parameters>
+
+  <services>
+    <service id="doctrine.dbal.connection" class="Doctrine\DBAL\DriverManager" constructor="getConnection">
+      <argument type="collection">
+        <argument key="dbname">%doctrine.dbal.dbname%</argument>
+        <argument key="user">%doctrine.dbal.user%</argument>
+        <argument key="password">%doctrine.dbal.password%</argument>
+        <argument key="host">%doctrine.dbal.host%</argument>
+        <argument key="driverClass">%doctrine.dbal.driver_class%</argument>
+        <argument key="wrapperClass">%doctrine.dbal.wrapper_class%</argument>
+      </argument>
+      <argument type="service" id="doctrine.dbal.configuration" />
+      <argument type="service" id="doctrine.dbal.event_manager" />
+    </service>
+
+    <service id="doctrine.dbal.configuration" class="%doctrine.dbal.configuration_class%" />
+
+    <service id="doctrine.dbal.event_manager" class="%doctrine.dbal.event_manager_class%" />
+  </services>
+</container>

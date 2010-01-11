@@ -38,7 +38,7 @@ use Symfony\Components\Console\Command\ListCommand;
  *     $app->run();
  *
  * @package    symfony
- * @subpackage cli
+ * @subpackage console
  * @author     Fabien Potencier <fabien.potencier@symfony-project.com>
  */
 class Application

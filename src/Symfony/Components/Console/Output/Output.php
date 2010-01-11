@@ -21,7 +21,7 @@ namespace Symfony\Components\Console\Output;
  *  * quiet: -q (no output)
  *
  * @package    symfony
- * @subpackage cli
+ * @subpackage console
  * @author     Fabien Potencier <fabien.potencier@symfony-project.com>
  */
 abstract class Output implements OutputInterface

@@ -32,7 +32,7 @@ namespace Symfony\Components\Console\Input;
  * `StringInput` when you want to provide your own input.
  *
  * @package    symfony
- * @subpackage cli
+ * @subpackage console
  * @author     Fabien Potencier <fabien.potencier@symfony-project.com>
  *
  * @see http://www.gnu.org/software/libc/manual/html_node/Argument-Syntax.html

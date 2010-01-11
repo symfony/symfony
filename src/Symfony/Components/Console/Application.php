@@ -14,6 +14,9 @@ use Symfony\Components\Console\Output\ConsoleOutput;
 use Symfony\Components\Console\Command\Command;
 use Symfony\Components\Console\Command\HelpCommand;
 use Symfony\Components\Console\Command\ListCommand;
+use Symfony\Components\Console\Helper\HelperSet;
+use Symfony\Components\Console\Helper\FormatterHelper;
+use Symfony\Components\Console\Helper\DialogHelper;
 
 /*
  * This file is part of the symfony framework.
@@ -53,6 +56,7 @@ class Application
   protected $catchExceptions;
   protected $autoExit;
   protected $definition;
+  protected $helperSet;
 
   /**
    * Constructor.
@@ -68,6 +72,10 @@ class Application
     $this->autoExit = true;
     $this->commands = array();
     $this->aliases = array();
+    $this->helperSet = new HelperSet(array(
+      new FormatterHelper(),
+      new DialogHelper(),
+    ));
 
     $this->addCommand(new HelpCommand());
     $this->addCommand(new ListCommand());
@@ -198,6 +206,26 @@ class Application
     $this->runningCommand = null;
 
     return is_numeric($statusCode) ? $statusCode : 0;
+  }
+
+  /**
+   * Set a helper set to be used with the command.
+   *
+   * @param HelperSet $helperSet The helper set
+   */
+  public function setHelperSet(HelperSet $helperSet)
+  {
+    $this->helperSet = $helperSet;
+  }
+
+  /**
+   * Get the helper set associated with the command
+   *
+   * @return HelperSet The HelperSet isntance associated with this command
+   */
+  public function getHelperSet()
+  {
+    return $this->helperSet;
   }
 
   /**

@@ -8,9 +8,6 @@ use Symfony\Components\Console\Input\InputArgument;
 use Symfony\Components\Console\Input\InputInterface;
 use Symfony\Components\Console\Output\OutputInterface;
 use Symfony\Components\Console\Application;
-use Symfony\Components\Console\Helper\HelperSet;
-use Symfony\Components\Console\Helper\FormatterHelper;
-use Symfony\Components\Console\Helper\InteractHelper;
 
 /*
  * This file is part of the symfony framework.
@@ -45,25 +42,14 @@ class Command
   /**
    * Constructor.
    *
-   * @param string          $name
-   * @param HelperSet       $helperSet A helper set instance
+   * @param string $name The name of the command
    */
-  public function __construct($name = null, HelperSet $helperSet = null)
+  public function __construct($name = null)
   {
     $this->definition = new InputDefinition();
     $this->ignoreValidationErrors = false;
     $this->applicationDefinitionMerged = false;
     $this->aliases = array();
-
-    if (null === $helperSet)
-    {
-      $helperSet = new HelperSet(array(
-        new FormatterHelper(),
-        new InteractHelper(),
-      ));
-    }
-
-    $this->setHelperSet($helperSet);
 
     if (null !== $name)
     {
@@ -393,39 +379,17 @@ class Command
   }
 
   /**
-   * Set a helper set to be used with the command.
+   * Gets a helper instance by name.
    *
-   * @param HelperSet $helperSet The helper set
-   */
-  public function setHelperSet(HelperSet $helperSet)
-  {
-    $this->helperSet = $helperSet;
-
-    $helperSet->setCommand($this);
-  }
-
-  /**
-   * Get the helper set associated with the command
-   *
-   * @return HelperSet
-   */
-  public function getHelperSet()
-  {
-    return $this->helperSet;
-  }
-
-  /**
-   * Gets a helper value.
-   *
-   * @param string $name  The helper name
+   * @param string $name The helper name
    *
    * @return mixed The helper value
    *
    * @throws \InvalidArgumentException if the helper is not defined
    */
-  public function __get($name)
+  protected function getHelper($name)
   {
-    return $this->helperSet->get($name);
+    return $this->application->getHelperSet()->get($name);
   }
 
   /**

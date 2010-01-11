@@ -1,7 +1,7 @@
 <?xml version="1.0" ?>
 
-<container xmlns="http://symfony-project.org/2.0/container"
-    xmlns:project="http://symfony-project.org/2.0/container/project">
+<container xmlns="http://www.symfony-project.org/schema/services"
+    xmlns:project="http://www.example.com/schema/project">
 
   <project:bar />
 

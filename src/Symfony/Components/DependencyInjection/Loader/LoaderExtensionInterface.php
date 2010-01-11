@@ -31,9 +31,18 @@ interface LoaderExtensionInterface
   public function load($tag, array $config);
 
   /**
-   * Returns the namespace to be used for this extension.
+   * Returns the namespace to be used for this extension (XML namespace).
    *
-   * @return string The namespace
+   * @return string The XML namespace
    */
   public function getNamespace();
+
+  /**
+   * Returns the recommanded alias to use in XML.
+   *
+   * This alias is also the mandatory prefix to use when using YAML.
+   *
+   * @return string The alias
+   */
+  public function getAlias();
 }

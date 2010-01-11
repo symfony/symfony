@@ -165,7 +165,9 @@ class XmlDumper extends Dumper
     return <<<EOF
 <?xml version="1.0" ?>
 
-<container xmlns="http://symfony-project.org/2.0/container">
+<container xmlns="http://www.symfony-project.org/schema/services"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xsi:schemaLocation="http://www.symfony-project.org/schema/services http://www.symfony-project.org/schema/services/services-1.0.xsd">
 
 EOF;
   }

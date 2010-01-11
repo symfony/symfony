@@ -195,10 +195,12 @@ class XmlFileLoader extends FileLoader
       {
         throw new \InvalidArgumentException(implode("\n", $this->getXmlErrors()));
       }
+      $dom->validateOnParse = true;
+      $dom->normalizeDocument();
       libxml_use_internal_errors(false);
       $this->validate($dom, $path);
 
-      $xmls[$path] = simplexml_import_dom($dom, 'Symfony\Components\DependencyInjection\SimpleXMLElement');
+      $xmls[$path] = simplexml_import_dom($dom, 'Symfony\\Components\\DependencyInjection\\SimpleXMLElement');
     }
 
     return $xmls;
@@ -210,7 +212,7 @@ class XmlFileLoader extends FileLoader
     $count = 0;
 
     // find anonymous service definitions
-    $xml->registerXPathNamespace('container', 'http://symfony-project.org/2.0/container');
+    $xml->registerXPathNamespace('container', 'http://www.symfony-project.org/schema/services');
     $nodes = $xml->xpath('//container:argument[@type="service"][not(@id)]');
     foreach ($nodes as $node)
     {
@@ -236,14 +238,52 @@ class XmlFileLoader extends FileLoader
 
   protected function validate($dom, $file)
   {
+    $this->validateSchema($dom, $file);
+    $this->validateExtensions($dom, $file);
+  }
+
+  protected function validateSchema($dom, $file)
+  {
+    $schemaLocations = array('http://www.symfony-project.org/schema/services' => __DIR__.'/schema/services/services-1.0.xsd');
+
+    if ($element = $dom->documentElement->getAttributeNS('http://www.w3.org/2001/XMLSchema-instance', 'schemaLocation'))
+    {
+      $items = preg_split('/\s+/', $element);
+      for ($i = 0, $nb = count($items); $i < $nb; $i += 2)
+      {
+        $schemaLocations[$items[$i]] = str_replace('http://www.symfony-project.org/', __DIR__.'/', $items[$i + 1]);
+      }
+    }
+
+    $imports = '';
+    foreach ($schemaLocations as $namespace => $location)
+    {
+      $imports .= sprintf('  <xsd:import namespace="%s" schemaLocation="%s" />'."\n", $namespace, $location);
+    }
+
+    $source = <<<EOF
+<?xml version="1.0" encoding="utf-8" ?>
+<xsd:schema xmlns="http://www.symfony-project.org/schema"
+    xmlns:xsd="http://www.w3.org/2001/XMLSchema"
+    targetNamespace="http://www.symfony-project.org/schema"
+    elementFormDefault="qualified">
+
+  <xsd:import namespace="http://www.w3.org/XML/1998/namespace"/>
+$imports
+</xsd:schema>
+EOF
+    ;
+
     libxml_use_internal_errors(true);
-    if (!$dom->schemaValidate(__DIR__.'/services.xsd'))
+    if (!$dom->schemaValidateSource($source))
     {
       throw new \InvalidArgumentException(implode("\n", $this->getXmlErrors()));
     }
     libxml_use_internal_errors(false);
+  }
 
-    // validate extensions
+  protected function validateExtensions($dom, $file)
+  {
     foreach ($dom->documentElement->childNodes as $node)
     {
       if (!$node instanceof \DOMElement || in_array($node->tagName, array('imports', 'parameters', 'services')))
@@ -251,19 +291,16 @@ class XmlFileLoader extends FileLoader
         continue;
       }
 
-      // can it be handled by an extension?
-      if (false !== strpos($node->tagName, ':'))
+      if ($node->namespaceURI === 'http://www.symfony-project.org/schema/services')
       {
-        list($namespace, $tag) = explode(':', $node->tagName);
-        if (!static::getExtension($namespace))
-        {
-          throw new \InvalidArgumentException(sprintf('There is no extension able to load the configuration for "%s" (in %s).', $node->tagName, $file));
-        }
-
-        continue;
+        throw new \InvalidArgumentException(sprintf('The "%s" tag is not valid (in %s).', $node->tagName, $file));
       }
 
-      throw new \InvalidArgumentException(sprintf('The "%s" tag is not valid (in %s).', $node->tagName, $file));
+      // can it be handled by an extension?
+      if (!static::getExtension($node->namespaceURI))
+      {
+        throw new \InvalidArgumentException(sprintf('There is no extension able to load the configuration for "%s" (in %s).', $node->tagName, $file));
+      }
     }
   }
 
@@ -289,15 +326,15 @@ class XmlFileLoader extends FileLoader
 
   protected function loadFromExtensions(BuilderConfiguration $configuration, $xml)
   {
-    foreach (dom_import_simplexml($xml)->getElementsByTagNameNS('*', '*') as $element)
+    foreach (dom_import_simplexml($xml)->childNodes as $node)
     {
-      if (!$element->prefix)
+      if (!$node instanceof \DOMElement || $node->namespaceURI === 'http://www.symfony-project.org/schema/services')
       {
         continue;
       }
 
-      $values = static::convertDomElementToArray($element);
-      $config = $this->getExtension($element->prefix)->load($element->localName, is_array($values) ? $values : array($values));
+      $values = static::convertDomElementToArray($node);
+      $config = $this->getExtension($node->namespaceURI)->load($node->localName, is_array($values) ? $values : array($values));
 
       $configuration->merge($config);
     }
@@ -345,7 +382,7 @@ class XmlFileLoader extends FileLoader
       }
       elseif (!$node instanceof \DOMComment)
       {
-        $config[$node->tagName] = static::convertDomElementToArray($node);
+        $config[$node->localName] = static::convertDomElementToArray($node);
         $empty = false;
       }
     }

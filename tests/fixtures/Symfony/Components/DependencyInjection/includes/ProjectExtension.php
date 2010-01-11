@@ -18,6 +18,11 @@ class ProjectExtension extends LoaderExtension
 
   public function getNamespace()
   {
+    return 'http://www.example.com/schema/project';
+  }
+
+  public function getAlias()
+  {
     return 'project';
   }
 }

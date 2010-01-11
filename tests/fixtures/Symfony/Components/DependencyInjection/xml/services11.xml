@@ -1,7 +1,7 @@
 <?xml version="1.0" ?>
 
-<container xmlns="http://symfony-project.org/2.0/container"
-    xmlns:foobar="http://symfony-project.org/2.0/container/foobar">
+<container xmlns="http://www.symfony-project.org/schema/services"
+    xmlns:foobar="http://www.example.com/schema/foobar">
 
   <foobar:foobar />
 

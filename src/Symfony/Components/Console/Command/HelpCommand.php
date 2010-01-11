@@ -22,7 +22,7 @@ use Symfony\Components\Console\Command\Command;
  * HelpCommand displays the help for a given command.
  *
  * @package    symfony
- * @subpackage cli
+ * @subpackage console
  * @author     Fabien Potencier <fabien.potencier@symfony-project.com>
  */
 class HelpCommand extends Command

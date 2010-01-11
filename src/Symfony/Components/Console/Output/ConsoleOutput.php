@@ -23,7 +23,7 @@ namespace Symfony\Components\Console\Output;
  *     $output = new StreamOutput(fopen('php://stdout', 'w'));
  *
  * @package    symfony
- * @subpackage cli
+ * @subpackage console
  * @author     Fabien Potencier <fabien.potencier@symfony-project.com>
  */
 class ConsoleOutput extends StreamOutput

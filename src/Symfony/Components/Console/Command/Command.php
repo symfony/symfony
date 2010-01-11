@@ -7,8 +7,10 @@ use Symfony\Components\Console\Input\InputOption;
 use Symfony\Components\Console\Input\InputArgument;
 use Symfony\Components\Console\Input\InputInterface;
 use Symfony\Components\Console\Output\OutputInterface;
-use Symfony\Components\Console\Output\Formatter;
 use Symfony\Components\Console\Application;
+use Symfony\Components\Console\Helper\HelperSet;
+use Symfony\Components\Console\Helper\FormatterHelper;
+use Symfony\Components\Console\Helper\InteractHelper;
 
 /*
  * This file is part of the symfony framework.
@@ -42,14 +44,26 @@ class Command
 
   /**
    * Constructor.
+   *
+   * @param string          $name
+   * @param HelperSet       $helperSet A helper set instance
    */
-  public function __construct($name = null)
+  public function __construct($name = null, HelperSet $helperSet = null)
   {
     $this->definition = new InputDefinition();
     $this->ignoreValidationErrors = false;
     $this->applicationDefinitionMerged = false;
-    $this->formatter = new Formatter();
     $this->aliases = array();
+
+    if (null === $helperSet)
+    {
+      $helperSet = new HelperSet(array(
+        new FormatterHelper(),
+        new InteractHelper(),
+      ));
+    }
+
+    $this->setHelperSet($helperSet);
 
     if (null !== $name)
     {
@@ -379,90 +393,39 @@ class Command
   }
 
   /**
-   * Asks a question to the user.
+   * Set a helper set to be used with the command.
    *
-   * @param OutputInterface $output
-   * @param string|array    $question The question to ask
-   * @param string          $default  The default answer if none is given by the user
-   *
-   * @param string The user answer
+   * @param HelperSet $helperSet The helper set
    */
-  static public function ask(OutputInterface $output, $question, $default = null)
+  public function setHelperSet(HelperSet $helperSet)
   {
-    // @codeCoverageIgnoreStart
-    $output->write($question);
+    $this->helperSet = $helperSet;
 
-    $ret = trim(fgets(STDIN));
-
-    return $ret ? $ret : $default;
-    // @codeCoverageIgnoreEnd
+    $helperSet->setCommand($this);
   }
 
   /**
-   * Asks a confirmation to the user.
+   * Get the helper set associated with the command
    *
-   * The question will be asked until the user answer by nothing, yes, or no.
-   *
-   * @param OutputInterface $output
-   * @param string|array    $question The question to ask
-   * @param Boolean         $default  The default answer if the user enters nothing
-   *
-   * @param Boolean true if the user has confirmed, false otherwise
+   * @return HelperSet
    */
-  static public function askConfirmation(OutputInterface $output, $question, $default = true)
+  public function getHelperSet()
   {
-    // @codeCoverageIgnoreStart
-    $answer = 'z';
-    while ($answer && !in_array(strtolower($answer[0]), array('y', 'n')))
-    {
-      $answer = static::ask($output, $question);
-    }
-
-    if (false === $default)
-    {
-      return $answer && 'y' == strtolower($answer[0]);
-    }
-    else
-    {
-      return !$answer || 'y' == strtolower($answer[0]);
-    }
-    // @codeCoverageIgnoreEnd
+    return $this->helperSet;
   }
 
   /**
-   * Asks for a value and validates the response.
+   * Gets a helper value.
    *
-   * @param OutputInterface $output
-   * @param string|array    $question
-   * @param Closure         $validator
-   * @param integer         $attempts Max number of times to ask before giving up (false by default, which means infinite)
+   * @param string $name  The helper name
    *
-   * @return mixed
+   * @return mixed The helper value
+   *
+   * @throws \InvalidArgumentException if the helper is not defined
    */
-  static public function askAndValidate(OutputInterface $output, $question, \Closure $validator, $attempts = false)
+  public function __get($name)
   {
-    // @codeCoverageIgnoreStart
-    $error = null;
-    while (false === $attempts || $attempts--)
-    {
-      if (null !== $error)
-      {
-        $output->write($this->formatter->formatBlock($error->getMessage(), 'error'));
-      }
-
-      $value = static::ask($output, $question, null);
-
-      try
-      {
-        return $validator($value);
-      }
-      catch (\Exception $error)
-      {
-      }
-    }
-
-    throw $error;
-    // @codeCoverageIgnoreEnd
+    return $this->helperSet->get($name);
   }
 
   /**

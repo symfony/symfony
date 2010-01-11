@@ -14,22 +14,14 @@ use Symfony\Components\Console\Output\OutputInterface;
  */
 
 /**
- * The Interact class provides helpers to interact with the user.
+ * The Dialog class provides helpers to interact with the user.
  *
  * @package    symfony
- * @subpackage cli
+ * @subpackage console
  * @author     Fabien Potencier <fabien.potencier@symfony-project.com>
  */
-class InteractHelper extends Helper
+class DialogHelper extends Helper
 {
-  /**
-   * Returns the helper's canonical name
-   */
-  public function getName()
-  {
-    return 'interact';
-  }
-
   /**
    * Asks a question to the user.
    *
@@ -115,5 +107,13 @@ class InteractHelper extends Helper
 
     throw $error;
     // @codeCoverageIgnoreEnd
+  }
+
+  /**
+   * Returns the helper's canonical name
+   */
+  public function getName()
+  {
+    return 'dialog';
   }
 }

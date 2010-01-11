@@ -3,30 +3,23 @@
 namespace Symfony\Components\Console\Helper;
 
 /*
- * This file is part of the symfony package.
+ * This file is part of the symfony framework.
  *
  * (c) Fabien Potencier <fabien.potencier@symfony-project.com>
  *
- * For the full copyright and license information, please view the LICENSE
- * file that was distributed with this source code.
+ * This source file is subject to the MIT license that is bundled
+ * with this source code in the file LICENSE.
  */
 
 /**
  * HelperInterface is the interface all helpers must implement.
  *
  * @package    symfony
- * @subpackage templating
+ * @subpackage console
  * @author     Fabien Potencier <fabien.potencier@symfony-project.com>
  */
 interface HelperInterface
 {
-  /**
-   * Returns the canonical name of this helper.
-   *
-   * @return string The canonical name
-   */
-  function getName();
-
   /**
    * Sets the helper set associated with this helper.
    *
@@ -40,4 +33,11 @@ interface HelperInterface
    * @return HelperSet A HelperSet instance
    */
   function getHelperSet();
+
+  /**
+   * Returns the canonical name of this helper.
+   *
+   * @return string The canonical name
+   */
+  function getName();
 }

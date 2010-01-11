@@ -21,7 +21,7 @@ namespace Symfony\Components\Console\Input;
  *  * `ArrayInput`: The input is provided as an array
  *
  * @package    symfony
- * @subpackage cli
+ * @subpackage console
  * @author     Fabien Potencier <fabien.potencier@symfony-project.com>
  */
 abstract class Input implements InputInterface

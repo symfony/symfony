@@ -15,7 +15,7 @@ namespace Symfony\Components\Console\Output;
  * The Formatter class provides helpers to format messages.
  *
  * @package    symfony
- * @subpackage cli
+ * @subpackage console
  * @author     Fabien Potencier <fabien.potencier@symfony-project.com>
  */
 class Formatter

@@ -19,7 +19,7 @@ namespace Symfony\Components\Console\Input;
  *     $input = new StringInput('foo --bar="foobar"');
  *
  * @package    symfony
- * @subpackage cli
+ * @subpackage console
  * @author     Fabien Potencier <fabien.potencier@symfony-project.com>
  */
 class StringInput extends ArgvInput

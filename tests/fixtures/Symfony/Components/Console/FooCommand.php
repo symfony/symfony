@@ -20,7 +20,7 @@ class FooCommand extends Command
 
   protected function interact(InputInterface $input, OutputInterface $output)
   {
-    $output->write('interact called');
+    $output->writeln('interact called');
   }
 
   protected function execute(InputInterface $input, OutputInterface $output)
@@ -28,6 +28,6 @@ class FooCommand extends Command
     $this->input = $input;
     $this->output = $output;
 
-    $output->write('called');
+    $output->writeln('called');
   }
 }

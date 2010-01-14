@@ -23,9 +23,9 @@ class TestOutput extends Output
     return static::$styles[$name];
   }
 
-  public function doWrite($message)
+  public function doWrite($message, $newline)
   {
-    $this->output .= $message."\n";
+    $this->output .= $message.($newline ? "\n" : '');
   }
 }
 
@@ -51,50 +51,50 @@ $t->diag('::setStyle()');
 Output::setStyle('FOO', array('bg' => 'red', 'fg' => 'yellow', 'blink' => true));
 $t->is(TestOutput::getStyle('foo'), array('bg' => 'red', 'fg' => 'yellow', 'blink' => true), '::setStyle() sets a new style');
 
-// ->write()
-$t->diag('->write()');
+// ->writeln()
+$t->diag('->writeln()');
 $output = new TestOutput(Output::VERBOSITY_QUIET);
-$output->write('foo');
-$t->is($output->output, '', '->write() outputs nothing if verbosity is set to VERBOSITY_QUIET');
+$output->writeln('foo');
+$t->is($output->output, '', '->writeln() outputs nothing if verbosity is set to VERBOSITY_QUIET');
 
 $output = new TestOutput();
-$output->write(array('foo', 'bar'));
-$t->is($output->output, "foo\nbar\n", '->write() can take an array of messages to output');
+$output->writeln(array('foo', 'bar'));
+$t->is($output->output, "foo\nbar\n", '->writeln() can take an array of messages to output');
 
 $output = new TestOutput();
-$output->write('<info>foo</info>', Output::OUTPUT_RAW);
-$t->is($output->output, "<info>foo</info>\n", '->write() outputs the raw message if OUTPUT_RAW is specified');
+$output->writeln('<info>foo</info>', Output::OUTPUT_RAW);
+$t->is($output->output, "<info>foo</info>\n", '->writeln() outputs the raw message if OUTPUT_RAW is specified');
 
 $output = new TestOutput();
-$output->write('<info>foo</info>', Output::OUTPUT_PLAIN);
-$t->is($output->output, "foo\n", '->write() strips decoration tags if OUTPUT_PLAIN is specified');
+$output->writeln('<info>foo</info>', Output::OUTPUT_PLAIN);
+$t->is($output->output, "foo\n", '->writeln() strips decoration tags if OUTPUT_PLAIN is specified');
 
 $output = new TestOutput();
 $output->setDecorated(false);
-$output->write('<info>foo</info>');
-$t->is($output->output, "foo\n", '->write() strips decoration tags if decoration is set to false');
+$output->writeln('<info>foo</info>');
+$t->is($output->output, "foo\n", '->writeln() strips decoration tags if decoration is set to false');
 
 $output = new TestOutput();
 $output->setDecorated(true);
-$output->write('<foo>foo</foo>');
-$t->is($output->output, "\033[33;41;5mfoo\033[0m\n", '->write() decorates the output');
+$output->writeln('<foo>foo</foo>');
+$t->is($output->output, "\033[33;41;5mfoo\033[0m\n", '->writeln() decorates the output');
 
 try
 {
-  $output->write('<foo>foo</foo>', 24);
-  $t->fail('->write() throws an \InvalidArgumentException when the type does not exist');
+  $output->writeln('<foo>foo</foo>', 24);
+  $t->fail('->writeln() throws an \InvalidArgumentException when the type does not exist');
 }
 catch (\InvalidArgumentException $e)
 {
-  $t->pass('->write() throws an \InvalidArgumentException when the type does not exist');
+  $t->pass('->writeln() throws an \InvalidArgumentException when the type does not exist');
 }
 
 try
 {
-  $output->write('<bar>foo</bar>');
-  $t->fail('->write() throws an \InvalidArgumentException when a style does not exist');
+  $output->writeln('<bar>foo</bar>');
+  $t->fail('->writeln() throws an \InvalidArgumentException when a style does not exist');
 }
 catch (\InvalidArgumentException $e)
 {
-  $t->pass('->write() throws an \InvalidArgumentException when a style does not exist');
+  $t->pass('->writeln() throws an \InvalidArgumentException when a style does not exist');
 }

@@ -28,11 +28,11 @@ class TestCommand extends Command
 
   protected function execute(InputInterface $input, OutputInterface $output)
   {
-    $output->write('execute called');
+    $output->writeln('execute called');
   }
 
   protected function interact(InputInterface $input, OutputInterface $output)
   {
-    $output->write('interact called');
+    $output->writeln('interact called');
   }
 }

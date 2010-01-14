@@ -190,7 +190,7 @@ $command = new TestCommand();
 $command->setApplication($application);
 $ret = $command->setCode(function (InputInterface $input, OutputInterface $output)
 {
-  $output->write('from the code...');
+  $output->writeln('from the code...');
 });
 $t->is($ret, $command, '->setCode() implements a fluent interface');
 $tester = new CommandTester($command);

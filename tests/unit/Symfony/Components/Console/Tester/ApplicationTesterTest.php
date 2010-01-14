@@ -21,7 +21,7 @@ $application->setAutoExit(false);
 $application->register('foo')
   ->addArgument('command')
   ->addArgument('foo')
-  ->setCode(function ($input, $output) { $output->write('foo'); })
+  ->setCode(function ($input, $output) { $output->writeln('foo'); })
 ;
 
 $tester = new ApplicationTester($application);

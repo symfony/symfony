@@ -62,11 +62,11 @@ EOF
   {
     if ($input->getOption('xml'))
     {
-      $output->write($this->application->asXml($input->getArgument('namespace')), Output::OUTPUT_RAW);
+      $output->writeln($this->application->asXml($input->getArgument('namespace')), Output::OUTPUT_RAW);
     }
     else
     {
-      $output->write($this->application->asText($input->getArgument('namespace')));
+      $output->writeln($this->application->asText($input->getArgument('namespace')));
     }
   }
 }

@@ -72,11 +72,11 @@ EOF
 
     if ($input->getOption('xml'))
     {
-      $output->write($this->command->asXml(), Output::OUTPUT_RAW);
+      $output->writeln($this->command->asXml(), Output::OUTPUT_RAW);
     }
     else
     {
-      $output->write($this->command->asText());
+      $output->writeln($this->command->asText());
     }
   }
 }

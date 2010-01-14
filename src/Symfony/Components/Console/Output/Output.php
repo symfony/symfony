@@ -111,12 +111,24 @@ abstract class Output implements OutputInterface
   }
 
   /**
-   * Writes a message to the output.
+   * Writes a message to the output and adds a newline at the end.
    *
    * @param string|array $messages The message as an array of lines of a single string
    * @param integer      $type     The type of output
    */
-  public function write($messages, $type = 0)
+  public function writeln($messages, $type = 0)
+  {
+    $this->write($messages, true, $type);
+  }
+
+  /**
+   * Writes a message to the output.
+   *
+   * @param string|array $messages The message as an array of lines of a single string
+   * @param Boolean      $newline  Whether to add a newline or not
+   * @param integer      $type     The type of output
+   */
+  public function write($messages, $newline = false, $type = 0)
   {
     if (self::VERBOSITY_QUIET === $this->verbosity)
     {
@@ -144,16 +156,17 @@ abstract class Output implements OutputInterface
           throw new \InvalidArgumentException(sprintf('Unknown output type given (%s)', $type));
       }
 
-      $this->doWrite($message);
+      $this->doWrite($message, $newline);
     }
   }
 
   /**
    * Writes a message to the output.
    *
-   * @param string $message A message to write to the output
+   * @param string  $message A message to write to the output
+   * @param Boolean $newline Whether to add a newline or not
    */
-  abstract public function doWrite($message);
+  abstract public function doWrite($message, $newline);
 
   /**
    * Formats a message according to the given styles.

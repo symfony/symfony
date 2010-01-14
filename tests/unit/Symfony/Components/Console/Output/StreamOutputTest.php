@@ -42,6 +42,6 @@ $t->is($output->getStream(), $stream, '->getStream() returns the current stream'
 // ->doWrite()
 $t->diag('->doWrite()');
 $output = new StreamOutput($stream);
-$output->write('foo');
+$output->writeln('foo');
 rewind($output->getStream());
 $t->is(stream_get_contents($output->getStream()), "foo\n", '->doWrite() writes to the stream');

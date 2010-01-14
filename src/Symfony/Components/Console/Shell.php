@@ -62,14 +62,14 @@ class Shell
     readline_read_history($this->history);
     readline_completion_function(array($this, 'autocompleter'));
 
-    $this->output->write($this->getHeader());
+    $this->output->writeln($this->getHeader());
     while (true)
     {
       $command = readline($this->application->getName().' > ');
 
       if (false === $command)
       {
-        $this->output->write("\n");
+        $this->output->writeln("\n");
 
         break;
       }
@@ -79,7 +79,7 @@ class Shell
 
       if (0 !== $ret = $this->application->run(new StringInput($command), $this->output))
       {
-        $this->output->write(sprintf('<error>The command terminated with an error status (%s)</error>', $ret));
+        $this->output->writeln(sprintf('<error>The command terminated with an error status (%s)</error>', $ret));
       }
     }
   }

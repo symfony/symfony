@@ -67,11 +67,12 @@ class StreamOutput extends Output
   /**
    * Writes a message to the output.
    *
-   * @param string $message A message to write to the output
+   * @param string  $message A message to write to the output
+   * @param Boolean $newline Whether to add a newline or not
    */
-  public function doWrite($message)
+  public function doWrite($message, $newline)
   {
-    if (false === @fwrite($this->stream, $message.PHP_EOL))
+    if (false === @fwrite($this->stream, $message.($newline ? PHP_EOL : '')))
     {
       // @codeCoverageIgnoreStart
       // should never happen

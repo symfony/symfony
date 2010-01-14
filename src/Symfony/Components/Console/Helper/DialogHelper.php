@@ -34,7 +34,7 @@ class DialogHelper extends Helper
   public function ask(OutputInterface $output, $question, $default = null)
   {
     // @codeCoverageIgnoreStart
-    $output->write($question);
+    $output->writeln($question);
 
     $ret = trim(fgets(STDIN));
 
@@ -91,7 +91,7 @@ class DialogHelper extends Helper
     {
       if (null !== $error)
       {
-        $output->write($this->getHelperSet()->get('formatter')->formatBlock($error->getMessage(), 'error'));
+        $output->writeln($this->getHelperSet()->get('formatter')->formatBlock($error->getMessage(), 'error'));
       }
 
       $value = $this->ask($output, $question, null);

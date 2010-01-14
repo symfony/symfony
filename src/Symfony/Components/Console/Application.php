@@ -187,7 +187,7 @@ class Application
 
     if (true === $input->hasParameterOption(array('--version', '-V')))
     {
-      $output->write($this->getLongVersion());
+      $output->writeln($this->getLongVersion());
 
       return 0;
     }
@@ -732,22 +732,22 @@ class Application
 
     $messages[] = str_repeat(' ', $len);
 
-    $output->write("\n");
+    $output->writeln("\n");
     foreach ($messages as $message)
     {
-      $output->write("<error>$message</error>");
+      $output->writeln("<error>$message</error>");
     }
-    $output->write("\n");
+    $output->writeln("\n");
 
     if (null !== $this->runningCommand)
     {
-      $output->write(sprintf('<info>%s</info>', sprintf($this->runningCommand->getSynopsis(), $this->getName())));
-      $output->write("\n");
+      $output->writeln(sprintf('<info>%s</info>', sprintf($this->runningCommand->getSynopsis(), $this->getName())));
+      $output->writeln("\n");
     }
 
     if (Output::VERBOSITY_VERBOSE === $output->getVerbosity())
     {
-      $output->write('</comment>Exception trace:</comment>');
+      $output->writeln('</comment>Exception trace:</comment>');
 
       // exception related properties
       $trace = $e->getTrace();
@@ -766,10 +766,10 @@ class Application
         $file = isset($trace[$i]['file']) ? $trace[$i]['file'] : 'n/a';
         $line = isset($trace[$i]['line']) ? $trace[$i]['line'] : 'n/a';
 
-        $output->write(sprintf(' %s%s%s() at <info>%s:%s</info>', $class, $type, $function, $file, $line));
+        $output->writeln(sprintf(' %s%s%s() at <info>%s:%s</info>', $class, $type, $function, $file, $line));
       }
 
-      $output->write("\n");
+      $output->writeln("\n");
     }
   }
 

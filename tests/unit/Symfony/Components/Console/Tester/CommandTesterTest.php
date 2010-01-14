@@ -19,7 +19,7 @@ $t = new LimeTest(6);
 $command = new Command('foo');
 $command->addArgument('command');
 $command->addArgument('foo');
-$command->setCode(function ($input, $output) { $output->write('foo'); });
+$command->setCode(function ($input, $output) { $output->writeln('foo'); });
 
 $tester = new CommandTester($command);
 $tester->execute(array('foo' => 'bar'), array('interactive' => false, 'decorated' => false, 'verbosity' => Output::VERBOSITY_VERBOSE));

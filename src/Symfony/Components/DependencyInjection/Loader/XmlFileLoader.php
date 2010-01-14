@@ -382,7 +382,19 @@ EOF
       }
       elseif (!$node instanceof \DOMComment)
       {
-        $config[$node->localName] = static::convertDomElementToArray($node);
+        if (isset($config[$node->localName]))
+        {
+          if (!is_array($config[$node->localName]))
+          {
+            $config[$node->localName] = array($config[$node->localName]);
+          }
+          $config[$node->localName][] = static::convertDomElementToArray($node);
+        }
+        else
+        {
+          $config[$node->localName] = static::convertDomElementToArray($node);
+        }
+
         $empty = false;
       }
     }

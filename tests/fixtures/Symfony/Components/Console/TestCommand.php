@@ -26,11 +26,6 @@ class TestCommand extends Command
     return $this->application;
   }
 
-  public function getDefinition()
-  {
-    return $this->definition;
-  }
-
   protected function execute(InputInterface $input, OutputInterface $output)
   {
     $output->write('execute called');

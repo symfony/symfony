@@ -50,8 +50,8 @@ $command = new TestCommand();
 $command->setApplication($application);
 $t->is($command->getApplication(), $application, '->setApplication() sets the current application');
 
-// ->setDefinition()
-$t->diag('->setDefinition()');
+// ->setDefinition() ->getDefinition()
+$t->diag('->setDefinition() ->getDefinition()');
 $ret = $command->setDefinition($definition = new InputDefinition());
 $t->is($ret, $command, '->setDefinition() implements a fluent interface');
 $t->is($command->getDefinition(), $definition, '->setDefinition() sets the current InputDefinition instance');

@@ -197,6 +197,16 @@ class Command
   }
 
   /**
+   * Gets the InputDefinition attached to this Command.
+   *
+   * @return InputDefinition $definition An InputDefinition instance
+   */
+  public function getDefinition()
+  {
+    return $this->definition;
+  }
+
+  /**
    * Adds an argument.
    *
    * @param string  $name        The argument name

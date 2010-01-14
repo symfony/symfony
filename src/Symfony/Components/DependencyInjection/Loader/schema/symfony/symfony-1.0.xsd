@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+
+<xsd:schema xmlns="http://www.symfony-project.org/schema/symfony"
+    xmlns:xsd="http://www.w3.org/2001/XMLSchema"
+    targetNamespace="http://www.symfony-project.org/schema/symfony"
+    elementFormDefault="qualified">
+
+  <xsd:element name="templating" type="templating" />
+
+  <xsd:complexType name="templating">
+    <xsd:sequence>
+      <xsd:element name="loader" type="xsd:string" minOccurs="0" maxOccurs="unbounded" />
+      <xsd:element name="helper" type="xsd:string" minOccurs="0" maxOccurs="unbounded" />
+    </xsd:sequence>
+
+    <xsd:attribute name="path" type="xsd:string" />
+    <xsd:attribute name="cache" type="xsd:string" />
+  </xsd:complexType>
+</xsd:schema>

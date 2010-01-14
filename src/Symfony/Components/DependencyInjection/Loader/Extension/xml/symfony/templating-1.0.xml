@@ -1,0 +1,46 @@
+<?xml version="1.0" ?>
+
+<container xmlns="http://www.symfony-project.org/schema/services"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xsi:schemaLocation="http://www.symfony-project.org/schema/services http://www.symfony-project.org/schema/services/services-1.0.xsd">
+
+  <parameters>
+    <parameter key="symfony.templating.engine.class">Symfony\Components\Templating\Engine</parameter>
+    <parameter key="symfony.templating.helperset.class">Symfony\Components\Templating\Helper\HelperSet</parameter>
+    <parameter key="symfony.templating.loader.filesystem.class">Symfony\Components\Templating\Loader\FilesystemLoader</parameter>
+    <parameter key="symfony.templating.loader.cache.class">Symfony\Components\Templating\Loader\CacheLoader</parameter>
+    <parameter key="symfony.templating.loader.Chain.class">Symfony\Components\Templating\Loader\ChainLoader</parameter>
+    <parameter key="symfony.templating.helper.javascripts.class">Symfony\Components\Templating\Helper\JavascriptsHelper</parameter>
+    <parameter key="symfony.templating.helper.stylesheets.class">Symfony\Components\Templating\Helper\StylesheetsHelper</parameter>
+  </parameters>
+
+  <services>
+    <service id="symfony.templating.engine" class="%symfony.templating.engine.class%">
+      <argument type="service" id="symfony.templating.loader" />
+      <argument type="collection"></argument>
+      <argument type="service" id="symfony.templating.helperset" />
+    </service>
+
+    <service id="symfony.templating.helperset" class="%symfony.templating.helperset.class%">
+      <argument>%symfony.templating.helpers%</argument>
+    </service>
+
+    <service id="symfony.templating.loader.filesystem" class="%symfony.templating.loader.filesystem.class%">
+      <argument>%symfony.templating.loader.filesystem.path%</argument>
+    </service>
+
+    <service id="symfony.templating.loader.cache" class="%symfony.templating.loader.cache.class%">
+      <argument type="service" id="symfony.templating.loader.wrapped" />
+      <argument>%symfony.templating.loader.cache.path%</argument>
+    </service>
+
+    <service id="symfony.templating.loader.chain" class="%symfony.templating.loader.chain.class%">
+      <argument>%symfony.templating.loader.chain.loaders%</argument>
+    </service>
+
+    <service id="symfony.templating.helper.javascripts" class="%symfony.templating.helper.javascripts.class%" />
+    <service id="symfony.templating.helper.stylesheets" class="%symfony.templating.helper.stylesheets.class%" />
+
+    <service id="symfony.templating.loader" alias="symfony.templating.loader.filesystem" />
+  </services>
+</container>

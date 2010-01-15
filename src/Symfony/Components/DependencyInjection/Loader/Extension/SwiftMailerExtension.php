@@ -107,7 +107,7 @@ class SwiftMailerExtension extends LoaderExtension
    */
   public function getNamespace()
   {
-    return 'http://www.symfony-project.org/schema/swiftmailer';
+    return 'http://www.symfony-project.org/schema/dic/swiftmailer';
   }
 
   /**

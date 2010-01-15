@@ -60,7 +60,7 @@ class DoctrineExtension extends LoaderExtension
    */
   public function getNamespace()
   {
-    return 'http://www.symfony-project.org/schema/doctrine';
+    return 'http://www.symfony-project.org/schema/dic/doctrine';
   }
 
   /**

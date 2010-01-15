@@ -112,7 +112,7 @@ class SymfonyTemplatingExtension extends LoaderExtension
    */
   public function getNamespace()
   {
-    return 'http://www.symfony-project.org/schema/symfony';
+    return 'http://www.symfony-project.org/schema/dic/symfony';
   }
 
   /**

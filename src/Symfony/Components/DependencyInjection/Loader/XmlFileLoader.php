@@ -211,7 +211,7 @@ class XmlFileLoader extends FileLoader
     $count = 0;
 
     // find anonymous service definitions
-    $xml->registerXPathNamespace('container', 'http://www.symfony-project.org/schema/services');
+    $xml->registerXPathNamespace('container', 'http://www.symfony-project.org/schema/dic/services');
     $nodes = $xml->xpath('//container:argument[@type="service"][not(@id)]');
     foreach ($nodes as $node)
     {
@@ -243,7 +243,7 @@ class XmlFileLoader extends FileLoader
 
   protected function validateSchema($dom, $file)
   {
-    $schemaLocations = array('http://www.symfony-project.org/schema/services' => __DIR__.'/schema/services/services-1.0.xsd');
+    $schemaLocations = array('http://www.symfony-project.org/schema/dic/services' => __DIR__.'/schema/dic/services/services-1.0.xsd');
 
     if ($element = $dom->documentElement->getAttributeNS('http://www.w3.org/2001/XMLSchema-instance', 'schemaLocation'))
     {
@@ -290,7 +290,7 @@ EOF
         continue;
       }
 
-      if ($node->namespaceURI === 'http://www.symfony-project.org/schema/services')
+      if ($node->namespaceURI === 'http://www.symfony-project.org/schema/dic/services')
       {
         throw new \InvalidArgumentException(sprintf('The "%s" tag is not valid (in %s).', $node->tagName, $file));
       }
@@ -327,7 +327,7 @@ EOF
   {
     foreach (dom_import_simplexml($xml)->childNodes as $node)
     {
-      if (!$node instanceof \DOMElement || $node->namespaceURI === 'http://www.symfony-project.org/schema/services')
+      if (!$node instanceof \DOMElement || $node->namespaceURI === 'http://www.symfony-project.org/schema/dic/services')
       {
         continue;
       }

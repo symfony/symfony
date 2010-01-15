@@ -122,7 +122,7 @@ class ZendExtension extends LoaderExtension
 
   public function getNamespace()
   {
-    return 'http://www.symfony-project.org/schema/zend';
+    return 'http://www.symfony-project.org/schema/dic/zend';
   }
 
   public function getAlias()

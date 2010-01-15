@@ -1,6 +1,6 @@
 <?xml version="1.0" ?>
 
-<container xmlns="http://www.symfony-project.org/schema/services"
+<container xmlns="http://www.symfony-project.org/schema/dic/services"
     xmlns:project="http://www.example.com/schema/project">
 
   <project:bar />

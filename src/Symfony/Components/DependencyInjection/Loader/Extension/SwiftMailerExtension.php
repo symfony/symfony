@@ -27,6 +27,14 @@ class SwiftMailerExtension extends LoaderExtension
   /**
    * Loads the Swift Mailer configuration.
    *
+   * Usage example:
+   *
+   *      <swift:mailer transport="gmail" delivery_strategy="spool">
+   *        <swift:username>fabien</swift:username>
+   *        <swift:password>xxxxx</swift:password>
+   *        <swift:spool path="/path/to/spool/" />
+   *      </swift:mailer>
+   *
    * @param array $config A configuration array
    *
    * @return BuilderConfiguration A BuilderConfiguration instance

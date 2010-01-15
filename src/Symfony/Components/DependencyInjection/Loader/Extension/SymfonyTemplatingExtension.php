@@ -26,7 +26,15 @@ use Symfony\Components\DependencyInjection\Reference;
 class SymfonyTemplatingExtension extends LoaderExtension
 {
   /**
-   * Loads the template configuration.
+   * Loads the templating configuration.
+   *
+   * Usage example:
+   *
+   *      <symfony:templating path="/path/to/templates" cache="/path/to/cache">
+   *        <symfony:loader>symfony.templating.loader.filesystem</symfony:loader>
+   *        <symfony:helper>symfony.templating.helper.javascripts</symfony:helper>
+   *        <symfony:helper>symfony.templating.helper.stylesheets</symfony:helper>
+   *      </symfony:templating>
    *
    * @param array $config A configuration array
    *

@@ -27,6 +27,10 @@ class ZendExtension extends LoaderExtension
   /**
    * Loads the logger configuration.
    *
+   * Usage example:
+   *
+   *      <zend:logger priority="info" path="/path/to/some.log" />
+   *
    * @param array $config A configuration array
    *
    * @return BuilderConfiguration A BuilderConfiguration instance
@@ -53,6 +57,13 @@ class ZendExtension extends LoaderExtension
 
   /**
    * Loads the mail configuration.
+   *
+   * Usage example:
+   *
+   *      <zend:mail transport="gmail">
+   *        <zend:username>fabien</zend:username>
+   *        <zend:password>xxxxxx</zend:password>
+   *      </zend:mail>
    *
    * @param array $config A configuration array
    *

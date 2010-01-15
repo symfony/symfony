@@ -27,6 +27,10 @@ class DoctrineExtension extends LoaderExtension
   /**
    * Loads the DBAL configuration.
    *
+   * Usage example:
+   *
+   *      <doctrine:dbal dbname="sfweb" username="root" />
+   *
    * @param array $config A configuration array
    *
    * @return BuilderConfiguration A BuilderConfiguration instance

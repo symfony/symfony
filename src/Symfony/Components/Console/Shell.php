@@ -134,7 +134,7 @@ class Shell
   {
     return <<<EOF
 
-Welcome to the <info>{$this->application->getName()}</info> shell.
+Welcome to the <info>{$this->application->getName()}</info> shell (<comment>{$this->application->getVersion()}</comment>).
 
 At the prompt, type <comment>help</comment> for some help,
 or <comment>list</comment> to get a list available commands.

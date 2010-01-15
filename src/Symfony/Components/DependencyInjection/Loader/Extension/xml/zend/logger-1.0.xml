@@ -1,0 +1,32 @@
+<?xml version="1.0" ?>
+
+<container xmlns="http://www.symfony-project.org/schema/services"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xsi:schemaLocation="http://www.symfony-project.org/schema/services http://www.symfony-project.org/schema/services/services-1.0.xsd">
+
+  <parameters>
+    <parameter key="zend.logger.class">\Zend_Log</parameter>
+    <parameter key="zend.logger.priority" type="constant">\Zend_Log::CRIT</parameter>
+  </parameters>
+
+  <services>
+    <service id="zend.logger" class="%zend.logger.class%">
+      <call method="addWriter">
+        <argument type="service" id="zend.logger.writer_stream" />
+      </call>
+    </service>
+
+    <service id="zend.logger.writer_stream" class="Zend_Log_Writer_Stream">
+      <argument>%zend.logger.path%</argument>
+      <call method="addFilter">
+        <argument type="service" id="zend.logger.filter" />
+      </call>
+    </service>
+
+    <service id="zend.logger.filter" class="Zend_Log_Filter_Priority">
+      <argument>%zend.logger.priority%</argument>
+    </service>
+
+    <service id="logger" alias="zend.logger" />
+  </services>
+</container>

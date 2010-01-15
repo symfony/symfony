@@ -114,7 +114,6 @@ class XmlFileLoader extends FileLoader
       return;
     }
 
-    $definitions = array();
     foreach ($xml->services->service as $service)
     {
       $this->parseDefinition($configuration, (string) $service['id'], $service, $file);

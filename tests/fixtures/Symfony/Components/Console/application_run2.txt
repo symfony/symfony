@@ -1,6 +1,7 @@
 Usage:
  UNKNOWN help [--xml] [-h|--help] [-q|--quiet] [-v|--verbose] [-V|--version] [-c|--color] [-n|--no-interaction] command [command_name]
 
+Aliases: ?
 Arguments:
  command           The command to execute
  command_name      The command name (default: help)

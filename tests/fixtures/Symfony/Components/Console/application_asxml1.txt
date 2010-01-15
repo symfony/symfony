@@ -11,7 +11,9 @@
  You can also output the help as XML by using the &lt;comment&gt;--xml&lt;/comment&gt; option:
  
    &lt;info&gt;./symfony help --xml test:all&lt;/info&gt;</help>
-  <aliases/>
+  <aliases>
+    <alias>?</alias>
+  </aliases>
   <arguments>
     <argument name="command_name" is_required="0" is_array="0">
       <description>The command name</description>

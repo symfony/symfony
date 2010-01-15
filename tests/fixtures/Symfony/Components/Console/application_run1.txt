@@ -12,5 +12,5 @@ Options:
   --no-interaction -n  Do not ask any interactive question.
 
 Available commands:
-  help   Displays help for a command
+  help   Displays help for a command (?)
   list   Lists commands

@@ -12,7 +12,7 @@
   <info>--no-interaction</info> <info>-n</info>  Do not ask any interactive question.
 
 <comment>Available commands:</comment>
-  <info>help  </info> Displays help for a command
+  <info>help  </info> Displays help for a command<comment> (?)</comment>
   <info>list  </info> Lists commands
 <comment>foo</comment>
   <info>:bar  </info> The foo:bar command<comment> (afoobar)</comment>

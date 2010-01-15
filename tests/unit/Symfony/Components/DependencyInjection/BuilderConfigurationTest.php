@@ -17,7 +17,7 @@ use Symfony\Components\DependencyInjection\Reference;
 
 $fixturesPath = __DIR__.'/../../../../fixtures/Symfony/Components/DependencyInjection/';
 
-$t = new LimeTest(1);
+$t = new LimeTest(37);
 
 // __construct()
 $t->diag('__construct()');

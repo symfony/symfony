@@ -265,4 +265,25 @@ class BuilderConfiguration
 
     return $this->definitions[$id];
   }
+
+  /**
+   * Gets a service definition by id or alias.
+   *
+   * The method "unaliases" recursively to return a Definition instance.
+   *
+   * @param  string  $id The service identifier or alias
+   *
+   * @return Definition A Definition instance
+   *
+   * @throws \InvalidArgumentException if the service definition does not exist
+   */
+  public function findDefinition($id)
+  {
+    if ($this->hasAlias($id))
+    {
+      return $this->findDefinition($this->getAlias($id));
+    }
+
+    return $this->getDefinition($id);
+  }
 }

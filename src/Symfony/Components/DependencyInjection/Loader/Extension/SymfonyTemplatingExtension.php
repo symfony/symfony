@@ -97,8 +97,8 @@ class SymfonyTemplatingExtension extends LoaderExtension
     if (isset($config['cache']))
     {
       // wrap the loader with some cache
-      $configuration->setAlias('symfony.templating.loader.wrapped', $configuration->getAlias('symfony.templating.loader'));
-      $configuration->setAlias('symfony.templating.loader', 'symfony.templating.loader.cache');
+      $configuration->setDefinition('symfony.templating.loader.wrapped', $configuration->findDefinition('symfony.templating.loader'));
+      $configuration->setDefinition('symfony.templating.loader', $configuration->getDefinition('symfony.templating.loader.cache'));
       $configuration->setParameter('symfony.templating.loader.cache.path', $config['cache']);
     }
 

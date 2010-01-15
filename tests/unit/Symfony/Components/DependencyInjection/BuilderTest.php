@@ -269,7 +269,7 @@ $config = new BuilderConfiguration();
 $config->setDefinition('baz', new Definition('BazClass'));
 $config->setAlias('alias_for_foo', 'foo');
 $container->merge($config);
-$t->is(array_keys($container->getDefinitions()), array('foo', 'bar', 'baz'), '->load() merges definitions already defined ones');
+$t->is(array_keys($container->getDefinitions()), array('foo', 'bar', 'baz'), '->merge() merges definitions already defined ones');
 $t->is($container->getAliases(), array('alias_for_foo' => 'foo'), '->merge() registers defined aliases');
 
 $container = new Builder();

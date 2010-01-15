@@ -30,7 +30,7 @@ class XmlFileLoader extends FileLoader
    *
    * @param  array $files An array of XML files
    *
-   * @return array An array of definitions and parameters
+   * @return BuilderConfiguration A BuilderConfiguration instance
    */
   public function load($files)
   {

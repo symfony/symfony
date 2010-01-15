@@ -29,11 +29,11 @@ use Symfony\Components\YAML\YAML;
 class YamlFileLoader extends FileLoader
 {
   /**
-   * Loads an array of XML files.
+   * Loads an array of Yaml files.
    *
-   * @param  array $files An array of XML files
+   * @param  array $files An array of Yaml files
    *
-   * @return array An array of definitions and parameters
+   * @return BuilderConfiguration A BuilderConfiguration instance
    */
   public function load($files)
   {

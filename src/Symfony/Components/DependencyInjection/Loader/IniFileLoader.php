@@ -22,6 +22,13 @@ use Symfony\Components\DependencyInjection\BuilderConfiguration;
  */
 class IniFileLoader extends FileLoader
 {
+  /**
+   * Loads a resource.
+   *
+   * @param mixed $resource The resource path
+   *
+   * @return BuilderConfiguration A BuilderConfiguration instance
+   */
   public function load($files)
   {
     if (!is_array($files))

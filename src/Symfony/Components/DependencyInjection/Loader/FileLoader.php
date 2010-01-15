@@ -20,8 +20,7 @@ namespace Symfony\Components\DependencyInjection\Loader;
  */
 abstract class FileLoader extends Loader
 {
-  protected
-    $paths = array();
+  protected $paths;
 
   /**
    * Constructor.

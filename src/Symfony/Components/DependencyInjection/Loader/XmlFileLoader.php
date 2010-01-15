@@ -71,7 +71,7 @@ class XmlFileLoader extends FileLoader
   {
     if (!$xml->parameters)
     {
-      return array();
+      return;
     }
 
     $configuration->addParameters($xml->parameters->getArgumentsAsPhp('parameter'));
@@ -111,7 +111,7 @@ class XmlFileLoader extends FileLoader
   {
     if (!$xml->services)
     {
-      return array();
+      return;
     }
 
     $definitions = array();

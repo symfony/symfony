@@ -6,6 +6,7 @@ use Symfony\Components\DependencyInjection\Container;
 use Symfony\Components\DependencyInjection\Definition;
 use Symfony\Components\DependencyInjection\Reference;
 use Symfony\Components\DependencyInjection\BuilderConfiguration;
+use Symfony\Components\DependencyInjection\FileResource;
 use Symfony\Components\YAML\YAML;
 
 /*
@@ -37,9 +38,13 @@ class YamlFileLoader extends FileLoader
    */
   public function load($file)
   {
-    $content = $this->loadFile($file);
+    $path = $this->findFile($file);
+
+    $content = $this->loadFile($path);
 
     $configuration = new BuilderConfiguration();
+
+    $configuration->addResource(new FileResource($path));
 
     if (!$content)
     {
@@ -166,14 +171,7 @@ class YamlFileLoader extends FileLoader
 
   protected function loadFile($file)
   {
-    $path = $this->getAbsolutePath($file);
-
-    if (!file_exists($path))
-    {
-      throw new \InvalidArgumentException(sprintf('The service file "%s" does not exist (in: %s).', $file, implode(', ', $this->paths)));
-    }
-
-    return $this->validate(YAML::load($path), $path);
+    return $this->validate(YAML::load($file), $file);
   }
 
   protected function validate($content, $file)

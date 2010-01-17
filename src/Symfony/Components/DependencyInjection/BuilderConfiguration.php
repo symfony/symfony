@@ -23,11 +23,32 @@ class BuilderConfiguration
   protected $definitions = array();
   protected $parameters  = array();
   protected $aliases     = array();
+  protected $resources   = array();
 
   public function __construct(array $definitions = array(), array $parameters = array())
   {
     $this->setDefinitions($definitions);
     $this->setParameters($parameters);
+  }
+
+  /**
+   * Returns an array of resources loaded to build this configuration.
+   *
+   * @return array An array of resources
+   */
+  public function getResources()
+  {
+    return $this->resources;
+  }
+
+  /**
+   * Adds a resource for this configuration.
+   *
+   * @param ResourceInterface $resource A resource instance
+   */
+  public function addResource(ResourceInterface $resource)
+  {
+    $this->resources[] = $resource;
   }
 
   /**
@@ -45,6 +66,11 @@ class BuilderConfiguration
     $this->addDefinitions($configuration->getDefinitions());
     $this->addAliases($configuration->getAliases());
     $this->addParameters($configuration->getParameters());
+
+    foreach ($configuration->getResources() as $resource)
+    {
+      $this->addResource($resource);
+    }
   }
 
   /**

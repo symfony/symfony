@@ -6,6 +6,7 @@ use Symfony\Components\DependencyInjection\Definition;
 use Symfony\Components\DependencyInjection\Reference;
 use Symfony\Components\DependencyInjection\BuilderConfiguration;
 use Symfony\Components\DependencyInjection\SimpleXMLElement;
+use Symfony\Components\DependencyInjection\FileResource;
 
 /*
  * This file is part of the symfony framework.
@@ -34,9 +35,13 @@ class XmlFileLoader extends FileLoader
    */
   public function load($file)
   {
+    $path = $this->findFile($file);
+
+    $xml = $this->parseFile($path);
+
     $configuration = new BuilderConfiguration();
 
-    $xml = $this->loadFile($file);
+    $configuration->addResource(new FileResource($path));
 
     // anonymous services
     $xml = $this->processAnonymousServices($configuration, $xml, $file);
@@ -165,25 +170,18 @@ class XmlFileLoader extends FileLoader
     $configuration->setDefinition($id, $definition);
   }
 
-  protected function loadFile($file)
+  protected function parseFile($file)
   {
-    $path = $this->getAbsolutePath($file);
-
-    if (!file_exists($path))
-    {
-      throw new \InvalidArgumentException(sprintf('The service file "%s" does not exist (in: %s).', $file, implode(', ', $this->paths)));
-    }
-
     $dom = new \DOMDocument();
     libxml_use_internal_errors(true);
-    if (!$dom->load(realpath($path), LIBXML_COMPACT))
+    if (!$dom->load($file, LIBXML_COMPACT))
     {
       throw new \InvalidArgumentException(implode("\n", $this->getXmlErrors()));
     }
     $dom->validateOnParse = true;
     $dom->normalizeDocument();
     libxml_use_internal_errors(false);
-    $this->validate($dom, $path);
+    $this->validate($dom, $file);
 
     return simplexml_import_dom($dom, 'Symfony\\Components\\DependencyInjection\\SimpleXMLElement');
   }

@@ -3,6 +3,7 @@
 namespace Symfony\Components\DependencyInjection\Loader;
 
 use Symfony\Components\DependencyInjection\BuilderConfiguration;
+use Symfony\Components\DependencyInjection\FileResource;
 
 /*
  * This file is part of the symfony framework.
@@ -31,13 +32,11 @@ class IniFileLoader extends FileLoader
    */
   public function load($file)
   {
+    $path = $this->findFile($file);
+
     $configuration = new BuilderConfiguration();
 
-    $path = $this->getAbsolutePath($file);
-    if (!file_exists($path))
-    {
-      throw new \InvalidArgumentException(sprintf('The %s file does not exist.', $file));
-    }
+    $configuration->addResource(new FileResource($path));
 
     $result = parse_ini_file($path, true);
     if (false === $result || array() === $result)

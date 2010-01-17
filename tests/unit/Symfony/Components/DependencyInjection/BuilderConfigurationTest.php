@@ -14,10 +14,11 @@ use Symfony\Components\DependencyInjection\Builder;
 use Symfony\Components\DependencyInjection\BuilderConfiguration;
 use Symfony\Components\DependencyInjection\Definition;
 use Symfony\Components\DependencyInjection\Reference;
+use Symfony\Components\DependencyInjection\FileResource;
 
 $fixturesPath = __DIR__.'/../../../../fixtures/Symfony/Components/DependencyInjection/';
 
-$t = new LimeTest(37);
+$t = new LimeTest(39);
 
 // __construct()
 $t->diag('__construct()');
@@ -61,6 +62,13 @@ $configuration = new BuilderConfiguration(array('foo' => new Definition('FooClas
 $config->setDefinition('foo', new Definition('BazClass'));
 $configuration->merge($config);
 $t->is($configuration->getDefinition('foo')->getClass(), 'BazClass', '->merge() overrides already defined services');
+
+$configuration = new BuilderConfiguration();
+$configuration->addResource($a = new FileResource('foo.xml'));
+$config = new BuilderConfiguration();
+$config->addResource($b = new FileResource('foo.yml'));
+$configuration->merge($config);
+$t->is($configuration->getResources(), array($a, $b), '->merge() merges resources');
 
 // ->setParameters() ->getParameters()
 $t->diag('->setParameters() ->getParameters()');
@@ -175,3 +183,10 @@ $configuration = new BuilderConfiguration(array('foo' => $definition = new Defin
 $configuration->setAlias('bar', 'foo');
 $configuration->setAlias('foobar', 'bar');
 $t->is($configuration->findDefinition('foobar'), $definition, '->findDefinition() returns a Definition');
+
+// ->addResource() ->getResources()
+$t->diag('->addResource() ->getResources()');
+$configuration = new BuilderConfiguration();
+$configuration->addResource($a = new FileResource('foo.xml'));
+$configuration->addResource($b = new FileResource('foo.yml'));
+$t->is($configuration->getResources(), array($a, $b), '->getResources() returns an array of resources read for the current configuration');

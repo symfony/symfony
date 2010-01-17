@@ -24,20 +24,20 @@ require_once $fixturesPath.'/includes/ProjectExtension.php';
 
 class ProjectLoader extends XmlFileLoader
 {
-  public function loadFile($file)
+  public function parseFile($file)
   {
-    return parent::loadFile($file);
+    return parent::parseFile($file);
   }
 }
 
-// ->loadFile()
-$t->diag('->loadFile()');
+// ->load()
+$t->diag('->load()');
 
 $loader = new ProjectLoader($fixturesPath.'/ini');
 
 try
 {
-  $loader->loadFile('foo.xml');
+  $loader->load('foo.xml');
   $t->fail('->load() throws an InvalidArgumentException if the loaded file does not exist');
 }
 catch (InvalidArgumentException $e)
@@ -45,30 +45,33 @@ catch (InvalidArgumentException $e)
   $t->pass('->load() throws an InvalidArgumentException if the loaded file does not exist');
 }
 
+// ->parseFile()
+$t->diag('->parseFile()');
+
 try
 {
-  $loader->loadFile('parameters.ini');
-  $t->fail('->load() throws an InvalidArgumentException if the loaded file is not a valid XML file');
+  $loader->parseFile($fixturesPath.'/ini/parameters.ini');
+  $t->fail('->parseFile() throws an InvalidArgumentException if the loaded file is not a valid XML file');
 }
 catch (InvalidArgumentException $e)
 {
-  $t->pass('->load() throws an InvalidArgumentException if the loaded file is not a valid XML file');
+  $t->pass('->parseFile() throws an InvalidArgumentException if the loaded file is not a valid XML file');
 }
 
 $loader = new ProjectLoader($fixturesPath.'/xml');
 
 try
 {
-  $loader->loadFile('nonvalid.xml');
-  $t->fail('->load() throws an InvalidArgumentException if the loaded file does not validate the XSD');
+  $loader->parseFile($fixturesPath.'/xml/nonvalid.xml');
+  $t->fail('->parseFile() throws an InvalidArgumentException if the loaded file does not validate the XSD');
 }
 catch (InvalidArgumentException $e)
 {
-  $t->pass('->load() throws an InvalidArgumentException if the loaded file does not validate the XSD');
+  $t->pass('->parseFile() throws an InvalidArgumentException if the loaded file does not validate the XSD');
 }
 
-$xml = $loader->loadFile('services1.xml');
-$t->is(get_class($xml), 'Symfony\\Components\\DependencyInjection\\SimpleXMLElement', '->loadFile() returns an SimpleXMLElement object');
+$xml = $loader->parseFile($fixturesPath.'/xml/services1.xml');
+$t->is(get_class($xml), 'Symfony\\Components\\DependencyInjection\\SimpleXMLElement', '->parseFile() returns an SimpleXMLElement object');
 
 // ->load() # parameters
 $t->diag('->load() # parameters');

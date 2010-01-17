@@ -79,7 +79,7 @@ $t->is($config->getParameters(), array('foo' => 'bar', 'values' => array(true, f
 // ->load() # imports
 $t->diag('->load() # imports');
 $config = $loader->load('services4.yml');
-$t->is($config->getParameters(), array('foo' => 'bar', 'bar' => '%foo%', 'values' => array(true, false), 'foo_bar' => new Reference('foo_bar')), '->load() imports and merges imported files');
+$t->is($config->getParameters(), array('foo' => 'bar', 'bar' => '%foo%', 'values' => array(true, false), 'foo_bar' => new Reference('foo_bar'), 'imported_from_xml' => true, 'imported_from_ini' => true), '->load() imports and merges imported files');
 
 // ->load() # services
 $t->diag('->load() # services');

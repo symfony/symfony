@@ -7,5 +7,7 @@
     <import resource="services2.xml" />
     <import resource="services3.xml" />
     <import resource="../ini/parameters.ini" class="Symfony\Components\DependencyInjection\Loader\IniFileLoader" />
+    <import resource="../ini/parameters2.ini" />
+    <import resource="../yaml/services13.yml" />
   </imports>
 </container>

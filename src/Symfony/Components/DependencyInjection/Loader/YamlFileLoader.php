@@ -87,15 +87,26 @@ class YamlFileLoader extends FileLoader
 
   protected function parseImport($import, $file)
   {
+    $class = null;
     if (isset($import['class']) && $import['class'] !== get_class($this))
     {
       $class = $import['class'];
-      $loader = new $class($this->paths);
     }
     else
     {
-      $loader = $this;
+      // try to detect loader with the extension
+      switch (pathinfo((string) $import['resource'], PATHINFO_EXTENSION))
+      {
+        case 'xml':
+          $class = 'Symfony\\Components\\DependencyInjection\\Loader\\XmlFileLoader';
+          break;
+        case 'ini':
+          $class = 'Symfony\\Components\\DependencyInjection\\Loader\\IniFileLoader';
+          break;
+      }
     }
+
+    $loader = null === $class ? $this : new $class($this->paths);
 
     $importedFile = $this->getAbsolutePath($import['resource'], dirname($file));
 

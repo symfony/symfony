@@ -28,41 +28,30 @@ class XmlFileLoader extends FileLoader
   /**
    * Loads an array of XML files.
    *
-   * @param  array $files An array of XML files
+   * @param  string $file An XML file path
    *
    * @return BuilderConfiguration A BuilderConfiguration instance
    */
-  public function load($files)
-  {
-    if (!is_array($files))
-    {
-      $files = array($files);
-    }
-
-    return $this->parse($this->getFilesAsXml($files));
-  }
-
-  protected function parse(array $xmls)
+  public function load($file)
   {
     $configuration = new BuilderConfiguration();
 
-    foreach ($xmls as $file => $xml)
-    {
-      // anonymous services
-      $xml = $this->processAnonymousServices($configuration, $xml, $file);
+    $xml = $this->loadFile($file);
 
-      // imports
-      $this->parseImports($configuration, $xml, $file);
+    // anonymous services
+    $xml = $this->processAnonymousServices($configuration, $xml, $file);
 
-      // parameters
-      $this->parseParameters($configuration, $xml, $file);
+    // imports
+    $this->parseImports($configuration, $xml, $file);
 
-      // services
-      $this->parseDefinitions($configuration, $xml, $file);
+    // parameters
+    $this->parseParameters($configuration, $xml, $file);
 
-      // extensions
-      $this->loadFromExtensions($configuration, $xml);
-    }
+    // services
+    $this->parseDefinitions($configuration, $xml, $file);
+
+    // extensions
+    $this->loadFromExtensions($configuration, $xml);
 
     return $configuration;
   }
@@ -92,7 +81,7 @@ class XmlFileLoader extends FileLoader
 
   protected function parseImport($import, $file)
   {
-    if (isset($import['class']) && $import['class'] != get_class($this))
+    if (isset($import['class']) && $import['class'] !== get_class($this))
     {
       $class = (string) $import['class'];
       $loader = new $class($this->paths);
@@ -176,33 +165,27 @@ class XmlFileLoader extends FileLoader
     $configuration->setDefinition($id, $definition);
   }
 
-  protected function getFilesAsXml(array $files)
+  protected function loadFile($file)
   {
-    $xmls = array();
-    foreach ($files as $file)
+    $path = $this->getAbsolutePath($file);
+
+    if (!file_exists($path))
     {
-      $path = $this->getAbsolutePath($file);
-
-      if (!file_exists($path))
-      {
-        throw new \InvalidArgumentException(sprintf('The service file "%s" does not exist (in: %s).', $file, implode(', ', $this->paths)));
-      }
-
-      $dom = new \DOMDocument();
-      libxml_use_internal_errors(true);
-      if (!$dom->load(realpath($path), LIBXML_COMPACT))
-      {
-        throw new \InvalidArgumentException(implode("\n", $this->getXmlErrors()));
-      }
-      $dom->validateOnParse = true;
-      $dom->normalizeDocument();
-      libxml_use_internal_errors(false);
-      $this->validate($dom, $path);
-
-      $xmls[$path] = simplexml_import_dom($dom, 'Symfony\\Components\\DependencyInjection\\SimpleXMLElement');
+      throw new \InvalidArgumentException(sprintf('The service file "%s" does not exist (in: %s).', $file, implode(', ', $this->paths)));
     }
 
-    return $xmls;
+    $dom = new \DOMDocument();
+    libxml_use_internal_errors(true);
+    if (!$dom->load(realpath($path), LIBXML_COMPACT))
+    {
+      throw new \InvalidArgumentException(implode("\n", $this->getXmlErrors()));
+    }
+    $dom->validateOnParse = true;
+    $dom->normalizeDocument();
+    libxml_use_internal_errors(false);
+    $this->validate($dom, $path);
+
+    return simplexml_import_dom($dom, 'Symfony\\Components\\DependencyInjection\\SimpleXMLElement');
   }
 
   protected function processAnonymousServices(BuilderConfiguration $configuration, $xml, $file)

@@ -31,49 +31,38 @@ class YamlFileLoader extends FileLoader
   /**
    * Loads an array of Yaml files.
    *
-   * @param  array $files An array of Yaml files
+   * @param  string $file A YAML file path
    *
    * @return BuilderConfiguration A BuilderConfiguration instance
    */
-  public function load($files)
+  public function load($file)
   {
-    if (!is_array($files))
-    {
-      $files = array($files);
-    }
+    $content = $this->loadFile($file);
 
-    return $this->parse($this->getFilesAsArray($files));
-  }
-
-  protected function parse($data)
-  {
     $configuration = new BuilderConfiguration();
 
-    foreach ($data as $file => $content)
+    if (!$content)
     {
-      if (!$content)
-      {
-        continue;
-      }
-
-      // imports
-      $this->parseImports($configuration, $content, $file);
-
-      // parameters
-      if (isset($content['parameters']))
-      {
-        foreach ($content['parameters'] as $key => $value)
-        {
-          $configuration->setParameter(strtolower($key), $this->resolveServices($value));
-        }
-      }
-
-      // services
-      $this->parseDefinitions($configuration, $content, $file);
-
-      // extensions
-      $this->loadFromExtensions($configuration, $content);
+      return $configuration;
     }
+
+    // imports
+    $this->parseImports($configuration, $content, $file);
+
+    // parameters
+    if (isset($content['parameters']))
+    {
+      foreach ($content['parameters'] as $key => $value)
+      {
+        $configuration->setParameter(strtolower($key), $this->resolveServices($value));
+      }
+    }
+
+    // services
+    $this->parseDefinitions($configuration, $content, $file);
+
+    // extensions
+    $this->loadFromExtensions($configuration, $content);
 
     return $configuration;
   }
@@ -93,7 +82,7 @@ class YamlFileLoader extends FileLoader
 
   protected function parseImport($import, $file)
   {
-    if (isset($import['class']) && $import['class'] != get_class($this))
+    if (isset($import['class']) && $import['class'] !== get_class($this))
     {
       $class = $import['class'];
       $loader = new $class($this->paths);
@@ -175,22 +164,16 @@ class YamlFileLoader extends FileLoader
     $configuration->setDefinition($id, $definition);
   }
 
-  protected function getFilesAsArray(array $files)
+  protected function loadFile($file)
   {
-    $yamls = array();
-    foreach ($files as $file)
+    $path = $this->getAbsolutePath($file);
+
+    if (!file_exists($path))
     {
-      $path = $this->getAbsolutePath($file);
-
-      if (!file_exists($path))
-      {
-        throw new \InvalidArgumentException(sprintf('The service file "%s" does not exist (in: %s).', $file, implode(', ', $this->paths)));
-      }
-
-      $yamls[$path] = $this->validate(YAML::load($path), $path);
+      throw new \InvalidArgumentException(sprintf('The service file "%s" does not exist (in: %s).', $file, implode(', ', $this->paths)));
     }
 
-    return $yamls;
+    return $this->validate(YAML::load($path), $path);
   }
 
   protected function validate($content, $file)

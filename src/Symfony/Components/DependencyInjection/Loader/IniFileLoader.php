@@ -25,39 +25,31 @@ class IniFileLoader extends FileLoader
   /**
    * Loads a resource.
    *
-   * @param mixed $resource The resource path
+   * @param  string $file An INI file path
    *
    * @return BuilderConfiguration A BuilderConfiguration instance
    */
-  public function load($files)
+  public function load($file)
   {
-    if (!is_array($files))
-    {
-      $files = array($files);
-    }
-
     $configuration = new BuilderConfiguration();
 
-    foreach ($files as $file)
+    $path = $this->getAbsolutePath($file);
+    if (!file_exists($path))
     {
-      $path = $this->getAbsolutePath($file);
-      if (!file_exists($path))
-      {
-        throw new \InvalidArgumentException(sprintf('The %s file does not exist.', $file));
-      }
+      throw new \InvalidArgumentException(sprintf('The %s file does not exist.', $file));
+    }
 
-      $result = parse_ini_file($path, true);
-      if (false === $result || array() === $result)
-      {
-        throw new \InvalidArgumentException(sprintf('The %s file is not valid.', $file));
-      }
+    $result = parse_ini_file($path, true);
+    if (false === $result || array() === $result)
+    {
+      throw new \InvalidArgumentException(sprintf('The %s file is not valid.', $file));
+    }
 
-      if (isset($result['parameters']) && is_array($result['parameters']))
+    if (isset($result['parameters']) && is_array($result['parameters']))
+    {
+      foreach ($result['parameters'] as $key => $value)
       {
-        foreach ($result['parameters'] as $key => $value)
-        {
-          $configuration->setParameter(strtolower($key), $value);
-        }
+        $configuration->setParameter(strtolower($key), $value);
       }
     }
 

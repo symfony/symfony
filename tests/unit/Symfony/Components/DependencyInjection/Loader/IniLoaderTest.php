@@ -13,21 +13,13 @@ require_once __DIR__.'/../../../../bootstrap.php';
 use Symfony\Components\DependencyInjection\Builder;
 use Symfony\Components\DependencyInjection\Loader\IniFileLoader;
 
-$t = new LimeTest(5);
+$t = new LimeTest(3);
 
 $fixturesPath = realpath(__DIR__.'/../../../../../fixtures/Symfony/Components/DependencyInjection/');
 
 $loader = new IniFileLoader($fixturesPath.'/ini');
-$config = $loader->load(array('parameters.ini'));
-$t->is($config->getParameters(), array('foo' => 'bar', 'bar' => '%foo%'), '->load() takes an array of file names as its first argument');
-
-$loader = new IniFileLoader($fixturesPath.'/ini');
 $config = $loader->load('parameters.ini');
 $t->is($config->getParameters(), array('foo' => 'bar', 'bar' => '%foo%'), '->load() takes a single file name as its first argument');
-
-$loader = new IniFileLoader($fixturesPath.'/ini');
-$config = $loader->load(array('parameters.ini', 'parameters1.ini'));
-$t->is($config->getParameters(), array('foo' => 'foo', 'bar' => '%foo%', 'baz' => 'baz'), '->load() merges parameters from all given files');
 
 try
 {

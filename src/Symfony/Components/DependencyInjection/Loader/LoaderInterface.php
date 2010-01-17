@@ -56,7 +56,7 @@ interface LoaderInterface
    * If you load file1.xml and file2.xml in this order, the value of complex
    * will be "foo".
    *
-   * @param mixed $resource The resource path
+   * @param mixed $resource The resource
    *
    * @return BuilderConfiguration A BuilderConfiguration instance
    */

@@ -12,7 +12,7 @@ require_once __DIR__.'/../../../bootstrap.php';
 
 use Symfony\Components\DependencyInjection\FileResource;
 
-$t = new LimeTest(5);
+$t = new LimeTest(4);
 
 // ->getResource()
 $t->diag('->getResource()');
@@ -23,11 +23,9 @@ $t->is($resource->getResource(), $file, '->getResource() returns the path to the
 
 // ->isUptodate()
 $t->diag('->isUptodate()');
-sleep(1);
-$t->ok($resource->isUptodate(), '->isUptodate() returns true if the resource has not changed');
 $t->ok($resource->isUptodate(time() + 10), '->isUptodate() returns true if the resource has not changed');
 $t->ok(!$resource->isUptodate(time() - 86400), '->isUptodate() returns false if the resource has been updated');
 unlink($file);
 
 $resource = new FileResource('/____foo/foobar'.rand(1, 999999));
-$t->ok(!$resource->isUptodate(), '->isUptodate() returns false if the resource does not exist');
+$t->ok(!$resource->isUptodate(time()), '->isUptodate() returns false if the resource does not exist');

@@ -49,16 +49,11 @@ class FileResource implements ResourceInterface
    *
    * @return Boolean true if the resource has not been updated, false otherwise
    */
-  public function isUptodate($timestamp = null)
+  public function isUptodate($timestamp)
   {
     if (!file_exists($this->resource))
     {
       return false;
-    }
-
-    if (null === $timestamp)
-    {
-      $timestamp = time();
     }
 
     return filemtime($this->resource) < $timestamp;

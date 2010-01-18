@@ -27,7 +27,7 @@ interface ResourceInterface
    *
    * @return Boolean true if the resource has not been updated, false otherwise
    */
-  function isUptodate($timestamp = null);
+  function isUptodate($timestamp);
 
   /**
    * Returns the resource tied to this Resource.

@@ -70,7 +70,7 @@ class SymfonyTemplatingExtension extends LoaderExtension
       );
     }
 
-    $configuration->setParameter('symfony.templating.loader.chain.loaders', $loaders);
+    $configuration->getDefinition('symfony.templating.loader.chain')->addArgument($loaders);
     $configuration->setAlias('symfony.templating.loader', 'symfony.templating.loader.chain');
 
     // helpers
@@ -91,7 +91,7 @@ class SymfonyTemplatingExtension extends LoaderExtension
       );
     }
 
-    $configuration->setParameter('symfony.templating.helpers', $helpers);
+    $configuration->getDefinition('symfony.templating.helperset')->addArgument($helpers);
 
     // cache?
     if (isset($config['cache']))

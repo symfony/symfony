@@ -21,9 +21,7 @@
       <argument type="service" id="symfony.templating.helperset" />
     </service>
 
-    <service id="symfony.templating.helperset" class="%symfony.templating.helperset.class%">
-      <argument>%symfony.templating.helpers%</argument>
-    </service>
+    <service id="symfony.templating.helperset" class="%symfony.templating.helperset.class%" />
 
     <service id="symfony.templating.loader.filesystem" class="%symfony.templating.loader.filesystem.class%">
       <argument>%symfony.templating.loader.filesystem.path%</argument>
@@ -34,9 +32,7 @@
       <argument>%symfony.templating.loader.cache.path%</argument>
     </service>
 
-    <service id="symfony.templating.loader.chain" class="%symfony.templating.loader.chain.class%">
-      <argument>%symfony.templating.loader.chain.loaders%</argument>
-    </service>
+    <service id="symfony.templating.loader.chain" class="%symfony.templating.loader.chain.class%" />
 
     <service id="symfony.templating.helper.javascripts" class="%symfony.templating.helper.javascripts.class%" />
     <service id="symfony.templating.helper.stylesheets" class="%symfony.templating.helper.stylesheets.class%" />

@@ -148,7 +148,6 @@ class ProjectServiceContainer extends Container
       'baz_class' => 'BazClass',
       'foo_class' => 'FooClass',
       'foo' => 'bar',
-      'foo_bar' => new Reference('foo_bar'),
     );
   }
 }

@@ -34,7 +34,6 @@ $container->setParameters(array(
   'baz_class' => 'BazClass',
   'foo_class' => 'FooClass',
   'foo' => 'bar',
-  'foo_bar' => new Reference('foo_bar'),
 ));
 $container->setAlias('alias_for_foo', 'foo');
 $container->

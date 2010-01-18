@@ -347,7 +347,7 @@ EOF;
       }
       elseif ($value instanceof Reference)
       {
-        $value = sprintf("new Reference('%s')", $value);
+        throw new \InvalidArgumentException(sprintf('You cannot dump a container with parameters that contain references to other services (reference to service %s found).', $value));
       }
       else
       {

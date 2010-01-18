@@ -7,7 +7,6 @@
     <parameter key="baz_class">BazClass</parameter>
     <parameter key="foo_class">FooClass</parameter>
     <parameter key="foo">bar</parameter>
-    <parameter key="foo_bar" type="service" id="foo_bar" />
   </parameters>
   <services>
     <service id="foo" class="FooClass" constructor="getInstance" shared="false">

@@ -36,7 +36,7 @@ namespace Symfony\Foundation;
  *     ));
  *
  *     // register a library using the PEAR naming convention
- *     $loader->registerClasses(array(
+ *     $loader->registerPrefixes(array(
  *       'Swift_' => __DIR__.'/Swift',
  *     ));
  *

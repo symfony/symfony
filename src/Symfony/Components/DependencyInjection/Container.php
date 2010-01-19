@@ -189,6 +189,11 @@ class Container implements ContainerInterface, \ArrayAccess, \Iterator
    */
   public function getService($id, $invalidBehavior = self::EXCEPTION_ON_INVALID_REFERENCE)
   {
+    if (!is_string($id))
+    {
+      throw new \InvalidArgumentException(sprintf('A service id should be a string (%s given).', str_replace("\n", '', var_export($id, true))));
+    }
+
     if (isset($this->services[$id]))
     {
       return $this->services[$id];

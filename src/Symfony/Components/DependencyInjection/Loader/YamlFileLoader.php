@@ -95,7 +95,7 @@ class YamlFileLoader extends FileLoader
     else
     {
       // try to detect loader with the extension
-      switch (pathinfo((string) $import['resource'], PATHINFO_EXTENSION))
+      switch (pathinfo($import['resource'], PATHINFO_EXTENSION))
       {
         case 'xml':
           $class = 'Symfony\\Components\\DependencyInjection\\Loader\\XmlFileLoader';

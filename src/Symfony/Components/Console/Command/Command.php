@@ -104,6 +104,25 @@ class Command
   {
   }
 
+  /**
+   * Initializes the command just after the input has been validated.
+   *
+   * This is mainly useful when a lot of commands extends one main command
+   * where some things need to be initialized based on the input arguments and options.
+   *
+   * @param InputInterface  $input  An InputInterface instance
+   * @param OutputInterface $output An OutputInterface instance
+   */
+  protected function initialize(InputInterface $input, OutputInterface $output)
+  {
+  }
+
+  /**
+   * Runs the command.
+   *
+   * @param InputInterface  $input  An InputInterface instance
+   * @param OutputInterface $output An OutputInterface instance
+   */
   public function run(InputInterface $input, OutputInterface $output)
   {
     // add the application arguments and options
@@ -121,6 +140,8 @@ class Command
         throw $e;
       }
     }
+
+    $this->initialize($input, $output);
 
     if ($input->isInteractive())
     {

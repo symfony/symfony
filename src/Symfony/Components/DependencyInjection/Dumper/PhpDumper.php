@@ -453,14 +453,17 @@ EOF;
     }
     else
     {
-      if ($this->container->hasDefinition($id) || $this->container->hasAlias($id))
+      if ($this->container->hasAlias($id))
+      {
+        $id = $this->container->getAlias($id);
+      }
+
+      if ($this->container->hasDefinition($id))
       {
         return sprintf('$this->get%sService()', Container::camelize($id));
       }
-      else
-      {
-        return sprintf('$this->getService(\'%s\')', $id);
-      }
+
+      return sprintf('$this->getService(\'%s\')', $id);
     }
   }
 }

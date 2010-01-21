@@ -38,7 +38,7 @@ class ProjectServiceContainer extends Container
   {
     require_once '%path%/foo.php';
 
-    $instance = call_user_func(array('FooClass', 'getInstance'), 'foo', $this->getService('foo.baz'), array($this->getParameter('foo') => 'foo is '.$this->getParameter('foo'), 'bar' => $this->getParameter('foo')), true, $this);
+    $instance = call_user_func(array('FooClass', 'getInstance'), 'foo', $this->getFoo_BazService(), array($this->getParameter('foo') => 'foo is '.$this->getParameter('foo'), 'bar' => $this->getParameter('foo')), true, $this);
     $instance->setBar('bar');
     $instance->initialize();
     sc_configure($instance);
@@ -58,8 +58,8 @@ class ProjectServiceContainer extends Container
   {
     if (isset($this->shared['bar'])) return $this->shared['bar'];
 
-    $instance = new FooClass('foo', $this->getService('foo.baz'), $this->getParameter('foo_bar'));
-    $this->getService('foo.baz')->configure($instance);
+    $instance = new FooClass('foo', $this->getFoo_BazService(), $this->getParameter('foo_bar'));
+    $this->getFoo_BazService()->configure($instance);
 
     return $this->shared['bar'] = $instance;
   }
@@ -113,7 +113,7 @@ class ProjectServiceContainer extends Container
     if (isset($this->shared['method_call1'])) return $this->shared['method_call1'];
 
     $instance = new FooClass();
-    $instance->setBar($this->getService('foo'));
+    $instance->setBar($this->getFooService());
     $instance->setBar($this->getService('foo', Container::NULL_ON_INVALID_REFERENCE));
     if ($this->hasService('foo'))
     {
@@ -134,7 +134,7 @@ class ProjectServiceContainer extends Container
    */
   protected function getAliasForFooService()
   {
-    return $this->getService('foo');
+    return $this->getFooService();
   }
 
   /**

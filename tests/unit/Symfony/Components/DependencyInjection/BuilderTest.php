@@ -17,7 +17,7 @@ use Symfony\Components\DependencyInjection\Reference;
 
 $fixturesPath = __DIR__.'/../../../../fixtures/Symfony/Components/DependencyInjection/';
 
-$t = new LimeTest(55);
+$t = new LimeTest(59);
 
 // ->setDefinitions() ->addDefinitions() ->getDefinitions() ->setDefinition() ->getDefinition() ->hasDefinition()
 $t->diag('->setDefinitions() ->addDefinitions() ->getDefinitions() ->setDefinition() ->getDefinition() ->hasDefinition()');
@@ -89,7 +89,7 @@ try
   @$builder->getService('baz');
   $t->fail('->getService() throws a LogicException if the service has a circular reference to itself');
 }
-catch (LogicException $e)
+catch (\LogicException $e)
 {
   $t->pass('->getService() throws a LogicException if the service has a circular reference to itself');
 }
@@ -105,13 +105,26 @@ $builder->bar = $bar = new stdClass();
 $builder->register('bar', 'stdClass');
 $t->is($builder->getServiceIds(), array('foo', 'bar', 'service_container'), '->getServiceIds() returns all defined service ids');
 
-// ->setAlias()
-$t->diag('->setAlias()');
+// ->setAlias() ->getAlias() ->hasAlias()
+$t->diag('->setAlias() ->getAlias() ->hasAlias()');
 $builder = new Builder();
 $builder->register('foo', 'stdClass');
 $builder->setAlias('bar', 'foo');
+$t->ok($builder->hasAlias('bar'), '->hasAlias() returns true if the alias exists');
+$t->ok(!$builder->hasAlias('foobar'), '->hasAlias() returns false if the alias does not exist');
+$t->is($builder->getAlias('bar'), 'foo', '->getAlias() returns the aliased service');
 $t->ok($builder->hasService('bar'), '->setAlias() defines a new service');
 $t->ok($builder->getService('bar') === $builder->getService('foo'), '->setAlias() creates a service that is an alias to another one');
+
+try
+{
+  $builder->getAlias('foobar');
+  $t->fail('->getAlias() throws an InvalidArgumentException if the alias does not exist');
+}
+catch (\InvalidArgumentException $e)
+{
+  $t->pass('->getAlias() throws an InvalidArgumentException if the alias does not exist');
+}
 
 // ->getAliases()
 $t->diag('->getAliases()');
@@ -186,7 +199,7 @@ try
   $builder->getService('foo4');
   $t->fail('->createService() throws an InvalidArgumentException if the configure callable is not a valid callable');
 }
-catch (InvalidArgumentException $e)
+catch (\InvalidArgumentException $e)
 {
   $t->pass('->createService() throws an InvalidArgumentException if the configure callable is not a valid callable');
 }

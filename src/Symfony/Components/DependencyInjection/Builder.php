@@ -175,6 +175,18 @@ class Builder extends Container
   }
 
   /**
+   * Returns true if an alias exists under the given identifier.
+   *
+   * @param  string  $id The service identifier
+   *
+   * @return Boolean true if the alias exists, false otherwise
+   */
+  public function hasAlias($id)
+  {
+    return array_key_exists($id, $this->aliases);
+  }
+
+  /**
    * Gets all defined aliases.
    *
    * @return array An array of aliases
@@ -182,6 +194,25 @@ class Builder extends Container
   public function getAliases()
   {
     return $this->aliases;
+  }
+
+  /**
+   * Gets an alias.
+   *
+   * @param  string  $id The service identifier
+   *
+   * @return string The aliased service identifier
+   *
+   * @throws \InvalidArgumentException if the alias does not exist
+   */
+  public function getAlias($id)
+  {
+    if (!$this->hasAlias($id))
+    {
+      throw new \InvalidArgumentException(sprintf('The service alias "%s" does not exist.', $id));
+    }
+
+    return $this->aliases[$id];
   }
 
   /**

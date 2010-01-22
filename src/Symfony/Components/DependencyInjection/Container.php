@@ -194,14 +194,14 @@ class Container implements ContainerInterface, \ArrayAccess, \Iterator
       throw new \InvalidArgumentException(sprintf('A service id should be a string (%s given).', str_replace("\n", '', var_export($id, true))));
     }
 
-    if (isset($this->services[$id]))
-    {
-      return $this->services[$id];
-    }
-
     if (method_exists($this, $method = 'get'.self::camelize($id).'Service'))
     {
       return $this->$method();
+    }
+
+    if (isset($this->services[$id]))
+    {
+      return $this->services[$id];
     }
 
     if (self::EXCEPTION_ON_INVALID_REFERENCE === $invalidBehavior)

@@ -85,7 +85,7 @@ class SymfonyTemplatingExtension extends LoaderExtension
     }
     else
     {
-      $helpers = array(
+      $helpers = null === $config['helper'] ? array() : array(
         new Reference('symfony.templating.helper.javascripts'),
         new Reference('symfony.templating.helper.stylesheets'),
       );

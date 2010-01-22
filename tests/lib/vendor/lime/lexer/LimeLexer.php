@@ -30,7 +30,7 @@
  * @package    Lime
  * @author     Bernhard Schussek <bernhard.schussek@symfony-project.com>
  * @author     Fabien Potencier <fabien.potencier@symfony-project.com>
- * @version    SVN: $Id: LimeLexer.php 23701 2009-11-08 21:23:40Z bschussek $
+ * @version    SVN: $Id: LimeLexer.php 25934 2009-12-27 20:44:07Z bschussek $
  */
 abstract class LimeLexer
 {
@@ -40,6 +40,7 @@ abstract class LimeLexer
     $inClassDeclaration,
     $currentFunction,
     $inFunctionDeclaration,
+    $inAssignment,
     $endOfCurrentExpr,
     $currentLine;
 
@@ -62,6 +63,7 @@ abstract class LimeLexer
     $this->inClassDeclaration = false;
     $this->currentFunction = array();
     $this->inFunctionDeclaration = false;
+    $this->inAssignment = false;
     $this->endOfCurrentExpr = true;
     $this->currentLine = 1;
 
@@ -90,6 +92,16 @@ abstract class LimeLexer
           case '}':
             $this->endOfCurrentExpr = true;
             break;
+          case '=':
+            $this->endOfCurrentExpr = false;
+            $this->inAssignment = true;
+            break;
+        }
+
+
+        if ($this->endOfCurrentExpr)
+        {
+          $this->inAssignment = false;
         }
 
         $this->beforeProcess($token, null);
@@ -235,6 +247,11 @@ abstract class LimeLexer
             break;
         }
 
+        if ($this->endOfCurrentExpr)
+        {
+          $this->inAssignment = false;
+        }
+
         $this->beforeProcess($text, $id);
         $this->process($text, $id);
         $this->afterProcess($text, $id);
@@ -346,6 +363,16 @@ abstract class LimeLexer
   }
 
   /**
+   * Returns how many functions are currently nested inside each other.
+   *
+   * @return integer
+   */
+  protected function getFunctionNestingLevel()
+  {
+    return count($this->currentFunction);
+  }
+
+  /**
    * Returns whether the current token marks the end of the last expression.
    *
    * @return boolean
@@ -353,6 +380,16 @@ abstract class LimeLexer
   protected function isEndOfCurrentExpr()
   {
     return $this->endOfCurrentExpr;
+  }
+
+  /**
+   * Returns whether the current token is inside an assignment operation.
+   *
+   * @return boolean
+   */
+  protected function inAssignment()
+  {
+    return $this->inAssignment;
   }
 
   /**

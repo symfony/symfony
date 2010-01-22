@@ -18,7 +18,7 @@
  *
  * @package    Lime
  * @author     Bernhard Schussek <bernhard.schussek@symfony-project.com>
- * @version    SVN: $Id: LimeOutputConsoleSummary.php 23701 2009-11-08 21:23:40Z bschussek $
+ * @version    SVN: $Id: LimeOutputConsoleSummary.php 25932 2009-12-27 19:55:32Z bschussek $
  */
 class LimeOutputConsoleSummary implements LimeOutputInterface
 {
@@ -27,18 +27,12 @@ class LimeOutputConsoleSummary implements LimeOutputInterface
     $options        = array(),
     $startTime      = 0,
     $file           = null,
+    $results        = array(),
     $actualFiles    = 0,
     $failedFiles    = 0,
     $actualTests    = 0,
-    $failedTests    = 0,
-    $expected       = array(),
-    $actual         = array(),
-    $passed         = array(),
-    $failed         = array(),
-    $errors         = array(),
-    $warnings       = array(),
-    $todos          = array(),
-    $line           = array();
+    $expectedTests  = 0,
+    $failedTests    = 0;
 
   /**
    * Constructor.
@@ -64,28 +58,24 @@ class LimeOutputConsoleSummary implements LimeOutputInterface
 
   public function focus($file)
   {
-    $this->file = $file;
-
-    if (!array_key_exists($file, $this->line))
+    if (!array_key_exists($file, $this->results))
     {
-      $this->line[$file] = count($this->line);
-      $this->expected[$file] = 0;
-      $this->actual[$file] = 0;
-      $this->passed[$file] = 0;
-      $this->failed[$file] = array();
-      $this->errors[$file] = array();
-      $this->warnings[$file] = array();
-      $this->todos[$file] = array();
+      $this->results[$file] = new LimeOutputResult();
     }
+
+    $this->file = $file;
   }
 
   public function close()
   {
     if (!is_null($this->file))
     {
+      $result = $this->results[$this->file];
+
       $this->actualFiles++;
-      $this->actualTests += $this->getActual();
-      $this->failedTests += $this->getFailed();
+      $this->actualTests += $result->getNbActual();
+      $this->expectedTests += $result->getNbExpected();
+      $this->failedTests += $result->getNbFailures();
 
       $path = $this->truncate($this->file);
 
@@ -96,14 +86,12 @@ class LimeOutputConsoleSummary implements LimeOutputInterface
 
       $this->printer->printText(str_pad($path, 73, '.'));
 
-      $incomplete = ($this->getExpected() > 0 && $this->getActual() != $this->getExpected());
-
-      if ($this->getErrors() || $this->getFailed() || $incomplete)
+      if ($result->hasErrors() || $result->hasFailures() || $result->isIncomplete())
       {
         $this->failedFiles++;
         $this->printer->printLine("not ok", LimePrinter::NOT_OK);
       }
-      else if ($this->getWarnings())
+      else if ($result->hasWarnings())
       {
         $this->printer->printLine("warning", LimePrinter::WARNING);
       }
@@ -112,29 +100,29 @@ class LimeOutputConsoleSummary implements LimeOutputInterface
         $this->printer->printLine("ok", LimePrinter::OK);
       }
 
-      if ($this->getExpected() > 0 && $this->getActual() != $this->getExpected())
+      if ($result->isIncomplete())
       {
         $this->printer->printLine('    Plan Mismatch:', LimePrinter::COMMENT);
-        if ($this->getActual() > $this->getExpected())
+        if ($result->getNbActual() > $result->getNbExpected())
         {
-          $this->printer->printLine(sprintf('    Looks like you only planned %s tests but ran %s.', $this->getExpected(), $this->getActual()));
+          $this->printer->printLine(sprintf('    Looks like you only planned %s tests but ran %s.', $result->getNbExpected(), $result->getNbActual()));
         }
         else
         {
-          $this->printer->printLine(sprintf('    Looks like you planned %s tests but only ran %s.', $this->getExpected(), $this->getActual()));
+          $this->printer->printLine(sprintf('    Looks like you planned %s tests but only ran %s.', $result->getNbExpected(), $result->getNbActual()));
         }
       }
 
-      if ($this->getFailed())
+      if ($result->hasFailures())
       {
         $this->printer->printLine('    Failed Tests:', LimePrinter::COMMENT);
 
         $i = 0;
-        foreach ($this->failed[$this->file] as $number => $failed)
+        foreach ($result->getFailures() as $number => $failed)
         {
           if (!$this->options['verbose'] && $i > 2)
           {
-            $this->printer->printLine(sprintf('    ... and %s more', $this->getFailed()-$i));
+            $this->printer->printLine(sprintf('    ... and %s more', $result->getNbFailures()-$i));
             break;
           }
 
@@ -144,15 +132,15 @@ class LimeOutputConsoleSummary implements LimeOutputInterface
         }
       }
 
-      if ($this->getWarnings())
+      if ($result->hasWarnings())
       {
         $this->printer->printLine('    Warnings:', LimePrinter::COMMENT);
 
-        foreach ($this->warnings[$this->file] as $i => $warning)
+        foreach ($result->getWarnings() as $i => $warning)
         {
           if (!$this->options['verbose'] && $i > 2)
           {
-            $this->printer->printLine(sprintf('    ... and %s more', $this->getWarnings()-$i));
+            $this->printer->printLine(sprintf('    ... and %s more', $result->getNbWarnings()-$i));
             break;
           }
 
@@ -169,15 +157,15 @@ class LimeOutputConsoleSummary implements LimeOutputInterface
         }
       }
 
-      if ($this->getErrors())
+      if ($result->hasErrors())
       {
         $this->printer->printLine('    Errors:', LimePrinter::COMMENT);
 
-        foreach ($this->errors[$this->file] as $i => $error)
+        foreach ($result->getErrors() as $i => $error)
         {
           if (!$this->options['verbose'] && $i > 2)
           {
-            $this->printer->printLine(sprintf('    ... and %s more', $this->getErrors()-$i));
+            $this->printer->printLine(sprintf('    ... and %s more', $result->getNbErrors()-$i));
             break;
           }
 
@@ -194,15 +182,15 @@ class LimeOutputConsoleSummary implements LimeOutputInterface
         }
       }
 
-      if ($this->getTodos())
+      if ($result->hasTodos())
       {
         $this->printer->printLine('    TODOs:', LimePrinter::COMMENT);
 
-        foreach ($this->todos[$this->file] as $i => $todo)
+        foreach ($result->getTodos() as $i => $todo)
         {
           if (!$this->options['verbose'] && $i > 2)
           {
-            $this->printer->printLine(sprintf('    ... and %s more', $this->getTodos()-$i));
+            $this->printer->printLine(sprintf('    ... and %s more', $result->getNbTodos()-$i));
             break;
           }
 
@@ -212,77 +200,39 @@ class LimeOutputConsoleSummary implements LimeOutputInterface
     }
   }
 
-  protected function getExpected()
-  {
-    return $this->expected[$this->file];
-  }
-
-  protected function getActual()
-  {
-    return $this->actual[$this->file];
-  }
-
-  protected function getPassed()
-  {
-    return $this->passed[$this->file];
-  }
-
-  protected function getFailed()
-  {
-    return count($this->failed[$this->file]);
-  }
-
-  protected function getErrors()
-  {
-    return count($this->errors[$this->file]);
-  }
-
-  protected function getWarnings()
-  {
-    return count($this->warnings[$this->file]);
-  }
-
-  protected function getTodos()
-  {
-    return count($this->todos[$this->file]);
-  }
-
   public function plan($amount)
   {
-    $this->expected[$this->file] = $amount;
+    $this->results[$this->file]->addPlan($amount);
   }
 
   public function pass($message, $file, $line)
   {
-    $this->passed[$this->file]++;
-    $this->actual[$this->file]++;
+    $this->results[$this->file]->addPassed();
   }
 
   public function fail($message, $file, $line, $error = null)
   {
-    $this->actual[$this->file]++;
-    $this->failed[$this->file][$this->actual[$this->file]] = array($message, $file, $line, $error);
+    $this->results[$this->file]->addFailure(array($message, $file, $line, $error));
   }
 
   public function skip($message, $file, $line)
   {
-    $this->actual[$this->file]++;
+    $this->results[$this->file]->addSkipped();
   }
 
   public function todo($message, $file, $line)
   {
-    $this->actual[$this->file]++;
-    $this->todos[$this->file][] = $message;
+    $this->results[$this->file]->addTodo($message);
   }
 
   public function warning($message, $file, $line)
   {
-    $this->warnings[$this->file][] = array($message, $file, $line);
+    $this->results[$this->file]->addWarning(array($message, $file, $line));
   }
 
   public function error(LimeError $error)
   {
-    $this->errors[$this->file][] = $error;
+    $this->results[$this->file]->addError($error);
   }
 
   public function comment($message) {}
@@ -293,7 +243,7 @@ class LimeOutputConsoleSummary implements LimeOutputInterface
     {
       $stats = sprintf(' Failed %d/%d test scripts, %.2f%% okay. %d/%d subtests failed, %.2f%% okay.',
           $this->failedFiles, $this->actualFiles, 100 - 100*$this->failedFiles/max(1,$this->actualFiles),
-          $this->failedTests, $this->actualTests, 100 - 100*$this->failedTests/max(1,$this->actualTests));
+          $this->failedTests, $this->expectedTests, 100 - 100*$this->failedTests/max(1,$this->expectedTests));
 
       $this->printer->printBox($stats, LimePrinter::NOT_OK);
     }

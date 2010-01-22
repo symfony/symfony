@@ -54,7 +54,7 @@ class LimeTestSuite extends LimeRegistration
       throw new LogicException(sprintf('The output "%s" does not support multi-processing', $type));
     }
 
-    $this->output = new LimeOutputInspectable($output);
+    $this->output = new LimeOutputProxy($output);
   }
 
   public function run()
@@ -109,12 +109,6 @@ class LimeTestSuite extends LimeRegistration
 
     $this->output->flush();
 
-    $planned = $this->output->getPlanned();
-    $passed = $this->output->getPassed();
-    $failed = $this->output->getFailed();
-    $errors = $this->output->getErrors();
-    $warnings = $this->output->getWarnings();
-
-    return 0 == ($failed + $errors + $warnings) && $planned == $passed;
+    return !$this->output->getResult()->isFailed();
   }
 }

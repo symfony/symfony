@@ -54,7 +54,7 @@
  *
  * @package    Lime
  * @author     Bernhard Schussek <bernhard.schussek@symfony-project.com>
- * @version    SVN: $Id: LimeLexerTransformAnnotations.php 23701 2009-11-08 21:23:40Z bschussek $
+ * @version    SVN: $Id: LimeLexerTransformAnnotations.php 25934 2009-12-27 20:44:07Z bschussek $
  * @see        LimeLexerAnnotationAware
  */
 class LimeLexerTransformAnnotations extends LimeLexerAnnotationAware
@@ -181,6 +181,27 @@ class LimeLexerTransformAnnotations extends LimeLexerAnnotationAware
       }
     }
 
+    // Closures and anonymous functions should not be stripped from the output
+    if ($this->inFunction())
+    {
+      if ($this->inFunctionDeclaration())
+      {
+        $this->functionBuffer .= $text;
+        $text = '';
+      }
+      // if the name of the function is NULL, it is a closure/anonymous function
+      else if (!$this->getCurrentFunction() || $this->inClass())
+      {
+        $text = $this->functionBuffer.$text;
+        $this->functionBuffer = '';
+      }
+      else
+      {
+        $text = str_repeat("\n", count(explode("\n", $this->functionBuffer.$text)) - 1);
+        $this->functionBuffer = '';
+      }
+    }
+
     if ($id == T_OPEN_TAG && !$this->initialized)
     {
       if (count($this->variables))
@@ -189,11 +210,7 @@ class LimeLexerTransformAnnotations extends LimeLexerAnnotationAware
       }
       $this->initialized = true;
     }
-    else if ($this->inClass() && $this->classNotLoaded)
-    {
-      // just print
-    }
-    else if ($this->inClass() || $this->inFunction())
+    else if ($this->inClass() && !$this->classNotLoaded)
     {
       $text = str_repeat("\n", count(explode("\n", $text)) - 1);
     }

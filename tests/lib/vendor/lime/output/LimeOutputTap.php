@@ -14,6 +14,7 @@ class LimeOutputTap implements LimeOutputInterface
 {
   protected
     $options    = array(),
+    $result     = null,
     $expected   = null,
     $passed     = 0,
     $actual     = 0,
@@ -25,6 +26,7 @@ class LimeOutputTap implements LimeOutputInterface
   public function __construct(LimePrinter $printer, array $options = array())
   {
     $this->printer = $printer;
+    $this->result = new LimeOutputResult();
     $this->options = array_merge(array(
       'verbose'   => false,
       'base_dir'  => null,
@@ -57,36 +59,35 @@ class LimeOutputTap implements LimeOutputInterface
 
   public function plan($amount)
   {
-    $this->expected += $amount;
+    $this->result->addPlan($amount);
   }
 
   public function pass($message, $file, $line)
   {
-    $this->actual++;
-    $this->passed++;
+    $this->result->addPassed();
 
     if (empty($message))
     {
-      $this->printer->printLine('ok '.$this->actual, LimePrinter::OK);
+      $this->printer->printLine('ok '.$this->result->getNbActual(), LimePrinter::OK);
     }
     else
     {
-      $this->printer->printText('ok '.$this->actual, LimePrinter::OK);
+      $this->printer->printText('ok '.$this->result->getNbActual(), LimePrinter::OK);
       $this->printer->printLine(' - '.$message);
     }
   }
 
   public function fail($message, $file, $line, $error = null)
   {
-    $this->actual++;
+    $this->result->addFailure(array($message, $file, $line, $error));
 
     if (empty($message))
     {
-      $this->printer->printLine('not ok '.$this->actual, LimePrinter::NOT_OK);
+      $this->printer->printLine('not ok '.$this->result->getNbActual(), LimePrinter::NOT_OK);
     }
     else
     {
-      $this->printer->printText('not ok '.$this->actual, LimePrinter::NOT_OK);
+      $this->printer->printText('not ok '.$this->result->getNbActual(), LimePrinter::NOT_OK);
       $this->printer->printLine(' - '.$message);
     }
 
@@ -103,17 +104,16 @@ class LimeOutputTap implements LimeOutputInterface
 
   public function skip($message, $file, $line)
   {
-    $this->actual++;
-    $this->passed++;
+    $this->result->addSkipped();
 
     if (empty($message))
     {
-      $this->printer->printText('ok '.$this->actual, LimePrinter::SKIP);
+      $this->printer->printText('ok '.$this->result->getNbActual(), LimePrinter::SKIP);
       $this->printer->printText(' ');
     }
     else
     {
-      $this->printer->printText('ok '.$this->actual, LimePrinter::SKIP);
+      $this->printer->printText('ok '.$this->result->getNbActual(), LimePrinter::SKIP);
       $this->printer->printText(' - '.$message.' ');
     }
 
@@ -122,17 +122,16 @@ class LimeOutputTap implements LimeOutputInterface
 
   public function todo($message, $file, $line)
   {
-    $this->actual++;
-    $this->passed++;
+    $this->result->addTodo($message);
 
     if (empty($message))
     {
-      $this->printer->printText('not ok '.$this->actual, LimePrinter::TODO);
+      $this->printer->printText('not ok '.$this->result->getNbActual(), LimePrinter::TODO);
       $this->printer->printText(' ');
     }
     else
     {
-      $this->printer->printText('not ok '.$this->actual, LimePrinter::TODO);
+      $this->printer->printText('not ok '.$this->result->getNbActual(), LimePrinter::TODO);
       $this->printer->printText(' - '.$message.' ');
     }
 
@@ -141,7 +140,7 @@ class LimeOutputTap implements LimeOutputInterface
 
   public function warning($message, $file, $line)
   {
-    $this->warnings++;
+    $this->result->addWarning(array($message, $file, $line));
 
     $message .= sprintf("\n(in %s on line %s)", $this->stripBaseDir($file), $line);
 
@@ -150,7 +149,7 @@ class LimeOutputTap implements LimeOutputInterface
 
   public function error(LimeError $error)
   {
-    $this->errors++;
+    $this->result->addError($error);
 
     $message = sprintf("%s: %s\n(in %s on line %s)", $error->getType(),
         $error->getMessage(), $this->stripBaseDir($error->getFile()), $error->getLine());
@@ -261,14 +260,10 @@ class LimeOutputTap implements LimeOutputInterface
 
   public function flush()
   {
-    if (is_null($this->expected))
-    {
-      $this->plan($this->actual);
-    }
+    $result = $this->result;
+    $this->printer->printLine('1..'.$result->getNbExpected());
 
-    $this->printer->printLine('1..'.$this->expected);
-
-    $messages = self::getMessages($this->actual, $this->expected, $this->passed, $this->errors, $this->warnings);
+    $messages = self::getMessages($result->getNbActual(), $result->getNbExpected(), $result->getNbPassed(), $result->getNbErrors(), $result->getNbWarnings());
 
     foreach ($messages as $message)
     {

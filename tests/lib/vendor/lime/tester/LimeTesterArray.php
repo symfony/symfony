@@ -215,12 +215,12 @@ class LimeTesterArray extends LimeTester implements ArrayAccess, Iterator
 
       foreach ($this->value as $k => $v)
       {
-        if ((is_null($key) || $key != $k) && !$truncated)
+        if ((is_null($key) || $key !== $k) && !$truncated)
         {
           $result .= "  ...\n";
           $truncated = true;
         }
-        else if ($k == $key)
+        else if ($k === $key)
         {
           $value = is_null($value) ? $v : $value;
           $result .= sprintf("  %s => %s,\n", var_export($k, true), $this->indent($value));

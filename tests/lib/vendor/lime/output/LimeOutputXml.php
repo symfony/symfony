@@ -13,7 +13,7 @@
 class LimeOutputXml implements LimeOutputInterface
 {
   protected
-    $ouptut = null;
+    $output = null;
 
   public function __construct()
   {

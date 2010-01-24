@@ -29,7 +29,8 @@ use Symfony\Components\DependencyInjection\Builder;
  */
 class GraphvizDumper extends Dumper
 {
-  protected $nodes, $edges;
+  protected $nodes;
+  protected $edges;
 
   /**
    * Dumps the service container as a graphviz graph.

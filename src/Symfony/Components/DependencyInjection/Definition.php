@@ -20,14 +20,13 @@ namespace Symfony\Components\DependencyInjection;
  */
 class Definition
 {
-  protected
-    $class        = null,
-    $file         = null,
-    $constructor  = null,
-    $shared       = true,
-    $arguments    = array(),
-    $calls        = array(),
-    $configurator = null;
+  protected $class;
+  protected $file;
+  protected $constructor;
+  protected $shared;
+  protected $arguments;
+  protected $calls;
+  protected $configurator;
 
   /**
    * Constructor.
@@ -37,14 +36,16 @@ class Definition
    */
   public function __construct($class, array $arguments = array())
   {
-    $this->class     = $class;
+    $this->class = $class;
     $this->arguments = $arguments;
+    $this->calls = array();
+    $this->shared = true;
   }
 
   /**
    * Sets the constructor method.
    *
-   * @param  string              $method The method name
+   * @param  string $method The method name
    *
    * @return Definition The current instance
    */
@@ -68,7 +69,7 @@ class Definition
   /**
    * Sets the service class.
    *
-   * @param  string              $class The service class
+   * @param  string $class The service class
    *
    * @return Definition The current instance
    */
@@ -92,7 +93,7 @@ class Definition
   /**
    * Sets the constructor arguments to pass to the service constructor.
    *
-   * @param  array               $arguments An array of arguments
+   * @param  array $arguments An array of arguments
    *
    * @return Definition The current instance
    */
@@ -106,7 +107,7 @@ class Definition
   /**
    * Adds a constructor argument to pass to the service constructor.
    *
-   * @param  mixed               $argument An argument
+   * @param  mixed $argument An argument
    *
    * @return Definition The current instance
    */
@@ -130,7 +131,7 @@ class Definition
   /**
    * Sets the methods to call after service initialization.
    *
-   * @param  array               $calls An array of method calls
+   * @param  array $calls An array of method calls
    *
    * @return Definition The current instance
    */
@@ -148,8 +149,8 @@ class Definition
   /**
    * Adds a method to call after service initialization.
    *
-   * @param  string              $method    The method name to call
-   * @param  array               $arguments An array of arguments to pass to the method call
+   * @param  string $method    The method name to call
+   * @param  array  $arguments An array of arguments to pass to the method call
    *
    * @return Definition The current instance
    */
@@ -173,7 +174,7 @@ class Definition
   /**
    * Sets a file to require before creating the service.
    *
-   * @param  string              $file A full pathname to include
+   * @param  string $file A full pathname to include
    *
    * @return Definition The current instance
    */
@@ -197,7 +198,7 @@ class Definition
   /**
    * Sets if the service must be shared or not.
    *
-   * @param  Boolean             $shared Whether the service must be shared or not
+   * @param  Boolean $shared Whether the service must be shared or not
    *
    * @return Definition The current instance
    */
@@ -221,7 +222,7 @@ class Definition
   /**
    * Sets a configurator to call after the service is fully initialized.
    *
-   * @param  mixed               $callable A PHP callable
+   * @param  mixed $callable A PHP callable
    *
    * @return Definition The current instance
    */

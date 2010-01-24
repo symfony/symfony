@@ -20,10 +20,9 @@ namespace Symfony\Components\DependencyInjection;
  */
 class Builder extends Container
 {
-  protected
-    $definitions = array(),
-    $aliases     = array(),
-    $loading     = array();
+  protected $definitions = array();
+  protected $aliases     = array();
+  protected $loading     = array();
 
   /**
    * Sets a service.

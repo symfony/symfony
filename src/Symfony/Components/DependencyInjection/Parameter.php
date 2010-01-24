@@ -20,8 +20,7 @@ namespace Symfony\Components\DependencyInjection;
  */
 class Parameter
 {
-  protected
-    $id = null;
+  protected $id;
 
   /**
    * Constructor.

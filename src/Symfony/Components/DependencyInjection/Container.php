@@ -52,11 +52,10 @@ namespace Symfony\Components\DependencyInjection;
  */
 class Container implements ContainerInterface, \ArrayAccess, \Iterator
 {
-  protected
-    $serviceIds = array(),
-    $parameters = array(),
-    $services   = array(),
-    $count      = 0;
+  protected $serviceIds = array();
+  protected $parameters = array();
+  protected $services   = array();
+  protected $count      = 0;
 
   const EXCEPTION_ON_INVALID_REFERENCE = 1;
   const NULL_ON_INVALID_REFERENCE      = 2;

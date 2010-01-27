@@ -168,7 +168,7 @@ class Container implements ContainerInterface, \ArrayAccess, \Iterator
    */
   public function hasService($id)
   {
-    return isset($this->services[$id]) || method_exists($this, 'get'.self::camelize($id).'Service');
+    return isset($this->services[$id]) || method_exists($this, 'get'.strtr($id, array('_' => '', '.' => '_')).'Service');
   }
 
   /**
@@ -193,7 +193,7 @@ class Container implements ContainerInterface, \ArrayAccess, \Iterator
       throw new \InvalidArgumentException(sprintf('A service id should be a string (%s given).', str_replace("\n", '', var_export($id, true))));
     }
 
-    if (method_exists($this, $method = 'get'.self::camelize($id).'Service'))
+    if (method_exists($this, $method = 'get'.strtr($id, array('_' => '', '.' => '_')).'Service'))
     {
       return $this->$method();
     }
@@ -375,7 +375,7 @@ class Container implements ContainerInterface, \ArrayAccess, \Iterator
 
   static public function camelize($id)
   {
-    return preg_replace(array('/(^|_|-)+(.)/e', '/\.(.)/e'), array("strtoupper('\\2')", "'_'.strtoupper('\\1')"), $id);
+    return preg_replace(array('/(^|_)+(.)/e', '/\.(.)/e'), array("strtoupper('\\2')", "'_'.strtoupper('\\1')"), $id);
   }
 
   static public function underscore($id)

@@ -375,6 +375,24 @@ class Container implements ContainerInterface, \ArrayAccess, \Iterator
     return $this->count > 0;
   }
 
+  /**
+   * Catches unknown methods.
+   *
+   * @param string $method    The called method name
+   * @param array  $arguments The method arguments
+   *
+   * @return mixed
+   */
+  public function __call($method, $arguments)
+  {
+    if (!preg_match('/^get(.+)Service$/', $method, $match))
+    {
+      throw new \RuntimeException(sprintf('Call to undefined method %s::%s.', get_class($this), $method));
+    }
+
+    return $this->getService(self::underscore($match[1]));
+  }
+
   static public function camelize($id)
   {
     return preg_replace(array('/(^|_)+(.)/e', '/\.(.)/e'), array("strtoupper('\\2')", "'_'.strtoupper('\\1')"), $id);

@@ -14,7 +14,7 @@ use Symfony\Components\DependencyInjection\Container;
 
 $fixturesPath = __DIR__.'/../../../../fixtures/Symfony/Components/DependencyInjection/';
 
-$t = new LimeTest(41);
+$t = new LimeTest(43);
 
 // __construct()
 $t->diag('__construct()');
@@ -206,3 +206,19 @@ $t->is($services, array(
   'foo.baz' => spl_object_hash($sc->__foo_baz),
   'foo' => spl_object_hash($foo)),
 'Container implements the Iterator interface');
+
+// __call()
+$t->diag('__call()');
+$sc = new Container();
+$sc->setService('foo_bar.foo', $foo = new stdClass());
+$t->is($sc->getFooBar_FooService(), $foo, '__call() finds services is the method is getXXXService()');
+
+try
+{
+  $sc->getFooBar_Foo();
+  $t->pass('__call() throws a \RuntimeException exception if the method is not a service method');
+}
+catch (\RuntimeException $e)
+{
+  $t->pass('__call() throws a \RuntimeException exception if the method is not a service method');
+}

@@ -109,7 +109,7 @@ class Container implements ContainerInterface, \ArrayAccess, \Iterator
   /**
    * Gets a service container parameter.
    *
-   * @param  string $name The parameter name
+   * @param string $name The parameter name
    *
    * @return mixed  The parameter value
    *
@@ -117,12 +117,14 @@ class Container implements ContainerInterface, \ArrayAccess, \Iterator
    */
   public function getParameter($name)
   {
-    if (!$this->hasParameter($name))
+    $name = strtolower($name);
+
+    if (!array_key_exists($name, $this->parameters))
     {
       throw new \InvalidArgumentException(sprintf('The parameter "%s" must be defined.', $name));
     }
 
-    return $this->parameters[strtolower($name)];
+    return $this->parameters[$name];
   }
 
   /**

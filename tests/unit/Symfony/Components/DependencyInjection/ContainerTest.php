@@ -216,7 +216,7 @@ $t->is($sc->getFooBar_FooService(), $foo, '__call() finds services is the method
 try
 {
   $sc->getFooBar_Foo();
-  $t->pass('__call() throws a \RuntimeException exception if the method is not a service method');
+  $t->fail('__call() throws a \RuntimeException exception if the method is not a service method');
 }
 catch (\RuntimeException $e)
 {

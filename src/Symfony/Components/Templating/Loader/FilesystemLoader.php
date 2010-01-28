@@ -23,8 +23,7 @@ use Symfony\Components\Templating\Storage\FileStorage;
  */
 class FilesystemLoader extends Loader
 {
-  protected
-    $templatePathPatternPatterns = array();
+  protected $templatePathPatterns;
 
   /**
    * Constructor.

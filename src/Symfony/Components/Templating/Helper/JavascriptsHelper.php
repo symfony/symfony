@@ -27,8 +27,7 @@ namespace Symfony\Components\Templating\Helper;
  */
 class JavascriptsHelper extends Helper
 {
-  protected
-    $javascripts = array();
+  protected $javascripts = array();
 
   /**
    * Adds a JavaScript file.

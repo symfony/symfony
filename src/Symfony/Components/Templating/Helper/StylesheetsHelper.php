@@ -27,8 +27,7 @@ namespace Symfony\Components\Templating\Helper;
  */
 class StylesheetsHelper extends Helper
 {
-  protected
-    $stylesheets = array();
+  protected $stylesheets = array();
 
   /**
    * Adds a stylesheets file.

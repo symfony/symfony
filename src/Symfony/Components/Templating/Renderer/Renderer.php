@@ -22,8 +22,7 @@ use Symfony\Components\Templating\Engine;
  */
 abstract class Renderer implements RendererInterface
 {
-  protected
-    $engine = null;
+  protected $engine;
 
   /**
    * Sets the template engine associated with this renderer.

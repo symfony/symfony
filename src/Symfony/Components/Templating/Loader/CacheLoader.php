@@ -27,9 +27,8 @@ use Symfony\Components\Templating\Storage\FileStorage;
  */
 class CacheLoader extends Loader
 {
-  protected
-    $loader = null,
-    $dir    = '';
+  protected $loader;
+  protected $dir;
 
   /**
    * Constructor.

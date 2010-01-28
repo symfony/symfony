@@ -26,10 +26,9 @@ namespace Symfony\Components\Templating\Helper;
  */
 class AssetsHelper extends Helper
 {
-  protected
-    $version  = null,
-    $baseURLs = array(),
-    $basePath = '';
+  protected $version;
+  protected $baseURLs;
+  protected $basePath;
 
   /**
    * Constructor.

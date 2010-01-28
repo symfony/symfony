@@ -20,9 +20,8 @@ namespace Symfony\Components\Templating\Storage;
  */
 class Storage
 {
-  protected
-    $renderer = null,
-    $template = '';
+  protected $renderer;
+  protected $template;
 
   /**
    * Constructor.

@@ -22,12 +22,12 @@ use Symfony\Components\Templating\Engine;
  */
 class HelperSet
 {
-  protected
-    $helpers = array(),
-    $engine  = null;
+  protected $helpers;
+  protected $engine;
 
   public function __construct(array $helpers = array())
   {
+    $this->helpers = array();
     foreach ($helpers as $alias => $helper)
     {
       $this->set($helper, is_int($alias) ? null : $alias);

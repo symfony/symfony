@@ -22,8 +22,7 @@ use Symfony\Components\Templating\DebuggerInterface;
  */
 abstract class Loader implements LoaderInterface
 {
-  protected
-    $debugger = null;
+  protected $debugger;
 
   /**
    * Sets the debugger to use for this loader.

@@ -24,16 +24,15 @@ use Symfony\Components\Templating\Renderer\PhpRenderer;
  */
 class Engine
 {
-  protected
-    $loader    = null,
-    $renderers = array(),
-    $current   = null,
-    $helperSet = array(),
-    $parents   = array(),
-    $stack     = array(),
-    $slots     = array(),
-    $openSlots = array(),
-    $charset   = 'UTF-8';
+  protected $loader;
+  protected $renderers;
+  protected $current;
+  protected $helperSet;
+  protected $parents;
+  protected $stack;
+  protected $slots;
+  protected $openSlots;
+  protected $charset;
 
   /**
    * Constructor.
@@ -46,6 +45,11 @@ class Engine
   {
     $this->loader    = $loader;
     $this->renderers = $renderers;
+    $this->parents   = array();
+    $this->stack     = array();
+    $this->slots     = array();
+    $this->openSlots = array();
+    $this->charset   = 'UTF-8';
 
     $this->setHelperSet(null === $helperSet ? new HelperSet() : $helperSet);
 

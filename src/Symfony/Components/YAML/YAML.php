@@ -19,8 +19,7 @@ namespace Symfony\Components\YAML;
  */
 class YAML
 {
-  static protected
-    $spec = '1.2';
+  static protected $spec = '1.2';
 
   /**
    * Sets the YAML specification version to use.

@@ -19,13 +19,12 @@ namespace Symfony\Components\YAML;
  */
 class Parser
 {
-  protected
-    $value         = '',
-    $offset        = 0,
-    $lines         = array(),
-    $currentLineNb = -1,
-    $currentLine   = '',
-    $refs          = array();
+  protected $value          = '';
+  protected $offset         = 0;
+  protected $lines          = array();
+  protected $currentLineNb  = -1;
+  protected $currentLine    = '';
+  protected $refs           = array();
 
   /**
    * Constructor

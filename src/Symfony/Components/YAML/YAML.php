@@ -119,13 +119,3 @@ class YAML
     return $yaml->dump($array, $inline);
   }
 }
-
-/**
- * Wraps echo to automatically provide a newline.
- *
- * @param string $string The string to echo with new line
- */
-function echoln($string)
-{
-  echo $string."\n";
-}

@@ -67,7 +67,13 @@ class Engine
   /**
    * Renders a template.
    *
-   * @param string $name       A template logical name
+   * The template name is composed of segments separated by a colon (:).
+   * By default, this engine knows how to parse templates with one or two segments:
+   *
+   *  * index:      The template logical name is index and the renderer is php
+   *  * index:twig: The template logical name is index and the renderer is twig
+   *
+   * @param string $name       A template name
    * @param array  $parameters An array of parameters to pass to the template
    *
    * @return string The evaluated template as a string
@@ -77,35 +83,23 @@ class Engine
    */
   public function render($name, array $parameters = array())
   {
-    // split renderer & template
-    if (false !== $pos = strpos($name, ':'))
-    {
-      $renderer = substr($name, 0, $pos);
-      $name = substr($name, $pos + 1);
-    }
-    else
-    {
-      $renderer = 'php';
-    }
+    list($name, $options) = $this->splitTemplateName($name);
 
     // load
-    $template = $this->loader->load($name, $renderer);
+    $template = $this->loader->load($name, $options);
 
     if (false === $template)
     {
-      throw new \InvalidArgumentException(sprintf('The template "%s" does not exist (renderer: %s).', $name, $renderer));
+      throw new \InvalidArgumentException(sprintf('The template "%s" does not exist (renderer: %s).', $name, $options['renderer']));
     }
 
     $this->current = $name;
     $this->parents[$name] = null;
 
     // renderer
-    if ($template->getRenderer())
-    {
-      $renderer = $template->getRenderer();
-    }
+    $renderer = $template->getRenderer() ? $template->getRenderer() : $options['renderer'];
 
-    if (!isset($this->renderers[$renderer]))
+    if (!isset($this->renderers[$options['renderer']]))
     {
       throw new \InvalidArgumentException(sprintf('The renderer "%s" is not registered.', $renderer));
     }
@@ -311,5 +305,20 @@ class Engine
   public function getCharset()
   {
     return $this->charset;
+  }
+
+  protected function splitTemplateName($name)
+  {
+    if (false !== $pos = strpos($name, ':'))
+    {
+      $renderer = substr($name, $pos + 1);
+      $name = substr($name, 0, $pos);
+    }
+    else
+    {
+      $renderer = 'php';
+    }
+
+    return array($name, array('renderer' => $renderer));
   }
 }

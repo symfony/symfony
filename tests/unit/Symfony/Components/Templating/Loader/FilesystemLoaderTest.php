@@ -64,7 +64,7 @@ $t->is((string) $storage, $path.'/foo.php', '->load() returns a FileStorage poin
 
 $loader = new ProjectTemplateLoader($pathPattern);
 $loader->setDebugger($debugger = new ProjectTemplateDebugger());
-$t->ok($loader->load('foo', 'xml') === false, '->load() returns false if the template does not exists for the given renderer');
+$t->ok($loader->load('foo', array('renderer' => 'xml')) === false, '->load() returns false if the template does not exists for the given renderer');
 $t->ok($debugger->hasMessage('Failed loading template'), '->load() logs a "Failed loading template" message if the template is not found');
 
 $loader = new ProjectTemplateLoader(array($fixturesPath.'/null/%name%', $pathPattern));

@@ -38,30 +38,41 @@ class FilesystemLoader extends Loader
     }
 
     $this->templatePathPatterns = $templatePathPatterns;
+
+    parent::__construct();
   }
 
   /**
    * Loads a template.
    *
    * @param string $template The logical template name
-   * @param string $renderer The renderer to use
+   * @param array  $options  An array of options
    *
    * @return Storage|Boolean false if the template cannot be loaded, a Storage instance otherwise
    */
-  public function load($template, $renderer = 'php')
+  public function load($template, array $options = array())
   {
     if (self::isAbsolutePath($template) && file_exists($template))
     {
       return new FileStorage($template);
     }
 
+    $options = $this->mergeDefaultOptions($options);
+    $options['name'] = $template;
+
+    $replacements = array();
+    foreach ($options as $key => $value)
+    {
+      $replacements['%'.$key.'%'] = $value;
+    }
+
     foreach ($this->templatePathPatterns as $templatePathPattern)
     {
-      if (is_file($file = strtr($templatePathPattern, array('%name%' => $template, '%renderer%' => $renderer))))
+      if (is_file($file = strtr($templatePathPattern, $replacements)))
       {
         if ($this->debugger)
         {
-          $this->debugger->log(sprintf('Loaded template file "%s" (renderer: %s)', $file, $renderer));
+          $this->debugger->log(sprintf('Loaded template file "%s" (renderer: %s)', $file, $options['renderer']));
         }
 
         return new FileStorage($file);
@@ -69,7 +80,7 @@ class FilesystemLoader extends Loader
 
       if ($this->debugger)
       {
-        $this->debugger->log(sprintf('Failed loading template file "%s" (renderer: %s)', $file, $renderer));
+        $this->debugger->log(sprintf('Failed loading template file "%s" (renderer: %s)', $file, $options['renderer']));
       }
     }
 

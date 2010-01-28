@@ -19,7 +19,7 @@ $t = new LimeTest(1);
 
 class ProjectTemplateLoader extends Loader
 {
-  public function load($template, $renderer = 'php')
+  public function load($template, array $options = array())
   {
   }
 

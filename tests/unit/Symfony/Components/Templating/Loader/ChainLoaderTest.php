@@ -47,5 +47,5 @@ $t->is($loader->getLoaders(), array($loader1, $loader2), '->addLoader() adds a t
 $t->diag('->load()');
 $loader = new ProjectTemplateLoader(array($loader1, $loader2));
 $t->ok($loader->load('bar') === false, '->load() returns false if the template is not found');
-$t->ok($loader->load('foo', 'xml') === false, '->load() returns false if the template does not exists for the given renderer');
+$t->ok($loader->load('foo', array('renderer' => 'xml')) === false, '->load() returns false if the template does not exists for the given renderer');
 $t->ok($loader->load('foo') instanceof FileStorage, '->load() returns a FileStorage if the template exists');

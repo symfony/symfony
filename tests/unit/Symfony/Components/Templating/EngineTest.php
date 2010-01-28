@@ -54,11 +54,11 @@ class ProjectTemplateLoader extends Loader
     $this->templates[$name] = $template;
   }
 
-  public function load($template, $renderer = 'php')
+  public function load($template, array $options = array())
   {
-    if (isset($this->templates[$template.'.'.$renderer]))
+    if (isset($this->templates[$template.'.'.$options['renderer']]))
     {
-      return new StringStorage($this->templates[$template.'.'.$renderer]);
+      return new StringStorage($this->templates[$template.'.'.$options['renderer']]);
     }
 
     return false;
@@ -202,7 +202,7 @@ $t->is($engine->render('foo', array('foo' => 'foo', 'bar' => 'bar')), 'bar-foo-'
 
 class CompilableTemplateLoader extends Loader implements CompilableLoaderInterface
 {
-  public function load($template, $renderer = 'php')
+  public function load($template, array $options = array())
   {
     return new StringStorage($template, 'foo');
   }

@@ -44,7 +44,7 @@ class ProjectTemplateLoaderVar extends Loader
     return 'Hello {{ name }}';
   }
 
-  public function load($template, $renderer = 'php')
+  public function load($template, array $options = array())
   {
     if (method_exists($this, $method = 'get'.ucfirst($template).'Template'))
     {
@@ -89,10 +89,10 @@ mkdir($dir, 0777, true);
 
 $loader = new ProjectTemplateLoader(new CompilableTemplateLoader(), $dir);
 $loader->setDebugger($debugger = new ProjectTemplateDebugger());
-$template = $loader->load('special', 'comp');
+$template = $loader->load('special', array('renderer' => 'comp'));
 $t->ok($debugger->hasMessage('Storing template'), '->load() logs a "Storing template" message if the template is found');
 $t->is($template->getRenderer(), 'php', '->load() changes the renderer to php if the template is compilable');
 
-$template = $loader->load('special', 'comp');
+$template = $loader->load('special', array('renderer' => 'comp'));
 $t->ok($debugger->hasMessage('Fetching template'), '->load() logs a "Storing template" message if the template is fetched from cache');
 $t->is($template->getRenderer(), 'php', '->load() changes the renderer to php if the template is compilable');

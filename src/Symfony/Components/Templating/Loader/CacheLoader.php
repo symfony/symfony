@@ -40,23 +40,27 @@ class CacheLoader extends Loader
   {
     $this->loader = $loader;
     $this->dir = $dir;
+
+    parent::__construct();
   }
 
   /**
    * Loads a template.
    *
    * @param string $template The logical template name
-   * @param string $renderer The renderer to use
+   * @param array  $options  An array of options
    *
    * @return Storage|Boolean false if the template cannot be loaded, a Storage instance otherwise
    */
-  public function load($template, $renderer = 'php')
+  public function load($template, array $options = array())
   {
-    $path = $this->dir.DIRECTORY_SEPARATOR.md5($template.$renderer).'.tpl';
+    $options = $this->mergeDefaultOptions($options);
+
+    $path = $this->dir.DIRECTORY_SEPARATOR.md5($template.$options['renderer']).'.tpl';
 
     if ($this->loader instanceof CompilableLoaderInterface)
     {
-      $renderer = 'php';
+      $options['renderer'] = 'php';
     }
 
     if (file_exists($path))
@@ -66,10 +70,10 @@ class CacheLoader extends Loader
         $this->debugger->log(sprintf('Fetching template "%s" from cache', $template));
       }
 
-      return new FileStorage($path, $renderer);
+      return new FileStorage($path, $options['renderer']);
     }
 
-    if (false === $content = $this->loader->load($template, $renderer))
+    if (false === $content = $this->loader->load($template, $options))
     {
       return false;
     }
@@ -86,6 +90,6 @@ class CacheLoader extends Loader
       $this->debugger->log(sprintf('Storing template "%s" in cache', $template));
     }
 
-    return new FileStorage($path, $renderer);
+    return new FileStorage($path, $options['renderer']);
   }
 }

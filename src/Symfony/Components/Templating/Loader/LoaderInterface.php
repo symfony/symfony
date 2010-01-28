@@ -24,9 +24,9 @@ interface LoaderInterface
    * Loads a template.
    *
    * @param string $template The logical template name
-   * @param string $renderer The renderer to use
+   * @param array  $options  An array of options
    *
    * @return Storage|Boolean false if the template cannot be loaded, a Storage instance otherwise
    */
-  function load($template, $renderer = 'php');
+  function load($template, array $options = array());
 }

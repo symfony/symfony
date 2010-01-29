@@ -25,14 +25,18 @@
 
     <service id="symfony.templating.loader.filesystem" class="%symfony.templating.loader.filesystem.class%">
       <argument>%symfony.templating.loader.filesystem.path%</argument>
+      <call method="setDebugger"><argument type="service" id="symfony.templating.debugger" /></call>
     </service>
 
     <service id="symfony.templating.loader.cache" class="%symfony.templating.loader.cache.class%">
       <argument type="service" id="symfony.templating.loader.wrapped" />
       <argument>%symfony.templating.loader.cache.path%</argument>
+      <call method="setDebugger"><argument type="service" id="symfony.templating.debugger" /></call>
     </service>
 
-    <service id="symfony.templating.loader.chain" class="%symfony.templating.loader.chain.class%" />
+    <service id="symfony.templating.loader.chain" class="%symfony.templating.loader.chain.class%">
+      <call method="setDebugger"><argument type="service" id="symfony.templating.debugger" /></call>
+    </service>
 
     <service id="symfony.templating.helper.javascripts" class="%symfony.templating.helper.javascripts.class%" />
     <service id="symfony.templating.helper.stylesheets" class="%symfony.templating.helper.stylesheets.class%" />

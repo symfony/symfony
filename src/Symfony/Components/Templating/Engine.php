@@ -5,6 +5,7 @@ namespace Symfony\Components\Templating;
 use Symfony\Components\Templating\Loader\LoaderInterface;
 use Symfony\Components\Templating\Helper\HelperSet;
 use Symfony\Components\Templating\Renderer\PhpRenderer;
+use Symfony\Components\Templating\Renderer\RendererInterface;
 
 /*
  * This file is part of the symfony package.
@@ -38,7 +39,7 @@ class Engine
    * Constructor.
    *
    * @param LoaderInterface $loader    A loader instance
-   * @param array                     $renderers An array of renderer instances
+   * @param array           $renderers An array of renderer instances
    * @param HelperSet       $helperSet A helper set instance
    */
   public function __construct(LoaderInterface $loader, array $renderers = array(), HelperSet $helperSet = null)
@@ -127,7 +128,7 @@ class Engine
   /**
    * Sets a helper value.
    *
-   * @param string                    $name  The helper name
+   * @param string          $name  The helper name
    * @param HelperInterface $value The helper value
    */
   public function setHelperSet(HelperSet $helperSet)
@@ -150,7 +151,7 @@ class Engine
   /**
    * Gets a helper value.
    *
-   * @param string $name  The helper name
+   * @param string $name The helper name
    *
    * @return mixed The helper value
    *
@@ -305,6 +306,18 @@ class Engine
   public function getCharset()
   {
     return $this->charset;
+  }
+
+  /**
+   * Sets a template renderer.
+   *
+   * @param string            $name     The renderer name
+   * @param RendererInterface $renderer A RendererInterface instance
+   */
+  public function setRenderer($name, RendererInterface $renderer)
+  {
+    $this->renderers[$name] = $renderer;
+    $renderer->setEngine($this);
   }
 
   protected function splitTemplateName($name)

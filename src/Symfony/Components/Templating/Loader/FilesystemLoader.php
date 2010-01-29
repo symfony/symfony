@@ -66,6 +66,7 @@ class FilesystemLoader extends Loader
       $replacements['%'.$key.'%'] = $value;
     }
 
+    $logs = array();
     foreach ($this->templatePathPatterns as $templatePathPattern)
     {
       if (is_file($file = strtr($templatePathPattern, $replacements)))
@@ -80,8 +81,13 @@ class FilesystemLoader extends Loader
 
       if ($this->debugger)
       {
-        $this->debugger->log(sprintf('Failed loading template file "%s" (renderer: %s)', $file, $options['renderer']));
+        $logs[] = sprintf('Failed loading template file "%s" (renderer: %s)', $file, $options['renderer']);
       }
+    }
+
+    foreach ($logs as $log)
+    {
+      $this->debugger->log($log);
     }
 
     return false;

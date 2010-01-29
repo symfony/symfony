@@ -5,8 +5,8 @@
     xsi:schemaLocation="http://www.symfony-project.org/schema/dic/services http://www.symfony-project.org/schema/dic/services/services-1.0.xsd">
 
   <parameters>
-    <parameter key="zend.logger.class">\Zend_Log</parameter>
-    <parameter key="zend.logger.priority" type="constant">\Zend_Log::CRIT</parameter>
+    <parameter key="zend.logger.class">Zend_Log</parameter>
+    <parameter key="zend.logger.priority" type="constant">Zend_Log::CRIT</parameter>
   </parameters>
 
   <services>

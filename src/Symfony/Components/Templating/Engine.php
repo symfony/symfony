@@ -309,6 +309,16 @@ class Engine
   }
 
   /**
+   * Gets the loader associated with this engine.
+   *
+   * @return LoaderInterface A LoaderInterface instance
+   */
+  public function getLoader()
+  {
+    return $this->loader;
+  }
+
+  /**
    * Sets a template renderer.
    *
    * @param string            $name     The renderer name

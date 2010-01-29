@@ -59,7 +59,7 @@ class ArrayDecorator extends GetterDecorator implements \Iterator, \ArrayAccess,
    */
   public function current()
   {
-    return Escaper::escape($this->escapingMethod, current($this->value));
+    return Escaper::escape($this->escaper, current($this->value));
   }
 
   /**
@@ -107,7 +107,7 @@ class ArrayDecorator extends GetterDecorator implements \Iterator, \ArrayAccess,
    */
   public function offsetGet($offset)
   {
-    return Escaper::escape($this->escapingMethod, $this->value[$offset]);
+    return Escaper::escape($this->escaper, $this->value[$offset]);
   }
 
   /**

@@ -16,7 +16,7 @@ use Symfony\Components\OutputEscaper\Escaper;
 $t = new LimeTest(11);
 
 $a = array('<strong>escaped!</strong>', 1, null, array(2, '<strong>escaped!</strong>'));
-$escaped = Escaper::escape('esc_entities', $a);
+$escaped = Escaper::escape('entities', $a);
 
 // ->getRaw()
 $t->diag('->getRaw()');

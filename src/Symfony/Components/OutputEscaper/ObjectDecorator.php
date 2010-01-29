@@ -30,15 +30,14 @@ class ObjectDecorator extends GetterDecorator
    * The calling of the method is changed slightly to accommodate passing a
    * specific escaping strategy. An additional parameter is appended to the
    * argument list which is the escaping strategy. The decorator will remove
-   * and use this parameter as the escaping strategy if it begins with 'esc_'
-   * (the prefix all escaping helper functions have).
+   * and use this parameter as the escaping strategy if it begins with 'esc_'.
    *
    * For example if an object, $o, implements methods a() and b($arg):
    *
    *   $o->a()                // Escapes the return value of a()
-   *   $o->a(ESC_RAW)         // Uses the escaping method ESC_RAW with a()
+   *   $o->a('esc_raw')       // Uses the escaping strategy 'raw' with a()
    *   $o->b('a')             // Escapes the return value of b('a')
-   *   $o->b('a', ESC_RAW);   // Uses the escaping method ESC_RAW with b('a')
+   *   $o->b('a', 'esc_raw'); // Uses the escaping strategy 'raw' with b('a')
    *
    * @param  string $method  The method on the object to be called
    * @param  array  $args    An array of arguments to be passed to the method
@@ -49,24 +48,26 @@ class ObjectDecorator extends GetterDecorator
   {
     if (count($args) > 0)
     {
-      $escapingMethod = $args[count($args) - 1];
-      if (is_string($escapingMethod) && substr($escapingMethod, 0, 4) === 'esc_')
+      $escaper = $args[count($args) - 1];
+      if (is_string($escaper) && 'esc_' === substr($escaper, 0, 4))
       {
+        $escaper = substr($escaper, 4);
+
         array_pop($args);
       }
       else
       {
-        $escapingMethod = $this->escapingMethod;
+        $escaper = $this->escaper;
       }
     }
     else
     {
-      $escapingMethod = $this->escapingMethod;
+      $escaper = $this->escaper;
     }
 
     $value = call_user_func_array(array($this->value, $method), $args);
 
-    return Escaper::escape($escapingMethod, $value);
+    return Escaper::escape($escaper, $value);
   }
 
   /**
@@ -98,6 +99,6 @@ class ObjectDecorator extends GetterDecorator
    */
   public function __toString()
   {
-    return $this->escape($this->escapingMethod, $this->value->__toString());
+    return $this->escape($this->escaper, $this->value->__toString());
   }
 }

@@ -41,17 +41,17 @@ abstract class GetterDecorator extends Escaper
    * {@link getRaw()} method, escaped and the result returned.
    *
    * @param  string $key             The key to retieve
-   * @param  string $escapingMethod  The escaping method (a PHP function) to use
+   * @param  string $escaper  The escaping method (a PHP function) to use
    *
    * @return mixed The escaped value
    */
-  public function get($key, $escapingMethod = null)
+  public function get($key, $escaper = null)
   {
-    if (!$escapingMethod)
+    if (!$escaper)
     {
-      $escapingMethod = $this->escapingMethod;
+      $escaper = $this->escaper;
     }
 
-    return Escaper::escape($escapingMethod, $this->getRaw($key));
+    return Escaper::escape($escaper, $this->getRaw($key));
   }
 }

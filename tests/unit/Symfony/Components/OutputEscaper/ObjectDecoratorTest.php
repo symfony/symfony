@@ -34,7 +34,7 @@ class OutputEscaperTest
 }
 
 $object = new OutputEscaperTest();
-$escaped = Escaper::escape('esc_entities', $object);
+$escaped = Escaper::escape('entities', $object);
 
 $t->is($escaped->getTitle(), '&lt;strong&gt;escaped!&lt;/strong&gt;', 'The escaped object behaves like the real object');
 

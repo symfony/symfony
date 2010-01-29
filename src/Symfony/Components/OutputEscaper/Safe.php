@@ -20,8 +20,7 @@ namespace Symfony\Components\OutputEscaper;
  */
 class Safe extends \ArrayIterator
 {
-  protected
-    $value = null;
+  protected $value;
 
   /**
    * Constructor.

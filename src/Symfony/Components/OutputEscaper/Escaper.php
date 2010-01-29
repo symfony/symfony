@@ -2,8 +2,6 @@
 
 namespace Symfony\Components\OutputEscaper;
 
-require_once __DIR__.'/escaping_helpers.php';
-
 /*
  * This file is part of the symfony package.
  *
@@ -31,32 +29,35 @@ abstract class Escaper
   protected $value;
 
   /**
-   * The escaping method that is going to be applied to the value and its
-   * children. This is actually a PHP callable.
+   * The escaper (a PHP callable) that is going to be applied to the value and its
+   * children.
    *
    * @var string
    */
-  protected $escapingMethod;
+  protected $escaper;
 
   static protected $charset = 'UTF-8';
-
   static protected $safeClasses = array();
-
-  static protected $strategies = array();
+  static protected $escapers;
 
   /**
-   * Constructor stores the escaping method and value.
+   * Constructor.
    *
    * Since Escaper is an abstract class, instances cannot be created
    * directly but the constructor will be inherited by sub-classes.
    *
-   * @param string $escapingMethod  Escaping method
-   * @param string $value           Escaping value
+   * @param string $callable A PHP callable
+   * @param string $value    Escaping value
    */
-  public function __construct($escapingMethod, $value)
+  public function __construct($escaper, $value)
   {
-    $this->value          = $value;
-    $this->escapingMethod = $escapingMethod;
+    if (null === self::$escapers)
+    {
+      self::initializeEscapers();
+    }
+
+    $this->escaper = is_string($escaper) && isset(self::$escapers[$escaper]) ? self::$escapers[$escaper] : $escaper;
+    $this->value = $value;
   }
 
   /**
@@ -78,31 +79,41 @@ abstract class Escaper
    *      method calls is escaped.
    *
    * The escaping method is actually a PHP callable. This class hosts a set
-   * of standard escaping methods.
+   * of standard escaping strategies.
    *
-   * @param  string $escapingMethod  The escaping method (a PHP callable) to apply to the value
-   * @param  mixed  $value           The value to escape
+   * @param  string $escaper The escaping method (a PHP callable) to apply to the value
+   * @param  mixed  $value   The value to escape
    *
-   * @return mixed Escaping value
+   * @return mixed Escaped value
    *
    * @throws \InvalidArgumentException If the escaping fails
    */
-  static public function escape($escapingMethod, $value)
+  static public function escape($escaper, $value)
   {
     if (null === $value)
     {
       return $value;
     }
 
+    if (null === self::$escapers)
+    {
+      self::initializeEscapers();
+    }
+
+    if (is_string($escaper) && isset(self::$escapers[$escaper]))
+    {
+      $escaper = self::$escapers[$escaper];
+    }
+
     // Scalars are anything other than arrays, objects and resources.
     if (is_scalar($value))
     {
-      return call_user_func($escapingMethod, $value);
+      return call_user_func($escaper, $value);
     }
 
     if (is_array($value))
     {
-      return new ArrayDecorator($escapingMethod, $value);
+      return new ArrayDecorator($escaper, $value);
     }
 
     if (is_object($value))
@@ -112,29 +123,29 @@ abstract class Escaper
         // avoid double decoration
         $copy = clone $value;
 
-        $copy->escapingMethod = $escapingMethod;
+        $copy->escaper = $escaper;
 
         return $copy;
       }
-      else if (self::isClassMarkedAsSafe(get_class($value)))
+      elseif (self::isClassMarkedAsSafe(get_class($value)))
       {
         // the class or one of its children is marked as safe
         // return the unescaped object
         return $value;
       }
-      else if ($value instanceof Safe)
+      elseif ($value instanceof Safe)
       {
         // do not escape objects marked as safe
         // return the original object
         return $value->getValue();
       }
-      else if ($value instanceof \Traversable)
+      elseif ($value instanceof \Traversable)
       {
-        return new IteratorDecorator($escapingMethod, $value);
+        return new IteratorDecorator($escaper, $value);
       }
       else
       {
-        return new ObjectDecorator($escapingMethod, $value);
+        return new ObjectDecorator($escaper, $value);
       }
     }
 
@@ -246,7 +257,7 @@ abstract class Escaper
    */
   public function __get($var)
   {
-    return $this->escape($this->escapingMethod, $this->value->$var);
+    return $this->escape($this->escaper, $this->value->$var);
   }
 
   /**
@@ -267,5 +278,102 @@ abstract class Escaper
   static public function getCharset()
   {
     return self::$charset;
+  }
+
+  /**
+   * Adds a named escaper.
+   *
+   * @param string $name    The escaper name
+   * @param mixed  $escaper A PHP callable
+   */
+  static public function setEscaper($name, $escaper)
+  {
+    self::$escapers[$name] = $escaper;
+  }
+
+  /**
+   * Initializes the built-in escapers.
+   *
+   * Each function specifies a way for applying a transformation to a string
+   * passed to it. The purpose is for the string to be "escaped" so it is
+   * suitable for the format it is being displayed in.
+   *
+   * For example, the string: "It's required that you enter a username & password.\n"
+   * If this were to be displayed as HTML it would be sensible to turn the
+   * ampersand into '&amp;' and the apostrophe into '&aps;'. However if it were
+   * going to be used as a string in JavaScript to be displayed in an alert box
+   * it would be right to leave the string as-is, but c-escape the apostrophe and
+   * the new line.
+   *
+   * For each function there is a define to avoid problems with strings being
+   * incorrectly specified.
+   */
+  static function initializeEscapers()
+  {
+    self::$escapers = array(
+      'htmlspecialchars' =>
+        /**
+         * Runs the PHP function htmlspecialchars on the value passed.
+         *
+         * @param string $value the value to escape
+         *
+         * @return string the escaped value
+         */
+        function ($value)
+        {
+          // Numbers and boolean values get turned into strings which can cause problems
+          // with type comparisons (e.g. === or is_int() etc).
+          return is_string($value) ? htmlspecialchars($value, ENT_QUOTES, Escaper::getCharset()) : $value;
+        },
+
+      'entities' =>
+        /**
+         * Runs the PHP function htmlentities on the value passed.
+         *
+         * @param string $value the value to escape
+         * @return string the escaped value
+         */
+        function ($value)
+        {
+          // Numbers and boolean values get turned into strings which can cause problems
+          // with type comparisons (e.g. === or is_int() etc).
+          return is_string($value) ? htmlentities($value, ENT_QUOTES, Escaper::getCharset()) : $value;
+        },
+
+      'raw' =>
+        /**
+         * An identity function that merely returns that which it is given, the purpose
+         * being to be able to specify that the value is not to be escaped in any way.
+         *
+         * @param string $value the value to escape
+         * @return string the escaped value
+         */
+        function ($value) { return $value; },
+
+      'js' =>
+        /**
+         * A function that c-escapes a string after applying (cf. entities). The
+         * assumption is that the value will be used to generate dynamic HTML in some
+         * way and the safest way to prevent mishap is to assume the value should have
+         * HTML entities set properly.
+         *
+         * The (cf. js_no_entities) method should be used to escape a string
+         * that is ultimately not going to end up as text in an HTML document.
+         *
+         * @param string $value the value to escape
+         * @return string the escaped value
+         */
+        function ($value) { return str_replace(array("\\"  , "\n"  , "\r" , "\""  , "'"  ), array("\\\\", "\\n" , "\\r", "\\\"", "\\'"), (is_string($value) ? htmlentities($value, ENT_QUOTES, Escaper::getCharset()) : $value)); },
+
+      'js_no_entities' =>
+        /**
+         * A function the c-escapes a string, making it suitable to be placed in a
+         * JavaScript string.
+         *
+         * @param string $value the value to escape
+         * @return string the escaped value
+         */
+        function ($value) { return str_replace(array("\\"  , "\n"  , "\r" , "\""  , "'"  ), array("\\\\", "\\n" , "\\r", "\\\"", "\\'"), $value); },
+    );
   }
 }

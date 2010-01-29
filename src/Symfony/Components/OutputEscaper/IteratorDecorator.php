@@ -35,15 +35,15 @@ class IteratorDecorator extends ObjectDecorator implements \Iterator, \Countable
   /**
    * Constructs a new escaping iteratoror using the escaping method and value supplied.
    *
-   * @param string      $escapingMethod The escaping method to use
+   * @param string      $escaper The escaping method to use
    * @param \Traversable $value         The iterator to escape
    */
-  public function __construct($escapingMethod, \Traversable $value)
+  public function __construct($escaper, \Traversable $value)
   {
     // Set the original value for __call(). Set our own iterator because passing
     // it to IteratorIterator will lose any other method calls.
 
-    parent::__construct($escapingMethod, $value);
+    parent::__construct($escaper, $value);
 
     $this->iterator = new \IteratorIterator($value);
   }
@@ -65,7 +65,7 @@ class IteratorDecorator extends ObjectDecorator implements \Iterator, \Countable
    */
   public function current()
   {
-    return Escaper::escape($this->escapingMethod, $this->iterator->current());
+    return Escaper::escape($this->escaper, $this->iterator->current());
   }
 
   /**
@@ -118,7 +118,7 @@ class IteratorDecorator extends ObjectDecorator implements \Iterator, \Countable
    */
   public function offsetGet($offset)
   {
-    return Escaper::escape($this->escapingMethod, $this->value[$offset]);
+    return Escaper::escape($this->escaper, $this->value[$offset]);
   }
 
   /**

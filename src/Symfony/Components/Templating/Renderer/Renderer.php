@@ -44,6 +44,11 @@ abstract class Renderer implements RendererInterface
    */
   public function __call($method, $arguments)
   {
+    if (!method_exists($this->engine, $method))
+    {
+      throw new \RuntimeException(sprintf('Call to undefined method %s::%s().', get_class($this->engine), $method));
+    }
+
     return call_user_func_array(array($this->engine, $method), $arguments);
   }
 

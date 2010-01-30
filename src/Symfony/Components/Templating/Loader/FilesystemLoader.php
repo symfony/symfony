@@ -85,9 +85,12 @@ class FilesystemLoader extends Loader
       }
     }
 
-    foreach ($logs as $log)
+    if ($this->debugger)
     {
-      $this->debugger->log($log);
+      foreach ($logs as $log)
+      {
+        $this->debugger->log($log);
+      }
     }
 
     return false;

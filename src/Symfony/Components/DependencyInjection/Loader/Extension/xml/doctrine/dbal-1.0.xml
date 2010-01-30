@@ -12,7 +12,6 @@
     <parameter key="doctrine.dbal.wrapper.class">Doctrine\DBAL\Connection</parameter>
     <parameter key="doctrine.dbal.configuration.class">Doctrine\DBAL\Configuration</parameter>
     <parameter key="doctrine.dbal.event_manager.class">Doctrine\Common\EventManager</parameter>
-    <parameter key="doctrine.dbal.logger.class">Doctrine\DBAL\Logging\DebugStack</parameter>
   </parameters>
 
   <services>
@@ -33,7 +32,7 @@
       <call method="setSqlLogger"><argument type="service" id="doctrine.dbal.logger" /></call>
     </service>
 
-    <service id="doctrine.dbal.logger" class="%doctrine.dbal.logger.class%" />
+    <service id="doctrine.dbal.logger.debug" class="Doctrine\DBAL\Logging\DebugStack" />
 
     <service id="doctrine.dbal.event_manager" class="%doctrine.dbal.event_manager.class%" />
   </services>

@@ -110,6 +110,46 @@ class Event implements \ArrayAccess
   }
 
   /**
+   * Returns true if the parameter exists.
+   *
+   * @param  string  $name  The parameter name
+   *
+   * @return Boolean true if the parameter exists, false otherwise
+   */
+  public function hasParameter($name)
+  {
+    return array_key_exists($name, $this->parameters);
+  }
+
+  /**
+   * Returns a parameter value.
+   *
+   * @param  string  $name  The parameter name
+   *
+   * @return mixed  The parameter value
+   */
+  public function getParameter($name)
+  {
+    if (!array_key_exists($name, $this->parameters))
+    {
+      throw new \InvalidArgumentException(sprintf('The event "%s" has no "%s" parameter.', $this->name, $name));
+    }
+
+    return $this->parameters[$name];
+  }
+
+  /**
+   * Sets a parameter.
+   *
+   * @param string  $name   The parameter name
+   * @param mixed   $value  The parameter value
+   */
+  public function setParameter($name, $value)
+  {
+    $this->parameters[$name] = $value;
+  }
+
+  /**
    * Returns true if the parameter exists (implements the ArrayAccess interface).
    *
    * @param  string  $name  The parameter name

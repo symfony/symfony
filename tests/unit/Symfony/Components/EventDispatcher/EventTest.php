@@ -12,7 +12,7 @@ require_once __DIR__.'/../../../bootstrap.php';
 
 use Symfony\Components\EventDispatcher\Event;
 
-$t = new LimeTest(11);
+$t = new LimeTest(16);
 
 $subject = new stdClass();
 $parameters = array('foo' => 'bar');
@@ -26,9 +26,26 @@ $t->is($event->getSubject(), $subject, '->getSubject() returns the event subject
 $t->diag('->getName()');
 $t->is($event->getName(), 'name', '->getName() returns the event name');
 
-// ->getParameters()
+// ->getParameters() ->setParameter() ->hasParameter() ->getParameter()
 $t->diag('->getParameters()');
 $t->is($event->getParameters(), $parameters, '->getParameters() returns the event parameters');
+$t->is($event->getParameter('foo'), 'bar', '->getParameter() returns the value of a parameter');
+$event->setParameter('foo', 'foo');
+$t->is($event->getParameter('foo'), 'foo', '->setParameter() changes the value of a parameter');
+$t->ok($event->hasParameter('foo'), '->hasParameter() returns true if the parameter is defined');
+unset($event['foo']);
+$t->ok(!$event->hasParameter('foo'), '->hasParameter() returns false if the parameter is not defined');
+
+try
+{
+  $event->getParameter('foobar');
+  $t->fail('->getParameter() throws an \InvalidArgumentException exception when the parameter does not exist');
+}
+catch (\InvalidArgumentException $e)
+{
+  $t->pass('->getParameter() throws an \InvalidArgumentException exception when the parameter does not exist');
+}
+$event = new Event($subject, 'name', $parameters);
 
 // ->getReturnValue() ->setReturnValue()
 $t->diag('->getReturnValue() ->setReturnValue()');

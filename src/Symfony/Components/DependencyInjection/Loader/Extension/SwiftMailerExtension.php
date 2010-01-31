@@ -95,7 +95,7 @@ class SwiftMailerExtension extends LoaderExtension
       }
     }
 
-    $configuration->setAlias(isset($config['alias']) ? $config['alias'] : 'mailer', 'swiftmailer.mailer');
+    $configuration->setAlias('mailer', 'swiftmailer.mailer');
 
     return $configuration;
   }

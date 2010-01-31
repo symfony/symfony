@@ -24,6 +24,13 @@ use Symfony\Components\DependencyInjection\BuilderConfiguration;
  */
 class DoctrineExtension extends LoaderExtension
 {
+  protected $alias;
+
+  public function setAlias($alias)
+  {
+    $this->alias = $alias;
+  }
+
   /**
    * Loads the DBAL configuration.
    *
@@ -49,6 +56,25 @@ class DoctrineExtension extends LoaderExtension
         $configuration->setParameter('doctrine.dbal.'.$key, $config[$key]);
       }
     }
+
+    $configuration->setAlias('connection', null !== $this->alias ? $this->alias : 'doctrine.dbal.connection');
+
+    return $configuration;
+  }
+
+  /**
+   * Loads the Doctrine ORM configuration.
+   *
+   * @param array $config A configuration array
+   *
+   * @return BuilderConfiguration A BuilderConfiguration instance
+   */
+  public function ormLoad($config)
+  {
+    $configuration = new BuilderConfiguration();
+
+    $loader = new XmlFileLoader(__DIR__.'/xml/doctrine');
+    $configuration->merge($loader->load('orm-1.0.xml'));
 
     return $configuration;
   }

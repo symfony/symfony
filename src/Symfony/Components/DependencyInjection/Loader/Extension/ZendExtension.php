@@ -52,6 +52,8 @@ class ZendExtension extends LoaderExtension
       $configuration->setParameter('zend.logger.path', $config['path']);
     }
 
+    $configuration->setAlias('logger', 'zend.logger');
+
     return $configuration;
   }
 
@@ -116,6 +118,8 @@ class ZendExtension extends LoaderExtension
         $configuration->setParameter('zend.mail.smtp.'.$key, $config[$key]);
       }
     }
+
+    $configuration->setAlias('mail', 'zend.mail');
 
     return $configuration;
   }

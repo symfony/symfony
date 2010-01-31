@@ -25,6 +25,19 @@ use Symfony\Components\DependencyInjection\Reference;
  */
 class SymfonyTemplatingExtension extends LoaderExtension
 {
+  protected $defaultHelpers = array();
+  protected $alias;
+
+  public function setAlias($alias)
+  {
+    $this->alias = $alias;
+  }
+
+  public function setDefaultHelpers(array $defaultHelpers)
+  {
+    $this->defaultHelpers = $defaultHelpers;
+  }
+
   /**
    * Loads the templating configuration.
    *
@@ -32,8 +45,10 @@ class SymfonyTemplatingExtension extends LoaderExtension
    *
    *      <symfony:templating path="/path/to/templates" cache="/path/to/cache">
    *        <symfony:loader>symfony.templating.loader.filesystem</symfony:loader>
-   *        <symfony:helper>symfony.templating.helper.javascripts</symfony:helper>
-   *        <symfony:helper>symfony.templating.helper.stylesheets</symfony:helper>
+   *        <symfony:helpers>
+   *          symfony.templating.helper.javascripts
+   *          symfony.templating.helper.stylesheets
+   *        </symfony:helpers>
    *      </symfony:templating>
    *
    * @param array $config A configuration array
@@ -81,21 +96,17 @@ class SymfonyTemplatingExtension extends LoaderExtension
     }
 
     // helpers
-    if (isset($config['helper']))
+    if (array_key_exists('helpers', $config))
     {
       $helpers = array();
-      $ids = is_array($config['helper']) ? $config['helper'] : array($config['helper']);
-      foreach ($ids as $id)
+      foreach (explode("\n", $config['helpers']) as $helper)
       {
-        $helpers[] = new Reference($id);
+        $helpers[] = new Reference(trim($helper));
       }
     }
     else
     {
-      $helpers = null === $config['helper'] ? array() : array(
-        new Reference('symfony.templating.helper.javascripts'),
-        new Reference('symfony.templating.helper.stylesheets'),
-      );
+      $helpers = $this->defaultHelpers;
     }
 
     $configuration->getDefinition('symfony.templating.helperset')->addArgument($helpers);
@@ -108,6 +119,8 @@ class SymfonyTemplatingExtension extends LoaderExtension
       $configuration->setDefinition('symfony.templating.loader', $configuration->getDefinition('symfony.templating.loader.cache'));
       $configuration->setParameter('symfony.templating.loader.cache.path', $config['cache']);
     }
+
+    $configuration->setAlias('templating', null !== $this->alias ? $this->alias : 'symfony.templating.engine');
 
     return $configuration;
   }

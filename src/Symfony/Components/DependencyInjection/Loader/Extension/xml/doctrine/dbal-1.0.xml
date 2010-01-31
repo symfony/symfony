@@ -22,14 +22,16 @@
         <argument key="password">%doctrine.dbal.password%</argument>
         <argument key="host">%doctrine.dbal.host%</argument>
         <argument key="driverClass">%doctrine.dbal.driver.class%</argument>
+        <!--
         <argument key="wrapperClass">%doctrine.dbal.wrapper.class%</argument>
+        //-->
       </argument>
       <argument type="service" id="doctrine.dbal.configuration" />
       <argument type="service" id="doctrine.dbal.event_manager" />
     </service>
 
     <service id="doctrine.dbal.configuration" class="%doctrine.dbal.configuration.class%">
-      <call method="setSqlLogger"><argument type="service" id="doctrine.dbal.logger" /></call>
+      <call method="setSqlLogger"><argument type="service" id="doctrine.dbal.logger" on-invalid="ignore" /></call>
     </service>
 
     <service id="doctrine.dbal.logger.debug" class="Doctrine\DBAL\Logging\DebugStack" />

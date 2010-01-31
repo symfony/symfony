@@ -26,7 +26,5 @@
     <service id="zend.logger.filter" class="Zend_Log_Filter_Priority">
       <argument>%zend.logger.priority%</argument>
     </service>
-
-    <service id="logger" alias="zend.logger" />
   </services>
 </container>

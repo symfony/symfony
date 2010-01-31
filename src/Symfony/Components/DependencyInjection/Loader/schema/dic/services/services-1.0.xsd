@@ -107,7 +107,7 @@
     <xsd:attribute name="type" type="parameter_type" />
     <xsd:attribute name="id" type="xsd:string" />
     <xsd:attribute name="key" type="xsd:string" />
-    <xsd:attribute name="on-invalid" type="xsd:string" />
+    <xsd:attribute name="on-invalid" type="invalid_sequence" />
   </xsd:complexType>
 
   <xsd:complexType name="argument" mixed="true">
@@ -144,6 +144,14 @@
       <xsd:enumeration value="service" />
       <xsd:enumeration value="string" />
       <xsd:enumeration value="constant" />
+    </xsd:restriction>
+  </xsd:simpleType>
+
+  <xsd:simpleType name="invalid_sequence">
+    <xsd:restriction base="xsd:string">
+      <xsd:enumeration value="null" />
+      <xsd:enumeration value="ignore" />
+      <xsd:enumeration value="exception" />
     </xsd:restriction>
   </xsd:simpleType>
 

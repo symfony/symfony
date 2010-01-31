@@ -21,6 +21,8 @@
 
     <xsd:attribute name="transport" type="xsd:string" />
     <xsd:attribute name="delivery_strategy" type="delivery_strategy" />
+    <xsd:attribute name="username" type="xsd:string" />
+    <xsd:attribute name="password" type="xsd:string" />
   </xsd:complexType>
 
   <xsd:complexType name="spool">

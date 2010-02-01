@@ -49,12 +49,17 @@ class DoctrineExtension extends LoaderExtension
     $loader = new XmlFileLoader(__DIR__.'/xml/doctrine');
     $configuration->merge($loader->load('dbal-1.0.xml'));
 
-    foreach (array('dbname', 'host', 'username', 'password') as $key)
+    foreach (array('dbname', 'host', 'username', 'password', 'path', 'port') as $key)
     {
       if (isset($config[$key]))
       {
         $configuration->setParameter('doctrine.dbal.'.$key, $config[$key]);
       }
+    }
+
+    if (isset($config['options']))
+    {
+      $configuration->setParameter('doctrine.dbal.driver.options', $config['options']);
     }
 
     if (isset($config['driver']))

@@ -49,12 +49,23 @@ class DoctrineExtension extends LoaderExtension
     $loader = new XmlFileLoader(__DIR__.'/xml/doctrine');
     $configuration->merge($loader->load('dbal-1.0.xml'));
 
-    foreach (array('dbname', 'driverClass', 'host', 'username', 'password') as $key)
+    foreach (array('dbname', 'host', 'username', 'password') as $key)
     {
       if (isset($config[$key]))
       {
         $configuration->setParameter('doctrine.dbal.'.$key, $config[$key]);
       }
+    }
+
+    if (isset($config['driver']))
+    {
+      $class = $config['driver'];
+      if (in_array($class, array('OCI8', 'PDOMsSql', 'PDOMySql', 'PDOOracle', 'PDOPgSql', 'PDOSqlite')))
+      {
+        $class = 'Doctrine\\DBAL\\Driver\\'.$class.'\\Driver';
+      }
+
+      $configuration->setParameter('doctrine.dbal.driver.class', $class);
     }
 
     $configuration->setAlias('connection', null !== $this->alias ? $this->alias : 'doctrine.dbal.connection');

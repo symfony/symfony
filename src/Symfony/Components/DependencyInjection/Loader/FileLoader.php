@@ -45,7 +45,7 @@ abstract class FileLoader extends Loader
       throw new \InvalidArgumentException(sprintf('The file "%s" does not exist (in: %s).', $file, implode(', ', $this->paths)));
     }
 
-    return realpath($path);
+    return $path;
   }
 
   protected function getAbsolutePath($file, $currentPath = null)

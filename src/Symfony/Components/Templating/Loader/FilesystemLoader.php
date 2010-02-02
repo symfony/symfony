@@ -71,7 +71,7 @@ class FilesystemLoader extends Loader
     {
       if (is_file($file = strtr($templatePathPattern, $replacements)))
       {
-        if ($this->debugger)
+        if (null !== $this->debugger)
         {
           $this->debugger->log(sprintf('Loaded template file "%s" (renderer: %s)', $file, $options['renderer']));
         }
@@ -79,13 +79,13 @@ class FilesystemLoader extends Loader
         return new FileStorage($file);
       }
 
-      if ($this->debugger)
+      if (null !== $this->debugger)
       {
         $logs[] = sprintf('Failed loading template file "%s" (renderer: %s)', $file, $options['renderer']);
       }
     }
 
-    if ($this->debugger)
+    if (null !== $this->debugger)
     {
       foreach ($logs as $log)
       {

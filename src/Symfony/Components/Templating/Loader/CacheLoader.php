@@ -61,7 +61,7 @@ class CacheLoader extends Loader
   {
     $options = $this->mergeDefaultOptions($options);
 
-    $path = $this->dir.DIRECTORY_SEPARATOR.md5($template.$options['renderer']).'.tpl';
+    $path = $this->dir.DIRECTORY_SEPARATOR.md5($template.serialize($options)).'.tpl';
 
     if ($this->loader instanceof CompilableLoaderInterface)
     {

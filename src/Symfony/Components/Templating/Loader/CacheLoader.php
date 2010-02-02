@@ -41,11 +41,6 @@ class CacheLoader extends Loader
     $this->loader = $loader;
     $this->dir = $dir;
 
-    if (!file_exists($dir))
-    {
-      mkdir($dir, 0777, true);
-    }
-
     parent::__construct();
   }
 
@@ -61,7 +56,10 @@ class CacheLoader extends Loader
   {
     $options = $this->mergeDefaultOptions($options);
 
-    $path = $this->dir.DIRECTORY_SEPARATOR.md5($template.serialize($options)).'.tpl';
+    $tmp = md5($template.serialize($options)).'.tpl';
+    $dir = $this->dir.DIRECTORY_SEPARATOR.substr($tmp, 0, 2);
+    $file = substr($tmp, 2);
+    $path = $dir.DIRECTORY_SEPARATOR.$file;
 
     if ($this->loader instanceof CompilableLoaderInterface)
     {
@@ -88,6 +86,11 @@ class CacheLoader extends Loader
     if ($this->loader instanceof CompilableLoaderInterface)
     {
       $content = $this->loader->compile($content);
+    }
+
+    if (!file_exists($dir))
+    {
+      mkdir($dir, 0777, true);
     }
 
     file_put_contents($path, $content);

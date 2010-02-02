@@ -34,12 +34,17 @@ class CacheLoader extends Loader
    * Constructor.
    *
    * @param Loader $loader A Loader instance
-   * @param string           $dir    The directory where to store the cache files
+   * @param string $dir    The directory where to store the cache files
    */
   public function __construct(Loader $loader, $dir)
   {
     $this->loader = $loader;
     $this->dir = $dir;
+
+    if (!file_exists($dir))
+    {
+      mkdir($dir, 0777, true);
+    }
 
     parent::__construct();
   }

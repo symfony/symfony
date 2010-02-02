@@ -157,6 +157,8 @@ class BuilderConfiguration
    */
   public function setAlias($alias, $id)
   {
+    unset($this->definitions[$alias]);
+
     $this->aliases[$alias] = $id;
   }
 

@@ -32,6 +32,7 @@ class Builder extends Container
    */
   public function setService($id, $service)
   {
+    unset($this->definitions[$id]);
     unset($this->aliases[$id]);
 
     parent::setService($id, $service);
@@ -136,8 +137,8 @@ class Builder extends Container
       return;
     }
 
-    $this->aliases = array_merge($this->aliases, $configuration->getAliases());
-    $this->definitions = array_merge($this->definitions, $configuration->getDefinitions());
+    $this->addDefinitions($configuration->getDefinitions());
+    $this->addAliases($configuration->getAliases());
 
     $currentParameters = $this->getParameters();
     foreach ($configuration->getParameters() as $key => $value)
@@ -163,6 +164,30 @@ class Builder extends Container
   }
 
   /**
+   * Adds the service aliases.
+   *
+   * @param array $aliases An array of aliases
+   */
+  public function addAliases(array $aliases)
+  {
+    foreach ($aliases as $alias => $id)
+    {
+      $this->setAlias($alias, $id);
+    }
+  }
+
+  /**
+   * Sets the service aliases.
+   *
+   * @param array $definitions An array of service definitions
+   */
+  public function setAliases(array $aliases)
+  {
+    $this->aliases = array();
+    $this->addAliases($aliases);
+  }
+
+  /**
    * Sets an alias for an existing service.
    *
    * @param string $alias The alias to create
@@ -170,6 +195,8 @@ class Builder extends Container
    */
   public function setAlias($alias, $id)
   {
+    unset($this->definitions[$alias]);
+
     $this->aliases[$alias] = $id;
   }
 

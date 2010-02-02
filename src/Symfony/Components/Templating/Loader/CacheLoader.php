@@ -78,10 +78,12 @@ class CacheLoader extends Loader
       return new FileStorage($path, $options['renderer']);
     }
 
-    if (false === $content = $this->loader->load($template, $options))
+    if (false === $storage = $this->loader->load($template, $options))
     {
       return false;
     }
+
+    $content = $storage->getContent();
 
     if ($this->loader instanceof CompilableLoaderInterface)
     {

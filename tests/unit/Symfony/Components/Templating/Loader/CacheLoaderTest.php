@@ -16,6 +16,7 @@ require_once __DIR__.'/../../../../../lib/SymfonyTests/Components/Templating/Pro
 use Symfony\Components\Templating\Loader\Loader;
 use Symfony\Components\Templating\Loader\CacheLoader;
 use Symfony\Components\Templating\Loader\CompilableLoaderInterface;
+use Symfony\Components\Templating\Storage\StringStorage;
 
 $t = new LimeTest(9);
 
@@ -48,7 +49,7 @@ class ProjectTemplateLoaderVar extends Loader
   {
     if (method_exists($this, $method = 'get'.ucfirst($template).'Template'))
     {
-      return $this->$method();
+      return new StringStorage($this->$method());
     }
 
     return false;

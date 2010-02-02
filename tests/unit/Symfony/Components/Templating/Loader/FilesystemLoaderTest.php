@@ -18,7 +18,7 @@ use Symfony\Components\Templating\Storage\FileStorage;
 
 $fixturesPath = realpath(__DIR__.'/../../../../../fixtures/Symfony/Components/Templating/');
 
-$t = new LimeTest(15);
+$t = new LimeTest(14);
 
 class ProjectTemplateLoader extends FilesystemLoader
 {
@@ -70,5 +70,4 @@ $t->ok($debugger->hasMessage('Failed loading template'), '->load() logs a "Faile
 $loader = new ProjectTemplateLoader(array($fixturesPath.'/null/%name%', $pathPattern));
 $loader->setDebugger($debugger = new ProjectTemplateDebugger());
 $loader->load('foo');
-$t->ok($debugger->hasMessage('Failed loading template'), '->load() logs a "Failed loading template" message if the template is not found');
 $t->ok($debugger->hasMessage('Loaded template file'), '->load() logs a "Loaded template file" message if the template is found');

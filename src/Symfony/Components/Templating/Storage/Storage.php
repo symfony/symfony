@@ -18,7 +18,7 @@ namespace Symfony\Components\Templating\Storage;
  * @subpackage templating
  * @author     Fabien Potencier <fabien.potencier@symfony-project.com>
  */
-class Storage
+abstract class Storage
 {
   protected $renderer;
   protected $template;
@@ -43,6 +43,8 @@ class Storage
   {
     return (string) $this->template;
   }
+
+  abstract public function getContent();
 
   /**
    * Gets the renderer.

@@ -14,7 +14,12 @@ require_once __DIR__.'/../../../../bootstrap.php';
 use Symfony\Components\Templating\Storage\Storage;
 use Symfony\Components\Templating\Storage\FileStorage;
 
-$t = new LimeTest(1);
+$t = new LimeTest(2);
 
 $storage = new FileStorage('foo');
 $t->ok($storage instanceof Storage, 'FileStorage is an instance of Storage');
+
+// ->getContent()
+$t->diag('->getContent()');
+$storage = new FileStorage(__DIR__.'/../../../../../fixtures/Symfony/Components/Templating/templates/foo.php');
+$t->is($storage->getContent(), '<?php echo $foo ?>', '->getContent() returns the content of the template');

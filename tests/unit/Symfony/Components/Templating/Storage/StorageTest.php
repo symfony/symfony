@@ -16,13 +16,20 @@ use Symfony\Components\Templating\Renderer\PhpRenderer;
 
 $t = new LimeTest(2);
 
+class TestStorage extends Storage
+{
+  public function getContent()
+  {
+  }
+}
+
 // __construct() __toString()
 $t->diag('__construct() __toString()');
 
-$storage = new Storage('foo');
+$storage = new TestStorage('foo');
 $t->is((string) $storage, 'foo', '__toString() returns the template name');
 
 // ->getRenderer()
 $t->diag('->getRenderer()');
-$storage = new Storage('foo', $renderer = new PhpRenderer());
+$storage = new TestStorage('foo', $renderer = new PhpRenderer());
 $t->ok($storage->getRenderer() === $renderer, '->getRenderer() returns the renderer');

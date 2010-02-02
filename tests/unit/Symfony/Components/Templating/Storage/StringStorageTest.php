@@ -14,7 +14,13 @@ require_once __DIR__.'/../../../../bootstrap.php';
 use Symfony\Components\Templating\Storage\Storage;
 use Symfony\Components\Templating\Storage\StringStorage;
 
-$t = new LimeTest(1);
+$t = new LimeTest(2);
 
 $storage = new StringStorage('foo');
 $t->ok($storage instanceof Storage, 'StringStorage is an instance of Storage');
+
+
+// ->getContent()
+$t->diag('->getContent()');
+$storage = new StringStorage('foo');
+$t->is($storage->getContent(), 'foo', '->getContent() returns the content of the template');

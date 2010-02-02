@@ -101,7 +101,10 @@ class SymfonyTemplatingExtension extends LoaderExtension
       $helpers = array();
       foreach (explode("\n", $config['helpers']) as $helper)
       {
-        $helpers[] = new Reference(trim($helper));
+        if ($helper)
+        {
+          $helpers[] = new Reference(trim($helper));
+        }
       }
     }
     else

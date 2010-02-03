@@ -440,11 +440,11 @@ class Builder extends Container
       }
       else
       {
-        $replaceParameter = function ($match) use ($parameters)
+        $replaceParameter = function ($match) use ($parameters, $value)
         {
           if (!array_key_exists($name = strtolower($match[2]), $parameters))
           {
-            throw new \RuntimeException(sprintf('The parameter "%s" must be defined.', $name));
+            throw new \RuntimeException(sprintf('The parameter "%s" must be defined (used in the following expression: "%s").', $name, $value));
           }
 
           return $parameters[$name];

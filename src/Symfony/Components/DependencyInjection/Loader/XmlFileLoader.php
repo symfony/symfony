@@ -235,14 +235,14 @@ class XmlFileLoader extends FileLoader
 
   protected function validateSchema($dom, $file)
   {
-    $schemaLocations = array('http://www.symfony-project.org/schema/dic/services' => __DIR__.'/schema/dic/services/services-1.0.xsd');
+    $schemaLocations = array('http://www.symfony-project.org/schema/dic/services' => str_replace('\\', '/', __DIR__.'/schema/dic/services/services-1.0.xsd'));
 
     if ($element = $dom->documentElement->getAttributeNS('http://www.w3.org/2001/XMLSchema-instance', 'schemaLocation'))
     {
       $items = preg_split('/\s+/', $element);
       for ($i = 0, $nb = count($items); $i < $nb; $i += 2)
       {
-        $schemaLocations[$items[$i]] = str_replace('http://www.symfony-project.org/', __DIR__.'/', $items[$i + 1]);
+        $schemaLocations[$items[$i]] = str_replace('http://www.symfony-project.org/', str_replace('\\', '/', __DIR__).'/', $items[$i + 1]);
       }
     }
 

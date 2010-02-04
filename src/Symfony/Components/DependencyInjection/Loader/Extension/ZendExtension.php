@@ -24,6 +24,11 @@ use Symfony\Components\DependencyInjection\BuilderConfiguration;
  */
 class ZendExtension extends LoaderExtension
 {
+  protected $resources = array(
+    'logger' => 'logger-1.0.xml',
+    'mail'   => 'mail-1.0.xml',
+  );
+
   /**
    * Loads the logger configuration.
    *
@@ -40,7 +45,7 @@ class ZendExtension extends LoaderExtension
     $configuration = new BuilderConfiguration();
 
     $loader = new XmlFileLoader(__DIR__.'/xml/zend');
-    $configuration->merge($loader->load('logger-1.0.xml'));
+    $configuration->merge($loader->load($this->resources['logger']));
 
     if (isset($config['priority']))
     {
@@ -76,7 +81,7 @@ class ZendExtension extends LoaderExtension
     $configuration = new BuilderConfiguration();
 
     $loader = new XmlFileLoader(__DIR__.'/xml/zend');
-    $configuration->merge($loader->load('mail-1.0.xml'));
+    $configuration->merge($loader->load($this->resources['logger']));
 
     if (isset($config['transport']))
     {

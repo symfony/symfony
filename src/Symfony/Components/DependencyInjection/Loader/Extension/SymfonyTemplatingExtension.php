@@ -25,6 +25,9 @@ use Symfony\Components\DependencyInjection\Reference;
  */
 class SymfonyTemplatingExtension extends LoaderExtension
 {
+  protected $resources = array(
+    'templating' => 'templating-1.0.xml',
+  );
   protected $defaultHelpers = array();
   protected $alias;
 
@@ -60,7 +63,7 @@ class SymfonyTemplatingExtension extends LoaderExtension
     $configuration = new BuilderConfiguration();
 
     $loader = new XmlFileLoader(__DIR__.'/xml/symfony');
-    $configuration->merge($loader->load('templating-1.0.xml'));
+    $configuration->merge($loader->load($this->resources['templating']));
 
     // path for the filesystem loader
     if (isset($config['path']))

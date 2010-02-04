@@ -11,16 +11,12 @@
 
   <services>
     <service id="zend.logger" class="%zend.logger.class%">
-      <call method="addWriter">
-        <argument type="service" id="zend.logger.writer_stream" />
-      </call>
+      <call method="addWriter"><argument type="service" id="zend.logger.writer.filesystem" /></call>
     </service>
 
-    <service id="zend.logger.writer_stream" class="Zend_Log_Writer_Stream">
+    <service id="zend.logger.writer.filesystem" class="Zend_Log_Writer_Stream">
       <argument>%zend.logger.path%</argument>
-      <call method="addFilter">
-        <argument type="service" id="zend.logger.filter" />
-      </call>
+      <call method="addFilter"><argument type="service" id="zend.logger.filter" /></call>
     </service>
 
     <service id="zend.logger.filter" class="Zend_Log_Filter_Priority">

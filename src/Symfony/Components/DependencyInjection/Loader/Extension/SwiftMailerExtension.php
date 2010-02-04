@@ -24,6 +24,10 @@ use Symfony\Components\DependencyInjection\BuilderConfiguration;
  */
 class SwiftMailerExtension extends LoaderExtension
 {
+  protected $resources = array(
+    'mailer' => 'swiftmailer-1.0.xml',
+  );
+
   /**
    * Loads the Swift Mailer configuration.
    *
@@ -44,7 +48,7 @@ class SwiftMailerExtension extends LoaderExtension
     $configuration = new BuilderConfiguration();
 
     $loader = new XmlFileLoader(__DIR__.'/xml/swiftmailer');
-    $configuration->merge($loader->load('swiftmailer-1.0.xml'));
+    $configuration->merge($loader->load($this->resources['mailer']));
 
     if (null === $config['transport'])
     {

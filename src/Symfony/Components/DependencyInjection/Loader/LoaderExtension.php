@@ -20,6 +20,19 @@ namespace Symfony\Components\DependencyInjection\Loader;
  */
 abstract class LoaderExtension implements LoaderExtensionInterface
 {
+  protected $resources = array();
+
+  /**
+   * Sets a configuration entry point for the given extension name.
+   *
+   * @param string The configuration extension name
+   * @param mixed  A resource
+   */
+  public function setConfiguration($name, $resource)
+  {
+    $this->resources[$name] = $resource;
+  }
+
   /**
    * Loads a specific configuration.
    *

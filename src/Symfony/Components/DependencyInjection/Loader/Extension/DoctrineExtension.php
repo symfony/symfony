@@ -24,6 +24,11 @@ use Symfony\Components\DependencyInjection\BuilderConfiguration;
  */
 class DoctrineExtension extends LoaderExtension
 {
+  protected $resources = array(
+    'dbal' => 'dbal-1.0.xml',
+    'orm'  => 'orm-1.0.xml',
+  );
+
   protected $alias;
 
   public function setAlias($alias)
@@ -47,7 +52,7 @@ class DoctrineExtension extends LoaderExtension
     $configuration = new BuilderConfiguration();
 
     $loader = new XmlFileLoader(__DIR__.'/xml/doctrine');
-    $configuration->merge($loader->load('dbal-1.0.xml'));
+    $configuration->merge($loader->load($this->resources['dbal']));
 
     foreach (array('dbname', 'host', 'username', 'password', 'path', 'port') as $key)
     {
@@ -90,7 +95,7 @@ class DoctrineExtension extends LoaderExtension
     $configuration = new BuilderConfiguration();
 
     $loader = new XmlFileLoader(__DIR__.'/xml/doctrine');
-    $configuration->merge($loader->load('orm-1.0.xml'));
+    $configuration->merge($loader->load($this->resources['orm']));
 
     return $configuration;
   }

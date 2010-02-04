@@ -21,6 +21,14 @@ namespace Symfony\Components\DependencyInjection\Loader;
 interface LoaderExtensionInterface
 {
   /**
+   * Sets a configuration entry point for the given extension name.
+   *
+   * @param string The configuration extension name
+   * @param mixed  A resource
+   */
+  public function setConfiguration($name, $resource);
+
+  /**
    * Loads a specific configuration.
    *
    * @param string The tag name

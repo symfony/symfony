@@ -18,7 +18,7 @@ use Symfony\Components\Templating\Renderer\Renderer;
 use Symfony\Components\Templating\Storage\Storage;
 use Symfony\Components\Templating\Loader\FilesystemLoader;
 
-$t = new LimeTest(3);
+$t = new LimeTest(1);
 
 class ProjectTemplateRenderer extends Renderer
 {
@@ -42,15 +42,3 @@ $t->diag('->setEngine()');
 $renderer = new ProjectTemplateRenderer();
 $renderer->setEngine($engine);
 $t->ok($renderer->getEngine() === $engine, '->setEngine() sets the engine instance tied to this renderer');
-
-// __call()
-$t->diag('__call()');
-$renderer = new ProjectTemplateRenderer();
-$renderer->setEngine($engine);
-$t->is($renderer->get('foo'), 'bar', '__call() proxies to the embedded engine instance');
-
-// __get()
-$t->diag('__get()');
-$renderer = new ProjectTemplateRenderer();
-$renderer->setEngine($engine);
-$t->is((string) $renderer->bar, 'foo', '__get() proxies to the embedded engine instance');

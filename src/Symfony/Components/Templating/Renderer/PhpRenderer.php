@@ -37,6 +37,7 @@ class PhpRenderer extends Renderer
     if ($template instanceof FileStorage)
     {
       extract($parameters);
+      $view = $this->engine;
       ob_start();
       require $template;
 
@@ -45,6 +46,7 @@ class PhpRenderer extends Renderer
     else if ($template instanceof StringStorage)
     {
       extract($parameters);
+      $view = $this->engine;
       ob_start();
       eval('; ?>'.$template.'<?php ;');
 

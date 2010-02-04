@@ -191,13 +191,13 @@ catch (InvalidArgumentException $e)
 }
 
 $engine->getHelperSet()->set(new SimpleHelper('bar'));
-$loader->setTemplate('foo.php', '<?php $this->extend("layout"); echo $this->foo.$foo ?>');
-$loader->setTemplate('layout.php', '-<?php echo $this->get("content") ?>-');
+$loader->setTemplate('foo.php', '<?php $view->extend("layout"); echo $view->foo.$foo ?>');
+$loader->setTemplate('layout.php', '-<?php echo $view->get("content") ?>-');
 $t->is($engine->render('foo', array('foo' => 'foo')), '-barfoo-', '->render() uses the decorator to decorate the template');
 
 $loader->setTemplate('bar.php', 'bar');
-$loader->setTemplate('foo.php', '<?php $this->extend("layout"); echo $foo ?>');
-$loader->setTemplate('layout.php', '<?php echo $this->render("bar") ?>-<?php echo $this->get("content") ?>-');
+$loader->setTemplate('foo.php', '<?php $view->extend("layout"); echo $foo ?>');
+$loader->setTemplate('layout.php', '<?php echo $view->render("bar") ?>-<?php echo $view->get("content") ?>-');
 $t->is($engine->render('foo', array('foo' => 'foo', 'bar' => 'bar')), 'bar-foo-', '->render() supports render() calls in templates');
 
 class CompilableTemplateLoader extends Loader implements CompilableLoaderInterface

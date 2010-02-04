@@ -159,7 +159,7 @@ class Engine
    */
   public function __get($name)
   {
-    return $this->helperSet->get($name);
+    return $this->$name = $this->helperSet->get($name);
   }
 
   /**

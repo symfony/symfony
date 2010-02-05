@@ -2,6 +2,8 @@
 
 namespace Symfony\Components\Templating\Helper;
 
+use Symfony\Components\Templating\Engine;
+
 /*
  * This file is part of the symfony package.
  *
@@ -28,16 +30,16 @@ interface HelperInterface
   function getName();
 
   /**
-   * Sets the helper set associated with this helper.
+   * Sets the engine associated with this helper.
    *
-   * @param HelperSet $helperSet A HelperSet instance
+   * @param Engine $engine A Engine instance
    */
-  function setHelperSet(HelperSet $helperSet = null);
+  function setEngine(Engine $engine = null);
 
   /**
-   * Gets the helper set associated with this helper.
+   * Gets the engine associated with this helper.
    *
-   * @return HelperSet A HelperSet instance
+   * @return Engine A Engine instance
    */
-  function getHelperSet();
+  function getEngine();
 }

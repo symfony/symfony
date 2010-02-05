@@ -37,7 +37,7 @@ class StylesheetsHelper extends Helper
    */
   public function add($stylesheet, $attributes = array())
   {
-    $this->stylesheets[$this->helperSet->get('assets')->getUrl($stylesheet)] = $attributes;
+    $this->stylesheets[$this->engine->get('assets')->getUrl($stylesheet)] = $attributes;
   }
 
   /**
@@ -63,7 +63,7 @@ class StylesheetsHelper extends Helper
       $atts = array();
       foreach ($attributes as $key => $value)
       {
-        $atts[] = sprintf('%s="%s"', $key, $this->helperSet->getEngine()->escape($value));
+        $atts[] = sprintf('%s="%s"', $key, $this->engine->escape($value));
       }
 
       $html[] = sprintf('<link href="%s" rel="stylesheet" type="text/css" %s />', $path, implode(' ', $atts));

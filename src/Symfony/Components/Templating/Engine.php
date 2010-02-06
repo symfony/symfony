@@ -121,12 +121,12 @@ class Engine
     if ($this->parents[$name])
     {
       $slots = $this->get('slots');
-      $this->stack[] = $slots->get('content');
-      $slots->set('content', $content);
+      $this->stack[] = $slots->get('_content');
+      $slots->set('_content', $content);
 
       $content = $this->render($this->parents[$name], $parameters);
 
-      $slots->set('content', array_pop($this->stack));
+      $slots->set('_content', array_pop($this->stack));
     }
 
     return $content;

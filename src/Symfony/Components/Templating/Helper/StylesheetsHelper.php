@@ -57,19 +57,19 @@ class StylesheetsHelper extends Helper
    */
   public function __toString()
   {
-    $html = array();
+    $html = '';
     foreach ($this->stylesheets as $path => $attributes)
     {
-      $atts = array();
+      $atts = '';
       foreach ($attributes as $key => $value)
       {
-        $atts[] = sprintf('%s="%s"', $key, $this->engine->escape($value));
+        $atts .= ' '.sprintf('%s="%s"', $key, $this->engine->escape($value));
       }
 
-      $html[] = sprintf('<link href="%s" rel="stylesheet" type="text/css" %s />', $path, implode(' ', $atts));
+      $html .= sprintf('<link href="%s" rel="stylesheet" type="text/css"%s />', $path, $atts)."\n";
     }
 
-    return implode("\n", $html);
+    return $html;
   }
 
   /**

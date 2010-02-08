@@ -19,7 +19,9 @@ class ProjectServiceContainer extends Container
    */
   public function __construct()
   {
-    parent::__construct($this->getDefaultParameters());
+    parent::__construct();
+
+    $this->parameters = $this->getDefaultParameters();
   }
 
   /**

@@ -14,7 +14,7 @@ use Symfony\Components\DependencyInjection\Container;
 
 $fixturesPath = __DIR__.'/../../../../fixtures/Symfony/Components/DependencyInjection/';
 
-$t = new LimeTest(43);
+$t = new LimeTest(42);
 
 // __construct()
 $t->diag('__construct()');
@@ -189,23 +189,6 @@ catch (LogicException $e)
 
 $t->is(spl_object_hash($sc->getService('foo_bar')), spl_object_hash($sc->__foo_bar), '->getService() camelizes the service id when looking for a method');
 $t->is(spl_object_hash($sc->getService('foo.baz')), spl_object_hash($sc->__foo_baz), '->getService() camelizes the service id when looking for a method');
-
-// Iterator
-$t->diag('implements Iterator');
-$sc = new ProjectServiceContainer();
-$sc->setService('foo', $foo = new stdClass());
-$services = array();
-foreach ($sc as $id => $service)
-{
-  $services[$id] = spl_object_hash($service);
-}
-$t->is($services, array(
-  'service_container' => spl_object_hash($sc),
-  'bar' => spl_object_hash($sc->__bar),
-  'foo_bar' => spl_object_hash($sc->__foo_bar),
-  'foo.baz' => spl_object_hash($sc->__foo_baz),
-  'foo' => spl_object_hash($foo)),
-'Container implements the Iterator interface');
 
 // __call()
 $t->diag('__call()');

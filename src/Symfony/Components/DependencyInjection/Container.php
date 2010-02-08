@@ -50,12 +50,10 @@ namespace Symfony\Components\DependencyInjection;
  * @subpackage dependency_injection
  * @author     Fabien Potencier <fabien.potencier@symfony-project.com>
  */
-class Container implements ContainerInterface, \ArrayAccess, \Iterator
+class Container implements ContainerInterface, \ArrayAccess
 {
-  protected $serviceIds = array();
   protected $parameters = array();
   protected $services   = array();
-  protected $count      = 0;
 
   const EXCEPTION_ON_INVALID_REFERENCE = 1;
   const NULL_ON_INVALID_REFERENCE      = 2;
@@ -323,56 +321,6 @@ class Container implements ContainerInterface, \ArrayAccess, \Iterator
   public function __unset($id)
   {
     throw new \LogicException('You can\'t unset a service.');
-  }
-
-  /**
-   * Resets the service identifiers array to the beginning (implements the Iterator interface).
-   */
-  public function rewind()
-  {
-    $this->serviceIds = $this->getServiceIds();
-
-    $this->count = count($this->serviceIds);
-  }
-
-  /**
-   * Gets the key associated with the current service (implements the Iterator interface).
-   *
-   * @return string The service identifier
-   */
-  public function key()
-  {
-    return current($this->serviceIds);
-  }
-
-  /**
-   * Returns the current service (implements the Iterator interface).
-   *
-   * @return mixed The service
-   */
-  public function current()
-  {
-    return $this->getService(current($this->serviceIds));
-  }
-
-  /**
-   * Moves to the next service (implements the Iterator interface).
-   */
-  public function next()
-  {
-    next($this->serviceIds);
-
-    --$this->count;
-  }
-
-  /**
-   * Returns true if the current service is valid (implements the Iterator interface).
-   *
-   * @return boolean The validity of the current service; true if it is valid
-   */
-  public function valid()
-  {
-    return $this->count > 0;
   }
 
   /**

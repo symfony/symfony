@@ -158,8 +158,10 @@ class GraphvizDumper extends Dumper
       $container->setDefinition($id, new Definition('stdClass'));
     }
 
-    foreach ($container as $id => $service)
+    foreach ($container->getServiceIds() as $id)
     {
+      $service = $container->getService($id);
+
       if (in_array($id, array_keys($container->getAliases())))
       {
         continue;

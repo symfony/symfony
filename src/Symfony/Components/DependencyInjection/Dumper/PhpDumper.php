@@ -112,7 +112,7 @@ EOF;
     }
     else
     {
-      if ($class != "'".$definition->getClass()."'")
+      if ($class != "'".str_replace('\\', '\\\\', $definition->getClass())."'")
       {
         return sprintf("    \$class = %s;\n    \$instance = new \$class(%s);\n", $class, implode(', ', $arguments));
       }

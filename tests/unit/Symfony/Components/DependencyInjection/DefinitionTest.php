@@ -12,7 +12,7 @@ require_once __DIR__.'/../../../bootstrap.php';
 
 use Symfony\Components\DependencyInjection\Definition;
 
-$t = new LimeTest(21);
+$t = new LimeTest(25);
 
 // __construct()
 $t->diag('__construct()');
@@ -69,3 +69,16 @@ $t->diag('->setConfigurator() ->getConfigurator()');
 $def = new Definition('stdClass');
 $t->is(spl_object_hash($def->setConfigurator('foo')), spl_object_hash($def), '->setConfigurator() implements a fluent interface');
 $t->is($def->getConfigurator(), 'foo', '->getConfigurator() returns the configurator');
+
+// ->getAnnotations() ->getAnnotation() ->addAnnotation()
+$t->diag('->getAnnotations() ->getAnnotation() ->addAnnotation()');
+$def = new Definition('stdClass');
+$t->is(spl_object_hash($def->addAnnotation('foo')), spl_object_hash($def), '->addAnnotation() implements a fluent interface');
+$t->is($def->getAnnotation('foo'), array(array()), '->getAnnotation() returns attributes for an annotation name');
+$def->addAnnotation('foo', array('foo' => 'bar'));
+$t->is($def->getAnnotation('foo'), array(array(), array('foo' => 'bar')), '->addAnnotation() can adds the same annotation several times');
+$def->addAnnotation('bar', array('bar' => 'bar'));
+$t->is($def->getAnnotations(), array(
+  'foo' => array(array(), array('foo' => 'bar')),
+  'bar' => array(array('bar' => 'bar')),
+), '->getAnnotations() returns all annotations');

@@ -18,7 +18,7 @@ namespace Symfony\Components\DependencyInjection;
  * @subpackage dependency_injection
  * @author     Fabien Potencier <fabien.potencier@symfony-project.com>
  */
-class Builder extends Container
+class Builder extends Container implements AnnotatedContainerInterface
 {
   protected $definitions = array();
   protected $aliases     = array();
@@ -479,6 +479,27 @@ class Builder extends Container
     }
 
     return $value;
+  }
+
+  /**
+   * Returns service ids for a given annotation.
+   *
+   * @param string $name The annotation name
+   *
+   * @return array An array of annotations
+   */
+  public function findAnnotatedServiceIds($name)
+  {
+    $annotations = array();
+    foreach ($this->getDefinitions() as $id => $definition)
+    {
+      if ($definition->getAnnotation($name))
+      {
+        $annotations[$id] = $definition->getAnnotation($name);
+      }
+    }
+
+    return $annotations;
   }
 
   static public function getServiceConditionals($value)

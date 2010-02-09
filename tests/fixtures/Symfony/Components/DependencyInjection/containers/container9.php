@@ -10,6 +10,8 @@ use Symfony\Components\DependencyInjection\Parameter;
 $container = new Builder();
 $container->
   register('foo', 'FooClass')->
+  addAnnotation('foo', array('foo' => 'foo'))->
+  addAnnotation('foo', array('bar' => 'bar'))->
   setConstructor('getInstance')->
   setArguments(array('foo', new Reference('foo.baz'), array('%foo%' => 'foo is %foo%', 'bar' => '%foo%'), true, new Reference('service_container')))->
   setFile(realpath(__DIR__.'/../includes/foo.php'))->

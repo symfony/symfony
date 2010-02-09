@@ -177,6 +177,17 @@ class YamlFileLoader extends FileLoader
       }
     }
 
+    if (isset($service['annotations']))
+    {
+      foreach ($service['annotations'] as $annotation)
+      {
+        $name = $annotation['name'];
+        unset($annotation['name']);
+
+        $definition->addAnnotation($name, $annotation);
+      }
+    }
+
     $configuration->setDefinition($id, $definition);
   }
 

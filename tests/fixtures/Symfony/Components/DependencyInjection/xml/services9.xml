@@ -10,6 +10,8 @@
   </parameters>
   <services>
     <service id="foo" class="FooClass" constructor="getInstance" shared="false">
+      <annotation name="foo" foo="foo" />
+      <annotation name="foo" bar="bar" />
       <file>%path%/foo.php</file>
       <argument>foo</argument>
       <argument type="service" id="foo.baz" />

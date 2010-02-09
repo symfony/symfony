@@ -48,6 +48,7 @@ class PhpDumper extends Dumper
       $this->startClass($options['class'], $options['base_class']).
       $this->addConstructor().
       $this->addServices().
+      $this->addAnnotations().
       $this->addDefaultParametersMethod().
       $this->endClass()
     ;
@@ -244,6 +245,42 @@ EOF;
     }
 
     return $code;
+  }
+
+  protected function addAnnotations()
+  {
+    $annotations = array();
+    foreach ($this->container->getDefinitions() as $id => $definition)
+    {
+      foreach ($definition->getAnnotations() as $name => $ann)
+      {
+        if (!isset($annotations[$name]))
+        {
+          $annotations[$name] = array();
+        }
+
+        $annotations[$name][$id] = $ann;
+      }
+    }
+    $annotations = var_export($annotations, true);
+
+    return <<<EOF
+
+  /**
+   * Returns service ids for a given annotation.
+   *
+   * @param string \$name The annotation name
+   *
+   * @return array An array of annotations
+   */
+  public function findAnnotatedServiceIds(\$name)
+  {
+    static \$annotations = $annotations;
+
+    return isset(\$annotations[\$name]) ? \$annotations[\$name] : array();
+  }
+
+EOF;
   }
 
   protected function startClass($class, $baseClass)

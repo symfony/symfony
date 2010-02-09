@@ -17,7 +17,7 @@ use Symfony\Components\DependencyInjection\Reference;
 
 $fixturesPath = __DIR__.'/../../../../fixtures/Symfony/Components/DependencyInjection/';
 
-$t = new LimeTest(59);
+$t = new LimeTest(61);
 
 // ->setDefinitions() ->addDefinitions() ->getDefinitions() ->setDefinition() ->getDefinition() ->hasDefinition()
 $t->diag('->setDefinitions() ->addDefinitions() ->getDefinitions() ->setDefinition() ->getDefinition() ->hasDefinition()');
@@ -290,3 +290,20 @@ $container->register('foo', 'FooClass');
 $config->setDefinition('foo', new Definition('BazClass'));
 $container->merge($config);
 $t->is($container->getDefinition('foo')->getClass(), 'BazClass', '->merge() overrides already defined services');
+
+// ->findAnnotatedServiceIds()
+$t->diag('->findAnnotatedServiceIds()');
+$builder = new Builder();
+$builder
+  ->register('foo', 'FooClass')
+  ->addAnnotation('foo', array('foo' => 'foo'))
+  ->addAnnotation('bar', array('bar' => 'bar'))
+  ->addAnnotation('foo', array('foofoo' => 'foofoo'))
+;
+$t->is($builder->findAnnotatedServiceIds('foo'), array(
+  'foo' => array(
+    array('foo' => 'foo'),
+    array('foofoo' => 'foofoo'),
+  )
+), '->findAnnotatedServiceIds() returns an array of service ids and its annotation attributes');
+$t->is($builder->findAnnotatedServiceIds('foobar'), array(), '->findAnnotatedServiceIds() returns an empty array if there is annotated services');

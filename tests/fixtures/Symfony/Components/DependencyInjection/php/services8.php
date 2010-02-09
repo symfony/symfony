@@ -25,6 +25,21 @@ class ProjectServiceContainer extends Container
   }
 
   /**
+   * Returns service ids for a given annotation.
+   *
+   * @param string $name The annotation name
+   *
+   * @return array An array of annotations
+   */
+  public function findAnnotatedServiceIds($name)
+  {
+    static $annotations = array (
+);
+
+    return isset($annotations[$name]) ? $annotations[$name] : array();
+  }
+
+  /**
    * Gets the default parameters.
    *
    * @return array An array of the default parameters

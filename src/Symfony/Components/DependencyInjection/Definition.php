@@ -27,6 +27,7 @@ class Definition
   protected $arguments;
   protected $calls;
   protected $configurator;
+  protected $annotations;
 
   /**
    * Constructor.
@@ -40,6 +41,7 @@ class Definition
     $this->arguments = $arguments;
     $this->calls = array();
     $this->shared = true;
+    $this->annotations = array();
   }
 
   /**
@@ -169,6 +171,53 @@ class Definition
   public function getMethodCalls()
   {
     return $this->calls;
+  }
+
+  /**
+   * Returns all annotations.
+   *
+   * @return array An array of annotations
+   */
+  public function getAnnotations()
+  {
+    return $this->annotations;
+  }
+
+  /**
+   * Gets an annotation by name.
+   *
+   * @param  string $name       The annotation name
+   *
+   * @return array  $attributes An array of attributes
+   */
+  public function getAnnotation($name)
+  {
+    if (!isset($this->annotations[$name]))
+    {
+      $this->annotations[$name] = array();
+    }
+
+    return $this->annotations[$name];
+  }
+
+  /**
+   * Adds an annotation for this definition.
+   *
+   * @param  string $name       The annotation name
+   * @param  array  $attributes An array of attributes
+   *
+   * @return Definition The current instance
+   */
+  public function addAnnotation($name, array $attributes = array())
+  {
+    if (!isset($this->annotations[$name]))
+    {
+      $this->annotations[$name] = array();
+    }
+
+    $this->annotations[$name][] = $attributes;
+
+    return $this;
   }
 
   /**

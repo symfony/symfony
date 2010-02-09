@@ -42,6 +42,26 @@ class YamlDumper extends Dumper
     $code = "  $id:\n";
     $code .= sprintf("    class: %s\n", $definition->getClass());
 
+    $annotationsCode = '';
+    foreach ($definition->getAnnotations() as $name => $annotations)
+    {
+      foreach ($annotations as $attributes)
+      {
+        $att = array();
+        foreach ($attributes as $key => $value)
+        {
+          $att[] = sprintf('%s: %s', YAML::dump($key), YAML::dump($value));
+        }
+        $att = $att ? ', '.implode(' ', $att) : '';
+
+        $annotationsCode .= sprintf("      - { name: %s%s }\n", YAML::dump($name), $att);
+      }
+    }
+    if ($annotationsCode)
+    {
+      $code .= "    annotations:\n".$annotationsCode;
+    }
+
     if ($definition->getFile())
     {
       $code .= sprintf("    file: %s\n", $definition->getFile());

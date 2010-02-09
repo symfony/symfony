@@ -178,6 +178,22 @@ class XmlFileLoader extends FileLoader
       $definition->addMethodCall((string) $call['method'], $call->getArgumentsAsPhp('argument'));
     }
 
+    foreach ($service->annotation as $annotation)
+    {
+      $parameters = array();
+      foreach ($annotation->attributes() as $name => $value)
+      {
+        if ('name' === $name)
+        {
+          continue;
+        }
+
+        $parameters[$name] = SimpleXMLElement::phpize($value);
+      }
+
+      $definition->addAnnotation((string) $annotation['name'], $parameters);
+    }
+
     $configuration->setDefinition($id, $definition);
   }
 

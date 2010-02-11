@@ -1,6 +1,6 @@
 <?php
 
-namespace Symfony\Components\YAML;
+namespace Symfony\Components\Yaml;
 
 /*
  * This file is part of the symfony package.
@@ -17,7 +17,7 @@ namespace Symfony\Components\YAML;
  * @subpackage yaml
  * @author     Fabien Potencier <fabien.potencier@symfony-project.com>
  */
-class YAML
+class Yaml
 {
   static protected $spec = '1.2';
 

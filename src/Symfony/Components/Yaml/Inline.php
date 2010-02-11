@@ -1,6 +1,6 @@
 <?php
 
-namespace Symfony\Components\YAML;
+namespace Symfony\Components\Yaml;
 
 /*
  * This file is part of the symfony package.
@@ -57,8 +57,8 @@ class Inline
    */
   static public function dump($value)
   {
-    $trueValues = '1.1' == YAML::getSpecVersion() ? array('true', 'on', '+', 'yes', 'y') : array('true');
-    $falseValues = '1.1' == YAML::getSpecVersion() ? array('false', 'off', '-', 'no', 'n') : array('false');
+    $trueValues = '1.1' == Yaml::getSpecVersion() ? array('true', 'on', '+', 'yes', 'y') : array('true');
+    $falseValues = '1.1' == Yaml::getSpecVersion() ? array('false', 'off', '-', 'no', 'n') : array('false');
 
     switch (true)
     {
@@ -351,8 +351,8 @@ class Inline
   {
     $scalar = trim($scalar);
 
-    $trueValues = '1.1' == YAML::getSpecVersion() ? array('true', 'on', '+', 'yes', 'y') : array('true');
-    $falseValues = '1.1' == YAML::getSpecVersion() ? array('false', 'off', '-', 'no', 'n') : array('false');
+    $trueValues = '1.1' == Yaml::getSpecVersion() ? array('true', 'on', '+', 'yes', 'y') : array('true');
+    $falseValues = '1.1' == Yaml::getSpecVersion() ? array('false', 'off', '-', 'no', 'n') : array('false');
 
     switch (true)
     {

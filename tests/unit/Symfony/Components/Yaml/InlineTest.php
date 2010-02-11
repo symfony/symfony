@@ -10,10 +10,10 @@
 
 require_once __DIR__.'/../../../bootstrap.php';
 
-use Symfony\Components\YAML\YAML;
-use Symfony\Components\YAML\Inline;
+use Symfony\Components\Yaml\Yaml;
+use Symfony\Components\Yaml\Inline;
 
-YAML::setSpecVersion('1.1');
+Yaml::setSpecVersion('1.1');
 
 $t = new LimeTest(124);
 

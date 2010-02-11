@@ -10,18 +10,18 @@
 
 require_once __DIR__.'/../../../bootstrap.php';
 
-use Symfony\Components\YAML\YAML;
-use Symfony\Components\YAML\Parser;
-use Symfony\Components\YAML\Dumper;
+use Symfony\Components\Yaml\Yaml;
+use Symfony\Components\Yaml\Parser;
+use Symfony\Components\Yaml\Dumper;
 
-YAML::setSpecVersion('1.1');
+Yaml::setSpecVersion('1.1');
 
 $t = new LimeTest(148);
 
 $parser = new Parser();
 $dumper = new Dumper();
 
-$path = __DIR__.'/../../../../fixtures/Symfony/Components/YAML';
+$path = __DIR__.'/../../../../fixtures/Symfony/Components/Yaml';
 $files = $parser->parse(file_get_contents($path.'/index.yml'));
 foreach ($files as $file)
 {

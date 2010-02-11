@@ -7,7 +7,7 @@ use Symfony\Components\DependencyInjection\Definition;
 use Symfony\Components\DependencyInjection\Reference;
 use Symfony\Components\DependencyInjection\BuilderConfiguration;
 use Symfony\Components\DependencyInjection\FileResource;
-use Symfony\Components\YAML\YAML;
+use Symfony\Components\Yaml\Yaml;
 
 /*
  * This file is part of the symfony framework.
@@ -193,7 +193,7 @@ class YamlFileLoader extends FileLoader
 
   protected function loadFile($file)
   {
-    return $this->validate(YAML::load($file), $file);
+    return $this->validate(Yaml::load($file), $file);
   }
 
   protected function validate($content, $file)

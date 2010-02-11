@@ -2,7 +2,7 @@
 
 namespace Symfony\Components\DependencyInjection\Dumper;
 
-use Symfony\Components\YAML\YAML;
+use Symfony\Components\Yaml\Yaml;
 use Symfony\Components\DependencyInjection\Container;
 use Symfony\Components\DependencyInjection\Parameter;
 use Symfony\Components\DependencyInjection\Reference;
@@ -50,11 +50,11 @@ class YamlDumper extends Dumper
         $att = array();
         foreach ($attributes as $key => $value)
         {
-          $att[] = sprintf('%s: %s', YAML::dump($key), YAML::dump($value));
+          $att[] = sprintf('%s: %s', Yaml::dump($key), Yaml::dump($value));
         }
         $att = $att ? ', '.implode(' ', $att) : '';
 
-        $annotationsCode .= sprintf("      - { name: %s%s }\n", YAML::dump($name), $att);
+        $annotationsCode .= sprintf("      - { name: %s%s }\n", Yaml::dump($name), $att);
       }
     }
     if ($annotationsCode)
@@ -74,12 +74,12 @@ class YamlDumper extends Dumper
 
     if ($definition->getArguments())
     {
-      $code .= sprintf("    arguments: %s\n", YAML::dump($this->dumpValue($definition->getArguments()), 0));
+      $code .= sprintf("    arguments: %s\n", Yaml::dump($this->dumpValue($definition->getArguments()), 0));
     }
 
     if ($definition->getMethodCalls())
     {
-      $code .= sprintf("    calls:\n      %s\n", str_replace("\n", "\n      ", YAML::dump($this->dumpValue($definition->getMethodCalls()), 1)));
+      $code .= sprintf("    calls:\n      %s\n", str_replace("\n", "\n      ", Yaml::dump($this->dumpValue($definition->getMethodCalls()), 1)));
     }
 
     if (!$definition->isShared())
@@ -101,7 +101,7 @@ class YamlDumper extends Dumper
         }
       }
 
-      $code .= sprintf("    configurator: %s\n", YAML::dump($callable, 0));
+      $code .= sprintf("    configurator: %s\n", Yaml::dump($callable, 0));
     }
 
     return $code;
@@ -140,7 +140,7 @@ class YamlDumper extends Dumper
       return '';
     }
 
-    return YAML::dump(array('parameters' => $this->prepareParameters($this->container->getParameters())), 2);
+    return Yaml::dump(array('parameters' => $this->prepareParameters($this->container->getParameters())), 2);
   }
 
   protected function dumpValue($value)

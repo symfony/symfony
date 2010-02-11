@@ -63,7 +63,7 @@ class Parser
       // tab?
       if (preg_match('#^\t+#', $this->currentLine))
       {
-        throw new \InvalidArgumentException(sprintf('A YAML file cannot contain tabs as indentation at line %d (%s).', $this->getRealCurrentLineNb() + 1, $this->currentLine));
+        throw new ParserException(sprintf('A YAML file cannot contain tabs as indentation at line %d (%s).', $this->getRealCurrentLineNb() + 1, $this->currentLine));
       }
 
       $isRef = $isInPlace = $isProcessed = false;
@@ -106,7 +106,7 @@ class Parser
             $isInPlace = substr($values['value'], 1);
             if (!array_key_exists($isInPlace, $this->refs))
             {
-              throw new \InvalidArgumentException(sprintf('Reference "%s" does not exist at line %s (%s).', $isInPlace, $this->getRealCurrentLineNb() + 1, $this->currentLine));
+              throw new ParserException(sprintf('Reference "%s" does not exist at line %s (%s).', $isInPlace, $this->getRealCurrentLineNb() + 1, $this->currentLine));
             }
           }
           else
@@ -127,7 +127,7 @@ class Parser
             $merged = array();
             if (!is_array($parsed))
             {
-              throw new \InvalidArgumentException(sprintf("YAML merge keys used with a scalar value instead of an array at line %s (%s)", $this->getRealCurrentLineNb() + 1, $this->currentLine));
+              throw new ParserException(sprintf("YAML merge keys used with a scalar value instead of an array at line %s (%s)", $this->getRealCurrentLineNb() + 1, $this->currentLine));
             }
             else if (isset($parsed[0]))
             {
@@ -136,7 +136,7 @@ class Parser
               {
                 if (!is_array($parsedItem))
                 {
-                  throw new \InvalidArgumentException(sprintf("Merge items must be arrays at line %s (%s).", $this->getRealCurrentLineNb() + 1, $parsedItem));
+                  throw new ParserException(sprintf("Merge items must be arrays at line %s (%s).", $this->getRealCurrentLineNb() + 1, $parsedItem));
                 }
                 $merged = array_merge($parsedItem, $merged);
               }
@@ -233,7 +233,7 @@ class Parser
             $error = 'Unable to parse line';
         }
 
-        throw new \InvalidArgumentException(sprintf('%s %d (%s).', $error, $this->getRealCurrentLineNb() + 1, $this->currentLine));
+        throw new ParserException(sprintf('%s %d (%s).', $error, $this->getRealCurrentLineNb() + 1, $this->currentLine));
       }
 
       if ($isRef)
@@ -278,7 +278,7 @@ class Parser
 
     if (!$this->isCurrentLineEmpty() && 0 == $newIndent)
     {
-      throw new \InvalidArgumentException(sprintf('Indentation problem at line %d (%s)', $this->getRealCurrentLineNb() + 1, $this->currentLine));
+      throw new ParserException(sprintf('Indentation problem at line %d (%s)', $this->getRealCurrentLineNb() + 1, $this->currentLine));
     }
 
     $data = array(substr($this->currentLine, $newIndent));
@@ -314,7 +314,7 @@ class Parser
       }
       else
       {
-        throw new \InvalidArgumentException(sprintf('Indentation problem at line %d (%s)', $this->getRealCurrentLineNb() + 1, $this->currentLine));
+        throw new ParserException(sprintf('Indentation problem at line %d (%s)', $this->getRealCurrentLineNb() + 1, $this->currentLine));
       }
     }
 
@@ -366,7 +366,7 @@ class Parser
 
       if (!array_key_exists($value, $this->refs))
       {
-        throw new \InvalidArgumentException(sprintf('Reference "%s" does not exist (%s).', $value, $this->currentLine));
+        throw new ParserException(sprintf('Reference "%s" does not exist (%s).', $value, $this->currentLine));
       }
       return $this->refs[$value];
     }

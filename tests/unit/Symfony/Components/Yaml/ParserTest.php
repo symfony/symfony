@@ -12,6 +12,7 @@ require_once __DIR__.'/../../../bootstrap.php';
 
 use Symfony\Components\Yaml\Yaml;
 use Symfony\Components\Yaml\Parser;
+use Symfony\Components\Yaml\ParserException;
 
 Yaml::setSpecVersion('1.1');
 
@@ -64,7 +65,7 @@ foreach ($yamls as $yaml)
     $content = $parser->parse($yaml);
     $t->fail('YAML files must not contain tabs');
   }
-  catch (InvalidArgumentException $e)
+  catch (ParserException $e)
   {
     $t->pass('YAML files must not contain tabs');
   }

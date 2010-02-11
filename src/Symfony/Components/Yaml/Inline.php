@@ -63,7 +63,7 @@ class Inline
     switch (true)
     {
       case is_resource($value):
-        throw new \InvalidArgumentException('Unable to dump PHP resources in a YAML file.');
+        throw new Exception('Unable to dump PHP resources in a YAML file.');
       case is_object($value):
         return '!!php/object:'.serialize($value);
       case is_array($value):
@@ -171,7 +171,7 @@ class Inline
       }
       else
       {
-        throw new \InvalidArgumentException(sprintf('Malformed inline YAML string (%s).', $scalar));
+        throw new ParserException(sprintf('Malformed inline YAML string (%s).', $scalar));
       }
 
       $output = $evaluate ? self::evaluateScalar($output) : $output;
@@ -192,7 +192,7 @@ class Inline
   {
     if (!preg_match('/'.self::REGEX_QUOTED_STRING.'/A', substr($scalar, $i), $match))
     {
-      throw new \InvalidArgumentException(sprintf('Malformed inline YAML string (%s).', substr($scalar, $i)));
+      throw new ParserException(sprintf('Malformed inline YAML string (%s).', substr($scalar, $i)));
     }
 
     $output = substr($match[0], 1, strlen($match[0]) - 2);
@@ -270,7 +270,7 @@ class Inline
       ++$i;
     }
 
-    throw new \InvalidArgumentException(sprintf('Malformed inline YAML string %s', $sequence));
+    throw new ParserException(sprintf('Malformed inline YAML string %s', $sequence));
   }
 
   /**
@@ -337,7 +337,7 @@ class Inline
       }
     }
 
-    throw new \InvalidArgumentException(sprintf('Malformed inline YAML string %s', $mapping));
+    throw new ParserException(sprintf('Malformed inline YAML string %s', $mapping));
   }
 
   /**

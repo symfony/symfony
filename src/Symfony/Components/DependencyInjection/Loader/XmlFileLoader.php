@@ -343,6 +343,9 @@ EOF
       $values = static::convertDomElementToArray($node);
       $config = $this->getExtension($node->namespaceURI)->load($node->localName, is_array($values) ? $values : array($values));
 
+      $r = new \ReflectionObject($this->getExtension($node->namespaceURI));
+      $config->addResource(new FileResource($r->getFileName()));
+
       $configuration->merge($config);
     }
   }

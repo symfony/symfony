@@ -253,7 +253,7 @@ class YamlFileLoader extends FileLoader
 
   protected function loadFromExtensions(BuilderConfiguration $configuration, $content)
   {
-    foreach ($content as $key => $config)
+    foreach ($content as $key => $values)
     {
       if (in_array($key, array('imports', 'parameters', 'services')))
       {
@@ -262,12 +262,17 @@ class YamlFileLoader extends FileLoader
 
       list($namespace, $tag) = explode('.', $key);
 
-      if (!is_array($config))
+      if (!is_array($values))
       {
-        $config = array();
+        $values = array();
       }
 
-      $configuration->merge(static::getExtension($namespace)->load($tag, $config));
+      $config = static::getExtension($namespace)->load($tag, $values);
+
+      $r = new \ReflectionObject($this->getExtension($namespace));
+      $config->addResource(new FileResource($r->getFileName()));
+
+      $configuration->merge($config);
     }
   }
 }

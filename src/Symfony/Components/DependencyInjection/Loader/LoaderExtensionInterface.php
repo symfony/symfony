@@ -46,6 +46,13 @@ interface LoaderExtensionInterface
   public function getNamespace();
 
   /**
+   * Returns the base path for the XSD files.
+   *
+   * @return string The XSD base path
+   */
+  public function getXsdValidationBasePath();
+
+  /**
    * Returns the recommanded alias to use in XML.
    *
    * This alias is also the mandatory prefix to use when using YAML.

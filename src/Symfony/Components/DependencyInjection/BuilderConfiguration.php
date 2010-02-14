@@ -2,6 +2,8 @@
 
 namespace Symfony\Components\DependencyInjection;
 
+use Symfony\Components\DependencyInjection\Loader\Loader;
+
 /*
  * This file is part of the symfony framework.
  *
@@ -45,16 +47,22 @@ class BuilderConfiguration
    * Adds a resource for this configuration.
    *
    * @param ResourceInterface $resource A resource instance
+   *
+   * @return BuilderConfiguration The current instance
    */
   public function addResource(ResourceInterface $resource)
   {
     $this->resources[] = $resource;
+
+    return $this;
   }
 
   /**
    * Merges a BuilderConfiguration with the current one.
    *
    * @param BuilderConfiguration $configuration
+   *
+   * @return BuilderConfiguration The current instance
    */
   public function merge(BuilderConfiguration $configuration = null)
   {
@@ -71,12 +79,35 @@ class BuilderConfiguration
     {
       $this->addResource($resource);
     }
+
+    return $this;
+  }
+
+  /**
+   * Merges the configuration given by an extension.
+   *
+   * @param $key    string The extension tag to load (namespace.tag)
+   * @param $values array  An array of values to customize the extension
+   *
+   * @return BuilderConfiguration The current instance
+   */
+  public function mergeExtension($key, array $values = array())
+  {
+    list($namespace, $tag) = explode('.', $key);
+
+    $config = Loader::getExtension($namespace)->load($tag, $values);
+
+    $this->merge($config);
+
+    return $this;
   }
 
   /**
    * Sets the service container parameters.
    *
    * @param array $parameters An array of parameters
+   *
+   * @return BuilderConfiguration The current instance
    */
   public function setParameters(array $parameters)
   {
@@ -85,16 +116,22 @@ class BuilderConfiguration
     {
       $this->parameters[strtolower($key)] = $value;
     }
+
+    return $this;
   }
 
   /**
    * Adds parameters to the service container parameters.
    *
    * @param array $parameters An array of parameters
+   *
+   * @return BuilderConfiguration The current instance
    */
   public function addParameters(array $parameters)
   {
     $this->setParameters(array_merge($this->parameters, $parameters));
+
+    return $this;
   }
 
   /**
@@ -143,10 +180,14 @@ class BuilderConfiguration
    *
    * @param string $name       The parameter name
    * @param mixed  $parameters The parameter value
+   *
+   * @return BuilderConfiguration The current instance
    */
   public function setParameter($name, $value)
   {
     $this->parameters[strtolower($name)] = $value;
+
+    return $this;
   }
 
   /**
@@ -154,18 +195,24 @@ class BuilderConfiguration
    *
    * @param string $alias The alias to create
    * @param string $id    The service to alias
+   *
+   * @return BuilderConfiguration The current instance
    */
   public function setAlias($alias, $id)
   {
     unset($this->definitions[$alias]);
 
     $this->aliases[$alias] = $id;
+
+    return $this;
   }
 
   /**
    * Adds definition aliases.
    *
    * @param array $aliases An array of aliases
+   *
+   * @return BuilderConfiguration The current instance
    */
   public function addAliases(array $aliases)
   {
@@ -173,6 +220,8 @@ class BuilderConfiguration
     {
       $this->setAlias($alias, $id);
     }
+
+    return $this;
   }
 
   /**
@@ -221,18 +270,24 @@ class BuilderConfiguration
    *
    * @param  string     $id         The identifier
    * @param  Definition $definition A Definition instance
+   *
+   * @return BuilderConfiguration The current instance
    */
   public function setDefinition($id, Definition $definition)
   {
     unset($this->aliases[$id]);
 
     return $this->definitions[$id] = $definition;
+
+    return $this;
   }
 
   /**
    * Adds the definitions.
    *
    * @param array $definitions An array of definitions
+   *
+   * @return BuilderConfiguration The current instance
    */
   public function addDefinitions(array $definitions)
   {
@@ -240,17 +295,23 @@ class BuilderConfiguration
     {
       $this->setDefinition($id, $definition);
     }
+
+    return $this;
   }
 
   /**
    * Sets the definitions.
    *
    * @param array $definitions An array of definitions
+   *
+   * @return BuilderConfiguration The current instance
    */
   public function setDefinitions(array $definitions)
   {
     $this->definitions = array();
     $this->addDefinitions($definitions);
+
+    return $this;
   }
 
   /**

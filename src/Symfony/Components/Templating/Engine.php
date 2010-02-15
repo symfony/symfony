@@ -133,6 +133,19 @@ class Engine
   }
 
   /**
+   * Outputs a rendered template.
+   *
+   * @param string $name       A template name
+   * @param array  $parameters An array of parameters to pass to the template
+   *
+   * @see render()
+   */
+  public function output($name, array $parameters = array())
+  {
+    echo $this->render($name, $parameters);
+  }
+
+  /**
    * Gets a helper value.
    *
    * @param string $name The helper name

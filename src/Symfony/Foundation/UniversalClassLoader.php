@@ -124,7 +124,11 @@ class UniversalClassLoader
         if (0 === strpos($namespace, $ns))
         {
           $class = substr($class, $pos + 1);
-          require $dir.DIRECTORY_SEPARATOR.str_replace('\\', DIRECTORY_SEPARATOR, $namespace).DIRECTORY_SEPARATOR.str_replace('_', DIRECTORY_SEPARATOR, $class).'.php';
+          $file = $dir.DIRECTORY_SEPARATOR.str_replace('\\', DIRECTORY_SEPARATOR, $namespace).DIRECTORY_SEPARATOR.str_replace('_', DIRECTORY_SEPARATOR, $class).'.php';
+          if (file_exists($file))
+          {
+            require $file;
+          }
 
           return;
         }
@@ -137,7 +141,11 @@ class UniversalClassLoader
       {
         if (0 === strpos($class, $prefix))
         {
-          require $dir.DIRECTORY_SEPARATOR.str_replace('_', DIRECTORY_SEPARATOR, $class).'.php';
+          $file = $dir.DIRECTORY_SEPARATOR.str_replace('_', DIRECTORY_SEPARATOR, $class).'.php';
+          if (file_exists($file))
+          {
+            require $file;
+          }
 
           return;
         }

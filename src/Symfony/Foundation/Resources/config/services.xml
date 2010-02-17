@@ -1,0 +1,40 @@
+<?xml version="1.0" ?>
+
+<container xmlns="http://www.symfony-project.org/schema/dic/services"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xsi:schemaLocation="http://www.symfony-project.org/schema/dic/services http://www.symfony-project.org/schema/dic/services/services-1.0.xsd">
+
+  <parameters>
+    <parameter key="event_dispatcher.class">Symfony\Foundation\EventDispatcher</parameter>
+    <parameter key="debug.event_dispatcher.class">Symfony\Foundation\Debug\EventDispatcher</parameter>
+    <parameter key="request_handler.class">Symfony\Components\RequestHandler\RequestHandler</parameter>
+    <parameter key="request.class">Symfony\Components\RequestHandler\Request</parameter>
+    <parameter key="response.class">Symfony\Components\RequestHandler\Response</parameter>
+    <parameter key="error_handler.class">Symfony\Foundation\Debug\ErrorHandler</parameter>
+    <parameter key="error_handler.level">null</parameter>
+  </parameters>
+
+  <services>
+    <service id="event_dispatcher" class="%event_dispatcher.class%">
+      <argument type="service" id="service_container" />
+    </service>
+
+    <service id="debug.event_dispatcher" class="%debug.event_dispatcher.class%">
+      <argument type="service" id="service_container" />
+      <argument type="service" id="logger" on-invalid="null" />
+    </service>
+
+    <service id="error_handler" class="%error_handler.class%">
+      <argument>%error_handler.level%</argument>
+      <call method="register" />
+    </service>
+
+    <service id="request_handler" class="%request_handler.class%">
+      <argument type="service" id="event_dispatcher" />
+    </service>
+
+    <service id="request" class="%request.class%" />
+
+    <service id="response" class="%response.class%" shared="false" />
+  </services>
+</container>

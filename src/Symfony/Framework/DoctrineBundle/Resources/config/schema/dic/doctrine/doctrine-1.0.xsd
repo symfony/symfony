@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+
+<xsd:schema xmlns="http://www.symfony-project.org/schema/dic/doctrine"
+    xmlns:xsd="http://www.w3.org/2001/XMLSchema"
+    targetNamespace="http://www.symfony-project.org/schema/dic/doctrine"
+    elementFormDefault="qualified">
+
+  <xsd:element name="dbal" type="dbal" />
+
+  <xsd:complexType name="dbal">
+    <xsd:attribute name="dbname" type="xsd:string" />
+    <xsd:attribute name="host" type="xsd:string" />
+    <xsd:attribute name="port" type="xsd:integer" />
+    <xsd:attribute name="username" type="xsd:string" />
+    <xsd:attribute name="password" type="xsd:string" />
+    <xsd:attribute name="driver" type="xsd:string" />
+    <xsd:attribute name="options" type="xsd:string" />
+    <xsd:attribute name="path" type="xsd:string" />
+  </xsd:complexType>
+</xsd:schema>

@@ -1,0 +1,89 @@
+<?xml version="1.0" ?>
+
+<container xmlns="http://www.symfony-project.org/schema/dic/services"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xsi:schemaLocation="http://www.symfony-project.org/schema/dic/services http://www.symfony-project.org/schema/dic/services/services-1.0.xsd">
+
+  <parameters>
+    <parameter key="templating.engine.class">Symfony\Framework\WebBundle\Templating\Engine</parameter>
+    <parameter key="templating.loader.filesystem.class">Symfony\Components\Templating\Loader\FilesystemLoader</parameter>
+    <parameter key="templating.loader.cache.class">Symfony\Components\Templating\Loader\CacheLoader</parameter>
+    <parameter key="templating.loader.chain.class">Symfony\Components\Templating\Loader\ChainLoader</parameter>
+    <parameter key="templating.helper.javascripts.class">Symfony\Components\Templating\Helper\JavascriptsHelper</parameter>
+    <parameter key="templating.helper.stylesheets.class">Symfony\Components\Templating\Helper\StylesheetsHelper</parameter>
+    <parameter key="templating.helper.slots.class">Symfony\Components\Templating\Helper\SlotsHelper</parameter>
+    <parameter key="templating.helper.assets.class">Symfony\Components\Templating\Helper\AssetsHelper</parameter>
+    <parameter key="templating.helper.actions.class">Symfony\Framework\WebBundle\Helper\ActionsHelper</parameter>
+    <parameter key="templating.helper.router.class">Symfony\Framework\WebBundle\Helper\RouterHelper</parameter>
+    <parameter key="templating.helper.request.class">Symfony\Framework\WebBundle\Helper\RequestHelper</parameter>
+    <parameter key="templating.helper.user.class">Symfony\Framework\WebBundle\Helper\UserHelper</parameter>
+  </parameters>
+
+  <services>
+    <service id="templating.engine" class="%templating.engine.class%">
+      <argument type="service" id="service_container" />
+      <argument type="service" id="templating.loader" />
+      <argument type="collection"></argument>
+      <argument>%templating.output_escaper%</argument>
+      <call method="setCharset"><argument>%kernel.charset%</argument></call>
+    </service>
+
+    <service id="templating.loader.filesystem" class="%templating.loader.filesystem.class%">
+      <argument>%templating.loader.filesystem.path%</argument>
+      <call method="setDebugger"><argument type="service" id="templating.debugger" on-invalid="ignore" /></call>
+    </service>
+
+    <service id="templating.loader.cache" class="%templating.loader.cache.class%">
+      <argument type="service" id="templating.loader.wrapped" />
+      <argument>%templating.loader.cache.path%</argument>
+      <call method="setDebugger"><argument type="service" id="templating.debugger" on-invalid="ignore" /></call>
+    </service>
+
+    <service id="templating.loader.chain" class="%templating.loader.chain.class%">
+      <call method="setDebugger"><argument type="service" id="templating.debugger" on-invalid="ignore" /></call>
+    </service>
+
+    <service id="templating.helper.javascripts" class="%templating.helper.javascripts.class%">
+      <annotation name="templating.helper" alias="javascripts" />
+    </service>
+
+    <service id="templating.helper.stylesheets" class="%templating.helper.stylesheets.class%">
+      <annotation name="templating.helper" alias="stylesheets" />
+    </service>
+
+    <service id="templating.helper.slots" class="%templating.helper.slots.class%">
+      <annotation name="templating.helper" alias="slots" />
+    </service>
+
+    <service id="templating.helper.assets" class="%templating.helper.assets.class%">
+      <annotation name="templating.helper" alias="assets" />
+      <argument>%request.base_path%</argument>
+      <argument />
+      <argument>%templating.assets.version%</argument>
+    </service>
+
+    <service id="templating.helper.request" class="%templating.helper.request.class%">
+      <annotation name="templating.helper" alias="request" />
+      <argument type="service" id="request" />
+    </service>
+
+    <service id="templating.helper.user" class="%templating.helper.user.class%">
+      <annotation name="templating.helper" alias="user" />
+      <argument type="service" id="user" />
+    </service>
+
+    <service id="templating.helper.router" class="%templating.helper.router.class%">
+      <annotation name="templating.helper" alias="router" />
+      <argument type="service" id="router" />
+    </service>
+
+    <service id="templating.helper.actions" class="%templating.helper.actions.class%">
+      <annotation name="templating.helper" alias="actions" />
+      <argument type="service" id="service_container" />
+    </service>
+
+    <service id="templating.loader" alias="templating.loader.filesystem" />
+
+    <service id="templating" alias="templating.engine" />
+  </services>
+</container>

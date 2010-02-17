@@ -1,0 +1,29 @@
+<?xml version="1.0" ?>
+
+<container xmlns="http://www.symfony-project.org/schema/dic/services"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xsi:schemaLocation="http://www.symfony-project.org/schema/dic/services http://www.symfony-project.org/schema/dic/services/services-1.0.xsd">
+
+  <parameters>
+    <parameter key="doctrine.entity_manager.class">Doctrine\ORM\EntityManager</parameter>
+  </parameters>
+
+  <services>
+    <service id="doctrine.orm.manager" class="%doctrine.entity_manager.class%" constructor="create">
+      <argument type="service" id="doctrine.dbal.connection" />
+      <argument type="service" id="doctrine.orm.configuration" />
+    </service>
+
+    <service id="doctrine.orm.configuration" class="Doctrine\ORM\Configuration">
+      <!--
+      <call method="setMetadataCacheImpl"><argument type="service" id="doctrine.orm.cache" /></call>
+      <call method="setQueryCacheImpl"><argument type="service" id="doctrine.orm.cache" /></call>
+      //-->
+      <call method="setProxyDir"><argument>%kernel.cache_dir%/doctrine/Proxies</argument></call>
+      <call method="setProxyNamespace"><argument>Proxies</argument></call>
+      <call method="setAutoGenerateProxyClasses"><argument>true</argument></call>
+    </service>
+
+    <service id="doctrine.orm.cache" class="Doctrine\Common\Cache\ApcCache" />
+  </services>
+</container>

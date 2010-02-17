@@ -1,0 +1,52 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+
+<xsd:schema xmlns="http://www.symfony-project.org/schema/dic/swiftmailer"
+    xmlns:xsd="http://www.w3.org/2001/XMLSchema"
+    targetNamespace="http://www.symfony-project.org/schema/dic/swiftmailer"
+    elementFormDefault="qualified">
+
+  <xsd:element name="mailer" type="mailer" />
+
+  <xsd:complexType name="mailer">
+    <xsd:sequence>
+      <xsd:element name="spool" type="spool" minOccurs="0" maxOccurs="1" />
+    </xsd:sequence>
+
+    <xsd:attribute name="username" type="xsd:string" />
+    <xsd:attribute name="password" type="xsd:string" />
+    <xsd:attribute name="host" type="xsd:string" />
+    <xsd:attribute name="port" type="xsd:string" />
+    <xsd:attribute name="encryption" type="encryption" />
+    <xsd:attribute name="auth_mode" type="auth_mode" />
+    <xsd:attribute name="transport" type="xsd:string" />
+    <xsd:attribute name="delivery_strategy" type="delivery_strategy" />
+  </xsd:complexType>
+
+  <xsd:complexType name="spool">
+    <xsd:attribute name="path" type="xsd:string" />
+  </xsd:complexType>
+
+  <xsd:simpleType name="encryption">
+    <xsd:restriction base="xsd:string">
+      <xsd:enumeration value="tls" />
+      <xsd:enumeration value="ssl" />
+    </xsd:restriction>
+  </xsd:simpleType>
+
+  <xsd:simpleType name="auth_mode">
+    <xsd:restriction base="xsd:string">
+      <xsd:enumeration value="plain" />
+      <xsd:enumeration value="login" />
+      <xsd:enumeration value="cram-md5" />
+    </xsd:restriction>
+  </xsd:simpleType>
+
+  <xsd:simpleType name="delivery_strategy">
+    <xsd:restriction base="xsd:string">
+      <xsd:enumeration value="realtime" />
+      <xsd:enumeration value="spool" />
+      <xsd:enumeration value="single_address" />
+      <xsd:enumeration value="none" />
+    </xsd:restriction>
+  </xsd:simpleType>
+</xsd:schema>

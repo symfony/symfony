@@ -1,0 +1,47 @@
+<?xml version="1.0" ?>
+
+<container xmlns="http://www.symfony-project.org/schema/dic/services"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xsi:schemaLocation="http://www.symfony-project.org/schema/dic/services http://www.symfony-project.org/schema/dic/services/services-1.0.xsd">
+
+  <parameters>
+    <parameter key="request_parser.class">Symfony\Framework\WebBundle\Listener\RequestParser</parameter>
+    <parameter key="controller_loader.class">Symfony\Framework\WebBundle\Listener\ControllerLoader</parameter>
+    <parameter key="router.class">Symfony\Components\Routing\Router</parameter>
+    <parameter key="response_filter.class">Symfony\Framework\WebBundle\Listener\ResponseFilter</parameter>
+  </parameters>
+
+  <services>
+    <service id="controller_loader" class="%controller_loader.class%">
+      <annotation name="kernel.listener" event="core.load_controller" method="resolve" />
+      <argument type="service" id="service_container" />
+      <argument type="service" id="logger" on-invalid="ignore" />
+    </service>
+
+    <service id="request_parser" class="%request_parser.class%">
+      <annotation name="kernel.listener" event="core.request" method="resolve" />
+      <argument type="service" id="service_container" />
+      <argument type="service" id="router" />
+      <argument type="service" id="logger" on-invalid="ignore" />
+    </service>
+
+    <service id="router" class="%router.class%">
+      <argument type="collection">
+        <argument type="service" id="kernel" />
+        <argument>registerRoutes</argument>
+      </argument>
+      <argument type="collection">
+        <argument key="cache_dir">%kernel.cache_dir%</argument>
+        <argument key="debug">%kernel.debug%</argument>
+        <argument key="matcher_cache_class">%kernel.name%UrlMatcher</argument>
+        <argument key="generator_cache_class">%kernel.name%UrlGenerator</argument>
+      </argument>
+    </service>
+
+    <service id="response_filter" class="%response_filter.class%">
+      <annotation name="kernel.listener" event="core.response" method="filter" />
+      <argument type="service" id="event_dispatcher" />
+      <argument type="service" id="request" />
+    </service>
+  </services>
+</container>

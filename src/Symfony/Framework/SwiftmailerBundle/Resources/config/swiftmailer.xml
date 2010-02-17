@@ -1,0 +1,104 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+
+<container xmlns="http://www.symfony-project.org/schema/dic/services"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xsi:schemaLocation="http://www.symfony-project.org/schema/dic/services http://www.symfony-project.org/schema/dic/services/services-1.0.xsd">
+
+  <parameters>
+    <parameter key="swiftmailer.class">Swift_Mailer</parameter>
+
+    <parameter key="swiftmailer.transport.smtp.class">Swift_Transport_EsmtpTransport</parameter>
+    <parameter key="swiftmailer.transport.sendmail.class">Swift_Transport_SendmailTransport</parameter>
+    <parameter key="swiftmailer.transport.mail.class">Swift_Transport_MailTransport</parameter>
+
+    <parameter key="swiftmailer.transport.smtp.host">localhost</parameter>
+    <parameter key="swiftmailer.transport.smtp.port">25</parameter>
+    <parameter key="swiftmailer.transport.smtp.encryption">null</parameter>
+    <parameter key="swiftmailer.transport.smtp.username">null</parameter>
+    <parameter key="swiftmailer.transport.smtp.password">null</parameter>
+    <parameter key="swiftmailer.transport.smtp.auth_mode">null</parameter>
+
+    <parameter key="swiftmailer.transport.failover.class">Swift_Transport_FailoverTransport</parameter>
+    <parameter key="swiftmailer.spool.file.class">Swift_FileSpool</parameter>
+
+    <parameter key="swiftmailer.init_file">swift_init.php</parameter>
+
+    <parameter key="swiftmailer.plugin.redirecting.class">Swift_Plugins_RedirectingPlugin</parameter>
+    <parameter key="swiftmailer.plugin.blackhole.class">Swift_Plugins_BlackholePlugin</parameter>
+  </parameters>
+
+  <services>
+    <service id="swiftmailer.mailer" class="%swiftmailer.class%">
+      <argument type="service" id="swiftmailer.transport" />
+      <file>%swiftmailer.init_file%</file>
+    </service>
+
+    <service id="swiftmailer.transport.smtp" class="%swiftmailer.transport.smtp.class%">
+      <argument type="service" id="swiftmailer.transport.buffer" />
+      <argument type="collection">
+        <argument type="service" id="swiftmailer.transport.authhandler" />
+      </argument>
+      <argument type="service" id="swiftmailer.transport.eventdispatcher" />
+
+      <call method="setHost"><argument>%swiftmailer.transport.smtp.host%</argument></call>
+      <call method="setPort"><argument>%swiftmailer.transport.smtp.port%</argument></call>
+      <call method="setEncryption"><argument>%swiftmailer.transport.smtp.encryption%</argument></call>
+      <call method="setUsername"><argument>%swiftmailer.transport.smtp.username%</argument></call>
+      <call method="setPassword"><argument>%swiftmailer.transport.smtp.password%</argument></call>
+      <call method="setAuthMode"><argument>%swiftmailer.transport.smtp.auth_mode%</argument></call>
+    </service>
+
+    <service id="swiftmailer.transport.sendmail" class="%swiftmailer.transport.sendmail.class%">
+      <argument type="service" id="swiftmailer.transport.buffer" />
+      <argument type="service" id="swiftmailer.transport.eventdispatcher" />
+    </service>
+
+    <service id="swiftmailer.transport.mail" class="%swiftmailer.transport.mail.class%">
+      <argument type="service" id="swiftmailer.transport.mailinvoker" />
+      <argument type="service" id="swiftmailer.transport.eventdispatcher" />
+    </service>
+
+    <service id="swiftmailer.transport.failover" class="%swiftmailer.transport.failover.class%" />
+
+    <service id="swiftmailer.transport.mailinvoker" class="Swift_Transport_SimpleMailInvoker" />
+
+    <service id="swiftmailer.transport.buffer" class="Swift_Transport_StreamBuffer">
+      <argument type="service" id="swiftmailer.transport.replacementfactory" />
+    </service>
+
+    <service id="swiftmailer.transport.authhandler" class="Swift_Transport_Esmtp_AuthHandler">
+      <argument type="collection">
+        <argument type="service"><service class="Swift_Transport_Esmtp_Auth_CramMd5Authenticator" /></argument>
+        <argument type="service"><service class="Swift_Transport_Esmtp_Auth_LoginAuthenticator" /></argument>
+        <argument type="service"><service class="Swift_Transport_Esmtp_Auth_PlainAuthenticator" /></argument>
+      </argument>
+    </service>
+
+    <service id="swiftmailer.transport.eventdispatcher" class="Swift_Events_SimpleEventDispatcher" />
+
+    <service id="swiftmailer.transport.replacementfactory" class="Swift_StreamFilters_StringReplacementFilterFactory" />
+
+    <service id="swiftmailer.transport.spool" class="Swift_Transport_SpoolTransport">
+      <argument type="service" id="swiftmailer.transport.eventdispatcher" />
+      <argument type="service" id="swiftmailer.spool" />
+    </service>
+
+    <service id="swiftmailer.transport.null" class="Swift_Transport_NullTransport">
+      <argument type="service" id="swiftmailer.transport.eventdispatcher" />
+    </service>
+
+    <service id="swiftmailer.spool.file" class="%swiftmailer.spool.file.class%">
+      <argument>%swiftmailer.spool.file.path%</argument>
+    </service>
+
+    <service id="swiftmailer.plugin.redirecting" class="%swiftmailer.plugin.redirecting.class%">
+      <argument>%swiftmailer.single_address%</argument>
+    </service>
+
+    <service id="swiftmailer.plugin.blackhole" class="%swiftmailer.plugin.blackhole.class%" />
+
+    <service id="swiftmailer.transport" alias="swiftmailer.transport.smtp" />
+
+    <service id="swiftmailer.spool" alias="swiftmailer.spool.file" />
+  </services>
+</container>

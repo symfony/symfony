@@ -1,0 +1,11 @@
+imports:
+  - { resource: config.xml }
+
+zend.logger:
+  priority: debug
+  path:     %kernel.logs_dir%/%kernel.environment%.log
+
+web.debug:
+  exception: %kernel.debug%
+  toolbar:   %kernel.debug%
+  ide:       textmate

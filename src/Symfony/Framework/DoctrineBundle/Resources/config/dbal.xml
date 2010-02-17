@@ -1,0 +1,58 @@
+<?xml version="1.0" ?>
+
+<container xmlns="http://www.symfony-project.org/schema/dic/services"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xsi:schemaLocation="http://www.symfony-project.org/schema/dic/services http://www.symfony-project.org/schema/dic/services/services-1.0.xsd">
+
+  <parameters>
+    <parameter key="doctrine.dbal.dbname">null</parameter>
+    <parameter key="doctrine.dbal.user">root</parameter>
+    <parameter key="doctrine.dbal.password"></parameter>
+    <parameter key="doctrine.dbal.host">localhost</parameter>
+    <parameter key="doctrine.dbal.port">null</parameter>
+    <parameter key="doctrine.dbal.path">null</parameter>
+    <parameter key="doctrine.dbal.driver.class">Doctrine\DBAL\Driver\PDOMySql\Driver</parameter>
+    <parameter key="doctrine.dbal.driver.options" type="collection" />
+    <parameter key="doctrine.dbal.wrapper.class">Doctrine\DBAL\Connection</parameter>
+    <parameter key="doctrine.dbal.configuration.class">Doctrine\DBAL\Configuration</parameter>
+    <parameter key="doctrine.dbal.event_manager.class">Doctrine\Common\EventManager</parameter>
+    <parameter key="doctrine.debug.collector.class">Symfony\Framework\DoctrineBundle\Debug\DoctrineDataCollector</parameter>
+  </parameters>
+
+  <services>
+    <service id="doctrine.dbal.connection" class="Doctrine\DBAL\DriverManager" constructor="getConnection">
+      <argument type="collection">
+        <argument key="dbname">%doctrine.dbal.dbname%</argument>
+        <argument key="user">%doctrine.dbal.user%</argument>
+        <argument key="password">%doctrine.dbal.password%</argument>
+        <argument key="host">%doctrine.dbal.host%</argument>
+        <argument key="port">%doctrine.dbal.port%</argument>
+        <argument key="path">%doctrine.dbal.path%</argument>
+        <argument key="driverClass">%doctrine.dbal.driver.class%</argument>
+        <argument key="driverOptions">%doctrine.dbal.driver.options%</argument>
+        <!--
+        <argument key="wrapperClass">%doctrine.dbal.wrapper.class%</argument>
+        //-->
+      </argument>
+      <argument type="service" id="doctrine.dbal.configuration" />
+      <argument type="service" id="doctrine.dbal.event_manager" />
+    </service>
+
+    <service id="doctrine.dbal.configuration" class="%doctrine.dbal.configuration.class%">
+      <call method="setSqlLogger"><argument type="service" id="doctrine.dbal.logger" on-invalid="ignore" /></call>
+    </service>
+
+    <service id="doctrine.dbal.logger.debug" class="Doctrine\DBAL\Logging\DebugStack" />
+
+    <service id="doctrine.dbal.event_manager" class="%doctrine.dbal.event_manager.class%" />
+
+    <service id="doctrine.dbal.logger" class="Symfony\Framework\DoctrineBundle\Logger\DbalLogger">
+      <argument type="service" id="logger" on-invalid="null" />
+    </service>
+
+    <service id="doctrine.debug.collector" class="%doctrine.debug.collector.class%">
+      <annotation name="debug.collector" />
+      <argument type="service" id="service_container" />
+    </service>
+  </services>
+</container>

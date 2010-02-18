@@ -3,10 +3,8 @@
 namespace Symfony\Framework\WebBundle;
 
 use Symfony\Foundation\Bundle\Bundle as BaseBundle;
-use Symfony\Components\DependencyInjection\Container;
 use Symfony\Components\DependencyInjection\ContainerInterface;
 use Symfony\Components\DependencyInjection\Loader\Loader;
-use Symfony\Components\DependencyInjection\Reference;
 use Symfony\Framework\WebBundle\DependencyInjection\WebExtension;
 
 /*

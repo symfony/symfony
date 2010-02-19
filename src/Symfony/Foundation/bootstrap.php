@@ -39,9 +39,7 @@ namespace Symfony\Foundation\Bundle;
 use Symfony\Foundation\Bundle\Bundle;
 use Symfony\Foundation\ClassCollectionLoader;
 use Symfony\Components\DependencyInjection\ContainerInterface;
-use Symfony\Components\DependencyInjection\Container;
 use Symfony\Components\DependencyInjection\Loader\Loader;
-use Symfony\Components\Debug\ErrorHandler;
 
 
 
@@ -536,7 +534,7 @@ abstract class Kernel
     {
       if (false === @mkdir($parameters['kernel.cache_dir'], 0777, true))
       {
-        die(sprintf('Unable to write in the cache directory (%s)', dirname($parameters['kernel.cache_dir'])));
+        die(sprintf('Unable to create the cache directory (%s)', $parameters['kernel.cache_dir']));
       }
     }
     elseif (!is_writable($parameters['kernel.cache_dir']))
@@ -548,12 +546,12 @@ abstract class Kernel
     {
       if (false === @mkdir($parameters['kernel.logs_dir'], 0777, true))
       {
-        die(sprintf('Failed to write in the logs directory (%s)', dirname($parameters['kernel.logs_dir'])));
+        die(sprintf('Unable to create the logs directory (%s)', $parameters['kernel.logs_dir']));
       }
     }
     elseif (!is_writable($parameters['kernel.logs_dir']))
     {
-      die(sprintf('Failed to write in the logs directory (%s)', $parameters['kernel.logs_dir']));
+      die(sprintf('Unable to write in the logs directory (%s)', $parameters['kernel.logs_dir']));
     }
 
         $dumper = new PhpDumper($container);

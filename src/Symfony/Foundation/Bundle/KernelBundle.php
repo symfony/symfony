@@ -5,9 +5,7 @@ namespace Symfony\Foundation\Bundle;
 use Symfony\Foundation\Bundle\Bundle;
 use Symfony\Foundation\ClassCollectionLoader;
 use Symfony\Components\DependencyInjection\ContainerInterface;
-use Symfony\Components\DependencyInjection\Container;
 use Symfony\Components\DependencyInjection\Loader\Loader;
-use Symfony\Components\Debug\ErrorHandler;
 
 /*
  * This file is part of the symfony framework.

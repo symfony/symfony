@@ -9,14 +9,14 @@ flexibility in mind. It allows developers to built better and easy to maintain
 websites with PHP.
 
 Symfony can be used to develop all kind of websites, from your personal blog
-to hight traffic ones like Dailymotion or Yahoo! Answers.
+to high traffic ones like Dailymotion or Yahoo! Answers.
 
 High Performance
 ----------------
 
-Built with performance in mind, Symfony 2 is one of the fastest PHP framework.
-It is up to 3 times faster than symfony 1.4 or Zend Framework 1.10 and
-consumes half the memory.
+Built with performance in mind, Symfony 2 is one of the fastest PHP
+frameworks. It is up to 3 times faster than symfony 1.4 or Zend Framework 1.10
+and consumes half the memory.
 
 Requirements
 ------------
@@ -26,14 +26,14 @@ Symfony is only supported on PHP 5.3.0 and up.
 Documentation
 -------------
 
-Symfony 2.0 is still in the early stages of development, but the "[Quick Tour][1]"
-tutorial can get you started fast.
+Symfony 2.0 is still in the early stages of development, but the
+"[Quick Tour][1]" tutorial can get you started fast.
 
 The "Quick Tour" tutorial barely scratches the surface of Symfony 2.0 but it
-gives you a first feeling of the framework. If like us you think that Symfony
-2.0 can be of great help to speed up your development and take the quality of
-your work to the next level, visit the official [Symfony 2 website][2] to
-learn about it.
+gives you a first feeling of the framework. If, like us, you think that
+Symfony 2.0 can help speed up your development and take the quality of your
+work to the next level, visit the official [Symfony 2 website][2] to learn
+more.
 
 [1]: http://symfony-reloaded.org/learn
 [2]: http://symfony-reloaded.org/

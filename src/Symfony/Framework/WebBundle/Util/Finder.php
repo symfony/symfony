@@ -29,18 +29,18 @@ namespace Symfony\Framework\WebBundle\Util;
  */
 class Finder
 {
-  protected $type                   = 'file';
-  protected $names                  = array();
-  protected $prunes                 = array();
-  protected $discards               = array();
-  protected $execs                  = array();
-  protected $mindepth               = 0;
-  protected $sizes                  = array();
-  protected $maxdepth               = 1000000;
-  protected $relative               = false;
-  protected $follow_link            = false;
-  protected $sort                   = false;
-  protected $ignore_version_control = true;
+  protected $type                 = 'file';
+  protected $names                = array();
+  protected $prunes               = array();
+  protected $discards             = array();
+  protected $execs                = array();
+  protected $mindepth             = 0;
+  protected $sizes                = array();
+  protected $maxdepth             = 1000000;
+  protected $relative             = false;
+  protected $followLinks          = false;
+  protected $sort                 = false;
+  protected $ignoreVersionControl = true;
 
   /**
    * Sets maximum directory depth.
@@ -50,7 +50,7 @@ class Finder
    * @param  int $level
    * @return object current Finder object
    */
-  public function maxdepth($level)
+  public function maxDepth($level)
   {
     $this->maxdepth = $level;
 
@@ -65,14 +65,14 @@ class Finder
    * @param  int $level
    * @return object current Finder object
    */
-  public function mindepth($level)
+  public function minDepth($level)
   {
     $this->mindepth = $level;
 
     return $this;
   }
 
-  public function get_type()
+  public function getType()
   {
     return $this->type;
   }
@@ -119,7 +119,7 @@ class Finder
   /*
    * glob, patterns (must be //) or strings
    */
-  protected function to_regex($str)
+  protected function toRegex($str)
   {
     if (preg_match('/^(!)?([^a-zA-Z0-9\\\\]).+?\\2[ims]?$/', $str))
     {
@@ -129,7 +129,7 @@ class Finder
     return Glob::toRegex($str);
   }
 
-  protected function args_to_array($arg_list, $not = false)
+  protected function argsToArray($arg_list, $not = false)
   {
     $list = array();
     $nbArgList = count($arg_list);
@@ -139,12 +139,12 @@ class Finder
       {
         foreach ($arg_list[$i] as $arg)
         {
-          $list[] = array($not, $this->to_regex($arg));
+          $list[] = array($not, $this->toRegex($arg));
         }
       }
       else
       {
-        $list[] = array($not, $this->to_regex($arg_list[$i]));
+        $list[] = array($not, $this->toRegex($arg_list[$i]));
       }
     }
 
@@ -166,7 +166,7 @@ class Finder
   public function name()
   {
     $args = func_get_args();
-    $this->names = array_merge($this->names, $this->args_to_array($args));
+    $this->names = array_merge($this->names, $this->argsToArray($args));
 
     return $this;
   }
@@ -178,10 +178,10 @@ class Finder
    * @param  list   a list of patterns, globs or strings
    * @return Finder Current object
    */
-  public function not_name()
+  public function notName()
   {
     $args = func_get_args();
-    $this->names = array_merge($this->names, $this->args_to_array($args, true));
+    $this->names = array_merge($this->names, $this->argsToArray($args, true));
 
     return $this;
   }
@@ -217,7 +217,7 @@ class Finder
   public function prune()
   {
     $args = func_get_args();
-    $this->prunes = array_merge($this->prunes, $this->args_to_array($args));
+    $this->prunes = array_merge($this->prunes, $this->argsToArray($args));
 
     return $this;
   }
@@ -231,7 +231,7 @@ class Finder
   public function discard()
   {
     $args = func_get_args();
-    $this->discards = array_merge($this->discards, $this->args_to_array($args));
+    $this->discards = array_merge($this->discards, $this->argsToArray($args));
 
     return $this;
   }
@@ -245,9 +245,9 @@ class Finder
    *
    * @return Finder Current object
    */
-  public function ignore_version_control($ignore = true)
+  public function ignoreVersionControl($ignore = true)
   {
-    $this->ignore_version_control = $ignore;
+    $this->ignoreVersionControl = $ignore;
 
     return $this;
   }
@@ -257,7 +257,7 @@ class Finder
    *
    * @return Finder Current object
    */
-  public function sort_by_name()
+  public function sortByName()
   {
     $this->sort = 'name';
 
@@ -269,7 +269,7 @@ class Finder
    *
    * @return Finder Current object
    */
-  public function sort_by_type()
+  public function sortByType()
   {
     $this->sort = 'type';
 
@@ -325,9 +325,9 @@ class Finder
    *
    * @return Finder Current object
    */
-  public function follow_link()
+  public function followLinks()
   {
-    $this->follow_link = true;
+    $this->followLinks = true;
 
     return $this;
   }
@@ -344,7 +344,7 @@ class Finder
 
     $finder = clone $this;
 
-    if ($this->ignore_version_control)
+    if ($this->ignoreVersionControl)
     {
       $ignores = array('.svn', '_svn', 'CVS', '_darcs', '.arch-params', '.monotone', '.bzr', '.git', '.hg');
 
@@ -377,7 +377,7 @@ class Finder
         $dir = $here_dir.'/'.$dir;
       }
 
-      $new_files = str_replace('\\', '/', $finder->search_in($dir));
+      $new_files = str_replace('\\', '/', $finder->searchIn($dir));
 
       if ($this->relative)
       {
@@ -395,7 +395,7 @@ class Finder
     return array_unique($files);
   }
 
-  protected function search_in($dir, $depth = 0)
+  protected function searchIn($dir, $depth = 0)
   {
     if ($depth > $this->maxdepth)
     {
@@ -404,7 +404,7 @@ class Finder
 
     $dir = realpath($dir);
 
-    if ((!$this->follow_link) && is_link($dir))
+    if ((!$this->followLinks) && is_link($dir))
     {
       return array();
     }
@@ -420,7 +420,7 @@ class Finder
         if ($entryname == '.' || $entryname == '..') continue;
 
         $current_entry = $dir.DIRECTORY_SEPARATOR.$entryname;
-        if ((!$this->follow_link) && is_link($current_entry))
+        if ((!$this->followLinks) && is_link($current_entry))
         {
           continue;
         }
@@ -433,20 +433,20 @@ class Finder
           }
           else
           {
-            if (($this->type === 'directory' || $this->type === 'any') && ($depth >= $this->mindepth) && !$this->is_discarded($dir, $entryname) && $this->match_names($dir, $entryname) && $this->exec_ok($dir, $entryname))
+            if (($this->type === 'directory' || $this->type === 'any') && ($depth >= $this->mindepth) && !$this->isDiscarded($dir, $entryname) && $this->matchNames($dir, $entryname) && $this->execOk($dir, $entryname))
             {
               $files[] = $current_entry;
             }
 
-            if (!$this->is_pruned($dir, $entryname))
+            if (!$this->isPruned($dir, $entryname))
             {
-              $files = array_merge($files, $this->search_in($current_entry, $depth + 1));
+              $files = array_merge($files, $this->searchIn($current_entry, $depth + 1));
             }
           }
         }
         else
         {
-          if (($this->type !== 'directory' || $this->type === 'any') && ($depth >= $this->mindepth) && !$this->is_discarded($dir, $entryname) && $this->match_names($dir, $entryname) && $this->size_ok($dir, $entryname) && $this->exec_ok($dir, $entryname))
+          if (($this->type !== 'directory' || $this->type === 'any') && ($depth >= $this->mindepth) && !$this->isDiscarded($dir, $entryname) && $this->matchNames($dir, $entryname) && $this->sizeOk($dir, $entryname) && $this->execOk($dir, $entryname))
           {
             if ($this->sort === 'type')
             {
@@ -465,14 +465,14 @@ class Finder
         ksort($temp_folders);
         foreach($temp_folders as $entryname => $current_entry)
         {
-          if (($this->type === 'directory' || $this->type === 'any') && ($depth >= $this->mindepth) && !$this->is_discarded($dir, $entryname) && $this->match_names($dir, $entryname) && $this->exec_ok($dir, $entryname))
+          if (($this->type === 'directory' || $this->type === 'any') && ($depth >= $this->mindepth) && !$this->isDiscarded($dir, $entryname) && $this->matchNames($dir, $entryname) && $this->execOk($dir, $entryname))
           {
             $files[] = $current_entry;
           }
 
-          if (!$this->is_pruned($dir, $entryname))
+          if (!$this->isPruned($dir, $entryname))
           {
-            $files = array_merge($files, $this->search_in($current_entry, $depth + 1));
+            $files = array_merge($files, $this->searchIn($current_entry, $depth + 1));
           }
         }
 
@@ -486,7 +486,7 @@ class Finder
     return $files;
   }
 
-  protected function match_names($dir, $entry)
+  protected function matchNames($dir, $entry)
   {
     if (!count($this->names)) return true;
 
@@ -524,7 +524,7 @@ class Finder
     return true;
   }
 
-  protected function size_ok($dir, $entry)
+  protected function sizeOk($dir, $entry)
   {
     if (0 === count($this->sizes)) return true;
 
@@ -539,7 +539,7 @@ class Finder
     return true;
   }
 
-  protected function is_pruned($dir, $entry)
+  protected function isPruned($dir, $entry)
   {
     if (0 === count($this->prunes)) return false;
 
@@ -552,7 +552,7 @@ class Finder
     return false;
   }
 
-  protected function is_discarded($dir, $entry)
+  protected function isDiscarded($dir, $entry)
   {
     if (0 === count($this->discards)) return false;
 
@@ -565,7 +565,7 @@ class Finder
     return false;
   }
 
-  protected function exec_ok($dir, $entry)
+  protected function execOk($dir, $entry)
   {
     if (0 === count($this->execs)) return true;
 

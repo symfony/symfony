@@ -126,7 +126,7 @@ class Finder
       return $str;
     }
 
-    return GlobToRegex::glob_to_regex($str);
+    return Glob::toRegex($str);
   }
 
   protected function args_to_array($arg_list, $not = false)

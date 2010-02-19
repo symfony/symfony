@@ -23,7 +23,7 @@ namespace Symfony\Framework\WebBundle\Util;
  *   if (/$regex/) echo "matched: $car\n";
  * }
  *
- * GlobToRegex implements glob(3) style matching that can be used to match
+ * Glob implements glob(3) style matching that can be used to match
  * against text, rather than fetching names from a filesystem.
  *
  * based on perl Text::Glob module.
@@ -34,7 +34,7 @@ namespace Symfony\Framework\WebBundle\Util;
  * @copyright  2004-2005 Fabien Potencier <fabien.potencier@gmail.com>
  * @copyright  2002 Richard Clamp <richardc@unixbeard.net>
  */
-class GlobToRegex
+class Glob
 {
   protected static $strict_leading_dot = true;
   protected static $strict_wildcard_slash = true;
@@ -55,7 +55,7 @@ class GlobToRegex
    * @param  string $glob  pattern
    * @return string regex
    */
-  public static function glob_to_regex($glob)
+  public static function toRegex($glob)
   {
     $first_byte = true;
     $escaping = false;

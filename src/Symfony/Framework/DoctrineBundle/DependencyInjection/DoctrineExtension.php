@@ -41,7 +41,7 @@ class DoctrineExtension extends LoaderExtension
    *
    * Usage example:
    *
-   *      <doctrine:dbal dbname="sfweb" username="root" />
+   *      <doctrine:dbal dbname="sfweb" user="root" />
    *
    * @param array $config A configuration array
    *
@@ -54,7 +54,7 @@ class DoctrineExtension extends LoaderExtension
     $loader = new XmlFileLoader(__DIR__.'/../Resources/config');
     $configuration->merge($loader->load($this->resources['dbal']));
 
-    foreach (array('dbname', 'host', 'username', 'password', 'path', 'port') as $key)
+    foreach (array('dbname', 'host', 'user', 'password', 'path', 'port') as $key)
     {
       if (isset($config[$key]))
       {

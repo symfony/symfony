@@ -19,7 +19,6 @@ namespace Symfony\Components\Yaml;
  */
 class Parser
 {
-  protected $value          = '';
   protected $offset         = 0;
   protected $lines          = array();
   protected $currentLineNb  = -1;
@@ -47,10 +46,9 @@ class Parser
    */
   public function parse($value)
   {
-    $this->value = $this->cleanup($value);
     $this->currentLineNb = -1;
     $this->currentLine = '';
-    $this->lines = explode("\n", $this->value);
+    $this->lines = explode("\n", $this->cleanup($value));
 
     $data = array();
     while ($this->moveToNextLine())
@@ -191,8 +189,7 @@ class Parser
       }
       else
       {
-        // one liner?
-        if (1 == count(explode("\n", rtrim($this->value, "\n"))))
+        if (1 == count($this->lines))
         {
           $value = Inline::load($this->lines[0]);
           if (is_array($value))
@@ -543,10 +540,8 @@ class Parser
   {
     $value = str_replace(array("\r\n", "\r"), "\n", $value);
 
-    if (!preg_match("#\n$#", $value))
-    {
-      $value .= "\n";
-    }
+    // remove trailing newlines
+    $value = rtrim($value, "\n");
 
     // strip YAML header
     preg_replace('#^\%YAML[: ][\d\.]+.*\n#s', '', $value);

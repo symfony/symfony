@@ -51,11 +51,11 @@ class JavascriptsHelper extends Helper
   }
 
   /**
-   * Returns a string representation of this helper as HTML.
+   * Returns HTML representation of the links to JavaScripts.
    *
    * @return string The HTML representation of the JavaScripts
    */
-  public function __toString()
+  public function render()
   {
     $html = '';
     foreach ($this->javascripts as $path => $attributes)
@@ -70,6 +70,25 @@ class JavascriptsHelper extends Helper
     }
 
     return $html;
+  }
+
+  /**
+   * Outputs HTML representation of the links to JavaScripts.
+   * 
+   */
+  public function output()
+  {
+    echo $this->render();
+  }
+
+  /**
+   * Returns a string representation of this helper as HTML.
+   *
+   * @return string The HTML representation of the JavaScripts
+   */
+  public function __toString()
+  {
+    return $this->render();
   }
 
   /**

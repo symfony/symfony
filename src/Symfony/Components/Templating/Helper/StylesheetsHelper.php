@@ -51,11 +51,11 @@ class StylesheetsHelper extends Helper
   }
 
   /**
-   * Returns a string representation of this helper as HTML.
+   * Returns HTML representation of the links to stylesheets.
    *
    * @return string The HTML representation of the stylesheets
    */
-  public function __toString()
+  public function render()
   {
     $html = '';
     foreach ($this->stylesheets as $path => $attributes)
@@ -70,6 +70,25 @@ class StylesheetsHelper extends Helper
     }
 
     return $html;
+  }
+
+  /**
+   * Outputs HTML representation of the links to stylesheets.
+   * 
+   */
+  public function output()
+  {
+    echo $this->render();
+  }
+
+  /**
+   * Returns a string representation of this helper as HTML.
+   *
+   * @return string The HTML representation of the stylesheets
+   */
+  public function __toString()
+  {
+    return $this->render();
   }
 
   /**

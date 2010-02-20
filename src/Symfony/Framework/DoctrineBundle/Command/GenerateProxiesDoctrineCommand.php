@@ -8,8 +8,6 @@ use Symfony\Components\Console\Input\InputInterface;
 use Symfony\Components\Console\Output\OutputInterface;
 use Symfony\Components\Console\Output\Output;
 use Symfony\Framework\WebBundle\Util\Filesystem;
-use Doctrine\Common\Cli\Configuration;
-use Doctrine\Common\Cli\CliController as DoctrineCliController;
 
 /*
  * This file is part of the symfony framework.
@@ -21,7 +19,7 @@ use Doctrine\Common\Cli\CliController as DoctrineCliController;
  */
 
 /**
- * 
+ * Generate the Doctrine ORM entity proxies to your cache directory.
  *
  * @package    symfony
  * @subpackage console
@@ -36,6 +34,7 @@ class GenerateProxiesDoctrineCommand extends DoctrineCommand
   {
     $this
       ->setName('doctrine:generate-proxies')
+      ->setDescription('Generates proxy classes for entity classes.')
     ;
   }
 
@@ -44,9 +43,6 @@ class GenerateProxiesDoctrineCommand extends DoctrineCommand
    */
   protected function execute(InputInterface $input, OutputInterface $output)
   {
-    $configuration = new Configuration();
-    $configuration->setAttribute('em', $this->container->getDoctrine_Orm_ManagerService());
-
     $dirs = array();
     $bundleDirs = $this->container->getKernelService()->getBundleDirs();
     foreach ($this->container->getKernelService()->getBundles() as $bundle)
@@ -55,7 +51,7 @@ class GenerateProxiesDoctrineCommand extends DoctrineCommand
       $namespace = dirname($tmp);
       $class = basename($tmp);
 
-      if (isset($bundleDirs[$namespace]) && is_dir($dir = $bundleDirs[$namespace].'/'.$class.'/Model/Doctrine'))
+      if (isset($bundleDirs[$namespace]) && is_dir($dir = $bundleDirs[$namespace].'/'.$class.'/Entities'))
       {
         $dirs[] = $dir;
       }
@@ -66,10 +62,9 @@ class GenerateProxiesDoctrineCommand extends DoctrineCommand
       mkdir($dir, 0777, true);
     }
 
-    $cli = new DoctrineCliController($configuration);
     foreach ($dirs as $dir)
     {
-      $cli->run(array('doctrine', 'orm:generate-proxies', '--class-dir='.$dir));
+      $this->runDoctrineCliTask('orm:generate-proxies', array('class-dir' => $dir));
     }
   }
 }

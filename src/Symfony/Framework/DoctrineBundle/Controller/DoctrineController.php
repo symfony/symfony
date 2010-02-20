@@ -23,18 +23,18 @@ use Symfony\Components\RequestHandler\Exception\NotFoundHttpException;
  */
 class DoctrineController extends Controller
 {
-  protected function getManager()
+  protected function getEntityManager()
   {
-    return $this->container->getDoctrine_ORM_ManagerService();
+    return $this->container->getDoctrine_ORM_EntityManagerService();
   }
 
   public function createQueryBuilder()
   {
-    return $this->getManager()->createQueryBuilder();
+    return $this->getEntityManager()->createQueryBuilder();
   }
 
   public function createQuery($dql = '')
   {
-    return $this->getManager()->createQuery($dql);
+    return $this->getEntityManager()->createQuery($dql);
   }
 }

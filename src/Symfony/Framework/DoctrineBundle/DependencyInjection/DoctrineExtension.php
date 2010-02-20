@@ -97,6 +97,14 @@ class DoctrineExtension extends LoaderExtension
     $loader = new XmlFileLoader(__DIR__.'/../Resources/config');
     $configuration->merge($loader->load($this->resources['orm']));
 
+    foreach (array('entity_manager.class', 'metadata_driver_impl.class', 'cache.class') as $key)
+    {
+      if (isset($config[$key]))
+      {
+        $configuration->setParameter('doctrine.orm.'.$key, $config[$key]);
+      }
+    }
+
     return $configuration;
   }
 

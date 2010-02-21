@@ -15,7 +15,7 @@ use Symfony\Components\RequestHandler\Request;
  */
 
 /**
- * 
+ *
  *
  * @package    symfony
  * @author     Fabien Potencier <fabien.potencier@symfony-project.com>
@@ -41,7 +41,7 @@ class RedirectController extends Controller
       return $response;
     }
 
-    $code = $permanent ? 302 : 301;
+    $code = $permanent ? 301 : 302;
 
     $parameters = $this->getRequest()->getPathParameters();
     unset($parameters['_route'], $parameters['route']);

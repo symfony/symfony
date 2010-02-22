@@ -27,7 +27,7 @@
 
   <doctrine:dbal
     dbname="xxxxxxxx"
-    username="root"
+    user="root"
     password=""
   />
 

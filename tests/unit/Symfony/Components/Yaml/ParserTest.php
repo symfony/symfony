@@ -16,7 +16,7 @@ use Symfony\Components\Yaml\ParserException;
 
 Yaml::setSpecVersion('1.1');
 
-$t = new LimeTest(148);
+$t = new LimeTest(149);
 
 $parser = new Parser();
 

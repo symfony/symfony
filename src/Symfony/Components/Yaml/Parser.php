@@ -189,7 +189,8 @@ class Parser
       }
       else
       {
-        if (1 == count($this->lines))
+        // 1-liner followed by newline
+        if (2 == count($this->lines) && empty($this->lines[1]))
         {
           $value = Inline::load($this->lines[0]);
           if (is_array($value))
@@ -540,8 +541,10 @@ class Parser
   {
     $value = str_replace(array("\r\n", "\r"), "\n", $value);
 
-    // remove trailing newlines
-    $value = rtrim($value, "\n");
+    if (!preg_match("#\n$#", $value))
+    {
+      $value .= "\n";
+    }
 
     // strip YAML header
     preg_replace('#^\%YAML[: ][\d\.]+.*\n#s', '', $value);

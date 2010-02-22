@@ -13,6 +13,12 @@ yaml: |
 php: |
     array('foo' => array())
 ---
+test: Empty value
+yaml: |
+    foo:
+php: |
+    array('foo' => null)
+---
 test: Inline string parsing
 brief: >
     Inline string parsing

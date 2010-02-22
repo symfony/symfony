@@ -448,6 +448,12 @@ abstract class Kernel
 
   public function getDefaultParameters()
   {
+    $bundles = array();
+    foreach ($this->bundles as $bundle)
+    {
+      $bundles[] = get_class($bundle);
+    }
+
     return array_merge(
       array(
         'kernel.root_dir'    => $this->rootDir,
@@ -457,6 +463,7 @@ abstract class Kernel
         'kernel.cache_dir'   => $this->rootDir.'/cache/'.$this->environment,
         'kernel.logs_dir'    => $this->rootDir.'/logs',
         'kernel.bundle_dirs' => $this->bundleDirs,
+        'kernel.bundles'     => $bundles,
         'kernel.charset'     => 'UTF-8',
       ),
       $this->getEnvParameters(),

@@ -89,7 +89,7 @@ class Parser
           }
           elseif (isset($values['leadspaces'])
             && ' ' == $values['leadspaces']
-            && preg_match('#^(?P<key>'.Inline::REGEX_QUOTED_STRING.'|[^ \'"].*?) *\:(\s+(?P<value>.+?))?\s*$#', $values['value'], $matches))
+            && preg_match('#^(?P<key>'.Inline::REGEX_QUOTED_STRING.'|[^ \'"\{].*?) *\:(\s+(?P<value>.+?))?\s*$#', $values['value'], $matches))
           {
             // this is a compact notation element, add to next block and parse
             $c = $this->getRealCurrentLineNb();

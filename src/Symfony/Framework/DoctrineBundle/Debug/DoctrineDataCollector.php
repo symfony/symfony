@@ -21,19 +21,17 @@ use Symfony\Framework\WebBundle\Debug\DataCollector\DataCollector;
  */
 class DoctrineDataCollector extends DataCollector
 {
-  protected $data;
-
-  public function collect()
+  protected function collect()
   {
-    $this->data = array();
+    $data = array();
     if ($this->container->hasService('doctrine.dbal.logger'))
     {
-      $this->data = array(
+      $data = array(
         'queries' => $this->container->getDoctrine_Dbal_LoggerService()->queries,
       );
     }
 
-    return $this->data;
+    return $data;
   }
 
   public function getSummary()

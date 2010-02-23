@@ -19,11 +19,9 @@ namespace Symfony\Framework\WebBundle\Debug\DataCollector;
  */
 class TimerDataCollector extends DataCollector
 {
-  protected $data;
-
-  public function collect()
+  protected function collect()
   {
-    return $this->data = array(
+    return array(
       'time' => microtime(true) - $this->container->getKernelService()->getStartTime(),
     );
   }

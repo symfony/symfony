@@ -6,6 +6,7 @@
 
   <parameters>
     <parameter key="debug.data_collector_manager.class">Symfony\Framework\WebBundle\Debug\DataCollector\DataCollectorManager</parameter>
+    <parameter key="debug.data_collector_manager.lifetime">86400</parameter>
     <parameter key="debug.data_collector.config.class">Symfony\Framework\WebBundle\Debug\DataCollector\ConfigDataCollector</parameter>
     <parameter key="debug.data_collector.app.class">Symfony\Framework\WebBundle\Debug\DataCollector\AppDataCollector</parameter>
     <parameter key="debug.data_collector.timer.class">Symfony\Framework\WebBundle\Debug\DataCollector\TimerDataCollector</parameter>
@@ -16,6 +17,7 @@
     <service id="debug.data_collector_manager" class="%debug.data_collector_manager.class%">
       <annotation name="kernel.listener" event="core.response" method="handle" />
       <argument type="service" id="service_container" />
+      <argument>%debug.data_collector_manager.lifetime%</argument>
     </service>
 
     <service id="debug.data_collector.config" class="%debug.data_collector.config.class%">

@@ -19,11 +19,9 @@ namespace Symfony\Framework\WebBundle\Debug\DataCollector;
  */
 class MemoryDataCollector extends DataCollector
 {
-  protected $data;
-
-  public function collect()
+  protected function collect()
   {
-    return $this->data = array(
+    return array(
       'memory' => memory_get_peak_usage(true),
     );
   }

@@ -23,11 +23,24 @@ abstract class DataCollector implements DataCollectorInterface
 {
   protected $manager;
   protected $container;
+  protected $data;
 
   public function __construct(ContainerInterface $container)
   {
     $this->container = $container;
   }
+
+  public function getData()
+  {
+    if (null === $this->data)
+    {
+      $this->data = $this->collect();
+    }
+
+    return $this->data;
+  }
+
+  abstract protected function collect();
 
   public function setCollectorManager(DataCollectorManager $manager)
   {

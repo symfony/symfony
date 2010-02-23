@@ -19,13 +19,11 @@ namespace Symfony\Framework\WebBundle\Debug\DataCollector;
  */
 class AppDataCollector extends DataCollector
 {
-  protected $data;
-
-  public function collect()
+  protected function collect()
   {
     $request = $this->container->getRequestService();
 
-    return $this->data = array(
+    return array(
       'route'        => $request->getPathParameter('_route') ? $request->getPathParameter('_route') : '<span style="color: #a33">NONE</span>',
       'format'       => $request->getRequestFormat(),
       'content_type' => $this->manager->getResponse()->getHeader('Content-Type') ? $this->manager->getResponse()->getHeader('Content-Type') : 'text/html',

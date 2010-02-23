@@ -5,6 +5,7 @@ namespace Symfony\Framework\WebBundle\Debug\DataCollector;
 use Symfony\Components\DependencyInjection\ContainerInterface;
 use Symfony\Components\EventDispatcher\Event;
 use Symfony\Components\RequestHandler\Response;
+use Symfony\Framework\WebBundle\Debug\RequestDebugData;
 
 /*
  * This file is part of the symfony framework.
@@ -24,21 +25,47 @@ use Symfony\Components\RequestHandler\Response;
 class DataCollectorManager
 {
   protected $container;
-  protected $token;
-  protected $data;
+  protected $requestDebugData;
   protected $collectors;
   protected $response;
+  protected $lifetime;
 
-  public function __construct(ContainerInterface $container)
+  public function __construct(ContainerInterface $container, $lifetime = 86400)
   {
     $this->container = $container;
-    $this->token = uniqid();
+    $this->lifetime = $lifetime;
+    $this->requestDebugData = new RequestDebugData(uniqid(), $this->container->getParameter('kernel.cache_dir').'/debug.db');
     $this->collectors = $this->initCollectors();
   }
 
   public function register()
   {
     $this->container->getEventDispatcherService()->connect('core.response', array($this, 'handle'));
+  }
+
+  public function handle(Event $event, Response $response)
+  {
+    if (!$event->getParameter('main_request'))
+    {
+      return $response;
+    }
+
+    $this->response = $response;
+
+    $data = array();
+    foreach ($this->collectors as $name => $collector)
+    {
+      $data[$name] = $collector->getData();
+    }
+    $this->requestDebugData->write($data);
+    $this->requestDebugData->purge($this->lifetime);
+
+    return $response;
+  }
+
+  public function getRequestDebugData()
+  {
+    return $this->requestDebugData;
   }
 
   public function getResponse()
@@ -73,37 +100,5 @@ class DataCollectorManager
     }
 
     return $this->collectors = array_merge($coreColectors, $userCollectors);
-  }
-
-  public function getData($name = null)
-  {
-    if (null === $name)
-    {
-      return $this->data;
-    }
-
-    return isset($this->data[$name]) ? $this->data[$name] : null;
-  }
-
-  public function handle(Event $event, Response $response)
-  {
-    if (!$event->getParameter('main_request'))
-    {
-      return $response;
-    }
-
-    $this->response = $response;
-
-    foreach ($this->collectors as $name => $collector)
-    {
-      $this->data[$name] = $collector->collect();
-    }
-
-    return $response;
-  }
-
-  public function getToken()
-  {
-    return $this->token;
   }
 }

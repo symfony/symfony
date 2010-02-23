@@ -21,7 +21,7 @@ interface DataCollectorInterface
 {
   public function setCollectorManager(DataCollectorManager $manager);
 
-  public function collect();
+  public function getData();
 
   public function getName();
 }

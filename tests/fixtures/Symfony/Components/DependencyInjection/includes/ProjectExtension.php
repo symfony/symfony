@@ -16,6 +16,11 @@ class ProjectExtension extends LoaderExtension
     return $configuration;
   }
 
+  public function getXsdValidationBasePath()
+  {
+    return false;
+  }
+
   public function getNamespace()
   {
     return 'http://www.example.com/schema/project';

@@ -71,7 +71,7 @@ class ExceptionHandler
 
     try
     {
-      $response = $event->getSubject()->handleRaw($request);
+      $response = $event->getSubject()->handleRaw($request, false);
     }
     catch (\Exception $e)
     {

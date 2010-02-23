@@ -149,7 +149,7 @@ yaml: |
       hr: 63,
       avg: 0.288
     }
-ruby: | 
+php: | 
   array(  
     'Mark McGwire' => 
       array( 'hr' => 65, 'avg' => 0.278 ), 
@@ -286,7 +286,6 @@ syck: |
  
 --- 
 test: Sequence key shortcut 
-todo: true
 spec: 2.12
 yaml: | 
   ---
@@ -297,6 +296,21 @@ yaml: |
     quantity: 4
   - item    : Big Shoes
     quantity: 1
+php: | 
+  array (
+    array (
+      'item' => 'Super Hoop',
+      'quantity' => 1,
+    ),
+    array (
+      'item' => 'Basketball',
+      'quantity' => 4,
+    ),
+    array (
+      'item' => 'Big Shoes',
+      'quantity' => 1,
+    )
+  )
 perl: | 
   [  
      { item => 'Super Hoop', quantity => 1 }, 

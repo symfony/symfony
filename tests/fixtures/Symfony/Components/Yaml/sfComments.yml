@@ -38,4 +38,14 @@ brief: >
 yaml: | 
     foo:   '#bar' 
 php: | 
-    array('foo' => '#bar') 
+    array('foo' => '#bar')
+---
+test: Document starting with a comment and a separator
+brief: >
+  Commenting before document start is allowed
+yaml: |
+    # document comment
+    ---
+    foo: bar # a comment
+php: |
+    array('foo' => 'bar')

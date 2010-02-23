@@ -547,10 +547,18 @@ class Parser
     }
 
     // strip YAML header
-    preg_replace('#^\%YAML[: ][\d\.]+.*\n#s', '', $value);
+    $count = 0;
+    $value = preg_replace('#^\%YAML[: ][\d\.]+.*\n#s', '', $value, -1, $count);
+    $this->offset += $count;
 
-    // remove ---
-    $value = preg_replace('#^\-\-\-.*?\n#s', '', $value);
+    // remove leading comments and/or ---
+    $trimmedValue = preg_replace('#^((\#.*?\n)|(\-\-\-.*?\n))*#s', '', $value, -1, $count);
+    if ($count == 1)
+    {
+      // items have been removed, update the offset
+      $this->offset += substr_count($value, "\n") - substr_count($trimmedValue, "\n");
+      $value = $trimmedValue;
+    }
 
     return $value;
   }

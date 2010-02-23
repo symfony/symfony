@@ -36,7 +36,7 @@ class Bundle extends BaseBundle
     foreach ($container->getParameter('kernel.bundles') as $className)
     {
       $tmp = dirname(str_replace('\\', '/', $className));
-      $namespace = dirname($tmp);
+      $namespace = str_replace('/', '\\', dirname($tmp));
       $class = basename($tmp);
 
       if (isset($bundleDirs[$namespace]))

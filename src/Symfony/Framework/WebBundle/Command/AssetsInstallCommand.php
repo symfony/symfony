@@ -56,7 +56,7 @@ class AssetsInstallCommand extends Command
     foreach ($this->container->getKernelService()->getBundles() as $bundle)
     {
       $tmp = dirname(str_replace('\\', '/', get_class($bundle)));
-      $namespace = dirname($tmp);
+      $namespace = str_replace('/', '\\', dirname($tmp));
       $class = basename($tmp);
 
       if (isset($dirs[$namespace]) && is_dir($originDir = $dirs[$namespace].'/'.$class.'/Resources/public'))

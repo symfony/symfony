@@ -54,7 +54,7 @@ class InitBundleCommand extends Command
     $dirs = $this->container->getKernelService()->getBundleDirs();
 
     $tmp = str_replace('\\', '/', $namespace);
-    $namespace = dirname($tmp);
+    $namespace = str_replace('/', '\\', dirname($tmp));
     $bundle = basename($tmp);
 
     if (!isset($dirs[$namespace]))

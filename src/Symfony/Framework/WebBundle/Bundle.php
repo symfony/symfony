@@ -5,6 +5,8 @@ namespace Symfony\Framework\WebBundle;
 use Symfony\Foundation\Bundle\Bundle as BaseBundle;
 use Symfony\Components\DependencyInjection\ContainerInterface;
 use Symfony\Components\DependencyInjection\Loader\Loader;
+use Symfony\Components\DependencyInjection\Loader\XmlFileLoader;
+use Symfony\Components\DependencyInjection\BuilderConfiguration;
 use Symfony\Framework\WebBundle\DependencyInjection\WebExtension;
 
 /*
@@ -34,5 +36,14 @@ class Bundle extends BaseBundle
       $dirs[] = $dir.'/%%bundle%%/Resources/views/%%controller%%/%%name%%%%format%%.php';
     }
     $container->setParameter('templating.loader.filesystem.path', $dirs);
+
+    $configuration = new BuilderConfiguration();
+    if ($container->getParameter('kernel.debug'))
+    {
+      $loader = new XmlFileLoader(__DIR__.'/Resources/config');
+      $configuration->merge($loader->load('debug.xml'));
+    }
+
+    return $configuration;
   }
 }

@@ -5,11 +5,11 @@
     xsi:schemaLocation="http://www.symfony-project.org/schema/dic/services http://www.symfony-project.org/schema/dic/services/services-1.0.xsd">
 
   <parameters>
-    <parameter key="symfony.templating.debugger.class">Symfony\Framework\WebBundle\Templating\Debugger</parameter>
+    <parameter key="templating.debugger.class">Symfony\Framework\WebBundle\Templating\Debugger</parameter>
   </parameters>
 
   <services>
-    <service id="symfony.templating.debugger" class="%symfony.templating.debugger.class%">
+    <service id="templating.debugger" class="%templating.debugger.class%">
       <argument type="service" id="logger" on-invalid="null" />
     </service>
   </services>

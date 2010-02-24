@@ -32,6 +32,7 @@
   </xsd:complexType>
 
   <xsd:complexType name="web">
+    <xsd:attribute name="ide" type="xsd:string" />
   </xsd:complexType>
 
   <xsd:complexType name="templating">
@@ -46,8 +47,6 @@
   </xsd:complexType>
 
   <xsd:complexType name="debug">
-    <xsd:attribute name="exception" type="xsd:string" />
     <xsd:attribute name="toolbar" type="xsd:string" />
-    <xsd:attribute name="ide" type="xsd:string" />
   </xsd:complexType>
 </xsd:schema>

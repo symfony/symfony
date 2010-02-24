@@ -57,26 +57,33 @@ class DoctrineExtension extends LoaderExtension
     $configuration->merge($loader->load($this->resources['dbal']));
 
     $defaultConnection = array(
-      'driver'              => 'PDOSqlite',
-      'dbname'              => 'symfony',
+      'driver'              => 'PDOMySQL',
       'user'                => 'root',
       'password'            => null,
       'host'                => 'localhost',
       'port'                => null,
-      'path'                => '%kernel.root_dir%/symfony.sqlite',
       'event_manager_class' => 'Doctrine\Common\EventManager',
       'configuration_class' => 'Doctrine\DBAL\Configuration',
       'wrapper_class'       => null,
       'options'             => array()
     );
 
-    $config['default_connection'] = isset($config['default_connection']) ?
-      $config['default_connection'] : 'default';
+    $config['default_connection'] = isset($config['default_connection']) ? $config['default_connection'] : 'default';
 
-    $config['connections'] = isset($config['connections']) ?
-      $config['connections'] : array($config['default_connection'] => $defaultConnection
-    );
-    foreach ($config['connections'] as $name => $connection)
+    $connections = array();
+    if (isset($config['connections']))
+    {
+      foreach ($config['connections'] as $name => $connection)
+      {
+        $connections[isset($connection['id']) ? $connection['id'] : $name] = $connection;
+      }
+    }
+    else
+    {
+      $connections = array($config['default_connection'] => $config);
+    }
+
+    foreach ($connections as $name => $connection)
     {
       $connection = array_merge($defaultConnection, $connection);
       $configurationClass = isset($connection['configuration_class']) ?
@@ -153,10 +160,7 @@ class DoctrineExtension extends LoaderExtension
     $loader = new XmlFileLoader(__DIR__.'/../Resources/config');
     $configuration->merge($loader->load($this->resources['orm']));
 
-    $config['default_entity_manager'] = isset($config['default_entity_manager']) ?
-      $config['default_entity_manager'] : 
-      'default'
-    ;
+    $config['default_entity_manager'] = isset($config['default_entity_manager']) ? $config['default_entity_manager'] : 'default';
     foreach (array('metadata_driver', 'cache_driver') as $key)
     {
       if (isset($config[$key]))

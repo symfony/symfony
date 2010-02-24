@@ -26,9 +26,6 @@ class KernelExtension extends LoaderExtension
   {
     $configuration = new BuilderConfiguration();
 
-    $loader = new XmlFileLoader(array(__DIR__.'/../Resources/config', __DIR__.'/Resources/config'));
-    $configuration->merge($loader->load('services.xml'));
-
     if (isset($config['charset']))
     {
       $configuration->setParameter('kernel.charset', $config['charset']);

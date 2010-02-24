@@ -166,8 +166,6 @@ class WebExtension extends LoaderExtension
       $configuration->setParameter('web_debug.file_link_format', 'txmt://open?url=file://%%f&line=%%l');
     }
 
-    $configuration->setAlias('event_dispatcher', 'debug.event_dispatcher');
-
     return $configuration;
   }
 

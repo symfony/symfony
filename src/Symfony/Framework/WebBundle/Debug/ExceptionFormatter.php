@@ -168,7 +168,7 @@ class ExceptionFormatter
       $text = $file;
     }
 
-    $linkFormat = $this->container->hasParameter('web_debug.file_link_format') ? $this->container->getParameter('web_debug.file_link_format') : ini_get('xdebug.file_link_format');
+    $linkFormat = $this->container->hasParameter('debug.file_link_format') ? $this->container->getParameter('debug.file_link_format') : ini_get('xdebug.file_link_format');
     if ('html' === $format && $file && $line && $linkFormat)
     {
       $link = strtr($linkFormat, array('%f' => $file, '%l' => $line));

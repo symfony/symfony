@@ -9,6 +9,11 @@
     <parameter key="controller_loader.class">Symfony\Framework\WebBundle\Listener\ControllerLoader</parameter>
     <parameter key="router.class">Symfony\Components\Routing\Router</parameter>
     <parameter key="response_filter.class">Symfony\Framework\WebBundle\Listener\ResponseFilter</parameter>
+
+    <parameter key="exception_handler.class">Symfony\Framework\WebBundle\Listener\ExceptionHandler</parameter>
+    <parameter key="exception_handler.bundle">WebBundle</parameter>
+    <parameter key="exception_handler.controller">Exception</parameter>
+    <parameter key="exception_handler.action">exception</parameter>
   </parameters>
 
   <services>
@@ -42,6 +47,15 @@
       <annotation name="kernel.listener" event="core.response" method="filter" />
       <argument type="service" id="event_dispatcher" />
       <argument type="service" id="request" />
+    </service>
+
+    <service id="exception_handler" class="%exception_handler.class%">
+      <annotation name="kernel.listener" event="core.exception" method="handle" />
+      <argument type="service" id="service_container" />
+      <argument type="service" id="logger" on-invalid="null" />
+      <argument>%exception_handler.bundle%</argument>
+      <argument>%exception_handler.controller%</argument>
+      <argument>%exception_handler.action%</argument>
     </service>
   </services>
 </container>

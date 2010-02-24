@@ -154,11 +154,6 @@ class WebExtension extends LoaderExtension
     $loader = new XmlFileLoader(__DIR__.'/../Resources/config');
     $configuration->merge($loader->load($this->resources['debug']));
 
-    if (isset($config['exception']) && $config['exception'])
-    {
-      $configuration->merge($loader->load('debug_exception_handler.xml'));
-    }
-
     if (isset($config['toolbar']) && $config['toolbar'])
     {
       $configuration->merge($loader->load('debug_data_collector.xml'));

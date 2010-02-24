@@ -179,10 +179,19 @@ class DoctrineExtension extends LoaderExtension
         sprintf('doctrine.orm.%s_configuration', $name), $ormConfigDef
       );
 
+      $drivers = array('metadata', 'query', 'result');
+      foreach ($drivers as $driver)
+      {
+        $definition = $configuration->getDefinition(sprintf('doctrine.orm.cache.%s', $configuration->getParameter('doctrine.orm.cache_driver')));
+        $clone = clone $definition;
+        $clone->addMethodCall('setNamespace', array(sprintf('doctrine_%s_', $driver)));
+        $configuration->setDefinition(sprintf('doctrine.orm.%s_cache', $driver), $clone);
+      }
+
       $methods = array(
-        'setMetadataCacheImpl' => new Reference('doctrine.orm.cache'),
-        'setQueryCacheImpl' => new Reference('doctrine.orm.cache'),
-        'setResultCacheImpl' => new Reference('doctrine.orm.cache'),
+        'setMetadataCacheImpl' => new Reference('doctrine.orm.metadata_cache'),
+        'setQueryCacheImpl' => new Reference('doctrine.orm.query_cache'),
+        'setResultCacheImpl' => new Reference('doctrine.orm.result_cache'),
         'setMetadataDriverImpl' => new Reference('doctrine.orm.metadata_driver'),
         'setProxyDir' => '%kernel.cache_dir%/doctrine/Proxies',
         'setProxyNamespace' => 'Proxies',

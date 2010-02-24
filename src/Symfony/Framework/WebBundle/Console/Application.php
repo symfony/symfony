@@ -92,7 +92,7 @@ class Application extends BaseApplication
         // look for commands
         foreach (new \RecursiveIteratorIterator(new \RecursiveDirectoryIterator($commandDir), \RecursiveIteratorIterator::LEAVES_ONLY) as $file)
         {
-          if ($file->isDir())
+          if ($file->isDir() || strpos($file, -4) !== '.php')
           {
             continue;
           }

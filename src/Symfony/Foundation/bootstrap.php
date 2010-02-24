@@ -63,7 +63,7 @@ class KernelBundle extends Bundle
       $configuration->setDefinition('event_dispatcher', $configuration->findDefinition('debug.event_dispatcher'));
     }
 
-    $container->merge($configuration);
+    return $configuration;
   }
 
   public function boot(ContainerInterface $container)

@@ -59,6 +59,7 @@ class KernelBundle extends Bundle
 
     if ($container->getParameter('kernel.debug'))
     {
+      $configuration->merge($loader->load('debug.xml'));
       $configuration->setDefinition('event_dispatcher', $configuration->findDefinition('debug.event_dispatcher'));
     }
 

@@ -6,7 +6,6 @@
 
   <parameters>
     <parameter key="event_dispatcher.class">Symfony\Foundation\EventDispatcher</parameter>
-    <parameter key="debug.event_dispatcher.class">Symfony\Foundation\Debug\EventDispatcher</parameter>
     <parameter key="request_handler.class">Symfony\Components\RequestHandler\RequestHandler</parameter>
     <parameter key="request.class">Symfony\Components\RequestHandler\Request</parameter>
     <parameter key="response.class">Symfony\Components\RequestHandler\Response</parameter>
@@ -17,11 +16,6 @@
   <services>
     <service id="event_dispatcher" class="%event_dispatcher.class%">
       <argument type="service" id="service_container" />
-    </service>
-
-    <service id="debug.event_dispatcher" class="%debug.event_dispatcher.class%">
-      <argument type="service" id="service_container" />
-      <argument type="service" id="logger" on-invalid="null" />
     </service>
 
     <service id="error_handler" class="%error_handler.class%">

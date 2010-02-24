@@ -51,7 +51,7 @@ class Bundle extends BaseBundle
         }
       }
     }
-    $container->setParameter('doctrine.orm.metadata_driver_impl.dirs', $metadataDirs);
-    $container->setParameter('doctrine.entity_dirs', $entityDirs);
+    $container->setParameter('doctrine.orm.metadata_driver.mapping_dirs', $metadataDirs);
+    $container->setParameter('doctrine.orm.entity_dirs', $entityDirs);
   }
 }

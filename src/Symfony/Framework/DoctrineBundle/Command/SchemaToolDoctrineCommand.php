@@ -55,7 +55,7 @@ class SchemaToolDoctrineCommand extends DoctrineCommand
     $options = $this->buildDoctrineCliTaskOptions($input, array(
       'create', 'drop', 'update', 'complete-update', 're-create', 'dump-sql'
     ));
-    $entityDirs = $this->container->getParameter('doctrine.entity_dirs');
+    $entityDirs = $this->container->getParameter('doctrine.orm.entity_dirs');
     $options['class-dir'] = implode(', ', $entityDirs);
     $this->runDoctrineCliTask('orm:schema-tool', $options);
   }

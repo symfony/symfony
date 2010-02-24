@@ -5,6 +5,8 @@ namespace Symfony\Framework\DoctrineBundle\DependencyInjection;
 use Symfony\Components\DependencyInjection\Loader\LoaderExtension;
 use Symfony\Components\DependencyInjection\Loader\XmlFileLoader;
 use Symfony\Components\DependencyInjection\BuilderConfiguration;
+use Symfony\Components\DependencyInjection\Definition;
+use Symfony\Components\DependencyInjection\Reference;
 
 /*
  * This file is part of the symfony framework.
@@ -54,31 +56,85 @@ class DoctrineExtension extends LoaderExtension
     $loader = new XmlFileLoader(__DIR__.'/../Resources/config');
     $configuration->merge($loader->load($this->resources['dbal']));
 
-    foreach (array('dbname', 'host', 'user', 'password', 'path', 'port') as $key)
+    $defaultConnection = array(
+      'driver'              => 'PDOSqlite',
+      'dbname'              => 'symfony',
+      'user'                => 'root',
+      'password'            => null,
+      'host'                => 'localhost',
+      'port'                => null,
+      'path'                => '%kernel.root_dir%/symfony.sqlite',
+      'event_manager_class' => 'Doctrine\Common\EventManager',
+      'configuration_class' => 'Doctrine\DBAL\Configuration',
+      'wrapper_class'       => null,
+      'options'             => array()
+    );
+
+    $config['default_connection'] = isset($config['default_connection']) ?
+      $config['default_connection'] : 'default';
+
+    $config['connections'] = isset($config['connections']) ?
+      $config['connections'] : array($config['default_connection'] => $defaultConnection
+    );
+    foreach ($config['connections'] as $name => $connection)
     {
-      if (isset($config[$key]))
+      $connection = array_merge($defaultConnection, $connection);
+      $configurationClass = isset($connection['configuration_class']) ?
+        $connection['configuration_class'] : 'Doctrine\DBAL\Configuration';
+
+      $configurationDef = new Definition($configurationClass);
+      $configurationDef->addMethodCall('setSqlLogger', array(
+        new Reference('doctrine.dbal.logger')
+      ));
+      $configuration->setDefinition(
+        sprintf('doctrine.dbal.%s_connection.configuration', $name),
+        $configurationDef
+      );
+
+      $eventManagerDef = new Definition($connection['event_manager_class']);
+      $configuration->setDefinition(
+        sprintf('doctrine.dbal.%s_connection.event_manager', $name),
+        $eventManagerDef
+      );
+
+      $driverOptions = array();
+      if (isset($connection['driver']))
       {
-        $configuration->setParameter('doctrine.dbal.'.$key, $config[$key]);
+        $driverOptions['driverClass'] = sprintf(
+          'Doctrine\\DBAL\\Driver\\%s\\Driver',
+          $connection['driver']
+        );
       }
-    }
-
-    if (isset($config['options']))
-    {
-      $configuration->setParameter('doctrine.dbal.driver.options', $config['options']);
-    }
-
-    if (isset($config['driver']))
-    {
-      $class = $config['driver'];
-      if (in_array($class, array('OCI8', 'PDOMsSql', 'PDOMySql', 'PDOOracle', 'PDOPgSql', 'PDOSqlite')))
+      if (isset($connection['wrapper_class']))
       {
-        $class = 'Doctrine\\DBAL\\Driver\\'.$class.'\\Driver';
+        $driverOptions['wrapperClass'] = $connection['wrapper_class'];
       }
-
-      $configuration->setParameter('doctrine.dbal.driver.class', $class);
+      if (isset($connection['options']))
+      {
+        $driverOptions['driverOptions'] = $connection['options'];
+      }
+      foreach (array('dbname', 'host', 'user', 'password', 'path', 'port') as $key)
+      {
+        if (isset($connection[$key]))
+        {
+          $driverOptions[$key] = $connection[$key];
+        }
+      }
+      $driverArgs = array(
+        $driverOptions,
+        new Reference(sprintf('doctrine.dbal.%s_connection.configuration', $name)),
+        new Reference(sprintf('doctrine.dbal.%s_connection.event_manager', $name))
+      );
+      $driverDef = new Definition('Doctrine\DBAL\DriverManager', $driverArgs);
+      $driverDef->setConstructor('getConnection');
+      $configuration->setDefinition(sprintf('doctrine.dbal.%s_connection', $name), $driverDef);
     }
 
-    $configuration->setAlias('database_connection', null !== $this->alias ? $this->alias : 'doctrine.dbal.connection');
+    $configuration->setAlias('database_connection', 
+      null !== $this->alias ? $this->alias : sprintf(
+        'doctrine.dbal.%s_connection', $config['default_connection']
+      )
+    );
 
     return $configuration;
   }
@@ -97,13 +153,82 @@ class DoctrineExtension extends LoaderExtension
     $loader = new XmlFileLoader(__DIR__.'/../Resources/config');
     $configuration->merge($loader->load($this->resources['orm']));
 
-    foreach (array('entity_manager.class', 'metadata_driver_impl.class', 'cache.class') as $key)
+    $config['default_entity_manager'] = isset($config['default_entity_manager']) ?
+      $config['default_entity_manager'] : 
+      'default'
+    ;
+    foreach (array('metadata_driver', 'cache_driver') as $key)
     {
       if (isset($config[$key]))
       {
         $configuration->setParameter('doctrine.orm.'.$key, $config[$key]);
       }
     }
+
+    $config['entity_managers'] = isset($config['entity_managers']) ?
+      $config['entity_managers'] : array($config['default_entity_manager'] => array())
+    ;
+    foreach ($config['entity_managers'] as $name => $connection)
+    {
+      $ormConfigDef = new Definition('Doctrine\ORM\Configuration');
+      $configuration->setDefinition(
+        sprintf('doctrine.orm.%s_configuration', $name), $ormConfigDef
+      );
+
+      $methods = array(
+        'setMetadataCacheImpl' => new Reference('doctrine.orm.cache'),
+        'setQueryCacheImpl' => new Reference('doctrine.orm.cache'),
+        'setResultCacheImpl' => new Reference('doctrine.orm.cache'),
+        'setMetadataDriverImpl' => new Reference('doctrine.orm.metadata_driver'),
+        'setProxyDir' => '%kernel.cache_dir%/doctrine/Proxies',
+        'setProxyNamespace' => 'Proxies',
+        'setAutoGenerateProxyClasses' => true
+      );
+
+      foreach ($methods as $method => $arg)
+      {
+        $ormConfigDef->addMethodCall($method, array($arg));
+      }
+
+      $ormEmArgs = array(
+        new Reference(
+          sprintf('doctrine.dbal.%s_connection',
+          isset($connection['connection']) ? $connection['connection'] : $name)
+        ),
+        new Reference(sprintf('doctrine.orm.%s_configuration', $name))
+      );
+      $ormEmDef = new Definition('Doctrine\ORM\EntityManager', $ormEmArgs);
+      $ormEmDef->setConstructor('create');
+
+      $configuration->setDefinition(
+        sprintf('doctrine.orm.%s_entity_manager', $name),
+        $ormEmDef
+      );
+
+      if ($name == $config['default_entity_manager'])
+      {
+        $configuration->setAlias(
+          'doctrine.orm.entity_manager',
+          sprintf('doctrine.orm.%s_entity_manager', $name)
+        );
+      }
+    }
+
+    $configuration->setAlias(
+      'doctrine.orm.metadata_driver',
+      sprintf(
+        'doctrine.orm.metadata_driver.%s',
+        $configuration->getParameter('doctrine.orm.metadata_driver')
+      )
+    );
+
+    $configuration->setAlias(
+      'doctrine.orm.cache',
+      sprintf(
+        'doctrine.orm.cache.%s',
+        $configuration->getParameter('doctrine.orm.cache_driver')
+      )
+    );
 
     return $configuration;
   }

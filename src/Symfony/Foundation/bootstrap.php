@@ -537,28 +537,20 @@ abstract class Kernel
     $container->merge($configuration);
     $this->optimizeContainer($container);
 
-        if (!is_dir($parameters['kernel.cache_dir']))
+    foreach (array('cache', 'logs') as $name)
     {
-      if (false === @mkdir($parameters['kernel.cache_dir'], 0777, true))
+      $key = sprintf('kernel.%s_dir', $name);
+      if (!is_dir($parameters[$key]))
       {
-        die(sprintf('Unable to create the cache directory (%s)', $parameters['kernel.cache_dir']));
+        if (false === @mkdir($parameters[$key], 0777, true))
+        {
+          die(sprintf('Unable to create the %s directory (%s)', $name, dirname($parameters['kernel.cache_dir'])));
+        }
       }
-    }
-    elseif (!is_writable($parameters['kernel.cache_dir']))
-    {
-      die(sprintf('Unable to write in the cache directory (%s)', $parameters['kernel.cache_dir']));
-    }
-
-        if (!is_dir($parameters['kernel.logs_dir']))
-    {
-      if (false === @mkdir($parameters['kernel.logs_dir'], 0777, true))
+      elseif (!is_writable($parameters[$key]))
       {
-        die(sprintf('Unable to create the logs directory (%s)', $parameters['kernel.logs_dir']));
+        die(sprintf('Unable to write in the %s directory (%s)', $name, $parameters['kernel.cache_dir']));
       }
-    }
-    elseif (!is_writable($parameters['kernel.logs_dir']))
-    {
-      die(sprintf('Unable to write in the logs directory (%s)', $parameters['kernel.logs_dir']));
     }
 
         $dumper = new PhpDumper($container);

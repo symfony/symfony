@@ -5,31 +5,56 @@
     xsi:schemaLocation="http://www.symfony-project.org/schema/dic/services http://www.symfony-project.org/schema/dic/services/services-1.0.xsd">
 
   <parameters>
-    <parameter key="doctrine.orm.entity_manager.class">Doctrine\ORM\EntityManager</parameter>
-    <parameter key="doctrine.orm.metadata_driver_impl.class">Doctrine\ORM\Mapping\Driver\XmlDriver</parameter>
-    <parameter key="doctrine.orm.cache.class">Doctrine\Common\Cache\ArrayCache</parameter>
+    <parameter key="doctrine.orm.metadata_driver">xml</parameter>
+    <parameter key="doctrine.orm.cache_driver">array</parameter>
+    <parameter key="doctrine.orm.cache.memcache.host">localhost</parameter>
+    <parameter key="doctrine.orm.cache.memcache.port">11211</parameter>
   </parameters>
 
   <services>
-    <service id="doctrine.orm.entity_manager" class="%doctrine.orm.entity_manager.class%" constructor="create">
-      <argument type="service" id="doctrine.dbal.connection" />
-      <argument type="service" id="doctrine.orm.configuration" />
+    <!--- Should we just move all this to php code? is it best to go one way or the other? -->
+
+    <!--- Annotation Metadata Driver Service -->
+    <service id="doctrine.orm.metadata_driver.annotation" class="Doctrine\ORM\Mapping\Driver\AnnotationDriver">
+      <argument type="service" id="doctrine.orm.metadata_driver.annotation.reader" />
+      <argument>%doctrine.orm.entity_dirs%</argument>
     </service>
 
-    <service id="doctrine.orm.metadata_driver_impl" class="%doctrine.orm.metadata_driver_impl.class%">
-      <argument>%doctrine.orm.metadata_driver_impl.dirs%</argument>
+    <service id="doctrine.orm.metadata_driver.annotation.reader" class="Doctrine\Common\Annotations\AnnotationReader">
+      <argument type="service" id="doctrine.orm.cache" />
+      <call method="setDefaultAnnotationNamespace"><argument>Doctrine\ORM\Mapping\</argument></call>
     </service>
 
-    <service id="doctrine.orm.cache" class="%doctrine.orm.cache.class%" />
-
-    <service id="doctrine.orm.configuration" class="Doctrine\ORM\Configuration">
-      <call method="setMetadataCacheImpl"><argument type="service" id="doctrine.orm.cache" /></call>
-      <call method="setQueryCacheImpl"><argument type="service" id="doctrine.orm.cache" /></call>
-      <call method="setResultCacheImpl"><argument type="service" id="doctrine.orm.cache" /></call>
-      <call method="setMetadataDriverImpl"><argument type="service" id="doctrine.orm.metadata_driver_impl" /></call>
-      <call method="setProxyDir"><argument>%kernel.cache_dir%/doctrine/Proxies</argument></call>
-      <call method="setProxyNamespace"><argument>Proxies</argument></call>
-      <call method="setAutoGenerateProxyClasses"><argument>true</argument></call>
+    <!--- XML Metadata Driver Service -->
+    <service id="doctrine.orm.metadata_driver.xml" class="Doctrine\ORM\Mapping\Driver\XmlDriver">
+      <argument>%doctrine.orm.metadata_driver.mapping_dirs%</argument>
     </service>
+
+    <!--- YAML Metadata Driver Service -->
+    <service id="doctrine.orm.metadata_driver.yml" class="Doctrine\ORM\Mapping\Driver\YamlDriver">
+      <argument>%doctrine.orm.metadata_driver.mapping_dirs%</argument>
+    </service>
+
+    <!--- ORM Array Cache Driver Service -->
+    <service id="doctrine.orm.cache.array" class="Doctrine\Common\Cache\ArrayCache" />
+
+    <!--- ORM APC Cache Driver Service -->
+    <service id="doctrine.orm.cache.apc" class="Doctrine\Common\Cache\ApcCache" />
+
+    <!--- ORM Memcache Cache Driver Service -->
+    <service id="doctrine.orm.cache.memcache" class="Doctrine\Common\Cache\MemcacheCache">
+      <call method="setMemcache"><argument type="service" id="doctrine.orm.cache.memcache.instance" /></call>
+    </service>
+
+    <!--- ORM Memcache Cache Driver Memcache instance. See doctrine.orm.cache.memcache -->
+    <service id="doctrine.orm.cache.memcache.instance" class="Memcache">
+      <call method="connect">
+        <argument>%doctrine.orm.cache.memcache.host%</argument>
+        <argument>%doctrine.orm.cache.memcache.port%</argument>
+      </call>
+    </service>
+
+    <!--- ORM Xcache Cache Driver Service -->
+    <service id="doctrine.orm.cache.xcache" class="Doctrine\Common\Cache\XcacheCache" />
   </services>
 </container>

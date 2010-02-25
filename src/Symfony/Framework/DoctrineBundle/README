@@ -23,6 +23,10 @@ do the following:
       user: root
       password: ~
 
+Or if you want to use XML instead of YAMl it would like like this:
+
+    <doctrine:dbal dbname="symfony_guestbook" user="root" password="" />
+
 Or if you have multiple connections and want to customize the configuration of the
 connection further you can use the following:
 
@@ -32,7 +36,7 @@ connection further you can use the following:
       connections:
         default:
           driver:               PDOSqlite     # PDOSqlite, PDOMySql, PDOMsSql, PDOOracle, PDOPgSql, OCI8
-          dbname:               symfony
+          dbname:               symfony_guestbook
           user:                 root
           password:             null
           host:                 localhost
@@ -42,6 +46,12 @@ connection further you can use the following:
           configuration_class:  Doctrine\DBAL\Configuration
           wrapper_class:        ~
           options:              []
+
+You can also specify multiple connections using the XML format:
+
+    <doctrine:dbal default_connection="default">
+        <doctrine:connection id="default" dbname="symfony_guestbook" user="root" password="" />
+    </doctrine:dbal>
 
 ### Object Relational Mapper
 

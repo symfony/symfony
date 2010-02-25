@@ -3,11 +3,13 @@
 namespace Symfony\Framework\DoctrineBundle\Command;
 
 use Symfony\Framework\WebBundle\Command\Command;
+use Symfony\Components\Console\Input\ArrayInput;
 use Symfony\Components\Console\Input\InputArgument;
 use Symfony\Components\Console\Input\InputOption;
 use Symfony\Components\Console\Input\InputInterface;
 use Symfony\Components\Console\Output\OutputInterface;
 use Symfony\Components\Console\Output\Output;
+use Symfony\Framework\WebBundle\Console\Application;
 use Symfony\Framework\WebBundle\Util\Filesystem;
 use Doctrine\Common\Cli\Configuration;
 use Doctrine\Common\Cli\CliController as DoctrineCliController;
@@ -30,16 +32,19 @@ use Doctrine\Common\Cli\CliController as DoctrineCliController;
  */
 abstract class DoctrineCommand extends Command
 {
-  protected $cli;
+  protected
+    $cli,
+    $em;
 
   protected function getDoctrineCli()
   {
     if ($this->cli === null)
     {
       $configuration = new Configuration();
-      $configuration->setAttribute('em', $this->container->getDoctrine_Orm_EntityManagerService());
       $this->cli = new DoctrineCliController($configuration);
     }
+    $em = $this->em ? $this->em : $this->container->getDoctrine_Orm_EntityManagerService();
+    $this->cli->getConfiguration()->setAttribute('em', $em);
     return $this->cli;
   }
 
@@ -60,7 +65,7 @@ abstract class DoctrineCommand extends Command
     return $this->getDoctrineCli()->run(array_merge(array('doctrine', $name), $builtOptions));
   }
 
-  public function buildDoctrineCliTaskOptions(InputInterface $input, array $options)
+  protected function buildDoctrineCliTaskOptions(InputInterface $input, array $options)
   {
     $taskOptions = array();
     foreach ($options as $option)
@@ -71,5 +76,50 @@ abstract class DoctrineCommand extends Command
       }
     }
     return $options;
+  }
+
+  protected function runCommand($name, array $input = array())
+  {
+    $arguments = array();
+    $arguments = array_merge(array($name), $input);
+    $input = new ArrayInput($arguments);
+    $application = new Application($this->container->getKernelService());
+    $application->setAutoExit(false);
+    $application->run($input);
+  }
+
+  /**
+   * TODO: Better way to do these functions?
+   */
+  protected function getDoctrineConnections()
+  {
+    $connections = array();
+    $ids = $this->container->getServiceIds();
+    foreach ($ids as $id)
+    {
+      preg_match('/doctrine.dbal.(.*)_connection/', $id, $matches);
+      if ($matches)
+      {
+        $name = $matches[1];
+        $connections[$name] = $this->container->getService($id);
+      }
+    }
+    return $connections;
+  }
+
+  protected function getDoctrineEntityManagers()
+  {
+    $entityManagers = array();
+    $ids = $this->container->getServiceIds();
+    foreach ($ids as $id)
+    {
+      preg_match('/doctrine.orm.(.*)_entity_manager/', $id, $matches);
+      if ($matches)
+      {
+        $name = $matches[1];
+        $entityManagers[$name] = $this->container->getService($id);
+      }
+    }
+    return $entityManagers;
   }
 }

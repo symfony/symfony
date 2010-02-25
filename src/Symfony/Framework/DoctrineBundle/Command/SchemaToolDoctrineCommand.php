@@ -44,6 +44,7 @@ class SchemaToolDoctrineCommand extends DoctrineCommand
       ->addOption('complete-update', null, null, 'Complete update and drop anything that is not in your schema.')
       ->addOption('re-create', null, null, 'Drop and re-create your database schema.')
       ->addOption('dump-sql', null, null, 'Dump the SQL instead of executing it.')
+      ->addOption('connection', null, null, 'The connection to use.')
     ;
   }
 
@@ -55,8 +56,33 @@ class SchemaToolDoctrineCommand extends DoctrineCommand
     $options = $this->buildDoctrineCliTaskOptions($input, array(
       'create', 'drop', 'update', 'complete-update', 're-create', 'dump-sql'
     ));
+
     $entityDirs = $this->container->getParameter('doctrine.orm.entity_dirs');
     $options['class-dir'] = implode(', ', $entityDirs);
-    $this->runDoctrineCliTask('orm:schema-tool', $options);
+
+    $found = false;
+    $ems = $this->getDoctrineEntityManagers();
+    foreach  ($ems as $name => $em)
+    {
+      if ($input->getOption('connection') && $name !== $input->getOption('connection'))
+      {
+        continue;
+      }
+      $this->em = $em;
+      $this->runDoctrineCliTask('orm:schema-tool', $options);
+      $found = true;
+    }
+
+    if ($found === false)
+    {
+      if ($input->getOption('connection'))
+      {
+        $output->writeln(sprintf('<error>Could not find a connection named <comment>%s</comment></error>', $input->getOption('connection')));
+      }
+      else
+      {
+        $output->writeln(sprintf('<error>Could not find any configured connections</error>', $input->getOption('connection')));        
+      }
+    }
   }
 }

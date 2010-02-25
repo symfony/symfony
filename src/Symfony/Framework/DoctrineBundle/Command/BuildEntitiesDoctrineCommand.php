@@ -21,14 +21,14 @@ use Doctrine\Common\Cli\CliController as DoctrineCliController;
  */
 
 /**
- * Execute a SQL query and output the results
+ * Build all Bundle entity classes from mapping information.
  *
  * @package    symfony
  * @subpackage console
  * @author     Fabien Potencier <fabien.potencier@symfony-project.com>
  * @author     Jonathan H. Wage <jonwage@gmail.com>
  */
-class RunSqlDoctrineCommand extends DoctrineCommand
+class BuildEntitiesDoctrineCommand extends DoctrineCommand
 {
   /**
    * @see Command
@@ -36,12 +36,8 @@ class RunSqlDoctrineCommand extends DoctrineCommand
   protected function configure()
   {
     $this
-      ->setName('doctrine:run-sql')
-      ->setDescription('Executes arbitrary SQL from a file or directly from the command line.')
-      ->addOption('sql', null, null, 'The SQL query to run.')
-      ->addOption('file', null, null, 'Path to a SQL file to run.')
-      ->addOption('depth', null, null, 'The depth to output the data to.')
-      ->addOption('connection', null, null, 'The connection to use.')
+      ->setName('doctrine:build-entities')
+      ->setDescription('Build all Bundle entity classes from mapping information.')
     ;
   }
 
@@ -50,9 +46,21 @@ class RunSqlDoctrineCommand extends DoctrineCommand
    */
   protected function execute(InputInterface $input, OutputInterface $output)
   {
-    $options = $this->buildDoctrineCliTaskOptions($input, array(
-      'sql', 'file', 'depth'
-    ));
-    $this->runDoctrineCliTask('dbal:run-sql', $options);
+    foreach ($this->container->getParameter('kernel.bundle_dirs') as $bundle => $path)
+    {
+      $bundles = glob($path.'/*Bundle');
+      foreach ($bundles as $p)
+      {
+        if (!is_dir($metadataPath = $p.'/Resources/config/doctrine/metadata'))
+        {
+          continue;
+        }
+        $opts = array();
+        $opts['--from'] = $metadataPath;
+        $opts['--to'] = 'annotation';
+        $opts['--dest'] = realpath($path.'/..');
+        $this->runCommand('doctrine:convert-mapping', $opts);
+      }
+    }
   }
 }

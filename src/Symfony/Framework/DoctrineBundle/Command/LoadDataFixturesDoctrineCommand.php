@@ -41,7 +41,7 @@ class LoadDataFixturesDoctrineCommand extends DoctrineCommand
     $this
       ->setName('doctrine:load-data-fixtures')
       ->setDescription('Load data fixtures to your database.')
-      ->addOption('dir_or_file', null, null, 'The directory or file to load data fixtures from.')
+      ->addOption('dir_or_file', null, InputOption::PARAMETER_OPTIONAL | InputOption::PARAMETER_IS_ARRAY, 'The directory or file to load data fixtures from.')
       ->addOption('append', null, InputOption::PARAMETER_OPTIONAL, 'Whether or not to append the data fixtures.', false)
     ;
   }
@@ -51,37 +51,11 @@ class LoadDataFixturesDoctrineCommand extends DoctrineCommand
    */
   protected function execute(InputInterface $input, OutputInterface $output)
   {
-    $em = $this->container->getDoctrine_ORM_EntityManagerService();
-    if (!$input->getOption('append'))
-    {
-      $classes = array();
-      $metadatas = $em->getMetadataFactory()->getAllMetadata();
-
-      foreach ($metadatas as $metadata)
-      {
-        if (!$metadata->isMappedSuperclass)
-        {
-          $classes[] = $metadata;
-        }
-      }
-      $cmf = $em->getMetadataFactory();
-      $classes = $this->getCommitOrder($em, $classes);
-      for ($i = count($classes) - 1; $i >= 0; --$i)
-      {
-        $class = $classes[$i];
-        if ($cmf->hasMetadataFor($class->name))
-        {
-          try {
-            $em->createQuery('DELETE FROM '.$class->name.' a')->execute();
-          } catch (Exception $e) {}
-        }
-      }
-    }
-
+    $defaultEm = $this->container->getDoctrine_ORM_EntityManagerService();
     $dirOrFile = $input->getOption('dir_or_file');
     if ($dirOrFile)
     {
-      $paths = $dirOrFile;
+      $paths = is_array($dirOrFile) ? $dirOrFile : array($dirOrFile);
     } else {
       $paths = array();
       $bundleDirs = $this->container->getKernelService()->getBundleDirs();
@@ -112,23 +86,86 @@ class LoadDataFixturesDoctrineCommand extends DoctrineCommand
       $files = array_merge($files, $found);
     }
 
+    $ems = array();
+    $emEntities = array();
     $files = array_unique($files);
-
     foreach ($files as $file)
     {
+      $em = $defaultEm;
+      $output->writeln(sprintf('<info>Loading data fixtures from <comment>"%s"</comment></info>', $file));
+
       $before = array_keys(get_defined_vars());
       include($file);
       $after = array_keys(get_defined_vars());
       $new = array_diff($after, $before);
-      $entities = array_values($new);
-      unset($entities[array_search('before', $entities)]);
-      foreach ($entities as $entity) {
-        $em->persist($$entity);
+      $params = $em->getConnection()->getParams();
+      $emName = isset($params['path']) ? $params['path']:$params['dbname'];
+
+      $ems[$emName] = $em;
+      $emEntities[$emName] = array();
+      $variables = array_values($new);
+
+      foreach ($variables as $variable)
+      {
+        $value = $$variable;
+        if (!is_object($value) || $value instanceof \Doctrine\ORM\EntityManager)
+        {
+          continue;
+        }
+        $emEntities[$emName][] = $value;
       }
-      $em->flush();
+      foreach ($ems as $emName => $em)
+      {
+        if (!$input->getOption('append'))
+        {
+          $output->writeln(sprintf('<info>Purging data from entity manager named <comment>"%s"</comment></info>', $emName));
+          $this->purgeEntityManager($em);
+        }
+
+        $entities = $emEntities[$emName];
+        $numEntities = count($entities);
+        $output->writeln(sprintf('<info>Persisting "%s" '.($numEntities > 1 ? 'entities' : 'entity').'</info>', count($entities)));
+
+        foreach ($entities as $entity)
+        {
+          $output->writeln(sprintf('<info>Persisting "%s" entity:</info>', get_class($entity)));
+          $output->writeln('');
+          $output->writeln(var_dump($entity));
+
+          $em->persist($entity);
+        }
+        $output->writeln('<info>Flushing entity manager</info>');
+        $em->flush();
+      }
     }
   }
   
+  protected function purgeEntityManager(EntityManager $em)
+  {
+    $classes = array();
+    $metadatas = $em->getMetadataFactory()->getAllMetadata();
+
+    foreach ($metadatas as $metadata)
+    {
+      if (!$metadata->isMappedSuperclass)
+      {
+        $classes[] = $metadata;
+      }
+    }
+    $cmf = $em->getMetadataFactory();
+    $classes = $this->getCommitOrder($em, $classes);
+    for ($i = count($classes) - 1; $i >= 0; --$i)
+    {
+      $class = $classes[$i];
+      if ($cmf->hasMetadataFor($class->name))
+      {
+        try {
+          $em->createQuery('DELETE FROM '.$class->name.' a')->execute();
+        } catch (Exception $e) {}
+      }
+    }
+  }
+
   protected function getCommitOrder(EntityManager $em, array $classes)
   {
     $calc = new CommitOrderCalculator;

@@ -1,0 +1,191 @@
+DoctrineBundle
+--------------
+
+This document describes some of the functionality provided by the 
+**DoctrineBundle**. Doctrine 2 is a first class citizen in Symfony 2 and is 
+tightly integrated. Continue reading to learn how to use Doctrine 2 with the
+latest Symfony 2!
+
+## Configuration
+
+This section will help you with configuring your Symfony 2 project to enable
+the Doctrine DBAL and ORM services.
+
+### Database Abstraction Layer
+
+You can configure your database abstraction layer simply configuration a few 
+pieces of information about your database. If you only have one database you can
+do the following:
+
+    [yml]
+    doctrine.dbal:
+      dbname: symfony_guestbook
+      user: root
+      password: ~
+
+Or if you have multiple connections and want to customize the configuration of the
+connection further you can use the following:
+
+    [yml]
+    doctrine.dbal:
+      default_connection:       default
+      connections:
+        default:
+          driver:               PDOSqlite     # PDOSqlite, PDOMySql, PDOMsSql, PDOOracle, PDOPgSql, OCI8
+          dbname:               symfony
+          user:                 root
+          password:             null
+          host:                 localhost
+          port:                 ~
+          path:                 %kernel.data_dir%/symfony.sqlite
+          event_manager_class:  Doctrine\Common\EventManager
+          configuration_class:  Doctrine\DBAL\Configuration
+          wrapper_class:        ~
+          options:              []
+
+### Object Relational Mapper
+
+If you want to enable the Doctrine 2 ORM you can do so with the following:
+
+    doctrine.orm:
+      default_entity_manager:   default
+      metadata_driver:          xml           # xml, yml, annotation
+      cache_driver:             apc           # array, apc, memcache, xcache
+      entity_managers:
+        default:
+          connection:           default
+
+It's pretty simple, you can specify which entity managers you want to instantiate
+for which connections and also configure some other information about the ORM
+like what type of mapping files to use or what cache driver to use.
+
+## Creating a Bundle
+
+To get started we need to create a new bundle:
+
+    $ php console init:bundle "Bundle\\GuestbookBundle"
+    Initializing bundle "GuestbookBundle" in "/path/to/symfony-sandbox/src/Bundle"
+
+Now basically the most important thing to know about using Doctrine 2 with Symfony
+is where to put your mapping information files, where your entity classes are and 
+a few commands to help move things faster!
+
+## Mapping Information
+
+You can place all your mapping information inside a bundle. Below is an example
+path for the **GuestbookBundle** we created above:
+
+    /path/to/symfony-sandbox/src/Bundle/GuestbookBundle/Resources/config/doctrine/metadata
+
+Any files found in here that have a suffix of **.dcm.xml** (or whatever
+mapping_driver you picked) are used as your entities mapping information.
+
+In the **GuestbookBundle** we have a file named **Bundle.GuestbookBundle.Entities.Entry.dcm.xml**
+which contains the following XML:
+
+    <?xml version="1.0" encoding="UTF-8"?>
+
+    <doctrine-mapping xmlns="http://doctrine-project.org/schemas/orm/doctrine-mapping"
+          xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+          xsi:schemaLocation="http://doctrine-project.org/schemas/orm/doctrine-mapping
+                              http://www.doctrine-project.org/schemas/orm/doctrine-mapping.xsd">
+
+        <entity name="Bundle\GuestbookBundle\Entities\Entry" table="guestbook_entry">
+
+            <id name="id" type="integer" column="id">
+                <generator strategy="AUTO"/>
+            </id>
+
+            <field name="createdAt" column="created_at" type="datetime" />
+            <field name="name" column="name" type="string" length="255" />
+            <field name="emailAddress" column="email_address" type="string" length="255" />
+            <field name="body" column="body" type="text" />
+
+        </entity>
+
+    </doctrine-mapping>
+
+## Building Entities
+
+Doctrine can help you a little bit by generating the entity classes for your 
+mapping information with the command:
+
+    $ php console doctrine:build-entities
+
+Now if you have a look in the bundles **Entities** directory you will see a new
+file named **Entry.php** with some code like the following:
+
+    [php]
+    // Bundle/GuestbookBundle/Entities/Entry.php
+
+    namespace Bundle\GuestbookBundle\Entities;
+
+    /**
+     * @Entity
+     * @Table(name="guestbook_entry")
+     */
+    class Entry
+    {
+        /**
+         * @Column(name="created_at", type="datetime")
+         */
+        private $createdAt;
+
+        /**
+         * @Column(name="name", type="string", length=255)
+         */
+        private $name;
+
+    // ...
+
+> **NOTE**
+> If you modify your mapping information and re-run the build entities command
+> it will modify the classes and update them based on the mapping information.
+
+## Commands
+
+The Doctrine 2 CLI is integrated with the Symfony 2 CLI so we have all the common
+commands we need to make working with Doctrine 2 just as easy and fast as before!
+
+    $ php console list doctrine
+
+    Available commands for the "doctrine" namespace:
+      :build                       Build task for easily re-building your Doctrine development environment.
+      :build-entities              Build all Bundle entity classes from mapping information.
+      :clear-cache                 Clear cache from configured query, result and metadata drivers. (doctrine:cc)
+      :convert-mapping             Convert mapping information between supported formats.
+      :database-tool               Create and drop the configured databases.
+      :ensure-production-settings  Verify that Doctrine is properly configured for a production environment.
+      :generate-proxies            Generates proxy classes for entity classes.
+      :load-data-fixtures          Load data fixtures to your database.
+      :run-dql                     Executes arbitrary DQL directly from the command line.
+      :run-sql                     Executes arbitrary SQL from a file or directly from the command line.
+      :schema-tool                 Processes the schema and either apply it directly on EntityManager or generate the SQL output.
+      :version                     Displays the current installed Doctrine version.
+
+The development workflow is very similar to how it is in Symfony 1.4. You can modify 
+your mapping information and use **doctrine:build --all** to re-build your 
+environment:
+
+    php console doctrine:build --all
+
+The recommend way to work is to re-build your entities and update your database
+schema:
+
+    php console doctrine:build --entities --and-update-schema
+
+Now any changes you made in your mapping information will be reflected in the 
+according databases! Here are all the available options for the **build** task:
+
+    $ php console help doctrine:build
+    Usage:
+     Symfony doctrine:build [--all] [--all-classes] [--entities] [--db] [--and-load[="..."]] [--and-append[="..."]] [--and-update-schema] [--dump-sql] [--connection]
+
+    Options:
+     --all   Build everything and reset the database
+     --entities Build model classes
+     --db    Drop database, create database and create schema.
+     --and-load Load data fixtures (multiple values allowed)
+     --and-append Load data fixtures and append to existing data (multiple values allowed)
+     --and-update-schema Update schema after rebuilding all classes
+     --connection The connection to use.

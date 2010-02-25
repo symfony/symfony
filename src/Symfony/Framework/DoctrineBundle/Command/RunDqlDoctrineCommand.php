@@ -40,6 +40,7 @@ class RunDqlDoctrineCommand extends DoctrineCommand
       ->setDescription('Executes arbitrary DQL directly from the command line.')
       ->addOption('dql', null, null, 'The DQL query to run.')
       ->addOption('depth', null, null, 'The depth to output the data to.')
+      ->addOption('connection', null, null, 'The connection to use.')
     ;
   }
 

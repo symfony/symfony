@@ -5,7 +5,6 @@
     xsi:schemaLocation="http://www.symfony-project.org/schema/dic/services http://www.symfony-project.org/schema/dic/services/services-1.0.xsd">
 
   <parameters>
-    <parameter key="doctrine.orm.metadata_driver">xml</parameter>
     <parameter key="doctrine.orm.cache_driver">array</parameter>
     <parameter key="doctrine.orm.cache.memcache.host">localhost</parameter>
     <parameter key="doctrine.orm.cache.memcache.port">11211</parameter>

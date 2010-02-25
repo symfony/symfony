@@ -7,6 +7,7 @@ use Symfony\Components\DependencyInjection\Loader\XmlFileLoader;
 use Symfony\Components\DependencyInjection\BuilderConfiguration;
 use Symfony\Components\DependencyInjection\Definition;
 use Symfony\Components\DependencyInjection\Reference;
+use Symfony\Components\DependencyInjection\Container;
 
 /*
  * This file is part of the symfony framework.
@@ -32,6 +33,11 @@ class DoctrineExtension extends LoaderExtension
   );
 
   protected $alias;
+
+  public function __construct(Container $container)
+  {
+    $this->container = $container;
+  }
 
   public function setAlias($alias)
   {
@@ -188,6 +194,29 @@ class DoctrineExtension extends LoaderExtension
         $configuration->setDefinition(sprintf('doctrine.orm.%s_cache', $driver), $clone);
       }
 
+      // configure metadata driver for each bundle based on the type of mapping files found
+      $mappingDriverDef = new Definition('Doctrine\ORM\Mapping\Driver\DriverChain');
+      $bundleEntityMappings = array();
+      $bundleDirs = $this->container->getParameter('kernel.bundle_dirs');
+      foreach ($this->container->getParameter('kernel.bundles') as $className)
+      {
+        $tmp = dirname(str_replace('\\', '/', $className));
+        $namespace = str_replace('/', '\\', dirname($tmp));
+        $class = basename($tmp);
+
+        if (isset($bundleDirs[$namespace]) && is_dir($dir = $bundleDirs[$namespace].'/'.$class.'/Resources/config/doctrine/metadata'))
+        {
+          $type = $this->detectMappingType($dir);
+          $mappingDriverDef->addMethodCall('addDriver', array(
+              new Reference(sprintf('doctrine.orm.metadata_driver.%s', $type)),
+              $namespace.'\\'.$class.'\\Entities'
+            )
+          );
+        }
+      }
+
+      $configuration->setDefinition('doctrine.orm.metadata_driver', $mappingDriverDef);
+
       $methods = array(
         'setMetadataCacheImpl' => new Reference('doctrine.orm.metadata_cache'),
         'setQueryCacheImpl' => new Reference('doctrine.orm.query_cache'),
@@ -228,14 +257,6 @@ class DoctrineExtension extends LoaderExtension
     }
 
     $configuration->setAlias(
-      'doctrine.orm.metadata_driver',
-      sprintf(
-        'doctrine.orm.metadata_driver.%s',
-        $configuration->getParameter('doctrine.orm.metadata_driver')
-      )
-    );
-
-    $configuration->setAlias(
       'doctrine.orm.cache',
       sprintf(
         'doctrine.orm.cache.%s',
@@ -244,6 +265,26 @@ class DoctrineExtension extends LoaderExtension
     );
 
     return $configuration;
+  }
+
+  /**
+   * Detect the type of Doctrine 2 mapping files located in a given directory.
+   * Simply finds the first file in a directory and returns the extension. If no
+   * mapping files are found then the annotation type is returned.
+   *
+   * @param string $dir
+   * @return string $type
+   */
+  protected function detectMappingType($dir)
+  {
+    $files = glob($dir.'/*.*');
+    if (!$files)
+    {
+      return 'annotation';
+    }
+    $info = pathinfo($files[0]);
+
+    return $info['extension'];
   }
 
   /**

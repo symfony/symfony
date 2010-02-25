@@ -28,7 +28,7 @@ class Bundle extends BaseBundle
 {
   public function buildContainer(ContainerInterface $container)
   {
-    Loader::registerExtension(new DoctrineExtension());
+    Loader::registerExtension(new DoctrineExtension($container));
 
     $metadataDirs = array();
     $entityDirs = array();

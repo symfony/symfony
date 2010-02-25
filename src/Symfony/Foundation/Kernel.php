@@ -225,9 +225,9 @@ abstract class Kernel
     $parameters = array();
     foreach ($_SERVER as $key => $value)
     {
-      if ('SYMFONY__' === $key = substr($key, 0, 9))
+      if ('SYMFONY__' === substr($key, 0, 9))
       {
-        $parameters[strtolower(str_replace('__', '.', $key))] = $value;
+        $parameters[strtolower(str_replace('__', '.', substr($key, 9)))] = $value;
       }
     }
 

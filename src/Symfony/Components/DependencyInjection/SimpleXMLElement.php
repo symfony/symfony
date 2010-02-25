@@ -65,23 +65,24 @@ class SimpleXMLElement extends \SimpleXMLElement
   static public function phpize($value)
   {
     $value = (string) $value;
+    $lowercaseValue = strtolower($value);
 
     switch (true)
     {
-      case 'null' == strtolower($value):
+      case 'null' === $lowercaseValue:
         return null;
       case ctype_digit($value):
         return '0' == $value[0] ? octdec($value) : intval($value);
-      case 'true' === strtolower($value):
+      case 'true' === $lowercaseValue:
         return true;
-      case 'false' === strtolower($value):
+      case 'false' === $lowercaseValue:
         return false;
       case is_numeric($value):
         return '0x' == $value[0].$value[1] ? hexdec($value) : floatval($value);
       case preg_match('/^(-|\+)?[0-9,]+(\.[0-9]+)?$/', $value):
         return floatval(str_replace(',', '', $value));
       default:
-        return (string) $value;
+        return $value;
     }
   }
 }

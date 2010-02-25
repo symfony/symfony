@@ -373,6 +373,12 @@ abstract class Kernel
   abstract public function registerRoutes();
 
   
+  public function isBooted()
+  {
+    return $this->booted;
+  }
+
+  
   public function boot()
   {
     if (true === $this->booted)

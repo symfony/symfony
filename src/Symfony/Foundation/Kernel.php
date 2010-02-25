@@ -84,6 +84,16 @@ abstract class Kernel
   abstract public function registerRoutes();
 
   /**
+   * Checks whether the current kernel has been booted or not.
+   *
+   * @return boolean $booted
+   */
+  public function isBooted()
+  {
+    return $this->booted;
+  }
+
+  /**
    * Boots the current kernel.
    *
    * This method boots the bundles, which MUST set

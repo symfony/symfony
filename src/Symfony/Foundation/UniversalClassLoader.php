@@ -12,7 +12,7 @@ namespace Symfony\Foundation;
  */
 
 /**
- * UniversalClassLoader implements a "universal" autoloder for PHP 5.3.
+ * UniversalClassLoader implements a "universal" autoloader for PHP 5.3.
  *
  * It is able to load classes that use either:
  *

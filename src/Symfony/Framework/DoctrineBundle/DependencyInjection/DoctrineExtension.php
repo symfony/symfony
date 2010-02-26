@@ -204,14 +204,29 @@ class DoctrineExtension extends LoaderExtension
         $namespace = str_replace('/', '\\', dirname($tmp));
         $class = basename($tmp);
 
-        if (isset($bundleDirs[$namespace]) && is_dir($dir = $bundleDirs[$namespace].'/'.$class.'/Resources/config/doctrine/metadata'))
+        if (isset($bundleDirs[$namespace]))
         {
-          $type = $this->detectMappingType($dir);
-          $mappingDriverDef->addMethodCall('addDriver', array(
-              new Reference(sprintf('doctrine.orm.metadata_driver.%s', $type)),
-              $namespace.'\\'.$class.'\\Entities'
-            )
-          );
+          if (is_dir($dir = $bundleDirs[$namespace].'/'.$class.'/Resources/config/doctrine/metadata'))
+          {
+            $type = $this->detectMappingType($dir);
+          }
+          elseif (is_dir($dir = $bundleDirs[$namespace].'/'.$class.'/Entities'))
+          {
+            $type = 'annotation';
+          }
+          else
+          {
+            $type = false;
+          }
+
+          if (false !== $type)
+          {
+            $mappingDriverDef->addMethodCall('addDriver', array(
+                new Reference(sprintf('doctrine.orm.metadata_driver.%s', $type)),
+                $namespace.'\\'.$class.'\\Entities'
+              )
+            );
+          }
         }
       }
 

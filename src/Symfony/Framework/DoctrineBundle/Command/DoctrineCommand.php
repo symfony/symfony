@@ -33,6 +33,7 @@ use Doctrine\Common\Cli\CliController as DoctrineCliController;
 abstract class DoctrineCommand extends Command
 {
   protected
+    $application,
     $cli,
     $em;
 
@@ -80,12 +81,16 @@ abstract class DoctrineCommand extends Command
 
   protected function runCommand($name, array $input = array())
   {
+    if ($this->application === null)
+    {
+      $this->application = new Application($this->container->getKernelService());
+    }
+
     $arguments = array();
     $arguments = array_merge(array($name), $input);
     $input = new ArrayInput($arguments);
-    $application = new Application($this->container->getKernelService());
-    $application->setAutoExit(false);
-    $application->run($input);
+    $this->application->setAutoExit(false);
+    $this->application->run($input);
   }
 
   /**

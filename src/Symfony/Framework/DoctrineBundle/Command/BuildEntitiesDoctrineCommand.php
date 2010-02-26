@@ -46,21 +46,32 @@ class BuildEntitiesDoctrineCommand extends DoctrineCommand
    */
   protected function execute(InputInterface $input, OutputInterface $output)
   {
-    foreach ($this->container->getParameter('kernel.bundle_dirs') as $bundle => $path)
+    $dirs = array();
+    $bundleDirs = $this->container->getKernelService()->getBundleDirs();
+    foreach ($this->container->getKernelService()->getBundles() as $bundle)
     {
-      $bundles = glob($path.'/*Bundle');
-      foreach ($bundles as $p)
+      $tmp = dirname(str_replace('\\', '/', get_class($bundle)));
+      $namespace = str_replace('/', '\\', dirname($tmp));
+      $class = basename($tmp);
+
+      if (isset($bundleDirs[$namespace]))
       {
-        if (!is_dir($metadataPath = $p.'/Resources/config/doctrine/metadata'))
+        if (is_dir($dir = $bundleDirs[$namespace].'/'.$class.'/Entities'))
         {
-          continue;
+          $this->convertMapping($dir, $bundleDirs[$namespace].'/..');
+        } else if (is_dir($dir = $bundleDirs[$namespace].'/'.$class.'/Resources/config/doctrine/metadata')) {
+          $this->convertMapping($dir, $bundleDirs[$namespace].'/..');
         }
-        $opts = array();
-        $opts['--from'] = $metadataPath;
-        $opts['--to'] = 'annotation';
-        $opts['--dest'] = realpath($path.'/..');
-        $this->runCommand('doctrine:convert-mapping', $opts);
       }
     }
+  }
+
+  protected function convertMapping($mappingPath, $dest)
+  {
+    $opts = array();
+    $opts['--from'] = $mappingPath;
+    $opts['--to'] = 'annotation';
+    $opts['--dest'] = realpath($dest);
+    $this->runCommand('doctrine:convert-mapping', $opts);
   }
 }

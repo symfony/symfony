@@ -14,7 +14,7 @@ use Symfony\Components\DependencyInjection\ContainerInterface;
  */
 
 /**
- * 
+ * WebBundle Controller gives you convenient access to all commonly needed services.
  *
  * @package    symfony
  * @author     Fabien Potencier <fabien.potencier@symfony-project.com>
@@ -36,11 +36,6 @@ class Controller
   public function getUser()
   {
     return $this->container->getUserService();
-  }
-
-  public function getDatabaseConnection()
-  {
-    return $this->container->getDatabaseConnectionService();
   }
 
   public function getMailer()

@@ -16,25 +16,65 @@ use Symfony\Components\RequestHandler\Exception\NotFoundHttpException;
  */
 
 /**
- * 
+ * Doctrine ORM controller gives you access to entity managers and DQL queries.
  *
  * @package    symfony
  * @author     Fabien Potencier <fabien.potencier@symfony-project.com>
+ * @author     Jonathan H. Wage <jonwage@gmail.com>
  */
 class DoctrineController extends Controller
 {
-  protected function getEntityManager()
+  public function getDatabaseConnection($name = null)
   {
-    return $this->container->getDoctrine_ORM_EntityManagerService();
+    if ($name)
+    {
+      return $this->container->getService(sprintf('doctrine.dbal.%s_connection', $name));
+    }
+    else
+    {
+      return $this->container->getDatabaseConnectionService();
+    }
   }
 
-  public function createQueryBuilder()
+  /**
+   * Get the default entity manager service or the entity manager 
+   * with the given name.
+   *
+   * @param string $name Optional entity manager service name 
+   * @return object $em
+   */
+  protected function getEntityManager($name = null)
   {
-    return $this->getEntityManager()->createQueryBuilder();
+    if ($name)
+    {
+      return $this->container->getService(sprintf('doctrine.orm.%s_entity_manager', $name));
+    }
+    else
+    {
+      return $this->container->getDoctrine_ORM_EntityManagerService();
+    }
   }
 
-  public function createQuery($dql = '')
+  /**
+   * Create a new QueryBuilder instance.
+   *
+   * @param string $name Optional entity manager service name 
+   * @return object QueryBuilder
+   */
+  public function createQueryBuilder($name = null)
   {
-    return $this->getEntityManager()->createQuery($dql);
+    return $this->getEntityManager($name)->createQueryBuilder();
+  }
+
+  /**
+   * Create a new Query instance.
+   *
+   * @param string $dql Optional Dql string to create the query from
+   * @param string $name Optional entity manager service name 
+   * @return object QueryBuilder
+   */
+  public function createQuery($dql = '', $name = null)
+  {
+    return $this->getEntityManager($name)->createQuery($dql);
   }
 }

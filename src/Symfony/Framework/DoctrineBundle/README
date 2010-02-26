@@ -59,7 +59,6 @@ If you want to enable the Doctrine 2 ORM you can do so with the following:
 
     doctrine.orm:
       default_entity_manager:   default
-      metadata_driver:          xml           # xml, yml, annotation
       cache_driver:             apc           # array, apc, memcache, xcache
       entity_managers:
         default:
@@ -157,6 +156,8 @@ file named **Entry.php** with some code like the following:
 The Doctrine 2 CLI is integrated with the Symfony 2 CLI so we have all the common
 commands we need to make working with Doctrine 2 just as easy and fast as before!
 
+### Listing Available Doctrine Commands
+
     $ php console list doctrine
 
     Available commands for the "doctrine" namespace:
@@ -167,11 +168,44 @@ commands we need to make working with Doctrine 2 just as easy and fast as before
       :database-tool               Create and drop the configured databases.
       :ensure-production-settings  Verify that Doctrine is properly configured for a production environment.
       :generate-proxies            Generates proxy classes for entity classes.
+      :import-mapping              Import the initial mapping information for entities from an existing database.
+      :init-entity                 Initialize a new Doctrine entity inside a bundle.
       :load-data-fixtures          Load data fixtures to your database.
       :run-dql                     Executes arbitrary DQL directly from the command line.
       :run-sql                     Executes arbitrary SQL from a file or directly from the command line.
       :schema-tool                 Processes the schema and either apply it directly on EntityManager or generate the SQL output.
       :version                     Displays the current installed Doctrine version.
+
+### Schema Tool
+
+The schema tool in Doctrine 2 allows you to easily drop and your create your 
+database schemas for your mapping information.
+
+You can easily create your initial schema from mapping information:
+
+    php console doctrine:schema-tool --create
+
+Or if you want to then drop your schema you can do:
+
+    php console doctrine:schema-tool --drop
+
+If you want to re-create it (drop and create) you can use:
+
+    php console doctrine:schema-tool --re-create
+
+Now the scenario arrises where you want to change your mapping information and
+update your database without blowing away everything and losing your existing data.
+You can do the following for that:
+
+    php console doctrine:schema-tool --update
+
+> **TIP**
+> The above will not drop anything from your database schema. To drop the remaining
+> things from your schema you need to use the **--complete-update** option.
+>
+>     php console doctrine:schema-tool --complete-update
+
+### Doctrine Build Command
 
 The development workflow is very similar to how it is in Symfony 1.4. You can modify 
 your mapping information and use **doctrine:build --all** to re-build your 
@@ -187,6 +221,11 @@ schema:
 Now any changes you made in your mapping information will be reflected in the 
 according databases! Here are all the available options for the **build** task:
 
+> **NOTE**
+> Not the key difference here is that you can modify your schema during development
+> and just update your database schema without having to blow everything away and 
+> re-build it all.
+
     $ php console help doctrine:build
     Usage:
      Symfony doctrine:build [--all] [--all-classes] [--entities] [--db] [--and-load[="..."]] [--and-append[="..."]] [--and-update-schema] [--dump-sql] [--connection]
@@ -199,3 +238,19 @@ according databases! Here are all the available options for the **build** task:
      --and-append Load data fixtures and append to existing data (multiple values allowed)
      --and-update-schema Update schema after rebuilding all classes
      --connection The connection to use.
+
+### Doctrine Init Entity Command
+
+You can easily initialize a new Doctrine entity for a bundle by using the 
+**doctrine:init-bundle** command:
+
+    $ php console doctrine:init-entity --bundle="Bundle\MySampleBundle" --entity="User\Group"
+
+Now if you have a look inside the bundle you will see that you have a **Group** class
+located here **Bundle/MySampleBundle/Entities/User/Group.php**.
+
+Now you can customize the mapping information for the entity by editing the metadata
+information inside **Bundle/MySampleBundle/Resources/config/doctrine/metadata** and
+just update your database schema:
+
+    $ php console doctrine:schema-tool --update

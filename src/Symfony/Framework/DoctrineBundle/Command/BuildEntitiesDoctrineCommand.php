@@ -56,10 +56,12 @@ class BuildEntitiesDoctrineCommand extends DoctrineCommand
 
       if (isset($bundleDirs[$namespace]))
       {
-        if (is_dir($dir = $bundleDirs[$namespace].'/'.$class.'/Entities'))
+        if (is_dir($dir = $bundleDirs[$namespace].'/'.$class.'/Resources/config/doctrine/metadata'))
         {
           $this->convertMapping($dir, $bundleDirs[$namespace].'/..');
-        } else if (is_dir($dir = $bundleDirs[$namespace].'/'.$class.'/Resources/config/doctrine/metadata')) {
+        }
+        else if (is_dir($dir = $bundleDirs[$namespace].'/'.$class.'/Entities'))
+        {
           $this->convertMapping($dir, $bundleDirs[$namespace].'/..');
         }
       }

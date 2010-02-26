@@ -55,6 +55,27 @@ class BuildDoctrineCommand extends DoctrineCommand
       ->addOption('and-append', null, InputOption::PARAMETER_OPTIONAL | InputOption::PARAMETER_IS_ARRAY, 'Load data fixtures and append to existing data')
       ->addOption('and-update-schema', null, null, 'Update schema after rebuilding all classes')
       ->addOption('connection', null, null, 'The connection to use.')
+      ->setHelp('
+The <info>doctrine:build</info> task builds your Doctrine development environment.
+
+  <info>php console doctrine:build --all</info>
+
+The above command will re-build your entities and re-create your database schema.
+
+If you wanted to only update your schema instead of re-creating it you can run
+the following:
+
+  <info>php console doctrine:build --entities --and-update-schema</info>
+
+Now your entities are re-built and your database schema is up to date!
+
+You can also use the <info>--and-load</info> and <info>--and-append</info> to
+load data fixtures after running another build option.
+
+  <info>php console doctrine:build --all --and-load</info>
+
+The above will re-build everything and load all bundle data fixtures.
+')
     ;
   }
 

@@ -116,7 +116,7 @@ class Engine extends BaseEngine
   // Bundle:controller:action(:renderer)
   protected function splitTemplateName($name)
   {
-    $parts = explode(':', $name, 3);
+    $parts = explode(':', $name, 4);
 
     $options = array(
       'bundle'     => str_replace('\\', '/', $parts[0]),

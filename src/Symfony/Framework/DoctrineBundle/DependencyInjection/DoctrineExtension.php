@@ -213,6 +213,17 @@ class DoctrineExtension extends LoaderExtension
           elseif (is_dir($dir = $bundleDirs[$namespace].'/'.$class.'/Entities'))
           {
             $type = 'annotation';
+
+            $reader = new \Doctrine\Common\Annotations\AnnotationReader();
+            $reader->setDefaultAnnotationNamespace('Doctrine\\ORM\\Mapping\\');
+            $annotationDriver = new \Doctrine\ORM\Mapping\Driver\AnnotationDriver($reader, $dir);
+            $classNames = $annotationDriver->getAllClassNames();
+            foreach ($classNames as $className)
+            {
+              $alias = substr_replace($className, '', 0, strpos($className, '\\') + 1);
+              $alias = str_replace('\Entities\\', '\\', $alias);
+              $ormConfigDef->addMethodCall('addEntityAlias', array($className, $alias));
+            }
           }
           else
           {

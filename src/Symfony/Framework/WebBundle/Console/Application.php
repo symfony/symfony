@@ -18,7 +18,7 @@ use Symfony\Foundation\Kernel;
  */
 
 /**
- * 
+ *
  *
  * @package    symfony
  * @author     Fabien Potencier <fabien.potencier@symfony-project.com>
@@ -95,7 +95,7 @@ class Application extends BaseApplication
         // look for commands
         foreach (new \RecursiveIteratorIterator(new \RecursiveDirectoryIterator($commandDir), \RecursiveIteratorIterator::LEAVES_ONLY) as $file)
         {
-          if ($file->isDir() || strpos($file, -4) !== '.php')
+          if ($file->isDir() || substr($file, -4) !== '.php')
           {
             continue;
           }

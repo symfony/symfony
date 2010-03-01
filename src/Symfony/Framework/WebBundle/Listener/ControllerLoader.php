@@ -85,7 +85,7 @@ class ControllerLoader
       {
         if (null !== $this->logger)
         {
-          $logs[] = sprintf('Failed finding controller "%s:%s" from namespace "%s"', $bundle, $controller, $namespace);
+          $logs[] = sprintf('Failed finding controller "%s:%s" from namespace "%s" (%s)', $bundle, $controller, $namespace, $try);
         }
       }
       else

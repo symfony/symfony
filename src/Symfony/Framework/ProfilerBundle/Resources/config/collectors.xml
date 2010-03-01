@@ -6,6 +6,8 @@
 
   <parameters>
     <parameter key="data_collector_manager.class">Symfony\Framework\ProfilerBundle\DataCollector\DataCollectorManager</parameter>
+    <parameter key="data_collector_manager.storage.class">Symfony\Framework\ProfilerBundle\ProfilerStorage</parameter>
+    <parameter key="data_collector_manager.storage.file">%kernel.cache_dir%/profiler.db</parameter>
     <parameter key="data_collector_manager.lifetime">86400</parameter>
     <parameter key="data_collector.config.class">Symfony\Framework\ProfilerBundle\DataCollector\ConfigDataCollector</parameter>
     <parameter key="data_collector.app.class">Symfony\Framework\ProfilerBundle\DataCollector\AppDataCollector</parameter>
@@ -17,7 +19,12 @@
     <service id="data_collector_manager" class="%data_collector_manager.class%">
       <annotation name="kernel.listener" event="core.response" method="handle" />
       <argument type="service" id="service_container" />
+      <argument type="service" id="data_collector_manager.storage" />
       <argument>%data_collector_manager.lifetime%</argument>
+    </service>
+
+    <service id="data_collector_manager.storage" class="%data_collector_manager.storage.class%">
+      <argument>%data_collector_manager.storage.file%</argument>
     </service>
 
     <service id="data_collector.config" class="%data_collector.config.class%">

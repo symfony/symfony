@@ -58,6 +58,16 @@ class UniversalClassLoader
   protected $namespaces = array();
   protected $prefixes = array();
 
+  public function getNamespaces()
+  {
+    return $this->namespaces;
+  }
+
+  public function getPrefixes()
+  {
+    return $this->prefixes;
+  }
+
   /**
    * Registers an array of namespaces
    *

@@ -5,7 +5,7 @@ namespace Symfony\Framework\ProfilerBundle\DataCollector;
 use Symfony\Components\DependencyInjection\ContainerInterface;
 use Symfony\Components\EventDispatcher\Event;
 use Symfony\Components\RequestHandler\Response;
-use Symfony\Framework\ProfilerBundle\RequestDebugData;
+use Symfony\Framework\ProfilerBundle\ProfilerStorage;
 
 /*
  * This file is part of the symfony framework.
@@ -25,16 +25,16 @@ use Symfony\Framework\ProfilerBundle\RequestDebugData;
 class DataCollectorManager
 {
   protected $container;
-  protected $requestDebugData;
+  protected $profilerStorage;
   protected $collectors;
   protected $response;
   protected $lifetime;
 
-  public function __construct(ContainerInterface $container, $lifetime = 86400)
+  public function __construct(ContainerInterface $container, ProfilerStorage $profilerStorage, $lifetime = 86400)
   {
     $this->container = $container;
     $this->lifetime = $lifetime;
-    $this->requestDebugData = new RequestDebugData(uniqid(), $this->container->getParameter('kernel.cache_dir').'/debug.db');
+    $this->profilerStorage = $profilerStorage;
     $this->collectors = $this->initCollectors();
   }
 
@@ -57,15 +57,15 @@ class DataCollectorManager
     {
       $data[$name] = $collector->getData();
     }
-    $this->requestDebugData->write($data);
-    $this->requestDebugData->purge($this->lifetime);
+    $this->profilerStorage->write($data);
+    $this->profilerStorage->purge($this->lifetime);
 
     return $response;
   }
 
-  public function getRequestDebugData()
+  public function getProfilerStorage()
   {
-    return $this->requestDebugData;
+    return $this->profilerStorage;
   }
 
   public function getResponse()

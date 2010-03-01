@@ -26,7 +26,7 @@ class ConfigDataCollector extends DataCollector
     $kernel = $this->container->getKernelService();
 
     return array(
-      'token'           => $this->manager->getRequestDebugData()->getToken(),
+      'token'           => $this->manager->getProfilerStorage()->getToken(),
       'symfony_version' => Kernel::VERSION,
       'name'            => $kernel->getName(),
       'env'             => $kernel->getEnvironment(),

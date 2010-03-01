@@ -17,16 +17,16 @@ namespace Symfony\Framework\ProfilerBundle;
  * @package    symfony
  * @author     Fabien Potencier <fabien.potencier@symfony-project.com>
  */
-class RequestDebugData
+class ProfilerStorage
 {
   protected $token;
   protected $data;
   protected $store;
 
-  public function __construct($token, $store)
+  public function __construct($store, $token = null)
   {
-    $this->token = $token;
     $this->store = $store;
+    $this->token = null === $token ? uniqid() : $token;
     $this->data = null;
   }
 

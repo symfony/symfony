@@ -76,24 +76,12 @@ EOF;
 
   protected function addServiceReturn($id, $definition)
   {
-    if ($definition->isShared())
-    {
-      return <<<EOF
-
-    return \$this->shared['$id'] = \$instance;
-  }
-
-EOF;
-    }
-    else
-    {
-      return <<<EOF
+    return <<<EOF
 
     return \$instance;
   }
 
 EOF;
-    }
   }
 
   protected function addServiceInstance($id, $definition)
@@ -108,19 +96,23 @@ EOF;
 
     if (null !== $definition->getConstructor())
     {
-      return sprintf("    \$instance = call_user_func(array(%s, '%s')%s);\n", $class, $definition->getConstructor(), $arguments ? ', '.implode(', ', $arguments) : '');
+      $code = sprintf("    \$instance = call_user_func(array(%s, '%s')%s);\n", $class, $definition->getConstructor(), $arguments ? ', '.implode(', ', $arguments) : '');
+    }
+    elseif ($class != "'".str_replace('\\', '\\\\', $definition->getClass())."'")
+    {
+      $code = sprintf("    \$class = %s;\n    \$instance = new \$class(%s);\n", $class, implode(', ', $arguments));
     }
     else
     {
-      if ($class != "'".str_replace('\\', '\\\\', $definition->getClass())."'")
-      {
-        return sprintf("    \$class = %s;\n    \$instance = new \$class(%s);\n", $class, implode(', ', $arguments));
-      }
-      else
-      {
-        return sprintf("    \$instance = new %s(%s);\n", $definition->getClass(), implode(', ', $arguments));
-      }
+      $code = sprintf("    \$instance = new %s(%s);\n", $definition->getClass(), implode(', ', $arguments));
     }
+
+    if ($definition->isShared())
+    {
+      $code .= sprintf("    \$this->shared['$id'] = \$instance;\n");
+    }
+
+    return $code;
   }
 
   protected function addServiceMethodCalls($id, $definition)

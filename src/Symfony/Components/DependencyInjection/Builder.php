@@ -97,14 +97,7 @@ class Builder extends Container implements AnnotatedContainerInterface
 
       $this->loading[$id] = true;
 
-      if ($definition->isShared())
-      {
-        $service = $this->services[$id] = $this->createService($definition);
-      }
-      else
-      {
-        $service = $this->createService($definition);
-      }
+      $service = $this->createService($definition, $id);
 
       unset($this->loading[$id]);
 
@@ -339,10 +332,11 @@ class Builder extends Container implements AnnotatedContainerInterface
    * Creates a service for a service definition.
    *
    * @param  Definition $definition A service definition instance
+   * @param  string     $id         The service identifier
    *
    * @return object              The service described by the service definition
    */
-  protected function createService(Definition $definition)
+  protected function createService(Definition $definition, $id)
   {
     if (null !== $definition->getFile())
     {
@@ -360,6 +354,11 @@ class Builder extends Container implements AnnotatedContainerInterface
     else
     {
       $service = null === $r->getConstructor() ? $r->newInstance() : $r->newInstanceArgs($arguments);
+    }
+
+    if ($definition->isShared())
+    {
+      $this->services[$id] = $service;
     }
 
     foreach ($definition->getMethodCalls() as $call)

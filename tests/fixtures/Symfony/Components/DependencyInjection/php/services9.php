@@ -61,9 +61,10 @@ class ProjectServiceContainer extends Container
     if (isset($this->shared['bar'])) return $this->shared['bar'];
 
     $instance = new FooClass('foo', $this->getFoo_BazService(), $this->getParameter('foo_bar'));
+    $this->shared['bar'] = $instance;
     $this->getFoo_BazService()->configure($instance);
 
-    return $this->shared['bar'] = $instance;
+    return $instance;
   }
 
   /**
@@ -79,9 +80,10 @@ class ProjectServiceContainer extends Container
     if (isset($this->shared['foo.baz'])) return $this->shared['foo.baz'];
 
     $instance = call_user_func(array($this->getParameter('baz_class'), 'getInstance'));
+    $this->shared['foo.baz'] = $instance;
     call_user_func(array($this->getParameter('baz_class'), 'configureStatic1'), $instance);
 
-    return $this->shared['foo.baz'] = $instance;
+    return $instance;
   }
 
   /**
@@ -98,8 +100,9 @@ class ProjectServiceContainer extends Container
 
     $class = $this->getParameter('foo_class');
     $instance = new $class();
+    $this->shared['foo_bar'] = $instance;
 
-    return $this->shared['foo_bar'] = $instance;
+    return $instance;
   }
 
   /**
@@ -115,6 +118,7 @@ class ProjectServiceContainer extends Container
     if (isset($this->shared['method_call1'])) return $this->shared['method_call1'];
 
     $instance = new FooClass();
+    $this->shared['method_call1'] = $instance;
     $instance->setBar($this->getFooService());
     $instance->setBar($this->getService('foo', Container::NULL_ON_INVALID_REFERENCE));
     if ($this->hasService('foo'))
@@ -126,7 +130,7 @@ class ProjectServiceContainer extends Container
       $instance->setBar($this->getService('foobaz', Container::NULL_ON_INVALID_REFERENCE));
     }
 
-    return $this->shared['method_call1'] = $instance;
+    return $instance;
   }
 
   /**

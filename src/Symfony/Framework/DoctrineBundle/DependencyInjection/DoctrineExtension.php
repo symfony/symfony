@@ -7,7 +7,6 @@ use Symfony\Components\DependencyInjection\Loader\XmlFileLoader;
 use Symfony\Components\DependencyInjection\BuilderConfiguration;
 use Symfony\Components\DependencyInjection\Definition;
 use Symfony\Components\DependencyInjection\Reference;
-use Symfony\Components\DependencyInjection\Container;
 
 /*
  * This file is part of the symfony framework.
@@ -33,10 +32,13 @@ class DoctrineExtension extends LoaderExtension
   );
 
   protected $alias;
+  protected $bundleDirs;
+  protected $bundles;
 
-  public function __construct(Container $container)
+  public function __construct(array $bundleDirs, array $bundles)
   {
-    $this->container = $container;
+    $this->bundleDirs = $bundleDirs;
+    $this->bundles = $bundles;
   }
 
   public function setAlias($alias)
@@ -197,8 +199,8 @@ class DoctrineExtension extends LoaderExtension
       // configure metadata driver for each bundle based on the type of mapping files found
       $mappingDriverDef = new Definition('Doctrine\ORM\Mapping\Driver\DriverChain');
       $bundleEntityMappings = array();
-      $bundleDirs = $this->container->getParameter('kernel.bundle_dirs');
-      foreach ($this->container->getParameter('kernel.bundles') as $className)
+      $bundleDirs = $this->bundleDirs;
+      foreach ($this->bundles as $className)
       {
         $tmp = dirname(str_replace('\\', '/', $className));
         $namespace = str_replace('/', '\\', dirname($tmp));

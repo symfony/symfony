@@ -1,6 +1,6 @@
 <?php
 
-namespace Symfony\Framework\WebBundle\Debug;
+namespace Symfony\Framework\ProfilerBundle;
 
 /*
  * This file is part of the symfony framework.

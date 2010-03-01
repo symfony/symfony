@@ -1,6 +1,6 @@
 <?php
 
-namespace Symfony\Framework\WebBundle\Debug\DataCollector;
+namespace Symfony\Framework\ProfilerBundle\DataCollector;
 
 use Symfony\Foundation\Kernel;
 

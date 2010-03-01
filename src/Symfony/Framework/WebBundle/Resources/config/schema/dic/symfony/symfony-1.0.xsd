@@ -8,7 +8,6 @@
   <xsd:element name="web" type="web" />
   <xsd:element name="templating" type="templating" />
   <xsd:element name="user" type="user" />
-  <xsd:element name="debug" type="debug" />
 
   <xsd:complexType name="user">
     <xsd:sequence>
@@ -44,9 +43,5 @@
     <xsd:attribute name="assets_version" type="xsd:string" />
     <xsd:attribute name="path" type="xsd:string" />
     <xsd:attribute name="cache" type="xsd:string" />
-  </xsd:complexType>
-
-  <xsd:complexType name="debug">
-    <xsd:attribute name="toolbar" type="xsd:string" />
   </xsd:complexType>
 </xsd:schema>

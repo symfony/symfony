@@ -1,11 +1,11 @@
 <?php
 
-namespace Symfony\Framework\WebBundle\Debug\DataCollector;
+namespace Symfony\Framework\ProfilerBundle\DataCollector;
 
 use Symfony\Components\DependencyInjection\ContainerInterface;
 use Symfony\Components\EventDispatcher\Event;
 use Symfony\Components\RequestHandler\Response;
-use Symfony\Framework\WebBundle\Debug\RequestDebugData;
+use Symfony\Framework\ProfilerBundle\RequestDebugData;
 
 /*
  * This file is part of the symfony framework.
@@ -80,7 +80,7 @@ class DataCollectorManager
 
   public function initCollectors()
   {
-    $config = $this->container->findAnnotatedServiceIds('debug.collector');
+    $config = $this->container->findAnnotatedServiceIds('data_collector');
     $ids = array();
     $coreColectors = array();
     $userCollectors = array();

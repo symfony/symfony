@@ -27,7 +27,6 @@ class WebExtension extends LoaderExtension
   protected $resources = array(
     'templating' => 'templating.xml',
     'web'        => 'web.xml',
-    'debug'      => 'debug.xml',
     'user'       => 'user.xml',
   );
 
@@ -142,20 +141,6 @@ class WebExtension extends LoaderExtension
       $configuration->setDefinition('templating.loader.wrapped', $configuration->findDefinition('templating.loader'));
       $configuration->setDefinition('templating.loader', $configuration->getDefinition('templating.loader.cache'));
       $configuration->setParameter('templating.loader.cache.path', $config['cache']);
-    }
-
-    return $configuration;
-  }
-
-  public function debugLoad($config)
-  {
-    $configuration = new BuilderConfiguration();
-
-    if (isset($config['toolbar']) && $config['toolbar'])
-    {
-      $loader = new XmlFileLoader(__DIR__.'/../Resources/config');
-      $configuration->merge($loader->load('debug_data_collector.xml'));
-      $configuration->merge($loader->load('debug_web_debug_toolbar.xml'));
     }
 
     return $configuration;

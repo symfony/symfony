@@ -5,14 +5,14 @@
     xsi:schemaLocation="http://www.symfony-project.org/schema/dic/services http://www.symfony-project.org/schema/dic/services/services-1.0.xsd">
 
   <parameters>
-    <parameter key="debug.web_debug_toolbar.class">Symfony\Framework\WebBundle\Debug\WebDebugToolbar</parameter>
+    <parameter key="debug.toolbar.class">Symfony\Framework\ProfilerBundle\Listener\WebDebugToolbar</parameter>
   </parameters>
 
   <services>
-    <service id="debug.web_debug_toolbar" class="%debug.web_debug_toolbar.class%">
+    <service id="debug.toolbar" class="%debug.toolbar.class%">
       <annotation name="kernel.listener" event="core.response" method="handle" />
       <argument type="service" id="service_container" />
-      <argument type="service" id="debug.data_collector_manager" />
+      <argument type="service" id="data_collector_manager" />
     </service>
   </services>
 </container>

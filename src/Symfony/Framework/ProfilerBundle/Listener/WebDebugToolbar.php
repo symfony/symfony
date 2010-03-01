@@ -1,11 +1,11 @@
 <?php
 
-namespace Symfony\Framework\WebBundle\Debug;
+namespace Symfony\Framework\ProfilerBundle\Listener;
 
 use Symfony\Components\DependencyInjection\ContainerInterface;
 use Symfony\Components\EventDispatcher\Event;
 use Symfony\Components\RequestHandler\Response;
-use Symfony\Framework\WebBundle\Debug\DataCollector\DataCollectorManager;
+use Symfony\Framework\ProfilerBundle\DataCollector\DataCollectorManager;
 
 /*
  * This file is part of the symfony framework.

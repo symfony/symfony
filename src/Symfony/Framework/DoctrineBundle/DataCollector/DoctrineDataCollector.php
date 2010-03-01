@@ -1,8 +1,8 @@
 <?php
 
-namespace Symfony\Framework\DoctrineBundle\Debug;
+namespace Symfony\Framework\DoctrineBundle\DataCollector;
 
-use Symfony\Framework\WebBundle\Debug\DataCollector\DataCollector;
+use Symfony\Framework\ProfilerBundle\DataCollector\DataCollector;
 
 /*
  * This file is part of the symfony framework.

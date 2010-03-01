@@ -130,6 +130,18 @@ abstract class Input implements InputInterface
   }
 
   /**
+   * Returns true if an InputArgument object exists by name or position.
+   *
+   * @param string|integer $name The InputArgument name or position
+   *
+   * @return Boolean true if the InputArgument object exists, false otherwise
+   */
+  public function hasArgument($name)
+  {
+    return $this->definition->hasArgument($name);
+  }
+
+  /**
    * Returns the options values.
    *
    * @return array An array of option values
@@ -170,5 +182,17 @@ abstract class Input implements InputInterface
     }
 
     $this->options[$name] = $value;
+  }
+
+  /**
+   * Returns true if an InputOption object exists by name.
+   *
+   * @param string $name The InputOption name
+   *
+   * @return Boolean true if the InputOption object exists, false otherwise
+   */
+  public function hasOption($name)
+  {
+    return $this->definition->hasOption($name);
   }
 }

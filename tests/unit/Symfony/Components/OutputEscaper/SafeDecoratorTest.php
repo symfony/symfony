@@ -11,13 +11,13 @@
 
 require_once __DIR__.'/../../../bootstrap.php';
 
-use Symfony\Components\OutputEscaper\Safe;
+use Symfony\Components\OutputEscaper\SafeDecorator;
 
 $t = new LimeTest(13);
 
 // ->getValue()
 $t->diag('->getValue()');
-$safe = new Safe('foo');
+$safe = new SafeDecorator('foo');
 $t->is($safe->getValue(), 'foo', '->getValue() returns the embedded value');
 
 // ->__set() ->__get()
@@ -28,7 +28,7 @@ class TestClass1
   public $foo = 'bar';
 }
 
-$safe = new Safe(new TestClass1());
+$safe = new SafeDecorator(new TestClass1());
 
 $t->is($safe->foo, 'bar', '->__get() returns the object parameter');
 $safe->foo = 'baz';
@@ -45,7 +45,7 @@ class TestClass2
   }
 }
 
-$safe = new Safe(new TestClass2());
+$safe = new SafeDecorator(new TestClass2());
 $t->is($safe->doSomething(), 'ok', '->__call() invokes the embedded method');
 
 // ->__isset() ->__unset()
@@ -58,7 +58,7 @@ class TestClass3
     $nullValue = null;
 }
 
-$safe = new Safe(new TestClass3());
+$safe = new SafeDecorator(new TestClass3());
 
 $t->is(isset($safe->boolValue), true, '->__isset() returns true if the property is not null');
 $t->is(isset($safe->nullValue), false, '->__isset() returns false if the property is null');
@@ -73,7 +73,7 @@ $t->diag('Iterator');
 $input = array('one' => 1, 'two' => 2, 'three' => 3, 'children' => array(1, 2, 3));
 $output = array();
 
-$safe = new Safe($input);
+$safe = new SafeDecorator($input);
 foreach ($safe as $key => $value)
 {
   $output[$key] = $value;
@@ -83,7 +83,7 @@ $t->same($output, $input, '"Iterator" implementation imitates an array');
 // ArrayAccess
 $t->diag('ArrayAccess');
 
-$safe = new Safe(array('foo' => 'bar'));
+$safe = new SafeDecorator(array('foo' => 'bar'));
 
 $t->is($safe['foo'], 'bar', '"ArrayAccess" implementation returns a value from the embedded array');
 $safe['foo'] = 'baz';

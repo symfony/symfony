@@ -133,7 +133,7 @@ abstract class Escaper
         // return the unescaped object
         return $value;
       }
-      elseif ($value instanceof Safe)
+      elseif ($value instanceof SafeDecorator)
       {
         // do not escape objects marked as safe
         // return the original object

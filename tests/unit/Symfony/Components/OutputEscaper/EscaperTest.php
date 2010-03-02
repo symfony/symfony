@@ -12,7 +12,7 @@
 require_once __DIR__.'/../../../bootstrap.php';
 
 use Symfony\Components\OutputEscaper\Escaper;
-use Symfony\Components\OutputEscaper\Safe;
+use Symfony\Components\OutputEscaper\SafeDecorator;
 use Symfony\Components\OutputEscaper\IteratorDecorator;
 use Symfony\Components\OutputEscaper\ArrayDecorator;
 use Symfony\Components\OutputEscaper\ObjectDecorator;
@@ -78,7 +78,7 @@ $t->is(Escaper::escape('entities', $output)->getTitle(), '&lt;strong&gt;escaped!
 $t->ok(Escaper::escape('entities', new \DirectoryIterator('.')) instanceof IteratorDecorator, '::escape() returns a IteratorDecorator object if the value to escape is an object that implements the ArrayAccess interface');
 
 $t->diag('::escape() does not escape object marked as being safe');
-$t->ok(Escaper::escape('entities', new Safe(new OutputEscaperTestClass())) instanceof OutputEscaperTestClass, '::escape() returns the original value if it is marked as being safe');
+$t->ok(Escaper::escape('entities', new SafeDecorator(new OutputEscaperTestClass())) instanceof OutputEscaperTestClass, '::escape() returns the original value if it is marked as being safe');
 
 Escaper::markClassAsSafe('OutputEscaperTestClass');
 $t->ok(Escaper::escape('entities', new OutputEscaperTestClass()) instanceof OutputEscaperTestClass, '::escape() returns the original value if the object class is marked as being safe');
@@ -129,7 +129,7 @@ $t->is($output->getTitleTitle(), '<strong>escaped!</strong>', '::unescape() is r
 $t->ok(IteratorDecorator::unescape(Escaper::escape('entities', new DirectoryIterator('.'))) instanceof DirectoryIterator, '::unescape() unescapes IteratorDecorator objects');
 
 $t->diag('::unescape() does not unescape object marked as being safe');
-$t->ok(Escaper::unescape(Escaper::escape('entities', new Safe(new OutputEscaperTestClass()))) instanceof OutputEscaperTestClass, '::unescape() returns the original value if it is marked as being safe');
+$t->ok(Escaper::unescape(Escaper::escape('entities', new SafeDecorator(new OutputEscaperTestClass()))) instanceof OutputEscaperTestClass, '::unescape() returns the original value if it is marked as being safe');
 
 Escaper::markClassAsSafe('OutputEscaperTestClass');
 $t->ok(Escaper::unescape(Escaper::escape('entities', new OutputEscaperTestClass())) instanceof OutputEscaperTestClass, '::unescape() returns the original value if the object class is marked as being safe');

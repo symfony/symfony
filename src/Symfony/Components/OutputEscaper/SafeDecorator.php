@@ -18,7 +18,7 @@ namespace Symfony\Components\OutputEscaper;
  * @subpackage output_escaper
  * @author     Fabien Potencier <fabien.potencier@symfony-project.com>
  */
-class Safe extends \ArrayIterator
+class SafeDecorator extends \ArrayIterator
 {
   protected $value;
 

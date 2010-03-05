@@ -208,11 +208,13 @@ class DoctrineExtension extends LoaderExtension
 
         if (isset($bundleDirs[$namespace]))
         {
+          $type = false;
           if (is_dir($dir = $bundleDirs[$namespace].'/'.$class.'/Resources/config/doctrine/metadata'))
           {
             $type = $this->detectMappingType($dir);
           }
-          elseif (is_dir($dir = $bundleDirs[$namespace].'/'.$class.'/Entities'))
+
+          if (is_dir($dir = $bundleDirs[$namespace].'/'.$class.'/Entities'))
           {
             $type = 'annotation';
 
@@ -226,10 +228,6 @@ class DoctrineExtension extends LoaderExtension
               $alias = str_replace('\Entities\\', '\\', $alias);
               $ormConfigDef->addMethodCall('addEntityAlias', array($className, $alias));
             }
-          }
-          else
-          {
-            $type = false;
           }
 
           if (false !== $type)

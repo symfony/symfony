@@ -109,13 +109,13 @@ The above will re-build everything and load all bundle data fixtures.
     {
       $dirOrFile = $input->getOption('and-load');
       $this->runCommand('doctrine:load-data-fixtures', 
-        array('--dir_or_file' => $dirOrFile, '--append' => false)
+        array('--dir-or-file' => $dirOrFile, '--append' => false)
       );
     }
     else if ($input->hasOption('and-append'))
     {
       $dirOrFile = $input->getOption('and-append');
-      $this->runCommand('doctrine:load-data-fixtures', array('--dir_or_file' => $dirOrFile, '--append' => true));
+      $this->runCommand('doctrine:load-data-fixtures', array('--dir-or-file' => $dirOrFile, '--append' => true));
     }
   }
 

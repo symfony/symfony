@@ -41,7 +41,7 @@ class LoadDataFixturesDoctrineCommand extends DoctrineCommand
     $this
       ->setName('doctrine:load-data-fixtures')
       ->setDescription('Load data fixtures to your database.')
-      ->addOption('dir_or_file', null, InputOption::PARAMETER_OPTIONAL | InputOption::PARAMETER_IS_ARRAY, 'The directory or file to load data fixtures from.')
+      ->addOption('dir-or-file', null, InputOption::PARAMETER_OPTIONAL | InputOption::PARAMETER_IS_ARRAY, 'The directory or file to load data fixtures from.')
       ->addOption('append', null, InputOption::PARAMETER_OPTIONAL, 'Whether or not to append the data fixtures.', false)
     ;
   }
@@ -52,7 +52,7 @@ class LoadDataFixturesDoctrineCommand extends DoctrineCommand
   protected function execute(InputInterface $input, OutputInterface $output)
   {
     $defaultEm = $this->container->getDoctrine_ORM_EntityManagerService();
-    $dirOrFile = $input->getOption('dir_or_file');
+    $dirOrFile = $input->getOption('dir-or-file');
     if ($dirOrFile)
     {
       $paths = is_array($dirOrFile) ? $dirOrFile : array($dirOrFile);

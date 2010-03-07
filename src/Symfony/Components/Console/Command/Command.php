@@ -406,7 +406,7 @@ class Command
    */
   public function getSynopsis()
   {
-    return sprintf('%%s %s %s', $this->getFullName(), $this->definition->getSynopsis());
+    return sprintf('%s %s', $this->getFullName(), $this->definition->getSynopsis());
   }
 
   /**
@@ -432,7 +432,7 @@ class Command
   {
     $messages = array(
       '<comment>Usage:</comment>',
-      sprintf(' '.$this->getSynopsis(), null === $this->application ? '' : $this->application->getName()),
+      ' '.$this->getSynopsis(),
       '',
     );
 

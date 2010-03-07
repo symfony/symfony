@@ -132,7 +132,7 @@ $t->is($command->getAliases(), array('name1'), '->setAliases() sets the aliases'
 
 // ->getSynopsis()
 $t->diag('->getSynopsis()');
-$t->is($command->getSynopsis(), '%s foobar:bar [--foo] [foo]', '->getSynopsis() returns the synopsis');
+$t->is($command->getSynopsis(), 'foobar:bar [--foo] [foo]', '->getSynopsis() returns the synopsis');
 
 // ->mergeApplicationDefinition()
 $t->diag('->mergeApplicationDefinition()');

@@ -1,7 +1,7 @@
 Console Tool
 
 Usage:
-  UNKNOWN [options] command [arguments]
+  [options] command [arguments]
 
 Options:
   --help      -h  Display this help message.

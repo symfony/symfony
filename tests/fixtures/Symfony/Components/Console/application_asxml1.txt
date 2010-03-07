@@ -2,7 +2,7 @@
 <symfony>
   <commands>
     <command id="help" namespace="_global" name="help">
-  <usage> help [--xml] [command_name]</usage>
+  <usage>help [--xml] [command_name]</usage>
   <description>Displays help for a command</description>
   <help>The &lt;info&gt;help&lt;/info&gt; command displays help for a given command:
  
@@ -29,7 +29,7 @@
   </options>
 </command>
     <command id="list" namespace="_global" name="list">
-  <usage> list [--xml] [namespace]</usage>
+  <usage>list [--xml] [namespace]</usage>
   <description>Lists commands</description>
   <help>The &lt;info&gt;list&lt;/info&gt; command lists all commands:
  
@@ -56,7 +56,7 @@
   </options>
 </command>
     <command id="foo:bar" namespace="foo" name="bar">
-  <usage> foo:bar </usage>
+  <usage>foo:bar </usage>
   <description>The foo:bar command</description>
   <help/>
   <aliases>

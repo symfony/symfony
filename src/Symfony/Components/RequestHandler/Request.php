@@ -28,7 +28,7 @@ class Request implements RequestInterface
   protected $pathParameters;
   protected $requestParameters;
   protected $queryParameters;
-  protected $serverParameter;
+  protected $serverParameters;
   protected $languages;
   protected $charsets;
   protected $acceptableContentTypes;

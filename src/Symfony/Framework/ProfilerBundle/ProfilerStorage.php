@@ -57,12 +57,14 @@ class ProfilerStorage
 
   protected function read()
   {
-    $db = $this->initDb(SQLITE3_OPEN_CREATE | SQLITE3_OPEN_READ);
-    $data = $db->querySingle(sprintf("SELECT data FROM data WHERE token = '%s' LIMIT 1 ORDER BY created_at DESC", $db->escapeString($this->token)));
-
-    $this->data = unserialize(pack('H*', $data));
-
-    $db->close();
+    $db = $this->initDb();
+    $args = array(':token' => $this->token);
+    $data = $this->exec($db, "SELECT data FROM data WHERE token = :token ORDER BY created_at DESC LIMIT 1", $args);
+    $this->close($db);
+    if (isset($data[0]['data']))
+    {
+      return unserialize(pack('H*', $data[0]['data']));
+    }
   }
 
   public function write($data)
@@ -70,23 +72,84 @@ class ProfilerStorage
     $unpack = unpack('H*', serialize($data));
     $data = $unpack[1];
 
-    $db = $this->initDb(SQLITE3_OPEN_CREATE | SQLITE3_OPEN_READWRITE);
-    $db->exec(sprintf("INSERT INTO data (token, data, created_at) VALUES ('%s', '%s', %s)", $db->escapeString($this->token), $db->escapeString($data), time()));
-    $db->close();
+    $db = $this->initDb(false);
+    $args = array(
+      ':token' => $this->token,
+      ':data' => (string) $data,
+      ':time' => time()
+    );
+    $this->exec($db, "INSERT INTO data (token, data, created_at) VALUES (:token, :data, :time)", $args);
+    $this->close($db);
   }
 
-  protected function initDb($flags)
+  protected function initDb($readOnly = true)
   {
-    $db = new \SQLite3($this->store, $flags);
-    $db->exec('CREATE TABLE IF NOT EXISTS data (token STRING, data STRING, created_at TIMESTAMP)');
+    if (class_exists('\SQLite3'))
+    {
+      $flags  = $readOnly ? \SQLITE3_OPEN_READONLY : \SQLITE3_OPEN_READWRITE;
+      $flags |= \SQLITE3_OPEN_CREATE;
+      $db = new \SQLite3($this->store, $flags);
+    }
+    elseif (class_exists('\PDO') && in_array('sqlite', \PDO::getAvailableDrivers(), true))
+    {
+      $db = new \PDO('sqlite:'.$this->store);
+    }
+    else
+    {
+      throw new \RuntimeException('You need to enable either the SQLite or PDO_SQLite extension for the ProfilerBundle to run properly.');
+    }
+
+    $db->exec('CREATE TABLE IF NOT EXISTS data (token STRING, data STRING, created_at INTEGER)');
     $db->exec('CREATE INDEX IF NOT EXISTS data_data ON data (created_at)');
 
     return $db;
   }
 
+  protected function exec($db, $query, array $args = array())
+  {
+    $return = array();
+    $stmt = $db->prepare($query);
+
+    if ($db instanceof \SQLite3)
+    {
+      foreach ($args as $arg => $val)
+      {
+        $stmt->bindValue($arg, $val, is_int($val) ? \SQLITE3_INTEGER : \SQLITE3_TEXT);
+      }
+      $res = $stmt->execute();
+      while ($row = $res->fetchArray(\SQLITE3_ASSOC))
+      {
+        $return[] = $row;
+      }
+      $res->finalize();
+      $stmt->close();
+    }
+    else
+    {
+      foreach ($args as $arg => $val)
+      {
+        $stmt->bindValue($arg, $val, is_int($val) ? \PDO::PARAM_INT : \PDO::PARAM_STR);
+      }
+      $stmt->execute();
+      $return = $stmt->fetchAll(\PDO::FETCH_ASSOC);
+    }
+
+    return $return;
+  }
+
+  protected function close($db)
+  {
+    if ($db instanceof \SQLite3)
+    {
+      $db->close();
+    }
+  }
+
   public function purge($lifetime)
   {
-    $db = $this->initDb(SQLITE3_OPEN_CREATE | SQLITE3_OPEN_READWRITE);
-    $db->exec(sprintf("DELETE FROM data WHERE strftime('%%s', 'now') - created_at > %d", $lifetime));
+    $db = $this->initDb(false);
+    $args = array(':time' => time() - (int) $lifetime);
+    $this->exec($db, "DELETE FROM data WHERE created_at < :time", $args);
+    $this->close($db);
   }
 }

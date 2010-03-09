@@ -27,7 +27,7 @@ namespace Symfony\Foundation;
  *
  * Example usage:
  *
- *     $loader = new ClassLoader();
+ *     $loader = new UniversalClassLoader();
  *
  *     // register classes with namespaces
  *     $loader->registerNamespaces(array(

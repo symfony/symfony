@@ -185,7 +185,7 @@ abstract class Kernel
 
   public function getParameters()
   {
-    return $parameters;
+    return $this->parameters;
   }
 
   public function getDefaultParameters()

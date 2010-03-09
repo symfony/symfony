@@ -38,7 +38,7 @@ class UrlGenerator implements UrlGeneratorInterface
   public function __construct(RouteCollection $routes, array $context = array(), array $defaults = array())
   {
     $this->routes = $routes;
-    $this->context = array_merge(array('base_url', ''), $context);
+    $this->context = array_merge(array('base_url' => ''), $context);
     $this->defaults = $defaults;
     $this->cache = array();
   }

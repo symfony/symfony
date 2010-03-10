@@ -38,7 +38,7 @@ class UrlGenerator implements UrlGeneratorInterface
   public function __construct(RouteCollection $routes, array $context = array(), array $defaults = array())
   {
     $this->routes = $routes;
-    $this->context = array_merge(array('base_url', ''), $context);
+    $this->context = array_merge(array('base_url' => ''), $context);
     $this->defaults = $defaults;
     $this->cache = array();
   }
@@ -64,10 +64,10 @@ class UrlGenerator implements UrlGeneratorInterface
       $this->cache[$name] = $route->compile();
     }
 
-    return $this->doGenerate($this->cache[$name]->getVariables(), $route->getDefaults(), $this->cache[$name]->getTokens(), $parameters, $name, $absolute);
+    return $this->doGenerate($this->cache[$name]->getVariables(), $route->getDefaults(), $route->getRequirements(), $this->cache[$name]->getTokens(), $parameters, $name, $absolute);
   }
 
-  protected function doGenerate($variables, $defaults, $tokens, $parameters, $name, $absolute)
+  protected function doGenerate($variables, $defaults, $requirements, $tokens, $parameters, $name, $absolute)
   {
     $defaults = array_merge($this->defaults, $defaults);
     $tparams = array_merge($defaults, $parameters);
@@ -86,6 +86,12 @@ class UrlGenerator implements UrlGeneratorInterface
       {
         if (false === $optional || !isset($defaults[$token[3]]) || (isset($parameters[$token[3]]) && $parameters[$token[3]] != $defaults[$token[3]]))
         {
+          // check requirement
+          if (isset($requirements[$token[3]]) && !preg_match('#^'.$requirements[$token[3]].'$#', $tparams[$token[3]]))
+          {
+            throw new \InvalidArgumentException(sprintf('Parameter "%s" for route "%s" must match "%s" ("%s" given).', $token[3], $name, $requirements[$token[3]], $tparams[$token[3]]));
+          }
+
           $url = $token[1].urlencode($tparams[$token[3]]).$url;
           $optional = false;
         }

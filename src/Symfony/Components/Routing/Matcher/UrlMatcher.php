@@ -59,7 +59,7 @@ class UrlMatcher implements UrlMatcherInterface
       $compiledRoute = $route->compile();
 
       // check HTTP method requirement
-      if (!isset($this->context['method']) || (($req = $route->getRequirement('_method')) && !in_array(strtolower($this->context['method']), array_map('strtolower', (array) $req))))
+      if (isset($this->context['method']) && (($req = $route->getRequirement('_method')) && !in_array(strtolower($this->context['method']), array_map('strtolower', (array) $req))))
       {
         continue;
       }

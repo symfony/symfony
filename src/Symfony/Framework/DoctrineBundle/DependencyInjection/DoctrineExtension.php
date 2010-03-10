@@ -207,7 +207,7 @@ class DoctrineExtension extends LoaderExtension
         $namespace = str_replace('/', '\\', dirname($tmp));
         $class = basename($tmp);
 
-        if (isset($bundleDirs[$namespace]))
+        if (!isset($bundleDirs[$namespace]))
         {
           continue;
         }

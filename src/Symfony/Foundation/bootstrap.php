@@ -461,7 +461,7 @@ abstract class Kernel
 
   public function getParameters()
   {
-    return $parameters;
+    return $this->parameters;
   }
 
   public function getDefaultParameters()
@@ -557,17 +557,17 @@ abstract class Kernel
 
     foreach (array('cache', 'logs') as $name)
     {
-      $key = sprintf('kernel.%s_dir', $name);
-      if (!is_dir($parameters[$key]))
+      $dir = $parameters[sprintf('kernel.%s_dir', $name)];
+      if (!is_dir($dir))
       {
-        if (false === @mkdir($parameters[$key], 0777, true))
+        if (false === @mkdir($dir, 0777, true))
         {
-          die(sprintf('Unable to create the %s directory (%s)', $name, dirname($parameters['kernel.cache_dir'])));
+          die(sprintf('Unable to create the %s directory (%s)', $name, dirname($dir)));
         }
       }
-      elseif (!is_writable($parameters[$key]))
+      elseif (!is_writable($dir))
       {
-        die(sprintf('Unable to write in the %s directory (%s)', $name, $parameters['kernel.cache_dir']));
+        die(sprintf('Unable to write in the %s directory (%s)', $name, $dir));
       }
     }
 

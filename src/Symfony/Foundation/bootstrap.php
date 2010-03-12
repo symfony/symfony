@@ -316,6 +316,7 @@ use Symfony\Components\DependencyInjection\ContainerInterface;
 use Symfony\Components\DependencyInjection\Builder;
 use Symfony\Components\DependencyInjection\BuilderConfiguration;
 use Symfony\Components\DependencyInjection\Dumper\PhpDumper;
+use Symfony\Components\DependencyInjection\FileResource;
 use Symfony\Components\RequestHandler\RequestInterface;
 
 
@@ -329,13 +330,12 @@ abstract class Kernel
   protected $debug;
   protected $booted;
   protected $name;
-  protected $parameters;
   protected $startTime;
 
   const VERSION = '2.0.0-DEV';
 
   
-  public function __construct($environment, $debug, $parameters = array())
+  public function __construct($environment, $debug)
   {
     $this->debug = (Boolean) $debug;
     if ($this->debug)
@@ -355,7 +355,6 @@ abstract class Kernel
 
     $this->booted = false;
     $this->environment = $environment;
-    $this->parameters = $parameters;
     $this->bundles = $this->registerBundles();
     $this->bundleDirs = $this->registerBundleDirs();
     $this->rootDir = realpath($this->registerRootDir());
@@ -459,12 +458,33 @@ abstract class Kernel
     return $this->debug ? $this->startTime : -INF;
   }
 
-  public function getParameters()
+  public function getCacheDir()
   {
-    return $this->parameters;
+    return $this->rootDir.'/cache/'.$this->environment;
   }
 
-  public function getDefaultParameters()
+  public function getLogDir()
+  {
+    return $this->rootDir.'/logs';
+  }
+
+  protected function initializeContainer()
+  {
+    $class = $this->name.'ProjectContainer';
+    $location = $this->getCacheDir().'/'.$class;
+    $reload = $this->debug ? $this->needsReload($class, $location) : false;
+
+    if ($reload || !file_exists($location.'.php'))
+    {
+      $this->buildContainer($class, $location.'.php');
+    }
+
+    require_once $location.'.php';
+
+    return new $class();
+  }
+
+  public function getKernelParameters()
   {
     $bundles = array();
     foreach ($this->bundles as $bundle)
@@ -478,32 +498,14 @@ abstract class Kernel
         'kernel.environment' => $this->environment,
         'kernel.debug'       => $this->debug,
         'kernel.name'        => $this->name,
-        'kernel.cache_dir'   => $this->rootDir.'/cache/'.$this->environment,
-        'kernel.logs_dir'    => $this->rootDir.'/logs',
+        'kernel.cache_dir'   => $this->getCacheDir(),
+        'kernel.logs_dir'    => $this->getLogDir(),
         'kernel.bundle_dirs' => $this->bundleDirs,
         'kernel.bundles'     => $bundles,
         'kernel.charset'     => 'UTF-8',
       ),
-      $this->getEnvParameters(),
-      $this->parameters
+      $this->getEnvParameters()
     );
-  }
-
-  protected function initializeContainer()
-  {
-    $parameters = $this->getDefaultParameters();
-    $class = $this->name.'ProjectContainer';
-    $file = $parameters['kernel.cache_dir'].'/'.$class.'.php';
-    $reload = $this->debug ? $this->needsReload($class, $file, $parameters) : false;
-
-    if ($reload || !file_exists($file))
-    {
-      $this->buildContainer($class, $file, $parameters);
-    }
-
-    require_once $file;
-
-    return new $class();
   }
 
   protected function getEnvParameters()
@@ -520,17 +522,15 @@ abstract class Kernel
     return $parameters;
   }
 
-  protected function needsReload($class, $file, $parameters)
+  protected function needsReload($class, $location)
   {
-    $metadata = $parameters['kernel.cache_dir'].'/'.$class.'.meta';
-
-    if (!file_exists($metadata) || !file_exists($file))
+    if (!file_exists($location.'.meta') || !file_exists($location.'.php'))
     {
       return true;
     }
 
-    $meta = unserialize(file_get_contents($metadata));
-    $time = filemtime($file);
+    $meta = unserialize(file_get_contents($location.'.meta'));
+    $time = filemtime($location.'.php');
     foreach ($meta as $resource)
     {
       if (!$resource->isUptodate($time))
@@ -542,9 +542,9 @@ abstract class Kernel
     return false;
   }
 
-  protected function buildContainer($class, $file, $parameters)
+  protected function buildContainer($class, $file)
   {
-    $container = new Builder($parameters);
+    $container = new Builder($this->getKernelParameters());
 
     $configuration = new BuilderConfiguration();
     foreach ($this->bundles as $bundle)
@@ -557,7 +557,7 @@ abstract class Kernel
 
     foreach (array('cache', 'logs') as $name)
     {
-      $dir = $parameters[sprintf('kernel.%s_dir', $name)];
+      $dir = $container->getParameter(sprintf('kernel.%s_dir', $name));
       if (!is_dir($dir))
       {
         if (false === @mkdir($dir, 0777, true))
@@ -581,7 +581,14 @@ abstract class Kernel
 
     if ($this->debug)
     {
-            $this->writeCacheFile($parameters['kernel.cache_dir'].'/'.$class.'.meta', serialize($configuration->getResources()));
+            $parent = new \ReflectionObject($this);
+      $configuration->addResource(new FileResource($parent->getFileName()));
+      while ($parent = $parent->getParentClass())
+      {
+        $configuration->addResource(new FileResource($parent->getFileName()));
+      }
+
+            $this->writeCacheFile($this->getCacheDir().'/'.$class.'.meta', serialize($configuration->getResources()));
     }
   }
 

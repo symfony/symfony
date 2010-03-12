@@ -143,3 +143,31 @@ yaml: |
     0123
 php: |
   array('foo' => "0123\n")
+---
+test: Comments in folded scalars
+brief: Comments in folded scalars should be kept as is
+yaml: |
+  # comment
+  foo: |
+    # comment
+    bar
+  bar:
+    # comment
+    foo: bar # comment
+    bar: |
+      # comment
+      foo
+    foobar:
+      foo: |
+        # comment
+        bar
+  # comment
+php: |
+  array(
+    'foo' => "# comment\nbar\n",
+    'bar' => array(
+      'foo' => 'bar',
+      'bar' => "# comment\nfoo\n",
+      'foobar' => array('foo' => "# comment\nbar\n")
+    )
+  )

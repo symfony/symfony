@@ -16,7 +16,7 @@ use Symfony\Components\Yaml\Dumper;
 
 Yaml::setSpecVersion('1.1');
 
-$t = new LimeTest(150);
+$t = new LimeTest(151);
 
 $parser = new Parser();
 $dumper = new Dumper();

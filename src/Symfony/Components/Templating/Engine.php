@@ -182,7 +182,7 @@ class Engine
       $this->helpers[$alias] = $helper;
     }
 
-    $helper->setEngine($this);
+    $helper->setCharset($this->charset);
   }
 
   /**

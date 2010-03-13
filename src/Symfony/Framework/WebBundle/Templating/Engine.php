@@ -87,7 +87,7 @@ class Engine extends BaseEngine
     if (is_string($this->helpers[$name]))
     {
       $this->helpers[$name] = $this->container->getService('templating.helper.'.$name);
-      $this->helpers[$name]->setEngine($this);
+      $this->helpers[$name]->setCharset($this->charset);
     }
 
     return $this->helpers[$name];

@@ -28,6 +28,17 @@ namespace Symfony\Components\Templating\Helper;
 class JavascriptsHelper extends Helper
 {
   protected $javascripts = array();
+  protected $assetHelper;
+
+  /**
+   * Constructor.
+   *
+   * @param AssetsHelper $assetHelper A AssetsHelper instance
+   */
+  public function __construct(AssetsHelper $assetHelper)
+  {
+    $this->assetHelper = $assetHelper;
+  }
 
   /**
    * Adds a JavaScript file.
@@ -37,7 +48,7 @@ class JavascriptsHelper extends Helper
    */
   public function add($javascript, $attributes = array())
   {
-    $this->javascripts[$this->engine->get('assets')->getUrl($javascript)] = $attributes;
+    $this->javascripts[$this->assetHelper->getUrl($javascript)] = $attributes;
   }
 
   /**
@@ -63,7 +74,7 @@ class JavascriptsHelper extends Helper
       $atts = '';
       foreach ($attributes as $key => $value)
       {
-        $atts .= ' '.sprintf('%s="%s"', $key, $this->engine->escape($value));
+        $atts .= ' '.sprintf('%s="%s"', $key, htmlspecialchars($value, ENT_QUOTES, $this->charset));
       }
 
       $html .= sprintf('<script type="text/javascript" src="%s"%s></script>', $path, $atts)."\n";

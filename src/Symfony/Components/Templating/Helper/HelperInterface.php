@@ -2,8 +2,6 @@
 
 namespace Symfony\Components\Templating\Helper;
 
-use Symfony\Components\Templating\Engine;
-
 /*
  * This file is part of the symfony package.
  *
@@ -30,16 +28,16 @@ interface HelperInterface
   function getName();
 
   /**
-   * Sets the engine associated with this helper.
+   * Sets the default charset.
    *
-   * @param Engine $engine A Engine instance
+   * @param string $charset The charset
    */
-  function setEngine(Engine $engine = null);
+  function setCharset($charset);
 
   /**
-   * Gets the engine associated with this helper.
+   * Gets the default charset.
    *
-   * @return Engine A Engine instance
+   * @return string The default charset
    */
-  function getEngine();
+  function getCharset();
 }

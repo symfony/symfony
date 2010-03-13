@@ -28,6 +28,17 @@ namespace Symfony\Components\Templating\Helper;
 class StylesheetsHelper extends Helper
 {
   protected $stylesheets = array();
+  protected $assetHelper;
+
+  /**
+   * Constructor.
+   *
+   * @param AssetsHelper $assetHelper A AssetsHelper instance
+   */
+  public function __construct(AssetsHelper $assetHelper)
+  {
+    $this->assetHelper = $assetHelper;
+  }
 
   /**
    * Adds a stylesheets file.
@@ -37,7 +48,7 @@ class StylesheetsHelper extends Helper
    */
   public function add($stylesheet, $attributes = array())
   {
-    $this->stylesheets[$this->engine->get('assets')->getUrl($stylesheet)] = $attributes;
+    $this->stylesheets[$this->assetHelper->getUrl($stylesheet)] = $attributes;
   }
 
   /**
@@ -63,7 +74,7 @@ class StylesheetsHelper extends Helper
       $atts = '';
       foreach ($attributes as $key => $value)
       {
-        $atts .= ' '.sprintf('%s="%s"', $key, $this->engine->escape($value));
+        $atts .= ' '.sprintf('%s="%s"', $key, htmlspecialchars($value, ENT_QUOTES, $this->charset));
       }
 
       $html .= sprintf('<link href="%s" rel="stylesheet" type="text/css"%s />', $path, $atts)."\n";

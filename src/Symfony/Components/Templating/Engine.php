@@ -5,6 +5,7 @@ namespace Symfony\Components\Templating;
 use Symfony\Components\Templating\Loader\LoaderInterface;
 use Symfony\Components\Templating\Renderer\PhpRenderer;
 use Symfony\Components\Templating\Renderer\RendererInterface;
+use Symfony\Components\Templating\Helper\HelperInterface;
 
 /*
  * This file is part of the symfony package.
@@ -171,7 +172,7 @@ class Engine
    * Sets a helper.
    *
    * @param HelperInterface $value The helper instance
-   * @param string                    $alias An alias
+   * @param string          $alias An alias
    */
   public function set(HelperInterface $helper, $alias = null)
   {

@@ -45,10 +45,12 @@
 
     <service id="templating.helper.javascripts" class="%templating.helper.javascripts.class%">
       <annotation name="templating.helper" alias="javascripts" />
+      <argument type="service" id="templating.helper.assets" />
     </service>
 
     <service id="templating.helper.stylesheets" class="%templating.helper.stylesheets.class%">
       <annotation name="templating.helper" alias="stylesheets" />
+      <argument type="service" id="templating.helper.assets" />
     </service>
 
     <service id="templating.helper.slots" class="%templating.helper.slots.class%">

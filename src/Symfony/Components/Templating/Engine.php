@@ -32,6 +32,7 @@ class Engine
   protected $parents;
   protected $stack;
   protected $charset;
+  protected $cache;
 
   /**
    * Constructor.

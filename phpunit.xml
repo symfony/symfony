@@ -7,7 +7,7 @@
          convertNoticesToExceptions="true"
          convertWarningsToExceptions="true"
          processIsolation="false"
-         stopOnFailure="true"
+         stopOnFailure="false"
          syntaxCheck="false"
 >
   <testsuites>
@@ -30,8 +30,8 @@
         <directory suffix=".php">./src/Symfony/Framework/WebBundle/Resources</directory>
         <directory suffix=".php">./src/Symfony/Framework/ZendBundle/Resources</directory>
 
-        <file>src/Symfony/Foundation/bootstrap.php</file>
-        <file>src/Symfony/Foundation/packager.php</file>
+        <file>./src/Symfony/Foundation/bootstrap.php</file>
+        <file>./src/Symfony/Foundation/packager.php</file>
       </exclude>
     </whitelist>
   </filter>

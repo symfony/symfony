@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<phpunit backupGlobals="false"
+         backupStaticAttributes="false"
+         colors="false"
+         convertErrorsToExceptions="true"
+         convertNoticesToExceptions="true"
+         convertWarningsToExceptions="true"
+         processIsolation="false"
+         stopOnFailure="true"
+         syntaxCheck="false"
+>
+  <testsuites>
+    <testsuite name="Symfony Test Suite">
+      <directory>./tests/Symfony/</directory>
+      <directory>./src/Symfony/Framework/</directory>
+    </testsuite>
+  </testsuites>
+</phpunit>

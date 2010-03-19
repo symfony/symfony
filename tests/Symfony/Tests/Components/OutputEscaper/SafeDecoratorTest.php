@@ -20,35 +20,35 @@ class SafeDecoratorTest extends \PHPUnit_Framework_TestCase
   public function testGetValue()
   {
     $safe = new SafeDecorator('foo');
-    $this->assertEquals($safe->getValue(), 'foo', '->getValue() returns the embedded value');
+    $this->assertEquals('foo', $safe->getValue(), '->getValue() returns the embedded value');
   }
 
   public function testMagicGetAndSet()
   {
     $safe = new SafeDecorator(new TestClass1());
 
-    $this->assertEquals($safe->foo, 'bar', '->__get() returns the object parameter');
+    $this->assertEquals('bar', $safe->foo, '->__get() returns the object parameter');
     $safe->foo = 'baz';
-    $this->assertEquals($safe->foo, 'baz', '->__set() sets the object parameter');
+    $this->assertEquals('baz', $safe->foo, '->__set() sets the object parameter');
   }
 
   public function testMagicCall()
   {
     $safe = new SafeDecorator(new TestClass2());
 
-    $this->assertEquals($safe->doSomething(), 'ok', '->__call() invokes the embedded method');
+    $this->assertEquals('ok', $safe->doSomething(), '->__call() invokes the embedded method');
   }
 
   public function testMagicIssetAndUnset()
   {
     $safe = new SafeDecorator(new TestClass3());
 
-    $this->assertEquals(isset($safe->boolValue), true, '->__isset() returns true if the property is not null');
-    $this->assertEquals(isset($safe->nullValue), false, '->__isset() returns false if the property is null');
-    $this->assertEquals(isset($safe->undefinedValue), false, '->__isset() returns false if the property does not exist');
+    $this->assertEquals(true, isset($safe->boolValue), '->__isset() returns true if the property is not null');
+    $this->assertEquals(false, isset($safe->nullValue), '->__isset() returns false if the property is null');
+    $this->assertEquals(false, isset($safe->undefinedValue), '->__isset() returns false if the property does not exist');
 
     unset($safe->boolValue);
-    $this->assertEquals(isset($safe->boolValue), false, '->__unset() unsets the embedded property');
+    $this->assertEquals(false, isset($safe->boolValue), '->__unset() unsets the embedded property');
   }
 
   public function testIteratorInterface()
@@ -68,12 +68,12 @@ class SafeDecoratorTest extends \PHPUnit_Framework_TestCase
   {
     $safe = new SafeDecorator(array('foo' => 'bar'));
 
-    $this->assertEquals($safe['foo'], 'bar', '"ArrayAccess" implementation returns a value from the embedded array');
+    $this->assertEquals('bar', $safe['foo'], '"ArrayAccess" implementation returns a value from the embedded array');
     $safe['foo'] = 'baz';
-    $this->assertEquals($safe['foo'], 'baz', '"ArrayAccess" implementation sets a value on the embedded array');
-    $this->assertEquals(isset($safe['foo']), true, '"ArrayAccess" checks if a value is set on the embedded array');
+    $this->assertEquals('baz', $safe['foo'], '"ArrayAccess" implementation sets a value on the embedded array');
+    $this->assertEquals(true, isset($safe['foo']), '"ArrayAccess" checks if a value is set on the embedded array');
     unset($safe['foo']);
-    $this->assertEquals(isset($safe['foo']), false, '"ArrayAccess" unsets a value on the embedded array');
+    $this->assertEquals(false, isset($safe['foo']), '"ArrayAccess" unsets a value on the embedded array');
   }
 }
 

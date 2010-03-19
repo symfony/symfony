@@ -28,14 +28,14 @@ class ArrayDecoratorTest extends \PHPUnit_Framework_TestCase
 
   public function testGetRaw()
   {
-    $this->assertEquals(self::$escaped->getRaw(0), '<strong>escaped!</strong>', '->getRaw() returns the raw value');
+    $this->assertEquals('<strong>escaped!</strong>', self::$escaped->getRaw(0), '->getRaw() returns the raw value');
   }
 
   public function testArrayAccessInterface()
   {
-    $this->assertEquals(self::$escaped[0], '&lt;strong&gt;escaped!&lt;/strong&gt;', 'The escaped object behaves like an array');
-    $this->assertEquals(self::$escaped[2], null, 'The escaped object behaves like an array');
-    $this->assertEquals(self::$escaped[3][1], '&lt;strong&gt;escaped!&lt;/strong&gt;', 'The escaped object behaves like an array');
+    $this->assertEquals('&lt;strong&gt;escaped!&lt;/strong&gt;', self::$escaped[0], 'The escaped object behaves like an array');
+    $this->assertEquals(null, self::$escaped[2], 'The escaped object behaves like an array');
+    $this->assertEquals('&lt;strong&gt;escaped!&lt;/strong&gt;', self::$escaped[3][1], 'The escaped object behaves like an array');
 
     $this->assertTrue(isset(self::$escaped[1]), 'The escaped object behaves like an array (isset)');
 
@@ -67,13 +67,13 @@ class ArrayDecoratorTest extends \PHPUnit_Framework_TestCase
       switch ($key)
       {
         case 0:
-          $this->assertEquals($value, '&lt;strong&gt;escaped!&lt;/strong&gt;', 'The escaped object behaves like an array');
+          $this->assertEquals('&lt;strong&gt;escaped!&lt;/strong&gt;', $value, 'The escaped object behaves like an array');
           break;
         case 1:
-          $this->assertEquals($value, 1, 'The escaped object behaves like an array');
+          $this->assertEquals(1, $value, 'The escaped object behaves like an array');
           break;
         case 2:
-          $this->assertEquals($value, null, 'The escaped object behaves like an array');
+          $this->assertEquals(null, $value, 'The escaped object behaves like an array');
           break;
         case 3:
           break;
@@ -85,6 +85,6 @@ class ArrayDecoratorTest extends \PHPUnit_Framework_TestCase
 
   public function testCountableInterface()
   {
-    $this->assertEquals(count(self::$escaped), 4, 'The escaped object implements the Countable interface');
+    $this->assertEquals(4, count(self::$escaped), 'The escaped object implements the Countable interface');
   }
 }

@@ -26,7 +26,7 @@ class CacheLoaderTest extends \PHPUnit_Framework_TestCase
   {
     $loader = new ProjectTemplateLoader($varLoader = new ProjectTemplateLoaderVar(), sys_get_temp_dir());
     $this->assertTrue($loader->getLoader() === $varLoader, '__construct() takes a template loader as its first argument');
-    $this->assertEquals($loader->getDir(), sys_get_temp_dir(), '__construct() takes a directory where to store the cache as its second argument');
+    $this->assertEquals(sys_get_temp_dir(), $loader->getDir(), '__construct() takes a directory where to store the cache as its second argument');
   }
 
   public function testLoad()
@@ -50,11 +50,11 @@ class CacheLoaderTest extends \PHPUnit_Framework_TestCase
     $loader->setDebugger($debugger = new \ProjectTemplateDebugger());
     $template = $loader->load('special', array('renderer' => 'comp'));
     $this->assertTrue($debugger->hasMessage('Storing template'), '->load() logs a "Storing template" message if the template is found');
-    $this->assertEquals($template->getRenderer(), 'php', '->load() changes the renderer to php if the template is compilable');
+    $this->assertEquals('php', $template->getRenderer(), '->load() changes the renderer to php if the template is compilable');
 
     $template = $loader->load('special', array('renderer' => 'comp'));
     $this->assertTrue($debugger->hasMessage('Fetching template'), '->load() logs a "Storing template" message if the template is fetched from cache');
-    $this->assertEquals($template->getRenderer(), 'php', '->load() changes the renderer to php if the template is compilable');
+    $this->assertEquals('php', $template->getRenderer(), '->load() changes the renderer to php if the template is compilable');
   }
 }
 

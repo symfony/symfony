@@ -24,13 +24,13 @@ class StylesheetsHelperTest extends \PHPUnit_Framework_TestCase
     $assetHelper = new AssetsHelper();
     $helper = new StylesheetsHelper($assetHelper);
     $helper->add('foo');
-    $this->assertEquals($helper->get(), array('/foo' => array()), '->add() adds a stylesheet');
+    $this->assertEquals(array('/foo' => array()), $helper->get(), '->add() adds a stylesheet');
     $helper->add('/foo');
-    $this->assertEquals($helper->get(), array('/foo' => array()), '->add() does not add the same stylesheet twice');
+    $this->assertEquals(array('/foo' => array()), $helper->get(), '->add() does not add the same stylesheet twice');
     $helper = new StylesheetsHelper($assetHelper);
     $assetHelper->setBaseURLs('http://assets.example.com/');
     $helper->add('foo');
-    $this->assertEquals($helper->get(), array('http://assets.example.com/foo' => array()), '->add() converts the stylesheet to a public path');
+    $this->assertEquals(array('http://assets.example.com/foo' => array()), $helper->get(), '->add() converts the stylesheet to a public path');
   }
 
   public function testMagicToString()
@@ -39,6 +39,6 @@ class StylesheetsHelperTest extends \PHPUnit_Framework_TestCase
     $assetHelper->setBaseURLs('');
     $helper = new StylesheetsHelper($assetHelper);
     $helper->add('foo', array('media' => 'ba>'));
-    $this->assertEquals($helper->__toString(), '<link href="/foo" rel="stylesheet" type="text/css" media="ba&gt;" />'."\n", '->__toString() converts the stylesheet configuration to HTML');
+    $this->assertEquals('<link href="/foo" rel="stylesheet" type="text/css" media="ba&gt;" />'."\n", $helper->__toString(), '->__toString() converts the stylesheet configuration to HTML');
   }
 }

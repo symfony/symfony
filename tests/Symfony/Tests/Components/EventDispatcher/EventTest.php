@@ -21,22 +21,23 @@ class EventTest extends \PHPUnit_Framework_TestCase
 
   public function testGetSubject()
   {
-    $this->assertEquals($this->createEvent()->getSubject(), $this->subject, '->getSubject() returns the event subject');
+    $event = $this->createEvent();
+    $this->assertEquals($this->subject, $event->getSubject(), '->getSubject() returns the event subject');
   }
 
   public function testGetName()
   {
-    $this->assertEquals($this->createEvent()->getName(), 'name', '->getName() returns the event name');
+    $this->assertEquals('name', $this->createEvent()->getName(), '->getName() returns the event name');
   }
 
   public function testParameters()
   {
     $event = $this->createEvent();
 
-    $this->assertEquals($event->getParameters(), $this->parameters, '->getParameters() returns the event parameters');
-    $this->assertEquals($event->getParameter('foo'), 'bar', '->getParameter() returns the value of a parameter');
+    $this->assertEquals($this->parameters, $event->getParameters(), '->getParameters() returns the event parameters');
+    $this->assertEquals('bar', $event->getParameter('foo'), '->getParameter() returns the value of a parameter');
     $event->setParameter('foo', 'foo');
-    $this->assertEquals($event->getParameter('foo'), 'foo', '->setParameter() changes the value of a parameter');
+    $this->assertEquals('foo', $event->getParameter('foo'), '->setParameter() changes the value of a parameter');
     $this->assertTrue($event->hasParameter('foo'), '->hasParameter() returns true if the parameter is defined');
     unset($event['foo']);
     $this->assertTrue(!$event->hasParameter('foo'), '->hasParameter() returns false if the parameter is not defined');
@@ -56,25 +57,25 @@ class EventTest extends \PHPUnit_Framework_TestCase
   {
     $event = $this->createEvent();
     $event->setReturnValue('foo');
-    $this->assertEquals($event->getReturnValue(), 'foo', '->getReturnValue() returns the return value of the event');
+    $this->assertEquals('foo', $event->getReturnValue(), '->getReturnValue() returns the return value of the event');
   }
 
   public function testSetIsProcessed()
   {
     $event = $this->createEvent();
     $event->setProcessed(true);
-    $this->assertEquals($event->isProcessed(), true, '->isProcessed() returns true if the event has been processed');
+    $this->assertEquals(true, $event->isProcessed(), '->isProcessed() returns true if the event has been processed');
     $event->setProcessed(false);
-    $this->assertEquals($event->isProcessed(), false, '->setProcessed() changes the processed status');
+    $this->assertEquals(false, $event->isProcessed(), '->setProcessed() changes the processed status');
   }
 
   public function testArrayAccessInterface()
   {
     $event = $this->createEvent();
 
-    $this->assertEquals($event['foo'], 'bar', 'Event implements the ArrayAccess interface');
+    $this->assertEquals('bar', $event['foo'], 'Event implements the ArrayAccess interface');
     $event['foo'] = 'foo';
-    $this->assertEquals($event['foo'], 'foo', 'Event implements the ArrayAccess interface');
+    $this->assertEquals('foo', $event['foo'], 'Event implements the ArrayAccess interface');
 
     try
     {

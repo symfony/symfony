@@ -19,47 +19,47 @@ class ContainerTest extends \PHPUnit_Framework_TestCase
   public function testConstructor()
   {
     $sc = new Container();
-    $this->assertEquals(spl_object_hash($sc->getService('service_container')), spl_object_hash($sc), '__construct() automatically registers itself as a service');
+    $this->assertEquals(spl_object_hash($sc), spl_object_hash($sc->getService('service_container')), '__construct() automatically registers itself as a service');
 
     $sc = new Container(array('foo' => 'bar'));
-    $this->assertEquals($sc->getParameters(), array('foo' => 'bar'), '__construct() takes an array of parameters as its first argument');
+    $this->assertEquals(array('foo' => 'bar'), $sc->getParameters(), '__construct() takes an array of parameters as its first argument');
   }
 
   public function testGetSetParameters()
   {
     $sc = new Container();
-    $this->assertEquals($sc->getParameters(), array(), '->getParameters() returns an empty array if no parameter has been defined');
+    $this->assertEquals(array(), $sc->getParameters(), '->getParameters() returns an empty array if no parameter has been defined');
 
     $sc->setParameters(array('foo' => 'bar'));
-    $this->assertEquals($sc->getParameters(), array('foo' => 'bar'), '->setParameters() sets the parameters');
+    $this->assertEquals(array('foo' => 'bar'), $sc->getParameters(), '->setParameters() sets the parameters');
 
     $sc->setParameters(array('bar' => 'foo'));
-    $this->assertEquals($sc->getParameters(), array('bar' => 'foo'), '->setParameters() overrides the previous defined parameters');
+    $this->assertEquals(array('bar' => 'foo'), $sc->getParameters(), '->setParameters() overrides the previous defined parameters');
 
     $sc->setParameters(array('Bar' => 'foo'));
-    $this->assertEquals($sc->getParameters(), array('bar' => 'foo'), '->setParameters() converts the key to lowercase');
+    $this->assertEquals(array('bar' => 'foo'), $sc->getParameters(), '->setParameters() converts the key to lowercase');
   }
 
   public function testGetSetParameter()
   {
     $sc = new Container(array('foo' => 'bar'));
     $sc->setParameter('bar', 'foo');
-    $this->assertEquals($sc->getParameter('bar'), 'foo', '->setParameter() sets the value of a new parameter');
-    $this->assertEquals($sc['bar'], 'foo', '->offsetGet() gets the value of a parameter');
+    $this->assertEquals('foo', $sc->getParameter('bar'), '->setParameter() sets the value of a new parameter');
+    $this->assertEquals('foo', $sc['bar'], '->offsetGet() gets the value of a parameter');
 
     $sc['bar1'] = 'foo1';
-    $this->assertEquals($sc['bar1'], 'foo1', '->offsetset() sets the value of a parameter');
+    $this->assertEquals('foo1', $sc['bar1'], '->offsetset() sets the value of a parameter');
 
     unset($sc['bar1']);
     $this->assertTrue(!isset($sc['bar1']), '->offsetUnset() removes a parameter');
 
     $sc->setParameter('foo', 'baz');
-    $this->assertEquals($sc->getParameter('foo'), 'baz', '->setParameter() overrides previously set parameter');
+    $this->assertEquals('baz', $sc->getParameter('foo'), '->setParameter() overrides previously set parameter');
 
     $sc->setParameter('Foo', 'baz1');
-    $this->assertEquals($sc->getParameter('foo'), 'baz1', '->setParameter() converts the key to lowercase');
-    $this->assertEquals($sc->getParameter('FOO'), 'baz1', '->getParameter() converts the key to lowercase');
-    $this->assertEquals($sc['FOO'], 'baz1', '->offsetGet() converts the key to lowercase');
+    $this->assertEquals('baz1', $sc->getParameter('foo'), '->setParameter() converts the key to lowercase');
+    $this->assertEquals('baz1', $sc->getParameter('FOO'), '->getParameter() converts the key to lowercase');
+    $this->assertEquals('baz1', $sc['FOO'], '->offsetGet() converts the key to lowercase');
 
     try
     {
@@ -95,21 +95,21 @@ class ContainerTest extends \PHPUnit_Framework_TestCase
   {
     $sc = new Container(array('foo' => 'bar'));
     $sc->addParameters(array('bar' => 'foo'));
-    $this->assertEquals($sc->getParameters(), array('foo' => 'bar', 'bar' => 'foo'), '->addParameters() adds parameters to the existing ones');
+    $this->assertEquals(array('foo' => 'bar', 'bar' => 'foo'), $sc->getParameters(), '->addParameters() adds parameters to the existing ones');
     $sc->addParameters(array('Bar' => 'fooz'));
-    $this->assertEquals($sc->getParameters(), array('foo' => 'bar', 'bar' => 'fooz'), '->addParameters() converts keys to lowercase');
+    $this->assertEquals(array('foo' => 'bar', 'bar' => 'fooz'), $sc->getParameters(), '->addParameters() converts keys to lowercase');
   }
 
   public function testServices()
   {
     $sc = new Container();
     $sc->setService('foo', $obj = new \stdClass());
-    $this->assertEquals(spl_object_hash($sc->getService('foo')), spl_object_hash($obj), '->setService() registers a service under a key name');
+    $this->assertEquals(spl_object_hash($obj), spl_object_hash($sc->getService('foo')), '->setService() registers a service under a key name');
 
     $sc->foo1 = $obj1 = new \stdClass();
-    $this->assertEquals(spl_object_hash($sc->foo1), spl_object_hash($obj1), '->__set() sets a service');
+    $this->assertEquals(spl_object_hash($obj1), spl_object_hash($sc->foo1), '->__set() sets a service');
 
-    $this->assertEquals(spl_object_hash($sc->foo), spl_object_hash($obj), '->__get() gets a service by name');
+    $this->assertEquals(spl_object_hash($obj), spl_object_hash($sc->foo), '->__get() gets a service by name');
     $this->assertTrue($sc->hasService('foo'), '->hasService() returns true if the service is defined');
     $this->assertTrue(isset($sc->foo), '->__isset() returns true if the service is defined');
     $this->assertTrue(!$sc->hasService('bar'), '->hasService() returns false if the service is not defined');
@@ -121,10 +121,10 @@ class ContainerTest extends \PHPUnit_Framework_TestCase
     $sc = new Container();
     $sc->setService('foo', $obj = new \stdClass());
     $sc->setService('bar', $obj = new \stdClass());
-    $this->assertEquals($sc->getServiceIds(), array('service_container', 'foo', 'bar'), '->getServiceIds() returns all defined service ids');
+    $this->assertEquals(array('service_container', 'foo', 'bar'), $sc->getServiceIds(), '->getServiceIds() returns all defined service ids');
 
     $sc = new ProjectServiceContainer();
-    $this->assertEquals(spl_object_hash($sc->getService('bar')), spl_object_hash($sc->__bar), '->getService() looks for a getXXXService() method');
+    $this->assertEquals(spl_object_hash($sc->__bar), spl_object_hash($sc->getService('bar')), '->getService() looks for a getXXXService() method');
     $this->assertTrue($sc->hasService('bar'), '->hasService() returns true if the service has been defined as a getXXXService() method');
 
     $sc->setService('bar', $bar = new \stdClass());
@@ -157,15 +157,15 @@ class ContainerTest extends \PHPUnit_Framework_TestCase
     {
     }
 
-    $this->assertEquals(spl_object_hash($sc->getService('foo_bar')), spl_object_hash($sc->__foo_bar), '->getService() camelizes the service id when looking for a method');
-    $this->assertEquals(spl_object_hash($sc->getService('foo.baz')), spl_object_hash($sc->__foo_baz), '->getService() camelizes the service id when looking for a method');
+    $this->assertEquals(spl_object_hash($sc->__foo_bar), spl_object_hash($sc->getService('foo_bar')), '->getService() camelizes the service id when looking for a method');
+    $this->assertEquals(spl_object_hash($sc->__foo_baz), spl_object_hash($sc->getService('foo.baz')), '->getService() camelizes the service id when looking for a method');
   }
 
   public function testMagicCall()
   {
     $sc = new Container();
     $sc->setService('foo_bar.foo', $foo = new \stdClass());
-    $this->assertEquals($sc->getFooBar_FooService(), $foo, '__call() finds services is the method is getXXXService()');
+    $this->assertEquals($foo, $sc->getFooBar_FooService(), '__call() finds services is the method is getXXXService()');
 
     try
     {

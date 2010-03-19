@@ -69,7 +69,7 @@ class YamlFileLoaderTest extends \PHPUnit_Framework_TestCase
   {
     $loader = new ProjectLoader3(self::$fixturesPath.'/yaml');
     $config = $loader->load('services2.yml');
-    $this->assertEquals($config->getParameters(), array('foo' => 'bar', 'values' => array(true, false, 0, 1000.3), 'bar' => 'foo', 'foo_bar' => new Reference('foo_bar')), '->load() converts YAML keys to lowercase');
+    $this->assertEquals(array('foo' => 'bar', 'values' => array(true, false, 0, 1000.3), 'bar' => 'foo', 'foo_bar' => new Reference('foo_bar')), $config->getParameters(), '->load() converts YAML keys to lowercase');
   }
 
   public function testLoadImports()
@@ -79,7 +79,7 @@ class YamlFileLoaderTest extends \PHPUnit_Framework_TestCase
 
     $actual = $config->getParameters();
     $expected = array('foo' => 'bar', 'values' => array(true, false), 'bar' => '%foo%', 'foo_bar' => new Reference('foo_bar'), 'imported_from_ini' => true, 'imported_from_xml' => true);
-    $this->assertEquals(array_keys($actual), array_keys($expected), '->load() imports and merges imported files');
+    $this->assertEquals(array_keys($expected), array_keys($actual), '->load() imports and merges imported files');
   }
 
   public function testLoadServices()
@@ -88,21 +88,21 @@ class YamlFileLoaderTest extends \PHPUnit_Framework_TestCase
     $config = $loader->load('services6.yml');
     $services = $config->getDefinitions();
     $this->assertTrue(isset($services['foo']), '->load() parses service elements');
-    $this->assertEquals(get_class($services['foo']), 'Symfony\\Components\\DependencyInjection\\Definition', '->load() converts service element to Definition instances');
-    $this->assertEquals($services['foo']->getClass(), 'FooClass', '->load() parses the class attribute');
+    $this->assertEquals('Symfony\\Components\\DependencyInjection\\Definition', get_class($services['foo']), '->load() converts service element to Definition instances');
+    $this->assertEquals('FooClass', $services['foo']->getClass(), '->load() parses the class attribute');
     $this->assertTrue($services['shared']->isShared(), '->load() parses the shared attribute');
     $this->assertTrue(!$services['non_shared']->isShared(), '->load() parses the shared attribute');
-    $this->assertEquals($services['constructor']->getConstructor(), 'getInstance', '->load() parses the constructor attribute');
-    $this->assertEquals($services['file']->getFile(), '%path%/foo.php', '->load() parses the file tag');
-    $this->assertEquals($services['arguments']->getArguments(), array('foo', new Reference('foo'), array(true, false)), '->load() parses the argument tags');
-    $this->assertEquals($services['configurator1']->getConfigurator(), 'sc_configure', '->load() parses the configurator tag');
-    $this->assertEquals($services['configurator2']->getConfigurator(), array(new Reference('baz'), 'configure'), '->load() parses the configurator tag');
-    $this->assertEquals($services['configurator3']->getConfigurator(), array('BazClass', 'configureStatic'), '->load() parses the configurator tag');
-    $this->assertEquals($services['method_call1']->getMethodCalls(), array(array('setBar', array())), '->load() parses the method_call tag');
-    $this->assertEquals($services['method_call2']->getMethodCalls(), array(array('setBar', array('foo', new Reference('foo'), array(true, false)))), '->load() parses the method_call tag');
+    $this->assertEquals('getInstance', $services['constructor']->getConstructor(), '->load() parses the constructor attribute');
+    $this->assertEquals('%path%/foo.php', $services['file']->getFile(), '->load() parses the file tag');
+    $this->assertEquals(array('foo', new Reference('foo'), array(true, false)), $services['arguments']->getArguments(), '->load() parses the argument tags');
+    $this->assertEquals('sc_configure', $services['configurator1']->getConfigurator(), '->load() parses the configurator tag');
+    $this->assertEquals(array(new Reference('baz'), 'configure'), $services['configurator2']->getConfigurator(), '->load() parses the configurator tag');
+    $this->assertEquals(array('BazClass', 'configureStatic'), $services['configurator3']->getConfigurator(), '->load() parses the configurator tag');
+    $this->assertEquals(array(array('setBar', array())), $services['method_call1']->getMethodCalls(), '->load() parses the method_call tag');
+    $this->assertEquals(array(array('setBar', array('foo', new Reference('foo'), array(true, false)))), $services['method_call2']->getMethodCalls(), '->load() parses the method_call tag');
     $aliases = $config->getAliases();
     $this->assertTrue(isset($aliases['alias_for_foo']), '->load() parses aliases');
-    $this->assertEquals($aliases['alias_for_foo'], 'foo', '->load() parses aliases');
+    $this->assertEquals('foo', $aliases['alias_for_foo'], '->load() parses aliases');
   }
 
   public function testExtensions()

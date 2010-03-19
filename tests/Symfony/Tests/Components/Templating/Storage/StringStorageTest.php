@@ -23,6 +23,6 @@ class StringStorageTest extends \PHPUnit_Framework_TestCase
     $storage = new StringStorage('foo');
     $this->assertTrue($storage instanceof Storage, 'StringStorage is an instance of Storage');
     $storage = new StringStorage('foo');
-    $this->assertEquals($storage->getContent(), 'foo', '->getContent() returns the content of the template');
+    $this->assertEquals('foo', $storage->getContent(), '->getContent() returns the content of the template');
   }
 }

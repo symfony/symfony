@@ -20,9 +20,9 @@ class InputOptionTest extends \PHPUnit_Framework_TestCase
   public function testConstructor()
   {
     $option = new InputOption('foo');
-    $this->assertEquals($option->getName(), 'foo', '__construct() takes a name as its first argument');
+    $this->assertEquals('foo', $option->getName(), '__construct() takes a name as its first argument');
     $option = new InputOption('--foo');
-    $this->assertEquals($option->getName(), 'foo', '__construct() removes the leading -- of the option name');
+    $this->assertEquals('foo', $option->getName(), '__construct() removes the leading -- of the option name');
 
     try
     {
@@ -35,35 +35,35 @@ class InputOptionTest extends \PHPUnit_Framework_TestCase
 
     // shortcut argument
     $option = new InputOption('foo', 'f');
-    $this->assertEquals($option->getShortcut(), 'f', '__construct() can take a shortcut as its second argument');
+    $this->assertEquals('f', $option->getShortcut(), '__construct() can take a shortcut as its second argument');
     $option = new InputOption('foo', '-f');
-    $this->assertEquals($option->getShortcut(), 'f', '__construct() removes the leading - of the shortcut');
+    $this->assertEquals('f', $option->getShortcut(), '__construct() removes the leading - of the shortcut');
 
     // mode argument
     $option = new InputOption('foo', 'f');
-    $this->assertEquals($option->acceptParameter(), false, '__construct() gives a "Option::PARAMETER_NONE" mode by default');
-    $this->assertEquals($option->isParameterRequired(), false, '__construct() gives a "Option::PARAMETER_NONE" mode by default');
-    $this->assertEquals($option->isParameterOptional(), false, '__construct() gives a "Option::PARAMETER_NONE" mode by default');
+    $this->assertEquals(false, $option->acceptParameter(), '__construct() gives a "Option::PARAMETER_NONE" mode by default');
+    $this->assertEquals(false, $option->isParameterRequired(), '__construct() gives a "Option::PARAMETER_NONE" mode by default');
+    $this->assertEquals(false, $option->isParameterOptional(), '__construct() gives a "Option::PARAMETER_NONE" mode by default');
 
     $option = new InputOption('foo', 'f', null);
-    $this->assertEquals($option->acceptParameter(), false, '__construct() can take "Option::PARAMETER_NONE" as its mode');
-    $this->assertEquals($option->isParameterRequired(), false, '__construct() can take "Option::PARAMETER_NONE" as its mode');
-    $this->assertEquals($option->isParameterOptional(), false, '__construct() can take "Option::PARAMETER_NONE" as its mode');
+    $this->assertEquals(false, $option->acceptParameter(), '__construct() can take "Option::PARAMETER_NONE" as its mode');
+    $this->assertEquals(false, $option->isParameterRequired(), '__construct() can take "Option::PARAMETER_NONE" as its mode');
+    $this->assertEquals(false, $option->isParameterOptional(), '__construct() can take "Option::PARAMETER_NONE" as its mode');
 
     $option = new InputOption('foo', 'f', InputOption::PARAMETER_NONE);
-    $this->assertEquals($option->acceptParameter(), false, '__construct() can take "Option::PARAMETER_NONE" as its mode');
-    $this->assertEquals($option->isParameterRequired(), false, '__construct() can take "Option::PARAMETER_NONE" as its mode');
-    $this->assertEquals($option->isParameterOptional(), false, '__construct() can take "Option::PARAMETER_NONE" as its mode');
+    $this->assertEquals(false, $option->acceptParameter(), '__construct() can take "Option::PARAMETER_NONE" as its mode');
+    $this->assertEquals(false, $option->isParameterRequired(), '__construct() can take "Option::PARAMETER_NONE" as its mode');
+    $this->assertEquals(false, $option->isParameterOptional(), '__construct() can take "Option::PARAMETER_NONE" as its mode');
 
     $option = new InputOption('foo', 'f', InputOption::PARAMETER_REQUIRED);
-    $this->assertEquals($option->acceptParameter(), true, '__construct() can take "Option::PARAMETER_REQUIRED" as its mode');
-    $this->assertEquals($option->isParameterRequired(), true, '__construct() can take "Option::PARAMETER_REQUIRED" as its mode');
-    $this->assertEquals($option->isParameterOptional(), false, '__construct() can take "Option::PARAMETER_REQUIRED" as its mode');
+    $this->assertEquals(true, $option->acceptParameter(), '__construct() can take "Option::PARAMETER_REQUIRED" as its mode');
+    $this->assertEquals(true, $option->isParameterRequired(), '__construct() can take "Option::PARAMETER_REQUIRED" as its mode');
+    $this->assertEquals(false, $option->isParameterOptional(), '__construct() can take "Option::PARAMETER_REQUIRED" as its mode');
 
     $option = new InputOption('foo', 'f', InputOption::PARAMETER_OPTIONAL);
-    $this->assertEquals($option->acceptParameter(), true, '__construct() can take "Option::PARAMETER_OPTIONAL" as its mode');
-    $this->assertEquals($option->isParameterRequired(), false, '__construct() can take "Option::PARAMETER_OPTIONAL" as its mode');
-    $this->assertEquals($option->isParameterOptional(), true, '__construct() can take "Option::PARAMETER_OPTIONAL" as its mode');
+    $this->assertEquals(true, $option->acceptParameter(), '__construct() can take "Option::PARAMETER_OPTIONAL" as its mode');
+    $this->assertEquals(false, $option->isParameterRequired(), '__construct() can take "Option::PARAMETER_OPTIONAL" as its mode');
+    $this->assertEquals(true, $option->isParameterOptional(), '__construct() can take "Option::PARAMETER_OPTIONAL" as its mode');
 
     try
     {
@@ -86,22 +86,22 @@ class InputOptionTest extends \PHPUnit_Framework_TestCase
   public function testGetDescription()
   {
     $option = new InputOption('foo', 'f', null, 'Some description');
-    $this->assertEquals($option->getDescription(), 'Some description', '->getDescription() returns the description message');
+    $this->assertEquals('Some description', $option->getDescription(), '->getDescription() returns the description message');
   }
 
   public function testGetDefault()
   {
     $option = new InputOption('foo', null, InputOption::PARAMETER_OPTIONAL, '', 'default');
-    $this->assertEquals($option->getDefault(), 'default', '->getDefault() returns the default value');
+    $this->assertEquals('default', $option->getDefault(), '->getDefault() returns the default value');
 
     $option = new InputOption('foo', null, InputOption::PARAMETER_REQUIRED, '', 'default');
-    $this->assertEquals($option->getDefault(), 'default', '->getDefault() returns the default value');
+    $this->assertEquals('default', $option->getDefault(), '->getDefault() returns the default value');
 
     $option = new InputOption('foo', null, InputOption::PARAMETER_REQUIRED);
     $this->assertTrue(is_null($option->getDefault()), '->getDefault() returns null if no default value is configured');
 
     $option = new InputOption('foo', null, InputOption::PARAMETER_OPTIONAL | InputOption::PARAMETER_IS_ARRAY);
-    $this->assertEquals($option->getDefault(), array(), '->getDefault() returns an empty array if option is an array');
+    $this->assertEquals(array(), $option->getDefault(), '->getDefault() returns an empty array if option is an array');
 
     $option = new InputOption('foo', null, InputOption::PARAMETER_NONE);
     $this->assertTrue($option->getDefault() === false, '->getDefault() returns false if the option does not take a parameter');
@@ -113,11 +113,11 @@ class InputOptionTest extends \PHPUnit_Framework_TestCase
     $option->setDefault(null);
     $this->assertTrue(is_null($option->getDefault()), '->setDefault() can reset the default value by passing null');
     $option->setDefault('another');
-    $this->assertEquals($option->getDefault(), 'another', '->setDefault() changes the default value');
+    $this->assertEquals('another', $option->getDefault(), '->setDefault() changes the default value');
 
     $option = new InputOption('foo', null, InputOption::PARAMETER_REQUIRED | InputOption::PARAMETER_IS_ARRAY);
     $option->setDefault(array(1, 2));
-    $this->assertEquals($option->getDefault(), array(1, 2), '->setDefault() changes the default value');
+    $this->assertEquals(array(1, 2), $option->getDefault(), '->setDefault() changes the default value');
 
     $option = new InputOption('foo', 'f', InputOption::PARAMETER_NONE);
     try

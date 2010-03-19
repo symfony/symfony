@@ -28,7 +28,7 @@ class IniLoaderTest extends \PHPUnit_Framework_TestCase
   {
     $loader = new IniFileLoader(self::$fixturesPath.'/ini');
     $config = $loader->load('parameters.ini');
-    $this->assertEquals($config->getParameters(), array('foo' => 'bar', 'bar' => '%foo%'), '->load() takes a single file name as its first argument');
+    $this->assertEquals(array('foo' => 'bar', 'bar' => '%foo%'), $config->getParameters(), '->load() takes a single file name as its first argument');
 
     try
     {

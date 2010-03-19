@@ -56,7 +56,7 @@ class ParserTest extends \PHPUnit_Framework_TestCase
         {
           $expected = var_export(eval('return '.trim($test['php']).';'), true);
 
-          $this->assertEquals(var_export($this->parser->parse($test['yaml']), true), $expected, $test['test']);
+          $this->assertEquals($expected, var_export($this->parser->parse($test['yaml']), true), $test['test']);
         }
       }
     }

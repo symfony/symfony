@@ -33,14 +33,14 @@ class ChainLoaderTest extends \PHPUnit_Framework_TestCase
   public function testConstructor()
   {
     $loader = new ProjectTemplateLoader1(array(self::$loader1, self::$loader2));
-    $this->assertEquals($loader->getLoaders(), array(self::$loader1, self::$loader2), '__construct() takes an array of template loaders as its second argument');
+    $this->assertEquals(array(self::$loader1, self::$loader2), $loader->getLoaders(), '__construct() takes an array of template loaders as its second argument');
   }
 
   public function testAddLoader()
   {
     $loader = new ProjectTemplateLoader1(array(self::$loader1));
     $loader->addLoader(self::$loader2);
-    $this->assertEquals($loader->getLoaders(), array(self::$loader1, self::$loader2), '->addLoader() adds a template loader at the end of the loaders');
+    $this->assertEquals(array(self::$loader1, self::$loader2), $loader->getLoaders(), '->addLoader() adds a template loader at the end of the loaders');
   }
 
   public function testLoad()

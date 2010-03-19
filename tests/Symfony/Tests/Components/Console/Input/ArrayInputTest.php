@@ -22,11 +22,11 @@ class ArrayInputTest extends \PHPUnit_Framework_TestCase
   public function testGetFirstArgument()
   {
     $input = new ArrayInput(array());
-    $this->assertEquals($input->getFirstArgument(), null, '->getFirstArgument() returns null if no argument were passed');
+    $this->assertEquals(null, $input->getFirstArgument(), '->getFirstArgument() returns null if no argument were passed');
     $input = new ArrayInput(array('name' => 'Fabien'));
-    $this->assertEquals($input->getFirstArgument(), 'Fabien', '->getFirstArgument() returns the first passed argument');
+    $this->assertEquals('Fabien', $input->getFirstArgument(), '->getFirstArgument() returns the first passed argument');
     $input = new ArrayInput(array('--foo' => 'bar', 'name' => 'Fabien'));
-    $this->assertEquals($input->getFirstArgument(), 'Fabien', '->getFirstArgument() returns the first passed argument');
+    $this->assertEquals('Fabien', $input->getFirstArgument(), '->getFirstArgument() returns the first passed argument');
   }
 
   public function testHasParameterOption()
@@ -42,7 +42,7 @@ class ArrayInputTest extends \PHPUnit_Framework_TestCase
   public function testParse()
   {
     $input = new ArrayInput(array('name' => 'foo'), new InputDefinition(array(new InputArgument('name'))));
-    $this->assertEquals($input->getArguments(), array('name' => 'foo'), '->parse() parses required arguments');
+    $this->assertEquals(array('name' => 'foo'), $input->getArguments(), '->parse() parses required arguments');
 
     try
     {
@@ -54,13 +54,13 @@ class ArrayInputTest extends \PHPUnit_Framework_TestCase
     }
 
     $input = new ArrayInput(array('--foo' => 'bar'), new InputDefinition(array(new InputOption('foo'))));
-    $this->assertEquals($input->getOptions(), array('foo' => 'bar'), '->parse() parses long options');
+    $this->assertEquals(array('foo' => 'bar'), $input->getOptions(), '->parse() parses long options');
 
     $input = new ArrayInput(array('--foo' => 'bar'), new InputDefinition(array(new InputOption('foo', 'f', InputOption::PARAMETER_OPTIONAL, '', 'default'))));
-    $this->assertEquals($input->getOptions(), array('foo' => 'bar'), '->parse() parses long options with a default value');
+    $this->assertEquals(array('foo' => 'bar'), $input->getOptions(), '->parse() parses long options with a default value');
 
     $input = new ArrayInput(array('--foo' => null), new InputDefinition(array(new InputOption('foo', 'f', InputOption::PARAMETER_OPTIONAL, '', 'default'))));
-    $this->assertEquals($input->getOptions(), array('foo' => 'default'), '->parse() parses long options with a default value');
+    $this->assertEquals(array('foo' => 'default'), $input->getOptions(), '->parse() parses long options with a default value');
 
     try
     {
@@ -81,7 +81,7 @@ class ArrayInputTest extends \PHPUnit_Framework_TestCase
     }
 
     $input = new ArrayInput(array('-f' => 'bar'), new InputDefinition(array(new InputOption('foo', 'f'))));
-    $this->assertEquals($input->getOptions(), array('foo' => 'bar'), '->parse() parses short options');
+    $this->assertEquals(array('foo' => 'bar'), $input->getOptions(), '->parse() parses short options');
 
     try
     {

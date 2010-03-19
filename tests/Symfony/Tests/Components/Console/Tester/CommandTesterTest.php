@@ -34,24 +34,24 @@ class CommandTesterTest extends \PHPUnit_Framework_TestCase
 
   public function testExecute()
   {
-    $this->assertEquals($this->tester->getInput()->isInteractive(), false, '->execute() takes an interactive option');
-    $this->assertEquals($this->tester->getOutput()->isDecorated(), false, '->execute() takes a decorated option');
-    $this->assertEquals($this->tester->getOutput()->getVerbosity(), Output::VERBOSITY_VERBOSE, '->execute() takes a verbosity option');
+    $this->assertEquals(false, $this->tester->getInput()->isInteractive(), '->execute() takes an interactive option');
+    $this->assertEquals(false, $this->tester->getOutput()->isDecorated(), '->execute() takes a decorated option');
+    $this->assertEquals(Output::VERBOSITY_VERBOSE, $this->tester->getOutput()->getVerbosity(), '->execute() takes a verbosity option');
   }
 
   public function testGetInput()
   {
-    $this->assertEquals($this->tester->getInput()->getArgument('foo'), 'bar', '->getInput() returns the current input instance');
+    $this->assertEquals('bar', $this->tester->getInput()->getArgument('foo'), '->getInput() returns the current input instance');
   }
 
   public function testGetOutput()
   {
     rewind($this->tester->getOutput()->getStream());
-    $this->assertEquals(stream_get_contents($this->tester->getOutput()->getStream()), "foo\n", '->getOutput() returns the current output instance');
+    $this->assertEquals("foo\n", stream_get_contents($this->tester->getOutput()->getStream()), '->getOutput() returns the current output instance');
   }
 
   public function testGetDisplay()
   {
-    $this->assertEquals($this->tester->getDisplay(), "foo\n", '->getDisplay() returns the display of the last execution');
+    $this->assertEquals("foo\n", $this->tester->getDisplay(), '->getDisplay() returns the display of the last execution');
   }
 }

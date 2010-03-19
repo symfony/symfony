@@ -33,53 +33,53 @@ class ApplicationTest extends \PHPUnit_Framework_TestCase
   public function testConstructor()
   {
     $application = new Application('foo', 'bar');
-    $this->assertEquals($application->getName(), 'foo', '__construct() takes the application name as its first argument');
-    $this->assertEquals($application->getVersion(), 'bar', '__construct() takes the application version as its first argument');
-    $this->assertEquals(array_keys($application->getCommands()), array('help', 'list'), '__construct() registered the help and list commands by default');
+    $this->assertEquals('foo', $application->getName(), '__construct() takes the application name as its first argument');
+    $this->assertEquals('bar', $application->getVersion(), '__construct() takes the application version as its first argument');
+    $this->assertEquals(array('help', 'list'), array_keys($application->getCommands()), '__construct() registered the help and list commands by default');
   }
 
   public function testSetGetName()
   {
     $application = new Application();
     $application->setName('foo');
-    $this->assertEquals($application->getName(), 'foo', '->setName() sets the name of the application');
+    $this->assertEquals('foo', $application->getName(), '->setName() sets the name of the application');
   }
 
   public function testSetGetVersion()
   {
     $application = new Application();
     $application->setVersion('bar');
-    $this->assertEquals($application->getVersion(), 'bar', '->setVersion() sets the version of the application');
+    $this->assertEquals('bar', $application->getVersion(), '->setVersion() sets the version of the application');
   }
 
   public function testGetLongVersion()
   {
     $application = new Application('foo', 'bar');
-    $this->assertEquals($application->getLongVersion(), '<info>foo</info> version <comment>bar</comment>', '->getLongVersion() returns the long version of the application');
+    $this->assertEquals('<info>foo</info> version <comment>bar</comment>', $application->getLongVersion(), '->getLongVersion() returns the long version of the application');
   }
 
   public function testHelp()
   {
     $application = new Application();
-    $this->assertEquals($application->getHelp(), file_get_contents(self::$fixturesPath.'/application_gethelp.txt'), '->setHelp() returns a help message');
+    $this->assertEquals(file_get_contents(self::$fixturesPath.'/application_gethelp.txt'), $application->getHelp(), '->setHelp() returns a help message');
   }
 
   public function testGetCommands()
   {
     $application = new Application();
     $commands = $application->getCommands();
-    $this->assertEquals(get_class($commands['help']), 'Symfony\\Components\\Console\\Command\\HelpCommand', '->getCommands() returns the registered commands');
+    $this->assertEquals('Symfony\\Components\\Console\\Command\\HelpCommand', get_class($commands['help']), '->getCommands() returns the registered commands');
 
     $application->addCommand(new \FooCommand());
     $commands = $application->getCommands('foo');
-    $this->assertEquals(count($commands), 1, '->getCommands() takes a namespace as its first argument');
+    $this->assertEquals(1, count($commands), '->getCommands() takes a namespace as its first argument');
   }
 
   public function testRegister()
   {
     $application = new Application();
     $command = $application->register('foo');
-    $this->assertEquals($command->getName(), 'foo', '->register() regiters a new command');
+    $this->assertEquals('foo', $command->getName(), '->register() regiters a new command');
   }
 
   public function testAddCommand()
@@ -87,12 +87,12 @@ class ApplicationTest extends \PHPUnit_Framework_TestCase
     $application = new Application();
     $application->addCommand($foo = new \FooCommand());
     $commands = $application->getCommands();
-    $this->assertEquals($commands['foo:bar'], $foo, '->addCommand() registers a command');
+    $this->assertEquals($foo, $commands['foo:bar'], '->addCommand() registers a command');
 
     $application = new Application();
     $application->addCommands(array($foo = new \FooCommand(), $foo1 = new \Foo1Command()));
     $commands = $application->getCommands();
-    $this->assertEquals(array($commands['foo:bar'], $commands['foo:bar1']), array($foo, $foo1), '->addCommands() registers an array of commands');
+    $this->assertEquals(array($foo, $foo1), array($commands['foo:bar'], $commands['foo:bar1']), '->addCommands() registers an array of commands');
   }
 
   public function testHasGetCommand()
@@ -103,8 +103,8 @@ class ApplicationTest extends \PHPUnit_Framework_TestCase
 
     $application->addCommand($foo = new \FooCommand());
     $this->assertTrue($application->hasCommand('afoobar'), '->hasCommand() returns true if an alias is registered');
-    $this->assertEquals($application->getCommand('foo:bar'), $foo, '->getCommand() returns a command by name');
-    $this->assertEquals($application->getCommand('afoobar'), $foo, '->getCommand() returns a command by alias');
+    $this->assertEquals($foo, $application->getCommand('foo:bar'), '->getCommand() returns a command by name');
+    $this->assertEquals($foo, $application->getCommand('afoobar'), '->getCommand() returns a command by alias');
 
     try
     {
@@ -119,7 +119,7 @@ class ApplicationTest extends \PHPUnit_Framework_TestCase
     $application->addCommand($foo = new \FooCommand());
     $application->setWantHelps();
     $command = $application->getCommand('foo:bar');
-    $this->assertEquals(get_class($command), 'Symfony\Components\Console\Command\HelpCommand', '->getCommand() returns the help command if --help is provided as the input');
+    $this->assertEquals('Symfony\Components\Console\Command\HelpCommand', get_class($command), '->getCommand() returns the help command if --help is provided as the input');
   }
 
   public function testGetNamespaces()
@@ -127,17 +127,17 @@ class ApplicationTest extends \PHPUnit_Framework_TestCase
     $application = new TestApplication();
     $application->addCommand(new \FooCommand());
     $application->addCommand(new \Foo1Command());
-    $this->assertEquals($application->getNamespaces(), array('foo'), '->getNamespaces() returns an array of unique used namespaces');
+    $this->assertEquals(array('foo'), $application->getNamespaces(), '->getNamespaces() returns an array of unique used namespaces');
   }
 
   public function testFindNamespace()
   {
     $application = new TestApplication();
     $application->addCommand(new \FooCommand());
-    $this->assertEquals($application->findNamespace('foo'), 'foo', '->findNamespace() returns the given namespace if it exists');
-    $this->assertEquals($application->findNamespace('f'), 'foo', '->findNamespace() finds a namespace given an abbreviation');
+    $this->assertEquals('foo', $application->findNamespace('foo'), '->findNamespace() returns the given namespace if it exists');
+    $this->assertEquals('foo', $application->findNamespace('f'), '->findNamespace() finds a namespace given an abbreviation');
     $application->addCommand(new \Foo2Command());
-    $this->assertEquals($application->findNamespace('foo'), 'foo', '->findNamespace() returns the given namespace if it exists');
+    $this->assertEquals('foo', $application->findNamespace('foo'), '->findNamespace() returns the given namespace if it exists');
     try
     {
       $application->findNamespace('f');
@@ -161,11 +161,11 @@ class ApplicationTest extends \PHPUnit_Framework_TestCase
   {
     $application = new TestApplication();
     $application->addCommand(new \FooCommand());
-    $this->assertEquals(get_class($application->findCommand('foo:bar')), 'FooCommand', '->findCommand() returns a command if its name exists');
-    $this->assertEquals(get_class($application->findCommand('h')), 'Symfony\Components\Console\Command\HelpCommand', '->findCommand() returns a command if its name exists');
-    $this->assertEquals(get_class($application->findCommand('f:bar')), 'FooCommand', '->findCommand() returns a command if the abbreviation for the namespace exists');
-    $this->assertEquals(get_class($application->findCommand('f:b')), 'FooCommand', '->findCommand() returns a command if the abbreviation for the namespace and the command name exist');
-    $this->assertEquals(get_class($application->findCommand('a')), 'FooCommand', '->findCommand() returns a command if the abbreviation exists for an alias');
+    $this->assertEquals('FooCommand', get_class($application->findCommand('foo:bar')), '->findCommand() returns a command if its name exists');
+    $this->assertEquals('Symfony\Components\Console\Command\HelpCommand', get_class($application->findCommand('h')), '->findCommand() returns a command if its name exists');
+    $this->assertEquals('FooCommand', get_class($application->findCommand('f:bar')), '->findCommand() returns a command if the abbreviation for the namespace exists');
+    $this->assertEquals('FooCommand', get_class($application->findCommand('f:b')), '->findCommand() returns a command if the abbreviation for the namespace and the command name exist');
+    $this->assertEquals('FooCommand', get_class($application->findCommand('a')), '->findCommand() returns a command if the abbreviation exists for an alias');
 
     $application->addCommand(new \Foo1Command());
     $application->addCommand(new \Foo2Command());
@@ -206,7 +206,7 @@ class ApplicationTest extends \PHPUnit_Framework_TestCase
 
     $application->setCatchExceptions(true);
     $tester->run(array('command' => 'foo'));
-    $this->assertEquals($tester->getDisplay(), file_get_contents(self::$fixturesPath.'/application_renderexception1.txt'), '->setCatchExceptions() sets the catch exception flag');
+    $this->assertEquals(file_get_contents(self::$fixturesPath.'/application_renderexception1.txt'), $tester->getDisplay(), '->setCatchExceptions() sets the catch exception flag');
 
     $application->setCatchExceptions(false);
     try
@@ -223,16 +223,16 @@ class ApplicationTest extends \PHPUnit_Framework_TestCase
   {
     $application = new Application();
     $application->addCommand(new \FooCommand);
-    $this->assertEquals($application->asText(), file_get_contents(self::$fixturesPath.'/application_astext1.txt'), '->asText() returns a text representation of the application');
-    $this->assertEquals($application->asText('foo'), file_get_contents(self::$fixturesPath.'/application_astext2.txt'), '->asText() returns a text representation of the application');
+    $this->assertEquals(file_get_contents(self::$fixturesPath.'/application_astext1.txt'), $application->asText(), '->asText() returns a text representation of the application');
+    $this->assertEquals(file_get_contents(self::$fixturesPath.'/application_astext2.txt'), $application->asText('foo'), '->asText() returns a text representation of the application');
   }
 
   public function testAsXml()
   {
     $application = new Application();
     $application->addCommand(new \FooCommand);
-    $this->assertEquals($application->asXml(), file_get_contents(self::$fixturesPath.'/application_asxml1.txt'), '->asXml() returns an XML representation of the application');
-    $this->assertEquals($application->asXml('foo'), file_get_contents(self::$fixturesPath.'/application_asxml2.txt'), '->asXml() returns an XML representation of the application');
+    $this->assertEquals(file_get_contents(self::$fixturesPath.'/application_asxml1.txt'), $application->asXml(), '->asXml() returns an XML representation of the application');
+    $this->assertEquals(file_get_contents(self::$fixturesPath.'/application_asxml2.txt'), $application->asXml('foo'), '->asXml() returns an XML representation of the application');
   }
 
   public function testRenderException()
@@ -242,13 +242,13 @@ class ApplicationTest extends \PHPUnit_Framework_TestCase
     $tester = new ApplicationTester($application);
 
     $tester->run(array('command' => 'foo'));
-    $this->assertEquals($tester->getDisplay(), file_get_contents(self::$fixturesPath.'/application_renderexception1.txt'), '->renderException() renders a pretty exception');
+    $this->assertEquals(file_get_contents(self::$fixturesPath.'/application_renderexception1.txt'), $tester->getDisplay(), '->renderException() renders a pretty exception');
 
     $tester->run(array('command' => 'foo'), array('verbosity' => Output::VERBOSITY_VERBOSE));
     $this->assertRegExp('/Exception trace/', $tester->getDisplay(), '->renderException() renders a pretty exception with a stack trace when verbosity is verbose');
 
     $tester->run(array('command' => 'list', '--foo' => true));
-    $this->assertEquals($tester->getDisplay(), file_get_contents(self::$fixturesPath.'/application_renderexception2.txt'), '->renderException() renders the command synopsis when an exception occurs in the context of a command');
+    $this->assertEquals(file_get_contents(self::$fixturesPath.'/application_renderexception2.txt'), $tester->getDisplay(), '->renderException() renders the command synopsis when an exception occurs in the context of a command');
   }
 
   public function testRun()
@@ -263,25 +263,25 @@ class ApplicationTest extends \PHPUnit_Framework_TestCase
     $application->run();
     ob_end_clean();
 
-    $this->assertEquals(get_class($command->input), 'Symfony\Components\Console\Input\ArgvInput', '->run() creates an ArgvInput by default if none is given');
-    $this->assertEquals(get_class($command->output), 'Symfony\Components\Console\Output\ConsoleOutput', '->run() creates a ConsoleOutput by default if none is given');
+    $this->assertEquals('Symfony\Components\Console\Input\ArgvInput', get_class($command->input), '->run() creates an ArgvInput by default if none is given');
+    $this->assertEquals('Symfony\Components\Console\Output\ConsoleOutput', get_class($command->output), '->run() creates a ConsoleOutput by default if none is given');
 
     $application = new Application();
     $application->setAutoExit(false);
     $application->setCatchExceptions(false);
     $tester = new ApplicationTester($application);
     $tester->run(array());
-    $this->assertEquals($tester->getDisplay(), file_get_contents(self::$fixturesPath.'/application_run1.txt'), '->run() runs the list command if no argument is passed');
+    $this->assertEquals(file_get_contents(self::$fixturesPath.'/application_run1.txt'), $tester->getDisplay(), '->run() runs the list command if no argument is passed');
 
     $tester->run(array('--help' => true));
-    $this->assertEquals($tester->getDisplay(), file_get_contents(self::$fixturesPath.'/application_run2.txt'), '->run() runs the help command if --help is passed');
+    $this->assertEquals(file_get_contents(self::$fixturesPath.'/application_run2.txt'), $tester->getDisplay(), '->run() runs the help command if --help is passed');
 
     $application = new Application();
     $application->setAutoExit(false);
     $application->setCatchExceptions(false);
     $tester = new ApplicationTester($application);
     $tester->run(array('command' => 'list', '--help' => true));
-    $this->assertEquals($tester->getDisplay(), file_get_contents(self::$fixturesPath.'/application_run3.txt'), '->run() displays the help if --help is passed');
+    $this->assertEquals(file_get_contents(self::$fixturesPath.'/application_run3.txt'), $tester->getDisplay(), '->run() displays the help if --help is passed');
 
     $application = new Application();
     $application->setAutoExit(false);
@@ -295,21 +295,21 @@ class ApplicationTest extends \PHPUnit_Framework_TestCase
     $application->setCatchExceptions(false);
     $tester = new ApplicationTester($application);
     $tester->run(array('--version' => true));
-    $this->assertEquals($tester->getDisplay(), file_get_contents(self::$fixturesPath.'/application_run4.txt'), '->run() displays the program version if --version is passed');
+    $this->assertEquals(file_get_contents(self::$fixturesPath.'/application_run4.txt'), $tester->getDisplay(), '->run() displays the program version if --version is passed');
 
     $application = new Application();
     $application->setAutoExit(false);
     $application->setCatchExceptions(false);
     $tester = new ApplicationTester($application);
     $tester->run(array('command' => 'list', '--quiet' => true));
-    $this->assertEquals($tester->getDisplay(), '', '->run() removes all output if --quiet is passed');
+    $this->assertEquals('', $tester->getDisplay(), '->run() removes all output if --quiet is passed');
 
     $application = new Application();
     $application->setAutoExit(false);
     $application->setCatchExceptions(false);
     $tester = new ApplicationTester($application);
     $tester->run(array('command' => 'list', '--verbose' => true));
-    $this->assertEquals($tester->getOutput()->getVerbosity(), Output::VERBOSITY_VERBOSE, '->run() sets the output to verbose is --verbose is passed');
+    $this->assertEquals(Output::VERBOSITY_VERBOSE, $tester->getOutput()->getVerbosity(), '->run() sets the output to verbose is --verbose is passed');
 
     $application = new Application();
     $application->setAutoExit(false);
@@ -317,7 +317,7 @@ class ApplicationTest extends \PHPUnit_Framework_TestCase
     $application->addCommand(new \FooCommand());
     $tester = new ApplicationTester($application);
     $tester->run(array('command' => 'foo:bar', '--no-interaction' => true));
-    $this->assertEquals($tester->getDisplay(), "called\n", '->run() does not called interact() if --no-interaction is passed');
+    $this->assertEquals("called\n", $tester->getDisplay(), '->run() does not called interact() if --no-interaction is passed');
   }
 }
 

@@ -30,13 +30,13 @@ class EscaperTest extends \PHPUnit_Framework_TestCase
 
   public function testEscapeDoesNotEscapeAValueWhenEscapingMethodIsRAW()
   {
-    $this->assertEquals(Escaper::escape('raw', '<strong>escaped!</strong>'), '<strong>escaped!</strong>', '::escape() takes an escaping strategy function name as its first argument');
+    $this->assertEquals('<strong>escaped!</strong>', Escaper::escape('raw', '<strong>escaped!</strong>'), '::escape() takes an escaping strategy function name as its first argument');
   }
 
   public function testEscapeEscapesStrings()
   {
-    $this->assertEquals(Escaper::escape('entities', '<strong>escaped!</strong>'), '&lt;strong&gt;escaped!&lt;/strong&gt;', '::escape() returns an escaped string if the value to escape is a string');
-    $this->assertEquals(Escaper::escape('entities', '<strong>échappé</strong>'), '&lt;strong&gt;&eacute;chapp&eacute;&lt;/strong&gt;', '::escape() returns an escaped string if the value to escape is a string');
+    $this->assertEquals('&lt;strong&gt;escaped!&lt;/strong&gt;', Escaper::escape('entities', '<strong>escaped!</strong>'), '::escape() returns an escaped string if the value to escape is a string');
+    $this->assertEquals('&lt;strong&gt;&eacute;chapp&eacute;&lt;/strong&gt;', Escaper::escape('entities', '<strong>échappé</strong>'), '::escape() returns an escaped string if the value to escape is a string');
   }
 
   public function testEscapeEscapesArrays()
@@ -47,9 +47,9 @@ class EscaperTest extends \PHPUnit_Framework_TestCase
     );
     $output = Escaper::escape('entities', $input);
     $this->assertTrue($output instanceof ArrayDecorator, '::escape() returns a ArrayDecorator object if the value to escape is an array');
-    $this->assertEquals($output['foo'], '&lt;strong&gt;escaped!&lt;/strong&gt;', '::escape() escapes all elements of the original array');
-    $this->assertEquals($output['bar']['foo'], '&lt;strong&gt;escaped!&lt;/strong&gt;', '::escape() is recursive');
-    $this->assertEquals($output->getRawValue(), $input, '->getRawValue() returns the unescaped value');
+    $this->assertEquals('&lt;strong&gt;escaped!&lt;/strong&gt;', $output['foo'], '::escape() escapes all elements of the original array');
+    $this->assertEquals('&lt;strong&gt;escaped!&lt;/strong&gt;', $output['bar']['foo'], '::escape() is recursive');
+    $this->assertEquals($input, $output->getRawValue(), '->getRawValue() returns the unescaped value');
   }
 
   public function testEscapeEscapesObjects()
@@ -57,12 +57,12 @@ class EscaperTest extends \PHPUnit_Framework_TestCase
     $input = new OutputEscaperTestClass();
     $output = Escaper::escape('entities', $input);
     $this->assertTrue($output instanceof ObjectDecorator, '::escape() returns a ObjectDecorator object if the value to escape is an object');
-    $this->assertEquals($output->getTitle(), '&lt;strong&gt;escaped!&lt;/strong&gt;', '::escape() escapes all methods of the original object');
-    $this->assertEquals($output->title, '&lt;strong&gt;escaped!&lt;/strong&gt;', '::escape() escapes all properties of the original object');
-    $this->assertEquals($output->getTitleTitle(), '&lt;strong&gt;escaped!&lt;/strong&gt;', '::escape() is recursive');
-    $this->assertEquals($output->getRawValue(), $input, '->getRawValue() returns the unescaped value');
+    $this->assertEquals('&lt;strong&gt;escaped!&lt;/strong&gt;', $output->getTitle(), '::escape() escapes all methods of the original object');
+    $this->assertEquals('&lt;strong&gt;escaped!&lt;/strong&gt;', $output->title, '::escape() escapes all properties of the original object');
+    $this->assertEquals('&lt;strong&gt;escaped!&lt;/strong&gt;', $output->getTitleTitle(), '::escape() is recursive');
+    $this->assertEquals($input, $output->getRawValue(), '->getRawValue() returns the unescaped value');
 
-    $this->assertEquals(Escaper::escape('entities', $output)->getTitle(), '&lt;strong&gt;escaped!&lt;/strong&gt;', '::escape() does not double escape an object');
+    $this->assertEquals('&lt;strong&gt;escaped!&lt;/strong&gt;', Escaper::escape('entities', $output)->getTitle(), '::escape() does not double escape an object');
     $this->assertTrue(Escaper::escape('entities', new \DirectoryIterator('.')) instanceof IteratorDecorator, '::escape() returns a IteratorDecorator object if the value to escape is an object that implements the ArrayAccess interface');
   }
 
@@ -99,8 +99,8 @@ class EscaperTest extends \PHPUnit_Framework_TestCase
 
   public function testUnescapeUnescapesStrings()
   {
-    $this->assertEquals(Escaper::unescape('&lt;strong&gt;escaped!&lt;/strong&gt;'), '<strong>escaped!</strong>', '::unescape() returns an unescaped string if the value to unescape is a string');
-    $this->assertEquals(Escaper::unescape('&lt;strong&gt;&eacute;chapp&eacute;&lt;/strong&gt;'), '<strong>échappé</strong>', '::unescape() returns an unescaped string if the value to unescape is a string');
+    $this->assertEquals('<strong>escaped!</strong>', Escaper::unescape('&lt;strong&gt;escaped!&lt;/strong&gt;'), '::unescape() returns an unescaped string if the value to unescape is a string');
+    $this->assertEquals('<strong>échappé</strong>', Escaper::unescape('&lt;strong&gt;&eacute;chapp&eacute;&lt;/strong&gt;'), '::unescape() returns an unescaped string if the value to unescape is a string');
   }
 
   public function testUnescapeUnescapesArrays()
@@ -111,8 +111,8 @@ class EscaperTest extends \PHPUnit_Framework_TestCase
     ));
     $output = Escaper::unescape($input);
     $this->assertTrue(is_array($output), '::unescape() returns an array if the input is a ArrayDecorator object');
-    $this->assertEquals($output['foo'], '<strong>escaped!</strong>', '::unescape() unescapes all elements of the original array');
-    $this->assertEquals($output['bar']['foo'], '<strong>escaped!</strong>', '::unescape() is recursive');
+    $this->assertEquals('<strong>escaped!</strong>', $output['foo'], '::unescape() unescapes all elements of the original array');
+    $this->assertEquals('<strong>escaped!</strong>', $output['bar']['foo'], '::unescape() is recursive');
   }
 
   public function testUnescapeUnescapesObjects()
@@ -121,9 +121,9 @@ class EscaperTest extends \PHPUnit_Framework_TestCase
     $input = Escaper::escape('entities', $object);
     $output = Escaper::unescape($input);
     $this->assertTrue($output instanceof OutputEscaperTestClass, '::unescape() returns the original object when a ObjectDecorator object is passed');
-    $this->assertEquals($output->getTitle(), '<strong>escaped!</strong>', '::unescape() unescapes all methods of the original object');
-    $this->assertEquals($output->title, '<strong>escaped!</strong>', '::unescape() unescapes all properties of the original object');
-    $this->assertEquals($output->getTitleTitle(), '<strong>escaped!</strong>', '::unescape() is recursive');
+    $this->assertEquals('<strong>escaped!</strong>', $output->getTitle(), '::unescape() unescapes all methods of the original object');
+    $this->assertEquals('<strong>escaped!</strong>', $output->title, '::unescape() unescapes all properties of the original object');
+    $this->assertEquals('<strong>escaped!</strong>', $output->getTitleTitle(), '::unescape() is recursive');
 
     $this->assertTrue(IteratorDecorator::unescape(Escaper::escape('entities', new \DirectoryIterator('.'))) instanceof \DirectoryIterator, '::unescape() unescapes IteratorDecorator objects');
   }
@@ -140,7 +140,7 @@ class EscaperTest extends \PHPUnit_Framework_TestCase
   public function testUnescapeDoesNothingToResources()
   {
     $fh = fopen(__FILE__, 'r');
-    $this->assertEquals(Escaper::unescape($fh), $fh, '::unescape() do nothing to resources');
+    $this->assertEquals($fh, Escaper::unescape($fh), '::unescape() do nothing to resources');
   }
 
   public function testUnescapeUnescapesMixedArrays()
@@ -156,7 +156,7 @@ class EscaperTest extends \PHPUnit_Framework_TestCase
       'bar'    => '<strong>bar</strong>',
       'foobar' => $object,
     );
-    $this->assertEquals(Escaper::unescape($input), $output, '::unescape() unescapes values with some escaped and unescaped values');
+    $this->assertEquals($output, Escaper::unescape($input), '::unescape() unescapes values with some escaped and unescaped values');
   }
 }
 

@@ -23,29 +23,29 @@ class ArgvInputTest extends \PHPUnit_Framework_TestCase
   {
     $_SERVER['argv'] = array('cli.php', 'foo');
     $input = new TestInput();
-    $this->assertEquals($input->getTokens(), array('foo'), '__construct() automatically get its input from the argv server variable');
+    $this->assertEquals(array('foo'), $input->getTokens(), '__construct() automatically get its input from the argv server variable');
   }
 
   public function testParser()
   {
     $input = new TestInput(array('cli.php', 'foo'));
     $input->bind(new InputDefinition(array(new InputArgument('name'))));
-    $this->assertEquals($input->getArguments(), array('name' => 'foo'), '->parse() parses required arguments');
+    $this->assertEquals(array('name' => 'foo'), $input->getArguments(), '->parse() parses required arguments');
 
     $input->bind(new InputDefinition(array(new InputArgument('name'))));
-    $this->assertEquals($input->getArguments(), array('name' => 'foo'), '->parse() is stateless');
+    $this->assertEquals(array('name' => 'foo'), $input->getArguments(), '->parse() is stateless');
 
     $input = new TestInput(array('cli.php', '--foo'));
     $input->bind(new InputDefinition(array(new InputOption('foo'))));
-    $this->assertEquals($input->getOptions(), array('foo' => true), '->parse() parses long options without parameter');
+    $this->assertEquals(array('foo' => true), $input->getOptions(), '->parse() parses long options without parameter');
 
     $input = new TestInput(array('cli.php', '--foo=bar'));
     $input->bind(new InputDefinition(array(new InputOption('foo', 'f', InputOption::PARAMETER_REQUIRED))));
-    $this->assertEquals($input->getOptions(), array('foo' => 'bar'), '->parse() parses long options with a required parameter (with a = separator)');
+    $this->assertEquals(array('foo' => 'bar'), $input->getOptions(), '->parse() parses long options with a required parameter (with a = separator)');
 
     $input = new TestInput(array('cli.php', '--foo', 'bar'));
     $input->bind(new InputDefinition(array(new InputOption('foo', 'f', InputOption::PARAMETER_REQUIRED))));
-    $this->assertEquals($input->getOptions(), array('foo' => 'bar'), '->parse() parses long options with a required parameter (with a space separator)');
+    $this->assertEquals(array('foo' => 'bar'), $input->getOptions(), '->parse() parses long options with a required parameter (with a space separator)');
 
     try
     {
@@ -59,19 +59,19 @@ class ArgvInputTest extends \PHPUnit_Framework_TestCase
 
     $input = new TestInput(array('cli.php', '-f'));
     $input->bind(new InputDefinition(array(new InputOption('foo', 'f'))));
-    $this->assertEquals($input->getOptions(), array('foo' => true), '->parse() parses short options without parameter');
+    $this->assertEquals(array('foo' => true), $input->getOptions(), '->parse() parses short options without parameter');
 
     $input = new TestInput(array('cli.php', '-fbar'));
     $input->bind(new InputDefinition(array(new InputOption('foo', 'f', InputOption::PARAMETER_REQUIRED))));
-    $this->assertEquals($input->getOptions(), array('foo' => 'bar'), '->parse() parses short options with a required parameter (with no separator)');
+    $this->assertEquals(array('foo' => 'bar'), $input->getOptions(), '->parse() parses short options with a required parameter (with no separator)');
 
     $input = new TestInput(array('cli.php', '-f', 'bar'));
     $input->bind(new InputDefinition(array(new InputOption('foo', 'f', InputOption::PARAMETER_REQUIRED))));
-    $this->assertEquals($input->getOptions(), array('foo' => 'bar'), '->parse() parses short options with a required parameter (with a space separator)');
+    $this->assertEquals(array('foo' => 'bar'), $input->getOptions(), '->parse() parses short options with a required parameter (with a space separator)');
 
     $input = new TestInput(array('cli.php', '-f', '-b', 'foo'));
     $input->bind(new InputDefinition(array(new InputArgument('name'), new InputOption('foo', 'f', InputOption::PARAMETER_OPTIONAL), new InputOption('bar', 'b'))));
-    $this->assertEquals($input->getOptions(), array('foo' => null, 'bar' => true), '->parse() parses short options with an optional parameter which is not present');
+    $this->assertEquals(array('foo' => null, 'bar' => true), $input->getOptions(), '->parse() parses short options with an optional parameter which is not present');
 
     try
     {
@@ -125,32 +125,32 @@ class ArgvInputTest extends \PHPUnit_Framework_TestCase
 
     $input = new TestInput(array('cli.php', '-fb'));
     $input->bind(new InputDefinition(array(new InputOption('foo', 'f'), new InputOption('bar', 'b'))));
-    $this->assertEquals($input->getOptions(), array('foo' => true, 'bar' => true), '->parse() parses short options when they are aggregated as a single one');
+    $this->assertEquals(array('foo' => true, 'bar' => true), $input->getOptions(), '->parse() parses short options when they are aggregated as a single one');
 
     $input = new TestInput(array('cli.php', '-fb', 'bar'));
     $input->bind(new InputDefinition(array(new InputOption('foo', 'f'), new InputOption('bar', 'b', InputOption::PARAMETER_REQUIRED))));
-    $this->assertEquals($input->getOptions(), array('foo' => true, 'bar' => 'bar'), '->parse() parses short options when they are aggregated as a single one and the last one has a required parameter');
+    $this->assertEquals(array('foo' => true, 'bar' => 'bar'), $input->getOptions(), '->parse() parses short options when they are aggregated as a single one and the last one has a required parameter');
 
     $input = new TestInput(array('cli.php', '-fb', 'bar'));
     $input->bind(new InputDefinition(array(new InputOption('foo', 'f'), new InputOption('bar', 'b', InputOption::PARAMETER_OPTIONAL))));
-    $this->assertEquals($input->getOptions(), array('foo' => true, 'bar' => 'bar'), '->parse() parses short options when they are aggregated as a single one and the last one has an optional parameter');
+    $this->assertEquals(array('foo' => true, 'bar' => 'bar'), $input->getOptions(), '->parse() parses short options when they are aggregated as a single one and the last one has an optional parameter');
 
     $input = new TestInput(array('cli.php', '-fbbar'));
     $input->bind(new InputDefinition(array(new InputOption('foo', 'f'), new InputOption('bar', 'b', InputOption::PARAMETER_OPTIONAL))));
-    $this->assertEquals($input->getOptions(), array('foo' => true, 'bar' => 'bar'), '->parse() parses short options when they are aggregated as a single one and the last one has an optional parameter with no separator');
+    $this->assertEquals(array('foo' => true, 'bar' => 'bar'), $input->getOptions(), '->parse() parses short options when they are aggregated as a single one and the last one has an optional parameter with no separator');
 
     $input = new TestInput(array('cli.php', '-fbbar'));
     $input->bind(new InputDefinition(array(new InputOption('foo', 'f', InputOption::PARAMETER_OPTIONAL), new InputOption('bar', 'b', InputOption::PARAMETER_OPTIONAL))));
-    $this->assertEquals($input->getOptions(), array('foo' => 'bbar', 'bar' => null), '->parse() parses short options when they are aggregated as a single one and one of them takes a parameter');
+    $this->assertEquals(array('foo' => 'bbar', 'bar' => null), $input->getOptions(), '->parse() parses short options when they are aggregated as a single one and one of them takes a parameter');
   }
 
   public function testGetFirstArgument()
   {
     $input = new TestInput(array('cli.php', '-fbbar'));
-    $this->assertEquals($input->getFirstArgument(), '', '->getFirstArgument() returns the first argument from the raw input');
+    $this->assertEquals('', $input->getFirstArgument(), '->getFirstArgument() returns the first argument from the raw input');
 
     $input = new TestInput(array('cli.php', '-fbbar', 'foo'));
-    $this->assertEquals($input->getFirstArgument(), 'foo', '->getFirstArgument() returns the first argument from the raw input');
+    $this->assertEquals('foo', $input->getFirstArgument(), '->getFirstArgument() returns the first argument from the raw input');
   }
 
   public function testHasParameterOption()

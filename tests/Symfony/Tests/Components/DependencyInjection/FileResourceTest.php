@@ -33,7 +33,7 @@ class FileResourceTest extends \PHPUnit_Framework_TestCase
 
   public function testGetResource()
   {
-    $this->assertEquals($this->resource->getResource(), $this->file, '->getResource() returns the path to the resource');
+    $this->assertEquals($this->file, $this->resource->getResource(), '->getResource() returns the path to the resource');
   }
 
   public function testIsUptodate()

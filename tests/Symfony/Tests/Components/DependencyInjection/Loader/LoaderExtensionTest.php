@@ -30,6 +30,6 @@ class LoaderExtensionTest extends \PHPUnit_Framework_TestCase
     }
 
     $config = $extension->load('bar', array('foo' => 'bar'));
-    $this->assertEquals($config->getParameters(), array('project.parameter.bar' => 'bar'), '->load() calls the method tied to the given tag');
+    $this->assertEquals(array('project.parameter.bar' => 'bar'), $config->getParameters(), '->load() calls the method tied to the given tag');
   }
 }

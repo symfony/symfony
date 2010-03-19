@@ -33,18 +33,18 @@ class InputDefinitionTest extends \PHPUnit_Framework_TestCase
     $this->initializeArguments();
 
     $definition = new InputDefinition();
-    $this->assertEquals($definition->getArguments(), array(), '__construct() creates a new InputDefinition object');
+    $this->assertEquals(array(), $definition->getArguments(), '__construct() creates a new InputDefinition object');
 
     $definition = new InputDefinition(array($this->foo, $this->bar));
-    $this->assertEquals($definition->getArguments(), array('foo' => $this->foo, 'bar' => $this->bar), '__construct() takes an array of InputArgument objects as its first argument');
+    $this->assertEquals(array('foo' => $this->foo, 'bar' => $this->bar), $definition->getArguments(), '__construct() takes an array of InputArgument objects as its first argument');
 
     $this->initializeOptions();
 
     $definition = new InputDefinition();
-    $this->assertEquals($definition->getOptions(), array(), '__construct() creates a new InputDefinition object');
+    $this->assertEquals(array(), $definition->getOptions(), '__construct() creates a new InputDefinition object');
 
     $definition = new InputDefinition(array($this->foo, $this->bar));
-    $this->assertEquals($definition->getOptions(), array('foo' => $this->foo, 'bar' => $this->bar), '__construct() takes an array of InputOption objects as its first argument');
+    $this->assertEquals(array('foo' => $this->foo, 'bar' => $this->bar), $definition->getOptions(), '__construct() takes an array of InputOption objects as its first argument');
   }
 
   public function testSetArguments()
@@ -53,10 +53,10 @@ class InputDefinitionTest extends \PHPUnit_Framework_TestCase
 
     $definition = new InputDefinition();
     $definition->setArguments(array($this->foo));
-    $this->assertEquals($definition->getArguments(), array('foo' => $this->foo), '->setArguments() sets the array of InputArgument objects');
+    $this->assertEquals(array('foo' => $this->foo), $definition->getArguments(), '->setArguments() sets the array of InputArgument objects');
     $definition->setArguments(array($this->bar));
 
-    $this->assertEquals($definition->getArguments(), array('bar' => $this->bar), '->setArguments() clears all InputArgument objects');
+    $this->assertEquals(array('bar' => $this->bar), $definition->getArguments(), '->setArguments() clears all InputArgument objects');
   }
 
   public function testAddArguments()
@@ -65,9 +65,9 @@ class InputDefinitionTest extends \PHPUnit_Framework_TestCase
 
     $definition = new InputDefinition();
     $definition->addArguments(array($this->foo));
-    $this->assertEquals($definition->getArguments(), array('foo' => $this->foo), '->addArguments() adds an array of InputArgument objects');
+    $this->assertEquals(array('foo' => $this->foo), $definition->getArguments(), '->addArguments() adds an array of InputArgument objects');
     $definition->addArguments(array($this->bar));
-    $this->assertEquals($definition->getArguments(), array('foo' => $this->foo, 'bar' => $this->bar), '->addArguments() does not clear existing InputArgument objects');
+    $this->assertEquals(array('foo' => $this->foo, 'bar' => $this->bar), $definition->getArguments(), '->addArguments() does not clear existing InputArgument objects');
   }
 
   public function testAddArgument()
@@ -76,9 +76,9 @@ class InputDefinitionTest extends \PHPUnit_Framework_TestCase
 
     $definition = new InputDefinition();
     $definition->addArgument($this->foo);
-    $this->assertEquals($definition->getArguments(), array('foo' => $this->foo), '->addArgument() adds a InputArgument object');
+    $this->assertEquals(array('foo' => $this->foo), $definition->getArguments(), '->addArgument() adds a InputArgument object');
     $definition->addArgument($this->bar);
-    $this->assertEquals($definition->getArguments(), array('foo' => $this->foo, 'bar' => $this->bar), '->addArgument() adds a InputArgument object');
+    $this->assertEquals(array('foo' => $this->foo, 'bar' => $this->bar), $definition->getArguments(), '->addArgument() adds a InputArgument object');
 
     // arguments must have different names
     try
@@ -120,7 +120,7 @@ class InputDefinitionTest extends \PHPUnit_Framework_TestCase
 
     $definition = new InputDefinition();
     $definition->addArguments(array($this->foo));
-    $this->assertEquals($definition->getArgument('foo'), $this->foo, '->getArgument() returns a InputArgument by its name');
+    $this->assertEquals($this->foo, $definition->getArgument('foo'), '->getArgument() returns a InputArgument by its name');
     try
     {
       $definition->getArgument('bar');
@@ -137,8 +137,8 @@ class InputDefinitionTest extends \PHPUnit_Framework_TestCase
 
     $definition = new InputDefinition();
     $definition->addArguments(array($this->foo));
-    $this->assertEquals($definition->hasArgument('foo'), true, '->hasArgument() returns true if a InputArgument exists for the given name');
-    $this->assertEquals($definition->hasArgument('bar'), false, '->hasArgument() returns false if a InputArgument exists for the given name');
+    $this->assertEquals(true, $definition->hasArgument('foo'), '->hasArgument() returns true if a InputArgument exists for the given name');
+    $this->assertEquals(false, $definition->hasArgument('bar'), '->hasArgument() returns false if a InputArgument exists for the given name');
   }
 
   public function testGetArgumentRequiredCount()
@@ -147,9 +147,9 @@ class InputDefinitionTest extends \PHPUnit_Framework_TestCase
 
     $definition = new InputDefinition();
     $definition->addArgument($this->foo2);
-    $this->assertEquals($definition->getArgumentRequiredCount(), 1, '->getArgumentRequiredCount() returns the number of required arguments');
+    $this->assertEquals(1, $definition->getArgumentRequiredCount(), '->getArgumentRequiredCount() returns the number of required arguments');
     $definition->addArgument($this->foo);
-    $this->assertEquals($definition->getArgumentRequiredCount(), 1, '->getArgumentRequiredCount() returns the number of required arguments');
+    $this->assertEquals(1, $definition->getArgumentRequiredCount(), '->getArgumentRequiredCount() returns the number of required arguments');
   }
 
   public function testGetArgumentCount()
@@ -158,9 +158,9 @@ class InputDefinitionTest extends \PHPUnit_Framework_TestCase
 
     $definition = new InputDefinition();
     $definition->addArgument($this->foo2);
-    $this->assertEquals($definition->getArgumentCount(), 1, '->getArgumentCount() returns the number of arguments');
+    $this->assertEquals(1, $definition->getArgumentCount(), '->getArgumentCount() returns the number of arguments');
     $definition->addArgument($this->foo);
-    $this->assertEquals($definition->getArgumentCount(), 2, '->getArgumentCount() returns the number of arguments');
+    $this->assertEquals(2, $definition->getArgumentCount(), '->getArgumentCount() returns the number of arguments');
   }
 
   public function testGetArgumentDefaults()
@@ -171,12 +171,12 @@ class InputDefinitionTest extends \PHPUnit_Framework_TestCase
       new InputArgument('foo3', InputArgument::OPTIONAL | InputArgument::IS_ARRAY),
     //  new InputArgument('foo4', InputArgument::OPTIONAL | InputArgument::IS_ARRAY, '', array(1, 2)),
     ));
-    $this->assertEquals($definition->getArgumentDefaults(), array('foo1' => null, 'foo2' => 'default', 'foo3' => array()), '->getArgumentDefaults() return the default values for each argument');
+    $this->assertEquals(array('foo1' => null, 'foo2' => 'default', 'foo3' => array()), $definition->getArgumentDefaults(), '->getArgumentDefaults() return the default values for each argument');
 
     $definition = new InputDefinition(array(
       new InputArgument('foo4', InputArgument::OPTIONAL | InputArgument::IS_ARRAY, '', array(1, 2)),
     ));
-    $this->assertEquals($definition->getArgumentDefaults(), array('foo4' => array(1, 2)), '->getArgumentDefaults() return the default values for each argument');
+    $this->assertEquals(array('foo4' => array(1, 2)), $definition->getArgumentDefaults(), '->getArgumentDefaults() return the default values for each argument');
   }
 
   public function testSetOptions()
@@ -184,9 +184,9 @@ class InputDefinitionTest extends \PHPUnit_Framework_TestCase
     $this->initializeOptions();
 
     $definition = new InputDefinition(array($this->foo));
-    $this->assertEquals($definition->getOptions(), array('foo' => $this->foo), '->setOptions() sets the array of InputOption objects');
+    $this->assertEquals(array('foo' => $this->foo), $definition->getOptions(), '->setOptions() sets the array of InputOption objects');
     $definition->setOptions(array($this->bar));
-    $this->assertEquals($definition->getOptions(), array('bar' => $this->bar), '->setOptions() clears all InputOption objects');
+    $this->assertEquals(array('bar' => $this->bar), $definition->getOptions(), '->setOptions() clears all InputOption objects');
     try
     {
       $definition->getOptionForShortcut('f');
@@ -202,9 +202,9 @@ class InputDefinitionTest extends \PHPUnit_Framework_TestCase
     $this->initializeOptions();
 
     $definition = new InputDefinition(array($this->foo));
-    $this->assertEquals($definition->getOptions(), array('foo' => $this->foo), '->addOptions() adds an array of InputOption objects');
+    $this->assertEquals(array('foo' => $this->foo), $definition->getOptions(), '->addOptions() adds an array of InputOption objects');
     $definition->addOptions(array($this->bar));
-    $this->assertEquals($definition->getOptions(), array('foo' => $this->foo, 'bar' => $this->bar), '->addOptions() does not clear existing InputOption objects');
+    $this->assertEquals(array('foo' => $this->foo, 'bar' => $this->bar), $definition->getOptions(), '->addOptions() does not clear existing InputOption objects');
   }
 
   public function testAddOption()
@@ -213,9 +213,9 @@ class InputDefinitionTest extends \PHPUnit_Framework_TestCase
 
     $definition = new InputDefinition();
     $definition->addOption($this->foo);
-    $this->assertEquals($definition->getOptions(), array('foo' => $this->foo), '->addOption() adds a InputOption object');
+    $this->assertEquals(array('foo' => $this->foo), $definition->getOptions(), '->addOption() adds a InputOption object');
     $definition->addOption($this->bar);
-    $this->assertEquals($definition->getOptions(), array('foo' => $this->foo, 'bar' => $this->bar), '->addOption() adds a InputOption object');
+    $this->assertEquals(array('foo' => $this->foo, 'bar' => $this->bar), $definition->getOptions(), '->addOption() adds a InputOption object');
     try
     {
       $definition->addOption($this->foo2);
@@ -239,7 +239,7 @@ class InputDefinitionTest extends \PHPUnit_Framework_TestCase
     $this->initializeOptions();
 
     $definition = new InputDefinition(array($this->foo));
-    $this->assertEquals($definition->getOption('foo'), $this->foo, '->getOption() returns a InputOption by its name');
+    $this->assertEquals($this->foo, $definition->getOption('foo'), '->getOption() returns a InputOption by its name');
     try
     {
       $definition->getOption('bar');
@@ -255,8 +255,8 @@ class InputDefinitionTest extends \PHPUnit_Framework_TestCase
     $this->initializeOptions();
 
     $definition = new InputDefinition(array($this->foo));
-    $this->assertEquals($definition->hasOption('foo'), true, '->hasOption() returns true if a InputOption exists for the given name');
-    $this->assertEquals($definition->hasOption('bar'), false, '->hasOption() returns false if a InputOption exists for the given name');
+    $this->assertEquals(true, $definition->hasOption('foo'), '->hasOption() returns true if a InputOption exists for the given name');
+    $this->assertEquals(false, $definition->hasOption('bar'), '->hasOption() returns false if a InputOption exists for the given name');
   }
 
   public function testHasShortcut()
@@ -264,8 +264,8 @@ class InputDefinitionTest extends \PHPUnit_Framework_TestCase
     $this->initializeOptions();
 
     $definition = new InputDefinition(array($this->foo));
-    $this->assertEquals($definition->hasShortcut('f'), true, '->hasShortcut() returns true if a InputOption exists for the given shortcut');
-    $this->assertEquals($definition->hasShortcut('b'), false, '->hasShortcut() returns false if a InputOption exists for the given shortcut');
+    $this->assertEquals(true, $definition->hasShortcut('f'), '->hasShortcut() returns true if a InputOption exists for the given shortcut');
+    $this->assertEquals(false, $definition->hasShortcut('b'), '->hasShortcut() returns false if a InputOption exists for the given shortcut');
   }
 
   public function testGetOptionForShortcut()
@@ -273,7 +273,7 @@ class InputDefinitionTest extends \PHPUnit_Framework_TestCase
     $this->initializeOptions();
 
     $definition = new InputDefinition(array($this->foo));
-    $this->assertEquals($definition->getOptionForShortcut('f'), $this->foo, '->getOptionForShortcut() returns a InputOption by its shortcut');
+    $this->assertEquals($this->foo, $definition->getOptionForShortcut('f'), '->getOptionForShortcut() returns a InputOption by its shortcut');
     try
     {
       $definition->getOptionForShortcut('l');
@@ -304,28 +304,28 @@ class InputDefinitionTest extends \PHPUnit_Framework_TestCase
       'foo6' => array(),
       'foo7' => array(1, 2),
     );
-    $this->assertEquals($definition->getOptionDefaults(), $defaults, '->getOptionDefaults() returns the default values for all options');
+    $this->assertEquals($defaults, $definition->getOptionDefaults(), '->getOptionDefaults() returns the default values for all options');
   }
 
   public function testGetSynopsis()
   {
     $definition = new InputDefinition(array(new InputOption('foo')));
-    $this->assertEquals($definition->getSynopsis(), '[--foo]', '->getSynopsis() returns a synopsis of arguments and options');
+    $this->assertEquals('[--foo]', $definition->getSynopsis(), '->getSynopsis() returns a synopsis of arguments and options');
     $definition = new InputDefinition(array(new InputOption('foo', 'f')));
-    $this->assertEquals($definition->getSynopsis(), '[-f|--foo]', '->getSynopsis() returns a synopsis of arguments and options');
+    $this->assertEquals('[-f|--foo]', $definition->getSynopsis(), '->getSynopsis() returns a synopsis of arguments and options');
     $definition = new InputDefinition(array(new InputOption('foo', 'f', InputOption::PARAMETER_REQUIRED)));
-    $this->assertEquals($definition->getSynopsis(), '[-f|--foo="..."]', '->getSynopsis() returns a synopsis of arguments and options');
+    $this->assertEquals('[-f|--foo="..."]', $definition->getSynopsis(), '->getSynopsis() returns a synopsis of arguments and options');
     $definition = new InputDefinition(array(new InputOption('foo', 'f', InputOption::PARAMETER_OPTIONAL)));
-    $this->assertEquals($definition->getSynopsis(), '[-f|--foo[="..."]]', '->getSynopsis() returns a synopsis of arguments and options');
+    $this->assertEquals('[-f|--foo[="..."]]', $definition->getSynopsis(), '->getSynopsis() returns a synopsis of arguments and options');
 
     $definition = new InputDefinition(array(new InputArgument('foo')));
-    $this->assertEquals($definition->getSynopsis(), '[foo]', '->getSynopsis() returns a synopsis of arguments and options');
+    $this->assertEquals('[foo]', $definition->getSynopsis(), '->getSynopsis() returns a synopsis of arguments and options');
     $definition = new InputDefinition(array(new InputArgument('foo', InputArgument::REQUIRED)));
-    $this->assertEquals($definition->getSynopsis(), 'foo', '->getSynopsis() returns a synopsis of arguments and options');
+    $this->assertEquals('foo', $definition->getSynopsis(), '->getSynopsis() returns a synopsis of arguments and options');
     $definition = new InputDefinition(array(new InputArgument('foo', InputArgument::IS_ARRAY)));
-    $this->assertEquals($definition->getSynopsis(), '[foo1] ... [fooN]', '->getSynopsis() returns a synopsis of arguments and options');
+    $this->assertEquals('[foo1] ... [fooN]', $definition->getSynopsis(), '->getSynopsis() returns a synopsis of arguments and options');
     $definition = new InputDefinition(array(new InputArgument('foo', InputArgument::REQUIRED | InputArgument::IS_ARRAY)));
-    $this->assertEquals($definition->getSynopsis(), 'foo1 ... [fooN]', '->getSynopsis() returns a synopsis of arguments and options');
+    $this->assertEquals('foo1 ... [fooN]', $definition->getSynopsis(), '->getSynopsis() returns a synopsis of arguments and options');
   }
 
   public function testAsText()
@@ -336,7 +336,7 @@ class InputDefinitionTest extends \PHPUnit_Framework_TestCase
       new InputOption('foo', 'f', InputOption::PARAMETER_REQUIRED, 'The foo option'),
       new InputOption('bar', 'b', InputOption::PARAMETER_OPTIONAL, 'The foo option', 'bar'),
     ));
-    $this->assertEquals($definition->asText(), file_get_contents(self::$fixtures.'/definition_astext.txt'), '->asText() returns a textual representation of the InputDefinition');
+    $this->assertEquals(file_get_contents(self::$fixtures.'/definition_astext.txt'), $definition->asText(), '->asText() returns a textual representation of the InputDefinition');
   }
 
   public function testAsXml()
@@ -347,7 +347,7 @@ class InputDefinitionTest extends \PHPUnit_Framework_TestCase
       new InputOption('foo', 'f', InputOption::PARAMETER_REQUIRED, 'The foo option'),
       new InputOption('bar', 'b', InputOption::PARAMETER_OPTIONAL, 'The foo option', 'bar'),
     ));
-    $this->assertEquals($definition->asXml(), file_get_contents(self::$fixtures.'/definition_asxml.txt'), '->asText() returns a textual representation of the InputDefinition');
+    $this->assertEquals(file_get_contents(self::$fixtures.'/definition_asxml.txt'), $definition->asXml(), '->asText() returns a textual representation of the InputDefinition');
   }
 
   protected function initializeArguments()

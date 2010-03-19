@@ -22,14 +22,14 @@ class EventDispatcherTest extends \PHPUnit_Framework_TestCase
     $dispatcher = new EventDispatcher();
 
     $dispatcher->connect('bar', 'listenToBar');
-    $this->assertEquals($dispatcher->getListeners('bar'), array('listenToBar'), '->connect() connects a listener to an event name');
+    $this->assertEquals(array('listenToBar'), $dispatcher->getListeners('bar'), '->connect() connects a listener to an event name');
     $dispatcher->connect('bar', 'listenToBarBar');
-    $this->assertEquals($dispatcher->getListeners('bar'), array('listenToBar', 'listenToBarBar'), '->connect() can connect several listeners for the same event name');
+    $this->assertEquals(array('listenToBar', 'listenToBarBar'), $dispatcher->getListeners('bar'), '->connect() can connect several listeners for the same event name');
 
     $dispatcher->connect('barbar', 'listenToBarBar');
     $dispatcher->disconnect('bar', 'listenToBarBar');
-    $this->assertEquals($dispatcher->getListeners('bar'), array('listenToBar'), '->disconnect() disconnects a listener for an event name');
-    $this->assertEquals($dispatcher->getListeners('barbar'), array('listenToBarBar'), '->disconnect() disconnects a listener for an event name');
+    $this->assertEquals(array('listenToBar'), $dispatcher->getListeners('bar'), '->disconnect() disconnects a listener for an event name');
+    $this->assertEquals(array('listenToBarBar'), $dispatcher->getListeners('barbar'), '->disconnect() disconnects a listener for an event name');
 
     $this->assertTrue($dispatcher->disconnect('foobar', 'listen') === false, '->disconnect() returns false if the listener does not exist');
   }
@@ -38,15 +38,15 @@ class EventDispatcherTest extends \PHPUnit_Framework_TestCase
   {
     $dispatcher = new EventDispatcher();
 
-    $this->assertEquals($dispatcher->hasListeners('foo'), false, '->hasListeners() returns false if the event has no listener');
+    $this->assertEquals(false, $dispatcher->hasListeners('foo'), '->hasListeners() returns false if the event has no listener');
     $dispatcher->connect('foo', 'listenToFoo');
-    $this->assertEquals($dispatcher->hasListeners('foo'), true, '->hasListeners() returns true if the event has some listeners');
+    $this->assertEquals(true, $dispatcher->hasListeners('foo'), '->hasListeners() returns true if the event has some listeners');
     $dispatcher->disconnect('foo', 'listenToFoo');
-    $this->assertEquals($dispatcher->hasListeners('foo'), false, '->hasListeners() returns false if the event has no listener');
+    $this->assertEquals(false, $dispatcher->hasListeners('foo'), '->hasListeners() returns false if the event has no listener');
 
     $dispatcher->connect('bar', 'listenToBar');
-    $this->assertEquals($dispatcher->getListeners('bar'), array('listenToBar'), '->getListeners() returns an array of listeners connected to the given event name');
-    $this->assertEquals($dispatcher->getListeners('foobar'), array(), '->getListeners() returns an empty array if no listener are connected to the given event name');
+    $this->assertEquals(array('listenToBar'), $dispatcher->getListeners('bar'), '->getListeners() returns an array of listeners connected to the given event name');
+    $this->assertEquals(array(), $dispatcher->getListeners('foobar'), '->getListeners() returns an empty array if no listener are connected to the given event name');
   }
 
   public function testNotify()
@@ -56,15 +56,15 @@ class EventDispatcherTest extends \PHPUnit_Framework_TestCase
     $dispatcher->connect('foo', array($listener, 'listenToFoo'));
     $dispatcher->connect('foo', array($listener, 'listenToFooBis'));
     $e = $dispatcher->notify($event = new Event(new \stdClass(), 'foo'));
-    $this->assertEquals($listener->getValue(), 'listenToFoolistenToFooBis', '->notify() notifies all registered listeners in order');
-    $this->assertEquals($e, $event, '->notify() returns the event object');
+    $this->assertEquals('listenToFoolistenToFooBis', $listener->getValue(), '->notify() notifies all registered listeners in order');
+    $this->assertEquals($event, $e, '->notify() returns the event object');
 
     $listener->reset();
     $dispatcher = new EventDispatcher();
     $dispatcher->connect('foo', array($listener, 'listenToFooBis'));
     $dispatcher->connect('foo', array($listener, 'listenToFoo'));
     $dispatcher->notify(new Event(new \stdClass(), 'foo'));
-    $this->assertEquals($listener->getValue(), 'listenToFooBislistenToFoo', '->notify() notifies all registered listeners in order');
+    $this->assertEquals('listenToFooBislistenToFoo', $listener->getValue(), '->notify() notifies all registered listeners in order');
   }
 
   public function testNotifyUntil()
@@ -74,15 +74,15 @@ class EventDispatcherTest extends \PHPUnit_Framework_TestCase
     $dispatcher->connect('foo', array($listener, 'listenToFoo'));
     $dispatcher->connect('foo', array($listener, 'listenToFooBis'));
     $e = $dispatcher->notifyUntil($event = new Event(new \stdClass(), 'foo'));
-    $this->assertEquals($listener->getValue(), 'listenToFoolistenToFooBis', '->notifyUntil() notifies all registered listeners in order and stops if it returns true');
-    $this->assertEquals($e, $event, '->notifyUntil() returns the event object');
+    $this->assertEquals('listenToFoolistenToFooBis', $listener->getValue(), '->notifyUntil() notifies all registered listeners in order and stops if it returns true');
+    $this->assertEquals($event, $e, '->notifyUntil() returns the event object');
 
     $listener->reset();
     $dispatcher = new EventDispatcher();
     $dispatcher->connect('foo', array($listener, 'listenToFooBis'));
     $dispatcher->connect('foo', array($listener, 'listenToFoo'));
     $e = $dispatcher->notifyUntil($event = new Event(new \stdClass(), 'foo'));
-    $this->assertEquals($listener->getValue(), 'listenToFooBis', '->notifyUntil() notifies all registered listeners in order and stops if it returns true');
+    $this->assertEquals('listenToFooBis', $listener->getValue(), '->notifyUntil() notifies all registered listeners in order and stops if it returns true');
   }
 
   public function testFilter()
@@ -92,15 +92,15 @@ class EventDispatcherTest extends \PHPUnit_Framework_TestCase
     $dispatcher->connect('foo', array($listener, 'filterFoo'));
     $dispatcher->connect('foo', array($listener, 'filterFooBis'));
     $e = $dispatcher->filter($event = new Event(new \stdClass(), 'foo'), 'foo');
-    $this->assertEquals($e->getReturnValue(), '-*foo*-', '->filter() filters a value');
-    $this->assertEquals($e, $event, '->filter() returns the event object');
+    $this->assertEquals('-*foo*-', $e->getReturnValue(), '->filter() filters a value');
+    $this->assertEquals($event, $e, '->filter() returns the event object');
 
     $listener->reset();
     $dispatcher = new EventDispatcher();
     $dispatcher->connect('foo', array($listener, 'filterFooBis'));
     $dispatcher->connect('foo', array($listener, 'filterFoo'));
     $e = $dispatcher->filter($event = new Event(new \stdClass(), 'foo'), 'foo');
-    $this->assertEquals($e->getReturnValue(), '*-foo-*', '->filter() filters a value');
+    $this->assertEquals('*-foo-*', $e->getReturnValue(), '->filter() filters a value');
   }
 }
 

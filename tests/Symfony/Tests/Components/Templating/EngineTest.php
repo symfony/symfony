@@ -37,11 +37,11 @@ class EngineTest extends \PHPUnit_Framework_TestCase
   public function testConstructor()
   {
     $engine = new ProjectTemplateEngine(self::$loader);
-    $this->assertEquals($engine->getLoader(), self::$loader, '__construct() takes a loader instance as its second first argument');
-    $this->assertEquals(array_keys($engine->getRenderers()), array('php'), '__construct() automatically registers a PHP renderer if none is given');
+    $this->assertEquals(self::$loader, $engine->getLoader(), '__construct() takes a loader instance as its second first argument');
+    $this->assertEquals(array('php'), array_keys($engine->getRenderers()), '__construct() automatically registers a PHP renderer if none is given');
 
     $engine = new ProjectTemplateEngine(self::$loader, array('foo' => self::$renderer));
-    $this->assertEquals(array_keys($engine->getRenderers()), array('foo', 'php'), '__construct() takes an array of renderers as its third argument');
+    $this->assertEquals(array('foo', 'php'), array_keys($engine->getRenderers()), '__construct() takes an array of renderers as its third argument');
     $this->assertTrue(self::$renderer->getEngine() === $engine, '__construct() registers itself on all renderers');
 
     $engine = new ProjectTemplateEngine(self::$loader, array('php' => self::$renderer));
@@ -52,7 +52,7 @@ class EngineTest extends \PHPUnit_Framework_TestCase
   {
     $engine = new ProjectTemplateEngine(self::$loader);
     $engine->set($helper = new \SimpleHelper('bar'), 'foo');
-    $this->assertEquals($engine->foo, $helper, '->__get() returns the value of a helper');
+    $this->assertEquals($helper, $engine->foo, '->__get() returns the value of a helper');
 
     try
     {
@@ -69,10 +69,10 @@ class EngineTest extends \PHPUnit_Framework_TestCase
     $engine = new ProjectTemplateEngine(self::$loader);
     $foo = new \SimpleHelper('foo');
     $engine->set($foo);
-    $this->assertEquals($engine->get('foo'), $foo, '->set() sets a helper');
+    $this->assertEquals($foo, $engine->get('foo'), '->set() sets a helper');
 
     $engine->set($foo, 'bar');
-    $this->assertEquals($engine->get('bar'), $foo, '->set() takes an alias as a second argument');
+    $this->assertEquals($foo, $engine->get('bar'), '->set() takes an alias as a second argument');
 
     try
     {
@@ -113,33 +113,34 @@ class EngineTest extends \PHPUnit_Framework_TestCase
     $engine->set(new \SimpleHelper('bar'));
     self::$loader->setTemplate('foo.php', '<?php $view->extend("layout"); echo $view->foo.$foo ?>');
     self::$loader->setTemplate('layout.php', '-<?php echo $view->slots->get("_content") ?>-');
-    $this->assertEquals($engine->render('foo', array('foo' => 'foo')), '-barfoo-', '->render() uses the decorator to decorate the template');
+    $this->assertEquals('-barfoo-', $engine->render('foo', array('foo' => 'foo')), '->render() uses the decorator to decorate the template');
 
     $engine = new ProjectTemplateEngine(self::$loader, array(), array(new SlotsHelper()));
     $engine->set(new \SimpleHelper('bar'));
     self::$loader->setTemplate('bar.php', 'bar');
     self::$loader->setTemplate('foo.php', '<?php $view->extend("layout"); echo $foo ?>');
     self::$loader->setTemplate('layout.php', '<?php echo $view->render("bar") ?>-<?php echo $view->slots->get("_content") ?>-');
-    $this->assertEquals($engine->render('foo', array('foo' => 'foo', 'bar' => 'bar')), 'bar-foo-', '->render() supports render() calls in templates');
+    $this->assertEquals('bar-foo-', $engine->render('foo', array('foo' => 'foo', 'bar' => 'bar')), '->render() supports render() calls in templates');
 
     // compilable templates
     $engine = new ProjectTemplateEngine(new CompilableTemplateLoader(), array('foo' => new FooTemplateRenderer()));
-    $this->assertEquals($engine->render('index'), 'foo', '->load() takes into account the renderer embedded in the Storage instance if not null');
+    $this->assertEquals('foo', $engine->render('index'), '->load() takes into account the renderer embedded in the Storage instance if not null');
   }
 
   public function testEscape()
   {
     $engine = new ProjectTemplateEngine(self::$loader);
-    $this->assertEquals($engine->escape('<br />'), '&lt;br /&gt;', '->escape() escapes strings');
-    $this->assertEquals($engine->escape($foo = new \stdClass()), $foo, '->escape() does nothing on non strings');
+    $this->assertEquals('&lt;br /&gt;', $engine->escape('<br />'), '->escape() escapes strings');
+    $foo = new \stdClass();
+    $this->assertEquals($foo, $engine->escape($foo), '->escape() does nothing on non strings');
   }
 
   public function testGetSetCharset()
   {
     $engine = new ProjectTemplateEngine(self::$loader);
-    $this->assertEquals($engine->getCharset(), 'UTF-8', '->getCharset() returns UTF-8 by default');
+    $this->assertEquals('UTF-8', $engine->getCharset(), '->getCharset() returns UTF-8 by default');
     $engine->setCharset('ISO-8859-1');
-    $this->assertEquals($engine->getCharset(), 'ISO-8859-1', '->setCharset() changes the default charset to use');
+    $this->assertEquals('ISO-8859-1', $engine->getCharset(), '->setCharset() changes the default charset to use');
   }
 }
 

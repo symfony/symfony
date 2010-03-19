@@ -19,57 +19,57 @@ class OutputTest extends \PHPUnit_Framework_TestCase
   public function testConstructor()
   {
     $output = new TestOutput(Output::VERBOSITY_QUIET, true);
-    $this->assertEquals($output->getVerbosity(), Output::VERBOSITY_QUIET, '__construct() takes the verbosity as its first argument');
-    $this->assertEquals($output->isDecorated(), true, '__construct() takes the decorated flag as its second argument');
+    $this->assertEquals(Output::VERBOSITY_QUIET, $output->getVerbosity(), '__construct() takes the verbosity as its first argument');
+    $this->assertEquals(true, $output->isDecorated(), '__construct() takes the decorated flag as its second argument');
   }
 
   public function testSetIsDecorated()
   {
     $output = new TestOutput();
     $output->setDecorated(true);
-    $this->assertEquals($output->isDecorated(), true, 'setDecorated() sets the decorated flag');
+    $this->assertEquals(true, 'setDecorated() sets the decorated flag', $output->isDecorated());
   }
 
   public function testSetGetVerbosity()
   {
     $output = new TestOutput();
     $output->setVerbosity(Output::VERBOSITY_QUIET);
-    $this->assertEquals($output->getVerbosity(), Output::VERBOSITY_QUIET, '->setVerbosity() sets the verbosity');
+    $this->assertEquals(Output::VERBOSITY_QUIET, $output->getVerbosity(), '->setVerbosity() sets the verbosity');
   }
 
   public function testSetStyle()
   {
     Output::setStyle('FOO', array('bg' => 'red', 'fg' => 'yellow', 'blink' => true));
-    $this->assertEquals(TestOutput::getStyle('foo'), array('bg' => 'red', 'fg' => 'yellow', 'blink' => true), '::setStyle() sets a new style');
+    $this->assertEquals(array('bg' => 'red', 'fg' => 'yellow', 'blink' => true), TestOutput::getStyle('foo'), '::setStyle() sets a new style');
   }
 
   public function testWrite()
   {
     $output = new TestOutput(Output::VERBOSITY_QUIET);
     $output->writeln('foo');
-    $this->assertEquals($output->output, '', '->writeln() outputs nothing if verbosity is set to VERBOSITY_QUIET');
+    $this->assertEquals('', $output->output, '->writeln() outputs nothing if verbosity is set to VERBOSITY_QUIET');
 
     $output = new TestOutput();
     $output->writeln(array('foo', 'bar'));
-    $this->assertEquals($output->output, "foo\nbar\n", '->writeln() can take an array of messages to output');
+    $this->assertEquals("foo\nbar\n", $output->output, '->writeln() can take an array of messages to output');
 
     $output = new TestOutput();
     $output->writeln('<info>foo</info>', Output::OUTPUT_RAW);
-    $this->assertEquals($output->output, "<info>foo</info>\n", '->writeln() outputs the raw message if OUTPUT_RAW is specified');
+    $this->assertEquals("<info>foo</info>\n", $output->output, '->writeln() outputs the raw message if OUTPUT_RAW is specified');
 
     $output = new TestOutput();
     $output->writeln('<info>foo</info>', Output::OUTPUT_PLAIN);
-    $this->assertEquals($output->output, "foo\n", '->writeln() strips decoration tags if OUTPUT_PLAIN is specified');
+    $this->assertEquals("foo\n", $output->output, '->writeln() strips decoration tags if OUTPUT_PLAIN is specified');
 
     $output = new TestOutput();
     $output->setDecorated(false);
     $output->writeln('<info>foo</info>');
-    $this->assertEquals($output->output, "foo\n", '->writeln() strips decoration tags if decoration is set to false');
+    $this->assertEquals("foo\n", $output->output, '->writeln() strips decoration tags if decoration is set to false');
 
     $output = new TestOutput();
     $output->setDecorated(true);
     $output->writeln('<foo>foo</foo>');
-    $this->assertEquals($output->output, "\033[33;41;5mfoo\033[0m\n", '->writeln() decorates the output');
+    $this->assertEquals("\033[33;41;5mfoo\033[0m\n", $output->output, '->writeln() decorates the output');
 
     try
     {

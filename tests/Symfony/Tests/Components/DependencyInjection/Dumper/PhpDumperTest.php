@@ -28,8 +28,8 @@ class PhpDumperTest extends \PHPUnit_Framework_TestCase
   {
     $dumper = new PhpDumper($container = new Builder());
 
-    $this->assertEquals($dumper->dump(), file_get_contents(self::$fixturesPath.'/php/services1.php'), '->dump() dumps an empty container as an empty PHP class');
-    $this->assertEquals($dumper->dump(array('class' => 'Container', 'base_class' => 'AbstractContainer')), file_get_contents(self::$fixturesPath.'/php/services1-1.php'), '->dump() takes a class and a base_class options');
+    $this->assertEquals(file_get_contents(self::$fixturesPath.'/php/services1.php'), $dumper->dump(), '->dump() dumps an empty container as an empty PHP class');
+    $this->assertEquals(file_get_contents(self::$fixturesPath.'/php/services1-1.php'), $dumper->dump(array('class' => 'Container', 'base_class' => 'AbstractContainer')), '->dump() takes a class and a base_class options');
 
     $container = new Builder();
     $dumper = new PhpDumper($container);
@@ -39,14 +39,14 @@ class PhpDumperTest extends \PHPUnit_Framework_TestCase
   {
     $container = include self::$fixturesPath.'/containers/container8.php';
     $dumper = new PhpDumper($container);
-    $this->assertEquals($dumper->dump(), file_get_contents(self::$fixturesPath.'/php/services8.php'), '->dump() dumps parameters');
+    $this->assertEquals(file_get_contents(self::$fixturesPath.'/php/services8.php'), $dumper->dump(), '->dump() dumps parameters');
   }
 
   public function testAddService()
   {
     $container = include self::$fixturesPath.'/containers/container9.php';
     $dumper = new PhpDumper($container);
-    $this->assertEquals($dumper->dump(), str_replace('%path%', self::$fixturesPath.'/includes', file_get_contents(self::$fixturesPath.'/php/services9.php')), '->dump() dumps services');
+    $this->assertEquals(str_replace('%path%', self::$fixturesPath.'/includes', file_get_contents(self::$fixturesPath.'/php/services9.php')), $dumper->dump(), '->dump() dumps services');
 
     $dumper = new PhpDumper($container = new Builder());
     $container->register('foo', 'FooClass')->addArgument(new \stdClass());

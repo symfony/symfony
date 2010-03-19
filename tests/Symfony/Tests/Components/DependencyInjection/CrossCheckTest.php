@@ -65,9 +65,9 @@ class CrossCheckTest extends \PHPUnit_Framework_TestCase
 
       unlink($tmp);
 
-      $this->assertEquals(serialize($container1), serialize($container2), 'loading a dump from a previously loaded container returns the same container');
+      $this->assertEquals(serialize($container2), serialize($container1), 'loading a dump from a previously loaded container returns the same container');
 
-      $this->assertEquals($container1->getParameters(), $container2->getParameters(), '->getParameters() returns the same value for both containers');
+      $this->assertEquals($container2->getParameters(), $container1->getParameters(), '->getParameters() returns the same value for both containers');
 
       $services1 = array();
       foreach ($container1 as $id => $service)
@@ -82,7 +82,7 @@ class CrossCheckTest extends \PHPUnit_Framework_TestCase
 
       unset($services1['service_container'], $services2['service_container']);
 
-      $this->assertEquals($services1, $services2, 'Iterator on the containers returns the same services');
+      $this->assertEquals($services2, $services1, 'Iterator on the containers returns the same services');
     }
   }
 }

@@ -20,20 +20,20 @@ class InputArgumentTest extends \PHPUnit_Framework_TestCase
   public function testConstructor()
   {
     $argument = new InputArgument('foo');
-    $this->assertEquals($argument->getName(), 'foo', '__construct() takes a name as its first argument');
+    $this->assertEquals('foo', $argument->getName(), '__construct() takes a name as its first argument');
 
     // mode argument
     $argument = new InputArgument('foo');
-    $this->assertEquals($argument->isRequired(), false, '__construct() gives a "Argument::OPTIONAL" mode by default');
+    $this->assertEquals(false, $argument->isRequired(), '__construct() gives a "Argument::OPTIONAL" mode by default');
 
     $argument = new InputArgument('foo', null);
-    $this->assertEquals($argument->isRequired(), false, '__construct() can take "Argument::OPTIONAL" as its mode');
+    $this->assertEquals(false, $argument->isRequired(), '__construct() can take "Argument::OPTIONAL" as its mode');
 
     $argument = new InputArgument('foo', InputArgument::OPTIONAL);
-    $this->assertEquals($argument->isRequired(), false, '__construct() can take "Argument::PARAMETER_OPTIONAL" as its mode');
+    $this->assertEquals(false, $argument->isRequired(), '__construct() can take "Argument::PARAMETER_OPTIONAL" as its mode');
 
     $argument = new InputArgument('foo', InputArgument::REQUIRED);
-    $this->assertEquals($argument->isRequired(), true, '__construct() can take "Argument::PARAMETER_REQUIRED" as its mode');
+    $this->assertEquals(true, $argument->isRequired(), '__construct() can take "Argument::PARAMETER_REQUIRED" as its mode');
 
     try
     {
@@ -58,13 +58,13 @@ class InputArgumentTest extends \PHPUnit_Framework_TestCase
   public function testGetDescription()
   {
     $argument = new InputArgument('foo', null, 'Some description');
-    $this->assertEquals($argument->getDescription(), 'Some description', '->getDescription() return the message description');
+    $this->assertEquals('Some description', $argument->getDescription(), '->getDescription() return the message description');
   }
 
   public function testGetDefault()
   {
     $argument = new InputArgument('foo', InputArgument::OPTIONAL, '', 'default');
-    $this->assertEquals($argument->getDefault(), 'default', '->getDefault() return the default value');
+    $this->assertEquals('default', $argument->getDefault(), '->getDefault() return the default value');
   }
 
   public function testSetDefault()
@@ -73,11 +73,11 @@ class InputArgumentTest extends \PHPUnit_Framework_TestCase
     $argument->setDefault(null);
     $this->assertTrue(is_null($argument->getDefault()), '->setDefault() can reset the default value by passing null');
     $argument->setDefault('another');
-    $this->assertEquals($argument->getDefault(), 'another', '->setDefault() changes the default value');
+    $this->assertEquals('another', $argument->getDefault(), '->setDefault() changes the default value');
 
     $argument = new InputArgument('foo', InputArgument::OPTIONAL | InputArgument::IS_ARRAY);
     $argument->setDefault(array(1, 2));
-    $this->assertEquals($argument->getDefault(), array(1, 2), '->setDefault() changes the default value');
+    $this->assertEquals(array(1, 2), $argument->getDefault(), '->setDefault() changes the default value');
 
     try
     {

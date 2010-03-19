@@ -28,15 +28,15 @@ class ObjectDecoratorTest extends \PHPUnit_Framework_TestCase
 
   public function testGenericBehavior()
   {
-    $this->assertEquals(self::$escaped->getTitle(), '&lt;strong&gt;escaped!&lt;/strong&gt;', 'The escaped object behaves like the real object');
+    $this->assertEquals('&lt;strong&gt;escaped!&lt;/strong&gt;', self::$escaped->getTitle(), 'The escaped object behaves like the real object');
 
     $array = self::$escaped->getTitles();
-    $this->assertEquals($array[2], '&lt;strong&gt;escaped!&lt;/strong&gt;', 'The escaped object behaves like the real object');
+    $this->assertEquals('&lt;strong&gt;escaped!&lt;/strong&gt;', $array[2], 'The escaped object behaves like the real object');
   }
 
   public function testMagicToString()
   {
-    $this->assertEquals(self::$escaped->__toString(), '&lt;strong&gt;escaped!&lt;/strong&gt;', 'The escaped object behaves like the real object');
+    $this->assertEquals('&lt;strong&gt;escaped!&lt;/strong&gt;', self::$escaped->__toString(), 'The escaped object behaves like the real object');
   }
 }
 

@@ -25,9 +25,9 @@ class PhpRendererTest extends \PHPUnit_Framework_TestCase
     $renderer = new PhpRenderer();
 
     $template = new StringStorage('<?php echo $foo ?>');
-    $this->assertEquals($renderer->evaluate($template, array('foo' => 'bar')), 'bar', '->evaluate() renders templates that are instances of StringStorage');
+    $this->assertEquals('bar', $renderer->evaluate($template, array('foo' => 'bar')), '->evaluate() renders templates that are instances of StringStorage');
 
     $template = new FileStorage(__DIR__.'/../../../../../fixtures/Symfony/Components/Templating/templates/foo.php');
-    $this->assertEquals($renderer->evaluate($template, array('foo' => 'bar')), 'bar', '->evaluate() renders templates that are instances of FileStorage');
+    $this->assertEquals('bar', $renderer->evaluate($template, array('foo' => 'bar')), '->evaluate() renders templates that are instances of FileStorage');
   }
 }

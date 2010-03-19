@@ -36,14 +36,14 @@ class StreamOutputTest extends \PHPUnit_Framework_TestCase
     }
 
     $output = new StreamOutput($this->stream, Output::VERBOSITY_QUIET, true);
-    $this->assertEquals($output->getVerbosity(), Output::VERBOSITY_QUIET, '__construct() takes the verbosity as its first argument');
-    $this->assertEquals($output->isDecorated(), true, '__construct() takes the decorated flag as its second argument');
+    $this->assertEquals(Output::VERBOSITY_QUIET, $output->getVerbosity(), '__construct() takes the verbosity as its first argument');
+    $this->assertEquals(true, $output->isDecorated(), '__construct() takes the decorated flag as its second argument');
   }
 
   public function testGetStream()
   {
     $output = new StreamOutput($this->stream);
-    $this->assertEquals($output->getStream(), $this->stream, '->getStream() returns the current stream');
+    $this->assertEquals($this->stream, $output->getStream(), '->getStream() returns the current stream');
   }
 
   public function testDoWrite()
@@ -51,6 +51,6 @@ class StreamOutputTest extends \PHPUnit_Framework_TestCase
     $output = new StreamOutput($this->stream);
     $output->writeln('foo');
     rewind($output->getStream());
-    $this->assertEquals(stream_get_contents($output->getStream()), "foo\n", '->doWrite() writes to the stream');
+    $this->assertEquals("foo\n", stream_get_contents($output->getStream()), '->doWrite() writes to the stream');
   }
 }

@@ -38,74 +38,74 @@ class BuilderConfigurationTest extends \PHPUnit_Framework_TestCase
       'bar' => 'bar',
     );
     $configuration = new BuilderConfiguration($definitions, $parameters);
-    $this->assertEquals($configuration->getDefinitions(), $definitions, '__construct() takes an array of definitions as its first argument');
-    $this->assertEquals($configuration->getParameters(), $parameters, '__construct() takes an array of parameters as its second argument');
+    $this->assertEquals($definitions, $configuration->getDefinitions(), '__construct() takes an array of definitions as its first argument');
+    $this->assertEquals($parameters, $configuration->getParameters(), '__construct() takes an array of parameters as its second argument');
   }
 
   public function testMerge()
   {
     $configuration = new BuilderConfiguration();
     $configuration->merge(null);
-    $this->assertEquals($configuration->getParameters(), array(), '->merge() accepts null as an argument');
-    $this->assertEquals($configuration->getDefinitions(), array(), '->merge() accepts null as an argument');
+    $this->assertEquals(array(), $configuration->getParameters(), '->merge() accepts null as an argument');
+    $this->assertEquals(array(), $configuration->getDefinitions(), '->merge() accepts null as an argument');
 
     $configuration = new BuilderConfiguration(array(), array('bar' => 'foo'));
     $configuration1 = new BuilderConfiguration(array(), array('foo' => 'bar'));
     $configuration->merge($configuration1);
-    $this->assertEquals($configuration->getParameters(), array('bar' => 'foo', 'foo' => 'bar'), '->merge() merges current parameters with the loaded ones');
+    $this->assertEquals(array('bar' => 'foo', 'foo' => 'bar'), $configuration->getParameters(), '->merge() merges current parameters with the loaded ones');
 
     $configuration = new BuilderConfiguration(array(), array('bar' => 'foo', 'foo' => 'baz'));
     $config = new BuilderConfiguration(array(), array('foo' => 'bar'));
     $configuration->merge($config);
-    $this->assertEquals($configuration->getParameters(), array('bar' => 'foo', 'foo' => 'bar'), '->merge() overrides existing parameters');
+    $this->assertEquals(array('bar' => 'foo', 'foo' => 'bar'), $configuration->getParameters(), '->merge() overrides existing parameters');
 
     $configuration = new BuilderConfiguration(array('foo' => new Definition('FooClass'), 'bar' => new Definition('BarClass')));
     $config = new BuilderConfiguration(array('baz' => new Definition('BazClass')));
     $config->setAlias('alias_for_foo', 'foo');
     $configuration->merge($config);
-    $this->assertEquals(array_keys($configuration->getDefinitions()), array('foo', 'bar', 'baz'), '->merge() merges definitions already defined ones');
-    $this->assertEquals($configuration->getAliases(), array('alias_for_foo' => 'foo'), '->merge() registers defined aliases');
+    $this->assertEquals(array('foo', 'bar', 'baz'), array_keys($configuration->getDefinitions()), '->merge() merges definitions already defined ones');
+    $this->assertEquals(array('alias_for_foo' => 'foo'), $configuration->getAliases(), '->merge() registers defined aliases');
 
     $configuration = new BuilderConfiguration(array('foo' => new Definition('FooClass')));
     $config->setDefinition('foo', new Definition('BazClass'));
     $configuration->merge($config);
-    $this->assertEquals($configuration->getDefinition('foo')->getClass(), 'BazClass', '->merge() overrides already defined services');
+    $this->assertEquals('BazClass', $configuration->getDefinition('foo')->getClass(), '->merge() overrides already defined services');
 
     $configuration = new BuilderConfiguration();
     $configuration->addResource($a = new FileResource('foo.xml'));
     $config = new BuilderConfiguration();
     $config->addResource($b = new FileResource('foo.yml'));
     $configuration->merge($config);
-    $this->assertEquals($configuration->getResources(), array($a, $b), '->merge() merges resources');
+    $this->assertEquals(array($a, $b), $configuration->getResources(), '->merge() merges resources');
   }
 
   public function testSetGetParameters()
   {
     $configuration = new BuilderConfiguration();
-    $this->assertEquals($configuration->getParameters(), array(), '->getParameters() returns an empty array if no parameter has been defined');
+    $this->assertEquals(array(), $configuration->getParameters(), '->getParameters() returns an empty array if no parameter has been defined');
 
     $configuration->setParameters(array('foo' => 'bar'));
-    $this->assertEquals($configuration->getParameters(), array('foo' => 'bar'), '->setParameters() sets the parameters');
+    $this->assertEquals(array('foo' => 'bar'), $configuration->getParameters(), '->setParameters() sets the parameters');
 
     $configuration->setParameters(array('bar' => 'foo'));
-    $this->assertEquals($configuration->getParameters(), array('bar' => 'foo'), '->setParameters() overrides the previous defined parameters');
+    $this->assertEquals(array('bar' => 'foo'), $configuration->getParameters(), '->setParameters() overrides the previous defined parameters');
 
     $configuration->setParameters(array('Bar' => 'foo'));
-    $this->assertEquals($configuration->getParameters(), array('bar' => 'foo'), '->setParameters() converts the key to lowercase');
+    $this->assertEquals(array('bar' => 'foo'), $configuration->getParameters(), '->setParameters() converts the key to lowercase');
   }
 
   public function testSetGetParameter()
   {
     $configuration = new BuilderConfiguration(array(), array('foo' => 'bar'));
     $configuration->setParameter('bar', 'foo');
-    $this->assertEquals($configuration->getParameter('bar'), 'foo', '->setParameter() sets the value of a new parameter');
+    $this->assertEquals('foo', $configuration->getParameter('bar'), '->setParameter() sets the value of a new parameter');
 
     $configuration->setParameter('foo', 'baz');
-    $this->assertEquals($configuration->getParameter('foo'), 'baz', '->setParameter() overrides previously set parameter');
+    $this->assertEquals('baz', $configuration->getParameter('foo'), '->setParameter() overrides previously set parameter');
 
     $configuration->setParameter('Foo', 'baz1');
-    $this->assertEquals($configuration->getParameter('foo'), 'baz1', '->setParameter() converts the key to lowercase');
-    $this->assertEquals($configuration->getParameter('FOO'), 'baz1', '->getParameter() converts the key to lowercase');
+    $this->assertEquals('baz1', $configuration->getParameter('foo'), '->setParameter() converts the key to lowercase');
+    $this->assertEquals('baz1', $configuration->getParameter('FOO'), '->getParameter() converts the key to lowercase');
 
     try
     {
@@ -129,16 +129,16 @@ class BuilderConfigurationTest extends \PHPUnit_Framework_TestCase
   {
     $configuration = new BuilderConfiguration(array(), array('foo' => 'bar'));
     $configuration->addParameters(array('bar' => 'foo'));
-    $this->assertEquals($configuration->getParameters(), array('foo' => 'bar', 'bar' => 'foo'), '->addParameters() adds parameters to the existing ones');
+    $this->assertEquals(array('foo' => 'bar', 'bar' => 'foo'), $configuration->getParameters(), '->addParameters() adds parameters to the existing ones');
     $configuration->addParameters(array('Bar' => 'fooz'));
-    $this->assertEquals($configuration->getParameters(), array('foo' => 'bar', 'bar' => 'fooz'), '->addParameters() converts keys to lowercase');
+    $this->assertEquals(array('foo' => 'bar', 'bar' => 'fooz'), $configuration->getParameters(), '->addParameters() converts keys to lowercase');
   }
 
   public function testAliases()
   {
     $configuration = new BuilderConfiguration();
     $configuration->setAlias('bar', 'foo');
-    $this->assertEquals($configuration->getAlias('bar'), 'foo', '->setAlias() defines a new alias');
+    $this->assertEquals('foo', $configuration->getAlias('bar'), '->setAlias() defines a new alias');
     $this->assertTrue($configuration->hasAlias('bar'), '->hasAlias() returns true if the alias is defined');
     $this->assertTrue(!$configuration->hasAlias('baba'), '->hasAlias() returns false if the alias is not defined');
 
@@ -152,10 +152,10 @@ class BuilderConfigurationTest extends \PHPUnit_Framework_TestCase
     }
 
     $configuration->setAlias('barbar', 'foofoo');
-    $this->assertEquals($configuration->getAliases(), array('bar' => 'foo', 'barbar' => 'foofoo'), '->getAliases() returns an array of all defined aliases');
+    $this->assertEquals(array('bar' => 'foo', 'barbar' => 'foofoo'), $configuration->getAliases(), '->getAliases() returns an array of all defined aliases');
 
     $configuration->addAliases(array('foo' => 'bar'));
-    $this->assertEquals($configuration->getAliases(), array('bar' => 'foo', 'barbar' => 'foofoo', 'foo' => 'bar'), '->addAliases() adds some aliases');
+    $this->assertEquals(array('bar' => 'foo', 'barbar' => 'foofoo', 'foo' => 'bar'), $configuration->getAliases(), '->addAliases() adds some aliases');
   }
 
   public function testDefinitions()
@@ -166,16 +166,16 @@ class BuilderConfigurationTest extends \PHPUnit_Framework_TestCase
       'bar' => new Definition('BarClass'),
     );
     $configuration->setDefinitions($definitions);
-    $this->assertEquals($configuration->getDefinitions(), $definitions, '->setDefinitions() sets the service definitions');
+    $this->assertEquals($definitions, $configuration->getDefinitions(), '->setDefinitions() sets the service definitions');
     $this->assertTrue($configuration->hasDefinition('foo'), '->hasDefinition() returns true if a service definition exists');
     $this->assertTrue(!$configuration->hasDefinition('foobar'), '->hasDefinition() returns false if a service definition does not exist');
 
     $configuration->setDefinition('foobar', $foo = new Definition('FooBarClass'));
-    $this->assertEquals($configuration->getDefinition('foobar'), $foo, '->getDefinition() returns a service definition if defined');
+    $this->assertEquals($foo, $configuration->getDefinition('foobar'), '->getDefinition() returns a service definition if defined');
     $this->assertTrue($configuration->setDefinition('foobar', $foo = new Definition('FooBarClass')) === $foo, '->setDefinition() implements a fuild interface by returning the service reference');
 
     $configuration->addDefinitions($defs = array('foobar' => new Definition('FooBarClass')));
-    $this->assertEquals($configuration->getDefinitions(), array_merge($definitions, $defs), '->addDefinitions() adds the service definitions');
+    $this->assertEquals(array_merge($definitions, $defs), $configuration->getDefinitions(), '->addDefinitions() adds the service definitions');
 
     try
     {
@@ -192,7 +192,7 @@ class BuilderConfigurationTest extends \PHPUnit_Framework_TestCase
     $configuration = new BuilderConfiguration(array('foo' => $definition = new Definition('FooClass')));
     $configuration->setAlias('bar', 'foo');
     $configuration->setAlias('foobar', 'bar');
-    $this->assertEquals($configuration->findDefinition('foobar'), $definition, '->findDefinition() returns a Definition');
+    $this->assertEquals($definition, $configuration->findDefinition('foobar'), '->findDefinition() returns a Definition');
   }
 
   public function testResources()
@@ -200,6 +200,6 @@ class BuilderConfigurationTest extends \PHPUnit_Framework_TestCase
     $configuration = new BuilderConfiguration();
     $configuration->addResource($a = new FileResource('foo.xml'));
     $configuration->addResource($b = new FileResource('foo.yml'));
-    $this->assertEquals($configuration->getResources(), array($a, $b), '->getResources() returns an array of resources read for the current configuration');
+    $this->assertEquals(array($a, $b), $configuration->getResources(), '->getResources() returns an array of resources read for the current configuration');
   }
 }

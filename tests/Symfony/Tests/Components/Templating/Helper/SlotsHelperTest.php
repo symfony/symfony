@@ -21,8 +21,8 @@ class SlotsHelperTest extends \PHPUnit_Framework_TestCase
   {
     $helper = new SlotsHelper();
     $helper->set('foo', 'bar');
-    $this->assertEquals($helper->get('foo'), 'bar', '->set() sets a slot value');
-    $this->assertEquals($helper->get('bar', 'bar'), 'bar', '->get() takes a default value to return if the slot does not exist');
+    $this->assertEquals('bar', $helper->get('foo'), '->set() sets a slot value');
+    $this->assertEquals('bar', $helper->get('bar', 'bar'), '->get() takes a default value to return if the slot does not exist');
 
     $this->assertTrue($helper->has('foo'), '->has() returns true if the slot exists');
     $this->assertTrue(!$helper->has('bar'), '->has() returns false if the slot does not exist');
@@ -35,20 +35,20 @@ class SlotsHelperTest extends \PHPUnit_Framework_TestCase
     ob_start();
     $ret = $helper->output('foo');
     $output = ob_get_clean();
-    $this->assertEquals($output, 'bar', '->output() outputs the content of a slot');
-    $this->assertEquals($ret, true, '->output() returns true if the slot exists');
+    $this->assertEquals('bar', $output, '->output() outputs the content of a slot');
+    $this->assertEquals(true, $ret, '->output() returns true if the slot exists');
 
     ob_start();
     $ret = $helper->output('bar', 'bar');
     $output = ob_get_clean();
-    $this->assertEquals($output, 'bar', '->output() takes a default value to return if the slot does not exist');
-    $this->assertEquals($ret, true, '->output() returns true if the slot does not exist but a default value is provided');
+    $this->assertEquals('bar', $output, '->output() takes a default value to return if the slot does not exist');
+    $this->assertEquals(true, $ret, '->output() returns true if the slot does not exist but a default value is provided');
 
     ob_start();
     $ret = $helper->output('bar');
     $output = ob_get_clean();
-    $this->assertEquals($output, '', '->output() outputs nothing if the slot does not exist');
-    $this->assertEquals($ret, false, '->output() returns false if the slot does not exist');
+    $this->assertEquals('', $output, '->output() outputs nothing if the slot does not exist');
+    $this->assertEquals(false, $ret, '->output() returns false if the slot does not exist');
   }
 
   public function testStartStop()
@@ -57,7 +57,7 @@ class SlotsHelperTest extends \PHPUnit_Framework_TestCase
     $helper->start('bar');
     echo 'foo';
     $helper->stop();
-    $this->assertEquals($helper->get('bar'), 'foo', '->start() starts a slot');
+    $this->assertEquals('foo', $helper->get('bar'), '->start() starts a slot');
     $this->assertTrue($helper->has('bar'), '->starts() starts a slot');
 
     $helper->start('bar');

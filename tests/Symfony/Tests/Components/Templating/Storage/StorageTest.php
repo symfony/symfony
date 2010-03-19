@@ -21,7 +21,7 @@ class StorageTest extends \PHPUnit_Framework_TestCase
   public function testMagicToString()
   {
     $storage = new TestStorage('foo');
-    $this->assertEquals((string) $storage, 'foo', '__toString() returns the template name');
+    $this->assertEquals('foo', (string) $storage, '__toString() returns the template name');
   }
 
   public function testGetRenderer()

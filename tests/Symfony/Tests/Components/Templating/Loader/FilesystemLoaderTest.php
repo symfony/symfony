@@ -32,9 +32,9 @@ class FilesystemLoaderTest extends \PHPUnit_Framework_TestCase
     $pathPattern = self::$fixturesPath.'/templates/%name%.%renderer%';
     $path = self::$fixturesPath.'/templates';
     $loader = new ProjectTemplateLoader2($pathPattern);
-    $this->assertEquals($loader->getTemplatePathPatterns(), array($pathPattern), '__construct() takes a path as its second argument');
+    $this->assertEquals(array($pathPattern), $loader->getTemplatePathPatterns(), '__construct() takes a path as its second argument');
     $loader = new ProjectTemplateLoader2(array($pathPattern));
-    $this->assertEquals($loader->getTemplatePathPatterns(), array($pathPattern), '__construct() takes an array of paths as its second argument');
+    $this->assertEquals(array($pathPattern), $loader->getTemplatePathPatterns(), '__construct() takes an array of paths as its second argument');
   }
 
   public function testIsAbsolutePath()
@@ -52,13 +52,13 @@ class FilesystemLoaderTest extends \PHPUnit_Framework_TestCase
     $loader = new ProjectTemplateLoader2($pathPattern);
     $storage = $loader->load($path.'/foo.php');
     $this->assertTrue($storage instanceof FileStorage, '->load() returns a FileStorage if you pass an absolute path');
-    $this->assertEquals((string) $storage, $path.'/foo.php', '->load() returns a FileStorage pointing to the passed absolute path');
+    $this->assertEquals($path.'/foo.php', (string) $storage, '->load() returns a FileStorage pointing to the passed absolute path');
 
     $this->assertTrue($loader->load('bar') === false, '->load() returns false if the template is not found');
 
     $storage = $loader->load('foo');
     $this->assertTrue($storage instanceof FileStorage, '->load() returns a FileStorage if you pass a relative template that exists');
-    $this->assertEquals((string) $storage, $path.'/foo.php', '->load() returns a FileStorage pointing to the absolute path of the template');
+    $this->assertEquals($path.'/foo.php', (string) $storage, '->load() returns a FileStorage pointing to the absolute path of the template');
 
     $loader = new ProjectTemplateLoader2($pathPattern);
     $loader->setDebugger($debugger = new \ProjectTemplateDebugger());

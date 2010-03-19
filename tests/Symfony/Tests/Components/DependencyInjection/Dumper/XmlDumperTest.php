@@ -28,7 +28,7 @@ class XmlDumperTest extends \PHPUnit_Framework_TestCase
   {
     $dumper = new XmlDumper($container = new Builder());
 
-    $this->assertEquals($dumper->dump(), file_get_contents(self::$fixturesPath.'/xml/services1.xml'), '->dump() dumps an empty container as an empty XML file');
+    $this->assertEquals(file_get_contents(self::$fixturesPath.'/xml/services1.xml'), $dumper->dump(), '->dump() dumps an empty container as an empty XML file');
 
     $container = new Builder();
     $dumper = new XmlDumper($container);
@@ -38,14 +38,14 @@ class XmlDumperTest extends \PHPUnit_Framework_TestCase
   {
     $container = include self::$fixturesPath.'//containers/container8.php';
     $dumper = new XmlDumper($container);
-    $this->assertEquals($dumper->dump(), file_get_contents(self::$fixturesPath.'/xml/services8.xml'), '->dump() dumps parameters');
+    $this->assertEquals(file_get_contents(self::$fixturesPath.'/xml/services8.xml'), $dumper->dump(), '->dump() dumps parameters');
   }
 
   public function testAddService()
   {
     $container = include self::$fixturesPath.'/containers/container9.php';
     $dumper = new XmlDumper($container);
-    $this->assertEquals($dumper->dump(), str_replace('%path%', self::$fixturesPath.'/includes', file_get_contents(self::$fixturesPath.'/xml/services9.xml')), '->dump() dumps services');
+    $this->assertEquals(str_replace('%path%', self::$fixturesPath.'/includes', file_get_contents(self::$fixturesPath.'/xml/services9.xml')), $dumper->dump(), '->dump() dumps services');
 
     $dumper = new XmlDumper($container = new Builder());
     $container->register('foo', 'FooClass')->addArgument(new \stdClass());

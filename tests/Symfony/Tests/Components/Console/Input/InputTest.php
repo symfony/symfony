@@ -22,21 +22,21 @@ class InputTest extends \PHPUnit_Framework_TestCase
   public function testConstructor()
   {
     $input = new ArrayInput(array('name' => 'foo'), new InputDefinition(array(new InputArgument('name'))));
-    $this->assertEquals($input->getArgument('name'), 'foo', '->__construct() takes a InputDefinition as an argument');
+    $this->assertEquals('foo', $input->getArgument('name'), '->__construct() takes a InputDefinition as an argument');
   }
 
   public function testOptions()
   {
     $input = new ArrayInput(array('--name' => 'foo'), new InputDefinition(array(new InputOption('name'))));
-    $this->assertEquals($input->getOption('name'), 'foo', '->getOption() returns the value for the given option');
+    $this->assertEquals('foo', $input->getOption('name'), '->getOption() returns the value for the given option');
 
     $input->setOption('name', 'bar');
-    $this->assertEquals($input->getOption('name'), 'bar', '->setOption() sets the value for a given option');
-    $this->assertEquals($input->getOptions(), array('name' => 'bar'), '->getOptions() returns all option values');
+    $this->assertEquals('bar', $input->getOption('name'), '->setOption() sets the value for a given option');
+    $this->assertEquals(array('name' => 'bar'), $input->getOptions(), '->getOptions() returns all option values');
 
     $input = new ArrayInput(array('--name' => 'foo'), new InputDefinition(array(new InputOption('name'), new InputOption('bar', '', InputOption::PARAMETER_OPTIONAL, '', 'default'))));
-    $this->assertEquals($input->getOption('bar'), 'default', '->getOption() returns the default value for optional options');
-    $this->assertEquals($input->getOptions(), array('name' => 'foo', 'bar' => 'default'), '->getOptions() returns all option values, even optional ones');
+    $this->assertEquals('default', $input->getOption('bar'), '->getOption() returns the default value for optional options');
+    $this->assertEquals(array('name' => 'foo', 'bar' => 'default'), $input->getOptions(), '->getOptions() returns all option values, even optional ones');
 
     try
     {
@@ -60,15 +60,15 @@ class InputTest extends \PHPUnit_Framework_TestCase
   public function testArguments()
   {
     $input = new ArrayInput(array('name' => 'foo'), new InputDefinition(array(new InputArgument('name'))));
-    $this->assertEquals($input->getArgument('name'), 'foo', '->getArgument() returns the value for the given argument');
+    $this->assertEquals('foo', $input->getArgument('name'), '->getArgument() returns the value for the given argument');
 
     $input->setArgument('name', 'bar');
-    $this->assertEquals($input->getArgument('name'), 'bar', '->setArgument() sets the value for a given argument');
-    $this->assertEquals($input->getArguments(), array('name' => 'bar'), '->getArguments() returns all argument values');
+    $this->assertEquals('bar', $input->getArgument('name'), '->setArgument() sets the value for a given argument');
+    $this->assertEquals(array('name' => 'bar'), $input->getArguments(), '->getArguments() returns all argument values');
 
     $input = new ArrayInput(array('name' => 'foo'), new InputDefinition(array(new InputArgument('name'), new InputArgument('bar', InputArgument::OPTIONAL, '', 'default'))));
-    $this->assertEquals($input->getArgument('bar'), 'default', '->getArgument() returns the default value for optional arguments');
-    $this->assertEquals($input->getArguments(), array('name' => 'foo', 'bar' => 'default'), '->getArguments() returns all argument values, even optional ones');
+    $this->assertEquals('default', $input->getArgument('bar'), '->getArgument() returns the default value for optional arguments');
+    $this->assertEquals(array('name' => 'foo', 'bar' => 'default'), $input->getArguments(), '->getArguments() returns all argument values, even optional ones');
 
     try
     {

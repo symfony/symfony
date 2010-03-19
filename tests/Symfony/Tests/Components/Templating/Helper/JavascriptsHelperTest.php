@@ -24,13 +24,13 @@ class JavascriptsHelperTest extends \PHPUnit_Framework_TestCase
     $assetHelper = new AssetsHelper();
     $helper = new JavascriptsHelper($assetHelper);
     $helper->add('foo');
-    $this->assertEquals($helper->get(), array('/foo' => array()), '->add() adds a JavaScript');
+    $this->assertEquals(array('/foo' => array()), $helper->get(), '->add() adds a JavaScript');
     $helper->add('/foo');
-    $this->assertEquals($helper->get(), array('/foo' => array()), '->add() does not add the same JavaScript twice');
+    $this->assertEquals(array('/foo' => array()), $helper->get(), '->add() does not add the same JavaScript twice');
     $helper = new JavascriptsHelper($assetHelper);
     $assetHelper->setBaseURLs('http://assets.example.com/');
     $helper->add('foo');
-    $this->assertEquals($helper->get(), array('http://assets.example.com/foo' => array()), '->add() converts the JavaScript to a public path');
+    $this->assertEquals(array('http://assets.example.com/foo' => array()), $helper->get(), '->add() converts the JavaScript to a public path');
   }
 
   public function testMagicToString()
@@ -39,6 +39,6 @@ class JavascriptsHelperTest extends \PHPUnit_Framework_TestCase
     $assetHelper->setBaseURLs('');
     $helper = new JavascriptsHelper($assetHelper);
     $helper->add('foo', array('class' => 'ba>'));
-    $this->assertEquals($helper->__toString(), '<script type="text/javascript" src="/foo" class="ba&gt;"></script>'."\n", '->__toString() converts the JavaScript configuration to HTML');
+    $this->assertEquals('<script type="text/javascript" src="/foo" class="ba&gt;"></script>'."\n", $helper->__toString(), '->__toString() converts the JavaScript configuration to HTML');
   }
 }

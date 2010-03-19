@@ -28,18 +28,18 @@ class GraphvizDumperTest extends \PHPUnit_Framework_TestCase
   {
     $dumper = new GraphvizDumper($container = new Builder());
 
-    $this->assertEquals($dumper->dump(), file_get_contents(self::$fixturesPath.'/graphviz/services1.dot'), '->dump() dumps an empty container as an empty dot file');
+    $this->assertEquals(file_get_contents(self::$fixturesPath.'/graphviz/services1.dot'), $dumper->dump(), '->dump() dumps an empty container as an empty dot file');
 
     $container = new Builder();
     $dumper = new GraphvizDumper($container);
 
     $container = include self::$fixturesPath.'/containers/container9.php';
     $dumper = new GraphvizDumper($container);
-    $this->assertEquals($dumper->dump(), str_replace('%path%', __DIR__, file_get_contents(self::$fixturesPath.'/graphviz/services9.dot')), '->dump() dumps services');
+    $this->assertEquals(str_replace('%path%', __DIR__, file_get_contents(self::$fixturesPath.'/graphviz/services9.dot')), $dumper->dump(), '->dump() dumps services');
 
     $container = include self::$fixturesPath.'/containers/container10.php';
     $dumper = new GraphvizDumper($container);
-    $this->assertEquals($dumper->dump(), str_replace('%path%', __DIR__, file_get_contents(self::$fixturesPath.'/graphviz/services10.dot')), '->dump() dumps services');
+    $this->assertEquals(str_replace('%path%', __DIR__, file_get_contents(self::$fixturesPath.'/graphviz/services10.dot')), $dumper->dump(), '->dump() dumps services');
 
     $container = include self::$fixturesPath.'/containers/container10.php';
     $dumper = new GraphvizDumper($container);

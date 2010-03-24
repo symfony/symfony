@@ -83,11 +83,7 @@ class Parser
         }
         else
         {
-          if (preg_match('/^([^ ]+)\: +({.*?)$/', $values['value'], $matches))
-          {
-            $data[] = array($matches[1] => Inline::load($matches[2]));
-          }
-          elseif (isset($values['leadspaces'])
+          if (isset($values['leadspaces'])
             && ' ' == $values['leadspaces']
             && preg_match('#^(?P<key>'.Inline::REGEX_QUOTED_STRING.'|[^ \'"\{].*?) *\:(\s+(?P<value>.+?))?\s*$#', $values['value'], $matches))
           {
@@ -99,7 +95,7 @@ class Parser
             $block = $values['value'];
             if (!$this->isNextLineIndented())
             {
-              $block .= "\n".$this->getNextEmbedBlock();
+              $block .= "\n".$this->getNextEmbedBlock($this->getCurrentLineIndentation() + 2);
             }
 
             $data[] = $parser->parse($block);
@@ -283,17 +279,26 @@ class Parser
   /**
    * Returns the next embed block of YAML.
    *
+   * @param integer $indentation The indent level at which the block is to be read, or null for default
+   *
    * @return string A YAML string
    */
-  protected function getNextEmbedBlock()
+  protected function getNextEmbedBlock($indentation = null)
   {
     $this->moveToNextLine();
 
-    $newIndent = $this->getCurrentLineIndentation();
-
-    if (!$this->isCurrentLineEmpty() && 0 == $newIndent)
+    if (null === $indentation)
     {
-      throw new ParserException(sprintf('Indentation problem at line %d (%s)', $this->getRealCurrentLineNb() + 1, $this->currentLine));
+      $newIndent = $this->getCurrentLineIndentation();
+
+      if (!$this->isCurrentLineEmpty() && 0 == $newIndent)
+      {
+        throw new ParserException(sprintf('Indentation problem at line %d (%s)', $this->getRealCurrentLineNb() + 1, $this->currentLine));
+      }
+    }
+    else
+    {
+      $newIndent = $indentation;
     }
 
     $data = array(substr($this->currentLine, $newIndent));

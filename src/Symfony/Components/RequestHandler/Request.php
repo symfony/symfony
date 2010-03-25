@@ -45,11 +45,14 @@ class Request implements RequestInterface
   /**
    * Constructor.
    *
-   * @param array $parameters An array of parameters (see setParameters())
+   * @param array $query   The GET parameters
+   * @param array $request The POST parameters
+   * @param array $path    The parameters parsed from the PATH_INFO (see Router)
+   * @param array $server  The SERVER parameters
    */
-  public function __construct(array $parameters = array())
+  public function __construct(array $query = null, array $request = null, array $path = null, array $server = null)
   {
-    $this->setParameters($parameters);
+    $this->setParameters($request, $query, $path, $server);
   }
 
   /**
@@ -57,21 +60,17 @@ class Request implements RequestInterface
    *
    * This method also re-initializes all properties.
    *
-   * The parameters can define four elements:
-   *
-   *   * request: The POST parameters
-   *   * query:   The GET parameters
-   *   * path:    The parameters parsed from the PATH_INFO (see Router)
-   *   * server:  The SERVER parameters
-   *
-   * @param array $parameters An array of parameters
+   * @param array $query   The GET parameters
+   * @param array $request The POST parameters
+   * @param array $path    The parameters parsed from the PATH_INFO
+   * @param array $server  The SERVER parameters
    */
-  public function setParameters(array $parameters = array())
+  public function setParameters(array $query = null, array $request = null, array $path = null, array $server = null)
   {
-    $this->requestParameters = isset($parameters['request']) ? $parameters['request'] : $_POST;
-    $this->queryParameters = isset($parameters['query']) ? $parameters['query'] : $_GET;
-    $this->pathParameters = isset($parameters['path']) ? $parameters['path'] : array();
-    $this->serverParameters = isset($parameters['server']) ? $parameters['server'] : $_SERVER;
+    $this->requestParameters = null !== $request ? $request : $_POST;
+    $this->queryParameters = null !== $query ? $query : $_GET;
+    $this->pathParameters = null !== $path ? $path : array();
+    $this->serverParameters = null !== $server ? $server : $_SERVER;
 
     $this->languages = null;
     $this->charsets = null;
@@ -85,30 +84,25 @@ class Request implements RequestInterface
     $this->format = null;
   }
 
-  public function duplicate(array $parameters = array())
+  /**
+   * Clones a request and overrides some of its parameters.
+   *
+   * @param array $query   The GET parameters
+   * @param array $request The POST parameters
+   * @param array $path    The parameters parsed from the PATH_INFO
+   * @param array $server  The SERVER parameters
+   */
+  public function duplicate(array $query = null, array $request = null, array $path = null, array $server = null)
   {
-    $request = clone $this;
+    $dup = clone $this;
+    $dup->setParameters(
+      null !== $query ? $query : $this->queryParameters,
+      null !== $request ? $request : $this->requestParameters,
+      null !== $path ? $path : $this->pathParameters,
+      null !== $server ? $server : $this->serverParameters
+    );
 
-    foreach (array('request', 'query', 'path', 'server') as $key)
-    {
-      if (isset($parameters[$key]))
-      {
-        $request->{$key.'Parameters'} = $parameters[$key];
-      }
-    }
-
-    $this->languages = null;
-    $this->charsets = null;
-    $this->acceptableContentTypes = null;
-    $this->scriptName = null;
-    $this->pathInfo = null;
-    $this->requestUri = null;
-    $this->baseUrl = null;
-    $this->basePath = null;
-    $this->method = null;
-    $this->format = null;
-
-    return $request;
+    return $dup;
   }
 
   /**

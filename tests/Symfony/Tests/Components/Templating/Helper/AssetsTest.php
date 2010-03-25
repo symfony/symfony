@@ -11,8 +11,6 @@
 
 namespace Symfony\Tests\Components\Templating\Helper;
 
-require_once __DIR__.'/../../../bootstrap.php';
-
 use Symfony\Components\Templating\Helper\AssetsHelper;
 
 class AssetsHelperTest extends \PHPUnit_Framework_TestCase

@@ -10,8 +10,6 @@
 
 namespace Symfony\Tests\Components\DependencyInjection;
 
-require_once __DIR__.'/../../bootstrap.php';
-
 use Symfony\Components\DependencyInjection\Builder;
 
 class CrossCheckTest extends \PHPUnit_Framework_TestCase

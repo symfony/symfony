@@ -10,8 +10,6 @@
 
 namespace Symfony\Tests\Components\EventDispatcher;
 
-require_once __DIR__.'/../../bootstrap.php';
-
 use Symfony\Components\EventDispatcher\Event;
 
 class EventTest extends \PHPUnit_Framework_TestCase

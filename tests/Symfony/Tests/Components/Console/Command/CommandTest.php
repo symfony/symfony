@@ -10,8 +10,6 @@
 
 namespace Symfony\Tests\Components\Console\Command;
 
-require_once __DIR__.'/../../../bootstrap.php';
-
 use Symfony\Components\Console\Command\Command;
 use Symfony\Components\Console\Application;
 use Symfony\Components\Console\Input\InputDefinition;

@@ -11,8 +11,6 @@
 
 namespace Symfony\Tests\Components\Templating\Helper;
 
-require_once __DIR__.'/../../../bootstrap.php';
-
 use Symfony\Components\Templating\Helper\SlotsHelper;
 
 class SlotsHelperTest extends \PHPUnit_Framework_TestCase

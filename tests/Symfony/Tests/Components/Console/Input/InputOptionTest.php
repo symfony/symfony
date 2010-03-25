@@ -10,8 +10,6 @@
 
 namespace Symfony\Tests\Components\Console\Input;
 
-require_once __DIR__.'/../../../bootstrap.php';
-
 use Symfony\Components\Console\Input\InputOption;
 use Symfony\Components\Console\Exception;
 

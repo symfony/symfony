@@ -10,8 +10,6 @@
 
 namespace Symfony\Tests\Components\DependencyInjection\Loader;
 
-require_once __DIR__.'/../../../bootstrap.php';
-
 require_once __DIR__.'/../../../../../fixtures/Symfony/Components/DependencyInjection/includes/ProjectExtension.php';
 
 class LoaderExtensionTest extends \PHPUnit_Framework_TestCase

@@ -10,8 +10,6 @@
 
 namespace Symfony\Tests\Components\Console\Input;
 
-require_once __DIR__.'/../../../bootstrap.php';
-
 use Symfony\Components\Console\Input\ArgvInput;
 use Symfony\Components\Console\Input\InputDefinition;
 use Symfony\Components\Console\Input\InputArgument;

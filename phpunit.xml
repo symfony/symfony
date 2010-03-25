@@ -9,6 +9,7 @@
          processIsolation="false"
          stopOnFailure="false"
          syntaxCheck="false"
+         bootstrap="tests/Symfony/Tests/bootstrap.php"
 >
   <testsuites>
     <testsuite name="Symfony Test Suite">

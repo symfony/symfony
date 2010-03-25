@@ -10,8 +10,6 @@
 
 namespace Symfony\Tests\Components\Console\Tester;
 
-require_once __DIR__.'/../../../bootstrap.php';
-
 use Symfony\Components\Console\Application;
 use Symfony\Components\Console\Output\Output;
 use Symfony\Components\Console\Tester\ApplicationTester;

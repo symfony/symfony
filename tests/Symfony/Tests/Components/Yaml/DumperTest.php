@@ -10,8 +10,6 @@
 
 namespace Symfony\Tests\Components\OutputEscaper;
 
-require_once __DIR__.'/../../bootstrap.php';
-
 use Symfony\Components\Yaml\Yaml;
 use Symfony\Components\Yaml\Parser;
 use Symfony\Components\Yaml\Dumper;

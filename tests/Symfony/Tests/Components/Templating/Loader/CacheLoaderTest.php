@@ -11,8 +11,6 @@
 
 namespace Symfony\Tests\Components\Templating\Loader;
 
-require_once __DIR__.'/../../../bootstrap.php';
-
 require_once __DIR__.'/../../../../../lib/SymfonyTests/Components/Templating/ProjectTemplateDebugger.php';
 
 use Symfony\Components\Templating\Loader\Loader;

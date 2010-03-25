@@ -11,8 +11,6 @@
 
 namespace Symfony\Tests\Components\Templating;
 
-require_once __DIR__.'/../../bootstrap.php';
-
 require_once __DIR__.'/../../../../lib/SymfonyTests/Components/Templating/SimpleHelper.php';
 
 use Symfony\Components\Templating\Engine;

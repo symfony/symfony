@@ -11,8 +11,6 @@
 
 namespace Symfony\Tests\Components\OutputEscaper;
 
-require_once __DIR__.'/../../bootstrap.php';
-
 use Symfony\Components\OutputEscaper\Escaper;
 use Symfony\Components\OutputEscaper\SafeDecorator;
 use Symfony\Components\OutputEscaper\IteratorDecorator;

@@ -11,8 +11,6 @@
 
 namespace Symfony\Tests\Components\RequestHandler;
 
-require_once __DIR__.'/../../bootstrap.php';
-
 use Symfony\Components\RequestHandler\Request;
 
 class RequestTest extends \PHPUnit_Framework_TestCase

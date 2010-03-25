@@ -10,8 +10,6 @@
 
 namespace Symfony\Tests\Components\Console\Formatter;
 
-require_once __DIR__.'/../../../bootstrap.php';
-
 use Symfony\Components\Console\Helper\FormatterHelper;
 
 class FormatterHelperTest extends \PHPUnit_Framework_TestCase

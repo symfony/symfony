@@ -11,8 +11,6 @@
 
 namespace Symfony\Tests\Components\Templating\Helper;
 
-require_once __DIR__.'/../../../bootstrap.php';
-
 use Symfony\Components\Templating\Helper\AssetsHelper;
 use Symfony\Components\Templating\Helper\JavascriptsHelper;
 use Symfony\Components\Templating\Loader\FilesystemLoader;

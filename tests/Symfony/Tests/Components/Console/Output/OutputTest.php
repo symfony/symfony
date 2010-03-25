@@ -10,8 +10,6 @@
 
 namespace Symfony\Tests\Components\Console\Output;
 
-require_once __DIR__.'/../../../bootstrap.php';
-
 use Symfony\Components\Console\Output\Output;
 
 class OutputTest extends \PHPUnit_Framework_TestCase

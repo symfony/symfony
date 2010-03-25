@@ -11,8 +11,6 @@
 
 namespace Symfony\Tests\Components\Templating\Renderer;
 
-require_once __DIR__.'/../../../bootstrap.php';
-
 use Symfony\Components\Templating\Renderer\PhpRenderer;
 use Symfony\Components\Templating\Storage\Storage;
 use Symfony\Components\Templating\Storage\StringStorage;

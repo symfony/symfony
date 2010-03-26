@@ -38,7 +38,7 @@ class UrlGenerator implements UrlGeneratorInterface
   public function __construct(RouteCollection $routes, array $context = array(), array $defaults = array())
   {
     $this->routes = $routes;
-    $this->context = array_merge(array('base_url' => ''), $context);
+    $this->context = $context;
     $this->defaults = $defaults;
     $this->cache = array();
   }
@@ -123,7 +123,7 @@ class UrlGenerator implements UrlGeneratorInterface
       $url .= '?'.http_build_query($extra);
     }
 
-    $url = $this->context['base_url'].$url;
+    $url = (isset($this->context['base_url']) ? $this->context['base_url'] : '').$url;
 
     if ($absolute && isset($this->context['host']))
     {

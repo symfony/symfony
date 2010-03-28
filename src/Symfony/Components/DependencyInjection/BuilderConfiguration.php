@@ -277,7 +277,7 @@ class BuilderConfiguration
   {
     unset($this->aliases[$id]);
 
-    return $this->definitions[$id] = $definition;
+    $this->definitions[$id] = $definition;
 
     return $this;
   }

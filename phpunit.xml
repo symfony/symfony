@@ -20,16 +20,12 @@
 
   <filter>
     <whitelist>
-      <directory suffix=".php">./src/Symfony/</directory>
+      <directory>./src/Symfony/</directory>
       <exclude>
-        <directory suffix=".php">./src/Symfony/Framework/DoctrineBundle</directory>
-        <directory suffix=".php">./src/Symfony/Framework/ZendBundle</directory>
+        <directory>./src/Symfony/Framework/DoctrineBundle</directory>
+        <directory>./src/Symfony/Framework/ZendBundle</directory>
 
-        <directory suffix=".php">./src/Symfony/Framework/DoctrineBundle/Resources</directory>
-        <directory suffix=".php">./src/Symfony/Framework/ProfilerBundle/Resources</directory>
-        <directory suffix=".php">./src/Symfony/Framework/SwiftmailerBundle/Resources</directory>
-        <directory suffix=".php">./src/Symfony/Framework/WebBundle/Resources</directory>
-        <directory suffix=".php">./src/Symfony/Framework/ZendBundle/Resources</directory>
+        <directory>./src/Symfony/Framework/*/Resources</directory>
 
         <file>./src/Symfony/Foundation/bootstrap.php</file>
         <file>./src/Symfony/Foundation/packager.php</file>

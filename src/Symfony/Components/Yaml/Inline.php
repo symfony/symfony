@@ -37,15 +37,30 @@ class Inline
       return '';
     }
 
+    if (function_exists('mb_internal_encoding') && ((int) ini_get('mbstring.func_overload')) & 2)
+    {
+      $mbEncoding = mb_internal_encoding();
+      mb_internal_encoding('ASCII');
+    }
+
     switch ($value[0])
     {
       case '[':
-        return self::parseSequence($value);
+        $result = self::parseSequence($value);
+        break;
       case '{':
-        return self::parseMapping($value);
+        $result = self::parseMapping($value);
+        break;
       default:
-        return self::parseScalar($value);
+        $result = self::parseScalar($value);
     }
+
+    if (isset($mbEncoding))
+    {
+      mb_internal_encoding($mbEncoding);
+    }
+
+    return $result;
   }
 
   /**

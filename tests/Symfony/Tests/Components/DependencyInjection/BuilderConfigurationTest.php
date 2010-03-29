@@ -170,7 +170,7 @@ class BuilderConfigurationTest extends \PHPUnit_Framework_TestCase
 
     $configuration->setDefinition('foobar', $foo = new Definition('FooBarClass'));
     $this->assertEquals($foo, $configuration->getDefinition('foobar'), '->getDefinition() returns a service definition if defined');
-    $this->assertTrue($configuration->setDefinition('foobar', $foo = new Definition('FooBarClass')) === $foo, '->setDefinition() implements a fuild interface by returning the service reference');
+    $this->assertTrue($configuration->setDefinition('foobar', new Definition('FooBarClass')) === $configuration, '->setDefinition() implements a fuild interface');
 
     $configuration->addDefinitions($defs = array('foobar' => new Definition('FooBarClass')));
     $this->assertEquals(array_merge($definitions, $defs), $configuration->getDefinitions(), '->addDefinitions() adds the service definitions');

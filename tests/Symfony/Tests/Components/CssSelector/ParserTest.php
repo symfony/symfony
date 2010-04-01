@@ -24,30 +24,19 @@ class ParserTest extends \PHPUnit_Framework_TestCase
     $this->assertEquals('descendant-or-self::foo:h1', Parser::cssToXpath('foo|h1'));
   }
 
-  public function testParse()
+  /**
+   * @dataProvider getCssSelectors
+   */
+  public function testParse($css, $xpath)
   {
     $parser = new Parser();
 
-    $tests = array(
-      'h1' => "h1",
-      'foo|h1' => "foo:h1",
-      'h1, h2, h3' => "h1 | h2 | h3",
-      'h1:nth-child(3n+1)' => "*/*[name() = 'h1' and ((position() -1) mod 3 = 0 and position() >= 1)]",
-      'h1 > p' => "h1/p",
-      'h1#foo' => "h1[@id = 'foo']",
-      'h1.foo' => "h1[contains(concat(' ', normalize-space(@class), ' '), ' foo ')]",
-      'h1[class*="foo bar"]' => "h1[contains(@class, 'foo bar')]",
-      'h1[foo|class*="foo bar"]' => "h1[contains(@foo:class, 'foo bar')]",
-      'h1[class]' => "h1[@class]",
-      'h1 .foo' => "h1/descendant::*[contains(concat(' ', normalize-space(@class), ' '), ' foo ')]",
-      'h1 #foo' => "h1/descendant::*[@id = 'foo']",
-      'h1 [class*=foo]' => "h1/descendant::*[contains(@class, 'foo')]",
-    );
+    $this->assertEquals($xpath, (string) $parser->parse($css)->toXpath(), '->parse() parses an input string and returns a node');
+  }
 
-    foreach ($tests as $selector => $xpath)
-    {
-      $this->assertEquals($xpath, (string) $parser->parse($selector)->toXpath(), '->parse() parses an input string and returns a node');
-    }
+  public function testParseExceptions()
+  {
+    $parser = new Parser();
 
     try
     {
@@ -58,5 +47,24 @@ class ParserTest extends \PHPUnit_Framework_TestCase
     {
       $this->assertEquals("Expected symbol, got '' at h1: -> ", $e->getMessage(), '->parse() throws an Exception if the css selector is not valid');
     }
+  }
+
+  public function getCssSelectors()
+  {
+    return array(
+      array('h1', "h1"),
+      array('foo|h1', "foo:h1"),
+      array('h1, h2, h3', "h1 | h2 | h3"),
+      array('h1:nth-child(3n+1)', "*/*[name() = 'h1' and ((position() -1) mod 3 = 0 and position() >= 1)]"),
+      array('h1 > p', "h1/p"),
+      array('h1#foo', "h1[@id = 'foo']"),
+      array('h1.foo', "h1[contains(concat(' ', normalize-space(@class), ' '), ' foo ')]"),
+      array('h1[class*="foo bar"]', "h1[contains(@class, 'foo bar')]"),
+      array('h1[foo|class*="foo bar"]', "h1[contains(@foo:class, 'foo bar')]"),
+      array('h1[class]', "h1[@class]"),
+      array('h1 .foo', "h1/descendant::*[contains(concat(' ', normalize-space(@class), ' '), ' foo ')]"),
+      array('h1 #foo', "h1/descendant::*[@id = 'foo']"),
+      array('h1 [class*=foo]', "h1/descendant::*[contains(@class, 'foo')]"),
+    );
   }
 }

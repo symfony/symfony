@@ -15,29 +15,40 @@ use Symfony\Components\CssSelector\Tokenizer;
 
 class TokenizerTest extends \PHPUnit_Framework_TestCase
 {
-  public function testTokenize()
+  protected $tokenizer;
+
+  public function setUp()
   {
-    $tokenizer = new Tokenizer();
+    $this->tokenizer = new Tokenizer();
+  }
 
-    $tests = array(
-      'h1',
-      'h1:nth-child(3n+1)',
-      'h1 > p',
-      'h1#foo',
-      'h1.foo',
-      'h1[class*=foo]',
-      'h1 .foo',
-      'h1 #foo',
-      'h1 [class*=foo]',
+  /**
+   * @dataProvider getCssSelectors
+   */
+  public function testTokenize($css)
+  {
+    $this->assertEquals($css, $this->tokensToString($this->tokenizer->tokenize($css)), '->tokenize() lexes an input string and returns an array of tokens');
+  }
+
+  public function testTokenizeWithQuotedStrings()
+  {
+    $this->assertEquals('foo[class=foo bar  ]', $this->tokensToString($this->tokenizer->tokenize('foo[class="foo bar"]')), '->tokenize() lexes an input string and returns an array of tokens');
+    $this->assertEquals("foo[class=foo Abar     ]", $this->tokensToString($this->tokenizer->tokenize('foo[class="foo \\65 bar"]')), '->tokenize() lexes an input string and returns an array of tokens');
+  }
+
+  public function getCssSelectors()
+  {
+    return array(
+      array('h1'),
+      array('h1:nth-child(3n+1)'),
+      array('h1 > p'),
+      array('h1#foo'),
+      array('h1.foo'),
+      array('h1[class*=foo]'),
+      array('h1 .foo'),
+      array('h1 #foo'),
+      array('h1 [class*=foo]'),
     );
-
-    foreach ($tests as $test)
-    {
-      $this->assertEquals($test, $this->tokensToString($tokenizer->tokenize($test)), '->tokenize() lexes an input string and returns an array of tokens');
-    }
-
-    $this->assertEquals('foo[class=foo bar  ]', $this->tokensToString($tokenizer->tokenize('foo[class="foo bar"]')), '->tokenize() lexes an input string and returns an array of tokens');
-    $this->assertEquals("foo[class=foo Abar     ]", $this->tokensToString($tokenizer->tokenize('foo[class="foo \\65 bar"]')), '->tokenize() lexes an input string and returns an array of tokens');
   }
 
   protected function tokensToString($tokens)

@@ -67,7 +67,7 @@ class FunctionNode implements NodeInterface
     list($a, $b) = $this->parseSeries($expr);
     if (!$a && !$b && !$last)
     {
-      # a=0 means nothing is returned...
+      // a=0 means nothing is returned...
       $xpath->addCondition('false() and position() = 0');
 
       return $xpath;
@@ -92,7 +92,7 @@ class FunctionNode implements NodeInterface
 
     if ($last)
     {
-      # FIXME: I'm not sure if this is right
+      // FIXME: I'm not sure if this is right
       $a = -$a;
       $b = -$b;
     }
@@ -131,13 +131,13 @@ class FunctionNode implements NodeInterface
     }
 
     return $xpath;
-    # FIXME: handle an+b, odd, even
-    # an+b means every-a, plus b, e.g., 2n+1 means odd
-    # 0n+b means b
-    # n+0 means a=1, i.e., all elements
-    # an means every a elements, i.e., 2n means even
-    # -n means -1n
-    # -1n+6 means elements 6 and previous
+    /* FIXME: handle an+b, odd, even
+       an+b means every-a, plus b, e.g., 2n+1 means odd
+       0n+b means b
+       n+0 means a=1, i.e., all elements
+       an means every a elements, i.e., 2n means even
+       -n means -1n
+       -1n+6 means elements 6 and previous */
   }
 
   protected function _xpath_nth_last_child($xpath, $expr)
@@ -162,23 +162,23 @@ class FunctionNode implements NodeInterface
 
   protected function _xpath_contains($xpath, $expr)
   {
-    # text content, minus tags, must contain expr
+    // text content, minus tags, must contain expr
     if ($expr instanceof ElementNode)
     {
       $expr = $expr->formatElement();
     }
     $xpath->addCondition(sprintf('contains(css:lower-case(string(.)), %s)', XPathExpr::xpathLiteral(strtolower($expr))));
-    # FIXME: Currently case insensitive matching doesn't seem to be happening
+    // FIXME: Currently case insensitive matching doesn't seem to be happening
 
     return $xpath;
   }
 
   protected function _xpath_not($xpath, $expr)
   {
-    # everything for which not expr applies
+    // everything for which not expr applies
     $expr = $expr->toXpath();
     $cond = $expr->getCondition();
-    # FIXME: should I do something about element_path?
+    // FIXME: should I do something about element_path?
     $xpath->addCondition(sprintf('not(%s)', $cond));
 
     return $xpath;
@@ -194,13 +194,13 @@ class FunctionNode implements NodeInterface
 
     if (!$s || $s == '*')
     {
-      # Happens when there's nothing, which the CSS parser thinks of as *
+      // Happens when there's nothing, which the CSS parser thinks of as *
       return array(0, 0);
     }
 
     if (is_string($s))
     {
-      # Happens when you just get a number
+      // Happens when you just get a number
       return array(0, $s);
     }
 
@@ -219,7 +219,7 @@ class FunctionNode implements NodeInterface
 
     if (false === strpos($s, 'n'))
     {
-      # Just a b
+      // Just a b
 
       return array(0, intval((string) $s));
     }

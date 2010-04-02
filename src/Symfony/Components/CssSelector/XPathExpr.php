@@ -99,7 +99,7 @@ class XPathExpr
   {
     if ($this->element == '*')
     {
-      # We weren't doing a test anyway
+      // We weren't doing a test anyway
       return;
     }
 
@@ -132,8 +132,8 @@ class XPathExpr
     $prefix .= $combiner;
     $path = $other->prefix.$other->path;
 
-    # We don't need a star prefix if we are joining to this other
-    # prefix; so we'll get rid of it
+    /* We don't need a star prefix if we are joining to this other
+       prefix; so we'll get rid of it */
     if ($other->starPrefix && $path == '*/')
     {
       $path = '';
@@ -148,7 +148,7 @@ class XPathExpr
   {
     if ($s instanceof Node\ElementNode)
     {
-      # This is probably a symbol that looks like an expression...
+      // This is probably a symbol that looks like an expression...
       $s = $s->formatElement();
     }
     else

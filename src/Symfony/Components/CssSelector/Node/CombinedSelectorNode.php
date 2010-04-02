@@ -65,7 +65,7 @@ class CombinedSelectorNode implements NodeInterface
 
   protected function _xpath_descendant($xpath, $sub)
   {
-    # when sub is a descendant in any way of xpath
+    // when sub is a descendant in any way of xpath
     $xpath->join('/descendant::', $sub->toXpath());
 
     return $xpath;
@@ -73,7 +73,7 @@ class CombinedSelectorNode implements NodeInterface
 
   protected function _xpath_child($xpath, $sub)
   {
-    # when sub is an immediate child of xpath
+    // when sub is an immediate child of xpath
     $xpath->join('/', $sub->toXpath());
 
     return $xpath;
@@ -81,7 +81,7 @@ class CombinedSelectorNode implements NodeInterface
 
   protected function _xpath_direct_adjacent($xpath, $sub)
   {
-    # when sub immediately follows xpath
+    // when sub immediately follows xpath
     $xpath->join('/following-sibling::', $sub->toXpath());
     $xpath->addNameTest();
     $xpath->addCondition('position() = 1');
@@ -91,7 +91,7 @@ class CombinedSelectorNode implements NodeInterface
 
   protected function _xpath_indirect_adjacent($xpath, $sub)
   {
-    # when sub comes somewhere after xpath as a sibling
+    // when sub comes somewhere after xpath as a sibling
     $xpath->join('/following-sibling::', $sub->toXpath());
 
     return $xpath;

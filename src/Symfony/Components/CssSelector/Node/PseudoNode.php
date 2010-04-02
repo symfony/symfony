@@ -72,7 +72,7 @@ class PseudoNode implements NodeInterface
 
   protected function xpath_checked($xpath)
   {
-    # FIXME: is this really all the elements?
+    // FIXME: is this really all the elements?
     $xpath->addCondition("(@selected or @checked) and (name(.) = 'input' or name(.) = 'option')");
 
     return $xpath;
@@ -80,7 +80,7 @@ class PseudoNode implements NodeInterface
 
   protected function xpath_root($xpath)
   {
-    # if this element is the root element
+    // if this element is the root element
     throw new SyntaxError();
   }
 

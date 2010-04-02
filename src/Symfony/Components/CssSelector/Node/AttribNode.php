@@ -68,7 +68,7 @@ class AttribNode implements NodeInterface
     }
     elseif ($this->operator == '!=')
     {
-      # FIXME: this seems like a weird hack...
+      // FIXME: this seems like a weird hack...
       if ($value)
       {
         $path->addCondition(sprintf('not(%s) or %s != %s', $attrib, $attrib, XPathExpr::xpathLiteral($value)));
@@ -77,7 +77,7 @@ class AttribNode implements NodeInterface
       {
         $path->addCondition(sprintf('%s != %s', $attrib, XPathExpr::xpathLiteral($value)));
       }
-      #path.addCondition('%s != %s' % (attrib, xpathLiteral(value)))
+      // path.addCondition('%s != %s' % (attrib, xpathLiteral(value)))
     }
     elseif ($this->operator == '~=')
     {
@@ -85,7 +85,7 @@ class AttribNode implements NodeInterface
     }
     elseif ($this->operator == '|=')
     {
-      # Weird, but true...
+      // Weird, but true...
       $path->addCondition(sprintf('%s = %s or starts-with(%s, %s)', $attrib, XPathExpr::xpathLiteral($value), $attrib, XPathExpr::xpathLiteral($value.'-')));
     }
     elseif ($this->operator == '^=')
@@ -94,12 +94,12 @@ class AttribNode implements NodeInterface
     }
     elseif ($this->operator == '$=')
     {
-      # Oddly there is a starts-with in XPath 1.0, but not ends-with
+      // Oddly there is a starts-with in XPath 1.0, but not ends-with
       $path->addCondition(sprintf('substring(%s, string-length(%s)-%s) = %s', $attrib, $attrib, strlen($value) - 1, XPathExpr::xpathLiteral($value)));
     }
     elseif ($this->operator == '*=')
     {
-      # FIXME: case sensitive?
+      // FIXME: case sensitive?
       $path->addCondition(sprintf('contains(%s, %s)', $attrib, XPathExpr::xpathLiteral($value)));
     }
     else
@@ -112,7 +112,7 @@ class AttribNode implements NodeInterface
 
   protected function xpathAttrib()
   {
-    # FIXME: if attrib is *?
+    // FIXME: if attrib is *?
     if ($this->namespace == '*')
     {
       return '@'.$this->attrib;

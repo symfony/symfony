@@ -90,7 +90,7 @@ class Tokenizer
 
       if ($c === '"' || $c === "'")
       {
-        # Quoted string
+        // Quoted string
         $old_pos = $pos;
         list($sym, $pos) = $this->tokenizeEscapedString($s, $pos);
 
@@ -125,7 +125,7 @@ class Tokenizer
       $result = substr($s, $start, $next - $start);
       if ('\\' === $result[strlen($result) - 1])
       {
-        # next quote character is escaped
+        // next quote character is escaped
         $pos = $next + 1;
         $continue;
       }
@@ -164,7 +164,7 @@ class Tokenizer
 
     if (!preg_match('#[^\w\-]#', $s, $match, PREG_OFFSET_CAPTURE, $pos))
     {
-      # Goes to end of s
+      // Goes to end of s
       return array(substr($s, $start), strlen($s));
     }
 

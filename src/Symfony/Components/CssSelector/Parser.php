@@ -123,7 +123,7 @@ class Parser
       }
       elseif (in_array($peek, array('+', '>', '~')))
       {
-        # A combinator
+        // A combinator
         $combinator = (string) $stream->next();
       }
       else
@@ -184,8 +184,8 @@ class Parser
       {
         if ($has_hash)
         {
-          # You can't have two hashes
-          # (FIXME: is there some more general rule I'm missing?)
+          /* You can't have two hashes
+            (FIXME: is there some more general rule I'm missing?) */
           // @codeCoverageIgnoreStart
           break;
           // @codeCoverageIgnoreEnd
@@ -238,7 +238,7 @@ class Parser
           }
           else
           {
-            # FIXME: parseSimpleSelector, or selector, or...?
+            // FIXME: parseSimpleSelector, or selector, or...?
             $selector = $this->parseSimpleSelector($stream);
           }
           $next = $stream->next();
@@ -265,7 +265,7 @@ class Parser
 
         break;
       }
-      # FIXME: not sure what "negation" is
+      // FIXME: not sure what "negation" is
     }
 
     return $result;

@@ -59,7 +59,7 @@ class ElementNode implements NodeInterface
     }
     else
     {
-      # FIXME: Should we lowercase here?
+      // FIXME: Should we lowercase here?
       $el = sprintf('%s:%s', $this->namespace, $this->element);
     }
 

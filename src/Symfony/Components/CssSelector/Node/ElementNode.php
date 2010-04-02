@@ -45,10 +45,8 @@ class ElementNode implements NodeInterface
     {
       return $this->element;
     }
-    else
-    {
-      return sprintf('%s|%s', $this->namespace, $this->element);
-    }
+
+    return sprintf('%s|%s', $this->namespace, $this->element);
   }
 
   public function toXpath()

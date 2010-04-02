@@ -52,18 +52,16 @@ class TokenStream
 
       return $this->peeked;
     }
-    else
+
+    if (!count($this->tokens))
     {
-      if (!count($this->tokens))
-      {
-        return null;
-      }
-
-      $next = array_shift($this->tokens);
-      $this->used[] = $next;
-
-      return $next;
+      return null;
     }
+
+    $next = array_shift($this->tokens);
+    $this->used[] = $next;
+
+    return $next;
   }
 
   public function peek()

@@ -208,11 +208,13 @@ class FunctionNode implements NodeInterface
     {
       return array(2, 1);
     }
-    elseif ($s == 'even')
+
+    if ($s == 'even')
     {
       return array(2, 0);
     }
-    elseif ($s == 'n')
+
+    if ($s == 'n')
     {
       return array(1, 0);
     }

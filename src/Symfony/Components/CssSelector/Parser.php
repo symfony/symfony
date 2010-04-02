@@ -104,10 +104,8 @@ class Parser
     {
       return $result[0];
     }
-    else
-    {
-      return new Node\OrNode($result);
-    }
+
+    return new Node\OrNode($result);
   }
 
   protected function parseSelector($stream)

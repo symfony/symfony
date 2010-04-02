@@ -117,10 +117,8 @@ class AttribNode implements NodeInterface
     {
       return '@'.$this->attrib;
     }
-    else
-    {
-      return sprintf('@%s:%s', $this->namespace, $this->attrib);
-    }
+
+    return sprintf('@%s:%s', $this->namespace, $this->attrib);
   }
 
   protected function formatAttrib()
@@ -129,9 +127,7 @@ class AttribNode implements NodeInterface
     {
       return $this->attrib;
     }
-    else
-    {
-      return sprintf('%s|%s', $this->namespace, $this->attrib);
-    }
+
+    return sprintf('%s|%s', $this->namespace, $this->attrib);
   }
 }

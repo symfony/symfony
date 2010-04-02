@@ -348,7 +348,10 @@ abstract class Escaper
          * @param string $value the value to escape
          * @return string the escaped value
          */
-        function ($value) { return $value; },
+        function ($value)
+        {
+          return $value;
+        },
 
       'js' =>
         /**
@@ -363,7 +366,10 @@ abstract class Escaper
          * @param string $value the value to escape
          * @return string the escaped value
          */
-        function ($value) { return str_replace(array("\\"  , "\n"  , "\r" , "\""  , "'"  ), array("\\\\", "\\n" , "\\r", "\\\"", "\\'"), (is_string($value) ? htmlentities($value, ENT_QUOTES, Escaper::getCharset()) : $value)); },
+        function ($value)
+        {
+          return str_replace(array("\\"  , "\n"  , "\r" , "\""  , "'"  ), array("\\\\", "\\n" , "\\r", "\\\"", "\\'"), (is_string($value) ? htmlentities($value, ENT_QUOTES, Escaper::getCharset()) : $value));
+        },
 
       'js_no_entities' =>
         /**
@@ -373,7 +379,10 @@ abstract class Escaper
          * @param string $value the value to escape
          * @return string the escaped value
          */
-        function ($value) { return str_replace(array("\\"  , "\n"  , "\r" , "\""  , "'"  ), array("\\\\", "\\n" , "\\r", "\\\"", "\\'"), $value); },
+        function ($value)
+        {
+          return str_replace(array("\\"  , "\n"  , "\r" , "\""  , "'"  ), array("\\\\", "\\n" , "\\r", "\\\"", "\\'"), $value);
+        },
     );
   }
 }

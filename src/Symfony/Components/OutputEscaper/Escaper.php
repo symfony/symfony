@@ -127,26 +127,28 @@ abstract class Escaper
 
         return $copy;
       }
-      elseif (self::isClassMarkedAsSafe(get_class($value)))
+
+      if (self::isClassMarkedAsSafe(get_class($value)))
       {
         // the class or one of its children is marked as safe
         // return the unescaped object
         return $value;
       }
-      elseif ($value instanceof SafeDecorator)
+
+      if ($value instanceof SafeDecorator)
       {
         // do not escape objects marked as safe
         // return the original object
         return $value->getValue();
       }
-      elseif ($value instanceof \Traversable)
+
+      if ($value instanceof \Traversable)
       {
         return new IteratorDecorator($escaper, $value);
       }
-      else
-      {
-        return new ObjectDecorator($escaper, $value);
-      }
+
+      return new ObjectDecorator($escaper, $value);
+
     }
 
     // it must be a resource; cannot escape that.
@@ -173,7 +175,8 @@ abstract class Escaper
     {
       return html_entity_decode($value, ENT_QUOTES, self::$charset);
     }
-    elseif (is_array($value))
+
+    if (is_array($value))
     {
       foreach ($value as $name => $v)
       {
@@ -182,7 +185,8 @@ abstract class Escaper
 
       return $value;
     }
-    elseif (is_object($value))
+
+    if (is_object($value))
     {
       return $value instanceof Escaper ? $value->getRawValue() : $value;
     }

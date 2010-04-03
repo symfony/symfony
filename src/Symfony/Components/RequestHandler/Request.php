@@ -353,7 +353,7 @@ class Request implements RequestInterface
 
     foreach (static::$formats as $format => $mimeTypes)
     {
-      if (in_array($mimeType, $mimeTypes))
+      if (in_array($mimeType, (array) $mimeTypes))
       {
         return $format;
       }

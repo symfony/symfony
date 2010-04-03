@@ -147,7 +147,7 @@ class Response implements ResponseInterface
    */
   public function setCookie($name, $value, $expire = null, $path = '/', $domain = '', $secure = false, $httpOnly = false)
   {
-    if (!is_null($expire))
+    if (null !== $expire)
     {
       if (is_numeric($expire))
       {
@@ -228,7 +228,7 @@ class Response implements ResponseInterface
   {
     $name = $this->normalizeHeaderName($name);
 
-    if (is_null($value))
+    if (null === $value)
     {
       unset($this->headers[$name]);
 

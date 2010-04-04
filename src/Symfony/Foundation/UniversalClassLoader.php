@@ -17,7 +17,7 @@ namespace Symfony\Foundation;
  * It is able to load classes that use either:
  *
  *  * The technical interoperability standards for PHP 5.3 namespaces and
- *    class names (http://groups.google.com/group/php-standards/web/final-proposal);
+ *    class names (http://groups.google.com/group/php-standards/web/psr-0-final-proposal);
  *
  *  * The PEAR naming convention for classes (http://pear.php.net/).
  *

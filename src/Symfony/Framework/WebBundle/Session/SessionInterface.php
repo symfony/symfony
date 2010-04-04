@@ -28,7 +28,7 @@ interface SessionInterface
    *
    * @return mixed Data associated with the key
    *
-   * @throws RuntimeException If an error occurs while reading data from this storage
+   * @throws \RuntimeException If an error occurs while reading data from this storage
    */
   public function read($key);
 
@@ -41,7 +41,7 @@ interface SessionInterface
    *
    * @return mixed Data associated with the key
    *
-   * @throws RuntimeException If an error occurs while removing data from this storage
+   * @throws \RuntimeException If an error occurs while removing data from this storage
    */
   public function remove($key);
 
@@ -53,7 +53,7 @@ interface SessionInterface
    * @param  string $key   A unique key identifying your data
    * @param  mixed  $data  Data associated with your key
    *
-   * @throws RuntimeException If an error occurs while writing to this storage
+   * @throws \RuntimeException If an error occurs while writing to this storage
    */
   public function write($key, $data);
 
@@ -64,7 +64,7 @@ interface SessionInterface
    *
    * @return boolean True if session regenerated, false if error
    *
-   * @throws RuntimeException If an error occurs while regenerating this storage
+   * @throws \RuntimeException If an error occurs while regenerating this storage
    */
   public function regenerate($destroy = false);
 }

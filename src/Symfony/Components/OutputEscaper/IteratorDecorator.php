@@ -131,7 +131,7 @@ class IteratorDecorator extends ObjectDecorator implements \Iterator, \Countable
    * @param  string $offset  (ignored)
    * @param  string $value   (ignored)
    *
-   * @throws \LogicException
+   * @throws \LogicException When trying to set values
    */
   public function offsetSet($offset, $value)
   {
@@ -147,7 +147,7 @@ class IteratorDecorator extends ObjectDecorator implements \Iterator, \Countable
    *
    * @param  string $offset  (ignored)
    *
-   * @throws \LogicException
+   * @throws \LogicException When trying to unset values
    */
   public function offsetUnset($offset)
   {

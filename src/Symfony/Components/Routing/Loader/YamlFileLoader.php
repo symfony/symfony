@@ -31,6 +31,8 @@ class YamlFileLoader extends FileLoader
    * @param  string $file A Yaml file path
    *
    * @return RouteCollection A RouteCollection instance
+   *
+   * @throws \InvalidArgumentException When route can't be parsed
    */
   public function load($file)
   {
@@ -60,6 +62,9 @@ class YamlFileLoader extends FileLoader
     return $collection;
   }
 
+  /**
+   * @throws \InvalidArgumentException When coonfig pattern is not defined for the given route
+   */
   protected function parseRoute(RouteCollection $collection, $name, $config, $file)
   {
     $defaults = isset($config['defaults']) ? $config['defaults'] : array();
@@ -76,6 +81,9 @@ class YamlFileLoader extends FileLoader
     $collection->addRoute($name, $route);
   }
 
+  /**
+   * @throws \InvalidArgumentException When import resource is not defined
+   */
   protected function parseImport(RouteCollection $collection, $name, $import, $file)
   {
     if (!isset($import['resource']))

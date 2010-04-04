@@ -25,6 +25,9 @@ use Symfony\Components\RequestHandler\Exception\HttpException;
  */
 class ExceptionController extends Controller
 {
+  /**
+   * @throws \InvalidArgumentException When the exception template does not exist
+   */
   public function exceptionAction(\Exception $exception, Request $originalRequest, array $logs)
   {
     $template = $this->container->getParameter('kernel.debug') ? 'exception' : 'error';

@@ -40,6 +40,8 @@ abstract class LoaderExtension implements LoaderExtensionInterface
    * @param array  An array of configuration values
    *
    * @return BuilderConfiguration A BuilderConfiguration instance
+   *
+   * @throws \InvalidArgumentException When provided tag is not defined in this extension
    */
   public function load($tag, array $config)
   {

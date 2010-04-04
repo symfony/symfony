@@ -48,6 +48,8 @@ class DatabaseToolDoctrineCommand extends DoctrineCommand
 
   /**
    * @see Command
+   *
+   * @throws \InvalidArgumentException When neither of --drop or --create is specified
    */
   protected function execute(InputInterface $input, OutputInterface $output)
   {

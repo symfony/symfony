@@ -118,6 +118,8 @@ class ArgvInput extends Input
    * Parses a short option set.
    *
    * @param string $token The current token
+   *
+   * @throws \RuntimeException When option given doesn't exist
    */
   protected function parseShortOptionSet($name)
   {
@@ -166,6 +168,8 @@ class ArgvInput extends Input
    * Parses an argument.
    *
    * @param string $token The current token
+   *
+   * @throws \RuntimeException When too many arguments are given
    */
   protected function parseArgument($token)
   {
@@ -182,6 +186,8 @@ class ArgvInput extends Input
    *
    * @param string $shortcut The short option key
    * @param mixed  $value    The value for the option
+   *
+   * @throws \RuntimeException When option given doesn't exist
    */
   protected function addShortOption($shortcut, $value)
   {
@@ -198,6 +204,8 @@ class ArgvInput extends Input
    *
    * @param string $name  The long option key
    * @param mixed  $value The value for the option
+   *
+   * @throws \RuntimeException When option given doesn't exist
    */
   protected function addLongOption($name, $value)
   {

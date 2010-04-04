@@ -108,6 +108,9 @@ class Tokenizer
     }
   }
 
+  /**
+   * @throws SyntaxError When expected closing is not found
+   */
   protected function tokenizeEscapedString($s, $pos)
   {
     $quote = $s[$pos];
@@ -139,6 +142,9 @@ class Tokenizer
     }
   }
 
+  /**
+   * @throws SyntaxError When invalid escape sequence is found
+   */
   protected function unescapeStringLiteral($literal)
   {
     return preg_replace_callback('#(\\\\(?:[A-Fa-f0-9]{1,6}(?:\r\n|\s)?|[^A-Fa-f0-9]))#', function ($matches) use ($literal)
@@ -158,6 +164,9 @@ class Tokenizer
     }, $literal);
   }
 
+  /**
+   * @throws SyntaxError When Unexpected symbol is found
+   */
   protected function tokenizeSymbol($s, $pos)
   {
     $start = $pos;

@@ -58,6 +58,8 @@ Now you have a new entity and your database has been updated.
 
   /**
    * @see Command
+   *
+   * @throws \InvalidArgumentException When the bundle doesn't end with Bundle (Example: "Bundle\MySampleBundle")
    */
   protected function execute(InputInterface $input, OutputInterface $output)
   {

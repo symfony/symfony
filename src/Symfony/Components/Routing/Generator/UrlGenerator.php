@@ -51,6 +51,8 @@ class UrlGenerator implements UrlGeneratorInterface
    * @param  Boolean $absolute   Whether to generate an absolute URL
    *
    * @return string The generated URL
+   *
+   * @throws \InvalidArgumentException When route doesn't exist
    */
   public function generate($name, array $parameters, $absolute = false)
   {
@@ -67,6 +69,9 @@ class UrlGenerator implements UrlGeneratorInterface
     return $this->doGenerate($this->cache[$name]->getVariables(), $route->getDefaults(), $route->getRequirements(), $this->cache[$name]->getTokens(), $parameters, $name, $absolute);
   }
 
+  /**
+   * @throws \InvalidArgumentException When route has some missing mandatory parameters
+   */
   protected function doGenerate($variables, $defaults, $requirements, $tokens, $parameters, $name, $absolute)
   {
     $defaults = array_merge($this->defaults, $defaults);

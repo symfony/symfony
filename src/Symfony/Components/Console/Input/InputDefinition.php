@@ -97,6 +97,8 @@ class InputDefinition
    * Add an InputArgument object.
    *
    * @param InputArgument $argument An InputArgument object
+   *
+   * @throws \LogicException When incorrect argument is given
    */
   public function addArgument(InputArgument $argument)
   {
@@ -138,6 +140,8 @@ class InputDefinition
    * @param string|integer $name The InputArgument name or position
    *
    * @return InputArgument An InputArgument object
+   *
+   * @throws \InvalidArgumentException When argument given doesn't exist
    */
   public function getArgument($name)
   {
@@ -240,6 +244,8 @@ class InputDefinition
    * Add an InputOption object.
    *
    * @param InputOption $option An InputOption object
+   *
+   * @throws \LogicException When option given already exist
    */
   public function addOption(InputOption $option)
   {
@@ -342,6 +348,8 @@ class InputDefinition
    * @param string $shortcut The shortcut
    *
    * @return string The InputOption name
+   *
+   * @throws \InvalidArgumentException When option given does not exist
    */
   protected function shortcutToName($shortcut)
   {

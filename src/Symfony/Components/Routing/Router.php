@@ -41,6 +41,8 @@ class Router implements RouterInterface
    * @param array $options  An array of options
    * @param array $context  The context
    * @param array $defaults The default values
+   *
+   * @throws \InvalidArgumentException When unsupported option is provided
    */
   public function __construct($loader, array $options = array(), array $context = array(), array $defaults = array())
   {
@@ -249,6 +251,9 @@ class Router implements RouterInterface
     return $this->options['cache_dir'].'/'.$class.'.'.$extension;
   }
 
+  /**
+   * @throws \RuntimeException When cache file can't be wrote 
+   */
   protected function writeCacheFile($file, $content)
   {
     $tmpFile = tempnam(dirname($file), basename($file));

@@ -68,6 +68,9 @@ abstract class Input implements InputInterface
    */
   abstract protected function parse();
 
+  /**
+   * @throws \RuntimeException When not enough arguments are given
+   */
   public function validate()
   {
     if (count($this->arguments) < $this->definition->getArgumentRequiredCount())
@@ -102,6 +105,8 @@ abstract class Input implements InputInterface
    * @param string $name The argument name
    *
    * @return mixed The argument value
+   *
+   * @throws \InvalidArgumentException When argument given doesn't exist
    */
   public function getArgument($name)
   {
@@ -118,6 +123,8 @@ abstract class Input implements InputInterface
    *
    * @param string $name  The argument name
    * @param string $value The argument value
+   *
+   * @throws \InvalidArgumentException When argument given doesn't exist
    */
   public function setArgument($name, $value)
   {
@@ -157,6 +164,8 @@ abstract class Input implements InputInterface
    * @param string $name The option name
    *
    * @return mixed The option value
+   *
+   * @throws \InvalidArgumentException When option given doesn't exist
    */
   public function getOption($name)
   {
@@ -173,6 +182,8 @@ abstract class Input implements InputInterface
    *
    * @param string $name  The option name
    * @param string $value The option value
+   *
+   * @throws \InvalidArgumentException When option given doesn't exist
    */
   public function setOption($name, $value)
   {

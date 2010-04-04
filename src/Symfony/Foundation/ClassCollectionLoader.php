@@ -19,6 +19,9 @@ namespace Symfony\Foundation;
  */
 class ClassCollectionLoader
 {
+  /**
+   * @throws \InvalidArgumentException When class can't be loaded
+   */
   static public function load($classes, $cacheDir, $name, $autoReload)
   {
     $cache = $cacheDir.'/'.$name.'.php';

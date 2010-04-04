@@ -117,6 +117,8 @@ class ArrayInput extends Input
    *
    * @param string $shortcut The short option key
    * @param mixed  $value    The value for the option
+   *
+   * @throws \RuntimeException When option given doesn't exist
    */
   protected function addShortOption($shortcut, $value)
   {
@@ -133,6 +135,8 @@ class ArrayInput extends Input
    *
    * @param string $name  The long option key
    * @param mixed  $value The value for the option
+   *
+   * @throws \RuntimeException When option given doesn't exist
    */
   protected function addLongOption($name, $value)
   {
@@ -161,6 +165,8 @@ class ArrayInput extends Input
    *
    * @param string $name  The argument name
    * @param mixed  $value The value for the argument
+   *
+   * @throws \RuntimeException When option given doesn't exist
    */
   protected function addArgument($name, $value)
   {

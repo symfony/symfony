@@ -43,6 +43,8 @@ class Command
    * Constructor.
    *
    * @param string $name The name of the command
+   *
+   * @throws \LogicException When the command name is empty
    */
   public function __construct($name = null)
   {
@@ -88,6 +90,8 @@ class Command
    * @param OutputInterface $output An OutputInterface instance
    *
    * @return integer 0 if everything went fine, or an error code
+   *
+   * @throws \LogicException When this abstrass class is not implemented
    */
   protected function execute(InputInterface $input, OutputInterface $output)
   {
@@ -273,6 +277,8 @@ class Command
    * @param string $name The command name
    *
    * @return Command The current instance
+   *
+   * @throws \InvalidArgumentException When command name given is empty
    */
   public function setName($name)
   {

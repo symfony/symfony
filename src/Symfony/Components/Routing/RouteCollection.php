@@ -37,6 +37,8 @@ class RouteCollection
    *
    * @param string $name  The route name
    * @param Route  $route A Route instance
+   *
+   * @throws \InvalidArgumentException When route name contains non valid characters
    */
   public function addRoute($name, Route $route)
   {

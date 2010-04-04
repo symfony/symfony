@@ -166,6 +166,8 @@ class Filesystem
    *
    * @param string $origin  The origin filename
    * @param string $target  The new filename
+   *
+   * @throws \RuntimeException When target file already exists
    */
   public function rename($origin, $target)
   {
@@ -220,6 +222,8 @@ class Filesystem
    * @param string $targetDir  The target directory
    * @param Finder $finder     An Finder instance
    * @param array  $options    An array of options (see copy())
+   *
+   * @throws \RuntimeException When file type is unknown
    */
   public function mirror($originDir, $targetDir, $finder = null, $options = array())
   {

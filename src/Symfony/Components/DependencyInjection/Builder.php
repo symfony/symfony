@@ -335,6 +335,8 @@ class Builder extends Container implements AnnotatedContainerInterface
    * @param  string     $id         The service identifier
    *
    * @return object              The service described by the service definition
+   *
+   * @throws \InvalidArgumentException When configure callable is not callable
    */
   protected function createService(Definition $definition, $id)
   {

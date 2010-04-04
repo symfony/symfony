@@ -46,6 +46,9 @@ class ErrorHandler
     set_error_handler(array($this, 'handle'));
   }
 
+  /**
+   * @throws \ErrorException When error_reporting returns error
+   */
   public function handle($level, $message, $file, $line, $context)
   {
     if (0 === $this->level)

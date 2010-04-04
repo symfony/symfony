@@ -81,6 +81,8 @@ The above will re-build everything and load all bundle data fixtures.
 
   /**
    * @see Command
+   *
+   * @throws \InvalidArgumentException When neither of any build options is included
    */
   protected function execute(InputInterface $input, OutputInterface $output)
   {

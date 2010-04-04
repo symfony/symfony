@@ -29,6 +29,8 @@ class IniFileLoader extends FileLoader
    * @param  string $file An INI file path
    *
    * @return BuilderConfiguration A BuilderConfiguration instance
+   *
+   * @throws \InvalidArgumentException When ini file is not valid
    */
   public function load($file)
   {

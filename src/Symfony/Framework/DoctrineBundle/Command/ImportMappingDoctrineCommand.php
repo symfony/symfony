@@ -44,6 +44,8 @@ class ImportMappingDoctrineCommand extends DoctrineCommand
 
   /**
    * @see Command
+   *
+   * @throws \InvalidArgumentException When the bundle doesn't end with Bundle (Example: "Bundle\MySampleBundle")
    */
   protected function execute(InputInterface $input, OutputInterface $output)
   {

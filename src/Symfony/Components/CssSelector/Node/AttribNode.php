@@ -53,6 +53,9 @@ class AttribNode implements NodeInterface
     }
   }
 
+  /**
+   * @throws SyntaxError When unknown operator is found
+   */
   public function toXpath()
   {
     $path = $this->selector->toXpath();

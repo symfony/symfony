@@ -69,6 +69,8 @@ class Inline
    * @param mixed $value The PHP variable to convert
    *
    * @return string The YAML string representing the PHP array
+   *
+   * @throws Exception When trying to dump PHP ressource
    */
   static public function dump($value)
   {
@@ -157,6 +159,8 @@ class Inline
    * @param boolean $evaluate
    *
    * @return string A YAML string
+   *
+   * @throws ParserException When malformed inline YAML string is parsed
    */
   static public function parseScalar($scalar, $delimiters = null, $stringDelimiters = array('"', "'"), &$i = 0, $evaluate = true)
   {
@@ -202,6 +206,8 @@ class Inline
    * @param integer $i
    *
    * @return string A YAML string
+   *
+   * @throws ParserException When malformed inline YAML string is parsed
    */
   static protected function parseQuotedScalar($scalar, &$i)
   {
@@ -235,6 +241,8 @@ class Inline
    * @param integer $i
    *
    * @return string A YAML string
+   *
+   * @throws ParserException When malformed inline YAML string is parsed
    */
   static protected function parseSequence($sequence, &$i = 0)
   {
@@ -295,6 +303,8 @@ class Inline
    * @param integer $i
    *
    * @return string A YAML string
+   *
+   * @throws ParserException When malformed inline YAML string is parsed
    */
   static protected function parseMapping($mapping, &$i = 0)
   {

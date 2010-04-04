@@ -35,6 +35,9 @@ class PseudoNode implements NodeInterface
   protected $type;
   protected $ident;
 
+  /**
+   * @throws SyntaxError When incorrect PseudoNode type is given
+   */
   public function __construct($element, $type, $ident)
   {
     $this->element = $element;
@@ -53,6 +56,9 @@ class PseudoNode implements NodeInterface
     return sprintf('%s[%s%s%s]', __CLASS__, $this->element, $this->type, $this->ident);
   }
 
+  /**
+   * @throws SyntaxError When unsupported or unknown pseudo-class is found
+   */
   public function toXpath()
   {
     $el_xpath = $this->element->toXpath();
@@ -78,6 +84,9 @@ class PseudoNode implements NodeInterface
     return $xpath;
   }
 
+  /**
+   * @throws SyntaxError If this element is the root element
+   */
   protected function xpath_root($xpath)
   {
     // if this element is the root element
@@ -114,6 +123,9 @@ class PseudoNode implements NodeInterface
     return $xpath;
   }
 
+  /**
+   * @throws SyntaxError Because *:last-of-type is not implemented
+   */
   protected function xpath_last_of_type($xpath)
   {
     if ($xpath->getElement() == '*')
@@ -135,6 +147,9 @@ class PseudoNode implements NodeInterface
     return $xpath;
   }
 
+  /**
+   * @throws SyntaxError Because *:only-of-type is not implemented
+   */
   protected function xpath_only_of_type($xpath)
   {
     if ($xpath->getElement() == '*')

@@ -25,6 +25,8 @@ class Yaml
    * Sets the YAML specification version to use.
    *
    * @param string $version The YAML specification version
+   *
+   * @throws \InvalidArgumentException When version of YAML specs is not supported
    */
   static public function setSpecVersion($version)
   {

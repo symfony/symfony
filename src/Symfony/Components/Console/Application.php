@@ -99,6 +99,8 @@ class Application
    * @param OutputInterface $output An Output instance
    *
    * @return integer 0 if everything went fine, or an error code
+   *
+   * @throws \Exception When doRun returns Exception
    */
   public function run(InputInterface $input = null, OutputInterface $output = null)
   {
@@ -396,6 +398,8 @@ class Application
    * @param string $name The command name or alias
    *
    * @return Command A Command object
+   *
+   * @throws \InvalidArgumentException When command name given does not exist
    */
   public function getCommand($name)
   {
@@ -456,6 +460,8 @@ class Application
    * Finds a registered namespace by a name or an abbreviation.
    *
    * @return string A registered namespace
+   *
+   * @throws \InvalidArgumentException When namespace is incorrect or ambiguous
    */
   public function findNamespace($namespace)
   {
@@ -483,6 +489,8 @@ class Application
    * @param  string $name A command name or a command alias
    *
    * @return Command A Command instance
+   *
+   * @throws \InvalidArgumentException When command name is incorrect or ambiguous
    */
   public function findCommand($name)
   {

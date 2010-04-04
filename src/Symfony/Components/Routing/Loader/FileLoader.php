@@ -37,6 +37,9 @@ abstract class FileLoader implements LoaderInterface
     $this->paths = $paths;
   }
 
+  /**
+   * @throws \InvalidArgumentException When file is not found
+   */
   protected function findFile($file)
   {
     $path = $this->getAbsolutePath($file);

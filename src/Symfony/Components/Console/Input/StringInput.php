@@ -40,6 +40,9 @@ class StringInput extends ArgvInput
     $this->tokens = $this->tokenize($input);
   }
 
+  /**
+   * @throws \InvalidArgumentException When unable to parse input (should never happen)
+   */
   protected function tokenize($input)
   {
     $input = preg_replace('/(\r\n|\r|\n|\t)/', ' ', $input);

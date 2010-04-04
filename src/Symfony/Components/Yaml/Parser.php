@@ -42,7 +42,7 @@ class Parser
    *
    * @return mixed  A PHP value
    *
-   * @throws \InvalidArgumentException If the YAML is not valid
+   * @throws ParserException If the YAML is not valid
    */
   public function parse($value)
   {
@@ -298,6 +298,8 @@ class Parser
    * @param integer $indentation The indent level at which the block is to be read, or null for default
    *
    * @return string A YAML string
+   *
+   * @throws ParserException When indentation problem are detected
    */
   protected function getNextEmbedBlock($indentation = null)
   {
@@ -386,6 +388,8 @@ class Parser
    * @param  string $value A YAML value
    *
    * @return mixed  A PHP value
+   *
+   * @throws ParserException When reference doesn't not exist
    */
   protected function parseValue($value)
   {

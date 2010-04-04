@@ -127,6 +127,8 @@ abstract class Output implements OutputInterface
    * @param string|array $messages The message as an array of lines of a single string
    * @param Boolean      $newline  Whether to add a newline or not
    * @param integer      $type     The type of output
+   *
+   * @throws \InvalidArgumentException When unknown output type is given
    */
   public function write($messages, $newline = false, $type = 0)
   {
@@ -182,6 +184,9 @@ abstract class Output implements OutputInterface
     return preg_replace_callback('#</([a-z][a-z0-9\-_]+)>#i', array($this, 'replaceEndStyle'), $message);
   }
 
+  /**
+   * @throws \InvalidArgumentException When style is unknown
+   */
   protected function replaceStartStyle($match)
   {
     if (!$this->decorated)

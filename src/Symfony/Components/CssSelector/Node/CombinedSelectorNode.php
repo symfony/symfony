@@ -50,6 +50,9 @@ class CombinedSelectorNode implements NodeInterface
     return sprintf('%s[%s %s %s]', __CLASS__, $this->selector, $comb, $this->subselector);
   }
 
+  /**
+   * @throws SyntaxError When unknown combinator is found
+   */
   public function toXpath()
   {
     if (!isset(self::$_method_mapping[$this->combinator]))

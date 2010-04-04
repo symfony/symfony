@@ -21,6 +21,9 @@ class PdoSession extends NativeSession
 {
   protected $db;
 
+  /**
+   * @throws \InvalidArgumentException When "db_table" option is not provided
+   */
   public function __construct(\PDO $db, $options = null)
   {
     $this->db = $db;
@@ -60,8 +63,6 @@ class PdoSession extends NativeSession
    * @param  string $name  (ignored)
    *
    * @return boolean true, if the session was opened, otherwise an exception is thrown
-   *
-   * @throws <b>DatabaseException</b> If a connection with the database does not exist or cannot be created
    */
   public function sessionOpen($path = null, $name = null)
   {
@@ -84,9 +85,9 @@ class PdoSession extends NativeSession
    *
    * @param  string $id  A session ID
    *
-   * @return bool true, if the session was destroyed, otherwise an exception is thrown
+   * @return bool   true, if the session was destroyed, otherwise an exception is thrown
    *
-   * @throws <b>DatabaseException</b> If the session cannot be destroyed
+   * @throws \RuntimeException If the session cannot be destroyed
    */
   public function sessionDestroy($id)
   {
@@ -118,7 +119,7 @@ class PdoSession extends NativeSession
    *
    * @return bool true, if old sessions have been cleaned, otherwise an exception is thrown
    *
-   * @throws <b>DatabaseException</b> If any old sessions cannot be cleaned
+   * @throws \RuntimeException If any old sessions cannot be cleaned
    */
   public function sessionGC($lifetime)
   {
@@ -148,7 +149,7 @@ class PdoSession extends NativeSession
    *
    * @return string      The session data if the session was read or created, otherwise an exception is thrown
    *
-   * @throws <b>DatabaseException</b> If the session cannot be read
+   * @throws \RuntimeException If the session cannot be read
    */
   public function sessionRead($id)
   {
@@ -202,7 +203,7 @@ class PdoSession extends NativeSession
    *
    * @return bool true, if the session was written, otherwise an exception is thrown
    *
-   * @throws <b>DatabaseException</b> If the session data cannot be written
+   * @throws \RuntimeException If the session data cannot be written
    */
   public function sessionWrite($id, $data)
   {

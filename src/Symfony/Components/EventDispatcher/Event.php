@@ -127,6 +127,8 @@ class Event implements \ArrayAccess
    * @param  string  $name  The parameter name
    *
    * @return mixed  The parameter value
+   *
+   * @throws \InvalidArgumentException When parameter doesn't exists for this event
    */
   public function getParameter($name)
   {

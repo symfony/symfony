@@ -144,6 +144,8 @@ class Response implements ResponseInterface
    * @param  string  $domain    Domain name
    * @param  bool    $secure    If secure
    * @param  bool    $httpOnly  If uses only HTTP
+   *
+   * @throws \InvalidArgumentException When cookie expire parameter is not valid
    */
   public function setCookie($name, $value, $expire = null, $path = '/', $domain = '', $secure = false, $httpOnly = false)
   {
@@ -192,6 +194,7 @@ class Response implements ResponseInterface
    * @param string $code  HTTP status code
    * @param string $text  HTTP status text
    *
+   * @throws \InvalidArgumentException When the HTTP status code is not valid
    */
   public function setStatusCode($code, $text = null)
   {

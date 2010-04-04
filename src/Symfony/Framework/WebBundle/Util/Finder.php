@@ -286,6 +286,8 @@ class Finder
    *
    * @param  mixed  function or method to call
    * @return Finder Current object
+   *
+   * @throws \InvalidArgumentException If function or method does not exist
    */
   public function exec()
   {

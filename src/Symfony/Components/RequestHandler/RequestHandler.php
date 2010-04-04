@@ -46,6 +46,8 @@ class RequestHandler
    * @param  Boolean           $main     Whether this is the main request or not
    *
    * @return ResponseInterface $response A Response instance
+   *
+   * @throws \Exception When Exception couldn't be catch by event processing
    */
   public function handle(RequestInterface $request, $main = true)
   {
@@ -78,7 +80,8 @@ class RequestHandler
    *
    * @return ResponseInterface $response A Response instance
    *
-   * @throws \LogicException if one of the listener does not behave as expected
+   * @throws \LogicException       If one of the listener does not behave as expected
+   * @throws NotFoundHttpException When controller cannot be found
    */
   public function handleRaw(RequestInterface $request, $main = true)
   {

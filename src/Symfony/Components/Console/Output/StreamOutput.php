@@ -36,6 +36,8 @@ class StreamOutput extends Output
    * @param mixed   $stream    A stream resource
    * @param integer $verbosity The verbosity level (self::VERBOSITY_QUIET, self::VERBOSITY_NORMAL, self::VERBOSITY_VERBOSE)
    * @param Boolean $decorated Whether to decorate messages or not (null for auto-guessing)
+   *
+   * @throws \InvalidArgumentException When first argument is not a real stream
    */
   public function __construct($stream, $verbosity = self::VERBOSITY_NORMAL, $decorated = null)
   {
@@ -69,6 +71,8 @@ class StreamOutput extends Output
    *
    * @param string  $message A message to write to the output
    * @param Boolean $newline Whether to add a newline or not
+   *
+   * @throws \RuntimeException When unable to write output (should never happen)
    */
   public function doWrite($message, $newline)
   {

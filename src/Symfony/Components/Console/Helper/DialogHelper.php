@@ -82,6 +82,8 @@ class DialogHelper extends Helper
    * @param integer         $attempts Max number of times to ask before giving up (false by default, which means infinite)
    *
    * @return mixed
+   *
+   * @throws \Exception When any of the validator returns an error
    */
   public function askAndValidate(OutputInterface $output, $question, \Closure $validator, $attempts = false)
   {

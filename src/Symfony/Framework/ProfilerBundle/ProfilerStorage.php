@@ -82,6 +82,9 @@ class ProfilerStorage
     $this->close($db);
   }
 
+  /**
+   * @throws \RuntimeException When neither of SQLite or PDO_SQLite extension is enabled
+   */
   protected function initDb($readOnly = true)
   {
     if (class_exists('\SQLite3'))

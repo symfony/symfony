@@ -127,6 +127,8 @@ class RouteCompiler implements RouteCompilerInterface
 
   /**
    * Tokenizes the route.
+   *
+   * @throws \InvalidArgumentException When route can't be parsed
    */
   protected function tokenize()
   {

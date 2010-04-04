@@ -317,6 +317,8 @@ class Container implements ContainerInterface, \ArrayAccess
    * Removes a service by identifier.
    *
    * @param string The service identifier
+   *
+   * @throws LogicException When trying to unset a service
    */
   public function __unset($id)
   {
@@ -330,6 +332,8 @@ class Container implements ContainerInterface, \ArrayAccess
    * @param array  $arguments The method arguments
    *
    * @return mixed
+   *
+   * @throws \RuntimeException When calling to an undefined method
    */
   public function __call($method, $arguments)
   {

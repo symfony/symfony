@@ -98,6 +98,8 @@ abstract class Kernel implements \Serializable
    * the DI container.
    *
    * @return Kernel The current Kernel instance
+   *
+   * @throws \LogicException When the Kernel is already booted
    */
   public function boot()
   {

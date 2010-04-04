@@ -197,6 +197,9 @@ class XmlFileLoader extends FileLoader
     $configuration->setDefinition($id, $definition);
   }
 
+  /**
+   * @throws \InvalidArgumentException When loading of XML file returns error
+   */
   protected function parseFile($file)
   {
     $dom = new \DOMDocument();
@@ -249,6 +252,10 @@ class XmlFileLoader extends FileLoader
     $this->validateExtensions($dom, $file);
   }
 
+  /**
+   * @throws \RuntimeException         When extension references a non-existent XSD file
+   * @throws \InvalidArgumentException When xml doesn't validate its xsd schema
+   */
   protected function validateSchema($dom, $file)
   {
     $schemaLocations = array('http://www.symfony-project.org/schema/dic/services' => str_replace('\\', '/', __DIR__.'/schema/dic/services/services-1.0.xsd'));
@@ -299,6 +306,9 @@ EOF
     libxml_use_internal_errors(false);
   }
 
+  /**
+   * @throws  \InvalidArgumentException When non valid tag are found or no extension are found
+   */
   protected function validateExtensions($dom, $file)
   {
     foreach ($dom->documentElement->childNodes as $node)

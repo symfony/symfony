@@ -39,6 +39,8 @@ class InputOption
    * @param integer $mode        The option mode: self::PARAMETER_REQUIRED, self::PARAMETER_NONE or self::PARAMETER_OPTIONAL
    * @param string  $description A description text
    * @param mixed   $default     The default value (must be null for self::PARAMETER_REQUIRED or self::PARAMETER_NONE)
+   *
+   * @throws \InvalidArgumentException If option mode is invalid or incompatible
    */
   public function __construct($name, $shortcut = null, $mode = null, $description = '', $default = null)
   {

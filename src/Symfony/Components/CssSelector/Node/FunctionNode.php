@@ -46,6 +46,9 @@ class FunctionNode implements NodeInterface
     return sprintf('%s[%s%s%s(%s)]', __CLASS__, $this->selector, $this->type, $this->name, $this->expr);
   }
 
+  /**
+   * @throws SyntaxError When unsupported or unknown pseudo-class is found
+   */
   public function toXpath()
   {
     $sel_path = $this->selector->toXpath();

@@ -36,6 +36,8 @@ class InputArgument
    * @param integer $mode        The argument mode: self::REQUIRED or self::OPTIONAL
    * @param string  $description A description text
    * @param mixed   $default     The default value (for self::OPTIONAL mode only)
+   *
+   * @throws \InvalidArgumentException When argument mode is not valid
    */
   public function __construct($name, $mode = null, $description = '', $default = null)
   {
@@ -89,6 +91,8 @@ class InputArgument
    * Sets the default value.
    *
    * @param mixed $default The default value
+   *
+   * @throws \LogicException When incorrect default value is given
    */
   public function setDefault($default = null)
   {

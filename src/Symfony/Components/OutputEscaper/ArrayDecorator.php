@@ -120,7 +120,7 @@ class ArrayDecorator extends GetterDecorator implements \Iterator, \ArrayAccess,
    * @param  string $offset  (ignored)
    * @param  string $value   (ignored)
    *
-   * @throws \LogicException
+   * @throws \LogicException When trying to set values
    */
   public function offsetSet($offset, $value)
   {
@@ -136,7 +136,7 @@ class ArrayDecorator extends GetterDecorator implements \Iterator, \ArrayAccess,
    *
    * @param  string $offset  (ignored)
    *
-   * @throws LogicException
+   * @throws \LogicException When trying to unset values
    */
   public function offsetUnset($offset)
   {

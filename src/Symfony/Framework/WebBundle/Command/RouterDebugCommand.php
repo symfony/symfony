@@ -104,6 +104,9 @@ EOF
     }
   }
 
+  /**
+   * @throws \InvalidArgumentException When route does not exist
+   */
   protected function outputRoute(OutputInterface $output, $routes, $name)
   {
     $output->writeln($this->getHelper('formatter')->formatSection('router', sprintf('Route "%s"', $name)));

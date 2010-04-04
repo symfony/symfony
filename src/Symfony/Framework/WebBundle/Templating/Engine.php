@@ -77,6 +77,9 @@ class Engine extends BaseEngine
     return isset($this->helpers[$name]);
   }
 
+  /**
+   * @throws \InvalidArgumentException When the helper is not defined
+   */
   public function get($name)
   {
     if (!isset($this->helpers[$name]))

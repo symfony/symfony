@@ -74,6 +74,9 @@ class ControllerLoader
     return true;
   }
 
+  /**
+   * @throws \InvalidArgumentException|\LogicException If controller can't be found
+   */
   public function findController($bundle, $controller, $action)
   {
     $class = null;
@@ -130,6 +133,9 @@ class ControllerLoader
     return array($controller, $method);
   }
 
+  /**
+   * @throws \RuntimeException When value for argument given is not provided
+   */
   public function getMethodArguments(\ReflectionFunctionAbstract $r, array $parameters, $controller)
   {
     $arguments = array();

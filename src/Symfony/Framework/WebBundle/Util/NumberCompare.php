@@ -43,7 +43,9 @@ class NumberCompare
   {
     $this->test = $test;
   }
-
+  /**
+   * @throws \RuntimeException If the test is not understood
+   */
   public function test($number)
   {
     if (!preg_match('{^([<>]=?)?(.*?)([kmg]i?)?$}i', $this->test, $matches))

@@ -32,6 +32,8 @@ class ApacheMatcherDumper extends MatcherDumper
    * @param  array  $options An array of options
    *
    * @return string A PHP class representing the matcher class
+   *
+   * @throws \RuntimeException When a route has more than 9 variables
    */
   public function dump(array $options = array())
   {

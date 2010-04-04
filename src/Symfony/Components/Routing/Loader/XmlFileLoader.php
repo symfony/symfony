@@ -30,6 +30,8 @@ class XmlFileLoader extends FileLoader
    * @param  string $file A XML file path
    *
    * @return RouteCollection A RouteCollection instance
+   *
+   * @throws \InvalidArgumentException When a tag can't be parsed
    */
   public function load($file)
   {
@@ -123,6 +125,9 @@ class XmlFileLoader extends FileLoader
     $collection->addCollection($loader->load($importedFile), (string) $node->getAttribute('prefix'));
   }
 
+  /**
+   * @throws \InvalidArgumentException When loading of XML file returns error
+   */
   protected function loadFile($path)
   {
     $dom = new \DOMDocument();
@@ -139,6 +144,9 @@ class XmlFileLoader extends FileLoader
     return $dom;
   }
 
+  /**
+   * @throws \InvalidArgumentException When xml doesn't validate its xsd schema
+   */
   protected function validate($dom, $file)
   {
     libxml_use_internal_errors(true);

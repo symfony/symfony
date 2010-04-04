@@ -38,6 +38,8 @@ class Shell
    * a \RuntimeException exception is thrown.
    *
    * @param Application $application An application instance
+   *
+   * @throws \RuntimeException When Readline extension is not enabled
    */
   public function __construct(Application $application)
   {

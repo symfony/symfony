@@ -143,6 +143,9 @@ class YamlDumper extends Dumper
     return Yaml::dump(array('parameters' => $this->prepareParameters($this->container->getParameters())), 2);
   }
 
+  /**
+   * @throws \RuntimeException When trying to dump object or ressource
+   */
   protected function dumpValue($value)
   {
     if (is_array($value))

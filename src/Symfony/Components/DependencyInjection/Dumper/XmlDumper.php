@@ -227,6 +227,9 @@ EOF;
     return $args;
   }
 
+  /**
+   * @throws \RuntimeException When trying to dump object or ressource
+   */
   static public function phpToXml($value)
   {
     switch (true)

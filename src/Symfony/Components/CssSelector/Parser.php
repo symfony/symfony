@@ -26,6 +26,9 @@ namespace Symfony\Components\CssSelector;
  */
 class Parser
 {
+  /**
+   * @throws SyntaxError When got None for xpath expression
+   */
   static public function cssToXpath($cssExpr, $prefix = 'descendant-or-self::')
   {
     if (is_string($cssExpr))
@@ -66,6 +69,9 @@ class Parser
     return (string) $expr;
   }
 
+  /**
+   * @throws \Exception When tokenizer throws it while parsing
+   */
   public function parse($string)
   {
     $tokenizer = new Tokenizer();
@@ -108,6 +114,9 @@ class Parser
     return new Node\OrNode($result);
   }
 
+  /**
+   * @throws SyntaxError When expected selector but got something else
+   */
   protected function parseSelector($stream)
   {
     $result = $this->parseSimpleSelector($stream);
@@ -141,6 +150,9 @@ class Parser
     return $result;
   }
 
+  /**
+   * @throws SyntaxError When expected symbol but got something else
+   */
   protected function parseSimpleSelector($stream)
   {
     $peek = $stream->peek();
@@ -269,6 +281,9 @@ class Parser
     return $result;
   }
 
+  /**
+   * @throws SyntaxError When encountered unexpected selector 
+   */
   protected function parseAttrib($selector, $stream)
   {
     $attrib = $stream->next();

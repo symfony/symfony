@@ -31,7 +31,7 @@ class CompiledRoute
    *
    * @param Route  $route        A original Route instance
    * @param string $staticPrefix The static prefix of the compiled route
-   * @param string $regex        The regular expresion to use to match this route
+   * @param string $regex        The regular expression to use to match this route
    * @param array  $tokens       An array of tokens to use to generate URL for this route
    * @param array  $variables    An array of variables
    */

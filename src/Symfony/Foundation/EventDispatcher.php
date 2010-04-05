@@ -16,7 +16,7 @@ use Symfony\Components\DependencyInjection\ContainerInterface;
  */
 
 /**
- * This EventDispatcher implementation uses a DependencyInjection contrainer to
+ * This EventDispatcher implementation uses a DependencyInjection container to
  * lazy load listeners.
  *
  * @package    symfony

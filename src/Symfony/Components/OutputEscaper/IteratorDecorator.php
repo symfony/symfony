@@ -33,7 +33,7 @@ class IteratorDecorator extends ObjectDecorator implements \Iterator, \Countable
   private $iterator;
 
   /**
-   * Constructs a new escaping iteratoror using the escaping method and value supplied.
+   * Constructs a new escaping iterator using the escaping method and value supplied.
    *
    * @param string      $escaper The escaping method to use
    * @param \Traversable $value         The iterator to escape
@@ -100,7 +100,7 @@ class IteratorDecorator extends ObjectDecorator implements \Iterator, \Countable
   /**
    * Returns true if the supplied offset isset in the array (as required by the ArrayAccess interface).
    *
-   * @param  string $offset  The offset of the value to check existance of
+   * @param  string $offset  The offset of the value to check existence of
    *
    * @return bool true if the offset isset; false otherwise
    */

@@ -50,7 +50,7 @@ class Glob
   }
 
   /**
-   * Returns a compiled regex which is the equiavlent of the globbing pattern.
+   * Returns a compiled regex which is the equivalent of the globbing pattern.
    *
    * @param  string $glob  pattern
    * @return string regex

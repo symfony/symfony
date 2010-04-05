@@ -24,7 +24,7 @@ use Doctrine\Common\Cli\CliController as DoctrineCliController;
  */
 
 /**
- * Base class for Doctrine consol commands to extend from.
+ * Base class for Doctrine console commands to extend from.
  *
  * @package    symfony
  * @subpackage console

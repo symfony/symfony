@@ -63,7 +63,7 @@ class YamlFileLoader extends FileLoader
   }
 
   /**
-   * @throws \InvalidArgumentException When coonfig pattern is not defined for the given route
+   * @throws \InvalidArgumentException When config pattern is not defined for the given route
    */
   protected function parseRoute(RouteCollection $collection, $name, $config, $file)
   {

@@ -89,7 +89,7 @@ class ArrayDecorator extends GetterDecorator implements \Iterator, \ArrayAccess,
   /**
    * Returns true if the supplied offset isset in the array (as required by the ArrayAccess interface).
    *
-   * @param  string $offset  The offset of the value to check existance of
+   * @param  string $offset  The offset of the value to check existence of
    *
    * @return bool true if the offset isset; false otherwise
    */

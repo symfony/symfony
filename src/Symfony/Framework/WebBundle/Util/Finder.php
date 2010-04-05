@@ -241,7 +241,7 @@ class Finder
    *
    * Currently supports Subversion, CVS, DARCS, Gnu Arch, Monotone, Bazaar-NG, GIT, Mercurial
    *
-   * @param  bool   $ignore  falase when version control directories shall be included (default is true)
+   * @param  bool   $ignore  false when version control directories shall be included (default is true)
    *
    * @return Finder Current object
    */
@@ -279,7 +279,7 @@ class Finder
   /**
    * Executes function or method for each element.
    *
-   * Element match if functino or method returns true.
+   * Element match if function or method returns true.
    *
    * $finder->exec('myfunction');
    * $finder->exec(array($object, 'mymethod'));

@@ -137,7 +137,7 @@ class SwiftMailerExtension extends LoaderExtension
   }
 
   /**
-   * Returns the recommanded alias to use in XML.
+   * Returns the recommended alias to use in XML.
    *
    * This alias is also the mandatory prefix to use when using YAML.
    *

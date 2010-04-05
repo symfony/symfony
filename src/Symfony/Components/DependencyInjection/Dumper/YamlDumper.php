@@ -144,7 +144,7 @@ class YamlDumper extends Dumper
   }
 
   /**
-   * @throws \RuntimeException When trying to dump object or ressource
+   * @throws \RuntimeException When trying to dump object or resource
    */
   protected function dumpValue($value)
   {

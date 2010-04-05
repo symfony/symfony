@@ -82,7 +82,7 @@ class DataCollectorManager
   {
     $config = $this->container->findAnnotatedServiceIds('data_collector');
     $ids = array();
-    $coreColectors = array();
+    $coreCollectors = array();
     $userCollectors = array();
     foreach ($config as $id => $attributes)
     {
@@ -91,7 +91,7 @@ class DataCollectorManager
 
       if (isset($attributes[0]['core']) && $attributes[0]['core'])
       {
-        $coreColectors[$collector->getName()] = $collector;
+        $coreCollectors[$collector->getName()] = $collector;
       }
       else
       {
@@ -99,6 +99,6 @@ class DataCollectorManager
       }
     }
 
-    return $this->collectors = array_merge($coreColectors, $userCollectors);
+    return $this->collectors = array_merge($coreCollectors, $userCollectors);
   }
 }

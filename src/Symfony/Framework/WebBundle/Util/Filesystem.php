@@ -24,7 +24,7 @@ class Filesystem
    *
    * This method only copies the file if the origin file is newer than the target file.
    *
-   * By default, if the target already exists, it is not overriden.
+   * By default, if the target already exists, it is not overridden.
    *
    * To override existing files, pass the "override" option.
    *

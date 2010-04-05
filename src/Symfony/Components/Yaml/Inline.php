@@ -70,7 +70,7 @@ class Inline
    *
    * @return string The YAML string representing the PHP array
    *
-   * @throws Exception When trying to dump PHP ressource
+   * @throws Exception When trying to dump PHP resource
    */
   static public function dump($value)
   {

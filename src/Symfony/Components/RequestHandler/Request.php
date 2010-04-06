@@ -29,6 +29,8 @@ class Request implements RequestInterface
   protected $requestParameters;
   protected $queryParameters;
   protected $serverParameters;
+  protected $filesParameters;
+  protected $cookiesParameters;
   protected $languages;
   protected $charsets;
   protected $acceptableContentTypes;
@@ -48,11 +50,13 @@ class Request implements RequestInterface
    * @param array $query   The GET parameters
    * @param array $request The POST parameters
    * @param array $path    The parameters parsed from the PATH_INFO (see Router)
+   * @param array $cookies The COOKIE parameters
+   * @param array $files   The FILES parameters
    * @param array $server  The SERVER parameters
    */
-  public function __construct(array $query = null, array $request = null, array $path = null, array $server = null)
+  public function __construct(array $query = null, array $request = null, array $path = null, array $cookies = null, array $files = null, array $server = null)
   {
-    $this->setParameters($request, $query, $path, $server);
+    $this->setParameters($request, $query, $path, $cookies, $files, $server);
   }
 
   /**
@@ -63,13 +67,17 @@ class Request implements RequestInterface
    * @param array $query   The GET parameters
    * @param array $request The POST parameters
    * @param array $path    The parameters parsed from the PATH_INFO
+   * @param array $cookies The COOKIE parameters
+   * @param array $files   The FILES parameters
    * @param array $server  The SERVER parameters
    */
-  public function setParameters(array $query = null, array $request = null, array $path = null, array $server = null)
+  public function setParameters(array $query = null, array $request = null, array $path = null, array $cookies = null, array $files = null, array $server = null)
   {
     $this->requestParameters = null !== $request ? $request : $_POST;
     $this->queryParameters = null !== $query ? $query : $_GET;
     $this->pathParameters = null !== $path ? $path : array();
+    $this->cookiesParameters = null !== $cookies ? $cookies : $_COOKIE;
+    $this->filesParameters = self::convertFileInformation(null !== $files ? $files : $_FILES);
     $this->serverParameters = null !== $server ? $server : $_SERVER;
 
     $this->languages = null;
@@ -90,32 +98,23 @@ class Request implements RequestInterface
    * @param array $query   The GET parameters
    * @param array $request The POST parameters
    * @param array $path    The parameters parsed from the PATH_INFO
+   * @param array $cookies The COOKIE parameters
+   * @param array $files   The FILES parameters
    * @param array $server  The SERVER parameters
    */
-  public function duplicate(array $query = null, array $request = null, array $path = null, array $server = null)
+  public function duplicate(array $query = null, array $request = null, array $path = null, array $cookies = null, array $files = null, array $server = null)
   {
     $dup = clone $this;
     $dup->setParameters(
       null !== $query ? $query : $this->queryParameters,
       null !== $request ? $request : $this->requestParameters,
       null !== $path ? $path : $this->pathParameters,
+      null !== $cookies ? $cookies : $this->cookiesParameters,
+      null !== $files ? $files : $this->filesParameters,
       null !== $server ? $server : $this->serverParameters
     );
 
     return $dup;
-  }
-
-  /**
-   * Gets a cookie value.
-   *
-   * @param  string $name          Cookie name
-   * @param  string $defaultValue  Default value returned when no cookie with given name is found
-   *
-   * @return mixed The cookie value
-   */
-  public function getCookie($name, $default = null)
-  {
-    return isset($_COOKIE[$name]) ? $_COOKIE[$name] : $default;
   }
 
   // Order of precedence: GET, PATH, POST, COOKIE
@@ -128,49 +127,143 @@ class Request implements RequestInterface
     return $this->getQueryParameter($key, $this->getPathParameter($key, $this->getRequestParameter($key, $default)));
   }
 
+  /**
+   * Returns the server parameters ($_SERVER).
+   *
+   * @return array An array of server parameters
+   */
   public function getServerParameters()
   {
     return $this->serverParameters;
   }
 
-  public function getServerParameter($name, $default = null)
+  /**
+   * Returns a server parameter ($_SERVER).
+   *
+   * @param string $key     The key
+   * @param mixed  $default The default value
+   */
+  public function getServerParameter($key, $default = null)
   {
-    return isset($this->serverParameters[$name]) ? $this->serverParameters[$name] : $default;
+    return isset($this->serverParameters[$key]) ? $this->serverParameters[$key] : $default;
   }
 
+  /**
+   * Returns the path parameters.
+   *
+   * @return array An array of path parameters
+   */
   public function getPathParameters()
   {
     return $this->pathParameters;
   }
 
+  /**
+   * Sets the path parameters.
+   *
+   * @param array An array of path parameters
+   */
   public function setPathParameters(array $parameters)
   {
     $this->pathParameters = $parameters;
   }
 
+  /**
+   * Returns a path parameter.
+   *
+   * @param string $key     The key
+   * @param mixed  $default The default value
+   */
   public function getPathParameter($key, $default = null)
   {
     return isset($this->pathParameters[$key]) ? $this->pathParameters[$key] : $default;
   }
 
+  /**
+   * Returns the request parameters ($_POST).
+   *
+   * @return array An array of request parameters
+   */
   public function getRequestParameters()
   {
     return $this->requestParameters;
   }
 
+  /**
+   * Returns a request parameter ($_POST).
+   *
+   * @param string $key     The server key
+   * @param mixed  $default The default value
+   */
   public function getRequestParameter($key, $default = null)
   {
     return isset($this->requestParameters[$key]) ? $this->requestParameters[$key] : $default;
   }
 
+  /**
+   * Returns the query parameters ($_GET).
+   *
+   * @return array An array of query parameters
+   */
   public function getQueryParameters()
   {
     return $this->queryParameters;
   }
 
+  /**
+   * Returns a query parameter ($_GET).
+   *
+   * @param string $key     The server key
+   * @param mixed  $default The default value
+   */
   public function getQueryParameter($key, $default = null)
   {
     return isset($this->queryParameters[$key]) ? $this->queryParameters[$key] : $default;
+  }
+
+  /**
+   * Returns a cookie value ($_COOKIE).
+   *
+   * @param string $key    The key
+   * @param mixed  $default The default value
+   *
+   * @return mixed The cookie value
+   */
+  public function getCookie($key, $default = null)
+  {
+    return isset($this->cookiesParameters[$key]) ? $cookiesParameters[$key] : $default;
+  }
+
+  /**
+   * Returns the array of cookies ($_COOKIE).
+   *
+   * @param array An array of cookies
+   */
+  public function getCookies()
+  {
+    return $this->cookiesParameters;
+  }
+
+  /**
+   * Returns a file from the request ($_FILES).
+   *
+   * @param  string $key A key
+   *
+   * @return array The associated file
+   */
+  public function getFile($key)
+  {
+    return isset($this->filesParameters[$key]) ? $this->filesParameters[$key] : array();
+  }
+
+  /**
+   * Returns the array of files ($_FILES).
+   *
+   * @return array An associative array of files
+   */
+  public function getFiles()
+  {
+    return $this->filesParameters;
   }
 
   public function getHttpHeader($name, $default = null)
@@ -735,6 +828,26 @@ class Request implements RequestInterface
     return (string) $pathInfo;
   }
 
+  /**
+   * Converts uploaded file array to a format following the $_GET and $POST naming convention.
+   *
+   * It's safe to pass an already converted array, in which case this method just returns the original array unmodified.
+   *
+   * @param  array $taintedFiles An array representing uploaded file information
+   *
+   * @return array An array of re-ordered uploaded file information
+   */
+  protected function convertFileInformation(array $taintedFiles)
+  {
+    $files = array();
+    foreach ($taintedFiles as $key => $data)
+    {
+      $files[$key] = $this->fixPhpFilesArray($data);
+    }
+
+    return $files;
+  }
+
   static protected function initializeFormats()
   {
     static::$formats = array(
@@ -746,5 +859,35 @@ class Request implements RequestInterface
       'rdf'  => 'application/rdf+xml',
       'atom' => 'application/atom+xml',
     );
+  }
+
+  static protected function fixPhpFilesArray($data)
+  {
+    $fileKeys = array('error', 'name', 'size', 'tmp_name', 'type');
+    $keys = array_keys($data);
+    sort($keys);
+
+    if ($fileKeys != $keys || !isset($data['name']) || !is_array($data['name']))
+    {
+      return $data;
+    }
+
+    $files = $data;
+    foreach ($fileKeys as $k)
+    {
+      unset($files[$k]);
+    }
+    foreach (array_keys($data['name']) as $key)
+    {
+      $files[$key] = self::fixPhpFilesArray(array(
+        'error'    => $data['error'][$key],
+        'name'     => $data['name'][$key],
+        'type'     => $data['type'][$key],
+        'tmp_name' => $data['tmp_name'][$key],
+        'size'     => $data['size'][$key],
+      ));
+    }
+
+    return $files;
   }
 }

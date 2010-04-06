@@ -170,7 +170,11 @@ class FunctionNode implements NodeInterface
     {
       $expr = $expr->formatElement();
     }
-    $xpath->addCondition(sprintf('contains(css:lower-case(string(.)), %s)', XPathExpr::xpathLiteral(strtolower($expr))));
+
+    // FIXME: lower-case is only available with XPath 2
+    //$xpath->addCondition(sprintf('contains(lower-case(string(.)), %s)', XPathExpr::xpathLiteral(strtolower($expr))));
+    $xpath->addCondition(sprintf('contains(string(.), %s)', XPathExpr::xpathLiteral($expr)));
+
     // FIXME: Currently case insensitive matching doesn't seem to be happening
 
     return $xpath;

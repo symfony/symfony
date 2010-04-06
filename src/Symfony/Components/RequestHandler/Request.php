@@ -102,6 +102,7 @@ class Request implements RequestInterface
    * @param array  $files      The request files ($_FILES)
    * @param array  $server     The server parameters ($_SERVER)
    *
+   * @return Request A Request instance
    */
   static public function createFromUri($uri, $method = 'get', $parameters = array(), $cookies = array(), $files = array(), $server = array())
   {

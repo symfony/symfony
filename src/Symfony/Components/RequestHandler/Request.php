@@ -93,6 +93,57 @@ class Request implements RequestInterface
   }
 
   /**
+   * Creates a Request based on a given URI and configuration.
+   *
+   * @param string $uri        The URI
+   * @param string $method     The HTTP method
+   * @param array  $parameters The request (GET) or query (POST) parameters
+   * @param array  $cookies    The request cookies ($_COOKIE)
+   * @param array  $files      The request files ($_FILES)
+   * @param array  $server     The server parameters ($_SERVER)
+   *
+   */
+  static public function createFromUri($uri, $method = 'get', $parameters = array(), $cookies = array(), $files = array(), $server = array())
+  {
+    if (in_array($method, array('post', 'put', 'delete')))
+    {
+      $request = $parameters;
+      $query = array();
+    }
+    else
+    {
+      $request = array();
+      $query = $parameters;
+    }
+
+    $queryString = false !== ($pos = strpos($uri, '?')) ? html_entity_decode(substr($uri, $pos + 1)) : '';
+    parse_str($queryString, $qs);
+    if (is_array($qs))
+    {
+      $query = array_replace($qs, $query);
+    }
+
+    $server = array_replace(array(
+      'HTTP_HOST'            => 'localhost',
+      'SERVER_NAME'          => 'localhost',
+      'SERVER_PORT'          => 80,
+      'HTTP_USER_AGENT'      => 'SymfonyClient/1.0',
+      'HTTP_ACCEPT'          => 'text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8',
+      'HTTP_ACCEPT_LANGUAGE' => 'en-us,en;q=0.5',
+      'HTTP_ACCEPT_CHARSET'  => 'ISO-8859-1,utf-8;q=0.7,*;q=0.7',
+      'REMOTE_ADDR'          => '127.0.0.1',
+      'REQUEST_METHOD'       => strtoupper($method),
+      'PATH_INFO'            => '',
+      'REQUEST_URI'          => $uri,
+      'SCRIPT_NAME'          => '',
+      'SCRIPT_FILENAME'      => '',
+      'QUERY_STRING'         => $queryString,
+    ), $server);
+
+    return new self($request, $query, array(), $cookies, $files, $server);
+  }
+
+  /**
    * Clones a request and overrides some of its parameters.
    *
    * @param array $query   The GET parameters

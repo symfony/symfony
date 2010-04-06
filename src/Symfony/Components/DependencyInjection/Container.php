@@ -339,7 +339,7 @@ class Container implements ContainerInterface, \ArrayAccess
   {
     if (!preg_match('/^get(.+)Service$/', $method, $match))
     {
-      throw new \RuntimeException(sprintf('Call to undefined method %s::%s.', get_class($this), $method));
+      throw new \BadMethodCallException(sprintf('Call to undefined method %s::%s.', get_class($this), $method));
     }
 
     return $this->getService(self::underscore($match[1]));

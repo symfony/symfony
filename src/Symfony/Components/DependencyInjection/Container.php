@@ -333,7 +333,7 @@ class Container implements ContainerInterface, \ArrayAccess
    *
    * @return mixed
    *
-   * @throws \RuntimeException When calling to an undefined method
+   * @throws \BadMethodCallException When calling to an undefined method
    */
   public function __call($method, $arguments)
   {

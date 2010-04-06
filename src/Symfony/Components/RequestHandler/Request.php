@@ -642,13 +642,13 @@ class Request implements RequestInterface
     // Does the baseUrl have anything in common with the request_uri?
     $requestUri = $this->getRequestUri();
 
-    if (0 === strpos($requestUri, $baseUrl))
+    if ($baseUrl && 0 === strpos($requestUri, $baseUrl))
     {
       // full $baseUrl matches
       return $baseUrl;
     }
 
-    if (0 === strpos($requestUri, dirname($baseUrl)))
+    if ($baseUrl && 0 === strpos($requestUri, dirname($baseUrl)))
     {
       // directory portion of $baseUrl matches
       return rtrim(dirname($baseUrl), '/');

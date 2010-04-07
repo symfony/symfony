@@ -85,7 +85,7 @@ class StylesheetsHelper extends Helper
 
   /**
    * Outputs HTML representation of the links to stylesheets.
-   * 
+   *
    */
   public function output()
   {

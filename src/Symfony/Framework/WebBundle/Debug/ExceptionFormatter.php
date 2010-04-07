@@ -145,7 +145,7 @@ class ExceptionFormatter
       {
         $formattedValue = $value;
       }
-      
+
       $result[] = is_int($key) ? $formattedValue : sprintf("'%s' => %s", $this->escape($key), $formattedValue);
     }
 
@@ -154,12 +154,12 @@ class ExceptionFormatter
 
   /**
    * Formats a file path.
-   * 
+   *
    * @param  string  $file   An absolute file path
    * @param  integer $line   The line number
    * @param  string  $format The output format (txt or html)
    * @param  string  $text   Use this text for the link rather than the file path
-   * 
+   *
    * @return string
    */
   protected function formatFile($file, $line, $format = 'html', $text = null)

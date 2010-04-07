@@ -252,7 +252,7 @@ class Router implements RouterInterface
   }
 
   /**
-   * @throws \RuntimeException When cache file can't be wrote 
+   * @throws \RuntimeException When cache file can't be wrote
    */
   protected function writeCacheFile($file, $content)
   {

@@ -43,7 +43,7 @@ class InitBundleCommand extends Command
 
   /**
    * @see Command
-   * 
+   *
    * @throws \InvalidArgumentException When namespace doesn't end with Bundle
    * @throws \RuntimeException         When bundle can't be executed
    */

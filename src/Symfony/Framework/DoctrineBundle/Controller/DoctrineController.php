@@ -38,10 +38,10 @@ class DoctrineController extends Controller
   }
 
   /**
-   * Get the default entity manager service or the entity manager 
+   * Get the default entity manager service or the entity manager
    * with the given name.
    *
-   * @param string $name Optional entity manager service name 
+   * @param string $name Optional entity manager service name
    * @return object $em
    */
   protected function getEntityManager($name = null)
@@ -59,7 +59,7 @@ class DoctrineController extends Controller
   /**
    * Create a new QueryBuilder instance.
    *
-   * @param string $name Optional entity manager service name 
+   * @param string $name Optional entity manager service name
    * @return object QueryBuilder
    */
   public function createQueryBuilder($name = null)
@@ -70,8 +70,9 @@ class DoctrineController extends Controller
   /**
    * Create a new Query instance.
    *
-   * @param string $dql Optional Dql string to create the query from
-   * @param string $name Optional entity manager service name 
+   * @param string $dql  Optional Dql string to create the query from
+   * @param string $name Optional entity manager service name
+   *
    * @return object QueryBuilder
    */
   public function createQuery($dql = '', $name = null)

@@ -18,7 +18,7 @@ use Symfony\Components\RequestHandler\Exception\HttpException;
  */
 
 /**
- * 
+ * ExceptionController.
  *
  * @package    Symfony
  * @subpackage Framework_WebBundle

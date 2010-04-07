@@ -282,7 +282,7 @@ class Parser
   }
 
   /**
-   * @throws SyntaxError When encountered unexpected selector 
+   * @throws SyntaxError When encountered unexpected selector
    */
   protected function parseAttrib($selector, $stream)
   {

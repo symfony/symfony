@@ -88,7 +88,7 @@ class DatabaseToolDoctrineCommand extends DoctrineCommand
       }
       else
       {
-        throw new \InvalidArgumentException(sprintf('<error>Could not find any configured connections</error>', $input->getOption('connection')));        
+        throw new \InvalidArgumentException(sprintf('<error>Could not find any configured connections</error>', $input->getOption('connection')));
       }
     }
   }

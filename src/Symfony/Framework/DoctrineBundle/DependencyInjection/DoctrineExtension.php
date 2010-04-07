@@ -145,7 +145,7 @@ class DoctrineExtension extends LoaderExtension
       $configuration->setDefinition(sprintf('doctrine.dbal.%s_connection', $name), $driverDef);
     }
 
-    $configuration->setAlias('database_connection', 
+    $configuration->setAlias('database_connection',
       null !== $this->alias ? $this->alias : sprintf(
         'doctrine.dbal.%s_connection', $config['default_connection']
       )

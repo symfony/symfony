@@ -81,7 +81,7 @@ class SchemaToolDoctrineCommand extends DoctrineCommand
       }
       else
       {
-        $output->writeln(sprintf('<error>Could not find any configured connections</error>', $input->getOption('connection')));        
+        $output->writeln(sprintf('<error>Could not find any configured connections</error>', $input->getOption('connection')));
       }
     }
   }

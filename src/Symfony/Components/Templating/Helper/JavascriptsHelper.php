@@ -85,7 +85,7 @@ class JavascriptsHelper extends Helper
 
   /**
    * Outputs HTML representation of the links to JavaScripts.
-   * 
+   *
    */
   public function output()
   {

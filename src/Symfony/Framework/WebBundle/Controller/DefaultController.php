@@ -15,7 +15,7 @@ use Symfony\Components\RequestHandler\Request;
  */
 
 /**
- * 
+ * DefaultController.
  *
  * @package    Symfony
  * @subpackage Framework_WebBundle

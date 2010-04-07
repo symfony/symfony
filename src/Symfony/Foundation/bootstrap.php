@@ -77,11 +77,11 @@ class KernelBundle extends Bundle
 
 namespace Symfony\Foundation\Bundle;
 
-
-
 use Symfony\Components\DependencyInjection\Loader\LoaderExtension;
 use Symfony\Components\DependencyInjection\Loader\XmlFileLoader;
 use Symfony\Components\DependencyInjection\BuilderConfiguration;
+
+
 
 
 class KernelExtension extends LoaderExtension
@@ -193,6 +193,7 @@ class ErrorHandler
     set_error_handler(array($this, 'handle'));
   }
 
+  
   public function handle($level, $message, $file, $line, $context)
   {
     if (0 === $this->level)
@@ -217,6 +218,7 @@ namespace Symfony\Foundation;
 
 class ClassCollectionLoader
 {
+  
   static public function load($classes, $cacheDir, $name, $autoReload)
   {
     $cache = $cacheDir.'/'.$name.'.php';
@@ -310,14 +312,14 @@ class ClassCollectionLoader
 
 namespace Symfony\Foundation;
 
-
-
 use Symfony\Components\DependencyInjection\ContainerInterface;
 use Symfony\Components\DependencyInjection\Builder;
 use Symfony\Components\DependencyInjection\BuilderConfiguration;
 use Symfony\Components\DependencyInjection\Dumper\PhpDumper;
 use Symfony\Components\DependencyInjection\FileResource;
 use Symfony\Components\RequestHandler\RequestInterface;
+
+
 
 
 abstract class Kernel implements \Serializable

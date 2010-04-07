@@ -64,10 +64,10 @@ class User
   }
 
   /**
-   * Sets an user attribute
-   * 
+   * Sets an user attribute.
+   *
    * @param string $name
-   * @param mixed $value
+   * @param mixed  $value
    */
   public function setAttribute($name, $value)
   {
@@ -105,9 +105,9 @@ class User
   }
 
   /**
-   * Sets the user culture
-   * 
-   * @param string $culture 
+   * Sets the user culture.
+   *
+   * @param string $culture
    */
   public function setCulture($culture)
   {

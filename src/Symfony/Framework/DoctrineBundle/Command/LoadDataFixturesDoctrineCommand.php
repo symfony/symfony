@@ -139,7 +139,7 @@ class LoadDataFixturesDoctrineCommand extends DoctrineCommand
       }
     }
   }
-  
+
   protected function purgeEntityManager(EntityManager $em)
   {
     $classes = array();

@@ -2,8 +2,12 @@
 
 namespace Symfony\Foundation\Bundle;
 
+use Symfony\Components\DependencyInjection\Loader\LoaderExtension;
+use Symfony\Components\DependencyInjection\Loader\XmlFileLoader;
+use Symfony\Components\DependencyInjection\BuilderConfiguration;
+
 /*
- * This file is part of the symfony package.
+ * This file is part of the Symfony package.
  *
  * (c) Fabien Potencier <fabien.potencier@symfony-project.com>
  *
@@ -11,14 +15,12 @@ namespace Symfony\Foundation\Bundle;
  * file that was distributed with this source code.
  */
 
-use Symfony\Components\DependencyInjection\Loader\LoaderExtension;
-use Symfony\Components\DependencyInjection\Loader\XmlFileLoader;
-use Symfony\Components\DependencyInjection\BuilderConfiguration;
-
 /**
+ * KernelExtension.
  *
- * @package Symfony
- * @author  Fabien Potencier <fabien.potencier@symfony-project.org>
+ * @package    Symfony
+ * @subpackage Foundation
+ * @author     Fabien Potencier <fabien.potencier@symfony-project.org>
  */
 class KernelExtension extends LoaderExtension
 {

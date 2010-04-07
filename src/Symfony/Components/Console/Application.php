@@ -19,7 +19,7 @@ use Symfony\Components\Console\Helper\FormatterHelper;
 use Symfony\Components\Console\Helper\DialogHelper;
 
 /*
- * This file is part of the symfony framework.
+ * This file is part of the Symfony framework.
  *
  * (c) Fabien Potencier <fabien.potencier@symfony-project.com>
  *
@@ -40,8 +40,8 @@ use Symfony\Components\Console\Helper\DialogHelper;
  *     $app->addCommand(new SimpleCommand());
  *     $app->run();
  *
- * @package    symfony
- * @subpackage console
+ * @package    Symfony
+ * @subpackage Components_Console
  * @author     Fabien Potencier <fabien.potencier@symfony-project.com>
  */
 class Application

@@ -6,7 +6,7 @@ use Symfony\Components\Templating\DebuggerInterface;
 use Symfony\Foundation\LoggerInterface;
 
 /*
- * This file is part of the symfony package.
+ * This file is part of the Symfony package.
  *
  * (c) Fabien Potencier <fabien.potencier@symfony-project.com>
  *
@@ -17,8 +17,9 @@ use Symfony\Foundation\LoggerInterface;
 /**
  * Binds the Symfony templating loader debugger to the Symfony logger.
  *
- * @package symfony
- * @author  Fabien Potencier <fabien.potencier@symfony-project.com>
+ * @package    Symfony
+ * @subpackage Framework_WebBundle
+ * @author     Fabien Potencier <fabien.potencier@symfony-project.com>
  */
 class Debugger implements DebuggerInterface
 {

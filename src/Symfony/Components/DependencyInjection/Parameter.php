@@ -3,7 +3,7 @@
 namespace Symfony\Components\DependencyInjection;
 
 /*
- * This file is part of the symfony framework.
+ * This file is part of the Symfony framework.
  *
  * (c) Fabien Potencier <fabien.potencier@symfony-project.com>
  *
@@ -14,8 +14,8 @@ namespace Symfony\Components\DependencyInjection;
 /**
  * Parameter represents a parameter reference.
  *
- * @package    symfony
- * @subpackage dependency_injection
+ * @package    Symfony
+ * @subpackage Components_DependencyInjection
  * @author     Fabien Potencier <fabien.potencier@symfony-project.com>
  */
 class Parameter

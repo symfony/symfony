@@ -7,7 +7,7 @@ use Symfony\Components\EventDispatcher\Event;
 use Symfony\Foundation\LoggerInterface;
 
 /*
- * This file is part of the symfony framework.
+ * This file is part of the Symfony framework.
  *
  * (c) Fabien Potencier <fabien.potencier@symfony-project.com>
  *
@@ -16,9 +16,10 @@ use Symfony\Foundation\LoggerInterface;
  */
 
 /**
- * 
+ * ExceptionHandler.
  *
- * @package    symfony
+ * @package    Symfony
+ * @subpackage Framework_WebBundle
  * @author     Fabien Potencier <fabien.potencier@symfony-project.com>
  */
 class ExceptionHandler

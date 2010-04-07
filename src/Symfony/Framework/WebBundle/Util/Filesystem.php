@@ -3,7 +3,7 @@
 namespace Symfony\Framework\WebBundle\Util;
 
 /*
- * This file is part of the symfony framework.
+ * This file is part of the Symfony framework.
  *
  * (c) Fabien Potencier <fabien.potencier@symfony-project.com>
  *
@@ -14,8 +14,9 @@ namespace Symfony\Framework\WebBundle\Util;
 /**
  * Provides basic utility to manipulate the file system.
  *
- * @package symfony
- * @author  Fabien Potencier <fabien.potencier@symfony-project.com>
+ * @package    Symfony
+ * @subpackage Framework_WebBundle
+ * @author     Fabien Potencier <fabien.potencier@symfony-project.com>
  */
 class Filesystem
 {

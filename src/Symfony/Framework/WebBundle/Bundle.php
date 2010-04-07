@@ -10,7 +10,7 @@ use Symfony\Components\DependencyInjection\BuilderConfiguration;
 use Symfony\Framework\WebBundle\DependencyInjection\WebExtension;
 
 /*
- * This file is part of the symfony framework.
+ * This file is part of the Symfony framework.
  *
  * (c) Fabien Potencier <fabien.potencier@symfony-project.com>
  *
@@ -19,9 +19,10 @@ use Symfony\Framework\WebBundle\DependencyInjection\WebExtension;
  */
 
 /**
- * 
+ * Bundle.
  *
- * @package    symfony
+ * @package    Symfony
+ * @subpackage Framework_WebBundle
  * @author     Fabien Potencier <fabien.potencier@symfony-project.com>
  */
 class Bundle extends BaseBundle

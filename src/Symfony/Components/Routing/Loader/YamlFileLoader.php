@@ -8,7 +8,7 @@ use Symfony\Components\Routing\FileResource;
 use Symfony\Components\Yaml\Yaml;
 
 /*
- * This file is part of the symfony framework.
+ * This file is part of the Symfony framework.
  *
  * (c) Fabien Potencier <fabien.potencier@symfony-project.com>
  *
@@ -19,8 +19,8 @@ use Symfony\Components\Yaml\Yaml;
 /**
  * YamlFileLoader loads Yaml routing files.
  *
- * @package    symfony
- * @subpackage routing
+ * @package    Symfony
+ * @subpackage Components_Routing
  * @author     Fabien Potencier <fabien.potencier@symfony-project.com>
  */
 class YamlFileLoader extends FileLoader

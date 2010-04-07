@@ -7,7 +7,7 @@ use Symfony\Components\DependencyInjection\Parameter;
 use Symfony\Components\DependencyInjection\Reference;
 
 /*
- * This file is part of the symfony framework.
+ * This file is part of the Symfony framework.
  *
  * (c) Fabien Potencier <fabien.potencier@symfony-project.com>
  *
@@ -18,8 +18,8 @@ use Symfony\Components\DependencyInjection\Reference;
 /**
  * XmlDumper dumps a service container as an XML string.
  *
- * @package    symfony
- * @subpackage dependency_injection
+ * @package    Symfony
+ * @subpackage Components_DependencyInjection
  * @author     Fabien Potencier <fabien.potencier@symfony-project.com>
  */
 class XmlDumper extends Dumper

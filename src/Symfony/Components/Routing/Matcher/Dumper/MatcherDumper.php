@@ -6,7 +6,7 @@ use Symfony\Components\Routing\RouteCollection;
 use Symfony\Components\Routing\Route;
 
 /*
- * This file is part of the symfony framework.
+ * This file is part of the Symfony framework.
  *
  * (c) Fabien Potencier <fabien.potencier@symfony-project.com>
  *
@@ -17,8 +17,8 @@ use Symfony\Components\Routing\Route;
 /**
  * MatcherDumper is the abstract class for all built-in matcher dumpers.
  *
- * @package    symfony
- * @subpackage routing
+ * @package    Symfony
+ * @subpackage Components_Routing
  * @author     Fabien Potencier <fabien.potencier@symfony-project.com>
  */
 abstract class MatcherDumper implements MatcherDumperInterface

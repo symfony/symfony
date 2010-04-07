@@ -8,7 +8,7 @@ use Symfony\Components\OutputEscaper\Escaper;
 use Symfony\Components\DependencyInjection\ContainerInterface;
 
 /*
- * This file is part of the symfony package.
+ * This file is part of the Symfony package.
  *
  * (c) Fabien Potencier <fabien.potencier@symfony-project.com>
  *
@@ -20,8 +20,9 @@ use Symfony\Components\DependencyInjection\ContainerInterface;
  * This engine knows how to render Symfony templates and automatically
  * escapes template parameters.
  *
- * @package symfony
- * @author  Fabien Potencier <fabien.potencier@symfony-project.com>
+ * @package    Symfony
+ * @subpackage Framework_WebBundle
+ * @author     Fabien Potencier <fabien.potencier@symfony-project.com>
  */
 class Engine extends BaseEngine
 {

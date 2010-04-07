@@ -9,7 +9,7 @@ use Symfony\Foundation\LoggerInterface;
 use Symfony\Components\DependencyInjection\ContainerInterface;
 
 /*
- * This file is part of the symfony package.
+ * This file is part of the Symfony package.
  *
  * (c) Fabien Potencier <fabien.potencier@symfony-project.com>
  *
@@ -20,7 +20,8 @@ use Symfony\Components\DependencyInjection\ContainerInterface;
 /**
  * EventDispatcher extends the original EventDispatcher class to add some debugging tools.
  *
- * @package    symfony
+ * @package    Symfony
+ * @subpackage Foundation
  * @author     Fabien Potencier <fabien.potencier@symfony-project.com>
  */
 class EventDispatcher extends BaseEventDispatcher

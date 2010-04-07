@@ -3,7 +3,7 @@
 namespace Symfony\Framework\WebBundle\Util;
 
 /*
- * This file is part of the symfony framework.
+ * This file is part of the Symfony framework.
  *
  * (c) Fabien Potencier <fabien.potencier@symfony-project.com>
  *
@@ -24,8 +24,9 @@ namespace Symfony\Framework\WebBundle\Util;
  *
  * Interface loosely based on perl File::Find::Rule module.
  *
- * @package symfony
- * @author  Fabien Potencier <fabien.potencier@symfony-project.com>
+ * @package    Symfony
+ * @subpackage Framework_WebBundle
+ * @author     Fabien Potencier <fabien.potencier@symfony-project.com>
  */
 class Finder
 {

@@ -8,7 +8,7 @@ use Symfony\Components\RequestHandler\RequestInterface;
 use Symfony\Components\RequestHandler\ResponseInterface;
 
 /*
- * This file is part of the symfony framework.
+ * This file is part of the Symfony framework.
  *
  * (c) Fabien Potencier <fabien.potencier@symfony-project.com>
  *
@@ -17,9 +17,10 @@ use Symfony\Components\RequestHandler\ResponseInterface;
  */
 
 /**
- * 
+ * ResponseFilter.
  *
- * @package    symfony
+ * @package    Symfony
+ * @subpackage Framework_WebBundle
  * @author     Fabien Potencier <fabien.potencier@symfony-project.com>
  */
 class ResponseFilter

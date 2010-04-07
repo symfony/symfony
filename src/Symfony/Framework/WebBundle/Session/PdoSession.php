@@ -3,7 +3,7 @@
 namespace Symfony\Framework\WebBundle\Session;
 
 /*
- * This file is part of the symfony framework.
+ * This file is part of the Symfony framework.
  *
  * (c) Fabien Potencier <fabien.potencier@symfony-project.com>
  *
@@ -12,9 +12,10 @@ namespace Symfony\Framework\WebBundle\Session;
  */
 
 /**
+ * PdoSession.
  *
- *
- * @package    symfony
+ * @package    Symfony
+ * @subpackage Framework_WebBundle
  * @author     Fabien Potencier <fabien.potencier@symfony-project.com>
  */
 class PdoSession extends NativeSession

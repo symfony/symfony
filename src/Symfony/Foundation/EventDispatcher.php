@@ -7,7 +7,7 @@ use Symfony\Components\EventDispatcher\Event;
 use Symfony\Components\DependencyInjection\ContainerInterface;
 
 /*
- * This file is part of the symfony package.
+ * This file is part of the Symfony package.
  *
  * (c) Fabien Potencier <fabien.potencier@symfony-project.com>
  *
@@ -19,7 +19,8 @@ use Symfony\Components\DependencyInjection\ContainerInterface;
  * This EventDispatcher implementation uses a DependencyInjection container to
  * lazy load listeners.
  *
- * @package    symfony
+ * @package    Symfony
+ * @subpackage Foundation
  * @author     Fabien Potencier <fabien.potencier@symfony-project.com>
  */
 class EventDispatcher extends BaseEventDispatcher

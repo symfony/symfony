@@ -3,7 +3,7 @@
 namespace Symfony\Components\DependencyInjection\Loader;
 
 /*
- * This file is part of the symfony framework.
+ * This file is part of the Symfony framework.
  *
  * (c) Fabien Potencier <fabien.potencier@symfony-project.com>
  *
@@ -20,8 +20,8 @@ namespace Symfony\Components\DependencyInjection\Loader;
  * $container = new Builder();
  * $container->merge($config);
  *
- * @package    symfony
- * @subpackage dependency_injection
+ * @package    Symfony
+ * @subpackage Components_DependencyInjection
  * @author     Fabien Potencier <fabien.potencier@symfony-project.com>
  */
 interface LoaderInterface

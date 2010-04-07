@@ -7,7 +7,7 @@ use Symfony\Components\DependencyInjection\ContainerInterface;
 use Symfony\Components\EventDispatcher\Event;
 
 /*
- * This file is part of the symfony framework.
+ * This file is part of the Symfony framework.
  *
  * (c) Fabien Potencier <fabien.potencier@symfony-project.com>
  *
@@ -19,7 +19,8 @@ use Symfony\Components\EventDispatcher\Event;
  * ControllerLoader listen to the core.load_controller and finds the controller
  * to execute based on the request parameters.
  *
- * @package    symfony
+ * @package    Symfony
+ * @subpackage Framework_WebBundle
  * @author     Fabien Potencier <fabien.potencier@symfony-project.com>
  */
 class ControllerLoader

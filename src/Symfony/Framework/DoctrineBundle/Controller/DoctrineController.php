@@ -7,7 +7,7 @@ use Symfony\Components\RequestHandler\Request;
 use Symfony\Components\RequestHandler\Exception\NotFoundHttpException;
 
 /*
- * This file is part of the symfony framework.
+ * This file is part of the Symfony framework.
  *
  * (c) Fabien Potencier <fabien.potencier@symfony-project.com>
  *
@@ -18,7 +18,8 @@ use Symfony\Components\RequestHandler\Exception\NotFoundHttpException;
 /**
  * Doctrine ORM controller gives you access to entity managers and DQL queries.
  *
- * @package    symfony
+ * @package    Symfony
+ * @subpackage Framework_DoctrineBundle
  * @author     Fabien Potencier <fabien.potencier@symfony-project.com>
  * @author     Jonathan H. Wage <jonwage@gmail.com>
  */

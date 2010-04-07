@@ -6,7 +6,7 @@ use Symfony\Foundation\LoggerInterface;
 use Doctrine\DBAL\Logging\DebugStack;
 
 /*
- * This file is part of the symfony framework.
+ * This file is part of the Symfony framework.
  *
  * (c) Fabien Potencier <fabien.potencier@symfony-project.com>
  *
@@ -15,9 +15,10 @@ use Doctrine\DBAL\Logging\DebugStack;
  */
 
 /**
- * 
+ * DbalLogger.
  *
- * @package    symfony
+ * @package    Symfony
+ * @subpackage Framework_DoctrineBundle
  * @author     Fabien Potencier <fabien.potencier@symfony-project.com>
  */
 class DbalLogger extends DebugStack

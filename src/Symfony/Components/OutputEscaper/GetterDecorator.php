@@ -3,7 +3,7 @@
 namespace Symfony\Components\OutputEscaper;
 
 /*
- * This file is part of the symfony package.
+ * This file is part of the Symfony package.
  *
  * (c) Fabien Potencier <fabien.potencier@symfony-project.com>
  *
@@ -15,8 +15,8 @@ namespace Symfony\Components\OutputEscaper;
  * Abstract output escaping decorator class for "getter" objects.
  *
  * @see        Escaper
- * @package    symfony
- * @subpackage output_escaper
+ * @package    Symfony
+ * @subpackage Components_OutputEscaper
  * @author     Fabien Potencier <fabien.potencier@symfony-project.com>
  * @author     Mike Squire <mike@somosis.co.uk>
  */
@@ -25,7 +25,7 @@ abstract class GetterDecorator extends Escaper
   /**
    * Returns the raw, unescaped value associated with the key supplied.
    *
-   * The key might be an index into an array or a value to be passed to the 
+   * The key might be an index into an array or a value to be passed to the
    * decorated object's get() method.
    *
    * @param  string $key  The key to retrieve

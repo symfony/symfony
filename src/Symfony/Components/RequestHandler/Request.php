@@ -3,7 +3,7 @@
 namespace Symfony\Components\RequestHandler;
 
 /*
- * This file is part of the symfony package.
+ * This file is part of the Symfony package.
  *
  * (c) Fabien Potencier <fabien.potencier@symfony-project.com>
  *
@@ -19,8 +19,8 @@ namespace Symfony\Components\RequestHandler;
  *
  * You can reinitialize the request by calling the setParameters() method.
  *
- * @package    symfony
- * @subpackage request_handler
+ * @package    Symfony
+ * @subpackage Components_RequestHandler
  * @author     Fabien Potencier <fabien.potencier@symfony-project.com>
  */
 class Request implements RequestInterface

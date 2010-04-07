@@ -5,7 +5,7 @@ namespace Symfony\Components\CssSelector\Node;
 use Symfony\Components\CssSelector\XPathExpr;
 
 /*
- * This file is part of the symfony package.
+ * This file is part of the Symfony package.
  *
  * (c) Fabien Potencier <fabien.potencier@symfony-project.com>
  *
@@ -19,8 +19,8 @@ use Symfony\Components\CssSelector\XPathExpr;
  * This component is a port of the Python lxml library,
  * which is copyright Infrae and distributed under the BSD license.
  *
- * @package    symfony
- * @subpackage css_selector
+ * @package    Symfony
+ * @subpackage Components_CssSelector
  * @author     Fabien Potencier <fabien.potencier@symfony-project.com>
  */
 class HashNode implements NodeInterface

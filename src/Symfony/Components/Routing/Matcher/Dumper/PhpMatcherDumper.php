@@ -5,7 +5,7 @@ namespace Symfony\Components\Routing\Matcher\Dumper;
 use Symfony\Components\Routing\Route;
 
 /*
- * This file is part of the symfony framework.
+ * This file is part of the Symfony framework.
  *
  * (c) Fabien Potencier <fabien.potencier@symfony-project.com>
  *
@@ -16,8 +16,8 @@ use Symfony\Components\Routing\Route;
 /**
  * PhpMatcherDumper creates a PHP class able to match URLs for a given set of routes.
  *
- * @package    symfony
- * @subpackage routing
+ * @package    Symfony
+ * @subpackage Components_Routing
  * @author     Fabien Potencier <fabien.potencier@symfony-project.com>
  */
 class PhpMatcherDumper extends MatcherDumper

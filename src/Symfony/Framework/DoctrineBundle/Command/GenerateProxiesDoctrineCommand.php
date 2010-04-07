@@ -10,7 +10,7 @@ use Symfony\Components\Console\Output\Output;
 use Symfony\Framework\WebBundle\Util\Filesystem;
 
 /*
- * This file is part of the symfony framework.
+ * This file is part of the Symfony framework.
  *
  * (c) Fabien Potencier <fabien.potencier@symfony-project.com>
  *
@@ -21,8 +21,8 @@ use Symfony\Framework\WebBundle\Util\Filesystem;
 /**
  * Generate the Doctrine ORM entity proxies to your cache directory.
  *
- * @package    symfony
- * @subpackage console
+ * @package    Symfony
+ * @subpackage Framework_DoctrineBundle
  * @author     Fabien Potencier <fabien.potencier@symfony-project.com>
  */
 class GenerateProxiesDoctrineCommand extends DoctrineCommand

@@ -3,7 +3,7 @@
 namespace Symfony\Components\Console\Input;
 
 /*
- * This file is part of the symfony framework.
+ * This file is part of the Symfony framework.
  *
  * (c) Fabien Potencier <fabien.potencier@symfony-project.com>
  *
@@ -14,8 +14,8 @@ namespace Symfony\Components\Console\Input;
 /**
  * InputInterface is the interface implemented by all input classes.
  *
- * @package    symfony
- * @subpackage console
+ * @package    Symfony
+ * @subpackage Components_Console
  * @author     Fabien Potencier <fabien.potencier@symfony-project.com>
  */
 interface InputInterface

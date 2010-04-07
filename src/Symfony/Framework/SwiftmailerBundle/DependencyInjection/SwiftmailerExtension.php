@@ -8,7 +8,7 @@ use Symfony\Components\DependencyInjection\BuilderConfiguration;
 use Symfony\Components\DependencyInjection\Reference;
 
 /*
- * This file is part of the symfony framework.
+ * This file is part of the Symfony framework.
  *
  * (c) Fabien Potencier <fabien.potencier@symfony-project.com>
  *
@@ -17,10 +17,10 @@ use Symfony\Components\DependencyInjection\Reference;
  */
 
 /**
- * SwiftMailerExtension is an extension for the Swift Mailer library.
+ * SwiftMailerExtension is an extension for the SwiftMailer library.
  *
- * @package    symfony
- * @subpackage dependency_injection
+ * @package    Symfony
+ * @subpackage Framework_SwiftmailerBundle
  * @author     Fabien Potencier <fabien.potencier@symfony-project.com>
  */
 class SwiftMailerExtension extends LoaderExtension

@@ -9,7 +9,7 @@ use Symfony\Components\DependencyInjection\Loader\Loader;
 use Symfony\Framework\ZendBundle\DependencyInjection\ZendExtension;
 
 /*
- * This file is part of the symfony framework.
+ * This file is part of the Symfony framework.
  *
  * (c) Fabien Potencier <fabien.potencier@symfony-project.com>
  *
@@ -18,9 +18,10 @@ use Symfony\Framework\ZendBundle\DependencyInjection\ZendExtension;
  */
 
 /**
- * 
+ * Bundle.
  *
- * @package    symfony
+ * @package    Symfony
+ * @subpackage Framework_ZendBundle
  * @author     Fabien Potencier <fabien.potencier@symfony-project.com>
  */
 class Bundle extends BaseBundle

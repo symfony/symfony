@@ -5,7 +5,7 @@ namespace Symfony\Framework\ProfilerBundle\DataCollector;
 use Symfony\Components\DependencyInjection\ContainerInterface;
 
 /*
- * This file is part of the symfony framework.
+ * This file is part of the Symfony framework.
  *
  * (c) Fabien Potencier <fabien.potencier@symfony-project.com>
  *
@@ -14,9 +14,10 @@ use Symfony\Components\DependencyInjection\ContainerInterface;
  */
 
 /**
- * 
+ * DataCollector.
  *
- * @package    symfony
+ * @package    Symfony
+ * @subpackage Framework_ProfilerBundle
  * @author     Fabien Potencier <fabien.potencier@symfony-project.com>
  */
 abstract class DataCollector implements DataCollectorInterface

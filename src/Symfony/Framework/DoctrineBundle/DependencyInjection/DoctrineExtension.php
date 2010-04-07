@@ -9,7 +9,7 @@ use Symfony\Components\DependencyInjection\Definition;
 use Symfony\Components\DependencyInjection\Reference;
 
 /*
- * This file is part of the symfony framework.
+ * This file is part of the Symfony framework.
  *
  * (c) Fabien Potencier <fabien.potencier@symfony-project.com>
  *
@@ -20,8 +20,8 @@ use Symfony\Components\DependencyInjection\Reference;
 /**
  * DoctrineExtension is an extension for the Doctrine DBAL and ORM library.
  *
- * @package    symfony
- * @subpackage dependency_injection
+ * @package    Symfony
+ * @subpackage Framework_DoctrineBundle
  * @author     Fabien Potencier <fabien.potencier@symfony-project.com>
  */
 class DoctrineExtension extends LoaderExtension

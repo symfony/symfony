@@ -3,7 +3,7 @@
 require_once __DIR__.'/UniversalClassLoader.php';
 
 /*
- * This file is part of the symfony framework.
+ * This file is part of the Symfony framework.
  *
  * (c) Fabien Potencier <fabien.potencier@symfony-project.com>
  *

@@ -3,7 +3,7 @@
 namespace Symfony\Components\Routing\Matcher;
 
 /*
- * This file is part of the symfony framework.
+ * This file is part of the Symfony framework.
  *
  * (c) Fabien Potencier <fabien.potencier@symfony-project.com>
  *
@@ -14,8 +14,8 @@ namespace Symfony\Components\Routing\Matcher;
 /**
  * UrlMatcherInterface is the interface that all URL matcher classes must implements.
  *
- * @package    symfony
- * @subpackage routing
+ * @package    Symfony
+ * @subpackage Components_Routing
  * @author     Fabien Potencier <fabien.potencier@symfony-project.com>
  */
 interface UrlMatcherInterface

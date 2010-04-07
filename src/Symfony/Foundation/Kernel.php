@@ -2,15 +2,6 @@
 
 namespace Symfony\Foundation;
 
-/*
- * This file is part of the symfony package.
- *
- * (c) Fabien Potencier <fabien.potencier@symfony-project.com>
- *
- * For the full copyright and license information, please view the LICENSE
- * file that was distributed with this source code.
- */
-
 use Symfony\Components\DependencyInjection\ContainerInterface;
 use Symfony\Components\DependencyInjection\Builder;
 use Symfony\Components\DependencyInjection\BuilderConfiguration;
@@ -18,12 +9,22 @@ use Symfony\Components\DependencyInjection\Dumper\PhpDumper;
 use Symfony\Components\DependencyInjection\FileResource;
 use Symfony\Components\RequestHandler\RequestInterface;
 
+/*
+ * This file is part of the Symfony package.
+ *
+ * (c) Fabien Potencier <fabien.potencier@symfony-project.com>
+ *
+ * For the full copyright and license information, please view the LICENSE
+ * file that was distributed with this source code.
+ */
+
 /**
  * The Kernel is the heart of the Symfony system. It manages an environment
  * that can host bundles.
  *
- * @package Symfony
- * @author  Fabien Potencier <fabien.potencier@symfony-project.org>
+ * @package    Symfony
+ * @subpackage Foundation
+ * @author     Fabien Potencier <fabien.potencier@symfony-project.org>
  */
 abstract class Kernel implements \Serializable
 {

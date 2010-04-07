@@ -8,7 +8,7 @@ use Symfony\Components\DependencyInjection\Loader\Loader;
 use Symfony\Framework\ProfilerBundle\DependencyInjection\ProfilerExtension;
 
 /*
- * This file is part of the symfony framework.
+ * This file is part of the Symfony framework.
  *
  * (c) Fabien Potencier <fabien.potencier@symfony-project.com>
  *
@@ -17,9 +17,10 @@ use Symfony\Framework\ProfilerBundle\DependencyInjection\ProfilerExtension;
  */
 
 /**
- * 
+ * Bundle.
  *
- * @package    symfony
+ * @package    Symfony
+ * @subpackage Framework_ProfilerBundle
  * @author     Fabien Potencier <fabien.potencier@symfony-project.com>
  */
 class Bundle extends BaseBundle

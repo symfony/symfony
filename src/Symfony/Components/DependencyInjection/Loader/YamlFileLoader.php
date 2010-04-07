@@ -10,7 +10,7 @@ use Symfony\Components\DependencyInjection\FileResource;
 use Symfony\Components\Yaml\Yaml;
 
 /*
- * This file is part of the symfony framework.
+ * This file is part of the Symfony framework.
  *
  * (c) Fabien Potencier <fabien.potencier@symfony-project.com>
  *
@@ -23,8 +23,8 @@ use Symfony\Components\Yaml\Yaml;
  *
  * The YAML format does not support anonymous services (cf. the XML loader).
  *
- * @package    symfony
- * @subpackage dependency_injection
+ * @package    Symfony
+ * @subpackage Components_DependencyInjection
  * @author     Fabien Potencier <fabien.potencier@symfony-project.com>
  */
 class YamlFileLoader extends FileLoader

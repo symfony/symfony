@@ -3,7 +3,7 @@
 namespace Symfony\Framework\ProfilerBundle\DataCollector;
 
 /*
- * This file is part of the symfony framework.
+ * This file is part of the Symfony framework.
  *
  * (c) Fabien Potencier <fabien.potencier@symfony-project.com>
  *
@@ -12,9 +12,10 @@ namespace Symfony\Framework\ProfilerBundle\DataCollector;
  */
 
 /**
- * 
+ * MemoryDataCollector.
  *
- * @package    symfony
+ * @package    Symfony
+ * @subpackage Framework_ProfilerBundle
  * @author     Fabien Potencier <fabien.potencier@symfony-project.com>
  */
 class MemoryDataCollector extends DataCollector

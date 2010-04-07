@@ -3,7 +3,7 @@
 namespace Symfony\Components\Templating\Loader;
 
 /*
- * This file is part of the symfony package.
+ * This file is part of the Symfony package.
  *
  * (c) Fabien Potencier <fabien.potencier@symfony-project.com>
  *
@@ -15,8 +15,8 @@ namespace Symfony\Components\Templating\Loader;
  * CompilableLoaderInterface is the interface a template loader must implement
  * if the templates are compilable.
  *
- * @package    symfony
- * @subpackage templating
+ * @package    Symfony
+ * @subpackage Components_Templating
  * @author     Fabien Potencier <fabien.potencier@symfony-project.com>
  */
 interface CompilableLoaderInterface

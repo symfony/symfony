@@ -10,7 +10,7 @@ use Symfony\Components\Console\Output\Output;
 use Symfony\Framework\WebBundle\Util\Filesystem;
 
 /*
- * This file is part of the symfony framework.
+ * This file is part of the Symfony framework.
  *
  * (c) Fabien Potencier <fabien.potencier@symfony-project.com>
  *
@@ -19,10 +19,10 @@ use Symfony\Framework\WebBundle\Util\Filesystem;
  */
 
 /**
- * 
+ * AssetsInstallCommand.
  *
- * @package    symfony
- * @subpackage console
+ * @package    Symfony
+ * @subpackage Framework_WebBundle
  * @author     Fabien Potencier <fabien.potencier@symfony-project.com>
  */
 class AssetsInstallCommand extends Command

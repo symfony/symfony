@@ -5,7 +5,7 @@ namespace Symfony\Framework\DoctrineBundle\DataCollector;
 use Symfony\Framework\ProfilerBundle\DataCollector\DataCollector;
 
 /*
- * This file is part of the symfony framework.
+ * This file is part of the Symfony framework.
  *
  * (c) Fabien Potencier <fabien.potencier@symfony-project.com>
  *
@@ -14,9 +14,10 @@ use Symfony\Framework\ProfilerBundle\DataCollector\DataCollector;
  */
 
 /**
- * 
+ * DoctrineDataCollector.
  *
- * @package    symfony
+ * @package    Symfony
+ * @subpackage Framework_DoctrineBundle
  * @author     Fabien Potencier <fabien.potencier@symfony-project.com>
  */
 class DoctrineDataCollector extends DataCollector

@@ -8,7 +8,7 @@ use Symfony\Components\Templating\Renderer\RendererInterface;
 use Symfony\Components\Templating\Helper\HelperInterface;
 
 /*
- * This file is part of the symfony package.
+ * This file is part of the Symfony package.
  *
  * (c) Fabien Potencier <fabien.potencier@symfony-project.com>
  *
@@ -19,8 +19,8 @@ use Symfony\Components\Templating\Helper\HelperInterface;
 /**
  * Engine is the main class of the templating component.
  *
- * @package    symfony
- * @subpackage templating
+ * @package    Symfony
+ * @subpackage Components_Templating
  * @author     Fabien Potencier <fabien.potencier@symfony-project.com>
  */
 class Engine

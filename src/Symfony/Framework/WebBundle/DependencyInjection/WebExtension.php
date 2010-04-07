@@ -8,7 +8,7 @@ use Symfony\Components\DependencyInjection\BuilderConfiguration;
 use Symfony\Components\DependencyInjection\Reference;
 
 /*
- * This file is part of the symfony framework.
+ * This file is part of the Symfony framework.
  *
  * (c) Fabien Potencier <fabien.potencier@symfony-project.com>
  *
@@ -17,9 +17,10 @@ use Symfony\Components\DependencyInjection\Reference;
  */
 
 /**
- * 
+ * WebExtension.
  *
- * @package    symfony
+ * @package    Symfony
+ * @subpackage Framework_WebBundle
  * @author     Fabien Potencier <fabien.potencier@symfony-project.com>
  */
 class WebExtension extends LoaderExtension

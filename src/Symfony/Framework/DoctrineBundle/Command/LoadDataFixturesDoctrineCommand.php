@@ -15,7 +15,7 @@ use Doctrine\ORM\EntityManager;
 use Doctrine\ORM\Internal\CommitOrderCalculator;
 
 /*
- * This file is part of the symfony framework.
+ * This file is part of the Symfony framework.
  *
  * (c) Fabien Potencier <fabien.potencier@symfony-project.com>
  *
@@ -24,10 +24,10 @@ use Doctrine\ORM\Internal\CommitOrderCalculator;
  */
 
 /**
- * Load data fixtures from bundles
+ * Load data fixtures from bundles.
  *
- * @package    symfony
- * @subpackage console
+ * @package    Symfony
+ * @subpackage Framework_DoctrineBundle
  * @author     Fabien Potencier <fabien.potencier@symfony-project.com>
  * @author     Jonathan H. Wage <jonwage@gmail.com>
  */

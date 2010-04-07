@@ -5,7 +5,7 @@ namespace Symfony\Components\DependencyInjection\Dumper;
 use Symfony\Components\DependencyInjection\Builder;
 
 /*
- * This file is part of the symfony framework.
+ * This file is part of the Symfony framework.
  *
  * (c) Fabien Potencier <fabien.potencier@symfony-project.com>
  *
@@ -16,8 +16,8 @@ use Symfony\Components\DependencyInjection\Builder;
 /**
  * Dumper is the abstract class for all built-in dumpers.
  *
- * @package    symfony
- * @subpackage dependency_injection
+ * @package    Symfony
+ * @subpackage Components_DependencyInjection
  * @author     Fabien Potencier <fabien.potencier@symfony-project.com>
  */
 abstract class Dumper implements DumperInterface

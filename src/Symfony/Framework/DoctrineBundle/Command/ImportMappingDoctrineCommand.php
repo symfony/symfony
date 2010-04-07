@@ -9,7 +9,7 @@ use Symfony\Components\Console\Output\OutputInterface;
 use Symfony\Components\Console\Output\Output;
 
 /*
- * This file is part of the symfony framework.
+ * This file is part of the Symfony framework.
  *
  * (c) Fabien Potencier <fabien.potencier@symfony-project.com>
  *
@@ -21,8 +21,8 @@ use Symfony\Components\Console\Output\Output;
  * Import the initial mapping information for entities from an existing database
  * into a bundle.
  *
- * @package    symfony
- * @subpackage console
+ * @package    Symfony
+ * @subpackage Framework_DoctrineBundle
  * @author     Fabien Potencier <fabien.potencier@symfony-project.com>
  * @author     Jonathan H. Wage <jonwage@gmail.com>
  */

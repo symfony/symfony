@@ -3,7 +3,7 @@
 namespace Symfony\Components\Console\Input;
 
 /*
- * This file is part of the symfony framework.
+ * This file is part of the Symfony framework.
  *
  * (c) Fabien Potencier <fabien.potencier@symfony-project.com>
  *
@@ -21,8 +21,8 @@ namespace Symfony\Components\Console\Input;
  *       new InputOption('foo', 'f', InputOption::PARAMETER_REQUIRED),
  *     ));
  *
- * @package    symfony
- * @subpackage console
+ * @package    Symfony
+ * @subpackage Components_Console
  * @author     Fabien Potencier <fabien.potencier@symfony-project.com>
  */
 class InputDefinition

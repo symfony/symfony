@@ -11,7 +11,7 @@ use Symfony\Framework\WebBundle\Util\Filesystem;
 use Symfony\Framework\WebBundle\Util\Mustache;
 
 /*
- * This file is part of the symfony framework.
+ * This file is part of the Symfony framework.
  *
  * (c) Fabien Potencier <fabien.potencier@symfony-project.com>
  *
@@ -22,8 +22,8 @@ use Symfony\Framework\WebBundle\Util\Mustache;
 /**
  * Initializes a new bundle.
  *
- * @package    symfony
- * @subpackage console
+ * @package    Symfony
+ * @subpackage Framework_WebBundle
  * @author     Fabien Potencier <fabien.potencier@symfony-project.com>
  */
 class InitBundleCommand extends Command

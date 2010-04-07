@@ -6,7 +6,7 @@ use Symfony\Components\Routing\Route;
 use Symfony\Components\Routing\RouteCollection;
 
 /*
- * This file is part of the symfony framework.
+ * This file is part of the Symfony framework.
  *
  * (c) Fabien Potencier <fabien.potencier@symfony-project.com>
  *
@@ -17,8 +17,8 @@ use Symfony\Components\Routing\RouteCollection;
 /**
  * ApacheUrlMatcher matches URL based on Apache mod_rewrite matching (see ApacheMatcherDumper).
  *
- * @package    symfony
- * @subpackage routing
+ * @package    Symfony
+ * @subpackage Components_Routing
  * @author     Fabien Potencier <fabien.potencier@symfony-project.com>
  */
 class ApacheUrlMatcher extends UrlMatcher

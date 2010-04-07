@@ -7,7 +7,7 @@ use Symfony\Components\Templating\Storage\FileStorage;
 use Symfony\Components\Templating\Storage\StringStorage;
 
 /*
- * This file is part of the symfony package.
+ * This file is part of the Symfony package.
  *
  * (c) Fabien Potencier <fabien.potencier@symfony-project.com>
  *
@@ -18,8 +18,8 @@ use Symfony\Components\Templating\Storage\StringStorage;
 /**
  * PhpRenderer is a renderer for PHP templates.
  *
- * @package    symfony
- * @subpackage templating
+ * @package    Symfony
+ * @subpackage Components_Templating
  * @author     Fabien Potencier <fabien.potencier@symfony-project.com>
  */
 class PhpRenderer extends Renderer

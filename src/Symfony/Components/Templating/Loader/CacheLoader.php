@@ -6,7 +6,7 @@ use Symfony\Components\Templating\Storage\Storage;
 use Symfony\Components\Templating\Storage\FileStorage;
 
 /*
- * This file is part of the symfony package.
+ * This file is part of the Symfony package.
  *
  * (c) Fabien Potencier <fabien.potencier@symfony-project.com>
  *
@@ -19,10 +19,10 @@ use Symfony\Components\Templating\Storage\FileStorage;
  * on the filesystem.
  *
  * This cache only caches on disk to allow PHP accelerators to cache the opcodes.
- * All other mecanism would imply the use of `eval()`.
+ * All other mechanism would imply the use of `eval()`.
  *
- * @package    symfony
- * @subpackage templating
+ * @package    Symfony
+ * @subpackage Components_Templating
  * @author     Fabien Potencier <fabien.potencier@symfony-project.com>
  */
 class CacheLoader extends Loader

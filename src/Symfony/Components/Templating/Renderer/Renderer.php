@@ -5,7 +5,7 @@ namespace Symfony\Components\Templating\Renderer;
 use Symfony\Components\Templating\Engine;
 
 /*
- * This file is part of the symfony package.
+ * This file is part of the Symfony package.
  *
  * (c) Fabien Potencier <fabien.potencier@symfony-project.com>
  *
@@ -16,8 +16,8 @@ use Symfony\Components\Templating\Engine;
 /**
  * Renderer is the base class for all template renderer.
  *
- * @package    symfony
- * @subpackage templating
+ * @package    Symfony
+ * @subpackage Components_Templating
  * @author     Fabien Potencier <fabien.potencier@symfony-project.com>
  */
 abstract class Renderer implements RendererInterface

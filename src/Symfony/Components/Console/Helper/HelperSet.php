@@ -5,7 +5,7 @@ namespace Symfony\Components\Console\Helper;
 use Symfony\Components\Console\Command\Command;
 
 /*
- * This file is part of the symfony framework.
+ * This file is part of the Symfony framework.
  *
  * (c) Fabien Potencier <fabien.potencier@symfony-project.com>
  *
@@ -16,8 +16,8 @@ use Symfony\Components\Console\Command\Command;
 /**
  * HelperSet represents a set of helpers to be used with a command.
  *
- * @package    symfony
- * @subpackage console
+ * @package    Symfony
+ * @subpackage Components_Console
  * @author     Fabien Potencier <fabien.potencier@symfony-project.com>
  */
 class HelperSet

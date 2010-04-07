@@ -8,7 +8,7 @@ use Symfony\Components\EventDispatcher\Event;
 use Symfony\Components\Routing\RouterInterface;
 
 /*
- * This file is part of the symfony framework.
+ * This file is part of the Symfony framework.
  *
  * (c) Fabien Potencier <fabien.potencier@symfony-project.com>
  *
@@ -17,9 +17,10 @@ use Symfony\Components\Routing\RouterInterface;
  */
 
 /**
- * 
+ * RequestParser.
  *
- * @package    symfony
+ * @package    Symfony
+ * @subpackage Framework_WebBundle
  * @author     Fabien Potencier <fabien.potencier@symfony-project.com>
  */
 class RequestParser

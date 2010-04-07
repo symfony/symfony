@@ -3,7 +3,7 @@
 namespace Symfony\Components\DependencyInjection;
 
 /*
- * This file is part of the symfony framework.
+ * This file is part of the Symfony framework.
  *
  * (c) Fabien Potencier <fabien.potencier@symfony-project.com>
  *
@@ -11,6 +11,13 @@ namespace Symfony\Components\DependencyInjection;
  * with this source code in the file LICENSE.
  */
 
+/**
+ * SimpleXMLElement class.
+ *
+ * @package    Symfony
+ * @subpackage Components_DependencyInjection
+ * @author     Fabien Potencier <fabien.potencier@symfony-project.com>
+ */
 class SimpleXMLElement extends \SimpleXMLElement
 {
   public function getAttributeAsPhp($name)

@@ -3,7 +3,7 @@
 namespace Symfony\Components\OutputEscaper;
 
 /*
- * This file is part of the symfony package.
+ * This file is part of the Symfony package.
  *
  * (c) Fabien Potencier <fabien.potencier@symfony-project.com>
  *
@@ -14,8 +14,8 @@ namespace Symfony\Components\OutputEscaper;
 /**
  * Marks a variable as being safe for output.
  *
- * @package    symfony
- * @subpackage output_escaper
+ * @package    Symfony
+ * @subpackage Components_OutputEscaper
  * @author     Fabien Potencier <fabien.potencier@symfony-project.com>
  */
 class SafeDecorator extends \ArrayIterator

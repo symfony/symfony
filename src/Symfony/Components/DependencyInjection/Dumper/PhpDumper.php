@@ -8,7 +8,7 @@ use Symfony\Components\DependencyInjection\Reference;
 use Symfony\Components\DependencyInjection\Parameter;
 
 /*
- * This file is part of the symfony framework.
+ * This file is part of the Symfony framework.
  *
  * (c) Fabien Potencier <fabien.potencier@symfony-project.com>
  *
@@ -19,8 +19,8 @@ use Symfony\Components\DependencyInjection\Parameter;
 /**
  * PhpDumper dumps a service container as a PHP class.
  *
- * @package    symfony
- * @subpackage dependency_injection
+ * @package    Symfony
+ * @subpackage Components_DependencyInjection
  * @author     Fabien Potencier <fabien.potencier@symfony-project.com>
  */
 class PhpDumper extends Dumper

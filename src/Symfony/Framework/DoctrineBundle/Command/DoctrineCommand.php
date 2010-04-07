@@ -15,7 +15,7 @@ use Doctrine\Common\Cli\Configuration;
 use Doctrine\Common\Cli\CliController as DoctrineCliController;
 
 /*
- * This file is part of the symfony framework.
+ * This file is part of the Symfony framework.
  *
  * (c) Fabien Potencier <fabien.potencier@symfony-project.com>
  *
@@ -26,8 +26,8 @@ use Doctrine\Common\Cli\CliController as DoctrineCliController;
 /**
  * Base class for Doctrine console commands to extend from.
  *
- * @package    symfony
- * @subpackage console
+ * @package    Symfony
+ * @subpackage Framework_DoctrineBundle
  * @author     Fabien Potencier <fabien.potencier@symfony-project.com>
  */
 abstract class DoctrineCommand extends Command

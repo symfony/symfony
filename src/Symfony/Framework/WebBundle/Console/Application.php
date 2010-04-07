@@ -9,7 +9,7 @@ use Symfony\Components\Console\Output\OutputInterface;
 use Symfony\Foundation\Kernel;
 
 /*
- * This file is part of the symfony framework.
+ * This file is part of the Symfony framework.
  *
  * (c) Fabien Potencier <fabien.potencier@symfony-project.com>
  *
@@ -18,9 +18,10 @@ use Symfony\Foundation\Kernel;
  */
 
 /**
+ * Application.
  *
- *
- * @package    symfony
+ * @package    Symfony
+ * @subpackage Framework_WebBundle
  * @author     Fabien Potencier <fabien.potencier@symfony-project.com>
  */
 class Application extends BaseApplication

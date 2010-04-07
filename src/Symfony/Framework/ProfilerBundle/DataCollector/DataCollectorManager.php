@@ -8,7 +8,7 @@ use Symfony\Components\RequestHandler\Response;
 use Symfony\Framework\ProfilerBundle\ProfilerStorage;
 
 /*
- * This file is part of the symfony framework.
+ * This file is part of the Symfony framework.
  *
  * (c) Fabien Potencier <fabien.potencier@symfony-project.com>
  *
@@ -17,9 +17,10 @@ use Symfony\Framework\ProfilerBundle\ProfilerStorage;
  */
 
 /**
- * 
+ * DataCollectorManager.
  *
- * @package    symfony
+ * @package    Symfony
+ * @subpackage Framework_ProfilerBundle
  * @author     Fabien Potencier <fabien.potencier@symfony-project.com>
  */
 class DataCollectorManager

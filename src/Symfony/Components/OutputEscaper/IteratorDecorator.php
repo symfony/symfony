@@ -3,7 +3,7 @@
 namespace Symfony\Components\OutputEscaper;
 
 /*
- * This file is part of the symfony package.
+ * This file is part of the Symfony package.
  *
  * (c) Fabien Potencier <fabien.potencier@symfony-project.com>
  *
@@ -18,8 +18,8 @@ namespace Symfony\Components\OutputEscaper;
  * into an iterator with each value escaped.
  *
  * @see        Escaper
- * @package    symfony
- * @subpackage output_escaper
+ * @package    Symfony
+ * @subpackage Components_OutputEscaper
  * @author     Fabien Potencier <fabien.potencier@symfony-project.com>
  * @author     Mike Squire <mike@somosis.co.uk>
  */

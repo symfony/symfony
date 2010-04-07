@@ -3,7 +3,7 @@
 namespace Symfony\Components\Console\Input;
 
 /*
- * This file is part of the symfony framework.
+ * This file is part of the Symfony framework.
  *
  * (c) Fabien Potencier <fabien.potencier@symfony-project.com>
  *
@@ -18,8 +18,8 @@ namespace Symfony\Components\Console\Input;
  *
  *     $input = new ArrayInput(array('name' => 'foo', '--bar' => 'foobar'));
  *
- * @package    symfony
- * @subpackage console
+ * @package    Symfony
+ * @subpackage Components_Console
  * @author     Fabien Potencier <fabien.potencier@symfony-project.com>
  */
 class ArrayInput extends Input
@@ -29,7 +29,7 @@ class ArrayInput extends Input
   /**
    * Constructor.
    *
-   * @param array      $param An array of parameters
+   * @param array           $param An array of parameters
    * @param InputDefinition $definition A InputDefinition instance
    */
   public function __construct(array $parameters, InputDefinition $definition = null)

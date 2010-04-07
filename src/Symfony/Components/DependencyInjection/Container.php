@@ -3,7 +3,7 @@
 namespace Symfony\Components\DependencyInjection;
 
 /*
- * This file is part of the symfony framework.
+ * This file is part of the Symfony framework.
  *
  * (c) Fabien Potencier <fabien.potencier@symfony-project.com>
  *
@@ -46,8 +46,8 @@ namespace Symfony\Components\DependencyInjection;
  *  * IGNORE_ON_INVALID_REFERENCE:    Ignores the wrapping command asking for the reference
  *                                    (for instance, ignore a setter if the service does not exist)
  *
- * @package    symfony
- * @subpackage dependency_injection
+ * @package    Symfony
+ * @subpackage Components_DependencyInjection
  * @author     Fabien Potencier <fabien.potencier@symfony-project.com>
  */
 class Container implements ContainerInterface, \ArrayAccess

@@ -6,7 +6,7 @@ use Symfony\Components\DependencyInjection\BuilderConfiguration;
 use Symfony\Components\DependencyInjection\FileResource;
 
 /*
- * This file is part of the symfony framework.
+ * This file is part of the Symfony framework.
  *
  * (c) Fabien Potencier <fabien.potencier@symfony-project.com>
  *
@@ -17,8 +17,8 @@ use Symfony\Components\DependencyInjection\FileResource;
 /**
  * IniFileLoader loads parameters from INI files.
  *
- * @package    symfony
- * @subpackage dependency_injection
+ * @package    Symfony
+ * @subpackage Components_DependencyInjection
  * @author     Fabien Potencier <fabien.potencier@symfony-project.com>
  */
 class IniFileLoader extends FileLoader

@@ -3,7 +3,7 @@
 namespace Symfony\Components\Routing;
 
 /*
- * This file is part of the symfony framework.
+ * This file is part of the Symfony framework.
  *
  * (c) Fabien Potencier <fabien.potencier@symfony-project.com>
  *
@@ -14,8 +14,8 @@ namespace Symfony\Components\Routing;
 /**
  * RouteCompiler compiles Route instances to CompiledRoute instances.
  *
- * @package    symfony
- * @subpackage routing
+ * @package    Symfony
+ * @subpackage Components_Routing
  * @author     Fabien Potencier <fabien.potencier@symfony-project.com>
  */
 class RouteCompiler implements RouteCompilerInterface

@@ -10,7 +10,7 @@ use Symfony\Components\Console\Output\Output;
 use Symfony\Components\Console\Command\Command;
 
 /*
- * This file is part of the symfony framework.
+ * This file is part of the Symfony framework.
  *
  * (c) Fabien Potencier <fabien.potencier@symfony-project.com>
  *
@@ -21,8 +21,8 @@ use Symfony\Components\Console\Command\Command;
 /**
  * ListCommand displays the list of all available commands for the application.
  *
- * @package    symfony
- * @subpackage console
+ * @package    Symfony
+ * @subpackage Components_Console
  * @author     Fabien Potencier <fabien.potencier@symfony-project.com>
  */
 class ListCommand extends Command

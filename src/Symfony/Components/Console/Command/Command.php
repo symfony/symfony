@@ -10,7 +10,7 @@ use Symfony\Components\Console\Output\OutputInterface;
 use Symfony\Components\Console\Application;
 
 /*
- * This file is part of the symfony framework.
+ * This file is part of the Symfony framework.
  *
  * (c) Fabien Potencier <fabien.potencier@symfony-project.com>
  *
@@ -21,8 +21,8 @@ use Symfony\Components\Console\Application;
 /**
  * Base class for all commands.
  *
- * @package    symfony
- * @subpackage console
+ * @package    Symfony
+ * @subpackage Components_Console
  * @author     Fabien Potencier <fabien.potencier@symfony-project.com>
  */
 class Command

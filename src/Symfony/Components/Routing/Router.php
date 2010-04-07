@@ -3,7 +3,7 @@
 namespace Symfony\Components\Routing;
 
 /*
- * This file is part of the symfony framework.
+ * This file is part of the Symfony framework.
  *
  * (c) Fabien Potencier <fabien.potencier@symfony-project.com>
  *
@@ -15,8 +15,8 @@ namespace Symfony\Components\Routing;
  * The Router class is an example of the integration of all pieces of the
  * routing system for easier use.
  *
- * @package    symfony
- * @subpackage routing
+ * @package    Symfony
+ * @subpackage Components_Routing
  * @author     Fabien Potencier <fabien.potencier@symfony-project.com>
  */
 class Router implements RouterInterface

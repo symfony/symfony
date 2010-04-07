@@ -12,7 +12,7 @@ use Doctrine\Common\Cli\Configuration;
 use Doctrine\Common\Cli\CliController as DoctrineCliController;
 
 /*
- * This file is part of the symfony framework.
+ * This file is part of the Symfony framework.
  *
  * (c) Fabien Potencier <fabien.potencier@symfony-project.com>
  *
@@ -24,8 +24,8 @@ use Doctrine\Common\Cli\CliController as DoctrineCliController;
  * Convert Doctrine ORM metadata mapping information between the various supported
  * formats.
  *
- * @package    symfony
- * @subpackage console
+ * @package    Symfony
+ * @subpackage Framework_DoctrineBundle
  * @author     Fabien Potencier <fabien.potencier@symfony-project.com>
  * @author     Jonathan H. Wage <jonwage@gmail.com>
  */

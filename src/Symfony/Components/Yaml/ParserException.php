@@ -3,7 +3,7 @@
 namespace Symfony\Components\Yaml;
 
 /*
- * This file is part of the symfony package.
+ * This file is part of the Symfony package.
  *
  * (c) Fabien Potencier <fabien.potencier@symfony-project.com>
  *
@@ -14,8 +14,8 @@ namespace Symfony\Components\Yaml;
 /**
  * Exception class used by all exceptions thrown by the component.
  *
- * @package    symfony
- * @subpackage yaml
+ * @package    Symfony
+ * @subpackage Components_Yaml
  * @author     Fabien Potencier <fabien.potencier@symfony-project.com>
  */
 class ParserException extends Exception

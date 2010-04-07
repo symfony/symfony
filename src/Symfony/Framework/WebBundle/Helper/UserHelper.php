@@ -6,7 +6,7 @@ use Symfony\Components\Templating\Helper\Helper;
 use Symfony\Framework\WebBundle\User;
 
 /*
- * This file is part of the symfony framework.
+ * This file is part of the Symfony framework.
  *
  * (c) Fabien Potencier <fabien.potencier@symfony-project.com>
  *
@@ -15,9 +15,10 @@ use Symfony\Framework\WebBundle\User;
  */
 
 /**
- * 
+ * UserHelper.
  *
- * @package    symfony
+ * @package    Symfony
+ * @subpackage Framework_WebBundle
  * @author     Fabien Potencier <fabien.potencier@symfony-project.com>
  */
 class UserHelper extends Helper

@@ -5,7 +5,7 @@ namespace Symfony\Components\DependencyInjection;
 use Symfony\Components\DependencyInjection\Loader\Loader;
 
 /*
- * This file is part of the symfony framework.
+ * This file is part of the Symfony framework.
  *
  * (c) Fabien Potencier <fabien.potencier@symfony-project.com>
  *
@@ -16,8 +16,8 @@ use Symfony\Components\DependencyInjection\Loader\Loader;
 /**
  * A BuilderConfiguration is a consistent set of definitions and parameters.
  *
- * @package    symfony
- * @subpackage dependency_injection
+ * @package    Symfony
+ * @subpackage Components_DependencyInjection
  * @author     Fabien Potencier <fabien.potencier@symfony-project.com>
  */
 class BuilderConfiguration

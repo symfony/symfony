@@ -7,7 +7,7 @@ use Symfony\Components\DependencyInjection\Loader\XmlFileLoader;
 use Symfony\Components\DependencyInjection\BuilderConfiguration;
 
 /*
- * This file is part of the symfony framework.
+ * This file is part of the Symfony framework.
  *
  * (c) Fabien Potencier <fabien.potencier@symfony-project.com>
  *
@@ -18,8 +18,8 @@ use Symfony\Components\DependencyInjection\BuilderConfiguration;
 /**
  * ZendExtension is an extension for the Zend Framework libraries.
  *
- * @package    symfony
- * @subpackage dependency_injection
+ * @package    Symfony
+ * @subpackage Framework_ZendBundle
  * @author     Fabien Potencier <fabien.potencier@symfony-project.com>
  */
 class ZendExtension extends LoaderExtension

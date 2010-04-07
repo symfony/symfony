@@ -3,7 +3,7 @@
 namespace Symfony\Components\DependencyInjection\Loader;
 
 /*
- * This file is part of the symfony framework.
+ * This file is part of the Symfony framework.
  *
  * (c) Fabien Potencier <fabien.potencier@symfony-project.com>
  *
@@ -14,8 +14,8 @@ namespace Symfony\Components\DependencyInjection\Loader;
 /**
  * FileLoader is the abstract class used by all built-in loaders that are file based.
  *
- * @package    symfony
- * @subpackage dependency_injection
+ * @package    Symfony
+ * @subpackage Components_DependencyInjection
  * @author     Fabien Potencier <fabien.potencier@symfony-project.com>
  */
 abstract class FileLoader extends Loader

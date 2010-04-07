@@ -3,7 +3,7 @@
 namespace Symfony\Components\Console\Input;
 
 /*
- * This file is part of the symfony framework.
+ * This file is part of the Symfony framework.
  *
  * (c) Fabien Potencier <fabien.potencier@symfony-project.com>
  *
@@ -20,7 +20,7 @@ namespace Symfony\Components\Console\Input;
  *
  * By default, the `$_SERVER['argv']` array is used for the input values.
  *
- * This can be overriden by explicitly passing the input values in the constructor:
+ * This can be overridden by explicitly passing the input values in the constructor:
  *
  *     $input = new ArgvInput($_SERVER['argv']);
  *
@@ -31,8 +31,8 @@ namespace Symfony\Components\Console\Input;
  * the same rules as the argv one. It's almost always better to use the
  * `StringInput` when you want to provide your own input.
  *
- * @package    symfony
- * @subpackage console
+ * @package    Symfony
+ * @subpackage Components_Console
  * @author     Fabien Potencier <fabien.potencier@symfony-project.com>
  *
  * @see http://www.gnu.org/software/libc/manual/html_node/Argument-Syntax.html
@@ -46,7 +46,7 @@ class ArgvInput extends Input
   /**
    * Constructor.
    *
-   * @param array      $argv An array of parameters from the CLI (in the argv format)
+   * @param array           $argv An array of parameters from the CLI (in the argv format)
    * @param InputDefinition $definition A InputDefinition instance
    */
   public function __construct(array $argv = null, InputDefinition $definition = null)

@@ -5,7 +5,7 @@ namespace Symfony\Framework\WebBundle;
 use Symfony\Components\DependencyInjection\ContainerInterface;
 
 /*
- * This file is part of the symfony framework.
+ * This file is part of the Symfony framework.
  *
  * (c) Fabien Potencier <fabien.potencier@symfony-project.com>
  *
@@ -16,7 +16,8 @@ use Symfony\Components\DependencyInjection\ContainerInterface;
 /**
  * WebBundle Controller gives you convenient access to all commonly needed services.
  *
- * @package    symfony
+ * @package    Symfony
+ * @subpackage Framework_WebBundle
  * @author     Fabien Potencier <fabien.potencier@symfony-project.com>
  */
 class Controller

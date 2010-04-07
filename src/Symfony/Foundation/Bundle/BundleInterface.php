@@ -5,7 +5,7 @@ namespace Symfony\Foundation\Bundle;
 use Symfony\Components\DependencyInjection\ContainerInterface;
 
 /*
- * This file is part of the symfony framework.
+ * This file is part of the Symfony framework.
  *
  * (c) Fabien Potencier <fabien.potencier@symfony-project.com>
  *
@@ -14,9 +14,10 @@ use Symfony\Components\DependencyInjection\ContainerInterface;
  */
 
 /**
- * 
+ * BundleInterface.
  *
- * @package    symfony
+ * @package    Symfony
+ * @subpackage Foundation
  * @author     Fabien Potencier <fabien.potencier@symfony-project.com>
  */
 interface BundleInterface

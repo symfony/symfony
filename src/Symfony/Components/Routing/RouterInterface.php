@@ -3,7 +3,7 @@
 namespace Symfony\Components\Routing;
 
 /*
- * This file is part of the symfony framework.
+ * This file is part of the Symfony framework.
  *
  * (c) Fabien Potencier <fabien.potencier@symfony-project.com>
  *
@@ -16,8 +16,8 @@ namespace Symfony\Components\Routing;
  *
  * This interface is the concatenation of UrlMatcherInterface and UrlGeneratorInterface.
  *
- * @package    symfony
- * @subpackage routing
+ * @package    Symfony
+ * @subpackage Components_Routing
  * @author     Fabien Potencier <fabien.potencier@symfony-project.com>
  */
 interface RouterInterface

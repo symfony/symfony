@@ -5,7 +5,7 @@ namespace Symfony\Framework\ProfilerBundle\DataCollector;
 use Symfony\Foundation\Kernel;
 
 /*
- * This file is part of the symfony framework.
+ * This file is part of the Symfony framework.
  *
  * (c) Fabien Potencier <fabien.potencier@symfony-project.com>
  *
@@ -14,9 +14,10 @@ use Symfony\Foundation\Kernel;
  */
 
 /**
- * 
+ * ConfigDataCollector.
  *
- * @package    symfony
+ * @package    Symfony
+ * @subpackage Framework_ProfilerBundle
  * @author     Fabien Potencier <fabien.potencier@symfony-project.com>
  */
 class ConfigDataCollector extends DataCollector

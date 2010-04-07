@@ -39,7 +39,7 @@ class RequestTest extends \PHPUnit_Framework_TestCase
     $request->setParameters(null, null, array('foo' => 'bar'));
     $this->assertEquals('bar', $request->getPathParameter('foo'), '->setParameter() takes an array of path parameters as its thrid argument');
 
-    $request->setParameters(null, null, null, array('HTTP_FOO' => 'bar'));
+    $request->setParameters(null, null, null, null, null, array('HTTP_FOO' => 'bar'));
     $this->assertEquals('bar', $request->getHttpHeader('foo'), '->setParameter() takes an array of HTTP headers as its fourth argument');
   }
 
@@ -48,7 +48,7 @@ class RequestTest extends \PHPUnit_Framework_TestCase
    */
   public function testDuplicate()
   {
-    $request = new Request(array('foo' => 'bar'), array('foo' => 'bar'), array('foo' => 'bar'), array('HTTP_FOO' => 'bar'));
+    $request = new Request(array('foo' => 'bar'), array('foo' => 'bar'), array('foo' => 'bar'), array(), array(), array('HTTP_FOO' => 'bar'));
     $dup = $request->duplicate();
 
     $this->assertEquals($request->getQueryParameters(), $dup->getQueryParameters(), '->duplicate() duplicates a request an copy the current query parameters');
@@ -56,7 +56,7 @@ class RequestTest extends \PHPUnit_Framework_TestCase
     $this->assertEquals($request->getPathParameters(), $dup->getPathParameters(), '->duplicate() duplicates a request an copy the current path parameters');
     $this->assertEquals($request->getHttpHeader('foo'), $dup->getHttpHeader('foo'), '->duplicate() duplicates a request an copy the current HTTP headers');
 
-    $dup = $request->duplicate(array('foo' => 'foobar'), array('foo' => 'foobar'), array('foo' => 'foobar'), array('HTTP_FOO' => 'foobar'));
+    $dup = $request->duplicate(array('foo' => 'foobar'), array('foo' => 'foobar'), array('foo' => 'foobar'), array(), array(), array('HTTP_FOO' => 'foobar'));
 
     $this->assertEquals(array('foo' => 'foobar'), $dup->getQueryParameters(), '->duplicate() overrides the query parameters if provided');
     $this->assertEquals(array('foo' => 'foobar'), $dup->getRequestParameters(), '->duplicate() overrides the request parameters if provided');

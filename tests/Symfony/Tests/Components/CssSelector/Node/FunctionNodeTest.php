@@ -23,7 +23,7 @@ class FunctionNodeTest extends \PHPUnit_Framework_TestCase
 
     // h1:contains("foo")
     $function = new FunctionNode($element, ':', 'contains', 'foo');
-    $this->assertEquals("h1[contains(css:lower-case(string(.)), 'foo')]", (string) $function->toXpath(), '->toXpath() returns the xpath representation of the node');
+    $this->assertEquals("h1[contains(string(.), 'foo')]", (string) $function->toXpath(), '->toXpath() returns the xpath representation of the node');
 
     // h1:nth-child(1)
     $function = new FunctionNode($element, ':', 'nth-child', 1);

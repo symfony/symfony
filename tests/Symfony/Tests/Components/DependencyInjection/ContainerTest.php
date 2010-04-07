@@ -170,7 +170,7 @@ class ContainerTest extends \PHPUnit_Framework_TestCase
       $sc->getFooBar_Foo();
       $this->fail('__call() throws a \RuntimeException exception if the method is not a service method');
     }
-    catch (\RuntimeException $e)
+    catch (\BadMethodCallException $e)
     {
     }
   }

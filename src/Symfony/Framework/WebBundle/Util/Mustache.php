@@ -34,6 +34,11 @@ class Mustache
   {
     foreach (new \RecursiveIteratorIterator(new \RecursiveDirectoryIterator($dir), \RecursiveIteratorIterator::LEAVES_ONLY) as $file)
     {
+      if ($file->isDot())
+      {
+        continue;
+      }
+
       static::renderFile((string) $file, $parameters);
     }
   }

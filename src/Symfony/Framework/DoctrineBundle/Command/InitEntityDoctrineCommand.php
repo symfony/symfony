@@ -103,9 +103,9 @@ Now you have a new entity and your database has been updated.
     </entity>
 
 </doctrine-mapping>',
-    $fullEntityClassName,
-    str_replace('\\', '_', strtolower($entity))
-  );
+      $fullEntityClassName,
+      str_replace('\\', '_', strtolower($entity))
+    );
 
     if (!is_dir($dir = dirname($path)))
     {

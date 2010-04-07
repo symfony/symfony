@@ -53,8 +53,8 @@ class XmlFileLoader extends FileLoader
       switch ($node->tagName)
       {
         case 'route':
-         $this->parseRoute($collection, $node, $path);
-         break;
+          $this->parseRoute($collection, $node, $path);
+          break;
         case 'import':
           $this->parseImport($collection, $node, $path);
           break;

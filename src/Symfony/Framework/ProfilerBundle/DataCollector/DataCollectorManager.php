@@ -6,6 +6,7 @@ use Symfony\Components\DependencyInjection\ContainerInterface;
 use Symfony\Components\EventDispatcher\Event;
 use Symfony\Components\RequestHandler\Response;
 use Symfony\Framework\ProfilerBundle\ProfilerStorage;
+use Symfony\Foundation\LoggerInterface;
 
 /*
  * This file is part of the Symfony framework.
@@ -31,7 +32,7 @@ class DataCollectorManager
   protected $response;
   protected $lifetime;
 
-  public function __construct(ContainerInterface $container, ProfilerStorage $profilerStorage, $lifetime = 86400)
+  public function __construct(ContainerInterface $container, LoggerInterface $logger, ProfilerStorage $profilerStorage, $lifetime = 86400)
   {
     $this->container = $container;
     $this->lifetime = $lifetime;
@@ -58,8 +59,16 @@ class DataCollectorManager
     {
       $data[$name] = $collector->getData();
     }
-    $this->profilerStorage->write($data);
-    $this->profilerStorage->purge($this->lifetime);
+
+    try
+    {
+      $this->profilerStorage->write($data);
+      $this->profilerStorage->purge($this->lifetime);
+    }
+    catch (\Exception $e)
+    {
+      $this->logger->err('Unable to store the profiler information.');
+    }
 
     return $response;
   }

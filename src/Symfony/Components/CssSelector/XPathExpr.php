@@ -38,6 +38,21 @@ class XPathExpr
     $this->starPrefix = $starPrefix;
   }
 
+  public function getPrefix()
+  {
+    return $this->prefix;
+  }
+
+  public function getPath()
+  {
+    return $this->path;
+  }
+
+  public function hasStarPrefix()
+  {
+    return $this->starPrefix;
+  }
+
   public function getElement()
   {
     return $this->element;
@@ -130,18 +145,18 @@ class XPathExpr
     $prefix = (string) $this;
 
     $prefix .= $combiner;
-    $path = $other->prefix.$other->path;
+    $path = $other->getPrefix().$other->getPath();
 
     /* We don't need a star prefix if we are joining to this other
        prefix; so we'll get rid of it */
-    if ($other->starPrefix && $path == '*/')
+    if ($other->hasStarPrefix() && $path == '*/')
     {
       $path = '';
     }
     $this->prefix = $prefix;
     $this->path = $path;
-    $this->element = $other->element;
-    $this->condition = $other->condition;
+    $this->element = $other->getElement();
+    $this->condition = $other->GetCondition();
   }
 
   static public function xpathLiteral($s)

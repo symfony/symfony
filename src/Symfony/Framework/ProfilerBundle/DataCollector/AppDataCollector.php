@@ -25,7 +25,7 @@ class AppDataCollector extends DataCollector
     $request = $this->container->getRequestService();
 
     return array(
-      'route'        => $request->getPathParameter('_route') ? $request->getPathParameter('_route') : '<span style="color: #a33">NONE</span>',
+      'route'        => $request->path->get('_route') ? $request->path->get('_route') : '<span style="color: #a33">NONE</span>',
       'format'       => $request->getRequestFormat(),
       'content_type' => $this->manager->getResponse()->getHeader('Content-Type') ? $this->manager->getResponse()->getHeader('Content-Type') : 'text/html',
       'code'         => $this->manager->getResponse()->getStatusCode(),

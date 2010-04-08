@@ -52,7 +52,7 @@ class RequestParser
 
     $this->container->setParameter('request.base_path', $request->getBasePath());
 
-    if ($request->getPathParameter('_bundle'))
+    if ($request->path->get('_bundle'))
     {
       return;
     }
@@ -71,7 +71,7 @@ class RequestParser
         $this->logger->info(sprintf('Matched route "%s" (parameters: %s)', $parameters['_route'], str_replace("\n", '', var_export($parameters, true))));
       }
 
-      $request->setPathParameters($parameters);
+      $request->path->replace($parameters);
     }
     elseif (null !== $this->logger)
     {

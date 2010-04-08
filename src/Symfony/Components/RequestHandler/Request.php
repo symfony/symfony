@@ -17,7 +17,7 @@ namespace Symfony\Components\RequestHandler;
  * After initialization, the request is read-only. The only writable
  * values are the query ones (mostly by the router).
  *
- * You can reinitialize the request by calling the setParameters() method.
+ * You can reinitialize the request by calling the initialize() method.
  *
  * @package    Symfony
  * @subpackage Components_RequestHandler
@@ -25,12 +25,14 @@ namespace Symfony\Components\RequestHandler;
  */
 class Request implements RequestInterface
 {
-  protected $pathParameters;
-  protected $requestParameters;
-  protected $queryParameters;
-  protected $serverParameters;
-  protected $filesParameters;
-  protected $cookiesParameters;
+  public $path;
+  public $request;
+  public $query;
+  public $server;
+  public $files;
+  public $cookies;
+  public $headers;
+
   protected $languages;
   protected $charsets;
   protected $acceptableContentTypes;
@@ -56,7 +58,7 @@ class Request implements RequestInterface
    */
   public function __construct(array $query = null, array $request = null, array $path = null, array $cookies = null, array $files = null, array $server = null)
   {
-    $this->setParameters($request, $query, $path, $cookies, $files, $server);
+    $this->initialize($request, $query, $path, $cookies, $files, $server);
   }
 
   /**
@@ -71,14 +73,15 @@ class Request implements RequestInterface
    * @param array $files   The FILES parameters
    * @param array $server  The SERVER parameters
    */
-  public function setParameters(array $query = null, array $request = null, array $path = null, array $cookies = null, array $files = null, array $server = null)
+  public function initialize(array $query = null, array $request = null, array $path = null, array $cookies = null, array $files = null, array $server = null)
   {
-    $this->requestParameters = null !== $request ? $request : $_POST;
-    $this->queryParameters = null !== $query ? $query : $_GET;
-    $this->pathParameters = null !== $path ? $path : array();
-    $this->cookiesParameters = null !== $cookies ? $cookies : $_COOKIE;
-    $this->filesParameters = self::convertFileInformation(null !== $files ? $files : $_FILES);
-    $this->serverParameters = null !== $server ? $server : $_SERVER;
+    $this->request = new RequestBag(null !== $request ? $request : $_POST);
+    $this->query = new RequestBag(null !== $query ? $query : $_GET);
+    $this->path = new RequestBag(null !== $path ? $path : array());
+    $this->cookies = new RequestBag(null !== $cookies ? $cookies : $_COOKIE);
+    $this->files = new RequestBag(self::convertFileInformation(null !== $files ? $files : $_FILES));
+    $this->server = new RequestBag(null !== $server ? $server : $_SERVER);
+    $this->headers = new RequestBag($this->initializeHeaders());
 
     $this->languages = null;
     $this->charsets = null;
@@ -157,13 +160,13 @@ class Request implements RequestInterface
   public function duplicate(array $query = null, array $request = null, array $path = null, array $cookies = null, array $files = null, array $server = null)
   {
     $dup = clone $this;
-    $dup->setParameters(
-      null !== $query ? $query : $this->queryParameters,
-      null !== $request ? $request : $this->requestParameters,
-      null !== $path ? $path : $this->pathParameters,
-      null !== $cookies ? $cookies : $this->cookiesParameters,
-      null !== $files ? $files : $this->filesParameters,
-      null !== $server ? $server : $this->serverParameters
+    $dup->initialize(
+      null !== $query ? $query : $this->query->all(),
+      null !== $request ? $request : $this->request->all(),
+      null !== $path ? $path : $this->path->all(),
+      null !== $cookies ? $cookies : $this->cookies->all(),
+      null !== $files ? $files : $this->files->all(),
+      null !== $server ? $server : $this->server->all()
     );
 
     return $dup;
@@ -174,153 +177,9 @@ class Request implements RequestInterface
   //  * slow
   //  * prefer to get from a "named" source
   // This method is mainly useful for libraries that want to provide some flexibility
-  public function getParameter($key, $default = null)
+  public function get($key, $default = null)
   {
-    return $this->getQueryParameter($key, $this->getPathParameter($key, $this->getRequestParameter($key, $default)));
-  }
-
-  /**
-   * Returns the server parameters ($_SERVER).
-   *
-   * @return array An array of server parameters
-   */
-  public function getServerParameters()
-  {
-    return $this->serverParameters;
-  }
-
-  /**
-   * Returns a server parameter ($_SERVER).
-   *
-   * @param string $key     The key
-   * @param mixed  $default The default value
-   */
-  public function getServerParameter($key, $default = null)
-  {
-    return isset($this->serverParameters[$key]) ? $this->serverParameters[$key] : $default;
-  }
-
-  /**
-   * Returns the path parameters.
-   *
-   * @return array An array of path parameters
-   */
-  public function getPathParameters()
-  {
-    return $this->pathParameters;
-  }
-
-  /**
-   * Sets the path parameters.
-   *
-   * @param array An array of path parameters
-   */
-  public function setPathParameters(array $parameters)
-  {
-    $this->pathParameters = $parameters;
-  }
-
-  /**
-   * Returns a path parameter.
-   *
-   * @param string $key     The key
-   * @param mixed  $default The default value
-   */
-  public function getPathParameter($key, $default = null)
-  {
-    return isset($this->pathParameters[$key]) ? $this->pathParameters[$key] : $default;
-  }
-
-  /**
-   * Returns the request parameters ($_POST).
-   *
-   * @return array An array of request parameters
-   */
-  public function getRequestParameters()
-  {
-    return $this->requestParameters;
-  }
-
-  /**
-   * Returns a request parameter ($_POST).
-   *
-   * @param string $key     The server key
-   * @param mixed  $default The default value
-   */
-  public function getRequestParameter($key, $default = null)
-  {
-    return isset($this->requestParameters[$key]) ? $this->requestParameters[$key] : $default;
-  }
-
-  /**
-   * Returns the query parameters ($_GET).
-   *
-   * @return array An array of query parameters
-   */
-  public function getQueryParameters()
-  {
-    return $this->queryParameters;
-  }
-
-  /**
-   * Returns a query parameter ($_GET).
-   *
-   * @param string $key     The server key
-   * @param mixed  $default The default value
-   */
-  public function getQueryParameter($key, $default = null)
-  {
-    return isset($this->queryParameters[$key]) ? $this->queryParameters[$key] : $default;
-  }
-
-  /**
-   * Returns a cookie value ($_COOKIE).
-   *
-   * @param string $key    The key
-   * @param mixed  $default The default value
-   *
-   * @return mixed The cookie value
-   */
-  public function getCookie($key, $default = null)
-  {
-    return isset($this->cookiesParameters[$key]) ? $cookiesParameters[$key] : $default;
-  }
-
-  /**
-   * Returns the array of cookies ($_COOKIE).
-   *
-   * @param array An array of cookies
-   */
-  public function getCookies()
-  {
-    return $this->cookiesParameters;
-  }
-
-  /**
-   * Returns a file from the request ($_FILES).
-   *
-   * @param  string $key A key
-   *
-   * @return array The associated file
-   */
-  public function getFile($key)
-  {
-    return isset($this->filesParameters[$key]) ? $this->filesParameters[$key] : array();
-  }
-
-  /**
-   * Returns the array of files ($_FILES).
-   *
-   * @return array An associative array of files
-   */
-  public function getFiles()
-  {
-    return $this->filesParameters;
-  }
-
-  public function getHttpHeader($name, $default = null)
-  {
-    return $this->getServerParameter('HTTP_'.strtoupper(strtr($name, '-', '_')), $default);
+    return $this->query->get($key, $this->path->get($key, $this->request->get($key, $default)));
   }
 
   /**
@@ -330,7 +189,7 @@ class Request implements RequestInterface
    */
   public function getScriptName()
   {
-    return $this->getServerParameter('SCRIPT_NAME', $this->getServerParameter('ORIG_SCRIPT_NAME', ''));
+    return $this->server->get('SCRIPT_NAME', $this->server->get('ORIG_SCRIPT_NAME', ''));
   }
 
   public function getPathInfo()
@@ -365,20 +224,20 @@ class Request implements RequestInterface
 
   public function getScheme()
   {
-    return ($this->getServerParameter('HTTPS') == 'on') ? 'https' : 'http';
+    return ($this->server->get('HTTPS') == 'on') ? 'https' : 'http';
   }
 
   public function getHttpHost()
   {
-    $host = $this->getServerParameter('HTTP_HOST');
+    $host = $this->headers->get('HOST');
     if (!empty($host))
     {
       return $host;
     }
 
     $scheme = $this->getScheme();
-    $name   = $this->getServerParameter('SERVER_NAME');
-    $port   = $this->getServerParameter('SERVER_PORT');
+    $name   = $this->server->get('SERVER_NAME');
+    $port   = $this->server->get('SERVER_PORT');
 
     if (($scheme === 'http' && $port === 80) || ($scheme === 'https' && $port === 443))
     {
@@ -403,11 +262,11 @@ class Request implements RequestInterface
   public function isSecure()
   {
     return (
-      (strtolower($this->getServerParameter('HTTPS')) == 'on' || $this->getServerParameter('HTTPS') == 1)
+      (strtolower($this->server->get('HTTPS')) == 'on' || $this->server->get('HTTPS') == 1)
       ||
-      (strtolower($this->getServerParameter('HTTP_SSL_HTTPS')) == 'on' || $this->getServerParameter('HTTP_SSL_HTTPS') == 1)
+      (strtolower($this->server->get('HTTP_SSL_HTTPS')) == 'on' || $this->server->get('HTTP_SSL_HTTPS') == 1)
       ||
-      (strtolower($this->getServerParameter('HTTP_X_FORWARDED_PROTO')) == 'https')
+      (strtolower($this->server->get('HTTP_X_FORWARDED_PROTO')) == 'https')
     );
   }
 
@@ -418,7 +277,7 @@ class Request implements RequestInterface
    */
   public function getHost()
   {
-    if ($host = $this->getServerParameter('HTTP_X_FORWARDED_HOST'))
+    if ($host = $this->server->get('HTTP_X_FORWARDED_HOST'))
     {
       $elements = implode(',', $host);
 
@@ -426,7 +285,7 @@ class Request implements RequestInterface
     }
     else
     {
-      return $this->getServerParameter('HTTP_HOST', $this->getServerParameter('SERVER_NAME', $this->getServerParameter('SERVER_ADDR', '')));
+      return $this->server->get('HTTP_HOST', $this->server->get('SERVER_NAME', $this->server->get('SERVER_ADDR', '')));
     }
   }
 
@@ -439,10 +298,10 @@ class Request implements RequestInterface
   {
     if (null === $this->method)
     {
-      switch ($this->getServerParameter('REQUEST_METHOD', 'GET'))
+      switch ($this->server->get('REQUEST_METHOD', 'GET'))
       {
         case 'POST':
-          $this->method = strtoupper($this->getRequestParameter('_method', 'POST'));
+          $this->method = strtoupper($this->request->get('_method', 'POST'));
           break;
 
         case 'PUT':
@@ -538,7 +397,7 @@ class Request implements RequestInterface
   {
     if (null === $this->format)
     {
-      $this->format = $this->getParameter('_format', 'html');
+      $this->format = $this->get('_format', 'html');
     }
 
     return $this->format;
@@ -582,7 +441,7 @@ class Request implements RequestInterface
       return $this->languages;
     }
 
-    $languages = $this->splitHttpAcceptHeader($this->getHttpHeader('ACCEPT_LANGUAGE'));
+    $languages = $this->splitHttpAcceptHeader($this->headers->get('ACCEPT_LANGUAGE'));
     foreach ($languages as $lang)
     {
       if (strstr($lang, '-'))
@@ -632,7 +491,7 @@ class Request implements RequestInterface
       return $this->charsets;
     }
 
-    return $this->charsets = $this->splitHttpAcceptHeader($this->getHttpHeader('ACCEPT_CHARSET'));
+    return $this->charsets = $this->splitHttpAcceptHeader($this->headers->get('ACCEPT_CHARSET'));
   }
 
   /**
@@ -647,7 +506,7 @@ class Request implements RequestInterface
       return $this->acceptableContentTypes;
     }
 
-    return $this->acceptableContentTypes = $this->splitHttpAcceptHeader($this->getHttpHeader('ACCEPT'));
+    return $this->acceptableContentTypes = $this->splitHttpAcceptHeader($this->headers->get('ACCEPT'));
   }
 
   /**
@@ -660,7 +519,7 @@ class Request implements RequestInterface
    */
   public function isXmlHttpRequest()
   {
-    return 'XMLHttpRequest' == $this->getHttpHeader('X_REQUESTED_WITH');
+    return 'XMLHttpRequest' == $this->headers->get('X_REQUESTED_WITH');
   }
 
   /**
@@ -709,38 +568,33 @@ class Request implements RequestInterface
   {
     $requestUri = '';
 
-    if (isset($this->serverParameters['HTTP_X_REWRITE_URL']))
+    if ($this->headers->has('X_REWRITE_URL'))
     {
       // check this first so IIS will catch
-      $requestUri = $this->serverParameters['HTTP_X_REWRITE_URL'];
+      $requestUri = $this->headers->get('X_REWRITE_URL');
     }
-    elseif (
-        // IIS7 with URL Rewrite: make sure we get the unencoded url (double slash problem)
-        isset($this->serverParameters['IIS_WasUrlRewritten'])
-        && $this->serverParameters['IIS_WasUrlRewritten'] == '1'
-        && isset($this->serverParameters['UNENCODED_URL'])
-        && $this->serverParameters['UNENCODED_URL'] != ''
-        )
+    elseif ($this->server->get('IIS_WasUrlRewritten') == '1' && $this->server->get('UNENCODED_URL') != '')
     {
-      $requestUri = $this->serverParameters['UNENCODED_URL'];
+      // IIS7 with URL Rewrite: make sure we get the unencoded url (double slash problem)
+      $requestUri = $this->server->get('UNENCODED_URL');
     }
-    elseif (isset($this->serverParameters['REQUEST_URI']))
+    elseif ($this->server->has('REQUEST_URI'))
     {
-      $requestUri = $this->serverParameters['REQUEST_URI'];
-      // Http proxy reqs setup request uri with scheme and host [and port] + the url path, only use url path
-      $schemeAndHttpHost = $this->getScheme() . '://' . $this->getHttpHost();
+      $requestUri = $this->server->get('REQUEST_URI');
+      // HTTP proxy reqs setup request uri with scheme and host [and port] + the url path, only use url path
+      $schemeAndHttpHost = $this->getScheme().'://'.$this->getHttpHost();
       if (strpos($requestUri, $schemeAndHttpHost) === 0)
       {
         $requestUri = substr($requestUri, strlen($schemeAndHttpHost));
       }
     }
-    elseif (isset($this->serverParameters['ORIG_PATH_INFO']))
+    elseif ($this->server->has('ORIG_PATH_INFO'))
     {
       // IIS 5.0, PHP as CGI
-      $requestUri = $this->serverParameters['ORIG_PATH_INFO'];
-      if (!empty($this->serverParameters['QUERY_STRING']))
+      $requestUri = $this->server->get('ORIG_PATH_INFO');
+      if ($this->server->get('QUERY_STRING'))
       {
-        $requestUri .= '?' . $this->serverParameters['QUERY_STRING'];
+        $requestUri .= '?'.$this->server->get('QUERY_STRING');
       }
     }
 
@@ -751,26 +605,26 @@ class Request implements RequestInterface
   {
     $baseUrl = '';
 
-    $filename = (isset($this->serverParameters['SCRIPT_FILENAME'])) ? basename($this->serverParameters['SCRIPT_FILENAME']) : '';
+    $filename = basename($this->server->get('SCRIPT_FILENAME'));
 
-    if (isset($this->serverParameters['SCRIPT_NAME']) && basename($this->serverParameters['SCRIPT_NAME']) === $filename)
+    if (basename($this->server->get('SCRIPT_NAME')) === $filename)
     {
-      $baseUrl = $this->serverParameters['SCRIPT_NAME'];
+      $baseUrl = $this->server->get('SCRIPT_NAME');
     }
-    elseif (isset($this->serverParameters['PHP_SELF']) && basename($this->serverParameters['PHP_SELF']) === $filename)
+    elseif (basename($this->server->get('PHP_SELF')) === $filename)
     {
-      $baseUrl = $this->serverParameters['PHP_SELF'];
+      $baseUrl = $this->server->get('PHP_SELF');
     }
-    elseif (isset($this->serverParameters['ORIG_SCRIPT_NAME']) && basename($this->serverParameters['ORIG_SCRIPT_NAME']) === $filename)
+    elseif (basename($this->server->get('ORIG_SCRIPT_NAME')) === $filename)
     {
-      $baseUrl = $this->serverParameters['ORIG_SCRIPT_NAME']; // 1and1 shared hosting compatibility
+      $baseUrl = $this->server->get('ORIG_SCRIPT_NAME'); // 1and1 shared hosting compatibility
     }
     else
     {
       // Backtrack up the script_filename to find the portion matching
       // php_self
-      $path    = isset($this->serverParameters['PHP_SELF']) ? $this->serverParameters['PHP_SELF'] : '';
-      $file    = isset($this->serverParameters['SCRIPT_FILENAME']) ? $this->serverParameters['SCRIPT_FILENAME'] : '';
+      $path    = $this->server->get('PHP_SELF', '');
+      $file    = $this->server->get('SCRIPT_FILENAME', '');
       $segs    = explode('/', trim($file, '/'));
       $segs    = array_reverse($segs);
       $index   = 0;
@@ -779,7 +633,7 @@ class Request implements RequestInterface
       do
       {
         $seg     = $segs[$index];
-        $baseUrl = '/' . $seg . $baseUrl;
+        $baseUrl = '/'.$seg.$baseUrl;
         ++$index;
       } while (($last > $index) && (false !== ($pos = strpos($path, $baseUrl))) && (0 != $pos));
     }
@@ -826,7 +680,7 @@ class Request implements RequestInterface
   protected function prepareBasePath()
   {
     $basePath = '';
-    $filename = (isset($this->serverParameters['SCRIPT_FILENAME'])) ? basename($this->serverParameters['SCRIPT_FILENAME']) : '';
+    $filename = basename($this->server->get('SCRIPT_FILENAME'));
     $baseUrl = $this->getBaseUrl();
     if (empty($baseUrl))
     {
@@ -898,6 +752,20 @@ class Request implements RequestInterface
     }
 
     return $files;
+  }
+
+  protected function initializeHeaders()
+  {
+    $headers = array();
+    foreach ($this->server->all() as $key => $value)
+    {
+      if ('HTTP_' === substr($key, 0, 5))
+      {
+        $headers[strtoupper(strtr(substr($key, 5), '-', '_'))] = $value;
+      }
+    }
+
+    return $headers;
   }
 
   static protected function initializeFormats()

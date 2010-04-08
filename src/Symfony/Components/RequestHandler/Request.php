@@ -591,7 +591,7 @@ class Request implements RequestInterface
         if ($codes[0] == 'i')
         {
           // Language not listed in ISO 639 that are not variants
-          // of any listed language, which can be registerd with the
+          // of any listed language, which can be registered with the
           // i-prefix, such as i-cherokee
           if (count($codes) > 1)
           {
@@ -767,21 +767,21 @@ class Request implements RequestInterface
     }
     else
     {
-        // Backtrack up the script_filename to find the portion matching
-        // php_self
-        $path    = isset($this->serverParameters['PHP_SELF']) ? $this->serverParameters['PHP_SELF'] : '';
-        $file    = isset($this->serverParameters['SCRIPT_FILENAME']) ? $this->serverParameters['SCRIPT_FILENAME'] : '';
-        $segs    = explode('/', trim($file, '/'));
-        $segs    = array_reverse($segs);
-        $index   = 0;
-        $last    = count($segs);
-        $baseUrl = '';
-        do
-        {
-          $seg     = $segs[$index];
-          $baseUrl = '/' . $seg . $baseUrl;
-          ++$index;
-        } while (($last > $index) && (false !== ($pos = strpos($path, $baseUrl))) && (0 != $pos));
+      // Backtrack up the script_filename to find the portion matching
+      // php_self
+      $path    = isset($this->serverParameters['PHP_SELF']) ? $this->serverParameters['PHP_SELF'] : '';
+      $file    = isset($this->serverParameters['SCRIPT_FILENAME']) ? $this->serverParameters['SCRIPT_FILENAME'] : '';
+      $segs    = explode('/', trim($file, '/'));
+      $segs    = array_reverse($segs);
+      $index   = 0;
+      $last    = count($segs);
+      $baseUrl = '';
+      do
+      {
+        $seg     = $segs[$index];
+        $baseUrl = '/' . $seg . $baseUrl;
+        ++$index;
+      } while (($last > $index) && (false !== ($pos = strpos($path, $baseUrl))) && (0 != $pos));
     }
 
     // Does the baseUrl have anything in common with the request_uri?

@@ -11,6 +11,7 @@
 namespace Symfony\Tests\Components\Console\Command;
 
 use Symfony\Components\Console\Command\Command;
+use Symfony\Components\Console\Helper\FormatterHelper;
 use Symfony\Components\Console\Application;
 use Symfony\Components\Console\Input\InputDefinition;
 use Symfony\Components\Console\Input\InputArgument;
@@ -83,7 +84,7 @@ class CommandTest extends \PHPUnit_Framework_TestCase
     $this->assertTrue($command->getDefinition()->hasOption('foo'), '->addOption() adds an option to the command');
   }
 
-  public function testgetNamespaceGetNameGetFullNameSetName()
+  public function testGetNamespaceGetNameGetFullNameSetName()
   {
     $command = new \TestCommand();
     $this->assertEquals('namespace', $command->getNamespace(), '->getNamespace() returns the command namespace');
@@ -153,6 +154,24 @@ class CommandTest extends \PHPUnit_Framework_TestCase
     $command->addOption('foo');
     $command->addArgument('foo');
     $this->assertEquals('namespace:name [--foo] [foo]', $command->getSynopsis(), '->getSynopsis() returns the synopsis');
+  }
+
+  public function testGetHelper()
+  {
+    $application = new Application();
+    $command = new \TestCommand();
+    $command->setApplication($application);
+    $formatterHelper = new FormatterHelper();
+    $this->assertEquals($formatterHelper->getName(), $command->getHelper('formatter')->getName(), '->getHelper() returns the correct helper');
+  }
+
+  public function testGet()
+  {
+    $application = new Application();
+    $command = new \TestCommand();
+    $command->setApplication($application);
+    $formatterHelper = new FormatterHelper();
+    $this->assertEquals($formatterHelper->getName(), $command->formatter->getName(), '->__get() returns the correct helper');
   }
 
   public function testMergeApplicationDefinition()

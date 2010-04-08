@@ -35,4 +35,10 @@ class TestCommand extends Command
   {
     $output->writeln('interact called');
   }
+
+  public function getHelper($name)
+  {
+    return parent::getHelper($name);
+  }
+
 }

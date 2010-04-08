@@ -140,6 +140,10 @@ abstract class Kernel implements \Serializable
     {
       $request = $this->container->getRequestService();
     }
+    else
+    {
+      $this->container->setService('request', $request);
+    }
 
     return $this->container->getRequestHandlerService()->handle($request);
   }

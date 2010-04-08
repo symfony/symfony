@@ -40,8 +40,8 @@ abstract class GetterDecorator extends Escaper
    * Typically (using this implementation) the raw value is obtained using the
    * {@link getRaw()} method, escaped and the result returned.
    *
-   * @param  string $key             The key to retieve
-   * @param  string $escaper  The escaping method (a PHP function) to use
+   * @param  string $key     The key to retrieve
+   * @param  string $escaper The escaping method (a PHP function) to use
    *
    * @return mixed The escaped value
    */

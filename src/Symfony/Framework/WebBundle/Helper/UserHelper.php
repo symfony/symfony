@@ -39,7 +39,7 @@ class UserHelper extends Helper
    * Returns a user attribute
    *
    * @param string $name    The attribute name
-   * @param mixed  $default The defaut value
+   * @param mixed  $default The default value
    *
    * @return mixed
    */

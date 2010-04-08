@@ -193,14 +193,14 @@ class Container implements ContainerInterface, \ArrayAccess
       throw new \InvalidArgumentException(sprintf('A service id should be a string (%s given).', str_replace("\n", '', var_export($id, true))));
     }
 
-    if (method_exists($this, $method = 'get'.strtr($id, array('_' => '', '.' => '_')).'Service') && 'getService' !== $method)
-    {
-      return $this->$method();
-    }
-
     if (isset($this->services[$id]))
     {
       return $this->services[$id];
+    }
+
+    if (method_exists($this, $method = 'get'.strtr($id, array('_' => '', '.' => '_')).'Service') && 'getService' !== $method)
+    {
+      return $this->$method();
     }
 
     if (self::EXCEPTION_ON_INVALID_REFERENCE === $invalidBehavior)

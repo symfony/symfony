@@ -57,4 +57,17 @@ class PhpDumperTest extends \PHPUnit_Framework_TestCase
     {
     }
   }
+
+  public function testOverrideServiceWhenUsingADumpedContainer()
+  {
+    require_once self::$fixturesPath.'/php/services9.php';
+    require_once self::$fixturesPath.'/includes/foo.php';
+
+    $container = new \ProjectServiceContainer();
+    $container->setService('bar', $bar = new \stdClass());
+    $container->setParameter('foo_bar', 'foo_bar');
+
+    $this->assertEquals($bar, $container->getBarService(), '->setService() overrides an already defined service');
+    $this->assertEquals($bar, $container->getService('bar'), '->setService() overrides an already defined service');
+  }
 }

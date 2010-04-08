@@ -126,7 +126,7 @@ class ContainerTest extends \PHPUnit_Framework_TestCase
     $this->assertTrue($sc->hasService('bar'), '->hasService() returns true if the service has been defined as a getXXXService() method');
 
     $sc->setService('bar', $bar = new \stdClass());
-    $this->assertNotEquals(spl_object_hash($sc->getService('bar')), spl_object_hash($bar), '->getService() prefers to return a service defined with a getXXXService() method than one defined with setService()');
+    $this->assertEquals(spl_object_hash($sc->getService('bar')), spl_object_hash($bar), '->getService() prefers to return a service defined with a getXXXService() method than one defined with setService()');
 
     try
     {

@@ -23,7 +23,7 @@ do the following:
       user: root
       password: ~
 
-Or if you want to use XML instead of YAMl it would like like this:
+Or if you want to use XML instead of YAMl it would look like this:
 
     <doctrine:dbal dbname="symfony_guestbook" user="root" password="" />
 
@@ -178,7 +178,7 @@ commands we need to make working with Doctrine 2 just as easy and fast as before
 
 ### Schema Tool
 
-The schema tool in Doctrine 2 allows you to easily drop and your create your 
+The schema tool in Doctrine 2 allows you to easily drop and create your 
 database schemas for your mapping information.
 
 You can easily create your initial schema from mapping information:

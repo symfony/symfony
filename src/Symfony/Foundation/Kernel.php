@@ -312,7 +312,7 @@ abstract class Kernel implements \Serializable
 
     if ($this->debug)
     {
-      // add the Kernel class hierachy as resources
+      // add the Kernel class hierarchy as resources
       $parent = new \ReflectionObject($this);
       $configuration->addResource(new FileResource($parent->getFileName()));
       while ($parent = $parent->getParentClass())

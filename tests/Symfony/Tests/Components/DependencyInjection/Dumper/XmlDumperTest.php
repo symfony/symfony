@@ -32,7 +32,7 @@ class XmlDumperTest extends \PHPUnit_Framework_TestCase
     $dumper = new XmlDumper($container);
   }
 
-  public function testAddParemeters()
+  public function testAddParameters()
   {
     $container = include self::$fixturesPath.'//containers/container8.php';
     $dumper = new XmlDumper($container);

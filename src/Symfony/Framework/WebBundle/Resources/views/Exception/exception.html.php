@@ -4,7 +4,7 @@
     <meta http-equiv="Content-Type" content="text/html; charset=<?php echo $charset ?>"/>
     <title><?php echo htmlspecialchars($message, ENT_QUOTES, $charset) ?> (<?php echo $code ?> <?php echo $text ?>)</title>
     <style type="text/css">
-    body { margin: 0; padding: 0px; margin-top: 30px; background-color: #eee }
+    body { margin: 0; padding: 0; margin-top: 30px; background-color: #eee }
     body, td, th { font: 11px Verdana, Arial, sans-serif; color: #333 }
     a { color: #333 }
     h1 { margin: 0; margin-top: 4px; font-weight: normal; font-size: 170%; letter-spacing: -0.03em; }

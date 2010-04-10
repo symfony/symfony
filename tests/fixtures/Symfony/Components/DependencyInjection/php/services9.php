@@ -153,11 +153,11 @@ class ProjectServiceContainer extends Container
   public function findAnnotatedServiceIds($name)
   {
     static $annotations = array (
-  'foo' => 
+  'foo' =>
   array (
-    'foo' => 
+    'foo' =>
     array (
-      0 => 
+      0 =>
       array (
         'foo' => 'foo',
       ),

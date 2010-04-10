@@ -1,4 +1,4 @@
-<?php 
+<?php
 
 namespace Symfony\Foundation\Bundle;
 
@@ -145,7 +145,7 @@ class KernelExtension extends LoaderExtension
     return $configuration;
   }
 
-  
+
   public function getXsdValidationBasePath()
   {
     return false;
@@ -182,7 +182,7 @@ class ErrorHandler
 
   protected $level;
 
-  
+
   public function __construct($level = null)
   {
     $this->level = null === $level ? error_reporting() : $level;
@@ -193,7 +193,7 @@ class ErrorHandler
     set_error_handler(array($this, 'handle'));
   }
 
-  
+
   public function handle($level, $message, $file, $line, $context)
   {
     if (0 === $this->level)
@@ -218,7 +218,7 @@ namespace Symfony\Foundation;
 
 class ClassCollectionLoader
 {
-  
+
   static public function load($classes, $cacheDir, $name, $autoReload)
   {
     $cache = $cacheDir.'/'.$name.'.php';
@@ -336,7 +336,7 @@ abstract class Kernel implements \Serializable
 
   const VERSION = '2.0.0-DEV';
 
-  
+
   public function __construct($environment, $debug)
   {
     $this->debug = (Boolean) $debug;
@@ -373,13 +373,13 @@ abstract class Kernel implements \Serializable
 
   abstract public function registerRoutes();
 
-  
+
   public function isBooted()
   {
     return $this->booted;
   }
 
-  
+
   public function boot()
   {
     if (true === $this->booted)
@@ -683,7 +683,7 @@ class EventDispatcher extends BaseEventDispatcher
 {
   protected $container;
 
-  
+
   public function __construct(ContainerInterface $container)
   {
     $this->container = $container;
@@ -700,7 +700,7 @@ class EventDispatcher extends BaseEventDispatcher
     }
   }
 
-  
+
   public function getListeners($name)
   {
     if (!isset($this->listeners[$name]))

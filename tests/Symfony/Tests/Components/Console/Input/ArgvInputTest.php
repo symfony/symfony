@@ -51,8 +51,10 @@ class ArgvInputTest extends \PHPUnit_Framework_TestCase
       $input->bind(new InputDefinition(array(new InputOption('foo', 'f', InputOption::PARAMETER_REQUIRED))));
       $this->fail('->parse() throws a \RuntimeException if no parameter is passed to an option when it is required');
     }
-    catch (\RuntimeException $e)
+    catch (\Exception $e)
     {
+      $this->assertType('\RuntimeException', $e, '->parse() throws a \RuntimeException if no parameter is passed to an option when it is required');
+      $this->assertEquals('The "--foo" option requires a value.', $e->getMessage(), '->parse() throws a \RuntimeException if no parameter is passed to an option when it is required');
     }
 
     $input = new TestInput(array('cli.php', '-f'));
@@ -77,8 +79,10 @@ class ArgvInputTest extends \PHPUnit_Framework_TestCase
       $input->bind(new InputDefinition(array(new InputOption('foo', 'f', InputOption::PARAMETER_REQUIRED))));
       $this->fail('->parse() throws a \RuntimeException if no parameter is passed to an option when it is required');
     }
-    catch (\RuntimeException $e)
+    catch (\Exception $e)
     {
+      $this->assertType('\RuntimeException', $e, '->parse() throws a \RuntimeException if no parameter is passed to an option when it is required');
+      $this->assertEquals('The "--foo" option requires a value.', $e->getMessage(), '->parse() throws a \RuntimeException if no parameter is passed to an option when it is required');
     }
 
     try
@@ -87,8 +91,10 @@ class ArgvInputTest extends \PHPUnit_Framework_TestCase
       $input->bind(new InputDefinition(array(new InputOption('foo', 'f', InputOption::PARAMETER_NONE))));
       $this->fail('->parse() throws a \RuntimeException if a value is passed to an option which does not take one');
     }
-    catch (\RuntimeException $e)
+    catch (\Exception $e)
     {
+      $this->assertType('\RuntimeException', $e, '->parse() throws a \RuntimeException if a value is passed to an option which does not take one');
+      $this->assertEquals('The "-o" option does not exist.', $e->getMessage(), '->parse() throws a \RuntimeException if a value is passed to an option which does not take one');
     }
 
     try
@@ -97,8 +103,10 @@ class ArgvInputTest extends \PHPUnit_Framework_TestCase
       $input->bind(new InputDefinition());
       $this->fail('->parse() throws a \RuntimeException if too many arguments are passed');
     }
-    catch (\RuntimeException $e)
+    catch (\Exception $e)
     {
+      $this->assertType('\RuntimeException', $e, '->parse() throws a \RuntimeException if too many arguments are passed');
+      $this->assertEquals('Too many arguments.', $e->getMessage(), '->parse() throws a \RuntimeException if too many arguments are passed');
     }
 
     try
@@ -107,8 +115,10 @@ class ArgvInputTest extends \PHPUnit_Framework_TestCase
       $input->bind(new InputDefinition());
       $this->fail('->parse() throws a \RuntimeException if an unknown long option is passed');
     }
-    catch (\RuntimeException $e)
+    catch (\Exception $e)
     {
+      $this->assertType('\RuntimeException', $e, '->parse() throws a \RuntimeException if an unknown long option is passed');
+      $this->assertEquals('The "--foo" option does not exist.', $e->getMessage(), '->parse() throws a \RuntimeException if an unknown long option is passed');
     }
 
     try
@@ -117,8 +127,10 @@ class ArgvInputTest extends \PHPUnit_Framework_TestCase
       $input->bind(new InputDefinition());
       $this->fail('->parse() throws a \RuntimeException if an unknown short option is passed');
     }
-    catch (\RuntimeException $e)
+    catch (\Exception $e)
     {
+      $this->assertType('\RuntimeException', $e, '->parse() throws a \RuntimeException if an unknown short option is passed');
+      $this->assertEquals('The "-f" option does not exist.', $e->getMessage(), '->parse() throws a \RuntimeException if an unknown short option is passed');
     }
 
     $input = new TestInput(array('cli.php', '-fb'));
@@ -160,7 +172,7 @@ class ArgvInputTest extends \PHPUnit_Framework_TestCase
     $this->assertTrue($input->hasParameterOption('--foo'), '->hasParameterOption() returns true if the given short option is in the raw input');
 
     $input = new TestInput(array('cli.php', 'foo'));
-    $this->assertTrue(!$input->hasParameterOption('--foo'), '->hasParameterOption() returns false if the given short option is not in the raw input');
+    $this->assertFalse($input->hasParameterOption('--foo'), '->hasParameterOption() returns false if the given short option is not in the raw input');
   }
 }
 

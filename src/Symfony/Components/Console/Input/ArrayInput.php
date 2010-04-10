@@ -124,7 +124,7 @@ class ArrayInput extends Input
   {
     if (!$this->definition->hasShortcut($shortcut))
     {
-      throw new \RuntimeException(sprintf('The "-%s" option does not exist.', $shortcut));
+      throw new \InvalidArgumentException(sprintf('The "-%s" option does not exist.', $shortcut));
     }
 
     $this->addLongOption($this->definition->getOptionForShortcut($shortcut)->getName(), $value);
@@ -136,13 +136,14 @@ class ArrayInput extends Input
    * @param string $name  The long option key
    * @param mixed  $value The value for the option
    *
-   * @throws \RuntimeException When option given doesn't exist
+   * @throws \InvalidArgumentException When option given doesn't exist
+   * @throws \InvalidArgumentException When a required value is missing
    */
   protected function addLongOption($name, $value)
   {
     if (!$this->definition->hasOption($name))
     {
-      throw new \RuntimeException(sprintf('The "--%s" option does not exist.', $name));
+      throw new \InvalidArgumentException(sprintf('The "--%s" option does not exist.', $name));
     }
 
     $option = $this->definition->getOption($name);
@@ -151,7 +152,7 @@ class ArrayInput extends Input
     {
       if ($option->isParameterRequired())
       {
-        throw new \RuntimeException(sprintf('The "--%s" option requires a value.', $name));
+        throw new \InvalidArgumentException(sprintf('The "--%s" option requires a value.', $name));
       }
 
       $value = $option->isParameterOptional() ? $option->getDefault() : true;
@@ -166,13 +167,13 @@ class ArrayInput extends Input
    * @param string $name  The argument name
    * @param mixed  $value The value for the argument
    *
-   * @throws \RuntimeException When option given doesn't exist
+   * @throws \InvalidArgumentException When argument given doesn't exist
    */
   protected function addArgument($name, $value)
   {
     if (!$this->definition->hasArgument($name))
     {
-      throw new \RuntimeException(sprintf('The "%s" argument does not exist.', $name));
+      throw new \InvalidArgumentException(sprintf('The "%s" argument does not exist.', $name));
     }
 
     $this->arguments[$name] = $value;

@@ -35,8 +35,10 @@ class YamlFileLoaderTest extends \PHPUnit_Framework_TestCase
       $loader->loadFile('foo.yml');
       $this->fail('->load() throws an InvalidArgumentException if the loaded file does not exist');
     }
-    catch (\InvalidArgumentException $e)
+    catch (\Exception $e)
     {
+      $this->assertType('\InvalidArgumentException', $e, '->load() throws an InvalidArgumentException if the loaded file does not exist');
+      $this->assertEquals('The service file "foo.yml" is not valid.', $e->getMessage(), '->load() throws an InvalidArgumentException if the loaded file does not exist');
     }
 
     try
@@ -44,8 +46,10 @@ class YamlFileLoaderTest extends \PHPUnit_Framework_TestCase
       $loader->loadFile('parameters.ini');
       $this->fail('->load() throws an InvalidArgumentException if the loaded file is not a valid YAML file');
     }
-    catch (\InvalidArgumentException $e)
+    catch (\Exception $e)
     {
+      $this->assertType('\InvalidArgumentException', $e, '->load() throws an InvalidArgumentException if the loaded file is not a valid YAML file');
+      $this->assertEquals('The service file "parameters.ini" is not valid.', $e->getMessage(), '->load() throws an InvalidArgumentException if the loaded file is not a valid YAML file');
     }
 
     $loader = new ProjectLoader3(self::$fixturesPath.'/yaml');
@@ -57,8 +61,10 @@ class YamlFileLoaderTest extends \PHPUnit_Framework_TestCase
         $loader->loadFile($fixture.'.yml');
         $this->fail('->load() throws an InvalidArgumentException if the loaded file does not validate');
       }
-      catch (\InvalidArgumentException $e)
+      catch (\Exception $e)
       {
+        $this->assertType('\InvalidArgumentException', $e, '->load() throws an InvalidArgumentException if the loaded file does not validate');
+        $this->assertStringMatchesFormat('The service file "nonvalid%d.yml" is not valid.', $e->getMessage(), '->load() throws an InvalidArgumentException if the loaded file does not validate');
       }
     }
   }
@@ -89,7 +95,7 @@ class YamlFileLoaderTest extends \PHPUnit_Framework_TestCase
     $this->assertEquals('Symfony\\Components\\DependencyInjection\\Definition', get_class($services['foo']), '->load() converts service element to Definition instances');
     $this->assertEquals('FooClass', $services['foo']->getClass(), '->load() parses the class attribute');
     $this->assertTrue($services['shared']->isShared(), '->load() parses the shared attribute');
-    $this->assertTrue(!$services['non_shared']->isShared(), '->load() parses the shared attribute');
+    $this->assertFalse($services['non_shared']->isShared(), '->load() parses the shared attribute');
     $this->assertEquals('getInstance', $services['constructor']->getConstructor(), '->load() parses the constructor attribute');
     $this->assertEquals('%path%/foo.php', $services['file']->getFile(), '->load() parses the file tag');
     $this->assertEquals(array('foo', new Reference('foo'), array(true, false)), $services['arguments']->getArguments(), '->load() parses the argument tags');
@@ -119,8 +125,10 @@ class YamlFileLoaderTest extends \PHPUnit_Framework_TestCase
       $config = $loader->load('services11.yml');
       $this->fail('->load() throws an InvalidArgumentException if the tag is not valid');
     }
-    catch (\InvalidArgumentException $e)
+    catch (\Exception $e)
     {
+      $this->assertType('\InvalidArgumentException', $e, '->load() throws an InvalidArgumentException if the tag is not valid');
+      $this->assertStringStartsWith('There is no extension able to load the configuration for "foobar.foobar" (in', $e->getMessage(), '->load() throws an InvalidArgumentException if the tag is not valid');
     }
 
     try
@@ -128,8 +136,10 @@ class YamlFileLoaderTest extends \PHPUnit_Framework_TestCase
       $config = $loader->load('services12.yml');
       $this->fail('->load() throws an InvalidArgumentException if an extension is not loaded');
     }
-    catch (\InvalidArgumentException $e)
+    catch (\Exception $e)
     {
+      $this->assertType('\InvalidArgumentException', $e, '->load() throws an InvalidArgumentException if an extension is not loaded');
+      $this->assertStringStartsWith('The "foobar" tag is not valid (in', $e->getMessage(), '->load() throws an InvalidArgumentException if an extension is not loaded');
     }
   }
 }

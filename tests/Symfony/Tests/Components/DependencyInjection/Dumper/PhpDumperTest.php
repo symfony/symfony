@@ -26,8 +26,8 @@ class PhpDumperTest extends \PHPUnit_Framework_TestCase
   {
     $dumper = new PhpDumper($container = new Builder());
 
-    $this->assertEquals(file_get_contents(self::$fixturesPath.'/php/services1.php'), $dumper->dump(), '->dump() dumps an empty container as an empty PHP class');
-    $this->assertEquals(file_get_contents(self::$fixturesPath.'/php/services1-1.php'), $dumper->dump(array('class' => 'Container', 'base_class' => 'AbstractContainer')), '->dump() takes a class and a base_class options');
+    $this->assertStringEqualsFile(self::$fixturesPath.'/php/services1.php', $dumper->dump(), '->dump() dumps an empty container as an empty PHP class');
+    $this->assertStringEqualsFile(self::$fixturesPath.'/php/services1-1.php', $dumper->dump(array('class' => 'Container', 'base_class' => 'AbstractContainer')), '->dump() takes a class and a base_class options');
 
     $container = new Builder();
     $dumper = new PhpDumper($container);
@@ -37,14 +37,14 @@ class PhpDumperTest extends \PHPUnit_Framework_TestCase
   {
     $container = include self::$fixturesPath.'/containers/container8.php';
     $dumper = new PhpDumper($container);
-    $this->assertEquals(file_get_contents(self::$fixturesPath.'/php/services8.php'), $dumper->dump(), '->dump() dumps parameters');
+    $this->assertStringEqualsFile(self::$fixturesPath.'/php/services8.php', $dumper->dump(), '->dump() dumps parameters');
   }
 
   public function testAddService()
   {
     $container = include self::$fixturesPath.'/containers/container9.php';
     $dumper = new PhpDumper($container);
-    $this->assertEquals(str_replace('%path%', self::$fixturesPath.'/includes', file_get_contents(self::$fixturesPath.'/php/services9.php')), $dumper->dump(), '->dump() dumps services');
+    $this->assertEquals(str_replace('%path%', str_replace('\\','\\\\',self::$fixturesPath.DIRECTORY_SEPARATOR.'includes'.DIRECTORY_SEPARATOR), file_get_contents(self::$fixturesPath.'/php/services9.php')), $dumper->dump(), '->dump() dumps services');
 
     $dumper = new PhpDumper($container = new Builder());
     $container->register('foo', 'FooClass')->addArgument(new \stdClass());
@@ -53,8 +53,10 @@ class PhpDumperTest extends \PHPUnit_Framework_TestCase
       $dumper->dump();
       $this->fail('->dump() throws a RuntimeException if the container to be dumped has reference to objects or resources');
     }
-    catch (\RuntimeException $e)
+    catch (\Exception $e)
     {
+      $this->assertType('\RuntimeException', $e, '->dump() returns a LogicException if the dump() method has not been overriden by a children class');
+      $this->assertEquals('Unable to dump a service container if a parameter is an object or a resource.', $e->getMessage(), '->dump() returns a LogicException if the dump() method has not been overriden by a children class');
     }
   }
 

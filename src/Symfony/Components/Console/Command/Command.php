@@ -294,7 +294,7 @@ class Command
 
     if (!$name)
     {
-      throw new \InvalidArgumentException('A command name cannot be empty');
+      throw new \InvalidArgumentException('A command name cannot be empty.');
     }
 
     $this->namespace = $namespace;

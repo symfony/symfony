@@ -35,8 +35,10 @@ class XmlFileLoaderTest extends \PHPUnit_Framework_TestCase
       $loader->load('foo.xml');
       $this->fail('->load() throws an InvalidArgumentException if the loaded file does not exist');
     }
-    catch (\InvalidArgumentException $e)
+    catch (\Exception $e)
     {
+      $this->assertType('\InvalidArgumentException', $e, '->load() throws an InvalidArgumentException if the loaded file does not exist');
+      $this->assertStringStartsWith('The file "foo.xml" does not exist (in:', $e->getMessage(), '->load() throws an InvalidArgumentException if the loaded file does not exist');
     }
   }
 
@@ -49,8 +51,10 @@ class XmlFileLoaderTest extends \PHPUnit_Framework_TestCase
       $loader->parseFile(self::$fixturesPath.'/ini/parameters.ini');
       $this->fail('->parseFile() throws an InvalidArgumentException if the loaded file is not a valid XML file');
     }
-    catch (\InvalidArgumentException $e)
+    catch (\Exception $e)
     {
+      $this->assertType('\InvalidArgumentException', $e, '->parseFile() throws an InvalidArgumentException if the loaded file is not a valid XML file');
+      $this->assertStringStartsWith('[ERROR 4] Start tag expected, \'<\' not found (in', $e->getMessage(), '->parseFile() throws an InvalidArgumentException if the loaded file is not a valid XML file');
     }
 
     $loader = new ProjectLoader2(self::$fixturesPath.'/xml');
@@ -60,8 +64,10 @@ class XmlFileLoaderTest extends \PHPUnit_Framework_TestCase
       $loader->parseFile(self::$fixturesPath.'/xml/nonvalid.xml');
       $this->fail('->parseFile() throws an InvalidArgumentException if the loaded file does not validate the XSD');
     }
-    catch (\InvalidArgumentException $e)
+    catch (\Exception $e)
     {
+      $this->assertType('\InvalidArgumentException', $e, '->parseFile() throws an InvalidArgumentException if the loaded file does not validate the XSD');
+      $this->assertStringStartsWith('[ERROR 1845] Element \'nonvalid\': No matching global declaration available for the validation root. (in', $e->getMessage(), '->parseFile() throws an InvalidArgumentException if the loaded file does not validate the XSD');
     }
 
     $xml = $loader->parseFile(self::$fixturesPath.'/xml/services1.xml');
@@ -120,7 +126,7 @@ class XmlFileLoaderTest extends \PHPUnit_Framework_TestCase
     $this->assertEquals('Symfony\\Components\\DependencyInjection\\Definition', get_class($services['foo']), '->load() converts <service> element to Definition instances');
     $this->assertEquals('FooClass', $services['foo']->getClass(), '->load() parses the class attribute');
     $this->assertTrue($services['shared']->isShared(), '->load() parses the shared attribute');
-    $this->assertTrue(!$services['non_shared']->isShared(), '->load() parses the shared attribute');
+    $this->assertFalse($services['non_shared']->isShared(), '->load() parses the shared attribute');
     $this->assertEquals('getInstance', $services['constructor']->getConstructor(), '->load() parses the constructor attribute');
     $this->assertEquals('%path%/foo.php', $services['file']->getFile(), '->load() parses the file tag');
     $this->assertEquals(array('foo', new Reference('foo'), array(true, false)), $services['arguments']->getArguments(), '->load() parses the argument tags');
@@ -177,8 +183,10 @@ class XmlFileLoaderTest extends \PHPUnit_Framework_TestCase
       $config = $loader->load('services11.xml');
       $this->fail('->load() throws an InvalidArgumentException if the tag is not valid');
     }
-    catch (\InvalidArgumentException $e)
+    catch (\Exception $e)
     {
+      $this->assertType('\InvalidArgumentException', $e, '->load() throws an InvalidArgumentException if the tag is not valid');
+      $this->assertStringStartsWith('There is no extension able to load the configuration for "foobar:foobar" (in', $e->getMessage(), '->load() throws an InvalidArgumentException if the tag is not valid');
     }
 
     try
@@ -186,8 +194,10 @@ class XmlFileLoaderTest extends \PHPUnit_Framework_TestCase
       $config = $loader->load('services12.xml');
       $this->fail('->load() throws an InvalidArgumentException if an extension is not loaded');
     }
-    catch (\InvalidArgumentException $e)
+    catch (\Exception $e)
     {
+      $this->assertType('\InvalidArgumentException', $e, '->load() throws an InvalidArgumentException if an extension is not loaded');
+      $this->assertStringStartsWith('The "foobar" tag is not valid (in', $e->getMessage(), '->load() throws an InvalidArgumentException if an extension is not loaded');
     }
   }
 }

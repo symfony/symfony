@@ -49,18 +49,18 @@ class FilesystemLoaderTest extends \PHPUnit_Framework_TestCase
     $path = self::$fixturesPath.'/templates';
     $loader = new ProjectTemplateLoader2($pathPattern);
     $storage = $loader->load($path.'/foo.php');
-    $this->assertTrue($storage instanceof FileStorage, '->load() returns a FileStorage if you pass an absolute path');
+    $this->assertType('Symfony\Components\Templating\Storage\FileStorage', $storage, '->load() returns a FileStorage if you pass an absolute path');
     $this->assertEquals($path.'/foo.php', (string) $storage, '->load() returns a FileStorage pointing to the passed absolute path');
 
-    $this->assertTrue($loader->load('bar') === false, '->load() returns false if the template is not found');
+    $this->assertFalse($loader->load('bar'), '->load() returns false if the template is not found');
 
     $storage = $loader->load('foo');
-    $this->assertTrue($storage instanceof FileStorage, '->load() returns a FileStorage if you pass a relative template that exists');
+    $this->assertType('Symfony\Components\Templating\Storage\FileStorage', $storage, '->load() returns a FileStorage if you pass a relative template that exists');
     $this->assertEquals($path.'/foo.php', (string) $storage, '->load() returns a FileStorage pointing to the absolute path of the template');
 
     $loader = new ProjectTemplateLoader2($pathPattern);
     $loader->setDebugger($debugger = new \ProjectTemplateDebugger());
-    $this->assertTrue($loader->load('foo', array('renderer' => 'xml')) === false, '->load() returns false if the template does not exists for the given renderer');
+    $this->assertFalse($loader->load('foo', array('renderer' => 'xml')), '->load() returns false if the template does not exists for the given renderer');
     $this->assertTrue($debugger->hasMessage('Failed loading template'), '->load() logs a "Failed loading template" message if the template is not found');
 
     $loader = new ProjectTemplateLoader2(array(self::$fixturesPath.'/null/%name%', $pathPattern));

@@ -22,16 +22,16 @@ class InputArgumentTest extends \PHPUnit_Framework_TestCase
 
     // mode argument
     $argument = new InputArgument('foo');
-    $this->assertEquals(false, $argument->isRequired(), '__construct() gives a "Argument::OPTIONAL" mode by default');
+    $this->assertFalse($argument->isRequired(), '__construct() gives a "Argument::OPTIONAL" mode by default');
 
     $argument = new InputArgument('foo', null);
-    $this->assertEquals(false, $argument->isRequired(), '__construct() can take "Argument::OPTIONAL" as its mode');
+    $this->assertFalse($argument->isRequired(), '__construct() can take "Argument::OPTIONAL" as its mode');
 
     $argument = new InputArgument('foo', InputArgument::OPTIONAL);
-    $this->assertEquals(false, $argument->isRequired(), '__construct() can take "Argument::PARAMETER_OPTIONAL" as its mode');
+    $this->assertFalse($argument->isRequired(), '__construct() can take "Argument::PARAMETER_OPTIONAL" as its mode');
 
     $argument = new InputArgument('foo', InputArgument::REQUIRED);
-    $this->assertEquals(true, $argument->isRequired(), '__construct() can take "Argument::PARAMETER_REQUIRED" as its mode');
+    $this->assertTrue($argument->isRequired(), '__construct() can take "Argument::PARAMETER_REQUIRED" as its mode');
 
     try
     {
@@ -40,6 +40,8 @@ class InputArgumentTest extends \PHPUnit_Framework_TestCase
     }
     catch (\Exception $e)
     {
+      $this->assertType('\Exception', $e, '__construct() throws an Exception if the mode is not valid');
+      $this->assertEquals('Argument mode "ANOTHER_ONE" is not valid.', $e->getMessage());
     }
   }
 
@@ -50,7 +52,7 @@ class InputArgumentTest extends \PHPUnit_Framework_TestCase
     $argument = new InputArgument('foo', InputArgument::OPTIONAL | InputArgument::IS_ARRAY);
     $this->assertTrue($argument->isArray(), '->isArray() returns true if the argument can be an array');
     $argument = new InputArgument('foo', InputArgument::OPTIONAL);
-    $this->assertTrue(!$argument->isArray(), '->isArray() returns false if the argument can not be an array');
+    $this->assertFalse($argument->isArray(), '->isArray() returns false if the argument can not be an array');
   }
 
   public function testGetDescription()
@@ -69,7 +71,7 @@ class InputArgumentTest extends \PHPUnit_Framework_TestCase
   {
     $argument = new InputArgument('foo', InputArgument::OPTIONAL, '', 'default');
     $argument->setDefault(null);
-    $this->assertTrue(is_null($argument->getDefault()), '->setDefault() can reset the default value by passing null');
+    $this->assertNull($argument->getDefault(), '->setDefault() can reset the default value by passing null');
     $argument->setDefault('another');
     $this->assertEquals('another', $argument->getDefault(), '->setDefault() changes the default value');
 
@@ -85,6 +87,8 @@ class InputArgumentTest extends \PHPUnit_Framework_TestCase
     }
     catch (\Exception $e)
     {
+      $this->assertType('\Exception', $e, '->parse() throws an \InvalidArgumentException exception if an invalid option is passed');
+      $this->assertEquals('Cannot set a default value except for Parameter::OPTIONAL mode.', $e->getMessage());
     }
 
     try
@@ -95,6 +99,8 @@ class InputArgumentTest extends \PHPUnit_Framework_TestCase
     }
     catch (\Exception $e)
     {
+      $this->assertType('\Exception', $e, '->setDefault() throws an Exception if you give a default value which is not an array for a IS_ARRAY option');
+      $this->assertEquals('A default value for an array argument must be an array.', $e->getMessage());
     }
   }
 }

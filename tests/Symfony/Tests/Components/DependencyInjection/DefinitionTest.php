@@ -65,9 +65,9 @@ class DefinitionTest extends \PHPUnit_Framework_TestCase
   public function testSetIsShared()
   {
     $def = new Definition('stdClass');
-    $this->assertEquals(true, $def->isShared(), '->isShared() returns true by default');
+    $this->assertTrue($def->isShared(), '->isShared() returns true by default');
     $this->assertEquals(spl_object_hash($def), spl_object_hash($def->setShared(false)), '->setShared() implements a fluent interface');
-    $this->assertEquals(false, $def->isShared(), '->isShared() returns false if the instance must not be shared');
+    $this->assertFalse($def->isShared(), '->isShared() returns false if the instance must not be shared');
   }
 
   public function testSetGetConfigurator()

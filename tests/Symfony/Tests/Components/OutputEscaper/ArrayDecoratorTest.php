@@ -32,7 +32,7 @@ class ArrayDecoratorTest extends \PHPUnit_Framework_TestCase
   public function testArrayAccessInterface()
   {
     $this->assertEquals('&lt;strong&gt;escaped!&lt;/strong&gt;', self::$escaped[0], 'The escaped object behaves like an array');
-    $this->assertEquals(null, self::$escaped[2], 'The escaped object behaves like an array');
+    $this->assertNull(self::$escaped[2], 'The escaped object behaves like an array');
     $this->assertEquals('&lt;strong&gt;escaped!&lt;/strong&gt;', self::$escaped[3][1], 'The escaped object behaves like an array');
 
     $this->assertTrue(isset(self::$escaped[1]), 'The escaped object behaves like an array (isset)');
@@ -43,8 +43,10 @@ class ArrayDecoratorTest extends \PHPUnit_Framework_TestCase
 
       $this->fail('The escaped object is read only (unset)');
     }
-    catch (\LogicException $e)
+    catch (\Exception $e)
     {
+      $this->assertType('\LogicException', $e, 'The escaped object is read only (unset)');
+      $this->assertEquals('Cannot unset values.', $e->getMessage(), 'The escaped object is read only (unset)');
     }
 
     try
@@ -53,8 +55,10 @@ class ArrayDecoratorTest extends \PHPUnit_Framework_TestCase
 
       $this->fail('The escaped object is read only (set)');
     }
-    catch (\LogicException $e)
+    catch (\Exception $e)
     {
+      $this->assertType('\LogicException', $e, 'The escaped object is read only (set)');
+      $this->assertEquals('Cannot set values.', $e->getMessage(), 'The escaped object is read only (set)');
     }
   }
 
@@ -71,7 +75,7 @@ class ArrayDecoratorTest extends \PHPUnit_Framework_TestCase
           $this->assertEquals(1, $value, 'The escaped object behaves like an array');
           break;
         case 2:
-          $this->assertEquals(null, $value, 'The escaped object behaves like an array');
+          $this->assertNull($value, 'The escaped object behaves like an array');
           break;
         case 3:
           break;

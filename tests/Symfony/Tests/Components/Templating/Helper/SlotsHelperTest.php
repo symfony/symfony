@@ -23,7 +23,7 @@ class SlotsHelperTest extends \PHPUnit_Framework_TestCase
     $this->assertEquals('bar', $helper->get('bar', 'bar'), '->get() takes a default value to return if the slot does not exist');
 
     $this->assertTrue($helper->has('foo'), '->has() returns true if the slot exists');
-    $this->assertTrue(!$helper->has('bar'), '->has() returns false if the slot does not exist');
+    $this->assertFalse($helper->has('bar'), '->has() returns false if the slot does not exist');
   }
 
   public function testOutput()
@@ -34,19 +34,19 @@ class SlotsHelperTest extends \PHPUnit_Framework_TestCase
     $ret = $helper->output('foo');
     $output = ob_get_clean();
     $this->assertEquals('bar', $output, '->output() outputs the content of a slot');
-    $this->assertEquals(true, $ret, '->output() returns true if the slot exists');
+    $this->assertTrue($ret, '->output() returns true if the slot exists');
 
     ob_start();
     $ret = $helper->output('bar', 'bar');
     $output = ob_get_clean();
     $this->assertEquals('bar', $output, '->output() takes a default value to return if the slot does not exist');
-    $this->assertEquals(true, $ret, '->output() returns true if the slot does not exist but a default value is provided');
+    $this->assertTrue($ret, '->output() returns true if the slot does not exist but a default value is provided');
 
     ob_start();
     $ret = $helper->output('bar');
     $output = ob_get_clean();
     $this->assertEquals('', $output, '->output() outputs nothing if the slot does not exist');
-    $this->assertEquals(false, $ret, '->output() returns false if the slot does not exist');
+    $this->assertFalse($ret, '->output() returns false if the slot does not exist');
   }
 
   public function testStartStop()
@@ -65,9 +65,11 @@ class SlotsHelperTest extends \PHPUnit_Framework_TestCase
       $helper->stop();
       $this->fail('->start() throws an InvalidArgumentException if a slot with the same name is already started');
     }
-    catch (\InvalidArgumentException $e)
+    catch (\Exception $e)
     {
       $helper->stop();
+      $this->assertType('\InvalidArgumentException', $e, '->start() throws an InvalidArgumentException if a slot with the same name is already started');
+      $this->assertEquals('A slot named "bar" is already started.', $e->getMessage(), '->start() throws an InvalidArgumentException if a slot with the same name is already started');
     }
 
     try
@@ -75,8 +77,10 @@ class SlotsHelperTest extends \PHPUnit_Framework_TestCase
       $helper->stop();
       $this->fail('->stop() throws an LogicException if no slot is started');
     }
-    catch (\LogicException $e)
+    catch (\Exception $e)
     {
+      $this->assertType('\LogicException', $e, '->stop() throws an LogicException if no slot is started');
+      $this->assertEquals('No slot started.', $e->getMessage(), '->stop() throws an LogicException if no slot is started');
     }
   }
 }

@@ -18,6 +18,6 @@ class NullOutputTest extends \PHPUnit_Framework_TestCase
   {
     $output = new NullOutput();
     $output->write('foo');
-    $this->assertTrue(true, '->write() does nothing');
+    $this->assertTrue(true, '->write() does nothing'); // FIXME
   }
 }

@@ -26,7 +26,7 @@ class XmlDumperTest extends \PHPUnit_Framework_TestCase
   {
     $dumper = new XmlDumper($container = new Builder());
 
-    $this->assertEquals(file_get_contents(self::$fixturesPath.'/xml/services1.xml'), $dumper->dump(), '->dump() dumps an empty container as an empty XML file');
+    $this->assertXmlStringEqualsXmlFile(self::$fixturesPath.'/xml/services1.xml', $dumper->dump(), '->dump() dumps an empty container as an empty XML file');
 
     $container = new Builder();
     $dumper = new XmlDumper($container);
@@ -36,14 +36,14 @@ class XmlDumperTest extends \PHPUnit_Framework_TestCase
   {
     $container = include self::$fixturesPath.'//containers/container8.php';
     $dumper = new XmlDumper($container);
-    $this->assertEquals(file_get_contents(self::$fixturesPath.'/xml/services8.xml'), $dumper->dump(), '->dump() dumps parameters');
+    $this->assertXmlStringEqualsXmlFile(self::$fixturesPath.'/xml/services8.xml', $dumper->dump(), '->dump() dumps parameters');
   }
 
   public function testAddService()
   {
     $container = include self::$fixturesPath.'/containers/container9.php';
     $dumper = new XmlDumper($container);
-    $this->assertEquals(str_replace('%path%', self::$fixturesPath.'/includes', file_get_contents(self::$fixturesPath.'/xml/services9.xml')), $dumper->dump(), '->dump() dumps services');
+    $this->assertEquals(str_replace('%path%', self::$fixturesPath.DIRECTORY_SEPARATOR.'includes'.DIRECTORY_SEPARATOR, file_get_contents(self::$fixturesPath.'/xml/services9.xml')), $dumper->dump(), '->dump() dumps services');
 
     $dumper = new XmlDumper($container = new Builder());
     $container->register('foo', 'FooClass')->addArgument(new \stdClass());
@@ -52,8 +52,10 @@ class XmlDumperTest extends \PHPUnit_Framework_TestCase
       $dumper->dump();
       $this->fail('->dump() throws a RuntimeException if the container to be dumped has reference to objects or resources');
     }
-    catch (\RuntimeException $e)
+    catch (\Exception $e)
     {
+      $this->assertType('\RuntimeException', $e, '->dump() throws a RuntimeException if the container to be dumped has reference to objects or resources');
+      $this->assertEquals('Unable to dump a service container if a parameter is an object or a resource.', $e->getMessage(), '->dump() throws a RuntimeException if the container to be dumped has reference to objects or resources');
     }
   }
 }

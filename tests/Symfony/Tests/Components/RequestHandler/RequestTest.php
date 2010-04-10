@@ -71,8 +71,8 @@ class RequestTest extends \PHPUnit_Framework_TestCase
   {
     $request = new Request();
 
-    $this->assertEquals(null, $request->getFormat(null), '->getFormat() returns null when mime-type is null');
-    $this->assertEquals(null, $request->getFormat('unexistant-mime-type'), '->getFormat() returns null when mime-type is unknown');
+    $this->assertNull($request->getFormat(null), '->getFormat() returns null when mime-type is null');
+    $this->assertNull($request->getFormat('unexistant-mime-type'), '->getFormat() returns null when mime-type is unknown');
     $this->assertEquals('txt', $request->getFormat('text/plain'), '->getFormat() returns correct format when mime-type have one format only');
     $this->assertEquals('js', $request->getFormat('application/javascript'), '->getFormat() returns correct format when format have multiple mime-type (first)');
     $this->assertEquals('js', $request->getFormat('application/x-javascript'), '->getFormat() returns correct format when format have multiple mime-type');

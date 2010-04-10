@@ -9,7 +9,7 @@ services:
     annotations:
       - { name: foo, foo: foo }
       - { name: foo, bar: bar }
-    file: %path%/foo.php
+    file: %path%foo.php
     constructor: getInstance
     arguments: [foo, '@foo.baz', { '%foo%': 'foo is %foo%', bar: '%foo%' }, true, '@service_container']
     calls:

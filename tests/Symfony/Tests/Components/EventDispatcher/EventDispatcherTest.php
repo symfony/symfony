@@ -29,18 +29,18 @@ class EventDispatcherTest extends \PHPUnit_Framework_TestCase
     $this->assertEquals(array('listenToBar'), $dispatcher->getListeners('bar'), '->disconnect() disconnects a listener for an event name');
     $this->assertEquals(array('listenToBarBar'), $dispatcher->getListeners('barbar'), '->disconnect() disconnects a listener for an event name');
 
-    $this->assertTrue($dispatcher->disconnect('foobar', 'listen') === false, '->disconnect() returns false if the listener does not exist');
+    $this->assertFalse($dispatcher->disconnect('foobar', 'listen'), '->disconnect() returns false if the listener does not exist');
   }
 
   public function testGetHasListeners()
   {
     $dispatcher = new EventDispatcher();
 
-    $this->assertEquals(false, $dispatcher->hasListeners('foo'), '->hasListeners() returns false if the event has no listener');
+    $this->assertFalse($dispatcher->hasListeners('foo'), '->hasListeners() returns false if the event has no listener');
     $dispatcher->connect('foo', 'listenToFoo');
     $this->assertEquals(true, $dispatcher->hasListeners('foo'), '->hasListeners() returns true if the event has some listeners');
     $dispatcher->disconnect('foo', 'listenToFoo');
-    $this->assertEquals(false, $dispatcher->hasListeners('foo'), '->hasListeners() returns false if the event has no listener');
+    $this->assertFalse($dispatcher->hasListeners('foo'), '->hasListeners() returns false if the event has no listener');
 
     $dispatcher->connect('bar', 'listenToBar');
     $this->assertEquals(array('listenToBar'), $dispatcher->getListeners('bar'), '->getListeners() returns an array of listeners connected to the given event name');

@@ -1,7 +1,7 @@
 
 
                                       
-  [RuntimeException]                  
+  [InvalidArgumentException]          
   The "--foo" option does not exist.  
                                       
 

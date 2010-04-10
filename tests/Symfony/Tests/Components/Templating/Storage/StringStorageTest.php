@@ -19,7 +19,7 @@ class StringStorageTest extends \PHPUnit_Framework_TestCase
   public function testGetContent()
   {
     $storage = new StringStorage('foo');
-    $this->assertTrue($storage instanceof Storage, 'StringStorage is an instance of Storage');
+    $this->assertType('Symfony\Components\Templating\Storage\Storage', $storage, 'StringStorage is an instance of Storage');
     $storage = new StringStorage('foo');
     $this->assertEquals('foo', $storage->getContent(), '->getContent() returns the content of the template');
   }

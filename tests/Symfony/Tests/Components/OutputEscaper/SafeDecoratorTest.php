@@ -41,12 +41,12 @@ class SafeDecoratorTest extends \PHPUnit_Framework_TestCase
   {
     $safe = new SafeDecorator(new TestClass3());
 
-    $this->assertEquals(true, isset($safe->boolValue), '->__isset() returns true if the property is not null');
-    $this->assertEquals(false, isset($safe->nullValue), '->__isset() returns false if the property is null');
-    $this->assertEquals(false, isset($safe->undefinedValue), '->__isset() returns false if the property does not exist');
+    $this->assertTrue(isset($safe->boolValue), '->__isset() returns true if the property is not null');
+    $this->assertFalse(isset($safe->nullValue), '->__isset() returns false if the property is null');
+    $this->assertFalse(isset($safe->undefinedValue), '->__isset() returns false if the property does not exist');
 
     unset($safe->boolValue);
-    $this->assertEquals(false, isset($safe->boolValue), '->__unset() unsets the embedded property');
+    $this->assertFalse(isset($safe->boolValue), '->__unset() unsets the embedded property');
   }
 
   public function testIteratorInterface()
@@ -69,9 +69,9 @@ class SafeDecoratorTest extends \PHPUnit_Framework_TestCase
     $this->assertEquals('bar', $safe['foo'], '"ArrayAccess" implementation returns a value from the embedded array');
     $safe['foo'] = 'baz';
     $this->assertEquals('baz', $safe['foo'], '"ArrayAccess" implementation sets a value on the embedded array');
-    $this->assertEquals(true, isset($safe['foo']), '"ArrayAccess" checks if a value is set on the embedded array');
+    $this->assertTrue(isset($safe['foo']), '"ArrayAccess" checks if a value is set on the embedded array');
     unset($safe['foo']);
-    $this->assertEquals(false, isset($safe['foo']), '"ArrayAccess" unsets a value on the embedded array');
+    $this->assertFalse(isset($safe['foo']), '"ArrayAccess" unsets a value on the embedded array');
   }
 }
 

@@ -21,9 +21,9 @@ class EscaperTest extends \PHPUnit_Framework_TestCase
 {
   public function testEscapeDoesNotEscapeSpecialValues()
   {
-    $this->assertSame(Escaper::escape('entities', null), null, '::escape() returns null if the value to escape is null');
-    $this->assertSame(Escaper::escape('entities', false), false, '::escape() returns false if the value to escape is false');
-    $this->assertSame(Escaper::escape('entities', true), true, '::escape() returns true if the value to escape is true');
+    $this->assertNull(Escaper::escape('entities', null), '::escape() returns null if the value to escape is null');
+    $this->assertFalse(Escaper::escape('entities', false), '::escape() returns false if the value to escape is false');
+    $this->assertTrue(Escaper::escape('entities', true), '::escape() returns true if the value to escape is true');
   }
 
   public function testEscapeDoesNotEscapeAValueWhenEscapingMethodIsRAW()
@@ -44,7 +44,7 @@ class EscaperTest extends \PHPUnit_Framework_TestCase
       'bar' => array('foo' => '<strong>escaped!</strong>'),
     );
     $output = Escaper::escape('entities', $input);
-    $this->assertTrue($output instanceof ArrayDecorator, '::escape() returns a ArrayDecorator object if the value to escape is an array');
+    $this->assertType('Symfony\Components\OutputEscaper\ArrayDecorator', $output, '::escape() returns a ArrayDecorator object if the value to escape is an array');
     $this->assertEquals('&lt;strong&gt;escaped!&lt;/strong&gt;', $output['foo'], '::escape() escapes all elements of the original array');
     $this->assertEquals('&lt;strong&gt;escaped!&lt;/strong&gt;', $output['bar']['foo'], '::escape() is recursive');
     $this->assertEquals($input, $output->getRawValue(), '->getRawValue() returns the unescaped value');
@@ -54,23 +54,23 @@ class EscaperTest extends \PHPUnit_Framework_TestCase
   {
     $input = new OutputEscaperTestClass();
     $output = Escaper::escape('entities', $input);
-    $this->assertTrue($output instanceof ObjectDecorator, '::escape() returns a ObjectDecorator object if the value to escape is an object');
+    $this->assertType('Symfony\Components\OutputEscaper\ObjectDecorator', $output, '::escape() returns a ObjectDecorator object if the value to escape is an object');
     $this->assertEquals('&lt;strong&gt;escaped!&lt;/strong&gt;', $output->getTitle(), '::escape() escapes all methods of the original object');
     $this->assertEquals('&lt;strong&gt;escaped!&lt;/strong&gt;', $output->title, '::escape() escapes all properties of the original object');
     $this->assertEquals('&lt;strong&gt;escaped!&lt;/strong&gt;', $output->getTitleTitle(), '::escape() is recursive');
     $this->assertEquals($input, $output->getRawValue(), '->getRawValue() returns the unescaped value');
 
     $this->assertEquals('&lt;strong&gt;escaped!&lt;/strong&gt;', Escaper::escape('entities', $output)->getTitle(), '::escape() does not double escape an object');
-    $this->assertTrue(Escaper::escape('entities', new \DirectoryIterator('.')) instanceof IteratorDecorator, '::escape() returns a IteratorDecorator object if the value to escape is an object that implements the ArrayAccess interface');
+    $this->assertType('Symfony\Components\OutputEscaper\IteratorDecorator', Escaper::escape('entities', new \DirectoryIterator('.')), '::escape() returns a IteratorDecorator object if the value to escape is an object that implements the ArrayAccess interface');
   }
 
   public function testEscapeDoesNotEscapeObjectMarkedAsBeingSafe()
   {
-    $this->assertTrue(Escaper::escape('entities', new SafeDecorator(new OutputEscaperTestClass())) instanceof OutputEscaperTestClass, '::escape() returns the original value if it is marked as being safe');
+    $this->assertType('Symfony\Tests\Components\OutputEscaper\OutputEscaperTestClass', Escaper::escape('entities', new SafeDecorator(new OutputEscaperTestClass())), '::escape() returns the original value if it is marked as being safe');
 
     Escaper::markClassAsSafe('Symfony\Tests\Components\OutputEscaper\OutputEscaperTestClass');
-    $this->assertTrue(Escaper::escape('entities', new OutputEscaperTestClass()) instanceof OutputEscaperTestClass, '::escape() returns the original value if the object class is marked as being safe');
-    $this->assertTrue(Escaper::escape('entities', new OutputEscaperTestClassChild()) instanceof OutputEscaperTestClassChild, '::escape() returns the original value if one of the object parent class is marked as being safe');
+    $this->assertType('Symfony\Tests\Components\OutputEscaper\OutputEscaperTestClass', Escaper::escape('entities', new OutputEscaperTestClass()), '::escape() returns the original value if the object class is marked as being safe');
+    $this->assertType('Symfony\Tests\Components\OutputEscaper\OutputEscaperTestClass', Escaper::escape('entities', new OutputEscaperTestClassChild()), '::escape() returns the original value if one of the object parent class is marked as being safe');
   }
 
   public function testEscapeCannotEscapeResources()
@@ -90,9 +90,9 @@ class EscaperTest extends \PHPUnit_Framework_TestCase
 
   public function testUnescapeDoesNotUnescapeSpecialValues()
   {
-    $this->assertTrue(Escaper::unescape(null) === null, '::unescape() returns null if the value to unescape is null');
-    $this->assertTrue(Escaper::unescape(false) === false, '::unescape() returns false if the value to unescape is false');
-    $this->assertTrue(Escaper::unescape(true) === true, '::unescape() returns true if the value to unescape is true');
+    $this->assertNull(Escaper::unescape(null), '::unescape() returns null if the value to unescape is null');
+    $this->assertFalse(Escaper::unescape(false), '::unescape() returns false if the value to unescape is false');
+    $this->assertTrue(Escaper::unescape(true), '::unescape() returns true if the value to unescape is true');
   }
 
   public function testUnescapeUnescapesStrings()
@@ -108,7 +108,7 @@ class EscaperTest extends \PHPUnit_Framework_TestCase
       'bar' => array('foo' => '<strong>escaped!</strong>'),
     ));
     $output = Escaper::unescape($input);
-    $this->assertTrue(is_array($output), '::unescape() returns an array if the input is a ArrayDecorator object');
+    $this->assertType('array', $output, '::unescape() returns an array if the input is a ArrayDecorator object');
     $this->assertEquals('<strong>escaped!</strong>', $output['foo'], '::unescape() unescapes all elements of the original array');
     $this->assertEquals('<strong>escaped!</strong>', $output['bar']['foo'], '::unescape() is recursive');
   }
@@ -118,21 +118,21 @@ class EscaperTest extends \PHPUnit_Framework_TestCase
     $object = new OutputEscaperTestClass();
     $input = Escaper::escape('entities', $object);
     $output = Escaper::unescape($input);
-    $this->assertTrue($output instanceof OutputEscaperTestClass, '::unescape() returns the original object when a ObjectDecorator object is passed');
+    $this->assertType('Symfony\Tests\Components\OutputEscaper\OutputEscaperTestClass', $output, '::unescape() returns the original object when a ObjectDecorator object is passed');
     $this->assertEquals('<strong>escaped!</strong>', $output->getTitle(), '::unescape() unescapes all methods of the original object');
     $this->assertEquals('<strong>escaped!</strong>', $output->title, '::unescape() unescapes all properties of the original object');
     $this->assertEquals('<strong>escaped!</strong>', $output->getTitleTitle(), '::unescape() is recursive');
 
-    $this->assertTrue(IteratorDecorator::unescape(Escaper::escape('entities', new \DirectoryIterator('.'))) instanceof \DirectoryIterator, '::unescape() unescapes IteratorDecorator objects');
+    $this->assertType('\DirectoryIterator', IteratorDecorator::unescape(Escaper::escape('entities', new \DirectoryIterator('.'))), '::unescape() unescapes IteratorDecorator objects');
   }
 
   public function testUnescapeDoesNotUnescapeObjectMarkedAsBeingSafe()
   {
-    $this->assertTrue(Escaper::unescape(Escaper::escape('entities', new SafeDecorator(new OutputEscaperTestClass()))) instanceof OutputEscaperTestClass, '::unescape() returns the original value if it is marked as being safe');
+    $this->assertType('Symfony\Tests\Components\OutputEscaper\OutputEscaperTestClass', Escaper::unescape(Escaper::escape('entities', new SafeDecorator(new OutputEscaperTestClass()))), '::unescape() returns the original value if it is marked as being safe');
 
     Escaper::markClassAsSafe('OutputEscaperTestClass');
-    $this->assertTrue(Escaper::unescape(Escaper::escape('entities', new OutputEscaperTestClass())) instanceof OutputEscaperTestClass, '::unescape() returns the original value if the object class is marked as being safe');
-    $this->assertTrue(Escaper::unescape(Escaper::escape('entities', new OutputEscaperTestClassChild())) instanceof OutputEscaperTestClassChild, '::unescape() returns the original value if one of the object parent class is marked as being safe');
+    $this->assertType('Symfony\Tests\Components\OutputEscaper\OutputEscaperTestClass', Escaper::unescape(Escaper::escape('entities', new OutputEscaperTestClass())), '::unescape() returns the original value if the object class is marked as being safe');
+    $this->assertType('Symfony\Tests\Components\OutputEscaper\OutputEscaperTestClass', Escaper::unescape(Escaper::escape('entities', new OutputEscaperTestClassChild())), '::unescape() returns the original value if one of the object parent class is marked as being safe');
   }
 
   public function testUnescapeDoesNothingToResources()

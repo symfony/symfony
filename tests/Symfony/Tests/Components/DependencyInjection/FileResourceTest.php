@@ -37,9 +37,9 @@ class FileResourceTest extends \PHPUnit_Framework_TestCase
   public function testIsUptodate()
   {
     $this->assertTrue($this->resource->isUptodate(time() + 10), '->isUptodate() returns true if the resource has not changed');
-    $this->assertTrue(!$this->resource->isUptodate(time() - 86400), '->isUptodate() returns false if the resource has been updated');
+    $this->assertFalse($this->resource->isUptodate(time() - 86400), '->isUptodate() returns false if the resource has been updated');
 
     $resource = new FileResource('/____foo/foobar'.rand(1, 999999));
-    $this->assertTrue(!$resource->isUptodate(time()), '->isUptodate() returns false if the resource does not exist');
+    $this->assertFalse($resource->isUptodate(time()), '->isUptodate() returns false if the resource does not exist');
   }
 }

@@ -18,14 +18,14 @@ class OutputTest extends \PHPUnit_Framework_TestCase
   {
     $output = new TestOutput(Output::VERBOSITY_QUIET, true);
     $this->assertEquals(Output::VERBOSITY_QUIET, $output->getVerbosity(), '__construct() takes the verbosity as its first argument');
-    $this->assertEquals(true, $output->isDecorated(), '__construct() takes the decorated flag as its second argument');
+    $this->assertTrue($output->isDecorated(), '__construct() takes the decorated flag as its second argument');
   }
 
   public function testSetIsDecorated()
   {
     $output = new TestOutput();
     $output->setDecorated(true);
-    $this->assertEquals(true, 'setDecorated() sets the decorated flag', $output->isDecorated());
+    $this->assertTrue($output->isDecorated(), 'setDecorated() sets the decorated flag');
   }
 
   public function testSetGetVerbosity()
@@ -74,8 +74,10 @@ class OutputTest extends \PHPUnit_Framework_TestCase
       $output->writeln('<foo>foo</foo>', 24);
       $this->fail('->writeln() throws an \InvalidArgumentException when the type does not exist');
     }
-    catch (\InvalidArgumentException $e)
+    catch (\Exception $e)
     {
+      $this->assertType('\InvalidArgumentException', $e, '->writeln() throws an \InvalidArgumentException when the type does not exist');
+      $this->assertEquals('Unknown output type given (24)', $e->getMessage());
     }
 
     try
@@ -83,8 +85,10 @@ class OutputTest extends \PHPUnit_Framework_TestCase
       $output->writeln('<bar>foo</bar>');
       $this->fail('->writeln() throws an \InvalidArgumentException when a style does not exist');
     }
-    catch (\InvalidArgumentException $e)
+    catch (\Exception $e)
     {
+      $this->assertType('\InvalidArgumentException', $e, '->writeln() throws an \InvalidArgumentException when a style does not exist');
+      $this->assertEquals('Unknown style "bar".', $e->getMessage());
     }
   }
 }

@@ -38,15 +38,17 @@ class EventTest extends \PHPUnit_Framework_TestCase
     $this->assertEquals('foo', $event->getParameter('foo'), '->setParameter() changes the value of a parameter');
     $this->assertTrue($event->hasParameter('foo'), '->hasParameter() returns true if the parameter is defined');
     unset($event['foo']);
-    $this->assertTrue(!$event->hasParameter('foo'), '->hasParameter() returns false if the parameter is not defined');
+    $this->assertFalse($event->hasParameter('foo'), '->hasParameter() returns false if the parameter is not defined');
 
     try
     {
       $event->getParameter('foobar');
       $this->fail('->getParameter() throws an \InvalidArgumentException exception when the parameter does not exist');
     }
-    catch (\InvalidArgumentException $e)
+    catch (\Exception $e)
     {
+      $this->assertType('\InvalidArgumentException', $e, '->getParameter() throws an \InvalidArgumentException exception when the parameter does not exist');
+      $this->assertEquals('The event "name" has no "foobar" parameter.', $e->getMessage(), '->getParameter() throws an \InvalidArgumentException exception when the parameter does not exist');
     }
     $event = new Event($this->subject, 'name', $this->parameters);
   }
@@ -62,9 +64,9 @@ class EventTest extends \PHPUnit_Framework_TestCase
   {
     $event = $this->createEvent();
     $event->setProcessed(true);
-    $this->assertEquals(true, $event->isProcessed(), '->isProcessed() returns true if the event has been processed');
+    $this->assertTrue($event->isProcessed(), '->isProcessed() returns true if the event has been processed');
     $event->setProcessed(false);
-    $this->assertEquals(false, $event->isProcessed(), '->setProcessed() changes the processed status');
+    $this->assertFalse($event->isProcessed(), '->setProcessed() changes the processed status');
   }
 
   public function testArrayAccessInterface()
@@ -80,13 +82,15 @@ class EventTest extends \PHPUnit_Framework_TestCase
       $event['foobar'];
       $this->fail('::offsetGet() throws an \InvalidArgumentException exception when the parameter does not exist');
     }
-    catch (\InvalidArgumentException $e)
+    catch (\Exception $e)
     {
+      $this->assertType('\InvalidArgumentException', $e, '::offsetGet() throws an \InvalidArgumentException exception when the parameter does not exist');
+      $this->assertEquals('The event "name" has no "foobar" parameter.', $e->getMessage(), '::offsetGet() throws an \InvalidArgumentException exception when the parameter does not exist');
     }
 
     $this->assertTrue(isset($event['foo']), 'Event implements the ArrayAccess interface');
     unset($event['foo']);
-    $this->assertTrue(!isset($event['foo']), 'Event implements the ArrayAccess interface');
+    $this->assertFalse(isset($event['foo']), 'Event implements the ArrayAccess interface');
   }
 
   protected function createEvent()

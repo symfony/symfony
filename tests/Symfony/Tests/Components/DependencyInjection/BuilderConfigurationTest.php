@@ -110,8 +110,10 @@ class BuilderConfigurationTest extends \PHPUnit_Framework_TestCase
       $configuration->getParameter('baba');
       $this->fail('->getParameter() throws an \InvalidArgumentException if the key does not exist');
     }
-    catch (\InvalidArgumentException $e)
+    catch (\Exception $e)
     {
+      $this->assertType('\InvalidArgumentException', $e, '->getParameter() throws an \InvalidArgumentException if the key does not exist');
+      $this->assertEquals('The parameter "baba" must be defined.', $e->getMessage(), '->getParameter() throws an \InvalidArgumentException if the key does not exist');
     }
   }
 
@@ -120,7 +122,7 @@ class BuilderConfigurationTest extends \PHPUnit_Framework_TestCase
     $configuration = new BuilderConfiguration(array(), array('foo' => 'bar'));
     $this->assertTrue($configuration->hasParameter('foo'), '->hasParameter() returns true if a parameter is defined');
     $this->assertTrue($configuration->hasParameter('Foo'), '->hasParameter() converts the key to lowercase');
-    $this->assertTrue(!$configuration->hasParameter('bar'), '->hasParameter() returns false if a parameter is not defined');
+    $this->assertFalse($configuration->hasParameter('bar'), '->hasParameter() returns false if a parameter is not defined');
   }
 
   public function testAddParameters()
@@ -138,15 +140,17 @@ class BuilderConfigurationTest extends \PHPUnit_Framework_TestCase
     $configuration->setAlias('bar', 'foo');
     $this->assertEquals('foo', $configuration->getAlias('bar'), '->setAlias() defines a new alias');
     $this->assertTrue($configuration->hasAlias('bar'), '->hasAlias() returns true if the alias is defined');
-    $this->assertTrue(!$configuration->hasAlias('baba'), '->hasAlias() returns false if the alias is not defined');
+    $this->assertFalse($configuration->hasAlias('baba'), '->hasAlias() returns false if the alias is not defined');
 
     try
     {
       $configuration->getAlias('baba');
       $this->fail('->getAlias() throws an \InvalidArgumentException if the alias does not exist');
     }
-    catch (\InvalidArgumentException $e)
+    catch (\Exception $e)
     {
+      $this->assertType('\InvalidArgumentException', $e, '->getAlias() throws an \InvalidArgumentException if the alias does not exist');
+      $this->assertEquals('The service alias "baba" does not exist.', $e->getMessage(), '->getAlias() throws an \InvalidArgumentException if the alias does not exist');
     }
 
     $configuration->setAlias('barbar', 'foofoo');
@@ -166,7 +170,7 @@ class BuilderConfigurationTest extends \PHPUnit_Framework_TestCase
     $configuration->setDefinitions($definitions);
     $this->assertEquals($definitions, $configuration->getDefinitions(), '->setDefinitions() sets the service definitions');
     $this->assertTrue($configuration->hasDefinition('foo'), '->hasDefinition() returns true if a service definition exists');
-    $this->assertTrue(!$configuration->hasDefinition('foobar'), '->hasDefinition() returns false if a service definition does not exist');
+    $this->assertFalse($configuration->hasDefinition('foobar'), '->hasDefinition() returns false if a service definition does not exist');
 
     $configuration->setDefinition('foobar', $foo = new Definition('FooBarClass'));
     $this->assertEquals($foo, $configuration->getDefinition('foobar'), '->getDefinition() returns a service definition if defined');
@@ -180,8 +184,10 @@ class BuilderConfigurationTest extends \PHPUnit_Framework_TestCase
       $configuration->getDefinition('baz');
       $this->fail('->getDefinition() throws an InvalidArgumentException if the service definition does not exist');
     }
-    catch (\InvalidArgumentException $e)
+    catch (\Exception $e)
     {
+      $this->assertType('\InvalidArgumentException', $e, '->getDefinition() throws an InvalidArgumentException if the service definition does not exist');
+      $this->assertEquals('The service definition "baz" does not exist.', $e->getMessage(), '->getDefinition() throws an InvalidArgumentException if the service definition does not exist');
     }
   }
 

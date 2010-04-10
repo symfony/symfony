@@ -78,8 +78,10 @@ class ParserTest extends \PHPUnit_Framework_TestCase
 
         $this->fail('YAML files must not contain tabs');
       }
-      catch (ParserException $e)
+      catch (\Exception $e)
       {
+        $this->assertType('\Exception', $e, 'YAML files must not contain tabs');
+        $this->assertEquals('A YAML file cannot contain tabs as indentation at line 2 ('.strpbrk($yaml, "\t").').', $e->getMessage(), 'YAML files must not contain tabs');
       }
     }
   }

@@ -41,8 +41,10 @@ class InputTest extends \PHPUnit_Framework_TestCase
       $input->setOption('foo', 'bar');
       $this->fail('->setOption() throws a \InvalidArgumentException if the option does not exist');
     }
-    catch (\InvalidArgumentException $e)
+    catch (\Exception $e)
     {
+      $this->assertType('\InvalidArgumentException', $e, '->setOption() throws a \InvalidArgumentException if the option does not exist');
+      $this->assertEquals('The "foo" option does not exist.', $e->getMessage());
     }
 
     try
@@ -50,8 +52,10 @@ class InputTest extends \PHPUnit_Framework_TestCase
       $input->getOption('foo');
       $this->fail('->getOption() throws a \InvalidArgumentException if the option does not exist');
     }
-    catch (\InvalidArgumentException $e)
+    catch (\Exception $e)
     {
+      $this->assertType('\InvalidArgumentException', $e, '->setOption() throws a \InvalidArgumentException if the option does not exist');
+      $this->assertEquals('The "foo" option does not exist.', $e->getMessage());
     }
   }
 
@@ -73,8 +77,10 @@ class InputTest extends \PHPUnit_Framework_TestCase
       $input->setArgument('foo', 'bar');
       $this->fail('->setArgument() throws a \InvalidArgumentException if the argument does not exist');
     }
-    catch (\InvalidArgumentException $e)
+    catch (\Exception $e)
     {
+      $this->assertType('\InvalidArgumentException', $e, '->setOption() throws a \InvalidArgumentException if the option does not exist');
+      $this->assertEquals('The "foo" argument does not exist.', $e->getMessage());
     }
 
     try
@@ -82,8 +88,10 @@ class InputTest extends \PHPUnit_Framework_TestCase
       $input->getArgument('foo');
       $this->fail('->getArgument() throws a \InvalidArgumentException if the argument does not exist');
     }
-    catch (\InvalidArgumentException $e)
+    catch (\Exception $e)
     {
+      $this->assertType('\InvalidArgumentException', $e, '->setOption() throws a \InvalidArgumentException if the option does not exist');
+      $this->assertEquals('The "foo" argument does not exist.', $e->getMessage());
     }
   }
 
@@ -97,8 +105,10 @@ class InputTest extends \PHPUnit_Framework_TestCase
       $input->validate();
       $this->fail('->validate() throws a \RuntimeException if not enough arguments are given');
     }
-    catch (\RuntimeException $e)
+    catch (\Exception $e)
     {
+      $this->assertType('\RuntimeException', $e, '->validate() throws a \RuntimeException if not enough arguments are given');
+      $this->assertEquals('Not enough arguments.', $e->getMessage());
     }
 
     $input = new ArrayInput(array('name' => 'foo'));
@@ -119,6 +129,6 @@ class InputTest extends \PHPUnit_Framework_TestCase
     $input = new ArrayInput(array());
     $this->assertTrue($input->isInteractive(), '->isInteractive() returns whether the input should be interactive or not');
     $input->setInteractive(false);
-    $this->assertTrue(!$input->isInteractive(), '->setInteractive() changes the interactive flag');
+    $this->assertFalse($input->isInteractive(), '->setInteractive() changes the interactive flag');
   }
 }

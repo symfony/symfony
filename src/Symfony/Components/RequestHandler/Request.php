@@ -79,7 +79,7 @@ class Request implements RequestInterface
     $this->query = new RequestBag(null !== $query ? $query : $_GET);
     $this->path = new RequestBag(null !== $path ? $path : array());
     $this->cookies = new RequestBag(null !== $cookies ? $cookies : $_COOKIE);
-    $this->files = new RequestBag(self::convertFileInformation(null !== $files ? $files : $_FILES));
+    $this->files = new RequestBag($this->convertFileInformation(null !== $files ? $files : $_FILES));
     $this->server = new RequestBag(null !== $server ? $server : $_SERVER);
     $this->headers = new RequestBag($this->initializeHeaders());
 

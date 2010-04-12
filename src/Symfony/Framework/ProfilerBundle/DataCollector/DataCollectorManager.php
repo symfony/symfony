@@ -31,10 +31,12 @@ class DataCollectorManager
   protected $collectors;
   protected $response;
   protected $lifetime;
+  protected $logger;
 
   public function __construct(ContainerInterface $container, LoggerInterface $logger, ProfilerStorage $profilerStorage, $lifetime = 86400)
   {
     $this->container = $container;
+    $this->logger = $logger;
     $this->lifetime = $lifetime;
     $this->profilerStorage = $profilerStorage;
     $this->collectors = $this->initCollectors();

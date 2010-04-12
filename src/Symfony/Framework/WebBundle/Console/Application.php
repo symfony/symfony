@@ -80,37 +80,9 @@ class Application extends BaseApplication
 
   protected function registerCommands()
   {
-    // search all places where there are bundles
-    foreach ($this->kernel->getContainer()->getParameter('kernel.bundle_dirs') as $dir)
+    foreach ($this->kernel->getBundles() as $bundle)
     {
-      // search all registered bundles
-      foreach ($this->kernel->getBundles() as $bundle)
-      {
-        $bundleBase = dirname(str_replace('\\', '/', get_class($bundle)));
-        $commandDir = $dir.'/'.basename($bundleBase).'/Command';
-        if (!is_dir($commandDir))
-        {
-          continue;
-        }
-
-        // look for commands
-        foreach (new \RecursiveIteratorIterator(new \RecursiveDirectoryIterator($commandDir), \RecursiveIteratorIterator::LEAVES_ONLY) as $file)
-        {
-          if ($file->isDir() || substr($file, -4) !== '.php')
-          {
-            continue;
-          }
-
-          $class = str_replace('/', '\\', $bundleBase).'\\Command\\'.str_replace(realpath($commandDir).'/', '', basename(realpath($file), '.php'));
-
-          $r = new \ReflectionClass($class);
-
-          if ($r->isSubclassOf('Symfony\\Components\\Console\\Command\\Command') && !$r->isAbstract())
-          {
-            $this->addCommand(new $class());
-          }
-        }
-      }
+      $bundle->registerCommands($this);
     }
   }
 }

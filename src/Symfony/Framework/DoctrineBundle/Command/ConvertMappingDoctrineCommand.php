@@ -7,9 +7,7 @@ use Symfony\Components\Console\Input\InputOption;
 use Symfony\Components\Console\Input\InputInterface;
 use Symfony\Components\Console\Output\OutputInterface;
 use Symfony\Components\Console\Output\Output;
-use Symfony\Framework\WebBundle\Util\Filesystem;
-use Doctrine\Common\Cli\Configuration;
-use Doctrine\Common\Cli\CliController as DoctrineCliController;
+use Doctrine\ORM\Tools\Console\Command\ConvertMappingCommand;
 
 /*
  * This file is part of the Symfony framework.
@@ -29,20 +27,16 @@ use Doctrine\Common\Cli\CliController as DoctrineCliController;
  * @author     Fabien Potencier <fabien.potencier@symfony-project.com>
  * @author     Jonathan H. Wage <jonwage@gmail.com>
  */
-class ConvertMappingDoctrineCommand extends DoctrineCommand
+class ConvertMappingDoctrineCommand extends ConvertMappingCommand
 {
   /**
    * @see Command
    */
   protected function configure()
   {
-    $this
-      ->setName('doctrine:convert-mapping')
-      ->setDescription('Convert mapping information between supported formats.')
-      ->addOption('from', null, null, 'The source to convert from.')
-      ->addOption('to', null, null, 'The type of mapping to convert to.')
-      ->addOption('dest', null, null, 'Where to output the converted source.')
-    ;
+    parent::configure();
+    $this->setName('doctrine:convert-mapping');
+    $this->addOption('em', null, InputOption::PARAMETER_OPTIONAL, 'The entity manager to convert the mapping information from.');
   }
 
   /**
@@ -50,9 +44,8 @@ class ConvertMappingDoctrineCommand extends DoctrineCommand
    */
   protected function execute(InputInterface $input, OutputInterface $output)
   {
-    $options = $this->buildDoctrineCliTaskOptions($input, array(
-      'from', 'to', 'dest'
-    ));
-    $this->runDoctrineCliTask('orm:convert-mapping', $options);
+    DoctrineCommand::setApplicationEntityManager($this->application, $input->getOption('em'));
+
+    return parent::execute($input, $output);
   }
 }

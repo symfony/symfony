@@ -7,9 +7,7 @@ use Symfony\Components\Console\Input\InputOption;
 use Symfony\Components\Console\Input\InputInterface;
 use Symfony\Components\Console\Output\OutputInterface;
 use Symfony\Components\Console\Output\Output;
-use Symfony\Framework\WebBundle\Util\Filesystem;
-use Doctrine\Common\Cli\Configuration;
-use Doctrine\Common\Cli\CliController as DoctrineCliController;
+use Doctrine\ORM\Tools\Console\Command\EnsureProductionSettingsCommand;
 
 /*
  * This file is part of the Symfony framework.
@@ -28,17 +26,16 @@ use Doctrine\Common\Cli\CliController as DoctrineCliController;
  * @author     Fabien Potencier <fabien.potencier@symfony-project.com>
  * @author     Jonathan H. Wage <jonwage@gmail.com>
  */
-class EnsureProductionSettingsDoctrineCommand extends DoctrineCommand
+class EnsureProductionSettingsDoctrineCommand extends EnsureProductionSettingsCommand
 {
   /**
    * @see Command
    */
   protected function configure()
   {
-    $this
-      ->setName('doctrine:ensure-production-settings')
-      ->setDescription('Verify that Doctrine is properly configured for a production environment.')
-    ;
+    parent::configure();
+    $this->setName('doctrine:ensure-production-settings');
+    $this->addOption('em', null, InputOption::PARAMETER_OPTIONAL, 'The entity manager to ensure production settings for.');
   }
 
   /**
@@ -46,6 +43,8 @@ class EnsureProductionSettingsDoctrineCommand extends DoctrineCommand
    */
   protected function execute(InputInterface $input, OutputInterface $output)
   {
-    $this->runDoctrineCliTask('orm:ensure-production-settings');
+    DoctrineCommand::setApplicationEntityManager($this->application, $input->getOption('em'));
+
+    parent::execute($input, $output);
   }
 }

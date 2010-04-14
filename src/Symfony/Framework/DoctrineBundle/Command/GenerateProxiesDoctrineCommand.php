@@ -7,7 +7,7 @@ use Symfony\Components\Console\Input\InputOption;
 use Symfony\Components\Console\Input\InputInterface;
 use Symfony\Components\Console\Output\OutputInterface;
 use Symfony\Components\Console\Output\Output;
-use Symfony\Framework\WebBundle\Util\Filesystem;
+use Doctrine\ORM\Tools\Console\Command\GenerateProxiesCommand;
 
 /*
  * This file is part of the Symfony framework.
@@ -24,18 +24,18 @@ use Symfony\Framework\WebBundle\Util\Filesystem;
  * @package    Symfony
  * @subpackage Framework_DoctrineBundle
  * @author     Fabien Potencier <fabien.potencier@symfony-project.com>
+ * @author     Jonathan H. Wage <jonwage@gmail.com>
  */
-class GenerateProxiesDoctrineCommand extends DoctrineCommand
+class GenerateProxiesDoctrineCommand extends GenerateProxiesCommand
 {
   /**
    * @see Command
    */
   protected function configure()
   {
-    $this
-      ->setName('doctrine:generate-proxies')
-      ->setDescription('Generates proxy classes for entity classes.')
-    ;
+    parent::configure();
+    $this->setName('doctrine:generate-proxies');
+    $this->addOption('em', null, InputOption::PARAMETER_OPTIONAL, 'The entity manager to generate proxies for.');
   }
 
   /**
@@ -43,28 +43,8 @@ class GenerateProxiesDoctrineCommand extends DoctrineCommand
    */
   protected function execute(InputInterface $input, OutputInterface $output)
   {
-    $dirs = array();
-    $bundleDirs = $this->container->getKernelService()->getBundleDirs();
-    foreach ($this->container->getKernelService()->getBundles() as $bundle)
-    {
-      $tmp = dirname(str_replace('\\', '/', get_class($bundle)));
-      $namespace = str_replace('/', '\\', dirname($tmp));
-      $class = basename($tmp);
+    DoctrineCommand::setApplicationEntityManager($this->application, $input->getOption('em'));
 
-      if (isset($bundleDirs[$namespace]) && is_dir($dir = $bundleDirs[$namespace].'/'.$class.'/Entities'))
-      {
-        $dirs[] = $dir;
-      }
-    }
-
-    if (!is_dir($dir = $this->container->getParameter('kernel.cache_dir').'/doctrine/Proxies'))
-    {
-      mkdir($dir, 0777, true);
-    }
-
-    foreach ($dirs as $dir)
-    {
-      $this->runDoctrineCliTask('orm:generate-proxies', array('class-dir' => $dir));
-    }
+    return parent::execute($input, $output);
   }
 }

@@ -7,9 +7,7 @@ use Symfony\Components\Console\Input\InputOption;
 use Symfony\Components\Console\Input\InputInterface;
 use Symfony\Components\Console\Output\OutputInterface;
 use Symfony\Components\Console\Output\Output;
-use Symfony\Framework\WebBundle\Util\Filesystem;
-use Doctrine\Common\Cli\Configuration;
-use Doctrine\Common\Cli\CliController as DoctrineCliController;
+use Doctrine\ORM\Tools\Console\Command\RunDqlCommand;
 
 /*
  * This file is part of the Symfony framework.
@@ -28,20 +26,16 @@ use Doctrine\Common\Cli\CliController as DoctrineCliController;
  * @author     Fabien Potencier <fabien.potencier@symfony-project.com>
  * @author     Jonathan H. Wage <jonwage@gmail.com>
  */
-class RunDqlDoctrineCommand extends DoctrineCommand
+class RunDqlDoctrineCommand extends RunDqlCommand
 {
   /**
    * @see Command
    */
   protected function configure()
   {
-    $this
-      ->setName('doctrine:run-dql')
-      ->setDescription('Executes arbitrary DQL directly from the command line.')
-      ->addOption('dql', null, null, 'The DQL query to run.')
-      ->addOption('depth', null, null, 'The depth to output the data to.')
-      ->addOption('connection', null, null, 'The connection to use.')
-    ;
+    parent::configure();
+    $this->setName('doctrine:run-dql');
+    $this->addOption('em', null, InputOption::PARAMETER_OPTIONAL, 'The entity manager to execute the DQL query on.');
   }
 
   /**
@@ -49,9 +43,8 @@ class RunDqlDoctrineCommand extends DoctrineCommand
    */
   protected function execute(InputInterface $input, OutputInterface $output)
   {
-    $options = $this->buildDoctrineCliTaskOptions($input, array(
-      'dql', 'depth'
-    ));
-    $this->runDoctrineCliTask('orm:run-dql', $options);
+    DoctrineCommand::setApplicationEntityManager($this->application, $input->getOption('em'));
+
+    return parent::execute($input, $output);
   }
 }

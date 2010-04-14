@@ -7,7 +7,7 @@ use Symfony\Components\Console\Input\InputOption;
 use Symfony\Components\Console\Input\InputInterface;
 use Symfony\Components\Console\Output\OutputInterface;
 use Symfony\Components\Console\Output\Output;
-use Doctrine\DBAL\Tools\Console\Command\RunSqlCommand;
+use Doctrine\ORM\Tools\Console\Command\SchemaTool\DropCommand;
 
 /*
  * This file is part of the Symfony framework.
@@ -19,32 +19,32 @@ use Doctrine\DBAL\Tools\Console\Command\RunSqlCommand;
  */
 
 /**
- * Execute a SQL query and output the results.
+ * Command to drop the database schema for a set of classes based on their mappings.
  *
  * @package    Symfony
  * @subpackage Framework_DoctrineBundle
  * @author     Fabien Potencier <fabien.potencier@symfony-project.com>
  * @author     Jonathan H. Wage <jonwage@gmail.com>
  */
-class RunSqlDoctrineCommand extends RunSqlCommand
+class DropSchemaDoctrineCommand extends DropCommand
 {
   /**
-   * @see RunSqlCommand
+   * @see Command
    */
   protected function configure()
   {
     parent::configure();
-    $this->setName('doctrine:run-sql');
-    $this->addOption('connection', null, null, 'The connection to execute the SQL query on.');
+    $this->setName('doctrine:drop-schema');
+    $this->addOption('em', null, InputOption::PARAMETER_OPTIONAL, 'The entity manager to drop the schema for.');
   }
 
   /**
-   * @see RunSqlCommand
+   * @see Command
    */
   protected function execute(InputInterface $input, OutputInterface $output)
   {
-    DoctrineCommand::setApplicationConnection($this->application, $input->getOption('connection'));
+    DoctrineCommand::setApplicationEntityManager($this->application, $input->getOption('em'));
 
-    return parent::execute($input, $output);
+    parent::execute($input, $output);
   }
 }

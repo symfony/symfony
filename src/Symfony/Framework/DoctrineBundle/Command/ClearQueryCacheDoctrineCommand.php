@@ -2,12 +2,10 @@
 
 namespace Symfony\Framework\DoctrineBundle\Command;
 
-use Symfony\Components\Console\Input\InputArgument;
 use Symfony\Components\Console\Input\InputOption;
 use Symfony\Components\Console\Input\InputInterface;
 use Symfony\Components\Console\Output\OutputInterface;
-use Symfony\Components\Console\Output\Output;
-use Doctrine\DBAL\Tools\Console\Command\RunSqlCommand;
+use Doctrine\ORM\Tools\Console\Command\ClearCache\QueryCommand;
 
 /*
  * This file is part of the Symfony framework.
@@ -19,31 +17,25 @@ use Doctrine\DBAL\Tools\Console\Command\RunSqlCommand;
  */
 
 /**
- * Execute a SQL query and output the results.
+ * Command to clear the query cache of the various cache drivers.
  *
  * @package    Symfony
  * @subpackage Framework_DoctrineBundle
  * @author     Fabien Potencier <fabien.potencier@symfony-project.com>
  * @author     Jonathan H. Wage <jonwage@gmail.com>
  */
-class RunSqlDoctrineCommand extends RunSqlCommand
+class ClearQueryCacheDoctrineCommand extends QueryCommand
 {
-  /**
-   * @see RunSqlCommand
-   */
   protected function configure()
   {
     parent::configure();
-    $this->setName('doctrine:run-sql');
-    $this->addOption('connection', null, null, 'The connection to execute the SQL query on.');
+    $this->setName('doctrine:clear-cache:query');
+    $this->addOption('em', null, InputOption::PARAMETER_OPTIONAL, 'The entity manager to clear the cache for.');
   }
 
-  /**
-   * @see RunSqlCommand
-   */
   protected function execute(InputInterface $input, OutputInterface $output)
   {
-    DoctrineCommand::setApplicationConnection($this->application, $input->getOption('connection'));
+    DoctrineCommand::setApplicationEntityManager($this->application, $input->getOption('em'));
 
     return parent::execute($input, $output);
   }

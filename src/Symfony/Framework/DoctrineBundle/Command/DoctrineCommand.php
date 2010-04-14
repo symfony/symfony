@@ -10,9 +10,12 @@ use Symfony\Components\Console\Input\InputInterface;
 use Symfony\Components\Console\Output\OutputInterface;
 use Symfony\Components\Console\Output\Output;
 use Symfony\Framework\WebBundle\Console\Application;
-use Symfony\Framework\WebBundle\Util\Filesystem;
-use Doctrine\Common\Cli\Configuration;
-use Doctrine\Common\Cli\CliController as DoctrineCliController;
+use Symfony\Foundation\Bundle\Bundle;
+use Doctrine\DBAL\Tools\Console\Helper\ConnectionHelper;
+use Doctrine\ORM\Tools\Console\Helper\EntityManagerHelper;
+use Doctrine\ORM\Tools\DisconnectedClassMetadataFactory;
+use Doctrine\ORM\Mapping\ClassMetadata;
+use Doctrine\ORM\Mapping\ClassMetadataInfo;
 
 /*
  * This file is part of the Symfony framework.
@@ -32,65 +35,57 @@ use Doctrine\Common\Cli\CliController as DoctrineCliController;
  */
 abstract class DoctrineCommand extends Command
 {
-  protected
-    $application,
-    $cli,
-    $em;
-
-  protected function getDoctrineCli()
+  public static function setApplicationEntityManager(Application $application, $emName)
   {
-    if ($this->cli === null)
+    $container = $application->getKernel()->getContainer();
+    $emName = $emName ? $emName : 'default';
+    $emServiceName = sprintf('doctrine.orm.%s_entity_manager', $emName);
+    if (!$container->hasService($emServiceName))
     {
-      $configuration = new Configuration();
-      $this->cli = new DoctrineCliController($configuration);
+      throw new \InvalidArgumentException(sprintf('Could not find Doctrine EntityManager named "%s"', $emName));
     }
-    $em = $this->em ? $this->em : $this->container->getDoctrine_Orm_EntityManagerService();
-    $this->cli->getConfiguration()->setAttribute('em', $em);
-    return $this->cli;
+
+    $em = $container->getService($emServiceName);
+    $helperSet = $application->getHelperSet();
+    $helperSet->set(new ConnectionHelper($em->getConnection()), 'db');
+    $helperSet->set(new EntityManagerHelper($em), 'em');
   }
 
-  protected function runDoctrineCliTask($name, $options = array())
+  public static function setApplicationConnection(Application $application, $connName)
   {
-    $builtOptions = array();
-    foreach ($options as $key => $value)
+    $container = $application->getKernel()->getContainer();
+    $connName = $connName ? $connName : 'default';
+    $connServiceName = sprintf('doctrine.dbal.%s_connection', $connName);
+    if (!$container->hasService($connServiceName))
     {
-      if ($value === null)
-      {
-        $builtOptions[] = sprintf('--%s', $key);
-      }
-      else
-      {
-        $builtOptions[] = sprintf('--%s=%s', $key, $value);
-      }
+      throw new \InvalidArgumentException(sprintf('Could not find Doctrine Connection named "%s"', $connName));
     }
-    return $this->getDoctrineCli()->run(array_merge(array('doctrine', $name), $builtOptions));
+
+    $connection = $container->getService($connServiceName);
+    $helperSet = $application->getHelperSet();
+    $helperSet->set(new ConnectionHelper($connection), 'db');
   }
 
-  protected function buildDoctrineCliTaskOptions(InputInterface $input, array $options)
+  protected function getEntityManager($name = null)
   {
-    $taskOptions = array();
-    foreach ($options as $option)
+    $name = $name ? $name : 'default';
+    $serviceName = sprintf('doctrine.orm.%s_entity_manager', $name);
+    if (!$this->container->hasService($serviceName))
     {
-      if ($value = $input->getOption($option))
-      {
-        $options[$option] = $value;
-      }
+      throw new \InvalidArgumentException(sprintf('Could not find Doctrine EntityManager named "%s"', $name));
     }
-    return $options;
+    
+    return $this->container->getService($serviceName);
   }
 
   protected function runCommand($name, array $input = array())
   {
-    if ($this->application === null)
-    {
-      $this->application = new Application($this->container->getKernelService());
-    }
-
+    $application = new Application($this->container->getKernelService());
     $arguments = array();
     $arguments = array_merge(array($name), $input);
     $input = new ArrayInput($arguments);
-    $this->application->setAutoExit(false);
-    $this->application->run($input);
+    $application->setAutoExit(false);
+    $application->run($input);
   }
 
   /**
@@ -126,5 +121,46 @@ abstract class DoctrineCommand extends Command
       }
     }
     return $entityManagers;
+  }
+
+  protected function getBundleMetadatas(Bundle $bundle)
+  {
+    $tmp = dirname(str_replace('\\', '/', get_class($bundle)));
+    $namespace = str_replace('/', '\\', dirname($tmp));
+    $class = basename($tmp);
+
+    $bundleMetadatas = array();
+    $entityManagers = $this->getDoctrineEntityManagers();
+    foreach ($entityManagers as $key => $em)
+    {
+      $cmf = new SymfonyDisconnectedClassMetadataFactory($em);
+      $metadatas = $cmf->getAllMetadata();
+      foreach ($metadatas as $metadata)
+      {
+        if (strpos($metadata->name, $namespace) !== false)
+        {
+          $bundleMetadatas[] = $metadata;
+        }
+      }
+    }
+    return $bundleMetadatas;
+  }
+}
+
+class SymfonyDisconnectedClassMetadataFactory extends DisconnectedClassMetadataFactory
+{
+  /**
+   * @override
+   */
+  protected function _newClassMetadataInstance($className)
+  {
+    if (class_exists($className))
+    {
+      return new ClassMetadata($className);
+    }
+    else
+    {
+      return new ClassMetadataInfo($className);
+    }
   }
 }

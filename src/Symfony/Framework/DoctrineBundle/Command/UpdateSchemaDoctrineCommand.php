@@ -7,9 +7,7 @@ use Symfony\Components\Console\Input\InputOption;
 use Symfony\Components\Console\Input\InputInterface;
 use Symfony\Components\Console\Output\OutputInterface;
 use Symfony\Components\Console\Output\Output;
-use Symfony\Framework\WebBundle\Util\Filesystem;
-use Doctrine\Common\Cli\Configuration;
-use Doctrine\Common\Cli\CliController as DoctrineCliController;
+use Doctrine\ORM\Tools\Console\Command\SchemaTool\UpdateCommand;
 
 /*
  * This file is part of the Symfony framework.
@@ -21,24 +19,23 @@ use Doctrine\Common\Cli\CliController as DoctrineCliController;
  */
 
 /**
- * Check what version of the Doctrine ORM being used.
+ * Command to update the database schema for a set of classes based on their mappings.
  *
  * @package    Symfony
  * @subpackage Framework_DoctrineBundle
  * @author     Fabien Potencier <fabien.potencier@symfony-project.com>
  * @author     Jonathan H. Wage <jonwage@gmail.com>
  */
-class VersionDoctrineCommand extends DoctrineCommand
+class UpdateSchemaDoctrineCommand extends UpdateCommand
 {
   /**
    * @see Command
    */
   protected function configure()
   {
-    $this
-      ->setName('doctrine:version')
-      ->setDescription('Displays the current installed Doctrine version.')
-    ;
+    parent::configure();
+    $this->setName('doctrine:update-schema');
+    $this->addOption('em', null, InputOption::PARAMETER_OPTIONAL, 'The entity manager to update the schema for.');
   }
 
   /**
@@ -46,6 +43,8 @@ class VersionDoctrineCommand extends DoctrineCommand
    */
   protected function execute(InputInterface $input, OutputInterface $output)
   {
-    $this->runDoctrineCliTask('orm:version');
+    DoctrineCommand::setApplicationEntityManager($this->application, $input->getOption('em'));
+
+    parent::execute($input, $output);
   }
 }

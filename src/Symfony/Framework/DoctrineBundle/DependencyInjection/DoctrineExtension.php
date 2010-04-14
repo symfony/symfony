@@ -220,8 +220,10 @@ class DoctrineExtension extends LoaderExtension
 
         if (is_dir($dir = $bundleDirs[$namespace].'/'.$class.'/Entities'))
         {
-          $type = 'annotation';
-
+          if ($type === false)
+          {
+            $type = 'annotation';
+          }
           $aliasMap[$class] = $namespace.'\\'.$class.'\\Entities';
         }
 

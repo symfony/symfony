@@ -24,63 +24,64 @@ class CrossCheckTest extends \PHPUnit_Framework_TestCase
     require_once self::$fixturesPath.'/includes/foo.php';
   }
 
-  public function testCrossCheck()
+  /**
+   * @dataProvider crossCheckLoadersDumpers
+   */
+  public function testCrossCheck($fixture, $type)
   {
-    // cross-check loaders/dumpers
+    $loaderClass = 'Symfony\\Components\\DependencyInjection\\Loader\\'.ucfirst($type).'FileLoader';
+    $dumperClass = 'Symfony\\Components\\DependencyInjection\\Dumper\\'.ucfirst($type).'Dumper';
 
-    $fixtures = array(
-      'services1.xml' => 'xml',
-      'services2.xml' => 'xml',
-      'services6.xml' => 'xml',
-      'services8.xml' => 'xml',
-      'services9.xml' => 'xml',
+    $container1 = new Builder();
+    $loader1 = new $loaderClass($container1);
+    $loader1->load(self::$fixturesPath.'/'.$type.'/'.$fixture);
+    $container1->setParameter('path', self::$fixturesPath.'/includes');
 
-      'services1.yml' => 'yaml',
-      'services2.yml' => 'yaml',
-      'services6.yml' => 'yaml',
-      'services8.yml' => 'yaml',
-      'services9.yml' => 'yaml',
-    );
+    $dumper = new $dumperClass($container1);
+    $tmp = tempnam('sf_service_container', 'sf');
+    file_put_contents($tmp, $dumper->dump());
 
-    foreach ($fixtures as $fixture => $type)
+    $container2 = new Builder();
+    $loader2 = new $loaderClass($container2);
+    $loader2->load($tmp);
+    $container2->setParameter('path', self::$fixturesPath.'/includes');
+
+    unlink($tmp);
+
+    $this->assertEquals(serialize($container2), serialize($container1), 'loading a dump from a previously loaded container returns the same container');
+
+    $this->assertEquals($container2->getParameters(), $container1->getParameters(), '->getParameters() returns the same value for both containers');
+
+    $services1 = array();
+    foreach ($container1 as $id => $service)
     {
-      $loaderClass = 'Symfony\\Components\\DependencyInjection\\Loader\\'.ucfirst($type).'FileLoader';
-      $dumperClass = 'Symfony\\Components\\DependencyInjection\\Dumper\\'.ucfirst($type).'Dumper';
-
-      $container1 = new Builder();
-      $loader1 = new $loaderClass($container1);
-      $loader1->load(self::$fixturesPath.'/'.$type.'/'.$fixture);
-      $container1->setParameter('path', self::$fixturesPath.'/includes');
-
-      $dumper = new $dumperClass($container1);
-      $tmp = tempnam('sf_service_container', 'sf');
-      file_put_contents($tmp, $dumper->dump());
-
-      $container2 = new Builder();
-      $loader2 = new $loaderClass($container2);
-      $loader2->load($tmp);
-      $container2->setParameter('path', self::$fixturesPath.'/includes');
-
-      unlink($tmp);
-
-      $this->assertEquals(serialize($container2), serialize($container1), 'loading a dump from a previously loaded container returns the same container');
-
-      $this->assertEquals($container2->getParameters(), $container1->getParameters(), '->getParameters() returns the same value for both containers');
-
-      $services1 = array();
-      foreach ($container1 as $id => $service)
-      {
-        $services1[$id] = serialize($service);
-      }
-      $services2 = array();
-      foreach ($container2 as $id => $service)
-      {
-        $services2[$id] = serialize($service);
-      }
-
-      unset($services1['service_container'], $services2['service_container']);
-
-      $this->assertEquals($services2, $services1, 'Iterator on the containers returns the same services');
+      $services1[$id] = serialize($service);
     }
+    $services2 = array();
+    foreach ($container2 as $id => $service)
+    {
+      $services2[$id] = serialize($service);
+    }
+
+    unset($services1['service_container'], $services2['service_container']);
+
+    $this->assertEquals($services2, $services1, 'Iterator on the containers returns the same services');
+  }
+
+  public function crossCheckLoadersDumpers()
+  {
+    return array(
+      array('services1.xml', 'xml'),
+      array('services2.xml', 'xml'),
+      array('services6.xml', 'xml'),
+      array('services8.xml', 'xml'),
+      array('services9.xml', 'xml'),
+
+      array('services1.yml', 'yaml'),
+      array('services2.yml', 'yaml'),
+      array('services6.yml', 'yaml'),
+      array('services8.yml', 'yaml'),
+      array('services9.yml', 'yaml'),
+    );
   }
 }

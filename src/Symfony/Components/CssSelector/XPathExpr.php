@@ -173,28 +173,31 @@ class XPathExpr
 
     if (false === strpos($s, "'"))
     {
-      $s = sprintf("'%s'", $s);
+      return sprintf("'%s'", $s);
     }
-    elseif (false === strpos($s, '"'))
+
+    if (false === strpos($s, '"'))
     {
-      $s = sprintf('"%s"', $s);
+      return sprintf('"%s"', $s);
     }
-    else
+
+    $string = $s;
+    $parts = array();
+    while (true)
     {
-      $tmp = array();
-      foreach (preg_split("#('+)#", $s) as $part)
+      if (false !== $pos = strpos($string, "'"))
       {
-        if (!$part)
-        {
-          continue;
-        }
-
-        $tmp[] = sprintf(false !== strpos($part, "'") ? '"%s"' : "'%s'", $part);
+        $parts[] = sprintf("'%s'", substr($string, 0, $pos));
+        $parts[] = "\"'\"";
+        $string = substr($string, $pos + 1);
       }
-
-      $s = sprintf("concat(%s)", implode($tmp, ','));
+      else
+      {
+        $parts[] = "'$string'";
+        break;
+      }
     }
 
-    return $s;
+    return sprintf("concat(%s)", implode($parts, ', '));
   }
 }

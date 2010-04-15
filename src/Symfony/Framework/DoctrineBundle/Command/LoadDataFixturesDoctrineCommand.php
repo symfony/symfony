@@ -33,26 +33,33 @@ use Doctrine\ORM\Internal\CommitOrderCalculator;
  */
 class LoadDataFixturesDoctrineCommand extends DoctrineCommand
 {
-  /**
-   * @see Command
-   */
   protected function configure()
   {
     $this
-      ->setName('doctrine:load-data-fixtures')
+      ->setName('doctrine:data:load')
       ->setDescription('Load data fixtures to your database.')
-      ->addOption('dir-or-file', null, InputOption::PARAMETER_OPTIONAL | InputOption::PARAMETER_IS_ARRAY, 'The directory or file to load data fixtures from.')
+      ->addOption('fixtures', null, InputOption::PARAMETER_OPTIONAL | InputOption::PARAMETER_IS_ARRAY, 'The directory or file to load data fixtures from.')
       ->addOption('append', null, InputOption::PARAMETER_OPTIONAL, 'Whether or not to append the data fixtures.', false)
-    ;
+      ->setHelp(<<<EOT
+The <info>doctrine:data:load</info> command loads data fixtures from your bundles:
+
+  <info>./symfony doctrine:data:load</info>
+
+You can also optionally specify the path to fixtures with the <info>--fixtures</info> option:
+
+  <info>./symfony doctrine:data:load --fixtures=/path/to/fixtures1 --fixtures=/path/to/fixtures2</info>
+
+If you want to append the fixtures instead of flushing the database first you can use the <info>--append</info> option:
+
+  <info>./symfony doctrine:data:load --append</info>
+EOT
+    );
   }
 
-  /**
-   * @see Command
-   */
   protected function execute(InputInterface $input, OutputInterface $output)
   {
     $defaultEm = $this->container->getDoctrine_ORM_EntityManagerService();
-    $dirOrFile = $input->getOption('dir-or-file');
+    $dirOrFile = $input->getOption('fixtures');
     if ($dirOrFile)
     {
       $paths = is_array($dirOrFile) ? $dirOrFile : array($dirOrFile);

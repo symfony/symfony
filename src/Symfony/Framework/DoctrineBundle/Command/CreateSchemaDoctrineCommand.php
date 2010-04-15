@@ -28,19 +28,25 @@ use Doctrine\ORM\Tools\Console\Command\SchemaTool\CreateCommand;
  */
 class CreateSchemaDoctrineCommand extends CreateCommand
 {
-  /**
-   * @see Command
-   */
   protected function configure()
   {
     parent::configure();
-    $this->setName('doctrine:create-schema');
-    $this->addOption('em', null, InputOption::PARAMETER_OPTIONAL, 'The entity manager to create the schema for.');
+
+    $this
+      ->setName('doctrine:schema:create')
+      ->addOption('em', null, InputOption::PARAMETER_OPTIONAL, 'The entity manager to create the schema for.')
+      ->setHelp(<<<EOT
+The <info>doctrine:schema:create</info> command creates the default entity managers schema:
+
+  <info>./symfony doctrine:schema:create</info>
+
+You can also optionally specify the name of a entity manager to create the schema for:
+
+  <info>./symfony doctrine:schema:create --em=default</info>
+EOT
+    );
   }
 
-  /**
-   * @see Command
-   */
   protected function execute(InputInterface $input, OutputInterface $output)
   {
     DoctrineCommand::setApplicationEntityManager($this->application, $input->getOption('em'));

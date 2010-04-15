@@ -16,6 +16,7 @@ use Doctrine\ORM\Tools\Console\Helper\EntityManagerHelper;
 use Doctrine\ORM\Tools\DisconnectedClassMetadataFactory;
 use Doctrine\ORM\Mapping\ClassMetadata;
 use Doctrine\ORM\Mapping\ClassMetadataInfo;
+use Doctrine\ORM\Tools\EntityGenerator;
 
 /*
  * This file is part of the Symfony framework.
@@ -64,6 +65,18 @@ abstract class DoctrineCommand extends Command
     $connection = $container->getService($connServiceName);
     $helperSet = $application->getHelperSet();
     $helperSet->set(new ConnectionHelper($connection), 'db');
+  }
+
+  protected function getEntityGenerator()
+  {
+    $entityGenerator = new EntityGenerator();
+
+    $entityGenerator->setGenerateAnnotations(false);
+    $entityGenerator->setGenerateStubMethods(true);
+    $entityGenerator->setRegenerateEntityIfExists(false);
+    $entityGenerator->setUpdateEntityIfExists(true);
+    $entityGenerator->setNumSpaces(2);
+    return $entityGenerator;
   }
 
   protected function getEntityManager($name = null)

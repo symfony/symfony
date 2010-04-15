@@ -29,39 +29,28 @@ use Doctrine\DBAL\Connection;
  * @author     Fabien Potencier <fabien.potencier@symfony-project.com>
  * @author     Jonathan H. Wage <jonwage@gmail.com>
  */
-class DatabaseToolDoctrineCommand extends DoctrineCommand
+class DropDatabaseDoctrineCommand extends DoctrineCommand
 {
-  /**
-   * @see Command
-   */
   protected function configure()
   {
     $this
-      ->setName('doctrine:database-tool')
-      ->setDescription('Create and drop the configured databases.')
-      ->addOption('re-create', null, null, 'Drop and re-create your databases.')
-      ->addOption('drop', null, null, 'Drop your databases.')
-      ->addOption('create', null, null, 'Create your databases.')
-      ->addOption('connection', null, null, 'The connection name to work on.')
-    ;
+      ->setName('doctrine:database:drop')
+      ->setDescription('Drop the configured databases.')
+      ->addOption('connection', null, null, 'The connection name to create the database for.')
+      ->setHelp(<<<EOT
+The <info>doctrine:database:drop</info> command drops the default connections database:
+
+  <info>./symfony doctrine:database:drop</info>
+
+You can also optionally specify the name of a connection to drop the database for:
+
+  <info>./symfony doctrine:database:drop --connection=default</info>
+EOT
+    );
   }
 
-  /**
-   * @see Command
-   *
-   * @throws \InvalidArgumentException When neither of --drop or --create is specified
-   */
   protected function execute(InputInterface $input, OutputInterface $output)
   {
-    if ($input->getOption('re-create'))
-    {
-      $input->setOption('drop', true);
-      $input->setOption('create', true);
-    }
-    if (!$input->getOption('drop') && !$input->getOption('create'))
-    {
-      throw new \InvalidArgumentException('You must specify one of the --drop and --create options or both.');
-    }
     $found = false;
     $connections = $this->getDoctrineConnections();
     foreach ($connections as $name => $connection)
@@ -70,14 +59,7 @@ class DatabaseToolDoctrineCommand extends DoctrineCommand
       {
         continue;
       }
-      if ($input->getOption('drop'))
-      {
-        $this->dropDatabaseForConnection($connection, $output);
-      }
-      if ($input->getOption('create'))
-      {
-        $this->createDatabaseForConnection($connection, $output);
-      }
+      $this->dropDatabaseForConnection($connection, $output);
       $found = true;
     }
     if ($found === false)
@@ -105,25 +87,5 @@ class DatabaseToolDoctrineCommand extends DoctrineCommand
       $output->writeln(sprintf('<error>Could not drop database for connection named <comment>%s</comment></error>', $name));
       $output->writeln(sprintf('<error>%s</error>', $e->getMessage()));
     }
-  }
-
-  protected function createDatabaseForConnection(Connection $connection, OutputInterface $output)
-  {
-    $params = $connection->getParams();
-    $name = isset($params['path']) ? $params['path']:$params['dbname'];
-
-    unset($params['dbname']);
-
-    $tmpConnection = \Doctrine\DBAL\DriverManager::getConnection($params);
-
-    try {
-      $tmpConnection->getSchemaManager()->createDatabase($name);
-      $output->writeln(sprintf('<info>Created database for connection named <comment>%s</comment></info>', $name));
-    } catch (\Exception $e) {
-      $output->writeln(sprintf('<error>Could not create database for connection named <comment>%s</comment></error>', $name));
-      $output->writeln(sprintf('<error>%s</error>', $e->getMessage()));
-    }
-
-    $tmpConnection->close();
   }
 }

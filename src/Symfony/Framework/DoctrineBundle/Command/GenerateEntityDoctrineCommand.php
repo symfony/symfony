@@ -30,35 +30,30 @@ use Doctrine\ORM\Mapping\ClassMetadataInfo;
  */
 class GenerateEntityDoctrineCommand extends DoctrineCommand
 {
-  /**
-   * @see Command
-   */
   protected function configure()
   {
     $this
-      ->setName('doctrine:generate-entity')
+      ->setName('doctrine:generate:entity')
       ->setDescription('Generate a new Doctrine entity inside a bundle.')
       ->addArgument('bundle', null, InputArgument::REQUIRED, 'The bundle to initialize the entity in.')
       ->addArgument('entity', null, InputArgument::REQUIRED, 'The entity class to initialize.')
       ->addOption('mapping-type', null, InputOption::PARAMETER_OPTIONAL, 'The mapping type to to use for the entity.')
       ->addOption('fields', null, InputOption::PARAMETER_OPTIONAL, 'The fields to create with the new entity.')
-      ->setHelp('
-The <info>doctrine:generate-entity</info> task initializes a new Doctrine entity inside a bundle:
+      ->setHelp(<<<EOT
+The <info>doctrine:generate:entity</info> task initializes a new Doctrine entity inside a bundle:
 
-    <comment>php console doctrine:generate-entity "Bundle\MyCustomBundle" "User\Group"</comment>
+    <comment>./symfony doctrine:generate:entity "Bundle\MyCustomBundle" "User\Group"</comment>
 
 The above would initialize a new entity in the following entity namespace <info>Bundle\MyCustomBundle\Entities\User\Group</info>.
 
 You can also optionally specify the fields you want to generate in the new entity:
 
-    <comment>php console doctrine:generate-entity "Bundle\MyCustomBundle" "User\Group" --fields="name:string(255) description:text"</comment>
-      ')
-    ;
+    <comment>./symfony doctrine:generate:entity "Bundle\MyCustomBundle" "User\Group" --fields="name:string(255) description:text"</comment>
+EOT
+    );
   }
 
   /**
-   * @see Command
-   *
    * @throws \InvalidArgumentException When the bundle doesn't end with Bundle (Example: "Bundle\MySampleBundle")
    */
   protected function execute(InputInterface $input, OutputInterface $output)
@@ -118,14 +113,7 @@ You can also optionally specify the fields you want to generate in the new entit
     {
       $path = $dirs[$namespace].'/'.$bundle.'/Entities/'.str_replace($entityNamespace.'\\', null, $fullEntityClassName).'.php';
 
-      $entityGenerator = new EntityGenerator();
-      $entityGenerator->setGenerateAnnotations(false);
-      $entityGenerator->setGenerateStubMethods(true);
-      $entityGenerator->setRegenerateEntityIfExists(false);
-      $entityGenerator->setUpdateEntityIfExists(false);
-      $entityGenerator->setNumSpaces(2);
-
-      $exporter->setEntityGenerator($entityGenerator);
+      $exporter->setEntityGenerator($this->getEntityGenerator());
     } else {
       $path = $dirs[$namespace].'/'.$bundle.'/Resources/config/doctrine/metadata/'.str_replace('\\', '.', $fullEntityClassName).'.dcm.xml';
     }

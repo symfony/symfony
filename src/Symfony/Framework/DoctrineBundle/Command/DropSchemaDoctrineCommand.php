@@ -28,19 +28,25 @@ use Doctrine\ORM\Tools\Console\Command\SchemaTool\DropCommand;
  */
 class DropSchemaDoctrineCommand extends DropCommand
 {
-  /**
-   * @see Command
-   */
   protected function configure()
   {
     parent::configure();
-    $this->setName('doctrine:drop-schema');
-    $this->addOption('em', null, InputOption::PARAMETER_OPTIONAL, 'The entity manager to drop the schema for.');
+
+    $this
+      ->setName('doctrine:schema:drop')
+      ->addOption('em', null, InputOption::PARAMETER_OPTIONAL, 'The entity manager to drop the schema for.')
+      ->setHelp(<<<EOT
+The <info>doctrine:schema:drop</info> command drops the default entity managers schema:
+
+  <info>./symfony doctrine:schema:drop</info>
+
+You can also optionally specify the name of a entity manager to drop the schema for:
+
+  <info>./symfony doctrine:schema:drop --em=default</info>
+EOT
+    );
   }
 
-  /**
-   * @see Command
-   */
   protected function execute(InputInterface $input, OutputInterface $output)
   {
     DoctrineCommand::setApplicationEntityManager($this->application, $input->getOption('em'));

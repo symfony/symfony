@@ -28,19 +28,21 @@ use Doctrine\ORM\Tools\Console\Command\GenerateProxiesCommand;
  */
 class GenerateProxiesDoctrineCommand extends GenerateProxiesCommand
 {
-  /**
-   * @see Command
-   */
   protected function configure()
   {
     parent::configure();
-    $this->setName('doctrine:generate-proxies');
-    $this->addOption('em', null, InputOption::PARAMETER_OPTIONAL, 'The entity manager to generate proxies for.');
+
+    $this
+      ->setName('doctrine:generate:proxies')
+      ->addOption('em', null, InputOption::PARAMETER_OPTIONAL, 'The entity manager to generate proxies for.')
+      ->setHelp(<<<EOT
+The <info>doctrine:generate:proxies</info> command generates proxy classes for your entities:
+
+  <info>./symfony doctrine:generate:proxies</info>
+EOT
+    );
   }
 
-  /**
-   * @see Command
-   */
   protected function execute(InputInterface $input, OutputInterface $output)
   {
     DoctrineCommand::setApplicationEntityManager($this->application, $input->getOption('em'));

@@ -28,19 +28,21 @@ use Doctrine\DBAL\Tools\Console\Command\RunSqlCommand;
  */
 class RunSqlDoctrineCommand extends RunSqlCommand
 {
-  /**
-   * @see RunSqlCommand
-   */
   protected function configure()
   {
     parent::configure();
-    $this->setName('doctrine:run-sql');
-    $this->addOption('connection', null, null, 'The connection to execute the SQL query on.');
+
+    $this
+      ->setName('doctrine:query:sql')
+      ->addOption('connection', null, null, 'The connection to execute the SQL query on.')
+      ->setHelp(<<<EOT
+The <info>doctrine:query:sql</info> command executes the given DQL query and outputs the results:
+
+  <info>./symfony doctrine:query:sql "SELECT * from user"</info>
+EOT
+    );
   }
 
-  /**
-   * @see RunSqlCommand
-   */
   protected function execute(InputInterface $input, OutputInterface $output)
   {
     DoctrineCommand::setApplicationConnection($this->application, $input->getOption('connection'));

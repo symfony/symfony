@@ -28,19 +28,25 @@ use Doctrine\ORM\Tools\Console\Command\SchemaTool\UpdateCommand;
  */
 class UpdateSchemaDoctrineCommand extends UpdateCommand
 {
-  /**
-   * @see Command
-   */
   protected function configure()
   {
     parent::configure();
-    $this->setName('doctrine:update-schema');
-    $this->addOption('em', null, InputOption::PARAMETER_OPTIONAL, 'The entity manager to update the schema for.');
+
+    $this
+      ->setName('doctrine:schema:update')
+      ->addOption('em', null, InputOption::PARAMETER_OPTIONAL, 'The entity manager to update the schema for.')
+      ->setHelp(<<<EOT
+The <info>doctrine:schema:update</info> command updates the default entity managers schema:
+
+  <info>./symfony doctrine:schema:update</info>
+
+You can also optionally specify the name of a entity manager to update the schema for:
+
+  <info>./symfony doctrine:schema:update --em=default</info>
+EOT
+    );
   }
 
-  /**
-   * @see Command
-   */
   protected function execute(InputInterface $input, OutputInterface $output)
   {
     DoctrineCommand::setApplicationEntityManager($this->application, $input->getOption('em'));

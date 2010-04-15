@@ -28,7 +28,15 @@ class GenerateRepositoriesDoctrineCommand extends DoctrineCommand
 {
   protected function configure()
   {
-    $this->setName('doctrine:generate-repositories');
+    $this
+      ->setName('doctrine:generate:repositories')
+      ->setDescription('Generate repository classes from your mapping information.')
+      ->setHelp(<<<EOT
+The <info>doctrine:generate:repositories</info> command generates the configured entity repository classes from your mapping information:
+
+  <info>./symfony doctrine:generate:repositories</info>
+EOT
+    );
   }
 
   protected function execute(InputInterface $input, OutputInterface $output)

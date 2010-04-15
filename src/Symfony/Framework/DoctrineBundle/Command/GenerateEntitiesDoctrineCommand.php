@@ -31,25 +31,20 @@ class GenerateEntitiesDoctrineCommand extends DoctrineCommand
 {
   protected function configure()
   {
-      $this
-      ->setName('doctrine:generate-entities')
+    $this
+      ->setName('doctrine:generate:entities')
       ->setDescription('Generate entity classes and method stubs from your mapping information.')
       ->setHelp(<<<EOT
-Generate entity classes and method stubs from your mapping information.
+The <info>doctrine:generate:entities</info> command generates entity classes and method stubs from your mapping information:
+
+  <info>./symfony doctrine:generate:entities</info>
 EOT
-      );
+    );
   }
 
   protected function execute(InputInterface $input, OutputInterface $output)
   {
-    $entityGenerator = new EntityGenerator();
-
-    $entityGenerator->setGenerateAnnotations(false);
-    $entityGenerator->setGenerateStubMethods(true);
-    $entityGenerator->setRegenerateEntityIfExists(false);
-    $entityGenerator->setUpdateEntityIfExists(true);
-    $entityGenerator->setNumSpaces(2);
-
+    $entityGenerator = $this->getEntityGenerator();
     $bundleDirs = $this->container->getKernelService()->getBundleDirs();
     foreach ($this->container->getKernelService()->getBundles() as $bundle)
     {

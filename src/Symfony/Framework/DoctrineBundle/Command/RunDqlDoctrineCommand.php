@@ -34,7 +34,7 @@ class RunDqlDoctrineCommand extends RunDqlCommand
 
     $this
       ->setName('doctrine:query:dql')
-      ->addOption('em', null, InputOption::PARAMETER_OPTIONAL, 'The entity manager to execute the DQL query on.')
+      ->addOption('em', null, InputOption::PARAMETER_OPTIONAL, 'The entity manager to use for this command.')
       ->setHelp(<<<EOT
 The <info>doctrine:query:dql</info> command executes the given DQL query and outputs the results:
 

@@ -34,7 +34,7 @@ class CreateSchemaDoctrineCommand extends CreateCommand
 
     $this
       ->setName('doctrine:schema:create')
-      ->addOption('em', null, InputOption::PARAMETER_OPTIONAL, 'The entity manager to create the schema for.')
+      ->addOption('em', null, InputOption::PARAMETER_OPTIONAL, 'The entity manager to use for this command.')
       ->setHelp(<<<EOT
 The <info>doctrine:schema:create</info> command creates the default entity managers schema:
 

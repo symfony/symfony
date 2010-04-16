@@ -36,7 +36,7 @@ class DropDatabaseDoctrineCommand extends DoctrineCommand
     $this
       ->setName('doctrine:database:drop')
       ->setDescription('Drop the configured databases.')
-      ->addOption('connection', null, null, 'The connection name to create the database for.')
+      ->addOption('connection', null, InputOption::PARAMETER_OPTIONAL, 'The connection to use for this command.')
       ->setHelp(<<<EOT
 The <info>doctrine:database:drop</info> command drops the default connections database:
 

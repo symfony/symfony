@@ -17,6 +17,8 @@ use Doctrine\ORM\Tools\DisconnectedClassMetadataFactory;
 use Doctrine\ORM\Mapping\ClassMetadata;
 use Doctrine\ORM\Mapping\ClassMetadataInfo;
 use Doctrine\ORM\Tools\EntityGenerator;
+use DoctrineExtensions\Migrations\Configuration\Configuration;
+use Doctrine\Common\Util\Inflector;
 
 /*
  * This file is part of the Symfony framework.
@@ -36,6 +38,23 @@ use Doctrine\ORM\Tools\EntityGenerator;
  */
 abstract class DoctrineCommand extends Command
 {
+  public static function configureMigrationsForBundle(Application $application, $bundle, Configuration $configuration)
+  {
+      $configuration->setMigrationsNamespace($bundle.'\DoctrineMigrations');
+
+      $dirs = $application->getKernel()->getBundleDirs();
+
+      $tmp = str_replace('\\', '/', $bundle);
+      $namespace = str_replace('/', '\\', dirname($tmp));
+      $bundle = basename($tmp);
+
+      $dir = $dirs[$namespace].'/'.$bundle.'/DoctrineMigrations';
+      $configuration->setMigrationsDirectory($dir);
+      $configuration->registerMigrationsFromDirectory($dir);
+      $configuration->setName($bundle.' Migrations');
+      $configuration->setMigrationsTableName(Inflector::tableize($bundle).'_migration_versions');
+  }
+
   public static function setApplicationEntityManager(Application $application, $emName)
   {
     $container = $application->getKernel()->getContainer();

@@ -39,7 +39,7 @@ class ImportMappingDoctrineCommand extends DoctrineCommand
       ->setName('doctrine:mapping:import')
       ->addArgument('bundle', InputArgument::REQUIRED, 'The bundle to import the mapping information to.')
       ->addArgument('mapping-type', InputArgument::OPTIONAL, 'The mapping type to export the imported mapping information to.')
-      ->addArgument('em', InputArgument::OPTIONAL, 'The entity manager to import the mapping information from.')
+      ->addOption('em', null, InputOption::PARAMETER_OPTIONAL, 'The entity manager to use for this command.')
       ->setDescription('Import mapping information from an existing database.')
       ->setHelp(<<<EOT
 The <info>doctrine:mapping:import</info> command imports mapping information from an existing database:
@@ -93,7 +93,7 @@ EOT
       $exporter->setEntityGenerator($entityGenerator);
     }
 
-    $emName = $input->getArgument('em') ? $input->getArgument('em') : 'default';
+    $emName = $input->getOption('em') ? $input->getOption('em') : 'default';
     $emServiceName = sprintf('doctrine.orm.%s_entity_manager', $emName);
     $em = $this->container->getService($emServiceName);
     $databaseDriver = new DatabaseDriver($em->getConnection()->getSchemaManager());

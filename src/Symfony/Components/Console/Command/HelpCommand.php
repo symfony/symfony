@@ -47,11 +47,11 @@ class HelpCommand extends Command
       ->setHelp(<<<EOF
 The <info>help</info> command displays help for a given command:
 
-  <info>./symfony help test:all</info>
+  <info>./symfony help list</info>
 
 You can also output the help as XML by using the <comment>--xml</comment> option:
 
-  <info>./symfony help --xml test:all</info>
+  <info>./symfony help --xml list</info>
 EOF
       );
   }

@@ -34,7 +34,7 @@ class Mustache
   {
     foreach (new \RecursiveIteratorIterator(new \RecursiveDirectoryIterator($dir), \RecursiveIteratorIterator::LEAVES_ONLY) as $file)
     {
-      if ($file->isDot())
+      if ($file instanceof \DirectoryIterator && $file->isDot())
       {
         continue;
       }

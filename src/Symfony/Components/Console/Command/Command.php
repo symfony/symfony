@@ -282,7 +282,7 @@ class Command
    */
   public function setName($name)
   {
-    if (false !== $pos = strpos($name, ':'))
+    if (false !== $pos = strrpos($name, ':'))
     {
       $namespace = substr($name, 0, $pos);
       $name = substr($name, $pos + 1);

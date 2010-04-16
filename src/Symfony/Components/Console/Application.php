@@ -496,7 +496,7 @@ class Application
   {
     // namespace
     $namespace = '';
-    if (false !== $pos = strpos($name, ':'))
+    if (false !== $pos = strrpos($name, ':'))
     {
       $namespace = $this->findNamespace(substr($name, 0, $pos));
       $name = substr($name, $pos + 1);

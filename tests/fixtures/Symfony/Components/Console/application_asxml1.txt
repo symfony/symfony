@@ -6,11 +6,11 @@
   <description>Displays help for a command</description>
   <help>The &lt;info&gt;help&lt;/info&gt; command displays help for a given command:
  
-   &lt;info&gt;./symfony help test:all&lt;/info&gt;
+   &lt;info&gt;./symfony help list&lt;/info&gt;
  
  You can also output the help as XML by using the &lt;comment&gt;--xml&lt;/comment&gt; option:
  
-   &lt;info&gt;./symfony help --xml test:all&lt;/info&gt;</help>
+   &lt;info&gt;./symfony help --xml list&lt;/info&gt;</help>
   <aliases>
     <alias>?</alias>
   </aliases>

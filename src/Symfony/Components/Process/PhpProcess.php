@@ -50,7 +50,7 @@ class PhpProcess extends Process
    *
    * @return integer The exit status code
    */
-  public function run($callback)
+  public function run($callback = null)
   {
     if (null === $this->commandline)
     {

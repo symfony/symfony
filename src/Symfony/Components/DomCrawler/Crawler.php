@@ -613,7 +613,7 @@ class Crawler extends \SplObjectStorage
 
     if ('/' !== substr($path, -1))
     {
-      $path = dirname($path);
+      $path = substr($path, 0, strrpos($path, '/') + 1);
     }
 
     return array(preg_replace('#^(.*?//[^/]+)\/.*$#', '$1', $uri), $path);

@@ -172,7 +172,7 @@ abstract class Client
    */
   public function request($method, $uri, $parameters = array(), $headers = array(), $files = array(), $server = array(), $changeHistory = true)
   {
-    $uri = $this->getAboluteUri($uri);
+    $uri = $this->getAbsoluteUri($uri);
 
     $server = array_merge($this->server, $server);
     if (!$this->history->isEmpty())
@@ -320,7 +320,7 @@ abstract class Client
     $this->history->clear();
   }
 
-  protected function getAboluteUri($uri)
+  protected function getAbsoluteUri($uri)
   {
     // already absolute?
     if ('http' === substr($uri, 0, 4))

@@ -72,6 +72,35 @@ class Crawler extends \SplObjectStorage
     }
   }
 
+  public function addContent($content, $type = null)
+  {
+    if (empty($type))
+    {
+      $type = 'text/html';
+    }
+
+    // DOM only for HTML/XML content
+    if (!preg_match('/(x|ht)ml/i', $type, $matches))
+    {
+      return null;
+    }
+
+    $charset = 'ISO-8859-1';
+    if (false !== $pos = strpos($type, 'charset='))
+    {
+      $charset = substr($type, $pos + 8);
+    }
+
+    if ('x' === $matches[1])
+    {
+      $this->addXmlContent($content, $charset);
+    }
+    else
+    {
+      $this->addHtmlContent($content, $charset);
+    }
+  }
+
   /**
    * Adds an HTML content to the list of nodes.
    *

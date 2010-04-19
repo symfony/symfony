@@ -73,6 +73,32 @@ class CrawlerTest extends \PHPUnit_Framework_TestCase
   }
 
   /**
+   * @covers Symfony\Components\DomCrawler\Crawler::addContent
+   */
+  public function testAddContent()
+  {
+    $crawler = new Crawler();
+    $crawler->addContent('<html><div class="foo"></html>', 'text/html; charset=UTF-8');
+    $this->assertEquals('foo', $crawler->filter('div')->attr('class'), '->addContent() adds nodes from an HTML string');
+
+    $crawler = new Crawler();
+    $crawler->addContent('<html><div class="foo"></html>');
+    $this->assertEquals('foo', $crawler->filter('div')->attr('class'), '->addContent() uses text/html as the default type');
+
+    $crawler = new Crawler();
+    $crawler->addContent('<html><div class="foo"></div></html>', 'text/xml; charset=UTF-8');
+    $this->assertEquals('foo', $crawler->filter('div')->attr('class'), '->addContent() adds nodes from an XML string');
+
+    $crawler = new Crawler();
+    $crawler->addContent('<html><div class="foo"></div></html>', 'text/xml');
+    $this->assertEquals('foo', $crawler->filter('div')->attr('class'), '->addContent() adds nodes from an XML string');
+
+    $crawler = new Crawler();
+    $crawler->addContent('foo bar', 'text/plain');
+    $this->assertEquals(0, $crawler->count(), '->addContent() does nothing if the type is not (x|ht)ml');
+  }
+
+  /**
    * @covers Symfony\Components\DomCrawler\Crawler::addDocument
    */
   public function testAddDocument()

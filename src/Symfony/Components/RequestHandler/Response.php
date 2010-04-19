@@ -137,15 +137,15 @@ class Response implements ResponseInterface
   /**
    * Sets a cookie.
    *
-   * @param  string  $name      HTTP header name
-   * @param  string  $value     Value for the cookie
-   * @param  string  $expire    Cookie expiration period
-   * @param  string  $path      Path
-   * @param  string  $domain    Domain name
-   * @param  bool    $secure    If secure
-   * @param  bool    $httpOnly  If uses only HTTP
+   * @param  string $name     The cookie name
+   * @param  string $value    The value of the cookie
+   * @param  string $expire   The time the cookie expires
+   * @param  string $path     The path on the server in which the cookie will be available on
+   * @param  string $domain   The domain that the cookie is available
+   * @param  bool   $secure   Indicates that the cookie should only be transmitted over a secure HTTPS connection from the client
+   * @param  bool   $httpOnly When TRUE the cookie will be made accessible only through the HTTP protocol
    *
-   * @throws \InvalidArgumentException When cookie expire parameter is not valid
+   * @throws \InvalidArgumentException When the cookie expire parameter is not valid
    */
   public function setCookie($name, $value, $expire = null, $path = '/', $domain = '', $secure = false, $httpOnly = false)
   {

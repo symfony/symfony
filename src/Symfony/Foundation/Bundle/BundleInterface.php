@@ -25,4 +25,6 @@ interface BundleInterface
   public function buildContainer(ContainerInterface $container);
 
   public function boot(ContainerInterface $container);
+
+  public function shutdown(ContainerInterface $container);
 }

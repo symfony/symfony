@@ -29,4 +29,8 @@ abstract class Bundle implements BundleInterface
   public function boot(ContainerInterface $container)
   {
   }
+
+  public function shutdown(ContainerInterface $container)
+  {
+  }
 }

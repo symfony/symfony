@@ -113,7 +113,7 @@ abstract class Kernel implements \Serializable
     $this->container = $this->initializeContainer();
     $this->container->setService('kernel', $this);
 
-    // boot bundles (in reverse order)
+    // boot bundles
     foreach ($this->bundles as $bundle)
     {
       $bundle->boot($this->container);
@@ -122,6 +122,36 @@ abstract class Kernel implements \Serializable
     $this->booted = true;
 
     return $this;
+  }
+
+  /**
+   * Shutdowns the kernel.
+   *
+   * This method is mainly useful when doing functional testing.
+   */
+  public function shutdown()
+  {
+    $this->booted = false;
+
+    foreach ($this->bundles as $bundle)
+    {
+      $bundle->shutdown($this->container);
+    }
+
+    $this->container = null;
+  }
+
+  /**
+   * Reboots the kernel.
+   *
+   * This method is mainly useful when doing functional testing.
+   *
+   * It is a shortcut for the call to shutdown() and boot().
+   */
+  public function reboot()
+  {
+    $this->shutdown();
+    $this->boot();
   }
 
   public function run()

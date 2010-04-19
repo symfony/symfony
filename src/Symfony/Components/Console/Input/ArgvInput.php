@@ -70,7 +70,7 @@ class ArgvInput extends Input
   protected function parse()
   {
     $this->parsed = $this->tokens;
-    while ($token = array_shift($this->parsed))
+    while (null !== $token = array_shift($this->parsed))
     {
       if ('--' === substr($token, 0, 2))
       {

@@ -46,9 +46,13 @@ class ControllerLoader
     list($parameters['_bundle'], $parameters['_controller'], $parameters['_action']) = explode(':', $controller);
     $parameters['_format'] = $request->getRequestFormat();
 
-    $request = $request->duplicate(null, null, $parameters);
+    $subRequest = $request->duplicate(null, null, $parameters);
 
-    return $this->container->getRequestHandlerService()->handleRaw($request, false);
+    $response = $this->container->getRequestHandlerService()->handleRaw($subRequest, false);
+
+    $this->container->setService('request', $request);
+
+    return $response;
   }
 
   public function resolve(Event $event)

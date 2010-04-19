@@ -266,7 +266,7 @@ RETURN;
     $client = new TestClient();
     $client->request('GET', 'http://www.example.com/foo/foobar');
     $client->reload();
-    $this->assertEquals('http://www.example.com/foo/foobar', $client->getRequest()->getUri(), '->forward() realoads the current page');
+    $this->assertEquals('http://www.example.com/foo/foobar', $client->getRequest()->getUri(), '->forward() reloads the current page');
   }
 
   public function testRestart()

@@ -98,12 +98,12 @@ class Process
 
     $descriptors = array(array('pipe', 'r'), array('pipe', 'w'), array('pipe', 'w'));
 
-    $proccess = proc_open($this->commandline, $descriptors, $pipes, $this->cwd, $this->env, $this->options);
+    $process = proc_open($this->commandline, $descriptors, $pipes, $this->cwd, $this->env, $this->options);
 
     stream_set_blocking($pipes[1], false);
     stream_set_blocking($pipes[2], false);
 
-    if (!is_resource($proccess))
+    if (!is_resource($process))
     {
       throw new \RuntimeException('Unable to launch a new process.');
     }
@@ -128,7 +128,7 @@ class Process
       }
       elseif ($n === 0)
       {
-        proc_terminate($proccess);
+        proc_terminate($process);
 
         throw new \RuntimeException('The process timed out.');
       }
@@ -164,9 +164,9 @@ class Process
       }
     }
 
-    $this->status = proc_get_status($proccess);
+    $this->status = proc_get_status($process);
 
-    proc_close($proccess);
+    proc_close($process);
 
     if ($this->status['signaled'])
     {

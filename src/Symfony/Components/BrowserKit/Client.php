@@ -295,7 +295,7 @@ abstract class Client
   /**
    * Follow redirects?
    *
-   * @throws sfException If request was not a redirect
+   * @throws \LogicException If request was not a redirect
    *
    * @return Symfony\Components\BrowserKit\Client
    */

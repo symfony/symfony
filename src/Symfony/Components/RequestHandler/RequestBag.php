@@ -90,7 +90,7 @@ class RequestBag
    *
    * @return string The filtered value
    */
-  public function getAlnum($value, $default = '')
+  public function getAlnum($key, $default = '')
   {
     return preg_replace('/[^[:alnum:]]/', '', $this->get($key, $default));
   }
@@ -103,7 +103,7 @@ class RequestBag
    *
    * @return string The filtered value
    */
-  public function getDigits($value, $default = '')
+  public function getDigits($key, $default = '')
   {
     return preg_replace('/[^[:digit:]]/', '', $this->get($key, $default));
   }

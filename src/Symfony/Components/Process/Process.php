@@ -41,6 +41,8 @@ class Process
    * @param string  $stdin       The STDIN content
    * @param integer $timeout     The timeout in seconds
    * @param array   $options     An array of options for proc_open
+   *
+   * @throws \RuntimeException When proc_open is not installed
    */
   public function __construct($commandline, $cwd, array $env = array(), $stdin = null, $timeout = 60, array $options = array())
   {
@@ -75,6 +77,8 @@ class Process
    *                                       output available on STDOUT or STDERR
    *
    * @return integer The exit status code
+   *
+   * @throws \RuntimeException When process can't be launch or is stopped
    */
   public function run($callback = null)
   {

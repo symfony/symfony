@@ -292,6 +292,8 @@ class Crawler extends \SplObjectStorage
    * Returns the siblings nodes of the current selection
    *
    * @return Crawler A Crawler instance with the sibling nodes
+   *
+   * @throws \InvalidArgumentException When current node is empty
    */
   public function siblings()
   {
@@ -307,6 +309,8 @@ class Crawler extends \SplObjectStorage
    * Returns the next siblings nodes of the current selection
    *
    * @return Crawler A Crawler instance with the next sibling nodes
+   *
+   * @throws \InvalidArgumentException When current node is empty
    */
   public function nextAll()
   {
@@ -337,6 +341,8 @@ class Crawler extends \SplObjectStorage
    * Returns the parents nodes of the current selection
    *
    * @return Crawler A Crawler instance with the parents nodes of the current selection
+   *
+   * @throws \InvalidArgumentException When current node is empty
    */
   public function parents()
   {
@@ -362,7 +368,9 @@ class Crawler extends \SplObjectStorage
   /**
    * Returns the children nodes of the current selection
    *
-   * @return Crawler A Crawler instance with the chidren nodes
+   * @return Crawler A Crawler instance with the children nodes
+   *
+   * @throws \InvalidArgumentException When current node is empty
    */
   public function children()
   {
@@ -380,6 +388,8 @@ class Crawler extends \SplObjectStorage
    * @param string $attribute The attribute name
    *
    * @return string The attribute value
+   *
+   * @throws \InvalidArgumentException When current node is empty
    */
   public function attr($attribute)
   {
@@ -395,6 +405,8 @@ class Crawler extends \SplObjectStorage
    * Returns the node value of the first node of the list.
    *
    * @return string The node value
+   *
+   * @throws \InvalidArgumentException When current node is empty
    */
   public function text()
   {

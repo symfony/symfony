@@ -273,6 +273,8 @@ class Form
    * @param string $name The field name
    *
    * @return Field\FormField The field instance
+   *
+   * @throws \InvalidArgumentException When field is not present in this form
    */
   public function getField($name)
   {

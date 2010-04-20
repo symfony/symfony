@@ -46,6 +46,8 @@ class ChoiceFormField extends FormField
    * Sets the value of the field.
    *
    * @param string $value The value of the field
+   *
+   * @throws \InvalidArgumentException When value type provided is not correct
    */
   public function setValue($value)
   {
@@ -103,6 +105,8 @@ class ChoiceFormField extends FormField
    * This method should only be used internally.
    *
    * @param \DOMNode $node A \DOMNode
+   *
+   * @throws \LogicException When choice provided is not multiple nor radio
    */
   public function addChoice(\DOMNode $node)
   {
@@ -141,6 +145,8 @@ class ChoiceFormField extends FormField
 
   /**
    * Initializes the form field.
+   *
+   * @throws \LogicException When node type is incorrect
    */
   protected function initialize()
   {

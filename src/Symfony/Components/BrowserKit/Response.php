@@ -41,6 +41,21 @@ class Response
     $this->cookies = $cookies;
   }
 
+  public function __toString()
+  {
+    $headers = '';
+    foreach ($this->headers as $name => $value)
+    {
+      $headers .= sprintf("%s: %s\n", $name, $value);
+    }
+    foreach ($this->cookies as $name => $cookie)
+    {
+      $headers .= sprintf("Set-Cookie: %s=%s\n", $name, $cookie['value']);
+    }
+
+    return $headers."\n".$this->content;
+  }
+
   /**
    * Gets the response content.
    *
@@ -87,8 +102,6 @@ class Response
         return $value;
       }
     }
-
-    return null;
   }
 
   /**

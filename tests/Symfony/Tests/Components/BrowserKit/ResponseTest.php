@@ -49,4 +49,11 @@ class ResponseTest extends \PHPUnit_Framework_TestCase
     $response = new Response('foo', 304, array(), array('foo' => 'bar'));
     $this->assertEquals(array('foo' => 'bar'), $response->getCookies(), '->getCookies() returns the cookies of the response');
   }
+
+  public function testMagicToString()
+  {
+    $response = new Response('foo', 304, array('foo' => 'bar'), array('foo' => array('value' => 'bar')));
+
+    $this->assertEquals("foo: bar\nSet-Cookie: foo=bar\n\nfoo", $response->__toString(), '->__toString() returns the headers and the content as a string');
+  }
 }

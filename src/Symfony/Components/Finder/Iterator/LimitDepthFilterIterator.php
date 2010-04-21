@@ -50,7 +50,7 @@ class LimitDepthFilterIterator extends \FilterIterator
   {
     $fileinfo = $this->getInnerIterator()->current();
 
-    $depth = substr_count(str_replace('\\', '/', $fileinfo->getPath()), '/') - substr_count(str_replace('\\', '/', $this->baseDir->getPathname()), '/');
+    $depth = substr_count($fileinfo->getPath(), DIRECTORY_SEPARATOR) - substr_count($this->baseDir->getPathname(), DIRECTORY_SEPARATOR);
 
     if ($depth > $this->maxDepth)
     {

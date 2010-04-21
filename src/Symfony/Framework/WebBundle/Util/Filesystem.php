@@ -226,26 +226,28 @@ class Filesystem
    *
    * @throws \RuntimeException When file type is unknown
    */
-  public function mirror($originDir, $targetDir, $finder = null, $options = array())
+  public function mirror($originDir, $targetDir, Finder $finder = null, $options = array())
   {
     if (null === $finder)
     {
-      $finder = Finder::type('any');
+      $finder = new Finder();
     }
 
-    foreach ($finder->relative()->in($originDir) as $file)
+    foreach ($finder->in($originDir) as $file)
     {
-      if (is_dir($originDir.DIRECTORY_SEPARATOR.$file))
+      $target = $targetDir.DIRECTORY_SEPARATOR.str_replace(realpath($originDir), '', $file->getRealPath());
+
+      if (is_dir($file))
       {
-        $this->mkdirs($targetDir.DIRECTORY_SEPARATOR.$file);
+        $this->mkdirs($target);
       }
-      else if (is_file($originDir.DIRECTORY_SEPARATOR.$file))
+      else if (is_file($file))
       {
-        $this->copy($originDir.DIRECTORY_SEPARATOR.$file, $targetDir.DIRECTORY_SEPARATOR.$file, $options);
+        $this->copy($file, $target, $options);
       }
-      else if (is_link($originDir.DIRECTORY_SEPARATOR.$file))
+      else if (is_link($file))
       {
-        $this->symlink($originDir.DIRECTORY_SEPARATOR.$file, $targetDir.DIRECTORY_SEPARATOR.$file);
+        $this->symlink($file, $target);
       }
       else
       {

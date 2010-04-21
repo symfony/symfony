@@ -7,8 +7,8 @@ use Symfony\Components\Console\Input\InputOption;
 use Symfony\Components\Console\Input\InputInterface;
 use Symfony\Components\Console\Output\OutputInterface;
 use Symfony\Components\Console\Output\Output;
+use Symfony\Components\Finder\Finder;
 use Symfony\Framework\WebBundle\Util\Filesystem;
-use Symfony\Framework\WebBundle\Util\Finder;
 use Doctrine\Common\Cli\Configuration;
 use Doctrine\Common\Cli\CliController as DoctrineCliController;
 use Doctrine\ORM\EntityManager;
@@ -77,10 +77,14 @@ class LoadDataFixturesDoctrineCommand extends DoctrineCommand
     {
       if (is_dir($path))
       {
-        $found = Finder::type('file')
+        $finder = new Finder();
+        $found = iterator_to_array($finder
+          ->files()
           ->name('*.php')
-          ->in($path);
-      } else {
+          ->in($path));
+      }
+      else
+      {
         $found = array($path);
       }
       $files = array_merge($files, $found);

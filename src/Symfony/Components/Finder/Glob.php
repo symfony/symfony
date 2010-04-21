@@ -1,6 +1,6 @@
 <?php
 
-namespace Symfony\Framework\WebBundle\Util;
+namespace Symfony\Components\Finder;
 
 /*
  * This file is part of the Symfony framework.
@@ -12,7 +12,7 @@ namespace Symfony\Framework\WebBundle\Util;
  */
 
 /**
- * Match globbing patterns against text.
+ * Glob matches globbing patterns against text.
  *
  *   if match_glob("foo.*", "foo.bar") echo "matched\n";
  *
@@ -26,59 +26,47 @@ namespace Symfony\Framework\WebBundle\Util;
  * Glob implements glob(3) style matching that can be used to match
  * against text, rather than fetching names from a filesystem.
  *
- * based on perl Text::Glob module.
+ * Based on the Perl Text::Glob module.
  *
  * @package    Symfony
- * @subpackage Framework_WebBundle
- * @author     Fabien Potencier <fabien.potencier@symfony-project.com> php port
- * @author     Richard Clamp <richardc@unixbeard.net> perl version
+ * @subpackage Components_Finder
+ * @author     Fabien Potencier <fabien.potencier@symfony-project.com> PHP port
+ * @author     Richard Clamp <richardc@unixbeard.net> Perl version
  * @copyright  2004-2005 Fabien Potencier <fabien.potencier@symfony-project.com>
  * @copyright  2002 Richard Clamp <richardc@unixbeard.net>
  */
 class Glob
 {
-  protected static $strict_leading_dot = true;
-  protected static $strict_wildcard_slash = true;
-
-  public static function setStrictLeadingDot($boolean)
-  {
-    self::$strict_leading_dot = $boolean;
-  }
-
-  public static function setStrictWildcardSlash($boolean)
-  {
-    self::$strict_wildcard_slash = $boolean;
-  }
-
   /**
-   * Returns a compiled regex which is the equivalent of the globbing pattern.
+   * Returns a regexp which is the equivalent of the glob pattern.
    *
-   * @param  string $glob  pattern
-   * @return string regex
+   * @param  string $glob  The glob pattern
+   *
+   * @return string regex The regexp
    */
-  public static function toRegex($glob)
+  static public function toRegex($glob, $strictLeadingDot = true, $strictWildcardSlash = true)
   {
-    $first_byte = true;
+    $firstByte = true;
     $escaping = false;
-    $in_curlies = 0;
+    $inCurlies = 0;
     $regex = '';
     $sizeGlob = strlen($glob);
     for ($i = 0; $i < $sizeGlob; $i++)
     {
       $car = $glob[$i];
-      if ($first_byte)
+      if ($firstByte)
       {
-        if (self::$strict_leading_dot && $car !== '.')
+        if ($strictLeadingDot && $car !== '.')
         {
           $regex .= '(?=[^\.])';
         }
 
-        $first_byte = false;
+        $firstByte = false;
       }
 
       if ($car === '/')
       {
-        $first_byte = true;
+        $firstByte = true;
       }
 
       if ($car === '.' || $car === '(' || $car === ')' || $car === '|' || $car === '+' || $car === '^' || $car === '$')
@@ -87,25 +75,31 @@ class Glob
       }
       elseif ($car === '*')
       {
-        $regex .= ($escaping ? '\\*' : (self::$strict_wildcard_slash ? '[^/]*' : '.*'));
+        $regex .= $escaping ? '\\*' : ($strictWildcardSlash ? '[^/]*' : '.*');
       }
       elseif ($car === '?')
       {
-        $regex .= ($escaping ? '\\?' : (self::$strict_wildcard_slash ? '[^/]' : '.'));
+        $regex .= $escaping ? '\\?' : ($strictWildcardSlash ? '[^/]' : '.');
       }
       elseif ($car === '{')
       {
-        $regex .= ($escaping ? '\\{' : '(');
-        if (!$escaping) ++$in_curlies;
+        $regex .= $escaping ? '\\{' : '(';
+        if (!$escaping)
+        {
+          ++$inCurlies;
+        }
       }
-      elseif ($car === '}' && $in_curlies)
+      elseif ($car === '}' && $inCurlies)
       {
-        $regex .= ($escaping ? '}' : ')');
-        if (!$escaping) --$in_curlies;
+        $regex .= $escaping ? '}' : ')';
+        if (!$escaping)
+        {
+          --$inCurlies;
+        }
       }
-      elseif ($car === ',' && $in_curlies)
+      elseif ($car === ',' && $inCurlies)
       {
-        $regex .= ($escaping ? ',' : '|');
+        $regex .= $escaping ? ',' : '|';
       }
       elseif ($car === '\\')
       {

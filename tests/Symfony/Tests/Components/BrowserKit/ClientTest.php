@@ -223,6 +223,7 @@ RETURN;
   public function testFollowRedirect()
   {
     $client = new TestClient();
+    $client->followRedirects(false);
     $client->request('GET', 'http://www.example.com/foo/foobar');
 
     try
@@ -240,6 +241,12 @@ RETURN;
     $client->followRedirect();
 
     $this->assertEquals('http://www.example.com/redirected', $client->getRequest()->getUri(), '->followRedirect() follows a redirect if any');
+
+    $client = new TestClient();
+    $client->setNextResponse(new Response('', 200, array('Location' => 'http://www.example.com/redirected')));
+    $client->request('GET', 'http://www.example.com/foo/foobar');
+
+    $this->assertEquals('http://www.example.com/redirected', $client->getRequest()->getUri(), '->followRedirect() automatically follows redirects if followRedirects is true');
   }
 
   public function testBack()

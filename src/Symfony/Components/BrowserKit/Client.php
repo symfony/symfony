@@ -38,6 +38,7 @@ abstract class Client
   protected $crawler;
   protected $insulated;
   protected $redirect;
+  protected $followRedirects;
 
   /**
    * Constructor.
@@ -52,6 +53,17 @@ abstract class Client
     $this->history = null === $history ? new History() : $history;
     $this->cookieJar = null === $cookieJar ? new CookieJar() : $cookieJar;
     $this->insulated = false;
+    $this->followRedirects = true;
+  }
+
+  /**
+   * Sets whether to automatically follow redirects or not.
+   *
+   * @param Boolean $followRedirect Whether to follow redirects
+   */
+  public function followRedirects($followRedirect = true)
+  {
+    $this->followRedirects = (Boolean) $followRedirect;
   }
 
   /**
@@ -206,6 +218,11 @@ abstract class Client
 
     $this->redirect = $response->getHeader('Location');
 
+    if ($this->followRedirects && $this->redirect)
+    {
+      return $this->crawler = $this->followRedirect();
+    }
+
     return $this->crawler = $this->createCrawlerFromContent($request->getUri(), $response->getContent(), $response->getHeader('Content-Type'));
   }
 
@@ -301,7 +318,7 @@ abstract class Client
    */
   public function followRedirect()
   {
-    if (null === $this->redirect)
+    if (empty($this->redirect))
     {
       throw new \LogicException('The request was not redirected.');
     }

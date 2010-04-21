@@ -50,6 +50,9 @@ class KernelBundle extends Bundle
     $container->getErrorHandlerService();
 
     // load core classes
-    ClassCollectionLoader::load($container->getParameter('kernel.compiled_classes'), $container->getParameter('kernel.cache_dir'), 'classes', $container->getParameter('kernel.debug'));
+    if ($container->getParameter('kernel.include_core_classes'))
+    {
+      ClassCollectionLoader::load($container->getParameter('kernel.compiled_classes'), $container->getParameter('kernel.cache_dir'), 'classes', $container->getParameter('kernel.debug'));
+    }
   }
 }

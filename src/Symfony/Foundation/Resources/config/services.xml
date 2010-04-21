@@ -11,6 +11,7 @@
     <parameter key="response.class">Symfony\Components\RequestHandler\Response</parameter>
     <parameter key="error_handler.class">Symfony\Foundation\Debug\ErrorHandler</parameter>
     <parameter key="error_handler.level">null</parameter>
+    <parameter key="kernel.include_core_classes">true</parameter>
   </parameters>
 
   <services>

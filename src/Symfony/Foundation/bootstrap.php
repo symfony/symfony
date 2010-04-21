@@ -76,7 +76,10 @@ class KernelBundle extends Bundle
   {
     $container->getErrorHandlerService();
 
-        ClassCollectionLoader::load($container->getParameter('kernel.compiled_classes'), $container->getParameter('kernel.cache_dir'), 'classes', $container->getParameter('kernel.debug'));
+        if ($container->getParameter('kernel.include_core_classes'))
+    {
+      ClassCollectionLoader::load($container->getParameter('kernel.compiled_classes'), $container->getParameter('kernel.cache_dir'), 'classes', $container->getParameter('kernel.debug'));
+    }
   }
 }
 
@@ -92,6 +95,17 @@ use Symfony\Components\DependencyInjection\BuilderConfiguration;
 
 class KernelExtension extends LoaderExtension
 {
+  public function testLoad($config)
+  {
+    $configuration = new BuilderConfiguration();
+
+    $loader = new XmlFileLoader(array(__DIR__.'/../Resources/config', __DIR__.'/Resources/config'));
+    $configuration->merge($loader->load('test.xml'));
+    $configuration->setParameter('kernel.include_core_classes', false);
+
+    return $configuration;
+  }
+
   public function configLoad($config)
   {
     $configuration = new BuilderConfiguration();

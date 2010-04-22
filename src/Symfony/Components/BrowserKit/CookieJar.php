@@ -71,7 +71,6 @@ class CookieJar
    */
   public function updateFromResponse(Response $response)
   {
-    $this->clear();
     foreach ($response->getCookies() as $name => $cookie)
     {
       $this->set(new Cookie(

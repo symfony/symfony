@@ -3,7 +3,7 @@
 namespace Symfony\Components\DomCrawler;
 
 /*
- * This file is part of the symfony package.
+ * This file is part of the Symfony package.
  *
  * (c) Fabien Potencier <fabien.potencier@symfony-project.com>
  *
@@ -68,7 +68,7 @@ class Form
   /**
    * Gets the form node associated with this form.
    *
-   * @return \DOMNode $node A \DOMNode instance
+   * @return \DOMNode A \DOMNode instance
    */
   public function getFormNode()
   {
@@ -211,7 +211,7 @@ class Form
    * This method merges the value if the method is GET to mimics
    * browser behavior.
    *
-   * @param Boolean $absolute Wheter to return an absolute URI or not (this only works if a base URI has been provided)
+   * @param Boolean $absolute Whether to return an absolute URI or not (this only works if a base URI has been provided)
    *
    * @return string The URI
    */

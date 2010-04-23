@@ -27,7 +27,7 @@ class ChainIterator implements \Iterator
   /**
    * Constructor.
    *
-   * @param array $iterators An array of \Iterator instances
+   * @param Iterator[] $iterators An array of \Iterator instances
    */
   public function __construct(array $iterators = array())
   {

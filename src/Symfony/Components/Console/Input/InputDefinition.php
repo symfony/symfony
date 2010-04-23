@@ -80,7 +80,7 @@ class InputDefinition
   /**
    * Add an array of InputArgument objects.
    *
-   * @param array $arguments An array of InputArgument objects
+   * @param InputArgument[] $arguments An array of InputArgument objects
    */
   public function addArguments($arguments = array())
   {
@@ -230,7 +230,7 @@ class InputDefinition
   /**
    * Add an array of InputOption objects.
    *
-   * @param array $options An array of InputOption objects
+   * @param InputOption[] $options An array of InputOption objects
    */
   public function addOptions($options = array())
   {

@@ -60,7 +60,7 @@ class ProfilerStorage
   {
     $db = $this->initDb();
     $args = array(':token' => $this->token);
-    $data = $this->exec($db, "SELECT data FROM data WHERE token = :token ORDER BY created_at DESC LIMIT 1", $args);
+    $data = $this->exec($db, 'SELECT data FROM data WHERE token = :token ORDER BY created_at DESC LIMIT 1', $args);
     $this->close($db);
     if (isset($data[0]['data']))
     {
@@ -79,7 +79,7 @@ class ProfilerStorage
       ':data' => (string) $data,
       ':time' => time()
     );
-    $this->exec($db, "INSERT INTO data (token, data, created_at) VALUES (:token, :data, :time)", $args);
+    $this->exec($db, 'INSERT INTO data (token, data, created_at) VALUES (:token, :data, :time)', $args);
     $this->close($db);
   }
 
@@ -153,7 +153,7 @@ class ProfilerStorage
   {
     $db = $this->initDb(false);
     $args = array(':time' => time() - (int) $lifetime);
-    $this->exec($db, "DELETE FROM data WHERE created_at < :time", $args);
+    $this->exec($db, 'DELETE FROM data WHERE created_at < :time', $args);
     $this->close($db);
   }
 }

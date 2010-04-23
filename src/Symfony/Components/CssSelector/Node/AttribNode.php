@@ -107,7 +107,7 @@ class AttribNode implements NodeInterface
     }
     else
     {
-      throw new SyntaxError(sprintf("Unknown operator: %s", $this->operator));
+      throw new SyntaxError(sprintf('Unknown operator: %s', $this->operator));
     }
 
     return $path;

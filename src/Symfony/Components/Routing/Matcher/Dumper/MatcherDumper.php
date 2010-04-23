@@ -42,7 +42,7 @@ abstract class MatcherDumper implements MatcherDumperInterface
    *
    * @return string The representation of the routing
    *
-   * @throws \LogicException When this abstrass class is not implemented
+   * @throws \LogicException When this abstract class is not implemented
    */
   public function dump(array $options = array())
   {

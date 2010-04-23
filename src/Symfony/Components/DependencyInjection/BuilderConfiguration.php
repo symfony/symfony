@@ -36,7 +36,7 @@ class BuilderConfiguration
   /**
    * Returns an array of resources loaded to build this configuration.
    *
-   * @return array An array of resources
+   * @return ResourceInterface[] An array of resources
    */
   public function getResources()
   {
@@ -285,7 +285,7 @@ class BuilderConfiguration
   /**
    * Adds the definitions.
    *
-   * @param array $definitions An array of definitions
+   * @param Definition[] $definitions An array of definitions
    *
    * @return BuilderConfiguration The current instance
    */

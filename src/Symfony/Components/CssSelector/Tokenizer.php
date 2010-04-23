@@ -122,7 +122,7 @@ class Tokenizer
       $next = strpos($s, $quote, $pos);
       if (false === $next)
       {
-        throw new SyntaxError(sprintf("Expected closing %s for string in: %s", $quote, substr($s, $start)));
+        throw new SyntaxError(sprintf('Expected closing %s for string in: %s', $quote, substr($s, $start)));
       }
 
       $result = substr($s, $start, $next - $start);
@@ -159,7 +159,7 @@ class Tokenizer
       }
       else
       {
-        throw new SyntaxError(sprintf("Invalid escape sequence %s in string %s", $matches[0], $literal));
+        throw new SyntaxError(sprintf('Invalid escape sequence %s in string %s', $matches[0], $literal));
       }
     }, $literal);
   }
@@ -181,7 +181,7 @@ class Tokenizer
 
     if ($matchStart == $pos)
     {
-      throw new SyntaxError(sprintf("Unexpected symbol: %s at %s", $s[$pos], $pos));
+      throw new SyntaxError(sprintf('Unexpected symbol: %s at %s', $s[$pos], $pos));
     }
 
     $result = substr($s, $start, $matchStart - $start);

@@ -5,7 +5,7 @@ namespace Symfony\Components\RequestHandler\Test;
 use Symfony\Components\RequestHandler\Request;
 
 /*
- * This file is part of the symfony package.
+ * This file is part of the Symfony package.
  *
  * (c) Fabien Potencier <fabien.potencier@symfony-project.com>
  *

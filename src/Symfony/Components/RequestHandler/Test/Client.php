@@ -11,7 +11,7 @@ use Symfony\Components\BrowserKit\History;
 use Symfony\Components\BrowserKit\CookieJar;
 
 /*
- * This file is part of the symfony package.
+ * This file is part of the Symfony package.
  *
  * (c) Fabien Potencier <fabien.potencier@symfony-project.com>
  *
@@ -183,7 +183,7 @@ EOF;
   {
     if ('assert' !== substr($method, 0, 6))
     {
-      throw new \BadMethodCallException(sprintf("Method %s::%s is not defined.", get_class($this), $method));
+      throw new \BadMethodCallException(sprintf('Method %s::%s is not defined.', get_class($this), $method));
     }
 
     // standard PHPUnit assert?
@@ -194,14 +194,14 @@ EOF;
 
     if (!preg_match('/^assert([A-Z].+?)([A-Z].+)$/', $method, $matches))
     {
-      throw new \BadMethodCallException(sprintf("Method %s::%s is not defined.", get_class($this), $method));
+      throw new \BadMethodCallException(sprintf('Method %s::%s is not defined.', get_class($this), $method));
     }
 
     // registered tester object?
     $name = strtolower($matches[1]);
     if (!$this->hasTester($name))
     {
-      throw new \BadMethodCallException(sprintf("Method %s::%s is not defined (assert object \"%s\" is not defined).", get_class($this), $method, $name));
+      throw new \BadMethodCallException(sprintf('Method %s::%s is not defined (assert object "%s" is not defined).', get_class($this), $method, $name));
     }
 
     $tester = $this->getTester($name);

@@ -65,12 +65,12 @@ class PseudoNode implements NodeInterface
 
     if (in_array($this->ident, self::$unsupported))
     {
-      throw new SyntaxError(sprintf("The pseudo-class %s is unsupported", $this->ident));
+      throw new SyntaxError(sprintf('The pseudo-class %s is unsupported', $this->ident));
     }
     $method = 'xpath_'.str_replace('-', '_', $this->ident);
     if (!method_exists($this, $method))
     {
-      throw new SyntaxError(sprintf("The pseudo-class %s is unknown", $this->ident));
+      throw new SyntaxError(sprintf('The pseudo-class %s is unknown', $this->ident));
     }
 
     return $this->$method($el_xpath);
@@ -115,7 +115,7 @@ class PseudoNode implements NodeInterface
   {
     if ($xpath->getElement() == '*')
     {
-      throw new SyntaxError("*:first-of-type is not implemented");
+      throw new SyntaxError('*:first-of-type is not implemented');
     }
     $xpath->addStarPrefix();
     $xpath->addCondition('position() = 1');
@@ -130,7 +130,7 @@ class PseudoNode implements NodeInterface
   {
     if ($xpath->getElement() == '*')
     {
-      throw new SyntaxError("*:last-of-type is not implemented");
+      throw new SyntaxError('*:last-of-type is not implemented');
     }
     $xpath->addStarPrefix();
     $xpath->addCondition('position() = last()');
@@ -154,7 +154,7 @@ class PseudoNode implements NodeInterface
   {
     if ($xpath->getElement() == '*')
     {
-      throw new SyntaxError("*:only-of-type is not implemented");
+      throw new SyntaxError('*:only-of-type is not implemented');
     }
     $xpath->addCondition('last() = 1');
 
@@ -163,7 +163,7 @@ class PseudoNode implements NodeInterface
 
   protected function xpath_empty($xpath)
   {
-    $xpath->addCondition("not(*) and not(normalize-space())");
+    $xpath->addCondition('not(*) and not(normalize-space())');
 
     return $xpath;
   }

@@ -57,7 +57,7 @@ class CombinedSelectorNode implements NodeInterface
   {
     if (!isset(self::$_method_mapping[$this->combinator]))
     {
-      throw new SyntaxError(sprintf("Unknown combinator: %s", $this->combinator));
+      throw new SyntaxError(sprintf('Unknown combinator: %s', $this->combinator));
     }
 
     $method = '_xpath_'.self::$_method_mapping[$this->combinator];

@@ -51,7 +51,7 @@ class UserHelper extends Helper
   /**
    * Returns the user culture
    *
-   * @return string $culture
+   * @return string
    */
   public function getCulture()
   {

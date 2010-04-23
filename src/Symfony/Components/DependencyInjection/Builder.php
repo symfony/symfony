@@ -253,7 +253,7 @@ class Builder extends Container implements AnnotatedContainerInterface
   /**
    * Adds the service definitions.
    *
-   * @param array $definitions An array of service definitions
+   * @param Definition[] $definitions An array of service definitions
    */
   public function addDefinitions(array $definitions)
   {
@@ -287,7 +287,7 @@ class Builder extends Container implements AnnotatedContainerInterface
   /**
    * Sets a service definition.
    *
-   * @param  string              $id         The service identifier
+   * @param  string     $id         The service identifier
    * @param  Definition $definition A Definition instance
    */
   public function setDefinition($id, Definition $definition)

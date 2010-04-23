@@ -54,12 +54,12 @@ class FunctionNode implements NodeInterface
     $sel_path = $this->selector->toXpath();
     if (in_array($this->name, self::$unsupported))
     {
-      throw new SyntaxError(sprintf("The pseudo-class %s is not supported", $this->name));
+      throw new SyntaxError(sprintf('The pseudo-class %s is not supported', $this->name));
     }
     $method = '_xpath_'.str_replace('-', '_', $this->name);
     if (!method_exists($this, $method))
     {
-      throw new SyntaxError(sprintf("The pseudo-class %s is unknown", $this->name));
+      throw new SyntaxError(sprintf('The pseudo-class %s is unknown', $this->name));
     }
 
     return $this->$method($sel_path, $this->expr);
@@ -152,7 +152,7 @@ class FunctionNode implements NodeInterface
   {
     if ($xpath->getElement() == '*')
     {
-      throw new SyntaxError("*:nth-of-type() is not implemented");
+      throw new SyntaxError('*:nth-of-type() is not implemented');
     }
 
     return $this->_xpath_nth_child($xpath, $expr, false, false);

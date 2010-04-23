@@ -425,10 +425,10 @@ EOF;
       $code = array();
       foreach ($value as $k => $v)
       {
-        $code[] = sprintf("%s => %s", $this->dumpValue($k), $this->dumpValue($v));
+        $code[] = sprintf('%s => %s', $this->dumpValue($k), $this->dumpValue($v));
       }
 
-      return sprintf("array(%s)", implode(', ', $code));
+      return sprintf('array(%s)', implode(', ', $code));
     }
     elseif (is_object($value) && $value instanceof Reference)
     {

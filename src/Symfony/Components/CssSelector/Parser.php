@@ -57,7 +57,7 @@ class Parser
     // @codeCoverageIgnoreStart
     if (!$expr)
     {
-      throw new SyntaxError(sprintf("Got None for xpath expression from %s.", $cssExpr));
+      throw new SyntaxError(sprintf('Got None for xpath expression from %s.', $cssExpr));
     }
     // @codeCoverageIgnoreEnd
 
@@ -86,7 +86,7 @@ class Parser
     {
       $class = get_class($e);
 
-      throw new $class(sprintf("%s at %s -> %s", $e->getMessage(), implode($stream->getUsed(), ''), $stream->peek()));
+      throw new $class(sprintf('%s at %s -> %s', $e->getMessage(), implode($stream->getUsed(), ''), $stream->peek()));
     }
   }
 

@@ -161,6 +161,9 @@ class Engine
     return $this->$name = $this->get($name);
   }
 
+  /**
+   * @param Helper[] $helpers An array of helper
+   */
   public function addHelpers(array $helpers = array())
   {
     foreach ($helpers as $alias => $helper)

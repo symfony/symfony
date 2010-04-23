@@ -106,7 +106,7 @@ abstract class DoctrineCommand extends Command
     {
       throw new \InvalidArgumentException(sprintf('Could not find Doctrine EntityManager named "%s"', $name));
     }
-    
+
     return $this->container->getService($serviceName);
   }
 
@@ -122,6 +122,8 @@ abstract class DoctrineCommand extends Command
 
   /**
    * TODO: Better way to do these functions?
+   *
+   * @return Connection[] An array of Connections
    */
   protected function getDoctrineConnections()
   {
@@ -136,6 +138,7 @@ abstract class DoctrineCommand extends Command
         $connections[$name] = $this->container->getService($id);
       }
     }
+
     return $connections;
   }
 

@@ -188,7 +188,7 @@ class Definition
    *
    * @param  string $name       The annotation name
    *
-   * @return array  $attributes An array of attributes
+   * @return array An array of attributes
    */
   public function getAnnotation($name)
   {

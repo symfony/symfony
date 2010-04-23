@@ -97,7 +97,7 @@ class User
   /**
    * Returns the user culture
    *
-   * @return string $culture
+   * @return string
    */
   public function getCulture()
   {

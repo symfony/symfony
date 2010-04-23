@@ -3,7 +3,7 @@
 namespace Symfony\Components\DomCrawler;
 
 /*
- * This file is part of the symfony package.
+ * This file is part of the Symfony package.
  *
  * (c) Fabien Potencier <fabien.potencier@symfony-project.com>
  *
@@ -61,7 +61,7 @@ class Link
   /**
    * Gets the URI associated with this link.
    *
-   * @param Boolean $absolute Wheter to return an absolute URI or not (this only works if a base URI has been provided)
+   * @param Boolean $absolute Whether to return an absolute URI or not (this only works if a base URI has been provided)
    *
    * @return string The URI
    */

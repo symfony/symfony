@@ -220,7 +220,7 @@ abstract class Output implements OutputInterface
       }
     }
 
-    return "\033[".implode(';', $codes)."m";
+    return "\033[".implode(';', $codes).'m';
   }
 
   protected function replaceEndStyle($match)

@@ -38,7 +38,7 @@ class XPathExprOr extends XPathExpr
     $tmp = array();
     foreach ($this->items as $i)
     {
-      $tmp[] = sprintf("%s%s", $prefix, $i);
+      $tmp[] = sprintf('%s%s', $prefix, $i);
     }
 
     return implode($tmp, ' | ');

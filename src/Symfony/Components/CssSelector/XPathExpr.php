@@ -118,7 +118,7 @@ class XPathExpr
       return;
     }
 
-    $this->addCondition(sprintf("name() = %s", XPathExpr::xpathLiteral($this->element)));
+    $this->addCondition(sprintf('name() = %s', XPathExpr::xpathLiteral($this->element)));
     $this->element = '*';
   }
 
@@ -198,6 +198,6 @@ class XPathExpr
       }
     }
 
-    return sprintf("concat(%s)", implode($parts, ', '));
+    return sprintf('concat(%s)', implode($parts, ', '));
   }
 }

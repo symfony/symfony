@@ -296,7 +296,8 @@ class DoctrineExtension extends LoaderExtension
    * mapping files are found then the annotation type is returned.
    *
    * @param string $dir
-   * @return string $type
+   *
+   * @return string
    */
   protected function detectMappingType($dir)
   {

@@ -26,6 +26,9 @@ class HelperSet
     $helpers = array(),
     $command = null;
 
+  /**
+   * @param Helper[] $helpers An array of helper.
+   */
   public function __construct(array $helpers = array())
   {
     foreach ($helpers as $alias => $helper)

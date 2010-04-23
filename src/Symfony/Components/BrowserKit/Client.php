@@ -8,7 +8,7 @@ use Symfony\Components\DomCrawler\Form;
 use Symfony\Components\Process\PhpProcess;
 
 /*
- * This file is part of the symfony package.
+ * This file is part of the Symfony package.
  *
  * (c) Fabien Potencier <fabien.potencier@symfony-project.com>
  *

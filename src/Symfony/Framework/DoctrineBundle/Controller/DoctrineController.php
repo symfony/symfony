@@ -42,7 +42,8 @@ class DoctrineController extends Controller
    * with the given name.
    *
    * @param string $name Optional entity manager service name
-   * @return object $em
+   *
+   * @return object
    */
   protected function getEntityManager($name = null)
   {

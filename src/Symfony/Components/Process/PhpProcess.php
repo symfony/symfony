@@ -3,7 +3,7 @@
 namespace Symfony\Components\Process;
 
 /*
- * This file is part of the symfony package.
+ * This file is part of the Symfony package.
  *
  * (c) Fabien Potencier <fabien.potencier@symfony-project.com>
  *
@@ -88,6 +88,6 @@ class PhpProcess extends Process
       }
     }
 
-    throw new \RuntimeException("Unable to find the PHP executable.");
+    throw new \RuntimeException('Unable to find the PHP executable.');
   }
 }

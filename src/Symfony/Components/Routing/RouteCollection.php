@@ -111,7 +111,7 @@ class RouteCollection
   /**
    * Returns an array of resources loaded to build this collection.
    *
-   * @return array An array of resources
+   * @return ResourceInterface[] An array of resources
    */
   public function getResources()
   {

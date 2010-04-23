@@ -5,7 +5,7 @@ namespace Symfony\Components\DomCrawler;
 use Symfony\Components\CssSelector\Parser as CssParser;
 
 /*
- * This file is part of the symfony package.
+ * This file is part of the Symfony package.
  *
  * (c) Fabien Potencier <fabien.potencier@symfony-project.com>
  *

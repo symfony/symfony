@@ -27,7 +27,7 @@ class ChainLoader extends Loader
   /**
    * Constructor.
    *
-   * @param array $loaders    An array of loader instances
+   * @param Loader[] $loaders An array of loader instances
    */
   public function __construct(array $loaders = array())
   {

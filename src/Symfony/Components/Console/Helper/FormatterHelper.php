@@ -29,7 +29,7 @@ class FormatterHelper extends Helper
    */
   public function formatSection($section, $message, $style = 'info')
   {
-    return sprintf("<%s>[%s]</%s> %s", $style, $section, $style, $message);
+    return sprintf('<%s>[%s]</%s> %s', $style, $section, $style, $message);
   }
 
   /**

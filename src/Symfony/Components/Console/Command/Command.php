@@ -224,7 +224,7 @@ class Command
   /**
    * Gets the InputDefinition attached to this Command.
    *
-   * @return InputDefinition $definition An InputDefinition instance
+   * @return InputDefinition An InputDefinition instance
    */
   public function getDefinition()
   {
@@ -390,7 +390,7 @@ class Command
   public function getProcessedHelp()
   {
     $name = $this->namespace.':'.$this->name;
-    
+
     $placeholders = array(
       '%command.name%',
       '%command.full_name%'

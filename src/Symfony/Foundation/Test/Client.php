@@ -8,7 +8,7 @@ use Symfony\Components\BrowserKit\History;
 use Symfony\Components\BrowserKit\CookieJar;
 
 /*
- * This file is part of the symfony package.
+ * This file is part of the Symfony package.
  *
  * (c) Fabien Potencier <fabien.potencier@symfony-project.com>
  *
@@ -82,7 +82,7 @@ class Client extends BaseClient
       return $this->container->getService($this->testers[$name]);
     }
 
-    return $parent::getTester($name);
+    return parent::getTester($name);
   }
 
   /**

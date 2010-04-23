@@ -67,7 +67,7 @@ class CookieJarTest extends \PHPUnit_Framework_TestCase
     $cookieJar->updateFromResponse($response);
 
     $this->assertEquals('foo', $cookieJar->get('foo')->getValue(), '->updateFromResponse() updates cookies from a Response objects');
-    $this->assertNull($cookieJar->get('bar'), '->updateFromResponse() updates cookies from a Response objects');
+    $this->assertEquals('bar', $cookieJar->get('bar')->getValue(), '->updateFromResponse() keeps existing cookies');
   }
 
   /**

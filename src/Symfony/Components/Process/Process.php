@@ -112,7 +112,7 @@ class Process
       throw new \RuntimeException('Unable to launch a new process.');
     }
 
-    if (!is_null($this->stdin))
+    if (null !== $this->stdin)
     {
       fwrite($pipes[0], (binary) $this->stdin);
     }

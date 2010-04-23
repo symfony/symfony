@@ -204,7 +204,7 @@ class Response implements ResponseInterface
       throw new \InvalidArgumentException(sprintf('The HTTP status code "%s" is not valid.', $code));
     }
 
-    $this->statusText = false === $text ? '' : (is_null($text) ? self::$statusTexts[$this->statusCode] : $text);
+    $this->statusText = false === $text ? '' : (null === $text ? self::$statusTexts[$this->statusCode] : $text);
 
     return $this;
   }

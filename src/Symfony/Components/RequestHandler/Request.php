@@ -759,7 +759,7 @@ class Request implements RequestInterface
     $headers = array();
     foreach ($this->server->all() as $key => $value)
     {
-      if (strtolower('HTTP_') === strtolower(substr($key, 0, 5)))
+      if ('http_' === strtolower(substr($key, 0, 5)))
       {
         $headers[strtoupper(strtr(substr($key, 5), '-', '_'))] = $value;
       }

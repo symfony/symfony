@@ -154,10 +154,8 @@ class KernelExtension extends LoaderExtension
         'Symfony\\Components\\EventDispatcher\\Event',
         'Symfony\\Components\\Routing\\Matcher\\UrlMatcherInterface',
         'Symfony\\Components\\Routing\\Matcher\\UrlMatcher',
-        'Symfony\\Components\\RequestHandler\\RequestInterface',
-        'Symfony\\Components\\RequestHandler\\Request',
         'Symfony\\Components\\RequestHandler\\RequestHandler',
-        'Symfony\\Components\\RequestHandler\\ResponseInterface',
+        'Symfony\\Components\\RequestHandler\\Request',
         'Symfony\\Components\\RequestHandler\\Response',
         'Symfony\\Components\\Templating\\Loader\\LoaderInterface',
         'Symfony\\Components\\Templating\\Loader\\Loader',
@@ -368,12 +366,13 @@ use Symfony\Components\DependencyInjection\Builder;
 use Symfony\Components\DependencyInjection\BuilderConfiguration;
 use Symfony\Components\DependencyInjection\Dumper\PhpDumper;
 use Symfony\Components\DependencyInjection\FileResource;
-use Symfony\Components\RequestHandler\RequestInterface;
+use Symfony\Components\RequestHandler\Request;
+use Symfony\Components\RequestHandler\RequestHandlerInterface;
 
 
 
 
-abstract class Kernel implements \Serializable
+abstract class Kernel implements RequestHandlerInterface, \Serializable
 {
   protected $bundles;
   protected $bundleDirs;
@@ -471,12 +470,7 @@ abstract class Kernel implements \Serializable
     $this->boot();
   }
 
-  public function run()
-  {
-    $this->handle()->send();
-  }
-
-  public function handle(RequestInterface $request = null)
+  public function handle(Request $request = null, $main = true)
   {
     if (false === $this->booted)
     {

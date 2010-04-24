@@ -4,8 +4,8 @@ namespace Symfony\Framework\WebBundle\Listener;
 
 use Symfony\Components\EventDispatcher\EventDispatcher;
 use Symfony\Components\EventDispatcher\Event;
-use Symfony\Components\RequestHandler\RequestInterface;
-use Symfony\Components\RequestHandler\ResponseInterface;
+use Symfony\Components\RequestHandler\Request;
+use Symfony\Components\RequestHandler\Response;
 
 /*
  * This file is part of the Symfony framework.
@@ -28,7 +28,7 @@ class ResponseFilter
   protected $dispatcher;
   protected $request;
 
-  public function __construct(EventDispatcher $dispatcher, RequestInterface $request)
+  public function __construct(EventDispatcher $dispatcher, Request $request)
   {
     $this->dispatcher = $dispatcher;
     $this->request = $request;
@@ -39,7 +39,7 @@ class ResponseFilter
     $this->dispatcher->connect('core.response', array($this, 'filter'));
   }
 
-  public function filter(Event $event, ResponseInterface $response)
+  public function filter(Event $event, Response $response)
   {
     if (!$event->getParameter('main_request') || $response->hasHeader('Content-Type'))
     {

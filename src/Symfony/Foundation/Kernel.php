@@ -7,7 +7,8 @@ use Symfony\Components\DependencyInjection\Builder;
 use Symfony\Components\DependencyInjection\BuilderConfiguration;
 use Symfony\Components\DependencyInjection\Dumper\PhpDumper;
 use Symfony\Components\DependencyInjection\FileResource;
-use Symfony\Components\RequestHandler\RequestInterface;
+use Symfony\Components\RequestHandler\Request;
+use Symfony\Components\RequestHandler\RequestHandlerInterface;
 
 /*
  * This file is part of the Symfony package.
@@ -26,7 +27,7 @@ use Symfony\Components\RequestHandler\RequestInterface;
  * @subpackage Foundation
  * @author     Fabien Potencier <fabien.potencier@symfony-project.org>
  */
-abstract class Kernel implements \Serializable
+abstract class Kernel implements RequestHandlerInterface, \Serializable
 {
   protected $bundles;
   protected $bundleDirs;
@@ -154,12 +155,7 @@ abstract class Kernel implements \Serializable
     $this->boot();
   }
 
-  public function run()
-  {
-    $this->handle()->send();
-  }
-
-  public function handle(RequestInterface $request = null)
+  public function handle(Request $request = null, $main = true)
   {
     if (false === $this->booted)
     {

@@ -22,7 +22,7 @@ use Symfony\Components\RequestHandler\Exception\NotFoundHttpException;
  * @subpackage Components_RequestHandler
  * @author     Fabien Potencier <fabien.potencier@symfony-project.com>
  */
-class RequestHandler
+class RequestHandler implements RequestHandlerInterface
 {
   protected $dispatcher;
 
@@ -42,14 +42,14 @@ class RequestHandler
    * All exceptions are caught, and a core.exception event is notified
    * for user management.
    *
-   * @param  RequestInterface  $request  A Request instance
-   * @param  Boolean           $main     Whether this is the main request or not
+   * @param  Request $request A Request instance
+   * @param  Boolean $main    Whether this is the main request or not
    *
-   * @return ResponseInterface $response A Response instance
+   * @return Response $response A Response instance
    *
-   * @throws \Exception When Exception couldn't be catch by event processing
+   * @throws \Exception When Exception couldn't be caught by event processing
    */
-  public function handle(RequestInterface $request, $main = true)
+  public function handle(Request $request, $main = true)
   {
     $main = (Boolean) $main;
 
@@ -75,15 +75,15 @@ class RequestHandler
    *
    * Exceptions are not caught.
    *
-   * @param  RequestInterface  $request  A Request instance
-   * @param  Boolean           $main     Whether this is the main request or not
+   * @param  Request $request A Request instance
+   * @param  Boolean $main    Whether this is the main request or not
    *
-   * @return ResponseInterface $response A Response instance
+   * @return Response $response A Response instance
    *
    * @throws \LogicException       If one of the listener does not behave as expected
    * @throws NotFoundHttpException When controller cannot be found
    */
-  public function handleRaw(RequestInterface $request, $main = true)
+  public function handleRaw(Request $request, $main = true)
   {
     $main = (Boolean) $main;
 
@@ -146,7 +146,7 @@ class RequestHandler
    */
   protected function filterResponse($response, $message, $main)
   {
-    if (!$response instanceof ResponseInterface)
+    if (!$response instanceof Response)
     {
       throw new \RuntimeException($message);
     }
@@ -154,7 +154,7 @@ class RequestHandler
     $event = $this->dispatcher->filter(new Event($this, 'core.response', array('main_request' => $main)), $response);
     $response = $event->getReturnValue();
 
-    if (!$response instanceof ResponseInterface)
+    if (!$response instanceof Response)
     {
       throw new \RuntimeException('A "core.response" listener returned a non response object.');
     }

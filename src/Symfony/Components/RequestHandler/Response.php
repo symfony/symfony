@@ -18,7 +18,7 @@ namespace Symfony\Components\RequestHandler;
  * @subpackage Components_RequestHandler
  * @author     Fabien Potencier <fabien.potencier@symfony-project.com>
  */
-class Response implements ResponseInterface
+class Response
 {
   protected $content;
   protected $version;

@@ -23,7 +23,7 @@ namespace Symfony\Components\RequestHandler;
  * @subpackage Components_RequestHandler
  * @author     Fabien Potencier <fabien.potencier@symfony-project.com>
  */
-class Request implements RequestInterface
+class Request
 {
   public $path;
   public $request;

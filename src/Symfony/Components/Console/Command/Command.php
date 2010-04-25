@@ -91,7 +91,7 @@ class Command
    *
    * @return integer 0 if everything went fine, or an error code
    *
-   * @throws \LogicException When this abstrass class is not implemented
+   * @throws \LogicException When this abstract class is not implemented
    */
   protected function execute(InputInterface $input, OutputInterface $output)
   {

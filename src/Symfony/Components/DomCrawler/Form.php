@@ -31,7 +31,7 @@ class Form
   /**
    * Constructor.
    *
-   * @param \DOMNode $node A \DOMNode instance
+   * @param \DOMNode $node   A \DOMNode instance
    * @param string   $method The method to use for the link (if null, it defaults to the method defined by the form)
    * @param string   $host   The base URI to use for absolute links (like http://localhost)
    * @param string   $path   The base path for relative links (/ by default)

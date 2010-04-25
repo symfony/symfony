@@ -70,6 +70,8 @@ abstract class Client
    * Sets the insulated flag.
    *
    * @param Boolean $insulated Whether to insulate the requests or not
+   *
+   * @throws \RuntimeException When Symfony Process Component is not installed
    */
   public function insulate($insulated = true)
   {
@@ -231,7 +233,9 @@ abstract class Client
    *
    * @param Request $request A Request instance
    *
-   * @param Response $response A Response instance
+   * @return Response A Response instance
+   *
+   * @throws \RuntimeException When processing returns exit code
    */
   protected function doRequestInProcess($request)
   {
@@ -249,9 +253,9 @@ abstract class Client
   /**
    * Makes a request.
    *
-   * @param Request  $request A Request instance
+   * @param Request $request A Request instance
    *
-   * @param Response $response A Response instance
+   * @return Response A Response instance
    */
   abstract protected function doRequest($request);
 
@@ -259,6 +263,8 @@ abstract class Client
    * Returns the script to execute when the request must be insulated.
    *
    * @param Request $request A Request instance
+   *
+   * @throws \LogicException When this abstract class is not implemented
    */
   protected function getScript($request)
   {
@@ -312,9 +318,9 @@ abstract class Client
   /**
    * Follow redirects?
    *
-   * @throws \LogicException If request was not a redirect
-   *
    * @return Symfony\Components\BrowserKit\Client
+   *
+   * @throws \LogicException If request was not a redirect
    */
   public function followRedirect()
   {

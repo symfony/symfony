@@ -45,6 +45,11 @@ class RequestParser
   {
     $request = $event->getParameter('request');
 
+    if (!$event->getParameter('main_request'))
+    {
+      return;
+    }
+
     // set the context even if the parsing does not need to be done
     // to have correct link generation
     $this->router->setContext(array(
@@ -55,7 +60,7 @@ class RequestParser
     ));
     $this->container->setParameter('request.base_path', $request->getBasePath());
 
-    if (!$event->getParameter('main_request') || $request->path->has('_bundle'))
+    if ($request->path->has('_bundle'))
     {
       return;
     }

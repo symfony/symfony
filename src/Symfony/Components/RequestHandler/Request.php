@@ -136,13 +136,14 @@ class Request
       'HTTP_ACCEPT_LANGUAGE' => 'en-us,en;q=0.5',
       'HTTP_ACCEPT_CHARSET'  => 'ISO-8859-1,utf-8;q=0.7,*;q=0.7',
       'REMOTE_ADDR'          => '127.0.0.1',
+      'SCRIPT_NAME'          => '',
+      'SCRIPT_FILENAME'      => '',
+    ), $server, array(
       'REQUEST_METHOD'       => strtoupper($method),
       'PATH_INFO'            => '',
       'REQUEST_URI'          => $uri,
-      'SCRIPT_NAME'          => '',
-      'SCRIPT_FILENAME'      => '',
       'QUERY_STRING'         => $queryString,
-    ), $server);
+    ));
 
     return new self($request, $query, array(), $cookies, $files, $server);
   }

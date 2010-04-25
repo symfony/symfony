@@ -43,26 +43,22 @@ class RequestParser
 
   public function resolve(Event $event)
   {
-    if (!$event->getParameter('main_request'))
-    {
-      return;
-    }
-
     $request = $event->getParameter('request');
 
-    $this->container->setParameter('request.base_path', $request->getBasePath());
-
-    if ($request->path->get('_bundle'))
-    {
-      return;
-    }
-
+    // set the context even if the parsing does not need to be done
+    // to have correct link generation
     $this->router->setContext(array(
       'base_url'  => $request->getBaseUrl(),
       'method'    => $request->getMethod(),
       'host'      => $request->getHost(),
       'is_secure' => $request->isSecure(),
     ));
+    $this->container->setParameter('request.base_path', $request->getBasePath());
+
+    if (!$event->getParameter('main_request') || $request->path->has('_bundle'))
+    {
+      return;
+    }
 
     if (false !== $parameters = $this->router->match($request->getPathInfo()))
     {

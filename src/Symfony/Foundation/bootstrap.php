@@ -383,6 +383,7 @@ abstract class Kernel implements RequestHandlerInterface, \Serializable
   protected $booted;
   protected $name;
   protected $startTime;
+  protected $request;
 
   const VERSION = '2.0.0-DEV';
 
@@ -470,6 +471,12 @@ abstract class Kernel implements RequestHandlerInterface, \Serializable
     $this->boot();
   }
 
+  
+  public function getRequest()
+  {
+    return $this->request;
+  }
+
   public function handle(Request $request = null, $main = true)
   {
     if (false === $this->booted)
@@ -484,6 +491,11 @@ abstract class Kernel implements RequestHandlerInterface, \Serializable
     else
     {
       $this->container->setService('request', $request);
+    }
+
+    if (true === $main)
+    {
+      $this->request = $request;
     }
 
     return $this->container->getRequestHandlerService()->handle($request);

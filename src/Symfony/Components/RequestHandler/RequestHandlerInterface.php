@@ -30,5 +30,12 @@ interface RequestHandlerInterface
    *
    * @throws \Exception When Exception couldn't be caught by event processing
    */
-  public function handle(Request $request, $main = true);
+  public function handle(Request $request = null, $main = true);
+
+  /**
+   * Gets the Request instance associated with the main request.
+   *
+   * @return Request A Request instance
+   */
+  public function getRequest();
 }

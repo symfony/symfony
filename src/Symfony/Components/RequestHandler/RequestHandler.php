@@ -25,6 +25,7 @@ use Symfony\Components\RequestHandler\Exception\NotFoundHttpException;
 class RequestHandler implements RequestHandlerInterface
 {
   protected $dispatcher;
+  protected $request;
 
   /**
    * Constructor
@@ -34,6 +35,16 @@ class RequestHandler implements RequestHandlerInterface
   public function __construct(EventDispatcher $dispatcher)
   {
     $this->dispatcher = $dispatcher;
+  }
+
+  /**
+   * Gets the Request instance associated with the main request.
+   *
+   * @return Request A Request instance
+   */
+  public function getRequest()
+  {
+    return $this->request;
   }
 
   /**
@@ -49,9 +60,19 @@ class RequestHandler implements RequestHandlerInterface
    *
    * @throws \Exception When Exception couldn't be caught by event processing
    */
-  public function handle(Request $request, $main = true)
+  public function handle(Request $request = null, $main = true)
   {
     $main = (Boolean) $main;
+
+    if (null === $request)
+    {
+      $request = new Request();
+    }
+
+    if (true === $main)
+    {
+      $this->request = $request;
+    }
 
     try
     {
@@ -63,7 +84,7 @@ class RequestHandler implements RequestHandlerInterface
       $event = $this->dispatcher->notifyUntil(new Event($this, 'core.exception', array('main_request' => $main, 'request' => $request, 'exception' => $e)));
       if ($event->isProcessed())
       {
-        return $this->filterResponse($event->getReturnValue(), 'A "core.exception" listener returned a non response object.', $main);
+        return $this->filterResponse($event->getReturnValue(), $request, 'A "core.exception" listener returned a non response object.', $main);
       }
 
       throw $e;
@@ -91,7 +112,7 @@ class RequestHandler implements RequestHandlerInterface
     $event = $this->dispatcher->notifyUntil(new Event($this, 'core.request', array('main_request' => $main, 'request' => $request)));
     if ($event->isProcessed())
     {
-      return $this->filterResponse($event->getReturnValue(), 'A "core.request" listener returned a non response object.', $main);
+      return $this->filterResponse($event->getReturnValue(), $request, 'A "core.request" listener returned a non response object.', $main);
     }
 
     // load controller
@@ -115,7 +136,7 @@ class RequestHandler implements RequestHandlerInterface
     {
       try
       {
-        return $this->filterResponse($event->getReturnValue(), 'A "core.controller" listener returned a non response object.', $main);
+        return $this->filterResponse($event->getReturnValue(), $request, 'A "core.controller" listener returned a non response object.', $main);
       }
       catch (\Exception $e)
       {
@@ -129,9 +150,9 @@ class RequestHandler implements RequestHandlerInterface
     }
 
     // view
-    $event = $this->dispatcher->filter(new Event($this, 'core.view', array('main_request' => $main)), $retval);
+    $event = $this->dispatcher->filter(new Event($this, 'core.view', array('main_request' => $main, 'request' => $request)), $retval);
 
-    return $this->filterResponse($event->getReturnValue(), sprintf('The controller must return a response (instead of %s).', is_object($event->getReturnValue()) ? 'an object of class '.get_class($event->getReturnValue()) : str_replace("\n", '', var_export($event->getReturnValue(), true))), $main);
+    return $this->filterResponse($event->getReturnValue(), $request, sprintf('The controller must return a response (instead of %s).', is_object($event->getReturnValue()) ? 'an object of class '.get_class($event->getReturnValue()) : str_replace("\n", '', var_export($event->getReturnValue(), true))), $main);
   }
 
   /**
@@ -144,14 +165,14 @@ class RequestHandler implements RequestHandlerInterface
    *
    * @throws \RuntimeException if the response object does not implement the send() method
    */
-  protected function filterResponse($response, $message, $main)
+  protected function filterResponse($response, $request, $message, $main)
   {
     if (!$response instanceof Response)
     {
       throw new \RuntimeException($message);
     }
 
-    $event = $this->dispatcher->filter(new Event($this, 'core.response', array('main_request' => $main)), $response);
+    $event = $this->dispatcher->filter(new Event($this, 'core.response', array('main_request' => $main, 'request' => $request)), $response);
     $response = $event->getReturnValue();
 
     if (!$response instanceof Response)

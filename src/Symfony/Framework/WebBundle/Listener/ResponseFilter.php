@@ -26,12 +26,10 @@ use Symfony\Components\RequestHandler\Response;
 class ResponseFilter
 {
   protected $dispatcher;
-  protected $request;
 
-  public function __construct(EventDispatcher $dispatcher, Request $request)
+  public function __construct(EventDispatcher $dispatcher)
   {
     $this->dispatcher = $dispatcher;
-    $this->request = $request;
   }
 
   public function register()
@@ -46,8 +44,9 @@ class ResponseFilter
       return $response;
     }
 
-    $format = $this->request->getRequestFormat();
-    if ((null !== $format) && $mimeType = $this->request->getMimeType($format))
+    $request = $event->getParameter('request');
+    $format = $request->getRequestFormat();
+    if ((null !== $format) && $mimeType = $request->getMimeType($format))
     {
       $response->setHeader('Content-Type', $mimeType);
     }

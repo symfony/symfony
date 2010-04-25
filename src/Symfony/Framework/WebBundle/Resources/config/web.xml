@@ -46,7 +46,6 @@
     <service id="response_filter" class="%response_filter.class%">
       <annotation name="kernel.listener" event="core.response" method="filter" />
       <argument type="service" id="event_dispatcher" />
-      <argument type="service" id="request" />
     </service>
 
     <service id="exception_handler" class="%exception_handler.class%">

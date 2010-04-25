@@ -2,6 +2,8 @@
 
 namespace Symfony\Components\RequestHandler;
 
+use Symfony\Components\RequestHandler\Cache\CacheControl;
+
 /*
  * This file is part of the Symfony package.
  *
@@ -43,6 +45,7 @@ class Request
   protected $basePath;
   protected $method;
   protected $format;
+  protected $cacheControl;
 
   static protected $formats;
 
@@ -80,9 +83,10 @@ class Request
     $this->path = new RequestBag(null !== $path ? $path : array());
     $this->cookies = new RequestBag(null !== $cookies ? $cookies : $_COOKIE);
     $this->files = new RequestBag($this->convertFileInformation(null !== $files ? $files : $_FILES));
-    $this->server = new RequestBag(null !== $server ? $server : $_SERVER);
-    $this->headers = new RequestBag($this->initializeHeaders());
+    $this->server = new NormalizedRequestBag(null !== $server ? $server : $_SERVER);
+    $this->headers = new NormalizedRequestBag($this->initializeHeaders());
 
+    $this->cacheControl = null;
     $this->languages = null;
     $this->charsets = null;
     $this->acceptableContentTypes = null;
@@ -136,13 +140,14 @@ class Request
       'HTTP_ACCEPT_LANGUAGE' => 'en-us,en;q=0.5',
       'HTTP_ACCEPT_CHARSET'  => 'ISO-8859-1,utf-8;q=0.7,*;q=0.7',
       'REMOTE_ADDR'          => '127.0.0.1',
+      'SCRIPT_NAME'          => '',
+      'SCRIPT_FILENAME'      => '',
+    ), $server, array(
       'REQUEST_METHOD'       => strtoupper($method),
       'PATH_INFO'            => '',
       'REQUEST_URI'          => $uri,
-      'SCRIPT_NAME'          => '',
-      'SCRIPT_FILENAME'      => '',
       'QUERY_STRING'         => $queryString,
-    ), $server);
+    ));
 
     return new self($request, $query, array(), $cookies, $files, $server);
   }
@@ -423,6 +428,43 @@ class Request
     }
 
     return $this->format;
+  }
+
+  public function isMethodSafe()
+  {
+    return in_array(strtolower($this->getMethod()), array('get', 'head'));
+  }
+
+  public function getCacheControl()
+  {
+    if (null === $this->cacheControl)
+    {
+      $this->cacheControl = new CacheControl($this->headers->get('CACHE_CONTROL'));
+    }
+
+    return $this->cacheControl;
+  }
+
+  public function isNoCache()
+  {
+    return $this->getCacheControl()->isNoCache() || 'no-cache' == $this->headers->get('PRAGMA');
+  }
+
+  // Determine if the #response validators (ETag, Last-Modified) matches
+  // a conditional value specified in #request.
+  public function doesResponseMatch(Response $response)
+  {
+    $lastModified = $this->headers->get('if_modified_since');
+    if ($etags = $this->headers->get('if_none_match'))
+    {
+      $etags = preg_split('/\s*,\s*/', $etags);
+
+      return (in_array($response->getEtag(), $etags) || in_array('*', $etags)) && (!$lastModified || $response->getLastModified() == $lastModified);
+    }
+    elseif ($lastModified)
+    {
+      return $lastModified == $response->getLastModified();
+    }
   }
 
   /**
@@ -781,9 +823,9 @@ class Request
     $headers = array();
     foreach ($this->server->all() as $key => $value)
     {
-      if ('http_' === strtolower(substr($key, 0, 5)))
+      if ('http-' === strtolower(substr($key, 0, 5)))
       {
-        $headers[strtoupper(strtr(substr($key, 5), '-', '_'))] = $value;
+        $headers[substr($key, 5)] = $value;
       }
     }
 

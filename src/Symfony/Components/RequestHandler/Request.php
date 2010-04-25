@@ -238,6 +238,11 @@ class Request
     return ($this->server->get('HTTPS') == 'on') ? 'https' : 'http';
   }
 
+  public function getPort()
+  {
+    return $this->server->get('SERVER_PORT');
+  }
+
   public function getHttpHost()
   {
     $host = $this->headers->get('HOST');
@@ -298,6 +303,12 @@ class Request
     {
       return $this->server->get('HTTP_HOST', $this->server->get('SERVER_NAME', $this->server->get('SERVER_ADDR', '')));
     }
+  }
+
+  public function setMethod($method)
+  {
+    $this->method = null;
+    $this->server->set('REQUEST_METHOD', 'GET');
   }
 
   /**

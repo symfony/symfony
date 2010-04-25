@@ -44,7 +44,6 @@ class ControllerLoader
     $request = $this->container->getRequestService();
 
     list($parameters['_bundle'], $parameters['_controller'], $parameters['_action']) = explode(':', $controller);
-    $parameters['_format'] = $request->getRequestFormat();
 
     $subRequest = $request->duplicate(null, null, $parameters);
 

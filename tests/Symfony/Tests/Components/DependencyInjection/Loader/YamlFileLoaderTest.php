@@ -37,7 +37,7 @@ class YamlFileLoaderTest extends \PHPUnit_Framework_TestCase
     }
     catch (\Exception $e)
     {
-      $this->assertType('\InvalidArgumentException', $e, '->load() throws an InvalidArgumentException if the loaded file does not exist');
+      $this->assertInstanceOf('\InvalidArgumentException', $e, '->load() throws an InvalidArgumentException if the loaded file does not exist');
       $this->assertEquals('The service file "foo.yml" is not valid.', $e->getMessage(), '->load() throws an InvalidArgumentException if the loaded file does not exist');
     }
 
@@ -48,7 +48,7 @@ class YamlFileLoaderTest extends \PHPUnit_Framework_TestCase
     }
     catch (\Exception $e)
     {
-      $this->assertType('\InvalidArgumentException', $e, '->load() throws an InvalidArgumentException if the loaded file is not a valid YAML file');
+      $this->assertInstanceOf('\InvalidArgumentException', $e, '->load() throws an InvalidArgumentException if the loaded file is not a valid YAML file');
       $this->assertEquals('The service file "parameters.ini" is not valid.', $e->getMessage(), '->load() throws an InvalidArgumentException if the loaded file is not a valid YAML file');
     }
 
@@ -63,7 +63,7 @@ class YamlFileLoaderTest extends \PHPUnit_Framework_TestCase
       }
       catch (\Exception $e)
       {
-        $this->assertType('\InvalidArgumentException', $e, '->load() throws an InvalidArgumentException if the loaded file does not validate');
+        $this->assertInstanceOf('\InvalidArgumentException', $e, '->load() throws an InvalidArgumentException if the loaded file does not validate');
         $this->assertStringMatchesFormat('The service file "nonvalid%d.yml" is not valid.', $e->getMessage(), '->load() throws an InvalidArgumentException if the loaded file does not validate');
       }
     }
@@ -127,7 +127,7 @@ class YamlFileLoaderTest extends \PHPUnit_Framework_TestCase
     }
     catch (\Exception $e)
     {
-      $this->assertType('\InvalidArgumentException', $e, '->load() throws an InvalidArgumentException if the tag is not valid');
+      $this->assertInstanceOf('\InvalidArgumentException', $e, '->load() throws an InvalidArgumentException if the tag is not valid');
       $this->assertStringStartsWith('There is no extension able to load the configuration for "foobar.foobar" (in', $e->getMessage(), '->load() throws an InvalidArgumentException if the tag is not valid');
     }
 
@@ -138,7 +138,7 @@ class YamlFileLoaderTest extends \PHPUnit_Framework_TestCase
     }
     catch (\Exception $e)
     {
-      $this->assertType('\InvalidArgumentException', $e, '->load() throws an InvalidArgumentException if an extension is not loaded');
+      $this->assertInstanceOf('\InvalidArgumentException', $e, '->load() throws an InvalidArgumentException if an extension is not loaded');
       $this->assertStringStartsWith('The "foobar" tag is not valid (in', $e->getMessage(), '->load() throws an InvalidArgumentException if an extension is not loaded');
     }
   }

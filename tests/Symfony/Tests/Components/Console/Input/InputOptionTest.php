@@ -29,7 +29,7 @@ class InputOptionTest extends \PHPUnit_Framework_TestCase
     }
     catch (\Exception $e)
     {
-      $this->assertType('\Exception', $e, '->setDefault() throws an Exception if PARAMETER_IS_ARRAY option is used when an option does not accept a value');
+      $this->assertInstanceOf('\Exception', $e, '->setDefault() throws an Exception if PARAMETER_IS_ARRAY option is used when an option does not accept a value');
       $this->assertEquals('Impossible to have an option mode PARAMETER_IS_ARRAY if the option does not accept a parameter.', $e->getMessage());
     }
 
@@ -72,7 +72,7 @@ class InputOptionTest extends \PHPUnit_Framework_TestCase
     }
     catch (\Exception $e)
     {
-      $this->assertType('\Exception', $e, '__construct() throws an Exception if the mode is not valid');
+      $this->assertInstanceOf('\Exception', $e, '__construct() throws an Exception if the mode is not valid');
       $this->assertEquals('Option mode "ANOTHER_ONE" is not valid.', $e->getMessage());
     }
   }
@@ -129,7 +129,7 @@ class InputOptionTest extends \PHPUnit_Framework_TestCase
     }
     catch (\Exception $e)
     {
-      $this->assertType('\Exception', $e, '->setDefault() throws an Exception if you give a default value for a PARAMETER_NONE option');
+      $this->assertInstanceOf('\Exception', $e, '->setDefault() throws an Exception if you give a default value for a PARAMETER_NONE option');
       $this->assertEquals('Cannot set a default value when using Option::PARAMETER_NONE mode.', $e->getMessage());
     }
 
@@ -141,7 +141,7 @@ class InputOptionTest extends \PHPUnit_Framework_TestCase
     }
     catch (\Exception $e)
     {
-      $this->assertType('\Exception', $e, '->setDefault() throws an Exception if you give a default value which is not an array for a PARAMETER_IS_ARRAY option');
+      $this->assertInstanceOf('\Exception', $e, '->setDefault() throws an Exception if you give a default value which is not an array for a PARAMETER_IS_ARRAY option');
       $this->assertEquals('A default value for an array option must be an array.', $e->getMessage());
     }
   }

@@ -47,7 +47,7 @@ class EventTest extends \PHPUnit_Framework_TestCase
     }
     catch (\Exception $e)
     {
-      $this->assertType('\InvalidArgumentException', $e, '->getParameter() throws an \InvalidArgumentException exception when the parameter does not exist');
+      $this->assertInstanceOf('\InvalidArgumentException', $e, '->getParameter() throws an \InvalidArgumentException exception when the parameter does not exist');
       $this->assertEquals('The event "name" has no "foobar" parameter.', $e->getMessage(), '->getParameter() throws an \InvalidArgumentException exception when the parameter does not exist');
     }
     $event = new Event($this->subject, 'name', $this->parameters);
@@ -84,7 +84,7 @@ class EventTest extends \PHPUnit_Framework_TestCase
     }
     catch (\Exception $e)
     {
-      $this->assertType('\InvalidArgumentException', $e, '::offsetGet() throws an \InvalidArgumentException exception when the parameter does not exist');
+      $this->assertInstanceOf('\InvalidArgumentException', $e, '::offsetGet() throws an \InvalidArgumentException exception when the parameter does not exist');
       $this->assertEquals('The event "name" has no "foobar" parameter.', $e->getMessage(), '::offsetGet() throws an \InvalidArgumentException exception when the parameter does not exist');
     }
 

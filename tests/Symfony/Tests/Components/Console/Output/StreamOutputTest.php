@@ -31,7 +31,7 @@ class StreamOutputTest extends \PHPUnit_Framework_TestCase
     }
     catch (\Exception $e)
     {
-      $this->assertType('\InvalidArgumentException', $e, '__construct() throws an \InvalidArgumentException if the first argument is not a stream');
+      $this->assertInstanceOf('\InvalidArgumentException', $e, '__construct() throws an \InvalidArgumentException if the first argument is not a stream');
       $this->assertEquals('The StreamOutput class needs a stream as its first argument.', $e->getMessage());
     }
 

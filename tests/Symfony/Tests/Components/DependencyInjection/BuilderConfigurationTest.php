@@ -112,7 +112,7 @@ class BuilderConfigurationTest extends \PHPUnit_Framework_TestCase
     }
     catch (\Exception $e)
     {
-      $this->assertType('\InvalidArgumentException', $e, '->getParameter() throws an \InvalidArgumentException if the key does not exist');
+      $this->assertInstanceOf('\InvalidArgumentException', $e, '->getParameter() throws an \InvalidArgumentException if the key does not exist');
       $this->assertEquals('The parameter "baba" must be defined.', $e->getMessage(), '->getParameter() throws an \InvalidArgumentException if the key does not exist');
     }
   }
@@ -149,7 +149,7 @@ class BuilderConfigurationTest extends \PHPUnit_Framework_TestCase
     }
     catch (\Exception $e)
     {
-      $this->assertType('\InvalidArgumentException', $e, '->getAlias() throws an \InvalidArgumentException if the alias does not exist');
+      $this->assertInstanceOf('\InvalidArgumentException', $e, '->getAlias() throws an \InvalidArgumentException if the alias does not exist');
       $this->assertEquals('The service alias "baba" does not exist.', $e->getMessage(), '->getAlias() throws an \InvalidArgumentException if the alias does not exist');
     }
 
@@ -186,7 +186,7 @@ class BuilderConfigurationTest extends \PHPUnit_Framework_TestCase
     }
     catch (\Exception $e)
     {
-      $this->assertType('\InvalidArgumentException', $e, '->getDefinition() throws an InvalidArgumentException if the service definition does not exist');
+      $this->assertInstanceOf('\InvalidArgumentException', $e, '->getDefinition() throws an InvalidArgumentException if the service definition does not exist');
       $this->assertEquals('The service definition "baz" does not exist.', $e->getMessage(), '->getDefinition() throws an InvalidArgumentException if the service definition does not exist');
     }
   }

@@ -29,7 +29,7 @@ class LinkTest extends \PHPUnit_Framework_TestCase
     }
     catch (\Exception $e)
     {
-      $this->assertType('\LogicException', $e, '__construct() throws a \LogicException if the node is not an "a" tag');
+      $this->assertInstanceOf('\LogicException', $e, '__construct() throws a \LogicException if the node is not an "a" tag');
     }
   }
 

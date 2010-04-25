@@ -111,7 +111,7 @@ class ApplicationTest extends \PHPUnit_Framework_TestCase
     }
     catch (\Exception $e)
     {
-      $this->assertType('\InvalidArgumentException', $e, '->getCommand() throws an \InvalidArgumentException if the command does not exist');
+      $this->assertInstanceOf('\InvalidArgumentException', $e, '->getCommand() throws an \InvalidArgumentException if the command does not exist');
       $this->assertEquals('The command "foofoo" does not exist.', $e->getMessage(), '->getCommand() throws an \InvalidArgumentException if the command does not exist');
     }
 
@@ -145,7 +145,7 @@ class ApplicationTest extends \PHPUnit_Framework_TestCase
     }
     catch (\Exception $e)
     {
-      $this->assertType('\InvalidArgumentException', $e, '->findNamespace() throws an \InvalidArgumentException if the abbreviation is ambiguous');
+      $this->assertInstanceOf('\InvalidArgumentException', $e, '->findNamespace() throws an \InvalidArgumentException if the abbreviation is ambiguous');
       $this->assertEquals('The namespace "f" is ambiguous (foo, foo1).', $e->getMessage(), '->findNamespace() throws an \InvalidArgumentException if the abbreviation is ambiguous');
     }
 
@@ -156,7 +156,7 @@ class ApplicationTest extends \PHPUnit_Framework_TestCase
     }
     catch (\Exception $e)
     {
-      $this->assertType('\InvalidArgumentException', $e, '->findNamespace() throws an \InvalidArgumentException if no command is in the given namespace');
+      $this->assertInstanceOf('\InvalidArgumentException', $e, '->findNamespace() throws an \InvalidArgumentException if no command is in the given namespace');
       $this->assertEquals('There are no commands defined in the "bar" namespace.', $e->getMessage(), '->findNamespace() throws an \InvalidArgumentException if no command is in the given namespace');
     }
   }
@@ -181,7 +181,7 @@ class ApplicationTest extends \PHPUnit_Framework_TestCase
     }
     catch (\Exception $e)
     {
-      $this->assertType('\InvalidArgumentException', $e, '->findCommand() throws an \InvalidArgumentException if the abbreviation is ambiguous for a namespace');
+      $this->assertInstanceOf('\InvalidArgumentException', $e, '->findCommand() throws an \InvalidArgumentException if the abbreviation is ambiguous for a namespace');
       $this->assertEquals('Command "f" is not defined.', $e->getMessage(), '->findCommand() throws an \InvalidArgumentException if the abbreviation is ambiguous for a namespace');
     }
 
@@ -192,7 +192,7 @@ class ApplicationTest extends \PHPUnit_Framework_TestCase
     }
     catch (\Exception $e)
     {
-      $this->assertType('\InvalidArgumentException', $e, '->findCommand() throws an \InvalidArgumentException if the abbreviation is ambiguous for an alias');
+      $this->assertInstanceOf('\InvalidArgumentException', $e, '->findCommand() throws an \InvalidArgumentException if the abbreviation is ambiguous for an alias');
       $this->assertEquals('Command "a" is ambiguous (afoobar, afoobar1 and 1 more).', $e->getMessage(), '->findCommand() throws an \InvalidArgumentException if the abbreviation is ambiguous for an alias');
     }
 
@@ -203,7 +203,7 @@ class ApplicationTest extends \PHPUnit_Framework_TestCase
     }
     catch (\Exception $e)
     {
-      $this->assertType('\InvalidArgumentException', $e, '->findCommand() throws an \InvalidArgumentException if the abbreviation is ambiguous for a command');
+      $this->assertInstanceOf('\InvalidArgumentException', $e, '->findCommand() throws an \InvalidArgumentException if the abbreviation is ambiguous for a command');
       $this->assertEquals('Command "foo:b" is ambiguous (foo:bar, foo:bar1).', $e->getMessage(), '->findCommand() throws an \InvalidArgumentException if the abbreviation is ambiguous for a command');
     }
   }
@@ -226,7 +226,7 @@ class ApplicationTest extends \PHPUnit_Framework_TestCase
     }
     catch (\Exception $e)
     {
-      $this->assertType('\Exception', $e, '->setCatchExceptions() sets the catch exception flag');
+      $this->assertInstanceOf('\Exception', $e, '->setCatchExceptions() sets the catch exception flag');
       $this->assertEquals('Command "foo" is not defined.', $e->getMessage(), '->setCatchExceptions() sets the catch exception flag');
     }
   }

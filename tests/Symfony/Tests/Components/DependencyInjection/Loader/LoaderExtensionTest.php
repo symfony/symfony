@@ -25,7 +25,7 @@ class LoaderExtensionTest extends \PHPUnit_Framework_TestCase
     }
     catch (\Exception $e)
     {
-      $this->assertType('\InvalidArgumentException', $e, '->load() throws an InvalidArgumentException if the tag does not exist');
+      $this->assertInstanceOf('\InvalidArgumentException', $e, '->load() throws an InvalidArgumentException if the tag does not exist');
       $this->assertEquals('The tag "foo" is not defined in the "http://www.example.com/schema/project" extension.', $e->getMessage(), '->load() throws an InvalidArgumentException if the tag does not exist');
     }
 

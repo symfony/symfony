@@ -53,7 +53,7 @@ class ArgvInputTest extends \PHPUnit_Framework_TestCase
     }
     catch (\Exception $e)
     {
-      $this->assertType('\RuntimeException', $e, '->parse() throws a \RuntimeException if no parameter is passed to an option when it is required');
+      $this->assertInstanceOf('\RuntimeException', $e, '->parse() throws a \RuntimeException if no parameter is passed to an option when it is required');
       $this->assertEquals('The "--foo" option requires a value.', $e->getMessage(), '->parse() throws a \RuntimeException if no parameter is passed to an option when it is required');
     }
 
@@ -81,7 +81,7 @@ class ArgvInputTest extends \PHPUnit_Framework_TestCase
     }
     catch (\Exception $e)
     {
-      $this->assertType('\RuntimeException', $e, '->parse() throws a \RuntimeException if no parameter is passed to an option when it is required');
+      $this->assertInstanceOf('\RuntimeException', $e, '->parse() throws a \RuntimeException if no parameter is passed to an option when it is required');
       $this->assertEquals('The "--foo" option requires a value.', $e->getMessage(), '->parse() throws a \RuntimeException if no parameter is passed to an option when it is required');
     }
 
@@ -93,7 +93,7 @@ class ArgvInputTest extends \PHPUnit_Framework_TestCase
     }
     catch (\Exception $e)
     {
-      $this->assertType('\RuntimeException', $e, '->parse() throws a \RuntimeException if a value is passed to an option which does not take one');
+      $this->assertInstanceOf('\RuntimeException', $e, '->parse() throws a \RuntimeException if a value is passed to an option which does not take one');
       $this->assertEquals('The "-o" option does not exist.', $e->getMessage(), '->parse() throws a \RuntimeException if a value is passed to an option which does not take one');
     }
 
@@ -105,7 +105,7 @@ class ArgvInputTest extends \PHPUnit_Framework_TestCase
     }
     catch (\Exception $e)
     {
-      $this->assertType('\RuntimeException', $e, '->parse() throws a \RuntimeException if too many arguments are passed');
+      $this->assertInstanceOf('\RuntimeException', $e, '->parse() throws a \RuntimeException if too many arguments are passed');
       $this->assertEquals('Too many arguments.', $e->getMessage(), '->parse() throws a \RuntimeException if too many arguments are passed');
     }
 
@@ -117,7 +117,7 @@ class ArgvInputTest extends \PHPUnit_Framework_TestCase
     }
     catch (\Exception $e)
     {
-      $this->assertType('\RuntimeException', $e, '->parse() throws a \RuntimeException if an unknown long option is passed');
+      $this->assertInstanceOf('\RuntimeException', $e, '->parse() throws a \RuntimeException if an unknown long option is passed');
       $this->assertEquals('The "--foo" option does not exist.', $e->getMessage(), '->parse() throws a \RuntimeException if an unknown long option is passed');
     }
 
@@ -129,7 +129,7 @@ class ArgvInputTest extends \PHPUnit_Framework_TestCase
     }
     catch (\Exception $e)
     {
-      $this->assertType('\RuntimeException', $e, '->parse() throws a \RuntimeException if an unknown short option is passed');
+      $this->assertInstanceOf('\RuntimeException', $e, '->parse() throws a \RuntimeException if an unknown short option is passed');
       $this->assertEquals('The "-f" option does not exist.', $e->getMessage(), '->parse() throws a \RuntimeException if an unknown short option is passed');
     }
 

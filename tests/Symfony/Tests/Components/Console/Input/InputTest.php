@@ -43,7 +43,7 @@ class InputTest extends \PHPUnit_Framework_TestCase
     }
     catch (\Exception $e)
     {
-      $this->assertType('\InvalidArgumentException', $e, '->setOption() throws a \InvalidArgumentException if the option does not exist');
+      $this->assertInstanceOf('\InvalidArgumentException', $e, '->setOption() throws a \InvalidArgumentException if the option does not exist');
       $this->assertEquals('The "foo" option does not exist.', $e->getMessage());
     }
 
@@ -54,7 +54,7 @@ class InputTest extends \PHPUnit_Framework_TestCase
     }
     catch (\Exception $e)
     {
-      $this->assertType('\InvalidArgumentException', $e, '->setOption() throws a \InvalidArgumentException if the option does not exist');
+      $this->assertInstanceOf('\InvalidArgumentException', $e, '->setOption() throws a \InvalidArgumentException if the option does not exist');
       $this->assertEquals('The "foo" option does not exist.', $e->getMessage());
     }
   }
@@ -79,7 +79,7 @@ class InputTest extends \PHPUnit_Framework_TestCase
     }
     catch (\Exception $e)
     {
-      $this->assertType('\InvalidArgumentException', $e, '->setOption() throws a \InvalidArgumentException if the option does not exist');
+      $this->assertInstanceOf('\InvalidArgumentException', $e, '->setOption() throws a \InvalidArgumentException if the option does not exist');
       $this->assertEquals('The "foo" argument does not exist.', $e->getMessage());
     }
 
@@ -90,7 +90,7 @@ class InputTest extends \PHPUnit_Framework_TestCase
     }
     catch (\Exception $e)
     {
-      $this->assertType('\InvalidArgumentException', $e, '->setOption() throws a \InvalidArgumentException if the option does not exist');
+      $this->assertInstanceOf('\InvalidArgumentException', $e, '->setOption() throws a \InvalidArgumentException if the option does not exist');
       $this->assertEquals('The "foo" argument does not exist.', $e->getMessage());
     }
   }
@@ -107,7 +107,7 @@ class InputTest extends \PHPUnit_Framework_TestCase
     }
     catch (\Exception $e)
     {
-      $this->assertType('\RuntimeException', $e, '->validate() throws a \RuntimeException if not enough arguments are given');
+      $this->assertInstanceOf('\RuntimeException', $e, '->validate() throws a \RuntimeException if not enough arguments are given');
       $this->assertEquals('Not enough arguments.', $e->getMessage());
     }
 

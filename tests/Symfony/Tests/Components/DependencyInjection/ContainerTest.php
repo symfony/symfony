@@ -66,7 +66,7 @@ class ContainerTest extends \PHPUnit_Framework_TestCase
     }
     catch (\Exception $e)
     {
-      $this->assertType('\InvalidArgumentException', $e, '->getParameter() thrown an \InvalidArgumentException if the key does not exist');
+      $this->assertInstanceOf('\InvalidArgumentException', $e, '->getParameter() thrown an \InvalidArgumentException if the key does not exist');
       $this->assertEquals('The parameter "baba" must be defined.', $e->getMessage(), '->getParameter() thrown an \InvalidArgumentException if the key does not exist');
     }
 
@@ -77,7 +77,7 @@ class ContainerTest extends \PHPUnit_Framework_TestCase
     }
     catch (\Exception $e)
     {
-      $this->assertType('\InvalidArgumentException', $e, '->offsetGet() thrown an \InvalidArgumentException if the key does not exist');
+      $this->assertInstanceOf('\InvalidArgumentException', $e, '->offsetGet() thrown an \InvalidArgumentException if the key does not exist');
       $this->assertEquals('The parameter "baba" must be defined.', $e->getMessage(), '->offsetGet() thrown an \InvalidArgumentException if the key does not exist');
     }
   }
@@ -139,7 +139,7 @@ class ContainerTest extends \PHPUnit_Framework_TestCase
     }
     catch (\Exception $e)
     {
-      $this->assertType('\InvalidArgumentException', $e, '->getService() thrown an \InvalidArgumentException if the service does not exist');
+      $this->assertInstanceOf('\InvalidArgumentException', $e, '->getService() thrown an \InvalidArgumentException if the service does not exist');
       $this->assertEquals('The service "baba" does not exist.', $e->getMessage(), '->getService() thrown an \InvalidArgumentException if the service does not exist');
     }
 
@@ -150,7 +150,7 @@ class ContainerTest extends \PHPUnit_Framework_TestCase
     }
     catch (\Exception $e)
     {
-      $this->assertType('\InvalidArgumentException', $e, '->__get() thrown an \InvalidArgumentException if the service does not exist');
+      $this->assertInstanceOf('\InvalidArgumentException', $e, '->__get() thrown an \InvalidArgumentException if the service does not exist');
       $this->assertEquals('The service "baba" does not exist.', $e->getMessage(), '->__get() thrown an \InvalidArgumentException if the service does not exist');
     }
 
@@ -161,7 +161,7 @@ class ContainerTest extends \PHPUnit_Framework_TestCase
     }
     catch (\Exception $e)
     {
-      $this->assertType('\LogicException', $e, '->__unset() thrown an LogicException if you try to remove a service');
+      $this->assertInstanceOf('\LogicException', $e, '->__unset() thrown an LogicException if you try to remove a service');
       $this->assertEquals('You can\'t unset a service.', $e->getMessage(), '->__unset() thrown an LogicException if you try to remove a service');
     }
 
@@ -182,7 +182,7 @@ class ContainerTest extends \PHPUnit_Framework_TestCase
     }
     catch (\Exception $e)
     {
-      $this->assertType('\BadMethodCallException', $e, '__call() throws a \BadMethodCallException exception if the method is not a service method');
+      $this->assertInstanceOf('\BadMethodCallException', $e, '__call() throws a \BadMethodCallException exception if the method is not a service method');
       $this->assertEquals('Call to undefined method Symfony\Components\DependencyInjection\Container::getFooBar_Foo.', $e->getMessage(), '__call() throws a \BadMethodCallException exception if the method is not a service method');
     }
   }
@@ -198,7 +198,7 @@ class ContainerTest extends \PHPUnit_Framework_TestCase
     }
     catch (\Exception $e)
     {
-      $this->assertType('\InvalidArgumentException', $e, '->getService() throws a \InvalidArgumentException exception if the service is empty');
+      $this->assertInstanceOf('\InvalidArgumentException', $e, '->getService() throws a \InvalidArgumentException exception if the service is empty');
       $this->assertEquals('The service "" does not exist.', $e->getMessage(), '->getService() throws a \InvalidArgumentException exception if the service is empty');
     }
   }

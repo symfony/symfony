@@ -50,7 +50,7 @@ class BuilderTest extends \PHPUnit_Framework_TestCase
     }
     catch (\Exception $e)
     {
-      $this->assertType('\InvalidArgumentException', $e, '->getDefinition() throws an InvalidArgumentException if the service definition does not exist');
+      $this->assertInstanceOf('\InvalidArgumentException', $e, '->getDefinition() throws an InvalidArgumentException if the service definition does not exist');
       $this->assertEquals('The service definition "baz" does not exist.', $e->getMessage(), '->getDefinition() throws an InvalidArgumentException if the service definition does not exist');
     }
   }
@@ -60,7 +60,7 @@ class BuilderTest extends \PHPUnit_Framework_TestCase
     $builder = new Builder();
     $builder->register('foo', 'FooClass');
     $this->assertTrue($builder->hasDefinition('foo'), '->register() registers a new service definition');
-    $this->assertType('Symfony\Components\DependencyInjection\Definition', $builder->getDefinition('foo'), '->register() returns the newly created Definition instance');
+    $this->assertInstanceOf('Symfony\Components\DependencyInjection\Definition', $builder->getDefinition('foo'), '->register() returns the newly created Definition instance');
   }
 
   public function testHasService()
@@ -83,7 +83,7 @@ class BuilderTest extends \PHPUnit_Framework_TestCase
     }
     catch (\Exception $e)
     {
-      $this->assertType('\InvalidArgumentException', $e, '->getService() throws an InvalidArgumentException if the service does not exist');
+      $this->assertInstanceOf('\InvalidArgumentException', $e, '->getService() throws an InvalidArgumentException if the service does not exist');
       $this->assertEquals('The service definition "foo" does not exist.', $e->getMessage(), '->getService() throws an InvalidArgumentException if the service does not exist');
     }
     $builder->register('foo', 'stdClass');
@@ -101,7 +101,7 @@ class BuilderTest extends \PHPUnit_Framework_TestCase
     }
     catch (\Exception $e)
     {
-      $this->assertType('\LogicException', $e, '->getService() throws a LogicException if the service has a circular reference to itself');
+      $this->assertInstanceOf('\LogicException', $e, '->getService() throws a LogicException if the service has a circular reference to itself');
       $this->assertEquals('The service "baz" has a circular reference to itself.', $e->getMessage(), '->getService() throws a LogicException if the service has a circular reference to itself');
     }
 
@@ -136,7 +136,7 @@ class BuilderTest extends \PHPUnit_Framework_TestCase
     }
     catch (\Exception $e)
     {
-      $this->assertType('\InvalidArgumentException', $e, '->getAlias() throws an InvalidArgumentException if the alias does not exist');
+      $this->assertInstanceOf('\InvalidArgumentException', $e, '->getAlias() throws an InvalidArgumentException if the alias does not exist');
       $this->assertEquals('The service alias "foobar" does not exist.', $e->getMessage(), '->getAlias() throws an InvalidArgumentException if the alias does not exist');
     }
   }
@@ -157,10 +157,10 @@ class BuilderTest extends \PHPUnit_Framework_TestCase
   {
     $builder = new Builder();
     $builder->register('foo1', 'FooClass')->setFile(self::$fixturesPath.'/includes/foo.php');
-    $this->assertType('\FooClass', $builder->getService('foo1'), '->createService() requires the file defined by the service definition');
+    $this->assertInstanceOf('\FooClass', $builder->getService('foo1'), '->createService() requires the file defined by the service definition');
     $builder->register('foo2', 'FooClass')->setFile(self::$fixturesPath.'/includes/%file%.php');
     $builder->setParameter('file', 'foo');
-    $this->assertType('\FooClass', $builder->getService('foo2'), '->createService() replaces parameters in the file provided by the service definition');
+    $this->assertInstanceOf('\FooClass', $builder->getService('foo2'), '->createService() replaces parameters in the file provided by the service definition');
   }
 
   public function testCreateServiceClass()
@@ -168,7 +168,7 @@ class BuilderTest extends \PHPUnit_Framework_TestCase
     $builder = new Builder();
     $builder->register('foo1', '%class%');
     $builder->setParameter('class', 'stdClass');
-    $this->assertType('\stdClass', $builder->getService('foo1'), '->createService() replaces parameters in the class provided by the service definition');
+    $this->assertInstanceOf('\stdClass', $builder->getService('foo1'), '->createService() replaces parameters in the class provided by the service definition');
   }
 
   public function testCreateServiceArguments()
@@ -223,7 +223,7 @@ class BuilderTest extends \PHPUnit_Framework_TestCase
     }
     catch (\Exception $e)
     {
-      $this->assertType('\InvalidArgumentException', $e, '->createService() throws an InvalidArgumentException if the configure callable is not a valid callable');
+      $this->assertInstanceOf('\InvalidArgumentException', $e, '->createService() throws an InvalidArgumentException if the configure callable is not a valid callable');
       $this->assertEquals('The configure callable for class "FooClass" is not a callable.', $e->getMessage(), '->createService() throws an InvalidArgumentException if the configure callable is not a valid callable');
     }
   }
@@ -248,7 +248,7 @@ class BuilderTest extends \PHPUnit_Framework_TestCase
     }
     catch (\Exception $e)
     {
-      $this->assertType('\RuntimeException', $e, '->resolveValue() throws a RuntimeException if a placeholder references a non-existant parameter');
+      $this->assertInstanceOf('\RuntimeException', $e, '->resolveValue() throws a RuntimeException if a placeholder references a non-existant parameter');
       $this->assertEquals('The parameter "foobar" must be defined.', $e->getMessage(), '->resolveValue() throws a RuntimeException if a placeholder references a non-existant parameter');
     }
 
@@ -259,7 +259,7 @@ class BuilderTest extends \PHPUnit_Framework_TestCase
     }
     catch (\Exception $e)
     {
-      $this->assertType('\RuntimeException', $e, '->resolveValue() throws a RuntimeException if a placeholder references a non-existant parameter');
+      $this->assertInstanceOf('\RuntimeException', $e, '->resolveValue() throws a RuntimeException if a placeholder references a non-existant parameter');
       $this->assertEquals('The parameter "foobar" must be defined (used in the following expression: "foo %foobar% bar").', $e->getMessage(), '->resolveValue() throws a RuntimeException if a placeholder references a non-existant parameter');
     }
   }

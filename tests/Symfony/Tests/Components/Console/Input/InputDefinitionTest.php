@@ -86,7 +86,7 @@ class InputDefinitionTest extends \PHPUnit_Framework_TestCase
     }
     catch (\Exception $e)
     {
-      $this->assertType('\Exception', $e, '->addArgument() throws a Exception if another argument is already registered with the same name');
+      $this->assertInstanceOf('\Exception', $e, '->addArgument() throws a Exception if another argument is already registered with the same name');
       $this->assertEquals('An argument with name "foo" already exist.', $e->getMessage());
     }
 
@@ -99,7 +99,7 @@ class InputDefinitionTest extends \PHPUnit_Framework_TestCase
     }
     catch (\Exception $e)
     {
-      $this->assertType('\Exception', $e, '->addArgument() throws a Exception if there is an array parameter already registered');
+      $this->assertInstanceOf('\Exception', $e, '->addArgument() throws a Exception if there is an array parameter already registered');
       $this->assertEquals('Cannot add an argument after an array argument.', $e->getMessage());
     }
 
@@ -114,7 +114,7 @@ class InputDefinitionTest extends \PHPUnit_Framework_TestCase
     }
     catch (\Exception $e)
     {
-      $this->assertType('\Exception', $e, '->addArgument() throws an exception if you try to add a required argument after an optional one');
+      $this->assertInstanceOf('\Exception', $e, '->addArgument() throws an exception if you try to add a required argument after an optional one');
       $this->assertEquals('Cannot add a required argument after an optional one.', $e->getMessage());
     }
   }
@@ -133,7 +133,7 @@ class InputDefinitionTest extends \PHPUnit_Framework_TestCase
     }
     catch (\Exception $e)
     {
-      $this->assertType('\Exception', $e, '->getArgument() throws an exception if the InputArgument name does not exist');
+      $this->assertInstanceOf('\Exception', $e, '->getArgument() throws an exception if the InputArgument name does not exist');
       $this->assertEquals('The "bar" argument does not exist.', $e->getMessage());
     }
   }
@@ -201,7 +201,7 @@ class InputDefinitionTest extends \PHPUnit_Framework_TestCase
     }
     catch (\Exception $e)
     {
-      $this->assertType('\Exception', $e, '->setOptions() clears all InputOption objects');
+      $this->assertInstanceOf('\Exception', $e, '->setOptions() clears all InputOption objects');
       $this->assertEquals('The "-f" option does not exist.', $e->getMessage());
     }
   }
@@ -232,7 +232,7 @@ class InputDefinitionTest extends \PHPUnit_Framework_TestCase
     }
     catch (\Exception $e)
     {
-      $this->assertType('\Exception', $e, '->addOption() throws a Exception if the another option is already registered with the same name');
+      $this->assertInstanceOf('\Exception', $e, '->addOption() throws a Exception if the another option is already registered with the same name');
       $this->assertEquals('An option named "foo" already exist.', $e->getMessage());
     }
     try
@@ -242,7 +242,7 @@ class InputDefinitionTest extends \PHPUnit_Framework_TestCase
     }
     catch (\Exception $e)
     {
-      $this->assertType('\Exception', $e, '->addOption() throws a Exception if the another option is already registered with the same shortcut');
+      $this->assertInstanceOf('\Exception', $e, '->addOption() throws a Exception if the another option is already registered with the same shortcut');
       $this->assertEquals('An option with shortcut "f" already exist.', $e->getMessage());
     }
   }
@@ -260,7 +260,7 @@ class InputDefinitionTest extends \PHPUnit_Framework_TestCase
     }
     catch (\Exception $e)
     {
-      $this->assertType('\Exception', $e, '->getOption() throws an exception if the option name does not exist');
+      $this->assertInstanceOf('\Exception', $e, '->getOption() throws an exception if the option name does not exist');
       $this->assertEquals('The "--bar" option does not exist.', $e->getMessage());
     }
   }
@@ -296,7 +296,7 @@ class InputDefinitionTest extends \PHPUnit_Framework_TestCase
     }
     catch (\Exception $e)
     {
-      $this->assertType('\Exception', $e, '->getOption() throws an exception if the shortcut does not exist');
+      $this->assertInstanceOf('\Exception', $e, '->getOption() throws an exception if the shortcut does not exist');
       $this->assertEquals('The "-l" option does not exist.', $e->getMessage());
     }
   }

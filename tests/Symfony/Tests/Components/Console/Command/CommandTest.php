@@ -43,7 +43,7 @@ class CommandTest extends \PHPUnit_Framework_TestCase
     }
     catch (\Exception $e)
     {
-      $this->assertType('\LogicException', $e, '__construct() throws a \LogicException if the name is null');
+      $this->assertInstanceOf('\LogicException', $e, '__construct() throws a \LogicException if the name is null');
       $this->assertEquals('The command name cannot be empty.', $e->getMessage(), '__construct() throws a \LogicException if the name is null');
     }
     $command = new Command('foo:bar');
@@ -111,7 +111,7 @@ class CommandTest extends \PHPUnit_Framework_TestCase
     }
     catch (\Exception $e)
     {
-      $this->assertType('\InvalidArgumentException', $e, '->setName() throws an \InvalidArgumentException if the name is empty');
+      $this->assertInstanceOf('\InvalidArgumentException', $e, '->setName() throws an \InvalidArgumentException if the name is empty');
       $this->assertEquals('A command name cannot be empty.', $e->getMessage(), '->setName() throws an \InvalidArgumentException if the name is empty');
     }
 
@@ -122,7 +122,7 @@ class CommandTest extends \PHPUnit_Framework_TestCase
     }
     catch (\Exception $e)
     {
-      $this->assertType('\InvalidArgumentException', $e, '->setName() throws an \InvalidArgumentException if the name is empty');
+      $this->assertInstanceOf('\InvalidArgumentException', $e, '->setName() throws an \InvalidArgumentException if the name is empty');
       $this->assertEquals('A command name cannot be empty.', $e->getMessage(), '->setName() throws an \InvalidArgumentException if the name is empty');
     }
   }
@@ -214,7 +214,7 @@ class CommandTest extends \PHPUnit_Framework_TestCase
     }
     catch (\Exception $e)
     {
-      $this->assertType('\InvalidArgumentException', $e, '->run() throws a \InvalidArgumentException when the input does not validate the current InputDefinition');
+      $this->assertInstanceOf('\InvalidArgumentException', $e, '->run() throws a \InvalidArgumentException when the input does not validate the current InputDefinition');
       $this->assertEquals('The "--bar" option does not exist.', $e->getMessage(), '->run() throws a \InvalidArgumentException when the input does not validate the current InputDefinition');
     }
 
@@ -229,7 +229,7 @@ class CommandTest extends \PHPUnit_Framework_TestCase
     }
     catch (\Exception $e)
     {
-      $this->assertType('\LogicException', $e, '->run() throws a \LogicException if the execute() method has not been overriden and no code has been provided');
+      $this->assertInstanceOf('\LogicException', $e, '->run() throws a \LogicException if the execute() method has not been overriden and no code has been provided');
       $this->assertEquals('You must override the execute() method in the concrete command class.', $e->getMessage(), '->run() throws a \LogicException if the execute() method has not been overriden and no code has been provided');
     }
   }

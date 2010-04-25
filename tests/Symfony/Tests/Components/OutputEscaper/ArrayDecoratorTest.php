@@ -45,7 +45,7 @@ class ArrayDecoratorTest extends \PHPUnit_Framework_TestCase
     }
     catch (\Exception $e)
     {
-      $this->assertType('\LogicException', $e, 'The escaped object is read only (unset)');
+      $this->assertInstanceOf('\LogicException', $e, 'The escaped object is read only (unset)');
       $this->assertEquals('Cannot unset values.', $e->getMessage(), 'The escaped object is read only (unset)');
     }
 
@@ -57,7 +57,7 @@ class ArrayDecoratorTest extends \PHPUnit_Framework_TestCase
     }
     catch (\Exception $e)
     {
-      $this->assertType('\LogicException', $e, 'The escaped object is read only (set)');
+      $this->assertInstanceOf('\LogicException', $e, 'The escaped object is read only (set)');
       $this->assertEquals('Cannot set values.', $e->getMessage(), 'The escaped object is read only (set)');
     }
   }

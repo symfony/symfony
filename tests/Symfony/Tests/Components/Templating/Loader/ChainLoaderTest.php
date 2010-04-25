@@ -46,7 +46,7 @@ class ChainLoaderTest extends \PHPUnit_Framework_TestCase
     $loader = new ProjectTemplateLoader1(array(self::$loader1, self::$loader2));
     $this->assertFalse($loader->load('bar'), '->load() returns false if the template is not found');
     $this->assertFalse($loader->load('foo', array('renderer' => 'xml')), '->load() returns false if the template does not exists for the given renderer');
-    $this->assertType('Symfony\Components\Templating\Storage\FileStorage', $loader->load('foo'), '->load() returns a FileStorage if the template exists');
+    $this->assertInstanceOf('Symfony\Components\Templating\Storage\FileStorage', $loader->load('foo'), '->load() returns a FileStorage if the template exists');
   }
 }
 

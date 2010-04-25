@@ -59,7 +59,7 @@ class EngineTest extends \PHPUnit_Framework_TestCase
     }
     catch (\Exception $e)
     {
-      $this->assertType('\InvalidArgumentException', $e, '->__get() throws an InvalidArgumentException if the helper is not defined');
+      $this->assertInstanceOf('\InvalidArgumentException', $e, '->__get() throws an InvalidArgumentException if the helper is not defined');
       $this->assertEquals('The helper "bar" is not defined.', $e->getMessage(), '->__get() throws an InvalidArgumentException if the helper is not defined');
     }
   }
@@ -81,7 +81,7 @@ class EngineTest extends \PHPUnit_Framework_TestCase
     }
     catch (\Exception $e)
     {
-      $this->assertType('\InvalidArgumentException', $e, '->get() throws an InvalidArgumentException if the helper is not defined');
+      $this->assertInstanceOf('\InvalidArgumentException', $e, '->get() throws an InvalidArgumentException if the helper is not defined');
       $this->assertEquals('The helper "foobar" is not defined.', $e->getMessage(), '->get() throws an InvalidArgumentException if the helper is not defined');
     }
 
@@ -99,7 +99,7 @@ class EngineTest extends \PHPUnit_Framework_TestCase
     }
     catch (\Exception $e)
     {
-      $this->assertType('\InvalidArgumentException', $e, '->render() throws an InvalidArgumentException if the template does not exist');
+      $this->assertInstanceOf('\InvalidArgumentException', $e, '->render() throws an InvalidArgumentException if the template does not exist');
       $this->assertEquals('The template "name" does not exist (renderer: php).', $e->getMessage(), '->render() throws an InvalidArgumentException if the template does not exist');
     }
 
@@ -111,7 +111,7 @@ class EngineTest extends \PHPUnit_Framework_TestCase
     }
     catch (\Exception $e)
     {
-      $this->assertType('\InvalidArgumentException', $e, '->render() throws an InvalidArgumentException if no renderer is registered for the given renderer');
+      $this->assertInstanceOf('\InvalidArgumentException', $e, '->render() throws an InvalidArgumentException if no renderer is registered for the given renderer');
       $this->assertEquals('The template "foo" does not exist (renderer: name).', $e->getMessage(), '->render() throws an InvalidArgumentException if no renderer is registered for the given renderer');
     }
 

@@ -76,7 +76,7 @@ class OutputTest extends \PHPUnit_Framework_TestCase
     }
     catch (\Exception $e)
     {
-      $this->assertType('\InvalidArgumentException', $e, '->writeln() throws an \InvalidArgumentException when the type does not exist');
+      $this->assertInstanceOf('\InvalidArgumentException', $e, '->writeln() throws an \InvalidArgumentException when the type does not exist');
       $this->assertEquals('Unknown output type given (24)', $e->getMessage());
     }
 
@@ -87,7 +87,7 @@ class OutputTest extends \PHPUnit_Framework_TestCase
     }
     catch (\Exception $e)
     {
-      $this->assertType('\InvalidArgumentException', $e, '->writeln() throws an \InvalidArgumentException when a style does not exist');
+      $this->assertInstanceOf('\InvalidArgumentException', $e, '->writeln() throws an \InvalidArgumentException when a style does not exist');
       $this->assertEquals('Unknown style "bar".', $e->getMessage());
     }
   }

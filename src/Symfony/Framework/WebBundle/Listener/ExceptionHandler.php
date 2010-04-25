@@ -73,6 +73,8 @@ class ExceptionHandler
     try
     {
       $response = $event->getSubject()->handleRaw($request, false);
+
+      error_log(sprintf('%s: %s', get_class($exception), $exception->getMessage()));
     }
     catch (\Exception $e)
     {

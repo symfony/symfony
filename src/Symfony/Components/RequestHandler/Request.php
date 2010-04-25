@@ -128,10 +128,10 @@ class Request
     }
 
     $server = array_replace(array(
-      'HTTP_HOST'            => 'localhost',
       'SERVER_NAME'          => 'localhost',
       'SERVER_PORT'          => 80,
-      'HTTP_USER_AGENT'      => 'SymfonyClient/1.0',
+      'HTTP_HOST'            => 'localhost',
+      'HTTP_USER_AGENT'      => 'Symfony/X.X',
       'HTTP_ACCEPT'          => 'text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8',
       'HTTP_ACCEPT_LANGUAGE' => 'en-us,en;q=0.5',
       'HTTP_ACCEPT_CHARSET'  => 'ISO-8859-1,utf-8;q=0.7,*;q=0.7',
@@ -280,9 +280,9 @@ class Request
     return (
       (strtolower($this->server->get('HTTPS')) == 'on' || $this->server->get('HTTPS') == 1)
       ||
-      (strtolower($this->server->get('HTTP_SSL_HTTPS')) == 'on' || $this->server->get('HTTP_SSL_HTTPS') == 1)
+      (strtolower($this->headers->get('SSL_HTTPS')) == 'on' || $this->headers->get('SSL_HTTPS') == 1)
       ||
-      (strtolower($this->server->get('HTTP_X_FORWARDED_PROTO')) == 'https')
+      (strtolower($this->headers->get('X_FORWARDED_PROTO')) == 'https')
     );
   }
 
@@ -293,7 +293,7 @@ class Request
    */
   public function getHost()
   {
-    if ($host = $this->server->get('HTTP_X_FORWARDED_HOST'))
+    if ($host = $this->headers->get('X_FORWARDED_HOST'))
     {
       $elements = implode(',', $host);
 
@@ -301,7 +301,7 @@ class Request
     }
     else
     {
-      return $this->server->get('HTTP_HOST', $this->server->get('SERVER_NAME', $this->server->get('SERVER_ADDR', '')));
+      return $this->headers->get('HOST', $this->server->get('SERVER_NAME', $this->server->get('SERVER_ADDR', '')));
     }
   }
 

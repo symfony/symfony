@@ -24,7 +24,7 @@ class RequestBag
 
   public function __construct($input)
   {
-    $this->input = $input;
+    $this->replace($input);
   }
 
   /**
@@ -67,6 +67,16 @@ class RequestBag
   public function has($key)
   {
     return array_key_exists($key, $this->input);
+  }
+
+  /**
+   * Deletes a parameter.
+   *
+   * @param string $key The key
+   */
+  public function delete($key)
+  {
+    unset($this->input[$key]);
   }
 
   /**

@@ -172,6 +172,17 @@ class Request
     return $dup;
   }
 
+  public function __clone()
+  {
+    $this->query   = clone $this->query;
+    $this->request = clone $this->request;
+    $this->path    = clone $this->path;
+    $this->cookies = clone $this->cookies;
+    $this->files   = clone $this->files;
+    $this->server  = clone $this->server;
+    $this->headers = clone $this->headers;
+  }
+
   // Order of precedence: GET, PATH, POST, COOKIE
   // Avoid using this method in controllers:
   //  * slow

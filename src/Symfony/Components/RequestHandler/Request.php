@@ -563,7 +563,7 @@ class Request
       // Cut off any q-value that might come after a semi-colon
       if ($pos = strpos($value, ';'))
       {
-        $q     = (float) trim(substr($value, $pos + 3));
+        $q     = (float) trim(substr($value, strpos($value, '=') + 1));
         $value = trim(substr($value, 0, $pos));
       }
       else
@@ -571,7 +571,10 @@ class Request
         $q = 1;
       }
 
-      $values[$value] = $q;
+      if (0 < $q)
+      {
+        $values[trim($value)] = $q;
+      }
     }
 
     arsort($values);

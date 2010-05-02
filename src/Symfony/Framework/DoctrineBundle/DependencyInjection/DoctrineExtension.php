@@ -65,7 +65,7 @@ class DoctrineExtension extends LoaderExtension
     $configuration->merge($loader->load($this->resources['dbal']));
 
     $defaultConnection = array(
-      'driver'              => 'PDOMySQL',
+      'driver'              => 'PDOMySql',
       'user'                => 'root',
       'password'            => null,
       'host'                => 'localhost',

@@ -12,7 +12,7 @@ namespace Symfony\Components\RequestHandler;
  */
 
 /**
- * Response is the base implementation of a server response.
+ * Response represents an HTTP response.
  *
  * @package    Symfony
  * @subpackage Components_RequestHandler
@@ -70,6 +70,13 @@ class Response
     505 => 'HTTP Version Not Supported',
   );
 
+  /**
+   * Constructor.
+   *
+   * @param string  $content The response content
+   * @param integer $status  The response status code
+   * @param array   $headers An array of response headers
+   */
   public function __construct($content = '', $status = 200, $headers = array())
   {
     $this->setContent($content);
@@ -83,6 +90,11 @@ class Response
     $this->cookies = array();
   }
 
+  /**
+   * Returns the response content after sending the headers.
+   *
+   * @return string The response content
+   */
   public function __toString()
   {
     $this->sendHeaders();
@@ -98,8 +110,6 @@ class Response
   public function setContent($content)
   {
     $this->content = $content;
-
-    return $this;
   }
 
   /**
@@ -120,8 +130,6 @@ class Response
   public function setProtocolVersion($version)
   {
     $this->version = $version;
-
-    return $this;
   }
 
   /**
@@ -174,8 +182,6 @@ class Response
       'secure'   => (Boolean) $secure,
       'httpOnly' => (Boolean) $httpOnly,
     );
-
-    return $this;
   }
 
   /**
@@ -191,8 +197,8 @@ class Response
   /**
    * Sets response status code.
    *
-   * @param string $code  HTTP status code
-   * @param string $text  HTTP status text
+   * @param integer $code HTTP status code
+   * @param string  $text HTTP status text
    *
    * @throws \InvalidArgumentException When the HTTP status code is not valid
    */
@@ -205,8 +211,6 @@ class Response
     }
 
     $this->statusText = false === $text ? '' : (null === $text ? self::$statusTexts[$this->statusCode] : $text);
-
-    return $this;
   }
 
   /**

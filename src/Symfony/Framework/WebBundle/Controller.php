@@ -3,6 +3,7 @@
 namespace Symfony\Framework\WebBundle;
 
 use Symfony\Components\DependencyInjection\ContainerInterface;
+use Symfony\Components\RequestHandler\Request;
 use Symfony\Components\RequestHandler\Response;
 
 /*
@@ -24,6 +25,7 @@ use Symfony\Components\RequestHandler\Response;
 class Controller
 {
   protected $container;
+  protected $request;
 
   function __construct(ContainerInterface $container)
   {
@@ -32,7 +34,17 @@ class Controller
 
   public function getRequest()
   {
-    return $this->container->getRequestService();
+    if (null === $this->request)
+    {
+      $this->request = $this->container->getRequestService();
+    }
+
+    return $this->request;
+  }
+
+  public function setRequest(Request $request)
+  {
+    return $this->request = $request;
   }
 
   public function getUser()

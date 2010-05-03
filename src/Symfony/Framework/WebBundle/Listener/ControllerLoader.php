@@ -39,13 +39,13 @@ class ControllerLoader
     $this->container->getEventDispatcherService()->connect('core.load_controller', array($this, 'resolve'));
   }
 
-  public function run($controller, array $parameters)
+  public function run($controller, array $path = array(), array $query = array())
   {
     $request = $this->container->getRequestService();
 
-    list($parameters['_bundle'], $parameters['_controller'], $parameters['_action']) = explode(':', $controller);
+    list($path['_bundle'], $path['_controller'], $path['_action']) = explode(':', $controller);
 
-    $subRequest = $request->duplicate(null, null, $parameters);
+    $subRequest = $request->duplicate($query, null, $path);
 
     $response = $this->container->getRequestHandlerService()->handleRaw($subRequest, false);
 

@@ -42,7 +42,7 @@ class ResponseTest extends \PHPUnit_Framework_TestCase
     $this->assertEquals(0, $now->diff($response->getDate())->format('%s'), '->getDate() returns the date when the header has been modified');
   }
 
-  public function getMaxAge()
+  public function testGetMaxAge()
   {
     $response = new Response();
     $response->headers->set('Cache-Control', 's-maxage=600, max-age=0');

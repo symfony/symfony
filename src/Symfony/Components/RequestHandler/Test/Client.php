@@ -156,7 +156,7 @@ EOF;
       $uri = '/'.$matches[2];
     }
 
-    return Request::createFromUri($uri, $request->getMethod(), $request->getParameters(), $request->getFiles(), $request->getCookies(), $request->getServer());
+    return Request::create($uri, $request->getMethod(), $request->getParameters(), $request->getFiles(), $request->getCookies(), $request->getServer());
   }
 
   /**
@@ -168,7 +168,7 @@ EOF;
    */
   protected function filterResponse($response)
   {
-    return new DomResponse($response->getContent(), $response->getStatusCode(), $response->getHeaders(), $response->getCookies());
+    return new DomResponse($response->getContent(), $response->getStatusCode(), $response->headers, $response->getCookies());
   }
 
   /**

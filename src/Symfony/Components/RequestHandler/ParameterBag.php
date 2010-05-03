@@ -12,34 +12,44 @@ namespace Symfony\Components\RequestHandler;
  */
 
 /**
- * RequestBag is a container for key/value pairs.
+ * ParameterBag is a container for key/value pairs.
  *
  * @package    Symfony
  * @subpackage Components_RequestHandler
  * @author     Fabien Potencier <fabien.potencier@symfony-project.com>
  */
-class RequestBag
+class ParameterBag
 {
-  protected $input;
+  protected $parameters;
 
-  public function __construct($input)
+  /**
+   * Constructor.
+   *
+   * @param array $parameters An array of parameters
+   */
+  public function __construct(array $parameters = array())
   {
-    $this->replace($input);
+    $this->replace($parameters);
   }
 
   /**
-   * Returns the input.
+   * Returns the parameters.
    *
-   * @return array An array of input
+   * @return array An array of parameters
    */
   public function all()
   {
-    return $this->input;
+    return $this->parameters;
   }
 
-  public function replace($input)
+  /**
+   * Replaces the current parameters by a new set.
+   *
+   * @param array $parameters An array of parameters
+   */
+  public function replace(array $parameters = array())
   {
-    $this->input = $input;
+    $this->parameters = $parameters;
   }
 
   /**
@@ -50,7 +60,7 @@ class RequestBag
    */
   public function get($key, $default = null)
   {
-    return array_key_exists($key, $this->input) ? $this->input[$key] : $default;
+    return array_key_exists($key, $this->parameters) ? $this->parameters[$key] : $default;
   }
 
   /**
@@ -59,14 +69,21 @@ class RequestBag
    * @param string $key   The key
    * @param mixed  $value The value
    */
-  public function set($key, $value)
+  public function set($key, $value, $replace = true)
   {
-    $this->input[$key] = $value;
+    $this->parameters[$key] = $value;
   }
 
+  /**
+   * Returns true if the parameter is defined.
+   *
+   * @param string $key The key
+   *
+   * @return Boolean true if the parameter exists, false otherwise
+   */
   public function has($key)
   {
-    return array_key_exists($key, $this->input);
+    return array_key_exists($key, $this->parameters);
   }
 
   /**
@@ -76,7 +93,7 @@ class RequestBag
    */
   public function delete($key)
   {
-    unset($this->input[$key]);
+    unset($this->parameters[$key]);
   }
 
   /**
@@ -129,5 +146,20 @@ class RequestBag
   public function getInt($key, $default = 0)
   {
     return (int) $this->get($key, $default);
+  }
+
+  public function getDate($key, \DateTime $default = null)
+  {
+    if (null === $value = $this->get($key))
+    {
+      return $default;
+    }
+
+    if (false === $date = \DateTime::createFromFormat(DATE_RFC2822, $value))
+    {
+      throw new \RuntimeException(sprintf('The %s HTTP header is not parseable (%s).', $key, $value));
+    }
+
+    return $date;
   }
 }

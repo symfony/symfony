@@ -39,7 +39,7 @@ class ResponseFilter
 
   public function filter(Event $event, Response $response)
   {
-    if (!$event->getParameter('main_request') || $response->hasHeader('Content-Type'))
+    if (!$event->getParameter('main_request') || $response->headers->has('Content-Type'))
     {
       return $response;
     }
@@ -48,7 +48,7 @@ class ResponseFilter
     $format = $request->getRequestFormat();
     if ((null !== $format) && $mimeType = $request->getMimeType($format))
     {
-      $response->setHeader('Content-Type', $mimeType);
+      $response->headers->set('Content-Type', $mimeType);
     }
 
     return $response;

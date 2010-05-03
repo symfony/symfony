@@ -12,12 +12,7 @@ namespace Symfony\Components\RequestHandler;
  */
 
 /**
- * Request is the base implementation of a user request.
- *
- * After initialization, the request is read-only. The only writable
- * values are the query ones (mostly by the router).
- *
- * You can reinitialize the request by calling the initialize() method.
+ * Request represents an HTTP request.
  *
  * @package    Symfony
  * @subpackage Components_RequestHandler
@@ -75,13 +70,13 @@ class Request
    */
   public function initialize(array $query = null, array $request = null, array $path = null, array $cookies = null, array $files = null, array $server = null)
   {
-    $this->request = new RequestBag(null !== $request ? $request : $_POST);
-    $this->query = new RequestBag(null !== $query ? $query : $_GET);
-    $this->path = new RequestBag(null !== $path ? $path : array());
-    $this->cookies = new RequestBag(null !== $cookies ? $cookies : $_COOKIE);
-    $this->files = new RequestBag($this->convertFileInformation(null !== $files ? $files : $_FILES));
-    $this->server = new RequestBag(null !== $server ? $server : $_SERVER);
-    $this->headers = new RequestBag($this->initializeHeaders());
+    $this->request = new ParameterBag(null !== $request ? $request : $_POST);
+    $this->query = new ParameterBag(null !== $query ? $query : $_GET);
+    $this->path = new ParameterBag(null !== $path ? $path : array());
+    $this->cookies = new ParameterBag(null !== $cookies ? $cookies : $_COOKIE);
+    $this->files = new ParameterBag($this->convertFileInformation(null !== $files ? $files : $_FILES));
+    $this->server = new HeaderBag(null !== $server ? $server : $_SERVER, 'request');
+    $this->headers = new HeaderBag($this->initializeHeaders(), 'request');
 
     $this->languages = null;
     $this->charsets = null;
@@ -107,12 +102,26 @@ class Request
    *
    * @return Request A Request instance
    */
-  static public function createFromUri($uri, $method = 'get', $parameters = array(), $cookies = array(), $files = array(), $server = array())
+  static public function create($uri, $method = 'get', $parameters = array(), $cookies = array(), $files = array(), $server = array())
   {
-    if (in_array($method, array('post', 'put', 'delete')))
+    $defaults = array(
+      'SERVER_NAME'          => 'localhost',
+      'SERVER_PORT'          => 80,
+      'HTTP_HOST'            => 'localhost',
+      'HTTP_USER_AGENT'      => 'Symfony/X.X',
+      'HTTP_ACCEPT'          => 'text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8',
+      'HTTP_ACCEPT_LANGUAGE' => 'en-us,en;q=0.5',
+      'HTTP_ACCEPT_CHARSET'  => 'ISO-8859-1,utf-8;q=0.7,*;q=0.7',
+      'REMOTE_ADDR'          => '127.0.0.1',
+      'SCRIPT_NAME'          => '',
+      'SCRIPT_FILENAME'      => '',
+    );
+
+    if (in_array(strtolower($method), array('post', 'put', 'delete')))
     {
       $request = $parameters;
       $query = array();
+      $defaults['CONTENT_TYPE'] = 'application/x-www-form-urlencoded';
     }
     else
     {
@@ -127,18 +136,7 @@ class Request
       $query = array_replace($qs, $query);
     }
 
-    $server = array_replace(array(
-      'SERVER_NAME'          => 'localhost',
-      'SERVER_PORT'          => 80,
-      'HTTP_HOST'            => 'localhost',
-      'HTTP_USER_AGENT'      => 'Symfony/X.X',
-      'HTTP_ACCEPT'          => 'text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8',
-      'HTTP_ACCEPT_LANGUAGE' => 'en-us,en;q=0.5',
-      'HTTP_ACCEPT_CHARSET'  => 'ISO-8859-1,utf-8;q=0.7,*;q=0.7',
-      'REMOTE_ADDR'          => '127.0.0.1',
-      'SCRIPT_NAME'          => '',
-      'SCRIPT_FILENAME'      => '',
-    ), $server, array(
+    $server = array_replace($defaults, $server, array(
       'REQUEST_METHOD'       => strtoupper($method),
       'PATH_INFO'            => '',
       'REQUEST_URI'          => $uri,
@@ -426,6 +424,16 @@ class Request
     return $this->format;
   }
 
+  public function isMethodSafe()
+  {
+    return in_array(strtolower($this->getMethod()), array('get', 'head'));
+  }
+
+  public function isNoCache()
+  {
+    return $this->headers->getCacheControl()->isNoCache() || 'no-cache' == $this->headers->get('Pragma');
+  }
+
   /**
    * Returns the preferred language.
    *
@@ -464,7 +472,7 @@ class Request
       return $this->languages;
     }
 
-    $languages = $this->splitHttpAcceptHeader($this->headers->get('ACCEPT_LANGUAGE'));
+    $languages = $this->splitHttpAcceptHeader($this->headers->get('Accept-Language'));
     foreach ($languages as $lang)
     {
       if (strstr($lang, '-'))
@@ -514,7 +522,7 @@ class Request
       return $this->charsets;
     }
 
-    return $this->charsets = $this->splitHttpAcceptHeader($this->headers->get('ACCEPT_CHARSET'));
+    return $this->charsets = $this->splitHttpAcceptHeader($this->headers->get('Accept-Charset'));
   }
 
   /**
@@ -529,7 +537,7 @@ class Request
       return $this->acceptableContentTypes;
     }
 
-    return $this->acceptableContentTypes = $this->splitHttpAcceptHeader($this->headers->get('ACCEPT'));
+    return $this->acceptableContentTypes = $this->splitHttpAcceptHeader($this->headers->get('Accept'));
   }
 
   /**
@@ -542,7 +550,7 @@ class Request
    */
   public function isXmlHttpRequest()
   {
-    return 'XMLHttpRequest' == $this->headers->get('X_REQUESTED_WITH');
+    return 'XMLHttpRequest' == $this->headers->get('X-Requested-With');
   }
 
   /**
@@ -785,9 +793,9 @@ class Request
     $headers = array();
     foreach ($this->server->all() as $key => $value)
     {
-      if ('http_' === strtolower(substr($key, 0, 5)))
+      if ('http-' === strtolower(substr($key, 0, 5)))
       {
-        $headers[strtoupper(strtr(substr($key, 5), '-', '_'))] = $value;
+        $headers[substr($key, 5)] = $value;
       }
     }
 

@@ -38,7 +38,7 @@ class ResponseTester extends Tester
     if (class_exists('Symfony\Components\DomCrawler\Crawler'))
     {
       $this->crawler = new Crawler();
-      $this->crawler->addContent($this->response->getContent(), $this->response->getHeader('Content-Type'));
+      $this->crawler->addContent($this->response->getContent(), $this->response->headers->get('Content-Type'));
     }
   }
 
@@ -121,16 +121,16 @@ class ResponseTester extends Tester
    */
   public function assertHeaderEquals($key, $value)
   {
-    $headers = explode(', ', $this->response->getHeader($key));
+    $headers = explode(', ', $this->response->headers->get($key));
     foreach ($headers as $header)
     {
       if ($header == $value)
       {
-        return $this->test->pass(sprintf('Response header "%s" is "%s" (%s)', $key, $value, $this->response->getHeader($key)));
+        return $this->test->pass(sprintf('Response header "%s" is "%s" (%s)', $key, $value, $this->response->headers->get($key)));
       }
     }
 
-    $this->test->fail(sprintf('Response header "%s" matches "%s" (%s)', $key, $value, $this->response->getHeader($key)));
+    $this->test->fail(sprintf('Response header "%s" matches "%s" (%s)', $key, $value, $this->response->headers->get($key)));
   }
 
   /**
@@ -141,16 +141,16 @@ class ResponseTester extends Tester
    */
   public function assertNotHeaderEquals($key, $value)
   {
-    $headers = explode(', ', $this->response->getHeader($key));
+    $headers = explode(', ', $this->response->headers->get($key));
     foreach ($headers as $header)
     {
       if ($header == $value)
       {
-        return $this->test->fail(sprintf('Response header "%s" is not "%s" (%s)', $key, $value, $this->response->getHeader($key)));
+        return $this->test->fail(sprintf('Response header "%s" is not "%s" (%s)', $key, $value, $this->response->headers->get($key)));
       }
     }
 
-    $this->test->pass(sprintf('Response header "%s" does not match "%s" (%s)', $key, $value, $this->response->getHeader($key)));
+    $this->test->pass(sprintf('Response header "%s" does not match "%s" (%s)', $key, $value, $this->response->headers->get($key)));
   }
 
   /**
@@ -161,16 +161,16 @@ class ResponseTester extends Tester
    */
   public function assertHeaderRegExp($key, $regex)
   {
-    $headers = explode(', ', $this->response->getHeader($key));
+    $headers = explode(', ', $this->response->headers->get($key));
     foreach ($headers as $header)
     {
       if (preg_match($regex, $header))
       {
-        return $this->test->pass(sprintf('Response header "%s" matches "%s" (%s)', $key, $value, $this->response->getHeader($key)));
+        return $this->test->pass(sprintf('Response header "%s" matches "%s" (%s)', $key, $value, $this->response->headers->get($key)));
       }
     }
 
-    return $this->test->fail(sprintf('Response header "%s" matches "%s" (%s)', $key, $value, $this->response->getHeader($key)));
+    return $this->test->fail(sprintf('Response header "%s" matches "%s" (%s)', $key, $value, $this->response->headers->get($key)));
   }
 
   /**
@@ -181,16 +181,16 @@ class ResponseTester extends Tester
    */
   public function assertNotHeaderRegExp($key, $regex)
   {
-    $headers = explode(', ', $this->response->getHeader($key));
+    $headers = explode(', ', $this->response->headers->get($key));
     foreach ($headers as $header)
     {
       if (!preg_match($regex, $header))
       {
-        return $this->test->pass(sprintf('Response header "%s" matches "%s" (%s)', $key, $value, $this->response->getHeader($key)));
+        return $this->test->pass(sprintf('Response header "%s" matches "%s" (%s)', $key, $value, $this->response->headers->get($key)));
       }
     }
 
-    return $this->test->fail(sprintf('Response header "%s" matches "%s" (%s)', $key, $value, $this->response->getHeader($key)));
+    return $this->test->fail(sprintf('Response header "%s" matches "%s" (%s)', $key, $value, $this->response->headers->get($key)));
   }
 
   /**
@@ -337,7 +337,7 @@ class ResponseTester extends Tester
 
     if (null !== $location)
     {
-      $this->test->assertEquals($location, $this->response->getHeader('Location'), sprintf('Page redirected to "%s"', $location));
+      $this->test->assertEquals($location, $this->response->headers->get('Location'), sprintf('Page redirected to "%s"', $location));
     }
   }
 

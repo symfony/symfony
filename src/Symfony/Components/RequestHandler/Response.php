@@ -20,11 +20,12 @@ namespace Symfony\Components\RequestHandler;
  */
 class Response
 {
+  public $headers;
+
   protected $content;
   protected $version;
   protected $statusCode;
   protected $statusText;
-  protected $headers;
   protected $cookies;
 
   static public $statusTexts = array(
@@ -82,11 +83,7 @@ class Response
     $this->setContent($content);
     $this->setStatusCode($status);
     $this->setProtocolVersion('1.0');
-    $this->headers = array();
-    foreach ($headers as $name => $value)
-    {
-      $this->setHeader($name, $value);
-    }
+    $this->headers = new HeaderBag($headers, 'response');
     $this->cookies = array();
   }
 
@@ -100,6 +97,57 @@ class Response
     $this->sendHeaders();
 
     return (string) $this->getContent();
+  }
+
+  /**
+   * Clones the current Response instance.
+   */
+  public function __clone()
+  {
+    $this->headers = clone $this->headers;
+  }
+
+  /**
+   * Sends HTTP headers, including cookies.
+   */
+  public function sendHeaders()
+  {
+    if (!$this->headers->has('Content-Type'))
+    {
+      $this->headers->set('Content-Type', 'text/html');
+    }
+
+    // status
+    header(sprintf('HTTP/%s %s %s', $this->version, $this->statusCode, $this->statusText));
+
+    // headers
+    foreach ($this->headers->all() as $name => $value)
+    {
+      header($name.': '.$value);
+    }
+
+    // cookies
+    foreach ($this->cookies as $cookie)
+    {
+      setrawcookie($cookie['name'], $cookie['value'], $cookie['expire'], $cookie['path'], $cookie['domain'], $cookie['secure'], $cookie['httpOnly']);
+    }
+  }
+
+  /**
+   * Sends content for the current web response.
+   */
+  public function sendContent()
+  {
+    echo $this->content;
+  }
+
+  /**
+   * Sends HTTP headers and content.
+   */
+  public function send()
+  {
+    $this->sendHeaders();
+    $this->sendContent();
   }
 
   /**
@@ -221,127 +269,5 @@ class Response
   public function getStatusCode()
   {
     return $this->statusCode;
-  }
-
-  /**
-   * Sets a HTTP header.
-   *
-   * @param string  $name     HTTP header name
-   * @param string  $value    Value (if null, remove the HTTP header)
-   * @param bool    $replace  Replace for the value
-   *
-   */
-  public function setHeader($name, $value, $replace = true)
-  {
-    $name = $this->normalizeHeaderName($name);
-
-    if (null === $value)
-    {
-      unset($this->headers[$name]);
-
-      return;
-    }
-
-    if (!$replace)
-    {
-      $current = isset($this->headers[$name]) ? $this->headers[$name] : '';
-      $value = ($current ? $current.', ' : '').$value;
-    }
-
-    $this->headers[$name] = $value;
-
-    return $this;
-  }
-
-  /**
-   * Gets HTTP header current value.
-   *
-   * @param  string $name     HTTP header name
-   * @param  string $default  Default value returned if named HTTP header is not found
-   *
-   * @return array
-   */
-  public function getHeader($name, $default = null)
-  {
-    $name = $this->normalizeHeaderName($name);
-
-    return isset($this->headers[$name]) ? $this->headers[$name] : $default;
-  }
-
-  /**
-   * Checks if the response has given HTTP header.
-   *
-   * @param  string $name  HTTP header name
-   *
-   * @return bool
-   */
-  public function hasHeader($name)
-  {
-    return array_key_exists($this->normalizeHeaderName($name), $this->headers);
-  }
-
-  /**
-   * Retrieves HTTP headers from the current web response.
-   *
-   * @return string HTTP headers
-   */
-  public function getHeaders()
-  {
-    return $this->headers;
-  }
-
-  /**
-   * Sends HTTP headers, including cookies.
-   */
-  public function sendHeaders()
-  {
-    if (!$this->hasHeader('Content-Type'))
-    {
-      $this->setHeader('Content-Type', 'text/html');
-    }
-
-    // status
-    header(sprintf('HTTP/%s %s %s', $this->version, $this->statusCode, $this->statusText));
-
-    // headers
-    foreach ($this->headers as $name => $value)
-    {
-      header($name.': '.$value);
-    }
-
-    // cookies
-    foreach ($this->cookies as $cookie)
-    {
-      setrawcookie($cookie['name'], $cookie['value'], $cookie['expire'], $cookie['path'], $cookie['domain'], $cookie['secure'], $cookie['httpOnly']);
-    }
-  }
-
-  /**
-   * Sends content for the current web response.
-   */
-  public function sendContent()
-  {
-    echo $this->content;
-  }
-
-  /**
-   * Sends HTTP headers and content.
-   */
-  public function send()
-  {
-    $this->sendHeaders();
-    $this->sendContent();
-  }
-
-  /**
-   * Normalizes a HTTP header name.
-   *
-   * @param  string $name The HTTP header name
-   *
-   * @return string The normalized HTTP header name
-   */
-  protected function normalizeHeaderName($name)
-  {
-    return strtr(strtolower($name), '_', '-');
   }
 }

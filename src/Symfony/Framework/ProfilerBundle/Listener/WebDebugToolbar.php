@@ -51,7 +51,7 @@ class WebDebugToolbar
     if (
       '3' === substr($response->getStatusCode(), 0, 1)
       ||
-      ($response->hasHeader('Content-Type') && false === strpos($response->getHeader('Content-Type'), 'html'))
+      ($response->headers->has('Content-Type') && false === strpos($response->headers->get('Content-Type'), 'html'))
       ||
       'html' !== $request->getRequestFormat()
       ||

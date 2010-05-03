@@ -64,7 +64,7 @@ class Controller
     $response->setStatusCode($status);
     foreach ($headers as $name => $value)
     {
-      $response->setHeader($name, $value);
+      $response->headers->set($name, $value);
     }
 
     return $response;
@@ -96,7 +96,7 @@ class Controller
   {
     $response = $this->container->getResponseService();
     $response->setStatusCode($status);
-    $response->setHeader('Location', $url);
+    $response->headers->set('Location', $url);
 
     return $response;
   }

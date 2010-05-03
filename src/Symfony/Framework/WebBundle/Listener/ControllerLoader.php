@@ -72,7 +72,7 @@ class ControllerLoader
     $controller[0]->setRequest($request);
 
     $r = new \ReflectionObject($controller[0]);
-    $arguments = $this->getMethodArguments($r->getMethod($controller[1]), $event->getParameter('request')->path->all(), sprintf('%s::%s()', get_class($controller[0]), $controller[1]));
+    $arguments = $this->getMethodArguments($r->getMethod($controller[1]), $request->path->all(), sprintf('%s::%s()', get_class($controller[0]), $controller[1]));
 
     $event->setReturnValue(array($controller, $arguments));
 

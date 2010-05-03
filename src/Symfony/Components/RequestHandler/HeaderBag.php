@@ -24,12 +24,28 @@ class HeaderBag extends ParameterBag
   protected $type;
 
   /**
-   * Replaces the current HTTP headers by a new set.
+   * Constructor.
    *
    * @param array  $parameters An array of HTTP headers
    * @param string $type       The type (null, request, or response)
    */
-  public function replace(array $parameters = array(), $type = null)
+  public function __construct(array $parameters = array(), $type = null)
+  {
+    $this->replace($parameters);
+
+    if (null !== $type && !in_array($type, array('request', 'response')))
+    {
+      throw new \InvalidArgumentException(sprintf('The "%s" type is not supported by the HeaderBag constructor.', $type));
+    }
+    $this->type = $type;
+  }
+
+  /**
+   * Replaces the current HTTP headers by a new set.
+   *
+   * @param array  $parameters An array of HTTP headers
+   */
+  public function replace(array $parameters = array())
   {
     $this->cacheControl = null;
     $this->parameters = array();
@@ -37,12 +53,6 @@ class HeaderBag extends ParameterBag
     {
       $this->parameters[strtr(strtolower($key), '_', '-')] = $value;
     }
-
-    if (null !== $type && !in_array($type, array('request', 'response')))
-    {
-      throw new \InvalidArgumentException(sprintf('The "%s" type is not supported by the HeaderBag constructor.', $type));
-    }
-    $this->type = $type;
   }
 
   /**
@@ -76,11 +86,6 @@ class HeaderBag extends ParameterBag
     }
 
     $this->parameters[$key] = $value;
-
-    if ('cache-control' == $key)
-    {
-      $this->cacheControl = null;
-    }
   }
 
   /**

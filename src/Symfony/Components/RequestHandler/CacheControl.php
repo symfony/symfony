@@ -36,14 +36,14 @@ class CacheControl
    */
   public function __construct(HeaderBag $bag, $header, $type = null)
   {
-    $this->bag = $bag;
-    $this->attributes = $this->parse($header);
-
     if (null !== $type && !in_array($type, array('request', 'response')))
     {
       throw new \InvalidArgumentException(sprintf('The "%s" type is not supported by the CacheControl constructor.', $type));
     }
     $this->type = $type;
+
+    $this->bag = $bag;
+    $this->attributes = $this->parse($header);
   }
 
   public function __toString()

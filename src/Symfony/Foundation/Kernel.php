@@ -50,28 +50,23 @@ abstract class Kernel implements RequestHandlerInterface, \Serializable
    */
   public function __construct($environment, $debug)
   {
+    $this->environment = $environment;
     $this->debug = (Boolean) $debug;
+    $this->booted = false;
+    $this->rootDir = realpath($this->registerRootDir());
+    $this->name = basename($this->rootDir);
+
     if ($this->debug)
     {
       ini_set('display_errors', 1);
       error_reporting(-1);
+
+      $this->startTime = microtime(true);
     }
     else
     {
       ini_set('display_errors', 0);
     }
-
-    if ($this->debug)
-    {
-      $this->startTime = microtime(true);
-    }
-
-    $this->booted = false;
-    $this->environment = $environment;
-    $this->bundles = $this->registerBundles();
-    $this->bundleDirs = $this->registerBundleDirs();
-    $this->rootDir = realpath($this->registerRootDir());
-    $this->name = basename($this->rootDir);
   }
 
   abstract public function registerRootDir();
@@ -110,6 +105,9 @@ abstract class Kernel implements RequestHandlerInterface, \Serializable
     {
       throw new \LogicException('The kernel is already booted.');
     }
+
+    $this->bundles = $this->registerBundles();
+    $this->bundleDirs = $this->registerBundleDirs();
 
     // initialize the container
     $this->container = $this->initializeContainer();

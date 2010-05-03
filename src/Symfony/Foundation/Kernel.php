@@ -164,7 +164,18 @@ abstract class Kernel implements RequestHandlerInterface, \Serializable
     return $this->request;
   }
 
-  public function handle(Request $request = null, $main = true)
+  /**
+   * Handles a request to convert it to a response by calling the Request Handler service.
+   *
+   * @param  Request $request A Request instance
+   * @param  Boolean $main    Whether this is the main request or not
+   * @param  Boolean $raw     Whether to catch exceptions or not
+   *
+   * @return Response $response A Response instance
+   *
+   * @throws \Exception
+   */
+  public function handle(Request $request = null, $main = true, $raw = false)
   {
     if (false === $this->booted)
     {
@@ -185,7 +196,14 @@ abstract class Kernel implements RequestHandlerInterface, \Serializable
       $this->request = $request;
     }
 
-    return $this->container->getRequestHandlerService()->handle($request);
+    if (true === $raw)
+    {
+      return $this->container->getRequestHandlerService()->handleRaw($request, $main);
+    }
+    else
+    {
+      return $this->container->getRequestHandlerService()->handle($request, $main);
+    }
   }
 
   public function getBundleDirs()

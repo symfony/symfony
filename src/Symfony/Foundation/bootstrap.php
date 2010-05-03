@@ -475,7 +475,8 @@ abstract class Kernel implements RequestHandlerInterface, \Serializable
     return $this->request;
   }
 
-  public function handle(Request $request = null, $main = true)
+  
+  public function handle(Request $request = null, $main = true, $raw = false)
   {
     if (false === $this->booted)
     {
@@ -496,7 +497,14 @@ abstract class Kernel implements RequestHandlerInterface, \Serializable
       $this->request = $request;
     }
 
-    return $this->container->getRequestHandlerService()->handle($request);
+    if (true === $raw)
+    {
+      return $this->container->getRequestHandlerService()->handleRaw($request, $main);
+    }
+    else
+    {
+      return $this->container->getRequestHandlerService()->handle($request, $main);
+    }
   }
 
   public function getBundleDirs()

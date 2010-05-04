@@ -42,7 +42,7 @@ class NativeSession implements SessionInterface
    * @param array $options  An associative array of options
    *
    */
-  public function __construct($options = null)
+  public function __construct(array $options = array())
   {
     $cookieDefaults = session_get_cookie_params();
 

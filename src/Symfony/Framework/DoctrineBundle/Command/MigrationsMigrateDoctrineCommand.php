@@ -5,7 +5,7 @@ namespace Symfony\Framework\DoctrineBundle\Command;
 use Symfony\Components\Console\Input\InputInterface;
 use Symfony\Components\Console\Output\OutputInterface;
 use Symfony\Components\Console\Input\InputOption;
-use DoctrineExtensions\Migrations\Tools\Console\Command\MigrateCommand;
+use Doctrine\DBAL\Migrations\Tools\Console\Command\MigrateCommand;
 
 /*
  * This file is part of the Symfony framework.

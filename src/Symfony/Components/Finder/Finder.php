@@ -29,7 +29,7 @@ namespace Symfony\Components\Finder;
  * @subpackage Components_Finder
  * @author     Fabien Potencier <fabien.potencier@symfony-project.com>
  */
-class Finder
+class Finder implements \IteratorAggregate
 {
   protected $mode        = 0;
   protected $names       = array();
@@ -42,6 +42,7 @@ class Finder
   protected $followLinks = false;
   protected $sort        = false;
   protected $ignoreVCS   = true;
+  protected $dirs        = array();
 
   /**
    * Restricts the matching to directories only.
@@ -278,35 +279,64 @@ class Finder
   /**
    * Searches files and directories which match defined rules.
    *
-   * @param  string $dir A directory path
+   * @param  string|array $dirs A directory path or an array of directories
+   *
+   * @return Symfony\Components\Finder The current Finder instance
+   *
+   * @throws \InvalidArgumentException if one of the directory does not exist
+   */
+  public function in($dirs)
+  {
+    if (!is_array($dirs))
+    {
+      $dirs = array($dirs);
+    }
+
+    foreach ($dirs as $dir)
+    {
+      if (!is_dir($dir))
+      {
+        throw new \InvalidArgumentException(sprintf('The "%s" directory does not exist.', $dir));
+      }
+    }
+
+    $this->dirs = array_merge($this->dirs, $dirs);
+
+    return $this;
+  }
+
+  /**
+   * Returns an Iterator for the current Finder configuration.
+   *
+   * This method implements the IteratorAggregate interface.
    *
    * @return \Iterator An iterator
    *
-   * @throws \InvalidArgumentException if the directory does not exist
+   * @throws \LogicException if the in() method has not been called
    */
-  public function in($dir)
+  public function getIterator()
   {
-    if (is_array($dir))
+    if (0 === count($this->dirs))
     {
-      $iterator = new \AppendIterator();
-      foreach ($dir as $d)
-      {
-        $iterator->append($this->searchInDirectory($d));
-      }
-
-      return $iterator;
+      throw new \LogicException('You must call the in() method before iterating over a Finder.');
     }
 
-    return $this->searchInDirectory($dir);
+    if (1 === count($this->dirs))
+    {
+      return $this->searchInDirectory($this->dirs[0]);
+    }
+
+    $iterator = new \AppendIterator();
+    foreach ($this->dirs as $dir)
+    {
+      $iterator->append($this->searchInDirectory($dir));
+    }
+
+    return $iterator;
   }
 
   protected function searchInDirectory($dir)
   {
-    if (!is_dir($dir))
-    {
-      throw new \InvalidArgumentException(sprintf('The "%s" directory does not exist.', $dir));
-    }
-
     $flags = \FilesystemIterator::SKIP_DOTS;
 
     if ($this->followLinks)

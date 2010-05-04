@@ -346,14 +346,14 @@ class Finder implements \IteratorAggregate
 
     $iterator = new \RecursiveIteratorIterator(new \RecursiveDirectoryIterator($dir, $flags), \RecursiveIteratorIterator::SELF_FIRST);
 
+    if ($this->mindepth > 0 || $this->maxdepth < INF)
+    {
+      $iterator = new Iterator\LimitDepthFilterIterator($iterator, $this->mindepth, $this->maxdepth);
+    }
+
     if ($this->mode)
     {
       $iterator = new Iterator\FileTypeFilterIterator($iterator, $this->mode);
-    }
-
-    if ($this->mindepth > 0 || $this->maxdepth < INF)
-    {
-      $iterator = new Iterator\LimitDepthFilterIterator($iterator, $dir, $this->mindepth, $this->maxdepth);
     }
 
     if ($this->exclude)

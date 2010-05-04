@@ -21,22 +21,18 @@ namespace Symfony\Components\Finder\Iterator;
 class LimitDepthFilterIterator extends \FilterIterator
 {
   protected $minDepth = 0;
-  protected $maxDepth = INF;
-  protected $baseDir;
 
   /**
    * Constructor.
    *
    * @param \Iterator $iterator The Iterator to filter
-   * @param string    $baseDir  The base directory for the depth comparison
    * @param integer   $minDepth The minimum depth
-   * @param integer   $maxDepth The maximum depth
    */
-  public function __construct(\Iterator $iterator, $baseDir, $minDepth, $maxDepth)
+  public function __construct(\RecursiveIteratorIterator $iterator, $minDepth, $maxDepth)
   {
-    $this->baseDir  = new \SplFileInfo($baseDir);
     $this->minDepth = (integer) $minDepth;
-    $this->maxDepth = (double) $maxDepth;
+
+    $iterator->setMaxDepth(INF === $maxDepth ? -1 : $maxDepth);
 
     parent::__construct($iterator);
   }
@@ -48,20 +44,6 @@ class LimitDepthFilterIterator extends \FilterIterator
    */
   public function accept()
   {
-    $fileinfo = $this->getInnerIterator()->current();
-
-    $depth = substr_count($fileinfo->getPath(), DIRECTORY_SEPARATOR) - substr_count($this->baseDir->getPathname(), DIRECTORY_SEPARATOR);
-
-    if ($depth > $this->maxDepth)
-    {
-      return false;
-    }
-
-    if ($depth < $this->minDepth)
-    {
-      return false;
-    }
-
-    return true;
+    return $this->getInnerIterator()->getDepth() >= $this->minDepth;
   }
 }

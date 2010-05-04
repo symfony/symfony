@@ -288,10 +288,10 @@ class Finder
   {
     if (is_array($dir))
     {
-      $iterator = new Iterator\ChainIterator();
+      $iterator = new \AppendIterator();
       foreach ($dir as $d)
       {
-        $iterator->attach($this->searchInDirectory($d));
+        $iterator->append($this->searchInDirectory($d));
       }
 
       return $iterator;

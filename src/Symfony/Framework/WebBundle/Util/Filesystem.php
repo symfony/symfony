@@ -2,6 +2,8 @@
 
 namespace Symfony\Framework\WebBundle\Util;
 
+use Symfony\Components\Finder\Finder;
+
 /*
  * This file is part of the Symfony framework.
  *

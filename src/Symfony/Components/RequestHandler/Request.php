@@ -75,7 +75,7 @@ class Request
     $this->path = new ParameterBag(null !== $path ? $path : array());
     $this->cookies = new ParameterBag(null !== $cookies ? $cookies : $_COOKIE);
     $this->files = new ParameterBag($this->convertFileInformation(null !== $files ? $files : $_FILES));
-    $this->server = new HeaderBag(null !== $server ? $server : $_SERVER, 'request');
+    $this->server = new ParameterBag(null !== $server ? $server : $_SERVER);
     $this->headers = new HeaderBag($this->initializeHeaders(), 'request');
 
     $this->languages = null;
@@ -793,7 +793,7 @@ class Request
     $headers = array();
     foreach ($this->server->all() as $key => $value)
     {
-      if ('http-' === strtolower(substr($key, 0, 5)))
+      if ('http_' === strtolower(substr($key, 0, 5)))
       {
         $headers[substr($key, 5)] = $value;
       }

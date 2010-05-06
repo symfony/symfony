@@ -72,7 +72,7 @@ class ExceptionHandler
 
         try
         {
-            $response = $event->getSubject()->handleRaw($request, false);
+            $response = $event->getSubject()->handle($request, false, true);
 
             error_log(sprintf('%s: %s', get_class($exception), $exception->getMessage()));
         }

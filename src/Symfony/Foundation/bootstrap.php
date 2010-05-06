@@ -497,14 +497,7 @@ abstract class Kernel implements HttpKernelInterface, \Serializable
             $this->request = $request;
         }
 
-        if (true === $raw)
-        {
-            return $this->container->getHttpKernelService()->handleRaw($request, $main);
-        }
-        else
-        {
-            return $this->container->getHttpKernelService()->handle($request, $main);
-        }
+        return $this->container->getHttpKernelService()->handle($request, $main, $raw);
     }
 
     public function getBundleDirs()

@@ -55,12 +55,13 @@ class HttpKernel implements HttpKernelInterface
      *
      * @param  Request $request A Request instance
      * @param  Boolean $main    Whether this is the main request or not
+     * @param  Boolean $raw     Whether to catch exceptions or not
      *
      * @return Response $response A Response instance
      *
      * @throws \Exception When Exception couldn't be caught by event processing
      */
-    public function handle(Request $request = null, $main = true)
+    public function handle(Request $request = null, $main = true, $raw = false)
     {
         $main = (Boolean) $main;
 
@@ -80,6 +81,11 @@ class HttpKernel implements HttpKernelInterface
         }
         catch (\Exception $e)
         {
+            if (true === $raw)
+            {
+                throw $e;
+            }
+
             // exception
             $event = $this->dispatcher->notifyUntil(new Event($this, 'core.exception', array('main_request' => $main, 'request' => $request, 'exception' => $e)));
             if ($event->isProcessed())
@@ -104,7 +110,7 @@ class HttpKernel implements HttpKernelInterface
      * @throws \LogicException       If one of the listener does not behave as expected
      * @throws NotFoundHttpException When controller cannot be found
      */
-    public function handleRaw(Request $request, $main = true)
+    protected function handleRaw(Request $request, $main = true)
     {
         $main = (Boolean) $main;
 

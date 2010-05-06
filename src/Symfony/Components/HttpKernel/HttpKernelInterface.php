@@ -25,12 +25,11 @@ interface HttpKernelInterface
      *
      * @param  Request $request A Request instance
      * @param  Boolean $main    Whether this is the main request or not
+     * @param  Boolean $raw     Whether to catch exceptions or not
      *
      * @return Response $response A Response instance
-     *
-     * @throws \Exception When Exception couldn't be caught by event processing
      */
-    public function handle(Request $request = null, $main = true);
+    public function handle(Request $request = null, $main = true, $raw = false);
 
     /**
      * Gets the Request instance associated with the main request.

@@ -172,8 +172,6 @@ abstract class Kernel implements HttpKernelInterface, \Serializable
      * @param  Boolean $raw     Whether to catch exceptions or not
      *
      * @return Response $response A Response instance
-     *
-     * @throws \Exception
      */
     public function handle(Request $request = null, $main = true, $raw = false)
     {
@@ -196,14 +194,7 @@ abstract class Kernel implements HttpKernelInterface, \Serializable
             $this->request = $request;
         }
 
-        if (true === $raw)
-        {
-            return $this->container->getHttpKernelService()->handleRaw($request, $main);
-        }
-        else
-        {
-            return $this->container->getHttpKernelService()->handle($request, $main);
-        }
+        return $this->container->getHttpKernelService()->handle($request, $main, $raw);
     }
 
     public function getBundleDirs()

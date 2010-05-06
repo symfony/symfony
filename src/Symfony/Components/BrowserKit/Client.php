@@ -183,7 +183,7 @@ abstract class Client
      *
      * @return Symfony\Components\DomCrawler\Crawler
      */
-    public function request($method, $uri, $parameters = array(), $headers = array(), $files = array(), $server = array(), $changeHistory = true)
+    public function request($method, $uri, array $parameters = array(), array $headers = array(), array $files = array(), array $server = array(), $changeHistory = true)
     {
         $uri = $this->getAbsoluteUri($uri);
 
@@ -378,6 +378,6 @@ abstract class Client
      */
     protected function requestFromRequest(Request $request, $changeHistory = true)
     {
-        return $this->request($request->getMethod(), $request->getUri(), $request->getParameters(), $request->getFiles(), array(), $request->getServer(), $changeHistory);
+        return $this->request($request->getMethod(), $request->getUri(), $request->getParameters(), array(), $request->getFiles(), $request->getServer(), $changeHistory);
     }
 }

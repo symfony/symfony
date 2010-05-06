@@ -33,7 +33,7 @@ class Response
      * @param array   $headers An array of headers
      * @param array   $cookies An array of cookies
      */
-    public function __construct($content = '', $status = 200, $headers = array(), $cookies = array())
+    public function __construct($content = '', $status = 200, array $headers = array(), array $cookies = array())
     {
         $this->content = $content;
         $this->status  = $status;

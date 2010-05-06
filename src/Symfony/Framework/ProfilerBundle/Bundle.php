@@ -25,8 +25,8 @@ use Symfony\Framework\ProfilerBundle\DependencyInjection\ProfilerExtension;
  */
 class Bundle extends BaseBundle
 {
-  public function buildContainer(ContainerInterface $container)
-  {
-    Loader::registerExtension(new ProfilerExtension());
-  }
+    public function buildContainer(ContainerInterface $container)
+    {
+        Loader::registerExtension(new ProfilerExtension());
+    }
 }

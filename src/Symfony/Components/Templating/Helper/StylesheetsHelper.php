@@ -27,88 +27,88 @@ namespace Symfony\Components\Templating\Helper;
  */
 class StylesheetsHelper extends Helper
 {
-  protected $stylesheets = array();
-  protected $assetHelper;
+    protected $stylesheets = array();
+    protected $assetHelper;
 
-  /**
-   * Constructor.
-   *
-   * @param AssetsHelper $assetHelper A AssetsHelper instance
-   */
-  public function __construct(AssetsHelper $assetHelper)
-  {
-    $this->assetHelper = $assetHelper;
-  }
-
-  /**
-   * Adds a stylesheets file.
-   *
-   * @param string $stylesheet A stylesheet file path
-   * @param array  $attributes An array of attributes
-   */
-  public function add($stylesheet, $attributes = array())
-  {
-    $this->stylesheets[$this->assetHelper->getUrl($stylesheet)] = $attributes;
-  }
-
-  /**
-   * Returns all stylesheet files.
-   *
-   * @param array An array of stylesheet files to include
-   */
-  public function get()
-  {
-    return $this->stylesheets;
-  }
-
-  /**
-   * Returns HTML representation of the links to stylesheets.
-   *
-   * @return string The HTML representation of the stylesheets
-   */
-  public function render()
-  {
-    $html = '';
-    foreach ($this->stylesheets as $path => $attributes)
+    /**
+     * Constructor.
+     *
+     * @param AssetsHelper $assetHelper A AssetsHelper instance
+     */
+    public function __construct(AssetsHelper $assetHelper)
     {
-      $atts = '';
-      foreach ($attributes as $key => $value)
-      {
-        $atts .= ' '.sprintf('%s="%s"', $key, htmlspecialchars($value, ENT_QUOTES, $this->charset));
-      }
-
-      $html .= sprintf('<link href="%s" rel="stylesheet" type="text/css"%s />', $path, $atts)."\n";
+        $this->assetHelper = $assetHelper;
     }
 
-    return $html;
-  }
+    /**
+     * Adds a stylesheets file.
+     *
+     * @param string $stylesheet A stylesheet file path
+     * @param array  $attributes An array of attributes
+     */
+    public function add($stylesheet, $attributes = array())
+    {
+        $this->stylesheets[$this->assetHelper->getUrl($stylesheet)] = $attributes;
+    }
 
-  /**
-   * Outputs HTML representation of the links to stylesheets.
-   *
-   */
-  public function output()
-  {
-    echo $this->render();
-  }
+    /**
+     * Returns all stylesheet files.
+     *
+     * @param array An array of stylesheet files to include
+     */
+    public function get()
+    {
+        return $this->stylesheets;
+    }
 
-  /**
-   * Returns a string representation of this helper as HTML.
-   *
-   * @return string The HTML representation of the stylesheets
-   */
-  public function __toString()
-  {
-    return $this->render();
-  }
+    /**
+     * Returns HTML representation of the links to stylesheets.
+     *
+     * @return string The HTML representation of the stylesheets
+     */
+    public function render()
+    {
+        $html = '';
+        foreach ($this->stylesheets as $path => $attributes)
+        {
+            $atts = '';
+            foreach ($attributes as $key => $value)
+            {
+                $atts .= ' '.sprintf('%s="%s"', $key, htmlspecialchars($value, ENT_QUOTES, $this->charset));
+            }
 
-  /**
-   * Returns the canonical name of this helper.
-   *
-   * @return string The canonical name
-   */
-  public function getName()
-  {
-    return 'stylesheets';
-  }
+            $html .= sprintf('<link href="%s" rel="stylesheet" type="text/css"%s />', $path, $atts)."\n";
+        }
+
+        return $html;
+    }
+
+    /**
+     * Outputs HTML representation of the links to stylesheets.
+     *
+     */
+    public function output()
+    {
+        echo $this->render();
+    }
+
+    /**
+     * Returns a string representation of this helper as HTML.
+     *
+     * @return string The HTML representation of the stylesheets
+     */
+    public function __toString()
+    {
+        return $this->render();
+    }
+
+    /**
+     * Returns the canonical name of this helper.
+     *
+     * @return string The canonical name
+     */
+    public function getName()
+    {
+        return 'stylesheets';
+    }
 }

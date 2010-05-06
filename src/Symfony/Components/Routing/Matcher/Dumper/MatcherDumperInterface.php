@@ -20,17 +20,17 @@ namespace Symfony\Components\Routing\Matcher\Dumper;
  */
 interface MatcherDumperInterface
 {
-  /**
-   * Dumps a set of routes to a PHP class.
-   *
-   * Available options:
-   *
-   *  * class:      The class name
-   *  * base_class: The base class name
-   *
-   * @param  array  $options An array of options
-   *
-   * @return string A PHP class representing the matcher class
-   */
-  function dump(array $options = array());
+    /**
+     * Dumps a set of routes to a PHP class.
+     *
+     * Available options:
+     *
+     *  * class:      The class name
+     *  * base_class: The base class name
+     *
+     * @param  array  $options An array of options
+     *
+     * @return string A PHP class representing the matcher class
+     */
+    function dump(array $options = array());
 }

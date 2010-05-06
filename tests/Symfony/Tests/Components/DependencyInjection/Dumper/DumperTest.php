@@ -15,21 +15,21 @@ use Symfony\Components\DependencyInjection\Dumper\Dumper;
 
 class DumperTest extends \PHPUnit_Framework_TestCase
 {
-  public function testDump()
-  {
-    $builder = new Builder();
-    $dumper = new ProjectDumper($builder);
-    try
+    public function testDump()
     {
-      $dumper->dump();
-      $this->fail('->dump() returns a LogicException if the dump() method has not been overriden by a children class');
+        $builder = new Builder();
+        $dumper = new ProjectDumper($builder);
+        try
+        {
+            $dumper->dump();
+            $this->fail('->dump() returns a LogicException if the dump() method has not been overriden by a children class');
+        }
+        catch (\Exception $e)
+        {
+            $this->assertInstanceOf('\LogicException', $e, '->dump() returns a LogicException if the dump() method has not been overriden by a children class');
+            $this->assertEquals('You must extend this abstract class and implement the dump() method.', $e->getMessage(), '->dump() returns a LogicException if the dump() method has not been overriden by a children class');
+        }
     }
-    catch (\Exception $e)
-    {
-      $this->assertInstanceOf('\LogicException', $e, '->dump() returns a LogicException if the dump() method has not been overriden by a children class');
-      $this->assertEquals('You must extend this abstract class and implement the dump() method.', $e->getMessage(), '->dump() returns a LogicException if the dump() method has not been overriden by a children class');
-    }
-  }
 }
 
 class ProjectDumper extends Dumper

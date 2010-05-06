@@ -29,253 +29,253 @@ use Symfony\Components\Yaml\Yaml;
  */
 class YamlFileLoader extends FileLoader
 {
-  /**
-   * Loads an array of Yaml files.
-   *
-   * @param  string $file A YAML file path
-   *
-   * @return BuilderConfiguration A BuilderConfiguration instance
-   */
-  public function load($file)
-  {
-    $path = $this->findFile($file);
-
-    $content = $this->loadFile($path);
-
-    $configuration = new BuilderConfiguration();
-
-    $configuration->addResource(new FileResource($path));
-
-    if (!$content)
+    /**
+     * Loads an array of Yaml files.
+     *
+     * @param  string $file A YAML file path
+     *
+     * @return BuilderConfiguration A BuilderConfiguration instance
+     */
+    public function load($file)
     {
-      return $configuration;
-    }
+        $path = $this->findFile($file);
 
-    // imports
-    $this->parseImports($configuration, $content, $file);
+        $content = $this->loadFile($path);
 
-    // parameters
-    if (isset($content['parameters']))
-    {
-      foreach ($content['parameters'] as $key => $value)
-      {
-        $configuration->setParameter(strtolower($key), $this->resolveServices($value));
-      }
-    }
+        $configuration = new BuilderConfiguration();
 
-    // services
-    $this->parseDefinitions($configuration, $content, $file);
+        $configuration->addResource(new FileResource($path));
 
-    // extensions
-    $this->loadFromExtensions($configuration, $content);
-
-    return $configuration;
-  }
-
-  protected function parseImports(BuilderConfiguration $configuration, $content, $file)
-  {
-    if (!isset($content['imports']))
-    {
-      return;
-    }
-
-    foreach ($content['imports'] as $import)
-    {
-      $configuration->merge($this->parseImport($import, $file));
-    }
-  }
-
-  protected function parseImport($import, $file)
-  {
-    $class = null;
-    if (isset($import['class']) && $import['class'] !== get_class($this))
-    {
-      $class = $import['class'];
-    }
-    else
-    {
-      // try to detect loader with the extension
-      switch (pathinfo($import['resource'], PATHINFO_EXTENSION))
-      {
-        case 'xml':
-          $class = 'Symfony\\Components\\DependencyInjection\\Loader\\XmlFileLoader';
-          break;
-        case 'ini':
-          $class = 'Symfony\\Components\\DependencyInjection\\Loader\\IniFileLoader';
-          break;
-      }
-    }
-
-    $loader = null === $class ? $this : new $class($this->paths);
-
-    $importedFile = $this->getAbsolutePath($import['resource'], dirname($file));
-
-    return $loader->load($importedFile);
-  }
-
-  protected function parseDefinitions(BuilderConfiguration $configuration, $content, $file)
-  {
-    if (!isset($content['services']))
-    {
-      return;
-    }
-
-    foreach ($content['services'] as $id => $service)
-    {
-      $this->parseDefinition($configuration, $id, $service, $file);
-    }
-  }
-
-  protected function parseDefinition(BuilderConfiguration $configuration, $id, $service, $file)
-  {
-    if (is_string($service) && 0 === strpos($service, '@'))
-    {
-      $configuration->setAlias($id, substr($service, 1));
-
-      return;
-    }
-
-    $definition = new Definition($service['class']);
-
-    if (isset($service['shared']))
-    {
-      $definition->setShared($service['shared']);
-    }
-
-    if (isset($service['constructor']))
-    {
-      $definition->setConstructor($service['constructor']);
-    }
-
-    if (isset($service['file']))
-    {
-      $definition->setFile($service['file']);
-    }
-
-    if (isset($service['arguments']))
-    {
-      $definition->setArguments($this->resolveServices($service['arguments']));
-    }
-
-    if (isset($service['configurator']))
-    {
-      if (is_string($service['configurator']))
-      {
-        $definition->setConfigurator($service['configurator']);
-      }
-      else
-      {
-        $definition->setConfigurator(array($this->resolveServices($service['configurator'][0]), $service['configurator'][1]));
-      }
-    }
-
-    if (isset($service['calls']))
-    {
-      foreach ($service['calls'] as $call)
-      {
-        $definition->addMethodCall($call[0], $this->resolveServices($call[1]));
-      }
-    }
-
-    if (isset($service['annotations']))
-    {
-      foreach ($service['annotations'] as $annotation)
-      {
-        $name = $annotation['name'];
-        unset($annotation['name']);
-
-        $definition->addAnnotation($name, $annotation);
-      }
-    }
-
-    $configuration->setDefinition($id, $definition);
-  }
-
-  protected function loadFile($file)
-  {
-    return $this->validate(Yaml::load($file), $file);
-  }
-
-  /**
-   * @throws \InvalidArgumentException When service file is not valid
-   */
-  protected function validate($content, $file)
-  {
-    if (null === $content)
-    {
-      return $content;
-    }
-
-    if (!is_array($content))
-    {
-      throw new \InvalidArgumentException(sprintf('The service file "%s" is not valid.', $file));
-    }
-
-    foreach (array_keys($content) as $key)
-    {
-      if (in_array($key, array('imports', 'parameters', 'services')))
-      {
-        continue;
-      }
-
-      // can it be handled by an extension?
-      if (false !== strpos($key, '.'))
-      {
-        list($namespace, $tag) = explode('.', $key);
-        if (!static::getExtension($namespace))
+        if (!$content)
         {
-          throw new \InvalidArgumentException(sprintf('There is no extension able to load the configuration for "%s" (in %s).', $key, $file));
+            return $configuration;
         }
 
-        continue;
-      }
+        // imports
+        $this->parseImports($configuration, $content, $file);
 
-      throw new \InvalidArgumentException(sprintf('The "%s" tag is not valid (in %s).', $key, $file));
+        // parameters
+        if (isset($content['parameters']))
+        {
+            foreach ($content['parameters'] as $key => $value)
+            {
+                $configuration->setParameter(strtolower($key), $this->resolveServices($value));
+            }
+        }
+
+        // services
+        $this->parseDefinitions($configuration, $content, $file);
+
+        // extensions
+        $this->loadFromExtensions($configuration, $content);
+
+        return $configuration;
     }
 
-    return $content;
-  }
-
-  protected function resolveServices($value)
-  {
-    if (is_array($value))
+    protected function parseImports(BuilderConfiguration $configuration, $content, $file)
     {
-      $value = array_map(array($this, 'resolveServices'), $value);
+        if (!isset($content['imports']))
+        {
+            return;
+        }
+
+        foreach ($content['imports'] as $import)
+        {
+            $configuration->merge($this->parseImport($import, $file));
+        }
     }
-    else if (is_string($value) && 0 === strpos($value, '@@'))
+
+    protected function parseImport($import, $file)
     {
-      $value = new Reference(substr($value, 2), Container::IGNORE_ON_INVALID_REFERENCE);
+        $class = null;
+        if (isset($import['class']) && $import['class'] !== get_class($this))
+        {
+            $class = $import['class'];
+        }
+        else
+        {
+            // try to detect loader with the extension
+            switch (pathinfo($import['resource'], PATHINFO_EXTENSION))
+            {
+                case 'xml':
+                    $class = 'Symfony\\Components\\DependencyInjection\\Loader\\XmlFileLoader';
+                    break;
+                case 'ini':
+                    $class = 'Symfony\\Components\\DependencyInjection\\Loader\\IniFileLoader';
+                    break;
+            }
+        }
+
+        $loader = null === $class ? $this : new $class($this->paths);
+
+        $importedFile = $this->getAbsolutePath($import['resource'], dirname($file));
+
+        return $loader->load($importedFile);
     }
-    else if (is_string($value) && 0 === strpos($value, '@'))
+
+    protected function parseDefinitions(BuilderConfiguration $configuration, $content, $file)
     {
-      $value = new Reference(substr($value, 1));
+        if (!isset($content['services']))
+        {
+            return;
+        }
+
+        foreach ($content['services'] as $id => $service)
+        {
+            $this->parseDefinition($configuration, $id, $service, $file);
+        }
     }
 
-    return $value;
-  }
-
-  protected function loadFromExtensions(BuilderConfiguration $configuration, $content)
-  {
-    foreach ($content as $key => $values)
+    protected function parseDefinition(BuilderConfiguration $configuration, $id, $service, $file)
     {
-      if (in_array($key, array('imports', 'parameters', 'services')))
-      {
-        continue;
-      }
+        if (is_string($service) && 0 === strpos($service, '@'))
+        {
+            $configuration->setAlias($id, substr($service, 1));
 
-      list($namespace, $tag) = explode('.', $key);
+            return;
+        }
 
-      if (!is_array($values))
-      {
-        $values = array();
-      }
+        $definition = new Definition($service['class']);
 
-      $config = static::getExtension($namespace)->load($tag, $values);
+        if (isset($service['shared']))
+        {
+            $definition->setShared($service['shared']);
+        }
 
-      $r = new \ReflectionObject($this->getExtension($namespace));
-      $config->addResource(new FileResource($r->getFileName()));
+        if (isset($service['constructor']))
+        {
+            $definition->setConstructor($service['constructor']);
+        }
 
-      $configuration->merge($config);
+        if (isset($service['file']))
+        {
+            $definition->setFile($service['file']);
+        }
+
+        if (isset($service['arguments']))
+        {
+            $definition->setArguments($this->resolveServices($service['arguments']));
+        }
+
+        if (isset($service['configurator']))
+        {
+            if (is_string($service['configurator']))
+            {
+                $definition->setConfigurator($service['configurator']);
+            }
+            else
+            {
+                $definition->setConfigurator(array($this->resolveServices($service['configurator'][0]), $service['configurator'][1]));
+            }
+        }
+
+        if (isset($service['calls']))
+        {
+            foreach ($service['calls'] as $call)
+            {
+                $definition->addMethodCall($call[0], $this->resolveServices($call[1]));
+            }
+        }
+
+        if (isset($service['annotations']))
+        {
+            foreach ($service['annotations'] as $annotation)
+            {
+                $name = $annotation['name'];
+                unset($annotation['name']);
+
+                $definition->addAnnotation($name, $annotation);
+            }
+        }
+
+        $configuration->setDefinition($id, $definition);
     }
-  }
+
+    protected function loadFile($file)
+    {
+        return $this->validate(Yaml::load($file), $file);
+    }
+
+    /**
+     * @throws \InvalidArgumentException When service file is not valid
+     */
+    protected function validate($content, $file)
+    {
+        if (null === $content)
+        {
+            return $content;
+        }
+
+        if (!is_array($content))
+        {
+            throw new \InvalidArgumentException(sprintf('The service file "%s" is not valid.', $file));
+        }
+
+        foreach (array_keys($content) as $key)
+        {
+            if (in_array($key, array('imports', 'parameters', 'services')))
+            {
+                continue;
+            }
+
+            // can it be handled by an extension?
+            if (false !== strpos($key, '.'))
+            {
+                list($namespace, $tag) = explode('.', $key);
+                if (!static::getExtension($namespace))
+                {
+                    throw new \InvalidArgumentException(sprintf('There is no extension able to load the configuration for "%s" (in %s).', $key, $file));
+                }
+
+                continue;
+            }
+
+            throw new \InvalidArgumentException(sprintf('The "%s" tag is not valid (in %s).', $key, $file));
+        }
+
+        return $content;
+    }
+
+    protected function resolveServices($value)
+    {
+        if (is_array($value))
+        {
+            $value = array_map(array($this, 'resolveServices'), $value);
+        }
+        else if (is_string($value) && 0 === strpos($value, '@@'))
+        {
+            $value = new Reference(substr($value, 2), Container::IGNORE_ON_INVALID_REFERENCE);
+        }
+        else if (is_string($value) && 0 === strpos($value, '@'))
+        {
+            $value = new Reference(substr($value, 1));
+        }
+
+        return $value;
+    }
+
+    protected function loadFromExtensions(BuilderConfiguration $configuration, $content)
+    {
+        foreach ($content as $key => $values)
+        {
+            if (in_array($key, array('imports', 'parameters', 'services')))
+            {
+                continue;
+            }
+
+            list($namespace, $tag) = explode('.', $key);
+
+            if (!is_array($values))
+            {
+                $values = array();
+            }
+
+            $config = static::getExtension($namespace)->load($tag, $values);
+
+            $r = new \ReflectionObject($this->getExtension($namespace));
+            $config->addResource(new FileResource($r->getFileName()));
+
+            $configuration->merge($config);
+        }
+    }
 }

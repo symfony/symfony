@@ -7,8 +7,8 @@ use Symfony\Components\DependencyInjection\Reference;
 
 $container = new Builder();
 $container->
-  register('foo', 'FooClass')->
-  addArgument(new Reference('bar'))
+    register('foo', 'FooClass')->
+    addArgument(new Reference('bar'))
 ;
 
 return $container;

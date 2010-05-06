@@ -26,155 +26,155 @@ namespace Symfony\Components\Templating\Helper;
  */
 class AssetsHelper extends Helper
 {
-  protected $version;
-  protected $baseURLs;
-  protected $basePath;
+    protected $version;
+    protected $baseURLs;
+    protected $basePath;
 
-  /**
-   * Constructor.
-   *
-   * @param string       $basePath The base path
-   * @param string|array $baseURLs The domain URL or an array of domain URLs
-   * @param string       $version  The version
-   */
-  public function __construct($basePath = null, $baseURLs = array(), $version = null)
-  {
-    $this->setBasePath($basePath);
-    $this->setBaseURLs($baseURLs);
-    $this->version = $version;
-  }
-
-  /**
-   * Gets the version to add to public URL.
-   *
-   * @return string The current version
-   */
-  public function getVersion()
-  {
-    return $this->version;
-  }
-
-  /**
-   * Sets the version that is added to each public URL.
-   *
-   * @param string $id The version
-   */
-  public function setVersion($version)
-  {
-    $this->version = $version;
-  }
-
-  /**
-   * Gets the base path.
-   *
-   * @return string The base path
-   */
-  public function getBasePath()
-  {
-    return $this->basePath;
-  }
-
-  /**
-   * Sets the base path.
-   *
-   * @param string $basePath The base path
-   */
-  public function setBasePath($basePath)
-  {
-    if (strlen($basePath) && '/' != $basePath[0])
+    /**
+     * Constructor.
+     *
+     * @param string       $basePath The base path
+     * @param string|array $baseURLs The domain URL or an array of domain URLs
+     * @param string       $version  The version
+     */
+    public function __construct($basePath = null, $baseURLs = array(), $version = null)
     {
-      $basePath = '/'.$basePath;
+        $this->setBasePath($basePath);
+        $this->setBaseURLs($baseURLs);
+        $this->version = $version;
     }
 
-    $this->basePath = rtrim($basePath, '/').'/';
-  }
-
-  /**
-   * Gets the base URL.
-   *
-   * @param  string $path The path
-   *
-   * @return string The base URL
-   */
-  public function getBaseURL($path)
-  {
-    $count = count($this->baseURLs);
-
-    if (0 === $count)
+    /**
+     * Gets the version to add to public URL.
+     *
+     * @return string The current version
+     */
+    public function getVersion()
     {
-      return '';
+        return $this->version;
     }
 
-    if (1 === $count)
+    /**
+     * Sets the version that is added to each public URL.
+     *
+     * @param string $id The version
+     */
+    public function setVersion($version)
     {
-      return $this->baseURLs[0];
+        $this->version = $version;
     }
 
-    return $this->baseURLs[fmod(hexdec(substr(md5($path), 0, 10)), $count)];
-
-  }
-
-  /**
-   * Gets the base URLs.
-   *
-   * @return array The base URLs
-   */
-  public function getBaseURLs()
-  {
-    return $this->baseURLs;
-  }
-
-  /**
-   * Sets the base URLs.
-   *
-   * If you pass an array, the getBaseURL() will return a
-   * random one each time it is called.
-   *
-   * @param string|array $baseURLs The base URLs
-   */
-  public function setBaseURLs($baseURLs)
-  {
-    if (!is_array($baseURLs))
+    /**
+     * Gets the base path.
+     *
+     * @return string The base path
+     */
+    public function getBasePath()
     {
-      $baseURLs = array($baseURLs);
+        return $this->basePath;
     }
 
-    $this->baseURLs = array();
-    foreach ($baseURLs as $URL)
+    /**
+     * Sets the base path.
+     *
+     * @param string $basePath The base path
+     */
+    public function setBasePath($basePath)
     {
-      $this->baseURLs[] = rtrim($URL, '/');
-    }
-  }
+        if (strlen($basePath) && '/' != $basePath[0])
+        {
+            $basePath = '/'.$basePath;
+        }
 
-  /**
-   * Returns the public path.
-   *
-   * @param string $path A public path
-   *
-   * @return string A public path which takes into account the base path and URL path
-   */
-  public function getUrl($path)
-  {
-    if (strpos($path, '://'))
-    {
-      return $path;
+        $this->basePath = rtrim($basePath, '/').'/';
     }
 
-    if (0 !== strpos($path, '/'))
+    /**
+     * Gets the base URL.
+     *
+     * @param  string $path The path
+     *
+     * @return string The base URL
+     */
+    public function getBaseURL($path)
     {
-      $path = $this->basePath.$path;
+        $count = count($this->baseURLs);
+
+        if (0 === $count)
+        {
+            return '';
+        }
+
+        if (1 === $count)
+        {
+            return $this->baseURLs[0];
+        }
+
+        return $this->baseURLs[fmod(hexdec(substr(md5($path), 0, 10)), $count)];
+
     }
 
-    return $this->getBaseURL($path).$path.($this->version ? '?'.$this->version : '');
-  }
+    /**
+     * Gets the base URLs.
+     *
+     * @return array The base URLs
+     */
+    public function getBaseURLs()
+    {
+        return $this->baseURLs;
+    }
 
-  /**
-   * Returns the canonical name of this helper.
-   *
-   * @return string The canonical name
-   */
-  public function getName()
-  {
-    return 'assets';
-  }
+    /**
+     * Sets the base URLs.
+     *
+     * If you pass an array, the getBaseURL() will return a
+     * random one each time it is called.
+     *
+     * @param string|array $baseURLs The base URLs
+     */
+    public function setBaseURLs($baseURLs)
+    {
+        if (!is_array($baseURLs))
+        {
+            $baseURLs = array($baseURLs);
+        }
+
+        $this->baseURLs = array();
+        foreach ($baseURLs as $URL)
+        {
+            $this->baseURLs[] = rtrim($URL, '/');
+        }
+    }
+
+    /**
+     * Returns the public path.
+     *
+     * @param string $path A public path
+     *
+     * @return string A public path which takes into account the base path and URL path
+     */
+    public function getUrl($path)
+    {
+        if (strpos($path, '://'))
+        {
+            return $path;
+        }
+
+        if (0 !== strpos($path, '/'))
+        {
+            $path = $this->basePath.$path;
+        }
+
+        return $this->getBaseURL($path).$path.($this->version ? '?'.$this->version : '');
+    }
+
+    /**
+     * Returns the canonical name of this helper.
+     *
+     * @return string The canonical name
+     */
+    public function getName()
+    {
+        return 'assets';
+    }
 }

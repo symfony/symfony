@@ -29,24 +29,24 @@ use Doctrine\ORM\Tools\Console\Command\ConvertMappingCommand;
  */
 class ConvertMappingDoctrineCommand extends ConvertMappingCommand
 {
-  protected function configure()
-  {
-    parent::configure();
-    $this
-      ->setName('doctrine:mapping:convert')
-      ->addOption('em', null, InputOption::PARAMETER_OPTIONAL, 'The entity manager to use for this command.')
-      ->setHelp(<<<EOT
+    protected function configure()
+    {
+        parent::configure();
+        $this
+            ->setName('doctrine:mapping:convert')
+            ->addOption('em', null, InputOption::PARAMETER_OPTIONAL, 'The entity manager to use for this command.')
+            ->setHelp(<<<EOT
 The <info>doctrine:mapping:convert</info> command converts mapping information between supported formats:
 
   <info>./symfony doctrine:mapping:convert xml /path/to/output</info>
 EOT
-    );
-  }
+        );
+    }
 
-  protected function execute(InputInterface $input, OutputInterface $output)
-  {
-    DoctrineCommand::setApplicationEntityManager($this->application, $input->getOption('em'));
+    protected function execute(InputInterface $input, OutputInterface $output)
+    {
+        DoctrineCommand::setApplicationEntityManager($this->application, $input->getOption('em'));
 
-    return parent::execute($input, $output);
-  }
+        return parent::execute($input, $output);
+    }
 }

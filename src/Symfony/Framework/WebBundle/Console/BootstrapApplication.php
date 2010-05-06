@@ -27,13 +27,13 @@ use Symfony\Framework\WebBundle\Command\InitApplicationCommand;
  */
 class BootstrapApplication extends BaseApplication
 {
-  /**
-   * Constructor.
-   */
-  public function __construct()
-  {
-    parent::__construct('Symfony', Kernel::VERSION);
+    /**
+     * Constructor.
+     */
+    public function __construct()
+    {
+        parent::__construct('Symfony', Kernel::VERSION);
 
-    $this->addCommand(new InitApplicationCommand());
-  }
+        $this->addCommand(new InitApplicationCommand());
+    }
 }

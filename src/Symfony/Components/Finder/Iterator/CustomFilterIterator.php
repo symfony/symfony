@@ -23,38 +23,38 @@ namespace Symfony\Components\Finder\Iterator;
  */
 class CustomFilterIterator extends \FilterIterator
 {
-  protected $filters = array();
+    protected $filters = array();
 
-  /**
-   * Constructor.
-   *
-   * @param \Iterator $iterator The Iterator to filter
-   * @param array     $filters  An array of \Closure
-   */
-  public function __construct(\Iterator $iterator, array $filters)
-  {
-    $this->filters = $filters;
-
-    parent::__construct($iterator);
-  }
-
-  /**
-   * Filters the iterator values.
-   *
-   * @return Boolean true if the value should be kept, false otherwise
-   */
-  public function accept()
-  {
-    $fileinfo = $this->getInnerIterator()->current();
-
-    foreach ($this->filters as $filter)
+    /**
+     * Constructor.
+     *
+     * @param \Iterator $iterator The Iterator to filter
+     * @param array     $filters  An array of \Closure
+     */
+    public function __construct(\Iterator $iterator, array $filters)
     {
-      if (false === $filter($fileinfo))
-      {
-        return false;
-      }
+        $this->filters = $filters;
+
+        parent::__construct($iterator);
     }
 
-    return true;
-  }
+    /**
+     * Filters the iterator values.
+     *
+     * @return Boolean true if the value should be kept, false otherwise
+     */
+    public function accept()
+    {
+        $fileinfo = $this->getInnerIterator()->current();
+
+        foreach ($this->filters as $filter)
+        {
+            if (false === $filter($fileinfo))
+            {
+                return false;
+            }
+        }
+
+        return true;
+    }
 }

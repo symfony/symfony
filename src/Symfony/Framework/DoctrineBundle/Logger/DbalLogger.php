@@ -23,35 +23,35 @@ use Doctrine\DBAL\Logging\DebugStack;
  */
 class DbalLogger extends DebugStack
 {
-  protected $logger;
+    protected $logger;
 
-  /**
-   * Constructor.
-   *
-   * @param LoggerInterface $logger A LoggerInterface instance
-   */
-  public function __construct(LoggerInterface $logger = null)
-  {
-    $this->logger = $logger;
-  }
-
-  public function logSql($sql, array $params = null)
-  {
-    parent::logSql($sql, $params);
-
-    if (null !== $this->logger)
+    /**
+     * Constructor.
+     *
+     * @param LoggerInterface $logger A LoggerInterface instance
+     */
+    public function __construct(LoggerInterface $logger = null)
     {
-      $this->log($sql.' ('.str_replace("\n", '', var_export($params, true)).')');
+        $this->logger = $logger;
     }
-  }
 
-  /**
-   * Logs a message.
-   *
-   * @param string $message A message to log
-   */
-  public function log($message)
-  {
-    $this->logger->info($message);
-  }
+    public function logSql($sql, array $params = null)
+    {
+        parent::logSql($sql, $params);
+
+        if (null !== $this->logger)
+        {
+            $this->log($sql.' ('.str_replace("\n", '', var_export($params, true)).')');
+        }
+    }
+
+    /**
+     * Logs a message.
+     *
+     * @param string $message A message to log
+     */
+    public function log($message)
+    {
+        $this->logger->info($message);
+    }
 }

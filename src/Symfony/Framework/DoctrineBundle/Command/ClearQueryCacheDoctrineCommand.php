@@ -26,15 +26,15 @@ use Doctrine\ORM\Tools\Console\Command\ClearCache\QueryCommand;
  */
 class ClearQueryCacheDoctrineCommand extends QueryCommand
 {
-  protected function configure()
-  {
-    parent::configure();
+    protected function configure()
+    {
+        parent::configure();
 
-    $this
-      ->setName('doctrine:cache:clear-query')
-      ->setDescription('Clear all query cache for a entity manager.')
-      ->addOption('em', null, InputOption::PARAMETER_OPTIONAL, 'The entity manager to use for this command.')
-      ->setHelp(<<<EOT
+        $this
+            ->setName('doctrine:cache:clear-query')
+            ->setDescription('Clear all query cache for a entity manager.')
+            ->addOption('em', null, InputOption::PARAMETER_OPTIONAL, 'The entity manager to use for this command.')
+            ->setHelp(<<<EOT
 The <info>doctrine:cache:clear-query</info> command clears all query cache for the default entity manager:
 
   <info>./symfony doctrine:cache:clear-query</info>
@@ -43,13 +43,13 @@ You can also optionally specify the <comment>--em</comment> option to specify wh
 
   <info>./symfony doctrine:cache:clear-query --em=default</info>
 EOT
-    );
-  }
+        );
+    }
 
-  protected function execute(InputInterface $input, OutputInterface $output)
-  {
-    DoctrineCommand::setApplicationEntityManager($this->application, $input->getOption('em'));
+    protected function execute(InputInterface $input, OutputInterface $output)
+    {
+        DoctrineCommand::setApplicationEntityManager($this->application, $input->getOption('em'));
 
-    return parent::execute($input, $output);
-  }
+        return parent::execute($input, $output);
+    }
 }

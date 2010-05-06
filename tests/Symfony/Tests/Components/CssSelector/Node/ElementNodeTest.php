@@ -15,16 +15,16 @@ use Symfony\Components\CssSelector\Node\ElementNode;
 
 class ElementNodeTest extends \PHPUnit_Framework_TestCase
 {
-  public function testToXpath()
-  {
-    // h1
-    $element = new ElementNode('*', 'h1');
+    public function testToXpath()
+    {
+        // h1
+        $element = new ElementNode('*', 'h1');
 
-    $this->assertEquals('h1', (string) $element->toXpath(), '->toXpath() returns the xpath representation of the node');
+        $this->assertEquals('h1', (string) $element->toXpath(), '->toXpath() returns the xpath representation of the node');
 
-    // foo|h1
-    $element = new ElementNode('foo', 'h1');
+        // foo|h1
+        $element = new ElementNode('foo', 'h1');
 
-    $this->assertEquals('foo:h1', (string) $element->toXpath(), '->toXpath() returns the xpath representation of the node');
-  }
+        $this->assertEquals('foo:h1', (string) $element->toXpath(), '->toXpath() returns the xpath representation of the node');
+    }
 }

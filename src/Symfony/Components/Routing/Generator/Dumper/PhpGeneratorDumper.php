@@ -22,79 +22,79 @@ use Symfony\Components\Routing\Route;
  */
 class PhpGeneratorDumper extends GeneratorDumper
 {
-  /**
-   * Dumps a set of routes to a PHP class.
-   *
-   * Available options:
-   *
-   *  * class:      The class name
-   *  * base_class: The base class name
-   *
-   * @param  array  $options An array of options
-   *
-   * @return string A PHP class representing the generator class
-   */
-  public function dump(array $options = array())
-  {
-    $options = array_merge(array(
-      'class'      => 'ProjectUrlGenerator',
-      'base_class' => 'Symfony\\Components\\Routing\\Generator\\UrlGenerator',
-    ), $options);
-
-    return
-      $this->startClass($options['class'], $options['base_class']).
-      $this->addConstructor().
-      $this->addGenerator().
-      $this->endClass()
-    ;
-  }
-
-  protected function addGenerator()
-  {
-    $methods = array();
-
-    foreach ($this->routes->getRoutes() as $name => $route)
+    /**
+     * Dumps a set of routes to a PHP class.
+     *
+     * Available options:
+     *
+     *  * class:      The class name
+     *  * base_class: The base class name
+     *
+     * @param  array  $options An array of options
+     *
+     * @return string A PHP class representing the generator class
+     */
+    public function dump(array $options = array())
     {
-      $compiledRoute = $route->compile();
+        $options = array_merge(array(
+            'class'      => 'ProjectUrlGenerator',
+            'base_class' => 'Symfony\\Components\\Routing\\Generator\\UrlGenerator',
+        ), $options);
 
-      $variables = str_replace("\n", '', var_export($compiledRoute->getVariables(), true));
-      $defaults = str_replace("\n", '', var_export($route->getDefaults(), true));
-      $requirements = str_replace("\n", '', var_export($compiledRoute->getRequirements(), true));
-      $tokens = str_replace("\n", '', var_export($compiledRoute->getTokens(), true));
+        return
+            $this->startClass($options['class'], $options['base_class']).
+            $this->addConstructor().
+            $this->addGenerator().
+            $this->endClass()
+        ;
+    }
 
-      $methods[] = <<<EOF
-  protected function get{$name}RouteInfo()
-  {
-    return array($variables, array_merge(\$this->defaults, $defaults), $requirements, $tokens);
-  }
+    protected function addGenerator()
+    {
+        $methods = array();
+
+        foreach ($this->routes->getRoutes() as $name => $route)
+        {
+            $compiledRoute = $route->compile();
+
+            $variables = str_replace("\n", '', var_export($compiledRoute->getVariables(), true));
+            $defaults = str_replace("\n", '', var_export($route->getDefaults(), true));
+            $requirements = str_replace("\n", '', var_export($compiledRoute->getRequirements(), true));
+            $tokens = str_replace("\n", '', var_export($compiledRoute->getTokens(), true));
+
+            $methods[] = <<<EOF
+    protected function get{$name}RouteInfo()
+    {
+        return array($variables, array_merge(\$this->defaults, $defaults), $requirements, $tokens);
+    }
 
 EOF
-      ;
-    }
+            ;
+        }
 
-    $methods = implode("\n", $methods);
+        $methods = implode("\n", $methods);
 
-    return <<<EOF
+        return <<<EOF
 
-  public function generate(\$name, array \$parameters, \$absolute = false)
-  {
-    if (!method_exists(\$this, \$method = 'get'.\$name.'RouteInfo'))
+    public function generate(\$name, array \$parameters, \$absolute = false)
     {
-      throw new \InvalidArgumentException(sprintf('Route "%s" does not exist.', \$name));
+        if (!method_exists(\$this, \$method = 'get'.\$name.'RouteInfo'))
+        {
+            throw new \InvalidArgumentException(sprintf('Route "%s" does not exist.', \$name));
+        }
+
+        list(\$variables, \$defaults, \$requirements, \$tokens) = \$this->\$method();
+
+        return \$this->doGenerate(\$variables, \$defaults, \$requirements, \$tokens, \$parameters, \$name, \$absolute);
     }
-
-    list(\$variables, \$defaults, \$requirements, \$tokens) = \$this->\$method();
-
-    return \$this->doGenerate(\$variables, \$defaults, \$requirements, \$tokens, \$parameters, \$name, \$absolute);
-  }
 
 $methods
 EOF;
-  }
+    }
 
-  protected function startClass($class, $baseClass)
-  {
-    return <<<EOF
+    protected function startClass($class, $baseClass)
+    {
+        return <<<EOF
 <?php
 
 /**
@@ -107,28 +107,28 @@ class $class extends $baseClass
 {
 
 EOF;
-  }
+    }
 
-  protected function addConstructor()
-  {
-    return <<<EOF
-  /**
-   * Constructor.
-   */
-  public function __construct(array \$context = array(), array \$defaults = array())
-  {
-    \$this->context = \$context;
-    \$this->defaults = \$defaults;
-  }
+    protected function addConstructor()
+    {
+        return <<<EOF
+    /**
+     * Constructor.
+     */
+    public function __construct(array \$context = array(), array \$defaults = array())
+    {
+        \$this->context = \$context;
+        \$this->defaults = \$defaults;
+    }
 
 EOF;
-  }
+    }
 
-  protected function endClass()
-  {
-    return <<<EOF
+    protected function endClass()
+    {
+        return <<<EOF
 }
 
 EOF;
-  }
+    }
 }

@@ -20,24 +20,24 @@ namespace Symfony\Framework\ZendBundle\Logger;
  */
 class DebugLogger extends \Zend_Log_Writer_Abstract
 {
-  protected $logs = array();
+    protected $logs = array();
 
-  public function getLogs()
-  {
-    return $this->logs;
-  }
+    public function getLogs()
+    {
+        return $this->logs;
+    }
 
-  /**
-   * Write a message to the log.
-   *
-   * @param array $event Event data
-   */
-  protected function _write($event)
-  {
-    $this->logs[] = $event;
-  }
+    /**
+     * Write a message to the log.
+     *
+     * @param array $event Event data
+     */
+    protected function _write($event)
+    {
+        $this->logs[] = $event;
+    }
 
-  static public function factory($config)
-  {
-  }
+    static public function factory($config)
+    {
+    }
 }

@@ -20,36 +20,36 @@ namespace Symfony\Components\DependencyInjection\Loader;
  */
 abstract class LoaderExtension implements LoaderExtensionInterface
 {
-  protected $resources = array();
+    protected $resources = array();
 
-  /**
-   * Sets a configuration entry point for the given extension name.
-   *
-   * @param string The configuration extension name
-   * @param mixed  A resource
-   */
-  public function setConfiguration($name, $resource)
-  {
-    $this->resources[$name] = $resource;
-  }
-
-  /**
-   * Loads a specific configuration.
-   *
-   * @param string The tag name
-   * @param array  An array of configuration values
-   *
-   * @return BuilderConfiguration A BuilderConfiguration instance
-   *
-   * @throws \InvalidArgumentException When provided tag is not defined in this extension
-   */
-  public function load($tag, array $config)
-  {
-    if (!method_exists($this, $method = $tag.'Load'))
+    /**
+     * Sets a configuration entry point for the given extension name.
+     *
+     * @param string The configuration extension name
+     * @param mixed  A resource
+     */
+    public function setConfiguration($name, $resource)
     {
-      throw new \InvalidArgumentException(sprintf('The tag "%s" is not defined in the "%s" extension.', $tag, $this->getNamespace()));
+        $this->resources[$name] = $resource;
     }
 
-    return $this->$method($config);
-  }
+    /**
+     * Loads a specific configuration.
+     *
+     * @param string The tag name
+     * @param array  An array of configuration values
+     *
+     * @return BuilderConfiguration A BuilderConfiguration instance
+     *
+     * @throws \InvalidArgumentException When provided tag is not defined in this extension
+     */
+    public function load($tag, array $config)
+    {
+        if (!method_exists($this, $method = $tag.'Load'))
+        {
+            throw new \InvalidArgumentException(sprintf('The tag "%s" is not defined in the "%s" extension.', $tag, $this->getNamespace()));
+        }
+
+        return $this->$method($config);
+    }
 }

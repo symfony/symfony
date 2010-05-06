@@ -26,113 +26,113 @@ use Symfony\Components\DependencyInjection\ContainerInterface;
  */
 class EventDispatcher extends BaseEventDispatcher
 {
-  protected $logger;
+    protected $logger;
 
-  /**
-   * Constructor.
-   *
-   * @param LoggerInterface $logger A LoggerInterface instance
-   */
-  public function __construct(ContainerInterface $container, LoggerInterface $logger = null)
-  {
-    $this->logger = $logger;
-
-    parent::__construct($container);
-  }
-
-  /**
-   * Notifies all listeners of a given event.
-   *
-   * @param Event $event A Event instance
-   *
-   * @return Event The Event instance
-   */
-  public function notify(Event $event)
-  {
-    foreach ($this->getListeners($event->getName()) as $listener)
+    /**
+     * Constructor.
+     *
+     * @param LoggerInterface $logger A LoggerInterface instance
+     */
+    public function __construct(ContainerInterface $container, LoggerInterface $logger = null)
     {
-      if (null !== $this->logger)
-      {
-        $this->logger->debug(sprintf('Notifying event "%s" to listener "%s"', $event->getName(), $this->listenerToString($listener)));
-      }
+        $this->logger = $logger;
 
-      call_user_func($listener, $event);
+        parent::__construct($container);
     }
 
-    return $event;
-  }
-
-  /**
-   * Notifies all listeners of a given event until one returns a non null value.
-   *
-   * @param  Event $event A Event instance
-   *
-   * @return Event The Event instance
-   */
-  public function notifyUntil(Event $event)
-  {
-    foreach ($this->getListeners($event->getName()) as $listener)
+    /**
+     * Notifies all listeners of a given event.
+     *
+     * @param Event $event A Event instance
+     *
+     * @return Event The Event instance
+     */
+    public function notify(Event $event)
     {
-      if (null !== $this->logger)
-      {
-        $this->logger->debug(sprintf('Notifying (until) event "%s" to listener "%s"', $event->getName(), $this->listenerToString($listener)));
-      }
-
-      if (call_user_func($listener, $event))
-      {
-        if (null !== $this->logger)
+        foreach ($this->getListeners($event->getName()) as $listener)
         {
-          $this->logger->debug(sprintf('Listener "%s" processed the event "%s"', $this->listenerToString($listener), $event->getName()));
+            if (null !== $this->logger)
+            {
+                $this->logger->debug(sprintf('Notifying event "%s" to listener "%s"', $event->getName(), $this->listenerToString($listener)));
+            }
+
+            call_user_func($listener, $event);
         }
 
-        $event->setProcessed(true);
-        break;
-      }
+        return $event;
     }
 
-    return $event;
-  }
-
-  /**
-   * Filters a value by calling all listeners of a given event.
-   *
-   * @param  Event  $event   A Event instance
-   * @param  mixed    $value   The value to be filtered
-   *
-   * @return Event The Event instance
-   */
-  public function filter(Event $event, $value)
-  {
-    foreach ($this->getListeners($event->getName()) as $listener)
+    /**
+     * Notifies all listeners of a given event until one returns a non null value.
+     *
+     * @param  Event $event A Event instance
+     *
+     * @return Event The Event instance
+     */
+    public function notifyUntil(Event $event)
     {
-      if (null !== $this->logger)
-      {
-        $this->logger->debug(sprintf('Notifying (filter) event "%s" to listener "%s"', $event->getName(), $this->listenerToString($listener)));
-      }
+        foreach ($this->getListeners($event->getName()) as $listener)
+        {
+            if (null !== $this->logger)
+            {
+                $this->logger->debug(sprintf('Notifying (until) event "%s" to listener "%s"', $event->getName(), $this->listenerToString($listener)));
+            }
 
-      $value = call_user_func($listener, $event, $value);
+            if (call_user_func($listener, $event))
+            {
+                if (null !== $this->logger)
+                {
+                    $this->logger->debug(sprintf('Listener "%s" processed the event "%s"', $this->listenerToString($listener), $event->getName()));
+                }
+
+                $event->setProcessed(true);
+                break;
+            }
+        }
+
+        return $event;
     }
 
-    $event->setReturnValue($value);
-
-    return $event;
-  }
-
-  protected function listenerToString($listener)
-  {
-    if (is_object($listener) && $listener instanceof \Closure)
+    /**
+     * Filters a value by calling all listeners of a given event.
+     *
+     * @param  Event  $event   A Event instance
+     * @param  mixed    $value   The value to be filtered
+     *
+     * @return Event The Event instance
+     */
+    public function filter(Event $event, $value)
     {
-      return 'Closure';
+        foreach ($this->getListeners($event->getName()) as $listener)
+        {
+            if (null !== $this->logger)
+            {
+                $this->logger->debug(sprintf('Notifying (filter) event "%s" to listener "%s"', $event->getName(), $this->listenerToString($listener)));
+            }
+
+            $value = call_user_func($listener, $event, $value);
+        }
+
+        $event->setReturnValue($value);
+
+        return $event;
     }
 
-    if (is_string($listener))
+    protected function listenerToString($listener)
     {
-      return $listener;
-    }
+        if (is_object($listener) && $listener instanceof \Closure)
+        {
+            return 'Closure';
+        }
 
-    if (is_array($listener))
-    {
-      return sprintf('(%s, %s)', is_object($listener[0]) ? get_class($listener[0]) : $listener[0], $listener[1]);
+        if (is_string($listener))
+        {
+            return $listener;
+        }
+
+        if (is_array($listener))
+        {
+            return sprintf('(%s, %s)', is_object($listener[0]) ? get_class($listener[0]) : $listener[0], $listener[1]);
+        }
     }
-  }
 }

@@ -28,14 +28,14 @@ use Doctrine\ORM\Tools\Console\Command\EnsureProductionSettingsCommand;
  */
 class EnsureProductionSettingsDoctrineCommand extends EnsureProductionSettingsCommand
 {
-  protected function configure()
-  {
-    parent::configure();
+    protected function configure()
+    {
+        parent::configure();
 
-    $this
-      ->setName('doctrine:ensure-production-settings')
-      ->addOption('em', null, InputOption::PARAMETER_OPTIONAL, 'The entity manager to use for this command.')
-      ->setHelp(<<<EOT
+        $this
+            ->setName('doctrine:ensure-production-settings')
+            ->addOption('em', null, InputOption::PARAMETER_OPTIONAL, 'The entity manager to use for this command.')
+            ->setHelp(<<<EOT
 The <info>doctrine:cache:clear-metadata</info> command clears all metadata cache for the default entity manager:
 
   <info>./symfony doctrine:cache:clear-metadata</info>
@@ -44,13 +44,13 @@ You can also optionally specify the <comment>--em</comment> option to specify wh
 
   <info>./symfony doctrine:cache:clear-metadata --em=default</info>
 EOT
-    );
-  }
+        );
+    }
 
-  protected function execute(InputInterface $input, OutputInterface $output)
-  {
-    DoctrineCommand::setApplicationEntityManager($this->application, $input->getOption('em'));
+    protected function execute(InputInterface $input, OutputInterface $output)
+    {
+        DoctrineCommand::setApplicationEntityManager($this->application, $input->getOption('em'));
 
-    parent::execute($input, $output);
-  }
+        parent::execute($input, $output);
+    }
 }

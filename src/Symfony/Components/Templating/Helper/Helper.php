@@ -20,25 +20,25 @@ namespace Symfony\Components\Templating\Helper;
  */
 abstract class Helper implements HelperInterface
 {
-  protected $charset = 'UTF-8';
+    protected $charset = 'UTF-8';
 
-  /**
-   * Sets the default charset.
-   *
-   * @param string $charset The charset
-   */
-  public function setCharset($charset)
-  {
-    $this->charset = $charset;
-  }
+    /**
+     * Sets the default charset.
+     *
+     * @param string $charset The charset
+     */
+    public function setCharset($charset)
+    {
+        $this->charset = $charset;
+    }
 
-  /**
-   * Gets the default charset.
-   *
-   * @return string The default charset
-   */
-  public function getCharset()
-  {
-    return $this->charset;
-  }
+    /**
+     * Gets the default charset.
+     *
+     * @return string The default charset
+     */
+    public function getCharset()
+    {
+        return $this->charset;
+    }
 }

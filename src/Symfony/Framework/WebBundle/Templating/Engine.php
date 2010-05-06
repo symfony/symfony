@@ -26,115 +26,115 @@ use Symfony\Components\DependencyInjection\ContainerInterface;
  */
 class Engine extends BaseEngine
 {
-  protected $container;
-  protected $escaper;
-  protected $level;
+    protected $container;
+    protected $escaper;
+    protected $level;
 
-  /**
-   * Constructor.
-   *
-   * @param ContainerInterface $container A ContainerInterface instance
-   * @param LoaderInterface    $loader    A loader instance
-   * @param array              $renderers An array of renderer instances
-   * @param mixed              $escaper   The escaper to use (or false to disable escaping)
-   */
-  public function __construct(ContainerInterface $container, LoaderInterface $loader, array $renderers = array(), $escaper)
-  {
-    parent::__construct($loader, $renderers);
-
-    $this->level = 0;
-    $this->container = $container;
-    $this->escaper = $escaper;
-
-    $this->helpers = array();
-    foreach ($this->container->findAnnotatedServiceIds('templating.helper') as $id => $attributes)
+    /**
+     * Constructor.
+     *
+     * @param ContainerInterface $container A ContainerInterface instance
+     * @param LoaderInterface    $loader    A loader instance
+     * @param array              $renderers An array of renderer instances
+     * @param mixed              $escaper   The escaper to use (or false to disable escaping)
+     */
+    public function __construct(ContainerInterface $container, LoaderInterface $loader, array $renderers = array(), $escaper)
     {
-      if (isset($attributes[0]['alias']))
-      {
-        $this->helpers[$attributes[0]['alias']] = $id;
-      }
-    }
-  }
+        parent::__construct($loader, $renderers);
 
-  public function render($name, array $parameters = array())
-  {
-    ++$this->level;
+        $this->level = 0;
+        $this->container = $container;
+        $this->escaper = $escaper;
 
-    // escape only once
-    if (1 === $this->level && !isset($parameters['_data']))
-    {
-      $parameters = $this->escapeParameters($parameters);
+        $this->helpers = array();
+        foreach ($this->container->findAnnotatedServiceIds('templating.helper') as $id => $attributes)
+        {
+            if (isset($attributes[0]['alias']))
+            {
+                $this->helpers[$attributes[0]['alias']] = $id;
+            }
+        }
     }
 
-    $content = parent::render($name, $parameters);
-
-    --$this->level;
-
-    return $content;
-  }
-
-  public function has($name)
-  {
-    return isset($this->helpers[$name]);
-  }
-
-  /**
-   * @throws \InvalidArgumentException When the helper is not defined
-   */
-  public function get($name)
-  {
-    if (!isset($this->helpers[$name]))
+    public function render($name, array $parameters = array())
     {
-      throw new \InvalidArgumentException(sprintf('The helper "%s" is not defined.', $name));
+        ++$this->level;
+
+        // escape only once
+        if (1 === $this->level && !isset($parameters['_data']))
+        {
+            $parameters = $this->escapeParameters($parameters);
+        }
+
+        $content = parent::render($name, $parameters);
+
+        --$this->level;
+
+        return $content;
     }
 
-    if (is_string($this->helpers[$name]))
+    public function has($name)
     {
-      $this->helpers[$name] = $this->container->getService('templating.helper.'.$name);
-      $this->helpers[$name]->setCharset($this->charset);
+        return isset($this->helpers[$name]);
     }
 
-    return $this->helpers[$name];
-  }
-
-  protected function escapeParameters(array $parameters)
-  {
-    if (false !== $this->escaper)
+    /**
+     * @throws \InvalidArgumentException When the helper is not defined
+     */
+    public function get($name)
     {
-      Escaper::setCharset($this->getCharset());
+        if (!isset($this->helpers[$name]))
+        {
+            throw new \InvalidArgumentException(sprintf('The helper "%s" is not defined.', $name));
+        }
 
-      $parameters['_data'] = Escaper::escape($this->escaper, $parameters);
-      foreach ($parameters['_data'] as $key => $value)
-      {
-        $parameters[$key] = $value;
-      }
-    }
-    else
-    {
-      $parameters['_data'] = Escaper::escape('raw', $parameters);
-    }
+        if (is_string($this->helpers[$name]))
+        {
+            $this->helpers[$name] = $this->container->getService('templating.helper.'.$name);
+            $this->helpers[$name]->setCharset($this->charset);
+        }
 
-    return $parameters;
-  }
-
-  // Bundle:controller:action(:renderer)
-  protected function splitTemplateName($name)
-  {
-    $parts = explode(':', $name, 4);
-
-    $options = array(
-      'bundle'     => str_replace('\\', '/', $parts[0]),
-      'controller' => $parts[1],
-      'renderer'   => isset($parts[3]) ? $parts[3] : 'php',
-      'format'     => '',
-    );
-
-    $format = $this->container->getRequestService()->getRequestFormat();
-    if (null !== $format && 'html' !== $format)
-    {
-      $options['format'] = '.'.$format;
+        return $this->helpers[$name];
     }
 
-    return array($parts[2], $options);
-  }
+    protected function escapeParameters(array $parameters)
+    {
+        if (false !== $this->escaper)
+        {
+            Escaper::setCharset($this->getCharset());
+
+            $parameters['_data'] = Escaper::escape($this->escaper, $parameters);
+            foreach ($parameters['_data'] as $key => $value)
+            {
+                $parameters[$key] = $value;
+            }
+        }
+        else
+        {
+            $parameters['_data'] = Escaper::escape('raw', $parameters);
+        }
+
+        return $parameters;
+    }
+
+    // Bundle:controller:action(:renderer)
+    protected function splitTemplateName($name)
+    {
+        $parts = explode(':', $name, 4);
+
+        $options = array(
+            'bundle'     => str_replace('\\', '/', $parts[0]),
+            'controller' => $parts[1],
+            'renderer'   => isset($parts[3]) ? $parts[3] : 'php',
+            'format'     => '',
+        );
+
+        $format = $this->container->getRequestService()->getRequestFormat();
+        if (null !== $format && 'html' !== $format)
+        {
+            $options['format'] = '.'.$format;
+        }
+
+        return array($parts[2], $options);
+    }
 }

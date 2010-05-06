@@ -20,8 +20,8 @@ namespace Symfony\Components\Templating\Storage;
  */
 class StringStorage extends Storage
 {
-  public function getContent()
-  {
-    return $this->template;
-  }
+    public function getContent()
+    {
+        return $this->template;
+    }
 }

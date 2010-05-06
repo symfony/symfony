@@ -27,10 +27,10 @@ use Symfony\Components\Console\Command\Command as BaseCommand;
  */
 abstract class Command extends BaseCommand
 {
-  protected $container;
+    protected $container;
 
-  protected function initialize(InputInterface $input, OutputInterface $output)
-  {
-    $this->container = $this->application->getKernel()->getContainer();
-  }
+    protected function initialize(InputInterface $input, OutputInterface $output)
+    {
+        $this->container = $this->application->getKernel()->getContainer();
+    }
 }

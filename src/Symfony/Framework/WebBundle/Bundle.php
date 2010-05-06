@@ -27,24 +27,24 @@ use Symfony\Framework\WebBundle\DependencyInjection\WebExtension;
  */
 class Bundle extends BaseBundle
 {
-  public function buildContainer(ContainerInterface $container)
-  {
-    Loader::registerExtension(new WebExtension());
-
-    $dirs = array('%kernel.root_dir%/views/%%bundle%%/%%controller%%/%%name%%%%format%%.php');
-    foreach ($container->getParameter('kernel.bundle_dirs') as $dir)
+    public function buildContainer(ContainerInterface $container)
     {
-      $dirs[] = $dir.'/%%bundle%%/Resources/views/%%controller%%/%%name%%%%format%%.php';
-    }
-    $container->setParameter('templating.loader.filesystem.path', $dirs);
+        Loader::registerExtension(new WebExtension());
 
-    $configuration = new BuilderConfiguration();
-    if ($container->getParameter('kernel.debug'))
-    {
-      $loader = new XmlFileLoader(__DIR__.'/Resources/config');
-      $configuration->merge($loader->load('debug.xml'));
-    }
+        $dirs = array('%kernel.root_dir%/views/%%bundle%%/%%controller%%/%%name%%%%format%%.php');
+        foreach ($container->getParameter('kernel.bundle_dirs') as $dir)
+        {
+            $dirs[] = $dir.'/%%bundle%%/Resources/views/%%controller%%/%%name%%%%format%%.php';
+        }
+        $container->setParameter('templating.loader.filesystem.path', $dirs);
 
-    return $configuration;
-  }
+        $configuration = new BuilderConfiguration();
+        if ($container->getParameter('kernel.debug'))
+        {
+            $loader = new XmlFileLoader(__DIR__.'/Resources/config');
+            $configuration->merge($loader->load('debug.xml'));
+        }
+
+        return $configuration;
+    }
 }

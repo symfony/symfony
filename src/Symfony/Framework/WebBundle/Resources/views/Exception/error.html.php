@@ -22,28 +22,28 @@
 </head>
 <body>
 <div class="sfTContainer">
-  <a title="symfony website" href="http://www.symfony-project.org/"><img alt="symfony PHP Framework" class="sfTLogo" src="<?php echo $path ?>/sf/sf_default/images/sfTLogo.png" height="39" width="186" /></a>
-  <div class="sfTMessageContainer sfTAlert">
-    <img alt="page not found" class="sfTMessageIcon" src="<?php echo $path ?>/sf/sf_default/images/icons/tools48.png" height="48" width="48" />
-    <div class="sfTMessageWrap">
-      <h1>Oops! An Error Occurred</h1>
-      <h5>The server returned a "<?php echo $code ?> <?php echo $text ?>".</h5>
+    <a title="symfony website" href="http://www.symfony-project.org/"><img alt="symfony PHP Framework" class="sfTLogo" src="<?php echo $path ?>/sf/sf_default/images/sfTLogo.png" height="39" width="186" /></a>
+    <div class="sfTMessageContainer sfTAlert">
+        <img alt="page not found" class="sfTMessageIcon" src="<?php echo $path ?>/sf/sf_default/images/icons/tools48.png" height="48" width="48" />
+        <div class="sfTMessageWrap">
+            <h1>Oops! An Error Occurred</h1>
+            <h5>The server returned a "<?php echo $code ?> <?php echo $text ?>".</h5>
+        </div>
     </div>
-  </div>
 
-  <dl class="sfTMessageInfo">
-    <dt>Something is broken</dt>
-    <dd>Please e-mail us at [email] and let us know what you were doing when this error occurred. We will fix it as soon as possible.
-    Sorry for any inconvenience caused.</dd>
+    <dl class="sfTMessageInfo">
+        <dt>Something is broken</dt>
+        <dd>Please e-mail us at [email] and let us know what you were doing when this error occurred. We will fix it as soon as possible.
+        Sorry for any inconvenience caused.</dd>
 
-    <dt>What's next</dt>
-    <dd>
-      <ul class="sfTIconList">
-        <li class="sfTLinkMessage"><a href="javascript:history.go(-1)">Back to previous page</a></li>
-        <li class="sfTLinkMessage"><a href="/">Go to Homepage</a></li>
-      </ul>
-    </dd>
-  </dl>
+        <dt>What's next</dt>
+        <dd>
+            <ul class="sfTIconList">
+                <li class="sfTLinkMessage"><a href="javascript:history.go(-1)">Back to previous page</a></li>
+                <li class="sfTLinkMessage"><a href="/">Go to Homepage</a></li>
+            </ul>
+        </dd>
+    </dl>
 </div>
 </body>
 </html>

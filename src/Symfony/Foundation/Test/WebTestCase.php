@@ -20,27 +20,27 @@ namespace Symfony\Foundation\Test;
  */
 abstract class WebTestCase extends \PHPUnit_Framework_TestCase
 {
-  /**
-   * Creates a Client.
-   *
-   * @return Symfony\Foundation\Test\Client A Client instance
-   */
-  public function createClient(array $server = array())
-  {
-    $kernel = $this->createKernel();
-    $kernel->boot();
+    /**
+     * Creates a Client.
+     *
+     * @return Symfony\Foundation\Test\Client A Client instance
+     */
+    public function createClient(array $server = array())
+    {
+        $kernel = $this->createKernel();
+        $kernel->boot();
 
-    $client = $kernel->getContainer()->getTest_ClientService();
-    $client->setServerParameters($server);
-    $client->setTestCase($this);
+        $client = $kernel->getContainer()->getTest_ClientService();
+        $client->setServerParameters($server);
+        $client->setTestCase($this);
 
-    return $client;
-  }
+        return $client;
+    }
 
-  /**
-   * Creates a Kernel.
-   *
-   * @return Symfony\Foundation\Kernel A Kernel instance
-   */
-  abstract protected function createKernel();
+    /**
+     * Creates a Kernel.
+     *
+     * @return Symfony\Foundation\Kernel A Kernel instance
+     */
+    abstract protected function createKernel();
 }

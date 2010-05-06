@@ -20,26 +20,26 @@ namespace Symfony\Framework\WebBundle\Util;
  */
 class Mustache
 {
-  static public function renderString($string, $parameters)
-  {
-    $replacer = function ($match) use($parameters)
+    static public function renderString($string, $parameters)
     {
-      return isset($parameters[$match[1]]) ? $parameters[$match[1]] : $match[0];
-    };
+        $replacer = function ($match) use($parameters)
+        {
+            return isset($parameters[$match[1]]) ? $parameters[$match[1]] : $match[0];
+        };
 
-    return preg_replace_callback('/{{\s*(.+?)\s*}}/', $replacer, $string);
-  }
-
-  static public function renderFile($file, $parameters)
-  {
-    file_put_contents($file, static::renderString(file_get_contents($file), $parameters));
-  }
-
-  static public function renderDir($dir, $parameters)
-  {
-    foreach (new \RecursiveIteratorIterator(new \RecursiveDirectoryIterator($dir), \RecursiveIteratorIterator::LEAVES_ONLY) as $file)
-    {
-      static::renderFile((string) $file, $parameters);
+        return preg_replace_callback('/{{\s*(.+?)\s*}}/', $replacer, $string);
     }
-  }
+
+    static public function renderFile($file, $parameters)
+    {
+        file_put_contents($file, static::renderString(file_get_contents($file), $parameters));
+    }
+
+    static public function renderDir($dir, $parameters)
+    {
+        foreach (new \RecursiveIteratorIterator(new \RecursiveDirectoryIterator($dir), \RecursiveIteratorIterator::LEAVES_ONLY) as $file)
+        {
+            static::renderFile((string) $file, $parameters);
+        }
+    }
 }

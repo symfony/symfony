@@ -23,7 +23,7 @@ namespace Symfony\Components\CssSelector\Node;
  */
 interface NodeInterface
 {
-  public function __toString();
+    public function __toString();
 
-  public function toXpath();
+    public function toXpath();
 }

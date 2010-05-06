@@ -23,29 +23,29 @@ use Symfony\Components\Routing\Route;
  */
 abstract class MatcherDumper implements MatcherDumperInterface
 {
-  protected $routes;
+    protected $routes;
 
-  /**
-   * Constructor.
-   *
-   * @param RouteCollection $routes The RouteCollection to dump
-   */
-  public function __construct(RouteCollection $routes)
-  {
-    $this->routes = $routes;
-  }
+    /**
+     * Constructor.
+     *
+     * @param RouteCollection $routes The RouteCollection to dump
+     */
+    public function __construct(RouteCollection $routes)
+    {
+        $this->routes = $routes;
+    }
 
-  /**
-   * Dumps the routing.
-   *
-   * @param  array  $options An array of options
-   *
-   * @return string The representation of the routing
-   *
-   * @throws \LogicException When this abstract class is not implemented
-   */
-  public function dump(array $options = array())
-  {
-    throw new \LogicException('You must extend this abstract class and implement the dump() method.');
-  }
+    /**
+     * Dumps the routing.
+     *
+     * @param  array  $options An array of options
+     *
+     * @return string The representation of the routing
+     *
+     * @throws \LogicException When this abstract class is not implemented
+     */
+    public function dump(array $options = array())
+    {
+        throw new \LogicException('You must extend this abstract class and implement the dump() method.');
+    }
 }

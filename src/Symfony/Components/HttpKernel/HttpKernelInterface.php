@@ -20,22 +20,22 @@ namespace Symfony\Components\HttpKernel;
  */
 interface HttpKernelInterface
 {
-  /**
-   * Handles a request to convert it to a response.
-   *
-   * @param  Request $request A Request instance
-   * @param  Boolean $main    Whether this is the main request or not
-   *
-   * @return Response $response A Response instance
-   *
-   * @throws \Exception When Exception couldn't be caught by event processing
-   */
-  public function handle(Request $request = null, $main = true);
+    /**
+     * Handles a request to convert it to a response.
+     *
+     * @param  Request $request A Request instance
+     * @param  Boolean $main    Whether this is the main request or not
+     *
+     * @return Response $response A Response instance
+     *
+     * @throws \Exception When Exception couldn't be caught by event processing
+     */
+    public function handle(Request $request = null, $main = true);
 
-  /**
-   * Gets the Request instance associated with the main request.
-   *
-   * @return Request A Request instance
-   */
-  public function getRequest();
+    /**
+     * Gets the Request instance associated with the main request.
+     *
+     * @return Request A Request instance
+     */
+    public function getRequest();
 }

@@ -23,58 +23,58 @@ use Symfony\Framework\WebBundle\User;
  */
 class UserHelper extends Helper
 {
-  protected $user;
+    protected $user;
 
-  /**
-   * Constructor.
-   *
-   * @param Request $request A Request instance
-   */
-  public function __construct(User $user)
-  {
-    $this->user = $user;
-  }
+    /**
+     * Constructor.
+     *
+     * @param Request $request A Request instance
+     */
+    public function __construct(User $user)
+    {
+        $this->user = $user;
+    }
 
-  /**
-   * Returns a user attribute
-   *
-   * @param string $name    The attribute name
-   * @param mixed  $default The default value
-   *
-   * @return mixed
-   */
-  public function getAttribute($name, $default = null)
-  {
-    return $this->user->getAttribute($name, $default);
-  }
+    /**
+     * Returns a user attribute
+     *
+     * @param string $name    The attribute name
+     * @param mixed  $default The default value
+     *
+     * @return mixed
+     */
+    public function getAttribute($name, $default = null)
+    {
+        return $this->user->getAttribute($name, $default);
+    }
 
-  /**
-   * Returns the user culture
-   *
-   * @return string
-   */
-  public function getCulture()
-  {
-    return $this->user->getCulture();
-  }
+    /**
+     * Returns the user culture
+     *
+     * @return string
+     */
+    public function getCulture()
+    {
+        return $this->user->getCulture();
+    }
 
-  public function getFlash($name, $default = null)
-  {
-    return $this->user->getFlash($name, $default);
-  }
+    public function getFlash($name, $default = null)
+    {
+        return $this->user->getFlash($name, $default);
+    }
 
-  public function hasFlash($name)
-  {
-    return $this->user->hasFlash($name);
-  }
+    public function hasFlash($name)
+    {
+        return $this->user->hasFlash($name);
+    }
 
-  /**
-   * Returns the canonical name of this helper.
-   *
-   * @return string The canonical name
-   */
-  public function getName()
-  {
-    return 'user';
-  }
+    /**
+     * Returns the canonical name of this helper.
+     *
+     * @return string The canonical name
+     */
+    public function getName()
+    {
+        return 'user';
+    }
 }

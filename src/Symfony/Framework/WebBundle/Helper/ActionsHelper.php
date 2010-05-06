@@ -24,35 +24,35 @@ use Symfony\Components\OutputEscaper\Escaper;
  */
 class ActionsHelper extends Helper
 {
-  protected $container;
+    protected $container;
 
-  /**
-   * Constructor.
-   *
-   * @param Constructor $container A ContainerInterface instance
-   */
-  public function __construct(ContainerInterface $container)
-  {
-    $this->container = $container;
-  }
+    /**
+     * Constructor.
+     *
+     * @param Constructor $container A ContainerInterface instance
+     */
+    public function __construct(ContainerInterface $container)
+    {
+        $this->container = $container;
+    }
 
-  public function output($controller, array $parameters = array())
-  {
-    echo $this->render($controller, $parameters);
-  }
+    public function output($controller, array $parameters = array())
+    {
+        echo $this->render($controller, $parameters);
+    }
 
-  public function render($controller, array $parameters = array())
-  {
-    return $this->container->getControllerLoaderService()->run($controller, Escaper::unescape($parameters))->getContent();
-  }
+    public function render($controller, array $parameters = array())
+    {
+        return $this->container->getControllerLoaderService()->run($controller, Escaper::unescape($parameters))->getContent();
+    }
 
-  /**
-   * Returns the canonical name of this helper.
-   *
-   * @return string The canonical name
-   */
-  public function getName()
-  {
-    return 'actions';
-  }
+    /**
+     * Returns the canonical name of this helper.
+     *
+     * @return string The canonical name
+     */
+    public function getName()
+    {
+        return 'actions';
+    }
 }

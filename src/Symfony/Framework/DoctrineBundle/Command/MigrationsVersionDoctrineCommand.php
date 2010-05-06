@@ -26,21 +26,21 @@ use DoctrineExtensions\Migrations\Tools\Console\Command\VersionCommand;
  */
 class MigrationsVersionDoctrineCommand extends VersionCommand
 {
-  protected function configure()
-  {
-    parent::configure();
+    protected function configure()
+    {
+        parent::configure();
 
-    $this
-      ->setName('doctrine:migrations:version')
-      ->addOption('bundle', null, InputOption::PARAMETER_REQUIRED, 'The bundle to load migrations configuration from.')
-      ->addOption('em', null, InputOption::PARAMETER_OPTIONAL, 'The entity manager to use for this command.')
-    ;
-  }
+        $this
+            ->setName('doctrine:migrations:version')
+            ->addOption('bundle', null, InputOption::PARAMETER_REQUIRED, 'The bundle to load migrations configuration from.')
+            ->addOption('em', null, InputOption::PARAMETER_OPTIONAL, 'The entity manager to use for this command.')
+        ;
+    }
 
-  public function execute(InputInterface $input, OutputInterface $output)
-  {
-    DoctrineCommand::setApplicationEntityManager($this->application, $input->getOption('em'));
+    public function execute(InputInterface $input, OutputInterface $output)
+    {
+        DoctrineCommand::setApplicationEntityManager($this->application, $input->getOption('em'));
 
-    parent::execute($input, $output);
-  }
+        parent::execute($input, $output);
+    }
 }

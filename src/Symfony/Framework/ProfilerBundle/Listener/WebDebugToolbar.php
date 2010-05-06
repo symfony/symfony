@@ -25,81 +25,81 @@ use Symfony\Framework\ProfilerBundle\DataCollector\DataCollectorManager;
  */
 class WebDebugToolbar
 {
-  protected $container;
-  protected $collectorManager;
+    protected $container;
+    protected $collectorManager;
 
-  public function __construct(ContainerInterface $container, DataCollectorManager $collectorManager)
-  {
-    $this->container = $container;
-    $this->collectorManager = $collectorManager;
-  }
-
-  public function register()
-  {
-    $this->container->getEventDispatcherService()->connect('core.response', array($this, 'handle'));
-  }
-
-  public function handle(Event $event, Response $response)
-  {
-    if (!$event->getParameter('main_request'))
+    public function __construct(ContainerInterface $container, DataCollectorManager $collectorManager)
     {
-      return $response;
+        $this->container = $container;
+        $this->collectorManager = $collectorManager;
     }
 
-    $request = $this->container->getRequestService();
-
-    if (
-      '3' === substr($response->getStatusCode(), 0, 1)
-      ||
-      ($response->headers->has('Content-Type') && false === strpos($response->headers->get('Content-Type'), 'html'))
-      ||
-      'html' !== $request->getRequestFormat()
-      ||
-      $request->isXmlHttpRequest()
-    )
+    public function register()
     {
-      return $response;
+        $this->container->getEventDispatcherService()->connect('core.response', array($this, 'handle'));
     }
 
-    $response->setContent($this->injectToolbar($response));
-
-    return $response;
-  }
-
-  /**
-   * Injects the web debug toolbar into a given HTML string.
-   *
-   * @param string $content The HTML content
-   *
-   * @return Response A Response instance
-   */
-  protected function injectToolbar(Response $response)
-  {
-    $data = '';
-    foreach ($this->collectorManager->getCollectors() as $name => $collector)
+    public function handle(Event $event, Response $response)
     {
-      $data .= $collector->getSummary();
+        if (!$event->getParameter('main_request'))
+        {
+            return $response;
+        }
+
+        $request = $this->container->getRequestService();
+
+        if (
+            '3' === substr($response->getStatusCode(), 0, 1)
+            ||
+            ($response->headers->has('Content-Type') && false === strpos($response->headers->get('Content-Type'), 'html'))
+            ||
+            'html' !== $request->getRequestFormat()
+            ||
+            $request->isXmlHttpRequest()
+        )
+        {
+            return $response;
+        }
+
+        $response->setContent($this->injectToolbar($response));
+
+        return $response;
     }
 
-    $toolbar = <<<EOF
+    /**
+     * Injects the web debug toolbar into a given HTML string.
+     *
+     * @param string $content The HTML content
+     *
+     * @return Response A Response instance
+     */
+    protected function injectToolbar(Response $response)
+    {
+        $data = '';
+        foreach ($this->collectorManager->getCollectors() as $name => $collector)
+        {
+            $data .= $collector->getSummary();
+        }
+
+        $toolbar = <<<EOF
 
 <!-- START of Symfony 2 Web Debug Toolbar -->
 <div style="clear: both; height: 40px;"></div>
 <div style="position: fixed; bottom: 0px; left:0; z-index: 6000000; width: 100%; background: #dde4eb; border-top: 1px solid #bbb; padding: 5px; margin: 0; font: 11px Verdana, Arial, sans-serif; color: #222;">
-  $data
+    $data
 </div>
 <!-- END of Symfony 2 Web Debug Toolbar -->
 
 EOF;
 
-    $toolbar = "\n".str_replace("\n", '', $toolbar)."\n";
-    $count = 0;
-    $content = str_ireplace('</body>', $toolbar.'</body>', $response->getContent(), $count);
-    if (!$count)
-    {
-      $content .= $toolbar;
-    }
+        $toolbar = "\n".str_replace("\n", '', $toolbar)."\n";
+        $count = 0;
+        $content = str_ireplace('</body>', $toolbar.'</body>', $response->getContent(), $count);
+        if (!$count)
+        {
+            $content .= $toolbar;
+        }
 
-    return $content;
-  }
+        return $content;
+    }
 }

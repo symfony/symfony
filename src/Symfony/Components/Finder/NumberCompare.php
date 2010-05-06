@@ -35,75 +35,75 @@ namespace Symfony\Components\Finder;
  */
 class NumberCompare
 {
-  protected $target;
-  protected $comparison;
+    protected $target;
+    protected $comparison;
 
-  /**
-   * Constructor.
-   *
-   * @param string $test A comparison string
-   */
-  public function __construct($test)
-  {
-    if (!preg_match('#^\s*([<>=]=?)?\s*([0-9\.]+)\s*([kmg]i?)?\s*$#i', $test, $matches))
+    /**
+     * Constructor.
+     *
+     * @param string $test A comparison string
+     */
+    public function __construct($test)
     {
-      throw new \InvalidArgumentException(sprintf('Don\'t understand "%s" as a test.', $test));
+        if (!preg_match('#^\s*([<>=]=?)?\s*([0-9\.]+)\s*([kmg]i?)?\s*$#i', $test, $matches))
+        {
+            throw new \InvalidArgumentException(sprintf('Don\'t understand "%s" as a test.', $test));
+        }
+
+        $this->target = $matches[2];
+        $this->comparison = isset($matches[1]) ? $matches[1] : '==';
+
+        $magnitude = strtolower(isset($matches[3]) ? $matches[3] : '');
+        switch ($magnitude)
+        {
+            case 'k':
+                $this->target *= 1000;
+                break;
+            case 'ki':
+                $this->target *= 1024;
+                break;
+            case 'm':
+                $this->target *= 1000000;
+                break;
+            case 'mi':
+                $this->target *= 1024*1024;
+                break;
+            case 'g':
+                $this->target *= 1000000000;
+                break;
+            case 'gi':
+                $this->target *= 1024*1024*1024;
+                break;
+        }
     }
 
-    $this->target = $matches[2];
-    $this->comparison = isset($matches[1]) ? $matches[1] : '==';
-
-    $magnitude = strtolower(isset($matches[3]) ? $matches[3] : '');
-    switch ($magnitude)
+    /**
+     * Tests a number against the test.
+     *
+     * @throws \InvalidArgumentException If the test is not understood
+     */
+    public function test($number)
     {
-      case 'k':
-        $this->target *= 1000;
-        break;
-      case 'ki':
-        $this->target *= 1024;
-        break;
-      case 'm':
-        $this->target *= 1000000;
-        break;
-      case 'mi':
-        $this->target *= 1024*1024;
-        break;
-      case 'g':
-        $this->target *= 1000000000;
-        break;
-      case 'gi':
-        $this->target *= 1024*1024*1024;
-        break;
-    }
-  }
+        if ($this->comparison === '>')
+        {
+            return ($number > $this->target);
+        }
 
-  /**
-   * Tests a number against the test.
-   *
-   * @throws \InvalidArgumentException If the test is not understood
-   */
-  public function test($number)
-  {
-    if ($this->comparison === '>')
-    {
-      return ($number > $this->target);
-    }
+        if ($this->comparison === '>=')
+        {
+            return ($number >= $this->target);
+        }
 
-    if ($this->comparison === '>=')
-    {
-      return ($number >= $this->target);
-    }
+        if ($this->comparison === '<')
+        {
+            return ($number < $this->target);
+        }
 
-    if ($this->comparison === '<')
-    {
-      return ($number < $this->target);
-    }
+        if ($this->comparison === '<=')
+        {
+            return ($number <= $this->target);
+        }
 
-    if ($this->comparison === '<=')
-    {
-      return ($number <= $this->target);
+        return ($number == $this->target);
     }
-
-    return ($number == $this->target);
-  }
 }

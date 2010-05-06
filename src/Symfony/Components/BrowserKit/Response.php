@@ -20,97 +20,97 @@ namespace Symfony\Components\BrowserKit;
  */
 class Response
 {
-  protected $content;
-  protected $status;
-  protected $headers;
-  protected $cookies;
+    protected $content;
+    protected $status;
+    protected $headers;
+    protected $cookies;
 
-  /**
-   * Constructor.
-   *
-   * @param string  $content The content of the response
-   * @param integer $status  The response status code
-   * @param array   $headers An array of headers
-   * @param array   $cookies An array of cookies
-   */
-  public function __construct($content = '', $status = 200, $headers = array(), $cookies = array())
-  {
-    $this->content = $content;
-    $this->status  = $status;
-    $this->headers = $headers;
-    $this->cookies = $cookies;
-  }
-
-  public function __toString()
-  {
-    $headers = '';
-    foreach ($this->headers as $name => $value)
+    /**
+     * Constructor.
+     *
+     * @param string  $content The content of the response
+     * @param integer $status  The response status code
+     * @param array   $headers An array of headers
+     * @param array   $cookies An array of cookies
+     */
+    public function __construct($content = '', $status = 200, $headers = array(), $cookies = array())
     {
-      $headers .= sprintf("%s: %s\n", $name, $value);
-    }
-    foreach ($this->cookies as $name => $cookie)
-    {
-      $headers .= sprintf("Set-Cookie: %s=%s\n", $name, $cookie['value']);
+        $this->content = $content;
+        $this->status  = $status;
+        $this->headers = $headers;
+        $this->cookies = $cookies;
     }
 
-    return $headers."\n".$this->content;
-  }
-
-  /**
-   * Gets the response content.
-   *
-   * @return string The response content
-   */
-  public function getContent()
-  {
-    return $this->content;
-  }
-
-  /**
-   * Gets the response status code.
-   *
-   * @return integer The response status code
-   */
-  public function getStatus()
-  {
-    return $this->status;
-  }
-
-  /**
-   * Gets the response headers.
-   *
-   * @return array The response headers
-   */
-  public function getHeaders()
-  {
-    return $this->headers;
-  }
-
-  /**
-   * Gets a response header.
-   *
-   * @param string $header The header name
-   *
-   * @return string The header value
-   */
-  public function getHeader($header)
-  {
-    foreach ($this->headers as $key => $value)
+    public function __toString()
     {
-      if (str_replace('-', '_', strtolower($key)) == str_replace('-', '_', strtolower($header)))
-      {
-        return $value;
-      }
-    }
-  }
+        $headers = '';
+        foreach ($this->headers as $name => $value)
+        {
+            $headers .= sprintf("%s: %s\n", $name, $value);
+        }
+        foreach ($this->cookies as $name => $cookie)
+        {
+            $headers .= sprintf("Set-Cookie: %s=%s\n", $name, $cookie['value']);
+        }
 
-  /**
-   * Gets the response cookies.
-   *
-   * @return array The response cookies
-   */
-  public function getCookies()
-  {
-    return $this->cookies;
-  }
+        return $headers."\n".$this->content;
+    }
+
+    /**
+     * Gets the response content.
+     *
+     * @return string The response content
+     */
+    public function getContent()
+    {
+        return $this->content;
+    }
+
+    /**
+     * Gets the response status code.
+     *
+     * @return integer The response status code
+     */
+    public function getStatus()
+    {
+        return $this->status;
+    }
+
+    /**
+     * Gets the response headers.
+     *
+     * @return array The response headers
+     */
+    public function getHeaders()
+    {
+        return $this->headers;
+    }
+
+    /**
+     * Gets a response header.
+     *
+     * @param string $header The header name
+     *
+     * @return string The header value
+     */
+    public function getHeader($header)
+    {
+        foreach ($this->headers as $key => $value)
+        {
+            if (str_replace('-', '_', strtolower($key)) == str_replace('-', '_', strtolower($header)))
+            {
+                return $value;
+            }
+        }
+    }
+
+    /**
+     * Gets the response cookies.
+     *
+     * @return array The response cookies
+     */
+    public function getCookies()
+    {
+        return $this->cookies;
+    }
 }

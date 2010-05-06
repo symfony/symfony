@@ -23,46 +23,46 @@ use Symfony\Components\Console\Application;
  */
 abstract class Bundle implements BundleInterface
 {
-  public function buildContainer(ContainerInterface $container)
-  {
-  }
-
-  public function boot(ContainerInterface $container)
-  {
-  }
-
-  public function shutdown(ContainerInterface $container)
-  {
-  }
-
-  public function registerCommands(Application $application)
-  {
-    foreach ($application->getKernel()->getBundleDirs() as $dir)
+    public function buildContainer(ContainerInterface $container)
     {
-      $bundleBase = dirname(str_replace('\\', '/', get_class($this)));
-      $commandDir = $dir.'/'.basename($bundleBase).'/Command';
-      if (!is_dir($commandDir))
-      {
-        continue;
-      }
-
-      // look for commands
-      foreach (new \RecursiveIteratorIterator(new \RecursiveDirectoryIterator($commandDir), \RecursiveIteratorIterator::LEAVES_ONLY) as $file)
-      {
-        if ($file->isDir() || substr($file, -4) !== '.php')
-        {
-          continue;
-        }
-
-        $class = str_replace('/', '\\', $bundleBase).'\\Command\\'.str_replace(realpath($commandDir).'/', '', basename(realpath($file), '.php'));
-
-        $r = new \ReflectionClass($class);
-
-        if ($r->isSubclassOf('Symfony\\Components\\Console\\Command\\Command') && !$r->isAbstract())
-        {
-          $application->addCommand(new $class());
-        }
-      }
     }
-  }
+
+    public function boot(ContainerInterface $container)
+    {
+    }
+
+    public function shutdown(ContainerInterface $container)
+    {
+    }
+
+    public function registerCommands(Application $application)
+    {
+        foreach ($application->getKernel()->getBundleDirs() as $dir)
+        {
+            $bundleBase = dirname(str_replace('\\', '/', get_class($this)));
+            $commandDir = $dir.'/'.basename($bundleBase).'/Command';
+            if (!is_dir($commandDir))
+            {
+                continue;
+            }
+
+            // look for commands
+            foreach (new \RecursiveIteratorIterator(new \RecursiveDirectoryIterator($commandDir), \RecursiveIteratorIterator::LEAVES_ONLY) as $file)
+            {
+                if ($file->isDir() || substr($file, -4) !== '.php')
+                {
+                    continue;
+                }
+
+                $class = str_replace('/', '\\', $bundleBase).'\\Command\\'.str_replace(realpath($commandDir).'/', '', basename(realpath($file), '.php'));
+
+                $r = new \ReflectionClass($class);
+
+                if ($r->isSubclassOf('Symfony\\Components\\Console\\Command\\Command') && !$r->isAbstract())
+                {
+                    $application->addCommand(new $class());
+                }
+            }
+        }
+    }
 }

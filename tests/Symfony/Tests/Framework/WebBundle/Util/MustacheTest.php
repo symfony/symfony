@@ -16,43 +16,43 @@ use Symfony\Framework\WebBundle\Util\Filesystem;
 
 class MustacheTest extends \PHPUnit_Framework_TestCase
 {
-  protected $dir;
+    protected $dir;
 
-  public function setUp()
-  {
-    $dir = __DIR__.'/../../../../../fixtures/Symfony/Framework/WebBundle/Util';
+    public function setUp()
+    {
+        $dir = __DIR__.'/../../../../../fixtures/Symfony/Framework/WebBundle/Util';
 
-    $this->dir = sys_get_temp_dir().'/mustache';
-    $filesystem = new Filesystem();
-    $filesystem->mirror($dir, $this->dir);
-  }
+        $this->dir = sys_get_temp_dir().'/mustache';
+        $filesystem = new Filesystem();
+        $filesystem->mirror($dir, $this->dir);
+    }
 
-  public function tearDown()
-  {
-    $filesystem = new Filesystem();
-    $filesystem->remove($this->dir);
-  }
+    public function tearDown()
+    {
+        $filesystem = new Filesystem();
+        $filesystem->remove($this->dir);
+    }
 
-  public function testRenderString()
-  {
-    $template = 'Hi {{ you }}, my name is {{ me }}!';
-    $expected = 'Hi {{ you }}, my name is Kris!';
+    public function testRenderString()
+    {
+        $template = 'Hi {{ you }}, my name is {{ me }}!';
+        $expected = 'Hi {{ you }}, my name is Kris!';
 
-    $this->assertEquals(Mustache::renderString($template, array('me' => 'Kris')), $expected, '::renderString() does not modify unknown parameters');
-  }
+        $this->assertEquals(Mustache::renderString($template, array('me' => 'Kris')), $expected, '::renderString() does not modify unknown parameters');
+    }
 
-  public function testRenderFile()
-  {
-    Mustache::renderFile($this->dir.'/template.txt', array('me' => 'Fabien'));
+    public function testRenderFile()
+    {
+        Mustache::renderFile($this->dir.'/template.txt', array('me' => 'Fabien'));
 
-    $this->assertEquals('Hello Fabien', file_get_contents($this->dir.'/template.txt'), '::renderFile() renders a file');
-  }
+        $this->assertEquals('Hello Fabien', file_get_contents($this->dir.'/template.txt'), '::renderFile() renders a file');
+    }
 
-  public function testRenderDir()
-  {
-    Mustache::renderDir($this->dir, array('me' => 'Fabien'));
+    public function testRenderDir()
+    {
+        Mustache::renderDir($this->dir, array('me' => 'Fabien'));
 
-    $this->assertEquals('Hello Fabien', file_get_contents($this->dir.'/template.txt'), '::renderDir() renders a directory');
-    $this->assertEquals('Hello Fabien', file_get_contents($this->dir.'/foo/bar.txt'), '::renderDir() renders a directory');
-  }
+        $this->assertEquals('Hello Fabien', file_get_contents($this->dir.'/template.txt'), '::renderDir() renders a directory');
+        $this->assertEquals('Hello Fabien', file_get_contents($this->dir.'/foo/bar.txt'), '::renderDir() renders a directory');
+    }
 }

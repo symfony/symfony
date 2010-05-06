@@ -23,181 +23,181 @@ namespace Symfony\Components\CssSelector;
  */
 class XPathExpr
 {
-  protected $prefix;
-  protected $path;
-  protected $element;
-  protected $condition;
-  protected $starPrefix;
+    protected $prefix;
+    protected $path;
+    protected $element;
+    protected $condition;
+    protected $starPrefix;
 
-  public function __construct($prefix = null, $path = null, $element = '*', $condition = null, $starPrefix = false)
-  {
-    $this->prefix = $prefix;
-    $this->path = $path;
-    $this->element = $element;
-    $this->condition = $condition;
-    $this->starPrefix = $starPrefix;
-  }
-
-  public function getPrefix()
-  {
-    return $this->prefix;
-  }
-
-  public function getPath()
-  {
-    return $this->path;
-  }
-
-  public function hasStarPrefix()
-  {
-    return $this->starPrefix;
-  }
-
-  public function getElement()
-  {
-    return $this->element;
-  }
-
-  public function getCondition()
-  {
-    return $this->condition;
-  }
-
-  public function __toString()
-  {
-    $path = '';
-    if (null !== $this->prefix)
+    public function __construct($prefix = null, $path = null, $element = '*', $condition = null, $starPrefix = false)
     {
-      $path .= $this->prefix;
+        $this->prefix = $prefix;
+        $this->path = $path;
+        $this->element = $element;
+        $this->condition = $condition;
+        $this->starPrefix = $starPrefix;
     }
 
-    if (null !== $this->path)
+    public function getPrefix()
     {
-      $path .= $this->path;
+        return $this->prefix;
     }
 
-    $path .= $this->element;
-
-    if ($this->condition)
+    public function getPath()
     {
-      $path .= sprintf('[%s]', $this->condition);
+        return $this->path;
     }
 
-    return $path;
-  }
-
-  public function addCondition($condition)
-  {
-    if ($this->condition)
+    public function hasStarPrefix()
     {
-      $this->condition = sprintf('%s and (%s)', $this->condition, $condition);
-    }
-    else
-    {
-      $this->condition = $condition;
-    }
-  }
-
-  public function addPrefix($prefix)
-  {
-    if ($this->prefix)
-    {
-      $this->prefix = $prefix.$this->prefix;
-    }
-    else
-    {
-      $this->prefix = $prefix;
-    }
-  }
-
-  public function addNameTest()
-  {
-    if ($this->element == '*')
-    {
-      // We weren't doing a test anyway
-      return;
+        return $this->starPrefix;
     }
 
-    $this->addCondition(sprintf('name() = %s', XPathExpr::xpathLiteral($this->element)));
-    $this->element = '*';
-  }
-
-  public function addStarPrefix()
-  {
-    /*
-    Adds a /* prefix if there is no prefix.  This is when you need
-    to keep context's constrained to a single parent.
-    */
-    if ($this->path)
+    public function getElement()
     {
-      $this->path .= '*/';
-    }
-    else
-    {
-      $this->path = '*/';
+        return $this->element;
     }
 
-    $this->starPrefix = true;
-  }
-
-  public function join($combiner, $other)
-  {
-    $prefix = (string) $this;
-
-    $prefix .= $combiner;
-    $path = $other->getPrefix().$other->getPath();
-
-    /* We don't need a star prefix if we are joining to this other
-       prefix; so we'll get rid of it */
-    if ($other->hasStarPrefix() && $path == '*/')
+    public function getCondition()
     {
-      $path = '';
-    }
-    $this->prefix = $prefix;
-    $this->path = $path;
-    $this->element = $other->getElement();
-    $this->condition = $other->GetCondition();
-  }
-
-  static public function xpathLiteral($s)
-  {
-    if ($s instanceof Node\ElementNode)
-    {
-      // This is probably a symbol that looks like an expression...
-      $s = $s->formatElement();
-    }
-    else
-    {
-      $s = (string) $s;
+        return $this->condition;
     }
 
-    if (false === strpos($s, "'"))
+    public function __toString()
     {
-      return sprintf("'%s'", $s);
+        $path = '';
+        if (null !== $this->prefix)
+        {
+            $path .= $this->prefix;
+        }
+
+        if (null !== $this->path)
+        {
+            $path .= $this->path;
+        }
+
+        $path .= $this->element;
+
+        if ($this->condition)
+        {
+            $path .= sprintf('[%s]', $this->condition);
+        }
+
+        return $path;
     }
 
-    if (false === strpos($s, '"'))
+    public function addCondition($condition)
     {
-      return sprintf('"%s"', $s);
+        if ($this->condition)
+        {
+            $this->condition = sprintf('%s and (%s)', $this->condition, $condition);
+        }
+        else
+        {
+            $this->condition = $condition;
+        }
     }
 
-    $string = $s;
-    $parts = array();
-    while (true)
+    public function addPrefix($prefix)
     {
-      if (false !== $pos = strpos($string, "'"))
-      {
-        $parts[] = sprintf("'%s'", substr($string, 0, $pos));
-        $parts[] = "\"'\"";
-        $string = substr($string, $pos + 1);
-      }
-      else
-      {
-        $parts[] = "'$string'";
-        break;
-      }
+        if ($this->prefix)
+        {
+            $this->prefix = $prefix.$this->prefix;
+        }
+        else
+        {
+            $this->prefix = $prefix;
+        }
     }
 
-    return sprintf('concat(%s)', implode($parts, ', '));
-  }
+    public function addNameTest()
+    {
+        if ($this->element == '*')
+        {
+            // We weren't doing a test anyway
+            return;
+        }
+
+        $this->addCondition(sprintf('name() = %s', XPathExpr::xpathLiteral($this->element)));
+        $this->element = '*';
+    }
+
+    public function addStarPrefix()
+    {
+        /*
+        Adds a /* prefix if there is no prefix.  This is when you need
+        to keep context's constrained to a single parent.
+        */
+        if ($this->path)
+        {
+            $this->path .= '*/';
+        }
+        else
+        {
+            $this->path = '*/';
+        }
+
+        $this->starPrefix = true;
+    }
+
+    public function join($combiner, $other)
+    {
+        $prefix = (string) $this;
+
+        $prefix .= $combiner;
+        $path = $other->getPrefix().$other->getPath();
+
+        /* We don't need a star prefix if we are joining to this other
+             prefix; so we'll get rid of it */
+        if ($other->hasStarPrefix() && $path == '*/')
+        {
+            $path = '';
+        }
+        $this->prefix = $prefix;
+        $this->path = $path;
+        $this->element = $other->getElement();
+        $this->condition = $other->GetCondition();
+    }
+
+    static public function xpathLiteral($s)
+    {
+        if ($s instanceof Node\ElementNode)
+        {
+            // This is probably a symbol that looks like an expression...
+            $s = $s->formatElement();
+        }
+        else
+        {
+            $s = (string) $s;
+        }
+
+        if (false === strpos($s, "'"))
+        {
+            return sprintf("'%s'", $s);
+        }
+
+        if (false === strpos($s, '"'))
+        {
+            return sprintf('"%s"', $s);
+        }
+
+        $string = $s;
+        $parts = array();
+        while (true)
+        {
+            if (false !== $pos = strpos($string, "'"))
+            {
+                $parts[] = sprintf("'%s'", substr($string, 0, $pos));
+                $parts[] = "\"'\"";
+                $string = substr($string, $pos + 1);
+            }
+            else
+            {
+                $parts[] = "'$string'";
+                break;
+            }
+        }
+
+        return sprintf('concat(%s)', implode($parts, ', '));
+    }
 }

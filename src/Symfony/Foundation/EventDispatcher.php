@@ -25,50 +25,50 @@ use Symfony\Components\DependencyInjection\ContainerInterface;
  */
 class EventDispatcher extends BaseEventDispatcher
 {
-  protected $container;
+    protected $container;
 
-  /**
-   * Constructor.
-   *
-   */
-  public function __construct(ContainerInterface $container)
-  {
-    $this->container = $container;
-
-    foreach ($container->findAnnotatedServiceIds('kernel.listener') as $id => $attributes)
+    /**
+     * Constructor.
+     *
+     */
+    public function __construct(ContainerInterface $container)
     {
-      foreach ($attributes as $attribute)
-      {
-        if (isset($attribute['event']))
+        $this->container = $container;
+
+        foreach ($container->findAnnotatedServiceIds('kernel.listener') as $id => $attributes)
         {
-          $this->connect($attribute['event'], array($id, isset($attribute['method']) ? $attribute['method'] : 'handle'));
+            foreach ($attributes as $attribute)
+            {
+                if (isset($attribute['event']))
+                {
+                    $this->connect($attribute['event'], array($id, isset($attribute['method']) ? $attribute['method'] : 'handle'));
+                }
+            }
         }
-      }
     }
-  }
 
-  /**
-   * Returns all listeners associated with a given event name.
-   *
-   * @param  string   $name    The event name
-   *
-   * @return array  An array of listeners
-   */
-  public function getListeners($name)
-  {
-    if (!isset($this->listeners[$name]))
+    /**
+     * Returns all listeners associated with a given event name.
+     *
+     * @param  string   $name    The event name
+     *
+     * @return array  An array of listeners
+     */
+    public function getListeners($name)
     {
-      return array();
-    }
+        if (!isset($this->listeners[$name]))
+        {
+            return array();
+        }
 
-    foreach ($this->listeners[$name] as $i => $listener)
-    {
-      if (is_array($listener) && is_string($listener[0]))
-      {
-        $this->listeners[$name][$i] = array($this->container->getService($listener[0]), $listener[1]);
-      }
-    }
+        foreach ($this->listeners[$name] as $i => $listener)
+        {
+            if (is_array($listener) && is_string($listener[0]))
+            {
+                $this->listeners[$name][$i] = array($this->container->getService($listener[0]), $listener[1]);
+            }
+        }
 
-    return $this->listeners[$name];
-  }
+        return $this->listeners[$name];
+    }
 }

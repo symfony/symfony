@@ -25,8 +25,8 @@ use Symfony\Framework\SwiftmailerBundle\DependencyInjection\SwiftmailerExtension
  */
 class Bundle extends BaseBundle
 {
-  public function buildContainer(ContainerInterface $container)
-  {
-    Loader::registerExtension(new SwiftmailerExtension());
-  }
+    public function buildContainer(ContainerInterface $container)
+    {
+        Loader::registerExtension(new SwiftmailerExtension());
+    }
 }

@@ -17,22 +17,22 @@ use Symfony\Components\DomCrawler\Field\TextareaFormField;
 
 class TextareaFormFieldTest extends FormFieldTestCase
 {
-  public function testInitialize()
-  {
-    $node = $this->createNode('textarea', 'foo bar');
-    $field = new TextareaFormField($node);
-
-    $this->assertEquals('foo bar', $field->getValue(), '->initialize() sets the value of the field to the textare node value');
-
-    $node = $this->createNode('input', '');
-    try
+    public function testInitialize()
     {
-      $field = new TextareaFormField($node);
-      $this->fail('->initialize() throws a \LogicException if the node is not a textarea');
+        $node = $this->createNode('textarea', 'foo bar');
+        $field = new TextareaFormField($node);
+
+        $this->assertEquals('foo bar', $field->getValue(), '->initialize() sets the value of the field to the textare node value');
+
+        $node = $this->createNode('input', '');
+        try
+        {
+            $field = new TextareaFormField($node);
+            $this->fail('->initialize() throws a \LogicException if the node is not a textarea');
+        }
+        catch (\LogicException $e)
+        {
+            $this->assertTrue(true, '->initialize() throws a \LogicException if the node is not a textarea');
+        }
     }
-    catch (\LogicException $e)
-    {
-      $this->assertTrue(true, '->initialize() throws a \LogicException if the node is not a textarea');
-    }
-  }
 }

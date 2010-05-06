@@ -1,3 +1,3 @@
 /*
-  <?php echo $code.' '.$text."\n" ?>
+    <?php echo $code.' '.$text."\n" ?>
 */

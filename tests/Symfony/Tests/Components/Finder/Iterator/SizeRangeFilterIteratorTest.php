@@ -18,22 +18,22 @@ require_once __DIR__.'/RealIteratorTestCase.php';
 
 class SizeRangeFilterIteratorTest extends RealIteratorTestCase
 {
-  /**
-   * @dataProvider getAcceptData
-   */
-  public function testAccept($size, $expected)
-  {
-    $inner = new Iterator(self::$files);
+    /**
+     * @dataProvider getAcceptData
+     */
+    public function testAccept($size, $expected)
+    {
+        $inner = new Iterator(self::$files);
 
-    $iterator = new SizeRangeFilterIterator($inner, $size);
+        $iterator = new SizeRangeFilterIterator($inner, $size);
 
-    $this->assertIterator($expected, $iterator);
-  }
+        $this->assertIterator($expected, $iterator);
+    }
 
-  public function getAcceptData()
-  {
-    return array(
-      array(array(new NumberCompare('< 1K'), new NumberCompare('> 0.5K')), array(sys_get_temp_dir().'/symfony2_finder/.git', sys_get_temp_dir().'/symfony2_finder/foo', sys_get_temp_dir().'/symfony2_finder/test.php', sys_get_temp_dir().'/symfony2_finder/toto')),
-    );
-  }
+    public function getAcceptData()
+    {
+        return array(
+            array(array(new NumberCompare('< 1K'), new NumberCompare('> 0.5K')), array(sys_get_temp_dir().'/symfony2_finder/.git', sys_get_temp_dir().'/symfony2_finder/foo', sys_get_temp_dir().'/symfony2_finder/test.php', sys_get_temp_dir().'/symfony2_finder/toto')),
+        );
+    }
 }

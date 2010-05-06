@@ -25,26 +25,26 @@ use Symfony\Components\CssSelector\XPathExprOr;
  */
 class OrNode implements NodeInterface
 {
-  protected $items;
+    protected $items;
 
-  public function __construct($items)
-  {
-    $this->items = $items;
-  }
-
-  public function __toString()
-  {
-    return sprintf('%s(%s)', __CLASS__, $this->items);
-  }
-
-  public function toXpath()
-  {
-    $paths = array();
-    foreach ($this->items as $item)
+    public function __construct($items)
     {
-      $paths[] = $item->toXpath();
+        $this->items = $items;
     }
 
-    return new XPathExprOr($paths);
-  }
+    public function __toString()
+    {
+        return sprintf('%s(%s)', __CLASS__, $this->items);
+    }
+
+    public function toXpath()
+    {
+        $paths = array();
+        foreach ($this->items as $item)
+        {
+            $paths[] = $item->toXpath();
+        }
+
+        return new XPathExprOr($paths);
+    }
 }

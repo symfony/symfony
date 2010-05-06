@@ -15,50 +15,50 @@ use Symfony\Components\CssSelector\Tokenizer;
 
 class TokenizerTest extends \PHPUnit_Framework_TestCase
 {
-  protected $tokenizer;
+    protected $tokenizer;
 
-  public function setUp()
-  {
-    $this->tokenizer = new Tokenizer();
-  }
-
-  /**
-   * @dataProvider getCssSelectors
-   */
-  public function testTokenize($css)
-  {
-    $this->assertEquals($css, $this->tokensToString($this->tokenizer->tokenize($css)), '->tokenize() lexes an input string and returns an array of tokens');
-  }
-
-  public function testTokenizeWithQuotedStrings()
-  {
-    $this->assertEquals('foo[class=foo bar  ]', $this->tokensToString($this->tokenizer->tokenize('foo[class="foo bar"]')), '->tokenize() lexes an input string and returns an array of tokens');
-    $this->assertEquals("foo[class=foo Abar     ]", $this->tokensToString($this->tokenizer->tokenize('foo[class="foo \\65 bar"]')), '->tokenize() lexes an input string and returns an array of tokens');
-  }
-
-  public function getCssSelectors()
-  {
-    return array(
-      array('h1'),
-      array('h1:nth-child(3n+1)'),
-      array('h1 > p'),
-      array('h1#foo'),
-      array('h1.foo'),
-      array('h1[class*=foo]'),
-      array('h1 .foo'),
-      array('h1 #foo'),
-      array('h1 [class*=foo]'),
-    );
-  }
-
-  protected function tokensToString($tokens)
-  {
-    $str = '';
-    foreach ($tokens as $token)
+    public function setUp()
     {
-      $str .= str_repeat(' ', $token->getPosition() - strlen($str)).$token;
+        $this->tokenizer = new Tokenizer();
     }
 
-    return $str;
-  }
+    /**
+     * @dataProvider getCssSelectors
+     */
+    public function testTokenize($css)
+    {
+        $this->assertEquals($css, $this->tokensToString($this->tokenizer->tokenize($css)), '->tokenize() lexes an input string and returns an array of tokens');
+    }
+
+    public function testTokenizeWithQuotedStrings()
+    {
+        $this->assertEquals('foo[class=foo bar  ]', $this->tokensToString($this->tokenizer->tokenize('foo[class="foo bar"]')), '->tokenize() lexes an input string and returns an array of tokens');
+        $this->assertEquals("foo[class=foo Abar     ]", $this->tokensToString($this->tokenizer->tokenize('foo[class="foo \\65 bar"]')), '->tokenize() lexes an input string and returns an array of tokens');
+    }
+
+    public function getCssSelectors()
+    {
+        return array(
+            array('h1'),
+            array('h1:nth-child(3n+1)'),
+            array('h1 > p'),
+            array('h1#foo'),
+            array('h1.foo'),
+            array('h1[class*=foo]'),
+            array('h1 .foo'),
+            array('h1 #foo'),
+            array('h1 [class*=foo]'),
+        );
+    }
+
+    protected function tokensToString($tokens)
+    {
+        $str = '';
+        foreach ($tokens as $token)
+        {
+            $str .= str_repeat(' ', $token->getPosition() - strlen($str)).$token;
+        }
+
+        return $str;
+    }
 }

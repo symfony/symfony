@@ -20,12 +20,12 @@ namespace Symfony\Components\Routing\Loader;
  */
 interface LoaderInterface
 {
-  /**
-   * Loads a resource.
-   *
-   * @param  mixed $resource A resource
-   *
-   * @return RouteCollection A RouteCollection instance
-   */
-  function load($resource);
+    /**
+     * Loads a resource.
+     *
+     * @param  mixed $resource A resource
+     *
+     * @return RouteCollection A RouteCollection instance
+     */
+    function load($resource);
 }

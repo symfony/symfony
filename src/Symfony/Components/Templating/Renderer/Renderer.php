@@ -22,15 +22,15 @@ use Symfony\Components\Templating\Engine;
  */
 abstract class Renderer implements RendererInterface
 {
-  protected $engine;
+    protected $engine;
 
-  /**
-   * Sets the template engine associated with this renderer.
-   *
-   * @param Engine $engine A Engine instance
-   */
-  public function setEngine(Engine $engine)
-  {
-    $this->engine = $engine;
-  }
+    /**
+     * Sets the template engine associated with this renderer.
+     *
+     * @param Engine $engine A Engine instance
+     */
+    public function setEngine(Engine $engine)
+    {
+        $this->engine = $engine;
+    }
 }

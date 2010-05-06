@@ -20,5 +20,5 @@ namespace Symfony\Components\DependencyInjection\Dumper;
  */
 interface DumperInterface
 {
-  function dump(array $options = array());
+    function dump(array $options = array());
 }

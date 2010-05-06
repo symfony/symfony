@@ -27,25 +27,25 @@ use Symfony\Components\Routing\Matcher\Dumper\ApacheMatcherDumper;
  */
 class RouterApacheDumperCommand extends Command
 {
-  /**
-   * @see Command
-   */
-  protected function configure()
-  {
-    $this
-      ->setName('router:dump-apache')
-    ;
-  }
+    /**
+     * @see Command
+     */
+    protected function configure()
+    {
+        $this
+            ->setName('router:dump-apache')
+        ;
+    }
 
-  /**
-   * @see Command
-   */
-  protected function execute(InputInterface $input, OutputInterface $output)
-  {
-    $router = $this->container->getService('router');
+    /**
+     * @see Command
+     */
+    protected function execute(InputInterface $input, OutputInterface $output)
+    {
+        $router = $this->container->getService('router');
 
-    $dumper = new ApacheMatcherDumper($router->getRouteCollection());
+        $dumper = new ApacheMatcherDumper($router->getRouteCollection());
 
-    $output->writeln($dumper->dump(), Output::OUTPUT_RAW);
-  }
+        $output->writeln($dumper->dump(), Output::OUTPUT_RAW);
+    }
 }

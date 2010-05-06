@@ -20,25 +20,25 @@ namespace Symfony\Components\Console\Output;
  */
 interface OutputInterface
 {
-  /**
-   * Writes a message to the output.
-   *
-   * @param string|array $messages The message as an array of lines of a single string
-   * @param integer      $type     The type of output
-   */
-  public function write($messages, $type = 0);
+    /**
+     * Writes a message to the output.
+     *
+     * @param string|array $messages The message as an array of lines of a single string
+     * @param integer      $type     The type of output
+     */
+    public function write($messages, $type = 0);
 
-  /**
-   * Sets the verbosity of the output.
-   *
-   * @param integer $level The level of verbosity
-   */
-  public function setVerbosity($level);
+    /**
+     * Sets the verbosity of the output.
+     *
+     * @param integer $level The level of verbosity
+     */
+    public function setVerbosity($level);
 
-  /**
-   * Sets the decorated flag.
-   *
-   * @param Boolean $decorated Whether to decorated the messages or not
-   */
-  public function setDecorated($decorated);
+    /**
+     * Sets the decorated flag.
+     *
+     * @param Boolean $decorated Whether to decorated the messages or not
+     */
+    public function setDecorated($decorated);
 }

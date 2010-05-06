@@ -20,15 +20,15 @@ $loader->register();
 
 if (file_exists(__DIR__.'/bootstrap.php'))
 {
-  unlink(__DIR__.'/bootstrap.php');
+    unlink(__DIR__.'/bootstrap.php');
 }
 ClassCollectionLoader::load(array(
-  'Symfony\\Foundation\\Bundle\\Bundle',
-  'Symfony\\Foundation\\Bundle\\BundleInterface',
-  'Symfony\\Foundation\\Bundle\\KernelBundle',
-  'Symfony\\Foundation\\Bundle\\KernelExtension',
-  'Symfony\\Foundation\\Debug\\ErrorHandler',
-  'Symfony\\Foundation\\ClassCollectionLoader',
-  'Symfony\\Foundation\\Kernel',
-  'Symfony\\Foundation\\EventDispatcher',
+    'Symfony\\Foundation\\Bundle\\Bundle',
+    'Symfony\\Foundation\\Bundle\\BundleInterface',
+    'Symfony\\Foundation\\Bundle\\KernelBundle',
+    'Symfony\\Foundation\\Bundle\\KernelExtension',
+    'Symfony\\Foundation\\Debug\\ErrorHandler',
+    'Symfony\\Foundation\\ClassCollectionLoader',
+    'Symfony\\Foundation\\Kernel',
+    'Symfony\\Foundation\\EventDispatcher',
 ), __DIR__, 'bootstrap', false);

@@ -22,9 +22,9 @@ use Symfony\Components\DependencyInjection\ContainerInterface;
  */
 interface BundleInterface
 {
-  public function buildContainer(ContainerInterface $container);
+    public function buildContainer(ContainerInterface $container);
 
-  public function boot(ContainerInterface $container);
+    public function boot(ContainerInterface $container);
 
-  public function shutdown(ContainerInterface $container);
+    public function shutdown(ContainerInterface $container);
 }

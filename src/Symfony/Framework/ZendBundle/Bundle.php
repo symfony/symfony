@@ -26,8 +26,8 @@ use Symfony\Framework\ZendBundle\DependencyInjection\ZendExtension;
  */
 class Bundle extends BaseBundle
 {
-  public function buildContainer(ContainerInterface $container)
-  {
-    Loader::registerExtension(new ZendExtension());
-  }
+    public function buildContainer(ContainerInterface $container)
+    {
+        Loader::registerExtension(new ZendExtension());
+    }
 }

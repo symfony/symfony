@@ -23,20 +23,20 @@ use Symfony\Components\Templating\Storage\Storage;
  */
 interface RendererInterface
 {
-  /**
-   * Evaluates a template.
-   *
-   * @param Storage $template   The template to render
-   * @param array   $parameters An array of parameters to pass to the template
-   *
-   * @return string|false The evaluated template, or false if the renderer is unable to render the template
-   */
-  function evaluate(Storage $template, array $parameters = array());
+    /**
+     * Evaluates a template.
+     *
+     * @param Storage $template   The template to render
+     * @param array   $parameters An array of parameters to pass to the template
+     *
+     * @return string|false The evaluated template, or false if the renderer is unable to render the template
+     */
+    function evaluate(Storage $template, array $parameters = array());
 
-  /**
-   * Sets the template engine associated with this renderer.
-   *
-   * @param Engine $engine A Engine instance
-   */
-  function setEngine(Engine $engine);
+    /**
+     * Sets the template engine associated with this renderer.
+     *
+     * @param Engine $engine A Engine instance
+     */
+    function setEngine(Engine $engine);
 }

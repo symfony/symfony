@@ -23,61 +23,61 @@ namespace Symfony\Components\CssSelector;
  */
 class TokenStream
 {
-  protected $used;
-  protected $tokens;
-  protected $source;
-  protected $peeked;
-  protected $peeking;
+    protected $used;
+    protected $tokens;
+    protected $source;
+    protected $peeked;
+    protected $peeking;
 
-  public function __construct($tokens, $source = null)
-  {
-    $this->used = array();
-    $this->tokens = $tokens;
-    $this->source = $source;
-    $this->peeked = null;
-    $this->peeking = false;
-  }
-
-  public function getUsed()
-  {
-    return $this->used;
-  }
-
-  public function next()
-  {
-    if ($this->peeking)
+    public function __construct($tokens, $source = null)
     {
-      $this->peeking = false;
-      $this->used[] = $this->peeked;
-
-      return $this->peeked;
+        $this->used = array();
+        $this->tokens = $tokens;
+        $this->source = $source;
+        $this->peeked = null;
+        $this->peeking = false;
     }
 
-    if (!count($this->tokens))
+    public function getUsed()
     {
-      return null;
+        return $this->used;
     }
 
-    $next = array_shift($this->tokens);
-    $this->used[] = $next;
-
-    return $next;
-  }
-
-  public function peek()
-  {
-    if (!$this->peeking)
+    public function next()
     {
-      if (!count($this->tokens))
-      {
-        return null;
-      }
+        if ($this->peeking)
+        {
+            $this->peeking = false;
+            $this->used[] = $this->peeked;
 
-      $this->peeked = array_shift($this->tokens);
+            return $this->peeked;
+        }
 
-      $this->peeking = true;
+        if (!count($this->tokens))
+        {
+            return null;
+        }
+
+        $next = array_shift($this->tokens);
+        $this->used[] = $next;
+
+        return $next;
     }
 
-    return $this->peeked;
-  }
+    public function peek()
+    {
+        if (!$this->peeking)
+        {
+            if (!count($this->tokens))
+            {
+                return null;
+            }
+
+            $this->peeked = array_shift($this->tokens);
+
+            $this->peeking = true;
+        }
+
+        return $this->peeked;
+    }
 }

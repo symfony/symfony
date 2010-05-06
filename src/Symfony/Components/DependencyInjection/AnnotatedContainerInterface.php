@@ -20,12 +20,12 @@ namespace Symfony\Components\DependencyInjection;
  */
 interface AnnotatedContainerInterface
 {
-  /**
-   * Returns service ids for a given annotation.
-   *
-   * @param string $name The annotation name
-   *
-   * @return array An array of annotations
-   */
-  public function findAnnotatedServiceIds($name);
+    /**
+     * Returns service ids for a given annotation.
+     *
+     * @param string $name The annotation name
+     *
+     * @return array An array of annotations
+     */
+    public function findAnnotatedServiceIds($name);
 }

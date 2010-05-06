@@ -22,14 +22,14 @@ use Symfony\Components\Console\Shell as BaseShell;
  */
 class Shell extends BaseShell
 {
-  /**
-   * Returns the shell header.
-   *
-   * @return string The header string
-   */
-  protected function getHeader()
-  {
-    return <<<EOF
+    /**
+     * Returns the shell header.
+     *
+     * @return string The header string
+     */
+    protected function getHeader()
+    {
+        return <<<EOF
 <info>
       _____                  __                    ___  
      / ____|                / _|                  |__ \ 
@@ -42,6 +42,6 @@ class Shell extends BaseShell
 
 </info>
 EOF
-    .parent::getHeader();
-  }
+        .parent::getHeader();
+    }
 }

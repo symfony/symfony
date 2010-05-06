@@ -23,98 +23,98 @@ use Symfony\Components\Templating\Storage\FileStorage;
  */
 class FilesystemLoader extends Loader
 {
-  protected $templatePathPatterns;
+    protected $templatePathPatterns;
 
-  /**
-   * Constructor.
-   *
-   * @param array $templatePathPatterns An array of path patterns to look for templates
-   */
-  public function __construct($templatePathPatterns)
-  {
-    if (!is_array($templatePathPatterns))
+    /**
+     * Constructor.
+     *
+     * @param array $templatePathPatterns An array of path patterns to look for templates
+     */
+    public function __construct($templatePathPatterns)
     {
-      $templatePathPatterns = array($templatePathPatterns);
-    }
-
-    $this->templatePathPatterns = $templatePathPatterns;
-
-    parent::__construct();
-  }
-
-  /**
-   * Loads a template.
-   *
-   * @param string $template The logical template name
-   * @param array  $options  An array of options
-   *
-   * @return Storage|Boolean false if the template cannot be loaded, a Storage instance otherwise
-   */
-  public function load($template, array $options = array())
-  {
-    if (self::isAbsolutePath($template) && file_exists($template))
-    {
-      return new FileStorage($template);
-    }
-
-    $options = $this->mergeDefaultOptions($options);
-    $options['name'] = $template;
-
-    $replacements = array();
-    foreach ($options as $key => $value)
-    {
-      $replacements['%'.$key.'%'] = $value;
-    }
-
-    $logs = array();
-    foreach ($this->templatePathPatterns as $templatePathPattern)
-    {
-      if (is_file($file = strtr($templatePathPattern, $replacements)))
-      {
-        if (null !== $this->debugger)
+        if (!is_array($templatePathPatterns))
         {
-          $this->debugger->log(sprintf('Loaded template file "%s" (renderer: %s)', $file, $options['renderer']));
+            $templatePathPatterns = array($templatePathPatterns);
         }
 
-        return new FileStorage($file);
-      }
+        $this->templatePathPatterns = $templatePathPatterns;
 
-      if (null !== $this->debugger)
-      {
-        $logs[] = sprintf('Failed loading template file "%s" (renderer: %s)', $file, $options['renderer']);
-      }
+        parent::__construct();
     }
 
-    if (null !== $this->debugger)
+    /**
+     * Loads a template.
+     *
+     * @param string $template The logical template name
+     * @param array  $options  An array of options
+     *
+     * @return Storage|Boolean false if the template cannot be loaded, a Storage instance otherwise
+     */
+    public function load($template, array $options = array())
     {
-      foreach ($logs as $log)
-      {
-        $this->debugger->log($log);
-      }
+        if (self::isAbsolutePath($template) && file_exists($template))
+        {
+            return new FileStorage($template);
+        }
+
+        $options = $this->mergeDefaultOptions($options);
+        $options['name'] = $template;
+
+        $replacements = array();
+        foreach ($options as $key => $value)
+        {
+            $replacements['%'.$key.'%'] = $value;
+        }
+
+        $logs = array();
+        foreach ($this->templatePathPatterns as $templatePathPattern)
+        {
+            if (is_file($file = strtr($templatePathPattern, $replacements)))
+            {
+                if (null !== $this->debugger)
+                {
+                    $this->debugger->log(sprintf('Loaded template file "%s" (renderer: %s)', $file, $options['renderer']));
+                }
+
+                return new FileStorage($file);
+            }
+
+            if (null !== $this->debugger)
+            {
+                $logs[] = sprintf('Failed loading template file "%s" (renderer: %s)', $file, $options['renderer']);
+            }
+        }
+
+        if (null !== $this->debugger)
+        {
+            foreach ($logs as $log)
+            {
+                $this->debugger->log($log);
+            }
+        }
+
+        return false;
     }
 
-    return false;
-  }
-
-  /**
-   * Returns true if the file is an existing absolute path.
-   *
-   * @param string $file A path
-   *
-   * @return true if the path exists and is absolute, false otherwise
-   */
-  static protected function isAbsolutePath($file)
-  {
-    if ($file[0] == '/' || $file[0] == '\\' ||
-        (strlen($file) > 3 && ctype_alpha($file[0]) &&
-         $file[1] == ':' &&
-         ($file[2] == '\\' || $file[2] == '/')
-        )
-       )
+    /**
+     * Returns true if the file is an existing absolute path.
+     *
+     * @param string $file A path
+     *
+     * @return true if the path exists and is absolute, false otherwise
+     */
+    static protected function isAbsolutePath($file)
     {
-      return true;
-    }
+        if ($file[0] == '/' || $file[0] == '\\' ||
+                (strlen($file) > 3 && ctype_alpha($file[0]) &&
+                 $file[1] == ':' &&
+                 ($file[2] == '\\' || $file[2] == '/')
+                )
+             )
+        {
+            return true;
+        }
 
-    return false;
-  }
+        return false;
+    }
 }

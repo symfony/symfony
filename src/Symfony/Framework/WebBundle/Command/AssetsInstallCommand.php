@@ -27,50 +27,50 @@ use Symfony\Framework\WebBundle\Util\Filesystem;
  */
 class AssetsInstallCommand extends Command
 {
-  /**
-   * @see Command
-   */
-  protected function configure()
-  {
-    $this
-      ->setDefinition(array(
-        new InputArgument('target', InputArgument::REQUIRED, 'The target directory'),
-      ))
-      ->setName('assets:install')
-    ;
-  }
-
-  /**
-   * @see Command
-   *
-   * @throws \InvalidArgumentException When the target directory does not exist
-   */
-  protected function execute(InputInterface $input, OutputInterface $output)
-  {
-    if (!is_dir($input->getArgument('target')))
+    /**
+     * @see Command
+     */
+    protected function configure()
     {
-      throw new \InvalidArgumentException(sprintf('The target directory "%s" does not exist.', $input->getArgument('target')));
+        $this
+            ->setDefinition(array(
+                new InputArgument('target', InputArgument::REQUIRED, 'The target directory'),
+            ))
+            ->setName('assets:install')
+        ;
     }
 
-    $filesystem = new Filesystem();
-
-    $dirs = $this->container->getKernelService()->getBundleDirs();
-    foreach ($this->container->getKernelService()->getBundles() as $bundle)
+    /**
+     * @see Command
+     *
+     * @throws \InvalidArgumentException When the target directory does not exist
+     */
+    protected function execute(InputInterface $input, OutputInterface $output)
     {
-      $tmp = dirname(str_replace('\\', '/', get_class($bundle)));
-      $namespace = str_replace('/', '\\', dirname($tmp));
-      $class = basename($tmp);
+        if (!is_dir($input->getArgument('target')))
+        {
+            throw new \InvalidArgumentException(sprintf('The target directory "%s" does not exist.', $input->getArgument('target')));
+        }
 
-      if (isset($dirs[$namespace]) && is_dir($originDir = $dirs[$namespace].'/'.$class.'/Resources/public'))
-      {
-        $output->writeln(sprintf('Installing assets for <comment>%s\\%s</comment>', $namespace, $class));
+        $filesystem = new Filesystem();
 
-        $targetDir = $input->getArgument('target').'/bundles/'.preg_replace('/bundle$/', '', strtolower($class));
+        $dirs = $this->container->getKernelService()->getBundleDirs();
+        foreach ($this->container->getKernelService()->getBundles() as $bundle)
+        {
+            $tmp = dirname(str_replace('\\', '/', get_class($bundle)));
+            $namespace = str_replace('/', '\\', dirname($tmp));
+            $class = basename($tmp);
 
-        $filesystem->remove($targetDir);
-        mkdir($targetDir, 0755, true);
-        $filesystem->mirror($originDir, $targetDir);
-      }
+            if (isset($dirs[$namespace]) && is_dir($originDir = $dirs[$namespace].'/'.$class.'/Resources/public'))
+            {
+                $output->writeln(sprintf('Installing assets for <comment>%s\\%s</comment>', $namespace, $class));
+
+                $targetDir = $input->getArgument('target').'/bundles/'.preg_replace('/bundle$/', '', strtolower($class));
+
+                $filesystem->remove($targetDir);
+                mkdir($targetDir, 0755, true);
+                $filesystem->mirror($originDir, $targetDir);
+            }
+        }
     }
-  }
 }

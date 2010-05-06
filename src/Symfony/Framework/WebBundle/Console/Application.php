@@ -26,63 +26,63 @@ use Symfony\Foundation\Kernel;
  */
 class Application extends BaseApplication
 {
-  protected $kernel;
+    protected $kernel;
 
-  /**
-   * Constructor.
-   */
-  public function __construct(Kernel $kernel)
-  {
-    $this->kernel = $kernel;
-
-    parent::__construct('Symfony', Kernel::VERSION.' - '.$kernel->getName());
-
-    $this->definition->addOption(new InputOption('--shell', '-s', InputOption::PARAMETER_NONE, 'Launch the shell.'));
-
-    if (!$this->kernel->isBooted())
+    /**
+     * Constructor.
+     */
+    public function __construct(Kernel $kernel)
     {
-      $this->kernel->boot();
+        $this->kernel = $kernel;
+
+        parent::__construct('Symfony', Kernel::VERSION.' - '.$kernel->getName());
+
+        $this->definition->addOption(new InputOption('--shell', '-s', InputOption::PARAMETER_NONE, 'Launch the shell.'));
+
+        if (!$this->kernel->isBooted())
+        {
+            $this->kernel->boot();
+        }
+
+        $this->registerCommands();
     }
 
-    $this->registerCommands();
-  }
-
-  /**
-   * Gets the Kernel associated with this Console.
-   *
-   * @return Kernel A Kernel instance
-   */
-  public function getKernel()
-  {
-    return $this->kernel;
-  }
-
-  /**
-   * Runs the current application.
-   *
-   * @param InputInterface  $input  An Input instance
-   * @param OutputInterface $output An Output instance
-   *
-   * @return integer 0 if everything went fine, or an error code
-   */
-  public function doRun(InputInterface $input, OutputInterface $output)
-  {
-    if (true === $input->hasParameterOption(array('--shell', '-s')))
+    /**
+     * Gets the Kernel associated with this Console.
+     *
+     * @return Kernel A Kernel instance
+     */
+    public function getKernel()
     {
-      $shell = new Shell($this);
-      $shell->run();
-
-      return 0;
+        return $this->kernel;
     }
 
-    return parent::doRun($input, $output);
-  }
-
-  protected function registerCommands()
-  {
-    foreach ($this->kernel->getBundles() as $bundle)
+    /**
+     * Runs the current application.
+     *
+     * @param InputInterface  $input  An Input instance
+     * @param OutputInterface $output An Output instance
+     *
+     * @return integer 0 if everything went fine, or an error code
+     */
+    public function doRun(InputInterface $input, OutputInterface $output)
     {
-      $bundle->registerCommands($this);
+        if (true === $input->hasParameterOption(array('--shell', '-s')))
+        {
+            $shell = new Shell($this);
+            $shell->run();
+
+            return 0;
+        }
+
+        return parent::doRun($input, $output);
     }
-  }
+
+    protected function registerCommands()
+    {
+        foreach ($this->kernel->getBundles() as $bundle)
+        {
+            $bundle->registerCommands($this);
+        }
+    }
 }

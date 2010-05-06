@@ -20,73 +20,73 @@ namespace Symfony\Components\Routing\Loader;
  */
 abstract class FileLoader implements LoaderInterface
 {
-  protected $paths;
+    protected $paths;
 
-  /**
-   * Constructor.
-   *
-   * @param string|array $paths A path or an array of paths where to look for resources
-   */
-  public function __construct($paths = array())
-  {
-    if (!is_array($paths))
+    /**
+     * Constructor.
+     *
+     * @param string|array $paths A path or an array of paths where to look for resources
+     */
+    public function __construct($paths = array())
     {
-      $paths = array($paths);
-    }
-
-    $this->paths = $paths;
-  }
-
-  /**
-   * @throws \InvalidArgumentException When file is not found
-   */
-  protected function findFile($file)
-  {
-    $path = $this->getAbsolutePath($file);
-    if (!file_exists($path))
-    {
-      throw new \InvalidArgumentException(sprintf('The file "%s" does not exist (in: %s).', $file, implode(', ', $this->paths)));
-    }
-
-    return $path;
-  }
-
-  protected function getAbsolutePath($file, $currentPath = null)
-  {
-    if (self::isAbsolutePath($file))
-    {
-      return $file;
-    }
-    else if (null !== $currentPath && file_exists($currentPath.DIRECTORY_SEPARATOR.$file))
-    {
-      return $currentPath.DIRECTORY_SEPARATOR.$file;
-    }
-    else
-    {
-      foreach ($this->paths as $path)
-      {
-        if (file_exists($path.DIRECTORY_SEPARATOR.$file))
+        if (!is_array($paths))
         {
-          return $path.DIRECTORY_SEPARATOR.$file;
+            $paths = array($paths);
         }
-      }
+
+        $this->paths = $paths;
     }
 
-    return $file;
-  }
-
-  static protected function isAbsolutePath($file)
-  {
-    if ($file[0] == '/' || $file[0] == '\\' ||
-        (strlen($file) > 3 && ctype_alpha($file[0]) &&
-         $file[1] == ':' &&
-         ($file[2] == '\\' || $file[2] == '/')
-        )
-       )
+    /**
+     * @throws \InvalidArgumentException When file is not found
+     */
+    protected function findFile($file)
     {
-      return true;
+        $path = $this->getAbsolutePath($file);
+        if (!file_exists($path))
+        {
+            throw new \InvalidArgumentException(sprintf('The file "%s" does not exist (in: %s).', $file, implode(', ', $this->paths)));
+        }
+
+        return $path;
     }
 
-    return false;
-  }
+    protected function getAbsolutePath($file, $currentPath = null)
+    {
+        if (self::isAbsolutePath($file))
+        {
+            return $file;
+        }
+        else if (null !== $currentPath && file_exists($currentPath.DIRECTORY_SEPARATOR.$file))
+        {
+            return $currentPath.DIRECTORY_SEPARATOR.$file;
+        }
+        else
+        {
+            foreach ($this->paths as $path)
+            {
+                if (file_exists($path.DIRECTORY_SEPARATOR.$file))
+                {
+                    return $path.DIRECTORY_SEPARATOR.$file;
+                }
+            }
+        }
+
+        return $file;
+    }
+
+    static protected function isAbsolutePath($file)
+    {
+        if ($file[0] == '/' || $file[0] == '\\' ||
+                (strlen($file) > 3 && ctype_alpha($file[0]) &&
+                 $file[1] == ':' &&
+                 ($file[2] == '\\' || $file[2] == '/')
+                )
+             )
+        {
+            return true;
+        }
+
+        return false;
+    }
 }

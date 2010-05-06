@@ -20,42 +20,42 @@ namespace Symfony\Components\DependencyInjection;
  */
 class FileResource implements ResourceInterface
 {
-  protected $resource;
+    protected $resource;
 
-  /**
-   * Constructor.
-   *
-   * @param string $resource The file path to the resource
-   */
-  public function __construct($resource)
-  {
-    $this->resource = $resource;
-  }
-
-  /**
-   * Returns the resource tied to this Resource.
-   *
-   * @return mixed The resource
-   */
-  public function getResource()
-  {
-    return $this->resource;
-  }
-
-  /**
-   * Returns true if the resource has not been updated since the given timestamp.
-   *
-   * @param timestamp $timestamp The last time the resource was loaded
-   *
-   * @return Boolean true if the resource has not been updated, false otherwise
-   */
-  public function isUptodate($timestamp)
-  {
-    if (!file_exists($this->resource))
+    /**
+     * Constructor.
+     *
+     * @param string $resource The file path to the resource
+     */
+    public function __construct($resource)
     {
-      return false;
+        $this->resource = $resource;
     }
 
-    return filemtime($this->resource) < $timestamp;
-  }
+    /**
+     * Returns the resource tied to this Resource.
+     *
+     * @return mixed The resource
+     */
+    public function getResource()
+    {
+        return $this->resource;
+    }
+
+    /**
+     * Returns true if the resource has not been updated since the given timestamp.
+     *
+     * @param timestamp $timestamp The last time the resource was loaded
+     *
+     * @return Boolean true if the resource has not been updated, false otherwise
+     */
+    public function isUptodate($timestamp)
+    {
+        if (!file_exists($this->resource))
+        {
+            return false;
+        }
+
+        return filemtime($this->resource) < $timestamp;
+    }
 }

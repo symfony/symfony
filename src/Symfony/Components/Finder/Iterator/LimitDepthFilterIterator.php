@@ -20,30 +20,30 @@ namespace Symfony\Components\Finder\Iterator;
  */
 class LimitDepthFilterIterator extends \FilterIterator
 {
-  protected $minDepth = 0;
+    protected $minDepth = 0;
 
-  /**
-   * Constructor.
-   *
-   * @param \Iterator $iterator The Iterator to filter
-   * @param integer   $minDepth The minimum depth
-   */
-  public function __construct(\RecursiveIteratorIterator $iterator, $minDepth, $maxDepth)
-  {
-    $this->minDepth = (integer) $minDepth;
+    /**
+     * Constructor.
+     *
+     * @param \Iterator $iterator The Iterator to filter
+     * @param integer   $minDepth The minimum depth
+     */
+    public function __construct(\RecursiveIteratorIterator $iterator, $minDepth, $maxDepth)
+    {
+        $this->minDepth = (integer) $minDepth;
 
-    $iterator->setMaxDepth(INF === $maxDepth ? -1 : $maxDepth);
+        $iterator->setMaxDepth(INF === $maxDepth ? -1 : $maxDepth);
 
-    parent::__construct($iterator);
-  }
+        parent::__construct($iterator);
+    }
 
-  /**
-   * Filters the iterator values.
-   *
-   * @return Boolean true if the value should be kept, false otherwise
-   */
-  public function accept()
-  {
-    return $this->getInnerIterator()->getDepth() >= $this->minDepth;
-  }
+    /**
+     * Filters the iterator values.
+     *
+     * @return Boolean true if the value should be kept, false otherwise
+     */
+    public function accept()
+    {
+        return $this->getInnerIterator()->getDepth() >= $this->minDepth;
+    }
 }

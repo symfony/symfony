@@ -14,10 +14,10 @@ use Symfony\Components\Console\Output\NullOutput;
 
 class NullOutputTest extends \PHPUnit_Framework_TestCase
 {
-  public function testConstructor()
-  {
-    $output = new NullOutput();
-    $output->write('foo');
-    $this->assertTrue(true, '->write() does nothing'); // FIXME
-  }
+    public function testConstructor()
+    {
+        $output = new NullOutput();
+        $output->write('foo');
+        $this->assertTrue(true, '->write() does nothing'); // FIXME
+    }
 }

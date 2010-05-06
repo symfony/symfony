@@ -20,19 +20,19 @@ namespace Symfony\Components\Routing;
  */
 interface ResourceInterface
 {
-  /**
-   * Returns true if the resource has not been updated since the given timestamp.
-   *
-   * @param int $timestamp The last time the resource was loaded
-   *
-   * @return Boolean true if the resource has not been updated, false otherwise
-   */
-  function isUptodate($timestamp);
+    /**
+     * Returns true if the resource has not been updated since the given timestamp.
+     *
+     * @param int $timestamp The last time the resource was loaded
+     *
+     * @return Boolean true if the resource has not been updated, false otherwise
+     */
+    function isUptodate($timestamp);
 
-  /**
-   * Returns the resource tied to this Resource.
-   *
-   * @return mixed The resource
-   */
-  function getResource();
+    /**
+     * Returns the resource tied to this Resource.
+     *
+     * @return mixed The resource
+     */
+    function getResource();
 }

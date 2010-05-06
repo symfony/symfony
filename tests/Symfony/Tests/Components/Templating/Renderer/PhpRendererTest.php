@@ -18,14 +18,14 @@ use Symfony\Components\Templating\Storage\FileStorage;
 
 class PhpRendererTest extends \PHPUnit_Framework_TestCase
 {
-  public function testEvaluate()
-  {
-    $renderer = new PhpRenderer();
+    public function testEvaluate()
+    {
+        $renderer = new PhpRenderer();
 
-    $template = new StringStorage('<?php echo $foo ?>');
-    $this->assertEquals('bar', $renderer->evaluate($template, array('foo' => 'bar')), '->evaluate() renders templates that are instances of StringStorage');
+        $template = new StringStorage('<?php echo $foo ?>');
+        $this->assertEquals('bar', $renderer->evaluate($template, array('foo' => 'bar')), '->evaluate() renders templates that are instances of StringStorage');
 
-    $template = new FileStorage(__DIR__.'/../../../../../fixtures/Symfony/Components/Templating/templates/foo.php');
-    $this->assertEquals('bar', $renderer->evaluate($template, array('foo' => 'bar')), '->evaluate() renders templates that are instances of FileStorage');
-  }
+        $template = new FileStorage(__DIR__.'/../../../../../fixtures/Symfony/Components/Templating/templates/foo.php');
+        $this->assertEquals('bar', $renderer->evaluate($template, array('foo' => 'bar')), '->evaluate() renders templates that are instances of FileStorage');
+    }
 }

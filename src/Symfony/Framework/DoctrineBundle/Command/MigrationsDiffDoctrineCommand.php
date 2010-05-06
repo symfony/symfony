@@ -27,24 +27,24 @@ use DoctrineExtensions\Migrations\Tools\Console\Command\DiffCommand;
  */
 class MigrationsDiffDoctrineCommand extends DiffCommand
 {
-  protected function configure()
-  {
-    parent::configure();
+    protected function configure()
+    {
+        parent::configure();
 
-    $this
-      ->setName('doctrine:migrations:diff')
-      ->addOption('bundle', null, InputOption::PARAMETER_REQUIRED, 'The bundle to load migrations configuration from.')
-      ->addOption('em', null, InputOption::PARAMETER_OPTIONAL, 'The entity manager to use for this command.')
-    ;
-  }
+        $this
+            ->setName('doctrine:migrations:diff')
+            ->addOption('bundle', null, InputOption::PARAMETER_REQUIRED, 'The bundle to load migrations configuration from.')
+            ->addOption('em', null, InputOption::PARAMETER_OPTIONAL, 'The entity manager to use for this command.')
+        ;
+    }
 
-  public function execute(InputInterface $input, OutputInterface $output)
-  {
-    DoctrineCommand::setApplicationEntityManager($this->application, $input->getOption('em'));
+    public function execute(InputInterface $input, OutputInterface $output)
+    {
+        DoctrineCommand::setApplicationEntityManager($this->application, $input->getOption('em'));
 
-    $configuration = $this->_getMigrationConfiguration($input, $output);
-    DoctrineCommand::configureMigrationsForBundle($this->application, $input->getOption('bundle'), $configuration);
+        $configuration = $this->_getMigrationConfiguration($input, $output);
+        DoctrineCommand::configureMigrationsForBundle($this->application, $input->getOption('bundle'), $configuration);
 
-    parent::execute($input, $output);
-  }
+        parent::execute($input, $output);
+    }
 }

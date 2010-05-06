@@ -22,52 +22,52 @@ use Symfony\Components\Templating\Storage;
  */
 class ChainLoader extends Loader
 {
-  protected $loaders;
+    protected $loaders;
 
-  /**
-   * Constructor.
-   *
-   * @param Loader[] $loaders An array of loader instances
-   */
-  public function __construct(array $loaders = array())
-  {
-    $this->loaders = array();
-    foreach ($loaders as $loader)
+    /**
+     * Constructor.
+     *
+     * @param Loader[] $loaders An array of loader instances
+     */
+    public function __construct(array $loaders = array())
     {
-      $this->addLoader($loader);
+        $this->loaders = array();
+        foreach ($loaders as $loader)
+        {
+            $this->addLoader($loader);
+        }
+
+        parent::__construct();
     }
 
-    parent::__construct();
-  }
-
-  /**
-   * Adds a loader instance.
-   *
-   * @param Loader $loader A Loader instance
-   */
-  public function addLoader(Loader $loader)
-  {
-    $this->loaders[] = $loader;
-  }
-
-  /**
-   * Loads a template.
-   *
-   * @param string $template The logical template name
-   * @param array  $options  An array of options
-   *
-   * @return Storage|Boolean false if the template cannot be loaded, a Storage instance otherwise
-   */
-  public function load($template, array $options = array())
-  {
-    foreach ($this->loaders as $loader)
+    /**
+     * Adds a loader instance.
+     *
+     * @param Loader $loader A Loader instance
+     */
+    public function addLoader(Loader $loader)
     {
-      if (false !== $ret = $loader->load($template, $options))
-      {
-        return $ret;
-      }
+        $this->loaders[] = $loader;
     }
 
-    return false;
-  }
+    /**
+     * Loads a template.
+     *
+     * @param string $template The logical template name
+     * @param array  $options  An array of options
+     *
+     * @return Storage|Boolean false if the template cannot be loaded, a Storage instance otherwise
+     */
+    public function load($template, array $options = array())
+    {
+        foreach ($this->loaders as $loader)
+        {
+            if (false !== $ret = $loader->load($template, $options))
+            {
+                return $ret;
+            }
+        }
+
+        return false;
+    }
 }

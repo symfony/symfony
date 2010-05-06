@@ -20,15 +20,15 @@ namespace Symfony\Components\HttpKernel\Test;
  */
 class Tester implements TesterInterface
 {
-  protected $test;
+    protected $test;
 
-  /**
-   * Sets the TestCase instance associated with this tester object.
-   *
-   * @param \PHPUnit_Framework_TestCase $test A \PHPUnit_Framework_TestCase instance
-   */
-  public function setTestCase(\PHPUnit_Framework_TestCase $test)
-  {
-    $this->test = $test;
-  }
+    /**
+     * Sets the TestCase instance associated with this tester object.
+     *
+     * @param \PHPUnit_Framework_TestCase $test A \PHPUnit_Framework_TestCase instance
+     */
+    public function setTestCase(\PHPUnit_Framework_TestCase $test)
+    {
+        $this->test = $test;
+    }
 }

@@ -20,9 +20,9 @@ namespace Symfony\Framework\ProfilerBundle\DataCollector;
  */
 interface DataCollectorInterface
 {
-  public function setCollectorManager(DataCollectorManager $manager);
+    public function setCollectorManager(DataCollectorManager $manager);
 
-  public function getData();
+    public function getData();
 
-  public function getName();
+    public function getName();
 }

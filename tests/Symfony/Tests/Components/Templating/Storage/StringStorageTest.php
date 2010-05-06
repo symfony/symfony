@@ -16,11 +16,11 @@ use Symfony\Components\Templating\Storage\StringStorage;
 
 class StringStorageTest extends \PHPUnit_Framework_TestCase
 {
-  public function testGetContent()
-  {
-    $storage = new StringStorage('foo');
-    $this->assertInstanceOf('Symfony\Components\Templating\Storage\Storage', $storage, 'StringStorage is an instance of Storage');
-    $storage = new StringStorage('foo');
-    $this->assertEquals('foo', $storage->getContent(), '->getContent() returns the content of the template');
-  }
+    public function testGetContent()
+    {
+        $storage = new StringStorage('foo');
+        $this->assertInstanceOf('Symfony\Components\Templating\Storage\Storage', $storage, 'StringStorage is an instance of Storage');
+        $storage = new StringStorage('foo');
+        $this->assertEquals('foo', $storage->getContent(), '->getContent() returns the content of the template');
+    }
 }

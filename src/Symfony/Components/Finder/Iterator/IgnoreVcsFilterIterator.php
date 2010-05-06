@@ -22,13 +22,13 @@ namespace Symfony\Components\Finder\Iterator;
  */
 class IgnoreVcsFilterIterator extends ExcludeDirectoryFilterIterator
 {
-  /**
-   * Constructor.
-   *
-   * @param \Iterator $iterator The Iterator to filter
-   */
-  public function __construct(\Iterator $iterator)
-  {
-    parent::__construct($iterator, array('.svn', '_svn', 'CVS', '_darcs', '.arch-params', '.monotone', '.bzr', '.git', '.hg'));
-  }
+    /**
+     * Constructor.
+     *
+     * @param \Iterator $iterator The Iterator to filter
+     */
+    public function __construct(\Iterator $iterator)
+    {
+        parent::__construct($iterator, array('.svn', '_svn', 'CVS', '_darcs', '.arch-params', '.monotone', '.bzr', '.git', '.hg'));
+    }
 }

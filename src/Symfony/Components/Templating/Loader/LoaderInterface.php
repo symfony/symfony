@@ -20,13 +20,13 @@ namespace Symfony\Components\Templating\Loader;
  */
 interface LoaderInterface
 {
-  /**
-   * Loads a template.
-   *
-   * @param string $template The logical template name
-   * @param array  $options  An array of options
-   *
-   * @return Storage|Boolean false if the template cannot be loaded, a Storage instance otherwise
-   */
-  function load($template, array $options = array());
+    /**
+     * Loads a template.
+     *
+     * @param string $template The logical template name
+     * @param array  $options  An array of options
+     *
+     * @return Storage|Boolean false if the template cannot be loaded, a Storage instance otherwise
+     */
+    function load($template, array $options = array());
 }

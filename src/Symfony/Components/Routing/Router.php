@@ -21,256 +21,256 @@ namespace Symfony\Components\Routing;
  */
 class Router implements RouterInterface
 {
-  protected $matcher;
-  protected $generator;
-  protected $options;
-  protected $defaults;
-  protected $context;
-  protected $loader;
-  protected $collection;
+    protected $matcher;
+    protected $generator;
+    protected $options;
+    protected $defaults;
+    protected $context;
+    protected $loader;
+    protected $collection;
 
-  /**
-   * Constructor.
-   *
-   * Available options:
-   *
-   *   * cache_dir: The cache directory (or null to disable caching)
-   *   * debug:     Whether to enable debugging or not (false by default)
-   *
-   * @param mixed $loader   A PHP callable that returns a RouteCollection instance
-   * @param array $options  An array of options
-   * @param array $context  The context
-   * @param array $defaults The default values
-   *
-   * @throws \InvalidArgumentException When unsupported option is provided
-   */
-  public function __construct($loader, array $options = array(), array $context = array(), array $defaults = array())
-  {
-    $this->loader = $loader;
-    $this->context = $context;
-    $this->defaults = $defaults;
-    $this->options = array(
-      'cache_dir'              => null,
-      'debug'                  => false,
-      'generator_class'        => 'Symfony\\Components\\Routing\\Generator\\UrlGenerator',
-      'generator_base_class'   => 'Symfony\\Components\\Routing\\Generator\\UrlGenerator',
-      'generator_dumper_class' => 'Symfony\\Components\\Routing\\Generator\\Dumper\\PhpGeneratorDumper',
-      'generator_cache_class'  => 'ProjectUrlGenerator',
-      'matcher_class'          => 'Symfony\\Components\\Routing\\Matcher\\UrlMatcher',
-      'matcher_base_class'     => 'Symfony\\Components\\Routing\\Matcher\\UrlMatcher',
-      'matcher_dumper_class'   => 'Symfony\\Components\\Routing\\Matcher\\Dumper\\PhpMatcherDumper',
-      'matcher_cache_class'    => 'ProjectUrlMatcher',
-    );
-
-    // check option names
-    if ($diff = array_diff(array_keys($options), array_keys($this->options)))
+    /**
+     * Constructor.
+     *
+     * Available options:
+     *
+     *   * cache_dir: The cache directory (or null to disable caching)
+     *   * debug:     Whether to enable debugging or not (false by default)
+     *
+     * @param mixed $loader   A PHP callable that returns a RouteCollection instance
+     * @param array $options  An array of options
+     * @param array $context  The context
+     * @param array $defaults The default values
+     *
+     * @throws \InvalidArgumentException When unsupported option is provided
+     */
+    public function __construct($loader, array $options = array(), array $context = array(), array $defaults = array())
     {
-      throw new \InvalidArgumentException(sprintf('The Router does not support the following options: \'%s\'.', implode('\', \'', $diff)));
+        $this->loader = $loader;
+        $this->context = $context;
+        $this->defaults = $defaults;
+        $this->options = array(
+            'cache_dir'              => null,
+            'debug'                  => false,
+            'generator_class'        => 'Symfony\\Components\\Routing\\Generator\\UrlGenerator',
+            'generator_base_class'   => 'Symfony\\Components\\Routing\\Generator\\UrlGenerator',
+            'generator_dumper_class' => 'Symfony\\Components\\Routing\\Generator\\Dumper\\PhpGeneratorDumper',
+            'generator_cache_class'  => 'ProjectUrlGenerator',
+            'matcher_class'          => 'Symfony\\Components\\Routing\\Matcher\\UrlMatcher',
+            'matcher_base_class'     => 'Symfony\\Components\\Routing\\Matcher\\UrlMatcher',
+            'matcher_dumper_class'   => 'Symfony\\Components\\Routing\\Matcher\\Dumper\\PhpMatcherDumper',
+            'matcher_cache_class'    => 'ProjectUrlMatcher',
+        );
+
+        // check option names
+        if ($diff = array_diff(array_keys($options), array_keys($this->options)))
+        {
+            throw new \InvalidArgumentException(sprintf('The Router does not support the following options: \'%s\'.', implode('\', \'', $diff)));
+        }
+
+        $this->options = array_merge($this->options, $options);
     }
 
-    $this->options = array_merge($this->options, $options);
-  }
-
-  /**
-   * Gets the RouteCollection instance associated with this Router.
-   *
-   * @return RouteCollection A RouteCollection instance
-   */
-  public function getRouteCollection()
-  {
-    if (null === $this->collection)
+    /**
+     * Gets the RouteCollection instance associated with this Router.
+     *
+     * @return RouteCollection A RouteCollection instance
+     */
+    public function getRouteCollection()
     {
-      $this->collection = call_user_func($this->loader);
+        if (null === $this->collection)
+        {
+            $this->collection = call_user_func($this->loader);
+        }
+
+        return $this->collection;
     }
 
-    return $this->collection;
-  }
-
-  /**
-   * Sets the request context.
-   *
-   * @param array $context  The context
-   */
-  public function setContext(array $context = array())
-  {
-    $this->context = $context;
-  }
-
-  /**
-   * Sets the defaults.
-   *
-   * @param array $defaults The defaults
-   */
-  public function setDefaults(array $defaults = array())
-  {
-    $this->defaults = $defaults;
-  }
-
-  /**
-   * Generates a URL from the given parameters.
-   *
-   * @param  string  $name       The name of the route
-   * @param  array   $parameters An array of parameters
-   * @param  Boolean $absolute   Whether to generate an absolute URL
-   *
-   * @return string The generated URL
-   */
-  public function generate($name, array $parameters, $absolute = false)
-  {
-    return $this->getGenerator()->generate($name, $parameters, $absolute);
-  }
-
-  /**
-   * Tries to match a URL with a set of routes.
-   *
-   * Returns false if no route matches the URL.
-   *
-   * @param  string $url URL to be parsed
-   *
-   * @return array|false An array of parameters or false if no route matches
-   */
-  public function match($url)
-  {
-    return $this->getMatcher()->match($url);
-  }
-
-  /**
-   * Gets the UrlMatcher instance associated with this Router.
-   *
-   * @return UrlMatcherInterface A UrlMatcherInterface instance
-   */
-  public function getMatcher()
-  {
-    if (null !== $this->matcher)
+    /**
+     * Sets the request context.
+     *
+     * @param array $context  The context
+     */
+    public function setContext(array $context = array())
     {
-      return $this->matcher;
+        $this->context = $context;
     }
 
-    if (null === $this->options['cache_dir'] || null === $this->options['matcher_cache_class'])
+    /**
+     * Sets the defaults.
+     *
+     * @param array $defaults The defaults
+     */
+    public function setDefaults(array $defaults = array())
     {
-      return $this->matcher = new $this->options['matcher_class']($this->getRouteCollection(), $this->context, $this->defaults);
+        $this->defaults = $defaults;
     }
 
-    $class = $this->options['matcher_cache_class'];
-    if ($this->needsReload($class))
+    /**
+     * Generates a URL from the given parameters.
+     *
+     * @param  string  $name       The name of the route
+     * @param  array   $parameters An array of parameters
+     * @param  Boolean $absolute   Whether to generate an absolute URL
+     *
+     * @return string The generated URL
+     */
+    public function generate($name, array $parameters, $absolute = false)
     {
-      $dumper = new $this->options['matcher_dumper_class']($this->getRouteCollection());
-
-      $options = array(
-        'class'      => $class,
-        'base_class' => $this->options['matcher_base_class'],
-      );
-
-      $this->updateCache($class, $dumper->dump($options));
+        return $this->getGenerator()->generate($name, $parameters, $absolute);
     }
 
-    require_once $this->getCacheFile($class);
-
-    return $this->matcher = new $class($this->context, $this->defaults);
-  }
-
-  /**
-   * Gets the UrlGenerator instance associated with this Router.
-   *
-   * @return UrlGeneratorInterface A UrlGeneratorInterface instance
-   */
-  public function getGenerator()
-  {
-    if (null !== $this->generator)
+    /**
+     * Tries to match a URL with a set of routes.
+     *
+     * Returns false if no route matches the URL.
+     *
+     * @param  string $url URL to be parsed
+     *
+     * @return array|false An array of parameters or false if no route matches
+     */
+    public function match($url)
     {
-      return $this->generator;
+        return $this->getMatcher()->match($url);
     }
 
-    if (null === $this->options['cache_dir'] || null === $this->options['generator_cache_class'])
+    /**
+     * Gets the UrlMatcher instance associated with this Router.
+     *
+     * @return UrlMatcherInterface A UrlMatcherInterface instance
+     */
+    public function getMatcher()
     {
-      return $this->generator = new $this->options['generator_class']($this->getRouteCollection(), $this->context, $this->defaults);
+        if (null !== $this->matcher)
+        {
+            return $this->matcher;
+        }
+
+        if (null === $this->options['cache_dir'] || null === $this->options['matcher_cache_class'])
+        {
+            return $this->matcher = new $this->options['matcher_class']($this->getRouteCollection(), $this->context, $this->defaults);
+        }
+
+        $class = $this->options['matcher_cache_class'];
+        if ($this->needsReload($class))
+        {
+            $dumper = new $this->options['matcher_dumper_class']($this->getRouteCollection());
+
+            $options = array(
+                'class'      => $class,
+                'base_class' => $this->options['matcher_base_class'],
+            );
+
+            $this->updateCache($class, $dumper->dump($options));
+        }
+
+        require_once $this->getCacheFile($class);
+
+        return $this->matcher = new $class($this->context, $this->defaults);
     }
 
-    $class = $this->options['generator_cache_class'];
-    if ($this->needsReload($class))
+    /**
+     * Gets the UrlGenerator instance associated with this Router.
+     *
+     * @return UrlGeneratorInterface A UrlGeneratorInterface instance
+     */
+    public function getGenerator()
     {
-      $dumper = new $this->options['generator_dumper_class']($this->getRouteCollection());
+        if (null !== $this->generator)
+        {
+            return $this->generator;
+        }
 
-      $options = array(
-        'class'      => $class,
-        'base_class' => $this->options['generator_base_class'],
-      );
+        if (null === $this->options['cache_dir'] || null === $this->options['generator_cache_class'])
+        {
+            return $this->generator = new $this->options['generator_class']($this->getRouteCollection(), $this->context, $this->defaults);
+        }
 
-      $this->updateCache($class, $dumper->dump($options));
+        $class = $this->options['generator_cache_class'];
+        if ($this->needsReload($class))
+        {
+            $dumper = new $this->options['generator_dumper_class']($this->getRouteCollection());
+
+            $options = array(
+                'class'      => $class,
+                'base_class' => $this->options['generator_base_class'],
+            );
+
+            $this->updateCache($class, $dumper->dump($options));
+        }
+
+        require_once $this->getCacheFile($class);
+
+        return $this->generator = new $class($this->context, $this->defaults);
     }
 
-    require_once $this->getCacheFile($class);
-
-    return $this->generator = new $class($this->context, $this->defaults);
-  }
-
-  protected function updateCache($class, $dump)
-  {
-    $this->writeCacheFile($this->getCacheFile($class), $dump);
-
-    if ($this->options['debug'])
+    protected function updateCache($class, $dump)
     {
-      $this->writeCacheFile($this->getCacheFile($class, 'meta'), serialize($this->getRouteCollection()->getResources()));
-    }
-  }
+        $this->writeCacheFile($this->getCacheFile($class), $dump);
 
-  protected function needsReload($class)
-  {
-    $file = $this->getCacheFile($class);
-    if (!file_exists($file))
-    {
-      return true;
+        if ($this->options['debug'])
+        {
+            $this->writeCacheFile($this->getCacheFile($class, 'meta'), serialize($this->getRouteCollection()->getResources()));
+        }
     }
 
-    if (!$this->options['debug'])
+    protected function needsReload($class)
     {
-      return false;
+        $file = $this->getCacheFile($class);
+        if (!file_exists($file))
+        {
+            return true;
+        }
+
+        if (!$this->options['debug'])
+        {
+            return false;
+        }
+
+        $metadata = $this->getCacheFile($class, 'meta');
+        if (!file_exists($metadata))
+        {
+            return true;
+        }
+
+        $time = filemtime($file);
+        $meta = unserialize(file_get_contents($metadata));
+        foreach ($meta as $resource)
+        {
+            if (!$resource->isUptodate($time))
+            {
+                return true;
+            }
+        }
+
+        return false;
     }
 
-    $metadata = $this->getCacheFile($class, 'meta');
-    if (!file_exists($metadata))
+    protected function getCacheFile($class, $extension = 'php')
     {
-      return true;
+        return $this->options['cache_dir'].'/'.$class.'.'.$extension;
     }
 
-    $time = filemtime($file);
-    $meta = unserialize(file_get_contents($metadata));
-    foreach ($meta as $resource)
+    /**
+     * @throws \RuntimeException When cache file can't be wrote
+     */
+    protected function writeCacheFile($file, $content)
     {
-      if (!$resource->isUptodate($time))
-      {
-        return true;
-      }
+        $tmpFile = tempnam(dirname($file), basename($file));
+        if (!$fp = @fopen($tmpFile, 'wb'))
+        {
+            throw new \RuntimeException(sprintf('Failed to write cache file "%s".', $tmpFile));
+        }
+
+        @fwrite($fp, $content);
+        @fclose($fp);
+
+        if ($content != file_get_contents($tmpFile))
+        {
+            throw new \RuntimeException(sprintf('Failed to write cache file "%s" (cache corrupted).', $tmpFile));
+        }
+
+        @rename($tmpFile, $file);
+        chmod($file, 0644);
     }
-
-    return false;
-  }
-
-  protected function getCacheFile($class, $extension = 'php')
-  {
-    return $this->options['cache_dir'].'/'.$class.'.'.$extension;
-  }
-
-  /**
-   * @throws \RuntimeException When cache file can't be wrote
-   */
-  protected function writeCacheFile($file, $content)
-  {
-    $tmpFile = tempnam(dirname($file), basename($file));
-    if (!$fp = @fopen($tmpFile, 'wb'))
-    {
-      throw new \RuntimeException(sprintf('Failed to write cache file "%s".', $tmpFile));
-    }
-
-    @fwrite($fp, $content);
-    @fclose($fp);
-
-    if ($content != file_get_contents($tmpFile))
-    {
-      throw new \RuntimeException(sprintf('Failed to write cache file "%s" (cache corrupted).', $tmpFile));
-    }
-
-    @rename($tmpFile, $file);
-    chmod($file, 0644);
-  }
 }

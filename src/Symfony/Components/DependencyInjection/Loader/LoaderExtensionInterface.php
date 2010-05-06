@@ -20,44 +20,44 @@ namespace Symfony\Components\DependencyInjection\Loader;
  */
 interface LoaderExtensionInterface
 {
-  /**
-   * Sets a configuration entry point for the given extension name.
-   *
-   * @param string The configuration extension name
-   * @param mixed  A resource
-   */
-  public function setConfiguration($name, $resource);
+    /**
+     * Sets a configuration entry point for the given extension name.
+     *
+     * @param string The configuration extension name
+     * @param mixed  A resource
+     */
+    public function setConfiguration($name, $resource);
 
-  /**
-   * Loads a specific configuration.
-   *
-   * @param string The tag name
-   * @param array  An array of configuration values
-   *
-   * @return BuilderConfiguration A BuilderConfiguration instance
-   */
-  public function load($tag, array $config);
+    /**
+     * Loads a specific configuration.
+     *
+     * @param string The tag name
+     * @param array  An array of configuration values
+     *
+     * @return BuilderConfiguration A BuilderConfiguration instance
+     */
+    public function load($tag, array $config);
 
-  /**
-   * Returns the namespace to be used for this extension (XML namespace).
-   *
-   * @return string The XML namespace
-   */
-  public function getNamespace();
+    /**
+     * Returns the namespace to be used for this extension (XML namespace).
+     *
+     * @return string The XML namespace
+     */
+    public function getNamespace();
 
-  /**
-   * Returns the base path for the XSD files.
-   *
-   * @return string The XSD base path
-   */
-  public function getXsdValidationBasePath();
+    /**
+     * Returns the base path for the XSD files.
+     *
+     * @return string The XSD base path
+     */
+    public function getXsdValidationBasePath();
 
-  /**
-   * Returns the recommended alias to use in XML.
-   *
-   * This alias is also the mandatory prefix to use when using YAML.
-   *
-   * @return string The alias
-   */
-  public function getAlias();
+    /**
+     * Returns the recommended alias to use in XML.
+     *
+     * This alias is also the mandatory prefix to use when using YAML.
+     *
+     * @return string The alias
+     */
+    public function getAlias();
 }

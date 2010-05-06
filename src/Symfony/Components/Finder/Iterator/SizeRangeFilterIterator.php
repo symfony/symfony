@@ -20,44 +20,44 @@ namespace Symfony\Components\Finder\Iterator;
  */
 class SizeRangeFilterIterator extends \FilterIterator
 {
-  protected $patterns = array();
+    protected $patterns = array();
 
-  /**
-   * Constructor.
-   *
-   * @param \Iterator $iterator The Iterator to filter
-   * @param array     $patterns An array of \NumberCompare instances
-   */
-  public function __construct(\Iterator $iterator, array $patterns)
-  {
-    $this->patterns = $patterns;
-
-    parent::__construct($iterator);
-  }
-
-  /**
-   * Filters the iterator values.
-   *
-   * @return Boolean true if the value should be kept, false otherwise
-   */
-  public function accept()
-  {
-    $fileinfo = $this->getInnerIterator()->current();
-
-    if (!$fileinfo->isFile())
+    /**
+     * Constructor.
+     *
+     * @param \Iterator $iterator The Iterator to filter
+     * @param array     $patterns An array of \NumberCompare instances
+     */
+    public function __construct(\Iterator $iterator, array $patterns)
     {
-      return true;
+        $this->patterns = $patterns;
+
+        parent::__construct($iterator);
     }
 
-    $filesize = $fileinfo->getSize();
-    foreach ($this->patterns as $compare)
+    /**
+     * Filters the iterator values.
+     *
+     * @return Boolean true if the value should be kept, false otherwise
+     */
+    public function accept()
     {
-      if (!$compare->test($filesize))
-      {
-        return false;
-      }
-    }
+        $fileinfo = $this->getInnerIterator()->current();
 
-    return true;
-  }
+        if (!$fileinfo->isFile())
+        {
+            return true;
+        }
+
+        $filesize = $fileinfo->getSize();
+        foreach ($this->patterns as $compare)
+        {
+            if (!$compare->test($filesize))
+            {
+                return false;
+            }
+        }
+
+        return true;
+    }
 }

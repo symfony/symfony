@@ -22,25 +22,25 @@ namespace Symfony\Components\Routing;
  */
 interface RouterInterface
 {
-  /**
-   * Tries to match a URL with a set of routes.
-   *
-   * Returns false if no route matches the URL.
-   *
-   * @param  string $url URL to be parsed
-   *
-   * @return array|false An array of parameters or false if no route matches
-   */
-  public function match($url);
+    /**
+     * Tries to match a URL with a set of routes.
+     *
+     * Returns false if no route matches the URL.
+     *
+     * @param  string $url URL to be parsed
+     *
+     * @return array|false An array of parameters or false if no route matches
+     */
+    public function match($url);
 
-  /**
-   * Generates a URL from the given parameters.
-   *
-   * @param  string  $name       The name of the route
-   * @param  array   $parameters An array of parameters
-   * @param  Boolean $absolute   Whether to generate an absolute URL
-   *
-   * @return string The generated URL
-   */
-  public function generate($name, array $parameters, $absolute = false);
+    /**
+     * Generates a URL from the given parameters.
+     *
+     * @param  string  $name       The name of the route
+     * @param  array   $parameters An array of parameters
+     * @param  Boolean $absolute   Whether to generate an absolute URL
+     *
+     * @return string The generated URL
+     */
+    public function generate($name, array $parameters, $absolute = false);
 }

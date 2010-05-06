@@ -15,19 +15,19 @@ use Symfony\Components\HttpKernel\Test\Tester;
 
 class TestTester extends Tester
 {
-  public function getTestCase()
-  {
-    return $this->test;
-  }
+    public function getTestCase()
+    {
+        return $this->test;
+    }
 }
 
 class TesterTest extends \PHPUnit_Framework_TestCase
 {
-  public function testSetTestCase()
-  {
-    $tester = new TestTester();
-    $tester->setTestCase($this);
+    public function testSetTestCase()
+    {
+        $tester = new TestTester();
+        $tester->setTestCase($this);
 
-    $this->assertSame($this, $tester->getTestCase(), '->setTestCase() sets the test case object associated with the tester');
-  }
+        $this->assertSame($this, $tester->getTestCase(), '->setTestCase() sets the test case object associated with the tester');
+    }
 }

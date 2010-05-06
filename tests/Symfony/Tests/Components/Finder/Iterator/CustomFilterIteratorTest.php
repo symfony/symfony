@@ -17,23 +17,23 @@ require_once __DIR__.'/IteratorTestCase.php';
 
 class CustomFilterIteratorTest extends IteratorTestCase
 {
-  /**
-   * @dataProvider getAcceptData
-   */
-  public function testAccept($filters, $expected)
-  {
-    $inner = new Iterator(array('test.php', 'test.py', 'foo.php'));
+    /**
+     * @dataProvider getAcceptData
+     */
+    public function testAccept($filters, $expected)
+    {
+        $inner = new Iterator(array('test.php', 'test.py', 'foo.php'));
 
-    $iterator = new CustomFilterIterator($inner, $filters);
+        $iterator = new CustomFilterIterator($inner, $filters);
 
-    $this->assertIterator($expected, $iterator);
-  }
+        $this->assertIterator($expected, $iterator);
+    }
 
-  public function getAcceptData()
-  {
-    return array(
-      array(array(function (\SplFileInfo $fileinfo) { return false; }), array()),
-      array(array(function (\SplFileInfo $fileinfo) { return preg_match('/^test/', $fileinfo) > 0; }), array('test.php', 'test.py')),
-    );
-  }
+    public function getAcceptData()
+    {
+        return array(
+            array(array(function (\SplFileInfo $fileinfo) { return false; }), array()),
+            array(array(function (\SplFileInfo $fileinfo) { return preg_match('/^test/', $fileinfo) > 0; }), array('test.php', 'test.py')),
+        );
+    }
 }

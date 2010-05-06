@@ -29,42 +29,42 @@ use Doctrine\ORM\Tools\EntityGenerator;
  */
 class GenerateEntitiesDoctrineCommand extends DoctrineCommand
 {
-  protected function configure()
-  {
-    $this
-      ->setName('doctrine:generate:entities')
-      ->setDescription('Generate entity classes and method stubs from your mapping information.')
-      ->setHelp(<<<EOT
+    protected function configure()
+    {
+        $this
+            ->setName('doctrine:generate:entities')
+            ->setDescription('Generate entity classes and method stubs from your mapping information.')
+            ->setHelp(<<<EOT
 The <info>doctrine:generate:entities</info> command generates entity classes and method stubs from your mapping information:
 
   <info>./symfony doctrine:generate:entities</info>
 EOT
-    );
-  }
-
-  protected function execute(InputInterface $input, OutputInterface $output)
-  {
-    $entityGenerator = $this->getEntityGenerator();
-    $bundleDirs = $this->container->getKernelService()->getBundleDirs();
-    foreach ($this->container->getKernelService()->getBundles() as $bundle)
-    {
-      $tmp = dirname(str_replace('\\', '/', get_class($bundle)));
-      $namespace = str_replace('/', '\\', dirname($tmp));
-      $class = basename($tmp);
-
-      if (isset($bundleDirs[$namespace]))
-      {
-        $destination = realpath($bundleDirs[$namespace].'/..');
-        if ($metadatas = $this->getBundleMetadatas($bundle))
-        {
-          $output->writeln(sprintf('Generating entities for "<info>%s</info>"', $class));
-          foreach ($metadatas as $metadata)
-          {
-            $output->writeln(sprintf('  > generating <comment>%s</comment>', $metadata->name));
-            $entityGenerator->generate(array($metadata), $destination);
-          }
-        }
-      }
+        );
     }
-  }
+
+    protected function execute(InputInterface $input, OutputInterface $output)
+    {
+        $entityGenerator = $this->getEntityGenerator();
+        $bundleDirs = $this->container->getKernelService()->getBundleDirs();
+        foreach ($this->container->getKernelService()->getBundles() as $bundle)
+        {
+            $tmp = dirname(str_replace('\\', '/', get_class($bundle)));
+            $namespace = str_replace('/', '\\', dirname($tmp));
+            $class = basename($tmp);
+
+            if (isset($bundleDirs[$namespace]))
+            {
+                $destination = realpath($bundleDirs[$namespace].'/..');
+                if ($metadatas = $this->getBundleMetadatas($bundle))
+                {
+                    $output->writeln(sprintf('Generating entities for "<info>%s</info>"', $class));
+                    foreach ($metadatas as $metadata)
+                    {
+                        $output->writeln(sprintf('  > generating <comment>%s</comment>', $metadata->name));
+                        $entityGenerator->generate(array($metadata), $destination);
+                    }
+                }
+            }
+        }
+    }
 }

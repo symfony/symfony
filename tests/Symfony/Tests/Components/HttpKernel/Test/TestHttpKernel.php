@@ -19,21 +19,21 @@ use Symfony\Components\EventDispatcher\Event;
 
 class TestHttpKernel extends HttpKernel
 {
-  public function __construct()
-  {
-    $this->dispatcher = new EventDispatcher();
-    $this->dispatcher->connect('core.load_controller', array($this, 'loadController'));
-  }
+    public function __construct()
+    {
+        $this->dispatcher = new EventDispatcher();
+        $this->dispatcher->connect('core.load_controller', array($this, 'loadController'));
+    }
 
-  public function loadController(Event $event)
-  {
-    $event->setReturnValue(array(array($this, 'callController'), array($event['request'])));
+    public function loadController(Event $event)
+    {
+        $event->setReturnValue(array(array($this, 'callController'), array($event['request'])));
 
-    return true;
-  }
+        return true;
+    }
 
-  public function callController(Request $request)
-  {
-    return new Response('Request: '.$request->getRequestUri());
-  }
+    public function callController(Request $request)
+    {
+        return new Response('Request: '.$request->getRequestUri());
+    }
 }

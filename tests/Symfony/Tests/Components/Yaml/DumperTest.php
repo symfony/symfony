@@ -16,75 +16,75 @@ use Symfony\Components\Yaml\Dumper;
 
 class DumperTest extends \PHPUnit_Framework_TestCase
 {
-  protected $parser;
-  protected $dumper;
-  protected $path;
+    protected $parser;
+    protected $dumper;
+    protected $path;
 
-  static public function setUpBeforeClass()
-  {
-    Yaml::setSpecVersion('1.1');
-  }
-
-  public function setUp()
-  {
-    $this->parser = new Parser();
-    $this->dumper = new Dumper();
-    $this->path = __DIR__.'/../../../../fixtures/Symfony/Components/Yaml';
-  }
-
-  public function testSpecifications()
-  {
-    $files = $this->parser->parse(file_get_contents($this->path.'/index.yml'));
-    foreach ($files as $file)
+    static public function setUpBeforeClass()
     {
-      $yamls = file_get_contents($this->path.'/'.$file.'.yml');
-
-      // split YAMLs documents
-      foreach (preg_split('/^---( %YAML\:1\.0)?/m', $yamls) as $yaml)
-      {
-        if (!$yaml)
-        {
-          continue;
-        }
-
-        $test = $this->parser->parse($yaml);
-        if (isset($test['dump_skip']) && $test['dump_skip'])
-        {
-          continue;
-        }
-        else if (isset($test['todo']) && $test['todo'])
-        {
-          // TODO
-        }
-        else
-        {
-          $expected = eval('return '.trim($test['php']).';');
-
-          $this->assertEquals($expected, $this->parser->parse($this->dumper->dump($expected, 10)), $test['test']);
-        }
-      }
+        Yaml::setSpecVersion('1.1');
     }
-  }
 
-  public function testInlineLevel()
-  {
-    // inline level
-    $array = array(
-      '' => 'bar',
-      'foo' => '#bar',
-      'foo\'bar' => array(),
-      'bar' => array(1, 'foo'),
-      'foobar' => array(
-        'foo' => 'bar',
-        'bar' => array(1, 'foo'),
-        'foobar' => array(
-          'foo' => 'bar',
-          'bar' => array(1, 'foo'),
-        ),
-      ),
-    );
+    public function setUp()
+    {
+        $this->parser = new Parser();
+        $this->dumper = new Dumper();
+        $this->path = __DIR__.'/../../../../fixtures/Symfony/Components/Yaml';
+    }
 
-    $expected = <<<EOF
+    public function testSpecifications()
+    {
+        $files = $this->parser->parse(file_get_contents($this->path.'/index.yml'));
+        foreach ($files as $file)
+        {
+            $yamls = file_get_contents($this->path.'/'.$file.'.yml');
+
+            // split YAMLs documents
+            foreach (preg_split('/^---( %YAML\:1\.0)?/m', $yamls) as $yaml)
+            {
+                if (!$yaml)
+                {
+                    continue;
+                }
+
+                $test = $this->parser->parse($yaml);
+                if (isset($test['dump_skip']) && $test['dump_skip'])
+                {
+                    continue;
+                }
+                else if (isset($test['todo']) && $test['todo'])
+                {
+                    // TODO
+                }
+                else
+                {
+                    $expected = eval('return '.trim($test['php']).';');
+
+                    $this->assertEquals($expected, $this->parser->parse($this->dumper->dump($expected, 10)), $test['test']);
+                }
+            }
+        }
+    }
+
+    public function testInlineLevel()
+    {
+        // inline level
+        $array = array(
+            '' => 'bar',
+            'foo' => '#bar',
+            'foo\'bar' => array(),
+            'bar' => array(1, 'foo'),
+            'foobar' => array(
+                'foo' => 'bar',
+                'bar' => array(1, 'foo'),
+                'foobar' => array(
+                    'foo' => 'bar',
+                    'bar' => array(1, 'foo'),
+                ),
+            ),
+        );
+
+        $expected = <<<EOF
 { '': bar, foo: '#bar', 'foo''bar': {  }, bar: [1, foo], foobar: { foo: bar, bar: [1, foo], foobar: { foo: bar, bar: [1, foo] } } }
 EOF;
 $this->assertEquals($expected, $this->dumper->dump($array, -10), '->dump() takes an inline level argument');
@@ -98,9 +98,9 @@ bar: [1, foo]
 foobar: { foo: bar, bar: [1, foo], foobar: { foo: bar, bar: [1, foo] } }
 
 EOF;
-    $this->assertEquals($expected, $this->dumper->dump($array, 1), '->dump() takes an inline level argument');
+        $this->assertEquals($expected, $this->dumper->dump($array, 1), '->dump() takes an inline level argument');
 
-    $expected = <<<EOF
+        $expected = <<<EOF
 '': bar
 foo: '#bar'
 'foo''bar': {  }
@@ -113,9 +113,9 @@ foobar:
   foobar: { foo: bar, bar: [1, foo] }
 
 EOF;
-    $this->assertEquals($expected, $this->dumper->dump($array, 2), '->dump() takes an inline level argument');
+        $this->assertEquals($expected, $this->dumper->dump($array, 2), '->dump() takes an inline level argument');
 
-    $expected = <<<EOF
+        $expected = <<<EOF
 '': bar
 foo: '#bar'
 'foo''bar': {  }
@@ -132,9 +132,9 @@ foobar:
     bar: [1, foo]
 
 EOF;
-    $this->assertEquals($expected, $this->dumper->dump($array, 3), '->dump() takes an inline level argument');
+        $this->assertEquals($expected, $this->dumper->dump($array, 3), '->dump() takes an inline level argument');
 
-    $expected = <<<EOF
+        $expected = <<<EOF
 '': bar
 foo: '#bar'
 'foo''bar': {  }
@@ -153,19 +153,19 @@ foobar:
       - foo
 
 EOF;
-    $this->assertEquals($expected, $this->dumper->dump($array, 4), '->dump() takes an inline level argument');
-    $this->assertEquals($expected, $this->dumper->dump($array, 10), '->dump() takes an inline level argument');
-  }
+        $this->assertEquals($expected, $this->dumper->dump($array, 4), '->dump() takes an inline level argument');
+        $this->assertEquals($expected, $this->dumper->dump($array, 10), '->dump() takes an inline level argument');
+    }
 
-  public function testObjectsSupport()
-  {
-    $a = array('foo' => new A(), 'bar' => 1);
+    public function testObjectsSupport()
+    {
+        $a = array('foo' => new A(), 'bar' => 1);
 
-    $this->assertEquals('{ foo: !!php/object:O:40:"Symfony\Tests\Components\OutputEscaper\A":1:{s:1:"a";s:3:"foo";}, bar: 1 }', $this->dumper->dump($a), '->dump() is able to dump objects');
-  }
+        $this->assertEquals('{ foo: !!php/object:O:40:"Symfony\Tests\Components\OutputEscaper\A":1:{s:1:"a";s:3:"foo";}, bar: 1 }', $this->dumper->dump($a), '->dump() is able to dump objects');
+    }
 }
 
 class A
 {
-  public $a = 'foo';
+    public $a = 'foo';
 }

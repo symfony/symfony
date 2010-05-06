@@ -5,7 +5,7 @@
 <?php if (isset($traces) && count($traces) > 0): ?>
 [stack trace]
 <?php foreach ($traces as $line): ?>
-  <?php echo $line ?>
+    <?php echo $line ?>
 
 <?php endforeach; ?>
 <?php endif; ?>

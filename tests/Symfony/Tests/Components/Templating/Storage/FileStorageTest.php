@@ -16,11 +16,11 @@ use Symfony\Components\Templating\Storage\FileStorage;
 
 class FileStorageTest extends \PHPUnit_Framework_TestCase
 {
-  public function testGetContent()
-  {
-    $storage = new FileStorage('foo');
-    $this->assertInstanceOf('Symfony\Components\Templating\Storage\Storage', $storage, 'FileStorage is an instance of Storage');
-    $storage = new FileStorage(__DIR__.'/../../../../../fixtures/Symfony/Components/Templating/templates/foo.php');
-    $this->assertEquals('<?php echo $foo ?>', $storage->getContent(), '->getContent() returns the content of the template');
-  }
+    public function testGetContent()
+    {
+        $storage = new FileStorage('foo');
+        $this->assertInstanceOf('Symfony\Components\Templating\Storage\Storage', $storage, 'FileStorage is an instance of Storage');
+        $storage = new FileStorage(__DIR__.'/../../../../../fixtures/Symfony/Components/Templating/templates/foo.php');
+        $this->assertEquals('<?php echo $foo ?>', $storage->getContent(), '->getContent() returns the content of the template');
+    }
 }

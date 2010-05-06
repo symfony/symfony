@@ -22,29 +22,29 @@ use Symfony\Components\DependencyInjection\ContainerInterface;
  */
 abstract class DataCollector implements DataCollectorInterface
 {
-  protected $manager;
-  protected $container;
-  protected $data;
+    protected $manager;
+    protected $container;
+    protected $data;
 
-  public function __construct(ContainerInterface $container)
-  {
-    $this->container = $container;
-  }
-
-  public function getData()
-  {
-    if (null === $this->data)
+    public function __construct(ContainerInterface $container)
     {
-      $this->data = $this->collect();
+        $this->container = $container;
     }
 
-    return $this->data;
-  }
+    public function getData()
+    {
+        if (null === $this->data)
+        {
+            $this->data = $this->collect();
+        }
 
-  abstract protected function collect();
+        return $this->data;
+    }
 
-  public function setCollectorManager(DataCollectorManager $manager)
-  {
-    $this->manager = $manager;
-  }
+    abstract protected function collect();
+
+    public function setCollectorManager(DataCollectorManager $manager)
+    {
+        $this->manager = $manager;
+    }
 }

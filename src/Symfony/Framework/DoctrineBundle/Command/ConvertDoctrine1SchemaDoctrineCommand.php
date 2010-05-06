@@ -34,91 +34,91 @@ use Doctrine\ORM\Tools\ConvertDoctrine1Schema;
  */
 class ConvertDoctrine1SchemaDoctrineCommand extends DoctrineCommand
 {
-  protected function configure()
-  {
-    $this
-      ->setName('doctrine:mapping:convert-d1-schema')
-      ->setDescription('Convert a Doctrine 1 schema to Doctrine 2 mapping files.')
-      ->addArgument('d1-schema', InputArgument::REQUIRED, 'Path to the Doctrine 1 schema files.')
-      ->addArgument('bundle', InputArgument::REQUIRED, 'The bundle to write the converted mapping information to.')
-      ->addArgument('mapping-type', InputArgument::OPTIONAL, 'The mapping type to export the converted mapping information to.')
-      ->setHelp(<<<EOT
+    protected function configure()
+    {
+        $this
+            ->setName('doctrine:mapping:convert-d1-schema')
+            ->setDescription('Convert a Doctrine 1 schema to Doctrine 2 mapping files.')
+            ->addArgument('d1-schema', InputArgument::REQUIRED, 'Path to the Doctrine 1 schema files.')
+            ->addArgument('bundle', InputArgument::REQUIRED, 'The bundle to write the converted mapping information to.')
+            ->addArgument('mapping-type', InputArgument::OPTIONAL, 'The mapping type to export the converted mapping information to.')
+            ->setHelp(<<<EOT
 The <info>doctrine:mapping:convert-d1-schema</info> command converts a Doctrine 1 schema to Doctrine 2 mapping files:
 
   <info>./symfony doctrine:mapping:convert-d1-schema /path/to/doctrine1schema "Bundle\MyBundle" xml</info>
 
 Each Doctrine 1 model will have its own XML mapping file located in <info>Bundle/MyBundle/config/doctrine/metadata</info>.
 EOT
-    );
-  }
+        );
+    }
 
-  /**
-   * @see Command
-   */
-  protected function execute(InputInterface $input, OutputInterface $output)
-  {
-    $bundleClass = null;
-    $bundleDirs = $this->container->getKernelService()->getBundleDirs();
-    foreach ($this->container->getKernelService()->getBundles() as $bundle)
+    /**
+     * @see Command
+     */
+    protected function execute(InputInterface $input, OutputInterface $output)
     {
-      if (strpos(get_class($bundle), $input->getArgument('bundle')) !== false)
-      {
-        $tmp = dirname(str_replace('\\', '/', get_class($bundle)));
-        $namespace = str_replace('/', '\\', dirname($tmp));
-        $class = basename($tmp);
-
-        if (isset($bundleDirs[$namespace]))
+        $bundleClass = null;
+        $bundleDirs = $this->container->getKernelService()->getBundleDirs();
+        foreach ($this->container->getKernelService()->getBundles() as $bundle)
         {
-          $destPath = realpath($bundleDirs[$namespace]).'/'.$class;
-          $bundleClass = $class;
-          break;
+            if (strpos(get_class($bundle), $input->getArgument('bundle')) !== false)
+            {
+                $tmp = dirname(str_replace('\\', '/', get_class($bundle)));
+                $namespace = str_replace('/', '\\', dirname($tmp));
+                $class = basename($tmp);
+
+                if (isset($bundleDirs[$namespace]))
+                {
+                    $destPath = realpath($bundleDirs[$namespace]).'/'.$class;
+                    $bundleClass = $class;
+                    break;
+                }
+            }
         }
-      }
-    }
 
-    $type = $input->getArgument('mapping-type') ? $input->getArgument('mapping-type') : 'xml';
-    if ($type === 'annotation')
-    {
-      $destPath .= '/Entities';
-    }
-    else
-    {
-      $destPath .= '/Resources/config/doctrine/metadata';
-    }
-
-    $cme = new ClassMetadataExporter();
-    $exporter = $cme->getExporter($type);
-
-    if ($type === 'annotation')
-    {
-      $entityGenerator = $this->getEntityGenerator();
-      $exporter->setEntityGenerator($entityGenerator);
-    }
-
-    $converter = new ConvertDoctrine1Schema($input->getArgument('d1-schema'));
-    $metadata = $converter->getMetadata();
-
-    if ($metadata)
-    {
-      $output->writeln(sprintf('Converting Doctrine 1 schema "<info>%s</info>"', $input->getArgument('d1-schema')));
-      foreach ($metadata as $class)
-      {
-        $className = $class->name;
-        $class->name = $namespace.'\\'.$bundleClass.'\\Entities\\'.$className;
+        $type = $input->getArgument('mapping-type') ? $input->getArgument('mapping-type') : 'xml';
         if ($type === 'annotation')
         {
-          $path = $destPath.'/'.$className.'.php';
+            $destPath .= '/Entities';
         }
         else
         {
-          $path = $destPath.'/'.str_replace('\\', '.', $class->name).'.dcm.xml';
+            $destPath .= '/Resources/config/doctrine/metadata';
         }
-        $output->writeln(sprintf('  > writing <comment>%s</comment>', $path));
-        $code = $exporter->exportClassMetadata($class);
-        file_put_contents($path, $code);
-      }
-    } else {
-      $output->writeln('Database does not have any mapping information.'.PHP_EOL, 'ERROR');
+
+        $cme = new ClassMetadataExporter();
+        $exporter = $cme->getExporter($type);
+
+        if ($type === 'annotation')
+        {
+            $entityGenerator = $this->getEntityGenerator();
+            $exporter->setEntityGenerator($entityGenerator);
+        }
+
+        $converter = new ConvertDoctrine1Schema($input->getArgument('d1-schema'));
+        $metadata = $converter->getMetadata();
+
+        if ($metadata)
+        {
+            $output->writeln(sprintf('Converting Doctrine 1 schema "<info>%s</info>"', $input->getArgument('d1-schema')));
+            foreach ($metadata as $class)
+            {
+                $className = $class->name;
+                $class->name = $namespace.'\\'.$bundleClass.'\\Entities\\'.$className;
+                if ($type === 'annotation')
+                {
+                    $path = $destPath.'/'.$className.'.php';
+                }
+                else
+                {
+                    $path = $destPath.'/'.str_replace('\\', '.', $class->name).'.dcm.xml';
+                }
+                $output->writeln(sprintf('  > writing <comment>%s</comment>', $path));
+                $code = $exporter->exportClassMetadata($class);
+                file_put_contents($path, $code);
+            }
+        } else {
+            $output->writeln('Database does not have any mapping information.'.PHP_EOL, 'ERROR');
+        }
     }
-  }
 }

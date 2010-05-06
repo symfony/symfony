@@ -14,22 +14,22 @@ require_once __DIR__.'/../../../../../fixtures/Symfony/Components/DependencyInje
 
 class LoaderExtensionTest extends \PHPUnit_Framework_TestCase
 {
-  public function testLoad()
-  {
-    $extension = new \ProjectExtension();
-
-    try
+    public function testLoad()
     {
-      $extension->load('foo', array());
-      $this->fail('->load() throws an InvalidArgumentException if the tag does not exist');
-    }
-    catch (\Exception $e)
-    {
-      $this->assertInstanceOf('\InvalidArgumentException', $e, '->load() throws an InvalidArgumentException if the tag does not exist');
-      $this->assertEquals('The tag "foo" is not defined in the "http://www.example.com/schema/project" extension.', $e->getMessage(), '->load() throws an InvalidArgumentException if the tag does not exist');
-    }
+        $extension = new \ProjectExtension();
 
-    $config = $extension->load('bar', array('foo' => 'bar'));
-    $this->assertEquals(array('project.parameter.bar' => 'bar'), $config->getParameters(), '->load() calls the method tied to the given tag');
-  }
+        try
+        {
+            $extension->load('foo', array());
+            $this->fail('->load() throws an InvalidArgumentException if the tag does not exist');
+        }
+        catch (\Exception $e)
+        {
+            $this->assertInstanceOf('\InvalidArgumentException', $e, '->load() throws an InvalidArgumentException if the tag does not exist');
+            $this->assertEquals('The tag "foo" is not defined in the "http://www.example.com/schema/project" extension.', $e->getMessage(), '->load() throws an InvalidArgumentException if the tag does not exist');
+        }
+
+        $config = $extension->load('bar', array('foo' => 'bar'));
+        $this->assertEquals(array('project.parameter.bar' => 'bar'), $config->getParameters(), '->load() calls the method tied to the given tag');
+    }
 }

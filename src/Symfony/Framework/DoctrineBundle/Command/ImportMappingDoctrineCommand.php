@@ -33,15 +33,15 @@ use Doctrine\ORM\Tools\Export\ClassMetadataExporter;
  */
 class ImportMappingDoctrineCommand extends DoctrineCommand
 {
-  protected function configure()
-  {
-    $this
-      ->setName('doctrine:mapping:import')
-      ->addArgument('bundle', InputArgument::REQUIRED, 'The bundle to import the mapping information to.')
-      ->addArgument('mapping-type', InputArgument::OPTIONAL, 'The mapping type to export the imported mapping information to.')
-      ->addOption('em', null, InputOption::PARAMETER_OPTIONAL, 'The entity manager to use for this command.')
-      ->setDescription('Import mapping information from an existing database.')
-      ->setHelp(<<<EOT
+    protected function configure()
+    {
+        $this
+            ->setName('doctrine:mapping:import')
+            ->addArgument('bundle', InputArgument::REQUIRED, 'The bundle to import the mapping information to.')
+            ->addArgument('mapping-type', InputArgument::OPTIONAL, 'The mapping type to export the imported mapping information to.')
+            ->addOption('em', null, InputOption::PARAMETER_OPTIONAL, 'The entity manager to use for this command.')
+            ->setDescription('Import mapping information from an existing database.')
+            ->setHelp(<<<EOT
 The <info>doctrine:mapping:import</info> command imports mapping information from an existing database:
 
   <info>./symfony doctrine:mapping:import "Bundle\MyCustomBundle" xml</info>
@@ -50,78 +50,78 @@ You can also optionally specify which entity manager to import from with the <in
 
   <info>./symfony doctrine:mapping:import "Bundle\MyCustomBundle" xml --em=default</info>
 EOT
-    );
-  }
+        );
+    }
 
-  protected function execute(InputInterface $input, OutputInterface $output)
-  {
-    $bundleClass = null;
-    $bundleDirs = $this->container->getKernelService()->getBundleDirs();
-    foreach ($this->container->getKernelService()->getBundles() as $bundle)
+    protected function execute(InputInterface $input, OutputInterface $output)
     {
-      if (strpos(get_class($bundle), $input->getArgument('bundle')) !== false)
-      {
-        $tmp = dirname(str_replace('\\', '/', get_class($bundle)));
-        $namespace = str_replace('/', '\\', dirname($tmp));
-        $class = basename($tmp);
-
-        if (isset($bundleDirs[$namespace]))
+        $bundleClass = null;
+        $bundleDirs = $this->container->getKernelService()->getBundleDirs();
+        foreach ($this->container->getKernelService()->getBundles() as $bundle)
         {
-          $destPath = realpath($bundleDirs[$namespace]).'/'.$class;
-          $bundleClass = $class;
-          break;
+            if (strpos(get_class($bundle), $input->getArgument('bundle')) !== false)
+            {
+                $tmp = dirname(str_replace('\\', '/', get_class($bundle)));
+                $namespace = str_replace('/', '\\', dirname($tmp));
+                $class = basename($tmp);
+
+                if (isset($bundleDirs[$namespace]))
+                {
+                    $destPath = realpath($bundleDirs[$namespace]).'/'.$class;
+                    $bundleClass = $class;
+                    break;
+                }
+            }
         }
-      }
-    }
 
-    $type = $input->getArgument('mapping-type') ? $input->getArgument('mapping-type') : 'xml';
-    if ($type === 'annotation')
-    {
-      $destPath .= '/Entities';
-    }
-    else
-    {
-      $destPath .= '/Resources/config/doctrine/metadata';
-    }
-
-    $cme = new ClassMetadataExporter();
-    $exporter = $cme->getExporter($type);
-
-    if ($type === 'annotation')
-    {
-      $entityGenerator = $this->getEntityGenerator();
-      $exporter->setEntityGenerator($entityGenerator);
-    }
-
-    $emName = $input->getOption('em') ? $input->getOption('em') : 'default';
-    $emServiceName = sprintf('doctrine.orm.%s_entity_manager', $emName);
-    $em = $this->container->getService($emServiceName);
-    $databaseDriver = new DatabaseDriver($em->getConnection()->getSchemaManager());
-    $em->getConfiguration()->setMetadataDriverImpl($databaseDriver);
-
-    $cmf = new DisconnectedClassMetadataFactory($em);
-    $metadata = $cmf->getAllMetadata();
-    if ($metadata)
-    {
-      $output->writeln(sprintf('Importing mapping information from "<info>%s</info>" entity manager', $emName));
-      foreach ($metadata as $class)
-      {
-        $className = $class->name;
-        $class->name = $namespace.'\\'.$bundleClass.'\\Entities\\'.$className;
+        $type = $input->getArgument('mapping-type') ? $input->getArgument('mapping-type') : 'xml';
         if ($type === 'annotation')
         {
-          $path = $destPath.'/'.$className.'.php';
+            $destPath .= '/Entities';
         }
         else
         {
-          $path = $destPath.'/'.str_replace('\\', '.', $class->name).'.dcm.xml';
+            $destPath .= '/Resources/config/doctrine/metadata';
         }
-        $output->writeln(sprintf('  > writing <comment>%s</comment>', $path));
-        $code = $exporter->exportClassMetadata($class);
-        file_put_contents($path, $code);
-      }
-    } else {
-      $output->writeln('Database does not have any mapping information.'.PHP_EOL, 'ERROR');
+
+        $cme = new ClassMetadataExporter();
+        $exporter = $cme->getExporter($type);
+
+        if ($type === 'annotation')
+        {
+            $entityGenerator = $this->getEntityGenerator();
+            $exporter->setEntityGenerator($entityGenerator);
+        }
+
+        $emName = $input->getOption('em') ? $input->getOption('em') : 'default';
+        $emServiceName = sprintf('doctrine.orm.%s_entity_manager', $emName);
+        $em = $this->container->getService($emServiceName);
+        $databaseDriver = new DatabaseDriver($em->getConnection()->getSchemaManager());
+        $em->getConfiguration()->setMetadataDriverImpl($databaseDriver);
+
+        $cmf = new DisconnectedClassMetadataFactory($em);
+        $metadata = $cmf->getAllMetadata();
+        if ($metadata)
+        {
+            $output->writeln(sprintf('Importing mapping information from "<info>%s</info>" entity manager', $emName));
+            foreach ($metadata as $class)
+            {
+                $className = $class->name;
+                $class->name = $namespace.'\\'.$bundleClass.'\\Entities\\'.$className;
+                if ($type === 'annotation')
+                {
+                    $path = $destPath.'/'.$className.'.php';
+                }
+                else
+                {
+                    $path = $destPath.'/'.str_replace('\\', '.', $class->name).'.dcm.xml';
+                }
+                $output->writeln(sprintf('  > writing <comment>%s</comment>', $path));
+                $code = $exporter->exportClassMetadata($class);
+                file_put_contents($path, $code);
+            }
+        } else {
+            $output->writeln('Database does not have any mapping information.'.PHP_EOL, 'ERROR');
+        }
     }
-  }
 }

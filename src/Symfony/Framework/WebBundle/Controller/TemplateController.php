@@ -22,8 +22,8 @@ use Symfony\Framework\WebBundle\Controller;
  */
 class TemplateController extends Controller
 {
-  public function templateAction($template)
-  {
-    return $this->render($template);
-  }
+    public function templateAction($template)
+    {
+        return $this->render($template);
+    }
 }

@@ -23,28 +23,28 @@ use Symfony\Foundation\LoggerInterface;
  */
 class Debugger implements DebuggerInterface
 {
-  protected $logger;
+    protected $logger;
 
-  /**
-   * Constructor.
-   *
-   * @param LoggerInterface $logger A LoggerInterface instance
-   */
-  public function __construct(LoggerInterface $logger = null)
-  {
-    $this->logger = $logger;
-  }
-
-  /**
-   * Logs a message.
-   *
-   * @param string $message A message to log
-   */
-  public function log($message)
-  {
-    if (null !== $this->logger)
+    /**
+     * Constructor.
+     *
+     * @param LoggerInterface $logger A LoggerInterface instance
+     */
+    public function __construct(LoggerInterface $logger = null)
     {
-      $this->logger->info($message);
+        $this->logger = $logger;
     }
-  }
+
+    /**
+     * Logs a message.
+     *
+     * @param string $message A message to log
+     */
+    public function log($message)
+    {
+        if (null !== $this->logger)
+        {
+            $this->logger->info($message);
+        }
+    }
 }

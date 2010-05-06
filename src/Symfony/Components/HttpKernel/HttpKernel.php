@@ -24,162 +24,162 @@ use Symfony\Components\HttpKernel\Exception\NotFoundHttpException;
  */
 class HttpKernel implements HttpKernelInterface
 {
-  protected $dispatcher;
-  protected $request;
+    protected $dispatcher;
+    protected $request;
 
-  /**
-   * Constructor
-   *
-   * @param EventDispatcher $dispatcher An event dispatcher instance
-   */
-  public function __construct(EventDispatcher $dispatcher)
-  {
-    $this->dispatcher = $dispatcher;
-  }
-
-  /**
-   * Gets the Request instance associated with the main request.
-   *
-   * @return Request A Request instance
-   */
-  public function getRequest()
-  {
-    return $this->request;
-  }
-
-  /**
-   * Handles a request to convert it to a response.
-   *
-   * All exceptions are caught, and a core.exception event is notified
-   * for user management.
-   *
-   * @param  Request $request A Request instance
-   * @param  Boolean $main    Whether this is the main request or not
-   *
-   * @return Response $response A Response instance
-   *
-   * @throws \Exception When Exception couldn't be caught by event processing
-   */
-  public function handle(Request $request = null, $main = true)
-  {
-    $main = (Boolean) $main;
-
-    if (null === $request)
+    /**
+     * Constructor
+     *
+     * @param EventDispatcher $dispatcher An event dispatcher instance
+     */
+    public function __construct(EventDispatcher $dispatcher)
     {
-      $request = new Request();
+        $this->dispatcher = $dispatcher;
     }
 
-    if (true === $main)
+    /**
+     * Gets the Request instance associated with the main request.
+     *
+     * @return Request A Request instance
+     */
+    public function getRequest()
     {
-      $this->request = $request;
+        return $this->request;
     }
 
-    try
+    /**
+     * Handles a request to convert it to a response.
+     *
+     * All exceptions are caught, and a core.exception event is notified
+     * for user management.
+     *
+     * @param  Request $request A Request instance
+     * @param  Boolean $main    Whether this is the main request or not
+     *
+     * @return Response $response A Response instance
+     *
+     * @throws \Exception When Exception couldn't be caught by event processing
+     */
+    public function handle(Request $request = null, $main = true)
     {
-      return $this->handleRaw($request, $main);
-    }
-    catch (\Exception $e)
-    {
-      // exception
-      $event = $this->dispatcher->notifyUntil(new Event($this, 'core.exception', array('main_request' => $main, 'request' => $request, 'exception' => $e)));
-      if ($event->isProcessed())
-      {
-        return $this->filterResponse($event->getReturnValue(), $request, 'A "core.exception" listener returned a non response object.', $main);
-      }
+        $main = (Boolean) $main;
 
-      throw $e;
-    }
-  }
+        if (null === $request)
+        {
+            $request = new Request();
+        }
 
-  /**
-   * Handles a request to convert it to a response.
-   *
-   * Exceptions are not caught.
-   *
-   * @param  Request $request A Request instance
-   * @param  Boolean $main    Whether this is the main request or not
-   *
-   * @return Response $response A Response instance
-   *
-   * @throws \LogicException       If one of the listener does not behave as expected
-   * @throws NotFoundHttpException When controller cannot be found
-   */
-  public function handleRaw(Request $request, $main = true)
-  {
-    $main = (Boolean) $main;
+        if (true === $main)
+        {
+            $this->request = $request;
+        }
 
-    // request
-    $event = $this->dispatcher->notifyUntil(new Event($this, 'core.request', array('main_request' => $main, 'request' => $request)));
-    if ($event->isProcessed())
-    {
-      return $this->filterResponse($event->getReturnValue(), $request, 'A "core.request" listener returned a non response object.', $main);
-    }
+        try
+        {
+            return $this->handleRaw($request, $main);
+        }
+        catch (\Exception $e)
+        {
+            // exception
+            $event = $this->dispatcher->notifyUntil(new Event($this, 'core.exception', array('main_request' => $main, 'request' => $request, 'exception' => $e)));
+            if ($event->isProcessed())
+            {
+                return $this->filterResponse($event->getReturnValue(), $request, 'A "core.exception" listener returned a non response object.', $main);
+            }
 
-    // load controller
-    $event = $this->dispatcher->notifyUntil(new Event($this, 'core.load_controller', array('main_request' => $main, 'request' => $request)));
-    if (!$event->isProcessed())
-    {
-      throw new NotFoundHttpException('Unable to find the controller.');
+            throw $e;
+        }
     }
 
-    list($controller, $arguments) = $event->getReturnValue();
-
-    // controller must be a callable
-    if (!is_callable($controller))
+    /**
+     * Handles a request to convert it to a response.
+     *
+     * Exceptions are not caught.
+     *
+     * @param  Request $request A Request instance
+     * @param  Boolean $main    Whether this is the main request or not
+     *
+     * @return Response $response A Response instance
+     *
+     * @throws \LogicException       If one of the listener does not behave as expected
+     * @throws NotFoundHttpException When controller cannot be found
+     */
+    public function handleRaw(Request $request, $main = true)
     {
-      throw new \LogicException(sprintf('The controller must be a callable (%s).', var_export($controller, true)));
+        $main = (Boolean) $main;
+
+        // request
+        $event = $this->dispatcher->notifyUntil(new Event($this, 'core.request', array('main_request' => $main, 'request' => $request)));
+        if ($event->isProcessed())
+        {
+            return $this->filterResponse($event->getReturnValue(), $request, 'A "core.request" listener returned a non response object.', $main);
+        }
+
+        // load controller
+        $event = $this->dispatcher->notifyUntil(new Event($this, 'core.load_controller', array('main_request' => $main, 'request' => $request)));
+        if (!$event->isProcessed())
+        {
+            throw new NotFoundHttpException('Unable to find the controller.');
+        }
+
+        list($controller, $arguments) = $event->getReturnValue();
+
+        // controller must be a callable
+        if (!is_callable($controller))
+        {
+            throw new \LogicException(sprintf('The controller must be a callable (%s).', var_export($controller, true)));
+        }
+
+        // controller
+        $event = $this->dispatcher->notifyUntil(new Event($this, 'core.controller', array('main_request' => $main, 'request' => $request, 'controller' => &$controller, 'arguments' => &$arguments)));
+        if ($event->isProcessed())
+        {
+            try
+            {
+                return $this->filterResponse($event->getReturnValue(), $request, 'A "core.controller" listener returned a non response object.', $main);
+            }
+            catch (\Exception $e)
+            {
+                $retval = $event->getReturnValue();
+            }
+        }
+        else
+        {
+            // call controller
+            $retval = call_user_func_array($controller, $arguments);
+        }
+
+        // view
+        $event = $this->dispatcher->filter(new Event($this, 'core.view', array('main_request' => $main, 'request' => $request)), $retval);
+
+        return $this->filterResponse($event->getReturnValue(), $request, sprintf('The controller must return a response (instead of %s).', is_object($event->getReturnValue()) ? 'an object of class '.get_class($event->getReturnValue()) : str_replace("\n", '', var_export($event->getReturnValue(), true))), $main);
     }
 
-    // controller
-    $event = $this->dispatcher->notifyUntil(new Event($this, 'core.controller', array('main_request' => $main, 'request' => $request, 'controller' => &$controller, 'arguments' => &$arguments)));
-    if ($event->isProcessed())
+    /**
+     * Filters a response object.
+     *
+     * @param Object $response A Response instance
+     * @param string $message  A error message in case the response is not a Response object
+     *
+     * @param Object $response The filtered Response instance
+     *
+     * @throws \RuntimeException if the response object does not implement the send() method
+     */
+    protected function filterResponse($response, $request, $message, $main)
     {
-      try
-      {
-        return $this->filterResponse($event->getReturnValue(), $request, 'A "core.controller" listener returned a non response object.', $main);
-      }
-      catch (\Exception $e)
-      {
-        $retval = $event->getReturnValue();
-      }
+        if (!$response instanceof Response)
+        {
+            throw new \RuntimeException($message);
+        }
+
+        $event = $this->dispatcher->filter(new Event($this, 'core.response', array('main_request' => $main, 'request' => $request)), $response);
+        $response = $event->getReturnValue();
+
+        if (!$response instanceof Response)
+        {
+            throw new \RuntimeException('A "core.response" listener returned a non response object.');
+        }
+
+        return $response;
     }
-    else
-    {
-      // call controller
-      $retval = call_user_func_array($controller, $arguments);
-    }
-
-    // view
-    $event = $this->dispatcher->filter(new Event($this, 'core.view', array('main_request' => $main, 'request' => $request)), $retval);
-
-    return $this->filterResponse($event->getReturnValue(), $request, sprintf('The controller must return a response (instead of %s).', is_object($event->getReturnValue()) ? 'an object of class '.get_class($event->getReturnValue()) : str_replace("\n", '', var_export($event->getReturnValue(), true))), $main);
-  }
-
-  /**
-   * Filters a response object.
-   *
-   * @param Object $response A Response instance
-   * @param string $message  A error message in case the response is not a Response object
-   *
-   * @param Object $response The filtered Response instance
-   *
-   * @throws \RuntimeException if the response object does not implement the send() method
-   */
-  protected function filterResponse($response, $request, $message, $main)
-  {
-    if (!$response instanceof Response)
-    {
-      throw new \RuntimeException($message);
-    }
-
-    $event = $this->dispatcher->filter(new Event($this, 'core.response', array('main_request' => $main, 'request' => $request)), $response);
-    $response = $event->getReturnValue();
-
-    if (!$response instanceof Response)
-    {
-      throw new \RuntimeException('A "core.response" listener returned a non response object.');
-    }
-
-    return $response;
-  }
 }

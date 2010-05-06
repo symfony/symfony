@@ -17,37 +17,37 @@ require_once __DIR__.'/RealIteratorTestCase.php';
 
 class SortableIteratorTest extends RealIteratorTestCase
 {
-  public function testConstructor()
-  {
-    try
+    public function testConstructor()
     {
-      new SortableIterator(new Iterator(array()), 'foobar');
-      $this->fail('__construct() throws an \InvalidArgumentException exception if the mode is not valid');
+        try
+        {
+            new SortableIterator(new Iterator(array()), 'foobar');
+            $this->fail('__construct() throws an \InvalidArgumentException exception if the mode is not valid');
+        }
+        catch (\Exception $e)
+        {
+            $this->assertInstanceOf('InvalidArgumentException', $e, '__construct() throws an \InvalidArgumentException exception if the mode is not valid');
+        }
     }
-    catch (\Exception $e)
+
+    /**
+     * @dataProvider getAcceptData
+     */
+    public function testAccept($mode, $expected)
     {
-      $this->assertInstanceOf('InvalidArgumentException', $e, '__construct() throws an \InvalidArgumentException exception if the mode is not valid');
+        $inner = new Iterator(self::$files);
+
+        $iterator = new SortableIterator($inner, $mode);
+
+        $this->assertIterator($expected, $iterator);
     }
-  }
 
-  /**
-   * @dataProvider getAcceptData
-   */
-  public function testAccept($mode, $expected)
-  {
-    $inner = new Iterator(self::$files);
-
-    $iterator = new SortableIterator($inner, $mode);
-
-    $this->assertIterator($expected, $iterator);
-  }
-
-  public function getAcceptData()
-  {
-    return array(
-      array(SortableIterator::SORT_BY_NAME, array(sys_get_temp_dir().'/symfony2_finder/.git', sys_get_temp_dir().'/symfony2_finder/foo', sys_get_temp_dir().'/symfony2_finder/foo/bar.tmp', sys_get_temp_dir().'/symfony2_finder/test.php', sys_get_temp_dir().'/symfony2_finder/test.py', sys_get_temp_dir().'/symfony2_finder/toto')),
-      array(SortableIterator::SORT_BY_TYPE, array(sys_get_temp_dir().'/symfony2_finder/.git', sys_get_temp_dir().'/symfony2_finder/foo', sys_get_temp_dir().'/symfony2_finder/toto', sys_get_temp_dir().'/symfony2_finder/foo/bar.tmp', sys_get_temp_dir().'/symfony2_finder/test.php', sys_get_temp_dir().'/symfony2_finder/test.py')),
-      array(function (\SplFileInfo $a, \SplFileInfo $b) { return strcmp($a->getRealpath(), $b->getRealpath()); }, array(sys_get_temp_dir().'/symfony2_finder/.git', sys_get_temp_dir().'/symfony2_finder/foo', sys_get_temp_dir().'/symfony2_finder/foo/bar.tmp', sys_get_temp_dir().'/symfony2_finder/test.php', sys_get_temp_dir().'/symfony2_finder/test.py', sys_get_temp_dir().'/symfony2_finder/toto')),
-    );
-  }
+    public function getAcceptData()
+    {
+        return array(
+            array(SortableIterator::SORT_BY_NAME, array(sys_get_temp_dir().'/symfony2_finder/.git', sys_get_temp_dir().'/symfony2_finder/foo', sys_get_temp_dir().'/symfony2_finder/foo/bar.tmp', sys_get_temp_dir().'/symfony2_finder/test.php', sys_get_temp_dir().'/symfony2_finder/test.py', sys_get_temp_dir().'/symfony2_finder/toto')),
+            array(SortableIterator::SORT_BY_TYPE, array(sys_get_temp_dir().'/symfony2_finder/.git', sys_get_temp_dir().'/symfony2_finder/foo', sys_get_temp_dir().'/symfony2_finder/toto', sys_get_temp_dir().'/symfony2_finder/foo/bar.tmp', sys_get_temp_dir().'/symfony2_finder/test.php', sys_get_temp_dir().'/symfony2_finder/test.py')),
+            array(function (\SplFileInfo $a, \SplFileInfo $b) { return strcmp($a->getRealpath(), $b->getRealpath()); }, array(sys_get_temp_dir().'/symfony2_finder/.git', sys_get_temp_dir().'/symfony2_finder/foo', sys_get_temp_dir().'/symfony2_finder/foo/bar.tmp', sys_get_temp_dir().'/symfony2_finder/test.php', sys_get_temp_dir().'/symfony2_finder/test.py', sys_get_temp_dir().'/symfony2_finder/toto')),
+        );
+    }
 }

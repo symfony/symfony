@@ -20,27 +20,27 @@ namespace Symfony\Components\DependencyInjection\Loader;
  */
 abstract class Loader implements LoaderInterface
 {
-  static protected $extensions = array();
+    static protected $extensions = array();
 
-  /**
-   * Registers an extension.
-   *
-   * @param LoaderExtensionInterface $extension An extension instance
-   */
-  static public function registerExtension(LoaderExtensionInterface $extension)
-  {
-    static::$extensions[$extension->getAlias()] = static::$extensions[$extension->getNamespace()] = $extension;
-  }
+    /**
+     * Registers an extension.
+     *
+     * @param LoaderExtensionInterface $extension An extension instance
+     */
+    static public function registerExtension(LoaderExtensionInterface $extension)
+    {
+        static::$extensions[$extension->getAlias()] = static::$extensions[$extension->getNamespace()] = $extension;
+    }
 
-  /**
-   * Returns an extension by alias or namespace.
-   *
-   * @param string $name An alias or a namespace
-   *
-   * @return LoaderExtensionInterface An extension instance
-   */
-  static public function getExtension($name)
-  {
-    return isset(static::$extensions[$name]) ? static::$extensions[$name] : null;
-  }
+    /**
+     * Returns an extension by alias or namespace.
+     *
+     * @param string $name An alias or a namespace
+     *
+     * @return LoaderExtensionInterface An extension instance
+     */
+    static public function getExtension($name)
+    {
+        return isset(static::$extensions[$name]) ? static::$extensions[$name] : null;
+    }
 }

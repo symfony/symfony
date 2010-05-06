@@ -27,32 +27,32 @@ use Symfony\Components\DependencyInjection\BuilderConfiguration;
  */
 class KernelBundle extends Bundle
 {
-  public function buildContainer(ContainerInterface $container)
-  {
-    Loader::registerExtension(new KernelExtension());
-
-    $configuration = new BuilderConfiguration();
-
-    $loader = new XmlFileLoader(array(__DIR__.'/../Resources/config', __DIR__.'/Resources/config'));
-    $configuration->merge($loader->load('services.xml'));
-
-    if ($container->getParameter('kernel.debug'))
+    public function buildContainer(ContainerInterface $container)
     {
-      $configuration->merge($loader->load('debug.xml'));
-      $configuration->setDefinition('event_dispatcher', $configuration->findDefinition('debug.event_dispatcher'));
+        Loader::registerExtension(new KernelExtension());
+
+        $configuration = new BuilderConfiguration();
+
+        $loader = new XmlFileLoader(array(__DIR__.'/../Resources/config', __DIR__.'/Resources/config'));
+        $configuration->merge($loader->load('services.xml'));
+
+        if ($container->getParameter('kernel.debug'))
+        {
+            $configuration->merge($loader->load('debug.xml'));
+            $configuration->setDefinition('event_dispatcher', $configuration->findDefinition('debug.event_dispatcher'));
+        }
+
+        return $configuration;
     }
 
-    return $configuration;
-  }
-
-  public function boot(ContainerInterface $container)
-  {
-    $container->getErrorHandlerService();
-
-    // load core classes
-    if ($container->getParameter('kernel.include_core_classes'))
+    public function boot(ContainerInterface $container)
     {
-      ClassCollectionLoader::load($container->getParameter('kernel.compiled_classes'), $container->getParameter('kernel.cache_dir'), 'classes', $container->getParameter('kernel.debug'));
+        $container->getErrorHandlerService();
+
+        // load core classes
+        if ($container->getParameter('kernel.include_core_classes'))
+        {
+            ClassCollectionLoader::load($container->getParameter('kernel.compiled_classes'), $container->getParameter('kernel.cache_dir'), 'classes', $container->getParameter('kernel.debug'));
+        }
     }
-  }
 }

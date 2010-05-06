@@ -17,23 +17,23 @@ require_once __DIR__.'/RealIteratorTestCase.php';
 
 class FileTypeFilterIteratorTest extends RealIteratorTestCase
 {
-  /**
-   * @dataProvider getAcceptData
-   */
-  public function testAccept($mode, $expected)
-  {
-    $inner = new Iterator(self::$files);
+    /**
+     * @dataProvider getAcceptData
+     */
+    public function testAccept($mode, $expected)
+    {
+        $inner = new Iterator(self::$files);
 
-    $iterator = new FileTypeFilterIterator($inner, $mode);
+        $iterator = new FileTypeFilterIterator($inner, $mode);
 
-    $this->assertIterator($expected, $iterator);
-  }
+        $this->assertIterator($expected, $iterator);
+    }
 
-  public function getAcceptData()
-  {
-    return array(
-      array(FileTypeFilterIterator::ONLY_FILES, array(sys_get_temp_dir().'/symfony2_finder/test.py', sys_get_temp_dir().'/symfony2_finder/foo/bar.tmp', sys_get_temp_dir().'/symfony2_finder/test.php')),
-      array(FileTypeFilterIterator::ONLY_DIRECTORIES, array(sys_get_temp_dir().'/symfony2_finder/.git', sys_get_temp_dir().'/symfony2_finder/foo', sys_get_temp_dir().'/symfony2_finder/toto')),
-    );
-  }
+    public function getAcceptData()
+    {
+        return array(
+            array(FileTypeFilterIterator::ONLY_FILES, array(sys_get_temp_dir().'/symfony2_finder/test.py', sys_get_temp_dir().'/symfony2_finder/foo/bar.tmp', sys_get_temp_dir().'/symfony2_finder/test.php')),
+            array(FileTypeFilterIterator::ONLY_DIRECTORIES, array(sys_get_temp_dir().'/symfony2_finder/.git', sys_get_temp_dir().'/symfony2_finder/foo', sys_get_temp_dir().'/symfony2_finder/toto')),
+        );
+    }
 }

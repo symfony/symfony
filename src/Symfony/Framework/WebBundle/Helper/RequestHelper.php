@@ -23,30 +23,30 @@ use Symfony\Components\HttpKernel\Request;
  */
 class RequestHelper extends Helper
 {
-  protected $request;
+    protected $request;
 
-  /**
-   * Constructor.
-   *
-   * @param Request $request A Request instance
-   */
-  public function __construct(Request $request)
-  {
-    $this->request = $request;
-  }
+    /**
+     * Constructor.
+     *
+     * @param Request $request A Request instance
+     */
+    public function __construct(Request $request)
+    {
+        $this->request = $request;
+    }
 
-  public function getParameter($key, $default = null)
-  {
-    return $this->request->getParameter($key, $default);
-  }
+    public function getParameter($key, $default = null)
+    {
+        return $this->request->getParameter($key, $default);
+    }
 
-  /**
-   * Returns the canonical name of this helper.
-   *
-   * @return string The canonical name
-   */
-  public function getName()
-  {
-    return 'request';
-  }
+    /**
+     * Returns the canonical name of this helper.
+     *
+     * @return string The canonical name
+     */
+    public function getName()
+    {
+        return 'request';
+    }
 }

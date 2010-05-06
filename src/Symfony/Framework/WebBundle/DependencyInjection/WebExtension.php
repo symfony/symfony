@@ -25,145 +25,145 @@ use Symfony\Components\DependencyInjection\Reference;
  */
 class WebExtension extends LoaderExtension
 {
-  protected $resources = array(
-    'templating' => 'templating.xml',
-    'web'        => 'web.xml',
-    'user'       => 'user.xml',
-  );
+    protected $resources = array(
+        'templating' => 'templating.xml',
+        'web'        => 'web.xml',
+        'user'       => 'user.xml',
+    );
 
-  public function webLoad($config)
-  {
-    $configuration = new BuilderConfiguration();
-
-    $loader = new XmlFileLoader(__DIR__.'/../Resources/config');
-    $configuration->merge($loader->load($this->resources['web']));
-
-    if (isset($config['ide']) && 'textmate' === $config['ide'])
+    public function webLoad($config)
     {
-      $configuration->setParameter('debug.file_link_format', 'txmt://open?url=file://%%f&line=%%l');
+        $configuration = new BuilderConfiguration();
+
+        $loader = new XmlFileLoader(__DIR__.'/../Resources/config');
+        $configuration->merge($loader->load($this->resources['web']));
+
+        if (isset($config['ide']) && 'textmate' === $config['ide'])
+        {
+            $configuration->setParameter('debug.file_link_format', 'txmt://open?url=file://%%f&line=%%l');
+        }
+
+        return $configuration;
     }
 
-    return $configuration;
-  }
-
-  public function userLoad($config)
-  {
-    $configuration = new BuilderConfiguration();
-
-    $loader = new XmlFileLoader(__DIR__.'/../Resources/config');
-    $configuration->merge($loader->load($this->resources['user']));
-
-    if (isset($config['default_culture']))
+    public function userLoad($config)
     {
-      $configuration->setParameter('user.default_culture', $config['default_culture']);
+        $configuration = new BuilderConfiguration();
+
+        $loader = new XmlFileLoader(__DIR__.'/../Resources/config');
+        $configuration->merge($loader->load($this->resources['user']));
+
+        if (isset($config['default_culture']))
+        {
+            $configuration->setParameter('user.default_culture', $config['default_culture']);
+        }
+
+        if (isset($config['class']))
+        {
+            $configuration->setParameter('user.class', $config['class']);
+        }
+
+        foreach (array('name', 'auto_start', 'lifetime', 'path', 'domain', 'secure', 'httponly', 'cache_limiter', 'pdo.db_table') as $name)
+        {
+            if (isset($config['session'][$name]))
+            {
+                $configuration->setParameter('session.options.'.$name, $config['session'][$name]);
+            }
+        }
+
+        if (isset($config['session']['class']))
+        {
+            $class = $config['session']['class'];
+            if (in_array($class, array('Native', 'Pdo')))
+            {
+                $class = 'Symfony\\Framework\\WebBundle\\Session\\'.$class.'Session';
+            }
+
+            $configuration->setParameter('user.session', 'user.session.'.strtolower($class));
+        }
+
+        return $configuration;
     }
 
-    if (isset($config['class']))
+    /**
+     * Loads the templating configuration.
+     *
+     * @param array $config A configuration array
+     *
+     * @return BuilderConfiguration A BuilderConfiguration instance
+     */
+    public function templatingLoad($config)
     {
-      $configuration->setParameter('user.class', $config['class']);
+        $configuration = new BuilderConfiguration();
+
+        $loader = new XmlFileLoader(__DIR__.'/../Resources/config');
+        $configuration->merge($loader->load($this->resources['templating']));
+
+        $configuration->setParameter('templating.output_escaper', array_key_exists('escaping', $config) ? $config['escaping'] : false);
+        $configuration->setParameter('templating.assets.version', array_key_exists('assets_version', $config) ? $config['assets_version'] : null);
+
+        // path for the filesystem loader
+        if (isset($config['path']))
+        {
+            $configuration->setParameter('templating.loader.filesystem.path', $config['path']);
+        }
+
+        // loaders
+        if (isset($config['loader']))
+        {
+            $loaders = array();
+            $ids = is_array($config['loader']) ? $config['loader'] : array($config['loader']);
+            foreach ($ids as $id)
+            {
+                $loaders[] = new Reference($id);
+            }
+        }
+        else
+        {
+            $loaders = array(
+                new Reference('templating.loader.filesystem'),
+            );
+        }
+
+        if (1 === count($loaders))
+        {
+            $configuration->setAlias('templating.loader', (string) $loaders[0]);
+        }
+        else
+        {
+            $configuration->getDefinition('templating.loader.chain')->addArgument($loaders);
+            $configuration->setAlias('templating.loader', 'templating.loader.chain');
+        }
+
+        // cache?
+        if (isset($config['cache']))
+        {
+            // wrap the loader with some cache
+            $configuration->setDefinition('templating.loader.wrapped', $configuration->findDefinition('templating.loader'));
+            $configuration->setDefinition('templating.loader', $configuration->getDefinition('templating.loader.cache'));
+            $configuration->setParameter('templating.loader.cache.path', $config['cache']);
+        }
+
+        return $configuration;
     }
 
-    foreach (array('name', 'auto_start', 'lifetime', 'path', 'domain', 'secure', 'httponly', 'cache_limiter', 'pdo.db_table') as $name)
+    /**
+     * Returns the base path for the XSD files.
+     *
+     * @return string The XSD base path
+     */
+    public function getXsdValidationBasePath()
     {
-      if (isset($config['session'][$name]))
-      {
-        $configuration->setParameter('session.options.'.$name, $config['session'][$name]);
-      }
+        return __DIR__.'/../Resources/config/';
     }
 
-    if (isset($config['session']['class']))
+    public function getNamespace()
     {
-      $class = $config['session']['class'];
-      if (in_array($class, array('Native', 'Pdo')))
-      {
-        $class = 'Symfony\\Framework\\WebBundle\\Session\\'.$class.'Session';
-      }
-
-      $configuration->setParameter('user.session', 'user.session.'.strtolower($class));
+        return 'http://www.symfony-project.org/schema/dic/symfony';
     }
 
-    return $configuration;
-  }
-
-  /**
-   * Loads the templating configuration.
-   *
-   * @param array $config A configuration array
-   *
-   * @return BuilderConfiguration A BuilderConfiguration instance
-   */
-  public function templatingLoad($config)
-  {
-    $configuration = new BuilderConfiguration();
-
-    $loader = new XmlFileLoader(__DIR__.'/../Resources/config');
-    $configuration->merge($loader->load($this->resources['templating']));
-
-    $configuration->setParameter('templating.output_escaper', array_key_exists('escaping', $config) ? $config['escaping'] : false);
-    $configuration->setParameter('templating.assets.version', array_key_exists('assets_version', $config) ? $config['assets_version'] : null);
-
-    // path for the filesystem loader
-    if (isset($config['path']))
+    public function getAlias()
     {
-      $configuration->setParameter('templating.loader.filesystem.path', $config['path']);
+        return 'web';
     }
-
-    // loaders
-    if (isset($config['loader']))
-    {
-      $loaders = array();
-      $ids = is_array($config['loader']) ? $config['loader'] : array($config['loader']);
-      foreach ($ids as $id)
-      {
-        $loaders[] = new Reference($id);
-      }
-    }
-    else
-    {
-      $loaders = array(
-        new Reference('templating.loader.filesystem'),
-      );
-    }
-
-    if (1 === count($loaders))
-    {
-      $configuration->setAlias('templating.loader', (string) $loaders[0]);
-    }
-    else
-    {
-      $configuration->getDefinition('templating.loader.chain')->addArgument($loaders);
-      $configuration->setAlias('templating.loader', 'templating.loader.chain');
-    }
-
-    // cache?
-    if (isset($config['cache']))
-    {
-      // wrap the loader with some cache
-      $configuration->setDefinition('templating.loader.wrapped', $configuration->findDefinition('templating.loader'));
-      $configuration->setDefinition('templating.loader', $configuration->getDefinition('templating.loader.cache'));
-      $configuration->setParameter('templating.loader.cache.path', $config['cache']);
-    }
-
-    return $configuration;
-  }
-
-  /**
-   * Returns the base path for the XSD files.
-   *
-   * @return string The XSD base path
-   */
-  public function getXsdValidationBasePath()
-  {
-    return __DIR__.'/../Resources/config/';
-  }
-
-  public function getNamespace()
-  {
-    return 'http://www.symfony-project.org/schema/dic/symfony';
-  }
-
-  public function getAlias()
-  {
-    return 'web';
-  }
 }

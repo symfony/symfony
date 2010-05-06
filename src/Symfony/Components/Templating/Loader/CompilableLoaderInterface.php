@@ -21,14 +21,14 @@ namespace Symfony\Components\Templating\Loader;
  */
 interface CompilableLoaderInterface
 {
-  /**
-   * Compiles a template.
-   *
-   * @param string $template The template to compile
-   *
-   * @return string The compiled template
-   *
-   * @throws \Exception if the template is not compilable
-   */
-  public function compile($template);
+    /**
+     * Compiles a template.
+     *
+     * @param string $template The template to compile
+     *
+     * @return string The compiled template
+     *
+     * @throws \Exception if the template is not compilable
+     */
+    public function compile($template);
 }

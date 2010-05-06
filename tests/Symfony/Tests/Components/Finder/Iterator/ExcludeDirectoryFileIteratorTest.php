@@ -17,23 +17,23 @@ require_once __DIR__.'/IteratorTestCase.php';
 
 class ExcludeDirectoryFilterIteratorTest extends IteratorTestCase
 {
-  /**
-   * @dataProvider getAcceptData
-   */
-  public function testAccept($directories, $expected)
-  {
-    $inner = new Iterator(array('/foo/test.php', '/foo/test.py', '/bar/foo.php'));
+    /**
+     * @dataProvider getAcceptData
+     */
+    public function testAccept($directories, $expected)
+    {
+        $inner = new Iterator(array('/foo/test.php', '/foo/test.py', '/bar/foo.php'));
 
-    $iterator = new ExcludeDirectoryFilterIterator($inner, $directories);
+        $iterator = new ExcludeDirectoryFilterIterator($inner, $directories);
 
-    $this->assertIterator($expected, $iterator);
-  }
+        $this->assertIterator($expected, $iterator);
+    }
 
-  public function getAcceptData()
-  {
-    return array(
-      array(array('foo'), array('/bar/foo.php')),
-      array(array('fo'), array('/foo/test.php', '/foo/test.py', '/bar/foo.php')),
-    );
-  }
+    public function getAcceptData()
+    {
+        return array(
+            array(array('foo'), array('/bar/foo.php')),
+            array(array('fo'), array('/foo/test.php', '/foo/test.py', '/bar/foo.php')),
+        );
+    }
 }

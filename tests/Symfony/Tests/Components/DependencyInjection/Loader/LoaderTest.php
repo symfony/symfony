@@ -16,16 +16,16 @@ use Symfony\Components\DependencyInjection\Loader\Loader;
 
 class ProjectLoader1 extends Loader
 {
-  public function load($resource)
-  {
-  }
+    public function load($resource)
+    {
+    }
 }
 
 class LoaderTest extends \PHPUnit_Framework_TestCase
 {
-  public function testExtension()
-  {
-    ProjectLoader1::registerExtension($extension = new \ProjectExtension());
-    $this->assertTrue(ProjectLoader1::getExtension('project') === $extension, '::registerExtension() registers an extension');
-  }
+    public function testExtension()
+    {
+        ProjectLoader1::registerExtension($extension = new \ProjectExtension());
+        $this->assertTrue(ProjectLoader1::getExtension('project') === $extension, '::registerExtension() registers an extension');
+    }
 }

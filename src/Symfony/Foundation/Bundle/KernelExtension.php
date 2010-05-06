@@ -24,91 +24,91 @@ use Symfony\Components\DependencyInjection\BuilderConfiguration;
  */
 class KernelExtension extends LoaderExtension
 {
-  public function testLoad($config)
-  {
-    $configuration = new BuilderConfiguration();
-
-    $loader = new XmlFileLoader(array(__DIR__.'/../Resources/config', __DIR__.'/Resources/config'));
-    $configuration->merge($loader->load('test.xml'));
-    $configuration->setParameter('kernel.include_core_classes', false);
-
-    return $configuration;
-  }
-
-  public function configLoad($config)
-  {
-    $configuration = new BuilderConfiguration();
-
-    if (isset($config['charset']))
+    public function testLoad($config)
     {
-      $configuration->setParameter('kernel.charset', $config['charset']);
+        $configuration = new BuilderConfiguration();
+
+        $loader = new XmlFileLoader(array(__DIR__.'/../Resources/config', __DIR__.'/Resources/config'));
+        $configuration->merge($loader->load('test.xml'));
+        $configuration->setParameter('kernel.include_core_classes', false);
+
+        return $configuration;
     }
 
-    if (!array_key_exists('compilation', $config))
+    public function configLoad($config)
     {
-      $classes = array(
-        'Symfony\\Components\\Routing\\Router',
-        'Symfony\\Components\\Routing\\RouterInterface',
-        'Symfony\\Components\\EventDispatcher\\Event',
-        'Symfony\\Components\\Routing\\Matcher\\UrlMatcherInterface',
-        'Symfony\\Components\\Routing\\Matcher\\UrlMatcher',
-        'Symfony\\Components\\HttpKernel\\HttpKernel',
-        'Symfony\\Components\\HttpKernel\\Request',
-        'Symfony\\Components\\HttpKernel\\Response',
-        'Symfony\\Components\\Templating\\Loader\\LoaderInterface',
-        'Symfony\\Components\\Templating\\Loader\\Loader',
-        'Symfony\\Components\\Templating\\Loader\\FilesystemLoader',
-        'Symfony\\Components\\Templating\\Engine',
-        'Symfony\\Components\\Templating\\Renderer\\RendererInterface',
-        'Symfony\\Components\\Templating\\Renderer\\Renderer',
-        'Symfony\\Components\\Templating\\Renderer\\PhpRenderer',
-        'Symfony\\Components\\Templating\\Storage\\Storage',
-        'Symfony\\Components\\Templating\\Storage\\FileStorage',
-        'Symfony\\Framework\\WebBundle\\Controller',
-        'Symfony\\Framework\\WebBundle\\Listener\\RequestParser',
-        'Symfony\\Framework\\WebBundle\\Listener\\ControllerLoader',
-        'Symfony\\Framework\\WebBundle\\Listener\\ResponseFilter',
-        'Symfony\\Framework\\WebBundle\\Templating\\Engine',
-      );
-    }
-    else
-    {
-      $classes = array();
-      foreach (explode("\n", $config['compilation']) as $class)
-      {
-        if ($class)
+        $configuration = new BuilderConfiguration();
+
+        if (isset($config['charset']))
         {
-          $classes[] = trim($class);
+            $configuration->setParameter('kernel.charset', $config['charset']);
         }
-      }
-    }
-    $configuration->setParameter('kernel.compiled_classes', $classes);
 
-    if (array_key_exists('error_handler_level', $config))
+        if (!array_key_exists('compilation', $config))
+        {
+            $classes = array(
+                'Symfony\\Components\\Routing\\Router',
+                'Symfony\\Components\\Routing\\RouterInterface',
+                'Symfony\\Components\\EventDispatcher\\Event',
+                'Symfony\\Components\\Routing\\Matcher\\UrlMatcherInterface',
+                'Symfony\\Components\\Routing\\Matcher\\UrlMatcher',
+                'Symfony\\Components\\HttpKernel\\HttpKernel',
+                'Symfony\\Components\\HttpKernel\\Request',
+                'Symfony\\Components\\HttpKernel\\Response',
+                'Symfony\\Components\\Templating\\Loader\\LoaderInterface',
+                'Symfony\\Components\\Templating\\Loader\\Loader',
+                'Symfony\\Components\\Templating\\Loader\\FilesystemLoader',
+                'Symfony\\Components\\Templating\\Engine',
+                'Symfony\\Components\\Templating\\Renderer\\RendererInterface',
+                'Symfony\\Components\\Templating\\Renderer\\Renderer',
+                'Symfony\\Components\\Templating\\Renderer\\PhpRenderer',
+                'Symfony\\Components\\Templating\\Storage\\Storage',
+                'Symfony\\Components\\Templating\\Storage\\FileStorage',
+                'Symfony\\Framework\\WebBundle\\Controller',
+                'Symfony\\Framework\\WebBundle\\Listener\\RequestParser',
+                'Symfony\\Framework\\WebBundle\\Listener\\ControllerLoader',
+                'Symfony\\Framework\\WebBundle\\Listener\\ResponseFilter',
+                'Symfony\\Framework\\WebBundle\\Templating\\Engine',
+            );
+        }
+        else
+        {
+            $classes = array();
+            foreach (explode("\n", $config['compilation']) as $class)
+            {
+                if ($class)
+                {
+                    $classes[] = trim($class);
+                }
+            }
+        }
+        $configuration->setParameter('kernel.compiled_classes', $classes);
+
+        if (array_key_exists('error_handler_level', $config))
+        {
+            $configuration->setParameter('error_handler.level', $config['error_handler_level']);
+        }
+
+        return $configuration;
+    }
+
+    /**
+     * Returns the base path for the XSD files.
+     *
+     * @return string The XSD base path
+     */
+    public function getXsdValidationBasePath()
     {
-      $configuration->setParameter('error_handler.level', $config['error_handler_level']);
+        return false;
     }
 
-    return $configuration;
-  }
+    public function getNamespace()
+    {
+        return 'http://www.symfony-project.org/schema/dic/symfony/kernel';
+    }
 
-  /**
-   * Returns the base path for the XSD files.
-   *
-   * @return string The XSD base path
-   */
-  public function getXsdValidationBasePath()
-  {
-    return false;
-  }
-
-  public function getNamespace()
-  {
-    return 'http://www.symfony-project.org/schema/dic/symfony/kernel';
-  }
-
-  public function getAlias()
-  {
-    return 'kernel';
-  }
+    public function getAlias()
+    {
+        return 'kernel';
+    }
 }

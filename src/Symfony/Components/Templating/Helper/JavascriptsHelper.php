@@ -27,88 +27,88 @@ namespace Symfony\Components\Templating\Helper;
  */
 class JavascriptsHelper extends Helper
 {
-  protected $javascripts = array();
-  protected $assetHelper;
+    protected $javascripts = array();
+    protected $assetHelper;
 
-  /**
-   * Constructor.
-   *
-   * @param AssetsHelper $assetHelper A AssetsHelper instance
-   */
-  public function __construct(AssetsHelper $assetHelper)
-  {
-    $this->assetHelper = $assetHelper;
-  }
-
-  /**
-   * Adds a JavaScript file.
-   *
-   * @param string $javascript A JavaScript file path
-   * @param array  $attributes An array of attributes
-   */
-  public function add($javascript, $attributes = array())
-  {
-    $this->javascripts[$this->assetHelper->getUrl($javascript)] = $attributes;
-  }
-
-  /**
-   * Returns all JavaScript files.
-   *
-   * @param array An array of JavaScript files to include
-   */
-  public function get()
-  {
-    return $this->javascripts;
-  }
-
-  /**
-   * Returns HTML representation of the links to JavaScripts.
-   *
-   * @return string The HTML representation of the JavaScripts
-   */
-  public function render()
-  {
-    $html = '';
-    foreach ($this->javascripts as $path => $attributes)
+    /**
+     * Constructor.
+     *
+     * @param AssetsHelper $assetHelper A AssetsHelper instance
+     */
+    public function __construct(AssetsHelper $assetHelper)
     {
-      $atts = '';
-      foreach ($attributes as $key => $value)
-      {
-        $atts .= ' '.sprintf('%s="%s"', $key, htmlspecialchars($value, ENT_QUOTES, $this->charset));
-      }
-
-      $html .= sprintf('<script type="text/javascript" src="%s"%s></script>', $path, $atts)."\n";
+        $this->assetHelper = $assetHelper;
     }
 
-    return $html;
-  }
+    /**
+     * Adds a JavaScript file.
+     *
+     * @param string $javascript A JavaScript file path
+     * @param array  $attributes An array of attributes
+     */
+    public function add($javascript, $attributes = array())
+    {
+        $this->javascripts[$this->assetHelper->getUrl($javascript)] = $attributes;
+    }
 
-  /**
-   * Outputs HTML representation of the links to JavaScripts.
-   *
-   */
-  public function output()
-  {
-    echo $this->render();
-  }
+    /**
+     * Returns all JavaScript files.
+     *
+     * @param array An array of JavaScript files to include
+     */
+    public function get()
+    {
+        return $this->javascripts;
+    }
 
-  /**
-   * Returns a string representation of this helper as HTML.
-   *
-   * @return string The HTML representation of the JavaScripts
-   */
-  public function __toString()
-  {
-    return $this->render();
-  }
+    /**
+     * Returns HTML representation of the links to JavaScripts.
+     *
+     * @return string The HTML representation of the JavaScripts
+     */
+    public function render()
+    {
+        $html = '';
+        foreach ($this->javascripts as $path => $attributes)
+        {
+            $atts = '';
+            foreach ($attributes as $key => $value)
+            {
+                $atts .= ' '.sprintf('%s="%s"', $key, htmlspecialchars($value, ENT_QUOTES, $this->charset));
+            }
 
-  /**
-   * Returns the canonical name of this helper.
-   *
-   * @return string The canonical name
-   */
-  public function getName()
-  {
-    return 'javascripts';
-  }
+            $html .= sprintf('<script type="text/javascript" src="%s"%s></script>', $path, $atts)."\n";
+        }
+
+        return $html;
+    }
+
+    /**
+     * Outputs HTML representation of the links to JavaScripts.
+     *
+     */
+    public function output()
+    {
+        echo $this->render();
+    }
+
+    /**
+     * Returns a string representation of this helper as HTML.
+     *
+     * @return string The HTML representation of the JavaScripts
+     */
+    public function __toString()
+    {
+        return $this->render();
+    }
+
+    /**
+     * Returns the canonical name of this helper.
+     *
+     * @return string The canonical name
+     */
+    public function getName()
+    {
+        return 'javascripts';
+    }
 }

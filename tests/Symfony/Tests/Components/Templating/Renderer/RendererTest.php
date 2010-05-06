@@ -20,23 +20,23 @@ use Symfony\Components\Templating\Loader\FilesystemLoader;
 
 class RendererTest extends \PHPUnit_Framework_TestCase
 {
-  public function testSetEngine()
-  {
-    $loader = new FilesystemLoader(array(__DIR__.'/fixtures/templates/%name%.%renderer%'));
-    $engine = new Engine($loader);
-    $renderer = new ProjectTemplateRenderer();
-    $renderer->setEngine($engine);
-    $this->assertTrue($renderer->getEngine() === $engine, '->setEngine() sets the engine instance tied to this renderer');
-  }
+    public function testSetEngine()
+    {
+        $loader = new FilesystemLoader(array(__DIR__.'/fixtures/templates/%name%.%renderer%'));
+        $engine = new Engine($loader);
+        $renderer = new ProjectTemplateRenderer();
+        $renderer->setEngine($engine);
+        $this->assertTrue($renderer->getEngine() === $engine, '->setEngine() sets the engine instance tied to this renderer');
+    }
 }
 class ProjectTemplateRenderer extends Renderer
 {
-  public function getEngine()
-  {
-    return $this->engine;
-  }
+    public function getEngine()
+    {
+        return $this->engine;
+    }
 
-  public function evaluate(Storage $template, array $parameters = array())
-  {
-  }
+    public function evaluate(Storage $template, array $parameters = array())
+    {
+    }
 }

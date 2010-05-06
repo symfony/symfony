@@ -26,91 +26,91 @@ use Symfony\Foundation\LoggerInterface;
  */
 class DataCollectorManager
 {
-  protected $container;
-  protected $profilerStorage;
-  protected $collectors;
-  protected $response;
-  protected $lifetime;
-  protected $logger;
+    protected $container;
+    protected $profilerStorage;
+    protected $collectors;
+    protected $response;
+    protected $lifetime;
+    protected $logger;
 
-  public function __construct(ContainerInterface $container, LoggerInterface $logger, ProfilerStorage $profilerStorage, $lifetime = 86400)
-  {
-    $this->container = $container;
-    $this->logger = $logger;
-    $this->lifetime = $lifetime;
-    $this->profilerStorage = $profilerStorage;
-    $this->collectors = $this->initCollectors();
-  }
-
-  public function register()
-  {
-    $this->container->getEventDispatcherService()->connect('core.response', array($this, 'handle'));
-  }
-
-  public function handle(Event $event, Response $response)
-  {
-    if (!$event->getParameter('main_request'))
+    public function __construct(ContainerInterface $container, LoggerInterface $logger, ProfilerStorage $profilerStorage, $lifetime = 86400)
     {
-      return $response;
+        $this->container = $container;
+        $this->logger = $logger;
+        $this->lifetime = $lifetime;
+        $this->profilerStorage = $profilerStorage;
+        $this->collectors = $this->initCollectors();
     }
 
-    $this->response = $response;
-
-    $data = array();
-    foreach ($this->collectors as $name => $collector)
+    public function register()
     {
-      $data[$name] = $collector->getData();
+        $this->container->getEventDispatcherService()->connect('core.response', array($this, 'handle'));
     }
 
-    try
+    public function handle(Event $event, Response $response)
     {
-      $this->profilerStorage->write($data);
-      $this->profilerStorage->purge($this->lifetime);
-    }
-    catch (\Exception $e)
-    {
-      $this->logger->err('Unable to store the profiler information.');
-    }
+        if (!$event->getParameter('main_request'))
+        {
+            return $response;
+        }
 
-    return $response;
-  }
+        $this->response = $response;
 
-  public function getProfilerStorage()
-  {
-    return $this->profilerStorage;
-  }
+        $data = array();
+        foreach ($this->collectors as $name => $collector)
+        {
+            $data[$name] = $collector->getData();
+        }
 
-  public function getResponse()
-  {
-    return $this->response;
-  }
+        try
+        {
+            $this->profilerStorage->write($data);
+            $this->profilerStorage->purge($this->lifetime);
+        }
+        catch (\Exception $e)
+        {
+            $this->logger->err('Unable to store the profiler information.');
+        }
 
-  public function getCollectors()
-  {
-    return $this->collectors;
-  }
-
-  public function initCollectors()
-  {
-    $config = $this->container->findAnnotatedServiceIds('data_collector');
-    $ids = array();
-    $coreCollectors = array();
-    $userCollectors = array();
-    foreach ($config as $id => $attributes)
-    {
-      $collector = $this->container->getService($id);
-      $collector->setCollectorManager($this);
-
-      if (isset($attributes[0]['core']) && $attributes[0]['core'])
-      {
-        $coreCollectors[$collector->getName()] = $collector;
-      }
-      else
-      {
-        $userCollectors[$collector->getName()] = $collector;
-      }
+        return $response;
     }
 
-    return $this->collectors = array_merge($coreCollectors, $userCollectors);
-  }
+    public function getProfilerStorage()
+    {
+        return $this->profilerStorage;
+    }
+
+    public function getResponse()
+    {
+        return $this->response;
+    }
+
+    public function getCollectors()
+    {
+        return $this->collectors;
+    }
+
+    public function initCollectors()
+    {
+        $config = $this->container->findAnnotatedServiceIds('data_collector');
+        $ids = array();
+        $coreCollectors = array();
+        $userCollectors = array();
+        foreach ($config as $id => $attributes)
+        {
+            $collector = $this->container->getService($id);
+            $collector->setCollectorManager($this);
+
+            if (isset($attributes[0]['core']) && $attributes[0]['core'])
+            {
+                $coreCollectors[$collector->getName()] = $collector;
+            }
+            else
+            {
+                $userCollectors[$collector->getName()] = $collector;
+            }
+        }
+
+        return $this->collectors = array_merge($coreCollectors, $userCollectors);
+    }
 }

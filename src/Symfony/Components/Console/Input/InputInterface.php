@@ -20,39 +20,39 @@ namespace Symfony\Components\Console\Input;
  */
 interface InputInterface
 {
-  /**
-   * Returns the first argument from the raw parameters (not parsed).
-   *
-   * @return string The value of the first argument or null otherwise
-   */
-  function getFirstArgument();
+    /**
+     * Returns the first argument from the raw parameters (not parsed).
+     *
+     * @return string The value of the first argument or null otherwise
+     */
+    function getFirstArgument();
 
-  /**
-   * Returns true if the raw parameters (not parsed) contains a value.
-   *
-   * This method is to be used to introspect the input parameters
-   * before it has been validated. It must be used carefully.
-   *
-   * @param string $value The value to look for in the raw parameters
-   *
-   * @return Boolean true if the value is contained in the raw parameters
-   */
-  function hasParameterOption($value);
+    /**
+     * Returns true if the raw parameters (not parsed) contains a value.
+     *
+     * This method is to be used to introspect the input parameters
+     * before it has been validated. It must be used carefully.
+     *
+     * @param string $value The value to look for in the raw parameters
+     *
+     * @return Boolean true if the value is contained in the raw parameters
+     */
+    function hasParameterOption($value);
 
-  /**
-   * Binds the current Input instance with the given arguments and options.
-   *
-   * @param InputDefinition $definition A InputDefinition instance
-   */
-  function bind(InputDefinition $definition);
+    /**
+     * Binds the current Input instance with the given arguments and options.
+     *
+     * @param InputDefinition $definition A InputDefinition instance
+     */
+    function bind(InputDefinition $definition);
 
-  function validate();
+    function validate();
 
-  function getArguments();
+    function getArguments();
 
-  function getArgument($name);
+    function getArgument($name);
 
-  function getOptions();
+    function getOptions();
 
-  function getOption($name);
+    function getOption($name);
 }

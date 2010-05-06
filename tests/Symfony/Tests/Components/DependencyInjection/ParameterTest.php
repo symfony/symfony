@@ -14,9 +14,9 @@ use Symfony\Components\DependencyInjection\Parameter;
 
 class ParameterTest extends \PHPUnit_Framework_TestCase
 {
-  public function testConstructor()
-  {
-    $ref = new Parameter('foo');
-    $this->assertEquals('foo', (string) $ref, '__construct() sets the id of the parameter, which is used for the __toString() method');
-  }
+    public function testConstructor()
+    {
+        $ref = new Parameter('foo');
+        $this->assertEquals('foo', (string) $ref, '__construct() sets the id of the parameter, which is used for the __toString() method');
+    }
 }

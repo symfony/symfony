@@ -22,43 +22,43 @@ use Symfony\Foundation\LoggerInterface;
  */
 class Logger extends \Zend_Log implements LoggerInterface
 {
-  public function emerg($message)
-  {
-    return parent::log($message, 0);
-  }
+    public function emerg($message)
+    {
+        return parent::log($message, 0);
+    }
 
-  public function alert($message)
-  {
-    return parent::log($message, 1);
-  }
+    public function alert($message)
+    {
+        return parent::log($message, 1);
+    }
 
-  public function crit($message)
-  {
-    return parent::log($message, 2);
-  }
+    public function crit($message)
+    {
+        return parent::log($message, 2);
+    }
 
-  public function err($message)
-  {
-    return parent::log($message, 3);
-  }
+    public function err($message)
+    {
+        return parent::log($message, 3);
+    }
 
-  public function warn($message)
-  {
-    return parent::log($message, 4);
-  }
+    public function warn($message)
+    {
+        return parent::log($message, 4);
+    }
 
-  public function notice($message)
-  {
-    return parent::log($message, 5);
-  }
+    public function notice($message)
+    {
+        return parent::log($message, 5);
+    }
 
-  public function info($message)
-  {
-    return parent::log($message, 6);
-  }
+    public function info($message)
+    {
+        return parent::log($message, 6);
+    }
 
-  public function debug($message)
-  {
-    return parent::log($message, 7);
-  }
+    public function debug($message)
+    {
+        return parent::log($message, 7);
+    }
 }

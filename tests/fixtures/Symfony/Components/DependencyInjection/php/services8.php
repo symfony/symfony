@@ -12,53 +12,53 @@ use Symfony\Components\DependencyInjection\Parameter;
  */
 class ProjectServiceContainer extends Container
 {
-  protected $shared = array();
+    protected $shared = array();
 
-  /**
-   * Constructor.
-   */
-  public function __construct()
-  {
-    parent::__construct();
+    /**
+     * Constructor.
+     */
+    public function __construct()
+    {
+        parent::__construct();
 
-    $this->parameters = $this->getDefaultParameters();
-  }
+        $this->parameters = $this->getDefaultParameters();
+    }
 
-  /**
-   * Returns service ids for a given annotation.
-   *
-   * @param string $name The annotation name
-   *
-   * @return array An array of annotations
-   */
-  public function findAnnotatedServiceIds($name)
-  {
-    static $annotations = array (
+    /**
+     * Returns service ids for a given annotation.
+     *
+     * @param string $name The annotation name
+     *
+     * @return array An array of annotations
+     */
+    public function findAnnotatedServiceIds($name)
+    {
+        static $annotations = array (
 );
 
-    return isset($annotations[$name]) ? $annotations[$name] : array();
-  }
+        return isset($annotations[$name]) ? $annotations[$name] : array();
+    }
 
-  /**
-   * Gets the default parameters.
-   *
-   * @return array An array of the default parameters
-   */
-  protected function getDefaultParameters()
-  {
-    return array(
-      'foo' => 'bar',
-      'bar' => 'foo is %foo bar',
-      'values' => array(
-        0 => true,
-        1 => false,
-        2 => NULL,
-        3 => 0,
-        4 => 1000.3,
-        5 => 'true',
-        6 => 'false',
-        7 => 'null',
-      ),
-    );
-  }
+    /**
+     * Gets the default parameters.
+     *
+     * @return array An array of the default parameters
+     */
+    protected function getDefaultParameters()
+    {
+        return array(
+            'foo' => 'bar',
+            'bar' => 'foo is %foo bar',
+            'values' => array(
+                0 => true,
+                1 => false,
+                2 => NULL,
+                3 => 0,
+                4 => 1000.3,
+                5 => 'true',
+                6 => 'false',
+                7 => 'null',
+            ),
+        );
+    }
 }

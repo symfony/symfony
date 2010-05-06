@@ -25,78 +25,78 @@ use Symfony\Components\CssSelector\SyntaxError;
  */
 class CombinedSelectorNode implements NodeInterface
 {
-  static protected $_method_mapping = array(
-    ' ' => 'descendant',
-    '>' => 'child',
-    '+' => 'direct_adjacent',
-    '~' => 'indirect_adjacent',
-  );
+    static protected $_method_mapping = array(
+        ' ' => 'descendant',
+        '>' => 'child',
+        '+' => 'direct_adjacent',
+        '~' => 'indirect_adjacent',
+    );
 
-  protected $selector;
-  protected $combinator;
-  protected $subselector;
+    protected $selector;
+    protected $combinator;
+    protected $subselector;
 
-  public function __construct($selector, $combinator, $subselector)
-  {
-    $this->selector = $selector;
-    $this->combinator = $combinator;
-    $this->subselector = $subselector;
-  }
-
-  public function __toString()
-  {
-    $comb = $this->combinator == ' ' ? '<followed>' : $this->combinator;
-
-    return sprintf('%s[%s %s %s]', __CLASS__, $this->selector, $comb, $this->subselector);
-  }
-
-  /**
-   * @throws SyntaxError When unknown combinator is found
-   */
-  public function toXpath()
-  {
-    if (!isset(self::$_method_mapping[$this->combinator]))
+    public function __construct($selector, $combinator, $subselector)
     {
-      throw new SyntaxError(sprintf('Unknown combinator: %s', $this->combinator));
+        $this->selector = $selector;
+        $this->combinator = $combinator;
+        $this->subselector = $subselector;
     }
 
-    $method = '_xpath_'.self::$_method_mapping[$this->combinator];
-    $path = $this->selector->toXpath();
+    public function __toString()
+    {
+        $comb = $this->combinator == ' ' ? '<followed>' : $this->combinator;
 
-    return $this->$method($path, $this->subselector);
-  }
+        return sprintf('%s[%s %s %s]', __CLASS__, $this->selector, $comb, $this->subselector);
+    }
 
-  protected function _xpath_descendant($xpath, $sub)
-  {
-    // when sub is a descendant in any way of xpath
-    $xpath->join('/descendant::', $sub->toXpath());
+    /**
+     * @throws SyntaxError When unknown combinator is found
+     */
+    public function toXpath()
+    {
+        if (!isset(self::$_method_mapping[$this->combinator]))
+        {
+            throw new SyntaxError(sprintf('Unknown combinator: %s', $this->combinator));
+        }
 
-    return $xpath;
-  }
+        $method = '_xpath_'.self::$_method_mapping[$this->combinator];
+        $path = $this->selector->toXpath();
 
-  protected function _xpath_child($xpath, $sub)
-  {
-    // when sub is an immediate child of xpath
-    $xpath->join('/', $sub->toXpath());
+        return $this->$method($path, $this->subselector);
+    }
 
-    return $xpath;
-  }
+    protected function _xpath_descendant($xpath, $sub)
+    {
+        // when sub is a descendant in any way of xpath
+        $xpath->join('/descendant::', $sub->toXpath());
 
-  protected function _xpath_direct_adjacent($xpath, $sub)
-  {
-    // when sub immediately follows xpath
-    $xpath->join('/following-sibling::', $sub->toXpath());
-    $xpath->addNameTest();
-    $xpath->addCondition('position() = 1');
+        return $xpath;
+    }
 
-    return $xpath;
-  }
+    protected function _xpath_child($xpath, $sub)
+    {
+        // when sub is an immediate child of xpath
+        $xpath->join('/', $sub->toXpath());
 
-  protected function _xpath_indirect_adjacent($xpath, $sub)
-  {
-    // when sub comes somewhere after xpath as a sibling
-    $xpath->join('/following-sibling::', $sub->toXpath());
+        return $xpath;
+    }
 
-    return $xpath;
-  }
+    protected function _xpath_direct_adjacent($xpath, $sub)
+    {
+        // when sub immediately follows xpath
+        $xpath->join('/following-sibling::', $sub->toXpath());
+        $xpath->addNameTest();
+        $xpath->addCondition('position() = 1');
+
+        return $xpath;
+    }
+
+    protected function _xpath_indirect_adjacent($xpath, $sub)
+    {
+        // when sub comes somewhere after xpath as a sibling
+        $xpath->join('/following-sibling::', $sub->toXpath());
+
+        return $xpath;
+    }
 }

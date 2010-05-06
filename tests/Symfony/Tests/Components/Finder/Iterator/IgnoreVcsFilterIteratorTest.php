@@ -17,12 +17,12 @@ require_once __DIR__.'/IteratorTestCase.php';
 
 class IgnoreVcsFilterIteratorTest extends IteratorTestCase
 {
-  public function testAccept()
-  {
-    $inner = new Iterator(array('/.git/test.php', '/foo/test.py', '/bar/foo.php'));
+    public function testAccept()
+    {
+        $inner = new Iterator(array('/.git/test.php', '/foo/test.py', '/bar/foo.php'));
 
-    $iterator = new IgnoreVcsFilterIterator($inner);
+        $iterator = new IgnoreVcsFilterIterator($inner);
 
-    $this->assertIterator(array('/foo/test.py', '/bar/foo.php'), $iterator);
-  }
+        $this->assertIterator(array('/foo/test.py', '/bar/foo.php'), $iterator);
+    }
 }

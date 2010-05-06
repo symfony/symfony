@@ -1,9 +1,9 @@
 <?php
 
-namespace Symfony\Components\RequestHandler\Test;
+namespace Symfony\Components\HttpKernel\Test;
 
-use Symfony\Components\RequestHandler\RequestHandler;
-use Symfony\Components\RequestHandler\Request;
+use Symfony\Components\HttpKernel\HttpKernel;
+use Symfony\Components\HttpKernel\Request;
 use Symfony\Components\BrowserKit\Client as BaseClient;
 use Symfony\Components\BrowserKit\Request as DomRequest;
 use Symfony\Components\BrowserKit\Response as DomResponse;
@@ -20,29 +20,29 @@ use Symfony\Components\BrowserKit\CookieJar;
  */
 
 /**
- * Client simulates a browser and makes requests to a RequestHandler object.
+ * Client simulates a browser and makes requests to a Kernel object.
  *
  * @package    Symfony
- * @subpackage Components_RequestHandler
+ * @subpackage Components_HttpKernel
  * @author     Fabien Potencier <fabien.potencier@symfony-project.com>
  */
 class Client extends BaseClient
 {
-  protected $requestHandler;
+  protected $kernel;
   protected $test;
   protected $testers;
 
   /**
    * Constructor.
    *
-   * @param Symfony\Components\RequestHandler\RequestHandler $requestHandler A RequestHandler instance
-   * @param array                                            $server         The server parameters (equivalent of $_SERVER)
-   * @param Symfony\Components\BrowserKit\History            $history        A History instance to store the browser history
-   * @param Symfony\Components\BrowserKit\CookieJar          $cookieJar      A CookieJar instance to store the cookies
+   * @param Symfony\Components\HttpKernel\HttpKernel $kernel    An HttpKernel instance
+   * @param array                                    $server    The server parameters (equivalent of $_SERVER)
+   * @param Symfony\Components\BrowserKit\History    $history   A History instance to store the browser history
+   * @param Symfony\Components\BrowserKit\CookieJar  $cookieJar A CookieJar instance to store the cookies
    */
-  public function __construct(RequestHandler $requestHandler, array $server = array(), History $history = null, CookieJar $cookieJar = null)
+  public function __construct(HttpKernel $kernel, array $server = array(), History $history = null, CookieJar $cookieJar = null)
   {
-    $this->requestHandler = $requestHandler;
+    $this->kernel = $kernel;
     $this->testers = array();
 
     parent::__construct($server, $history, $cookieJar);
@@ -103,23 +103,23 @@ class Client extends BaseClient
   /**
    * Makes a request.
    *
-   * @param Symfony\Components\RequestHandler\Request  $request A Request instance
+   * @param Symfony\Components\HttpKernel\Request  $request A Request instance
    *
-   * @param Symfony\Components\RequestHandler\Response $response A Response instance
+   * @param Symfony\Components\HttpKernel\Response $response A Response instance
    */
   protected function doRequest($request)
   {
-    return $this->requestHandler->handle($request);
+    return $this->kernel->handle($request);
   }
 
   /**
    * Returns the script to execute when the request must be insulated.
    *
-   * @param Symfony\Components\RequestHandler\Request $request A Request instance
+   * @param Symfony\Components\HttpKernel\Request $request A Request instance
    */
   protected function getScript($request)
   {
-    $requestHandler = serialize($this->requestHandler);
+    $kernel = serialize($this->kernel);
     $request = serialize($request);
 
     $r = new \ReflectionClass('\\Symfony\\Foundation\\UniversalClassLoader');
@@ -136,17 +136,17 @@ require_once '$requirePath';
 \$loader->registerNamespaces(array('Symfony' => '$symfonyPath'));
 \$loader->register();
 
-\$requestHandler = unserialize('$requestHandler');
-echo serialize(\$requestHandler->handle(unserialize('$request')));
+\$kernel = unserialize('$kernel');
+echo serialize(\$kernel->handle(unserialize('$request')));
 EOF;
   }
 
   /**
-   * Converts the BrowserKit request to a RequestHandler request.
+   * Converts the BrowserKit request to a HttpKernel request.
    *
    * @param Symfony\Components\BrowserKit\Request $request A Request instance
    *
-   * @return Symfony\Components\RequestHandler\Request A Request instance
+   * @return Symfony\Components\HttpKernel\Request A Request instance
    */
   protected function filterRequest(DomRequest $request)
   {
@@ -160,9 +160,9 @@ EOF;
   }
 
   /**
-   * Converts the RequestHandler response to a BrowserKit response.
+   * Converts the HttpKernel response to a BrowserKit response.
    *
-   * @param Symfony\Components\RequestHandler\Response $response A Response instance
+   * @param Symfony\Components\HttpKernel\Response $response A Response instance
    *
    * @return Symfony\Components\BrowserKit\Response A Response instance
    */

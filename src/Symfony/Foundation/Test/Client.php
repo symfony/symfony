@@ -3,7 +3,7 @@
 namespace Symfony\Foundation\Test;
 
 use Symfony\Foundation\Kernel;
-use Symfony\Components\RequestHandler\Test\Client as BaseClient;
+use Symfony\Components\HttpKernel\Test\Client as BaseClient;
 use Symfony\Components\BrowserKit\History;
 use Symfony\Components\BrowserKit\CookieJar;
 
@@ -41,7 +41,7 @@ class Client extends BaseClient
     $this->kernel = $kernel;
     $this->container = $kernel->getContainer();
 
-    parent::__construct($kernel->getContainer()->getRequestHandlerService(), $server, $history, $cookieJar);
+    parent::__construct($kernel->getContainer()->getHttpKernelService(), $server, $history, $cookieJar);
 
     $this->addTestersFromContainer();
   }
@@ -88,9 +88,9 @@ class Client extends BaseClient
   /**
    * Makes a request.
    *
-   * @param Symfony\Components\RequestHandler\Request  $request A Request instance
+   * @param Symfony\Components\HttpKernel\Request  $request A Request instance
    *
-   * @param Symfony\Components\RequestHandler\Response $response A Response instance
+   * @param Symfony\Components\HttpKernel\Response $response A Response instance
    */
   protected function doRequest($request)
   {
@@ -102,7 +102,7 @@ class Client extends BaseClient
   /**
    * Returns the script to execute when the request must be insulated.
    *
-   * @param Symfony\Components\RequestHandler\Request $request A Request instance
+   * @param Symfony\Components\HttpKernel\Request $request A Request instance
    */
   protected function getScript($request)
   {

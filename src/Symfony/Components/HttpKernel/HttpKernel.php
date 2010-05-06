@@ -1,10 +1,10 @@
 <?php
 
-namespace Symfony\Components\RequestHandler;
+namespace Symfony\Components\HttpKernel;
 
 use Symfony\Components\EventDispatcher\Event;
 use Symfony\Components\EventDispatcher\EventDispatcher;
-use Symfony\Components\RequestHandler\Exception\NotFoundHttpException;
+use Symfony\Components\HttpKernel\Exception\NotFoundHttpException;
 
 /*
  * This file is part of the Symfony package.
@@ -16,13 +16,13 @@ use Symfony\Components\RequestHandler\Exception\NotFoundHttpException;
  */
 
 /**
- * RequestHandler notifies events to convert a Request object to a Response one.
+ * HttpKernel notifies events to convert a Request object to a Response one.
  *
  * @package    Symfony
- * @subpackage Components_RequestHandler
+ * @subpackage Components_HttpKernel
  * @author     Fabien Potencier <fabien.potencier@symfony-project.com>
  */
-class RequestHandler implements RequestHandlerInterface
+class HttpKernel implements HttpKernelInterface
 {
   protected $dispatcher;
   protected $request;

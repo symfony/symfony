@@ -1,6 +1,6 @@
 <?php
 
-namespace Symfony\Components\RequestHandler;
+namespace Symfony\Components\HttpKernel;
 
 /*
  * This file is part of the Symfony package.
@@ -15,7 +15,7 @@ namespace Symfony\Components\RequestHandler;
  * HeaderBag is a ParameterBag optimized to hold header HTTP headers.
  *
  * @package    Symfony
- * @subpackage Components_RequestHandler
+ * @subpackage Components_HttpKernel
  * @author     Fabien Potencier <fabien.potencier@symfony-project.com>
  */
 class HeaderBag extends ParameterBag
@@ -113,7 +113,7 @@ class HeaderBag extends ParameterBag
   /**
    * Returns an instance able to manage the Cache-Control header.
    *
-   * @return Symfony\Components\RequestHandler\Cache\CacheControl A CacheControl instance
+   * @return Symfony\Components\HttpKernel\Cache\CacheControl A CacheControl instance
    */
   public function getCacheControl()
   {

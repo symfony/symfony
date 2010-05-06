@@ -6,9 +6,9 @@
 
   <parameters>
     <parameter key="event_dispatcher.class">Symfony\Foundation\EventDispatcher</parameter>
-    <parameter key="request_handler.class">Symfony\Components\RequestHandler\RequestHandler</parameter>
-    <parameter key="request.class">Symfony\Components\RequestHandler\Request</parameter>
-    <parameter key="response.class">Symfony\Components\RequestHandler\Response</parameter>
+    <parameter key="http_kernel.class">Symfony\Components\HttpKernel\HttpKernel</parameter>
+    <parameter key="request.class">Symfony\Components\HttpKernel\Request</parameter>
+    <parameter key="response.class">Symfony\Components\HttpKernel\Response</parameter>
     <parameter key="error_handler.class">Symfony\Foundation\Debug\ErrorHandler</parameter>
     <parameter key="error_handler.level">null</parameter>
     <parameter key="kernel.include_core_classes">true</parameter>
@@ -24,7 +24,7 @@
       <call method="register" />
     </service>
 
-    <service id="request_handler" class="%request_handler.class%">
+    <service id="http_kernel" class="%http_kernel.class%">
       <argument type="service" id="event_dispatcher" />
     </service>
 

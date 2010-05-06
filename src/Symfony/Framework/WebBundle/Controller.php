@@ -3,8 +3,8 @@
 namespace Symfony\Framework\WebBundle;
 
 use Symfony\Components\DependencyInjection\ContainerInterface;
-use Symfony\Components\RequestHandler\Request;
-use Symfony\Components\RequestHandler\Response;
+use Symfony\Components\HttpKernel\Request;
+use Symfony\Components\HttpKernel\Response;
 
 /*
  * This file is part of the Symfony framework.

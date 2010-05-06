@@ -1,6 +1,6 @@
 <?php
 
-namespace Symfony\Components\RequestHandler\Exception;
+namespace Symfony\Components\HttpKernel\Exception;
 
 /*
  * This file is part of the Symfony package.
@@ -12,21 +12,14 @@ namespace Symfony\Components\RequestHandler\Exception;
  */
 
 /**
- * ForbiddenHttpException.
+ * HttpException.
+ *
+ * By convention, exception code == response status code.
  *
  * @package    Symfony
- * @subpackage Components_RequestHandler
+ * @subpackage Components_HttpKernel
  * @author     Fabien Potencier <fabien.potencier@symfony-project.com>
  */
-class ForbiddenHttpException extends HttpException
+class HttpException extends \Exception
 {
-  public function __construct($message = '')
-  {
-    if (!$message)
-    {
-      $message = 'Forbidden';
-    }
-
-    parent::__construct($message, 403);
-  }
 }

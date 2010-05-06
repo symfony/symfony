@@ -3,7 +3,7 @@
 namespace Symfony\Framework\WebBundle\Helper;
 
 use Symfony\Components\Templating\Helper\Helper;
-use Symfony\Components\RequestHandler\Request;
+use Symfony\Components\HttpKernel\Request;
 
 /*
  * This file is part of the Symfony framework.

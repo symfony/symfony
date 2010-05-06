@@ -3,8 +3,6 @@
 namespace Symfony\Framework\DoctrineBundle\Controller;
 
 use Symfony\Framework\WebBundle\Controller;
-use Symfony\Components\RequestHandler\Request;
-use Symfony\Components\RequestHandler\Exception\NotFoundHttpException;
 
 /*
  * This file is part of the Symfony framework.

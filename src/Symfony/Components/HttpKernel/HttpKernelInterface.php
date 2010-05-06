@@ -1,6 +1,6 @@
 <?php
 
-namespace Symfony\Components\RequestHandler;
+namespace Symfony\Components\HttpKernel;
 
 /*
  * This file is part of the Symfony package.
@@ -12,13 +12,13 @@ namespace Symfony\Components\RequestHandler;
  */
 
 /**
- * RequestHandlerInterface.
+ * HttpKernelInterface.
  *
  * @package    Symfony
- * @subpackage Components_RequestHandler
+ * @subpackage Components_HttpKernel
  * @author     Fabien Potencier <fabien.potencier@symfony-project.com>
  */
-interface RequestHandlerInterface
+interface HttpKernelInterface
 {
   /**
    * Handles a request to convert it to a response.

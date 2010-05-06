@@ -9,9 +9,9 @@
  * file that was distributed with this source code.
  */
 
-namespace Symfony\Tests\Components\RequestHandler\Test;
+namespace Symfony\Tests\Components\HttpKernel\Test;
 
-use Symfony\Components\RequestHandler\Test\Tester;
+use Symfony\Components\HttpKernel\Test\Tester;
 
 class TestTester extends Tester
 {

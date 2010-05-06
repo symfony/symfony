@@ -1,8 +1,8 @@
 <?php
 
-namespace Symfony\Components\RequestHandler\Test;
+namespace Symfony\Components\HttpKernel\Test;
 
-use Symfony\Components\RequestHandler\Request;
+use Symfony\Components\HttpKernel\Request;
 
 /*
  * This file is part of the Symfony package.
@@ -17,7 +17,7 @@ use Symfony\Components\RequestHandler\Request;
  * RequestTester implements tests for the Request object.
  *
  * @package    Symfony
- * @subpackage Components_RequestHandler
+ * @subpackage Components_HttpKernel
  * @author     Fabien Potencier <fabien.potencier@symfony-project.com>
  */
 class RequestTester extends Tester
@@ -27,7 +27,7 @@ class RequestTester extends Tester
   /**
    * Constructor.
    *
-   * @param Symfony\Components\RequestHandler\Request $request A Request instance
+   * @param Symfony\Components\HttpKernel\Request $request A Request instance
    */
   public function __construct(Request $request)
   {

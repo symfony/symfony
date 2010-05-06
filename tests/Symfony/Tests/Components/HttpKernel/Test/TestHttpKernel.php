@@ -9,15 +9,15 @@
  * file that was distributed with this source code.
  */
 
-namespace Symfony\Tests\Components\RequestHandler\Test;
+namespace Symfony\Tests\Components\HttpKernel\Test;
 
-use Symfony\Components\RequestHandler\RequestHandler;
-use Symfony\Components\RequestHandler\Request;
-use Symfony\Components\RequestHandler\Response;
+use Symfony\Components\HttpKernel\HttpKernel;
+use Symfony\Components\HttpKernel\Request;
+use Symfony\Components\HttpKernel\Response;
 use Symfony\Components\EventDispatcher\EventDispatcher;
 use Symfony\Components\EventDispatcher\Event;
 
-class TestRequestHandler extends RequestHandler
+class TestHttpKernel extends HttpKernel
 {
   public function __construct()
   {

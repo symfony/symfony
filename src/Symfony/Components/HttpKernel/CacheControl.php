@@ -1,6 +1,6 @@
 <?php
 
-namespace Symfony\Components\RequestHandler;
+namespace Symfony\Components\HttpKernel;
 
 /*
  * This file is part of the Symfony framework.
@@ -18,7 +18,7 @@ namespace Symfony\Components\RequestHandler;
  * (and those that only apply to requests or responses).
  *
  * @package    Symfony
- * @subpackage Components_RequestHandler
+ * @subpackage Components_HttpKernel
  * @author     Fabien Potencier <fabien.potencier@symfony-project.com>
  */
 class CacheControl
@@ -30,9 +30,9 @@ class CacheControl
   /**
    * Constructor.
    *
-   * @param Symfony\Components\RequestHandler\HeaderBag $bag    A HeaderBag instance
-   * @param string                                      $header The value of the Cache-Control HTTP header
-   * @param string                                      $type   The type (null, request, or response)
+   * @param Symfony\Components\HttpKernel\HeaderBag $bag    A HeaderBag instance
+   * @param string                                  $header The value of the Cache-Control HTTP header
+   * @param string                                  $type   The type (null, request, or response)
    */
   public function __construct(HeaderBag $bag, $header, $type = null)
   {

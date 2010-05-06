@@ -47,7 +47,7 @@ class ControllerLoader
 
     $subRequest = $request->duplicate($query, null, $path);
 
-    $response = $this->container->getRequestHandlerService()->handleRaw($subRequest, false);
+    $response = $this->container->getHttpKernelService()->handleRaw($subRequest, false);
 
     $this->container->setService('request', $request);
 

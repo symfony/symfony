@@ -1,6 +1,6 @@
 <?php
 
-namespace Symfony\Components\RequestHandler;
+namespace Symfony\Components\HttpKernel;
 
 /*
  * This file is part of the Symfony package.
@@ -15,7 +15,7 @@ namespace Symfony\Components\RequestHandler;
  * Response represents an HTTP response.
  *
  * @package    Symfony
- * @subpackage Components_RequestHandler
+ * @subpackage Components_HttpKernel
  * @author     Fabien Potencier <fabien.potencier@symfony-project.com>
  */
 class Response

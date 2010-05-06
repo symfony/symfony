@@ -9,8 +9,8 @@
     <parameter key="test.client.parameters" type="collection"></parameter>
     <parameter key="test.client.history.class">Symfony\Components\BrowserKit\History</parameter>
     <parameter key="test.client.cookiejar.class">Symfony\Components\BrowserKit\CookieJar</parameter>
-    <parameter key="test.tester.request.class">Symfony\Components\RequestHandler\Test\RequestTester</parameter>
-    <parameter key="test.tester.response.class">Symfony\Components\RequestHandler\Test\ResponseTester</parameter>
+    <parameter key="test.tester.request.class">Symfony\Components\HttpKernel\Test\RequestTester</parameter>
+    <parameter key="test.tester.response.class">Symfony\Components\HttpKernel\Test\ResponseTester</parameter>
   </parameters>
 
   <services>

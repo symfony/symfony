@@ -1,8 +1,8 @@
 <?php
 
-namespace Symfony\Components\RequestHandler\Test;
+namespace Symfony\Components\HttpKernel\Test;
 
-use Symfony\Components\RequestHandler\Response;
+use Symfony\Components\HttpKernel\Response;
 use Symfony\Components\DomCrawler\Crawler;
 
 /*
@@ -18,7 +18,7 @@ use Symfony\Components\DomCrawler\Crawler;
  * ResponseTester implements tests for the Response object.
  *
  * @package    Symfony
- * @subpackage Components_RequestHandler
+ * @subpackage Components_HttpKernel
  * @author     Fabien Potencier <fabien.potencier@symfony-project.com>
  */
 class ResponseTester extends Tester
@@ -29,7 +29,7 @@ class ResponseTester extends Tester
   /**
    * Constructor.
    *
-   * @param Symfony\Components\RequestHandler\Response $response A Response instance
+   * @param Symfony\Components\HttpKernel\Response $response A Response instance
    */
   public function __construct(Response $response)
   {

@@ -9,18 +9,18 @@
  * file that was distributed with this source code.
  */
 
-namespace Symfony\Tests\Components\RequestHandler\Test;
+namespace Symfony\Tests\Components\HttpKernel\Test;
 
-use Symfony\Components\RequestHandler\Test\Client;
-use Symfony\Components\RequestHandler\Test\RequestTester;
-use Symfony\Components\RequestHandler\Test\ResponseTester;
-use Symfony\Components\RequestHandler\RequestHandler;
-use Symfony\Components\RequestHandler\Request;
-use Symfony\Components\RequestHandler\Response;
+use Symfony\Components\HttpKernel\Test\Client;
+use Symfony\Components\HttpKernel\Test\RequestTester;
+use Symfony\Components\HttpKernel\Test\ResponseTester;
+use Symfony\Components\HttpKernel\HttpKernel;
+use Symfony\Components\HttpKernel\Request;
+use Symfony\Components\HttpKernel\Response;
 use Symfony\Components\EventDispatcher\EventDispatcher;
 use Symfony\Components\EventDispatcher\Event;
 
-require_once __DIR__.'/TestRequestHandler.php';
+require_once __DIR__.'/TestHttpKernel.php';
 
 class TestClient extends Client
 {
@@ -28,7 +28,7 @@ class TestClient extends Client
   {
     $script = parent::getScript($request);
 
-    $script = preg_replace('/(\->register\(\);)/', "$0\nrequire_once '".__DIR__."/TestRequestHandler.php';", $script);
+    $script = preg_replace('/(\->register\(\);)/', "$0\nrequire_once '".__DIR__."/TestHttpKernel.php';", $script);
 
     return $script;
   }
@@ -38,7 +38,7 @@ class ClientTest extends \PHPUnit_Framework_TestCase
 {
   public function testDoRequest()
   {
-    $client = new Client(new TestRequestHandler());
+    $client = new Client(new TestHttpKernel());
 
     $client->request('GET', '/');
     $this->assertEquals('Request: /', $client->getResponse()->getContent(), '->doRequest() uses the request handler to make the request');
@@ -50,7 +50,7 @@ class ClientTest extends \PHPUnit_Framework_TestCase
 
   public function testGetScript()
   {
-    $client = new TestClient(new TestRequestHandler());
+    $client = new TestClient(new TestHttpKernel());
     $client->insulate();
     $client->request('GET', '/');
 
@@ -59,7 +59,7 @@ class ClientTest extends \PHPUnit_Framework_TestCase
 
   public function testAddHasGetTester()
   {
-    $client = new TestClient(new TestRequestHandler());
+    $client = new TestClient(new TestHttpKernel());
     $client->request('GET', '/');
     $client->addTester('foo', $tester = new RequestTester($client->getRequest()));
 
@@ -81,7 +81,7 @@ class ClientTest extends \PHPUnit_Framework_TestCase
 
   public function testMagicCall()
   {
-    $client = new TestClient(new TestRequestHandler());
+    $client = new TestClient(new TestHttpKernel());
     $client->request('DELETE', '/foo');
     $client->addTester('request', new RequestTester($client->getRequest()));
     $client->addTester('response', new ResponseTester($client->getResponse()));

@@ -4,9 +4,9 @@ namespace Symfony\Framework\WebBundle\Controller;
 
 use Symfony\Framework\WebBundle\Controller;
 use Symfony\Framework\WebBundle\Debug\ExceptionFormatter;
-use Symfony\Components\RequestHandler\Request;
-use Symfony\Components\RequestHandler\Response;
-use Symfony\Components\RequestHandler\Exception\HttpException;
+use Symfony\Components\HttpKernel\Request;
+use Symfony\Components\HttpKernel\Response;
+use Symfony\Components\HttpKernel\Exception\HttpException;
 
 /*
  * This file is part of the Symfony framework.

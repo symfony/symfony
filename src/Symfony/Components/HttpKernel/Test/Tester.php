@@ -1,6 +1,6 @@
 <?php
 
-namespace Symfony\Components\RequestHandler\Test;
+namespace Symfony\Components\HttpKernel\Test;
 
 /*
  * This file is part of the Symfony package.
@@ -15,7 +15,7 @@ namespace Symfony\Components\RequestHandler\Test;
  * Tester is the base class for all tester classes.
  *
  * @package    Symfony
- * @subpackage Components_RequestHandler
+ * @subpackage Components_HttpKernel
  * @author     Fabien Potencier <fabien.potencier@symfony-project.com>
  */
 class Tester implements TesterInterface

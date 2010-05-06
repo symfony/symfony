@@ -154,9 +154,9 @@ class KernelExtension extends LoaderExtension
         'Symfony\\Components\\EventDispatcher\\Event',
         'Symfony\\Components\\Routing\\Matcher\\UrlMatcherInterface',
         'Symfony\\Components\\Routing\\Matcher\\UrlMatcher',
-        'Symfony\\Components\\RequestHandler\\RequestHandler',
-        'Symfony\\Components\\RequestHandler\\Request',
-        'Symfony\\Components\\RequestHandler\\Response',
+        'Symfony\\Components\\HttpKernel\\HttpKernel',
+        'Symfony\\Components\\HttpKernel\\Request',
+        'Symfony\\Components\\HttpKernel\\Response',
         'Symfony\\Components\\Templating\\Loader\\LoaderInterface',
         'Symfony\\Components\\Templating\\Loader\\Loader',
         'Symfony\\Components\\Templating\\Loader\\FilesystemLoader',
@@ -366,13 +366,13 @@ use Symfony\Components\DependencyInjection\Builder;
 use Symfony\Components\DependencyInjection\BuilderConfiguration;
 use Symfony\Components\DependencyInjection\Dumper\PhpDumper;
 use Symfony\Components\DependencyInjection\FileResource;
-use Symfony\Components\RequestHandler\Request;
-use Symfony\Components\RequestHandler\RequestHandlerInterface;
+use Symfony\Components\HttpKernel\Request;
+use Symfony\Components\HttpKernel\HttpKernelInterface;
 
 
 
 
-abstract class Kernel implements RequestHandlerInterface, \Serializable
+abstract class Kernel implements HttpKernelInterface, \Serializable
 {
   protected $bundles;
   protected $bundleDirs;
@@ -499,11 +499,11 @@ abstract class Kernel implements RequestHandlerInterface, \Serializable
 
     if (true === $raw)
     {
-      return $this->container->getRequestHandlerService()->handleRaw($request, $main);
+      return $this->container->getHttpKernelService()->handleRaw($request, $main);
     }
     else
     {
-      return $this->container->getRequestHandlerService()->handle($request, $main);
+      return $this->container->getHttpKernelService()->handle($request, $main);
     }
   }
 

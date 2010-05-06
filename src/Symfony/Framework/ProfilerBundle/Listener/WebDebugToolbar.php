@@ -4,7 +4,7 @@ namespace Symfony\Framework\ProfilerBundle\Listener;
 
 use Symfony\Components\DependencyInjection\ContainerInterface;
 use Symfony\Components\EventDispatcher\Event;
-use Symfony\Components\RequestHandler\Response;
+use Symfony\Components\HttpKernel\Response;
 use Symfony\Framework\ProfilerBundle\DataCollector\DataCollectorManager;
 
 /*

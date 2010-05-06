@@ -9,14 +9,14 @@
  * file that was distributed with this source code.
  */
 
-namespace Symfony\Tests\Components\RequestHandler;
+namespace Symfony\Tests\Components\HttpKernel;
 
-use Symfony\Components\RequestHandler\ParameterBag;
+use Symfony\Components\HttpKernel\ParameterBag;
 
 class ParameterBagTest extends \PHPUnit_Framework_TestCase
 {
   /**
-   * @covers Symfony\Components\RequestHandler\ParameterBag::__construct
+   * @covers Symfony\Components\HttpKernel\ParameterBag::__construct
    */
   public function testConstructor()
   {
@@ -24,7 +24,7 @@ class ParameterBagTest extends \PHPUnit_Framework_TestCase
   }
 
   /**
-   * @covers Symfony\Components\RequestHandler\ParameterBag::all
+   * @covers Symfony\Components\HttpKernel\ParameterBag::all
    */
   public function testAll()
   {
@@ -33,7 +33,7 @@ class ParameterBagTest extends \PHPUnit_Framework_TestCase
   }
 
   /**
-   * @covers Symfony\Components\RequestHandler\ParameterBag::replace
+   * @covers Symfony\Components\HttpKernel\ParameterBag::replace
    */
   public function testReplace()
   {
@@ -45,7 +45,7 @@ class ParameterBagTest extends \PHPUnit_Framework_TestCase
   }
 
   /**
-   * @covers Symfony\Components\RequestHandler\ParameterBag::get
+   * @covers Symfony\Components\HttpKernel\ParameterBag::get
    */
   public function testGet()
   {
@@ -57,7 +57,7 @@ class ParameterBagTest extends \PHPUnit_Framework_TestCase
   }
 
   /**
-   * @covers Symfony\Components\RequestHandler\ParameterBag::set
+   * @covers Symfony\Components\HttpKernel\ParameterBag::set
    */
   public function testSet()
   {
@@ -71,7 +71,7 @@ class ParameterBagTest extends \PHPUnit_Framework_TestCase
   }
 
   /**
-   * @covers Symfony\Components\RequestHandler\ParameterBag::has
+   * @covers Symfony\Components\HttpKernel\ParameterBag::has
    */
   public function testHas()
   {
@@ -82,7 +82,7 @@ class ParameterBagTest extends \PHPUnit_Framework_TestCase
   }
 
   /**
-   * @covers Symfony\Components\RequestHandler\ParameterBag::getAlpha
+   * @covers Symfony\Components\HttpKernel\ParameterBag::getAlpha
    */
   public function testGetAlpha()
   {
@@ -93,7 +93,7 @@ class ParameterBagTest extends \PHPUnit_Framework_TestCase
   }
 
   /**
-   * @covers Symfony\Components\RequestHandler\ParameterBag::getAlnum
+   * @covers Symfony\Components\HttpKernel\ParameterBag::getAlnum
    */
   public function testGetAlnum()
   {
@@ -104,7 +104,7 @@ class ParameterBagTest extends \PHPUnit_Framework_TestCase
   }
 
   /**
-   * @covers Symfony\Components\RequestHandler\ParameterBag::getDigits
+   * @covers Symfony\Components\HttpKernel\ParameterBag::getDigits
    */
   public function testGetDigits()
   {
@@ -115,7 +115,7 @@ class ParameterBagTest extends \PHPUnit_Framework_TestCase
   }
 
   /**
-   * @covers Symfony\Components\RequestHandler\ParameterBag::getInt
+   * @covers Symfony\Components\HttpKernel\ParameterBag::getInt
    */
   public function testGetInt()
   {

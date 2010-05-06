@@ -3,7 +3,6 @@
 namespace Symfony\Framework\WebBundle\Controller;
 
 use Symfony\Framework\WebBundle\Controller;
-use Symfony\Components\RequestHandler\Request;
 
 /*
  * This file is part of the Symfony framework.

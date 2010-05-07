@@ -38,8 +38,7 @@ class XmlDumper extends Dumper
 
     protected function addParameters()
     {
-        if (!$this->container->getParameters())
-        {
+        if (!$this->container->getParameters()) {
             return '';
         }
 
@@ -55,13 +54,11 @@ class XmlDumper extends Dumper
             !$definition->isShared() ? ' shared="false"' : ''
         );
 
-        foreach ($definition->getAnnotations() as $name => $annotations)
-        {
+        foreach ($definition->getAnnotations() as $name => $annotations) {
             foreach ($annotations as $attributes)
             {
                 $att = array();
-                foreach ($attributes as $key => $value)
-                {
+                foreach ($attributes as $key => $value) {
                     $att[] = sprintf('%s="%s"', $key, $value);
                 }
                 $att = $att ? ' '.implode(' ', $att) : '';
@@ -70,43 +67,32 @@ class XmlDumper extends Dumper
             }
         }
 
-        if ($definition->getFile())
-        {
+        if ($definition->getFile()) {
             $code .= sprintf("      <file>%s</file>\n", $definition->getFile());
         }
 
-        if ($definition->getArguments())
-        {
+        if ($definition->getArguments()) {
             $code .= $this->convertParameters($definition->getArguments(), 'argument', 6);
         }
 
-        foreach ($definition->getMethodCalls() as $call)
-        {
+        foreach ($definition->getMethodCalls() as $call) {
             if (count($call[1]))
             {
                 $code .= sprintf("      <call method=\"%s\">\n%s      </call>\n", $call[0], $this->convertParameters($call[1], 'argument', 8));
-            }
-            else
-            {
+            } else {
                 $code .= sprintf("      <call method=\"%s\" />\n", $call[0]);
             }
         }
 
-        if ($callable = $definition->getConfigurator())
-        {
+        if ($callable = $definition->getConfigurator()) {
             if (is_array($callable))
             {
-                if (is_object($callable[0]) && $callable[0] instanceof Reference)
-                {
+                if (is_object($callable[0]) && $callable[0] instanceof Reference) {
                     $code .= sprintf("      <configurator service=\"%s\" method=\"%s\" />\n", $callable[0], $callable[1]);
-                }
-                else
-                {
+                } else {
                     $code .= sprintf("      <configurator class=\"%s\" method=\"%s\" />\n", $callable[0], $callable[1]);
                 }
-            }
-            else
-            {
+            } else {
                 $code .= sprintf("      <configurator function=\"%s\" />\n", $callable);
             }
         }
@@ -123,19 +109,16 @@ class XmlDumper extends Dumper
 
     protected function addServices()
     {
-        if (!$this->container->getDefinitions())
-        {
+        if (!$this->container->getDefinitions()) {
             return '';
         }
 
         $code = '';
-        foreach ($this->container->getDefinitions() as $id => $definition)
-        {
+        foreach ($this->container->getDefinitions() as $id => $definition) {
             $code .= $this->addService($id, $definition);
         }
 
-        foreach ($this->container->getAliases() as $alias => $id)
-        {
+        foreach ($this->container->getAliases() as $alias => $id) {
             $code .= $this->addServiceAlias($alias, $id);
         }
 
@@ -147,22 +130,17 @@ class XmlDumper extends Dumper
         $white = str_repeat(' ', $depth);
         $xml = '';
         $withKeys = array_keys($parameters) !== range(0, count($parameters) - 1);
-        foreach ($parameters as $key => $value)
-        {
+        foreach ($parameters as $key => $value) {
             $attributes = '';
             $key = $withKeys ? sprintf(' key="%s"', $key) : '';
-            if (is_array($value))
-            {
+            if (is_array($value)) {
                 $value = "\n".$this->convertParameters($value, $type, $depth + 2).$white;
                 $attributes = ' type="collection"';
             }
 
-            if (is_object($value) && $value instanceof Reference)
-            {
+            if (is_object($value) && $value instanceof Reference) {
                 $xml .= sprintf("%s<%s%s type=\"service\" id=\"%s\" %s/>\n", $white, $type, $key, (string) $value, $this->getXmlInvalidBehavior($value));
-            }
-            else
-            {
+            } else {
                 if (in_array($value, array('null', 'true', 'false'), true))
                 {
                     $attributes = ' type="string"';
@@ -194,8 +172,7 @@ EOF;
 
     protected function getXmlInvalidBehavior(Reference $reference)
     {
-        switch ($reference->getInvalidBehavior())
-        {
+        switch ($reference->getInvalidBehavior()) {
             case Container::NULL_ON_INVALID_REFERENCE:
                 return 'on-invalid="null" ';
             case Container::IGNORE_ON_INVALID_REFERENCE:
@@ -208,18 +185,13 @@ EOF;
     protected function escape($arguments)
     {
         $args = array();
-        foreach ($arguments as $k => $v)
-        {
+        foreach ($arguments as $k => $v) {
             if (is_array($v))
             {
                 $args[$k] = $this->escape($v);
-            }
-            elseif (is_string($v))
-            {
+            } elseif (is_string($v)) {
                 $args[$k] = str_replace('%', '%%', $v);
-            }
-            else
-            {
+            } else {
                 $args[$k] = $v;
             }
         }
@@ -232,8 +204,7 @@ EOF;
      */
     static public function phpToXml($value)
     {
-        switch (true)
-        {
+        switch (true) {
             case null === $value:
                 return 'null';
             case true === $value:

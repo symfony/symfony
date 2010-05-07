@@ -32,15 +32,13 @@ class Bundle extends BaseBundle
         Loader::registerExtension(new WebExtension());
 
         $dirs = array('%kernel.root_dir%/views/%%bundle%%/%%controller%%/%%name%%%%format%%.php');
-        foreach ($container->getParameter('kernel.bundle_dirs') as $dir)
-        {
+        foreach ($container->getParameter('kernel.bundle_dirs') as $dir) {
             $dirs[] = $dir.'/%%bundle%%/Resources/views/%%controller%%/%%name%%%%format%%.php';
         }
         $container->setParameter('templating.loader.filesystem.path', $dirs);
 
         $configuration = new BuilderConfiguration();
-        if ($container->getParameter('kernel.debug'))
-        {
+        if ($container->getParameter('kernel.debug')) {
             $loader = new XmlFileLoader(__DIR__.'/Resources/config');
             $configuration->merge($loader->load('debug.xml'));
         }

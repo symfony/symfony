@@ -53,8 +53,7 @@ EOT
     {
         $found = false;
         $connections = $this->getDoctrineConnections();
-        foreach ($connections as $name => $connection)
-        {
+        foreach ($connections as $name => $connection) {
             if ($input->getOption('connection') && $name != $input->getOption('connection'))
             {
                 continue;
@@ -62,14 +61,11 @@ EOT
             $this->dropDatabaseForConnection($connection, $output);
             $found = true;
         }
-        if ($found === false)
-        {
+        if ($found === false) {
             if ($input->getOption('connection'))
             {
                 throw new \InvalidArgumentException(sprintf('<error>Could not find a connection named <comment>%s</comment></error>', $input->getOption('connection')));
-            }
-            else
-            {
+            } else {
                 throw new \InvalidArgumentException(sprintf('<error>Could not find any configured connections</error>', $input->getOption('connection')));
             }
         }
@@ -80,7 +76,7 @@ EOT
         $params = $connection->getParams();
         $name = isset($params['path']) ? $params['path']:$params['dbname'];
 
-        try {
+        try  {
             $connection->getSchemaManager()->dropDatabase($name);
             $output->writeln(sprintf('<info>Dropped database for connection named <comment>%s</comment></info>', $name));
         } catch (\Exception $e) {

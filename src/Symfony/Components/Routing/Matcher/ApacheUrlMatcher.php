@@ -49,15 +49,13 @@ class ApacheUrlMatcher extends UrlMatcher
      */
     public function match($url)
     {
-        if (!isset($_SERVER['_ROUTING__route']))
-        {
+        if (!isset($_SERVER['_ROUTING__route'])) {
             // fall-back to the default UrlMatcher
             return parent::match($url);
         }
 
         $parameters = array();
-        foreach ($_SERVER as $key => $value)
-        {
+        foreach ($_SERVER as $key => $value) {
             if ('_ROUTING_' === substr($key, 0, 9))
             {
                 $parameters[substr($key, 9)] = $value;

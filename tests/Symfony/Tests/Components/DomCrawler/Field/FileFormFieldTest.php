@@ -25,24 +25,18 @@ class FileFormFieldTest extends FormFieldTestCase
         $this->assertEquals(array('name' => '', 'type' => '', 'tmp_name' => '', 'error' => UPLOAD_ERR_NO_FILE, 'size' => 0), $field->getValue(), '->initialize() sets the value of the field to no file uploaded');
 
         $node = $this->createNode('textarea', '');
-        try
-        {
+        try {
             $field = new FileFormField($node);
             $this->fail('->initialize() throws a \LogicException if the node is not an input field');
-        }
-        catch (\LogicException $e)
-        {
+        } catch (\LogicException $e) {
             $this->assertTrue(true, '->initialize() throws a \LogicException if the node is not an input field');
         }
 
         $node = $this->createNode('input', '', array('type' => 'text'));
-        try
-        {
+        try {
             $field = new FileFormField($node);
             $this->fail('->initialize() throws a \LogicException if the node is not a file input field');
-        }
-        catch (\LogicException $e)
-        {
+        } catch (\LogicException $e) {
             $this->assertTrue(true, '->initialize() throws a \LogicException if the node is not a file input field');
         }
     }
@@ -68,13 +62,10 @@ class FileFormFieldTest extends FormFieldTestCase
         $value = $field->getValue();
         $this->assertEquals(UPLOAD_ERR_FORM_SIZE, $value['error'], '->setErrorCode() sets the file input field error code');
 
-        try
-        {
+        try {
             $field->setErrorCode('foobar');
             $this->fail('->setErrorCode() throws a \InvalidArgumentException if the error code is not valid');
-        }
-        catch (\InvalidArgumentException $e)
-        {
+        } catch (\InvalidArgumentException $e) {
             $this->assertTrue(true, '->setErrorCode() throws a \InvalidArgumentException if the error code is not valid');
         }
     }

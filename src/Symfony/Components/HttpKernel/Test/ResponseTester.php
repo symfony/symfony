@@ -35,8 +35,7 @@ class ResponseTester extends Tester
     {
         $this->response = $response;
 
-        if (class_exists('Symfony\Components\DomCrawler\Crawler'))
-        {
+        if (class_exists('Symfony\Components\DomCrawler\Crawler')) {
             $this->crawler = new Crawler();
             $this->crawler->addContent($this->response->getContent(), $this->response->headers->get('Content-Type'));
         }
@@ -51,8 +50,7 @@ class ResponseTester extends Tester
      */
     public function assertSelectEquals($selector, $arguments, $expected)
     {
-        if (null === $this->crawler)
-        {
+        if (null === $this->crawler) {
             // @codeCoverageIgnoreStart
             throw new \RuntimeException(sprintf('Unable to use %s() as the Symfony DomCrawler does not seem to be installed.', __METHOD__));
             // @codeCoverageIgnoreEnd
@@ -69,8 +67,7 @@ class ResponseTester extends Tester
      */
     public function assertSelectCount($selector, $count)
     {
-        if (null === $this->crawler)
-        {
+        if (null === $this->crawler) {
             // @codeCoverageIgnoreStart
             throw new \RuntimeException(sprintf('Unable to use %s() as the Symfony DomCrawler does not seem to be installed.', __METHOD__));
             // @codeCoverageIgnoreEnd
@@ -86,8 +83,7 @@ class ResponseTester extends Tester
      */
     public function assertSelectExists($selector)
     {
-        if (null === $this->crawler)
-        {
+        if (null === $this->crawler) {
             // @codeCoverageIgnoreStart
             throw new \RuntimeException(sprintf('Unable to use %s() as the Symfony DomCrawler does not seem to be installed.', __METHOD__));
             // @codeCoverageIgnoreEnd
@@ -103,8 +99,7 @@ class ResponseTester extends Tester
      */
     public function assertNotSelectExists($selector)
     {
-        if (null === $this->crawler)
-        {
+        if (null === $this->crawler) {
             // @codeCoverageIgnoreStart
             throw new \RuntimeException(sprintf('Unable to use %s() as the Symfony DomCrawler does not seem to be installed.', __METHOD__));
             // @codeCoverageIgnoreEnd
@@ -122,8 +117,7 @@ class ResponseTester extends Tester
     public function assertHeaderEquals($key, $value)
     {
         $headers = explode(', ', $this->response->headers->get($key));
-        foreach ($headers as $header)
-        {
+        foreach ($headers as $header) {
             if ($header == $value)
             {
                 return $this->test->pass(sprintf('Response header "%s" is "%s" (%s)', $key, $value, $this->response->headers->get($key)));
@@ -142,8 +136,7 @@ class ResponseTester extends Tester
     public function assertNotHeaderEquals($key, $value)
     {
         $headers = explode(', ', $this->response->headers->get($key));
-        foreach ($headers as $header)
-        {
+        foreach ($headers as $header) {
             if ($header == $value)
             {
                 return $this->test->fail(sprintf('Response header "%s" is not "%s" (%s)', $key, $value, $this->response->headers->get($key)));
@@ -162,8 +155,7 @@ class ResponseTester extends Tester
     public function assertHeaderRegExp($key, $regex)
     {
         $headers = explode(', ', $this->response->headers->get($key));
-        foreach ($headers as $header)
-        {
+        foreach ($headers as $header) {
             if (preg_match($regex, $header))
             {
                 return $this->test->pass(sprintf('Response header "%s" matches "%s" (%s)', $key, $value, $this->response->headers->get($key)));
@@ -182,8 +174,7 @@ class ResponseTester extends Tester
     public function assertNotHeaderRegExp($key, $regex)
     {
         $headers = explode(', ', $this->response->headers->get($key));
-        foreach ($headers as $header)
-        {
+        foreach ($headers as $header) {
             if (!preg_match($regex, $header))
             {
                 return $this->test->pass(sprintf('Response header "%s" matches "%s" (%s)', $key, $value, $this->response->headers->get($key)));
@@ -202,21 +193,16 @@ class ResponseTester extends Tester
      */
     public function assertCookie($name, $value = null, $attributes = array())
     {
-        foreach ($this->response->getCookies() as $cookie)
-        {
+        foreach ($this->response->getCookies() as $cookie) {
             if ($name == $cookie['name'])
             {
-                if (null === $value)
-                {
+                if (null === $value) {
                     $this->test->pass(sprintf('Response sets cookie "%s"', $name));
-                }
-                else
-                {
+                } else {
                     $this->test->assertTrue($value == $cookie['value'], sprintf('Response sets cookie "%s" to "%s"', $name, $value));
                 }
 
-                foreach ($attributes as $attributeName => $attributeValue)
-                {
+                foreach ($attributes as $attributeName => $attributeValue) {
                     if (!array_key_exists($attributeName, $cookie))
                     {
                         throw new \LogicException(sprintf('The cookie attribute "%s" is not valid.', $attributeName));
@@ -335,8 +321,7 @@ class ResponseTester extends Tester
     {
         $this->test->assertTrue(in_array($this->response->getStatusCode(), array(301, 302, 303, 307)), 'Status code is a redirect');
 
-        if (null !== $location)
-        {
+        if (null !== $location) {
             $this->test->assertEquals($location, $this->response->headers->get('Location'), sprintf('Page redirected to "%s"', $location));
         }
     }

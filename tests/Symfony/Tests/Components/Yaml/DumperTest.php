@@ -35,29 +35,22 @@ class DumperTest extends \PHPUnit_Framework_TestCase
     public function testSpecifications()
     {
         $files = $this->parser->parse(file_get_contents($this->path.'/index.yml'));
-        foreach ($files as $file)
-        {
+        foreach ($files as $file) {
             $yamls = file_get_contents($this->path.'/'.$file.'.yml');
 
             // split YAMLs documents
-            foreach (preg_split('/^---( %YAML\:1\.0)?/m', $yamls) as $yaml)
-            {
+            foreach (preg_split('/^---( %YAML\:1\.0)?/m', $yamls) as $yaml) {
                 if (!$yaml)
                 {
                     continue;
                 }
 
                 $test = $this->parser->parse($yaml);
-                if (isset($test['dump_skip']) && $test['dump_skip'])
-                {
+                if (isset($test['dump_skip']) && $test['dump_skip']) {
                     continue;
-                }
-                else if (isset($test['todo']) && $test['todo'])
-                {
+                } else if (isset($test['todo']) && $test['todo']) {
                     // TODO
-                }
-                else
-                {
+                } else {
                     $expected = eval('return '.trim($test['php']).';');
 
                     $this->assertEquals($expected, $this->parser->parse($this->dumper->dump($expected, 10)), $test['test']);

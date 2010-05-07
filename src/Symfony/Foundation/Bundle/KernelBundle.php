@@ -36,8 +36,7 @@ class KernelBundle extends Bundle
         $loader = new XmlFileLoader(array(__DIR__.'/../Resources/config', __DIR__.'/Resources/config'));
         $configuration->merge($loader->load('services.xml'));
 
-        if ($container->getParameter('kernel.debug'))
-        {
+        if ($container->getParameter('kernel.debug')) {
             $configuration->merge($loader->load('debug.xml'));
             $configuration->setDefinition('event_dispatcher', $configuration->findDefinition('debug.event_dispatcher'));
         }
@@ -50,8 +49,7 @@ class KernelBundle extends Bundle
         $container->getErrorHandlerService();
 
         // load core classes
-        if ($container->getParameter('kernel.include_core_classes'))
-        {
+        if ($container->getParameter('kernel.include_core_classes')) {
             ClassCollectionLoader::load($container->getParameter('kernel.compiled_classes'), $container->getParameter('kernel.cache_dir'), 'classes', $container->getParameter('kernel.debug'));
         }
     }

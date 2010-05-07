@@ -57,17 +57,13 @@ class DialogHelper extends Helper
     {
         // @codeCoverageIgnoreStart
         $answer = 'z';
-        while ($answer && !in_array(strtolower($answer[0]), array('y', 'n')))
-        {
+        while ($answer && !in_array(strtolower($answer[0]), array('y', 'n'))) {
             $answer = $this->ask($output, $question);
         }
 
-        if (false === $default)
-        {
+        if (false === $default) {
             return $answer && 'y' == strtolower($answer[0]);
-        }
-        else
-        {
+        } else {
             return !$answer || 'y' == strtolower($answer[0]);
         }
         // @codeCoverageIgnoreEnd
@@ -89,8 +85,7 @@ class DialogHelper extends Helper
     {
         // @codeCoverageIgnoreStart
         $error = null;
-        while (false === $attempts || $attempts--)
-        {
+        while (false === $attempts || $attempts--) {
             if (null !== $error)
             {
                 $output->writeln($this->getHelperSet()->get('formatter')->formatBlock($error->getMessage(), 'error'));
@@ -98,12 +93,9 @@ class DialogHelper extends Helper
 
             $value = $this->ask($output, $question, null);
 
-            try
-            {
+            try {
                 return $validator($value);
-            }
-            catch (\Exception $error)
-            {
+            } catch (\Exception $error) {
             }
         }
 

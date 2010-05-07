@@ -111,8 +111,7 @@ class User
      */
     public function setCulture($culture)
     {
-        if ($this->culture != $culture)
-        {
+        if ($this->culture != $culture) {
             $this->setAttribute('_culture', $culture);
 
             $this->dispatcher->notify(new Event($this, 'user.change_culture', array('culture' => $culture)));

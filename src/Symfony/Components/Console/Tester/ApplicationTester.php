@@ -52,18 +52,15 @@ class ApplicationTester
     public function run(array $input, $options = array())
     {
         $this->input = new ArrayInput($input);
-        if (isset($options['interactive']))
-        {
+        if (isset($options['interactive'])) {
             $this->input->setInteractive($options['interactive']);
         }
 
         $this->output = new StreamOutput(fopen('php://memory', 'w', false));
-        if (isset($options['decorated']))
-        {
+        if (isset($options['decorated'])) {
             $this->output->setDecorated($options['decorated']);
         }
-        if (isset($options['verbosity']))
-        {
+        if (isset($options['verbosity'])) {
             $this->output->setVerbosity($options['verbosity']);
         }
 

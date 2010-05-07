@@ -17,13 +17,10 @@ class NumberCompareTest extends \PHPUnit_Framework_TestCase
 {
     public function testConstructor()
     {
-        try
-        {
+        try {
             new NumberCompare('foobar');
             $this->fail('->test() throws an \InvalidArgumentException if the test expression is not valid.');
-        }
-        catch (\Exception $e)
-        {
+        } catch (\Exception $e) {
             $this->assertInstanceOf('InvalidArgumentException', $e, '->test() throws an \InvalidArgumentException if the test expression is not valid.');
         }
     }
@@ -33,14 +30,12 @@ class NumberCompareTest extends \PHPUnit_Framework_TestCase
      */
     public function testTest($test, $match, $noMatch)
     {
-        foreach ($match as $m)
-        {
+        foreach ($match as $m) {
             $c = new NumberCompare($test);
             $this->assertTrue($c->test($m), '->test() tests a string against the expression');
         }
 
-        foreach ($noMatch as $m)
-        {
+        foreach ($noMatch as $m) {
             $c = new NumberCompare($test);
             $this->assertFalse($c->test($m), '->test() tests a string against the expression');
         }

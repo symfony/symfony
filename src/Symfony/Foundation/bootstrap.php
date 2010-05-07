@@ -24,17 +24,14 @@ abstract class Bundle implements BundleInterface
 
     public function registerCommands(Application $application)
     {
-        foreach ($application->getKernel()->getBundleDirs() as $dir)
-        {
+        foreach ($application->getKernel()->getBundleDirs() as $dir) {
             $bundleBase = dirname(str_replace('\\', '/', get_class($this)));
             $commandDir = $dir.'/'.basename($bundleBase).'/Command';
-            if (!is_dir($commandDir))
-            {
+            if (!is_dir($commandDir)) {
                 continue;
             }
 
-                        foreach (new \RecursiveIteratorIterator(new \RecursiveDirectoryIterator($commandDir), \RecursiveIteratorIterator::LEAVES_ONLY) as $file)
-            {
+                        foreach (new \RecursiveIteratorIterator(new \RecursiveDirectoryIterator($commandDir), \RecursiveIteratorIterator::LEAVES_ONLY) as $file) {
                 if ($file->isDir() || substr($file, -4) !== '.php')
                 {
                     continue;
@@ -44,8 +41,7 @@ abstract class Bundle implements BundleInterface
 
                 $r = new \ReflectionClass($class);
 
-                if ($r->isSubclassOf('Symfony\\Components\\Console\\Command\\Command') && !$r->isAbstract())
-                {
+                if ($r->isSubclassOf('Symfony\\Components\\Console\\Command\\Command') && !$r->isAbstract()) {
                     $application->addCommand(new $class());
                 }
             }
@@ -94,8 +90,7 @@ class KernelBundle extends Bundle
         $loader = new XmlFileLoader(array(__DIR__.'/../Resources/config', __DIR__.'/Resources/config'));
         $configuration->merge($loader->load('services.xml'));
 
-        if ($container->getParameter('kernel.debug'))
-        {
+        if ($container->getParameter('kernel.debug')) {
             $configuration->merge($loader->load('debug.xml'));
             $configuration->setDefinition('event_dispatcher', $configuration->findDefinition('debug.event_dispatcher'));
         }
@@ -107,8 +102,7 @@ class KernelBundle extends Bundle
     {
         $container->getErrorHandlerService();
 
-                if ($container->getParameter('kernel.include_core_classes'))
-        {
+                if ($container->getParameter('kernel.include_core_classes')) {
             ClassCollectionLoader::load($container->getParameter('kernel.compiled_classes'), $container->getParameter('kernel.cache_dir'), 'classes', $container->getParameter('kernel.debug'));
         }
     }
@@ -141,13 +135,11 @@ class KernelExtension extends LoaderExtension
     {
         $configuration = new BuilderConfiguration();
 
-        if (isset($config['charset']))
-        {
+        if (isset($config['charset'])) {
             $configuration->setParameter('kernel.charset', $config['charset']);
         }
 
-        if (!array_key_exists('compilation', $config))
-        {
+        if (!array_key_exists('compilation', $config)) {
             $classes = array(
                 'Symfony\\Components\\Routing\\Router',
                 'Symfony\\Components\\Routing\\RouterInterface',
@@ -172,12 +164,9 @@ class KernelExtension extends LoaderExtension
                 'Symfony\\Framework\\WebBundle\\Listener\\ResponseFilter',
                 'Symfony\\Framework\\WebBundle\\Templating\\Engine',
             );
-        }
-        else
-        {
+        } else {
             $classes = array();
-            foreach (explode("\n", $config['compilation']) as $class)
-            {
+            foreach (explode("\n", $config['compilation']) as $class) {
                 if ($class)
                 {
                     $classes[] = trim($class);
@@ -186,8 +175,7 @@ class KernelExtension extends LoaderExtension
         }
         $configuration->setParameter('kernel.compiled_classes', $classes);
 
-        if (array_key_exists('error_handler_level', $config))
-        {
+        if (array_key_exists('error_handler_level', $config)) {
             $configuration->setParameter('error_handler.level', $config['error_handler_level']);
         }
 
@@ -245,13 +233,11 @@ class ErrorHandler
     
     public function handle($level, $message, $file, $line, $context)
     {
-        if (0 === $this->level)
-        {
+        if (0 === $this->level) {
             return false;
         }
 
-        if (error_reporting() & $level && $this->level & $level)
-        {
+        if (error_reporting() & $level && $this->level & $level) {
             throw new \ErrorException(sprintf('%s: %s in %s line %d', isset($this->levels[$level]) ? $this->levels[$level] : $level, $message, $file, $line));
         }
 
@@ -273,28 +259,20 @@ class ClassCollectionLoader
         $cache = $cacheDir.'/'.$name.'.php';
 
                 $reload = false;
-        if ($autoReload)
-        {
+        if ($autoReload) {
             $metadata = $cacheDir.'/'.$name.'.meta';
-            if (!file_exists($metadata) || !file_exists($cache))
-            {
+            if (!file_exists($metadata) || !file_exists($cache)) {
                 $reload = true;
-            }
-            else
-            {
+            } else {
                 $time = filemtime($cache);
                 $meta = unserialize(file_get_contents($metadata));
 
-                if ($meta[1] != $classes)
-                {
+                if ($meta[1] != $classes) {
                     $reload = true;
-                }
-                else
-                {
+                } else {
                     foreach ($meta[0] as $resource)
                     {
-                        if (!file_exists($resource) || filemtime($resource) > $time)
-                        {
+                        if (!file_exists($resource) || filemtime($resource) > $time) {
                             $reload = true;
 
                             break;
@@ -304,8 +282,7 @@ class ClassCollectionLoader
             }
         }
 
-        if (!$reload && file_exists($cache))
-        {
+        if (!$reload && file_exists($cache)) {
             require_once $cache;
 
             return;
@@ -313,8 +290,7 @@ class ClassCollectionLoader
 
         $files = array();
         $content = '';
-        foreach ($classes as $class)
-        {
+        foreach ($classes as $class) {
             if (!class_exists($class) && !interface_exists($class))
             {
                 throw new \InvalidArgumentException(sprintf('Unable to load class "%s"', $class));
@@ -326,14 +302,12 @@ class ClassCollectionLoader
             $content .= preg_replace(array('/^\s*<\?php/', '/\?>\s*$/'), '', file_get_contents($r->getFileName()));
         }
 
-                if (!is_dir(dirname($cache)))
-        {
+                if (!is_dir(dirname($cache))) {
             mkdir(dirname($cache), 0777, true);
         }
         self::writeCacheFile($cache, Kernel::stripComments('<?php '.$content));
 
-        if ($autoReload)
-        {
+        if ($autoReload) {
                         self::writeCacheFile($metadata, serialize(array($files, $classes)));
         }
     }
@@ -341,15 +315,13 @@ class ClassCollectionLoader
     static protected function writeCacheFile($file, $content)
     {
         $tmpFile = tempnam(dirname($file), basename($file));
-        if (!$fp = @fopen($tmpFile, 'wb'))
-        {
+        if (!$fp = @fopen($tmpFile, 'wb')) {
             die(sprintf('Failed to write cache file "%s".', $tmpFile));
         }
         @fwrite($fp, $content);
         @fclose($fp);
 
-        if ($content != file_get_contents($tmpFile))
-        {
+        if ($content != file_get_contents($tmpFile)) {
             die(sprintf('Failed to write cache file "%s" (cache corrupted).', $tmpFile));
         }
 
@@ -396,15 +368,12 @@ abstract class Kernel implements HttpKernelInterface, \Serializable
         $this->rootDir = realpath($this->registerRootDir());
         $this->name = basename($this->rootDir);
 
-        if ($this->debug)
-        {
+        if ($this->debug) {
             ini_set('display_errors', 1);
             error_reporting(-1);
 
             $this->startTime = microtime(true);
-        }
-        else
-        {
+        } else {
             ini_set('display_errors', 0);
         }
     }
@@ -428,8 +397,7 @@ abstract class Kernel implements HttpKernelInterface, \Serializable
     
     public function boot()
     {
-        if (true === $this->booted)
-        {
+        if (true === $this->booted) {
             throw new \LogicException('The kernel is already booted.');
         }
 
@@ -439,8 +407,7 @@ abstract class Kernel implements HttpKernelInterface, \Serializable
                 $this->container = $this->initializeContainer();
         $this->container->setService('kernel', $this);
 
-                foreach ($this->bundles as $bundle)
-        {
+                foreach ($this->bundles as $bundle) {
             $bundle->boot($this->container);
         }
 
@@ -454,8 +421,7 @@ abstract class Kernel implements HttpKernelInterface, \Serializable
     {
         $this->booted = false;
 
-        foreach ($this->bundles as $bundle)
-        {
+        foreach ($this->bundles as $bundle) {
             $bundle->shutdown($this->container);
         }
 
@@ -478,22 +444,17 @@ abstract class Kernel implements HttpKernelInterface, \Serializable
     
     public function handle(Request $request = null, $main = true, $raw = false)
     {
-        if (false === $this->booted)
-        {
+        if (false === $this->booted) {
             $this->boot();
         }
 
-        if (null === $request)
-        {
+        if (null === $request) {
             $request = $this->container->getRequestService();
-        }
-        else
-        {
+        } else {
             $this->container->setService('request', $request);
         }
 
-        if (true === $main)
-        {
+        if (true === $main) {
             $this->request = $request;
         }
 
@@ -556,8 +517,7 @@ abstract class Kernel implements HttpKernelInterface, \Serializable
         $location = $this->getCacheDir().'/'.$class;
         $reload = $this->debug ? $this->needsReload($class, $location) : false;
 
-        if ($reload || !file_exists($location.'.php'))
-        {
+        if ($reload || !file_exists($location.'.php')) {
             $this->buildContainer($class, $location.'.php');
         }
 
@@ -569,8 +529,7 @@ abstract class Kernel implements HttpKernelInterface, \Serializable
     public function getKernelParameters()
     {
         $bundles = array();
-        foreach ($this->bundles as $bundle)
-        {
+        foreach ($this->bundles as $bundle) {
             $bundles[] = get_class($bundle);
         }
 
@@ -593,8 +552,7 @@ abstract class Kernel implements HttpKernelInterface, \Serializable
     protected function getEnvParameters()
     {
         $parameters = array();
-        foreach ($_SERVER as $key => $value)
-        {
+        foreach ($_SERVER as $key => $value) {
             if ('SYMFONY__' === substr($key, 0, 9))
             {
                 $parameters[strtolower(str_replace('__', '.', substr($key, 9)))] = $value;
@@ -606,15 +564,13 @@ abstract class Kernel implements HttpKernelInterface, \Serializable
 
     protected function needsReload($class, $location)
     {
-        if (!file_exists($location.'.meta') || !file_exists($location.'.php'))
-        {
+        if (!file_exists($location.'.meta') || !file_exists($location.'.php')) {
             return true;
         }
 
         $meta = unserialize(file_get_contents($location.'.meta'));
         $time = filemtime($location.'.php');
-        foreach ($meta as $resource)
-        {
+        foreach ($meta as $resource) {
             if (!$resource->isUptodate($time))
             {
                 return true;
@@ -629,44 +585,36 @@ abstract class Kernel implements HttpKernelInterface, \Serializable
         $container = new Builder($this->getKernelParameters());
 
         $configuration = new BuilderConfiguration();
-        foreach ($this->bundles as $bundle)
-        {
+        foreach ($this->bundles as $bundle) {
             $configuration->merge($bundle->buildContainer($container));
         }
         $configuration->merge($this->registerContainerConfiguration());
         $container->merge($configuration);
         $this->optimizeContainer($container);
 
-        foreach (array('cache', 'logs') as $name)
-        {
+        foreach (array('cache', 'logs') as $name) {
             $dir = $container->getParameter(sprintf('kernel.%s_dir', $name));
-            if (!is_dir($dir))
-            {
+            if (!is_dir($dir)) {
                 if (false === @mkdir($dir, 0777, true))
                 {
                     die(sprintf('Unable to create the %s directory (%s)', $name, dirname($dir)));
                 }
-            }
-            elseif (!is_writable($dir))
-            {
+            } elseif (!is_writable($dir)) {
                 die(sprintf('Unable to write in the %s directory (%s)', $name, $dir));
             }
         }
 
                 $dumper = new PhpDumper($container);
         $content = $dumper->dump(array('class' => $class));
-        if (!$this->debug)
-        {
+        if (!$this->debug) {
             $content = self::stripComments($content);
         }
         $this->writeCacheFile($file, $content);
 
-        if ($this->debug)
-        {
+        if ($this->debug) {
                         $parent = new \ReflectionObject($this);
             $configuration->addResource(new FileResource($parent->getFileName()));
-            while ($parent = $parent->getParentClass())
-            {
+            while ($parent = $parent->getParentClass()) {
                 $configuration->addResource(new FileResource($parent->getFileName()));
             }
 
@@ -676,8 +624,7 @@ abstract class Kernel implements HttpKernelInterface, \Serializable
 
     public function optimizeContainer(Builder $container)
     {
-                foreach ($container->getDefinitions() as $definition)
-        {
+                foreach ($container->getDefinitions() as $definition) {
             if (false !== strpos($class = $definition->getClass(), '%'))
             {
                 $definition->setClass(Builder::resolveValue($class, $container->getParameters()));
@@ -688,24 +635,19 @@ abstract class Kernel implements HttpKernelInterface, \Serializable
 
     static public function stripComments($source)
     {
-        if (!function_exists('token_get_all'))
-        {
+        if (!function_exists('token_get_all')) {
             return $source;
         }
 
         $ignore = array(T_COMMENT => true, T_DOC_COMMENT => true);
         $output = '';
-        foreach (token_get_all($source) as $token)
-        {
+        foreach (token_get_all($source) as $token) {
                         if (isset($token[1]))
             {
-                                if (!isset($ignore[$token[0]]))
-                {
+                                if (!isset($ignore[$token[0]])) {
                                         $output .= $token[1];
                 }
-            }
-            else
-            {
+            } else {
                                 $output .= $token;
             }
         }
@@ -716,15 +658,13 @@ abstract class Kernel implements HttpKernelInterface, \Serializable
     protected function writeCacheFile($file, $content)
     {
         $tmpFile = tempnam(dirname($file), basename($file));
-        if (!$fp = @fopen($tmpFile, 'wb'))
-        {
+        if (!$fp = @fopen($tmpFile, 'wb')) {
             die(sprintf('Failed to write cache file "%s".', $tmpFile));
         }
         @fwrite($fp, $content);
         @fclose($fp);
 
-        if ($content != file_get_contents($tmpFile))
-        {
+        if ($content != file_get_contents($tmpFile)) {
             die(sprintf('Failed to write cache file "%s" (cache corrupted).', $tmpFile));
         }
 
@@ -764,12 +704,10 @@ class EventDispatcher extends BaseEventDispatcher
     {
         $this->container = $container;
 
-        foreach ($container->findAnnotatedServiceIds('kernel.listener') as $id => $attributes)
-        {
+        foreach ($container->findAnnotatedServiceIds('kernel.listener') as $id => $attributes) {
             foreach ($attributes as $attribute)
             {
-                if (isset($attribute['event']))
-                {
+                if (isset($attribute['event'])) {
                     $this->connect($attribute['event'], array($id, isset($attribute['method']) ? $attribute['method'] : 'handle'));
                 }
             }
@@ -779,13 +717,11 @@ class EventDispatcher extends BaseEventDispatcher
     
     public function getListeners($name)
     {
-        if (!isset($this->listeners[$name]))
-        {
+        if (!isset($this->listeners[$name])) {
             return array();
         }
 
-        foreach ($this->listeners[$name] as $i => $listener)
-        {
+        foreach ($this->listeners[$name] as $i => $listener) {
             if (is_array($listener) && is_string($listener[0]))
             {
                 $this->listeners[$name][$i] = array($this->container->getService($listener[0]), $listener[1]);

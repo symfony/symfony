@@ -45,8 +45,7 @@ class RequestParser
     {
         $request = $event->getParameter('request');
 
-        if (!$event->getParameter('main_request'))
-        {
+        if (!$event->getParameter('main_request')) {
             return;
         }
 
@@ -60,22 +59,18 @@ class RequestParser
         ));
         $this->container->setParameter('request.base_path', $request->getBasePath());
 
-        if ($request->path->has('_bundle'))
-        {
+        if ($request->path->has('_bundle')) {
             return;
         }
 
-        if (false !== $parameters = $this->router->match($request->getPathInfo()))
-        {
+        if (false !== $parameters = $this->router->match($request->getPathInfo())) {
             if (null !== $this->logger)
             {
                 $this->logger->info(sprintf('Matched route "%s" (parameters: %s)', $parameters['_route'], str_replace("\n", '', var_export($parameters, true))));
             }
 
             $request->path->replace($parameters);
-        }
-        elseif (null !== $this->logger)
-        {
+        } elseif (null !== $this->logger) {
             $this->logger->err(sprintf('No route found for %s', $request->getPathInfo()));
         }
     }

@@ -35,14 +35,12 @@ class FilenameFilterIterator extends \FilterIterator
     public function __construct(\Iterator $iterator, array $matchPatterns, array $noMatchPatterns)
     {
         $this->matchRegexps = array();
-        foreach ($matchPatterns as $pattern)
-        {
+        foreach ($matchPatterns as $pattern) {
             $this->matchRegexps[] = $this->toRegex($pattern);
         }
 
         $this->noMatchRegexps = array();
-        foreach ($noMatchPatterns as $pattern)
-        {
+        foreach ($noMatchPatterns as $pattern) {
             $this->noMatchRegexps[] = $this->toRegex($pattern);
         }
 
@@ -59,38 +57,30 @@ class FilenameFilterIterator extends \FilterIterator
         $fileinfo = $this->getInnerIterator()->current();
 
         // should at least match one rule
-        if ($this->matchRegexps)
-        {
+        if ($this->matchRegexps) {
             $match = false;
-            foreach ($this->matchRegexps as $regex)
-            {
+            foreach ($this->matchRegexps as $regex) {
                 if (preg_match($regex, $fileinfo->getFilename()))
                 {
                     $match = true;
                     break;
                 }
             }
-        }
-        else
-        {
+        } else {
             $match = true;
         }
 
         // should at least not match one rule to exclude
-        if ($this->noMatchRegexps)
-        {
+        if ($this->noMatchRegexps) {
             $exclude = false;
-            foreach ($this->noMatchRegexps as $regex)
-            {
+            foreach ($this->noMatchRegexps as $regex) {
                 if (preg_match($regex, $fileinfo->getFilename()))
                 {
                     $exclude = true;
                     break;
                 }
             }
-        }
-        else
-        {
+        } else {
             $exclude = false;
         }
 
@@ -99,8 +89,7 @@ class FilenameFilterIterator extends \FilterIterator
 
     protected function toRegex($str)
     {
-        if (preg_match('/^([^a-zA-Z0-9\\\\]).+?\\1[ims]?$/', $str))
-        {
+        if (preg_match('/^([^a-zA-Z0-9\\\\]).+?\\1[ims]?$/', $str)) {
             return $str;
         }
 

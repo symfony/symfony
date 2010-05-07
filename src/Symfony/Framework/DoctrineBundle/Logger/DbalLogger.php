@@ -39,8 +39,7 @@ class DbalLogger extends DebugStack
     {
         parent::logSql($sql, $params);
 
-        if (null !== $this->logger)
-        {
+        if (null !== $this->logger) {
             $this->log($sql.' ('.str_replace("\n", '', var_export($params, true)).')');
         }
     }

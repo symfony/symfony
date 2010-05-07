@@ -33,25 +33,20 @@ class ParserTest extends \PHPUnit_Framework_TestCase
     public function testSpecifications()
     {
         $files = $this->parser->parse(file_get_contents($this->path.'/index.yml'));
-        foreach ($files as $file)
-        {
+        foreach ($files as $file) {
             $yamls = file_get_contents($this->path.'/'.$file.'.yml');
 
             // split YAMLs documents
-            foreach (preg_split('/^---( %YAML\:1\.0)?/m', $yamls) as $yaml)
-            {
+            foreach (preg_split('/^---( %YAML\:1\.0)?/m', $yamls) as $yaml) {
                 if (!$yaml)
                 {
                     continue;
                 }
 
                 $test = $this->parser->parse($yaml);
-                if (isset($test['todo']) && $test['todo'])
-                {
+                if (isset($test['todo']) && $test['todo']) {
                     // TODO
-                }
-                else
-                {
+                } else {
                     $expected = var_export(eval('return '.trim($test['php']).';'), true);
 
                     $this->assertEquals($expected, var_export($this->parser->parse($test['yaml']), true), $test['test']);
@@ -70,16 +65,13 @@ class ParserTest extends \PHPUnit_Framework_TestCase
             "foo:\n 	 bar",
         );
 
-        foreach ($yamls as $yaml)
-        {
+        foreach ($yamls as $yaml) {
             try
             {
                 $content = $this->parser->parse($yaml);
 
                 $this->fail('YAML files must not contain tabs');
-            }
-            catch (\Exception $e)
-            {
+            } catch (\Exception $e) {
                 $this->assertInstanceOf('\Exception', $e, 'YAML files must not contain tabs');
                 $this->assertEquals('A YAML file cannot contain tabs as indentation at line 2 ('.strpbrk($yaml, "\t").').', $e->getMessage(), 'YAML files must not contain tabs');
             }

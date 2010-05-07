@@ -45,8 +45,7 @@ abstract class LoaderExtension implements LoaderExtensionInterface
      */
     public function load($tag, array $config)
     {
-        if (!method_exists($this, $method = $tag.'Load'))
-        {
+        if (!method_exists($this, $method = $tag.'Load')) {
             throw new \InvalidArgumentException(sprintf('The tag "%s" is not defined in the "%s" extension.', $tag, $this->getNamespace()));
         }
 

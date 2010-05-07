@@ -60,28 +60,24 @@ EOT
     {
         $defaultEm = $this->container->getDoctrine_ORM_EntityManagerService();
         $dirOrFile = $input->getOption('fixtures');
-        if ($dirOrFile)
-        {
+        if ($dirOrFile) {
             $paths = is_array($dirOrFile) ? $dirOrFile : array($dirOrFile);
         } else {
             $paths = array();
             $bundleDirs = $this->container->getKernelService()->getBundleDirs();
-            foreach ($this->container->getKernelService()->getBundles() as $bundle)
-            {
+            foreach ($this->container->getKernelService()->getBundles() as $bundle) {
                 $tmp = dirname(str_replace('\\', '/', get_class($bundle)));
                 $namespace = str_replace('/', '\\', dirname($tmp));
                 $class = basename($tmp);
 
-                if (isset($bundleDirs[$namespace]) && is_dir($dir = $bundleDirs[$namespace].'/'.$class.'/Resources/data/fixtures/doctrine'))
-                {
+                if (isset($bundleDirs[$namespace]) && is_dir($dir = $bundleDirs[$namespace].'/'.$class.'/Resources/data/fixtures/doctrine')) {
                     $paths[] = $dir;
                 }
             }
         }
 
         $files = array();
-        foreach ($paths as $path)
-        {
+        foreach ($paths as $path) {
             if (is_dir($path))
             {
                 $finder = new Finder();
@@ -89,9 +85,7 @@ EOT
                     ->files()
                     ->name('*.php')
                     ->in($path));
-            }
-            else
-            {
+            } else {
                 $found = array($path);
             }
             $files = array_merge($files, $found);
@@ -100,8 +94,7 @@ EOT
         $ems = array();
         $emEntities = array();
         $files = array_unique($files);
-        foreach ($files as $file)
-        {
+        foreach ($files as $file) {
             $em = $defaultEm;
             $output->writeln(sprintf('<info>Loading data fixtures from <comment>"%s"</comment></info>', $file));
 
@@ -116,17 +109,14 @@ EOT
             $emEntities[$emName] = array();
             $variables = array_values($new);
 
-            foreach ($variables as $variable)
-            {
+            foreach ($variables as $variable) {
                 $value = $$variable;
-                if (!is_object($value) || $value instanceof \Doctrine\ORM\EntityManager)
-                {
+                if (!is_object($value) || $value instanceof \Doctrine\ORM\EntityManager) {
                     continue;
                 }
                 $emEntities[$emName][] = $value;
             }
-            foreach ($ems as $emName => $em)
-            {
+            foreach ($ems as $emName => $em) {
                 if (!$input->getOption('append'))
                 {
                     $output->writeln(sprintf('<info>Purging data from entity manager named <comment>"%s"</comment></info>', $emName));
@@ -137,8 +127,7 @@ EOT
                 $numEntities = count($entities);
                 $output->writeln(sprintf('<info>Persisting "%s" '.($numEntities > 1 ? 'entities' : 'entity').'</info>', count($entities)));
 
-                foreach ($entities as $entity)
-                {
+                foreach ($entities as $entity) {
                     $output->writeln(sprintf('<info>Persisting "%s" entity:</info>', get_class($entity)));
                     $output->writeln('');
                     $output->writeln(var_dump($entity));
@@ -156,8 +145,7 @@ EOT
         $classes = array();
         $metadatas = $em->getMetadataFactory()->getAllMetadata();
 
-        foreach ($metadatas as $metadata)
-        {
+        foreach ($metadatas as $metadata) {
             if (!$metadata->isMappedSuperclass)
             {
                 $classes[] = $metadata;
@@ -165,11 +153,9 @@ EOT
         }
         $cmf = $em->getMetadataFactory();
         $classes = $this->getCommitOrder($em, $classes);
-        for ($i = count($classes) - 1; $i >= 0; --$i)
-        {
+        for ($i = count($classes) - 1; $i >= 0; --$i) {
             $class = $classes[$i];
-            if ($cmf->hasMetadataFor($class->name))
-            {
+            if ($cmf->hasMetadataFor($class->name)) {
                 try {
                     $em->createQuery('DELETE FROM '.$class->name.' a')->execute();
                 } catch (Exception $e) {}
@@ -181,16 +167,14 @@ EOT
     {
         $calc = new CommitOrderCalculator;
 
-        foreach ($classes as $class)
-        {
+        foreach ($classes as $class) {
             $calc->addClass($class);
 
-            foreach ($class->associationMappings as $assoc)
-            {
+            foreach ($class->associationMappings as $assoc) {
                 if ($assoc->isOwningSide) {
                     $targetClass = $em->getClassMetadata($assoc->targetEntityName);
 
-                    if ( ! $calc->hasClass($targetClass->name)) {
+                    if ( ! $calc->hasClass($targetClass->name))  {
                             $calc->addClass($targetClass);
                     }
 

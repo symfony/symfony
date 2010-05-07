@@ -31,8 +31,7 @@ class EventDispatcher
      */
     public function connect($name, $listener)
     {
-        if (!isset($this->listeners[$name]))
-        {
+        if (!isset($this->listeners[$name])) {
             $this->listeners[$name] = array();
         }
 
@@ -49,13 +48,11 @@ class EventDispatcher
      */
     public function disconnect($name, $listener)
     {
-        if (!isset($this->listeners[$name]))
-        {
+        if (!isset($this->listeners[$name])) {
             return false;
         }
 
-        foreach ($this->listeners[$name] as $i => $callable)
-        {
+        foreach ($this->listeners[$name] as $i => $callable) {
             if ($listener === $callable)
             {
                 unset($this->listeners[$name][$i]);
@@ -72,8 +69,7 @@ class EventDispatcher
      */
     public function notify(Event $event)
     {
-        foreach ($this->getListeners($event->getName()) as $listener)
-        {
+        foreach ($this->getListeners($event->getName()) as $listener) {
             call_user_func($listener, $event);
         }
 
@@ -89,8 +85,7 @@ class EventDispatcher
      */
     public function notifyUntil(Event $event)
     {
-        foreach ($this->getListeners($event->getName()) as $listener)
-        {
+        foreach ($this->getListeners($event->getName()) as $listener) {
             if (call_user_func($listener, $event))
             {
                 $event->setProcessed(true);
@@ -111,8 +106,7 @@ class EventDispatcher
      */
     public function filter(Event $event, $value)
     {
-        foreach ($this->getListeners($event->getName()) as $listener)
-        {
+        foreach ($this->getListeners($event->getName()) as $listener) {
             $value = call_user_func($listener, $event, $value);
         }
 
@@ -130,8 +124,7 @@ class EventDispatcher
      */
     public function hasListeners($name)
     {
-        if (!isset($this->listeners[$name]))
-        {
+        if (!isset($this->listeners[$name])) {
             $this->listeners[$name] = array();
         }
 
@@ -147,8 +140,7 @@ class EventDispatcher
      */
     public function getListeners($name)
     {
-        if (!isset($this->listeners[$name]))
-        {
+        if (!isset($this->listeners[$name])) {
             return array();
         }
 

@@ -19,13 +19,10 @@ class DumperTest extends \PHPUnit_Framework_TestCase
     {
         $builder = new Builder();
         $dumper = new ProjectDumper($builder);
-        try
-        {
+        try {
             $dumper->dump();
             $this->fail('->dump() returns a LogicException if the dump() method has not been overriden by a children class');
-        }
-        catch (\Exception $e)
-        {
+        } catch (\Exception $e) {
             $this->assertInstanceOf('\LogicException', $e, '->dump() returns a LogicException if the dump() method has not been overriden by a children class');
             $this->assertEquals('You must extend this abstract class and implement the dump() method.', $e->getMessage(), '->dump() returns a LogicException if the dump() method has not been overriden by a children class');
         }

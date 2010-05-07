@@ -18,13 +18,10 @@ class LoaderExtensionTest extends \PHPUnit_Framework_TestCase
     {
         $extension = new \ProjectExtension();
 
-        try
-        {
+        try {
             $extension->load('foo', array());
             $this->fail('->load() throws an InvalidArgumentException if the tag does not exist');
-        }
-        catch (\Exception $e)
-        {
+        } catch (\Exception $e) {
             $this->assertInstanceOf('\InvalidArgumentException', $e, '->load() throws an InvalidArgumentException if the tag does not exist');
             $this->assertEquals('The tag "foo" is not defined in the "http://www.example.com/schema/project" extension.', $e->getMessage(), '->load() throws an InvalidArgumentException if the tag does not exist');
         }

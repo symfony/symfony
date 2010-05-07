@@ -54,8 +54,7 @@ class TokenizerTest extends \PHPUnit_Framework_TestCase
     protected function tokensToString($tokens)
     {
         $str = '';
-        foreach ($tokens as $token)
-        {
+        foreach ($tokens as $token) {
             $str .= str_repeat(' ', $token->getPosition() - strlen($str)).$token;
         }
 

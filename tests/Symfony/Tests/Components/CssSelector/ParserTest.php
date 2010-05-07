@@ -38,13 +38,10 @@ class ParserTest extends \PHPUnit_Framework_TestCase
     {
         $parser = new Parser();
 
-        try
-        {
+        try {
             $parser->parse('h1:');
             $this->fail('->parse() throws an Exception if the css selector is not valid');
-        }
-        catch (\Exception $e)
-        {
+        } catch (\Exception $e) {
             $this->assertInstanceOf('\Symfony\Components\CssSelector\SyntaxError', $e, '->parse() throws an Exception if the css selector is not valid');
             $this->assertEquals("Expected symbol, got '' at h1: -> ", $e->getMessage(), '->parse() throws an Exception if the css selector is not valid');
         }

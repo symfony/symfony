@@ -43,31 +43,26 @@ class FormatterHelper extends Helper
      */
     public function formatBlock($messages, $style, $large = false)
     {
-        if (!is_array($messages))
-        {
+        if (!is_array($messages)) {
             $messages = array($messages);
         }
 
         $len = 0;
         $lines = array();
-        foreach ($messages as $message)
-        {
+        foreach ($messages as $message) {
             $lines[] = sprintf($large ? '  %s  ' : ' %s ', $message);
             $len = max($this->strlen($message) + ($large ? 4 : 2), $len);
         }
 
         $messages = $large ? array(str_repeat(' ', $len)) : array();
-        foreach ($lines as $line)
-        {
+        foreach ($lines as $line) {
             $messages[] = $line.str_repeat(' ', $len - $this->strlen($line));
         }
-        if ($large)
-        {
+        if ($large) {
             $messages[] = str_repeat(' ', $len);
         }
 
-        foreach ($messages as &$message)
-        {
+        foreach ($messages as &$message) {
             $message = sprintf('<%s>%s</%s>', $style, $message, $style);
         }
 

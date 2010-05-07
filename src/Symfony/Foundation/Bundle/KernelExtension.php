@@ -39,13 +39,11 @@ class KernelExtension extends LoaderExtension
     {
         $configuration = new BuilderConfiguration();
 
-        if (isset($config['charset']))
-        {
+        if (isset($config['charset'])) {
             $configuration->setParameter('kernel.charset', $config['charset']);
         }
 
-        if (!array_key_exists('compilation', $config))
-        {
+        if (!array_key_exists('compilation', $config)) {
             $classes = array(
                 'Symfony\\Components\\Routing\\Router',
                 'Symfony\\Components\\Routing\\RouterInterface',
@@ -70,12 +68,9 @@ class KernelExtension extends LoaderExtension
                 'Symfony\\Framework\\WebBundle\\Listener\\ResponseFilter',
                 'Symfony\\Framework\\WebBundle\\Templating\\Engine',
             );
-        }
-        else
-        {
+        } else {
             $classes = array();
-            foreach (explode("\n", $config['compilation']) as $class)
-            {
+            foreach (explode("\n", $config['compilation']) as $class) {
                 if ($class)
                 {
                     $classes[] = trim($class);
@@ -84,8 +79,7 @@ class KernelExtension extends LoaderExtension
         }
         $configuration->setParameter('kernel.compiled_classes', $classes);
 
-        if (array_key_exists('error_handler_level', $config))
-        {
+        if (array_key_exists('error_handler_level', $config)) {
             $configuration->setParameter('error_handler.level', $config['error_handler_level']);
         }
 

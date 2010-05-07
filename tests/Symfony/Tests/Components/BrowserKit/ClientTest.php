@@ -34,12 +34,9 @@ class TestClient extends Client
 
     protected function doRequest($request)
     {
-        if (null === $this->nextResponse)
-        {
+        if (null === $this->nextResponse) {
             return new Response();
-        }
-        else
-        {
+        } else {
             $response = $this->nextResponse;
             $this->nextResponse = null;
 
@@ -227,13 +224,10 @@ class ClientTest extends \PHPUnit_Framework_TestCase
         $client->followRedirects(false);
         $client->request('GET', 'http://www.example.com/foo/foobar');
 
-        try
-        {
+        try {
             $client->followRedirect();
             $this->fail('->followRedirect() throws a \LogicException if the request was not redirected');
-        }
-        catch (\Exception $e)
-        {
+        } catch (\Exception $e) {
             $this->assertInstanceof('LogicException', $e, '->followRedirect() throws a \LogicException if the request was not redirected');
         }
 
@@ -298,13 +292,10 @@ class ClientTest extends \PHPUnit_Framework_TestCase
 
         $client->setNextScript("new Symfony\Components\BrowserKit\Response('foobar)");
 
-        try
-        {
+        try {
             $client->request('GET', 'http://www.example.com/foo/foobar');
             $this->fail('->request() throws a \RuntimeException if the script has an error');
-        }
-        catch (\Exception $e)
-        {
+        } catch (\Exception $e) {
             $this->assertInstanceof('RuntimeException', $e, '->request() throws a \RuntimeException if the script has an error');
         }
     }

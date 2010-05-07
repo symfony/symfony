@@ -76,8 +76,7 @@ class Route
         $this->pattern = trim($pattern);
 
         // a route must start with a slash
-        if (empty($this->pattern) || '/' !== $this->pattern[0])
-        {
+        if (empty($this->pattern) || '/' !== $this->pattern[0]) {
             $this->pattern = '/'.$this->pattern;
         }
 
@@ -188,15 +187,13 @@ class Route
     public function setRequirements(array $requirements)
     {
         $this->requirements = array();
-        foreach ($requirements as $key => $regex)
-        {
+        foreach ($requirements as $key => $regex) {
             if ('^' == $regex[0])
             {
                 $regex = substr($regex, 1);
             }
 
-            if ('$' == substr($regex, -1))
-            {
+            if ('$' == substr($regex, -1)) {
                 $regex = substr($regex, 0, -1);
             }
 
@@ -223,15 +220,13 @@ class Route
      */
     public function compile()
     {
-        if (null !== $this->compiled)
-        {
+        if (null !== $this->compiled) {
             return $this->compiled;
         }
 
         $class = $this->getOption('compiler_class');
 
-        if (!isset(static::$compilers[$class]))
-        {
+        if (!isset(static::$compilers[$class])) {
             static::$compilers[$class] = new $class;
         }
 

@@ -25,35 +25,26 @@ class InputFormFieldTest extends FormFieldTestCase
         $this->assertEquals('value', $field->getValue(), '->initialize() sets the value of the field to the value attribute value');
 
         $node = $this->createNode('textarea', '');
-        try
-        {
+        try {
             $field = new InputFormField($node);
             $this->fail('->initialize() throws a \LogicException if the node is not an input');
-        }
-        catch (\LogicException $e)
-        {
+        } catch (\LogicException $e) {
             $this->assertTrue(true, '->initialize() throws a \LogicException if the node is not an input');
         }
 
         $node = $this->createNode('input', '', array('type' => 'checkbox'));
-        try
-        {
+        try {
             $field = new InputFormField($node);
             $this->fail('->initialize() throws a \LogicException if the node is a checkbox');
-        }
-        catch (\LogicException $e)
-        {
+        } catch (\LogicException $e) {
             $this->assertTrue(true, '->initialize() throws a \LogicException if the node is a checkbox');
         }
 
         $node = $this->createNode('input', '', array('type' => 'file'));
-        try
-        {
+        try {
             $field = new InputFormField($node);
             $this->fail('->initialize() throws a \LogicException if the node is a file');
-        }
-        catch (\LogicException $e)
-        {
+        } catch (\LogicException $e) {
             $this->assertTrue(true, '->initialize() throws a \LogicException if the node is a file');
         }
     }

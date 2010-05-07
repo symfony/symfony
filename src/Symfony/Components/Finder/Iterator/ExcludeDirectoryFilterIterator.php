@@ -31,8 +31,7 @@ class ExcludeDirectoryFilterIterator extends \FilterIterator
     public function __construct(\Iterator $iterator, array $directories)
     {
         $this->patterns = array();
-        foreach ($directories as $directory)
-        {
+        foreach ($directories as $directory) {
             $this->patterns[] = '#/'.preg_quote($directory, '#').'(/|$)#';
         }
 
@@ -48,16 +47,13 @@ class ExcludeDirectoryFilterIterator extends \FilterIterator
     {
         $fileinfo = $this->getInnerIterator()->current();
 
-        foreach ($this->patterns as $pattern)
-        {
+        foreach ($this->patterns as $pattern) {
             $path = $fileinfo->getPathname();
-            if ($fileinfo->isDir())
-            {
+            if ($fileinfo->isDir()) {
                 $path .= '/';
             }
 
-            if (preg_match($pattern, $path))
-            {
+            if (preg_match($pattern, $path)) {
                 return false;
             }
         }

@@ -41,20 +41,15 @@ class Form
     public function __construct(\DOMNode $node, $method = null, $host = null, $path = '/')
     {
         $this->button = $node;
-        if ('button' == $node->nodeName || ('input' == $node->nodeName && in_array($node->getAttribute('type'), array('submit', 'button', 'image'))))
-        {
+        if ('button' == $node->nodeName || ('input' == $node->nodeName && in_array($node->getAttribute('type'), array('submit', 'button', 'image')))) {
             do
             {
                 // use the ancestor form element
-                if (null === $node = $node->parentNode)
-                {
+                if (null === $node = $node->parentNode) {
                     throw new \LogicException('The selected node does not have a form ancestor.');
                 }
-            }
-            while ('form' != $node->nodeName);
-        }
-        else
-        {
+            } while ('form' != $node->nodeName);
+        } else {
             throw new \LogicException(sprintf('Unable to submit on a "%s" tag.', $node->nodeName));
         }
         $this->node = $node;
@@ -84,8 +79,7 @@ class Form
      */
     public function getValue($name)
     {
-        if (!$this->hasField($name))
-        {
+        if (!$this->hasField($name)) {
             throw new \InvalidArgumentException(sprintf('The form field "%s" does not exist', $name));
         }
 
@@ -102,8 +96,7 @@ class Form
      */
     public function setValue($name, $value)
     {
-        if (!$this->hasField($name))
-        {
+        if (!$this->hasField($name)) {
             throw new \InvalidArgumentException(sprintf('The form field "%s" does not exist', $name));
         }
 
@@ -119,8 +112,7 @@ class Form
      */
     public function setValues(array $values)
     {
-        foreach ($values as $name => $value)
-        {
+        foreach ($values as $name => $value) {
             $this->setValue($name, $value);
         }
 
@@ -137,8 +129,7 @@ class Form
     public function getValues()
     {
         $values = array();
-        foreach ($this->fields as $name => $field)
-        {
+        foreach ($this->fields as $name => $field) {
             if (!$field instanceof Field\FileFormField && $field->hasValue())
             {
                 $values[$name] = $field->getValue();
@@ -155,14 +146,12 @@ class Form
      */
     public function getFiles()
     {
-        if (!in_array($this->getMethod(), array('post', 'put', 'delete')))
-        {
+        if (!in_array($this->getMethod(), array('post', 'put', 'delete'))) {
             return array();
         }
 
         $files = array();
-        foreach ($this->fields as $name => $field)
-        {
+        foreach ($this->fields as $name => $field) {
             if ($field instanceof Field\FileFormField)
             {
                 $files[$name] = $field->getValue();
@@ -219,19 +208,16 @@ class Form
     {
         $uri = $this->node->getAttribute('action');
 
-        if (!in_array($this->getMethod(), array('post', 'put', 'delete')) && $queryString = http_build_query($this->getValues(), null, '&'))
-        {
+        if (!in_array($this->getMethod(), array('post', 'put', 'delete')) && $queryString = http_build_query($this->getValues(), null, '&')) {
             $sep = false === strpos($uri, '?') ? '?' : '&';
             $uri .= $sep.$queryString;
         }
 
-        if ($uri && '/' !== $uri[0])
-        {
+        if ($uri && '/' !== $uri[0]) {
             $uri = $this->path.$uri;
         }
 
-        if ($absolute && null !== $this->host)
-        {
+        if ($absolute && null !== $this->host) {
             return $this->host.$uri;
         }
 
@@ -247,8 +233,7 @@ class Form
      */
     public function getMethod()
     {
-        if (null !== $this->method)
-        {
+        if (null !== $this->method) {
             return $this->method;
         }
 
@@ -278,8 +263,7 @@ class Form
      */
     public function getField($name)
     {
-        if (!$this->hasField($name))
-        {
+        if (!$this->hasField($name)) {
             throw new \InvalidArgumentException(sprintf('The form has no "%s" field', $name));
         }
 
@@ -320,8 +304,7 @@ class Form
         $root->appendChild($button);
         $xpath = new \DOMXPath($document);
 
-        foreach ($xpath->query('descendant::input | descendant::textarea | descendant::select', $root) as $node)
-        {
+        foreach ($xpath->query('descendant::input | descendant::textarea | descendant::select', $root) as $node) {
             if ($node->hasAttribute('disabled') || !$node->hasAttribute('name'))
             {
                 continue;
@@ -329,35 +312,22 @@ class Form
 
             $nodeName = $node->nodeName;
 
-            if ($node === $button)
-            {
+            if ($node === $button) {
                 $this->setField(new Field\InputFormField($node));
-            }
-            elseif ('select' == $nodeName || 'input' == $nodeName && 'checkbox' == $node->getAttribute('type'))
-            {
+            } elseif ('select' == $nodeName || 'input' == $nodeName && 'checkbox' == $node->getAttribute('type')) {
                 $this->setField(new Field\ChoiceFormField($node));
-            }
-            elseif ('input' == $nodeName && 'radio' == $node->getAttribute('type'))
-            {
+            } elseif ('input' == $nodeName && 'radio' == $node->getAttribute('type')) {
                 if ($this->hasField($node->getAttribute('name')))
                 {
                     $this->getField($node->getAttribute('name'))->addChoice($node);
-                }
-                else
-                {
+                } else {
                     $this->setField(new Field\ChoiceFormField($node));
                 }
-            }
-            elseif ('input' == $nodeName && 'file' == $node->getAttribute('type'))
-            {
+            } elseif ('input' == $nodeName && 'file' == $node->getAttribute('type')) {
                 $this->setField(new Field\FileFormField($node));
-            }
-            elseif ('input' == $nodeName && !in_array($node->getAttribute('type'), array('submit', 'button', 'image')))
-            {
+            } elseif ('input' == $nodeName && !in_array($node->getAttribute('type'), array('submit', 'button', 'image'))) {
                 $this->setField(new Field\InputFormField($node));
-            }
-            elseif ('textarea' == $nodeName)
-            {
+            } elseif ('textarea' == $nodeName) {
                 $this->setField(new Field\TextareaFormField($node));
             }
         }

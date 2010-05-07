@@ -38,8 +38,7 @@ class WebExtension extends LoaderExtension
         $loader = new XmlFileLoader(__DIR__.'/../Resources/config');
         $configuration->merge($loader->load($this->resources['web']));
 
-        if (isset($config['ide']) && 'textmate' === $config['ide'])
-        {
+        if (isset($config['ide']) && 'textmate' === $config['ide']) {
             $configuration->setParameter('debug.file_link_format', 'txmt://open?url=file://%%f&line=%%l');
         }
 
@@ -53,29 +52,24 @@ class WebExtension extends LoaderExtension
         $loader = new XmlFileLoader(__DIR__.'/../Resources/config');
         $configuration->merge($loader->load($this->resources['user']));
 
-        if (isset($config['default_culture']))
-        {
+        if (isset($config['default_culture'])) {
             $configuration->setParameter('user.default_culture', $config['default_culture']);
         }
 
-        if (isset($config['class']))
-        {
+        if (isset($config['class'])) {
             $configuration->setParameter('user.class', $config['class']);
         }
 
-        foreach (array('name', 'auto_start', 'lifetime', 'path', 'domain', 'secure', 'httponly', 'cache_limiter', 'pdo.db_table') as $name)
-        {
+        foreach (array('name', 'auto_start', 'lifetime', 'path', 'domain', 'secure', 'httponly', 'cache_limiter', 'pdo.db_table') as $name) {
             if (isset($config['session'][$name]))
             {
                 $configuration->setParameter('session.options.'.$name, $config['session'][$name]);
             }
         }
 
-        if (isset($config['session']['class']))
-        {
+        if (isset($config['session']['class'])) {
             $class = $config['session']['class'];
-            if (in_array($class, array('Native', 'Pdo')))
-            {
+            if (in_array($class, array('Native', 'Pdo'))) {
                 $class = 'Symfony\\Framework\\WebBundle\\Session\\'.$class.'Session';
             }
 
@@ -103,41 +97,32 @@ class WebExtension extends LoaderExtension
         $configuration->setParameter('templating.assets.version', array_key_exists('assets_version', $config) ? $config['assets_version'] : null);
 
         // path for the filesystem loader
-        if (isset($config['path']))
-        {
+        if (isset($config['path'])) {
             $configuration->setParameter('templating.loader.filesystem.path', $config['path']);
         }
 
         // loaders
-        if (isset($config['loader']))
-        {
+        if (isset($config['loader'])) {
             $loaders = array();
             $ids = is_array($config['loader']) ? $config['loader'] : array($config['loader']);
-            foreach ($ids as $id)
-            {
+            foreach ($ids as $id) {
                 $loaders[] = new Reference($id);
             }
-        }
-        else
-        {
+        } else {
             $loaders = array(
                 new Reference('templating.loader.filesystem'),
             );
         }
 
-        if (1 === count($loaders))
-        {
+        if (1 === count($loaders)) {
             $configuration->setAlias('templating.loader', (string) $loaders[0]);
-        }
-        else
-        {
+        } else {
             $configuration->getDefinition('templating.loader.chain')->addArgument($loaders);
             $configuration->setAlias('templating.loader', 'templating.loader.chain');
         }
 
         // cache?
-        if (isset($config['cache']))
-        {
+        if (isset($config['cache'])) {
             // wrap the loader with some cache
             $configuration->setDefinition('templating.loader.wrapped', $configuration->findDefinition('templating.loader'));
             $configuration->setDefinition('templating.loader', $configuration->getDefinition('templating.loader.cache'));

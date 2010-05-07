@@ -105,13 +105,10 @@ class BuilderConfigurationTest extends \PHPUnit_Framework_TestCase
         $this->assertEquals('baz1', $configuration->getParameter('foo'), '->setParameter() converts the key to lowercase');
         $this->assertEquals('baz1', $configuration->getParameter('FOO'), '->getParameter() converts the key to lowercase');
 
-        try
-        {
+        try {
             $configuration->getParameter('baba');
             $this->fail('->getParameter() throws an \InvalidArgumentException if the key does not exist');
-        }
-        catch (\Exception $e)
-        {
+        } catch (\Exception $e) {
             $this->assertInstanceOf('\InvalidArgumentException', $e, '->getParameter() throws an \InvalidArgumentException if the key does not exist');
             $this->assertEquals('The parameter "baba" must be defined.', $e->getMessage(), '->getParameter() throws an \InvalidArgumentException if the key does not exist');
         }
@@ -142,13 +139,10 @@ class BuilderConfigurationTest extends \PHPUnit_Framework_TestCase
         $this->assertTrue($configuration->hasAlias('bar'), '->hasAlias() returns true if the alias is defined');
         $this->assertFalse($configuration->hasAlias('baba'), '->hasAlias() returns false if the alias is not defined');
 
-        try
-        {
+        try {
             $configuration->getAlias('baba');
             $this->fail('->getAlias() throws an \InvalidArgumentException if the alias does not exist');
-        }
-        catch (\Exception $e)
-        {
+        } catch (\Exception $e) {
             $this->assertInstanceOf('\InvalidArgumentException', $e, '->getAlias() throws an \InvalidArgumentException if the alias does not exist');
             $this->assertEquals('The service alias "baba" does not exist.', $e->getMessage(), '->getAlias() throws an \InvalidArgumentException if the alias does not exist');
         }
@@ -179,13 +173,10 @@ class BuilderConfigurationTest extends \PHPUnit_Framework_TestCase
         $configuration->addDefinitions($defs = array('foobar' => new Definition('FooBarClass')));
         $this->assertEquals(array_merge($definitions, $defs), $configuration->getDefinitions(), '->addDefinitions() adds the service definitions');
 
-        try
-        {
+        try {
             $configuration->getDefinition('baz');
             $this->fail('->getDefinition() throws an InvalidArgumentException if the service definition does not exist');
-        }
-        catch (\Exception $e)
-        {
+        } catch (\Exception $e) {
             $this->assertInstanceOf('\InvalidArgumentException', $e, '->getDefinition() throws an InvalidArgumentException if the service definition does not exist');
             $this->assertEquals('The service definition "baz" does not exist.', $e->getMessage(), '->getDefinition() throws an InvalidArgumentException if the service definition does not exist');
         }

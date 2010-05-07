@@ -29,28 +29,20 @@ class ClassCollectionLoader
 
         // auto-reload
         $reload = false;
-        if ($autoReload)
-        {
+        if ($autoReload) {
             $metadata = $cacheDir.'/'.$name.'.meta';
-            if (!file_exists($metadata) || !file_exists($cache))
-            {
+            if (!file_exists($metadata) || !file_exists($cache)) {
                 $reload = true;
-            }
-            else
-            {
+            } else {
                 $time = filemtime($cache);
                 $meta = unserialize(file_get_contents($metadata));
 
-                if ($meta[1] != $classes)
-                {
+                if ($meta[1] != $classes) {
                     $reload = true;
-                }
-                else
-                {
+                } else {
                     foreach ($meta[0] as $resource)
                     {
-                        if (!file_exists($resource) || filemtime($resource) > $time)
-                        {
+                        if (!file_exists($resource) || filemtime($resource) > $time) {
                             $reload = true;
 
                             break;
@@ -60,8 +52,7 @@ class ClassCollectionLoader
             }
         }
 
-        if (!$reload && file_exists($cache))
-        {
+        if (!$reload && file_exists($cache)) {
             require_once $cache;
 
             return;
@@ -69,8 +60,7 @@ class ClassCollectionLoader
 
         $files = array();
         $content = '';
-        foreach ($classes as $class)
-        {
+        foreach ($classes as $class) {
             if (!class_exists($class) && !interface_exists($class))
             {
                 throw new \InvalidArgumentException(sprintf('Unable to load class "%s"', $class));
@@ -83,14 +73,12 @@ class ClassCollectionLoader
         }
 
         // cache the core classes
-        if (!is_dir(dirname($cache)))
-        {
+        if (!is_dir(dirname($cache))) {
             mkdir(dirname($cache), 0777, true);
         }
         self::writeCacheFile($cache, Kernel::stripComments('<?php '.$content));
 
-        if ($autoReload)
-        {
+        if ($autoReload) {
             // save the resources
             self::writeCacheFile($metadata, serialize(array($files, $classes)));
         }
@@ -99,15 +87,13 @@ class ClassCollectionLoader
     static protected function writeCacheFile($file, $content)
     {
         $tmpFile = tempnam(dirname($file), basename($file));
-        if (!$fp = @fopen($tmpFile, 'wb'))
-        {
+        if (!$fp = @fopen($tmpFile, 'wb')) {
             die(sprintf('Failed to write cache file "%s".', $tmpFile));
         }
         @fwrite($fp, $content);
         @fclose($fp);
 
-        if ($content != file_get_contents($tmpFile))
-        {
+        if ($content != file_get_contents($tmpFile)) {
             die(sprintf('Failed to write cache file "%s" (cache corrupted).', $tmpFile));
         }
 

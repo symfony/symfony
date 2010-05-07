@@ -37,8 +37,7 @@ class ExceptionController extends Controller
         $format = $format = $originalRequest->getRequestFormat();
 
         // when using CLI, we force the format to be TXT
-        if (0 === strncasecmp(PHP_SAPI, 'cli', 3))
-        {
+        if (0 === strncasecmp(PHP_SAPI, 'cli', 3)) {
             $format = 'txt';
         }
 
@@ -48,8 +47,7 @@ class ExceptionController extends Controller
             'format'     => '.'.$format,
         ));
 
-        if (false === $template)
-        {
+        if (false === $template) {
             throw new \InvalidArgumentException(sprintf('The exception template for format "%s" does not exist.', $format));
         }
 
@@ -62,8 +60,7 @@ class ExceptionController extends Controller
         $charset   = $this->container->getParameter('kernel.charset');
 
         $errors = 0;
-        foreach ($logs as $log)
-        {
+        foreach ($logs as $log) {
             if ('ERR' === $log['priorityName'])
             {
                 ++$errors;
@@ -71,7 +68,7 @@ class ExceptionController extends Controller
         }
 
         $currentContent = '';
-        while (false !== $content = ob_get_clean()) { $currentContent .= $content; }
+        while (false !== $content = ob_get_clean())  { $currentContent .= $content; }
 
         ob_start();
         require $template;

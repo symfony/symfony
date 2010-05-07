@@ -46,13 +46,11 @@ class ZendExtension extends LoaderExtension
         $loader = new XmlFileLoader(__DIR__.'/../Resources/config');
         $configuration->merge($loader->load($this->resources['logger']));
 
-        if (isset($config['priority']))
-        {
+        if (isset($config['priority'])) {
             $configuration->setParameter('zend.logger.priority', is_int($config['priority']) ? $config['priority'] : constant('\Zend_Log::'.strtoupper($config['priority'])));
         }
 
-        if (isset($config['path']))
-        {
+        if (isset($config['path'])) {
             $configuration->setParameter('zend.logger.path', $config['path']);
         }
 

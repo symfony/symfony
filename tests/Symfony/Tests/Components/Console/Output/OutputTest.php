@@ -69,24 +69,18 @@ class OutputTest extends \PHPUnit_Framework_TestCase
         $output->writeln('<foo>foo</foo>');
         $this->assertEquals("\033[33;41;5mfoo\033[0m\n", $output->output, '->writeln() decorates the output');
 
-        try
-        {
+        try {
             $output->writeln('<foo>foo</foo>', 24);
             $this->fail('->writeln() throws an \InvalidArgumentException when the type does not exist');
-        }
-        catch (\Exception $e)
-        {
+        } catch (\Exception $e) {
             $this->assertInstanceOf('\InvalidArgumentException', $e, '->writeln() throws an \InvalidArgumentException when the type does not exist');
             $this->assertEquals('Unknown output type given (24)', $e->getMessage());
         }
 
-        try
-        {
+        try {
             $output->writeln('<bar>foo</bar>');
             $this->fail('->writeln() throws an \InvalidArgumentException when a style does not exist');
-        }
-        catch (\Exception $e)
-        {
+        } catch (\Exception $e) {
             $this->assertInstanceOf('\InvalidArgumentException', $e, '->writeln() throws an \InvalidArgumentException when a style does not exist');
             $this->assertEquals('Unknown style "bar".', $e->getMessage());
         }

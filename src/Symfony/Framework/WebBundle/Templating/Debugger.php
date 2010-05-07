@@ -42,8 +42,7 @@ class Debugger implements DebuggerInterface
      */
     public function log($message)
     {
-        if (null !== $this->logger)
-        {
+        if (null !== $this->logger) {
             $this->logger->info($message);
         }
     }

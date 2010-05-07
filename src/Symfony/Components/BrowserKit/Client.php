@@ -75,8 +75,7 @@ abstract class Client
      */
     public function insulate($insulated = true)
     {
-        if (!class_exists('Symfony\\Components\\Process\\Process'))
-        {
+        if (!class_exists('Symfony\\Components\\Process\\Process')) {
             // @codeCoverageIgnoreStart
             throw new \RuntimeException('Unable to isolate requests as the Symfony Process Component is not installed.');
             // @codeCoverageIgnoreEnd
@@ -189,8 +188,7 @@ abstract class Client
         $uri = $this->getAbsoluteUri($uri);
 
         $server = array_merge($this->server, $server);
-        if (!$this->history->isEmpty())
-        {
+        if (!$this->history->isEmpty()) {
             $server['HTTP_REFERER'] = $this->history->current()->getUri();
         }
         $server['HTTP_HOST'] = parse_url($uri, PHP_URL_HOST);
@@ -200,17 +198,13 @@ abstract class Client
 
         $this->request = $this->filterRequest($request);
 
-        if (true === $changeHistory)
-        {
+        if (true === $changeHistory) {
             $this->history->add($request);
         }
 
-        if ($this->insulated)
-        {
+        if ($this->insulated) {
             $this->response = $this->doRequestInProcess($this->request);
-        }
-        else
-        {
+        } else {
             $this->response = $this->doRequest($this->request);
         }
 
@@ -220,8 +214,7 @@ abstract class Client
 
         $this->redirect = $response->getHeader('Location');
 
-        if ($this->followRedirects && $this->redirect)
-        {
+        if ($this->followRedirects && $this->redirect) {
             return $this->crawler = $this->followRedirect();
         }
 
@@ -242,8 +235,7 @@ abstract class Client
         $process = new PhpProcess($this->getScript($request));
         $process->run();
 
-        if ($process->getExitCode() > 0)
-        {
+        if ($process->getExitCode() > 0) {
             throw new \RuntimeException($process->getErrorOutput());
         }
 
@@ -324,8 +316,7 @@ abstract class Client
      */
     public function followRedirect()
     {
-        if (empty($this->redirect))
-        {
+        if (empty($this->redirect)) {
             throw new \LogicException('The request was not redirected.');
         }
 
@@ -346,17 +337,13 @@ abstract class Client
     protected function getAbsoluteUri($uri)
     {
         // already absolute?
-        if ('http' === substr($uri, 0, 4))
-        {
+        if ('http' === substr($uri, 0, 4)) {
             return $uri;
         }
 
-        if (!$this->history->isEmpty())
-        {
+        if (!$this->history->isEmpty()) {
             $currentUri = $this->history->current()->getUri();
-        }
-        else
-        {
+        } else {
             $currentUri = sprintf('http%s://%s/',
                 isset($this->server['HTTPS']) ? 's' : '',
                 isset($this->server['HTTP_HOST']) ? $this->server['HTTP_HOST'] : 'localhost'
@@ -364,17 +351,14 @@ abstract class Client
         }
 
         // anchor?
-        if (!$uri || '#' == $uri[0])
-        {
+        if (!$uri || '#' == $uri[0]) {
             return preg_replace('/#.*?$/', '', $currentUri).$uri;
         }
 
-        if ('/' !== $uri[0])
-        {
+        if ('/' !== $uri[0]) {
             $path = parse_url($currentUri, PHP_URL_PATH);
 
-            if ('/' !== substr($path, -1))
-            {
+            if ('/' !== substr($path, -1)) {
                 $path = substr($path, 0, strrpos($path, '/') + 1);
             }
 

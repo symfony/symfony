@@ -30,8 +30,7 @@ class FileFormField extends FormField
     public function setErrorCode($error)
     {
         $codes = array(UPLOAD_ERR_INI_SIZE, UPLOAD_ERR_FORM_SIZE, UPLOAD_ERR_PARTIAL, UPLOAD_ERR_NO_FILE, UPLOAD_ERR_NO_TMP_DIR, UPLOAD_ERR_CANT_WRITE, UPLOAD_ERR_EXTENSION);
-        if (!in_array($error, $codes))
-        {
+        if (!in_array($error, $codes)) {
             throw new \InvalidArgumentException(sprintf('The error code %s is not valid.', $error));
         }
 
@@ -45,13 +44,10 @@ class FileFormField extends FormField
      */
     public function setValue($value)
     {
-        if (null !== $value && is_readable($value))
-        {
+        if (null !== $value && is_readable($value)) {
             $error = UPLOAD_ERR_OK;
             $size = filesize($value);
-        }
-        else
-        {
+        } else {
             $error = UPLOAD_ERR_NO_FILE;
             $size = 0;
             $value = '';
@@ -67,13 +63,11 @@ class FileFormField extends FormField
      */
     protected function initialize()
     {
-        if ('input' != $this->node->nodeName)
-        {
+        if ('input' != $this->node->nodeName) {
             throw new \LogicException(sprintf('A FileFormField can only be created from an input tag (%s given).', $this->node->nodeName));
         }
 
-        if ('file' != $this->node->getAttribute('type'))
-        {
+        if ('file' != $this->node->getAttribute('type')) {
             throw new \LogicException(sprintf('A FileFormField can only be created from an input tag with a type of file (given type is %s).', $this->node->getAttribute('type')));
         }
 

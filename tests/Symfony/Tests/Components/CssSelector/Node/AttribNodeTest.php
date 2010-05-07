@@ -31,8 +31,7 @@ class AttribNodeTest extends \PHPUnit_Framework_TestCase
         );
 
         // h1[class??foo]
-        foreach ($operators as $op => $xpath)
-        {
+        foreach ($operators as $op => $xpath) {
             $attrib = new AttribNode($element, '*', 'class', $op, 'foo');
             $this->assertEquals($xpath, (string) $attrib->toXpath(), '->toXpath() returns the xpath representation of the node');
         }

@@ -49,8 +49,7 @@ class EventDispatcher extends BaseEventDispatcher
      */
     public function notify(Event $event)
     {
-        foreach ($this->getListeners($event->getName()) as $listener)
-        {
+        foreach ($this->getListeners($event->getName()) as $listener) {
             if (null !== $this->logger)
             {
                 $this->logger->debug(sprintf('Notifying event "%s" to listener "%s"', $event->getName(), $this->listenerToString($listener)));
@@ -71,15 +70,13 @@ class EventDispatcher extends BaseEventDispatcher
      */
     public function notifyUntil(Event $event)
     {
-        foreach ($this->getListeners($event->getName()) as $listener)
-        {
+        foreach ($this->getListeners($event->getName()) as $listener) {
             if (null !== $this->logger)
             {
                 $this->logger->debug(sprintf('Notifying (until) event "%s" to listener "%s"', $event->getName(), $this->listenerToString($listener)));
             }
 
-            if (call_user_func($listener, $event))
-            {
+            if (call_user_func($listener, $event)) {
                 if (null !== $this->logger)
                 {
                     $this->logger->debug(sprintf('Listener "%s" processed the event "%s"', $this->listenerToString($listener), $event->getName()));
@@ -103,8 +100,7 @@ class EventDispatcher extends BaseEventDispatcher
      */
     public function filter(Event $event, $value)
     {
-        foreach ($this->getListeners($event->getName()) as $listener)
-        {
+        foreach ($this->getListeners($event->getName()) as $listener) {
             if (null !== $this->logger)
             {
                 $this->logger->debug(sprintf('Notifying (filter) event "%s" to listener "%s"', $event->getName(), $this->listenerToString($listener)));
@@ -120,18 +116,15 @@ class EventDispatcher extends BaseEventDispatcher
 
     protected function listenerToString($listener)
     {
-        if (is_object($listener) && $listener instanceof \Closure)
-        {
+        if (is_object($listener) && $listener instanceof \Closure) {
             return 'Closure';
         }
 
-        if (is_string($listener))
-        {
+        if (is_string($listener)) {
             return $listener;
         }
 
-        if (is_array($listener))
-        {
+        if (is_array($listener)) {
             return sprintf('(%s, %s)', is_object($listener[0]) ? get_class($listener[0]) : $listener[0], $listener[1]);
         }
     }

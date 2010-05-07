@@ -62,8 +62,7 @@ class NativeSession implements SessionInterface
 
         session_name($sessionName);
 
-        if (!(boolean) ini_get('session.use_cookies') && $sessionId = $this->options['session_id'])
-        {
+        if (!(boolean) ini_get('session.use_cookies') && $sessionId = $this->options['session_id']) {
             session_id($sessionId);
         }
 
@@ -74,13 +73,11 @@ class NativeSession implements SessionInterface
         $httpOnly = $this->options['session_cookie_httponly'];
         session_set_cookie_params($lifetime, $path, $domain, $secure, $httpOnly);
 
-        if (null !== $this->options['session_cache_limiter'])
-        {
+        if (null !== $this->options['session_cache_limiter']) {
             session_cache_limiter($this->options['session_cache_limiter']);
         }
 
-        if ($this->options['auto_start'] && !self::$sessionStarted)
-        {
+        if ($this->options['auto_start'] && !self::$sessionStarted) {
             session_start();
             self::$sessionStarted = true;
         }
@@ -113,8 +110,7 @@ class NativeSession implements SessionInterface
     {
         $retval = null;
 
-        if (isset($_SESSION[$key]))
-        {
+        if (isset($_SESSION[$key])) {
             $retval = $_SESSION[$key];
             unset($_SESSION[$key]);
         }
@@ -146,8 +142,7 @@ class NativeSession implements SessionInterface
      */
     public function regenerate($destroy = false)
     {
-        if (self::$sessionIdRegenerated)
-        {
+        if (self::$sessionIdRegenerated) {
             return;
         }
 

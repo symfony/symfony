@@ -20,24 +20,18 @@ class ChoiceFormFieldTest extends FormFieldTestCase
     public function testInitialize()
     {
         $node = $this->createNode('textarea', '');
-        try
-        {
+        try {
             $field = new ChoiceFormField($node);
             $this->fail('->initialize() throws a \LogicException if the node is not an input or a select');
-        }
-        catch (\LogicException $e)
-        {
+        } catch (\LogicException $e) {
             $this->assertTrue(true, '->initialize() throws a \LogicException if the node is not an input or a select');
         }
 
         $node = $this->createNode('input', '', array('type' => 'text'));
-        try
-        {
+        try {
             $field = new ChoiceFormField($node);
             $this->fail('->initialize() throws a \LogicException if the node is an input with a type different from checkbox or radio');
-        }
-        catch (\LogicException $e)
-        {
+        } catch (\LogicException $e) {
             $this->assertTrue(true, '->initialize() throws a \LogicException if the node is an input with a type different from checkbox or radio');
         }
     }
@@ -100,23 +94,17 @@ class ChoiceFormFieldTest extends FormFieldTestCase
         $field->setValue('foo');
         $this->assertEquals('foo', $field->getValue(), '->setValue() changes the selected option');
 
-        try
-        {
+        try {
             $field->setValue('foobar');
             $this->fail('->setValue() throws an \InvalidArgumentException if the value is not one of the selected options');
-        }
-        catch (\InvalidArgumentException $e)
-        {
+        } catch (\InvalidArgumentException $e) {
             $this->assertTrue(true, '->setValue() throws an \InvalidArgumentException if the value is not one of the selected options');
         }
 
-        try
-        {
+        try {
             $field->setValue(array('foobar'));
             $this->fail('->setValue() throws an \InvalidArgumentException if the value is an array');
-        }
-        catch (\InvalidArgumentException $e)
-        {
+        } catch (\InvalidArgumentException $e) {
             $this->assertTrue(true, '->setValue() throws an \InvalidArgumentException if the value is an array');
         }
     }
@@ -142,13 +130,10 @@ class ChoiceFormFieldTest extends FormFieldTestCase
 
         $this->assertEquals(array('foo', 'bar'), $field->getValue(), '->getValue() returns the selected options');
 
-        try
-        {
+        try {
             $field->setValue(array('foobar'));
             $this->fail('->setValue() throws an \InvalidArgumentException if the value is not one of the options');
-        }
-        catch (\InvalidArgumentException $e)
-        {
+        } catch (\InvalidArgumentException $e) {
             $this->assertTrue(true, '->setValue() throws an \InvalidArgumentException if the value is not one of the options');
         }
     }
@@ -175,13 +160,10 @@ class ChoiceFormFieldTest extends FormFieldTestCase
         $field->setValue('foo');
         $this->assertEquals('foo', $field->getValue(), '->setValue() changes the selected radio button');
 
-        try
-        {
+        try {
             $field->setValue('foobar');
             $this->fail('->setValue() throws an \InvalidArgumentException if the value is not one of the radio button values');
-        }
-        catch (\InvalidArgumentException $e)
-        {
+        } catch (\InvalidArgumentException $e) {
             $this->assertTrue(true, '->setValue() throws an \InvalidArgumentException if the value is not one of the radio button values');
         }
     }
@@ -194,13 +176,10 @@ class ChoiceFormFieldTest extends FormFieldTestCase
         $this->assertFalse($field->hasValue(), '->hasValue() returns false when the checkbox is not checked');
         $this->assertEquals(null, $field->getValue(), '->getValue() returns null if the checkbox is not checked');
         $this->assertFalse($field->isMultiple(), '->hasValue() returns false for checkboxes');
-        try
-        {
+        try {
             $field->addChoice(new \DOMNode());
             $this->fail('->addChoice() throws a \LogicException for checkboxes');
-        }
-        catch (\LogicException $e)
-        {
+        } catch (\LogicException $e) {
             $this->assertTrue(true, '->initialize() throws a \LogicException for checkboxes');
         }
 
@@ -224,13 +203,10 @@ class ChoiceFormFieldTest extends FormFieldTestCase
         $field->setValue(true);
         $this->assertEquals('foo', $field->getValue(), '->setValue() checks the checkbox is value is true');
 
-        try
-        {
+        try {
             $field->setValue('bar');
             $this->fail('->setValue() throws an \InvalidArgumentException if the value is not one from the value attribute');
-        }
-        catch (\InvalidArgumentException $e)
-        {
+        } catch (\InvalidArgumentException $e) {
             $this->assertTrue(true, '->setValue() throws an \InvalidArgumentException if the value is not one from the value attribute');
         }
     }
@@ -240,18 +216,15 @@ class ChoiceFormFieldTest extends FormFieldTestCase
         $document = new \DOMDocument();
         $node = $document->createElement('select');
 
-        foreach ($attributes as $name => $value)
-        {
+        foreach ($attributes as $name => $value) {
             $node->setAttribute($name, $value);
         }
         $node->setAttribute('name', 'name');
 
-        foreach ($options as $value => $selected)
-        {
+        foreach ($options as $value => $selected) {
             $option = $document->createElement('option', $value);
             $option->setAttribute('value', $value);
-            if ($selected)
-            {
+            if ($selected) {
                 $option->setAttribute('selected', 'selected');
             }
             $node->appendChild($option);

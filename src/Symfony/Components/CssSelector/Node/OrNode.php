@@ -40,8 +40,7 @@ class OrNode implements NodeInterface
     public function toXpath()
     {
         $paths = array();
-        foreach ($this->items as $item)
-        {
+        foreach ($this->items as $item) {
             $paths[] = $item->toXpath();
         }
 

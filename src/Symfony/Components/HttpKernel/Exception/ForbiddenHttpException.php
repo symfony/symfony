@@ -22,8 +22,7 @@ class ForbiddenHttpException extends HttpException
 {
     public function __construct($message = '')
     {
-        if (!$message)
-        {
+        if (!$message) {
             $message = 'Forbidden';
         }
 

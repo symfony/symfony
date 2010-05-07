@@ -17,8 +17,7 @@ class Iterator implements \Iterator
     public function __construct(array $values = array())
     {
         $this->values = array();
-        foreach ($values as $value)
-        {
+        foreach ($values as $value) {
             $this->attach(new \SplFileInfo($value));
         }
         $this->rewind();

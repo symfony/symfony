@@ -66,20 +66,17 @@ class XPathExpr
     public function __toString()
     {
         $path = '';
-        if (null !== $this->prefix)
-        {
+        if (null !== $this->prefix) {
             $path .= $this->prefix;
         }
 
-        if (null !== $this->path)
-        {
+        if (null !== $this->path) {
             $path .= $this->path;
         }
 
         $path .= $this->element;
 
-        if ($this->condition)
-        {
+        if ($this->condition) {
             $path .= sprintf('[%s]', $this->condition);
         }
 
@@ -88,32 +85,25 @@ class XPathExpr
 
     public function addCondition($condition)
     {
-        if ($this->condition)
-        {
+        if ($this->condition) {
             $this->condition = sprintf('%s and (%s)', $this->condition, $condition);
-        }
-        else
-        {
+        } else {
             $this->condition = $condition;
         }
     }
 
     public function addPrefix($prefix)
     {
-        if ($this->prefix)
-        {
+        if ($this->prefix) {
             $this->prefix = $prefix.$this->prefix;
-        }
-        else
-        {
+        } else {
             $this->prefix = $prefix;
         }
     }
 
     public function addNameTest()
     {
-        if ($this->element == '*')
-        {
+        if ($this->element == '*') {
             // We weren't doing a test anyway
             return;
         }
@@ -128,12 +118,9 @@ class XPathExpr
         Adds a /* prefix if there is no prefix.  This is when you need
         to keep context's constrained to a single parent.
         */
-        if ($this->path)
-        {
+        if ($this->path) {
             $this->path .= '*/';
-        }
-        else
-        {
+        } else {
             $this->path = '*/';
         }
 
@@ -149,8 +136,7 @@ class XPathExpr
 
         /* We don't need a star prefix if we are joining to this other
              prefix; so we'll get rid of it */
-        if ($other->hasStarPrefix() && $path == '*/')
-        {
+        if ($other->hasStarPrefix() && $path == '*/') {
             $path = '';
         }
         $this->prefix = $prefix;
@@ -161,38 +147,30 @@ class XPathExpr
 
     static public function xpathLiteral($s)
     {
-        if ($s instanceof Node\ElementNode)
-        {
+        if ($s instanceof Node\ElementNode) {
             // This is probably a symbol that looks like an expression...
             $s = $s->formatElement();
-        }
-        else
-        {
+        } else {
             $s = (string) $s;
         }
 
-        if (false === strpos($s, "'"))
-        {
+        if (false === strpos($s, "'")) {
             return sprintf("'%s'", $s);
         }
 
-        if (false === strpos($s, '"'))
-        {
+        if (false === strpos($s, '"')) {
             return sprintf('"%s"', $s);
         }
 
         $string = $s;
         $parts = array();
-        while (true)
-        {
+        while (true) {
             if (false !== $pos = strpos($string, "'"))
             {
                 $parts[] = sprintf("'%s'", substr($string, 0, $pos));
                 $parts[] = "\"'\"";
                 $string = substr($string, $pos + 1);
-            }
-            else
-            {
+            } else {
                 $parts[] = "'$string'";
                 break;
             }

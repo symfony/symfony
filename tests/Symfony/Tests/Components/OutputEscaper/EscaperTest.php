@@ -76,14 +76,11 @@ class EscaperTest extends \PHPUnit_Framework_TestCase
     public function testEscapeCannotEscapeResources()
     {
         $fh = fopen(__FILE__, 'r');
-        try
-        {
+        try {
             Escaper::escape('entities', $fh);
 
             $this->fail('::escape() throws an InvalidArgumentException if the value cannot be escaped');
-        }
-        catch (\InvalidArgumentException $e)
-        {
+        } catch (\InvalidArgumentException $e) {
         }
         fclose($fh);
     }

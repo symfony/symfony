@@ -52,13 +52,11 @@ class ErrorHandler
      */
     public function handle($level, $message, $file, $line, $context)
     {
-        if (0 === $this->level)
-        {
+        if (0 === $this->level) {
             return false;
         }
 
-        if (error_reporting() & $level && $this->level & $level)
-        {
+        if (error_reporting() & $level && $this->level & $level) {
             throw new \ErrorException(sprintf('%s: %s in %s line %d', isset($this->levels[$level]) ? $this->levels[$level] : $level, $message, $file, $line));
         }
 

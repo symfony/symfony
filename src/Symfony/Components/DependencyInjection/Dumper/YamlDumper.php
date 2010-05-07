@@ -43,13 +43,11 @@ class YamlDumper extends Dumper
         $code .= sprintf("    class: %s\n", $definition->getClass());
 
         $annotationsCode = '';
-        foreach ($definition->getAnnotations() as $name => $annotations)
-        {
+        foreach ($definition->getAnnotations() as $name => $annotations) {
             foreach ($annotations as $attributes)
             {
                 $att = array();
-                foreach ($attributes as $key => $value)
-                {
+                foreach ($attributes as $key => $value) {
                     $att[] = sprintf('%s: %s', Yaml::dump($key), Yaml::dump($value));
                 }
                 $att = $att ? ', '.implode(' ', $att) : '';
@@ -57,46 +55,36 @@ class YamlDumper extends Dumper
                 $annotationsCode .= sprintf("      - { name: %s%s }\n", Yaml::dump($name), $att);
             }
         }
-        if ($annotationsCode)
-        {
+        if ($annotationsCode) {
             $code .= "    annotations:\n".$annotationsCode;
         }
 
-        if ($definition->getFile())
-        {
+        if ($definition->getFile()) {
             $code .= sprintf("    file: %s\n", $definition->getFile());
         }
 
-        if ($definition->getConstructor())
-        {
+        if ($definition->getConstructor()) {
             $code .= sprintf("    constructor: %s\n", $definition->getConstructor());
         }
 
-        if ($definition->getArguments())
-        {
+        if ($definition->getArguments()) {
             $code .= sprintf("    arguments: %s\n", Yaml::dump($this->dumpValue($definition->getArguments()), 0));
         }
 
-        if ($definition->getMethodCalls())
-        {
+        if ($definition->getMethodCalls()) {
             $code .= sprintf("    calls:\n      %s\n", str_replace("\n", "\n      ", Yaml::dump($this->dumpValue($definition->getMethodCalls()), 1)));
         }
 
-        if (!$definition->isShared())
-        {
+        if (!$definition->isShared()) {
             $code .= "    shared: false\n";
         }
 
-        if ($callable = $definition->getConfigurator())
-        {
+        if ($callable = $definition->getConfigurator()) {
             if (is_array($callable))
             {
-                if (is_object($callable[0]) && $callable[0] instanceof Reference)
-                {
+                if (is_object($callable[0]) && $callable[0] instanceof Reference) {
                     $callable = array($this->getServiceCall((string) $callable[0], $callable[0]), $callable[1]);
-                }
-                else
-                {
+                } else {
                     $callable = array($callable[0], $callable[1]);
                 }
             }
@@ -114,19 +102,16 @@ class YamlDumper extends Dumper
 
     protected function addServices()
     {
-        if (!$this->container->getDefinitions())
-        {
+        if (!$this->container->getDefinitions()) {
             return '';
         }
 
         $code = "services:\n";
-        foreach ($this->container->getDefinitions() as $id => $definition)
-        {
+        foreach ($this->container->getDefinitions() as $id => $definition) {
             $code .= $this->addService($id, $definition);
         }
 
-        foreach ($this->container->getAliases() as $alias => $id)
-        {
+        foreach ($this->container->getAliases() as $alias => $id) {
             $code .= $this->addServiceAlias($alias, $id);
         }
 
@@ -135,8 +120,7 @@ class YamlDumper extends Dumper
 
     protected function addParameters()
     {
-        if (!$this->container->getParameters())
-        {
+        if (!$this->container->getParameters()) {
             return '';
         }
 
@@ -148,42 +132,29 @@ class YamlDumper extends Dumper
      */
     protected function dumpValue($value)
     {
-        if (is_array($value))
-        {
+        if (is_array($value)) {
             $code = array();
-            foreach ($value as $k => $v)
-            {
+            foreach ($value as $k => $v) {
                 $code[$k] = $this->dumpValue($v);
             }
 
             return $code;
-        }
-        elseif (is_object($value) && $value instanceof Reference)
-        {
+        } elseif (is_object($value) && $value instanceof Reference) {
             return $this->getServiceCall((string) $value, $value);
-        }
-        elseif (is_object($value) && $value instanceof Parameter)
-        {
+        } elseif (is_object($value) && $value instanceof Parameter) {
             return $this->getParameterCall((string) $value);
-        }
-        elseif (is_object($value) || is_resource($value))
-        {
+        } elseif (is_object($value) || is_resource($value)) {
             throw new \RuntimeException('Unable to dump a service container if a parameter is an object or a resource.');
-        }
-        else
-        {
+        } else {
             return $value;
         }
     }
 
     protected function getServiceCall($id, Reference $reference = null)
     {
-        if (null !== $reference && Container::EXCEPTION_ON_INVALID_REFERENCE !== $reference->getInvalidBehavior())
-        {
+        if (null !== $reference && Container::EXCEPTION_ON_INVALID_REFERENCE !== $reference->getInvalidBehavior()) {
             return sprintf('@@%s', $id);
-        }
-        else
-        {
+        } else {
             return sprintf('@%s', $id);
         }
     }
@@ -196,14 +167,11 @@ class YamlDumper extends Dumper
     protected function prepareParameters($parameters)
     {
         $filtered = array();
-        foreach ($parameters as $key => $value)
-        {
+        foreach ($parameters as $key => $value) {
             if (is_array($value))
             {
                 $value = $this->prepareParameters($value);
-            }
-            elseif ($value instanceof Reference)
-            {
+            } elseif ($value instanceof Reference) {
                 $value = '@'.$value;
             }
 
@@ -216,18 +184,13 @@ class YamlDumper extends Dumper
     protected function escape($arguments)
     {
         $args = array();
-        foreach ($arguments as $k => $v)
-        {
+        foreach ($arguments as $k => $v) {
             if (is_array($v))
             {
                 $args[$k] = $this->escape($v);
-            }
-            elseif (is_string($v))
-            {
+            } elseif (is_string($v)) {
                 $args[$k] = str_replace('%', '%%', $v);
-            }
-            else
-            {
+            } else {
                 $args[$k] = $v;
             }
         }

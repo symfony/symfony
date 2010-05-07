@@ -33,13 +33,10 @@ class InputArgumentTest extends \PHPUnit_Framework_TestCase
         $argument = new InputArgument('foo', InputArgument::REQUIRED);
         $this->assertTrue($argument->isRequired(), '__construct() can take "Argument::PARAMETER_REQUIRED" as its mode');
 
-        try
-        {
+        try {
             $argument = new InputArgument('foo', 'ANOTHER_ONE');
             $this->fail('__construct() throws an Exception if the mode is not valid');
-        }
-        catch (\Exception $e)
-        {
+        } catch (\Exception $e) {
             $this->assertInstanceOf('\Exception', $e, '__construct() throws an Exception if the mode is not valid');
             $this->assertEquals('Argument mode "ANOTHER_ONE" is not valid.', $e->getMessage());
         }
@@ -79,26 +76,20 @@ class InputArgumentTest extends \PHPUnit_Framework_TestCase
         $argument->setDefault(array(1, 2));
         $this->assertEquals(array(1, 2), $argument->getDefault(), '->setDefault() changes the default value');
 
-        try
-        {
+        try {
             $argument = new InputArgument('foo', InputArgument::REQUIRED);
             $argument->setDefault('default');
             $this->fail('->setDefault() throws an Exception if you give a default value for a required argument');
-        }
-        catch (\Exception $e)
-        {
+        } catch (\Exception $e) {
             $this->assertInstanceOf('\Exception', $e, '->parse() throws an \InvalidArgumentException exception if an invalid option is passed');
             $this->assertEquals('Cannot set a default value except for Parameter::OPTIONAL mode.', $e->getMessage());
         }
 
-        try
-        {
+        try {
             $argument = new InputArgument('foo', InputArgument::IS_ARRAY);
             $argument->setDefault('default');
             $this->fail('->setDefault() throws an Exception if you give a default value which is not an array for a IS_ARRAY option');
-        }
-        catch (\Exception $e)
-        {
+        } catch (\Exception $e) {
             $this->assertInstanceOf('\Exception', $e, '->setDefault() throws an Exception if you give a default value which is not an array for a IS_ARRAY option');
             $this->assertEquals('A default value for an array argument must be an array.', $e->getMessage());
         }

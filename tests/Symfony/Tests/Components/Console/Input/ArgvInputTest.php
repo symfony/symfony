@@ -45,14 +45,11 @@ class ArgvInputTest extends \PHPUnit_Framework_TestCase
         $input->bind(new InputDefinition(array(new InputOption('foo', 'f', InputOption::PARAMETER_REQUIRED))));
         $this->assertEquals(array('foo' => 'bar'), $input->getOptions(), '->parse() parses long options with a required parameter (with a space separator)');
 
-        try
-        {
+        try {
             $input = new TestInput(array('cli.php', '--foo'));
             $input->bind(new InputDefinition(array(new InputOption('foo', 'f', InputOption::PARAMETER_REQUIRED))));
             $this->fail('->parse() throws a \RuntimeException if no parameter is passed to an option when it is required');
-        }
-        catch (\Exception $e)
-        {
+        } catch (\Exception $e) {
             $this->assertInstanceOf('\RuntimeException', $e, '->parse() throws a \RuntimeException if no parameter is passed to an option when it is required');
             $this->assertEquals('The "--foo" option requires a value.', $e->getMessage(), '->parse() throws a \RuntimeException if no parameter is passed to an option when it is required');
         }
@@ -73,62 +70,47 @@ class ArgvInputTest extends \PHPUnit_Framework_TestCase
         $input->bind(new InputDefinition(array(new InputArgument('name'), new InputOption('foo', 'f', InputOption::PARAMETER_OPTIONAL), new InputOption('bar', 'b'))));
         $this->assertEquals(array('foo' => null, 'bar' => true), $input->getOptions(), '->parse() parses short options with an optional parameter which is not present');
 
-        try
-        {
+        try {
             $input = new TestInput(array('cli.php', '-f'));
             $input->bind(new InputDefinition(array(new InputOption('foo', 'f', InputOption::PARAMETER_REQUIRED))));
             $this->fail('->parse() throws a \RuntimeException if no parameter is passed to an option when it is required');
-        }
-        catch (\Exception $e)
-        {
+        } catch (\Exception $e) {
             $this->assertInstanceOf('\RuntimeException', $e, '->parse() throws a \RuntimeException if no parameter is passed to an option when it is required');
             $this->assertEquals('The "--foo" option requires a value.', $e->getMessage(), '->parse() throws a \RuntimeException if no parameter is passed to an option when it is required');
         }
 
-        try
-        {
+        try {
             $input = new TestInput(array('cli.php', '-ffoo'));
             $input->bind(new InputDefinition(array(new InputOption('foo', 'f', InputOption::PARAMETER_NONE))));
             $this->fail('->parse() throws a \RuntimeException if a value is passed to an option which does not take one');
-        }
-        catch (\Exception $e)
-        {
+        } catch (\Exception $e) {
             $this->assertInstanceOf('\RuntimeException', $e, '->parse() throws a \RuntimeException if a value is passed to an option which does not take one');
             $this->assertEquals('The "-o" option does not exist.', $e->getMessage(), '->parse() throws a \RuntimeException if a value is passed to an option which does not take one');
         }
 
-        try
-        {
+        try {
             $input = new TestInput(array('cli.php', 'foo', 'bar'));
             $input->bind(new InputDefinition());
             $this->fail('->parse() throws a \RuntimeException if too many arguments are passed');
-        }
-        catch (\Exception $e)
-        {
+        } catch (\Exception $e) {
             $this->assertInstanceOf('\RuntimeException', $e, '->parse() throws a \RuntimeException if too many arguments are passed');
             $this->assertEquals('Too many arguments.', $e->getMessage(), '->parse() throws a \RuntimeException if too many arguments are passed');
         }
 
-        try
-        {
+        try {
             $input = new TestInput(array('cli.php', '--foo'));
             $input->bind(new InputDefinition());
             $this->fail('->parse() throws a \RuntimeException if an unknown long option is passed');
-        }
-        catch (\Exception $e)
-        {
+        } catch (\Exception $e) {
             $this->assertInstanceOf('\RuntimeException', $e, '->parse() throws a \RuntimeException if an unknown long option is passed');
             $this->assertEquals('The "--foo" option does not exist.', $e->getMessage(), '->parse() throws a \RuntimeException if an unknown long option is passed');
         }
 
-        try
-        {
+        try {
             $input = new TestInput(array('cli.php', '-f'));
             $input->bind(new InputDefinition());
             $this->fail('->parse() throws a \RuntimeException if an unknown short option is passed');
-        }
-        catch (\Exception $e)
-        {
+        } catch (\Exception $e) {
             $this->assertInstanceOf('\RuntimeException', $e, '->parse() throws a \RuntimeException if an unknown short option is passed');
             $this->assertEquals('The "-f" option does not exist.', $e->getMessage(), '->parse() throws a \RuntimeException if an unknown short option is passed');
         }

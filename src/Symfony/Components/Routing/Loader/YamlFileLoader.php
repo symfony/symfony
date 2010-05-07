@@ -43,18 +43,13 @@ class YamlFileLoader extends FileLoader
         $collection = new RouteCollection();
         $collection->addResource(new FileResource($path));
 
-        foreach ($config as $name => $config)
-        {
+        foreach ($config as $name => $config) {
             if (isset($config['resource']))
             {
                 $this->parseImport($collection, $name, $config, $path);
-            }
-            elseif (isset($config['pattern']))
-            {
+            } elseif (isset($config['pattern'])) {
                 $this->parseRoute($collection, $name, $config, $path);
-            }
-            else
-            {
+            } else {
                 throw new \InvalidArgumentException(sprintf('Unable to parse the "%s" route.', $name));
             }
         }
@@ -71,8 +66,7 @@ class YamlFileLoader extends FileLoader
         $requirements = isset($config['requirements']) ? $config['requirements'] : array();
         $options = isset($config['options']) ? $config['options'] : array();
 
-        if (!isset($config['pattern']))
-        {
+        if (!isset($config['pattern'])) {
             throw new \InvalidArgumentException(sprintf('You must define a "pattern" for the "%s" route.', $name));
         }
 
@@ -86,21 +80,16 @@ class YamlFileLoader extends FileLoader
      */
     protected function parseImport(RouteCollection $collection, $name, $import, $file)
     {
-        if (!isset($import['resource']))
-        {
+        if (!isset($import['resource'])) {
             throw new \InvalidArgumentException(sprintf('You must define a "resource" when importing (%s).', $name));
         }
 
         $class = null;
-        if (isset($import['class']) && $import['class'] !== get_class($this))
-        {
+        if (isset($import['class']) && $import['class'] !== get_class($this)) {
             $class = $import['class'];
-        }
-        else
-        {
+        } else {
             // try to detect loader with the extension
-            switch (pathinfo($import['resource'], PATHINFO_EXTENSION))
-            {
+            switch (pathinfo($import['resource'], PATHINFO_EXTENSION)) {
                 case 'xml':
                     $class = 'Symfony\\Components\\Routing\\Loader\\XmlFileLoader';
                     break;

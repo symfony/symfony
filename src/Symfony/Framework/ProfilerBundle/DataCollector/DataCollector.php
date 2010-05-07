@@ -33,8 +33,7 @@ abstract class DataCollector implements DataCollectorInterface
 
     public function getData()
     {
-        if (null === $this->data)
-        {
+        if (null === $this->data) {
             $this->data = $this->collect();
         }
 

@@ -56,15 +56,12 @@ abstract class Kernel implements HttpKernelInterface, \Serializable
         $this->rootDir = realpath($this->registerRootDir());
         $this->name = basename($this->rootDir);
 
-        if ($this->debug)
-        {
+        if ($this->debug) {
             ini_set('display_errors', 1);
             error_reporting(-1);
 
             $this->startTime = microtime(true);
-        }
-        else
-        {
+        } else {
             ini_set('display_errors', 0);
         }
     }
@@ -101,8 +98,7 @@ abstract class Kernel implements HttpKernelInterface, \Serializable
      */
     public function boot()
     {
-        if (true === $this->booted)
-        {
+        if (true === $this->booted) {
             throw new \LogicException('The kernel is already booted.');
         }
 
@@ -114,8 +110,7 @@ abstract class Kernel implements HttpKernelInterface, \Serializable
         $this->container->setService('kernel', $this);
 
         // boot bundles
-        foreach ($this->bundles as $bundle)
-        {
+        foreach ($this->bundles as $bundle) {
             $bundle->boot($this->container);
         }
 
@@ -133,8 +128,7 @@ abstract class Kernel implements HttpKernelInterface, \Serializable
     {
         $this->booted = false;
 
-        foreach ($this->bundles as $bundle)
-        {
+        foreach ($this->bundles as $bundle) {
             $bundle->shutdown($this->container);
         }
 
@@ -175,22 +169,17 @@ abstract class Kernel implements HttpKernelInterface, \Serializable
      */
     public function handle(Request $request = null, $main = true, $raw = false)
     {
-        if (false === $this->booted)
-        {
+        if (false === $this->booted) {
             $this->boot();
         }
 
-        if (null === $request)
-        {
+        if (null === $request) {
             $request = $this->container->getRequestService();
-        }
-        else
-        {
+        } else {
             $this->container->setService('request', $request);
         }
 
-        if (true === $main)
-        {
+        if (true === $main) {
             $this->request = $request;
         }
 
@@ -253,8 +242,7 @@ abstract class Kernel implements HttpKernelInterface, \Serializable
         $location = $this->getCacheDir().'/'.$class;
         $reload = $this->debug ? $this->needsReload($class, $location) : false;
 
-        if ($reload || !file_exists($location.'.php'))
-        {
+        if ($reload || !file_exists($location.'.php')) {
             $this->buildContainer($class, $location.'.php');
         }
 
@@ -266,8 +254,7 @@ abstract class Kernel implements HttpKernelInterface, \Serializable
     public function getKernelParameters()
     {
         $bundles = array();
-        foreach ($this->bundles as $bundle)
-        {
+        foreach ($this->bundles as $bundle) {
             $bundles[] = get_class($bundle);
         }
 
@@ -290,8 +277,7 @@ abstract class Kernel implements HttpKernelInterface, \Serializable
     protected function getEnvParameters()
     {
         $parameters = array();
-        foreach ($_SERVER as $key => $value)
-        {
+        foreach ($_SERVER as $key => $value) {
             if ('SYMFONY__' === substr($key, 0, 9))
             {
                 $parameters[strtolower(str_replace('__', '.', substr($key, 9)))] = $value;
@@ -303,15 +289,13 @@ abstract class Kernel implements HttpKernelInterface, \Serializable
 
     protected function needsReload($class, $location)
     {
-        if (!file_exists($location.'.meta') || !file_exists($location.'.php'))
-        {
+        if (!file_exists($location.'.meta') || !file_exists($location.'.php')) {
             return true;
         }
 
         $meta = unserialize(file_get_contents($location.'.meta'));
         $time = filemtime($location.'.php');
-        foreach ($meta as $resource)
-        {
+        foreach ($meta as $resource) {
             if (!$resource->isUptodate($time))
             {
                 return true;
@@ -326,26 +310,21 @@ abstract class Kernel implements HttpKernelInterface, \Serializable
         $container = new Builder($this->getKernelParameters());
 
         $configuration = new BuilderConfiguration();
-        foreach ($this->bundles as $bundle)
-        {
+        foreach ($this->bundles as $bundle) {
             $configuration->merge($bundle->buildContainer($container));
         }
         $configuration->merge($this->registerContainerConfiguration());
         $container->merge($configuration);
         $this->optimizeContainer($container);
 
-        foreach (array('cache', 'logs') as $name)
-        {
+        foreach (array('cache', 'logs') as $name) {
             $dir = $container->getParameter(sprintf('kernel.%s_dir', $name));
-            if (!is_dir($dir))
-            {
+            if (!is_dir($dir)) {
                 if (false === @mkdir($dir, 0777, true))
                 {
                     die(sprintf('Unable to create the %s directory (%s)', $name, dirname($dir)));
                 }
-            }
-            elseif (!is_writable($dir))
-            {
+            } elseif (!is_writable($dir)) {
                 die(sprintf('Unable to write in the %s directory (%s)', $name, $dir));
             }
         }
@@ -353,19 +332,16 @@ abstract class Kernel implements HttpKernelInterface, \Serializable
         // cache the container
         $dumper = new PhpDumper($container);
         $content = $dumper->dump(array('class' => $class));
-        if (!$this->debug)
-        {
+        if (!$this->debug) {
             $content = self::stripComments($content);
         }
         $this->writeCacheFile($file, $content);
 
-        if ($this->debug)
-        {
+        if ($this->debug) {
             // add the Kernel class hierarchy as resources
             $parent = new \ReflectionObject($this);
             $configuration->addResource(new FileResource($parent->getFileName()));
-            while ($parent = $parent->getParentClass())
-            {
+            while ($parent = $parent->getParentClass()) {
                 $configuration->addResource(new FileResource($parent->getFileName()));
             }
 
@@ -377,8 +353,7 @@ abstract class Kernel implements HttpKernelInterface, \Serializable
     public function optimizeContainer(Builder $container)
     {
         // replace all classes with the real value
-        foreach ($container->getDefinitions() as $definition)
-        {
+        foreach ($container->getDefinitions() as $definition) {
             if (false !== strpos($class = $definition->getClass(), '%'))
             {
                 $definition->setClass(Builder::resolveValue($class, $container->getParameters()));
@@ -389,27 +364,21 @@ abstract class Kernel implements HttpKernelInterface, \Serializable
 
     static public function stripComments($source)
     {
-        if (!function_exists('token_get_all'))
-        {
+        if (!function_exists('token_get_all')) {
             return $source;
         }
 
         $ignore = array(T_COMMENT => true, T_DOC_COMMENT => true);
         $output = '';
-        foreach (token_get_all($source) as $token)
-        {
+        foreach (token_get_all($source) as $token) {
             // array
-            if (isset($token[1]))
-            {
+            if (isset($token[1])) {
                 // no action on comments
-                if (!isset($ignore[$token[0]]))
-                {
+                if (!isset($ignore[$token[0]])) {
                     // anything else -> output "as is"
                     $output .= $token[1];
                 }
-            }
-            else
-            {
+            } else {
                 // simple 1-character token
                 $output .= $token;
             }
@@ -421,15 +390,13 @@ abstract class Kernel implements HttpKernelInterface, \Serializable
     protected function writeCacheFile($file, $content)
     {
         $tmpFile = tempnam(dirname($file), basename($file));
-        if (!$fp = @fopen($tmpFile, 'wb'))
-        {
+        if (!$fp = @fopen($tmpFile, 'wb')) {
             die(sprintf('Failed to write cache file "%s".', $tmpFile));
         }
         @fwrite($fp, $content);
         @fclose($fp);
 
-        if ($content != file_get_contents($tmpFile))
-        {
+        if ($content != file_get_contents($tmpFile)) {
             die(sprintf('Failed to write cache file "%s" (cache corrupted).', $tmpFile));
         }
 

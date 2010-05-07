@@ -150,13 +150,11 @@ class ParameterBag
 
     public function getDate($key, \DateTime $default = null)
     {
-        if (null === $value = $this->get($key))
-        {
+        if (null === $value = $this->get($key)) {
             return $default;
         }
 
-        if (false === $date = \DateTime::createFromFormat(DATE_RFC2822, $value))
-        {
+        if (false === $date = \DateTime::createFromFormat(DATE_RFC2822, $value)) {
             throw new \RuntimeException(sprintf('The %s HTTP header is not parseable (%s).', $key, $value));
         }
 

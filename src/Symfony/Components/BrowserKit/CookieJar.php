@@ -71,8 +71,7 @@ class CookieJar
      */
     public function updateFromResponse(Response $response)
     {
-        foreach ($response->getCookies() as $name => $cookie)
-        {
+        foreach ($response->getCookies() as $name => $cookie) {
             $this->set(new Cookie(
                 $name,
                 isset($cookie['value']) ? $cookie['value'] : '',
@@ -110,20 +109,17 @@ class CookieJar
         $parts = parse_url($uri);
 
         $cookies = array();
-        foreach ($this->cookieJar as $cookie)
-        {
+        foreach ($this->cookieJar as $cookie) {
             if ($cookie->getDomain() && $cookie->getDomain() != substr($parts['host'], -strlen($cookie->getDomain())))
             {
                 continue;
             }
 
-            if ($cookie->getPath() != substr($parts['path'], 0, strlen($cookie->getPath())))
-            {
+            if ($cookie->getPath() != substr($parts['path'], 0, strlen($cookie->getPath()))) {
                 continue;
             }
 
-            if ($cookie->isSecure() && 'https' != $parts['scheme'])
-            {
+            if ($cookie->isSecure() && 'https' != $parts['scheme']) {
                 continue;
             }
 
@@ -139,8 +135,7 @@ class CookieJar
     public function flushExpiredCookies()
     {
         $cookies = $this->cookieJar;
-        foreach ($cookies as $name => $cookie)
-        {
+        foreach ($cookies as $name => $cookie) {
             if ($cookie->isExpired())
             {
                 unset($this->cookieJar[$name]);

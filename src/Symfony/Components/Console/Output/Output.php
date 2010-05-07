@@ -132,18 +132,15 @@ abstract class Output implements OutputInterface
      */
     public function write($messages, $newline = false, $type = 0)
     {
-        if (self::VERBOSITY_QUIET === $this->verbosity)
-        {
+        if (self::VERBOSITY_QUIET === $this->verbosity) {
             return;
         }
 
-        if (!is_array($messages))
-        {
+        if (!is_array($messages)) {
             $messages = array($messages);
         }
 
-        foreach ($messages as $message)
-        {
+        foreach ($messages as $message) {
             switch ($type)
             {
                 case Output::OUTPUT_NORMAL:
@@ -189,31 +186,26 @@ abstract class Output implements OutputInterface
      */
     protected function replaceStartStyle($match)
     {
-        if (!$this->decorated)
-        {
+        if (!$this->decorated) {
             return '';
         }
 
-        if (!isset(static::$styles[strtolower($match[1])]))
-        {
+        if (!isset(static::$styles[strtolower($match[1])])) {
             throw new \InvalidArgumentException(sprintf('Unknown style "%s".', $match[1]));
         }
 
         $parameters = static::$styles[strtolower($match[1])];
         $codes = array();
 
-        if (isset($parameters['fg']))
-        {
+        if (isset($parameters['fg'])) {
             $codes[] = static::$foreground[$parameters['fg']];
         }
 
-        if (isset($parameters['bg']))
-        {
+        if (isset($parameters['bg'])) {
             $codes[] = static::$background[$parameters['bg']];
         }
 
-        foreach (static::$options as $option => $value)
-        {
+        foreach (static::$options as $option => $value) {
             if (isset($parameters[$option]) && $parameters[$option])
             {
                 $codes[] = $value;
@@ -225,8 +217,7 @@ abstract class Output implements OutputInterface
 
     protected function replaceEndStyle($match)
     {
-        if (!$this->decorated)
-        {
+        if (!$this->decorated) {
             return '';
         }
 

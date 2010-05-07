@@ -46,16 +46,14 @@ class Process
      */
     public function __construct($commandline, $cwd, array $env = array(), $stdin = null, $timeout = 60, array $options = array())
     {
-        if (!function_exists('proc_open'))
-        {
+        if (!function_exists('proc_open')) {
             throw new \RuntimeException('The Process class relies on proc_open, which is not available on your PHP installation.');
         }
 
         $this->commandline = $commandline;
         $this->cwd = null === $cwd ? getcwd() : $cwd;
         $this->env = array();
-        foreach ($env as $key => $value)
-        {
+        foreach ($env as $key => $value) {
             $this->env[(binary) $key] = (binary) $value;
         }
         $this->stdin = $stdin;
@@ -82,19 +80,15 @@ class Process
      */
     public function run($callback = null)
     {
-        if (null === $callback)
-        {
+        if (null === $callback) {
             $this->stdout = '';
             $this->stderr = '';
             $that = $this;
             $callback = function ($type, $line) use ($that)
             {
-                if ('out' == $type)
-                {
+                if ('out' == $type) {
                     $that->addOutput($line);
-                }
-                else
-                {
+                } else {
                     $that->addErrorOutput($line);
                 }
             };
@@ -107,62 +101,49 @@ class Process
         stream_set_blocking($pipes[1], false);
         stream_set_blocking($pipes[2], false);
 
-        if (!is_resource($process))
-        {
+        if (!is_resource($process)) {
             throw new \RuntimeException('Unable to launch a new process.');
         }
 
-        if (null !== $this->stdin)
-        {
+        if (null !== $this->stdin) {
             fwrite($pipes[0], (binary) $this->stdin);
         }
         fclose($pipes[0]);
 
-        while (true)
-        {
+        while (true) {
             $r = $pipes;
             $w = null;
             $e = null;
 
             $n = @stream_select($r, $w, $e, $this->timeout);
 
-            if ($n === false)
-            {
+            if ($n === false) {
                 break;
-            }
-            elseif ($n === 0)
-            {
+            } elseif ($n === 0) {
                 proc_terminate($process);
 
                 throw new \RuntimeException('The process timed out.');
-            }
-            elseif ($n > 0)
-            {
+            } elseif ($n > 0) {
                 $called = false;
 
-                while (true)
-                {
+                while (true) {
                     $c = false;
-                    if ($line = (binary) fgets($pipes[1], 1024))
-                    {
+                    if ($line = (binary) fgets($pipes[1], 1024)) {
                         $called = $c = true;
                         call_user_func($callback, 'out', $line);
                     }
 
-                    if ($line = fgets($pipes[2], 1024))
-                    {
+                    if ($line = fgets($pipes[2], 1024)) {
                         $called = $c = true;
                         call_user_func($callback, 'err', $line);
                     }
 
-                    if (!$c)
-                    {
+                    if (!$c) {
                         break;
                     }
                 }
 
-                if (!$called)
-                {
+                if (!$called) {
                     break;
                 }
             }
@@ -172,8 +153,7 @@ class Process
 
         proc_close($process);
 
-        if ($this->status['signaled'])
-        {
+        if ($this->status['signaled']) {
             throw new \RuntimeException(sprintf('The process stopped because of a "%s" signal.', $this->status['stopsig']));
         }
 

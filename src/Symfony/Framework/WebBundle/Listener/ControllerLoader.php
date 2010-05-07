@@ -58,8 +58,7 @@ class ControllerLoader
     {
         $request = $event->getParameter('request');
 
-        if (!($bundle = $request->path->get('_bundle')) || !($controller = $request->path->get('_controller')) || !($action = $request->path->get('_action')))
-        {
+        if (!($bundle = $request->path->get('_bundle')) || !($controller = $request->path->get('_controller')) || !($action = $request->path->get('_action'))) {
             if (null !== $this->logger)
             {
                 $this->logger->err(sprintf('Unable to look for the controller as some mandatory parameters are missing (_bundle: %s, _controller: %s, _action: %s)', isset($bundle) ? var_export($bundle, true) : 'NULL', isset($controller) ? var_export($controller, true) : 'NULL', isset($action) ? var_export($action, true) : 'NULL'));
@@ -86,18 +85,14 @@ class ControllerLoader
     {
         $class = null;
         $logs = array();
-        foreach (array_keys($this->container->getParameter('kernel.bundle_dirs')) as $namespace)
-        {
+        foreach (array_keys($this->container->getParameter('kernel.bundle_dirs')) as $namespace) {
             $try = $namespace.'\\'.$bundle.'\\Controller\\'.$controller.'Controller';
-            if (!class_exists($try))
-            {
+            if (!class_exists($try)) {
                 if (null !== $this->logger)
                 {
                     $logs[] = sprintf('Failed finding controller "%s:%s" from namespace "%s" (%s)', $bundle, $controller, $namespace, $try);
                 }
-            }
-            else
-            {
+            } else {
                 if (!in_array($namespace.'\\'.$bundle.'\\Bundle', array_map(function ($bundle) { return get_class($bundle); }, $this->container->getKernelService()->getBundles())))
                 {
                     throw new \LogicException(sprintf('To use the "%s" controller, you first need to enable the Bundle "%s" in your Kernel class.', $try, $namespace.'\\'.$bundle));
@@ -109,12 +104,10 @@ class ControllerLoader
             }
         }
 
-        if (null === $class)
-        {
+        if (null === $class) {
             if (null !== $this->logger)
             {
-                foreach ($logs as $log)
-                {
+                foreach ($logs as $log) {
                     $this->logger->info($log);
                 }
             }
@@ -125,13 +118,11 @@ class ControllerLoader
         $controller = new $class($this->container);
 
         $method = $action.'Action';
-        if (!method_exists($controller, $method))
-        {
+        if (!method_exists($controller, $method)) {
             throw new \InvalidArgumentException(sprintf('Method "%s::%s" does not exist.', $class, $method));
         }
 
-        if (null !== $this->logger)
-        {
+        if (null !== $this->logger) {
             $this->logger->info(sprintf('Using controller "%s::%s"%s', $class, $method, isset($file) ? sprintf(' from file "%s"', $file) : ''));
         }
 
@@ -144,18 +135,13 @@ class ControllerLoader
     public function getMethodArguments(\ReflectionFunctionAbstract $r, array $parameters, $controller)
     {
         $arguments = array();
-        foreach ($r->getParameters() as $param)
-        {
+        foreach ($r->getParameters() as $param) {
             if (array_key_exists($param->getName(), $parameters))
             {
                 $arguments[] = $parameters[$param->getName()];
-            }
-            elseif ($param->isDefaultValueAvailable())
-            {
+            } elseif ($param->isDefaultValueAvailable()) {
                 $arguments[] = $param->getDefaultValue();
-            }
-            else
-            {
+            } else {
                 throw new \RuntimeException(sprintf('Controller "%s" requires that you provide a value for the "$%s" argument (because there is no default value or because there is a non optional argument after this one).', $controller, $param->getName()));
             }
         }

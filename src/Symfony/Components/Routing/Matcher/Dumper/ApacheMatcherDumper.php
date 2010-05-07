@@ -43,32 +43,27 @@ class ApacheMatcherDumper extends MatcherDumper
 
         $regexes = array();
 
-        foreach ($this->routes->getRoutes() as $name => $route)
-        {
+        foreach ($this->routes->getRoutes() as $name => $route) {
             $compiledRoute = $route->compile();
 
             // Apache "only" supports 9 variables
-            if (count($compiledRoute->getVariables()) > 9)
-            {
+            if (count($compiledRoute->getVariables()) > 9) {
                 throw new \RuntimeException(sprintf('Unable to dump a route collection as route "%s" has more than 9 variables', $name));
             }
 
             $regex = preg_replace('/\?P<.+?>/', '', substr($compiledRoute->getRegex(), 1, -2));
 
             $variables = array('E=_ROUTING__route:'.$name);
-            foreach (array_keys($compiledRoute->getVariables()) as $i => $variable)
-            {
+            foreach (array_keys($compiledRoute->getVariables()) as $i => $variable) {
                 $variables[] = 'E=_ROUTING_'.$variable.':%'.($i + 1);
             }
-            foreach ($route->getDefaults() as $key => $value)
-            {
+            foreach ($route->getDefaults() as $key => $value) {
                 $variables[] = 'E=_ROUTING_'.$key.':'.$value;
             }
             $variables = implode(',', $variables);
 
             $conditions = array();
-            foreach ((array) $route->getRequirement('_method') as $method)
-            {
+            foreach ((array) $route->getRequirement('_method') as $method) {
                 $conditions[] = sprintf('RewriteCond %%{REQUEST_METHOD} =%s', strtoupper($method));
             }
 

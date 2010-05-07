@@ -59,26 +59,20 @@ class SlotsHelperTest extends \PHPUnit_Framework_TestCase
         $this->assertTrue($helper->has('bar'), '->starts() starts a slot');
 
         $helper->start('bar');
-        try
-        {
+        try {
             $helper->start('bar');
             $helper->stop();
             $this->fail('->start() throws an InvalidArgumentException if a slot with the same name is already started');
-        }
-        catch (\Exception $e)
-        {
+        } catch (\Exception $e) {
             $helper->stop();
             $this->assertInstanceOf('\InvalidArgumentException', $e, '->start() throws an InvalidArgumentException if a slot with the same name is already started');
             $this->assertEquals('A slot named "bar" is already started.', $e->getMessage(), '->start() throws an InvalidArgumentException if a slot with the same name is already started');
         }
 
-        try
-        {
+        try {
             $helper->stop();
             $this->fail('->stop() throws an LogicException if no slot is started');
-        }
-        catch (\Exception $e)
-        {
+        } catch (\Exception $e) {
             $this->assertInstanceOf('\LogicException', $e, '->stop() throws an LogicException if no slot is started');
             $this->assertEquals('No slot started.', $e->getMessage(), '->stop() throws an LogicException if no slot is started');
         }

@@ -49,8 +49,7 @@ class InitBundleCommand extends Command
      */
     protected function execute(InputInterface $input, OutputInterface $output)
     {
-        if (!preg_match('/Bundle$/', $namespace = $input->getArgument('namespace')))
-        {
+        if (!preg_match('/Bundle$/', $namespace = $input->getArgument('namespace'))) {
             throw new \InvalidArgumentException('The namespace must end with Bundle.');
         }
 
@@ -60,16 +59,14 @@ class InitBundleCommand extends Command
         $namespace = str_replace('/', '\\', dirname($tmp));
         $bundle = basename($tmp);
 
-        if (!isset($dirs[$namespace]))
-        {
+        if (!isset($dirs[$namespace])) {
             throw new \InvalidArgumentException(sprintf('Unable to initialize the bundle (%s not defined).', $namespace));
         }
 
         $dir = $dirs[$namespace];
         $output->writeln(sprintf('Initializing bundle "<info>%s</info>" in "<info>%s</info>"', $bundle, realpath($dir)));
 
-        if (file_exists($targetDir = $dir.'/'.$bundle))
-        {
+        if (file_exists($targetDir = $dir.'/'.$bundle)) {
             throw new \RuntimeException(sprintf('Bundle "%s" already exists.', $bundle));
         }
 

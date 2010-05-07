@@ -22,13 +22,10 @@ class InputOptionTest extends \PHPUnit_Framework_TestCase
         $option = new InputOption('--foo');
         $this->assertEquals('foo', $option->getName(), '__construct() removes the leading -- of the option name');
 
-        try
-        {
+        try {
             $option = new InputOption('foo', 'f', InputOption::PARAMETER_IS_ARRAY);
             $this->fail('->setDefault() throws an Exception if PARAMETER_IS_ARRAY option is used when an option does not accept a value');
-        }
-        catch (\Exception $e)
-        {
+        } catch (\Exception $e) {
             $this->assertInstanceOf('\Exception', $e, '->setDefault() throws an Exception if PARAMETER_IS_ARRAY option is used when an option does not accept a value');
             $this->assertEquals('Impossible to have an option mode PARAMETER_IS_ARRAY if the option does not accept a parameter.', $e->getMessage());
         }
@@ -65,13 +62,10 @@ class InputOptionTest extends \PHPUnit_Framework_TestCase
         $this->assertFalse($option->isParameterRequired(), '__construct() can take "Option::PARAMETER_OPTIONAL" as its mode');
         $this->assertTrue($option->isParameterOptional(), '__construct() can take "Option::PARAMETER_OPTIONAL" as its mode');
 
-        try
-        {
+        try {
             $option = new InputOption('foo', 'f', 'ANOTHER_ONE');
             $this->fail('__construct() throws an Exception if the mode is not valid');
-        }
-        catch (\Exception $e)
-        {
+        } catch (\Exception $e) {
             $this->assertInstanceOf('\Exception', $e, '__construct() throws an Exception if the mode is not valid');
             $this->assertEquals('Option mode "ANOTHER_ONE" is not valid.', $e->getMessage());
         }
@@ -122,25 +116,19 @@ class InputOptionTest extends \PHPUnit_Framework_TestCase
         $this->assertEquals(array(1, 2), $option->getDefault(), '->setDefault() changes the default value');
 
         $option = new InputOption('foo', 'f', InputOption::PARAMETER_NONE);
-        try
-        {
+        try {
             $option->setDefault('default');
             $this->fail('->setDefault() throws an Exception if you give a default value for a PARAMETER_NONE option');
-        }
-        catch (\Exception $e)
-        {
+        } catch (\Exception $e) {
             $this->assertInstanceOf('\Exception', $e, '->setDefault() throws an Exception if you give a default value for a PARAMETER_NONE option');
             $this->assertEquals('Cannot set a default value when using Option::PARAMETER_NONE mode.', $e->getMessage());
         }
 
         $option = new InputOption('foo', 'f', InputOption::PARAMETER_OPTIONAL | InputOption::PARAMETER_IS_ARRAY);
-        try
-        {
+        try {
             $option->setDefault('default');
             $this->fail('->setDefault() throws an Exception if you give a default value which is not an array for a PARAMETER_IS_ARRAY option');
-        }
-        catch (\Exception $e)
-        {
+        } catch (\Exception $e) {
             $this->assertInstanceOf('\Exception', $e, '->setDefault() throws an Exception if you give a default value which is not an array for a PARAMETER_IS_ARRAY option');
             $this->assertEquals('A default value for an array option must be an array.', $e->getMessage());
         }

@@ -42,8 +42,7 @@ class RouteCollection
      */
     public function addRoute($name, Route $route)
     {
-        if (!preg_match('/^[a-z0-9A-Z_]+$/', $name))
-        {
+        if (!preg_match('/^[a-z0-9A-Z_]+$/', $name)) {
             throw new \InvalidArgumentException(sprintf('Name "%s" contains non valid characters for a route name.', $name));
         }
 
@@ -82,8 +81,7 @@ class RouteCollection
     {
         $collection->addPrefix($prefix);
 
-        foreach ($collection->getResources() as $resource)
-        {
+        foreach ($collection->getResources() as $resource) {
             $this->addResource($resource);
         }
 
@@ -97,13 +95,11 @@ class RouteCollection
      */
     public function addPrefix($prefix)
     {
-        if (!$prefix)
-        {
+        if (!$prefix) {
             return;
         }
 
-        foreach ($this->getRoutes() as $route)
-        {
+        foreach ($this->getRoutes() as $route) {
             $route->setPattern($prefix.$route->getPattern());
         }
     }

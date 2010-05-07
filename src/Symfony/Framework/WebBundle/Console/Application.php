@@ -39,8 +39,7 @@ class Application extends BaseApplication
 
         $this->definition->addOption(new InputOption('--shell', '-s', InputOption::PARAMETER_NONE, 'Launch the shell.'));
 
-        if (!$this->kernel->isBooted())
-        {
+        if (!$this->kernel->isBooted()) {
             $this->kernel->boot();
         }
 
@@ -67,8 +66,7 @@ class Application extends BaseApplication
      */
     public function doRun(InputInterface $input, OutputInterface $output)
     {
-        if (true === $input->hasParameterOption(array('--shell', '-s')))
-        {
+        if (true === $input->hasParameterOption(array('--shell', '-s'))) {
             $shell = new Shell($this);
             $shell->run();
 
@@ -80,8 +78,7 @@ class Application extends BaseApplication
 
     protected function registerCommands()
     {
-        foreach ($this->kernel->getBundles() as $bundle)
-        {
+        foreach ($this->kernel->getBundles() as $bundle) {
             $bundle->registerCommands($this);
         }
     }

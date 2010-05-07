@@ -45,16 +45,14 @@ class TokenStream
 
     public function next()
     {
-        if ($this->peeking)
-        {
+        if ($this->peeking) {
             $this->peeking = false;
             $this->used[] = $this->peeked;
 
             return $this->peeked;
         }
 
-        if (!count($this->tokens))
-        {
+        if (!count($this->tokens)) {
             return null;
         }
 
@@ -66,8 +64,7 @@ class TokenStream
 
     public function peek()
     {
-        if (!$this->peeking)
-        {
+        if (!$this->peeking) {
             if (!count($this->tokens))
             {
                 return null;

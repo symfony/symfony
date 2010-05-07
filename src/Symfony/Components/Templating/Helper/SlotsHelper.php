@@ -35,8 +35,7 @@ class SlotsHelper extends Helper
      */
     public function start($name)
     {
-        if (in_array($name, $this->openSlots))
-        {
+        if (in_array($name, $this->openSlots)) {
             throw new \InvalidArgumentException(sprintf('A slot named "%s" is already started.', $name));
         }
 
@@ -56,8 +55,7 @@ class SlotsHelper extends Helper
     {
         $content = ob_get_clean();
 
-        if (!$this->openSlots)
-        {
+        if (!$this->openSlots) {
             throw new \LogicException('No slot started.');
         }
 
@@ -110,8 +108,7 @@ class SlotsHelper extends Helper
      */
     public function output($name, $default = false)
     {
-        if (!isset($this->slots[$name]))
-        {
+        if (!isset($this->slots[$name])) {
             if (false !== $default)
             {
                 echo $default;

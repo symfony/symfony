@@ -55,8 +55,7 @@ class SafeDecoratorTest extends \PHPUnit_Framework_TestCase
         $output = array();
 
         $safe = new SafeDecorator($input);
-        foreach ($safe as $key => $value)
-        {
+        foreach ($safe as $key => $value) {
             $output[$key] = $value;
         }
         $this->assertSame($output, $input, '"Iterator" implementation imitates an array');

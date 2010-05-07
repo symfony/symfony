@@ -112,8 +112,7 @@ class Response
      */
     public function sendHeaders()
     {
-        if (!$this->headers->has('Content-Type'))
-        {
+        if (!$this->headers->has('Content-Type')) {
             $this->headers->set('Content-Type', 'text/html');
         }
 
@@ -121,14 +120,12 @@ class Response
         header(sprintf('HTTP/%s %s %s', $this->version, $this->statusCode, $this->statusText));
 
         // headers
-        foreach ($this->headers->all() as $name => $value)
-        {
+        foreach ($this->headers->all() as $name => $value) {
             header($name.': '.$value);
         }
 
         // cookies
-        foreach ($this->cookies as $cookie)
-        {
+        foreach ($this->cookies as $cookie) {
             setrawcookie($cookie['name'], $cookie['value'], $cookie['expire'], $cookie['path'], $cookie['domain'], $cookie['secure'], $cookie['httpOnly']);
         }
     }
@@ -205,17 +202,13 @@ class Response
      */
     public function setCookie($name, $value, $expire = null, $path = '/', $domain = '', $secure = false, $httpOnly = false)
     {
-        if (null !== $expire)
-        {
+        if (null !== $expire) {
             if (is_numeric($expire))
             {
                 $expire = (int) $expire;
-            }
-            else
-            {
+            } else {
                 $expire = strtotime($expire);
-                if (false === $expire || -1 == $expire)
-                {
+                if (false === $expire || -1 == $expire) {
                     throw new \InvalidArgumentException('The cookie expire parameter is not valid.');
                 }
             }
@@ -253,8 +246,7 @@ class Response
     public function setStatusCode($code, $text = null)
     {
         $this->statusCode = (int) $code;
-        if ($this->statusCode < 100 || $this->statusCode > 599)
-        {
+        if ($this->statusCode < 100 || $this->statusCode > 599) {
             throw new \InvalidArgumentException(sprintf('The HTTP status code "%s" is not valid.', $code));
         }
 
@@ -284,13 +276,11 @@ class Response
      */
     public function isCacheable()
     {
-        if (!in_array($this->statusCode, array(200, 203, 300, 301, 302, 404, 410)))
-        {
+        if (!in_array($this->statusCode, array(200, 203, 300, 301, 302, 404, 410))) {
             return false;
         }
 
-        if ($this->headers->getCacheControl()->isNoStore() || $this->headers->getCacheControl()->isPrivate())
-        {
+        if ($this->headers->getCacheControl()->isNoStore() || $this->headers->getCacheControl()->isPrivate()) {
             return false;
         }
 
@@ -362,8 +352,7 @@ class Response
      */
     public function getDate()
     {
-        if (null === $date = $this->headers->getDate('Date'))
-        {
+        if (null === $date = $this->headers->getDate('Date')) {
             $date = new \DateTime();
             $this->headers->set('Date', $date->format(DATE_RFC2822));
         }
@@ -378,8 +367,7 @@ class Response
      */
     public function getAge()
     {
-        if ($age = $this->headers->get('Age'))
-        {
+        if ($age = $this->headers->get('Age')) {
             return $age;
         }
 
@@ -391,8 +379,7 @@ class Response
      */
     public function expire()
     {
-        if ($this->isFresh())
-        {
+        if ($this->isFresh()) {
             $this->headers->set('Age', $this->getMaxAge());
         }
     }
@@ -416,12 +403,9 @@ class Response
      */
     public function setExpires(\DateTime $date = null)
     {
-        if (null === $date)
-        {
+        if (null === $date) {
             $this->headers->delete('Expires');
-        }
-        else
-        {
+        } else {
             $this->headers->set('Expires', $date->format(DATE_RFC2822));
         }
     }
@@ -437,18 +421,15 @@ class Response
      */
     public function getMaxAge()
     {
-        if ($age = $this->headers->getCacheControl()->getSharedMaxAge())
-        {
+        if ($age = $this->headers->getCacheControl()->getSharedMaxAge()) {
             return $age;
         }
 
-        if ($age = $this->headers->getCacheControl()->getMaxAge())
-        {
+        if ($age = $this->headers->getCacheControl()->getMaxAge()) {
             return $age;
         }
 
-        if (null !== $this->getExpires())
-        {
+        if (null !== $this->getExpires()) {
             return $this->getExpires()->format('U') - $this->getDate()->format('U');
         }
 
@@ -491,8 +472,7 @@ class Response
      */
     public function getTtl()
     {
-        if ($maxAge = $this->getMaxAge())
-        {
+        if ($maxAge = $this->getMaxAge()) {
             return $maxAge - $this->getAge();
         }
 
@@ -542,12 +522,9 @@ class Response
      */
     public function setLastModified(\DateTime $date = null)
     {
-        if (null === $date)
-        {
+        if (null === $date) {
             $this->headers->delete('Last-Modified');
-        }
-        else
-        {
+        } else {
             $this->headers->set('Last-Modified', $date->format(DATE_RFC2822));
         }
 
@@ -565,12 +542,9 @@ class Response
 
     public function setEtag($etag = null)
     {
-        if (null === $etag)
-        {
+        if (null === $etag) {
             $this->headers->delete('Etag');
-        }
-        else
-        {
+        } else {
             $this->headers->set('ETag', $etag);
         }
     }
@@ -589,8 +563,7 @@ class Response
         $this->setContent(null);
 
         // remove headers that MUST NOT be included with 304 Not Modified responses
-        foreach (array('Allow', 'Content-Encoding', 'Content-Language', 'Content-Length', 'Content-MD5', 'Content-Type', 'Last-Modified') as $header)
-        {
+        foreach (array('Allow', 'Content-Encoding', 'Content-Language', 'Content-Length', 'Content-MD5', 'Content-Type', 'Last-Modified') as $header) {
             $this->headers->delete($header);
         }
     }
@@ -612,8 +585,7 @@ class Response
      */
     public function getVary()
     {
-        if (!$vary = $this->headers->get('Vary'))
-        {
+        if (!$vary = $this->headers->get('Vary')) {
             return array();
         }
 
@@ -635,19 +607,15 @@ class Response
     {
         $lastModified = $request->headers->get('If-Modified-Since');
         $notModified = false;
-        if ($etags = $request->headers->get('If-None-Match'))
-        {
+        if ($etags = $request->headers->get('If-None-Match')) {
             $etags = preg_split('/\s*,\s*/', $etags);
 
             $notModified = (in_array($this->getEtag(), $etags) || in_array('*', $etags)) && (!$lastModified || $this->headers->get('Last-Modified') == $lastModified);
-        }
-        elseif ($lastModified)
-        {
+        } elseif ($lastModified) {
             $notModified = $lastModified == $this->headers->get('Last-Modified');
         }
 
-        if ($notModified)
-        {
+        if ($notModified) {
             $this->setNotModified();
         }
 

@@ -47,13 +47,10 @@ class XmlDumperTest extends \PHPUnit_Framework_TestCase
 
         $dumper = new XmlDumper($container = new Builder());
         $container->register('foo', 'FooClass')->addArgument(new \stdClass());
-        try
-        {
+        try {
             $dumper->dump();
             $this->fail('->dump() throws a RuntimeException if the container to be dumped has reference to objects or resources');
-        }
-        catch (\Exception $e)
-        {
+        } catch (\Exception $e) {
             $this->assertInstanceOf('\RuntimeException', $e, '->dump() throws a RuntimeException if the container to be dumped has reference to objects or resources');
             $this->assertEquals('Unable to dump a service container if a parameter is an object or a resource.', $e->getMessage(), '->dump() throws a RuntimeException if the container to be dumped has reference to objects or resources');
         }

@@ -53,8 +53,7 @@ class PhpGeneratorDumper extends GeneratorDumper
     {
         $methods = array();
 
-        foreach ($this->routes->getRoutes() as $name => $route)
-        {
+        foreach ($this->routes->getRoutes() as $name => $route) {
             $compiledRoute = $route->compile();
 
             $variables = str_replace("\n", '', var_export($compiledRoute->getVariables(), true));
@@ -78,8 +77,7 @@ EOF
 
     public function generate(\$name, array \$parameters, \$absolute = false)
     {
-        if (!method_exists(\$this, \$method = 'get'.\$name.'RouteInfo'))
-        {
+        if (!method_exists(\$this, \$method = 'get'.\$name.'RouteInfo')) {
             throw new \InvalidArgumentException(sprintf('Route "%s" does not exist.', \$name));
         }
 

@@ -160,8 +160,7 @@ class FinderTest extends Iterator\RealIteratorTestCase
 
     public function testFollowLinks()
     {
-        if ('\\' == DIRECTORY_SEPARATOR)
-        {
+        if ('\\' == DIRECTORY_SEPARATOR) {
             return;
         }
 
@@ -173,13 +172,10 @@ class FinderTest extends Iterator\RealIteratorTestCase
     public function testIn()
     {
         $finder = new Finder();
-        try
-        {
+        try {
             $finder->in('foobar');
             $this->fail('->in() throws a \InvalidArgumentException if the directory does not exist');
-        }
-        catch (\Exception $e)
-        {
+        } catch (\Exception $e) {
             $this->assertInstanceOf('InvalidArgumentException', $e, '->in() throws a \InvalidArgumentException if the directory does not exist');
         }
 
@@ -192,20 +188,16 @@ class FinderTest extends Iterator\RealIteratorTestCase
     public function testGetIterator()
     {
         $finder = new Finder();
-        try
-        {
+        try {
             $finder->getIterator();
             $this->fail('->getIterator() throws a \LogicException if the in() method has not been called');
-        }
-        catch (\Exception $e)
-        {
+        } catch (\Exception $e) {
             $this->assertInstanceOf('LogicException', $e, '->getIterator() throws a \LogicException if the in() method has not been called');
         }
 
         $finder = new Finder();
         $dirs = array();
-        foreach ($finder->directories()->in(self::$tmpDir) as $dir)
-        {
+        foreach ($finder->directories()->in(self::$tmpDir) as $dir) {
             $dirs[] = (string) $dir;
         }
 
@@ -222,8 +214,7 @@ class FinderTest extends Iterator\RealIteratorTestCase
     protected function toAbsolute($files)
     {
         $f = array();
-        foreach ($files as $file)
-        {
+        foreach ($files as $file) {
             $f[] = self::$tmpDir.$file;
         }
 

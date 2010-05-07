@@ -50,8 +50,7 @@ class AssetsHelperTest extends \PHPUnit_Framework_TestCase
         $this->assertEquals(array('http://www.example.com'), $helper->getBaseURLs(), '->setBaseURLs() removes the / at the of an absolute base path');
         $helper->setBaseURLs(array('http://www1.example.com/', 'http://www2.example.com/'));
         $URLs = array();
-        for ($i = 0; $i < 20; $i++)
-        {
+        for ($i = 0; $i < 20; $i++) {
             $URLs[] = $helper->getBaseURL($i);
         }
         $URLs = array_values(array_unique($URLs));

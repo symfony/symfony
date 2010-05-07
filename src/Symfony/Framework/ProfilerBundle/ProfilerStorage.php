@@ -38,13 +38,11 @@ class ProfilerStorage
 
     public function getData($name = null)
     {
-        if (null === $this->data)
-        {
+        if (null === $this->data) {
             $this->data = $this->read();
         }
 
-        if (null === $name)
-        {
+        if (null === $name) {
             return $this->data;
         }
 
@@ -62,8 +60,7 @@ class ProfilerStorage
         $args = array(':token' => $this->token);
         $data = $this->exec($db, 'SELECT data FROM data WHERE token = :token ORDER BY created_at DESC LIMIT 1', $args);
         $this->close($db);
-        if (isset($data[0]['data']))
-        {
+        if (isset($data[0]['data'])) {
             return unserialize(pack('H*', $data[0]['data']));
         }
     }
@@ -88,18 +85,13 @@ class ProfilerStorage
      */
     protected function initDb($readOnly = true)
     {
-        if (class_exists('\SQLite3'))
-        {
+        if (class_exists('\SQLite3')) {
             $flags  = $readOnly ? \SQLITE3_OPEN_READONLY : \SQLITE3_OPEN_READWRITE;
             $flags |= \SQLITE3_OPEN_CREATE;
             $db = new \SQLite3($this->store, $flags);
-        }
-        elseif (class_exists('\PDO') && in_array('sqlite', \PDO::getAvailableDrivers(), true))
-        {
+        } elseif (class_exists('\PDO') && in_array('sqlite', \PDO::getAvailableDrivers(), true)) {
             $db = new \PDO('sqlite:'.$this->store);
-        }
-        else
-        {
+        } else {
             throw new \RuntimeException('You need to enable either the SQLite or PDO_SQLite extension for the ProfilerBundle to run properly.');
         }
 
@@ -114,22 +106,18 @@ class ProfilerStorage
         $return = array();
         $stmt = $db->prepare($query);
 
-        if ($db instanceof \SQLite3)
-        {
+        if ($db instanceof \SQLite3) {
             foreach ($args as $arg => $val)
             {
                 $stmt->bindValue($arg, $val, is_int($val) ? \SQLITE3_INTEGER : \SQLITE3_TEXT);
             }
             $res = $stmt->execute();
-            while ($row = $res->fetchArray(\SQLITE3_ASSOC))
-            {
+            while ($row = $res->fetchArray(\SQLITE3_ASSOC)) {
                 $return[] = $row;
             }
             $res->finalize();
             $stmt->close();
-        }
-        else
-        {
+        } else {
             foreach ($args as $arg => $val)
             {
                 $stmt->bindValue($arg, $val, is_int($val) ? \PDO::PARAM_INT : \PDO::PARAM_STR);
@@ -143,8 +131,7 @@ class ProfilerStorage
 
     protected function close($db)
     {
-        if ($db instanceof \SQLite3)
-        {
+        if ($db instanceof \SQLite3) {
             $db->close();
         }
     }

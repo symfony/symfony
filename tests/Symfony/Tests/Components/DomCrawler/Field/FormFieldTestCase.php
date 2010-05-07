@@ -18,8 +18,7 @@ class FormFieldTestCase extends \PHPUnit_Framework_TestCase
         $document = new \DOMDocument();
         $node = $document->createElement($tag, $value);
 
-        foreach ($attributes as $name => $value)
-        {
+        foreach ($attributes as $name => $value) {
             $node->setAttribute($name, $value);
         }
 

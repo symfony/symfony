@@ -36,24 +36,18 @@ class InputTest extends \PHPUnit_Framework_TestCase
         $this->assertEquals('default', $input->getOption('bar'), '->getOption() returns the default value for optional options');
         $this->assertEquals(array('name' => 'foo', 'bar' => 'default'), $input->getOptions(), '->getOptions() returns all option values, even optional ones');
 
-        try
-        {
+        try {
             $input->setOption('foo', 'bar');
             $this->fail('->setOption() throws a \InvalidArgumentException if the option does not exist');
-        }
-        catch (\Exception $e)
-        {
+        } catch (\Exception $e) {
             $this->assertInstanceOf('\InvalidArgumentException', $e, '->setOption() throws a \InvalidArgumentException if the option does not exist');
             $this->assertEquals('The "foo" option does not exist.', $e->getMessage());
         }
 
-        try
-        {
+        try {
             $input->getOption('foo');
             $this->fail('->getOption() throws a \InvalidArgumentException if the option does not exist');
-        }
-        catch (\Exception $e)
-        {
+        } catch (\Exception $e) {
             $this->assertInstanceOf('\InvalidArgumentException', $e, '->setOption() throws a \InvalidArgumentException if the option does not exist');
             $this->assertEquals('The "foo" option does not exist.', $e->getMessage());
         }
@@ -72,24 +66,18 @@ class InputTest extends \PHPUnit_Framework_TestCase
         $this->assertEquals('default', $input->getArgument('bar'), '->getArgument() returns the default value for optional arguments');
         $this->assertEquals(array('name' => 'foo', 'bar' => 'default'), $input->getArguments(), '->getArguments() returns all argument values, even optional ones');
 
-        try
-        {
+        try {
             $input->setArgument('foo', 'bar');
             $this->fail('->setArgument() throws a \InvalidArgumentException if the argument does not exist');
-        }
-        catch (\Exception $e)
-        {
+        } catch (\Exception $e) {
             $this->assertInstanceOf('\InvalidArgumentException', $e, '->setOption() throws a \InvalidArgumentException if the option does not exist');
             $this->assertEquals('The "foo" argument does not exist.', $e->getMessage());
         }
 
-        try
-        {
+        try {
             $input->getArgument('foo');
             $this->fail('->getArgument() throws a \InvalidArgumentException if the argument does not exist');
-        }
-        catch (\Exception $e)
-        {
+        } catch (\Exception $e) {
             $this->assertInstanceOf('\InvalidArgumentException', $e, '->setOption() throws a \InvalidArgumentException if the option does not exist');
             $this->assertEquals('The "foo" argument does not exist.', $e->getMessage());
         }
@@ -100,13 +88,10 @@ class InputTest extends \PHPUnit_Framework_TestCase
         $input = new ArrayInput(array());
         $input->bind(new InputDefinition(array(new InputArgument('name', InputArgument::REQUIRED))));
 
-        try
-        {
+        try {
             $input->validate();
             $this->fail('->validate() throws a \RuntimeException if not enough arguments are given');
-        }
-        catch (\Exception $e)
-        {
+        } catch (\Exception $e) {
             $this->assertInstanceOf('\RuntimeException', $e, '->validate() throws a \RuntimeException if not enough arguments are given');
             $this->assertEquals('Not enough arguments.', $e->getMessage());
         }
@@ -114,12 +99,9 @@ class InputTest extends \PHPUnit_Framework_TestCase
         $input = new ArrayInput(array('name' => 'foo'));
         $input->bind(new InputDefinition(array(new InputArgument('name', InputArgument::REQUIRED))));
 
-        try
-        {
+        try {
             $input->validate();
-        }
-        catch (\RuntimeException $e)
-        {
+        } catch (\RuntimeException $e) {
             $this->fail('->validate() does not throw a \RuntimeException if enough arguments are given');
         }
     }

@@ -22,21 +22,17 @@ class RealIteratorTestCase extends IteratorTestCase
         $tmpDir = sys_get_temp_dir().'/symfony2_finder';
         self::$files = array($tmpDir.'/.git', $tmpDir.'/test.py', $tmpDir.'/foo', $tmpDir.'/foo/bar.tmp', $tmpDir.'/test.php', $tmpDir.'/toto');
 
-        if (is_dir($tmpDir))
-        {
+        if (is_dir($tmpDir)) {
             self::tearDownAfterClass();
             rmdir($tmpDir);
         }
         mkdir($tmpDir);
 
-        foreach (self::$files as $file)
-        {
+        foreach (self::$files as $file) {
             if (false !== ($pos = strpos($file, '.')) && '/' !== $file[$pos - 1])
             {
                 touch($file);
-            }
-            else
-            {
+            } else {
                 mkdir($file);
             }
         }
@@ -47,14 +43,11 @@ class RealIteratorTestCase extends IteratorTestCase
 
     static public function tearDownAfterClass()
     {
-        foreach (self::$files as $file)
-        {
+        foreach (self::$files as $file) {
             if (false !== ($pos = strpos($file, '.')) && '/' !== $file[$pos - 1])
             {
                 @unlink($file);
-            }
-            else
-            {
+            } else {
                 @rmdir($file);
             }
         }

@@ -104,13 +104,10 @@ class ApplicationTest extends \PHPUnit_Framework_TestCase
         $this->assertEquals($foo, $application->getCommand('foo:bar'), '->getCommand() returns a command by name');
         $this->assertEquals($foo, $application->getCommand('afoobar'), '->getCommand() returns a command by alias');
 
-        try
-        {
+        try {
             $application->getCommand('foofoo');
             $this->fail('->getCommand() throws an \InvalidArgumentException if the command does not exist');
-        }
-        catch (\Exception $e)
-        {
+        } catch (\Exception $e) {
             $this->assertInstanceOf('\InvalidArgumentException', $e, '->getCommand() throws an \InvalidArgumentException if the command does not exist');
             $this->assertEquals('The command "foofoo" does not exist.', $e->getMessage(), '->getCommand() throws an \InvalidArgumentException if the command does not exist');
         }
@@ -138,24 +135,18 @@ class ApplicationTest extends \PHPUnit_Framework_TestCase
         $this->assertEquals('foo', $application->findNamespace('f'), '->findNamespace() finds a namespace given an abbreviation');
         $application->addCommand(new \Foo2Command());
         $this->assertEquals('foo', $application->findNamespace('foo'), '->findNamespace() returns the given namespace if it exists');
-        try
-        {
+        try {
             $application->findNamespace('f');
             $this->fail('->findNamespace() throws an \InvalidArgumentException if the abbreviation is ambiguous');
-        }
-        catch (\Exception $e)
-        {
+        } catch (\Exception $e) {
             $this->assertInstanceOf('\InvalidArgumentException', $e, '->findNamespace() throws an \InvalidArgumentException if the abbreviation is ambiguous');
             $this->assertEquals('The namespace "f" is ambiguous (foo, foo1).', $e->getMessage(), '->findNamespace() throws an \InvalidArgumentException if the abbreviation is ambiguous');
         }
 
-        try
-        {
+        try {
             $application->findNamespace('bar');
             $this->fail('->findNamespace() throws an \InvalidArgumentException if no command is in the given namespace');
-        }
-        catch (\Exception $e)
-        {
+        } catch (\Exception $e) {
             $this->assertInstanceOf('\InvalidArgumentException', $e, '->findNamespace() throws an \InvalidArgumentException if no command is in the given namespace');
             $this->assertEquals('There are no commands defined in the "bar" namespace.', $e->getMessage(), '->findNamespace() throws an \InvalidArgumentException if no command is in the given namespace');
         }
@@ -174,35 +165,26 @@ class ApplicationTest extends \PHPUnit_Framework_TestCase
         $application->addCommand(new \Foo1Command());
         $application->addCommand(new \Foo2Command());
 
-        try
-        {
+        try {
             $application->findCommand('f');
             $this->fail('->findCommand() throws an \InvalidArgumentException if the abbreviation is ambiguous for a namespace');
-        }
-        catch (\Exception $e)
-        {
+        } catch (\Exception $e) {
             $this->assertInstanceOf('\InvalidArgumentException', $e, '->findCommand() throws an \InvalidArgumentException if the abbreviation is ambiguous for a namespace');
             $this->assertEquals('Command "f" is not defined.', $e->getMessage(), '->findCommand() throws an \InvalidArgumentException if the abbreviation is ambiguous for a namespace');
         }
 
-        try
-        {
+        try {
             $application->findCommand('a');
             $this->fail('->findCommand() throws an \InvalidArgumentException if the abbreviation is ambiguous for an alias');
-        }
-        catch (\Exception $e)
-        {
+        } catch (\Exception $e) {
             $this->assertInstanceOf('\InvalidArgumentException', $e, '->findCommand() throws an \InvalidArgumentException if the abbreviation is ambiguous for an alias');
             $this->assertEquals('Command "a" is ambiguous (afoobar, afoobar1 and 1 more).', $e->getMessage(), '->findCommand() throws an \InvalidArgumentException if the abbreviation is ambiguous for an alias');
         }
 
-        try
-        {
+        try {
             $application->findCommand('foo:b');
             $this->fail('->findCommand() throws an \InvalidArgumentException if the abbreviation is ambiguous for a command');
-        }
-        catch (\Exception $e)
-        {
+        } catch (\Exception $e) {
             $this->assertInstanceOf('\InvalidArgumentException', $e, '->findCommand() throws an \InvalidArgumentException if the abbreviation is ambiguous for a command');
             $this->assertEquals('Command "foo:b" is ambiguous (foo:bar, foo:bar1).', $e->getMessage(), '->findCommand() throws an \InvalidArgumentException if the abbreviation is ambiguous for a command');
         }
@@ -219,13 +201,10 @@ class ApplicationTest extends \PHPUnit_Framework_TestCase
         $this->assertStringEqualsFile(self::$fixturesPath.'/application_renderexception1.txt', $tester->getDisplay(), '->setCatchExceptions() sets the catch exception flag');
 
         $application->setCatchExceptions(false);
-        try
-        {
+        try {
             $tester->run(array('command' => 'foo'));
             $this->fail('->setCatchExceptions() sets the catch exception flag');
-        }
-        catch (\Exception $e)
-        {
+        } catch (\Exception $e) {
             $this->assertInstanceOf('\Exception', $e, '->setCatchExceptions() sets the catch exception flag');
             $this->assertEquals('Command "foo" is not defined.', $e->getMessage(), '->setCatchExceptions() sets the catch exception flag');
         }

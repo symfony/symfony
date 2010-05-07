@@ -28,26 +28,20 @@ class SimpleXMLElement extends \SimpleXMLElement
     public function getArgumentsAsPhp($name)
     {
         $arguments = array();
-        foreach ($this->$name as $arg)
-        {
+        foreach ($this->$name as $arg) {
             $key = isset($arg['key']) ? (string) $arg['key'] : (!$arguments ? 0 : max(array_keys($arguments)) + 1);
 
             // parameter keys are case insensitive
-            if ('parameter' == $name)
-            {
+            if ('parameter' == $name) {
                 $key = strtolower($key);
             }
 
-            switch ($arg['type'])
-            {
+            switch ($arg['type']) {
                 case 'service':
                     $invalidBehavior = Container::EXCEPTION_ON_INVALID_REFERENCE;
-                    if (isset($arg['on-invalid']) && 'ignore' == $arg['on-invalid'])
-                    {
+                    if (isset($arg['on-invalid']) && 'ignore' == $arg['on-invalid']) {
                         $invalidBehavior = Container::IGNORE_ON_INVALID_REFERENCE;
-                    }
-                    elseif (isset($arg['on-invalid']) && 'null' == $arg['on-invalid'])
-                    {
+                    } elseif (isset($arg['on-invalid']) && 'null' == $arg['on-invalid']) {
                         $invalidBehavior = Container::NULL_ON_INVALID_REFERENCE;
                     }
                     $arguments[$key] = new Reference((string) $arg['id'], $invalidBehavior);
@@ -74,8 +68,7 @@ class SimpleXMLElement extends \SimpleXMLElement
         $value = (string) $value;
         $lowercaseValue = strtolower($value);
 
-        switch (true)
-        {
+        switch (true) {
             case 'null' === $lowercaseValue:
                 return null;
             case ctype_digit($value):

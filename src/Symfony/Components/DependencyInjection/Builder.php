@@ -65,28 +65,21 @@ class Builder extends Container implements AnnotatedContainerInterface
      */
     public function getService($id, $invalidBehavior = Container::EXCEPTION_ON_INVALID_REFERENCE)
     {
-        try
-        {
+        try {
             return parent::getService($id, Container::EXCEPTION_ON_INVALID_REFERENCE);
-        }
-        catch (\InvalidArgumentException $e)
-        {
+        } catch (\InvalidArgumentException $e) {
             if (isset($this->loading[$id]))
             {
                 throw new \LogicException(sprintf('The service "%s" has a circular reference to itself.', $id));
             }
 
-            if (!$this->hasDefinition($id) && isset($this->aliases[$id]))
-            {
+            if (!$this->hasDefinition($id) && isset($this->aliases[$id])) {
                 return $this->getService($this->aliases[$id]);
             }
 
-            try
-            {
+            try {
                 $definition = $this->getDefinition($id);
-            }
-            catch (\InvalidArgumentException $e)
-            {
+            } catch (\InvalidArgumentException $e) {
                 if (Container::EXCEPTION_ON_INVALID_REFERENCE !== $invalidBehavior)
                 {
                     return null;
@@ -125,8 +118,7 @@ class Builder extends Container implements AnnotatedContainerInterface
      */
     public function merge(BuilderConfiguration $configuration = null)
     {
-        if (null === $configuration)
-        {
+        if (null === $configuration) {
             return;
         }
 
@@ -134,14 +126,12 @@ class Builder extends Container implements AnnotatedContainerInterface
         $this->addAliases($configuration->getAliases());
 
         $currentParameters = $this->getParameters();
-        foreach ($configuration->getParameters() as $key => $value)
-        {
+        foreach ($configuration->getParameters() as $key => $value) {
             $this->setParameter($key, $value);
         }
         $this->addParameters($currentParameters);
 
-        foreach ($this->parameters as $key => $value)
-        {
+        foreach ($this->parameters as $key => $value) {
             $this->parameters[$key] = self::resolveValue($value, $this->parameters);
         }
     }
@@ -163,8 +153,7 @@ class Builder extends Container implements AnnotatedContainerInterface
      */
     public function addAliases(array $aliases)
     {
-        foreach ($aliases as $alias => $id)
-        {
+        foreach ($aliases as $alias => $id) {
             $this->setAlias($alias, $id);
         }
     }
@@ -226,8 +215,7 @@ class Builder extends Container implements AnnotatedContainerInterface
      */
     public function getAlias($id)
     {
-        if (!$this->hasAlias($id))
-        {
+        if (!$this->hasAlias($id)) {
             throw new \InvalidArgumentException(sprintf('The service alias "%s" does not exist.', $id));
         }
 
@@ -257,8 +245,7 @@ class Builder extends Container implements AnnotatedContainerInterface
      */
     public function addDefinitions(array $definitions)
     {
-        foreach ($definitions as $id => $definition)
-        {
+        foreach ($definitions as $id => $definition) {
             $this->setDefinition($id, $definition);
         }
     }
@@ -320,8 +307,7 @@ class Builder extends Container implements AnnotatedContainerInterface
      */
     public function getDefinition($id)
     {
-        if (!$this->hasDefinition($id))
-        {
+        if (!$this->hasDefinition($id)) {
             throw new \InvalidArgumentException(sprintf('The service definition "%s" does not exist.', $id));
         }
 
@@ -340,8 +326,7 @@ class Builder extends Container implements AnnotatedContainerInterface
      */
     protected function createService(Definition $definition, $id)
     {
-        if (null !== $definition->getFile())
-        {
+        if (null !== $definition->getFile()) {
             require_once self::resolveValue($definition->getFile(), $this->parameters);
         }
 
@@ -349,27 +334,21 @@ class Builder extends Container implements AnnotatedContainerInterface
 
         $arguments = $this->resolveServices(self::resolveValue($definition->getArguments(), $this->parameters));
 
-        if (null !== $definition->getConstructor())
-        {
+        if (null !== $definition->getConstructor()) {
             $service = call_user_func_array(array(self::resolveValue($definition->getClass(), $this->parameters), $definition->getConstructor()), $arguments);
-        }
-        else
-        {
+        } else {
             $service = null === $r->getConstructor() ? $r->newInstance() : $r->newInstanceArgs($arguments);
         }
 
-        if ($definition->isShared())
-        {
+        if ($definition->isShared()) {
             $this->services[$id] = $service;
         }
 
-        foreach ($definition->getMethodCalls() as $call)
-        {
+        foreach ($definition->getMethodCalls() as $call) {
             $services = self::getServiceConditionals($call[1]);
 
             $ok = true;
-            foreach ($services as $s)
-            {
+            foreach ($services as $s) {
                 if (!$this->hasService($s))
                 {
                     $ok = false;
@@ -377,25 +356,20 @@ class Builder extends Container implements AnnotatedContainerInterface
                 }
             }
 
-            if ($ok)
-            {
+            if ($ok) {
                 call_user_func_array(array($service, $call[0]), $this->resolveServices(self::resolveValue($call[1], $this->parameters)));
             }
         }
 
-        if ($callable = $definition->getConfigurator())
-        {
+        if ($callable = $definition->getConfigurator()) {
             if (is_array($callable) && is_object($callable[0]) && $callable[0] instanceof Reference)
             {
                 $callable[0] = $this->getService((string) $callable[0]);
-            }
-            elseif (is_array($callable))
-            {
+            } elseif (is_array($callable)) {
                 $callable[0] = self::resolveValue($callable[0], $this->parameters);
             }
 
-            if (!is_callable($callable))
-            {
+            if (!is_callable($callable)) {
                 throw new \InvalidArgumentException(sprintf('The configure callable for class "%s" is not a callable.', get_class($service)));
             }
 
@@ -416,35 +390,27 @@ class Builder extends Container implements AnnotatedContainerInterface
      */
     static public function resolveValue($value, $parameters)
     {
-        if (is_array($value))
-        {
+        if (is_array($value)) {
             $args = array();
-            foreach ($value as $k => $v)
-            {
+            foreach ($value as $k => $v) {
                 $args[self::resolveValue($k, $parameters)] = self::resolveValue($v, $parameters);
             }
 
             $value = $args;
-        }
-        else if (is_string($value))
-        {
+        } else if (is_string($value)) {
             if (preg_match('/^%([^%]+)%$/', $value, $match))
             {
                 // we do this to deal with non string values (boolean, integer, ...)
                 // the preg_replace_callback converts them to strings
-                if (!array_key_exists($name = strtolower($match[1]), $parameters))
-                {
+                if (!array_key_exists($name = strtolower($match[1]), $parameters)) {
                     throw new \RuntimeException(sprintf('The parameter "%s" must be defined.', $name));
                 }
 
                 $value = $parameters[$name];
-            }
-            else
-            {
+            } else {
                 $replaceParameter = function ($match) use ($parameters, $value)
                 {
-                    if (!array_key_exists($name = strtolower($match[2]), $parameters))
-                    {
+                    if (!array_key_exists($name = strtolower($match[2]), $parameters)) {
                         throw new \RuntimeException(sprintf('The parameter "%s" must be defined (used in the following expression: "%s").', $name, $value));
                     }
 
@@ -467,15 +433,12 @@ class Builder extends Container implements AnnotatedContainerInterface
      */
     public function resolveServices($value)
     {
-        if (is_array($value))
-        {
+        if (is_array($value)) {
             foreach ($value as &$v)
             {
                 $v = $this->resolveServices($v);
             }
-        }
-        else if (is_object($value) && $value instanceof Reference)
-        {
+        } else if (is_object($value) && $value instanceof Reference) {
             $value = $this->getService((string) $value, $value->getInvalidBehavior());
         }
 
@@ -492,8 +455,7 @@ class Builder extends Container implements AnnotatedContainerInterface
     public function findAnnotatedServiceIds($name)
     {
         $annotations = array();
-        foreach ($this->getDefinitions() as $id => $definition)
-        {
+        foreach ($this->getDefinitions() as $id => $definition) {
             if ($definition->getAnnotation($name))
             {
                 $annotations[$id] = $definition->getAnnotation($name);
@@ -507,15 +469,12 @@ class Builder extends Container implements AnnotatedContainerInterface
     {
         $services = array();
 
-        if (is_array($value))
-        {
+        if (is_array($value)) {
             foreach ($value as $v)
             {
                 $services = array_unique(array_merge($services, self::getServiceConditionals($v)));
             }
-        }
-        elseif (is_object($value) && $value instanceof Reference && $value->getInvalidBehavior() === Container::IGNORE_ON_INVALID_REFERENCE)
-        {
+        } elseif (is_object($value) && $value instanceof Reference && $value->getInvalidBehavior() === Container::IGNORE_ON_INVALID_REFERENCE) {
             $services[] = (string) $value;
         }
 

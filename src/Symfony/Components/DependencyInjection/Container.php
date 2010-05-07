@@ -78,8 +78,7 @@ class Container implements ContainerInterface, \ArrayAccess
     public function setParameters(array $parameters)
     {
         $this->parameters = array();
-        foreach ($parameters as $key => $value)
-        {
+        foreach ($parameters as $key => $value) {
             $this->parameters[strtolower($key)] = $value;
         }
     }
@@ -117,8 +116,7 @@ class Container implements ContainerInterface, \ArrayAccess
     {
         $name = strtolower($name);
 
-        if (!array_key_exists($name, $this->parameters))
-        {
+        if (!array_key_exists($name, $this->parameters)) {
             throw new \InvalidArgumentException(sprintf('The parameter "%s" must be defined.', $name));
         }
 
@@ -188,27 +186,21 @@ class Container implements ContainerInterface, \ArrayAccess
      */
     public function getService($id, $invalidBehavior = self::EXCEPTION_ON_INVALID_REFERENCE)
     {
-        if (!is_string($id))
-        {
+        if (!is_string($id)) {
             throw new \InvalidArgumentException(sprintf('A service id should be a string (%s given).', str_replace("\n", '', var_export($id, true))));
         }
 
-        if (isset($this->services[$id]))
-        {
+        if (isset($this->services[$id])) {
             return $this->services[$id];
         }
 
-        if (method_exists($this, $method = 'get'.strtr($id, array('_' => '', '.' => '_')).'Service') && 'getService' !== $method)
-        {
+        if (method_exists($this, $method = 'get'.strtr($id, array('_' => '', '.' => '_')).'Service') && 'getService' !== $method) {
             return $this->$method();
         }
 
-        if (self::EXCEPTION_ON_INVALID_REFERENCE === $invalidBehavior)
-        {
+        if (self::EXCEPTION_ON_INVALID_REFERENCE === $invalidBehavior) {
             throw new \InvalidArgumentException(sprintf('The service "%s" does not exist.', $id));
-        }
-        else
-        {
+        } else {
             return null;
         }
     }
@@ -222,8 +214,7 @@ class Container implements ContainerInterface, \ArrayAccess
     {
         $ids = array();
         $r = new \ReflectionClass($this);
-        foreach ($r->getMethods() as $method)
-        {
+        foreach ($r->getMethods() as $method) {
             if (preg_match('/^get(.+)Service$/', $name = $method->getName(), $match))
             {
                 $ids[] = self::underscore($match[1]);
@@ -337,8 +328,7 @@ class Container implements ContainerInterface, \ArrayAccess
      */
     public function __call($method, $arguments)
     {
-        if (!preg_match('/^get(.+)Service$/', $method, $match))
-        {
+        if (!preg_match('/^get(.+)Service$/', $method, $match)) {
             throw new \BadMethodCallException(sprintf('Call to undefined method %s::%s.', get_class($this), $method));
         }
 

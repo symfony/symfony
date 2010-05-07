@@ -50,13 +50,10 @@ class HistoryTest extends \PHPUnit_Framework_TestCase
     {
         $history = new History();
 
-        try
-        {
+        try {
             $history->current();
             $this->fail('->current() throws a \LogicException if the history is empty');
-        }
-        catch (\Exception $e)
-        {
+        } catch (\Exception $e) {
             $this->assertInstanceof('LogicException', $e, '->current() throws a \LogicException if the history is empty');
         }
 
@@ -70,13 +67,10 @@ class HistoryTest extends \PHPUnit_Framework_TestCase
         $history = new History();
         $history->add(new Request('http://www.example.com/', 'get'));
 
-        try
-        {
+        try {
             $history->back();
             $this->fail('->back() throws a \LogicException if the history is already on the first page');
-        }
-        catch (\Exception $e)
-        {
+        } catch (\Exception $e) {
             $this->assertInstanceof('LogicException', $e, '->current() throws a \LogicException if the history is already on the first page');
         }
 
@@ -92,13 +86,10 @@ class HistoryTest extends \PHPUnit_Framework_TestCase
         $history->add(new Request('http://www.example.com/', 'get'));
         $history->add(new Request('http://www.example1.com/', 'get'));
 
-        try
-        {
+        try {
             $history->forward();
             $this->fail('->forward() throws a \LogicException if the history is already on the last page');
-        }
-        catch (\Exception $e)
-        {
+        } catch (\Exception $e) {
             $this->assertInstanceof('LogicException', $e, '->forward() throws a \LogicException if the history is already on the last page');
         }
 

@@ -65,22 +65,17 @@ class HttpKernel implements HttpKernelInterface
     {
         $main = (Boolean) $main;
 
-        if (null === $request)
-        {
+        if (null === $request) {
             $request = new Request();
         }
 
-        if (true === $main)
-        {
+        if (true === $main) {
             $this->request = $request;
         }
 
-        try
-        {
+        try {
             return $this->handleRaw($request, $main);
-        }
-        catch (\Exception $e)
-        {
+        } catch (\Exception $e) {
             if (true === $raw)
             {
                 throw $e;
@@ -88,8 +83,7 @@ class HttpKernel implements HttpKernelInterface
 
             // exception
             $event = $this->dispatcher->notifyUntil(new Event($this, 'core.exception', array('main_request' => $main, 'request' => $request, 'exception' => $e)));
-            if ($event->isProcessed())
-            {
+            if ($event->isProcessed()) {
                 return $this->filterResponse($event->getReturnValue(), $request, 'A "core.exception" listener returned a non response object.', $main);
             }
 
@@ -116,41 +110,33 @@ class HttpKernel implements HttpKernelInterface
 
         // request
         $event = $this->dispatcher->notifyUntil(new Event($this, 'core.request', array('main_request' => $main, 'request' => $request)));
-        if ($event->isProcessed())
-        {
+        if ($event->isProcessed()) {
             return $this->filterResponse($event->getReturnValue(), $request, 'A "core.request" listener returned a non response object.', $main);
         }
 
         // load controller
         $event = $this->dispatcher->notifyUntil(new Event($this, 'core.load_controller', array('main_request' => $main, 'request' => $request)));
-        if (!$event->isProcessed())
-        {
+        if (!$event->isProcessed()) {
             throw new NotFoundHttpException('Unable to find the controller.');
         }
 
         list($controller, $arguments) = $event->getReturnValue();
 
         // controller must be a callable
-        if (!is_callable($controller))
-        {
+        if (!is_callable($controller)) {
             throw new \LogicException(sprintf('The controller must be a callable (%s).', var_export($controller, true)));
         }
 
         // controller
         $event = $this->dispatcher->notifyUntil(new Event($this, 'core.controller', array('main_request' => $main, 'request' => $request, 'controller' => &$controller, 'arguments' => &$arguments)));
-        if ($event->isProcessed())
-        {
+        if ($event->isProcessed()) {
             try
             {
                 return $this->filterResponse($event->getReturnValue(), $request, 'A "core.controller" listener returned a non response object.', $main);
-            }
-            catch (\Exception $e)
-            {
+            } catch (\Exception $e) {
                 $retval = $event->getReturnValue();
             }
-        }
-        else
-        {
+        } else {
             // call controller
             $retval = call_user_func_array($controller, $arguments);
         }
@@ -173,16 +159,14 @@ class HttpKernel implements HttpKernelInterface
      */
     protected function filterResponse($response, $request, $message, $main)
     {
-        if (!$response instanceof Response)
-        {
+        if (!$response instanceof Response) {
             throw new \RuntimeException($message);
         }
 
         $event = $this->dispatcher->filter(new Event($this, 'core.response', array('main_request' => $main, 'request' => $request)), $response);
         $response = $event->getReturnValue();
 
-        if (!$response instanceof Response)
-        {
+        if (!$response instanceof Response) {
             throw new \RuntimeException('A "core.response" listener returned a non response object.');
         }
 

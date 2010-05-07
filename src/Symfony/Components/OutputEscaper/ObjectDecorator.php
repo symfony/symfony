@@ -46,22 +46,16 @@ class ObjectDecorator extends GetterDecorator
      */
     public function __call($method, $args)
     {
-        if (count($args) > 0)
-        {
+        if (count($args) > 0) {
             $escaper = $args[count($args) - 1];
-            if (is_string($escaper) && 'esc_' === substr($escaper, 0, 4))
-            {
+            if (is_string($escaper) && 'esc_' === substr($escaper, 0, 4)) {
                 $escaper = substr($escaper, 4);
 
                 array_pop($args);
-            }
-            else
-            {
+            } else {
                 $escaper = $this->escaper;
             }
-        }
-        else
-        {
+        } else {
             $escaper = $this->escaper;
         }
 
@@ -84,8 +78,7 @@ class ObjectDecorator extends GetterDecorator
      */
     public function getRaw($key)
     {
-        if (!is_callable(array($this->value, 'get')))
-        {
+        if (!is_callable(array($this->value, 'get'))) {
             throw new \LogicException('Object does not have a callable get() method.');
         }
 

@@ -41,8 +41,7 @@ class WebDebugToolbar
 
     public function handle(Event $event, Response $response)
     {
-        if (!$event->getParameter('main_request'))
-        {
+        if (!$event->getParameter('main_request')) {
             return $response;
         }
 
@@ -76,8 +75,7 @@ class WebDebugToolbar
     protected function injectToolbar(Response $response)
     {
         $data = '';
-        foreach ($this->collectorManager->getCollectors() as $name => $collector)
-        {
+        foreach ($this->collectorManager->getCollectors() as $name => $collector) {
             $data .= $collector->getSummary();
         }
 
@@ -95,8 +93,7 @@ EOF;
         $toolbar = "\n".str_replace("\n", '', $toolbar)."\n";
         $count = 0;
         $content = str_ireplace('</body>', $toolbar.'</body>', $response->getContent(), $count);
-        if (!$count)
-        {
+        if (!$count) {
             $content .= $toolbar;
         }
 

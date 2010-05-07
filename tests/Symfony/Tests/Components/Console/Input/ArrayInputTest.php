@@ -42,13 +42,10 @@ class ArrayInputTest extends \PHPUnit_Framework_TestCase
         $input = new ArrayInput(array('name' => 'foo'), new InputDefinition(array(new InputArgument('name'))));
         $this->assertEquals(array('name' => 'foo'), $input->getArguments(), '->parse() parses required arguments');
 
-        try
-        {
+        try {
             $input = new ArrayInput(array('foo' => 'foo'), new InputDefinition(array(new InputArgument('name'))));
             $this->fail('->parse() throws an \InvalidArgumentException exception if an invalid argument is passed');
-        }
-        catch (\Exception $e)
-        {
+        } catch (\Exception $e) {
             $this->assertInstanceOf('\InvalidArgumentException', $e, '->parse() throws an \InvalidArgumentException exception if an invalid argument is passed');
             $this->assertEquals('The "foo" argument does not exist.', $e->getMessage(), '->parse() throws an \InvalidArgumentException exception if an invalid argument is passed');
         }
@@ -62,24 +59,18 @@ class ArrayInputTest extends \PHPUnit_Framework_TestCase
         $input = new ArrayInput(array('--foo' => null), new InputDefinition(array(new InputOption('foo', 'f', InputOption::PARAMETER_OPTIONAL, '', 'default'))));
         $this->assertEquals(array('foo' => 'default'), $input->getOptions(), '->parse() parses long options with a default value');
 
-        try
-        {
+        try {
             $input = new ArrayInput(array('--foo' => null), new InputDefinition(array(new InputOption('foo', 'f', InputOption::PARAMETER_REQUIRED))));
             $this->fail('->parse() throws an \InvalidArgumentException exception if a required option is passed without a value');
-        }
-        catch (\Exception $e)
-        {
+        } catch (\Exception $e) {
             $this->assertInstanceOf('\InvalidArgumentException', $e, '->parse() throws an \InvalidArgumentException exception if a required option is passed without a value');
             $this->assertEquals('The "--foo" option requires a value.', $e->getMessage(), '->parse() throws an \InvalidArgumentException exception if a required option is passed without a value');
         }
 
-        try
-        {
+        try {
             $input = new ArrayInput(array('--foo' => 'foo'), new InputDefinition());
             $this->fail('->parse() throws an \InvalidArgumentException exception if an invalid option is passed');
-        }
-        catch (\Exception $e)
-        {
+        } catch (\Exception $e) {
             $this->assertInstanceOf('\InvalidArgumentException', $e, '->parse() throws an \InvalidArgumentException exception if an invalid option is passed');
             $this->assertEquals('The "--foo" option does not exist.', $e->getMessage(), '->parse() throws an \InvalidArgumentException exception if an invalid option is passed');
         }
@@ -87,13 +78,10 @@ class ArrayInputTest extends \PHPUnit_Framework_TestCase
         $input = new ArrayInput(array('-f' => 'bar'), new InputDefinition(array(new InputOption('foo', 'f'))));
         $this->assertEquals(array('foo' => 'bar'), $input->getOptions(), '->parse() parses short options');
 
-        try
-        {
+        try {
             $input = new ArrayInput(array('-o' => 'foo'), new InputDefinition());
             $this->fail('->parse() throws an \InvalidArgumentException exception if an invalid option is passed');
-        }
-        catch (\Exception $e)
-        {
+        } catch (\Exception $e) {
             $this->assertInstanceOf('\InvalidArgumentException', $e, '->parse() throws an \InvalidArgumentException exception if an invalid option is passed');
             $this->assertEquals('The "-o" option does not exist.', $e->getMessage(), '->parse() throws an \InvalidArgumentException exception if an invalid option is passed');
         }

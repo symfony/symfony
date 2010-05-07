@@ -66,8 +66,7 @@ class BuilderConfiguration
      */
     public function merge(BuilderConfiguration $configuration = null)
     {
-        if (null === $configuration)
-        {
+        if (null === $configuration) {
             return;
         }
 
@@ -75,8 +74,7 @@ class BuilderConfiguration
         $this->addAliases($configuration->getAliases());
         $this->addParameters($configuration->getParameters());
 
-        foreach ($configuration->getResources() as $resource)
-        {
+        foreach ($configuration->getResources() as $resource) {
             $this->addResource($resource);
         }
 
@@ -112,8 +110,7 @@ class BuilderConfiguration
     public function setParameters(array $parameters)
     {
         $this->parameters = array();
-        foreach ($parameters as $key => $value)
-        {
+        foreach ($parameters as $key => $value) {
             $this->parameters[strtolower($key)] = $value;
         }
 
@@ -167,8 +164,7 @@ class BuilderConfiguration
      */
     public function getParameter($name)
     {
-        if (!$this->hasParameter($name))
-        {
+        if (!$this->hasParameter($name)) {
             throw new \InvalidArgumentException(sprintf('The parameter "%s" must be defined.', $name));
         }
 
@@ -216,8 +212,7 @@ class BuilderConfiguration
      */
     public function addAliases(array $aliases)
     {
-        foreach ($aliases as $alias => $id)
-        {
+        foreach ($aliases as $alias => $id) {
             $this->setAlias($alias, $id);
         }
 
@@ -257,8 +252,7 @@ class BuilderConfiguration
      */
     public function getAlias($alias)
     {
-        if (!$this->hasAlias($alias))
-        {
+        if (!$this->hasAlias($alias)) {
             throw new \InvalidArgumentException(sprintf('The service alias "%s" does not exist.', $alias));
         }
 
@@ -291,8 +285,7 @@ class BuilderConfiguration
      */
     public function addDefinitions(array $definitions)
     {
-        foreach ($definitions as $id => $definition)
-        {
+        foreach ($definitions as $id => $definition) {
             $this->setDefinition($id, $definition);
         }
 
@@ -347,8 +340,7 @@ class BuilderConfiguration
      */
     public function getDefinition($id)
     {
-        if (!$this->hasDefinition($id))
-        {
+        if (!$this->hasDefinition($id)) {
             throw new \InvalidArgumentException(sprintf('The service definition "%s" does not exist.', $id));
         }
 
@@ -368,8 +360,7 @@ class BuilderConfiguration
      */
     public function findDefinition($id)
     {
-        if ($this->hasAlias($id))
-        {
+        if ($this->hasAlias($id)) {
             return $this->findDefinition($this->getAlias($id));
         }
 

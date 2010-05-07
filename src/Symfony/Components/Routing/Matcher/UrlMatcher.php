@@ -54,24 +54,20 @@ class UrlMatcher implements UrlMatcherInterface
     {
         $url = $this->normalizeUrl($url);
 
-        foreach ($this->routes->getRoutes() as $name => $route)
-        {
+        foreach ($this->routes->getRoutes() as $name => $route) {
             $compiledRoute = $route->compile();
 
             // check HTTP method requirement
-            if (isset($this->context['method']) && (($req = $route->getRequirement('_method')) && !in_array(strtolower($this->context['method']), array_map('strtolower', (array) $req))))
-            {
+            if (isset($this->context['method']) && (($req = $route->getRequirement('_method')) && !in_array(strtolower($this->context['method']), array_map('strtolower', (array) $req)))) {
                 continue;
             }
 
             // check the static prefix of the URL first. Only use the more expensive preg_match when it matches
-            if ('' !== $compiledRoute->getStaticPrefix() && 0 !== strpos($url, $compiledRoute->getStaticPrefix()))
-            {
+            if ('' !== $compiledRoute->getStaticPrefix() && 0 !== strpos($url, $compiledRoute->getStaticPrefix())) {
                 continue;
             }
 
-            if (!preg_match($compiledRoute->getRegex(), $url, $matches))
-            {
+            if (!preg_match($compiledRoute->getRegex(), $url, $matches)) {
                 continue;
             }
 
@@ -84,8 +80,7 @@ class UrlMatcher implements UrlMatcherInterface
     protected function mergeDefaults($params, $defaults)
     {
         $parameters = array_merge($this->defaults, $defaults);
-        foreach ($params as $key => $value)
-        {
+        foreach ($params as $key => $value) {
             if (!is_int($key))
             {
                 $parameters[$key] = urldecode($value);
@@ -98,14 +93,12 @@ class UrlMatcher implements UrlMatcherInterface
     protected function normalizeUrl($url)
     {
         // ensure that the URL starts with a /
-        if ('/' !== substr($url, 0, 1))
-        {
+        if ('/' !== substr($url, 0, 1)) {
             $url = '/'.$url;
         }
 
         // remove the query string
-        if (false !== $pos = strpos($url, '?'))
-        {
+        if (false !== $pos = strpos($url, '?')) {
             $url = substr($url, 0, $pos);
         }
 

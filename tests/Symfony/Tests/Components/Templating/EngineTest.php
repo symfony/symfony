@@ -52,13 +52,10 @@ class EngineTest extends \PHPUnit_Framework_TestCase
         $engine->set($helper = new \SimpleHelper('bar'), 'foo');
         $this->assertEquals($helper, $engine->foo, '->__get() returns the value of a helper');
 
-        try
-        {
+        try {
             $engine->bar;
             $this->fail('->__get() throws an InvalidArgumentException if the helper is not defined');
-        }
-        catch (\Exception $e)
-        {
+        } catch (\Exception $e) {
             $this->assertInstanceOf('\InvalidArgumentException', $e, '->__get() throws an InvalidArgumentException if the helper is not defined');
             $this->assertEquals('The helper "bar" is not defined.', $e->getMessage(), '->__get() throws an InvalidArgumentException if the helper is not defined');
         }
@@ -74,13 +71,10 @@ class EngineTest extends \PHPUnit_Framework_TestCase
         $engine->set($foo, 'bar');
         $this->assertEquals($foo, $engine->get('bar'), '->set() takes an alias as a second argument');
 
-        try
-        {
+        try {
             $engine->get('foobar');
             $this->fail('->get() throws an InvalidArgumentException if the helper is not defined');
-        }
-        catch (\Exception $e)
-        {
+        } catch (\Exception $e) {
             $this->assertInstanceOf('\InvalidArgumentException', $e, '->get() throws an InvalidArgumentException if the helper is not defined');
             $this->assertEquals('The helper "foobar" is not defined.', $e->getMessage(), '->get() throws an InvalidArgumentException if the helper is not defined');
         }
@@ -92,25 +86,19 @@ class EngineTest extends \PHPUnit_Framework_TestCase
     public function testExtendRender()
     {
         $engine = new ProjectTemplateEngine(self::$loader, array(), array(new SlotsHelper()));
-        try
-        {
+        try {
             $engine->render('name');
             $this->fail('->render() throws an InvalidArgumentException if the template does not exist');
-        }
-        catch (\Exception $e)
-        {
+        } catch (\Exception $e) {
             $this->assertInstanceOf('\InvalidArgumentException', $e, '->render() throws an InvalidArgumentException if the template does not exist');
             $this->assertEquals('The template "name" does not exist (renderer: php).', $e->getMessage(), '->render() throws an InvalidArgumentException if the template does not exist');
         }
 
-        try
-        {
+        try {
             self::$loader->setTemplate('name.foo', 'foo');
             $engine->render('foo:name');
             $this->fail('->render() throws an InvalidArgumentException if no renderer is registered for the given renderer');
-        }
-        catch (\Exception $e)
-        {
+        } catch (\Exception $e) {
             $this->assertInstanceOf('\InvalidArgumentException', $e, '->render() throws an InvalidArgumentException if no renderer is registered for the given renderer');
             $this->assertEquals('The template "foo" does not exist (renderer: name).', $e->getMessage(), '->render() throws an InvalidArgumentException if no renderer is registered for the given renderer');
         }
@@ -182,8 +170,7 @@ class ProjectTemplateLoader extends Loader
 
     public function load($template, array $options = array())
     {
-        if (isset($this->templates[$template.'.'.$options['renderer']]))
-        {
+        if (isset($this->templates[$template.'.'.$options['renderer']])) {
             return new StringStorage($this->templates[$template.'.'.$options['renderer']]);
         }
 

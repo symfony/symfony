@@ -59,16 +59,14 @@ EOT
     {
         $bundleClass = null;
         $bundleDirs = $this->container->getKernelService()->getBundleDirs();
-        foreach ($this->container->getKernelService()->getBundles() as $bundle)
-        {
+        foreach ($this->container->getKernelService()->getBundles() as $bundle) {
             if (strpos(get_class($bundle), $input->getArgument('bundle')) !== false)
             {
                 $tmp = dirname(str_replace('\\', '/', get_class($bundle)));
                 $namespace = str_replace('/', '\\', dirname($tmp));
                 $class = basename($tmp);
 
-                if (isset($bundleDirs[$namespace]))
-                {
+                if (isset($bundleDirs[$namespace])) {
                     $destPath = realpath($bundleDirs[$namespace]).'/'.$class;
                     $bundleClass = $class;
                     break;
@@ -77,20 +75,16 @@ EOT
         }
 
         $type = $input->getArgument('mapping-type') ? $input->getArgument('mapping-type') : 'xml';
-        if ($type === 'annotation')
-        {
+        if ($type === 'annotation') {
             $destPath .= '/Entities';
-        }
-        else
-        {
+        } else {
             $destPath .= '/Resources/config/doctrine/metadata';
         }
 
         $cme = new ClassMetadataExporter();
         $exporter = $cme->getExporter($type);
 
-        if ($type === 'annotation')
-        {
+        if ($type === 'annotation') {
             $entityGenerator = $this->getEntityGenerator();
             $exporter->setEntityGenerator($entityGenerator);
         }
@@ -98,19 +92,14 @@ EOT
         $converter = new ConvertDoctrine1Schema($input->getArgument('d1-schema'));
         $metadata = $converter->getMetadata();
 
-        if ($metadata)
-        {
+        if ($metadata) {
             $output->writeln(sprintf('Converting Doctrine 1 schema "<info>%s</info>"', $input->getArgument('d1-schema')));
-            foreach ($metadata as $class)
-            {
+            foreach ($metadata as $class) {
                 $className = $class->name;
                 $class->name = $namespace.'\\'.$bundleClass.'\\Entities\\'.$className;
-                if ($type === 'annotation')
-                {
+                if ($type === 'annotation') {
                     $path = $destPath.'/'.$className.'.php';
-                }
-                else
-                {
+                } else {
                     $path = $destPath.'/'.str_replace('\\', '.', $class->name).'.dcm.xml';
                 }
                 $output->writeln(sprintf('  > writing <comment>%s</comment>', $path));

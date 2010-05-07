@@ -53,13 +53,11 @@ class Engine
 
         $this->addHelpers($helpers);
 
-        if (!isset($this->renderers['php']))
-        {
+        if (!isset($this->renderers['php'])) {
             $this->renderers['php'] = new PhpRenderer();
         }
 
-        foreach ($this->renderers as $renderer)
-        {
+        foreach ($this->renderers as $renderer) {
             $renderer->setEngine($this);
         }
     }
@@ -83,19 +81,15 @@ class Engine
      */
     public function render($name, array $parameters = array())
     {
-        if (isset($this->cache[$name]))
-        {
+        if (isset($this->cache[$name])) {
             list($name, $options, $template) = $this->cache[$name];
-        }
-        else
-        {
+        } else {
             list($name, $options) = $this->splitTemplateName($old = $name);
 
             // load
             $template = $this->loader->load($name, $options);
 
-            if (false === $template)
-            {
+            if (false === $template) {
                 throw new \InvalidArgumentException(sprintf('The template "%s" does not exist (renderer: %s).', $name, $options['renderer']));
             }
 
@@ -108,20 +102,17 @@ class Engine
         // renderer
         $renderer = $template->getRenderer() ? $template->getRenderer() : $options['renderer'];
 
-        if (!isset($this->renderers[$options['renderer']]))
-        {
+        if (!isset($this->renderers[$options['renderer']])) {
             throw new \InvalidArgumentException(sprintf('The renderer "%s" is not registered.', $renderer));
         }
 
         // render
-        if (false === $content = $this->renderers[$renderer]->evaluate($template, $parameters))
-        {
+        if (false === $content = $this->renderers[$renderer]->evaluate($template, $parameters)) {
             throw new \RuntimeException(sprintf('The template "%s" cannot be rendered (renderer: %s).', $name, $renderer));
         }
 
         // decorator
-        if ($this->parents[$name])
-        {
+        if ($this->parents[$name]) {
             $slots = $this->get('slots');
             $this->stack[] = $slots->get('_content');
             $slots->set('_content', $content);
@@ -166,8 +157,7 @@ class Engine
      */
     public function addHelpers(array $helpers = array())
     {
-        foreach ($helpers as $alias => $helper)
-        {
+        foreach ($helpers as $alias => $helper) {
             $this->set($helper, is_int($alias) ? null : $alias);
         }
     }
@@ -181,8 +171,7 @@ class Engine
     public function set(HelperInterface $helper, $alias = null)
     {
         $this->helpers[$helper->getName()] = $helper;
-        if (null !== $alias)
-        {
+        if (null !== $alias) {
             $this->helpers[$alias] = $helper;
         }
 
@@ -212,8 +201,7 @@ class Engine
      */
     public function get($name)
     {
-        if (!isset($this->helpers[$name]))
-        {
+        if (!isset($this->helpers[$name])) {
             throw new \InvalidArgumentException(sprintf('The helper "%s" is not defined.', $name));
         }
 
@@ -286,13 +274,10 @@ class Engine
 
     protected function splitTemplateName($name)
     {
-        if (false !== $pos = strpos($name, ':'))
-        {
+        if (false !== $pos = strpos($name, ':')) {
             $renderer = substr($name, $pos + 1);
             $name = substr($name, 0, $pos);
-        }
-        else
-        {
+        } else {
             $renderer = 'php';
         }
 

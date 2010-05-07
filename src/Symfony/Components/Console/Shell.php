@@ -43,8 +43,7 @@ class Shell
      */
     public function __construct(Application $application)
     {
-        if (!function_exists('readline'))
-        {
+        if (!function_exists('readline')) {
             throw new \RuntimeException('Unable to start the shell as the Readline extension is not enabled.');
         }
 
@@ -65,12 +64,10 @@ class Shell
         readline_completion_function(array($this, 'autocompleter'));
 
         $this->output->writeln($this->getHeader());
-        while (true)
-        {
+        while (true) {
             $command = readline($this->application->getName().' > ');
 
-            if (false === $command)
-            {
+            if (false === $command) {
                 $this->output->writeln("\n");
 
                 break;
@@ -79,8 +76,7 @@ class Shell
             readline_add_history($command);
             readline_write_history($this->history);
 
-            if (0 !== $ret = $this->application->run(new StringInput($command), $this->output))
-            {
+            if (0 !== $ret = $this->application->run(new StringInput($command), $this->output)) {
                 $this->output->writeln(sprintf('<error>The command terminated with an error status (%s)</error>', $ret));
             }
         }
@@ -97,30 +93,24 @@ class Shell
         $info = readline_info();
         $text = substr($info['line_buffer'], 0, $info['end']);
 
-        if ($info['point'] !== $info['end'])
-        {
+        if ($info['point'] !== $info['end']) {
             return true;
         }
 
         // task name?
-        if (false === strpos($text, ' ') || !$text)
-        {
+        if (false === strpos($text, ' ') || !$text) {
             return array_keys($this->application->getCommands());
         }
 
         // options and arguments?
-        try
-        {
+        try {
             $command = $this->application->findCommand(substr($text, 0, strpos($text, ' ')));
-        }
-        catch (\Exception $e)
-        {
+        } catch (\Exception $e) {
             return true;
         }
 
         $list = array('--help');
-        foreach ($command->getDefinition()->getOptions() as $option)
-        {
+        foreach ($command->getDefinition()->getOptions() as $option) {
             $list[] = '--'.$option->getName();
         }
 

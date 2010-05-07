@@ -65,13 +65,10 @@ class ClientTest extends \PHPUnit_Framework_TestCase
 
         $this->assertSame($tester, $client->getTester('foo'), '->addTester() adds a tester object');
 
-        try
-        {
+        try {
             $client->getTester('bar');
             $this->pass('->getTester() throws an \InvalidArgumentException if the tester object does not exist');
-        }
-        catch (\Exception $e)
-        {
+        } catch (\Exception $e) {
             $this->assertInstanceof('InvalidArgumentException', $e, '->getTester() throws an \InvalidArgumentException if the tester object does not exist');
         }
 
@@ -90,33 +87,24 @@ class ClientTest extends \PHPUnit_Framework_TestCase
         $client->assertRequestMethod('DELETE');
         $client->assertTrue(true, '->__call() redirects assert methods to PHPUnit');
 
-        try
-        {
+        try {
             $client->foobar();
             $this->pass('->__call() throws a \BadMethodCallException if the method does not exist');
-        }
-        catch (\Exception $e)
-        {
+        } catch (\Exception $e) {
             $this->assertInstanceof('BadMethodCallException', $e, '->__call() throws a \BadMethodCallException if the method does not exist');
         }
 
-        try
-        {
+        try {
             $client->assertFoo();
             $this->pass('->__call() throws a \BadMethodCallException if the method does not exist');
-        }
-        catch (\Exception $e)
-        {
+        } catch (\Exception $e) {
             $this->assertInstanceof('BadMethodCallException', $e, '->__call() throws a \BadMethodCallException if the method does not exist');
         }
 
-        try
-        {
+        try {
             $client->assertFooBar();
             $this->pass('->__call() throws a \BadMethodCallException if the method does not exist');
-        }
-        catch (\Exception $e)
-        {
+        } catch (\Exception $e) {
             $this->assertInstanceof('BadMethodCallException', $e, '->__call() throws a \BadMethodCallException if the method does not exist');
         }
     }

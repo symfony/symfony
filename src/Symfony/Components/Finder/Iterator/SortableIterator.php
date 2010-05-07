@@ -31,31 +31,23 @@ class SortableIterator extends \ArrayIterator
      */
     public function __construct(\Iterator $iterator, $sort)
     {
-        if (!$sort instanceof \Closure && self::SORT_BY_NAME == $sort)
-        {
+        if (!$sort instanceof \Closure && self::SORT_BY_NAME == $sort) {
             $sort = function ($a, $b)
             {
                 return strcmp($a->getRealpath(), $b->getRealpath());
             };
-        }
-        elseif (!$sort instanceof \Closure && self::SORT_BY_TYPE == $sort)
-        {
+        } elseif (!$sort instanceof \Closure && self::SORT_BY_TYPE == $sort) {
             $sort = function ($a, $b)
             {
-                if ($a->isDir() && $b->isFile())
-                {
+                if ($a->isDir() && $b->isFile()) {
                     return -1;
-                }
-                elseif ($a->isFile() && $b->isDir())
-                {
+                } elseif ($a->isFile() && $b->isDir()) {
                     return 1;
                 }
 
                 return strcmp($a->getRealpath(), $b->getRealpath());
             };
-        }
-        elseif (!$sort instanceof \Closure)
-        {
+        } elseif (!$sort instanceof \Closure) {
             throw new \InvalidArgumentException(sprintf('The SortableIterator takes a \Closure or a valid built-in sort algorithm as an argument (%s given).', $sort));
         }
 

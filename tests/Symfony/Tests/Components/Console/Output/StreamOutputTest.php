@@ -24,13 +24,10 @@ class StreamOutputTest extends \PHPUnit_Framework_TestCase
 
     public function testConstructor()
     {
-        try
-        {
+        try {
             $output = new StreamOutput('foo');
             $this->fail('__construct() throws an \InvalidArgumentException if the first argument is not a stream');
-        }
-        catch (\Exception $e)
-        {
+        } catch (\Exception $e) {
             $this->assertInstanceOf('\InvalidArgumentException', $e, '__construct() throws an \InvalidArgumentException if the first argument is not a stream');
             $this->assertEquals('The StreamOutput class needs a stream as its first argument.', $e->getMessage());
         }

@@ -51,16 +51,14 @@ class RouteCompiler implements RouteCompilerInterface
 
         $this->tokenize();
 
-        foreach ($this->tokens as $token)
-        {
+        foreach ($this->tokens as $token) {
             call_user_func_array(array($this, 'compileFor'.ucfirst(array_shift($token))), $token);
         }
 
         $this->postCompile();
 
         $separator = '';
-        if (count($this->tokens))
-        {
+        if (count($this->tokens)) {
             $lastToken = $this->tokens[count($this->tokens) - 1];
             $separator = 'separator' == $lastToken[0] ? $lastToken[2] : '';
         }
@@ -69,15 +67,12 @@ class RouteCompiler implements RouteCompilerInterface
 
         // optimize tokens for generation
         $tokens = array();
-        foreach ($this->tokens as $i => $token)
-        {
+        foreach ($this->tokens as $i => $token) {
             if ($i + 1 === count($this->tokens) && 'separator' === $token[0])
             {
                 // trailing /
                 $tokens[] = array('text', $token[2], '', null);
-            }
-            elseif ('separator' !== $token[0])
-            {
+            } elseif ('separator' !== $token[0]) {
                 $tokens[] = $token;
             }
         }
@@ -101,15 +96,13 @@ class RouteCompiler implements RouteCompilerInterface
     {
         // all segments after the last static segment are optional
         // be careful, the n-1 is optional only if n is empty
-        for ($i = $this->firstOptional, $max = count($this->segments); $i < $max; $i++)
-        {
+        for ($i = $this->firstOptional, $max = count($this->segments); $i < $max; $i++) {
             $this->segments[$i] = (0 == $i ? '/?' : '').str_repeat(' ', $i - $this->firstOptional).'(?:'.$this->segments[$i];
             $this->segments[] = str_repeat(' ', $max - $i - 1).')?';
         }
 
         $this->staticPrefix = '';
-        foreach ($this->tokens as $token)
-        {
+        foreach ($this->tokens as $token) {
             switch ($token[0])
             {
                 case 'separator':
@@ -138,47 +131,36 @@ class RouteCompiler implements RouteCompilerInterface
         $currentSeparator = '';
 
         // a route is an array of (separator + variable) or (separator + text) segments
-        while (strlen($buffer))
-        {
+        while (strlen($buffer)) {
             if (false !== $this->tokenizeBufferBefore($buffer, $tokens, $afterASeparator, $currentSeparator))
             {
                 // a custom token
                 $this->customToken = true;
-            }
-            else if ($afterASeparator && preg_match('#^'.$this->options['variable_prefix_regex'].'('.$this->options['variable_regex'].')#', $buffer, $match))
-            {
+            } else if ($afterASeparator && preg_match('#^'.$this->options['variable_prefix_regex'].'('.$this->options['variable_regex'].')#', $buffer, $match)) {
                 // a variable
                 $this->tokens[] = array('variable', $currentSeparator, $match[0], $match[1]);
 
                 $currentSeparator = '';
                 $buffer = substr($buffer, strlen($match[0]));
                 $afterASeparator = false;
-            }
-            else if ($afterASeparator && preg_match('#^('.$this->options['text_regex'].')(?:'.$this->options['segment_separators_regex'].'|$)#', $buffer, $match))
-            {
+            } else if ($afterASeparator && preg_match('#^('.$this->options['text_regex'].')(?:'.$this->options['segment_separators_regex'].'|$)#', $buffer, $match)) {
                 // a text
                 $this->tokens[] = array('text', $currentSeparator, $match[1], null);
 
                 $currentSeparator = '';
                 $buffer = substr($buffer, strlen($match[1]));
                 $afterASeparator = false;
-            }
-            else if (!$afterASeparator && preg_match('#^'.$this->options['segment_separators_regex'].'#', $buffer, $match))
-            {
+            } else if (!$afterASeparator && preg_match('#^'.$this->options['segment_separators_regex'].'#', $buffer, $match)) {
                 // a separator
                 $this->tokens[] = array('separator', $currentSeparator, $match[0], null);
 
                 $currentSeparator = $match[0];
                 $buffer = substr($buffer, strlen($match[0]));
                 $afterASeparator = true;
-            }
-            else if (false !== $this->tokenizeBufferAfter($buffer, $tokens, $afterASeparator, $currentSeparator))
-            {
+            } else if (false !== $this->tokenizeBufferAfter($buffer, $tokens, $afterASeparator, $currentSeparator)) {
                 // a custom token
                 $this->customToken = true;
-            }
-            else
-            {
+            } else {
                 // parsing problem
                 throw new \InvalidArgumentException(sprintf('Unable to parse "%s" route near "%s".', $this->route->getPattern(), $buffer));
             }
@@ -228,16 +210,14 @@ class RouteCompiler implements RouteCompilerInterface
 
     protected function compileForVariable($separator, $name, $variable)
     {
-        if (null === $requirement = $this->route->getRequirement($variable))
-        {
+        if (null === $requirement = $this->route->getRequirement($variable)) {
             $requirement = $this->options['variable_content_regex'];
         }
 
         $this->segments[] = preg_quote($separator, '#').'(?P<'.$variable.'>'.$requirement.')';
         $this->variables[$variable] = $name;
 
-        if (!$this->route->getDefault($variable))
-        {
+        if (!$this->route->getDefault($variable)) {
             $this->firstOptional = count($this->segments);
         }
     }

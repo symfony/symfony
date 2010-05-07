@@ -28,8 +28,7 @@ class {{ class }}Kernel extends Kernel
             // register your bundles here
         );
 
-        if ($this->isDebug())
-        {
+        if ($this->isDebug()) {
             $bundles[] = new Symfony\Framework\ProfilerBundle\Bundle();
         }
 

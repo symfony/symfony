@@ -31,8 +31,7 @@ class HelperSet
      */
     public function __construct(array $helpers = array())
     {
-        foreach ($helpers as $alias => $helper)
-        {
+        foreach ($helpers as $alias => $helper) {
             $this->set($helper, is_int($alias) ? null : $alias);
         }
     }
@@ -46,8 +45,7 @@ class HelperSet
     public function set(HelperInterface $helper, $alias = null)
     {
         $this->helpers[$helper->getName()] = $helper;
-        if (null !== $alias)
-        {
+        if (null !== $alias) {
             $this->helpers[$alias] = $helper;
         }
 
@@ -77,8 +75,7 @@ class HelperSet
      */
     public function get($name)
     {
-        if (!$this->has($name))
-        {
+        if (!$this->has($name)) {
             throw new \InvalidArgumentException(sprintf('The helper "%s" is not defined.', $name));
         }
 

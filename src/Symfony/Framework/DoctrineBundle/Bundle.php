@@ -35,20 +35,17 @@ class Bundle extends BaseBundle
         $metadataDirs = array();
         $entityDirs = array();
         $bundleDirs = $container->getParameter('kernel.bundle_dirs');
-        foreach ($container->getParameter('kernel.bundles') as $className)
-        {
+        foreach ($container->getParameter('kernel.bundles') as $className) {
             $tmp = dirname(str_replace('\\', '/', $className));
             $namespace = str_replace('/', '\\', dirname($tmp));
             $class = basename($tmp);
 
-            if (isset($bundleDirs[$namespace]))
-            {
+            if (isset($bundleDirs[$namespace])) {
                 if (is_dir($dir = $bundleDirs[$namespace].'/'.$class.'/Resources/config/doctrine/metadata'))
                 {
                     $metadataDirs[] = realpath($dir);
                 }
-                if (is_dir($dir = $bundleDirs[$namespace].'/'.$class.'/Entities'))
-                {
+                if (is_dir($dir = $bundleDirs[$namespace].'/'.$class.'/Entities')) {
                     $entityDirs[] = realpath($dir);
                 }
             }

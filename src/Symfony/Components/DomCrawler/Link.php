@@ -37,8 +37,7 @@ class Link
      */
     public function __construct(\DOMNode $node, $method = 'get', $host = null, $path = '/')
     {
-        if ('a' != $node->nodeName)
-        {
+        if ('a' != $node->nodeName) {
             throw new \LogicException(sprintf('Unable to click on a "%s" tag.', $node->nodeName));
         }
 
@@ -69,13 +68,11 @@ class Link
     {
         $uri = $this->node->getAttribute('href');
 
-        if ($uri && '/' !== $uri[0])
-        {
+        if ($uri && '/' !== $uri[0]) {
             $uri = $this->path.$uri;
         }
 
-        if ($absolute && null !== $this->host)
-        {
+        if ($absolute && null !== $this->host) {
             return $this->host.$uri;
         }
 

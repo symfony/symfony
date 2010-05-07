@@ -49,26 +49,21 @@ class DataCollectorManager
 
     public function handle(Event $event, Response $response)
     {
-        if (!$event->getParameter('main_request'))
-        {
+        if (!$event->getParameter('main_request')) {
             return $response;
         }
 
         $this->response = $response;
 
         $data = array();
-        foreach ($this->collectors as $name => $collector)
-        {
+        foreach ($this->collectors as $name => $collector) {
             $data[$name] = $collector->getData();
         }
 
-        try
-        {
+        try {
             $this->profilerStorage->write($data);
             $this->profilerStorage->purge($this->lifetime);
-        }
-        catch (\Exception $e)
-        {
+        } catch (\Exception $e) {
             $this->logger->err('Unable to store the profiler information.');
         }
 
@@ -96,17 +91,13 @@ class DataCollectorManager
         $ids = array();
         $coreCollectors = array();
         $userCollectors = array();
-        foreach ($config as $id => $attributes)
-        {
+        foreach ($config as $id => $attributes) {
             $collector = $this->container->getService($id);
             $collector->setCollectorManager($this);
 
-            if (isset($attributes[0]['core']) && $attributes[0]['core'])
-            {
+            if (isset($attributes[0]['core']) && $attributes[0]['core']) {
                 $coreCollectors[$collector->getName()] = $collector;
-            }
-            else
-            {
+            } else {
                 $userCollectors[$collector->getName()] = $collector;
             }
         }

@@ -55,17 +55,13 @@ EOF
         $router = $this->container->getService('router');
 
         $routes = array();
-        foreach ($router->getRouteCollection()->getRoutes() as $name => $route)
-        {
+        foreach ($router->getRouteCollection()->getRoutes() as $name => $route) {
             $routes[$name] = $route->compile();
         }
 
-        if ($input->getArgument('name'))
-        {
+        if ($input->getArgument('name')) {
             $this->outputRoute($output, $routes, $input->getArgument('name'));
-        }
-        else
-        {
+        } else {
             $this->outputRoutes($output, $routes);
         }
     }
@@ -76,18 +72,15 @@ EOF
 
         $maxName = 4;
         $maxMethod = 6;
-        foreach ($routes as $name => $route)
-        {
+        foreach ($routes as $name => $route) {
             $requirements = $route->getRequirements();
             $method = isset($requirements['_method']) ? strtoupper(is_array($requirements['_method']) ? implode(', ', $requirements['_method']) : $requirements['_method']) : 'ANY';
 
-            if (strlen($name) > $maxName)
-            {
+            if (strlen($name) > $maxName) {
                 $maxName = strlen($name);
             }
 
-            if (strlen($method) > $maxMethod)
-            {
+            if (strlen($method) > $maxMethod) {
                 $maxMethod = strlen($method);
             }
         }
@@ -96,8 +89,7 @@ EOF
         // displays the generated routes
         $format1  = '%-'.($maxName + 9).'s %-'.($maxMethod + 9).'s %s';
         $output->writeln(sprintf($format1, '<comment>Name</comment>', '<comment>Method</comment>', '<comment>Pattern</comment>'));
-        foreach ($routes as $name => $route)
-        {
+        foreach ($routes as $name => $route) {
             $requirements = $route->getRequirements();
             $method = isset($requirements['_method']) ? strtoupper(is_array($requirements['_method']) ? implode(', ', $requirements['_method']) : $requirements['_method']) : 'ANY';
             $output->writeln(sprintf($format, $name, $method, $route->getPattern()));
@@ -111,8 +103,7 @@ EOF
     {
         $output->writeln($this->getHelper('formatter')->formatSection('router', sprintf('Route "%s"', $name)));
 
-        if (!isset($routes[$name]))
-        {
+        if (!isset($routes[$name])) {
             throw new \InvalidArgumentException(sprintf('The route "%s" does not exist.', $name));
         }
 
@@ -124,8 +115,7 @@ EOF
         $defaults = '';
         $d = $route->getDefaults();
         ksort($d);
-        foreach ($d as $name => $value)
-        {
+        foreach ($d as $name => $value) {
             $defaults .= ($defaults ? "\n".str_repeat(' ', 13) : '').$name.': '.$this->formatValue($value);
         }
         $output->writeln(sprintf('<comment>Defaults</comment>     %s', $defaults));
@@ -133,8 +123,7 @@ EOF
         $requirements = '';
         $r = $route->getRequirements();
         ksort($r);
-        foreach ($r as $name => $value)
-        {
+        foreach ($r as $name => $value) {
             $requirements .= ($requirements ? "\n".str_repeat(' ', 13) : '').$name.': '.$this->formatValue($value);
         }
         $output->writeln(sprintf('<comment>Requirements</comment> %s', $requirements));
@@ -142,8 +131,7 @@ EOF
         $options = '';
         $o = $route->getOptions();
         ksort($o);
-        foreach ($o as $name => $value)
-        {
+        foreach ($o as $name => $value) {
             $options .= ($options ? "\n".str_repeat(' ', 13) : '').$name.': '.$this->formatValue($value);
         }
         $output->writeln(sprintf('<comment>Options</comment>      %s', $options));
@@ -151,14 +139,11 @@ EOF
         $output->writeln(preg_replace('/^             /', '', preg_replace('/^/m', '             ', $route->getRegex())), Output::OUTPUT_RAW);
 
         $tokens = '';
-        foreach ($route->getTokens() as $token)
-        {
+        foreach ($route->getTokens() as $token) {
             if (!$tokens)
             {
                 $tokens = $this->displayToken($token);
-            }
-            else
-            {
+            } else {
                 $tokens .= "\n".str_repeat(' ', 13).$this->displayToken($token);
             }
         }
@@ -175,12 +160,9 @@ EOF
 
     protected function formatValue($value)
     {
-        if (is_object($value))
-        {
+        if (is_object($value)) {
             return sprintf('object(%s)', get_class($value));
-        }
-        else
-        {
+        } else {
             return preg_replace("/\n\s*/s", '', var_export($value, true));
         }
     }

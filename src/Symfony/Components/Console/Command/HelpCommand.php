@@ -66,17 +66,13 @@ EOF
      */
     protected function execute(InputInterface $input, OutputInterface $output)
     {
-        if (null === $this->command)
-        {
+        if (null === $this->command) {
             $this->command = $this->application->getCommand($input->getArgument('command_name'));
         }
 
-        if ($input->getOption('xml'))
-        {
+        if ($input->getOption('xml')) {
             $output->writeln($this->command->asXml(), Output::OUTPUT_RAW);
-        }
-        else
-        {
+        } else {
             $output->writeln($this->command->asText());
         }
     }

@@ -69,11 +69,9 @@ class StylesheetsHelper extends Helper
     public function render()
     {
         $html = '';
-        foreach ($this->stylesheets as $path => $attributes)
-        {
+        foreach ($this->stylesheets as $path => $attributes) {
             $atts = '';
-            foreach ($attributes as $key => $value)
-            {
+            foreach ($attributes as $key => $value) {
                 $atts .= ' '.sprintf('%s="%s"', $key, htmlspecialchars($value, ENT_QUOTES, $this->charset));
             }
 

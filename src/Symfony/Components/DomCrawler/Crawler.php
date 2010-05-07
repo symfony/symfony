@@ -58,45 +58,34 @@ class Crawler extends \SplObjectStorage
      */
     public function add($node)
     {
-        if ($node instanceof \DOMNodeList)
-        {
+        if ($node instanceof \DOMNodeList) {
             $this->addNodeList($node);
-        }
-        elseif (is_array($node))
-        {
+        } elseif (is_array($node)) {
             $this->addNodes($node);
-        }
-        elseif (null !== $node)
-        {
+        } elseif (null !== $node) {
             $this->addNode($node);
         }
     }
 
     public function addContent($content, $type = null)
     {
-        if (empty($type))
-        {
+        if (empty($type)) {
             $type = 'text/html';
         }
 
         // DOM only for HTML/XML content
-        if (!preg_match('/(x|ht)ml/i', $type, $matches))
-        {
+        if (!preg_match('/(x|ht)ml/i', $type, $matches)) {
             return null;
         }
 
         $charset = 'ISO-8859-1';
-        if (false !== $pos = strpos($type, 'charset='))
-        {
+        if (false !== $pos = strpos($type, 'charset=')) {
             $charset = substr($type, $pos + 8);
         }
 
-        if ('x' === $matches[1])
-        {
+        if ('x' === $matches[1]) {
             $this->addXmlContent($content, $charset);
-        }
-        else
-        {
+        } else {
             $this->addHtmlContent($content, $charset);
         }
     }
@@ -139,8 +128,7 @@ class Crawler extends \SplObjectStorage
      */
     public function addDocument(\DOMDocument $dom)
     {
-        if ($dom->documentElement)
-        {
+        if ($dom->documentElement) {
             $this->addNode($dom->documentElement);
         }
     }
@@ -152,8 +140,7 @@ class Crawler extends \SplObjectStorage
      */
     public function addNodeList(\DOMNodeList $nodes)
     {
-        foreach ($nodes as $node)
-        {
+        foreach ($nodes as $node) {
             $this->addNode($node);
         }
     }
@@ -165,8 +152,7 @@ class Crawler extends \SplObjectStorage
      */
     public function addNodes(array $nodes)
     {
-        foreach ($nodes as $node)
-        {
+        foreach ($nodes as $node) {
             $this->add($node);
         }
     }
@@ -178,12 +164,9 @@ class Crawler extends \SplObjectStorage
      */
     public function addNode(\DOMNode $node)
     {
-        if ($node instanceof \DOMDocument)
-        {
+        if ($node instanceof \DOMDocument) {
             $this->attach($node->documentElement);
-        }
-        else
-        {
+        } else {
             $this->attach($node);
         }
     }
@@ -207,8 +190,7 @@ class Crawler extends \SplObjectStorage
      */
     public function eq($position)
     {
-        foreach ($this as $i => $node)
-        {
+        foreach ($this as $i => $node) {
             if ($i == $position)
             {
                 return new static($node, $this->uri);
@@ -237,8 +219,7 @@ class Crawler extends \SplObjectStorage
     public function each(\Closure $closure)
     {
         $data = array();
-        foreach ($this as $i => $node)
-        {
+        foreach ($this as $i => $node) {
             $data[] = $closure($node, $i);
         }
 
@@ -257,8 +238,7 @@ class Crawler extends \SplObjectStorage
     public function reduce(\Closure $closure)
     {
         $nodes = array();
-        foreach ($this as $i => $node)
-        {
+        foreach ($this as $i => $node) {
             if (false !== $closure($node, $i))
             {
                 $nodes[] = $node;
@@ -297,8 +277,7 @@ class Crawler extends \SplObjectStorage
      */
     public function siblings()
     {
-        if (!count($this))
-        {
+        if (!count($this)) {
             throw new \InvalidArgumentException('The current node list is empty.');
         }
 
@@ -314,8 +293,7 @@ class Crawler extends \SplObjectStorage
      */
     public function nextAll()
     {
-        if (!count($this))
-        {
+        if (!count($this)) {
             throw new \InvalidArgumentException('The current node list is empty.');
         }
 
@@ -329,8 +307,7 @@ class Crawler extends \SplObjectStorage
      */
     public function previousAll()
     {
-        if (!count($this))
-        {
+        if (!count($this)) {
             throw new \InvalidArgumentException('The current node list is empty.');
         }
 
@@ -346,16 +323,14 @@ class Crawler extends \SplObjectStorage
      */
     public function parents()
     {
-        if (!count($this))
-        {
+        if (!count($this)) {
             throw new \InvalidArgumentException('The current node list is empty.');
         }
 
         $node = $this->getNode(0);
         $nodes = array();
 
-        while ($node = $node->parentNode)
-        {
+        while ($node = $node->parentNode) {
             if (1 === $node->nodeType && '_root' !== $node->nodeName)
             {
                 $nodes[] = $node;
@@ -374,8 +349,7 @@ class Crawler extends \SplObjectStorage
      */
     public function children()
     {
-        if (!count($this))
-        {
+        if (!count($this)) {
             throw new \InvalidArgumentException('The current node list is empty.');
         }
 
@@ -393,8 +367,7 @@ class Crawler extends \SplObjectStorage
      */
     public function attr($attribute)
     {
-        if (!count($this))
-        {
+        if (!count($this)) {
             throw new \InvalidArgumentException('The current node list is empty.');
         }
 
@@ -410,8 +383,7 @@ class Crawler extends \SplObjectStorage
      */
     public function text()
     {
-        if (!count($this))
-        {
+        if (!count($this)) {
             throw new \InvalidArgumentException('The current node list is empty.');
         }
 
@@ -433,23 +405,18 @@ class Crawler extends \SplObjectStorage
      */
     public function extract($attributes)
     {
-        if (!is_array($attributes))
-        {
+        if (!is_array($attributes)) {
             $attributes = array($attributes);
         }
 
         $data = array();
-        foreach ($this as $node)
-        {
+        foreach ($this as $node) {
             $elements = array();
-            foreach ($attributes as $attribute)
-            {
+            foreach ($attributes as $attribute) {
                 if ('_text' === $attribute)
                 {
                     $elements[] = $node->nodeValue;
-                }
-                else
-                {
+                } else {
                     $elements[] = $node->getAttribute($attribute);
                 }
             }
@@ -471,8 +438,7 @@ class Crawler extends \SplObjectStorage
     {
         $document = new \DOMDocument('1.0', 'UTF-8');
         $root = $document->appendChild($document->createElement('_root'));
-        foreach ($this as $node)
-        {
+        foreach ($this as $node) {
             $root->appendChild($document->importNode($node, true));
         }
 
@@ -494,8 +460,7 @@ class Crawler extends \SplObjectStorage
      */
     public function filter($selector)
     {
-        if (!class_exists('Symfony\\Components\\CssSelector\\Parser'))
-        {
+        if (!class_exists('Symfony\\Components\\CssSelector\\Parser')) {
             // @codeCoverageIgnoreStart
             throw new \RuntimeException('Unable to filter with a CSS selector as the Symfony CssSelector is not installed (you can use filterXPath instead).');
             // @codeCoverageIgnoreEnd
@@ -546,8 +511,7 @@ class Crawler extends \SplObjectStorage
      */
     public function link($method = 'get')
     {
-        if (!count($this))
-        {
+        if (!count($this)) {
             throw new \InvalidArgumentException('The current node list is empty.');
         }
 
@@ -564,8 +528,7 @@ class Crawler extends \SplObjectStorage
     public function links()
     {
         $links = array();
-        foreach ($this as $node)
-        {
+        foreach ($this as $node) {
             $links[] = new Link($node, 'get', $this->host, $this->path);
         }
 
@@ -584,15 +547,13 @@ class Crawler extends \SplObjectStorage
      */
     public function form(array $values = null, $method = null)
     {
-        if (!count($this))
-        {
+        if (!count($this)) {
             throw new \InvalidArgumentException('The current node list is empty.');
         }
 
         $form = new Form($this->getNode(0), $method, $this->host, $this->path);
 
-        if (null !== $values)
-        {
+        if (null !== $values) {
             $form->setValues($values);
         }
 
@@ -601,8 +562,7 @@ class Crawler extends \SplObjectStorage
 
     protected function getNode($position)
     {
-        foreach ($this as $i => $node)
-        {
+        foreach ($this as $i => $node) {
             if ($i == $position)
             {
                 return $node;
@@ -616,15 +576,13 @@ class Crawler extends \SplObjectStorage
 
     protected function parseUri($uri)
     {
-        if ('http' !== substr($uri, 0, 4))
-        {
+        if ('http' !== substr($uri, 0, 4)) {
             return array(null, '/');
         }
 
         $path = parse_url($uri, PHP_URL_PATH);
 
-        if ('/' !== substr($path, -1))
-        {
+        if ('/' !== substr($path, -1)) {
             $path = substr($path, 0, strrpos($path, '/') + 1);
         }
 
@@ -635,42 +593,35 @@ class Crawler extends \SplObjectStorage
     {
         $nodes = array();
 
-        do
-        {
+        do {
             if ($node !== $this->getNode(0) && $node->nodeType === 1)
             {
                 $nodes[] = $node;
             }
-        }
-        while($node = $node->$siblingDir);
+        } while($node = $node->$siblingDir);
 
         return $nodes;
     }
 
     static public function xpathLiteral($s)
     {
-        if (false === strpos($s, "'"))
-        {
+        if (false === strpos($s, "'")) {
             return sprintf("'%s'", $s);
         }
 
-        if (false === strpos($s, '"'))
-        {
+        if (false === strpos($s, '"')) {
             return sprintf('"%s"', $s);
         }
 
         $string = $s;
         $parts = array();
-        while (true)
-        {
+        while (true) {
             if (false !== $pos = strpos($string, "'"))
             {
                 $parts[] = sprintf("'%s'", substr($string, 0, $pos));
                 $parts[] = "\"'\"";
                 $string = substr($string, $pos + 1);
-            }
-            else
-            {
+            } else {
                 $parts[] = "'$string'";
                 break;
             }

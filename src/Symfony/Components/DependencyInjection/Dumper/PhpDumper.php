@@ -56,16 +56,14 @@ class PhpDumper extends Dumper
 
     protected function addServiceInclude($id, $definition)
     {
-        if (null !== $definition->getFile())
-        {
+        if (null !== $definition->getFile()) {
             return sprintf("        require_once %s;\n\n", $this->dumpValue($definition->getFile()));
         }
     }
 
     protected function addServiceShared($id, $definition)
     {
-        if ($definition->isShared())
-        {
+        if ($definition->isShared()) {
             return <<<EOF
         if (isset(\$this->shared['$id'])) return \$this->shared['$id'];
 
@@ -89,26 +87,19 @@ EOF;
         $class = $this->dumpValue($definition->getClass());
 
         $arguments = array();
-        foreach ($definition->getArguments() as $value)
-        {
+        foreach ($definition->getArguments() as $value) {
             $arguments[] = $this->dumpValue($value);
         }
 
-        if (null !== $definition->getConstructor())
-        {
+        if (null !== $definition->getConstructor()) {
             $code = sprintf("        \$instance = call_user_func(array(%s, '%s')%s);\n", $class, $definition->getConstructor(), $arguments ? ', '.implode(', ', $arguments) : '');
-        }
-        elseif ($class != "'".str_replace('\\', '\\\\', $definition->getClass())."'")
-        {
+        } elseif ($class != "'".str_replace('\\', '\\\\', $definition->getClass())."'") {
             $code = sprintf("        \$class = %s;\n        \$instance = new \$class(%s);\n", $class, implode(', ', $arguments));
-        }
-        else
-        {
+        } else {
             $code = sprintf("        \$instance = new %s(%s);\n", $definition->getClass(), implode(', ', $arguments));
         }
 
-        if ($definition->isShared())
-        {
+        if ($definition->isShared()) {
             $code .= sprintf("        \$this->shared['$id'] = \$instance;\n");
         }
 
@@ -118,11 +109,9 @@ EOF;
     protected function addServiceMethodCalls($id, $definition)
     {
         $calls = '';
-        foreach ($definition->getMethodCalls() as $call)
-        {
+        foreach ($definition->getMethodCalls() as $call) {
             $arguments = array();
-            foreach ($call[1] as $value)
-            {
+            foreach ($call[1] as $value) {
                 $arguments[] = $this->dumpValue($value);
             }
 
@@ -134,24 +123,18 @@ EOF;
 
     protected function addServiceConfigurator($id, $definition)
     {
-        if (!$callable = $definition->getConfigurator())
-        {
+        if (!$callable = $definition->getConfigurator()) {
             return '';
         }
 
-        if (is_array($callable))
-        {
+        if (is_array($callable)) {
             if (is_object($callable[0]) && $callable[0] instanceof Reference)
             {
                 return sprintf("        %s->%s(\$instance);\n", $this->getServiceCall((string) $callable[0]), $callable[1]);
-            }
-            else
-            {
+            } else {
                 return sprintf("        call_user_func(array(%s, '%s'), \$instance);\n", $this->dumpValue($callable[0]), $callable[1]);
             }
-        }
-        else
-        {
+        } else {
             return sprintf("        %s(\$instance);\n", $callable);
         }
     }
@@ -163,8 +146,7 @@ EOF;
         $type = 0 === strpos($class, '%') ? 'Object' : $class;
 
         $doc = '';
-        if ($definition->isShared())
-        {
+        if ($definition->isShared()) {
             $doc = <<<EOF
 
      *
@@ -202,8 +184,7 @@ EOF;
         $name = Container::camelize($alias);
         $type = 'Object';
 
-        if ($this->container->hasDefinition($id))
-        {
+        if ($this->container->hasDefinition($id)) {
             $class = $this->container->getDefinition($id)->getClass();
             $type = 0 === strpos($class, '%') ? 'Object' : $class;
         }
@@ -226,13 +207,11 @@ EOF;
     protected function addServices()
     {
         $code = '';
-        foreach ($this->container->getDefinitions() as $id => $definition)
-        {
+        foreach ($this->container->getDefinitions() as $id => $definition) {
             $code .= $this->addService($id, $definition);
         }
 
-        foreach ($this->container->getAliases() as $alias => $id)
-        {
+        foreach ($this->container->getAliases() as $alias => $id) {
             $code .= $this->addServiceAlias($alias, $id);
         }
 
@@ -242,12 +221,10 @@ EOF;
     protected function addAnnotations()
     {
         $annotations = array();
-        foreach ($this->container->getDefinitions() as $id => $definition)
-        {
+        foreach ($this->container->getDefinitions() as $id => $definition) {
             foreach ($definition->getAnnotations() as $name => $ann)
             {
-                if (!isset($annotations[$name]))
-                {
+                if (!isset($annotations[$name])) {
                     $annotations[$name] = array();
                 }
 
@@ -278,17 +255,14 @@ EOF;
     protected function startClass($class, $baseClass)
     {
         $properties = array();
-        foreach ($this->container->getDefinitions() as $id => $definition)
-        {
+        foreach ($this->container->getDefinitions() as $id => $definition) {
             $type = 0 === strpos($definition->getClass(), '%') ? 'Object' : $definition->getClass();
             $properties[] = sprintf(' * @property %s $%s', $type, $id);
         }
 
-        foreach ($this->container->getAliases() as $alias => $id)
-        {
+        foreach ($this->container->getAliases() as $alias => $id) {
             $type = 'Object';
-            if ($this->container->hasDefinition($id))
-            {
+            if ($this->container->hasDefinition($id)) {
                 $sclass = $this->container->getDefinition($id)->getClass();
                 $type = 0 === strpos($sclass, '%') ? 'Object' : $sclass;
             }
@@ -296,8 +270,7 @@ EOF;
             $properties[] = sprintf(' * @property %s $%s', $type, $alias);
         }
         $properties = implode("\n", $properties);
-        if ($properties)
-        {
+        if ($properties) {
             $properties = "\n *\n".$properties;
         }
 
@@ -323,8 +296,7 @@ EOF;
 
     protected function addConstructor()
     {
-        if (!$this->container->getParameters())
-        {
+        if (!$this->container->getParameters()) {
             return '';
         }
 
@@ -345,8 +317,7 @@ EOF;
 
     protected function addDefaultParametersMethod()
     {
-        if (!$this->container->getParameters())
-        {
+        if (!$this->container->getParameters()) {
             return '';
         }
 
@@ -370,18 +341,13 @@ EOF;
     protected function exportParameters($parameters, $indent = 12)
     {
         $php = array();
-        foreach ($parameters as $key => $value)
-        {
+        foreach ($parameters as $key => $value) {
             if (is_array($value))
             {
                 $value = $this->exportParameters($value, $indent + 4);
-            }
-            elseif ($value instanceof Reference)
-            {
+            } elseif ($value instanceof Reference) {
                 throw new \InvalidArgumentException(sprintf('You cannot dump a container with parameters that contain references to other services (reference to service %s found).', $value));
-            }
-            else
-            {
+            } else {
                 $value = var_export($value, true);
             }
 
@@ -401,53 +367,41 @@ EOF;
 
     protected function wrapServiceConditionals($value, $code)
     {
-        if (!$services = Builder::getServiceConditionals($value))
-        {
+        if (!$services = Builder::getServiceConditionals($value)) {
             return $code;
         }
 
         $conditions = array();
-        foreach ($services as $service)
-        {
+        foreach ($services as $service) {
             $conditions[] = sprintf("\$this->hasService('%s')", $service);
         }
 
         // re-indent the wrapped code
         $code = implode("\n", array_map(function ($line) { return $line ? '    '.$line : $line; }, explode("\n", $code)));
 
-        return sprintf("        if (%s)\n        {\n%s        }\n", implode(' && ', $conditions), $code);
+        return sprintf("        if (%s) {\n%s        }\n", implode(' && ', $conditions), $code);
     }
 
     protected function dumpValue($value)
     {
-        if (is_array($value))
-        {
+        if (is_array($value)) {
             $code = array();
-            foreach ($value as $k => $v)
-            {
+            foreach ($value as $k => $v) {
                 $code[] = sprintf('%s => %s', $this->dumpValue($k), $this->dumpValue($v));
             }
 
             return sprintf('array(%s)', implode(', ', $code));
-        }
-        elseif (is_object($value) && $value instanceof Reference)
-        {
+        } elseif (is_object($value) && $value instanceof Reference) {
             return $this->getServiceCall((string) $value, $value);
-        }
-        elseif (is_object($value) && $value instanceof Parameter)
-        {
+        } elseif (is_object($value) && $value instanceof Parameter) {
             return sprintf("\$this->getParameter('%s')", strtolower($value));
-        }
-        elseif (is_string($value))
-        {
+        } elseif (is_string($value)) {
             if (preg_match('/^%([^%]+)%$/', $value, $match))
             {
                 // we do this to deal with non string values (boolean, integer, ...)
                 // the preg_replace_callback converts them to strings
                 return sprintf("\$this->getParameter('%s')", strtolower($match[1]));
-            }
-            else
-            {
+            } else {
                 $replaceParameters = function ($match)
                 {
                     return sprintf("'.\$this->getParameter('%s').'", strtolower($match[2]));
@@ -460,37 +414,28 @@ EOF;
 
                 return $code;
             }
-        }
-        elseif (is_object($value) || is_resource($value))
-        {
+        } elseif (is_object($value) || is_resource($value)) {
             throw new \RuntimeException('Unable to dump a service container if a parameter is an object or a resource.');
-        }
-        else
-        {
+        } else {
             return var_export($value, true);
         }
     }
 
     protected function getServiceCall($id, Reference $reference = null)
     {
-        if ('service_container' === $id)
-        {
+        if ('service_container' === $id) {
             return '$this';
         }
 
-        if (null !== $reference && Container::EXCEPTION_ON_INVALID_REFERENCE !== $reference->getInvalidBehavior())
-        {
+        if (null !== $reference && Container::EXCEPTION_ON_INVALID_REFERENCE !== $reference->getInvalidBehavior()) {
             return sprintf('$this->getService(\'%s\', Container::NULL_ON_INVALID_REFERENCE)', $id);
-        }
-        else
-        {
+        } else {
             if ($this->container->hasAlias($id))
             {
                 $id = $this->container->getAlias($id);
             }
 
-            if ($this->container->hasDefinition($id))
-            {
+            if ($this->container->hasDefinition($id)) {
                 return sprintf('$this->get%sService()', Container::camelize($id));
             }
 

@@ -22,13 +22,10 @@ class LinkTest extends \PHPUnit_Framework_TestCase
 
         $node = $dom->getElementsByTagName('div')->item(0);
 
-        try
-        {
+        try {
             new Link($node);
             $this->fail('__construct() throws a \LogicException if the node is not an "a" tag');
-        }
-        catch (\Exception $e)
-        {
+        } catch (\Exception $e) {
             $this->assertInstanceOf('\LogicException', $e, '__construct() throws a \LogicException if the node is not an "a" tag');
         }
     }

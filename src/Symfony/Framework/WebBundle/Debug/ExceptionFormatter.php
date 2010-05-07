@@ -53,17 +53,13 @@ class ExceptionFormatter
         ));
 
         $traces = array();
-        if ($format == 'html')
-        {
+        if ($format == 'html') {
             $lineFormat = 'at <strong>%s%s%s</strong>(%s)<br />in <em>%s</em> line %s <a href="#" onclick="toggle(\'%s\'); return false;">...</a><br /><ul class="code" id="%s" style="display: %s">%s</ul>';
-        }
-        else
-        {
+        } else {
             $lineFormat = 'at %s%s%s(%s) in %s line %s';
         }
 
-        for ($i = 0, $count = count($traceData); $i < $count; $i++)
-        {
+        for ($i = 0, $count = count($traceData); $i < $count; $i++) {
             $line = isset($traceData[$i]['line']) ? $traceData[$i]['line'] : null;
             $file = isset($traceData[$i]['file']) ? $traceData[$i]['file'] : null;
             $args = isset($traceData[$i]['args']) ? $traceData[$i]['args'] : array();
@@ -94,13 +90,11 @@ class ExceptionFormatter
      */
     protected function fileExcerpt($file, $line)
     {
-        if (is_readable($file))
-        {
+        if (is_readable($file)) {
             $content = preg_split('#<br />#', highlight_file($file, true));
 
             $lines = array();
-            for ($i = max($line - 3, 1), $max = min($line + 3, count($content)); $i <= $max; $i++)
-            {
+            for ($i = max($line - 3, 1), $max = min($line + 3, count($content)); $i <= $max; $i++) {
                 $lines[] = '<li'.($i == $line ? ' class="selected"' : '').'>'.$content[$i - 1].'</li>';
             }
 
@@ -123,26 +117,17 @@ class ExceptionFormatter
 
         $single and $args = array($args);
 
-        foreach ($args as $key => $value)
-        {
+        foreach ($args as $key => $value) {
             if (is_object($value))
             {
                 $formattedValue = ($format == 'html' ? '<em>object</em>' : 'object').sprintf("('%s')", get_class($value));
-            }
-            else if (is_array($value))
-            {
+            } else if (is_array($value)) {
                 $formattedValue = ($format == 'html' ? '<em>array</em>' : 'array').sprintf("(%s)", $this->formatArgs($value));
-            }
-            else if (is_string($value))
-            {
+            } else if (is_string($value)) {
                 $formattedValue = ($format == 'html' ? sprintf("'%s'", $this->escape($value)) : "'$value'");
-            }
-            else if (null === $value)
-            {
+            } else if (null === $value) {
                 $formattedValue = ($format == 'html' ? '<em>null</em>' : 'null');
-            }
-            else
-            {
+            } else {
                 $formattedValue = $value;
             }
 
@@ -164,14 +149,12 @@ class ExceptionFormatter
      */
     protected function formatFile($file, $line, $format = 'html', $text = null)
     {
-        if (null === $text)
-        {
+        if (null === $text) {
             $text = $file;
         }
 
         $linkFormat = $this->container->hasParameter('debug.file_link_format') ? $this->container->getParameter('debug.file_link_format') : ini_get('xdebug.file_link_format');
-        if ('html' === $format && $file && $line && $linkFormat)
-        {
+        if ('html' === $format && $file && $line && $linkFormat) {
             $link = strtr($linkFormat, array('%f' => $file, '%l' => $line));
             $text = sprintf('<a href="%s" title="Click to open this file" class="file_link">%s</a>', $link, $text);
         }
@@ -188,8 +171,7 @@ class ExceptionFormatter
      */
     protected function escape($value)
     {
-        if (!is_string($value))
-        {
+        if (!is_string($value)) {
             return $value;
         }
 

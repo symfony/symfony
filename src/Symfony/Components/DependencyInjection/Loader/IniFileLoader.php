@@ -41,13 +41,11 @@ class IniFileLoader extends FileLoader
         $configuration->addResource(new FileResource($path));
 
         $result = parse_ini_file($path, true);
-        if (false === $result || array() === $result)
-        {
+        if (false === $result || array() === $result) {
             throw new \InvalidArgumentException(sprintf('The %s file is not valid.', $file));
         }
 
-        if (isset($result['parameters']) && is_array($result['parameters']))
-        {
+        if (isset($result['parameters']) && is_array($result['parameters'])) {
             foreach ($result['parameters'] as $key => $value)
             {
                 $configuration->setParameter(strtolower($key), $value);

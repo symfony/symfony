@@ -30,35 +30,26 @@ class FormTest extends \PHPUnit_Framework_TestCase
 
         $nodes = $dom->getElementsByTagName('input');
 
-        try
-        {
+        try {
             $form = new Form($nodes->item(0));
             $this->fail('__construct() throws a \\LogicException if the node has no form ancestor');
-        }
-        catch (\LogicException $e)
-        {
+        } catch (\LogicException $e) {
             $this->assertTrue(true, '__construct() throws a \\LogicException if the node has no form ancestor');
         }
 
-        try
-        {
+        try {
             $form = new Form($nodes->item(1));
             $this->fail('__construct() throws a \\LogicException if the input type is not submit, button, or image');
-        }
-        catch (\LogicException $e)
-        {
+        } catch (\LogicException $e) {
             $this->assertTrue(true, '__construct() throws a \\LogicException if the input type is not submit, button, or image');
         }
 
         $nodes = $dom->getElementsByTagName('button');
 
-        try
-        {
+        try {
             $form = new Form($nodes->item(0));
             $this->fail('__construct() throws a \\LogicException if the input type is not submit, button, or image');
-        }
-        catch (\LogicException $e)
-        {
+        } catch (\LogicException $e) {
             $this->assertTrue(true, '__construct() throws a \\LogicException if the input type is not submit, button, or image');
         }
     }
@@ -171,23 +162,17 @@ class FormTest extends \PHPUnit_Framework_TestCase
         $this->assertEquals($form, $ret, '->setValue() implements a fluent interface');
         $this->assertEquals('bar', $form->getValue('foo'), '->setValue() changes the value of a form field');
 
-        try
-        {
+        try {
             $form->setValue('foobar', 'bar');
             $this->pass('->setValue() throws an \InvalidArgumentException exception if the field does not exist');
-        }
-        catch (\InvalidArgumentException $e)
-        {
+        } catch (\InvalidArgumentException $e) {
             $this->assertTrue(true, '->setValue() throws an \InvalidArgumentException exception if the field does not exist');
         }
 
-        try
-        {
+        try {
             $form->getValue('foobar');
             $this->pass('->getValue() throws an \InvalidArgumentException exception if the field does not exist');
-        }
-        catch (\InvalidArgumentException $e)
-        {
+        } catch (\InvalidArgumentException $e) {
             $this->assertTrue(true, '->getValue() throws an \InvalidArgumentException exception if the field does not exist');
         }
     }
@@ -320,13 +305,10 @@ class FormTest extends \PHPUnit_Framework_TestCase
 
         $this->assertEquals('Symfony\\Components\\DomCrawler\\Field\\InputFormField', get_class($form->getField('bar')), '->getField() returns the field object associated with the given name');
 
-        try
-        {
+        try {
             $form->getField('foo');
             $this->fail('->getField() throws an \InvalidArgumentException if the field does not exist');
-        }
-        catch (\InvalidArgumentException $e)
-        {
+        } catch (\InvalidArgumentException $e) {
             $this->assertTrue(true, '->getField() throws an \InvalidArgumentException if the field does not exist');
         }
     }

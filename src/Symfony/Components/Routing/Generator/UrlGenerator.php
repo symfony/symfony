@@ -56,13 +56,11 @@ class UrlGenerator implements UrlGeneratorInterface
      */
     public function generate($name, array $parameters, $absolute = false)
     {
-        if (null === $route = $this->routes->getRoute($name))
-        {
+        if (null === $route = $this->routes->getRoute($name)) {
             throw new \InvalidArgumentException(sprintf('Route "%s" does not exist.', $name));
         }
 
-        if (!isset($this->cache[$name]))
-        {
+        if (!isset($this->cache[$name])) {
             $this->cache[$name] = $route->compile();
         }
 
@@ -78,60 +76,48 @@ class UrlGenerator implements UrlGeneratorInterface
         $tparams = array_merge($defaults, $parameters);
 
         // all params must be given
-        if ($diff = array_diff_key($variables, $tparams))
-        {
+        if ($diff = array_diff_key($variables, $tparams)) {
             throw new \InvalidArgumentException(sprintf('The "%s" route has some missing mandatory parameters (%s).', $name, implode(', ', $diff)));
         }
 
         $url = '';
         $optional = true;
-        foreach ($tokens as $token)
-        {
+        foreach ($tokens as $token) {
             if ('variable' === $token[0])
             {
-                if (false === $optional || !isset($defaults[$token[3]]) || (isset($parameters[$token[3]]) && $parameters[$token[3]] != $defaults[$token[3]]))
-                {
+                if (false === $optional || !isset($defaults[$token[3]]) || (isset($parameters[$token[3]]) && $parameters[$token[3]] != $defaults[$token[3]])) {
                     // check requirement
-                    if (isset($requirements[$token[3]]) && !preg_match('#^'.$requirements[$token[3]].'$#', $tparams[$token[3]]))
-                    {
+                    if (isset($requirements[$token[3]]) && !preg_match('#^'.$requirements[$token[3]].'$#', $tparams[$token[3]])) {
                         throw new \InvalidArgumentException(sprintf('Parameter "%s" for route "%s" must match "%s" ("%s" given).', $token[3], $name, $requirements[$token[3]], $tparams[$token[3]]));
                     }
 
                     $url = $token[1].urlencode($tparams[$token[3]]).$url;
                     $optional = false;
                 }
-            }
-            elseif ('text' === $token[0])
-            {
+            } elseif ('text' === $token[0]) {
                 $url = $token[1].$token[2].$url;
                 $optional = false;
-            }
-            else
-            {
+            } else {
                 // handle custom tokens
-                if ($segment = call_user_func_array(array($this, 'generateFor'.ucfirst(array_shift($token))), array_merge(array($optional, $tparams), $token)))
-                {
+                if ($segment = call_user_func_array(array($this, 'generateFor'.ucfirst(array_shift($token))), array_merge(array($optional, $tparams), $token))) {
                     $url = $segment.$url;
                     $optional = false;
                 }
             }
         }
 
-        if (!$url)
-        {
+        if (!$url) {
             $url = '/';
         }
 
         // add a query string if needed
-        if ($extra = array_diff_key($parameters, $variables, $defaults))
-        {
+        if ($extra = array_diff_key($parameters, $variables, $defaults)) {
             $url .= '?'.http_build_query($extra);
         }
 
         $url = (isset($this->context['base_url']) ? $this->context['base_url'] : '').$url;
 
-        if ($absolute && isset($this->context['host']))
-        {
+        if ($absolute && isset($this->context['host'])) {
             $url = 'http'.(isset($this->context['is_secure']) && $this->context['is_secure'] ? 's' : '').'://'.$this->context['host'].$url;
         }
 

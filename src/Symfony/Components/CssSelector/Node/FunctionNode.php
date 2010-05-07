@@ -52,13 +52,11 @@ class FunctionNode implements NodeInterface
     public function toXpath()
     {
         $sel_path = $this->selector->toXpath();
-        if (in_array($this->name, self::$unsupported))
-        {
+        if (in_array($this->name, self::$unsupported)) {
             throw new SyntaxError(sprintf('The pseudo-class %s is not supported', $this->name));
         }
         $method = '_xpath_'.str_replace('-', '_', $this->name);
-        if (!method_exists($this, $method))
-        {
+        if (!method_exists($this, $method)) {
             throw new SyntaxError(sprintf('The pseudo-class %s is unknown', $this->name));
         }
 
@@ -68,22 +66,19 @@ class FunctionNode implements NodeInterface
     protected function _xpath_nth_child($xpath, $expr, $last = false, $addNameTest = true)
     {
         list($a, $b) = $this->parseSeries($expr);
-        if (!$a && !$b && !$last)
-        {
+        if (!$a && !$b && !$last) {
             // a=0 means nothing is returned...
             $xpath->addCondition('false() and position() = 0');
 
             return $xpath;
         }
 
-        if ($addNameTest)
-        {
+        if ($addNameTest) {
             $xpath->addNameTest();
         }
 
         $xpath->addStarPrefix();
-        if ($a == 0)
-        {
+        if ($a == 0) {
             if ($last)
             {
                 $b = sprintf('last() - %s', $b);
@@ -93,43 +88,32 @@ class FunctionNode implements NodeInterface
             return $xpath;
         }
 
-        if ($last)
-        {
+        if ($last) {
             // FIXME: I'm not sure if this is right
             $a = -$a;
             $b = -$b;
         }
 
-        if ($b > 0)
-        {
+        if ($b > 0) {
             $b_neg = -$b;
-        }
-        else
-        {
+        } else {
             $b_neg = sprintf('+%s', -$b);
         }
 
-        if ($a != 1)
-        {
+        if ($a != 1) {
             $expr = array(sprintf('(position() %s) mod %s = 0', $b_neg, $a));
-        }
-        else
-        {
+        } else {
             $expr = array();
         }
 
-        if ($b >= 0)
-        {
+        if ($b >= 0) {
             $expr[] = sprintf('position() >= %s', $b);
-        }
-        elseif ($b < 0 && $last)
-        {
+        } elseif ($b < 0 && $last) {
             $expr[] = sprintf('position() < (last() %s)', $b);
         }
         $expr = implode($expr, ' and ');
 
-        if ($expr)
-        {
+        if ($expr) {
             $xpath->addCondition($expr);
         }
 
@@ -150,8 +134,7 @@ class FunctionNode implements NodeInterface
 
     protected function _xpath_nth_of_type($xpath, $expr)
     {
-        if ($xpath->getElement() == '*')
-        {
+        if ($xpath->getElement() == '*') {
             throw new SyntaxError('*:nth-of-type() is not implemented');
         }
 
@@ -166,8 +149,7 @@ class FunctionNode implements NodeInterface
     protected function _xpath_contains($xpath, $expr)
     {
         // text content, minus tags, must contain expr
-        if ($expr instanceof ElementNode)
-        {
+        if ($expr instanceof ElementNode) {
             $expr = $expr->formatElement();
         }
 
@@ -194,69 +176,52 @@ class FunctionNode implements NodeInterface
     // Parses things like '1n+2', or 'an+b' generally, returning (a, b)
     protected function parseSeries($s)
     {
-        if ($s instanceof ElementNode)
-        {
+        if ($s instanceof ElementNode) {
             $s = $s->formatElement();
         }
 
-        if (!$s || $s == '*')
-        {
+        if (!$s || $s == '*') {
             // Happens when there's nothing, which the CSS parser thinks of as *
             return array(0, 0);
         }
 
-        if (is_string($s))
-        {
+        if (is_string($s)) {
             // Happens when you just get a number
             return array(0, $s);
         }
 
-        if ($s == 'odd')
-        {
+        if ($s == 'odd') {
             return array(2, 1);
         }
 
-        if ($s == 'even')
-        {
+        if ($s == 'even') {
             return array(2, 0);
         }
 
-        if ($s == 'n')
-        {
+        if ($s == 'n') {
             return array(1, 0);
         }
 
-        if (false === strpos($s, 'n'))
-        {
+        if (false === strpos($s, 'n')) {
             // Just a b
 
             return array(0, intval((string) $s));
         }
 
         list($a, $b) = explode('n', $s);
-        if (!$a)
-        {
+        if (!$a) {
             $a = 1;
-        }
-        elseif ($a == '-' || $a == '+')
-        {
+        } elseif ($a == '-' || $a == '+') {
             $a = intval($a.'1');
-        }
-        else
-        {
+        } else {
             $a = intval($a);
         }
 
-        if (!$b)
-        {
+        if (!$b) {
             $b = 0;
-        }
-        elseif ($b == '-' || $b == '+')
-        {
+        } elseif ($b == '-' || $b == '+') {
             $b = intval($b.'1');
-        }
-        else
-        {
+        } else {
             $b = intval($b);
         }
 

@@ -43,15 +43,13 @@ class XmlFileLoader extends FileLoader
         $collection->addResource(new FileResource($path));
 
         // process routes and imports
-        foreach ($xml->documentElement->childNodes as $node)
-        {
+        foreach ($xml->documentElement->childNodes as $node) {
             if (!$node instanceof \DOMElement)
             {
                 continue;
             }
 
-            switch ($node->tagName)
-            {
+            switch ($node->tagName) {
                 case 'route':
                     $this->parseRoute($collection, $node, $path);
                     break;
@@ -72,15 +70,13 @@ class XmlFileLoader extends FileLoader
         $requirements = array();
         $options = array();
 
-        foreach ($definition->childNodes as $node)
-        {
+        foreach ($definition->childNodes as $node) {
             if (!$node instanceof \DOMElement)
             {
                 continue;
             }
 
-            switch ($node->tagName)
-            {
+            switch ($node->tagName) {
                 case 'default':
                     $defaults[(string) $node->getAttribute('key')] = trim((string) $node->nodeValue);
                  break;
@@ -103,15 +99,11 @@ class XmlFileLoader extends FileLoader
     protected function parseImport(RouteCollection $collection, $node, $file)
     {
         $class = null;
-        if ($node->hasAttribute('class') && $import->getAttribute('class') !== get_class($this))
-        {
+        if ($node->hasAttribute('class') && $import->getAttribute('class') !== get_class($this)) {
             $class = (string) $node->getAttribute('class');
-        }
-        else
-        {
+        } else {
             // try to detect loader with the extension
-            switch (pathinfo((string) $node->getAttribute('resource'), PATHINFO_EXTENSION))
-            {
+            switch (pathinfo((string) $node->getAttribute('resource'), PATHINFO_EXTENSION)) {
                 case 'yml':
                     $class = 'Symfony\\Components\\Routing\\Loader\\YamlFileLoader';
                     break;
@@ -132,8 +124,7 @@ class XmlFileLoader extends FileLoader
     {
         $dom = new \DOMDocument();
         libxml_use_internal_errors(true);
-        if (!$dom->load($path, LIBXML_COMPACT))
-        {
+        if (!$dom->load($path, LIBXML_COMPACT)) {
             throw new \InvalidArgumentException(implode("\n", $this->getXmlErrors()));
         }
         $dom->validateOnParse = true;
@@ -150,8 +141,7 @@ class XmlFileLoader extends FileLoader
     protected function validate($dom, $file)
     {
         libxml_use_internal_errors(true);
-        if (!$dom->schemaValidate(__DIR__.'/schema/routing/routing-1.0.xsd'))
-        {
+        if (!$dom->schemaValidate(__DIR__.'/schema/routing/routing-1.0.xsd')) {
             throw new \InvalidArgumentException(implode("\n", $this->getXmlErrors()));
         }
         libxml_use_internal_errors(false);
@@ -160,8 +150,7 @@ class XmlFileLoader extends FileLoader
     protected function getXmlErrors()
     {
         $errors = array();
-        foreach (libxml_get_errors() as $error)
-        {
+        foreach (libxml_get_errors() as $error) {
             $errors[] = sprintf('[%s %s] %s (in %s - line %d, column %d)',
                 LIBXML_ERR_WARNING == $error->level ? 'WARNING' : 'ERROR',
                 $error->code,

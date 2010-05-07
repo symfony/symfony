@@ -41,12 +41,9 @@ class InputArgument
      */
     public function __construct($name, $mode = null, $description = '', $default = null)
     {
-        if (null === $mode)
-        {
+        if (null === $mode) {
             $mode = self::OPTIONAL;
-        }
-        else if (is_string($mode) || $mode > 7)
-        {
+        } else if (is_string($mode) || $mode > 7) {
             throw new \InvalidArgumentException(sprintf('Argument mode "%s" is not valid.', $mode));
         }
 
@@ -96,19 +93,15 @@ class InputArgument
      */
     public function setDefault($default = null)
     {
-        if (self::REQUIRED === $this->mode && null !== $default)
-        {
+        if (self::REQUIRED === $this->mode && null !== $default) {
             throw new \LogicException('Cannot set a default value except for Parameter::OPTIONAL mode.');
         }
 
-        if ($this->isArray())
-        {
+        if ($this->isArray()) {
             if (null === $default)
             {
                 $default = array();
-            }
-            else if (!is_array($default))
-            {
+            } else if (!is_array($default)) {
                 throw new \LogicException('A default value for an array argument must be an array.');
             }
         }

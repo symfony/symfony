@@ -37,8 +37,7 @@ class CrawlerTest extends \PHPUnit_Framework_TestCase
         $crawler->add($this->createNodeList());
         $this->assertEquals('foo', $crawler->filter('div')->attr('class'), '->add() adds nodes from a \DOMNodeList');
 
-        foreach ($this->createNodeList() as $node)
-        {
+        foreach ($this->createNodeList() as $node) {
             $list[] = $node;
         }
         $crawler = new Crawler();
@@ -125,8 +124,7 @@ class CrawlerTest extends \PHPUnit_Framework_TestCase
      */
     public function testAddNodes()
     {
-        foreach ($this->createNodeList() as $node)
-        {
+        foreach ($this->createNodeList() as $node) {
             $list[] = $node;
         }
 
@@ -199,13 +197,10 @@ class CrawlerTest extends \PHPUnit_Framework_TestCase
     {
         $this->assertEquals('first', $this->createTestCrawler()->filter('li')->attr('class'), '->attr() returns the attribute of the first element of the node list');
 
-        try
-        {
+        try {
             $this->createTestCrawler()->filter('ol')->attr('class');
             $this->fail('->attr() throws an \InvalidArgumentException if the node list is empty');
-        }
-        catch (\InvalidArgumentException $e)
-        {
+        } catch (\InvalidArgumentException $e) {
             $this->assertTrue(true, '->attr() throws an \InvalidArgumentException if the node list is empty');
         }
     }
@@ -214,13 +209,10 @@ class CrawlerTest extends \PHPUnit_Framework_TestCase
     {
         $this->assertEquals('One', $this->createTestCrawler()->filter('li')->text(), '->text() returns the node value of the first element of the node list');
 
-        try
-        {
+        try {
             $this->createTestCrawler()->filter('ol')->text();
             $this->fail('->text() throws an \InvalidArgumentException if the node list is empty');
-        }
-        catch (\InvalidArgumentException $e)
-        {
+        } catch (\InvalidArgumentException $e) {
             $this->assertTrue(true, '->text() throws an \InvalidArgumentException if the node list is empty');
         }
     }
@@ -311,13 +303,10 @@ class CrawlerTest extends \PHPUnit_Framework_TestCase
         $crawler = $this->createTestCrawler('http://example.com/bar')->selectLink('Foo');
         $this->assertEquals('http://example.com/foo', $crawler->link()->getUri(), '->form() linketurns a Link instance');
 
-        try
-        {
+        try {
             $this->createTestCrawler()->filter('ol')->link();
             $this->fail('->link() throws an \InvalidArgumentException if the node list is empty');
-        }
-        catch (\InvalidArgumentException $e)
-        {
+        } catch (\InvalidArgumentException $e) {
             $this->assertTrue(true, '->link() throws an \InvalidArgumentException if the node list is empty');
         }
     }
@@ -348,13 +337,10 @@ class CrawlerTest extends \PHPUnit_Framework_TestCase
         $crawler = $this->createTestCrawler('http://example.com/bar')->selectButton('FooValue');
         $this->assertEquals('http://example.com/foo?FooName=FooValue', $crawler->form()->getUri(), '->form() returns a Form instance');
 
-        try
-        {
+        try {
             $this->createTestCrawler()->filter('ol')->form();
             $this->fail('->form() throws an \InvalidArgumentException if the node list is empty');
-        }
-        catch (\InvalidArgumentException $e)
-        {
+        } catch (\InvalidArgumentException $e) {
             $this->assertTrue(true, '->form() throws an \InvalidArgumentException if the node list is empty');
         }
     }
@@ -393,13 +379,10 @@ class CrawlerTest extends \PHPUnit_Framework_TestCase
         $this->assertEquals('Two', $nodes->eq(0)->text());
         $this->assertEquals('Three', $nodes->eq(1)->text());
 
-        try
-        {
+        try {
             $this->createTestCrawler()->filter('ol')->siblings();
             $this->fail('->siblings() throws an \InvalidArgumentException if the node list is empty');
-        }
-        catch (\InvalidArgumentException $e)
-        {
+        } catch (\InvalidArgumentException $e) {
             $this->assertTrue(true, '->siblings() throws an \InvalidArgumentException if the node list is empty');
         }
     }
@@ -414,13 +397,10 @@ class CrawlerTest extends \PHPUnit_Framework_TestCase
         $this->assertEquals(1, $nodes->count());
         $this->assertEquals('Three', $nodes->eq(0)->text());
 
-        try
-        {
+        try {
             $this->createTestCrawler()->filter('ol')->nextAll();
             $this->fail('->nextAll() throws an \InvalidArgumentException if the node list is empty');
-        }
-        catch (\InvalidArgumentException $e)
-        {
+        } catch (\InvalidArgumentException $e) {
             $this->assertTrue(true, '->nextAll() throws an \InvalidArgumentException if the node list is empty');
         }
     }
@@ -435,13 +415,10 @@ class CrawlerTest extends \PHPUnit_Framework_TestCase
         $this->assertEquals(2, $nodes->count());
         $this->assertEquals('Two', $nodes->eq(0)->text());
 
-        try
-        {
+        try {
             $this->createTestCrawler()->filter('ol')->previousAll();
             $this->fail('->previousAll() throws an \InvalidArgumentException if the node list is empty');
-        }
-        catch (\InvalidArgumentException $e)
-        {
+        } catch (\InvalidArgumentException $e) {
             $this->assertTrue(true, '->previousAll() throws an \InvalidArgumentException if the node list is empty');
         }
     }
@@ -458,13 +435,10 @@ class CrawlerTest extends \PHPUnit_Framework_TestCase
         $this->assertEquals('Two', $nodes->eq(1)->text());
         $this->assertEquals('Three', $nodes->eq(2)->text());
 
-        try
-        {
+        try {
             $this->createTestCrawler()->filter('ol')->children();
             $this->fail('->children() throws an \InvalidArgumentException if the node list is empty');
-        }
-        catch (\InvalidArgumentException $e)
-        {
+        } catch (\InvalidArgumentException $e) {
             $this->assertTrue(true, '->children() throws an \InvalidArgumentException if the node list is empty');
         }
     }
@@ -481,13 +455,10 @@ class CrawlerTest extends \PHPUnit_Framework_TestCase
         $nodes = $this->createTestCrawler()->filter('html')->parents();
         $this->assertEquals(0, $nodes->count());
 
-        try
-        {
+        try {
             $this->createTestCrawler()->filter('ol')->parents();
             $this->fail('->parents() throws an \InvalidArgumentException if the node list is empty');
-        }
-        catch (\InvalidArgumentException $e)
-        {
+        } catch (\InvalidArgumentException $e) {
             $this->assertTrue(true, '->parents() throws an \InvalidArgumentException if the node list is empty');
         }
     }

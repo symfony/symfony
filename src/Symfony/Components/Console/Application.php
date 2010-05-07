@@ -104,22 +104,17 @@ class Application
      */
     public function run(InputInterface $input = null, OutputInterface $output = null)
     {
-        if (null === $input)
-        {
+        if (null === $input) {
             $input = new ArgvInput();
         }
 
-        if (null === $output)
-        {
+        if (null === $output) {
             $output = new ConsoleOutput();
         }
 
-        try
-        {
+        try {
             $statusCode = $this->doRun($input, $output);
-        }
-        catch (\Exception $e)
-        {
+        } catch (\Exception $e) {
             if (!$this->catchExceptions)
             {
                 throw $e;
@@ -131,14 +126,11 @@ class Application
             $statusCode = is_numeric($statusCode) && $statusCode ? $statusCode : 1;
         }
 
-        if ($this->autoExit)
-        {
+        if ($this->autoExit) {
             // @codeCoverageIgnoreStart
             exit($statusCode);
             // @codeCoverageIgnoreEnd
-        }
-        else
-        {
+        } else {
             return $statusCode;
         }
     }
@@ -155,47 +147,37 @@ class Application
     {
         $name = $input->getFirstArgument('command');
 
-        if (true === $input->hasParameterOption(array('--color', '-c')))
-        {
+        if (true === $input->hasParameterOption(array('--color', '-c'))) {
             $output->setDecorated(true);
         }
 
-        if (true === $input->hasParameterOption(array('--help', '-H')))
-        {
+        if (true === $input->hasParameterOption(array('--help', '-H'))) {
             if (!$name)
             {
                 $name = 'help';
                 $input = new ArrayInput(array('command' => 'help'));
-            }
-            else
-            {
+            } else {
                 $this->wantHelps = true;
             }
         }
 
-        if (true === $input->hasParameterOption(array('--no-interaction', '-n')))
-        {
+        if (true === $input->hasParameterOption(array('--no-interaction', '-n'))) {
             $input->setInteractive(false);
         }
 
-        if (true === $input->hasParameterOption(array('--quiet', '-q')))
-        {
+        if (true === $input->hasParameterOption(array('--quiet', '-q'))) {
             $output->setVerbosity(Output::VERBOSITY_QUIET);
-        }
-        elseif (true === $input->hasParameterOption(array('--verbose', '-v')))
-        {
+        } elseif (true === $input->hasParameterOption(array('--verbose', '-v'))) {
             $output->setVerbosity(Output::VERBOSITY_VERBOSE);
         }
 
-        if (true === $input->hasParameterOption(array('--version', '-V')))
-        {
+        if (true === $input->hasParameterOption(array('--version', '-V'))) {
             $output->writeln($this->getLongVersion());
 
             return 0;
         }
 
-        if (!$name)
-        {
+        if (!$name) {
             $name = 'list';
             $input = new ArrayInput(array('command' => 'list'));
         }
@@ -255,8 +237,7 @@ class Application
             '<comment>Options:</comment>',
         );
 
-        foreach ($this->definition->getOptions() as $option)
-        {
+        foreach ($this->definition->getOptions() as $option) {
             $messages[] = sprintf('  %-29s %s %s',
                 '<info>--'.$option->getName().'</info>',
                 $option->getShortcut() ? '<info>-'.$option->getShortcut().'</info>' : '  ',
@@ -334,12 +315,9 @@ class Application
      */
     public function getLongVersion()
     {
-        if ('UNKNOWN' !== $this->getName() && 'UNKNOWN' !== $this->getVersion())
-        {
+        if ('UNKNOWN' !== $this->getName() && 'UNKNOWN' !== $this->getVersion()) {
             return sprintf('<info>%s</info> version <comment>%s</comment>', $this->getName(), $this->getVersion());
-        }
-        else
-        {
+        } else {
             return '<info>Console Tool</info>';
         }
     }
@@ -363,8 +341,7 @@ class Application
      */
     public function addCommands(array $commands)
     {
-        foreach ($commands as $command)
-        {
+        foreach ($commands as $command) {
             $this->addCommand($command);
         }
     }
@@ -384,8 +361,7 @@ class Application
 
         $this->commands[$command->getFullName()] = $command;
 
-        foreach ($command->getAliases() as $alias)
-        {
+        foreach ($command->getAliases() as $alias) {
             $this->aliases[$alias] = $command;
         }
 
@@ -403,15 +379,13 @@ class Application
      */
     public function getCommand($name)
     {
-        if (!isset($this->commands[$name]) && !isset($this->aliases[$name]))
-        {
+        if (!isset($this->commands[$name]) && !isset($this->aliases[$name])) {
             throw new \InvalidArgumentException(sprintf('The command "%s" does not exist.', $name));
         }
 
         $command = isset($this->commands[$name]) ? $this->commands[$name] : $this->aliases[$name];
 
-        if ($this->wantHelps)
-        {
+        if ($this->wantHelps) {
             $this->wantHelps = false;
 
             $helpCommand = $this->getCommand('help');
@@ -445,8 +419,7 @@ class Application
     public function getNamespaces()
     {
         $namespaces = array();
-        foreach ($this->commands as $command)
-        {
+        foreach ($this->commands as $command) {
             if ($command->getNamespace())
             {
                 $namespaces[$command->getNamespace()] = true;
@@ -467,13 +440,11 @@ class Application
     {
         $abbrevs = static::getAbbreviations($this->getNamespaces());
 
-        if (!isset($abbrevs[$namespace]))
-        {
+        if (!isset($abbrevs[$namespace])) {
             throw new \InvalidArgumentException(sprintf('There are no commands defined in the "%s" namespace.', $namespace));
         }
 
-        if (count($abbrevs[$namespace]) > 1)
-        {
+        if (count($abbrevs[$namespace]) > 1) {
             throw new \InvalidArgumentException(sprintf('The namespace "%s" is ambiguous (%s).', $namespace, $this->getAbbreviationSuggestions($abbrevs[$namespace])));
         }
 
@@ -496,8 +467,7 @@ class Application
     {
         // namespace
         $namespace = '';
-        if (false !== $pos = strrpos($name, ':'))
-        {
+        if (false !== $pos = strrpos($name, ':')) {
             $namespace = $this->findNamespace(substr($name, 0, $pos));
             $name = substr($name, $pos + 1);
         }
@@ -506,8 +476,7 @@ class Application
 
         // name
         $commands = array();
-        foreach ($this->commands as $command)
-        {
+        foreach ($this->commands as $command) {
             if ($command->getNamespace() == $namespace)
             {
                 $commands[] = $command->getName();
@@ -515,13 +484,11 @@ class Application
         }
 
         $abbrevs = static::getAbbreviations($commands);
-        if (isset($abbrevs[$name]) && 1 == count($abbrevs[$name]))
-        {
+        if (isset($abbrevs[$name]) && 1 == count($abbrevs[$name])) {
             return $this->getCommand($namespace ? $namespace.':'.$abbrevs[$name][0] : $abbrevs[$name][0]);
         }
 
-        if (isset($abbrevs[$name]) && count($abbrevs[$name]) > 1)
-        {
+        if (isset($abbrevs[$name]) && count($abbrevs[$name]) > 1) {
             $suggestions = $this->getAbbreviationSuggestions(array_map(function ($command) use ($namespace) { return $namespace.':'.$command; }, $abbrevs[$name]));
 
             throw new \InvalidArgumentException(sprintf('Command "%s" is ambiguous (%s).', $fullName, $suggestions));
@@ -529,13 +496,11 @@ class Application
 
         // aliases
         $abbrevs = static::getAbbreviations(array_keys($this->aliases));
-        if (!isset($abbrevs[$fullName]))
-        {
+        if (!isset($abbrevs[$fullName])) {
             throw new \InvalidArgumentException(sprintf('Command "%s" is not defined.', $fullName));
         }
 
-        if (count($abbrevs[$fullName]) > 1)
-        {
+        if (count($abbrevs[$fullName]) > 1) {
             throw new \InvalidArgumentException(sprintf('Command "%s" is ambiguous (%s).', $fullName, $this->getAbbreviationSuggestions($abbrevs[$fullName])));
         }
 
@@ -553,14 +518,12 @@ class Application
      */
     public function getCommands($namespace = null)
     {
-        if (null === $namespace)
-        {
+        if (null === $namespace) {
             return $this->commands;
         }
 
         $commands = array();
-        foreach ($this->commands as $name => $command)
-        {
+        foreach ($this->commands as $name => $command) {
             if ($namespace === $command->getNamespace())
             {
                 $commands[$name] = $command;
@@ -580,25 +543,20 @@ class Application
     static public function getAbbreviations($names)
     {
         $abbrevs = array();
-        foreach ($names as $name)
-        {
+        foreach ($names as $name) {
             for ($len = strlen($name) - 1; $len > 0; --$len)
             {
                 $abbrev = substr($name, 0, $len);
-                if (!isset($abbrevs[$abbrev]))
-                {
+                if (!isset($abbrevs[$abbrev])) {
                     $abbrevs[$abbrev] = array($name);
-                }
-                else
-                {
+                } else {
                     $abbrevs[$abbrev][] = $name;
                 }
             }
         }
 
         // Non-abbreviations always get entered, even if they aren't unique
-        foreach ($names as $name)
-        {
+        foreach ($names as $name) {
             $abbrevs[$name] = array($name);
         }
 
@@ -617,32 +575,26 @@ class Application
         $commands = $namespace ? $this->getCommands($this->findNamespace($namespace)) : $this->commands;
 
         $messages = array($this->getHelp(), '');
-        if ($namespace)
-        {
+        if ($namespace) {
             $messages[] = sprintf("<comment>Available commands for the \"%s\" namespace:</comment>", $namespace);
-        }
-        else
-        {
+        } else {
             $messages[] = '<comment>Available commands:</comment>';
         }
 
         $width = 0;
-        foreach ($commands as $command)
-        {
+        foreach ($commands as $command) {
             $width = strlen($command->getName()) > $width ? strlen($command->getName()) : $width;
         }
         $width += 2;
 
         // add commands by namespace
-        foreach ($this->sortCommands($commands) as $space => $commands)
-        {
+        foreach ($this->sortCommands($commands) as $space => $commands) {
             if (!$namespace && '_global' !== $space)
             {
                 $messages[] = '<comment>'.$space.'</comment>';
             }
 
-            foreach ($commands as $command)
-            {
+            foreach ($commands as $command) {
                 $aliases = $command->getAliases() ? '<comment> ('.implode(', ', $command->getAliases()).')</comment>' : '';
 
                 $messages[] = sprintf("  <info>%-${width}s</info> %s%s", ($command->getNamespace() ? ':' : '').$command->getName(), $command->getDescription(), $aliases);
@@ -670,26 +622,21 @@ class Application
 
         $xml->appendChild($commandsXML = $dom->createElement('commands'));
 
-        if ($namespace)
-        {
+        if ($namespace) {
             $commandsXML->setAttribute('namespace', $namespace);
-        }
-        else
-        {
+        } else {
             $xml->appendChild($namespacesXML = $dom->createElement('namespaces'));
         }
 
         // add commands by namespace
-        foreach ($this->sortCommands($commands) as $space => $commands)
-        {
+        foreach ($this->sortCommands($commands) as $space => $commands) {
             if (!$namespace)
             {
                 $namespacesXML->appendChild($namespaceArrayXML = $dom->createElement('namespace'));
                 $namespaceArrayXML->setAttribute('id', $space);
             }
 
-            foreach ($commands as $command)
-            {
+            foreach ($commands as $command) {
                 if (!$namespace)
                 {
                     $namespaceArrayXML->appendChild($commandXML = $dom->createElement('command'));
@@ -725,36 +672,31 @@ class Application
         $title = sprintf('  [%s]  ', get_class($e));
         $len = $strlen($title);
         $lines = array();
-        foreach (explode("\n", $e->getMessage()) as $line)
-        {
+        foreach (explode("\n", $e->getMessage()) as $line) {
             $lines[] = sprintf('  %s  ', $line);
             $len = max($strlen($line) + 4, $len);
         }
 
         $messages = array(str_repeat(' ', $len), $title.str_repeat(' ', $len - $strlen($title)));
 
-        foreach ($lines as $line)
-        {
+        foreach ($lines as $line) {
             $messages[] = $line.str_repeat(' ', $len - $strlen($line));
         }
 
         $messages[] = str_repeat(' ', $len);
 
         $output->writeln("\n");
-        foreach ($messages as $message)
-        {
+        foreach ($messages as $message) {
             $output->writeln('<error>'.$message.'</error>');
         }
         $output->writeln("\n");
 
-        if (null !== $this->runningCommand)
-        {
+        if (null !== $this->runningCommand) {
             $output->writeln(sprintf('<info>%s</info>', sprintf($this->runningCommand->getSynopsis(), $this->getName())));
             $output->writeln("\n");
         }
 
-        if (Output::VERBOSITY_VERBOSE === $output->getVerbosity())
-        {
+        if (Output::VERBOSITY_VERBOSE === $output->getVerbosity()) {
             $output->writeln('</comment>Exception trace:</comment>');
 
             // exception related properties
@@ -766,8 +708,7 @@ class Application
                 'args'     => array(),
             ));
 
-            for ($i = 0, $count = count($trace); $i < $count; $i++)
-            {
+            for ($i = 0, $count = count($trace); $i < $count; $i++) {
                 $class = isset($trace[$i]['class']) ? $trace[$i]['class'] : '';
                 $type = isset($trace[$i]['type']) ? $trace[$i]['type'] : '';
                 $function = $trace[$i]['function'];
@@ -784,12 +725,10 @@ class Application
     private function sortCommands($commands)
     {
         $namespacedCommands = array();
-        foreach ($commands as $name => $command)
-        {
+        foreach ($commands as $name => $command) {
             $key = $command->getNamespace() ? $command->getNamespace() : '_global';
 
-            if (!isset($namespacedCommands[$key]))
-            {
+            if (!isset($namespacedCommands[$key])) {
                 $namespacedCommands[$key] = array();
             }
 
@@ -797,8 +736,7 @@ class Application
         }
         ksort($namespacedCommands);
 
-        foreach ($namespacedCommands as $name => &$commands)
-        {
+        foreach ($namespacedCommands as $name => &$commands) {
             ksort($commands);
         }
 

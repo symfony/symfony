@@ -53,13 +53,11 @@ class CrossCheckTest extends \PHPUnit_Framework_TestCase
         $this->assertEquals($container2->getParameters(), $container1->getParameters(), '->getParameters() returns the same value for both containers');
 
         $services1 = array();
-        foreach ($container1 as $id => $service)
-        {
+        foreach ($container1 as $id => $service) {
             $services1[$id] = serialize($service);
         }
         $services2 = array();
-        foreach ($container2 as $id => $service)
-        {
+        foreach ($container2 as $id => $service) {
             $services2[$id] = serialize($service);
         }
 

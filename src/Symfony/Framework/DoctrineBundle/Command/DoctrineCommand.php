@@ -60,8 +60,7 @@ abstract class DoctrineCommand extends Command
         $container = $application->getKernel()->getContainer();
         $emName = $emName ? $emName : 'default';
         $emServiceName = sprintf('doctrine.orm.%s_entity_manager', $emName);
-        if (!$container->hasService($emServiceName))
-        {
+        if (!$container->hasService($emServiceName)) {
             throw new \InvalidArgumentException(sprintf('Could not find Doctrine EntityManager named "%s"', $emName));
         }
 
@@ -76,8 +75,7 @@ abstract class DoctrineCommand extends Command
         $container = $application->getKernel()->getContainer();
         $connName = $connName ? $connName : 'default';
         $connServiceName = sprintf('doctrine.dbal.%s_connection', $connName);
-        if (!$container->hasService($connServiceName))
-        {
+        if (!$container->hasService($connServiceName)) {
             throw new \InvalidArgumentException(sprintf('Could not find Doctrine Connection named "%s"', $connName));
         }
 
@@ -102,8 +100,7 @@ abstract class DoctrineCommand extends Command
     {
         $name = $name ? $name : 'default';
         $serviceName = sprintf('doctrine.orm.%s_entity_manager', $name);
-        if (!$this->container->hasService($serviceName))
-        {
+        if (!$this->container->hasService($serviceName)) {
             throw new \InvalidArgumentException(sprintf('Could not find Doctrine EntityManager named "%s"', $name));
         }
 
@@ -129,11 +126,9 @@ abstract class DoctrineCommand extends Command
     {
         $connections = array();
         $ids = $this->container->getServiceIds();
-        foreach ($ids as $id)
-        {
+        foreach ($ids as $id) {
             preg_match('/doctrine.dbal.(.*)_connection/', $id, $matches);
-            if ($matches)
-            {
+            if ($matches) {
                 $name = $matches[1];
                 $connections[$name] = $this->container->getService($id);
             }
@@ -146,11 +141,9 @@ abstract class DoctrineCommand extends Command
     {
         $entityManagers = array();
         $ids = $this->container->getServiceIds();
-        foreach ($ids as $id)
-        {
+        foreach ($ids as $id) {
             preg_match('/doctrine.orm.(.*)_entity_manager/', $id, $matches);
-            if ($matches)
-            {
+            if ($matches) {
                 $name = $matches[1];
                 $entityManagers[$name] = $this->container->getService($id);
             }
@@ -166,12 +159,10 @@ abstract class DoctrineCommand extends Command
 
         $bundleMetadatas = array();
         $entityManagers = $this->getDoctrineEntityManagers();
-        foreach ($entityManagers as $key => $em)
-        {
+        foreach ($entityManagers as $key => $em) {
             $cmf = new SymfonyDisconnectedClassMetadataFactory($em);
             $metadatas = $cmf->getAllMetadata();
-            foreach ($metadatas as $metadata)
-            {
+            foreach ($metadatas as $metadata) {
                 if (strpos($metadata->name, $namespace) !== false)
                 {
                     $bundleMetadatas[] = $metadata;
@@ -189,12 +180,9 @@ class SymfonyDisconnectedClassMetadataFactory extends DisconnectedClassMetadataF
      */
     protected function _newClassMetadataInstance($className)
     {
-        if (class_exists($className))
-        {
+        if (class_exists($className)) {
             return new ClassMetadata($className);
-        }
-        else
-        {
+        } else {
             return new ClassMetadataInfo($className);
         }
     }

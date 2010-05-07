@@ -121,12 +121,10 @@ class ProjectServiceContainer extends Container
         $this->shared['method_call1'] = $instance;
         $instance->setBar($this->getFooService());
         $instance->setBar($this->getService('foo', Container::NULL_ON_INVALID_REFERENCE));
-        if ($this->hasService('foo'))
-        {
+        if ($this->hasService('foo')) {
             $instance->setBar($this->getService('foo', Container::NULL_ON_INVALID_REFERENCE));
         }
-        if ($this->hasService('foobaz'))
-        {
+        if ($this->hasService('foobaz')) {
             $instance->setBar($this->getService('foobaz', Container::NULL_ON_INVALID_REFERENCE));
         }
 

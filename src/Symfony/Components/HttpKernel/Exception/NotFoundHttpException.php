@@ -22,8 +22,7 @@ class NotFoundHttpException extends HttpException
 {
     public function __construct($message = '')
     {
-        if (!$message)
-        {
+        if (!$message) {
             $message = 'Not Found';
         }
 

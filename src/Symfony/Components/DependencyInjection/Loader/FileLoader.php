@@ -29,8 +29,7 @@ abstract class FileLoader extends Loader
      */
     public function __construct($paths = array())
     {
-        if (!is_array($paths))
-        {
+        if (!is_array($paths)) {
             $paths = array($paths);
         }
 
@@ -43,8 +42,7 @@ abstract class FileLoader extends Loader
     protected function findFile($file)
     {
         $path = $this->getAbsolutePath($file);
-        if (!file_exists($path))
-        {
+        if (!file_exists($path)) {
             throw new \InvalidArgumentException(sprintf('The file "%s" does not exist (in: %s).', $file, implode(', ', $this->paths)));
         }
 
@@ -53,20 +51,14 @@ abstract class FileLoader extends Loader
 
     protected function getAbsolutePath($file, $currentPath = null)
     {
-        if (self::isAbsolutePath($file))
-        {
+        if (self::isAbsolutePath($file)) {
             return $file;
-        }
-        else if (null !== $currentPath && file_exists($currentPath.DIRECTORY_SEPARATOR.$file))
-        {
+        } else if (null !== $currentPath && file_exists($currentPath.DIRECTORY_SEPARATOR.$file)) {
             return $currentPath.DIRECTORY_SEPARATOR.$file;
-        }
-        else
-        {
+        } else {
             foreach ($this->paths as $path)
             {
-                if (file_exists($path.DIRECTORY_SEPARATOR.$file))
-                {
+                if (file_exists($path.DIRECTORY_SEPARATOR.$file)) {
                     return $path.DIRECTORY_SEPARATOR.$file;
                 }
             }

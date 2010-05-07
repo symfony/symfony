@@ -34,8 +34,7 @@ class Controller
 
     public function getRequest()
     {
-        if (null === $this->request)
-        {
+        if (null === $this->request) {
             $this->request = $this->container->getRequestService();
         }
 
@@ -62,8 +61,7 @@ class Controller
         $response = $this->container->getResponseService();
         $response->setContent($content);
         $response->setStatusCode($status);
-        foreach ($headers as $name => $value)
-        {
+        foreach ($headers as $name => $value) {
             $response->headers->set($name, $value);
         }
 
@@ -117,8 +115,7 @@ class Controller
      */
     public function render($view, array $parameters = array(), Response $response = null)
     {
-        if (null === $response)
-        {
+        if (null === $response) {
             $response = $this->container->getResponseService();
         }
 

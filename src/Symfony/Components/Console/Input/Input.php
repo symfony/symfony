@@ -38,12 +38,9 @@ abstract class Input implements InputInterface
      */
     public function __construct(InputDefinition $definition = null)
     {
-        if (null === $definition)
-        {
+        if (null === $definition) {
             $this->definition = new InputDefinition();
-        }
-        else
-        {
+        } else {
             $this->bind($definition);
             $this->validate();
         }
@@ -73,8 +70,7 @@ abstract class Input implements InputInterface
      */
     public function validate()
     {
-        if (count($this->arguments) < $this->definition->getArgumentRequiredCount())
-        {
+        if (count($this->arguments) < $this->definition->getArgumentRequiredCount()) {
             throw new \RuntimeException('Not enough arguments.');
         }
     }
@@ -110,8 +106,7 @@ abstract class Input implements InputInterface
      */
     public function getArgument($name)
     {
-        if (!$this->definition->hasArgument($name))
-        {
+        if (!$this->definition->hasArgument($name)) {
             throw new \InvalidArgumentException(sprintf('The "%s" argument does not exist.', $name));
         }
 
@@ -128,8 +123,7 @@ abstract class Input implements InputInterface
      */
     public function setArgument($name, $value)
     {
-        if (!$this->definition->hasArgument($name))
-        {
+        if (!$this->definition->hasArgument($name)) {
             throw new \InvalidArgumentException(sprintf('The "%s" argument does not exist.', $name));
         }
 
@@ -169,8 +163,7 @@ abstract class Input implements InputInterface
      */
     public function getOption($name)
     {
-        if (!$this->definition->hasOption($name))
-        {
+        if (!$this->definition->hasOption($name)) {
             throw new \InvalidArgumentException(sprintf('The "%s" option does not exist.', $name));
         }
 
@@ -187,8 +180,7 @@ abstract class Input implements InputInterface
      */
     public function setOption($name, $value)
     {
-        if (!$this->definition->hasOption($name))
-        {
+        if (!$this->definition->hasOption($name)) {
             throw new \InvalidArgumentException(sprintf('The "%s" option does not exist.', $name));
         }
 

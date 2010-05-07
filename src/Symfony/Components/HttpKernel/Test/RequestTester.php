@@ -126,8 +126,7 @@ class RequestTester extends Tester
      */
     public function assertCookieEquals($name, $value)
     {
-        if (!$this->request->cookies->has($name))
-        {
+        if (!$this->request->cookies->has($name)) {
             return $this->test->fail(sprintf('Cookie "%s" does not exist.', $name));
         }
 
@@ -142,8 +141,7 @@ class RequestTester extends Tester
      */
     public function assertCookieRegExp($name, $regexp)
     {
-        if (!$this->request->cookies->has($name))
-        {
+        if (!$this->request->cookies->has($name)) {
             return $this->test->fail(sprintf('cookie "%s" does not exist.', $name));
         }
 
@@ -158,8 +156,7 @@ class RequestTester extends Tester
      */
     public function assertNotCookieRegExp($name, $regexp)
     {
-        if (!$this->request->cookies->has($name))
-        {
+        if (!$this->request->cookies->has($name)) {
             return $this->test->fail(sprintf('Cookie "%s" does not exist.', $name));
         }
 

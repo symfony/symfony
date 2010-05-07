@@ -37,8 +37,7 @@ class Mustache
 
     static public function renderDir($dir, $parameters)
     {
-        foreach (new \RecursiveIteratorIterator(new \RecursiveDirectoryIterator($dir), \RecursiveIteratorIterator::LEAVES_ONLY) as $file)
-        {
+        foreach (new \RecursiveIteratorIterator(new \RecursiveDirectoryIterator($dir), \RecursiveIteratorIterator::LEAVES_ONLY) as $file) {
             static::renderFile((string) $file, $parameters);
         }
     }

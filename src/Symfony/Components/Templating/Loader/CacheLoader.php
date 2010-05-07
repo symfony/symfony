@@ -61,13 +61,11 @@ class CacheLoader extends Loader
         $file = substr($tmp, 2);
         $path = $dir.DIRECTORY_SEPARATOR.$file;
 
-        if ($this->loader instanceof CompilableLoaderInterface)
-        {
+        if ($this->loader instanceof CompilableLoaderInterface) {
             $options['renderer'] = 'php';
         }
 
-        if (file_exists($path))
-        {
+        if (file_exists($path)) {
             if (null !== $this->debugger)
             {
                 $this->debugger->log(sprintf('Fetching template "%s" from cache', $template));
@@ -76,27 +74,23 @@ class CacheLoader extends Loader
             return new FileStorage($path, $options['renderer']);
         }
 
-        if (false === $storage = $this->loader->load($template, $options))
-        {
+        if (false === $storage = $this->loader->load($template, $options)) {
             return false;
         }
 
         $content = $storage->getContent();
 
-        if ($this->loader instanceof CompilableLoaderInterface)
-        {
+        if ($this->loader instanceof CompilableLoaderInterface) {
             $content = $this->loader->compile($content);
         }
 
-        if (!file_exists($dir))
-        {
+        if (!file_exists($dir)) {
             mkdir($dir, 0777, true);
         }
 
         file_put_contents($path, $content);
 
-        if (null !== $this->debugger)
-        {
+        if (null !== $this->debugger) {
             $this->debugger->log(sprintf('Storing template "%s" in cache', $template));
         }
 

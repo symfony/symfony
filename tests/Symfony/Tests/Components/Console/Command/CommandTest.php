@@ -36,13 +36,10 @@ class CommandTest extends \PHPUnit_Framework_TestCase
     public function testConstructor()
     {
         $application = new Application();
-        try
-        {
+        try {
             $command = new Command();
             $this->fail('__construct() throws a \LogicException if the name is null');
-        }
-        catch (\Exception $e)
-        {
+        } catch (\Exception $e) {
             $this->assertInstanceOf('\LogicException', $e, '__construct() throws a \LogicException if the name is null');
             $this->assertEquals('The command name cannot be empty.', $e->getMessage(), '__construct() throws a \LogicException if the name is null');
         }
@@ -104,24 +101,18 @@ class CommandTest extends \PHPUnit_Framework_TestCase
         $this->assertEquals('bar', $command->getName(), '->setName() sets the command name');
         $this->assertEquals('foobar', $command->getNamespace(), '->setName() can set the command namespace');
 
-        try
-        {
+        try {
             $command->setName('');
             $this->fail('->setName() throws an \InvalidArgumentException if the name is empty');
-        }
-        catch (\Exception $e)
-        {
+        } catch (\Exception $e) {
             $this->assertInstanceOf('\InvalidArgumentException', $e, '->setName() throws an \InvalidArgumentException if the name is empty');
             $this->assertEquals('A command name cannot be empty.', $e->getMessage(), '->setName() throws an \InvalidArgumentException if the name is empty');
         }
 
-        try
-        {
+        try {
             $command->setName('foo:');
             $this->fail('->setName() throws an \InvalidArgumentException if the name is empty');
-        }
-        catch (\Exception $e)
-        {
+        } catch (\Exception $e) {
             $this->assertInstanceOf('\InvalidArgumentException', $e, '->setName() throws an \InvalidArgumentException if the name is empty');
             $this->assertEquals('A command name cannot be empty.', $e->getMessage(), '->setName() throws an \InvalidArgumentException if the name is empty');
         }
@@ -207,13 +198,10 @@ class CommandTest extends \PHPUnit_Framework_TestCase
         $application = new Application();
         $command->setApplication($application);
         $tester = new CommandTester($command);
-        try
-        {
+        try {
             $tester->execute(array('--bar' => true));
             $this->fail('->run() throws a \InvalidArgumentException when the input does not validate the current InputDefinition');
-        }
-        catch (\Exception $e)
-        {
+        } catch (\Exception $e) {
             $this->assertInstanceOf('\InvalidArgumentException', $e, '->run() throws a \InvalidArgumentException when the input does not validate the current InputDefinition');
             $this->assertEquals('The "--bar" option does not exist.', $e->getMessage(), '->run() throws a \InvalidArgumentException when the input does not validate the current InputDefinition');
         }
@@ -222,13 +210,10 @@ class CommandTest extends \PHPUnit_Framework_TestCase
         $this->assertEquals('execute called'.PHP_EOL, $tester->execute(array(), array('interactive' => false)), '->run() does not call the interact() method if the input is not interactive');
 
         $command = new Command('foo');
-        try
-        {
+        try {
             $command->run(new StringInput(''), new NullOutput());
             $this->fail('->run() throws a \LogicException if the execute() method has not been overriden and no code has been provided');
-        }
-        catch (\Exception $e)
-        {
+        } catch (\Exception $e) {
             $this->assertInstanceOf('\LogicException', $e, '->run() throws a \LogicException if the execute() method has not been overriden and no code has been provided');
             $this->assertEquals('You must override the execute() method in the concrete command class.', $e->getMessage(), '->run() throws a \LogicException if the execute() method has not been overriden and no code has been provided');
         }

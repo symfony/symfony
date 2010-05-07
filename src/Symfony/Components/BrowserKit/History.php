@@ -71,8 +71,7 @@ class History
      */
     public function back()
     {
-        if ($this->position < 1)
-        {
+        if ($this->position < 1) {
             throw new \LogicException('You are already on the first page.');
         }
 
@@ -88,8 +87,7 @@ class History
      */
     public function forward()
     {
-        if ($this->position > count($this->stack) - 2)
-        {
+        if ($this->position > count($this->stack) - 2) {
             throw new \LogicException('You are already on the last page.');
         }
 
@@ -105,8 +103,7 @@ class History
      */
     public function current()
     {
-        if (-1 == $this->position)
-        {
+        if (-1 == $this->position) {
             throw new \LogicException('The page history is empty.');
         }
 

@@ -31,8 +31,7 @@ class ProfilerExtension extends LoaderExtension
         $loader = new XmlFileLoader(__DIR__.'/../Resources/config');
         $configuration->merge($loader->load('collectors.xml'));
 
-        if (isset($config['toolbar']) && $config['toolbar'])
-        {
+        if (isset($config['toolbar']) && $config['toolbar']) {
             $configuration->merge($loader->load('toolbar.xml'));
         }
 

@@ -37,26 +37,20 @@ class ArrayDecoratorTest extends \PHPUnit_Framework_TestCase
 
         $this->assertTrue(isset(self::$escaped[1]), 'The escaped object behaves like an array (isset)');
 
-        try
-        {
+        try {
             unset(self::$escaped[0]);
 
             $this->fail('The escaped object is read only (unset)');
-        }
-        catch (\Exception $e)
-        {
+        } catch (\Exception $e) {
             $this->assertInstanceOf('\LogicException', $e, 'The escaped object is read only (unset)');
             $this->assertEquals('Cannot unset values.', $e->getMessage(), 'The escaped object is read only (unset)');
         }
 
-        try
-        {
+        try {
             self::$escaped[0] = 12;
 
             $this->fail('The escaped object is read only (set)');
-        }
-        catch (\Exception $e)
-        {
+        } catch (\Exception $e) {
             $this->assertInstanceOf('\LogicException', $e, 'The escaped object is read only (set)');
             $this->assertEquals('Cannot set values.', $e->getMessage(), 'The escaped object is read only (set)');
         }
@@ -64,8 +58,7 @@ class ArrayDecoratorTest extends \PHPUnit_Framework_TestCase
 
     public function testIteratorInterface()
     {
-        foreach (self::$escaped as $key => $value)
-        {
+        foreach (self::$escaped as $key => $value) {
             switch ($key)
             {
                 case 0:

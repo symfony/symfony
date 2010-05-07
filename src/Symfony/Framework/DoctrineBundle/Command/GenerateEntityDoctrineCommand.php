@@ -58,8 +58,7 @@ EOT
      */
     protected function execute(InputInterface $input, OutputInterface $output)
     {
-        if (!preg_match('/Bundle$/', $bundle = $input->getArgument('bundle')))
-        {
+        if (!preg_match('/Bundle$/', $bundle = $input->getArgument('bundle'))) {
             throw new \InvalidArgumentException('The bundle name must end with Bundle. Example: "Bundle\MySampleBundle".');
         }
 
@@ -69,8 +68,7 @@ EOT
         $namespace = str_replace('/', '\\', dirname($tmp));
         $bundle = basename($tmp);
 
-        if (!isset($dirs[$namespace]))
-        {
+        if (!isset($dirs[$namespace])) {
             throw new \InvalidArgumentException(sprintf('Unable to initialize the bundle entity (%s not defined).', $namespace));
         }
 
@@ -90,8 +88,7 @@ EOT
         // Map the specified fields
         $fields = $input->getOption('fields');
         $e = explode(' ', $fields);
-        foreach ($e as $value)
-        {
+        foreach ($e as $value) {
             $e = explode(':', $value);
             $name = $e[0];
             $type = isset($e[1]) ? $e[1] : 'string';
@@ -109,8 +106,7 @@ EOT
         $cme = new ClassMetadataExporter();
         $exporter = $cme->getExporter($mappingType);
 
-        if ($mappingType === 'annotation')
-        {
+        if ($mappingType === 'annotation') {
             $path = $dirs[$namespace].'/'.$bundle.'/Entities/'.str_replace($entityNamespace.'\\', null, $fullEntityClassName).'.php';
 
             $exporter->setEntityGenerator($this->getEntityGenerator());
@@ -120,8 +116,7 @@ EOT
 
         $code = $exporter->exportClassMetadata($class);
 
-        if (!is_dir($dir = dirname($path)))
-        {
+        if (!is_dir($dir = dirname($path))) {
             mkdir($dir, 0777, true);
         }
 

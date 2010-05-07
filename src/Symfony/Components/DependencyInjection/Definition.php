@@ -140,8 +140,7 @@ class Definition
     public function setMethodCalls(array $calls = array())
     {
         $this->calls = array();
-        foreach ($calls as $call)
-        {
+        foreach ($calls as $call) {
             $this->addMethodCall($call[0], $call[1]);
         }
 
@@ -192,8 +191,7 @@ class Definition
      */
     public function getAnnotation($name)
     {
-        if (!isset($this->annotations[$name]))
-        {
+        if (!isset($this->annotations[$name])) {
             $this->annotations[$name] = array();
         }
 
@@ -210,8 +208,7 @@ class Definition
      */
     public function addAnnotation($name, array $attributes = array())
     {
-        if (!isset($this->annotations[$name]))
-        {
+        if (!isset($this->annotations[$name])) {
             $this->annotations[$name] = array();
         }
 

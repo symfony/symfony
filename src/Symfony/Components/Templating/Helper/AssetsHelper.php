@@ -81,8 +81,7 @@ class AssetsHelper extends Helper
      */
     public function setBasePath($basePath)
     {
-        if (strlen($basePath) && '/' != $basePath[0])
-        {
+        if (strlen($basePath) && '/' != $basePath[0]) {
             $basePath = '/'.$basePath;
         }
 
@@ -100,13 +99,11 @@ class AssetsHelper extends Helper
     {
         $count = count($this->baseURLs);
 
-        if (0 === $count)
-        {
+        if (0 === $count) {
             return '';
         }
 
-        if (1 === $count)
-        {
+        if (1 === $count) {
             return $this->baseURLs[0];
         }
 
@@ -134,14 +131,12 @@ class AssetsHelper extends Helper
      */
     public function setBaseURLs($baseURLs)
     {
-        if (!is_array($baseURLs))
-        {
+        if (!is_array($baseURLs)) {
             $baseURLs = array($baseURLs);
         }
 
         $this->baseURLs = array();
-        foreach ($baseURLs as $URL)
-        {
+        foreach ($baseURLs as $URL) {
             $this->baseURLs[] = rtrim($URL, '/');
         }
     }
@@ -155,13 +150,11 @@ class AssetsHelper extends Helper
      */
     public function getUrl($path)
     {
-        if (strpos($path, '://'))
-        {
+        if (strpos($path, '://')) {
             return $path;
         }
 
-        if (0 !== strpos($path, '/'))
-        {
+        if (0 !== strpos($path, '/')) {
             $path = $this->basePath.$path;
         }
 

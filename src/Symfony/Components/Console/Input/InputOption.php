@@ -44,30 +44,24 @@ class InputOption
      */
     public function __construct($name, $shortcut = null, $mode = null, $description = '', $default = null)
     {
-        if ('--' === substr($name, 0, 2))
-        {
+        if ('--' === substr($name, 0, 2)) {
             $name = substr($name, 2);
         }
 
-        if (empty($shortcut))
-        {
+        if (empty($shortcut)) {
             $shortcut = null;
         }
 
-        if (null !== $shortcut)
-        {
+        if (null !== $shortcut) {
             if ('-' === $shortcut[0])
             {
                 $shortcut = substr($shortcut, 1);
             }
         }
 
-        if (null === $mode)
-        {
+        if (null === $mode) {
             $mode = self::PARAMETER_NONE;
-        }
-        else if (!is_int($mode) || $mode > 15)
-        {
+        } else if (!is_int($mode) || $mode > 15) {
             throw new \InvalidArgumentException(sprintf('Option mode "%s" is not valid.', $mode));
         }
 
@@ -76,8 +70,7 @@ class InputOption
         $this->mode        = $mode;
         $this->description = $description;
 
-        if ($this->isArray() && !$this->acceptParameter())
-        {
+        if ($this->isArray() && !$this->acceptParameter()) {
             throw new \InvalidArgumentException('Impossible to have an option mode PARAMETER_IS_ARRAY if the option does not accept a parameter.');
         }
 
@@ -151,19 +144,15 @@ class InputOption
      */
     public function setDefault($default = null)
     {
-        if (self::PARAMETER_NONE === (self::PARAMETER_NONE & $this->mode) && null !== $default)
-        {
+        if (self::PARAMETER_NONE === (self::PARAMETER_NONE & $this->mode) && null !== $default) {
             throw new \LogicException('Cannot set a default value when using Option::PARAMETER_NONE mode.');
         }
 
-        if ($this->isArray())
-        {
+        if ($this->isArray()) {
             if (null === $default)
             {
                 $default = array();
-            }
-            elseif (!is_array($default))
-            {
+            } elseif (!is_array($default)) {
                 throw new \LogicException('A default value for an array option must be an array.');
             }
         }

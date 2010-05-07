@@ -63,8 +63,7 @@ class Router implements RouterInterface
         );
 
         // check option names
-        if ($diff = array_diff(array_keys($options), array_keys($this->options)))
-        {
+        if ($diff = array_diff(array_keys($options), array_keys($this->options))) {
             throw new \InvalidArgumentException(sprintf('The Router does not support the following options: \'%s\'.', implode('\', \'', $diff)));
         }
 
@@ -78,8 +77,7 @@ class Router implements RouterInterface
      */
     public function getRouteCollection()
     {
-        if (null === $this->collection)
-        {
+        if (null === $this->collection) {
             $this->collection = call_user_func($this->loader);
         }
 
@@ -141,19 +139,16 @@ class Router implements RouterInterface
      */
     public function getMatcher()
     {
-        if (null !== $this->matcher)
-        {
+        if (null !== $this->matcher) {
             return $this->matcher;
         }
 
-        if (null === $this->options['cache_dir'] || null === $this->options['matcher_cache_class'])
-        {
+        if (null === $this->options['cache_dir'] || null === $this->options['matcher_cache_class']) {
             return $this->matcher = new $this->options['matcher_class']($this->getRouteCollection(), $this->context, $this->defaults);
         }
 
         $class = $this->options['matcher_cache_class'];
-        if ($this->needsReload($class))
-        {
+        if ($this->needsReload($class)) {
             $dumper = new $this->options['matcher_dumper_class']($this->getRouteCollection());
 
             $options = array(
@@ -176,19 +171,16 @@ class Router implements RouterInterface
      */
     public function getGenerator()
     {
-        if (null !== $this->generator)
-        {
+        if (null !== $this->generator) {
             return $this->generator;
         }
 
-        if (null === $this->options['cache_dir'] || null === $this->options['generator_cache_class'])
-        {
+        if (null === $this->options['cache_dir'] || null === $this->options['generator_cache_class']) {
             return $this->generator = new $this->options['generator_class']($this->getRouteCollection(), $this->context, $this->defaults);
         }
 
         $class = $this->options['generator_cache_class'];
-        if ($this->needsReload($class))
-        {
+        if ($this->needsReload($class)) {
             $dumper = new $this->options['generator_dumper_class']($this->getRouteCollection());
 
             $options = array(
@@ -208,8 +200,7 @@ class Router implements RouterInterface
     {
         $this->writeCacheFile($this->getCacheFile($class), $dump);
 
-        if ($this->options['debug'])
-        {
+        if ($this->options['debug']) {
             $this->writeCacheFile($this->getCacheFile($class, 'meta'), serialize($this->getRouteCollection()->getResources()));
         }
     }
@@ -217,26 +208,22 @@ class Router implements RouterInterface
     protected function needsReload($class)
     {
         $file = $this->getCacheFile($class);
-        if (!file_exists($file))
-        {
+        if (!file_exists($file)) {
             return true;
         }
 
-        if (!$this->options['debug'])
-        {
+        if (!$this->options['debug']) {
             return false;
         }
 
         $metadata = $this->getCacheFile($class, 'meta');
-        if (!file_exists($metadata))
-        {
+        if (!file_exists($metadata)) {
             return true;
         }
 
         $time = filemtime($file);
         $meta = unserialize(file_get_contents($metadata));
-        foreach ($meta as $resource)
-        {
+        foreach ($meta as $resource) {
             if (!$resource->isUptodate($time))
             {
                 return true;
@@ -257,16 +244,14 @@ class Router implements RouterInterface
     protected function writeCacheFile($file, $content)
     {
         $tmpFile = tempnam(dirname($file), basename($file));
-        if (!$fp = @fopen($tmpFile, 'wb'))
-        {
+        if (!$fp = @fopen($tmpFile, 'wb')) {
             throw new \RuntimeException(sprintf('Failed to write cache file "%s".', $tmpFile));
         }
 
         @fwrite($fp, $content);
         @fclose($fp);
 
-        if ($content != file_get_contents($tmpFile))
-        {
+        if ($content != file_get_contents($tmpFile)) {
             throw new \RuntimeException(sprintf('Failed to write cache file "%s" (cache corrupted).', $tmpFile));
         }
 

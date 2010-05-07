@@ -44,12 +44,10 @@ class Response
     public function __toString()
     {
         $headers = '';
-        foreach ($this->headers as $name => $value)
-        {
+        foreach ($this->headers as $name => $value) {
             $headers .= sprintf("%s: %s\n", $name, $value);
         }
-        foreach ($this->cookies as $name => $cookie)
-        {
+        foreach ($this->cookies as $name => $cookie) {
             $headers .= sprintf("Set-Cookie: %s=%s\n", $name, $cookie['value']);
         }
 
@@ -95,8 +93,7 @@ class Response
      */
     public function getHeader($header)
     {
-        foreach ($this->headers as $key => $value)
-        {
+        foreach ($this->headers as $key => $value) {
             if (str_replace('-', '_', strtolower($key)) == str_replace('-', '_', strtolower($header)))
             {
                 return $value;

@@ -51,11 +51,9 @@ class Glob
         $inCurlies = 0;
         $regex = '';
         $sizeGlob = strlen($glob);
-        for ($i = 0; $i < $sizeGlob; $i++)
-        {
+        for ($i = 0; $i < $sizeGlob; $i++) {
             $car = $glob[$i];
-            if ($firstByte)
-            {
+            if ($firstByte) {
                 if ($strictLeadingDot && $car !== '.')
                 {
                     $regex .= '(?=[^\.])';
@@ -64,59 +62,39 @@ class Glob
                 $firstByte = false;
             }
 
-            if ($car === '/')
-            {
+            if ($car === '/') {
                 $firstByte = true;
             }
 
-            if ($car === '.' || $car === '(' || $car === ')' || $car === '|' || $car === '+' || $car === '^' || $car === '$')
-            {
+            if ($car === '.' || $car === '(' || $car === ')' || $car === '|' || $car === '+' || $car === '^' || $car === '$') {
                 $regex .= "\\$car";
-            }
-            elseif ($car === '*')
-            {
+            } elseif ($car === '*') {
                 $regex .= $escaping ? '\\*' : ($strictWildcardSlash ? '[^/]*' : '.*');
-            }
-            elseif ($car === '?')
-            {
+            } elseif ($car === '?') {
                 $regex .= $escaping ? '\\?' : ($strictWildcardSlash ? '[^/]' : '.');
-            }
-            elseif ($car === '{')
-            {
+            } elseif ($car === '{') {
                 $regex .= $escaping ? '\\{' : '(';
-                if (!$escaping)
-                {
+                if (!$escaping) {
                     ++$inCurlies;
                 }
-            }
-            elseif ($car === '}' && $inCurlies)
-            {
+            } elseif ($car === '}' && $inCurlies) {
                 $regex .= $escaping ? '}' : ')';
-                if (!$escaping)
-                {
+                if (!$escaping) {
                     --$inCurlies;
                 }
-            }
-            elseif ($car === ',' && $inCurlies)
-            {
+            } elseif ($car === ',' && $inCurlies) {
                 $regex .= $escaping ? ',' : '|';
-            }
-            elseif ($car === '\\')
-            {
+            } elseif ($car === '\\') {
                 if ($escaping)
                 {
                     $regex .= '\\\\';
                     $escaping = false;
-                }
-                else
-                {
+                } else {
                     $escaping = true;
                 }
 
                 continue;
-            }
-            else
-            {
+            } else {
                 $regex .= $car;
             }
             $escaping = false;

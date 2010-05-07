@@ -44,20 +44,16 @@ EOT
         $generator = new EntityRepositoryGenerator();
         $kernel = $this->application->getKernel();
         $bundleDirs = $kernel->getBundleDirs();
-        foreach ($kernel->getBundles() as $bundle)
-        {
+        foreach ($kernel->getBundles() as $bundle) {
             $tmp = dirname(str_replace('\\', '/', get_class($bundle)));
             $namespace = str_replace('/', '\\', dirname($tmp));
             $class = basename($tmp);
 
-            if (isset($bundleDirs[$namespace]))
-            {
+            if (isset($bundleDirs[$namespace])) {
                 $destination = realpath($bundleDirs[$namespace].'/..');
-                if ($metadatas = $this->getBundleMetadatas($bundle))
-                {
+                if ($metadatas = $this->getBundleMetadatas($bundle)) {
                     $output->writeln(sprintf('Generating entity repositories for "<info>%s</info>"', $class));
-                    foreach ($metadatas as $metadata)
-                    {
+                    foreach ($metadatas as $metadata) {
                         if ($metadata->customRepositoryClassName)
                         {
                             $output->writeln(sprintf('  > generating <comment>%s</comment>', $metadata->customRepositoryClassName));

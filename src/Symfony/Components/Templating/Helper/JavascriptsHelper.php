@@ -69,11 +69,9 @@ class JavascriptsHelper extends Helper
     public function render()
     {
         $html = '';
-        foreach ($this->javascripts as $path => $attributes)
-        {
+        foreach ($this->javascripts as $path => $attributes) {
             $atts = '';
-            foreach ($attributes as $key => $value)
-            {
+            foreach ($attributes as $key => $value) {
                 $atts .= ' '.sprintf('%s="%s"', $key, htmlspecialchars($value, ENT_QUOTES, $this->charset));
             }
 

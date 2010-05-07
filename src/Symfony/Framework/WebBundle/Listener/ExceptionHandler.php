@@ -47,15 +47,13 @@ class ExceptionHandler
 
     public function handle(Event $event)
     {
-        if (!$event->getParameter('main_request'))
-        {
+        if (!$event->getParameter('main_request')) {
             return false;
         }
 
         $exception = $event->getParameter('exception');
 
-        if (null !== $this->logger)
-        {
+        if (null !== $this->logger) {
             $this->logger->err(sprintf('%s (uncaught %s exception)', $exception->getMessage(), get_class($exception)));
         }
 
@@ -70,14 +68,11 @@ class ExceptionHandler
 
         $request = $event->getParameter('request')->duplicate(null, null, $parameters);
 
-        try
-        {
+        try {
             $response = $event->getSubject()->handle($request, false, true);
 
             error_log(sprintf('%s: %s', get_class($exception), $exception->getMessage()));
-        }
-        catch (\Exception $e)
-        {
+        } catch (\Exception $e) {
             return false;
         }
 

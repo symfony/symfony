@@ -39,15 +39,13 @@ class ResponseFilter
 
     public function filter(Event $event, Response $response)
     {
-        if (!$event->getParameter('main_request') || $response->headers->has('Content-Type'))
-        {
+        if (!$event->getParameter('main_request') || $response->headers->has('Content-Type')) {
             return $response;
         }
 
         $request = $event->getParameter('request');
         $format = $request->getRequestFormat();
-        if ((null !== $format) && $mimeType = $request->getMimeType($format))
-        {
+        if ((null !== $format) && $mimeType = $request->getMimeType($format)) {
             $response->headers->set('Content-Type', $mimeType);
         }
 

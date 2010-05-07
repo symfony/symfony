@@ -33,8 +33,7 @@ class RedirectController extends Controller
      */
     public function redirectAction($route, $permanent = false)
     {
-        if (!$route)
-        {
+        if (!$route) {
             $response = $this->container->getResponseService();
             $response->setStatusCode(410);
 

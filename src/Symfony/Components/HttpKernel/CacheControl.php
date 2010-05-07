@@ -36,8 +36,7 @@ class CacheControl
      */
     public function __construct(HeaderBag $bag, $header, $type = null)
     {
-        if (null !== $type && !in_array($type, array('request', 'response')))
-        {
+        if (null !== $type && !in_array($type, array('request', 'response'))) {
             throw new \InvalidArgumentException(sprintf('The "%s" type is not supported by the CacheControl constructor.', $type));
         }
         $this->type = $type;
@@ -50,14 +49,11 @@ class CacheControl
     {
         $parts = array();
         ksort($this->attributes);
-        foreach ($this->attributes as $key => $value)
-        {
+        foreach ($this->attributes as $key => $value) {
             if (true === $value)
             {
                 $parts[] = $key;
-            }
-            else
-            {
+            } else {
                 if (preg_match('#[^a-zA-Z0-9._-]#', $value))
                 {
                     $value = '"'.$value.'"';
@@ -245,8 +241,7 @@ class CacheControl
     {
         $attributes = array();
         preg_match_all('#([a-zA-Z][a-zA-Z_-]*)\s*(?:=(?:"([^"]*)"|([^ \t",;]*)))?#', $header, $matches, PREG_SET_ORDER);
-        foreach ($matches as $match)
-        {
+        foreach ($matches as $match) {
             $attributes[strtolower($match[1])] = isset($match[2]) && $match[2] ? $match[2] : (isset($match[3]) ? $match[3] : true);
         }
 
@@ -255,12 +250,9 @@ class CacheControl
 
     protected function setValue($key, $value, $isBoolean = false)
     {
-        if (false === $value)
-        {
+        if (false === $value) {
             unset($this->attributes[$key]);
-        }
-        else
-        {
+        } else {
             $this->attributes[$key] = $isBoolean ? true : $value;
         }
 
@@ -269,8 +261,7 @@ class CacheControl
 
     protected function checkAttribute($name, $expected)
     {
-        if (null !== $this->type && $expected !== $this->type)
-        {
+        if (null !== $this->type && $expected !== $this->type) {
             throw new \LogicException(sprintf("The property %s only applies to the %s Cache-Control.", $name, $expected));
         }
     }

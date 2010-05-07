@@ -47,8 +47,7 @@ abstract class GetterDecorator extends Escaper
      */
     public function get($key, $escaper = null)
     {
-        if (!$escaper)
-        {
+        if (!$escaper) {
             $escaper = $this->escaper;
         }
 

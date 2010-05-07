@@ -92,8 +92,7 @@ class Client extends BaseClient
      */
     public function getTester($name)
     {
-        if (!isset($this->testers[$name]))
-        {
+        if (!isset($this->testers[$name])) {
             throw new \InvalidArgumentException(sprintf('Tester "%s" does not exist.', $name));
         }
 
@@ -151,8 +150,7 @@ EOF;
     protected function filterRequest(DomRequest $request)
     {
         $uri = $request->getUri();
-        if (preg_match('#^https?\://([^/]+)/(.*)$#', $uri, $matches))
-        {
+        if (preg_match('#^https?\://([^/]+)/(.*)$#', $uri, $matches)) {
             $uri = '/'.$matches[2];
         }
 
@@ -181,26 +179,22 @@ EOF;
      */
     public function __call($method, $arguments)
     {
-        if ('assert' !== substr($method, 0, 6))
-        {
+        if ('assert' !== substr($method, 0, 6)) {
             throw new \BadMethodCallException(sprintf('Method %s::%s is not defined.', get_class($this), $method));
         }
 
         // standard PHPUnit assert?
-        if (method_exists($this->test, $method))
-        {
+        if (method_exists($this->test, $method)) {
             return call_user_func_array(array($this->test, $method), $arguments);
         }
 
-        if (!preg_match('/^assert([A-Z].+?)([A-Z].+)$/', $method, $matches))
-        {
+        if (!preg_match('/^assert([A-Z].+?)([A-Z].+)$/', $method, $matches)) {
             throw new \BadMethodCallException(sprintf('Method %s::%s is not defined.', get_class($this), $method));
         }
 
         // registered tester object?
         $name = strtolower($matches[1]);
-        if (!$this->hasTester($name))
-        {
+        if (!$this->hasTester($name)) {
             throw new \BadMethodCallException(sprintf('Method %s::%s is not defined (assert object "%s" is not defined).', get_class($this), $method, $name));
         }
 

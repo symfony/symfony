@@ -83,8 +83,7 @@ class ProjectTemplateLoaderVar extends Loader
 
     public function load($template, array $options = array())
     {
-        if (method_exists($this, $method = 'get'.ucfirst($template).'Template'))
-        {
+        if (method_exists($this, $method = 'get'.ucfirst($template).'Template')) {
             return new StringStorage($this->$method());
         }
 

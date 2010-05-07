@@ -32,8 +32,7 @@ class FilesystemLoader extends Loader
      */
     public function __construct($templatePathPatterns)
     {
-        if (!is_array($templatePathPatterns))
-        {
+        if (!is_array($templatePathPatterns)) {
             $templatePathPatterns = array($templatePathPatterns);
         }
 
@@ -52,8 +51,7 @@ class FilesystemLoader extends Loader
      */
     public function load($template, array $options = array())
     {
-        if (self::isAbsolutePath($template) && file_exists($template))
-        {
+        if (self::isAbsolutePath($template) && file_exists($template)) {
             return new FileStorage($template);
         }
 
@@ -61,32 +59,27 @@ class FilesystemLoader extends Loader
         $options['name'] = $template;
 
         $replacements = array();
-        foreach ($options as $key => $value)
-        {
+        foreach ($options as $key => $value) {
             $replacements['%'.$key.'%'] = $value;
         }
 
         $logs = array();
-        foreach ($this->templatePathPatterns as $templatePathPattern)
-        {
+        foreach ($this->templatePathPatterns as $templatePathPattern) {
             if (is_file($file = strtr($templatePathPattern, $replacements)))
             {
-                if (null !== $this->debugger)
-                {
+                if (null !== $this->debugger) {
                     $this->debugger->log(sprintf('Loaded template file "%s" (renderer: %s)', $file, $options['renderer']));
                 }
 
                 return new FileStorage($file);
             }
 
-            if (null !== $this->debugger)
-            {
+            if (null !== $this->debugger) {
                 $logs[] = sprintf('Failed loading template file "%s" (renderer: %s)', $file, $options['renderer']);
             }
         }
 
-        if (null !== $this->debugger)
-        {
+        if (null !== $this->debugger) {
             foreach ($logs as $log)
             {
                 $this->debugger->log($log);

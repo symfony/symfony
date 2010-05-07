@@ -287,13 +287,11 @@ class Finder implements \IteratorAggregate
      */
     public function in($dirs)
     {
-        if (!is_array($dirs))
-        {
+        if (!is_array($dirs)) {
             $dirs = array($dirs);
         }
 
-        foreach ($dirs as $dir)
-        {
+        foreach ($dirs as $dir) {
             if (!is_dir($dir))
             {
                 throw new \InvalidArgumentException(sprintf('The "%s" directory does not exist.', $dir));
@@ -316,19 +314,16 @@ class Finder implements \IteratorAggregate
      */
     public function getIterator()
     {
-        if (0 === count($this->dirs))
-        {
+        if (0 === count($this->dirs)) {
             throw new \LogicException('You must call the in() method before iterating over a Finder.');
         }
 
-        if (1 === count($this->dirs))
-        {
+        if (1 === count($this->dirs)) {
             return $this->searchInDirectory($this->dirs[0]);
         }
 
         $iterator = new \AppendIterator();
-        foreach ($this->dirs as $dir)
-        {
+        foreach ($this->dirs as $dir) {
             $iterator->append($this->searchInDirectory($dir));
         }
 
@@ -339,50 +334,41 @@ class Finder implements \IteratorAggregate
     {
         $flags = \FilesystemIterator::SKIP_DOTS;
 
-        if ($this->followLinks)
-        {
+        if ($this->followLinks) {
             $flags |= \FilesystemIterator::FOLLOW_SYMLINKS;
         }
 
         $iterator = new \RecursiveIteratorIterator(new \RecursiveDirectoryIterator($dir, $flags), \RecursiveIteratorIterator::SELF_FIRST);
 
-        if ($this->mindepth > 0 || $this->maxdepth < INF)
-        {
+        if ($this->mindepth > 0 || $this->maxdepth < INF) {
             $iterator = new Iterator\LimitDepthFilterIterator($iterator, $this->mindepth, $this->maxdepth);
         }
 
-        if ($this->mode)
-        {
+        if ($this->mode) {
             $iterator = new Iterator\FileTypeFilterIterator($iterator, $this->mode);
         }
 
-        if ($this->exclude)
-        {
+        if ($this->exclude) {
             $iterator = new Iterator\ExcludeDirectoryFilterIterator($iterator, $this->exclude);
         }
 
-        if ($this->ignoreVCS)
-        {
+        if ($this->ignoreVCS) {
             $iterator = new Iterator\IgnoreVcsFilterIterator($iterator);
         }
 
-        if ($this->names || $this->notNames)
-        {
+        if ($this->names || $this->notNames) {
             $iterator = new Iterator\FilenameFilterIterator($iterator, $this->names, $this->notNames);
         }
 
-        if ($this->sizes)
-        {
+        if ($this->sizes) {
             $iterator = new Iterator\SizeRangeFilterIterator($iterator, $this->sizes);
         }
 
-        if ($this->filters)
-        {
+        if ($this->filters) {
             $iterator = new Iterator\CustomFilterIterator($iterator, $this->filters);
         }
 
-        if ($this->sort)
-        {
+        if ($this->sort) {
             $iterator = new Iterator\SortableIterator($iterator, $this->sort);
         }
 

@@ -45,8 +45,7 @@ class NumberCompare
      */
     public function __construct($test)
     {
-        if (!preg_match('#^\s*([<>=]=?)?\s*([0-9\.]+)\s*([kmg]i?)?\s*$#i', $test, $matches))
-        {
+        if (!preg_match('#^\s*([<>=]=?)?\s*([0-9\.]+)\s*([kmg]i?)?\s*$#i', $test, $matches)) {
             throw new \InvalidArgumentException(sprintf('Don\'t understand "%s" as a test.', $test));
         }
 
@@ -54,8 +53,7 @@ class NumberCompare
         $this->comparison = isset($matches[1]) ? $matches[1] : '==';
 
         $magnitude = strtolower(isset($matches[3]) ? $matches[3] : '');
-        switch ($magnitude)
-        {
+        switch ($magnitude) {
             case 'k':
                 $this->target *= 1000;
                 break;
@@ -84,23 +82,19 @@ class NumberCompare
      */
     public function test($number)
     {
-        if ($this->comparison === '>')
-        {
+        if ($this->comparison === '>') {
             return ($number > $this->target);
         }
 
-        if ($this->comparison === '>=')
-        {
+        if ($this->comparison === '>=') {
             return ($number >= $this->target);
         }
 
-        if ($this->comparison === '<')
-        {
+        if ($this->comparison === '<') {
             return ($number < $this->target);
         }
 
-        if ($this->comparison === '<=')
-        {
+        if ($this->comparison === '<=') {
             return ($number <= $this->target);
         }
 

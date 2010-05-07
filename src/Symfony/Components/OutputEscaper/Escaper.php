@@ -51,8 +51,7 @@ abstract class Escaper
      */
     public function __construct($escaper, $value)
     {
-        if (null === self::$escapers)
-        {
+        if (null === self::$escapers) {
             self::initializeEscapers();
         }
 
@@ -90,34 +89,28 @@ abstract class Escaper
      */
     static public function escape($escaper, $value)
     {
-        if (null === $value)
-        {
+        if (null === $value) {
             return $value;
         }
 
-        if (null === self::$escapers)
-        {
+        if (null === self::$escapers) {
             self::initializeEscapers();
         }
 
-        if (is_string($escaper) && isset(self::$escapers[$escaper]))
-        {
+        if (is_string($escaper) && isset(self::$escapers[$escaper])) {
             $escaper = self::$escapers[$escaper];
         }
 
         // Scalars are anything other than arrays, objects and resources.
-        if (is_scalar($value))
-        {
+        if (is_scalar($value)) {
             return call_user_func($escaper, $value);
         }
 
-        if (is_array($value))
-        {
+        if (is_array($value)) {
             return new ArrayDecorator($escaper, $value);
         }
 
-        if (is_object($value))
-        {
+        if (is_object($value)) {
             if ($value instanceof Escaper)
             {
                 // avoid double decoration
@@ -128,22 +121,19 @@ abstract class Escaper
                 return $copy;
             }
 
-            if (self::isClassMarkedAsSafe(get_class($value)))
-            {
+            if (self::isClassMarkedAsSafe(get_class($value))) {
                 // the class or one of its children is marked as safe
                 // return the unescaped object
                 return $value;
             }
 
-            if ($value instanceof SafeDecorator)
-            {
+            if ($value instanceof SafeDecorator) {
                 // do not escape objects marked as safe
                 // return the original object
                 return $value->getValue();
             }
 
-            if ($value instanceof \Traversable)
-            {
+            if ($value instanceof \Traversable) {
                 return new IteratorDecorator($escaper, $value);
             }
 
@@ -166,18 +156,15 @@ abstract class Escaper
      */
     static public function unescape($value)
     {
-        if (null === $value || is_bool($value))
-        {
+        if (null === $value || is_bool($value)) {
             return $value;
         }
 
-        if (is_scalar($value))
-        {
+        if (is_scalar($value)) {
             return html_entity_decode($value, ENT_QUOTES, self::$charset);
         }
 
-        if (is_array($value))
-        {
+        if (is_array($value)) {
             foreach ($value as $name => $v)
             {
                 $value[$name] = self::unescape($v);
@@ -186,8 +173,7 @@ abstract class Escaper
             return $value;
         }
 
-        if (is_object($value))
-        {
+        if (is_object($value)) {
             return $value instanceof Escaper ? $value->getRawValue() : $value;
         }
 
@@ -203,13 +189,11 @@ abstract class Escaper
      */
     static public function isClassMarkedAsSafe($class)
     {
-        if (in_array($class, self::$safeClasses))
-        {
+        if (in_array($class, self::$safeClasses)) {
             return true;
         }
 
-        foreach (self::$safeClasses as $safeClass)
-        {
+        foreach (self::$safeClasses as $safeClass) {
             if (is_subclass_of($class, $safeClass))
             {
                 return true;

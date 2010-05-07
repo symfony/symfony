@@ -63,8 +63,7 @@ class XmlFileLoader extends FileLoader
 
     protected function parseParameters(BuilderConfiguration $configuration, $xml, $file)
     {
-        if (!$xml->parameters)
-        {
+        if (!$xml->parameters) {
             return;
         }
 
@@ -73,13 +72,11 @@ class XmlFileLoader extends FileLoader
 
     protected function parseImports(BuilderConfiguration $configuration, $xml, $file)
     {
-        if (!$xml->imports)
-        {
+        if (!$xml->imports) {
             return;
         }
 
-        foreach ($xml->imports->import as $import)
-        {
+        foreach ($xml->imports->import as $import) {
             $configuration->merge($this->parseImport($import, $file));
         }
     }
@@ -87,15 +84,11 @@ class XmlFileLoader extends FileLoader
     protected function parseImport($import, $file)
     {
         $class = null;
-        if (isset($import['class']) && $import['class'] !== get_class($this))
-        {
+        if (isset($import['class']) && $import['class'] !== get_class($this)) {
             $class = (string) $import['class'];
-        }
-        else
-        {
+        } else {
             // try to detect loader with the extension
-            switch (pathinfo((string) $import['resource'], PATHINFO_EXTENSION))
-            {
+            switch (pathinfo((string) $import['resource'], PATHINFO_EXTENSION)) {
                 case 'yml':
                     $class = 'Symfony\\Components\\DependencyInjection\\Loader\\YamlFileLoader';
                     break;
@@ -114,21 +107,18 @@ class XmlFileLoader extends FileLoader
 
     protected function parseDefinitions(BuilderConfiguration $configuration, $xml, $file)
     {
-        if (!$xml->services)
-        {
+        if (!$xml->services) {
             return;
         }
 
-        foreach ($xml->services->service as $service)
-        {
+        foreach ($xml->services->service as $service) {
             $this->parseDefinition($configuration, (string) $service['id'], $service, $file);
         }
     }
 
     protected function parseDefinition(BuilderConfiguration $configuration, $id, $service, $file)
     {
-        if ((string) $service['alias'])
-        {
+        if ((string) $service['alias']) {
             $configuration->setAlias($id, (string) $service['alias']);
 
             return;
@@ -136,8 +126,7 @@ class XmlFileLoader extends FileLoader
 
         $definition = new Definition((string) $service['class']);
 
-        foreach (array('shared', 'constructor') as $key)
-        {
+        foreach (array('shared', 'constructor') as $key) {
             if (isset($service[$key]))
             {
                 $method = 'set'.ucfirst($key);
@@ -145,27 +134,21 @@ class XmlFileLoader extends FileLoader
             }
         }
 
-        if ($service->file)
-        {
+        if ($service->file) {
             $definition->setFile((string) $service->file);
         }
 
         $definition->setArguments($service->getArgumentsAsPhp('argument'));
 
-        if (isset($service->configurator))
-        {
+        if (isset($service->configurator)) {
             if (isset($service->configurator['function']))
             {
                 $definition->setConfigurator((string) $service->configurator['function']);
-            }
-            else
-            {
+            } else {
                 if (isset($service->configurator['service']))
                 {
                     $class = new Reference((string) $service->configurator['service']);
-                }
-                else
-                {
+                } else {
                     $class = (string) $service->configurator['class'];
                 }
 
@@ -173,16 +156,13 @@ class XmlFileLoader extends FileLoader
             }
         }
 
-        foreach ($service->call as $call)
-        {
+        foreach ($service->call as $call) {
             $definition->addMethodCall((string) $call['method'], $call->getArgumentsAsPhp('argument'));
         }
 
-        foreach ($service->annotation as $annotation)
-        {
+        foreach ($service->annotation as $annotation) {
             $parameters = array();
-            foreach ($annotation->attributes() as $name => $value)
-            {
+            foreach ($annotation->attributes() as $name => $value) {
                 if ('name' === $name)
                 {
                     continue;
@@ -204,8 +184,7 @@ class XmlFileLoader extends FileLoader
     {
         $dom = new \DOMDocument();
         libxml_use_internal_errors(true);
-        if (!$dom->load($file, LIBXML_COMPACT))
-        {
+        if (!$dom->load($file, LIBXML_COMPACT)) {
             throw new \InvalidArgumentException(implode("\n", $this->getXmlErrors()));
         }
         $dom->validateOnParse = true;
@@ -224,8 +203,7 @@ class XmlFileLoader extends FileLoader
         // find anonymous service definitions
         $xml->registerXPathNamespace('container', 'http://www.symfony-project.org/schema/dic/services');
         $nodes = $xml->xpath('//container:argument[@type="service"][not(@id)]');
-        foreach ($nodes as $node)
-        {
+        foreach ($nodes as $node) {
             // give it a unique names
             $node['id'] = sprintf('_%s_%d', md5($file), ++$count);
 
@@ -235,8 +213,7 @@ class XmlFileLoader extends FileLoader
 
         // resolve definitions
         krsort($definitions);
-        foreach ($definitions as $id => $def)
-        {
+        foreach ($definitions as $id => $def) {
             $this->parseDefinition($configuration, $id, $def[0], $def[1]);
 
             $oNode = dom_import_simplexml($def[0]);
@@ -260,17 +237,14 @@ class XmlFileLoader extends FileLoader
     {
         $schemaLocations = array('http://www.symfony-project.org/schema/dic/services' => str_replace('\\', '/', __DIR__.'/schema/dic/services/services-1.0.xsd'));
 
-        if ($element = $dom->documentElement->getAttributeNS('http://www.w3.org/2001/XMLSchema-instance', 'schemaLocation'))
-        {
+        if ($element = $dom->documentElement->getAttributeNS('http://www.w3.org/2001/XMLSchema-instance', 'schemaLocation')) {
             $items = preg_split('/\s+/', $element);
-            for ($i = 0, $nb = count($items); $i < $nb; $i += 2)
-            {
+            for ($i = 0, $nb = count($items); $i < $nb; $i += 2) {
                 if ($extension = static::getExtension($items[$i]))
                 {
                     $path = str_replace('http://www.symfony-project.org/', str_replace('\\', '/', $extension->getXsdValidationBasePath()).'/', $items[$i + 1]);
 
-                    if (!file_exists($path))
-                    {
+                    if (!file_exists($path)) {
                         throw new \RuntimeException(sprintf('Extension "%s" references a non-existent XSD file "%s"', get_class($extension), $path));
                     }
 
@@ -280,8 +254,7 @@ class XmlFileLoader extends FileLoader
         }
 
         $imports = '';
-        foreach ($schemaLocations as $namespace => $location)
-        {
+        foreach ($schemaLocations as $namespace => $location) {
             $imports .= sprintf('  <xsd:import namespace="%s" schemaLocation="%s" />'."\n", $namespace, $location);
         }
 
@@ -299,8 +272,7 @@ EOF
         ;
 
         libxml_use_internal_errors(true);
-        if (!$dom->schemaValidateSource($source))
-        {
+        if (!$dom->schemaValidateSource($source)) {
             throw new \InvalidArgumentException(implode("\n", $this->getXmlErrors()));
         }
         libxml_use_internal_errors(false);
@@ -311,21 +283,18 @@ EOF
      */
     protected function validateExtensions($dom, $file)
     {
-        foreach ($dom->documentElement->childNodes as $node)
-        {
+        foreach ($dom->documentElement->childNodes as $node) {
             if (!$node instanceof \DOMElement || in_array($node->tagName, array('imports', 'parameters', 'services')))
             {
                 continue;
             }
 
-            if ($node->namespaceURI === 'http://www.symfony-project.org/schema/dic/services')
-            {
+            if ($node->namespaceURI === 'http://www.symfony-project.org/schema/dic/services') {
                 throw new \InvalidArgumentException(sprintf('The "%s" tag is not valid (in %s).', $node->tagName, $file));
             }
 
             // can it be handled by an extension?
-            if (!static::getExtension($node->namespaceURI))
-            {
+            if (!static::getExtension($node->namespaceURI)) {
                 throw new \InvalidArgumentException(sprintf('There is no extension able to load the configuration for "%s" (in %s).', $node->tagName, $file));
             }
         }
@@ -334,8 +303,7 @@ EOF
     protected function getXmlErrors()
     {
         $errors = array();
-        foreach (libxml_get_errors() as $error)
-        {
+        foreach (libxml_get_errors() as $error) {
             $errors[] = sprintf('[%s %s] %s (in %s - line %d, column %d)',
                 LIBXML_ERR_WARNING == $error->level ? 'WARNING' : 'ERROR',
                 $error->code,
@@ -353,8 +321,7 @@ EOF
 
     protected function loadFromExtensions(BuilderConfiguration $configuration, $xml)
     {
-        foreach (dom_import_simplexml($xml)->childNodes as $node)
-        {
+        foreach (dom_import_simplexml($xml)->childNodes as $node) {
             if (!$node instanceof \DOMElement || $node->namespaceURI === 'http://www.symfony-project.org/schema/dic/services')
             {
                 continue;
@@ -393,35 +360,27 @@ EOF
     {
         $empty = true;
         $config = array();
-        foreach ($element->attributes as $name => $node)
-        {
+        foreach ($element->attributes as $name => $node) {
             $config[$name] = SimpleXMLElement::phpize($node->value);
             $empty = false;
         }
 
         $nodeValue = false;
-        foreach ($element->childNodes as $node)
-        {
+        foreach ($element->childNodes as $node) {
             if ($node instanceof \DOMText)
             {
-                if (trim($node->nodeValue))
-                {
+                if (trim($node->nodeValue)) {
                     $nodeValue = trim($node->nodeValue);
                     $empty = false;
                 }
-            }
-            elseif (!$node instanceof \DOMComment)
-            {
+            } elseif (!$node instanceof \DOMComment) {
                 if (isset($config[$node->localName]))
                 {
-                    if (!is_array($config[$node->localName]))
-                    {
+                    if (!is_array($config[$node->localName])) {
                         $config[$node->localName] = array($config[$node->localName]);
                     }
                     $config[$node->localName][] = static::convertDomElementToArray($node);
-                }
-                else
-                {
+                } else {
                     $config[$node->localName] = static::convertDomElementToArray($node);
                 }
 
@@ -429,15 +388,11 @@ EOF
             }
         }
 
-        if (false !== $nodeValue)
-        {
+        if (false !== $nodeValue) {
             $value = SimpleXMLElement::phpize($nodeValue);
-            if (count($config))
-            {
+            if (count($config)) {
                 $config['value'] = $value;
-            }
-            else
-            {
+            } else {
                 $config = $value;
             }
         }

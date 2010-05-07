@@ -46,20 +46,16 @@ EOT
     {
         $entityGenerator = $this->getEntityGenerator();
         $bundleDirs = $this->container->getKernelService()->getBundleDirs();
-        foreach ($this->container->getKernelService()->getBundles() as $bundle)
-        {
+        foreach ($this->container->getKernelService()->getBundles() as $bundle) {
             $tmp = dirname(str_replace('\\', '/', get_class($bundle)));
             $namespace = str_replace('/', '\\', dirname($tmp));
             $class = basename($tmp);
 
-            if (isset($bundleDirs[$namespace]))
-            {
+            if (isset($bundleDirs[$namespace])) {
                 $destination = realpath($bundleDirs[$namespace].'/..');
-                if ($metadatas = $this->getBundleMetadatas($bundle))
-                {
+                if ($metadatas = $this->getBundleMetadatas($bundle)) {
                     $output->writeln(sprintf('Generating entities for "<info>%s</info>"', $class));
-                    foreach ($metadatas as $metadata)
-                    {
+                    foreach ($metadatas as $metadata) {
                         $output->writeln(sprintf('  > generating <comment>%s</comment>', $metadata->name));
                         $entityGenerator->generate(array($metadata), $destination);
                     }

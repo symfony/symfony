@@ -25,8 +25,7 @@ class DoctrineDataCollector extends DataCollector
     protected function collect()
     {
         $data = array();
-        if ($this->container->hasService('doctrine.dbal.logger'))
-        {
+        if ($this->container->hasService('doctrine.dbal.logger')) {
             $data = array(
                 'queries' => $this->container->getDoctrine_Dbal_LoggerService()->queries,
             );

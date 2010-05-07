@@ -32,19 +32,16 @@ class Inline
     {
         $value = trim($value);
 
-        if (0 == strlen($value))
-        {
+        if (0 == strlen($value)) {
             return '';
         }
 
-        if (function_exists('mb_internal_encoding') && ((int) ini_get('mbstring.func_overload')) & 2)
-        {
+        if (function_exists('mb_internal_encoding') && ((int) ini_get('mbstring.func_overload')) & 2) {
             $mbEncoding = mb_internal_encoding();
             mb_internal_encoding('ASCII');
         }
 
-        switch ($value[0])
-        {
+        switch ($value[0]) {
             case '[':
                 $result = self::parseSequence($value);
                 break;
@@ -55,8 +52,7 @@ class Inline
                 $result = self::parseScalar($value);
         }
 
-        if (isset($mbEncoding))
-        {
+        if (isset($mbEncoding)) {
             mb_internal_encoding($mbEncoding);
         }
 
@@ -77,8 +73,7 @@ class Inline
         $trueValues = '1.1' == Yaml::getSpecVersion() ? array('true', 'on', '+', 'yes', 'y') : array('true');
         $falseValues = '1.1' == Yaml::getSpecVersion() ? array('false', 'off', '-', 'no', 'n') : array('false');
 
-        switch (true)
-        {
+        switch (true) {
             case is_resource($value):
                 throw new Exception('Unable to dump PHP resources in a YAML file.');
             case is_object($value):
@@ -131,8 +126,7 @@ class Inline
             (count($keys) > 1 && array_reduce($keys, function ($v, $w) { return (integer) $v + $w; }, 0) == count($keys) * (count($keys) - 1) / 2))
         {
             $output = array();
-            foreach ($value as $val)
-            {
+            foreach ($value as $val) {
                 $output[] = self::dump($val);
             }
 
@@ -141,8 +135,7 @@ class Inline
 
         // mapping
         $output = array();
-        foreach ($value as $key => $val)
-        {
+        foreach ($value as $key => $val) {
             $output[] = sprintf('%s: %s', self::dump($key), self::dump($val));
         }
 
@@ -164,32 +157,23 @@ class Inline
      */
     static public function parseScalar($scalar, $delimiters = null, $stringDelimiters = array('"', "'"), &$i = 0, $evaluate = true)
     {
-        if (in_array($scalar[$i], $stringDelimiters))
-        {
+        if (in_array($scalar[$i], $stringDelimiters)) {
             // quoted scalar
             $output = self::parseQuotedScalar($scalar, $i);
-        }
-        else
-        {
+        } else {
             // "normal" string
-            if (!$delimiters)
-            {
+            if (!$delimiters) {
                 $output = substr($scalar, $i);
                 $i += strlen($output);
 
                 // remove comments
-                if (false !== $strpos = strpos($output, ' #'))
-                {
+                if (false !== $strpos = strpos($output, ' #')) {
                     $output = rtrim(substr($output, 0, $strpos));
                 }
-            }
-            else if (preg_match('/^(.+?)('.implode('|', $delimiters).')/', substr($scalar, $i), $match))
-            {
+            } else if (preg_match('/^(.+?)('.implode('|', $delimiters).')/', substr($scalar, $i), $match)) {
                 $output = $match[1];
                 $i += strlen($output);
-            }
-            else
-            {
+            } else {
                 throw new ParserException(sprintf('Malformed inline YAML string (%s).', $scalar));
             }
 
@@ -211,20 +195,16 @@ class Inline
      */
     static protected function parseQuotedScalar($scalar, &$i)
     {
-        if (!preg_match('/'.self::REGEX_QUOTED_STRING.'/A', substr($scalar, $i), $match))
-        {
+        if (!preg_match('/'.self::REGEX_QUOTED_STRING.'/A', substr($scalar, $i), $match)) {
             throw new ParserException(sprintf('Malformed inline YAML string (%s).', substr($scalar, $i)));
         }
 
         $output = substr($match[0], 1, strlen($match[0]) - 2);
 
-        if ('"' == $scalar[$i])
-        {
+        if ('"' == $scalar[$i]) {
             // evaluate the string
             $output = str_replace(array('\\"', '\\n', '\\r'), array('"', "\n", "\r"), $output);
-        }
-        else
-        {
+        } else {
             // unescape '
             $output = str_replace('\'\'', '\'', $output);
         }
@@ -251,8 +231,7 @@ class Inline
         $i += 1;
 
         // [foo, bar, ...]
-        while ($i < $len)
-        {
+        while ($i < $len) {
             switch ($sequence[$i])
             {
                 case '[':
@@ -272,15 +251,11 @@ class Inline
                     $isQuoted = in_array($sequence[$i], array('"', "'"));
                     $value = self::parseScalar($sequence, array(',', ']'), array('"', "'"), $i);
 
-                    if (!$isQuoted && false !== strpos($value, ': '))
-                    {
+                    if (!$isQuoted && false !== strpos($value, ': ')) {
                         // embedded mapping?
-                        try
-                        {
+                        try {
                             $value = self::parseMapping('{'.$value.'}');
-                        }
-                        catch (\InvalidArgumentException $e)
-                        {
+                        } catch (\InvalidArgumentException $e) {
                             // no, it's not
                         }
                     }
@@ -313,8 +288,7 @@ class Inline
         $i += 1;
 
         // {foo: bar, bar:foo, ...}
-        while ($i < $len)
-        {
+        while ($i < $len) {
             switch ($mapping[$i])
             {
                 case ' ':
@@ -330,8 +304,7 @@ class Inline
 
             // value
             $done = false;
-            while ($i < $len)
-            {
+            while ($i < $len) {
                 switch ($mapping[$i])
                 {
                     case '[':
@@ -355,8 +328,7 @@ class Inline
 
                 ++$i;
 
-                if ($done)
-                {
+                if ($done) {
                     continue 2;
                 }
             }
@@ -379,8 +351,7 @@ class Inline
         $trueValues = '1.1' == Yaml::getSpecVersion() ? array('true', 'on', '+', 'yes', 'y') : array('true');
         $falseValues = '1.1' == Yaml::getSpecVersion() ? array('false', 'off', '-', 'no', 'n') : array('false');
 
-        switch (true)
-        {
+        switch (true) {
             case 'null' == strtolower($scalar):
             case '' == $scalar:
             case '~' == $scalar:

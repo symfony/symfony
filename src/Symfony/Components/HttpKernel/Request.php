@@ -124,6 +124,12 @@ class Request
         } else {
             $request = array();
             $query = $parameters;
+            if (false !== $pos = strpos($uri, '?')) {
+                $qs = substr($uri, $pos + 1);
+                parse_str($qs, $params);
+
+                $query = array_merge($params, $query);
+            }
         }
 
         $queryString = false !== ($pos = strpos($uri, '?')) ? html_entity_decode(substr($uri, $pos + 1)) : '';

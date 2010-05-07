@@ -29,6 +29,5 @@ ClassCollectionLoader::load(array(
     'Symfony\\Foundation\\Bundle\\KernelExtension',
     'Symfony\\Foundation\\Debug\\ErrorHandler',
     'Symfony\\Foundation\\ClassCollectionLoader',
-    'Symfony\\Foundation\\Kernel',
     'Symfony\\Foundation\\EventDispatcher',
 ), __DIR__, 'bootstrap', false);

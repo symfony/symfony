@@ -68,13 +68,12 @@ abstract class FileLoader implements LoaderInterface
 
     static protected function isAbsolutePath($file)
     {
-        if ($file[0] == '/' || $file[0] == '\\' ||
-                (strlen($file) > 3 && ctype_alpha($file[0]) &&
-                 $file[1] == ':' &&
-                 ($file[2] == '\\' || $file[2] == '/')
-                )
-             )
-        {
+        if ($file[0] == '/' || $file[0] == '\\' 
+            || (strlen($file) > 3 && ctype_alpha($file[0]) 
+                && $file[1] == ':' 
+                && ($file[2] == '\\' || $file[2] == '/')
+            )
+        ) {
             return true;
         }
 

@@ -67,7 +67,9 @@ class ExceptionController extends Controller
         }
 
         $currentContent = '';
-        while (false !== $content = ob_get_clean()) { $currentContent .= $content; }
+        while (false !== $content = ob_get_clean()) {
+            $currentContent .= $content; 
+        }
 
         ob_start();
         require $template;

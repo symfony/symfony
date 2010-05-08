@@ -73,8 +73,9 @@ class PhpMatcherDumper extends MatcherDumper
             $conditions = implode(' && ', $conditions);
 
             $code[] = sprintf(<<<EOF
-        if ($conditions)
+        if ($conditions) {
             return array_merge(\$this->mergeDefaults(\$matches, %s), array('_route' => '%s'));
+        }
 
 EOF
             , str_replace("\n", '', var_export($compiledRoute->getDefaults(), true)), $name);

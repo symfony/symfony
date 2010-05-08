@@ -57,15 +57,13 @@ class ChoiceFormField extends FormField
             // check
             $this->value = $this->options[0];
         } else {
-            if (is_array($value))
-            {
+            if (is_array($value)) {
                 if (!$this->multiple) {
                     throw new \InvalidArgumentException(sprintf('The value for "%s" cannot be an array.', $this->name));
                 }
 
                 foreach ($value as $v) {
-                    if (!in_array($v, $this->options))
-                    {
+                    if (!in_array($v, $this->options)) {
                         throw new \InvalidArgumentException(sprintf('Input "%s" cannot take "%s" as a value (possible values: %s).', $this->name, $v, implode(', ', $this->options)));
                     }
                 }

@@ -83,8 +83,7 @@ class UrlGenerator implements UrlGeneratorInterface
         $url = '';
         $optional = true;
         foreach ($tokens as $token) {
-            if ('variable' === $token[0])
-            {
+            if ('variable' === $token[0]) {
                 if (false === $optional || !isset($defaults[$token[3]]) || (isset($parameters[$token[3]]) && $parameters[$token[3]] != $defaults[$token[3]])) {
                     // check requirement
                     if (isset($requirements[$token[3]]) && !preg_match('#^'.$requirements[$token[3]].'$#', $tparams[$token[3]])) {

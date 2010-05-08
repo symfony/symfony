@@ -104,16 +104,14 @@ class Filesystem
 
         $files = array_reverse($files);
         foreach ($files as $file) {
-            if (!file_exists($file))
-            {
+            if (!file_exists($file)) {
                 continue;
             }
 
             if (is_dir($file) && !is_link($file)) {
                 $fp = opendir($file);
                 while (false !== $item = readdir($fp)) {
-                    if (!in_array($item, array('.', '..')))
-                    {
+                    if (!in_array($item, array('.', '..'))) {
                         $this->remove($file.'/'.$item);
                     }
                 }
@@ -184,8 +182,7 @@ class Filesystem
 
         $ok = false;
         if (is_link($targetDir)) {
-            if (readlink($targetDir) != $originDir)
-            {
+            if (readlink($targetDir) != $originDir) {
                 unlink($targetDir);
             } else {
                 $ok = true;

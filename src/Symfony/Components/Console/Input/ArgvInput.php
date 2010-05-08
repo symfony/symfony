@@ -70,8 +70,7 @@ class ArgvInput extends Input
     {
         $this->parsed = $this->tokens;
         while (null !== $token = array_shift($this->parsed)) {
-            if ('--' === substr($token, 0, 2))
-            {
+            if ('--' === substr($token, 0, 2)) {
                 $this->parseLongOption($token);
             } elseif ('-' === $token[0]) {
                 $this->parseShortOption($token);
@@ -91,8 +90,7 @@ class ArgvInput extends Input
         $name = substr($token, 1);
 
         if (strlen($name) > 1) {
-            if ($this->definition->hasShortcut($name[0]) && $this->definition->getOptionForShortcut($name[0])->acceptParameter())
-            {
+            if ($this->definition->hasShortcut($name[0]) && $this->definition->getOptionForShortcut($name[0])->acceptParameter()) {
                 // an option with a value (with no space)
                 $this->addShortOption($name[0], substr($name, 1));
             } else {
@@ -114,8 +112,7 @@ class ArgvInput extends Input
     {
         $len = strlen($name);
         for ($i = 0; $i < $len; $i++) {
-            if (!$this->definition->hasShortcut($name[$i]))
-            {
+            if (!$this->definition->hasShortcut($name[$i])) {
                 throw new \RuntimeException(sprintf('The "-%s" option does not exist.', $name[$i]));
             }
 
@@ -207,8 +204,7 @@ class ArgvInput extends Input
         }
 
         if (null === $value) {
-            if ($option->isParameterRequired())
-            {
+            if ($option->isParameterRequired()) {
                 throw new \RuntimeException(sprintf('The "--%s" option requires a value.', $name));
             }
 
@@ -226,8 +222,7 @@ class ArgvInput extends Input
     public function getFirstArgument()
     {
         foreach ($this->tokens as $token) {
-            if ($token && '-' === $token[0])
-            {
+            if ($token && '-' === $token[0]) {
                 continue;
             }
 
@@ -252,8 +247,7 @@ class ArgvInput extends Input
         }
 
         foreach ($this->tokens as $v) {
-            if (in_array($v, $values))
-            {
+            if (in_array($v, $values)) {
                 return true;
             }
         }

@@ -78,8 +78,7 @@ EOT
 
         $files = array();
         foreach ($paths as $path) {
-            if (is_dir($path))
-            {
+            if (is_dir($path)) {
                 $finder = new Finder();
                 $found = iterator_to_array($finder
                     ->files()
@@ -117,8 +116,7 @@ EOT
                 $emEntities[$emName][] = $value;
             }
             foreach ($ems as $emName => $em) {
-                if (!$input->getOption('append'))
-                {
+                if (!$input->getOption('append')) {
                     $output->writeln(sprintf('<info>Purging data from entity manager named <comment>"%s"</comment></info>', $emName));
                     $this->purgeEntityManager($em);
                 }
@@ -146,8 +144,7 @@ EOT
         $metadatas = $em->getMetadataFactory()->getAllMetadata();
 
         foreach ($metadatas as $metadata) {
-            if (!$metadata->isMappedSuperclass)
-            {
+            if (!$metadata->isMappedSuperclass) {
                 $classes[] = $metadata;
             }
         }
@@ -174,7 +171,7 @@ EOT
                 if ($assoc->isOwningSide) {
                     $targetClass = $em->getClassMetadata($assoc->targetEntityName);
 
-                    if ( ! $calc->hasClass($targetClass->name))  {
+                    if ( ! $calc->hasClass($targetClass->name)) {
                             $calc->addClass($targetClass);
                     }
 

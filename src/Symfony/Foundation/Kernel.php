@@ -280,8 +280,7 @@ abstract class Kernel implements HttpKernelInterface, \Serializable
     {
         $parameters = array();
         foreach ($_SERVER as $key => $value) {
-            if ('SYMFONY__' === substr($key, 0, 9))
-            {
+            if ('SYMFONY__' === substr($key, 0, 9)) {
                 $parameters[strtolower(str_replace('__', '.', substr($key, 9)))] = $value;
             }
         }
@@ -298,8 +297,7 @@ abstract class Kernel implements HttpKernelInterface, \Serializable
         $meta = unserialize(file_get_contents($location.'.meta'));
         $time = filemtime($location.'.php');
         foreach ($meta as $resource) {
-            if (!$resource->isUptodate($time))
-            {
+            if (!$resource->isUptodate($time)) {
                 return true;
             }
         }
@@ -322,8 +320,7 @@ abstract class Kernel implements HttpKernelInterface, \Serializable
         foreach (array('cache', 'logs') as $name) {
             $dir = $container->getParameter(sprintf('kernel.%s_dir', $name));
             if (!is_dir($dir)) {
-                if (false === @mkdir($dir, 0777, true))
-                {
+                if (false === @mkdir($dir, 0777, true)) {
                     die(sprintf('Unable to create the %s directory (%s)', $name, dirname($dir)));
                 }
             } elseif (!is_writable($dir)) {
@@ -356,8 +353,7 @@ abstract class Kernel implements HttpKernelInterface, \Serializable
     {
         // replace all classes with the real value
         foreach ($container->getDefinitions() as $definition) {
-            if (false !== strpos($class = $definition->getClass(), '%'))
-            {
+            if (false !== strpos($class = $definition->getClass(), '%')) {
                 $definition->setClass(Builder::resolveValue($class, $container->getParameters()));
                 unset($container[substr($class, 1, -1)]);
             }

@@ -60,8 +60,7 @@ class GraphvizDumper extends Dumper
         );
 
         foreach (array('graph', 'node', 'edge', 'node.instance', 'node.definition', 'node.missing') as $key) {
-            if (isset($options[$key]))
-            {
+            if (isset($options[$key])) {
                 $this->options[$key] = array_merge($this->options[$key], $options[$key]);
             }
         }
@@ -99,8 +98,7 @@ class GraphvizDumper extends Dumper
     {
         $code = '';
         foreach ($this->edges as $id => $edges) {
-            foreach ($edges as $edge)
-            {
+            foreach ($edges as $edge) {
                 $code .= sprintf("  node_%s -> node_%s [label=\"%s\" style=\"%s\"];\n", $this->dotize($id), $this->dotize($edge['to']), $edge['name'], $edge['required'] ? 'filled' : 'dashed');
             }
         }
@@ -112,16 +110,14 @@ class GraphvizDumper extends Dumper
     {
         $edges = array();
         foreach ($arguments as $argument) {
-            if (is_object($argument) && $argument instanceof Parameter)
-            {
+            if (is_object($argument) && $argument instanceof Parameter) {
                 $argument = $this->container->hasParameter($argument) ? $this->container->getParameter($argument) : null;
             } elseif (is_string($argument) && preg_match('/^%([^%]+)%$/', $argument, $match)) {
                 $argument = $this->container->hasParameter($match[1]) ? $this->container->getParameter($match[1]) : null;
             }
 
             if ($argument instanceof Reference) {
-                if (!$this->container->hasService((string) $argument))
-                {
+                if (!$this->container->hasService((string) $argument)) {
                     $this->nodes[(string) $argument] = array('name' => $name, 'required' => $required, 'class' => '', 'attributes' => $this->options['node.missing']);
                 }
 
@@ -211,8 +207,7 @@ class GraphvizDumper extends Dumper
     {
         $aliases = array();
         foreach ($this->container->getAliases() as $alias => $origin) {
-            if ($id == $origin)
-            {
+            if ($id == $origin) {
                 $aliases[] = $alias;
             }
         }

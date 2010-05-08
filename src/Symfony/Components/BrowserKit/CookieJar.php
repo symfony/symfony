@@ -110,8 +110,7 @@ class CookieJar
 
         $cookies = array();
         foreach ($this->cookieJar as $cookie) {
-            if ($cookie->getDomain() && $cookie->getDomain() != substr($parts['host'], -strlen($cookie->getDomain())))
-            {
+            if ($cookie->getDomain() && $cookie->getDomain() != substr($parts['host'], -strlen($cookie->getDomain()))) {
                 continue;
             }
 
@@ -136,8 +135,7 @@ class CookieJar
     {
         $cookies = $this->cookieJar;
         foreach ($cookies as $name => $cookie) {
-            if ($cookie->isExpired())
-            {
+            if ($cookie->isExpired()) {
                 unset($this->cookieJar[$name]);
             }
         }

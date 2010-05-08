@@ -188,8 +188,7 @@ class Route
     {
         $this->requirements = array();
         foreach ($requirements as $key => $regex) {
-            if ('^' == $regex[0])
-            {
+            if ('^' == $regex[0]) {
                 $regex = substr($regex, 1);
             }
 

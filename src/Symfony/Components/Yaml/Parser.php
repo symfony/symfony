@@ -57,8 +57,7 @@ class Parser
 
         $data = array();
         while ($this->moveToNextLine()) {
-            if ($this->isCurrentLineEmpty())
-            {
+            if ($this->isCurrentLineEmpty()) {
                 continue;
             }
 
@@ -69,8 +68,7 @@ class Parser
 
             $isRef = $isInPlace = $isProcessed = false;
             if (preg_match('#^\-((?P<leadspaces>\s+)(?P<value>.+?))?\s*$#', $this->currentLine, $values)) {
-                if (isset($values['value']) && preg_match('#^&(?P<ref>[^ ]+) *(?P<value>.*)#', $values['value'], $matches))
-                {
+                if (isset($values['value']) && preg_match('#^&(?P<ref>[^ ]+) *(?P<value>.*)#', $values['value'], $matches)) {
                     $isRef = $matches['ref'];
                     $values['value'] = $matches['value'];
                 }
@@ -105,15 +103,13 @@ class Parser
                 $key = Inline::parseScalar($values['key']);
 
                 if ('<<' === $key) {
-                    if (isset($values['value']) && '*' === substr($values['value'], 0, 1))
-                    {
+                    if (isset($values['value']) && '*' === substr($values['value'], 0, 1)) {
                         $isInPlace = substr($values['value'], 1);
                         if (!array_key_exists($isInPlace, $this->refs)) {
                             throw new ParserException(sprintf('Reference "%s" does not exist at line %s (%s).', $isInPlace, $this->getRealCurrentLineNb() + 1, $this->currentLine));
                         }
                     } else {
-                        if (isset($values['value']) && $values['value'] !== '')
-                        {
+                        if (isset($values['value']) && $values['value'] !== '') {
                             $value = $values['value'];
                         } else {
                             $value = $this->getNextEmbedBlock();
@@ -129,8 +125,7 @@ class Parser
                         } else if (isset($parsed[0])) {
                             // Numeric array, merge individual elements
                             foreach (array_reverse($parsed) as $parsedItem) {
-                                if (!is_array($parsedItem))
-                                {
+                                if (!is_array($parsedItem)) {
                                     throw new ParserException(sprintf('Merge items must be arrays at line %s (%s).', $this->getRealCurrentLineNb() + 1, $parsedItem));
                                 }
                                 $merged = array_merge($parsedItem, $merged);
@@ -163,8 +158,7 @@ class Parser
                         $data[$key] = $parser->parse($this->getNextEmbedBlock());
                     }
                 } else {
-                    if ($isInPlace)
-                    {
+                    if ($isInPlace) {
                         $data = $this->refs[$isInPlace];
                     } else {
                         $data[$key] = $this->parseValue($values['value']);
@@ -273,8 +267,7 @@ class Parser
         $data = array(substr($this->currentLine, $newIndent));
 
         while ($this->moveToNextLine()) {
-            if ($this->isCurrentLineEmpty())
-            {
+            if ($this->isCurrentLineEmpty()) {
                 if ($this->isCurrentLineBlank()) {
                     $data[] = substr($this->currentLine, $newIndent);
                 }
@@ -335,8 +328,7 @@ class Parser
     protected function parseValue($value)
     {
         if ('*' === substr($value, 0, 1)) {
-            if (false !== $pos = strpos($value, '#'))
-            {
+            if (false !== $pos = strpos($value, '#')) {
                 $value = substr($value, 1, $pos - 2);
             } else {
                 $value = substr($value, 1);
@@ -397,8 +389,7 @@ class Parser
             $this->moveToNextLine();
 
             if (preg_match('#^(?P<indent> {'.strlen($textIndent).',})(?P<text>.+)$#', $this->currentLine, $matches)) {
-                if (' ' == $separator && $previousIndent != $matches['indent'])
-                {
+                if (' ' == $separator && $previousIndent != $matches['indent']) {
                     $text = substr($text, 0, -1)."\n";
                 }
                 $previousIndent = $matches['indent'];

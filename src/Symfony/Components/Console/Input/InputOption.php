@@ -53,8 +53,7 @@ class InputOption
         }
 
         if (null !== $shortcut) {
-            if ('-' === $shortcut[0])
-            {
+            if ('-' === $shortcut[0]) {
                 $shortcut = substr($shortcut, 1);
             }
         }
@@ -149,8 +148,7 @@ class InputOption
         }
 
         if ($this->isArray()) {
-            if (null === $default)
-            {
+            if (null === $default) {
                 $default = array();
             } elseif (!is_array($default)) {
                 throw new \LogicException('A default value for an array option must be an array.');

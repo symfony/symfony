@@ -141,8 +141,7 @@ abstract class Output implements OutputInterface
         }
 
         foreach ($messages as $message) {
-            switch ($type)
-            {
+            switch ($type) {
                 case Output::OUTPUT_NORMAL:
                     $message = $this->format($message);
                     break;
@@ -206,8 +205,7 @@ abstract class Output implements OutputInterface
         }
 
         foreach (static::$options as $option => $value) {
-            if (isset($parameters[$option]) && $parameters[$option])
-            {
+            if (isset($parameters[$option]) && $parameters[$option]) {
                 $codes[] = $value;
             }
         }

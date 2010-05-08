@@ -47,8 +47,7 @@ class ArrayInput extends Input
     public function getFirstArgument()
     {
         foreach ($this->parameters as $key => $value) {
-            if ($key && '-' === $key[0])
-            {
+            if ($key && '-' === $key[0]) {
                 continue;
             }
 
@@ -73,8 +72,7 @@ class ArrayInput extends Input
         }
 
         foreach ($this->parameters as $k => $v) {
-            if (!is_int($k))
-            {
+            if (!is_int($k)) {
                 $v = $k;
             }
 
@@ -92,8 +90,7 @@ class ArrayInput extends Input
     protected function parse()
     {
         foreach ($this->parameters as $key => $value) {
-            if ('--' === substr($key, 0, 2))
-            {
+            if ('--' === substr($key, 0, 2)) {
                 $this->addLongOption(substr($key, 2), $value);
             } elseif ('-' === $key[0]) {
                 $this->addShortOption(substr($key, 1), $value);
@@ -138,8 +135,7 @@ class ArrayInput extends Input
         $option = $this->definition->getOption($name);
 
         if (null === $value) {
-            if ($option->isParameterRequired())
-            {
+            if ($option->isParameterRequired()) {
                 throw new \InvalidArgumentException(sprintf('The "--%s" option requires a value.', $name));
             }
 

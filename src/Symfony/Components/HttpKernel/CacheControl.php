@@ -50,12 +50,10 @@ class CacheControl
         $parts = array();
         ksort($this->attributes);
         foreach ($this->attributes as $key => $value) {
-            if (true === $value)
-            {
+            if (true === $value) {
                 $parts[] = $key;
             } else {
-                if (preg_match('#[^a-zA-Z0-9._-]#', $value))
-                {
+                if (preg_match('#[^a-zA-Z0-9._-]#', $value)) {
                     $value = '"'.$value.'"';
                 }
 

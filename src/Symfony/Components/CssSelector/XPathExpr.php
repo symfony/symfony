@@ -165,8 +165,7 @@ class XPathExpr
         $string = $s;
         $parts = array();
         while (true) {
-            if (false !== $pos = strpos($string, "'"))
-            {
+            if (false !== $pos = strpos($string, "'")) {
                 $parts[] = sprintf("'%s'", substr($string, 0, $pos));
                 $parts[] = "\"'\"";
                 $string = substr($string, $pos + 1);

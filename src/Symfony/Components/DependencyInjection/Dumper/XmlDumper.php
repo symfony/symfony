@@ -55,8 +55,7 @@ class XmlDumper extends Dumper
         );
 
         foreach ($definition->getAnnotations() as $name => $annotations) {
-            foreach ($annotations as $attributes)
-            {
+            foreach ($annotations as $attributes) {
                 $att = array();
                 foreach ($attributes as $key => $value) {
                     $att[] = sprintf('%s="%s"', $key, $value);
@@ -76,8 +75,7 @@ class XmlDumper extends Dumper
         }
 
         foreach ($definition->getMethodCalls() as $call) {
-            if (count($call[1]))
-            {
+            if (count($call[1])) {
                 $code .= sprintf("      <call method=\"%s\">\n%s      </call>\n", $call[0], $this->convertParameters($call[1], 'argument', 8));
             } else {
                 $code .= sprintf("      <call method=\"%s\" />\n", $call[0]);
@@ -85,8 +83,7 @@ class XmlDumper extends Dumper
         }
 
         if ($callable = $definition->getConfigurator()) {
-            if (is_array($callable))
-            {
+            if (is_array($callable)) {
                 if (is_object($callable[0]) && $callable[0] instanceof Reference) {
                     $code .= sprintf("      <configurator service=\"%s\" method=\"%s\" />\n", $callable[0], $callable[1]);
                 } else {
@@ -141,8 +138,7 @@ class XmlDumper extends Dumper
             if (is_object($value) && $value instanceof Reference) {
                 $xml .= sprintf("%s<%s%s type=\"service\" id=\"%s\" %s/>\n", $white, $type, $key, (string) $value, $this->getXmlInvalidBehavior($value));
             } else {
-                if (in_array($value, array('null', 'true', 'false'), true))
-                {
+                if (in_array($value, array('null', 'true', 'false'), true)) {
                     $attributes = ' type="string"';
                 }
 
@@ -186,8 +182,7 @@ EOF;
     {
         $args = array();
         foreach ($arguments as $k => $v) {
-            if (is_array($v))
-            {
+            if (is_array($v)) {
                 $args[$k] = $this->escape($v);
             } elseif (is_string($v)) {
                 $args[$k] = str_replace('%', '%%', $v);

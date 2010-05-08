@@ -111,8 +111,7 @@ abstract class Escaper
         }
 
         if (is_object($value)) {
-            if ($value instanceof Escaper)
-            {
+            if ($value instanceof Escaper) {
                 // avoid double decoration
                 $copy = clone $value;
 
@@ -165,8 +164,7 @@ abstract class Escaper
         }
 
         if (is_array($value)) {
-            foreach ($value as $name => $v)
-            {
+            foreach ($value as $name => $v) {
                 $value[$name] = self::unescape($v);
             }
 
@@ -194,8 +192,7 @@ abstract class Escaper
         }
 
         foreach (self::$safeClasses as $safeClass) {
-            if (is_subclass_of($class, $safeClass))
-            {
+            if (is_subclass_of($class, $safeClass)) {
                 return true;
             }
         }

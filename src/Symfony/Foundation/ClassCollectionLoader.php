@@ -40,8 +40,7 @@ class ClassCollectionLoader
                 if ($meta[1] != $classes) {
                     $reload = true;
                 } else {
-                    foreach ($meta[0] as $resource)
-                    {
+                    foreach ($meta[0] as $resource) {
                         if (!file_exists($resource) || filemtime($resource) > $time) {
                             $reload = true;
 
@@ -61,8 +60,7 @@ class ClassCollectionLoader
         $files = array();
         $content = '';
         foreach ($classes as $class) {
-            if (!class_exists($class) && !interface_exists($class))
-            {
+            if (!class_exists($class) && !interface_exists($class)) {
                 throw new \InvalidArgumentException(sprintf('Unable to load class "%s"', $class));
             }
 

@@ -69,8 +69,7 @@ class PhpProcess extends Process
     static public function getPhpBinary()
     {
         if (getenv('PHP_PATH')) {
-            if (!is_executable($php = getenv('PHP_PATH')))
-            {
+            if (!is_executable($php = getenv('PHP_PATH'))) {
                 throw new \RuntimeException('The defined PHP_PATH environment variable is not a valid PHP executable.');
             }
 
@@ -79,8 +78,7 @@ class PhpProcess extends Process
 
         $suffixes = DIRECTORY_SEPARATOR == '\\' ? (getenv('PATHEXT') ? explode(PATH_SEPARATOR, getenv('PATHEXT')) : array('.exe', '.bat', '.cmd', '.com')) : array('');
         foreach ($suffixes as $suffix) {
-            if (is_executable($php = PHP_BINDIR.DIRECTORY_SEPARATOR.'php'.$suffix))
-            {
+            if (is_executable($php = PHP_BINDIR.DIRECTORY_SEPARATOR.'php'.$suffix)) {
                 return $php;
             }
         }

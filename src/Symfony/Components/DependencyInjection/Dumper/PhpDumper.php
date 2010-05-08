@@ -128,8 +128,7 @@ EOF;
         }
 
         if (is_array($callable)) {
-            if (is_object($callable[0]) && $callable[0] instanceof Reference)
-            {
+            if (is_object($callable[0]) && $callable[0] instanceof Reference) {
                 return sprintf("        %s->%s(\$instance);\n", $this->getServiceCall((string) $callable[0]), $callable[1]);
             } else {
                 return sprintf("        call_user_func(array(%s, '%s'), \$instance);\n", $this->dumpValue($callable[0]), $callable[1]);
@@ -222,8 +221,7 @@ EOF;
     {
         $annotations = array();
         foreach ($this->container->getDefinitions() as $id => $definition) {
-            foreach ($definition->getAnnotations() as $name => $ann)
-            {
+            foreach ($definition->getAnnotations() as $name => $ann) {
                 if (!isset($annotations[$name])) {
                     $annotations[$name] = array();
                 }
@@ -342,8 +340,7 @@ EOF;
     {
         $php = array();
         foreach ($parameters as $key => $value) {
-            if (is_array($value))
-            {
+            if (is_array($value)) {
                 $value = $this->exportParameters($value, $indent + 4);
             } elseif ($value instanceof Reference) {
                 throw new \InvalidArgumentException(sprintf('You cannot dump a container with parameters that contain references to other services (reference to service %s found).', $value));
@@ -396,8 +393,7 @@ EOF;
         } elseif (is_object($value) && $value instanceof Parameter) {
             return sprintf("\$this->getParameter('%s')", strtolower($value));
         } elseif (is_string($value)) {
-            if (preg_match('/^%([^%]+)%$/', $value, $match))
-            {
+            if (preg_match('/^%([^%]+)%$/', $value, $match)) {
                 // we do this to deal with non string values (boolean, integer, ...)
                 // the preg_replace_callback converts them to strings
                 return sprintf("\$this->getParameter('%s')", strtolower($match[1]));
@@ -430,8 +426,7 @@ EOF;
         if (null !== $reference && Container::EXCEPTION_ON_INVALID_REFERENCE !== $reference->getInvalidBehavior()) {
             return sprintf('$this->getService(\'%s\', Container::NULL_ON_INVALID_REFERENCE)', $id);
         } else {
-            if ($this->container->hasAlias($id))
-            {
+            if ($this->container->hasAlias($id)) {
                 $id = $this->container->getAlias($id);
             }
 

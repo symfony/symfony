@@ -66,8 +66,7 @@ class CacheLoader extends Loader
         }
 
         if (file_exists($path)) {
-            if (null !== $this->debugger)
-            {
+            if (null !== $this->debugger) {
                 $this->debugger->log(sprintf('Fetching template "%s" from cache', $template));
             }
 

@@ -60,8 +60,7 @@ class FilenameFilterIterator extends \FilterIterator
         if ($this->matchRegexps) {
             $match = false;
             foreach ($this->matchRegexps as $regex) {
-                if (preg_match($regex, $fileinfo->getFilename()))
-                {
+                if (preg_match($regex, $fileinfo->getFilename())) {
                     $match = true;
                     break;
                 }
@@ -74,8 +73,7 @@ class FilenameFilterIterator extends \FilterIterator
         if ($this->noMatchRegexps) {
             $exclude = false;
             foreach ($this->noMatchRegexps as $regex) {
-                if (preg_match($regex, $fileinfo->getFilename()))
-                {
+                if (preg_match($regex, $fileinfo->getFilename())) {
                     $exclude = true;
                     break;
                 }

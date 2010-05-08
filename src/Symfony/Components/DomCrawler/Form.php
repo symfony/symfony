@@ -42,8 +42,7 @@ class Form
     {
         $this->button = $node;
         if ('button' == $node->nodeName || ('input' == $node->nodeName && in_array($node->getAttribute('type'), array('submit', 'button', 'image')))) {
-            do
-            {
+            do {
                 // use the ancestor form element
                 if (null === $node = $node->parentNode) {
                     throw new \LogicException('The selected node does not have a form ancestor.');
@@ -130,8 +129,7 @@ class Form
     {
         $values = array();
         foreach ($this->fields as $name => $field) {
-            if (!$field instanceof Field\FileFormField && $field->hasValue())
-            {
+            if (!$field instanceof Field\FileFormField && $field->hasValue()) {
                 $values[$name] = $field->getValue();
             }
         }
@@ -152,8 +150,7 @@ class Form
 
         $files = array();
         foreach ($this->fields as $name => $field) {
-            if ($field instanceof Field\FileFormField)
-            {
+            if ($field instanceof Field\FileFormField) {
                 $files[$name] = $field->getValue();
             }
         }
@@ -305,8 +302,7 @@ class Form
         $xpath = new \DOMXPath($document);
 
         foreach ($xpath->query('descendant::input | descendant::textarea | descendant::select', $root) as $node) {
-            if ($node->hasAttribute('disabled') || !$node->hasAttribute('name'))
-            {
+            if ($node->hasAttribute('disabled') || !$node->hasAttribute('name')) {
                 continue;
             }
 
@@ -317,8 +313,7 @@ class Form
             } elseif ('select' == $nodeName || 'input' == $nodeName && 'checkbox' == $node->getAttribute('type')) {
                 $this->setField(new Field\ChoiceFormField($node));
             } elseif ('input' == $nodeName && 'radio' == $node->getAttribute('type')) {
-                if ($this->hasField($node->getAttribute('name')))
-                {
+                if ($this->hasField($node->getAttribute('name'))) {
                     $this->getField($node->getAttribute('name'))->addChoice($node);
                 } else {
                     $this->setField(new Field\ChoiceFormField($node));

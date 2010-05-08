@@ -55,8 +55,7 @@ class YamlFileLoader extends FileLoader
 
         // parameters
         if (isset($content['parameters'])) {
-            foreach ($content['parameters'] as $key => $value)
-            {
+            foreach ($content['parameters'] as $key => $value) {
                 $configuration->setParameter(strtolower($key), $this->resolveServices($value));
             }
         }
@@ -143,8 +142,7 @@ class YamlFileLoader extends FileLoader
         }
 
         if (isset($service['configurator'])) {
-            if (is_string($service['configurator']))
-            {
+            if (is_string($service['configurator'])) {
                 $definition->setConfigurator($service['configurator']);
             } else {
                 $definition->setConfigurator(array($this->resolveServices($service['configurator'][0]), $service['configurator'][1]));
@@ -152,15 +150,13 @@ class YamlFileLoader extends FileLoader
         }
 
         if (isset($service['calls'])) {
-            foreach ($service['calls'] as $call)
-            {
+            foreach ($service['calls'] as $call) {
                 $definition->addMethodCall($call[0], $this->resolveServices($call[1]));
             }
         }
 
         if (isset($service['annotations'])) {
-            foreach ($service['annotations'] as $annotation)
-            {
+            foreach ($service['annotations'] as $annotation) {
                 $name = $annotation['name'];
                 unset($annotation['name']);
 
@@ -190,8 +186,7 @@ class YamlFileLoader extends FileLoader
         }
 
         foreach (array_keys($content) as $key) {
-            if (in_array($key, array('imports', 'parameters', 'services')))
-            {
+            if (in_array($key, array('imports', 'parameters', 'services'))) {
                 continue;
             }
 
@@ -227,8 +222,7 @@ class YamlFileLoader extends FileLoader
     protected function loadFromExtensions(BuilderConfiguration $configuration, $content)
     {
         foreach ($content as $key => $values) {
-            if (in_array($key, array('imports', 'parameters', 'services')))
-            {
+            if (in_array($key, array('imports', 'parameters', 'services'))) {
                 continue;
             }
 

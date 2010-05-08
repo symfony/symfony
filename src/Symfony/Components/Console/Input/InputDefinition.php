@@ -49,8 +49,7 @@ class InputDefinition
         $arguments = array();
         $options = array();
         foreach ($definition as $item) {
-            if ($item instanceof InputOption)
-            {
+            if ($item instanceof InputOption) {
                 $options[] = $item;
             } else {
                 $arguments[] = $item;
@@ -82,8 +81,7 @@ class InputDefinition
     public function addArguments($arguments = array())
     {
         if (null !== $arguments) {
-            foreach ($arguments as $argument)
-            {
+            foreach ($arguments as $argument) {
                 $this->addArgument($argument);
             }
         }
@@ -386,8 +384,7 @@ class InputDefinition
         if ($this->getArguments()) {
             $text[] = '<comment>Arguments:</comment>';
             foreach ($this->getArguments() as $argument) {
-                if (null !== $argument->getDefault() && (!is_array($argument->getDefault()) || count($argument->getDefault())))
-                {
+                if (null !== $argument->getDefault() && (!is_array($argument->getDefault()) || count($argument->getDefault()))) {
                     $default = sprintf('<comment> (default: %s)</comment>', is_array($argument->getDefault()) ? str_replace("\n", '', var_export($argument->getDefault(), true)): $argument->getDefault());
                 } else {
                     $default = '';
@@ -403,8 +400,7 @@ class InputDefinition
             $text[] = '<comment>Options:</comment>';
 
             foreach ($this->getOptions() as $option) {
-                if ($option->acceptParameter() && null !== $option->getDefault() && (!is_array($option->getDefault()) || count($option->getDefault())))
-                {
+                if ($option->acceptParameter() && null !== $option->getDefault() && (!is_array($option->getDefault()) || count($option->getDefault()))) {
                     $default = sprintf('<comment> (default: %s)</comment>', is_array($option->getDefault()) ? str_replace("\n", '', print_r($option->getDefault(), true)): $option->getDefault());
                 } else {
                     $default = '';

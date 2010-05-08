@@ -29,8 +29,7 @@ class RealIteratorTestCase extends IteratorTestCase
         mkdir($tmpDir);
 
         foreach (self::$files as $file) {
-            if (false !== ($pos = strpos($file, '.')) && '/' !== $file[$pos - 1])
-            {
+            if (false !== ($pos = strpos($file, '.')) && '/' !== $file[$pos - 1]) {
                 touch($file);
             } else {
                 mkdir($file);
@@ -44,8 +43,7 @@ class RealIteratorTestCase extends IteratorTestCase
     static public function tearDownAfterClass()
     {
         foreach (self::$files as $file) {
-            if (false !== ($pos = strpos($file, '.')) && '/' !== $file[$pos - 1])
-            {
+            if (false !== ($pos = strpos($file, '.')) && '/' !== $file[$pos - 1]) {
                 @unlink($file);
             } else {
                 @rmdir($file);

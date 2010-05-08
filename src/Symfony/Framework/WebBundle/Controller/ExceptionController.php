@@ -61,14 +61,13 @@ class ExceptionController extends Controller
 
         $errors = 0;
         foreach ($logs as $log) {
-            if ('ERR' === $log['priorityName'])
-            {
+            if ('ERR' === $log['priorityName']) {
                 ++$errors;
             }
         }
 
         $currentContent = '';
-        while (false !== $content = ob_get_clean())  { $currentContent .= $content; }
+        while (false !== $content = ob_get_clean()) { $currentContent .= $content; }
 
         ob_start();
         require $template;

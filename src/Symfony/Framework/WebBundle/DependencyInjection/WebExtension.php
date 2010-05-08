@@ -61,8 +61,7 @@ class WebExtension extends LoaderExtension
         }
 
         foreach (array('name', 'auto_start', 'lifetime', 'path', 'domain', 'secure', 'httponly', 'cache_limiter', 'pdo.db_table') as $name) {
-            if (isset($config['session'][$name]))
-            {
+            if (isset($config['session'][$name])) {
                 $configuration->setParameter('session.options.'.$name, $config['session'][$name]);
             }
         }

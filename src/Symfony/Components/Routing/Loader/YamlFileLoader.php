@@ -44,8 +44,7 @@ class YamlFileLoader extends FileLoader
         $collection->addResource(new FileResource($path));
 
         foreach ($config as $name => $config) {
-            if (isset($config['resource']))
-            {
+            if (isset($config['resource'])) {
                 $this->parseImport($collection, $name, $config, $path);
             } elseif (isset($config['pattern'])) {
                 $this->parseRoute($collection, $name, $config, $path);

@@ -118,8 +118,7 @@ class ExceptionFormatter
         $single and $args = array($args);
 
         foreach ($args as $key => $value) {
-            if (is_object($value))
-            {
+            if (is_object($value)) {
                 $formattedValue = ($format == 'html' ? '<em>object</em>' : 'object').sprintf("('%s')", get_class($value));
             } else if (is_array($value)) {
                 $formattedValue = ($format == 'html' ? '<em>array</em>' : 'array').sprintf("(%s)", $this->formatArgs($value));

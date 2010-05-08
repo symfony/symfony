@@ -64,8 +64,7 @@ class RequestParser
         }
 
         if (false !== $parameters = $this->router->match($request->getPathInfo())) {
-            if (null !== $this->logger)
-            {
+            if (null !== $this->logger) {
                 $this->logger->info(sprintf('Matched route "%s" (parameters: %s)', $parameters['_route'], str_replace("\n", '', var_export($parameters, true))));
             }
 

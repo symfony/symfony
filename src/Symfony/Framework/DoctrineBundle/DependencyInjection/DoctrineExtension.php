@@ -80,8 +80,7 @@ class DoctrineExtension extends LoaderExtension
 
         $connections = array();
         if (isset($config['connections'])) {
-            foreach ($config['connections'] as $name => $connection)
-            {
+            foreach ($config['connections'] as $name => $connection) {
                 $connections[isset($connection['id']) ? $connection['id'] : $name] = $connection;
             }
         } else {
@@ -122,8 +121,7 @@ class DoctrineExtension extends LoaderExtension
                 $driverOptions['driverOptions'] = $connection['options'];
             }
             foreach (array('dbname', 'host', 'user', 'password', 'path', 'port') as $key) {
-                if (isset($connection[$key]))
-                {
+                if (isset($connection[$key])) {
                     $driverOptions[$key] = $connection[$key];
                 }
             }
@@ -162,8 +160,7 @@ class DoctrineExtension extends LoaderExtension
 
         $config['default_entity_manager'] = isset($config['default_entity_manager']) ? $config['default_entity_manager'] : 'default';
         foreach (array('metadata_driver', 'cache_driver') as $key) {
-            if (isset($config[$key]))
-            {
+            if (isset($config[$key])) {
                 $configuration->setParameter('doctrine.orm.'.$key, $config[$key]);
             }
         }
@@ -205,8 +202,7 @@ class DoctrineExtension extends LoaderExtension
                 }
 
                 if (is_dir($dir = $bundleDirs[$namespace].'/'.$class.'/Entities')) {
-                    if ($type === false)
-                    {
+                    if ($type === false) {
                         $type = 'annotation';
                     }
                     $aliasMap[$class] = $namespace.'\\'.$class.'\\Entities';

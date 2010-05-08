@@ -203,8 +203,7 @@ class Response
     public function setCookie($name, $value, $expire = null, $path = '/', $domain = '', $secure = false, $httpOnly = false)
     {
         if (null !== $expire) {
-            if (is_numeric($expire))
-            {
+            if (is_numeric($expire)) {
                 $expire = (int) $expire;
             } else {
                 $expire = strtotime($expire);

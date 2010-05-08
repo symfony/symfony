@@ -53,8 +53,7 @@ class EventDispatcher
         }
 
         foreach ($this->listeners[$name] as $i => $callable) {
-            if ($listener === $callable)
-            {
+            if ($listener === $callable) {
                 unset($this->listeners[$name][$i]);
             }
         }
@@ -86,8 +85,7 @@ class EventDispatcher
     public function notifyUntil(Event $event)
     {
         foreach ($this->getListeners($event->getName()) as $listener) {
-            if (call_user_func($listener, $event))
-            {
+            if (call_user_func($listener, $event)) {
                 $event->setProcessed(true);
                 break;
             }

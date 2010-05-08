@@ -68,8 +68,7 @@ class Builder extends Container implements AnnotatedContainerInterface
         try {
             return parent::getService($id, Container::EXCEPTION_ON_INVALID_REFERENCE);
         } catch (\InvalidArgumentException $e) {
-            if (isset($this->loading[$id]))
-            {
+            if (isset($this->loading[$id])) {
                 throw new \LogicException(sprintf('The service "%s" has a circular reference to itself.', $id));
             }
 
@@ -80,8 +79,7 @@ class Builder extends Container implements AnnotatedContainerInterface
             try {
                 $definition = $this->getDefinition($id);
             } catch (\InvalidArgumentException $e) {
-                if (Container::EXCEPTION_ON_INVALID_REFERENCE !== $invalidBehavior)
-                {
+                if (Container::EXCEPTION_ON_INVALID_REFERENCE !== $invalidBehavior) {
                     return null;
                 }
 
@@ -349,8 +347,7 @@ class Builder extends Container implements AnnotatedContainerInterface
 
             $ok = true;
             foreach ($services as $s) {
-                if (!$this->hasService($s))
-                {
+                if (!$this->hasService($s)) {
                     $ok = false;
                     break;
                 }
@@ -362,8 +359,7 @@ class Builder extends Container implements AnnotatedContainerInterface
         }
 
         if ($callable = $definition->getConfigurator()) {
-            if (is_array($callable) && is_object($callable[0]) && $callable[0] instanceof Reference)
-            {
+            if (is_array($callable) && is_object($callable[0]) && $callable[0] instanceof Reference) {
                 $callable[0] = $this->getService((string) $callable[0]);
             } elseif (is_array($callable)) {
                 $callable[0] = self::resolveValue($callable[0], $this->parameters);
@@ -398,8 +394,7 @@ class Builder extends Container implements AnnotatedContainerInterface
 
             $value = $args;
         } else if (is_string($value)) {
-            if (preg_match('/^%([^%]+)%$/', $value, $match))
-            {
+            if (preg_match('/^%([^%]+)%$/', $value, $match)) {
                 // we do this to deal with non string values (boolean, integer, ...)
                 // the preg_replace_callback converts them to strings
                 if (!array_key_exists($name = strtolower($match[1]), $parameters)) {
@@ -434,8 +429,7 @@ class Builder extends Container implements AnnotatedContainerInterface
     public function resolveServices($value)
     {
         if (is_array($value)) {
-            foreach ($value as &$v)
-            {
+            foreach ($value as &$v) {
                 $v = $this->resolveServices($v);
             }
         } else if (is_object($value) && $value instanceof Reference) {
@@ -456,8 +450,7 @@ class Builder extends Container implements AnnotatedContainerInterface
     {
         $annotations = array();
         foreach ($this->getDefinitions() as $id => $definition) {
-            if ($definition->getAnnotation($name))
-            {
+            if ($definition->getAnnotation($name)) {
                 $annotations[$id] = $definition->getAnnotation($name);
             }
         }
@@ -470,8 +463,7 @@ class Builder extends Container implements AnnotatedContainerInterface
         $services = array();
 
         if (is_array($value)) {
-            foreach ($value as $v)
-            {
+            foreach ($value as $v) {
                 $services = array_unique(array_merge($services, self::getServiceConditionals($v)));
             }
         } elseif (is_object($value) && $value instanceof Reference && $value->getInvalidBehavior() === Container::IGNORE_ON_INVALID_REFERENCE) {

@@ -109,8 +109,7 @@ class SlotsHelper extends Helper
     public function output($name, $default = false)
     {
         if (!isset($this->slots[$name])) {
-            if (false !== $default)
-            {
+            if (false !== $default) {
                 echo $default;
 
                 return true;

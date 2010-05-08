@@ -44,8 +44,7 @@ class XmlFileLoader extends FileLoader
 
         // process routes and imports
         foreach ($xml->documentElement->childNodes as $node) {
-            if (!$node instanceof \DOMElement)
-            {
+            if (!$node instanceof \DOMElement) {
                 continue;
             }
 
@@ -71,8 +70,7 @@ class XmlFileLoader extends FileLoader
         $options = array();
 
         foreach ($definition->childNodes as $node) {
-            if (!$node instanceof \DOMElement)
-            {
+            if (!$node instanceof \DOMElement) {
                 continue;
             }
 

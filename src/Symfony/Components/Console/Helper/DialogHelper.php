@@ -86,8 +86,7 @@ class DialogHelper extends Helper
         // @codeCoverageIgnoreStart
         $error = null;
         while (false === $attempts || $attempts--) {
-            if (null !== $error)
-            {
+            if (null !== $error) {
                 $output->writeln($this->getHelperSet()->get('formatter')->formatBlock($error->getMessage(), 'error'));
             }
 

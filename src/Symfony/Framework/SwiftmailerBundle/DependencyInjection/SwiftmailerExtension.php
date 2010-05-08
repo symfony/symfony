@@ -69,8 +69,7 @@ class SwiftMailerExtension extends LoaderExtension
         }
 
         foreach (array('encryption', 'port', 'host', 'username', 'password', 'auth_mode') as $key) {
-            if (isset($config[$key]))
-            {
+            if (isset($config[$key])) {
                 $configuration->setParameter('swiftmailer.transport.'.$config['transport'].'.'.$key, $config[$key]);
             }
         }
@@ -84,8 +83,7 @@ class SwiftMailerExtension extends LoaderExtension
             $configuration->setAlias('swiftmailer.spool', 'swiftmailer.spool.'.$type);
 
             foreach (array('path') as $key) {
-                if (isset($config['spool'][$key]))
-                {
+                if (isset($config['spool'][$key])) {
                     $configuration->setParameter('swiftmailer.spool.'.$type.'.'.$key, $config['spool'][$key]);
                 }
             }

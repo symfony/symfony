@@ -107,8 +107,7 @@ class ProfilerStorage
         $stmt = $db->prepare($query);
 
         if ($db instanceof \SQLite3) {
-            foreach ($args as $arg => $val)
-            {
+            foreach ($args as $arg => $val) {
                 $stmt->bindValue($arg, $val, is_int($val) ? \SQLITE3_INTEGER : \SQLITE3_TEXT);
             }
             $res = $stmt->execute();
@@ -118,8 +117,7 @@ class ProfilerStorage
             $res->finalize();
             $stmt->close();
         } else {
-            foreach ($args as $arg => $val)
-            {
+            foreach ($args as $arg => $val) {
                 $stmt->bindValue($arg, $val, is_int($val) ? \PDO::PARAM_INT : \PDO::PARAM_STR);
             }
             $stmt->execute();

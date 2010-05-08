@@ -36,8 +36,7 @@ class InlineTest extends \PHPUnit_Framework_TestCase
         }
 
         foreach ($this->getTestsForLoad() as $yaml => $value) {
-            if ($value == 1230)
-            {
+            if ($value == 1230) {
                 continue;
             }
 
@@ -45,8 +44,7 @@ class InlineTest extends \PHPUnit_Framework_TestCase
         }
 
         foreach ($testsForDump as $yaml => $value) {
-            if ($value == 1230)
-            {
+            if ($value == 1230) {
                 continue;
             }
 

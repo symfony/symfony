@@ -38,8 +38,7 @@ class ParserTest extends \PHPUnit_Framework_TestCase
 
             // split YAMLs documents
             foreach (preg_split('/^---( %YAML\:1\.0)?/m', $yamls) as $yaml) {
-                if (!$yaml)
-                {
+                if (!$yaml) {
                     continue;
                 }
 
@@ -66,8 +65,7 @@ class ParserTest extends \PHPUnit_Framework_TestCase
         );
 
         foreach ($yamls as $yaml) {
-            try
-            {
+            try {
                 $content = $this->parser->parse($yaml);
 
                 $this->fail('YAML files must not contain tabs');

@@ -71,8 +71,7 @@ class KernelExtension extends LoaderExtension
         } else {
             $classes = array();
             foreach (explode("\n", $config['compilation']) as $class) {
-                if ($class)
-                {
+                if ($class) {
                     $classes[] = trim($class);
                 }
             }

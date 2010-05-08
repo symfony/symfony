@@ -54,8 +54,7 @@ EOT
                 if ($metadatas = $this->getBundleMetadatas($bundle)) {
                     $output->writeln(sprintf('Generating entity repositories for "<info>%s</info>"', $class));
                     foreach ($metadatas as $metadata) {
-                        if ($metadata->customRepositoryClassName)
-                        {
+                        if ($metadata->customRepositoryClassName) {
                             $output->writeln(sprintf('  > generating <comment>%s</comment>', $metadata->customRepositoryClassName));
                             $generator->writeEntityRepositoryClass($metadata->customRepositoryClassName, $destination);
                         }

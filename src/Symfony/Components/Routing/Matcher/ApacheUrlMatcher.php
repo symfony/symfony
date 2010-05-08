@@ -56,8 +56,7 @@ class ApacheUrlMatcher extends UrlMatcher
 
         $parameters = array();
         foreach ($_SERVER as $key => $value) {
-            if ('_ROUTING_' === substr($key, 0, 9))
-            {
+            if ('_ROUTING_' === substr($key, 0, 9)) {
                 $parameters[substr($key, 9)] = $value;
                 unset($_SERVER[$key]);
             }

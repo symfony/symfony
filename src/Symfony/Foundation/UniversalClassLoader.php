@@ -129,8 +129,7 @@ class UniversalClassLoader
             // namespaced class name
             $namespace = substr($class, 0, $pos);
             foreach ($this->namespaces as $ns => $dir) {
-                if (0 === strpos($namespace, $ns))
-                {
+                if (0 === strpos($namespace, $ns)) {
                     $class = substr($class, $pos + 1);
                     $file = $dir.DIRECTORY_SEPARATOR.str_replace('\\', DIRECTORY_SEPARATOR, $namespace).DIRECTORY_SEPARATOR.str_replace('_', DIRECTORY_SEPARATOR, $class).'.php';
                     if (file_exists($file)) {
@@ -143,8 +142,7 @@ class UniversalClassLoader
         } else {
             // PEAR-like class name
             foreach ($this->prefixes as $prefix => $dir) {
-                if (0 === strpos($class, $prefix))
-                {
+                if (0 === strpos($class, $prefix)) {
                     $file = $dir.DIRECTORY_SEPARATOR.str_replace('_', DIRECTORY_SEPARATOR, $class).'.php';
                     if (file_exists($file)) {
                         require $file;

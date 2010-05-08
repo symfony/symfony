@@ -59,8 +59,7 @@ class ArrayDecoratorTest extends \PHPUnit_Framework_TestCase
     public function testIteratorInterface()
     {
         foreach (self::$escaped as $key => $value) {
-            switch ($key)
-            {
+            switch ($key) {
                 case 0:
                     $this->assertEquals('&lt;strong&gt;escaped!&lt;/strong&gt;', $value, 'The escaped object behaves like an array');
                     break;

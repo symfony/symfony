@@ -94,8 +94,7 @@ class Response
     public function getHeader($header)
     {
         foreach ($this->headers as $key => $value) {
-            if (str_replace('-', '_', strtolower($key)) == str_replace('-', '_', strtolower($header)))
-            {
+            if (str_replace('-', '_', strtolower($key)) == str_replace('-', '_', strtolower($header))) {
                 return $value;
             }
         }

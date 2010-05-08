@@ -41,8 +41,7 @@ class Bundle extends BaseBundle
             $class = basename($tmp);
 
             if (isset($bundleDirs[$namespace])) {
-                if (is_dir($dir = $bundleDirs[$namespace].'/'.$class.'/Resources/config/doctrine/metadata'))
-                {
+                if (is_dir($dir = $bundleDirs[$namespace].'/'.$class.'/Resources/config/doctrine/metadata')) {
                     $metadataDirs[] = realpath($dir);
                 }
                 if (is_dir($dir = $bundleDirs[$namespace].'/'.$class.'/Entities')) {

@@ -46,8 +46,7 @@ class IniFileLoader extends FileLoader
         }
 
         if (isset($result['parameters']) && is_array($result['parameters'])) {
-            foreach ($result['parameters'] as $key => $value)
-            {
+            foreach ($result['parameters'] as $key => $value) {
                 $configuration->setParameter(strtolower($key), $value);
             }
         }

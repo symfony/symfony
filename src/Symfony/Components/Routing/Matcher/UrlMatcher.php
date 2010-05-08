@@ -81,8 +81,7 @@ class UrlMatcher implements UrlMatcherInterface
     {
         $parameters = array_merge($this->defaults, $defaults);
         foreach ($params as $key => $value) {
-            if (!is_int($key))
-            {
+            if (!is_int($key)) {
                 $parameters[$key] = urldecode($value);
             }
         }

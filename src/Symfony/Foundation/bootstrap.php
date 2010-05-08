@@ -32,8 +32,7 @@ abstract class Bundle implements BundleInterface
             }
 
                         foreach (new \RecursiveIteratorIterator(new \RecursiveDirectoryIterator($commandDir), \RecursiveIteratorIterator::LEAVES_ONLY) as $file) {
-                if ($file->isDir() || substr($file, -4) !== '.php')
-                {
+                if ($file->isDir() || substr($file, -4) !== '.php') {
                     continue;
                 }
 
@@ -167,8 +166,7 @@ class KernelExtension extends LoaderExtension
         } else {
             $classes = array();
             foreach (explode("\n", $config['compilation']) as $class) {
-                if ($class)
-                {
+                if ($class) {
                     $classes[] = trim($class);
                 }
             }
@@ -270,8 +268,7 @@ class ClassCollectionLoader
                 if ($meta[1] != $classes) {
                     $reload = true;
                 } else {
-                    foreach ($meta[0] as $resource)
-                    {
+                    foreach ($meta[0] as $resource) {
                         if (!file_exists($resource) || filemtime($resource) > $time) {
                             $reload = true;
 
@@ -291,8 +288,7 @@ class ClassCollectionLoader
         $files = array();
         $content = '';
         foreach ($classes as $class) {
-            if (!class_exists($class) && !interface_exists($class))
-            {
+            if (!class_exists($class) && !interface_exists($class)) {
                 throw new \InvalidArgumentException(sprintf('Unable to load class "%s"', $class));
             }
 
@@ -350,8 +346,7 @@ class EventDispatcher extends BaseEventDispatcher
         $this->container = $container;
 
         foreach ($container->findAnnotatedServiceIds('kernel.listener') as $id => $attributes) {
-            foreach ($attributes as $attribute)
-            {
+            foreach ($attributes as $attribute) {
                 if (isset($attribute['event'])) {
                     $this->connect($attribute['event'], array($id, isset($attribute['method']) ? $attribute['method'] : 'handle'));
                 }
@@ -367,8 +362,7 @@ class EventDispatcher extends BaseEventDispatcher
         }
 
         foreach ($this->listeners[$name] as $i => $listener) {
-            if (is_array($listener) && is_string($listener[0]))
-            {
+            if (is_array($listener) && is_string($listener[0])) {
                 $this->listeners[$name][$i] = array($this->container->getService($listener[0]), $listener[1]);
             }
         }

@@ -56,8 +56,7 @@ abstract class FileLoader implements LoaderInterface
         } else if (null !== $currentPath && file_exists($currentPath.DIRECTORY_SEPARATOR.$file)) {
             return $currentPath.DIRECTORY_SEPARATOR.$file;
         } else {
-            foreach ($this->paths as $path)
-            {
+            foreach ($this->paths as $path) {
                 if (file_exists($path.DIRECTORY_SEPARATOR.$file)) {
                     return $path.DIRECTORY_SEPARATOR.$file;
                 }

@@ -44,8 +44,7 @@ class YamlDumper extends Dumper
 
         $annotationsCode = '';
         foreach ($definition->getAnnotations() as $name => $annotations) {
-            foreach ($annotations as $attributes)
-            {
+            foreach ($annotations as $attributes) {
                 $att = array();
                 foreach ($attributes as $key => $value) {
                     $att[] = sprintf('%s: %s', Yaml::dump($key), Yaml::dump($value));
@@ -80,8 +79,7 @@ class YamlDumper extends Dumper
         }
 
         if ($callable = $definition->getConfigurator()) {
-            if (is_array($callable))
-            {
+            if (is_array($callable)) {
                 if (is_object($callable[0]) && $callable[0] instanceof Reference) {
                     $callable = array($this->getServiceCall((string) $callable[0], $callable[0]), $callable[1]);
                 } else {
@@ -168,8 +166,7 @@ class YamlDumper extends Dumper
     {
         $filtered = array();
         foreach ($parameters as $key => $value) {
-            if (is_array($value))
-            {
+            if (is_array($value)) {
                 $value = $this->prepareParameters($value);
             } elseif ($value instanceof Reference) {
                 $value = '@'.$value;
@@ -185,8 +182,7 @@ class YamlDumper extends Dumper
     {
         $args = array();
         foreach ($arguments as $k => $v) {
-            if (is_array($v))
-            {
+            if (is_array($v)) {
                 $args[$k] = $this->escape($v);
             } elseif (is_string($v)) {
                 $args[$k] = str_replace('%', '%%', $v);

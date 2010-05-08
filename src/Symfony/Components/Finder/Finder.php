@@ -292,8 +292,7 @@ class Finder implements \IteratorAggregate
         }
 
         foreach ($dirs as $dir) {
-            if (!is_dir($dir))
-            {
+            if (!is_dir($dir)) {
                 throw new \InvalidArgumentException(sprintf('The "%s" directory does not exist.', $dir));
             }
         }

@@ -232,8 +232,7 @@ class Inline
 
         // [foo, bar, ...]
         while ($i < $len) {
-            switch ($sequence[$i])
-            {
+            switch ($sequence[$i]) {
                 case '[':
                     // nested sequence
                     $output[] = self::parseSequence($sequence, $i);
@@ -289,8 +288,7 @@ class Inline
 
         // {foo: bar, bar:foo, ...}
         while ($i < $len) {
-            switch ($mapping[$i])
-            {
+            switch ($mapping[$i]) {
                 case ' ':
                 case ',':
                     ++$i;
@@ -305,8 +303,7 @@ class Inline
             // value
             $done = false;
             while ($i < $len) {
-                switch ($mapping[$i])
-                {
+                switch ($mapping[$i]) {
                     case '[':
                         // nested sequence
                         $output[$key] = self::parseSequence($mapping, $i);

@@ -127,8 +127,7 @@ class XmlFileLoader extends FileLoader
         $definition = new Definition((string) $service['class']);
 
         foreach (array('shared', 'constructor') as $key) {
-            if (isset($service[$key]))
-            {
+            if (isset($service[$key])) {
                 $method = 'set'.ucfirst($key);
                 $definition->$method((string) $service->getAttributeAsPhp($key));
             }
@@ -141,12 +140,10 @@ class XmlFileLoader extends FileLoader
         $definition->setArguments($service->getArgumentsAsPhp('argument'));
 
         if (isset($service->configurator)) {
-            if (isset($service->configurator['function']))
-            {
+            if (isset($service->configurator['function'])) {
                 $definition->setConfigurator((string) $service->configurator['function']);
             } else {
-                if (isset($service->configurator['service']))
-                {
+                if (isset($service->configurator['service'])) {
                     $class = new Reference((string) $service->configurator['service']);
                 } else {
                     $class = (string) $service->configurator['class'];
@@ -163,8 +160,7 @@ class XmlFileLoader extends FileLoader
         foreach ($service->annotation as $annotation) {
             $parameters = array();
             foreach ($annotation->attributes() as $name => $value) {
-                if ('name' === $name)
-                {
+                if ('name' === $name) {
                     continue;
                 }
 
@@ -240,8 +236,7 @@ class XmlFileLoader extends FileLoader
         if ($element = $dom->documentElement->getAttributeNS('http://www.w3.org/2001/XMLSchema-instance', 'schemaLocation')) {
             $items = preg_split('/\s+/', $element);
             for ($i = 0, $nb = count($items); $i < $nb; $i += 2) {
-                if ($extension = static::getExtension($items[$i]))
-                {
+                if ($extension = static::getExtension($items[$i])) {
                     $path = str_replace('http://www.symfony-project.org/', str_replace('\\', '/', $extension->getXsdValidationBasePath()).'/', $items[$i + 1]);
 
                     if (!file_exists($path)) {
@@ -284,8 +279,7 @@ EOF
     protected function validateExtensions($dom, $file)
     {
         foreach ($dom->documentElement->childNodes as $node) {
-            if (!$node instanceof \DOMElement || in_array($node->tagName, array('imports', 'parameters', 'services')))
-            {
+            if (!$node instanceof \DOMElement || in_array($node->tagName, array('imports', 'parameters', 'services'))) {
                 continue;
             }
 
@@ -322,8 +316,7 @@ EOF
     protected function loadFromExtensions(BuilderConfiguration $configuration, $xml)
     {
         foreach (dom_import_simplexml($xml)->childNodes as $node) {
-            if (!$node instanceof \DOMElement || $node->namespaceURI === 'http://www.symfony-project.org/schema/dic/services')
-            {
+            if (!$node instanceof \DOMElement || $node->namespaceURI === 'http://www.symfony-project.org/schema/dic/services') {
                 continue;
             }
 
@@ -367,15 +360,13 @@ EOF
 
         $nodeValue = false;
         foreach ($element->childNodes as $node) {
-            if ($node instanceof \DOMText)
-            {
+            if ($node instanceof \DOMText) {
                 if (trim($node->nodeValue)) {
                     $nodeValue = trim($node->nodeValue);
                     $empty = false;
                 }
             } elseif (!$node instanceof \DOMComment) {
-                if (isset($config[$node->localName]))
-                {
+                if (isset($config[$node->localName])) {
                     if (!is_array($config[$node->localName])) {
                         $config[$node->localName] = array($config[$node->localName]);
                     }

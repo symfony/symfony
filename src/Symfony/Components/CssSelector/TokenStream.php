@@ -65,8 +65,7 @@ class TokenStream
     public function peek()
     {
         if (!$this->peeking) {
-            if (!count($this->tokens))
-            {
+            if (!count($this->tokens)) {
                 return null;
             }
 

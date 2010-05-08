@@ -79,8 +79,7 @@ class FunctionNode implements NodeInterface
 
         $xpath->addStarPrefix();
         if ($a == 0) {
-            if ($last)
-            {
+            if ($last) {
                 $b = sprintf('last() - %s', $b);
             }
             $xpath->addCondition(sprintf('position() = %s', $b));

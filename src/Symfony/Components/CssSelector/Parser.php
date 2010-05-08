@@ -32,8 +32,7 @@ class Parser
     static public function cssToXpath($cssExpr, $prefix = 'descendant-or-self::')
     {
         if (is_string($cssExpr)) {
-            if (preg_match('#^\w+\s*$#u', $cssExpr, $match))
-            {
+            if (preg_match('#^\w+\s*$#u', $cssExpr, $match)) {
                 return $prefix.trim($match[0]);
             }
 
@@ -162,8 +161,7 @@ class Parser
         while (1) {
             $peek = $stream->peek();
             if ($peek == '#') {
-                if ($has_hash)
-                {
+                if ($has_hash) {
                     /* You can't have two hashes
                         (FIXME: is there some more general rule I'm missing?) */
                     // @codeCoverageIgnoreStart
@@ -219,8 +217,7 @@ class Parser
 
                 continue;
             } else {
-                if ($peek == ' ')
-                {
+                if ($peek == ' ') {
                     $stream->next();
                 }
 

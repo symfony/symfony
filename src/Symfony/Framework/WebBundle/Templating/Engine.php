@@ -48,8 +48,7 @@ class Engine extends BaseEngine
 
         $this->helpers = array();
         foreach ($this->container->findAnnotatedServiceIds('templating.helper') as $id => $attributes) {
-            if (isset($attributes[0]['alias']))
-            {
+            if (isset($attributes[0]['alias'])) {
                 $this->helpers[$attributes[0]['alias']] = $id;
             }
         }

@@ -35,8 +35,7 @@ class Tokenizer
         $s = preg_replace('#/\*.*?\*/#s', '', $s);
 
         while (1) {
-            if (preg_match('#\s+#A', $s, $match, 0, $pos))
-            {
+            if (preg_match('#\s+#A', $s, $match, 0, $pos)) {
                 $preceding_whitespace_pos = $pos;
                 $pos += strlen($match[0]);
             } else {
@@ -44,8 +43,7 @@ class Tokenizer
             }
 
             if ($pos >= strlen($s)) {
-                if (isset($mbEncoding))
-                {
+                if (isset($mbEncoding)) {
                     mb_internal_encoding($mbEncoding);
                 }
 
@@ -70,8 +68,7 @@ class Tokenizer
             }
 
             if (in_array($c, array('>', '+', '~', ',', '.', '*', '=', '[', ']', '(', ')', '|', ':', '#'))) {
-                if (in_array($c, array('.', '#', '[')) && $preceding_whitespace_pos > 0)
-                {
+                if (in_array($c, array('.', '#', '[')) && $preceding_whitespace_pos > 0) {
                     $tokens[] = new Token('Token', ' ', $preceding_whitespace_pos);
                 }
                 $tokens[] = new Token('Token', $c, $pos);

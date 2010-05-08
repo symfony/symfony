@@ -49,8 +49,7 @@ class YamlFileLoaderTest extends \PHPUnit_Framework_TestCase
         $loader = new ProjectLoader3(self::$fixturesPath.'/yaml');
 
         foreach (array('nonvalid1', 'nonvalid2') as $fixture) {
-            try
-            {
+            try {
                 $loader->loadFile($fixture.'.yml');
                 $this->fail('->load() throws an InvalidArgumentException if the loaded file does not validate');
             } catch (\Exception $e) {

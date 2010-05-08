@@ -50,8 +50,7 @@ class SizeRangeFilterIterator extends \FilterIterator
 
         $filesize = $fileinfo->getSize();
         foreach ($this->patterns as $compare) {
-            if (!$compare->test($filesize))
-            {
+            if (!$compare->test($filesize)) {
                 return false;
             }
         }

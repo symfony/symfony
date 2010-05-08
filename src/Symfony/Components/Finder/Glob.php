@@ -54,8 +54,7 @@ class Glob
         for ($i = 0; $i < $sizeGlob; $i++) {
             $car = $glob[$i];
             if ($firstByte) {
-                if ($strictLeadingDot && $car !== '.')
-                {
+                if ($strictLeadingDot && $car !== '.') {
                     $regex .= '(?=[^\.])';
                 }
 
@@ -85,8 +84,7 @@ class Glob
             } elseif ($car === ',' && $inCurlies) {
                 $regex .= $escaping ? ',' : '|';
             } elseif ($car === '\\') {
-                if ($escaping)
-                {
+                if ($escaping) {
                     $regex .= '\\\\';
                     $escaping = false;
                 } else {

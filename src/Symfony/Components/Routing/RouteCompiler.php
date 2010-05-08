@@ -68,8 +68,7 @@ class RouteCompiler implements RouteCompilerInterface
         // optimize tokens for generation
         $tokens = array();
         foreach ($this->tokens as $i => $token) {
-            if ($i + 1 === count($this->tokens) && 'separator' === $token[0])
-            {
+            if ($i + 1 === count($this->tokens) && 'separator' === $token[0]) {
                 // trailing /
                 $tokens[] = array('text', $token[2], '', null);
             } elseif ('separator' !== $token[0]) {
@@ -103,8 +102,7 @@ class RouteCompiler implements RouteCompilerInterface
 
         $this->staticPrefix = '';
         foreach ($this->tokens as $token) {
-            switch ($token[0])
-            {
+            switch ($token[0]) {
                 case 'separator':
                     break;
                 case 'text':
@@ -132,8 +130,7 @@ class RouteCompiler implements RouteCompilerInterface
 
         // a route is an array of (separator + variable) or (separator + text) segments
         while (strlen($buffer)) {
-            if (false !== $this->tokenizeBufferBefore($buffer, $tokens, $afterASeparator, $currentSeparator))
-            {
+            if (false !== $this->tokenizeBufferBefore($buffer, $tokens, $afterASeparator, $currentSeparator)) {
                 // a custom token
                 $this->customToken = true;
             } else if ($afterASeparator && preg_match('#^'.$this->options['variable_prefix_regex'].'('.$this->options['variable_regex'].')#', $buffer, $match)) {

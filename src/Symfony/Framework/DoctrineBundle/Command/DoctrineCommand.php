@@ -163,8 +163,7 @@ abstract class DoctrineCommand extends Command
             $cmf = new SymfonyDisconnectedClassMetadataFactory($em);
             $metadatas = $cmf->getAllMetadata();
             foreach ($metadatas as $metadata) {
-                if (strpos($metadata->name, $namespace) !== false)
-                {
+                if (strpos($metadata->name, $namespace) !== false) {
                     $bundleMetadatas[] = $metadata;
                 }
             }

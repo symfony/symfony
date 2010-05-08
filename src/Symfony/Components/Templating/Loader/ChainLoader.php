@@ -60,8 +60,7 @@ class ChainLoader extends Loader
     public function load($template, array $options = array())
     {
         foreach ($this->loaders as $loader) {
-            if (false !== $ret = $loader->load($template, $options))
-            {
+            if (false !== $ret = $loader->load($template, $options)) {
                 return $ret;
             }
         }

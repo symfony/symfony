@@ -60,8 +60,7 @@ EOT
         $bundleClass = null;
         $bundleDirs = $this->container->getKernelService()->getBundleDirs();
         foreach ($this->container->getKernelService()->getBundles() as $bundle) {
-            if (strpos(get_class($bundle), $input->getArgument('bundle')) !== false)
-            {
+            if (strpos(get_class($bundle), $input->getArgument('bundle')) !== false) {
                 $tmp = dirname(str_replace('\\', '/', get_class($bundle)));
                 $namespace = str_replace('/', '\\', dirname($tmp));
                 $class = basename($tmp);

@@ -76,8 +76,7 @@ class HttpKernel implements HttpKernelInterface
         try {
             return $this->handleRaw($request, $main);
         } catch (\Exception $e) {
-            if (true === $raw)
-            {
+            if (true === $raw) {
                 throw $e;
             }
 
@@ -130,8 +129,7 @@ class HttpKernel implements HttpKernelInterface
         // controller
         $event = $this->dispatcher->notifyUntil(new Event($this, 'core.controller', array('main_request' => $main, 'request' => $request, 'controller' => &$controller, 'arguments' => &$arguments)));
         if ($event->isProcessed()) {
-            try
-            {
+            try {
                 return $this->filterResponse($event->getReturnValue(), $request, 'A "core.controller" listener returned a non response object.', $main);
             } catch (\Exception $e) {
                 $retval = $event->getReturnValue();

@@ -115,8 +115,7 @@ class Application
         try {
             $statusCode = $this->doRun($input, $output);
         } catch (\Exception $e) {
-            if (!$this->catchExceptions)
-            {
+            if (!$this->catchExceptions) {
                 throw $e;
             }
 
@@ -152,8 +151,7 @@ class Application
         }
 
         if (true === $input->hasParameterOption(array('--help', '-H'))) {
-            if (!$name)
-            {
+            if (!$name) {
                 $name = 'help';
                 $input = new ArrayInput(array('command' => 'help'));
             } else {
@@ -420,8 +418,7 @@ class Application
     {
         $namespaces = array();
         foreach ($this->commands as $command) {
-            if ($command->getNamespace())
-            {
+            if ($command->getNamespace()) {
                 $namespaces[$command->getNamespace()] = true;
             }
         }
@@ -477,8 +474,7 @@ class Application
         // name
         $commands = array();
         foreach ($this->commands as $command) {
-            if ($command->getNamespace() == $namespace)
-            {
+            if ($command->getNamespace() == $namespace) {
                 $commands[] = $command->getName();
             }
         }
@@ -524,8 +520,7 @@ class Application
 
         $commands = array();
         foreach ($this->commands as $name => $command) {
-            if ($namespace === $command->getNamespace())
-            {
+            if ($namespace === $command->getNamespace()) {
                 $commands[$name] = $command;
             }
         }
@@ -544,8 +539,7 @@ class Application
     {
         $abbrevs = array();
         foreach ($names as $name) {
-            for ($len = strlen($name) - 1; $len > 0; --$len)
-            {
+            for ($len = strlen($name) - 1; $len > 0; --$len) {
                 $abbrev = substr($name, 0, $len);
                 if (!isset($abbrevs[$abbrev])) {
                     $abbrevs[$abbrev] = array($name);
@@ -589,8 +583,7 @@ class Application
 
         // add commands by namespace
         foreach ($this->sortCommands($commands) as $space => $commands) {
-            if (!$namespace && '_global' !== $space)
-            {
+            if (!$namespace && '_global' !== $space) {
                 $messages[] = '<comment>'.$space.'</comment>';
             }
 
@@ -630,15 +623,13 @@ class Application
 
         // add commands by namespace
         foreach ($this->sortCommands($commands) as $space => $commands) {
-            if (!$namespace)
-            {
+            if (!$namespace) {
                 $namespacesXML->appendChild($namespaceArrayXML = $dom->createElement('namespace'));
                 $namespaceArrayXML->setAttribute('id', $space);
             }
 
             foreach ($commands as $command) {
-                if (!$namespace)
-                {
+                if (!$namespace) {
                     $namespaceArrayXML->appendChild($commandXML = $dom->createElement('command'));
                     $commandXML->appendChild($dom->createTextNode($command->getName()));
                 }

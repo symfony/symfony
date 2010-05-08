@@ -59,8 +59,7 @@ class ControllerLoader
         $request = $event->getParameter('request');
 
         if (!($bundle = $request->path->get('_bundle')) || !($controller = $request->path->get('_controller')) || !($action = $request->path->get('_action'))) {
-            if (null !== $this->logger)
-            {
+            if (null !== $this->logger) {
                 $this->logger->err(sprintf('Unable to look for the controller as some mandatory parameters are missing (_bundle: %s, _controller: %s, _action: %s)', isset($bundle) ? var_export($bundle, true) : 'NULL', isset($controller) ? var_export($controller, true) : 'NULL', isset($action) ? var_export($action, true) : 'NULL'));
             }
 
@@ -88,8 +87,7 @@ class ControllerLoader
         foreach (array_keys($this->container->getParameter('kernel.bundle_dirs')) as $namespace) {
             $try = $namespace.'\\'.$bundle.'\\Controller\\'.$controller.'Controller';
             if (!class_exists($try)) {
-                if (null !== $this->logger)
-                {
+                if (null !== $this->logger) {
                     $logs[] = sprintf('Failed finding controller "%s:%s" from namespace "%s" (%s)', $bundle, $controller, $namespace, $try);
                 }
             } else {
@@ -105,8 +103,7 @@ class ControllerLoader
         }
 
         if (null === $class) {
-            if (null !== $this->logger)
-            {
+            if (null !== $this->logger) {
                 foreach ($logs as $log) {
                     $this->logger->info($log);
                 }
@@ -136,8 +133,7 @@ class ControllerLoader
     {
         $arguments = array();
         foreach ($r->getParameters() as $param) {
-            if (array_key_exists($param->getName(), $parameters))
-            {
+            if (array_key_exists($param->getName(), $parameters)) {
                 $arguments[] = $parameters[$param->getName()];
             } elseif ($param->isDefaultValueAvailable()) {
                 $arguments[] = $param->getDefaultValue();

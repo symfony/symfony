@@ -224,8 +224,7 @@ class Router implements RouterInterface
         $time = filemtime($file);
         $meta = unserialize(file_get_contents($metadata));
         foreach ($meta as $resource) {
-            if (!$resource->isUptodate($time))
-            {
+            if (!$resource->isUptodate($time)) {
                 return true;
             }
         }

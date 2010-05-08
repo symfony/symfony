@@ -98,8 +98,7 @@ class InputArgument
         }
 
         if ($this->isArray()) {
-            if (null === $default)
-            {
+            if (null === $default) {
                 $default = array();
             } else if (!is_array($default)) {
                 throw new \LogicException('A default value for an array argument must be an array.');

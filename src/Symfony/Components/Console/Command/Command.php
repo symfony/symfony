@@ -134,8 +134,7 @@ class Command
         try {
             $input->bind($this->definition);
         } catch (\Exception $e) {
-            if (!$this->ignoreValidationErrors)
-            {
+            if (!$this->ignoreValidationErrors) {
                 throw $e;
             }
         }

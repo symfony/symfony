@@ -50,8 +50,7 @@ class EventDispatcher extends BaseEventDispatcher
     public function notify(Event $event)
     {
         foreach ($this->getListeners($event->getName()) as $listener) {
-            if (null !== $this->logger)
-            {
+            if (null !== $this->logger) {
                 $this->logger->debug(sprintf('Notifying event "%s" to listener "%s"', $event->getName(), $this->listenerToString($listener)));
             }
 
@@ -71,14 +70,12 @@ class EventDispatcher extends BaseEventDispatcher
     public function notifyUntil(Event $event)
     {
         foreach ($this->getListeners($event->getName()) as $listener) {
-            if (null !== $this->logger)
-            {
+            if (null !== $this->logger) {
                 $this->logger->debug(sprintf('Notifying (until) event "%s" to listener "%s"', $event->getName(), $this->listenerToString($listener)));
             }
 
             if (call_user_func($listener, $event)) {
-                if (null !== $this->logger)
-                {
+                if (null !== $this->logger) {
                     $this->logger->debug(sprintf('Listener "%s" processed the event "%s"', $this->listenerToString($listener), $event->getName()));
                 }
 
@@ -101,8 +98,7 @@ class EventDispatcher extends BaseEventDispatcher
     public function filter(Event $event, $value)
     {
         foreach ($this->getListeners($event->getName()) as $listener) {
-            if (null !== $this->logger)
-            {
+            if (null !== $this->logger) {
                 $this->logger->debug(sprintf('Notifying (filter) event "%s" to listener "%s"', $event->getName(), $this->listenerToString($listener)));
             }
 

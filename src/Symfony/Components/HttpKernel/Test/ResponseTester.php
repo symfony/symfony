@@ -118,8 +118,7 @@ class ResponseTester extends Tester
     {
         $headers = explode(', ', $this->response->headers->get($key));
         foreach ($headers as $header) {
-            if ($header == $value)
-            {
+            if ($header == $value) {
                 return $this->test->pass(sprintf('Response header "%s" is "%s" (%s)', $key, $value, $this->response->headers->get($key)));
             }
         }
@@ -137,8 +136,7 @@ class ResponseTester extends Tester
     {
         $headers = explode(', ', $this->response->headers->get($key));
         foreach ($headers as $header) {
-            if ($header == $value)
-            {
+            if ($header == $value) {
                 return $this->test->fail(sprintf('Response header "%s" is not "%s" (%s)', $key, $value, $this->response->headers->get($key)));
             }
         }
@@ -156,8 +154,7 @@ class ResponseTester extends Tester
     {
         $headers = explode(', ', $this->response->headers->get($key));
         foreach ($headers as $header) {
-            if (preg_match($regex, $header))
-            {
+            if (preg_match($regex, $header)) {
                 return $this->test->pass(sprintf('Response header "%s" matches "%s" (%s)', $key, $value, $this->response->headers->get($key)));
             }
         }
@@ -175,8 +172,7 @@ class ResponseTester extends Tester
     {
         $headers = explode(', ', $this->response->headers->get($key));
         foreach ($headers as $header) {
-            if (!preg_match($regex, $header))
-            {
+            if (!preg_match($regex, $header)) {
                 return $this->test->pass(sprintf('Response header "%s" matches "%s" (%s)', $key, $value, $this->response->headers->get($key)));
             }
         }
@@ -194,8 +190,7 @@ class ResponseTester extends Tester
     public function assertCookie($name, $value = null, $attributes = array())
     {
         foreach ($this->response->getCookies() as $cookie) {
-            if ($name == $cookie['name'])
-            {
+            if ($name == $cookie['name']) {
                 if (null === $value) {
                     $this->test->pass(sprintf('Response sets cookie "%s"', $name));
                 } else {
@@ -203,8 +198,7 @@ class ResponseTester extends Tester
                 }
 
                 foreach ($attributes as $attributeName => $attributeValue) {
-                    if (!array_key_exists($attributeName, $cookie))
-                    {
+                    if (!array_key_exists($attributeName, $cookie)) {
                         throw new \LogicException(sprintf('The cookie attribute "%s" is not valid.', $attributeName));
                     }
 

@@ -309,8 +309,7 @@ class Request
     public function getMethod()
     {
         if (null === $this->method) {
-            switch ($this->server->get('REQUEST_METHOD', 'GET'))
-            {
+            switch ($this->server->get('REQUEST_METHOD', 'GET')) {
                 case 'POST':
                     $this->method = strtoupper($this->request->get('_method', 'POST'));
                     break;
@@ -365,8 +364,7 @@ class Request
         }
 
         foreach (static::$formats as $format => $mimeTypes) {
-            if (in_array($mimeType, (array) $mimeTypes))
-            {
+            if (in_array($mimeType, (array) $mimeTypes)) {
                 return $format;
             }
         }
@@ -456,8 +454,7 @@ class Request
 
         $languages = $this->splitHttpAcceptHeader($this->headers->get('Accept-Language'));
         foreach ($languages as $lang) {
-            if (strstr($lang, '-'))
-            {
+            if (strstr($lang, '-')) {
                 $codes = explode('-', $lang);
                 if ($codes[0] == 'i') {
                     // Language not listed in ISO 639 that are not variants
@@ -467,8 +464,7 @@ class Request
                         $lang = $codes[1];
                     }
                 } else {
-                    for ($i = 0, $max = count($codes); $i < $max; $i++)
-                    {
+                    for ($i = 0, $max = count($codes); $i < $max; $i++) {
                         if ($i == 0) {
                             $lang = strtolower($codes[0]);
                         } else {
@@ -725,8 +721,7 @@ class Request
     {
         $headers = array();
         foreach ($this->server->all() as $key => $value) {
-            if ('http_' === strtolower(substr($key, 0, 5)))
-            {
+            if ('http_' === strtolower(substr($key, 0, 5))) {
                 $headers[substr($key, 5)] = $value;
             }
         }

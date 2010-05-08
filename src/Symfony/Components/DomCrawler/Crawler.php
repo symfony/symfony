@@ -191,8 +191,7 @@ class Crawler extends \SplObjectStorage
     public function eq($position)
     {
         foreach ($this as $i => $node) {
-            if ($i == $position)
-            {
+            if ($i == $position) {
                 return new static($node, $this->uri);
             }
         }
@@ -239,8 +238,7 @@ class Crawler extends \SplObjectStorage
     {
         $nodes = array();
         foreach ($this as $i => $node) {
-            if (false !== $closure($node, $i))
-            {
+            if (false !== $closure($node, $i)) {
                 $nodes[] = $node;
             }
         }
@@ -331,8 +329,7 @@ class Crawler extends \SplObjectStorage
         $nodes = array();
 
         while ($node = $node->parentNode) {
-            if (1 === $node->nodeType && '_root' !== $node->nodeName)
-            {
+            if (1 === $node->nodeType && '_root' !== $node->nodeName) {
                 $nodes[] = $node;
             }
         }
@@ -413,8 +410,7 @@ class Crawler extends \SplObjectStorage
         foreach ($this as $node) {
             $elements = array();
             foreach ($attributes as $attribute) {
-                if ('_text' === $attribute)
-                {
+                if ('_text' === $attribute) {
                     $elements[] = $node->nodeValue;
                 } else {
                     $elements[] = $node->getAttribute($attribute);
@@ -563,8 +559,7 @@ class Crawler extends \SplObjectStorage
     protected function getNode($position)
     {
         foreach ($this as $i => $node) {
-            if ($i == $position)
-            {
+            if ($i == $position) {
                 return $node;
             }
         // @codeCoverageIgnoreStart
@@ -594,8 +589,7 @@ class Crawler extends \SplObjectStorage
         $nodes = array();
 
         do {
-            if ($node !== $this->getNode(0) && $node->nodeType === 1)
-            {
+            if ($node !== $this->getNode(0) && $node->nodeType === 1) {
                 $nodes[] = $node;
             }
         } while($node = $node->$siblingDir);
@@ -616,8 +610,7 @@ class Crawler extends \SplObjectStorage
         $string = $s;
         $parts = array();
         while (true) {
-            if (false !== $pos = strpos($string, "'"))
-            {
+            if (false !== $pos = strpos($string, "'")) {
                 $parts[] = sprintf("'%s'", substr($string, 0, $pos));
                 $parts[] = "\"'\"";
                 $string = substr($string, $pos + 1);

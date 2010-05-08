@@ -130,8 +130,7 @@ EOF;
     protected function addTestersFromContainer()
     {
         foreach ($this->container->findAnnotatedServiceIds('test.tester') as $id => $config) {
-            if (!isset($config[0]['alias']))
-            {
+            if (!isset($config[0]['alias'])) {
                 continue;
             }
 

@@ -140,8 +140,7 @@ EOF
 
         $tokens = '';
         foreach ($route->getTokens() as $token) {
-            if (!$tokens)
-            {
+            if (!$tokens) {
                 $tokens = $this->displayToken($token);
             } else {
                 $tokens .= "\n".str_repeat(' ', 13).$this->displayToken($token);

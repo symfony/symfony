@@ -122,6 +122,27 @@ class HeaderBag extends ParameterBag
     }
 
     /**
+     * Returns the HTTP header value converted to a date.
+     *
+     * @param string    $key     The parameter key
+     * @param \DateTime $default The default value
+     *
+     * @return \DateTime The filtered value
+     */
+    public function getDate($key, \DateTime $default = null)
+    {
+        if (null === $value = $this->get($key)) {
+            return $default;
+        }
+
+        if (false === $date = \DateTime::createFromFormat(DATE_RFC2822, $value)) {
+            throw new \RuntimeException(sprintf('The %s HTTP header is not parseable (%s).', $key, $value));
+        }
+
+        return $date;
+    }
+
+    /**
      * Normalizes a HTTP header name.
      *
      * @param  string $key The HTTP header name

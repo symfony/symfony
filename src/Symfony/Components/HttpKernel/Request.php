@@ -271,34 +271,50 @@ class Request
     /**
      * Generates a normalized URI for the Request.
      *
-     * It builds a normalized query string, where keys/value pairs are alphabetized
-     * and have consistent escaping.
-     *
      * @return string A normalized URI for the Request
+     *
+     * @see getQueryString()
      */
     public function getUri()
     {
-        $parts = $this->getScheme().'://'.$this->getHost().':'.$this->getPort().$this->getScriptName().$this->getPathInfo();
-
-        if ($qs = $this->server->get('QUERY_STRING')) {
-            $parts = array();
-            foreach (explode('&', $qs) as $segment) {
-                $tmp = explode('=', urldecode($segment), 2);
-                $parts[urlencode($tmp[0])] = urlencode($tmp[1]);
-            }
-            ksort($parts);
-
-            $elements = array();
-            foreach ($parts as $key => $value) {
-                $elements[] = "$key=$value";
-            }
-
-            if (count($elements)) {
-                $parts .= '?'.implode('&', $elements);
-            }
+        $qs = $this->getQueryString();
+        if (null !== $qs)
+        {
+            $qs = '?'.$qs;
         }
 
-        return $parts;
+        return $this->getScheme().'://'.$this->getHost().':'.$this->getPort().$this->getScriptName().$this->getPathInfo().$qs;
+    }
+
+    /**
+     * Generates the normalized query string for the Request.
+     *
+     * It builds a normalized query string, where keys/value pairs are alphabetized
+     * and have consistent escaping.
+     *
+     * @return string A normalized query string for the Request
+     */
+    public function getQueryString()
+    {
+        if (!$qs = $this->server->get('QUERY_STRING')) {
+            return null;
+        }
+
+        $parts = array();
+        foreach (explode('&', $qs) as $segment) {
+            $tmp = explode('=', urldecode($segment), 2);
+            $parts[urlencode($tmp[0])] = urlencode($tmp[1]);
+        }
+        ksort($parts);
+
+        $elements = array();
+        foreach ($parts as $key => $value) {
+            $elements[] = "$key=$value";
+        }
+
+        if (count($elements)) {
+            return implode('&', $elements);
+        }
     }
 
     public function isSecure()

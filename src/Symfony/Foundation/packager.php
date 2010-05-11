@@ -18,8 +18,7 @@ $loader = new UniversalClassLoader();
 $loader->registerNamespaces(array('Symfony' => __DIR__.'/../..'));
 $loader->register();
 
-if (file_exists(__DIR__.'/bootstrap.php'))
-{
+if (file_exists(__DIR__.'/bootstrap.php')) {
     unlink(__DIR__.'/bootstrap.php');
 }
 ClassCollectionLoader::load(array(

@@ -278,8 +278,7 @@ class Request
     public function getUri()
     {
         $qs = $this->getQueryString();
-        if (null !== $qs)
-        {
+        if (null !== $qs) {
             $qs = '?'.$qs;
         }
 

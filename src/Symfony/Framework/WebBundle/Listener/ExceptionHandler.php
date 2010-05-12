@@ -25,19 +25,15 @@ use Symfony\Foundation\LoggerInterface;
 class ExceptionHandler
 {
     protected $container;
-    protected $bundle;
     protected $controller;
-    protected $action;
     protected $logger;
 
-    public function __construct(ContainerInterface $container, LoggerInterface $logger = null, $bundle, $controller, $action)
+    public function __construct(ContainerInterface $container, LoggerInterface $logger = null, $controller)
     {
         $this->container = $container;
         $this->logger = $logger;
 
-        $this->bundle = $bundle;
         $this->controller = $controller;
-        $this->action = $action;
     }
 
     public function register()
@@ -58,9 +54,7 @@ class ExceptionHandler
         }
 
         $parameters = array(
-            '_bundle'         => $this->bundle,
             '_controller'     => $this->controller,
-            '_action'         => $this->action,
             'exception'       => $exception,
             'originalRequest' => $event->getParameter('request'),
             'logs'            => $this->container->hasService('zend.logger.writer.debug') ? $this->container->getService('zend.logger.writer.debug')->getLogs() : array(),

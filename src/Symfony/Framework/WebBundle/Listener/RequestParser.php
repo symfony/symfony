@@ -59,7 +59,7 @@ class RequestParser
         ));
         $this->container->setParameter('request.base_path', $request->getBasePath());
 
-        if ($request->path->has('_bundle')) {
+        if ($request->path->has('_controller')) {
             return;
         }
 

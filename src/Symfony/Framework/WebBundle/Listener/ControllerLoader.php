@@ -43,7 +43,7 @@ class ControllerLoader
     {
         $request = $this->container->getRequestService();
 
-        list($path['_bundle'], $path['_controller'], $path['_action']) = explode(':', $controller);
+        $path['_controller'] = $controller;
 
         $subRequest = $request->duplicate($query, null, $path);
 
@@ -58,15 +58,15 @@ class ControllerLoader
     {
         $request = $event->getParameter('request');
 
-        if (!($bundle = $request->path->get('_bundle')) || !($controller = $request->path->get('_controller')) || !($action = $request->path->get('_action'))) {
+        if (!$controller = $request->path->get('_controller')) {
             if (null !== $this->logger) {
-                $this->logger->err(sprintf('Unable to look for the controller as some mandatory parameters are missing (_bundle: %s, _controller: %s, _action: %s)', isset($bundle) ? var_export($bundle, true) : 'NULL', isset($controller) ? var_export($controller, true) : 'NULL', isset($action) ? var_export($action, true) : 'NULL'));
+                $this->logger->err('Unable to look for the controller as the _controller parameter is missing');
             }
 
             return false;
         }
 
-        $controller = $this->findController($bundle, $controller, $action);
+        $controller = $this->findController($controller);
         $controller[0]->setRequest($request);
 
         $r = new \ReflectionObject($controller[0]);
@@ -80,8 +80,9 @@ class ControllerLoader
     /**
      * @throws \InvalidArgumentException|\LogicException If controller can't be found
      */
-    public function findController($bundle, $controller, $action)
+    public function findController($controller)
     {
+        list($bundle, $controller, $action) = explode(':', $controller);
         $class = null;
         $logs = array();
         foreach (array_keys($this->container->getParameter('kernel.bundle_dirs')) as $namespace) {

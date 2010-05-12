@@ -1,3 +1,3 @@
 homepage:
   pattern: /
-  defaults: { _bundle: WebBundle, _controller: Default, _action: index }
+  defaults: { _controller: WebBundle:Default:index }

@@ -14,6 +14,9 @@ namespace Symfony\Components\Templating\Helper;
 /**
  * Helper is the base class for all helper classes.
  *
+ * Most of the time, a Helper is an adapter around an existing
+ * class that exposes a read-only interface for templates.
+ *
  * @package    Symfony
  * @subpackage Components_Templating
  * @author     Fabien Potencier <fabien.potencier@symfony-project.com>

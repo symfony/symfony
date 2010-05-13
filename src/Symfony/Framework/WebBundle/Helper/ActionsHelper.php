@@ -5,6 +5,7 @@ namespace Symfony\Framework\WebBundle\Helper;
 use Symfony\Components\Templating\Helper\Helper;
 use Symfony\Components\DependencyInjection\ContainerInterface;
 use Symfony\Components\OutputEscaper\Escaper;
+use Symfony\Components\HttpKernel\HttpKernelInterface;
 
 /*
  * This file is part of the Symfony framework.
@@ -42,27 +43,62 @@ class ActionsHelper extends Helper
      * @param string $controller A controller name to execute (a string like BlogBundle:Post:index)
      * @param array  $path       An array of path parameters
      * @param array  $query      An array of query parameters
+     * @param array  $options    An array of options
      *
      * @see render()
      */
-     public function output($controller, array $path = array(), array $query = array())
-     {
-         echo $this->render($controller, $path, $query);
-     }
+    public function output($controller, array $path = array(), array $query = array(), array $options = array())
+    {
+        echo $this->render($controller, $path, $query, $options);
+    }
 
     /**
      * Returns the Response content for a given controller.
      *
+     * Available options:
+     *
+     *  * ignore_errors: true to return an empty string in case of an error
+     *  * alt: an alternative controller to execute in case of an error (an array with the controller, the path arguments, the query arguments)
+     *
      * @param string $controller A controller name to execute (a string like BlogBundle:Post:index)
      * @param array  $path       An array of path parameters
      * @param array  $query      An array of query parameters
+     * @param array  $options    An array of options
      */
-    public function render($controller, array $path = array(), array $query = array())
+    public function render($controller, array $path = array(), array $query = array(), array $options = array())
     {
-        $path['_controller'] = $controller;
-        $subRequest = $this->container->getRequestService()->duplicate($query, null, Escaper::unescape($path));
+        $options = array_merge(array(
+            'ignore_errors' => true,
+            'alt'           => array(),
+        ), $options);
 
-        return $this->container->getKernelService()->handle($subRequest, HttpKernelInterface::EMBEDDED_REQUEST, true);
+        if (!is_array($options['alt']))
+        {
+            $options['alt'] = array($options['alt']);
+        }
+
+        $path = Escaper::unescape($path);
+        $query = Escaper::unescape($query);
+
+        $request = $this->container->getRequestService();
+        $path['_controller'] = $controller;
+        $path['_format'] = $request->getRequestFormat();
+        $subRequest = $request->duplicate($query, null, $path);
+
+        try {
+            return $this->container->getKernelService()->handle($subRequest, HttpKernelInterface::EMBEDDED_REQUEST, true);
+        } catch (\Exception $e) {
+            if ($options['alt']) {
+                $alt = $options['alt'];
+                unset($options['alt']);
+
+                return $this->render($alt[0], isset($alt[1]) ? $alt[1] : array(), isset($alt[2]) ? $alt[2] : array(), $options);
+            }
+
+            if (!$options['ignore_errors']) {
+                throw $e;
+            }
+        }
     }
 
     /**

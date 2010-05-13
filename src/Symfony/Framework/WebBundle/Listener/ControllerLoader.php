@@ -39,15 +39,6 @@ class ControllerLoader
         $this->container->getEventDispatcherService()->connect('core.load_controller', array($this, 'resolve'));
     }
 
-    public function run($controller, array $path = array(), array $query = array())
-    {
-        $path['_controller'] = $controller;
-
-        $subRequest = $this->container->getRequestService()->duplicate($query, null, $path);
-
-        return $this->container->getKernelService()->handle($subRequest, false, true);
-    }
-
     public function resolve(Event $event)
     {
         $request = $event->getParameter('request');

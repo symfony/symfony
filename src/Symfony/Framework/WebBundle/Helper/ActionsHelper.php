@@ -36,14 +36,33 @@ class ActionsHelper extends Helper
         $this->container = $container;
     }
 
-    public function output($controller, array $parameters = array())
-    {
-        echo $this->render($controller, $parameters);
-    }
+    /**
+     * Outputs the Response content for a given controller.
+     *
+     * @param string $controller A controller name to execute (a string like BlogBundle:Post:index)
+     * @param array  $path       An array of path parameters
+     * @param array  $query      An array of query parameters
+     *
+     * @see render()
+     */
+     public function output($controller, array $path = array(), array $query = array())
+     {
+         echo $this->render($controller, $path, $query);
+     }
 
-    public function render($controller, array $parameters = array())
+    /**
+     * Returns the Response content for a given controller.
+     *
+     * @param string $controller A controller name to execute (a string like BlogBundle:Post:index)
+     * @param array  $path       An array of path parameters
+     * @param array  $query      An array of query parameters
+     */
+    public function render($controller, array $path = array(), array $query = array())
     {
-        return $this->container->getControllerLoaderService()->run($controller, Escaper::unescape($parameters))->getContent();
+        $path['_controller'] = $controller;
+        $subRequest = $this->container->getRequestService()->duplicate($query, null, Escaper::unescape($path));
+
+        return $this->container->getKernelService()->handle($subRequest, false, true);
     }
 
     /**

@@ -82,9 +82,21 @@ class Controller
         return $this->container->getRouterService()->generate($route, $parameters);
     }
 
+    /**
+     * Forwards the request to another controller.
+     *
+     * @param  string  $controller The controller name (a string like BlogBundle:Post:index)
+     * @param  array   $path       An array of path parameters
+     * @param  array   $query      An array of query parameters
+     *
+     * @return Response A Response instance
+     */
     public function forward($controller, array $path = array(), array $query = array())
     {
-        return $this->container->getControllerLoaderService()->run($controller, $path, $query);
+        $path['_controller'] = $controller;
+        $subRequest = $this->getRequest()->duplicate($query, null, $path);
+
+        return $this->container->getKernelService()->handle($subRequest, false, true);
     }
 
     /**

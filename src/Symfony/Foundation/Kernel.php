@@ -161,7 +161,7 @@ abstract class Kernel implements HttpKernelInterface, \Serializable
     }
 
     /**
-     * Handles a request to convert it to a response by calling the Request Handler service.
+     * Handles a request to convert it to a response by calling the HttpKernel service.
      *
      * @param  Request $request A Request instance
      * @param  Boolean $main    Whether this is the main request or not
@@ -177,15 +177,19 @@ abstract class Kernel implements HttpKernelInterface, \Serializable
 
         if (null === $request) {
             $request = $this->container->getRequestService();
-        } else {
-            $this->container->setService('request', $request);
         }
 
         if (true === $main) {
             $this->request = $request;
         }
 
-        return $this->container->getHttpKernelService()->handle($request, $main, $raw);
+        $this->container->setService('request', $request);
+
+        $response = $this->container->getHttpKernelService()->handle($request, $main, $raw);
+
+        $this->container->setService('request', $this->request);
+
+        return $response;
     }
 
     public function getBundleDirs()

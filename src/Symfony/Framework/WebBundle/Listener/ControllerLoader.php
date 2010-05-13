@@ -41,17 +41,11 @@ class ControllerLoader
 
     public function run($controller, array $path = array(), array $query = array())
     {
-        $request = $this->container->getRequestService();
-
         $path['_controller'] = $controller;
 
-        $subRequest = $request->duplicate($query, null, $path);
+        $subRequest = $this->container->getRequestService()->duplicate($query, null, $path);
 
-        $response = $this->container->getKernelService()->handle($subRequest, false, true);
-
-        $this->container->setService('request', $request);
-
-        return $response;
+        return $this->container->getKernelService()->handle($subRequest, false, true);
     }
 
     public function resolve(Event $event)

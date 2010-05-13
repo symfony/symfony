@@ -82,9 +82,9 @@ class Controller
         return $this->container->getRouterService()->generate($route, $parameters);
     }
 
-    public function forward($controller, array $parameters = array())
+    public function forward($controller, array $path = array(), array $query = array())
     {
-        return $this->container->getControllerLoaderService()->run($controller, $parameters);
+        return $this->container->getControllerLoaderService()->run($controller, $path, $query);
     }
 
     /**

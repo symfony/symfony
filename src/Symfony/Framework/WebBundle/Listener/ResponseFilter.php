@@ -6,6 +6,7 @@ use Symfony\Components\EventDispatcher\EventDispatcher;
 use Symfony\Components\EventDispatcher\Event;
 use Symfony\Components\HttpKernel\Request;
 use Symfony\Components\HttpKernel\Response;
+use Symfony\Components\HttpKernel\HttpKernelInterface;
 
 /*
  * This file is part of the Symfony framework.
@@ -39,7 +40,7 @@ class ResponseFilter
 
     public function filter(Event $event, Response $response)
     {
-        if (!$event->getParameter('main_request') || $response->headers->has('Content-Type')) {
+        if (HttpKernelInterface::MASTER_REQUEST !== $event->getParameter('request_type') || $response->headers->has('Content-Type')) {
             return $response;
         }
 

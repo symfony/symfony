@@ -151,7 +151,7 @@ abstract class Kernel implements HttpKernelInterface, \Serializable
     }
 
     /**
-     * Gets the Request instance associated with the main request.
+     * Gets the Request instance associated with the master request.
      *
      * @return Request A Request instance
      */
@@ -164,12 +164,12 @@ abstract class Kernel implements HttpKernelInterface, \Serializable
      * Handles a request to convert it to a response by calling the HttpKernel service.
      *
      * @param  Request $request A Request instance
-     * @param  Boolean $main    Whether this is the main request or not
+     * @param  integer $type    The type of the request (one of HttpKernelInterface::MASTER_REQUEST, HttpKernelInterface::FORWARDED_REQUEST, or HttpKernelInterface::EMBEDDED_REQUEST)
      * @param  Boolean $raw     Whether to catch exceptions or not
      *
      * @return Response $response A Response instance
      */
-    public function handle(Request $request = null, $main = true, $raw = false)
+    public function handle(Request $request = null, $type = HttpKernelInterface::MASTER_REQUEST, $raw = false)
     {
         if (false === $this->booted) {
             $this->boot();
@@ -179,13 +179,13 @@ abstract class Kernel implements HttpKernelInterface, \Serializable
             $request = $this->container->getRequestService();
         }
 
-        if (true === $main) {
+        if (HttpKernelInterface::MASTER_REQUEST === $type) {
             $this->request = $request;
         }
 
         $this->container->setService('request', $request);
 
-        $response = $this->container->getHttpKernelService()->handle($request, $main, $raw);
+        $response = $this->container->getHttpKernelService()->handle($request, $type, $raw);
 
         $this->container->setService('request', $this->request);
 

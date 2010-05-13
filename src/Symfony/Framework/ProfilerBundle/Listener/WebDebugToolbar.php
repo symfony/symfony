@@ -5,6 +5,7 @@ namespace Symfony\Framework\ProfilerBundle\Listener;
 use Symfony\Components\DependencyInjection\ContainerInterface;
 use Symfony\Components\EventDispatcher\Event;
 use Symfony\Components\HttpKernel\Response;
+use Symfony\Components\HttpKernel\HttpKernelInterface;
 use Symfony\Framework\ProfilerBundle\DataCollector\DataCollectorManager;
 
 /*
@@ -41,7 +42,7 @@ class WebDebugToolbar
 
     public function handle(Event $event, Response $response)
     {
-        if (!$event->getParameter('main_request')) {
+        if (HttpKernelInterface::MASTER_REQUEST !== $event->getParameter('request_type')) {
             return $response;
         }
 

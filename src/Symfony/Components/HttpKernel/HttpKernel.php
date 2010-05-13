@@ -38,7 +38,7 @@ class HttpKernel implements HttpKernelInterface
     }
 
     /**
-     * Gets the Request instance associated with the main request.
+     * Gets the Request instance associated with the master request.
      *
      * @return Request A Request instance
      */
@@ -48,42 +48,45 @@ class HttpKernel implements HttpKernelInterface
     }
 
     /**
-     * Handles a request to convert it to a response.
+     * Handles a Request to convert it to a Response.
      *
      * All exceptions are caught, and a core.exception event is notified
      * for user management.
      *
-     * @param  Request $request A Request instance
-     * @param  Boolean $main    Whether this is the main request or not
-     * @param  Boolean $raw     Whether to catch exceptions or not
+     * @param Request $request A Request instance
+     * @param integer $type    The type of the request (one of HttpKernelInterface::MASTER_REQUEST, HttpKernelInterface::FORWARDED_REQUEST, or HttpKernelInterface::EMBEDDED_REQUEST)
+     * @param Boolean $raw     Whether to catch exceptions or not
      *
-     * @return Response $response A Response instance
+     * @return Response A Response instance
      *
-     * @throws \Exception When Exception couldn't be caught by event processing
+     * @throws \Exception When an Exception occurs during processing
+     *                    and couldn't be caught by event processing or $raw is true
      */
-    public function handle(Request $request = null, $main = true, $raw = false)
+    public function handle(Request $request = null, $type = HttpKernelInterface::MASTER_REQUEST, $raw = false)
     {
-        $main = (Boolean) $main;
+        if (HttpKernelInterface::EMBEDDED_REQUEST === $type) {
+            return $this->handleEmbedded($request, $raw);
+        }
 
         if (null === $request) {
             $request = new Request();
         }
 
-        if (true === $main) {
+        if (HttpKernelInterface::MASTER_REQUEST === $type) {
             $this->request = $request;
         }
 
         try {
-            return $this->handleRaw($request, $main);
+            return $this->handleRaw($request, $type);
         } catch (\Exception $e) {
             if (true === $raw) {
                 throw $e;
             }
 
             // exception
-            $event = $this->dispatcher->notifyUntil(new Event($this, 'core.exception', array('main_request' => $main, 'request' => $request, 'exception' => $e)));
+            $event = $this->dispatcher->notifyUntil(new Event($this, 'core.exception', array('request_type' => $type, 'request' => $request, 'exception' => $e)));
             if ($event->isProcessed()) {
-                return $this->filterResponse($event->getReturnValue(), $request, 'A "core.exception" listener returned a non response object.', $main);
+                return $this->filterResponse($event->getReturnValue(), $request, 'A "core.exception" listener returned a non response object.', $type);
             }
 
             throw $e;
@@ -95,26 +98,24 @@ class HttpKernel implements HttpKernelInterface
      *
      * Exceptions are not caught.
      *
-     * @param  Request $request A Request instance
-     * @param  Boolean $main    Whether this is the main request or not
+     * @param Request $request A Request instance
+     * @param integer $type    The type of the request (one of HttpKernelInterface::MASTER_REQUEST, HttpKernelInterface::FORWARDED_REQUEST, or HttpKernelInterface::EMBEDDED_REQUEST)
      *
-     * @return Response $response A Response instance
+     * @return Response A Response instance
      *
      * @throws \LogicException       If one of the listener does not behave as expected
      * @throws NotFoundHttpException When controller cannot be found
      */
-    protected function handleRaw(Request $request, $main = true)
+    protected function handleRaw(Request $request, $type = self::MASTER_REQUEST)
     {
-        $main = (Boolean) $main;
-
         // request
-        $event = $this->dispatcher->notifyUntil(new Event($this, 'core.request', array('main_request' => $main, 'request' => $request)));
+        $event = $this->dispatcher->notifyUntil(new Event($this, 'core.request', array('request_type' => $type, 'request' => $request)));
         if ($event->isProcessed()) {
-            return $this->filterResponse($event->getReturnValue(), $request, 'A "core.request" listener returned a non response object.', $main);
+            return $this->filterResponse($event->getReturnValue(), $request, 'A "core.request" listener returned a non response object.', $type);
         }
 
         // load controller
-        $event = $this->dispatcher->notifyUntil(new Event($this, 'core.load_controller', array('main_request' => $main, 'request' => $request)));
+        $event = $this->dispatcher->notifyUntil(new Event($this, 'core.load_controller', array('request_type' => $type, 'request' => $request)));
         if (!$event->isProcessed()) {
             throw new NotFoundHttpException('Unable to find the controller.');
         }
@@ -127,10 +128,10 @@ class HttpKernel implements HttpKernelInterface
         }
 
         // controller
-        $event = $this->dispatcher->notifyUntil(new Event($this, 'core.controller', array('main_request' => $main, 'request' => $request, 'controller' => &$controller, 'arguments' => &$arguments)));
+        $event = $this->dispatcher->notifyUntil(new Event($this, 'core.controller', array('request_type' => $type, 'request' => $request, 'controller' => &$controller, 'arguments' => &$arguments)));
         if ($event->isProcessed()) {
             try {
-                return $this->filterResponse($event->getReturnValue(), $request, 'A "core.controller" listener returned a non response object.', $main);
+                return $this->filterResponse($event->getReturnValue(), $request, 'A "core.controller" listener returned a non response object.', $type);
             } catch (\Exception $e) {
                 $retval = $event->getReturnValue();
             }
@@ -140,28 +141,60 @@ class HttpKernel implements HttpKernelInterface
         }
 
         // view
-        $event = $this->dispatcher->filter(new Event($this, 'core.view', array('main_request' => $main, 'request' => $request)), $retval);
+        $event = $this->dispatcher->filter(new Event($this, 'core.view', array('request_type' => $type, 'request' => $request)), $retval);
 
-        return $this->filterResponse($event->getReturnValue(), $request, sprintf('The controller must return a response (instead of %s).', is_object($event->getReturnValue()) ? 'an object of class '.get_class($event->getReturnValue()) : str_replace("\n", '', var_export($event->getReturnValue(), true))), $main);
+        return $this->filterResponse($event->getReturnValue(), $request, sprintf('The controller must return a response (instead of %s).', is_object($event->getReturnValue()) ? 'an object of class '.get_class($event->getReturnValue()) : str_replace("\n", '', var_export($event->getReturnValue(), true))), $type);
+    }
+
+    /**
+     * Handles a request that need to be embedded.
+     *
+     * @param Request $request A Request instance
+     * @param  Boolean $raw Whether to catch exceptions or not
+     *
+     * @return string|false The Response content or false if there is a problem
+     *
+     * @throws \RuntimeException When an Exception occurs during processing
+     *                           and couldn't be caught by event processing or $raw is true
+     */
+    protected function handleEmbedded(Request $request, $raw = false)
+    {
+        try {
+            $response = $this->handleRaw($request, HttpKernelInterface::EMBEDDED_REQUEST);
+
+            if (200 != $response->getStatusCode()) {
+                throw new \RuntimeException(sprintf('Error when rendering "%s" (Status code is %s).', $request->getUri(), $response->getStatusCode()));
+            }
+
+            return $response->getContent();
+        } catch (\Exception $e) {
+            if (true === $raw)
+            {
+                throw $e;
+            }
+
+            return false;
+        }
     }
 
     /**
      * Filters a response object.
      *
-     * @param Object $response A Response instance
-     * @param string $message  A error message in case the response is not a Response object
+     * @param Response $response A Response instance
+     * @param string   $message  A error message in case the response is not a Response object
+     * @param integer $type    The type of the request (one of HttpKernelInterface::MASTER_REQUEST, HttpKernelInterface::FORWARDED_REQUEST, or HttpKernelInterface::EMBEDDED_REQUEST)
      *
-     * @param Object $response The filtered Response instance
+     * @return Response The filtered Response instance
      *
-     * @throws \RuntimeException if the response object does not implement the send() method
+     * @throws \RuntimeException if the passed object is not a Response instance
      */
-    protected function filterResponse($response, $request, $message, $main)
+    protected function filterResponse($response, $request, $message, $type)
     {
         if (!$response instanceof Response) {
             throw new \RuntimeException($message);
         }
 
-        $event = $this->dispatcher->filter(new Event($this, 'core.response', array('main_request' => $main, 'request' => $request)), $response);
+        $event = $this->dispatcher->filter(new Event($this, 'core.response', array('request_type' => $type, 'request' => $request)), $response);
         $response = $event->getReturnValue();
 
         if (!$response instanceof Response) {

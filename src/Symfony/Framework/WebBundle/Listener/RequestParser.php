@@ -6,6 +6,7 @@ use Symfony\Foundation\LoggerInterface;
 use Symfony\Components\DependencyInjection\ContainerInterface;
 use Symfony\Components\EventDispatcher\Event;
 use Symfony\Components\Routing\RouterInterface;
+use Symfony\Components\HttpKernel\HttpKernelInterface;
 
 /*
  * This file is part of the Symfony framework.
@@ -45,19 +46,17 @@ class RequestParser
     {
         $request = $event->getParameter('request');
 
-        if (!$event->getParameter('main_request')) {
-            return;
+        if (HttpKernelInterface::MASTER_REQUEST === $event->getParameter('request_type')) {
+            // set the context even if the parsing does not need to be done
+            // to have correct link generation
+            $this->router->setContext(array(
+                'base_url'  => $request->getBaseUrl(),
+                'method'    => $request->getMethod(),
+                'host'      => $request->getHost(),
+                'is_secure' => $request->isSecure(),
+            ));
+            $this->container->setParameter('request.base_path', $request->getBasePath());
         }
-
-        // set the context even if the parsing does not need to be done
-        // to have correct link generation
-        $this->router->setContext(array(
-            'base_url'  => $request->getBaseUrl(),
-            'method'    => $request->getMethod(),
-            'host'      => $request->getHost(),
-            'is_secure' => $request->isSecure(),
-        ));
-        $this->container->setParameter('request.base_path', $request->getBasePath());
 
         if ($request->path->has('_controller')) {
             return;

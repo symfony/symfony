@@ -5,6 +5,7 @@ namespace Symfony\Framework\WebBundle;
 use Symfony\Components\DependencyInjection\ContainerInterface;
 use Symfony\Components\HttpKernel\Request;
 use Symfony\Components\HttpKernel\Response;
+use Symfony\Components\HttpKernel\HttpKernelInterface;
 
 /*
  * This file is part of the Symfony framework.
@@ -96,7 +97,7 @@ class Controller
         $path['_controller'] = $controller;
         $subRequest = $this->getRequest()->duplicate($query, null, $path);
 
-        return $this->container->getKernelService()->handle($subRequest, false, true);
+        return $this->container->getKernelService()->handle($subRequest, HttpKernelInterface::FORWARDED_REQUEST, true);
     }
 
     /**

@@ -62,7 +62,7 @@ class ActionsHelper extends Helper
         $path['_controller'] = $controller;
         $subRequest = $this->container->getRequestService()->duplicate($query, null, Escaper::unescape($path));
 
-        return $this->container->getKernelService()->handle($subRequest, false, true);
+        return $this->container->getKernelService()->handle($subRequest, HttpKernelInterface::EMBEDDED_REQUEST, true);
     }
 
     /**

@@ -5,6 +5,7 @@ namespace Symfony\Framework\ProfilerBundle\DataCollector;
 use Symfony\Components\DependencyInjection\ContainerInterface;
 use Symfony\Components\EventDispatcher\Event;
 use Symfony\Components\HttpKernel\Response;
+use Symfony\Components\HttpKernel\HttpKernelInterface;
 use Symfony\Framework\ProfilerBundle\ProfilerStorage;
 use Symfony\Foundation\LoggerInterface;
 
@@ -49,7 +50,7 @@ class DataCollectorManager
 
     public function handle(Event $event, Response $response)
     {
-        if (!$event->getParameter('main_request')) {
+        if (HttpKernelInterface::MASTER_REQUEST !== $event->getParameter('request_type')) {
             return $response;
         }
 

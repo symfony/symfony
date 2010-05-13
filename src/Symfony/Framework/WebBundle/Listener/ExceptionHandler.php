@@ -5,6 +5,7 @@ namespace Symfony\Framework\WebBundle\Listener;
 use Symfony\Components\DependencyInjection\ContainerInterface;
 use Symfony\Components\EventDispatcher\Event;
 use Symfony\Foundation\LoggerInterface;
+use Symfony\Components\HttpKernel\HttpKernelInterface;
 
 /*
  * This file is part of the Symfony framework.
@@ -43,7 +44,7 @@ class ExceptionHandler
 
     public function handle(Event $event)
     {
-        if (!$event->getParameter('main_request')) {
+        if (HttpKernelInterface::MASTER_REQUEST !== $event->getParameter('request_type')) {
             return false;
         }
 
@@ -63,7 +64,7 @@ class ExceptionHandler
         $request = $event->getParameter('request')->duplicate(null, null, $parameters);
 
         try {
-            $response = $event->getSubject()->handle($request, false, true);
+            $response = $event->getSubject()->handle($request, HttpKernelInterface::FORWARDED_REQUEST, true);
 
             error_log(sprintf('%s: %s', get_class($exception), $exception->getMessage()));
         } catch (\Exception $e) {

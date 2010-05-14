@@ -27,6 +27,7 @@ class LimitDepthFilterIterator extends \FilterIterator
      *
      * @param \Iterator $iterator The Iterator to filter
      * @param integer   $minDepth The minimum depth
+     * @param integer   $maxDepth The maximum depth
      */
     public function __construct(\RecursiveIteratorIterator $iterator, $minDepth, $maxDepth)
     {

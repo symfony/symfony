@@ -36,13 +36,15 @@ class Finder implements \IteratorAggregate
     protected $notNames    = array();
     protected $exclude     = array();
     protected $filters     = array();
-    protected $mindepth    = 0;
-    protected $maxdepth    = INF;
+    protected $minDepth    = 0;
+    protected $maxDepth    = INF;
     protected $sizes       = array();
     protected $followLinks = false;
     protected $sort        = false;
     protected $ignoreVCS   = true;
     protected $dirs        = array();
+    protected $minDate     = false;
+    protected $maxDate     = false;
 
     /**
      * Restricts the matching to directories only.
@@ -81,7 +83,7 @@ class Finder implements \IteratorAggregate
      */
     public function maxDepth($level)
     {
-        $this->maxdepth = (double) $level;
+        $this->maxDepth = (double) $level;
 
         return $this;
     }
@@ -99,7 +101,52 @@ class Finder implements \IteratorAggregate
      */
     public function minDepth($level)
     {
-        $this->mindepth = (integer) $level;
+        $this->minDepth = (integer) $level;
+
+        return $this;
+    }
+
+    /**
+     * Sets the maximum date (last modified) for a file or directory.
+     *
+     * The date must be something that strtotime() is able to parse:
+     *
+     *   $finder->maxDate('yesterday');
+     *   $finder->maxDate('2 days ago');
+     *   $finder->maxDate('now - 2 hours');
+     *   $finder->maxDate('2005-10-15');
+     *
+     * @param  string $date A date
+     *
+     * @return Symfony\Components\Finder The current Finder instance
+     *
+     * @see Symfony\Components\Finder\Iterator\DateRangeFilterIterator
+     */
+    public function maxDate($date)
+    {
+        if (false === $this->maxDate = @strtotime($date)) {
+            throw new \InvalidArgumentException(sprintf('"%s" is not a valid date'));
+        }
+
+        return $this;
+    }
+
+    /**
+     * Sets the minimum date (last modified) for a file or a directory.
+     *
+     * The date must be something that strtotime() is able to parse (@see maxDate()).
+     *
+     * @param  string $date A date
+     *
+     * @return Symfony\Components\Finder The current Finder instance
+     *
+     * @see Symfony\Components\Finder\Iterator\DateRangeFilterIterator
+     */
+    public function minDate($date)
+    {
+        if (false === $this->minDate = @strtotime($date)) {
+            throw new \InvalidArgumentException(sprintf('"%s" is not a valid date'));
+        }
 
         return $this;
     }
@@ -339,8 +386,8 @@ class Finder implements \IteratorAggregate
 
         $iterator = new \RecursiveIteratorIterator(new \RecursiveDirectoryIterator($dir, $flags), \RecursiveIteratorIterator::SELF_FIRST);
 
-        if ($this->mindepth > 0 || $this->maxdepth < INF) {
-            $iterator = new Iterator\LimitDepthFilterIterator($iterator, $this->mindepth, $this->maxdepth);
+        if ($this->minDepth > 0 || $this->maxDepth < INF) {
+            $iterator = new Iterator\LimitDepthFilterIterator($iterator, $this->minDepth, $this->maxDepth);
         }
 
         if ($this->mode) {
@@ -361,6 +408,10 @@ class Finder implements \IteratorAggregate
 
         if ($this->sizes) {
             $iterator = new Iterator\SizeRangeFilterIterator($iterator, $this->sizes);
+        }
+
+        if (false !== $this->minDate || false !== $this->maxDate) {
+            $iterator = new Iterator\DateRangeFilterIterator($iterator, $this->minDate, $this->maxDate);
         }
 
         if ($this->filters) {

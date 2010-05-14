@@ -59,7 +59,7 @@ class ActionsHelper extends Helper
      *  * path: An array of path parameters (only when the first argument is a controller)
      *  * query: An array of query parameters (only when the first argument is a controller)
      *  * ignore_errors: true to return an empty string in case of an error
-     *  * alt: an alternative controller to execute in case of an error (an array with the controller, the path arguments, the query arguments)
+     *  * alt: an alternative controller to execute in case of an error (can be a controller, a URI, or an array with the controller, the path arguments, and the query arguments)
      *
      * @param string $controller A controller name to execute (a string like BlogBundle:Post:index), or a relative URI
      * @param array  $options    An array of options
@@ -80,6 +80,11 @@ class ActionsHelper extends Helper
         $options['path'] = Escaper::unescape($options['path']);
         $options['query'] = Escaper::unescape($options['query']);
 
+        return $this->doRender($controller, $options);
+    }
+
+    protected function doRender($controller, array $options = array())
+    {
         // controller or URI?
         $request = $this->container->getRequestService();
         if (0 === strpos($controller, '/')) {
@@ -101,7 +106,7 @@ class ActionsHelper extends Helper
                 $options['path'] = isset($alt[1]) ? $alt[1] : array();
                 $options['query'] = isset($alt[2]) ? $alt[2] : array();
 
-                return $this->render($alt[0], $options);
+                return $this->doRender($alt[0], $options);
             }
 
             if (!$options['ignore_errors']) {

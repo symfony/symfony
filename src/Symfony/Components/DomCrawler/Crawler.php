@@ -477,7 +477,7 @@ class Crawler extends \SplObjectStorage
         $xpath  = sprintf('//a[contains(concat(\' \', normalize-space(string(.)), \' \'), %s)] ', static::xpathLiteral(' '.$value.' ')).
                             sprintf('| //a/img[contains(concat(\' \', normalize-space(string(@alt)), \' \'), %s)]/ancestor::a', static::xpathLiteral(' '.$value.' '));
 
-     return $this->filterXPath($xpath);
+        return $this->filterXPath($xpath);
     }
 
     /**

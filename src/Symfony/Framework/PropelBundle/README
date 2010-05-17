@@ -8,6 +8,15 @@ Currently supports:
  * Generation of model classes based on an XML schema (not YAML) placed under `BundleName/Resources/*schema.xml`.
  * Propel runtime initialization through `$container->getPropelService()`.
 
+Installation
+------------
+
+ * Checkout Propel and Phing in the src/vendor/ directory
+
+    > cd sandbox/src/vendor
+    > svn checkout http://svn.propelorm.org/branches/1.5 propel
+    > svn checkout http://phing.mirror.svn.symfony-project.com/tags/2.3.3/classes/phing phing
+    
 Sample Configuration
 --------------------
 

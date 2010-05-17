@@ -14,10 +14,12 @@
       <xsd:element name="session" type="session" minOccurs="0" maxOccurs="1" />
     </xsd:sequence>
 
+    <xsd:attribute name="class" type="xsd:string" />
     <xsd:attribute name="default_culture" type="xsd:string" />
   </xsd:complexType>
 
   <xsd:complexType name="session">
+    <xsd:attribute name="class" type="xsd:string" />
     <xsd:attribute name="name" type="xsd:string" />
     <xsd:attribute name="type" type="xsd:string" />
     <xsd:attribute name="auto_start" type="xsd:string" />

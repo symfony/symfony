@@ -1,0 +1,27 @@
+<?xml version="1.0" ?>
+
+<container xmlns="http://www.symfony-project.org/schema/dic/services"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xsi:schemaLocation="http://www.symfony-project.org/schema/dic/services http://www.symfony-project.org/schema/dic/services/services-1.0.xsd">
+
+  <parameters>
+    <parameter key="propel.class">Propel</parameter>
+    <parameter key="propel.configuration.class">PropelConfiguration</parameter>
+  </parameters>
+
+  <services>
+    <service id="propel" class="%propel.class%">
+      <call method="setConfiguration">
+        <argument type="service" id="propel.configuration" />
+      </call>
+      <call method="initialize" />
+    </service>
+
+    <service id="propel.configuration" class="%propel.configuration.class%" />
+<!--
+    <service id="propel.logger" class="%propel.logger.class%">
+      <argument></argument>
+    </service>
+//-->
+  </services>
+</container>

@@ -1,0 +1,30 @@
+Propel Bundle
+=============
+
+This is a (work in progress) implementation of Propel in Symfony 2.
+
+Currently supports:
+
+ * Generation of model classes based on an XML schema (not YAML) placed under `BundleName/Resources/*schema.xml`.
+ * Propel runtime initialization through `$container->getPropelService()`.
+
+Sample Configuration
+--------------------
+
+    propel.generator:
+      path: %kernel.root_dir%/../src/vendor/propel/generator
+
+    propel.dbal:
+      driver:               mysql
+      user:                 root
+      password:             null
+      dsn:                  mysql:host=localhost;dbname=test
+      options:              {}
+    #  default_connection:       default
+    #  connections:
+    #    default:
+    #      driver:               mysql
+    #      user:                 root
+    #      password:             null
+    #      dsn:                  mysql:host=localhost;dbname=test
+    #      options:              {}

@@ -80,39 +80,7 @@ class ActionsHelper extends Helper
         $options['path'] = Escaper::unescape($options['path']);
         $options['query'] = Escaper::unescape($options['query']);
 
-        return $this->doRender($controller, $options);
-    }
-
-    protected function doRender($controller, array $options = array())
-    {
-        // controller or URI?
-        $request = $this->container->getRequestService();
-        if (0 === strpos($controller, '/')) {
-            // URI
-            $subRequest = Request::create($controller, 'get', array(), $request->cookies->all(), array(), $request->server->all());
-        } else {
-            // controller
-            $options['path']['_controller'] = $controller;
-            $options['path']['_format'] = $request->getRequestFormat();
-            $subRequest = $request->duplicate($options['query'], null, $options['path']);
-        }
-
-        try {
-            return $this->container->getKernelService()->handle($subRequest, HttpKernelInterface::EMBEDDED_REQUEST, true);
-        } catch (\Exception $e) {
-            if ($options['alt']) {
-                $alt = $options['alt'];
-                unset($options['alt']);
-                $options['path'] = isset($alt[1]) ? $alt[1] : array();
-                $options['query'] = isset($alt[2]) ? $alt[2] : array();
-
-                return $this->doRender($alt[0], $options);
-            }
-
-            if (!$options['ignore_errors']) {
-                throw $e;
-            }
-        }
+        return $this->container->getControllerManagerService()->render($controller, $options);
     }
 
     /**

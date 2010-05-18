@@ -150,7 +150,7 @@ class HttpKernel implements HttpKernelInterface
      * Handles a request that need to be embedded.
      *
      * @param Request $request A Request instance
-     * @param  Boolean $raw Whether to catch exceptions or not
+     * @param Boolean $raw Whether to catch exceptions or not
      *
      * @return string|false The Response content or false if there is a problem
      *
@@ -182,7 +182,7 @@ class HttpKernel implements HttpKernelInterface
      *
      * @param Response $response A Response instance
      * @param string   $message  A error message in case the response is not a Response object
-     * @param integer $type    The type of the request (one of HttpKernelInterface::MASTER_REQUEST, HttpKernelInterface::FORWARDED_REQUEST, or HttpKernelInterface::EMBEDDED_REQUEST)
+     * @param integer  $type    The type of the request (one of HttpKernelInterface::MASTER_REQUEST, HttpKernelInterface::FORWARDED_REQUEST, or HttpKernelInterface::EMBEDDED_REQUEST)
      *
      * @return Response The filtered Response instance
      *

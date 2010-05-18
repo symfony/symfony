@@ -6,6 +6,7 @@
 
   <parameters>
     <parameter key="request_parser.class">Symfony\Framework\WebBundle\Listener\RequestParser</parameter>
+    <parameter key="controller_manager.class">Symfony\Framework\WebBundle\Controller\ControllerManager</parameter>
     <parameter key="controller_loader.class">Symfony\Framework\WebBundle\Listener\ControllerLoader</parameter>
     <parameter key="router.class">Symfony\Components\Routing\Router</parameter>
     <parameter key="response_filter.class">Symfony\Framework\WebBundle\Listener\ResponseFilter</parameter>
@@ -17,9 +18,15 @@
   </parameters>
 
   <services>
+    <service id="controller_manager" class="%controller_manager.class%">
+      <argument type="service" id="service_container" />
+      <argument type="service" id="logger" on-invalid="ignore" />
+    </service>
+
     <service id="controller_loader" class="%controller_loader.class%">
       <annotation name="kernel.listener" event="core.load_controller" method="resolve" />
-      <argument type="service" id="service_container" />
+      <argument type="service" id="event_dispatcher" />
+      <argument type="service" id="controller_manager" />
       <argument type="service" id="logger" on-invalid="ignore" />
     </service>
 

@@ -5,6 +5,7 @@ namespace Symfony\Framework\WebBundle\Controller;
 use Symfony\Foundation\LoggerInterface;
 use Symfony\Components\DependencyInjection\ContainerInterface;
 use Symfony\Components\HttpKernel\HttpKernelInterface;
+use Symfony\Components\HttpKernel\Request;
 
 /*
  * This file is part of the Symfony framework.
@@ -36,6 +37,13 @@ class ControllerManager
     /**
      * Renders a Controller and returns the Response content.
      *
+     * Available options:
+     *
+     *  * path: An array of path parameters (only when the first argument is a controller)
+     *  * query: An array of query parameters (only when the first argument is a controller)
+     *  * ignore_errors: true to return an empty string in case of an error
+     *  * alt: an alternative controller to execute in case of an error (can be a controller, a URI, or an array with the controller, the path arguments, and the query arguments)
+     *
      * @param string $controller A controller name to execute (a string like BlogBundle:Post:index), or a relative URI
      * @param array  $options    An array of options
      *
@@ -43,6 +51,17 @@ class ControllerManager
      */
     public function render($controller, array $options = array())
     {
+        $options = array_merge(array(
+            'path'          => array(),
+            'query'         => array(),
+            'ignore_errors' => true,
+            'alt'           => array(),
+        ), $options);
+
+        if (!is_array($options['alt'])) {
+            $options['alt'] = array($options['alt']);
+        }
+
         $request = $this->container->getRequestService();
 
         // controller or URI?

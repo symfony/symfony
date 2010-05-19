@@ -53,6 +53,7 @@ class KernelExtension extends LoaderExtension
                 'Symfony\\Components\\HttpKernel\\HttpKernel',
                 'Symfony\\Components\\HttpKernel\\Request',
                 'Symfony\\Components\\HttpKernel\\Response',
+                'Symfony\\Components\\HttpKernel\\Listener\\ResponseFilter',
                 'Symfony\\Components\\Templating\\Loader\\LoaderInterface',
                 'Symfony\\Components\\Templating\\Loader\\Loader',
                 'Symfony\\Components\\Templating\\Loader\\FilesystemLoader',
@@ -65,7 +66,6 @@ class KernelExtension extends LoaderExtension
                 'Symfony\\Framework\\WebBundle\\Controller',
                 'Symfony\\Framework\\WebBundle\\Listener\\RequestParser',
                 'Symfony\\Framework\\WebBundle\\Listener\\ControllerLoader',
-                'Symfony\\Framework\\WebBundle\\Listener\\ResponseFilter',
                 'Symfony\\Framework\\WebBundle\\Templating\\Engine',
             );
         } else {

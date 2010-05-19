@@ -16,8 +16,7 @@ use Symfony\Components\DependencyInjection\ContainerInterface;
  */
 
 /**
- * This EventDispatcher implementation uses a DependencyInjection container to
- * lazy load listeners.
+ * This EventDispatcher implementation uses a DependencyInjection container to load listeners.
  *
  * @package    Symfony
  * @subpackage Foundation
@@ -25,44 +24,14 @@ use Symfony\Components\DependencyInjection\ContainerInterface;
  */
 class EventDispatcher extends BaseEventDispatcher
 {
-    protected $container;
-
     /**
      * Constructor.
      *
      */
     public function __construct(ContainerInterface $container)
     {
-        $this->container = $container;
-
         foreach ($container->findAnnotatedServiceIds('kernel.listener') as $id => $attributes) {
-            foreach ($attributes as $attribute) {
-                if (isset($attribute['event'])) {
-                    $this->connect($attribute['event'], array($id, isset($attribute['method']) ? $attribute['method'] : 'handle'));
-                }
-            }
+            $container->getService($id)->register($this);
         }
-    }
-
-    /**
-     * Returns all listeners associated with a given event name.
-     *
-     * @param  string   $name    The event name
-     *
-     * @return array  An array of listeners
-     */
-    public function getListeners($name)
-    {
-        if (!isset($this->listeners[$name])) {
-            return array();
-        }
-
-        foreach ($this->listeners[$name] as $i => $listener) {
-            if (is_array($listener) && is_string($listener[0])) {
-                $this->listeners[$name][$i] = array($this->container->getService($listener[0]), $listener[1]);
-            }
-        }
-
-        return $this->listeners[$name];
     }
 }

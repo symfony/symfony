@@ -27,19 +27,22 @@ use Symfony\Components\EventDispatcher\Event;
 class ControllerLoader
 {
     protected $manager;
-    protected $dispatcher;
     protected $logger;
 
-    public function __construct(EventDispatcher $dispatcher, ControllerManager $manager, LoggerInterface $logger = null)
+    public function __construct(ControllerManager $manager, LoggerInterface $logger = null)
     {
-        $this->dispatcher = $dispatcher;
         $this->manager = $manager;
         $this->logger = $logger;
     }
 
-    public function register()
+    /**
+     * Registers a core.load_controller listener.
+     *
+     * @param Symfony\Components\EventDispatcher\EventDispatcher $dispatcher An EventDispatcher instance
+     */
+    public function register(EventDispatcher $dispatcher)
     {
-        $this->dispatcher->connect('core.load_controller', array($this, 'resolve'));
+        $dispatcher->connect('core.load_controller', array($this, 'resolve'));
     }
 
     /**

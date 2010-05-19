@@ -17,7 +17,7 @@
 
   <services>
     <service id="data_collector_manager" class="%data_collector_manager.class%">
-      <annotation name="kernel.listener" event="core.response" method="handle" />
+      <annotation name="kernel.listener" />
       <argument type="service" id="service_container" />
       <argument type="service" id="logger" />
       <argument type="service" id="data_collector_manager.storage" />

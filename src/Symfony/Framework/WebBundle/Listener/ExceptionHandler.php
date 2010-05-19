@@ -3,6 +3,7 @@
 namespace Symfony\Framework\WebBundle\Listener;
 
 use Symfony\Components\DependencyInjection\ContainerInterface;
+use Symfony\Components\EventDispatcher\EventDispatcher;
 use Symfony\Components\EventDispatcher\Event;
 use Symfony\Foundation\LoggerInterface;
 use Symfony\Components\HttpKernel\HttpKernelInterface;
@@ -37,9 +38,14 @@ class ExceptionHandler
         $this->controller = $controller;
     }
 
-    public function register()
+    /**
+     * Registers a core.exception listener.
+     *
+     * @param Symfony\Components\EventDispatcher\EventDispatcher $dispatcher An EventDispatcher instance
+     */
+    public function register(EventDispatcher $dispatcher)
     {
-        $this->container->getEventDispatcherService()->connect('core.exception', array($this, 'handle'));
+        $dispatcher->connect('core.exception', array($this, 'handle'));
     }
 
     public function handle(Event $event)

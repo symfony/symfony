@@ -48,7 +48,6 @@ class Application
 {
     protected $commands;
     protected $aliases;
-    protected $application;
     protected $wantHelps = false;
     protected $runningCommand;
     protected $name;

@@ -35,7 +35,6 @@ class Command
     protected $application;
     protected $description;
     protected $ignoreValidationErrors;
-    protected $formatter;
     protected $applicationDefinitionMerged;
     protected $code;
 

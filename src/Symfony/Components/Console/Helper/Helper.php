@@ -20,8 +20,7 @@ namespace Symfony\Components\Console\Helper;
  */
 abstract class Helper implements HelperInterface
 {
-    protected
-        $helperSet = null;
+    protected $helperSet = null;
 
     /**
      * Sets the helper set associated with this helper.

@@ -22,15 +22,15 @@ use Symfony\Components\Console\Command\Command;
  */
 class HelperSet
 {
-    protected
-        $helpers = array(),
-        $command = null;
+    protected $helpers;
+    protected $command;
 
     /**
      * @param Helper[] $helpers An array of helper.
      */
     public function __construct(array $helpers = array())
     {
+        $this->helpers = array();
         foreach ($helpers as $alias => $helper) {
             $this->set($helper, is_int($alias) ? null : $alias);
         }

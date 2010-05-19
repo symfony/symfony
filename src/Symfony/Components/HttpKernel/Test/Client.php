@@ -166,7 +166,7 @@ EOF;
      */
     protected function filterResponse($response)
     {
-        return new DomResponse($response->getContent(), $response->getStatusCode(), $response->headers, $response->getCookies());
+        return new DomResponse($response->getContent(), $response->getStatusCode(), $response->headers->all(), $response->getCookies());
     }
 
     /**

@@ -25,6 +25,13 @@ use Symfony\Framework\SwiftmailerBundle\DependencyInjection\SwiftmailerExtension
  */
 class Bundle extends BaseBundle
 {
+    /**
+     * Customizes the Container instance.
+     *
+     * @param Symfony\Components\DependencyInjection\ContainerInterface $container A ContainerInterface instance
+     *
+     * @return Symfony\Components\DependencyInjection\BuilderConfiguration A BuilderConfiguration instance
+     */
     public function buildContainer(ContainerInterface $container)
     {
         Loader::registerExtension(new SwiftmailerExtension());

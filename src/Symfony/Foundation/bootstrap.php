@@ -10,18 +10,67 @@ use Symfony\Components\Console\Application;
 
 abstract class Bundle implements BundleInterface
 {
+    protected $name;
+    protected $namespacePrefix;
+    protected $path;
+    protected $reflection;
+
+    
     public function buildContainer(ContainerInterface $container)
     {
     }
 
+    
     public function boot(ContainerInterface $container)
     {
     }
 
+    
     public function shutdown(ContainerInterface $container)
     {
     }
 
+    
+    public function getName()
+    {
+        if (null === $this->name) {
+            $this->initReflection();
+        }
+
+        return $this->name;
+    }
+
+    
+    public function getNamespacePrefix()
+    {
+        if (null === $this->name) {
+            $this->initReflection();
+        }
+
+        return $this->namespacePrefix;
+    }
+
+    
+    public function getPath()
+    {
+        if (null === $this->name) {
+            $this->initReflection();
+        }
+
+        return $this->path;
+    }
+
+    
+    public function getReflection()
+    {
+        if (null === $this->name) {
+            $this->initReflection();
+        }
+
+        return $this->reflection;
+    }
+
+    
     public function registerCommands(Application $application)
     {
         foreach ($application->getKernel()->getBundleDirs() as $dir) {
@@ -46,6 +95,15 @@ abstract class Bundle implements BundleInterface
             }
         }
     }
+
+    protected function initReflection()
+    {
+        $tmp = dirname(str_replace('\\', '/', get_class($this)));
+        $this->namespacePrefix = str_replace('/', '\\', dirname($tmp));
+        $this->name = basename($tmp);
+        $this->reflection = new \ReflectionObject($this);
+        $this->path = dirname($this->reflection->getFilename());
+    }
 }
 
 
@@ -58,10 +116,13 @@ use Symfony\Components\DependencyInjection\ContainerInterface;
 
 interface BundleInterface
 {
+    
     public function buildContainer(ContainerInterface $container);
 
+    
     public function boot(ContainerInterface $container);
 
+    
     public function shutdown(ContainerInterface $container);
 }
 
@@ -80,6 +141,7 @@ use Symfony\Components\DependencyInjection\BuilderConfiguration;
 
 class KernelBundle extends Bundle
 {
+    
     public function buildContainer(ContainerInterface $container)
     {
         Loader::registerExtension(new KernelExtension());
@@ -97,6 +159,7 @@ class KernelBundle extends Bundle
         return $configuration;
     }
 
+    
     public function boot(ContainerInterface $container)
     {
         $container->getErrorHandlerService();

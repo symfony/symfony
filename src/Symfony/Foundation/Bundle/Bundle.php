@@ -23,18 +23,101 @@ use Symfony\Components\Console\Application;
  */
 abstract class Bundle implements BundleInterface
 {
+    protected $name;
+    protected $namespacePrefix;
+    protected $path;
+    protected $reflection;
+
+    /**
+     * Customizes the Container instance.
+     *
+     * @param Symfony\Components\DependencyInjection\ContainerInterface $container A ContainerInterface instance
+     *
+     * @return Symfony\Components\DependencyInjection\BuilderConfiguration A BuilderConfiguration instance
+     */
     public function buildContainer(ContainerInterface $container)
     {
     }
 
+    /**
+     * Boots the Bundle.
+     *
+     * @param Symfony\Components\DependencyInjection\ContainerInterface $container A ContainerInterface instance
+     */
     public function boot(ContainerInterface $container)
     {
     }
 
+    /**
+     * Shutdowns the Bundle.
+     *
+     * @param Symfony\Components\DependencyInjection\ContainerInterface $container A ContainerInterface instance
+     */
     public function shutdown(ContainerInterface $container)
     {
     }
 
+    /**
+     * Gets the Bundle name.
+     *
+     * @return string The Bundle name
+     */
+    public function getName()
+    {
+        if (null === $this->name) {
+            $this->initReflection();
+        }
+
+        return $this->name;
+    }
+
+    /**
+     * Gets the Bundle namespace prefix.
+     *
+     * @return string The Bundle namespace prefix
+     */
+    public function getNamespacePrefix()
+    {
+        if (null === $this->name) {
+            $this->initReflection();
+        }
+
+        return $this->namespacePrefix;
+    }
+
+    /**
+     * Gets the Bundle absolute path.
+     *
+     * @return string The Bundle absolute path
+     */
+    public function getPath()
+    {
+        if (null === $this->name) {
+            $this->initReflection();
+        }
+
+        return $this->path;
+    }
+
+    /**
+     * Gets the Bundle Reflection instance.
+     *
+     * @return \ReflectionObject A \ReflectionObject instance for the Bundle
+     */
+    public function getReflection()
+    {
+        if (null === $this->name) {
+            $this->initReflection();
+        }
+
+        return $this->reflection;
+    }
+
+    /**
+     * Registers the Commands for the console.
+     *
+     * @param Symfony\Components\Console\Application An Application instance
+     */
     public function registerCommands(Application $application)
     {
         foreach ($application->getKernel()->getBundleDirs() as $dir) {
@@ -59,5 +142,14 @@ abstract class Bundle implements BundleInterface
                 }
             }
         }
+    }
+
+    protected function initReflection()
+    {
+        $tmp = dirname(str_replace('\\', '/', get_class($this)));
+        $this->namespacePrefix = str_replace('/', '\\', dirname($tmp));
+        $this->name = basename($tmp);
+        $this->reflection = new \ReflectionObject($this);
+        $this->path = dirname($this->reflection->getFilename());
     }
 }

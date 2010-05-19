@@ -27,6 +27,13 @@ use Symfony\Components\DependencyInjection\BuilderConfiguration;
  */
 class KernelBundle extends Bundle
 {
+    /**
+     * Customizes the Container instance.
+     *
+     * @param Symfony\Components\DependencyInjection\ContainerInterface $container A ContainerInterface instance
+     *
+     * @return Symfony\Components\DependencyInjection\BuilderConfiguration A BuilderConfiguration instance
+     */
     public function buildContainer(ContainerInterface $container)
     {
         Loader::registerExtension(new KernelExtension());
@@ -44,6 +51,11 @@ class KernelBundle extends Bundle
         return $configuration;
     }
 
+    /**
+     * Boots the Bundle.
+     *
+     * @param Symfony\Components\DependencyInjection\ContainerInterface $container A ContainerInterface instance
+     */
     public function boot(ContainerInterface $container)
     {
         $container->getErrorHandlerService();

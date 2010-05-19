@@ -192,11 +192,21 @@ abstract class Kernel implements HttpKernelInterface, \Serializable
         return $response;
     }
 
+    /**
+     * Gets the directories where bundles can be stored.
+     *
+     * @return array An array of directories where bundles can be stored
+     */
     public function getBundleDirs()
     {
         return $this->bundleDirs;
     }
 
+    /**
+     * Gets the registered bundle names.
+     *
+     * @return array An array of registered bundle names
+     */
     public function getBundles()
     {
         return $this->bundles;

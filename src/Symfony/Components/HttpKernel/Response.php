@@ -235,6 +235,16 @@ class Response
     }
 
     /**
+     * Sets cookies.
+     *
+     * @param array $cookies An array of cookies
+     */
+    public function setCookies(array $cookies)
+    {
+        return $this->cookies = $cookies;
+    }
+
+    /**
      * Sets response status code.
      *
      * @param integer $code HTTP status code
@@ -526,7 +536,6 @@ class Response
         } else {
             $this->headers->set('Last-Modified', $date->format(DATE_RFC2822));
         }
-
     }
 
     /**
@@ -539,12 +548,16 @@ class Response
         return $this->headers->get('ETag');
     }
 
-    public function setEtag($etag = null)
+    public function setEtag($etag = null, $weak = false)
     {
         if (null === $etag) {
             $this->headers->delete('Etag');
         } else {
-            $this->headers->set('ETag', $etag);
+            if (0 !== strpos($etag, '"')) {
+                $etag = '"'.$etag.'"';
+            }
+
+            $this->headers->set('ETag', (true === $weak ? 'W/' : '').$etag);
         }
     }
 
@@ -606,9 +619,7 @@ class Response
     {
         $lastModified = $request->headers->get('If-Modified-Since');
         $notModified = false;
-        if ($etags = $request->headers->get('If-None-Match')) {
-            $etags = preg_split('/\s*,\s*/', $etags);
-
+        if ($etags = $request->getEtags()) {
             $notModified = (in_array($this->getEtag(), $etags) || in_array('*', $etags)) && (!$lastModified || $this->headers->get('Last-Modified') == $lastModified);
         } elseif ($lastModified) {
             $notModified = $lastModified == $this->headers->get('Last-Modified');

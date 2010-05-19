@@ -460,6 +460,11 @@ class Request
         return in_array(strtolower($this->getMethod()), array('get', 'head'));
     }
 
+    public function getETags()
+    {
+        return preg_split('/\s*,\s*/', $this->headers->get('if_none_match'));
+    }
+
     public function isNoCache()
     {
         return $this->headers->getCacheControl()->isNoCache() || 'no-cache' == $this->headers->get('Pragma');

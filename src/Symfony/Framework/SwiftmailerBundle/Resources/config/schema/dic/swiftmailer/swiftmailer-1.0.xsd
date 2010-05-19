@@ -19,7 +19,10 @@
     <xsd:attribute name="encryption" type="encryption" />
     <xsd:attribute name="auth_mode" type="auth_mode" />
     <xsd:attribute name="transport" type="xsd:string" />
+    <xsd:attribute name="type" type="xsd:string" />
     <xsd:attribute name="delivery_strategy" type="delivery_strategy" />
+    <xsd:attribute name="delivery_address" type="xsd:string" />
+    <xsd:attribute name="disable_delivery" type="xsd:boolean" />
   </xsd:complexType>
 
   <xsd:complexType name="spool">

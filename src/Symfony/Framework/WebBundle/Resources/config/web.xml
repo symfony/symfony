@@ -12,9 +12,7 @@
     <parameter key="response_filter.class">Symfony\Components\HttpKernel\Listener\ResponseFilter</parameter>
 
     <parameter key="exception_handler.class">Symfony\Framework\WebBundle\Listener\ExceptionHandler</parameter>
-    <parameter key="exception_handler.bundle">WebBundle</parameter>
-    <parameter key="exception_handler.controller">Exception</parameter>
-    <parameter key="exception_handler.action">exception</parameter>
+    <parameter key="exception_handler.controller">WebBundle:Exception:exception</parameter>
   </parameters>
 
   <services>
@@ -57,9 +55,7 @@
       <annotation name="kernel.listener" />
       <argument type="service" id="service_container" />
       <argument type="service" id="logger" on-invalid="null" />
-      <argument>%exception_handler.bundle%</argument>
       <argument>%exception_handler.controller%</argument>
-      <argument>%exception_handler.action%</argument>
     </service>
   </services>
 </container>

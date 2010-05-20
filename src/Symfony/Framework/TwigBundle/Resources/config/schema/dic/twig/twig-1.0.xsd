@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+
+<xsd:schema xmlns="http://www.symfony-project.org/schema/dic/twig"
+    xmlns:xsd="http://www.w3.org/2001/XMLSchema"
+    targetNamespace="http://www.symfony-project.org/schema/dic/twig"
+    elementFormDefault="qualified">
+
+  <xsd:element name="config" type="config" />
+
+  <xsd:complexType name="config">
+    <xsd:attribute name="charset" type="xsd:string" />
+    <xsd:attribute name="debug" type="xsd:string" />
+    <xsd:attribute name="cache" type="xsd:string" />
+    <xsd:attribute name="trim_blocks" type="xsd:string" />
+    <xsd:attribute name="auto_reload" type="xsd:string" />
+    <xsd:attribute name="base_template_class" type="xsd:string" />
+  </xsd:complexType>
+</xsd:schema>

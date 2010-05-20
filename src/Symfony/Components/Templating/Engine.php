@@ -284,7 +284,7 @@ class Engine
         $renderer->setEngine($this);
     }
 
-    protected function splitTemplateName($name)
+    public function splitTemplateName($name)
     {
         if (false !== $pos = strpos($name, ':')) {
             $renderer = substr($name, $pos + 1);

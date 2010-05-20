@@ -119,7 +119,7 @@ class Engine extends BaseEngine
     }
 
     // Bundle:controller:action(:renderer)
-    protected function splitTemplateName($name)
+    public function splitTemplateName($name)
     {
         $parts = explode(':', $name, 4);
 

@@ -27,6 +27,7 @@ abstract class Storage
      * Constructor.
      *
      * @param string $template The template name
+     * @param string $renderer The renderer name
      */
     public function __construct($template, $renderer = null)
     {
@@ -44,6 +45,11 @@ abstract class Storage
         return (string) $this->template;
     }
 
+    /**
+     * Returns the content of the template.
+     *
+     * @return string The template content
+     */
     abstract public function getContent();
 
     /**

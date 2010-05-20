@@ -40,11 +40,17 @@ class Engine extends BaseEngine
      */
     public function __construct(ContainerInterface $container, LoaderInterface $loader, array $renderers = array(), $escaper)
     {
-        parent::__construct($loader, $renderers);
-
         $this->level = 0;
         $this->container = $container;
         $this->escaper = $escaper;
+
+        foreach ($this->container->findAnnotatedServiceIds('templating.renderer') as $id => $attributes) {
+            if (isset($attributes[0]['alias'])) {
+                $renderers[$attributes[0]['alias']] = $this->container->getService($id);
+            }
+        }
+
+        parent::__construct($loader, $renderers);
 
         $this->helpers = array();
         foreach ($this->container->findAnnotatedServiceIds('templating.helper') as $id => $attributes) {

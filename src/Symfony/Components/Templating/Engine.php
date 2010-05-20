@@ -153,6 +153,18 @@ class Engine
     }
 
     /**
+     * Returns true if the helper if defined.
+     *
+     * @param string  $name The helper name
+     *
+     * @return Boolean true if the helper is defined, false otherwise
+     */
+    public function __isset($name)
+    {
+        return isset($this->helpers[$name]);
+    }
+
+    /**
      * @param Helper[] $helpers An array of helper
      */
     public function addHelpers(array $helpers = array())

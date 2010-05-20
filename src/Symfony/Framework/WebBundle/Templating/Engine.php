@@ -64,9 +64,13 @@ class Engine extends BaseEngine
     {
         ++$this->level;
 
-        // escape only once
-        if (1 === $this->level && !isset($parameters['_data'])) {
-            $parameters = $this->escapeParameters($parameters);
+        list(, $options) = $this->splitTemplateName($name);
+        if ('php' === $options['renderer'])
+        {
+            // escape only once
+            if (1 === $this->level && !isset($parameters['_data'])) {
+                $parameters = $this->escapeParameters($parameters);
+            }
         }
 
         $content = parent::render($name, $parameters);

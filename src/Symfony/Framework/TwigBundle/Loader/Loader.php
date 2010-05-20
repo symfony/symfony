@@ -81,8 +81,7 @@ class Loader implements \Twig_LoaderInterface
     public function isFresh($name, $time)
     {
         if ($name instanceof Storage) {
-            if ($name instanceof FileStorage)
-            {
+            if ($name instanceof FileStorage) {
                 return filemtime((string) $name) < $time;
             }
 

@@ -31,8 +31,7 @@ class StylesheetTokenParser extends \Twig_TokenParser
         $lineno = $token->getLine();
         $nodes[] = $this->parser->getExpressionParser()->parseExpression();
 
-        if ($this->parser->getStream()->test(\Twig_Token::NAME_TYPE, 'with'))
-        {
+        if ($this->parser->getStream()->test(\Twig_Token::NAME_TYPE, 'with')) {
             $this->parser->getStream()->expect(\Twig_Token::NAME_TYPE, 'with');
             $nodes[] = $this->parser->getExpressionParser()->parseExpression();
         }

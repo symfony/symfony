@@ -15,7 +15,6 @@ require_once __DIR__.'/../../../../lib/SymfonyTests/Components/Templating/Simple
 
 use Symfony\Components\Templating\Engine;
 use Symfony\Components\Templating\Loader\Loader;
-use Symfony\Components\Templating\Loader\CompilableLoaderInterface;
 use Symfony\Components\Templating\Renderer\Renderer;
 use Symfony\Components\Templating\Renderer\PhpRenderer;
 use Symfony\Components\Templating\Storage\Storage;
@@ -115,10 +114,6 @@ class EngineTest extends \PHPUnit_Framework_TestCase
         self::$loader->setTemplate('foo.php', '<?php $view->extend("layout"); echo $foo ?>');
         self::$loader->setTemplate('layout.php', '<?php echo $view->render("bar") ?>-<?php echo $view->slots->get("_content") ?>-');
         $this->assertEquals('bar-foo-', $engine->render('foo', array('foo' => 'foo', 'bar' => 'bar')), '->render() supports render() calls in templates');
-
-        // compilable templates
-        $engine = new ProjectTemplateEngine(new CompilableTemplateLoader(), array('foo' => new FooTemplateRenderer()));
-        $this->assertEquals('foo', $engine->render('index'), '->load() takes into account the renderer embedded in the Storage instance if not null');
     }
 
     public function testEscape()
@@ -176,18 +171,10 @@ class ProjectTemplateLoader extends Loader
 
         return false;
     }
-}
 
-class CompilableTemplateLoader extends Loader implements CompilableLoaderInterface
-{
-    public function load($template, array $options = array())
+    public function isFresh($template, array $options = array(), $time)
     {
-        return new StringStorage($template, 'foo');
-    }
-
-    public function compile($template)
-    {
-        return 'COMPILED';
+        return false;
     }
 }
 

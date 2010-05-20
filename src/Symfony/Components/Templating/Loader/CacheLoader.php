@@ -61,10 +61,6 @@ class CacheLoader extends Loader
         $file = substr($tmp, 2);
         $path = $dir.DIRECTORY_SEPARATOR.$file;
 
-        if ($this->loader instanceof CompilableLoaderInterface) {
-            $options['renderer'] = 'php';
-        }
-
         if (file_exists($path)) {
             if (null !== $this->debugger) {
                 $this->debugger->log(sprintf('Fetching template "%s" from cache', $template));
@@ -78,10 +74,6 @@ class CacheLoader extends Loader
         }
 
         $content = $storage->getContent();
-
-        if ($this->loader instanceof CompilableLoaderInterface) {
-            $content = $this->loader->compile($content);
-        }
 
         if (!file_exists($dir)) {
             mkdir($dir, 0777, true);

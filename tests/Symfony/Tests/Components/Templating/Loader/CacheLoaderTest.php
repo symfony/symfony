@@ -15,7 +15,6 @@ require_once __DIR__.'/../../../../../lib/SymfonyTests/Components/Templating/Pro
 
 use Symfony\Components\Templating\Loader\Loader;
 use Symfony\Components\Templating\Loader\CacheLoader;
-use Symfony\Components\Templating\Loader\CompilableLoaderInterface;
 use Symfony\Components\Templating\Storage\StringStorage;
 
 class CacheLoaderTest extends \PHPUnit_Framework_TestCase
@@ -39,20 +38,6 @@ class CacheLoaderTest extends \PHPUnit_Framework_TestCase
         $this->assertTrue($debugger->hasMessage('Storing template'), '->load() logs a "Storing template" message if the template is found');
         $loader->load('index');
         $this->assertTrue($debugger->hasMessage('Fetching template'), '->load() logs a "Storing template" message if the template is fetched from cache');
-
-        // load() template compilation
-        $dir = sys_get_temp_dir().DIRECTORY_SEPARATOR.rand(111111, 999999);
-        mkdir($dir, 0777, true);
-
-        $loader = new ProjectTemplateLoader(new CompilableTemplateLoader(), $dir);
-        $loader->setDebugger($debugger = new \ProjectTemplateDebugger());
-        $template = $loader->load('special', array('renderer' => 'comp'));
-        $this->assertTrue($debugger->hasMessage('Storing template'), '->load() logs a "Storing template" message if the template is found');
-        $this->assertEquals('php', $template->getRenderer(), '->load() changes the renderer to php if the template is compilable');
-
-        $template = $loader->load('special', array('renderer' => 'comp'));
-        $this->assertTrue($debugger->hasMessage('Fetching template'), '->load() logs a "Storing template" message if the template is fetched from cache');
-        $this->assertEquals('php', $template->getRenderer(), '->load() changes the renderer to php if the template is compilable');
     }
 }
 
@@ -89,12 +74,9 @@ class ProjectTemplateLoaderVar extends Loader
 
         return false;
     }
-}
 
-class CompilableTemplateLoader extends ProjectTemplateLoaderVar implements CompilableLoaderInterface
-{
-    public function compile($template)
+    public function isFresh($template, array $options = array(), $time)
     {
-        return preg_replace('/{{\s*([a-zA-Z0-9_]+)\s*}}/', '<?php echo $$1 ?>', $template);
+        return false;
     }
 }

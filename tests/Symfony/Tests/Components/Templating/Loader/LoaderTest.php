@@ -35,4 +35,9 @@ class ProjectTemplateLoader4 extends Loader
     {
         return $this->debugger;
     }
+
+    public function isFresh($template, array $options = array(), $time)
+    {
+        return false;
+    }
 }

@@ -38,9 +38,9 @@ class Bundle extends BaseBundle
     {
         Loader::registerExtension(new WebExtension());
 
-        $dirs = array('%kernel.root_dir%/views/%%bundle%%/%%controller%%/%%name%%%%format%%.php');
+        $dirs = array('%kernel.root_dir%/views/%%bundle%%/%%controller%%/%%name%%%%format%%.%%renderer%%');
         foreach ($container->getParameter('kernel.bundle_dirs') as $dir) {
-            $dirs[] = $dir.'/%%bundle%%/Resources/views/%%controller%%/%%name%%%%format%%.php';
+            $dirs[] = $dir.'/%%bundle%%/Resources/views/%%controller%%/%%name%%%%format%%.%%renderer%%';
         }
         $container->setParameter('templating.loader.filesystem.path', $dirs);
 

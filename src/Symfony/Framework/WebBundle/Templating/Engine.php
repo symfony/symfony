@@ -122,7 +122,7 @@ class Engine extends BaseEngine
         $options = array(
             'bundle'     => str_replace('\\', '/', $parts[0]),
             'controller' => $parts[1],
-            'renderer'   => isset($parts[3]) ? $parts[3] : 'php',
+            'renderer'   => isset($parts[3]) && $parts[3] ? $parts[3] : 'php',
             'format'     => '',
         );
 

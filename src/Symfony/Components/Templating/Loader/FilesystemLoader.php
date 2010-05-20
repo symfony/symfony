@@ -88,6 +88,23 @@ class FilesystemLoader extends Loader
     }
 
     /**
+     * Returns true if the template is still fresh.
+     *
+     * @param string    $template The template name
+     * @param array     $options  An array of options
+     * @param timestamp $time     The last modification time of the cached template
+     */
+    public function isFresh($template, array $options = array(), $time)
+    {
+        if (false === $template = $this->load($template, $options))
+        {
+            return false;
+        }
+
+        return filemtime((string) $template) < $time;
+    }
+
+    /**
      * Returns true if the file is an existing absolute path.
      *
      * @param string $file A path

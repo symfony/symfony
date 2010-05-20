@@ -67,4 +67,22 @@ class ChainLoader extends Loader
 
         return false;
     }
+
+    /**
+     * Returns true if the template is still fresh.
+     *
+     * @param string    $template The template name
+     * @param array     $options  An array of options
+     * @param timestamp $time     The last modification time of the cached template
+     */
+    public function isFresh($template, array $options = array(), $time)
+    {
+        foreach ($this->loaders as $loader) {
+            if (false !== $ret = $loader->load($template, $options)) {
+                return $loader->isFresh($template, $options);
+            }
+        }
+
+        return false;
+    }
 }

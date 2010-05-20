@@ -95,4 +95,16 @@ class CacheLoader extends Loader
 
         return new FileStorage($path, $options['renderer']);
     }
+
+    /**
+     * Returns true if the template is still fresh.
+     *
+     * @param string    $template The template name
+     * @param array     $options  An array of options
+     * @param timestamp $time     The last modification time of the cached template
+     */
+    public function isFresh($template, array $options = array(), $time)
+    {
+        return $this->loader->isFresh($template, $options);
+    }
 }

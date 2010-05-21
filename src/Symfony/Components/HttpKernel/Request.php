@@ -31,7 +31,6 @@ class Request
     protected $languages;
     protected $charsets;
     protected $acceptableContentTypes;
-    protected $scriptName;
     protected $pathInfo;
     protected $requestUri;
     protected $baseUrl;
@@ -81,7 +80,6 @@ class Request
         $this->languages = null;
         $this->charsets = null;
         $this->acceptableContentTypes = null;
-        $this->scriptName = null;
         $this->pathInfo = null;
         $this->requestUri = null;
         $this->baseUrl = null;

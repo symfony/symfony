@@ -23,6 +23,8 @@
       <directory>./src/Symfony/</directory>
       <exclude>
         <directory>./src/Symfony/Framework/DoctrineBundle</directory>
+        <directory>./src/Symfony/Framework/DoctrineMigrationsBundle</directory>
+        <directory>./src/Symfony/Framework/TwigBundle</directory>
         <directory>./src/Symfony/Framework/ZendBundle</directory>
 
         <directory>./src/Symfony/Framework/*/Resources</directory>

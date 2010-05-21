@@ -16,7 +16,7 @@ use Symfony\Framework\TwigBundle\Node\HelperNode;
 /**
  * Wrapper for the route helper generate() method.
  *
- * {% route blog_post with ['id': post.id] %}
+ * {% route 'blog_post' with ['id': post.id] %}
  *
  * @package    Symfony
  * @subpackage Framework_TwigBundle

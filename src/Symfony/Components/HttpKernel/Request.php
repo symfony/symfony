@@ -145,7 +145,7 @@ class Request
             'QUERY_STRING'         => $queryString,
         ));
 
-        return new self($request, $query, array(), $cookies, $files, $server);
+        return new self($query, $request, array(), $cookies, $files, $server);
     }
 
     /**

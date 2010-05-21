@@ -1,6 +1,6 @@
 <?php
 
-namespace Symfony\Components\Finder;
+namespace Symfony\Components\Finder\Comparator;
 
 /*
  * This file is part of the Symfony framework.
@@ -33,71 +33,45 @@ namespace Symfony\Components\Finder;
  * @copyright  2002 Richard Clamp <richardc@unixbeard.net>
  * @see        http://physics.nist.gov/cuu/Units/binary.html
  */
-class NumberCompare
+class NumberComparator extends Comparator
 {
-    protected $target;
-    protected $comparison;
-
     /**
      * Constructor.
      *
      * @param string $test A comparison string
+     *
+     * @throws \InvalidArgumentException If the test is not understood
      */
     public function __construct($test)
     {
         if (!preg_match('#^\s*([<>=]=?)?\s*([0-9\.]+)\s*([kmg]i?)?\s*$#i', $test, $matches)) {
-            throw new \InvalidArgumentException(sprintf('Don\'t understand "%s" as a test.', $test));
+            throw new \InvalidArgumentException(sprintf('Don\'t understand "%s" as a number test.', $test));
         }
 
-        $this->target = $matches[2];
-        $this->comparison = isset($matches[1]) ? $matches[1] : '==';
-
+        $target = $matches[2];
         $magnitude = strtolower(isset($matches[3]) ? $matches[3] : '');
         switch ($magnitude) {
             case 'k':
-                $this->target *= 1000;
+                $target *= 1000;
                 break;
             case 'ki':
-                $this->target *= 1024;
+                $target *= 1024;
                 break;
             case 'm':
-                $this->target *= 1000000;
+                $target *= 1000000;
                 break;
             case 'mi':
-                $this->target *= 1024*1024;
+                $target *= 1024*1024;
                 break;
             case 'g':
-                $this->target *= 1000000000;
+                $target *= 1000000000;
                 break;
             case 'gi':
-                $this->target *= 1024*1024*1024;
+                $target *= 1024*1024*1024;
                 break;
         }
-    }
 
-    /**
-     * Tests a number against the test.
-     *
-     * @throws \InvalidArgumentException If the test is not understood
-     */
-    public function test($number)
-    {
-        if ($this->comparison === '>') {
-            return ($number > $this->target);
-        }
-
-        if ($this->comparison === '>=') {
-            return ($number >= $this->target);
-        }
-
-        if ($this->comparison === '<') {
-            return ($number < $this->target);
-        }
-
-        if ($this->comparison === '<=') {
-            return ($number <= $this->target);
-        }
-
-        return ($number == $this->target);
+        $this->setTarget($target);
+        $this->setOperator(isset($matches[1]) ? $matches[1] : '==');
     }
 }

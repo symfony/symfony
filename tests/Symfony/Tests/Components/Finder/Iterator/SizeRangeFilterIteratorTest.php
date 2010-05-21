@@ -12,7 +12,7 @@
 namespace Symfony\Tests\Components\Finder\Iterator;
 
 use Symfony\Components\Finder\Iterator\SizeRangeFilterIterator;
-use Symfony\Components\Finder\NumberCompare;
+use Symfony\Components\Finder\Comparator\NumberComparator;
 
 require_once __DIR__.'/RealIteratorTestCase.php';
 
@@ -33,7 +33,7 @@ class SizeRangeFilterIteratorTest extends RealIteratorTestCase
     public function getAcceptData()
     {
         return array(
-            array(array(new NumberCompare('< 1K'), new NumberCompare('> 0.5K')), array(sys_get_temp_dir().'/symfony2_finder/.git', sys_get_temp_dir().'/symfony2_finder/foo', sys_get_temp_dir().'/symfony2_finder/test.php', sys_get_temp_dir().'/symfony2_finder/toto')),
+            array(array(new NumberComparator('< 1K'), new NumberComparator('> 0.5K')), array(sys_get_temp_dir().'/symfony2_finder/.git', sys_get_temp_dir().'/symfony2_finder/foo', sys_get_temp_dir().'/symfony2_finder/test.php', sys_get_temp_dir().'/symfony2_finder/toto')),
         );
     }
 }

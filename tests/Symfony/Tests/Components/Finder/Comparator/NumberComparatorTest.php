@@ -9,19 +9,19 @@
  * file that was distributed with this source code.
  */
 
-namespace Symfony\Tests\Components\Finder;
+namespace Symfony\Tests\Components\Finder\Comparator;
 
-use Symfony\Components\Finder\NumberCompare;
+use Symfony\Components\Finder\Comparator\NumberComparator;
 
-class NumberCompareTest extends \PHPUnit_Framework_TestCase
+class NumberComparatorTest extends \PHPUnit_Framework_TestCase
 {
     public function testConstructor()
     {
         try {
-            new NumberCompare('foobar');
-            $this->fail('->test() throws an \InvalidArgumentException if the test expression is not valid.');
+            new NumberComparator('foobar');
+            $this->fail('__construct() throws an \InvalidArgumentException if the test expression is not valid.');
         } catch (\Exception $e) {
-            $this->assertInstanceOf('InvalidArgumentException', $e, '->test() throws an \InvalidArgumentException if the test expression is not valid.');
+            $this->assertInstanceOf('InvalidArgumentException', $e, '__construct() throws an \InvalidArgumentException if the test expression is not valid.');
         }
     }
 
@@ -30,13 +30,13 @@ class NumberCompareTest extends \PHPUnit_Framework_TestCase
      */
     public function testTest($test, $match, $noMatch)
     {
+        $c = new NumberComparator($test);
+
         foreach ($match as $m) {
-            $c = new NumberCompare($test);
             $this->assertTrue($c->test($m), '->test() tests a string against the expression');
         }
 
         foreach ($noMatch as $m) {
-            $c = new NumberCompare($test);
             $this->assertFalse($c->test($m), '->test() tests a string against the expression');
         }
     }

@@ -112,6 +112,13 @@ class FinderTest extends Iterator\RealIteratorTestCase
         $this->assertIterator($this->toAbsolute(array('test.php')), $finder->in(self::$tmpDir)->getIterator());
     }
 
+    public function testDate()
+    {
+        $finder = new Finder();
+        $this->assertSame($finder, $finder->files()->date('until last month'));
+        $this->assertIterator($this->toAbsolute(array('foo/bar.tmp', 'test.php')), $finder->in(self::$tmpDir)->getIterator());
+    }
+
     public function testExclude()
     {
         $finder = new Finder();
@@ -182,7 +189,7 @@ class FinderTest extends Iterator\RealIteratorTestCase
         $finder = new Finder();
         $iterator = $finder->files()->name('*.php')->maxDepth(0)->in(array(self::$tmpDir, __DIR__))->getIterator();
 
-        $this->assertIterator(array(self::$tmpDir.'test.php', __DIR__.'/FinderTest.php', __DIR__.'/GlobTest.php', __DIR__.'/NumberCompareTest.php'), $iterator);
+        $this->assertIterator(array(self::$tmpDir.'test.php', __DIR__.'/FinderTest.php', __DIR__.'/GlobTest.php'), $iterator);
     }
 
     public function testGetIterator()

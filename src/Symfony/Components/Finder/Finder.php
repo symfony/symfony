@@ -43,8 +43,7 @@ class Finder implements \IteratorAggregate
     protected $sort        = false;
     protected $ignoreVCS   = true;
     protected $dirs        = array();
-    protected $minDate     = false;
-    protected $maxDate     = false;
+    protected $dates       = array();
 
     /**
      * Restricts the matching to directories only.
@@ -107,46 +106,26 @@ class Finder implements \IteratorAggregate
     }
 
     /**
-     * Sets the maximum date (last modified) for a file or directory.
+     * Adds tests for file dates (last modified).
      *
      * The date must be something that strtotime() is able to parse:
      *
-     *   $finder->maxDate('yesterday');
-     *   $finder->maxDate('2 days ago');
-     *   $finder->maxDate('now - 2 hours');
-     *   $finder->maxDate('2005-10-15');
+     *   $finder->date('since yesterday');
+     *   $finder->date('until 2 days ago');
+     *   $finder->date('> now - 2 hours');
+     *   $finder->date('>= 2005-10-15');
      *
-     * @param  string $date A date
-     *
-     * @return Symfony\Components\Finder The current Finder instance
-     *
-     * @see Symfony\Components\Finder\Iterator\DateRangeFilterIterator
-     */
-    public function maxDate($date)
-    {
-        if (false === $this->maxDate = @strtotime($date)) {
-            throw new \InvalidArgumentException(sprintf('"%s" is not a valid date'));
-        }
-
-        return $this;
-    }
-
-    /**
-     * Sets the minimum date (last modified) for a file or a directory.
-     *
-     * The date must be something that strtotime() is able to parse (@see maxDate()).
-     *
-     * @param  string $date A date
+     * @param  string $date A date rage string
      *
      * @return Symfony\Components\Finder The current Finder instance
      *
+     * @see strtotime
      * @see Symfony\Components\Finder\Iterator\DateRangeFilterIterator
+     * @see Symfony\Components\Finder\Comparator\DateComparator
      */
-    public function minDate($date)
+    public function date($date)
     {
-        if (false === $this->minDate = @strtotime($date)) {
-            throw new \InvalidArgumentException(sprintf('"%s" is not a valid date'));
-        }
+        $this->dates[] = new Comparator\DateComparator($date);
 
         return $this;
     }
@@ -201,11 +180,11 @@ class Finder implements \IteratorAggregate
      * @return Symfony\Components\Finder The current Finder instance
      *
      * @see Symfony\Components\Finder\Iterator\SizeRangeFilterIterator
-     * @see Symfony\Components\Finder\NumberCompare
+     * @see Symfony\Components\Finder\Comparator\NumberComparator
      */
     public function size($size)
     {
-        $this->sizes[] = new NumberCompare($size);
+        $this->sizes[] = new Comparator\NumberComparator($size);
 
         return $this;
     }
@@ -410,8 +389,8 @@ class Finder implements \IteratorAggregate
             $iterator = new Iterator\SizeRangeFilterIterator($iterator, $this->sizes);
         }
 
-        if (false !== $this->minDate || false !== $this->maxDate) {
-            $iterator = new Iterator\DateRangeFilterIterator($iterator, $this->minDate, $this->maxDate);
+        if ($this->dates) {
+            $iterator = new Iterator\DateRangeFilterIterator($iterator, $this->dates);
         }
 
         if ($this->filters) {

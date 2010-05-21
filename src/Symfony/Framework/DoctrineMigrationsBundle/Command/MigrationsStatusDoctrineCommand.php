@@ -1,6 +1,6 @@
 <?php
 
-namespace Symfony\Framework\DoctrineBundle\Command;
+namespace Symfony\Framework\DoctrineMigrationsBundle\Command;
 
 use Symfony\Components\Console\Input\InputInterface;
 use Symfony\Components\Console\Output\OutputInterface;

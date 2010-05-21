@@ -120,7 +120,7 @@ class DoctrineExtension extends LoaderExtension
             if (isset($connection['options'])) {
                 $driverOptions['driverOptions'] = $connection['options'];
             }
-            foreach (array('dbname', 'host', 'user', 'password', 'path', 'port') as $key) {
+            foreach (array('dbname', 'host', 'user', 'password', 'path', 'port', 'unix_socket') as $key) {
                 if (isset($connection[$key])) {
                     $driverOptions[$key] = $connection[$key];
                 }

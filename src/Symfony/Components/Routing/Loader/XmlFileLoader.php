@@ -138,11 +138,15 @@ class XmlFileLoader extends FileLoader
      */
     protected function validate($dom, $file)
     {
-        libxml_use_internal_errors(true);
-        if (!$dom->schemaValidate(__DIR__.'/schema/routing/routing-1.0.xsd')) {
+        $parts = explode('/', str_replace('\\', '/', __DIR__.'/schema/routing/routing-1.0.xsd'));
+        $drive = '\\' === DIRECTORY_SEPARATOR ? array_shift($parts) : '';
+        $location = 'file:///'.$drive.implode('/', array_map('rawurlencode', $parts));
+
+        $current = libxml_use_internal_errors(true);
+        if (!$dom->schemaValidate($location)) {
             throw new \InvalidArgumentException(implode("\n", $this->getXmlErrors()));
         }
-        libxml_use_internal_errors(false);
+        libxml_use_internal_errors($current);
     }
 
     protected function getXmlErrors()

@@ -250,6 +250,10 @@ class XmlFileLoader extends FileLoader
 
         $imports = '';
         foreach ($schemaLocations as $namespace => $location) {
+            $parts = explode('/', $location);
+            $drive = '\\' === DIRECTORY_SEPARATOR ? array_shift($parts) : '';
+            $location = 'file:///'.$drive.implode('/', array_map('rawurlencode', $parts));
+
             $imports .= sprintf('  <xsd:import namespace="%s" schemaLocation="%s" />'."\n", $namespace, $location);
         }
 
@@ -266,11 +270,11 @@ $imports
 EOF
         ;
 
-        libxml_use_internal_errors(true);
+        $current = libxml_use_internal_errors(true);
         if (!$dom->schemaValidateSource($source)) {
             throw new \InvalidArgumentException(implode("\n", $this->getXmlErrors()));
         }
-        libxml_use_internal_errors(false);
+        libxml_use_internal_errors($current);
     }
 
     /**

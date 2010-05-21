@@ -15,7 +15,7 @@ use Symfony\Components\Finder\Comparator\Comparator;
 
 class ComparatorTest extends \PHPUnit_Framework_TestCase
 {
-    public function testSetOperator()
+    public function testGetSetOperator()
     {
         $comparator = new Comparator();
         try {
@@ -24,6 +24,17 @@ class ComparatorTest extends \PHPUnit_Framework_TestCase
         } catch (\Exception $e) {
             $this->assertInstanceOf('InvalidArgumentException', $e, '->setOperator() throws an \InvalidArgumentException if the operator is not valid.');
         }
+
+        $comparator = new Comparator();
+        $comparator->setOperator('>');
+        $this->assertEquals('>', $comparator->getOperator(), '->getOperator() returns the current operator');
+    }
+
+    public function testGetSetTarget()
+    {
+        $comparator = new Comparator();
+        $comparator->setTarget(8);
+        $this->assertEquals(8, $comparator->getTarget(), '->getTarget() returns the target');
     }
 
     /**

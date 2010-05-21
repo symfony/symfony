@@ -20,17 +20,17 @@ namespace Symfony\Components\Finder\Iterator;
  */
 class SizeRangeFilterIterator extends \FilterIterator
 {
-    protected $patterns = array();
+    protected $comparators = array();
 
     /**
      * Constructor.
      *
-     * @param \Iterator $iterator The Iterator to filter
-     * @param array     $patterns An array of \NumberCompare instances
+     * @param \Iterator $iterator    The Iterator to filter
+     * @param array     $comparators An array of \NumberComparator instances
      */
-    public function __construct(\Iterator $iterator, array $patterns)
+    public function __construct(\Iterator $iterator, array $comparators)
     {
-        $this->patterns = $patterns;
+        $this->comparators = $comparators;
 
         parent::__construct($iterator);
     }
@@ -49,7 +49,7 @@ class SizeRangeFilterIterator extends \FilterIterator
         }
 
         $filesize = $fileinfo->getSize();
-        foreach ($this->patterns as $compare) {
+        foreach ($this->comparators as $compare) {
             if (!$compare->test($filesize)) {
                 return false;
             }

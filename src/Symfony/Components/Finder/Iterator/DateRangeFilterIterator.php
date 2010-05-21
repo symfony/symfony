@@ -20,17 +20,17 @@ namespace Symfony\Components\Finder\Iterator;
  */
 class DateRangeFilterIterator extends \FilterIterator
 {
-    protected $patterns = array();
+    protected $comparators = array();
 
     /**
      * Constructor.
      *
-     * @param \Iterator $iterator The Iterator to filter
-     * @param array     $patterns An array of \DateCompare instances
+     * @param \Iterator $iterator    The Iterator to filter
+     * @param array     $comparators An array of \DateCompare instances
      */
-    public function __construct(\Iterator $iterator, array $patterns)
+    public function __construct(\Iterator $iterator, array $comparators)
     {
-        $this->patterns = $patterns;
+        $this->comparators = $comparators;
 
         parent::__construct($iterator);
     }
@@ -49,7 +49,7 @@ class DateRangeFilterIterator extends \FilterIterator
         }
 
         $filedate = $fileinfo->getMTime();
-        foreach ($this->patterns as $compare) {
+        foreach ($this->comparators as $compare) {
             if (!$compare->test($filedate)) {
                 return false;
             }

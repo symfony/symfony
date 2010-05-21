@@ -16,14 +16,12 @@ namespace Symfony\Components\Finder;
  *
  * It is a thin wrapper around several specialized iterator classes.
  *
- * All rules may be invoked several times, except for ->in() method.
- * Some rules are cumulative (->name() for example) whereas others are destructive
- * (most recent value is used, ->maxDepth() method for example).
+ * All rules may be invoked several times.
  *
  * All methods return the current Finder object to allow easy chaining:
  *
  * $finder = new Finder();
- * $iterator = $finder->files()->name('*.php')->in(__DIR__);
+ * $finder = $finder->files()->name('*.php')->in(__DIR__);
  *
  * @package    Symfony
  * @subpackage Components_Finder
@@ -36,8 +34,7 @@ class Finder implements \IteratorAggregate
     protected $notNames    = array();
     protected $exclude     = array();
     protected $filters     = array();
-    protected $minDepth    = 0;
-    protected $maxDepth    = INF;
+    protected $depths      = array();
     protected $sizes       = array();
     protected $followLinks = false;
     protected $sort        = false;
@@ -70,37 +67,23 @@ class Finder implements \IteratorAggregate
     }
 
     /**
-     * Sets the maximum directory depth.
+     * Adds tests for the directory depth.
      *
-     * The Finder will descend at most $level levels of directories below the starting point.
+     * Usage:
      *
-     * @param  int $level The max depth
+     *   $finder->depth('> 1') // the Finder will start matching at level 1.
+     *   $finder->depth('< 3') // the Finder will descend at most 3 levels of directories below the starting point.
      *
-     * @return Symfony\Components\Finder The current Finder instance
-     *
-     * @see Symfony\Components\Finder\Iterator\LimitDepthFilterIterator
-     */
-    public function maxDepth($level)
-    {
-        $this->maxDepth = (double) $level;
-
-        return $this;
-    }
-
-    /**
-     * Sets the minimum directory depth.
-     *
-     * The Finder will start matching at level $level.
-     *
-     * @param  int $level The min depth
+     * @param  int $level The depth level expression
      *
      * @return Symfony\Components\Finder The current Finder instance
      *
-     * @see Symfony\Components\Finder\Iterator\LimitDepthFilterIterator
+     * @see Symfony\Components\Finder\Iterator\DepthRangeFilterIterator
+     * @see Symfony\Components\Finder\Comparator\NumberComparator
      */
-    public function minDepth($level)
+    public function depth($level)
     {
-        $this->minDepth = (integer) $level;
+        $this->depths[] = new Comparator\NumberComparator($level);
 
         return $this;
     }
@@ -365,8 +348,8 @@ class Finder implements \IteratorAggregate
 
         $iterator = new \RecursiveIteratorIterator(new \RecursiveDirectoryIterator($dir, $flags), \RecursiveIteratorIterator::SELF_FIRST);
 
-        if ($this->minDepth > 0 || $this->maxDepth < INF) {
-            $iterator = new Iterator\LimitDepthFilterIterator($iterator, $this->minDepth, $this->maxDepth);
+        if ($this->depths) {
+            $iterator = new Iterator\DepthRangeFilterIterator($iterator, $this->depths);
         }
 
         if ($this->mode) {

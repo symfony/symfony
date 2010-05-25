@@ -80,7 +80,7 @@ class Controller
      */
     public function generateUrl($route, array $parameters = array(), $absolute = false)
     {
-        return $this->container->getRouterService()->generate($route, $parameters);
+        return $this->container->getRouterService()->generate($route, $parameters, $absolute);
     }
 
     /**

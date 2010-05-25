@@ -254,7 +254,7 @@ abstract class Kernel implements HttpKernelInterface, \Serializable
 
     protected function initializeContainer()
     {
-        $class = $this->name.'ProjectContainer';
+        $class = $this->name.ucfirst($this->environment).($this->debug ? 'Debug' : '').'ProjectContainer';
         $location = $this->getCacheDir().'/'.$class;
         $reload = $this->debug ? $this->needsReload($class, $location) : false;
 

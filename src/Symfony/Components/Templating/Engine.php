@@ -153,7 +153,7 @@ class Engine
     }
 
     /**
-     * Returns true if the helper if defined.
+     * Returns true if the helper is defined.
      *
      * @param string  $name The helper name
      *

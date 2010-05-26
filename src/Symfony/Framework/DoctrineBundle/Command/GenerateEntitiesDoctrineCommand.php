@@ -34,16 +34,35 @@ class GenerateEntitiesDoctrineCommand extends DoctrineCommand
         $this
             ->setName('doctrine:generate:entities')
             ->setDescription('Generate entity classes and method stubs from your mapping information.')
+            ->addOption('bundle', null, InputOption::PARAMETER_OPTIONAL, 'The bundle to initialize the entity or entities in.')
+            ->addOption('entity', null, InputOption::PARAMETER_OPTIONAL, 'The entity class to initialize (requires bundle parameter).')
             ->setHelp(<<<EOT
 The <info>doctrine:generate:entities</info> command generates entity classes and method stubs from your mapping information:
 
   <info>./symfony doctrine:generate:entities</info>
+
+The above would generate entity classes for all bundles.
+
+You can also optionally limit generation to entities within an individual bundle:
+
+  <info>./symfony doctrine:generate:entities --bundle="Bundle\MyCustomBundle"</info>
+
+Alternatively, you can limit generation to a single entity within a bundle:
+
+  <info>./symfony doctrine:generate:entities --bundle="Bundle\MyCustomBundle" --entity="User"</info>
 EOT
         );
     }
 
     protected function execute(InputInterface $input, OutputInterface $output)
     {
+        $filterBundle = str_replace('/', '\\', $input->getOption('bundle'));
+        $filterEntity = $filterBundle . '\\Entities\\' . str_replace('/', '\\', $input->getOption('entity'));
+
+        if (!isset($filterBundle) && isset($filterEntity)) {
+            throw new \InvalidArgumentException(sprintf('Unable to specify an entity without also specifying a bundle.'));
+        }
+
         $entityGenerator = $this->getEntityGenerator();
         $bundleDirs = $this->container->getKernelService()->getBundleDirs();
         foreach ($this->container->getKernelService()->getBundles() as $bundle) {
@@ -51,11 +70,20 @@ EOT
             $namespace = str_replace('/', '\\', dirname($tmp));
             $class = basename($tmp);
 
+            if (isset($filterBundle) && $filterBundle != $namespace . '\\' . $class) {
+                continue;
+            }
+
             if (isset($bundleDirs[$namespace])) {
                 $destination = realpath($bundleDirs[$namespace].'/..');
                 if ($metadatas = $this->getBundleMetadatas($bundle)) {
                     $output->writeln(sprintf('Generating entities for "<info>%s</info>"', $class));
+
                     foreach ($metadatas as $metadata) {
+                        if (isset($filterEntity) && strpos($metadata->name, $filterEntity) !== 0) {
+                            continue;
+                        }
+
                         $output->writeln(sprintf('  > generating <comment>%s</comment>', $metadata->name));
                         $entityGenerator->generate(array($metadata), $destination);
                     }

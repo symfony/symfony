@@ -120,8 +120,8 @@ EOT
             mkdir($dir, 0777, true);
         }
 
+        $output->writeln(sprintf('Generating entity for "<info>%s</info>"', $bundle));
+        $output->writeln(sprintf('  > generating <comment>%s</comment>', $fullEntityClassName));
         file_put_contents($path, $code);
-
-        $this->runCommand('doctrine:generate-entities');
     }
 }

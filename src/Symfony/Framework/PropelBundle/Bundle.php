@@ -43,5 +43,7 @@ class Bundle extends BaseBundle
         $autoloader = \PropelAutoloader::getInstance();
         $autoloader->addClassPaths(include($autoload));
         $autoloader->register();
+
+        $container->getPropelService();
     }
 }

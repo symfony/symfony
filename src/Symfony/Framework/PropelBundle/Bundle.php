@@ -31,9 +31,7 @@ class Bundle extends BaseBundle
                 }
             }
 
-            if ($map) {
-                file_put_contents($autoload, '<?php return '.var_export($map, true).';');
-            }
+            file_put_contents($autoload, '<?php return '.var_export($map, true).';');
         }
 
         $autoloader = \PropelAutoloader::getInstance();

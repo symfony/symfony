@@ -135,7 +135,7 @@ class BuildCommand extends Command
 
         // Build file
         $args[] = '-f';
-        $args[] = realpath($kernel->getContainer()->getParameter('propel.generator.path').DIRECTORY_SEPARATOR.'build.xml');
+        $args[] = realpath($kernel->getContainer()->getParameter('propel.path').'/generator/build.xml');
 
 /*
         // Logger

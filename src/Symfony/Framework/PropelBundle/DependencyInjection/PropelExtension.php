@@ -15,20 +15,25 @@ class PropelExtension extends LoaderExtension
     );
 
     /**
-     * Loads the DBAL configuration.
+     * Loads the Propel configuration.
      *
      * @param array $config A configuration array
      *
      * @return BuilderConfiguration A BuilderConfiguration instance
      */
-    public function generatorLoad($config)
+    public function configLoad($config)
     {
         if (!isset($config['path'])) {
             throw new \InvalidArgumentException('The "path" parameter is mandatory.');
         }
 
         $configuration = new BuilderConfiguration();
-        $configuration->setParameter('propel.generator.path', $config['path']);
+        $configuration->setParameter('propel.path', $config['path']);
+
+        if (isset($config['phing_path']))
+        {
+            $configuration->setParameter('propel.phing_path', $config['phing_path']);
+        }
 
         return $configuration;
     }

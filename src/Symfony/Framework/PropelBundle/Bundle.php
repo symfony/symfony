@@ -17,6 +17,12 @@ class Bundle extends BaseBundle
 
     public function boot(ContainerInterface $container)
     {
+        require_once $container->getParameter('propel.path').'/runtime/lib/Propel.php';
+
+        if (0 === strncasecmp(PHP_SAPI, 'cli', 3)) {
+            set_include_path($container->getParameter('propel.phing_path').'/classes'.PATH_SEPARATOR.get_include_path());
+        }
+
         $kernel = $container->getKernelService();
         if (!file_exists($autoload = $kernel->getCacheDir().'/propel_autoload.php')) {
             $map = array();

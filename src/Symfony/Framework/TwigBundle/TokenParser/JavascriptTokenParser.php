@@ -14,15 +14,15 @@ use Symfony\Framework\TwigBundle\Node\HelperNode;
  */
 
 /**
- * Wrapper for the stylesheets helper add() method.
+ * Wrapper for the javascripts helper add() method.
  *
- * {% stylesheet 'bundles/blog/css/blog.css' with ['media': 'screen'] %}
+ * {% javascript 'bundles/blog/css/blog.css' %}
  *
  * @package    Symfony
  * @subpackage Framework_TwigBundle
  * @author     Fabien Potencier <fabien.potencier@symfony-project.com>
  */
-class StylesheetTokenParser extends \Twig_TokenParser
+class JavascriptTokenParser extends \Twig_TokenParser
 {
     public function parse(\Twig_Token $token)
     {
@@ -38,11 +38,11 @@ class StylesheetTokenParser extends \Twig_TokenParser
 
         $stream->expect(\Twig_Token::BLOCK_END_TYPE);
 
-        return new HelperNode('stylesheets', 'add', new \Twig_NodeList($nodes), false, $token->getLine(), $this->getTag());
+        return new HelperNode('javascripts', 'add', new \Twig_NodeList($nodes), false, $token->getLine(), $this->getTag());
     }
 
     public function getTag()
     {
-        return 'stylesheet';
+        return 'javascripts';
     }
 }

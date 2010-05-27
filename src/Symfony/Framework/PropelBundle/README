@@ -20,6 +20,9 @@ Installation
 Sample Configuration
 --------------------
 
+### Project configuration
+
+    # in sandbox/hello/config/config.yml
     propel.generator:
       path: %kernel.root_dir%/../src/vendor/propel/generator
 
@@ -37,3 +40,39 @@ Sample Configuration
     #      password:             null
     #      dsn:                  mysql:host=localhost;dbname=test
     #      options:              {}
+
+### Autoloading
+
+    // in src/autoload.php
+    <?php
+
+    require_once __DIR__.'/vendor/symfony/src/Symfony/Foundation/UniversalClassLoader.php';
+
+    use Symfony\Foundation\UniversalClassLoader;
+
+    $loader = new UniversalClassLoader();
+    $loader->registerNamespaces(array(
+      'Symfony'     => __DIR__.'/vendor/symfony/src',
+      'Application' => __DIR__,
+      'Bundle'      => __DIR__,
+      'Doctrine'    => __DIR__.'/vendor/doctrine/lib',
+    ));
+    $loader->registerPrefixes(array(
+      'Swift_' => __DIR__.'/vendor/swiftmailer/lib/classes',
+      'Zend_'  => __DIR__.'/vendor/zend/library',
+    ));
+    $loader->register();
+
+    require_once __DIR__.'/vendor/propel/runtime/lib/Propel.php';
+
+    set_include_path(
+        __DIR__.'/vendor/phing/classes'.PATH_SEPARATOR.
+        __DIR__.'/vendor/zend/library'.PATH_SEPARATOR.
+        __DIR__.'/vendor/swiftmailer/lib'.PATH_SEPARATOR.
+        get_include_path()
+    );
+    
+Known Problems
+--------------
+
+Your application must not be un a path inclufing dots in directory names (i.e. '/Users/me/symfony/2.0/sandbox/' fails).

@@ -57,7 +57,8 @@ class PropelExtension extends LoaderExtension
             'user'                => 'root',
             'password'            => null,
             'dsn'                 => null,
-            'classname'           => 'PropelPDO',
+// FIXME: should be automatically changed based on %kernel.debug%
+            'classname'           => 'DebugPDO', //'PropelPDO',
             'options'             => array(),
             'attributes'          => array(),
 // FIXME: Mysql wants UTF8, not UTF-8 (%kernel.charset%)
@@ -75,7 +76,11 @@ class PropelExtension extends LoaderExtension
             $connections = array($config['default_connection'] => $config);
         }
 
-        $c = array('datasources' => array());
+        $c = array(
+// FIXME: should be the same value as %zend.logger.priority%
+            'log'         => array('level' => 7),
+            'datasources' => array(),
+        );
         foreach ($connections as $name => $connection) {
             $connection = array_replace($defaultConnection, $connection);
 
@@ -92,9 +97,6 @@ class PropelExtension extends LoaderExtension
               ),
             );
         }
-//// FIXME
-
-        // $c['classmap'] = //...;
 
         $configuration->getDefinition('propel.configuration')->setArguments(array($c));
 

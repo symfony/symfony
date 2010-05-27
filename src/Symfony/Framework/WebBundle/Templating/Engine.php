@@ -119,16 +119,25 @@ class Engine extends BaseEngine
     }
 
     // Bundle:controller:action(:renderer)
-    public function splitTemplateName($name)
+    public function splitTemplateName($name, array $defaults = array())
     {
         $parts = explode(':', $name, 4);
 
-        $options = array(
-            'bundle'     => str_replace('\\', '/', $parts[0]),
-            'controller' => $parts[1],
-            'renderer'   => isset($parts[3]) && $parts[3] ? $parts[3] : 'php',
-            'format'     => '',
+        $options = array_replace(
+            array(
+                'renderer' => 'php',
+                'format'   => '',
+            ),
+            $defaults,
+            array(
+                'bundle'     => str_replace('\\', '/', $parts[0]),
+                'controller' => $parts[1],
+            )
         );
+
+        if (isset($parts[3]) && $parts[3]) {
+            $options['renderer'] = $parts[3];
+        }
 
         $format = $this->container->getRequestService()->getRequestFormat();
         if (null !== $format && 'html' !== $format) {

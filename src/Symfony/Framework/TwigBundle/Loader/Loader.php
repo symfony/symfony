@@ -43,7 +43,7 @@ class Loader implements \Twig_LoaderInterface
             return $name->getContent();
         }
 
-        list($name, $options) = $this->engine->splitTemplateName($name);
+        list($name, $options) = $this->engine->splitTemplateName($name, array('renderer' => 'twig'));
 
         $template = $this->engine->getLoader()->load($name, $options);
 
@@ -67,7 +67,7 @@ class Loader implements \Twig_LoaderInterface
             return (string) $name;
         }
 
-        list($name, $options) = $this->engine->splitTemplateName($name);
+        list($name, $options) = $this->engine->splitTemplateName($name, array('renderer' => 'twig'));
 
         return $name.'_'.serialize($options);
     }
@@ -88,7 +88,7 @@ class Loader implements \Twig_LoaderInterface
             return false;
         }
 
-        list($name, $options) = $this->engine->splitTemplateName($name);
+        list($name, $options) = $this->engine->splitTemplateName($name, array('renderer' => 'twig'));
 
         return $this->engine->getLoader()->isFresh($name, $options, $time);
     }

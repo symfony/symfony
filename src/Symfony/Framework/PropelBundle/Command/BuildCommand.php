@@ -52,29 +52,6 @@ class BuildCommand extends Command
     protected function execute(InputInterface $input, OutputInterface $output)
     {
         return $this->callPhing('om');
-
-        if (!is_dir($input->getArgument('target'))) {
-            throw new \InvalidArgumentException(sprintf('The target directory "%s" does not exist.', $input->getArgument('target')));
-        }
-
-        $filesystem = new Filesystem();
-
-        $dirs = $this->container->getKernelService()->getBundleDirs();
-        foreach ($this->container->getKernelService()->getBundles() as $bundle) {
-            $tmp = dirname(str_replace('\\', '/', get_class($bundle)));
-            $namespace = str_replace('/', '\\', dirname($tmp));
-            $class = basename($tmp);
-
-            if (isset($dirs[$namespace]) && is_dir($originDir = $dirs[$namespace].'/'.$class.'/Resources/public')) {
-                $output->writeln(sprintf('Installing assets for <comment>%s\\%s</comment>', $namespace, $class));
-
-                $targetDir = $input->getArgument('target').'/bundles/'.preg_replace('/bundle$/', '', strtolower($class));
-
-                $filesystem->remove($targetDir);
-                mkdir($targetDir, 0755, true);
-                $filesystem->mirror($originDir, $targetDir);
-            }
-        }
     }
 
     protected function callPhing($taskName, $properties = array())
@@ -86,18 +63,13 @@ class BuildCommand extends Command
         $filesystem->remove($tmpDir);
         $filesystem->mkdirs($tmpDir);
 
-        $bundleDirs = $kernel->getBundleDirs();
         foreach ($kernel->getBundles() as $bundle) {
-            $tmp = dirname(str_replace('\\', '/', get_class($bundle)));
-            $namespace = str_replace('/', '\\', dirname($tmp));
-            $class = basename($tmp);
-
-            if (isset($bundleDirs[$namespace]) && is_dir($dir = $bundleDirs[$namespace].'/'.$class.'/Resources/config')) {
+            if (is_dir($dir = $bundle->getPath().'/Resources/config')) {
                 $finder = new Finder();
                 $schemas = $finder->files()->name('*schema.xml')->followLinks()->in($dir);
 
-                $parts = explode(DIRECTORY_SEPARATOR, realpath($bundleDirs[$namespace]));
-                $prefix = implode('.', array_slice($parts, 1, -1));
+                $parts = explode(DIRECTORY_SEPARATOR, realpath($bundle->getPath()));
+                $prefix = implode('.', array_slice($parts, 1, -2));
 
                 foreach ($schemas as $schema) {
                     $filesystem->copy((string) $schema, $file = $tmpDir.DIRECTORY_SEPARATOR.md5($schema).'_'.$schema->getBaseName());

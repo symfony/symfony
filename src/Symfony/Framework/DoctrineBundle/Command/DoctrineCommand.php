@@ -73,7 +73,7 @@ abstract class DoctrineCommand extends Command
         $entityGenerator->setGenerateStubMethods(true);
         $entityGenerator->setRegenerateEntityIfExists(false);
         $entityGenerator->setUpdateEntityIfExists(true);
-        $entityGenerator->setNumSpaces(2);
+        $entityGenerator->setNumSpaces(4);
         return $entityGenerator;
     }
 

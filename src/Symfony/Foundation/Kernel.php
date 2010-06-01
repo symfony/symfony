@@ -217,6 +217,11 @@ abstract class Kernel implements HttpKernelInterface, \Serializable
         return $this->name;
     }
 
+    public function getSafeName()
+    {
+        return preg_replace('/[^a-zA-Z0-9_]+/', '', $this->name);
+    }
+
     public function getEnvironment()
     {
         return $this->environment;
@@ -254,7 +259,7 @@ abstract class Kernel implements HttpKernelInterface, \Serializable
 
     protected function initializeContainer()
     {
-        $class = $this->name.ucfirst($this->environment).($this->debug ? 'Debug' : '').'ProjectContainer';
+        $class = $this->getSafeName().ucfirst($this->environment).($this->debug ? 'Debug' : '').'ProjectContainer';
         $location = $this->getCacheDir().'/'.$class;
         $reload = $this->debug ? $this->needsReload($class, $location) : false;
 

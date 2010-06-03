@@ -16,7 +16,7 @@ use Symfony\Framework\TwigBundle\Node\HelperNode;
 /**
  * Wrapper for the javascripts helper add() method.
  *
- * {% javascript 'bundles/blog/css/blog.css' %}
+ * {% javascript 'bundles/blog/js/blog.js' %}
  *
  * @package    Symfony
  * @subpackage Framework_TwigBundle
@@ -43,6 +43,6 @@ class JavascriptTokenParser extends \Twig_TokenParser
 
     public function getTag()
     {
-        return 'javascripts';
+        return 'javascript';
     }
 }

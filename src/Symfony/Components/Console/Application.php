@@ -633,10 +633,7 @@ class Application
                     $commandXML->appendChild($dom->createTextNode($command->getName()));
                 }
 
-                $commandXML = new \DOMDocument('1.0', 'UTF-8');
-                $commandXML->formatOutput = true;
-                $commandXML->loadXML($command->asXml());
-                $node = $commandXML->getElementsByTagName('command')->item(0);
+                $node = $command->asXml(true)->getElementsByTagName('command')->item(0);
                 $node = $dom->importNode($node, true);
 
                 $commandsXML->appendChild($node);

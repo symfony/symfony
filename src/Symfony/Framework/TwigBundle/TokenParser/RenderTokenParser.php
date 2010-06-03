@@ -38,7 +38,7 @@ class RenderTokenParser extends \Twig_TokenParser
 
         $this->parser->getStream()->expect(\Twig_Token::BLOCK_END_TYPE);
 
-        return new HelperNode('actions', 'render', new \Twig_NodeList($nodes), true, $lineno, $this->getTag());
+        return new HelperNode('actions', 'render', new \Twig_Node($nodes), true, $lineno, $this->getTag());
     }
 
     public function getTag()

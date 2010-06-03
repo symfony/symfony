@@ -28,7 +28,7 @@ class StylesheetsTokenParser extends \Twig_TokenParser
     {
         $this->parser->getStream()->expect(\Twig_Token::BLOCK_END_TYPE);
 
-        return new HelperNode('stylesheets', 'render', new \Twig_NodeList(array()), true, $token->getLine(), $this->getTag());
+        return new HelperNode('stylesheets', 'render', null, true, $token->getLine(), $this->getTag());
     }
 
     public function getTag()

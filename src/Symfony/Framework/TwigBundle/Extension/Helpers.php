@@ -33,6 +33,8 @@ class Helpers extends \Twig_Extension
     public function getTokenParsers()
     {
         return array(
+            new JavascriptTokenParser(),
+            new JavascriptsTokenParser(),
             new StylesheetTokenParser(),
             new StylesheetsTokenParser(),
             new RouteTokenParser(),

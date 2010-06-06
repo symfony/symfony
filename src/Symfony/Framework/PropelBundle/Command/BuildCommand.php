@@ -52,40 +52,6 @@ class BuildCommand extends Command
     protected function execute(InputInterface $input, OutputInterface $output)
     {
         $this->callPhing('om');
-
-        foreach ($this->application->getKernel()->getBundles() as $bundle) {
-            $map = array();
-            if (is_dir($dir = $bundle->getPath().'/Model/map')) {
-                $finder = new Finder();
-                $files = $finder->files()->name('*TableMap.php')->followLinks()->in($dir);
-
-                foreach ($files as $file) {
-                    $class = substr($file->getBasename(), 0, -12);
-
-                    $map = array_merge($map, array(
-                        $class                => 'Model/'.$class.'.php',
-                        $class.'Peer'         => 'Model/'.$class.'Peer.php',
-                        $class.'Query'        => 'Model/'.$class.'Query.php',
-                        'Base'.$class         => 'Model/om/Base'.$class.'.php',
-                        'Base'.$class.'Peer'  => 'Model/om/Base'.$class.'Peer.php',
-                        'Base'.$class.'Query' => 'Model/om/Base'.$class.'Query.php',
-                        $class.'TableMap'     => 'Model/map/'.$class.'TableMap.php',
-                    ));
-                }
-            }
-
-            if (!is_dir($bundle->getPath().'/Resources/config'))
-            {
-                mkdir($bundle->getPath().'/Resources/config', null, true);
-            }
-
-            if ($map)
-            {
-                file_put_contents($bundle->getPath().'/Resources/config/classmap.php', '<?php return '.var_export($map, true).';');
-            }
-        }
-
-        unlink($this->application->getKernel()->getCacheDir().'/propel_autoload.php');
     }
 
     protected function callPhing($taskName, $properties = array())

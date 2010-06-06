@@ -9,8 +9,8 @@
  * file that was distributed with this source code.
  */
 
-require_once __DIR__.'/../../../src/Symfony/Foundation/UniversalClassLoader.php';
+namespace Symfony\Framework\WebBundle\Tests;
 
-$loader = new Symfony\Foundation\UniversalClassLoader();
-$loader->registerNamespace('Symfony', __DIR__.'/../../../src');
-$loader->register();
+class TestCase extends \PHPUnit_Framework_TestCase
+{
+}

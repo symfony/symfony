@@ -9,12 +9,12 @@
          processIsolation="false"
          stopOnFailure="false"
          syntaxCheck="false"
-         bootstrap="tests/Symfony/Tests/bootstrap.php"
+         bootstrap="tests/bootstrap.php"
 >
   <testsuites>
     <testsuite name="Symfony Test Suite">
       <directory>./tests/Symfony/</directory>
-      <directory>./src/Symfony/Framework/</directory>
+      <directory>./src/Symfony/Framework/*/Tests/</directory>
     </testsuite>
   </testsuites>
 
@@ -22,13 +22,7 @@
     <whitelist>
       <directory>./src/Symfony/</directory>
       <exclude>
-        <directory>./src/Symfony/Framework/DoctrineBundle</directory>
-        <directory>./src/Symfony/Framework/DoctrineMigrationsBundle</directory>
-        <directory>./src/Symfony/Framework/TwigBundle</directory>
-        <directory>./src/Symfony/Framework/ZendBundle</directory>
-
         <directory>./src/Symfony/Framework/*/Resources</directory>
-
         <file>./src/Symfony/Foundation/bootstrap.php</file>
         <file>./src/Symfony/Foundation/packager.php</file>
       </exclude>

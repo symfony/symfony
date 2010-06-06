@@ -9,18 +9,19 @@
  * file that was distributed with this source code.
  */
 
-namespace Symfony\Tests\Framework\WebBundle\Util;
+namespace Symfony\Framework\WebBundle\Tests\Util;
 
+use Symfony\Framework\WebBundle\Tests\TestCase;
 use Symfony\Framework\WebBundle\Util\Mustache;
 use Symfony\Framework\WebBundle\Util\Filesystem;
 
-class MustacheTest extends \PHPUnit_Framework_TestCase
+class MustacheTest extends TestCase
 {
     protected $dir;
 
     public function setUp()
     {
-        $dir = __DIR__.'/../../../../../fixtures/Symfony/Framework/WebBundle/Util';
+        $dir = __DIR__.'/fixtures/';
 
         $this->dir = sys_get_temp_dir().'/mustache';
         $filesystem = new Filesystem();

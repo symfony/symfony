@@ -49,13 +49,13 @@ class UserHelper extends Helper
     }
 
     /**
-     * Returns the user culture
+     * Returns the user locale
      *
      * @return string
      */
-    public function getCulture()
+    public function getLocale()
     {
-        return $this->user->getCulture();
+        return $this->user->getLocale();
     }
 
     public function getFlash($name, $default = null)

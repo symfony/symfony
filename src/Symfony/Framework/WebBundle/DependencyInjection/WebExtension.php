@@ -68,8 +68,8 @@ class WebExtension extends LoaderExtension
             $configuration->merge($loader->load($this->resources['user']));
         }
 
-        if (isset($config['default_culture'])) {
-            $configuration->setParameter('user.default_culture', $config['default_culture']);
+        if (isset($config['default_locale'])) {
+            $configuration->setParameter('user.default_locale', $config['default_locale']);
         }
 
         if (isset($config['class'])) {

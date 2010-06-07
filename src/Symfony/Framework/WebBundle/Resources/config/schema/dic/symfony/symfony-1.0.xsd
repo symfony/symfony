@@ -15,7 +15,7 @@
     </xsd:sequence>
 
     <xsd:attribute name="class" type="xsd:string" />
-    <xsd:attribute name="default_culture" type="xsd:string" />
+    <xsd:attribute name="default_locale" type="xsd:string" />
   </xsd:complexType>
 
   <xsd:complexType name="session">

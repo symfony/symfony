@@ -25,7 +25,7 @@ use Symfony\Framework\WebBundle\Session\SessionInterface;
 class User
 {
     protected $session;
-    protected $culture;
+    protected $locale;
     protected $attributes;
     protected $oldFlashes;
 
@@ -43,7 +43,7 @@ class User
 
         $this->setAttributes($session->read('_user', array(
             '_flash'   => array(),
-            '_culture' => isset($options['default_culture']) ? $options['default_culture'] : 'en',
+            '_locale'  => isset($options['default_locale']) ? $options['default_locale'] : 'en',
         )));
 
         // flag current flash to be removed at shutdown
@@ -95,26 +95,26 @@ class User
     }
 
     /**
-     * Returns the user culture
+     * Returns the user locale
      *
      * @return string
      */
-    public function getCulture()
+    public function getLocale()
     {
-        return $this->getAttribute('_culture');
+        return $this->getAttribute('_locale');
     }
 
     /**
-     * Sets the user culture.
+     * Sets the user locale.
      *
-     * @param string $culture
+     * @param string $locale
      */
-    public function setCulture($culture)
+    public function setLocale($locale)
     {
-        if ($this->culture != $culture) {
-            $this->setAttribute('_culture', $culture);
+        if ($this->locale != $locale) {
+            $this->setAttribute('_locale', $locale);
 
-            $this->dispatcher->notify(new Event($this, 'user.change_culture', array('culture' => $culture)));
+            $this->dispatcher->notify(new Event($this, 'user.change_locale', array('locale' => $locale)));
         }
     }
 

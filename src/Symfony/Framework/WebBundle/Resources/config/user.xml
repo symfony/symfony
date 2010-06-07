@@ -6,7 +6,7 @@
 
   <parameters>
     <parameter key="user.class">Symfony\Framework\WebBundle\User</parameter>
-    <parameter key="user.default_culture">en</parameter>
+    <parameter key="user.default_locale">en</parameter>
     <parameter key="user.session.class">Symfony\Framework\WebBundle\Session\NativeSession</parameter>
     <parameter key="user.session.pdo.class">Symfony\Framework\WebBundle\Session\PdoSession</parameter>
     <parameter key="session.options.name">SYMFONY_SESSION</parameter>
@@ -25,7 +25,7 @@
       <argument type="service" id="event_dispatcher" />
       <argument type="service" id="user.session" />
       <argument type="collection">
-        <argument key="default_culture">%user.default_culture%</argument>
+        <argument key="default_locale">%user.default_locale%</argument>
       </argument>
     </service>
 

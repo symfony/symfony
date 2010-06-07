@@ -489,25 +489,25 @@ class Request
     /**
      * Returns the preferred language.
      *
-     * @param  array  $cultures  An array of ordered available cultures
+     * @param  array  $locales  An array of ordered available locales
      *
-     * @return string The preferred culture
+     * @return string The preferred locale
      */
-    public function getPreferredLanguage(array $cultures = null)
+    public function getPreferredLanguage(array $locales = null)
     {
         $preferredLanguages = $this->getLanguages();
 
-        if (null === $cultures) {
+        if (null === $locales) {
             return isset($preferredLanguages[0]) ? $preferredLanguages[0] : null;
         }
 
         if (!$preferredLanguages) {
-            return $cultures[0];
+            return $locales[0];
         }
 
-        $preferredLanguages = array_values(array_intersect($preferredLanguages, $cultures));
+        $preferredLanguages = array_values(array_intersect($preferredLanguages, $locales));
 
-        return isset($preferredLanguages[0]) ? $preferredLanguages[0] : $cultures[0];
+        return isset($preferredLanguages[0]) ? $preferredLanguages[0] : $locales[0];
     }
 
     /**

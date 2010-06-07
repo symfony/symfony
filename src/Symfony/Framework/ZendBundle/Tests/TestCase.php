@@ -15,7 +15,7 @@ class TestCase extends \PHPUnit_Framework_TestCase
 {
     public function setUp()
     {
-        if (!class_exists('Zend_Log')) {
+        if (!class_exists('Zend\\Log\\Logger')) {
             $this->markTestSkipped('Zend Framework is not available.');
         }
     }

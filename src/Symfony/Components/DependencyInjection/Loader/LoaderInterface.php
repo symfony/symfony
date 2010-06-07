@@ -2,6 +2,8 @@
 
 namespace Symfony\Components\DependencyInjection\Loader;
 
+use Symfony\Components\DependencyInjection\BuilderConfiguration;
+
 /*
  * This file is part of the Symfony framework.
  *
@@ -56,11 +58,13 @@ interface LoaderInterface
      * If you load file1.xml and file2.xml in this order, the value of complex
      * will be "foo".
      *
-     * @param mixed $resource The resource
+     * @param mixed                $resource       The resource
+     * @param Boolean              $main           Whether this is the main load() call
+     * @param BuilderConfiguration $configuration  A BuilderConfiguration instance to use for the configuration
      *
      * @return BuilderConfiguration A BuilderConfiguration instance
      */
-    function load($resource);
+    function load($resource, $main = true, BuilderConfiguration $configuration = null);
 
     static function registerExtension(LoaderExtensionInterface $extension);
 }

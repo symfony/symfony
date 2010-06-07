@@ -13,10 +13,11 @@ namespace Symfony\Tests\Components\DependencyInjection\Loader;
 require_once __DIR__.'/../../../../../fixtures/Symfony/Components/DependencyInjection/includes/ProjectExtension.php';
 
 use Symfony\Components\DependencyInjection\Loader\Loader;
+use Symfony\Components\DependencyInjection\BuilderConfiguration;
 
 class ProjectLoader1 extends Loader
 {
-    public function load($resource)
+    public function load($resource, $main = true, BuilderConfiguration $configuration = null)
     {
     }
 }

@@ -6,10 +6,8 @@ use Symfony\Components\DependencyInjection\Loader\LoaderExtension;
 
 class ProjectExtension extends LoaderExtension
 {
-    public function barLoad(array $config)
+    public function barLoad(array $config, BuilderConfiguration $configuration)
     {
-        $configuration = new BuilderConfiguration();
-
         $configuration->setDefinition('project.service.bar', new Definition('FooClass'));
         $configuration->setParameter('project.parameter.bar', isset($config['foo']) ? $config['foo'] : 'foobar');
 

@@ -32,17 +32,21 @@ class YamlFileLoader extends FileLoader
     /**
      * Loads an array of Yaml files.
      *
-     * @param  string $file A YAML file path
+     * @param mixed                $resource       The resource
+     * @param Boolean              $main           Whether this is the main load() call
+     * @param BuilderConfiguration $configuration  A BuilderConfiguration instance to use for the configuration
      *
      * @return BuilderConfiguration A BuilderConfiguration instance
      */
-    public function load($file)
+    public function load($file, $main = true, BuilderConfiguration $configuration = null)
     {
         $path = $this->findFile($file);
 
         $content = $this->loadFile($path);
 
-        $configuration = new BuilderConfiguration();
+        if (null === $configuration) {
+            $configuration = new BuilderConfiguration();
+        }
 
         $configuration->addResource(new FileResource($path));
 
@@ -66,6 +70,10 @@ class YamlFileLoader extends FileLoader
         // extensions
         $this->loadFromExtensions($configuration, $content);
 
+        if ($main) {
+            $configuration->mergeExtensionsConfiguration();
+        }
+
         return $configuration;
     }
 
@@ -76,11 +84,11 @@ class YamlFileLoader extends FileLoader
         }
 
         foreach ($content['imports'] as $import) {
-            $configuration->merge($this->parseImport($import, $file));
+            $this->parseImport($configuration, $import, $file);
         }
     }
 
-    protected function parseImport($import, $file)
+    protected function parseImport(BuilderConfiguration $configuration, $import, $file)
     {
         $class = null;
         if (isset($import['class']) && $import['class'] !== get_class($this)) {
@@ -101,7 +109,7 @@ class YamlFileLoader extends FileLoader
 
         $importedFile = $this->getAbsolutePath($import['resource'], dirname($file));
 
-        return $loader->load($importedFile);
+        return $loader->load($importedFile, false, $configuration);
     }
 
     protected function parseDefinitions(BuilderConfiguration $configuration, $content, $file)
@@ -232,12 +240,7 @@ class YamlFileLoader extends FileLoader
                 $values = array();
             }
 
-            $config = static::getExtension($namespace)->load($tag, $values);
-
-            $r = new \ReflectionObject($this->getExtension($namespace));
-            $config->addResource(new FileResource($r->getFileName()));
-
-            $configuration->merge($config);
+            $configuration->loadFromExtension($this->getExtension($namespace), $tag, $values);
         }
     }
 }

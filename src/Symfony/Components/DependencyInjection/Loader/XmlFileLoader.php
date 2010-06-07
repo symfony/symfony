@@ -29,17 +29,21 @@ class XmlFileLoader extends FileLoader
     /**
      * Loads an array of XML files.
      *
-     * @param  string $file An XML file path
+     * @param mixed                $resource       The resource
+     * @param Boolean              $main           Whether this is the main load() call
+     * @param BuilderConfiguration $configuration  A BuilderConfiguration instance to use for the configuration
      *
      * @return BuilderConfiguration A BuilderConfiguration instance
      */
-    public function load($file)
+    public function load($file, $main = true, BuilderConfiguration $configuration = null)
     {
         $path = $this->findFile($file);
 
         $xml = $this->parseFile($path);
 
-        $configuration = new BuilderConfiguration();
+        if (null === $configuration) {
+            $configuration = new BuilderConfiguration();
+        }
 
         $configuration->addResource(new FileResource($path));
 
@@ -57,6 +61,10 @@ class XmlFileLoader extends FileLoader
 
         // extensions
         $this->loadFromExtensions($configuration, $xml);
+
+        if ($main) {
+            $configuration->mergeExtensionsConfiguration();
+        }
 
         return $configuration;
     }
@@ -77,11 +85,11 @@ class XmlFileLoader extends FileLoader
         }
 
         foreach ($xml->imports->import as $import) {
-            $configuration->merge($this->parseImport($import, $file));
+            $this->parseImport($configuration, $import, $file);
         }
     }
 
-    protected function parseImport($import, $file)
+    protected function parseImport(BuilderConfiguration $configuration, $import, $file)
     {
         $class = null;
         if (isset($import['class']) && $import['class'] !== get_class($this)) {
@@ -102,7 +110,7 @@ class XmlFileLoader extends FileLoader
 
         $importedFile = $this->getAbsolutePath((string) $import['resource'], dirname($file));
 
-        return $loader->load($importedFile);
+        return $loader->load($importedFile, false, $configuration);
     }
 
     protected function parseDefinitions(BuilderConfiguration $configuration, $xml, $file)
@@ -325,12 +333,11 @@ EOF
             }
 
             $values = static::convertDomElementToArray($node);
-            $config = $this->getExtension($node->namespaceURI)->load($node->localName, is_array($values) ? $values : array($values));
+            if (!is_array($values)) {
+                $values = array();
+            }
 
-            $r = new \ReflectionObject($this->getExtension($node->namespaceURI));
-            $config->addResource(new FileResource($r->getFileName()));
-
-            $configuration->merge($config);
+            $configuration->loadFromExtension($this->getExtension($node->namespaceURI), $node->localName, $values);
         }
     }
 

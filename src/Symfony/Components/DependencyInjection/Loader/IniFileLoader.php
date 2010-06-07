@@ -26,17 +26,21 @@ class IniFileLoader extends FileLoader
     /**
      * Loads a resource.
      *
-     * @param  string $file An INI file path
+     * @param mixed                $resource       The resource
+     * @param Boolean              $main           Whether this is the main load() call
+     * @param BuilderConfiguration $configuration  A BuilderConfiguration instance to use for the configuration
      *
      * @return BuilderConfiguration A BuilderConfiguration instance
      *
      * @throws \InvalidArgumentException When ini file is not valid
      */
-    public function load($file)
+    public function load($file, $main = true, BuilderConfiguration $configuration = null)
     {
         $path = $this->findFile($file);
 
-        $configuration = new BuilderConfiguration();
+        if (null === $configuration) {
+            $configuration = new BuilderConfiguration();
+        }
 
         $configuration->addResource(new FileResource($path));
 

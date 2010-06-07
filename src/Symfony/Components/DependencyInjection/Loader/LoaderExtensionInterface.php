@@ -2,6 +2,8 @@
 
 namespace Symfony\Components\DependencyInjection\Loader;
 
+use Symfony\Components\DependencyInjection\BuilderConfiguration;
+
 /*
  * This file is part of the Symfony framework.
  *
@@ -31,12 +33,15 @@ interface LoaderExtensionInterface
     /**
      * Loads a specific configuration.
      *
-     * @param string The tag name
-     * @param array  An array of configuration values
+     * @param string               $tag           The tag name
+     * @param array                $config        An array of configuration values
+     * @param BuilderConfiguration $configuration A BuilderConfiguration instance
      *
      * @return BuilderConfiguration A BuilderConfiguration instance
+     *
+     * @throws \InvalidArgumentException When provided tag is not defined in this extension
      */
-    public function load($tag, array $config);
+    public function load($tag, array $config, BuilderConfiguration $configuration);
 
     /**
      * Returns the namespace to be used for this extension (XML namespace).

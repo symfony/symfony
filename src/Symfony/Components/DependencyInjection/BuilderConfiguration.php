@@ -2,7 +2,7 @@
 
 namespace Symfony\Components\DependencyInjection;
 
-use Symfony\Components\DependencyInjection\Loader\Loader;
+use Symfony\Components\DependencyInjection\Loader\LoaderExtensionInterface;
 
 /*
  * This file is part of the Symfony framework.
@@ -22,13 +22,18 @@ use Symfony\Components\DependencyInjection\Loader\Loader;
  */
 class BuilderConfiguration
 {
-    protected $definitions = array();
-    protected $parameters  = array();
-    protected $aliases     = array();
-    protected $resources   = array();
+    protected $definitions;
+    protected $parameters;
+    protected $aliases;
+    protected $resources;
+    protected $extensions;
 
     public function __construct(array $definitions = array(), array $parameters = array())
     {
+        $this->aliases    = array();
+        $this->resources  = array();
+        $this->extensions = array();
+
         $this->setDefinitions($definitions);
         $this->setParameters($parameters);
     }
@@ -82,20 +87,42 @@ class BuilderConfiguration
     }
 
     /**
-     * Merges the configuration given by an extension.
+     * Loads the configuration for an extension.
      *
-     * @param $key    string The extension tag to load (namespace.tag)
-     * @param $values array  An array of values to customize the extension
+     * @param $extension LoaderExtensionInterface A LoaderExtensionInterface instance
+     * @param $tag       string                   The extension tag to load (without the namespace - namespace.tag)
+     * @param $values    array                    An array of values that customizes the extension
      *
      * @return BuilderConfiguration The current instance
      */
-    public function mergeExtension($key, array $values = array())
+    public function loadFromExtension(LoaderExtensionInterface $extension, $tag, array $values = array())
     {
-        list($namespace, $tag) = explode('.', $key);
+        $namespace = $extension->getAlias();
 
-        $config = Loader::getExtension($namespace)->load($tag, $values);
+        if (!isset($this->extensions[$namespace])) {
+            $this->extensions[$namespace] = new self();
 
-        $this->merge($config);
+            $r = new \ReflectionObject($extension);
+            $this->extensions[$namespace]->addResource(new FileResource($r->getFileName()));
+        }
+
+        $this->extensions[$namespace] = $extension->load($tag, $values, $this->extensions[$namespace]);
+
+        return $this;
+    }
+
+    /**
+     * Merges the extension configuration.
+     *
+     * @return BuilderConfiguration The current instance
+     */
+    public function mergeExtensionsConfiguration()
+    {
+        foreach ($this->extensions as $name => $configuration) {
+            $this->merge($configuration);
+        }
+
+        $this->extensions = array();
 
         return $this;
     }

@@ -24,14 +24,14 @@ use Symfony\Components\DependencyInjection\BuilderConfiguration;
  */
 class TwigExtension extends LoaderExtension
 {
-    public function configLoad($config)
+    public function configLoad($config, BuilderConfiguration $configuration)
     {
-        $configuration = new BuilderConfiguration();
+        if (!$configuration->hasDefinition('twig')) {
+            $loader = new XmlFileLoader(__DIR__.'/../Resources/config');
+            $configuration->merge($loader->load('twig.xml'));
+        }
 
-        $loader = new XmlFileLoader(__DIR__.'/../Resources/config');
-        $configuration->merge($loader->load('twig.xml'));
-
-        $configuration->setParameter('twig_options', array_replace($configuration->getParameter('twig_options'), $config));
+        $configuration->setParameter('twig.options', array_replace($configuration->getParameter('twig.options'), $config));
 
         return $configuration;
     }

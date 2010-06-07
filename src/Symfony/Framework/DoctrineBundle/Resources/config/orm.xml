@@ -8,6 +8,7 @@
     <parameter key="doctrine.orm.cache_driver">array</parameter>
     <parameter key="doctrine.orm.cache.memcache.host">localhost</parameter>
     <parameter key="doctrine.orm.cache.memcache.port">11211</parameter>
+    <parameter key="doctrine.orm.default_entity_manager">default</parameter>
   </parameters>
 
   <services>

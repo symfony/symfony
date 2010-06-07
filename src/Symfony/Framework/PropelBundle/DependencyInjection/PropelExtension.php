@@ -21,14 +21,20 @@ class PropelExtension extends LoaderExtension
      *
      * @return BuilderConfiguration A BuilderConfiguration instance
      */
-    public function configLoad($config)
+    public function configLoad($config, BuilderConfiguration $configuration)
     {
-        if (!isset($config['path'])) {
-            throw new \InvalidArgumentException('The "path" parameter is mandatory.');
+        if (!$configuration->hasParameter('propel.path')) {
+            if (!isset($config['path'])) {
+                throw new \InvalidArgumentException('The "path" parameter is mandatory.');
+            }
+
+            $configuration->setParameter('propel.path', $config['path']);
         }
 
-        $configuration = new BuilderConfiguration();
-        $configuration->setParameter('propel.path', $config['path']);
+        if (isset($config['path']))
+        {
+            $configuration->setParameter('propel.path', $config['path']);
+        }
 
         if (isset($config['phing_path']))
         {
@@ -45,12 +51,12 @@ class PropelExtension extends LoaderExtension
      *
      * @return BuilderConfiguration A BuilderConfiguration instance
      */
-    public function dbalLoad($config)
+    public function dbalLoad($config, BuilderConfiguration $configuration)
     {
-        $configuration = new BuilderConfiguration();
-
-        $loader = new XmlFileLoader(__DIR__.'/../Resources/config');
-        $configuration->merge($loader->load($this->resources['propel']));
+        if (!$configuration->hasDefinition('propel')) {
+            $loader = new XmlFileLoader(__DIR__.'/../Resources/config');
+            $configuration->merge($loader->load($this->resources['propel']));
+        }
 
         $defaultConnection = array(
             'driver'              => 'mysql',
@@ -65,7 +71,8 @@ class PropelExtension extends LoaderExtension
             'settings'            => array('charset' => array('value' => 'UTF8')),
         );
 
-        $config['default_connection'] = isset($config['default_connection']) ? $config['default_connection'] : 'default';
+        $defaultConnectionName = isset($config['default_connection']) ? $config['default_connection'] : $configuration->getParameter('propel.dbal.default_connection');
+        $configuration->setParameter('propel.dbal.default_connection', $defaultConnectionName);
 
         $connections = array();
         if (isset($config['connections'])) {
@@ -73,29 +80,38 @@ class PropelExtension extends LoaderExtension
                 $connections[isset($connection['id']) ? $connection['id'] : $name] = $connection;
             }
         } else {
-            $connections = array($config['default_connection'] => $config);
+            $connections = array($defaultConnectionName => $config);
         }
 
-        $c = array(
+        $arguments = $configuration->getDefinition('propel.configuration')->getArguments();
+        if (count($arguments)) {
+            $c = $arguments[0];
+        } else {
+            $c = array(
 // FIXME: should be the same value as %zend.logger.priority%
-            'log'         => array('level' => 7),
-            'datasources' => array(),
-        );
-        foreach ($connections as $name => $connection) {
-            $connection = array_replace($defaultConnection, $connection);
-
-            $c['datasources'][$name] = array(
-              'adapter'    => $connection['driver'],
-              'connection' => array(
-                'dsn'        => $connection['dsn'],
-                'user'       => $connection['user'],
-                'password'   => $connection['password'],
-                'classname'  => $connection['classname'],
-                'options'    => $connection['options'],
-                'attributes' => $connection['attributes'],
-                'settings'   => $connection['settings'],
-              ),
+                'log'         => array('level' => 7),
+                'datasources' => array(),
             );
+        }
+
+        foreach ($connections as $name => $connection) {
+            if (isset($c['datasources'][$name])) {
+            } else {
+                $connection = array_replace($defaultConnection, $connection);
+
+                $c['datasources'][$name] = array(
+                  'connection' => array(),
+                );
+            }
+
+            if (isset($connection['driver'])) {
+                $c['datasources'][$name]['adapter'] = $connection['driver'];
+            }
+            foreach (array('dsn', 'user', 'password', 'classname', 'options', 'attributes', 'settings') as $att) {
+                if (isset($connection[$att])) {
+                    $c['datasources'][$name]['connection'][$att] = $connection[$att];
+                }
+            }
         }
 
         $configuration->getDefinition('propel.configuration')->setArguments(array($c));

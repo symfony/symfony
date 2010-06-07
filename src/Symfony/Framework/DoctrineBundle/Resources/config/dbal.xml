@@ -6,6 +6,7 @@
 
   <parameters>
     <parameter key="doctrine.data_collector.class">Symfony\Framework\DoctrineBundle\DataCollector\DoctrineDataCollector</parameter>
+    <parameter key="doctrine.dbal.default_connection">default</parameter>
   </parameters>
 
   <services>

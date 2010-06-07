@@ -6,29 +6,29 @@
 
   <parameters>
     <parameter key="twig.class">Symfony\Framework\TwigBundle\Environment</parameter>
-    <parameter key="twig_options" type="collection">
+    <parameter key="twig.options" type="collection">
         <parameter key="charset">%kernel.charset%</parameter>
         <parameter key="debug">%kernel.debug%</parameter>
         <parameter key="cache">%kernel.cache_dir%/twig</parameter>
     </parameter>
-    <parameter key="twig_loader.class">Symfony\Framework\TwigBundle\Loader\Loader</parameter>
-    <parameter key="twig_renderer.class">Symfony\Framework\TwigBundle\Renderer\Renderer</parameter>
+    <parameter key="twig.loader.class">Symfony\Framework\TwigBundle\Loader\Loader</parameter>
+    <parameter key="twig.renderer.class">Symfony\Framework\TwigBundle\Renderer\Renderer</parameter>
   </parameters>
 
   <services>
     <service id="twig" class="%twig.class%">
       <argument type="service" id="service_container" />
-      <argument type="service" id="twig_loader" />
-      <argument>%twig_options%</argument>
+      <argument type="service" id="twig.loader" />
+      <argument>%twig.options%</argument>
     </service>
 
-    <service id="twig_loader" class="%twig_loader.class%">
+    <service id="twig_loader" class="%twig.loader.class%">
       <call method="setEngine">
         <argument type="service" id="templating" />
       </call>
     </service>
 
-    <service id="twig_renderer" class="%twig_renderer.class%">
+    <service id="twig_renderer" class="%twig.renderer.class%">
       <annotation name="templating.renderer" alias="twig" />
       <argument type="service" id="twig" />
     </service>

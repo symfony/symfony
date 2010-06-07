@@ -8,6 +8,7 @@
     <parameter key="propel.class">Propel</parameter>
     <parameter key="propel.configuration.class">PropelConfiguration</parameter>
     <parameter key="propel.logger.class">Symfony\Framework\PropelBundle\Logger\PropelLogger</parameter>
+    <parameter key="propel.dbal.default_connection">default</parameter>
   </parameters>
 
   <services>

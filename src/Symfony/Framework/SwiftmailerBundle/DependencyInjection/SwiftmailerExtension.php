@@ -44,25 +44,31 @@ class SwiftMailerExtension extends LoaderExtension
      *
      * @return BuilderConfiguration A BuilderConfiguration instance
      */
-    public function mailerLoad($config)
+    public function mailerLoad($config, BuilderConfiguration $configuration)
     {
-        $configuration = new BuilderConfiguration();
-
-        $loader = new XmlFileLoader(__DIR__.'/../Resources/config');
-        $configuration->merge($loader->load($this->resources['mailer']));
-
-        if (isset($config['transport']) && null === $config['transport']) {
-            $config['transport'] = 'null';
-        } elseif (!isset($config['transport'])) {
-            $config['transport'] = 'smtp';
-        } elseif ('gmail' === $config['transport']) {
-            $config['encryption'] = 'ssl';
-            $config['auth_mode'] = 'login';
-            $config['host'] = 'smtp.gmail.com';
-            $config['transport'] = 'smtp';
+        if (!$configuration->hasDefinition('swiftmailer.mailer')) {
+            $loader = new XmlFileLoader(__DIR__.'/../Resources/config');
+            $configuration->merge($loader->load($this->resources['mailer']));
+            $configuration->setAlias('mailer', 'swiftmailer.mailer');
         }
 
-        $configuration->setAlias('swiftmailer.transport', 'swiftmailer.transport.'.$config['transport']);
+        $transport = $configuration->getParameter('swiftmailer.transport.name');
+        if (array_key_exists('transport', $config)) {
+            if (null === $config['transport']) {
+                $transport = 'null';
+            } elseif ('gmail' === $config['transport']) {
+                $config['encryption'] = 'ssl';
+                $config['auth_mode'] = 'login';
+                $config['host'] = 'smtp.gmail.com';
+                $transport = 'smtp';
+            } else {
+                $transport = $config['transport'];
+            }
+
+            $configuration->setParameter('swiftmailer.transport.name', $transport);
+        }
+
+        $configuration->setAlias('swiftmailer.transport', 'swiftmailer.transport.'.$transport);
 
         if (isset($config['encryption']) && 'ssl' === $config['encryption'] && !isset($config['port'])) {
             $config['port'] = 465;
@@ -70,7 +76,7 @@ class SwiftMailerExtension extends LoaderExtension
 
         foreach (array('encryption', 'port', 'host', 'username', 'password', 'auth_mode') as $key) {
             if (isset($config[$key])) {
-                $configuration->setParameter('swiftmailer.transport.'.$config['transport'].'.'.$key, $config[$key]);
+                $configuration->setParameter('swiftmailer.transport.'.$transport.'.'.$key, $config[$key]);
             }
         }
 
@@ -78,7 +84,7 @@ class SwiftMailerExtension extends LoaderExtension
         if (isset($config['spool'])) {
             $type = isset($config['type']) ? $config['type'] : 'file';
 
-            $configuration->setAlias('swiftmailer.transport.real', 'swiftmailer.transport.'.$config['transport']);
+            $configuration->setAlias('swiftmailer.transport.real', 'swiftmailer.transport.'.$transport);
             $configuration->setAlias('swiftmailer.transport', 'swiftmailer.transport.spool');
             $configuration->setAlias('swiftmailer.spool', 'swiftmailer.spool.'.$type);
 
@@ -97,8 +103,6 @@ class SwiftMailerExtension extends LoaderExtension
         if (isset($config['disable_delivery']) && $config['disable_delivery']) {
             $configuration->findDefinition('swiftmailer.transport')->addMethodCall('registerPlugin', array(new Reference('swiftmailer.plugin.blackhole')));
         }
-
-        $configuration->setAlias('mailer', 'swiftmailer.mailer');
 
         return $configuration;
     }

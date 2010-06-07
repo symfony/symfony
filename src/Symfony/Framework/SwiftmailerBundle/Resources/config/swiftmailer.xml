@@ -7,6 +7,7 @@
   <parameters>
     <parameter key="swiftmailer.class">Swift_Mailer</parameter>
 
+    <parameter key="swiftmailer.transport.name">smtp</parameter>
     <parameter key="swiftmailer.transport.smtp.class">Swift_Transport_EsmtpTransport</parameter>
     <parameter key="swiftmailer.transport.sendmail.class">Swift_Transport_SendmailTransport</parameter>
     <parameter key="swiftmailer.transport.mail.class">Swift_Transport_MailTransport</parameter>

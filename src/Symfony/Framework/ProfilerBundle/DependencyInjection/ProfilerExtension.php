@@ -24,14 +24,15 @@ use Symfony\Components\DependencyInjection\BuilderConfiguration;
  */
 class ProfilerExtension extends LoaderExtension
 {
-    public function configLoad($config)
+    public function configLoad($config, BuilderConfiguration $configuration)
     {
-        $configuration = new BuilderConfiguration();
+        if (!$configuration->hasDefinition('data_collector_manager')) {
+            $loader = new XmlFileLoader(__DIR__.'/../Resources/config');
+            $configuration->merge($loader->load('collectors.xml'));
+        }
 
-        $loader = new XmlFileLoader(__DIR__.'/../Resources/config');
-        $configuration->merge($loader->load('collectors.xml'));
-
-        if (isset($config['toolbar']) && $config['toolbar']) {
+        if (isset($config['toolbar']) && $config['toolbar'] && !$configuration->hasDefinition('debug.toolbar')) {
+            $loader = new XmlFileLoader(__DIR__.'/../Resources/config');
             $configuration->merge($loader->load('toolbar.xml'));
         }
 

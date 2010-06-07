@@ -17,6 +17,8 @@
     <parameter key="templating.helper.router.class">Symfony\Framework\WebBundle\Helper\RouterHelper</parameter>
     <parameter key="templating.helper.request.class">Symfony\Framework\WebBundle\Helper\RequestHelper</parameter>
     <parameter key="templating.helper.user.class">Symfony\Framework\WebBundle\Helper\UserHelper</parameter>
+    <parameter key="templating.output_escaper">false</parameter>
+    <parameter key="templating.assets.version">null</parameter>
   </parameters>
 
   <services>

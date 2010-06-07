@@ -31,12 +31,20 @@ class WebExtension extends LoaderExtension
         'user'       => 'user.xml',
     );
 
-    public function webLoad($config)
+    /**
+     * Loads the web configuration.
+     *
+     * @param array                $config        A configuration array
+     * @param BuilderConfiguration $configuration A BuilderConfiguration instance
+     *
+     * @return BuilderConfiguration A BuilderConfiguration instance
+     */
+    public function webLoad($config, BuilderConfiguration $configuration)
     {
-        $configuration = new BuilderConfiguration();
-
-        $loader = new XmlFileLoader(__DIR__.'/../Resources/config');
-        $configuration->merge($loader->load($this->resources['web']));
+        if (!$configuration->hasDefinition('controller_manager')) {
+            $loader = new XmlFileLoader(__DIR__.'/../Resources/config');
+            $configuration->merge($loader->load($this->resources['web']));
+        }
 
         if (isset($config['ide']) && 'textmate' === $config['ide']) {
             $configuration->setParameter('debug.file_link_format', 'txmt://open?url=file://%%f&line=%%l');
@@ -45,12 +53,20 @@ class WebExtension extends LoaderExtension
         return $configuration;
     }
 
-    public function userLoad($config)
+    /**
+     * Loads the user configuration.
+     *
+     * @param array                $config        A configuration array
+     * @param BuilderConfiguration $configuration A BuilderConfiguration instance
+     *
+     * @return BuilderConfiguration A BuilderConfiguration instance
+     */
+    public function userLoad($config, BuilderConfiguration $configuration)
     {
-        $configuration = new BuilderConfiguration();
-
-        $loader = new XmlFileLoader(__DIR__.'/../Resources/config');
-        $configuration->merge($loader->load($this->resources['user']));
+        if (!$configuration->hasDefinition('user')) {
+            $loader = new XmlFileLoader(__DIR__.'/../Resources/config');
+            $configuration->merge($loader->load($this->resources['user']));
+        }
 
         if (isset($config['default_culture'])) {
             $configuration->setParameter('user.default_culture', $config['default_culture']);
@@ -85,15 +101,20 @@ class WebExtension extends LoaderExtension
      *
      * @return BuilderConfiguration A BuilderConfiguration instance
      */
-    public function templatingLoad($config)
+    public function templatingLoad($config, BuilderConfiguration $configuration)
     {
-        $configuration = new BuilderConfiguration();
+        if (!$configuration->hasDefinition('templating')) {
+            $loader = new XmlFileLoader(__DIR__.'/../Resources/config');
+            $configuration->merge($loader->load($this->resources['templating']));
+        }
 
-        $loader = new XmlFileLoader(__DIR__.'/../Resources/config');
-        $configuration->merge($loader->load($this->resources['templating']));
+        if (array_key_exists('escaping', $config)) {
+            $configuration->setParameter('templating.output_escaper', $config['escaping']);
+        }
 
-        $configuration->setParameter('templating.output_escaper', array_key_exists('escaping', $config) ? $config['escaping'] : false);
-        $configuration->setParameter('templating.assets.version', array_key_exists('assets_version', $config) ? $config['assets_version'] : null);
+        if (array_key_exists('assets_version', $config)) {
+            $configuration->setParameter('templating.assets.version', $config['assets_version']);
+        }
 
         // path for the filesystem loader
         if (isset($config['path'])) {
@@ -107,17 +128,13 @@ class WebExtension extends LoaderExtension
             foreach ($ids as $id) {
                 $loaders[] = new Reference($id);
             }
-        } else {
-            $loaders = array(
-                new Reference('templating.loader.filesystem'),
-            );
-        }
 
-        if (1 === count($loaders)) {
-            $configuration->setAlias('templating.loader', (string) $loaders[0]);
-        } else {
-            $configuration->getDefinition('templating.loader.chain')->addArgument($loaders);
-            $configuration->setAlias('templating.loader', 'templating.loader.chain');
+            if (1 === count($loaders)) {
+                $configuration->setAlias('templating.loader', (string) $loaders[0]);
+            } else {
+                $configuration->getDefinition('templating.loader.chain')->addArgument($loaders);
+                $configuration->setAlias('templating.loader', 'templating.loader.chain');
+            }
         }
 
         // cache?

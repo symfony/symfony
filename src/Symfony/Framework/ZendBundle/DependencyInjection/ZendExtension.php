@@ -35,16 +35,18 @@ class ZendExtension extends LoaderExtension
      *
      *      <zend:logger priority="info" path="/path/to/some.log" />
      *
-     * @param array $config A configuration array
+     * @param array                $config        A configuration array
+     * @param BuilderConfiguration $configuration A BuilderConfiguration instance
      *
      * @return BuilderConfiguration A BuilderConfiguration instance
      */
-    public function loggerLoad($config)
+    public function loggerLoad($config, BuilderConfiguration $configuration)
     {
-        $configuration = new BuilderConfiguration();
-
-        $loader = new XmlFileLoader(__DIR__.'/../Resources/config');
-        $configuration->merge($loader->load($this->resources['logger']));
+        if (!$configuration->hasDefinition('zend.logger')) {
+            $loader = new XmlFileLoader(__DIR__.'/../Resources/config');
+            $configuration->merge($loader->load($this->resources['logger']));
+            $configuration->setAlias('logger', 'zend.logger');
+        }
 
         if (isset($config['priority'])) {
             $configuration->setParameter('zend.logger.priority', is_int($config['priority']) ? $config['priority'] : constant('\Zend_Log::'.strtoupper($config['priority'])));
@@ -53,8 +55,6 @@ class ZendExtension extends LoaderExtension
         if (isset($config['path'])) {
             $configuration->setParameter('zend.logger.path', $config['path']);
         }
-
-        $configuration->setAlias('logger', 'zend.logger');
 
         return $configuration;
     }

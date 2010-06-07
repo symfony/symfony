@@ -2,6 +2,7 @@
 
 namespace Symfony\Framework\ZendBundle\Logger;
 
+use Zend\Log\Logger as BaseLogger;
 use Symfony\Foundation\LoggerInterface;
 
 /*
@@ -20,7 +21,7 @@ use Symfony\Foundation\LoggerInterface;
  * @subpackage Framework_ZendBundle
  * @author     Fabien Potencier <fabien.potencier@symfony-project.com>
  */
-class Logger extends \Zend_Log implements LoggerInterface
+class Logger extends BaseLogger implements LoggerInterface
 {
     public function emerg($message)
     {

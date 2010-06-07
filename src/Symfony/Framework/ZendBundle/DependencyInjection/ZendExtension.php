@@ -49,7 +49,7 @@ class ZendExtension extends LoaderExtension
         }
 
         if (isset($config['priority'])) {
-            $configuration->setParameter('zend.logger.priority', is_int($config['priority']) ? $config['priority'] : constant('\Zend_Log::'.strtoupper($config['priority'])));
+            $configuration->setParameter('zend.logger.priority', is_int($config['priority']) ? $config['priority'] : constant('\\Zend\\Log\\Logger::'.strtoupper($config['priority'])));
         }
 
         if (isset($config['path'])) {

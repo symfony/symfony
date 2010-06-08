@@ -31,10 +31,10 @@ class Helpers extends \Twig_Extension
     {
         return array(
             // {% javascript 'bundles/blog/js/blog.js' %}
-            new HelperTokenParser('stylesheet', '<js> [with <arguments:array>]', 'javascripts', 'add'),
+            new HelperTokenParser('javascript', '<js> [with <arguments:array>]', 'javascripts', 'add'),
 
             // {% javascripts %}
-            new HelperTokenParser('stylesheets', '', 'stylesheets', 'render'),
+            new HelperTokenParser('javascripts', '', 'javascripts', 'render'),
 
             // {% stylesheet 'bundles/blog/css/blog.css' with ['media': 'screen'] %}
             new HelperTokenParser('stylesheet', '<css> [with <arguments:array>]', 'stylesheets', 'add'),

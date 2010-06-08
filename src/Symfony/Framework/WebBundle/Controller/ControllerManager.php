@@ -152,7 +152,6 @@ class ControllerManager
     public function getMethodArguments(array $path, $controller, $method)
     {
         $r = new \ReflectionObject($controller);
-
         $arguments = array();
         foreach ($r->getMethod($method)->getParameters() as $param) {
             if (array_key_exists($param->getName(), $path)) {
@@ -160,7 +159,7 @@ class ControllerManager
             } elseif ($param->isDefaultValueAvailable()) {
                 $arguments[] = $param->getDefaultValue();
             } else {
-                throw new \RuntimeException(sprintf('Controller "%s::%s()" requires that you provide a value for the "$%s" argument (because there is no default value or because there is a non optional argument after this one).', $controller, $method, $param->getName()));
+                throw new \RuntimeException(sprintf('Controller "%s::%s()" requires that you provide a value for the "$%s" argument (because there is no default value or because there is a non optional argument after this one).', get_class($controller), $method, $param->getName()));
             }
         }
 

@@ -3,10 +3,7 @@
 namespace Symfony\Framework\TwigBundle\Extension;
 
 use Symfony\Components\Templating\Engine;
-use Symfony\Framework\TwigBundle\TokenParser\StylesheetTokenParser;
-use Symfony\Framework\TwigBundle\TokenParser\StylesheetsTokenParser;
-use Symfony\Framework\TwigBundle\TokenParser\RouteTokenParser;
-use Symfony\Framework\TwigBundle\TokenParser\RenderTokenParser;
+use Symfony\Framework\TwigBundle\TokenParser\HelperTokenParser;
 
 /*
  * This file is part of the Symfony package.
@@ -33,12 +30,23 @@ class Helpers extends \Twig_Extension
     public function getTokenParsers()
     {
         return array(
-            new JavascriptTokenParser(),
-            new JavascriptsTokenParser(),
-            new StylesheetTokenParser(),
-            new StylesheetsTokenParser(),
-            new RouteTokenParser(),
-            new RenderTokenParser(),
+            // {% javascript 'bundles/blog/js/blog.js' %}
+            new HelperTokenParser('stylesheet', '<js> [with <arguments:array>]', 'javascripts', 'add'),
+
+            // {% javascripts %}
+            new HelperTokenParser('stylesheets', '', 'stylesheets', 'render'),
+
+            // {% stylesheet 'bundles/blog/css/blog.css' with ['media': 'screen'] %}
+            new HelperTokenParser('stylesheet', '<css> [with <arguments:array>]', 'stylesheets', 'add'),
+
+            // {% stylesheets %}
+            new HelperTokenParser('stylesheets', '', 'stylesheets', 'render'),
+
+            // {% route 'blog_post' with ['id': post.id] %}
+            new HelperTokenParser('route', '<route> [with <arguments:array>]', 'router', 'generate'),
+
+            // {% render 'BlogBundle:Post:list' with ['path': ['limit': 2], 'alt': 'BlogBundle:Post:error'] %}
+            new HelperTokenParser('render', '<template> [with <arguments:array>]', 'actions', 'render'),
         );
     }
 

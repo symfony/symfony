@@ -178,7 +178,7 @@ class DoctrineExtension extends LoaderExtension
             $bundleEntityMappings = array();
             $bundleDirs = $this->bundleDirs;
             $aliasMap = array();
-            foreach (array_reverse($this->bundles) as $className) {
+            foreach ($this->bundles as $className) {
                 $tmp = dirname(str_replace('\\', '/', $className));
                 $namespace = str_replace('/', '\\', dirname($tmp));
                 $class = basename($tmp);

@@ -52,6 +52,9 @@ class SwiftMailerExtension extends LoaderExtension
             $configuration->setAlias('mailer', 'swiftmailer.mailer');
         }
 
+        $r = new \ReflectionClass('Swift_Message');
+        $configuration->setParameter('swiftmailer.base_dir', dirname(dirname(dirname($r->getFilename()))));
+
         $transport = $configuration->getParameter('swiftmailer.transport.name');
         if (array_key_exists('transport', $config)) {
             if (null === $config['transport']) {

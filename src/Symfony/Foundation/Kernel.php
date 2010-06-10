@@ -66,6 +66,17 @@ abstract class Kernel implements HttpKernelInterface, \Serializable
         }
     }
 
+    public function __clone()
+    {
+        if ($this->debug) {
+            $this->startTime = microtime(true);
+        }
+
+        $this->booted = false;
+        $this->container = null;
+        $this->request = null;
+    }
+
     abstract public function registerRootDir();
 
     abstract public function registerBundles();

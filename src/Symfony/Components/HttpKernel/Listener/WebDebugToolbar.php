@@ -4,6 +4,7 @@ namespace Symfony\Components\HttpKernel\Listener;
 
 use Symfony\Components\EventDispatcher\EventDispatcher;
 use Symfony\Components\EventDispatcher\Event;
+use Symfony\Components\HttpKernel\Request;
 use Symfony\Components\HttpKernel\Response;
 use Symfony\Components\HttpKernel\HttpKernelInterface;
 use Symfony\Components\HttpKernel\Profiler\Profiler;
@@ -59,7 +60,7 @@ class WebDebugToolbar
             return $response;
         }
 
-        $response->setContent($this->injectToolbar($response));
+        $response->setContent($this->injectToolbar($request, $response));
 
         return $response;
     }
@@ -71,18 +72,20 @@ class WebDebugToolbar
      *
      * @return Response A Response instance
      */
-    protected function injectToolbar(Response $response)
+    protected function injectToolbar(Request $request, Response $response)
     {
         $data = '';
         foreach ($this->profiler->getCollectors() as $name => $collector) {
             $data .= $collector->getSummary();
         }
 
+        $position = false === strpos($request->headers->get('user-agent'), 'Mobile') ? 'fixed' : 'absolute';
+
         $toolbar = <<<EOF
 
 <!-- START of Symfony 2 Web Debug Toolbar -->
 <div style="clear: both; height: 40px;"></div>
-<div style="position: fixed; bottom: 0px; left:0; z-index: 6000000; width: 100%; background: #dde4eb; border-top: 1px solid #bbb; padding: 5px; margin: 0; font: 11px Verdana, Arial, sans-serif; color: #222;">
+<div style="position: $position; bottom: 0px; left:0; z-index: 6000000; width: 100%; background: #dde4eb; border-top: 1px solid #bbb; padding: 5px; margin: 0; font: 11px Verdana, Arial, sans-serif; color: #222;">
     $data
 </div>
 <!-- END of Symfony 2 Web Debug Toolbar -->

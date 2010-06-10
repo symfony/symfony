@@ -40,7 +40,7 @@ abstract class WebTestCase extends \PHPUnit_Framework_TestCase
     /**
      * Creates a Kernel.
      *
-     * @return Symfony\Foundation\Kernel A Kernel instance
+     * @return Symfony\Components\HttpKernel\HttpKernelInterface A HttpKernelInterface instance
      */
     abstract protected function createKernel();
 }

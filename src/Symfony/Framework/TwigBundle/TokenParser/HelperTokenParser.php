@@ -55,40 +55,14 @@ class HelperTokenParser extends \Twig_SimpleTokenParser
 
     protected function getNode(array $values, $line)
     {
-        $helper = new \Twig_Node_Expression_GetAttr(
-            new \Twig_Node_Expression_Name('_view', $line),
-            new \Twig_Node_Expression_Constant($this->helper, $line),
-            new \Twig_Node(),
-            \Twig_Node_Expression_GetAttr::TYPE_ANY,
-            $line
+        return $this->output(
+            $this->markAsSafe(
+                $this->getAttribute(
+                    $this->getAttribute('_view', $this->helper),
+                    $this->method,
+                    $this->getNodeValues($values)
+                )
+            )
         );
-
-        $call = new \Twig_Node_Expression_GetAttr(
-            $helper,
-            new \Twig_Node_Expression_Constant($this->method, $line),
-            new \Twig_Node($this->getArguments($values)),
-            \Twig_Node_Expression_GetAttr::TYPE_METHOD,
-            $line
-        );
-
-        $safe = new \Twig_Node_Expression_Filter(
-            $call,
-            new \Twig_Node(array(new \Twig_Node_Expression_Constant('safe', $line), new \Twig_Node())),
-            $line
-        );
-
-        return new \Twig_Node_Print($safe, $line);
-    }
-
-    protected function getArguments(array $values)
-    {
-        $arguments = array();
-        foreach ($values as $value) {
-            if ($value instanceof \Twig_NodeInterface) {
-                $arguments[] = $value;
-            }
-        }
-
-        return $arguments;
     }
 }

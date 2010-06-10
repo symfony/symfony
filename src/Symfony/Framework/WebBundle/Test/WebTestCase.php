@@ -29,9 +29,12 @@ abstract class WebTestCase extends BaseWebTestCase
      * If you run tests with the PHPUnit CLI tool, everything will work as expected.
      * If not, override this method in your test classes.
      *
+     * @param string  $environment The environment
+     * @param Boolean $debug       The debug flag
+     *
      * @return Symfony\Components\HttpKernel\HttpKernelInterface A HttpKernelInterface instance
      */
-    protected function createKernel()
+    protected function createKernel($environment, $debug)
     {
         // black magic below, you have been warned!
         $dir = getcwd();
@@ -57,6 +60,6 @@ abstract class WebTestCase extends BaseWebTestCase
 
         require_once $file;
 
-        return new $class('test', true);
+        return new $class($environment, $debug);
     }
 }

@@ -23,11 +23,15 @@ abstract class WebTestCase extends \PHPUnit_Framework_TestCase
     /**
      * Creates a Client.
      *
+     * @param string  $environment The environment
+     * @param Boolean $debug       The debug flag
+     * @param array   $server      An array of server parameters
+     *
      * @return Symfony\Foundation\Test\Client A Client instance
      */
-    public function createClient(array $server = array())
+    public function createClient($environment = 'test', $debug = true, array $server = array())
     {
-        $kernel = $this->createKernel();
+        $kernel = $this->createKernel($environment, $debug);
         $kernel->boot();
 
         $client = $kernel->getContainer()->getTest_ClientService();
@@ -40,7 +44,10 @@ abstract class WebTestCase extends \PHPUnit_Framework_TestCase
     /**
      * Creates a Kernel.
      *
+     * @param string  $environment The environment
+     * @param Boolean $debug       The debug flag
+     *
      * @return Symfony\Components\HttpKernel\HttpKernelInterface A HttpKernelInterface instance
      */
-    abstract protected function createKernel();
+    abstract protected function createKernel($environment, $debug);
 }

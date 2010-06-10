@@ -2,7 +2,7 @@
 
 namespace Symfony\Components\HttpKernel\Test;
 
-use Symfony\Components\HttpKernel\HttpKernel;
+use Symfony\Components\HttpKernel\HttpKernelInterface;
 use Symfony\Components\HttpKernel\Request;
 use Symfony\Components\BrowserKit\Client as BaseClient;
 use Symfony\Components\BrowserKit\Request as DomRequest;
@@ -35,12 +35,12 @@ class Client extends BaseClient
     /**
      * Constructor.
      *
-     * @param Symfony\Components\HttpKernel\HttpKernel $kernel    An HttpKernel instance
-     * @param array                                    $server    The server parameters (equivalent of $_SERVER)
-     * @param Symfony\Components\BrowserKit\History    $history   A History instance to store the browser history
-     * @param Symfony\Components\BrowserKit\CookieJar  $cookieJar A CookieJar instance to store the cookies
+     * @param Symfony\Components\HttpKernel\HttpKernelInterface $kernel    An HttpKernel instance
+     * @param array                                             $server    The server parameters (equivalent of $_SERVER)
+     * @param Symfony\Components\BrowserKit\History             $history   A History instance to store the browser history
+     * @param Symfony\Components\BrowserKit\CookieJar           $cookieJar A CookieJar instance to store the cookies
      */
-    public function __construct(HttpKernel $kernel, array $server = array(), History $history = null, CookieJar $cookieJar = null)
+    public function __construct(HttpKernelInterface $kernel, array $server = array(), History $history = null, CookieJar $cookieJar = null)
     {
         $this->kernel = $kernel;
         $this->testers = array();

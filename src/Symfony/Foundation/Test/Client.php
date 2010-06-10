@@ -2,7 +2,7 @@
 
 namespace Symfony\Foundation\Test;
 
-use Symfony\Foundation\Kernel;
+use Symfony\Components\HttpKernel\HttpKernelInterface;
 use Symfony\Components\HttpKernel\Test\Client as BaseClient;
 use Symfony\Components\BrowserKit\History;
 use Symfony\Components\BrowserKit\CookieJar;
@@ -31,17 +31,17 @@ class Client extends BaseClient
     /**
      * Constructor.
      *
-     * @param Symfony\Foundation\Kernel               $kernel    A Kernel instance
-     * @param array                                   $server    The server parameters (equivalent of $_SERVER)
-     * @param Symfony\Components\BrowserKit\History   $history   A History instance to store the browser history
-     * @param Symfony\Components\BrowserKit\CookieJar $cookieJar A CookieJar instance to store the cookies
+     * @param Symfony\Components\HttpKernel\HttpKernelInterface $kernel    A Kernel instance
+     * @param array                                             $server    The server parameters (equivalent of $_SERVER)
+     * @param Symfony\Components\BrowserKit\History             $history   A History instance to store the browser history
+     * @param Symfony\Components\BrowserKit\CookieJar           $cookieJar A CookieJar instance to store the cookies
      */
-    public function __construct(Kernel $kernel, array $server = array(), History $history = null, CookieJar $cookieJar = null)
+    public function __construct(HttpKernelInterface $kernel, array $server = array(), History $history = null, CookieJar $cookieJar = null)
     {
         $this->kernel = $kernel;
         $this->container = $kernel->getContainer();
 
-        parent::__construct($kernel->getContainer()->getHttpKernelService(), $server, $history, $cookieJar);
+        parent::__construct($kernel, $server, $history, $cookieJar);
 
         $this->addTestersFromContainer();
     }

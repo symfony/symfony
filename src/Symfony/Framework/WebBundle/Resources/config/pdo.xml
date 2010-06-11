@@ -4,9 +4,9 @@
     xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
     xsi:schemaLocation="http://www.symfony-project.org/schema/dic/services http://www.symfony-project.org/schema/dic/services/services-1.0.xsd">
 
-  <service id="pdo_connection" class="PDO">
-    <argument key="dsn">%pdo.dsn%</argument>
-    <argument key="username">%pdo.username%</argument>
-    <argument key="password">%pdo.password%</argument>
-  </service>
+    <service id="pdo_connection" class="PDO">
+        <argument key="dsn">%pdo.dsn%</argument>
+        <argument key="username">%pdo.username%</argument>
+        <argument key="password">%pdo.password%</argument>
+    </service>
 </container>

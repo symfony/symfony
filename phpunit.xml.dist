@@ -11,21 +11,21 @@
          syntaxCheck="false"
          bootstrap="tests/bootstrap.php"
 >
-  <testsuites>
-    <testsuite name="Symfony Test Suite">
-      <directory>./tests/Symfony/</directory>
-      <directory>./src/Symfony/Framework/*/Tests/</directory>
-    </testsuite>
-  </testsuites>
+    <testsuites>
+        <testsuite name="Symfony Test Suite">
+            <directory>./tests/Symfony/</directory>
+            <directory>./src/Symfony/Framework/*/Tests/</directory>
+        </testsuite>
+    </testsuites>
 
-  <filter>
-    <whitelist>
-      <directory>./src/Symfony/</directory>
-      <exclude>
-        <directory>./src/Symfony/Framework/*/Resources</directory>
-        <file>./src/Symfony/Foundation/bootstrap.php</file>
-        <file>./src/Symfony/Foundation/packager.php</file>
-      </exclude>
-    </whitelist>
-  </filter>
+    <filter>
+        <whitelist>
+            <directory>./src/Symfony/</directory>
+            <exclude>
+                <directory>./src/Symfony/Framework/*/Resources</directory>
+                <file>./src/Symfony/Foundation/bootstrap.php</file>
+                <file>./src/Symfony/Foundation/packager.php</file>
+            </exclude>
+        </whitelist>
+    </filter>
 </phpunit>

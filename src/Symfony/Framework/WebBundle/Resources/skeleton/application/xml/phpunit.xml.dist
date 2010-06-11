@@ -11,19 +11,19 @@
          syntaxCheck="false"
          bootstrap="../src/autoload.php"
 >
-  <testsuites>
-    <testsuite name="Project Test Suite">
-      <directory>../src/Application/*/Tests</directory>
-    </testsuite>
-  </testsuites>
+    <testsuites>
+        <testsuite name="Project Test Suite">
+            <directory>../src/Application/*/Tests</directory>
+        </testsuite>
+    </testsuites>
 
-  <filter>
-    <whitelist>
-      <directory>../src/Application</directory>
-      <exclude>
-        <directory>../src/Application/*/Resources</directory>
-        <directory>../src/Application/*/Tests</directory>
-      </exclude>
-    </whitelist>
-  </filter>
+    <filter>
+        <whitelist>
+            <directory>../src/Application</directory>
+            <exclude>
+                <directory>../src/Application/*/Resources</directory>
+                <directory>../src/Application/*/Tests</directory>
+            </exclude>
+        </whitelist>
+    </filter>
 </phpunit>

@@ -1,8 +1,8 @@
 imports:
-  - { resource: config.yml }
+    - { resource: config.yml }
 
 zend.logger:
-  priority: debug
-  path:     %kernel.logs_dir%/%kernel.environment%.log
+    priority: debug
+    path:     %kernel.logs_dir%/%kernel.environment%.log
 
 kernel.test: ~

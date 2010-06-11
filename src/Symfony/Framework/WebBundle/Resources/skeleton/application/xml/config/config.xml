@@ -13,29 +13,33 @@
                         http://www.symfony-project.org/schema/dic/symfony http://www.symfony-project.org/schema/dic/symfony/symfony-1.0.xsd
                         http://www.symfony-project.org/schema/dic/swiftmailer http://www.symfony-project.org/schema/dic/swiftmailer/swiftmailer-1.0.xsd">
 
-  <kernel:config
-    charset="UTF-8"
-    error_handler_level="null"
-  />
+    <parameters>
+        <parameter key="kernel.include_core_classes">false</parameter>
+    </parameters>
 
-  <web:web />
+    <kernel:config
+        charset="UTF-8"
+        error_handler_level="null"
+    />
 
-  <web:templating
-    escaping="htmlspecialchars"
-    assets_version="SomeVersionScheme"
-  />
+    <web:web />
 
-  <doctrine:dbal
-    dbname="xxxxxxxx"
-    user="root"
-    password=""
-  />
+    <web:templating
+        escaping="htmlspecialchars"
+        assets_version="SomeVersionScheme"
+    />
 
-  <doctrine:orm />
+    <doctrine:dbal
+        dbname="xxxxxxxx"
+        user="root"
+        password=""
+    />
 
-  <swift:mailer
-    transport="gmail"
-    username="xxxxxxxx"
-    password="xxxxxxxx"
-  />
+    <doctrine:orm />
+
+    <swift:mailer
+        transport="gmail"
+        username="xxxxxxxx"
+        password="xxxxxxxx"
+    />
 </container>

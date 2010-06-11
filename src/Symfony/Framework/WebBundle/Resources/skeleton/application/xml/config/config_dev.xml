@@ -9,16 +9,16 @@
                         http://www.symfony-project.org/schema/dic/zend http://www.symfony-project.org/schema/dic/zend/zend-1.0.xsd
                         http://www.symfony-project.org/schema/dic/symfony/profiler http://www.symfony-project.org/schema/dic/symfony/profiler-1.0.xsd">
 
-  <imports>
-    <import resource="config.xml" />
-  </imports>
+    <imports>
+        <import resource="config.xml" />
+    </imports>
 
-  <zend:logger
-    priority="info"
-    path="%kernel.logs_dir%/%kernel.environment%.log"
-  />
+    <zend:logger
+        priority="info"
+        path="%kernel.logs_dir%/%kernel.environment%.log"
+    />
 
-  <profiler:config
-    toolbar="true"
-  />
+    <profiler:config
+        toolbar="true"
+    />
 </container>

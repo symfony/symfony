@@ -385,7 +385,6 @@ abstract class Kernel implements HttpKernelInterface, \Serializable
         foreach ($container->getDefinitions() as $definition) {
             if (false !== strpos($class = $definition->getClass(), '%')) {
                 $definition->setClass(Builder::resolveValue($class, $container->getParameters()));
-                unset($container[substr($class, 1, -1)]);
             }
         }
     }

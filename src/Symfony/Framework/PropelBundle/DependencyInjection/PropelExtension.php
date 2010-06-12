@@ -23,6 +23,11 @@ class PropelExtension extends LoaderExtension
      */
     public function configLoad($config, BuilderConfiguration $configuration)
     {
+        if (!$configuration->hasDefinition('propel')) {
+            $loader = new XmlFileLoader(__DIR__.'/../Resources/config');
+            $configuration->merge($loader->load($this->resources['propel']));
+        }
+
         if (!$configuration->hasParameter('propel.path')) {
             if (!isset($config['path'])) {
                 throw new \InvalidArgumentException('The "path" parameter is mandatory.');
@@ -31,13 +36,11 @@ class PropelExtension extends LoaderExtension
             $configuration->setParameter('propel.path', $config['path']);
         }
 
-        if (isset($config['path']))
-        {
+        if (isset($config['path'])) {
             $configuration->setParameter('propel.path', $config['path']);
         }
 
-        if (isset($config['phing_path']))
-        {
+        if (isset($config['phing_path'])) {
             $configuration->setParameter('propel.phing_path', $config['phing_path']);
         }
 

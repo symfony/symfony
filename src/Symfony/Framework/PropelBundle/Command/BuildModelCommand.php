@@ -25,20 +25,22 @@ use Symfony\Components\Console\Output\Output;
  * @subpackage Framework_PropelBundle
  * @author     Fabien Potencier <fabien.potencier@symfony-project.com>
  */
-class BuildCommand extends PhingCommand
+class BuildModelCommand extends PhingCommand
 {
-    protected $additionalPhingArgs = array();
-
     /**
      * @see Command
      */
     protected function configure()
     {
         $this
-            ->setDefinition(array(
-                new InputOption('--classes', '', InputOption::PARAMETER_NONE, 'Build all classes'),
-            ))
-            ->setName('propel:build')
+            ->setDescription('Build the Propel Object Model classes based on XML schemas')
+            ->setHelp(<<<EOT
+The <info>propel:build-model</info> command builds the Propel runtime model classes (ActiveRecord, Query, Peer, and TableMap classes) based on the XML schemas defined in all Bundles:
+
+  <info>./symfony propel:build-model</info>
+EOT
+            )
+            ->setName('propel:build-model')
         ;
     }
 

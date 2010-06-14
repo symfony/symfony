@@ -48,6 +48,46 @@ class ChoiceFormField extends FormField
      *
      * @throws \InvalidArgumentException When value type provided is not correct
      */
+    public function select($value)
+    {
+        $this->setValue($value);
+    }
+
+    /**
+     * Ticks a checkbox.
+     *
+     * @throws \InvalidArgumentException When value type provided is not correct
+     */
+    public function tick()
+    {
+        if ('checkbox' !== $this->type) {
+            throw new \LogicException(sprintf('You cannot tick "%s" as it is not a checkbox (%s).', $this->name, $this->type));
+        }
+
+        $this->setValue(true);
+    }
+
+    /**
+     * Ticks a checkbox.
+     *
+     * @throws \InvalidArgumentException When value type provided is not correct
+     */
+    public function untick()
+    {
+        if ('checkbox' !== $this->type) {
+            throw new \LogicException(sprintf('You cannot tick "%s" as it is not a checkbox (%s).', $this->name, $this->type));
+        }
+
+        $this->setValue(false);
+    }
+
+    /**
+     * Sets the value of the field.
+     *
+     * @param string $value The value of the field
+     *
+     * @throws \InvalidArgumentException When value type provided is not correct
+     */
     public function setValue($value)
     {
         if ('checkbox' == $this->type && false === $value) {

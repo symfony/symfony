@@ -18,7 +18,7 @@ namespace Symfony\Components\DomCrawler;
  * @subpackage Components_DomCrawler
  * @author     Fabien Potencier <fabien.potencier@symfony-project.com>
  */
-class Form
+class Form implements \ArrayAccess
 {
     protected $document;
     protected $button;
@@ -326,5 +326,52 @@ class Form
                 $this->setField(new Field\TextareaFormField($node));
             }
         }
+    }
+
+    /**
+     * Returns true if the named field exists.
+     *
+     * @param string $name The field name
+     *
+     * @param Boolean true if the field exists, false otherwise
+     */
+    public function offsetExists($name)
+    {
+        return $this->hasValue($name);
+    }
+
+    /**
+     * Gets the value of a field.
+     *
+     * @param string $name The field name
+     *
+     * @throws \InvalidArgumentException if the field does not exist
+     */
+    public function offsetGet($name)
+    {
+        return $this->getValue($name);
+    }
+
+    /**
+     * Sets the value of a field.
+     *
+     * @param string       $name  The field name
+     * @param string|array $value The value of the field
+     *
+     * @throws \InvalidArgumentException if the field does not exist
+     */
+    public function offsetSet($name, $value)
+    {
+        $this->setValue($name, $value);
+    }
+
+    /**
+     * Unimplemented.
+     *
+     * @param string $name The field name
+     */
+    public function offsetUnset($name)
+    {
+        throw new \LogicException('The Form fields cannot be removed.');
     }
 }

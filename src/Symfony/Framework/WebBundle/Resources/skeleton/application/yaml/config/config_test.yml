@@ -4,4 +4,7 @@ imports:
 zend.logger:
     priority: debug
 
+profiler.config:
+    toolbar: false
+
 kernel.test: ~

@@ -11,12 +11,11 @@
                         http://www.symfony-project.org/schema/dic/symfony/profiler http://www.symfony-project.org/schema/dic/symfony/profiler-1.0.xsd">
 
     <imports>
-        <import resource="config.xml" />
+        <import resource="config_dev.xml" />
     </imports>
 
     <zend:logger
         priority="info"
-        path="%kernel.logs_dir%/%kernel.environment%.log"
     />
 
     <kernel:test />

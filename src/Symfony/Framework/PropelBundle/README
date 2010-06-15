@@ -48,9 +48,9 @@ Sample Configuration
 Place the following schema in src/Application/HelloBundle/Resources/config/schema.xml:
 
     <?xml version="1.0" encoding="UTF-8"?>
-    <database name="default" package="Application.HelloBundle.Model" defaultIdMethod="native">
+    <database name="default" namespace="Application\HelloBundle\Model" defaultIdMethod="native">
 
-      <table name="book" namespace="Application\HelloBundle\Model">
+      <table name="book">
         <column name="id" type="integer" required="true" primaryKey="true" autoIncrement="true" />
         <column name="title" type="varchar" primaryString="1" size="100" />
         <column name="ISBN" type="varchar" size="20" />
@@ -60,7 +60,7 @@ Place the following schema in src/Application/HelloBundle/Resources/config/schem
         </foreign-key>
       </table>
 
-      <table name="author" namespace="Application\HelloBundle\Model">
+      <table name="author">
         <column name="id" type="integer" required="true" primaryKey="true" autoIncrement="true" />
         <column name="first_name" type="varchar" size="100" />
         <column name="last_name" type="varchar" size="100" />

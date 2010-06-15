@@ -54,13 +54,24 @@ abstract class PhingCommand extends Command
                     $file = $tmpDir.DIRECTORY_SEPARATOR.$tempSchema;
                     $filesystem->copy((string) $schema, $file);
                     
-                    $content = file_get_contents($file);
-                    $content = preg_replace_callback('/package\s*=\s*"(.*?)"/', function ($matches) use ($prefix) {
-                        $package = $prefix.'.'.$matches[1];
-                        return sprintf('package="%s"', $package);
-                    }, $content);
-
-                    file_put_contents($file, $content);
+                    // the package needs to be set absolute
+                    // besides, the automated namespace to package conversion has not taken place yet
+                    // so it needs to be done manually
+                    $database = simplexml_load_file($file);
+                    if (isset($database['package'])) {
+                        $database['package'] = $prefix . '.' . $database['package'];
+                    } elseif (isset($database['namespace'])) {
+                        $database['package'] = $prefix . '.' . str_replace('\\', '.', $database['namespace']);
+                    }
+                    foreach ($database->table as $table)
+                    {
+                        if (isset($table['package'])) {
+                            $table['package'] = $prefix . '.' . $table['package'];
+                        } elseif (isset($table['namespace'])) {
+                            $table['package'] = $prefix . '.' . str_replace('\\', '.', $table['namespace']);
+                        }
+                    }
+                    file_put_contents($file, $database->asXML());
                 }
             }
         }
@@ -75,6 +86,7 @@ abstract class PhingCommand extends Command
             'project.dir'       => $tmpDir,
             'propel.output.dir' => $kernel->getRootDir().'/propel',
             'propel.php.dir'    => '/',
+            'propel.packageObjectModel' => true,
         ), $properties);
         foreach ($properties as $key => $value) {
             $args[] = "-D$key=$value";

@@ -3,6 +3,8 @@
 namespace Symfony\Framework\PropelBundle\Command;
 
 use Symfony\Framework\PropelBundle\Command\PhingCommand;
+use Symfony\Framework\PropelBundle\Command\BuildModelCommand;
+use Symfony\Framework\PropelBundle\Command\BuildSqlCommand;
 use Symfony\Components\Console\Input\InputArgument;
 use Symfony\Components\Console\Input\InputOption;
 use Symfony\Components\Console\Input\InputInterface;
@@ -36,7 +38,8 @@ class BuildCommand extends PhingCommand
     {
         $this
             ->setDefinition(array(
-                new InputOption('--classes', '', InputOption::PARAMETER_NONE, 'Build all classes'),
+                new InputOption('--classes', '', InputOption::PARAMETER_NONE, 'Build only classes'),
+                new InputOption('--sql', '', InputOption::PARAMETER_NONE, 'Build only code'),
             ))
             ->setName('propel:build')
         ;
@@ -49,7 +52,19 @@ class BuildCommand extends PhingCommand
      */
     protected function execute(InputInterface $input, OutputInterface $output)
     {
-        $this->callPhing('om');
+        if (!$input->getOption('sql')) {
+            $output->writeln('<info>Building model classes</info>');
+            $modelCommand = new BuildModelCommand();
+            $modelCommand->setApplication($this->application);
+            $modelCommand->execute($input, $output);
+        }
+
+        if (!$input->getOption('classes')) {
+            $output->writeln('<info>Building model sql</info>');
+            $sqlCommand = new BuildSQLCommand();
+            $sqlCommand->setApplication($this->application);
+            $sqlCommand->execute($input, $output);
+        }
     }
 
 }

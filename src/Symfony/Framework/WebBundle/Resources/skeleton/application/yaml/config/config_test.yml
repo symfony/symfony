@@ -1,5 +1,5 @@
 imports:
-    - { resource: config_test.yml }
+    - { resource: config_dev.yml }
 
 zend.logger:
     priority: debug

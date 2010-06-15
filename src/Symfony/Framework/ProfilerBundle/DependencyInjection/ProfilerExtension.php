@@ -31,9 +31,15 @@ class ProfilerExtension extends LoaderExtension
             $configuration->merge($loader->load('collectors.xml'));
         }
 
-        if (isset($config['toolbar']) && $config['toolbar'] && !$configuration->hasDefinition('debug.toolbar')) {
-            $loader = new XmlFileLoader(__DIR__.'/../Resources/config');
-            $configuration->merge($loader->load('toolbar.xml'));
+        if (isset($config['toolbar'])) {
+            if ($config['toolbar']) {
+                if (!$configuration->hasDefinition('debug.toolbar')) {
+                    $loader = new XmlFileLoader(__DIR__.'/../Resources/config');
+                    $configuration->merge($loader->load('toolbar.xml'));
+                }
+            } else {
+                $configuration->getDefinition('debug.toolbar')->clearAnnotations();
+            }
         }
 
         return $configuration;

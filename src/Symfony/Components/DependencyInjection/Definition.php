@@ -218,6 +218,18 @@ class Definition
     }
 
     /**
+     * Clears the annotation for this definition.
+     *
+     * @return Definition The current instance
+     */
+    public function clearAnnotations()
+    {
+        $this->annotations = array();
+
+        return $this;
+    }
+
+    /**
      * Sets a file to require before creating the service.
      *
      * @param  string $file A full pathname to include

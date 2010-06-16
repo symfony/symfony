@@ -92,6 +92,6 @@ class ObjectDecorator extends GetterDecorator
      */
     public function __toString()
     {
-        return $this->escape($this->escaper, $this->value->__toString());
+        return $this->escape($this->escaper, (string) $this->value);
     }
 }

@@ -22,6 +22,8 @@ use Symfony\Components\HttpKernel\Test\WebTestCase as BaseWebTestCase;
  */
 abstract class WebTestCase extends BaseWebTestCase
 {
+    protected $kernel;
+
     /**
      * Creates a Client.
      *
@@ -32,10 +34,10 @@ abstract class WebTestCase extends BaseWebTestCase
      */
     public function createClient(array $options = array(), array $server = array())
     {
-        $kernel = $this->createKernel($options);
-        $kernel->boot();
+        $this->kernel = $this->createKernel($options);
+        $this->kernel->boot();
 
-        $client = $kernel->getContainer()->getTest_ClientService();
+        $client = $this->kernel->getContainer()->getTest_ClientService();
         $client->setServerParameters($server);
 
         $this->setCurrentClient($client);

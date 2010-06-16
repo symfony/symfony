@@ -4,6 +4,7 @@ namespace Symfony\Framework\WebBundle\Test;
 
 use Symfony\Foundation\Test\WebTestCase as BaseWebTestCase;
 use Symfony\Components\Finder\Finder;
+use Symfony\Components\HttpKernel\Response;
 
 /*
  * This file is part of the Symfony package.
@@ -23,6 +24,15 @@ use Symfony\Components\Finder\Finder;
  */
 abstract class WebTestCase extends BaseWebTestCase
 {
+    public function getProfiler(Response $response)
+    {
+        $container = $this->kernel->getContainer();
+
+        if ($container->hasService('profiler')) {
+            return $container->getProfilerService()->load($response);
+        }
+    }
+
     /**
      * Creates a Kernel.
      *

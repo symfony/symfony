@@ -4,7 +4,6 @@ namespace Symfony\Components\HttpKernel\Listener;
 
 use Symfony\Components\EventDispatcher\EventDispatcher;
 use Symfony\Components\EventDispatcher\Event;
-use Symfony\Components\HttpKernel\Request;
 use Symfony\Components\HttpKernel\Response;
 use Symfony\Components\HttpKernel\HttpKernelInterface;
 

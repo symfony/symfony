@@ -22,16 +22,24 @@ use Symfony\Framework\ProfilerBundle\DataCollector\DataCollector;
  */
 class DoctrineDataCollector extends DataCollector
 {
-    protected function collect()
+    public function collect()
     {
-        $data = array();
+        $this->data = array();
         if ($this->container->hasService('doctrine.dbal.logger')) {
-            $data = array(
+            $this->data = array(
                 'queries' => $this->container->getDoctrine_Dbal_LoggerService()->queries,
             );
         }
+    }
 
-        return $data;
+    public function getQueryCount()
+    {
+        return count($this->data['queries']);
+    }
+
+    public function getQueries()
+    {
+        return $this->data['queries'];
     }
 
     public function getSummary()

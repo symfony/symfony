@@ -23,12 +23,14 @@ class ProfilerStorage
     protected $token;
     protected $data;
     protected $store;
+    protected $lifetime;
 
-    public function __construct($store, $token = null)
+    public function __construct($store, $token = null, $lifetime = 86400)
     {
         $this->store = $store;
         $this->token = null === $token ? uniqid() : $token;
         $this->data = null;
+        $this->lifetime = (int) $lifetime;
     }
 
     public function hasData()
@@ -46,7 +48,13 @@ class ProfilerStorage
             return $this->data;
         }
 
-        return isset($this->data[$name]) ? $this->data[$name] : null;
+        return isset($this->data[$name]) ? $this->data[$name] : array();
+    }
+
+    public function setToken($token)
+    {
+        $this->token = $token;
+        $this->data = null;
     }
 
     public function getToken()
@@ -134,10 +142,10 @@ class ProfilerStorage
         }
     }
 
-    public function purge($lifetime)
+    public function purge()
     {
         $db = $this->initDb(false);
-        $args = array(':time' => time() - (int) $lifetime);
+        $args = array(':time' => time() - $this->lifetime);
         $this->exec($db, 'DELETE FROM data WHERE created_at < :time', $args);
         $this->close($db);
     }

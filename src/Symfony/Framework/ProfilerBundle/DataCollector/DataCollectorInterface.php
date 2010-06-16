@@ -2,6 +2,8 @@
 
 namespace Symfony\Framework\ProfilerBundle\DataCollector;
 
+use Symfony\Framework\ProfilerBundle\Profiler;
+
 /*
  * This file is part of the Symfony framework.
  *
@@ -20,7 +22,7 @@ namespace Symfony\Framework\ProfilerBundle\DataCollector;
  */
 interface DataCollectorInterface
 {
-    public function setCollectorManager(DataCollectorManager $manager);
+    public function setProfiler(Profiler $profiler);
 
     public function getData();
 

@@ -3,6 +3,7 @@
 namespace Symfony\Framework\ProfilerBundle\DataCollector;
 
 use Symfony\Components\DependencyInjection\ContainerInterface;
+use Symfony\Framework\ProfilerBundle\Profiler;
 
 /*
  * This file is part of the Symfony framework.
@@ -22,7 +23,7 @@ use Symfony\Components\DependencyInjection\ContainerInterface;
  */
 abstract class DataCollector implements DataCollectorInterface
 {
-    protected $manager;
+    protected $profiler;
     protected $container;
     protected $data;
 
@@ -33,17 +34,18 @@ abstract class DataCollector implements DataCollectorInterface
 
     public function getData()
     {
-        if (null === $this->data) {
-            $this->data = $this->collect();
-        }
-
         return $this->data;
     }
 
-    abstract protected function collect();
-
-    public function setCollectorManager(DataCollectorManager $manager)
+    public function setData($data)
     {
-        $this->manager = $manager;
+        $this->data = $data;
+    }
+
+    abstract public function collect();
+
+    public function setProfiler(Profiler $profiler)
+    {
+        $this->profiler = $profiler;
     }
 }

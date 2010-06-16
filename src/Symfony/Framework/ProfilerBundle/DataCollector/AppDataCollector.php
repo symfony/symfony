@@ -20,16 +20,26 @@ namespace Symfony\Framework\ProfilerBundle\DataCollector;
  */
 class AppDataCollector extends DataCollector
 {
-    protected function collect()
+    public function collect()
     {
         $request = $this->container->getRequestService();
 
-        return array(
+        $this->data = array(
             'route'        => $request->path->get('_route') ? $request->path->get('_route') : '<span style="color: #a33">NONE</span>',
             'format'       => $request->getRequestFormat(),
-            'content_type' => $this->manager->getResponse()->headers->get('Content-Type') ? $this->manager->getResponse()->headers->get('Content-Type') : 'text/html',
-            'code'         => $this->manager->getResponse()->getStatusCode(),
+            'content_type' => $this->profiler->getResponse()->headers->get('Content-Type') ? $this->profiler->getResponse()->headers->get('Content-Type') : 'text/html',
+            'code'         => $this->profiler->getResponse()->getStatusCode(),
         );
+    }
+
+    public function getRoute()
+    {
+        return $this->data['route'];
+    }
+
+    public function getFormat()
+    {
+        return $this->data['format'];
     }
 
     public function getSummary()

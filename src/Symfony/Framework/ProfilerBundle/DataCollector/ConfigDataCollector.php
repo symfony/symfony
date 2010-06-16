@@ -22,12 +22,12 @@ use Symfony\Foundation\Kernel;
  */
 class ConfigDataCollector extends DataCollector
 {
-    protected function collect()
+    public function collect()
     {
         $kernel = $this->container->getKernelService();
 
-        return array(
-            'token'           => $this->manager->getProfilerStorage()->getToken(),
+        $this->data = array(
+            'token'           => $this->profiler->getProfilerStorage()->getToken(),
             'symfony_version' => Kernel::VERSION,
             'name'            => $kernel->getName(),
             'env'             => $kernel->getEnvironment(),

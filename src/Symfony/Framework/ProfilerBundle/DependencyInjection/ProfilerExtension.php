@@ -26,7 +26,7 @@ class ProfilerExtension extends LoaderExtension
 {
     public function configLoad($config, BuilderConfiguration $configuration)
     {
-        if (!$configuration->hasDefinition('data_collector_manager')) {
+        if (!$configuration->hasDefinition('profiler')) {
             $loader = new XmlFileLoader(__DIR__.'/../Resources/config');
             $configuration->merge($loader->load('collectors.xml'));
         }

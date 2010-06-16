@@ -20,11 +20,16 @@ namespace Symfony\Framework\ProfilerBundle\DataCollector;
  */
 class TimerDataCollector extends DataCollector
 {
-    protected function collect()
+    public function collect()
     {
-        return array(
+        $this->data = array(
             'time' => microtime(true) - $this->container->getKernelService()->getStartTime(),
         );
+    }
+
+    public function getTime()
+    {
+        return $this->data['time'];
     }
 
     public function getSummary()

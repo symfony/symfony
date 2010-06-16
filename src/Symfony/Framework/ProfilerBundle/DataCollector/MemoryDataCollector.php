@@ -20,11 +20,16 @@ namespace Symfony\Framework\ProfilerBundle\DataCollector;
  */
 class MemoryDataCollector extends DataCollector
 {
-    protected function collect()
+    public function collect()
     {
-        return array(
+        $this->data = array(
             'memory' => memory_get_peak_usage(true),
         );
+    }
+
+    public function getMemory()
+    {
+        return $this->data['memory'];
     }
 
     public function getSummary()

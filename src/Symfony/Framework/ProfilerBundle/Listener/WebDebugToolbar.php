@@ -7,7 +7,7 @@ use Symfony\Components\EventDispatcher\EventDispatcher;
 use Symfony\Components\EventDispatcher\Event;
 use Symfony\Components\HttpKernel\Response;
 use Symfony\Components\HttpKernel\HttpKernelInterface;
-use Symfony\Framework\ProfilerBundle\DataCollector\DataCollectorManager;
+use Symfony\Framework\ProfilerBundle\Profiler;
 
 /*
  * This file is part of the Symfony framework.
@@ -28,12 +28,12 @@ use Symfony\Framework\ProfilerBundle\DataCollector\DataCollectorManager;
 class WebDebugToolbar
 {
     protected $container;
-    protected $collectorManager;
+    protected $profiler;
 
-    public function __construct(ContainerInterface $container, DataCollectorManager $collectorManager)
+    public function __construct(ContainerInterface $container, Profiler $profiler)
     {
         $this->container = $container;
-        $this->collectorManager = $collectorManager;
+        $this->profiler = $profiler;
     }
 
     /**
@@ -77,7 +77,7 @@ class WebDebugToolbar
     protected function injectToolbar(Response $response)
     {
         $data = '';
-        foreach ($this->collectorManager->getCollectors() as $name => $collector) {
+        foreach ($this->profiler->getCollectors() as $name => $collector) {
             $data .= $collector->getSummary();
         }
 

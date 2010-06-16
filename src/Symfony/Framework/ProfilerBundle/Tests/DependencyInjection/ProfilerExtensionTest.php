@@ -23,7 +23,7 @@ class ProfilerExtensionTest extends TestCase
         $loader = new ProfilerExtension();
 
         $configuration = $loader->configLoad(array(), $configuration);
-        $this->assertEquals('Symfony\\Framework\\ProfilerBundle\\DataCollector\\DataCollectorManager', $configuration->getParameter('data_collector_manager.class'), '->configLoad() loads the collectors.xml file if not already loaded');
+        $this->assertEquals('Symfony\\Framework\\ProfilerBundle\\Profiler', $configuration->getParameter('profiler.class'), '->configLoad() loads the collectors.xml file if not already loaded');
         $this->assertFalse($configuration->hasParameter('debug.toolbar.class'), '->configLoad() does not load the toolbar.xml file');
 
         $configuration = $loader->configLoad(array('toolbar' => true), $configuration);

@@ -55,14 +55,17 @@ EOT
         $this->callPhing('sql', array('propel.packageObjectModel' => false));
         $filesystem = new Filesystem();
         $basePath = $this->application->getKernel()->getRootDir(). DIRECTORY_SEPARATOR . 'propel'. DIRECTORY_SEPARATOR . 'sql';
+        $sqlMap = file_get_contents($basePath . DIRECTORY_SEPARATOR . 'sqldb.map');
         foreach ($this->tempSchemas as $schemaFile => $schemaDetails) {
             $sqlFile = str_replace('.xml', '.sql', $schemaFile);
-            $targetFileName = $basePath . DIRECTORY_SEPARATOR . $schemaDetails['bundle'] . '-' . str_replace('.xml', '.sql', $schemaDetails['basename']);
-            $filesystem->remove($targetFileName);
-            $filesystem->rename($basePath . DIRECTORY_SEPARATOR . $sqlFile, $targetFileName);
-            $output->writeln(sprintf('Wrote SQL file for bundle "<info>%s</info>" in "<info>%s</info>"', $schemaDetails['bundle'], $targetFileName));
-            
+            $targetSqlFile = $schemaDetails['bundle'] . '-' . str_replace('.xml', '.sql', $schemaDetails['basename']);
+            $targetSqlFilePath = $basePath . DIRECTORY_SEPARATOR . $targetSqlFile;
+            $sqlMap = str_replace($sqlFile, $targetSqlFile, $sqlMap);
+            $filesystem->remove($targetSqlFilePath);
+            $filesystem->rename($basePath . DIRECTORY_SEPARATOR . $sqlFile, $targetSqlFilePath);
+            $output->writeln(sprintf('Wrote SQL file for bundle "<info>%s</info>" in "<info>%s</info>"', $schemaDetails['bundle'], $targetSqlFilePath));
         }
+        file_put_contents($basePath . DIRECTORY_SEPARATOR . 'sqldb.map', $sqlMap);
     }
 
 }

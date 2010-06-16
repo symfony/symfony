@@ -2,7 +2,6 @@
 
 namespace Symfony\Components\HttpKernel\Listener;
 
-use Symfony\Components\DependencyInjection\ContainerInterface;
 use Symfony\Components\EventDispatcher\EventDispatcher;
 use Symfony\Components\EventDispatcher\Event;
 use Symfony\Components\HttpKernel\Response;
@@ -27,12 +26,10 @@ use Symfony\Components\HttpKernel\Profiler\Profiler;
  */
 class WebDebugToolbar
 {
-    protected $container;
     protected $profiler;
 
-    public function __construct(ContainerInterface $container, Profiler $profiler)
+    public function __construct(Profiler $profiler)
     {
-        $this->container = $container;
         $this->profiler = $profiler;
     }
 
@@ -52,7 +49,7 @@ class WebDebugToolbar
             return $response;
         }
 
-        $request = $this->container->getRequestService();
+        $request = $event->getParameter('request');
 
         if ('3' === substr($response->getStatusCode(), 0, 1)
             || ($response->headers->has('Content-Type') && false === strpos($response->headers->get('Content-Type'), 'html'))

@@ -11,7 +11,6 @@
     <services>
         <service id="debug.toolbar" class="%debug.toolbar.class%">
             <annotation name="kernel.listener" />
-            <argument type="service" id="service_container" />
             <argument type="service" id="profiler" />
         </service>
     </services>

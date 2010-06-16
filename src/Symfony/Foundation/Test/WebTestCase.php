@@ -2,6 +2,8 @@
 
 namespace Symfony\Foundation\Test;
 
+use Symfony\Components\HttpKernel\Test\WebTestCase as BaseWebTestCase;
+
 /*
  * This file is part of the Symfony package.
  *
@@ -18,25 +20,25 @@ namespace Symfony\Foundation\Test;
  * @subpackage Foundation
  * @author     Fabien Potencier <fabien.potencier@symfony-project.com>
  */
-abstract class WebTestCase extends \PHPUnit_Framework_TestCase
+abstract class WebTestCase extends BaseWebTestCase
 {
     /**
      * Creates a Client.
      *
-     * @param string  $environment The environment
-     * @param Boolean $debug       The debug flag
-     * @param array   $server      An array of server parameters
+     * @param array   $options An array of options to pass to the createKernel class
+     * @param array   $server  An array of server parameters
      *
-     * @return Symfony\Foundation\Test\Client A Client instance
+     * @return Symfony\Foundation\Client A Client instance
      */
-    public function createClient($environment = 'test', $debug = true, array $server = array())
+    public function createClient(array $options = array(), array $server = array())
     {
-        $kernel = $this->createKernel($environment, $debug);
+        $kernel = $this->createKernel($options);
         $kernel->boot();
 
         $client = $kernel->getContainer()->getTest_ClientService();
         $client->setServerParameters($server);
-        $client->setTestCase($this);
+
+        $this->setCurrentClient($client);
 
         return $client;
     }
@@ -44,10 +46,9 @@ abstract class WebTestCase extends \PHPUnit_Framework_TestCase
     /**
      * Creates a Kernel.
      *
-     * @param string  $environment The environment
-     * @param Boolean $debug       The debug flag
+     * @param array $options An array of options
      *
      * @return Symfony\Components\HttpKernel\HttpKernelInterface A HttpKernelInterface instance
      */
-    abstract protected function createKernel($environment, $debug);
+    abstract protected function createKernel(array $options = array());
 }

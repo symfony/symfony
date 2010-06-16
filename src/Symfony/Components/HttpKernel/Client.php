@@ -1,6 +1,6 @@
 <?php
 
-namespace Symfony\Components\HttpKernel\Test;
+namespace Symfony\Components\HttpKernel;
 
 use Symfony\Components\HttpKernel\HttpKernelInterface;
 use Symfony\Components\HttpKernel\Request;
@@ -29,8 +29,6 @@ use Symfony\Components\BrowserKit\CookieJar;
 class Client extends BaseClient
 {
     protected $kernel;
-    protected $test;
-    protected $testers;
 
     /**
      * Constructor.
@@ -43,60 +41,10 @@ class Client extends BaseClient
     public function __construct(HttpKernelInterface $kernel, array $server = array(), History $history = null, CookieJar $cookieJar = null)
     {
         $this->kernel = $kernel;
-        $this->testers = array();
 
         parent::__construct($server, $history, $cookieJar);
 
         $this->followRedirects = false;
-    }
-
-    /**
-     * Sets the \PHPUnit_Framework_TestCase instance associated with this client.
-     *
-     * @param \PHPUnit_Framework_TestCase $test A \PHPUnit_Framework_TestCase instance
-     */
-    public function setTestCase(\PHPUnit_Framework_TestCase $test)
-    {
-        $this->test = $test;
-    }
-
-    /**
-     * Returns true if the tester is defined.
-     *
-     * @param string $name The tester alias
-     *
-     * @return Boolean true if the tester is defined, false otherwise
-     */
-    public function hasTester($name)
-    {
-        return isset($this->testers[$name]);
-    }
-
-    /**
-     * Adds an tester object for this client.
-     *
-     * @param string                                  $name   The tester alias
-     * @param Symfony\Foundation\Test\TesterInterface $tester A Tester instance
-     */
-    public function addTester($name, TesterInterface $tester)
-    {
-        $this->testers[$name] = $tester;
-    }
-
-    /**
-     * Gets an tester by name.
-     *
-     * @param string $name The tester alias
-     *
-     * @return Symfony\Foundation\Test\TesterInterface An Tester instance
-     */
-    public function getTester($name)
-    {
-        if (!isset($this->testers[$name])) {
-            throw new \InvalidArgumentException(sprintf('Tester "%s" does not exist.', $name));
-        }
-
-        return $this->testers[$name];
     }
 
     /**
@@ -124,7 +72,7 @@ class Client extends BaseClient
         $r = new \ReflectionClass('\\Symfony\\Foundation\\UniversalClassLoader');
         $requirePath = $r->getFileName();
 
-        $symfonyPath = realpath(__DIR__.'/../../../..');
+        $symfonyPath = realpath(__DIR__.'/../../..');
 
         return <<<EOF
 <?php
@@ -167,40 +115,5 @@ EOF;
     protected function filterResponse($response)
     {
         return new DomResponse($response->getContent(), $response->getStatusCode(), $response->headers->all(), $response->getCookies());
-    }
-
-    /**
-     * Called when a method does not exit.
-     *
-     * It forwards assert* methods.
-     *
-     * @param string $method    The method name to execute
-     * @param array  $arguments An array of arguments to pass to the method
-     */
-    public function __call($method, $arguments)
-    {
-        if ('assert' !== substr($method, 0, 6)) {
-            throw new \BadMethodCallException(sprintf('Method %s::%s is not defined.', get_class($this), $method));
-        }
-
-        // standard PHPUnit assert?
-        if (method_exists($this->test, $method)) {
-            return call_user_func_array(array($this->test, $method), $arguments);
-        }
-
-        if (!preg_match('/^assert([A-Z].+?)([A-Z].+)$/', $method, $matches)) {
-            throw new \BadMethodCallException(sprintf('Method %s::%s is not defined.', get_class($this), $method));
-        }
-
-        // registered tester object?
-        $name = strtolower($matches[1]);
-        if (!$this->hasTester($name)) {
-            throw new \BadMethodCallException(sprintf('Method %s::%s is not defined (assert object "%s" is not defined).', get_class($this), $method, $name));
-        }
-
-        $tester = $this->getTester($name);
-        $tester->setTestCase($this->test);
-
-        return call_user_func_array(array($tester, 'assert'.$matches[2]), $arguments);
     }
 }

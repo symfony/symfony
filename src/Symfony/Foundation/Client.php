@@ -1,9 +1,9 @@
 <?php
 
-namespace Symfony\Foundation\Test;
+namespace Symfony\Foundation;
 
 use Symfony\Components\HttpKernel\HttpKernelInterface;
-use Symfony\Components\HttpKernel\Test\Client as BaseClient;
+use Symfony\Components\HttpKernel\Client as BaseClient;
 use Symfony\Components\BrowserKit\History;
 use Symfony\Components\BrowserKit\CookieJar;
 
@@ -25,7 +25,6 @@ use Symfony\Components\BrowserKit\CookieJar;
  */
 class Client extends BaseClient
 {
-    protected $kernel;
     protected $container;
 
     /**
@@ -38,12 +37,9 @@ class Client extends BaseClient
      */
     public function __construct(HttpKernelInterface $kernel, array $server = array(), History $history = null, CookieJar $cookieJar = null)
     {
-        $this->kernel = $kernel;
-        $this->container = $kernel->getContainer();
-
         parent::__construct($kernel, $server, $history, $cookieJar);
 
-        $this->addTestersFromContainer();
+        $this->container = $kernel->getContainer();
     }
 
     /**
@@ -64,24 +60,6 @@ class Client extends BaseClient
     public function getKernel()
     {
         return $this->kernel;
-    }
-
-    /**
-     * Gets an tester by name.
-     *
-     * @param string $name The tester alias
-     *
-     * @return Symfony\Foundation\Test\TesterInterface A Tester instance
-     */
-    public function getTester($name)
-    {
-        if (isset($this->testers[$name]) && !is_object($this->testers[$name])) {
-            $this->container->setService('test.response', $this->getResponse());
-
-            return $this->container->getService($this->testers[$name]);
-        }
-
-        return parent::getTester($name);
     }
 
     /**
@@ -120,21 +98,5 @@ require_once '$path';
 \$kernel->boot();
 echo serialize(\$kernel->handle(unserialize('$request')));
 EOF;
-    }
-
-    /**
-     * Adds tester objects from the container.
-     *
-     * This methods adds services with the test.tester annotation as tester objects.
-     */
-    protected function addTestersFromContainer()
-    {
-        foreach ($this->container->findAnnotatedServiceIds('test.tester') as $id => $config) {
-            if (!isset($config[0]['alias'])) {
-                continue;
-            }
-
-            $this->testers[$config[0]['alias']] = $id;
-        }
     }
 }

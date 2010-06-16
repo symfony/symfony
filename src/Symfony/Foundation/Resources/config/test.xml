@@ -5,12 +5,10 @@
     xsi:schemaLocation="http://www.symfony-project.org/schema/dic/services http://www.symfony-project.org/schema/dic/services/services-1.0.xsd">
 
     <parameters>
-        <parameter key="test.client.class">Symfony\Foundation\Test\Client</parameter>
+        <parameter key="test.client.class">Symfony\Foundation\Client</parameter>
         <parameter key="test.client.parameters" type="collection"></parameter>
         <parameter key="test.client.history.class">Symfony\Components\BrowserKit\History</parameter>
         <parameter key="test.client.cookiejar.class">Symfony\Components\BrowserKit\CookieJar</parameter>
-        <parameter key="test.tester.request.class">Symfony\Components\HttpKernel\Test\RequestTester</parameter>
-        <parameter key="test.tester.response.class">Symfony\Components\HttpKernel\Test\ResponseTester</parameter>
     </parameters>
 
     <services>
@@ -24,15 +22,5 @@
         <service id="test.client.history" class="%test.client.history.class%" shared="false" />
 
         <service id="test.client.cookiejar" class="%test.client.cookiejar.class%" shared="false" />
-
-        <service id="test.tester.request" class="%test.tester.request.class%" shared="false">
-            <annotation name="test.tester" alias="request" />
-            <argument type="service" id="request" />
-        </service>
-
-        <service id="test.tester.response" class="%test.tester.response.class%" shared="false">
-            <annotation name="test.tester" alias="response" />
-            <argument type="service" id="test.response" />
-        </service>
     </services>
 </container>

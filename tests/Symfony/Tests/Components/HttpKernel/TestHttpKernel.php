@@ -9,7 +9,7 @@
  * file that was distributed with this source code.
  */
 
-namespace Symfony\Tests\Components\HttpKernel\Test;
+namespace Symfony\Tests\Components\HttpKernel;
 
 use Symfony\Components\HttpKernel\HttpKernel;
 use Symfony\Components\HttpKernel\Request;

@@ -61,6 +61,7 @@ class DataCollectorManager
         }
 
         $this->response = $response;
+        $this->response->headers->set('X-Debug-Token', $this->profilerStorage->getToken());
 
         $data = array();
         foreach ($this->collectors as $name => $collector) {

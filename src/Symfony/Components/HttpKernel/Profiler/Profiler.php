@@ -37,16 +37,37 @@ class Profiler implements \ArrayAccess
         $this->collectors = array();
     }
 
+    /**
+     * Clones the Profiler instance.
+     */
     public function __clone()
     {
         $this->profilerStorage = clone $this->profilerStorage;
     }
 
+    /**
+     * Returns a new Profiler for the given Response.
+     *
+     * @param Symfony\Components\HttpKernel\Response $response A Response instance
+     *
+     * @return Symfony\Components\HttpKernel\Profiler\Profiler A new Profiler instance
+     */
     public function load(Response $response)
     {
-        return $this->getProfilerForToken($response->headers->get('X-Debug-Token'));
+        if (!$token = $response->headers->get('X-Debug-Token')) {
+            return null;
+        }
+
+        return $this->getProfilerForToken($token);
     }
 
+    /**
+     * Returns a new Profiler for the given token.
+     *
+     * @param string $token A token
+     *
+     * @return Symfony\Components\HttpKernel\Profiler\Profiler A new Profiler instance
+     */
     public function getProfilerForToken($token)
     {
         $profiler = clone $this;
@@ -56,6 +77,11 @@ class Profiler implements \ArrayAccess
         return $profiler;
     }
 
+    /**
+     * Collects data for the given Response.
+     *
+     * @param Symfony\Components\HttpKernel\Response $response A Response instance
+     */
     public function collect(Response $response)
     {
         $this->response = $response;
@@ -78,6 +104,9 @@ class Profiler implements \ArrayAccess
         }
     }
 
+    /**
+     * Loads the data stored in the storage for all collectors.
+     */
     public function loadCollectorData()
     {
         try {
@@ -91,39 +120,78 @@ class Profiler implements \ArrayAccess
         }
     }
 
+    /**
+     * Gets the profiler storage.
+     *
+     * @return Symfony\Components\HttpKernel\Profiler\ProfilerStorage A ProfilerStorage instance
+     */
     public function getProfilerStorage()
     {
         return $this->profilerStorage;
     }
 
+    /**
+     * Gets the Response.
+     *
+     * @return Symfony\Components\HttpKernel\Response A Response instance
+     */
     public function getResponse()
     {
         return $this->response;
     }
 
+    /**
+     * Gets the Collectors associated with this profiler.
+     *
+     * @return array An array of collectors
+     */
     public function getCollectors()
     {
         return $this->collectors;
     }
 
+    /**
+     * Sets the Collectors associated with this profiler.
+     *
+     * @param array $collectors An array of collectors
+     */
     public function setCollectors(array $collectors = array())
     {
         $this->collectors = array();
         foreach ($collectors as $name => $collector) {
-            $this->setCollector($name, $collector);
+            $this->addCollector($collector);
         }
     }
 
-    public function setCollector($name, DataCollectorInterface $collector)
+    /**
+     * Adds a Collector.
+     *
+     * @param Symfony\Components\HttpKernel\Profiler\DataCollector\DataCollectorInterface $collector A DataCollectorInterface instance
+     */
+    public function addCollector(DataCollectorInterface $collector)
     {
-        $this->collectors[$name] = $collector;
+        $this->collectors[$collector->getName()] = $collector;
     }
 
+    /**
+     * Returns true if a Collector for the given name exists.
+     *
+     * @param string $name A collector name
+     */
     public function hasCollector($name)
     {
         return isset($this->collectors[$name]);
     }
 
+    /**
+     * Gets a Collector by name.
+     *
+     * @param string $name A collector name
+     *
+     * @return Symfony\Components\HttpKernel\Profiler\DataCollector\DataCollectorInterface A DataCollectorInterface instance
+     *
+     * @throws \InvalidArgumentException if the collector does not exist
+     */
     public function getCollector($name)
     {
         if (!isset($this->collectors[$name])) {
@@ -134,11 +202,11 @@ class Profiler implements \ArrayAccess
     }
 
     /**
-     * Returns true if the named field exists.
+     * Returns true if the named collector exists.
      *
-     * @param string $name The field name
+     * @param string $name The collector name
      *
-     * @param Boolean true if the field exists, false otherwise
+     * @param Boolean true if the collector exists, false otherwise
      */
     public function offsetExists($name)
     {
@@ -146,11 +214,11 @@ class Profiler implements \ArrayAccess
     }
 
     /**
-     * Gets the value of a field.
+     * Gets a collector.
      *
-     * @param string $name The field name
+     * @param string $name The collector name
      *
-     * @throws \InvalidArgumentException if the field does not exist
+     * @throws \InvalidArgumentException if the collector does not exist
      */
     public function offsetGet($name)
     {
@@ -158,25 +226,27 @@ class Profiler implements \ArrayAccess
     }
 
     /**
-     * Sets the value of a field.
+     * Unimplemented.
      *
-     * @param string       $name  The field name
-     * @param string|array $value The value of the field
+     * @param string       $name  The collector name
+     * @param string|array $value The collector
      *
-     * @throws \InvalidArgumentException if the field does not exist
+     * @throws \LogicException
      */
     public function offsetSet($name, $value)
     {
-        throw new \LogicException('The Collectors cannot be set.');
+        throw new \LogicException('A Collector cannot be set.');
     }
 
     /**
      * Unimplemented.
      *
-     * @param string $name The field name
+     * @param string $name The collector name
+     *
+     * @throws \LogicException
      */
     public function offsetUnset($name)
     {
-        throw new \LogicException('The Collectors cannot be removed.');
+        throw new \LogicException('A Collector cannot be removed.');
     }
 }

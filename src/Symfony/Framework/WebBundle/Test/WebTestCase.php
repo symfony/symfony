@@ -24,6 +24,13 @@ use Symfony\Components\HttpKernel\Response;
  */
 abstract class WebTestCase extends BaseWebTestCase
 {
+    /**
+     * Gets a profiler for the given Response.
+     *
+     * @param Symfony\Components\HttpKernel\Response $response A Response instance
+     *
+     * @return Symfony\Components\HttpKernel\Profiler\Profiler A Profiler instance
+     */
     public function getProfiler(Response $response)
     {
         $container = $this->kernel->getContainer();

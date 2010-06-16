@@ -1,12 +1,12 @@
 <?php
 
-namespace Symfony\Framework\ProfilerBundle\Listener;
+namespace Symfony\Components\HttpKernel\Listener;
 
 use Symfony\Components\EventDispatcher\EventDispatcher;
 use Symfony\Components\EventDispatcher\Event;
 use Symfony\Components\HttpKernel\Response;
 use Symfony\Components\HttpKernel\HttpKernelInterface;
-use Symfony\Framework\ProfilerBundle\Profiler;
+use Symfony\Components\HttpKernel\Profiler\Profiler;
 
 /*
  * This file is part of the Symfony framework.
@@ -18,13 +18,13 @@ use Symfony\Framework\ProfilerBundle\Profiler;
  */
 
 /**
- * DataCollector collects data for the current request by listening to the core.response event.
+ * Profiling collects data for the current request by listening to the core.response event.
  *
  * @package    Symfony
  * @subpackage Framework_ProfilerBundle
  * @author     Fabien Potencier <fabien.potencier@symfony-project.com>
  */
-class DataCollector
+class Profiling
 {
     protected $profiler;
 

@@ -2,7 +2,7 @@
 
 namespace Symfony\Framework\PropelBundle\Logger;
 
-use Symfony\Foundation\LoggerInterface;
+use Symfony\Components\HttpKernel\LoggerInterface;
 
 /*
  * This file is part of the Symfony framework.

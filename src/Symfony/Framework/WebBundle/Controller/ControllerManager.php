@@ -2,7 +2,7 @@
 
 namespace Symfony\Framework\WebBundle\Controller;
 
-use Symfony\Foundation\LoggerInterface;
+use Symfony\Components\HttpKernel\LoggerInterface;
 use Symfony\Components\DependencyInjection\ContainerInterface;
 use Symfony\Components\HttpKernel\HttpKernelInterface;
 use Symfony\Components\HttpKernel\Request;

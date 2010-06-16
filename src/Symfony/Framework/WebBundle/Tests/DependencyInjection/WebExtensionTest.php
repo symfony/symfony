@@ -17,13 +17,23 @@ use Symfony\Components\DependencyInjection\BuilderConfiguration;
 
 class WebExtensionTest extends TestCase
 {
-    public function testWebLoad()
+    public function testConfigLoad()
     {
         $configuration = new BuilderConfiguration();
         $loader = new WebExtension();
 
-        $configuration = $loader->webLoad(array(), $configuration);
+        $configuration = $loader->configLoad(array(), $configuration);
         $this->assertEquals('Symfony\\Framework\\WebBundle\\Listener\\RequestParser', $configuration->getParameter('request_parser.class'), '->webLoad() loads the web.xml file if not already loaded');
+
+        $configuration = new BuilderConfiguration();
+        $loader = new WebExtension();
+
+        $configuration = $loader->configLoad(array('profiler' => true), $configuration);
+        $this->assertEquals('Symfony\\Framework\\WebBundle\\Profiler', $configuration->getParameter('profiler.class'), '->configLoad() loads the collectors.xml file if not already loaded');
+        $this->assertFalse($configuration->hasParameter('debug.toolbar.class'), '->configLoad() does not load the toolbar.xml file');
+
+        $configuration = $loader->configLoad(array('toolbar' => true), $configuration);
+        $this->assertEquals('Symfony\\Components\\HttpKernel\\Listener\\WebDebugToolbar', $configuration->getParameter('debug.toolbar.class'), '->configLoad() loads the collectors.xml file if the toolbar option is given');
     }
 
     public function testUserLoad()

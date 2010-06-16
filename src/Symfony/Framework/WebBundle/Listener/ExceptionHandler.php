@@ -5,7 +5,7 @@ namespace Symfony\Framework\WebBundle\Listener;
 use Symfony\Components\DependencyInjection\ContainerInterface;
 use Symfony\Components\EventDispatcher\EventDispatcher;
 use Symfony\Components\EventDispatcher\Event;
-use Symfony\Foundation\LoggerInterface;
+use Symfony\Components\HttpKernel\LoggerInterface;
 use Symfony\Components\HttpKernel\HttpKernelInterface;
 
 /*

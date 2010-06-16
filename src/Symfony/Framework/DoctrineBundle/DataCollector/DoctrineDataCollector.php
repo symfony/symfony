@@ -2,7 +2,8 @@
 
 namespace Symfony\Framework\DoctrineBundle\DataCollector;
 
-use Symfony\Framework\ProfilerBundle\DataCollector\DataCollector;
+use Symfony\Components\HttpKernel\Profiler\DataCollector\DataCollector;
+use Symfony\Components\DependencyInjection\ContainerInterface;
 
 /*
  * This file is part of the Symfony framework.
@@ -22,6 +23,13 @@ use Symfony\Framework\ProfilerBundle\DataCollector\DataCollector;
  */
 class DoctrineDataCollector extends DataCollector
 {
+    protected $container;
+
+    public function __construct(ContainerInterface $container)
+    {
+        $this->container = $container;
+    }
+
     public function collect()
     {
         $this->data = array();

@@ -4,7 +4,7 @@ imports:
 zend.logger:
     priority: debug
 
-profiler.config:
+web.config:
     toolbar: false
 
 kernel.test: ~

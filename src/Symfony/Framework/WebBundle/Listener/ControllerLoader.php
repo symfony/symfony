@@ -3,7 +3,7 @@
 namespace Symfony\Framework\WebBundle\Listener;
 
 use Symfony\Framework\WebBundle\Controller\ControllerManager;
-use Symfony\Foundation\LoggerInterface;
+use Symfony\Components\HttpKernel\LoggerInterface;
 use Symfony\Components\EventDispatcher\EventDispatcher;
 use Symfony\Components\EventDispatcher\Event;
 

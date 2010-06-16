@@ -2,7 +2,7 @@
 
 namespace Symfony\Framework\DoctrineBundle\Logger;
 
-use Symfony\Foundation\LoggerInterface;
+use Symfony\Components\HttpKernel\LoggerInterface;
 use Doctrine\DBAL\Logging\DebugStack;
 
 /*

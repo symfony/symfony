@@ -5,9 +5,15 @@
     targetNamespace="http://www.symfony-project.org/schema/dic/symfony"
     elementFormDefault="qualified">
 
-  <xsd:element name="web" type="web" />
+  <xsd:element name="config" type="config" />
   <xsd:element name="templating" type="templating" />
   <xsd:element name="user" type="user" />
+
+  <xsd:complexType name="config">
+    <xsd:attribute name="ide" type="xsd:string" />
+    <xsd:attribute name="profiler" type="xsd:boolean" />
+    <xsd:attribute name="toolbar" type="xsd:boolean" />
+  </xsd:complexType>
 
   <xsd:complexType name="user">
     <xsd:sequence>
@@ -30,10 +36,6 @@
     <xsd:attribute name="httponly" type="xsd:string" />
     <xsd:attribute name="cache_limiter" type="xsd:string" />
     <xsd:attribute name="pdo.db_table" type="xsd:string" />
-  </xsd:complexType>
-
-  <xsd:complexType name="web">
-    <xsd:attribute name="ide" type="xsd:string" />
   </xsd:complexType>
 
   <xsd:complexType name="templating">

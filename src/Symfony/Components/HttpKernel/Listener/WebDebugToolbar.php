@@ -1,13 +1,13 @@
 <?php
 
-namespace Symfony\Framework\ProfilerBundle\Listener;
+namespace Symfony\Components\HttpKernel\Listener;
 
 use Symfony\Components\DependencyInjection\ContainerInterface;
 use Symfony\Components\EventDispatcher\EventDispatcher;
 use Symfony\Components\EventDispatcher\Event;
 use Symfony\Components\HttpKernel\Response;
 use Symfony\Components\HttpKernel\HttpKernelInterface;
-use Symfony\Framework\ProfilerBundle\Profiler;
+use Symfony\Components\HttpKernel\Profiler\Profiler;
 
 /*
  * This file is part of the Symfony framework.

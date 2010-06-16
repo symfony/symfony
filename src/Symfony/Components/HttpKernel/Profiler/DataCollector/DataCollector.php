@@ -1,9 +1,8 @@
 <?php
 
-namespace Symfony\Framework\ProfilerBundle\DataCollector;
+namespace Symfony\Components\HttpKernel\Profiler\DataCollector;
 
-use Symfony\Components\DependencyInjection\ContainerInterface;
-use Symfony\Framework\ProfilerBundle\Profiler;
+use Symfony\Components\HttpKernel\Profiler\Profiler;
 
 /*
  * This file is part of the Symfony framework.
@@ -18,19 +17,13 @@ use Symfony\Framework\ProfilerBundle\Profiler;
  * DataCollector.
  *
  * @package    Symfony
- * @subpackage Framework_ProfilerBundle
+ * @subpackage Components_HttpKernel
  * @author     Fabien Potencier <fabien.potencier@symfony-project.com>
  */
 abstract class DataCollector implements DataCollectorInterface
 {
     protected $profiler;
-    protected $container;
     protected $data;
-
-    public function __construct(ContainerInterface $container)
-    {
-        $this->container = $container;
-    }
 
     public function getData()
     {
@@ -41,8 +34,6 @@ abstract class DataCollector implements DataCollectorInterface
     {
         $this->data = $data;
     }
-
-    abstract public function collect();
 
     public function setProfiler(Profiler $profiler)
     {

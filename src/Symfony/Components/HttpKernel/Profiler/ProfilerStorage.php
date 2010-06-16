@@ -1,6 +1,6 @@
 <?php
 
-namespace Symfony\Framework\ProfilerBundle;
+namespace Symfony\Components\HttpKernel\Profiler;
 
 /*
  * This file is part of the Symfony framework.
@@ -15,7 +15,7 @@ namespace Symfony\Framework\ProfilerBundle;
  * ProfilerStorage.
  *
  * @package    Symfony
- * @subpackage Framework_ProfilerBundle
+ * @subpackage Components_HttpKernel
  * @author     Fabien Potencier <fabien.potencier@symfony-project.com>
  */
 class ProfilerStorage
@@ -100,7 +100,7 @@ class ProfilerStorage
         } elseif (class_exists('\PDO') && in_array('sqlite', \PDO::getAvailableDrivers(), true)) {
             $db = new \PDO('sqlite:'.$this->store);
         } else {
-            throw new \RuntimeException('You need to enable either the SQLite or PDO_SQLite extension for the ProfilerBundle to run properly.');
+            throw new \RuntimeException('You need to enable either the SQLite or PDO_SQLite extension for the profiler to run properly.');
         }
 
         $db->exec('CREATE TABLE IF NOT EXISTS data (token STRING, data STRING, created_at INTEGER)');

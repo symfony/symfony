@@ -5,7 +5,7 @@ kernel.config:
     charset:             UTF-8
     error_handler_level: null
 
-web.web: ~
+web.config: ~
 
 web.templating:
     escaping:       htmlspecialchars

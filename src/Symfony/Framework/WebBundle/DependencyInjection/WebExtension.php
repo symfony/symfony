@@ -39,7 +39,7 @@ class WebExtension extends LoaderExtension
      *
      * @return BuilderConfiguration A BuilderConfiguration instance
      */
-    public function webLoad($config, BuilderConfiguration $configuration)
+    public function configLoad($config, BuilderConfiguration $configuration)
     {
         if (!$configuration->hasDefinition('controller_manager')) {
             $loader = new XmlFileLoader(__DIR__.'/../Resources/config');
@@ -48,6 +48,33 @@ class WebExtension extends LoaderExtension
 
         if (isset($config['ide']) && 'textmate' === $config['ide']) {
             $configuration->setParameter('debug.file_link_format', 'txmt://open?url=file://%%f&line=%%l');
+        }
+
+        if (isset($config['toolbar']) && $config['toolbar']) {
+            $config['profiler'] = true;
+        }
+
+        if (isset($config['profiler'])) {
+            if ($config['profiler']) {
+                if (!$configuration->hasDefinition('profiler')) {
+                    $loader = new XmlFileLoader(__DIR__.'/../Resources/config');
+                    $configuration->merge($loader->load('collectors.xml'));
+                }
+            } elseif ($configuration->hasDefinition('profiler')) {
+                $configuration->getDefinition('profiling')->clearAnnotations();
+            }
+        }
+
+        // toolbar need to be registered after the profiler
+        if (isset($config['toolbar'])) {
+            if ($config['toolbar']) {
+                if (!$configuration->hasDefinition('debug.toolbar')) {
+                    $loader = new XmlFileLoader(__DIR__.'/../Resources/config');
+                    $configuration->merge($loader->load('toolbar.xml'));
+                }
+            } elseif ($configuration->hasDefinition('debug.toolbar')) {
+                $configuration->getDefinition('debug.toolbar')->clearAnnotations();
+            }
         }
 
         return $configuration;

@@ -1,11 +1,11 @@
 <?php
 
-namespace Symfony\Framework\ProfilerBundle;
+namespace Symfony\Components\HttpKernel\Profiler;
 
-use Symfony\Components\DependencyInjection\ContainerInterface;
 use Symfony\Components\HttpKernel\Response;
-use Symfony\Framework\ProfilerBundle\ProfilerStorage;
-use Symfony\Foundation\LoggerInterface;
+use Symfony\Components\HttpKernel\Profiler\ProfilerStorage;
+use Symfony\Components\HttpKernel\Profiler\DataCollector\DataCollectorInterface;
+use Symfony\Components\HttpKernel\LoggerInterface;
 
 /*
  * This file is part of the Symfony framework.
@@ -20,24 +20,21 @@ use Symfony\Foundation\LoggerInterface;
  * Profiler.
  *
  * @package    Symfony
- * @subpackage Framework_ProfilerBundle
+ * @subpackage Components_HttpKernel
  * @author     Fabien Potencier <fabien.potencier@symfony-project.com>
  */
 class Profiler implements \ArrayAccess
 {
-    protected $container;
     protected $profilerStorage;
     protected $collectors;
     protected $response;
     protected $logger;
 
-    public function __construct(ContainerInterface $container, ProfilerStorage $profilerStorage, LoggerInterface $logger = null)
+    public function __construct(ProfilerStorage $profilerStorage, LoggerInterface $logger = null)
     {
-        $this->container = $container;
         $this->profilerStorage = $profilerStorage;
         $this->logger = $logger;
-        $this->initCollectors();
-        $this->loadCollectorData();
+        $this->collectors = array();
     }
 
     public function __clone()
@@ -81,16 +78,6 @@ class Profiler implements \ArrayAccess
         }
     }
 
-    public function getProfilerStorage()
-    {
-        return $this->profilerStorage;
-    }
-
-    public function getResponse()
-    {
-        return $this->response;
-    }
-
     public function loadCollectorData()
     {
         try {
@@ -104,9 +91,32 @@ class Profiler implements \ArrayAccess
         }
     }
 
+    public function getProfilerStorage()
+    {
+        return $this->profilerStorage;
+    }
+
+    public function getResponse()
+    {
+        return $this->response;
+    }
+
     public function getCollectors()
     {
         return $this->collectors;
+    }
+
+    public function setCollectors(array $collectors = array())
+    {
+        $this->collectors = array();
+        foreach ($collectors as $name => $collector) {
+            $this->setCollector($name, $collector);
+        }
+    }
+
+    public function setCollector($name, DataCollectorInterface $collector)
+    {
+        $this->collectors[$name] = $collector;
     }
 
     public function hasCollector($name)
@@ -168,25 +178,5 @@ class Profiler implements \ArrayAccess
     public function offsetUnset($name)
     {
         throw new \LogicException('The Collectors cannot be removed.');
-    }
-
-    protected function initCollectors()
-    {
-        $config = $this->container->findAnnotatedServiceIds('data_collector');
-        $ids = array();
-        $coreCollectors = array();
-        $userCollectors = array();
-        foreach ($config as $id => $attributes) {
-            $collector = $this->container->getService($id);
-            $collector->setProfiler($this);
-
-            if (isset($attributes[0]['core']) && $attributes[0]['core']) {
-                $coreCollectors[$collector->getName()] = $collector;
-            } else {
-                $userCollectors[$collector->getName()] = $collector;
-            }
-        }
-
-        $this->collectors = array_merge($coreCollectors, $userCollectors);
     }
 }

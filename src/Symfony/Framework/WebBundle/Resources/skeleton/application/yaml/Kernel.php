@@ -28,7 +28,6 @@ class {{ class }}Kernel extends Kernel
         );
 
         if ($this->isDebug()) {
-            $bundles[] = new Symfony\Framework\ProfilerBundle\Bundle();
         }
 
         return $bundles;

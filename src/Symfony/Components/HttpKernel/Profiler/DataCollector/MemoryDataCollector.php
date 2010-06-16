@@ -1,6 +1,6 @@
 <?php
 
-namespace Symfony\Framework\ProfilerBundle\DataCollector;
+namespace Symfony\Components\HttpKernel\Profiler\DataCollector;
 
 /*
  * This file is part of the Symfony framework.
@@ -15,7 +15,7 @@ namespace Symfony\Framework\ProfilerBundle\DataCollector;
  * MemoryDataCollector.
  *
  * @package    Symfony
- * @subpackage Framework_ProfilerBundle
+ * @subpackage Components_HttpKernel
  * @author     Fabien Potencier <fabien.potencier@symfony-project.com>
  */
 class MemoryDataCollector extends DataCollector

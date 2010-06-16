@@ -4,10 +4,8 @@
     xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
     xmlns:zend="http://www.symfony-project.org/schema/dic/zend"
     xmlns:web="http://www.symfony-project.org/schema/dic/symfony"
-    xmlns:profiler="http://www.symfony-project.org/schema/dic/symfony/profiler"
     xsi:schemaLocation="http://www.symfony-project.org/schema/dic/services http://www.symfony-project.org/schema/dic/services/services-1.0.xsd
-                        http://www.symfony-project.org/schema/dic/zend http://www.symfony-project.org/schema/dic/zend/zend-1.0.xsd
-                        http://www.symfony-project.org/schema/dic/symfony/profiler http://www.symfony-project.org/schema/dic/symfony/profiler-1.0.xsd">
+                        http://www.symfony-project.org/schema/dic/zend http://www.symfony-project.org/schema/dic/zend/zend-1.0.xsd">
 
     <imports>
         <import resource="config.xml" />
@@ -18,7 +16,7 @@
         path="%kernel.logs_dir%/%kernel.environment%.log"
     />
 
-    <profiler:config
+    <web:config
         toolbar="true"
     />
 </container>

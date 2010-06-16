@@ -52,7 +52,7 @@ EOT
      */
     protected function execute(InputInterface $input, OutputInterface $output)
     {
-        $this->callPhing('sql');
+        $this->callPhing('sql', array('propel.packageObjectModel' => false));
         $filesystem = new Filesystem();
         $basePath = $this->application->getKernel()->getRootDir(). DIRECTORY_SEPARATOR . 'propel'. DIRECTORY_SEPARATOR . 'sql';
         foreach ($this->tempSchemas as $schemaFile => $schemaDetails) {

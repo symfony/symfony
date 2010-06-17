@@ -159,6 +159,10 @@ class XmlFileLoaderTest extends \PHPUnit_Framework_TestCase
         $doc = new \DOMDocument("1.0");
         $doc->loadXML('<foo><foo><!-- foo --></foo></foo>');
         $this->assertEquals(array('foo' => null), ProjectLoader2::convertDomElementToArray($doc->documentElement), '::convertDomElementToArray() converts a \DomElement to an array');
+
+        $doc = new \DOMDocument("1.0");
+        $doc->loadXML('<foo><foo foo="bar"/><foo foo="bar"/></foo>');
+        $this->assertEquals(array('foo' => array(array('foo' => 'bar'), array('foo' => 'bar'))), ProjectLoader2::convertDomElementToArray($doc->documentElement), '::convertDomElementToArray() converts a \DomElement to an array');
     }
 
     public function testExtensions()

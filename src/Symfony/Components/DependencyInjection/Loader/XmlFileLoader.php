@@ -374,7 +374,7 @@ EOF
                 }
             } elseif (!$node instanceof \DOMComment) {
                 if (isset($config[$node->localName])) {
-                    if (!is_array($config[$node->localName])) {
+                    if (!is_array($config[$node->localName]) || !is_int(key($config[$node->localName]))) {
                         $config[$node->localName] = array($config[$node->localName]);
                     }
                     $config[$node->localName][] = static::convertDomElementToArray($node);

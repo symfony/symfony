@@ -62,7 +62,9 @@ class Crawler extends \SplObjectStorage
             $this->addNodeList($node);
         } elseif (is_array($node)) {
             $this->addNodes($node);
-        } elseif (null !== $node) {
+        } elseif (is_string($node)) {
+            $this->addContent($node);
+        } elseif (is_object($node)) {
             $this->addNode($node);
         }
     }

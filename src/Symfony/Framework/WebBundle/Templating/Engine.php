@@ -123,6 +123,10 @@ class Engine extends BaseEngine
     {
         $parts = explode(':', $name, 4);
 
+        if (sizeof($parts) < 3) {
+            throw new \InvalidArgumentException(sprintf('Template name "%s" is not valid.', $name));
+        }
+
         $options = array_replace(
             array(
                 'renderer' => 'php',

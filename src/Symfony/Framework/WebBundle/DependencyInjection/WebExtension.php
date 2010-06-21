@@ -58,7 +58,7 @@ class WebExtension extends LoaderExtension
             if ($config['profiler']) {
                 if (!$configuration->hasDefinition('profiler')) {
                     $loader = new XmlFileLoader(__DIR__.'/../Resources/config');
-                    $configuration->merge($loader->load('collectors.xml'));
+                    $configuration->merge($loader->load('profiling.xml'));
                 }
             } elseif ($configuration->hasDefinition('profiler')) {
                 $configuration->getDefinition('profiling')->clearAnnotations();

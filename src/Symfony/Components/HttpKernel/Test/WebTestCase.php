@@ -42,12 +42,12 @@ abstract class WebTestCase extends \PHPUnit_Framework_TestCase
     /**
      * Asserts that the response matches a given CSS selector.
      *
+     * @param array  $expected  The expected values for the attributes
      * @param string $selector  A CSS selector
      * @param array  $arguments An array of attributes to extract
-     * @param array  $expected  The expected values for the attributes
      * @param Symfony\Foundation\Client $client A Client instance
      */
-    public function assertResponseSelectEquals($selector, $arguments, $expected, Client $client = null)
+    public function assertResponseSelectEquals($expected, $selector, $arguments, Client $client = null)
     {
         $this->assertEquals($expected, $this->getCrawler($client)->filter($selector)->extract($arguments));
     }
@@ -55,11 +55,11 @@ abstract class WebTestCase extends \PHPUnit_Framework_TestCase
     /**
      * Asserts that the response matches a given CSS selector n times.
      *
-     * @param string  $selector A CSS selector
      * @param integer $count   The number of times the CSS selector must match
+     * @param string  $selector A CSS selector
      * @param Symfony\Foundation\Client $client A Client instance
      */
-    public function assertResponseSelectCount($selector, $count, Client $client = null)
+    public function assertResponseSelectCount($count, $selector, Client $client = null)
     {
         $this->assertEquals($count, $this->getCrawler($client)->filter($selector)->count(), sprintf('response selector "%s" matches "%s" times', $selector, $count));
     }
@@ -89,11 +89,11 @@ abstract class WebTestCase extends \PHPUnit_Framework_TestCase
     /**
      * Asserts the a response header has the given value.
      *
-     * @param string $key   The header name
      * @param string $value The header value
+     * @param string $key   The header name
      * @param Symfony\Foundation\Client $client A Client instance
      */
-    public function assertResponseHeaderEquals($key, $value, Client $client = null)
+    public function assertResponseHeaderEquals($value, $key, Client $client = null)
     {
         $headers = explode(', ', $this->getResponse($client)->headers->get($key));
         foreach ($headers as $header) {
@@ -108,11 +108,11 @@ abstract class WebTestCase extends \PHPUnit_Framework_TestCase
     /**
      * Asserts the a response header has not the given value.
      *
-     * @param string $key   The header name
      * @param string $value The header value
+     * @param string $key   The header name
      * @param Symfony\Foundation\Client $client A Client instance
      */
-    public function assertResponseNotHeaderEquals($key, $value, Client $client = null)
+    public function assertResponseNotHeaderEquals($value, $key, Client $client = null)
     {
         $headers = explode(', ', $this->getResponse($client)->headers->get($key));
         foreach ($headers as $header) {
@@ -127,11 +127,11 @@ abstract class WebTestCase extends \PHPUnit_Framework_TestCase
     /**
      * Asserts the response header matches the given regexp.
      *
-     * @param string $key   The header name
      * @param string $regex A regexp
+     * @param string $key   The header name
      * @param Symfony\Foundation\Client $client A Client instance
      */
-    public function assertResponseHeaderRegExp($key, $regex, Client $client = null)
+    public function assertResponseHeaderRegExp($regex, $key, Client $client = null)
     {
         $headers = explode(', ', $this->getResponse($client)->headers->get($key));
         foreach ($headers as $header) {
@@ -146,11 +146,11 @@ abstract class WebTestCase extends \PHPUnit_Framework_TestCase
     /**
      * Asserts the response header does not match the given regexp.
      *
-     * @param string $key   The header name
      * @param string $regex A regexp
+     * @param string $key   The header name
      * @param Symfony\Foundation\Client $client A Client instance
      */
-    public function assertResponseNotHeaderRegExp($key, $regex, Client $client = null)
+    public function assertResponseNotHeaderRegExp($regex, $key, Client $client = null)
     {
         $headers = explode(', ', $this->getResponse($client)->headers->get($key));
         foreach ($headers as $header) {
@@ -165,12 +165,12 @@ abstract class WebTestCase extends \PHPUnit_Framework_TestCase
     /**
      * Asserts if a cookie was set with the given value and attributes.
      *
-     * @param  string $name       The cookie name
      * @param  string $value      The cookie value
      * @param  array  $attributes Other cookie attributes to check (expires, path, domain, etc)
+     * @param  string $name       The cookie name
      * @param Symfony\Foundation\Client $client A Client instance
      */
-    public function assertResponseCookie($name, $value = null, $attributes = array(), Client $client = null)
+    public function assertResponseCookie($value, $attributes = array(), $name, Client $client = null)
     {
         foreach ($this->getResponse($client)->getCookies() as $cookie) {
             if ($name == $cookie['name']) {

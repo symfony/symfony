@@ -57,6 +57,13 @@ class YamlFileLoader extends FileLoader
         // imports
         $this->parseImports($configuration, $content, $file);
 
+        // extensions
+        $this->loadFromExtensions($configuration, $content);
+
+        if ($main) {
+            $configuration->mergeExtensionsConfiguration();
+        }
+
         // parameters
         if (isset($content['parameters'])) {
             foreach ($content['parameters'] as $key => $value) {
@@ -66,13 +73,6 @@ class YamlFileLoader extends FileLoader
 
         // services
         $this->parseDefinitions($configuration, $content, $file);
-
-        // extensions
-        $this->loadFromExtensions($configuration, $content);
-
-        if ($main) {
-            $configuration->mergeExtensionsConfiguration();
-        }
 
         return $configuration;
     }

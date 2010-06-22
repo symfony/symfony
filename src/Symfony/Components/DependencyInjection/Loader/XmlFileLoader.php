@@ -53,18 +53,18 @@ class XmlFileLoader extends FileLoader
         // imports
         $this->parseImports($configuration, $xml, $file);
 
-        // parameters
-        $this->parseParameters($configuration, $xml, $file);
-
-        // services
-        $this->parseDefinitions($configuration, $xml, $file);
-
         // extensions
         $this->loadFromExtensions($configuration, $xml);
 
         if ($main) {
             $configuration->mergeExtensionsConfiguration();
         }
+
+        // parameters
+        $this->parseParameters($configuration, $xml, $file);
+
+        // services
+        $this->parseDefinitions($configuration, $xml, $file);
 
         return $configuration;
     }

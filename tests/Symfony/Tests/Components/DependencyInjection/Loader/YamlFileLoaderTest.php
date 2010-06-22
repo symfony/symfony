@@ -107,8 +107,12 @@ class YamlFileLoaderTest extends \PHPUnit_Framework_TestCase
         $config = $loader->load('services10.yml');
         $services = $config->getDefinitions();
         $parameters = $config->getParameters();
+
         $this->assertTrue(isset($services['project.service.bar']), '->load() parses extension elements');
         $this->assertTrue(isset($parameters['project.parameter.bar']), '->load() parses extension elements');
+
+        $this->assertEquals('BAR', $services['project.service.foo']->getClass(), '->load() parses extension elements');
+        $this->assertEquals('BAR', $parameters['project.parameter.foo'], '->load() parses extension elements');
 
         try {
             $config = $loader->load('services11.yml');

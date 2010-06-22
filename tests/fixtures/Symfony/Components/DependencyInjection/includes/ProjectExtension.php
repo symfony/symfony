@@ -11,6 +11,9 @@ class ProjectExtension extends LoaderExtension
         $configuration->setDefinition('project.service.bar', new Definition('FooClass'));
         $configuration->setParameter('project.parameter.bar', isset($config['foo']) ? $config['foo'] : 'foobar');
 
+        $configuration->setDefinition('project.service.foo', new Definition('FooClass'));
+        $configuration->setParameter('project.parameter.foo', isset($config['foo']) ? $config['foo'] : 'foobar');
+
         return $configuration;
     }
 

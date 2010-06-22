@@ -322,14 +322,7 @@ class Request
         }
         ksort($parts);
 
-        $elements = array();
-        foreach ($parts as $key => $value) {
-            $elements[] = "$key=$value";
-        }
-
-        if (count($elements)) {
-            return implode('&', $elements);
-        }
+        return http_build_query($parts);
     }
 
     public function isSecure()

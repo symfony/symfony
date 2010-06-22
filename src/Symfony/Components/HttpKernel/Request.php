@@ -351,7 +351,7 @@ class Request
     public function getHost()
     {
         if ($host = $this->headers->get('X_FORWARDED_HOST')) {
-            $elements = implode(',', $host);
+            $elements = explode(',', $host);
 
             return trim($elements[count($elements) - 1]);
         } else {

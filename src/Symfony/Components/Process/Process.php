@@ -66,7 +66,7 @@ class Process
      *
      * The callback receives the type of output (out or err) and
      * some bytes from the output in real-time. It allows to have feedback
-     * from the forked process during exection.
+     * from the forked process during execution.
      *
      * If you don't provide a callback, the STDOUT and STDERR are available only after
      * the process is finished via the getOutput() and getErrorOutput() methods.

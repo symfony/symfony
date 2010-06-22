@@ -77,5 +77,7 @@ class InitBundleCommand extends Command
             'namespace' => $namespace,
             'bundle'    => $bundle,
         ));
+
+        rename($targetDir.'/Bundle.php', $targetDir.'/'.$bundle.'.php');
     }
 }

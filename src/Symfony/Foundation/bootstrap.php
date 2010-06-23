@@ -384,7 +384,10 @@ class ClassCollectionLoader
             die(sprintf('Failed to write cache file "%s" (cache corrupted).', $tmpFile));
         }
 
-        @rename($tmpFile, $file);
+        if (!@rename($tmpFile, $file)) {
+            throw new \RuntimeException(sprintf('Failed to write cache file "%s".', $file));
+        }
+
         chmod($file, 0644);
     }
 }

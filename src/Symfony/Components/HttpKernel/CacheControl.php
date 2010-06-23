@@ -200,6 +200,30 @@ class CacheControl
         $this->setValue('s-maxage', (integer) $age);
     }
 
+    public function setStaleWhileRevalidate($age)
+    {
+        $this->checkAttribute('stale-while-revalidate', 'response');
+
+        $this->setValue('stale-while-revalidate', (integer) $age);
+    }
+
+    public function getStaleWhileRevalidate()
+    {
+        $this->checkAttribute('stale-while-revalidate', 'response');
+
+        return array_key_exists('stale-while-revalidate', $this->attributes) ? $this->attributes['stale-while-revalidate'] : null;
+    }
+
+    public function setStaleIfError($age)
+    {
+        $this->setValue('stale-if-error', (integer) $age);
+    }
+
+    public function getStaleIfError()
+    {
+        return array_key_exists('stale-if-error', $this->attributes) ? $this->attributes['stale-if-error'] : null;
+    }
+
     public function mustRevalidate()
     {
         $this->checkAttribute('must-revalidate', 'response');

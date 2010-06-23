@@ -27,15 +27,20 @@ class ControllerManager
 {
     protected $container;
     protected $logger;
+    protected $esiSupport;
 
     public function __construct(ContainerInterface $container, LoggerInterface $logger = null)
     {
         $this->container = $container;
         $this->logger = $logger;
+        $this->esiSupport = $container->hasService('esi') && $container->getEsiService()->hasSurrogateEsiCapability($container->getRequestService());
     }
 
     /**
      * Renders a Controller and returns the Response content.
+     *
+     * Note that this method generates an esi:include tag only when both the standalone
+     * option is set to true and the request has ESI capability (@see Symfony\Components\HttpKernel\Cache\ESI).
      *
      * Available options:
      *
@@ -43,6 +48,8 @@ class ControllerManager
      *  * query: An array of query parameters (only when the first argument is a controller)
      *  * ignore_errors: true to return an empty string in case of an error
      *  * alt: an alternative controller to execute in case of an error (can be a controller, a URI, or an array with the controller, the path arguments, and the query arguments)
+     *  * standalone: whether to generate an esi:include tag or not when ESI is supported
+     *  * comment: a comment to add when returning an esi:include tag
      *
      * @param string $controller A controller name to execute (a string like BlogBundle:Post:index), or a relative URI
      * @param array  $options    An array of options
@@ -56,10 +63,23 @@ class ControllerManager
             'query'         => array(),
             'ignore_errors' => true,
             'alt'           => array(),
+            'standalone'    => false,
+            'comment'       => '',
         ), $options);
 
         if (!is_array($options['alt'])) {
             $options['alt'] = array($options['alt']);
+        }
+
+        if ($this->esiSupport && $options['standalone']) {
+            $uri = $this->generateInternalUri($controller, $options['path'], $options['query']);
+
+            $alt = '';
+            if ($options['alt']) {
+                $alt = $this->generateInternalUri($options['alt'][0], isset($options['alt'][1]) ? $options['alt'][1] : array(), isset($options['alt'][2]) ? $options['alt'][2] : array());
+            }
+
+            return $this->container->getEsiService()->renderTag($uri, $alt, $options['ignore_errors'], $options['comment']);
         }
 
         $request = $this->container->getRequestService();
@@ -164,5 +184,35 @@ class ControllerManager
         }
 
         return $arguments;
+    }
+
+    /**
+     * Generates an internal URI for a given controller.
+     *
+     * This method uses the "_internal" route, which should be available.
+     *
+     * @param string $controller A controller name to execute (a string like BlogBundle:Post:index), or a relative URI
+     * @param array  $path       An array of path parameters
+     * @param array  $query      An array of query parameters
+     *
+     * @return string An internal URI
+     */
+    public function generateInternalUri($controller, array $path = array(), array $query = array())
+    {
+        if (0 === strpos($controller, '/')) {
+            return $controller;
+        }
+
+        $uri = $this->container->getRouterService()->generate('_internal', array(
+            'controller' => $controller,
+            'path'       => $path ? http_build_query($path) : 'none',
+            '_format'    => $this->container->getRequestService()->getRequestFormat(),
+        ), true);
+
+        if ($query) {
+            $uri = $uri.'?'.http_build_query($query);
+        }
+
+        return $uri;
     }
 }

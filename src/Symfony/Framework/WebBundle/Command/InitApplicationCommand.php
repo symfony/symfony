@@ -74,6 +74,7 @@ class InitApplicationCommand extends BaseCommand
         $filesystem->chmod($targetDir.'/cache', 0777);
 
         $filesystem->rename($targetDir.'/Kernel.php', $targetDir.'/'.$input->getArgument('name').'Kernel.php');
+        $filesystem->rename($targetDir.'/Cache.php', $targetDir.'/'.$input->getArgument('name').'Cache.php');
 
         $filesystem->copy(__DIR__.'/../Resources/skeleton/web/front_controller.php', $file = $webDir.'/'.(file_exists($webDir.'/index.php') ? strtolower($input->getArgument('name')) : 'index').'.php');
         Mustache::renderFile($file, $parameters);

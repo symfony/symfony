@@ -12,6 +12,8 @@
         <parameter key="response_filter.class">Symfony\Components\HttpKernel\Listener\ResponseFilter</parameter>
         <parameter key="exception_handler.class">Symfony\Framework\WebBundle\Listener\ExceptionHandler</parameter>
         <parameter key="exception_handler.controller">WebBundle:Exception:exception</parameter>
+        <parameter key="esi.class">Symfony\Components\HttpKernel\Cache\Esi</parameter>
+        <parameter key="esi_filter.class">Symfony\Components\HttpKernel\Listener\EsiFilter</parameter>
     </parameters>
 
     <services>
@@ -44,6 +46,13 @@
                 <argument key="matcher_cache_class">%kernel.name%UrlMatcher</argument>
                 <argument key="generator_cache_class">%kernel.name%UrlGenerator</argument>
             </argument>
+        </service>
+
+        <service id="esi" class="%esi.class%" />
+
+        <service id="esi_filter" class="%esi_filter.class%">
+          <annotation name="kernel.listener" />
+          <argument type="service" id="esi" on-invalid="ignore" />
         </service>
 
         <service id="response_filter" class="%response_filter.class%">

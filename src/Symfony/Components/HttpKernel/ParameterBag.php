@@ -53,6 +53,16 @@ class ParameterBag
     }
 
     /**
+     * Adds parameters.
+     *
+     * @param array $parameters An array of parameters
+     */
+    public function add(array $parameters = array())
+    {
+        $this->parameters = array_replace($this->parameters, $parameters);
+    }
+
+    /**
      * Returns a parameter by name.
      *
      * @param string $key     The key

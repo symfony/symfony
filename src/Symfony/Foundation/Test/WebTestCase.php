@@ -40,8 +40,6 @@ abstract class WebTestCase extends BaseWebTestCase
         $client = $this->kernel->getContainer()->getTest_ClientService();
         $client->setServerParameters($server);
 
-        $this->setCurrentClient($client);
-
         return $client;
     }
 

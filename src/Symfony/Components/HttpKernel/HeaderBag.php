@@ -98,6 +98,19 @@ class HeaderBag extends ParameterBag
     }
 
     /**
+     * Returns true if the given HTTP header contains the given value.
+     *
+     * @param string $key   The HTTP header name
+     * @param string $value The HTTP value
+     *
+     * @return Boolean true if the value is contained in the header, false otherwise
+     */
+    public function contains($key, $value)
+    {
+        return in_array($value, explode(', ', $this->get($key, '')));
+    }
+
+    /**
      * Deletes a header.
      *
      * @param string $key The HTTP header name

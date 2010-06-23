@@ -254,6 +254,30 @@ class Response
     }
 
     /**
+     * Retrieves a cookies by name.
+     *
+     * @param string $name The cookie name
+     *
+     * @return array|false An array of cookie parameters, or false if the cookie does not exist
+     */
+    public function getCookie($name)
+    {
+        return isset($this->cookies[$name]) ? $this->cookies[$name] : false;
+    }
+
+    /**
+     * Returns true if the cookie is defined.
+     *
+     * @param string $name The cookie name
+     *
+     * @return Boolean true if the cookie is defined, false otherwise
+     */
+    public function hasCookie($name)
+    {
+        return isset($this->cookies[$name]);
+    }
+
+    /**
      * Sets cookies.
      *
      * @param array $cookies An array of cookies
@@ -705,5 +729,10 @@ class Response
     public function isEmpty()
     {
         return in_array($this->statusCode, array(201, 204, 304));
+    }
+
+    public function isRedirected($location)
+    {
+        return $this->isRedirect() && $location == $this->headers->get('Location');
     }
 }

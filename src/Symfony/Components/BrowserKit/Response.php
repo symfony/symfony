@@ -23,22 +23,22 @@ class Response
     protected $content;
     protected $status;
     protected $headers;
-    protected $cookies;
 
     /**
      * Constructor.
      *
+     * The headers array is a set of key/value pairs. If a header is present multiple times
+     * then the value is an array of all the values.
+     *
      * @param string  $content The content of the response
      * @param integer $status  The response status code
      * @param array   $headers An array of headers
-     * @param array   $cookies An array of cookies
      */
-    public function __construct($content = '', $status = 200, array $headers = array(), array $cookies = array())
+    public function __construct($content = '', $status = 200, array $headers = array())
     {
         $this->content = $content;
         $this->status  = $status;
         $this->headers = $headers;
-        $this->cookies = $cookies;
     }
 
     public function __toString()
@@ -46,9 +46,6 @@ class Response
         $headers = '';
         foreach ($this->headers as $name => $value) {
             $headers .= sprintf("%s: %s\n", $name, $value);
-        }
-        foreach ($this->cookies as $name => $cookie) {
-            $headers .= sprintf("Set-Cookie: %s=%s\n", $name, $cookie['value']);
         }
 
         return $headers."\n".$this->content;
@@ -87,26 +84,23 @@ class Response
     /**
      * Gets a response header.
      *
-     * @param string $header The header name
+     * @param string  $header The header name
+     * @param Boolean $first  Whether to return the first value or all header values
      *
-     * @return string The header value
+     * @return string|array The first header value if $first is true, an array of values otherwise
      */
-    public function getHeader($header)
+    public function getHeader($header, $first = true)
     {
         foreach ($this->headers as $key => $value) {
             if (str_replace('-', '_', strtolower($key)) == str_replace('-', '_', strtolower($header))) {
-                return $value;
+                if ($first) {
+                    return is_array($value) ? (count($value) ? $value[0] : '') : $value;
+                } else {
+                    return is_array($value) ? $value : array($value);
+                }
             }
         }
-    }
 
-    /**
-     * Gets the response cookies.
-     *
-     * @return array The response cookies
-     */
-    public function getCookies()
-    {
-        return $this->cookies;
+        return $first ? null : array();
     }
 }

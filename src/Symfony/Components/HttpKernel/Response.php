@@ -26,7 +26,6 @@ class Response
     protected $version;
     protected $statusCode;
     protected $statusText;
-    protected $cookies;
 
     static public $statusTexts = array(
         100 => 'Continue',
@@ -84,7 +83,6 @@ class Response
         $this->setStatusCode($status);
         $this->setProtocolVersion('1.0');
         $this->headers = new HeaderBag($headers, 'response');
-        $this->cookies = array();
     }
 
     /**
@@ -104,13 +102,10 @@ class Response
         $content .= sprintf('HTTP/%s %s %s', $this->version, $this->statusCode, $this->statusText)."\n";
 
         // headers
-        foreach ($this->headers->all() as $name => $value) {
-            $content .= "$name: $value\n";
-        }
-
-        // cookies
-        foreach ($this->cookies as $cookie) {
-            $content .= sprintf('Set-Cookie: %s=%s; expires=%s; path=%s; domain=%s%s%s', $cookie['name'], $cookie['value'], $cookie['expire'], $cookie['path'], $cookie['domain'], $cookie['secure'] ? '; secure' : '', $cookie['httpOnly'] ? '; HttpOnly' : '')."\n";
+        foreach ($this->headers->all() as $name => $values) {
+            foreach ($values as $value) {
+                $content .= "$name: $value\n";
+            }
         }
 
         $content .= "\n".$this->getContent();
@@ -127,7 +122,7 @@ class Response
     }
 
     /**
-     * Sends HTTP headers, including cookies.
+     * Sends HTTP headers.
      */
     public function sendHeaders()
     {
@@ -139,13 +134,10 @@ class Response
         header(sprintf('HTTP/%s %s %s', $this->version, $this->statusCode, $this->statusText));
 
         // headers
-        foreach ($this->headers->all() as $name => $value) {
-            header($name.': '.$value);
-        }
-
-        // cookies
-        foreach ($this->cookies as $cookie) {
-            setrawcookie($cookie['name'], $cookie['value'], $cookie['expire'], $cookie['path'], $cookie['domain'], $cookie['secure'], $cookie['httpOnly']);
+        foreach ($this->headers->all() as $name => $values) {
+            foreach ($values as $value) {
+                header($name.': '.$value);
+            }
         }
     }
 
@@ -204,87 +196,6 @@ class Response
     public function getProtocolVersion()
     {
         return $this->version;
-    }
-
-    /**
-     * Sets a cookie.
-     *
-     * @param  string $name     The cookie name
-     * @param  string $value    The value of the cookie
-     * @param  string $expire   The time the cookie expires
-     * @param  string $path     The path on the server in which the cookie will be available on
-     * @param  string $domain   The domain that the cookie is available
-     * @param  bool   $secure   Indicates that the cookie should only be transmitted over a secure HTTPS connection from the client
-     * @param  bool   $httpOnly When TRUE the cookie will be made accessible only through the HTTP protocol
-     *
-     * @throws \InvalidArgumentException When the cookie expire parameter is not valid
-     */
-    public function setCookie($name, $value, $expire = null, $path = '/', $domain = '', $secure = false, $httpOnly = false)
-    {
-        if (null !== $expire) {
-            if (is_numeric($expire)) {
-                $expire = (int) $expire;
-            } else {
-                $expire = strtotime($expire);
-                if (false === $expire || -1 == $expire) {
-                    throw new \InvalidArgumentException('The cookie expire parameter is not valid.');
-                }
-            }
-        }
-
-        $this->cookies[$name] = array(
-            'name'     => $name,
-            'value'    => $value,
-            'expire'   => $expire,
-            'path'     => $path,
-            'domain'   => $domain,
-            'secure'   => (Boolean) $secure,
-            'httpOnly' => (Boolean) $httpOnly,
-        );
-    }
-
-    /**
-     * Retrieves cookies from the current web response.
-     *
-     * @return array Cookies
-     */
-    public function getCookies()
-    {
-        return $this->cookies;
-    }
-
-    /**
-     * Retrieves a cookies by name.
-     *
-     * @param string $name The cookie name
-     *
-     * @return array|false An array of cookie parameters, or false if the cookie does not exist
-     */
-    public function getCookie($name)
-    {
-        return isset($this->cookies[$name]) ? $this->cookies[$name] : false;
-    }
-
-    /**
-     * Returns true if the cookie is defined.
-     *
-     * @param string $name The cookie name
-     *
-     * @return Boolean true if the cookie is defined, false otherwise
-     */
-    public function hasCookie($name)
-    {
-        return isset($this->cookies[$name]);
-    }
-
-    /**
-     * Sets cookies.
-     *
-     * @param array $cookies An array of cookies
-     */
-    public function setCookies(array $cookies)
-    {
-        return $this->cookies = $cookies;
     }
 
     /**

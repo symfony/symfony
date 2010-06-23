@@ -68,18 +68,12 @@ class CookieJar
      * Updates the cookie jar from a Response object.
      *
      * @param Symfony\Components\BrowserKit\Response $response A Response object
+     * @param string                                 $url    The base URL
      */
-    public function updateFromResponse(Response $response)
+    public function updateFromResponse(Response $response, $uri = null)
     {
-        foreach ($response->getCookies() as $name => $cookie) {
-            $this->set(new Cookie(
-                $name,
-                isset($cookie['value']) ? $cookie['value'] : '',
-                isset($cookie['expire']) ? $cookie['expire'] : 0,
-                isset($cookie['path']) ? $cookie['path'] : '/',
-                isset($cookie['domain']) ? $cookie['domain'] : '',
-                isset($cookie['secure']) ? $cookie['secure'] : false
-            ));
+        foreach ($response->getHeader('Set-Cookie', false) as $cookie) {
+            $this->set(Cookie::fromString($cookie), $uri);
         }
     }
 

@@ -29,31 +29,31 @@ class ResponseTest extends \PHPUnit_Framework_TestCase
 
     public function testGetHeaders()
     {
-        $response = new Response('foo', 304, array('foo' => 'bar'));
+        $response = new Response('foo', 200, array('foo' => 'bar'));
         $this->assertEquals(array('foo' => 'bar'), $response->getHeaders(), '->getHeaders() returns the headers of the response');
     }
 
     public function testGetHeader()
     {
-        $response = new Response('foo', 304, array('Content-Type' => 'text/html'));
+        $response = new Response('foo', 200, array(
+            'Content-Type' => 'text/html',
+            'Set-Cookie'   => array('foo=bar', 'bar=foo'),
+        ));
 
         $this->assertEquals('text/html', $response->getHeader('Content-Type'), '->getHeader() returns a header of the response');
         $this->assertEquals('text/html', $response->getHeader('content-type'), '->getHeader() returns a header of the response');
         $this->assertEquals('text/html', $response->getHeader('content_type'), '->getHeader() returns a header of the response');
+        $this->assertEquals('foo=bar', $response->getHeader('Set-Cookie'), '->getHeader() returns the first header value');
+        $this->assertEquals(array('foo=bar', 'bar=foo'), $response->getHeader('Set-Cookie', false), '->getHeader() returns all header values if first is false');
 
         $this->assertNull($response->getHeader('foo'), '->getHeader() returns null if the header is not defined');
-    }
-
-    public function testGetCookies()
-    {
-        $response = new Response('foo', 304, array(), array('foo' => 'bar'));
-        $this->assertEquals(array('foo' => 'bar'), $response->getCookies(), '->getCookies() returns the cookies of the response');
+        $this->assertEquals(array(), $response->getHeader('foo', false), '->getHeader() returns an empty array if the header is not defined and first is set to false');
     }
 
     public function testMagicToString()
     {
-        $response = new Response('foo', 304, array('foo' => 'bar'), array('foo' => array('value' => 'bar')));
+        $response = new Response('foo', 304, array('foo' => 'bar'));
 
-        $this->assertEquals("foo: bar\nSet-Cookie: foo=bar\n\nfoo", $response->__toString(), '->__toString() returns the headers and the content as a string');
+        $this->assertEquals("foo: bar\n\nfoo", $response->__toString(), '->__toString() returns the headers and the content as a string');
     }
 }

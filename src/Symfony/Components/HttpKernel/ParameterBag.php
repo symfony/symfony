@@ -69,7 +69,7 @@ class ParameterBag
      * @param string $key   The key
      * @param mixed  $value The value
      */
-    public function set($key, $value, $replace = true)
+    public function set($key, $value)
     {
         $this->parameters[$key] = $value;
     }

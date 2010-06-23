@@ -60,7 +60,7 @@ class CookieJarTest extends \PHPUnit_Framework_TestCase
 
     public function testUpdateFromResponse()
     {
-        $response = new Response('', 200, array(), array('foo' => array('value' => 'foo')));
+        $response = new Response('', 200, array('Set-Cookie' => 'foo=foo'));
 
         $cookieJar = new CookieJar();
         $cookieJar->set(new Cookie('bar', 'bar'));
@@ -78,9 +78,9 @@ class CookieJarTest extends \PHPUnit_Framework_TestCase
         $cookieJar = new CookieJar();
         $cookieJar->set($cookie1 = new Cookie('foo_nothing', 'foo'));
         $cookieJar->set($cookie2 = new Cookie('foo_expired', 'foo', time() - 86400));
-        $cookieJar->set($cookie3 = new Cookie('foo_path', 'foo', 0, '/foo'));
-        $cookieJar->set($cookie4 = new Cookie('foo_domain', 'foo', 0, '/', 'example.com'));
-        $cookieJar->set($cookie5 = new Cookie('foo_secure', 'foo', 0, '/', '', true));
+        $cookieJar->set($cookie3 = new Cookie('foo_path', 'foo', null, '/foo'));
+        $cookieJar->set($cookie4 = new Cookie('foo_domain', 'foo', null, '/', 'example.com'));
+        $cookieJar->set($cookie5 = new Cookie('foo_secure', 'foo', null, '/', '', true));
 
         $this->assertEquals($values, array_keys($cookieJar->getValues($uri)), '->getValues() returns the cookie for a given URI');
     }

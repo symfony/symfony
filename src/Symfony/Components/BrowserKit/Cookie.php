@@ -20,31 +20,144 @@ namespace Symfony\Components\BrowserKit;
  */
 class Cookie
 {
+    const DATE_FORMAT = 'D, d-M-Y H:i:s T';
+
     protected $name;
     protected $value;
-    protected $expire;
+    protected $expires;
     protected $path;
     protected $domain;
     protected $secure;
+    protected $httponly;
 
     /**
      * Sets a cookie.
      *
-     * @param  string  $name   The cookie name
-     * @param  string  $value  The value of the cookie
-     * @param  string  $expire The time the cookie expires
-     * @param  string  $path   The path on the server in which the cookie will be available on
-     * @param  string  $domain The domain that the cookie is available
-     * @param  bool    $secure Indicates that the cookie should only be transmitted over a secure HTTPS connection from the client
+     * @param  string  $name     The cookie name
+     * @param  string  $value    The value of the cookie
+     * @param  string  $expires  The time the cookie expires
+     * @param  string  $path     The path on the server in which the cookie will be available on
+     * @param  string  $domain   The domain that the cookie is available
+     * @param  bool    $secure   Indicates that the cookie should only be transmitted over a secure HTTPS connection from the client
+     * @param  bool    $httponly The cookie httponly flag
      */
-    public function __construct($name, $value, $expire = 0, $path = '/', $domain = '', $secure = false)
+    public function __construct($name, $value, $expires = null, $path = '/', $domain = '', $secure = false, $httponly = false)
     {
-        $this->name   = $name;
-        $this->value  = $value;
-        $this->expire = (integer) $expire;
-        $this->path   = empty($path) ? '/' : $path;
-        $this->domain = $domain;
-        $this->secure = (Boolean) $secure;
+        $this->name     = $name;
+        $this->value    = $value;
+        $this->expires  = null === $expires ? null : (integer) $expires;
+        $this->path     = empty($path) ? '/' : $path;
+        $this->domain   = $domain;
+        $this->secure   = (Boolean) $secure;
+        $this->httponly = (Boolean) $httponly;
+    }
+
+    /**
+     * Returns the HTTP representation of the Cookie.
+     *
+     * @return string The HTTP representation of the Cookie
+     */
+    public function __toString()
+    {
+        $cookie = sprintf('%s=%s', $this->name, urlencode($this->value));
+
+        if (null !== $this->expires) {
+            $cookie .= '; expires='.substr(\DateTime::createFromFormat('U', $this->expires, new \DateTimeZone('UTC'))->format(static::DATE_FORMAT), 0, -5);
+        }
+
+        if ('/' !== $this->path) {
+            $cookie .= '; path='.$this->path;
+        }
+
+        if ('' !== $this->domain) {
+            $cookie .= '; domain='.$this->domain;
+        }
+
+        if ($this->secure) {
+            $cookie .= '; secure';
+        }
+
+        if ($this->httponly) {
+            $cookie .= '; httponly';
+        }
+
+        return $cookie;
+    }
+
+    /**
+     * Creates a Cookie instance from a Set-Cookie header value.
+     *
+     * @param string $cookie A Set-Cookie header value
+     * @param string $url    The base URL
+     *
+     * @param Symfony\Components\BrowserKit\Cookie A Cookie instance
+     */
+    static public function fromString($cookie, $url = null)
+    {
+        $parts = explode(';', $cookie);
+
+        if (false === strpos($parts[0], '=')) {
+            throw new \InvalidArgumentException('The cookie string "%s" is not valid.');
+        }
+
+        list($name, $value) = explode('=', array_shift($parts), 2);
+
+        $values = array(
+            'name'     => trim($name),
+            'value'    => urldecode(trim($value)),
+            'expires'  =>  null,
+            'path'     => '/',
+            'domain'   => '',
+            'secure'   => false,
+            'httponly' => false,
+        );
+
+        if (null !== $url) {
+            if ((false === $parts = parse_url($url)) || !isset($parts['host']) || !isset($parts['path'])) {
+                throw new \InvalidArgumentException(sprintf('The URL "%s" is not valid.', $url));
+            }
+
+            $values['domain'] = $parts['host'];
+            $values['path'] = substr($parts['path'], 0, strrpos($parts['path'], '/'));
+        }
+
+        foreach ($parts as $part) {
+            $part = trim($part);
+
+            if ('secure' === strtolower($part)) {
+                $values['secure'] = true;
+
+                continue;
+            }
+
+            if ('httponly' === strtolower($part)) {
+                $values['httponly'] = true;
+
+                continue;
+            }
+
+            if (2 === count($elements = explode('=', $part, 2))) {
+                if ('expires' === $elements[0]) {
+                    if (false === $date = \DateTime::createFromFormat(static::DATE_FORMAT, $elements[1], new \DateTimeZone('UTC'))) {
+                        throw new \InvalidArgumentException(sprintf('The expires part of cookie is not valid (%s).', $elements[1]));
+                    }
+
+                    $elements[1] = $date->getTimestamp();
+                }
+
+                $values[strtolower($elements[0])] = $elements[1];
+            }
+        }
+
+        return new static(
+            $values['name'],
+            $values['value'],
+            $values['expires'],
+            $values['path'],
+            $values['domain'],
+            $values['secure'],
+            $values['httponly']
+        );
     }
 
     /**
@@ -68,13 +181,13 @@ class Cookie
     }
 
     /**
-     * Gets the expire time of the cookie.
+     * Gets the expires time of the cookie.
      *
-     * @return string The cookie expire time
+     * @return string The cookie expires time
      */
-    public function getExpireTime()
+    public function getExpiresTime()
     {
-        return $this->expire;
+        return $this->expires;
     }
 
     /**
@@ -108,12 +221,22 @@ class Cookie
     }
 
     /**
+     * Returns the httponly flag of the cookie.
+     *
+     * @return Boolean The cookie httponly flag
+     */
+    public function isHttponly()
+    {
+        return $this->httponly;
+    }
+
+    /**
      * Returns true if the cookie has expired.
      *
      * @return Boolean true if the cookie has expired, false otherwise
      */
     public function isExpired()
     {
-        return $this->expire && $this->expire < time();
+        return (null !== $this->expires) && $this->expires < time();
     }
 }

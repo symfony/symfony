@@ -188,7 +188,7 @@ class ClientTest extends \PHPUnit_Framework_TestCase
     public function testRequestCookies()
     {
         $client = new TestClient();
-        $client->setNextResponse(new Response('<html><a href="/foo">foo</a></html>', 200, array(), array('foo' => array('value' => 'bar'))));
+        $client->setNextResponse(new Response('<html><a href="/foo">foo</a></html>', 200, array('Set-Cookie' => 'foo=bar')));
         $client->request('GET', 'http://www.example.com/foo/foobar');
         $this->assertEquals(array('foo' => 'bar'), $client->getCookieJar()->getValues('http://www.example.com/foo/foobar'), '->request() updates the CookieJar');
 

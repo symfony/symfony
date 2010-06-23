@@ -61,7 +61,7 @@ class RequestTest extends \PHPUnit_Framework_TestCase
         $this->assertEquals(array('foo' => 'foobar'), $dup->query->all(), '->duplicate() overrides the query parameters if provided');
         $this->assertEquals(array('foo' => 'foobar'), $dup->request->all(), '->duplicate() overrides the request parameters if provided');
         $this->assertEquals(array('foo' => 'foobar'), $dup->path->all(), '->duplicate() overrides the path parameters if provided');
-        $this->assertEquals(array('foo' => 'foobar'), $dup->headers->all(), '->duplicate() overrides the HTTP header if provided');
+        $this->assertEquals(array('foo' => array('foobar')), $dup->headers->all(), '->duplicate() overrides the HTTP header if provided');
     }
 
     /**

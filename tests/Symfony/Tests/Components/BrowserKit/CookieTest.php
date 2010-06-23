@@ -15,6 +15,51 @@ use Symfony\Components\BrowserKit\Cookie;
 
 class CookieTest extends \PHPUnit_Framework_TestCase
 {
+    /**
+     * @dataProvider getTestsForToFromString
+     */
+    public function testToFromString($cookie)
+    {
+        $this->assertEquals($cookie, (string) Cookie::fromString($cookie));
+    }
+
+    public function getTestsForToFromString()
+    {
+        return array(
+            array('foo=bar'),
+            array('foo=bar; expires=Fri, 31-Dec-2010 23:59:59 GMT'),
+            array('foo=bar; path=/foo'),
+            array('foo=bar; domain=google.com'),
+            array('foo=bar; secure'),
+            array('foo=bar; httponly'),
+            array('foo=bar; path=/foo; domain=google.com; secure; httponly'),
+        );
+    }
+
+    public function testFromStringWithUrl()
+    {
+        $this->assertEquals('foo=bar; domain=www.example.com', (string) Cookie::FromString('foo=bar', 'http://www.example.com/'));
+        $this->assertEquals('foo=bar; path=/foo; domain=www.example.com', (string) Cookie::FromString('foo=bar', 'http://www.example.com/foo/bar'));
+    }
+
+    public function testFromStringThrowsAnExceptionIfCookieIsNotValid()
+    {
+        $this->setExpectedException('InvalidArgumentException');
+        Cookie::FromString('foo');
+    }
+
+    public function testFromStringThrowsAnExceptionIfCookieDateIsNotValid()
+    {
+        $this->setExpectedException('InvalidArgumentException');
+        Cookie::FromString('foo=bar; expires=foo');
+    }
+
+    public function testFromStringThrowsAnExceptionIfUrlIsNotValid()
+    {
+        $this->setExpectedException('InvalidArgumentException');
+        Cookie::FromString('foo=bar', 'foobar');
+    }
+
     public function testGetName()
     {
         $cookie = new Cookie('foo', 'bar');
@@ -48,22 +93,31 @@ class CookieTest extends \PHPUnit_Framework_TestCase
         $this->assertFalse($cookie->isSecure(), '->isSecure() returns false if not defined');
 
         $cookie = new Cookie('foo', 'bar', 0, '/', 'foo.com', true);
-        $this->assertTrue($cookie->isSecure(), '->getDomain() returns the cookie secure flag');
+        $this->assertTrue($cookie->isSecure(), '->isSecure() returns the cookie secure flag');
     }
 
-    public function testGetExpireTime()
+    public function testIsHttponly()
     {
         $cookie = new Cookie('foo', 'bar');
-        $this->assertEquals(0, $cookie->getExpireTime(), '->getExpireTime() returns the expire time');
+        $this->assertFalse($cookie->isHttponly(), '->isHttponly() returns false if not defined');
+
+        $cookie = new Cookie('foo', 'bar', 0, '/', 'foo.com', false, true);
+        $this->assertTrue($cookie->isHttponly(), '->isHttponly() returns the cookie httponly flag');
+    }
+
+    public function testGetExpiresTime()
+    {
+        $cookie = new Cookie('foo', 'bar');
+        $this->assertEquals(null, $cookie->getExpiresTime(), '->getExpiresTime() returns the expires time');
 
         $cookie = new Cookie('foo', 'bar', $time = time() - 86400);
-        $this->assertEquals($time, $cookie->getExpireTime(), '->getExpireTime() returns the expire time');
+        $this->assertEquals($time, $cookie->getExpiresTime(), '->getExpiresTime() returns the expires time');
     }
 
     public function testIsExpired()
     {
         $cookie = new Cookie('foo', 'bar');
-        $this->assertFalse($cookie->isExpired(), '->isExpired() returns false when the cookie never expires (0 as expire time)');
+        $this->assertFalse($cookie->isExpired(), '->isExpired() returns false when the cookie never expires (null as expires time)');
 
         $cookie = new Cookie('foo', 'bar', time() - 86400);
         $this->assertTrue($cookie->isExpired(), '->isExpired() returns true when the cookie is expired');

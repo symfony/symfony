@@ -88,15 +88,34 @@ class Response
     }
 
     /**
-     * Returns the response content after sending the headers.
+     * Returns the response content as it will be sent (with the headers).
      *
      * @return string The response content
      */
     public function __toString()
     {
-        $this->sendHeaders();
+        $content = '';
 
-        return (string) $this->getContent();
+        if (!$this->headers->has('Content-Type')) {
+            $this->headers->set('Content-Type', 'text/html');
+        }
+
+        // status
+        $content .= sprintf('HTTP/%s %s %s', $this->version, $this->statusCode, $this->statusText)."\n";
+
+        // headers
+        foreach ($this->headers->all() as $name => $value) {
+            $content .= "$name: $value\n";
+        }
+
+        // cookies
+        foreach ($this->cookies as $cookie) {
+            $content .= sprintf('Set-Cookie: %s=%s; expires=%s; path=%s; domain=%s%s%s', $cookie['name'], $cookie['value'], $cookie['expire'], $cookie['path'], $cookie['domain'], $cookie['secure'] ? '; secure' : '', $cookie['httpOnly'] ? '; HttpOnly' : '')."\n";
+        }
+
+        $content .= "\n".$this->getContent();
+
+        return $content;
     }
 
     /**

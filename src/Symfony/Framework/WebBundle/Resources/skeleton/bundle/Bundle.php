@@ -2,9 +2,9 @@
 
 namespace {{ namespace }}\{{ bundle }};
 
-use Symfony\Foundation\Bundle\Bundle;
+use Symfony\Foundation\Bundle\Bundle as BaseBundle;
 use Symfony\Components\DependencyInjection\ContainerInterface;
 
-class {{ bundle }} extends Bundle
+class Bundle extends BaseBundle
 {
 }

@@ -1,12 +1,11 @@
 <?php
 
-namespace Symfony\Framework\ZendBundle;
+namespace Symfony\Framework\SwiftmailerBundle;
 
-use Symfony\Foundation\Bundle\Bundle;
+use Symfony\Foundation\Bundle\Bundle as BaseBundle;
 use Symfony\Components\DependencyInjection\ContainerInterface;
-use Symfony\Components\DependencyInjection\Reference;
 use Symfony\Components\DependencyInjection\Loader\Loader;
-use Symfony\Framework\ZendBundle\DependencyInjection\ZendExtension;
+use Symfony\Framework\SwiftmailerBundle\DependencyInjection\SwiftmailerExtension;
 
 /*
  * This file is part of the Symfony framework.
@@ -21,10 +20,10 @@ use Symfony\Framework\ZendBundle\DependencyInjection\ZendExtension;
  * Bundle.
  *
  * @package    Symfony
- * @subpackage Framework_ZendBundle
+ * @subpackage Framework_SwiftmailerBundle
  * @author     Fabien Potencier <fabien.potencier@symfony-project.com>
  */
-class ZendBundle extends Bundle
+class Bundle extends BaseBundle
 {
     /**
      * Customizes the Container instance.
@@ -35,6 +34,6 @@ class ZendBundle extends Bundle
      */
     public function buildContainer(ContainerInterface $container)
     {
-        Loader::registerExtension(new ZendExtension());
+        Loader::registerExtension(new SwiftmailerExtension());
     }
 }

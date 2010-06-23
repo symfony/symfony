@@ -17,12 +17,12 @@ class {{ class }}Kernel extends Kernel
     {
         $bundles = array(
             new Symfony\Foundation\Bundle\KernelBundle(),
-            new Symfony\Framework\WebBundle\WebBundle(),
+            new Symfony\Framework\WebBundle\Bundle(),
 
             // enable third-party bundles
-            new Symfony\Framework\ZendBundle\ZendBundle(),
-            new Symfony\Framework\DoctrineBundle\DoctrineBundle(),
-            new Symfony\Framework\SwiftmailerBundle\SwiftmailerBundle(),
+            new Symfony\Framework\ZendBundle\Bundle(),
+            new Symfony\Framework\DoctrineBundle\Bundle(),
+            new Symfony\Framework\SwiftmailerBundle\Bundle(),
 
             // register your bundles here
         );

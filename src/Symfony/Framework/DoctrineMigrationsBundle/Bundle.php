@@ -2,7 +2,7 @@
 
 namespace Symfony\Framework\DoctrineMigrationsBundle;
 
-use Symfony\Foundation\Bundle\Bundle;
+use Symfony\Foundation\Bundle\Bundle as BaseBundle;
 
 /*
  * This file is part of the Symfony framework.
@@ -21,6 +21,6 @@ use Symfony\Foundation\Bundle\Bundle;
  * @author     Fabien Potencier <fabien.potencier@symfony-project.com>
  * @author     Jonathan H. Wage <jonwage@gmail.com>
  */
-class DoctrineMigrationsBundle extends Bundle
+class Bundle extends BaseBundle
 {
 }

@@ -1,29 +1,31 @@
 <?php
 
-namespace Symfony\Framework\SwiftmailerBundle;
+namespace Symfony\Framework\TwigBundle;
 
-use Symfony\Foundation\Bundle\Bundle;
+use Symfony\Foundation\Bundle\Bundle as BaseBundle;
 use Symfony\Components\DependencyInjection\ContainerInterface;
 use Symfony\Components\DependencyInjection\Loader\Loader;
-use Symfony\Framework\SwiftmailerBundle\DependencyInjection\SwiftmailerExtension;
+use Symfony\Components\DependencyInjection\Loader\XmlFileLoader;
+use Symfony\Components\DependencyInjection\BuilderConfiguration;
+use Symfony\Framework\TwigBundle\DependencyInjection\TwigExtension;
 
 /*
- * This file is part of the Symfony framework.
+ * This file is part of the Symfony package.
  *
  * (c) Fabien Potencier <fabien.potencier@symfony-project.com>
  *
- * This source file is subject to the MIT license that is bundled
- * with this source code in the file LICENSE.
+ * For the full copyright and license information, please view the LICENSE
+ * file that was distributed with this source code.
  */
 
 /**
  * Bundle.
  *
  * @package    Symfony
- * @subpackage Framework_SwiftmailerBundle
+ * @subpackage Framework_TwigBundle
  * @author     Fabien Potencier <fabien.potencier@symfony-project.com>
  */
-class SwiftmailerBundle extends Bundle
+class Bundle extends BaseBundle
 {
     /**
      * Customizes the Container instance.
@@ -34,6 +36,6 @@ class SwiftmailerBundle extends Bundle
      */
     public function buildContainer(ContainerInterface $container)
     {
-        Loader::registerExtension(new SwiftmailerExtension());
+        Loader::registerExtension(new TwigExtension());
     }
 }

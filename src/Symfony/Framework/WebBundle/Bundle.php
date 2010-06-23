@@ -2,7 +2,7 @@
 
 namespace Symfony\Framework\WebBundle;
 
-use Symfony\Foundation\Bundle\Bundle;
+use Symfony\Foundation\Bundle\Bundle as BaseBundle;
 use Symfony\Components\DependencyInjection\ContainerInterface;
 use Symfony\Components\DependencyInjection\Loader\Loader;
 use Symfony\Components\DependencyInjection\Loader\XmlFileLoader;
@@ -25,7 +25,7 @@ use Symfony\Framework\WebBundle\DependencyInjection\WebExtension;
  * @subpackage Framework_WebBundle
  * @author     Fabien Potencier <fabien.potencier@symfony-project.com>
  */
-class WebBundle extends Bundle
+class Bundle extends BaseBundle
 {
     /**
      * Customizes the Container instance.

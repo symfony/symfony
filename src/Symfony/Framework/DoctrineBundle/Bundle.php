@@ -2,7 +2,7 @@
 
 namespace Symfony\Framework\DoctrineBundle;
 
-use Symfony\Foundation\Bundle\Bundle;
+use Symfony\Foundation\Bundle\Bundle as BaseBundle;
 use Symfony\Components\DependencyInjection\ContainerInterface;
 use Symfony\Components\DependencyInjection\Loader\Loader;
 use Symfony\Components\DependencyInjection\Loader\XmlFileLoader;
@@ -25,7 +25,7 @@ use Symfony\Framework\DoctrineBundle\DependencyInjection\DoctrineExtension;
  * @author     Fabien Potencier <fabien.potencier@symfony-project.com>
  * @author     Jonathan H. Wage <jonwage@gmail.com>
  */
-class DoctrineBundle extends Bundle
+class Bundle extends BaseBundle
 {
     /**
      * Customizes the Container instance.

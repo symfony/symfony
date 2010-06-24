@@ -60,7 +60,7 @@ class AssetsInstallCommand extends Command
                 $targetDir = $input->getArgument('target').'/bundles/'.preg_replace('/bundle$/', '', strtolower($bundle->getName()));
 
                 $filesystem->remove($targetDir);
-                mkdir($targetDir, 0755, true);
+                mkdir($targetDir, 0777, true);
                 $filesystem->mirror($originDir, $targetDir);
             }
         }

@@ -40,7 +40,7 @@ class Store
     {
         $this->root = $root;
         if (!is_dir($this->root)) {
-            mkdir($this->root, 0755, true);
+            mkdir($this->root, 0777, true);
         }
         $this->keyCache = new \SplObjectStorage();
         $this->locks = array();
@@ -313,7 +313,7 @@ class Store
     {
         $path = $this->getPath($key);
         if (!is_dir(dirname($path))) {
-            mkdir(dirname($path), 0755, true);
+            mkdir(dirname($path), 0777, true);
         }
 
         $tmpFile = tempnam(dirname($path), basename($path));

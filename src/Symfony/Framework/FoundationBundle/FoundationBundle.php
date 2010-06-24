@@ -36,7 +36,7 @@ class FoundationBundle extends Bundle
      */
     public function buildContainer(ContainerInterface $container)
     {
-        Loader::registerExtension(new WebExtension());
+        Loader::registerExtension(new WebExtension($container->getParameter('kernel.bundle_dirs'), $container->getParameter('kernel.bundles')));
 
         $dirs = array('%kernel.root_dir%/views/%%bundle%%/%%controller%%/%%name%%%%format%%.%%renderer%%');
         foreach ($container->getParameter('kernel.bundle_dirs') as $dir) {

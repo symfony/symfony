@@ -6,6 +6,8 @@ use Symfony\Components\DependencyInjection\Loader\LoaderExtension;
 use Symfony\Components\DependencyInjection\Loader\XmlFileLoader;
 use Symfony\Components\DependencyInjection\BuilderConfiguration;
 use Symfony\Components\DependencyInjection\Reference;
+use Symfony\Components\DependencyInjection\Definition;
+use Symfony\Components\DependencyInjection\FileResource;
 
 /*
  * This file is part of the Symfony framework.
@@ -29,7 +31,19 @@ class WebExtension extends LoaderExtension
         'templating' => 'templating.xml',
         'web'        => 'web.xml',
         'user'       => 'user.xml',
+        // validation.xml conflicts with the naming convention for XML
+        // validation mapping files, so call it validator.xml
+        'validation' => 'validator.xml',
     );
+
+    protected $bundleDirs = array();
+    protected $bundles = array();
+
+    public function __construct(array $bundleDirs, array $bundles)
+    {
+        $this->bundleDirs = $bundleDirs;
+        $this->bundles = $bundles;
+    }
 
     /**
      * Loads the web configuration.
@@ -74,6 +88,82 @@ class WebExtension extends LoaderExtension
                 }
             } elseif ($configuration->hasDefinition('debug.toolbar')) {
                 $configuration->getDefinition('debug.toolbar')->clearAnnotations();
+            }
+        }
+
+        if (isset($config['validation'])) {
+            if ($config['validation']) {
+                if (!$configuration->hasDefinition('validator')) {
+                    $loader = new XmlFileLoader(__DIR__.'/../Resources/config');
+                    $configuration->merge($loader->load($this->resources['validation']));
+                }
+
+                $xmlMappingFiles = array();
+                $yamlMappingFiles = array();
+                $messageFiles = array();
+
+                // default entries by the framework
+                $xmlMappingFiles[] = __DIR__.'/../../../Components/Form/Resources/config/validation.xml';
+                $messageFiles[] = __DIR__ . '/../../../Components/Validator/Resources/i18n/messages.en.xml';
+                $messageFiles[] = __DIR__ . '/../../../Components/Form/Resources/i18n/messages.en.xml';
+
+                foreach ($this->bundles as $className) {
+                    $tmp = dirname(str_replace('\\', '/', $className));
+                    $namespace = str_replace('/', '\\', dirname($tmp));
+                    $bundle = basename($tmp);
+
+                    foreach ($this->bundleDirs as $dir) {
+                        if (file_exists($file = $dir.'/'.$bundle.'/Resources/config/validation.xml')) {
+                            $xmlMappingFiles[] = realpath($file);
+                        }
+                        if (file_exists($file = $dir.'/'.$bundle.'/Resources/config/validation.yml')) {
+                            $yamlMappingFiles[] = realpath($file);
+                        }
+
+                        // TODO do we really want the message files of all cultures?
+                        foreach (glob($dir.'/'.$bundle.'/Resources/i18n/messages.*.xml') as $file) {
+                            $messageFiles[] = realpath($file);
+                        }
+                    }
+                }
+
+                $xmlFilesLoader = new Definition(
+                    $configuration->getParameter('validator.mapping.loader.xml_files_loader.class'),
+                    array($xmlMappingFiles)
+                );
+
+                $yamlFilesLoader = new Definition(
+                    $configuration->getParameter('validator.mapping.loader.yaml_files_loader.class'),
+                    array($yamlMappingFiles)
+                );
+
+                $configuration->setDefinition('validator.mapping.loader.xml_files_loader', $xmlFilesLoader);
+                $configuration->setDefinition('validator.mapping.loader.yaml_files_loader', $yamlFilesLoader);
+                $configuration->setParameter('validator.message_interpolator.files', $messageFiles);
+
+                foreach ($xmlMappingFiles as $file) {
+                    $configuration->addResource(new FileResource($file));
+                }
+
+                foreach ($yamlMappingFiles as $file) {
+                    $configuration->addResource(new FileResource($file));
+                }
+
+                foreach ($messageFiles as $file) {
+                    $configuration->addResource(new FileResource($file));
+                }
+
+                if (isset($config['validation']['annotations']) && $config['validation']['annotations'] === true) {
+                    $annotationLoader = new Definition($configuration->getParameter('validator.mapping.loader.annotation_loader.class'));
+                    $configuration->setDefinition('validator.mapping.loader.annotation_loader', $annotationLoader);
+
+                    $loader = $configuration->getDefinition('validator.mapping.loader.loader_chain');
+                    $arguments = $loader->getArguments();
+                    array_unshift($arguments, new Reference('validator.mapping.loader.annotation_loader'));
+                    $loader->setArguments($arguments);
+                }
+            } elseif ($configuration->hasDefinition('validator')) {
+                $configuration->getDefinition('validator')->clearAnnotations();
             }
         }
 

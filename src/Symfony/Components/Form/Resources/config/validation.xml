@@ -1,0 +1,41 @@
+<?xml version="1.0" ?>
+
+<constraint-mapping xmlns="http://www.symfony-project.org/schema/dic/constraint-mapping"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xsi:schemaLocation="http://www.symfony-project.org/schema/dic/constraint-mapping http://www.symfony-project.org/schema/dic/services/constraint-mapping-1.0.xsd">
+
+  <class name="Symfony\Components\Form\FieldGroup">
+    <property name="fields">
+      <constraint name="Valid" />
+    </property>
+    <getter property="boundWithExtraFields">
+      <constraint name="AssertFalse">
+        <option name="message">Symfony.Form.FieldGroup.extraFieldsMessage</option>
+      </constraint>
+    </getter>
+  </class>
+
+  <class name="Symfony\Components\Form\Form">
+    <getter property="data">
+      <constraint name="Valid" />
+    </getter>
+    <getter property="postMaxSizeReached">
+      <constraint name="AssertFalse">
+        <option name="message">Symfony.Form.Form.postMaxSizeMessage</option>
+      </constraint>
+    </getter>
+    <getter property="csrfTokenValid">
+      <constraint name="AssertTrue">
+        <option name="message">Symfony.Form.Form.csrfInvalidMessage</option>
+      </constraint>
+    </getter>
+  </class>
+
+  <class name="Symfony\Components\Form\RepeatedField">
+    <getter property="firstEqualToSecond">
+      <constraint name="AssertTrue">
+        <option name="message">Symfony.Form.RepeatedField.invalidMessage</option>
+      </constraint>
+    </getter>
+  </class>
+</constraint-mapping>

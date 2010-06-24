@@ -27,7 +27,7 @@ abstract class BaseValueTransformer extends Configurable implements ValueTransfo
      */
     public function __construct(array $options = array())
     {
-        $this->locale = \Locale::getDefault();
+        $this->locale = class_exists('\Locale', false) ? \Locale::getDefault() : 'en';
 
         parent::__construct($options);
     }

@@ -2,7 +2,9 @@
 
 namespace Symfony\Tests\Components\Form;
 
-class DateTimeTestCase extends \PHPUnit_Framework_TestCase
+require_once __DIR__ . '/LocalizedTestCase.php';
+
+class DateTimeTestCase extends LocalizedTestCase
 {
     public static function assertDateTimeEquals(\DateTime $expected, \DateTime $actual)
     {

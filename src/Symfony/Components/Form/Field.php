@@ -42,7 +42,7 @@ abstract class Field extends Configurable implements FieldInterface
         $this->addOption('property_path', (string)$key);
 
         $this->key = (string)$key;
-        $this->locale = \Locale::getDefault();
+        $this->locale = class_exists('\Locale', false) ? \Locale::getDefault() : 'en';
         $this->generator = new HtmlGenerator();
 
         parent::__construct($options);

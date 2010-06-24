@@ -3,11 +3,13 @@
 namespace Symfony\Tests\Components\Form\ValueTransformer;
 
 require_once __DIR__ . '/../../../../../bootstrap.php';
+require_once __DIR__ . '/../LocalizedTestCase.php';
 
 use Symfony\Components\Form\ValueTransformer\PercentToLocalizedStringTransformer;
+use Symfony\Tests\Components\Form\LocalizedTestCase;
 
 
-class PercentToLocalizedStringTransformerTest extends \PHPUnit_Framework_TestCase
+class PercentToLocalizedStringTransformerTest extends LocalizedTestCase
 {
     public function testTransform()
     {

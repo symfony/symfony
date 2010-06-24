@@ -3,11 +3,13 @@
 namespace Symfony\Tests\Components\Form\ValueTransformer;
 
 require_once __DIR__ . '/../../../../../bootstrap.php';
+require_once __DIR__ . '/../LocalizedTestCase.php';
 
 use Symfony\Components\Form\ValueTransformer\NumberToLocalizedStringTransformer;
+use Symfony\Tests\Components\Form\LocalizedTestCase;
 
 
-class NumberToLocalizedStringTransformerTest extends \PHPUnit_Framework_TestCase
+class NumberToLocalizedStringTransformerTest extends LocalizedTestCase
 {
     public function testTransform()
     {

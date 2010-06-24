@@ -634,7 +634,7 @@ class FieldGroupTest extends \PHPUnit_Framework_TestCase
         $group->add($field);
         $group->setLocale('de_DE');
 
-        $this->assertEquals(array(\Locale::getDefault(), 'de_DE'), $field->locales);
+        $this->assertEquals(array(class_exists('\Locale', false) ? \Locale::getDefault() : 'en', 'de_DE'), $field->locales);
     }
 
     public function testTranslatorIsPassedToField_SetBeforeAddingTheField()

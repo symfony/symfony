@@ -3,10 +3,11 @@
 namespace Symfony\Tests\Components\Form;
 
 require_once __DIR__ . '/../../../../bootstrap.php';
+require_once __DIR__ . '/LocalizedTestCase.php';
 
 use Symfony\Components\Form\MoneyField;
 
-class MoneyFieldTest extends \PHPUnit_Framework_TestCase
+class MoneyFieldTest extends LocalizedTestCase
 {
     public function testRenderWithoutCurrency()
     {

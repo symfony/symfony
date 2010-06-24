@@ -3,10 +3,11 @@
 namespace Symfony\Tests\Components\Form;
 
 require_once __DIR__ . '/../../../../bootstrap.php';
+require_once __DIR__ . '/LocalizedTestCase.php';
 
 use Symfony\Components\Form\PercentField;
 
-class PercentFieldTest extends \PHPUnit_Framework_TestCase
+class PercentFieldTest extends LocalizedTestCase
 {
     public function testRender()
     {

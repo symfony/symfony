@@ -1,3 +1,0 @@
-homepage:
-    pattern:  /
-    defaults: { _controller: WebBundle:Default:index }

@@ -1,0 +1,56 @@
+<?xml version="1.0" ?>
+
+<container xmlns="http://www.symfony-project.org/schema/dic/services"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xsi:schemaLocation="http://www.symfony-project.org/schema/dic/services http://www.symfony-project.org/schema/dic/services/services-1.0.xsd">
+
+    <parameters>
+        <parameter key="profiler.class">Symfony\Framework\FoundationBundle\Profiler</parameter>
+        <parameter key="profiler.storage.class">Symfony\Components\HttpKernel\Profiler\ProfilerStorage</parameter>
+        <parameter key="profiler.storage.file">%kernel.cache_dir%/profiler.db</parameter>
+        <parameter key="profiler.storage.lifetime">86400</parameter>
+        <parameter key="profiling.class">Symfony\Components\HttpKernel\Listener\Profiling</parameter>
+        <parameter key="data_collector.config.class">Symfony\Framework\FoundationBundle\DataCollector\ConfigDataCollector</parameter>
+        <parameter key="data_collector.app.class">Symfony\Framework\FoundationBundle\DataCollector\AppDataCollector</parameter>
+        <parameter key="data_collector.timer.class">Symfony\Framework\FoundationBundle\DataCollector\TimerDataCollector</parameter>
+        <parameter key="data_collector.memory.class">Symfony\Components\HttpKernel\Profiler\DataCollector\MemoryDataCollector</parameter>
+    </parameters>
+
+    <services>
+        <service id="profiler" class="%profiler.class%">
+            <argument type="service" id="service_container" />
+            <argument type="service" id="profiler.storage" />
+            <argument type="service" id="logger" on-invalid="null" />
+        </service>
+
+        <service id="profiler.storage" class="%profiler.storage.class%">
+            <argument>%profiler.storage.file%</argument>
+            <argument>null</argument>
+            <argument>%profiler.storage.lifetime%</argument>
+        </service>
+
+        <service id="profiling" class="%profiling.class%">
+            <annotation name="kernel.listener" />
+            <argument type="service" id="profiler" />
+        </service>
+
+        <service id="data_collector.config" class="%data_collector.config.class%">
+            <annotation name="data_collector" core="true" />
+            <argument type="service" id="service_container" />
+        </service>
+
+        <service id="data_collector.app" class="%data_collector.app.class%">
+            <annotation name="data_collector" core="true" />
+            <argument type="service" id="service_container" />
+        </service>
+
+        <service id="data_collector.timer" class="%data_collector.timer.class%">
+            <annotation name="data_collector" core="true" />
+            <argument type="service" id="service_container" />
+        </service>
+
+        <service id="data_collector.memory" class="%data_collector.memory.class%">
+            <annotation name="data_collector" core="true" />
+        </service>
+    </services>
+</container>

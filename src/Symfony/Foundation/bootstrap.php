@@ -221,10 +221,10 @@ class KernelExtension extends LoaderExtension
                 'Symfony\\Components\\Templating\\Renderer\\PhpRenderer',
                 'Symfony\\Components\\Templating\\Storage\\Storage',
                 'Symfony\\Components\\Templating\\Storage\\FileStorage',
-                'Symfony\\Framework\\WebBundle\\Controller',
-                'Symfony\\Framework\\WebBundle\\Listener\\RequestParser',
-                'Symfony\\Framework\\WebBundle\\Listener\\ControllerLoader',
-                'Symfony\\Framework\\WebBundle\\Templating\\Engine',
+                'Symfony\\Framework\\FoundationBundle\\Controller',
+                'Symfony\\Framework\\FoundationBundle\\Listener\\RequestParser',
+                'Symfony\\Framework\\FoundationBundle\\Listener\\ControllerLoader',
+                'Symfony\\Framework\\FoundationBundle\\Templating\\Engine',
             );
         } else {
             $classes = array();

@@ -20,7 +20,7 @@ use Symfony\Components\HttpKernel\HttpKernelInterface;
  * ResponseFilter.
  *
  * @package    Symfony
- * @subpackage Framework_WebBundle
+ * @subpackage Framework_HttpKernel
  * @author     Fabien Potencier <fabien.potencier@symfony-project.com>
  */
 class ResponseFilter

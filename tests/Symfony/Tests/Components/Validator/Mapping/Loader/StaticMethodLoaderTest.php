@@ -9,39 +9,39 @@ use Symfony\Components\Validator\Mapping\Loader\StaticMethodLoader;
 
 class StaticMethodLoaderTest extends \PHPUnit_Framework_TestCase
 {
-  public function testLoadClassMetadataReturnsTrueIfSuccessful()
-  {
-    $loader = new StaticMethodLoader('loadMetadata');
-    $metadata = new ClassMetadata(__NAMESPACE__.'\StaticLoaderEntity');
+    public function testLoadClassMetadataReturnsTrueIfSuccessful()
+    {
+        $loader = new StaticMethodLoader('loadMetadata');
+        $metadata = new ClassMetadata(__NAMESPACE__.'\StaticLoaderEntity');
 
-    $this->assertTrue($loader->loadClassMetadata($metadata));
-  }
+        $this->assertTrue($loader->loadClassMetadata($metadata));
+    }
 
-  public function testLoadClassMetadataReturnsFalseIfNotSuccessful()
-  {
-    $loader = new StaticMethodLoader('loadMetadata');
-    $metadata = new ClassMetadata('\stdClass');
+    public function testLoadClassMetadataReturnsFalseIfNotSuccessful()
+    {
+        $loader = new StaticMethodLoader('loadMetadata');
+        $metadata = new ClassMetadata('\stdClass');
 
-    $this->assertFalse($loader->loadClassMetadata($metadata));
-  }
+        $this->assertFalse($loader->loadClassMetadata($metadata));
+    }
 
-  public function testLoadClassMetadata()
-  {
-    $loader = new StaticMethodLoader('loadMetadata');
-    $metadata = new ClassMetadata(__NAMESPACE__.'\StaticLoaderEntity');
+    public function testLoadClassMetadata()
+    {
+        $loader = new StaticMethodLoader('loadMetadata');
+        $metadata = new ClassMetadata(__NAMESPACE__.'\StaticLoaderEntity');
 
-    $loader->loadClassMetadata($metadata);
+        $loader->loadClassMetadata($metadata);
 
-    $this->assertEquals(StaticLoaderEntity::$invokedWith, $metadata);
-  }
+        $this->assertEquals(StaticLoaderEntity::$invokedWith, $metadata);
+    }
 }
 
 class StaticLoaderEntity
 {
-  static public $invokedWith = null;
+    static public $invokedWith = null;
 
-  public static function loadMetadata(ClassMetadata $metadata)
-  {
-    self::$invokedWith = $metadata;
-  }
+    public static function loadMetadata(ClassMetadata $metadata)
+    {
+        self::$invokedWith = $metadata;
+    }
 }

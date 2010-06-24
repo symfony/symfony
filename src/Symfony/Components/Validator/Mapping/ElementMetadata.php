@@ -7,78 +7,75 @@ use Symfony\Components\Validator\Constraint;
 
 class ElementMetadata
 {
-  private $constraints = array();
-  private $constraintsByGroup = array();
+    private $constraints = array();
+    private $constraintsByGroup = array();
 
-  /**
-   * Clones this object
-   */
-  public function __clone()
-  {
-    $constraints = $this->constraints;
-
-    $this->constraints = array();
-    $this->constraintsByGroup = array();
-
-    foreach ($constraints as $constraint)
+    /**
+     * Clones this object
+     */
+    public function __clone()
     {
-      $this->addConstraint(clone $constraint);
-    }
-  }
+        $constraints = $this->constraints;
 
-  /**
-   * Adds a constraint to this element
-   *
-   * @param Constraint $constraint
-   */
-  public function addConstraint(Constraint $constraint)
-  {
-    $this->constraints[] = $constraint;
+        $this->constraints = array();
+        $this->constraintsByGroup = array();
 
-    foreach ($constraint->groups as $group)
-    {
-      if (!isset($this->constraintsByGroup[$group]))
-      {
-        $this->constraintsByGroup[$group] = array();
-      }
-
-      $this->constraintsByGroup[$group][] = $constraint;
+        foreach ($constraints as $constraint) {
+            $this->addConstraint(clone $constraint);
+        }
     }
 
-    return $this;
-  }
+    /**
+     * Adds a constraint to this element
+     *
+     * @param Constraint $constraint
+     */
+    public function addConstraint(Constraint $constraint)
+    {
+        $this->constraints[] = $constraint;
 
-  /**
-   * Returns all constraints of this element
-   *
-   * @return array  An array of Constraint instances
-   */
-  public function getConstraints()
-  {
-    return $this->constraints;
-  }
+        foreach ($constraint->groups as $group) {
+            if (!isset($this->constraintsByGroup[$group])) {
+                $this->constraintsByGroup[$group] = array();
+            }
 
-  /**
-   * Returns whether this element has any constraints
-   *
-   * @return boolean
-   */
-  public function hasConstraints()
-  {
-    return count($this->constraints) > 0;
-  }
+            $this->constraintsByGroup[$group][] = $constraint;
+        }
 
-  /**
-   * Returns the constraints of the given group
-   *
-   * @param  string $group  The group name
-   * @return array  An array with all Constraint instances belonging to
-   *                the group
-   */
-  public function findConstraints($group)
-  {
-    return isset($this->constraintsByGroup[$group])
-        ? $this->constraintsByGroup[$group]
-        : array();
-  }
+        return $this;
+    }
+
+    /**
+     * Returns all constraints of this element
+     *
+     * @return array  An array of Constraint instances
+     */
+    public function getConstraints()
+    {
+        return $this->constraints;
+    }
+
+    /**
+     * Returns whether this element has any constraints
+     *
+     * @return boolean
+     */
+    public function hasConstraints()
+    {
+        return count($this->constraints) > 0;
+    }
+
+    /**
+     * Returns the constraints of the given group
+     *
+     * @param  string $group  The group name
+     * @return array  An array with all Constraint instances belonging to
+     *                the group
+     */
+    public function findConstraints($group)
+    {
+        return isset($this->constraintsByGroup[$group])
+                ? $this->constraintsByGroup[$group]
+                : array();
+    }
 }

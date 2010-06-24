@@ -10,301 +10,300 @@ use Symfony\Tests\Components\Form\DateTimeTestCase;
 
 class DateTimeToLocalizedStringTransformerTest extends DateTimeTestCase
 {
-  protected $dateTime;
-  protected $dateTimeWithoutSeconds;
+    protected $dateTime;
+    protected $dateTimeWithoutSeconds;
 
-  public function setUp()
-  {
-    $this->dateTime = new \DateTime('2010-02-03 04:05:06 UTC');
-    $this->dateTimeWithoutSeconds = new \DateTime('2010-02-03 04:05:00 UTC');
-  }
-
-  public static function assertEquals($expected, $actual, $message = '', $delta = 0, $maxDepth = 10, $canonicalize = FALSE, $ignoreCase = FALSE)
-  {
-    if ($expected instanceof \DateTime && $actual instanceof \DateTime)
+    public function setUp()
     {
-      $expected = $expected->format('c');
-      $actual = $actual->format('c');
+        $this->dateTime = new \DateTime('2010-02-03 04:05:06 UTC');
+        $this->dateTimeWithoutSeconds = new \DateTime('2010-02-03 04:05:00 UTC');
     }
 
-    parent::assertEquals($expected, $actual, $message, $delta, $maxDepth, $canonicalize, $ignoreCase);
-  }
+    public static function assertEquals($expected, $actual, $message = '', $delta = 0, $maxDepth = 10, $canonicalize = FALSE, $ignoreCase = FALSE)
+    {
+        if ($expected instanceof \DateTime && $actual instanceof \DateTime) {
+            $expected = $expected->format('c');
+            $actual = $actual->format('c');
+        }
 
-  public function testTransformShortDate()
-  {
-    $transformer = new DateTimeToLocalizedStringTransformer(array(
-      'input_timezone' => 'UTC',
-      'output_timezone' => 'UTC',
-      'date_format' => 'short',
-    ));
-    $transformer->setLocale('de_AT');
-    $this->assertEquals('03.02.10 04:05', $transformer->transform($this->dateTime));
-  }
+        parent::assertEquals($expected, $actual, $message, $delta, $maxDepth, $canonicalize, $ignoreCase);
+    }
 
-  public function testTransformMediumDate()
-  {
-    $transformer = new DateTimeToLocalizedStringTransformer(array(
-      'input_timezone' => 'UTC',
-      'output_timezone' => 'UTC',
-      'date_format' => 'medium',
-    ));
-    $transformer->setLocale('de_AT');
-    $this->assertEquals('03.02.2010 04:05', $transformer->transform($this->dateTime));
-  }
+    public function testTransformShortDate()
+    {
+        $transformer = new DateTimeToLocalizedStringTransformer(array(
+            'input_timezone' => 'UTC',
+            'output_timezone' => 'UTC',
+            'date_format' => 'short',
+        ));
+        $transformer->setLocale('de_AT');
+        $this->assertEquals('03.02.10 04:05', $transformer->transform($this->dateTime));
+    }
 
-  public function testTransformLongDate()
-  {
-    $transformer = new DateTimeToLocalizedStringTransformer(array(
-      'input_timezone' => 'UTC',
-      'output_timezone' => 'UTC',
-      'date_format' => 'long',
-    ));
-    $transformer->setLocale('de_AT');
-    $this->assertEquals('03. Februar 2010 04:05', $transformer->transform($this->dateTime));
-  }
+    public function testTransformMediumDate()
+    {
+        $transformer = new DateTimeToLocalizedStringTransformer(array(
+            'input_timezone' => 'UTC',
+            'output_timezone' => 'UTC',
+            'date_format' => 'medium',
+        ));
+        $transformer->setLocale('de_AT');
+        $this->assertEquals('03.02.2010 04:05', $transformer->transform($this->dateTime));
+    }
 
-  public function testTransformFullDate()
-  {
-    $transformer = new DateTimeToLocalizedStringTransformer(array(
-      'input_timezone' => 'UTC',
-      'output_timezone' => 'UTC',
-      'date_format' => 'full',
-    ));
-    $transformer->setLocale('de_AT');
-    $this->assertEquals('Mittwoch, 03. Februar 2010 04:05', $transformer->transform($this->dateTime));
-  }
+    public function testTransformLongDate()
+    {
+        $transformer = new DateTimeToLocalizedStringTransformer(array(
+            'input_timezone' => 'UTC',
+            'output_timezone' => 'UTC',
+            'date_format' => 'long',
+        ));
+        $transformer->setLocale('de_AT');
+        $this->assertEquals('03. Februar 2010 04:05', $transformer->transform($this->dateTime));
+    }
 
-  public function testTransformShortTime()
-  {
-    $transformer = new DateTimeToLocalizedStringTransformer(array(
-      'input_timezone' => 'UTC',
-      'output_timezone' => 'UTC',
-      'time_format' => 'short',
-    ));
-    $transformer->setLocale('de_AT');
-    $this->assertEquals('03.02.2010 04:05', $transformer->transform($this->dateTime));
-  }
+    public function testTransformFullDate()
+    {
+        $transformer = new DateTimeToLocalizedStringTransformer(array(
+            'input_timezone' => 'UTC',
+            'output_timezone' => 'UTC',
+            'date_format' => 'full',
+        ));
+        $transformer->setLocale('de_AT');
+        $this->assertEquals('Mittwoch, 03. Februar 2010 04:05', $transformer->transform($this->dateTime));
+    }
 
-  public function testTransformMediumTime()
-  {
-    $transformer = new DateTimeToLocalizedStringTransformer(array(
-      'input_timezone' => 'UTC',
-      'output_timezone' => 'UTC',
-      'time_format' => 'medium',
-    ));
-    $transformer->setLocale('de_AT');
-    $this->assertEquals('03.02.2010 04:05:06', $transformer->transform($this->dateTime));
-  }
+    public function testTransformShortTime()
+    {
+        $transformer = new DateTimeToLocalizedStringTransformer(array(
+            'input_timezone' => 'UTC',
+            'output_timezone' => 'UTC',
+            'time_format' => 'short',
+        ));
+        $transformer->setLocale('de_AT');
+        $this->assertEquals('03.02.2010 04:05', $transformer->transform($this->dateTime));
+    }
 
-  public function testTransformLongTime()
-  {
-    $transformer = new DateTimeToLocalizedStringTransformer(array(
-      'input_timezone' => 'UTC',
-      'output_timezone' => 'UTC',
-      'time_format' => 'long',
-    ));
-    $transformer->setLocale('de_AT');
-    $this->assertEquals('03.02.2010 04:05:06 GMT+00:00', $transformer->transform($this->dateTime));
-  }
+    public function testTransformMediumTime()
+    {
+        $transformer = new DateTimeToLocalizedStringTransformer(array(
+            'input_timezone' => 'UTC',
+            'output_timezone' => 'UTC',
+            'time_format' => 'medium',
+        ));
+        $transformer->setLocale('de_AT');
+        $this->assertEquals('03.02.2010 04:05:06', $transformer->transform($this->dateTime));
+    }
 
-  public function testTransformFullTime()
-  {
-    $transformer = new DateTimeToLocalizedStringTransformer(array(
-      'input_timezone' => 'UTC',
-      'output_timezone' => 'UTC',
-      'time_format' => 'full',
-    ));
-    $transformer->setLocale('de_AT');
-    $this->assertEquals('03.02.2010 04:05:06 GMT+00:00', $transformer->transform($this->dateTime));
-  }
+    public function testTransformLongTime()
+    {
+        $transformer = new DateTimeToLocalizedStringTransformer(array(
+            'input_timezone' => 'UTC',
+            'output_timezone' => 'UTC',
+            'time_format' => 'long',
+        ));
+        $transformer->setLocale('de_AT');
+        $this->assertEquals('03.02.2010 04:05:06 GMT+00:00', $transformer->transform($this->dateTime));
+    }
 
-  public function testTransformToDifferentLocale()
-  {
-    $transformer = new DateTimeToLocalizedStringTransformer(array(
-      'input_timezone' => 'UTC',
-      'output_timezone' => 'UTC',
-    ));
-    $transformer->setLocale('en_US');
-    $this->assertEquals('Feb 3, 2010 4:05 AM', $transformer->transform($this->dateTime));
-  }
+    public function testTransformFullTime()
+    {
+        $transformer = new DateTimeToLocalizedStringTransformer(array(
+            'input_timezone' => 'UTC',
+            'output_timezone' => 'UTC',
+            'time_format' => 'full',
+        ));
+        $transformer->setLocale('de_AT');
+        $this->assertEquals('03.02.2010 04:05:06 GMT+00:00', $transformer->transform($this->dateTime));
+    }
 
-  public function testTransform_differentTimezones()
-  {
-    $transformer = new DateTimeToLocalizedStringTransformer(array(
-      'input_timezone' => 'America/New_York',
-      'output_timezone' => 'Asia/Hong_Kong',
-    ));
-    $transformer->setLocale('de_AT');
+    public function testTransformToDifferentLocale()
+    {
+        $transformer = new DateTimeToLocalizedStringTransformer(array(
+            'input_timezone' => 'UTC',
+            'output_timezone' => 'UTC',
+        ));
+        $transformer->setLocale('en_US');
+        $this->assertEquals('Feb 3, 2010 4:05 AM', $transformer->transform($this->dateTime));
+    }
 
-    $input = new \DateTime('2010-02-03 04:05:06 America/New_York');
+    public function testTransform_differentTimezones()
+    {
+        $transformer = new DateTimeToLocalizedStringTransformer(array(
+            'input_timezone' => 'America/New_York',
+            'output_timezone' => 'Asia/Hong_Kong',
+        ));
+        $transformer->setLocale('de_AT');
 
-    $dateTime = clone $input;
-    $dateTime->setTimezone(new \DateTimeZone('Asia/Hong_Kong'));
+        $input = new \DateTime('2010-02-03 04:05:06 America/New_York');
 
-    $this->assertEquals($dateTime->format('d.m.Y H:i'), $transformer->transform($input));
-  }
+        $dateTime = clone $input;
+        $dateTime->setTimezone(new \DateTimeZone('Asia/Hong_Kong'));
 
-  public function testTransformRequiresValidDateTime()
-  {
-    $transformer = new DateTimeToLocalizedStringTransformer();
+        $this->assertEquals($dateTime->format('d.m.Y H:i'), $transformer->transform($input));
+    }
 
-    $this->setExpectedException('\InvalidArgumentException');
+    public function testTransformRequiresValidDateTime()
+    {
+        $transformer = new DateTimeToLocalizedStringTransformer();
 
-    $transformer->transform('2010-01-01');
-  }
+        $this->setExpectedException('\InvalidArgumentException');
 
-  public function testTransformWrapsIntlErrors()
-  {
-    $transformer = new DateTimeToLocalizedStringTransformer();
+        $transformer->transform('2010-01-01');
+    }
 
-    // HOW TO REPRODUCE?
+    public function testTransformWrapsIntlErrors()
+    {
+        $transformer = new DateTimeToLocalizedStringTransformer();
 
-    //$this->setExpectedException('Symfony\Components\Form\ValueTransformer\Transdate_formationFailedException');
+        // HOW TO REPRODUCE?
 
-    //$transformer->transform(1.5);
-  }
+        //$this->setExpectedException('Symfony\Components\Form\ValueTransformer\Transdate_formationFailedException');
 
-  public function testReverseTransformShortDate()
-  {
-    $transformer = new DateTimeToLocalizedStringTransformer(array(
-      'input_timezone' => 'UTC',
-      'output_timezone' => 'UTC',
-      'date_format' => 'short',
-    ));
-    $transformer->setLocale('de_AT');
-    $this->assertDateTimeEquals($this->dateTimeWithoutSeconds, $transformer->reverseTransform('03.02.10 04:05'));
-  }
+        //$transformer->transform(1.5);
+    }
 
-  public function testReverseTransformMediumDate()
-  {
-    $transformer = new DateTimeToLocalizedStringTransformer(array(
-      'input_timezone' => 'UTC',
-      'output_timezone' => 'UTC',
-      'date_format' => 'medium',
-    ));
-    $transformer->setLocale('de_AT');
-    $this->assertDateTimeEquals($this->dateTimeWithoutSeconds, $transformer->reverseTransform('03.02.2010 04:05'));
-  }
+    public function testReverseTransformShortDate()
+    {
+        $transformer = new DateTimeToLocalizedStringTransformer(array(
+            'input_timezone' => 'UTC',
+            'output_timezone' => 'UTC',
+            'date_format' => 'short',
+        ));
+        $transformer->setLocale('de_AT');
+        $this->assertDateTimeEquals($this->dateTimeWithoutSeconds, $transformer->reverseTransform('03.02.10 04:05'));
+    }
 
-  public function testReverseTransformLongDate()
-  {
-    $transformer = new DateTimeToLocalizedStringTransformer(array(
-      'input_timezone' => 'UTC',
-      'output_timezone' => 'UTC',
-      'date_format' => 'long',
-    ));
-    $transformer->setLocale('de_AT');
-    $this->assertDateTimeEquals($this->dateTimeWithoutSeconds, $transformer->reverseTransform('03. Februar 2010 04:05'));
-  }
+    public function testReverseTransformMediumDate()
+    {
+        $transformer = new DateTimeToLocalizedStringTransformer(array(
+            'input_timezone' => 'UTC',
+            'output_timezone' => 'UTC',
+            'date_format' => 'medium',
+        ));
+        $transformer->setLocale('de_AT');
+        $this->assertDateTimeEquals($this->dateTimeWithoutSeconds, $transformer->reverseTransform('03.02.2010 04:05'));
+    }
 
-  public function testReverseTransformFullDate()
-  {
-    $transformer = new DateTimeToLocalizedStringTransformer(array(
-      'input_timezone' => 'UTC',
-      'output_timezone' => 'UTC',
-      'date_format' => 'full',
-    ));
-    $transformer->setLocale('de_AT');
-    $this->assertDateTimeEquals($this->dateTimeWithoutSeconds, $transformer->reverseTransform('Mittwoch, 03. Februar 2010 04:05'));
-  }
+    public function testReverseTransformLongDate()
+    {
+        $transformer = new DateTimeToLocalizedStringTransformer(array(
+            'input_timezone' => 'UTC',
+            'output_timezone' => 'UTC',
+            'date_format' => 'long',
+        ));
+        $transformer->setLocale('de_AT');
+        $this->assertDateTimeEquals($this->dateTimeWithoutSeconds, $transformer->reverseTransform('03. Februar 2010 04:05'));
+    }
 
-  public function testReverseTransformShortTime()
-  {
-    $transformer = new DateTimeToLocalizedStringTransformer(array(
-      'input_timezone' => 'UTC',
-      'output_timezone' => 'UTC',
-      'time_format' => 'short',
-    ));
-    $transformer->setLocale('de_AT');
-    $this->assertDateTimeEquals($this->dateTimeWithoutSeconds, $transformer->reverseTransform('03.02.2010 04:05'));
-  }
+    public function testReverseTransformFullDate()
+    {
+        $transformer = new DateTimeToLocalizedStringTransformer(array(
+            'input_timezone' => 'UTC',
+            'output_timezone' => 'UTC',
+            'date_format' => 'full',
+        ));
+        $transformer->setLocale('de_AT');
+        $this->assertDateTimeEquals($this->dateTimeWithoutSeconds, $transformer->reverseTransform('Mittwoch, 03. Februar 2010 04:05'));
+    }
 
-  public function testReverseTransformMediumTime()
-  {
-    $transformer = new DateTimeToLocalizedStringTransformer(array(
-      'input_timezone' => 'UTC',
-      'output_timezone' => 'UTC',
-      'time_format' => 'medium',
-    ));
-    $transformer->setLocale('de_AT');
-    $this->assertDateTimeEquals($this->dateTime, $transformer->reverseTransform('03.02.2010 04:05:06'));
-  }
+    public function testReverseTransformShortTime()
+    {
+        $transformer = new DateTimeToLocalizedStringTransformer(array(
+            'input_timezone' => 'UTC',
+            'output_timezone' => 'UTC',
+            'time_format' => 'short',
+        ));
+        $transformer->setLocale('de_AT');
+        $this->assertDateTimeEquals($this->dateTimeWithoutSeconds, $transformer->reverseTransform('03.02.2010 04:05'));
+    }
 
-  public function testReverseTransformLongTime()
-  {
-    $transformer = new DateTimeToLocalizedStringTransformer(array(
-      'input_timezone' => 'UTC',
-      'output_timezone' => 'UTC',
-      'time_format' => 'long',
-    ));
-    $transformer->setLocale('de_AT');
-    $this->assertDateTimeEquals($this->dateTime, $transformer->reverseTransform('03.02.2010 04:05:06 GMT+00:00'));
-  }
+    public function testReverseTransformMediumTime()
+    {
+        $transformer = new DateTimeToLocalizedStringTransformer(array(
+            'input_timezone' => 'UTC',
+            'output_timezone' => 'UTC',
+            'time_format' => 'medium',
+        ));
+        $transformer->setLocale('de_AT');
+        $this->assertDateTimeEquals($this->dateTime, $transformer->reverseTransform('03.02.2010 04:05:06'));
+    }
 
-  public function testReverseTransformFullTime()
-  {
-    $transformer = new DateTimeToLocalizedStringTransformer(array(
-      'input_timezone' => 'UTC',
-      'output_timezone' => 'UTC',
-      'time_format' => 'full',
-    ));
-    $transformer->setLocale('de_AT');
-    $this->assertDateTimeEquals($this->dateTime, $transformer->reverseTransform('03.02.2010 04:05:06 GMT+00:00'));
-  }
+    public function testReverseTransformLongTime()
+    {
+        $transformer = new DateTimeToLocalizedStringTransformer(array(
+            'input_timezone' => 'UTC',
+            'output_timezone' => 'UTC',
+            'time_format' => 'long',
+        ));
+        $transformer->setLocale('de_AT');
+        $this->assertDateTimeEquals($this->dateTime, $transformer->reverseTransform('03.02.2010 04:05:06 GMT+00:00'));
+    }
 
-  public function testReverseTransformFromDifferentLocale()
-  {
-    $transformer = new DateTimeToLocalizedStringTransformer(array(
-      'input_timezone' => 'UTC',
-      'output_timezone' => 'UTC',
-    ));
-    $transformer->setLocale('en_US');
-    $this->assertDateTimeEquals($this->dateTimeWithoutSeconds, $transformer->reverseTransform('Feb 3, 2010 04:05 AM'));
-  }
+    public function testReverseTransformFullTime()
+    {
+        $transformer = new DateTimeToLocalizedStringTransformer(array(
+            'input_timezone' => 'UTC',
+            'output_timezone' => 'UTC',
+            'time_format' => 'full',
+        ));
+        $transformer->setLocale('de_AT');
+        $this->assertDateTimeEquals($this->dateTime, $transformer->reverseTransform('03.02.2010 04:05:06 GMT+00:00'));
+    }
 
-  public function testReverseTransform_differentTimezones()
-  {
-    $transformer = new DateTimeToLocalizedStringTransformer(array(
-      'input_timezone' => 'America/New_York',
-      'output_timezone' => 'Asia/Hong_Kong',
-    ));
-    $transformer->setLocale('de_AT');
+    public function testReverseTransformFromDifferentLocale()
+    {
+        $transformer = new DateTimeToLocalizedStringTransformer(array(
+            'input_timezone' => 'UTC',
+            'output_timezone' => 'UTC',
+        ));
+        $transformer->setLocale('en_US');
+        $this->assertDateTimeEquals($this->dateTimeWithoutSeconds, $transformer->reverseTransform('Feb 3, 2010 04:05 AM'));
+    }
 
-    $dateTime = new \DateTime('2010-02-03 04:05:00 Asia/Hong_Kong');
-    $dateTime->setTimezone(new \DateTimeZone('America/New_York'));
+    public function testReverseTransform_differentTimezones()
+    {
+        $transformer = new DateTimeToLocalizedStringTransformer(array(
+            'input_timezone' => 'America/New_York',
+            'output_timezone' => 'Asia/Hong_Kong',
+        ));
+        $transformer->setLocale('de_AT');
 
-    $this->assertDateTimeEquals($dateTime, $transformer->reverseTransform('03.02.2010 04:05'));
-  }
+        $dateTime = new \DateTime('2010-02-03 04:05:00 Asia/Hong_Kong');
+        $dateTime->setTimezone(new \DateTimeZone('America/New_York'));
 
-  public function testReverseTransformRequiresString()
-  {
-    $transformer = new DateTimeToLocalizedStringTransformer();
+        $this->assertDateTimeEquals($dateTime, $transformer->reverseTransform('03.02.2010 04:05'));
+    }
 
-    $this->setExpectedException('\InvalidArgumentException');
+    public function testReverseTransformRequiresString()
+    {
+        $transformer = new DateTimeToLocalizedStringTransformer();
 
-    $transformer->reverseTransform(12345);
-  }
+        $this->setExpectedException('\InvalidArgumentException');
 
-  public function testReverseTransformWrapsIntlErrors()
-  {
-    $transformer = new DateTimeToLocalizedStringTransformer();
+        $transformer->reverseTransform(12345);
+    }
 
-    $this->setExpectedException('Symfony\Components\Form\ValueTransformer\TransformationFailedException');
+    public function testReverseTransformWrapsIntlErrors()
+    {
+        $transformer = new DateTimeToLocalizedStringTransformer();
 
-    $transformer->reverseTransform('12345');
-  }
+        $this->setExpectedException('Symfony\Components\Form\ValueTransformer\TransformationFailedException');
 
-  public function testValidateDateFormatOption()
-  {
-    $this->setExpectedException('\InvalidArgumentException');
+        $transformer->reverseTransform('12345');
+    }
 
-    new DateTimeToLocalizedStringTransformer(array('date_format' => 'foobar'));
-  }
+    public function testValidateDateFormatOption()
+    {
+        $this->setExpectedException('\InvalidArgumentException');
 
-  public function testValidateTimeFormatOption()
-  {
-    $this->setExpectedException('\InvalidArgumentException');
+        new DateTimeToLocalizedStringTransformer(array('date_format' => 'foobar'));
+    }
 
-    new DateTimeToLocalizedStringTransformer(array('time_format' => 'foobar'));
-  }
+    public function testValidateTimeFormatOption()
+    {
+        $this->setExpectedException('\InvalidArgumentException');
+
+        new DateTimeToLocalizedStringTransformer(array('time_format' => 'foobar'));
+    }
 }

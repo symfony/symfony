@@ -19,124 +19,119 @@ use Symfony\Components\Form\Exception\InvalidOptionsException;
  */
 abstract class Configurable
 {
-  /**
-   * The options and their values
-   * @var array
-   */
-  private $options = array();
+    /**
+     * The options and their values
+     * @var array
+     */
+    private $options = array();
 
-  /**
-   * The names of the valid options
-   * @var array
-   */
-  private $knownOptions = array();
+    /**
+     * The names of the valid options
+     * @var array
+     */
+    private $knownOptions = array();
 
-  /**
-   * The names of the required options
-   * @var array
-   */
-  private $requiredOptions = array();
+    /**
+     * The names of the required options
+     * @var array
+     */
+    private $requiredOptions = array();
 
-  /**
-   * The allowed values for each option
-   * @var array
-   */
-  private $allowedValues = array();
+    /**
+     * The allowed values for each option
+     * @var array
+     */
+    private $allowedValues = array();
 
-  /**
-   * Reads, validates and stores the given options
-   *
-   * @param array $options
-   */
-  public function __construct(array $options = array())
-  {
-    $this->options = array_merge($this->options, $options);
-
-    $this->configure();
-
-    // check option names
-    if ($diff = array_diff_key($this->options, $this->knownOptions))
+    /**
+     * Reads, validates and stores the given options
+     *
+     * @param array $options
+     */
+    public function __construct(array $options = array())
     {
-      throw new InvalidOptionsException(sprintf('%s does not support the following options: "%s".', get_class($this), implode('", "', array_keys($diff))), array_keys($diff));
+        $this->options = array_merge($this->options, $options);
+
+        $this->configure();
+
+        // check option names
+        if ($diff = array_diff_key($this->options, $this->knownOptions)) {
+            throw new InvalidOptionsException(sprintf('%s does not support the following options: "%s".', get_class($this), implode('", "', array_keys($diff))), array_keys($diff));
+        }
+
+        // check required options
+        if ($diff = array_diff_key($this->requiredOptions, $this->options)) {
+            throw new MissingOptionsException(sprintf('%s requires the following options: \'%s\'.', get_class($this), implode('", "', array_keys($diff))), array_keys($diff));
+        }
     }
 
-    // check required options
-    if ($diff = array_diff_key($this->requiredOptions, $this->options))
+    /**
+     * Configures the valid options
+     *
+     * This method should call addOption() or addRequiredOption() for every
+     * accepted option.
+     */
+    protected function configure()
     {
-      throw new MissingOptionsException(sprintf('%s requires the following options: \'%s\'.', get_class($this), implode('", "', array_keys($diff))), array_keys($diff));
-    }
-  }
-
-  /**
-   * Configures the valid options
-   *
-   * This method should call addOption() or addRequiredOption() for every
-   * accepted option.
-   */
-  protected function configure()
-  {
-  }
-
-  /**
-   * Returns an option value.
-   *
-   * @param  string $name  The option name
-   *
-   * @return mixed  The option value
-   */
-  public function getOption($name)
-  {
-    return array_key_exists($name, $this->options) ? $this->options[$name] : null;
-  }
-
-  /**
-   * Adds a new option value with a default value.
-   *
-   * @param string $name   The option name
-   * @param mixed  $value  The default value
-   */
-  protected function addOption($name, $value = null, array $allowedValues = array())
-  {
-    $this->knownOptions[$name] = true;
-
-    if (!array_key_exists($name, $this->options))
-    {
-      $this->options[$name] = $value;
     }
 
-    if (count($allowedValues) > 0 && !in_array($this->options[$name], $allowedValues))
+    /**
+     * Returns an option value.
+     *
+     * @param  string $name  The option name
+     *
+     * @return mixed  The option value
+     */
+    public function getOption($name)
     {
-      throw new InvalidOptionsException(sprintf('The option "%s" is expected to be one of "%s", but is "%s"', $name, implode('", "', $allowedValues), $this->options[$name]), array($name));
+        return array_key_exists($name, $this->options) ? $this->options[$name] : null;
     }
-  }
 
-  /**
-   * Adds a required option.
-   *
-   * @param string $name  The option name
-   */
-  protected function addRequiredOption($name, array $allowedValues = array())
-  {
-    $this->knownOptions[$name] = true;
-    $this->requiredOptions[$name] = true;
-
-    // only test if the option is set, otherwise an error will be thrown
-    // anyway
-    if (isset($this->options[$name]) && count($allowedValues) > 0 && !in_array($this->options[$name], $allowedValues))
+    /**
+     * Adds a new option value with a default value.
+     *
+     * @param string $name   The option name
+     * @param mixed  $value  The default value
+     */
+    protected function addOption($name, $value = null, array $allowedValues = array())
     {
-      throw new InvalidOptionsException(sprintf('The option "%s" is expected to be one of "%s", but is "%s"', $name, implode('", "', $allowedValues), $this->options[$name]), array($name));
-    }
-  }
+        $this->knownOptions[$name] = true;
 
-  /**
-   * Returns true if the option exists.
-   *
-   * @param  string $name  The option name
-   *
-   * @return bool true if the option is set, false otherwise
-   */
-  public function hasOption($name)
-  {
-    return isset($this->options[$name]);
-  }
+        if (!array_key_exists($name, $this->options)) {
+            $this->options[$name] = $value;
+        }
+
+        if (count($allowedValues) > 0 && !in_array($this->options[$name], $allowedValues)) {
+            throw new InvalidOptionsException(sprintf('The option "%s" is expected to be one of "%s", but is "%s"', $name, implode('", "', $allowedValues), $this->options[$name]), array($name));
+        }
+    }
+
+    /**
+     * Adds a required option.
+     *
+     * @param string $name  The option name
+     */
+    protected function addRequiredOption($name, array $allowedValues = array())
+    {
+        $this->knownOptions[$name] = true;
+        $this->requiredOptions[$name] = true;
+
+        // only test if the option is set, otherwise an error will be thrown
+        // anyway
+        if (isset($this->options[$name]) && count($allowedValues) > 0 && !in_array($this->options[$name], $allowedValues)) {
+            throw new InvalidOptionsException(sprintf('The option "%s" is expected to be one of "%s", but is "%s"', $name, implode('", "', $allowedValues), $this->options[$name]), array($name));
+        }
+    }
+
+    /**
+     * Returns true if the option exists.
+     *
+     * @param  string $name  The option name
+     *
+     * @return bool true if the option is set, false otherwise
+     */
+    public function hasOption($name)
+    {
+        return isset($this->options[$name]);
+    }
 }

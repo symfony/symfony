@@ -11,32 +11,32 @@ use Symfony\Components\Form\Configurable;
  */
 abstract class BaseValueTransformer extends Configurable implements ValueTransformerInterface
 {
-  /**
-   * The locale of this transformer as accepted by the class Locale
-   * @var string
-   */
-  protected $locale;
+    /**
+     * The locale of this transformer as accepted by the class Locale
+     * @var string
+     */
+    protected $locale;
 
-  /**
-   * Constructor.
-   *
-   * @param array $options     An array of options
-   *
-   * @throws \InvalidArgumentException when a option is not supported
-   * @throws \RuntimeException         when a required option is not given
-   */
-  public function __construct(array $options = array())
-  {
-    $this->locale = \Locale::getDefault();
+    /**
+     * Constructor.
+     *
+     * @param array $options     An array of options
+     *
+     * @throws \InvalidArgumentException when a option is not supported
+     * @throws \RuntimeException         when a required option is not given
+     */
+    public function __construct(array $options = array())
+    {
+        $this->locale = \Locale::getDefault();
 
-    parent::__construct($options);
-  }
+        parent::__construct($options);
+    }
 
-  /**
-   * {@inheritDoc}
-   */
-  public function setLocale($locale)
-  {
-    $this->locale = $locale;
-  }
+    /**
+     * {@inheritDoc}
+     */
+    public function setLocale($locale)
+    {
+        $this->locale = $locale;
+    }
 }

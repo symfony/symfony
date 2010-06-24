@@ -8,13 +8,13 @@ use Symfony\Components\Form\IntegerField;
 
 class IntegerFieldTest extends \PHPUnit_Framework_TestCase
 {
-  public function testBindCastsToInteger()
-  {
-    $field = new IntegerField('name');
+    public function testBindCastsToInteger()
+    {
+        $field = new IntegerField('name');
 
-    $field->bind('1.678');
+        $field->bind('1.678');
 
-    $this->assertSame(1, $field->getData());
-    $this->assertSame('1', $field->getDisplayedData());
-  }
+        $this->assertSame(1, $field->getData());
+        $this->assertSame('1', $field->getDisplayedData());
+    }
 }

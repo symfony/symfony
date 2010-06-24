@@ -7,14 +7,13 @@ use Symfony\Components\Validator\ConstraintValidator;
 
 class ConstraintAValidator extends ConstraintValidator
 {
-  public function isValid($value, Constraint $constraint)
-  {
-    if ($value != 'VALID')
+    public function isValid($value, Constraint $constraint)
     {
-      $this->setMessage('message', array('param' => 'value'));
-      return false;
-    }
+        if ($value != 'VALID') {
+            $this->setMessage('message', array('param' => 'value'));
+            return false;
+        }
 
-    return true;
-  }
+        return true;
+    }
 }

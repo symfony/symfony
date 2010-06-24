@@ -20,36 +20,34 @@ use Symfony\Components\Form\Field\ChoiceField;
  */
 class TableRenderer extends Renderer
 {
-  /**
-   * {@inheritDoc}
-   */
-  public function render(FieldInterface $group, array $attributes = array())
-  {
-    $html = "<table>\n";
-
-    foreach ($group as $field)
+    /**
+     * {@inheritDoc}
+     */
+    public function render(FieldInterface $group, array $attributes = array())
     {
-      $label = self::humanize($field->getKey());
+        $html = "<table>\n";
 
-      $html .= "<tr>\n";
-      $html .= "<td><label for=\"{$field->getId()}\">$label</label></td>\n";
-      $html .= "<td>\n";
-      if ($field->hasErrors())
-      {
-        $html .= $field->renderErrors()."\n";
-      }
-      $html .= $field->render()."\n";
-      $html .= "</td>";
-      $html .= "</tr>\n";
+        foreach ($group as $field) {
+            $label = self::humanize($field->getKey());
+
+            $html .= "<tr>\n";
+            $html .= "<td><label for=\"{$field->getId()}\">$label</label></td>\n";
+            $html .= "<td>\n";
+            if ($field->hasErrors()) {
+                $html .= $field->renderErrors()."\n";
+            }
+            $html .= $field->render()."\n";
+            $html .= "</td>";
+            $html .= "</tr>\n";
+        }
+
+        $html .= "</table>\n";
+
+        return $html;
     }
 
-    $html .= "</table>\n";
-
-    return $html;
-  }
-
-  protected static function humanize($text)
-  {
-    return ucfirst(strtolower(str_replace('_', ' ', $text)));
-  }
+    protected static function humanize($text)
+    {
+        return ucfirst(strtolower(str_replace('_', ' ', $text)));
+    }
 }

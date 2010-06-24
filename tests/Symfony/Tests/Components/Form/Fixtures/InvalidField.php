@@ -6,12 +6,12 @@ use Symfony\Components\Form\Field;
 
 class InvalidField extends Field
 {
-  public function isValid()
-  {
-    return false;
-  }
+    public function isValid()
+    {
+        return false;
+    }
 
-  public function render(array $attributes = array())
-  {
-  }
+    public function render(array $attributes = array())
+    {
+    }
 }

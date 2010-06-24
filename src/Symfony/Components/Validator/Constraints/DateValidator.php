@@ -8,29 +8,26 @@ use Symfony\Components\Validator\Exception\UnexpectedTypeException;
 
 class DateValidator extends ConstraintValidator
 {
-  const PATTERN = '/^(\d{4})-(\d{2})-(\d{2})$/';
+    const PATTERN = '/^(\d{4})-(\d{2})-(\d{2})$/';
 
-  public function isValid($value, Constraint $constraint)
-  {
-    if ($value === null)
+    public function isValid($value, Constraint $constraint)
     {
-      return true;
+        if ($value === null) {
+            return true;
+        }
+
+        if (!is_scalar($value) && !(is_object($value) && method_exists($value, '__toString()'))) {
+            throw new UnexpectedTypeException($value, 'string');
+        }
+
+        $value = (string)$value;
+
+        if (!preg_match(self::PATTERN, $value, $matches)) {
+            $this->setMessage($constraint->message, array('value' => $value));
+
+            return false;
+        }
+
+        return checkdate($matches[2], $matches[3], $matches[1]);
     }
-
-    if (!is_scalar($value) && !(is_object($value) && method_exists($value, '__toString()')))
-    {
-      throw new UnexpectedTypeException($value, 'string');
-    }
-
-    $value = (string)$value;
-
-    if (!preg_match(self::PATTERN, $value, $matches))
-    {
-      $this->setMessage($constraint->message, array('value' => $value));
-
-      return false;
-    }
-
-    return checkdate($matches[2], $matches[3], $matches[1]);
-  }
 }

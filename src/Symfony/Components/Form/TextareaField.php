@@ -19,18 +19,18 @@ use Symfony\Components\Form\Renderer\TextareaRenderer;
  */
 class TextareaField extends Field
 {
-  /**
-   * {@inheritDoc}
-   */
-  public function render(array $attributes = array())
-  {
-    $content = $this->generator->escape($this->getDisplayedData());
+    /**
+     * {@inheritDoc}
+     */
+    public function render(array $attributes = array())
+    {
+        $content = $this->generator->escape($this->getDisplayedData());
 
-    return $this->generator->contentTag('textarea', $content, array_merge(array(
-      'id'    => $this->getId(),
-      'name'  => $this->getName(),
-      'rows'  => 30,
-      'cols'  => 4,
-    ), $attributes));
-  }
+        return $this->generator->contentTag('textarea', $content, array_merge(array(
+            'id'    => $this->getId(),
+            'name'  => $this->getName(),
+            'rows'  => 30,
+            'cols'  => 4,
+        ), $attributes));
+    }
 }

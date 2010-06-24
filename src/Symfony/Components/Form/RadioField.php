@@ -20,14 +20,14 @@ use Symfony\Components\Form\ValueTransformer\BooleanToStringTransformer;
  */
 class RadioField extends ToggleField
 {
-  /**
-   * {@inheritDoc}
-   */
-  public function render(array $attributes = array())
-  {
-    return parent::render(array_merge(array(
-      'type' => 'radio',
-      'name' => $this->getParent() ? $this->getParent()->getName() : $this->getName(),
-    ), $attributes));
-  }
+    /**
+     * {@inheritDoc}
+     */
+    public function render(array $attributes = array())
+    {
+        return parent::render(array_merge(array(
+            'type' => 'radio',
+            'name' => $this->getParent() ? $this->getParent()->getName() : $this->getName(),
+        ), $attributes));
+    }
 }

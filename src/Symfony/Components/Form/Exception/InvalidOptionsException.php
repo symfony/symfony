@@ -4,17 +4,17 @@ namespace Symfony\Components\Form\Exception;
 
 class InvalidOptionsException extends FormException
 {
-  private $options;
+    private $options;
 
-  public function __construct($message, array $options)
-  {
-    parent::__construct($message);
+    public function __construct($message, array $options)
+    {
+        parent::__construct($message);
 
-    $this->options = $options;
-  }
+        $this->options = $options;
+    }
 
-  public function getOptions()
-  {
-    return $this->options;
-  }
+    public function getOptions()
+    {
+        return $this->options;
+    }
 }

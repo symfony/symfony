@@ -6,11 +6,11 @@ use Symfony\Components\Validator\Constraint;
 
 class ConstraintA extends Constraint
 {
-  public $property1;
-  public $property2;
+    public $property1;
+    public $property2;
 
-  public function defaultOption()
-  {
-    return 'property2';
-  }
+    public function defaultOption()
+    {
+        return 'property2';
+    }
 }

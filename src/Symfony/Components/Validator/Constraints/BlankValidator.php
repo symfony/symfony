@@ -7,15 +7,14 @@ use Symfony\Components\Validator\ConstraintValidator;
 
 class BlankValidator extends ConstraintValidator
 {
-  public function isValid($value, Constraint $constraint)
-  {
-    if ($value !== '' && $value !== null)
+    public function isValid($value, Constraint $constraint)
     {
-      $this->setMessage($constraint->message, array('value' => $value));
+        if ($value !== '' && $value !== null) {
+            $this->setMessage($constraint->message, array('value' => $value));
 
-      return false;
+            return false;
+        }
+
+        return true;
     }
-
-    return true;
-  }
 }

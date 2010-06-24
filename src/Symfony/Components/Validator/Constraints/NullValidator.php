@@ -7,15 +7,14 @@ use Symfony\Components\Validator\ConstraintValidator;
 
 class NullValidator extends ConstraintValidator
 {
-  public function isValid($value, Constraint $constraint)
-  {
-    if (!is_null($value))
+    public function isValid($value, Constraint $constraint)
     {
-      $this->setMessage($constraint->message, array('value' => $value));
+        if (!is_null($value)) {
+            $this->setMessage($constraint->message, array('value' => $value));
 
-      return false;
+            return false;
+        }
+
+        return true;
     }
-
-    return true;
-  }
 }

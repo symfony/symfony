@@ -21,83 +21,75 @@ use Symfony\Components\Form\Exception\UnexpectedTypeException;
  */
 class CollectionField extends FieldGroup
 {
-  /**
-   * The prototype for the inner fields
-   * @var FieldInterface
-   */
-  protected $prototype;
+    /**
+     * The prototype for the inner fields
+     * @var FieldInterface
+     */
+    protected $prototype;
 
-  /**
-   * Repeats the given field twice to verify the user's input
-   *
-   * @param FieldInterface $innerField
-   */
-  public function __construct(FieldInterface $innerField, array $options = array())
-  {
-    $this->prototype = $innerField;
-
-    parent::__construct($innerField->getKey(), $options);
-  }
-
-  protected function configure()
-  {
-    $this->addOption('modifiable', false);
-
-    if ($this->getOption('modifiable'))
+    /**
+     * Repeats the given field twice to verify the user's input
+     *
+     * @param FieldInterface $innerField
+     */
+    public function __construct(FieldInterface $innerField, array $options = array())
     {
-      $field = $this->newField('$$key$$', null);
-      // TESTME
-      $field->setRequired(false);
-      $this->add($field);
-    }
-  }
+        $this->prototype = $innerField;
 
-  public function setData($collection)
-  {
-    if (!is_array($collection) && !$collection instanceof Traversable)
-    {
-      throw new UnexpectedTypeException('The data must be an array');
+        parent::__construct($innerField->getKey(), $options);
     }
 
-    foreach ($collection as $name => $value)
+    protected function configure()
     {
-      $this->add($this->newField($name, $name));
+        $this->addOption('modifiable', false);
+
+        if ($this->getOption('modifiable')) {
+            $field = $this->newField('$$key$$', null);
+            // TESTME
+            $field->setRequired(false);
+            $this->add($field);
+        }
     }
 
-    parent::setData($collection);
-  }
-
-  public function bind($taintedData)
-  {
-    if (is_null($taintedData))
+    public function setData($collection)
     {
-      $taintedData = array();
+        if (!is_array($collection) && !$collection instanceof Traversable) {
+            throw new UnexpectedTypeException('The data must be an array');
+        }
+
+        foreach ($collection as $name => $value) {
+            $this->add($this->newField($name, $name));
+        }
+
+        parent::setData($collection);
     }
 
-    foreach ($this as $name => $field)
+    public function bind($taintedData)
     {
-      if (!isset($taintedData[$name]) && $this->getOption('modifiable') && $name != '$$key$$')
-      {
-        $this->remove($name);
-      }
+        if (is_null($taintedData)) {
+            $taintedData = array();
+        }
+
+        foreach ($this as $name => $field) {
+            if (!isset($taintedData[$name]) && $this->getOption('modifiable') && $name != '$$key$$') {
+                $this->remove($name);
+            }
+        }
+
+        foreach ($taintedData as $name => $value) {
+            if (!isset($this[$name]) && $this->getOption('modifiable')) {
+                $this->add($this->newField($name, $name));
+            }
+        }
+
+        return parent::bind($taintedData);
     }
 
-    foreach ($taintedData as $name => $value)
+    protected function newField($key, $propertyPath)
     {
-      if (!isset($this[$name]) && $this->getOption('modifiable'))
-      {
-      $this->add($this->newField($name, $name));
-      }
+        $field = clone $this->prototype;
+        $field->setKey($key);
+        $field->setPropertyPath($propertyPath === null ? null : '['.$propertyPath.']');
+        return $field;
     }
-
-    return parent::bind($taintedData);
-  }
-
-  protected function newField($key, $propertyPath)
-  {
-    $field = clone $this->prototype;
-    $field->setKey($key);
-    $field->setPropertyPath($propertyPath === null ? null : '['.$propertyPath.']');
-    return $field;
-  }
 }

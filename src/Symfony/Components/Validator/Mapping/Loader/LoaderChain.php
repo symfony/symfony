@@ -17,40 +17,37 @@ use Symfony\Components\Validator\Mapping\ClassMetadata;
  */
 class LoaderChain implements LoaderInterface
 {
-  protected $loaders;
+    protected $loaders;
 
-  /**
-   * Acccepts a list of LoaderInterface instances
-   *
-   * @param  array $loaders    An array of LoaderInterface instances
-   * @throws MappingException  If any of the loaders does not implement
-   *                           LoaderInterface
-   */
-  public function __construct(array $loaders)
-  {
-    foreach ($loaders as $loader)
+    /**
+     * Acccepts a list of LoaderInterface instances
+     *
+     * @param  array $loaders    An array of LoaderInterface instances
+     * @throws MappingException  If any of the loaders does not implement
+     *                           LoaderInterface
+     */
+    public function __construct(array $loaders)
     {
-      if (!$loader instanceof LoaderInterface)
-      {
-        throw new MappingException(sprintf('Class %s is expected to implement LoaderInterface', get_class($loader)));
-      }
+        foreach ($loaders as $loader) {
+            if (!$loader instanceof LoaderInterface) {
+                throw new MappingException(sprintf('Class %s is expected to implement LoaderInterface', get_class($loader)));
+            }
+        }
+
+        $this->loaders = $loaders;
     }
 
-    $this->loaders = $loaders;
-  }
-
-  /**
-   * {@inheritDoc}
-   */
-  public function loadClassMetadata(ClassMetadata $metadata)
-  {
-    $success = false;
-
-    foreach ($this->loaders as $loader)
+    /**
+     * {@inheritDoc}
+     */
+    public function loadClassMetadata(ClassMetadata $metadata)
     {
-      $success = $loader->loadClassMetadata($metadata) || $success;
-    }
+        $success = false;
 
-    return $success;
-  }
+        foreach ($this->loaders as $loader) {
+            $success = $loader->loadClassMetadata($metadata) || $success;
+        }
+
+        return $success;
+    }
 }

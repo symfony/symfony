@@ -20,34 +20,34 @@ require_once __DIR__.'/EntityInterface.php';
  */
 class Entity extends EntityParent implements EntityInterface
 {
-  /**
-   * @Validation({
-   *   @Choice(choices={"A", "B"}, message="Must be one of %choices%")
-   * })
-   */
-  protected $firstName;
+    /**
+     * @Validation({
+     *   @Choice(choices={"A", "B"}, message="Must be one of %choices%")
+     * })
+     */
+    protected $firstName;
 
-  protected $lastName;
+    protected $lastName;
 
-  private $internal;
+    private $internal;
 
-  public function __construct($internal = null)
-  {
-    $this->internal = $internal;
-  }
+    public function __construct($internal = null)
+    {
+        $this->internal = $internal;
+    }
 
-  public function getInternal()
-  {
-    return $this->internal . ' from getter';
-  }
+    public function getInternal()
+    {
+        return $this->internal . ' from getter';
+    }
 
-  /**
-   * @Validation({
-   *   @NotNull
-   * })
-   */
-  public function getLastName()
-  {
-    return $this->lastName;
-  }
+    /**
+     * @Validation({
+     *   @NotNull
+     * })
+     */
+    public function getLastName()
+    {
+        return $this->lastName;
+    }
 }

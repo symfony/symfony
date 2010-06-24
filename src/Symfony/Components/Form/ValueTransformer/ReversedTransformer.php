@@ -12,43 +12,43 @@ namespace Symfony\Components\Form\ValueTransformer;
  */
 class ReversedTransformer implements ValueTransformerInterface
 {
-  /**
-   * The reversed transformer
-   * @var ValueTransformerInterface
-   */
-  protected $reversedTransformer;
+    /**
+     * The reversed transformer
+     * @var ValueTransformerInterface
+     */
+    protected $reversedTransformer;
 
-  /**
-   * Reverses this transformer
-   *
-   * @param ValueTransformerInterface $innerTransformer
-   */
-  public function __construct(ValueTransformerInterface $reversedTransformer)
-  {
-    $this->reversedTransformer = $reversedTransformer;
-  }
+    /**
+     * Reverses this transformer
+     *
+     * @param ValueTransformerInterface $innerTransformer
+     */
+    public function __construct(ValueTransformerInterface $reversedTransformer)
+    {
+        $this->reversedTransformer = $reversedTransformer;
+    }
 
-  /**
-   * {@inheritDoc}
-   */
-  public function transform($value)
-  {
-    return $this->reversedTransformer->reverseTransform($value);
-  }
+    /**
+     * {@inheritDoc}
+     */
+    public function transform($value)
+    {
+        return $this->reversedTransformer->reverseTransform($value);
+    }
 
-  /**
-   * {@inheritDoc}
-   */
-  public function reverseTransform($value)
-  {
-    return $this->reversedTransformer->transform($value);
-  }
+    /**
+     * {@inheritDoc}
+     */
+    public function reverseTransform($value)
+    {
+        return $this->reversedTransformer->transform($value);
+    }
 
-  /**
-   * {@inheritDoc}
-   */
-  public function setLocale($locale)
-  {
-    $this->reversedTransformer->setLocale($locale);
-  }
+    /**
+     * {@inheritDoc}
+     */
+    public function setLocale($locale)
+    {
+        $this->reversedTransformer->setLocale($locale);
+    }
 }

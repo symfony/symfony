@@ -6,13 +6,13 @@ use Symfony\Components\Form\Field;
 
 class RequiredOptionsField extends Field
 {
-  protected function configure()
-  {
-    $this->addOption('foo');
-    $this->addRequiredOption('bar');
-  }
+    protected function configure()
+    {
+        $this->addOption('foo');
+        $this->addRequiredOption('bar');
+    }
 
-  public function render(array $attributes = array())
-  {
-  }
+    public function render(array $attributes = array())
+    {
+    }
 }

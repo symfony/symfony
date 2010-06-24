@@ -7,23 +7,23 @@ use Symfony\Components\Validator\Mapping\Loader\LoaderInterface;
 
 abstract class FilesLoader extends BaseFilesLoader
 {
-  protected $timesCalled = 0;
-  protected $loader;
+    protected $timesCalled = 0;
+    protected $loader;
 
-  public function __construct(array $paths, LoaderInterface $loader)
-  {
-    $this->loader = $loader;
-    parent::__construct($paths);
-  }
+    public function __construct(array $paths, LoaderInterface $loader)
+    {
+        $this->loader = $loader;
+        parent::__construct($paths);
+    }
 
-  protected function getFileLoaderInstance($file)
-  {
-    $this->timesCalled++;
-    return $this->loader;
-  }
+    protected function getFileLoaderInstance($file)
+    {
+        $this->timesCalled++;
+        return $this->loader;
+    }
 
-  public function getTimesCalled()
-  {
-    return $this->timesCalled;
-  }
+    public function getTimesCalled()
+    {
+        return $this->timesCalled;
+    }
 }

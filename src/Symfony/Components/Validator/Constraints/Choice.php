@@ -12,20 +12,20 @@ namespace Symfony\Components\Validator\Constraints;
 
 class Choice extends \Symfony\Components\Validator\Constraint
 {
-  public $choices;
-  public $callback;
-  public $multiple = false;
-  public $min = null;
-  public $max = null;
-  public $message = 'Symfony.Validator.Choice.message';
-  public $minMessage = 'Symfony.Validator.Choice.minMessage';
-  public $maxMessage = 'Symfony.Validator.Choice.maxMessage';
+    public $choices;
+    public $callback;
+    public $multiple = false;
+    public $min = null;
+    public $max = null;
+    public $message = 'Symfony.Validator.Choice.message';
+    public $minMessage = 'Symfony.Validator.Choice.minMessage';
+    public $maxMessage = 'Symfony.Validator.Choice.maxMessage';
 
-  /**
-   * {@inheritDoc}
-   */
-  public function defaultOption()
-  {
-    return 'choices';
-  }
+    /**
+     * {@inheritDoc}
+     */
+    public function defaultOption()
+    {
+        return 'choices';
+    }
 }

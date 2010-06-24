@@ -20,40 +20,38 @@ use Symfony\Components\Form\ValueTransformer\BooleanToStringTransformer;
  */
 abstract class ToggleField extends InputField
 {
-  /**
-   * {@inheritDoc}
-   */
-  protected function configure()
-  {
-    $this->addOption('value');
-    $this->addOption('label');
-    $this->addOption('translate_label', false);
-
-    $this->setValueTransformer(new BooleanToStringTransformer());
-  }
-
-  /**
-   * {@inheritDoc}
-   */
-  public function render(array $attributes = array())
-  {
-    $html = parent::render(array_merge(array(
-      'value'     => $this->getOption('value'),
-      'checked'	  => ((string)$this->getDisplayedData() !== '' && $this->getDisplayedData() !== 0),
-    ), $attributes));
-
-    if ($label = $this->getOption('label'))
+    /**
+     * {@inheritDoc}
+     */
+    protected function configure()
     {
-      if ($this->getOption('translate_label'))
-      {
-        $label = $this->translate($label);
-      }
+        $this->addOption('value');
+        $this->addOption('label');
+        $this->addOption('translate_label', false);
 
-      $html .= ' '.$this->generator->contentTag('label', $label, array(
-        'for' => $this->getId(),
-      ));
+        $this->setValueTransformer(new BooleanToStringTransformer());
     }
 
-    return $html;
-  }
+    /**
+     * {@inheritDoc}
+     */
+    public function render(array $attributes = array())
+    {
+        $html = parent::render(array_merge(array(
+            'value'     => $this->getOption('value'),
+            'checked'	  => ((string)$this->getDisplayedData() !== '' && $this->getDisplayedData() !== 0),
+        ), $attributes));
+
+        if ($label = $this->getOption('label')) {
+            if ($this->getOption('translate_label')) {
+                $label = $this->translate($label);
+            }
+
+            $html .= ' '.$this->generator->contentTag('label', $label, array(
+                'for' => $this->getId(),
+            ));
+        }
+
+        return $html;
+    }
 }

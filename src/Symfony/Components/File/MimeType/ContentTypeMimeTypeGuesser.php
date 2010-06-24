@@ -20,46 +20,42 @@ use Symfony\Components\File\Exception\AccessDeniedException;
  */
 class ContentTypeMimeTypeGuesser implements MimeTypeGuesserInterface
 {
-  /**
-   * Returns whether this guesser is supported on the corrent OS/PHP setup
-   *
-   * @return boolean
-   */
-  static public function isSupported()
-  {
-    return function_exists('mime_content_type');
-  }
-
-  /**
-   * Guesses the mime type of the file with the given path
-   *
-   * @see MimeTypeGuesserInterface::guess()
-   */
-  public function guess($path)
-  {
-    if (!is_file($path))
+    /**
+     * Returns whether this guesser is supported on the corrent OS/PHP setup
+     *
+     * @return boolean
+     */
+    static public function isSupported()
     {
-      throw new FileNotFoundException($path);
+        return function_exists('mime_content_type');
     }
 
-    if (!is_readable($path))
+    /**
+     * Guesses the mime type of the file with the given path
+     *
+     * @see MimeTypeGuesserInterface::guess()
+     */
+    public function guess($path)
     {
-      throw new AccessDeniedException($path);
+        if (!is_file($path)) {
+            throw new FileNotFoundException($path);
+        }
+
+        if (!is_readable($path)) {
+            throw new AccessDeniedException($path);
+        }
+
+        if (!self::isSupported() || !is_readable($path)) {
+            return null;
+        }
+
+        $type = mime_content_type($path);
+
+        // remove charset (added as of PHP 5.3)
+        if (false !== $pos = strpos($type, ';')) {
+            $type = substr($type, 0, $pos);
+        }
+
+        return $type;
     }
-
-    if (!self::isSupported() || !is_readable($path))
-    {
-      return null;
-    }
-
-    $type = mime_content_type($path);
-
-    // remove charset (added as of PHP 5.3)
-    if (false !== $pos = strpos($type, ';'))
-    {
-      $type = substr($type, 0, $pos);
-    }
-
-    return $type;
-  }
 }

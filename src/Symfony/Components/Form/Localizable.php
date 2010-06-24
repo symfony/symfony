@@ -9,10 +9,10 @@ namespace Symfony\Components\Form;
  */
 interface Localizable
 {
-  /**
-   * Sets the locale of the class.
-   *
-   * @param string $locale
-   */
-  public function setLocale($locale);
+    /**
+     * Sets the locale of the class.
+     *
+     * @param string $locale
+     */
+    public function setLocale($locale);
 }

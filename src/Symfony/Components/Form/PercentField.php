@@ -19,28 +19,28 @@ use Symfony\Components\Form\ValueTransformer\PercentToLocalizedStringTransformer
  */
 class PercentField extends NumberField
 {
-  const FRACTIONAL = 'fractional';
-  const INTEGER = 'integer';
+    const FRACTIONAL = 'fractional';
+    const INTEGER = 'integer';
 
-  /**
-   * {@inheritDoc}
-   */
-  protected function configure()
-  {
-    $this->addOption('precision', 0);
-    $this->addOption('type', self::FRACTIONAL);
+    /**
+     * {@inheritDoc}
+     */
+    protected function configure()
+    {
+        $this->addOption('precision', 0);
+        $this->addOption('type', self::FRACTIONAL);
 
-    $this->setValueTransformer(new PercentToLocalizedStringTransformer(array(
-      'precision' => $this->getOption('precision'),
-      'type' => $this->getOption('type'),
-    )));
-  }
+        $this->setValueTransformer(new PercentToLocalizedStringTransformer(array(
+            'precision' => $this->getOption('precision'),
+            'type' => $this->getOption('type'),
+        )));
+    }
 
-  /**
-   * {@inheritDoc}
-   */
-  public function render(array $attributes = array())
-  {
-    return parent::render($attributes).' %';
-  }
+    /**
+     * {@inheritDoc}
+     */
+    public function render(array $attributes = array())
+    {
+        return parent::render($attributes).' %';
+    }
 }

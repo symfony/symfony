@@ -19,24 +19,24 @@ use Symfony\Components\Form\Renderer\InputTextRenderer;
  */
 class TextField extends InputField
 {
-  /**
-   * {@inheritDoc}
-   */
-  protected function configure()
-  {
-    parent::configure();
+    /**
+     * {@inheritDoc}
+     */
+    protected function configure()
+    {
+        parent::configure();
 
-    $this->addOption('max_length');
-  }
+        $this->addOption('max_length');
+    }
 
-  /**
-   * {@inheritDoc}
-   */
-  public function render(array $attributes = array())
-  {
-    return parent::render(array_merge(array(
-      'type'        => 'text',
-      'maxlength'   => $this->getOption('max_length'),
-    ), $attributes));
-  }
+    /**
+     * {@inheritDoc}
+     */
+    public function render(array $attributes = array())
+    {
+        return parent::render(array_merge(array(
+            'type'        => 'text',
+            'maxlength'   => $this->getOption('max_length'),
+        ), $attributes));
+    }
 }

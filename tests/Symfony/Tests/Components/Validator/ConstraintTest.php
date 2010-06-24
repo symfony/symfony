@@ -13,74 +13,74 @@ use Symfony\Tests\Components\Validator\Fixtures\ConstraintC;
 
 class ConstraintTest extends \PHPUnit_Framework_TestCase
 {
-  public function testSetProperties()
-  {
-    $constraint = new ConstraintA(array(
-      'property1' => 'foo',
-      'property2' => 'bar',
-    ));
+    public function testSetProperties()
+    {
+        $constraint = new ConstraintA(array(
+            'property1' => 'foo',
+            'property2' => 'bar',
+        ));
 
-    $this->assertEquals('foo', $constraint->property1);
-    $this->assertEquals('bar', $constraint->property2);
-  }
+        $this->assertEquals('foo', $constraint->property1);
+        $this->assertEquals('bar', $constraint->property2);
+    }
 
-  public function testSetNotExistingPropertyThrowsException()
-  {
-    $this->setExpectedException('Symfony\Components\Validator\Exception\InvalidOptionsException');
+    public function testSetNotExistingPropertyThrowsException()
+    {
+        $this->setExpectedException('Symfony\Components\Validator\Exception\InvalidOptionsException');
 
-    new ConstraintA(array(
-      'foo' => 'bar',
-    ));
-  }
+        new ConstraintA(array(
+            'foo' => 'bar',
+        ));
+    }
 
-  public function testMagicPropertiesAreNotAllowed()
-  {
-    $constraint = new ConstraintA();
+    public function testMagicPropertiesAreNotAllowed()
+    {
+        $constraint = new ConstraintA();
 
-    $this->setExpectedException('Symfony\Components\Validator\Exception\InvalidOptionsException');
+        $this->setExpectedException('Symfony\Components\Validator\Exception\InvalidOptionsException');
 
-    $constraint->foo = 'bar';
-  }
+        $constraint->foo = 'bar';
+    }
 
-  public function testSetDefaultProperty()
-  {
-    $constraint = new ConstraintA('foo');
+    public function testSetDefaultProperty()
+    {
+        $constraint = new ConstraintA('foo');
 
-    $this->assertEquals('foo', $constraint->property2);
-  }
+        $this->assertEquals('foo', $constraint->property2);
+    }
 
-  public function testSetDefaultPropertyDoctrineStyle()
-  {
-    $constraint = new ConstraintA(array('value' => 'foo'));
+    public function testSetDefaultPropertyDoctrineStyle()
+    {
+        $constraint = new ConstraintA(array('value' => 'foo'));
 
-    $this->assertEquals('foo', $constraint->property2);
-  }
+        $this->assertEquals('foo', $constraint->property2);
+    }
 
-  public function testSetUndefinedDefaultProperty()
-  {
-    $this->setExpectedException('Symfony\Components\Validator\Exception\ConstraintDefinitionException');
+    public function testSetUndefinedDefaultProperty()
+    {
+        $this->setExpectedException('Symfony\Components\Validator\Exception\ConstraintDefinitionException');
 
-    new ConstraintB('foo');
-  }
+        new ConstraintB('foo');
+    }
 
-  public function testRequiredOptionsMustBeDefined()
-  {
-    $this->setExpectedException('Symfony\Components\Validator\Exception\MissingOptionsException');
+    public function testRequiredOptionsMustBeDefined()
+    {
+        $this->setExpectedException('Symfony\Components\Validator\Exception\MissingOptionsException');
 
-    new ConstraintC();
-  }
+        new ConstraintC();
+    }
 
-  public function testGroupsAreConvertedToArray()
-  {
-    $constraint = new ConstraintA(array('groups' => 'Foo'));
+    public function testGroupsAreConvertedToArray()
+    {
+        $constraint = new ConstraintA(array('groups' => 'Foo'));
 
-    $this->assertEquals(array('Foo'), $constraint->groups);
-  }
+        $this->assertEquals(array('Foo'), $constraint->groups);
+    }
 
-  public function testAddDefaultGroupAddsGroup()
-  {
-    $constraint = new ConstraintA(array('groups' => 'Default'));
-    $constraint->addImplicitGroupName('Foo');
-    $this->assertEquals(array('Default', 'Foo'), $constraint->groups);
-  }
+    public function testAddDefaultGroupAddsGroup()
+    {
+        $constraint = new ConstraintA(array('groups' => 'Default'));
+        $constraint->addImplicitGroupName('Foo');
+        $this->assertEquals(array('Default', 'Foo'), $constraint->groups);
+    }
 }

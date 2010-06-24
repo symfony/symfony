@@ -17,67 +17,67 @@ use Symfony\Components\Validator\Specification\Specification;
 
 class ValidatorTest_Class
 {
-  public $firstName = 'Bernhard';
+    public $firstName = 'Bernhard';
 
-  public $reference;
+    public $reference;
 
-  public function getLastName()
-  {
-    return 'Schussek';
-  }
+    public function getLastName()
+    {
+        return 'Schussek';
+    }
 
-  public function isAustralian()
-  {
-    return false;
-  }
+    public function isAustralian()
+    {
+        return false;
+    }
 }
 
 
 class ValidatorTest extends \PHPUnit_Framework_TestCase
 {
-  public function testValidatePropertyConstraint()
-  {
-    /*
-    $subject = new ValidatorTest_Class();
-    $subjectClass = get_class($subject);
+    public function testValidatePropertyConstraint()
+    {
+        /*
+        $subject = new ValidatorTest_Class();
+        $subjectClass = get_class($subject);
 
-    $constraint = new Constraint();
-    $property = new PropertySpecification($subjectClass, 'firstName', array($constraint));
-    $class = new ClassSpecification($subjectClass, array($property));
-    $specification = new Specification(array($class));
-    $metadata = new Metadata($specification);
+        $constraint = new Constraint();
+        $property = new PropertySpecification($subjectClass, 'firstName', array($constraint));
+        $class = new ClassSpecification($subjectClass, array($property));
+        $specification = new Specification(array($class));
+        $metadata = new Metadata($specification);
 
-    $validatorMock = $this->getMock('Symfony\Components\Validator\ConstraintValidatorInterface');
-    $validatorMock->expects($this->once())
-                  ->method('isValid')
-                  ->with($this->equalTo('Bernhard'), $this->equalTo($constraint))
-                  ->will($this->returnValue(false));
-    $validatorMock->expects($this->atLeastOnce())
-                  ->method('getMessageTemplate')
-                  ->will($this->returnValue('message'));
-    $validatorMock->expects($this->atLeastOnce())
-                  ->method('getMessageParameters')
-                  ->will($this->returnValue(array('param' => 'value')));
+        $validatorMock = $this->getMock('Symfony\Components\Validator\ConstraintValidatorInterface');
+        $validatorMock->expects($this->once())
+                                    ->method('isValid')
+                                    ->with($this->equalTo('Bernhard'), $this->equalTo($constraint))
+                                    ->will($this->returnValue(false));
+        $validatorMock->expects($this->atLeastOnce())
+                                    ->method('getMessageTemplate')
+                                    ->will($this->returnValue('message'));
+        $validatorMock->expects($this->atLeastOnce())
+                                    ->method('getMessageParameters')
+                                    ->will($this->returnValue(array('param' => 'value')));
 
-    $factoryMock = $this->getMock('Symfony\Components\Validator\ConstraintValidatorFactoryInterface');
-    $factoryMock->expects($this->once())
-                ->method('getInstance')
-                ->with($this->equalTo($constraint->validatedBy()))
-                ->will($this->returnValue($validatorMock));
+        $factoryMock = $this->getMock('Symfony\Components\Validator\ConstraintValidatorFactoryInterface');
+        $factoryMock->expects($this->once())
+                                ->method('getInstance')
+                                ->with($this->equalTo($constraint->validatedBy()))
+                                ->will($this->returnValue($validatorMock));
 
-    $validator = new Validator($metadata, $factoryMock);
+        $validator = new Validator($metadata, $factoryMock);
 
-    $builder = new PropertyPathBuilder();
-    $expected = new ConstraintViolationList();
-    $expected->add(new ConstraintViolation(
-      'message',
-      array('param' => 'value'),
-      $subjectClass,
-      $builder->atProperty('firstName')->getPropertyPath(),
-      'Bernhard'
-    ));
+        $builder = new PropertyPathBuilder();
+        $expected = new ConstraintViolationList();
+        $expected->add(new ConstraintViolation(
+            'message',
+            array('param' => 'value'),
+            $subjectClass,
+            $builder->atProperty('firstName')->getPropertyPath(),
+            'Bernhard'
+        ));
 
-    $this->assertEquals($expected, $validator->validateProperty($subject, 'firstName'));
-    */
-  }
+        $this->assertEquals($expected, $validator->validateProperty($subject, 'firstName'));
+        */
+    }
 }

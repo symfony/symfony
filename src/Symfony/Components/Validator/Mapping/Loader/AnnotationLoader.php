@@ -8,63 +8,55 @@ use Doctrine\Common\Annotations\AnnotationReader;
 
 class AnnotationLoader implements LoaderInterface
 {
-  protected $reader;
+    protected $reader;
 
-  public function __construct()
-  {
-    $this->reader = new AnnotationReader();
-    $this->reader->setDefaultAnnotationNamespace('Symfony\Components\Validator\Constraints\\');
-    $this->reader->setAutoloadAnnotations(true);
-  }
-
-  /**
-   * {@inheritDoc}
-   */
-  public function loadClassMetadata(ClassMetadata $metadata)
-  {
-    $annotClass = 'Symfony\Components\Validator\Constraints\Validation';
-    $reflClass = $metadata->getReflectionClass();
-    $loaded = false;
-
-    if ($annot = $this->reader->getClassAnnotation($reflClass, $annotClass))
+    public function __construct()
     {
-      foreach ($annot->constraints as $constraint)
-      {
-        $metadata->addConstraint($constraint);
-      }
-
-      $loaded = true;
+        $this->reader = new AnnotationReader();
+        $this->reader->setDefaultAnnotationNamespace('Symfony\Components\Validator\Constraints\\');
+        $this->reader->setAutoloadAnnotations(true);
     }
 
-    foreach ($reflClass->getProperties() as $property)
+    /**
+     * {@inheritDoc}
+     */
+    public function loadClassMetadata(ClassMetadata $metadata)
     {
-      if ($annot = $this->reader->getPropertyAnnotation($property, $annotClass))
-      {
-        foreach ($annot->constraints as $constraint)
-        {
-          $metadata->addPropertyConstraint($property->getName(), $constraint);
+        $annotClass = 'Symfony\Components\Validator\Constraints\Validation';
+        $reflClass = $metadata->getReflectionClass();
+        $loaded = false;
+
+        if ($annot = $this->reader->getClassAnnotation($reflClass, $annotClass)) {
+            foreach ($annot->constraints as $constraint) {
+                $metadata->addConstraint($constraint);
+            }
+
+            $loaded = true;
         }
 
-        $loaded = true;
-      }
-    }
+        foreach ($reflClass->getProperties() as $property) {
+            if ($annot = $this->reader->getPropertyAnnotation($property, $annotClass)) {
+                foreach ($annot->constraints as $constraint) {
+                    $metadata->addPropertyConstraint($property->getName(), $constraint);
+                }
 
-    foreach ($reflClass->getMethods() as $method)
-    {
-      if ($annot = $this->reader->getMethodAnnotation($method, $annotClass))
-      {
-        foreach ($annot->constraints as $constraint)
-        {
-          // TODO: clean this up
-          $name = lcfirst(substr($method->getName(), 0, 3)=='get' ? substr($method->getName(), 3) : substr($method->getName(), 2));
-
-          $metadata->addGetterConstraint($name, $constraint);
+                $loaded = true;
+            }
         }
 
-        $loaded = true;
-      }
-    }
+        foreach ($reflClass->getMethods() as $method) {
+            if ($annot = $this->reader->getMethodAnnotation($method, $annotClass)) {
+                foreach ($annot->constraints as $constraint) {
+                    // TODO: clean this up
+                    $name = lcfirst(substr($method->getName(), 0, 3)=='get' ? substr($method->getName(), 3) : substr($method->getName(), 2));
 
-    return $loaded;
-  }
+                    $metadata->addGetterConstraint($name, $constraint);
+                }
+
+                $loaded = true;
+            }
+        }
+
+        return $loaded;
+    }
 }

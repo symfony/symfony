@@ -10,36 +10,34 @@ namespace Symfony\Components\Form\ValueTransformer;
  */
 class BooleanToStringTransformer extends BaseValueTransformer
 {
-  /**
-   * Transforms a boolean into a string.
-   *
-   * @param  boolean $value   Boolean value.
-   * @return string           String value.
-   */
-  public function transform($value)
-  {
-    if (!is_bool($value))
+    /**
+     * Transforms a boolean into a string.
+     *
+     * @param  boolean $value   Boolean value.
+     * @return string           String value.
+     */
+    public function transform($value)
     {
-      throw new \InvalidArgumentException(sprintf('Expected argument of type boolean but got %s.', gettype($value)));
+        if (!is_bool($value)) {
+            throw new \InvalidArgumentException(sprintf('Expected argument of type boolean but got %s.', gettype($value)));
+        }
+
+        return true === $value ? '1' : '';
     }
 
-    return true === $value ? '1' : '';
-  }
-
-  /**
-   * Transforms a string into a boolean.
-   *
-   * @param  string $value  String value.
-   * @return boolean        Boolean value.
-   */
-  public function reverseTransform($value)
-  {
-    if (!is_string($value))
+    /**
+     * Transforms a string into a boolean.
+     *
+     * @param  string $value  String value.
+     * @return boolean        Boolean value.
+     */
+    public function reverseTransform($value)
     {
-      throw new \InvalidArgumentException(sprintf('Expected argument of type string but got %s.', gettype($value)));
-    }
+        if (!is_string($value)) {
+            throw new \InvalidArgumentException(sprintf('Expected argument of type string but got %s.', gettype($value)));
+        }
 
-    return $value !== '';
-  }
+        return $value !== '';
+    }
 
 }

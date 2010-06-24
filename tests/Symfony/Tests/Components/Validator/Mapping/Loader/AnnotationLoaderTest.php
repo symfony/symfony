@@ -15,48 +15,48 @@ use Symfony\Components\Validator\Mapping\Loader\AnnotationLoader;
 
 class AnnotationLoaderTest extends \PHPUnit_Framework_TestCase
 {
-  public function testLoadClassMetadataReturnsTrueIfSuccessful()
-  {
-    $loader = new AnnotationLoader();
-    $metadata = new ClassMetadata('Symfony\Tests\Components\Validator\Fixtures\Entity');
+    public function testLoadClassMetadataReturnsTrueIfSuccessful()
+    {
+        $loader = new AnnotationLoader();
+        $metadata = new ClassMetadata('Symfony\Tests\Components\Validator\Fixtures\Entity');
 
-    $this->assertTrue($loader->loadClassMetadata($metadata));
-  }
+        $this->assertTrue($loader->loadClassMetadata($metadata));
+    }
 
-  public function testLoadClassMetadataReturnsFalseIfNotSuccessful()
-  {
-    $loader = new AnnotationLoader();
-    $metadata = new ClassMetadata('\stdClass');
+    public function testLoadClassMetadataReturnsFalseIfNotSuccessful()
+    {
+        $loader = new AnnotationLoader();
+        $metadata = new ClassMetadata('\stdClass');
 
-    $this->assertFalse($loader->loadClassMetadata($metadata));
-  }
+        $this->assertFalse($loader->loadClassMetadata($metadata));
+    }
 
-  public function testLoadClassMetadata()
-  {
-    $loader = new AnnotationLoader();
-    $metadata = new ClassMetadata('Symfony\Tests\Components\Validator\Fixtures\Entity');
+    public function testLoadClassMetadata()
+    {
+        $loader = new AnnotationLoader();
+        $metadata = new ClassMetadata('Symfony\Tests\Components\Validator\Fixtures\Entity');
 
-    $loader->loadClassMetadata($metadata);
+        $loader->loadClassMetadata($metadata);
 
-    $expected = new ClassMetadata('Symfony\Tests\Components\Validator\Fixtures\Entity');
-    $expected->addConstraint(new NotNull());
-    $expected->addConstraint(new Min(3));
-    $expected->addConstraint(new Choice(array('A', 'B')));
-    $expected->addConstraint(new All(array(new NotNull(), new Min(3))));
-    $expected->addConstraint(new All(array('constraints' => array(new NotNull(), new Min(3)))));
-    $expected->addConstraint(new Collection(array('fields' => array(
-      'foo' => array(new NotNull(), new Min(3)),
-      'bar' => new Min(5),
-    ))));
-    $expected->addPropertyConstraint('firstName', new Choice(array(
-      'message' => 'Must be one of %choices%',
-      'choices' => array('A', 'B'),
-    )));
-    $expected->addGetterConstraint('lastName', new NotNull());
+        $expected = new ClassMetadata('Symfony\Tests\Components\Validator\Fixtures\Entity');
+        $expected->addConstraint(new NotNull());
+        $expected->addConstraint(new Min(3));
+        $expected->addConstraint(new Choice(array('A', 'B')));
+        $expected->addConstraint(new All(array(new NotNull(), new Min(3))));
+        $expected->addConstraint(new All(array('constraints' => array(new NotNull(), new Min(3)))));
+        $expected->addConstraint(new Collection(array('fields' => array(
+            'foo' => array(new NotNull(), new Min(3)),
+            'bar' => new Min(5),
+        ))));
+        $expected->addPropertyConstraint('firstName', new Choice(array(
+            'message' => 'Must be one of %choices%',
+            'choices' => array('A', 'B'),
+        )));
+        $expected->addGetterConstraint('lastName', new NotNull());
 
-    // load reflection class so that the comparison passes
-    $expected->getReflectionClass();
+        // load reflection class so that the comparison passes
+        $expected->getReflectionClass();
 
-    $this->assertEquals($expected, $metadata);
-  }
+        $this->assertEquals($expected, $metadata);
+    }
 }

@@ -6,7 +6,7 @@ use Symfony\Components\Form\Field;
 
 class TestField extends Field
 {
-  public function render(array $attributes = array())
-  {
-  }
+    public function render(array $attributes = array())
+    {
+    }
 }

@@ -17,51 +17,51 @@ use Symfony\Components\Validator\Mapping\Loader\LoaderInterface;
 
 class ClassMetadataFactoryTest extends \PHPUnit_Framework_TestCase
 {
-  const CLASSNAME = 'Symfony\Tests\Components\Validator\Fixtures\Entity';
-  const PARENTCLASS = 'Symfony\Tests\Components\Validator\Fixtures\EntityParent';
+    const CLASSNAME = 'Symfony\Tests\Components\Validator\Fixtures\Entity';
+    const PARENTCLASS = 'Symfony\Tests\Components\Validator\Fixtures\EntityParent';
 
-  public function testLoadClassMetadata()
-  {
-    $factory = new ClassMetadataFactory(new TestLoader());
-    $metadata = $factory->getClassMetadata(self::PARENTCLASS);
+    public function testLoadClassMetadata()
+    {
+        $factory = new ClassMetadataFactory(new TestLoader());
+        $metadata = $factory->getClassMetadata(self::PARENTCLASS);
 
-    $constraints = array(
-      new ConstraintA(array('groups' => array('Default', 'EntityParent'))),
-    );
+        $constraints = array(
+            new ConstraintA(array('groups' => array('Default', 'EntityParent'))),
+        );
 
-    $this->assertEquals($constraints, $metadata->getConstraints());
-  }
+        $this->assertEquals($constraints, $metadata->getConstraints());
+    }
 
-  public function testMergeParentConstraints()
-  {
-    $factory = new ClassMetadataFactory(new TestLoader());
-    $metadata = $factory->getClassMetadata(self::CLASSNAME);
+    public function testMergeParentConstraints()
+    {
+        $factory = new ClassMetadataFactory(new TestLoader());
+        $metadata = $factory->getClassMetadata(self::CLASSNAME);
 
-    $constraints = array(
-      new ConstraintA(array('groups' => array(
-        'Default',
-        'EntityParent',
-        'Entity',
-      ))),
-      new ConstraintA(array('groups' => array(
-        'Default',
-        'EntityInterface',
-        'Entity',
-      ))),
-      new ConstraintA(array('groups' => array(
-        'Default',
-        'Entity',
-      ))),
-    );
+        $constraints = array(
+            new ConstraintA(array('groups' => array(
+                'Default',
+                'EntityParent',
+                'Entity',
+            ))),
+            new ConstraintA(array('groups' => array(
+                'Default',
+                'EntityInterface',
+                'Entity',
+            ))),
+            new ConstraintA(array('groups' => array(
+                'Default',
+                'Entity',
+            ))),
+        );
 
-    $this->assertEquals($constraints, $metadata->getConstraints());
-  }
+        $this->assertEquals($constraints, $metadata->getConstraints());
+    }
 }
 
 class TestLoader implements LoaderInterface
 {
-  public function loadClassMetadata(ClassMetadata $metadata)
-  {
-    $metadata->addConstraint(new ConstraintA());
-  }
+    public function loadClassMetadata(ClassMetadata $metadata)
+    {
+        $metadata->addConstraint(new ConstraintA());
+    }
 }

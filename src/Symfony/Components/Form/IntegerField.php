@@ -17,21 +17,21 @@ namespace Symfony\Components\Form;
  */
 class IntegerField extends NumberField
 {
-  /**
-   * {@inheritDoc}
-   */
-  protected function configure()
-  {
-    $this->addOption('precision', 0);
+    /**
+     * {@inheritDoc}
+     */
+    protected function configure()
+    {
+        $this->addOption('precision', 0);
 
-    parent::configure();
-  }
+        parent::configure();
+    }
 
-  /**
-   * {@inheritDoc}
-   */
-  public function getData()
-  {
-    return (int)parent::getData();
-  }
+    /**
+     * {@inheritDoc}
+     */
+    public function getData()
+    {
+        return (int)parent::getData();
+    }
 }

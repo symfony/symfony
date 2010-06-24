@@ -6,34 +6,32 @@ use Symfony\Components\Validator\Mapping\ClassMetadata;
 
 class GroupChain
 {
-  protected $groups = array();
-  protected $groupSequences = array();
+    protected $groups = array();
+    protected $groupSequences = array();
 
-  public function addGroup($group)
-  {
-    $this->groups[$group] = $group;
-  }
-
-  public function addGroupSequence(array $groups)
-  {
-    if (count($groups) == 0)
+    public function addGroup($group)
     {
-      throw new \InvalidArgumentException('A group sequence must contain at least one group');
+        $this->groups[$group] = $group;
     }
 
-    if (!in_array($groups, $this->groupSequences, true))
+    public function addGroupSequence(array $groups)
     {
-      $this->groupSequences[] = $groups;
+        if (count($groups) == 0) {
+            throw new \InvalidArgumentException('A group sequence must contain at least one group');
+        }
+
+        if (!in_array($groups, $this->groupSequences, true)) {
+            $this->groupSequences[] = $groups;
+        }
     }
-  }
 
-  public function getGroups()
-  {
-    return $this->groups;
-  }
+    public function getGroups()
+    {
+        return $this->groups;
+    }
 
-  public function getGroupSequences()
-  {
-    return $this->groupSequences;
-  }
+    public function getGroupSequences()
+    {
+        return $this->groupSequences;
+    }
 }

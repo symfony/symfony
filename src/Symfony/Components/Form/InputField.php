@@ -9,16 +9,16 @@ namespace Symfony\Components\Form;
  */
 abstract class InputField extends Field
 {
-  /**
-   * {@inheritDoc}
-   */
-  public function render(array $attributes = array())
-  {
-    return $this->generator->tag('input', array_merge(array(
-      'id'          => $this->getId(),
-      'name'        => $this->getName(),
-      'value'       => $this->getDisplayedData(),
-      'disabled'    => $this->isDisabled(),
-    ), $attributes));
-  }
+    /**
+     * {@inheritDoc}
+     */
+    public function render(array $attributes = array())
+    {
+        return $this->generator->tag('input', array_merge(array(
+            'id'          => $this->getId(),
+            'name'        => $this->getName(),
+            'value'       => $this->getDisplayedData(),
+            'disabled'    => $this->isDisabled(),
+        ), $attributes));
+    }
 }

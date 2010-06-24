@@ -8,39 +8,39 @@ use Symfony\Components\Form\PercentField;
 
 class PercentFieldTest extends \PHPUnit_Framework_TestCase
 {
-  public function testRender()
-  {
-    $field = new PercentField('name');
+    public function testRender()
+    {
+        $field = new PercentField('name');
 
-    $field->setLocale('de_DE');
-    $field->setData(0.12);
+        $field->setLocale('de_DE');
+        $field->setData(0.12);
 
-    $html = '<input id="name" name="name" value="12" type="text" /> %';
+        $html = '<input id="name" name="name" value="12" type="text" /> %';
 
-    $this->assertEquals($html, $field->render());
-  }
+        $this->assertEquals($html, $field->render());
+    }
 
-  public function testRenderWithPrecision()
-  {
-    $field = new PercentField('name', array('precision' => 2));
+    public function testRenderWithPrecision()
+    {
+        $field = new PercentField('name', array('precision' => 2));
 
-    $field->setLocale('de_DE');
-    $field->setData(0.1234);
+        $field->setLocale('de_DE');
+        $field->setData(0.1234);
 
-    $html = '<input id="name" name="name" value="12,34" type="text" /> %';
+        $html = '<input id="name" name="name" value="12,34" type="text" /> %';
 
-    $this->assertEquals($html, $field->render());
-  }
+        $this->assertEquals($html, $field->render());
+    }
 
-  public function testRenderWithInteger()
-  {
-    $field = new PercentField('name', array('type' => 'integer'));
+    public function testRenderWithInteger()
+    {
+        $field = new PercentField('name', array('type' => 'integer'));
 
-    $field->setLocale('de_DE');
-    $field->setData(123);
+        $field->setLocale('de_DE');
+        $field->setData(123);
 
-    $html = '<input id="name" name="name" value="123" type="text" /> %';
+        $html = '<input id="name" name="name" value="123" type="text" /> %';
 
-    $this->assertEquals($html, $field->render());
-  }
+        $this->assertEquals($html, $field->render());
+    }
 }

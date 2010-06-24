@@ -20,13 +20,13 @@ use Symfony\Components\Form\ValueTransformer\BooleanToStringTransformer;
  */
 class CheckboxField extends ToggleField
 {
-  /**
-   * {@inheritDoc}
-   */
-  public function render(array $attributes = array())
-  {
-    return parent::render(array_merge(array(
-      'type' => 'checkbox',
-    ), $attributes));
-  }
+    /**
+     * {@inheritDoc}
+     */
+    public function render(array $attributes = array())
+    {
+        return parent::render(array_merge(array(
+            'type' => 'checkbox',
+        ), $attributes));
+    }
 }

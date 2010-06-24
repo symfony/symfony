@@ -19,24 +19,24 @@ use Symfony\Components\Form\Renderer\InputPasswordRenderer;
  */
 class PasswordField extends TextField
 {
-  /**
-   * {@inheritDoc}
-   */
-  protected function configure()
-  {
-    parent::configure();
+    /**
+     * {@inheritDoc}
+     */
+    protected function configure()
+    {
+        parent::configure();
 
-    $this->addOption('always_empty', true);
-  }
+        $this->addOption('always_empty', true);
+    }
 
-  /**
-   * {@inheritDoc}
-   */
-  public function render(array $attributes = array())
-  {
-    return parent::render(array_merge(array(
-      'value'       => $this->getOption('always_empty') && !$this->isBound() ? '' : $this->getDisplayedData(),
-      'type'        => 'password',
-    ), $attributes));
-  }
+    /**
+     * {@inheritDoc}
+     */
+    public function render(array $attributes = array())
+    {
+        return parent::render(array_merge(array(
+            'value'       => $this->getOption('always_empty') && !$this->isBound() ? '' : $this->getDisplayedData(),
+            'type'        => 'password',
+        ), $attributes));
+    }
 }

@@ -8,26 +8,26 @@ use Symfony\Components\Form\HiddenField;
 
 class HiddenFieldTest extends \PHPUnit_Framework_TestCase
 {
-  protected $field;
+    protected $field;
 
-  public function setUp()
-  {
-    $this->field = new HiddenField('name');
-  }
+    public function setUp()
+    {
+        $this->field = new HiddenField('name');
+    }
 
-  public function testRender()
-  {
-    $this->field->setData('foobar');
+    public function testRender()
+    {
+        $this->field->setData('foobar');
 
-    $html = '<input id="name" name="name" value="foobar" type="hidden" class="foobar" />';
+        $html = '<input id="name" name="name" value="foobar" type="hidden" class="foobar" />';
 
-    $this->assertEquals($html, $this->field->render(array(
-      'class' => 'foobar',
-    )));
-  }
+        $this->assertEquals($html, $this->field->render(array(
+            'class' => 'foobar',
+        )));
+    }
 
-  public function testIsHidden()
-  {
-    $this->assertTrue($this->field->isHidden());
-  }
+    public function testIsHidden()
+    {
+        $this->assertTrue($this->field->isHidden());
+    }
 }

@@ -20,15 +20,15 @@ namespace Symfony\Components\Form;
  */
 class BirthdayField extends DateField
 {
-  /**
-   * {@inheritDoc}
-   */
-  protected function configure()
-  {
-    $currentYear = date('Y');
+    /**
+     * {@inheritDoc}
+     */
+    protected function configure()
+    {
+        $currentYear = date('Y');
 
-    $this->addOption('years', range($currentYear-120, $currentYear));
+        $this->addOption('years', range($currentYear-120, $currentYear));
 
-    parent::configure();
-  }
+        parent::configure();
+    }
 }

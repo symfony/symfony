@@ -13,33 +13,33 @@ namespace Symfony\Components\Validator\Mapping\Loader;
  */
 abstract class FilesLoader extends LoaderChain
 {
-  /**
-   * Array of mapping files
-   * @param array $paths
-   */
-  public function __construct(array $paths)
-  {
-    parent::__construct($this->getFileLoaders($paths));
-  }
-
-  /**
-   * Array of mapping files
-   * @param array $paths
-   * @return array - array of metadata loaders
-   */
-  protected function getFileLoaders($paths)
-  {
-    $loaders = array();
-    foreach ($paths as $path) {
-      $loaders[] = $this->getFileLoaderInstance($path);
+    /**
+     * Array of mapping files
+     * @param array $paths
+     */
+    public function __construct(array $paths)
+    {
+        parent::__construct($this->getFileLoaders($paths));
     }
-    return $loaders;
-  }
 
-  /**
-   * Takes mapping file path
-   * @param string $file
-   * @return Symfony\Components\Validator\Mapping\Loader\LoaderInterface
-   */
-  abstract protected function getFileLoaderInstance($file);
+    /**
+     * Array of mapping files
+     * @param array $paths
+     * @return array - array of metadata loaders
+     */
+    protected function getFileLoaders($paths)
+    {
+        $loaders = array();
+        foreach ($paths as $path)  {
+            $loaders[] = $this->getFileLoaderInstance($path);
+        }
+        return $loaders;
+    }
+
+    /**
+     * Takes mapping file path
+     * @param string $file
+     * @return Symfony\Components\Validator\Mapping\Loader\LoaderInterface
+     */
+    abstract protected function getFileLoaderInstance($file);
 }

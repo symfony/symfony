@@ -8,39 +8,39 @@ use Symfony\Components\Form\MoneyField;
 
 class MoneyFieldTest extends \PHPUnit_Framework_TestCase
 {
-  public function testRenderWithoutCurrency()
-  {
-    $field = new MoneyField('name');
+    public function testRenderWithoutCurrency()
+    {
+        $field = new MoneyField('name');
 
-    $field->setLocale('de_AT');
-    $field->setData(1234);
+        $field->setLocale('de_AT');
+        $field->setData(1234);
 
-    $html = '<input id="name" name="name" value="1234,00" type="text" class="foobar" />';
+        $html = '<input id="name" name="name" value="1234,00" type="text" class="foobar" />';
 
-    $this->assertEquals($html, $field->render(array('class' => 'foobar')));
-  }
+        $this->assertEquals($html, $field->render(array('class' => 'foobar')));
+    }
 
-  public function testRenderWithCurrency_afterWidget()
-  {
-    $field = new MoneyField('name', array('currency' => 'EUR'));
+    public function testRenderWithCurrency_afterWidget()
+    {
+        $field = new MoneyField('name', array('currency' => 'EUR'));
 
-    $field->setLocale('de_DE');
-    $field->setData(1234);
+        $field->setLocale('de_DE');
+        $field->setData(1234);
 
-    $html = '<input id="name" name="name" value="1234,00" type="text" /> €';
+        $html = '<input id="name" name="name" value="1234,00" type="text" /> €';
 
-    $this->assertEquals($html, $field->render());
-  }
+        $this->assertEquals($html, $field->render());
+    }
 
-  public function testRenderWithCurrency_beforeWidget()
-  {
-    $field = new MoneyField('name', array('currency' => 'EUR'));
+    public function testRenderWithCurrency_beforeWidget()
+    {
+        $field = new MoneyField('name', array('currency' => 'EUR'));
 
-    $field->setLocale('en_US');
-    $field->setData(1234);
+        $field->setLocale('en_US');
+        $field->setData(1234);
 
-    $html = '€ <input id="name" name="name" value="1234.00" type="text" />';
+        $html = '€ <input id="name" name="name" value="1234.00" type="text" />';
 
-    $this->assertEquals($html, $field->render());
-  }
+        $this->assertEquals($html, $field->render());
+    }
 }

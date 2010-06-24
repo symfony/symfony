@@ -6,10 +6,10 @@ use Symfony\Components\Validator\Constraint;
 
 class ConstraintC extends Constraint
 {
-  public $option1;
+    public $option1;
 
-  public function requiredOptions()
-  {
-    return array('option1');
-  }
+    public function requiredOptions()
+    {
+        return array('option1');
+    }
 }

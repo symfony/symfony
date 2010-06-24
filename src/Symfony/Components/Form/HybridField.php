@@ -14,88 +14,77 @@ namespace Symfony\Components\Form;
  */
 class HybridField extends FieldGroup
 {
-  const FIELD = 0;
-  const GROUP = 1;
+    const FIELD = 0;
+    const GROUP = 1;
 
-  protected $mode = self::FIELD;
+    protected $mode = self::FIELD;
 
-  /**
-   * Sets the current mode of the field
-   *
-   * Note that you can't switch modes anymore once you have added children to
-   * this field.
-   *
-   * @param integer $mode  One of the constants HybridField::FIELD and
-   *                       HybridField::GROUP.
-   */
-  public function setFieldMode($mode)
-  {
-    if (count($this) > 0 && $mode === self::FIELD)
+    /**
+     * Sets the current mode of the field
+     *
+     * Note that you can't switch modes anymore once you have added children to
+     * this field.
+     *
+     * @param integer $mode  One of the constants HybridField::FIELD and
+     *                       HybridField::GROUP.
+     */
+    public function setFieldMode($mode)
     {
-      throw new FormException('Switching to mode FIELD is not allowed after adding nested fields');
+        if (count($this) > 0 && $mode === self::FIELD) {
+            throw new FormException('Switching to mode FIELD is not allowed after adding nested fields');
+        }
+
+        $this->mode = $mode;
     }
 
-    $this->mode = $mode;
-  }
+    /**
+     * {@inheritDoc}
+     *
+     * @throws FormException  When the field is in mode HybridField::FIELD adding
+     *                        subfields is not allowed
+     */
+    public function add(FieldInterface $field)
+    {
+        if ($this->mode === self::FIELD) {
+            throw new FormException('You cannot add nested fields while in mode FIELD');
+        }
 
-  /**
-   * {@inheritDoc}
-   *
-   * @throws FormException  When the field is in mode HybridField::FIELD adding
-   *                        subfields is not allowed
-   */
-  public function add(FieldInterface $field)
-  {
-    if ($this->mode === self::FIELD)
-    {
-      throw new FormException('You cannot add nested fields while in mode FIELD');
+        return parent::add($field);
     }
 
-    return parent::add($field);
-  }
+    /**
+     * {@inheritDoc}
+     */
+    public function getDisplayedData()
+    {
+        if ($this->mode === self::GROUP) {
+            return parent::getDisplayedData();
+        } else {
+            return Field::getDisplayedData();
+        }
+    }
 
-  /**
-   * {@inheritDoc}
-   */
-  public function getDisplayedData()
-  {
-    if ($this->mode === self::GROUP)
+    /**
+     * {@inheritDoc}
+     */
+    public function setData($data)
     {
-      return parent::getDisplayedData();
+        if ($this->mode === self::GROUP) {
+            parent::setData($data);
+        } else {
+            Field::setData($data);
+        }
     }
-    else
-    {
-      return Field::getDisplayedData();
-    }
-  }
 
-  /**
-   * {@inheritDoc}
-   */
-  public function setData($data)
-  {
-    if ($this->mode === self::GROUP)
+    /**
+     * {@inheritDoc}
+     */
+    public function bind($data)
     {
-      parent::setData($data);
+        if ($this->mode === self::GROUP) {
+            parent::bind($data);
+        } else {
+            Field::bind($data);
+        }
     }
-    else
-    {
-      Field::setData($data);
-    }
-  }
-
-  /**
-   * {@inheritDoc}
-   */
-  public function bind($data)
-  {
-    if ($this->mode === self::GROUP)
-    {
-      parent::bind($data);
-    }
-    else
-    {
-      Field::bind($data);
-    }
-  }
 }

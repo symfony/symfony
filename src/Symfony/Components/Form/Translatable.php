@@ -11,10 +11,10 @@ use Symfony\Components\I18N\TranslatorInterface;
  */
 interface Translatable
 {
-  /**
-   * Sets the translator unit of the class.
-   *
-   * @param TranslatorInterface $translator
-   */
-  public function setTranslator(TranslatorInterface $translator);
+    /**
+     * Sets the translator unit of the class.
+     *
+     * @param TranslatorInterface $translator
+     */
+    public function setTranslator(TranslatorInterface $translator);
 }

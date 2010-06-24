@@ -19,21 +19,21 @@ use Symfony\Components\Form\Renderer\InputHiddenRenderer;
  */
 class HiddenField extends InputField
 {
-  /**
-   * {@inheritDoc}
-   */
-  public function render(array $attributes = array())
-  {
-    return parent::render(array_merge(array(
-      'type'    => 'hidden',
-    ), $attributes));
-  }
+    /**
+     * {@inheritDoc}
+     */
+    public function render(array $attributes = array())
+    {
+        return parent::render(array_merge(array(
+            'type'    => 'hidden',
+        ), $attributes));
+    }
 
-  /**
-   * {@inheritDoc}
-   */
-  public function isHidden()
-  {
-    return true;
-  }
+    /**
+     * {@inheritDoc}
+     */
+    public function isHidden()
+    {
+        return true;
+    }
 }

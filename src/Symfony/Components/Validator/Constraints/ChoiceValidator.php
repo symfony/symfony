@@ -24,78 +24,60 @@ use Symfony\Components\Validator\Exception\UnexpectedTypeException;
  */
 class ChoiceValidator extends ConstraintValidator
 {
-  public function isValid($value, Constraint $constraint)
-  {
-    if (!$constraint->choices && !$constraint->callback)
+    public function isValid($value, Constraint $constraint)
     {
-      throw new ConstraintDefinitionException('Either "choices" or "callback" must be specified on constraint Choice');
-    }
-
-    if ($value === null)
-    {
-      return true;
-    }
-
-    if ($constraint->multiple && !is_array($value))
-    {
-      throw new UnexpectedTypeException($value, 'array');
-    }
-
-    if ($constraint->callback)
-    {
-      if (is_callable(array($this->context->getCurrentClass(), $constraint->callback)))
-      {
-        $choices = call_user_func(array($this->context->getCurrentClass(), $constraint->callback));
-      }
-      else if (is_callable($constraint->callback))
-      {
-        $choices = call_user_func($constraint->callback);
-      }
-      else
-      {
-        throw new ConstraintDefinitionException('The Choice constraint expects a valid callback');
-      }
-    }
-    else
-    {
-      $choices = $constraint->choices;
-    }
-
-    if ($constraint->multiple)
-    {
-      foreach ($value as $_value)
-      {
-        if (!in_array($_value, $choices, true))
-        {
-          $this->setMessage($constraint->message, array('value' => $_value));
-
-          return false;
+        if (!$constraint->choices && !$constraint->callback) {
+            throw new ConstraintDefinitionException('Either "choices" or "callback" must be specified on constraint Choice');
         }
-      }
 
-      $count = count($value);
+        if ($value === null) {
+            return true;
+        }
 
-      if ($constraint->min !== null && $count < $constraint->min)
-      {
-        $this->setMessage($constraint->minMessage, array('limit' => $constraint->min));
+        if ($constraint->multiple && !is_array($value)) {
+            throw new UnexpectedTypeException($value, 'array');
+        }
 
-        return false;
-      }
+        if ($constraint->callback) {
+            if (is_callable(array($this->context->getCurrentClass(), $constraint->callback))) {
+                $choices = call_user_func(array($this->context->getCurrentClass(), $constraint->callback));
+            } else if (is_callable($constraint->callback)) {
+                $choices = call_user_func($constraint->callback);
+            } else {
+                throw new ConstraintDefinitionException('The Choice constraint expects a valid callback');
+            }
+        } else {
+            $choices = $constraint->choices;
+        }
 
-      if ($constraint->max !== null && $count > $constraint->max)
-      {
-        $this->setMessage($constraint->maxMessage, array('limit' => $constraint->max));
+        if ($constraint->multiple) {
+            foreach ($value as $_value) {
+                if (!in_array($_value, $choices, true)) {
+                    $this->setMessage($constraint->message, array('value' => $_value));
 
-        return false;
-      }
+                    return false;
+                }
+            }
+
+            $count = count($value);
+
+            if ($constraint->min !== null && $count < $constraint->min) {
+                $this->setMessage($constraint->minMessage, array('limit' => $constraint->min));
+
+                return false;
+            }
+
+            if ($constraint->max !== null && $count > $constraint->max) {
+                $this->setMessage($constraint->maxMessage, array('limit' => $constraint->max));
+
+                return false;
+            }
+        } elseif (!in_array($value, $choices, true)) {
+            $this->setMessage($constraint->message, array('value' => $value));
+
+            return false;
+        }
+
+        return true;
     }
-    elseif (!in_array($value, $choices, true))
-    {
-      $this->setMessage($constraint->message, array('value' => $value));
-
-      return false;
-    }
-
-    return true;
-  }
 }

@@ -7,17 +7,16 @@ use Symfony\Components\Validator\Constraint;
 
 class ConstraintValidatorFactory implements ConstraintValidatorFactoryInterface
 {
-  protected $validators = array();
+    protected $validators = array();
 
-  public function getInstance(Constraint $constraint)
-  {
-    $className = $constraint->validatedBy();
-
-    if (!isset($this->validators[$className]))
+    public function getInstance(Constraint $constraint)
     {
-      $this->validators[$className] = new $className();
-    }
+        $className = $constraint->validatedBy();
 
-    return $this->validators[$className];
-  }
+        if (!isset($this->validators[$className])) {
+            $this->validators[$className] = new $className();
+        }
+
+        return $this->validators[$className];
+    }
 }

@@ -42,6 +42,9 @@ class Helpers extends \Twig_Extension
             // {% stylesheets %}
             new HelperTokenParser('stylesheets', '', 'stylesheets', 'render'),
 
+            // {% asset 'css/blog.css' %}
+            new HelperTokenParser('asset', '<location>', 'assets', 'getUrl'),
+
             // {% route 'blog_post' with ['id': post.id] %}
             new HelperTokenParser('route', '<route> [with <arguments:array>]', 'router', 'generate'),
 

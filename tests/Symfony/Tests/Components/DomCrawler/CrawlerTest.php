@@ -94,7 +94,7 @@ class CrawlerTest extends \PHPUnit_Framework_TestCase
 
         $crawler = new Crawler();
         $crawler->addContent('foo bar', 'text/plain');
-        $this->assertEquals(0, $crawler->count(), '->addContent() does nothing if the type is not (x|ht)ml');
+        $this->assertEquals(0, count($crawler), '->addContent() does nothing if the type is not (x|ht)ml');
     }
 
     /**
@@ -152,14 +152,6 @@ class CrawlerTest extends \PHPUnit_Framework_TestCase
         $this->assertEquals(0, count($crawler), '->clear() removes all the nodes from the crawler');
     }
 
-    public function testIsEmpty()
-    {
-        $crawler = new Crawler(new \DOMNode());
-        $this->assertFalse($crawler->isEmpty(), '->isEmpty() returns false if the crawler node list is not empty');
-        $crawler->clear();
-        $this->assertTrue($crawler->isEmpty(), '->isEmpty() returns true if the crawler node list is empty');
-    }
-
     public function testEq()
     {
         $crawler = $this->createTestCrawler()->filter('li');
@@ -167,7 +159,7 @@ class CrawlerTest extends \PHPUnit_Framework_TestCase
         $this->assertInstanceOf('Symfony\\Components\\DomCrawler\\Crawler', $crawler, '->eq() returns a new instance of a crawler');
 
         $this->assertEquals('Two', $crawler->eq(1)->text(), '->eq() returns the nth node of the list');
-        $this->assertTrue($crawler->eq(100)->isEmpty(), '->eq() returns an empty crawler if the nth node does not exist');
+        $this->assertEquals(0, count($crawler->eq(100)), '->eq() returns an empty crawler if the nth node does not exist');
     }
 
     public function testEach()
@@ -238,7 +230,7 @@ class CrawlerTest extends \PHPUnit_Framework_TestCase
 
         $crawler = $this->createTestCrawler()->filter('ul');
 
-        $this->assertEquals(6, $crawler->filterXPath('//li')->count(), '->filterXPath() filters the node list with the XPath expression');
+        $this->assertEquals(6, count($crawler->filterXPath('//li')), '->filterXPath() filters the node list with the XPath expression');
     }
 
     /**
@@ -252,7 +244,7 @@ class CrawlerTest extends \PHPUnit_Framework_TestCase
 
         $crawler = $this->createTestCrawler()->filter('ul');
 
-        $this->assertEquals(6, $crawler->filter('li')->count(), '->filter() filters the node list with the CSS selector');
+        $this->assertEquals(6, count($crawler->filter('li')), '->filter() filters the node list with the CSS selector');
     }
 
     public function testSelectLink()
@@ -261,17 +253,17 @@ class CrawlerTest extends \PHPUnit_Framework_TestCase
         $this->assertNotSame($crawler, $crawler->selectLink('Foo'), '->selectLink() returns a new instance of a crawler');
         $this->assertInstanceOf('Symfony\\Components\\DomCrawler\\Crawler', $crawler, '->selectLink() returns a new instance of a crawler');
 
-        $this->assertEquals(1, $crawler->selectLink('Fabien\'s Foo')->count(), '->selectLink() selects links by the node values');
-        $this->assertEquals(1, $crawler->selectLink('Fabien\'s Bar')->count(), '->selectLink() selects links by the alt attribute of a clickable image');
+        $this->assertEquals(1, count($crawler->selectLink('Fabien\'s Foo')), '->selectLink() selects links by the node values');
+        $this->assertEquals(1, count($crawler->selectLink('Fabien\'s Bar')), '->selectLink() selects links by the alt attribute of a clickable image');
 
-        $this->assertEquals(2, $crawler->selectLink('Fabien"s Foo')->count(), '->selectLink() selects links by the node values');
-        $this->assertEquals(2, $crawler->selectLink('Fabien"s Bar')->count(), '->selectLink() selects links by the alt attribute of a clickable image');
+        $this->assertEquals(2, count($crawler->selectLink('Fabien"s Foo')), '->selectLink() selects links by the node values');
+        $this->assertEquals(2, count($crawler->selectLink('Fabien"s Bar')), '->selectLink() selects links by the alt attribute of a clickable image');
 
-        $this->assertEquals(1, $crawler->selectLink('\' Fabien"s Foo')->count(), '->selectLink() selects links by the node values');
-        $this->assertEquals(1, $crawler->selectLink('\' Fabien"s Bar')->count(), '->selectLink() selects links by the alt attribute of a clickable image');
+        $this->assertEquals(1, count($crawler->selectLink('\' Fabien"s Foo')), '->selectLink() selects links by the node values');
+        $this->assertEquals(1, count($crawler->selectLink('\' Fabien"s Bar')), '->selectLink() selects links by the alt attribute of a clickable image');
 
-        $this->assertEquals(4, $crawler->selectLink('Foo')->count(), '->selectLink() selects links by the node values');
-        $this->assertEquals(4, $crawler->selectLink('Bar')->count(), '->selectLink() selects links by the node values');
+        $this->assertEquals(4, count($crawler->selectLink('Foo')), '->selectLink() selects links by the node values');
+        $this->assertEquals(4, count($crawler->selectLink('Bar')), '->selectLink() selects links by the node values');
     }
 
     public function testSelectButton()

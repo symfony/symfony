@@ -174,16 +174,6 @@ class Crawler extends \SplObjectStorage
     }
 
     /**
-     * Returns true if the list of nodes is empty.
-     *
-     * @return Boolean true if the list of nodes is empty, false otherwise
-     */
-    public function isEmpty()
-    {
-        return $this->count() < 1;
-    }
-
-    /**
      * Returns a node given its position in the node list.
      *
      * @param integer $position The position
@@ -265,7 +255,7 @@ class Crawler extends \SplObjectStorage
      */
     public function last()
     {
-        return $this->eq($this->count() - 1);
+        return $this->eq(count($this) - 1);
     }
 
     /**

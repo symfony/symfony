@@ -63,6 +63,20 @@ class Client extends BaseClient
     }
 
     /**
+     * Gets a profiler for the current Response.
+     *
+     * @return Symfony\Components\HttpKernel\Profiler\Profiler A Profiler instance
+     */
+    public function getProfiler()
+    {
+        if (!$this->container->hasService('profiler')) {
+            return false;
+        }
+
+        return $this->container->getProfilerService()->load($this->response);
+    }
+
+    /**
      * Makes a request.
      *
      * @param Symfony\Components\HttpKernel\Request  $request A Request instance

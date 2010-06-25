@@ -310,6 +310,8 @@ class Form implements \ArrayAccess
      *
      * @param string $name The field name
      *
+     * @return Symfony\Components\DomCrawler\Field The associated Field instance
+     *
      * @throws \InvalidArgumentException if the field does not exist
      */
     public function offsetGet($name)
@@ -318,7 +320,7 @@ class Form implements \ArrayAccess
             throw new \InvalidArgumentException(sprintf('The form field "%s" does not exist', $name));
         }
 
-        return $this->fields[$name]->getValue();
+        return $this->fields[$name];
     }
 
     /**

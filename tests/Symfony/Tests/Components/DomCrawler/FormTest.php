@@ -155,24 +155,24 @@ class FormTest extends \PHPUnit_Framework_TestCase
     {
         $form = $this->createForm('<form><input type="text" name="foo" value="foo" /><input type="submit" /></form>');
 
-        $this->assertEquals('foo', $form['foo'], '->getValue() returns the value of a form field');
+        $this->assertEquals('foo', $form['foo']->getValue(), '->__offsetGet() returns the value of a form field');
 
         $form['foo'] = 'bar';
 
-        $this->assertEquals('bar', $form['foo'], '->setValue() changes the value of a form field');
+        $this->assertEquals('bar', $form['foo']->getValue(), '->__offsetSet() changes the value of a form field');
 
         try {
             $form['foobar'] = 'bar';
-            $this->pass('->setValue() throws an \InvalidArgumentException exception if the field does not exist');
+            $this->pass('->__offsetSet() throws an \InvalidArgumentException exception if the field does not exist');
         } catch (\InvalidArgumentException $e) {
-            $this->assertTrue(true, '->setValue() throws an \InvalidArgumentException exception if the field does not exist');
+            $this->assertTrue(true, '->__offsetSet() throws an \InvalidArgumentException exception if the field does not exist');
         }
 
         try {
             $form['foobar'];
-            $this->pass('->getValue() throws an \InvalidArgumentException exception if the field does not exist');
+            $this->pass('->__offsetSet() throws an \InvalidArgumentException exception if the field does not exist');
         } catch (\InvalidArgumentException $e) {
-            $this->assertTrue(true, '->getValue() throws an \InvalidArgumentException exception if the field does not exist');
+            $this->assertTrue(true, '->__offsetSet() throws an \InvalidArgumentException exception if the field does not exist');
         }
     }
 

@@ -127,10 +127,11 @@ interface BundleInterface
 }
 
 
-namespace Symfony\Foundation\Bundle;
+namespace Symfony\Foundation;
 
 use Symfony\Foundation\Bundle\Bundle;
 use Symfony\Foundation\ClassCollectionLoader;
+use Symfony\Foundation\DependencyInjection\KernelExtension;
 use Symfony\Components\DependencyInjection\ContainerInterface;
 use Symfony\Components\DependencyInjection\Loader\Loader;
 use Symfony\Components\DependencyInjection\Loader\XmlFileLoader;
@@ -171,7 +172,7 @@ class KernelBundle extends Bundle
 }
 
 
-namespace Symfony\Foundation\Bundle;
+namespace Symfony\Foundation\DependencyInjection;
 
 use Symfony\Components\DependencyInjection\Loader\LoaderExtension;
 use Symfony\Components\DependencyInjection\Loader\XmlFileLoader;

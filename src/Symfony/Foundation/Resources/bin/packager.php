@@ -1,6 +1,6 @@
 <?php
 
-require_once __DIR__.'/UniversalClassLoader.php';
+require_once __DIR__.'/../../UniversalClassLoader.php';
 
 /*
  * This file is part of the Symfony framework.
@@ -15,18 +15,19 @@ use Symfony\Foundation\UniversalClassLoader;
 use Symfony\Foundation\ClassCollectionLoader;
 
 $loader = new UniversalClassLoader();
-$loader->registerNamespaces(array('Symfony' => __DIR__.'/../..'));
+$loader->registerNamespaces(array('Symfony' => __DIR__.'/../../../..'));
 $loader->register();
 
-if (file_exists(__DIR__.'/bootstrap.php')) {
-    unlink(__DIR__.'/bootstrap.php');
+if (file_exists(__DIR__.'/../../bootstrap.php')) {
+    unlink(__DIR__.'/../../bootstrap.php');
 }
+
 ClassCollectionLoader::load(array(
     'Symfony\\Foundation\\Bundle\\Bundle',
     'Symfony\\Foundation\\Bundle\\BundleInterface',
-    'Symfony\\Foundation\\Bundle\\KernelBundle',
-    'Symfony\\Foundation\\Bundle\\KernelExtension',
+    'Symfony\\Foundation\\KernelBundle',
+    'Symfony\\Foundation\\DependencyInjection\\KernelExtension',
     'Symfony\\Foundation\\Debug\\ErrorHandler',
     'Symfony\\Foundation\\ClassCollectionLoader',
     'Symfony\\Foundation\\EventDispatcher',
-), __DIR__, 'bootstrap', false);
+), __DIR__.'/../..', 'bootstrap', false);

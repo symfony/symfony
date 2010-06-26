@@ -209,15 +209,15 @@ class HeaderBag
             }
         }
 
-        if (null !== $this->expires) {
+        if (null !== $expires) {
             $cookie .= '; expires='.substr(\DateTime::createFromFormat('U', $expires, new \DateTimeZone('UTC'))->format('D, d-M-Y H:i:s T'), 0, -5);
         }
 
-        if ('/' !== $this->path) {
+        if ('/' !== $path) {
             $cookie .= '; path='.$path;
         }
 
-        if ('' !== $this->domain) {
+        if ('' !== $domain) {
             $cookie .= '; domain='.$domain;
         }
 

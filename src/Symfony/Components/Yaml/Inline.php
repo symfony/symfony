@@ -193,7 +193,7 @@ class Inline
      */
     static protected function parseQuotedScalar($scalar, &$i)
     {
-        if (!preg_match('/'.self::REGEX_QUOTED_STRING.'/A', substr($scalar, $i), $match)) {
+        if (!preg_match('/'.self::REGEX_QUOTED_STRING.'/Au', substr($scalar, $i), $match)) {
             throw new ParserException(sprintf('Malformed inline YAML string (%s).', substr($scalar, $i)));
         }
 

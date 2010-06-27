@@ -52,7 +52,7 @@ class Parser
 
         if (function_exists('mb_internal_encoding') && ((int) ini_get('mbstring.func_overload')) & 2) {
             $mbEncoding = mb_internal_encoding();
-            mb_internal_encoding('ASCII');
+            mb_internal_encoding('UTF-8');
         }
 
         $data = array();
@@ -67,8 +67,8 @@ class Parser
             }
 
             $isRef = $isInPlace = $isProcessed = false;
-            if (preg_match('#^\-((?P<leadspaces>\s+)(?P<value>.+?))?\s*$#', $this->currentLine, $values)) {
-                if (isset($values['value']) && preg_match('#^&(?P<ref>[^ ]+) *(?P<value>.*)#', $values['value'], $matches)) {
+            if (preg_match('#^\-((?P<leadspaces>\s+)(?P<value>.+?))?\s*$#u', $this->currentLine, $values)) {
+                if (isset($values['value']) && preg_match('#^&(?P<ref>[^ ]+) *(?P<value>.*)#u', $values['value'], $matches)) {
                     $isRef = $matches['ref'];
                     $values['value'] = $matches['value'];
                 }
@@ -82,7 +82,7 @@ class Parser
                 } else {
                     if (isset($values['leadspaces'])
                         && ' ' == $values['leadspaces']
-                        && preg_match('#^(?P<key>'.Inline::REGEX_QUOTED_STRING.'|[^ \'"\{].*?) *\:(\s+(?P<value>.+?))?\s*$#', $values['value'], $matches)
+                        && preg_match('#^(?P<key>'.Inline::REGEX_QUOTED_STRING.'|[^ \'"\{].*?) *\:(\s+(?P<value>.+?))?\s*$#u', $values['value'], $matches)
                     ) {
                         // this is a compact notation element, add to next block and parse
                         $c = $this->getRealCurrentLineNb();
@@ -99,7 +99,7 @@ class Parser
                         $data[] = $this->parseValue($values['value']);
                     }
                 }
-            } else if (preg_match('#^(?P<key>'.Inline::REGEX_QUOTED_STRING.'|[^ \'"].*?) *\:(\s+(?P<value>.+?))?\s*$#', $this->currentLine, $values)) {
+            } else if (preg_match('#^(?P<key>'.Inline::REGEX_QUOTED_STRING.'|[^ \'"].*?) *\:(\s+(?P<value>.+?))?\s*$#u', $this->currentLine, $values)) {
                 $key = Inline::parseScalar($values['key']);
 
                 if ('<<' === $key) {
@@ -137,7 +137,7 @@ class Parser
 
                         $isProcessed = $merged;
                     }
-                } else if (isset($values['value']) && preg_match('#^&(?P<ref>[^ ]+) *(?P<value>.*)#', $values['value'], $matches)) {
+                } else if (isset($values['value']) && preg_match('#^&(?P<ref>[^ ]+) *(?P<value>.*)#u', $values['value'], $matches)) {
                     $isRef = $matches['ref'];
                     $values['value'] = $matches['value'];
                 }
@@ -375,7 +375,7 @@ class Parser
             return '';
         }
 
-        if (!preg_match('#^(?P<indent>'.($indentation ? str_repeat(' ', $indentation) : ' +').')(?P<text>.*)$#', $this->currentLine, $matches)) {
+        if (!preg_match('#^(?P<indent>'.($indentation ? str_repeat(' ', $indentation) : ' +').')(?P<text>.*)$#u', $this->currentLine, $matches)) {
             $this->moveToPreviousLine();
 
             return '';
@@ -388,7 +388,7 @@ class Parser
         while ($this->currentLineNb + 1 < count($this->lines)) {
             $this->moveToNextLine();
 
-            if (preg_match('#^(?P<indent> {'.strlen($textIndent).',})(?P<text>.+)$#', $this->currentLine, $matches)) {
+            if (preg_match('#^(?P<indent> {'.strlen($textIndent).',})(?P<text>.+)$#u', $this->currentLine, $matches)) {
                 if (' ' == $separator && $previousIndent != $matches['indent']) {
                     $text = substr($text, 0, -1)."\n";
                 }
@@ -500,11 +500,11 @@ class Parser
 
         // strip YAML header
         $count = 0;
-        $value = preg_replace('#^\%YAML[: ][\d\.]+.*\n#s', '', $value, -1, $count);
+        $value = preg_replace('#^\%YAML[: ][\d\.]+.*\n#su', '', $value, -1, $count);
         $this->offset += $count;
 
         // remove leading comments and/or ---
-        $trimmedValue = preg_replace('#^((\#.*?\n)|(\-\-\-.*?\n))*#s', '', $value, -1, $count);
+        $trimmedValue = preg_replace('#^((\#.*?\n)|(\-\-\-.*?\n))*#su', '', $value, -1, $count);
         if ($count == 1) {
             // items have been removed, update the offset
             $this->offset += substr_count($value, "\n") - substr_count($trimmedValue, "\n");

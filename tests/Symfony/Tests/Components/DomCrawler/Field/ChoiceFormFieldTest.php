@@ -211,6 +211,57 @@ class ChoiceFormFieldTest extends FormFieldTestCase
         }
     }
 
+    public function testTick()
+    {
+        $node = $this->createSelectNode(array('foo' => false, 'bar' => false));
+        $field = new ChoiceFormField($node);
+
+        try {
+            $field->tick();
+            $this->fail('->tick() throws a \LogicException for select boxes');
+        } catch (\LogicException $e) {
+            $this->assertTrue(true, '->tick() throws a \LogicException for select boxes');
+        }
+
+        $node = $this->createNode('input', '', array('type' => 'checkbox', 'name' => 'name'));
+        $field = new ChoiceFormField($node);
+        $field->tick();
+        $this->assertEquals(1, $field->getValue(), '->tick() ticks checkoxes');
+    }
+
+    public function testUntick()
+    {
+        $node = $this->createSelectNode(array('foo' => false, 'bar' => false));
+        $field = new ChoiceFormField($node);
+
+        try {
+            $field->untick();
+            $this->fail('->untick() throws a \LogicException for select boxes');
+        } catch (\LogicException $e) {
+            $this->assertTrue(true, '->untick() throws a \LogicException for select boxes');
+        }
+
+        $node = $this->createNode('input', '', array('type' => 'checkbox', 'name' => 'name', 'checked' => 'checked'));
+        $field = new ChoiceFormField($node);
+        $field->untick();
+        $this->assertEquals(null, $field->getValue(), '->untick() unticks checkoxes');
+    }
+
+    public function testSelect()
+    {
+        $node = $this->createNode('input', '', array('type' => 'checkbox', 'name' => 'name', 'checked' => 'checked'));
+        $field = new ChoiceFormField($node);
+        $field->select(true);
+        $this->assertEquals(1, $field->getValue(), '->select() changes the value of the field');
+        $field->select(false);
+        $this->assertEquals(null, $field->getValue(), '->select() changes the value of the field');
+
+        $node = $this->createSelectNode(array('foo' => false, 'bar' => false));
+        $field = new ChoiceFormField($node);
+        $field->select('foo');
+        $this->assertEquals('foo', $field->getValue(), '->select() changes the selected option');
+    }
+
     protected function createSelectNode($options, $attributes = array())
     {
         $document = new \DOMDocument();

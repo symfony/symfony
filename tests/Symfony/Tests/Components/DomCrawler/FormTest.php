@@ -176,6 +176,23 @@ class FormTest extends \PHPUnit_Framework_TestCase
         }
     }
 
+    /**
+     * @expectedException LogicException
+     */
+    public function testOffsetUnset()
+    {
+        $form = $this->createForm('<form><input type="text" name="foo" value="foo" /><input type="submit" /></form>');
+        unset($form['foo']);
+    }
+
+    public function testOffsetIsset()
+    {
+        $form = $this->createForm('<form><input type="text" name="foo" value="foo" /><input type="submit" /></form>');
+
+        $this->assertTrue(isset($form['foo']), '->offsetIsset() return true if the field exists');
+        $this->assertFalse(isset($form['bar']), '->offsetIsset() return false if the field does not exist');
+    }
+
     public function testGetValues()
     {
         $form = $this->createForm('<form><input type="text" name="foo[bar]" value="foo" /><input type="text" name="bar" value="bar" /><input type="submit" /></form>');

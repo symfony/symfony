@@ -47,6 +47,10 @@ class CrawlerTest extends \PHPUnit_Framework_TestCase
         $crawler = new Crawler();
         $crawler->add($this->createNodeList()->item(0));
         $this->assertEquals('foo', $crawler->filter('div')->attr('class'), '->add() adds nodes from an \DOMNode');
+
+        $crawler = new Crawler();
+        $crawler->add('<html><body>Foo</body></html>');
+        $this->assertEquals('Foo', $crawler->filter('body')->text(), '->add() adds nodes from a string');
     }
 
     /**

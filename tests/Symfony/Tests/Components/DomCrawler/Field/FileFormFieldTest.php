@@ -53,6 +53,18 @@ class FileFormFieldTest extends FormFieldTestCase
         $this->assertEquals(array('name' => 'FileFormFieldTest.php', 'type' => '', 'tmp_name' => __FILE__, 'error' => 0, 'size' => filesize(__FILE__)), $field->getValue(), '->setValue() sets the value to the given file');
     }
 
+    public function testUpload()
+    {
+        $node = $this->createNode('input', '', array('type' => 'file'));
+        $field = new FileFormField($node);
+
+        $field->upload(null);
+        $this->assertEquals(array('name' => '', 'type' => '', 'tmp_name' => '', 'error' => UPLOAD_ERR_NO_FILE, 'size' => 0), $field->getValue(), '->upload() clears the uploaded file if the value is null');
+
+        $field->upload(__FILE__);
+        $this->assertEquals(array('name' => 'FileFormFieldTest.php', 'type' => '', 'tmp_name' => __FILE__, 'error' => 0, 'size' => filesize(__FILE__)), $field->getValue(), '->upload() sets the value to the given file');
+    }
+
     public function testSetErrorCode()
     {
         $node = $this->createNode('input', '', array('type' => 'file'));

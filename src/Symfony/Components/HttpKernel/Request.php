@@ -52,7 +52,7 @@ class Request
      */
     public function __construct(array $query = null, array $request = null, array $path = null, array $cookies = null, array $files = null, array $server = null)
     {
-        $this->initialize($request, $query, $path, $cookies, $files, $server);
+        $this->initialize($query, $request, $path, $cookies, $files, $server);
     }
 
     /**

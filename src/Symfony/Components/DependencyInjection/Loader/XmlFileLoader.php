@@ -245,7 +245,7 @@ class XmlFileLoader extends FileLoader
             $items = preg_split('/\s+/', $element);
             for ($i = 0, $nb = count($items); $i < $nb; $i += 2) {
                 if ($extension = static::getExtension($items[$i])) {
-                    $path = str_replace('http://www.symfony-project.org/', str_replace('\\', '/', $extension->getXsdValidationBasePath()).'/', $items[$i + 1]);
+                    $path = str_replace($extension->getNamespace(), str_replace('\\', '/', $extension->getXsdValidationBasePath()).'/', $items[$i + 1]);
 
                     if (!file_exists($path)) {
                         throw new \RuntimeException(sprintf('Extension "%s" references a non-existent XSD file "%s"', get_class($extension), $path));

@@ -129,7 +129,7 @@ class PropelExtension extends LoaderExtension
      */
     public function getXsdValidationBasePath()
     {
-        return __DIR__.'/../Resources/config/';
+        return __DIR__.'/../Resources/config/schema';
     }
 
     /**

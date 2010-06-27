@@ -44,7 +44,7 @@ class DependencyInjectionValidatorFactoryTest extends \PHPUnit_Framework_TestCas
 
     public function assertServiceExists($id)
     {
-        $this->assertTrue($this->container->hasService($id), 'Service ' . $id . ' doesn\'t exist on container');
+        $this->assertTrue($this->container->has($id), 'Service ' . $id . ' doesn\'t exist on container');
     }
 
     /**

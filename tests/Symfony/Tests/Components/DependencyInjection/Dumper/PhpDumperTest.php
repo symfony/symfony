@@ -12,6 +12,8 @@ namespace Symfony\Tests\Components\DependencyInjection\Dumper;
 
 use Symfony\Components\DependencyInjection\Builder;
 use Symfony\Components\DependencyInjection\Dumper\PhpDumper;
+use Symfony\Components\DependencyInjection\ParameterBag\ParameterBag;
+use Symfony\Components\DependencyInjection\Reference;
 
 class PhpDumperTest extends \PHPUnit_Framework_TestCase
 {
@@ -31,6 +33,15 @@ class PhpDumperTest extends \PHPUnit_Framework_TestCase
 
         $container = new Builder();
         $dumper = new PhpDumper($container);
+    }
+
+    /**
+     * @expectedException InvalidArgumentException
+     */
+    public function testExportParameters()
+    {
+        $dumper = new PhpDumper($container = new Builder(new ParameterBag(array('foo' => new Reference('foo')))));
+        $dumper->dump();
     }
 
     public function testAddParameters()
@@ -63,10 +74,10 @@ class PhpDumperTest extends \PHPUnit_Framework_TestCase
         require_once self::$fixturesPath.'/includes/foo.php';
 
         $container = new \ProjectServiceContainer();
-        $container->setService('bar', $bar = new \stdClass());
+        $container->set('bar', $bar = new \stdClass());
         $container->setParameter('foo_bar', 'foo_bar');
 
-        $this->assertEquals($bar, $container->getBarService(), '->setService() overrides an already defined service');
-        $this->assertEquals($bar, $container->getService('bar'), '->setService() overrides an already defined service');
+        $this->assertEquals($bar, $container->getBarService(), '->set() overrides an already defined service');
+        $this->assertEquals($bar, $container->get('bar'), '->set() overrides an already defined service');
     }
 }

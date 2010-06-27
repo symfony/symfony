@@ -6,7 +6,7 @@ use Symfony\Components\DependencyInjection\Definition;
 use Symfony\Components\DependencyInjection\Reference;
 use Symfony\Components\DependencyInjection\BuilderConfiguration;
 use Symfony\Components\DependencyInjection\SimpleXMLElement;
-use Symfony\Components\DependencyInjection\FileResource;
+use Symfony\Components\DependencyInjection\Resource\FileResource;
 
 /*
  * This file is part of the Symfony framework.
@@ -75,7 +75,7 @@ class XmlFileLoader extends FileLoader
             return;
         }
 
-        $configuration->addParameters($xml->parameters->getArgumentsAsPhp('parameter'));
+        $configuration->getParameterBag()->add($xml->parameters->getArgumentsAsPhp('parameter'));
     }
 
     protected function parseImports(BuilderConfiguration $configuration, $xml, $file)

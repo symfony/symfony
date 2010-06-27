@@ -21,6 +21,7 @@
 
     <parameter key="swiftmailer.transport.failover.class">Swift_Transport_FailoverTransport</parameter>
     <parameter key="swiftmailer.spool.file.class">Swift_FileSpool</parameter>
+    <parameter key="swiftmailer.spool.file.path">%kernel.cache_dir%/swiftmailer/pool</parameter>
 
     <parameter key="swiftmailer.init_file">%swiftmailer.base_dir%/swift_init.php</parameter>
 

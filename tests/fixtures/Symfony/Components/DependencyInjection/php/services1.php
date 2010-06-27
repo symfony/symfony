@@ -1,8 +1,10 @@
 <?php
 
+use Symfony\Components\DependencyInjection\ContainerInterface;
 use Symfony\Components\DependencyInjection\Container;
 use Symfony\Components\DependencyInjection\Reference;
 use Symfony\Components\DependencyInjection\Parameter;
+use Symfony\Components\DependencyInjection\ParameterBag\ParameterBag;
 
 /**
  * ProjectServiceContainer
@@ -13,6 +15,14 @@ use Symfony\Components\DependencyInjection\Parameter;
 class ProjectServiceContainer extends Container
 {
     protected $shared = array();
+
+    /**
+     * Constructor.
+     */
+    public function __construct()
+    {
+        parent::__construct(new ParameterBag($this->getDefaultParameters()));
+    }
 
     /**
      * Returns service ids for a given annotation.

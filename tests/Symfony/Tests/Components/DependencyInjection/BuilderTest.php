@@ -11,9 +11,11 @@
 namespace Symfony\Tests\Components\DependencyInjection;
 
 use Symfony\Components\DependencyInjection\Builder;
+use Symfony\Components\DependencyInjection\ContainerInterface;
 use Symfony\Components\DependencyInjection\BuilderConfiguration;
 use Symfony\Components\DependencyInjection\Definition;
 use Symfony\Components\DependencyInjection\Reference;
+use Symfony\Components\DependencyInjection\ParameterBag\ParameterBag;
 
 class BuilderTest extends \PHPUnit_Framework_TestCase
 {
@@ -24,6 +26,12 @@ class BuilderTest extends \PHPUnit_Framework_TestCase
         self::$fixturesPath = __DIR__.'/../../../../fixtures/Symfony/Components/DependencyInjection/';
     }
 
+    /**
+     * @covers Symfony\Components\DependencyInjection\Builder::setDefinitions
+     * @covers Symfony\Components\DependencyInjection\Builder::getDefinitions
+     * @covers Symfony\Components\DependencyInjection\Builder::setDefinition
+     * @covers Symfony\Components\DependencyInjection\Builder::getDefinition
+     */
     public function testDefinitions()
     {
         $builder = new Builder();
@@ -52,6 +60,9 @@ class BuilderTest extends \PHPUnit_Framework_TestCase
         }
     }
 
+    /**
+     * @covers Symfony\Components\DependencyInjection\Builder::register
+     */
     public function testRegister()
     {
         $builder = new Builder();
@@ -60,46 +71,58 @@ class BuilderTest extends \PHPUnit_Framework_TestCase
         $this->assertInstanceOf('Symfony\Components\DependencyInjection\Definition', $builder->getDefinition('foo'), '->register() returns the newly created Definition instance');
     }
 
-    public function testHasService()
+    /**
+     * @covers Symfony\Components\DependencyInjection\Builder::has
+     */
+    public function testHas()
     {
         $builder = new Builder();
-        $this->assertFalse($builder->hasService('foo'), '->hasService() returns false if the service does not exist');
+        $this->assertFalse($builder->has('foo'), '->has() returns false if the service does not exist');
         $builder->register('foo', 'FooClass');
-        $this->assertTrue($builder->hasService('foo'), '->hasService() returns true if a service definition exists');
-        $builder->bar = new \stdClass();
-        $this->assertTrue($builder->hasService('bar'), '->hasService() returns true if a service exists');
+        $this->assertTrue($builder->has('foo'), '->has() returns true if a service definition exists');
+        $builder->set('bar', new \stdClass());
+        $this->assertTrue($builder->has('bar'), '->has() returns true if a service exists');
     }
 
-    public function testGetService()
+    /**
+     * @covers Symfony\Components\DependencyInjection\Builder::get
+     */
+    public function testGet()
     {
         $builder = new Builder();
         try {
-            $builder->getService('foo');
-            $this->fail('->getService() throws an InvalidArgumentException if the service does not exist');
+            $builder->get('foo');
+            $this->fail('->get() throws an InvalidArgumentException if the service does not exist');
         } catch (\Exception $e) {
-            $this->assertInstanceOf('\InvalidArgumentException', $e, '->getService() throws an InvalidArgumentException if the service does not exist');
-            $this->assertEquals('The service definition "foo" does not exist.', $e->getMessage(), '->getService() throws an InvalidArgumentException if the service does not exist');
+            $this->assertInstanceOf('\InvalidArgumentException', $e, '->get() throws an InvalidArgumentException if the service does not exist');
+            $this->assertEquals('The service definition "foo" does not exist.', $e->getMessage(), '->get() throws an InvalidArgumentException if the service does not exist');
         }
+
+        $this->assertNull($builder->get('foo', ContainerInterface::NULL_ON_INVALID_REFERENCE), '->get() returns null if the service does not exist and NULL_ON_INVALID_REFERENCE is passed as a second argument');
+
         $builder->register('foo', 'stdClass');
-        $this->assertType('object', $builder->getService('foo'), '->getService() returns the service definition associated with the id');
-        $builder->bar = $bar = new \stdClass();
-        $this->assertEquals($bar, $builder->getService('bar'), '->getService() returns the service associated with the id');
+        $this->assertType('object', $builder->get('foo'), '->get() returns the service definition associated with the id');
+        $builder->set('bar', $bar = new \stdClass());
+        $this->assertEquals($bar, $builder->get('bar'), '->get() returns the service associated with the id');
         $builder->register('bar', 'stdClass');
-        $this->assertEquals($bar, $builder->getService('bar'), '->getService() returns the service associated with the id even if a definition has been defined');
+        $this->assertEquals($bar, $builder->get('bar'), '->get() returns the service associated with the id even if a definition has been defined');
 
         $builder->register('baz', 'stdClass')->setArguments(array(new Reference('baz')));
         try {
-            @$builder->getService('baz');
-            $this->fail('->getService() throws a LogicException if the service has a circular reference to itself');
+            @$builder->get('baz');
+            $this->fail('->get() throws a LogicException if the service has a circular reference to itself');
         } catch (\Exception $e) {
-            $this->assertInstanceOf('\LogicException', $e, '->getService() throws a LogicException if the service has a circular reference to itself');
-            $this->assertEquals('The service "baz" has a circular reference to itself.', $e->getMessage(), '->getService() throws a LogicException if the service has a circular reference to itself');
+            $this->assertInstanceOf('\LogicException', $e, '->get() throws a LogicException if the service has a circular reference to itself');
+            $this->assertEquals('The service "baz" has a circular reference to itself.', $e->getMessage(), '->get() throws a LogicException if the service has a circular reference to itself');
         }
 
         $builder->register('foobar', 'stdClass')->setShared(true);
-        $this->assertTrue($builder->getService('bar') === $builder->getService('bar'), '->getService() always returns the same instance if the service is shared');
+        $this->assertTrue($builder->get('bar') === $builder->get('bar'), '->get() always returns the same instance if the service is shared');
     }
 
+    /**
+     * @covers Symfony\Components\DependencyInjection\Builder::getServiceIds
+     */
     public function testGetServiceIds()
     {
         $builder = new Builder();
@@ -109,6 +132,11 @@ class BuilderTest extends \PHPUnit_Framework_TestCase
         $this->assertEquals(array('foo', 'bar', 'service_container'), $builder->getServiceIds(), '->getServiceIds() returns all defined service ids');
     }
 
+    /**
+     * @covers Symfony\Components\DependencyInjection\Builder::setAlias
+     * @covers Symfony\Components\DependencyInjection\Builder::hasAlias
+     * @covers Symfony\Components\DependencyInjection\Builder::getAlias
+     */
     public function testAliases()
     {
         $builder = new Builder();
@@ -117,8 +145,8 @@ class BuilderTest extends \PHPUnit_Framework_TestCase
         $this->assertTrue($builder->hasAlias('bar'), '->hasAlias() returns true if the alias exists');
         $this->assertFalse($builder->hasAlias('foobar'), '->hasAlias() returns false if the alias does not exist');
         $this->assertEquals('foo', $builder->getAlias('bar'), '->getAlias() returns the aliased service');
-        $this->assertTrue($builder->hasService('bar'), '->setAlias() defines a new service');
-        $this->assertTrue($builder->getService('bar') === $builder->getService('foo'), '->setAlias() creates a service that is an alias to another one');
+        $this->assertTrue($builder->has('bar'), '->setAlias() defines a new service');
+        $this->assertTrue($builder->get('bar') === $builder->get('foo'), '->setAlias() creates a service that is an alias to another one');
 
         try {
             $builder->getAlias('foobar');
@@ -129,6 +157,9 @@ class BuilderTest extends \PHPUnit_Framework_TestCase
         }
     }
 
+    /**
+     * @covers Symfony\Components\DependencyInjection\Builder::getAliases
+     */
     public function testGetAliases()
     {
         $builder = new Builder();
@@ -137,75 +168,114 @@ class BuilderTest extends \PHPUnit_Framework_TestCase
         $this->assertEquals(array('bar' => 'foo', 'foobar' => 'foo'), $builder->getAliases(), '->getAliases() returns all service aliases');
         $builder->register('bar', 'stdClass');
         $this->assertEquals(array('foobar' => 'foo'), $builder->getAliases(), '->getAliases() does not return aliased services that have been overridden');
-        $builder->setService('foobar', 'stdClass');
+        $builder->set('foobar', 'stdClass');
         $this->assertEquals(array(), $builder->getAliases(), '->getAliases() does not return aliased services that have been overridden');
     }
 
+    /**
+     * @covers Symfony\Components\DependencyInjection\Builder::setAliases
+     */
+    public function testSetAliases()
+    {
+        $builder = new Builder();
+        $builder->setAliases(array('bar' => 'foo', 'foobar' => 'foo'));
+        $this->assertEquals(array('bar' => 'foo', 'foobar' => 'foo'), $builder->getAliases(), '->getAliases() returns all service aliases');
+    }
+
+    /**
+     * @covers Symfony\Components\DependencyInjection\Builder::addAliases
+     */
+    public function testAddAliases()
+    {
+        $builder = new Builder();
+        $builder->setAliases(array('bar' => 'foo'));
+        $builder->addAliases(array('foobar' => 'foo'));
+        $this->assertEquals(array('bar' => 'foo', 'foobar' => 'foo'), $builder->getAliases(), '->getAliases() returns all service aliases');
+    }
+
+    /**
+     * @covers Symfony\Components\DependencyInjection\Builder::createService
+     */
     public function testCreateService()
     {
         $builder = new Builder();
         $builder->register('foo1', 'FooClass')->setFile(self::$fixturesPath.'/includes/foo.php');
-        $this->assertInstanceOf('\FooClass', $builder->getService('foo1'), '->createService() requires the file defined by the service definition');
+        $this->assertInstanceOf('\FooClass', $builder->get('foo1'), '->createService() requires the file defined by the service definition');
         $builder->register('foo2', 'FooClass')->setFile(self::$fixturesPath.'/includes/%file%.php');
         $builder->setParameter('file', 'foo');
-        $this->assertInstanceOf('\FooClass', $builder->getService('foo2'), '->createService() replaces parameters in the file provided by the service definition');
+        $this->assertInstanceOf('\FooClass', $builder->get('foo2'), '->createService() replaces parameters in the file provided by the service definition');
     }
 
+    /**
+     * @covers Symfony\Components\DependencyInjection\Builder::createService
+     */
     public function testCreateServiceClass()
     {
         $builder = new Builder();
         $builder->register('foo1', '%class%');
         $builder->setParameter('class', 'stdClass');
-        $this->assertInstanceOf('\stdClass', $builder->getService('foo1'), '->createService() replaces parameters in the class provided by the service definition');
+        $this->assertInstanceOf('\stdClass', $builder->get('foo1'), '->createService() replaces parameters in the class provided by the service definition');
     }
 
+    /**
+     * @covers Symfony\Components\DependencyInjection\Builder::createService
+     */
     public function testCreateServiceArguments()
     {
         $builder = new Builder();
         $builder->register('bar', 'stdClass');
         $builder->register('foo1', 'FooClass')->addArgument(array('foo' => '%value%', '%value%' => 'foo', new Reference('bar')));
         $builder->setParameter('value', 'bar');
-        $this->assertEquals(array('foo' => 'bar', 'bar' => 'foo', $builder->getService('bar')), $builder->getService('foo1')->arguments, '->createService() replaces parameters and service references in the arguments provided by the service definition');
+        $this->assertEquals(array('foo' => 'bar', 'bar' => 'foo', $builder->get('bar')), $builder->get('foo1')->arguments, '->createService() replaces parameters and service references in the arguments provided by the service definition');
     }
 
+    /**
+     * @covers Symfony\Components\DependencyInjection\Builder::createService
+     */
     public function testCreateServiceConstructor()
     {
         $builder = new Builder();
         $builder->register('bar', 'stdClass');
         $builder->register('foo1', 'FooClass')->setConstructor('getInstance')->addArgument(array('foo' => '%value%', '%value%' => 'foo', new Reference('bar')));
         $builder->setParameter('value', 'bar');
-        $this->assertTrue($builder->getService('foo1')->called, '->createService() calls the constructor to create the service instance');
-        $this->assertEquals(array('foo' => 'bar', 'bar' => 'foo', $builder->getService('bar')), $builder->getService('foo1')->arguments, '->createService() passes the arguments to the constructor');
+        $this->assertTrue($builder->get('foo1')->called, '->createService() calls the constructor to create the service instance');
+        $this->assertEquals(array('foo' => 'bar', 'bar' => 'foo', $builder->get('bar')), $builder->get('foo1')->arguments, '->createService() passes the arguments to the constructor');
     }
 
+    /**
+     * @covers Symfony\Components\DependencyInjection\Builder::createService
+     */
     public function testCreateServiceMethodCalls()
     {
         $builder = new Builder();
         $builder->register('bar', 'stdClass');
         $builder->register('foo1', 'FooClass')->addMethodCall('setBar', array(array('%value%', new Reference('bar'))));
         $builder->setParameter('value', 'bar');
-        $this->assertEquals(array('bar', $builder->getService('bar')), $builder->getService('foo1')->bar, '->createService() replaces the values in the method calls arguments');
+        $this->assertEquals(array('bar', $builder->get('bar')), $builder->get('foo1')->bar, '->createService() replaces the values in the method calls arguments');
     }
 
+    /**
+     * @covers Symfony\Components\DependencyInjection\Builder::createService
+     */
     public function testCreateServiceConfigurator()
     {
         require_once self::$fixturesPath.'/includes/classes.php';
 
         $builder = new Builder();
         $builder->register('foo1', 'FooClass')->setConfigurator('sc_configure');
-        $this->assertTrue($builder->getService('foo1')->configured, '->createService() calls the configurator');
+        $this->assertTrue($builder->get('foo1')->configured, '->createService() calls the configurator');
 
         $builder->register('foo2', 'FooClass')->setConfigurator(array('%class%', 'configureStatic'));
         $builder->setParameter('class', 'BazClass');
-        $this->assertTrue($builder->getService('foo2')->configured, '->createService() calls the configurator');
+        $this->assertTrue($builder->get('foo2')->configured, '->createService() calls the configurator');
 
         $builder->register('baz', 'BazClass');
         $builder->register('foo3', 'FooClass')->setConfigurator(array(new Reference('baz'), 'configure'));
-        $this->assertTrue($builder->getService('foo3')->configured, '->createService() calls the configurator');
+        $this->assertTrue($builder->get('foo3')->configured, '->createService() calls the configurator');
 
         $builder->register('foo4', 'FooClass')->setConfigurator('foo');
         try {
-            $builder->getService('foo4');
+            $builder->get('foo4');
             $this->fail('->createService() throws an InvalidArgumentException if the configure callable is not a valid callable');
         } catch (\Exception $e) {
             $this->assertInstanceOf('\InvalidArgumentException', $e, '->createService() throws an InvalidArgumentException if the configure callable is not a valid callable');
@@ -213,6 +283,9 @@ class BuilderTest extends \PHPUnit_Framework_TestCase
         }
     }
 
+    /**
+     * @covers Symfony\Components\DependencyInjection\Builder::resolveValue
+     */
     public function testResolveValue()
     {
         $this->assertEquals('foo', Builder::resolveValue('foo', array()), '->resolveValue() returns its argument unmodified if no placeholders are found');
@@ -243,44 +316,46 @@ class BuilderTest extends \PHPUnit_Framework_TestCase
         }
     }
 
+    /**
+     * @covers Symfony\Components\DependencyInjection\Builder::resolveServices
+     */
     public function testResolveServices()
     {
         $builder = new Builder();
         $builder->register('foo', 'FooClass');
-        $this->assertEquals($builder->getService('foo'), $builder->resolveServices(new Reference('foo')), '->resolveServices() resolves service references to service instances');
-        $this->assertEquals(array('foo' => array('foo', $builder->getService('foo'))), $builder->resolveServices(array('foo' => array('foo', new Reference('foo')))), '->resolveServices() resolves service references to service instances in nested arrays');
+        $this->assertEquals($builder->get('foo'), $builder->resolveServices(new Reference('foo')), '->resolveServices() resolves service references to service instances');
+        $this->assertEquals(array('foo' => array('foo', $builder->get('foo'))), $builder->resolveServices(array('foo' => array('foo', new Reference('foo')))), '->resolveServices() resolves service references to service instances in nested arrays');
     }
 
+    /**
+     * @covers Symfony\Components\DependencyInjection\Builder::merge
+     */
     public function testMerge()
     {
         $container = new Builder();
         $container->merge(null);
-        $this->assertEquals(array(), $container->getParameters(), '->merge() accepts null as an argument');
+        $this->assertEquals(array(), $container->getParameterBag()->all(), '->merge() accepts null as an argument');
         $this->assertEquals(array(), $container->getDefinitions(), '->merge() accepts null as an argument');
 
-        $container = new Builder(array('bar' => 'foo'));
-        $config = new BuilderConfiguration();
-        $config->setParameters(array('foo' => 'bar'));
+        $container = new Builder(new ParameterBag(array('bar' => 'foo')));
+        $config = new BuilderConfiguration(array(), new ParameterBag(array('foo' => 'bar')));
         $container->merge($config);
-        $this->assertEquals(array('bar' => 'foo', 'foo' => 'bar'), $container->getParameters(), '->merge() merges current parameters with the loaded ones');
+        $this->assertEquals(array('bar' => 'foo', 'foo' => 'bar'), $container->getParameterBag()->all(), '->merge() merges current parameters with the loaded ones');
 
-        $container = new Builder(array('bar' => 'foo', 'foo' => 'baz'));
-        $config = new BuilderConfiguration();
-        $config->setParameters(array('foo' => 'bar'));
+        $container = new Builder(new ParameterBag(array('bar' => 'foo', 'foo' => 'baz')));
+        $config = new BuilderConfiguration(array(), new ParameterBag(array('foo' => 'bar')));
         $container->merge($config);
-        $this->assertEquals(array('bar' => 'foo', 'foo' => 'baz'), $container->getParameters(), '->merge() does not change the already defined parameters');
+        $this->assertEquals(array('bar' => 'foo', 'foo' => 'baz'), $container->getParameterBag()->all(), '->merge() does not change the already defined parameters');
 
-        $container = new Builder(array('bar' => 'foo'));
-        $config = new BuilderConfiguration();
-        $config->setParameters(array('foo' => '%bar%'));
+        $container = new Builder(new ParameterBag(array('bar' => 'foo')));
+        $config = new BuilderConfiguration(array(), new ParameterBag(array('foo' => '%bar%')));
         $container->merge($config);
-        $this->assertEquals(array('bar' => 'foo', 'foo' => 'foo'), $container->getParameters(), '->merge() evaluates the values of the parameters towards already defined ones');
+        $this->assertEquals(array('bar' => 'foo', 'foo' => 'foo'), $container->getParameterBag()->all(), '->merge() evaluates the values of the parameters towards already defined ones');
 
-        $container = new Builder(array('bar' => 'foo'));
-        $config = new BuilderConfiguration();
-        $config->setParameters(array('foo' => '%bar%', 'baz' => '%foo%'));
+        $container = new Builder(new ParameterBag(array('bar' => 'foo')));
+        $config = new BuilderConfiguration(array(), new ParameterBag(array('foo' => '%bar%', 'baz' => '%foo%')));
         $container->merge($config);
-        $this->assertEquals(array('bar' => 'foo', 'foo' => 'foo', 'baz' => 'foo'), $container->getParameters(), '->merge() evaluates the values of the parameters towards already defined ones');
+        $this->assertEquals(array('bar' => 'foo', 'foo' => 'foo', 'baz' => 'foo'), $container->getParameterBag()->all(), '->merge() evaluates the values of the parameters towards already defined ones');
 
         $container = new Builder();
         $container->register('foo', 'FooClass');
@@ -299,6 +374,9 @@ class BuilderTest extends \PHPUnit_Framework_TestCase
         $this->assertEquals('BazClass', $container->getDefinition('foo')->getClass(), '->merge() overrides already defined services');
     }
 
+    /**
+     * @covers Symfony\Components\DependencyInjection\Builder::findAnnotatedServiceIds
+     */
     public function testFindAnnotatedServiceIds()
     {
         $builder = new Builder();

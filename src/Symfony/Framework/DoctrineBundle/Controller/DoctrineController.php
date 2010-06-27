@@ -26,7 +26,7 @@ class DoctrineController extends Controller
     public function getDatabaseConnection($name = null)
     {
         if ($name) {
-            return $this->container->getService(sprintf('doctrine.dbal.%s_connection', $name));
+            return $this->container->get(sprintf('doctrine.dbal.%s_connection', $name));
         } else {
             return $this->container->getDatabaseConnectionService();
         }
@@ -43,7 +43,7 @@ class DoctrineController extends Controller
     protected function getEntityManager($name = null)
     {
         if ($name) {
-            return $this->container->getService(sprintf('doctrine.orm.%s_entity_manager', $name));
+            return $this->container->get(sprintf('doctrine.orm.%s_entity_manager', $name));
         } else {
             return $this->container->getDoctrine_ORM_EntityManagerService();
         }

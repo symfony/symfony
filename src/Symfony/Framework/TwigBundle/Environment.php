@@ -27,7 +27,7 @@ class Environment extends \Twig_Environment
         parent::__construct($loader, $options);
 
         foreach ($container->findAnnotatedServiceIds('twig.extension') as $id => $attributes) {
-            $this->addExtension($container->getService($id));
+            $this->addExtension($container->get($id));
         }
     }
 }

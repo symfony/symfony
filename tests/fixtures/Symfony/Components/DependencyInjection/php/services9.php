@@ -1,8 +1,10 @@
 <?php
 
+use Symfony\Components\DependencyInjection\ContainerInterface;
 use Symfony\Components\DependencyInjection\Container;
 use Symfony\Components\DependencyInjection\Reference;
 use Symfony\Components\DependencyInjection\Parameter;
+use Symfony\Components\DependencyInjection\ParameterBag\ParameterBag;
 
 /**
  * ProjectServiceContainer
@@ -26,9 +28,7 @@ class ProjectServiceContainer extends Container
      */
     public function __construct()
     {
-        parent::__construct();
-
-        $this->parameters = $this->getDefaultParameters();
+        parent::__construct(new ParameterBag($this->getDefaultParameters()));
     }
 
     /**
@@ -120,12 +120,12 @@ class ProjectServiceContainer extends Container
         $instance = new FooClass();
         $this->shared['method_call1'] = $instance;
         $instance->setBar($this->getFooService());
-        $instance->setBar($this->getService('foo', Container::NULL_ON_INVALID_REFERENCE));
-        if ($this->hasService('foo')) {
-            $instance->setBar($this->getService('foo', Container::NULL_ON_INVALID_REFERENCE));
+        $instance->setBar($this->get('foo', ContainerInterface::NULL_ON_INVALID_REFERENCE));
+        if ($this->has('foo')) {
+            $instance->setBar($this->get('foo', ContainerInterface::NULL_ON_INVALID_REFERENCE));
         }
-        if ($this->hasService('foobaz')) {
-            $instance->setBar($this->getService('foobaz', Container::NULL_ON_INVALID_REFERENCE));
+        if ($this->has('foobaz')) {
+            $instance->setBar($this->get('foobaz', ContainerInterface::NULL_ON_INVALID_REFERENCE));
         }
 
         return $instance;

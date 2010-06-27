@@ -41,11 +41,11 @@ abstract class DoctrineCommand extends Command
         $container = $application->getKernel()->getContainer();
         $emName = $emName ? $emName : 'default';
         $emServiceName = sprintf('doctrine.orm.%s_entity_manager', $emName);
-        if (!$container->hasService($emServiceName)) {
+        if (!$container->has($emServiceName)) {
             throw new \InvalidArgumentException(sprintf('Could not find Doctrine EntityManager named "%s"', $emName));
         }
 
-        $em = $container->getService($emServiceName);
+        $em = $container->get($emServiceName);
         $helperSet = $application->getHelperSet();
         $helperSet->set(new ConnectionHelper($em->getConnection()), 'db');
         $helperSet->set(new EntityManagerHelper($em), 'em');
@@ -56,11 +56,11 @@ abstract class DoctrineCommand extends Command
         $container = $application->getKernel()->getContainer();
         $connName = $connName ? $connName : 'default';
         $connServiceName = sprintf('doctrine.dbal.%s_connection', $connName);
-        if (!$container->hasService($connServiceName)) {
+        if (!$container->has($connServiceName)) {
             throw new \InvalidArgumentException(sprintf('Could not find Doctrine Connection named "%s"', $connName));
         }
 
-        $connection = $container->getService($connServiceName);
+        $connection = $container->get($connServiceName);
         $helperSet = $application->getHelperSet();
         $helperSet->set(new ConnectionHelper($connection), 'db');
     }
@@ -81,11 +81,11 @@ abstract class DoctrineCommand extends Command
     {
         $name = $name ? $name : 'default';
         $serviceName = sprintf('doctrine.orm.%s_entity_manager', $name);
-        if (!$this->container->hasService($serviceName)) {
+        if (!$this->container->has($serviceName)) {
             throw new \InvalidArgumentException(sprintf('Could not find Doctrine EntityManager named "%s"', $name));
         }
 
-        return $this->container->getService($serviceName);
+        return $this->container->get($serviceName);
     }
 
     protected function runCommand($name, array $input = array())
@@ -111,7 +111,7 @@ abstract class DoctrineCommand extends Command
             preg_match('/doctrine.dbal.(.*)_connection/', $id, $matches);
             if ($matches) {
                 $name = $matches[1];
-                $connections[$name] = $this->container->getService($id);
+                $connections[$name] = $this->container->get($id);
             }
         }
 
@@ -126,7 +126,7 @@ abstract class DoctrineCommand extends Command
             preg_match('/doctrine.orm.(.*)_entity_manager/', $id, $matches);
             if ($matches) {
                 $name = $matches[1];
-                $entityManagers[$name] = $this->container->getService($id);
+                $entityManagers[$name] = $this->container->get($id);
             }
         }
         return $entityManagers;

@@ -64,7 +64,7 @@ class ExceptionHandler
             '_controller'     => $this->controller,
             'exception'       => $exception,
             'originalRequest' => $event->getParameter('request'),
-            'logs'            => $this->container->hasService('zend.logger.writer.debug') ? $this->container->getService('zend.logger.writer.debug')->getLogs() : array(),
+            'logs'            => $this->container->has('zend.logger.writer.debug') ? $this->container->get('zend.logger.writer.debug')->getLogs() : array(),
         );
 
         $request = $event->getParameter('request')->duplicate(null, null, $parameters);

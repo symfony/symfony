@@ -2,7 +2,7 @@
 
 require_once __DIR__.'/../includes/classes.php';
 
-use Symfony\Components\DependencyInjection\Container;
+use Symfony\Components\DependencyInjection\ContainerInterface;
 use Symfony\Components\DependencyInjection\Builder;
 use Symfony\Components\DependencyInjection\Reference;
 use Symfony\Components\DependencyInjection\Parameter;
@@ -32,7 +32,8 @@ $container->
     setConfigurator(array('%baz_class%', 'configureStatic1'))
 ;
 $container->register('foo_bar', '%foo_class%');
-$container->setParameters(array(
+$container->getParameterBag()->clear();
+$container->getParameterBag()->add(array(
     'baz_class' => 'BazClass',
     'foo_class' => 'FooClass',
     'foo' => 'bar',
@@ -41,9 +42,9 @@ $container->setAlias('alias_for_foo', 'foo');
 $container->
     register('method_call1', 'FooClass')->
     addMethodCall('setBar', array(new Reference('foo')))->
-    addMethodCall('setBar', array(new Reference('foo', Container::NULL_ON_INVALID_REFERENCE)))->
-    addMethodCall('setBar', array(new Reference('foo', Container::IGNORE_ON_INVALID_REFERENCE)))->
-    addMethodCall('setBar', array(new Reference('foobaz', Container::IGNORE_ON_INVALID_REFERENCE)))
+    addMethodCall('setBar', array(new Reference('foo', ContainerInterface::NULL_ON_INVALID_REFERENCE)))->
+    addMethodCall('setBar', array(new Reference('foo', ContainerInterface::IGNORE_ON_INVALID_REFERENCE)))->
+    addMethodCall('setBar', array(new Reference('foobaz', ContainerInterface::IGNORE_ON_INVALID_REFERENCE)))
 ;
 
 return $container;

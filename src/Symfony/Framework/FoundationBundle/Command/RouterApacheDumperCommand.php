@@ -42,7 +42,7 @@ class RouterApacheDumperCommand extends Command
      */
     protected function execute(InputInterface $input, OutputInterface $output)
     {
-        $router = $this->container->getService('router');
+        $router = $this->container->get('router');
 
         $dumper = new ApacheMatcherDumper($router->getRouteCollection());
 

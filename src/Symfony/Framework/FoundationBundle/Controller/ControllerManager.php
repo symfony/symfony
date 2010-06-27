@@ -33,7 +33,7 @@ class ControllerManager
     {
         $this->container = $container;
         $this->logger = $logger;
-        $this->esiSupport = $container->hasService('esi') && $container->getEsiService()->hasSurrogateEsiCapability($container->getRequestService());
+        $this->esiSupport = $container->has('esi') && $container->getEsiService()->hasSurrogateEsiCapability($container->getRequestService());
     }
 
     /**

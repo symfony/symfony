@@ -6,7 +6,8 @@ use Symfony\Components\DependencyInjection\ContainerInterface;
 use Symfony\Components\DependencyInjection\Builder;
 use Symfony\Components\DependencyInjection\BuilderConfiguration;
 use Symfony\Components\DependencyInjection\Dumper\PhpDumper;
-use Symfony\Components\DependencyInjection\FileResource;
+use Symfony\Components\DependencyInjection\Resource\FileResource;
+use Symfony\Components\DependencyInjection\ParameterBag\ParameterBag;
 use Symfony\Components\HttpKernel\Request;
 use Symfony\Components\HttpKernel\HttpKernelInterface;
 
@@ -120,7 +121,7 @@ abstract class Kernel implements HttpKernelInterface, \Serializable
 
         // initialize the container
         $this->container = $this->initializeContainer();
-        $this->container->setService('kernel', $this);
+        $this->container->set('kernel', $this);
 
         // boot bundles
         foreach ($this->bundles as $bundle) {
@@ -194,11 +195,11 @@ abstract class Kernel implements HttpKernelInterface, \Serializable
             $this->request = $request;
         }
 
-        $this->container->setService('request', $request);
+        $this->container->set('request', $request);
 
         $response = $this->container->getHttpKernelService()->handle($request, $type, $raw);
 
-        $this->container->setService('request', $this->request);
+        $this->container->set('request', $this->request);
 
         return $response;
     }
@@ -337,7 +338,7 @@ abstract class Kernel implements HttpKernelInterface, \Serializable
 
     protected function buildContainer($class, $file)
     {
-        $container = new Builder($this->getKernelParameters());
+        $container = new Builder(new ParameterBag($this->getKernelParameters()));
 
         $configuration = new BuilderConfiguration();
         foreach ($this->bundles as $bundle) {
@@ -345,7 +346,7 @@ abstract class Kernel implements HttpKernelInterface, \Serializable
         }
         $configuration->merge($this->registerContainerConfiguration());
         $container->merge($configuration);
-        $this->optimizeContainer($container);
+        $container->freeze();
 
         foreach (array('cache', 'logs') as $name) {
             $dir = $container->getParameter(sprintf('kernel.%s_dir', $name));
@@ -376,16 +377,6 @@ abstract class Kernel implements HttpKernelInterface, \Serializable
 
             // save the resources
             $this->writeCacheFile($this->getCacheDir().'/'.$class.'.meta', serialize($configuration->getResources()));
-        }
-    }
-
-    public function optimizeContainer(Builder $container)
-    {
-        // replace all classes with the real value
-        foreach ($container->getDefinitions() as $definition) {
-            if (false !== strpos($class = $definition->getClass(), '%')) {
-                $definition->setClass(Builder::resolveValue($class, $container->getParameters()));
-            }
         }
     }
 

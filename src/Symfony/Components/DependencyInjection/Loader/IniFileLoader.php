@@ -3,7 +3,7 @@
 namespace Symfony\Components\DependencyInjection\Loader;
 
 use Symfony\Components\DependencyInjection\BuilderConfiguration;
-use Symfony\Components\DependencyInjection\FileResource;
+use Symfony\Components\DependencyInjection\Resource\FileResource;
 
 /*
  * This file is part of the Symfony framework.
@@ -51,7 +51,7 @@ class IniFileLoader extends FileLoader
 
         if (isset($result['parameters']) && is_array($result['parameters'])) {
             foreach ($result['parameters'] as $key => $value) {
-                $configuration->setParameter(strtolower($key), $value);
+                $configuration->setParameter($key, $value);
             }
         }
 

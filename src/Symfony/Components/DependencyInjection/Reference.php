@@ -31,7 +31,7 @@ class Reference
      *
      * @see Container
      */
-    public function __construct($id, $invalidBehavior = Container::EXCEPTION_ON_INVALID_REFERENCE)
+    public function __construct($id, $invalidBehavior = ContainerInterface::EXCEPTION_ON_INVALID_REFERENCE)
     {
         $this->id = $id;
         $this->invalidBehavior = $invalidBehavior;

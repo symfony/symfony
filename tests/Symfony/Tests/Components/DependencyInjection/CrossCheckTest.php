@@ -50,7 +50,7 @@ class CrossCheckTest extends \PHPUnit_Framework_TestCase
 
         $this->assertEquals(serialize($container2), serialize($container1), 'loading a dump from a previously loaded container returns the same container');
 
-        $this->assertEquals($container2->getParameters(), $container1->getParameters(), '->getParameters() returns the same value for both containers');
+        $this->assertEquals($container2->getParameterBag()->all(), $container1->getParameterBag()->all(), '->getParameterBag() returns the same value for both containers');
 
         $services1 = array();
         foreach ($container1 as $id => $service) {

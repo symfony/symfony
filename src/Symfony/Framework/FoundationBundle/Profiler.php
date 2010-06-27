@@ -43,7 +43,7 @@ class Profiler extends BaseProfiler
         $coreCollectors = array();
         $userCollectors = array();
         foreach ($config as $id => $attributes) {
-            $collector = $this->container->getService($id);
+            $collector = $this->container->get($id);
             $collector->setProfiler($this);
 
             if (isset($attributes[0]['core']) && $attributes[0]['core']) {

@@ -8,9 +8,9 @@
  * file that was distributed with this source code.
  */
 
-namespace Symfony\Tests\Components\DependencyInjection;
+namespace Symfony\Tests\Components\DependencyInjection\Resource;
 
-use Symfony\Components\DependencyInjection\FileResource;
+use Symfony\Components\DependencyInjection\Resource\FileResource;
 
 class FileResourceTest extends \PHPUnit_Framework_TestCase
 {
@@ -29,11 +29,17 @@ class FileResourceTest extends \PHPUnit_Framework_TestCase
         unlink($this->file);
     }
 
+    /**
+     * @covers Symfony\Components\DependencyInjection\Resource\FileResource::getResource
+     */
     public function testGetResource()
     {
         $this->assertEquals($this->file, $this->resource->getResource(), '->getResource() returns the path to the resource');
     }
 
+    /**
+     * @covers Symfony\Components\DependencyInjection\Resource\FileResource::isUptodate
+     */
     public function testIsUptodate()
     {
         $this->assertTrue($this->resource->isUptodate(time() + 10), '->isUptodate() returns true if the resource has not changed');

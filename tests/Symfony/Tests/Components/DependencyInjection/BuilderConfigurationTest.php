@@ -14,7 +14,8 @@ use Symfony\Components\DependencyInjection\Builder;
 use Symfony\Components\DependencyInjection\BuilderConfiguration;
 use Symfony\Components\DependencyInjection\Definition;
 use Symfony\Components\DependencyInjection\Reference;
-use Symfony\Components\DependencyInjection\FileResource;
+use Symfony\Components\DependencyInjection\Resource\FileResource;
+use Symfony\Components\DependencyInjection\ParameterBag\ParameterBag;
 
 class BuilderConfigurationTest extends \PHPUnit_Framework_TestCase
 {
@@ -25,6 +26,9 @@ class BuilderConfigurationTest extends \PHPUnit_Framework_TestCase
         self::$fixturesPath = __DIR__.'/../../../../fixtures/Symfony/Components/DependencyInjection/';
     }
 
+    /**
+     * @covers Symfony\Components\DependencyInjection\BuilderConfiguration::__construct
+     */
     public function testConstructor()
     {
         $definitions = array(
@@ -35,27 +39,30 @@ class BuilderConfigurationTest extends \PHPUnit_Framework_TestCase
             'foo' => 'foo',
             'bar' => 'bar',
         );
-        $configuration = new BuilderConfiguration($definitions, $parameters);
+        $configuration = new BuilderConfiguration($definitions, new ParameterBag($parameters));
         $this->assertEquals($definitions, $configuration->getDefinitions(), '__construct() takes an array of definitions as its first argument');
-        $this->assertEquals($parameters, $configuration->getParameters(), '__construct() takes an array of parameters as its second argument');
+        $this->assertEquals($parameters, $configuration->getParameterBag()->all(), '__construct() takes a ParameterBag instance as its second argument');
     }
 
+    /**
+     * @covers Symfony\Components\DependencyInjection\BuilderConfiguration::merge
+     */
     public function testMerge()
     {
         $configuration = new BuilderConfiguration();
         $configuration->merge(null);
-        $this->assertEquals(array(), $configuration->getParameters(), '->merge() accepts null as an argument');
+        $this->assertEquals(array(), $configuration->getParameterBag()->all(), '->merge() accepts null as an argument');
         $this->assertEquals(array(), $configuration->getDefinitions(), '->merge() accepts null as an argument');
 
-        $configuration = new BuilderConfiguration(array(), array('bar' => 'foo'));
-        $configuration1 = new BuilderConfiguration(array(), array('foo' => 'bar'));
+        $configuration = new BuilderConfiguration(array(), new ParameterBag(array('bar' => 'foo')));
+        $configuration1 = new BuilderConfiguration(array(), new ParameterBag(array('foo' => 'bar')));
         $configuration->merge($configuration1);
-        $this->assertEquals(array('bar' => 'foo', 'foo' => 'bar'), $configuration->getParameters(), '->merge() merges current parameters with the loaded ones');
+        $this->assertEquals(array('bar' => 'foo', 'foo' => 'bar'), $configuration->getParameterBag()->all(), '->merge() merges current parameters with the loaded ones');
 
-        $configuration = new BuilderConfiguration(array(), array('bar' => 'foo', 'foo' => 'baz'));
-        $config = new BuilderConfiguration(array(), array('foo' => 'bar'));
+        $configuration = new BuilderConfiguration(array(), new ParameterBag(array('bar' => 'foo', 'foo' => 'baz')));
+        $config = new BuilderConfiguration(array(), new ParameterBag(array('foo' => 'bar')));
         $configuration->merge($config);
-        $this->assertEquals(array('bar' => 'foo', 'foo' => 'bar'), $configuration->getParameters(), '->merge() overrides existing parameters');
+        $this->assertEquals(array('bar' => 'foo', 'foo' => 'bar'), $configuration->getParameterBag()->all(), '->merge() overrides existing parameters');
 
         $configuration = new BuilderConfiguration(array('foo' => new Definition('FooClass'), 'bar' => new Definition('BarClass')));
         $config = new BuilderConfiguration(array('baz' => new Definition('BazClass')));
@@ -77,24 +84,25 @@ class BuilderConfigurationTest extends \PHPUnit_Framework_TestCase
         $this->assertEquals(array($a, $b), $configuration->getResources(), '->merge() merges resources');
     }
 
-    public function testSetGetParameters()
+    /**
+     * @covers Symfony\Components\DependencyInjection\BuilderConfiguration::getParameterBag
+     */
+    public function testGetParameterBag()
     {
         $configuration = new BuilderConfiguration();
-        $this->assertEquals(array(), $configuration->getParameters(), '->getParameters() returns an empty array if no parameter has been defined');
+        $this->assertEquals(array(), $configuration->getParameterBag()->all(), '->getParameterBag() returns an empty bag if no parameter has been defined');
 
-        $configuration->setParameters(array('foo' => 'bar'));
-        $this->assertEquals(array('foo' => 'bar'), $configuration->getParameters(), '->setParameters() sets the parameters');
-
-        $configuration->setParameters(array('bar' => 'foo'));
-        $this->assertEquals(array('bar' => 'foo'), $configuration->getParameters(), '->setParameters() overrides the previous defined parameters');
-
-        $configuration->setParameters(array('Bar' => 'foo'));
-        $this->assertEquals(array('bar' => 'foo'), $configuration->getParameters(), '->setParameters() converts the key to lowercase');
+        $configuration = new BuilderConfiguration(array(), new ParameterBag(array('foo' => 'bar')));
+        $this->assertEquals(array('foo' => 'bar'), $configuration->getParameterBag()->all(), '->getParameterBag() returns the parameter bag passed at construction time');
     }
 
+    /**
+     * @covers Symfony\Components\DependencyInjection\BuilderConfiguration::getParameter
+     * @covers Symfony\Components\DependencyInjection\BuilderConfiguration::setParameter
+     */
     public function testSetGetParameter()
     {
-        $configuration = new BuilderConfiguration(array(), array('foo' => 'bar'));
+        $configuration = new BuilderConfiguration(array(), new ParameterBag(array('foo' => 'bar')));
         $configuration->setParameter('bar', 'foo');
         $this->assertEquals('foo', $configuration->getParameter('bar'), '->setParameter() sets the value of a new parameter');
 
@@ -114,23 +122,12 @@ class BuilderConfigurationTest extends \PHPUnit_Framework_TestCase
         }
     }
 
-    public function testHasParameter()
-    {
-        $configuration = new BuilderConfiguration(array(), array('foo' => 'bar'));
-        $this->assertTrue($configuration->hasParameter('foo'), '->hasParameter() returns true if a parameter is defined');
-        $this->assertTrue($configuration->hasParameter('Foo'), '->hasParameter() converts the key to lowercase');
-        $this->assertFalse($configuration->hasParameter('bar'), '->hasParameter() returns false if a parameter is not defined');
-    }
-
-    public function testAddParameters()
-    {
-        $configuration = new BuilderConfiguration(array(), array('foo' => 'bar'));
-        $configuration->addParameters(array('bar' => 'foo'));
-        $this->assertEquals(array('foo' => 'bar', 'bar' => 'foo'), $configuration->getParameters(), '->addParameters() adds parameters to the existing ones');
-        $configuration->addParameters(array('Bar' => 'fooz'));
-        $this->assertEquals(array('foo' => 'bar', 'bar' => 'fooz'), $configuration->getParameters(), '->addParameters() converts keys to lowercase');
-    }
-
+    /**
+     * @covers Symfony\Components\DependencyInjection\BuilderConfiguration::setAlias
+     * @covers Symfony\Components\DependencyInjection\BuilderConfiguration::getAlias
+     * @covers Symfony\Components\DependencyInjection\BuilderConfiguration::hasAlias
+     * @covers Symfony\Components\DependencyInjection\BuilderConfiguration::getAliases
+     */
     public function testAliases()
     {
         $configuration = new BuilderConfiguration();
@@ -154,6 +151,13 @@ class BuilderConfigurationTest extends \PHPUnit_Framework_TestCase
         $this->assertEquals(array('bar' => 'foo', 'barbar' => 'foofoo', 'foo' => 'bar'), $configuration->getAliases(), '->addAliases() adds some aliases');
     }
 
+    /**
+     * @covers Symfony\Components\DependencyInjection\BuilderConfiguration::setDefinitions
+     * @covers Symfony\Components\DependencyInjection\BuilderConfiguration::addDefinitions
+     * @covers Symfony\Components\DependencyInjection\BuilderConfiguration::hasDefinition
+     * @covers Symfony\Components\DependencyInjection\BuilderConfiguration::getDefinition
+     * @covers Symfony\Components\DependencyInjection\BuilderConfiguration::setDefinition
+     */
     public function testDefinitions()
     {
         $configuration = new BuilderConfiguration();
@@ -182,6 +186,9 @@ class BuilderConfigurationTest extends \PHPUnit_Framework_TestCase
         }
     }
 
+    /**
+     * @covers Symfony\Components\DependencyInjection\BuilderConfiguration::findDefinition
+     */
     public function testFindDefinition()
     {
         $configuration = new BuilderConfiguration(array('foo' => $definition = new Definition('FooClass')));
@@ -190,6 +197,10 @@ class BuilderConfigurationTest extends \PHPUnit_Framework_TestCase
         $this->assertEquals($definition, $configuration->findDefinition('foobar'), '->findDefinition() returns a Definition');
     }
 
+    /**
+     * @covers Symfony\Components\DependencyInjection\BuilderConfiguration::getResources
+     * @covers Symfony\Components\DependencyInjection\BuilderConfiguration::addResource
+     */
     public function testResources()
     {
         $configuration = new BuilderConfiguration();

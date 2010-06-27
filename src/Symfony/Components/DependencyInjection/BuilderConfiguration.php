@@ -3,6 +3,10 @@
 namespace Symfony\Components\DependencyInjection;
 
 use Symfony\Components\DependencyInjection\Loader\LoaderExtensionInterface;
+use Symfony\Components\DependencyInjection\Resource\ResourceInterface;
+use Symfony\Components\DependencyInjection\Resource\FileResource;
+use Symfony\Components\DependencyInjection\ParameterBag\ParameterBagInterface;
+use Symfony\Components\DependencyInjection\ParameterBag\ParameterBag;
 
 /*
  * This file is part of the Symfony framework.
@@ -23,19 +27,19 @@ use Symfony\Components\DependencyInjection\Loader\LoaderExtensionInterface;
 class BuilderConfiguration
 {
     protected $definitions;
-    protected $parameters;
+    protected $parameterBag;
     protected $aliases;
     protected $resources;
     protected $extensions;
 
-    public function __construct(array $definitions = array(), array $parameters = array())
+    public function __construct(array $definitions = array(), ParameterBagInterface $parameterBag = null)
     {
         $this->aliases    = array();
         $this->resources  = array();
         $this->extensions = array();
 
         $this->setDefinitions($definitions);
-        $this->setParameters($parameters);
+        $this->parameterBag = null === $parameterBag ? new ParameterBag() : $parameterBag;
     }
 
     /**
@@ -77,7 +81,7 @@ class BuilderConfiguration
 
         $this->addDefinitions($configuration->getDefinitions());
         $this->addAliases($configuration->getAliases());
-        $this->addParameters($configuration->getParameters());
+        $this->parameterBag->add($configuration->getParameterBag()->all());
 
         foreach ($configuration->getResources() as $resource) {
             $this->addResource($resource);
@@ -128,60 +132,17 @@ class BuilderConfiguration
     }
 
     /**
-     * Sets the service container parameters.
+     * Gets the parameter bag.
      *
-     * @param array $parameters An array of parameters
-     *
-     * @return BuilderConfiguration The current instance
+     * @return Symfony\Components\DependencyInjection\ParameterBag\ParameterBagInterface A ParameterBagInterface instance
      */
-    public function setParameters(array $parameters)
+    public function getParameterBag()
     {
-        $this->parameters = array();
-        foreach ($parameters as $key => $value) {
-            $this->parameters[strtolower($key)] = $value;
-        }
-
-        return $this;
+        return $this->parameterBag;
     }
 
     /**
-     * Adds parameters to the service container parameters.
-     *
-     * @param array $parameters An array of parameters
-     *
-     * @return BuilderConfiguration The current instance
-     */
-    public function addParameters(array $parameters)
-    {
-        $this->setParameters(array_merge($this->parameters, $parameters));
-
-        return $this;
-    }
-
-    /**
-     * Gets the service container parameters.
-     *
-     * @return array An array of parameters
-     */
-    public function getParameters()
-    {
-        return $this->parameters;
-    }
-
-    /**
-     * Returns true if a parameter name is defined.
-     *
-     * @param  string  $name       The parameter name
-     *
-     * @return Boolean true if the parameter name is defined, false otherwise
-     */
-    public function hasParameter($name)
-    {
-        return array_key_exists(strtolower($name), $this->parameters);
-    }
-
-    /**
-     * Gets a service container parameter.
+     * Gets a parameter.
      *
      * @param  string $name The parameter name
      *
@@ -191,26 +152,28 @@ class BuilderConfiguration
      */
     public function getParameter($name)
     {
-        if (!$this->hasParameter($name)) {
-            throw new \InvalidArgumentException(sprintf('The parameter "%s" must be defined.', $name));
-        }
-
-        return $this->parameters[strtolower($name)];
+        return $this->parameterBag->get($name);
     }
 
     /**
-     * Sets a service container parameter.
+     * Sets a parameter.
      *
      * @param string $name       The parameter name
      * @param mixed  $parameters The parameter value
-     *
-     * @return BuilderConfiguration The current instance
      */
     public function setParameter($name, $value)
     {
-        $this->parameters[strtolower($name)] = $value;
+        $this->parameterBag->set($name, $value);
+    }
 
-        return $this;
+    /**
+     * Checks if a parameter is defined.
+     *
+     * @param string $name The parameter name
+     */
+    public function hasParameter($name)
+    {
+        return $this->parameterBag->has($name);
     }
 
     /**

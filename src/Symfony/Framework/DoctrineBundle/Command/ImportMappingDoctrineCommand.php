@@ -88,7 +88,7 @@ EOT
 
         $emName = $input->getOption('em') ? $input->getOption('em') : 'default';
         $emServiceName = sprintf('doctrine.orm.%s_entity_manager', $emName);
-        $em = $this->container->getService($emServiceName);
+        $em = $this->container->get($emServiceName);
         $databaseDriver = new DatabaseDriver($em->getConnection()->getSchemaManager());
         $em->getConfiguration()->setMetadataDriverImpl($databaseDriver);
 

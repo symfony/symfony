@@ -2,11 +2,11 @@
 
 namespace Symfony\Components\DependencyInjection\Loader;
 
-use Symfony\Components\DependencyInjection\Container;
+use Symfony\Components\DependencyInjection\ContainerInterface;
 use Symfony\Components\DependencyInjection\Definition;
 use Symfony\Components\DependencyInjection\Reference;
 use Symfony\Components\DependencyInjection\BuilderConfiguration;
-use Symfony\Components\DependencyInjection\FileResource;
+use Symfony\Components\DependencyInjection\Resource\FileResource;
 use Symfony\Components\Yaml\Yaml;
 
 /*
@@ -67,7 +67,7 @@ class YamlFileLoader extends FileLoader
         // parameters
         if (isset($content['parameters'])) {
             foreach ($content['parameters'] as $key => $value) {
-                $configuration->setParameter(strtolower($key), $this->resolveServices($value));
+                $configuration->setParameter($key, $this->resolveServices($value));
             }
         }
 
@@ -219,7 +219,7 @@ class YamlFileLoader extends FileLoader
         if (is_array($value)) {
             $value = array_map(array($this, 'resolveServices'), $value);
         } else if (is_string($value) && 0 === strpos($value, '@@')) {
-            $value = new Reference(substr($value, 2), Container::IGNORE_ON_INVALID_REFERENCE);
+            $value = new Reference(substr($value, 2), ContainerInterface::IGNORE_ON_INVALID_REFERENCE);
         } else if (is_string($value) && 0 === strpos($value, '@')) {
             $value = new Reference(substr($value, 1));
         }

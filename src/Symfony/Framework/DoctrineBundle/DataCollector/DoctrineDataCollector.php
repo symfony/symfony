@@ -33,7 +33,7 @@ class DoctrineDataCollector extends DataCollector
     public function collect()
     {
         $this->data = array();
-        if ($this->container->hasService('doctrine.dbal.logger')) {
+        if ($this->container->has('doctrine.dbal.logger')) {
             $this->data = array(
                 'queries' => $this->container->getDoctrine_Dbal_LoggerService()->queries,
             );

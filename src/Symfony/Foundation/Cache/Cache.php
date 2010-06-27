@@ -53,8 +53,8 @@ abstract class Cache extends BaseCache
         if (!$this->kernel->isBooted()) {
             $this->kernel->boot();
         }
-        $this->kernel->getContainer()->setService('cache', $this);
-        $this->kernel->getContainer()->setService('esi', $this->esi);
+        $this->kernel->getContainer()->set('cache', $this);
+        $this->kernel->getContainer()->set('esi', $this->esi);
 
         return parent::forward($request, $raw, $entry);
     }

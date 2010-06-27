@@ -14,6 +14,9 @@ use Symfony\Components\DependencyInjection\Parameter;
 
 class ParameterTest extends \PHPUnit_Framework_TestCase
 {
+    /**
+     * @covers Symfony\Components\DependencyInjection\Parameter::__construct
+     */
     public function testConstructor()
     {
         $ref = new Parameter('foo');

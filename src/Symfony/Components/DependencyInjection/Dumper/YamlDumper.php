@@ -3,7 +3,7 @@
 namespace Symfony\Components\DependencyInjection\Dumper;
 
 use Symfony\Components\Yaml\Yaml;
-use Symfony\Components\DependencyInjection\Container;
+use Symfony\Components\DependencyInjection\ContainerInterface;
 use Symfony\Components\DependencyInjection\Parameter;
 use Symfony\Components\DependencyInjection\Reference;
 
@@ -118,11 +118,11 @@ class YamlDumper extends Dumper
 
     protected function addParameters()
     {
-        if (!$this->container->getParameters()) {
+        if (!$this->container->getParameterBag()->all()) {
             return '';
         }
 
-        return Yaml::dump(array('parameters' => $this->prepareParameters($this->container->getParameters())), 2);
+        return Yaml::dump(array('parameters' => $this->prepareParameters($this->container->getParameterBag()->all())), 2);
     }
 
     /**
@@ -150,7 +150,7 @@ class YamlDumper extends Dumper
 
     protected function getServiceCall($id, Reference $reference = null)
     {
-        if (null !== $reference && Container::EXCEPTION_ON_INVALID_REFERENCE !== $reference->getInvalidBehavior()) {
+        if (null !== $reference && ContainerInterface::EXCEPTION_ON_INVALID_REFERENCE !== $reference->getInvalidBehavior()) {
             return sprintf('@@%s', $id);
         } else {
             return sprintf('@%s', $id);

@@ -11,45 +11,63 @@
 namespace Symfony\Tests\Components\DependencyInjection;
 
 use Symfony\Components\DependencyInjection\Container;
+use Symfony\Components\DependencyInjection\ContainerInterface;
+use Symfony\Components\DependencyInjection\ParameterBag\ParameterBag;
 
 class ContainerTest extends \PHPUnit_Framework_TestCase
 {
+    /**
+     * @covers Symfony\Components\DependencyInjection\Container::__construct
+     */
     public function testConstructor()
     {
         $sc = new Container();
-        $this->assertEquals(spl_object_hash($sc), spl_object_hash($sc->getService('service_container')), '__construct() automatically registers itself as a service');
+        $this->assertEquals(spl_object_hash($sc), spl_object_hash($sc->get('service_container')), '__construct() automatically registers itself as a service');
 
-        $sc = new Container(array('foo' => 'bar'));
-        $this->assertEquals(array('foo' => 'bar'), $sc->getParameters(), '__construct() takes an array of parameters as its first argument');
+        $sc = new Container(new ParameterBag(array('foo' => 'bar')));
+        $this->assertEquals(array('foo' => 'bar'), $sc->getParameterBag()->all(), '__construct() takes an array of parameters as its first argument');
     }
 
-    public function testGetSetParameters()
+    /**
+     * @covers Symfony\Components\DependencyInjection\Container::freeze
+     */
+    public function testFreeze()
+    {
+        $sc = new Container(new ParameterBag(array('foo' => 'bar')));
+        $sc->freeze();
+        $this->assertInstanceOf('Symfony\Components\DependencyInjection\ParameterBag\FrozenParameterBag', $sc->getParameterBag(), '->freeze() changes the parameter bag to a FrozenParameterBag instance');
+        $this->assertEquals(array('foo' => 'bar'), $sc->getParameterBag()->all(), '->freeze() copies the current parameters to the new parameter bag');
+    }
+
+    /**
+     * @covers Symfony\Components\DependencyInjection\Container::isFrozen
+     */
+    public function testIsFrozen()
+    {
+        $sc = new Container(new ParameterBag(array('foo' => 'bar')));
+        $this->assertFalse($sc->isFrozen(), '->isFrozen() returns false if the parameters are not frozen');
+        $sc->freeze();
+        $this->assertTrue($sc->isFrozen(), '->isFrozen() returns true if the parameters are frozen');
+    }
+
+    /**
+     * @covers Symfony\Components\DependencyInjection\Container::getParameterBag
+     */
+    public function testGetParameterBag()
     {
         $sc = new Container();
-        $this->assertEquals(array(), $sc->getParameters(), '->getParameters() returns an empty array if no parameter has been defined');
-
-        $sc->setParameters(array('foo' => 'bar'));
-        $this->assertEquals(array('foo' => 'bar'), $sc->getParameters(), '->setParameters() sets the parameters');
-
-        $sc->setParameters(array('bar' => 'foo'));
-        $this->assertEquals(array('bar' => 'foo'), $sc->getParameters(), '->setParameters() overrides the previous defined parameters');
-
-        $sc->setParameters(array('Bar' => 'foo'));
-        $this->assertEquals(array('bar' => 'foo'), $sc->getParameters(), '->setParameters() converts the key to lowercase');
+        $this->assertEquals(array(), $sc->getParameterBag()->all(), '->getParameterBag() returns an empty array if no parameter has been defined');
     }
 
+    /**
+     * @covers Symfony\Components\DependencyInjection\Container::setParameter
+     * @covers Symfony\Components\DependencyInjection\Container::getParameter
+     */
     public function testGetSetParameter()
     {
-        $sc = new Container(array('foo' => 'bar'));
+        $sc = new Container(new ParameterBag(array('foo' => 'bar')));
         $sc->setParameter('bar', 'foo');
         $this->assertEquals('foo', $sc->getParameter('bar'), '->setParameter() sets the value of a new parameter');
-        $this->assertEquals('foo', $sc['bar'], '->offsetGet() gets the value of a parameter');
-
-        $sc['bar1'] = 'foo1';
-        $this->assertEquals('foo1', $sc['bar1'], '->offsetset() sets the value of a parameter');
-
-        unset($sc['bar1']);
-        $this->assertFalse(isset($sc['bar1']), '->offsetUnset() removes a parameter');
 
         $sc->setParameter('foo', 'baz');
         $this->assertEquals('baz', $sc->getParameter('foo'), '->setParameter() overrides previously set parameter');
@@ -57,7 +75,6 @@ class ContainerTest extends \PHPUnit_Framework_TestCase
         $sc->setParameter('Foo', 'baz1');
         $this->assertEquals('baz1', $sc->getParameter('foo'), '->setParameter() converts the key to lowercase');
         $this->assertEquals('baz1', $sc->getParameter('FOO'), '->getParameter() converts the key to lowercase');
-        $this->assertEquals('baz1', $sc['FOO'], '->offsetGet() converts the key to lowercase');
 
         try {
             $sc->getParameter('baba');
@@ -66,98 +83,29 @@ class ContainerTest extends \PHPUnit_Framework_TestCase
             $this->assertInstanceOf('\InvalidArgumentException', $e, '->getParameter() thrown an \InvalidArgumentException if the key does not exist');
             $this->assertEquals('The parameter "baba" must be defined.', $e->getMessage(), '->getParameter() thrown an \InvalidArgumentException if the key does not exist');
         }
-
-        try {
-            $sc['baba'];
-            $this->fail('->offsetGet() thrown an \InvalidArgumentException if the key does not exist');
-        } catch (\Exception $e) {
-            $this->assertInstanceOf('\InvalidArgumentException', $e, '->offsetGet() thrown an \InvalidArgumentException if the key does not exist');
-            $this->assertEquals('The parameter "baba" must be defined.', $e->getMessage(), '->offsetGet() thrown an \InvalidArgumentException if the key does not exist');
-        }
     }
 
-    public function testHasParameter()
-    {
-        $sc = new Container(array('foo' => 'bar'));
-        $this->assertTrue($sc->hasParameter('foo'), '->hasParameter() returns true if a parameter is defined');
-        $this->assertTrue($sc->hasParameter('Foo'), '->hasParameter() converts the key to lowercase');
-        $this->assertTrue(isset($sc['Foo']), '->offsetExists() converts the key to lowercase');
-        $this->assertFalse($sc->hasParameter('bar'), '->hasParameter() returns false if a parameter is not defined');
-        $this->assertTrue(isset($sc['foo']), '->offsetExists() returns true if a parameter is defined');
-        $this->assertFalse(isset($sc['bar']), '->offsetExists() returns false if a parameter is not defined');
-    }
-
-    public function testAddParameters()
-    {
-        $sc = new Container(array('foo' => 'bar'));
-        $sc->addParameters(array('bar' => 'foo'));
-        $this->assertEquals(array('foo' => 'bar', 'bar' => 'foo'), $sc->getParameters(), '->addParameters() adds parameters to the existing ones');
-        $sc->addParameters(array('Bar' => 'fooz'));
-        $this->assertEquals(array('foo' => 'bar', 'bar' => 'fooz'), $sc->getParameters(), '->addParameters() converts keys to lowercase');
-    }
-
-    public function testServices()
-    {
-        $sc = new Container();
-        $sc->setService('foo', $obj = new \stdClass());
-        $this->assertEquals(spl_object_hash($obj), spl_object_hash($sc->getService('foo')), '->setService() registers a service under a key name');
-
-        $sc->foo1 = $obj1 = new \stdClass();
-        $this->assertEquals(spl_object_hash($obj1), spl_object_hash($sc->foo1), '->__set() sets a service');
-
-        $this->assertEquals(spl_object_hash($obj), spl_object_hash($sc->foo), '->__get() gets a service by name');
-        $this->assertTrue($sc->hasService('foo'), '->hasService() returns true if the service is defined');
-        $this->assertTrue(isset($sc->foo), '->__isset() returns true if the service is defined');
-        $this->assertFalse($sc->hasService('bar'), '->hasService() returns false if the service is not defined');
-        $this->assertFalse(isset($sc->bar), '->__isset() returns false if the service is not defined');
-    }
-
+    /**
+     * @covers Symfony\Components\DependencyInjection\Container::getServiceIds
+     */
     public function testGetServiceIds()
     {
         $sc = new Container();
-        $sc->setService('foo', $obj = new \stdClass());
-        $sc->setService('bar', $obj = new \stdClass());
+        $sc->set('foo', $obj = new \stdClass());
+        $sc->set('bar', $obj = new \stdClass());
         $this->assertEquals(array('service_container', 'foo', 'bar'), $sc->getServiceIds(), '->getServiceIds() returns all defined service ids');
 
         $sc = new ProjectServiceContainer();
-        $this->assertEquals(spl_object_hash($sc->__bar), spl_object_hash($sc->getService('bar')), '->getService() looks for a getXXXService() method');
-        $this->assertTrue($sc->hasService('bar'), '->hasService() returns true if the service has been defined as a getXXXService() method');
-
-        $sc->setService('bar', $bar = new \stdClass());
-        $this->assertEquals(spl_object_hash($sc->getService('bar')), spl_object_hash($bar), '->getService() prefers to return a service defined with a getXXXService() method than one defined with setService()');
-
-        try {
-            $sc->getService('baba');
-            $this->fail('->getService() thrown an \InvalidArgumentException if the service does not exist');
-        } catch (\Exception $e) {
-            $this->assertInstanceOf('\InvalidArgumentException', $e, '->getService() thrown an \InvalidArgumentException if the service does not exist');
-            $this->assertEquals('The service "baba" does not exist.', $e->getMessage(), '->getService() thrown an \InvalidArgumentException if the service does not exist');
-        }
-
-        try {
-            $sc->baba;
-            $this->fail('->__get() thrown an \InvalidArgumentException if the service does not exist');
-        } catch (\Exception $e) {
-            $this->assertInstanceOf('\InvalidArgumentException', $e, '->__get() thrown an \InvalidArgumentException if the service does not exist');
-            $this->assertEquals('The service "baba" does not exist.', $e->getMessage(), '->__get() thrown an \InvalidArgumentException if the service does not exist');
-        }
-
-        try {
-            unset($sc->baba);
-            $this->fail('->__unset() thrown an LogicException if you try to remove a service');
-        } catch (\Exception $e) {
-            $this->assertInstanceOf('\LogicException', $e, '->__unset() thrown an LogicException if you try to remove a service');
-            $this->assertEquals('You can\'t unset a service.', $e->getMessage(), '->__unset() thrown an LogicException if you try to remove a service');
-        }
-
-        $this->assertEquals(spl_object_hash($sc->__foo_bar), spl_object_hash($sc->getService('foo_bar')), '->getService() camelizes the service id when looking for a method');
-        $this->assertEquals(spl_object_hash($sc->__foo_baz), spl_object_hash($sc->getService('foo.baz')), '->getService() camelizes the service id when looking for a method');
+        $this->assertEquals(array('bar', 'foo_bar', 'foo.baz', 'service_container'), $sc->getServiceIds(), '->getServiceIds() returns defined service ids by getXXXService() methods');
     }
 
-    public function testMagicCall()
+    /**
+     * @covers Symfony\Components\DependencyInjection\Container::__call
+     */
+    public function testGetCall()
     {
         $sc = new Container();
-        $sc->setService('foo_bar.foo', $foo = new \stdClass());
+        $sc->set('foo_bar.foo', $foo = new \stdClass());
         $this->assertEquals($foo, $sc->getFooBar_FooService(), '__call() finds services is the method is getXXXService()');
 
         try {
@@ -169,17 +117,89 @@ class ContainerTest extends \PHPUnit_Framework_TestCase
         }
     }
 
-    public function testGetService()
+    /**
+     * @covers Symfony\Components\DependencyInjection\Container::offsetUnset
+     * @expectedException LogicException
+     */
+    public function testOffetUnset()
     {
         $sc = new Container();
+        unset($sc['foo']);
+    }
+
+    /**
+     * @covers Symfony\Components\DependencyInjection\Container::set
+     * @covers Symfony\Components\DependencyInjection\Container::offsetSet
+     */
+    public function testSet()
+    {
+        $sc = new Container();
+        $sc->set('foo', $foo = new \stdClass());
+        $this->assertEquals($foo, $sc->get('foo'), '->set() sets a service');
+        $sc['bar'] = $foo = new \stdClass();
+        $this->assertEquals($foo, $sc->get('bar'), '->offsetSet() sets a service');
+    }
+
+    /**
+     * @covers Symfony\Components\DependencyInjection\Container::get
+     * @covers Symfony\Components\DependencyInjection\Container::offsetGet
+     */
+    public function testGet()
+    {
+        $sc = new ProjectServiceContainer();
+        $sc->set('foo', $foo = new \stdClass());
+        $this->assertEquals($foo, $sc->get('foo'), '->get() returns the service for the given id');
+        $this->assertEquals($sc->__bar, $sc->get('bar'), '->get() returns the service for the given id');
+        $this->assertEquals($sc->__foo_bar, $sc->get('foo_bar'), '->get() returns the service if a get*Method() is defined');
+        $this->assertEquals($sc->__foo_baz, $sc->get('foo.baz'), '->get() returns the service if a get*Method() is defined');
+
+        $sc->set('bar', $bar = new \stdClass());
+        $this->assertEquals(spl_object_hash($sc->get('bar')), spl_object_hash($bar), '->getServiceIds() prefers to return a service defined with a getXXXService() method than one defined with set()');
 
         try {
-            $sc->getService('');
-            $this->fail('->getService() throws a \InvalidArgumentException exception if the service is empty');
+            $sc->get(new \stdClass());
+            $this->fail('->get() throws a \InvalidArgumentException exception if the service id is not a string');
         } catch (\Exception $e) {
-            $this->assertInstanceOf('\InvalidArgumentException', $e, '->getService() throws a \InvalidArgumentException exception if the service is empty');
-            $this->assertEquals('The service "" does not exist.', $e->getMessage(), '->getService() throws a \InvalidArgumentException exception if the service is empty');
+            $this->assertInstanceOf('\InvalidArgumentException', $e, '->get() throws a \InvalidArgumentException exception if the service id is not a string');
         }
+
+        try {
+            $sc->get('');
+            $this->fail('->get() throws a \InvalidArgumentException exception if the service is empty');
+        } catch (\Exception $e) {
+            $this->assertInstanceOf('\InvalidArgumentException', $e, '->get() throws a \InvalidArgumentException exception if the service is empty');
+            $this->assertEquals('The service "" does not exist.', $e->getMessage(), '->get() throws a \InvalidArgumentException exception if the service is empty');
+        }
+        $this->assertNull($sc->get('', ContainerInterface::NULL_ON_INVALID_REFERENCE));
+
+        try {
+            $sc[''];
+            $this->fail('->get() throws a \InvalidArgumentException exception if the service is empty');
+        } catch (\Exception $e) {
+            $this->assertInstanceOf('\InvalidArgumentException', $e, '->get() throws a \InvalidArgumentException exception if the service is empty');
+            $this->assertEquals('The service "" does not exist.', $e->getMessage(), '->get() throws a \InvalidArgumentException exception if the service is empty');
+        }
+    }
+
+    /**
+     * @covers Symfony\Components\DependencyInjection\Container::has
+     * @covers Symfony\Components\DependencyInjection\Container::offsetExists
+     */
+    public function testHas()
+    {
+        $sc = new ProjectServiceContainer();
+        $sc->set('foo', new \stdClass());
+        $this->assertFalse($sc->has('foo1'), '->has() returns false if the service does not exist');
+        $this->assertTrue($sc->has('foo'), '->has() returns true if the service exists');
+        $this->assertTrue($sc->has('bar'), '->has() returns true if a get*Method() is defined');
+        $this->assertTrue($sc->has('foo_bar'), '->has() returns true if a get*Method() is defined');
+        $this->assertTrue($sc->has('foo.baz'), '->has() returns true if a get*Method() is defined');
+
+        $this->assertFalse(isset($sc['foo1']), '->offsetExists() returns false if the service does not exist');
+        $this->assertTrue(isset($sc['foo']), '->offsetExists() returns true if the service exists');
+        $this->assertTrue(isset($sc['bar']), '->offsetExists() returns true if a get*Method() is defined');
+        $this->assertTrue(isset($sc['foo_bar']), '->offsetExists() returns true if a get*Method() is defined');
+        $this->assertTrue(isset($sc['foo.baz']), '->offsetExists() returns true if a get*Method() is defined');
     }
 }
 

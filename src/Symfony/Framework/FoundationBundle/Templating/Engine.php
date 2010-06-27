@@ -46,7 +46,7 @@ class Engine extends BaseEngine
 
         foreach ($this->container->findAnnotatedServiceIds('templating.renderer') as $id => $attributes) {
             if (isset($attributes[0]['alias'])) {
-                $renderers[$attributes[0]['alias']] = $this->container->getService($id);
+                $renderers[$attributes[0]['alias']] = $this->container->get($id);
             }
         }
 
@@ -95,7 +95,7 @@ class Engine extends BaseEngine
         }
 
         if (is_string($this->helpers[$name])) {
-            $this->helpers[$name] = $this->container->getService('templating.helper.'.$name);
+            $this->helpers[$name] = $this->container->get('templating.helper.'.$name);
             $this->helpers[$name]->setCharset($this->charset);
         }
 

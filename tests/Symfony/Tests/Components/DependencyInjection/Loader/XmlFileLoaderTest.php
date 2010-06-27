@@ -70,7 +70,7 @@ class XmlFileLoaderTest extends \PHPUnit_Framework_TestCase
         $loader = new ProjectLoader2(self::$fixturesPath.'/xml');
         $config = $loader->load('services2.xml');
 
-        $actual = $config->getParameters();
+        $actual = $config->getParameterBag()->all();
         $expected = array('a string', 'foo' => 'bar', 'values' => array(0, 'integer' => 4, 100 => null, 'true', true, false, 'on', 'off', 'float' => 1.3, 1000.3, 'a string', array('foo', 'bar')), 'foo_bar' => new Reference('foo_bar'));
 
         $this->assertEquals($expected, $actual, '->load() converts XML values to PHP ones');
@@ -81,7 +81,7 @@ class XmlFileLoaderTest extends \PHPUnit_Framework_TestCase
         $loader = new ProjectLoader2(self::$fixturesPath.'/xml');
         $config = $loader->load('services4.xml');
 
-        $actual = $config->getParameters();
+        $actual = $config->getParameterBag()->all();
         $expected = array('a string', 'foo' => 'bar', 'values' => array(true, false), 'foo_bar' => new Reference('foo_bar'), 'bar' => '%foo%', 'imported_from_ini' => true, 'imported_from_yaml' => true);
 
         $this->assertEquals(array_keys($expected), array_keys($actual), '->load() imports and merges imported files');
@@ -165,7 +165,7 @@ class XmlFileLoaderTest extends \PHPUnit_Framework_TestCase
 
         $config = $loader->load('services10.xml');
         $services = $config->getDefinitions();
-        $parameters = $config->getParameters();
+        $parameters = $config->getParameterBag()->all();
 
         $this->assertTrue(isset($services['project.service.bar']), '->load() parses extension elements');
         $this->assertTrue(isset($parameters['project.parameter.bar']), '->load() parses extension elements');

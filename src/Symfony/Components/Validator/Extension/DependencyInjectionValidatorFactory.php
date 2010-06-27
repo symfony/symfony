@@ -47,11 +47,11 @@ class DependencyInjectionValidatorFactory implements ConstraintValidatorFactoryI
         $className = $constraint->validatedBy();
         $id = $this->getServiceIdFromClass($className);
 
-        if (!$this->container->hasService($id)) {
-            $this->container->setService($id, new $className());
+        if (!$this->container->has($id)) {
+            $this->container->set($id, new $className());
         }
 
-        $validator = $this->container->getService($id);
+        $validator = $this->container->get($id);
 
         if (!$validator instanceof ConstraintValidatorInterface) {
             throw new \LogicException('Service "' . $id . '" is not instance of ConstraintValidatorInterface');

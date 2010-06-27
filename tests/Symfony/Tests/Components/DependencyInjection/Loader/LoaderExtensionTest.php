@@ -16,6 +16,9 @@ use Symfony\Components\DependencyInjection\BuilderConfiguration;
 
 class LoaderExtensionTest extends \PHPUnit_Framework_TestCase
 {
+    /**
+     * @covers Symfony\Components\DependencyInjection\Loader\LoaderExtension::load
+     */
     public function testLoad()
     {
         $extension = new \ProjectExtension();
@@ -29,6 +32,6 @@ class LoaderExtensionTest extends \PHPUnit_Framework_TestCase
         }
 
         $config = $extension->load('bar', array('foo' => 'bar'), new BuilderConfiguration());
-        $this->assertEquals(array('project.parameter.bar' => 'bar', 'project.parameter.foo' => 'bar'), $config->getParameters(), '->load() calls the method tied to the given tag');
+        $this->assertEquals(array('project.parameter.bar' => 'bar', 'project.parameter.foo' => 'bar'), $config->getParameterBag()->all(), '->load() calls the method tied to the given tag');
     }
 }

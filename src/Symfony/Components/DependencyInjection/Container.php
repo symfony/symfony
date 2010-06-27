@@ -2,6 +2,10 @@
 
 namespace Symfony\Components\DependencyInjection;
 
+use Symfony\Components\DependencyInjection\ParameterBag\ParameterBagInterface;
+use Symfony\Components\DependencyInjection\ParameterBag\ParameterBag;
+use Symfony\Components\DependencyInjection\ParameterBag\FrozenParameterBag;
+
 /*
  * This file is part of the Symfony framework.
  *
@@ -14,7 +18,7 @@ namespace Symfony\Components\DependencyInjection;
 /**
  * Container is a dependency injection container.
  *
- * It gives access to object instances (services), and parameters.
+ * It gives access to object instances (services).
  *
  * Services and parameters are simple key/pair stores.
  *
@@ -52,61 +56,53 @@ namespace Symfony\Components\DependencyInjection;
  */
 class Container implements ContainerInterface, \ArrayAccess
 {
-    protected $parameters = array();
-    protected $services   = array();
-
-    const EXCEPTION_ON_INVALID_REFERENCE = 1;
-    const NULL_ON_INVALID_REFERENCE      = 2;
-    const IGNORE_ON_INVALID_REFERENCE    = 3;
+    protected $parameterBag;
+    protected $services;
 
     /**
      * Constructor.
      *
-     * @param array $parameters An array of parameters
+     * @param Symfony\Components\DependencyInjection\ParameterBagInterface $parameterBag A ParameterBagInterface instance
      */
-    public function __construct(array $parameters = array())
+    public function __construct(ParameterBagInterface $parameterBag = null)
     {
-        $this->setParameters($parameters);
-        $this->setService('service_container', $this);
+        $this->parameterBag = null === $parameterBag ? new ParameterBag() : $parameterBag;
+        $this->services = array();
+        $this->set('service_container', $this);
     }
 
     /**
-     * Sets the service container parameters.
-     *
-     * @param array $parameters An array of parameters
+     * Freezes the container parameter bag.
      */
-    public function setParameters(array $parameters)
+    public function freeze()
     {
-        $this->parameters = array();
-        foreach ($parameters as $key => $value) {
-            $this->parameters[strtolower($key)] = $value;
-        }
+        $this->parameterBag = new FrozenParameterBag($this->parameterBag->all());
     }
 
     /**
-     * Adds parameters to the service container parameters.
+     * Returns true if the container parameter bag are frozen.
      *
-     * @param array $parameters An array of parameters
+     * @return Boolean true if the container parameter bag are frozen, false otherwise
      */
-    public function addParameters(array $parameters)
+    public function isFrozen()
     {
-        $this->setParameters(array_merge($this->parameters, $parameters));
+        return $this->parameterBag instanceof FrozenParameterBag;
     }
 
     /**
-     * Gets the service container parameters.
+     * Gets the service container parameter bag.
      *
-     * @return array An array of parameters
+     * @return Symfony\Components\DependencyInjection\ParameterBag\ParameterBagInterface A ParameterBagInterface instance
      */
-    public function getParameters()
+    public function getParameterBag()
     {
-        return $this->parameters;
+        return $this->parameterBag;
     }
 
     /**
-     * Gets a service container parameter.
+     * Gets a parameter.
      *
-     * @param string $name The parameter name
+     * @param  string $name The parameter name
      *
      * @return mixed  The parameter value
      *
@@ -114,36 +110,18 @@ class Container implements ContainerInterface, \ArrayAccess
      */
     public function getParameter($name)
     {
-        $name = strtolower($name);
-
-        if (!array_key_exists($name, $this->parameters)) {
-            throw new \InvalidArgumentException(sprintf('The parameter "%s" must be defined.', $name));
-        }
-
-        return $this->parameters[$name];
+        return $this->parameterBag->get($name);
     }
 
     /**
-     * Sets a service container parameter.
+     * Sets a parameter.
      *
      * @param string $name       The parameter name
      * @param mixed  $parameters The parameter value
      */
     public function setParameter($name, $value)
     {
-        $this->parameters[strtolower($name)] = $value;
-    }
-
-    /**
-     * Returns true if a parameter name is defined.
-     *
-     * @param  string  $name       The parameter name
-     *
-     * @return Boolean true if the parameter name is defined, false otherwise
-     */
-    public function hasParameter($name)
-    {
-        return array_key_exists(strtolower($name), $this->parameters);
+        $this->parameterBag->set($name, $value);
     }
 
     /**
@@ -152,7 +130,7 @@ class Container implements ContainerInterface, \ArrayAccess
      * @param string $id      The service identifier
      * @param object $service The service instance
      */
-    public function setService($id, $service)
+    public function set($id, $service)
     {
         $this->services[$id] = $service;
     }
@@ -164,7 +142,7 @@ class Container implements ContainerInterface, \ArrayAccess
      *
      * @return Boolean true if the service is defined, false otherwise
      */
-    public function hasService($id)
+    public function has($id)
     {
         return isset($this->services[$id]) || method_exists($this, 'get'.strtr($id, array('_' => '', '.' => '_')).'Service');
     }
@@ -172,7 +150,7 @@ class Container implements ContainerInterface, \ArrayAccess
     /**
      * Gets a service.
      *
-     * If a service is both defined through a setService() method and
+     * If a service is both defined through a set() method and
      * with a set*Service() method, the former has always precedence.
      *
      * @param  string $id              The service identifier
@@ -184,7 +162,7 @@ class Container implements ContainerInterface, \ArrayAccess
      *
      * @see Reference
      */
-    public function getService($id, $invalidBehavior = self::EXCEPTION_ON_INVALID_REFERENCE)
+    public function get($id, $invalidBehavior = self::EXCEPTION_ON_INVALID_REFERENCE)
     {
         if (!is_string($id)) {
             throw new \InvalidArgumentException(sprintf('A service id should be a string (%s given).', str_replace("\n", '', var_export($id, true))));
@@ -194,7 +172,7 @@ class Container implements ContainerInterface, \ArrayAccess
             return $this->services[$id];
         }
 
-        if (method_exists($this, $method = 'get'.strtr($id, array('_' => '', '.' => '_')).'Service') && 'getService' !== $method) {
+        if (method_exists($this, $method = 'get'.strtr($id, array('_' => '', '.' => '_')).'Service')) {
             return $this->$method();
         }
 
@@ -224,95 +202,48 @@ class Container implements ContainerInterface, \ArrayAccess
     }
 
     /**
-     * Returns true if the parameter name is defined (implements the ArrayAccess interface).
+     * Returns true if the service id is defined (implements the ArrayAccess interface).
      *
-     * @param  string  The parameter name
+     * @param  string  $id The service id
      *
-     * @return Boolean true if the parameter name is defined, false otherwise
+     * @return Boolean true if the service id is defined, false otherwise
      */
-    public function offsetExists($name)
+    public function offsetExists($id)
     {
-        return $this->hasParameter($name);
+        return $this->has($id);
     }
 
     /**
-     * Gets a service container parameter (implements the ArrayAccess interface).
+     * Gets a service by id (implements the ArrayAccess interface).
      *
-     * @param  string The parameter name
+     * @param  string $id The service id
      *
      * @return mixed  The parameter value
      */
-    public function offsetGet($name)
+    public function offsetGet($id)
     {
-        return $this->getParameter($name);
+        return $this->get($id);
     }
 
     /**
-     * Sets a parameter (implements the ArrayAccess interface).
+     * Sets a service (implements the ArrayAccess interface).
      *
-     * @param string The parameter name
-     * @param mixed  The parameter value
+     * @param string $id    The service id
+     * @param object $value The service
      */
-    public function offsetSet($name, $value)
+    public function offsetSet($id, $value)
     {
-        $this->setParameter($name, $value);
+        $this->set($id, $value);
     }
 
     /**
-     * Removes a parameter (implements the ArrayAccess interface).
+     * Removes a service (implements the ArrayAccess interface).
      *
-     * @param string The parameter name
+     * @param string $id The service id
      */
-    public function offsetUnset($name)
+    public function offsetUnset($id)
     {
-        unset($this->parameters[$name]);
-    }
-
-    /**
-     * Returns true if the container has a service with the given identifier.
-     *
-     * @param  string  The service identifier
-     *
-     * @return Boolean true if the container has a service with the given identifier, false otherwise
-     */
-    public function __isset($id)
-    {
-        return $this->hasService($id);
-    }
-
-    /**
-     * Gets the service associated with the given identifier.
-     *
-     * @param  string The service identifier
-     *
-     * @return mixed  The service instance associated with the given identifier
-     */
-    public function __get($id)
-    {
-        return $this->getService($id);
-    }
-
-    /**
-     * Sets a service.
-     *
-     * @param string The service identifier
-     * @param mixed  A service instance
-     */
-    public function __set($id, $service)
-    {
-        $this->setService($id, $service);
-    }
-
-    /**
-     * Removes a service by identifier.
-     *
-     * @param string The service identifier
-     *
-     * @throws LogicException When trying to unset a service
-     */
-    public function __unset($id)
-    {
-        throw new \LogicException('You can\'t unset a service.');
+        throw new \LogicException(sprintf('You can\'t unset a service (%s).', $id));
     }
 
     /**
@@ -331,7 +262,7 @@ class Container implements ContainerInterface, \ArrayAccess
             throw new \BadMethodCallException(sprintf('Call to undefined method %s::%s.', get_class($this), $method));
         }
 
-        return $this->getService(self::underscore($match[1]));
+        return $this->get(self::underscore($match[1]));
     }
 
     static public function camelize($id)

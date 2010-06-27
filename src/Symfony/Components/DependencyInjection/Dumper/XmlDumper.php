@@ -2,7 +2,7 @@
 
 namespace Symfony\Components\DependencyInjection\Dumper;
 
-use Symfony\Components\DependencyInjection\Container;
+use Symfony\Components\DependencyInjection\ContainerInterface;
 use Symfony\Components\DependencyInjection\Parameter;
 use Symfony\Components\DependencyInjection\Reference;
 
@@ -38,11 +38,11 @@ class XmlDumper extends Dumper
 
     protected function addParameters()
     {
-        if (!$this->container->getParameters()) {
+        if (!$this->container->getParameterBag()->all()) {
             return '';
         }
 
-        return sprintf("  <parameters>\n%s  </parameters>\n", $this->convertParameters($this->escape($this->container->getParameters()), 'parameter', 4));
+        return sprintf("  <parameters>\n%s  </parameters>\n", $this->convertParameters($this->escape($this->container->getParameterBag()->all()), 'parameter', 4));
     }
 
     protected function addService($id, $definition)
@@ -169,9 +169,9 @@ EOF;
     protected function getXmlInvalidBehavior(Reference $reference)
     {
         switch ($reference->getInvalidBehavior()) {
-            case Container::NULL_ON_INVALID_REFERENCE:
+            case ContainerInterface::NULL_ON_INVALID_REFERENCE:
                 return 'on-invalid="null" ';
-            case Container::IGNORE_ON_INVALID_REFERENCE:
+            case ContainerInterface::IGNORE_ON_INVALID_REFERENCE:
                 return 'on-invalid="ignore" ';
             default:
                 return '';

@@ -69,7 +69,7 @@ class Client extends BaseClient
      */
     public function getProfiler()
     {
-        if (!$this->container->hasService('profiler')) {
+        if (!$this->container->has('profiler')) {
             return false;
         }
 

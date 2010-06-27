@@ -14,8 +14,11 @@ use Symfony\Components\DependencyInjection\Builder;
 use Symfony\Components\DependencyInjection\BuilderConfiguration;
 use Symfony\Components\DependencyInjection\Loader\FileLoader;
 
-class XmlDumperTest extends \PHPUnit_Framework_TestCase
+class FileLoaderTest extends \PHPUnit_Framework_TestCase
 {
+    /**
+     * @covers Symfony\Components\DependencyInjection\Loader\FileLoader::__construct
+     */
     public function testConstructor()
     {
         $loader = new ProjectLoader(__DIR__);
@@ -25,6 +28,9 @@ class XmlDumperTest extends \PHPUnit_Framework_TestCase
         $this->assertEquals(array(__DIR__, __DIR__), $loader->paths, '__construct() takes an array of paths as its second argument');
     }
 
+    /**
+     * @covers Symfony\Components\DependencyInjection\Loader\FileLoader::GetAbsolutePath
+     */
     public function testGetAbsolutePath()
     {
         $loader = new ProjectLoader(array(__DIR__.'/../../../../../fixtures/Symfony/Components/DependencyInjection/containers'));

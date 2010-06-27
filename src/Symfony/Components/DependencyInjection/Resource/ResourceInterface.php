@@ -1,6 +1,6 @@
 <?php
 
-namespace Symfony\Components\DependencyInjection;
+namespace Symfony\Components\DependencyInjection\Resource;
 
 /*
  * This file is part of the Symfony framework.

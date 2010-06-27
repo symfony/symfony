@@ -63,7 +63,7 @@ class YamlFileLoaderTest extends \PHPUnit_Framework_TestCase
     {
         $loader = new ProjectLoader3(self::$fixturesPath.'/yaml');
         $config = $loader->load('services2.yml');
-        $this->assertEquals(array('foo' => 'bar', 'values' => array(true, false, 0, 1000.3), 'bar' => 'foo', 'foo_bar' => new Reference('foo_bar')), $config->getParameters(), '->load() converts YAML keys to lowercase');
+        $this->assertEquals(array('foo' => 'bar', 'values' => array(true, false, 0, 1000.3), 'bar' => 'foo', 'foo_bar' => new Reference('foo_bar')), $config->getParameterBag()->all(), '->load() converts YAML keys to lowercase');
     }
 
     public function testLoadImports()
@@ -71,7 +71,7 @@ class YamlFileLoaderTest extends \PHPUnit_Framework_TestCase
         $loader = new ProjectLoader3(self::$fixturesPath.'/yaml');
         $config = $loader->load('services4.yml');
 
-        $actual = $config->getParameters();
+        $actual = $config->getParameterBag()->all();
         $expected = array('foo' => 'bar', 'values' => array(true, false), 'bar' => '%foo%', 'foo_bar' => new Reference('foo_bar'), 'imported_from_ini' => true, 'imported_from_xml' => true);
         $this->assertEquals(array_keys($expected), array_keys($actual), '->load() imports and merges imported files');
     }
@@ -106,7 +106,7 @@ class YamlFileLoaderTest extends \PHPUnit_Framework_TestCase
 
         $config = $loader->load('services10.yml');
         $services = $config->getDefinitions();
-        $parameters = $config->getParameters();
+        $parameters = $config->getParameterBag()->all();
 
         $this->assertTrue(isset($services['project.service.bar']), '->load() parses extension elements');
         $this->assertTrue(isset($parameters['project.parameter.bar']), '->load() parses extension elements');

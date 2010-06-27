@@ -2,8 +2,6 @@
 
 namespace Symfony\Tests\Components\File;
 
-require_once __DIR__ . '/../../../../bootstrap.php';
-
 use Symfony\Components\File\File;
 use Symfony\Components\File\MimeType\MimeTypeGuesser;
 

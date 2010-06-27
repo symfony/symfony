@@ -2,8 +2,6 @@
 
 namespace Symfony\Tests\Components\Validator\Mapping\Loader;
 
-require_once __DIR__.'/../../../../../../bootstrap.php';
-
 use Symfony\Components\Validator\Mapping\ClassMetadata;
 use Symfony\Components\Validator\Mapping\Loader\StaticMethodLoader;
 

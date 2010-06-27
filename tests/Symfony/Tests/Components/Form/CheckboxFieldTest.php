@@ -2,8 +2,6 @@
 
 namespace Symfony\Tests\Components\Form;
 
-require_once __DIR__ . '/../../../../bootstrap.php';
-
 use Symfony\Components\Form\CheckboxField;
 
 class CheckboxFieldTest extends \PHPUnit_Framework_TestCase

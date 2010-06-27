@@ -2,7 +2,6 @@
 
 namespace Symfony\Tests\Components\Validator\Extension;
 
-require_once __DIR__.'/../../../../../bootstrap.php';
 require_once __DIR__.'/../Fixtures/InvalidConstraint.php';
 require_once __DIR__.'/../Fixtures/InvalidConstraintValidator.php';
 

@@ -2,8 +2,6 @@
 
 namespace Symfony\Tests\Components\Validator\MessageInterpolator;
 
-require_once __DIR__.'/../../../../../bootstrap.php';
-
 use Symfony\Components\Validator\MessageInterpolator\XliffMessageInterpolator;
 
 class XliffMessageInterpolatorTest extends \PHPUnit_Framework_TestCase

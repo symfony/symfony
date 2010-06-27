@@ -2,8 +2,6 @@
 
 namespace Symfony\Tests\Components\Form\ValueTransformer;
 
-require_once __DIR__ . '/../../../../../bootstrap.php';
-
 use Symfony\Components\Form\ValueTransformer\ValueTransformerChain;
 
 

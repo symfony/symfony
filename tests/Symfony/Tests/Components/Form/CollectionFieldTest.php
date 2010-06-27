@@ -2,7 +2,6 @@
 
 namespace Symfony\Tests\Components\Form;
 
-require_once __DIR__ . '/../../../../bootstrap.php';
 require_once __DIR__ . '/Fixtures/TestField.php';
 
 use Symfony\Components\Form\CollectionField;

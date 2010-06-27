@@ -2,7 +2,6 @@
 
 namespace Symfony\Tests\Components\Validator\Mapping;
 
-require_once __DIR__.'/../../../../../bootstrap.php';
 require_once __DIR__.'/../Fixtures/Entity.php';
 
 use Symfony\Components\Validator\Mapping\GetterMetadata;

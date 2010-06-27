@@ -2,9 +2,6 @@
 
 namespace Symfony\Tests\Components\Validator;
 
-require_once __DIR__.'/../../../../bootstrap.php';
-
-
 use Symfony\Components\Validator\Constraint;
 use Symfony\Components\Validator\Validator;
 use Symfony\Components\Validator\ConstraintViolation;

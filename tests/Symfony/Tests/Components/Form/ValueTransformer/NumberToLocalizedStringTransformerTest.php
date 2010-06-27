@@ -2,7 +2,6 @@
 
 namespace Symfony\Tests\Components\Form\ValueTransformer;
 
-require_once __DIR__ . '/../../../../../bootstrap.php';
 require_once __DIR__ . '/../LocalizedTestCase.php';
 
 use Symfony\Components\Form\ValueTransformer\NumberToLocalizedStringTransformer;

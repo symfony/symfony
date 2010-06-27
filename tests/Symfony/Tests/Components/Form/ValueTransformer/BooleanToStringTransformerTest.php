@@ -2,10 +2,7 @@
 
 namespace Symfony\Tests\Components\Form\ValueTransformer;
 
-require_once __DIR__ . '/../../../../../bootstrap.php';
-
 use Symfony\Components\Form\ValueTransformer\BooleanToStringTransformer;
-
 
 class BooleanToStringTransformerTest extends \PHPUnit_Framework_TestCase
 {

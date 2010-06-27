@@ -2,8 +2,6 @@
 
 namespace Symfony\Tests\Components\Form;
 
-require_once __DIR__ . '/../../../../bootstrap.php';
-
 use Symfony\Components\Form\ChoiceField;
 
 class ChoiceFieldTest extends \PHPUnit_Framework_TestCase

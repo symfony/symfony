@@ -12,11 +12,11 @@
         <parameter key="templating.helper.javascripts.class">Symfony\Components\Templating\Helper\JavascriptsHelper</parameter>
         <parameter key="templating.helper.stylesheets.class">Symfony\Components\Templating\Helper\StylesheetsHelper</parameter>
         <parameter key="templating.helper.slots.class">Symfony\Components\Templating\Helper\SlotsHelper</parameter>
-        <parameter key="templating.helper.assets.class">Symfony\Framework\FoundationBundle\Helper\AssetsHelper</parameter>
-        <parameter key="templating.helper.actions.class">Symfony\Framework\FoundationBundle\Helper\ActionsHelper</parameter>
-        <parameter key="templating.helper.router.class">Symfony\Framework\FoundationBundle\Helper\RouterHelper</parameter>
-        <parameter key="templating.helper.request.class">Symfony\Framework\FoundationBundle\Helper\RequestHelper</parameter>
-        <parameter key="templating.helper.user.class">Symfony\Framework\FoundationBundle\Helper\UserHelper</parameter>
+        <parameter key="templating.helper.assets.class">Symfony\Framework\FoundationBundle\Templating\Helper\AssetsHelper</parameter>
+        <parameter key="templating.helper.actions.class">Symfony\Framework\FoundationBundle\Templating\Helper\ActionsHelper</parameter>
+        <parameter key="templating.helper.router.class">Symfony\Framework\FoundationBundle\Templating\Helper\RouterHelper</parameter>
+        <parameter key="templating.helper.request.class">Symfony\Framework\FoundationBundle\Templating\Helper\RequestHelper</parameter>
+        <parameter key="templating.helper.user.class">Symfony\Framework\FoundationBundle\Templating\Helper\UserHelper</parameter>
         <parameter key="templating.output_escaper">false</parameter>
         <parameter key="templating.assets.version">null</parameter>
     </parameters>

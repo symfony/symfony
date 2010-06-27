@@ -1,6 +1,6 @@
 <?php
 
-namespace Symfony\Framework\FoundationBundle\Helper;
+namespace Symfony\Framework\FoundationBundle\Templating\Helper;
 
 use Symfony\Components\Templating\Helper\Helper;
 use Symfony\Components\HttpKernel\Request;

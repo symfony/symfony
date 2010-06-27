@@ -61,7 +61,6 @@ class RequestParser
                 'host'      => $request->getHost(),
                 'is_secure' => $request->isSecure(),
             ));
-            $this->container->setParameter('request.base_path', $request->getBasePath());
         }
 
         if ($request->path->has('_controller')) {

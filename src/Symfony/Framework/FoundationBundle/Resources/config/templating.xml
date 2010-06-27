@@ -12,7 +12,7 @@
         <parameter key="templating.helper.javascripts.class">Symfony\Components\Templating\Helper\JavascriptsHelper</parameter>
         <parameter key="templating.helper.stylesheets.class">Symfony\Components\Templating\Helper\StylesheetsHelper</parameter>
         <parameter key="templating.helper.slots.class">Symfony\Components\Templating\Helper\SlotsHelper</parameter>
-        <parameter key="templating.helper.assets.class">Symfony\Components\Templating\Helper\AssetsHelper</parameter>
+        <parameter key="templating.helper.assets.class">Symfony\Framework\FoundationBundle\Helper\AssetsHelper</parameter>
         <parameter key="templating.helper.actions.class">Symfony\Framework\FoundationBundle\Helper\ActionsHelper</parameter>
         <parameter key="templating.helper.router.class">Symfony\Framework\FoundationBundle\Helper\RouterHelper</parameter>
         <parameter key="templating.helper.request.class">Symfony\Framework\FoundationBundle\Helper\RequestHelper</parameter>
@@ -61,7 +61,7 @@
 
         <service id="templating.helper.assets" class="%templating.helper.assets.class%">
             <annotation name="templating.helper" alias="assets" />
-            <argument>%request.base_path%</argument>
+            <argument type="service" id="request" />
             <argument />
             <argument>%templating.assets.version%</argument>
         </service>

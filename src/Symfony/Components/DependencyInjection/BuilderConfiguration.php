@@ -49,7 +49,7 @@ class BuilderConfiguration
      */
     public function getResources()
     {
-        return $this->resources;
+        return array_unique($this->resources);
     }
 
     /**
@@ -103,6 +103,8 @@ class BuilderConfiguration
     {
         $namespace = $extension->getAlias();
 
+        $this->addObjectResource($extension);
+
         if (!isset($this->extensions[$namespace])) {
             $this->extensions[$namespace] = new self();
 
@@ -113,6 +115,20 @@ class BuilderConfiguration
         $this->extensions[$namespace] = $extension->load($tag, $values, $this->extensions[$namespace]);
 
         return $this;
+    }
+
+    /**
+     * Adds the object class hierarchy as resources.
+     *
+     * @param object $object An object instance
+     */
+    public function addObjectResource($object)
+    {
+        $parent = new \ReflectionObject($object);
+        $this->addResource(new FileResource($parent->getFileName()));
+        while ($parent = $parent->getParentClass()) {
+            $this->addResource(new FileResource($parent->getFileName()));
+        }
     }
 
     /**

@@ -343,6 +343,10 @@ abstract class Kernel implements HttpKernelInterface, \Serializable
         $configuration = new BuilderConfiguration();
         foreach ($this->bundles as $bundle) {
             $configuration->merge($bundle->buildContainer($container));
+
+            if ($this->debug) {
+                $configuration->addObjectResource($bundle);
+            }
         }
         $configuration->merge($this->registerContainerConfiguration());
         $container->merge($configuration);
@@ -368,12 +372,7 @@ abstract class Kernel implements HttpKernelInterface, \Serializable
         $this->writeCacheFile($file, $content);
 
         if ($this->debug) {
-            // add the Kernel class hierarchy as resources
-            $parent = new \ReflectionObject($this);
-            $configuration->addResource(new FileResource($parent->getFileName()));
-            while ($parent = $parent->getParentClass()) {
-                $configuration->addResource(new FileResource($parent->getFileName()));
-            }
+            $configuration->addObjectResource($this);
 
             // save the resources
             $this->writeCacheFile($this->getCacheDir().'/'.$class.'.meta', serialize($configuration->getResources()));

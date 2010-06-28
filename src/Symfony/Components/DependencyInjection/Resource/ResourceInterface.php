@@ -21,6 +21,13 @@ namespace Symfony\Components\DependencyInjection\Resource;
 interface ResourceInterface
 {
     /**
+     * Returns a string representation of the Resource.
+     *
+     * @return string A string representation of the Resource
+     */
+    function __toString();
+
+    /**
      * Returns true if the resource has not been updated since the given timestamp.
      *
      * @param int $timestamp The last time the resource was loaded

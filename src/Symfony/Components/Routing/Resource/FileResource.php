@@ -1,6 +1,6 @@
 <?php
 
-namespace Symfony\Components\Routing;
+namespace Symfony\Components\Routing\Resource;
 
 /*
  * This file is part of the Symfony framework.
@@ -29,7 +29,17 @@ class FileResource implements ResourceInterface
      */
     public function __construct($resource)
     {
-        $this->resource = $resource;
+        $this->resource = realpath($resource);
+    }
+
+    /**
+     * Returns a string representation of the Resource.
+     *
+     * @return string A string representation of the Resource
+     */
+    public function __toString()
+    {
+        return $this->resource;
     }
 
     /**

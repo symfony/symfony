@@ -9,9 +9,9 @@
  * file that was distributed with this source code.
  */
 
-namespace Symfony\Tests\Components\Routing;
+namespace Symfony\Tests\Components\Routing\Resource;
 
-use Symfony\Components\Routing\FileResource;
+use Symfony\Components\Routing\Resource\FileResource;
 
 class FileResourceTest extends \PHPUnit_Framework_TestCase
 {
@@ -20,7 +20,7 @@ class FileResourceTest extends \PHPUnit_Framework_TestCase
         $file = sys_get_temp_dir().'/tmp.xml';
         touch($file);
         $resource = new FileResource($file);
-        $this->assertEquals($file, $resource->getResource(), '->getResource() returns the path to the resource');
+        $this->assertEquals(realpath($file), $resource->getResource(), '->getResource() returns the path to the resource');
         unlink($file);
     }
 

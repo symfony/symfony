@@ -4,7 +4,7 @@ namespace Symfony\Components\Routing\Loader;
 
 use Symfony\Components\Routing\RouteCollection;
 use Symfony\Components\Routing\Route;
-use Symfony\Components\Routing\FileResource;
+use Symfony\Components\Routing\Resource\FileResource;
 use Symfony\Components\Yaml\Yaml;
 
 /*

@@ -1,6 +1,6 @@
 <?php
 
-namespace Symfony\Components\Routing;
+namespace Symfony\Components\Routing\Resource;
 
 /*
  * This file is part of the Symfony framework.
@@ -20,6 +20,13 @@ namespace Symfony\Components\Routing;
  */
 interface ResourceInterface
 {
+    /**
+     * Returns a string representation of the Resource.
+     *
+     * @return string A string representation of the Resource
+     */
+    function __toString();
+
     /**
      * Returns true if the resource has not been updated since the given timestamp.
      *

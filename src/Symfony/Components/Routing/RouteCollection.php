@@ -2,6 +2,8 @@
 
 namespace Symfony\Components\Routing;
 
+use Symfony\Components\Routing\Resource\ResourceInterface;
+
 /*
  * This file is part of the Symfony framework.
  *
@@ -111,7 +113,7 @@ class RouteCollection
      */
     public function getResources()
     {
-        return $this->resources;
+        return array_unique($this->resources);
     }
 
     /**

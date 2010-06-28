@@ -13,7 +13,7 @@ namespace Symfony\Tests\Components\Routing;
 
 use Symfony\Components\Routing\RouteCollection;
 use Symfony\Components\Routing\Route;
-use Symfony\Components\Routing\FileResource;
+use Symfony\Components\Routing\Resource\FileResource;
 
 class RouteCollectionTest extends \PHPUnit_Framework_TestCase
 {
@@ -45,9 +45,9 @@ class RouteCollectionTest extends \PHPUnit_Framework_TestCase
         $this->assertEquals('/foo/foo1', $collection->getRoute('foo')->getPattern(), '->addCollection() can add a prefix to all merged routes');
 
         $collection = new RouteCollection();
-        $collection->addResource($foo = new FileResource('foo'));
+        $collection->addResource($foo = new FileResource(__DIR__.'/Fixtures/foo.xml'));
         $collection1 = new RouteCollection();
-        $collection1->addResource($foo1 = new FileResource('foo1'));
+        $collection1->addResource($foo1 = new FileResource(__DIR__.'/Fixtures/foo1.xml'));
         $collection->addCollection($collection1);
         $this->assertEquals(array($foo, $foo1), $collection->getResources(), '->addCollection() merges resources');
     }
@@ -65,7 +65,7 @@ class RouteCollectionTest extends \PHPUnit_Framework_TestCase
     public function testResource()
     {
         $collection = new RouteCollection();
-        $collection->addResource($foo = new FileResource('foo'));
+        $collection->addResource($foo = new FileResource(__DIR__.'/Fixtures/foo.xml'));
         $this->assertEquals(array($foo), $collection->getResources(), '->addResources() adds a resource');
     }
 }

@@ -204,7 +204,7 @@ class HeaderBag
             } else {
                 $expires = strtotime($expires);
                 if (false === $expires || -1 == $expires) {
-                    throw new \InvalidArgumentException(sprintf('The "expires" cookie parameter is not valid.', $expire));
+                    throw new \InvalidArgumentException(sprintf('The "expires" cookie parameter is not valid.', $expires));
                 }
             }
         }
@@ -213,12 +213,10 @@ class HeaderBag
             $cookie .= '; expires='.substr(\DateTime::createFromFormat('U', $expires, new \DateTimeZone('UTC'))->format('D, d-M-Y H:i:s T'), 0, -5);
         }
 
+        $cookie .= '; domain='.$domain;
+
         if ('/' !== $path) {
             $cookie .= '; path='.$path;
-        }
-
-        if ('' !== $domain) {
-            $cookie .= '; domain='.$domain;
         }
 
         if ($secure) {

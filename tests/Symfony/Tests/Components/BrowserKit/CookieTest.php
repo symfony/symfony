@@ -32,14 +32,14 @@ class CookieTest extends \PHPUnit_Framework_TestCase
             array('foo=bar; domain=google.com'),
             array('foo=bar; secure'),
             array('foo=bar; httponly'),
-            array('foo=bar; path=/foo; domain=google.com; secure; httponly'),
+            array('foo=bar; domain=google.com; path=/foo; secure; httponly'),
         );
     }
 
     public function testFromStringWithUrl()
     {
         $this->assertEquals('foo=bar; domain=www.example.com', (string) Cookie::FromString('foo=bar', 'http://www.example.com/'));
-        $this->assertEquals('foo=bar; path=/foo; domain=www.example.com', (string) Cookie::FromString('foo=bar', 'http://www.example.com/foo/bar'));
+        $this->assertEquals('foo=bar; domain=www.example.com; path=/foo', (string) Cookie::FromString('foo=bar', 'http://www.example.com/foo/bar'));
     }
 
     public function testFromStringThrowsAnExceptionIfCookieIsNotValid()

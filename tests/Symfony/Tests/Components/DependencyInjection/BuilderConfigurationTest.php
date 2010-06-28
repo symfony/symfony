@@ -77,9 +77,9 @@ class BuilderConfigurationTest extends \PHPUnit_Framework_TestCase
         $this->assertEquals('BazClass', $configuration->getDefinition('foo')->getClass(), '->merge() overrides already defined services');
 
         $configuration = new BuilderConfiguration();
-        $configuration->addResource($a = new FileResource('foo.xml'));
+        $configuration->addResource($a = new FileResource(self::$fixturesPath.'/xml/services1.xml'));
         $config = new BuilderConfiguration();
-        $config->addResource($b = new FileResource('foo.yml'));
+        $config->addResource($b = new FileResource(self::$fixturesPath.'/xml/services2.xml'));
         $configuration->merge($config);
         $this->assertEquals(array($a, $b), $configuration->getResources(), '->merge() merges resources');
     }
@@ -204,8 +204,8 @@ class BuilderConfigurationTest extends \PHPUnit_Framework_TestCase
     public function testResources()
     {
         $configuration = new BuilderConfiguration();
-        $configuration->addResource($a = new FileResource('foo.xml'));
-        $configuration->addResource($b = new FileResource('foo.yml'));
+        $configuration->addResource($a = new FileResource(self::$fixturesPath.'/xml/services1.xml'));
+        $configuration->addResource($b = new FileResource(self::$fixturesPath.'/xml/services2.xml'));
         $this->assertEquals(array($a, $b), $configuration->getResources(), '->getResources() returns an array of resources read for the current configuration');
     }
 }

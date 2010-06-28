@@ -8,7 +8,7 @@
  * file that was distributed with this source code.
  */
 
-namespace Symfony\Tests\Components\OutputEscaper;
+namespace Symfony\Tests\Components\Yaml;
 
 use Symfony\Components\Yaml\Yaml;
 use Symfony\Components\Yaml\Inline;

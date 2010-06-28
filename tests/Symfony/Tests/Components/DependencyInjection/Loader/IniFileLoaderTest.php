@@ -19,7 +19,7 @@ class IniFileLoaderTest extends \PHPUnit_Framework_TestCase
 
     static public function setUpBeforeClass()
     {
-        self::$fixturesPath = realpath(__DIR__.'/../../../../../fixtures/Symfony/Components/DependencyInjection/');
+        self::$fixturesPath = realpath(__DIR__.'/../Fixtures/');
     }
 
     /**

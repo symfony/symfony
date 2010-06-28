@@ -8,7 +8,7 @@
  * file that was distributed with this source code.
  */
 
-namespace Symfony\Tests\Components\OutputEscaper;
+namespace Symfony\Tests\Components\Yaml;
 
 use Symfony\Components\Yaml\Yaml;
 use Symfony\Components\Yaml\Parser;
@@ -27,7 +27,7 @@ class ParserTest extends \PHPUnit_Framework_TestCase
     public function setUp()
     {
         $this->parser = new Parser();
-        $this->path = __DIR__.'/../../../../fixtures/Symfony/Components/Yaml';
+        $this->path = __DIR__.'/Fixtures';
     }
 
     public function testSpecifications()
@@ -80,7 +80,7 @@ class ParserTest extends \PHPUnit_Framework_TestCase
     {
         $b = array('foo' => new B(), 'bar' => 1);
         $this->assertEquals($this->parser->parse(<<<EOF
-foo: !!php/object:O:40:"Symfony\Tests\Components\OutputEscaper\B":1:{s:1:"b";s:3:"foo";}
+foo: !!php/object:O:31:"Symfony\Tests\Components\Yaml\B":1:{s:1:"b";s:3:"foo";}
 bar: 1
 EOF
         ), $b, '->parse() is able to dump objects');

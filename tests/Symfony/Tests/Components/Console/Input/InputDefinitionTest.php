@@ -23,7 +23,7 @@ class InputDefinitionTest extends \PHPUnit_Framework_TestCase
 
     static public function setUpBeforeClass()
     {
-        self::$fixtures = __DIR__.'/../../../../../fixtures/Symfony/Components/Console';
+        self::$fixtures = __DIR__.'/../Fixtures/';
     }
 
     public function testConstructor()

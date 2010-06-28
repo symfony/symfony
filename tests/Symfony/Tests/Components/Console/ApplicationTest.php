@@ -22,7 +22,7 @@ class ApplicationTest extends \PHPUnit_Framework_TestCase
 
     static public function setUpBeforeClass()
     {
-        self::$fixturesPath = realpath(__DIR__.'/../../../../fixtures/Symfony/Components/Console/');
+        self::$fixturesPath = realpath(__DIR__.'/Fixtures/');
         require_once self::$fixturesPath.'/FooCommand.php';
         require_once self::$fixturesPath.'/Foo1Command.php';
         require_once self::$fixturesPath.'/Foo2Command.php';

@@ -18,7 +18,7 @@ class CrossCheckTest extends \PHPUnit_Framework_TestCase
 
     static public function setUpBeforeClass()
     {
-        self::$fixturesPath = __DIR__.'/../../../../fixtures/Symfony/Components/DependencyInjection/';
+        self::$fixturesPath = __DIR__.'/Fixtures/';
 
         require_once self::$fixturesPath.'/includes/classes.php';
         require_once self::$fixturesPath.'/includes/foo.php';

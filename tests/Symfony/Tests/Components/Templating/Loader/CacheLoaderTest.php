@@ -11,7 +11,7 @@
 
 namespace Symfony\Tests\Components\Templating\Loader;
 
-require_once __DIR__.'/../../../../../lib/SymfonyTests/Components/Templating/ProjectTemplateDebugger.php';
+require_once __DIR__.'/../Fixtures/ProjectTemplateDebugger.php';
 
 use Symfony\Components\Templating\Loader\Loader;
 use Symfony\Components\Templating\Loader\CacheLoader;

@@ -11,7 +11,7 @@
 
 namespace Symfony\Tests\Components\Templating\Loader;
 
-require_once __DIR__.'/../../../../../lib/SymfonyTests/Components/Templating/ProjectTemplateDebugger.php';
+require_once __DIR__.'/../Fixtures/ProjectTemplateDebugger.php';
 
 use Symfony\Components\Templating\Loader\FilesystemLoader;
 use Symfony\Components\Templating\Storage\FileStorage;
@@ -22,7 +22,7 @@ class FilesystemLoaderTest extends \PHPUnit_Framework_TestCase
 
     static public function setUpBeforeClass()
     {
-        self::$fixturesPath = realpath(__DIR__.'/../../../../../fixtures/Symfony/Components/Templating/');
+        self::$fixturesPath = realpath(__DIR__.'/../Fixtures/');
     }
 
     public function testConstructor()

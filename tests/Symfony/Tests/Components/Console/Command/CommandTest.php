@@ -29,7 +29,7 @@ class CommandTest extends \PHPUnit_Framework_TestCase
 
     static public function setUpBeforeClass()
     {
-        self::$fixturesPath = __DIR__.'/../../../../../fixtures/Symfony/Components/Console/';
+        self::$fixturesPath = __DIR__.'/../Fixtures/';
         require_once self::$fixturesPath.'/TestCommand.php';
     }
 

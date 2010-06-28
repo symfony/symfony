@@ -8,7 +8,7 @@
  * file that was distributed with this source code.
  */
 
-namespace Symfony\Tests\Components\OutputEscaper;
+namespace Symfony\Tests\Components\Yaml;
 
 use Symfony\Components\Yaml\Yaml;
 use Symfony\Components\Yaml\Parser;
@@ -29,7 +29,7 @@ class DumperTest extends \PHPUnit_Framework_TestCase
     {
         $this->parser = new Parser();
         $this->dumper = new Dumper();
-        $this->path = __DIR__.'/../../../../fixtures/Symfony/Components/Yaml';
+        $this->path = __DIR__.'/Fixtures';
     }
 
     public function testSpecifications()
@@ -153,7 +153,7 @@ EOF;
     {
         $a = array('foo' => new A(), 'bar' => 1);
 
-        $this->assertEquals('{ foo: !!php/object:O:40:"Symfony\Tests\Components\OutputEscaper\A":1:{s:1:"a";s:3:"foo";}, bar: 1 }', $this->dumper->dump($a), '->dump() is able to dump objects');
+        $this->assertEquals('{ foo: !!php/object:O:31:"Symfony\Tests\Components\Yaml\A":1:{s:1:"a";s:3:"foo";}, bar: 1 }', $this->dumper->dump($a), '->dump() is able to dump objects');
     }
 }
 

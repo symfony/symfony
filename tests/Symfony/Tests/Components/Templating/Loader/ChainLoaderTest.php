@@ -11,7 +11,7 @@
 
 namespace Symfony\Tests\Components\Templating\Loader;
 
-require_once __DIR__.'/../../../../../lib/SymfonyTests/Components/Templating/ProjectTemplateDebugger.php';
+require_once __DIR__.'/../Fixtures/ProjectTemplateDebugger.php';
 
 use Symfony\Components\Templating\Loader\ChainLoader;
 use Symfony\Components\Templating\Loader\FilesystemLoader;
@@ -23,7 +23,7 @@ class ChainLoaderTest extends \PHPUnit_Framework_TestCase
 
     static public function setUpBeforeClass()
     {
-        $fixturesPath = realpath(__DIR__.'/../../../../../fixtures/Symfony/Components/Templating/');
+        $fixturesPath = realpath(__DIR__.'/../Fixtures/');
         self::$loader1 = new FilesystemLoader($fixturesPath.'/null/%name%');
         self::$loader2 = new FilesystemLoader($fixturesPath.'/templates/%name%.%renderer%');
     }

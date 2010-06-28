@@ -10,7 +10,7 @@
 
 namespace Symfony\Tests\Components\DependencyInjection\Loader;
 
-require_once __DIR__.'/../../../../../fixtures/Symfony/Components/DependencyInjection/includes/ProjectExtension.php';
+require_once __DIR__.'/../Fixtures/includes/ProjectExtension.php';
 
 use Symfony\Components\DependencyInjection\Loader\Loader;
 use Symfony\Components\DependencyInjection\BuilderConfiguration;

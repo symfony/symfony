@@ -23,7 +23,7 @@ class BuilderTest extends \PHPUnit_Framework_TestCase
 
     static public function setUpBeforeClass()
     {
-        self::$fixturesPath = __DIR__.'/../../../../fixtures/Symfony/Components/DependencyInjection/';
+        self::$fixturesPath = __DIR__.'/Fixtures/';
     }
 
     /**

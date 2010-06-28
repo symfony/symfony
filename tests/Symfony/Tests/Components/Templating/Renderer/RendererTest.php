@@ -11,7 +11,7 @@
 
 namespace Symfony\Tests\Components\Templating\Renderer;
 
-require_once __DIR__.'/../../../../../lib/SymfonyTests/Components/Templating/SimpleHelper.php';
+require_once __DIR__.'/../Fixtures/SimpleHelper.php';
 
 use Symfony\Components\Templating\Engine;
 use Symfony\Components\Templating\Renderer\Renderer;
@@ -22,7 +22,7 @@ class RendererTest extends \PHPUnit_Framework_TestCase
 {
     public function testSetEngine()
     {
-        $loader = new FilesystemLoader(array(__DIR__.'/fixtures/templates/%name%.%renderer%'));
+        $loader = new FilesystemLoader(array(__DIR__.'/../Fixtures/templates/%name%.%renderer%'));
         $engine = new Engine($loader);
         $renderer = new ProjectTemplateRenderer();
         $renderer->setEngine($engine);

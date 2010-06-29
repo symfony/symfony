@@ -27,14 +27,25 @@ class ParserTest extends \PHPUnit_Framework_TestCase
     public function setUp()
     {
         $this->parser = new Parser();
-        $this->path = __DIR__.'/Fixtures';
     }
 
-    public function testSpecifications()
+    /**
+     * @dataProvider getDataFormSpecifications
+     */
+    public function testSpecifications($expected, $yaml, $comment)
     {
-        $files = $this->parser->parse(file_get_contents($this->path.'/index.yml'));
+        $this->assertEquals($expected, var_export($this->parser->parse($yaml), true), $comment);
+    }
+
+    public function getDataFormSpecifications()
+    {
+        $parser = new Parser();
+        $path = __DIR__.'/Fixtures';
+
+        $tests = array();
+        $files = $parser->parse(file_get_contents($path.'/index.yml'));
         foreach ($files as $file) {
-            $yamls = file_get_contents($this->path.'/'.$file.'.yml');
+            $yamls = file_get_contents($path.'/'.$file.'.yml');
 
             // split YAMLs documents
             foreach (preg_split('/^---( %YAML\:1\.0)?/m', $yamls) as $yaml) {
@@ -42,16 +53,18 @@ class ParserTest extends \PHPUnit_Framework_TestCase
                     continue;
                 }
 
-                $test = $this->parser->parse($yaml);
+                $test = $parser->parse($yaml);
                 if (isset($test['todo']) && $test['todo']) {
                     // TODO
                 } else {
                     $expected = var_export(eval('return '.trim($test['php']).';'), true);
 
-                    $this->assertEquals($expected, var_export($this->parser->parse($test['yaml']), true), $test['test']);
+                    $tests[] = array($expected, $test['yaml'], $test['test']);
                 }
             }
         }
+
+        return $tests;
     }
 
     public function testTabsInYaml()

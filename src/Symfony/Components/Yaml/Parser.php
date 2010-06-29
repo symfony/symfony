@@ -503,12 +503,23 @@ class Parser
         $value = preg_replace('#^\%YAML[: ][\d\.]+.*\n#su', '', $value, -1, $count);
         $this->offset += $count;
 
-        // remove leading comments and/or ---
-        $trimmedValue = preg_replace('#^((\#.*?\n)|(\-\-\-.*?\n))*#su', '', $value, -1, $count);
+        // remove leading comments
+        $trimmedValue = preg_replace('#^(\#.*?\n)+#s', '', $value, -1, $count);
         if ($count == 1) {
             // items have been removed, update the offset
             $this->offset += substr_count($value, "\n") - substr_count($trimmedValue, "\n");
             $value = $trimmedValue;
+        }
+
+        // remove start of the document marker (---)
+        $trimmedValue = preg_replace('#^\-\-\-.*?\n#s', '', $value, -1, $count);
+        if ($count == 1) {
+            // items have been removed, update the offset
+            $this->offset += substr_count($value, "\n") - substr_count($trimmedValue, "\n");
+            $value = $trimmedValue;
+
+            // remove end of the document marker (...)
+            $value = preg_replace('#\.\.\.\s*$#s', '', $value);
         }
 
         return $value;

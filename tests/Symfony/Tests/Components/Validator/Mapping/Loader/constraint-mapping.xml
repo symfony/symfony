@@ -10,6 +10,9 @@
 
     <!-- Constraint without value -->
     <constraint name="NotNull" />
+
+    <!-- Custom constraint -->
+    <constraint name="Symfony\Tests\Components\Validator\Fixtures\ConstraintA" />
     
     <!-- Constraint with single value -->
     <constraint name="Min">3</constraint>

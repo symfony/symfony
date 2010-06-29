@@ -8,6 +8,7 @@ require_once __DIR__.'/EntityInterface.php';
 /**
  * @Validation({
  *   @NotNull,
+ *   @Symfony\Tests\Components\Validator\Fixtures\ConstraintA,
  *   @Min(3),
  *   @Choice({"A", "B"}),
  *   @All({@NotNull, @Min(3)}),

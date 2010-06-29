@@ -68,14 +68,13 @@ class YamlFileLoader extends FileLoader
 
         foreach ($nodes as $name => $childNodes) {
             if (is_numeric($name) && is_array($childNodes) && count($childNodes) == 1) {
-                $className = 'Symfony\\Components\\Validator\\Constraints\\'.key($childNodes);
                 $options = current($childNodes);
 
                 if (is_array($options)) {
                     $options = $this->parseNodes($options);
                 }
 
-                $values[] = new $className($options);
+                $values[] = $this->newConstraint(key($childNodes), $options);
             } else {
                 if (is_array($childNodes)) {
                     $childNodes = $this->parseNodes($childNodes);

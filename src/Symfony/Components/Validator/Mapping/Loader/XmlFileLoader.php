@@ -63,8 +63,6 @@ class XmlFileLoader extends FileLoader
         $constraints = array();
 
         foreach ($nodes as $node) {
-            $className = 'Symfony\\Components\\Validator\\Constraints\\'.$node['name'];
-
             if (count($node) > 0) {
                 if (count($node->value) > 0) {
                     $options = $this->parseValues($node->value);
@@ -81,7 +79,7 @@ class XmlFileLoader extends FileLoader
                 $options = null;
             }
 
-            $constraints[] = new $className($options);
+            $constraints[] = $this->newConstraint($node['name'], $options);
         }
 
         return $constraints;

@@ -22,4 +22,25 @@ abstract class FileLoader implements LoaderInterface
 
         $this->file = $file;
     }
+
+    /**
+     * Creates a new constraint instance for the given constraint name
+     *
+     * @param string $name    The constraint name. Either a constraint relative
+     *                        to the default constraint namespace, or a fully
+     *                        qualified class name
+     * @param array $options  The constraint options
+     *
+     * @return Constraint
+     */
+    protected function newConstraint($name, $options)
+    {
+        if (strpos($name, '\\') !== false && class_exists($name)) {
+            $className = (string)$name;
+        } else {
+            $className = 'Symfony\\Components\\Validator\\Constraints\\'.$name;
+        }
+
+        return new $className($options);
+    }
 }

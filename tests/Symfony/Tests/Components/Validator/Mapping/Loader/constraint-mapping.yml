@@ -2,6 +2,8 @@ Symfony\Tests\Components\Validator\Fixtures\Entity:
   constraints:
     # Constraint without value
     - NotNull: ~
+    # Custom constraint
+    - Symfony\Tests\Components\Validator\Fixtures\ConstraintA: ~
     # Constraint with single value
     - Min: 3
     # Constraint with multiple values

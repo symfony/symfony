@@ -3,6 +3,7 @@
 namespace Symfony\Tests\Components\Validator\Mapping\Loader;
 
 require_once __DIR__.'/../../Fixtures/Entity.php';
+require_once __DIR__.'/../../Fixtures/ConstraintA.php';
 
 use Symfony\Components\Validator\Constraints\All;
 use Symfony\Components\Validator\Constraints\Collection;
@@ -11,6 +12,7 @@ use Symfony\Components\Validator\Constraints\Min;
 use Symfony\Components\Validator\Constraints\Choice;
 use Symfony\Components\Validator\Mapping\ClassMetadata;
 use Symfony\Components\Validator\Mapping\Loader\AnnotationLoader;
+use Symfony\Tests\Components\Validator\Fixtures\ConstraintA;
 
 class AnnotationLoaderTest extends \PHPUnit_Framework_TestCase
 {
@@ -39,6 +41,7 @@ class AnnotationLoaderTest extends \PHPUnit_Framework_TestCase
 
         $expected = new ClassMetadata('Symfony\Tests\Components\Validator\Fixtures\Entity');
         $expected->addConstraint(new NotNull());
+        $expected->addConstraint(new ConstraintA());
         $expected->addConstraint(new Min(3));
         $expected->addConstraint(new Choice(array('A', 'B')));
         $expected->addConstraint(new All(array(new NotNull(), new Min(3))));

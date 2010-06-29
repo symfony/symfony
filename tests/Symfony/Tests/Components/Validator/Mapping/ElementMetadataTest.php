@@ -15,7 +15,7 @@ class ElementMetadataTest extends \PHPUnit_Framework_TestCase
 
     public function setUp()
     {
-        $this->metadata = new ElementMetadata('Symfony\Tests\Components\Validator\Fixtures\Entity');
+        $this->metadata = new TestElementMetadata('Symfony\Tests\Components\Validator\Fixtures\Entity');
     }
 
     public function testAddConstraints()
@@ -47,4 +47,16 @@ class ElementMetadataTest extends \PHPUnit_Framework_TestCase
 
         $this->assertEquals(array($constraint1), $this->metadata->findConstraints('TestGroup'));
     }
+
+    public function testSerialize()
+    {
+        $this->metadata->addConstraint(new ConstraintA(array('property1' => 'A')));
+        $this->metadata->addConstraint(new ConstraintB(array('groups' => 'TestGroup')));
+
+        $metadata = unserialize(serialize($this->metadata));
+
+        $this->assertEquals($this->metadata, $metadata);
+    }
 }
+
+class TestElementMetadata extends ElementMetadata {}

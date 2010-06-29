@@ -119,5 +119,17 @@ class ClassMetadataTest extends \PHPUnit_Framework_TestCase
 
         $this->assertEquals($reflClass, $this->metadata->getReflectionClass());
     }
+
+    public function testSerialize()
+    {
+        $this->metadata->addConstraint(new ConstraintA(array('property1' => 'A')));
+        $this->metadata->addConstraint(new ConstraintB(array('groups' => 'TestGroup')));
+        $this->metadata->addPropertyConstraint('firstName', new ConstraintA());
+        $this->metadata->addGetterConstraint('lastName', new ConstraintB());
+
+        $metadata = unserialize(serialize($this->metadata));
+
+        $this->assertEquals($this->metadata, $metadata);
+    }
 }
 

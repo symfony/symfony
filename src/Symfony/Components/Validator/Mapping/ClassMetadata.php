@@ -7,12 +7,12 @@ use Symfony\Components\Validator\Exception\ValidatorException;
 
 class ClassMetadata extends ElementMetadata
 {
-    private $name;
-    private $shortName;
-    private $members = array();
-    private $properties = array();
-    private $getters = array();
-    private $groupSequence = array();
+    public $name;
+    public $shortName;
+    public $members = array();
+    public $properties = array();
+    public $getters = array();
+    public $groupSequence = array();
     private $reflClass;
 
     /**
@@ -24,6 +24,23 @@ class ClassMetadata extends ElementMetadata
     {
         $this->name = $class;
         $this->shortName = substr($class, strrpos($class, '\\') + 1);
+    }
+
+    /**
+     * Returns the properties to be serialized
+     *
+     * @return array
+     */
+    public function __sleep()
+    {
+        return array_merge(parent::__sleep(), array(
+            'getters',
+            'groupSequence',
+            'members',
+            'name',
+           	'properties',
+            'shortName'
+        ));
     }
 
     /**

@@ -6,9 +6,9 @@ use Symfony\Components\Validator\Exception\ValidatorException;
 
 abstract class MemberMetadata extends ElementMetadata
 {
-    private $class;
-    private $name;
-    private $property;
+    public $class;
+    public $name;
+    public $property;
     private $reflMember;
 
     /**
@@ -23,6 +23,20 @@ abstract class MemberMetadata extends ElementMetadata
         $this->class = $class;
         $this->name = $name;
         $this->property = $property;
+    }
+
+    /**
+     * Returns the names of the properties that should be serialized
+     *
+     * @return array
+     */
+    public function __sleep()
+    {
+        return array_merge(parent::__sleep(), array(
+            'class',
+            'name',
+            'property'
+        ));
     }
 
     /**

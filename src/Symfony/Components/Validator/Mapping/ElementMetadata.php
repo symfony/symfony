@@ -2,13 +2,25 @@
 
 namespace Symfony\Components\Validator\Mapping;
 
-use \ReflectionClass;
 use Symfony\Components\Validator\Constraint;
 
-class ElementMetadata
+abstract class ElementMetadata
 {
-    private $constraints = array();
-    private $constraintsByGroup = array();
+    public $constraints = array();
+    public $constraintsByGroup = array();
+
+    /**
+     * Returns the names of the properties that should be serialized
+     *
+     * @return array
+     */
+    public function __sleep()
+    {
+        return array(
+            'constraints',
+            'constraintsByGroup',
+        );
+    }
 
     /**
      * Clones this object

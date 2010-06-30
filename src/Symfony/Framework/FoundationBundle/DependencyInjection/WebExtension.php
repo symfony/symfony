@@ -92,8 +92,8 @@ class WebExtension extends LoaderExtension
             }
         }
 
-        if (isset($config['validation'])) {
-            if ($config['validation']) {
+        if (isset($config['validation']['enabled'])) {
+            if ($config['validation']['enabled']) {
                 if (!$configuration->hasDefinition('validator')) {
                     $loader = new XmlFileLoader(__DIR__.'/../Resources/config');
                     $configuration->merge($loader->load($this->resources['validation']));
@@ -160,7 +160,7 @@ class WebExtension extends LoaderExtension
 
                     $loader = $configuration->getDefinition('validator.mapping.loader.loader_chain');
                     $arguments = $loader->getArguments();
-                    array_unshift($arguments, new Reference('validator.mapping.loader.annotation_loader'));
+                    array_unshift($arguments[0], new Reference('validator.mapping.loader.annotation_loader'));
                     $loader->setArguments($arguments);
                 }
             } elseif ($configuration->hasDefinition('validator')) {

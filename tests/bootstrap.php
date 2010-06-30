@@ -9,12 +9,6 @@
  * file that was distributed with this source code.
  */
 
-require_once __DIR__.'/../src/Symfony/Foundation/UniversalClassLoader.php';
-
-$loader = new Symfony\Foundation\UniversalClassLoader();
-$loader->registerNamespace('Symfony', __DIR__.'/../src');
-$loader->register();
-
 if (file_exists($file = __DIR__.'/../autoload.php')) {
     require_once $file;
 } elseif (file_exists($file = __DIR__.'/../autoload.php.dist')) {

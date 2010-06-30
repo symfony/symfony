@@ -66,7 +66,7 @@ class ProfilerStorage
     {
         $db = $this->initDb();
         $args = array(':token' => $this->token);
-        $data = $this->exec($db, 'SELECT data FROM data WHERE token = :token ORDER BY created_at DESC LIMIT 1', $args);
+        $data = $this->fetch($db, 'SELECT data FROM data WHERE token = :token ORDER BY created_at DESC LIMIT 1', $args);
         $this->close($db);
         if (isset($data[0]['data'])) {
             return unserialize(pack('H*', $data[0]['data']));
@@ -110,6 +110,24 @@ class ProfilerStorage
     }
 
     protected function exec($db, $query, array $args = array())
+    {
+        $stmt = $db->prepare($query);
+        if ($db instanceof \SQLite3) {
+            foreach ($args as $arg => $val) {
+                $stmt->bindValue($arg, $val, is_int($val) ? \SQLITE3_INTEGER : \SQLITE3_TEXT);
+            }
+
+            $res = $stmt->execute();
+            $res->finalize();
+        } else {
+            foreach ($args as $arg => $val) {
+                $stmt->bindValue($arg, $val, is_int($val) ? \PDO::PARAM_INT : \PDO::PARAM_STR);
+            }
+            $stmt->execute();
+        }
+    }
+
+    protected function fetch($db, $query, array $args = array())
     {
         $return = array();
         $stmt = $db->prepare($query);

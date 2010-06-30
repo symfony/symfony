@@ -1,7 +1,12 @@
 #!/bin/sh
 
 # initialization
-rm -rf vendor/*
+if [ -d "vendor" ]; then
+  rm -rf vendor/*
+else
+  mkdir vendor
+fi
+
 cd vendor
 
 # Doctrine

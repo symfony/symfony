@@ -2,8 +2,6 @@
 
 namespace Symfony\Framework\FoundationBundle\Util;
 
-use Symfony\Components\Finder\Finder;
-
 /*
  * This file is part of the Symfony framework.
  *
@@ -197,20 +195,20 @@ class Filesystem
     /**
      * Mirrors a directory to another.
      *
-     * @param string $originDir  The origin directory
-     * @param string $targetDir  The target directory
-     * @param Finder $finder     An Finder instance
-     * @param array  $options    An array of options (see copy())
+     * @param string $originDir      The origin directory
+     * @param string $targetDir      The target directory
+     * @param \Traversable $iterator A Traversable instance
+     * @param array  $options        An array of options (see copy())
      *
      * @throws \RuntimeException When file type is unknown
      */
-    public function mirror($originDir, $targetDir, Finder $finder = null, $options = array())
+    public function mirror($originDir, $targetDir, \Traversable $iterator = null, $options = array())
     {
-        if (null === $finder) {
-            $finder = new Finder();
+        if (null === $iterator) {
+            $iterator = new \RecursiveIteratorIterator(new \RecursiveDirectoryIterator($originDir, \FilesystemIterator::SKIP_DOTS), \RecursiveIteratorIterator::SELF_FIRST);
         }
 
-        foreach ($finder->in($originDir) as $file) {
+        foreach ($iterator as $file) {
             $target = $targetDir.DIRECTORY_SEPARATOR.str_replace(realpath($originDir), '', $file->getRealPath());
 
             if (is_dir($file)) {

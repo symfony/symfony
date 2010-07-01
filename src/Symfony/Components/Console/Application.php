@@ -143,7 +143,7 @@ class Application
      */
     public function doRun(InputInterface $input, OutputInterface $output)
     {
-        $name = $input->getFirstArgument('command');
+        $name = $this->getCommandName($input);
 
         if (true === $input->hasParameterOption(array('--ansi', '-a'))) {
             $output->setDecorated(true);
@@ -709,7 +709,12 @@ class Application
         }
     }
 
-    private function sortCommands($commands)
+    protected function getCommandName(InputInterface $input)
+    {
+        return $input->getFirstArgument('command');
+    }
+
+    protected function sortCommands($commands)
     {
         $namespacedCommands = array();
         foreach ($commands as $name => $command) {
@@ -730,7 +735,7 @@ class Application
         return $namespacedCommands;
     }
 
-    private function getAbbreviationSuggestions($abbrevs)
+    protected function getAbbreviationSuggestions($abbrevs)
     {
         return sprintf('%s, %s%s', $abbrevs[0], $abbrevs[1], count($abbrevs) > 2 ? sprintf(' and %d more', count($abbrevs) - 2) : '');
     }

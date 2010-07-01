@@ -8,7 +8,7 @@ Options:
   --quiet          -q Do not output any message.
   --verbose        -v Increase verbosity of messages.
   --version        -V Display this program version.
-  --color          -c Force ANSI color output.
+  --ansi           -a Force ANSI output.
   --no-interaction -n Do not ask any interactive question.
 
 Available commands:

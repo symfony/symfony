@@ -1,5 +1,5 @@
 <comment>Usage:</comment>
- namespace:name [-h|--help] [-q|--quiet] [-v|--verbose] [-V|--version] [-c|--color] [-n|--no-interaction] command
+ namespace:name [-h|--help] [-q|--quiet] [-v|--verbose] [-V|--version] [-a|--ansi] [-n|--no-interaction] command
 
 <comment>Aliases:</comment> <info>name</info>
 <comment>Arguments:</comment>
@@ -10,7 +10,7 @@
  <info>--quiet</info> (-q) Do not output any message.
  <info>--verbose</info> (-v) Increase verbosity of messages.
  <info>--version</info> (-V) Display this program version.
- <info>--color</info> (-c) Force ANSI color output.
+ <info>--ansi</info> (-a) Force ANSI output.
  <info>--no-interaction</info> (-n) Do not ask any interactive question.
 
 <comment>Help:</comment>

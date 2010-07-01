@@ -278,8 +278,8 @@ class ApplicationTest extends \PHPUnit_Framework_TestCase
         $application->setAutoExit(false);
         $application->setCatchExceptions(false);
         $tester = new ApplicationTester($application);
-        $tester->run(array('--color' => true));
-        $this->assertTrue($tester->getOutput()->isDecorated(), '->run() forces color output if --color is passed');
+        $tester->run(array('--ansi' => true));
+        $this->assertTrue($tester->getOutput()->isDecorated(), '->run() forces color output if --ansi is passed');
 
         $application = new Application();
         $application->setAutoExit(false);

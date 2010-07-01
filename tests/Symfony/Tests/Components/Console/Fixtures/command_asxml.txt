@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <command id="namespace:name" namespace="namespace" name="name">
-  <usage>namespace:name [-h|--help] [-q|--quiet] [-v|--verbose] [-V|--version] [-c|--color] [-n|--no-interaction] command</usage>
+  <usage>namespace:name [-h|--help] [-q|--quiet] [-v|--verbose] [-V|--version] [-a|--ansi] [-n|--no-interaction] command</usage>
   <description>description</description>
   <help>help</help>
   <aliases>
@@ -25,8 +25,8 @@
     <option name="--version" shortcut="-V" accept_parameter="0" is_parameter_required="0" is_multiple="0">
       <description>Display this program version.</description>
     </option>
-    <option name="--color" shortcut="-c" accept_parameter="0" is_parameter_required="0" is_multiple="0">
-      <description>Force ANSI color output.</description>
+    <option name="--ansi" shortcut="-a" accept_parameter="0" is_parameter_required="0" is_multiple="0">
+      <description>Force ANSI output.</description>
     </option>
     <option name="--no-interaction" shortcut="-n" accept_parameter="0" is_parameter_required="0" is_multiple="0">
       <description>Do not ask any interactive question.</description>

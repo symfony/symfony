@@ -29,7 +29,7 @@ class DialogHelper extends Helper
      * @param string|array    $question The question to ask
      * @param string          $default  The default answer if none is given by the user
      *
-     * @param string The user answer
+     * @return string The user answer
      */
     public function ask(OutputInterface $output, $question, $default = null)
     {
@@ -51,7 +51,7 @@ class DialogHelper extends Helper
      * @param string|array    $question The question to ask
      * @param Boolean         $default  The default answer if the user enters nothing
      *
-     * @param Boolean true if the user has confirmed, false otherwise
+     * @return Boolean true if the user has confirmed, false otherwise
      */
     public function askConfirmation(OutputInterface $output, $question, $default = true)
     {

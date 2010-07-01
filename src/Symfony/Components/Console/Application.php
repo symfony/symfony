@@ -530,7 +530,7 @@ class Application
     /**
      * Returns an array of possible abbreviations given a set of names.
      *
-     * @param array An array of names
+     * @param array $names An array of names
      *
      * @return array An array of abbreviations
      */

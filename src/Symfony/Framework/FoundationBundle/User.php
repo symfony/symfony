@@ -87,7 +87,7 @@ class User
     /**
      * Sets user attributes
      *
-     * @param array Attributes
+     * @param array $attributes Attributes
      */
     public function setAttributes($attributes)
     {

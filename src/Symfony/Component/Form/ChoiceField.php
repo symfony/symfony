@@ -43,11 +43,12 @@ class ChoiceField extends HybridField
 
             foreach ($this->getOption('preferred_choices') as $choice) {
                 $this->add($this->newChoiceField($choice, $choices[$choice]));
-                unset($choices[$choice]);
             }
 
             foreach ($this->getOption('choices') as $choice => $value) {
-                $this->add($this->newChoiceField($choice, $value));
+                if (!isset($this->preferredChoices[$choice])) {
+                    $this->add($this->newChoiceField($choice, $value));
+                }
             }
         } else {
             $this->setFieldMode(self::FIELD);

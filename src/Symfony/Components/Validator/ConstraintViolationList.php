@@ -11,11 +11,11 @@ class ConstraintViolationList implements \IteratorAggregate, \Countable
         $string = '';
 
         foreach ($this->violations as $violation) {
-            $param = $violation->getMessageParameters();
-            $message = str_replace(array_keys($param), $param, $violation->getMessageTemplate());
+            $root = $violation->getRoot();
+            $class = is_object($root) ? get_class($root) : $root;
             $string .= <<<EOF
-{$violation->getRoot()}.{$violation->getPropertyPath()}:
-    $message
+{$class}.{$violation->getPropertyPath()}:
+    {$violation->getMessage()}
 
 EOF;
         }

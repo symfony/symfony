@@ -54,7 +54,7 @@ class JavascriptsHelper extends Helper
     /**
      * Returns all JavaScript files.
      *
-     * @param array An array of JavaScript files to include
+     * @return array An array of JavaScript files to include
      */
     public function get()
     {

@@ -207,7 +207,7 @@ class Form implements \ArrayAccess
      *
      * @param string $name The field name
      *
-     * @param Boolean true if the field exists, false otherwise
+     * @return Boolean true if the field exists, false otherwise
      */
     public function hasField($name)
     {
@@ -298,7 +298,7 @@ class Form implements \ArrayAccess
      *
      * @param string $name The field name
      *
-     * @param Boolean true if the field exists, false otherwise
+     * @return Boolean true if the field exists, false otherwise
      */
     public function offsetExists($name)
     {

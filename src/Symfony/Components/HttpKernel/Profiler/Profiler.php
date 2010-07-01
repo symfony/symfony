@@ -206,7 +206,7 @@ class Profiler implements \ArrayAccess
      *
      * @param string $name The collector name
      *
-     * @param Boolean true if the collector exists, false otherwise
+     * @return Boolean true if the collector exists, false otherwise
      */
     public function offsetExists($name)
     {

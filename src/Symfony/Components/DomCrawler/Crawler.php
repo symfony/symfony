@@ -224,7 +224,7 @@ class Crawler extends \SplObjectStorage
      *
      * @param \Closure $closure An anonymous function
      *
-     * @param Crawler A Crawler instance with the selected nodes.
+     * @return Crawler A Crawler instance with the selected nodes.
      */
     public function reduce(\Closure $closure)
     {
@@ -390,7 +390,7 @@ class Crawler extends \SplObjectStorage
      *
      * @param array $attributes An array of attributes
      *
-     * @param array An array of extracted values
+     * @return array An array of extracted values
      */
     public function extract($attributes)
     {

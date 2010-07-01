@@ -54,7 +54,7 @@ class StylesheetsHelper extends Helper
     /**
      * Returns all stylesheet files.
      *
-     * @param array An array of stylesheet files to include
+     * @return array An array of stylesheet files to include
      */
     public function get()
     {

@@ -27,8 +27,8 @@ abstract class LoaderExtension implements LoaderExtensionInterface
     /**
      * Sets a configuration entry point for the given extension name.
      *
-     * @param string The configuration extension name
-     * @param mixed  A resource
+     * @param string $name     The configuration extension name
+     * @param mixed  $resource A resource
      */
     public function setConfiguration($name, $resource)
     {

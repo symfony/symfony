@@ -67,7 +67,7 @@ class Route
      *
      * This method implements a fluent interface.
      *
-     * @param string The pattern
+     * @param string $pattern The pattern
      *
      * @return Route The current Route instance
      */
@@ -98,7 +98,7 @@ class Route
      *
      * This method implements a fluent interface.
      *
-     * @param array The options
+     * @param array $options The options
      *
      * @return Route The current Route instance
      */
@@ -142,7 +142,7 @@ class Route
      *
      * This method implements a fluent interface.
      *
-     * @param array The defaults
+     * @param array $defaults The defaults
      *
      * @return Route The current Route instance
      */
@@ -180,7 +180,7 @@ class Route
      *
      * This method implements a fluent interface.
      *
-     * @param array The requirements
+     * @param array $requirements The requirements
      *
      * @return Route The current Route instance
      */

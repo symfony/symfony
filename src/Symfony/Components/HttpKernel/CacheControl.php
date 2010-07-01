@@ -257,7 +257,7 @@ class CacheControl
      *
      * @param string $header The value of the Cache-Control HTTP header
      *
-     * @param array An array representing the attribute values
+     * @return array An array representing the attribute values
      */
     protected function parse($header)
     {

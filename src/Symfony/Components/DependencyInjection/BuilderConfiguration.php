@@ -93,9 +93,9 @@ class BuilderConfiguration
     /**
      * Loads the configuration for an extension.
      *
-     * @param $extension LoaderExtensionInterface A LoaderExtensionInterface instance
-     * @param $tag       string                   The extension tag to load (without the namespace - namespace.tag)
-     * @param $values    array                    An array of values that customizes the extension
+     * @param LoaderExtensionInterface $extension A LoaderExtensionInterface instance
+     * @param string                   $tag       The extension tag to load (without the namespace - namespace.tag)
+     * @param array                    $values    An array of values that customizes the extension
      *
      * @return BuilderConfiguration The current instance
      */

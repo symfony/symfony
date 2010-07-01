@@ -191,7 +191,7 @@ class Esi
      *
      * @param array $attributes An array containing the attributes.
      *
-     * @param string The response content for the include.
+     * @return string The response content for the include.
      */
     protected function handleEsiIncludeTag($attributes)
     {

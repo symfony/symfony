@@ -116,7 +116,7 @@ abstract class Bundle implements BundleInterface
     /**
      * Registers the Commands for the console.
      *
-     * @param Symfony\Components\Console\Application An Application instance
+     * @param Symfony\Components\Console\Application $application An Application instance
      */
     public function registerCommands(Application $application)
     {

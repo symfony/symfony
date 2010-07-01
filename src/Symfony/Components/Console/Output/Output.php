@@ -175,9 +175,9 @@ abstract class Output implements OutputInterface
      */
     protected function format($message)
     {
-        $message = preg_replace_callback('#<([a-z][a-z0-9\-_]+)>#i', array($this, 'replaceStartStyle'), $message);
+        $message = preg_replace_callback('#<([a-z][a-z0-9\-_=;]+)>#i', array($this, 'replaceStartStyle'), $message);
 
-        return preg_replace_callback('#</([a-z][a-z0-9\-_]+)>#i', array($this, 'replaceEndStyle'), $message);
+        return preg_replace_callback('#</([a-z][a-z0-9\-_]*)?>#i', array($this, 'replaceEndStyle'), $message);
     }
 
     /**
@@ -189,11 +189,20 @@ abstract class Output implements OutputInterface
             return '';
         }
 
-        if (!isset(static::$styles[strtolower($match[1])])) {
-            throw new \InvalidArgumentException(sprintf('Unknown style "%s".', $match[1]));
+        if (isset(static::$styles[strtolower($match[1])])) {
+            $parameters = static::$styles[strtolower($match[1])];
+        } else {
+            // bg=blue;fg=red
+            if (!preg_match_all('/([^=]+)=([^;]+)(;|$)/', strtolower($match[1]), $matches, PREG_SET_ORDER)) {
+                throw new \InvalidArgumentException(sprintf('Unknown style "%s".', $match[1]));
+            }
+
+            $parameters = array();
+            foreach ($matches as $match) {
+                $parameters[$match[1]] = $match[2];
+            }
         }
 
-        $parameters = static::$styles[strtolower($match[1])];
         $codes = array();
 
         if (isset($parameters['fg'])) {

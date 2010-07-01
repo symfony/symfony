@@ -22,7 +22,7 @@ use Symfony\Components\HttpKernel\Profiler\Profiler;
  * WebDebugToolbar.
  *
  * @package    Symfony
- * @subpackage Framework_ProfilerBundle
+ * @subpackage Components_HttpKernel
  * @author     Fabien Potencier <fabien.potencier@symfony-project.com>
  */
 class WebDebugToolbar

@@ -21,7 +21,7 @@ use Symfony\Components\HttpKernel\Profiler\Profiler;
  * Profiling collects data for the current request by listening to the core.response event.
  *
  * @package    Symfony
- * @subpackage Framework_ProfilerBundle
+ * @subpackage Components_HttpKernel
  * @author     Fabien Potencier <fabien.potencier@symfony-project.com>
  */
 class Profiling

@@ -11,6 +11,7 @@
         <parameter key="response.class">Symfony\Components\HttpKernel\Response</parameter>
         <parameter key="error_handler.class">Symfony\Foundation\Debug\ErrorHandler</parameter>
         <parameter key="error_handler.level">null</parameter>
+        <parameter key="error_handler.enable">true</parameter>
         <parameter key="kernel.include_core_classes">true</parameter>
     </parameters>
 
@@ -21,7 +22,9 @@
 
         <service id="error_handler" class="%error_handler.class%">
             <argument>%error_handler.level%</argument>
-            <call method="register" />
+            <call method="register">
+                <argument>%error_handler.enable%</argument>
+            </call>
         </service>
 
         <service id="http_kernel" class="%http_kernel.class%">

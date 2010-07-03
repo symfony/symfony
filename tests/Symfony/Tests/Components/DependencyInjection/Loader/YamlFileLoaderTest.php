@@ -94,6 +94,9 @@ class YamlFileLoaderTest extends \PHPUnit_Framework_TestCase
         $this->assertEquals(array('BazClass', 'configureStatic'), $services['configurator3']->getConfigurator(), '->load() parses the configurator tag');
         $this->assertEquals(array(array('setBar', array())), $services['method_call1']->getMethodCalls(), '->load() parses the method_call tag');
         $this->assertEquals(array(array('setBar', array('foo', new Reference('foo'), array(true, false)))), $services['method_call2']->getMethodCalls(), '->load() parses the method_call tag');
+        $this->assertEquals('BazFactory', $services['factory_class']->getFactoryClass());
+        $this->assertEquals('BazFactoryService', $services['factory_service']->getFactoryService());
+        
         $aliases = $config->getAliases();
         $this->assertTrue(isset($aliases['alias_for_foo']), '->load() parses aliases');
         $this->assertEquals('foo', $aliases['alias_for_foo'], '->load() parses aliases');

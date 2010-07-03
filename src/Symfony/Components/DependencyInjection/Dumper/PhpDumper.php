@@ -93,7 +93,13 @@ EOF;
         }
 
         if (null !== $definition->getFactoryMethod()) {
-            $code = sprintf("        \$instance = call_user_func(array(%s, '%s')%s);\n", $class, $definition->getFactoryMethod(), $arguments ? ', '.implode(', ', $arguments) : '');
+            if (null !== $definition->getFactoryService()) {
+                $code = sprintf("        \$instance = \$this->get%sService()->%s(%s);\n", $this->dumpValue($definition->getFactoryService()), $definition->getFactoryMethod(), implode(', ', $arguments));
+            } elseif (null !== $definition->getFactoryClass()) {
+                $code = sprintf("        \$instance = call_user_func(array(%s, '%s')%s);\n", $this->dumpValue($definition->getFactoryClass()), $definition->getFactoryMethod(), $arguments ? ', '.implode(', ', $arguments) : '');
+            } else {
+                $code = sprintf("        \$instance = call_user_func(array(%s, '%s')%s);\n", $class, $definition->getFactoryMethod(), $arguments ? ', '.implode(', ', $arguments) : '');
+            }
         } elseif ($class != "'".str_replace('\\', '\\\\', $definition->getClass())."'") {
             $code = sprintf("        \$class = %s;\n        \$instance = new \$class(%s);\n", $class, implode(', ', $arguments));
         } else {

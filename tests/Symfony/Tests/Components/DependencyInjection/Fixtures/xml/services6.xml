@@ -43,5 +43,8 @@
       </call>
     </service>
     <service id="alias_for_foo" alias="foo" />
+
+    <service id="factory_class" constructor="createStatic" factoryclass="BazFactory" />
+    <service id="factory_service" constructor="create" factoryservice="BazFactoryService" />
   </services>
 </container>

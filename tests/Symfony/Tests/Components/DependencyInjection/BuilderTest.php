@@ -394,4 +394,27 @@ class BuilderTest extends \PHPUnit_Framework_TestCase
         ), '->findAnnotatedServiceIds() returns an array of service ids and its annotation attributes');
         $this->assertEquals(array(), $builder->findAnnotatedServiceIds('foobar'), '->findAnnotatedServiceIds() returns an empty array if there is annotated services');
     }
+
+    public function testFactories()
+    {
+        $def1 = new Definition('BazClass');
+        $def1->setFactoryClass('BazFactory');
+        $def1->setConstructor('createStatic');
+
+        $def2 = new Definition('BazClass');
+        $def2->setFactoryService('BazFactoryService');
+        $def2->setFactoryMethod('create');
+
+        $def3 = new Definition('BazFactory');
+
+        $builder = new Builder();
+        $builder->addDefinitions(array(
+            'baz_factory' => $def1,
+            'baz_service' => $def2,
+            'BazFactoryService' => $def3,
+        ));
+
+        $this->assertType('BazClass', $builder->get('baz_factory'));
+        $this->assertType('Bazclass', $builder->get('baz_service'));
+    }
 }

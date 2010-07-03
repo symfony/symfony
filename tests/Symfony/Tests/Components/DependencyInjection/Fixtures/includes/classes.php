@@ -30,3 +30,16 @@ class BazClass
     {
     }
 }
+
+class BazFactory
+{
+    static public function createStatic()
+    {
+        return new BazClass();
+    }
+
+    public function create()
+    {
+        return new BazClass();
+    }
+}

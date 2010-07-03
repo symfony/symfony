@@ -23,6 +23,8 @@ class Definition
     protected $class;
     protected $file;
     protected $factoryMethod;
+    protected $factoryService;
+    protected $factoryClass;
     protected $shared;
     protected $arguments;
     protected $calls;
@@ -61,11 +63,52 @@ class Definition
     /**
      * Gets the factory method.
      *
-     * @return Definition The factory method name
+     * @return string The factory method name
      */
     public function getFactoryMethod()
     {
         return $this->factoryMethod;
+    }
+
+    /**
+     * Set the name of the service that acts as a factory using the specified `constructor` method.
+     *
+     * @param string
+     */
+    public function setFactoryService($factoryService)
+    {
+        $this->factoryService = $factoryService;
+        return $this;
+    }
+
+    /**
+     * @return string
+     */
+    public function getFactoryService()
+    {
+        return $this->factoryService;
+    }
+
+    /**
+     * If service has a constructor method but no factory service, this class is the static callback.
+     *
+     * @param  string $factoryClass
+     * @return Definition
+     */
+    public function setFactoryClass($factoryClass)
+    {
+        $this->factoryClass = $factoryClass;
+        return $this;
+    }
+
+    /**
+     * Get the current static create class for this service.
+     *
+     * @return string
+     */
+    public function getFactoryClass()
+    {
+        return $this->factoryClass;
     }
 
     /**

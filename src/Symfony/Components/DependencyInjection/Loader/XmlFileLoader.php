@@ -134,7 +134,7 @@ class XmlFileLoader extends FileLoader
 
         $definition = new Definition((string) $service['class']);
 
-        foreach (array('shared', 'factory-method') as $key) {
+        foreach (array('shared', 'factory-method', 'factoryservice', 'factoryclass') as $key) {
             if (isset($service[$key])) {
                 $method = 'set'.str_replace('-', '', $key);
                 $definition->$method((string) $service->getAttributeAsPhp($key));

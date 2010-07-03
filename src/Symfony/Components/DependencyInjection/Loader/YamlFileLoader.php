@@ -141,6 +141,14 @@ class YamlFileLoader extends FileLoader
             $definition->setFactoryMethod($service['factory_method']);
         }
 
+        if (isset($service['factoryClass'])) {
+            $definition->setFactoryClass($service['factoryClass']);
+        }
+
+        if (isset($service['factoryService'])) {
+            $definition->setFactoryService($service['factoryService']);
+        }
+
         if (isset($service['file'])) {
             $definition->setFile($service['file']);
         }

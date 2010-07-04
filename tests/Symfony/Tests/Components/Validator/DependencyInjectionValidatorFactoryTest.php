@@ -5,7 +5,7 @@ namespace Symfony\Tests\Components\Validator;
 require_once __DIR__.'/Fixtures/InvalidConstraint.php';
 require_once __DIR__.'/Fixtures/InvalidConstraintValidator.php';
 
-use Symfony\Components\Validator\DependencyInjectionValidatorFactory;
+use Symfony\Components\Validator\Extension\DependencyInjectionValidatorFactory;
 use Symfony\Components\DependencyInjection\Container;
 use Symfony\Components\Validator\Constraints\Valid;
 use Symfony\Components\Validator\Constraints\ValidValidator;

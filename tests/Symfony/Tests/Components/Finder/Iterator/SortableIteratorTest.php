@@ -36,7 +36,7 @@ class SortableIteratorTest extends RealIteratorTestCase
 
         $iterator = new SortableIterator($inner, $mode);
 
-        $this->assertIterator($expected, $iterator);
+        $this->assertOrderedIterator($expected, $iterator);
     }
 
     public function getAcceptData()

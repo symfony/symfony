@@ -19,6 +19,16 @@ class IteratorTestCase extends \PHPUnit_Framework_TestCase
     {
         $values = array_map(function (\SplFileInfo $fileinfo) { return $fileinfo->getPathname(); }, iterator_to_array($iterator));
 
+        sort($values);
+        sort($expected);
+
+        $this->assertEquals($expected, array_values($values));
+    }
+
+    protected function assertOrderedIterator($expected, \Iterator $iterator)
+    {
+        $values = array_map(function (\SplFileInfo $fileinfo) { return $fileinfo->getPathname(); }, iterator_to_array($iterator));
+
         $this->assertEquals($expected, array_values($values));
     }
 }

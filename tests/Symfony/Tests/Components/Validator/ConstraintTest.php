@@ -82,4 +82,15 @@ class ConstraintTest extends \PHPUnit_Framework_TestCase
         $constraint->addImplicitGroupName('Foo');
         $this->assertEquals(array('Default', 'Foo'), $constraint->groups);
     }
+
+    public function testAllowsSettingZeroRequiredPropertyValue()
+    {
+        $constraint = new ConstraintA(0);
+        $this->assertEquals(0, $constraint->property2);
+    }
+
+    public function testCanCreateConstraintWithNoDefaultOptionAndEmptyArray()
+    {
+        new ConstraintB(array());
+    }
 }

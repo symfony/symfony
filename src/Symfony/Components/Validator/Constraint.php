@@ -67,7 +67,7 @@ class Constraint
                     $invalidOptions[] = $option;
                 }
             }
-        } else if ($options) {
+        } else if ($options !== null && ! (is_array($options) && count($options) === 0)) {
             $option = $this->defaultOption();
 
             if (is_null($option)) {

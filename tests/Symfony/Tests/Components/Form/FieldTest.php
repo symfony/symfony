@@ -8,6 +8,7 @@ require_once __DIR__ . '/Fixtures/InvalidField.php';
 require_once __DIR__ . '/Fixtures/RequiredOptionsField.php';
 
 use Symfony\Components\Form\ValueTransformer\ValueTransformerInterface;
+use Symfony\Components\Form\PropertyPath;
 use Symfony\Tests\Components\Form\Fixtures\Author;
 use Symfony\Tests\Components\Form\Fixtures\TestField;
 use Symfony\Tests\Components\Form\Fixtures\InvalidField;
@@ -20,6 +21,34 @@ class FieldTest extends \PHPUnit_Framework_TestCase
     protected function setUp()
     {
         $this->field = new TestField('title');
+    }
+
+    public function testGetPropertyPath_defaultPath()
+    {
+        $field = new TestField('title');
+
+        $this->assertEquals(new PropertyPath('title'), $field->getPropertyPath());
+    }
+
+    public function testGetPropertyPath_pathIsZero()
+    {
+        $field = new TestField('title', array('property_path' => '0'));
+
+        $this->assertEquals(new PropertyPath('0'), $field->getPropertyPath());
+    }
+
+    public function testGetPropertyPath_pathIsEmpty()
+    {
+        $field = new TestField('title', array('property_path' => ''));
+
+        $this->assertEquals(null, $field->getPropertyPath());
+    }
+
+    public function testGetPropertyPath_pathIsNull()
+    {
+        $field = new TestField('title', array('property_path' => null));
+
+        $this->assertEquals(null, $field->getPropertyPath());
     }
 
     public function testPassRequiredAsOption()

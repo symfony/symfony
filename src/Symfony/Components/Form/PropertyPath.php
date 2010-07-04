@@ -43,7 +43,7 @@ class PropertyPath
      */
     public function __construct($propertyPath)
     {
-        if (empty($propertyPath)) {
+        if ($propertyPath === '' || $propertyPath === null) {
             throw new InvalidPropertyPathException('The property path must not be empty');
         }
 
@@ -55,7 +55,7 @@ class PropertyPath
         $pattern = '/^((\w+)|\[(\w+)\])(.*)/';
 
         while (preg_match($pattern, $remaining, $matches)) {
-            if (!empty($matches[2])) {
+            if ($matches[2] !== '') {
                 $this->elements[] = $matches[2];
                 $this->isProperty[] = true;
             } else {

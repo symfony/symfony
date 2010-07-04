@@ -37,6 +37,13 @@ class PropertyPathTest extends \PHPUnit_Framework_TestCase
         $this->assertFalse($path->isIndex());
     }
 
+    public function testValidPropertyPath_zero()
+    {
+        $path = new PropertyPath('0');
+
+        $this->assertEquals('0', $path->getCurrent());
+    }
+
     public function testToString()
     {
         $path = new PropertyPath('reference.traversable[index].property');
@@ -70,6 +77,13 @@ class PropertyPathTest extends \PHPUnit_Framework_TestCase
         $this->setExpectedException('Symfony\Components\Form\Exception\InvalidPropertyPathException');
 
         new PropertyPath('');
+    }
+
+    public function testInvalidPropertyPath_null()
+    {
+        $this->setExpectedException('Symfony\Components\Form\Exception\InvalidPropertyPathException');
+
+        new PropertyPath(null);
     }
 
     public function testNextThrowsExceptionIfNoNextElement()

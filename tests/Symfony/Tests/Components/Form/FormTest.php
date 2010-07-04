@@ -25,6 +25,25 @@ class FormTest_PreconfiguredForm extends Form
     }
 }
 
+class TestSetDataBeforeConfigureForm extends Form
+{
+    protected $testCase;
+    protected $object;
+
+    public function __construct($testCase, $name, $object, $validator)
+    {
+        $this->testCase = $testCase;
+        $this->object = $object;
+
+        parent::__construct($name, $object, $validator);
+    }
+
+    protected function configure()
+    {
+        $this->testCase->assertEquals($this->object, $this->getData());
+    }
+}
+
 class FormTest extends \PHPUnit_Framework_TestCase
 {
     protected $validator;
@@ -41,6 +60,11 @@ class FormTest extends \PHPUnit_Framework_TestCase
     public function testConstructInitializesObject()
     {
         $this->assertEquals(new Author(), $this->form->getData());
+    }
+
+    public function testSetDataBeforeConfigure()
+    {
+        new TestSetDataBeforeConfigureForm($this, 'author', new Author(), $this->validator);
     }
 
     public function testIsCsrfProtected()

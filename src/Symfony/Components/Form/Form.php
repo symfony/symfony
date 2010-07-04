@@ -58,8 +58,6 @@ class Form extends FieldGroup
         $this->generator = new HtmlGenerator();
         $this->validator = $validator;
 
-        parent::__construct($name, $options);
-
         $this->setData($object);
         $this->setCsrfFieldName(self::$defaultCsrfFieldName);
 
@@ -80,6 +78,8 @@ class Form extends FieldGroup
         if (self::$defaultTranslator !== null) {
             $this->setTranslator(self::$defaultTranslator);
         }
+
+        parent::__construct($name, $options);
     }
 
     /**

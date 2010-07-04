@@ -55,6 +55,56 @@ class ClassMetadataFactoryTest extends \PHPUnit_Framework_TestCase
 
         $this->assertEquals($constraints, $metadata->getConstraints());
     }
+
+    public function testWriteMetadataToCache()
+    {
+        $cache = $this->getMock('Symfony\Components\Validator\Mapping\Cache\CacheInterface');
+        $factory = new ClassMetadataFactory(new TestLoader(), $cache);
+
+        $tester = $this;
+        $constraints = array(
+            new ConstraintA(array('groups' => array('Default', 'EntityParent'))),
+        );
+
+        $cache->expects($this->once())
+              ->method('has')
+              ->with($this->equalTo(self::PARENTCLASS))
+              ->will($this->returnValue(false));
+        $cache->expects($this->once())
+              ->method('write')
+              ->will($this->returnCallback(function($metadata) use ($tester, $constraints) {
+                  $tester->assertEquals($constraints, $metadata->getConstraints());
+              }));
+
+        $metadata = $factory->getClassMetadata(self::PARENTCLASS);
+
+        $this->assertEquals(self::PARENTCLASS, $metadata->getClassName());
+        $this->assertEquals($constraints, $metadata->getConstraints());
+    }
+
+    public function testReadMetadataFromCache()
+    {
+        $loader = $this->getMock('Symfony\Components\Validator\Mapping\Loader\LoaderInterface');
+        $cache = $this->getMock('Symfony\Components\Validator\Mapping\Cache\CacheInterface');
+        $factory = new ClassMetadataFactory($loader, $cache);
+
+        $tester = $this;
+        $metadata = new ClassMetadata(self::PARENTCLASS);
+        $metadata->addConstraint(new ConstraintA());
+
+        $loader->expects($this->never())
+               ->method('loadClassMetadata');
+
+        $cache->expects($this->once())
+              ->method('has')
+              ->with($this->equalTo(self::PARENTCLASS))
+              ->will($this->returnValue(true));
+        $cache->expects($this->once())
+              ->method('read')
+              ->will($this->returnValue($metadata));
+
+        $this->assertEquals($metadata,$factory->getClassMetadata(self::PARENTCLASS));
+    }
 }
 
 class TestLoader implements LoaderInterface

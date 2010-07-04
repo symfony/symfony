@@ -59,11 +59,11 @@ class WebExtensionTest extends TestCase
         $configuration = new BuilderConfiguration();
         $loader = $this->getWebExtension();
 
-        $configuration = $loader->configLoad(array('validation' => true), $configuration);
+        $configuration = $loader->configLoad(array('validation' => array('enabled' => true)), $configuration);
         $this->assertEquals('Symfony\Components\Validator\Validator', $configuration->getParameter('validator.class'), '->validationLoad() loads the validation.xml file if not already loaded');
         $this->assertFalse($configuration->hasDefinition('validator.mapping.loader.annotation_loader'), '->validationLoad() doesn\'t load the annotations service unless its needed');
 
-        $configuration = $loader->configLoad(array('validation' => array('annotations' => true)), $configuration);
+        $configuration = $loader->configLoad(array('validation' => array('enabled' => true, 'annotations' => true)), $configuration);
         $this->assertTrue($configuration->hasDefinition('validator.mapping.loader.annotation_loader'), '->validationLoad() loads the annotations service');
     }
 

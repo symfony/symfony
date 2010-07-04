@@ -47,12 +47,11 @@ class XmlDumper extends Dumper
 
     protected function addService($id, $definition)
     {
-        $code = sprintf("    <service id=\"%s\" class=\"%s\"%s%s%s%s>\n",
+        $code = sprintf("    <service id=\"%s\"%s%s%s%s>\n",
             $id,
-            $definition->getClass(),
+            $definition->getClass() ? sprintf(' class="%s"', $definition->getClass()) : '',
             $definition->getFactoryMethod() ? sprintf(' factory-method="%s"', $definition->getFactoryMethod()) : '',
-            $definition->getFactoryClass() ? sprintf(' factoryclass="%s"', $definition->getFactoryClass()) : '',
-            $definition->getFactoryService() ? sprintf(' constructor="%s"', $definition->getFactoryService()) : '',
+            $definition->getFactoryService() ? sprintf(' factory-service="%s"', $definition->getFactoryService()) : '',
             !$definition->isShared() ? ' shared="false"' : ''
         );
 

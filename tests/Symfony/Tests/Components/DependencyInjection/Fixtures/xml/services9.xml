@@ -52,6 +52,8 @@
         <argument type="service" id="foobaz" on-invalid="ignore" />
       </call>
     </service>
+    <service id="factory_service" factory-method="getInstance" factory-service="foo.baz">
+    </service>
     <service id="alias_for_foo" alias="foo" />
   </services>
 </container>

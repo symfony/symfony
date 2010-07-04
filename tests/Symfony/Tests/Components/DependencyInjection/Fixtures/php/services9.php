@@ -125,6 +125,24 @@ class ProjectServiceContainer extends Container
     }
 
     /**
+     * Gets the 'factory_service' service.
+     *
+     * This service is shared.
+     * This method always returns the same instance of the service.
+     *
+     * @return Object An instance returned by foo.baz::getInstance().
+     */
+    protected function getFactoryServiceService()
+    {
+        if (isset($this->shared['factory_service'])) return $this->shared['factory_service'];
+
+        $instance = $this->getFoo_BazService()->getInstance();
+        $this->shared['factory_service'] = $instance;
+
+        return $instance;
+    }
+
+    /**
      * Gets the alias_for_foo service alias.
      *
      * @return FooClass An instance of the foo service

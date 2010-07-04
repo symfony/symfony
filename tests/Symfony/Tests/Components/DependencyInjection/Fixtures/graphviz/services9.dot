@@ -8,6 +8,7 @@ digraph sc {
   node_foo_baz [label="foo.baz\nBazClass\n", shape=record, fillcolor="#eeeeee", style="filled"];
   node_foo_bar [label="foo_bar\nFooClass\n", shape=record, fillcolor="#eeeeee", style="filled"];
   node_method_call1 [label="method_call1\nFooClass\n", shape=record, fillcolor="#eeeeee", style="filled"];
+  node_factory_service [label="factory_service\n\n", shape=record, fillcolor="#eeeeee", style="filled"];
   node_service_container [label="service_container\nSymfony\\Components\\DependencyInjection\\Builder\n", shape=record, fillcolor="#9999ff", style="filled"];
   node_foobaz [label="foobaz\n\n", shape=record, fillcolor="#ff9999", style="filled"];
   node_foo -> node_foo_baz [label="" style="filled"];

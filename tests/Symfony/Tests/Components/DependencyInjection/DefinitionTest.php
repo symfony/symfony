@@ -37,13 +37,6 @@ class DefinitionTest extends \PHPUnit_Framework_TestCase
         $this->assertEquals('foo', $def->getFactoryMethod(), '->getFactoryMethod() returns the factory method name');
     }
 
-    public function testSetGetFactoryClass()
-    {
-        $def = new Definition('stdClass');
-        $this->assertSame($def, $def->setFactoryClass('stdClass2'), "->setFactoryClass() implements a fluent interface.");
-        $this->assertEquals('stdClass2', $def->getFactoryClass(), 'Overwrite default factory class method did not work.');
-    }
-
     public function testSetGetFactoryService()
     {
         $def = new Definition('stdClass');

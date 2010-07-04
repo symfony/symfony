@@ -18,5 +18,4 @@ services:
     calls:
       - [ setBar, [ foo, @foo, [true, false] ] ]
   alias_for_foo: @foo
-  factory_class: { class: BazClass, factoryClass: BazFactory }
-  factory_service: { class: BazClass, factoryService: BazFactoryService }
+  factory_service: { class: BazClass, factory_method: getInstance, factory_service: baz_factory }

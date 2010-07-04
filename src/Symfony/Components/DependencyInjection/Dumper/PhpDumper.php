@@ -94,9 +94,7 @@ EOF;
 
         if (null !== $definition->getFactoryMethod()) {
             if (null !== $definition->getFactoryService()) {
-                $code = sprintf("        \$instance = \$this->get%sService()->%s(%s);\n", $this->dumpValue($definition->getFactoryService()), $definition->getFactoryMethod(), implode(', ', $arguments));
-            } elseif (null !== $definition->getFactoryClass()) {
-                $code = sprintf("        \$instance = call_user_func(array(%s, '%s')%s);\n", $this->dumpValue($definition->getFactoryClass()), $definition->getFactoryMethod(), $arguments ? ', '.implode(', ', $arguments) : '');
+                $code = sprintf("        \$instance = %s->%s(%s);\n", $this->getServiceCall($definition->getFactoryService()), $definition->getFactoryMethod(), implode(', ', $arguments));
             } else {
                 $code = sprintf("        \$instance = call_user_func(array(%s, '%s')%s);\n", $class, $definition->getFactoryMethod(), $arguments ? ', '.implode(', ', $arguments) : '');
             }
@@ -148,8 +146,13 @@ EOF;
     protected function addService($id, $definition)
     {
         $name = Container::camelize($id);
-        $class = $definition->getClass();
-        $type = 0 === strpos($class, '%') ? 'Object' : $class;
+
+        $return = '';
+        if ($class = $definition->getClass()) {
+            $return = sprintf("@return %s A %s instance.", 0 === strpos($class, '%') ? 'Object' : $class, $class);
+        } elseif ($definition->getFactoryService()) {
+            $return = sprintf('@return Object An instance returned by %s::%s().', $definition->getFactoryService(), $definition->getFactoryMethod());
+        }
 
         $doc = '';
         if ($definition->isShared()) {
@@ -166,7 +169,7 @@ EOF;
     /**
      * Gets the '$id' service.$doc
      *
-     * @return $type A $class instance.
+     * $return
      */
     protected function get{$name}Service()
     {

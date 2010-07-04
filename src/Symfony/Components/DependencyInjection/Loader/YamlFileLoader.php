@@ -131,7 +131,11 @@ class YamlFileLoader extends FileLoader
             return;
         }
 
-        $definition = new Definition($service['class']);
+        $definition = new Definition();
+
+        if (isset($service['class'])) {
+            $definition->setClass($service['class']);
+        }
 
         if (isset($service['shared'])) {
             $definition->setShared($service['shared']);
@@ -141,12 +145,8 @@ class YamlFileLoader extends FileLoader
             $definition->setFactoryMethod($service['factory_method']);
         }
 
-        if (isset($service['factoryClass'])) {
-            $definition->setFactoryClass($service['factoryClass']);
-        }
-
-        if (isset($service['factoryService'])) {
-            $definition->setFactoryService($service['factoryService']);
+        if (isset($service['factory_service'])) {
+            $definition->setFactoryService($service['factory_service']);
         }
 
         if (isset($service['file'])) {

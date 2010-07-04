@@ -36,4 +36,7 @@ services:
       - [setBar, ['@@foo']]
       - [setBar, ['@@foobaz']]
       
+  factory_service:
+    factory_method: getInstance
+    factory_service: foo.baz
   alias_for_foo: @foo

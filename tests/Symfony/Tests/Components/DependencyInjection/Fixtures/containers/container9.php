@@ -46,5 +46,10 @@ $container->
     addMethodCall('setBar', array(new Reference('foo', ContainerInterface::IGNORE_ON_INVALID_REFERENCE)))->
     addMethodCall('setBar', array(new Reference('foobaz', ContainerInterface::IGNORE_ON_INVALID_REFERENCE)))
 ;
+$container->
+    register('factory_service')->
+    setFactoryService('foo.baz')->
+    setFactoryMethod('getInstance')
+;
 
 return $container;

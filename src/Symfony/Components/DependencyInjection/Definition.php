@@ -24,7 +24,6 @@ class Definition
     protected $file;
     protected $factoryMethod;
     protected $factoryService;
-    protected $factoryClass;
     protected $shared;
     protected $arguments;
     protected $calls;
@@ -37,7 +36,7 @@ class Definition
      * @param string $class     The service class
      * @param array  $arguments An array of arguments to pass to the service constructor
      */
-    public function __construct($class, array $arguments = array())
+    public function __construct($class = null, array $arguments = array())
     {
         $this->class = $class;
         $this->arguments = $arguments;
@@ -71,44 +70,27 @@ class Definition
     }
 
     /**
-     * Set the name of the service that acts as a factory using the specified `constructor` method.
+     * Sets the name of the service that acts as a factory using the constructor method.
      *
-     * @param string
+     * @param string $factoryService The factory service id
+     *
+     * @return Definition The current instance
      */
     public function setFactoryService($factoryService)
     {
         $this->factoryService = $factoryService;
+
         return $this;
     }
 
     /**
-     * @return string
+     * Gets the factory service id.
+     *
+     * @return string The factory service id
      */
     public function getFactoryService()
     {
         return $this->factoryService;
-    }
-
-    /**
-     * If service has a constructor method but no factory service, this class is the static callback.
-     *
-     * @param  string $factoryClass
-     * @return Definition
-     */
-    public function setFactoryClass($factoryClass)
-    {
-        $this->factoryClass = $factoryClass;
-        return $this;
-    }
-
-    /**
-     * Get the current static create class for this service.
-     *
-     * @return string
-     */
-    public function getFactoryClass()
-    {
-        return $this->factoryClass;
     }
 
     /**

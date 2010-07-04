@@ -232,7 +232,7 @@ class Builder extends Container implements AnnotatedContainerInterface
      *
      * @return Definition A Definition instance
      */
-    public function register($id, $class)
+    public function register($id, $class = null)
     {
         return $this->setDefinition($id, new Definition($class));
     }
@@ -329,20 +329,19 @@ class Builder extends Container implements AnnotatedContainerInterface
             require_once self::resolveValue($definition->getFile(), $this->getParameterBag()->all());
         }
 
-        $r = new \ReflectionClass(self::resolveValue($definition->getClass(), $this->getParameterBag()->all()));
-
         $arguments = $this->resolveServices(self::resolveValue($definition->getArguments(), $this->getParameterBag()->all()));
 
         if (null !== $definition->getFactoryMethod()) {
             if (null !== $definition->getFactoryService()) {
-                $factoryService = $this->get(self::resolveValue($definition->getFactoryService(), $this->getParameterBag()->all()));
-                $service = call_user_func_array(array($factoryService, $definition->getFactoryMethod()), $arguments);
-            } else if(null !== $definition->getFactoryClass()) {
-                $service = call_user_func_array(array(self::resolveValue($definition->getFactoryClass(), $this->getParameterBag()->all()), $definition->getFactoryMethod()), $arguments);
+                $factory = $this->get(self::resolveValue($definition->getFactoryService(), $this->getParameterBag()->all()));
             } else {
-                $service = call_user_func_array(array(self::resolveValue($definition->getClass(), $this->getParameterBag()->all()), $definition->getFactoryMethod()), $arguments);
+                $factory = self::resolveValue($definition->getClass(), $this->getParameterBag()->all());
             }
+
+            $service = call_user_func_array(array($factory, $definition->getFactoryMethod()), $arguments);
         } else {
+            $r = new \ReflectionClass(self::resolveValue($definition->getClass(), $this->getParameterBag()->all()));
+
             $service = null === $r->getConstructor() ? $r->newInstance() : $r->newInstanceArgs($arguments);
         }
 

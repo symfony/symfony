@@ -108,7 +108,7 @@ class DoctrineExtension extends LoaderExtension
 
                 $driverOptions = array();
                 $driverDef = new Definition('Doctrine\DBAL\DriverManager');
-                $driverDef->setConstructor('getConnection');
+                $driverDef->setFactoryMethod('getConnection');
                 $configuration->setDefinition(sprintf('doctrine.dbal.%s_connection', $name), $driverDef);
             }
 
@@ -233,7 +233,7 @@ class DoctrineExtension extends LoaderExtension
                 new Reference(sprintf('doctrine.orm.%s_configuration', $name))
             );
             $ormEmDef = new Definition('Doctrine\ORM\EntityManager', $ormEmArgs);
-            $ormEmDef->setConstructor('create');
+            $ormEmDef->setFactoryMethod('create');
 
             $configuration->setDefinition(
                 sprintf('doctrine.orm.%s_entity_manager', $name),

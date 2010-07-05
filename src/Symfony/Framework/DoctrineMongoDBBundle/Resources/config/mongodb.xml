@@ -93,7 +93,7 @@
     </service>
 
     <!-- document manager -->
-    <service id="doctrine.odm.mongodb.document_manager" class="%doctrine.odm.mongodb.document_manager_class%" constructor="create">
+    <service id="doctrine.odm.mongodb.document_manager" class="%doctrine.odm.mongodb.document_manager_class%" factory-method="create">
       <argument type="service" id="doctrine.odm.mongodb.connection" />
       <argument type="service" id="doctrine.odm.mongodb.configuration" />
     </service>

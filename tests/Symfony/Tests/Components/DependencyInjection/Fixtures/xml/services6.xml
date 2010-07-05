@@ -8,7 +8,7 @@
     <service id="baz" class="BazClass" />
     <service id="shared" class="FooClass" shared="true" />
     <service id="non_shared" class="FooClass" shared="false" />
-    <service id="constructor" class="FooClass" constructor="getInstance" />
+    <service id="constructor" class="FooClass" factory-method="getInstance" />
     <service id="file" class="FooClass">
       <file>%path%/foo.php</file>
     </service>

@@ -333,8 +333,8 @@ class Builder extends Container implements AnnotatedContainerInterface
 
         $arguments = $this->resolveServices(self::resolveValue($definition->getArguments(), $this->getParameterBag()->all()));
 
-        if (null !== $definition->getConstructor()) {
-            $service = call_user_func_array(array(self::resolveValue($definition->getClass(), $this->getParameterBag()->all()), $definition->getConstructor()), $arguments);
+        if (null !== $definition->getFactoryMethod()) {
+            $service = call_user_func_array(array(self::resolveValue($definition->getClass(), $this->getParameterBag()->all()), $definition->getFactoryMethod()), $arguments);
         } else {
             $service = null === $r->getConstructor() ? $r->newInstance() : $r->newInstanceArgs($arguments);
         }

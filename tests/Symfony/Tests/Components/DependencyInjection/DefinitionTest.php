@@ -27,14 +27,14 @@ class DefinitionTest extends \PHPUnit_Framework_TestCase
     }
 
     /**
-     * @covers Symfony\Components\DependencyInjection\Definition::setConstructor
-     * @covers Symfony\Components\DependencyInjection\Definition::getConstructor
+     * @covers Symfony\Components\DependencyInjection\Definition::setFactoryMethod
+     * @covers Symfony\Components\DependencyInjection\Definition::getFactoryMethod
      */
     public function testSetGetConstructor()
     {
         $def = new Definition('stdClass');
-        $this->assertEquals(spl_object_hash($def), spl_object_hash($def->setConstructor('foo')), '->setConstructor() implements a fluent interface');
-        $this->assertEquals('foo', $def->getConstructor(), '->getConstructor() returns the constructor name');
+        $this->assertEquals(spl_object_hash($def), spl_object_hash($def->setFactoryMethod('foo')), '->setFactoryMethod() implements a fluent interface');
+        $this->assertEquals('foo', $def->getFactoryMethod(), '->getFactoryMethod() returns the factory method name');
     }
 
     /**

@@ -62,8 +62,8 @@ class YamlDumper extends Dumper
             $code .= sprintf("    file: %s\n", $definition->getFile());
         }
 
-        if ($definition->getConstructor()) {
-            $code .= sprintf("    constructor: %s\n", $definition->getConstructor());
+        if ($definition->getFactoryMethod()) {
+            $code .= sprintf("    factory_method: %s\n", $definition->getFactoryMethod());
         }
 
         if ($definition->getArguments()) {

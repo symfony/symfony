@@ -12,7 +12,7 @@ $container->
     register('foo', 'FooClass')->
     addAnnotation('foo', array('foo' => 'foo'))->
     addAnnotation('foo', array('bar' => 'bar'))->
-    setConstructor('getInstance')->
+    setFactoryMethod('getInstance')->
     setArguments(array('foo', new Reference('foo.baz'), array('%foo%' => 'foo is %foo%', 'bar' => '%foo%'), true, new Reference('service_container')))->
     setFile(realpath(__DIR__.'/../includes/foo.php'))->
     setShared(false)->
@@ -28,7 +28,7 @@ $container->
 ;
 $container->
     register('foo.baz', '%baz_class%')->
-    setConstructor('getInstance')->
+    setFactoryMethod('getInstance')->
     setConfigurator(array('%baz_class%', 'configureStatic1'))
 ;
 $container->register('foo_bar', '%foo_class%');

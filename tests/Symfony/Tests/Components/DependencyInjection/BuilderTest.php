@@ -232,14 +232,14 @@ class BuilderTest extends \PHPUnit_Framework_TestCase
     /**
      * @covers Symfony\Components\DependencyInjection\Builder::createService
      */
-    public function testCreateServiceConstructor()
+    public function testCreateServiceFactoryMethod()
     {
         $builder = new Builder();
         $builder->register('bar', 'stdClass');
-        $builder->register('foo1', 'FooClass')->setConstructor('getInstance')->addArgument(array('foo' => '%value%', '%value%' => 'foo', new Reference('bar')));
+        $builder->register('foo1', 'FooClass')->setFactoryMethod('getInstance')->addArgument(array('foo' => '%value%', '%value%' => 'foo', new Reference('bar')));
         $builder->setParameter('value', 'bar');
-        $this->assertTrue($builder->get('foo1')->called, '->createService() calls the constructor to create the service instance');
-        $this->assertEquals(array('foo' => 'bar', 'bar' => 'foo', $builder->get('bar')), $builder->get('foo1')->arguments, '->createService() passes the arguments to the constructor');
+        $this->assertTrue($builder->get('foo1')->called, '->createService() calls the factory method to create the service instance');
+        $this->assertEquals(array('foo' => 'bar', 'bar' => 'foo', $builder->get('bar')), $builder->get('foo1')->arguments, '->createService() passes the arguments to the factory method');
     }
 
     /**

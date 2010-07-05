@@ -10,7 +10,7 @@ services:
       - { name: foo, foo: foo }
       - { name: foo, bar: bar }
     file: %path%foo.php
-    constructor: getInstance
+    factory_method: getInstance
     arguments: [foo, '@foo.baz', { '%foo%': 'foo is %foo%', bar: '%foo%' }, true, '@service_container']
     calls:
       - [setBar, [bar]]
@@ -24,7 +24,7 @@ services:
     configurator: ['@foo.baz', configure]
   foo.baz:
     class: %baz_class%
-    constructor: getInstance
+    factory_method: getInstance
     configurator: ['%baz_class%', configureStatic1]
   foo_bar:
     class: %foo_class%

@@ -22,7 +22,7 @@ class Definition
 {
     protected $class;
     protected $file;
-    protected $constructor;
+    protected $factoryMethod;
     protected $shared;
     protected $arguments;
     protected $calls;
@@ -45,27 +45,27 @@ class Definition
     }
 
     /**
-     * Sets the constructor method.
+     * Sets the factory method able to create an instance of this class.
      *
      * @param  string $method The method name
      *
      * @return Definition The current instance
      */
-    public function setConstructor($method)
+    public function setFactoryMethod($method)
     {
-        $this->constructor = $method;
+        $this->factoryMethod = $method;
 
         return $this;
     }
 
     /**
-     * Gets the constructor method.
+     * Gets the factory method.
      *
-     * @return Definition The constructor method name
+     * @return Definition The factory method name
      */
-    public function getConstructor()
+    public function getFactoryMethod()
     {
-        return $this->constructor;
+        return $this->factoryMethod;
     }
 
     /**
@@ -83,7 +83,7 @@ class Definition
     }
 
     /**
-     * Sets the constructor method.
+     * Sets the service class.
      *
      * @return string The service class
      */
@@ -93,7 +93,7 @@ class Definition
     }
 
     /**
-     * Sets the constructor arguments to pass to the service constructor.
+     * Sets the arguments to pass to the service constructor/factory method.
      *
      * @param  array $arguments An array of arguments
      *
@@ -107,7 +107,7 @@ class Definition
     }
 
     /**
-     * Adds a constructor argument to pass to the service constructor.
+     * Adds an argument to pass to the service constructor/factory method.
      *
      * @param  mixed $argument An argument
      *
@@ -121,7 +121,7 @@ class Definition
     }
 
     /**
-     * Gets the constructor arguments to pass to the service constructor.
+     * Gets the arguments to pass to the service constructor/factory method.
      *
      * @return array The array of arguments
      */

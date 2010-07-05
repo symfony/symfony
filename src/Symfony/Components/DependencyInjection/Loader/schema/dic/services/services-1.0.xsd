@@ -89,7 +89,7 @@
     <xsd:attribute name="id" type="xsd:string" />
     <xsd:attribute name="class" type="xsd:string" />
     <xsd:attribute name="shared" type="boolean" />
-    <xsd:attribute name="constructor" type="xsd:string" />
+    <xsd:attribute name="factory-method" type="xsd:string" />
     <xsd:attribute name="alias" type="xsd:string" />
   </xsd:complexType>
 

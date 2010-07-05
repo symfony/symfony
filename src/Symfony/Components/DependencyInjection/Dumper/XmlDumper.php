@@ -50,7 +50,7 @@ class XmlDumper extends Dumper
         $code = sprintf("    <service id=\"%s\" class=\"%s\"%s%s>\n",
             $id,
             $definition->getClass(),
-            $definition->getConstructor() ? sprintf(' constructor="%s"', $definition->getConstructor()) : '',
+            $definition->getFactoryMethod() ? sprintf(' factory-method="%s"', $definition->getFactoryMethod()) : '',
             !$definition->isShared() ? ' shared="false"' : ''
         );
 

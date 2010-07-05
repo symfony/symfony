@@ -92,8 +92,8 @@ EOF;
             $arguments[] = $this->dumpValue($value);
         }
 
-        if (null !== $definition->getConstructor()) {
-            $code = sprintf("        \$instance = call_user_func(array(%s, '%s')%s);\n", $class, $definition->getConstructor(), $arguments ? ', '.implode(', ', $arguments) : '');
+        if (null !== $definition->getFactoryMethod()) {
+            $code = sprintf("        \$instance = call_user_func(array(%s, '%s')%s);\n", $class, $definition->getFactoryMethod(), $arguments ? ', '.implode(', ', $arguments) : '');
         } elseif ($class != "'".str_replace('\\', '\\\\', $definition->getClass())."'") {
             $code = sprintf("        \$class = %s;\n        \$instance = new \$class(%s);\n", $class, implode(', ', $arguments));
         } else {

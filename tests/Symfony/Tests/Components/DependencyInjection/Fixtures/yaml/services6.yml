@@ -3,7 +3,7 @@ services:
   baz: { class: BazClass }
   shared: { class: FooClass, shared: true }
   non_shared: { class: FooClass, shared: false }
-  constructor: { class: FooClass, constructor: getInstance }
+  constructor: { class: FooClass, factory_method: getInstance }
   file: { class: FooClass, file: %path%/foo.php }
   arguments: { class: FooClass, arguments: [foo, @foo, [true, false]] }
   configurator1: { class: FooClass, configurator: sc_configure }

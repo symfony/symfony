@@ -119,7 +119,7 @@ class XmlFileLoaderTest extends \PHPUnit_Framework_TestCase
         $this->assertEquals('FooClass', $services['foo']->getClass(), '->load() parses the class attribute');
         $this->assertTrue($services['shared']->isShared(), '->load() parses the shared attribute');
         $this->assertFalse($services['non_shared']->isShared(), '->load() parses the shared attribute');
-        $this->assertEquals('getInstance', $services['constructor']->getConstructor(), '->load() parses the constructor attribute');
+        $this->assertEquals('getInstance', $services['constructor']->getFactoryMethod(), '->load() parses the factory-method attribute');
         $this->assertEquals('%path%/foo.php', $services['file']->getFile(), '->load() parses the file tag');
         $this->assertEquals(array('foo', new Reference('foo'), array(true, false)), $services['arguments']->getArguments(), '->load() parses the argument tags');
         $this->assertEquals('sc_configure', $services['configurator1']->getConfigurator(), '->load() parses the configurator tag');

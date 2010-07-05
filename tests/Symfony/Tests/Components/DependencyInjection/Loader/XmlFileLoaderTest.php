@@ -24,6 +24,7 @@ class XmlFileLoaderTest extends \PHPUnit_Framework_TestCase
     {
         self::$fixturesPath = realpath(__DIR__.'/../Fixtures/');
         require_once self::$fixturesPath.'/includes/ProjectExtension.php';
+        require_once self::$fixturesPath.'/includes/ProjectWithXsdExtension.php';
     }
 
     public function testLoad()
@@ -161,9 +162,11 @@ class XmlFileLoaderTest extends \PHPUnit_Framework_TestCase
     public function testExtensions()
     {
         Loader::registerExtension(new \ProjectExtension());
+        Loader::registerExtension(new \ProjectWithXsdExtension());
         $loader = new ProjectLoader2(self::$fixturesPath.'/xml');
 
-        $config = $loader->load('services10.xml');
+        // extension without an XSD
+        $config = $loader->load('extensions/services1.xml');
         $services = $config->getDefinitions();
         $parameters = $config->getParameterBag()->all();
 
@@ -173,20 +176,42 @@ class XmlFileLoaderTest extends \PHPUnit_Framework_TestCase
         $this->assertEquals('BAR', $services['project.service.foo']->getClass(), '->load() parses extension elements');
         $this->assertEquals('BAR', $parameters['project.parameter.foo'], '->load() parses extension elements');
 
+        // extension with an XSD
+        $config = $loader->load('extensions/services2.xml');
+        $services = $config->getDefinitions();
+        $parameters = $config->getParameterBag()->all();
+
+        $this->assertTrue(isset($services['project.service.bar']), '->load() parses extension elements');
+        $this->assertTrue(isset($parameters['project.parameter.bar']), '->load() parses extension elements');
+
+        $this->assertEquals('BAR', $services['project.service.foo']->getClass(), '->load() parses extension elements');
+        $this->assertEquals('BAR', $parameters['project.parameter.foo'], '->load() parses extension elements');
+
+        // extension with an XSD (does not validate)
         try {
-            $config = $loader->load('services11.xml');
+            $config = $loader->load('extensions/services3.xml');
+            $this->fail('->load() throws an InvalidArgumentException if the configuration does not validate the XSD');
+        } catch (\Exception $e) {
+            $this->assertInstanceOf('\InvalidArgumentException', $e, '->load() throws an InvalidArgumentException if the configuration does not validate the XSD');
+            $this->assertRegexp('/The attribute \'bar\' is not allowed/', $e->getMessage(), '->load() throws an InvalidArgumentException if the configuration does not validate the XSD');
+        }
+
+        // non-registered extension
+        try {
+            $config = $loader->load('extensions/services4.xml');
             $this->fail('->load() throws an InvalidArgumentException if the tag is not valid');
         } catch (\Exception $e) {
             $this->assertInstanceOf('\InvalidArgumentException', $e, '->load() throws an InvalidArgumentException if the tag is not valid');
-            $this->assertStringStartsWith('There is no extension able to load the configuration for "foobar:foobar" (in', $e->getMessage(), '->load() throws an InvalidArgumentException if the tag is not valid');
+            $this->assertStringStartsWith('There is no extension able to load the configuration for "project:bar" (in', $e->getMessage(), '->load() throws an InvalidArgumentException if the tag is not valid');
         }
 
+        // non-existent tag for a known extension
         try {
-            $config = $loader->load('services12.xml');
-            $this->fail('->load() throws an InvalidArgumentException if an extension is not loaded');
+            $config = $loader->load('extensions/services5.xml');
+            $this->fail('->load() throws an InvalidArgumentException if a tag is not valid for a given extension');
         } catch (\Exception $e) {
-            $this->assertInstanceOf('\InvalidArgumentException', $e, '->load() throws an InvalidArgumentException if an extension is not loaded');
-            $this->assertStringStartsWith('The "foobar" tag is not valid (in', $e->getMessage(), '->load() throws an InvalidArgumentException if an extension is not loaded');
+            $this->assertInstanceOf('\InvalidArgumentException', $e, '->load() throws an InvalidArgumentException if a tag is not valid for a given extension');
+            $this->assertStringStartsWith('The tag "projectwithxsd:foobar" is not defined in the "projectwithxsd" extension.', $e->getMessage(), '->load() throws an InvalidArgumentException if a tag is not valid for a given extension');
         }
     }
 }

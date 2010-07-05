@@ -28,6 +28,20 @@ class ChoiceFieldTest extends \PHPUnit_Framework_TestCase
         )
     );
 
+    public function testConfigureChoicesWithArrayObject()
+    {
+        $choices = new \ArrayObject($this->choices);
+
+        $field = new ChoiceField('name', array(
+            'multiple' => false,
+            'expanded' => true,
+            'choices' => $choices,
+            'preferred_choices' => $this->preferredChoices,
+        ));
+
+        $this->assertEquals($this->choices, $choices->getArrayCopy());
+    }
+
     public function testBindSingleNonExpanded()
     {
         $field = new ChoiceField('name', array(

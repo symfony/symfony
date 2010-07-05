@@ -253,26 +253,6 @@ EOF;
 
     protected function startClass($class, $baseClass)
     {
-        $properties = array();
-        foreach ($this->container->getDefinitions() as $id => $definition) {
-            $type = 0 === strpos($definition->getClass(), '%') ? 'Object' : $definition->getClass();
-            $properties[] = sprintf(' * @property %s $%s', $type, $id);
-        }
-
-        foreach ($this->container->getAliases() as $alias => $id) {
-            $type = 'Object';
-            if ($this->container->hasDefinition($id)) {
-                $sclass = $this->container->getDefinition($id)->getClass();
-                $type = 0 === strpos($sclass, '%') ? 'Object' : $sclass;
-            }
-
-            $properties[] = sprintf(' * @property %s $%s', $type, $alias);
-        }
-        $properties = implode("\n", $properties);
-        if ($properties) {
-            $properties = "\n *\n".$properties;
-        }
-
         $bagClass = $this->container->isFrozen() ? 'FrozenParameterBag' : 'ParameterBag';
 
         return <<<EOF
@@ -288,7 +268,7 @@ use Symfony\Components\DependencyInjection\ParameterBag\\$bagClass;
  * $class
  *
  * This class has been auto-generated
- * by the Symfony Dependency Injection Component.$properties
+ * by the Symfony Dependency Injection Component.
  */
 class $class extends $baseClass
 {

@@ -11,13 +11,6 @@ use Symfony\Components\DependencyInjection\ParameterBag\ParameterBag;
  *
  * This class has been auto-generated
  * by the Symfony Dependency Injection Component.
- *
- * @property FooClass $foo
- * @property FooClass $bar
- * @property Object $foo.baz
- * @property Object $foo_bar
- * @property FooClass $method_call1
- * @property FooClass $alias_for_foo
  */
 class ProjectServiceContainer extends Container
 {

@@ -56,5 +56,21 @@ class LinkTest extends \PHPUnit_Framework_TestCase
         $link = new Link($node, 'get', 'http://localhost', '/bar/');
         $this->assertEquals('http://localhost/bar/foo', $link->getUri(), '->getUri() returns the absolute URI of the link for relative hrefs');
         $this->assertEquals('/bar/foo', $link->getUri(false), '->getUri() returns the relative URI of the link if false is the first argument');
+
+        $dom = new \DOMDocument();
+        $dom->loadHTML('<html><a href="http://login.foo.com/foo">foo</a></html>');
+        $node = $dom->getElementsByTagName('a')->item(0);
+
+        $link = new Link($node, 'get', 'http://www.foo.com');
+        $this->assertEquals('http://login.foo.com/foo', $link->getUri(), '->getUri() returns the absolute URI of the link, regardless of the context of the object');
+
+        $link = new Link($node, 'get');
+        $this->assertEquals('http://login.foo.com/foo', $link->getUri(), '->getUri() returns the absolute URI of the link, regardless of the context of the object');
+
+        $link = new Link($node, 'get', null, '/bar/');
+        $this->assertEquals('http://login.foo.com/foo', $link->getUri(), '->getUri() returns the absolute URI of the link, regardless of the context of the object');
+
+        $link = new Link($node, 'get','http://www.foo.com','/bar/');
+        $this->assertEquals('http://login.foo.com/foo', $link->getUri(), '->getUri() returns the absolute URI of the link, regardless of the context of the object');
     }
 }

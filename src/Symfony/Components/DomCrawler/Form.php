@@ -169,17 +169,18 @@ class Form implements \ArrayAccess
     public function getUri($absolute = true)
     {
         $uri = $this->node->getAttribute('action');
+        $urlHaveScheme = 'http' === substr($uri, 0, 4);
 
         if (!in_array($this->getMethod(), array('post', 'put', 'delete')) && $queryString = http_build_query($this->getValues(), null, '&')) {
             $sep = false === strpos($uri, '?') ? '?' : '&';
             $uri .= $sep.$queryString;
         }
 
-        if ($uri && '/' !== $uri[0]) {
+        if ($uri && '/' !== $uri[0] && !$urlHaveScheme) {
             $uri = $this->path.$uri;
         }
 
-        if ($absolute && null !== $this->host) {
+        if ($absolute && null !== $this->host && !$urlHaveScheme) {
             return $this->host.$uri;
         }
 

@@ -263,15 +263,25 @@ EOF;
     public function testBindSingleExpanded()
     {
         $field = new ChoiceField('name', array(
-            'multiple' => true,
-            'expanded' => false,
+            'multiple' => false,
+            'expanded' => true,
             'choices' => $this->choices,
         ));
 
         $field->bind('b');
 
-        $this->assertEquals('b', $field->getData());
-        $this->assertEquals('b', $field->getDisplayedData());
+        $this->assertSame('b', $field->getData());
+        $this->assertSame(null, $field['a']->getData());
+        $this->assertSame(true, $field['b']->getData());
+        $this->assertSame(null, $field['c']->getData());
+        $this->assertSame(null, $field['d']->getData());
+        $this->assertSame(null, $field['e']->getData());
+        $this->assertSame('', $field['a']->getDisplayedData());
+        $this->assertSame('1', $field['b']->getDisplayedData());
+        $this->assertSame('', $field['c']->getDisplayedData());
+        $this->assertSame('', $field['d']->getDisplayedData());
+        $this->assertSame('', $field['e']->getDisplayedData());
+        $this->assertSame(array('a' => '', 'b' => '1', 'c' => '', 'd' => '', 'e' => ''), $field->getDisplayedData());
     }
 
     public function testBindSingleExpandedNumericChoices()

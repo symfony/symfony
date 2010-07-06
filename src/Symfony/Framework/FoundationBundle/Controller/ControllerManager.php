@@ -123,6 +123,7 @@ class ControllerManager
     public function findController($controller)
     {
         list($bundle, $controller, $action) = explode(':', $controller);
+        $bundle = strtr($bundle, array('/' => '\\'));
         $class = null;
         $logs = array();
         foreach (array_keys($this->container->getParameter('kernel.bundle_dirs')) as $namespace) {
@@ -132,7 +133,7 @@ class ControllerManager
                     $logs[] = sprintf('Failed finding controller "%s:%s" from namespace "%s" (%s)', $bundle, $controller, $namespace, $try);
                 }
             } else {
-                if (!in_array($namespace.'\\'.$bundle.'\\'.$bundle, array_map(function ($bundle) { return get_class($bundle); }, $this->container->getKernelService()->getBundles()))) {
+                if (!in_array($namespace.'\\'.$bundle.'\\'.strtr($bundle, array('\\' => '')), array_map(function ($bundle) { return get_class($bundle); }, $this->container->getKernelService()->getBundles()))) {
                     throw new \LogicException(sprintf('To use the "%s" controller, you first need to enable the Bundle "%s" in your Kernel class.', $try, $namespace.'\\'.$bundle));
                 }
 

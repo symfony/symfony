@@ -1,0 +1,24 @@
+<?xml version="1.0" ?>
+
+<container xmlns="http://www.symfony-project.org/schema/dic/services"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xsi:schemaLocation="http://www.symfony-project.org/schema/dic/services http://www.symfony-project.org/schema/dic/services/services-1.0.xsd">
+
+    <parameters>
+        <parameter key="zend.translator.class">Zend\Translator\Translator</parameter>
+        <parameter key="zend.translator.adapter" type="constant">Zend\Translator\Translator::AN_ARRAY</parameter>
+        <parameter key="zend.translator.catalogue" type="constant">null</parameter>
+        <parameter key="zend.translator.locale">en</parameter>
+    </parameters>
+
+    <services>
+        <service id="zend.translator" class="%zend.translator.class%">
+            <argument>%zend.translator.adapter%</argument>
+            <argument>%zend.translator.catalogue%</argument>
+            <argument>%zend.translator.locale%</argument>
+            <argument type="collection">
+                <argument key="log" type="service" id="zend.logger" on-invalid="ignore" />
+            </argument>
+        </service>
+    </services>
+</container>

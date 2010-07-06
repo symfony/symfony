@@ -27,6 +27,31 @@ class CollectionFieldTest extends \PHPUnit_Framework_TestCase
         $this->assertEquals(2, count($field));
         $this->assertEquals('foo@foo.com', $field[0]->getData());
         $this->assertEquals('foo@bar.com', $field[1]->getData());
+
+        $field->setData(array('foo@baz.com'));
+        $this->assertTrue($field[0] instanceof TestField);
+        $this->assertFalse(isset($field[1]));
+        $this->assertEquals(1, count($field));
+        $this->assertEquals('foo@baz.com', $field[0]->getData());
+    }
+
+    public function testSetDataAdjustsSizeIfModifiable()
+    {
+        $field = new CollectionField(new TestField('emails'), array(
+            'modifiable' => true,
+        ));
+        $field->setData(array('foo@foo.com', 'foo@bar.com'));
+
+        $this->assertTrue($field[0] instanceof TestField);
+        $this->assertTrue($field[1] instanceof TestField);
+        $this->assertTrue($field['$$key$$'] instanceof TestField);
+        $this->assertEquals(3, count($field));
+
+        $field->setData(array('foo@baz.com'));
+        $this->assertTrue($field[0] instanceof TestField);
+        $this->assertFalse(isset($field[1]));
+        $this->assertTrue($field['$$key$$'] instanceof TestField);
+        $this->assertEquals(2, count($field));
     }
 
     public function testThrowsExceptionIfObjectIsNotTraversable()

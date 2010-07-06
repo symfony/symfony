@@ -55,8 +55,10 @@ class CollectionField extends FieldGroup
             throw new UnexpectedTypeException('The data must be an array');
         }
 
-        foreach ($collection as $name => $value) {
-            $this->add($this->newField($name, $name));
+        foreach ($this as $name => $field) {
+            if (!$this->getOption('modifiable') || $name != '$$key$$') {
+                $this->remove($name);
+            }
         }
 
         parent::setData($collection);

@@ -53,7 +53,7 @@ class CollectionField extends FieldGroup
 
     public function setData($collection)
     {
-        if (!is_array($collection) && !$collection instanceof Traversable) {
+        if (!is_array($collection) && !$collection instanceof \Traversable) {
             throw new UnexpectedTypeException('The data must be an array');
         }
 

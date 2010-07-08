@@ -152,7 +152,7 @@ class ExceptionFormatter
             $text = $file;
         }
 
-        $linkFormat = $this->container->hasParameter('debug.file_link_format') ? $this->container->getParameter('debug.file_link_format') : ini_get('xdebug.file_link_format');
+        $linkFormat = $this->container->getParameterBag()->has('debug.file_link_format') ? $this->container->getParameter('debug.file_link_format') : ini_get('xdebug.file_link_format');
         if ('html' === $format && $file && $line && $linkFormat) {
             $link = strtr($linkFormat, array('%f' => $file, '%l' => $line));
             $text = sprintf('<a href="%s" title="Click to open this file" class="file_link">%s</a>', $link, $text);

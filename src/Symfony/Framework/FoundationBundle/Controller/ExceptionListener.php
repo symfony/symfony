@@ -1,6 +1,6 @@
 <?php
 
-namespace Symfony\Framework\FoundationBundle\Listener;
+namespace Symfony\Framework\FoundationBundle\Controller;
 
 use Symfony\Components\DependencyInjection\ContainerInterface;
 use Symfony\Components\EventDispatcher\EventDispatcher;
@@ -18,13 +18,13 @@ use Symfony\Components\HttpKernel\HttpKernelInterface;
  */
 
 /**
- * ExceptionHandler.
+ * ExceptionListener.
  *
  * @package    Symfony
  * @subpackage Framework_FoundationBundle
  * @author     Fabien Potencier <fabien.potencier@symfony-project.com>
  */
-class ExceptionHandler
+class ExceptionListener
 {
     protected $container;
     protected $controller;

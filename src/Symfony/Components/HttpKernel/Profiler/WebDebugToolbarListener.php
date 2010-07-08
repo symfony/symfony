@@ -1,13 +1,12 @@
 <?php
 
-namespace Symfony\Components\HttpKernel\Listener;
+namespace Symfony\Components\HttpKernel\Profiler;
 
 use Symfony\Components\EventDispatcher\EventDispatcher;
 use Symfony\Components\EventDispatcher\Event;
 use Symfony\Components\HttpKernel\Request;
 use Symfony\Components\HttpKernel\Response;
 use Symfony\Components\HttpKernel\HttpKernelInterface;
-use Symfony\Components\HttpKernel\Profiler\Profiler;
 
 /*
  * This file is part of the Symfony framework.
@@ -19,13 +18,13 @@ use Symfony\Components\HttpKernel\Profiler\Profiler;
  */
 
 /**
- * WebDebugToolbar.
+ * WebDebugToolbarListener.
  *
  * @package    Symfony
  * @subpackage Components_HttpKernel
  * @author     Fabien Potencier <fabien.potencier@symfony-project.com>
  */
-class WebDebugToolbar
+class WebDebugToolbarListener
 {
     protected $profiler;
 

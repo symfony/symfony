@@ -9,7 +9,7 @@
         <parameter key="profiler.storage.class">Symfony\Components\HttpKernel\Profiler\ProfilerStorage</parameter>
         <parameter key="profiler.storage.file">%kernel.cache_dir%/profiler.db</parameter>
         <parameter key="profiler.storage.lifetime">86400</parameter>
-        <parameter key="profiling.class">Symfony\Components\HttpKernel\Listener\Profiling</parameter>
+        <parameter key="profiler_listener.class">Symfony\Components\HttpKernel\Profiler\ProfilerListener</parameter>
     </parameters>
 
     <services>
@@ -25,7 +25,7 @@
             <argument>%profiler.storage.lifetime%</argument>
         </service>
 
-        <service id="profiling" class="%profiling.class%">
+        <service id="profiler_listener" class="%profiler_listener.class%">
             <annotation name="kernel.listener" />
             <argument type="service" id="profiler" />
         </service>

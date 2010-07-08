@@ -212,7 +212,7 @@ class KernelExtension extends LoaderExtension
                 'Symfony\\Components\\HttpKernel\\HttpKernel',
                 'Symfony\\Components\\HttpKernel\\Request',
                 'Symfony\\Components\\HttpKernel\\Response',
-                'Symfony\\Components\\HttpKernel\\Listener\\ResponseFilter',
+                'Symfony\\Components\\HttpKernel\\ResponseListener',
                 'Symfony\\Components\\Templating\\Loader\\LoaderInterface',
                 'Symfony\\Components\\Templating\\Loader\\Loader',
                 'Symfony\\Components\\Templating\\Loader\\FilesystemLoader',
@@ -222,9 +222,9 @@ class KernelExtension extends LoaderExtension
                 'Symfony\\Components\\Templating\\Renderer\\PhpRenderer',
                 'Symfony\\Components\\Templating\\Storage\\Storage',
                 'Symfony\\Components\\Templating\\Storage\\FileStorage',
+                'Symfony\\Framework\\FoundationBundle\\RequestListener',
                 'Symfony\\Framework\\FoundationBundle\\Controller',
-                'Symfony\\Framework\\FoundationBundle\\Listener\\RequestParser',
-                'Symfony\\Framework\\FoundationBundle\\Listener\\ControllerLoader',
+                'Symfony\\Framework\\FoundationBundle\\Controller\\ControllerLoaderListener',
                 'Symfony\\Framework\\FoundationBundle\\Templating\\Engine',
             );
         } else {

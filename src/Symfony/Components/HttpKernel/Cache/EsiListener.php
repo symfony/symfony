@@ -1,11 +1,10 @@
 <?php
 
-namespace Symfony\Components\HttpKernel\Listener;
+namespace Symfony\Components\HttpKernel\Cache;
 
-use Symfony\Components\EventDispatcher\EventDispatcher;
-use Symfony\Components\EventDispatcher\Event;
 use Symfony\Components\HttpKernel\Response;
 use Symfony\Components\HttpKernel\HttpKernelInterface;
+use Symfony\Components\EventDispatcher\EventDispatcher;
 
 /*
  * This file is part of the Symfony framework.
@@ -17,22 +16,38 @@ use Symfony\Components\HttpKernel\HttpKernelInterface;
  */
 
 /**
- * ResponseFilter.
+ * EsiListener adds a Surrogate-Control HTTP header when the Response needs to be parsed for ESI.
  *
  * @package    Symfony
  * @subpackage Components_HttpKernel
  * @author     Fabien Potencier <fabien.potencier@symfony-project.com>
  */
-class ResponseFilter
+class EsiListener
 {
+    protected $dispatcher;
+    protected $esi;
+
     /**
-     * Registers a core.response listener to change the Content-Type header based on the Request format.
+     * Constructor.
+     *
+     * @param Symfony\Components\HttpKernel\Cache\Esi $esi An ESI instance
+     */
+    public function __construct(Esi $esi = null)
+    {
+        $this->esi = $esi;
+    }
+
+    /**
+     * Registers a core.response listener to add the Surrogate-Control header to a Response when needed.
      *
      * @param Symfony\Components\EventDispatcher\EventDispatcher $dispatcher An EventDispatcher instance
      */
     public function register(EventDispatcher $dispatcher)
     {
-        $dispatcher->connect('core.response', array($this, 'filter'));
+        if (null !== $this->esi)
+        {
+            $dispatcher->connect('core.response', array($this, 'filter'));
+        }
     }
 
     /**
@@ -41,17 +56,13 @@ class ResponseFilter
      * @param Symfony\Components\EventDispatcher\Event $event    An Event instance
      * @param Symfony\Components\HttpKernel\Response   $response A Response instance
      */
-    public function filter(Event $event, Response $response)
+    public function filter($event, Response $response)
     {
-        if (HttpKernelInterface::MASTER_REQUEST !== $event->getParameter('request_type') || $response->headers->has('Content-Type')) {
+        if (HttpKernelInterface::MASTER_REQUEST !== $event->getParameter('request_type')) {
             return $response;
         }
 
-        $request = $event->getParameter('request');
-        $format = $request->getRequestFormat();
-        if ((null !== $format) && $mimeType = $request->getMimeType($format)) {
-            $response->headers->set('Content-Type', $mimeType);
-        }
+        $this->esi->addSurrogateControl($response);
 
         return $response;
     }

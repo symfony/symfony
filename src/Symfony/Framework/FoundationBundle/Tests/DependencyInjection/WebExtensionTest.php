@@ -23,7 +23,7 @@ class WebExtensionTest extends TestCase
         $loader = $this->getWebExtension();
 
         $configuration = $loader->configLoad(array(), $configuration);
-        $this->assertEquals('Symfony\\Framework\\FoundationBundle\\Listener\\RequestParser', $configuration->getParameter('request_parser.class'), '->webLoad() loads the web.xml file if not already loaded');
+        $this->assertEquals('Symfony\\Framework\\FoundationBundle\\RequestListener', $configuration->getParameter('request_listener.class'), '->webLoad() loads the web.xml file if not already loaded');
 
         $configuration = new BuilderConfiguration();
         $loader = $this->getWebExtension();
@@ -33,7 +33,7 @@ class WebExtensionTest extends TestCase
         $this->assertFalse($configuration->hasParameter('debug.toolbar.class'), '->configLoad() does not load the toolbar.xml file');
 
         $configuration = $loader->configLoad(array('toolbar' => true), $configuration);
-        $this->assertEquals('Symfony\\Components\\HttpKernel\\Listener\\WebDebugToolbar', $configuration->getParameter('debug.toolbar.class'), '->configLoad() loads the collectors.xml file if the toolbar option is given');
+        $this->assertEquals('Symfony\\Components\\HttpKernel\\Profiler\\WebDebugToolbarListener', $configuration->getParameter('debug.toolbar.class'), '->configLoad() loads the collectors.xml file if the toolbar option is given');
     }
 
     public function testUserLoad()

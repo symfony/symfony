@@ -1,6 +1,6 @@
 <?php
 
-namespace Symfony\Framework\FoundationBundle\Listener;
+namespace Symfony\Framework\FoundationBundle;
 
 use Symfony\Components\HttpKernel\LoggerInterface;
 use Symfony\Components\DependencyInjection\ContainerInterface;
@@ -19,13 +19,13 @@ use Symfony\Components\HttpKernel\HttpKernelInterface;
  */
 
 /**
- * RequestParser.
+ * RequestListener.
  *
  * @package    Symfony
  * @subpackage Framework_FoundationBundle
  * @author     Fabien Potencier <fabien.potencier@symfony-project.com>
  */
-class RequestParser
+class RequestListener
 {
     protected $container;
     protected $router;

@@ -1,8 +1,7 @@
 <?php
 
-namespace Symfony\Framework\FoundationBundle\Listener;
+namespace Symfony\Framework\FoundationBundle\Controller;
 
-use Symfony\Framework\FoundationBundle\Controller\ControllerManager;
 use Symfony\Components\HttpKernel\LoggerInterface;
 use Symfony\Components\EventDispatcher\EventDispatcher;
 use Symfony\Components\EventDispatcher\Event;
@@ -17,14 +16,14 @@ use Symfony\Components\EventDispatcher\Event;
  */
 
 /**
- * ControllerLoader listen to the core.load_controller and finds the controller
+ * ControllerLoaderListener listen to the core.load_controller and finds the controller
  * to execute based on the request parameters.
  *
  * @package    Symfony
  * @subpackage Framework_FoundationBundle
  * @author     Fabien Potencier <fabien.potencier@symfony-project.com>
  */
-class ControllerLoader
+class ControllerLoaderListener
 {
     protected $manager;
     protected $logger;

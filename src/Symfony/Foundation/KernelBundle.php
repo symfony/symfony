@@ -23,7 +23,7 @@ use Symfony\Components\DependencyInjection\BuilderConfiguration;
  * KernelBundle.
  *
  * @package    Symfony
- * @subpackage Foundation
+ * @subpackage Framework
  * @author     Fabien Potencier <fabien.potencier@symfony-project.com>
  */
 class KernelBundle extends Bundle

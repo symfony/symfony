@@ -17,7 +17,7 @@ use Symfony\Components\HttpFoundation\SessionStorage\SessionStorageInterface;
  * Session.
  *
  * @package    Symfony
- * @subpackage Framework_FoundationBundle
+ * @subpackage Components_HttpFoundation
  * @author     Fabien Potencier <fabien.potencier@symfony-project.com>
  */
 class Session

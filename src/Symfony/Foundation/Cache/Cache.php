@@ -21,7 +21,7 @@ use Symfony\Components\HttpFoundation\Response;
 /**
  *
  * @package    Symfony
- * @subpackage Foundation
+ * @subpackage Framework
  * @author     Fabien Potencier <fabien.potencier@symfony-project.org>
  */
 abstract class Cache extends BaseCache

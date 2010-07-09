@@ -15,7 +15,7 @@ namespace Symfony\Foundation\Debug;
  * ErrorException.
  *
  * @package    Symfony
- * @subpackage Foundation
+ * @subpackage Framework
  * @author     Fabien Potencier <fabien.potencier@symfony-project.com>
  */
 class ErrorException extends \Exception

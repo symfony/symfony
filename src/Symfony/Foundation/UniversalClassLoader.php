@@ -50,7 +50,7 @@ namespace Symfony\Foundation;
  * found before giving up.
  *
  * @package    Symfony
- * @subpackage Foundation
+ * @subpackage Framework
  * @author     Fabien Potencier <fabien.potencier@symfony-project.org>
  */
 class UniversalClassLoader

@@ -20,7 +20,7 @@ use Symfony\Components\BrowserKit\CookieJar;
  * Client simulates a browser and makes requests to a Kernel object.
  *
  * @package    Symfony
- * @subpackage Foundation
+ * @subpackage Framework
  * @author     Fabien Potencier <fabien.potencier@symfony-project.com>
  */
 class Client extends BaseClient

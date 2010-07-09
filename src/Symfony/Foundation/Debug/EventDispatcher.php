@@ -21,7 +21,7 @@ use Symfony\Components\DependencyInjection\ContainerInterface;
  * EventDispatcher extends the original EventDispatcher class to add some debugging tools.
  *
  * @package    Symfony
- * @subpackage Foundation
+ * @subpackage Framework
  * @author     Fabien Potencier <fabien.potencier@symfony-project.com>
  */
 class EventDispatcher extends BaseEventDispatcher

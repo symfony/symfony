@@ -25,7 +25,7 @@ use Symfony\Components\HttpKernel\HttpKernelInterface;
  * that can host bundles.
  *
  * @package    Symfony
- * @subpackage Foundation
+ * @subpackage Framework
  * @author     Fabien Potencier <fabien.potencier@symfony-project.org>
  */
 abstract class Kernel implements HttpKernelInterface, \Serializable

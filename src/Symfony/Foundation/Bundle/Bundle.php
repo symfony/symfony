@@ -18,7 +18,7 @@ use Symfony\Components\Console\Application;
  * Bundle.
  *
  * @package    Symfony
- * @subpackage Foundation
+ * @subpackage Framework
  * @author     Fabien Potencier <fabien.potencier@symfony-project.com>
  */
 abstract class Bundle implements BundleInterface

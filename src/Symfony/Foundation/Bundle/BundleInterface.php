@@ -17,7 +17,7 @@ use Symfony\Components\DependencyInjection\ContainerInterface;
  * BundleInterface.
  *
  * @package    Symfony
- * @subpackage Foundation
+ * @subpackage Framework
  * @author     Fabien Potencier <fabien.potencier@symfony-project.com>
  */
 interface BundleInterface

@@ -19,7 +19,7 @@ use Symfony\Components\DependencyInjection\ContainerInterface;
  * This EventDispatcher implementation uses a DependencyInjection container to load listeners.
  *
  * @package    Symfony
- * @subpackage Foundation
+ * @subpackage Framework
  * @author     Fabien Potencier <fabien.potencier@symfony-project.com>
  */
 class EventDispatcher extends BaseEventDispatcher

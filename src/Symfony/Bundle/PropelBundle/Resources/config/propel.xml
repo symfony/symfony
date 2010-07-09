@@ -1,0 +1,32 @@
+<?xml version="1.0" ?>
+
+<container xmlns="http://www.symfony-project.org/schema/dic/services"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xsi:schemaLocation="http://www.symfony-project.org/schema/dic/services http://www.symfony-project.org/schema/dic/services/services-1.0.xsd">
+
+  <parameters>
+    <parameter key="propel.class">Propel</parameter>
+    <parameter key="propel.configuration.class">PropelConfiguration</parameter>
+    <parameter key="propel.logger.class">Symfony\Bundle\PropelBundle\Logger\PropelLogger</parameter>
+    <parameter key="propel.dbal.default_connection">default</parameter>
+  </parameters>
+
+  <services>
+    <service id="propel" class="%propel.class%">
+      <call method="setConfiguration">
+        <argument type="service" id="propel.configuration" />
+      </call>
+      <call method="setLogger">
+        <argument type="service" id="propel.logger" />
+      </call>
+      <call method="initialize" />
+    </service>
+
+    <service id="propel.configuration" class="%propel.configuration.class%" />
+
+    <service id="propel.logger" class="%propel.logger.class%">
+      <argument type="service" id="logger" on-invalid="null" />
+    </service>
+
+  </services>
+</container>

@@ -15,7 +15,7 @@ namespace Symfony\Foundation;
  * ClassCollectionLoader.
  *
  * @package    Symfony
- * @subpackage Foundation
+ * @subpackage Framework
  * @author     Fabien Potencier <fabien.potencier@symfony-project.com>
  */
 class ClassCollectionLoader

@@ -19,7 +19,7 @@ use Symfony\Components\DependencyInjection\BuilderConfiguration;
  * KernelExtension.
  *
  * @package    Symfony
- * @subpackage Foundation
+ * @subpackage Framework
  * @author     Fabien Potencier <fabien.potencier@symfony-project.org>
  */
 class KernelExtension extends LoaderExtension

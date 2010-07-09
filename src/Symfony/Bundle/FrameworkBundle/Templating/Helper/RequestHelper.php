@@ -35,9 +35,17 @@ class RequestHelper extends Helper
         $this->request = $request;
     }
 
+    /**
+     * Returns a parameter from the current request object.
+     *
+     * @param string $key     The name of the parameter
+     * @param string $default A default value
+     *
+     * @see Symfony\Components\HttpFoundation\Request::get()
+     */
     public function getParameter($key, $default = null)
     {
-        return $this->request->getParameter($key, $default);
+        return $this->request->get($key, $default);
     }
 
     /**

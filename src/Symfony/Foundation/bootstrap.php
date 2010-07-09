@@ -219,7 +219,7 @@ class KernelExtension extends LoaderExtension
         if (isset($config['session']['class'])) {
             $class = $config['session']['class'];
             if (in_array($class, array('Native', 'Pdo'))) {
-                $class = 'Symfony\\Framework\\FoundationBundle\\SessionStorage\\'.$class.'SessionStorage';
+                $class = 'Symfony\\Framework\\FrameworkBundle\\SessionStorage\\'.$class.'SessionStorage';
             }
 
             $configuration->setParameter('session.session', 'session.session.'.strtolower($class));
@@ -256,10 +256,10 @@ class KernelExtension extends LoaderExtension
                 'Symfony\\Components\\Templating\\Renderer\\PhpRenderer',
                 'Symfony\\Components\\Templating\\Storage\\Storage',
                 'Symfony\\Components\\Templating\\Storage\\FileStorage',
-                'Symfony\\Framework\\FoundationBundle\\RequestListener',
-                'Symfony\\Framework\\FoundationBundle\\Controller',
-                'Symfony\\Framework\\FoundationBundle\\Controller\\ControllerLoaderListener',
-                'Symfony\\Framework\\FoundationBundle\\Templating\\Engine',
+                'Symfony\\Framework\\FrameworkBundle\\RequestListener',
+                'Symfony\\Framework\\FrameworkBundle\\Controller',
+                'Symfony\\Framework\\FrameworkBundle\\Controller\\ControllerLoaderListener',
+                'Symfony\\Framework\\FrameworkBundle\\Templating\\Engine',
             );
         } else {
             $classes = array();

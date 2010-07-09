@@ -7,7 +7,7 @@ use Symfony\Components\Console\Input\InputOption;
 use Symfony\Components\Console\Input\InputInterface;
 use Symfony\Components\Console\Output\OutputInterface;
 use Symfony\Components\Console\Output\Output;
-use Symfony\Bundle\FoundationBundle\Util\Filesystem;
+use Symfony\Bundle\FrameworkBundle\Util\Filesystem;
 use Doctrine\Common\Cli\Configuration;
 use Doctrine\Common\Cli\CliController as DoctrineCliController;
 use Doctrine\DBAL\Connection;

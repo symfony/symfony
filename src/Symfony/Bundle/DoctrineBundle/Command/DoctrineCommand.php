@@ -2,14 +2,14 @@
 
 namespace Symfony\Bundle\DoctrineBundle\Command;
 
-use Symfony\Bundle\FoundationBundle\Command\Command;
+use Symfony\Bundle\FrameworkBundle\Command\Command;
 use Symfony\Components\Console\Input\ArrayInput;
 use Symfony\Components\Console\Input\InputArgument;
 use Symfony\Components\Console\Input\InputOption;
 use Symfony\Components\Console\Input\InputInterface;
 use Symfony\Components\Console\Output\OutputInterface;
 use Symfony\Components\Console\Output\Output;
-use Symfony\Bundle\FoundationBundle\Console\Application;
+use Symfony\Bundle\FrameworkBundle\Console\Application;
 use Symfony\Foundation\Bundle\Bundle;
 use Doctrine\DBAL\Tools\Console\Helper\ConnectionHelper;
 use Doctrine\ORM\Tools\Console\Helper\EntityManagerHelper;

@@ -2,7 +2,7 @@
 
 namespace Symfony\Bundle\DoctrineMigrationsBundle\Command;
 
-use Symfony\Bundle\FoundationBundle\Console\Application;
+use Symfony\Bundle\FrameworkBundle\Console\Application;
 use Symfony\Bundle\DoctrineBundle\Command\DoctrineCommand as BaseCommand;
 use Doctrine\DBAL\Migrations\Configuration\Configuration;
 use Doctrine\Common\Util\Inflector;

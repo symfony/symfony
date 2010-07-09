@@ -1,0 +1,3 @@
+homepage:
+    pattern:  /
+    defaults: { _controller: FrameworkBundle:Default:index }

@@ -1,0 +1,69 @@
+<?xml version="1.0" ?>
+
+<container xmlns="http://www.symfony-project.org/schema/dic/services"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xsi:schemaLocation="http://www.symfony-project.org/schema/dic/services http://www.symfony-project.org/schema/dic/services/services-1.0.xsd">
+
+    <parameters>
+        <parameter key="request_listener.class">Symfony\Bundle\FrameworkBundle\RequestListener</parameter>
+        <parameter key="controller_manager.class">Symfony\Bundle\FrameworkBundle\Controller\ControllerManager</parameter>
+        <parameter key="controller_loader_listener.class">Symfony\Bundle\FrameworkBundle\Controller\ControllerLoaderListener</parameter>
+        <parameter key="router.class">Symfony\Components\Routing\Router</parameter>
+        <parameter key="response_listener.class">Symfony\Components\HttpKernel\ResponseListener</parameter>
+        <parameter key="exception_listener.class">Symfony\Bundle\FrameworkBundle\Controller\ExceptionListener</parameter>
+        <parameter key="exception_listener.controller">FrameworkBundle:Exception:exception</parameter>
+        <parameter key="esi.class">Symfony\Components\HttpKernel\Cache\Esi</parameter>
+        <parameter key="esi_listener.class">Symfony\Components\HttpKernel\Cache\EsiListener</parameter>
+    </parameters>
+
+    <services>
+        <service id="controller_manager" class="%controller_manager.class%">
+            <argument type="service" id="service_container" />
+            <argument type="service" id="logger" on-invalid="ignore" />
+        </service>
+
+        <service id="controller_loader_listener" class="%controller_loader_listener.class%">
+            <annotation name="kernel.listener" />
+            <argument type="service" id="controller_manager" />
+            <argument type="service" id="logger" on-invalid="ignore" />
+        </service>
+
+        <service id="request_listener" class="%request_listener.class%">
+            <annotation name="kernel.listener" />
+            <argument type="service" id="service_container" />
+            <argument type="service" id="router" />
+            <argument type="service" id="logger" on-invalid="ignore" />
+        </service>
+
+        <service id="router" class="%router.class%">
+            <argument type="collection">
+                <argument type="service" id="kernel" />
+                <argument>registerRoutes</argument>
+            </argument>
+            <argument type="collection">
+                <argument key="cache_dir">%kernel.cache_dir%</argument>
+                <argument key="debug">%kernel.debug%</argument>
+                <argument key="matcher_cache_class">%kernel.name%UrlMatcher</argument>
+                <argument key="generator_cache_class">%kernel.name%UrlGenerator</argument>
+            </argument>
+        </service>
+
+        <service id="esi" class="%esi.class%" />
+
+        <service id="esi_listener" class="%esi_listener.class%">
+          <annotation name="kernel.listener" />
+          <argument type="service" id="esi" on-invalid="ignore" />
+        </service>
+
+        <service id="response_listener" class="%response_listener.class%">
+            <annotation name="kernel.listener" />
+        </service>
+
+        <service id="exception_listener" class="%exception_listener.class%">
+            <annotation name="kernel.listener" />
+            <argument type="service" id="service_container" />
+            <argument type="service" id="logger" on-invalid="null" />
+            <argument>%exception_listener.controller%</argument>
+        </service>
+    </services>
+</container>

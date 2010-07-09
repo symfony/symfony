@@ -8,7 +8,7 @@ use Symfony\Components\Console\Input\InputOption;
 use Symfony\Components\Console\Input\InputInterface;
 use Symfony\Components\Console\Output\OutputInterface;
 use Symfony\Components\Console\Output\Output;
-use Symfony\Bundle\FoundationBundle\Util\Filesystem;
+use Symfony\Bundle\FrameworkBundle\Util\Filesystem;
 use Symfony\Components\Finder\Finder;
 
 /*

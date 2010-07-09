@@ -2,7 +2,7 @@
 
 namespace Symfony\Bundle\DoctrineBundle\Controller;
 
-use Symfony\Bundle\FoundationBundle\Controller;
+use Symfony\Bundle\FrameworkBundle\Controller;
 
 /*
  * This file is part of the Symfony framework.

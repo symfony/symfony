@@ -1,0 +1,11 @@
+#!/usr/bin/env php
+<?php
+
+require_once __DIR__.'/{{ class }}Kernel.php';
+
+use Symfony\Bundle\FrameworkBundle\Console\Application;
+
+$kernel = new {{ class }}Kernel('dev', true);
+
+$application = new Application($kernel);
+$application->run();

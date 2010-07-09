@@ -9,7 +9,7 @@
  * file that was distributed with this source code.
  */
 
-namespace Symfony\Tests\Foundation;
+namespace Symfony\Tests\Framework;
 
 use Symfony\Framework\Kernel;
 

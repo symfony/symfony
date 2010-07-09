@@ -9,7 +9,7 @@
  * file that was distributed with this source code.
  */
 
-namespace Symfony\Tests\Foundation\Debug;
+namespace Symfony\Tests\Framework\Debug;
 
 use Symfony\Framework\Debug\ErrorHandler;
 

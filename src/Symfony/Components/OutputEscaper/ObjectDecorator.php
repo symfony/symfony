@@ -106,4 +106,16 @@ class ObjectDecorator extends GetterDecorator
     {
         return $this->escape($this->escaper, $this->value->$key);
     }
+
+    /**
+     * Checks whether a value is set on the wrapped object.
+     *
+     * @param string $key The name of the value to check
+     *
+     * @return boolean Returns true if the value is set
+     */
+    public function __isset($key)
+    {
+        return isset($this->value->$key);
+    }
 }

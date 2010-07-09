@@ -41,6 +41,12 @@ class ObjectDecoratorTest extends \PHPUnit_Framework_TestCase
     {
         $this->assertEquals('&lt;em&gt;escape me&lt;/em&gt;', self::$escaped->someMember, 'The escaped object behaves like the real object');
     }
+
+    public function testMagicIsset()
+    {
+        $this->assertTrue(isset(self::$escaped->someMember), 'The escaped object behaves like the real object');
+        $this->assertFalse(isset(self::$escaped->invalidMember), 'The escaped object behaves like the real object');
+    }
 }
 
 class OutputEscaperTest

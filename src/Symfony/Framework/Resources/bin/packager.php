@@ -23,11 +23,11 @@ if (file_exists(__DIR__.'/../../bootstrap.php')) {
 }
 
 ClassCollectionLoader::load(array(
-    'Symfony\\Foundation\\Bundle\\Bundle',
-    'Symfony\\Foundation\\Bundle\\BundleInterface',
-    'Symfony\\Foundation\\KernelBundle',
-    'Symfony\\Foundation\\DependencyInjection\\KernelExtension',
-    'Symfony\\Foundation\\Debug\\ErrorHandler',
-    'Symfony\\Foundation\\ClassCollectionLoader',
-    'Symfony\\Foundation\\EventDispatcher',
+    'Symfony\\Framework\\Bundle\\Bundle',
+    'Symfony\\Framework\\Bundle\\BundleInterface',
+    'Symfony\\Framework\\KernelBundle',
+    'Symfony\\Framework\\DependencyInjection\\KernelExtension',
+    'Symfony\\Framework\\Debug\\ErrorHandler',
+    'Symfony\\Framework\\ClassCollectionLoader',
+    'Symfony\\Framework\\EventDispatcher',
 ), __DIR__.'/../..', 'bootstrap', false);

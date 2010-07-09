@@ -18,7 +18,7 @@ use Symfony\Components\Routing\Router;
  * RouterHelper.
  *
  * @package    Symfony
- * @subpackage Framework_FrameworkBundle
+ * @subpackage Bundle_FrameworkBundle
  * @author     Fabien Potencier <fabien.potencier@symfony-project.com>
  */
 class RouterHelper extends Helper

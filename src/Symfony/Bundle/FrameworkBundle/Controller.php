@@ -20,7 +20,7 @@ use Symfony\Components\HttpKernel\HttpKernelInterface;
  * FrameworkBundle Controller gives you convenient access to all commonly needed services.
  *
  * @package    Symfony
- * @subpackage Framework_FrameworkBundle
+ * @subpackage Bundle_FrameworkBundle
  * @author     Fabien Potencier <fabien.potencier@symfony-project.com>
  */
 class Controller

@@ -23,7 +23,7 @@ use Symfony\Bundle\FrameworkBundle\Util\Mustache;
  * Initializes a new bundle.
  *
  * @package    Symfony
- * @subpackage Framework_FrameworkBundle
+ * @subpackage Bundle_FrameworkBundle
  * @author     Fabien Potencier <fabien.potencier@symfony-project.com>
  */
 class InitBundleCommand extends Command

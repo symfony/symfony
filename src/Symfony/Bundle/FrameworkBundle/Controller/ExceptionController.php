@@ -21,7 +21,7 @@ use Symfony\Components\HttpKernel\Exception\HttpException;
  * ExceptionController.
  *
  * @package    Symfony
- * @subpackage Framework_FrameworkBundle
+ * @subpackage Bundle_FrameworkBundle
  * @author     Fabien Potencier <fabien.potencier@symfony-project.com>
  */
 class ExceptionController extends Controller

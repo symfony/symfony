@@ -18,7 +18,7 @@ use Symfony\Components\HttpKernel\LoggerInterface;
  * Binds the Symfony templating loader debugger to the Symfony logger.
  *
  * @package    Symfony
- * @subpackage Framework_FrameworkBundle
+ * @subpackage Bundle_FrameworkBundle
  * @author     Fabien Potencier <fabien.potencier@symfony-project.com>
  */
 class Debugger implements DebuggerInterface

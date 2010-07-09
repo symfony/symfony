@@ -20,7 +20,7 @@ use Symfony\Components\HttpFoundation\Request;
  * ControllerManager.
  *
  * @package    Symfony
- * @subpackage Framework_FrameworkBundle
+ * @subpackage Bundle_FrameworkBundle
  * @author     Fabien Potencier <fabien.potencier@symfony-project.com>
  */
 class ControllerManager

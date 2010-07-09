@@ -21,7 +21,7 @@ use Symfony\Components\DependencyInjection\ContainerInterface;
  * escapes template parameters.
  *
  * @package    Symfony
- * @subpackage Framework_FrameworkBundle
+ * @subpackage Bundle_FrameworkBundle
  * @author     Fabien Potencier <fabien.potencier@symfony-project.com>
  */
 class Engine extends BaseEngine

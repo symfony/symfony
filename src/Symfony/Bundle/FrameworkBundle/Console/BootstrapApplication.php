@@ -22,7 +22,7 @@ use Symfony\Bundle\FrameworkBundle\Command\InitApplicationCommand;
  * BootstrapApplication.
  *
  * @package    Symfony
- * @subpackage Framework_FrameworkBundle
+ * @subpackage Bundle_FrameworkBundle
  * @author     Fabien Potencier <fabien.potencier@symfony-project.com>
  */
 class BootstrapApplication extends BaseApplication

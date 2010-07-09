@@ -20,7 +20,7 @@ use Symfony\Components\EventDispatcher\Event;
  * to execute based on the request parameters.
  *
  * @package    Symfony
- * @subpackage Framework_FrameworkBundle
+ * @subpackage Bundle_FrameworkBundle
  * @author     Fabien Potencier <fabien.potencier@symfony-project.com>
  */
 class ControllerLoaderListener

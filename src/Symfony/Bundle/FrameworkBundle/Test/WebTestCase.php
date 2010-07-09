@@ -19,7 +19,7 @@ use Symfony\Components\HttpFoundation\Response;
  * WebTestCase is the base class for functional tests.
  *
  * @package    Symfony
- * @subpackage Framework_FrameworkBundle
+ * @subpackage Bundle_FrameworkBundle
  * @author     Fabien Potencier <fabien.potencier@symfony-project.com>
  */
 abstract class WebTestCase extends BaseWebTestCase

@@ -3,7 +3,7 @@
 namespace Symfony\Components\HttpKernel;
 
 use Symfony\Components\HttpKernel\HttpKernelInterface;
-use Symfony\Components\HttpKernel\Request;
+use Symfony\Components\HttpFoundation\Request;
 use Symfony\Components\BrowserKit\Client as BaseClient;
 use Symfony\Components\BrowserKit\Request as DomRequest;
 use Symfony\Components\BrowserKit\Response as DomResponse;
@@ -50,9 +50,9 @@ class Client extends BaseClient
     /**
      * Makes a request.
      *
-     * @param Symfony\Components\HttpKernel\Request  $request A Request instance
+     * @param Symfony\Components\HttpFoundation\Request  $request A Request instance
      *
-     * @param Symfony\Components\HttpKernel\Response $response A Response instance
+     * @param Symfony\Components\HttpFoundation\Response $response A Response instance
      */
     protected function doRequest($request)
     {
@@ -62,7 +62,7 @@ class Client extends BaseClient
     /**
      * Returns the script to execute when the request must be insulated.
      *
-     * @param Symfony\Components\HttpKernel\Request $request A Request instance
+     * @param Symfony\Components\HttpFoundation\Request $request A Request instance
      */
     protected function getScript($request)
     {
@@ -93,7 +93,7 @@ EOF;
      *
      * @param Symfony\Components\BrowserKit\Request $request A Request instance
      *
-     * @return Symfony\Components\HttpKernel\Request A Request instance
+     * @return Symfony\Components\HttpFoundation\Request A Request instance
      */
     protected function filterRequest(DomRequest $request)
     {
@@ -108,7 +108,7 @@ EOF;
     /**
      * Converts the HttpKernel response to a BrowserKit response.
      *
-     * @param Symfony\Components\HttpKernel\Response $response A Response instance
+     * @param Symfony\Components\HttpFoundation\Response $response A Response instance
      *
      * @return Symfony\Components\BrowserKit\Response A Response instance
      */

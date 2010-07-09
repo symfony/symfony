@@ -13,8 +13,8 @@ namespace Symfony\Tests\Components\HttpKernel\Cache;
 
 require_once __DIR__.'/CacheTestCase.php';
 
-use Symfony\Components\HttpKernel\Request;
-use Symfony\Components\HttpKernel\Response;
+use Symfony\Components\HttpFoundation\Request;
+use Symfony\Components\HttpFoundation\Response;
 use Symfony\Components\HttpKernel\Cache\Store;
 use Symfony\Tests\Components\HttpKernel\Cache\CacheTestCase;
 
@@ -78,7 +78,7 @@ class CacheStoreTest extends \PHPUnit_Framework_TestCase
         $response = $this->store->lookup($this->request);
 
         $this->assertNotNull($response);
-        $this->assertInstanceOf('Symfony\Components\HttpKernel\Response', $response);
+        $this->assertInstanceOf('Symfony\Components\HttpFoundation\Response', $response);
     }
 
     public function testDoesNotFindAnEntryWithLookupWhenNoneExists()
@@ -127,7 +127,7 @@ class CacheStoreTest extends \PHPUnit_Framework_TestCase
         $this->storeSimpleEntry();
         $this->store->invalidate($this->request);
         $response = $this->store->lookup($this->request);
-        $this->assertInstanceOf('Symfony\Components\HttpKernel\Response', $response);
+        $this->assertInstanceOf('Symfony\Components\HttpFoundation\Response', $response);
         $this->assertFalse($response->isFresh());
     }
 

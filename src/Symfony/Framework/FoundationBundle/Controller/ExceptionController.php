@@ -4,8 +4,8 @@ namespace Symfony\Framework\FoundationBundle\Controller;
 
 use Symfony\Framework\FoundationBundle\Controller;
 use Symfony\Framework\FoundationBundle\Debug\ExceptionFormatter;
-use Symfony\Components\HttpKernel\Request;
-use Symfony\Components\HttpKernel\Response;
+use Symfony\Components\HttpFoundation\Request;
+use Symfony\Components\HttpFoundation\Response;
 use Symfony\Components\HttpKernel\Exception\HttpException;
 
 /*

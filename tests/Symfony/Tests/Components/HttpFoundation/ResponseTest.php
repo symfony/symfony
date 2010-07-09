@@ -9,9 +9,9 @@
  * file that was distributed with this source code.
  */
 
-namespace Symfony\Tests\Components\HttpKernel;
+namespace Symfony\Tests\Components\HttpFoundation;
 
-use Symfony\Components\HttpKernel\Response;
+use Symfony\Components\HttpFoundation\Response;
 
 class ResponseTest extends \PHPUnit_Framework_TestCase
 {

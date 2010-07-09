@@ -5,6 +5,8 @@ namespace Symfony\Components\HttpKernel;
 use Symfony\Components\EventDispatcher\Event;
 use Symfony\Components\EventDispatcher\EventDispatcher;
 use Symfony\Components\HttpKernel\Exception\NotFoundHttpException;
+use Symfony\Components\HttpFoundation\Request;
+use Symfony\Components\HttpFoundation\Response;
 
 /*
  * This file is part of the Symfony package.

@@ -5,7 +5,7 @@ namespace Symfony\Framework\FoundationBundle\Controller;
 use Symfony\Components\HttpKernel\LoggerInterface;
 use Symfony\Components\DependencyInjection\ContainerInterface;
 use Symfony\Components\HttpKernel\HttpKernelInterface;
-use Symfony\Components\HttpKernel\Request;
+use Symfony\Components\HttpFoundation\Request;
 
 /*
  * This file is part of the Symfony framework.

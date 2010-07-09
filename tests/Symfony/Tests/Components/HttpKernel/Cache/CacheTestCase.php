@@ -13,7 +13,7 @@ namespace Symfony\Tests\Components\HttpKernel\Cache;
 
 require_once __DIR__.'/TestHttpKernel.php';
 
-use Symfony\Components\HttpKernel\Request;
+use Symfony\Components\HttpFoundation\Request;
 use Symfony\Components\HttpKernel\Cache\Cache;
 use Symfony\Components\HttpKernel\Cache\Store;
 

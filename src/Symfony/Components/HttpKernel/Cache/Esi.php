@@ -2,8 +2,8 @@
 
 namespace Symfony\Components\HttpKernel\Cache;
 
-use Symfony\Components\HttpKernel\Request;
-use Symfony\Components\HttpKernel\Response;
+use Symfony\Components\HttpFoundation\Request;
+use Symfony\Components\HttpFoundation\Response;
 use Symfony\Components\HttpKernel\HttpKernelInterface;
 
 /*
@@ -46,7 +46,7 @@ class Esi
     /**
      * Checks that at least one surrogate has ESI/1.0 capability.
      *
-     * @param Symfony\Components\HttpKernel\Request $request A Request instance
+     * @param Symfony\Components\HttpFoundation\Request $request A Request instance
      *
      * @return Boolean true if one surrogate has ESI/1.0 capability, false otherwise
      */
@@ -62,7 +62,7 @@ class Esi
     /**
      * Adds ESI/1.0 capability to the given Request.
      *
-     * @param Symfony\Components\HttpKernel\Request $request A Request instance
+     * @param Symfony\Components\HttpFoundation\Request $request A Request instance
      */
     public function addSurrogateEsiCapability(Request $request)
     {
@@ -77,7 +77,7 @@ class Esi
      *
      * This method only adds an ESI HTTP header if the Response has some ESI tags.
      *
-     * @param Symfony\Components\HttpKernel\Response $response A Response instance
+     * @param Symfony\Components\HttpFoundation\Response $response A Response instance
      */
     public function addSurrogateControl(Response $response)
     {
@@ -89,7 +89,7 @@ class Esi
     /**
      * Checks that the Response needs to be parsed for ESI tags.
      *
-     * @param Symfony\Components\HttpKernel\Response $response A Response instance
+     * @param Symfony\Components\HttpFoundation\Response $response A Response instance
      *
      * @return Boolean true if the Response needs to be parsed, false otherwise
      */
@@ -128,8 +128,8 @@ class Esi
     /**
      * Replaces a Response ESI tags with the included resource content.
      *
-     * @param Symfony\Components\HttpKernel\Request  $request  A Request instance
-     * @param Symfony\Components\HttpKernel\Response $response A Response instance
+     * @param Symfony\Components\HttpFoundation\Request  $request  A Request instance
+     * @param Symfony\Components\HttpFoundation\Response $response A Response instance
      */
     public function process(Request $request, Response $response)
     {

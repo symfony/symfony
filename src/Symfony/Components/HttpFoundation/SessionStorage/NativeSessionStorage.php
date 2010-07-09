@@ -1,6 +1,6 @@
 <?php
 
-namespace Symfony\Framework\FoundationBundle\Session;
+namespace Symfony\Components\HttpFoundation\SessionStorage;
 
 /*
  * This file is part of the Symfony framework.
@@ -12,13 +12,13 @@ namespace Symfony\Framework\FoundationBundle\Session;
  */
 
 /**
- * NativeSession.
+ * NativeSessionStorage.
  *
  * @package    Symfony
- * @subpackage Framework_FoundationBundle
+ * @subpackage Components_HttpFoundation
  * @author     Fabien Potencier <fabien.potencier@symfony-project.com>
  */
-class NativeSession implements SessionInterface
+class NativeSessionStorage implements SessionStorageInterface
 {
     static protected $sessionIdRegenerated = false;
     static protected $sessionStarted       = false;
@@ -30,7 +30,6 @@ class NativeSession implements SessionInterface
      *
      *  * session_name:            The cookie name (symfony by default)
      *  * session_id:              The session id (null by default)
-     *  * auto_start:              Whether to start the session (true by default)
      *  * session_cookie_lifetime: Cookie lifetime
      *  * session_cookie_path:     Cookie path
      *  * session_cookie_domain:   Cookie domain
@@ -48,7 +47,6 @@ class NativeSession implements SessionInterface
 
         $this->options = array_merge(array(
             'session_name'            => 'SYMFONY_SESSION',
-            'auto_start'              => true,
             'session_cookie_lifetime' => $cookieDefaults['lifetime'],
             'session_cookie_path'     => $cookieDefaults['path'],
             'session_cookie_domain'   => $cookieDefaults['domain'],
@@ -56,31 +54,37 @@ class NativeSession implements SessionInterface
             'session_cookie_httponly' => isset($cookieDefaults['httponly']) ? $cookieDefaults['httponly'] : false,
             'session_cache_limiter'   => 'none',
         ), $options);
+    }
 
-        // set session name
-        $sessionName = $this->options['session_name'];
-
-        session_name($sessionName);
-
-        if (!(boolean) ini_get('session.use_cookies') && $sessionId = $this->options['session_id']) {
-            session_id($sessionId);
+    /**
+     * Starts the session.
+     */
+    public function start()
+    {
+        if (self::$sessionStarted) {
+            return;
         }
 
-        $lifetime = $this->options['session_cookie_lifetime'];
-        $path     = $this->options['session_cookie_path'];
-        $domain   = $this->options['session_cookie_domain'];
-        $secure   = $this->options['session_cookie_secure'];
-        $httpOnly = $this->options['session_cookie_httponly'];
-        session_set_cookie_params($lifetime, $path, $domain, $secure, $httpOnly);
+        session_set_cookie_params(
+            $this->options['session_cookie_lifetime'],
+            $this->options['session_cookie_path'],
+            $this->options['session_cookie_domain'],
+            $this->options['session_cookie_secure'],
+            $this->options['session_cookie_httponly']
+        );
+        session_name($this->options['session_name']);
 
         if (null !== $this->options['session_cache_limiter']) {
             session_cache_limiter($this->options['session_cache_limiter']);
         }
 
-        if ($this->options['auto_start'] && !self::$sessionStarted) {
-            session_start();
-            self::$sessionStarted = true;
+        if (!ini_get('session.use_cookies') && $this->options['session_id'] && $this->options['session_id'] != session_id()) {
+            session_id($this->options['session_id']);
         }
+
+        session_start();
+
+        self::$sessionStarted = true;
     }
 
     /**

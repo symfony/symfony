@@ -36,15 +36,6 @@ class WebExtensionTest extends TestCase
         $this->assertEquals('Symfony\\Components\\HttpKernel\\Profiler\\WebDebugToolbarListener', $configuration->getParameter('debug.toolbar.class'), '->configLoad() loads the collectors.xml file if the toolbar option is given');
     }
 
-    public function testUserLoad()
-    {
-        $configuration = new BuilderConfiguration();
-        $loader = $this->getWebExtension();
-
-        $configuration = $loader->userLoad(array(), $configuration);
-        $this->assertEquals('Symfony\\Framework\\FoundationBundle\\User', $configuration->getParameter('user.class'), '->userLoad() loads the user.xml file if not already loaded');
-    }
-
     public function testTemplatingLoad()
     {
         $configuration = new BuilderConfiguration();

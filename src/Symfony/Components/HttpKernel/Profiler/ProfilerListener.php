@@ -4,7 +4,7 @@ namespace Symfony\Components\HttpKernel\Profiler;
 
 use Symfony\Components\EventDispatcher\EventDispatcher;
 use Symfony\Components\EventDispatcher\Event;
-use Symfony\Components\HttpKernel\Response;
+use Symfony\Components\HttpFoundation\Response;
 use Symfony\Components\HttpKernel\HttpKernelInterface;
 
 /*

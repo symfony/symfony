@@ -79,9 +79,9 @@ class Client extends BaseClient
     /**
      * Makes a request.
      *
-     * @param Symfony\Components\HttpKernel\Request  $request A Request instance
+     * @param Symfony\Components\HttpFoundation\Response  $request A Request instance
      *
-     * @param Symfony\Components\HttpKernel\Response $response A Response instance
+     * @param Symfony\Components\HttpFoundation\Response $response A Response instance
      */
     protected function doRequest($request)
     {
@@ -93,7 +93,7 @@ class Client extends BaseClient
     /**
      * Returns the script to execute when the request must be insulated.
      *
-     * @param Symfony\Components\HttpKernel\Request $request A Request instance
+     * @param Symfony\Components\HttpFoundation\Response $request A Request instance
      */
     protected function getScript($request)
     {

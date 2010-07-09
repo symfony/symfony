@@ -1,10 +1,8 @@
 <?php
 
-namespace Symfony\Framework\FoundationBundle;
+namespace Symfony\Components\HttpFoundation;
 
-use Symfony\Components\EventDispatcher\EventDispatcher;
-use Symfony\Components\EventDispatcher\Event;
-use Symfony\Framework\FoundationBundle\Session\SessionInterface;
+use Symfony\Components\HttpFoundation\SessionStorage\SessionStorageInterface;
 
 /*
  * This file is part of the Symfony framework.
@@ -16,42 +14,57 @@ use Symfony\Framework\FoundationBundle\Session\SessionInterface;
  */
 
 /**
- * User.
+ * Session.
  *
  * @package    Symfony
  * @subpackage Framework_FoundationBundle
  * @author     Fabien Potencier <fabien.potencier@symfony-project.com>
  */
-class User
+class Session
 {
-    protected $session;
+    protected $storage;
     protected $locale;
     protected $attributes;
     protected $oldFlashes;
+    protected $started;
+    protected $options;
 
     /**
-     * Initialize the user class
+     * Constructor.
      *
-     * @param EventDispatcher  $dispatcher A EventDispatcher instance
-     * @param SessionInterface $session    A SessionInterface instance
-     * @param array            $options    An array of options
+     * @param SessionStorageInterface $session A SessionStorageInterface instance
+     * @param array                   $options An array of options
      */
-    public function __construct(EventDispatcher $dispatcher, SessionInterface $session, $options = array())
+    public function __construct(SessionStorageInterface $storage, $options = array())
     {
-        $this->dispatcher = $dispatcher;
-        $this->session    = $session;
+        $this->storage = $storage;
+        $this->options = $options;
+    }
 
-        $this->setAttributes($session->read('_user', array(
+    /**
+     * Starts the session storage.
+     */
+    public function start()
+    {
+        if (true === $this->started) {
+            return;
+        }
+
+        $this->storage->start();
+
+        $this->setAttributes($this->storage->read('_symfony2', array(
             '_flash'   => array(),
-            '_locale'  => isset($options['default_locale']) ? $options['default_locale'] : 'en',
+            '_locale'  => isset($this->options['default_locale']) ? $this->options['default_locale'] : 'en',
         )));
 
         // flag current flash to be removed at shutdown
         $this->oldFlashes = array_flip(array_keys($this->getFlashMessages()));
+
+        $this->started = true;
     }
 
     /**
-     * Returns a user attribute
+     * Returns an attribute
      *
      * @param string $name    The attribute name
      * @param mixed  $default The default value
@@ -64,7 +77,7 @@ class User
     }
 
     /**
-     * Sets an user attribute.
+     * Sets an attribute.
      *
      * @param string $name
      * @param mixed  $value
@@ -75,9 +88,9 @@ class User
     }
 
     /**
-     * Returns user attributes
+     * Returns attributes.
      *
-     * @return array User attributes
+     * @return array Attributes
      */
     public function getAttributes()
     {
@@ -85,7 +98,7 @@ class User
     }
 
     /**
-     * Sets user attributes
+     * Sets attributes
      *
      * @param array $attributes Attributes
      */
@@ -95,7 +108,7 @@ class User
     }
 
     /**
-     * Returns the user locale
+     * Returns the locale
      *
      * @return string
      */
@@ -105,7 +118,7 @@ class User
     }
 
     /**
-     * Sets the user locale.
+     * Sets the locale.
      *
      * @param string $locale
      */
@@ -113,8 +126,6 @@ class User
     {
         if ($this->locale != $locale) {
             $this->setAttribute('_locale', $locale);
-
-            $this->dispatcher->notify(new Event($this, 'user.change_locale', array('locale' => $locale)));
         }
     }
 
@@ -146,8 +157,10 @@ class User
 
     public function __destruct()
     {
-        $this->attributes['_flash'] = array_diff_key($this->attributes['_flash'], $this->oldFlashes);
+        if (true === $this->started) {
+            $this->attributes['_flash'] = array_diff_key($this->attributes['_flash'], $this->oldFlashes);
 
-        $this->session->write('_user', $this->attributes);
+            $this->storage->write('_symfony2', $this->attributes);
+        }
     }
 }

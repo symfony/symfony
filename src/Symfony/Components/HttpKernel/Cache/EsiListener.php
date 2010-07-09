@@ -2,7 +2,7 @@
 
 namespace Symfony\Components\HttpKernel\Cache;
 
-use Symfony\Components\HttpKernel\Response;
+use Symfony\Components\HttpFoundation\Response;
 use Symfony\Components\HttpKernel\HttpKernelInterface;
 use Symfony\Components\EventDispatcher\EventDispatcher;
 
@@ -54,7 +54,7 @@ class EsiListener
      * Filters the Response.
      *
      * @param Symfony\Components\EventDispatcher\Event $event    An Event instance
-     * @param Symfony\Components\HttpKernel\Response   $response A Response instance
+     * @param Symfony\Components\HttpFoundation\Response   $response A Response instance
      */
     public function filter($event, Response $response)
     {

@@ -9,14 +9,14 @@
  * file that was distributed with this source code.
  */
 
-namespace Symfony\Tests\Components\HttpKernel;
+namespace Symfony\Tests\Components\HttpFoundation;
 
-use Symfony\Components\HttpKernel\Request;
+use Symfony\Components\HttpFoundation\Request;
 
 class RequestTest extends \PHPUnit_Framework_TestCase
 {
     /**
-     * @covers Symfony\Components\HttpKernel\Request::__construct
+     * @covers Symfony\Components\HttpFoundation\Request::__construct
      */
     public function testConstructor()
     {
@@ -24,7 +24,7 @@ class RequestTest extends \PHPUnit_Framework_TestCase
     }
 
     /**
-     * @covers Symfony\Components\HttpKernel\Request::initialize
+     * @covers Symfony\Components\HttpFoundation\Request::initialize
      */
     public function testInitialize()
     {
@@ -44,7 +44,7 @@ class RequestTest extends \PHPUnit_Framework_TestCase
     }
 
     /**
-     * @covers Symfony\Components\HttpKernel\Request::duplicate
+     * @covers Symfony\Components\HttpFoundation\Request::duplicate
      */
     public function testDuplicate()
     {
@@ -65,7 +65,7 @@ class RequestTest extends \PHPUnit_Framework_TestCase
     }
 
     /**
-     * @covers Symfony\Components\HttpKernel\Request::getFormat
+     * @covers Symfony\Components\HttpFoundation\Request::getFormat
      */
     public function testGetFormat()
     {

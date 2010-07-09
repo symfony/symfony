@@ -3,8 +3,8 @@
 namespace Symfony\Components\HttpKernel\Cache;
 
 use Symfony\Components\HttpKernel\HttpKernelInterface;
-use Symfony\Components\HttpKernel\Request;
-use Symfony\Components\HttpKernel\Response;
+use Symfony\Components\HttpFoundation\Request;
+use Symfony\Components\HttpFoundation\Response;
 
 /*
  * This file is part of the Symfony framework.
@@ -122,7 +122,7 @@ class Cache implements HttpKernelInterface
     /**
      * Gets the Request instance associated with the master request.
      *
-     * @return Symfony\Components\HttpKernel\Request A Request instance
+     * @return Symfony\Components\HttpFoundation\Request A Request instance
      */
     public function getRequest()
     {
@@ -132,11 +132,11 @@ class Cache implements HttpKernelInterface
     /**
      * Handles a Request.
      *
-     * @param Symfony\Components\HttpKernel\Request $request A Request instance
+     * @param Symfony\Components\HttpFoundation\Request $request A Request instance
      * @param integer                               $type    The type of the request (one of HttpKernelInterface::MASTER_REQUEST, HttpKernelInterface::FORWARDED_REQUEST, or HttpKernelInterface::EMBEDDED_REQUEST)
      * @param Boolean                               $raw     Whether to catch exceptions or not (this is NOT used in this context)
      *
-     * @return Symfony\Components\HttpKernel\Response A Response instance
+     * @return Symfony\Components\HttpFoundation\Response A Response instance
      */
     public function handle(Request $request = null, $type = HttpKernelInterface::MASTER_REQUEST, $raw = false)
     {
@@ -178,9 +178,9 @@ class Cache implements HttpKernelInterface
     /**
      * Forwards the Request to the backend without storing the Response in the cache.
      *
-     * @param Symfony\Components\HttpKernel\Request $request A Request instance
+     * @param Symfony\Components\HttpFoundation\Request $request A Request instance
      *
-     * @return Symfony\Components\HttpKernel\Response A Response instance
+     * @return Symfony\Components\HttpFoundation\Response A Response instance
      */
     protected function pass(Request $request)
     {
@@ -192,9 +192,9 @@ class Cache implements HttpKernelInterface
     /**
      * Invalidates non-safe methods (like POST, PUT, and DELETE).
      *
-     * @param Symfony\Components\HttpKernel\Request $request A Request instance
+     * @param Symfony\Components\HttpFoundation\Request $request A Request instance
      *
-     * @return Symfony\Components\HttpKernel\Response A Response instance
+     * @return Symfony\Components\HttpFoundation\Response A Response instance
      *
      * @see RFC2616 13.10
      */
@@ -229,9 +229,9 @@ class Cache implements HttpKernelInterface
      * the backend using conditional GET. When no matching cache entry is found,
      * it triggers "miss" processing.
      *
-     * @param Symfony\Components\HttpKernel\Request $request A Request instance
+     * @param Symfony\Components\HttpFoundation\Request $request A Request instance
      *
-     * @return Symfony\Components\HttpKernel\Response A Response instance
+     * @return Symfony\Components\HttpFoundation\Response A Response instance
      */
     protected function lookup(Request $request)
     {
@@ -278,10 +278,10 @@ class Cache implements HttpKernelInterface
      * The original request is used as a template for a conditional
      * GET request with the backend.
      *
-     * @param Symfony\Components\HttpKernel\Request  $request A Request instance
-     * @param Symfony\Components\HttpKernel\Response $entry A Response instance to validate
+     * @param Symfony\Components\HttpFoundation\Request  $request A Request instance
+     * @param Symfony\Components\HttpFoundation\Response $entry A Response instance to validate
      *
-     * @return Symfony\Components\HttpKernel\Response A Response instance
+     * @return Symfony\Components\HttpFoundation\Response A Response instance
      */
     protected function validate(Request $request, $entry)
     {
@@ -338,9 +338,9 @@ class Cache implements HttpKernelInterface
      *
      * This methods is trigered when the cache missed or a reload is required.
      *
-     * @param Symfony\Components\HttpKernel\Request  $request A Request instance
+     * @param Symfony\Components\HttpFoundation\Request  $request A Request instance
      *
-     * @return Symfony\Components\HttpKernel\Response A Response instance
+     * @return Symfony\Components\HttpFoundation\Response A Response instance
      */
     protected function fetch(Request $request)
     {
@@ -371,11 +371,11 @@ class Cache implements HttpKernelInterface
     /**
      * Forwards the Request to the backend and returns the Response.
      *
-     * @param Symfony\Components\HttpKernel\Request  $request  A Request instance
+     * @param Symfony\Components\HttpFoundation\Request  $request  A Request instance
      * @param Boolean                                $raw      Whether to catch exceptions or not
-     * @param Symfony\Components\HttpKernel\Response $response A Response instance (the stale entry if present, null otherwise)
+     * @param Symfony\Components\HttpFoundation\Response $response A Response instance (the stale entry if present, null otherwise)
      *
-     * @return Symfony\Components\HttpKernel\Response A Response instance
+     * @return Symfony\Components\HttpFoundation\Response A Response instance
      */
     protected function forward(Request $request, $raw = false, Response $entry = null)
     {
@@ -408,8 +408,8 @@ class Cache implements HttpKernelInterface
     /**
      * Checks whether the cache entry is "fresh enough" to satisfy the Request.
      *
-     * @param Symfony\Components\HttpKernel\Request  $request A Request instance
-     * @param Symfony\Components\HttpKernel\Response $entry   A Response instance
+     * @param Symfony\Components\HttpFoundation\Request  $request A Request instance
+     * @param Symfony\Components\HttpFoundation\Response $entry   A Response instance
      *
      * @return Boolean true if the cache entry if fresh enough, false otherwise
      */
@@ -429,8 +429,8 @@ class Cache implements HttpKernelInterface
     /**
      * Locks a Request during the call to the backend.
      *
-     * @param Symfony\Components\HttpKernel\Request  $request A Request instance
-     * @param Symfony\Components\HttpKernel\Response $entry   A Response instance
+     * @param Symfony\Components\HttpFoundation\Request  $request A Request instance
+     * @param Symfony\Components\HttpFoundation\Response $entry   A Response instance
      *
      * @return Boolean true if the cache entry can be returned even if it is staled, false otherwise
      */
@@ -486,8 +486,8 @@ class Cache implements HttpKernelInterface
     /**
      * Writes the Response to the cache.
      *
-     * @param Symfony\Components\HttpKernel\Request  $request  A Request instance
-     * @param Symfony\Components\HttpKernel\Response $response A Response instance
+     * @param Symfony\Components\HttpFoundation\Request  $request  A Request instance
+     * @param Symfony\Components\HttpFoundation\Response $response A Response instance
      */
     protected function store(Request $request, Response $response)
     {
@@ -512,9 +512,9 @@ class Cache implements HttpKernelInterface
     /**
      * Restores the Response body.
      *
-     * @param Symfony\Components\HttpKernel\Response $response A Response instance
+     * @param Symfony\Components\HttpFoundation\Response $response A Response instance
      *
-     * @return Symfony\Components\HttpKernel\Response A Response instance
+     * @return Symfony\Components\HttpFoundation\Response A Response instance
      */
     protected function restoreResponseBody(Response $response)
     {
@@ -553,7 +553,7 @@ class Cache implements HttpKernelInterface
      * Checks if the Request includes authorization or other sensitive information
      * that should cause the Response to be considered private by default.
      *
-     * @param Symfony\Components\HttpKernel\Request $request A Request instance
+     * @param Symfony\Components\HttpFoundation\Request $request A Request instance
      *
      * @return Boolean true if the Request is private, false otherwise
      */

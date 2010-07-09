@@ -1,6 +1,8 @@
 <?php
 
-namespace Symfony\Components\HttpKernel;
+namespace Symfony\Components\HttpFoundation;
+
+use Symfony\Components\HttpFoundation\SessionStorage\NativeSessionStorage;
 
 /*
  * This file is part of the Symfony package.
@@ -15,7 +17,7 @@ namespace Symfony\Components\HttpKernel;
  * Request represents an HTTP request.
  *
  * @package    Symfony
- * @subpackage Components_HttpKernel
+ * @subpackage Components_HttpFoundation
  * @author     Fabien Potencier <fabien.potencier@symfony-project.com>
  */
 class Request
@@ -37,6 +39,7 @@ class Request
     protected $basePath;
     protected $method;
     protected $format;
+    protected $session;
 
     static protected $formats;
 
@@ -208,6 +211,26 @@ class Request
     public function get($key, $default = null)
     {
         return $this->query->get($key, $this->path->get($key, $this->request->get($key, $default)));
+    }
+
+    public function getSession()
+    {
+        if (null === $this->session) {
+            $this->session = new Session(new NativeSessionStorage());
+        }
+        $this->session->start();
+
+        return $this->session;
+    }
+
+    public function hasSession()
+    {
+        return '' !== session_id();
+    }
+
+    public function setSession(Session $session)
+    {
+        $this->session = $session;
     }
 
     /**

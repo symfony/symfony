@@ -1,6 +1,6 @@
 <?php
 
-namespace Symfony\Components\HttpKernel;
+namespace Symfony\Components\HttpFoundation;
 
 /*
  * This file is part of the Symfony framework.
@@ -18,7 +18,7 @@ namespace Symfony\Components\HttpKernel;
  * (and those that only apply to requests or responses).
  *
  * @package    Symfony
- * @subpackage Components_HttpKernel
+ * @subpackage Components_HttpFoundation
  * @author     Fabien Potencier <fabien.potencier@symfony-project.com>
  */
 class CacheControl

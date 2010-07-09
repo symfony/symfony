@@ -1,6 +1,6 @@
 <?php
 
-namespace Symfony\Framework\FoundationBundle\Session;
+namespace Symfony\Components\HttpFoundation\SessionStorage;
 
 /*
  * This file is part of the Symfony framework.
@@ -12,14 +12,19 @@ namespace Symfony\Framework\FoundationBundle\Session;
  */
 
 /**
- * SessionInterface.
+ * SessionStorageInterface.
  *
  * @package    Symfony
- * @subpackage Framework_FoundationBundle
+ * @subpackage Components_HttpFoundation
  * @author     Fabien Potencier <fabien.potencier@symfony-project.com>
  */
-interface SessionInterface
+interface SessionStorageInterface
 {
+    /**
+     * Starts the session.
+     */
+    public function start();
+
     /**
      * Reads data from this storage.
      *

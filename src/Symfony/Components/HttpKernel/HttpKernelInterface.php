@@ -2,6 +2,8 @@
 
 namespace Symfony\Components\HttpKernel;
 
+use Symfony\Components\HttpFoundation\Request;
+
 /*
  * This file is part of the Symfony package.
  *

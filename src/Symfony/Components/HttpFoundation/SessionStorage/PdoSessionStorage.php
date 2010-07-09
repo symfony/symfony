@@ -1,6 +1,6 @@
 <?php
 
-namespace Symfony\Framework\FoundationBundle\Session;
+namespace Symfony\Components\HttpFoundation\SessionStorage;
 
 /*
  * This file is part of the Symfony framework.
@@ -12,13 +12,13 @@ namespace Symfony\Framework\FoundationBundle\Session;
  */
 
 /**
- * PdoSession.
+ * PdoSessionStorage.
  *
  * @package    Symfony
- * @subpackage Framework_FoundationBundle
+ * @subpackage Components_HttpFoundation
  * @author     Fabien Potencier <fabien.potencier@symfony-project.com>
  */
-class PdoSession extends NativeSession
+class PdoSessionStorage extends NativeSessionStorage
 {
     protected $db;
 
@@ -34,26 +34,33 @@ class PdoSession extends NativeSession
             'db_time_col' => 'sess_time',
         ), $options);
 
-        // disable auto_start
-        $options['auto_start'] = false;
+        if (!array_key_exists('db_table', $options)) {
+            throw new \InvalidArgumentException('You must provide the "db_table" option for a PdoSessionStorage.');
+        }
 
-        // initialize the parent
         parent::__construct($options);
+    }
 
-        if (!array_key_exists('db_table', $this->options)) {
-            throw new \InvalidArgumentException('You must provide a "db_table" option to PdoSession.');
+    /**
+     * Starts the session.
+     */
+    public function start()
+    {
+        if (self::$sessionStarted) {
+            return;
         }
 
         // use this object as the session handler
-        session_set_save_handler(array($this, 'sessionOpen'),
-                                                         array($this, 'sessionClose'),
-                                                         array($this, 'sessionRead'),
-                                                         array($this, 'sessionWrite'),
-                                                         array($this, 'sessionDestroy'),
-                                                         array($this, 'sessionGC'));
+        session_set_save_handler(
+            array($this, 'sessionOpen'),
+            array($this, 'sessionClose'),
+            array($this, 'sessionRead'),
+            array($this, 'sessionWrite'),
+            array($this, 'sessionDestroy'),
+            array($this, 'sessionGC')
+        );
 
-        // start our session
-        session_start();
+        parent::start();
     }
 
     /**

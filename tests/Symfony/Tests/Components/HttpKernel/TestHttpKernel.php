@@ -12,8 +12,8 @@
 namespace Symfony\Tests\Components\HttpKernel;
 
 use Symfony\Components\HttpKernel\HttpKernel;
-use Symfony\Components\HttpKernel\Request;
-use Symfony\Components\HttpKernel\Response;
+use Symfony\Components\HttpFoundation\Request;
+use Symfony\Components\HttpFoundation\Response;
 use Symfony\Components\EventDispatcher\EventDispatcher;
 use Symfony\Components\EventDispatcher\Event;
 

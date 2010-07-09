@@ -30,7 +30,6 @@ class WebExtension extends LoaderExtension
     protected $resources = array(
         'templating' => 'templating.xml',
         'web'        => 'web.xml',
-        'user'       => 'user.xml',
         // validation.xml conflicts with the naming convention for XML
         // validation mapping files, so call it validator.xml
         'validation' => 'validator.xml',
@@ -166,47 +165,6 @@ class WebExtension extends LoaderExtension
             } elseif ($configuration->hasDefinition('validator')) {
                 $configuration->getDefinition('validator')->clearAnnotations();
             }
-        }
-
-        return $configuration;
-    }
-
-    /**
-     * Loads the user configuration.
-     *
-     * @param array                $config        A configuration array
-     * @param BuilderConfiguration $configuration A BuilderConfiguration instance
-     *
-     * @return BuilderConfiguration A BuilderConfiguration instance
-     */
-    public function userLoad($config, BuilderConfiguration $configuration)
-    {
-        if (!$configuration->hasDefinition('user')) {
-            $loader = new XmlFileLoader(__DIR__.'/../Resources/config');
-            $configuration->merge($loader->load($this->resources['user']));
-        }
-
-        if (isset($config['default_locale'])) {
-            $configuration->setParameter('user.default_locale', $config['default_locale']);
-        }
-
-        if (isset($config['class'])) {
-            $configuration->setParameter('user.class', $config['class']);
-        }
-
-        foreach (array('name', 'auto_start', 'lifetime', 'path', 'domain', 'secure', 'httponly', 'cache_limiter', 'pdo.db_table') as $name) {
-            if (isset($config['session'][$name])) {
-                $configuration->setParameter('session.options.'.$name, $config['session'][$name]);
-            }
-        }
-
-        if (isset($config['session']['class'])) {
-            $class = $config['session']['class'];
-            if (in_array($class, array('Native', 'Pdo'))) {
-                $class = 'Symfony\\Framework\\FoundationBundle\\Session\\'.$class.'Session';
-            }
-
-            $configuration->setParameter('user.session', 'user.session.'.strtolower($class));
         }
 
         return $configuration;

@@ -3,7 +3,7 @@
 namespace Symfony\Framework\FoundationBundle\Templating\Helper;
 
 use Symfony\Components\Templating\Helper\Helper;
-use Symfony\Framework\FoundationBundle\User;
+use Symfony\Components\HttpFoundation\Request;
 
 /*
  * This file is part of the Symfony framework.
@@ -15,28 +15,28 @@ use Symfony\Framework\FoundationBundle\User;
  */
 
 /**
- * UserHelper.
+ * SessionHelper.
  *
  * @package    Symfony
  * @subpackage Framework_FoundationBundle
  * @author     Fabien Potencier <fabien.potencier@symfony-project.com>
  */
-class UserHelper extends Helper
+class SessionHelper extends Helper
 {
-    protected $user;
+    protected $session;
 
     /**
      * Constructor.
      *
      * @param Request $request A Request instance
      */
-    public function __construct(User $user)
+    public function __construct(Request $request)
     {
-        $this->user = $user;
+        $this->session = $request->getSession();
     }
 
     /**
-     * Returns a user attribute
+     * Returns an attribute
      *
      * @param string $name    The attribute name
      * @param mixed  $default The default value
@@ -45,27 +45,27 @@ class UserHelper extends Helper
      */
     public function getAttribute($name, $default = null)
     {
-        return $this->user->getAttribute($name, $default);
+        return $this->session->getAttribute($name, $default);
     }
 
     /**
-     * Returns the user locale
+     * Returns the locale
      *
      * @return string
      */
     public function getLocale()
     {
-        return $this->user->getLocale();
+        return $this->session->getLocale();
     }
 
     public function getFlash($name, $default = null)
     {
-        return $this->user->getFlash($name, $default);
+        return $this->session->getFlash($name, $default);
     }
 
     public function hasFlash($name)
     {
-        return $this->user->hasFlash($name);
+        return $this->session->hasFlash($name);
     }
 
     /**
@@ -75,6 +75,6 @@ class UserHelper extends Helper
      */
     public function getName()
     {
-        return 'user';
+        return 'session';
     }
 }

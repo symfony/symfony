@@ -4,6 +4,7 @@ namespace Symfony\Components\HttpKernel;
 
 use Symfony\Components\EventDispatcher\EventDispatcher;
 use Symfony\Components\EventDispatcher\Event;
+use Symfony\Components\HttpFoundation\Response;
 
 /*
  * This file is part of the Symfony framework.
@@ -37,7 +38,7 @@ class ResponseListener
      * Filters the Response.
      *
      * @param Symfony\Components\EventDispatcher\Event $event    An Event instance
-     * @param Symfony\Components\HttpKernel\Response   $response A Response instance
+     * @param Symfony\Components\HttpFoundation\Response   $response A Response instance
      */
     public function filter(Event $event, Response $response)
     {

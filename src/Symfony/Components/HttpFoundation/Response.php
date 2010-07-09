@@ -1,6 +1,6 @@
 <?php
 
-namespace Symfony\Components\HttpKernel;
+namespace Symfony\Components\HttpFoundation;
 
 /*
  * This file is part of the Symfony package.
@@ -15,7 +15,7 @@ namespace Symfony\Components\HttpKernel;
  * Response represents an HTTP response.
  *
  * @package    Symfony
- * @subpackage Components_HttpKernel
+ * @subpackage Components_HttpFoundation
  * @author     Fabien Potencier <fabien.potencier@symfony-project.com>
  */
 class Response

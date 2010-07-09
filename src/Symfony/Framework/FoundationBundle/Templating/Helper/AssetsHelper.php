@@ -2,7 +2,7 @@
 
 namespace Symfony\Framework\FoundationBundle\Templating\Helper;
 
-use Symfony\Components\HttpKernel\Request;
+use Symfony\Components\HttpFoundation\Request;
 use Symfony\Components\Templating\Helper\AssetsHelper as BaseAssetsHelper;
 
 /*
@@ -26,9 +26,9 @@ class AssetsHelper extends BaseAssetsHelper
     /**
      * Constructor.
      *
-     * @param Symfony\Components\HttpKernel\Request $request A Request instance
-     * @param string|array                          $baseURLs The domain URL or an array of domain URLs
-     * @param string                                $version  The version
+     * @param Symfony\Components\HttpFoundation\Request $request A Request instance
+     * @param string|array                              $baseURLs The domain URL or an array of domain URLs
+     * @param string                                    $version  The version
      */
     public function __construct(Request $request, $baseURLs = array(), $version = null)
     {

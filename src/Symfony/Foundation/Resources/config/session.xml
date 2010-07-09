@@ -5,10 +5,10 @@
     xsi:schemaLocation="http://www.symfony-project.org/schema/dic/services http://www.symfony-project.org/schema/dic/services/services-1.0.xsd">
 
     <parameters>
-        <parameter key="user.class">Symfony\Framework\FoundationBundle\User</parameter>
-        <parameter key="user.default_locale">en</parameter>
-        <parameter key="user.session.class">Symfony\Framework\FoundationBundle\Session\NativeSession</parameter>
-        <parameter key="user.session.pdo.class">Symfony\Framework\FoundationBundle\Session\PdoSession</parameter>
+        <parameter key="session.class">Symfony\Components\HttpFoundation\Session</parameter>
+        <parameter key="session.default_locale">en</parameter>
+        <parameter key="session.storage.class">Symfony\Components\HttpFoundation\SessionStorage\NativeSessionStorage</parameter>
+        <parameter key="session.storage.pdo.class">Symfony\Components\HttpFoundation\SessionStorage\PdoSessionStorage</parameter>
         <parameter key="session.options.name">SYMFONY_SESSION</parameter>
         <parameter key="session.options.auto_start">true</parameter>
         <parameter key="session.options.lifetime">false</parameter>
@@ -21,15 +21,14 @@
     </parameters>
 
     <services>
-        <service id="user" class="%user.class%">
-            <argument type="service" id="event_dispatcher" />
-            <argument type="service" id="user.session" />
+        <service id="session" class="%session.class%">
+            <argument type="service" id="session.storage" />
             <argument type="collection">
-                <argument key="default_locale">%user.default_locale%</argument>
+                <argument key="default_locale">%session.default_locale%</argument>
             </argument>
         </service>
 
-        <service id="user.session.native" class="%user.session.class%">
+        <service id="session.storage.native" class="%session.storage.class%">
             <argument type="collection">
                 <argument key="session_name">%session.options.name%</argument>
                 <argument key="session_cookie_lifetime">%session.options.lifetime%</argument>
@@ -41,7 +40,7 @@
             </argument>
         </service>
 
-        <service id="user.session.pdo" class="%user.session.pdo.class%">
+        <service id="session.storage.pdo" class="%session.storage.pdo.class%">
             <argument type="service" id="pdo_connection" />
             <argument type="collection">
                 <argument key="session_name">%session.options.name%</argument>
@@ -55,6 +54,6 @@
             </argument>
         </service>
 
-        <service id="user.session" alias="user.session.native" />
+        <service id="session.storage" alias="session.storage.native" />
     </services>
 </container>

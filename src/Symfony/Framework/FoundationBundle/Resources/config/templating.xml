@@ -16,7 +16,7 @@
         <parameter key="templating.helper.actions.class">Symfony\Framework\FoundationBundle\Templating\Helper\ActionsHelper</parameter>
         <parameter key="templating.helper.router.class">Symfony\Framework\FoundationBundle\Templating\Helper\RouterHelper</parameter>
         <parameter key="templating.helper.request.class">Symfony\Framework\FoundationBundle\Templating\Helper\RequestHelper</parameter>
-        <parameter key="templating.helper.user.class">Symfony\Framework\FoundationBundle\Templating\Helper\UserHelper</parameter>
+        <parameter key="templating.helper.session.class">Symfony\Framework\FoundationBundle\Templating\Helper\SessionHelper</parameter>
         <parameter key="templating.output_escaper">false</parameter>
         <parameter key="templating.assets.version">null</parameter>
     </parameters>
@@ -71,9 +71,9 @@
             <argument type="service" id="request" />
         </service>
 
-        <service id="templating.helper.user" class="%templating.helper.user.class%">
-            <annotation name="templating.helper" alias="user" />
-            <argument type="service" id="user" />
+        <service id="templating.helper.session" class="%templating.helper.session.class%">
+            <annotation name="templating.helper" alias="session" />
+            <argument type="service" id="request" />
         </service>
 
         <service id="templating.helper.router" class="%templating.helper.router.class%">

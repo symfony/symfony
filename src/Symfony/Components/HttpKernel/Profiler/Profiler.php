@@ -2,7 +2,7 @@
 
 namespace Symfony\Components\HttpKernel\Profiler;
 
-use Symfony\Components\HttpKernel\Response;
+use Symfony\Components\HttpFoundation\Response;
 use Symfony\Components\HttpKernel\Profiler\ProfilerStorage;
 use Symfony\Components\HttpKernel\Profiler\DataCollector\DataCollectorInterface;
 use Symfony\Components\HttpKernel\LoggerInterface;
@@ -48,7 +48,7 @@ class Profiler implements \ArrayAccess
     /**
      * Returns a new Profiler for the given Response.
      *
-     * @param Symfony\Components\HttpKernel\Response $response A Response instance
+     * @param Symfony\Components\HttpFoundation\Response $response A Response instance
      *
      * @return Symfony\Components\HttpKernel\Profiler\Profiler A new Profiler instance
      */
@@ -80,7 +80,7 @@ class Profiler implements \ArrayAccess
     /**
      * Collects data for the given Response.
      *
-     * @param Symfony\Components\HttpKernel\Response $response A Response instance
+     * @param Symfony\Components\HttpFoundation\Response $response A Response instance
      */
     public function collect(Response $response)
     {
@@ -133,7 +133,7 @@ class Profiler implements \ArrayAccess
     /**
      * Gets the Response.
      *
-     * @return Symfony\Components\HttpKernel\Response A Response instance
+     * @return Symfony\Components\HttpFoundation\Response A Response instance
      */
     public function getResponse()
     {

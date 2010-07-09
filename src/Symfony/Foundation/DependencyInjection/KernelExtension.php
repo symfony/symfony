@@ -35,6 +35,47 @@ class KernelExtension extends LoaderExtension
         return $configuration;
     }
 
+    /**
+     * Loads the session configuration.
+     *
+     * @param array                $config        A configuration array
+     * @param BuilderConfiguration $configuration A BuilderConfiguration instance
+     *
+     * @return BuilderConfiguration A BuilderConfiguration instance
+     */
+    public function sessionLoad($config, BuilderConfiguration $configuration)
+    {
+        if (!$configuration->hasDefinition('session')) {
+            $loader = new XmlFileLoader(array(__DIR__.'/../Resources/config', __DIR__.'/Resources/config'));
+            $configuration->merge($loader->load('session.xml'));
+        }
+
+        if (isset($config['default_locale'])) {
+            $configuration->setParameter('session.default_locale', $config['default_locale']);
+        }
+
+        if (isset($config['class'])) {
+            $configuration->setParameter('session.class', $config['class']);
+        }
+
+        foreach (array('name', 'auto_start', 'lifetime', 'path', 'domain', 'secure', 'httponly', 'cache_limiter', 'pdo.db_table') as $name) {
+            if (isset($config['session'][$name])) {
+                $configuration->setParameter('session.options.'.$name, $config['session'][$name]);
+            }
+        }
+
+        if (isset($config['session']['class'])) {
+            $class = $config['session']['class'];
+            if (in_array($class, array('Native', 'Pdo'))) {
+                $class = 'Symfony\\Framework\\FoundationBundle\\SessionStorage\\'.$class.'SessionStorage';
+            }
+
+            $configuration->setParameter('session.session', 'session.session.'.strtolower($class));
+        }
+
+        return $configuration;
+    }
+
     public function configLoad($config)
     {
         $configuration = new BuilderConfiguration();

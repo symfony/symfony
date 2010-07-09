@@ -6,8 +6,8 @@ use Symfony\Components\HttpKernel\HttpKernelInterface;
 use Symfony\Components\HttpKernel\Cache\Cache as BaseCache;
 use Symfony\Components\HttpKernel\Cache\Esi;
 use Symfony\Components\HttpKernel\Cache\Store;
-use Symfony\Components\HttpKernel\Request;
-use Symfony\Components\HttpKernel\Response;
+use Symfony\Components\HttpFoundation\Response;
+use Symfony\Components\HttpFoundation\Response;
 
 /*
  * This file is part of the Symfony package.
@@ -42,11 +42,11 @@ abstract class Cache extends BaseCache
     /**
      * Forwards the Request to the backend and returns the Response.
      *
-     * @param Symfony\Components\HttpKernel\Request  $request  A Request instance
+     * @param Symfony\Components\HttpFoundation\Response  $request  A Request instance
      * @param Boolean                                $raw      Whether to catch exceptions or not
-     * @param Symfony\Components\HttpKernel\Response $response A Response instance (the stale entry if present, null otherwise)
+     * @param Symfony\Components\HttpFoundation\Response $response A Response instance (the stale entry if present, null otherwise)
      *
-     * @return Symfony\Components\HttpKernel\Response A Response instance
+     * @return Symfony\Components\HttpFoundation\Response A Response instance
      */
     protected function forward(Request $request, $raw = false, Response $entry = null)
     {

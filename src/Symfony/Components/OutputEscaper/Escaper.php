@@ -234,18 +234,6 @@ abstract class Escaper
     }
 
     /**
-     * Gets a value from the escaper.
-     *
-     * @param  string $var  Value to get
-     *
-     * @return mixed Value
-     */
-    public function __get($var)
-    {
-        return $this->escape($this->escaper, $this->value->$var);
-    }
-
-    /**
      * Sets the current charset.
      *
      * @param string $charset The current charset

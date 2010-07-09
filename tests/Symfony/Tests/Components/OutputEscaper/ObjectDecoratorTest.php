@@ -36,10 +36,17 @@ class ObjectDecoratorTest extends \PHPUnit_Framework_TestCase
     {
         $this->assertEquals('&lt;strong&gt;escaped!&lt;/strong&gt;', self::$escaped->__toString(), 'The escaped object behaves like the real object');
     }
+
+    public function testMagicGet()
+    {
+        $this->assertEquals('&lt;em&gt;escape me&lt;/em&gt;', self::$escaped->someMember, 'The escaped object behaves like the real object');
+    }
 }
 
 class OutputEscaperTest
 {
+    public $someMember = '<em>escape me</em>';
+
     public function __toString()
     {
         return $this->getTitle();

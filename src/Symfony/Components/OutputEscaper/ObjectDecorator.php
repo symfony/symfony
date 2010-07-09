@@ -94,4 +94,16 @@ class ObjectDecorator extends GetterDecorator
     {
         return $this->escape($this->escaper, (string) $this->value);
     }
+
+    /**
+     * Gets a value from the escaper.
+     *
+     * @param string $key The name of the value to get
+     *
+     * @return mixed The value from the wrapped object
+     */
+    public function __get($key)
+    {
+        return $this->escape($this->escaper, $this->value->$key);
+    }
 }

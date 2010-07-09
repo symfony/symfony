@@ -2,11 +2,11 @@
 
 require_once __DIR__.'/../src/autoload.php';
 
-use Symfony\Foundation\Kernel;
+use Symfony\Framework\Kernel;
 use Symfony\Components\DependencyInjection\Loader\XmlFileLoader as ContainerLoader;
 use Symfony\Components\Routing\Loader\XmlFileLoader as RoutingLoader;
 
-use Symfony\Foundation\Bundle\KernelBundle;
+use Symfony\Framework\Bundle\KernelBundle;
 use Symfony\Bundle\FrameworkBundle\FrameworkBundle;
 use Symfony\Bundle\ZendBundle\ZendBundle;
 use Symfony\Bundle\DoctrineBundle\DoctrineBundle;

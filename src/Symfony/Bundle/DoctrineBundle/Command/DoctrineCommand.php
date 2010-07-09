@@ -10,7 +10,7 @@ use Symfony\Components\Console\Input\InputInterface;
 use Symfony\Components\Console\Output\OutputInterface;
 use Symfony\Components\Console\Output\Output;
 use Symfony\Bundle\FrameworkBundle\Console\Application;
-use Symfony\Foundation\Bundle\Bundle;
+use Symfony\Framework\Bundle\Bundle;
 use Doctrine\DBAL\Tools\Console\Helper\ConnectionHelper;
 use Doctrine\ORM\Tools\Console\Helper\EntityManagerHelper;
 use Doctrine\ORM\Tools\DisconnectedClassMetadataFactory;

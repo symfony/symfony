@@ -2,7 +2,7 @@
 
 namespace Symfony\Bundle\FrameworkBundle\Test;
 
-use Symfony\Foundation\Test\WebTestCase as BaseWebTestCase;
+use Symfony\Framework\Test\WebTestCase as BaseWebTestCase;
 use Symfony\Components\Finder\Finder;
 use Symfony\Components\HttpFoundation\Response;
 

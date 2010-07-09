@@ -7,7 +7,7 @@ use Symfony\Components\Console\Input\InputOption;
 use Symfony\Components\Console\Input\InputInterface;
 use Symfony\Components\Console\Output\OutputInterface;
 use Symfony\Components\Console\Output\Output;
-use Symfony\Foundation\Bundle\Bundle;
+use Symfony\Framework\Bundle\Bundle;
 use Doctrine\ORM\Tools\EntityGenerator;
 
 /*

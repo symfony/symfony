@@ -2,7 +2,7 @@
 
 namespace Symfony\Bundle\SwiftmailerBundle;
 
-use Symfony\Foundation\Bundle\Bundle;
+use Symfony\Framework\Bundle\Bundle;
 use Symfony\Components\DependencyInjection\ContainerInterface;
 use Symfony\Components\DependencyInjection\Loader\Loader;
 use Symfony\Bundle\SwiftmailerBundle\DependencyInjection\SwiftmailerExtension;

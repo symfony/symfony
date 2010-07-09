@@ -1,8 +1,6 @@
 <?php
 
-namespace Symfony\Bundle\DoctrineMigrationsBundle;
-
-use Symfony\Framework\Bundle\Bundle;
+namespace Symfony\Framework\Debug;
 
 /*
  * This file is part of the Symfony framework.
@@ -14,13 +12,12 @@ use Symfony\Framework\Bundle\Bundle;
  */
 
 /**
- * Bundle.
+ * ErrorException.
  *
  * @package    Symfony
- * @subpackage Bundle_DoctrineBundle
+ * @subpackage Framework
  * @author     Fabien Potencier <fabien.potencier@symfony-project.com>
- * @author     Jonathan H. Wage <jonwage@gmail.com>
  */
-class DoctrineMigrationsBundle extends Bundle
+class ErrorException extends \Exception
 {
 }

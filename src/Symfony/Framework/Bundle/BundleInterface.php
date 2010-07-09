@@ -1,12 +1,8 @@
 <?php
 
-namespace Symfony\Bundle\ZendBundle;
+namespace Symfony\Framework\Bundle;
 
-use Symfony\Framework\Bundle\Bundle;
 use Symfony\Components\DependencyInjection\ContainerInterface;
-use Symfony\Components\DependencyInjection\Reference;
-use Symfony\Components\DependencyInjection\Loader\Loader;
-use Symfony\Bundle\ZendBundle\DependencyInjection\ZendExtension;
 
 /*
  * This file is part of the Symfony framework.
@@ -18,13 +14,13 @@ use Symfony\Bundle\ZendBundle\DependencyInjection\ZendExtension;
  */
 
 /**
- * Bundle.
+ * BundleInterface.
  *
  * @package    Symfony
- * @subpackage Bundle_ZendBundle
+ * @subpackage Framework
  * @author     Fabien Potencier <fabien.potencier@symfony-project.com>
  */
-class ZendBundle extends Bundle
+interface BundleInterface
 {
     /**
      * Customizes the Container instance.
@@ -33,8 +29,19 @@ class ZendBundle extends Bundle
      *
      * @return Symfony\Components\DependencyInjection\BuilderConfiguration A BuilderConfiguration instance
      */
-    public function buildContainer(ContainerInterface $container)
-    {
-        Loader::registerExtension(new ZendExtension());
-    }
+    public function buildContainer(ContainerInterface $container);
+
+    /**
+     * Boots the Bundle.
+     *
+     * @param Symfony\Components\DependencyInjection\ContainerInterface $container A ContainerInterface instance
+     */
+    public function boot(ContainerInterface $container);
+
+    /**
+     * Shutdowns the Bundle.
+     *
+     * @param Symfony\Components\DependencyInjection\ContainerInterface $container A ContainerInterface instance
+     */
+    public function shutdown(ContainerInterface $container);
 }

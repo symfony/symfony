@@ -1,13 +1,14 @@
 <?php
 
-namespace Symfony\Bundle\FrameworkBundle;
+namespace Symfony\Framework;
 
 use Symfony\Framework\Bundle\Bundle;
+use Symfony\Framework\ClassCollectionLoader;
+use Symfony\Framework\DependencyInjection\KernelExtension;
 use Symfony\Components\DependencyInjection\ContainerInterface;
 use Symfony\Components\DependencyInjection\Loader\Loader;
 use Symfony\Components\DependencyInjection\Loader\XmlFileLoader;
 use Symfony\Components\DependencyInjection\BuilderConfiguration;
-use Symfony\Bundle\FrameworkBundle\DependencyInjection\WebExtension;
 
 /*
  * This file is part of the Symfony framework.
@@ -19,13 +20,13 @@ use Symfony\Bundle\FrameworkBundle\DependencyInjection\WebExtension;
  */
 
 /**
- * Bundle.
+ * KernelBundle.
  *
  * @package    Symfony
- * @subpackage Framework_FrameworkBundle
+ * @subpackage Framework
  * @author     Fabien Potencier <fabien.potencier@symfony-project.com>
  */
-class FrameworkBundle extends Bundle
+class KernelBundle extends Bundle
 {
     /**
      * Customizes the Container instance.
@@ -36,20 +37,33 @@ class FrameworkBundle extends Bundle
      */
     public function buildContainer(ContainerInterface $container)
     {
-        Loader::registerExtension(new WebExtension($container->getParameter('kernel.bundle_dirs'), $container->getParameter('kernel.bundles')));
-
-        $dirs = array('%kernel.root_dir%/views/%%bundle%%/%%controller%%/%%name%%%%format%%.%%renderer%%');
-        foreach ($container->getParameter('kernel.bundle_dirs') as $dir) {
-            $dirs[] = $dir.'/%%bundle%%/Resources/views/%%controller%%/%%name%%%%format%%.%%renderer%%';
-        }
-        $container->setParameter('templating.loader.filesystem.path', $dirs);
+        Loader::registerExtension(new KernelExtension());
 
         $configuration = new BuilderConfiguration();
+
+        $loader = new XmlFileLoader(array(__DIR__.'/../Resources/config', __DIR__.'/Resources/config'));
+        $configuration->merge($loader->load('services.xml'));
+
         if ($container->getParameter('kernel.debug')) {
-            $loader = new XmlFileLoader(__DIR__.'/Resources/config');
             $configuration->merge($loader->load('debug.xml'));
+            $configuration->setDefinition('event_dispatcher', $configuration->findDefinition('debug.event_dispatcher'));
         }
 
         return $configuration;
+    }
+
+    /**
+     * Boots the Bundle.
+     *
+     * @param Symfony\Components\DependencyInjection\ContainerInterface $container A ContainerInterface instance
+     */
+    public function boot(ContainerInterface $container)
+    {
+        $container->getErrorHandlerService();
+
+        // load core classes
+        if ($container->getParameter('kernel.include_core_classes')) {
+            ClassCollectionLoader::load($container->getParameter('kernel.compiled_classes'), $container->getParameter('kernel.cache_dir'), 'classes', $container->getParameter('kernel.debug'));
+        }
     }
 }

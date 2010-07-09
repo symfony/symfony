@@ -30,7 +30,7 @@ abstract class WebTestCase extends \PHPUnit_Framework_TestCase
      * @param Boolean $debug   The debug flag
      * @param array   $server  An array of server parameters
      *
-     * @return Symfony\Foundation\Client A Client instance
+     * @return Symfony\Framework\Client A Client instance
      */
     abstract public function createClient(array $options = array(), array $server = array());
 }

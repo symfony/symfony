@@ -2,7 +2,7 @@
 
 namespace Symfony\Bundle\FrameworkBundle\DataCollector;
 
-use Symfony\Foundation\Kernel;
+use Symfony\Framework\Kernel;
 use Symfony\Components\HttpKernel\Profiler\DataCollector\DataCollector;
 use Symfony\Components\DependencyInjection\ContainerInterface;
 

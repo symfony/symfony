@@ -6,7 +6,7 @@ use Symfony\Components\Console\Application as BaseApplication;
 use Symfony\Components\Console\Input\InputInterface;
 use Symfony\Components\Console\Input\InputOption;
 use Symfony\Components\Console\Output\OutputInterface;
-use Symfony\Foundation\Kernel;
+use Symfony\Framework\Kernel;
 use Symfony\Bundle\FrameworkBundle\Command\InitApplicationCommand;
 
 /*

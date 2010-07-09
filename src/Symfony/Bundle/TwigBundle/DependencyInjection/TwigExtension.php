@@ -32,8 +32,6 @@ class TwigExtension extends LoaderExtension
         }
 
         $configuration->setParameter('twig.options', array_replace($configuration->getParameter('twig.options'), $config));
-
-        return $configuration;
     }
 
     /**

@@ -60,8 +60,6 @@ class MongoDBExtension extends LoaderExtension
                 $configuration->setAlias('doctrine.odm.mongodb.'.$key, 'doctrine.odm.mongodb.'.$key.'.'.$config[$key]);
             }
         }
-
-        return $configuration;
     }
 
     /**

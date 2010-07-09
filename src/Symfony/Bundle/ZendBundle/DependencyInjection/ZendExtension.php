@@ -55,8 +55,6 @@ class ZendExtension extends LoaderExtension
         if (isset($config['path'])) {
             $configuration->setParameter('zend.logger.path', $config['path']);
         }
-
-        return $configuration;
     }
 
     /**

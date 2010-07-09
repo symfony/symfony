@@ -106,8 +106,6 @@ class SwiftMailerExtension extends LoaderExtension
         if (isset($config['disable_delivery']) && $config['disable_delivery']) {
             $configuration->findDefinition('swiftmailer.transport')->addMethodCall('registerPlugin', array(new Reference('swiftmailer.plugin.blackhole')));
         }
-
-        return $configuration;
     }
 
     /**

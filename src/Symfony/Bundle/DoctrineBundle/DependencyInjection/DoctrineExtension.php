@@ -133,8 +133,6 @@ class DoctrineExtension extends LoaderExtension
                 new Reference(sprintf('doctrine.dbal.%s_connection.event_manager', $name))
             ));
         }
-
-        return $configuration;
     }
 
     /**
@@ -255,8 +253,6 @@ class DoctrineExtension extends LoaderExtension
                 $configuration->getParameter('doctrine.orm.cache_driver')
             )
         );
-
-        return $configuration;
     }
 
     /**

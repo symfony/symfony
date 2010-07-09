@@ -166,8 +166,6 @@ class WebExtension extends LoaderExtension
                 $configuration->getDefinition('validator')->clearAnnotations();
             }
         }
-
-        return $configuration;
     }
 
     /**
@@ -221,8 +219,6 @@ class WebExtension extends LoaderExtension
             $configuration->setDefinition('templating.loader', $configuration->getDefinition('templating.loader.cache'));
             $configuration->setParameter('templating.loader.cache.path', $config['cache']);
         }
-
-        return $configuration;
     }
 
     /**

@@ -43,8 +43,6 @@ class PropelExtension extends LoaderExtension
         if (isset($config['phing_path'])) {
             $configuration->setParameter('propel.phing_path', $config['phing_path']);
         }
-
-        return $configuration;
     }
 
     /**
@@ -118,8 +116,6 @@ class PropelExtension extends LoaderExtension
         }
 
         $configuration->getDefinition('propel.configuration')->setArguments(array($c));
-
-        return $configuration;
     }
 
     /**

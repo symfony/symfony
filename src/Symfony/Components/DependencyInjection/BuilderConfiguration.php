@@ -112,7 +112,7 @@ class BuilderConfiguration
             $this->extensions[$namespace]->addResource(new FileResource($r->getFileName()));
         }
 
-        $this->extensions[$namespace] = $extension->load($tag, $values, $this->extensions[$namespace]);
+        $extension->load($tag, $values, $this->extensions[$namespace]);
 
         return $this;
     }

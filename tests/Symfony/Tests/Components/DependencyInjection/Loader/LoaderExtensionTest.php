@@ -31,7 +31,7 @@ class LoaderExtensionTest extends \PHPUnit_Framework_TestCase
             $this->assertEquals('The tag "project:foo" is not defined in the "project" extension.', $e->getMessage(), '->load() throws an InvalidArgumentException if the tag does not exist');
         }
 
-        $config = $extension->load('bar', array('foo' => 'bar'), new BuilderConfiguration());
+        $extension->load('bar', array('foo' => 'bar'), $config = new BuilderConfiguration());
         $this->assertEquals(array('project.parameter.bar' => 'bar', 'project.parameter.foo' => 'bar'), $config->getParameterBag()->all(), '->load() calls the method tied to the given tag');
     }
 }

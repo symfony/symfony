@@ -24,10 +24,8 @@ use Symfony\Components\DependencyInjection\BuilderConfiguration;
  */
 class KernelExtension extends LoaderExtension
 {
-    public function testLoad($config)
+    public function testLoad($config, BuilderConfiguration $configuration)
     {
-        $configuration = new BuilderConfiguration();
-
         $loader = new XmlFileLoader(array(__DIR__.'/../Resources/config', __DIR__.'/Resources/config'));
         $configuration->merge($loader->load('test.xml'));
         $configuration->setParameter('kernel.include_core_classes', false);
@@ -76,10 +74,8 @@ class KernelExtension extends LoaderExtension
         return $configuration;
     }
 
-    public function configLoad($config)
+    public function configLoad($config, BuilderConfiguration $configuration)
     {
-        $configuration = new BuilderConfiguration();
-
         if (isset($config['charset'])) {
             $configuration->setParameter('kernel.charset', $config['charset']);
         }

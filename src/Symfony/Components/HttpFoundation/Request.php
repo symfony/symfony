@@ -23,11 +23,35 @@ use Symfony\Components\HttpFoundation\SessionStorage\NativeSessionStorage;
 class Request
 {
     public $path;
+
+    /**
+     * @var \Symfony\Components\HttpFoundation\ParameterBag
+     */
     public $request;
+
+    /**
+     * @var \Symfony\Components\HttpFoundation\ParameterBag
+     */
     public $query;
+
+    /**
+     * @var \Symfony\Components\HttpFoundation\ParameterBag
+     */
     public $server;
+
+    /**
+     * @var \Symfony\Components\HttpFoundation\ParameterBag
+     */
     public $files;
+
+    /**
+     * @var \Symfony\Components\HttpFoundation\ParameterBag
+     */
     public $cookies;
+
+    /**
+     * @var \Symfony\Components\HttpFoundation\HeaderBag
+     */
     public $headers;
 
     protected $languages;

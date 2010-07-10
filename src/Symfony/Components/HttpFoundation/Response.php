@@ -20,6 +20,9 @@ namespace Symfony\Components\HttpFoundation;
  */
 class Response
 {
+    /**
+     * @var \Symfony\Components\HttpFoundation\HeaderBag
+     */
     public $headers;
 
     protected $content;

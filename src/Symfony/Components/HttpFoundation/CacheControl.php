@@ -30,7 +30,7 @@ class CacheControl
     /**
      * Constructor.
      *
-     * @param Symfony\Components\HttpKernel\HeaderBag $bag    A HeaderBag instance
+     * @param Symfony\Components\HttpFoundation\HeaderBag $bag    A HeaderBag instance
      * @param string                                  $header The value of the Cache-Control HTTP header
      * @param string                                  $type   The type (null, request, or response)
      */

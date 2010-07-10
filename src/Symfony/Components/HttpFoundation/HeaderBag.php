@@ -147,7 +147,7 @@ class HeaderBag
     /**
      * Returns an instance able to manage the Cache-Control header.
      *
-     * @return Symfony\Components\HttpKernel\Cache\CacheControl A CacheControl instance
+     * @return Symfony\Components\HttpFoundation\Cache\CacheControl A CacheControl instance
      */
     public function getCacheControl()
     {

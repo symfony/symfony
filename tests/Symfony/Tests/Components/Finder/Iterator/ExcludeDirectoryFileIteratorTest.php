@@ -13,16 +13,16 @@ namespace Symfony\Tests\Components\Finder\Iterator;
 
 use Symfony\Components\Finder\Iterator\ExcludeDirectoryFilterIterator;
 
-require_once __DIR__.'/IteratorTestCase.php';
+require_once __DIR__.'/RealIteratorTestCase.php';
 
-class ExcludeDirectoryFilterIteratorTest extends IteratorTestCase
+class ExcludeDirectoryFilterIteratorTest extends RealIteratorTestCase
 {
     /**
      * @dataProvider getAcceptData
      */
     public function testAccept($directories, $expected)
     {
-        $inner = new Iterator(array('/foo/test.php', '/foo/test.py', '/bar/foo.php'));
+        $inner = new \RecursiveIteratorIterator(new \RecursiveDirectoryIterator(sys_get_temp_dir().'/symfony2_finder', \FilesystemIterator::SKIP_DOTS), \RecursiveIteratorIterator::SELF_FIRST);
 
         $iterator = new ExcludeDirectoryFilterIterator($inner, $directories);
 
@@ -31,9 +31,23 @@ class ExcludeDirectoryFilterIteratorTest extends IteratorTestCase
 
     public function getAcceptData()
     {
+        $tmpDir = sys_get_temp_dir().'/symfony2_finder';
+
         return array(
-            array(array('foo'), array('/bar/foo.php')),
-            array(array('fo'), array('/foo/test.php', '/foo/test.py', '/bar/foo.php')),
+            array(array('foo'), array(
+                $tmpDir.'/.git',
+                $tmpDir.'/test.py',
+                $tmpDir.'/test.php',
+                $tmpDir.'/toto'
+            )),
+            array(array('fo'), array(
+                $tmpDir.'/.git',
+                $tmpDir.'/test.py',
+                $tmpDir.'/foo',
+                $tmpDir.'/foo/bar.tmp',
+                $tmpDir.'/test.php',
+                $tmpDir.'/toto'
+            )),
         );
     }
 }

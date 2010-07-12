@@ -32,7 +32,7 @@ class ExcludeDirectoryFilterIterator extends \FilterIterator
     {
         $this->patterns = array();
         foreach ($directories as $directory) {
-            $this->patterns[] = '#/'.preg_quote($directory, '#').'(/|$)#';
+            $this->patterns[] = '#(^|/)'.preg_quote($directory, '#').'(/|$)#';
         }
 
         parent::__construct($iterator);
@@ -45,15 +45,14 @@ class ExcludeDirectoryFilterIterator extends \FilterIterator
      */
     public function accept()
     {
-        $fileinfo = $this->getInnerIterator()->current();
+        $inner = $this;
+        while ($inner && !$inner->getInnerIterator() instanceof \RecursiveIteratorIterator) {
+            $inner = $inner->getInnerIterator();
+        }
 
         foreach ($this->patterns as $pattern) {
-            $path = $fileinfo->getPathname();
-            if ($fileinfo->isDir()) {
-                $path .= '/';
-            }
-
-            if (preg_match($pattern, $path)) {
+            $method = $inner->current()->isDir() ? 'getSubPathname' : 'getSubPath';
+            if (preg_match($pattern, $this->getInnerIterator()->$method())) {
                 return false;
             }
         }

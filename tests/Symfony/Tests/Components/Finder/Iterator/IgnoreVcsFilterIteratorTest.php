@@ -13,16 +13,24 @@ namespace Symfony\Tests\Components\Finder\Iterator;
 
 use Symfony\Components\Finder\Iterator\IgnoreVcsFilterIterator;
 
-require_once __DIR__.'/IteratorTestCase.php';
+require_once __DIR__.'/RealIteratorTestCase.php';
 
-class IgnoreVcsFilterIteratorTest extends IteratorTestCase
+class IgnoreVcsFilterIteratorTest extends RealIteratorTestCase
 {
     public function testAccept()
     {
-        $inner = new Iterator(array('/.git/test.php', '/foo/test.py', '/bar/foo.php'));
+        $inner = new \RecursiveIteratorIterator(new \RecursiveDirectoryIterator(sys_get_temp_dir().'/symfony2_finder', \FilesystemIterator::SKIP_DOTS), \RecursiveIteratorIterator::SELF_FIRST);
+        //$inner = new Iterator(array('/.git/test.php', '/foo/test.py', '/bar/foo.php'));
 
         $iterator = new IgnoreVcsFilterIterator($inner);
+        $tmpDir = sys_get_temp_dir().'/symfony2_finder';
 
-        $this->assertIterator(array('/foo/test.py', '/bar/foo.php'), $iterator);
+        $this->assertIterator(array(
+            $tmpDir.'/test.py',
+            $tmpDir.'/foo',
+            $tmpDir.'/foo/bar.tmp',
+            $tmpDir.'/test.php',
+            $tmpDir.'/toto'
+        ), $iterator);
     }
 }

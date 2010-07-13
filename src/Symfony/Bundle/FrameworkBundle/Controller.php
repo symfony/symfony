@@ -47,11 +47,6 @@ class Controller
         return $this->request = $request;
     }
 
-    public function getUser()
-    {
-        return $this->container->getUserService();
-    }
-
     public function getMailer()
     {
         return $this->container->getMailerService();

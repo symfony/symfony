@@ -1,8 +1,7 @@
 <?php
 
-namespace Symfony\Bundle\FrameworkBundle\Controller;
+namespace Symfony\Components\HttpKernel\Controller;
 
-use Symfony\Components\HttpKernel\LoggerInterface;
 use Symfony\Components\EventDispatcher\EventDispatcher;
 use Symfony\Components\EventDispatcher\Event;
 
@@ -26,12 +25,10 @@ use Symfony\Components\EventDispatcher\Event;
 class ControllerLoaderListener
 {
     protected $manager;
-    protected $logger;
 
-    public function __construct(ControllerManager $manager, LoggerInterface $logger = null)
+    public function __construct(ControllerManagerInterface $manager)
     {
         $this->manager = $manager;
-        $this->logger = $logger;
     }
 
     /**
@@ -55,20 +52,13 @@ class ControllerLoaderListener
     {
         $request = $event->getParameter('request');
 
-        if (!$controller = $request->path->get('_controller')) {
-            if (null !== $this->logger) {
-                $this->logger->err('Unable to look for the controller as the "_controller" parameter is missing');
-            }
-
+        if (false === $controller = $this->manager->getController($request)) {
             return false;
         }
 
-        list($controller, $method) = $this->manager->findController($controller);
-        $controller->setRequest($request);
+        $arguments = $this->manager->getMethodArguments($request, $controller);
 
-        $arguments = $this->manager->getMethodArguments($request->path->all(), $controller, $method);
-
-        $event->setReturnValue(array(array($controller, $method), $arguments));
+        $event->setReturnValue(array($controller, $arguments));
 
         return true;
     }

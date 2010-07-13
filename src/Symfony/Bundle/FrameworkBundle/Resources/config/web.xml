@@ -7,7 +7,7 @@
     <parameters>
         <parameter key="request_listener.class">Symfony\Bundle\FrameworkBundle\RequestListener</parameter>
         <parameter key="controller_manager.class">Symfony\Bundle\FrameworkBundle\Controller\ControllerManager</parameter>
-        <parameter key="controller_loader_listener.class">Symfony\Bundle\FrameworkBundle\Controller\ControllerLoaderListener</parameter>
+        <parameter key="controller_loader_listener.class">Symfony\Components\HttpKernel\Controller\ControllerLoaderListener</parameter>
         <parameter key="router.class">Symfony\Components\Routing\Router</parameter>
         <parameter key="response_listener.class">Symfony\Components\HttpKernel\ResponseListener</parameter>
         <parameter key="exception_listener.class">Symfony\Bundle\FrameworkBundle\Controller\ExceptionListener</parameter>

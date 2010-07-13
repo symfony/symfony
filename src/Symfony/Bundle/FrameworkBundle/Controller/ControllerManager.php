@@ -3,9 +3,10 @@
 namespace Symfony\Bundle\FrameworkBundle\Controller;
 
 use Symfony\Components\HttpKernel\LoggerInterface;
-use Symfony\Components\DependencyInjection\ContainerInterface;
+use Symfony\Components\HttpKernel\Controller\ControllerManagerInterface;
 use Symfony\Components\HttpKernel\HttpKernelInterface;
 use Symfony\Components\HttpFoundation\Request;
+use Symfony\Components\DependencyInjection\ContainerInterface;
 
 /*
  * This file is part of the Symfony framework.
@@ -23,7 +24,7 @@ use Symfony\Components\HttpFoundation\Request;
  * @subpackage Bundle_FrameworkBundle
  * @author     Fabien Potencier <fabien.potencier@symfony-project.com>
  */
-class ControllerManager
+class ControllerManager implements ControllerManagerInterface
 {
     protected $container;
     protected $logger;
@@ -112,16 +113,28 @@ class ControllerManager
     }
 
     /**
-     * Creates the Controller instance associated with the controller string
+     * Returns the Controller instance associated with a Request.
      *
-     * @param string $controller A controller name (a string like BlogBundle:Post:index)
+     * This method looks for a '_controller' request parameter that represents
+     * the controller name (a string like BlogBundle:Post:index).
      *
-     * @return array An array composed of the Controller instance and the Controller method
+     * @param \Symfony\Components\HttpFoundation\Request $request A Request instance
+     *
+     * @return mixed|Boolean A PHP callable representing the Controller,
+     *                       or false if this manager is not able to determine the controller
      *
      * @throws \InvalidArgumentException|\LogicException If the controller can't be found
      */
-    public function findController($controller)
+    public function getController(Request $request)
     {
+        if (!$controller = $request->path->get('_controller')) {
+            if (null !== $this->logger) {
+                $this->logger->err('Unable to look for the controller as the "_controller" parameter is missing');
+            }
+
+            return false;
+        }
+
         list($bundle, $controller, $action) = explode(':', $controller);
         $bundle = strtr($bundle, array('/' => '\\'));
         $class = null;
@@ -154,6 +167,7 @@ class ControllerManager
         }
 
         $controller = new $class($this->container);
+        $controller->setRequest($request);
 
         $method = $action.'Action';
         if (!method_exists($controller, $method)) {
@@ -168,10 +182,19 @@ class ControllerManager
     }
 
     /**
+     * Returns the arguments to pass to the controller.
+     *
+     * @param \Symfony\Components\HttpFoundation\Request $request    A Request instance
+     * @param mixed                                      $controller A PHP callable
+     *
      * @throws \RuntimeException When value for argument given is not provided
      */
-    public function getMethodArguments(array $path, $controller, $method)
+    public function getMethodArguments(Request $request, $controller)
     {
+        $path = $request->path->all();
+
+        list($controller, $method) = $controller;
+
         $r = new \ReflectionObject($controller);
         $arguments = array();
         foreach ($r->getMethod($method)->getParameters() as $param) {

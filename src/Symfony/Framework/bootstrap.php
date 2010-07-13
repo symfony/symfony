@@ -5,6 +5,7 @@ namespace Symfony\Framework\Bundle;
 use Symfony\Components\DependencyInjection\ContainerInterface;
 use Symfony\Components\DependencyInjection\ParameterBag\ParameterBagInterface;
 use Symfony\Components\Console\Application;
+use Symfony\Components\Finder\Finder;
 
 
 
@@ -74,25 +75,18 @@ abstract class Bundle implements BundleInterface
     
     public function registerCommands(Application $application)
     {
-        foreach ($application->getKernel()->getBundleDirs() as $dir) {
-            $bundleBase = dirname(str_replace('\\', '/', get_class($this)));
-            $commandDir = $dir.'/'.basename($bundleBase).'/Command';
-            if (!is_dir($commandDir)) {
-                continue;
-            }
+        if (!is_dir($dir = $this->getPath().'/Command')) {
+            return;
+        }
 
-                        foreach (new \RecursiveIteratorIterator(new \RecursiveDirectoryIterator($commandDir), \RecursiveIteratorIterator::LEAVES_ONLY) as $file) {
-                if ($file->isDir() || substr($file, -4) !== '.php') {
-                    continue;
-                }
+        $finder = new Finder();
+        $finder->files()->name('*Command.php')->in($dir);
 
-                $class = str_replace('/', '\\', $bundleBase).'\\Command\\'.str_replace(realpath($commandDir).'/', '', basename(realpath($file), '.php'));
-
-                $r = new \ReflectionClass($class);
-
-                if ($r->isSubclassOf('Symfony\\Components\\Console\\Command\\Command') && !$r->isAbstract()) {
-                    $application->addCommand(new $class());
-                }
+        $prefix = $this->namespacePrefix.'\\'.$this->name.'\\Command\\';
+        foreach ($finder as $file) {
+            $r = new \ReflectionClass($prefix.basename($file, '.php'));
+            if ($r->isSubclassOf('Symfony\\Components\\Console\\Command\\Command') && !$r->isAbstract()) {
+                $application->addCommand($r->newInstance());
             }
         }
     }

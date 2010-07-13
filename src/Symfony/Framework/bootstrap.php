@@ -3,6 +3,7 @@
 namespace Symfony\Framework\Bundle;
 
 use Symfony\Components\DependencyInjection\ContainerInterface;
+use Symfony\Components\DependencyInjection\ParameterBag\ParameterBagInterface;
 use Symfony\Components\Console\Application;
 
 
@@ -16,7 +17,7 @@ abstract class Bundle implements BundleInterface
     protected $reflection;
 
     
-    public function buildContainer(ContainerInterface $container)
+    public function buildContainer(ParameterBagInterface $parameterBag)
     {
     }
 
@@ -110,6 +111,7 @@ abstract class Bundle implements BundleInterface
 namespace Symfony\Framework\Bundle;
 
 use Symfony\Components\DependencyInjection\ContainerInterface;
+use Symfony\Components\DependencyInjection\ParameterBag\ParameterBagInterface;
 
 
 
@@ -117,7 +119,7 @@ use Symfony\Components\DependencyInjection\ContainerInterface;
 interface BundleInterface
 {
     
-    public function buildContainer(ContainerInterface $container);
+    public function buildContainer(ParameterBagInterface $parameterBag);
 
     
     public function boot(ContainerInterface $container);
@@ -132,6 +134,7 @@ namespace Symfony\Framework;
 use Symfony\Framework\Bundle\Bundle;
 use Symfony\Framework\ClassCollectionLoader;
 use Symfony\Framework\DependencyInjection\KernelExtension;
+use Symfony\Components\DependencyInjection\ParameterBag\ParameterBagInterface;
 use Symfony\Components\DependencyInjection\ContainerInterface;
 use Symfony\Components\DependencyInjection\Loader\Loader;
 use Symfony\Components\DependencyInjection\Loader\XmlFileLoader;
@@ -143,7 +146,7 @@ use Symfony\Components\DependencyInjection\BuilderConfiguration;
 class KernelBundle extends Bundle
 {
     
-    public function buildContainer(ContainerInterface $container)
+    public function buildContainer(ParameterBagInterface $parameterBag)
     {
         Loader::registerExtension(new KernelExtension());
 
@@ -152,7 +155,7 @@ class KernelBundle extends Bundle
         $loader = new XmlFileLoader(array(__DIR__.'/../Resources/config', __DIR__.'/Resources/config'));
         $configuration->merge($loader->load('services.xml'));
 
-        if ($container->getParameter('kernel.debug')) {
+        if ($parameterBag->get('kernel.debug')) {
             $configuration->merge($loader->load('debug.xml'));
             $configuration->setDefinition('event_dispatcher', $configuration->findDefinition('debug.event_dispatcher'));
         }
@@ -183,10 +186,8 @@ use Symfony\Components\DependencyInjection\BuilderConfiguration;
 
 class KernelExtension extends LoaderExtension
 {
-    public function testLoad($config)
+    public function testLoad($config, BuilderConfiguration $configuration)
     {
-        $configuration = new BuilderConfiguration();
-
         $loader = new XmlFileLoader(array(__DIR__.'/../Resources/config', __DIR__.'/Resources/config'));
         $configuration->merge($loader->load('test.xml'));
         $configuration->setParameter('kernel.include_core_classes', false);
@@ -228,10 +229,8 @@ class KernelExtension extends LoaderExtension
         return $configuration;
     }
 
-    public function configLoad($config)
+    public function configLoad($config, BuilderConfiguration $configuration)
     {
-        $configuration = new BuilderConfiguration();
-
         if (isset($config['charset'])) {
             $configuration->setParameter('kernel.charset', $config['charset']);
         }

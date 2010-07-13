@@ -3,7 +3,7 @@
 namespace Symfony\Bundle\DoctrineBundle;
 
 use Symfony\Framework\Bundle\Bundle;
-use Symfony\Components\DependencyInjection\ContainerInterface;
+use Symfony\Components\DependencyInjection\ParameterBag\ParameterBagInterface;
 use Symfony\Components\DependencyInjection\Loader\Loader;
 use Symfony\Components\DependencyInjection\Loader\XmlFileLoader;
 use Symfony\Bundle\DoctrineBundle\DependencyInjection\DoctrineExtension;
@@ -30,18 +30,18 @@ class DoctrineBundle extends Bundle
     /**
      * Customizes the Container instance.
      *
-     * @param Symfony\Components\DependencyInjection\ContainerInterface $container A ContainerInterface instance
+     * @param \Symfony\Components\DependencyInjection\ParameterBag\ParameterBagInterface $parameterBag A ParameterBagInterface instance
      *
-     * @return Symfony\Components\DependencyInjection\BuilderConfiguration A BuilderConfiguration instance
+     * @return \Symfony\Components\DependencyInjection\BuilderConfiguration A BuilderConfiguration instance
      */
-    public function buildContainer(ContainerInterface $container)
+    public function buildContainer(ParameterBagInterface $parameterBag)
     {
-        Loader::registerExtension(new DoctrineExtension($container->getParameter('kernel.bundle_dirs'), $container->getParameter('kernel.bundles')));
+        Loader::registerExtension(new DoctrineExtension($parameterBag->get('kernel.bundle_dirs'), $parameterBag->get('kernel.bundles')));
 
         $metadataDirs = array();
         $entityDirs = array();
-        $bundleDirs = $container->getParameter('kernel.bundle_dirs');
-        foreach ($container->getParameter('kernel.bundles') as $className) {
+        $bundleDirs = $parameterBag->get('kernel.bundle_dirs');
+        foreach ($parameterBag->get('kernel.bundles') as $className) {
             $tmp = dirname(str_replace('\\', '/', $className));
             $namespace = str_replace('/', '\\', dirname($tmp));
             $class = basename($tmp);
@@ -55,7 +55,7 @@ class DoctrineBundle extends Bundle
                 }
             }
         }
-        $container->setParameter('doctrine.orm.metadata_driver.mapping_dirs', $metadataDirs);
-        $container->setParameter('doctrine.orm.entity_dirs', $entityDirs);
+        $parameterBag->set('doctrine.orm.metadata_driver.mapping_dirs', $metadataDirs);
+        $parameterBag->set('doctrine.orm.entity_dirs', $entityDirs);
     }
 }

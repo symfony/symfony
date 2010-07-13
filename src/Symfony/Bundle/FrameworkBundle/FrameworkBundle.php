@@ -3,7 +3,7 @@
 namespace Symfony\Bundle\FrameworkBundle;
 
 use Symfony\Framework\Bundle\Bundle;
-use Symfony\Components\DependencyInjection\ContainerInterface;
+use Symfony\Components\DependencyInjection\ParameterBag\ParameterBagInterface;
 use Symfony\Components\DependencyInjection\Loader\Loader;
 use Symfony\Components\DependencyInjection\Loader\XmlFileLoader;
 use Symfony\Components\DependencyInjection\BuilderConfiguration;
@@ -30,22 +30,22 @@ class FrameworkBundle extends Bundle
     /**
      * Customizes the Container instance.
      *
-     * @param Symfony\Components\DependencyInjection\ContainerInterface $container A ContainerInterface instance
+     * @param \Symfony\Components\DependencyInjection\ParameterBag\ParameterBagInterface $parameterBag A ParameterBagInterface instance
      *
-     * @return Symfony\Components\DependencyInjection\BuilderConfiguration A BuilderConfiguration instance
+     * @return \Symfony\Components\DependencyInjection\BuilderConfiguration A BuilderConfiguration instance
      */
-    public function buildContainer(ContainerInterface $container)
+    public function buildContainer(ParameterBagInterface $parameterBag)
     {
-        Loader::registerExtension(new WebExtension($container->getParameter('kernel.bundle_dirs'), $container->getParameter('kernel.bundles')));
+        Loader::registerExtension(new WebExtension($parameterBag->get('kernel.bundle_dirs'), $parameterBag->get('kernel.bundles')));
 
         $dirs = array('%kernel.root_dir%/views/%%bundle%%/%%controller%%/%%name%%%%format%%.%%renderer%%');
-        foreach ($container->getParameter('kernel.bundle_dirs') as $dir) {
+        foreach ($parameterBag->get('kernel.bundle_dirs') as $dir) {
             $dirs[] = $dir.'/%%bundle%%/Resources/views/%%controller%%/%%name%%%%format%%.%%renderer%%';
         }
-        $container->setParameter('templating.loader.filesystem.path', $dirs);
+        $parameterBag->set('templating.loader.filesystem.path', $dirs);
 
         $configuration = new BuilderConfiguration();
-        if ($container->getParameter('kernel.debug')) {
+        if ($parameterBag->get('kernel.debug')) {
             $loader = new XmlFileLoader(__DIR__.'/Resources/config');
             $configuration->merge($loader->load('debug.xml'));
         }

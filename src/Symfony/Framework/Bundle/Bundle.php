@@ -3,6 +3,7 @@
 namespace Symfony\Framework\Bundle;
 
 use Symfony\Components\DependencyInjection\ContainerInterface;
+use Symfony\Components\DependencyInjection\ParameterBag\ParameterBagInterface;
 use Symfony\Components\Console\Application;
 
 /*
@@ -31,18 +32,18 @@ abstract class Bundle implements BundleInterface
     /**
      * Customizes the Container instance.
      *
-     * @param Symfony\Components\DependencyInjection\ContainerInterface $container A ContainerInterface instance
+     * @param \Symfony\Components\DependencyInjection\ParameterBag\ParameterBagInterface $parameterBag A ParameterBagInterface instance
      *
-     * @return Symfony\Components\DependencyInjection\BuilderConfiguration A BuilderConfiguration instance
+     * @return \Symfony\Components\DependencyInjection\BuilderConfiguration A BuilderConfiguration instance
      */
-    public function buildContainer(ContainerInterface $container)
+    public function buildContainer(ParameterBagInterface $parameterBag)
     {
     }
 
     /**
      * Boots the Bundle.
      *
-     * @param Symfony\Components\DependencyInjection\ContainerInterface $container A ContainerInterface instance
+     * @param \Symfony\Components\DependencyInjection\ContainerInterface $container A ContainerInterface instance
      */
     public function boot(ContainerInterface $container)
     {
@@ -51,7 +52,7 @@ abstract class Bundle implements BundleInterface
     /**
      * Shutdowns the Bundle.
      *
-     * @param Symfony\Components\DependencyInjection\ContainerInterface $container A ContainerInterface instance
+     * @param \Symfony\Components\DependencyInjection\ContainerInterface $container A ContainerInterface instance
      */
     public function shutdown(ContainerInterface $container)
     {

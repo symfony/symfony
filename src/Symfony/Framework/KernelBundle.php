@@ -5,6 +5,7 @@ namespace Symfony\Framework;
 use Symfony\Framework\Bundle\Bundle;
 use Symfony\Framework\ClassCollectionLoader;
 use Symfony\Framework\DependencyInjection\KernelExtension;
+use Symfony\Components\DependencyInjection\ParameterBag\ParameterBagInterface;
 use Symfony\Components\DependencyInjection\ContainerInterface;
 use Symfony\Components\DependencyInjection\Loader\Loader;
 use Symfony\Components\DependencyInjection\Loader\XmlFileLoader;
@@ -31,11 +32,11 @@ class KernelBundle extends Bundle
     /**
      * Customizes the Container instance.
      *
-     * @param Symfony\Components\DependencyInjection\ContainerInterface $container A ContainerInterface instance
+     * @param \Symfony\Components\DependencyInjection\ParameterBag\ParameterBagInterface $parameterBag A ParameterBagInterface instance
      *
-     * @return Symfony\Components\DependencyInjection\BuilderConfiguration A BuilderConfiguration instance
+     * @return \Symfony\Components\DependencyInjection\BuilderConfiguration A BuilderConfiguration instance
      */
-    public function buildContainer(ContainerInterface $container)
+    public function buildContainer(ParameterBagInterface $parameterBag)
     {
         Loader::registerExtension(new KernelExtension());
 
@@ -44,7 +45,7 @@ class KernelBundle extends Bundle
         $loader = new XmlFileLoader(array(__DIR__.'/../Resources/config', __DIR__.'/Resources/config'));
         $configuration->merge($loader->load('services.xml'));
 
-        if ($container->getParameter('kernel.debug')) {
+        if ($parameterBag->get('kernel.debug')) {
             $configuration->merge($loader->load('debug.xml'));
             $configuration->setDefinition('event_dispatcher', $configuration->findDefinition('debug.event_dispatcher'));
         }

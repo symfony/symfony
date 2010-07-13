@@ -338,17 +338,19 @@ abstract class Kernel implements HttpKernelInterface, \Serializable
 
     protected function buildContainer($class, $file)
     {
-        $container = new Builder(new ParameterBag($this->getKernelParameters()));
+        $parameterBag = new ParameterBag($this->getKernelParameters());
 
         $configuration = new BuilderConfiguration();
         foreach ($this->bundles as $bundle) {
-            $configuration->merge($bundle->buildContainer($container));
+            $configuration->merge($bundle->buildContainer($parameterBag));
 
             if ($this->debug) {
                 $configuration->addObjectResource($bundle);
             }
         }
         $configuration->merge($this->registerContainerConfiguration());
+
+        $container = new Builder($parameterBag);
         $container->merge($configuration);
         $container->freeze();
 

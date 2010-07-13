@@ -3,7 +3,7 @@
 namespace Symfony\Bundle\DoctrineMongoDBBundle;
 
 use Symfony\Framework\Bundle\Bundle;
-use Symfony\Components\DependencyInjection\ContainerInterface;
+use Symfony\Components\DependencyInjection\ParameterBag\ParameterBagInterface;
 use Symfony\Components\DependencyInjection\Loader\Loader;
 use Symfony\Bundle\DoctrineMongoDBBundle\DependencyInjection\MongoDBExtension;
 
@@ -16,8 +16,15 @@ use Symfony\Bundle\DoctrineMongoDBBundle\DependencyInjection\MongoDBExtension;
  */
 class DoctrineMongoDBBundle extends Bundle 
 {
-    public function buildContainer(ContainerInterface $container) 
+    /**
+     * Customizes the Container instance.
+     *
+     * @param \Symfony\Components\DependencyInjection\ParameterBag\ParameterBagInterface $parameterBag A ParameterBagInterface instance
+     *
+     * @return \Symfony\Components\DependencyInjection\BuilderConfiguration A BuilderConfiguration instance
+     */
+    public function buildContainer(ParameterBagInterface $parameterBag)
     {
-        Loader::registerExtension(new MongoDBExtension($container->getParameter('kernel.bundles')));
+        Loader::registerExtension(new MongoDBExtension($parameterBag->get('kernel.bundles')));
     }
 }

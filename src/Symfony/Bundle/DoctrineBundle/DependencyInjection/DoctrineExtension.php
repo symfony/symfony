@@ -125,7 +125,7 @@ class DoctrineExtension extends Extension
             if (isset($connection['options'])) {
                 $driverOptions['driverOptions'] = $connection['options'];
             }
-            foreach (array('dbname', 'host', 'user', 'password', 'path', 'port', 'unix_socket') as $key) {
+            foreach (array('dbname', 'host', 'user', 'password', 'path', 'memory', 'port', 'unix_socket', 'charset') as $key) {
                 if (isset($connection[$key])) {
                     $driverOptions[$key] = $connection[$key];
                 }

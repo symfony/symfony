@@ -21,6 +21,9 @@
     <xsd:attribute name="driver" type="xsd:string" />
     <xsd:attribute name="options" type="xsd:string" />
     <xsd:attribute name="path" type="xsd:string" />
+    <xsd:attribute name="unix_socket" type="xsd:string" />
+    <xsd:attribute name="memory" type="xsd:boolean" />
+    <xsd:attribute name="charset" type="xsd:string" />
   </xsd:complexType>
 
   <xsd:complexType name="connections">
@@ -39,6 +42,9 @@
     <xsd:attribute name="driver" type="xsd:string" />
     <xsd:attribute name="options" type="xsd:string" />
     <xsd:attribute name="path" type="xsd:string" />
+    <xsd:attribute name="unix_socket" type="xsd:string" />
+    <xsd:attribute name="memory" type="xsd:boolean" />
+    <xsd:attribute name="charset" type="xsd:string" />
     <xsd:attribute name="configuration_class" type="xsd:string" />
     <xsd:attribute name="event_manager_class" type="xsd:string" />
     <xsd:attribute name="wrapper_class" type="xsd:string" />

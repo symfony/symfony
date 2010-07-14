@@ -81,7 +81,12 @@ class DoctrineExtension extends Extension
 
         $connections = array();
         if (isset($config['connections'])) {
-            foreach ($config['connections'] as $name => $connection) {
+            $config_connections = $config['connections'];
+            if(isset($config['connections']['connection']) && isset($config['connections']['connection'][0])) {
+                // Multiple connections
+                $config_connections = $config['connections']['connection'];
+            }
+            foreach ($config_connections as $name => $connection) {
                 $connections[isset($connection['id']) ? $connection['id'] : $name] = $connection;
             }
         } else {

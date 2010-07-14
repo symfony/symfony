@@ -1,0 +1,19 @@
+<?xml version="1.0" ?>
+
+<container xmlns="http://www.symfony-project.org/schema/dic/services"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xmlns:doctrine="http://www.symfony-project.org/schema/dic/doctrine"
+    xsi:schemaLocation="http://www.symfony-project.org/schema/dic/services http://www.symfony-project.org/schema/dic/services/services-1.0.xsd
+                        http://www.symfony-project.org/schema/dic/doctrine http://www.symfony-project.org/schema/dic/doctrine/doctrine-1.0.xsd">
+
+    <doctrine:dbal>
+      <doctrine:connections>
+        <doctrine:connection
+            id="mysql"
+            dbname="mysql_db"
+            user="mysql_user"
+            password="mysql_s3cr3t"
+            unix_socket="/path/to/mysqld.sock" /><!--  -->
+      </doctrine:connections>
+    </doctrine:dbal>
+</container>

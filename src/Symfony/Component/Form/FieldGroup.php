@@ -373,6 +373,10 @@ class FieldGroup extends Field implements \IteratorAggregate, FieldGroupInterfac
             if ($type === self::FIELD_ERROR && $path->hasNext()) {
                 $path->next();
 
+                if ($path->isProperty() && $path->getCurrent() === 'fields') {
+                    $path->next();
+                }
+
                 if ($this->has($path->getCurrent()) && !$this->get($path->getCurrent())->isHidden()) {
                     $this->get($path->getCurrent())->addError($message, $path, $type);
 

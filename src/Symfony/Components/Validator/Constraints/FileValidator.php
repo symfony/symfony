@@ -6,7 +6,7 @@ use Symfony\Components\Validator\Constraint;
 use Symfony\Components\Validator\ConstraintValidator;
 use Symfony\Components\Validator\Exception\ConstraintDefinitionException;
 use Symfony\Components\Validator\Exception\UnexpectedTypeException;
-use Symfony\Components\File\File;
+use Symfony\Components\File\File as FileObject;
 
 class FileValidator extends ConstraintValidator
 {
@@ -16,11 +16,11 @@ class FileValidator extends ConstraintValidator
             return true;
         }
 
-        if (!is_scalar($value) && !$value instanceof File && !(is_object($value) && method_exists($value, '__toString()'))) {
+        if (!is_scalar($value) && !$value instanceof FileObject && !(is_object($value) && method_exists($value, '__toString()'))) {
             throw new UnexpectedTypeException($value, 'string');
         }
 
-        $path = $value instanceof File ? $value->getPath() : (string)$value;
+        $path = $value instanceof FileObject ? $value->getPath() : (string)$value;
 
         if (!file_exists($path)) {
             $this->setMessage($constraint->notFoundMessage, array('file' => $path));
@@ -63,7 +63,7 @@ class FileValidator extends ConstraintValidator
         }
 
         if ($constraint->mimeTypes) {
-            if (!$value instanceof File) {
+            if (!$value instanceof FileObject) {
                 throw new ConstraintValidationException();
             }
 

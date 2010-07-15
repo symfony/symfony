@@ -132,7 +132,7 @@ use Symfony\Components\DependencyInjection\ParameterBag\ParameterBagInterface;
 use Symfony\Components\DependencyInjection\ContainerInterface;
 use Symfony\Components\DependencyInjection\Loader\Loader;
 use Symfony\Components\DependencyInjection\Loader\XmlFileLoader;
-use Symfony\Components\DependencyInjection\BuilderConfiguration;
+use Symfony\Components\DependencyInjection\ContainerBuilder;
 
 
 
@@ -144,7 +144,7 @@ class KernelBundle extends Bundle
     {
         Loader::registerExtension(new KernelExtension());
 
-        $configuration = new BuilderConfiguration();
+        $configuration = new ContainerBuilder();
 
         $loader = new XmlFileLoader(array(__DIR__.'/../Resources/config', __DIR__.'/Resources/config'));
         $configuration->merge($loader->load('services.xml'));
@@ -173,14 +173,14 @@ namespace Symfony\Framework\DependencyInjection;
 
 use Symfony\Components\DependencyInjection\Loader\LoaderExtension;
 use Symfony\Components\DependencyInjection\Loader\XmlFileLoader;
-use Symfony\Components\DependencyInjection\BuilderConfiguration;
+use Symfony\Components\DependencyInjection\ContainerBuilder;
 
 
 
 
 class KernelExtension extends LoaderExtension
 {
-    public function testLoad($config, BuilderConfiguration $configuration)
+    public function testLoad($config, ContainerBuilder $configuration)
     {
         $loader = new XmlFileLoader(array(__DIR__.'/../Resources/config', __DIR__.'/Resources/config'));
         $configuration->merge($loader->load('test.xml'));
@@ -190,7 +190,7 @@ class KernelExtension extends LoaderExtension
     }
 
     
-    public function sessionLoad($config, BuilderConfiguration $configuration)
+    public function sessionLoad($config, ContainerBuilder $configuration)
     {
         if (!$configuration->hasDefinition('session')) {
             $loader = new XmlFileLoader(array(__DIR__.'/../Resources/config', __DIR__.'/Resources/config'));
@@ -223,7 +223,7 @@ class KernelExtension extends LoaderExtension
         return $configuration;
     }
 
-    public function configLoad($config, BuilderConfiguration $configuration)
+    public function configLoad($config, ContainerBuilder $configuration)
     {
         if (isset($config['charset'])) {
             $configuration->setParameter('kernel.charset', $config['charset']);

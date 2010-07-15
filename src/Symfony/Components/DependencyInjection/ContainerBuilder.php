@@ -2,6 +2,10 @@
 
 namespace Symfony\Components\DependencyInjection;
 
+use Symfony\Components\DependencyInjection\Loader\LoaderExtensionInterface;
+use Symfony\Components\DependencyInjection\Resource\ResourceInterface;
+use Symfony\Components\DependencyInjection\Resource\FileResource;
+
 /*
  * This file is part of the Symfony framework.
  *
@@ -12,17 +16,84 @@ namespace Symfony\Components\DependencyInjection;
  */
 
 /**
- * Builder is a DI container that provides an interface to build the services.
+ * ContainerBuilder is a DI container that provides an API to easily describe services.
  *
  * @package    Symfony
  * @subpackage Components_DependencyInjection
  * @author     Fabien Potencier <fabien.potencier@symfony-project.com>
  */
-class Builder extends Container implements AnnotatedContainerInterface
+class ContainerBuilder extends Container implements AnnotatedContainerInterface
 {
     protected $definitions = array();
     protected $aliases     = array();
     protected $loading     = array();
+    protected $resources   = array();
+    protected $extensions  = array();
+
+    /**
+     * Returns an array of resources loaded to build this configuration.
+     *
+     * @return ResourceInterface[] An array of resources
+     */
+    public function getResources()
+    {
+        return array_unique($this->resources);
+    }
+
+    /**
+     * Adds a resource for this configuration.
+     *
+     * @param ResourceInterface $resource A resource instance
+     *
+     * @return ContainerBuilder The current instance
+     */
+    public function addResource(ResourceInterface $resource)
+    {
+        $this->resources[] = $resource;
+
+        return $this;
+    }
+
+    /**
+     * Adds the object class hierarchy as resources.
+     *
+     * @param object $object An object instance
+     */
+    public function addObjectResource($object)
+    {
+        $parent = new \ReflectionObject($object);
+        $this->addResource(new FileResource($parent->getFileName()));
+        while ($parent = $parent->getParentClass()) {
+            $this->addResource(new FileResource($parent->getFileName()));
+        }
+    }
+
+    /**
+     * Loads the configuration for an extension.
+     *
+     * @param LoaderExtensionInterface $extension A LoaderExtensionInterface instance
+     * @param string                   $tag       The extension tag to load (without the namespace - namespace.tag)
+     * @param array                    $values    An array of values that customizes the extension
+     *
+     * @return ContainerBuilder The current instance
+     */
+    public function loadFromExtension(LoaderExtensionInterface $extension, $tag, array $values = array())
+    {
+        $namespace = $extension->getAlias();
+
+        $this->addObjectResource($extension);
+
+        if (!isset($this->extensions[$namespace])) {
+            $this->extensions[$namespace] = new self($this->parameterBag);
+
+            $r = new \ReflectionObject($extension);
+            $this->extensions[$namespace]->addResource(new FileResource($r->getFileName()));
+        }
+
+        $extension->load($tag, $values, $this->extensions[$namespace]);
+
+        return $this;
+    }
 
     /**
      * Sets a service.
@@ -97,7 +168,7 @@ class Builder extends Container implements AnnotatedContainerInterface
     }
 
     /**
-     * Merges a BuilderConfiguration with the current Builder configuration.
+     * Merges a ContainerBuilder with the current ContainerBuilder configuration.
      *
      * Service definitions overrides the current defined ones.
      *
@@ -105,33 +176,65 @@ class Builder extends Container implements AnnotatedContainerInterface
      * the parameters passed to the container constructor to have precedence
      * over the loaded ones.
      *
-     * $container = new Builder(array('foo' => 'bar'));
+     * $container = new ContainerBuilder(array('foo' => 'bar'));
      * $loader = new LoaderXXX($container);
      * $loader->load('resource_name');
      * $container->register('foo', new stdClass());
      *
      * In the above example, even if the loaded resource defines a foo
-     * parameter, the value will still be 'bar' as defined in the builder
+     * parameter, the value will still be 'bar' as defined in the ContainerBuilder
      * constructor.
      */
-    public function merge(BuilderConfiguration $configuration = null)
+    public function merge(ContainerBuilder $container)
     {
-        if (null === $configuration) {
-            return;
+        $this->addDefinitions($container->getDefinitions());
+        $this->addAliases($container->getAliases());
+        $this->parameterBag->add($container->getParameterBag()->all());
+
+        foreach ($container->getResources() as $resource) {
+            $this->addResource($resource);
         }
 
-        $this->addDefinitions($configuration->getDefinitions());
-        $this->addAliases($configuration->getAliases());
-
-        $parameterBag = $this->getParameterBag();
-        $currentParameters = $parameterBag->all();
-        foreach ($configuration->getParameterBag()->all() as $key => $value) {
-            $parameterBag->set($key, $value);
+        foreach ($container->getExtensionContainers() as $name => $container) {
+            if (isset($this->extensions[$name])) {
+                $this->extensions[$name]->merge($container);
+            } else {
+                $this->extensions[$name] = $container;
+            }
         }
-        $parameterBag->add($currentParameters);
+    }
 
-        foreach ($parameterBag->all() as $key => $value) {
-            $parameterBag->set($key, self::resolveValue($value, $this->getParameterBag()->all()));
+    /**
+     * Returns the containers for the registered extensions.
+     *
+     * @return LoaderExtensionInterface[] An array of extension containers
+     */
+    public function getExtensionContainers()
+    {
+        return $this->extensions;
+    }
+
+    /**
+     * Commits the extension configuration into the main configuration
+     * and resolves parameter values.
+     */
+    public function commit()
+    {
+        $parameters = $this->parameterBag->all();
+        $definitions = $this->definitions;
+        $aliases = $this->aliases;
+
+        foreach ($this->extensions as $container) {
+            $this->merge($container);
+        }
+        $this->extensions = array();
+
+        $this->addDefinitions($definitions);
+        $this->addAliases($aliases);
+        $this->parameterBag->add($parameters);
+
+        foreach ($this->parameterBag->all() as $key => $value) {
+            $this->parameterBag->set($key, self::resolveValue($value, $this->getParameterBag()->all()));
         }
     }
 
@@ -311,6 +414,26 @@ class Builder extends Container implements AnnotatedContainerInterface
         }
 
         return $this->definitions[$id];
+    }
+
+    /**
+     * Gets a service definition by id or alias.
+     *
+     * The method "unaliases" recursively to return a Definition instance.
+     *
+     * @param  string  $id The service identifier or alias
+     *
+     * @return Definition A Definition instance
+     *
+     * @throws \InvalidArgumentException if the service definition does not exist
+     */
+    public function findDefinition($id)
+    {
+        if ($this->hasAlias($id)) {
+            return $this->findDefinition($this->getAlias($id));
+        }
+
+        return $this->getDefinition($id);
     }
 
     /**

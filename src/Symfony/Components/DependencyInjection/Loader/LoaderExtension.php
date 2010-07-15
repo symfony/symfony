@@ -2,7 +2,7 @@
 
 namespace Symfony\Components\DependencyInjection\Loader;
 
-use Symfony\Components\DependencyInjection\BuilderConfiguration;
+use Symfony\Components\DependencyInjection\ContainerBuilder;
 
 /*
  * This file is part of the Symfony framework.
@@ -22,29 +22,16 @@ use Symfony\Components\DependencyInjection\BuilderConfiguration;
  */
 abstract class LoaderExtension implements LoaderExtensionInterface
 {
-    protected $resources = array();
-
-    /**
-     * Sets a configuration entry point for the given extension name.
-     *
-     * @param string $name     The configuration extension name
-     * @param mixed  $resource A resource
-     */
-    public function setConfiguration($name, $resource)
-    {
-        $this->resources[$name] = $resource;
-    }
-
     /**
      * Loads a specific configuration.
      *
-     * @param string               $tag           The tag name
-     * @param array                $config        An array of configuration values
-     * @param BuilderConfiguration $configuration A BuilderConfiguration instance
+     * @param string  $tag           The tag name
+     * @param array   $config        An array of configuration values
+     * @param ContainerBuilder $configuration A ContainerBuilder instance
      *
      * @throws \InvalidArgumentException When provided tag is not defined in this extension
      */
-    public function load($tag, array $config, BuilderConfiguration $configuration)
+    public function load($tag, array $config, ContainerBuilder $configuration)
     {
         if (!method_exists($this, $method = $tag.'Load')) {
             throw new \InvalidArgumentException(sprintf('The tag "%s:%s" is not defined in the "%s" extension.', $this->getAlias(), $tag, $this->getAlias()));

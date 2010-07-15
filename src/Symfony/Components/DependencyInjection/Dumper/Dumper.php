@@ -2,7 +2,7 @@
 
 namespace Symfony\Components\DependencyInjection\Dumper;
 
-use Symfony\Components\DependencyInjection\Builder;
+use Symfony\Components\DependencyInjection\ContainerBuilder;
 
 /*
  * This file is part of the Symfony framework.
@@ -27,9 +27,9 @@ abstract class Dumper implements DumperInterface
     /**
      * Constructor.
      *
-     * @param Builder $container The service container to dump
+     * @param ContainerBuilder $container The service container to dump
      */
-    public function __construct(Builder $container)
+    public function __construct(ContainerBuilder $container)
     {
         $this->container = $container;
     }

@@ -4,7 +4,7 @@ namespace Symfony\Bundle\TwigBundle\DependencyInjection;
 
 use Symfony\Components\DependencyInjection\Loader\LoaderExtension;
 use Symfony\Components\DependencyInjection\Loader\XmlFileLoader;
-use Symfony\Components\DependencyInjection\BuilderConfiguration;
+use Symfony\Components\DependencyInjection\ContainerBuilder;
 
 /*
  * This file is part of the Symfony framework.
@@ -28,16 +28,16 @@ class TwigExtension extends LoaderExtension
      * Loads the Twig configuration.
      *
      * @param array                                                        $config        An array of configuration settings
-     * @param \Symfony\Components\DependencyInjection\BuilderConfiguration $configuration A BuilderConfiguration instance
+     * @param \Symfony\Components\DependencyInjection\ContainerBuilder $container A ContainerBuilder instance
      */
-    public function configLoad($config, BuilderConfiguration $configuration)
+    public function configLoad($config, ContainerBuilder $container)
     {
-        if (!$configuration->hasDefinition('twig')) {
+        if (!$container->hasDefinition('twig')) {
             $loader = new XmlFileLoader(__DIR__.'/../Resources/config');
-            $configuration->merge($loader->load('twig.xml'));
+            $container->merge($loader->load('twig.xml'));
         }
 
-        $configuration->setParameter('twig.options', array_replace($configuration->getParameter('twig.options'), $config));
+        $container->setParameter('twig.options', array_replace($container->getParameter('twig.options'), $config));
     }
 
     /**

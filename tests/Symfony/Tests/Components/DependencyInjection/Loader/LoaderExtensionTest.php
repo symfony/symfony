@@ -12,7 +12,7 @@ namespace Symfony\Tests\Components\DependencyInjection\Loader;
 
 require_once __DIR__.'/../Fixtures/includes/ProjectExtension.php';
 
-use Symfony\Components\DependencyInjection\BuilderConfiguration;
+use Symfony\Components\DependencyInjection\ContainerBuilder;
 
 class LoaderExtensionTest extends \PHPUnit_Framework_TestCase
 {
@@ -24,14 +24,14 @@ class LoaderExtensionTest extends \PHPUnit_Framework_TestCase
         $extension = new \ProjectExtension();
 
         try {
-            $extension->load('foo', array(), new BuilderConfiguration());
+            $extension->load('foo', array(), new ContainerBuilder());
             $this->fail('->load() throws an InvalidArgumentException if the tag does not exist');
         } catch (\Exception $e) {
             $this->assertInstanceOf('\InvalidArgumentException', $e, '->load() throws an InvalidArgumentException if the tag does not exist');
             $this->assertEquals('The tag "project:foo" is not defined in the "project" extension.', $e->getMessage(), '->load() throws an InvalidArgumentException if the tag does not exist');
         }
 
-        $extension->load('bar', array('foo' => 'bar'), $config = new BuilderConfiguration());
+        $extension->load('bar', array('foo' => 'bar'), $config = new ContainerBuilder());
         $this->assertEquals(array('project.parameter.bar' => 'bar', 'project.parameter.foo' => 'bar'), $config->getParameterBag()->all(), '->load() calls the method tied to the given tag');
     }
 }

@@ -2,7 +2,7 @@
 
 namespace Symfony\Components\DependencyInjection\Loader;
 
-use Symfony\Components\DependencyInjection\BuilderConfiguration;
+use Symfony\Components\DependencyInjection\ContainerBuilder;
 
 /*
  * This file is part of the Symfony framework.
@@ -19,7 +19,7 @@ use Symfony\Components\DependencyInjection\BuilderConfiguration;
  * $loader = new XXXLoader();
  * $config = $loader->load('resource_name');
  *
- * $container = new Builder();
+ * $container = new ContainerBuilder();
  * $container->merge($config);
  *
  * @package    Symfony
@@ -32,7 +32,7 @@ interface LoaderInterface
      * Loads a resource.
      *
      * A resource can be anything that can be converted to a
-     * BuilderConfiguration instance.
+     * ContainerBuilder instance.
      *
      * Some loaders support an array of resources as an argument to the
      * constructor.
@@ -58,13 +58,12 @@ interface LoaderInterface
      * If you load file1.xml and file2.xml in this order, the value of complex
      * will be "foo".
      *
-     * @param mixed                $resource       The resource
-     * @param Boolean              $main           Whether this is the main load() call
-     * @param BuilderConfiguration $configuration  A BuilderConfiguration instance to use for the configuration
+     * @param mixed            $resource       The resource
+     * @param ContainerBuilder $container  A ContainerBuilder instance to use for the configuration
      *
-     * @return BuilderConfiguration A BuilderConfiguration instance
+     * @return ContainerBuilder A ContainerBuilder instance
      */
-    function load($resource, $main = true, BuilderConfiguration $configuration = null);
+    function load($resource, ContainerBuilder $container = null);
 
     static function registerExtension(LoaderExtensionInterface $extension);
 }

@@ -6,7 +6,7 @@ use Symfony\Framework\Bundle\Bundle;
 use Symfony\Components\DependencyInjection\ParameterBag\ParameterBagInterface;
 use Symfony\Components\DependencyInjection\Loader\Loader;
 use Symfony\Components\DependencyInjection\Loader\XmlFileLoader;
-use Symfony\Components\DependencyInjection\BuilderConfiguration;
+use Symfony\Components\DependencyInjection\ContainerBuilder;
 use Symfony\Bundle\FrameworkBundle\DependencyInjection\WebExtension;
 
 /*
@@ -32,7 +32,7 @@ class FrameworkBundle extends Bundle
      *
      * @param \Symfony\Components\DependencyInjection\ParameterBag\ParameterBagInterface $parameterBag A ParameterBagInterface instance
      *
-     * @return \Symfony\Components\DependencyInjection\BuilderConfiguration A BuilderConfiguration instance
+     * @return \Symfony\Components\DependencyInjection\ContainerBuilder A ContainerBuilder instance
      */
     public function buildContainer(ParameterBagInterface $parameterBag)
     {
@@ -44,12 +44,12 @@ class FrameworkBundle extends Bundle
         }
         $parameterBag->set('templating.loader.filesystem.path', $dirs);
 
-        $configuration = new BuilderConfiguration();
+        $container = new ContainerBuilder();
         if ($parameterBag->get('kernel.debug')) {
             $loader = new XmlFileLoader(__DIR__.'/Resources/config');
-            $configuration->merge($loader->load('debug.xml'));
+            $container->merge($loader->load('debug.xml'));
         }
 
-        return $configuration;
+        return $container;
     }
 }

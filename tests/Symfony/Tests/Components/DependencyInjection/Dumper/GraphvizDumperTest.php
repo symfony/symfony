@@ -10,7 +10,7 @@
 
 namespace Symfony\Tests\Components\DependencyInjection\Dumper;
 
-use Symfony\Components\DependencyInjection\Builder;
+use Symfony\Components\DependencyInjection\ContainerBuilder;
 use Symfony\Components\DependencyInjection\Dumper\GraphvizDumper;
 
 class GraphvizDumperTest extends \PHPUnit_Framework_TestCase
@@ -24,11 +24,11 @@ class GraphvizDumperTest extends \PHPUnit_Framework_TestCase
 
     public function testDump()
     {
-        $dumper = new GraphvizDumper($container = new Builder());
+        $dumper = new GraphvizDumper($container = new ContainerBuilder());
 
         $this->assertStringEqualsFile(self::$fixturesPath.'/graphviz/services1.dot', $dumper->dump(), '->dump() dumps an empty container as an empty dot file');
 
-        $container = new Builder();
+        $container = new ContainerBuilder();
         $dumper = new GraphvizDumper($container);
 
         $container = include self::$fixturesPath.'/containers/container9.php';

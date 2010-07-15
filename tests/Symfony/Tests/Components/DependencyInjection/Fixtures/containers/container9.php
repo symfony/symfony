@@ -3,11 +3,11 @@
 require_once __DIR__.'/../includes/classes.php';
 
 use Symfony\Components\DependencyInjection\ContainerInterface;
-use Symfony\Components\DependencyInjection\Builder;
+use Symfony\Components\DependencyInjection\ContainerBuilder;
 use Symfony\Components\DependencyInjection\Reference;
 use Symfony\Components\DependencyInjection\Parameter;
 
-$container = new Builder();
+$container = new ContainerBuilder();
 $container->
     register('foo', 'FooClass')->
     addAnnotation('foo', array('foo' => 'foo'))->

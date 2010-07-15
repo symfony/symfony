@@ -4,7 +4,7 @@ namespace Symfony\Bundle\PropelBundle\DependencyInjection;
 
 use Symfony\Components\DependencyInjection\Loader\LoaderExtension;
 use Symfony\Components\DependencyInjection\Loader\XmlFileLoader;
-use Symfony\Components\DependencyInjection\BuilderConfiguration;
+use Symfony\Components\DependencyInjection\ContainerBuilder;
 use Symfony\Components\DependencyInjection\Definition;
 use Symfony\Components\DependencyInjection\Reference;
 
@@ -18,29 +18,29 @@ class PropelExtension extends LoaderExtension
      * Loads the Propel configuration.
      *
      * @param array                                                        $config        An array of configuration settings
-     * @param \Symfony\Components\DependencyInjection\BuilderConfiguration $configuration A BuilderConfiguration instance
+     * @param \Symfony\Components\DependencyInjection\ContainerBuilder $container A ContainerBuilder instance
      */
-    public function configLoad($config, BuilderConfiguration $configuration)
+    public function configLoad($config, ContainerBuilder $container)
     {
-        if (!$configuration->hasDefinition('propel')) {
+        if (!$container->hasDefinition('propel')) {
             $loader = new XmlFileLoader(__DIR__.'/../Resources/config');
-            $configuration->merge($loader->load($this->resources['propel']));
+            $container->merge($loader->load($this->resources['propel']));
         }
 
-        if (!$configuration->hasParameter('propel.path')) {
+        if (!$container->hasParameter('propel.path')) {
             if (!isset($config['path'])) {
                 throw new \InvalidArgumentException('The "path" parameter is mandatory.');
             }
 
-            $configuration->setParameter('propel.path', $config['path']);
+            $container->setParameter('propel.path', $config['path']);
         }
 
         if (isset($config['path'])) {
-            $configuration->setParameter('propel.path', $config['path']);
+            $container->setParameter('propel.path', $config['path']);
         }
 
         if (isset($config['phing_path'])) {
-            $configuration->setParameter('propel.phing_path', $config['phing_path']);
+            $container->setParameter('propel.phing_path', $config['phing_path']);
         }
     }
 
@@ -48,13 +48,13 @@ class PropelExtension extends LoaderExtension
      * Loads the DBAL configuration.
      *
      * @param array                                                        $config        An array of configuration settings
-     * @param \Symfony\Components\DependencyInjection\BuilderConfiguration $configuration A BuilderConfiguration instance
+     * @param \Symfony\Components\DependencyInjection\ContainerBuilder $container A ContainerBuilder instance
      */
-    public function dbalLoad($config, BuilderConfiguration $configuration)
+    public function dbalLoad($config, ContainerBuilder $container)
     {
-        if (!$configuration->hasDefinition('propel')) {
+        if (!$container->hasDefinition('propel')) {
             $loader = new XmlFileLoader(__DIR__.'/../Resources/config');
-            $configuration->merge($loader->load($this->resources['propel']));
+            $container->merge($loader->load($this->resources['propel']));
         }
 
         $defaultConnection = array(
@@ -70,8 +70,8 @@ class PropelExtension extends LoaderExtension
             'settings'            => array('charset' => array('value' => 'UTF8')),
         );
 
-        $defaultConnectionName = isset($config['default_connection']) ? $config['default_connection'] : $configuration->getParameter('propel.dbal.default_connection');
-        $configuration->setParameter('propel.dbal.default_connection', $defaultConnectionName);
+        $defaultConnectionName = isset($config['default_connection']) ? $config['default_connection'] : $container->getParameter('propel.dbal.default_connection');
+        $container->setParameter('propel.dbal.default_connection', $defaultConnectionName);
 
         $connections = array();
         if (isset($config['connections'])) {
@@ -82,7 +82,7 @@ class PropelExtension extends LoaderExtension
             $connections = array($defaultConnectionName => $config);
         }
 
-        $arguments = $configuration->getDefinition('propel.configuration')->getArguments();
+        $arguments = $container->getDefinition('propel.configuration')->getArguments();
         if (count($arguments)) {
             $c = $arguments[0];
         } else {
@@ -113,7 +113,7 @@ class PropelExtension extends LoaderExtension
             }
         }
 
-        $configuration->getDefinition('propel.configuration')->setArguments(array($c));
+        $container->getDefinition('propel.configuration')->setArguments(array($c));
     }
 
     /**

@@ -4,7 +4,7 @@ namespace Symfony\Framework\DependencyInjection;
 
 use Symfony\Components\DependencyInjection\Loader\LoaderExtension;
 use Symfony\Components\DependencyInjection\Loader\XmlFileLoader;
-use Symfony\Components\DependencyInjection\BuilderConfiguration;
+use Symfony\Components\DependencyInjection\ContainerBuilder;
 
 /*
  * This file is part of the Symfony package.
@@ -24,41 +24,41 @@ use Symfony\Components\DependencyInjection\BuilderConfiguration;
  */
 class KernelExtension extends LoaderExtension
 {
-    public function testLoad($config, BuilderConfiguration $configuration)
+    public function testLoad($config, ContainerBuilder $container)
     {
         $loader = new XmlFileLoader(array(__DIR__.'/../Resources/config', __DIR__.'/Resources/config'));
-        $configuration->merge($loader->load('test.xml'));
-        $configuration->setParameter('kernel.include_core_classes', false);
+        $container->merge($loader->load('test.xml'));
+        $container->setParameter('kernel.include_core_classes', false);
 
-        return $configuration;
+        return $container;
     }
 
     /**
      * Loads the session configuration.
      *
      * @param array                $config        A configuration array
-     * @param BuilderConfiguration $configuration A BuilderConfiguration instance
+     * @param ContainerBuilder $container A ContainerBuilder instance
      *
-     * @return BuilderConfiguration A BuilderConfiguration instance
+     * @return ContainerBuilder A ContainerBuilder instance
      */
-    public function sessionLoad($config, BuilderConfiguration $configuration)
+    public function sessionLoad($config, ContainerBuilder $container)
     {
-        if (!$configuration->hasDefinition('session')) {
+        if (!$container->hasDefinition('session')) {
             $loader = new XmlFileLoader(array(__DIR__.'/../Resources/config', __DIR__.'/Resources/config'));
-            $configuration->merge($loader->load('session.xml'));
+            $container->merge($loader->load('session.xml'));
         }
 
         if (isset($config['default_locale'])) {
-            $configuration->setParameter('session.default_locale', $config['default_locale']);
+            $container->setParameter('session.default_locale', $config['default_locale']);
         }
 
         if (isset($config['class'])) {
-            $configuration->setParameter('session.class', $config['class']);
+            $container->setParameter('session.class', $config['class']);
         }
 
         foreach (array('name', 'auto_start', 'lifetime', 'path', 'domain', 'secure', 'httponly', 'cache_limiter', 'pdo.db_table') as $name) {
             if (isset($config['session'][$name])) {
-                $configuration->setParameter('session.options.'.$name, $config['session'][$name]);
+                $container->setParameter('session.options.'.$name, $config['session'][$name]);
             }
         }
 
@@ -68,16 +68,16 @@ class KernelExtension extends LoaderExtension
                 $class = 'Symfony\\Framework\\FrameworkBundle\\SessionStorage\\'.$class.'SessionStorage';
             }
 
-            $configuration->setParameter('session.session', 'session.session.'.strtolower($class));
+            $container->setParameter('session.session', 'session.session.'.strtolower($class));
         }
 
-        return $configuration;
+        return $container;
     }
 
-    public function configLoad($config, BuilderConfiguration $configuration)
+    public function configLoad($config, ContainerBuilder $container)
     {
         if (isset($config['charset'])) {
-            $configuration->setParameter('kernel.charset', $config['charset']);
+            $container->setParameter('kernel.charset', $config['charset']);
         }
 
         if (!array_key_exists('compilation', $config)) {
@@ -113,13 +113,13 @@ class KernelExtension extends LoaderExtension
                 }
             }
         }
-        $configuration->setParameter('kernel.compiled_classes', $classes);
+        $container->setParameter('kernel.compiled_classes', $classes);
 
         if (array_key_exists('error_handler_level', $config)) {
-            $configuration->setParameter('error_handler.level', $config['error_handler_level']);
+            $container->setParameter('error_handler.level', $config['error_handler_level']);
         }
 
-        return $configuration;
+        return $container;
     }
 
     /**

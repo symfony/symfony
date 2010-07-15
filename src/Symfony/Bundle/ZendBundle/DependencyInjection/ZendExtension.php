@@ -4,7 +4,7 @@ namespace Symfony\Bundle\ZendBundle\DependencyInjection;
 
 use Symfony\Components\DependencyInjection\Loader\LoaderExtension;
 use Symfony\Components\DependencyInjection\Loader\XmlFileLoader;
-use Symfony\Components\DependencyInjection\BuilderConfiguration;
+use Symfony\Components\DependencyInjection\ContainerBuilder;
 
 /*
  * This file is part of the Symfony framework.
@@ -36,22 +36,22 @@ class ZendExtension extends LoaderExtension
      *      <zend:logger priority="info" path="/path/to/some.log" />
      *
      * @param array                                                        $config        An array of configuration settings
-     * @param \Symfony\Components\DependencyInjection\BuilderConfiguration $configuration A BuilderConfiguration instance
+     * @param \Symfony\Components\DependencyInjection\ContainerBuilder $container A ContainerBuilder instance
      */
-    public function loggerLoad($config, BuilderConfiguration $configuration)
+    public function loggerLoad($config, ContainerBuilder $container)
     {
-        if (!$configuration->hasDefinition('zend.logger')) {
+        if (!$container->hasDefinition('zend.logger')) {
             $loader = new XmlFileLoader(__DIR__.'/../Resources/config');
-            $configuration->merge($loader->load($this->resources['logger']));
-            $configuration->setAlias('logger', 'zend.logger');
+            $container->merge($loader->load($this->resources['logger']));
+            $container->setAlias('logger', 'zend.logger');
         }
 
         if (isset($config['priority'])) {
-            $configuration->setParameter('zend.logger.priority', is_int($config['priority']) ? $config['priority'] : constant('\\Zend\\Log\\Logger::'.strtoupper($config['priority'])));
+            $container->setParameter('zend.logger.priority', is_int($config['priority']) ? $config['priority'] : constant('\\Zend\\Log\\Logger::'.strtoupper($config['priority'])));
         }
 
         if (isset($config['path'])) {
-            $configuration->setParameter('zend.logger.path', $config['path']);
+            $container->setParameter('zend.logger.path', $config['path']);
         }
     }
 

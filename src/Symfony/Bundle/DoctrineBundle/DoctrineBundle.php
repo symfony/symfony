@@ -32,7 +32,7 @@ class DoctrineBundle extends Bundle
      *
      * @param \Symfony\Components\DependencyInjection\ParameterBag\ParameterBagInterface $parameterBag A ParameterBagInterface instance
      *
-     * @return \Symfony\Components\DependencyInjection\BuilderConfiguration A BuilderConfiguration instance
+     * @return \Symfony\Components\DependencyInjection\ContainerBuilder A ContainerBuilder instance
      */
     public function buildContainer(ParameterBagInterface $parameterBag)
     {

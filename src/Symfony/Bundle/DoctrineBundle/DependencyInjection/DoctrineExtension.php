@@ -4,7 +4,7 @@ namespace Symfony\Bundle\DoctrineBundle\DependencyInjection;
 
 use Symfony\Components\DependencyInjection\Loader\LoaderExtension;
 use Symfony\Components\DependencyInjection\Loader\XmlFileLoader;
-use Symfony\Components\DependencyInjection\BuilderConfiguration;
+use Symfony\Components\DependencyInjection\ContainerBuilder;
 use Symfony\Components\DependencyInjection\Definition;
 use Symfony\Components\DependencyInjection\Reference;
 
@@ -54,13 +54,13 @@ class DoctrineExtension extends LoaderExtension
      *      <doctrine:dbal dbname="sfweb" user="root" />
      *
      * @param array                                                        $config        An array of configuration settings
-     * @param \Symfony\Components\DependencyInjection\BuilderConfiguration $configuration A BuilderConfiguration instance
+     * @param \Symfony\Components\DependencyInjection\ContainerBuilder $container A ContainerBuilder instance
      */
-    public function dbalLoad($config, BuilderConfiguration $configuration)
+    public function dbalLoad($config, ContainerBuilder $container)
     {
-        if (!$configuration->hasDefinition('doctrine.dbal.logger')) {
+        if (!$container->hasDefinition('doctrine.dbal.logger')) {
             $loader = new XmlFileLoader(__DIR__.'/../Resources/config');
-            $configuration->merge($loader->load($this->resources['dbal']));
+            $container->merge($loader->load($this->resources['dbal']));
         }
 
         $defaultConnection = array(
@@ -75,9 +75,9 @@ class DoctrineExtension extends LoaderExtension
             'options'             => array()
         );
 
-        $defaultConnectionName = isset($config['default_connection']) ? $config['default_connection'] : $configuration->getParameter('doctrine.dbal.default_connection');
-        $configuration->setAlias('database_connection', null !== $this->alias ? $this->alias : sprintf('doctrine.dbal.%s_connection', $defaultConnectionName));
-        $configuration->setParameter('doctrine.dbal.default_connection', $defaultConnectionName);
+        $defaultConnectionName = isset($config['default_connection']) ? $config['default_connection'] : $container->getParameter('doctrine.dbal.default_connection');
+        $container->setAlias('database_connection', null !== $this->alias ? $this->alias : sprintf('doctrine.dbal.%s_connection', $defaultConnectionName));
+        $container->setParameter('doctrine.dbal.default_connection', $defaultConnectionName);
 
         $connections = array();
         if (isset($config['connections'])) {
@@ -90,25 +90,25 @@ class DoctrineExtension extends LoaderExtension
 
         foreach ($connections as $name => $connection) {
             // previously registered?
-            if ($configuration->hasDefinition(sprintf('doctrine.dbal.%s_connection', $name))) {
-                $driverDef = $configuration->getDefinition(sprintf('doctrine.dbal.%s_connection', $name));
+            if ($container->hasDefinition(sprintf('doctrine.dbal.%s_connection', $name))) {
+                $driverDef = $container->getDefinition(sprintf('doctrine.dbal.%s_connection', $name));
                 $arguments = $driverDef->getArguments();
                 $driverOptions = $arguments[0];
             } else {
                 $connection = array_merge($defaultConnection, $connection);
 
-                $configurationClass = isset($connection['configuration_class']) ? $connection['configuration_class'] : 'Doctrine\DBAL\Configuration';
-                $configurationDef = new Definition($configurationClass);
-                $configurationDef->addMethodCall('setSqlLogger', array(new Reference('doctrine.dbal.logger')));
-                $configuration->setDefinition(sprintf('doctrine.dbal.%s_connection.configuration', $name), $configurationDef);
+                $containerClass = isset($connection['configuration_class']) ? $connection['configuration_class'] : 'Doctrine\DBAL\Configuration';
+                $containerDef = new Definition($containerClass);
+                $containerDef->addMethodCall('setSqlLogger', array(new Reference('doctrine.dbal.logger')));
+                $container->setDefinition(sprintf('doctrine.dbal.%s_connection.configuration', $name), $containerDef);
 
                 $eventManagerDef = new Definition($connection['event_manager_class']);
-                $configuration->setDefinition(sprintf('doctrine.dbal.%s_connection.event_manager', $name), $eventManagerDef);
+                $container->setDefinition(sprintf('doctrine.dbal.%s_connection.event_manager', $name), $eventManagerDef);
 
                 $driverOptions = array();
                 $driverDef = new Definition('Doctrine\DBAL\DriverManager');
                 $driverDef->setFactoryMethod('getConnection');
-                $configuration->setDefinition(sprintf('doctrine.dbal.%s_connection', $name), $driverDef);
+                $container->setDefinition(sprintf('doctrine.dbal.%s_connection', $name), $driverDef);
             }
 
             if (isset($connection['driver'])) {
@@ -138,35 +138,35 @@ class DoctrineExtension extends LoaderExtension
      * Loads the Doctrine ORM configuration.
      *
      * @param array                                                        $config        An array of configuration settings
-     * @param \Symfony\Components\DependencyInjection\BuilderConfiguration $configuration A BuilderConfiguration instance
+     * @param \Symfony\Components\DependencyInjection\ContainerBuilder $container A ContainerBuilder instance
      */
-    public function ormLoad($config, BuilderConfiguration $configuration)
+    public function ormLoad($config, ContainerBuilder $container)
     {
         $loader = new XmlFileLoader(__DIR__.'/../Resources/config');
-        $configuration->merge($loader->load($this->resources['orm']));
+        $container->merge($loader->load($this->resources['orm']));
 
         if (isset($config['default_entity_manager'])) {
-            $configuration->getParameter('doctrine.orm.default_entity_manager', $config['default_entity_manager']);
+            $container->getParameter('doctrine.orm.default_entity_manager', $config['default_entity_manager']);
         }
-        $defaultEntityManager = $configuration->getParameter('doctrine.orm.default_entity_manager');
+        $defaultEntityManager = $container->getParameter('doctrine.orm.default_entity_manager');
 
         foreach (array('metadata_driver', 'cache_driver') as $key) {
             if (isset($config[$key])) {
-                $configuration->setParameter('doctrine.orm.'.$key, $config[$key]);
+                $container->setParameter('doctrine.orm.'.$key, $config[$key]);
             }
         }
 
         $config['entity_managers'] = isset($config['entity_managers']) ? $config['entity_managers'] : array($defaultEntityManager => array());
         foreach ($config['entity_managers'] as $name => $connection) {
             $ormConfigDef = new Definition('Doctrine\ORM\Configuration');
-            $configuration->setDefinition(sprintf('doctrine.orm.%s_configuration', $name), $ormConfigDef);
+            $container->setDefinition(sprintf('doctrine.orm.%s_configuration', $name), $ormConfigDef);
 
             $drivers = array('metadata', 'query', 'result');
             foreach ($drivers as $driver) {
-                $definition = $configuration->getDefinition(sprintf('doctrine.orm.cache.%s', $configuration->getParameter('doctrine.orm.cache_driver')));
+                $definition = $container->getDefinition(sprintf('doctrine.orm.cache.%s', $container->getParameter('doctrine.orm.cache_driver')));
                 $clone = clone $definition;
                 $clone->addMethodCall('setNamespace', array(sprintf('doctrine_%s_', $driver)));
-                $configuration->setDefinition(sprintf('doctrine.orm.%s_cache', $driver), $clone);
+                $container->setDefinition(sprintf('doctrine.orm.%s_cache', $driver), $clone);
             }
 
             // configure metadata driver for each bundle based on the type of mapping files found
@@ -205,7 +205,7 @@ class DoctrineExtension extends LoaderExtension
             }
             $ormConfigDef->addMethodCall('setEntityNamespaces', array($aliasMap));
 
-            $configuration->setDefinition('doctrine.orm.metadata_driver', $mappingDriverDef);
+            $container->setDefinition('doctrine.orm.metadata_driver', $mappingDriverDef);
 
             $methods = array(
                 'setMetadataCacheImpl' => new Reference('doctrine.orm.metadata_cache'),
@@ -231,24 +231,24 @@ class DoctrineExtension extends LoaderExtension
             $ormEmDef = new Definition('Doctrine\ORM\EntityManager', $ormEmArgs);
             $ormEmDef->setFactoryMethod('create');
 
-            $configuration->setDefinition(
+            $container->setDefinition(
                 sprintf('doctrine.orm.%s_entity_manager', $name),
                 $ormEmDef
             );
 
             if ($name == $defaultEntityManager) {
-                $configuration->setAlias(
+                $container->setAlias(
                     'doctrine.orm.entity_manager',
                     sprintf('doctrine.orm.%s_entity_manager', $name)
                 );
             }
         }
 
-        $configuration->setAlias(
+        $container->setAlias(
             'doctrine.orm.cache',
             sprintf(
                 'doctrine.orm.cache.%s',
-                $configuration->getParameter('doctrine.orm.cache_driver')
+                $container->getParameter('doctrine.orm.cache_driver')
             )
         );
     }

@@ -10,7 +10,7 @@
 
 namespace Symfony\Tests\Components\DependencyInjection\Dumper;
 
-use Symfony\Components\DependencyInjection\Builder;
+use Symfony\Components\DependencyInjection\ContainerBuilder;
 use Symfony\Components\DependencyInjection\Dumper\XmlDumper;
 
 class XmlDumperTest extends \PHPUnit_Framework_TestCase
@@ -24,11 +24,11 @@ class XmlDumperTest extends \PHPUnit_Framework_TestCase
 
     public function testDump()
     {
-        $dumper = new XmlDumper($container = new Builder());
+        $dumper = new XmlDumper($container = new ContainerBuilder());
 
         $this->assertXmlStringEqualsXmlFile(self::$fixturesPath.'/xml/services1.xml', $dumper->dump(), '->dump() dumps an empty container as an empty XML file');
 
-        $container = new Builder();
+        $container = new ContainerBuilder();
         $dumper = new XmlDumper($container);
     }
 
@@ -52,7 +52,7 @@ class XmlDumperTest extends \PHPUnit_Framework_TestCase
         $dumper = new XmlDumper($container);
         $this->assertEquals(str_replace('%path%', self::$fixturesPath.DIRECTORY_SEPARATOR.'includes'.DIRECTORY_SEPARATOR, file_get_contents(self::$fixturesPath.'/xml/services9.xml')), $dumper->dump(), '->dump() dumps services');
 
-        $dumper = new XmlDumper($container = new Builder());
+        $dumper = new XmlDumper($container = new ContainerBuilder());
         $container->register('foo', 'FooClass')->addArgument(new \stdClass());
         try {
             $dumper->dump();

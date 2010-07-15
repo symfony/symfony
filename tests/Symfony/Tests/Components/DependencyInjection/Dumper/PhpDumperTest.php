@@ -10,7 +10,7 @@
 
 namespace Symfony\Tests\Components\DependencyInjection\Dumper;
 
-use Symfony\Components\DependencyInjection\Builder;
+use Symfony\Components\DependencyInjection\ContainerBuilder;
 use Symfony\Components\DependencyInjection\Dumper\PhpDumper;
 use Symfony\Components\DependencyInjection\ParameterBag\ParameterBag;
 use Symfony\Components\DependencyInjection\Reference;
@@ -26,12 +26,12 @@ class PhpDumperTest extends \PHPUnit_Framework_TestCase
 
     public function testDump()
     {
-        $dumper = new PhpDumper($container = new Builder());
+        $dumper = new PhpDumper($container = new ContainerBuilder());
 
         $this->assertStringEqualsFile(self::$fixturesPath.'/php/services1.php', $dumper->dump(), '->dump() dumps an empty container as an empty PHP class');
         $this->assertStringEqualsFile(self::$fixturesPath.'/php/services1-1.php', $dumper->dump(array('class' => 'Container', 'base_class' => 'AbstractContainer')), '->dump() takes a class and a base_class options');
 
-        $container = new Builder();
+        $container = new ContainerBuilder();
         $dumper = new PhpDumper($container);
     }
 
@@ -40,7 +40,7 @@ class PhpDumperTest extends \PHPUnit_Framework_TestCase
      */
     public function testExportParameters()
     {
-        $dumper = new PhpDumper($container = new Builder(new ParameterBag(array('foo' => new Reference('foo')))));
+        $dumper = new PhpDumper($container = new ContainerBuilder(new ParameterBag(array('foo' => new Reference('foo')))));
         $dumper->dump();
     }
 
@@ -57,7 +57,7 @@ class PhpDumperTest extends \PHPUnit_Framework_TestCase
         $dumper = new PhpDumper($container);
         $this->assertEquals(str_replace('%path%', str_replace('\\','\\\\',self::$fixturesPath.DIRECTORY_SEPARATOR.'includes'.DIRECTORY_SEPARATOR), file_get_contents(self::$fixturesPath.'/php/services9.php')), $dumper->dump(), '->dump() dumps services');
 
-        $dumper = new PhpDumper($container = new Builder());
+        $dumper = new PhpDumper($container = new ContainerBuilder());
         $container->register('foo', 'FooClass')->addArgument(new \stdClass());
         try {
             $dumper->dump();

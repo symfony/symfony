@@ -10,14 +10,14 @@
 
 namespace Symfony\Tests\Components\DependencyInjection\Dumper;
 
-use Symfony\Components\DependencyInjection\Builder;
+use Symfony\Components\DependencyInjection\ContainerBuilder;
 use Symfony\Components\DependencyInjection\Dumper\Dumper;
 
 class DumperTest extends \PHPUnit_Framework_TestCase
 {
     public function testDump()
     {
-        $builder = new Builder();
+        $builder = new ContainerBuilder();
         $dumper = new ProjectDumper($builder);
         try {
             $dumper->dump();

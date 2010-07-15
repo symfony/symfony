@@ -10,26 +10,26 @@
 
 namespace Symfony\Tests\Components\DependencyInjection;
 
-use Symfony\Components\DependencyInjection\Builder;
+use Symfony\Components\DependencyInjection\ContainerBuilder;
 use Symfony\Components\DependencyInjection\ContainerInterface;
-use Symfony\Components\DependencyInjection\BuilderConfiguration;
 use Symfony\Components\DependencyInjection\Definition;
 use Symfony\Components\DependencyInjection\Reference;
 use Symfony\Components\DependencyInjection\ParameterBag\ParameterBag;
+use Symfony\Components\DependencyInjection\Resource\FileResource;
 
 require_once __DIR__.'/Fixtures/includes/classes.php';
 
-class BuilderTest extends \PHPUnit_Framework_TestCase
+class ContainerBuilderTest extends \PHPUnit_Framework_TestCase
 {
     /**
-     * @covers Symfony\Components\DependencyInjection\Builder::setDefinitions
-     * @covers Symfony\Components\DependencyInjection\Builder::getDefinitions
-     * @covers Symfony\Components\DependencyInjection\Builder::setDefinition
-     * @covers Symfony\Components\DependencyInjection\Builder::getDefinition
+     * @covers Symfony\Components\DependencyInjection\ContainerBuilder::setDefinitions
+     * @covers Symfony\Components\DependencyInjection\ContainerBuilder::getDefinitions
+     * @covers Symfony\Components\DependencyInjection\ContainerBuilder::setDefinition
+     * @covers Symfony\Components\DependencyInjection\ContainerBuilder::getDefinition
      */
     public function testDefinitions()
     {
-        $builder = new Builder();
+        $builder = new ContainerBuilder();
         $definitions = array(
             'foo' => new Definition('FooClass'),
             'bar' => new Definition('BarClass'),
@@ -56,22 +56,22 @@ class BuilderTest extends \PHPUnit_Framework_TestCase
     }
 
     /**
-     * @covers Symfony\Components\DependencyInjection\Builder::register
+     * @covers Symfony\Components\DependencyInjection\ContainerBuilder::register
      */
     public function testRegister()
     {
-        $builder = new Builder();
+        $builder = new ContainerBuilder();
         $builder->register('foo', 'FooClass');
         $this->assertTrue($builder->hasDefinition('foo'), '->register() registers a new service definition');
         $this->assertInstanceOf('Symfony\Components\DependencyInjection\Definition', $builder->getDefinition('foo'), '->register() returns the newly created Definition instance');
     }
 
     /**
-     * @covers Symfony\Components\DependencyInjection\Builder::has
+     * @covers Symfony\Components\DependencyInjection\ContainerBuilder::has
      */
     public function testHas()
     {
-        $builder = new Builder();
+        $builder = new ContainerBuilder();
         $this->assertFalse($builder->has('foo'), '->has() returns false if the service does not exist');
         $builder->register('foo', 'FooClass');
         $this->assertTrue($builder->has('foo'), '->has() returns true if a service definition exists');
@@ -80,11 +80,11 @@ class BuilderTest extends \PHPUnit_Framework_TestCase
     }
 
     /**
-     * @covers Symfony\Components\DependencyInjection\Builder::get
+     * @covers Symfony\Components\DependencyInjection\ContainerBuilder::get
      */
     public function testGet()
     {
-        $builder = new Builder();
+        $builder = new ContainerBuilder();
         try {
             $builder->get('foo');
             $this->fail('->get() throws an InvalidArgumentException if the service does not exist');
@@ -116,11 +116,11 @@ class BuilderTest extends \PHPUnit_Framework_TestCase
     }
 
     /**
-     * @covers Symfony\Components\DependencyInjection\Builder::getServiceIds
+     * @covers Symfony\Components\DependencyInjection\ContainerBuilder::getServiceIds
      */
     public function testGetServiceIds()
     {
-        $builder = new Builder();
+        $builder = new ContainerBuilder();
         $builder->register('foo', 'stdClass');
         $builder->bar = $bar = new \stdClass();
         $builder->register('bar', 'stdClass');
@@ -128,13 +128,13 @@ class BuilderTest extends \PHPUnit_Framework_TestCase
     }
 
     /**
-     * @covers Symfony\Components\DependencyInjection\Builder::setAlias
-     * @covers Symfony\Components\DependencyInjection\Builder::hasAlias
-     * @covers Symfony\Components\DependencyInjection\Builder::getAlias
+     * @covers Symfony\Components\DependencyInjection\ContainerBuilder::setAlias
+     * @covers Symfony\Components\DependencyInjection\ContainerBuilder::hasAlias
+     * @covers Symfony\Components\DependencyInjection\ContainerBuilder::getAlias
      */
     public function testAliases()
     {
-        $builder = new Builder();
+        $builder = new ContainerBuilder();
         $builder->register('foo', 'stdClass');
         $builder->setAlias('bar', 'foo');
         $this->assertTrue($builder->hasAlias('bar'), '->hasAlias() returns true if the alias exists');
@@ -153,11 +153,11 @@ class BuilderTest extends \PHPUnit_Framework_TestCase
     }
 
     /**
-     * @covers Symfony\Components\DependencyInjection\Builder::getAliases
+     * @covers Symfony\Components\DependencyInjection\ContainerBuilder::getAliases
      */
     public function testGetAliases()
     {
-        $builder = new Builder();
+        $builder = new ContainerBuilder();
         $builder->setAlias('bar', 'foo');
         $builder->setAlias('foobar', 'foo');
         $this->assertEquals(array('bar' => 'foo', 'foobar' => 'foo'), $builder->getAliases(), '->getAliases() returns all service aliases');
@@ -168,32 +168,32 @@ class BuilderTest extends \PHPUnit_Framework_TestCase
     }
 
     /**
-     * @covers Symfony\Components\DependencyInjection\Builder::setAliases
+     * @covers Symfony\Components\DependencyInjection\ContainerBuilder::setAliases
      */
     public function testSetAliases()
     {
-        $builder = new Builder();
+        $builder = new ContainerBuilder();
         $builder->setAliases(array('bar' => 'foo', 'foobar' => 'foo'));
         $this->assertEquals(array('bar' => 'foo', 'foobar' => 'foo'), $builder->getAliases(), '->getAliases() returns all service aliases');
     }
 
     /**
-     * @covers Symfony\Components\DependencyInjection\Builder::addAliases
+     * @covers Symfony\Components\DependencyInjection\ContainerBuilder::addAliases
      */
     public function testAddAliases()
     {
-        $builder = new Builder();
+        $builder = new ContainerBuilder();
         $builder->setAliases(array('bar' => 'foo'));
         $builder->addAliases(array('foobar' => 'foo'));
         $this->assertEquals(array('bar' => 'foo', 'foobar' => 'foo'), $builder->getAliases(), '->getAliases() returns all service aliases');
     }
 
     /**
-     * @covers Symfony\Components\DependencyInjection\Builder::createService
+     * @covers Symfony\Components\DependencyInjection\ContainerBuilder::createService
      */
     public function testCreateService()
     {
-        $builder = new Builder();
+        $builder = new ContainerBuilder();
         $builder->register('foo1', 'FooClass')->setFile(__DIR__.'/Fixtures/includes/foo.php');
         $this->assertInstanceOf('\FooClass', $builder->get('foo1'), '->createService() requires the file defined by the service definition');
         $builder->register('foo2', 'FooClass')->setFile(__DIR__.'/Fixtures/includes/%file%.php');
@@ -202,22 +202,22 @@ class BuilderTest extends \PHPUnit_Framework_TestCase
     }
 
     /**
-     * @covers Symfony\Components\DependencyInjection\Builder::createService
+     * @covers Symfony\Components\DependencyInjection\ContainerBuilder::createService
      */
     public function testCreateServiceClass()
     {
-        $builder = new Builder();
+        $builder = new ContainerBuilder();
         $builder->register('foo1', '%class%');
         $builder->setParameter('class', 'stdClass');
         $this->assertInstanceOf('\stdClass', $builder->get('foo1'), '->createService() replaces parameters in the class provided by the service definition');
     }
 
     /**
-     * @covers Symfony\Components\DependencyInjection\Builder::createService
+     * @covers Symfony\Components\DependencyInjection\ContainerBuilder::createService
      */
     public function testCreateServiceArguments()
     {
-        $builder = new Builder();
+        $builder = new ContainerBuilder();
         $builder->register('bar', 'stdClass');
         $builder->register('foo1', 'FooClass')->addArgument(array('foo' => '%value%', '%value%' => 'foo', new Reference('bar')));
         $builder->setParameter('value', 'bar');
@@ -225,11 +225,11 @@ class BuilderTest extends \PHPUnit_Framework_TestCase
     }
 
     /**
-     * @covers Symfony\Components\DependencyInjection\Builder::createService
+     * @covers Symfony\Components\DependencyInjection\ContainerBuilder::createService
      */
     public function testCreateServiceFactoryMethod()
     {
-        $builder = new Builder();
+        $builder = new ContainerBuilder();
         $builder->register('bar', 'stdClass');
         $builder->register('foo1', 'FooClass')->setFactoryMethod('getInstance')->addArgument(array('foo' => '%value%', '%value%' => 'foo', new Reference('bar')));
         $builder->setParameter('value', 'bar');
@@ -238,11 +238,11 @@ class BuilderTest extends \PHPUnit_Framework_TestCase
     }
 
     /**
-     * @covers Symfony\Components\DependencyInjection\Builder::createService
+     * @covers Symfony\Components\DependencyInjection\ContainerBuilder::createService
      */
     public function testCreateServiceFactoryService()
     {
-        $builder = new Builder();
+        $builder = new ContainerBuilder();
         $builder->register('baz_service')->setFactoryService('baz_factory')->setFactoryMethod('getInstance');
         $builder->register('baz_factory', 'BazClass');
 
@@ -250,11 +250,11 @@ class BuilderTest extends \PHPUnit_Framework_TestCase
     }
 
     /**
-     * @covers Symfony\Components\DependencyInjection\Builder::createService
+     * @covers Symfony\Components\DependencyInjection\ContainerBuilder::createService
      */
     public function testCreateServiceMethodCalls()
     {
-        $builder = new Builder();
+        $builder = new ContainerBuilder();
         $builder->register('bar', 'stdClass');
         $builder->register('foo1', 'FooClass')->addMethodCall('setBar', array(array('%value%', new Reference('bar'))));
         $builder->setParameter('value', 'bar');
@@ -262,11 +262,11 @@ class BuilderTest extends \PHPUnit_Framework_TestCase
     }
 
     /**
-     * @covers Symfony\Components\DependencyInjection\Builder::createService
+     * @covers Symfony\Components\DependencyInjection\ContainerBuilder::createService
      */
     public function testCreateServiceConfigurator()
     {
-        $builder = new Builder();
+        $builder = new ContainerBuilder();
         $builder->register('foo1', 'FooClass')->setConfigurator('sc_configure');
         $this->assertTrue($builder->get('foo1')->configured, '->createService() calls the configurator');
 
@@ -289,23 +289,23 @@ class BuilderTest extends \PHPUnit_Framework_TestCase
     }
 
     /**
-     * @covers Symfony\Components\DependencyInjection\Builder::resolveValue
+     * @covers Symfony\Components\DependencyInjection\ContainerBuilder::resolveValue
      */
     public function testResolveValue()
     {
-        $this->assertEquals('foo', Builder::resolveValue('foo', array()), '->resolveValue() returns its argument unmodified if no placeholders are found');
-        $this->assertEquals('I\'m a bar', Builder::resolveValue('I\'m a %foo%', array('foo' => 'bar')), '->resolveValue() replaces placeholders by their values');
-        $this->assertTrue(Builder::resolveValue('%foo%', array('foo' => true)) === true, '->resolveValue() replaces arguments that are just a placeholder by their value without casting them to strings');
+        $this->assertEquals('foo', ContainerBuilder::resolveValue('foo', array()), '->resolveValue() returns its argument unmodified if no placeholders are found');
+        $this->assertEquals('I\'m a bar', ContainerBuilder::resolveValue('I\'m a %foo%', array('foo' => 'bar')), '->resolveValue() replaces placeholders by their values');
+        $this->assertTrue(ContainerBuilder::resolveValue('%foo%', array('foo' => true)) === true, '->resolveValue() replaces arguments that are just a placeholder by their value without casting them to strings');
 
-        $this->assertEquals(array('bar' => 'bar'), Builder::resolveValue(array('%foo%' => '%foo%'), array('foo' => 'bar')), '->resolveValue() replaces placeholders in keys and values of arrays');
+        $this->assertEquals(array('bar' => 'bar'), ContainerBuilder::resolveValue(array('%foo%' => '%foo%'), array('foo' => 'bar')), '->resolveValue() replaces placeholders in keys and values of arrays');
 
-        $this->assertEquals(array('bar' => array('bar' => array('bar' => 'bar'))), Builder::resolveValue(array('%foo%' => array('%foo%' => array('%foo%' => '%foo%'))), array('foo' => 'bar')), '->resolveValue() replaces placeholders in nested arrays');
+        $this->assertEquals(array('bar' => array('bar' => array('bar' => 'bar'))), ContainerBuilder::resolveValue(array('%foo%' => array('%foo%' => array('%foo%' => '%foo%'))), array('foo' => 'bar')), '->resolveValue() replaces placeholders in nested arrays');
 
-        $this->assertEquals('I\'m a %foo%', Builder::resolveValue('I\'m a %%foo%%', array('foo' => 'bar')), '->resolveValue() supports % escaping by doubling it');
-        $this->assertEquals('I\'m a bar %foo bar', Builder::resolveValue('I\'m a %foo% %%foo %foo%', array('foo' => 'bar')), '->resolveValue() supports % escaping by doubling it');
+        $this->assertEquals('I\'m a %foo%', ContainerBuilder::resolveValue('I\'m a %%foo%%', array('foo' => 'bar')), '->resolveValue() supports % escaping by doubling it');
+        $this->assertEquals('I\'m a bar %foo bar', ContainerBuilder::resolveValue('I\'m a %foo% %%foo %foo%', array('foo' => 'bar')), '->resolveValue() supports % escaping by doubling it');
 
         try {
-            Builder::resolveValue('%foobar%', array());
+            ContainerBuilder::resolveValue('%foobar%', array());
             $this->fail('->resolveValue() throws a RuntimeException if a placeholder references a non-existant parameter');
         } catch (\Exception $e) {
             $this->assertInstanceOf('\RuntimeException', $e, '->resolveValue() throws a RuntimeException if a placeholder references a non-existant parameter');
@@ -313,7 +313,7 @@ class BuilderTest extends \PHPUnit_Framework_TestCase
         }
 
         try {
-            Builder::resolveValue('foo %foobar% bar', array());
+            ContainerBuilder::resolveValue('foo %foobar% bar', array());
             $this->fail('->resolveValue() throws a RuntimeException if a placeholder references a non-existant parameter');
         } catch (\Exception $e) {
             $this->assertInstanceOf('\RuntimeException', $e, '->resolveValue() throws a RuntimeException if a placeholder references a non-existant parameter');
@@ -322,57 +322,51 @@ class BuilderTest extends \PHPUnit_Framework_TestCase
     }
 
     /**
-     * @covers Symfony\Components\DependencyInjection\Builder::resolveServices
+     * @covers Symfony\Components\DependencyInjection\ContainerBuilder::resolveServices
      */
     public function testResolveServices()
     {
-        $builder = new Builder();
+        $builder = new ContainerBuilder();
         $builder->register('foo', 'FooClass');
         $this->assertEquals($builder->get('foo'), $builder->resolveServices(new Reference('foo')), '->resolveServices() resolves service references to service instances');
         $this->assertEquals(array('foo' => array('foo', $builder->get('foo'))), $builder->resolveServices(array('foo' => array('foo', new Reference('foo')))), '->resolveServices() resolves service references to service instances in nested arrays');
     }
 
     /**
-     * @covers Symfony\Components\DependencyInjection\Builder::merge
+     * @covers Symfony\Components\DependencyInjection\ContainerBuilder::merge
      */
     public function testMerge()
     {
-        $container = new Builder();
-        $container->merge(null);
-        $this->assertEquals(array(), $container->getParameterBag()->all(), '->merge() accepts null as an argument');
-        $this->assertEquals(array(), $container->getDefinitions(), '->merge() accepts null as an argument');
-
-        $container = new Builder(new ParameterBag(array('bar' => 'foo')));
-        $config = new BuilderConfiguration(array(), new ParameterBag(array('foo' => 'bar')));
+        $container = new ContainerBuilder(new ParameterBag(array('bar' => 'foo')));
+        $config = new ContainerBuilder(new ParameterBag(array('foo' => 'bar')));
         $container->merge($config);
         $this->assertEquals(array('bar' => 'foo', 'foo' => 'bar'), $container->getParameterBag()->all(), '->merge() merges current parameters with the loaded ones');
 
-        $container = new Builder(new ParameterBag(array('bar' => 'foo', 'foo' => 'baz')));
-        $config = new BuilderConfiguration(array(), new ParameterBag(array('foo' => 'bar')));
+        $container = new ContainerBuilder(new ParameterBag(array('bar' => 'foo')));
+        $config = new ContainerBuilder(new ParameterBag(array('foo' => '%bar%')));
         $container->merge($config);
-        $this->assertEquals(array('bar' => 'foo', 'foo' => 'baz'), $container->getParameterBag()->all(), '->merge() does not change the already defined parameters');
-
-        $container = new Builder(new ParameterBag(array('bar' => 'foo')));
-        $config = new BuilderConfiguration(array(), new ParameterBag(array('foo' => '%bar%')));
-        $container->merge($config);
+////// FIXME
+        $container->commit();
         $this->assertEquals(array('bar' => 'foo', 'foo' => 'foo'), $container->getParameterBag()->all(), '->merge() evaluates the values of the parameters towards already defined ones');
 
-        $container = new Builder(new ParameterBag(array('bar' => 'foo')));
-        $config = new BuilderConfiguration(array(), new ParameterBag(array('foo' => '%bar%', 'baz' => '%foo%')));
+        $container = new ContainerBuilder(new ParameterBag(array('bar' => 'foo')));
+        $config = new ContainerBuilder(new ParameterBag(array('foo' => '%bar%', 'baz' => '%foo%')));
         $container->merge($config);
+////// FIXME
+        $container->commit();
         $this->assertEquals(array('bar' => 'foo', 'foo' => 'foo', 'baz' => 'foo'), $container->getParameterBag()->all(), '->merge() evaluates the values of the parameters towards already defined ones');
 
-        $container = new Builder();
+        $container = new ContainerBuilder();
         $container->register('foo', 'FooClass');
         $container->register('bar', 'BarClass');
-        $config = new BuilderConfiguration();
+        $config = new ContainerBuilder();
         $config->setDefinition('baz', new Definition('BazClass'));
         $config->setAlias('alias_for_foo', 'foo');
         $container->merge($config);
         $this->assertEquals(array('foo', 'bar', 'baz'), array_keys($container->getDefinitions()), '->merge() merges definitions already defined ones');
         $this->assertEquals(array('alias_for_foo' => 'foo'), $container->getAliases(), '->merge() registers defined aliases');
 
-        $container = new Builder();
+        $container = new ContainerBuilder();
         $container->register('foo', 'FooClass');
         $config->setDefinition('foo', new Definition('BazClass'));
         $container->merge($config);
@@ -380,11 +374,11 @@ class BuilderTest extends \PHPUnit_Framework_TestCase
     }
 
     /**
-     * @covers Symfony\Components\DependencyInjection\Builder::findAnnotatedServiceIds
+     * @covers Symfony\Components\DependencyInjection\ContainerBuilder::findAnnotatedServiceIds
      */
     public function testFindAnnotatedServiceIds()
     {
-        $builder = new Builder();
+        $builder = new ContainerBuilder();
         $builder
             ->register('foo', 'FooClass')
             ->addAnnotation('foo', array('foo' => 'foo'))
@@ -398,5 +392,29 @@ class BuilderTest extends \PHPUnit_Framework_TestCase
             )
         ), '->findAnnotatedServiceIds() returns an array of service ids and its annotation attributes');
         $this->assertEquals(array(), $builder->findAnnotatedServiceIds('foobar'), '->findAnnotatedServiceIds() returns an empty array if there is annotated services');
+    }
+
+    /**
+     * @covers Symfony\Components\DependencyInjection\ContainerBuilder::findDefinition
+     */
+    public function testFindDefinition()
+    {
+        $container = new ContainerBuilder();
+        $container->setDefinition('foo', $definition = new Definition('FooClass'));
+        $container->setAlias('bar', 'foo');
+        $container->setAlias('foobar', 'bar');
+        $this->assertEquals($definition, $container->findDefinition('foobar'), '->findDefinition() returns a Definition');
+    }
+
+    /**
+     * @covers Symfony\Components\DependencyInjection\ContainerBuilder::getResources
+     * @covers Symfony\Components\DependencyInjection\ContainerBuilder::addResource
+     */
+    public function testResources()
+    {
+        $container = new ContainerBuilder();
+        $container->addResource($a = new FileResource(__DIR__.'/Fixtures/xml/services1.xml'));
+        $container->addResource($b = new FileResource(__DIR__.'/Fixtures/xml/services2.xml'));
+        $this->assertEquals(array($a, $b), $container->getResources(), '->getResources() returns an array of resources read for the current configuration');
     }
 }

@@ -10,8 +10,7 @@
 
 namespace Symfony\Tests\Components\DependencyInjection\Loader;
 
-use Symfony\Components\DependencyInjection\Builder;
-use Symfony\Components\DependencyInjection\BuilderConfiguration;
+use Symfony\Components\DependencyInjection\ContainerBuilder;
 use Symfony\Components\DependencyInjection\Loader\FileLoader;
 
 class FileLoaderTest extends \PHPUnit_Framework_TestCase
@@ -51,7 +50,7 @@ class ProjectLoader extends FileLoader
 {
     public $paths;
 
-    public function load($resource, $main = true, BuilderConfiguration $configuration = null)
+    public function load($resource, ContainerBuilder $container = null)
     {
     }
 

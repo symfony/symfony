@@ -2,7 +2,7 @@
 
 namespace Symfony\Components\DependencyInjection\Dumper;
 
-use Symfony\Components\DependencyInjection\Builder;
+use Symfony\Components\DependencyInjection\ContainerBuilder;
 use Symfony\Components\DependencyInjection\Container;
 use Symfony\Components\DependencyInjection\ContainerInterface;
 use Symfony\Components\DependencyInjection\Reference;
@@ -354,7 +354,7 @@ EOF;
 
     protected function wrapServiceConditionals($value, $code)
     {
-        if (!$services = Builder::getServiceConditionals($value)) {
+        if (!$services = ContainerBuilder::getServiceConditionals($value)) {
             return $code;
         }
 

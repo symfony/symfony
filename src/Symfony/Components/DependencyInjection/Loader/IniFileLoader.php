@@ -2,7 +2,7 @@
 
 namespace Symfony\Components\DependencyInjection\Loader;
 
-use Symfony\Components\DependencyInjection\BuilderConfiguration;
+use Symfony\Components\DependencyInjection\ContainerBuilder;
 use Symfony\Components\DependencyInjection\Resource\FileResource;
 
 /*
@@ -26,23 +26,22 @@ class IniFileLoader extends FileLoader
     /**
      * Loads a resource.
      *
-     * @param mixed                $resource       The resource
-     * @param Boolean              $main           Whether this is the main load() call
-     * @param BuilderConfiguration $configuration  A BuilderConfiguration instance to use for the configuration
+     * @param mixed            $resource       The resource
+     * @param ContainerBuilder $container  A ContainerBuilder instance to use for the configuration
      *
-     * @return BuilderConfiguration A BuilderConfiguration instance
+     * @return ContainerBuilder A ContainerBuilder instance
      *
      * @throws \InvalidArgumentException When ini file is not valid
      */
-    public function load($file, $main = true, BuilderConfiguration $configuration = null)
+    public function load($file, ContainerBuilder $container = null)
     {
         $path = $this->findFile($file);
 
-        if (null === $configuration) {
-            $configuration = new BuilderConfiguration();
+        if (null === $container) {
+            $container = new ContainerBuilder();
         }
 
-        $configuration->addResource(new FileResource($path));
+        $container->addResource(new FileResource($path));
 
         $result = parse_ini_file($path, true);
         if (false === $result || array() === $result) {
@@ -51,10 +50,10 @@ class IniFileLoader extends FileLoader
 
         if (isset($result['parameters']) && is_array($result['parameters'])) {
             foreach ($result['parameters'] as $key => $value) {
-                $configuration->setParameter($key, $value);
+                $container->setParameter($key, $value);
             }
         }
 
-        return $configuration;
+        return $container;
     }
 }

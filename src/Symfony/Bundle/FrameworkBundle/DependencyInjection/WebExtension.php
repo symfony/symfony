@@ -5,7 +5,7 @@ namespace Symfony\Bundle\FrameworkBundle\DependencyInjection;
 use Symfony\Components\DependencyInjection\Loader\LoaderExtension;
 use Symfony\Components\DependencyInjection\Loader\XmlFileLoader;
 use Symfony\Components\DependencyInjection\Resource\FileResource;
-use Symfony\Components\DependencyInjection\BuilderConfiguration;
+use Symfony\Components\DependencyInjection\ContainerBuilder;
 use Symfony\Components\DependencyInjection\Reference;
 use Symfony\Components\DependencyInjection\Definition;
 
@@ -48,17 +48,17 @@ class WebExtension extends LoaderExtension
      * Loads the web configuration.
      *
      * @param array                                                        $config        An array of configuration settings
-     * @param \Symfony\Components\DependencyInjection\BuilderConfiguration $configuration A BuilderConfiguration instance
+     * @param \Symfony\Components\DependencyInjection\ContainerBuilder $container A ContainerBuilder instance
      */
-    public function configLoad($config, BuilderConfiguration $configuration)
+    public function configLoad($config, ContainerBuilder $container)
     {
-        if (!$configuration->hasDefinition('controller_manager')) {
+        if (!$container->hasDefinition('controller_manager')) {
             $loader = new XmlFileLoader(__DIR__.'/../Resources/config');
-            $configuration->merge($loader->load($this->resources['web']));
+            $container->merge($loader->load($this->resources['web']));
         }
 
         if (isset($config['ide']) && 'textmate' === $config['ide']) {
-            $configuration->setParameter('debug.file_link_format', 'txmt://open?url=file://%%f&line=%%l');
+            $container->setParameter('debug.file_link_format', 'txmt://open?url=file://%%f&line=%%l');
         }
 
         if (isset($config['toolbar']) && $config['toolbar']) {
@@ -67,33 +67,33 @@ class WebExtension extends LoaderExtension
 
         if (isset($config['profiler'])) {
             if ($config['profiler']) {
-                if (!$configuration->hasDefinition('profiler')) {
+                if (!$container->hasDefinition('profiler')) {
                     $loader = new XmlFileLoader(__DIR__.'/../Resources/config');
-                    $configuration->merge($loader->load('profiling.xml'));
-                    $configuration->merge($loader->load('collectors.xml'));
+                    $container->merge($loader->load('profiling.xml'));
+                    $container->merge($loader->load('collectors.xml'));
                 }
-            } elseif ($configuration->hasDefinition('profiler')) {
-                $configuration->getDefinition('profiling')->clearAnnotations();
+            } elseif ($container->hasDefinition('profiler')) {
+                $container->getDefinition('profiling')->clearAnnotations();
             }
         }
 
         // toolbar need to be registered after the profiler
         if (isset($config['toolbar'])) {
             if ($config['toolbar']) {
-                if (!$configuration->hasDefinition('debug.toolbar')) {
+                if (!$container->hasDefinition('debug.toolbar')) {
                     $loader = new XmlFileLoader(__DIR__.'/../Resources/config');
-                    $configuration->merge($loader->load('toolbar.xml'));
+                    $container->merge($loader->load('toolbar.xml'));
                 }
-            } elseif ($configuration->hasDefinition('debug.toolbar')) {
-                $configuration->getDefinition('debug.toolbar')->clearAnnotations();
+            } elseif ($container->hasDefinition('debug.toolbar')) {
+                $container->getDefinition('debug.toolbar')->clearAnnotations();
             }
         }
 
         if (isset($config['validation']['enabled'])) {
             if ($config['validation']['enabled']) {
-                if (!$configuration->hasDefinition('validator')) {
+                if (!$container->hasDefinition('validator')) {
                     $loader = new XmlFileLoader(__DIR__.'/../Resources/config');
-                    $configuration->merge($loader->load($this->resources['validation']));
+                    $container->merge($loader->load($this->resources['validation']));
                 }
 
                 $xmlMappingFiles = array();
@@ -126,42 +126,42 @@ class WebExtension extends LoaderExtension
                 }
 
                 $xmlFilesLoader = new Definition(
-                    $configuration->getParameter('validator.mapping.loader.xml_files_loader.class'),
+                    $container->getParameter('validator.mapping.loader.xml_files_loader.class'),
                     array($xmlMappingFiles)
                 );
 
                 $yamlFilesLoader = new Definition(
-                    $configuration->getParameter('validator.mapping.loader.yaml_files_loader.class'),
+                    $container->getParameter('validator.mapping.loader.yaml_files_loader.class'),
                     array($yamlMappingFiles)
                 );
 
-                $configuration->setDefinition('validator.mapping.loader.xml_files_loader', $xmlFilesLoader);
-                $configuration->setDefinition('validator.mapping.loader.yaml_files_loader', $yamlFilesLoader);
-                $configuration->setParameter('validator.message_interpolator.files', $messageFiles);
+                $container->setDefinition('validator.mapping.loader.xml_files_loader', $xmlFilesLoader);
+                $container->setDefinition('validator.mapping.loader.yaml_files_loader', $yamlFilesLoader);
+                $container->setParameter('validator.message_interpolator.files', $messageFiles);
 
                 foreach ($xmlMappingFiles as $file) {
-                    $configuration->addResource(new FileResource($file));
+                    $container->addResource(new FileResource($file));
                 }
 
                 foreach ($yamlMappingFiles as $file) {
-                    $configuration->addResource(new FileResource($file));
+                    $container->addResource(new FileResource($file));
                 }
 
                 foreach ($messageFiles as $file) {
-                    $configuration->addResource(new FileResource($file));
+                    $container->addResource(new FileResource($file));
                 }
 
                 if (isset($config['validation']['annotations']) && $config['validation']['annotations'] === true) {
-                    $annotationLoader = new Definition($configuration->getParameter('validator.mapping.loader.annotation_loader.class'));
-                    $configuration->setDefinition('validator.mapping.loader.annotation_loader', $annotationLoader);
+                    $annotationLoader = new Definition($container->getParameter('validator.mapping.loader.annotation_loader.class'));
+                    $container->setDefinition('validator.mapping.loader.annotation_loader', $annotationLoader);
 
-                    $loader = $configuration->getDefinition('validator.mapping.loader.loader_chain');
+                    $loader = $container->getDefinition('validator.mapping.loader.loader_chain');
                     $arguments = $loader->getArguments();
                     array_unshift($arguments[0], new Reference('validator.mapping.loader.annotation_loader'));
                     $loader->setArguments($arguments);
                 }
-            } elseif ($configuration->hasDefinition('validator')) {
-                $configuration->getDefinition('validator')->clearAnnotations();
+            } elseif ($container->hasDefinition('validator')) {
+                $container->getDefinition('validator')->clearAnnotations();
             }
         }
     }
@@ -170,26 +170,26 @@ class WebExtension extends LoaderExtension
      * Loads the templating configuration.
      *
      * @param array                                                        $config        An array of configuration settings
-     * @param \Symfony\Components\DependencyInjection\BuilderConfiguration $configuration A BuilderConfiguration instance
+     * @param \Symfony\Components\DependencyInjection\ContainerBuilder $container A ContainerBuilder instance
      */
-    public function templatingLoad($config, BuilderConfiguration $configuration)
+    public function templatingLoad($config, ContainerBuilder $container)
     {
-        if (!$configuration->hasDefinition('templating')) {
+        if (!$container->hasDefinition('templating')) {
             $loader = new XmlFileLoader(__DIR__.'/../Resources/config');
-            $configuration->merge($loader->load($this->resources['templating']));
+            $container->merge($loader->load($this->resources['templating']));
         }
 
         if (array_key_exists('escaping', $config)) {
-            $configuration->setParameter('templating.output_escaper', $config['escaping']);
+            $container->setParameter('templating.output_escaper', $config['escaping']);
         }
 
         if (array_key_exists('assets_version', $config)) {
-            $configuration->setParameter('templating.assets.version', $config['assets_version']);
+            $container->setParameter('templating.assets.version', $config['assets_version']);
         }
 
         // path for the filesystem loader
         if (isset($config['path'])) {
-            $configuration->setParameter('templating.loader.filesystem.path', $config['path']);
+            $container->setParameter('templating.loader.filesystem.path', $config['path']);
         }
 
         // loaders
@@ -201,20 +201,20 @@ class WebExtension extends LoaderExtension
             }
 
             if (1 === count($loaders)) {
-                $configuration->setAlias('templating.loader', (string) $loaders[0]);
+                $container->setAlias('templating.loader', (string) $loaders[0]);
             } else {
-                $configuration->getDefinition('templating.loader.chain')->addArgument($loaders);
-                $configuration->setAlias('templating.loader', 'templating.loader.chain');
+                $container->getDefinition('templating.loader.chain')->addArgument($loaders);
+                $container->setAlias('templating.loader', 'templating.loader.chain');
             }
         }
 
         // cache?
-        $configuration->setParameter('templating.loader.cache.path', null);
+        $container->setParameter('templating.loader.cache.path', null);
         if (isset($config['cache'])) {
             // wrap the loader with some cache
-            $configuration->setDefinition('templating.loader.wrapped', $configuration->findDefinition('templating.loader'));
-            $configuration->setDefinition('templating.loader', $configuration->getDefinition('templating.loader.cache'));
-            $configuration->setParameter('templating.loader.cache.path', $config['cache']);
+            $container->setDefinition('templating.loader.wrapped', $container->findDefinition('templating.loader'));
+            $container->setDefinition('templating.loader', $container->getDefinition('templating.loader.cache'));
+            $container->setParameter('templating.loader.cache.path', $config['cache']);
         }
     }
 

@@ -173,6 +173,7 @@ class XmlFileLoaderTest extends \PHPUnit_Framework_TestCase
 
         // extension without an XSD
         $config = $loader->load('extensions/services1.xml');
+        $config->commit();
         $services = $config->getDefinitions();
         $parameters = $config->getParameterBag()->all();
 
@@ -184,6 +185,7 @@ class XmlFileLoaderTest extends \PHPUnit_Framework_TestCase
 
         // extension with an XSD
         $config = $loader->load('extensions/services2.xml');
+        $config->commit();
         $services = $config->getDefinitions();
         $parameters = $config->getParameterBag()->all();
 

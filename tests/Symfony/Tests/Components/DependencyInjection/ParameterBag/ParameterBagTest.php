@@ -75,4 +75,40 @@ class ParameterBagTest extends \PHPUnit_Framework_TestCase
         $this->assertTrue($bag->has('Foo'), '->has() converts the key to lowercase');
         $this->assertFalse($bag->has('bar'), '->has() returns false if a parameter is not defined');
     }
+
+    /**
+     * @covers Symfony\Components\DependencyInjection\ParameterBag\ParameterBag::resolveValue
+     */
+    public function testResolveValue()
+    {
+        $bag = new ParameterBag(array());
+        $this->assertEquals('foo', $bag->resolveValue('foo'), '->resolveValue() returns its argument unmodified if no placeholders are found');
+
+        $bag = new ParameterBag(array('foo' => 'bar'));
+        $this->assertEquals('I\'m a bar', $bag->resolveValue('I\'m a %foo%'), '->resolveValue() replaces placeholders by their values');
+        $this->assertEquals(array('bar' => 'bar'), $bag->resolveValue(array('%foo%' => '%foo%')), '->resolveValue() replaces placeholders in keys and values of arrays');
+        $this->assertEquals(array('bar' => array('bar' => array('bar' => 'bar'))), $bag->resolveValue(array('%foo%' => array('%foo%' => array('%foo%' => '%foo%')))), '->resolveValue() replaces placeholders in nested arrays');
+        $this->assertEquals('I\'m a %foo%', $bag->resolveValue('I\'m a %%foo%%'), '->resolveValue() supports % escaping by doubling it');
+        $this->assertEquals('I\'m a bar %foo bar', $bag->resolveValue('I\'m a %foo% %%foo %foo%'), '->resolveValue() supports % escaping by doubling it');
+
+        $bag = new ParameterBag(array('foo' => true));
+        $this->assertTrue($bag->resolveValue('%foo%') === true, '->resolveValue() replaces arguments that are just a placeholder by their value without casting them to strings');
+
+        $bag = new ParameterBag(array());
+        try {
+            $bag->resolveValue('%foobar%', array());
+            $this->fail('->resolveValue() throws a RuntimeException if a placeholder references a non-existant parameter');
+        } catch (\Exception $e) {
+            $this->assertInstanceOf('\RuntimeException', $e, '->resolveValue() throws a RuntimeException if a placeholder references a non-existant parameter');
+            $this->assertEquals('The parameter "foobar" must be defined.', $e->getMessage(), '->resolveValue() throws a RuntimeException if a placeholder references a non-existant parameter');
+        }
+
+        try {
+            $bag->resolveValue('foo %foobar% bar', array());
+            $this->fail('->resolveValue() throws a RuntimeException if a placeholder references a non-existant parameter');
+        } catch (\Exception $e) {
+            $this->assertInstanceOf('\RuntimeException', $e, '->resolveValue() throws a RuntimeException if a placeholder references a non-existant parameter');
+            $this->assertEquals('The parameter "foobar" must be defined (used in the following expression: "foo %foobar% bar").', $e->getMessage(), '->resolveValue() throws a RuntimeException if a placeholder references a non-existant parameter');
+        }
+    }
 }

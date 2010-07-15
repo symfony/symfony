@@ -137,7 +137,7 @@ class GraphvizDumper extends Dumper
         $container = clone $this->container;
 
         foreach ($container->getDefinitions() as $id => $definition) {
-            $nodes[$id] = array('class' => str_replace('\\', '\\\\', $this->getValue($definition->getClass())), 'attributes' => array_merge($this->options['node.definition'], array('style' => $definition->isShared() ? 'filled' : 'dotted')));
+            $nodes[$id] = array('class' => str_replace('\\', '\\\\', $this->container->getParameterBag()->resolveValue($definition->getClass())), 'attributes' => array_merge($this->options['node.definition'], array('style' => $definition->isShared() ? 'filled' : 'dotted')));
 
             $container->setDefinition($id, new Definition('stdClass'));
         }
@@ -155,11 +155,6 @@ class GraphvizDumper extends Dumper
         }
 
         return $nodes;
-    }
-
-    protected function getValue($value, $default = '')
-    {
-        return ContainerBuilder::resolveValue($value, $this->container->getParameterBag()->all());
     }
 
     protected function startDot()

@@ -104,4 +104,47 @@ class ParameterBag implements ParameterBagInterface
     {
         return array_key_exists(strtolower($name), $this->parameters);
     }
+
+    /**
+     * Replaces parameter placeholders (%name%) by their values.
+     *
+     * @param  mixed $value A value
+     *
+     * @throws \RuntimeException if a placeholder references a parameter that does not exist
+     */
+    public function resolveValue($value)
+    {
+        if (is_array($value)) {
+            $args = array();
+            foreach ($value as $k => $v) {
+                $args[$this->resolveValue($k)] = $this->resolveValue($v);
+            }
+
+            $value = $args;
+        } else if (is_string($value)) {
+            if (preg_match('/^%([^%]+)%$/', $value, $match)) {
+                // we do this to deal with non string values (boolean, integer, ...)
+                // the preg_replace_callback converts them to strings
+                if (!array_key_exists($name = strtolower($match[1]), $this->parameters)) {
+                    throw new \RuntimeException(sprintf('The parameter "%s" must be defined.', $name));
+                }
+
+                $value = $this->parameters[$name];
+            } else {
+                $parameters = $this->parameters;
+                $replaceParameter = function ($match) use ($parameters, $value)
+                {
+                    if (!array_key_exists($name = strtolower($match[2]), $parameters)) {
+                        throw new \RuntimeException(sprintf('The parameter "%s" must be defined (used in the following expression: "%s").', $name, $value));
+                    }
+
+                    return $parameters[$name];
+                };
+
+                $value = str_replace('%%', '%', preg_replace_callback('/(?<!%)(%)([^%]+)\1/', $replaceParameter, $value));
+            }
+        }
+
+        return $value;
+    }
 }

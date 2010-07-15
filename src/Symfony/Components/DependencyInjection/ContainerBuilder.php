@@ -234,7 +234,7 @@ class ContainerBuilder extends Container implements AnnotatedContainerInterface
         $this->parameterBag->add($parameters);
 
         foreach ($this->parameterBag->all() as $key => $value) {
-            $this->parameterBag->set($key, self::resolveValue($value, $this->getParameterBag()->all()));
+            $this->parameterBag->set($key, $this->getParameterBag()->resolveValue($value));
         }
     }
 
@@ -449,21 +449,21 @@ class ContainerBuilder extends Container implements AnnotatedContainerInterface
     protected function createService(Definition $definition, $id)
     {
         if (null !== $definition->getFile()) {
-            require_once self::resolveValue($definition->getFile(), $this->getParameterBag()->all());
+            require_once $this->getParameterBag()->resolveValue($definition->getFile());
         }
 
-        $arguments = $this->resolveServices(self::resolveValue($definition->getArguments(), $this->getParameterBag()->all()));
+        $arguments = $this->resolveServices($this->getParameterBag()->resolveValue($definition->getArguments()));
 
         if (null !== $definition->getFactoryMethod()) {
             if (null !== $definition->getFactoryService()) {
-                $factory = $this->get(self::resolveValue($definition->getFactoryService(), $this->getParameterBag()->all()));
+                $factory = $this->get($this->getParameterBag()->resolveValue($definition->getFactoryService()));
             } else {
-                $factory = self::resolveValue($definition->getClass(), $this->getParameterBag()->all());
+                $factory = $this->getParameterBag()->resolveValue($definition->getClass());
             }
 
             $service = call_user_func_array(array($factory, $definition->getFactoryMethod()), $arguments);
         } else {
-            $r = new \ReflectionClass(self::resolveValue($definition->getClass(), $this->getParameterBag()->all()));
+            $r = new \ReflectionClass($this->getParameterBag()->resolveValue($definition->getClass()));
 
             $service = null === $r->getConstructor() ? $r->newInstance() : $r->newInstanceArgs($arguments);
         }
@@ -484,7 +484,7 @@ class ContainerBuilder extends Container implements AnnotatedContainerInterface
             }
 
             if ($ok) {
-                call_user_func_array(array($service, $call[0]), $this->resolveServices(self::resolveValue($call[1], $this->getParameterBag()->all())));
+                call_user_func_array(array($service, $call[0]), $this->resolveServices($this->getParameterBag()->resolveValue($call[1])));
             }
         }
 
@@ -492,7 +492,7 @@ class ContainerBuilder extends Container implements AnnotatedContainerInterface
             if (is_array($callable) && is_object($callable[0]) && $callable[0] instanceof Reference) {
                 $callable[0] = $this->get((string) $callable[0]);
             } elseif (is_array($callable)) {
-                $callable[0] = self::resolveValue($callable[0], $this->getParameterBag()->all());
+                $callable[0] = $this->getParameterBag()->resolveValue($callable[0]);
             }
 
             if (!is_callable($callable)) {
@@ -503,50 +503,6 @@ class ContainerBuilder extends Container implements AnnotatedContainerInterface
         }
 
         return $service;
-    }
-
-    /**
-     * Replaces parameter placeholders (%name%) by their values.
-     *
-     * @param  mixed $value A value
-     *
-     * @return mixed The same value with all placeholders replaced by their values
-     *
-     * @throws \RuntimeException if a placeholder references a parameter that does not exist
-     */
-    static public function resolveValue($value, $parameters)
-    {
-        if (is_array($value)) {
-            $args = array();
-            foreach ($value as $k => $v) {
-                $args[self::resolveValue($k, $parameters)] = self::resolveValue($v, $parameters);
-            }
-
-            $value = $args;
-        } else if (is_string($value)) {
-            if (preg_match('/^%([^%]+)%$/', $value, $match)) {
-                // we do this to deal with non string values (boolean, integer, ...)
-                // the preg_replace_callback converts them to strings
-                if (!array_key_exists($name = strtolower($match[1]), $parameters)) {
-                    throw new \RuntimeException(sprintf('The parameter "%s" must be defined.', $name));
-                }
-
-                $value = $parameters[$name];
-            } else {
-                $replaceParameter = function ($match) use ($parameters, $value)
-                {
-                    if (!array_key_exists($name = strtolower($match[2]), $parameters)) {
-                        throw new \RuntimeException(sprintf('The parameter "%s" must be defined (used in the following expression: "%s").', $name, $value));
-                    }
-
-                    return $parameters[$name];
-                };
-
-                $value = str_replace('%%', '%', preg_replace_callback('/(?<!%)(%)([^%]+)\1/', $replaceParameter, $value));
-            }
-        }
-
-        return $value;
     }
 
     /**

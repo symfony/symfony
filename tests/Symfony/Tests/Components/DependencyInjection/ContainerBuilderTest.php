@@ -289,39 +289,6 @@ class ContainerBuilderTest extends \PHPUnit_Framework_TestCase
     }
 
     /**
-     * @covers Symfony\Components\DependencyInjection\ContainerBuilder::resolveValue
-     */
-    public function testResolveValue()
-    {
-        $this->assertEquals('foo', ContainerBuilder::resolveValue('foo', array()), '->resolveValue() returns its argument unmodified if no placeholders are found');
-        $this->assertEquals('I\'m a bar', ContainerBuilder::resolveValue('I\'m a %foo%', array('foo' => 'bar')), '->resolveValue() replaces placeholders by their values');
-        $this->assertTrue(ContainerBuilder::resolveValue('%foo%', array('foo' => true)) === true, '->resolveValue() replaces arguments that are just a placeholder by their value without casting them to strings');
-
-        $this->assertEquals(array('bar' => 'bar'), ContainerBuilder::resolveValue(array('%foo%' => '%foo%'), array('foo' => 'bar')), '->resolveValue() replaces placeholders in keys and values of arrays');
-
-        $this->assertEquals(array('bar' => array('bar' => array('bar' => 'bar'))), ContainerBuilder::resolveValue(array('%foo%' => array('%foo%' => array('%foo%' => '%foo%'))), array('foo' => 'bar')), '->resolveValue() replaces placeholders in nested arrays');
-
-        $this->assertEquals('I\'m a %foo%', ContainerBuilder::resolveValue('I\'m a %%foo%%', array('foo' => 'bar')), '->resolveValue() supports % escaping by doubling it');
-        $this->assertEquals('I\'m a bar %foo bar', ContainerBuilder::resolveValue('I\'m a %foo% %%foo %foo%', array('foo' => 'bar')), '->resolveValue() supports % escaping by doubling it');
-
-        try {
-            ContainerBuilder::resolveValue('%foobar%', array());
-            $this->fail('->resolveValue() throws a RuntimeException if a placeholder references a non-existant parameter');
-        } catch (\Exception $e) {
-            $this->assertInstanceOf('\RuntimeException', $e, '->resolveValue() throws a RuntimeException if a placeholder references a non-existant parameter');
-            $this->assertEquals('The parameter "foobar" must be defined.', $e->getMessage(), '->resolveValue() throws a RuntimeException if a placeholder references a non-existant parameter');
-        }
-
-        try {
-            ContainerBuilder::resolveValue('foo %foobar% bar', array());
-            $this->fail('->resolveValue() throws a RuntimeException if a placeholder references a non-existant parameter');
-        } catch (\Exception $e) {
-            $this->assertInstanceOf('\RuntimeException', $e, '->resolveValue() throws a RuntimeException if a placeholder references a non-existant parameter');
-            $this->assertEquals('The parameter "foobar" must be defined (used in the following expression: "foo %foobar% bar").', $e->getMessage(), '->resolveValue() throws a RuntimeException if a placeholder references a non-existant parameter');
-        }
-    }
-
-    /**
      * @covers Symfony\Components\DependencyInjection\ContainerBuilder::resolveServices
      */
     public function testResolveServices()

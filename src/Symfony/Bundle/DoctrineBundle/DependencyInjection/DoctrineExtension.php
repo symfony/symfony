@@ -53,9 +53,8 @@ class DoctrineExtension extends LoaderExtension
      *
      *      <doctrine:dbal dbname="sfweb" user="root" />
      *
-     * @param array $config A configuration array
-     *
-     * @return BuilderConfiguration A BuilderConfiguration instance
+     * @param array                                                        $config        An array of configuration settings
+     * @param \Symfony\Components\DependencyInjection\BuilderConfiguration $configuration A BuilderConfiguration instance
      */
     public function dbalLoad($config, BuilderConfiguration $configuration)
     {
@@ -138,9 +137,8 @@ class DoctrineExtension extends LoaderExtension
     /**
      * Loads the Doctrine ORM configuration.
      *
-     * @param array $config A configuration array
-     *
-     * @return BuilderConfiguration A BuilderConfiguration instance
+     * @param array                                                        $config        An array of configuration settings
+     * @param \Symfony\Components\DependencyInjection\BuilderConfiguration $configuration A BuilderConfiguration instance
      */
     public function ormLoad($config, BuilderConfiguration $configuration)
     {

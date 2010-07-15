@@ -24,6 +24,12 @@ use Symfony\Components\DependencyInjection\BuilderConfiguration;
  */
 class TwigExtension extends LoaderExtension
 {
+    /**
+     * Loads the Twig configuration.
+     *
+     * @param array                                                        $config        An array of configuration settings
+     * @param \Symfony\Components\DependencyInjection\BuilderConfiguration $configuration A BuilderConfiguration instance
+     */
     public function configLoad($config, BuilderConfiguration $configuration)
     {
         if (!$configuration->hasDefinition('twig')) {

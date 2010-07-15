@@ -17,9 +17,8 @@ class PropelExtension extends LoaderExtension
     /**
      * Loads the Propel configuration.
      *
-     * @param array $config A configuration array
-     *
-     * @return BuilderConfiguration A BuilderConfiguration instance
+     * @param array                                                        $config        An array of configuration settings
+     * @param \Symfony\Components\DependencyInjection\BuilderConfiguration $configuration A BuilderConfiguration instance
      */
     public function configLoad($config, BuilderConfiguration $configuration)
     {
@@ -48,9 +47,8 @@ class PropelExtension extends LoaderExtension
     /**
      * Loads the DBAL configuration.
      *
-     * @param array $config A configuration array
-     *
-     * @return BuilderConfiguration A BuilderConfiguration instance
+     * @param array                                                        $config        An array of configuration settings
+     * @param \Symfony\Components\DependencyInjection\BuilderConfiguration $configuration A BuilderConfiguration instance
      */
     public function dbalLoad($config, BuilderConfiguration $configuration)
     {

@@ -30,6 +30,12 @@ class MongoDBExtension extends LoaderExtension
         $this->bundles = $bundles;
     }
 
+    /**
+     * Loads the MongoDB configuration.
+     *
+     * @param array                                                        $config        An array of configuration settings
+     * @param \Symfony\Components\DependencyInjection\BuilderConfiguration $configuration A BuilderConfiguration instance
+     */
     public function mongodbLoad($config, BuilderConfiguration $configuration)
     {
         $loader = new XmlFileLoader(__DIR__.'/../Resources/config');

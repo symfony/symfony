@@ -35,10 +35,8 @@ class ZendExtension extends LoaderExtension
      *
      *      <zend:logger priority="info" path="/path/to/some.log" />
      *
-     * @param array                $config        A configuration array
-     * @param BuilderConfiguration $configuration A BuilderConfiguration instance
-     *
-     * @return BuilderConfiguration A BuilderConfiguration instance
+     * @param array                                                        $config        An array of configuration settings
+     * @param \Symfony\Components\DependencyInjection\BuilderConfiguration $configuration A BuilderConfiguration instance
      */
     public function loggerLoad($config, BuilderConfiguration $configuration)
     {

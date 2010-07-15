@@ -47,10 +47,8 @@ class WebExtension extends LoaderExtension
     /**
      * Loads the web configuration.
      *
-     * @param array                $config        A configuration array
-     * @param BuilderConfiguration $configuration A BuilderConfiguration instance
-     *
-     * @return BuilderConfiguration A BuilderConfiguration instance
+     * @param array                                                        $config        An array of configuration settings
+     * @param \Symfony\Components\DependencyInjection\BuilderConfiguration $configuration A BuilderConfiguration instance
      */
     public function configLoad($config, BuilderConfiguration $configuration)
     {
@@ -171,9 +169,8 @@ class WebExtension extends LoaderExtension
     /**
      * Loads the templating configuration.
      *
-     * @param array $config A configuration array
-     *
-     * @return BuilderConfiguration A BuilderConfiguration instance
+     * @param array                                                        $config        An array of configuration settings
+     * @param \Symfony\Components\DependencyInjection\BuilderConfiguration $configuration A BuilderConfiguration instance
      */
     public function templatingLoad($config, BuilderConfiguration $configuration)
     {

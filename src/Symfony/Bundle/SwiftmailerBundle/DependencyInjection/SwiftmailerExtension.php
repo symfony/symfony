@@ -40,9 +40,8 @@ class SwiftMailerExtension extends LoaderExtension
      *        <swift:spool path="/path/to/spool/" />
      *      </swift:mailer>
      *
-     * @param array $config A configuration array
-     *
-     * @return BuilderConfiguration A BuilderConfiguration instance
+     * @param array                                                        $config        An array of configuration settings
+     * @param \Symfony\Components\DependencyInjection\BuilderConfiguration $configuration A BuilderConfiguration instance
      */
     public function mailerLoad($config, BuilderConfiguration $configuration)
     {

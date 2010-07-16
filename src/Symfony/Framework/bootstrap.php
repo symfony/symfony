@@ -75,16 +75,16 @@ abstract class Bundle implements BundleInterface
     
     public function registerCommands(Application $application)
     {
-        if (!is_dir($dir = $this->getPath().'/Command')) {
+        if (!$dir = realpath($this->getPath().'/Command')) {
             return;
         }
 
         $finder = new Finder();
         $finder->files()->name('*Command.php')->in($dir);
 
-        $prefix = $this->namespacePrefix.'\\'.$this->name.'\\Command\\';
+        $prefix = $this->namespacePrefix.'\\'.$this->name.'\\Command';
         foreach ($finder as $file) {
-            $r = new \ReflectionClass($prefix.basename($file, '.php'));
+            $r = new \ReflectionClass($prefix.strtr($file->getPath(), array($dir => '', '/' => '\\')).'\\'.basename($file, '.php'));
             if ($r->isSubclassOf('Symfony\\Components\\Console\\Command\\Command') && !$r->isAbstract()) {
                 $application->addCommand($r->newInstance());
             }

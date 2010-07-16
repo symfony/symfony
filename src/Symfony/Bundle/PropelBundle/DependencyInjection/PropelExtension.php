@@ -2,13 +2,13 @@
 
 namespace Symfony\Bundle\PropelBundle\DependencyInjection;
 
-use Symfony\Components\DependencyInjection\Loader\LoaderExtension;
+use Symfony\Components\DependencyInjection\Extension\Extension;
 use Symfony\Components\DependencyInjection\Loader\XmlFileLoader;
 use Symfony\Components\DependencyInjection\ContainerBuilder;
 use Symfony\Components\DependencyInjection\Definition;
 use Symfony\Components\DependencyInjection\Reference;
 
-class PropelExtension extends LoaderExtension
+class PropelExtension extends Extension
 {
     protected $resources = array(
         'propel' => 'propel.xml',
@@ -23,8 +23,8 @@ class PropelExtension extends LoaderExtension
     public function configLoad($config, ContainerBuilder $container)
     {
         if (!$container->hasDefinition('propel')) {
-            $loader = new XmlFileLoader(__DIR__.'/../Resources/config');
-            $container->merge($loader->load($this->resources['propel']));
+            $loader = new XmlFileLoader($container, __DIR__.'/../Resources/config');
+            $loader->load($this->resources['propel']);
         }
 
         if (!$container->hasParameter('propel.path')) {
@@ -53,8 +53,8 @@ class PropelExtension extends LoaderExtension
     public function dbalLoad($config, ContainerBuilder $container)
     {
         if (!$container->hasDefinition('propel')) {
-            $loader = new XmlFileLoader(__DIR__.'/../Resources/config');
-            $container->merge($loader->load($this->resources['propel']));
+            $loader = new XmlFileLoader($container, __DIR__.'/../Resources/config');
+            $loader->load($this->resources['propel']);
         }
 
         $defaultConnection = array(

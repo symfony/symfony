@@ -1,6 +1,6 @@
 <?php
 
-namespace Symfony\Components\DependencyInjection\Loader;
+namespace Symfony\Components\DependencyInjection\Extension;
 
 use Symfony\Components\DependencyInjection\ContainerBuilder;
 
@@ -14,13 +14,13 @@ use Symfony\Components\DependencyInjection\ContainerBuilder;
  */
 
 /**
- * LoaderExtensionInterface is the interface implemented by loader extension classes.
+ * ExtensionInterface is the interface implemented by container extension classes.
  *
  * @package    Symfony
  * @subpackage Components_DependencyInjection
  * @author     Fabien Potencier <fabien.potencier@symfony-project.com>
  */
-interface LoaderExtensionInterface
+interface ExtensionInterface
 {
     /**
      * Loads a specific configuration.

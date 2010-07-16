@@ -20,10 +20,10 @@ class FileLoaderTest extends \PHPUnit_Framework_TestCase
      */
     public function testConstructor()
     {
-        $loader = new ProjectLoader(__DIR__);
+        $loader = new ProjectLoader(new ContainerBuilder(), __DIR__);
         $this->assertEquals(array(__DIR__), $loader->paths, '__construct() takes a path as its second argument');
 
-        $loader = new ProjectLoader(array(__DIR__, __DIR__));
+        $loader = new ProjectLoader(new ContainerBuilder(), array(__DIR__, __DIR__));
         $this->assertEquals(array(__DIR__, __DIR__), $loader->paths, '__construct() takes an array of paths as its second argument');
     }
 
@@ -32,7 +32,7 @@ class FileLoaderTest extends \PHPUnit_Framework_TestCase
      */
     public function testGetAbsolutePath()
     {
-        $loader = new ProjectLoader(array(__DIR__.'/../Fixtures/containers'));
+        $loader = new ProjectLoader(new ContainerBuilder(), array(__DIR__.'/../Fixtures/containers'));
         $this->assertEquals('/foo.xml', $loader->getAbsolutePath('/foo.xml'), '->getAbsolutePath() return the path unmodified if it is already an absolute path');
         $this->assertEquals('c:\\\\foo.xml', $loader->getAbsolutePath('c:\\\\foo.xml'), '->getAbsolutePath() return the path unmodified if it is already an absolute path');
         $this->assertEquals('c:/foo.xml', $loader->getAbsolutePath('c:/foo.xml'), '->getAbsolutePath() return the path unmodified if it is already an absolute path');

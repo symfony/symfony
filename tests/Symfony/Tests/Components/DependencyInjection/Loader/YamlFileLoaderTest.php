@@ -10,7 +10,7 @@
 
 namespace Symfony\Tests\Components\DependencyInjection\Loader;
 
-use Symfony\Components\DependencyInjection\Builder;
+use Symfony\Components\DependencyInjection\ContainerBuilder;
 use Symfony\Components\DependencyInjection\Reference;
 use Symfony\Components\DependencyInjection\Definition;
 use Symfony\Components\DependencyInjection\Loader\Loader;
@@ -28,7 +28,7 @@ class YamlFileLoaderTest extends \PHPUnit_Framework_TestCase
 
     public function testLoadFile()
     {
-        $loader = new ProjectLoader3(self::$fixturesPath.'/ini');
+        $loader = new ProjectLoader3(new ContainerBuilder(), self::$fixturesPath.'/ini');
 
         try {
             $loader->loadFile('foo.yml');
@@ -46,7 +46,7 @@ class YamlFileLoaderTest extends \PHPUnit_Framework_TestCase
             $this->assertEquals('The service file "parameters.ini" is not valid.', $e->getMessage(), '->load() throws an InvalidArgumentException if the loaded file is not a valid YAML file');
         }
 
-        $loader = new ProjectLoader3(self::$fixturesPath.'/yaml');
+        $loader = new ProjectLoader3(new ContainerBuilder(), self::$fixturesPath.'/yaml');
 
         foreach (array('nonvalid1', 'nonvalid2') as $fixture) {
             try {
@@ -61,26 +61,29 @@ class YamlFileLoaderTest extends \PHPUnit_Framework_TestCase
 
     public function testLoadParameters()
     {
-        $loader = new ProjectLoader3(self::$fixturesPath.'/yaml');
-        $config = $loader->load('services2.yml');
-        $this->assertEquals(array('foo' => 'bar', 'values' => array(true, false, 0, 1000.3), 'bar' => 'foo', 'foo_bar' => new Reference('foo_bar')), $config->getParameterBag()->all(), '->load() converts YAML keys to lowercase');
+        $container = new ContainerBuilder();
+        $loader = new ProjectLoader3($container, self::$fixturesPath.'/yaml');
+        $loader->load('services2.yml');
+        $this->assertEquals(array('foo' => 'bar', 'values' => array(true, false, 0, 1000.3), 'bar' => 'foo', 'foo_bar' => new Reference('foo_bar')), $container->getParameterBag()->all(), '->load() converts YAML keys to lowercase');
     }
 
     public function testLoadImports()
     {
-        $loader = new ProjectLoader3(self::$fixturesPath.'/yaml');
-        $config = $loader->load('services4.yml');
+        $container = new ContainerBuilder();
+        $loader = new ProjectLoader3($container, self::$fixturesPath.'/yaml');
+        $loader->load('services4.yml');
 
-        $actual = $config->getParameterBag()->all();
+        $actual = $container->getParameterBag()->all();
         $expected = array('foo' => 'bar', 'values' => array(true, false), 'bar' => '%foo%', 'foo_bar' => new Reference('foo_bar'), 'imported_from_ini' => true, 'imported_from_xml' => true);
         $this->assertEquals(array_keys($expected), array_keys($actual), '->load() imports and merges imported files');
     }
 
     public function testLoadServices()
     {
-        $loader = new ProjectLoader3(self::$fixturesPath.'/yaml');
-        $config = $loader->load('services6.yml');
-        $services = $config->getDefinitions();
+        $container = new ContainerBuilder();
+        $loader = new ProjectLoader3($container, self::$fixturesPath.'/yaml');
+        $loader->load('services6.yml');
+        $services = $container->getDefinitions();
         $this->assertTrue(isset($services['foo']), '->load() parses service elements');
         $this->assertEquals('Symfony\\Components\\DependencyInjection\\Definition', get_class($services['foo']), '->load() converts service element to Definition instances');
         $this->assertEquals('FooClass', $services['foo']->getClass(), '->load() parses the class attribute');
@@ -96,20 +99,20 @@ class YamlFileLoaderTest extends \PHPUnit_Framework_TestCase
         $this->assertEquals(array(array('setBar', array('foo', new Reference('foo'), array(true, false)))), $services['method_call2']->getMethodCalls(), '->load() parses the method_call tag');
         $this->assertEquals('baz_factory', $services['factory_service']->getFactoryService());
 
-        $aliases = $config->getAliases();
+        $aliases = $container->getAliases();
         $this->assertTrue(isset($aliases['alias_for_foo']), '->load() parses aliases');
         $this->assertEquals('foo', $aliases['alias_for_foo'], '->load() parses aliases');
     }
 
     public function testExtensions()
     {
-        Loader::registerExtension(new \ProjectExtension());
-        $loader = new ProjectLoader3(self::$fixturesPath.'/yaml');
-
-        $config = $loader->load('services10.yml');
-        $config->freeze();
-        $services = $config->getDefinitions();
-        $parameters = $config->getParameterBag()->all();
+        $container = new ContainerBuilder();
+        $container->registerExtension(new \ProjectExtension());
+        $loader = new ProjectLoader3($container, self::$fixturesPath.'/yaml');
+        $loader->load('services10.yml');
+        $container->freeze();
+        $services = $container->getDefinitions();
+        $parameters = $container->getParameterBag()->all();
 
         $this->assertTrue(isset($services['project.service.bar']), '->load() parses extension elements');
         $this->assertTrue(isset($parameters['project.parameter.bar']), '->load() parses extension elements');
@@ -118,7 +121,7 @@ class YamlFileLoaderTest extends \PHPUnit_Framework_TestCase
         $this->assertEquals('BAR', $parameters['project.parameter.foo'], '->load() parses extension elements');
 
         try {
-            $config = $loader->load('services11.yml');
+            $loader->load('services11.yml');
             $this->fail('->load() throws an InvalidArgumentException if the tag is not valid');
         } catch (\Exception $e) {
             $this->assertInstanceOf('\InvalidArgumentException', $e, '->load() throws an InvalidArgumentException if the tag is not valid');
@@ -126,7 +129,7 @@ class YamlFileLoaderTest extends \PHPUnit_Framework_TestCase
         }
 
         try {
-            $config = $loader->load('services12.yml');
+            $loader->load('services12.yml');
             $this->fail('->load() throws an InvalidArgumentException if an extension is not loaded');
         } catch (\Exception $e) {
             $this->assertInstanceOf('\InvalidArgumentException', $e, '->load() throws an InvalidArgumentException if an extension is not loaded');

@@ -4,6 +4,7 @@ namespace Symfony\Bundle\SwiftmailerBundle;
 
 use Symfony\Framework\Bundle\Bundle;
 use Symfony\Components\DependencyInjection\ParameterBag\ParameterBagInterface;
+use Symfony\Components\DependencyInjection\ContainerBuilder;
 use Symfony\Components\DependencyInjection\Loader\Loader;
 use Symfony\Bundle\SwiftmailerBundle\DependencyInjection\SwiftmailerExtension;
 
@@ -34,6 +35,6 @@ class SwiftmailerBundle extends Bundle
      */
     public function buildContainer(ParameterBagInterface $parameterBag)
     {
-        Loader::registerExtension(new SwiftmailerExtension());
+        ContainerBuilder::registerExtension(new SwiftmailerExtension());
     }
 }

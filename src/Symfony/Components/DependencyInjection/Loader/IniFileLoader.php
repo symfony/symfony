@@ -27,21 +27,14 @@ class IniFileLoader extends FileLoader
      * Loads a resource.
      *
      * @param mixed            $resource       The resource
-     * @param ContainerBuilder $container  A ContainerBuilder instance to use for the configuration
-     *
-     * @return ContainerBuilder A ContainerBuilder instance
      *
      * @throws \InvalidArgumentException When ini file is not valid
      */
-    public function load($file, ContainerBuilder $container = null)
+    public function load($file)
     {
         $path = $this->findFile($file);
 
-        if (null === $container) {
-            $container = new ContainerBuilder();
-        }
-
-        $container->addResource(new FileResource($path));
+        $this->container->addResource(new FileResource($path));
 
         $result = parse_ini_file($path, true);
         if (false === $result || array() === $result) {
@@ -50,10 +43,8 @@ class IniFileLoader extends FileLoader
 
         if (isset($result['parameters']) && is_array($result['parameters'])) {
             foreach ($result['parameters'] as $key => $value) {
-                $container->setParameter($key, $value);
+                $this->container->setParameter($key, $value);
             }
         }
-
-        return $container;
     }
 }

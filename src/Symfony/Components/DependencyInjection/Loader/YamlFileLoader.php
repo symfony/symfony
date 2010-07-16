@@ -32,58 +32,49 @@ class YamlFileLoader extends FileLoader
     /**
      * Loads an array of Yaml files.
      *
-     * @param mixed            $resource       The resource
-     * @param ContainerBuilder $container  A ContainerBuilder instance to use for the configuration
-     *
-     * @return ContainerBuilder A ContainerBuilder instance
+     * @param mixed $resource The resource
      */
-    public function load($file, ContainerBuilder $container = null)
+    public function load($file)
     {
         $path = $this->findFile($file);
 
         $content = $this->loadFile($path);
 
-        if (null === $container) {
-            $container = new ContainerBuilder();
-        }
-
-        $container->addResource(new FileResource($path));
+        $this->container->addResource(new FileResource($path));
 
         if (!$content) {
-            return $container;
+            return;
         }
 
         // imports
-        $this->parseImports($container, $content, $file);
+        $this->parseImports($content, $file);
 
         // extensions
-        $this->loadFromExtensions($container, $content);
+        $this->loadFromExtensions($content);
 
         // parameters
         if (isset($content['parameters'])) {
             foreach ($content['parameters'] as $key => $value) {
-                $container->setParameter($key, $this->resolveServices($value));
+                $this->container->setParameter($key, $this->resolveServices($value));
             }
         }
 
         // services
-        $this->parseDefinitions($container, $content, $file);
-
-        return $container;
+        $this->parseDefinitions($content, $file);
     }
 
-    protected function parseImports(ContainerBuilder $container, $content, $file)
+    protected function parseImports($content, $file)
     {
         if (!isset($content['imports'])) {
             return;
         }
 
         foreach ($content['imports'] as $import) {
-            $this->parseImport($container, $import, $file);
+            $this->parseImport($import, $file);
         }
     }
 
-    protected function parseImport(ContainerBuilder $container, $import, $file)
+    protected function parseImport($import, $file)
     {
         $class = null;
         if (isset($import['class']) && $import['class'] !== get_class($this)) {
@@ -100,28 +91,28 @@ class YamlFileLoader extends FileLoader
             }
         }
 
-        $loader = null === $class ? $this : new $class($this->paths);
+        $loader = null === $class ? $this : new $class($this->container, $this->paths);
 
         $importedFile = $this->getAbsolutePath($import['resource'], dirname($file));
 
-        return $loader->load($importedFile, $container);
+        $loader->load($importedFile);
     }
 
-    protected function parseDefinitions(ContainerBuilder $container, $content, $file)
+    protected function parseDefinitions($content, $file)
     {
         if (!isset($content['services'])) {
             return;
         }
 
         foreach ($content['services'] as $id => $service) {
-            $this->parseDefinition($container, $id, $service, $file);
+            $this->parseDefinition($id, $service, $file);
         }
     }
 
-    protected function parseDefinition(ContainerBuilder $container, $id, $service, $file)
+    protected function parseDefinition($id, $service, $file)
     {
         if (is_string($service) && 0 === strpos($service, '@')) {
-            $container->setAlias($id, substr($service, 1));
+            $this->container->setAlias($id, substr($service, 1));
 
             return;
         }
@@ -175,7 +166,7 @@ class YamlFileLoader extends FileLoader
             }
         }
 
-        $container->setDefinition($id, $definition);
+        $this->container->setDefinition($id, $definition);
     }
 
     protected function loadFile($file)
@@ -204,7 +195,7 @@ class YamlFileLoader extends FileLoader
             // can it be handled by an extension?
             if (false !== strpos($key, '.')) {
                 list($namespace, $tag) = explode('.', $key);
-                if (!static::getExtension($namespace)) {
+                if (!$this->container->hasExtension($namespace)) {
                     throw new \InvalidArgumentException(sprintf('There is no extension able to load the configuration for "%s" (in %s).', $key, $file));
                 }
 
@@ -230,7 +221,7 @@ class YamlFileLoader extends FileLoader
         return $value;
     }
 
-    protected function loadFromExtensions(ContainerBuilder $container, $content)
+    protected function loadFromExtensions($content)
     {
         foreach ($content as $key => $values) {
             if (in_array($key, array('imports', 'parameters', 'services'))) {
@@ -243,7 +234,7 @@ class YamlFileLoader extends FileLoader
                 $values = array();
             }
 
-            $container->loadFromExtension($this->getExtension($namespace), $tag, $values);
+            $this->container->loadFromExtension($this->container->getExtension($namespace), $tag, $values);
         }
     }
 }

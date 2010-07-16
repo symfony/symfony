@@ -10,7 +10,7 @@
 
 namespace Symfony\Tests\Components\DependencyInjection\Loader;
 
-use Symfony\Components\DependencyInjection\Builder;
+use Symfony\Components\DependencyInjection\ContainerBuilder;
 use Symfony\Components\DependencyInjection\Loader\IniFileLoader;
 
 class IniFileLoaderTest extends \PHPUnit_Framework_TestCase
@@ -28,9 +28,10 @@ class IniFileLoaderTest extends \PHPUnit_Framework_TestCase
      */
     public function testLoader()
     {
-        $loader = new IniFileLoader(self::$fixturesPath.'/ini');
-        $config = $loader->load('parameters.ini');
-        $this->assertEquals(array('foo' => 'bar', 'bar' => '%foo%'), $config->getParameterBag()->all(), '->load() takes a single file name as its first argument');
+        $container = new ContainerBuilder();
+        $loader = new IniFileLoader($container, self::$fixturesPath.'/ini');
+        $loader->load('parameters.ini');
+        $this->assertEquals(array('foo' => 'bar', 'bar' => '%foo%'), $container->getParameterBag()->all(), '->load() takes a single file name as its first argument');
 
         try {
             $loader->load('foo.ini');

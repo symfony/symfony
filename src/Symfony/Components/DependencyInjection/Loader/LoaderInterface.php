@@ -58,12 +58,7 @@ interface LoaderInterface
      * If you load file1.xml and file2.xml in this order, the value of complex
      * will be "foo".
      *
-     * @param mixed            $resource       The resource
-     * @param ContainerBuilder $container  A ContainerBuilder instance to use for the configuration
-     *
-     * @return ContainerBuilder A ContainerBuilder instance
+     * @param mixed $resource The resource
      */
-    function load($resource, ContainerBuilder $container = null);
-
-    static function registerExtension(LoaderExtensionInterface $extension);
+    function load($resource);
 }

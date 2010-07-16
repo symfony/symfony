@@ -2,7 +2,7 @@
 
 namespace Symfony\Bundle\ZendBundle\DependencyInjection;
 
-use Symfony\Components\DependencyInjection\Loader\LoaderExtension;
+use Symfony\Components\DependencyInjection\Extension\Extension;
 use Symfony\Components\DependencyInjection\Loader\XmlFileLoader;
 use Symfony\Components\DependencyInjection\ContainerBuilder;
 
@@ -22,7 +22,7 @@ use Symfony\Components\DependencyInjection\ContainerBuilder;
  * @subpackage Bundle_ZendBundle
  * @author     Fabien Potencier <fabien.potencier@symfony-project.com>
  */
-class ZendExtension extends LoaderExtension
+class ZendExtension extends Extension
 {
     protected $resources = array(
         'logger' => 'logger.xml',
@@ -41,8 +41,8 @@ class ZendExtension extends LoaderExtension
     public function loggerLoad($config, ContainerBuilder $container)
     {
         if (!$container->hasDefinition('zend.logger')) {
-            $loader = new XmlFileLoader(__DIR__.'/../Resources/config');
-            $container->merge($loader->load($this->resources['logger']));
+            $loader = new XmlFileLoader($container, __DIR__.'/../Resources/config');
+            $loader->load($this->resources['logger']);
             $container->setAlias('logger', 'zend.logger');
         }
 

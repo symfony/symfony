@@ -2,7 +2,7 @@
 
 namespace Symfony\Bundle\FrameworkBundle\DependencyInjection;
 
-use Symfony\Components\DependencyInjection\Loader\LoaderExtension;
+use Symfony\Components\DependencyInjection\Extension\Extension;
 use Symfony\Components\DependencyInjection\Loader\XmlFileLoader;
 use Symfony\Components\DependencyInjection\Resource\FileResource;
 use Symfony\Components\DependencyInjection\ContainerBuilder;
@@ -25,7 +25,7 @@ use Symfony\Components\DependencyInjection\Definition;
  * @subpackage Bundle_FrameworkBundle
  * @author     Fabien Potencier <fabien.potencier@symfony-project.com>
  */
-class WebExtension extends LoaderExtension
+class WebExtension extends Extension
 {
     protected $resources = array(
         'templating' => 'templating.xml',
@@ -53,8 +53,8 @@ class WebExtension extends LoaderExtension
     public function configLoad($config, ContainerBuilder $container)
     {
         if (!$container->hasDefinition('controller_manager')) {
-            $loader = new XmlFileLoader(__DIR__.'/../Resources/config');
-            $container->merge($loader->load($this->resources['web']));
+            $loader = new XmlFileLoader($container, __DIR__.'/../Resources/config');
+            $loader->load($this->resources['web']);
         }
 
         if (isset($config['ide']) && 'textmate' === $config['ide']) {
@@ -68,9 +68,9 @@ class WebExtension extends LoaderExtension
         if (isset($config['profiler'])) {
             if ($config['profiler']) {
                 if (!$container->hasDefinition('profiler')) {
-                    $loader = new XmlFileLoader(__DIR__.'/../Resources/config');
-                    $container->merge($loader->load('profiling.xml'));
-                    $container->merge($loader->load('collectors.xml'));
+                    $loader = new XmlFileLoader($container, __DIR__.'/../Resources/config');
+                    $loader->load('profiling.xml');
+                    $loader->load('collectors.xml');
                 }
             } elseif ($container->hasDefinition('profiler')) {
                 $container->getDefinition('profiling')->clearAnnotations();
@@ -81,8 +81,8 @@ class WebExtension extends LoaderExtension
         if (isset($config['toolbar'])) {
             if ($config['toolbar']) {
                 if (!$container->hasDefinition('debug.toolbar')) {
-                    $loader = new XmlFileLoader(__DIR__.'/../Resources/config');
-                    $container->merge($loader->load('toolbar.xml'));
+                    $loader = new XmlFileLoader($container, __DIR__.'/../Resources/config');
+                    $loader->load('toolbar.xml');
                 }
             } elseif ($container->hasDefinition('debug.toolbar')) {
                 $container->getDefinition('debug.toolbar')->clearAnnotations();
@@ -92,8 +92,8 @@ class WebExtension extends LoaderExtension
         if (isset($config['validation']['enabled'])) {
             if ($config['validation']['enabled']) {
                 if (!$container->hasDefinition('validator')) {
-                    $loader = new XmlFileLoader(__DIR__.'/../Resources/config');
-                    $container->merge($loader->load($this->resources['validation']));
+                    $loader = new XmlFileLoader($container, __DIR__.'/../Resources/config');
+                    $loader->load($this->resources['validation']);
                 }
 
                 $xmlMappingFiles = array();
@@ -175,8 +175,8 @@ class WebExtension extends LoaderExtension
     public function templatingLoad($config, ContainerBuilder $container)
     {
         if (!$container->hasDefinition('templating')) {
-            $loader = new XmlFileLoader(__DIR__.'/../Resources/config');
-            $container->merge($loader->load($this->resources['templating']));
+            $loader = new XmlFileLoader($container, __DIR__.'/../Resources/config');
+            $loader->load($this->resources['templating']);
         }
 
         if (array_key_exists('escaping', $config)) {

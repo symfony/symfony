@@ -38,15 +38,15 @@ class KernelBundle extends Bundle
      */
     public function buildContainer(ParameterBagInterface $parameterBag)
     {
-        Loader::registerExtension(new KernelExtension());
+        ContainerBuilder::registerExtension(new KernelExtension());
 
         $container = new ContainerBuilder();
 
-        $loader = new XmlFileLoader(array(__DIR__.'/../Resources/config', __DIR__.'/Resources/config'));
-        $container->merge($loader->load('services.xml'));
+        $loader = new XmlFileLoader($container, array(__DIR__.'/../Resources/config', __DIR__.'/Resources/config'));
+        $loader->load('services.xml');
 
         if ($parameterBag->get('kernel.debug')) {
-            $container->merge($loader->load('debug.xml'));
+            $loader->load('debug.xml');
             $container->setDefinition('event_dispatcher', $container->findDefinition('debug.event_dispatcher'));
         }
 

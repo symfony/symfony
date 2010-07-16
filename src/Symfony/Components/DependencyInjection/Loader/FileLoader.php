@@ -2,6 +2,8 @@
 
 namespace Symfony\Components\DependencyInjection\Loader;
 
+use Symfony\Components\DependencyInjection\ContainerBuilder;
+
 /*
  * This file is part of the Symfony framework.
  *
@@ -25,10 +27,13 @@ abstract class FileLoader extends Loader
     /**
      * Constructor.
      *
+     * @param \Symfony\Components\DependencyInjection\ContainerBuilder $container A ContainerBuilder instance
      * @param string|array $paths A path or an array of paths where to look for resources
      */
-    public function __construct($paths = array())
+    public function __construct(ContainerBuilder $container, $paths = array())
     {
+        parent::__construct($container);
+
         if (!is_array($paths)) {
             $paths = array($paths);
         }

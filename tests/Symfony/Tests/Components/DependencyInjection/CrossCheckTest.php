@@ -34,15 +34,18 @@ class CrossCheckTest extends \PHPUnit_Framework_TestCase
 
         $tmp = tempnam('sf_service_container', 'sf');
 
-        $loader1 = new $loaderClass();
         file_put_contents($tmp, file_get_contents(self::$fixturesPath.'/'.$type.'/'.$fixture));
-        $container1 = $loader1->load($tmp);
+
+        $container1 = new ContainerBuilder();
+        $loader1 = new $loaderClass($container1);
+        $loader1->load($tmp);
 
         $dumper = new $dumperClass($container1);
         file_put_contents($tmp, $dumper->dump());
 
-        $loader2 = new $loaderClass();
-        $container2 = $loader2->load($tmp);
+        $container2 = new ContainerBuilder();
+        $loader2 = new $loaderClass($container2);
+        $loader2->load($tmp);
 
         unlink($tmp);
 
@@ -51,8 +54,6 @@ class CrossCheckTest extends \PHPUnit_Framework_TestCase
         $this->assertEquals($container2->getParameterBag()->all(), $container1->getParameterBag()->all(), '->getParameterBag() returns the same value for both containers');
 
         $this->assertEquals(serialize($container2), serialize($container1), 'loading a dump from a previously loaded container returns the same container');
-
-        $this->assertEquals($container2->getParameterBag()->all(), $container1->getParameterBag()->all(), '->getParameterBag() returns the same value for both containers');
 
         $services1 = array();
         foreach ($container1 as $id => $service) {

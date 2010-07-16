@@ -2,6 +2,8 @@
 
 namespace Symfony\Components\DependencyInjection\Loader;
 
+use Symfony\Components\DependencyInjection\ContainerBuilder;
+
 /*
  * This file is part of the Symfony framework.
  *
@@ -20,27 +22,15 @@ namespace Symfony\Components\DependencyInjection\Loader;
  */
 abstract class Loader implements LoaderInterface
 {
-    static protected $extensions = array();
+    protected $container;
 
     /**
-     * Registers an extension.
+     * Constructor.
      *
-     * @param LoaderExtensionInterface $extension An extension instance
+     * @param \Symfony\Components\DependencyInjection\ContainerBuilder $container A ContainerBuilder instance
      */
-    static public function registerExtension(LoaderExtensionInterface $extension)
+    public function __construct(ContainerBuilder $container)
     {
-        static::$extensions[$extension->getAlias()] = static::$extensions[$extension->getNamespace()] = $extension;
-    }
-
-    /**
-     * Returns an extension by alias or namespace.
-     *
-     * @param string $name An alias or a namespace
-     *
-     * @return LoaderExtensionInterface An extension instance
-     */
-    static public function getExtension($name)
-    {
-        return isset(static::$extensions[$name]) ? static::$extensions[$name] : null;
+        $this->container = $container;
     }
 }

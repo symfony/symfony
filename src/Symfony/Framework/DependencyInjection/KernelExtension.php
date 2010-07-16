@@ -2,7 +2,7 @@
 
 namespace Symfony\Framework\DependencyInjection;
 
-use Symfony\Components\DependencyInjection\Loader\LoaderExtension;
+use Symfony\Components\DependencyInjection\Extension\Extension;
 use Symfony\Components\DependencyInjection\Loader\XmlFileLoader;
 use Symfony\Components\DependencyInjection\ContainerBuilder;
 
@@ -22,12 +22,12 @@ use Symfony\Components\DependencyInjection\ContainerBuilder;
  * @subpackage Framework
  * @author     Fabien Potencier <fabien.potencier@symfony-project.org>
  */
-class KernelExtension extends LoaderExtension
+class KernelExtension extends Extension
 {
     public function testLoad($config, ContainerBuilder $container)
     {
-        $loader = new XmlFileLoader(array(__DIR__.'/../Resources/config', __DIR__.'/Resources/config'));
-        $container->merge($loader->load('test.xml'));
+        $loader = new XmlFileLoader($container, array(__DIR__.'/../Resources/config', __DIR__.'/Resources/config'));
+        $loader->load('test.xml');
         $container->setParameter('kernel.include_core_classes', false);
 
         return $container;
@@ -44,8 +44,8 @@ class KernelExtension extends LoaderExtension
     public function sessionLoad($config, ContainerBuilder $container)
     {
         if (!$container->hasDefinition('session')) {
-            $loader = new XmlFileLoader(array(__DIR__.'/../Resources/config', __DIR__.'/Resources/config'));
-            $container->merge($loader->load('session.xml'));
+            $loader = new XmlFileLoader($container, array(__DIR__.'/../Resources/config', __DIR__.'/Resources/config'));
+            $loader->load('session.xml');
         }
 
         if (isset($config['default_locale'])) {

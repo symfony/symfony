@@ -36,6 +36,6 @@ class TwigBundle extends Bundle
      */
     public function buildContainer(ParameterBagInterface $parameterBag)
     {
-        Loader::registerExtension(new TwigExtension());
+        ContainerBuilder::registerExtension(new TwigExtension());
     }
 }

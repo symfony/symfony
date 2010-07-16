@@ -2,9 +2,9 @@
 
 use Symfony\Components\DependencyInjection\ContainerBuilder;
 use Symfony\Components\DependencyInjection\Definition;
-use Symfony\Components\DependencyInjection\Loader\LoaderExtension;
+use Symfony\Components\DependencyInjection\Extension\Extension;
 
-class ProjectExtension extends LoaderExtension
+class ProjectExtension extends Extension
 {
     public function barLoad(array $config, ContainerBuilder $configuration)
     {

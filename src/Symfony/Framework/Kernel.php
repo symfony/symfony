@@ -350,7 +350,6 @@ abstract class Kernel implements HttpKernelInterface, \Serializable
             }
         }
         $container->merge($this->registerContainerConfiguration());
-        $container->commit();
         $container->freeze();
 
         foreach (array('cache', 'logs') as $name) {

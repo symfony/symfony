@@ -2,7 +2,7 @@
 
 namespace Symfony\Components\DependencyInjection;
 
-use Symfony\Components\DependencyInjection\Loader\LoaderExtensionInterface;
+use Symfony\Components\DependencyInjection\Extension\ExtensionInterface;
 use Symfony\Components\DependencyInjection\Resource\ResourceInterface;
 use Symfony\Components\DependencyInjection\Resource\FileResource;
 
@@ -24,11 +24,44 @@ use Symfony\Components\DependencyInjection\Resource\FileResource;
  */
 class ContainerBuilder extends Container implements AnnotatedContainerInterface
 {
-    protected $definitions = array();
-    protected $aliases     = array();
-    protected $loading     = array();
-    protected $resources   = array();
-    protected $extensions  = array();
+    static protected $extensions = array();
+
+    protected $definitions         = array();
+    protected $aliases             = array();
+    protected $loading             = array();
+    protected $resources           = array();
+    protected $extensionContainers = array();
+
+    /**
+     * Registers an extension.
+     *
+     * @param ExtensionInterface $extension An extension instance
+     */
+    static public function registerExtension(ExtensionInterface $extension)
+    {
+        static::$extensions[$extension->getAlias()] = static::$extensions[$extension->getNamespace()] = $extension;
+    }
+
+    /**
+     * Returns an extension by alias or namespace.
+     *
+     * @param string $name An alias or a namespace
+     *
+     * @return ExtensionInterface An extension instance
+     */
+    static public function getExtension($name)
+    {
+        if (!isset(static::$extensions[$name])) {
+            throw new \LogicException(sprintf('Container extension "%s" is not registered', $name));
+        }
+
+        return static::$extensions[$name];
+    }
+
+    static public function hasExtension($name)
+    {
+        return isset(static::$extensions[$name]);
+    }
 
     /**
      * Returns an array of resources loaded to build this configuration.
@@ -71,13 +104,13 @@ class ContainerBuilder extends Container implements AnnotatedContainerInterface
     /**
      * Loads the configuration for an extension.
      *
-     * @param LoaderExtensionInterface $extension A LoaderExtensionInterface instance
+     * @param ExtensionInterface $extension A ExtensionInterface instance
      * @param string                   $tag       The extension tag to load (without the namespace - namespace.tag)
      * @param array                    $values    An array of values that customizes the extension
      *
      * @return ContainerBuilder The current instance
      */
-    public function loadFromExtension(LoaderExtensionInterface $extension, $tag, array $values = array())
+    public function loadFromExtension(ExtensionInterface $extension, $tag, array $values = array())
     {
         if (true === $this->isFrozen()) {
             throw new \LogicException('Cannot load from an extension on a frozen container.');
@@ -87,14 +120,14 @@ class ContainerBuilder extends Container implements AnnotatedContainerInterface
 
         $this->addObjectResource($extension);
 
-        if (!isset($this->extensions[$namespace])) {
-            $this->extensions[$namespace] = new self($this->parameterBag);
+        if (!isset($this->extensionContainers[$namespace])) {
+            $this->extensionContainers[$namespace] = new self($this->parameterBag);
 
             $r = new \ReflectionObject($extension);
-            $this->extensions[$namespace]->addResource(new FileResource($r->getFileName()));
+            $this->extensionContainers[$namespace]->addResource(new FileResource($r->getFileName()));
         }
 
-        $extension->load($tag, $values, $this->extensions[$namespace]);
+        $extension->load($tag, $values, $this->extensionContainers[$namespace]);
 
         return $this;
     }
@@ -204,10 +237,10 @@ class ContainerBuilder extends Container implements AnnotatedContainerInterface
         }
 
         foreach ($container->getExtensionContainers() as $name => $container) {
-            if (isset($this->extensions[$name])) {
-                $this->extensions[$name]->merge($container);
+            if (isset($this->extensionContainers[$name])) {
+                $this->extensionContainers[$name]->merge($container);
             } else {
-                $this->extensions[$name] = $container;
+                $this->extensionContainers[$name] = $container;
             }
         }
     }
@@ -215,11 +248,11 @@ class ContainerBuilder extends Container implements AnnotatedContainerInterface
     /**
      * Returns the containers for the registered extensions.
      *
-     * @return LoaderExtensionInterface[] An array of extension containers
+     * @return ExtensionInterface[] An array of extension containers
      */
     public function getExtensionContainers()
     {
-        return $this->extensions;
+        return $this->extensionContainers;
     }
 
     /**
@@ -238,10 +271,10 @@ class ContainerBuilder extends Container implements AnnotatedContainerInterface
         $definitions = $this->definitions;
         $aliases = $this->aliases;
 
-        foreach ($this->extensions as $container) {
+        foreach ($this->extensionContainers as $container) {
             $this->merge($container);
         }
-        $this->extensions = array();
+        $this->extensionContainers = array();
 
         $this->addDefinitions($definitions);
         $this->addAliases($aliases);

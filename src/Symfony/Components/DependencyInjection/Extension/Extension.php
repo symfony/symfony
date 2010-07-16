@@ -1,6 +1,6 @@
 <?php
 
-namespace Symfony\Components\DependencyInjection\Loader;
+namespace Symfony\Components\DependencyInjection\Extension;
 
 use Symfony\Components\DependencyInjection\ContainerBuilder;
 
@@ -14,13 +14,13 @@ use Symfony\Components\DependencyInjection\ContainerBuilder;
  */
 
 /**
- * LoaderExtension is a helper class that helps organize extensions better.
+ * Extension is a helper class that helps organize extensions better.
  *
  * @package    Symfony
  * @subpackage Components_DependencyInjection
  * @author     Fabien Potencier <fabien.potencier@symfony-project.com>
  */
-abstract class LoaderExtension implements LoaderExtensionInterface
+abstract class Extension implements ExtensionInterface
 {
     /**
      * Loads a specific configuration.

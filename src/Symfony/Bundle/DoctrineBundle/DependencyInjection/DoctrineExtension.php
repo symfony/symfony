@@ -2,7 +2,7 @@
 
 namespace Symfony\Bundle\DoctrineBundle\DependencyInjection;
 
-use Symfony\Components\DependencyInjection\Loader\LoaderExtension;
+use Symfony\Components\DependencyInjection\Extension\Extension;
 use Symfony\Components\DependencyInjection\Loader\XmlFileLoader;
 use Symfony\Components\DependencyInjection\ContainerBuilder;
 use Symfony\Components\DependencyInjection\Definition;
@@ -24,7 +24,7 @@ use Symfony\Components\DependencyInjection\Reference;
  * @subpackage Bundle_DoctrineBundle
  * @author     Fabien Potencier <fabien.potencier@symfony-project.com>
  */
-class DoctrineExtension extends LoaderExtension
+class DoctrineExtension extends Extension
 {
     protected $resources;
     protected $alias;
@@ -59,8 +59,8 @@ class DoctrineExtension extends LoaderExtension
     public function dbalLoad($config, ContainerBuilder $container)
     {
         if (!$container->hasDefinition('doctrine.dbal.logger')) {
-            $loader = new XmlFileLoader(__DIR__.'/../Resources/config');
-            $container->merge($loader->load($this->resources['dbal']));
+            $loader = new XmlFileLoader($container, __DIR__.'/../Resources/config');
+            $loader->load($this->resources['dbal']);
         }
 
         $defaultConnection = array(
@@ -142,8 +142,8 @@ class DoctrineExtension extends LoaderExtension
      */
     public function ormLoad($config, ContainerBuilder $container)
     {
-        $loader = new XmlFileLoader(__DIR__.'/../Resources/config');
-        $container->merge($loader->load($this->resources['orm']));
+        $loader = new XmlFileLoader($container, __DIR__.'/../Resources/config');
+        $loader->load($this->resources['orm']);
 
         if (isset($config['default_entity_manager'])) {
             $container->getParameter('doctrine.orm.default_entity_manager', $config['default_entity_manager']);

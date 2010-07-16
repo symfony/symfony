@@ -8,16 +8,16 @@
  * file that was distributed with this source code.
  */
 
-namespace Symfony\Tests\Components\DependencyInjection\Loader;
+namespace Symfony\Tests\Components\DependencyInjection\Extension;
 
 require_once __DIR__.'/../Fixtures/includes/ProjectExtension.php';
 
 use Symfony\Components\DependencyInjection\ContainerBuilder;
 
-class LoaderExtensionTest extends \PHPUnit_Framework_TestCase
+class ExtensionTest extends \PHPUnit_Framework_TestCase
 {
     /**
-     * @covers Symfony\Components\DependencyInjection\Loader\LoaderExtension::load
+     * @covers Symfony\Components\DependencyInjection\Extension\Extension::load
      */
     public function testLoad()
     {

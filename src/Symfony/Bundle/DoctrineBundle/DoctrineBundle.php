@@ -4,6 +4,7 @@ namespace Symfony\Bundle\DoctrineBundle;
 
 use Symfony\Framework\Bundle\Bundle;
 use Symfony\Components\DependencyInjection\ParameterBag\ParameterBagInterface;
+use Symfony\Components\DependencyInjection\ContainerBuilder;
 use Symfony\Components\DependencyInjection\Loader\Loader;
 use Symfony\Components\DependencyInjection\Loader\XmlFileLoader;
 use Symfony\Bundle\DoctrineBundle\DependencyInjection\DoctrineExtension;
@@ -36,7 +37,7 @@ class DoctrineBundle extends Bundle
      */
     public function buildContainer(ParameterBagInterface $parameterBag)
     {
-        Loader::registerExtension(new DoctrineExtension($parameterBag->get('kernel.bundle_dirs'), $parameterBag->get('kernel.bundles')));
+        ContainerBuilder::registerExtension(new DoctrineExtension($parameterBag->get('kernel.bundle_dirs'), $parameterBag->get('kernel.bundles')));
 
         $metadataDirs = array();
         $entityDirs = array();

@@ -384,4 +384,16 @@ class ContainerBuilderTest extends \PHPUnit_Framework_TestCase
         $container->addResource($b = new FileResource(__DIR__.'/Fixtures/xml/services2.xml'));
         $this->assertEquals(array($a, $b), $container->getResources(), '->getResources() returns an array of resources read for the current configuration');
     }
+
+    /**
+     * @covers Symfony\Components\DependencyInjection\ContainerBuilder::registerExtension
+     * @covers Symfony\Components\DependencyInjection\ContainerBuilder::getExtension
+     */
+    public function testExtension()
+    {
+        $container = new ContainerBuilder();
+
+        $container->registerExtension($extension = new \ProjectExtension());
+        $this->assertTrue($container->getExtension('project') === $extension, '->registerExtension() registers an extension');
+    }
 }

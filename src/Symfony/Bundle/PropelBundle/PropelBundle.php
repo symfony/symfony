@@ -20,7 +20,7 @@ class PropelBundle extends Bundle
      */
     public function buildContainer(ParameterBagInterface $parameterBag)
     {
-        Loader::registerExtension(new PropelExtension());
+        ContainerBuilder::registerExtension(new PropelExtension());
     }
 
     public function boot(ContainerInterface $container)

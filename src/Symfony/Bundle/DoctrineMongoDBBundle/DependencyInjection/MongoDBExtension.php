@@ -2,7 +2,7 @@
 
 namespace Symfony\Bundle\DoctrineMongoDBBundle\DependencyInjection;
 
-use Symfony\Components\DependencyInjection\Loader\LoaderExtension;
+use Symfony\Components\DependencyInjection\Extension\Extension;
 use Symfony\Components\DependencyInjection\Loader\XmlFileLoader;
 use Symfony\Components\DependencyInjection\ContainerBuilder;
 use Symfony\Components\DependencyInjection\Reference;
@@ -18,7 +18,7 @@ use Symfony\Components\DependencyInjection\Resource\FileResource;
  *
  * @todo Add support for multiple document managers
  */
-class MongoDBExtension extends LoaderExtension
+class MongoDBExtension extends Extension
 {
     protected $bundles;
     protected $resources = array(
@@ -38,8 +38,8 @@ class MongoDBExtension extends LoaderExtension
      */
     public function mongodbLoad($config, ContainerBuilder $container)
     {
-        $loader = new XmlFileLoader(__DIR__.'/../Resources/config');
-        $container->merge($loader->load($this->resources['mongodb']));
+        $loader = new XmlFileLoader($container, __DIR__.'/../Resources/config');
+        $loader->load($this->resources['mongodb']);
 
         if (!$container->hasDefinition('doctrine.odm.mongodb.document_manager')) {
 

@@ -42,7 +42,13 @@ class XmlDumper extends Dumper
             return '';
         }
 
-        return sprintf("  <parameters>\n%s  </parameters>\n", $this->convertParameters($this->escape($this->container->getParameterBag()->all()), 'parameter', 4));
+        if ($this->container->isFrozen()) {
+            $parameters = $this->escape($this->container->getParameterBag()->all());
+        } else {
+            $parameters = $this->container->getParameterBag()->all();
+        }
+
+        return sprintf("  <parameters>\n%s  </parameters>\n", $this->convertParameters($parameters, 'parameter', 4));
     }
 
     protected function addService($id, $definition)

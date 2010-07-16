@@ -107,7 +107,7 @@ class YamlFileLoaderTest extends \PHPUnit_Framework_TestCase
         $loader = new ProjectLoader3(self::$fixturesPath.'/yaml');
 
         $config = $loader->load('services10.yml');
-        $config->commit();
+        $config->freeze();
         $services = $config->getDefinitions();
         $parameters = $config->getParameterBag()->all();
 

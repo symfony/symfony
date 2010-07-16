@@ -128,7 +128,13 @@ class YamlDumper extends Dumper
             return '';
         }
 
-        return Yaml::dump(array('parameters' => $this->prepareParameters($this->container->getParameterBag()->all())), 2);
+        if ($this->container->isFrozen()) {
+            $parameters = $this->prepareParameters($this->container->getParameterBag()->all());
+        } else {
+            $parameters = $this->container->getParameterBag()->all();
+        }
+
+        return Yaml::dump(array('parameters' => $parameters), 2);
     }
 
     /**

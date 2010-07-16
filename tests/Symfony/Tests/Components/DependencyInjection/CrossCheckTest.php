@@ -32,21 +32,23 @@ class CrossCheckTest extends \PHPUnit_Framework_TestCase
         $loaderClass = 'Symfony\\Components\\DependencyInjection\\Loader\\'.ucfirst($type).'FileLoader';
         $dumperClass = 'Symfony\\Components\\DependencyInjection\\Dumper\\'.ucfirst($type).'Dumper';
 
-        $container1 = new ContainerBuilder();
-        $loader1 = new $loaderClass($container1);
-        $loader1->load(self::$fixturesPath.'/'.$type.'/'.$fixture);
-        $container1->setParameter('path', self::$fixturesPath.'/includes');
+        $tmp = tempnam('sf_service_container', 'sf');
+
+        $loader1 = new $loaderClass();
+        file_put_contents($tmp, file_get_contents(self::$fixturesPath.'/'.$type.'/'.$fixture));
+        $container1 = $loader1->load($tmp);
 
         $dumper = new $dumperClass($container1);
-        $tmp = tempnam('sf_service_container', 'sf');
         file_put_contents($tmp, $dumper->dump());
 
-        $container2 = new ContainerBuilder();
-        $loader2 = new $loaderClass($container2);
-        $loader2->load($tmp);
-        $container2->setParameter('path', self::$fixturesPath.'/includes');
+        $loader2 = new $loaderClass();
+        $container2 = $loader2->load($tmp);
 
         unlink($tmp);
+
+        $this->assertEquals($container2->getAliases(), $container1->getAliases(), 'loading a dump from a previously loaded container returns the same container');
+        $this->assertEquals($container2->getDefinitions(), $container1->getDefinitions(), 'loading a dump from a previously loaded container returns the same container');
+        $this->assertEquals($container2->getParameterBag()->all(), $container1->getParameterBag()->all(), '->getParameterBag() returns the same value for both containers');
 
         $this->assertEquals(serialize($container2), serialize($container1), 'loading a dump from a previously loaded container returns the same container');
 

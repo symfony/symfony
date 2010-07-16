@@ -106,6 +106,16 @@ class ParameterBag implements ParameterBagInterface
     }
 
     /**
+     * Replaces parameter placeholders (%name%) by their values for all parameters.
+     */
+    public function resolve()
+    {
+        foreach ($this->parameters as $key => $value) {
+            $this->parameters[$key] = $this->resolveValue($value);
+        }
+    }
+
+    /**
      * Replaces parameter placeholders (%name%) by their values.
      *
      * @param  mixed $value A value
@@ -120,31 +130,24 @@ class ParameterBag implements ParameterBagInterface
                 $args[$this->resolveValue($k)] = $this->resolveValue($v);
             }
 
-            $value = $args;
-        } else if (is_string($value)) {
-            if (preg_match('/^%([^%]+)%$/', $value, $match)) {
-                // we do this to deal with non string values (boolean, integer, ...)
-                // the preg_replace_callback converts them to strings
-                if (!array_key_exists($name = strtolower($match[1]), $this->parameters)) {
-                    throw new \RuntimeException(sprintf('The parameter "%s" must be defined.', $name));
-                }
-
-                $value = $this->parameters[$name];
-            } else {
-                $parameters = $this->parameters;
-                $replaceParameter = function ($match) use ($parameters, $value)
-                {
-                    if (!array_key_exists($name = strtolower($match[2]), $parameters)) {
-                        throw new \RuntimeException(sprintf('The parameter "%s" must be defined (used in the following expression: "%s").', $name, $value));
-                    }
-
-                    return $parameters[$name];
-                };
-
-                $value = str_replace('%%', '%', preg_replace_callback('/(?<!%)(%)([^%]+)\1/', $replaceParameter, $value));
-            }
+            return $args;
         }
 
-        return $value;
+        if (!is_string($value)) {
+            return $value;
+        }
+
+        if (preg_match('/^%([^%]+)%$/', $value, $match)) {
+            // we do this to deal with non string values (boolean, integer, ...)
+            // the preg_replace_callback converts them to strings
+            return $this->get(strtolower($match[1]));
+        }
+
+        return str_replace('%%', '%', preg_replace_callback(array('/(?<!%)%([^%]+)%/'), array($this, 'resolveValueCallback'), $value));
+    }
+
+    protected function resolveValueCallback($match)
+    {
+        return $this->get(strtolower($match[1]));
     }
 }

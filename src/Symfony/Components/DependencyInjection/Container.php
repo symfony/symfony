@@ -72,10 +72,17 @@ class Container implements ContainerInterface, \ArrayAccess
     }
 
     /**
-     * Freezes the container parameter bag.
+     * Freezes the container.
+     *
+     * This method does two things:
+     *
+     *  * Parameter values are resolved;
+     *  * The parameter bag is freezed.
      */
     public function freeze()
     {
+        $this->parameterBag->resolve();
+
         $this->parameterBag = new FrozenParameterBag($this->parameterBag->all());
     }
 

@@ -79,6 +79,10 @@ class ContainerBuilder extends Container implements AnnotatedContainerInterface
      */
     public function loadFromExtension(LoaderExtensionInterface $extension, $tag, array $values = array())
     {
+        if (true === $this->isFrozen()) {
+            throw new \LogicException('Cannot load from an extension on a frozen container.');
+        }
+
         $namespace = $extension->getAlias();
 
         $this->addObjectResource($extension);
@@ -187,6 +191,10 @@ class ContainerBuilder extends Container implements AnnotatedContainerInterface
      */
     public function merge(ContainerBuilder $container)
     {
+        if (true === $this->isFrozen()) {
+            throw new \LogicException('Cannot merge on a frozen container.');
+        }
+
         $this->addDefinitions($container->getDefinitions());
         $this->addAliases($container->getAliases());
         $this->parameterBag->add($container->getParameterBag()->all());
@@ -215,10 +223,16 @@ class ContainerBuilder extends Container implements AnnotatedContainerInterface
     }
 
     /**
-     * Commits the extension configuration into the main configuration
-     * and resolves parameter values.
+     * Freezes the container.
+     *
+     * This method does four things:
+     *
+     *  * The extension configurations are merged;
+     *  * Parameter values are resolved;
+     *  * The parameter bag is freezed;
+     *  * Extension loading is disabled.
      */
-    public function commit()
+    public function freeze()
     {
         $parameters = $this->parameterBag->all();
         $definitions = $this->definitions;
@@ -233,9 +247,7 @@ class ContainerBuilder extends Container implements AnnotatedContainerInterface
         $this->addAliases($aliases);
         $this->parameterBag->add($parameters);
 
-        foreach ($this->parameterBag->all() as $key => $value) {
-            $this->parameterBag->set($key, $this->getParameterBag()->resolveValue($value));
-        }
+        parent::freeze();
     }
 
     /**

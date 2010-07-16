@@ -111,7 +111,7 @@ EOT
 
             $exporter->setEntityGenerator($this->getEntityGenerator());
         } else {
-            $mappingType = $mappingType=='yaml' ? 'yml' : $mappingType;
+            $mappingType = $mappingType == 'yaml' ? 'yml' : $mappingType;
             $path = $dirs[$namespace].'/'.$bundle.'/Resources/config/doctrine/metadata/'.str_replace('\\', '.', $fullEntityClassName).'.dcm.'.$mappingType;
         }
 

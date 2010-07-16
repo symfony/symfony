@@ -56,8 +56,8 @@ EOT
 
     protected function execute(InputInterface $input, OutputInterface $output)
     {
-        $filterBundle = str_replace('/', '\\', $input->getOption('bundle'));
-        $filterEntity = $filterBundle . '\\Entities\\' . str_replace('/', '\\', $input->getOption('entity'));
+        $filterBundle = $input->getOption('bundle') ? str_replace('/', '\\', $input->getOption('bundle')) : false;
+        $filterEntity = $filterBundle ? $filterBundle . '\\Entities\\' . str_replace('/', '\\', $input->getOption('entity')) : false;
 
         if (!isset($filterBundle) && isset($filterEntity)) {
             throw new \InvalidArgumentException(sprintf('Unable to specify an entity without also specifying a bundle.'));
@@ -70,7 +70,7 @@ EOT
             $namespace = str_replace('/', '\\', dirname($tmp));
             $class = basename($tmp);
 
-            if (isset($filterBundle) && $filterBundle != $namespace . '\\' . $class) {
+            if ($filterBundle && $filterBundle != $namespace . '\\' . $class) {
                 continue;
             }
 
@@ -80,7 +80,7 @@ EOT
                     $output->writeln(sprintf('Generating entities for "<info>%s</info>"', $class));
 
                     foreach ($metadatas as $metadata) {
-                        if (isset($filterEntity) && strpos($metadata->name, $filterEntity) !== 0) {
+                        if ($filterEntity && strpos($metadata->name, $filterEntity) !== 0) {
                             continue;
                         }
 

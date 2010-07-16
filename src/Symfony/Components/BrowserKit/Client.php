@@ -176,14 +176,13 @@ abstract class Client
      * @param string  $method        The request method
      * @param string  $uri           The URI to fetch
      * @param array   $parameters    The Request parameters
-     * @param array   $headers       The headers
      * @param array   $files         The files
-     * @param array   $server        The server parameters
+     * @param array   $server        The server parameters (HTTP headers are referenced with a HTTP_ prefix as PHP does)
      * @param Boolean $changeHistory Whether to update the history or not (only used internally for back(), forward(), and reload())
      *
      * @return Symfony\Components\DomCrawler\Crawler
      */
-    public function request($method, $uri, array $parameters = array(), array $headers = array(), array $files = array(), array $server = array(), $changeHistory = true)
+    public function request($method, $uri, array $parameters = array(), array $files = array(), array $server = array(), $changeHistory = true)
     {
         $uri = $this->getAbsoluteUri($uri);
 

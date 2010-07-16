@@ -5,6 +5,7 @@ require_once __DIR__.'/../src/autoload.php';
 use Symfony\Framework\Kernel;
 use Symfony\Components\DependencyInjection\Loader\YamlFileLoader as ContainerLoader;
 use Symfony\Components\Routing\Loader\YamlFileLoader as RoutingLoader;
+use Symfony\Components\DependencyInjection\ContainerBuilder;
 
 use Symfony\Framework\Bundle\KernelBundle;
 use Symfony\Bundle\FrameworkBundle\FrameworkBundle;
@@ -50,9 +51,11 @@ class {{ class }}Kernel extends Kernel
 
     public function registerContainerConfiguration()
     {
-        $loader = new ContainerLoader($this->getBundleDirs());
+        $container = new ContainerBuilder();
+        $loader = new ContainerLoader($container, $this->getBundleDirs());
+        $loader->load(__DIR__.'/config/config_'.$this->getEnvironment().'.yml');
 
-        return $loader->load(__DIR__.'/config/config_'.$this->getEnvironment().'.yml');
+        return $container;
     }
 
     public function registerRoutes()

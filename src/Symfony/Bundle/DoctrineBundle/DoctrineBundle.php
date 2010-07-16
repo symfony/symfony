@@ -37,8 +37,11 @@ class DoctrineBundle extends Bundle
      */
     public function buildContainer(ParameterBagInterface $parameterBag)
     {
-        ContainerBuilder::registerExtension(new DoctrineExtension($parameterBag->get('kernel.bundle_dirs'), $parameterBag->get('kernel.bundles')));
-
+        ContainerBuilder::registerExtension(new DoctrineExtension( 
+            $parameterBag->get('kernel.bundle_dirs'),
+            $parameterBag->get('kernel.bundles'),
+            $parameterBag->get('kernel.cache_dir')
+        ));
         $metadataDirs = array();
         $entityDirs = array();
         $bundleDirs = $parameterBag->get('kernel.bundle_dirs');

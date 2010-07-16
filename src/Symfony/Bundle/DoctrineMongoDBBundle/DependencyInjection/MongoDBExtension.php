@@ -24,10 +24,12 @@ class MongoDBExtension extends Extension
     protected $resources = array(
         'mongodb' => 'mongodb.xml',
     );
+    protected $kernelCacheDir;
 
-    public function __construct(array $bundles)
+    public function __construct(array $bundles, $kernelCacheDir)
     {
         $this->bundles = $bundles;
+        $this->kernelCacheDir = $kernelCacheDir;
     }
 
     /**
@@ -38,6 +40,15 @@ class MongoDBExtension extends Extension
      */
     public function mongodbLoad($config, ContainerBuilder $container)
     {
+        $proxyCacheDir = $this->kernelCacheDir . '/doctrine/mongodb-odm/Proxies';
+        if (!is_dir($proxyCacheDir)) {
+            if (false === @mkdir($proxyCacheDir, 0777, true)) {
+                die(sprintf('Unable to create the Doctrine Proxy directory (%s)', dirname($proxyCacheDir)));
+            }
+        } elseif (!is_writable($proxyCacheDir)) {
+            die(sprintf('Unable to write in the Doctrine Proxy directory (%s)', $proxyCacheDir));
+        }
+
         if (!$container->hasDefinition('doctrine.odm.mongodb.document_manager')) {
             $loader = new XmlFileLoader($container, __DIR__.'/../Resources/config');
             $loader->load($this->resources['mongodb']);

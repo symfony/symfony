@@ -26,19 +26,20 @@ use Symfony\Components\DependencyInjection\Reference;
  */
 class DoctrineExtension extends Extension
 {
-    protected $resources;
+    protected $resources = array(
+        'dbal' => 'dbal.xml',
+        'orm'  => 'orm.xml',
+    );
     protected $alias;
     protected $bundleDirs;
     protected $bundles;
+    protected $kernelCacheDir;
 
-    public function __construct(array $bundleDirs, array $bundles)
+    public function __construct(array $bundleDirs, array $bundles, $kernelCacheDir)
     {
-        $this->resources = array(
-            'dbal' => 'dbal.xml',
-            'orm'  => 'orm.xml',
-        );
         $this->bundleDirs = $bundleDirs;
         $this->bundles = $bundles;
+        $this->kernelCacheDir = $kernelCacheDir;
     }
 
     public function setAlias($alias)
@@ -212,12 +213,21 @@ class DoctrineExtension extends Extension
 
             $container->setDefinition('doctrine.orm.metadata_driver', $mappingDriverDef);
 
+            $proxyCacheDir = $this->kernelCacheDir . '/doctrine/orm/Proxies';
+            if (!is_dir($proxyCacheDir)) {
+                if (false === @mkdir($proxyCacheDir, 0777, true)) {
+                    die(sprintf('Unable to create the Doctrine Proxy directory (%s)', dirname($proxyCacheDir)));
+                }
+            } elseif (!is_writable($proxyCacheDir)) {
+                die(sprintf('Unable to write in the Doctrine Proxy directory (%s)', $proxyCacheDir));
+            }
+
             $methods = array(
                 'setMetadataCacheImpl' => new Reference('doctrine.orm.metadata_cache'),
                 'setQueryCacheImpl' => new Reference('doctrine.orm.query_cache'),
                 'setResultCacheImpl' => new Reference('doctrine.orm.result_cache'),
                 'setMetadataDriverImpl' => new Reference('doctrine.orm.metadata_driver'),
-                'setProxyDir' => '%kernel.cache_dir%/doctrine/Proxies',
+                'setProxyDir' => $proxyCacheDir,
                 'setProxyNamespace' => 'Proxies',
                 'setAutoGenerateProxyClasses' => true
             );

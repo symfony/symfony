@@ -25,6 +25,9 @@ class DoctrineMongoDBBundle extends Bundle
      */
     public function buildContainer(ParameterBagInterface $parameterBag)
     {
-        ContainerBuilder::registerExtension(new MongoDBExtension($parameterBag->get('kernel.bundles')));
+        ContainerBuilder::registerExtension(new MongoDBExtension(
+            $parameterBag->get('kernel.bundles'),
+            $parameterBag->get('kernel.cache_dir')
+        ));
     }
 }

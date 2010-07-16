@@ -87,19 +87,22 @@ EOT
 
         // Map the specified fields
         $fields = $input->getOption('fields');
-        $e = explode(' ', $fields);
-        foreach ($e as $value) {
-            $e = explode(':', $value);
-            $name = $e[0];
-            $type = isset($e[1]) ? $e[1] : 'string';
-            preg_match_all('/(.*)\((.*)\)/', $type, $matches);
-            $type = isset($matches[1][0]) ? $matches[1][0] : 'string';
-            $length = isset($matches[2][0]) ? $matches[2][0] : null;
-            $class->mapField(array(
-                'fieldName' => $name,
-                'type' => $type,
-                'length' => $length
-            ));
+        if ($fields)
+        {
+          $e = explode(' ', $fields);
+          foreach ($e as $value) {
+              $e = explode(':', $value);
+              $name = $e[0];
+              $type = isset($e[1]) ? $e[1] : 'string';
+              preg_match_all('/(.*)\((.*)\)/', $type, $matches);
+              $type = isset($matches[1][0]) ? $matches[1][0] : 'string';
+              $length = isset($matches[2][0]) ? $matches[2][0] : null;
+              $class->mapField(array(
+                  'fieldName' => $name,
+                  'type' => $type,
+                  'length' => $length
+              ));
+          }
         }
 
         // Setup a new exporter for the mapping type specified

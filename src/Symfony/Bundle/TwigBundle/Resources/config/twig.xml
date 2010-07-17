@@ -33,7 +33,7 @@
             <argument type="service" id="twig" />
         </service>
 
-        <service id="twig.extension.escaper" class="\Twig_Extension_Escaper">
+        <service id="twig.extension.escaper" class="Twig_Extension_Escaper">
             <annotation name="twig.extension" />
         </service>
 

@@ -267,12 +267,18 @@ class ApplicationTest extends \PHPUnit_Framework_TestCase
         $tester->run(array('--help' => true));
         $this->assertStringEqualsFile(self::$fixturesPath.'/application_run2.txt', $tester->getDisplay(), '->run() runs the help command if --help is passed');
 
+        $tester->run(array('-h' => true));
+        $this->assertStringEqualsFile(self::$fixturesPath.'/application_run2.txt', $tester->getDisplay(), '->run() runs the help command if -h is passed');
+
         $application = new Application();
         $application->setAutoExit(false);
         $application->setCatchExceptions(false);
         $tester = new ApplicationTester($application);
         $tester->run(array('command' => 'list', '--help' => true));
         $this->assertStringEqualsFile(self::$fixturesPath.'/application_run3.txt', $tester->getDisplay(), '->run() displays the help if --help is passed');
+
+        $tester->run(array('command' => 'list', '-h' => true));
+        $this->assertStringEqualsFile(self::$fixturesPath.'/application_run3.txt', $tester->getDisplay(), '->run() displays the help if -h is passed');
 
         $application = new Application();
         $application->setAutoExit(false);

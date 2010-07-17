@@ -2,6 +2,8 @@
 
 namespace Symfony\Components\Routing;
 
+use Symfony\Components\Routing\Loader\LoaderInterface;
+
 /*
  * This file is part of the Symfony framework.
  *
@@ -28,6 +30,7 @@ class Router implements RouterInterface
     protected $context;
     protected $loader;
     protected $collection;
+    protected $resource;
 
     /**
      * Constructor.
@@ -37,16 +40,18 @@ class Router implements RouterInterface
      *   * cache_dir: The cache directory (or null to disable caching)
      *   * debug:     Whether to enable debugging or not (false by default)
      *
-     * @param mixed $loader   A PHP callable that returns a RouteCollection instance
+     * @param Symfony\Components\Routing\Loader\LoaderInterface $loader A LoaderInterface instance
+     * @param mixed $resource The main resource to load
      * @param array $options  An array of options
      * @param array $context  The context
      * @param array $defaults The default values
      *
      * @throws \InvalidArgumentException When unsupported option is provided
      */
-    public function __construct($loader, array $options = array(), array $context = array(), array $defaults = array())
+    public function __construct(LoaderInterface $loader, $resource, array $options = array(), array $context = array(), array $defaults = array())
     {
         $this->loader = $loader;
+        $this->resource = $resource;
         $this->context = $context;
         $this->defaults = $defaults;
         $this->options = array(
@@ -78,7 +83,7 @@ class Router implements RouterInterface
     public function getRouteCollection()
     {
         if (null === $this->collection) {
-            $this->collection = call_user_func($this->loader);
+            $this->collection = $this->loader->load($this->resource);
         }
 
         return $this->collection;

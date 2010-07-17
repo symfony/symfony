@@ -2,6 +2,8 @@
 
 namespace Symfony\Components\Routing\Loader;
 
+use Symfony\Components\Routing\Loader\LoaderResolver;
+
 /*
  * This file is part of the Symfony framework.
  *
@@ -28,4 +30,27 @@ interface LoaderInterface
      * @return RouteCollection A RouteCollection instance
      */
     function load($resource);
+
+    /**
+     * Returns true if this class supports the given resource.
+     *
+     * @param  mixed $resource A resource
+     *
+     * @return Boolean true if this class supports the given resource, false otherwise
+     */
+    function supports($resource);
+
+    /**
+     * Gets the loader resolver.
+     *
+     * @return \Symfony\Components\Routing\Loader\LoaderResolver A LoaderResolver instance
+     */
+    function getResolver();
+
+    /**
+     * Sets the loader resolver.
+     *
+     * @param \Symfony\Components\Routing\Loader\LoaderResolver $resolver A LoaderResolver instance
+     */
+    function setResolver(LoaderResolver $resolver);
 }

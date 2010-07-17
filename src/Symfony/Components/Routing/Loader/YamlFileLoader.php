@@ -45,7 +45,9 @@ class YamlFileLoader extends FileLoader
 
         foreach ($config as $name => $config) {
             if (isset($config['resource'])) {
-                $this->parseImport($collection, $name, $config, $path);
+                $prefix = isset($config['prefix']) ? $config['prefix'] : null;
+                $this->currentDir = dirname($path);
+                $collection->addCollection($this->import($config['resource']), $prefix);
             } elseif (isset($config['pattern'])) {
                 $this->parseRoute($collection, $name, $config, $path);
             } else {
@@ -54,6 +56,18 @@ class YamlFileLoader extends FileLoader
         }
 
         return $collection;
+    }
+
+    /**
+     * Returns true if this class supports the given resource.
+     *
+     * @param  mixed $resource A resource
+     *
+     * @return Boolean true if this class supports the given resource, false otherwise
+     */
+    public function supports($resource)
+    {
+        return is_string($resource) && 'yml' === pathinfo($resource, PATHINFO_EXTENSION);
     }
 
     /**
@@ -72,34 +86,6 @@ class YamlFileLoader extends FileLoader
         $route = new Route($config['pattern'], $defaults, $requirements, $options);
 
         $collection->addRoute($name, $route);
-    }
-
-    /**
-     * @throws \InvalidArgumentException When import resource is not defined
-     */
-    protected function parseImport(RouteCollection $collection, $name, $import, $file)
-    {
-        if (!isset($import['resource'])) {
-            throw new \InvalidArgumentException(sprintf('You must define a "resource" when importing (%s).', $name));
-        }
-
-        $class = null;
-        if (isset($import['class']) && $import['class'] !== get_class($this)) {
-            $class = $import['class'];
-        } else {
-            // try to detect loader with the extension
-            switch (pathinfo($import['resource'], PATHINFO_EXTENSION)) {
-                case 'xml':
-                    $class = 'Symfony\\Components\\Routing\\Loader\\XmlFileLoader';
-                    break;
-            }
-        }
-
-        $loader = null === $class ? $this : new $class($this->paths);
-
-        $importedFile = $this->getAbsolutePath($import['resource'], dirname($file));
-
-        $collection->addCollection($loader->load($importedFile), isset($import['prefix']) ? $import['prefix'] : null);
     }
 
     protected function loadFile($file)

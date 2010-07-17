@@ -18,8 +18,9 @@ namespace Symfony\Components\Routing\Loader;
  * @subpackage Components_Routing
  * @author     Fabien Potencier <fabien.potencier@symfony-project.com>
  */
-abstract class FileLoader implements LoaderInterface
+abstract class FileLoader extends Loader
 {
+    protected $currentDir;
     protected $paths;
 
     /**
@@ -32,8 +33,25 @@ abstract class FileLoader implements LoaderInterface
         if (!is_array($paths)) {
             $paths = array($paths);
         }
-
         $this->paths = $paths;
+    }
+
+    /**
+     * Adds routes from a resource.
+     *
+     * @param mixed  $resource   A Resource
+     *
+     * @return Symfony\Components\Routing\RouteCollection A RouteCollection instance
+     */
+    public function import($resource)
+    {
+        $loader = $this->resolve($resource);
+
+        if ($loader instanceof FileLoader && null !== $this->currentDir) {
+            $resource = $this->getAbsolutePath($resource, $this->currentDir);
+        }
+
+        return $loader->load($resource);
     }
 
     /**

@@ -10,9 +10,17 @@
   <xsd:element name="user" type="user" />
 
   <xsd:complexType name="config">
+      <xsd:sequence>
+        <xsd:element name="router" type="router" minOccurs="0" maxOccurs="1" />
+      </xsd:sequence>
+
     <xsd:attribute name="ide" type="xsd:string" />
     <xsd:attribute name="profiler" type="xsd:boolean" />
     <xsd:attribute name="toolbar" type="xsd:boolean" />
+  </xsd:complexType>
+
+  <xsd:complexType name="router">
+    <xsd:attribute name="resource" type="xsd:string" />
   </xsd:complexType>
 
   <xsd:complexType name="user">

@@ -5,7 +5,8 @@ kernel.config:
     charset:             UTF-8
     error_handler_level: null
 
-web.config: ~
+web.config:
+    router: { resource: "%kernel.root_dir%/config/routing.yml" }
 
 web.templating:
     escaping:       htmlspecialchars

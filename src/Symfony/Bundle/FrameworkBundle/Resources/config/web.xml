@@ -8,7 +8,6 @@
         <parameter key="request_listener.class">Symfony\Bundle\FrameworkBundle\RequestListener</parameter>
         <parameter key="controller_manager.class">Symfony\Bundle\FrameworkBundle\Controller\ControllerManager</parameter>
         <parameter key="controller_loader_listener.class">Symfony\Components\HttpKernel\Controller\ControllerLoaderListener</parameter>
-        <parameter key="router.class">Symfony\Components\Routing\Router</parameter>
         <parameter key="response_listener.class">Symfony\Components\HttpKernel\ResponseListener</parameter>
         <parameter key="exception_listener.class">Symfony\Bundle\FrameworkBundle\Controller\ExceptionListener</parameter>
         <parameter key="exception_listener.controller">FrameworkBundle:Exception:exception</parameter>
@@ -33,19 +32,6 @@
             <argument type="service" id="service_container" />
             <argument type="service" id="router" />
             <argument type="service" id="logger" on-invalid="ignore" />
-        </service>
-
-        <service id="router" class="%router.class%">
-            <argument type="collection">
-                <argument type="service" id="kernel" />
-                <argument>registerRoutes</argument>
-            </argument>
-            <argument type="collection">
-                <argument key="cache_dir">%kernel.cache_dir%</argument>
-                <argument key="debug">%kernel.debug%</argument>
-                <argument key="matcher_cache_class">%kernel.name%UrlMatcher</argument>
-                <argument key="generator_cache_class">%kernel.name%UrlGenerator</argument>
-            </argument>
         </service>
 
         <service id="esi" class="%esi.class%" />

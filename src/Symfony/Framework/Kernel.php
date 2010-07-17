@@ -85,8 +85,6 @@ abstract class Kernel implements HttpKernelInterface, \Serializable
 
     abstract public function registerContainerConfiguration();
 
-    abstract public function registerRoutes();
-
     /**
      * Checks whether the current kernel has been booted or not.
      *

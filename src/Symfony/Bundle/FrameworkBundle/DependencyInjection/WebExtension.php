@@ -30,6 +30,7 @@ class WebExtension extends Extension
     protected $resources = array(
         'templating' => 'templating.xml',
         'web'        => 'web.xml',
+        'routing'    => 'routing.xml',
         // validation.xml conflicts with the naming convention for XML
         // validation mapping files, so call it validator.xml
         'validation' => 'validator.xml',
@@ -52,13 +53,22 @@ class WebExtension extends Extension
      */
     public function configLoad($config, ContainerBuilder $container)
     {
+        $loader = new XmlFileLoader($container, __DIR__.'/../Resources/config');
+
         if (!$container->hasDefinition('controller_manager')) {
-            $loader = new XmlFileLoader($container, __DIR__.'/../Resources/config');
             $loader->load($this->resources['web']);
         }
 
         if (isset($config['ide']) && 'textmate' === $config['ide']) {
             $container->setParameter('debug.file_link_format', 'txmt://open?url=file://%%f&line=%%l');
+        }
+
+        if (isset($config['router'])) {
+            if (!$container->hasDefinition('router')) {
+                $loader->load($this->resources['routing']);
+            }
+
+            $container->setParameter('routing.resource', $config['router']['resource']);
         }
 
         if (isset($config['toolbar']) && $config['toolbar']) {

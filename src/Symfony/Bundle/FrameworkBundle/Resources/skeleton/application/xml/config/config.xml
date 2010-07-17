@@ -22,7 +22,9 @@
         error_handler_level="null"
     />
 
-    <web:config />
+    <web:config>
+        <web:router resource="%kernel.root_dir%/config/routing.xml" />
+    </web:config>
 
     <web:templating
         escaping="htmlspecialchars"

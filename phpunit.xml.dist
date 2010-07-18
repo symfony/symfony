@@ -14,7 +14,7 @@
     <testsuites>
         <testsuite name="Symfony Test Suite">
             <directory>./tests/Symfony/</directory>
-            <directory>./src/Symfony/Framework/*/Tests/</directory>
+            <directory>./src/Symfony/Bundle/*/Tests/</directory>
         </testsuite>
     </testsuites>
 
@@ -22,9 +22,9 @@
         <whitelist>
             <directory>./src/Symfony/</directory>
             <exclude>
-                <directory>./src/Symfony/Framework/*/Resources</directory>
-                <file>./src/Symfony/Foundation/bootstrap.php</file>
-                <file>./src/Symfony/Foundation/packager.php</file>
+                <directory>./src/Symfony/Bundle/*/Resources</directory>
+                <file>./src/Symfony/Framework/bootstrap.php</file>
+                <file>./src/Symfony/Framework/packager.php</file>
             </exclude>
         </whitelist>
     </filter>

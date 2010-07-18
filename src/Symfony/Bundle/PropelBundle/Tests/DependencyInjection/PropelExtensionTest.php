@@ -13,54 +13,54 @@ namespace Symfony\Bundle\PropelBundle\Tests\DependencyInjection;
 
 use Symfony\Bundle\PropelBundle\Tests\TestCase;
 use Symfony\Bundle\PropelBundle\DependencyInjection\PropelExtension;
-use Symfony\Components\DependencyInjection\BuilderConfiguration;
+use Symfony\Components\DependencyInjection\ContainerBuilder;
 
 class PropelExtensionTest extends TestCase
 {
     public function testConfigLoad()
     {
-        $configuration = new BuilderConfiguration();
+        $container = new ContainerBuilder();
         $loader = new PropelExtension();
 
         try {
-            $configuration = $loader->configLoad(array(), $configuration);
+            $loader->configLoad(array(), $container);
             $this->fail();
         } catch (\Exception $e) {
             $this->assertInstanceOf('InvalidArgumentException', $e, '->configLoad() throws an \InvalidArgumentException if the Propel path is not set.');
         }
 
-        $configuration = $loader->configLoad(array('path' => '/propel'), $configuration);
-        $this->assertEquals('/propel', $configuration->getParameter('propel.path'), '->configLoad() sets the Propel path');
+        $loader->configLoad(array('path' => '/propel'), $container);
+        $this->assertEquals('/propel', $container->getParameter('propel.path'), '->configLoad() sets the Propel path');
 
-        $configuration = $loader->configLoad(array(), $configuration);
-        $this->assertEquals('/propel', $configuration->getParameter('propel.path'), '->configLoad() sets the Propel path');
+        $loader->configLoad(array(), $container);
+        $this->assertEquals('/propel', $container->getParameter('propel.path'), '->configLoad() sets the Propel path');
     }
 
     public function testDbalLoad()
     {
-        $configuration = new BuilderConfiguration();
+        $container = new ContainerBuilder();
         $loader = new PropelExtension();
 
-        $configuration = $loader->dbalLoad(array(), $configuration);
-        $this->assertEquals('Propel', $configuration->getParameter('propel.class'), '->dbalLoad() loads the propel.xml file if not already loaded');
+        $loader->dbalLoad(array(), $container);
+        $this->assertEquals('Propel', $container->getParameter('propel.class'), '->dbalLoad() loads the propel.xml file if not already loaded');
 
         // propel.dbal.default_connection
-        $this->assertEquals('default', $configuration->getParameter('propel.dbal.default_connection'), '->dbalLoad() overrides existing configuration options');
-        $configuration = $loader->dbalLoad(array('default_connection' => 'foo'), $configuration);
-        $this->assertEquals('foo', $configuration->getParameter('propel.dbal.default_connection'), '->dbalLoad() overrides existing configuration options');
-        $configuration = $loader->dbalLoad(array(), $configuration);
-        $this->assertEquals('foo', $configuration->getParameter('propel.dbal.default_connection'), '->dbalLoad() overrides existing configuration options');
+        $this->assertEquals('default', $container->getParameter('propel.dbal.default_connection'), '->dbalLoad() overrides existing configuration options');
+        $loader->dbalLoad(array('default_connection' => 'foo'), $container);
+        $this->assertEquals('foo', $container->getParameter('propel.dbal.default_connection'), '->dbalLoad() overrides existing configuration options');
+        $loader->dbalLoad(array(), $container);
+        $this->assertEquals('foo', $container->getParameter('propel.dbal.default_connection'), '->dbalLoad() overrides existing configuration options');
 
-        $configuration = new BuilderConfiguration();
+        $container = new ContainerBuilder();
         $loader = new PropelExtension();
-        $configuration = $loader->dbalLoad(array('password' => 'foo'), $configuration);
+        $loader->dbalLoad(array('password' => 'foo'), $container);
 
-        $arguments = $configuration->getDefinition('propel.configuration')->getArguments();
+        $arguments = $container->getDefinition('propel.configuration')->getArguments();
         $config = $arguments[0];
         $this->assertEquals('foo', $config['datasources']['default']['connection']['password']);
         $this->assertEquals('root', $config['datasources']['default']['connection']['user']);
 
-        $configuration = $loader->dbalLoad(array('user' => 'foo'), $configuration);
+        $loader->dbalLoad(array('user' => 'foo'), $container);
         $this->assertEquals('foo', $config['datasources']['default']['connection']['password']);
         $this->assertEquals('root', $config['datasources']['default']['connection']['user']);
     }

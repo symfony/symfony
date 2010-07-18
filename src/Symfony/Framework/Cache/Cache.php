@@ -6,7 +6,7 @@ use Symfony\Components\HttpKernel\HttpKernelInterface;
 use Symfony\Components\HttpKernel\Cache\Cache as BaseCache;
 use Symfony\Components\HttpKernel\Cache\Esi;
 use Symfony\Components\HttpKernel\Cache\Store;
-use Symfony\Components\HttpFoundation\Response;
+use Symfony\Components\HttpFoundation\Request;
 use Symfony\Components\HttpFoundation\Response;
 
 /*

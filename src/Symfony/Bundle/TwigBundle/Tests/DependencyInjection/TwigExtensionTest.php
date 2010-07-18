@@ -13,20 +13,20 @@ namespace Symfony\Bundle\TwigBundle\Tests\DependencyInjection;
 
 use Symfony\Bundle\TwigBundle\Tests\TestCase;
 use Symfony\Bundle\TwigBundle\DependencyInjection\TwigExtension;
-use Symfony\Components\DependencyInjection\BuilderConfiguration;
+use Symfony\Components\DependencyInjection\ContainerBuilder;
 
 class TwigExtensionTest extends TestCase
 {
     public function testConfigLoad()
     {
-        $configuration = new BuilderConfiguration();
+        $container = new ContainerBuilder();
         $loader = new TwigExtension();
 
-        $configuration = $loader->configLoad(array(), $configuration);
-        $this->assertEquals('Symfony\\Bundle\\TwigBundle\\Environment', $configuration->getParameter('twig.class'), '->configLoad() loads the twig.xml file if not already loaded');
+        $loader->configLoad(array(), $container);
+        $this->assertEquals('Symfony\\Bundle\\TwigBundle\\Environment', $container->getParameter('twig.class'), '->configLoad() loads the twig.xml file if not already loaded');
 
-        $configuration = $loader->configLoad(array('charset' => 'ISO-8859-1'), $configuration);
-        $options = $configuration->getParameter('twig.options');
+        $loader->configLoad(array('charset' => 'ISO-8859-1'), $container);
+        $options = $container->getParameter('twig.options');
         $this->assertEquals('ISO-8859-1', $options['charset'], '->configLoad() overrides existing configuration options');
         $this->assertEquals('%kernel.debug%', $options['debug'], '->configLoad() merges the new values with the old ones');
     }

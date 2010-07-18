@@ -12,6 +12,7 @@
 namespace Symfony\Tests\Framework;
 
 use Symfony\Framework\Kernel;
+use Symfony\Components\DependencyInjection\Loader\LoaderInterface;
 
 class KernelTest extends \PHPUnit_Framework_TestCase
 {
@@ -44,7 +45,7 @@ class KernelForTest extends Kernel
     {
     }
 
-    public function registerContainerConfiguration()
+    public function registerContainerConfiguration(LoaderInterface $loader)
     {
     }
 

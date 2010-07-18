@@ -7,6 +7,13 @@ use Symfony\Components\DependencyInjection\ContainerBuilder;
 use Symfony\Components\DependencyInjection\Dumper\PhpDumper;
 use Symfony\Components\DependencyInjection\Resource\FileResource;
 use Symfony\Components\DependencyInjection\ParameterBag\ParameterBag;
+use Symfony\Components\DependencyInjection\Loader\DelegatingLoader;
+use Symfony\Components\DependencyInjection\Loader\LoaderResolver;
+use Symfony\Components\DependencyInjection\Loader\LoaderInterface;
+use Symfony\Components\DependencyInjection\Loader\XmlFileLoader;
+use Symfony\Components\DependencyInjection\Loader\YamlFileLoader;
+use Symfony\Components\DependencyInjection\Loader\IniFileLoader;
+use Symfony\Components\DependencyInjection\Loader\PhpFileLoader;
 use Symfony\Components\HttpFoundation\Request;
 use Symfony\Components\HttpKernel\HttpKernelInterface;
 
@@ -83,7 +90,7 @@ abstract class Kernel implements HttpKernelInterface, \Serializable
 
     abstract public function registerBundleDirs();
 
-    abstract public function registerContainerConfiguration();
+    abstract public function registerContainerConfiguration(LoaderInterface $loader);
 
     /**
      * Checks whether the current kernel has been booted or not.
@@ -347,7 +354,10 @@ abstract class Kernel implements HttpKernelInterface, \Serializable
                 $container->addObjectResource($bundle);
             }
         }
-        $container->merge($this->registerContainerConfiguration());
+
+        if (null !== $cont = $this->registerContainerConfiguration($this->getContainerLoader($container))) {
+            $container->merge($cont);
+        }
         $container->freeze();
 
         foreach (array('cache', 'logs') as $name) {
@@ -375,6 +385,18 @@ abstract class Kernel implements HttpKernelInterface, \Serializable
             // save the resources
             $this->writeCacheFile($this->getCacheDir().'/'.$class.'.meta', serialize($container->getResources()));
         }
+    }
+
+    protected function getContainerLoader(ContainerInterface $container)
+    {
+        $resolver = new LoaderResolver(array(
+            new XmlFileLoader($container, $this->getBundleDirs()),
+            new YamlFileLoader($container, $this->getBundleDirs()),
+            new IniFileLoader($container, $this->getBundleDirs()),
+            new PhpFileLoader($container, $this->getBundleDirs()),
+        ));
+
+        return new DelegatingLoader($resolver);
     }
 
     static public function stripComments($source)

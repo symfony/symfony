@@ -2,7 +2,6 @@
 
 namespace Symfony\Components\DependencyInjection\Loader;
 
-use Symfony\Components\DependencyInjection\ContainerBuilder;
 use Symfony\Components\DependencyInjection\Resource\FileResource;
 
 /*
@@ -15,37 +14,32 @@ use Symfony\Components\DependencyInjection\Resource\FileResource;
  */
 
 /**
- * IniFileLoader loads parameters from INI files.
+ * PhpFileLoader loads service definitions from a PHP file.
+ *
+ * The PHP file is required and the $container variable can be
+ * used form the file to change the container.
  *
  * @package    Symfony
  * @subpackage Components_DependencyInjection
  * @author     Fabien Potencier <fabien.potencier@symfony-project.com>
  */
-class IniFileLoader extends FileLoader
+class PhpFileLoader extends FileLoader
 {
     /**
-     * Loads a resource.
+     * Loads an array of PHP files.
      *
-     * @param mixed            $resource       The resource
-     *
-     * @throws \InvalidArgumentException When ini file is not valid
+     * @param mixed $resource The resource
      */
     public function load($file)
     {
-        $path = $this->findFile($file);
+        $container = $this->container;
+        $loader = $this;
 
+        $path = $this->findFile($file);
+        $this->currentDir = dirname($path);
         $this->container->addResource(new FileResource($path));
 
-        $result = parse_ini_file($path, true);
-        if (false === $result || array() === $result) {
-            throw new \InvalidArgumentException(sprintf('The %s file is not valid.', $file));
-        }
-
-        if (isset($result['parameters']) && is_array($result['parameters'])) {
-            foreach ($result['parameters'] as $key => $value) {
-                $this->container->setParameter($key, $value);
-            }
-        }
+        include $path;
     }
 
     /**
@@ -57,6 +51,6 @@ class IniFileLoader extends FileLoader
      */
     public function supports($resource)
     {
-        return is_string($resource) && 'ini' === pathinfo($resource, PATHINFO_EXTENSION);
+        return is_string($resource) && 'php' === pathinfo($resource, PATHINFO_EXTENSION);
     }
 }

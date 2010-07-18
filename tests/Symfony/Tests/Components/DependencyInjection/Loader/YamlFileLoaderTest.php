@@ -14,7 +14,10 @@ use Symfony\Components\DependencyInjection\ContainerBuilder;
 use Symfony\Components\DependencyInjection\Reference;
 use Symfony\Components\DependencyInjection\Definition;
 use Symfony\Components\DependencyInjection\Loader\Loader;
+use Symfony\Components\DependencyInjection\Loader\XmlFileLoader;
 use Symfony\Components\DependencyInjection\Loader\YamlFileLoader;
+use Symfony\Components\DependencyInjection\Loader\IniFileLoader;
+use Symfony\Components\DependencyInjection\Loader\LoaderResolver;
 
 class YamlFileLoaderTest extends \PHPUnit_Framework_TestCase
 {
@@ -70,7 +73,12 @@ class YamlFileLoaderTest extends \PHPUnit_Framework_TestCase
     public function testLoadImports()
     {
         $container = new ContainerBuilder();
-        $loader = new ProjectLoader3($container, self::$fixturesPath.'/yaml');
+        $resolver = new LoaderResolver(array(
+            new IniFileLoader($container, self::$fixturesPath.'/yaml'),
+            new XmlFileLoader($container, self::$fixturesPath.'/yaml'),
+            $loader = new ProjectLoader3($container, self::$fixturesPath.'/yaml'),
+        ));
+        $loader->setResolver($resolver);
         $loader->load('services4.yml');
 
         $actual = $container->getParameterBag()->all();
@@ -135,6 +143,17 @@ class YamlFileLoaderTest extends \PHPUnit_Framework_TestCase
             $this->assertInstanceOf('\InvalidArgumentException', $e, '->load() throws an InvalidArgumentException if an extension is not loaded');
             $this->assertStringStartsWith('The "foobar" tag is not valid (in', $e->getMessage(), '->load() throws an InvalidArgumentException if an extension is not loaded');
         }
+    }
+
+    /**
+     * @covers Symfony\Components\DependencyInjection\Loader\YamlFileLoader::supports
+     */
+    public function testSupports()
+    {
+        $loader = new YamlFileLoader(new ContainerBuilder());
+
+        $this->assertTrue($loader->supports('foo.yml'), '->supports() returns true if the resource is loadable');
+        $this->assertFalse($loader->supports('foo.foo'), '->supports() returns true if the resource is loadable');
     }
 }
 

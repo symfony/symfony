@@ -49,4 +49,15 @@ class IniFileLoaderTest extends \PHPUnit_Framework_TestCase
             $this->assertEquals('The nonvalid.ini file is not valid.', $e->getMessage(), '->load() throws an InvalidArgumentException if the loaded file is not parseable');
         }
     }
+
+    /**
+     * @covers Symfony\Components\DependencyInjection\Loader\IniFileLoader::supports
+     */
+    public function testSupports()
+    {
+        $loader = new IniFileLoader(new ContainerBuilder());
+
+        $this->assertTrue($loader->supports('foo.ini'), '->supports() returns true if the resource is loadable');
+        $this->assertFalse($loader->supports('foo.foo'), '->supports() returns true if the resource is loadable');
+    }
 }

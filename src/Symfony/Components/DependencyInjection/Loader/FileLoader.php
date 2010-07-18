@@ -22,6 +22,7 @@ use Symfony\Components\DependencyInjection\ContainerBuilder;
  */
 abstract class FileLoader extends Loader
 {
+    protected $currentDir;
     protected $paths;
 
     /**
@@ -39,6 +40,22 @@ abstract class FileLoader extends Loader
         }
 
         $this->paths = $paths;
+    }
+
+    /**
+     * Adds definitions and parameters from a resource.
+     *
+     * @param mixed $resource A Resource
+     */
+    public function import($resource)
+    {
+        $loader = $this->resolve($resource);
+
+        if ($loader instanceof FileLoader && null !== $this->currentDir) {
+            $resource = $this->getAbsolutePath($resource, $this->currentDir);
+        }
+
+        $loader->load($resource);
     }
 
     /**

@@ -54,6 +54,11 @@ class ProjectLoader extends FileLoader
     {
     }
 
+    public function supports($resource)
+    {
+        return true;
+    }
+
     public function getAbsolutePath($file, $currentPath = null)
     {
         return parent::getAbsolutePath($file, $currentPath);

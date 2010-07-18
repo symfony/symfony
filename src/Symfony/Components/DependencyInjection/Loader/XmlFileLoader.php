@@ -55,6 +55,18 @@ class XmlFileLoader extends FileLoader
         $this->parseDefinitions($xml, $file);
     }
 
+    /**
+     * Returns true if this class supports the given resource.
+     *
+     * @param  mixed $resource A resource
+     *
+     * @return Boolean true if this class supports the given resource, false otherwise
+     */
+    public function supports($resource)
+    {
+        return is_string($resource) && 'xml' === pathinfo($resource, PATHINFO_EXTENSION);
+    }
+
     protected function parseParameters($xml, $file)
     {
         if (!$xml->parameters) {
@@ -71,32 +83,9 @@ class XmlFileLoader extends FileLoader
         }
 
         foreach ($xml->imports->import as $import) {
-            $this->parseImport($import, $file);
+            $this->currentDir = dirname($file);
+            $this->import((string) $import['resource']);
         }
-    }
-
-    protected function parseImport($import, $file)
-    {
-        $class = null;
-        if (isset($import['class']) && $import['class'] !== get_class($this)) {
-            $class = (string) $import['class'];
-        } else {
-            // try to detect loader with the extension
-            switch (pathinfo((string) $import['resource'], PATHINFO_EXTENSION)) {
-                case 'yml':
-                    $class = 'Symfony\\Components\\DependencyInjection\\Loader\\YamlFileLoader';
-                    break;
-                case 'ini':
-                    $class = 'Symfony\\Components\\DependencyInjection\\Loader\\IniFileLoader';
-                    break;
-            }
-        }
-
-        $loader = null === $class ? $this : new $class($this->container, $this->paths);
-
-        $importedFile = $this->getAbsolutePath((string) $import['resource'], dirname($file));
-
-        $loader->load($importedFile);
     }
 
     protected function parseDefinitions($xml, $file)

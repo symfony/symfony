@@ -29,8 +29,8 @@ class TextareaField extends Field
         return $this->generator->contentTag('textarea', $content, array_merge(array(
             'id'    => $this->getId(),
             'name'  => $this->getName(),
-            'rows'  => 30,
-            'cols'  => 4,
+            'rows'  => 4,
+            'cols'  => 30,
         ), $attributes));
     }
 }

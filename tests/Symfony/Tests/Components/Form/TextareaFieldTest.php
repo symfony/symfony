@@ -11,7 +11,7 @@ class TextareaFieldTest extends \PHPUnit_Framework_TestCase
         $field = new TextareaField('name');
         $field->setData('asdf');
 
-        $html = '<textarea id="name" name="name" rows="30" cols="4" class="foobar">asdf</textarea>';
+        $html = '<textarea id="name" name="name" rows="4" cols="30" class="foobar">asdf</textarea>';
 
         $this->assertEquals($html, $field->render(array('class' => 'foobar')));
     }
@@ -21,7 +21,7 @@ class TextareaFieldTest extends \PHPUnit_Framework_TestCase
         $field = new TextareaField('name');
         $field->setData('<&&amp;');
 
-        $html = '<textarea id="name" name="name" rows="30" cols="4">&lt;&amp;&amp;</textarea>';
+        $html = '<textarea id="name" name="name" rows="4" cols="30">&lt;&amp;&amp;</textarea>';
 
         $this->assertEquals($html, $field->render());
     }

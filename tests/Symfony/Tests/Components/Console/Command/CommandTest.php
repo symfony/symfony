@@ -35,7 +35,6 @@ class CommandTest extends \PHPUnit_Framework_TestCase
 
     public function testConstructor()
     {
-        $application = new Application();
         try {
             $command = new Command();
             $this->fail('__construct() throws a \LogicException if the name is null');
@@ -195,8 +194,6 @@ class CommandTest extends \PHPUnit_Framework_TestCase
     public function testRun()
     {
         $command = new \TestCommand();
-        $application = new Application();
-        $command->setApplication($application);
         $tester = new CommandTester($command);
         try {
             $tester->execute(array('--bar' => true));
@@ -221,9 +218,7 @@ class CommandTest extends \PHPUnit_Framework_TestCase
 
     public function testSetCode()
     {
-        $application = new Application();
         $command = new \TestCommand();
-        $command->setApplication($application);
         $ret = $command->setCode(function (InputInterface $input, OutputInterface $output)
         {
             $output->writeln('from the code...');
@@ -239,7 +234,7 @@ class CommandTest extends \PHPUnit_Framework_TestCase
         $command = new \TestCommand();
         $command->setApplication(new Application());
         $tester = new CommandTester($command);
-        $tester->execute(array());
+        $tester->execute(array('command' => $command->getFullName()));
         $this->assertStringEqualsFile(self::$fixturesPath.'/command_astext.txt', $command->asText(), '->asText() returns a text representation of the command');
     }
 
@@ -248,7 +243,7 @@ class CommandTest extends \PHPUnit_Framework_TestCase
         $command = new \TestCommand();
         $command->setApplication(new Application());
         $tester = new CommandTester($command);
-        $tester->execute(array());
+        $tester->execute(array('command' => $command->getFullName()));
         $this->assertXmlStringEqualsXmlFile(self::$fixturesPath.'/command_asxml.txt', $command->asXml(), '->asXml() returns an XML representation of the command');
     }
 }

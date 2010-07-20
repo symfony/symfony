@@ -2,31 +2,35 @@
 
 $container->setParameter('kernel.include_core_classes', false);
 
-$container->getExtension('kernel')->load('config', array(
+$container->loadFromExtension('kernel', 'config', array(
     'charset'             => 'UTF-8',
     'error_handler_level' => null,
-), $container);
+));
 
-$container->getExtension('web')->load('config', array(
+$container->loadFromExtension('kernel', 'config', array(
+    'charset'             => 'UTF-8',
+    'error_handler_level' => null,
+));
+
+$container->loadFromExtension('web', 'config', array(
     'router' => array('resource' => '%kernel.root_dir%/config/routing.php'),
-), $container);
+));
 
-$container->getExtension('web')->load('templating', array(
+$container->loadFromExtension('web', 'templating', array(
     'escaping'       => "htmlspecialchars",
     'assets_version' => "SomeVersionScheme",
-), $container);
+));
 
-$container->getExtension('doctrine')->load('dbal', array(
+$container->loadFromExtension('doctrine', 'dbal', array(
     'dbname'   => 'xxxxxxxx',
     'user'     => 'root',
     'password' => '',
-), $container);
+));
 
-$container->getExtension('doctrine')->load('orm', array(
-), $container);
+$container->loadFromExtension('doctrine', 'orm', array());
 
-$container->getExtension('swift')->load('mailer', array(
+$container->loadFromExtension('swift', 'mailer', array(
     'transport' => "gmail",
     'username'  => "xxxxxxxx",
     'password'  => "xxxxxxxx",
-), $container);
+));

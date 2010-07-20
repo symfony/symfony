@@ -2,9 +2,9 @@
 
 $loader->import('config_dev.php');
 
-$container->getExtension('web')->load('config', array(
+$container->loadFromExtension('web', 'config', array(
     'toolbar' => false,
-), $container);
+));
 
-$container->getExtension('kernel')->load('test', array(
-), $container);
+$container->loadFromExtension('kernel', 'test', array(
+));

@@ -2,11 +2,11 @@
 
 $loader->import('config.php');
 
-$container->getExtension('zend')->load('logger', array(
+$container->loadFromExtension('zend', 'logger', array(
     'priority' => 'info',
     'path'     => '%kernel.logs_dir%/%kernel.environment%.log',
-), $container);
+));
 
-$container->getExtension('web')->load('config', array(
+$container->loadFromExtension('web', 'config', array(
     'toolbar' => true,
-), $container);
+));

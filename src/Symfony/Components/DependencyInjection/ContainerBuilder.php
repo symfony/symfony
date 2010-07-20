@@ -104,18 +104,19 @@ class ContainerBuilder extends Container implements AnnotatedContainerInterface
     /**
      * Loads the configuration for an extension.
      *
-     * @param ExtensionInterface $extension A ExtensionInterface instance
-     * @param string                   $tag       The extension tag to load (without the namespace - namespace.tag)
-     * @param array                    $values    An array of values that customizes the extension
+     * @param string $extension The extension alias or namespace
+     * @param string $tag       The extension tag to load (without the namespace - namespace.tag)
+     * @param array  $values    An array of values that customizes the extension
      *
      * @return ContainerBuilder The current instance
      */
-    public function loadFromExtension(ExtensionInterface $extension, $tag, array $values = array())
+    public function loadFromExtension($extension, $tag, array $values = array())
     {
         if (true === $this->isFrozen()) {
             throw new \LogicException('Cannot load from an extension on a frozen container.');
         }
 
+        $extension = $this->getExtension($extension);
         $namespace = $extension->getAlias();
 
         $this->addObjectResource($extension);

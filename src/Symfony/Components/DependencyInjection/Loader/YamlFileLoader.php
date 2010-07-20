@@ -223,7 +223,7 @@ class YamlFileLoader extends FileLoader
                 $values = array();
             }
 
-            $this->container->loadFromExtension($this->container->getExtension($namespace), $tag, $values);
+            $this->container->loadFromExtension($namespace, $tag, $values);
         }
     }
 }

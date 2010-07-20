@@ -39,7 +39,7 @@ class InitApplicationCommand extends BaseCommand
                 new InputArgument('name', InputArgument::REQUIRED, 'The application name (Hello)'),
                 new InputArgument('path', InputArgument::REQUIRED, 'The path to the application (hello/)'),
                 new InputArgument('web_path', InputArgument::REQUIRED, 'The path to the public web root (web/)'),
-                new InputOption('yaml', '', InputOption::PARAMETER_NONE, 'Use YAML for configuration files'),
+                new InputOption('format', '', InputOption::PARAMETER_REQUIRED, 'Use the format for configuration files (php, xml, or yaml)', 'xml'),
             ))
             ->setName('init:application')
         ;
@@ -59,15 +59,15 @@ class InitApplicationCommand extends BaseCommand
         }
 
         $parameters = array(
-            'class' => $input->getArgument('name'),
+            'class'       => $input->getArgument('name'),
             'application' => strtolower($input->getArgument('name')),
+            'format'      => $input->getOption('format'),
         );
-
-        $format = $input->getOption('yaml') ? 'yaml' : 'xml';
 
         $filesystem = new Filesystem();
 
-        $filesystem->mirror(__DIR__.'/../Resources/skeleton/application/'.$format, $targetDir);
+        $filesystem->mirror(__DIR__.'/../Resources/skeleton/application/generic', $targetDir);
+        $filesystem->mirror(__DIR__.'/../Resources/skeleton/application/'.$input->getOption('format'), $targetDir);
         Mustache::renderDir($targetDir, $parameters);
         $filesystem->chmod($targetDir.'/console', 0777);
         $filesystem->chmod($targetDir.'/logs', 0777);

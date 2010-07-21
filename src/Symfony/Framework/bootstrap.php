@@ -214,7 +214,7 @@ class KernelExtension extends Extension
         if (isset($config['session']['class'])) {
             $class = $config['session']['class'];
             if (in_array($class, array('Native', 'Pdo'))) {
-                $class = 'Symfony\\Framework\\FrameworkBundle\\SessionStorage\\'.$class.'SessionStorage';
+                $class = 'Symfony\\Components\\HttpFoundation\\SessionStorage\\'.$class.'SessionStorage';
             }
 
             $container->setParameter('session.session', 'session.session.'.strtolower($class));
@@ -237,9 +237,10 @@ class KernelExtension extends Extension
                 'Symfony\\Components\\Routing\\Matcher\\UrlMatcherInterface',
                 'Symfony\\Components\\Routing\\Matcher\\UrlMatcher',
                 'Symfony\\Components\\HttpKernel\\HttpKernel',
-                'Symfony\\Components\\HttpKernel\\Request',
-                'Symfony\\Components\\HttpKernel\\Response',
+                'Symfony\\Components\\HttpFoundation\\Request',
+                'Symfony\\Components\\HttpFoundation\\Response',
                 'Symfony\\Components\\HttpKernel\\ResponseListener',
+                'Symfony\\Components\\HttpKernel\\Controller\\ControllerLoaderListener',
                 'Symfony\\Components\\Templating\\Loader\\LoaderInterface',
                 'Symfony\\Components\\Templating\\Loader\\Loader',
                 'Symfony\\Components\\Templating\\Loader\\FilesystemLoader',
@@ -249,10 +250,9 @@ class KernelExtension extends Extension
                 'Symfony\\Components\\Templating\\Renderer\\PhpRenderer',
                 'Symfony\\Components\\Templating\\Storage\\Storage',
                 'Symfony\\Components\\Templating\\Storage\\FileStorage',
-                'Symfony\\Framework\\FrameworkBundle\\RequestListener',
-                'Symfony\\Framework\\FrameworkBundle\\Controller',
-                'Symfony\\Framework\\FrameworkBundle\\Controller\\ControllerLoaderListener',
-                'Symfony\\Framework\\FrameworkBundle\\Templating\\Engine',
+                'Symfony\\Bundle\\FrameworkBundle\\RequestListener',
+                'Symfony\\Bundle\\FrameworkBundle\\Controller',
+                'Symfony\\Bundle\\FrameworkBundle\\Templating\\Engine',
             );
         } else {
             $classes = array();

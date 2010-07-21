@@ -22,7 +22,10 @@ use Symfony\Components\HttpFoundation\SessionStorage\NativeSessionStorage;
  */
 class Request
 {
-    public $path;
+    /**
+     * @var \Symfony\Components\HttpFoundation\ParameterBag
+     */
+    public $attributes;
 
     /**
      * @var \Symfony\Components\HttpFoundation\ParameterBag
@@ -70,16 +73,16 @@ class Request
     /**
      * Constructor.
      *
-     * @param array $query   The GET parameters
-     * @param array $request The POST parameters
-     * @param array $path    The parameters parsed from the PATH_INFO (see Router)
-     * @param array $cookies The COOKIE parameters
-     * @param array $files   The FILES parameters
-     * @param array $server  The SERVER parameters
+     * @param array $query      The GET parameters
+     * @param array $request    The POST parameters
+     * @param array $attributes The request attributes (parameters parsed from the PATH_INFO, ...)
+     * @param array $cookies    The COOKIE parameters
+     * @param array $files      The FILES parameters
+     * @param array $server     The SERVER parameters
      */
-    public function __construct(array $query = null, array $request = null, array $path = null, array $cookies = null, array $files = null, array $server = null)
+    public function __construct(array $query = null, array $request = null, array $attributes = null, array $cookies = null, array $files = null, array $server = null)
     {
-        $this->initialize($query, $request, $path, $cookies, $files, $server);
+        $this->initialize($query, $request, $attributes, $cookies, $files, $server);
     }
 
     /**
@@ -87,18 +90,18 @@ class Request
      *
      * This method also re-initializes all properties.
      *
-     * @param array $query   The GET parameters
-     * @param array $request The POST parameters
-     * @param array $path    The parameters parsed from the PATH_INFO
-     * @param array $cookies The COOKIE parameters
-     * @param array $files   The FILES parameters
-     * @param array $server  The SERVER parameters
+     * @param array $query      The GET parameters
+     * @param array $request    The POST parameters
+     * @param array $attributes The request attributes (parameters parsed from the PATH_INFO, ...)
+     * @param array $cookies    The COOKIE parameters
+     * @param array $files      The FILES parameters
+     * @param array $server     The SERVER parameters
      */
-    public function initialize(array $query = null, array $request = null, array $path = null, array $cookies = null, array $files = null, array $server = null)
+    public function initialize(array $query = null, array $request = null, array $attributes = null, array $cookies = null, array $files = null, array $server = null)
     {
         $this->request = new ParameterBag(null !== $request ? $request : $_POST);
         $this->query = new ParameterBag(null !== $query ? $query : $_GET);
-        $this->path = new ParameterBag(null !== $path ? $path : array());
+        $this->attributes = new ParameterBag(null !== $attributes ? $attributes : array());
         $this->cookies = new ParameterBag(null !== $cookies ? $cookies : $_COOKIE);
         $this->files = new ParameterBag($this->convertFileInformation(null !== $files ? $files : $_FILES));
         $this->server = new ParameterBag(null !== $server ? $server : $_SERVER);
@@ -176,20 +179,20 @@ class Request
     /**
      * Clones a request and overrides some of its parameters.
      *
-     * @param array $query   The GET parameters
-     * @param array $request The POST parameters
-     * @param array $path    The parameters parsed from the PATH_INFO
-     * @param array $cookies The COOKIE parameters
-     * @param array $files   The FILES parameters
-     * @param array $server  The SERVER parameters
+     * @param array $query      The GET parameters
+     * @param array $request    The POST parameters
+     * @param array $attributes The request attributes (parameters parsed from the PATH_INFO, ...)
+     * @param array $cookies    The COOKIE parameters
+     * @param array $files      The FILES parameters
+     * @param array $server     The SERVER parameters
      */
-    public function duplicate(array $query = null, array $request = null, array $path = null, array $cookies = null, array $files = null, array $server = null)
+    public function duplicate(array $query = null, array $request = null, array $attributes = null, array $cookies = null, array $files = null, array $server = null)
     {
         $dup = clone $this;
         $dup->initialize(
             null !== $query ? $query : $this->query->all(),
             null !== $request ? $request : $this->request->all(),
-            null !== $path ? $path : $this->path->all(),
+            null !== $attributes ? $attributes : $this->attributes->all(),
             null !== $cookies ? $cookies : $this->cookies->all(),
             null !== $files ? $files : $this->files->all(),
             null !== $server ? $server : $this->server->all()
@@ -200,13 +203,13 @@ class Request
 
     public function __clone()
     {
-        $this->query   = clone $this->query;
-        $this->request = clone $this->request;
-        $this->path    = clone $this->path;
-        $this->cookies = clone $this->cookies;
-        $this->files   = clone $this->files;
-        $this->server  = clone $this->server;
-        $this->headers = clone $this->headers;
+        $this->query      = clone $this->query;
+        $this->request    = clone $this->request;
+        $this->attributes = clone $this->attributes;
+        $this->cookies    = clone $this->cookies;
+        $this->files      = clone $this->files;
+        $this->server     = clone $this->server;
+        $this->headers    = clone $this->headers;
     }
 
     /**
@@ -234,7 +237,7 @@ class Request
     // This method is mainly useful for libraries that want to provide some flexibility
     public function get($key, $default = null)
     {
-        return $this->query->get($key, $this->path->get($key, $this->request->get($key, $default)));
+        return $this->query->get($key, $this->attributes->get($key, $this->request->get($key, $default)));
     }
 
     public function getSession()

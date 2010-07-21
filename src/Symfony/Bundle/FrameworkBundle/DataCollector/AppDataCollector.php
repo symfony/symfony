@@ -35,7 +35,7 @@ class AppDataCollector extends DataCollector
         $request = $this->container->getRequestService();
 
         $this->data = array(
-            'route'        => $request->path->get('_route') ? $request->path->get('_route') : '<span style="color: #a33">NONE</span>',
+            'route'        => $request->attributes->get('_route') ? $request->attributes->get('_route') : '<span style="color: #a33">NONE</span>',
             'format'       => $request->getRequestFormat(),
             'content_type' => $this->profiler->getResponse()->headers->get('Content-Type') ? $this->profiler->getResponse()->headers->get('Content-Type') : 'text/html',
             'code'         => $this->profiler->getResponse()->getStatusCode(),

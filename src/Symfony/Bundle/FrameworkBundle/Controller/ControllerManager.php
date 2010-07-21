@@ -128,7 +128,7 @@ class ControllerManager implements ControllerManagerInterface
      */
     public function getController(Request $request)
     {
-        if (!$controller = $request->path->get('_controller')) {
+        if (!$controller = $request->attributes->get('_controller')) {
             if (null !== $this->logger) {
                 $this->logger->err('Unable to look for the controller as the "_controller" parameter is missing');
             }
@@ -192,16 +192,16 @@ class ControllerManager implements ControllerManagerInterface
      */
     public function getMethodArguments(Request $request, $controller)
     {
-        $event = $this->container->get('event_dispatcher')->filter(new Event($this, 'controller_manager.filter_controller_arguments', array('controller' => $controller, 'request' => $request)), $request->path->all());
-        $path = $event->getReturnValue();
+        $event = $this->container->get('event_dispatcher')->filter(new Event($this, 'controller_manager.filter_controller_arguments', array('controller' => $controller, 'request' => $request)), $request->attributes->all());
+        $attributes = $event->getReturnValue();
 
         list($controller, $method) = $controller;
 
         $r = new \ReflectionObject($controller);
         $arguments = array();
         foreach ($r->getMethod($method)->getParameters() as $param) {
-            if (array_key_exists($param->getName(), $path)) {
-                $arguments[] = $path[$param->getName()];
+            if (array_key_exists($param->getName(), $attributes)) {
+                $arguments[] = $attributes[$param->getName()];
             } elseif ($param->isDefaultValueAvailable()) {
                 $arguments[] = $param->getDefaultValue();
             } else {

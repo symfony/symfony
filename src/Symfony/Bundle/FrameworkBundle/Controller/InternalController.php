@@ -26,12 +26,12 @@ class InternalController extends Controller
     {
         $request = $this->getRequest();
 
-        if ('none' !== $request->path->get('path'))
+        if ('none' !== $request->attributes->get('path'))
         {
-            parse_str($request->path->get('path'), $tmp);
-            $request->path->add($tmp);
+            parse_str($request->attributes->get('path'), $tmp);
+            $request->attributes->add($tmp);
         }
 
-        return $this->forward($request->path->get('controller'), $request->path->all(), $request->query->all());
+        return $this->forward($request->attributes->get('controller'), $request->attributes->all(), $request->query->all());
     }
 }

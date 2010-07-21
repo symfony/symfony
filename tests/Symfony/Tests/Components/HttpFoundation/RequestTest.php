@@ -37,7 +37,7 @@ class RequestTest extends \PHPUnit_Framework_TestCase
         $this->assertEquals('bar', $request->request->get('foo'), '->initialize() takes an array of request parameters as its second argument');
 
         $request->initialize(null, null, array('foo' => 'bar'));
-        $this->assertEquals('bar', $request->path->get('foo'), '->initialize() takes an array of path parameters as its thrid argument');
+        $this->assertEquals('bar', $request->attributes->get('foo'), '->initialize() takes an array of attributes as its thrid argument');
 
         $request->initialize(null, null, null, null, null, array('HTTP_FOO' => 'bar'));
         $this->assertEquals('bar', $request->headers->get('FOO'), '->initialize() takes an array of HTTP headers as its fourth argument');
@@ -53,14 +53,14 @@ class RequestTest extends \PHPUnit_Framework_TestCase
 
         $this->assertEquals($request->query->all(), $dup->query->all(), '->duplicate() duplicates a request an copy the current query parameters');
         $this->assertEquals($request->request->all(), $dup->request->all(), '->duplicate() duplicates a request an copy the current request parameters');
-        $this->assertEquals($request->path->all(), $dup->path->all(), '->duplicate() duplicates a request an copy the current path parameters');
+        $this->assertEquals($request->attributes->all(), $dup->attributes->all(), '->duplicate() duplicates a request an copy the current attributes');
         $this->assertEquals($request->headers->all(), $dup->headers->all(), '->duplicate() duplicates a request an copy the current HTTP headers');
 
         $dup = $request->duplicate(array('foo' => 'foobar'), array('foo' => 'foobar'), array('foo' => 'foobar'), array(), array(), array('HTTP_FOO' => 'foobar'));
 
         $this->assertEquals(array('foo' => 'foobar'), $dup->query->all(), '->duplicate() overrides the query parameters if provided');
         $this->assertEquals(array('foo' => 'foobar'), $dup->request->all(), '->duplicate() overrides the request parameters if provided');
-        $this->assertEquals(array('foo' => 'foobar'), $dup->path->all(), '->duplicate() overrides the path parameters if provided');
+        $this->assertEquals(array('foo' => 'foobar'), $dup->attributes->all(), '->duplicate() overrides the attributes if provided');
         $this->assertEquals(array('foo' => array('foobar')), $dup->headers->all(), '->duplicate() overrides the HTTP header if provided');
     }
 

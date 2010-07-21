@@ -63,7 +63,7 @@ class RequestListener
             ));
         }
 
-        if ($request->path->has('_controller')) {
+        if ($request->attributes->has('_controller')) {
             return;
         }
 
@@ -72,7 +72,7 @@ class RequestListener
                 $this->logger->info(sprintf('Matched route "%s" (parameters: %s)', $parameters['_route'], str_replace("\n", '', var_export($parameters, true))));
             }
 
-            $request->path->replace($parameters);
+            $request->attributes->replace($parameters);
         } elseif (null !== $this->logger) {
             $this->logger->err(sprintf('No route found for %s', $request->getPathInfo()));
         }

@@ -82,18 +82,18 @@ class Engine
     public function render($name, array $parameters = array())
     {
         if (isset($this->cache[$name])) {
-            list($name, $options, $template) = $this->cache[$name];
+            list($tpl, $options, $template) = $this->cache[$name];
         } else {
-            list($name, $options) = $this->splitTemplateName($old = $name);
+            list($tpl, $options) = $this->splitTemplateName($name);
 
             // load
-            $template = $this->loader->load($name, $options);
+            $template = $this->loader->load($tpl, $options);
 
             if (false === $template) {
                 throw new \InvalidArgumentException(sprintf('The template "%s" does not exist (renderer: %s).', $name, $options['renderer']));
             }
 
-            $this->cache[$old] = array($name, $options, $template);
+            $this->cache[$name] = array($tpl, $options, $template);
         }
 
         $this->current = $name;

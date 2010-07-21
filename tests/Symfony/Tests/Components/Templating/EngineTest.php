@@ -99,7 +99,7 @@ class EngineTest extends \PHPUnit_Framework_TestCase
             $this->fail('->render() throws an InvalidArgumentException if no renderer is registered for the given renderer');
         } catch (\Exception $e) {
             $this->assertInstanceOf('\InvalidArgumentException', $e, '->render() throws an InvalidArgumentException if no renderer is registered for the given renderer');
-            $this->assertEquals('The template "foo" does not exist (renderer: name).', $e->getMessage(), '->render() throws an InvalidArgumentException if no renderer is registered for the given renderer');
+            $this->assertEquals('The template "foo:name" does not exist (renderer: name).', $e->getMessage(), '->render() throws an InvalidArgumentException if no renderer is registered for the given renderer');
         }
 
         $engine = new ProjectTemplateEngine(self::$loader, array(), array(new SlotsHelper()));

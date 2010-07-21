@@ -57,6 +57,7 @@ class DoctrineExtensionTest extends TestCase
         $loadXml = new XmlFileLoader($container, __DIR__.'/Fixtures/xml');
         $loadXml->load('dbal_service_multiple_connections.xml');
         $loader->dbalLoad(array(), $container);
+        $container->freeze();
 
         // doctrine.dbal.mysql_connection
         $arguments = $container->getDefinition('doctrine.dbal.mysql_connection')->getArguments();
@@ -96,6 +97,7 @@ class DoctrineExtensionTest extends TestCase
         $loadXml = new XmlFileLoader($container, __DIR__.'/Fixtures/xml');
         $loadXml->load('dbal_service_single_connection.xml');
         $loader->dbalLoad(array(), $container);
+        $container->freeze();
 
         // doctrine.dbal.mysql_connection
         $arguments = $container->getDefinition('doctrine.dbal.mysql_connection')->getArguments();

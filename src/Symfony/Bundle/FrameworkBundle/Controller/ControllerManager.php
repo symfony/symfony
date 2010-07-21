@@ -6,6 +6,7 @@ use Symfony\Components\HttpKernel\LoggerInterface;
 use Symfony\Components\HttpKernel\Controller\ControllerManagerInterface;
 use Symfony\Components\HttpKernel\HttpKernelInterface;
 use Symfony\Components\HttpFoundation\Request;
+use Symfony\Components\EventDispatcher\Event;
 use Symfony\Components\DependencyInjection\ContainerInterface;
 
 /*
@@ -191,7 +192,8 @@ class ControllerManager implements ControllerManagerInterface
      */
     public function getMethodArguments(Request $request, $controller)
     {
-        $path = $request->path->all();
+        $event = $this->container->get('event_dispatcher')->filter(new Event($this, 'controller_manager.filter_controller_arguments', array('controller' => $controller, 'request' => $request)), $request->path->all());
+        $path = $event->getReturnValue();
 
         list($controller, $method) = $controller;
 

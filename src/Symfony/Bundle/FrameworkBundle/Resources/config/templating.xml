@@ -83,7 +83,7 @@
 
         <service id="templating.helper.actions" class="%templating.helper.actions.class%">
             <annotation name="templating.helper" alias="actions" />
-            <argument type="service" id="controller_manager" />
+            <argument type="service" id="controller_resolver" />
         </service>
 
         <service id="templating.loader" alias="templating.loader.filesystem" />

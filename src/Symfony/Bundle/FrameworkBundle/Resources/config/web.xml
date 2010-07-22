@@ -6,8 +6,7 @@
 
     <parameters>
         <parameter key="request_listener.class">Symfony\Bundle\FrameworkBundle\RequestListener</parameter>
-        <parameter key="controller_manager.class">Symfony\Bundle\FrameworkBundle\Controller\ControllerManager</parameter>
-        <parameter key="controller_loader_listener.class">Symfony\Components\HttpKernel\Controller\ControllerLoaderListener</parameter>
+        <parameter key="controller_resolver.class">Symfony\Bundle\FrameworkBundle\Controller\ControllerResolver</parameter>
         <parameter key="response_listener.class">Symfony\Components\HttpKernel\ResponseListener</parameter>
         <parameter key="exception_listener.class">Symfony\Bundle\FrameworkBundle\Controller\ExceptionListener</parameter>
         <parameter key="exception_listener.controller">FrameworkBundle:Exception:exception</parameter>
@@ -16,14 +15,8 @@
     </parameters>
 
     <services>
-        <service id="controller_manager" class="%controller_manager.class%">
+        <service id="controller_resolver" class="%controller_resolver.class%">
             <argument type="service" id="service_container" />
-            <argument type="service" id="logger" on-invalid="ignore" />
-        </service>
-
-        <service id="controller_loader_listener" class="%controller_loader_listener.class%">
-            <annotation name="kernel.listener" />
-            <argument type="service" id="controller_manager" />
             <argument type="service" id="logger" on-invalid="ignore" />
         </service>
 

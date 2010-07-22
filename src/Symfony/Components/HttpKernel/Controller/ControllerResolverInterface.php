@@ -14,7 +14,7 @@ use Symfony\Components\HttpFoundation\Request;
  */
 
 /**
- * A ControllerManagerInterface implementation knows how to determine the
+ * A ControllerResolverInterface implementation knows how to determine the
  * controller to execute based on a Request object.
  *
  * It can also determine the arguments to pass to the Controller.
@@ -25,21 +25,21 @@ use Symfony\Components\HttpFoundation\Request;
  * @subpackage Bundle_FrameworkBundle
  * @author     Fabien Potencier <fabien.potencier@symfony-project.com>
  */
-interface ControllerManagerInterface
+interface ControllerResolverInterface
 {
     /**
      * Returns the Controller instance associated with a Request.
      *
-     * As several managers can exist for a single application, a manager must
+     * As several resolvers can exist for a single application, a resolver must
      * return false when it is not able to determine the controller.
      *
-     * The manager must only throw an exception when it should be able to load
+     * The resolver must only throw an exception when it should be able to load
      * controller but cannot because of some errors made by the developer.
      *
      * @param \Symfony\Components\HttpFoundation\Request $request A Request instance
      *
      * @return mixed|Boolean A PHP callable representing the Controller,
-     *                       or false if this manager is not able to determine the controller
+     *                       or false if this resolver is not able to determine the controller
      *
      * @throws \InvalidArgumentException|\LogicException If the controller can't be found
      */
@@ -53,5 +53,5 @@ interface ControllerManagerInterface
      *
      * @throws \RuntimeException When value for argument given is not provided
      */
-    public function getMethodArguments(Request $request, $controller);
+    public function getArguments(Request $request, $controller);
 }

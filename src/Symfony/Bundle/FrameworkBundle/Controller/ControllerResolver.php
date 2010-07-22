@@ -3,7 +3,7 @@
 namespace Symfony\Bundle\FrameworkBundle\Controller;
 
 use Symfony\Components\HttpKernel\LoggerInterface;
-use Symfony\Components\HttpKernel\Controller\ControllerManagerInterface;
+use Symfony\Components\HttpKernel\Controller\ControllerResolverInterface;
 use Symfony\Components\HttpKernel\HttpKernelInterface;
 use Symfony\Components\HttpFoundation\Request;
 use Symfony\Components\EventDispatcher\Event;
@@ -19,13 +19,13 @@ use Symfony\Components\DependencyInjection\ContainerInterface;
  */
 
 /**
- * ControllerManager.
+ * ControllerResolver.
  *
  * @package    Symfony
  * @subpackage Bundle_FrameworkBundle
  * @author     Fabien Potencier <fabien.potencier@symfony-project.com>
  */
-class ControllerManager implements ControllerManagerInterface
+class ControllerResolver implements ControllerResolverInterface
 {
     protected $container;
     protected $logger;
@@ -122,7 +122,7 @@ class ControllerManager implements ControllerManagerInterface
      * @param \Symfony\Components\HttpFoundation\Request $request A Request instance
      *
      * @return mixed|Boolean A PHP callable representing the Controller,
-     *                       or false if this manager is not able to determine the controller
+     *                       or false if this resolver is not able to determine the controller
      *
      * @throws \InvalidArgumentException|\LogicException If the controller can't be found
      */
@@ -190,10 +190,9 @@ class ControllerManager implements ControllerManagerInterface
      *
      * @throws \RuntimeException When value for argument given is not provided
      */
-    public function getMethodArguments(Request $request, $controller)
+    public function getArguments(Request $request, $controller)
     {
-        $event = $this->container->get('event_dispatcher')->filter(new Event($this, 'controller_manager.filter_controller_arguments', array('controller' => $controller, 'request' => $request)), $request->attributes->all());
-        $attributes = $event->getReturnValue();
+        $attributes = $request->attributes->all();
 
         list($controller, $method) = $controller;
 

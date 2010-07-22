@@ -15,21 +15,23 @@ use Symfony\Components\HttpKernel\HttpKernel;
 use Symfony\Components\HttpFoundation\Request;
 use Symfony\Components\HttpFoundation\Response;
 use Symfony\Components\EventDispatcher\EventDispatcher;
-use Symfony\Components\EventDispatcher\Event;
+use Symfony\Components\HttpKernel\Controller\ControllerResolverInterface;
 
-class TestHttpKernel extends HttpKernel
+class TestHttpKernel extends HttpKernel implements ControllerResolverInterface
 {
     public function __construct()
     {
-        $this->dispatcher = new EventDispatcher();
-        $this->dispatcher->connect('core.load_controller', array($this, 'loadController'));
+        parent::__construct(new EventDispatcher(), $this);
     }
 
-    public function loadController(Event $event)
+    public function getController(Request $request)
     {
-        $event->setReturnValue(array(array($this, 'callController'), array($event['request'])));
+        return array($this, 'callController');
+    }
 
-        return true;
+    public function getArguments(Request $request, $controller)
+    {
+        return array($request);
     }
 
     public function callController(Request $request)

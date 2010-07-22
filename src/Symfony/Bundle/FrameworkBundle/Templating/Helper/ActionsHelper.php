@@ -4,7 +4,7 @@ namespace Symfony\Bundle\FrameworkBundle\Templating\Helper;
 
 use Symfony\Components\Templating\Helper\Helper;
 use Symfony\Components\OutputEscaper\Escaper;
-use Symfony\Bundle\FrameworkBundle\Controller\ControllerManager;
+use Symfony\Bundle\FrameworkBundle\Controller\ControllerResolver;
 
 /*
  * This file is part of the Symfony framework.
@@ -24,16 +24,16 @@ use Symfony\Bundle\FrameworkBundle\Controller\ControllerManager;
  */
 class ActionsHelper extends Helper
 {
-    protected $manager;
+    protected $resolver;
 
     /**
      * Constructor.
      *
      * @param Constructor $container A ContainerInterface instance
      */
-    public function __construct(ControllerManager $manager)
+    public function __construct(ControllerResolver $resolver)
     {
-        $this->manager = $manager;
+        $this->resolver = $resolver;
     }
 
     /**
@@ -55,7 +55,7 @@ class ActionsHelper extends Helper
      * @param string $controller A controller name to execute (a string like BlogBundle:Post:index), or a relative URI
      * @param array  $options    An array of options
      *
-     * @see Symfony\Bundle\FrameworkBundle\Controller\ControllerManager::render()
+     * @see Symfony\Bundle\FrameworkBundle\Controller\ControllerResolver::render()
      */
     public function render($controller, array $options = array())
     {
@@ -69,7 +69,7 @@ class ActionsHelper extends Helper
             $options['query'] = Escaper::unescape($options['query']);
         }
 
-        return $this->manager->render($controller, $options);
+        return $this->resolver->render($controller, $options);
     }
 
     /**

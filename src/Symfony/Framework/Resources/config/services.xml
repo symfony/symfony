@@ -29,6 +29,7 @@
 
         <service id="http_kernel" class="%http_kernel.class%">
             <argument type="service" id="event_dispatcher" />
+            <argument type="service" id="controller_resolver" />
         </service>
 
         <service id="request" class="%request.class%">

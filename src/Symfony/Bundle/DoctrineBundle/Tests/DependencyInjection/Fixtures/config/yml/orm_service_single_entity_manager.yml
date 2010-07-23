@@ -1,0 +1,24 @@
+doctrine.dbal:
+  connections:
+    default:
+      driver: PDOSqlite
+      dbname: sqlite_db
+      user: sqlite_user
+      password: sqlite_s3cr3t
+      memory: true
+
+doctrine.orm:
+  metadata_cache_driver: apc
+  default_entity_manager: dm2
+  default_connection: conn1
+  proxy_namespace: Proxies
+  auto_generate_proxy_classes: true
+  entity_managers:
+    default:
+      connection: default
+      metadata_cache_driver:
+        type: memcache
+        class: Doctrine\Common\Cache\MemcacheCache
+        host: localhost
+        port: 11211
+        instance_class: Memcache

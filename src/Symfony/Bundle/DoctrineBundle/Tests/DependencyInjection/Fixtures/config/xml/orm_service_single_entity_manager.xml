@@ -1,0 +1,40 @@
+<?xml version="1.0" ?>
+
+<container xmlns="http://www.symfony-project.org/schema/dic/services"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xmlns:doctrine="http://www.symfony-project.org/schema/dic/doctrine"
+    xsi:schemaLocation="http://www.symfony-project.org/schema/dic/services http://www.symfony-project.org/schema/dic/services/services-1.0.xsd
+                        http://www.symfony-project.org/schema/dic/doctrine/orm http://www.symfony-project.org/schema/dic/doctrine/orm/doctrine-1.0.xsd
+                        http://www.symfony-project.org/schema/dic/doctrine/dbal http://www.symfony-project.org/schema/dic/doctrine/dbal/doctrine-1.0.xsd">
+
+    <doctrine:dbal>
+        <doctrine:connections>
+            <doctrine:connection
+                id="default"
+                driver="PDOSqlite"
+                dbname="sqlite_db"
+                user="sqlite_user"
+                password="sqlite_s3cr3t"
+                memory="true" />
+        </doctrine:connections>
+    </doctrine:dbal>
+
+    <doctrine:orm
+            metadata_cache_driver="apc"
+            default_entity_manager="dm2"
+            default_connection="conn1"
+            proxy_namespace="Proxies"
+            auto_generate_proxy_classes="true"
+        >
+        <doctrine:entity_managers>
+            <doctrine:entity_manager id="default" connection="default">
+                <metadata_cache_driver type="memcache">
+                    <class>Doctrine\Common\Cache\MemcacheCache</class>
+                    <host>localhost</host>
+                    <port>11211</port>
+                    <instance_class>Memcache</instance_class>
+                </metadata_cache_driver>
+            </doctrine:entity_manager>
+        </doctrine:entity_managers>
+    </doctrine:orm>
+</container>

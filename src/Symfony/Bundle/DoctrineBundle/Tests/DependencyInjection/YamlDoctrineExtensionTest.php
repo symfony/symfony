@@ -9,16 +9,16 @@
  * file that was distributed with this source code.
  */
 
-namespace Symfony\Bundle\DoctrineMongoDBBundle\Tests\DependencyInjection;
+namespace Symfony\Bundle\DoctrineBundle\Tests\DependencyInjection;
 
 use Symfony\Components\DependencyInjection\ContainerBuilder;
-use Symfony\Components\DependencyInjection\Loader\XmlFileLoader;
+use Symfony\Components\DependencyInjection\Loader\YamlFileLoader;
 
-class XmlMongoDBExtensionTest extends AbstractMongoDBExtensionTest
+class YamlDoctrineExtensionTest extends AbstractDoctrineExtensionTest
 {
     protected function loadFromFile(ContainerBuilder $container, $file)
     {
-        $loadXml = new XmlFileLoader($container, __DIR__.'/Fixtures/config/xml');
-        $loadXml->load($file.'.xml');
+        $loadYaml = new YamlFileLoader($container, __DIR__.'/Fixtures/config/yml');
+        $loadYaml->load($file.'.yml');
     }
 }

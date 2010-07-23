@@ -37,29 +37,10 @@ class DoctrineBundle extends Bundle
      */
     public function buildContainer(ParameterBagInterface $parameterBag)
     {
-        ContainerBuilder::registerExtension(new DoctrineExtension( 
+        ContainerBuilder::registerExtension(new DoctrineExtension(
             $parameterBag->get('kernel.bundle_dirs'),
             $parameterBag->get('kernel.bundles'),
             $parameterBag->get('kernel.cache_dir')
         ));
-        $metadataDirs = array();
-        $entityDirs = array();
-        $bundleDirs = $parameterBag->get('kernel.bundle_dirs');
-        foreach ($parameterBag->get('kernel.bundles') as $className) {
-            $tmp = dirname(str_replace('\\', '/', $className));
-            $namespace = str_replace('/', '\\', dirname($tmp));
-            $class = basename($tmp);
-
-            if (isset($bundleDirs[$namespace])) {
-                if (is_dir($dir = $bundleDirs[$namespace].'/'.$class.'/Resources/config/doctrine/metadata')) {
-                    $metadataDirs[] = realpath($dir);
-                }
-                if (is_dir($dir = $bundleDirs[$namespace].'/'.$class.'/Entities')) {
-                    $entityDirs[] = realpath($dir);
-                }
-            }
-        }
-        $parameterBag->set('doctrine.orm.metadata_driver.mapping_dirs', $metadataDirs);
-        $parameterBag->set('doctrine.orm.entity_dirs', $entityDirs);
     }
 }

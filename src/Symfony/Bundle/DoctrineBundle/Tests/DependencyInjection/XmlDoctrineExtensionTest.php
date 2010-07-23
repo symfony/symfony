@@ -9,12 +9,12 @@
  * file that was distributed with this source code.
  */
 
-namespace Symfony\Bundle\DoctrineMongoDBBundle\Tests\DependencyInjection;
+namespace Symfony\Bundle\DoctrineBundle\Tests\DependencyInjection;
 
 use Symfony\Components\DependencyInjection\ContainerBuilder;
 use Symfony\Components\DependencyInjection\Loader\XmlFileLoader;
 
-class XmlMongoDBExtensionTest extends AbstractMongoDBExtensionTest
+class XmlDoctrineExtensionTest extends AbstractDoctrineExtensionTest
 {
     protected function loadFromFile(ContainerBuilder $container, $file)
     {

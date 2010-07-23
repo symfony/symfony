@@ -1,0 +1,33 @@
+<?xml version="1.0" ?>
+
+<container xmlns="http://www.symfony-project.org/schema/dic/services"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xmlns:doctrine="http://www.symfony-project.org/schema/dic/doctrine/odm/mongodb"
+    xsi:schemaLocation="http://www.symfony-project.org/schema/dic/services http://www.symfony-project.org/schema/dic/services/services-1.0.xsd
+                        http://www.symfony-project.org/schema/dic/doctrine/odm/mongodb http://www.symfony-project.org/schema/dic/doctrine/odm/mongodb/mongodb-1.0.xsd">
+
+    <doctrine:mongodb
+            metadata_cache_driver="apc"
+            default_document_manager="dm2"
+            default_connection="conn1"
+            proxy_namespace="Proxies"
+            auto_generate_proxy_classes="true"
+        >
+        <doctrine:connections>
+            <doctrine:connection id="conn1" server="mongodb://localhost:27017">
+                <options>
+                    <connect>true</connect>
+                </options>
+            </doctrine:connection>
+            <doctrine:connection id="conn2" server="mongodb://localhost:27017">
+                <options>
+                    <connect>true</connect>
+                </options>
+            </doctrine:connection>
+        </doctrine:connections>
+        <doctrine:document_managers>
+            <doctrine:document_manager id="dm1" metadata_cache_driver="xcache" connection="conn1" />
+            <doctrine:document_manager id="dm2" connection="conn2" />
+        </doctrine:document_managers>
+    </doctrine:mongodb>
+</container>

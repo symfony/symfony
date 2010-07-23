@@ -15,15 +15,12 @@ use Symfony\Components\DependencyInjection\Resource\FileResource;
  * @author Bulat Shakirzyanov <bulat@theopenskyproject.com>
  * @author Kris Wallsmith <kris.wallsmith@symfony-project.com>
  * @author Jonathan H. Wage <jonwage@gmail.com>
- *
- * @todo Add support for multiple document managers
  */
 class MongoDBExtension extends Extension
 {
     protected $resources = array(
         'mongodb' => 'mongodb.xml',
     );
-
     protected $bundleDirs;
     protected $bundles;
     protected $kernelCacheDir;
@@ -36,10 +33,14 @@ class MongoDBExtension extends Extension
     }
 
     /**
-     * Loads the MongoDB configuration.
+     * Loads the MongoDB ODM configuration.
      *
-     * @param array $config        An array of configuration settings
-     * @param \Symfony\Components\DependencyInjection\ContainerBuilder $container A ContainerBuilder instance
+     * Usage example:
+     *
+     *     <doctrine:mongodb server="mongodb://localhost:27017" />
+     *
+     * @param array $config An array of configuration settings
+     * @param ContainerBuilder $container A ContainerBuilder instance
      */
     public function mongodbLoad($config, ContainerBuilder $container)
     {
@@ -68,8 +69,8 @@ class MongoDBExtension extends Extension
     /**
      * Loads the default configuration.
      *
-     * @param array $config        An array of configuration settings
-     * @param \Symfony\Components\DependencyInjection\ContainerBuilder $container A ContainerBuilder instance
+     * @param array $config An array of configuration settings
+     * @param ContainerBuilder $container A ContainerBuilder instance
      */
     protected function loadDefaults(array $config, ContainerBuilder $container)
     {
@@ -79,6 +80,8 @@ class MongoDBExtension extends Extension
 
         // Allow these application configuration options to override the defaults
         $options = array(
+            'default_document_manager',
+            'default_connection',
             'cache_driver',
             'metadata_cache_driver',
             'proxy_namespace',
@@ -96,8 +99,8 @@ class MongoDBExtension extends Extension
     /**
      * Loads the document managers configuration.
      *
-     * @param array $config        An array of configuration settings
-     * @param \Symfony\Components\DependencyInjection\ContainerBuilder $container A ContainerBuilder instance
+     * @param array $config An array of configuration settings
+     * @param ContainerBuilder $container A ContainerBuilder instance
      */
     protected function loadDocumentManagers(array $config, ContainerBuilder $container)
     {
@@ -117,7 +120,7 @@ class MongoDBExtension extends Extension
      * Loads a document manager configuration.
      *
      * @param array $documentManager        A document manager configuration array
-     * @param \Symfony\Components\DependencyInjection\ContainerBuilder $container A ContainerBuilder instance
+     * @param ContainerBuilder $container A ContainerBuilder instance
      */
     protected function loadDocumentManager(array $documentManager, ContainerBuilder $container)
     {
@@ -142,7 +145,7 @@ class MongoDBExtension extends Extension
         }
 
         $odmDmArgs = array(
-            new Reference(sprintf('doctrine.odm.mongodb.%s_connection', isset($documentManager['connection']) ? $documentManager['connection'] : 'default')),
+            new Reference(sprintf('doctrine.odm.mongodb.%s_connection', isset($documentManager['connection']) ? $documentManager['connection'] : $documentManager['name'])),
             new Reference(sprintf('doctrine.odm.mongodb.%s_configuration', $documentManager['name']))
         );
         $odmDmDef = new Definition('%doctrine.odm.mongodb.document_manager_class%', $odmDmArgs);
@@ -160,14 +163,11 @@ class MongoDBExtension extends Extension
     /**
      * Gets the configured document managers.
      *
-     * @param array $config        An array of configuration settings
-     * @param \Symfony\Components\DependencyInjection\ContainerBuilder $container A ContainerBuilder instance
+     * @param array $config An array of configuration settings
+     * @param ContainerBuilder $container A ContainerBuilder instance
      */
     protected function getDocumentManagers(array $config, ContainerBuilder $container)
     {
-        if (isset($config['default_document_manager'])) {
-            $container->setParameter('doctrine.odm.mongodb.default_document_manager', $config['default_document_manager']);
-        }
         $defaultDocumentManager = $container->getParameter('doctrine.odm.mongodb.default_document_manager');
 
         $documentManagers = array();
@@ -190,8 +190,8 @@ class MongoDBExtension extends Extension
     /**
      * Loads a document managers bundles mapping information configuration.
      *
-     * @param array $config        An array of configuration settings
-     * @param \Symfony\Components\DependencyInjection\ContainerBuilder $container A ContainerBuilder instance
+     * @param array $config An array of configuration settings
+     * @param ContainerBuilder $container A ContainerBuilder instance
      */
     protected function loadDocumentManagerBundlesMappingInformation(array $documentManager, Definition $odmConfigDef, ContainerBuilder $container)
     {
@@ -200,7 +200,6 @@ class MongoDBExtension extends Extension
         $bundleDocumentMappings = array();
         $bundleDirs = $this->bundleDirs;
         $aliasMap = array();
-
         foreach ($this->bundles as $className) {
             $tmp = dirname(str_replace('\\', '/', $className));
             $namespace = str_replace('/', '\\', dirname($tmp));
@@ -236,7 +235,7 @@ class MongoDBExtension extends Extension
      * Loads the configured document manager metadata cache driver.
      *
      * @param array $config        A configured document manager array
-     * @param \Symfony\Components\DependencyInjection\ContainerBuilder $container A ContainerBuilder instance
+     * @param ContainerBuilder $container A ContainerBuilder instance
      */
     protected function loadDocumentManagerMetadataCacheDriver(array $documentManager, ContainerBuilder $container)
     {
@@ -263,8 +262,8 @@ class MongoDBExtension extends Extension
     /**
      * Loads the configured connections.
      *
-     * @param array $config        An array of configuration settings
-     * @param \Symfony\Components\DependencyInjection\ContainerBuilder $container A ContainerBuilder instance
+     * @param array $config An array of configuration settings
+     * @param ContainerBuilder $container A ContainerBuilder instance
      */
     protected function loadConnections(array $config, ContainerBuilder $container)
     {
@@ -282,14 +281,11 @@ class MongoDBExtension extends Extension
     /**
      * Gets the configured connections.
      *
-     * @param array $config        An array of configuration settings
-     * @param \Symfony\Components\DependencyInjection\ContainerBuilder $container A ContainerBuilder instance
+     * @param array $config An array of configuration settings
+     * @param ContainerBuilder $container A ContainerBuilder instance
      */
     protected function getConnections(array $config, ContainerBuilder $container)
     {
-        if (isset($config['default_connection'])) {
-            $container->setParameter('doctrine.odm.mongodb.default_connection', $config['default_connection']);
-        }
         $defaultConnection = $container->getParameter('doctrine.odm.mongodb.default_connection');
 
         $connections = array();
@@ -312,7 +308,7 @@ class MongoDBExtension extends Extension
      * Finds existing bundle subpaths.
      *
      * @param string $path A subpath to check for
-     * @param Symfony\Components\DependencyInjection\ContainerBuilder $container A ContainerBuilder configuration
+     * @param ContainerBuilder $container A ContainerBuilder configuration
      *
      * @return array An array of absolute directory paths
      */
@@ -339,7 +335,7 @@ class MongoDBExtension extends Extension
      * Detects what metadata driver to use for the supplied directory.
      *
      * @param string $dir A directory path
-     * @param Symfony\Components\DependencyInjection\ContainerBuilder $container A ContainerBuilder configuration
+     * @param ContainerBuilder $container A ContainerBuilder configuration
      *
      * @return string|null A metadata driver short name, if one can be detected
      */

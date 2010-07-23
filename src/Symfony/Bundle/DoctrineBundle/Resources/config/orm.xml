@@ -5,10 +5,39 @@
     xsi:schemaLocation="http://www.symfony-project.org/schema/dic/services http://www.symfony-project.org/schema/dic/services/services-1.0.xsd">
 
     <parameters>
-        <parameter key="doctrine.orm.cache_driver">array</parameter>
-        <parameter key="doctrine.orm.cache.memcache.host">localhost</parameter>
-        <parameter key="doctrine.orm.cache.memcache.port">11211</parameter>
         <parameter key="doctrine.orm.default_entity_manager">default</parameter>
+        <parameter key="doctrine.orm.metadata_cache_driver">array</parameter>
+        <parameter key="doctrine.orm.query_cache_driver">array</parameter>
+        <parameter key="doctrine.orm.result_cache_driver">array</parameter>
+        <parameter key="doctrine.orm.configuration_class">Doctrine\ORM\Configuration</parameter>
+        <parameter key="doctrine.orm.entity_manager_class">Doctrine\ORM\EntityManager</parameter>
+
+        <!-- proxies -->
+        <parameter key="doctrine.orm.proxy_namespace">Proxies</parameter>
+        <parameter key="doctrine.orm.auto_generate_proxy_classes">false</parameter>
+
+        <!-- cache -->
+        <parameter key="doctrine.orm.cache.array_class">Doctrine\Common\Cache\ArrayCache</parameter>
+        <parameter key="doctrine.orm.cache.apc_class">Doctrine\Common\Cache\ApcCache</parameter>
+        <parameter key="doctrine.orm.cache.memcache_class">Doctrine\Common\Cache\MemcacheCache</parameter>
+        <parameter key="doctrine.orm.cache.memcache_host">localhost</parameter>
+        <parameter key="doctrine.orm.cache.memcache_port">11211</parameter>
+        <parameter key="doctrine.orm.cache.memcache_instance_class">Memcache</parameter>
+        <parameter key="doctrine.orm.cache.xcache_class">Doctrine\Common\Cache\XcacheCache</parameter>
+
+        <!-- metadata -->
+        <parameter key="doctrine.orm.metadata.driver_chain_class">Doctrine\ORM\Mapping\Driver\DriverChain</parameter>
+        <parameter key="doctrine.orm.metadata.annotation_class">Doctrine\ORM\Mapping\Driver\AnnotationDriver</parameter>
+        <parameter key="doctrine.orm.metadata.annotation_reader_class">Doctrine\Common\Annotations\AnnotationReader</parameter>
+        <parameter key="doctrine.orm.metadata.annotation_default_namespace">Doctrine\ORM\Mapping\</parameter>
+        <parameter key="doctrine.orm.metadata.xml_class">Doctrine\ORM\Mapping\Driver\XmlDriver</parameter>
+        <parameter key="doctrine.orm.metadata.yml_class">Doctrine\ORM\Mapping\Driver\YamlDriver</parameter>
+
+        <!-- directories -->
+        <parameter key="doctrine.orm.mapping_dirs" type="collection"></parameter>
+        <parameter key="doctrine.orm.xml_mapping_dirs">%doctrine.orm.mapping_dirs%</parameter>
+        <parameter key="doctrine.orm.yml_mapping_dirs">%doctrine.orm.mapping_dirs%</parameter>
+        <parameter key="doctrine.orm.entity_dirs" type="collection"></parameter>
     </parameters>
 
     <services>

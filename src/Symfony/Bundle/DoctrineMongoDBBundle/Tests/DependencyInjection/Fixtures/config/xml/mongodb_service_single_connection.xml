@@ -1,0 +1,28 @@
+<?xml version="1.0" ?>
+
+<container xmlns="http://www.symfony-project.org/schema/dic/services"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xmlns:doctrine="http://www.symfony-project.org/schema/dic/doctrine/odm/mongodb"
+    xsi:schemaLocation="http://www.symfony-project.org/schema/dic/services http://www.symfony-project.org/schema/dic/services/services-1.0.xsd
+                        http://www.symfony-project.org/schema/dic/doctrine/odm/mongodb http://www.symfony-project.org/schema/dic/doctrine/odm/mongodb/mongodb-1.0.xsd">
+
+    <doctrine:mongodb>
+        <doctrine:connections>
+            <doctrine:connection id="default" server="mongodb://localhost:27017">
+                <options>
+                    <connect>true</connect>
+                </options>
+            </doctrine:connection>
+        </doctrine:connections>
+        <doctrine:document_managers>
+            <doctrine:document_manager id="default" connection="default">
+                <metadata_cache_driver type="memcache">
+                    <class>Doctrine\Common\Cache\MemcacheCache</class>
+                    <host>localhost</host>
+                    <port>11211</port>
+                    <instance_class>Memcache</instance_class>
+                </metadata_cache_driver>
+            </doctrine:document_manager>
+        </doctrine:document_managers>
+    </doctrine:mongodb>
+</container>

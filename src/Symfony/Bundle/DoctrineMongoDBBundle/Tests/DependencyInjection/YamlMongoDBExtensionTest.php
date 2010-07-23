@@ -18,7 +18,7 @@ class YamlMongoDBExtensionTest extends AbstractMongoDBExtensionTest
 {
     protected function loadFromFile(ContainerBuilder $container, $file)
     {
-        $loadYaml = new YamlFileLoader($container, __DIR__.'/Fixtures/yml');
+        $loadYaml = new YamlFileLoader($container, __DIR__.'/Fixtures/config/yml');
         $loadYaml->load($file.'.yml');
     }
 }

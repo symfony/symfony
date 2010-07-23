@@ -1,0 +1,19 @@
+<?xml version="1.0" ?>
+
+<container xmlns="http://www.symfony-project.org/schema/dic/services"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xmlns:doctrine="http://www.symfony-project.org/schema/dic/doctrine"
+    xsi:schemaLocation="http://www.symfony-project.org/schema/dic/services http://www.symfony-project.org/schema/dic/services/services-1.0.xsd
+                        http://www.symfony-project.org/schema/dic/doctrine/orm http://www.symfony-project.org/schema/dic/doctrine/orm/doctrine-1.0.xsd
+                        http://www.symfony-project.org/schema/dic/doctrine/dbal http://www.symfony-project.org/schema/dic/doctrine/dbal/doctrine-1.0.xsd">
+
+    <doctrine:dbal />
+    <doctrine:orm>
+        <metadata_cache_driver type="memcache">
+            <class>Doctrine\Common\Cache\MemcacheCache</class>
+            <host>localhost</host>
+            <port>11211</port>
+            <instance_class>Memcache</instance_class>
+        </metadata_cache_driver>
+    </doctrine:orm>
+</container>

@@ -1,0 +1,27 @@
+doctrine.dbal:
+  connections:
+    conn1:
+      driver: PDOSqlite
+      dbname: sqlite_db
+      user: sqlite_user
+      password: sqlite_s3cr3t
+      memory: true
+    conn2:
+      driver: PDOSqlite
+      dbname: sqlite_db
+      user: sqlite_user
+      password: sqlite_s3cr3t
+      memory: true
+
+doctrine.orm:
+  metadata_cache_driver: apc
+  default_entity_manager: dm2
+  default_connection: conn1
+  proxy_namespace: Proxies
+  auto_generate_proxy_classes: true
+  entity_managers:
+    dm1:
+      metadata_cache_driver: xcache
+      connection: conn1
+    dm2:
+      connection: conn2

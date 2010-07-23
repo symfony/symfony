@@ -1,0 +1,41 @@
+<?xml version="1.0" ?>
+
+<container xmlns="http://www.symfony-project.org/schema/dic/services"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xmlns:doctrine="http://www.symfony-project.org/schema/dic/doctrine"
+    xsi:schemaLocation="http://www.symfony-project.org/schema/dic/services http://www.symfony-project.org/schema/dic/services/services-1.0.xsd
+                        http://www.symfony-project.org/schema/dic/doctrine/orm http://www.symfony-project.org/schema/dic/doctrine/orm/doctrine-1.0.xsd
+                        http://www.symfony-project.org/schema/dic/doctrine/dbal http://www.symfony-project.org/schema/dic/doctrine/dbal/doctrine-1.0.xsd">
+
+    <doctrine:dbal>
+        <doctrine:connections>
+            <doctrine:connection
+                id="conn1"
+                driver="PDOSqlite"
+                dbname="sqlite_db"
+                user="sqlite_user"
+                password="sqlite_s3cr3t"
+                memory="true" />
+            <doctrine:connection
+                id="conn2"
+                driver="PDOSqlite"
+                dbname="sqlite_db"
+                user="sqlite_user"
+                password="sqlite_s3cr3t"
+                memory="true" />
+        </doctrine:connections>
+    </doctrine:dbal>
+
+    <doctrine:orm
+            metadata_cache_driver="apc"
+            default_entity_manager="dm2"
+            default_connection="conn1"
+            proxy_namespace="Proxies"
+            auto_generate_proxy_classes="true"
+        >
+        <doctrine:entity_managers>
+            <doctrine:entity_manager id="dm1" metadata_cache_driver="xcache" connection="conn1" />
+            <doctrine:entity_manager id="dm2" connection="conn2" />
+        </doctrine:entity_managers>
+    </doctrine:orm>
+</container>

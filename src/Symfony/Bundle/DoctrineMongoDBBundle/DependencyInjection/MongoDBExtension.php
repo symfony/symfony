@@ -56,15 +56,11 @@ class MongoDBExtension extends Extension
     {
         // Create document proxy directory
         $proxyCacheDir = $this->kernelCacheDir . '/doctrine/odm/mongodb/Proxies';
-        if (!is_dir($proxyCacheDir))
-        {
-            if (false === @mkdir($proxyCacheDir, 0777, true))
-            {
+        if (!is_dir($proxyCacheDir)) {
+            if (false === @mkdir($proxyCacheDir, 0777, true)) {
                 die(sprintf('Unable to create the Doctrine Proxy directory (%s)', dirname($proxyCacheDir)));
             }
-        }
-        elseif (!is_writable($proxyCacheDir))
-        {
+        } elseif (!is_writable($proxyCacheDir)) {
             die(sprintf('Unable to write in the Doctrine Proxy directory (%s)', $proxyCacheDir));
         }
     }
@@ -88,10 +84,8 @@ class MongoDBExtension extends Extension
             'proxy_namespace',
             'auto_generate_proxy_classes'
         );
-        foreach ($options as $key)
-        {
-            if (isset($config[$key]))
-            {
+        foreach ($options as $key) {
+            if (isset($config[$key])) {
                 $container->setParameter('doctrine.odm.mongodb.'.$key, $config[$key]);
             }
         }
@@ -108,8 +102,7 @@ class MongoDBExtension extends Extension
     protected function loadDocumentManagers(array $config, ContainerBuilder $container)
     {
         $documentManagers = $this->getDocumentManagers($config, $container);
-        foreach ($documentManagers as $name => $documentManager)
-        {
+        foreach ($documentManagers as $name => $documentManager) {
             $documentManager['name'] = $name;
             $this->loadDocumentManager($documentManager, $container);
         }
@@ -144,8 +137,7 @@ class MongoDBExtension extends Extension
             'setProxyNamespace' => $container->getParameter('doctrine.odm.mongodb.proxy_namespace'),
             'setAutoGenerateProxyClasses' => $container->getParameter('doctrine.odm.mongodb.auto_generate_proxy_classes')
         );
-        foreach ($methods as $method => $arg)
-        {
+        foreach ($methods as $method => $arg) {
             $odmConfigDef->addMethodCall($method, array($arg));
         }
 
@@ -157,8 +149,7 @@ class MongoDBExtension extends Extension
         $odmDmDef->setFactoryMethod('create');
         $container->setDefinition(sprintf('doctrine.odm.mongodb.%s_document_manager', $documentManager['name']), $odmDmDef );
 
-        if ($documentManager['name'] == $defaultDocumentManager)
-        {
+        if ($documentManager['name'] == $defaultDocumentManager) {
             $container->setAlias(
                 'doctrine.odm.mongodb.document_manager',
                 sprintf('doctrine.odm.mongodb.%s_document_manager', $documentManager['name'])
@@ -174,29 +165,23 @@ class MongoDBExtension extends Extension
      */
     protected function getDocumentManagers(array $config, ContainerBuilder $container)
     {
-        if (isset($config['default_document_manager']))
-        {
+        if (isset($config['default_document_manager'])) {
             $container->setParameter('doctrine.odm.mongodb.default_document_manager', $config['default_document_manager']);
         }
         $defaultDocumentManager = $container->getParameter('doctrine.odm.mongodb.default_document_manager');
 
         $documentManagers = array();
-        if (isset($config['document_managers']))
-        {
+        if (isset($config['document_managers'])) {
             $configDocumentManagers = $config['document_managers'];
-            if (isset($config['document_managers']['document_manager']) && isset($config['document_managers']['document_manager'][0]))
-            {
+            if (isset($config['document_managers']['document_manager']) && isset($config['document_managers']['document_manager'][0])) {
                 // Multiple document managers
                 $configDocumentManagers = $config['document_managers']['document_manager'];
             }
-            foreach ($configDocumentManagers as $name => $documentManager)
-            {
+            foreach ($configDocumentManagers as $name => $documentManager) {
                 $documentManagers[isset($documentManager['id']) ? $documentManager['id'] : $name] = $documentManager;
 >>>>>>> fe46b02... [DoctrineMongoDBBundle] Finishing implementation of DoctrineMongoDBBundle to support multiple connections/document managers plus refactoring and cleaning up code along the way.
             }
-        }
-        else
-        {
+        } else {
             $documentManagers = array($defaultDocumentManager => $config);
         }
         return $documentManagers;
@@ -216,30 +201,25 @@ class MongoDBExtension extends Extension
         $bundleDirs = $this->bundleDirs;
         $aliasMap = array();
 
-        foreach ($this->bundles as $className)
-        {
+        foreach ($this->bundles as $className) {
             $tmp = dirname(str_replace('\\', '/', $className));
             $namespace = str_replace('/', '\\', dirname($tmp));
             $class = basename($tmp);
 
-            if (!isset($bundleDirs[$namespace]))
-            {
+            if (!isset($bundleDirs[$namespace])) {
                 continue;
             }
 
             $type = $this->detectMetadataDriver($bundleDirs[$namespace].'/'.$class, $container);
 
-            if (is_dir($dir = $bundleDirs[$namespace].'/'.$class.'/Document'))
-            {
-                if ($type === null)
-                {
+            if (is_dir($dir = $bundleDirs[$namespace].'/'.$class.'/Document')) {
+                if ($type === null) {
                     $type = 'annotation';
                 }
                 $aliasMap[$class] = $namespace.'\\'.$class.'\\Document';
             }
 
-            if ($type !== null)
-            {
+            if ($type !== null) {
                 $mappingDriverDef->addMethodCall('addDriver', array(
                         new Reference(sprintf('doctrine.odm.mongodb.metadata_driver.%s', $type)),
                         $namespace.'\\'.$class.'\\Document'
@@ -264,8 +244,7 @@ class MongoDBExtension extends Extension
         $dmMetadataCacheDriver = isset($documentManager['metadata_cache_driver']) ? $documentManager['metadata_cache_driver'] : $metadataCacheDriver;
         $type = is_array($dmMetadataCacheDriver) && isset($dmMetadataCacheDriver['type']) ? $dmMetadataCacheDriver['type'] : $dmMetadataCacheDriver;
 
-        if ($type === 'memcache')
-        {
+        if ($type === 'memcache') {
             $memcacheClass = isset($dmMetadataCacheDriver['class']) ? $dmMetadataCacheDriver['class'] : '%'.sprintf('doctrine.odm.mongodb.cache.%s_class', $type).'%';
             $cacheDef = new Definition($memcacheClass);
             $memcacheHost = isset($dmMetadataCacheDriver['host']) ? $dmMetadataCacheDriver['host'] : '%doctrine.odm.mongodb.cache.memcache_host%';
@@ -275,9 +254,7 @@ class MongoDBExtension extends Extension
             $memcacheInstance->addMethodCall('connect', array($memcacheHost, $memcachePort));
             $container->setDefinition(sprintf('doctrine.odm.mongodb.%s_memcache_instance', $documentManager['name']), $memcacheInstance);
             $cacheDef->addMethodCall('setMemcache', array(new Reference(sprintf('doctrine.odm.mongodb.%s_memcache_instance', $documentManager['name']))));
-        }
-        else
-        {
+        } else {
              $cacheDef = new Definition('%'.sprintf('doctrine.odm.mongodb.cache.%s_class', $type).'%');
         }
         $container->setDefinition(sprintf('doctrine.odm.mongodb.%s_metadata_cache', $documentManager['name']), $cacheDef);
@@ -292,8 +269,7 @@ class MongoDBExtension extends Extension
     protected function loadConnections(array $config, ContainerBuilder $container)
     {
         $connections = $this->getConnections($config, $container);
-        foreach ($connections as $name => $connection)
-        {
+        foreach ($connections as $name => $connection) {
             $odmConnArgs = array(
                 isset($connection['server']) ? $connection['server'] : null,
                 isset($connection['options']) ? $connection['options'] : array()
@@ -311,28 +287,22 @@ class MongoDBExtension extends Extension
      */
     protected function getConnections(array $config, ContainerBuilder $container)
     {
-        if (isset($config['default_connection']))
-        {
+        if (isset($config['default_connection'])) {
             $container->setParameter('doctrine.odm.mongodb.default_connection', $config['default_connection']);
         }
         $defaultConnection = $container->getParameter('doctrine.odm.mongodb.default_connection');
 
         $connections = array();
-        if (isset($config['connections']))
-        {
+        if (isset($config['connections'])) {
             $configConnections = $config['connections'];
-            if (isset($config['connections']['connection']) && isset($config['connections']['connection'][0]))
-            {
+            if (isset($config['connections']['connection']) && isset($config['connections']['connection'][0])) {
                 // Multiple connections
                 $configConnections = $config['connections']['connection'];
             }
-            foreach ($configConnections as $name => $connection)
-            {
+            foreach ($configConnections as $name => $connection) {
                 $connections[isset($connection['id']) ? $connection['id'] : $name] = $connection;
             }
-        }
-        else
-        {
+        } else {
             $connections = array($defaultConnection => $config);
         }
         return $connections;
@@ -349,26 +319,19 @@ class MongoDBExtension extends Extension
     protected function findBundleSubpaths($path, ContainerBuilder $container)
     {
         $dirs = array();
-        foreach ($this->bundles as $bundle)
-        {
+        foreach ($this->bundles as $bundle) {
             $reflection = new \ReflectionClass($bundle);
-            if (is_dir($dir = dirname($reflection->getFilename()).'/'.$path))
-            {
+            if (is_dir($dir = dirname($reflection->getFilename()).'/'.$path)) {
                 $dirs[] = $dir;
                 $container->addResource(new FileResource($dir));
-            }
-            else
-            {
+            } else {
                 // add the closest existing parent directory as a file resource
-                do
-                {
+                do {
                     $dir = dirname($dir);
-                }
-                while (!is_dir($dir));
+                } while (!is_dir($dir));
                 $container->addResource(new FileResource($dir));
             }
         }
-
         return $dirs;
     }
 
@@ -384,26 +347,21 @@ class MongoDBExtension extends Extension
     {
         // add the closest existing directory as a resource
         $resource = $dir.'/Resources/config/doctrine/metadata';
-        while (!is_dir($resource))
-        {
+        while (!is_dir($resource)) {
             $resource = dirname($resource);
         }
         $container->addResource(new FileResource($resource));
 
-        if (count(glob($dir.'/Resources/config/doctrine/metadata/*.xml')))
-        {
+        if (count(glob($dir.'/Resources/config/doctrine/metadata/*.xml'))) {
             return 'xml';
-        }
-        elseif (count(glob($dir.'/Resources/config/doctrine/metadata/*.yml')))
-        {
+        } elseif (count(glob($dir.'/Resources/config/doctrine/metadata/*.yml'))) {
             return 'yml';
         }
 
         // add the directory itself as a resource
         $container->addResource(new FileResource($dir));
 
-        if (is_dir($dir.'/Document'))
-        {
+        if (is_dir($dir.'/Document')) {
             return 'annotation';
         }
     }

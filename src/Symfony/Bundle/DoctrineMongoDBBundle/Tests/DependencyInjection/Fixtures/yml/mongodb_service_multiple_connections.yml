@@ -1,0 +1,19 @@
+doctrine_odm.mongodb:
+  default_document_manager: dm2
+  default_connection: conn2
+  metadata_cache_driver: apc
+  connections:
+    conn1:
+      server: mongodb://localhost:27017
+      options:
+        connect: true
+    conn2:
+      server: mongodb://localhost:27017
+      options:
+        connect: true
+  document_managers:
+    dm1:
+      connection: conn1
+      metadata_cache_driver: xcache
+    dm2:
+      connection: conn2

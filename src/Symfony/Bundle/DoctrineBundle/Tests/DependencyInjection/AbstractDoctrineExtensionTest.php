@@ -149,6 +149,22 @@ abstract class AbstractDoctrineExtensionTest extends TestCase
         $this->assertEquals('doctrine.dbal.default_connection', (string) $arguments[0]);
         $this->assertInstanceOf('Symfony\Components\DependencyInjection\Reference', $arguments[1]);
         $this->assertEquals('doctrine.orm.default_configuration', (string) $arguments[1]);
+
+        $definition = $container->getDefinition('doctrine.orm.default_configuration');
+        $calls = $definition->getMethodCalls();
+        $this->assertEquals(array('YamlBundle' => 'Fixtures\Bundles\YamlBundle\Entity'), $calls[0][1][0]);
+        $this->assertEquals('doctrine.orm.default_metadata_cache', (string) $calls[1][1][0]);
+        $this->assertEquals('doctrine.orm.default_query_cache', (string) $calls[2][1][0]);
+        $this->assertEquals('doctrine.orm.default_result_cache', (string) $calls[3][1][0]);
+
+        $definition = $container->getDefinition('doctrine.orm.default_metadata_cache');
+        $this->assertEquals('%doctrine.orm.cache.array_class%', $definition->getClass());
+
+        $definition = $container->getDefinition('doctrine.orm.default_query_cache');
+        $this->assertEquals('%doctrine.orm.cache.array_class%', $definition->getClass());
+
+        $definition = $container->getDefinition('doctrine.orm.default_result_cache');
+        $this->assertEquals('%doctrine.orm.cache.array_class%', $definition->getClass());
     }
 
     public function testSingleEntityManagerConfiguration()
@@ -289,6 +305,15 @@ abstract class AbstractDoctrineExtensionTest extends TestCase
         $this->assertEquals('doctrine.dbal.conn2_connection', (string) $arguments[0]);
         $this->assertInstanceOf('Symfony\Components\DependencyInjection\Reference', $arguments[1]);
         $this->assertEquals('doctrine.orm.dm2_configuration', (string) $arguments[1]);
+
+        $definition = $container->getDefinition('doctrine.orm.dm1_metadata_cache');
+        $this->assertEquals('%doctrine.orm.cache.xcache_class%', $definition->getClass());
+
+        $definition = $container->getDefinition('doctrine.orm.dm1_query_cache');
+        $this->assertEquals('%doctrine.orm.cache.array_class%', $definition->getClass());
+
+        $definition = $container->getDefinition('doctrine.orm.dm1_result_cache');
+        $this->assertEquals('%doctrine.orm.cache.array_class%', $definition->getClass());
     }
 
     public function testBundleEntityAliases()

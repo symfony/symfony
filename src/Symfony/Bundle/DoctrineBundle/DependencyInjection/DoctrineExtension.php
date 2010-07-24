@@ -274,9 +274,9 @@ class DoctrineExtension extends Extension
         $this->loadOrmCacheDrivers($entityManager, $container);
 
         $methods = array(
-            'setMetadataCacheImpl' => new Reference('doctrine.orm.metadata_cache'),
-            'setQueryCacheImpl' => new Reference('doctrine.orm.query_cache'),
-            'setResultCacheImpl' => new Reference('doctrine.orm.result_cache'),
+            'setMetadataCacheImpl' => new Reference(sprintf('doctrine.orm.%s_metadata_cache', $entityManager['name'])),
+            'setQueryCacheImpl' => new Reference(sprintf('doctrine.orm.%s_query_cache', $entityManager['name'])),
+            'setResultCacheImpl' => new Reference(sprintf('doctrine.orm.%s_result_cache', $entityManager['name'])),
             'setMetadataDriverImpl' => new Reference('doctrine.orm.metadata_driver'),
             'setProxyDir' => $proxyCacheDir,
             'setProxyNamespace' => $container->getParameter('doctrine.orm.proxy_namespace'),
@@ -392,23 +392,9 @@ class DoctrineExtension extends Extension
      */
     protected function loadOrmEntityManagerMetadataCacheDriver(array $entityManager, ContainerBuilder $container)
     {
-        $metadataCacheDriver = $container->getParameter('doctrine.orm.metadata_cache_driver');
-        $emMetadataCacheDriver = isset($entityManager['metadata_cache_driver']) ? $entityManager['metadata_cache_driver'] : $metadataCacheDriver;
-        $type = is_array($emMetadataCacheDriver) && isset($emMetadataCacheDriver['type']) ? $emMetadataCacheDriver['type'] : $emMetadataCacheDriver;
-
-        if ($type === 'memcache') {
-            $memcacheClass = isset($emMetadataCacheDriver['class']) ? $emMetadataCacheDriver['class'] : '%'.sprintf('doctrine.orm.cache.%s_class', $type).'%';
-            $cacheDef = new Definition($memcacheClass);
-            $memcacheHost = isset($emMetadataCacheDriver['host']) ? $emMetadataCacheDriver['host'] : '%doctrine.orm.cache.memcache_host%';
-            $memcachePort = isset($emMetadataCacheDriver['port']) ? $emMetadataCacheDriver['port'] : '%doctrine.orm.cache.memcache_port%';
-            $memcacheInstanceClass = isset($emMetadataCacheDriver['instance_class']) ? $emMetadataCacheDriver['instance_class'] : '%doctrine.orm.cache.memcache_instance_class%';
-            $memcacheInstance = new Definition($memcacheInstanceClass);
-            $memcacheInstance->addMethodCall('connect', array($memcacheHost, $memcachePort));
-            $container->setDefinition(sprintf('doctrine.orm.%s_memcache_instance', $entityManager['name']), $memcacheInstance);
-            $cacheDef->addMethodCall('setMemcache', array(new Reference(sprintf('doctrine.orm.%s_memcache_instance', $entityManager['name']))));
-        } else {
-            $cacheDef = new Definition('%'.sprintf('doctrine.orm.cache.%s_class', $type).'%');
-        }
+        $cacheDriver = $container->getParameter('doctrine.orm.metadata_cache_driver');
+        $cacheDriver = isset($entityManager['metadata_cache_driver']) ? $entityManager['metadata_cache_driver'] : $cacheDriver;
+        $cacheDef = $this->getEntityManagerCacheDefinition($entityManager, $cacheDriver, $container);
         $container->setDefinition(sprintf('doctrine.orm.%s_metadata_cache', $entityManager['name']), $cacheDef);
     }
 
@@ -420,6 +406,10 @@ class DoctrineExtension extends Extension
      */
     protected function loadOrmEntityManagerQueryCacheDriver(array $entityManager, ContainerBuilder $container)
     {
+        $cacheDriver = $container->getParameter('doctrine.orm.query_cache_driver');
+        $cacheDriver = isset($entityManager['query_cache_driver']) ? $entityManager['query_cache_driver'] : $cacheDriver;
+        $cacheDef = $this->getEntityManagerCacheDefinition($entityManager, $cacheDriver, $container);
+        $container->setDefinition(sprintf('doctrine.orm.%s_query_cache', $entityManager['name']), $cacheDef);
     }
 
     /**
@@ -430,6 +420,37 @@ class DoctrineExtension extends Extension
      */
     protected function loadOrmEntityManagerResultCacheDriver(array $entityManager, ContainerBuilder $container)
     {
+        $cacheDriver = $container->getParameter('doctrine.orm.result_cache_driver');
+        $cacheDriver = isset($entityManager['result_cache_driver']) ? $entityManager['result_cache_driver'] : $cacheDriver;
+        $cacheDef = $this->getEntityManagerCacheDefinition($entityManager, $cacheDriver, $container);
+        $container->setDefinition(sprintf('doctrine.orm.%s_result_cache', $entityManager['name']), $cacheDef);
+    }
+
+    /**
+     * Gets an entity manager cache driver definition for metadata, query and result caches.
+     *
+     * @param array $entityManager
+     * @param string $cacheDriver
+     * @param ContainerBuilder $container
+     * @return Definition $cacheDef
+     */
+    protected function getEntityManagerCacheDefinition(array $entityManager, $cacheDriver, ContainerBuilder $container)
+    {
+        $type = is_array($cacheDriver) && isset($cacheDriver['type']) ? $cacheDriver['type'] : $cacheDriver;
+        if ($type === 'memcache') {
+            $memcacheClass = isset($cacheDriver['class']) ? $cacheDriver['class'] : '%'.sprintf('doctrine.orm.cache.%s_class', $type).'%';
+            $cacheDef = new Definition($memcacheClass);
+            $memcacheHost = isset($cacheDriver['host']) ? $cacheDriver['host'] : '%doctrine.orm.cache.memcache_host%';
+            $memcachePort = isset($cacheDriver['port']) ? $cacheDriver['port'] : '%doctrine.orm.cache.memcache_port%';
+            $memcacheInstanceClass = isset($cacheDriver['instance_class']) ? $cacheDriver['instance_class'] : '%doctrine.orm.cache.memcache_instance_class%';
+            $memcacheInstance = new Definition($memcacheInstanceClass);
+            $memcacheInstance->addMethodCall('connect', array($memcacheHost, $memcachePort));
+            $container->setDefinition(sprintf('doctrine.orm.%s_memcache_instance', $entityManager['name']), $memcacheInstance);
+            $cacheDef->addMethodCall('setMemcache', array(new Reference(sprintf('doctrine.orm.%s_memcache_instance', $entityManager['name']))));
+        } else {
+            $cacheDef = new Definition('%'.sprintf('doctrine.orm.cache.%s_class', $type).'%');
+        }
+        return $cacheDef;
     }
 
     /**

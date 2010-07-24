@@ -167,7 +167,7 @@ class HeaderBag
      * @param  string $expire   The time the cookie expires
      * @param  string $path     The path on the server in which the cookie will be available on
      * @param  bool   $secure   Indicates that the cookie should only be transmitted over a secure HTTPS connection from the client
-     * @param  bool   $httponly When TRUE the cookie will be made accessible only through the HTTP protocol
+     * @param  bool   $httponly When TRUE the cookie will not be made accessible to JavaScript, preventing XSS attacks from stealing cookies
      *
      * @throws \InvalidArgumentException When the cookie expire parameter is not valid
      */

@@ -171,7 +171,7 @@ class HeaderBag
      *
      * @throws \InvalidArgumentException When the cookie expire parameter is not valid
      */
-    public function setCookie($name, $value, $domain = null, $expires = null, $path = '/', $secure = false, $httponly = false)
+    public function setCookie($name, $value, $domain = null, $expires = null, $path = '/', $secure = false, $httponly = true)
     {
         // from PHP source code
         if (preg_match("/[=,; \t\r\n\013\014]/", $name)) {

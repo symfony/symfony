@@ -192,10 +192,6 @@ class HeaderBag
             return $this->set('Cookie', $cookie);
         }
 
-        if (!$domain) {
-            throw new \InvalidArgumentException('The cookie domain cannot be empty');
-        }
-
         if (null !== $expires) {
             if (is_numeric($expires)) {
                 $expires = (int) $expires;
@@ -211,7 +207,9 @@ class HeaderBag
             $cookie .= '; expires='.substr(\DateTime::createFromFormat('U', $expires, new \DateTimeZone('UTC'))->format('D, d-M-Y H:i:s T'), 0, -5);
         }
 
-        $cookie .= '; domain='.$domain;
+        if ($domain) {
+            $cookie .= '; domain='.$domain;
+        }
 
         if ('/' !== $path) {
             $cookie .= '; path='.$path;

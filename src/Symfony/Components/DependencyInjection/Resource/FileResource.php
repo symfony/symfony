@@ -39,7 +39,7 @@ class FileResource implements ResourceInterface
      */
     public function __toString()
     {
-        return $this->resource;
+        return (string) $this->resource;
     }
 
     /**

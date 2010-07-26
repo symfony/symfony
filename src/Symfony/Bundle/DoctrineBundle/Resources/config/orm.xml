@@ -50,7 +50,9 @@
         </service>
 
         <service id="doctrine.orm.metadata_driver.annotation.reader" class="Doctrine\Common\Annotations\AnnotationReader">
+<!--
             <argument type="service" id="doctrine.orm.cache" />
+//-->
             <call method="setDefaultAnnotationNamespace"><argument>Doctrine\ORM\Mapping\</argument></call>
         </service>
 

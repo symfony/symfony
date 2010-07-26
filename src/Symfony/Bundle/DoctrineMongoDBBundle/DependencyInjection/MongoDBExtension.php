@@ -111,11 +111,6 @@ class MongoDBExtension extends Extension
         }
     }
 
-<<<<<<< HEAD
-        foreach (array('host', 'port', 'database') as $key) {
-            if (isset($config[$key])) {
-                $container->setParameter('doctrine.odm.mongodb.default_'.$key, $config[$key]);
-=======
     /**
      * Loads a document manager configuration.
      *
@@ -179,7 +174,6 @@ class MongoDBExtension extends Extension
             }
             foreach ($configDocumentManagers as $name => $documentManager) {
                 $documentManagers[isset($documentManager['id']) ? $documentManager['id'] : $name] = $documentManager;
->>>>>>> fe46b02... [DoctrineMongoDBBundle] Finishing implementation of DoctrineMongoDBBundle to support multiple connections/document managers plus refactoring and cleaning up code along the way.
             }
         } else {
             $documentManagers = array($defaultDocumentManager => $config);

@@ -139,7 +139,8 @@ class Esi
             $type = 'text/html';
         }
 
-        if (!in_array($type, $this->contentTypes)) {
+        $parts = implode(';', $type);
+        if (!in_array($parts[0], $this->contentTypes)) {
             return $response;
         }
 

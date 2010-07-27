@@ -168,7 +168,6 @@ class ControllerResolver implements ControllerResolverInterface
         }
 
         $controller = new $class($this->container);
-        $controller->setRequest($request);
 
         $method = $action.'Action';
         if (!method_exists($controller, $method)) {

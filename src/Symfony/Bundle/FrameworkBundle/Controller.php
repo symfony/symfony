@@ -28,28 +28,39 @@ class Controller
     protected $container;
     protected $request;
 
+    /**
+     * Constructor.
+     *
+     * @param \Symfony\Components\DependencyInjection\ContainerInterface $container A ContainerInterface instance
+     */
     function __construct(ContainerInterface $container)
     {
         $this->container = $container;
+        $this->request = $this->container->get('request');
     }
 
+    /**
+     * Gets the Request.
+     *
+     * @return \Symfony\Components\HttpFoundation\Request A Request instance
+     */
     public function getRequest()
     {
-        if (null === $this->request) {
-            $this->request = $this->container->getRequestService();
-        }
-
         return $this->request;
     }
 
-    public function setRequest(Request $request)
-    {
-        return $this->request = $request;
-    }
-
+    /**
+     * Creates a Response instance.
+     *
+     * @param string  $content The Response body
+     * @param integer $status  The status code
+     * @param array   $headers An array of HTTP headers
+     *
+     * @return \Symfony\Components\HttpFoundation\Response A Response instance
+     */
     public function createResponse($content = '', $status = 200, array $headers = array())
     {
-        $response = $this->container->getResponseService();
+        $response = $this->container->get('response');
         $response->setContent($content);
         $response->setStatusCode($status);
         foreach ($headers as $name => $value) {
@@ -70,7 +81,7 @@ class Controller
      */
     public function generateUrl($route, array $parameters = array(), $absolute = false)
     {
-        return $this->container->getRouterService()->generate($route, $parameters, $absolute);
+        return $this->container->get('router')->generate($route, $parameters, $absolute);
     }
 
     /**
@@ -80,49 +91,59 @@ class Controller
      * @param  array   $path       An array of path parameters
      * @param  array   $query      An array of query parameters
      *
-     * @return Response A Response instance
+     * @return \Symfony\Components\HttpFoundation\Response A Response instance
      */
     public function forward($controller, array $path = array(), array $query = array())
     {
         $path['_controller'] = $controller;
         $subRequest = $this->getRequest()->duplicate($query, null, $path);
 
-        return $this->container->getKernelService()->handle($subRequest, HttpKernelInterface::FORWARDED_REQUEST, true);
+        return $this->container->get('kernel')->handle($subRequest, HttpKernelInterface::FORWARDED_REQUEST, true);
     }
 
     /**
-     * Sends an HTTP redirect response
+     * Returns an HTTP redirect Response.
+     *
+     * @return \Symfony\Components\HttpFoundation\Response A Response instance
      */
     public function redirect($url, $status = 302)
     {
-        $response = $this->container->getResponseService();
+        $response = $this->container->get('response');
         $response->setStatusCode($status);
         $response->headers->set('Location', $url);
 
         return $response;
     }
 
+    /**
+     * Returns a rendered view.
+     *
+     * @param string $view       The view name
+     * @param array  $parameters An array of parameters to pass to the view
+     *
+     * @return string The renderer view
+     */
     public function renderView($view, array $parameters = array())
     {
-        return $this->container->getTemplatingService()->render($view, $parameters);
+        return $this->container->get('templating')->render($view, $parameters);
     }
 
     /**
      * Renders a view.
      *
-     * @param string   $view       The view name
-     * @param array    $parameters An array of parameters to pass to the view
-     * @param Response $response   A response instance
+     * @param string $view The view name
+     * @param array $parameters An array of parameters to pass to the view
+     * @param \Symfony\Components\HttpFoundation\Response $response A response instance
      *
-     * @return Response A Response instance
+     * @return \Symfony\Components\HttpFoundation\Response A Response instance
      */
     public function render($view, array $parameters = array(), Response $response = null)
     {
         if (null === $response) {
-            $response = $this->container->getResponseService();
+            $response = $this->container->get('response');
         }
 
-        $response->setContent($this->container->getTemplatingService()->render($view, $parameters));
+        $response->setContent($this->container->get('templating')->render($view, $parameters));
 
         return $response;
     }

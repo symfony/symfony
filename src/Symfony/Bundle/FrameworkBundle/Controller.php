@@ -47,11 +47,6 @@ class Controller
         return $this->request = $request;
     }
 
-    public function getMailer()
-    {
-        return $this->container->getMailerService();
-    }
-
     public function createResponse($content = '', $status = 200, array $headers = array())
     {
         $response = $this->container->getResponseService();

@@ -62,7 +62,7 @@ class Container implements ContainerInterface, \ArrayAccess
     /**
      * Constructor.
      *
-     * @param Symfony\Components\DependencyInjection\ParameterBagInterface $parameterBag A ParameterBagInterface instance
+     * @param ParameterBagInterface $parameterBag A ParameterBagInterface instance
      */
     public function __construct(ParameterBagInterface $parameterBag = null)
     {
@@ -99,7 +99,7 @@ class Container implements ContainerInterface, \ArrayAccess
     /**
      * Gets the service container parameter bag.
      *
-     * @return Symfony\Components\DependencyInjection\ParameterBag\ParameterBagInterface A ParameterBagInterface instance
+     * @return ParameterBagInterface A ParameterBagInterface instance
      */
     public function getParameterBag()
     {

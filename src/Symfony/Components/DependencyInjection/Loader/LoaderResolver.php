@@ -25,7 +25,7 @@ class LoaderResolver implements LoaderResolverInterface
     /**
      * Constructor.
      *
-     * @param \Symfony\Components\DependencyInjection\Loader\LoaderInterface[] $loaders An array of loaders
+     * @param LoaderInterface[] $loaders An array of loaders
      */
     public function __construct(array $loaders = array())
     {
@@ -40,7 +40,7 @@ class LoaderResolver implements LoaderResolverInterface
      *
      * @param mixed  $resource A resource
      *
-     * @return Symfony\Components\DependencyInjection\Loader\LoaderInterface A LoaderInterface instance
+     * @return LoaderInterface A LoaderInterface instance
      */
     public function resolve($resource)
     {
@@ -56,7 +56,7 @@ class LoaderResolver implements LoaderResolverInterface
     /**
      * Sets a loader.
      *
-     * @param \Symfony\Components\DependencyInjection\Loader\LoaderInterface $loader A LoaderInterface instance
+     * @param LoaderInterface $loader A LoaderInterface instance
      */
     public function addLoader(LoaderInterface $loader)
     {
@@ -67,7 +67,7 @@ class LoaderResolver implements LoaderResolverInterface
     /**
      * Returns the registered loaders.
      *
-     * @return \Symfony\Components\DependencyInjection\Loader\LoaderInterface[] A array of LoaderInterface instances
+     * @return LoaderInterface[] A array of LoaderInterface instances
      */
     public function getLoaders()
     {

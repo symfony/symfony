@@ -34,8 +34,8 @@ class HttpKernel implements HttpKernelInterface
     /**
      * Constructor
      *
-     * @param \Symfony\Components\EventDispatcher\EventDispatcher $dispatcher An event dispatcher instance
-     * @param \Symfony\Components\HttpKernel\Controller\ControllerResolverInterface $resolver A ControllerResolverInterface instance
+     * @param EventDispatcher             $dispatcher An event dispatcher instance
+     * @param ControllerResolverInterface $resolver A ControllerResolverInterface instance
      */
     public function __construct(EventDispatcher $dispatcher, ControllerResolverInterface $resolver)
     {
@@ -59,11 +59,11 @@ class HttpKernel implements HttpKernelInterface
      * All exceptions are caught, and a core.exception event is notified
      * for user management.
      *
-     * @param \Symfony\Components\HttpFoundation\Request $request A Request instance
+     * @param Request $request A Request instance
      * @param integer $type The type of the request (one of HttpKernelInterface::MASTER_REQUEST, HttpKernelInterface::FORWARDED_REQUEST, or HttpKernelInterface::EMBEDDED_REQUEST)
      * @param Boolean $raw Whether to catch exceptions or not
      *
-     * @return \Symfony\Components\HttpFoundation\Response A Response instance
+     * @return Response A Response instance
      *
      * @throws \Exception When an Exception occurs during processing
      *                    and couldn't be caught by event processing or $raw is true
@@ -104,13 +104,13 @@ class HttpKernel implements HttpKernelInterface
      *
      * Exceptions are not caught.
      *
-     * @param \Symfony\Components\HttpFoundation\Request $request A Request instance
+     * @param Request $request A Request instance
      * @param integer $type The type of the request (one of HttpKernelInterface::MASTER_REQUEST, HttpKernelInterface::FORWARDED_REQUEST, or HttpKernelInterface::EMBEDDED_REQUEST)
      *
-     * @return \Symfony\Components\HttpFoundation\Response A Response instance
+     * @return Response A Response instance
      *
      * @throws \LogicException If one of the listener does not behave as expected
-     * @throws \Symfony\Components\HttpKernel\Exception\NotFoundHttpException When controller cannot be found
+     * @throws NotFoundHttpException When controller cannot be found
      */
     protected function handleRaw(Request $request, $type = self::MASTER_REQUEST)
     {
@@ -148,7 +148,7 @@ class HttpKernel implements HttpKernelInterface
     /**
      * Handles a request that need to be embedded.
      *
-     * @param \Symfony\Components\HttpFoundation\Request $request A Request instance
+     * @param Request $request A Request instance
      * @param Boolean $raw Whether to catch exceptions or not
      *
      * @return string|false The Response content or false if there is a problem
@@ -179,11 +179,11 @@ class HttpKernel implements HttpKernelInterface
     /**
      * Filters a response object.
      *
-     * @param \Symfony\Components\HttpFoundation\Response $response A Response instance
-     * @param string $message A error message in case the response is not a Response object
-     * @param integer $type The type of the request (one of HttpKernelInterface::MASTER_REQUEST, HttpKernelInterface::FORWARDED_REQUEST, or HttpKernelInterface::EMBEDDED_REQUEST)
+     * @param Response $response A Response instance
+     * @param string   $message A error message in case the response is not a Response object
+     * @param integer  $type The type of the request (one of HttpKernelInterface::MASTER_REQUEST, HttpKernelInterface::FORWARDED_REQUEST, or HttpKernelInterface::EMBEDDED_REQUEST)
      *
-     * @return \Symfony\Components\HttpFoundation\Response The filtered Response instance
+     * @return Response The filtered Response instance
      *
      * @throws \RuntimeException if the passed object is not a Response instance
      */

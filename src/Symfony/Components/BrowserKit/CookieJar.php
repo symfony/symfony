@@ -25,7 +25,7 @@ class CookieJar
     /**
      * Sets a cookie.
      *
-     * @param Symfony\Components\BrowserKit\Cookie $cookie A Cookie instance
+     * @param Cookie $cookie A Cookie instance
      */
     public function set(Cookie $cookie)
     {
@@ -37,7 +37,7 @@ class CookieJar
      *
      * @param string $name The cookie name
      *
-     * @return Symfony\Components\BrowserKit\Cookie|null A Cookie instance or null if the cookie does not exist
+     * @return Cookie|null A Cookie instance or null if the cookie does not exist
      */
     public function get($name)
     {
@@ -67,8 +67,8 @@ class CookieJar
     /**
      * Updates the cookie jar from a Response object.
      *
-     * @param Symfony\Components\BrowserKit\Response $response A Response object
-     * @param string                                 $url    The base URL
+     * @param Response $response A Response object
+     * @param string   $url    The base URL
      */
     public function updateFromResponse(Response $response, $uri = null)
     {

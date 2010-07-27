@@ -4,6 +4,7 @@ namespace Symfony\Bundle\FrameworkBundle\Routing;
 
 use Symfony\Components\Routing\Loader\LoaderResolver as BaseLoaderResolver;
 use Symfony\Components\DependencyInjection\ContainerInterface;
+use Symfony\Components\Routing\Loader\LoaderInterface;
 
 /*
  * This file is part of the Symfony package.
@@ -32,8 +33,8 @@ class LoaderResolver extends BaseLoaderResolver
     /**
      * Constructor.
      *
-     * @param \Symfony\Components\DependencyInjection\ContainerInterface $container A ContainerInterface instance
-     * @param \Symfony\Components\Routing\Loader\LoaderInterface[]       $loaders An array of loaders
+     * @param ContainerInterface $container A ContainerInterface instance
+     * @param LoaderInterface[]  $loaders An array of loaders
      */
     public function __construct(ContainerInterface $container, array $loaders = array())
     {
@@ -50,7 +51,7 @@ class LoaderResolver extends BaseLoaderResolver
      *
      * @param mixed  $resource A resource
      *
-     * @return Symfony\Components\Routing\Loader\LoaderInterface A LoaderInterface instance
+     * @return LoaderInterface A LoaderInterface instance
      */
     public function resolve($resource)
     {

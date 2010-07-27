@@ -48,9 +48,9 @@ class Profiler implements \ArrayAccess
     /**
      * Returns a new Profiler for the given Response.
      *
-     * @param Symfony\Components\HttpFoundation\Response $response A Response instance
+     * @param Response $response A Response instance
      *
-     * @return Symfony\Components\HttpKernel\Profiler\Profiler A new Profiler instance
+     * @return Profiler A new Profiler instance
      */
     public function load(Response $response)
     {
@@ -66,7 +66,7 @@ class Profiler implements \ArrayAccess
      *
      * @param string $token A token
      *
-     * @return Symfony\Components\HttpKernel\Profiler\Profiler A new Profiler instance
+     * @return Profiler A new Profiler instance
      */
     public function getProfilerForToken($token)
     {
@@ -80,7 +80,7 @@ class Profiler implements \ArrayAccess
     /**
      * Collects data for the given Response.
      *
-     * @param Symfony\Components\HttpFoundation\Response $response A Response instance
+     * @param Response $response A Response instance
      */
     public function collect(Response $response)
     {
@@ -123,7 +123,7 @@ class Profiler implements \ArrayAccess
     /**
      * Gets the profiler storage.
      *
-     * @return Symfony\Components\HttpKernel\Profiler\ProfilerStorage A ProfilerStorage instance
+     * @return ProfilerStorage A ProfilerStorage instance
      */
     public function getProfilerStorage()
     {
@@ -133,7 +133,7 @@ class Profiler implements \ArrayAccess
     /**
      * Gets the Response.
      *
-     * @return Symfony\Components\HttpFoundation\Response A Response instance
+     * @return Response A Response instance
      */
     public function getResponse()
     {
@@ -166,7 +166,7 @@ class Profiler implements \ArrayAccess
     /**
      * Adds a Collector.
      *
-     * @param Symfony\Components\HttpKernel\Profiler\DataCollector\DataCollectorInterface $collector A DataCollectorInterface instance
+     * @param DataCollectorInterface $collector A DataCollectorInterface instance
      */
     public function addCollector(DataCollectorInterface $collector)
     {
@@ -188,7 +188,7 @@ class Profiler implements \ArrayAccess
      *
      * @param string $name A collector name
      *
-     * @return Symfony\Components\HttpKernel\Profiler\DataCollector\DataCollectorInterface A DataCollectorInterface instance
+     * @return DataCollectorInterface A DataCollectorInterface instance
      *
      * @throws \InvalidArgumentException if the collector does not exist
      */

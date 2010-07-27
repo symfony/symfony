@@ -25,7 +25,7 @@ class DelegatingLoader extends Loader
     /**
      * Constructor.
      *
-     * @param \Symfony\Components\DependencyInjection\Loader\LoaderResolverInterface $resolver A LoaderResolverInterface instance
+     * @param LoaderResolverInterface $resolver A LoaderResolverInterface instance
      */
     public function __construct(LoaderResolverInterface $resolver)
     {

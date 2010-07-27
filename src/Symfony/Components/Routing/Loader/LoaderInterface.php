@@ -43,14 +43,14 @@ interface LoaderInterface
     /**
      * Gets the loader resolver.
      *
-     * @return \Symfony\Components\Routing\Loader\LoaderResolver A LoaderResolver instance
+     * @return LoaderResolver A LoaderResolver instance
      */
     function getResolver();
 
     /**
      * Sets the loader resolver.
      *
-     * @param \Symfony\Components\Routing\Loader\LoaderResolver $resolver A LoaderResolver instance
+     * @param LoaderResolver $resolver A LoaderResolver instance
      */
     function setResolver(LoaderResolver $resolver);
 }

@@ -30,7 +30,7 @@ class EsiListener
     /**
      * Constructor.
      *
-     * @param Symfony\Components\HttpKernel\Cache\Esi $esi An ESI instance
+     * @param Esi $esi An ESI instance
      */
     public function __construct(Esi $esi = null)
     {
@@ -40,7 +40,7 @@ class EsiListener
     /**
      * Registers a core.response listener to add the Surrogate-Control header to a Response when needed.
      *
-     * @param Symfony\Components\EventDispatcher\EventDispatcher $dispatcher An EventDispatcher instance
+     * @param EventDispatcher $dispatcher An EventDispatcher instance
      */
     public function register(EventDispatcher $dispatcher)
     {
@@ -53,8 +53,8 @@ class EsiListener
     /**
      * Filters the Response.
      *
-     * @param Symfony\Components\EventDispatcher\Event $event    An Event instance
-     * @param Symfony\Components\HttpFoundation\Response   $response A Response instance
+     * @param Event    $event    An Event instance
+     * @param Response $response A Response instance
      */
     public function filter($event, Response $response)
     {

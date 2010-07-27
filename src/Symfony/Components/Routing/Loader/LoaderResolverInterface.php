@@ -25,7 +25,7 @@ interface LoaderResolverInterface
      *
      * @param mixed  $resource A resource
      *
-     * @return Symfony\Components\Routing\Loader\LoaderInterface A LoaderInterface instance
+     * @return LoaderInterface A LoaderInterface instance
      */
     function resolve($resource);
 }

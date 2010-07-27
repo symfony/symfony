@@ -119,7 +119,7 @@ class ControllerResolver implements ControllerResolverInterface
      * This method looks for a '_controller' request parameter that represents
      * the controller name (a string like BlogBundle:Post:index).
      *
-     * @param \Symfony\Components\HttpFoundation\Request $request A Request instance
+     * @param Request $request A Request instance
      *
      * @return mixed|Boolean A PHP callable representing the Controller,
      *                       or false if this resolver is not able to determine the controller
@@ -184,8 +184,8 @@ class ControllerResolver implements ControllerResolverInterface
     /**
      * Returns the arguments to pass to the controller.
      *
-     * @param \Symfony\Components\HttpFoundation\Request $request    A Request instance
-     * @param mixed                                      $controller A PHP callable
+     * @param Request $request    A Request instance
+     * @param mixed   $controller A PHP callable
      *
      * @throws \RuntimeException When value for argument given is not provided
      */

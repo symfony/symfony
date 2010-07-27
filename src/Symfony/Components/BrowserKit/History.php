@@ -43,7 +43,7 @@ class History
     /**
      * Adds a Request to the history.
      *
-     * @param Symfony\Components\BrowserKit\Request $request A Request instance
+     * @param Request $request A Request instance
      */
     public function add(Request $request)
     {
@@ -65,7 +65,7 @@ class History
     /**
      * Goes back in the history.
      *
-     * @return Symfony\Components\BrowserKit\Request A Request instance
+     * @return Request A Request instance
      *
      * @throws \LogicException if the stack is already on the first page
      */
@@ -81,7 +81,7 @@ class History
     /**
      * Goes forward in the history.
      *
-     * @return Symfony\Components\BrowserKit\Request A Request instance
+     * @return Request A Request instance
      *
      * @throws \LogicException if the stack is already on the last page
      */
@@ -97,7 +97,7 @@ class History
     /**
      * Returns the current element in the history.
      *
-     * @return Symfony\Components\BrowserKit\Request A Request instance
+     * @return Request A Request instance
      *
      * @throws \LogicException if the stack is empty
      */

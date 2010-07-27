@@ -3,6 +3,7 @@
 namespace Symfony\Framework\Test;
 
 use Symfony\Components\HttpKernel\Test\WebTestCase as BaseWebTestCase;
+use Symfony\Framework\Client;
 
 /*
  * This file is part of the Symfony package.
@@ -30,7 +31,7 @@ abstract class WebTestCase extends BaseWebTestCase
      * @param array   $options An array of options to pass to the createKernel class
      * @param array   $server  An array of server parameters
      *
-     * @return Symfony\Framework\Client A Client instance
+     * @return Client A Client instance
      */
     public function createClient(array $options = array(), array $server = array())
     {
@@ -48,7 +49,7 @@ abstract class WebTestCase extends BaseWebTestCase
      *
      * @param array $options An array of options
      *
-     * @return Symfony\Components\HttpKernel\HttpKernelInterface A HttpKernelInterface instance
+     * @return HttpKernelInterface A HttpKernelInterface instance
      */
     abstract protected function createKernel(array $options = array());
 }

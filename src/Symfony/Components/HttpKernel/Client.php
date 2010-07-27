@@ -33,10 +33,10 @@ class Client extends BaseClient
     /**
      * Constructor.
      *
-     * @param Symfony\Components\HttpKernel\HttpKernelInterface $kernel    An HttpKernel instance
-     * @param array                                             $server    The server parameters (equivalent of $_SERVER)
-     * @param Symfony\Components\BrowserKit\History             $history   A History instance to store the browser history
-     * @param Symfony\Components\BrowserKit\CookieJar           $cookieJar A CookieJar instance to store the cookies
+     * @param HttpKernelInterface $kernel    An HttpKernel instance
+     * @param array               $server    The server parameters (equivalent of $_SERVER)
+     * @param History             $history   A History instance to store the browser history
+     * @param CookieJar           $cookieJar A CookieJar instance to store the cookies
      */
     public function __construct(HttpKernelInterface $kernel, array $server = array(), History $history = null, CookieJar $cookieJar = null)
     {
@@ -50,9 +50,9 @@ class Client extends BaseClient
     /**
      * Makes a request.
      *
-     * @param Symfony\Components\HttpFoundation\Request  $request A Request instance
+     * @param Request  $request A Request instance
      *
-     * @param Symfony\Components\HttpFoundation\Response $response A Response instance
+     * @return Response A Response instance
      */
     protected function doRequest($request)
     {
@@ -62,7 +62,7 @@ class Client extends BaseClient
     /**
      * Returns the script to execute when the request must be insulated.
      *
-     * @param Symfony\Components\HttpFoundation\Request $request A Request instance
+     * @param Request $request A Request instance
      */
     protected function getScript($request)
     {
@@ -91,9 +91,9 @@ EOF;
     /**
      * Converts the BrowserKit request to a HttpKernel request.
      *
-     * @param Symfony\Components\BrowserKit\Request $request A Request instance
+     * @param Request $request A Request instance
      *
-     * @return Symfony\Components\HttpFoundation\Request A Request instance
+     * @return Request A Request instance
      */
     protected function filterRequest(DomRequest $request)
     {
@@ -108,9 +108,9 @@ EOF;
     /**
      * Converts the HttpKernel response to a BrowserKit response.
      *
-     * @param Symfony\Components\HttpFoundation\Response $response A Response instance
+     * @param Response $response A Response instance
      *
-     * @return Symfony\Components\BrowserKit\Response A Response instance
+     * @return Response A Response instance
      */
     protected function filterResponse($response)
     {

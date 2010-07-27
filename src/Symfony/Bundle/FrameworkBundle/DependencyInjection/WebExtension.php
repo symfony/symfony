@@ -48,8 +48,8 @@ class WebExtension extends Extension
     /**
      * Loads the web configuration.
      *
-     * @param array                                                        $config        An array of configuration settings
-     * @param \Symfony\Components\DependencyInjection\ContainerBuilder $container A ContainerBuilder instance
+     * @param array            $config    An array of configuration settings
+     * @param ContainerBuilder $container A ContainerBuilder instance
      */
     public function configLoad($config, ContainerBuilder $container)
     {
@@ -179,8 +179,8 @@ class WebExtension extends Extension
     /**
      * Loads the templating configuration.
      *
-     * @param array                                                        $config        An array of configuration settings
-     * @param \Symfony\Components\DependencyInjection\ContainerBuilder $container A ContainerBuilder instance
+     * @param array            $config        An array of configuration settings
+     * @param ContainerBuilder $container A ContainerBuilder instance
      */
     public function templatingLoad($config, ContainerBuilder $container)
     {

@@ -29,7 +29,7 @@ abstract class Cache extends BaseCache
     /**
      * Constructor.
      *
-     * @param Symfony\Components\HttpKernel\HttpKernelInterface $kernel An HttpKernelInterface instance
+     * @param HttpKernelInterface $kernel An HttpKernelInterface instance
      */
     public function __construct(HttpKernelInterface $kernel)
     {
@@ -42,11 +42,11 @@ abstract class Cache extends BaseCache
     /**
      * Forwards the Request to the backend and returns the Response.
      *
-     * @param Symfony\Components\HttpFoundation\Response  $request  A Request instance
-     * @param Boolean                                $raw      Whether to catch exceptions or not
-     * @param Symfony\Components\HttpFoundation\Response $response A Response instance (the stale entry if present, null otherwise)
+     * @param Requset  $request  A Request instance
+     * @param Boolean  $raw      Whether to catch exceptions or not
+     * @param Response $response A Response instance (the stale entry if present, null otherwise)
      *
-     * @return Symfony\Components\HttpFoundation\Response A Response instance
+     * @return Response A Response instance
      */
     protected function forward(Request $request, $raw = false, Response $entry = null)
     {

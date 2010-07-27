@@ -40,11 +40,11 @@ class Router implements RouterInterface
      *   * cache_dir: The cache directory (or null to disable caching)
      *   * debug:     Whether to enable debugging or not (false by default)
      *
-     * @param Symfony\Components\Routing\Loader\LoaderInterface $loader A LoaderInterface instance
-     * @param mixed $resource The main resource to load
-     * @param array $options  An array of options
-     * @param array $context  The context
-     * @param array $defaults The default values
+     * @param LoaderInterface $loader A LoaderInterface instance
+     * @param mixed           $resource The main resource to load
+     * @param array           $options  An array of options
+     * @param array           $context  The context
+     * @param array           $defaults The default values
      *
      * @throws \InvalidArgumentException When unsupported option is provided
      */

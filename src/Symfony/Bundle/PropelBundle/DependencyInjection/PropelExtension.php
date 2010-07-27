@@ -17,8 +17,8 @@ class PropelExtension extends Extension
     /**
      * Loads the Propel configuration.
      *
-     * @param array                                                        $config        An array of configuration settings
-     * @param \Symfony\Components\DependencyInjection\ContainerBuilder $container A ContainerBuilder instance
+     * @param array            $config    An array of configuration settings
+     * @param ContainerBuilder $container A ContainerBuilder instance
      */
     public function configLoad($config, ContainerBuilder $container)
     {
@@ -47,8 +47,8 @@ class PropelExtension extends Extension
     /**
      * Loads the DBAL configuration.
      *
-     * @param array                                                        $config        An array of configuration settings
-     * @param \Symfony\Components\DependencyInjection\ContainerBuilder $container A ContainerBuilder instance
+     * @param array            $config    An array of configuration settings
+     * @param ContainerBuilder $container A ContainerBuilder instance
      */
     public function dbalLoad($config, ContainerBuilder $container)
     {

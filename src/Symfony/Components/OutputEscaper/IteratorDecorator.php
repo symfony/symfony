@@ -35,8 +35,8 @@ class IteratorDecorator extends ObjectDecorator implements \Iterator, \Countable
     /**
      * Constructs a new escaping iterator using the escaping method and value supplied.
      *
-     * @param string      $escaper The escaping method to use
-     * @param \Traversable $value         The iterator to escape
+     * @param string       $escaper The escaping method to use
+     * @param \Traversable $value   The iterator to escape
      */
     public function __construct($escaper, \Traversable $value)
     {

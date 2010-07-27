@@ -27,7 +27,7 @@ class ResponseListener
     /**
      * Registers a core.response listener to change the Content-Type header based on the Request format.
      *
-     * @param Symfony\Components\EventDispatcher\EventDispatcher $dispatcher An EventDispatcher instance
+     * @param EventDispatcher $dispatcher An EventDispatcher instance
      */
     public function register(EventDispatcher $dispatcher)
     {
@@ -37,8 +37,8 @@ class ResponseListener
     /**
      * Filters the Response.
      *
-     * @param Symfony\Components\EventDispatcher\Event $event    An Event instance
-     * @param Symfony\Components\HttpFoundation\Response   $response A Response instance
+     * @param Event    $event    An Event instance
+     * @param Response $response A Response instance
      */
     public function filter(Event $event, Response $response)
     {

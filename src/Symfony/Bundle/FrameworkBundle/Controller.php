@@ -31,7 +31,7 @@ class Controller
     /**
      * Constructor.
      *
-     * @param \Symfony\Components\DependencyInjection\ContainerInterface $container A ContainerInterface instance
+     * @param ContainerInterface $container A ContainerInterface instance
      */
     function __construct(ContainerInterface $container)
     {
@@ -42,7 +42,7 @@ class Controller
     /**
      * Gets the Request.
      *
-     * @return \Symfony\Components\HttpFoundation\Request A Request instance
+     * @return Request A Request instance
      */
     public function getRequest()
     {
@@ -56,7 +56,7 @@ class Controller
      * @param integer $status  The status code
      * @param array   $headers An array of HTTP headers
      *
-     * @return \Symfony\Components\HttpFoundation\Response A Response instance
+     * @return Response A Response instance
      */
     public function createResponse($content = '', $status = 200, array $headers = array())
     {
@@ -91,7 +91,7 @@ class Controller
      * @param  array   $path       An array of path parameters
      * @param  array   $query      An array of query parameters
      *
-     * @return \Symfony\Components\HttpFoundation\Response A Response instance
+     * @return Response A Response instance
      */
     public function forward($controller, array $path = array(), array $query = array())
     {
@@ -104,7 +104,7 @@ class Controller
     /**
      * Returns an HTTP redirect Response.
      *
-     * @return \Symfony\Components\HttpFoundation\Response A Response instance
+     * @return Response A Response instance
      */
     public function redirect($url, $status = 302)
     {
@@ -131,11 +131,11 @@ class Controller
     /**
      * Renders a view.
      *
-     * @param string $view The view name
-     * @param array $parameters An array of parameters to pass to the view
-     * @param \Symfony\Components\HttpFoundation\Response $response A response instance
+     * @param string   $view The view name
+     * @param array    $parameters An array of parameters to pass to the view
+     * @param Response $response A response instance
      *
-     * @return \Symfony\Components\HttpFoundation\Response A Response instance
+     * @return Response A Response instance
      */
     public function render($view, array $parameters = array(), Response $response = null)
     {

@@ -39,7 +39,7 @@ abstract class FilesLoader extends LoaderChain
     /**
      * Takes mapping file path
      * @param string $file
-     * @return Symfony\Components\Validator\Mapping\Loader\LoaderInterface
+     * @return LoaderInterface
      */
     abstract protected function getFileLoaderInstance($file);
 }

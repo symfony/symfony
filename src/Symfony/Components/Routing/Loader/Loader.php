@@ -25,7 +25,7 @@ abstract class Loader implements LoaderInterface
     /**
      * Gets the loader resolver.
      *
-     * @return \Symfony\Components\Routing\Loader\LoaderResolver A LoaderResolver instance
+     * @return LoaderResolver A LoaderResolver instance
      */
     public function getResolver()
     {
@@ -35,7 +35,7 @@ abstract class Loader implements LoaderInterface
     /**
      * Sets the loader resolver.
      *
-     * @param \Symfony\Components\Routing\Loader\LoaderResolver $resolver A LoaderResolver instance
+     * @param LoaderResolver $resolver A LoaderResolver instance
      */
     public function setResolver(LoaderResolver $resolver)
     {
@@ -57,7 +57,7 @@ abstract class Loader implements LoaderInterface
      *
      * @param mixed $resource A Resource
      *
-     * @return Symfony\Components\Routing\Loader\LoaderInterface A LoaderInterface instance
+     * @return LoaderInterface A LoaderInterface instance
      *
      * @throws \InvalidArgumentException if no loader is found
      */

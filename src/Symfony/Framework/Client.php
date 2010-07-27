@@ -2,10 +2,14 @@
 
 namespace Symfony\Framework;
 
+use Symfony\Components\DependencyInjection\ContainerInterface;
 use Symfony\Components\HttpKernel\HttpKernelInterface;
 use Symfony\Components\HttpKernel\Client as BaseClient;
 use Symfony\Components\BrowserKit\History;
 use Symfony\Components\BrowserKit\CookieJar;
+use Symfony\Components\HttpKernel\Profiler\Profiler;
+use Symfony\Components\HttpFoundation\Request;
+use Symfony\Components\HttpFoundation\Response;
 
 /*
  * This file is part of the Symfony package.
@@ -30,10 +34,10 @@ class Client extends BaseClient
     /**
      * Constructor.
      *
-     * @param Symfony\Components\HttpKernel\HttpKernelInterface $kernel    A Kernel instance
-     * @param array                                             $server    The server parameters (equivalent of $_SERVER)
-     * @param Symfony\Components\BrowserKit\History             $history   A History instance to store the browser history
-     * @param Symfony\Components\BrowserKit\CookieJar           $cookieJar A CookieJar instance to store the cookies
+     * @param HttpKernelInterface $kernel    A Kernel instance
+     * @param array               $server    The server parameters (equivalent of $_SERVER)
+     * @param History             $history   A History instance to store the browser history
+     * @param CookieJar           $cookieJar A CookieJar instance to store the cookies
      */
     public function __construct(HttpKernelInterface $kernel, array $server = array(), History $history = null, CookieJar $cookieJar = null)
     {
@@ -45,7 +49,7 @@ class Client extends BaseClient
     /**
      * Returns the container.
      *
-     * @return Symfony\Components\DependencyInjection\Container
+     * @return ContainerInterface
      */
     public function getContainer()
     {
@@ -55,7 +59,7 @@ class Client extends BaseClient
     /**
      * Returns the kernel.
      *
-     * @return Symfony\Framework\Kernel
+     * @return Kernel
      */
     public function getKernel()
     {
@@ -65,7 +69,7 @@ class Client extends BaseClient
     /**
      * Gets a profiler for the current Response.
      *
-     * @return Symfony\Components\HttpKernel\Profiler\Profiler A Profiler instance
+     * @return Profiler A Profiler instance
      */
     public function getProfiler()
     {
@@ -79,9 +83,9 @@ class Client extends BaseClient
     /**
      * Makes a request.
      *
-     * @param Symfony\Components\HttpFoundation\Response  $request A Request instance
+     * @param Request $request A Request instance
      *
-     * @param Symfony\Components\HttpFoundation\Response $response A Response instance
+     * @return Response A Response instance
      */
     protected function doRequest($request)
     {
@@ -93,7 +97,9 @@ class Client extends BaseClient
     /**
      * Returns the script to execute when the request must be insulated.
      *
-     * @param Symfony\Components\HttpFoundation\Response $request A Request instance
+     * @param Request $request A Request instance
+     *
+     * @return string The script content
      */
     protected function getScript($request)
     {

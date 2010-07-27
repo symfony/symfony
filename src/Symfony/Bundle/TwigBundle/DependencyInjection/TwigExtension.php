@@ -27,8 +27,8 @@ class TwigExtension extends Extension
     /**
      * Loads the Twig configuration.
      *
-     * @param array                                                        $config        An array of configuration settings
-     * @param \Symfony\Components\DependencyInjection\ContainerBuilder $container A ContainerBuilder instance
+     * @param array            $config    An array of configuration settings
+     * @param ContainerBuilder $container A ContainerBuilder instance
      */
     public function configLoad($config, ContainerBuilder $container)
     {

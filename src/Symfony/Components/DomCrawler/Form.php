@@ -2,6 +2,8 @@
 
 namespace Symfony\Components\DomCrawler;
 
+use Symfony\Components\DomCrawler\FormField;
+
 /*
  * This file is part of the Symfony package.
  *
@@ -220,7 +222,7 @@ class Form implements \ArrayAccess
      *
      * @param string $name The field name
      *
-     * @return Field\FormField The field instance
+     * @return FormField The field instance
      *
      * @throws \InvalidArgumentException When field is not present in this form
      */
@@ -238,7 +240,7 @@ class Form implements \ArrayAccess
      *
      * @param string $name The field name
      *
-     * @return Field\FormField The field instance
+     * @return FormField The field instance
      */
     public function setField(Field\FormField $field)
     {
@@ -311,7 +313,7 @@ class Form implements \ArrayAccess
      *
      * @param string $name The field name
      *
-     * @return Symfony\Components\DomCrawler\Field The associated Field instance
+     * @return FormField The associated Field instance
      *
      * @throws \InvalidArgumentException if the field does not exist
      */

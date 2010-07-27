@@ -26,9 +26,9 @@ class AssetsHelper extends BaseAssetsHelper
     /**
      * Constructor.
      *
-     * @param Symfony\Components\HttpFoundation\Request $request A Request instance
-     * @param string|array                              $baseURLs The domain URL or an array of domain URLs
-     * @param string                                    $version  The version
+     * @param Request      $request  A Request instance
+     * @param string|array $baseURLs The domain URL or an array of domain URLs
+     * @param string       $version  The version
      */
     public function __construct(Request $request, $baseURLs = array(), $version = null)
     {

@@ -11,6 +11,6 @@ use Symfony\Framework\Bundle\Bundle;
  * @author Kris Wallsmith <kris.wallsmith@symfony-project.com>
  * @author Jonathan H. Wage <jonwage@gmail.com>
  */
-class DoctrineMongoDBBundle extends Bundle 
+class DoctrineMongoDBBundle extends Bundle
 {
 }

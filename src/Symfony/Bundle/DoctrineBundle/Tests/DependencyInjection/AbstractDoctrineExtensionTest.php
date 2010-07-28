@@ -427,6 +427,20 @@ abstract class AbstractDoctrineExtensionTest extends TestCase
         $this->assertEquals(11211, $calls[0][1][1]);
     }
 
+    public function testDependencyInjectionImportsOverrideDefaults()
+    {
+        $container = new ContainerBuilder();
+        $loader = $this->getDoctrineExtensionLoader();
+        $container->registerExtension($loader);
+
+        $this->loadFromFile($container, 'orm_imports');
+
+        $container->freeze();
+
+        $this->assertEquals('apc', $container->getParameter('doctrine.orm.metadata_cache_driver'));
+        $this->assertTrue($container->getParameter('doctrine.orm.auto_generate_proxy_classes'));
+    }
+
     protected function getDoctrineExtensionLoader($bundle = 'YamlBundle')
     {
         require_once __DIR__.'/Fixtures/Bundles/'.$bundle.'/'.$bundle.'.php';

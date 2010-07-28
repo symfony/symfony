@@ -217,8 +217,10 @@ class DoctrineExtension extends Extension
      */
     protected function loadOrmDefaults(array $config, ContainerBuilder $container)
     {
-        $loader = new XmlFileLoader($container, __DIR__.'/../Resources/config');
-        $loader->load($this->resources['orm']);
+        if (!$container->hasDefinition('doctrine.orm.metadata_driver.annotation')) {
+            $loader = new XmlFileLoader($container, __DIR__.'/../Resources/config');
+            $loader->load($this->resources['orm']);
+        }
 
         // Allow these application configuration options to override the defaults
         $options = array(

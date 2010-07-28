@@ -74,9 +74,12 @@ class MongoDBExtension extends Extension
      */
     protected function loadDefaults(array $config, ContainerBuilder $container)
     {
-        // Load DoctrineMongoDBBundle/Resources/config/mongodb.xml
-        $loader = new XmlFileLoader($container, __DIR__.'/../Resources/config');
-        $loader->load($this->resources['mongodb']);
+        if(!$container->hasDefinition('doctrine.odm.mongodb.metadata.annotation'))
+        {
+            // Load DoctrineMongoDBBundle/Resources/config/mongodb.xml
+            $loader = new XmlFileLoader($container, __DIR__.'/../Resources/config');
+            $loader->load($this->resources['mongodb']);
+        }
 
         // Allow these application configuration options to override the defaults
         $options = array(

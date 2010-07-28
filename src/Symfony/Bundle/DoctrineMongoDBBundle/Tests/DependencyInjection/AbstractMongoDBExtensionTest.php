@@ -295,6 +295,20 @@ abstract class AbstractMongoDBExtensionTest extends TestCase
         $this->assertEquals(11211, $calls[0][1][1]);
     }
 
+    public function testDependencyInjectionImportsOverrideDefaults()
+    {
+        $container = new ContainerBuilder();
+        $loader = $this->getMongoDbExtensionLoader();
+        $container->registerExtension($loader);
+
+        $this->loadFromFile($container, 'odm_imports');
+
+        $container->freeze();
+
+        $this->assertEquals('apc', $container->getParameter('doctrine.odm.mongodb.metadata_cache_driver'));
+        $this->assertTrue($container->getParameter('doctrine.odm.mongodb.auto_generate_proxy_classes'));
+    }
+
     protected function getMongoDbExtensionLoader($bundle = 'YamlBundle')
     {
         require_once __DIR__.'/Fixtures/Bundles/'.$bundle.'/'.$bundle.'.php';

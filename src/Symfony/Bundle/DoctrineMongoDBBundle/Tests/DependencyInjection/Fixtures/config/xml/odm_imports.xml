@@ -1,0 +1,17 @@
+<?xml version="1.0" ?>
+
+<container xmlns="http://www.symfony-project.org/schema/dic/services"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xmlns:doctrine="http://www.symfony-project.org/schema/dic/doctrine/odm/mongodb"
+    xsi:schemaLocation="http://www.symfony-project.org/schema/dic/services http://www.symfony-project.org/schema/dic/services/services-1.0.xsd
+                        http://www.symfony-project.org/schema/dic/doctrine/odm/mongodb http://www.symfony-project.org/schema/dic/doctrine/odm/mongodb/mongodb-1.0.xsd">
+
+    <imports>
+        <import resource="odm_imports_import.xml" />
+    </imports>
+
+    <doctrine:mongodb
+        auto_generate_proxy_classes="true"
+    >
+    </doctrine:mongodb>
+</container>

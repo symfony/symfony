@@ -226,7 +226,7 @@ class Request
         // FIXME: populate $_FILES
 
         foreach ($this->headers->all() as $key => $value) {
-          $_SERVER['HTTP_'.strtoupper(str_replace('-', '_', $key))] = $value;
+            $_SERVER['HTTP_'.strtoupper(str_replace('-', '_', $key))] = implode(', ', $value);
         }
 
         // FIXME: should read variables_order and request_order

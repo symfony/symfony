@@ -91,7 +91,6 @@ class KernelExtension extends Extension
                 'Symfony\\Components\\HttpFoundation\\Request',
                 'Symfony\\Components\\HttpFoundation\\Response',
                 'Symfony\\Components\\HttpKernel\\ResponseListener',
-                'Symfony\\Components\\HttpKernel\\Controller\\ControllerLoaderListener',
                 'Symfony\\Components\\Templating\\Loader\\LoaderInterface',
                 'Symfony\\Components\\Templating\\Loader\\Loader',
                 'Symfony\\Components\\Templating\\Loader\\FilesystemLoader',

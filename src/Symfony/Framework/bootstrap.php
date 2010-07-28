@@ -231,8 +231,8 @@ class KernelExtension extends Extension
 
         if (!array_key_exists('compilation', $config)) {
             $classes = array(
-                'Symfony\\Components\\Routing\\Router',
                 'Symfony\\Components\\Routing\\RouterInterface',
+                'Symfony\\Components\\Routing\\Router',
                 'Symfony\\Components\\EventDispatcher\\Event',
                 'Symfony\\Components\\Routing\\Matcher\\UrlMatcherInterface',
                 'Symfony\\Components\\Routing\\Matcher\\UrlMatcher',

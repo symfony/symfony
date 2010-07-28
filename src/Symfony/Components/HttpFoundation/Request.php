@@ -225,6 +225,10 @@ class Request
         $_COOKIES = $this->cookies->all();
         // FIXME: populate $_FILES
 
+        foreach ($this->headers->all() as $key => $value) {
+          $_SERVER['HTTP_'.strtoupper(str_replace('-', '_', $key))] = $value;
+        }
+
         // FIXME: should read variables_order and request_order
         // to know which globals to merge and in which order
         $_REQUEST = array_merge($_GET, $_POST);

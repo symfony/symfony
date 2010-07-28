@@ -152,7 +152,7 @@ abstract class AbstractDoctrineExtensionTest extends TestCase
 
         $definition = $container->getDefinition('doctrine.orm.default_configuration');
         $calls = $definition->getMethodCalls();
-        $this->assertEquals(array('YamlBundle' => 'Fixtures\Bundles\YamlBundle\Entity'), $calls[0][1][0]);
+        $this->assertEquals(array('YamlBundle' => 'DoctrineBundle\Tests\DependencyInjection\Fixtures\Bundles\YamlBundle\Entity'), $calls[0][1][0]);
         $this->assertEquals('doctrine.orm.default_metadata_cache', (string) $calls[1][1][0]);
         $this->assertEquals('doctrine.orm.default_query_cache', (string) $calls[2][1][0]);
         $this->assertEquals('doctrine.orm.default_result_cache', (string) $calls[3][1][0]);
@@ -327,7 +327,7 @@ abstract class AbstractDoctrineExtensionTest extends TestCase
         $definition = $container->getDefinition('doctrine.orm.default_configuration');
         $calls = $definition->getMethodCalls();
         $this->assertTrue(isset($calls[0][1][0]['YamlBundle']));
-        $this->assertEquals('Fixtures\Bundles\YamlBundle\Entity', $calls[0][1][0]['YamlBundle']);
+        $this->assertEquals('DoctrineBundle\Tests\DependencyInjection\Fixtures\Bundles\YamlBundle\Entity', $calls[0][1][0]['YamlBundle']);
     }
 
     public function testYamlBundleMappingDetection()
@@ -345,7 +345,7 @@ abstract class AbstractDoctrineExtensionTest extends TestCase
 
         $calls = $container->getDefinition('doctrine.orm.metadata_driver')->getMethodCalls();
         $this->assertEquals('doctrine.orm.metadata_driver.yml', (string) $calls[0][1][0]);
-        $this->assertEquals('Fixtures\Bundles\YamlBundle\Entity', $calls[0][1][1]);
+        $this->assertEquals('DoctrineBundle\Tests\DependencyInjection\Fixtures\Bundles\YamlBundle\Entity', $calls[0][1][1]);
     }
 
     public function testXmlBundleMappingDetection()
@@ -363,7 +363,7 @@ abstract class AbstractDoctrineExtensionTest extends TestCase
 
         $calls = $container->getDefinition('doctrine.orm.metadata_driver')->getMethodCalls();
         $this->assertEquals('doctrine.orm.metadata_driver.xml', (string) $calls[0][1][0]);
-        $this->assertEquals('Fixtures\Bundles\XmlBundle\Entity', $calls[0][1][1]);
+        $this->assertEquals('DoctrineBundle\Tests\DependencyInjection\Fixtures\Bundles\XmlBundle\Entity', $calls[0][1][1]);
     }
 
     public function testAnnotationsBundleMappingDetection()
@@ -381,7 +381,7 @@ abstract class AbstractDoctrineExtensionTest extends TestCase
 
         $calls = $container->getDefinition('doctrine.orm.metadata_driver')->getMethodCalls();
         $this->assertEquals('doctrine.orm.metadata_driver.annotation', (string) $calls[0][1][0]);
-        $this->assertEquals('Fixtures\Bundles\AnnotationsBundle\Entity', $calls[0][1][1]);
+        $this->assertEquals('DoctrineBundle\Tests\DependencyInjection\Fixtures\Bundles\AnnotationsBundle\Entity', $calls[0][1][1]);
     }
 
     public function testEntityManagerMetadataCacheDriverConfiguration()
@@ -444,8 +444,8 @@ abstract class AbstractDoctrineExtensionTest extends TestCase
     protected function getDoctrineExtensionLoader($bundle = 'YamlBundle')
     {
         require_once __DIR__.'/Fixtures/Bundles/'.$bundle.'/'.$bundle.'.php';
-        $bundleDirs = array('Fixtures\\Bundles' => __DIR__.'/Fixtures/Bundles');
-        $bundles = array('Fixtures\\Bundles\\'.$bundle.'\\'.$bundle);
+        $bundleDirs = array('DoctrineBundle\\Tests\\DependencyInjection\\Fixtures\\Bundles' => __DIR__.'/Fixtures/Bundles');
+        $bundles = array('DoctrineBundle\\Tests\DependencyInjection\\Fixtures\\Bundles\\'.$bundle.'\\'.$bundle);
         return new DoctrineExtension($bundleDirs, $bundles, sys_get_temp_dir());
     }
 }

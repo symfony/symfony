@@ -1,6 +1,6 @@
 <?php
 
-namespace Fixtures\Bundles\AnnotationsBundle\Entity;
+namespace DoctrineBundle\Tests\DependencyInjection\Fixtures\Bundles\AnnotationsBundle\Entity;
 
 class Test
 {

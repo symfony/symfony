@@ -198,7 +198,7 @@ abstract class AbstractMongoDBExtensionTest extends TestCase
         $definition = $container->getDefinition('doctrine.odm.mongodb.default_configuration');
         $calls = $definition->getMethodCalls();
         $this->assertTrue(isset($calls[0][1][0]['YamlBundle']));
-        $this->assertEquals('Fixtures\Bundles\YamlBundle\Document', $calls[0][1][0]['YamlBundle']);
+        $this->assertEquals('DoctrineMongoDBBundle\Tests\DependencyInjection\Fixtures\Bundles\YamlBundle\Document', $calls[0][1][0]['YamlBundle']);
     }
 
     public function testYamlBundleMappingDetection()
@@ -215,7 +215,7 @@ abstract class AbstractMongoDBExtensionTest extends TestCase
 
         $calls = $container->getDefinition('doctrine.odm.mongodb.metadata_driver')->getMethodCalls();
         $this->assertEquals('doctrine.odm.mongodb.metadata_driver.yml', (string) $calls[0][1][0]);
-        $this->assertEquals('Fixtures\Bundles\YamlBundle\Document', $calls[0][1][1]);
+        $this->assertEquals('DoctrineMongoDBBundle\Tests\DependencyInjection\Fixtures\Bundles\YamlBundle\Document', $calls[0][1][1]);
     }
 
     public function testXmlBundleMappingDetection()
@@ -232,7 +232,7 @@ abstract class AbstractMongoDBExtensionTest extends TestCase
 
         $calls = $container->getDefinition('doctrine.odm.mongodb.metadata_driver')->getMethodCalls();
         $this->assertEquals('doctrine.odm.mongodb.metadata_driver.xml', (string) $calls[0][1][0]);
-        $this->assertEquals('Fixtures\Bundles\XmlBundle\Document', $calls[0][1][1]);
+        $this->assertEquals('DoctrineMongoDBBundle\Tests\DependencyInjection\Fixtures\Bundles\XmlBundle\Document', $calls[0][1][1]);
     }
 
     public function testAnnotationsBundleMappingDetection()
@@ -249,7 +249,7 @@ abstract class AbstractMongoDBExtensionTest extends TestCase
 
         $calls = $container->getDefinition('doctrine.odm.mongodb.metadata_driver')->getMethodCalls();
         $this->assertEquals('doctrine.odm.mongodb.metadata_driver.annotation', (string) $calls[0][1][0]);
-        $this->assertEquals('Fixtures\Bundles\AnnotationsBundle\Document', $calls[0][1][1]);
+        $this->assertEquals('DoctrineMongoDBBundle\Tests\DependencyInjection\Fixtures\Bundles\AnnotationsBundle\Document', $calls[0][1][1]);
     }
 
     public function testDocumentManagerMetadataCacheDriverConfiguration()
@@ -312,8 +312,8 @@ abstract class AbstractMongoDBExtensionTest extends TestCase
     protected function getMongoDbExtensionLoader($bundle = 'YamlBundle')
     {
         require_once __DIR__.'/Fixtures/Bundles/'.$bundle.'/'.$bundle.'.php';
-        $bundleDirs = array('Fixtures\\Bundles' => __DIR__.'/Fixtures/Bundles');
-        $bundles = array('Fixtures\\Bundles\\'.$bundle.'\\'.$bundle);
+        $bundleDirs = array('DoctrineMongoDBBundle\\Tests\\DependencyInjection\\Fixtures\\Bundles' => __DIR__.'/Fixtures/Bundles');
+        $bundles = array('DoctrineMongoDBBundle\\Tests\\DependencyInjection\\Fixtures\\Bundles\\'.$bundle.'\\'.$bundle);
         return new MongoDBExtension($bundleDirs, $bundles, sys_get_temp_dir());
     }
 }

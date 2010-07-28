@@ -1,6 +1,6 @@
 <?php
 
-namespace Fixtures\Bundles\YamlBundle;
+namespace DoctrineMongoDBBundle\Tests\DependencyInjection\Fixtures\Bundles\YamlBundle;
 
 use Symfony\Framework\Bundle\Bundle;
 

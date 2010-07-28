@@ -1,6 +1,6 @@
 <?php
 
-namespace Fixtures\Bundles\XmlBundle;
+namespace DoctrineMongoDBBundle\Tests\DependencyInjection\Fixtures\Bundles\XmlBundle;
 
 use Symfony\Framework\Bundle\Bundle;
 

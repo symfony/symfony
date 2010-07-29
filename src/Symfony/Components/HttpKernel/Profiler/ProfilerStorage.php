@@ -78,7 +78,7 @@ class ProfilerStorage
         $unpack = unpack('H*', serialize($data));
         $data = $unpack[1];
 
-        $db = $this->initDb(false);
+        $db = $this->initDb();
         $args = array(
             ':token' => $this->token,
             ':data' => (string) $data,
@@ -91,13 +91,11 @@ class ProfilerStorage
     /**
      * @throws \RuntimeException When neither of SQLite or PDO_SQLite extension is enabled
      */
-    protected function initDb($readOnly = true)
+    protected function initDb()
     {
-        if (class_exists('\SQLite3')) {
-            $flags  = $readOnly ? \SQLITE3_OPEN_READONLY : \SQLITE3_OPEN_READWRITE;
-            $flags |= \SQLITE3_OPEN_CREATE;
-            $db = new \SQLite3($this->store, $flags);
-        } elseif (class_exists('\PDO') && in_array('sqlite', \PDO::getAvailableDrivers(), true)) {
+        if (class_exists('SQLite3')) {
+            $db = new \SQLite3($this->store, \SQLITE3_OPEN_READWRITE | \SQLITE3_OPEN_CREATE);
+        } elseif (class_exists('PDO') && in_array('sqlite', \PDO::getAvailableDrivers(), true)) {
             $db = new \PDO('sqlite:'.$this->store);
         } else {
             throw new \RuntimeException('You need to enable either the SQLite or PDO_SQLite extension for the profiler to run properly.');
@@ -162,7 +160,7 @@ class ProfilerStorage
 
     public function purge()
     {
-        $db = $this->initDb(false);
+        $db = $this->initDb();
         $args = array(':time' => time() - $this->lifetime);
         $this->exec($db, 'DELETE FROM data WHERE created_at < :time', $args);
         $this->close($db);

@@ -57,5 +57,8 @@
     </service>
     <service id="doctrine.odm.mongodb.metadata.xml" class="%doctrine.odm.mongodb.metadata.xml_class%"><argument>%doctrine.odm.mongodb.xml_mapping_dirs%</argument></service>
     <service id="doctrine.odm.mongodb.metadata.yml" class="%doctrine.odm.mongodb.metadata.yml_class%"><argument>%doctrine.odm.mongodb.yml_mapping_dirs%</argument></service>
+
+    <!-- cache -->
+    <service id="doctrine.odm.mongodb.cache.array" class="%doctrine.odm.mongodb.cache.array_class%" />
   </services>
 </container>

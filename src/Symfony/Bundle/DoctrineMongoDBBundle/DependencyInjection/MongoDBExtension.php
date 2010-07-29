@@ -132,7 +132,7 @@ class MongoDBExtension extends Extension
 
         $methods = array(
             'setMetadataCacheImpl' => new Reference(sprintf('doctrine.odm.mongodb.%s_metadata_cache', $documentManager['name'])),
-            'setMetadataDriverImpl' => new Reference('doctrine.odm.mongodb.metadata_driver'),
+            'setMetadataDriverImpl' => new Reference('doctrine.odm.mongodb.metadata'),
             'setProxyDir' => $proxyCacheDir,
             'setProxyNamespace' => $container->getParameter('doctrine.odm.mongodb.proxy_namespace'),
             'setAutoGenerateProxyClasses' => $container->getParameter('doctrine.odm.mongodb.auto_generate_proxy_classes')
@@ -216,7 +216,7 @@ class MongoDBExtension extends Extension
 
             if ($type !== null) {
                 $mappingDriverDef->addMethodCall('addDriver', array(
-                        new Reference(sprintf('doctrine.odm.mongodb.metadata_driver.%s', $type)),
+                        new Reference(sprintf('doctrine.odm.mongodb.metadata.%s', $type)),
                         $namespace.'\\'.$class.'\\Document'
                     )
                 );
@@ -224,7 +224,7 @@ class MongoDBExtension extends Extension
         }
         $odmConfigDef->addMethodCall('setDocumentNamespaces', array($aliasMap));
 
-        $container->setDefinition('doctrine.odm.mongodb.metadata_driver', $mappingDriverDef);
+        $container->setDefinition('doctrine.odm.mongodb.metadata', $mappingDriverDef);
     }
 
     /**

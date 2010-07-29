@@ -5,8 +5,6 @@ namespace Symfony\Bundle\DoctrineBundle;
 use Symfony\Framework\Bundle\Bundle;
 use Symfony\Components\DependencyInjection\ParameterBag\ParameterBagInterface;
 use Symfony\Components\DependencyInjection\ContainerBuilder;
-use Symfony\Components\DependencyInjection\Loader\Loader;
-use Symfony\Components\DependencyInjection\Loader\XmlFileLoader;
 use Symfony\Bundle\DoctrineBundle\DependencyInjection\DoctrineExtension;
 
 /*

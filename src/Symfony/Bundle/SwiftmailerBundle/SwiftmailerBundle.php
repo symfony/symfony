@@ -5,7 +5,6 @@ namespace Symfony\Bundle\SwiftmailerBundle;
 use Symfony\Framework\Bundle\Bundle;
 use Symfony\Components\DependencyInjection\ParameterBag\ParameterBagInterface;
 use Symfony\Components\DependencyInjection\ContainerBuilder;
-use Symfony\Components\DependencyInjection\Loader\Loader;
 use Symfony\Bundle\SwiftmailerBundle\DependencyInjection\SwiftmailerExtension;
 
 /*

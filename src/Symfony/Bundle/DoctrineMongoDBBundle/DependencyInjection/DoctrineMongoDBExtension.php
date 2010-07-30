@@ -16,7 +16,7 @@ use Symfony\Components\DependencyInjection\Resource\FileResource;
  * @author Kris Wallsmith <kris.wallsmith@symfony-project.com>
  * @author Jonathan H. Wage <jonwage@gmail.com>
  */
-class MongoDBExtension extends Extension
+class DoctrineMongoDBExtension extends Extension
 {
     protected $resources = array(
         'mongodb' => 'mongodb.xml',

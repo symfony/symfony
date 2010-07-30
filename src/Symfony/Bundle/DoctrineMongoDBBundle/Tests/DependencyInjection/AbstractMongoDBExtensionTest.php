@@ -12,7 +12,7 @@
 namespace Symfony\Bundle\DoctrineMongoDBBundle\Tests\DependencyInjection;
 
 use Symfony\Bundle\DoctrineMongoDBBundle\Tests\TestCase;
-use Symfony\Bundle\DoctrineMongoDBBundle\DependencyInjection\MongoDBExtension;
+use Symfony\Bundle\DoctrineMongoDBBundle\DependencyInjection\DoctrineMongoDBExtension;
 use Symfony\Components\DependencyInjection\ContainerBuilder;
 use Symfony\Components\DependencyInjection\Loader\XmlFileLoader;
 use Symfony\Components\DependencyInjection\Loader\YamlFileLoader;
@@ -314,6 +314,6 @@ abstract class AbstractMongoDBExtensionTest extends TestCase
         require_once __DIR__.'/Fixtures/Bundles/'.$bundle.'/'.$bundle.'.php';
         $bundleDirs = array('DoctrineMongoDBBundle\\Tests\\DependencyInjection\\Fixtures\\Bundles' => __DIR__.'/Fixtures/Bundles');
         $bundles = array('DoctrineMongoDBBundle\\Tests\\DependencyInjection\\Fixtures\\Bundles\\'.$bundle.'\\'.$bundle);
-        return new MongoDBExtension($bundleDirs, $bundles, sys_get_temp_dir());
+        return new DoctrineMongoDBExtension($bundleDirs, $bundles, sys_get_temp_dir());
     }
 }

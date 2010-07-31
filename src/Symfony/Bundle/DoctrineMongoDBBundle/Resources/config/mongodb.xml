@@ -7,6 +7,7 @@
   <parameters>
     <parameter key="doctrine.odm.mongodb.default_document_manager">default</parameter>
     <parameter key="doctrine.odm.mongodb.default_connection">default</parameter>
+    <parameter key="doctrine.odm.mongodb.default_database">default</parameter>
     <parameter key="doctrine.odm.mongodb.metadata_cache_driver">array</parameter>
     <parameter key="doctrine.odm.mongodb.connection_class">Doctrine\ODM\MongoDB\Mongo</parameter>
     <parameter key="doctrine.odm.mongodb.configuration_class">Doctrine\ODM\MongoDB\Configuration</parameter>

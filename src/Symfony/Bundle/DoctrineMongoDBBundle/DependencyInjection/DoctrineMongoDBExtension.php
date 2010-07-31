@@ -87,7 +87,8 @@ class DoctrineMongoDBExtension extends Extension
             'cache_driver',
             'metadata_cache_driver',
             'proxy_namespace',
-            'auto_generate_proxy_classes'
+            'auto_generate_proxy_classes',
+            'default_database',
         );
         foreach ($options as $key) {
             if (isset($config[$key])) {
@@ -135,7 +136,8 @@ class DoctrineMongoDBExtension extends Extension
             'setMetadataDriverImpl' => new Reference('doctrine.odm.mongodb.metadata'),
             'setProxyDir' => $proxyCacheDir,
             'setProxyNamespace' => $container->getParameter('doctrine.odm.mongodb.proxy_namespace'),
-            'setAutoGenerateProxyClasses' => $container->getParameter('doctrine.odm.mongodb.auto_generate_proxy_classes')
+            'setAutoGenerateProxyClasses' => $container->getParameter('doctrine.odm.mongodb.auto_generate_proxy_classes'),
+            'setDefaultDB' => $container->getParameter('doctrine.odm.mongodb.default_database'),
         );
         foreach ($methods as $method => $arg) {
             $odmConfigDef->addMethodCall($method, array($arg));

@@ -6,7 +6,7 @@
     xsi:schemaLocation="http://www.symfony-project.org/schema/dic/services http://www.symfony-project.org/schema/dic/services/services-1.0.xsd
                         http://www.symfony-project.org/schema/dic/doctrine/odm/mongodb http://www.symfony-project.org/schema/dic/doctrine/odm/mongodb/mongodb-1.0.xsd">
 
-    <doctrine:mongodb server="mongodb://localhost:27017">
+    <doctrine:mongodb server="mongodb://localhost:27017" default_database="mydb">
         <metadata_cache_driver type="memcache">
             <class>Doctrine\Common\Cache\MemcacheCache</class>
             <host>localhost</host>

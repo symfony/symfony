@@ -1,5 +1,6 @@
 doctrine_odm.mongodb:
   server: mongodb://localhost:27017
+  default_database: mydb
   options: { connect: true }
   metadata_cache_driver:
     type: memcache

@@ -14,8 +14,6 @@ namespace Symfony\Components\Routing\Generator;
 /**
  * UrlGeneratorInterface is the interface that all URL generator classes must implements.
  *
- * @package    Symfony
- * @subpackage Components_Routing
  * @author     Fabien Potencier <fabien.potencier@symfony-project.com>
  */
 interface UrlGeneratorInterface

@@ -23,8 +23,6 @@ use Symfony\Components\DependencyInjection\ContainerBuilder;
 /**
  * KernelBundle.
  *
- * @package    Symfony
- * @subpackage Framework
  * @author     Fabien Potencier <fabien.potencier@symfony-project.com>
  */
 class KernelBundle extends Bundle

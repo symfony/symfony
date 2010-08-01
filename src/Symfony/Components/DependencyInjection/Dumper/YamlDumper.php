@@ -19,8 +19,6 @@ use Symfony\Components\DependencyInjection\Reference;
 /**
  * YamlDumper dumps a service container as a YAML string.
  *
- * @package    Symfony
- * @subpackage Components_DependencyInjection
  * @author     Fabien Potencier <fabien.potencier@symfony-project.com>
  */
 class YamlDumper extends Dumper

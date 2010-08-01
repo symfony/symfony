@@ -18,8 +18,6 @@ use Symfony\Components\Routing\Resource\FileResource;
 /**
  * ClosureLoader loads routes from a PHP closure.
  *
- * @package    Symfony
- * @subpackage Components_Routing
  * @author     Fabien Potencier <fabien.potencier@symfony-project.com>
  */
 class ClosureLoader extends Loader

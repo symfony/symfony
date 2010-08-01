@@ -13,8 +13,6 @@ namespace Symfony\Components\EventDispatcher;
 /**
  * Event.
  *
- * @package    Symfony
- * @subpackage Components_EventDispatcher
  * @author     Fabien Potencier <fabien.potencier@symfony-project.com>
  */
 class Event implements \ArrayAccess

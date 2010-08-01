@@ -16,8 +16,6 @@ use Symfony\Components\DependencyInjection\ContainerBuilder;
 /**
  * Loader is the abstract class used by all built-in loaders.
  *
- * @package    Symfony
- * @subpackage Components_DependencyInjection
  * @author     Fabien Potencier <fabien.potencier@symfony-project.com>
  */
 abstract class Loader implements LoaderInterface

@@ -16,8 +16,6 @@ namespace Symfony\Components\Finder\Iterator;
  *
  * It currently supports Subversion, CVS, DARCS, Gnu Arch, Monotone, Bazaar-NG, GIT, and Mercurial.
  *
- * @package    Symfony
- * @subpackage Components_Finder
  * @author     Fabien Potencier <fabien.potencier@symfony-project.com>
  */
 class IgnoreVcsFilterIterator extends ExcludeDirectoryFilterIterator

@@ -15,8 +15,6 @@ namespace Symfony\Components\Process;
  * Process is a thin wrapper around proc_* functions to ease
  * the forking processes from PHP.
  *
- * @package    Symfony
- * @subpackage Components_Process
  * @author     Fabien Potencier <fabien.potencier@symfony-project.com>
  */
 class Process

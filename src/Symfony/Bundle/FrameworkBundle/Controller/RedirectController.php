@@ -16,8 +16,6 @@ use Symfony\Bundle\FrameworkBundle\Controller;
 /**
  *
  *
- * @package    Symfony
- * @subpackage Bundle_FrameworkBundle
  * @author     Fabien Potencier <fabien.potencier@symfony-project.com>
  */
 class RedirectController extends Controller

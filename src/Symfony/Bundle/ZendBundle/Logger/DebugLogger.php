@@ -16,8 +16,6 @@ use Zend\Log\Writer\AbstractWriter;
 /**
  * DebugLogger.
  *
- * @package    Symfony
- * @subpackage Bundle_ZendBundle
  * @author     Fabien Potencier <fabien.potencier@symfony-project.com>
  */
 class DebugLogger extends AbstractWriter

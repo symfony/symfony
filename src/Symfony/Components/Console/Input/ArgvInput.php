@@ -31,8 +31,6 @@ namespace Symfony\Components\Console\Input;
  * the same rules as the argv one. It's almost always better to use the
  * `StringInput` when you want to provide your own input.
  *
- * @package    Symfony
- * @subpackage Components_Console
  * @author     Fabien Potencier <fabien.potencier@symfony-project.com>
  *
  * @see http://www.gnu.org/software/libc/manual/html_node/Argument-Syntax.html

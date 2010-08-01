@@ -16,8 +16,6 @@ use Symfony\Framework\Bundle\Bundle;
 /**
  * Bundle.
  *
- * @package    Symfony
- * @subpackage Bundle_DoctrineBundle
  * @author     Fabien Potencier <fabien.potencier@symfony-project.com>
  * @author     Jonathan H. Wage <jonwage@gmail.com>
  */

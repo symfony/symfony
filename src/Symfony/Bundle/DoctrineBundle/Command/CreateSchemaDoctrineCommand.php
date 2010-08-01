@@ -21,8 +21,6 @@ use Doctrine\ORM\Tools\Console\Command\SchemaTool\CreateCommand;
 /**
  * Command to create the database schema for a set of classes based on their mappings.
  *
- * @package    Symfony
- * @subpackage Bundle_DoctrineBundle
  * @author     Fabien Potencier <fabien.potencier@symfony-project.com>
  * @author     Jonathan H. Wage <jonwage@gmail.com>
  */

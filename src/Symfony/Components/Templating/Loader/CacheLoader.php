@@ -21,8 +21,6 @@ use Symfony\Components\Templating\Storage\FileStorage;
  * This cache only caches on disk to allow PHP accelerators to cache the opcodes.
  * All other mechanism would imply the use of `eval()`.
  *
- * @package    Symfony
- * @subpackage Components_Templating
  * @author     Fabien Potencier <fabien.potencier@symfony-project.com>
  */
 class CacheLoader extends Loader

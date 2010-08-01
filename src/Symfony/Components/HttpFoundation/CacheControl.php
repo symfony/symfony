@@ -17,8 +17,6 @@ namespace Symfony\Components\HttpFoundation;
  * This class knows about allowed attributes
  * (and those that only apply to requests or responses).
  *
- * @package    Symfony
- * @subpackage Components_HttpFoundation
  * @author     Fabien Potencier <fabien.potencier@symfony-project.com>
  */
 class CacheControl

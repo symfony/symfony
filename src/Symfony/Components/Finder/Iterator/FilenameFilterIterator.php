@@ -16,8 +16,6 @@ use Symfony\Components\Finder\Glob;
 /**
  * FilenameFilterIterator filters files by patterns (a regexp, a glob, or a string).
  *
- * @package    Symfony
- * @subpackage Components_Finder
  * @author     Fabien Potencier <fabien.potencier@symfony-project.com>
  */
 class FilenameFilterIterator extends \FilterIterator

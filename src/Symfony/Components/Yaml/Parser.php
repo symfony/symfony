@@ -13,8 +13,6 @@ namespace Symfony\Components\Yaml;
 /**
  * Parser parses YAML strings to convert them to PHP arrays.
  *
- * @package    Symfony
- * @subpackage Components_Yaml
  * @author     Fabien Potencier <fabien.potencier@symfony-project.com>
  */
 class Parser

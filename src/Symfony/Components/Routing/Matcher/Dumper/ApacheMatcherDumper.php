@@ -16,8 +16,6 @@ use Symfony\Components\Routing\Route;
 /**
  * ApacheMatcherDumper dumps a matcher in the Apache .htaccess format.
  *
- * @package    Symfony
- * @subpackage Components_Routing
  * @author     Fabien Potencier <fabien.potencier@symfony-project.com>
  */
 class ApacheMatcherDumper extends MatcherDumper

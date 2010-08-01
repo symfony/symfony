@@ -17,8 +17,6 @@ use Doctrine\DBAL\Logging\DebugStack;
 /**
  * DbalLogger.
  *
- * @package    Symfony
- * @subpackage Bundle_DoctrineBundle
  * @author     Fabien Potencier <fabien.potencier@symfony-project.com>
  */
 class DbalLogger extends DebugStack

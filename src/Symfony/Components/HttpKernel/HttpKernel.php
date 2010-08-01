@@ -21,8 +21,6 @@ use Symfony\Components\HttpFoundation\Response;
 /**
  * HttpKernel notifies events to convert a Request object to a Response one.
  *
- * @package    Symfony
- * @subpackage Components_HttpKernel
  * @author     Fabien Potencier <fabien.potencier@symfony-project.com>
  */
 class HttpKernel implements HttpKernelInterface

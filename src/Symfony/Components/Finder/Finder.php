@@ -23,8 +23,6 @@ namespace Symfony\Components\Finder;
  * $finder = new Finder();
  * $finder = $finder->files()->name('*.php')->in(__DIR__);
  *
- * @package    Symfony
- * @subpackage Components_Finder
  * @author     Fabien Potencier <fabien.potencier@symfony-project.com>
  */
 class Finder implements \IteratorAggregate

@@ -21,8 +21,6 @@ use Symfony\Components\Console\Command\Command;
 /**
  * ListCommand displays the list of all available commands for the application.
  *
- * @package    Symfony
- * @subpackage Components_Console
  * @author     Fabien Potencier <fabien.potencier@symfony-project.com>
  */
 class ListCommand extends Command

@@ -18,8 +18,6 @@ use Symfony\Components\DependencyInjection\ParameterBag\ParameterBagInterface;
 /**
  * BundleInterface.
  *
- * @package    Symfony
- * @subpackage Framework
  * @author     Fabien Potencier <fabien.potencier@symfony-project.com>
  */
 interface BundleInterface

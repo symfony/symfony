@@ -14,8 +14,6 @@ namespace Symfony\Components\DependencyInjection\Resource;
 /**
  * ResourceInterface is the interface that must be implemented by all Resource classes.
  *
- * @package    Symfony
- * @subpackage Components_DependencyInjection
  * @author     Fabien Potencier <fabien.potencier@symfony-project.com>
  */
 interface ResourceInterface

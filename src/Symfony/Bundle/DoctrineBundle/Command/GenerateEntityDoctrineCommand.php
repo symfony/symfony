@@ -23,8 +23,6 @@ use Doctrine\ORM\Mapping\ClassMetadataInfo;
 /**
  * Initialize a new Doctrine entity inside a bundle.
  *
- * @package    Symfony
- * @subpackage Bundle_DoctrineBundle
  * @author     Fabien Potencier <fabien.potencier@symfony-project.com>
  * @author     Jonathan H. Wage <jonwage@gmail.com>
  */

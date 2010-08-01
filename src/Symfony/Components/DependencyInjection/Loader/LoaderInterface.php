@@ -22,8 +22,6 @@ use Symfony\Components\DependencyInjection\ContainerBuilder;
  * $container = new ContainerBuilder();
  * $container->merge($config);
  *
- * @package    Symfony
- * @subpackage Components_DependencyInjection
  * @author     Fabien Potencier <fabien.potencier@symfony-project.com>
  */
 interface LoaderInterface

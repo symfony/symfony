@@ -20,8 +20,6 @@ use Symfony\Components\Finder\Finder;
 /**
  * Bundle.
  *
- * @package    Symfony
- * @subpackage Framework
  * @author     Fabien Potencier <fabien.potencier@symfony-project.com>
  */
 abstract class Bundle implements BundleInterface

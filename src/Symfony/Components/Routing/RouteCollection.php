@@ -16,8 +16,6 @@ use Symfony\Components\Routing\Resource\ResourceInterface;
 /**
  * A RouteCollection represents a set of Route instances.
  *
- * @package    Symfony
- * @subpackage Components_Routing
  * @author     Fabien Potencier <fabien.potencier@symfony-project.com>
  */
 class RouteCollection

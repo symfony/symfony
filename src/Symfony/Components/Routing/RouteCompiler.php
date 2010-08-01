@@ -14,8 +14,6 @@ namespace Symfony\Components\Routing;
 /**
  * RouteCompiler compiles Route instances to CompiledRoute instances.
  *
- * @package    Symfony
- * @subpackage Components_Routing
  * @author     Fabien Potencier <fabien.potencier@symfony-project.com>
  */
 class RouteCompiler implements RouteCompilerInterface

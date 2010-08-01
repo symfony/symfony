@@ -21,8 +21,6 @@ namespace Symfony\Components\Templating\Helper;
  *   echo $this->javascripts;
  * </code>
  *
- * @package    Symfony
- * @subpackage Components_Templating
  * @author     Fabien Potencier <fabien.potencier@symfony-project.com>
  */
 class JavascriptsHelper extends Helper

@@ -21,8 +21,6 @@ use Symfony\Bundle\FrameworkBundle\Util\Filesystem;
 /**
  * AssetsInstallCommand.
  *
- * @package    Symfony
- * @subpackage Bundle_FrameworkBundle
  * @author     Fabien Potencier <fabien.potencier@symfony-project.com>
  */
 class AssetsInstallCommand extends Command

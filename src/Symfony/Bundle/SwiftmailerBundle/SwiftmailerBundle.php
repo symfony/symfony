@@ -20,8 +20,6 @@ use Symfony\Bundle\SwiftmailerBundle\DependencyInjection\SwiftmailerExtension;
 /**
  * Bundle.
  *
- * @package    Symfony
- * @subpackage Bundle_SwiftmailerBundle
  * @author     Fabien Potencier <fabien.potencier@symfony-project.com>
  */
 class SwiftmailerBundle extends Bundle

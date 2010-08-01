@@ -14,8 +14,6 @@ namespace Symfony\Components\Yaml;
 /**
  * Exception class used by all exceptions thrown by the component.
  *
- * @package    Symfony
- * @subpackage Components_Yaml
  * @author     Fabien Potencier <fabien.potencier@symfony-project.com>
  */
 class Exception extends \Exception

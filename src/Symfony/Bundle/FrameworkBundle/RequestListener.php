@@ -21,8 +21,6 @@ use Symfony\Components\HttpKernel\HttpKernelInterface;
 /**
  * RequestListener.
  *
- * @package    Symfony
- * @subpackage Bundle_FrameworkBundle
  * @author     Fabien Potencier <fabien.potencier@symfony-project.com>
  */
 class RequestListener

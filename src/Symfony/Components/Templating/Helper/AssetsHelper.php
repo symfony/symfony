@@ -20,8 +20,6 @@ namespace Symfony\Components\Templating\Helper;
  *   <img src="<?php echo $this->assets->getUrl('foo.png') ?>" />
  * </code>
  *
- * @package    Symfony
- * @subpackage Components_Templating
  * @author     Fabien Potencier <fabien.potencier@symfony-project.com>
  */
 class AssetsHelper extends Helper

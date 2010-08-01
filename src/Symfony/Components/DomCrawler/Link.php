@@ -14,8 +14,6 @@ namespace Symfony\Components\DomCrawler;
 /**
  * Link represents an HTML link (an HTML a tag).
  *
- * @package    Symfony
- * @subpackage Components_DomCrawler
  * @author     Fabien Potencier <fabien.potencier@symfony-project.com>
  */
 class Link

@@ -24,8 +24,6 @@ use Symfony\Components\HttpKernel\HttpKernelInterface;
  *
  *  * Edge Architecture Specification (http://www.w3.org/TR/edge-arch)
  *
- * @package    Symfony
- * @subpackage Components_HttpKernel
  * @author     Fabien Potencier <fabien.potencier@symfony-project.com>
  */
 class Esi

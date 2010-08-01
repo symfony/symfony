@@ -16,8 +16,6 @@ use Symfony\Components\HttpKernel\Profiler\Profiler;
 /**
  * DataCollector.
  *
- * @package    Symfony
- * @subpackage Components_HttpKernel
  * @author     Fabien Potencier <fabien.potencier@symfony-project.com>
  */
 abstract class DataCollector implements DataCollectorInterface

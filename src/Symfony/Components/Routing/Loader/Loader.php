@@ -14,8 +14,6 @@ namespace Symfony\Components\Routing\Loader;
 /**
  * Loader is the abstract class used by all built-in loaders.
  *
- * @package    Symfony
- * @subpackage Components_Routing
  * @author     Fabien Potencier <fabien.potencier@symfony-project.com>
  */
 abstract class Loader implements LoaderInterface

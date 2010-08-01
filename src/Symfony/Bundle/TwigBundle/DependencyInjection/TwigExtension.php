@@ -18,8 +18,6 @@ use Symfony\Components\DependencyInjection\ContainerBuilder;
 /**
  * TwigExtension.
  *
- * @package    Symfony
- * @subpackage Bundle_TwigBundle
  * @author     Fabien Potencier <fabien.potencier@symfony-project.com>
  */
 class TwigExtension extends Extension

@@ -14,8 +14,6 @@ namespace Symfony\Components\Finder\Iterator;
 /**
  * SortableIterator applies a sort on a given Iterator.
  *
- * @package    Symfony
- * @subpackage Components_Finder
  * @author     Fabien Potencier <fabien.potencier@symfony-project.com>
  */
 class SortableIterator extends \ArrayIterator

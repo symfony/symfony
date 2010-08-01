@@ -21,8 +21,6 @@ use Symfony\Bundle\TwigBundle\DependencyInjection\TwigExtension;
 /**
  * Bundle.
  *
- * @package    Symfony
- * @subpackage Bundle_TwigBundle
  * @author     Fabien Potencier <fabien.potencier@symfony-project.com>
  */
 class TwigBundle extends Bundle

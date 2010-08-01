@@ -13,8 +13,6 @@ namespace Symfony\Components\Yaml;
 /**
  * Dumper dumps PHP variables to YAML strings.
  *
- * @package    Symfony
- * @subpackage Components_Yaml
  * @author     Fabien Potencier <fabien.potencier@symfony-project.com>
  */
 class Dumper

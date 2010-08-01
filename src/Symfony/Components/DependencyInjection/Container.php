@@ -50,8 +50,6 @@ use Symfony\Components\DependencyInjection\ParameterBag\FrozenParameterBag;
  *  * IGNORE_ON_INVALID_REFERENCE:    Ignores the wrapping command asking for the reference
  *                                    (for instance, ignore a setter if the service does not exist)
  *
- * @package    Symfony
- * @subpackage Components_DependencyInjection
  * @author     Fabien Potencier <fabien.potencier@symfony-project.com>
  */
 class Container implements ContainerInterface, \ArrayAccess

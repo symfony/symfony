@@ -16,8 +16,6 @@ use Symfony\Components\Routing\RouteCollection;
 /**
  * DelegatingLoader delegates route loading to other loaders using a loader resolver.
  *
- * @package    Symfony
- * @subpackage Components_Routing
  * @author     Fabien Potencier <fabien.potencier@symfony-project.com>
  */
 class DelegatingLoader extends Loader

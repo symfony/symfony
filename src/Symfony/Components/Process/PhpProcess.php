@@ -14,8 +14,6 @@ namespace Symfony\Components\Process;
 /**
  * PhpProcess runs a PHP script in a forked process.
  *
- * @package    Symfony
- * @subpackage Components_Process
  * @author     Fabien Potencier <fabien.potencier@symfony-project.com>
  */
 class PhpProcess extends Process

@@ -17,8 +17,6 @@ use Symfony\Components\DependencyInjection\ContainerInterface;
 /**
  * AppDataCollector.
  *
- * @package    Symfony
- * @subpackage Bundle_FrameworkBundle
  * @author     Fabien Potencier <fabien.potencier@symfony-project.com>
  */
 class AppDataCollector extends DataCollector

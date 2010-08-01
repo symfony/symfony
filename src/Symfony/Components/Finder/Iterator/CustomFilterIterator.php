@@ -17,8 +17,6 @@ namespace Symfony\Components\Finder\Iterator;
  * The anonymous function receives a \SplFileInfo and must return false
  * to remove files.
  *
- * @package    Symfony
- * @subpackage Components_Finder
  * @author     Fabien Potencier <fabien.potencier@symfony-project.com>
  */
 class CustomFilterIterator extends \FilterIterator

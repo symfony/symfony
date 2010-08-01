@@ -16,8 +16,6 @@ use Symfony\Components\Templating\Storage\Storage;
 
 /**
  *
- * @package    Symfony
- * @subpackage Bundle_TwigBundle
  * @author     Fabien Potencier <fabien.potencier@symfony-project.com>
  */
 class Renderer extends BaseRenderer

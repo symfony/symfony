@@ -22,8 +22,6 @@ use Symfony\Components\I18N\TranslatorInterface;
 /**
  * FieldGroup represents an array of widgets bind to names and values.
  *
- * @package    symfony
- * @subpackage form
  * @author     Fabien Potencier <fabien.potencier@symfony-project.com>
  * @version    SVN: $Id: FieldGroup.php 247 2010-02-01 09:24:55Z bernhard $
  */

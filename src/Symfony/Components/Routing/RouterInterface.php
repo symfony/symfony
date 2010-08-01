@@ -19,8 +19,6 @@ use Symfony\Components\Routing\Matcher\UrlMatcherInterface;
  *
  * This interface is the concatenation of UrlMatcherInterface and UrlGeneratorInterface.
  *
- * @package    Symfony
- * @subpackage Components_Routing
  * @author     Fabien Potencier <fabien.potencier@symfony-project.com>
  */
 interface RouterInterface extends UrlMatcherInterface, UrlGeneratorInterface

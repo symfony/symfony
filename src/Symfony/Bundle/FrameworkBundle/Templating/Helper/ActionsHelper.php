@@ -18,8 +18,6 @@ use Symfony\Bundle\FrameworkBundle\Controller\ControllerResolver;
 /**
  * ActionsHelper.
  *
- * @package    Symfony
- * @subpackage Bundle_FrameworkBundle
  * @author     Fabien Potencier <fabien.potencier@symfony-project.com>
  */
 class ActionsHelper extends Helper

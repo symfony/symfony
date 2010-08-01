@@ -27,8 +27,6 @@ use Symfony\Components\File\UploadedFile;
  * Csrf secret. If the global Csrf secret is also null, then a random one
  * is generated on the fly.
  *
- * @package    symfony
- * @subpackage form
  * @author     Fabien Potencier <fabien.potencier@symfony-project.com>
  * @version    SVN: $Id: Form.php 245 2010-01-31 22:22:39Z flo $
  */

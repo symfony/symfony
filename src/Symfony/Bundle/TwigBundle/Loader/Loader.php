@@ -17,8 +17,6 @@ use Symfony\Components\Templating\Storage\FileStorage;
 
 /**
  *
- * @package    Symfony
- * @subpackage Bundle_TwigBundle
  * @author     Fabien Potencier <fabien.potencier@symfony-project.com>
  */
 class Loader implements \Twig_LoaderInterface

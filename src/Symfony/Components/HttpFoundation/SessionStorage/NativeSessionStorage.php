@@ -14,8 +14,6 @@ namespace Symfony\Components\HttpFoundation\SessionStorage;
 /**
  * NativeSessionStorage.
  *
- * @package    Symfony
- * @subpackage Components_HttpFoundation
  * @author     Fabien Potencier <fabien.potencier@symfony-project.com>
  */
 class NativeSessionStorage implements SessionStorageInterface

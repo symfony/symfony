@@ -16,8 +16,6 @@ use Symfony\Components\Routing\Loader\LoaderResolver;
 /**
  * LoaderInterface is the interface that all loaders classes must implement.
  *
- * @package    Symfony
- * @subpackage Components_Routing
  * @author     Fabien Potencier <fabien.potencier@symfony-project.com>
  */
 interface LoaderInterface

@@ -18,8 +18,6 @@ use Symfony\Components\Templating\Storage\StringStorage;
 /**
  * PhpRenderer is a renderer for PHP templates.
  *
- * @package    Symfony
- * @subpackage Components_Templating
  * @author     Fabien Potencier <fabien.potencier@symfony-project.com>
  */
 class PhpRenderer extends Renderer

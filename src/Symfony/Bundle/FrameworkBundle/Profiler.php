@@ -19,8 +19,6 @@ use Symfony\Components\HttpKernel\LoggerInterface;
 /**
  * Profiler.
  *
- * @package    Symfony
- * @subpackage Bundle_FrameworkBundle
  * @author     Fabien Potencier <fabien.potencier@symfony-project.com>
  */
 class Profiler extends BaseProfiler

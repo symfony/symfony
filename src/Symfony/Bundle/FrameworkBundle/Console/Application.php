@@ -20,8 +20,6 @@ use Symfony\Framework\Kernel;
 /**
  * Application.
  *
- * @package    Symfony
- * @subpackage Bundle_FrameworkBundle
  * @author     Fabien Potencier <fabien.potencier@symfony-project.com>
  */
 class Application extends BaseApplication

@@ -14,8 +14,6 @@ namespace Symfony\Components\DependencyInjection\ParameterBag;
 /**
  * ParameterBagInterface.
  *
- * @package    Symfony
- * @subpackage Components_DependencyInjection
  * @author     Fabien Potencier <fabien.potencier@symfony-project.com>
  */
 interface ParameterBagInterface

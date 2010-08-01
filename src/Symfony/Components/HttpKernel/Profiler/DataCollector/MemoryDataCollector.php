@@ -14,8 +14,6 @@ namespace Symfony\Components\HttpKernel\Profiler\DataCollector;
 /**
  * MemoryDataCollector.
  *
- * @package    Symfony
- * @subpackage Components_HttpKernel
  * @author     Fabien Potencier <fabien.potencier@symfony-project.com>
  */
 class MemoryDataCollector extends DataCollector

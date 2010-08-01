@@ -19,8 +19,6 @@ use Doctrine\ORM\Tools\EntityRepositoryGenerator;
 /**
  * Command to generate repository classes for mapping information.
  *
- * @package    Symfony
- * @subpackage Bundle_DoctrineBundle
  * @author     Fabien Potencier <fabien.potencier@symfony-project.com>
  * @author     Jonathan H. Wage <jonwage@gmail.com>
  */

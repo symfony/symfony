@@ -17,8 +17,6 @@ use Symfony\Components\Routing\Route;
 /**
  * GeneratorDumper is the base class for all built-in generator dumpers.
  *
- * @package    Symfony
- * @subpackage Components_Routing
  * @author     Fabien Potencier <fabien.potencier@symfony-project.com>
  */
 abstract class GeneratorDumper implements GeneratorDumperInterface

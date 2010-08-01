@@ -14,8 +14,6 @@ namespace Symfony\Components\Routing\Matcher\Dumper;
 /**
  * MatcherDumperInterface is the interface that all matcher dumper classes must implement.
  *
- * @package    Symfony
- * @subpackage Components_Routing
  * @author     Fabien Potencier <fabien.potencier@symfony-project.com>
  */
 interface MatcherDumperInterface

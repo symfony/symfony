@@ -14,8 +14,6 @@ namespace Symfony\Components\HttpKernel\Exception;
 /**
  * NotFoundHttpException.
  *
- * @package    Symfony
- * @subpackage Components_HttpKernel
  * @author     Fabien Potencier <fabien.potencier@symfony-project.com>
  */
 class NotFoundHttpException extends HttpException

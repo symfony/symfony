@@ -18,8 +18,6 @@ use Symfony\Components\HttpFoundation\Response;
 /**
  * ResponseListener.
  *
- * @package    Symfony
- * @subpackage Components_HttpKernel
  * @author     Fabien Potencier <fabien.potencier@symfony-project.com>
  */
 class ResponseListener

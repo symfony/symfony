@@ -14,8 +14,6 @@ namespace Symfony\Components\Routing\Resource;
 /**
  * FileResource represents a resource stored on the filesystem.
  *
- * @package    Symfony
- * @subpackage Components_Routing
  * @author     Fabien Potencier <fabien.potencier@symfony-project.com>
  */
 class FileResource implements ResourceInterface

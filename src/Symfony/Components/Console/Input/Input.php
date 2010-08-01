@@ -20,8 +20,6 @@ namespace Symfony\Components\Console\Input;
  *  * `StringInput`: The input is provided as a string
  *  * `ArrayInput`: The input is provided as an array
  *
- * @package    Symfony
- * @subpackage Components_Console
  * @author     Fabien Potencier <fabien.potencier@symfony-project.com>
  */
 abstract class Input implements InputInterface

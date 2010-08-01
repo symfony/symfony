@@ -18,8 +18,6 @@ use Symfony\Components\Routing\Resource\FileResource;
 /**
  * XmlFileLoader loads XML routing files.
  *
- * @package    Symfony
- * @subpackage Components_Routing
  * @author     Fabien Potencier <fabien.potencier@symfony-project.com>
  */
 class XmlFileLoader extends FileLoader

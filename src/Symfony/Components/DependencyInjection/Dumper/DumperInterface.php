@@ -14,8 +14,6 @@ namespace Symfony\Components\DependencyInjection\Dumper;
 /**
  * DumperInterface is the interface implemented by service container dumper classes.
  *
- * @package    Symfony
- * @subpackage Components_DependencyInjection
  * @author     Fabien Potencier <fabien.potencier@symfony-project.com>
  */
 interface DumperInterface

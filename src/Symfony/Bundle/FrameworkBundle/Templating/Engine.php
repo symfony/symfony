@@ -20,8 +20,6 @@ use Symfony\Components\DependencyInjection\ContainerInterface;
  * This engine knows how to render Symfony templates and automatically
  * escapes template parameters.
  *
- * @package    Symfony
- * @subpackage Bundle_FrameworkBundle
  * @author     Fabien Potencier <fabien.potencier@symfony-project.com>
  */
 class Engine extends BaseEngine

@@ -14,8 +14,6 @@ namespace Symfony\Bundle\FrameworkBundle\Util;
 /**
  * Mustache.
  *
- * @package    Symfony
- * @subpackage Bundle_FrameworkBundle
  * @author     Fabien Potencier <fabien.potencier@symfony-project.com>
  */
 class Mustache

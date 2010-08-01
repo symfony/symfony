@@ -19,8 +19,6 @@ use Doctrine\ORM\Tools\Console\Command\ClearCache\ResultCommand;
 /**
  * Command to clear the result cache of the various cache drivers.
  *
- * @package    Symfony
- * @subpackage Bundle_DoctrineBundle
  * @author     Fabien Potencier <fabien.potencier@symfony-project.com>
  * @author     Jonathan H. Wage <jonwage@gmail.com>
  */

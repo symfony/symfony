@@ -21,8 +21,6 @@ use Symfony\Components\Console\Command\Command as BaseCommand;
 /**
  * Command.
  *
- * @package    Symfony
- * @subpackage Bundle_FrameworkBundle
  * @author     Fabien Potencier <fabien.potencier@symfony-project.com>
  */
 abstract class Command extends BaseCommand

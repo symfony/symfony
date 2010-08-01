@@ -14,8 +14,6 @@ namespace Symfony\Components\OutputEscaper;
 /**
  * Abstract class that provides an interface for escaping of output.
  *
- * @package    Symfony
- * @subpackage Components_OutputEscaper
  * @author     Fabien Potencier <fabien.potencier@symfony-project.com>
  * @author     Mike Squire <mike@somosis.co.uk>
  */

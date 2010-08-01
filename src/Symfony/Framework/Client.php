@@ -23,8 +23,6 @@ use Symfony\Components\HttpFoundation\Response;
 /**
  * Client simulates a browser and makes requests to a Kernel object.
  *
- * @package    Symfony
- * @subpackage Framework
  * @author     Fabien Potencier <fabien.potencier@symfony-project.com>
  */
 class Client extends BaseClient

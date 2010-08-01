@@ -17,8 +17,6 @@ use Symfony\Components\DependencyInjection\ContainerInterface;
 /**
  * DoctrineDataCollector.
  *
- * @package    Symfony
- * @subpackage Bundle_DoctrineBundle
  * @author     Fabien Potencier <fabien.potencier@symfony-project.com>
  */
 class DoctrineDataCollector extends DataCollector

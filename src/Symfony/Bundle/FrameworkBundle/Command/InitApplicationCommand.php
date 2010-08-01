@@ -23,8 +23,6 @@ use Symfony\Bundle\FrameworkBundle\Util\Mustache;
 /**
  * Initializes a new application.
  *
- * @package    symfony
- * @subpackage console
  * @author     Fabien Potencier <fabien.potencier@symfony-project.com>
  */
 class InitApplicationCommand extends BaseCommand

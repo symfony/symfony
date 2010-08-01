@@ -16,8 +16,6 @@ use Symfony\Components\DependencyInjection\ContainerInterface;
 /**
  * ExceptionFormatter.
  *
- * @package    Symfony
- * @subpackage Bundle_FrameworkBundle
  * @author     Fabien Potencier <fabien.potencier@symfony-project.com>
  */
 class ExceptionFormatter

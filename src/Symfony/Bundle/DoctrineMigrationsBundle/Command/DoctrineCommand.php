@@ -19,8 +19,6 @@ use Doctrine\Common\Util\Inflector;
 /**
  * Base class for Doctrine console commands to extend from.
  *
- * @package    Symfony
- * @subpackage Bundle_DoctrineBundle
  * @author     Fabien Potencier <fabien.potencier@symfony-project.com>
  */
 abstract class DoctrineCommand extends BaseCommand

@@ -14,8 +14,6 @@ namespace Symfony\Components\DependencyInjection;
 /**
  * AnnotatedContainerInterface is the interface implemented when a container knows how to deals with annotations.
  *
- * @package    Symfony
- * @subpackage Components_DependencyInjection
  * @author     Fabien Potencier <fabien.potencier@symfony-project.com>
  */
 interface AnnotatedContainerInterface

@@ -17,8 +17,6 @@ use Symfony\Framework\Client;
 /**
  * WebTestCase is the base class for functional tests.
  *
- * @package    Symfony
- * @subpackage Framework
  * @author     Fabien Potencier <fabien.potencier@symfony-project.com>
  */
 abstract class WebTestCase extends BaseWebTestCase

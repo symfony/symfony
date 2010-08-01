@@ -23,8 +23,6 @@ use Symfony\Components\Yaml\Yaml;
  *
  * The YAML format does not support anonymous services (cf. the XML loader).
  *
- * @package    Symfony
- * @subpackage Components_DependencyInjection
  * @author     Fabien Potencier <fabien.potencier@symfony-project.com>
  */
 class YamlFileLoader extends FileLoader

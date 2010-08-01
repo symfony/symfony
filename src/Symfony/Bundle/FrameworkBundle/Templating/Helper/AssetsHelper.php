@@ -17,8 +17,6 @@ use Symfony\Components\Templating\Helper\AssetsHelper as BaseAssetsHelper;
 /**
  * AssetsHelper is the base class for all helper classes that manages assets.
  *
- * @package    Symfony
- * @subpackage Bundle_FrameworkBundle
  * @author     Fabien Potencier <fabien.potencier@symfony-project.com>
  */
 class AssetsHelper extends BaseAssetsHelper

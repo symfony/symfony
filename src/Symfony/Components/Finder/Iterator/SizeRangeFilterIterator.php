@@ -14,8 +14,6 @@ namespace Symfony\Components\Finder\Iterator;
 /**
  * SizeRangeFilterIterator filters out files that are not in the given size range.
  *
- * @package    Symfony
- * @subpackage Components_Finder
  * @author     Fabien Potencier <fabien.potencier@symfony-project.com>
  */
 class SizeRangeFilterIterator extends \FilterIterator

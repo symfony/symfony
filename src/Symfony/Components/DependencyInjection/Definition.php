@@ -14,8 +14,6 @@ namespace Symfony\Components\DependencyInjection;
 /**
  * Definition represents a service definition.
  *
- * @package    Symfony
- * @subpackage Components_DependencyInjection
  * @author     Fabien Potencier <fabien.potencier@symfony-project.com>
  */
 class Definition

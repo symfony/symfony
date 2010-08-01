@@ -14,8 +14,6 @@ namespace Symfony\Bundle\TwigBundle\TokenParser;
 /**
  * Wrapper for Symfony helpers.
  *
- * @package    Symfony
- * @subpackage Bundle_TwigBundle
  * @author     Fabien Potencier <fabien.potencier@symfony-project.com>
  */
 class HelperTokenParser extends \Twig_SimpleTokenParser

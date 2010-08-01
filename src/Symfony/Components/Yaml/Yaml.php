@@ -13,8 +13,6 @@ namespace Symfony\Components\Yaml;
 /**
  * Yaml offers convenience methods to load and dump YAML.
  *
- * @package    Symfony
- * @subpackage Components_Yaml
  * @author     Fabien Potencier <fabien.potencier@symfony-project.com>
  */
 class Yaml

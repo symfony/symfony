@@ -27,8 +27,6 @@ use Doctrine\ORM\Tools\ConvertDoctrine1Schema;
 /**
  * Convert a Doctrine 1 schema to Doctrine 2 mapping files
  *
- * @package    Symfony
- * @subpackage Bundle_DoctrineBundle
  * @author     Fabien Potencier <fabien.potencier@symfony-project.com>
  * @author     Jonathan H. Wage <jonwage@gmail.com>
  */

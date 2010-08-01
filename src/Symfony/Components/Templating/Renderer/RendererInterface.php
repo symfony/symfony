@@ -17,8 +17,6 @@ use Symfony\Components\Templating\Storage\Storage;
 /**
  * RendererInterface is the interface all renderer classes must implement.
  *
- * @package    Symfony
- * @subpackage Components_Templating
  * @author     Fabien Potencier <fabien.potencier@symfony-project.com>
  */
 interface RendererInterface

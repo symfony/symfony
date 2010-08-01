@@ -21,8 +21,6 @@ use Symfony\Components\Console\Output\Output;
 /**
  * BuildCommand.
  *
- * @package    Symfony
- * @subpackage Bundle_PropelBundle
  * @author     Fabien Potencier <fabien.potencier@symfony-project.com>
  */
 class BuildModelCommand extends PhingCommand

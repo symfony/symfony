@@ -18,8 +18,6 @@ use Symfony\Components\DependencyInjection\ContainerBuilder;
 /**
  * ZendExtension is an extension for the Zend Framework libraries.
  *
- * @package    Symfony
- * @subpackage Bundle_ZendBundle
  * @author     Fabien Potencier <fabien.potencier@symfony-project.com>
  */
 class ZendExtension extends Extension

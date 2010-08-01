@@ -23,8 +23,6 @@ use Symfony\Components\DependencyInjection\ContainerBuilder;
  *
  *   dot -Tpng container.dot > foo.png
  *
- * @package    Symfony
- * @subpackage Components_DependencyInjection
  * @author     Fabien Potencier <fabien.potencier@symfony-project.com>
  */
 class GraphvizDumper extends Dumper

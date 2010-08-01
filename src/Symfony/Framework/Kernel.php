@@ -30,8 +30,6 @@ use Symfony\Components\HttpKernel\HttpKernelInterface;
  * The Kernel is the heart of the Symfony system. It manages an environment
  * that can host bundles.
  *
- * @package    Symfony
- * @subpackage Framework
  * @author     Fabien Potencier <fabien.potencier@symfony-project.org>
  */
 abstract class Kernel implements HttpKernelInterface, \Serializable

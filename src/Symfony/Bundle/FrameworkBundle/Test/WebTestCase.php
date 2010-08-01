@@ -19,8 +19,6 @@ use Symfony\Components\HttpKernel\HttpKernelInterface;
 /**
  * WebTestCase is the base class for functional tests.
  *
- * @package    Symfony
- * @subpackage Bundle_FrameworkBundle
  * @author     Fabien Potencier <fabien.potencier@symfony-project.com>
  */
 abstract class WebTestCase extends BaseWebTestCase

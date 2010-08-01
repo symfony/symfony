@@ -16,8 +16,6 @@ namespace Symfony\Components\OutputEscaper;
  * their return values.
  *
  * @see        Escaper
- * @package    Symfony
- * @subpackage Components_OutputEscaper
  * @author     Fabien Potencier <fabien.potencier@symfony-project.com>
  * @author     Mike Squire <mike@somosis.co.uk>
  */

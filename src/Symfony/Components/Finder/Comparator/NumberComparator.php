@@ -25,8 +25,6 @@ namespace Symfony\Components\Finder\Comparator;
  *
  * Based on the Perl Number::Compare module.
  *
- * @package    Symfony
- * @subpackage Components_Finder
  * @author     Fabien Potencier <fabien.potencier@symfony-project.com> PHP port
  * @author     Richard Clamp <richardc@unixbeard.net> Perl version
  * @copyright  2004-2005 Fabien Potencier <fabien.potencier@symfony-project.com>

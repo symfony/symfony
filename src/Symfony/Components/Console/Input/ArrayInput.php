@@ -18,8 +18,6 @@ namespace Symfony\Components\Console\Input;
  *
  *     $input = new ArrayInput(array('name' => 'foo', '--bar' => 'foobar'));
  *
- * @package    Symfony
- * @subpackage Components_Console
  * @author     Fabien Potencier <fabien.potencier@symfony-project.com>
  */
 class ArrayInput extends Input

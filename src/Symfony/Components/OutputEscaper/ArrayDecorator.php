@@ -15,8 +15,6 @@ namespace Symfony\Components\OutputEscaper;
  * Output escaping decorator class for arrays.
  *
  * @see        Escaper
- * @package    Symfony
- * @subpackage Components_OutputEscaper
  * @author     Fabien Potencier <fabien.potencier@symfony-project.com>
  * @author     Mike Squire <mike@somosis.co.uk>
  */

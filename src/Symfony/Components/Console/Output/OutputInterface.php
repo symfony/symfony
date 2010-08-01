@@ -14,8 +14,6 @@ namespace Symfony\Components\Console\Output;
 /**
  * OutputInterface is the interface implemented by all Output classes.
  *
- * @package    Symfony
- * @subpackage Components_Console
  * @author     Fabien Potencier <fabien.potencier@symfony-project.com>
  */
 interface OutputInterface

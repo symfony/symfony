@@ -16,8 +16,6 @@ use Symfony\Components\Routing\Route;
 /**
  * PhpMatcherDumper creates a PHP class able to match URLs for a given set of routes.
  *
- * @package    Symfony
- * @subpackage Components_Routing
  * @author     Fabien Potencier <fabien.potencier@symfony-project.com>
  */
 class PhpMatcherDumper extends MatcherDumper

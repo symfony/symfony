@@ -16,8 +16,6 @@ use Symfony\Components\DependencyInjection\ContainerBuilder;
 /**
  * Extension is a helper class that helps organize extensions better.
  *
- * @package    Symfony
- * @subpackage Components_DependencyInjection
  * @author     Fabien Potencier <fabien.potencier@symfony-project.com>
  */
 abstract class Extension implements ExtensionInterface

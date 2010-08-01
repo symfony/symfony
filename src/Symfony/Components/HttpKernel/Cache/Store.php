@@ -21,8 +21,6 @@ use Symfony\Components\HttpFoundation\HeaderBag;
 /**
  * Store implements all the logic for storing cache metadata (Request and Response headers).
  *
- * @package    Symfony
- * @subpackage Components_HttpKernel
  * @author     Fabien Potencier <fabien.potencier@symfony-project.com>
  */
 class Store

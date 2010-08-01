@@ -22,8 +22,6 @@ use Symfony\Components\HttpFoundation\Response;
 /**
  * Cache provides HTTP caching.
  *
- * @package    Symfony
- * @subpackage Components_HttpKernel
  * @author     Fabien Potencier <fabien.potencier@symfony-project.com>
  */
 class Cache implements HttpKernelInterface

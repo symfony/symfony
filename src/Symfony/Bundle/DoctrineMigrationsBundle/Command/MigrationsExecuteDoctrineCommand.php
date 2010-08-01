@@ -19,8 +19,6 @@ use Doctrine\DBAL\Migrations\Tools\Console\Command\ExecuteCommand;
 /**
  * Command for executing single migrations up or down manually.
  *
- * @package    Symfony
- * @subpackage Bundle_DoctrineBundle
  * @author     Fabien Potencier <fabien.potencier@symfony-project.com>
  * @author     Jonathan H. Wage <jonwage@gmail.com>
  */

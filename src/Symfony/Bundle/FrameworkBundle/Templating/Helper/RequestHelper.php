@@ -17,8 +17,6 @@ use Symfony\Components\HttpFoundation\Request;
 /**
  * RequestHelper.
  *
- * @package    Symfony
- * @subpackage Bundle_FrameworkBundle
  * @author     Fabien Potencier <fabien.potencier@symfony-project.com>
  */
 class RequestHelper extends Helper

@@ -16,8 +16,6 @@ use Symfony\Components\Console\Output\OutputInterface;
 /**
  * The Dialog class provides helpers to interact with the user.
  *
- * @package    Symfony
- * @subpackage Components_Console
  * @author     Fabien Potencier <fabien.potencier@symfony-project.com>
  */
 class DialogHelper extends Helper

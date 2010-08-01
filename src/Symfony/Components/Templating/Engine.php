@@ -19,8 +19,6 @@ use Symfony\Components\Templating\Helper\HelperInterface;
 /**
  * Engine is the main class of the templating component.
  *
- * @package    Symfony
- * @subpackage Components_Templating
  * @author     Fabien Potencier <fabien.potencier@symfony-project.com>
  */
 class Engine

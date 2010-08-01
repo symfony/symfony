@@ -14,8 +14,6 @@ namespace Symfony\Components\HttpKernel\Exception;
 /**
  * UnauthorizedHttpException.
  *
- * @package    Symfony
- * @subpackage Components_HttpKernel
  * @author     Fabien Potencier <fabien.potencier@symfony-project.com>
  */
 class UnauthorizedHttpException extends HttpException

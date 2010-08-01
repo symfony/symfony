@@ -16,8 +16,6 @@ namespace Symfony\Components\Console\Output;
  *
  *     $output = new NullOutput();
  *
- * @package    Symfony
- * @subpackage Components_Console
  * @author     Fabien Potencier <fabien.potencier@symfony-project.com>
  */
 class NullOutput extends Output

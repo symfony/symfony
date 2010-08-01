@@ -16,8 +16,6 @@ use Symfony\Components\HttpFoundation\Request;
 /**
  * HttpKernelInterface.
  *
- * @package    Symfony
- * @subpackage Components_HttpKernel
  * @author     Fabien Potencier <fabien.potencier@symfony-project.com>
  */
 interface HttpKernelInterface

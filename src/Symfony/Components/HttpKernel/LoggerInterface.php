@@ -14,8 +14,6 @@ namespace Symfony\Components\HttpKernel;
 /**
  * LoggerInterface.
  *
- * @package    Symfony
- * @subpackage Components_HttpKernel
  * @author     Fabien Potencier <fabien.potencier@symfony-project.com>
  */
 interface LoggerInterface

@@ -16,8 +16,6 @@ use Symfony\Components\Console\Output\StreamOutput;
  */
 
 /**
- * @package    Symfony
- * @subpackage Components_Console
  * @author     Fabien Potencier <fabien.potencier@symfony-project.com>
  */
 class ApplicationTester

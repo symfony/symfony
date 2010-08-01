@@ -13,8 +13,6 @@ namespace Symfony\Components\Yaml;
 /**
  * Inline implements a YAML parser/dumper for the YAML inline syntax.
  *
- * @package    Symfony
- * @subpackage Components_Yaml
  * @author     Fabien Potencier <fabien.potencier@symfony-project.com>
  */
 class Inline

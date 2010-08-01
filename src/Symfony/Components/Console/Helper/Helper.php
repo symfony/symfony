@@ -14,8 +14,6 @@ namespace Symfony\Components\Console\Helper;
 /**
  * Helper is the base class for all helper classes.
  *
- * @package    Symfony
- * @subpackage Components_Console
  * @author     Fabien Potencier <fabien.potencier@symfony-project.com>
  */
 abstract class Helper implements HelperInterface

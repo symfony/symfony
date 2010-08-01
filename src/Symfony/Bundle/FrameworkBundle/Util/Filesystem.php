@@ -14,8 +14,6 @@ namespace Symfony\Bundle\FrameworkBundle\Util;
 /**
  * Provides basic utility to manipulate the file system.
  *
- * @package    Symfony
- * @subpackage Bundle_FrameworkBundle
  * @author     Fabien Potencier <fabien.potencier@symfony-project.com>
  */
 class Filesystem

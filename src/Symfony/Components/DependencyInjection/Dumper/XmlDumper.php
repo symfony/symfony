@@ -18,8 +18,6 @@ use Symfony\Components\DependencyInjection\Reference;
 /**
  * XmlDumper dumps a service container as an XML string.
  *
- * @package    Symfony
- * @subpackage Components_DependencyInjection
  * @author     Fabien Potencier <fabien.potencier@symfony-project.com>
  */
 class XmlDumper extends Dumper

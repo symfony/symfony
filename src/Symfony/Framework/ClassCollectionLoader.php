@@ -14,8 +14,6 @@ namespace Symfony\Framework;
 /**
  * ClassCollectionLoader.
  *
- * @package    Symfony
- * @subpackage Framework
  * @author     Fabien Potencier <fabien.potencier@symfony-project.com>
  */
 class ClassCollectionLoader

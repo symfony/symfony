@@ -15,8 +15,6 @@ namespace Symfony\Components\EventDispatcher;
  *
  * @see http://developer.apple.com/documentation/Cocoa/Conceptual/Notifications/index.html Apple's Cocoa framework
  *
- * @package    Symfony
- * @subpackage Components_EventDispatcher
  * @author     Fabien Potencier <fabien.potencier@symfony-project.com>
  */
 class EventDispatcher

@@ -18,8 +18,6 @@ use Symfony\Components\DependencyInjection\ContainerBuilder;
 /**
  * KernelExtension.
  *
- * @package    Symfony
- * @subpackage Framework
  * @author     Fabien Potencier <fabien.potencier@symfony-project.org>
  */
 class KernelExtension extends Extension

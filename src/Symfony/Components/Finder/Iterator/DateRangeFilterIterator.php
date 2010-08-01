@@ -14,8 +14,6 @@ namespace Symfony\Components\Finder\Iterator;
 /**
  * DateRangeFilterIterator filters out files that are not in the given date range (last modified dates).
  *
- * @package    Symfony
- * @subpackage Components_Finder
  * @author     Fabien Potencier <fabien.potencier@symfony-project.com>
  */
 class DateRangeFilterIterator extends \FilterIterator

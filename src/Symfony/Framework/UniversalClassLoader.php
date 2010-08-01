@@ -49,8 +49,6 @@ namespace Symfony\Framework;
  * directory, and it will then fallback to the framework/ directory if not
  * found before giving up.
  *
- * @package    Symfony
- * @subpackage Framework
  * @author     Fabien Potencier <fabien.potencier@symfony-project.org>
  */
 class UniversalClassLoader

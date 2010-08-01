@@ -14,8 +14,6 @@ namespace Symfony\Components\HttpFoundation\SessionStorage;
 /**
  * PdoSessionStorage.
  *
- * @package    Symfony
- * @subpackage Components_HttpFoundation
  * @author     Fabien Potencier <fabien.potencier@symfony-project.com>
  */
 class PdoSessionStorage extends NativeSessionStorage

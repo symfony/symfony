@@ -21,8 +21,6 @@ use Symfony\Bundle\ZendBundle\DependencyInjection\ZendExtension;
 /**
  * Bundle.
  *
- * @package    Symfony
- * @subpackage Bundle_ZendBundle
  * @author     Fabien Potencier <fabien.potencier@symfony-project.com>
  */
 class ZendBundle extends Bundle

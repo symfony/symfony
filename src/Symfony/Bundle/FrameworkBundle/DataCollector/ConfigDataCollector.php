@@ -18,8 +18,6 @@ use Symfony\Components\DependencyInjection\ContainerInterface;
 /**
  * ConfigDataCollector.
  *
- * @package    Symfony
- * @subpackage Bundle_FrameworkBundle
  * @author     Fabien Potencier <fabien.potencier@symfony-project.com>
  */
 class ConfigDataCollector extends DataCollector

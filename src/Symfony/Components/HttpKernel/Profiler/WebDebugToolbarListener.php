@@ -20,8 +20,6 @@ use Symfony\Components\HttpKernel\HttpKernelInterface;
 /**
  * WebDebugToolbarListener.
  *
- * @package    Symfony
- * @subpackage Components_HttpKernel
  * @author     Fabien Potencier <fabien.potencier@symfony-project.com>
  */
 class WebDebugToolbarListener

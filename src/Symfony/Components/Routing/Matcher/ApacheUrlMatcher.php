@@ -17,8 +17,6 @@ use Symfony\Components\Routing\RouteCollection;
 /**
  * ApacheUrlMatcher matches URL based on Apache mod_rewrite matching (see ApacheMatcherDumper).
  *
- * @package    Symfony
- * @subpackage Components_Routing
  * @author     Fabien Potencier <fabien.potencier@symfony-project.com>
  */
 class ApacheUrlMatcher extends UrlMatcher

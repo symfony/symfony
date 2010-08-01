@@ -17,8 +17,6 @@ use Symfony\Components\HttpKernel\LoggerInterface;
 /**
  * Logger.
  *
- * @package    Symfony
- * @subpackage Bundle_ZendBundle
  * @author     Fabien Potencier <fabien.potencier@symfony-project.com>
  */
 class Logger extends BaseLogger implements LoggerInterface

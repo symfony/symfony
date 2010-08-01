@@ -16,8 +16,6 @@ use Symfony\Bundle\FrameworkBundle\Controller;
 /**
  * InternalController.
  *
- * @package    Symfony
- * @subpackage Bundle_FrameworkBundle
  * @author     Fabien Potencier <fabien.potencier@symfony-project.com>
  */
 class InternalController extends Controller

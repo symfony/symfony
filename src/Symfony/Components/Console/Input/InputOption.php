@@ -14,8 +14,6 @@ namespace Symfony\Components\Console\Input;
 /**
  * Represents a command line option.
  *
- * @package    Symfony
- * @subpackage Components_Console
  * @author     Fabien Potencier <fabien.potencier@symfony-project.com>
  */
 class InputOption

@@ -21,8 +21,6 @@ use Symfony\Components\Console\Application;
 /**
  * Base class for all commands.
  *
- * @package    Symfony
- * @subpackage Components_Console
  * @author     Fabien Potencier <fabien.potencier@symfony-project.com>
  */
 class Command

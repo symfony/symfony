@@ -17,8 +17,6 @@ namespace Symfony\Components\CssSelector\Node;
  * This component is a port of the Python lxml library,
  * which is copyright Infrae and distributed under the BSD license.
  *
- * @package    Symfony
- * @subpackage Components_CssSelector
  * @author     Fabien Potencier <fabien.potencier@symfony-project.com>
  */
 interface NodeInterface

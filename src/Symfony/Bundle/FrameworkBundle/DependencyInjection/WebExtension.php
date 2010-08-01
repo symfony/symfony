@@ -21,8 +21,6 @@ use Symfony\Components\DependencyInjection\Definition;
 /**
  * WebExtension.
  *
- * @package    Symfony
- * @subpackage Bundle_FrameworkBundle
  * @author     Fabien Potencier <fabien.potencier@symfony-project.com>
  */
 class WebExtension extends Extension

@@ -14,8 +14,6 @@ namespace Symfony\Components\Routing\Resource;
 /**
  * ResourceInterface is the interface that must be implemented by all Resource classes.
  *
- * @package    Symfony
- * @subpackage Components_Routing
  * @author     Fabien Potencier <fabien.potencier@symfony-project.com>
  */
 interface ResourceInterface

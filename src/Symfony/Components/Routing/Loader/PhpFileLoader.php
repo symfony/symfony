@@ -18,8 +18,6 @@ use Symfony\Components\Routing\Resource\FileResource;
  *
  * The file must return a RouteCollection instance.
  *
- * @package    Symfony
- * @subpackage Components_Routing
  * @author     Fabien Potencier <fabien.potencier@symfony-project.com>
  */
 class PhpFileLoader extends FileLoader

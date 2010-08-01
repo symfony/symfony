@@ -16,8 +16,6 @@ namespace Symfony\Components\DomCrawler\Field;
  *
  * It is constructed from a HTML select tag, or a HTML checkbox, or radio inputs.
  *
- * @package    Symfony
- * @subpackage Components_DomCrawler
  * @author     Fabien Potencier <fabien.potencier@symfony-project.com>
  */
 class ChoiceFormField extends FormField

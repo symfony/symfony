@@ -16,8 +16,6 @@ use Symfony\Bundle\TwigBundle\TokenParser\HelperTokenParser;
 
 /**
  *
- * @package    Symfony
- * @subpackage Bundle_TwigBundle
  * @author     Fabien Potencier <fabien.potencier@symfony-project.com>
  */
 class Helpers extends \Twig_Extension

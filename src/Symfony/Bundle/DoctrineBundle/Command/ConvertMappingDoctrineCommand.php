@@ -22,8 +22,6 @@ use Doctrine\ORM\Tools\Console\Command\ConvertMappingCommand;
  * Convert Doctrine ORM metadata mapping information between the various supported
  * formats.
  *
- * @package    Symfony
- * @subpackage Bundle_DoctrineBundle
  * @author     Fabien Potencier <fabien.potencier@symfony-project.com>
  * @author     Jonathan H. Wage <jonwage@gmail.com>
  */

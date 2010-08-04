@@ -29,4 +29,6 @@ interface DataCollectorInterface
     function collect();
 
     function setProfiler(Profiler $profiler);
+
+    function getSummary();
 }

@@ -453,7 +453,7 @@ class Cache implements HttpKernelInterface
                 // wait for the lock to be released
                 $wait = 0;
                 while (file_exists($lock) && $wait < 5) {
-                    sleep($wait += 0.05);
+                    usleep($wait += 50000);
                 }
 
                 if ($wait < 2) {

@@ -3,6 +3,7 @@
 namespace Symfony\Framework\Bundle;
 
 use Symfony\Components\DependencyInjection\ContainerInterface;
+use Symfony\Components\DependencyInjection\ContainerBuilder;
 use Symfony\Components\DependencyInjection\ParameterBag\ParameterBagInterface;
 use Symfony\Components\Console\Application;
 use Symfony\Components\Finder\Finder;
@@ -105,6 +106,7 @@ abstract class Bundle implements BundleInterface
 namespace Symfony\Framework\Bundle;
 
 use Symfony\Components\DependencyInjection\ContainerInterface;
+use Symfony\Components\DependencyInjection\ContainerBuilder;
 use Symfony\Components\DependencyInjection\ParameterBag\ParameterBagInterface;
 
 

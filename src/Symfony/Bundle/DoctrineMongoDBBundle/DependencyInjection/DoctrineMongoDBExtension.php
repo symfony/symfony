@@ -123,6 +123,7 @@ class DoctrineMongoDBExtension extends Extension
     protected function loadDocumentManager(array $documentManager, ContainerBuilder $container)
     {
         $defaultDocumentManager = $container->getParameter('doctrine.odm.mongodb.default_document_manager');
+        $defaultDatabase = isset($documentManager['default_database']) ? $documentManager['default_database'] : $container->getParameter('doctrine.odm.mongodb.default_database');
         $proxyCacheDir = $this->kernelCacheDir . '/doctrine/odm/mongodb/Proxies';
 
         $odmConfigDef = new Definition('%doctrine.odm.mongodb.configuration_class%');
@@ -137,7 +138,7 @@ class DoctrineMongoDBExtension extends Extension
             'setProxyDir' => $proxyCacheDir,
             'setProxyNamespace' => $container->getParameter('doctrine.odm.mongodb.proxy_namespace'),
             'setAutoGenerateProxyClasses' => $container->getParameter('doctrine.odm.mongodb.auto_generate_proxy_classes'),
-            'setDefaultDB' => $container->getParameter('doctrine.odm.mongodb.default_database'),
+            'setDefaultDB' => $defaultDatabase,
         );
         foreach ($methods as $method => $arg) {
             $odmConfigDef->addMethodCall($method, array($arg));

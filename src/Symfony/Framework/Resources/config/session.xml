@@ -10,7 +10,6 @@
         <parameter key="session.storage.class">Symfony\Components\HttpFoundation\SessionStorage\NativeSessionStorage</parameter>
         <parameter key="session.storage.pdo.class">Symfony\Components\HttpFoundation\SessionStorage\PdoSessionStorage</parameter>
         <parameter key="session.options.name">SYMFONY_SESSION</parameter>
-        <parameter key="session.options.auto_start">true</parameter>
         <parameter key="session.options.lifetime">false</parameter>
         <parameter key="session.options.path">/</parameter>
         <parameter key="session.options.domain" />

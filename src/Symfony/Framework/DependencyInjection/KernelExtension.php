@@ -54,7 +54,7 @@ class KernelExtension extends Extension
             $container->setParameter('session.class', $config['class']);
         }
 
-        foreach (array('name', 'auto_start', 'lifetime', 'path', 'domain', 'secure', 'httponly', 'cache_limiter', 'pdo.db_table') as $name) {
+        foreach (array('name', 'lifetime', 'path', 'domain', 'secure', 'httponly', 'cache_limiter', 'pdo.db_table') as $name) {
             if (isset($config['session'][$name])) {
                 $container->setParameter('session.options.'.$name, $config['session'][$name]);
             }

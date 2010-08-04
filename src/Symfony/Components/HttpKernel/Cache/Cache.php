@@ -452,11 +452,11 @@ class Cache implements HttpKernelInterface
             } else {
                 // wait for the lock to be released
                 $wait = 0;
-                while (file_exists($lock) && $wait < 5) {
+                while (file_exists($lock) && $wait < 5000000) {
                     usleep($wait += 50000);
                 }
 
-                if ($wait < 2) {
+                if ($wait < 2000000) {
                     // replace the current entry with the fresh one
                     $new = $this->lookup($request);
                     $entry->headers = $new->headers;

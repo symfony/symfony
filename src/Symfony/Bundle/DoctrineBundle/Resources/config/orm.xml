@@ -34,17 +34,17 @@
         <parameter key="doctrine.orm.metadata.yml_class">Doctrine\ORM\Mapping\Driver\YamlDriver</parameter>
 
         <!-- directories -->
-        <parameter key="doctrine.orm.mapping_dirs" type="collection"></parameter>
-        <parameter key="doctrine.orm.xml_mapping_dirs">%doctrine.orm.mapping_dirs%</parameter>
-        <parameter key="doctrine.orm.yml_mapping_dirs">%doctrine.orm.mapping_dirs%</parameter>
-        <parameter key="doctrine.orm.entity_dirs" type="collection"></parameter>
+        <parameter key="doctrine.orm.metadata_driver.mapping_dirs" type="collection"></parameter>
+        <parameter key="doctrine.orm.xml_mapping_dirs">%doctrine.orm.metadata_driver.mapping_dirs%</parameter>
+        <parameter key="doctrine.orm.yml_mapping_dirs">%doctrine.orm.metadata_driver.mapping_dirs%</parameter>
+        <parameter key="doctrine.orm.metadata_driver.entity_dirs" type="collection"></parameter>
     </parameters>
 
     <services>
         <!--- Annotation Metadata Driver Service -->
         <service id="doctrine.orm.metadata_driver.annotation" class="Doctrine\ORM\Mapping\Driver\AnnotationDriver">
             <argument type="service" id="doctrine.orm.metadata_driver.annotation.reader" />
-            <argument>%doctrine.orm.entity_dirs%</argument>
+            <argument>%doctrine.orm.metadata_driver.entity_dirs%</argument>
         </service>
 
         <service id="doctrine.orm.metadata_driver.annotation.reader" class="Doctrine\Common\Annotations\AnnotationReader">

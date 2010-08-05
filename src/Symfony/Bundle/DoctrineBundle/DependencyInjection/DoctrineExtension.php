@@ -227,8 +227,8 @@ class DoctrineExtension extends Extension
                 $container->setParameter('doctrine.orm.'.$key, $config[$key]);
             }
         }
-        $container->setParameter('doctrine.orm.mapping_dirs', $this->findBundleSubpaths('Resources/config/doctrine/metadata', $container));
-        $container->setParameter('doctrine.orm.entity_dirs', $this->findBundleSubpaths('Entity', $container));
+        $container->setParameter('doctrine.orm.metadata_driver.mapping_dirs', $this->findBundleSubpaths('Resources/config/doctrine/metadata', $container));
+        $container->setParameter('doctrine.orm.metadata_driver.entity_dirs', $this->findBundleSubpaths('Entity', $container));
     }
 
     /**

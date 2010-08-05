@@ -10,7 +10,7 @@
 
     <services>
         <service id="debug.toolbar" class="%debug.toolbar.class%">
-            <annotation name="kernel.listener" />
+            <tag name="kernel.listener" />
             <argument type="service" id="profiler" />
         </service>
     </services>

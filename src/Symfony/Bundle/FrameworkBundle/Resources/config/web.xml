@@ -21,7 +21,7 @@
         </service>
 
         <service id="request_listener" class="%request_listener.class%">
-            <annotation name="kernel.listener" />
+            <tag name="kernel.listener" />
             <argument type="service" id="service_container" />
             <argument type="service" id="router" />
             <argument type="service" id="logger" on-invalid="ignore" />
@@ -30,16 +30,16 @@
         <service id="esi" class="%esi.class%" />
 
         <service id="esi_listener" class="%esi_listener.class%">
-          <annotation name="kernel.listener" />
+          <tag name="kernel.listener" />
           <argument type="service" id="esi" on-invalid="ignore" />
         </service>
 
         <service id="response_listener" class="%response_listener.class%">
-            <annotation name="kernel.listener" />
+            <tag name="kernel.listener" />
         </service>
 
         <service id="exception_listener" class="%exception_listener.class%">
-            <annotation name="kernel.listener" />
+            <tag name="kernel.listener" />
             <argument type="service" id="service_container" />
             <argument type="service" id="logger" on-invalid="null" />
             <argument>%exception_listener.controller%</argument>

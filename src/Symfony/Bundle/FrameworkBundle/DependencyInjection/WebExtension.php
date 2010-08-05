@@ -81,7 +81,7 @@ class WebExtension extends Extension
                     $loader->load('collectors.xml');
                 }
             } elseif ($container->hasDefinition('profiler')) {
-                $container->getDefinition('profiling')->clearAnnotations();
+                $container->getDefinition('profiling')->clearTags();
             }
         }
 
@@ -93,7 +93,7 @@ class WebExtension extends Extension
                     $loader->load('toolbar.xml');
                 }
             } elseif ($container->hasDefinition('debug.toolbar')) {
-                $container->getDefinition('debug.toolbar')->clearAnnotations();
+                $container->getDefinition('debug.toolbar')->clearTags();
             }
         }
 
@@ -169,7 +169,7 @@ class WebExtension extends Extension
                     $loader->setArguments($arguments);
                 }
             } elseif ($container->hasDefinition('validator')) {
-                $container->getDefinition('validator')->clearAnnotations();
+                $container->getDefinition('validator')->clearTags();
             }
         }
     }

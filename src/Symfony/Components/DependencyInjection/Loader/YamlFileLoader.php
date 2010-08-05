@@ -144,12 +144,12 @@ class YamlFileLoader extends FileLoader
             }
         }
 
-        if (isset($service['annotations'])) {
-            foreach ($service['annotations'] as $annotation) {
-                $name = $annotation['name'];
-                unset($annotation['name']);
+        if (isset($service['tags'])) {
+            foreach ($service['tags'] as $tag) {
+                $name = $tag['name'];
+                unset($tag['name']);
 
-                $definition->addAnnotation($name, $annotation);
+                $definition->addTag($name, $tag);
             }
         }
 

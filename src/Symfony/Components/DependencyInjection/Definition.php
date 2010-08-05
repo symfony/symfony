@@ -26,7 +26,7 @@ class Definition
     protected $arguments;
     protected $calls;
     protected $configurator;
-    protected $annotations;
+    protected $tags;
 
     /**
      * Constructor.
@@ -40,7 +40,7 @@ class Definition
         $this->arguments = $arguments;
         $this->calls = array();
         $this->shared = true;
-        $this->annotations = array();
+        $this->tags = array();
     }
 
     /**
@@ -196,58 +196,58 @@ class Definition
     }
 
     /**
-     * Returns all annotations.
+     * Returns all tags.
      *
-     * @return array An array of annotations
+     * @return array An array of tags
      */
-    public function getAnnotations()
+    public function getTags()
     {
-        return $this->annotations;
+        return $this->tags;
     }
 
     /**
-     * Gets an annotation by name.
+     * Gets a tag by name.
      *
-     * @param  string $name       The annotation name
+     * @param  string $name The tag name
      *
      * @return array An array of attributes
      */
-    public function getAnnotation($name)
+    public function getTag($name)
     {
-        if (!isset($this->annotations[$name])) {
-            $this->annotations[$name] = array();
+        if (!isset($this->tags[$name])) {
+            $this->tags[$name] = array();
         }
 
-        return $this->annotations[$name];
+        return $this->tags[$name];
     }
 
     /**
-     * Adds an annotation for this definition.
+     * Adds a tag for this definition.
      *
-     * @param  string $name       The annotation name
+     * @param  string $name       The tag name
      * @param  array  $attributes An array of attributes
      *
      * @return Definition The current instance
      */
-    public function addAnnotation($name, array $attributes = array())
+    public function addTag($name, array $attributes = array())
     {
-        if (!isset($this->annotations[$name])) {
-            $this->annotations[$name] = array();
+        if (!isset($this->tags[$name])) {
+            $this->tags[$name] = array();
         }
 
-        $this->annotations[$name][] = $attributes;
+        $this->tags[$name][] = $attributes;
 
         return $this;
     }
 
     /**
-     * Clears the annotation for this definition.
+     * Clears the tags for this definition.
      *
      * @return Definition The current instance
      */
-    public function clearAnnotations()
+    public function clearTags()
     {
-        $this->annotations = array();
+        $this->tags = array();
 
         return $this;
     }

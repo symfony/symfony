@@ -59,15 +59,15 @@ class XmlDumper extends Dumper
             !$definition->isShared() ? ' shared="false"' : ''
         );
 
-        foreach ($definition->getAnnotations() as $name => $annotations) {
-            foreach ($annotations as $attributes) {
+        foreach ($definition->getTags() as $name => $tags) {
+            foreach ($tags as $attributes) {
                 $att = array();
                 foreach ($attributes as $key => $value) {
                     $att[] = sprintf('%s="%s"', $key, $value);
                 }
                 $att = $att ? ' '.implode(' ', $att) : '';
 
-                $code .= sprintf("      <annotation name=\"%s\"%s />\n", $name, $att);
+                $code .= sprintf("      <tag name=\"%s\"%s />\n", $name, $att);
             }
         }
 

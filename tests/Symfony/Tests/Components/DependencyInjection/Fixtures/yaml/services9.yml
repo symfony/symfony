@@ -6,7 +6,7 @@ parameters:
 services:
   foo:
     class: FooClass
-    annotations:
+    tags:
       - { name: foo, foo: foo }
       - { name: foo, bar: bar }
     file: %path%foo.php

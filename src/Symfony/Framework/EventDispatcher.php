@@ -28,7 +28,7 @@ class EventDispatcher extends BaseEventDispatcher
      */
     public function __construct(ContainerInterface $container)
     {
-        foreach ($container->findAnnotatedServiceIds('kernel.listener') as $id => $attributes) {
+        foreach ($container->findTaggedServiceIds('kernel.listener') as $id => $attributes) {
             $container->get($id)->register($this);
         }
     }

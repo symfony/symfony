@@ -20,7 +20,7 @@
         </service>
 
         <service id="doctrine.data_collector" class="%doctrine.data_collector.class%">
-            <annotation name="data_collector" />
+            <tag name="data_collector" />
             <argument type="service" id="service_container" />
         </service>
     </services>

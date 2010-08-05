@@ -207,7 +207,7 @@ class KernelExtension extends Extension
             $container->setParameter('session.class', $config['class']);
         }
 
-        foreach (array('name', 'auto_start', 'lifetime', 'path', 'domain', 'secure', 'httponly', 'cache_limiter', 'pdo.db_table') as $name) {
+        foreach (array('name', 'lifetime', 'path', 'domain', 'secure', 'httponly', 'cache_limiter', 'pdo.db_table') as $name) {
             if (isset($config['session'][$name])) {
                 $container->setParameter('session.options.'.$name, $config['session'][$name]);
             }
@@ -438,7 +438,7 @@ class EventDispatcher extends BaseEventDispatcher
     
     public function __construct(ContainerInterface $container)
     {
-        foreach ($container->findAnnotatedServiceIds('kernel.listener') as $id => $attributes) {
+        foreach ($container->findTaggedServiceIds('kernel.listener') as $id => $attributes) {
             $container->get($id)->register($this);
         }
     }

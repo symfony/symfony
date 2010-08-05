@@ -47,7 +47,7 @@ class PhpDumper extends Dumper
             $this->startClass($options['class'], $options['base_class']).
             $this->addConstructor().
             $this->addServices().
-            $this->addAnnotations().
+            $this->addTags().
             $this->addDefaultParametersMethod().
             $this->endClass()
         ;
@@ -229,34 +229,34 @@ EOF;
         return $code;
     }
 
-    protected function addAnnotations()
+    protected function addTags()
     {
-        $annotations = array();
+        $tags = array();
         foreach ($this->container->getDefinitions() as $id => $definition) {
-            foreach ($definition->getAnnotations() as $name => $ann) {
-                if (!isset($annotations[$name])) {
-                    $annotations[$name] = array();
+            foreach ($definition->getTags() as $name => $ann) {
+                if (!isset($tags[$name])) {
+                    $tags[$name] = array();
                 }
 
-                $annotations[$name][$id] = $ann;
+                $tags[$name][$id] = $ann;
             }
         }
-        $annotations = var_export($annotations, true);
+        $tags = var_export($tags, true);
 
         return <<<EOF
 
     /**
-     * Returns service ids for a given annotation.
+     * Returns service ids for a given tag.
      *
-     * @param string \$name The annotation name
+     * @param string \$name The tag name
      *
-     * @return array An array of annotations
+     * @return array An array of tags
      */
-    public function findAnnotatedServiceIds(\$name)
+    public function findTaggedServiceIds(\$name)
     {
-        static \$annotations = $annotations;
+        static \$tags = $tags;
 
-        return isset(\$annotations[\$name]) ? \$annotations[\$name] : array();
+        return isset(\$tags[\$name]) ? \$tags[\$name] : array();
     }
 
 EOF;

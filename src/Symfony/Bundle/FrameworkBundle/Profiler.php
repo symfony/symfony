@@ -36,7 +36,7 @@ class Profiler extends BaseProfiler
 
     protected function initCollectors()
     {
-        $config = $this->container->findAnnotatedServiceIds('data_collector');
+        $config = $this->container->findTaggedServiceIds('data_collector');
         $ids = array();
         $coreCollectors = array();
         $userCollectors = array();

@@ -153,15 +153,15 @@ class ProjectServiceContainer extends Container
     }
 
     /**
-     * Returns service ids for a given annotation.
+     * Returns service ids for a given tag.
      *
-     * @param string $name The annotation name
+     * @param string $name The tag name
      *
-     * @return array An array of annotations
+     * @return array An array of tags
      */
-    public function findAnnotatedServiceIds($name)
+    public function findTaggedServiceIds($name)
     {
-        static $annotations = array (
+        static $tags = array (
   'foo' => 
   array (
     'foo' => 
@@ -178,7 +178,7 @@ class ProjectServiceContainer extends Container
   ),
 );
 
-        return isset($annotations[$name]) ? $annotations[$name] : array();
+        return isset($tags[$name]) ? $tags[$name] : array();
     }
 
     /**

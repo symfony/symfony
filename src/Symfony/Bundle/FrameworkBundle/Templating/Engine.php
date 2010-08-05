@@ -42,7 +42,7 @@ class Engine extends BaseEngine
         $this->container = $container;
         $this->escaper = $escaper;
 
-        foreach ($this->container->findAnnotatedServiceIds('templating.renderer') as $id => $attributes) {
+        foreach ($this->container->findTaggedServiceIds('templating.renderer') as $id => $attributes) {
             if (isset($attributes[0]['alias'])) {
                 $renderers[$attributes[0]['alias']] = $this->container->get($id);
             }
@@ -51,7 +51,7 @@ class Engine extends BaseEngine
         parent::__construct($loader, $renderers);
 
         $this->helpers = array();
-        foreach ($this->container->findAnnotatedServiceIds('templating.helper') as $id => $attributes) {
+        foreach ($this->container->findTaggedServiceIds('templating.helper') as $id => $attributes) {
             if (isset($attributes[0]['alias'])) {
                 $this->helpers[$attributes[0]['alias']] = $id;
             }

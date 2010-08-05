@@ -42,20 +42,20 @@ class YamlDumper extends Dumper
             $code .= sprintf("    class: %s\n", $definition->getClass());
         }
 
-        $annotationsCode = '';
-        foreach ($definition->getAnnotations() as $name => $annotations) {
-            foreach ($annotations as $attributes) {
+        $tagsCode = '';
+        foreach ($definition->getTags() as $name => $tags) {
+            foreach ($tags as $attributes) {
                 $att = array();
                 foreach ($attributes as $key => $value) {
                     $att[] = sprintf('%s: %s', Yaml::dump($key), Yaml::dump($value));
                 }
                 $att = $att ? ', '.implode(' ', $att) : '';
 
-                $annotationsCode .= sprintf("      - { name: %s%s }\n", Yaml::dump($name), $att);
+                $tagsCode .= sprintf("      - { name: %s%s }\n", Yaml::dump($name), $att);
             }
         }
-        if ($annotationsCode) {
-            $code .= "    annotations:\n".$annotationsCode;
+        if ($tagsCode) {
+            $code .= "    tags:\n".$tagsCode;
         }
 
         if ($definition->getFile()) {

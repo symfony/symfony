@@ -13,22 +13,22 @@
 
     <services>
         <service id="data_collector.config" class="%data_collector.config.class%">
-            <annotation name="data_collector" core="true" />
+            <tag name="data_collector" core="true" />
             <argument type="service" id="service_container" />
         </service>
 
         <service id="data_collector.app" class="%data_collector.app.class%">
-            <annotation name="data_collector" core="true" />
+            <tag name="data_collector" core="true" />
             <argument type="service" id="service_container" />
         </service>
 
         <service id="data_collector.timer" class="%data_collector.timer.class%">
-            <annotation name="data_collector" core="true" />
+            <tag name="data_collector" core="true" />
             <argument type="service" id="service_container" />
         </service>
 
         <service id="data_collector.memory" class="%data_collector.memory.class%">
-            <annotation name="data_collector" core="true" />
+            <tag name="data_collector" core="true" />
         </service>
     </services>
 </container>

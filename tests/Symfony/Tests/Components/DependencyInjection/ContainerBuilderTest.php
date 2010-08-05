@@ -341,24 +341,24 @@ class ContainerBuilderTest extends \PHPUnit_Framework_TestCase
     }
 
     /**
-     * @covers Symfony\Components\DependencyInjection\ContainerBuilder::findAnnotatedServiceIds
+     * @covers Symfony\Components\DependencyInjection\ContainerBuilder::findTaggedServiceIds
      */
-    public function testFindAnnotatedServiceIds()
+    public function testfindTaggedServiceIds()
     {
         $builder = new ContainerBuilder();
         $builder
             ->register('foo', 'FooClass')
-            ->addAnnotation('foo', array('foo' => 'foo'))
-            ->addAnnotation('bar', array('bar' => 'bar'))
-            ->addAnnotation('foo', array('foofoo' => 'foofoo'))
+            ->addTag('foo', array('foo' => 'foo'))
+            ->addTag('bar', array('bar' => 'bar'))
+            ->addTag('foo', array('foofoo' => 'foofoo'))
         ;
-        $this->assertEquals($builder->findAnnotatedServiceIds('foo'), array(
+        $this->assertEquals($builder->findTaggedServiceIds('foo'), array(
             'foo' => array(
                 array('foo' => 'foo'),
                 array('foofoo' => 'foofoo'),
             )
-        ), '->findAnnotatedServiceIds() returns an array of service ids and its annotation attributes');
-        $this->assertEquals(array(), $builder->findAnnotatedServiceIds('foobar'), '->findAnnotatedServiceIds() returns an empty array if there is annotated services');
+        ), '->findTaggedServiceIds() returns an array of service ids and its tag attributes');
+        $this->assertEquals(array(), $builder->findTaggedServiceIds('foobar'), '->findTaggedServiceIds() returns an empty array if there is annotated services');
     }
 
     /**

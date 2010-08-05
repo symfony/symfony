@@ -20,7 +20,7 @@ use Symfony\Components\DependencyInjection\Resource\FileResource;
  *
  * @author     Fabien Potencier <fabien.potencier@symfony-project.com>
  */
-class ContainerBuilder extends Container implements AnnotatedContainerInterface
+class ContainerBuilder extends Container implements TaggedContainerInterface
 {
     static protected $extensions = array();
 
@@ -570,22 +570,22 @@ class ContainerBuilder extends Container implements AnnotatedContainerInterface
     }
 
     /**
-     * Returns service ids for a given annotation.
+     * Returns service ids for a given tag.
      *
-     * @param string $name The annotation name
+     * @param string $name The tag name
      *
-     * @return array An array of annotations
+     * @return array An array of tags
      */
-    public function findAnnotatedServiceIds($name)
+    public function findTaggedServiceIds($name)
     {
-        $annotations = array();
+        $tags = array();
         foreach ($this->getDefinitions() as $id => $definition) {
-            if ($definition->getAnnotation($name)) {
-                $annotations[$id] = $definition->getAnnotation($name);
+            if ($definition->getTag($name)) {
+                $tags[$id] = $definition->getTag($name);
             }
         }
 
-        return $annotations;
+        return $tags;
     }
 
     static public function getServiceConditionals($value)

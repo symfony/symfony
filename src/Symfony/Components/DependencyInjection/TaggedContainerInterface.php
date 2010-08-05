@@ -12,18 +12,18 @@ namespace Symfony\Components\DependencyInjection;
  */
 
 /**
- * AnnotatedContainerInterface is the interface implemented when a container knows how to deals with annotations.
+ * TaggedContainerInterface is the interface implemented when a container knows how to deals with tags.
  *
  * @author     Fabien Potencier <fabien.potencier@symfony-project.com>
  */
-interface AnnotatedContainerInterface
+interface TaggedContainerInterface
 {
     /**
-     * Returns service ids for a given annotation.
+     * Returns service ids for a given tag.
      *
-     * @param string $name The annotation name
+     * @param string $name The tag name
      *
-     * @return array An array of annotations
+     * @return array An array of tags
      */
-    public function findAnnotatedServiceIds($name);
+    public function findTaggedServiceIds($name);
 }

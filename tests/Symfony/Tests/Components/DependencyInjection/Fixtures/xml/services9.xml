@@ -10,8 +10,8 @@
   </parameters>
   <services>
     <service id="foo" class="FooClass" factory-method="getInstance" shared="false">
-      <annotation name="foo" foo="foo" />
-      <annotation name="foo" bar="bar" />
+      <tag name="foo" foo="foo" />
+      <tag name="foo" bar="bar" />
       <file>%path%foo.php</file>
       <argument>foo</argument>
       <argument type="service" id="foo.baz" />

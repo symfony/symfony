@@ -19,17 +19,17 @@
         </service>
 
         <service id="routing.loader.xml" class="%routing.loader.xml.class%">
-            <annotation name="routing.loader" />
+            <tag name="routing.loader" />
             <argument>%kernel.bundle_dirs%</argument>
         </service>
 
         <service id="routing.loader.yml" class="%routing.loader.yml.class%">
-            <annotation name="routing.loader" />
+            <tag name="routing.loader" />
             <argument>%kernel.bundle_dirs%</argument>
         </service>
 
         <service id="routing.loader.php" class="%routing.loader.php.class%">
-            <annotation name="routing.loader" />
+            <tag name="routing.loader" />
             <argument>%kernel.bundle_dirs%</argument>
         </service>
 

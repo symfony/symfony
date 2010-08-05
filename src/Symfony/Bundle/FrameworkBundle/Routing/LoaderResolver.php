@@ -39,7 +39,7 @@ class LoaderResolver extends BaseLoaderResolver
         parent::__construct($loaders);
 
         $this->container = $container;
-        foreach ($container->findAnnotatedServiceIds('routing.loader') as $id => $attributes) {
+        foreach ($container->findTaggedServiceIds('routing.loader') as $id => $attributes) {
             $this->services[] = $id;
         }
     }

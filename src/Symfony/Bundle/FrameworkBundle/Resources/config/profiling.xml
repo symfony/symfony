@@ -26,7 +26,7 @@
         </service>
 
         <service id="profiler_listener" class="%profiler_listener.class%">
-            <annotation name="kernel.listener" />
+            <tag name="kernel.listener" />
             <argument type="service" id="profiler" />
         </service>
     </services>

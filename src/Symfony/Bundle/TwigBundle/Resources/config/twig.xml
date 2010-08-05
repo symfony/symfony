@@ -29,16 +29,16 @@
         </service>
 
         <service id="twig.renderer" class="%twig.renderer.class%">
-            <annotation name="templating.renderer" alias="twig" />
+            <tag name="templating.renderer" alias="twig" />
             <argument type="service" id="twig" />
         </service>
 
         <service id="twig.extension.escaper" class="Twig_Extension_Escaper">
-            <annotation name="twig.extension" />
+            <tag name="twig.extension" />
         </service>
 
         <service id="twig.extension.helpers" class="Symfony\Bundle\TwigBundle\Extension\Helpers">
-            <annotation name="twig.extension" />
+            <tag name="twig.extension" />
         </service>
     </services>
 </container>

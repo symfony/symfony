@@ -118,34 +118,34 @@ class DefinitionTest extends \PHPUnit_Framework_TestCase
     }
 
     /**
-     * @covers Symfony\Components\DependencyInjection\Definition::clearAnnotations
+     * @covers Symfony\Components\DependencyInjection\Definition::clearTags
      */
-    public function testClearAnnotations()
+    public function testClearTags()
     {
         $def = new Definition('stdClass');
-        $this->assertEquals(spl_object_hash($def), spl_object_hash($def->clearAnnotations()), '->clearAnnotations() implements a fluent interface');
-        $def->addAnnotation('foo', array('foo' => 'bar'));
-        $def->clearAnnotations();
-        $this->assertEquals(array(), $def->getAnnotations(), '->clearAnnotations() removes all current annotations');
+        $this->assertEquals(spl_object_hash($def), spl_object_hash($def->clearTags()), '->clearTags() implements a fluent interface');
+        $def->addTag('foo', array('foo' => 'bar'));
+        $def->clearTags();
+        $this->assertEquals(array(), $def->getTags(), '->clearTags() removes all current tags');
     }
 
     /**
-     * @covers Symfony\Components\DependencyInjection\Definition::addAnnotation
-     * @covers Symfony\Components\DependencyInjection\Definition::getAnnotation
-     * @covers Symfony\Components\DependencyInjection\Definition::getAnnotations
+     * @covers Symfony\Components\DependencyInjection\Definition::addTag
+     * @covers Symfony\Components\DependencyInjection\Definition::getTag
+     * @covers Symfony\Components\DependencyInjection\Definition::getTags
      */
-    public function testAnnotations()
+    public function testTags()
     {
         $def = new Definition('stdClass');
-        $this->assertEquals(array(), $def->getAnnotation('foo'), '->getAnnotation() returns an empty array if the annotation is not defined');
-        $this->assertEquals(spl_object_hash($def), spl_object_hash($def->addAnnotation('foo')), '->addAnnotation() implements a fluent interface');
-        $this->assertEquals(array(array()), $def->getAnnotation('foo'), '->getAnnotation() returns attributes for an annotation name');
-        $def->addAnnotation('foo', array('foo' => 'bar'));
-        $this->assertEquals(array(array(), array('foo' => 'bar')), $def->getAnnotation('foo'), '->addAnnotation() can adds the same annotation several times');
-        $def->addAnnotation('bar', array('bar' => 'bar'));
-        $this->assertEquals($def->getAnnotations(), array(
+        $this->assertEquals(array(), $def->getTag('foo'), '->getTag() returns an empty array if the tag is not defined');
+        $this->assertEquals(spl_object_hash($def), spl_object_hash($def->addTag('foo')), '->addTag() implements a fluent interface');
+        $this->assertEquals(array(array()), $def->getTag('foo'), '->getTag() returns attributes for a tag name');
+        $def->addTag('foo', array('foo' => 'bar'));
+        $this->assertEquals(array(array(), array('foo' => 'bar')), $def->getTag('foo'), '->addTag() can adds the same tag several times');
+        $def->addTag('bar', array('bar' => 'bar'));
+        $this->assertEquals($def->getTags(), array(
             'foo' => array(array(), array('foo' => 'bar')),
             'bar' => array(array('bar' => 'bar')),
-        ), '->getAnnotations() returns all annotations');
+        ), '->getTags() returns all tags');
     }
 }

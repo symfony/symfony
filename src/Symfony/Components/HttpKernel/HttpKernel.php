@@ -123,7 +123,7 @@ class HttpKernel implements HttpKernelInterface
             throw new NotFoundHttpException('Unable to find the controller.');
         }
 
-        $event = $this->dispatcher->filter(new Event($this, 'core.controller', array('request' => $request)), $controller);
+        $event = $this->dispatcher->filter(new Event($this, 'core.controller', array('request_type' => $type, 'request' => $request)), $controller);
         $controller = $event->getReturnValue();
 
         // controller must be a callable

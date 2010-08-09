@@ -48,8 +48,4 @@ class KernelForTest extends Kernel
     public function registerContainerConfiguration(LoaderInterface $loader)
     {
     }
-
-    public function registerRoutes()
-    {
-    }
 }

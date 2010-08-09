@@ -152,7 +152,7 @@ class Route
     }
 
     /**
-     * Get an default value.
+     * Gets a default value.
      *
      * @param string $name A variable name
      *
@@ -161,6 +161,17 @@ class Route
     public function getDefault($name)
     {
         return isset($this->defaults[$name]) ? $this->defaults[$name] : null;
+    }
+
+    /**
+     * Sets a default value.
+     *
+     * @param string $name    A variable name
+     * @param mixed  $default The default value
+     */
+    public function setDefault($name, $default)
+    {
+        $this->defaults[$name] = $default;
     }
 
     /**

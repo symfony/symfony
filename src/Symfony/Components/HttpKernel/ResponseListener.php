@@ -16,7 +16,7 @@ use Symfony\Components\HttpFoundation\Response;
  */
 
 /**
- * ResponseListener.
+ * ResponseListener fixes the Response Content-Type.
  *
  * @author     Fabien Potencier <fabien.potencier@symfony-project.com>
  */

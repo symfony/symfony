@@ -18,7 +18,7 @@ use Symfony\Components\HttpKernel\HttpKernelInterface;
  */
 
 /**
- * WebDebugToolbarListener.
+ * WebDebugToolbarListener injects the Web Debug Toolbar.
  *
  * @author     Fabien Potencier <fabien.potencier@symfony-project.com>
  */

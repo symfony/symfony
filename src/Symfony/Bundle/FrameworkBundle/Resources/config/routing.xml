@@ -6,7 +6,7 @@
 
     <parameters>
         <parameter key="router.class">Symfony\Components\Routing\Router</parameter>
-        <parameter key="routing.loader.class">Symfony\Components\Routing\Loader\DelegatingLoader</parameter>
+        <parameter key="routing.loader.class">Symfony\Bundle\FrameworkBundle\Routing\DelegatingLoader</parameter>
         <parameter key="routing.resolver.class">Symfony\Bundle\FrameworkBundle\Routing\LoaderResolver</parameter>
         <parameter key="routing.loader.xml.class">Symfony\Components\Routing\Loader\XmlFileLoader</parameter>
         <parameter key="routing.loader.yml.class">Symfony\Components\Routing\Loader\YamlFileLoader</parameter>
@@ -34,6 +34,8 @@
         </service>
 
         <service id="routing.loader" class="%routing.loader.class%">
+            <argument type="service" id="controller_name_converter" />
+            <argument type="service" id="logger" on-invalid="null" />
             <argument type="service" id="routing.resolver" />
         </service>
 

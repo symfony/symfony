@@ -3,7 +3,7 @@
 namespace Symfony\Bundle\FrameworkBundle\Controller;
 
 use Symfony\Components\HttpKernel\LoggerInterface;
-use Symfony\Components\HttpKernel\Controller\ControllerResolverInterface;
+use Symfony\Components\HttpKernel\Controller\ControllerResolver as BaseControllerResolver;
 use Symfony\Components\HttpKernel\HttpKernelInterface;
 use Symfony\Components\HttpFoundation\Request;
 use Symfony\Components\EventDispatcher\Event;
@@ -21,19 +21,47 @@ use Symfony\Components\DependencyInjection\ContainerInterface;
 /**
  * ControllerResolver.
  *
- * @author     Fabien Potencier <fabien.potencier@symfony-project.com>
+ * @author Fabien Potencier <fabien.potencier@symfony-project.com>
  */
-class ControllerResolver implements ControllerResolverInterface
+class ControllerResolver extends BaseControllerResolver
 {
     protected $container;
-    protected $logger;
     protected $esiSupport;
 
+    /**
+     * Constructor.
+     *
+     * @param ContainerInterface $container A ContainerInterface instance
+     * @param LoggerInterface    $logger    A LoggerInterface instance
+     */
     public function __construct(ContainerInterface $container, LoggerInterface $logger = null)
     {
         $this->container = $container;
-        $this->logger = $logger;
         $this->esiSupport = $container->has('esi') && $container->getEsiService()->hasSurrogateEsiCapability($container->getRequestService());
+
+        parent::__construct($logger);
+    }
+
+    /**
+     * Returns a callable for the given controller.
+     *
+     * @param string $controller A Controller string
+     *
+     * @return mixed A PHP callable
+     */
+    protected function createController($controller)
+    {
+        if (false === strpos($controller, '::')) {
+            throw new \InvalidArgumentException(sprintf('Unable to find controller "%s".', $controller));
+        }
+
+        list($class, $method) = explode('::', $controller);
+
+        if (!class_exists($class)) {
+            throw new \InvalidArgumentException(sprintf('Class "%s" does not exist.', $class));
+        }
+
+        return array(new $class($this->container), $method);
     }
 
     /**
@@ -109,103 +137,6 @@ class ControllerResolver implements ControllerResolverInterface
                 throw $e;
             }
         }
-    }
-
-    /**
-     * Returns the Controller instance associated with a Request.
-     *
-     * This method looks for a '_controller' request parameter that represents
-     * the controller name (a string like BlogBundle:Post:index).
-     *
-     * @param Request $request A Request instance
-     *
-     * @return mixed|Boolean A PHP callable representing the Controller,
-     *                       or false if this resolver is not able to determine the controller
-     *
-     * @throws \InvalidArgumentException|\LogicException If the controller can't be found
-     */
-    public function getController(Request $request)
-    {
-        if (!$controller = $request->attributes->get('_controller')) {
-            if (null !== $this->logger) {
-                $this->logger->err('Unable to look for the controller as the "_controller" parameter is missing');
-            }
-
-            return false;
-        }
-
-        list($bundle, $controller, $action) = explode(':', $controller);
-        $bundle = strtr($bundle, array('/' => '\\'));
-        $class = null;
-        $logs = array();
-        foreach (array_keys($this->container->getParameter('kernel.bundle_dirs')) as $namespace) {
-            $try = $namespace.'\\'.$bundle.'\\Controller\\'.$controller.'Controller';
-            if (!class_exists($try)) {
-                if (null !== $this->logger) {
-                    $logs[] = sprintf('Failed finding controller "%s:%s" from namespace "%s" (%s)', $bundle, $controller, $namespace, $try);
-                }
-            } else {
-                if (!in_array($namespace.'\\'.$bundle.'\\'.strtr($bundle, array('\\' => '')), array_map(function ($bundle) { return get_class($bundle); }, $this->container->getKernelService()->getBundles()))) {
-                    throw new \LogicException(sprintf('To use the "%s" controller, you first need to enable the Bundle "%s" in your Kernel class.', $try, $namespace.'\\'.$bundle));
-                }
-
-                $class = $try;
-
-                break;
-            }
-        }
-
-        if (null === $class) {
-            if (null !== $this->logger) {
-                foreach ($logs as $log) {
-                    $this->logger->info($log);
-                }
-            }
-
-            throw new \InvalidArgumentException(sprintf('Unable to find controller "%s:%s".', $bundle, $controller));
-        }
-
-        $controller = new $class($this->container);
-
-        $method = $action.'Action';
-        if (!method_exists($controller, $method)) {
-            throw new \InvalidArgumentException(sprintf('Method "%s::%s" does not exist.', $class, $method));
-        }
-
-        if (null !== $this->logger) {
-            $this->logger->info(sprintf('Using controller "%s::%s"%s', $class, $method, isset($file) ? sprintf(' from file "%s"', $file) : ''));
-        }
-
-        return array($controller, $method);
-    }
-
-    /**
-     * Returns the arguments to pass to the controller.
-     *
-     * @param Request $request    A Request instance
-     * @param mixed   $controller A PHP callable
-     *
-     * @throws \RuntimeException When value for argument given is not provided
-     */
-    public function getArguments(Request $request, $controller)
-    {
-        $attributes = $request->attributes->all();
-
-        list($controller, $method) = $controller;
-
-        $r = new \ReflectionObject($controller);
-        $arguments = array();
-        foreach ($r->getMethod($method)->getParameters() as $param) {
-            if (array_key_exists($param->getName(), $attributes)) {
-                $arguments[] = $attributes[$param->getName()];
-            } elseif ($param->isDefaultValueAvailable()) {
-                $arguments[] = $param->getDefaultValue();
-            } else {
-                throw new \RuntimeException(sprintf('Controller "%s::%s()" requires that you provide a value for the "$%s" argument (because there is no default value or because there is a non optional argument after this one).', get_class($controller), $method, $param->getName()));
-            }
-        }
-
-        return $arguments;
     }
 
     /**

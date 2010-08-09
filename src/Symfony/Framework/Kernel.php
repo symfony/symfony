@@ -14,6 +14,7 @@ use Symfony\Components\DependencyInjection\Loader\XmlFileLoader;
 use Symfony\Components\DependencyInjection\Loader\YamlFileLoader;
 use Symfony\Components\DependencyInjection\Loader\IniFileLoader;
 use Symfony\Components\DependencyInjection\Loader\PhpFileLoader;
+use Symfony\Components\DependencyInjection\Loader\ClosureLoader;
 use Symfony\Components\HttpFoundation\Request;
 use Symfony\Components\HttpKernel\HttpKernelInterface;
 
@@ -394,6 +395,7 @@ abstract class Kernel implements HttpKernelInterface, \Serializable
             new YamlFileLoader($container, $this->getBundleDirs()),
             new IniFileLoader($container, $this->getBundleDirs()),
             new PhpFileLoader($container, $this->getBundleDirs()),
+            new ClosureLoader($container),
         ));
 
         return new DelegatingLoader($resolver);

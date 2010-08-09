@@ -116,7 +116,9 @@ abstract class Kernel implements HttpKernelInterface, \Serializable
             throw new \LogicException('The kernel is already booted.');
         }
 
-        require_once __DIR__.'/bootstrap.php';
+        if (!$this->isDebug()) {
+            require_once __DIR__.'/bootstrap.php';
+        }
 
         $this->bundles = $this->registerBundles();
         $this->bundleDirs = $this->registerBundleDirs();

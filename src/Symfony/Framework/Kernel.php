@@ -229,6 +229,25 @@ abstract class Kernel implements HttpKernelInterface, \Serializable
         return $this->bundles;
     }
 
+    /**
+     * Checks if a given class name belongs to an active bundle.
+     *
+     * @param string $class A class name
+     *
+     * @return Boolean true if the class belongs to an active bundle, false otherwise
+     */
+    public function isClassInActiveBundle($class)
+    {
+        foreach ($this->bundles as $bundle) {
+            $bundleClass = get_class($bundle);
+            if (0 === strpos($class, substr($bundleClass, 0, strrpos($bundleClass, '\\')))) {
+                return true;
+            }
+        }
+
+        return false;
+    }
+
     public function getName()
     {
         return $this->name;

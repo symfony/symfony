@@ -23,6 +23,7 @@
 
         <service id="controller_resolver" class="%controller_resolver.class%">
             <argument type="service" id="service_container" />
+            <argument type="service" id="controller_name_converter" />
             <argument type="service" id="logger" on-invalid="ignore" />
         </service>
 

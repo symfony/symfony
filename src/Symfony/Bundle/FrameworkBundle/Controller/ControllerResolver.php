@@ -8,6 +8,7 @@ use Symfony\Components\HttpKernel\HttpKernelInterface;
 use Symfony\Components\HttpFoundation\Request;
 use Symfony\Components\EventDispatcher\Event;
 use Symfony\Components\DependencyInjection\ContainerInterface;
+use Symfony\Bundle\FrameworkBundle\Controller\ControllerNameConverter;
 
 /*
  * This file is part of the Symfony framework.
@@ -26,17 +27,20 @@ use Symfony\Components\DependencyInjection\ContainerInterface;
 class ControllerResolver extends BaseControllerResolver
 {
     protected $container;
+    protected $converter;
     protected $esiSupport;
 
     /**
      * Constructor.
      *
-     * @param ContainerInterface $container A ContainerInterface instance
-     * @param LoggerInterface    $logger    A LoggerInterface instance
+     * @param ContainerInterface      $container A ContainerInterface instance
+     * @param ControllerNameConverter $converter A ControllerNameConverter instance
+     * @param LoggerInterface         $logger    A LoggerInterface instance
      */
-    public function __construct(ContainerInterface $container, LoggerInterface $logger = null)
+    public function __construct(ContainerInterface $container, ControllerNameConverter $converter, LoggerInterface $logger = null)
     {
         $this->container = $container;
+        $this->converter = $converter;
         $this->esiSupport = $container->has('esi') && $container->getEsiService()->hasSurrogateEsiCapability($container->getRequestService());
 
         parent::__construct($logger);
@@ -52,7 +56,8 @@ class ControllerResolver extends BaseControllerResolver
     protected function createController($controller)
     {
         if (false === strpos($controller, '::')) {
-            throw new \InvalidArgumentException(sprintf('Unable to find controller "%s".', $controller));
+            // must be a controller in the a:b:c notation then
+            $controller = $this->converter->fromShortNotation($controller);
         }
 
         list($class, $method) = explode('::', $controller);

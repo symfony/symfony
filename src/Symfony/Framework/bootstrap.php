@@ -19,11 +19,6 @@ abstract class Bundle implements BundleInterface
     protected $reflection;
 
     
-    public function buildContainer(ParameterBagInterface $parameterBag)
-    {
-    }
-
-    
     public function boot(ContainerInterface $container)
     {
     }
@@ -74,6 +69,26 @@ abstract class Bundle implements BundleInterface
     }
 
     
+    public function registerExtensions(ContainerBuilder $container)
+    {
+        if (!$dir = realpath($this->getPath().'/DependencyInjection')) {
+            return array();
+        }
+
+        $finder = new Finder();
+        $finder->files()->name('*Extension.php')->in($dir);
+
+        $prefix = $this->namespacePrefix.'\\'.$this->name.'\\DependencyInjection';
+        foreach ($finder as $file) {
+            $class = $prefix.strtr($file->getPath(), array($dir => '', '/' => '\\')).'\\'.basename($file, '.php');
+
+            if ('Extension' === substr($class, -9)) {
+                $container->registerExtension(new $class());
+            }
+        }
+    }
+
+    
     public function registerCommands(Application $application)
     {
         if (!$dir = realpath($this->getPath().'/Command')) {
@@ -115,9 +130,6 @@ use Symfony\Components\DependencyInjection\ParameterBag\ParameterBagInterface;
 interface BundleInterface
 {
     
-    public function buildContainer(ParameterBagInterface $parameterBag);
-
-    
     public function boot(ContainerInterface $container);
 
     
@@ -141,12 +153,6 @@ use Symfony\Components\DependencyInjection\ContainerBuilder;
 
 class KernelBundle extends Bundle
 {
-    
-    public function buildContainer(ParameterBagInterface $parameterBag)
-    {
-        ContainerBuilder::registerExtension(new KernelExtension());
-    }
-
     
     public function boot(ContainerInterface $container)
     {

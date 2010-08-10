@@ -30,17 +30,6 @@ abstract class Bundle implements BundleInterface
     protected $reflection;
 
     /**
-     * Customizes the Container instance.
-     *
-     * @param ParameterBagInterface $parameterBag A ParameterBagInterface instance
-     *
-     * @return ContainerBuilder A ContainerBuilder instance
-     */
-    public function buildContainer(ParameterBagInterface $parameterBag)
-    {
-    }
-
-    /**
      * Boots the Bundle.
      *
      * @param ContainerInterface $container A ContainerInterface instance
@@ -115,7 +104,36 @@ abstract class Bundle implements BundleInterface
     }
 
     /**
-     * Finds and registers commands for the current bundle.
+     * Finds and registers Dependency Injection Container extensions.
+     *
+     * Override this method if your DIC extensions do not follow the conventions:
+     *
+     * * Extensions are in the 'DependencyInjection/' sub-directory
+     * * Extension class names ends with 'Extension'
+     *
+     * @param ContainerBuilder A ContainerBuilder instance
+     */
+    public function registerExtensions(ContainerBuilder $container)
+    {
+        if (!$dir = realpath($this->getPath().'/DependencyInjection')) {
+            return array();
+        }
+
+        $finder = new Finder();
+        $finder->files()->name('*Extension.php')->in($dir);
+
+        $prefix = $this->namespacePrefix.'\\'.$this->name.'\\DependencyInjection';
+        foreach ($finder as $file) {
+            $class = $prefix.strtr($file->getPath(), array($dir => '', '/' => '\\')).'\\'.basename($file, '.php');
+
+            if ('Extension' === substr($class, -9)) {
+                $container->registerExtension(new $class());
+            }
+        }
+    }
+
+    /**
+     * Finds and registers Commands.
      *
      * @param Application $application An Application instance
      */

@@ -23,15 +23,4 @@ use Symfony\Bundle\TwigBundle\DependencyInjection\TwigExtension;
  */
 class TwigBundle extends Bundle
 {
-    /**
-     * Customizes the Container instance.
-     *
-     * @param ParameterBagInterface $parameterBag A ParameterBagInterface instance
-     *
-     * @return ContainerBuilder A ContainerBuilder instance
-     */
-    public function buildContainer(ParameterBagInterface $parameterBag)
-    {
-        ContainerBuilder::registerExtension(new TwigExtension());
-    }
 }

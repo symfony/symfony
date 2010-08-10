@@ -9,18 +9,6 @@ use Symfony\Bundle\PropelBundle\DependencyInjection\PropelExtension;
 
 class PropelBundle extends Bundle
 {
-    /**
-     * Customizes the Container instance.
-     *
-     * @param ParameterBagInterface $parameterBag A ParameterBagInterface instance
-     *
-     * @return ContainerBuilder A ContainerBuilder instance
-     */
-    public function buildContainer(ParameterBagInterface $parameterBag)
-    {
-        ContainerBuilder::registerExtension(new PropelExtension());
-    }
-
     public function boot(ContainerInterface $container)
     {
         require_once $container->getParameter('propel.path').'/runtime/lib/Propel.php';

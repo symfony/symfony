@@ -23,15 +23,6 @@ use Symfony\Components\DependencyInjection\ParameterBag\ParameterBagInterface;
 interface BundleInterface
 {
     /**
-     * Customizes the Container instance.
-     *
-     * @param ParameterBagInterface $parameterBag A ParameterBagInterface instance
-     *
-     * @return ContainerBuilder A ContainerBuilder instance
-     */
-    public function buildContainer(ParameterBagInterface $parameterBag);
-
-    /**
      * Boots the Bundle.
      *
      * @param ContainerInterface $container A ContainerInterface instance

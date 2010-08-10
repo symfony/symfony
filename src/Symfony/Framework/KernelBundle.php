@@ -28,18 +28,6 @@ use Symfony\Components\DependencyInjection\ContainerBuilder;
 class KernelBundle extends Bundle
 {
     /**
-     * Customizes the Container instance.
-     *
-     * @param ParameterBagInterface $parameterBag A ParameterBagInterface instance
-     *
-     * @return ContainerBuilder A ContainerBuilder instance
-     */
-    public function buildContainer(ParameterBagInterface $parameterBag)
-    {
-        ContainerBuilder::registerExtension(new KernelExtension());
-    }
-
-    /**
      * Boots the Bundle.
      *
      * @param ContainerInterface $container A ContainerInterface instance

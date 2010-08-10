@@ -24,15 +24,4 @@ use Symfony\Bundle\ZendBundle\DependencyInjection\ZendExtension;
  */
 class ZendBundle extends Bundle
 {
-    /**
-     * Customizes the Container instance.
-     *
-     * @param ParameterBagInterface $parameterBag A ParameterBagInterface instance
-     *
-     * @return ContainerBuilder A ContainerBuilder instance
-     */
-    public function buildContainer(ParameterBagInterface $parameterBag)
-    {
-        ContainerBuilder::registerExtension(new ZendExtension());
-    }
 }

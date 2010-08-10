@@ -24,15 +24,4 @@ use Symfony\Bundle\FrameworkBundle\DependencyInjection\WebExtension;
  */
 class FrameworkBundle extends Bundle
 {
-    /**
-     * Customizes the Container instance.
-     *
-     * @param ParameterBagInterface $parameterBag A ParameterBagInterface instance
-     *
-     * @return ContainerBuilder A ContainerBuilder instance
-     */
-    public function buildContainer(ParameterBagInterface $parameterBag)
-    {
-        ContainerBuilder::registerExtension(new WebExtension($parameterBag->get('kernel.bundle_dirs'), $parameterBag->get('kernel.bundles')));
-    }
 }

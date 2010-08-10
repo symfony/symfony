@@ -366,9 +366,7 @@ abstract class Kernel implements HttpKernelInterface, \Serializable
 
         $container = new ContainerBuilder($parameterBag);
         foreach ($this->bundles as $bundle) {
-            if (null !== $c = $bundle->buildContainer($parameterBag)) {
-                $container->merge($c);
-            }
+            $bundle->registerExtensions($container);
 
             if ($this->debug) {
                 $container->addObjectResource($bundle);

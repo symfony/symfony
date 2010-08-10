@@ -11,10 +11,6 @@
                         http://www.symfony-project.org/schema/dic/doctrine http://www.symfony-project.org/schema/dic/doctrine/doctrine-1.0.xsd
                         http://www.symfony-project.org/schema/dic/swiftmailer http://www.symfony-project.org/schema/dic/swiftmailer/swiftmailer-1.0.xsd">
 
-    <parameters>
-        <parameter key="kernel.include_core_classes">false</parameter>
-    </parameters>
-
     <kernel:config
         charset="UTF-8"
         error_handler="null"

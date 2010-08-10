@@ -17,6 +17,7 @@ use Symfony\Components\DependencyInjection\Loader\PhpFileLoader;
 use Symfony\Components\DependencyInjection\Loader\ClosureLoader;
 use Symfony\Components\HttpFoundation\Request;
 use Symfony\Components\HttpKernel\HttpKernelInterface;
+use Symfony\Framework\ClassCollectionLoader;
 
 /*
  * This file is part of the Symfony package.
@@ -35,6 +36,8 @@ use Symfony\Components\HttpKernel\HttpKernelInterface;
  */
 abstract class Kernel implements HttpKernelInterface, \Serializable
 {
+    static protected $loaded;
+
     protected $bundles;
     protected $bundleDirs;
     protected $container;
@@ -122,6 +125,14 @@ abstract class Kernel implements HttpKernelInterface, \Serializable
         $this->bundles = $this->registerBundles();
         $this->bundleDirs = $this->registerBundleDirs();
         $this->container = $this->initializeContainer();
+
+        // load core classes
+        ClassCollectionLoader::load(
+            $this->container->getParameter('kernel.compiled_classes'),
+            $this->container->getParameter('kernel.cache_dir'),
+            'classes',
+            $this->container->getParameter('kernel.debug')
+        );
 
         foreach ($this->bundles as $bundle) {
             $bundle->setContainer($this->container);
@@ -314,15 +325,16 @@ abstract class Kernel implements HttpKernelInterface, \Serializable
 
         return array_merge(
             array(
-                'kernel.root_dir'    => $this->rootDir,
-                'kernel.environment' => $this->environment,
-                'kernel.debug'       => $this->debug,
-                'kernel.name'        => $this->name,
-                'kernel.cache_dir'   => $this->getCacheDir(),
-                'kernel.logs_dir'    => $this->getLogDir(),
-                'kernel.bundle_dirs' => $this->bundleDirs,
-                'kernel.bundles'     => $bundles,
-                'kernel.charset'     => 'UTF-8',
+                'kernel.root_dir'         => $this->rootDir,
+                'kernel.environment'      => $this->environment,
+                'kernel.debug'            => $this->debug,
+                'kernel.name'             => $this->name,
+                'kernel.cache_dir'        => $this->getCacheDir(),
+                'kernel.logs_dir'         => $this->getLogDir(),
+                'kernel.bundle_dirs'      => $this->bundleDirs,
+                'kernel.bundles'          => $bundles,
+                'kernel.charset'          => 'UTF-8',
+                'kernel.compiled_classes' => array(),
             ),
             $this->getEnvParameters()
         );

@@ -1,7 +1,5 @@
 <?php
 
-$container->setParameter('kernel.include_core_classes', false);
-
 $container->loadFromExtension('kernel', 'config', array(
     'charset'       => 'UTF-8',
     'error_handler' => null,

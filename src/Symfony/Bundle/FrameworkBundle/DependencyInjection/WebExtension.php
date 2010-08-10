@@ -163,6 +163,21 @@ class WebExtension extends Extension
                 $container->getDefinition('validator')->clearTags();
             }
         }
+
+        $container->setParameter('kernel.compiled_classes', array_merge($container->getParameter('kernel.compiled_classes'), array(
+            'Symfony\\Components\\EventDispatcher\\Event',
+            'Symfony\\Components\\HttpKernel\\ResponseListener',
+            'Symfony\\Bundle\\FrameworkBundle\\Controller',
+
+            // routing
+            'Symfony\\Components\\Routing\\RouterInterface',
+            'Symfony\\Components\\Routing\\Router',
+            'Symfony\\Components\\Routing\\Matcher\\UrlMatcherInterface',
+            'Symfony\\Components\\Routing\\Matcher\\UrlMatcher',
+            'Symfony\\Components\\Routing\\Generator\\UrlGeneratorInterface',
+            'Symfony\\Components\\Routing\\Generator\\UrlGenerator',
+            'Symfony\\Bundle\\FrameworkBundle\\RequestListener',
+        )));
     }
 
     /**
@@ -226,6 +241,20 @@ class WebExtension extends Extension
             $container->setDefinition('templating.loader', $container->getDefinition('templating.loader.cache'));
             $container->setParameter('templating.loader.cache.path', $config['cache']);
         }
+
+        // compilation
+        $container->setParameter('kernel.compiled_classes', array_merge($container->getParameter('kernel.compiled_classes'), array(
+            'Symfony\\Components\\Templating\\Loader\\LoaderInterface',
+            'Symfony\\Components\\Templating\\Loader\\Loader',
+            'Symfony\\Components\\Templating\\Loader\\FilesystemLoader',
+            'Symfony\\Components\\Templating\\Engine',
+            'Symfony\\Components\\Templating\\Renderer\\RendererInterface',
+            'Symfony\\Components\\Templating\\Renderer\\Renderer',
+            'Symfony\\Components\\Templating\\Renderer\\PhpRenderer',
+            'Symfony\\Components\\Templating\\Storage\\Storage',
+            'Symfony\\Components\\Templating\\Storage\\FileStorage',
+            'Symfony\\Bundle\\FrameworkBundle\\Templating\\Engine',
+        )));
     }
 
     /**

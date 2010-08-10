@@ -29,10 +29,5 @@ class KernelBundle extends Bundle
         if ($this->container->has('error_handler')) {
             $this->container['error_handler'];
         }
-
-        // load core classes
-        if ($this->container->getParameterBag()->has('kernel.include_core_classes') && $this->container->getParameter('kernel.include_core_classes')) {
-            ClassCollectionLoader::load($this->container->getParameter('kernel.compiled_classes'), $this->container->getParameter('kernel.cache_dir'), 'classes', $this->container->getParameter('kernel.debug'));
-        }
     }
 }

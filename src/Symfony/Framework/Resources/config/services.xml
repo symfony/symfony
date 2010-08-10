@@ -12,7 +12,6 @@
         <parameter key="error_handler.class">Symfony\Framework\Debug\ErrorHandler</parameter>
         <parameter key="error_handler.level">null</parameter>
         <parameter key="error_handler.enable">true</parameter>
-        <parameter key="kernel.include_core_classes">true</parameter>
     </parameters>
 
     <services>

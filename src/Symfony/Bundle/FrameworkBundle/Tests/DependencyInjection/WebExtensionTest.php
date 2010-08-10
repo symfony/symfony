@@ -20,14 +20,14 @@ class WebExtensionTest extends TestCase
 {
     public function testConfigLoad()
     {
-        $container = new ContainerBuilder();
-        $loader = $this->getWebExtension();
+        $container = $this->getContainer();
+        $loader = new WebExtension();
 
         $loader->configLoad(array(), $container);
         $this->assertEquals('Symfony\\Bundle\\FrameworkBundle\\RequestListener', $container->getParameter('request_listener.class'), '->webLoad() loads the web.xml file if not already loaded');
 
         $container = $this->getContainer();
-        $loader = $this->getWebExtension();
+        $loader = new WebExtension();
 
         $loader->configLoad(array('profiler' => true), $container);
         $this->assertEquals('Symfony\\Bundle\\FrameworkBundle\\Profiler', $container->getParameter('profiler.class'), '->configLoad() loads the collectors.xml file if not already loaded');
@@ -40,7 +40,7 @@ class WebExtensionTest extends TestCase
     public function testTemplatingLoad()
     {
         $container = $this->getContainer();
-        $loader = $this->getWebExtension();
+        $loader = new WebExtension();
 
         $loader->templatingLoad(array(), $container);
         $this->assertEquals('Symfony\\Bundle\\FrameworkBundle\\Templating\\Engine', $container->getParameter('templating.engine.class'), '->templatingLoad() loads the templating.xml file if not already loaded');
@@ -49,7 +49,7 @@ class WebExtensionTest extends TestCase
     public function testValidationLoad()
     {
         $container = $this->getContainer();
-        $loader = $this->getWebExtension();
+        $loader = new WebExtension();
 
         $loader->configLoad(array('validation' => array('enabled' => true)), $container);
         $this->assertEquals('Symfony\Components\Validator\Validator', $container->getParameter('validator.class'), '->validationLoad() loads the validation.xml file if not already loaded');
@@ -59,20 +59,17 @@ class WebExtensionTest extends TestCase
         $this->assertTrue($container->hasDefinition('validator.mapping.loader.annotation_loader'), '->validationLoad() loads the annotations service');
     }
 
-    public function getWebExtension() {
-        return new WebExtension(array(
-            'Symfony\\Framework' => __DIR__ . '/../../../Framework',
-        ), array(
-            'FrameworkBundle',
-        ));
-    }
-
     protected function getContainer()
     {
         return new ContainerBuilder(new ParameterBag(array(
-            'kernel.bundle_dirs' => array(),
-            'kernel.bundles'     => array(),
-            'kernel.debug'       => false,
+            'kernel.bundle_dirs'      => array(
+                'Symfony\\Framework' => __DIR__ . '/../../../Framework',
+            ),
+            'kernel.bundles'          => array(
+                'FrameworkBundle',
+            ),
+            'kernel.debug'            => false,
+            'kernel.compiled_classes' => array(),
         )));
     }
 }

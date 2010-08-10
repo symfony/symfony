@@ -23,6 +23,8 @@ class ClassCollectionLoader
      */
     static public function load($classes, $cacheDir, $name, $autoReload)
     {
+        $classes = array_unique($classes);
+
         $cache = $cacheDir.'/'.$name.'.php';
 
         // auto-reload

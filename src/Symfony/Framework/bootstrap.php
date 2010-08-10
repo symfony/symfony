@@ -69,9 +69,7 @@ use Symfony\Framework\ClassCollectionLoader;
 class KernelBundle extends Bundle {
     public function boot() {
         if ($this->container->has('error_handler')) {
-            $this->container['error_handler']; }
-                if ($this->container->getParameterBag()->has('kernel.include_core_classes') && $this->container->getParameter('kernel.include_core_classes')) {
-            ClassCollectionLoader::load($this->container->getParameter('kernel.compiled_classes'), $this->container->getParameter('kernel.cache_dir'), 'classes', $this->container->getParameter('kernel.debug')); } } }
+            $this->container['error_handler']; } } }
 namespace Symfony\Framework\DependencyInjection;
 use Symfony\Components\DependencyInjection\Extension\Extension;
 use Symfony\Components\DependencyInjection\Loader\XmlFileLoader;
@@ -79,8 +77,7 @@ use Symfony\Components\DependencyInjection\ContainerBuilder;
 class KernelExtension extends Extension {
     public function testLoad($config, ContainerBuilder $container) {
         $loader = new XmlFileLoader($container, array(__DIR__.'/../Resources/config', __DIR__.'/Resources/config'));
-        $loader->load('test.xml');
-        $container->setParameter('kernel.include_core_classes', false); }
+        $loader->load('test.xml'); }
     public function sessionLoad($config, ContainerBuilder $container) {
         if (!$container->hasDefinition('session')) {
             $loader = new XmlFileLoader($container, array(__DIR__.'/../Resources/config', __DIR__.'/Resources/config'));
@@ -106,35 +103,6 @@ class KernelExtension extends Extension {
                 $container->setDefinition('event_dispatcher', $container->findDefinition('debug.event_dispatcher')); } }
         if (isset($config['charset'])) {
             $container->setParameter('kernel.charset', $config['charset']); }
-        if (!array_key_exists('compilation', $config)) {
-            $classes = array(
-                'Symfony\\Components\\Routing\\RouterInterface',
-                'Symfony\\Components\\Routing\\Router',
-                'Symfony\\Components\\EventDispatcher\\Event',
-                'Symfony\\Components\\Routing\\Matcher\\UrlMatcherInterface',
-                'Symfony\\Components\\Routing\\Matcher\\UrlMatcher',
-                'Symfony\\Components\\HttpKernel\\HttpKernel',
-                'Symfony\\Components\\HttpFoundation\\Request',
-                'Symfony\\Components\\HttpFoundation\\Response',
-                'Symfony\\Components\\HttpKernel\\ResponseListener',
-                'Symfony\\Components\\Templating\\Loader\\LoaderInterface',
-                'Symfony\\Components\\Templating\\Loader\\Loader',
-                'Symfony\\Components\\Templating\\Loader\\FilesystemLoader',
-                'Symfony\\Components\\Templating\\Engine',
-                'Symfony\\Components\\Templating\\Renderer\\RendererInterface',
-                'Symfony\\Components\\Templating\\Renderer\\Renderer',
-                'Symfony\\Components\\Templating\\Renderer\\PhpRenderer',
-                'Symfony\\Components\\Templating\\Storage\\Storage',
-                'Symfony\\Components\\Templating\\Storage\\FileStorage',
-                'Symfony\\Bundle\\FrameworkBundle\\RequestListener',
-                'Symfony\\Bundle\\FrameworkBundle\\Controller',
-                'Symfony\\Bundle\\FrameworkBundle\\Templating\\Engine',
-            ); } else {
-            $classes = array();
-            foreach (explode("\n", $config['compilation']) as $class) {
-                if ($class) {
-                    $classes[] = trim($class); } } }
-        $container->setParameter('kernel.compiled_classes', $classes);
         if (array_key_exists('error_handler', $config)) {
             if (false === $config['error_handler']) {
                 $container->getDefinition('error_handler')->setMethodCalls(array()); } else {
@@ -171,6 +139,7 @@ class ErrorHandler {
 namespace Symfony\Framework;
 class ClassCollectionLoader {
     static public function load($classes, $cacheDir, $name, $autoReload) {
+        $classes = array_unique($classes);
         $cache = $cacheDir.'/'.$name.'.php';
                 $reload = false;
         if ($autoReload) {

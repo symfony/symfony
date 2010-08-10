@@ -185,6 +185,10 @@ class WebExtension extends Extension
         if (!$container->hasDefinition('templating')) {
             $loader = new XmlFileLoader($container, __DIR__.'/../Resources/config');
             $loader->load($this->resources['templating']);
+
+            if ($container->getParameter('kernel.debug')) {
+                $loader->load('templating_debug.xml');
+            }
         }
 
         if (array_key_exists('escaping', $config)) {
@@ -194,6 +198,13 @@ class WebExtension extends Extension
         if (array_key_exists('assets_version', $config)) {
             $container->setParameter('templating.assets.version', $config['assets_version']);
         }
+
+        // template paths
+        $dirs = array('%kernel.root_dir%/views/%%bundle%%/%%controller%%/%%name%%%%format%%.%%renderer%%');
+        foreach ($container->getParameter('kernel.bundle_dirs') as $dir) {
+            $dirs[] = $dir.'/%%bundle%%/Resources/views/%%controller%%/%%name%%%%format%%.%%renderer%%';
+        }
+        $container->setParameter('templating.loader.filesystem.path', $dirs);
 
         // path for the filesystem loader
         if (isset($config['path'])) {

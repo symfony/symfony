@@ -34,19 +34,5 @@ class FrameworkBundle extends Bundle
     public function buildContainer(ParameterBagInterface $parameterBag)
     {
         ContainerBuilder::registerExtension(new WebExtension($parameterBag->get('kernel.bundle_dirs'), $parameterBag->get('kernel.bundles')));
-
-        $dirs = array('%kernel.root_dir%/views/%%bundle%%/%%controller%%/%%name%%%%format%%.%%renderer%%');
-        foreach ($parameterBag->get('kernel.bundle_dirs') as $dir) {
-            $dirs[] = $dir.'/%%bundle%%/Resources/views/%%controller%%/%%name%%%%format%%.%%renderer%%';
-        }
-        $parameterBag->set('templating.loader.filesystem.path', $dirs);
-
-        $container = new ContainerBuilder();
-        if ($parameterBag->get('kernel.debug')) {
-            $loader = new XmlFileLoader($container, __DIR__.'/Resources/config');
-            $loader->load('debug.xml');
-        }
-
-        return $container;
     }
 }

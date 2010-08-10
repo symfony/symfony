@@ -34,15 +34,6 @@ class WebExtension extends Extension
         'validation' => 'validator.xml',
     );
 
-    protected $bundleDirs = array();
-    protected $bundles = array();
-
-    public function __construct(array $bundleDirs, array $bundles)
-    {
-        $this->bundleDirs = $bundleDirs;
-        $this->bundles = $bundles;
-    }
-
     /**
      * Loads the web configuration.
      *
@@ -113,12 +104,12 @@ class WebExtension extends Extension
                 $messageFiles[] = __DIR__ . '/../../../Components/Validator/Resources/i18n/messages.en.xml';
                 $messageFiles[] = __DIR__ . '/../../../Components/Form/Resources/i18n/messages.en.xml';
 
-                foreach ($this->bundles as $className) {
+                foreach ($container->getParameter('kernel.bundles') as $className) {
                     $tmp = dirname(str_replace('\\', '/', $className));
                     $namespace = str_replace('/', '\\', dirname($tmp));
                     $bundle = basename($tmp);
 
-                    foreach ($this->bundleDirs as $dir) {
+                    foreach ($container->getParameter('kernel.bundle_dirs') as $dir) {
                         if (file_exists($file = $dir.'/'.$bundle.'/Resources/config/validation.xml')) {
                             $xmlMappingFiles[] = realpath($file);
                         }

@@ -14,6 +14,7 @@ namespace Symfony\Bundle\FrameworkBundle\Tests\DependencyInjection;
 use Symfony\Bundle\FrameworkBundle\Tests\TestCase;
 use Symfony\Bundle\FrameworkBundle\DependencyInjection\WebExtension;
 use Symfony\Components\DependencyInjection\ContainerBuilder;
+use Symfony\Components\DependencyInjection\ParameterBag\ParameterBag;
 
 class WebExtensionTest extends TestCase
 {
@@ -25,7 +26,7 @@ class WebExtensionTest extends TestCase
         $loader->configLoad(array(), $container);
         $this->assertEquals('Symfony\\Bundle\\FrameworkBundle\\RequestListener', $container->getParameter('request_listener.class'), '->webLoad() loads the web.xml file if not already loaded');
 
-        $container = new ContainerBuilder();
+        $container = $this->getContainer();
         $loader = $this->getWebExtension();
 
         $loader->configLoad(array('profiler' => true), $container);
@@ -38,7 +39,7 @@ class WebExtensionTest extends TestCase
 
     public function testTemplatingLoad()
     {
-        $container = new ContainerBuilder();
+        $container = $this->getContainer();
         $loader = $this->getWebExtension();
 
         $loader->templatingLoad(array(), $container);
@@ -47,7 +48,7 @@ class WebExtensionTest extends TestCase
 
     public function testValidationLoad()
     {
-        $container = new ContainerBuilder();
+        $container = $this->getContainer();
         $loader = $this->getWebExtension();
 
         $loader->configLoad(array('validation' => array('enabled' => true)), $container);
@@ -64,5 +65,14 @@ class WebExtensionTest extends TestCase
         ), array(
             'FrameworkBundle',
         ));
+    }
+
+    protected function getContainer()
+    {
+        return new ContainerBuilder(new ParameterBag(array(
+            'kernel.bundle_dirs' => array(),
+            'kernel.bundles'     => array(),
+            'kernel.debug'       => false,
+        )));
     }
 }

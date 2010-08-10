@@ -107,8 +107,6 @@ abstract class Kernel implements HttpKernelInterface, \Serializable
      * This method boots the bundles, which MUST set
      * the DI container.
      *
-     * @return Kernel The current Kernel instance
-     *
      * @throws \LogicException When the Kernel is already booted
      */
     public function boot()
@@ -123,19 +121,14 @@ abstract class Kernel implements HttpKernelInterface, \Serializable
 
         $this->bundles = $this->registerBundles();
         $this->bundleDirs = $this->registerBundleDirs();
-
-        // initialize the container
         $this->container = $this->initializeContainer();
-        $this->container->set('kernel', $this);
 
-        // boot bundles
         foreach ($this->bundles as $bundle) {
-            $bundle->boot($this->container);
+            $bundle->setContainer($this->container);
+            $bundle->boot();
         }
 
         $this->booted = true;
-
-        return $this;
     }
 
     /**
@@ -148,7 +141,8 @@ abstract class Kernel implements HttpKernelInterface, \Serializable
         $this->booted = false;
 
         foreach ($this->bundles as $bundle) {
-            $bundle->shutdown($this->container);
+            $bundle->shutdown();
+            $bundle->setContainer(null);
         }
 
         $this->container = null;
@@ -193,14 +187,14 @@ abstract class Kernel implements HttpKernelInterface, \Serializable
         }
 
         if (null === $request) {
-            $request = $this->container->getRequestService();
+            $request = $this->container->get('request');
+        } else {
+            $this->container->set('request', $request);
         }
 
         if (HttpKernelInterface::MASTER_REQUEST === $type) {
             $this->request = $request;
         }
-
-        $this->container->set('request', $request);
 
         $response = $this->container->getHttpKernelService()->handle($request, $type, $raw);
 
@@ -305,7 +299,10 @@ abstract class Kernel implements HttpKernelInterface, \Serializable
 
         require_once $location.'.php';
 
-        return new $class();
+        $container = new $class();
+        $container->set('kernel', $this);
+
+        return $container;
     }
 
     public function getKernelParameters()

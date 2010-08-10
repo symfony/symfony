@@ -4,7 +4,6 @@ namespace Symfony\Framework;
 
 use Symfony\Framework\Bundle\Bundle;
 use Symfony\Framework\ClassCollectionLoader;
-use Symfony\Components\DependencyInjection\ContainerInterface;
 
 /*
  * This file is part of the Symfony framework.
@@ -24,18 +23,16 @@ class KernelBundle extends Bundle
 {
     /**
      * Boots the Bundle.
-     *
-     * @param ContainerInterface $container A ContainerInterface instance
      */
-    public function boot(ContainerInterface $container)
+    public function boot()
     {
-        if ($container->has('error_handler')) {
-            $container['error_handler'];
+        if ($this->container->has('error_handler')) {
+            $this->container['error_handler'];
         }
 
         // load core classes
-        if ($container->getParameterBag()->has('kernel.include_core_classes') && $container->getParameter('kernel.include_core_classes')) {
-            ClassCollectionLoader::load($container->getParameter('kernel.compiled_classes'), $container->getParameter('kernel.cache_dir'), 'classes', $container->getParameter('kernel.debug'));
+        if ($this->container->getParameterBag()->has('kernel.include_core_classes') && $this->container->getParameter('kernel.include_core_classes')) {
+            ClassCollectionLoader::load($this->container->getParameter('kernel.compiled_classes'), $this->container->getParameter('kernel.cache_dir'), 'classes', $this->container->getParameter('kernel.debug'));
         }
     }
 }

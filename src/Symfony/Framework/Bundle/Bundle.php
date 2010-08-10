@@ -24,26 +24,33 @@ use Symfony\Components\Finder\Finder;
  */
 abstract class Bundle implements BundleInterface
 {
+    protected $container;
     protected $name;
     protected $namespacePrefix;
     protected $path;
     protected $reflection;
 
     /**
-     * Boots the Bundle.
+     * Sets the Container associated with this bundle.
      *
      * @param ContainerInterface $container A ContainerInterface instance
      */
-    public function boot(ContainerInterface $container)
+    public function setContainer(ContainerInterface $container = null)
+    {
+        $this->container = $container;
+    }
+
+    /**
+     * Boots the Bundle.
+     */
+    public function boot()
     {
     }
 
     /**
      * Shutdowns the Bundle.
-     *
-     * @param ContainerInterface $container A ContainerInterface instance
      */
-    public function shutdown(ContainerInterface $container)
+    public function shutdown()
     {
     }
 
@@ -111,7 +118,7 @@ abstract class Bundle implements BundleInterface
      * * Extensions are in the 'DependencyInjection/' sub-directory
      * * Extension class names ends with 'Extension'
      *
-     * @param ContainerBuilder A ContainerBuilder instance
+     * @param ContainerBuilder $container A ContainerBuilder instance
      */
     public function registerExtensions(ContainerBuilder $container)
     {

@@ -13,18 +13,25 @@ use Symfony\Components\Finder\Finder;
 
 abstract class Bundle implements BundleInterface
 {
+    protected $container;
     protected $name;
     protected $namespacePrefix;
     protected $path;
     protected $reflection;
 
     
-    public function boot(ContainerInterface $container)
+    public function setContainer(ContainerInterface $container = null)
+    {
+        $this->container = $container;
+    }
+
+    
+    public function boot()
     {
     }
 
     
-    public function shutdown(ContainerInterface $container)
+    public function shutdown()
     {
     }
 
@@ -121,8 +128,6 @@ abstract class Bundle implements BundleInterface
 namespace Symfony\Framework\Bundle;
 
 use Symfony\Components\DependencyInjection\ContainerInterface;
-use Symfony\Components\DependencyInjection\ContainerBuilder;
-use Symfony\Components\DependencyInjection\ParameterBag\ParameterBagInterface;
 
 
 
@@ -130,10 +135,13 @@ use Symfony\Components\DependencyInjection\ParameterBag\ParameterBagInterface;
 interface BundleInterface
 {
     
-    public function boot(ContainerInterface $container);
+    public function boot();
 
     
-    public function shutdown(ContainerInterface $container);
+    public function shutdown();
+
+    
+    public function setContainer(ContainerInterface $container);
 }
 
 
@@ -141,7 +149,6 @@ namespace Symfony\Framework;
 
 use Symfony\Framework\Bundle\Bundle;
 use Symfony\Framework\ClassCollectionLoader;
-use Symfony\Components\DependencyInjection\ContainerInterface;
 
 
 
@@ -149,14 +156,14 @@ use Symfony\Components\DependencyInjection\ContainerInterface;
 class KernelBundle extends Bundle
 {
     
-    public function boot(ContainerInterface $container)
+    public function boot()
     {
-        if ($container->has('error_handler')) {
-            $container['error_handler'];
+        if ($this->container->has('error_handler')) {
+            $this->container['error_handler'];
         }
 
-                if ($container->getParameterBag()->has('kernel.include_core_classes') && $container->getParameter('kernel.include_core_classes')) {
-            ClassCollectionLoader::load($container->getParameter('kernel.compiled_classes'), $container->getParameter('kernel.cache_dir'), 'classes', $container->getParameter('kernel.debug'));
+                if ($this->container->getParameterBag()->has('kernel.include_core_classes') && $this->container->getParameter('kernel.include_core_classes')) {
+            ClassCollectionLoader::load($this->container->getParameter('kernel.compiled_classes'), $this->container->getParameter('kernel.cache_dir'), 'classes', $this->container->getParameter('kernel.debug'));
         }
     }
 }

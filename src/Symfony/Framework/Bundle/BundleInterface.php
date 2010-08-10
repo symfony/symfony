@@ -3,8 +3,6 @@
 namespace Symfony\Framework\Bundle;
 
 use Symfony\Components\DependencyInjection\ContainerInterface;
-use Symfony\Components\DependencyInjection\ContainerBuilder;
-use Symfony\Components\DependencyInjection\ParameterBag\ParameterBagInterface;
 
 /*
  * This file is part of the Symfony framework.
@@ -24,15 +22,18 @@ interface BundleInterface
 {
     /**
      * Boots the Bundle.
-     *
-     * @param ContainerInterface $container A ContainerInterface instance
      */
-    public function boot(ContainerInterface $container);
+    public function boot();
 
     /**
      * Shutdowns the Bundle.
+     */
+    public function shutdown();
+
+    /**
+     * Sets the Container associated with this bundle.
      *
      * @param ContainerInterface $container A ContainerInterface instance
      */
-    public function shutdown(ContainerInterface $container);
+    public function setContainer(ContainerInterface $container);
 }

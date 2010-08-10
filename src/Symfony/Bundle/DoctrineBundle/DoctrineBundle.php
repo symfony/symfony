@@ -3,9 +3,6 @@
 namespace Symfony\Bundle\DoctrineBundle;
 
 use Symfony\Framework\Bundle\Bundle;
-use Symfony\Components\DependencyInjection\ParameterBag\ParameterBagInterface;
-use Symfony\Components\DependencyInjection\ContainerBuilder;
-use Symfony\Bundle\DoctrineBundle\DependencyInjection\DoctrineExtension;
 
 /*
  * This file is part of the Symfony framework.

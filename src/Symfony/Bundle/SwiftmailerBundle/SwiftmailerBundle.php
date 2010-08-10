@@ -3,9 +3,6 @@
 namespace Symfony\Bundle\SwiftmailerBundle;
 
 use Symfony\Framework\Bundle\Bundle;
-use Symfony\Components\DependencyInjection\ParameterBag\ParameterBagInterface;
-use Symfony\Components\DependencyInjection\ContainerBuilder;
-use Symfony\Bundle\SwiftmailerBundle\DependencyInjection\SwiftmailerExtension;
 
 /*
  * This file is part of the Symfony framework.

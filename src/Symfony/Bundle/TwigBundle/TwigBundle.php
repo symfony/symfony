@@ -3,9 +3,6 @@
 namespace Symfony\Bundle\TwigBundle;
 
 use Symfony\Framework\Bundle\Bundle;
-use Symfony\Components\DependencyInjection\ParameterBag\ParameterBagInterface;
-use Symfony\Components\DependencyInjection\ContainerBuilder;
-use Symfony\Bundle\TwigBundle\DependencyInjection\TwigExtension;
 
 /*
  * This file is part of the Symfony package.

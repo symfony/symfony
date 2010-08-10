@@ -3,10 +3,6 @@
 namespace Symfony\Bundle\FrameworkBundle;
 
 use Symfony\Framework\Bundle\Bundle;
-use Symfony\Components\DependencyInjection\ParameterBag\ParameterBagInterface;
-use Symfony\Components\DependencyInjection\Loader\XmlFileLoader;
-use Symfony\Components\DependencyInjection\ContainerBuilder;
-use Symfony\Bundle\FrameworkBundle\DependencyInjection\WebExtension;
 
 /*
  * This file is part of the Symfony framework.

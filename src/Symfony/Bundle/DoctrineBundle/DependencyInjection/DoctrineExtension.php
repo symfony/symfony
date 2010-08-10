@@ -30,16 +30,6 @@ class DoctrineExtension extends Extension
         'dbal' => 'dbal.xml',
         'orm'  => 'orm.xml',
     );
-    protected $bundleDirs;
-    protected $bundles;
-    protected $kernelCacheDir;
-
-    public function __construct(array $bundleDirs, array $bundles, $kernelCacheDir)
-    {
-        $this->bundleDirs = $bundleDirs;
-        $this->bundles = $bundles;
-        $this->kernelCacheDir = $kernelCacheDir;
-    }
 
     /**
      * Loads the DBAL configuration.
@@ -69,7 +59,7 @@ class DoctrineExtension extends Extension
      */
     public function ormLoad($config, ContainerBuilder $container)
     {
-        $this->createOrmProxyDirectory();
+        $this->createOrmProxyDirectory($container->getParameter('kernel.cache_dir'));
         $this->loadOrmDefaults($config, $container);
         $this->loadOrmEntityManagers($config, $container);
     }
@@ -196,10 +186,10 @@ class DoctrineExtension extends Extension
     /**
      * Create the Doctrine ORM Entity proxy directory
      */
-    protected function createOrmProxyDirectory()
+    protected function createOrmProxyDirectory($tmpDir)
     {
         // Create entity proxy directory
-        $proxyCacheDir = $this->kernelCacheDir . '/doctrine/orm/Proxies';
+        $proxyCacheDir = $tmpDir.'/doctrine/orm/Proxies';
         if (!is_dir($proxyCacheDir)) {
             if (false === @mkdir($proxyCacheDir, 0777, true)) {
                 die(sprintf('Unable to create the Doctrine Proxy directory (%s)', dirname($proxyCacheDir)));
@@ -265,7 +255,7 @@ class DoctrineExtension extends Extension
     protected function loadOrmEntityManager(array $entityManager, ContainerBuilder $container)
     {
         $defaultEntityManager = $container->getParameter('doctrine.orm.default_entity_manager');
-        $proxyCacheDir = $this->kernelCacheDir . '/doctrine/orm/Proxies';
+        $proxyCacheDir = $container->getParameter('kernel.cache_dir').'/doctrine/orm/Proxies';
 
         $ormConfigDef = new Definition('Doctrine\ORM\Configuration');
         $container->setDefinition(sprintf('doctrine.orm.%s_configuration', $entityManager['name']), $ormConfigDef);
@@ -338,9 +328,9 @@ class DoctrineExtension extends Extension
         // configure metadata driver for each bundle based on the type of mapping files found
         $mappingDriverDef = new Definition('%doctrine.orm.metadata.driver_chain_class%');
         $bundleEntityMappings = array();
-        $bundleDirs = $this->bundleDirs;
+        $bundleDirs = $container->getParameter('kernel.bundle_dirs');
         $aliasMap = array();
-        foreach ($this->bundles as $className) {
+        foreach ($container->getParameter('kernel.bundles') as $className) {
             $tmp = dirname(str_replace('\\', '/', $className));
             $namespace = str_replace('/', '\\', dirname($tmp));
             $class = basename($tmp);
@@ -464,7 +454,7 @@ class DoctrineExtension extends Extension
     protected function findBundleSubpaths($path, ContainerBuilder $container)
     {
         $dirs = array();
-        foreach ($this->bundles as $bundle) {
+        foreach ($container->getParameter('kernel.bundles') as $bundle) {
             $reflection = new \ReflectionClass($bundle);
             if (is_dir($dir = dirname($reflection->getFilename()).'/'.$path)) {
                 $dirs[] = $dir;

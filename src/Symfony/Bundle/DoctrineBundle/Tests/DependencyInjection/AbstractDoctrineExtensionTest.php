@@ -14,6 +14,7 @@ namespace Symfony\Bundle\DoctrineBundle\Tests\DependencyInjection;
 use Symfony\Bundle\DoctrineBundle\Tests\TestCase;
 use Symfony\Bundle\DoctrineBundle\DependencyInjection\DoctrineExtension;
 use Symfony\Components\DependencyInjection\ContainerBuilder;
+use Symfony\Components\DependencyInjection\ParameterBag\ParameterBag;
 use Symfony\Components\DependencyInjection\Loader\XmlFileLoader;
 use Symfony\Components\DependencyInjection\Loader\YamlFileLoader;
 
@@ -23,8 +24,8 @@ abstract class AbstractDoctrineExtensionTest extends TestCase
 
     public function testDbalLoad()
     {
-        $container = new ContainerBuilder();
-        $loader = $this->getDoctrineExtensionLoader();
+        $container = $this->getContainer();
+        $loader = new DoctrineExtension();
 
         $loader->dbalLoad(array(), $container);
         $this->assertEquals('Symfony\\Bundle\\DoctrineBundle\\DataCollector\\DoctrineDataCollector', $container->getParameter('doctrine.data_collector.class'), '->dbalLoad() loads the dbal.xml file if not already loaded');
@@ -36,8 +37,8 @@ abstract class AbstractDoctrineExtensionTest extends TestCase
         $loader->dbalLoad(array(), $container);
         $this->assertEquals('foo', $container->getParameter('doctrine.dbal.default_connection'), '->dbalLoad() overrides existing configuration options');
 
-        $container = new ContainerBuilder();
-        $loader = $this->getDoctrineExtensionLoader();
+        $container = $this->getContainer();
+        $loader = new DoctrineExtension();
         $loader->dbalLoad(array('password' => 'foo'), $container);
 
         $arguments = $container->getDefinition('doctrine.dbal.default_connection')->getArguments();
@@ -53,8 +54,8 @@ abstract class AbstractDoctrineExtensionTest extends TestCase
 
     public function testDbalLoadFromXmlMultipleConnections()
     {
-        $container = new ContainerBuilder();
-        $loader = $this->getDoctrineExtensionLoader();
+        $container = $this->getContainer();
+        $loader = new DoctrineExtension();
         $container->registerExtension($loader);
 
         $loadXml = new XmlFileLoader($container, __DIR__.'/Fixtures/config/xml');
@@ -73,8 +74,8 @@ abstract class AbstractDoctrineExtensionTest extends TestCase
 
         // doctrine.dbal.sqlite_connection
         $arguments = $container->getDefinition('doctrine.dbal.sqlite_connection')->getArguments();
-        $container = new ContainerBuilder();
-        $loader = $this->getDoctrineExtensionLoader();
+        $container = $this->getContainer();
+        $loader = new DoctrineExtension();
         $container->registerExtension($loader);
 
         $loadXml = new XmlFileLoader($container, __DIR__.'/Fixtures/config/xml');
@@ -94,8 +95,8 @@ abstract class AbstractDoctrineExtensionTest extends TestCase
 
     public function testDependencyInjectionConfigurationDefaults()
     {
-        $container = new ContainerBuilder();
-        $loader = $this->getDoctrineExtensionLoader();
+        $container = $this->getContainer();
+        $loader = new DoctrineExtension();
 
         $loader->dbalLoad(array(), $container);
         $loader->ormLoad(array(), $container);
@@ -169,8 +170,8 @@ abstract class AbstractDoctrineExtensionTest extends TestCase
 
     public function testSingleEntityManagerConfiguration()
     {
-        $container = new ContainerBuilder();
-        $loader = $this->getDoctrineExtensionLoader();
+        $container = $this->getContainer();
+        $loader = new DoctrineExtension();
 
         $loader->dbalLoad(array(), $container);
         $loader->ormLoad(array(), $container);
@@ -191,8 +192,8 @@ abstract class AbstractDoctrineExtensionTest extends TestCase
 
     public function testLoadSimpleSingleConnection()
     {
-        $container = new ContainerBuilder();
-        $loader = $this->getDoctrineExtensionLoader();
+        $container = $this->getContainer();
+        $loader = new DoctrineExtension();
         $container->registerExtension($loader);
 
         $loader->dbalLoad(array(), $container);
@@ -225,8 +226,8 @@ abstract class AbstractDoctrineExtensionTest extends TestCase
 
     public function testLoadSingleConnection()
     {
-        $container = new ContainerBuilder();
-        $loader = $this->getDoctrineExtensionLoader();
+        $container = $this->getContainer();
+        $loader = new DoctrineExtension();
         $container->registerExtension($loader);
 
         $this->loadFromFile($container, 'orm_service_single_entity_manager');
@@ -256,8 +257,8 @@ abstract class AbstractDoctrineExtensionTest extends TestCase
 
     public function testLoadMultipleConnections()
     {
-        $container = new ContainerBuilder();
-        $loader = $this->getDoctrineExtensionLoader();
+        $container = $this->getContainer();
+        $loader = new DoctrineExtension();
         $container->registerExtension($loader);
 
         $this->loadFromFile($container, 'orm_service_multiple_entity_managers');
@@ -318,8 +319,8 @@ abstract class AbstractDoctrineExtensionTest extends TestCase
 
     public function testBundleEntityAliases()
     {
-        $container = new ContainerBuilder();
-        $loader = $this->getDoctrineExtensionLoader();
+        $container = $this->getContainer();
+        $loader = new DoctrineExtension();
 
         $loader->dbalLoad(array(), $container);
         $loader->ormLoad(array(), $container);
@@ -332,8 +333,8 @@ abstract class AbstractDoctrineExtensionTest extends TestCase
 
     public function testYamlBundleMappingDetection()
     {
-        $container = new ContainerBuilder();
-        $loader = $this->getDoctrineExtensionLoader('YamlBundle');
+        $container = $this->getContainer('YamlBundle');
+        $loader = new DoctrineExtension();
 
         $loader->dbalLoad(array(), $container);
         $loader->ormLoad(array(), $container);
@@ -350,8 +351,8 @@ abstract class AbstractDoctrineExtensionTest extends TestCase
 
     public function testXmlBundleMappingDetection()
     {
-        $container = new ContainerBuilder();
-        $loader = $this->getDoctrineExtensionLoader('XmlBundle');
+        $container = $this->getContainer('XmlBundle');
+        $loader = new DoctrineExtension();
 
         $loader->dbalLoad(array(), $container);
         $loader->ormLoad(array(), $container);
@@ -368,8 +369,8 @@ abstract class AbstractDoctrineExtensionTest extends TestCase
 
     public function testAnnotationsBundleMappingDetection()
     {
-        $container = new ContainerBuilder();
-        $loader = $this->getDoctrineExtensionLoader('AnnotationsBundle');
+        $container = $this->getContainer('AnnotationsBundle');
+        $loader = new DoctrineExtension();
 
         $loader->dbalLoad(array(), $container);
         $loader->ormLoad(array(), $container);
@@ -386,8 +387,8 @@ abstract class AbstractDoctrineExtensionTest extends TestCase
 
     public function testEntityManagerMetadataCacheDriverConfiguration()
     {
-        $container = new ContainerBuilder();
-        $loader = $this->getDoctrineExtensionLoader();
+        $container = $this->getContainer();
+        $loader = new DoctrineExtension();
         $container->registerExtension($loader);
 
         $this->loadFromFile($container, 'orm_service_multiple_entity_managers');
@@ -403,8 +404,8 @@ abstract class AbstractDoctrineExtensionTest extends TestCase
 
     public function testEntityManagerMemcacheMetadataCacheDriverConfiguration()
     {
-        $container = new ContainerBuilder();
-        $loader = $this->getDoctrineExtensionLoader();
+        $container = $this->getContainer();
+        $loader = new DoctrineExtension();
         $container->registerExtension($loader);
 
         $this->loadFromFile($container, 'orm_service_simple_single_entity_manager');
@@ -429,8 +430,8 @@ abstract class AbstractDoctrineExtensionTest extends TestCase
 
     public function testDependencyInjectionImportsOverrideDefaults()
     {
-        $container = new ContainerBuilder();
-        $loader = $this->getDoctrineExtensionLoader();
+        $container = $this->getContainer();
+        $loader = new DoctrineExtension();
         $container->registerExtension($loader);
 
         $this->loadFromFile($container, 'orm_imports');
@@ -441,11 +442,14 @@ abstract class AbstractDoctrineExtensionTest extends TestCase
         $this->assertTrue($container->getParameter('doctrine.orm.auto_generate_proxy_classes'));
     }
 
-    protected function getDoctrineExtensionLoader($bundle = 'YamlBundle')
+    protected function getContainer($bundle = 'YamlBundle')
     {
         require_once __DIR__.'/Fixtures/Bundles/'.$bundle.'/'.$bundle.'.php';
-        $bundleDirs = array('DoctrineBundle\\Tests\\DependencyInjection\\Fixtures\\Bundles' => __DIR__.'/Fixtures/Bundles');
-        $bundles = array('DoctrineBundle\\Tests\DependencyInjection\\Fixtures\\Bundles\\'.$bundle.'\\'.$bundle);
-        return new DoctrineExtension($bundleDirs, $bundles, sys_get_temp_dir());
+
+        return new ContainerBuilder(new ParameterBag(array(
+            'kernel.bundle_dirs' => array('DoctrineBundle\\Tests\\DependencyInjection\\Fixtures\\Bundles' => __DIR__.'/Fixtures/Bundles'),
+            'kernel.bundles'     => array('DoctrineBundle\\Tests\DependencyInjection\\Fixtures\\Bundles\\'.$bundle.'\\'.$bundle),
+            'kernel.cache_dir'   => sys_get_temp_dir(),
+        )));
     }
 }

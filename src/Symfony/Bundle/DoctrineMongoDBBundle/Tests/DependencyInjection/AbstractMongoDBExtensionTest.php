@@ -23,8 +23,8 @@ abstract class AbstractMongoDBExtensionTest extends TestCase
 
     public function testDependencyInjectionConfigurationDefaults()
     {
-        $container = new ContainerBuilder();
-        $loader = $this->getMongoDbExtensionLoader();
+        $container = $this->getContainer();
+        $loader = new DoctrineMongoDBExtension();
 
         $loader->mongodbLoad(array(), $container);
 
@@ -73,8 +73,8 @@ abstract class AbstractMongoDBExtensionTest extends TestCase
 
     public function testSingleDocumentManagerConfiguration()
     {
-        $container = new ContainerBuilder();
-        $loader = $this->getMongoDbExtensionLoader();
+        $container = $this->getContainer();
+        $loader = new DoctrineMongoDBExtension();
 
         $config = array(
             'server' => 'mongodb://localhost:27017',
@@ -99,8 +99,8 @@ abstract class AbstractMongoDBExtensionTest extends TestCase
 
     public function testLoadSimpleSingleConnection()
     {
-        $container = new ContainerBuilder();
-        $loader = $this->getMongoDbExtensionLoader();
+        $container = $this->getContainer();
+        $loader = new DoctrineMongoDBExtension();
         $container->registerExtension($loader);
 
         $this->loadFromFile($container, 'mongodb_service_simple_single_connection');
@@ -130,8 +130,8 @@ abstract class AbstractMongoDBExtensionTest extends TestCase
 
     public function testLoadSingleConnection()
     {
-        $container = new ContainerBuilder();
-        $loader = $this->getMongoDbExtensionLoader();
+        $container = $this->getContainer();
+        $loader = new DoctrineMongoDBExtension();
         $container->registerExtension($loader);
 
         $this->loadFromFile($container, 'mongodb_service_single_connection');
@@ -155,8 +155,8 @@ abstract class AbstractMongoDBExtensionTest extends TestCase
 
     public function testLoadMultipleConnections()
     {
-        $container = new ContainerBuilder();
-        $loader = $this->getMongoDbExtensionLoader();
+        $container = $this->getContainer();
+        $loader = new DoctrineMongoDBExtension();
         $container->registerExtension($loader);
 
         $this->loadFromFile($container, 'mongodb_service_multiple_connections');
@@ -196,8 +196,8 @@ abstract class AbstractMongoDBExtensionTest extends TestCase
 
     public function testBundleDocumentAliases()
     {
-        $container = new ContainerBuilder();
-        $loader = $this->getMongoDbExtensionLoader();
+        $container = $this->getContainer();
+        $loader = new DoctrineMongoDBExtension();
 
         $loader->mongodbLoad(array(), $container);
 
@@ -209,8 +209,8 @@ abstract class AbstractMongoDBExtensionTest extends TestCase
 
     public function testYamlBundleMappingDetection()
     {
-        $container = new ContainerBuilder();
-        $loader = $this->getMongoDbExtensionLoader('YamlBundle');
+        $container = $this->getContainer();
+        $loader = new DoctrineMongoDBExtension('YamlBundle');
 
         $loader->mongodbLoad(array(), $container);
 
@@ -226,8 +226,8 @@ abstract class AbstractMongoDBExtensionTest extends TestCase
 
     public function testXmlBundleMappingDetection()
     {
-        $container = new ContainerBuilder();
-        $loader = $this->getMongoDbExtensionLoader('XmlBundle');
+        $container = $this->getContainer('XmlBundle');
+        $loader = new DoctrineMongoDBExtension();
 
         $loader->mongodbLoad(array(), $container);
 
@@ -243,8 +243,8 @@ abstract class AbstractMongoDBExtensionTest extends TestCase
 
     public function testAnnotationsBundleMappingDetection()
     {
-        $container = new ContainerBuilder();
-        $loader = $this->getMongoDbExtensionLoader('AnnotationsBundle');
+        $container = $this->getContainer('AnnotationsBundle');
+        $loader = new DoctrineMongoDBExtension();
 
         $loader->mongodbLoad(array(), $container);
 
@@ -260,8 +260,8 @@ abstract class AbstractMongoDBExtensionTest extends TestCase
 
     public function testDocumentManagerMetadataCacheDriverConfiguration()
     {
-        $container = new ContainerBuilder();
-        $loader = $this->getMongoDbExtensionLoader();
+        $container = $this->getContainer();
+        $loader = new DoctrineMongoDBExtension();
         $container->registerExtension($loader);
 
         $this->loadFromFile($container, 'mongodb_service_multiple_connections');
@@ -277,8 +277,8 @@ abstract class AbstractMongoDBExtensionTest extends TestCase
 
     public function testDocumentManagerMemcacheMetadataCacheDriverConfiguration()
     {
-        $container = new ContainerBuilder();
-        $loader = $this->getMongoDbExtensionLoader();
+        $container = $this->getContainer();
+        $loader = new DoctrineMongoDBExtension();
         $container->registerExtension($loader);
 
         $this->loadFromFile($container, 'mongodb_service_simple_single_connection');
@@ -303,8 +303,8 @@ abstract class AbstractMongoDBExtensionTest extends TestCase
 
     public function testDependencyInjectionImportsOverrideDefaults()
     {
-        $container = new ContainerBuilder();
-        $loader = $this->getMongoDbExtensionLoader();
+        $container = $this->getContainer();
+        $loader = new DoctrineMongoDBExtension();
         $container->registerExtension($loader);
 
         $this->loadFromFile($container, 'odm_imports');
@@ -315,11 +315,14 @@ abstract class AbstractMongoDBExtensionTest extends TestCase
         $this->assertTrue($container->getParameter('doctrine.odm.mongodb.auto_generate_proxy_classes'));
     }
 
-    protected function getMongoDbExtensionLoader($bundle = 'YamlBundle')
+    protected function getContainer($bundle = 'YamlBundle')
     {
         require_once __DIR__.'/Fixtures/Bundles/'.$bundle.'/'.$bundle.'.php';
-        $bundleDirs = array('DoctrineMongoDBBundle\\Tests\\DependencyInjection\\Fixtures\\Bundles' => __DIR__.'/Fixtures/Bundles');
-        $bundles = array('DoctrineMongoDBBundle\\Tests\\DependencyInjection\\Fixtures\\Bundles\\'.$bundle.'\\'.$bundle);
-        return new DoctrineMongoDBExtension($bundleDirs, $bundles, sys_get_temp_dir());
+
+        return new ContainerBuilder(new ParameterBag(array(
+            'kernel.bundle_dirs' => array('DoctrineMongoDBBundle\\Tests\\DependencyInjection\\Fixtures\\Bundles' => __DIR__.'/Fixtures/Bundles'),
+            'kernel.bundles'     => array('DoctrineMongoDBBundle\\Tests\\DependencyInjection\\Fixtures\\Bundles\\'.$bundle.'\\'.$bundle),
+            'kernel.cache_dir'   => sys_get_temp_dir(),
+        )));
     }
 }

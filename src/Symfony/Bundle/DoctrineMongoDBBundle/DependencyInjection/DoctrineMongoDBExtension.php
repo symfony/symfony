@@ -21,16 +21,6 @@ class DoctrineMongoDBExtension extends Extension
     protected $resources = array(
         'mongodb' => 'mongodb.xml',
     );
-    protected $bundleDirs;
-    protected $bundles;
-    protected $kernelCacheDir;
-
-    public function __construct(array $bundleDirs, array $bundles, $kernelCacheDir)
-    {
-        $this->bundleDirs = $bundleDirs;
-        $this->bundles = $bundles;
-        $this->kernelCacheDir = $kernelCacheDir;
-    }
 
     /**
      * Loads the MongoDB ODM configuration.
@@ -44,7 +34,7 @@ class DoctrineMongoDBExtension extends Extension
      */
     public function mongodbLoad($config, ContainerBuilder $container)
     {
-        $this->createProxyDirectory();
+        $this->createProxyDirectory($container->getParameter('kernel.cache_dir'));
         $this->loadDefaults($config, $container);
         $this->loadConnections($config, $container);
         $this->loadDocumentManagers($config, $container);
@@ -53,10 +43,10 @@ class DoctrineMongoDBExtension extends Extension
     /**
      * Create the Doctrine MongoDB ODM Document proxy directory
      */
-    protected function createProxyDirectory()
+    protected function createProxyDirectory($tmpDir)
     {
         // Create document proxy directory
-        $proxyCacheDir = $this->kernelCacheDir . '/doctrine/odm/mongodb/Proxies';
+        $proxyCacheDir = $tmpDir.'/doctrine/odm/mongodb/Proxies';
         if (!is_dir($proxyCacheDir)) {
             if (false === @mkdir($proxyCacheDir, 0777, true)) {
                 die(sprintf('Unable to create the Doctrine Proxy directory (%s)', dirname($proxyCacheDir)));
@@ -124,7 +114,7 @@ class DoctrineMongoDBExtension extends Extension
     {
         $defaultDocumentManager = $container->getParameter('doctrine.odm.mongodb.default_document_manager');
         $defaultDatabase = isset($documentManager['default_database']) ? $documentManager['default_database'] : $container->getParameter('doctrine.odm.mongodb.default_database');
-        $proxyCacheDir = $this->kernelCacheDir . '/doctrine/odm/mongodb/Proxies';
+        $proxyCacheDir = $this->container->getParameter('kernel.cache_dir').'/doctrine/odm/mongodb/Proxies';
 
         $odmConfigDef = new Definition('%doctrine.odm.mongodb.configuration_class%');
         $container->setDefinition(sprintf('doctrine.odm.mongodb.%s_configuration', $documentManager['name']), $odmConfigDef);
@@ -197,9 +187,9 @@ class DoctrineMongoDBExtension extends Extension
         // configure metadata driver for each bundle based on the type of mapping files found
         $mappingDriverDef = new Definition('%doctrine.odm.mongodb.metadata.driver_chain_class%');
         $bundleDocumentMappings = array();
-        $bundleDirs = $this->bundleDirs;
+        $bundleDirs = $container->getParameter('kernel.bundle_dirs');
         $aliasMap = array();
-        foreach ($this->bundles as $className) {
+        foreach ($container->getParameter('kernel.bundles') as $className) {
             $tmp = dirname(str_replace('\\', '/', $className));
             $namespace = str_replace('/', '\\', dirname($tmp));
             $class = basename($tmp);
@@ -314,7 +304,7 @@ class DoctrineMongoDBExtension extends Extension
     protected function findBundleSubpaths($path, ContainerBuilder $container)
     {
         $dirs = array();
-        foreach ($this->bundles as $bundle) {
+        foreach ($container->getParameter('kernel.bundles') as $bundle) {
             $reflection = new \ReflectionClass($bundle);
             if (is_dir($dir = dirname($reflection->getFilename()).'/'.$path)) {
                 $dirs[] = $dir;

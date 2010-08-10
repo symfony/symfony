@@ -3,13 +3,8 @@
 $container->setParameter('kernel.include_core_classes', false);
 
 $container->loadFromExtension('kernel', 'config', array(
-    'charset'             => 'UTF-8',
-    'error_handler_level' => null,
-));
-
-$container->loadFromExtension('kernel', 'config', array(
-    'charset'             => 'UTF-8',
-    'error_handler_level' => null,
+    'charset'       => 'UTF-8',
+    'error_handler' => null,
 ));
 
 $container->loadFromExtension('web', 'config', array(

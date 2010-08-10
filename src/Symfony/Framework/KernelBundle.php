@@ -37,18 +37,6 @@ class KernelBundle extends Bundle
     public function buildContainer(ParameterBagInterface $parameterBag)
     {
         ContainerBuilder::registerExtension(new KernelExtension());
-
-        $container = new ContainerBuilder();
-
-        $loader = new XmlFileLoader($container, array(__DIR__.'/../Resources/config', __DIR__.'/Resources/config'));
-        $loader->load('services.xml');
-
-        if ($parameterBag->get('kernel.debug')) {
-            $loader->load('debug.xml');
-            $container->setDefinition('event_dispatcher', $container->findDefinition('debug.event_dispatcher'));
-        }
-
-        return $container;
     }
 
     /**
@@ -58,10 +46,12 @@ class KernelBundle extends Bundle
      */
     public function boot(ContainerInterface $container)
     {
-        $container->getErrorHandlerService();
+        if ($container->has('error_handler')) {
+            $container['error_handler'];
+        }
 
         // load core classes
-        if ($container->getParameter('kernel.include_core_classes')) {
+        if ($container->getParameterBag()->has('kernel.include_core_classes') && $container->getParameter('kernel.include_core_classes')) {
             ClassCollectionLoader::load($container->getParameter('kernel.compiled_classes'), $container->getParameter('kernel.cache_dir'), 'classes', $container->getParameter('kernel.debug'));
         }
     }

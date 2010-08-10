@@ -9,7 +9,6 @@
         <parameter key="test.client.parameters" type="collection"></parameter>
         <parameter key="test.client.history.class">Symfony\Components\BrowserKit\History</parameter>
         <parameter key="test.client.cookiejar.class">Symfony\Components\BrowserKit\CookieJar</parameter>
-        <parameter key="error_handler.enable">false</parameter>
     </parameters>
 
     <services>

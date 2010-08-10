@@ -22,9 +22,6 @@
 
         <service id="error_handler" class="%error_handler.class%">
             <argument>%error_handler.level%</argument>
-            <call method="register">
-                <argument>%error_handler.enable%</argument>
-            </call>
         </service>
 
         <service id="http_kernel" class="%http_kernel.class%">

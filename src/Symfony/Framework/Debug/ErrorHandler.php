@@ -40,11 +40,9 @@ class ErrorHandler
         $this->level = null === $level ? error_reporting() : $level;
     }
 
-    public function register($enable=true)
+    public function register()
     {
-        if($enable) {
-            set_error_handler(array($this, 'handle'));
-        }
+        set_error_handler(array($this, 'handle'));
     }
 
     /**

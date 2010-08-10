@@ -22,22 +22,24 @@ use Symfony\Components\DependencyInjection\ContainerBuilder;
  */
 class KernelExtension extends Extension
 {
+    /**
+     * Loads the test configuration.
+     *
+     * @param array            $config    A configuration array
+     * @param ContainerBuilder $container A ContainerBuilder instance
+     */
     public function testLoad($config, ContainerBuilder $container)
     {
         $loader = new XmlFileLoader($container, array(__DIR__.'/../Resources/config', __DIR__.'/Resources/config'));
         $loader->load('test.xml');
         $container->setParameter('kernel.include_core_classes', false);
-
-        return $container;
     }
 
     /**
      * Loads the session configuration.
      *
-     * @param array                $config        A configuration array
+     * @param array            $config    A configuration array
      * @param ContainerBuilder $container A ContainerBuilder instance
-     *
-     * @return ContainerBuilder A ContainerBuilder instance
      */
     public function sessionLoad($config, ContainerBuilder $container)
     {
@@ -68,12 +70,26 @@ class KernelExtension extends Extension
 
             $container->setParameter('session.session', 'session.session.'.strtolower($class));
         }
-
-        return $container;
     }
 
+    /**
+     * Loads the config configuration.
+     *
+     * @param array            $config    A configuration array
+     * @param ContainerBuilder $container A ContainerBuilder instance
+     */
     public function configLoad($config, ContainerBuilder $container)
     {
+        if (!$container->hasDefinition('event_dispatcher')) {
+            $loader = new XmlFileLoader($container, array(__DIR__.'/../Resources/config', __DIR__.'/Resources/config'));
+            $loader->load('services.xml');
+
+            if ($container->getParameter('kernel.debug')) {
+                $loader->load('debug.xml');
+                $container->setDefinition('event_dispatcher', $container->findDefinition('debug.event_dispatcher'));
+            }
+        }
+
         if (isset($config['charset'])) {
             $container->setParameter('kernel.charset', $config['charset']);
         }
@@ -112,11 +128,14 @@ class KernelExtension extends Extension
         }
         $container->setParameter('kernel.compiled_classes', $classes);
 
-        if (array_key_exists('error_handler_level', $config)) {
-            $container->setParameter('error_handler.level', $config['error_handler_level']);
+        if (array_key_exists('error_handler', $config)) {
+            if (false === $config['error_handler']) {
+                $container->getDefinition('error_handler')->setMethodCalls(array());
+            } else {
+                $container->getDefinition('error_handler')->addMethodCall('register', array());
+                $container->setParameter('error_handler.level', $config['error_handler']);
+            }
         }
-
-        return $container;
     }
 
     /**

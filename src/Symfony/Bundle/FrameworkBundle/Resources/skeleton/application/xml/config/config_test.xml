@@ -12,6 +12,10 @@
         <import resource="config_dev.xml" />
     </imports>
 
+    <kernel:config
+        error_handler="false"
+    />
+
     <web:config
         toolbar="false"
     />

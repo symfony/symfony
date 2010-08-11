@@ -18,11 +18,20 @@ namespace Symfony\Framework;
  */
 class ClassCollectionLoader
 {
+    static protected $loaded;
+
     /**
      * @throws \InvalidArgumentException When class can't be loaded
      */
     static public function load($classes, $cacheDir, $name, $autoReload)
     {
+        // each $name can only be loaded once per PHP process
+        if (isset(self::$loaded[$name])) {
+            return;
+        }
+
+        self::$loaded[$name] = true;
+
         $classes = array_unique($classes);
 
         $cache = $cacheDir.'/'.$name.'.php';

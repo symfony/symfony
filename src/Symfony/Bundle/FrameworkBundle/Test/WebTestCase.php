@@ -49,7 +49,15 @@ abstract class WebTestCase extends BaseWebTestCase
         // find the --configuration flag from PHPUnit
         $cli = implode(' ', $_SERVER['argv']);
         if (preg_match('/\-\-configuration[= ]+([^ ]+)/', $cli, $matches)) {
-            $dir = $dir.'/'.dirname($matches[1]);
+            $dir = $dir.'/'.$matches[1];
+        } elseif (preg_match('/\-c +([^ ]+)/', $cli, $matches)) {
+            $dir = $dir.'/'.$matches[1];
+        } else {
+            throw new \RuntimeException('Unable to guess the Kernel directory.');
+        }
+
+        if (!is_dir($dir)) {
+            $dir = dirname($dir);
         }
 
         $finder = new Finder();

@@ -11,12 +11,12 @@
         <import resource="config.xml" />
     </imports>
 
+    <web:config
+        toolbar="true"
+    />
+
     <zend:logger
         priority="info"
         path="%kernel.logs_dir%/%kernel.environment%.log"
-    />
-
-    <web:config
-        toolbar="true"
     />
 </container>

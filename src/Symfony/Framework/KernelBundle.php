@@ -3,7 +3,6 @@
 namespace Symfony\Framework;
 
 use Symfony\Framework\Bundle\Bundle;
-use Symfony\Framework\ClassCollectionLoader;
 
 /*
  * This file is part of the Symfony framework.

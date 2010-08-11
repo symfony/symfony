@@ -3,20 +3,28 @@ kernel.config:
     error_handler: null
 
 web.config:
-    router: { resource: "%kernel.root_dir%/config/routing.yml" }
+    router:     { resource: "%kernel.root_dir%/config/routing.yml" }
+    validation: { enabled: true, annotations: true }
 
 web.templating:
     escaping:       htmlspecialchars
-    assets_version: SomeVersionScheme
+    #assets_version: SomeVersionScheme
 
-doctrine.dbal:
-    dbname:   xxxxxxxx
-    user:     root
-    password: ~
+## Twig Configuration
+#twig.config:
+#    auto_reload: true
 
-doctrine.orm: ~
+## Doctrine Configuration
+#doctrine.dbal:
+#    dbname:   xxxxxxxx
+#    user:     xxxxxxxx
+#    password: ~
 
-swift.mailer:
-    transport: gmail
-    username:  xxxxxxxx
-    password:  xxxxxxxx
+## Swiftmailer Configuration
+#swift.mailer:
+#    transport:  smtp
+#    encryption: ssl
+#    auth_mode:  login
+#    host:       smtp.gmail.com
+#    username:   xxxxxxxx
+#    password:   xxxxxxxx

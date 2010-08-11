@@ -4,10 +4,10 @@ imports:
 kernel.config:
     error_handler: false
 
-zend.logger:
-    priority: debug
-
 web.config:
     toolbar: false
+
+zend.logger:
+    priority: debug
 
 kernel.test: ~

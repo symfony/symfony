@@ -10,5 +10,8 @@ $container->loadFromExtension('web', 'config', array(
     'toolbar' => false,
 ));
 
-$container->loadFromExtension('kernel', 'test', array(
+$container->loadFromExtension('zend', 'logger', array(
+    'priority' => 'debug',
 ));
+
+$container->loadFromExtension('kernel', 'test');

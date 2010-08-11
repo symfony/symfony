@@ -2,13 +2,17 @@
 
 <container xmlns="http://www.symfony-project.org/schema/dic/services"
     xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-    xmlns:swift="http://www.symfony-project.org/schema/dic/swiftmailer"
-    xmlns:doctrine="http://www.symfony-project.org/schema/dic/doctrine"
     xmlns:kernel="http://www.symfony-project.org/schema/dic/symfony/kernel"
-    xmlns:zend="http://www.symfony-project.org/schema/dic/zend"
     xmlns:web="http://www.symfony-project.org/schema/dic/symfony"
+    xmlns:doctrine="http://www.symfony-project.org/schema/dic/doctrine"
+    xmlns:twig="http://www.symfony-project.org/schema/dic/twig"
+    xmlns:swift="http://www.symfony-project.org/schema/dic/swiftmailer"
+    xmlns:zend="http://www.symfony-project.org/schema/dic/zend"
     xsi:schemaLocation="http://www.symfony-project.org/schema/dic/services http://www.symfony-project.org/schema/dic/services/services-1.0.xsd
+                        http://www.symfony-project.org/schema/dic/symfony http://www.symfony-project.org/schema/dic/symfony/symfony-1.0.xsd
                         http://www.symfony-project.org/schema/dic/doctrine http://www.symfony-project.org/schema/dic/doctrine/doctrine-1.0.xsd
+                        http://www.symfony-project.org/schema/dic/zend http://www.symfony-project.org/schema/dic/zend/zend-1.0.xsd
+                        http://www.symfony-project.org/schema/dic/twig http://www.symfony-project.org/schema/dic/twig/twig-1.0.xsd
                         http://www.symfony-project.org/schema/dic/swiftmailer http://www.symfony-project.org/schema/dic/swiftmailer/swiftmailer-1.0.xsd">
 
     <kernel:config
@@ -18,24 +22,32 @@
 
     <web:config>
         <web:router resource="%kernel.root_dir%/config/routing.xml" />
+        <web:validation enabled="true" annotations="true" />
     </web:config>
 
     <web:templating
         escaping="htmlspecialchars"
-        assets_version="SomeVersionScheme"
     />
 
-    <doctrine:dbal
-        dbname="xxxxxxxx"
-        user="root"
-        password=""
-    />
+    <!-- Twig Configuration -->
+    <!--
+    <twig:config auto_reload="true" />
+    -->
 
+    <!-- Doctrine Configuration -->
+    <!--
+    <doctrine:dbal dbname="xxxxxxxx" user="xxxxxxxx" password="" />
     <doctrine:orm />
+    -->
 
+    <!-- Swiftmailer Configuration -->
+    <!--
     <swift:mailer
-        transport="gmail"
+        transport="smtp"
+        encryption="ssl"
+        auth_mode="login"
+        host="smtp.gmail.com"
         username="xxxxxxxx"
-        password="xxxxxxxx"
-    />
+        password="xxxxxxxx" />
+    -->
 </container>

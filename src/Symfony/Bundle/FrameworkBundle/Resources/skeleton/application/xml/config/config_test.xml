@@ -12,16 +12,16 @@
         <import resource="config_dev.xml" />
     </imports>
 
-    <kernel:config
-        error_handler="false"
-    />
-
     <web:config
         toolbar="false"
     />
 
+    <kernel:config
+        error_handler="false"
+    />
+
     <zend:logger
-        priority="info"
+        priority="debug"
     />
 
     <kernel:test />

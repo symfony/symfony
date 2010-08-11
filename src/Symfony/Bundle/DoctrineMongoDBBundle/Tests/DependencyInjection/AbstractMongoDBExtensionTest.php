@@ -16,6 +16,7 @@ use Symfony\Bundle\DoctrineMongoDBBundle\DependencyInjection\DoctrineMongoDBExte
 use Symfony\Components\DependencyInjection\ContainerBuilder;
 use Symfony\Components\DependencyInjection\Loader\XmlFileLoader;
 use Symfony\Components\DependencyInjection\Loader\YamlFileLoader;
+use Symfony\Components\DependencyInjection\ParameterBag\ParameterBag;
 
 abstract class AbstractMongoDBExtensionTest extends TestCase
 {

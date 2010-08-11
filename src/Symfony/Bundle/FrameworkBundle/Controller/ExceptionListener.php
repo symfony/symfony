@@ -72,6 +72,8 @@ class ExceptionListener
 
             error_log(sprintf('%s: %s', get_class($exception), $exception->getMessage()));
         } catch (\Exception $e) {
+            error_log(sprintf('Exception thrown when handling an exception (%s: %s)', get_class($e), $e->getMessage()));
+
             return false;
         }
 

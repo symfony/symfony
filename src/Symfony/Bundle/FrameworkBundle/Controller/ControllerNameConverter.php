@@ -56,7 +56,7 @@ class ControllerNameConverter
 
         list($class, $method) = $parts;
 
-        if (!preg_match('/Action$/', $method)) {
+        if ('Action' != substr($method, -6)) {
             throw new \InvalidArgumentException(sprintf('The "%s::%s" method does not look like a controller action (it does not end with Action)', $class, $method));
         }
         $action = substr($method, 0, -6);

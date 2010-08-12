@@ -246,21 +246,12 @@ class Router implements RouterInterface
     protected function writeCacheFile($file, $content)
     {
         $tmpFile = tempnam(dirname($file), basename($file));
-        if (!$fp = @fopen($tmpFile, 'wb')) {
-            throw new \RuntimeException(sprintf('Failed to write cache file "%s".', $tmpFile));
+        if (false !== @file_put_contents($tmpFile, $content) && @rename($tmpFile, $file)) {
+            chmod($file, 0644);
+
+            return;
         }
 
-        @fwrite($fp, $content);
-        @fclose($fp);
-
-        if ($content != file_get_contents($tmpFile)) {
-            throw new \RuntimeException(sprintf('Failed to write cache file "%s" (cache corrupted).', $tmpFile));
-        }
-
-        if (!@rename($tmpFile, $file)) {
-            throw new \RuntimeException(sprintf('Failed to write cache file "%s".', $file));
-        }
-
-        chmod($file, 0644);
+        throw new \RuntimeException(sprintf('Failed to write cache file "%s".', $file));
     }
 }

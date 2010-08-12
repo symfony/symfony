@@ -166,8 +166,8 @@ EOT
             $calc->addClass($class);
 
             foreach ($class->associationMappings as $assoc) {
-                if ($assoc->isOwningSide) {
-                    $targetClass = $em->getClassMetadata($assoc->targetEntityName);
+                if ($assoc['isOwningSide']) {
+                    $targetClass = $em->getClassMetadata($assoc['targetEntity']);
 
                     if ( ! $calc->hasClass($targetClass->name)) {
                             $calc->addClass($targetClass);

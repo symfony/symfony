@@ -124,10 +124,6 @@ EOT
                 $output->writeln(sprintf('<info>Persisting "%s" '.($numEntities > 1 ? 'entities' : 'entity').'</info>', count($entities)));
 
                 foreach ($entities as $entity) {
-                    $output->writeln(sprintf('<info>Persisting "%s" entity:</info>', get_class($entity)));
-                    $output->writeln('');
-                    $output->writeln(var_dump($entity));
-
                     $em->persist($entity);
                 }
                 $output->writeln('<info>Flushing entity manager</info>');

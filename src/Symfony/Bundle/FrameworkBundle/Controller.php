@@ -3,7 +3,6 @@
 namespace Symfony\Bundle\FrameworkBundle;
 
 use Symfony\Components\DependencyInjection\ContainerInterface;
-use Symfony\Components\HttpFoundation\Request;
 use Symfony\Components\HttpFoundation\Response;
 
 /*
@@ -23,7 +22,6 @@ use Symfony\Components\HttpFoundation\Response;
 class Controller implements \ArrayAccess
 {
     protected $container;
-    protected $request;
 
     /**
      * Constructor.

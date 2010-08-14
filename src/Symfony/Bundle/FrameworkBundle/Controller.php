@@ -20,7 +20,7 @@ use Symfony\Components\HttpFoundation\Response;
  *
  * @author     Fabien Potencier <fabien.potencier@symfony-project.com>
  */
-class Controller
+class Controller implements \ArrayAccess
 {
     protected $container;
     protected $request;
@@ -33,17 +33,6 @@ class Controller
     function __construct(ContainerInterface $container)
     {
         $this->container = $container;
-        $this->request = $this->container->get('request');
-    }
-
-    /**
-     * Gets the Request.
-     *
-     * @return Request A Request instance
-     */
-    public function getRequest()
-    {
-        return $this->request;
     }
 
     /**
@@ -130,5 +119,50 @@ class Controller
     public function render($view, array $parameters = array(), Response $response = null)
     {
         return $this->container->get('templating')->renderResponse($view, $parameters, $response);
+    }
+
+    /**
+     * Returns true if the service id is defined (implements the ArrayAccess interface).
+     *
+     * @param  string  $id The service id
+     *
+     * @return Boolean true if the service id is defined, false otherwise
+     */
+    public function offsetExists($id)
+    {
+        return $this->container->has($id);
+    }
+
+    /**
+     * Gets a service by id (implements the ArrayAccess interface).
+     *
+     * @param  string $id The service id
+     *
+     * @return mixed  The parameter value
+     */
+    public function offsetGet($id)
+    {
+        return $this->container->get($id);
+    }
+
+    /**
+     * Sets a service (implements the ArrayAccess interface).
+     *
+     * @param string $id    The service id
+     * @param object $value The service
+     */
+    public function offsetSet($id, $value)
+    {
+        throw new \LogicException(sprintf('You can\'t set a service from a controller (%s).', $id));
+    }
+
+    /**
+     * Removes a service (implements the ArrayAccess interface).
+     *
+     * @param string $id The service id
+     */
+    public function offsetUnset($id)
+    {
+        throw new \LogicException(sprintf('You can\'t unset a service from a controller (%s).', $id));
     }
 }

@@ -21,14 +21,13 @@ use Symfony\Components\HttpFoundation\Request;
 interface HttpKernelInterface
 {
     const MASTER_REQUEST = 1;
-    const FORWARDED_REQUEST = 2;
-    const EMBEDDED_REQUEST = 3;
+    const SUB_REQUEST = 2;
 
     /**
      * Handles a request to convert it to a response.
      *
      * @param  Request $request A Request instance
-     * @param  integer $type The type of the request (one of HttpKernelInterface::MASTER_REQUEST, HttpKernelInterface::FORWARDED_REQUEST, or HttpKernelInterface::EMBEDDED_REQUEST)
+     * @param  integer $type The type of the request (one of HttpKernelInterface::MASTER_REQUEST or HttpKernelInterface::SUB_REQUEST)
      * @param  Boolean $raw Whether to catch exceptions or not
      *
      * @return Response $response A Response instance

@@ -127,7 +127,13 @@ class ControllerResolver extends BaseControllerResolver
         }
 
         try {
-            return $this->container->getKernelService()->handle($subRequest, HttpKernelInterface::EMBEDDED_REQUEST, true);
+            $response = $this->container->getKernelService()->handle($subRequest, HttpKernelInterface::SUB_REQUEST, true);
+
+            if (200 != $response->getStatusCode()) {
+                throw new \RuntimeException(sprintf('Error when rendering "%s" (Status code is %s).', $request->getUri(), $response->getStatusCode()));
+            }
+
+            return $response->getContent();
         } catch (\Exception $e) {
             if ($options['alt']) {
                 $alt = $options['alt'];

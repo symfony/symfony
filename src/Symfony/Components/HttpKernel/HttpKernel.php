@@ -58,7 +58,7 @@ class HttpKernel implements HttpKernelInterface
      * for user management.
      *
      * @param Request $request A Request instance
-     * @param integer $type The type of the request (one of HttpKernelInterface::MASTER_REQUEST, HttpKernelInterface::FORWARDED_REQUEST, or HttpKernelInterface::EMBEDDED_REQUEST)
+     * @param integer $type The type of the request (one of HttpKernelInterface::MASTER_REQUEST or HttpKernelInterface::SUB_REQUEST)
      * @param Boolean $raw Whether to catch exceptions or not
      *
      * @return Response A Response instance
@@ -68,10 +68,6 @@ class HttpKernel implements HttpKernelInterface
      */
     public function handle(Request $request = null, $type = HttpKernelInterface::MASTER_REQUEST, $raw = false)
     {
-        if (HttpKernelInterface::EMBEDDED_REQUEST === $type) {
-            return $this->handleEmbedded($request, $raw);
-        }
-
         if (null === $request) {
             $request = new Request();
         }
@@ -103,7 +99,7 @@ class HttpKernel implements HttpKernelInterface
      * Exceptions are not caught.
      *
      * @param Request $request A Request instance
-     * @param integer $type The type of the request (one of HttpKernelInterface::MASTER_REQUEST, HttpKernelInterface::FORWARDED_REQUEST, or HttpKernelInterface::EMBEDDED_REQUEST)
+     * @param integer $type The type of the request (one of HttpKernelInterface::MASTER_REQUEST or HttpKernelInterface::SUB_REQUEST)
      *
      * @return Response A Response instance
      *
@@ -144,42 +140,11 @@ class HttpKernel implements HttpKernelInterface
     }
 
     /**
-     * Handles a request that need to be embedded.
-     *
-     * @param Request $request A Request instance
-     * @param Boolean $raw Whether to catch exceptions or not
-     *
-     * @return string|false The Response content or false if there is a problem
-     *
-     * @throws \RuntimeException When an Exception occurs during processing
-     *                           and couldn't be caught by event processing or $raw is true
-     */
-    protected function handleEmbedded(Request $request, $raw = false)
-    {
-        try {
-            $response = $this->handleRaw($request, HttpKernelInterface::EMBEDDED_REQUEST);
-
-            if (200 != $response->getStatusCode()) {
-                throw new \RuntimeException(sprintf('Error when rendering "%s" (Status code is %s).', $request->getUri(), $response->getStatusCode()));
-            }
-
-            return $response->getContent();
-        } catch (\Exception $e) {
-            if (true === $raw)
-            {
-                throw $e;
-            }
-
-            return false;
-        }
-    }
-
-    /**
      * Filters a response object.
      *
      * @param Response $response A Response instance
      * @param string   $message A error message in case the response is not a Response object
-     * @param integer  $type The type of the request (one of HttpKernelInterface::MASTER_REQUEST, HttpKernelInterface::FORWARDED_REQUEST, or HttpKernelInterface::EMBEDDED_REQUEST)
+     * @param integer  $type The type of the request (one of HttpKernelInterface::MASTER_REQUEST or HttpKernelInterface::SUB_REQUEST)
      *
      * @return Response The filtered Response instance
      *

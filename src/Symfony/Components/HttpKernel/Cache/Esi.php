@@ -173,7 +173,13 @@ class Esi
         $subRequest = Request::create($uri, 'get', array(), $cache->getRequest()->cookies->all(), array(), $cache->getRequest()->server->all());
 
         try {
-            return $cache->handle($subRequest, HttpKernelInterface::EMBEDDED_REQUEST, true);
+            $response = $cache->handle($subRequest, HttpKernelInterface::SUB_REQUEST, true);
+
+            if (200 != $response->getStatusCode()) {
+                throw new \RuntimeException(sprintf('Error when rendering "%s" (Status code is %s).', $request->getUri(), $response->getStatusCode()));
+            }
+
+            return $response->getContent();
         } catch (\Exception $e) {
             if ($alt) {
                 return $this->handle($cache, $alt, '', $ignoreErrors);

@@ -184,7 +184,7 @@ abstract class Kernel implements HttpKernelInterface, \Serializable
      * Handles a request to convert it to a response by calling the HttpKernel service.
      *
      * @param  Request $request A Request instance
-     * @param  integer $type    The type of the request (one of HttpKernelInterface::MASTER_REQUEST, HttpKernelInterface::FORWARDED_REQUEST, or HttpKernelInterface::EMBEDDED_REQUEST)
+     * @param  integer $type    The type of the request (one of HttpKernelInterface::MASTER_REQUEST or HttpKernelInterface::SUB_REQUEST)
      * @param  Boolean $raw     Whether to catch exceptions or not
      *
      * @return Response $response A Response instance

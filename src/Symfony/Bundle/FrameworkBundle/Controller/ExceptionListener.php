@@ -68,7 +68,7 @@ class ExceptionListener
         $request = $event->getParameter('request')->duplicate(null, null, $parameters);
 
         try {
-            $response = $event->getSubject()->handle($request, HttpKernelInterface::FORWARDED_REQUEST, true);
+            $response = $event->getSubject()->handle($request, HttpKernelInterface::SUB_REQUEST, true);
 
             error_log(sprintf('%s: %s', get_class($exception), $exception->getMessage()));
         } catch (\Exception $e) {

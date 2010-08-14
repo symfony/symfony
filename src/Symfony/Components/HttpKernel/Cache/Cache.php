@@ -131,7 +131,7 @@ class Cache implements HttpKernelInterface
      * Handles a Request.
      *
      * @param Request $request A Request instance
-     * @param integer $type    The type of the request (one of HttpKernelInterface::MASTER_REQUEST, HttpKernelInterface::FORWARDED_REQUEST, or HttpKernelInterface::EMBEDDED_REQUEST)
+     * @param integer $type    The type of the request (one of HttpKernelInterface::MASTER_REQUEST or HttpKernelInterface::SUB_REQUEST)
      * @param Boolean $raw     Whether to catch exceptions or not (this is NOT used in this context)
      *
      * @return Symfony\Components\HttpFoundation\Response A Response instance

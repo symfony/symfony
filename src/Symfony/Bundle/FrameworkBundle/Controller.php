@@ -96,7 +96,7 @@ class Controller
         $path['_controller'] = $controller;
         $subRequest = $this->getRequest()->duplicate($query, null, $path);
 
-        return $this->container->get('kernel')->handle($subRequest, HttpKernelInterface::FORWARDED_REQUEST, true);
+        return $this->container->get('kernel')->handle($subRequest, HttpKernelInterface::SUB_REQUEST);
     }
 
     /**

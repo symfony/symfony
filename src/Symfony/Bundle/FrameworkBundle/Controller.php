@@ -106,11 +106,7 @@ class Controller
      */
     public function redirect($url, $status = 302)
     {
-        $response = $this->container->get('response');
-        $response->setStatusCode($status);
-        $response->headers->set('Location', $url);
-
-        return $response;
+        return $this->container->get('response')->setRedirect($url, $status);
     }
 
     /**

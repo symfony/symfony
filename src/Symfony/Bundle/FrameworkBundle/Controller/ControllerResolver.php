@@ -81,7 +81,7 @@ class ControllerResolver extends BaseControllerResolver
     public function forward($controller, array $path = array(), array $query = array())
     {
         $path['_controller'] = $controller;
-        $subRequest = $this->getRequest()->duplicate($query, null, $path);
+        $subRequest = $this->container->getRequestService()->duplicate($query, null, $path);
 
         return $this->container->get('kernel')->handle($subRequest, HttpKernelInterface::SUB_REQUEST);
     }

@@ -89,7 +89,9 @@ class Controller implements \ArrayAccess
      */
     public function redirect($url, $status = 302)
     {
-        return $this->container->get('response')->setRedirect($url, $status);
+        $response = $this->container->get('response');
+        $response->setRedirect($url, $status);
+        return $response;
     }
 
     /**

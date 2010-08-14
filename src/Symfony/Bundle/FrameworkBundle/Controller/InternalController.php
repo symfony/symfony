@@ -3,6 +3,7 @@
 namespace Symfony\Bundle\FrameworkBundle\Controller;
 
 use Symfony\Bundle\FrameworkBundle\Controller;
+use Symfony\Components\HttpFoundation\Response;
 
 /*
  * This file is part of the Symfony framework.
@@ -20,16 +21,25 @@ use Symfony\Bundle\FrameworkBundle\Controller;
  */
 class InternalController extends Controller
 {
-    public function indexAction()
+    /**
+     * Forwards to the given controller with the given path.
+     *
+     * @param string $path       The path
+     * @param string $controller The controller name
+     *
+     * @return Response A Response instance
+     */
+    public function indexAction($path, $controller)
     {
-        $request = $this->getRequest();
+        $request = $this['request'];
+        $attributes = $request->attributes;
 
-        if ('none' !== $request->attributes->get('path'))
+        if ('none' !== $path)
         {
-            parse_str($request->attributes->get('path'), $tmp);
-            $request->attributes->add($tmp);
+            parse_str($path, $tmp);
+            $attributes->add($tmp);
         }
 
-        return $this->forward($request->attributes->get('controller'), $request->attributes->all(), $request->query->all());
+        return $this['controller_resolver']->forward($controller, $attributes->all(), $request->query->all());
     }
 }

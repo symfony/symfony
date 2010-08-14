@@ -3,6 +3,7 @@
 namespace Symfony\Bundle\FrameworkBundle\Controller;
 
 use Symfony\Bundle\FrameworkBundle\Controller;
+use Symfony\Components\HttpFoundation\Response;
 
 /*
  * This file is part of the Symfony framework.
@@ -20,8 +21,15 @@ use Symfony\Bundle\FrameworkBundle\Controller;
  */
 class TemplateController extends Controller
 {
+    /**
+     * Renders a template.
+     *
+     * @param string $template The template name
+     *
+     * @return Response A Response instance
+     */
     public function templateAction($template)
     {
-        return $this->render($template);
+        return $this['templating']->renderResponse($template);
     }
 }

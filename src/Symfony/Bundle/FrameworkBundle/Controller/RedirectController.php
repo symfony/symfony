@@ -3,6 +3,7 @@
 namespace Symfony\Bundle\FrameworkBundle\Controller;
 
 use Symfony\Bundle\FrameworkBundle\Controller;
+use Symfony\Components\HttpFoundation\Response;
 
 /*
  * This file is part of the Symfony framework.
@@ -20,7 +21,7 @@ use Symfony\Bundle\FrameworkBundle\Controller;
  */
 class RedirectController extends Controller
 {
-    /*
+    /**
      * Redirects to another route.
      *
      * It expects a route path parameter.
@@ -28,11 +29,16 @@ class RedirectController extends Controller
      *
      * If the route empty, the status code will be 410.
      * If the permanent path parameter is set, the status code will be 302.
+     *
+     * @param string  $route     The route pattern to redirect to
+     * @param Boolean $permanent Whether the redirect is permanent or not
+     *
+     * @return Response A Response instance
      */
     public function redirectAction($route, $permanent = false)
     {
         if (!$route) {
-            $response = $this->container->getResponseService();
+            $response = $this['response'];
             $response->setStatusCode(410);
 
             return $response;
@@ -40,9 +46,12 @@ class RedirectController extends Controller
 
         $code = $permanent ? 301 : 302;
 
-        $parameters = $this->getRequest()->getPathParameters();
-        unset($parameters['_route'], $parameters['route']);
+        $attributes = $this['request']->attributes->all();
+        unset($attributes['_route'], $attributes['route']);
 
-        return $this->redirect($this->container->getRouterService()->generate($route, $parameters), $code);
+        $response = $this['response'];
+        $response->setRedirect($this['router']->generate($route, $attributes), $code);
+
+        return $response;
     }
 }

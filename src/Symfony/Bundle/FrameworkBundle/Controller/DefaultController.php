@@ -3,6 +3,7 @@
 namespace Symfony\Bundle\FrameworkBundle\Controller;
 
 use Symfony\Bundle\FrameworkBundle\Controller;
+use Symfony\Components\HttpFoundation\Response;
 
 /*
  * This file is part of the Symfony framework.
@@ -20,8 +21,13 @@ use Symfony\Bundle\FrameworkBundle\Controller;
  */
 class DefaultController extends Controller
 {
+    /**
+     * Renders the Symfony2 welcome page.
+     *
+     * @return Response A Response instance
+     */
     public function indexAction()
     {
-        return $this->render('FrameworkBundle:Default:index');
+        return $this['templating']->renderResponse('FrameworkBundle:Default:index');
     }
 }

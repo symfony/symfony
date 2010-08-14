@@ -25,13 +25,18 @@ use Symfony\Components\HttpKernel\Exception\HttpException;
 class ExceptionController extends Controller
 {
     /**
+     * Converts an Exception to a Response.
+     *
+     * @param \Exception $exception An Exception instance
+     * @param Request    $request   The original Request instance
+     * @param array      $logs      An array of logs
+     *
      * @throws \InvalidArgumentException When the exception template does not exist
      */
     public function exceptionAction(\Exception $exception, Request $originalRequest, array $logs)
     {
         $template = $this->container->getParameter('kernel.debug') ? 'exception' : 'error';
 
-        $request = $this->getRequest();
         $format = $format = $originalRequest->getRequestFormat();
 
         // when using CLI, we force the format to be TXT
@@ -39,7 +44,7 @@ class ExceptionController extends Controller
             $format = 'txt';
         }
 
-        $template = $this->container->getTemplatingService()->getLoader()->load($template, array(
+        $template = $this['templating']->getLoader()->load($template, array(
             'bundle'     => 'FrameworkBundle',
             'controller' => 'Exception',
             'format'     => '.'.$format,
@@ -73,7 +78,7 @@ class ExceptionController extends Controller
         require $template;
         $content = ob_get_clean();
 
-        $response = $this->container->getResponseService();
+        $response = $this['response'];
         $response->setStatusCode($code);
         $response->setContent($content);
 

@@ -3,7 +3,6 @@
 namespace Symfony\Bundle\FrameworkBundle;
 
 use Symfony\Components\HttpKernel\LoggerInterface;
-use Symfony\Components\DependencyInjection\ContainerInterface;
 use Symfony\Components\EventDispatcher\EventDispatcher;
 use Symfony\Components\EventDispatcher\Event;
 use Symfony\Components\Routing\RouterInterface;
@@ -25,13 +24,11 @@ use Symfony\Components\HttpKernel\HttpKernelInterface;
  */
 class RequestListener
 {
-    protected $container;
     protected $router;
     protected $logger;
 
-    public function __construct(ContainerInterface $container, RouterInterface $router, LoggerInterface $logger = null)
+    public function __construct(RouterInterface $router, LoggerInterface $logger = null)
     {
-        $this->container = $container;
         $this->router = $router;
         $this->logger = $logger;
     }
@@ -39,7 +36,7 @@ class RequestListener
     /**
      * Registers a core.request listener.
      *
-     * @param Symfony\Components\EventDispatcher\EventDispatcher $dispatcher An EventDispatcher instance
+     * @param EventDispatcher $dispatcher An EventDispatcher instance
      */
     public function register(EventDispatcher $dispatcher)
     {

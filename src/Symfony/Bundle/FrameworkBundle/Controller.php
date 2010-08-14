@@ -5,7 +5,6 @@ namespace Symfony\Bundle\FrameworkBundle;
 use Symfony\Components\DependencyInjection\ContainerInterface;
 use Symfony\Components\HttpFoundation\Request;
 use Symfony\Components\HttpFoundation\Response;
-use Symfony\Components\HttpKernel\HttpKernelInterface;
 
 /*
  * This file is part of the Symfony framework.
@@ -93,10 +92,7 @@ class Controller
      */
     public function forward($controller, array $path = array(), array $query = array())
     {
-        $path['_controller'] = $controller;
-        $subRequest = $this->getRequest()->duplicate($query, null, $path);
-
-        return $this->container->get('kernel')->handle($subRequest, HttpKernelInterface::SUB_REQUEST);
+        return $this->container->get('controller_resolver')->forward($controller, $path, $query);
     }
 
     /**

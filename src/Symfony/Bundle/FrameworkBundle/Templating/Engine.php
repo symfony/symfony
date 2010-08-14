@@ -6,6 +6,7 @@ use Symfony\Components\Templating\Engine as BaseEngine;
 use Symfony\Components\Templating\Loader\LoaderInterface;
 use Symfony\Components\OutputEscaper\Escaper;
 use Symfony\Components\DependencyInjection\ContainerInterface;
+use Symfony\Components\HttpFoundation\Response;
 
 /*
  * This file is part of the Symfony package.
@@ -76,6 +77,26 @@ class Engine extends BaseEngine
         --$this->level;
 
         return $content;
+    }
+
+    /**
+     * Renders a view and returns a Response.
+     *
+     * @param string   $view       The view name
+     * @param array    $parameters An array of parameters to pass to the view
+     * @param Response $response   A Response instance
+     *
+     * @return Response A Response instance
+     */
+    public function renderResponse($view, array $parameters = array(), Response $response = null)
+    {
+        if (null === $response) {
+            $response = $this->container->get('response');
+        }
+
+        $response->setContent($this->render($view, $parameters));
+
+        return $response;
     }
 
     public function has($name)

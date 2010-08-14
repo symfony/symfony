@@ -133,12 +133,6 @@ class Controller
      */
     public function render($view, array $parameters = array(), Response $response = null)
     {
-        if (null === $response) {
-            $response = $this->container->get('response');
-        }
-
-        $response->setContent($this->container->get('templating')->render($view, $parameters));
-
-        return $response;
+        return $this->container->get('templating')->renderResponse($view, $parameters, $response);
     }
 }

@@ -65,7 +65,6 @@ interface BundleInterface {
     public function setContainer(ContainerInterface $container); }
 namespace Symfony\Framework;
 use Symfony\Framework\Bundle\Bundle;
-use Symfony\Framework\ClassCollectionLoader;
 class KernelBundle extends Bundle {
     public function boot() {
         if ($this->container->has('error_handler')) {
@@ -138,7 +137,11 @@ class ErrorHandler {
         return false; } }
 namespace Symfony\Framework;
 class ClassCollectionLoader {
+    static protected $loaded;
     static public function load($classes, $cacheDir, $name, $autoReload) {
+                if (isset(self::$loaded[$name])) {
+            return; }
+        self::$loaded[$name] = true;
         $classes = array_unique($classes);
         $cache = $cacheDir.'/'.$name.'.php';
                 $reload = false;
@@ -172,15 +175,10 @@ class ClassCollectionLoader {
                         self::writeCacheFile($metadata, serialize(array($files, $classes))); } }
     static protected function writeCacheFile($file, $content) {
         $tmpFile = tempnam(dirname($file), basename($file));
-        if (!$fp = @fopen($tmpFile, 'wb')) {
-            die(sprintf('Failed to write cache file "%s".', $tmpFile)); }
-        @fwrite($fp, $content);
-        @fclose($fp);
-        if ($content != file_get_contents($tmpFile)) {
-            die(sprintf('Failed to write cache file "%s" (cache corrupted).', $tmpFile)); }
-        if (!@rename($tmpFile, $file)) {
-            throw new \RuntimeException(sprintf('Failed to write cache file "%s".', $file)); }
-        chmod($file, 0644); } }
+        if (false !== @file_put_contents($tmpFile, $content) && @rename($tmpFile, $file)) {
+            chmod($file, 0644);
+            return; }
+        throw new \RuntimeException(sprintf('Failed to write cache file "%s".', $file)); } }
 namespace Symfony\Framework;
 use Symfony\Components\EventDispatcher\EventDispatcher as BaseEventDispatcher;
 use Symfony\Components\EventDispatcher\Event;

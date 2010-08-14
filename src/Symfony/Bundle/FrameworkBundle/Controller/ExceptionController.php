@@ -56,7 +56,7 @@ class ExceptionController extends Controller
 
         $code      = $exception instanceof HttpException ? $exception->getCode() : 500;
         $text      = Response::$statusTexts[$code];
-        $formatter = new ExceptionFormatter($this->container);
+        $formatter = new ExceptionFormatter($this->container->getParameterBag()->has('debug.file_link_format') ? $this->container->getParameter('debug.file_link_format') : null, $this->container->getParameter('kernel.charset'));
         $message   = null === $exception->getMessage() ? 'n/a' : $exception->getMessage();
         $name      = get_class($exception);
         $traces    = $formatter->getTraces($exception, 'html' === $format ? 'html' : 'text');

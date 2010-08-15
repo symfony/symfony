@@ -116,7 +116,7 @@ class Router implements RouterInterface
      *
      * @return string The generated URL
      */
-    public function generate($name, array $parameters, $absolute = false)
+    public function generate($name, array $parameters = array(), $absolute = false)
     {
         return $this->getGenerator()->generate($name, $parameters, $absolute);
     }

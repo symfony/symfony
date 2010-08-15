@@ -64,8 +64,7 @@ class Engine extends BaseEngine
         ++$this->level;
 
         list(, $options) = $this->splitTemplateName($name);
-        if ('php' === $options['renderer'])
-        {
+        if ('php' === $options['renderer']) {
             // escape only once
             if (1 === $this->level && !isset($parameters['_data'])) {
                 $parameters = $this->escapeParameters($parameters);

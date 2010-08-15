@@ -17,8 +17,10 @@
         <parameter key="templating.helper.router.class">Symfony\Bundle\FrameworkBundle\Templating\Helper\RouterHelper</parameter>
         <parameter key="templating.helper.request.class">Symfony\Bundle\FrameworkBundle\Templating\Helper\RequestHelper</parameter>
         <parameter key="templating.helper.session.class">Symfony\Bundle\FrameworkBundle\Templating\Helper\SessionHelper</parameter>
+        <parameter key="templating.helper.code.class">Symfony\Bundle\FrameworkBundle\Templating\Helper\CodeHelper</parameter>
         <parameter key="templating.output_escaper">false</parameter>
         <parameter key="templating.assets.version">null</parameter>
+        <parameter key="debug.file_link_format">null</parameter>
     </parameters>
 
     <services>
@@ -84,6 +86,11 @@
         <service id="templating.helper.actions" class="%templating.helper.actions.class%">
             <tag name="templating.helper" alias="actions" />
             <argument type="service" id="controller_resolver" />
+        </service>
+
+        <service id="templating.helper.code" class="%templating.helper.code.class%">
+            <tag name="templating.helper" alias="code" />
+            <argument>%debug.file_link_format%</argument>
         </service>
 
         <service id="templating.loader" alias="templating.loader.filesystem" />

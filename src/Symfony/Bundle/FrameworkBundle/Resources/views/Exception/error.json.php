@@ -1,5 +1,5 @@
 <?php echo json_encode(array(
     'error'       => array(
-        'code'      => $code,
-        'message'   => $text,
+        'code'      => $manager->getStatusCode(),
+        'message'   => $manager->getStatusText(),
 ))) ?>

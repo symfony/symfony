@@ -1,13 +1,14 @@
-[exception]   <?php echo $code.' | '.$text.' | '.$name ?>
+[exception]   <?php echo $manager->getStatusCode().' | '.$manager->getStatusText().' | '.$manager->getName() ?>
 
-[message]     <?php echo $message ?>
+[message]     <?php echo $manager->getMessage() ?>
 
-<?php if (isset($traces) && count($traces) > 0): ?>
+<?php if (count($manager->getTraces())): ?>
 [stack trace]
-<?php foreach ($traces as $line): ?>
-    <?php echo $line ?>
+<?php foreach ($manager->getTraces() as $i => $trace): ?>
+<?php echo $view->render('FrameworkBundle:Exception:trace.txt', array('i' => $i, 'trace' => $trace)) ?>
 
 <?php endforeach; ?>
+
 <?php endif; ?>
 [symfony]     v. <?php echo \Symfony\Framework\Kernel::VERSION ?> (symfony-project.org)
 [PHP]         v. <?php echo PHP_VERSION ?>

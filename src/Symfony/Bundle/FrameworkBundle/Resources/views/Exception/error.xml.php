@@ -1,2 +1,2 @@
-<?php echo sprintf('<?xml version="1.0" encoding="%s" ?>', $charset)."\n" ?>
-<error code="<?php echo $code ?>" message="<?php echo $text ?>" />
+<?php echo sprintf('<?xml version="1.0" encoding="%s" ?>', $view->getCharset())."\n" ?>
+<error code="<?php echo $manager->getStatusCode() ?>" message="<?php echo $manager->getStatusText() ?>" />

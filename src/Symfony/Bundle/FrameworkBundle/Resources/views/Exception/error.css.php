@@ -1,3 +1,1 @@
-/*
-    <?php echo $code.' '.$text."\n" ?>
-*/
+<?php echo $view->render('FrameworkBundle:Exception:error.js', array('manager' => $manager)) ?>

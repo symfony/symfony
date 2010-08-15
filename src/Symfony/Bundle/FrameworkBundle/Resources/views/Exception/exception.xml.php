@@ -1,11 +1,14 @@
-<?php echo sprintf('<?xml version="1.0" encoding="%s" ?>', $charset)."\n" ?>
-<error code="<?php echo $code ?>" message="<?php echo $text ?>">
+<?php echo sprintf('<?xml version="1.0" encoding="%s" ?>', $view->getCharset())."\n" ?>
+<error code="<?php echo $manager->getStatusCode() ?>" message="<?php echo $manager->getStatusText() ?>">
     <debug>
-        <name><?php echo $name ?></name>
-        <message><?php echo htmlspecialchars($message, ENT_QUOTES, $charset) ?></message>
+        <name><?php echo $manager->getName() ?></name>
+        <message><?php echo htmlspecialchars($manager->getMessage(), ENT_QUOTES, $view->getCharset()) ?></message>
         <traces>
-<?php foreach ($traces as $trace): ?>
-                <trace><?php echo $trace ?></trace>
+<?php foreach ($manager->getTraces() as $i => $trace): ?>
+                <trace>
+                <?php echo $view->render('FrameworkBundle:Exception:trace.txt', array('i' => $i, 'trace' => $trace)) ?>
+
+                </trace>
 <?php endforeach; ?>
         </traces>
     </debug>

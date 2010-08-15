@@ -27,7 +27,7 @@
         <img alt="page not found" class="sfTMessageIcon" src="<?php echo $path ?>/sf/sf_default/images/icons/tools48.png" height="48" width="48" />
         <div class="sfTMessageWrap">
             <h1>Oops! An Error Occurred</h1>
-            <h5>The server returned a "<?php echo $code ?> <?php echo $text ?>".</h5>
+            <h5>The server returned a "<?php echo $manager->getStatusCode() ?> <?php echo $manager->getStatusText() ?>".</h5>
         </div>
     </div>
 

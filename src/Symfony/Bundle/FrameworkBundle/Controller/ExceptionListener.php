@@ -5,7 +5,7 @@ namespace Symfony\Bundle\FrameworkBundle\Controller;
 use Symfony\Components\DependencyInjection\ContainerInterface;
 use Symfony\Components\EventDispatcher\EventDispatcher;
 use Symfony\Components\EventDispatcher\Event;
-use Symfony\Components\HttpKernel\LoggerInterface;
+use Symfony\Components\HttpKernel\Log\LoggerInterface;
 use Symfony\Components\HttpKernel\HttpKernelInterface;
 
 /*

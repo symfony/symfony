@@ -1,6 +1,6 @@
 <?php
 
-namespace Symfony\Components\HttpKernel;
+namespace Symfony\Components\HttpKernel\Log;
 
 /*
  * This file is part of the Symfony framework.

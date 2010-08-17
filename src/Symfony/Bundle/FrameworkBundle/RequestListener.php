@@ -2,7 +2,7 @@
 
 namespace Symfony\Bundle\FrameworkBundle;
 
-use Symfony\Components\HttpKernel\LoggerInterface;
+use Symfony\Components\HttpKernel\Log\LoggerInterface;
 use Symfony\Components\EventDispatcher\EventDispatcher;
 use Symfony\Components\EventDispatcher\Event;
 use Symfony\Components\Routing\RouterInterface;

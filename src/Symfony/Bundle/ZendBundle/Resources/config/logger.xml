@@ -37,5 +37,7 @@
         <service id="zend.logger.filter" class="Zend\Log\Filter\Priority">
             <argument>%zend.logger.priority%</argument>
         </service>
+
+        <service id="logger.debug" alias="zend.logger.writer.debug" />
     </services>
 </container>

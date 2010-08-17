@@ -5,7 +5,7 @@ namespace Symfony\Framework\Debug;
 use Symfony\Framework\EventDispatcher as BaseEventDispatcher;
 use Symfony\Components\EventDispatcher\EventDispatcherInterface;
 use Symfony\Components\EventDispatcher\Event;
-use Symfony\Components\HttpKernel\LoggerInterface;
+use Symfony\Components\HttpKernel\Log\LoggerInterface;
 use Symfony\Components\DependencyInjection\ContainerInterface;
 
 /*

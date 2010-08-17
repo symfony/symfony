@@ -11,7 +11,7 @@
 
 namespace Symfony\Tests\Components\HttpKernel;
 
-use Symfony\Components\HttpKernel\LoggerInterface;
+use Symfony\Components\HttpKernel\Log\LoggerInterface;
 
 class Logger implements LoggerInterface
 {

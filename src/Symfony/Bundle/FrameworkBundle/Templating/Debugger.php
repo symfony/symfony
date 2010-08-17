@@ -3,7 +3,7 @@
 namespace Symfony\Bundle\FrameworkBundle\Templating;
 
 use Symfony\Components\Templating\DebuggerInterface;
-use Symfony\Components\HttpKernel\LoggerInterface;
+use Symfony\Components\HttpKernel\Log\LoggerInterface;
 
 /*
  * This file is part of the Symfony package.

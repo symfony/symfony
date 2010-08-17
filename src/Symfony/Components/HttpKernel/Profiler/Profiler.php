@@ -5,7 +5,7 @@ namespace Symfony\Components\HttpKernel\Profiler;
 use Symfony\Components\HttpFoundation\Response;
 use Symfony\Components\HttpKernel\Profiler\ProfilerStorage;
 use Symfony\Components\HttpKernel\Profiler\DataCollector\DataCollectorInterface;
-use Symfony\Components\HttpKernel\LoggerInterface;
+use Symfony\Components\HttpKernel\Log\LoggerInterface;
 
 /*
  * This file is part of the Symfony framework.

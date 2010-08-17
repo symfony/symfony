@@ -5,7 +5,7 @@ namespace Symfony\Bundle\FrameworkBundle;
 use Symfony\Components\DependencyInjection\ContainerInterface;
 use Symfony\Components\HttpKernel\Profiler\Profiler as BaseProfiler;
 use Symfony\Components\HttpKernel\Profiler\ProfilerStorage;
-use Symfony\Components\HttpKernel\LoggerInterface;
+use Symfony\Components\HttpKernel\Log\LoggerInterface;
 
 /*
  * This file is part of the Symfony framework.

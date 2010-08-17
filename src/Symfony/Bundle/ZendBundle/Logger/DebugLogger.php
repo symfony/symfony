@@ -18,10 +18,13 @@ use Zend\Log\Writer\AbstractWriter;
  *
  * @author     Fabien Potencier <fabien.potencier@symfony-project.com>
  */
-class DebugLogger extends AbstractWriter
+class DebugLogger extends AbstractWriter implements DebugLoggerInterface
 {
     protected $logs = array();
 
+    /**
+     * {@inheritdoc}
+     */
     public function getLogs()
     {
         return $this->logs;

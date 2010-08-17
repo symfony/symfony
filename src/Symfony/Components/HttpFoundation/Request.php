@@ -516,6 +516,11 @@ class Request
         return $this->format;
     }
 
+    public function setRequestFormat($format)
+    {
+        $this->format = $format;
+    }
+
     public function isMethodSafe()
     {
         return in_array(strtolower($this->getMethod()), array('get', 'head'));

@@ -55,6 +55,8 @@ class ExceptionListener
 
         if (null !== $this->logger) {
             $this->logger->err(sprintf('%s: %s (uncaught exception)', get_class($exception), $exception->getMessage()));
+        } else {
+            error_log(sprintf('Uncaught PHP Exception %s: "%s" at %s line %s', get_class($exception), $exception->getMessage(), $exception->getFile(), $exception->getLine()));
         }
 
         $class = $this->container->getParameter('exception_manager.class');

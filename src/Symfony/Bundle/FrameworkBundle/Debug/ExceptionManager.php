@@ -29,7 +29,7 @@ class ExceptionManager
     protected $logger;
     protected $currentContent;
 
-    public function __construct(\Exception $exception, Request $request, DebugLoggerInterface $logger)
+    public function __construct(\Exception $exception, Request $request, DebugLoggerInterface $logger = null)
     {
         $this->exception = $exception;
         $this->request = $request;
@@ -58,11 +58,15 @@ class ExceptionManager
 
     public function getLogs()
     {
-        return $this->logger->getLogs();
+        return null === $this->logger ? array() : $this->logger->getLogs();
     }
 
     public function countErrors()
     {
+        if (null === $this->logger) {
+            return 0;
+        }
+
         $errors = 0;
         foreach ($this->logger->getLogs() as $log) {
             if ('ERR' === $log['priorityName']) {

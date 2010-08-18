@@ -19,6 +19,7 @@ web.templating:
 #    dbname:   xxxxxxxx
 #    user:     xxxxxxxx
 #    password: ~
+#doctrine.orm: ~
 
 ## Swiftmailer Configuration
 #swift.mailer:

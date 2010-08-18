@@ -21,18 +21,34 @@ class ClassCollectionLoader
     static protected $loaded;
 
     /**
+     * Loads a list of classes and caches them in one big file.
+     *
+     * @param array   $classes    An array of classes to load
+     * @param string  $cacheDir   A cache directory
+     * @param string  $name       The cache name prefix
+     * @param Boolean $autoReload Whether to flush the cache when the cache is stale or not
+     * @param Boolean $adaptive   Whether to remove already declared classes or not
+     *
      * @throws \InvalidArgumentException When class can't be loaded
      */
-    static public function load($classes, $cacheDir, $name, $autoReload)
+    static public function load($classes, $cacheDir, $name, $autoReload, $adaptive = false)
     {
         // each $name can only be loaded once per PHP process
         if (isset(self::$loaded[$name])) {
             return;
         }
 
-        self::$loaded[$name] = true;
-
         $classes = array_unique($classes);
+
+        if ($adaptive) {
+            // don't include already declared classes
+            $classes = array_diff($classes, get_declared_classes());
+
+            // the cache is different depending on which classes are already declared
+            $name = $name.'-'.substr(md5(implode('|', $classes)), 0, 5);
+        }
+
+        self::$loaded[$name] = true;
 
         $cache = $cacheDir.'/'.$name.'.php';
 

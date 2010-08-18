@@ -129,7 +129,8 @@ abstract class Kernel implements HttpKernelInterface, \Serializable
             $this->container->getParameter('kernel.compiled_classes'),
             $this->container->getParameter('kernel.cache_dir'),
             'classes',
-            $this->container->getParameter('kernel.debug')
+            $this->container->getParameter('kernel.debug'),
+            true
         );
 
         foreach ($this->bundles as $bundle) {

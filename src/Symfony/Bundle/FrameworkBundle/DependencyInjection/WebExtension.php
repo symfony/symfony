@@ -58,6 +58,20 @@ class WebExtension extends Extension
             }
 
             $container->setParameter('routing.resource', $config['router']['resource']);
+
+            $this->addCompiledClasses($container, array(
+                'Symfony\\Components\\Routing\\RouterInterface',
+                'Symfony\\Components\\Routing\\Router',
+                'Symfony\\Components\\Routing\\Matcher\\UrlMatcherInterface',
+                'Symfony\\Components\\Routing\\Matcher\\UrlMatcher',
+                'Symfony\\Components\\Routing\\Generator\\UrlGeneratorInterface',
+                'Symfony\\Components\\Routing\\Generator\\UrlGenerator',
+                'Symfony\\Components\\Routing\\Loader\\Loader',
+                'Symfony\\Components\\Routing\\Loader\\DelegatingLoader',
+                'Symfony\\Components\\Routing\\Loader\\LoaderResolver',
+                'Symfony\\Bundle\\FrameworkBundle\\Routing\\LoaderResolver',
+                'Symfony\\Bundle\\FrameworkBundle\\Routing\\DelegatingLoader',
+            ));
         }
 
         if (isset($config['toolbar']) && $config['toolbar']) {
@@ -164,20 +178,24 @@ class WebExtension extends Extension
             }
         }
 
-        $container->setParameter('kernel.compiled_classes', array_merge($container->getParameter('kernel.compiled_classes'), array(
-            'Symfony\\Components\\EventDispatcher\\Event',
-            'Symfony\\Components\\HttpKernel\\ResponseListener',
-            'Symfony\\Bundle\\FrameworkBundle\\Controller',
+        $this->addCompiledClasses($container, array(
+            'Symfony\\Components\\HttpFoundation\\ParameterBag',
+            'Symfony\\Components\\HttpFoundation\\HeaderBag',
+            'Symfony\\Components\\HttpFoundation\\Request',
+            'Symfony\\Components\\HttpFoundation\\Response',
 
-            // routing
-            'Symfony\\Components\\Routing\\RouterInterface',
-            'Symfony\\Components\\Routing\\Router',
-            'Symfony\\Components\\Routing\\Matcher\\UrlMatcherInterface',
-            'Symfony\\Components\\Routing\\Matcher\\UrlMatcher',
-            'Symfony\\Components\\Routing\\Generator\\UrlGeneratorInterface',
-            'Symfony\\Components\\Routing\\Generator\\UrlGenerator',
+            'Symfony\\Components\\HttpKernel\\HttpKernel',
+            'Symfony\\Components\\HttpKernel\\ResponseListener',
+            'Symfony\\Components\\HttpKernel\\Controller\\ControllerResolver',
+
             'Symfony\\Bundle\\FrameworkBundle\\RequestListener',
-        )));
+            'Symfony\\Bundle\\FrameworkBundle\\Controller\\ControllerNameConverter',
+            'Symfony\\Bundle\\FrameworkBundle\\Controller\\ControllerResolver',
+
+            'Symfony\\Components\\EventDispatcher\\Event',
+
+            'Symfony\\Bundle\\FrameworkBundle\\Controller',
+        ));
     }
 
     /**
@@ -243,7 +261,7 @@ class WebExtension extends Extension
         }
 
         // compilation
-        $container->setParameter('kernel.compiled_classes', array_merge($container->getParameter('kernel.compiled_classes'), array(
+        $this->addCompiledClasses($container, array(
             'Symfony\\Components\\Templating\\Loader\\LoaderInterface',
             'Symfony\\Components\\Templating\\Loader\\Loader',
             'Symfony\\Components\\Templating\\Loader\\FilesystemLoader',
@@ -254,7 +272,17 @@ class WebExtension extends Extension
             'Symfony\\Components\\Templating\\Storage\\Storage',
             'Symfony\\Components\\Templating\\Storage\\FileStorage',
             'Symfony\\Bundle\\FrameworkBundle\\Templating\\Engine',
-        )));
+            'Symfony\\Components\\Templating\\Helper\\Helper',
+            'Symfony\\Components\\Templating\\Helper\\SlotsHelper',
+            'Symfony\\Bundle\\FrameworkBundle\\Templating\\Helper\\ActionsHelper',
+            'Symfony\\Bundle\\FrameworkBundle\\Templating\\Helper\\RouterHelper',
+            'Symfony\\Bundle\\FrameworkBundle\\Templating\\Helper\\RouterHelper',
+        ));
+    }
+
+    protected function addCompiledClasses($container, array $classes)
+    {
+        $container->setParameter('kernel.compiled_classes', array_merge($container->getParameter('kernel.compiled_classes'), $classes));
     }
 
     /**

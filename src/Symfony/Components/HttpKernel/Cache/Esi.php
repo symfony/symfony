@@ -210,7 +210,7 @@ class Esi
             throw new \RuntimeException('Unable to process an ESI tag without a "src" attribute.');
         }
 
-        return sprintf('<?php echo $this->esi->handle($this, \'%s\', \'%s\', %s)->getContent() ?>'."\n",
+        return sprintf('<?php echo $this->esi->handle($this, \'%s\', \'%s\', %s) ?>'."\n",
             $options['src'],
             isset($options['alt']) ? $options['alt'] : null,
             isset($options['onerror']) && 'continue' == $options['onerror'] ? 'true' : 'false'

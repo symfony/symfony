@@ -34,7 +34,8 @@ class InternalController extends Controller
         $request = $this['request'];
         $attributes = $request->attributes;
 
-        unset($attributes['path'], $attributes['controller']);
+        $attributes->delete('path');
+        $attributes->delete('controller');
         if ('none' !== $path)
         {
             parse_str($path, $tmp);

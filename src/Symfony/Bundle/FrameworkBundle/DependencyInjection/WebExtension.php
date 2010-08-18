@@ -103,79 +103,7 @@ class WebExtension extends Extension
         }
 
         if (isset($config['validation']['enabled'])) {
-            if ($config['validation']['enabled']) {
-                if (!$container->hasDefinition('validator')) {
-                    $loader = new XmlFileLoader($container, __DIR__.'/../Resources/config');
-                    $loader->load($this->resources['validation']);
-                }
-
-                $xmlMappingFiles = array();
-                $yamlMappingFiles = array();
-                $messageFiles = array();
-
-                // default entries by the framework
-                $xmlMappingFiles[] = __DIR__.'/../../../Components/Form/Resources/config/validation.xml';
-                $messageFiles[] = __DIR__ . '/../../../Components/Validator/Resources/i18n/messages.en.xml';
-                $messageFiles[] = __DIR__ . '/../../../Components/Form/Resources/i18n/messages.en.xml';
-
-                foreach ($container->getParameter('kernel.bundles') as $className) {
-                    $tmp = dirname(str_replace('\\', '/', $className));
-                    $namespace = str_replace('/', '\\', dirname($tmp));
-                    $bundle = basename($tmp);
-
-                    foreach ($container->getParameter('kernel.bundle_dirs') as $dir) {
-                        if (file_exists($file = $dir.'/'.$bundle.'/Resources/config/validation.xml')) {
-                            $xmlMappingFiles[] = realpath($file);
-                        }
-                        if (file_exists($file = $dir.'/'.$bundle.'/Resources/config/validation.yml')) {
-                            $yamlMappingFiles[] = realpath($file);
-                        }
-
-                        // TODO do we really want the message files of all cultures?
-                        foreach (glob($dir.'/'.$bundle.'/Resources/i18n/messages.*.xml') as $file) {
-                            $messageFiles[] = realpath($file);
-                        }
-                    }
-                }
-
-                $xmlFilesLoader = new Definition(
-                    $container->getParameter('validator.mapping.loader.xml_files_loader.class'),
-                    array($xmlMappingFiles)
-                );
-
-                $yamlFilesLoader = new Definition(
-                    $container->getParameter('validator.mapping.loader.yaml_files_loader.class'),
-                    array($yamlMappingFiles)
-                );
-
-                $container->setDefinition('validator.mapping.loader.xml_files_loader', $xmlFilesLoader);
-                $container->setDefinition('validator.mapping.loader.yaml_files_loader', $yamlFilesLoader);
-                $container->setParameter('validator.message_interpolator.files', $messageFiles);
-
-                foreach ($xmlMappingFiles as $file) {
-                    $container->addResource(new FileResource($file));
-                }
-
-                foreach ($yamlMappingFiles as $file) {
-                    $container->addResource(new FileResource($file));
-                }
-
-                foreach ($messageFiles as $file) {
-                    $container->addResource(new FileResource($file));
-                }
-
-                if (isset($config['validation']['annotations']) && $config['validation']['annotations'] === true) {
-                    $annotationLoader = new Definition($container->getParameter('validator.mapping.loader.annotation_loader.class'));
-                    $container->setDefinition('validator.mapping.loader.annotation_loader', $annotationLoader);
-
-                    $loader = $container->getDefinition('validator.mapping.loader.loader_chain');
-                    $arguments = $loader->getArguments();
-                    array_unshift($arguments[0], new Reference('validator.mapping.loader.annotation_loader'));
-                    $loader->setArguments($arguments);
-                }
-            } elseif ($container->hasDefinition('validator')) {
-                $container->getDefinition('validator')->clearTags();
-            }
+            $this->registerValidationConfiguration($config, $container);
         }
 
         $this->addCompiledClasses($container, array(
@@ -278,6 +206,83 @@ class WebExtension extends Extension
             'Symfony\\Bundle\\FrameworkBundle\\Templating\\Helper\\RouterHelper',
             'Symfony\\Bundle\\FrameworkBundle\\Templating\\Helper\\RouterHelper',
         ));
+    }
+
+    protected function registerValidationConfiguration($config, ContainerBuilder $container)
+    {
+        if ($config['validation']['enabled']) {
+            if (!$container->hasDefinition('validator')) {
+                $loader = new XmlFileLoader($container, __DIR__.'/../Resources/config');
+                $loader->load($this->resources['validation']);
+            }
+
+            $xmlMappingFiles = array();
+            $yamlMappingFiles = array();
+            $messageFiles = array();
+
+            // default entries by the framework
+            $xmlMappingFiles[] = __DIR__.'/../../../Components/Form/Resources/config/validation.xml';
+            $messageFiles[] = __DIR__ . '/../../../Components/Validator/Resources/i18n/messages.en.xml';
+            $messageFiles[] = __DIR__ . '/../../../Components/Form/Resources/i18n/messages.en.xml';
+
+            foreach ($container->getParameter('kernel.bundles') as $className) {
+                $tmp = dirname(str_replace('\\', '/', $className));
+                $namespace = str_replace('/', '\\', dirname($tmp));
+                $bundle = basename($tmp);
+
+                foreach ($container->getParameter('kernel.bundle_dirs') as $dir) {
+                    if (file_exists($file = $dir.'/'.$bundle.'/Resources/config/validation.xml')) {
+                        $xmlMappingFiles[] = realpath($file);
+                    }
+                    if (file_exists($file = $dir.'/'.$bundle.'/Resources/config/validation.yml')) {
+                        $yamlMappingFiles[] = realpath($file);
+                    }
+
+                    // TODO do we really want the message files of all cultures?
+                    foreach (glob($dir.'/'.$bundle.'/Resources/i18n/messages.*.xml') as $file) {
+                        $messageFiles[] = realpath($file);
+                    }
+                }
+            }
+
+            $xmlFilesLoader = new Definition(
+                $container->getParameter('validator.mapping.loader.xml_files_loader.class'),
+                array($xmlMappingFiles)
+            );
+
+            $yamlFilesLoader = new Definition(
+                $container->getParameter('validator.mapping.loader.yaml_files_loader.class'),
+                array($yamlMappingFiles)
+            );
+
+            $container->setDefinition('validator.mapping.loader.xml_files_loader', $xmlFilesLoader);
+            $container->setDefinition('validator.mapping.loader.yaml_files_loader', $yamlFilesLoader);
+            $container->setParameter('validator.message_interpolator.files', $messageFiles);
+
+            foreach ($xmlMappingFiles as $file) {
+                $container->addResource(new FileResource($file));
+            }
+
+            foreach ($yamlMappingFiles as $file) {
+                $container->addResource(new FileResource($file));
+            }
+
+            foreach ($messageFiles as $file) {
+                $container->addResource(new FileResource($file));
+            }
+
+            if (isset($config['validation']['annotations']) && $config['validation']['annotations'] === true) {
+                $annotationLoader = new Definition($container->getParameter('validator.mapping.loader.annotation_loader.class'));
+                $container->setDefinition('validator.mapping.loader.annotation_loader', $annotationLoader);
+
+                $loader = $container->getDefinition('validator.mapping.loader.loader_chain');
+                $arguments = $loader->getArguments();
+                array_unshift($arguments[0], new Reference('validator.mapping.loader.annotation_loader'));
+                $loader->setArguments($arguments);
+            }
+        } elseif ($container->hasDefinition('validator')) {
+            $container->getDefinition('validator')->clearTags();
+        }
     }
 
     protected function addCompiledClasses($container, array $classes)

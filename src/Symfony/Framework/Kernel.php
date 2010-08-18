@@ -252,6 +252,23 @@ abstract class Kernel implements HttpKernelInterface, \Serializable
         return false;
     }
 
+    /**
+     * Returns the Bundle name for a given class.
+     *
+     * @param string $class A class name
+     *
+     * @return string The Bundle name or null if the class does not belongs to a bundle
+     */
+    public function getBundleForClass($class)
+    {
+        $namespace = substr($class, 0, strrpos($class, '\\'));
+        foreach (array_keys($this->getBundleDirs()) as $prefix) {
+            if (0 === $pos = strpos($namespace, $prefix)) {
+                return substr($namespace, strlen($prefix) + 1, strpos($class, 'Bundle\\') + 7);
+            }
+        }
+    }
+
     public function getName()
     {
         return $this->name;

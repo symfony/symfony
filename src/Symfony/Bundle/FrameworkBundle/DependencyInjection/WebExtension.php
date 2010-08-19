@@ -151,6 +151,10 @@ class WebExtension extends Extension
             $container->setParameter('templating.assets.version', $config['assets_version']);
         }
 
+        if (array_key_exists('assets_base_urls', $config)) {
+            $container->setParameter('templating.assets.base_urls', $config['assets_base_urls']);
+        }
+
         // template paths
         $dirs = array('%kernel.root_dir%/views/%%bundle%%/%%controller%%/%%name%%%%format%%.%%renderer%%');
         foreach ($container->getParameter('kernel.bundle_dirs') as $dir) {

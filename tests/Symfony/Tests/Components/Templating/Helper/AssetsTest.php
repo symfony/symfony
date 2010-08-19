@@ -82,14 +82,14 @@ class AssetsHelperTest extends \PHPUnit_Framework_TestCase
         $this->assertEquals('http://www.example.com/foo/foo.js', $helper->getUrl('/foo.js'), '->getUrl() prepends the base URL with a path');
 
         $helper = new AssetsHelper('/foo', 'http://www.example.com/');
-        $this->assertEquals('http://www.example.com/foo/foo.js', $helper->getUrl('foo.js'), '->getUrl() prepends the base URL and the base path if defined');
+        $this->assertEquals('http://www.example.com/foo.js', $helper->getUrl('foo.js'), '->getUrl() prepends the base URL and the base path if defined');
         $this->assertEquals('http://www.example.com/foo.js', $helper->getUrl('/foo.js'), '->getUrl() prepends the base URL but not the base path on absolute paths');
 
         $helper = new AssetsHelper('/bar', 'http://www.example.com/foo');
-        $this->assertEquals('http://www.example.com/foo/bar/foo.js', $helper->getUrl('foo.js'), '->getUrl() prepends the base URL and the base path if defined');
+        $this->assertEquals('http://www.example.com/foo/foo.js', $helper->getUrl('foo.js'), '->getUrl() prepends the base URL and the base path if defined');
         $this->assertEquals('http://www.example.com/foo/foo.js', $helper->getUrl('/foo.js'), '->getUrl() prepends the base URL but not the base path on absolute paths');
 
         $helper = new AssetsHelper('/bar', 'http://www.example.com/foo', 'abcd');
-        $this->assertEquals('http://www.example.com/foo/bar/foo.js?abcd', $helper->getUrl('foo.js'), '->getUrl() appends the version if defined');
+        $this->assertEquals('http://www.example.com/foo/foo.js?abcd', $helper->getUrl('foo.js'), '->getUrl() appends the version if defined');
     }
 }

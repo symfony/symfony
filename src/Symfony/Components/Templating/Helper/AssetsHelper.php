@@ -148,15 +148,16 @@ class AssetsHelper extends Helper
      */
     public function getUrl($path)
     {
-        if (strpos($path, '://')) {
+        if (false !== strpos($path, '://')) {
             return $path;
         }
 
+        $base = $this->getBaseURL($path);
         if (0 !== strpos($path, '/')) {
-            $path = $this->basePath.$path;
+            $path = $base ? '/'.$path : $this->basePath.$path;
         }
 
-        return $this->getBaseURL($path).$path.($this->version ? '?'.$this->version : '');
+        return $base.$path.($this->version ? '?'.$this->version : '');
     }
 
     /**

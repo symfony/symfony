@@ -20,6 +20,7 @@
         <parameter key="templating.helper.code.class">Symfony\Bundle\FrameworkBundle\Templating\Helper\CodeHelper</parameter>
         <parameter key="templating.output_escaper">false</parameter>
         <parameter key="templating.assets.version">null</parameter>
+        <parameter key="templating.assets.base_urls" type="collection"></parameter>
         <parameter key="debug.file_link_format">null</parameter>
     </parameters>
 
@@ -64,7 +65,7 @@
         <service id="templating.helper.assets" class="%templating.helper.assets.class%">
             <tag name="templating.helper" alias="assets" />
             <argument type="service" id="request" />
-            <argument />
+            <argument>%templating.assets.base_urls%</argument>
             <argument>%templating.assets.version%</argument>
         </service>
 

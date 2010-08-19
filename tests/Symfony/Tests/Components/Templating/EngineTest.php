@@ -45,18 +45,18 @@ class EngineTest extends \PHPUnit_Framework_TestCase
         $this->assertTrue($engine->getRenderers() === array('php' => self::$renderer), '__construct() can overridde the default PHP renderer');
     }
 
-    public function testMagicGet()
+    public function testOffsetGet()
     {
         $engine = new ProjectTemplateEngine(self::$loader);
         $engine->set($helper = new \SimpleHelper('bar'), 'foo');
-        $this->assertEquals($helper, $engine->foo, '->__get() returns the value of a helper');
+        $this->assertEquals($helper, $engine['foo'], '->offsetGet() returns the value of a helper');
 
         try {
-            $engine->bar;
-            $this->fail('->__get() throws an InvalidArgumentException if the helper is not defined');
+            $engine['bar'];
+            $this->fail('->offsetGet() throws an InvalidArgumentException if the helper is not defined');
         } catch (\Exception $e) {
-            $this->assertInstanceOf('\InvalidArgumentException', $e, '->__get() throws an InvalidArgumentException if the helper is not defined');
-            $this->assertEquals('The helper "bar" is not defined.', $e->getMessage(), '->__get() throws an InvalidArgumentException if the helper is not defined');
+            $this->assertInstanceOf('\InvalidArgumentException', $e, '->offsetGet() throws an InvalidArgumentException if the helper is not defined');
+            $this->assertEquals('The helper "bar" is not defined.', $e->getMessage(), '->offsetGet() throws an InvalidArgumentException if the helper is not defined');
         }
     }
 
@@ -104,15 +104,15 @@ class EngineTest extends \PHPUnit_Framework_TestCase
 
         $engine = new ProjectTemplateEngine(self::$loader, array(), array(new SlotsHelper()));
         $engine->set(new \SimpleHelper('bar'));
-        self::$loader->setTemplate('foo.php', '<?php $view->extend("layout"); echo $view->foo.$foo ?>');
-        self::$loader->setTemplate('layout.php', '-<?php echo $view->slots->get("_content") ?>-');
+        self::$loader->setTemplate('foo.php', '<?php $view->extend("layout"); echo $view[\'foo\'].$foo ?>');
+        self::$loader->setTemplate('layout.php', '-<?php echo $view[\'slots\']->get("_content") ?>-');
         $this->assertEquals('-barfoo-', $engine->render('foo', array('foo' => 'foo')), '->render() uses the decorator to decorate the template');
 
         $engine = new ProjectTemplateEngine(self::$loader, array(), array(new SlotsHelper()));
         $engine->set(new \SimpleHelper('bar'));
         self::$loader->setTemplate('bar.php', 'bar');
         self::$loader->setTemplate('foo.php', '<?php $view->extend("layout"); echo $foo ?>');
-        self::$loader->setTemplate('layout.php', '<?php echo $view->render("bar") ?>-<?php echo $view->slots->get("_content") ?>-');
+        self::$loader->setTemplate('layout.php', '<?php echo $view->render("bar") ?>-<?php echo $view[\'slots\']->get("_content") ?>-');
         $this->assertEquals('bar-foo-', $engine->render('foo', array('foo' => 'foo', 'bar' => 'bar')), '->render() supports render() calls in templates');
     }
 

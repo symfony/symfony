@@ -21,7 +21,7 @@ use Symfony\Components\Templating\Helper\HelperInterface;
  *
  * @author     Fabien Potencier <fabien.potencier@symfony-project.com>
  */
-class Engine
+class Engine implements \ArrayAccess
 {
     protected $loader;
     protected $renderers;
@@ -145,7 +145,7 @@ class Engine
      *
      * @throws \InvalidArgumentException if the helper is not defined
      */
-    public function __get($name)
+    public function offsetGet($name)
     {
         return $this->$name = $this->get($name);
     }
@@ -157,9 +157,30 @@ class Engine
      *
      * @return Boolean true if the helper is defined, false otherwise
      */
-    public function __isset($name)
+    public function offsetExists($name)
     {
         return isset($this->helpers[$name]);
+    }
+
+    /**
+     * Sets a helper.
+     *
+     * @param HelperInterface $value The helper instance
+     * @param string          $alias An alias
+     */
+    public function offsetSet($name, $value)
+    {
+        $this->set($name, $value);
+    }
+
+    /**
+     * Removes a helper.
+     *
+     * @param string $name The helper name
+     */
+    public function offsetUnset($name)
+    {
+        throw new \LogicException(sprintf('You can\'t unset a helper (%s).', $name));
     }
 
     /**

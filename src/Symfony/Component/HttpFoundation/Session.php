@@ -33,10 +33,11 @@ class Session
      * @param SessionStorageInterface $session A SessionStorageInterface instance
      * @param array                   $options An array of options
      */
-    public function __construct(SessionStorageInterface $storage, $options = array())
+    public function __construct(SessionStorageInterface $storage, array $options = array())
     {
         $this->storage = $storage;
         $this->options = $options;
+        $this->attributes = array();
     }
 
     /**
@@ -62,14 +63,26 @@ class Session
     }
 
     /**
-     * Returns an attribute
+     * Checks if an attribute is defined.
+     *
+     * @param string $name The attribute name
+     *
+     * @return Boolean true if the attribute is defined, false otherwise
+     */
+    public function has($name)
+    {
+        return array_key_exists($name, $this->attributes);
+    }
+
+    /**
+     * Returns an attribute.
      *
      * @param string $name    The attribute name
      * @param mixed  $default The default value
      *
      * @return mixed
      */
-    public function getAttribute($name, $default = null)
+    public function get($name, $default = null)
     {
         return array_key_exists($name, $this->attributes) ? $this->attributes[$name] : $default;
     }
@@ -80,8 +93,12 @@ class Session
      * @param string $name
      * @param mixed  $value
      */
-    public function setAttribute($name, $value)
+    public function set($name, $value)
     {
+        if (false === $this->started) {
+            $this->start();
+        }
+
         $this->attributes[$name] = $value;
     }
 
@@ -96,13 +113,33 @@ class Session
     }
 
     /**
-     * Sets attributes
+     * Sets attributes.
      *
      * @param array $attributes Attributes
      */
     public function setAttributes($attributes)
     {
+        if (false === $this->started) {
+            $this->start();
+        }
+
         $this->attributes = $attributes;
+    }
+
+    /**
+     * Removes an attribute.
+     *
+     * @param string $name
+     */
+    public function remove($name)
+    {
+        if (array_key_exists($this->attributes, $name)) {
+            if (false === $this->started) {
+                $this->start();
+            }
+
+            unset($this->attributes[$name]);
+        }
     }
 
     /**
@@ -134,6 +171,10 @@ class Session
 
     public function setFlashMessages($values)
     {
+        if (false === $this->started) {
+            $this->start();
+        }
+
         $this->attributes['_flash'] = $values;
     }
 
@@ -144,6 +185,10 @@ class Session
 
     public function setFlash($name, $value)
     {
+        if (false === $this->started) {
+            $this->start();
+        }
+
         $this->attributes['_flash'][$name] = $value;
         unset($this->oldFlashes[$name]);
     }

@@ -1,5 +1,5 @@
 <?php if ($trace['function']): ?>
-    at <?php echo $trace['class'].$trace['type'].$trace['function'] ?>(<?php echo $view->code->formatArgs($trace['args']) ?>)
+    at <?php echo $trace['class'].$trace['type'].$trace['function'] ?>(<?php echo $view['code']->formatArgs($trace['args']) ?>)
 <?php else: ?>
     at n/a
 <?php endif; ?>

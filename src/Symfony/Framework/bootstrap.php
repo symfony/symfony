@@ -138,14 +138,14 @@ class ErrorHandler {
 namespace Symfony\Framework;
 class ClassCollectionLoader {
     static protected $loaded;
-    static public function load($classes, $cacheDir, $name, $autoReload, $strict = false) {
+    static public function load($classes, $cacheDir, $name, $autoReload, $adaptive = false) {
                 if (isset(self::$loaded[$name])) {
             return; }
-        $classes = array_unique($classes);
-        if ($strict) {
-                        $classes = array_diff($classes, get_declared_classes());
-                        $name = $name.'-'.substr(md5(implode('|', $classes)), 0, 5); }
         self::$loaded[$name] = true;
+        $classes = array_unique($classes);
+        if ($adaptive) {
+                        $classes = array_diff($classes, get_declared_classes(), get_declared_interfaces());
+                        $name = $name.'-'.substr(md5(implode('|', $classes)), 0, 5); }
         $cache = $cacheDir.'/'.$name.'.php';
                 $reload = false;
         if ($autoReload) {

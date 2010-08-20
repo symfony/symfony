@@ -12,7 +12,7 @@
 namespace Symfony\Tests\Framework;
 
 use Symfony\Framework\Kernel;
-use Symfony\Components\DependencyInjection\Loader\LoaderInterface;
+use Symfony\Component\DependencyInjection\Loader\LoaderInterface;
 
 class KernelTest extends \PHPUnit_Framework_TestCase
 {

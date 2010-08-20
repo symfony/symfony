@@ -2,8 +2,8 @@
 
 namespace Symfony\Bundle\FrameworkBundle\Templating\Helper;
 
-use Symfony\Components\HttpFoundation\Request;
-use Symfony\Components\Templating\Helper\AssetsHelper as BaseAssetsHelper;
+use Symfony\Component\HttpFoundation\Request;
+use Symfony\Component\Templating\Helper\AssetsHelper as BaseAssetsHelper;
 
 /*
  * This file is part of the Symfony package.

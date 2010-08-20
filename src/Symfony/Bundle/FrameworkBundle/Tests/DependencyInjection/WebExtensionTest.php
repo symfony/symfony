@@ -13,8 +13,8 @@ namespace Symfony\Bundle\FrameworkBundle\Tests\DependencyInjection;
 
 use Symfony\Bundle\FrameworkBundle\Tests\TestCase;
 use Symfony\Bundle\FrameworkBundle\DependencyInjection\WebExtension;
-use Symfony\Components\DependencyInjection\ContainerBuilder;
-use Symfony\Components\DependencyInjection\ParameterBag\ParameterBag;
+use Symfony\Component\DependencyInjection\ContainerBuilder;
+use Symfony\Component\DependencyInjection\ParameterBag\ParameterBag;
 
 class WebExtensionTest extends TestCase
 {
@@ -34,7 +34,7 @@ class WebExtensionTest extends TestCase
         $this->assertFalse($container->getParameterBag()->has('debug.toolbar.class'), '->configLoad() does not load the toolbar.xml file');
 
         $loader->configLoad(array('toolbar' => true), $container);
-        $this->assertEquals('Symfony\\Components\\HttpKernel\\Profiler\\WebDebugToolbarListener', $container->getParameter('debug.toolbar.class'), '->configLoad() loads the collectors.xml file if the toolbar option is given');
+        $this->assertEquals('Symfony\\Component\\HttpKernel\\Profiler\\WebDebugToolbarListener', $container->getParameter('debug.toolbar.class'), '->configLoad() loads the collectors.xml file if the toolbar option is given');
     }
 
     public function testTemplatingLoad()
@@ -52,7 +52,7 @@ class WebExtensionTest extends TestCase
         $loader = new WebExtension();
 
         $loader->configLoad(array('validation' => array('enabled' => true)), $container);
-        $this->assertEquals('Symfony\Components\Validator\Validator', $container->getParameter('validator.class'), '->validationLoad() loads the validation.xml file if not already loaded');
+        $this->assertEquals('Symfony\Component\Validator\Validator', $container->getParameter('validator.class'), '->validationLoad() loads the validation.xml file if not already loaded');
         $this->assertFalse($container->hasDefinition('validator.mapping.loader.annotation_loader'), '->validationLoad() doesn\'t load the annotations service unless its needed');
 
         $loader->configLoad(array('validation' => array('enabled' => true, 'annotations' => true)), $container);

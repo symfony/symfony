@@ -2,8 +2,8 @@
 
 namespace Symfony\Bundle\FrameworkBundle\Templating\Helper;
 
-use Symfony\Components\Templating\Helper\Helper;
-use Symfony\Components\HttpFoundation\Request;
+use Symfony\Component\Templating\Helper\Helper;
+use Symfony\Component\HttpFoundation\Request;
 
 /*
  * This file is part of the Symfony framework.

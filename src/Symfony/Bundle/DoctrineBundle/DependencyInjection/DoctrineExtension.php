@@ -2,12 +2,12 @@
 
 namespace Symfony\Bundle\DoctrineBundle\DependencyInjection;
 
-use Symfony\Components\DependencyInjection\Extension\Extension;
-use Symfony\Components\DependencyInjection\Loader\XmlFileLoader;
-use Symfony\Components\DependencyInjection\ContainerBuilder;
-use Symfony\Components\DependencyInjection\Definition;
-use Symfony\Components\DependencyInjection\Reference;
-use Symfony\Components\DependencyInjection\Resource\FileResource;
+use Symfony\Component\DependencyInjection\Extension\Extension;
+use Symfony\Component\DependencyInjection\Loader\XmlFileLoader;
+use Symfony\Component\DependencyInjection\ContainerBuilder;
+use Symfony\Component\DependencyInjection\Definition;
+use Symfony\Component\DependencyInjection\Reference;
+use Symfony\Component\DependencyInjection\Resource\FileResource;
 
 /*
  * This file is part of the Symfony framework.

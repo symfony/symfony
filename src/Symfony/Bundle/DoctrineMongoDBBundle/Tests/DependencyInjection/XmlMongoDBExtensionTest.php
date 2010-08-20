@@ -11,8 +11,8 @@
 
 namespace Symfony\Bundle\DoctrineMongoDBBundle\Tests\DependencyInjection;
 
-use Symfony\Components\DependencyInjection\ContainerBuilder;
-use Symfony\Components\DependencyInjection\Loader\XmlFileLoader;
+use Symfony\Component\DependencyInjection\ContainerBuilder;
+use Symfony\Component\DependencyInjection\Loader\XmlFileLoader;
 
 class XmlMongoDBExtensionTest extends AbstractMongoDBExtensionTest
 {

@@ -12,7 +12,7 @@
 namespace Symfony\Bundle\FrameworkBundle\Tests;
 
 use Symfony\Framework\Kernel as BaseKernel;
-use Symfony\Components\DependencyInjection\Loader\LoaderInterface;
+use Symfony\Component\DependencyInjection\Loader\LoaderInterface;
 use Symfony\Bundle\FrameworkBundle\Util\Filesystem;
 
 class Kernel extends BaseKernel

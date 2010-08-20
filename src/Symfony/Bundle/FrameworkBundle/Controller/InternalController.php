@@ -3,7 +3,7 @@
 namespace Symfony\Bundle\FrameworkBundle\Controller;
 
 use Symfony\Bundle\FrameworkBundle\Controller;
-use Symfony\Components\HttpFoundation\Response;
+use Symfony\Component\HttpFoundation\Response;
 
 /*
  * This file is part of the Symfony framework.

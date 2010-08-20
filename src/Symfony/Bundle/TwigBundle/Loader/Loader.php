@@ -2,9 +2,9 @@
 
 namespace Symfony\Bundle\TwigBundle\Loader;
 
-use Symfony\Components\Templating\Engine;
-use Symfony\Components\Templating\Storage\Storage;
-use Symfony\Components\Templating\Storage\FileStorage;
+use Symfony\Component\Templating\Engine;
+use Symfony\Component\Templating\Storage\Storage;
+use Symfony\Component\Templating\Storage\FileStorage;
 
 /*
  * This file is part of the Symfony package.

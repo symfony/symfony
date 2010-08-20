@@ -6,12 +6,12 @@
 
     <parameters>
         <parameter key="templating.engine.class">Symfony\Bundle\FrameworkBundle\Templating\Engine</parameter>
-        <parameter key="templating.loader.filesystem.class">Symfony\Components\Templating\Loader\FilesystemLoader</parameter>
-        <parameter key="templating.loader.cache.class">Symfony\Components\Templating\Loader\CacheLoader</parameter>
-        <parameter key="templating.loader.chain.class">Symfony\Components\Templating\Loader\ChainLoader</parameter>
-        <parameter key="templating.helper.javascripts.class">Symfony\Components\Templating\Helper\JavascriptsHelper</parameter>
-        <parameter key="templating.helper.stylesheets.class">Symfony\Components\Templating\Helper\StylesheetsHelper</parameter>
-        <parameter key="templating.helper.slots.class">Symfony\Components\Templating\Helper\SlotsHelper</parameter>
+        <parameter key="templating.loader.filesystem.class">Symfony\Component\Templating\Loader\FilesystemLoader</parameter>
+        <parameter key="templating.loader.cache.class">Symfony\Component\Templating\Loader\CacheLoader</parameter>
+        <parameter key="templating.loader.chain.class">Symfony\Component\Templating\Loader\ChainLoader</parameter>
+        <parameter key="templating.helper.javascripts.class">Symfony\Component\Templating\Helper\JavascriptsHelper</parameter>
+        <parameter key="templating.helper.stylesheets.class">Symfony\Component\Templating\Helper\StylesheetsHelper</parameter>
+        <parameter key="templating.helper.slots.class">Symfony\Component\Templating\Helper\SlotsHelper</parameter>
         <parameter key="templating.helper.assets.class">Symfony\Bundle\FrameworkBundle\Templating\Helper\AssetsHelper</parameter>
         <parameter key="templating.helper.actions.class">Symfony\Bundle\FrameworkBundle\Templating\Helper\ActionsHelper</parameter>
         <parameter key="templating.helper.router.class">Symfony\Bundle\FrameworkBundle\Templating\Helper\RouterHelper</parameter>

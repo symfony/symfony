@@ -2,9 +2,9 @@
 
 namespace Symfony\Bundle\FrameworkBundle\Routing;
 
-use Symfony\Components\Routing\Loader\LoaderResolver as BaseLoaderResolver;
-use Symfony\Components\DependencyInjection\ContainerInterface;
-use Symfony\Components\Routing\Loader\LoaderInterface;
+use Symfony\Component\Routing\Loader\LoaderResolver as BaseLoaderResolver;
+use Symfony\Component\DependencyInjection\ContainerInterface;
+use Symfony\Component\Routing\Loader\LoaderInterface;
 
 /*
  * This file is part of the Symfony package.

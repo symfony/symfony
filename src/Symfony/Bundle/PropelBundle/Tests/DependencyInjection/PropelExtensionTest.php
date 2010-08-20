@@ -13,7 +13,7 @@ namespace Symfony\Bundle\PropelBundle\Tests\DependencyInjection;
 
 use Symfony\Bundle\PropelBundle\Tests\TestCase;
 use Symfony\Bundle\PropelBundle\DependencyInjection\PropelExtension;
-use Symfony\Components\DependencyInjection\ContainerBuilder;
+use Symfony\Component\DependencyInjection\ContainerBuilder;
 
 class PropelExtensionTest extends TestCase
 {

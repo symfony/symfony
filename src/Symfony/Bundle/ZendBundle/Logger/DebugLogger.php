@@ -3,7 +3,7 @@
 namespace Symfony\Bundle\ZendBundle\Logger;
 
 use Zend\Log\Writer\AbstractWriter;
-use Symfony\Components\HttpKernel\Log\DebugLoggerInterface;
+use Symfony\Component\HttpKernel\Log\DebugLoggerInterface;
 
 /*
  * This file is part of the Symfony framework.

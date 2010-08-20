@@ -13,7 +13,7 @@ namespace Symfony\Bundle\SwiftmailerBundle\Tests\DependencyInjection;
 
 use Symfony\Bundle\SwiftmailerBundle\Tests\TestCase;
 use Symfony\Bundle\SwiftmailerBundle\DependencyInjection\SwiftmailerExtension;
-use Symfony\Components\DependencyInjection\ContainerBuilder;
+use Symfony\Component\DependencyInjection\ContainerBuilder;
 
 class SwiftmailerExtensionTest extends TestCase
 {

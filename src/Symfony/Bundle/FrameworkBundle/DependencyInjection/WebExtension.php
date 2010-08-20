@@ -2,12 +2,12 @@
 
 namespace Symfony\Bundle\FrameworkBundle\DependencyInjection;
 
-use Symfony\Components\DependencyInjection\Extension\Extension;
-use Symfony\Components\DependencyInjection\Loader\XmlFileLoader;
-use Symfony\Components\DependencyInjection\Resource\FileResource;
-use Symfony\Components\DependencyInjection\ContainerBuilder;
-use Symfony\Components\DependencyInjection\Reference;
-use Symfony\Components\DependencyInjection\Definition;
+use Symfony\Component\DependencyInjection\Extension\Extension;
+use Symfony\Component\DependencyInjection\Loader\XmlFileLoader;
+use Symfony\Component\DependencyInjection\Resource\FileResource;
+use Symfony\Component\DependencyInjection\ContainerBuilder;
+use Symfony\Component\DependencyInjection\Reference;
+use Symfony\Component\DependencyInjection\Definition;
 
 /*
  * This file is part of the Symfony framework.
@@ -60,15 +60,15 @@ class WebExtension extends Extension
             $container->setParameter('routing.resource', $config['router']['resource']);
 
             $this->addCompiledClasses($container, array(
-                'Symfony\\Components\\Routing\\RouterInterface',
-                'Symfony\\Components\\Routing\\Router',
-                'Symfony\\Components\\Routing\\Matcher\\UrlMatcherInterface',
-                'Symfony\\Components\\Routing\\Matcher\\UrlMatcher',
-                'Symfony\\Components\\Routing\\Generator\\UrlGeneratorInterface',
-                'Symfony\\Components\\Routing\\Generator\\UrlGenerator',
-                'Symfony\\Components\\Routing\\Loader\\Loader',
-                'Symfony\\Components\\Routing\\Loader\\DelegatingLoader',
-                'Symfony\\Components\\Routing\\Loader\\LoaderResolver',
+                'Symfony\\Component\\Routing\\RouterInterface',
+                'Symfony\\Component\\Routing\\Router',
+                'Symfony\\Component\\Routing\\Matcher\\UrlMatcherInterface',
+                'Symfony\\Component\\Routing\\Matcher\\UrlMatcher',
+                'Symfony\\Component\\Routing\\Generator\\UrlGeneratorInterface',
+                'Symfony\\Component\\Routing\\Generator\\UrlGenerator',
+                'Symfony\\Component\\Routing\\Loader\\Loader',
+                'Symfony\\Component\\Routing\\Loader\\DelegatingLoader',
+                'Symfony\\Component\\Routing\\Loader\\LoaderResolver',
                 'Symfony\\Bundle\\FrameworkBundle\\Routing\\LoaderResolver',
                 'Symfony\\Bundle\\FrameworkBundle\\Routing\\DelegatingLoader',
             ));
@@ -107,20 +107,20 @@ class WebExtension extends Extension
         }
 
         $this->addCompiledClasses($container, array(
-            'Symfony\\Components\\HttpFoundation\\ParameterBag',
-            'Symfony\\Components\\HttpFoundation\\HeaderBag',
-            'Symfony\\Components\\HttpFoundation\\Request',
-            'Symfony\\Components\\HttpFoundation\\Response',
+            'Symfony\\Component\\HttpFoundation\\ParameterBag',
+            'Symfony\\Component\\HttpFoundation\\HeaderBag',
+            'Symfony\\Component\\HttpFoundation\\Request',
+            'Symfony\\Component\\HttpFoundation\\Response',
 
-            'Symfony\\Components\\HttpKernel\\HttpKernel',
-            'Symfony\\Components\\HttpKernel\\ResponseListener',
-            'Symfony\\Components\\HttpKernel\\Controller\\ControllerResolver',
+            'Symfony\\Component\\HttpKernel\\HttpKernel',
+            'Symfony\\Component\\HttpKernel\\ResponseListener',
+            'Symfony\\Component\\HttpKernel\\Controller\\ControllerResolver',
 
             'Symfony\\Bundle\\FrameworkBundle\\RequestListener',
             'Symfony\\Bundle\\FrameworkBundle\\Controller\\ControllerNameConverter',
             'Symfony\\Bundle\\FrameworkBundle\\Controller\\ControllerResolver',
 
-            'Symfony\\Components\\EventDispatcher\\Event',
+            'Symfony\\Component\\EventDispatcher\\Event',
 
             'Symfony\\Bundle\\FrameworkBundle\\Controller',
         ));
@@ -194,18 +194,18 @@ class WebExtension extends Extension
 
         // compilation
         $this->addCompiledClasses($container, array(
-            'Symfony\\Components\\Templating\\Loader\\LoaderInterface',
-            'Symfony\\Components\\Templating\\Loader\\Loader',
-            'Symfony\\Components\\Templating\\Loader\\FilesystemLoader',
-            'Symfony\\Components\\Templating\\Engine',
-            'Symfony\\Components\\Templating\\Renderer\\RendererInterface',
-            'Symfony\\Components\\Templating\\Renderer\\Renderer',
-            'Symfony\\Components\\Templating\\Renderer\\PhpRenderer',
-            'Symfony\\Components\\Templating\\Storage\\Storage',
-            'Symfony\\Components\\Templating\\Storage\\FileStorage',
+            'Symfony\\Component\\Templating\\Loader\\LoaderInterface',
+            'Symfony\\Component\\Templating\\Loader\\Loader',
+            'Symfony\\Component\\Templating\\Loader\\FilesystemLoader',
+            'Symfony\\Component\\Templating\\Engine',
+            'Symfony\\Component\\Templating\\Renderer\\RendererInterface',
+            'Symfony\\Component\\Templating\\Renderer\\Renderer',
+            'Symfony\\Component\\Templating\\Renderer\\PhpRenderer',
+            'Symfony\\Component\\Templating\\Storage\\Storage',
+            'Symfony\\Component\\Templating\\Storage\\FileStorage',
             'Symfony\\Bundle\\FrameworkBundle\\Templating\\Engine',
-            'Symfony\\Components\\Templating\\Helper\\Helper',
-            'Symfony\\Components\\Templating\\Helper\\SlotsHelper',
+            'Symfony\\Component\\Templating\\Helper\\Helper',
+            'Symfony\\Component\\Templating\\Helper\\SlotsHelper',
             'Symfony\\Bundle\\FrameworkBundle\\Templating\\Helper\\ActionsHelper',
             'Symfony\\Bundle\\FrameworkBundle\\Templating\\Helper\\RouterHelper',
             'Symfony\\Bundle\\FrameworkBundle\\Templating\\Helper\\RouterHelper',
@@ -225,9 +225,9 @@ class WebExtension extends Extension
             $messageFiles = array();
 
             // default entries by the framework
-            $xmlMappingFiles[] = __DIR__.'/../../../Components/Form/Resources/config/validation.xml';
-            $messageFiles[] = __DIR__ . '/../../../Components/Validator/Resources/i18n/messages.en.xml';
-            $messageFiles[] = __DIR__ . '/../../../Components/Form/Resources/i18n/messages.en.xml';
+            $xmlMappingFiles[] = __DIR__.'/../../../Component/Form/Resources/config/validation.xml';
+            $messageFiles[] = __DIR__ . '/../../../Component/Validator/Resources/i18n/messages.en.xml';
+            $messageFiles[] = __DIR__ . '/../../../Component/Form/Resources/i18n/messages.en.xml';
 
             foreach ($container->getParameter('kernel.bundles') as $className) {
                 $tmp = dirname(str_replace('\\', '/', $className));

@@ -2,9 +2,9 @@
 
 namespace Symfony\Framework;
 
-use Symfony\Components\EventDispatcher\EventDispatcher as BaseEventDispatcher;
-use Symfony\Components\EventDispatcher\Event;
-use Symfony\Components\DependencyInjection\ContainerInterface;
+use Symfony\Component\EventDispatcher\EventDispatcher as BaseEventDispatcher;
+use Symfony\Component\EventDispatcher\Event;
+use Symfony\Component\DependencyInjection\ContainerInterface;
 
 /*
  * This file is part of the Symfony package.

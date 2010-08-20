@@ -3,7 +3,7 @@
 namespace Symfony\Bundle\ZendBundle\Logger;
 
 use Zend\Log\Logger as BaseLogger;
-use Symfony\Components\HttpKernel\Log\LoggerInterface;
+use Symfony\Component\HttpKernel\Log\LoggerInterface;
 
 /*
  * This file is part of the Symfony framework.

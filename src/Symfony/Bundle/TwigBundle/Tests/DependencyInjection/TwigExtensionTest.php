@@ -13,7 +13,7 @@ namespace Symfony\Bundle\TwigBundle\Tests\DependencyInjection;
 
 use Symfony\Bundle\TwigBundle\Tests\TestCase;
 use Symfony\Bundle\TwigBundle\DependencyInjection\TwigExtension;
-use Symfony\Components\DependencyInjection\ContainerBuilder;
+use Symfony\Component\DependencyInjection\ContainerBuilder;
 
 class TwigExtensionTest extends TestCase
 {

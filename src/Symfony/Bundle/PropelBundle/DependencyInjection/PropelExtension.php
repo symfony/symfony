@@ -2,11 +2,11 @@
 
 namespace Symfony\Bundle\PropelBundle\DependencyInjection;
 
-use Symfony\Components\DependencyInjection\Extension\Extension;
-use Symfony\Components\DependencyInjection\Loader\XmlFileLoader;
-use Symfony\Components\DependencyInjection\ContainerBuilder;
-use Symfony\Components\DependencyInjection\Definition;
-use Symfony\Components\DependencyInjection\Reference;
+use Symfony\Component\DependencyInjection\Extension\Extension;
+use Symfony\Component\DependencyInjection\Loader\XmlFileLoader;
+use Symfony\Component\DependencyInjection\ContainerBuilder;
+use Symfony\Component\DependencyInjection\Definition;
+use Symfony\Component\DependencyInjection\Reference;
 
 class PropelExtension extends Extension
 {

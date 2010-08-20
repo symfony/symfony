@@ -1,10 +1,10 @@
 <?php
 namespace Symfony\Framework\Bundle;
-use Symfony\Components\DependencyInjection\ContainerInterface;
-use Symfony\Components\DependencyInjection\ContainerBuilder;
-use Symfony\Components\DependencyInjection\ParameterBag\ParameterBagInterface;
-use Symfony\Components\Console\Application;
-use Symfony\Components\Finder\Finder;
+use Symfony\Component\DependencyInjection\ContainerInterface;
+use Symfony\Component\DependencyInjection\ContainerBuilder;
+use Symfony\Component\DependencyInjection\ParameterBag\ParameterBagInterface;
+use Symfony\Component\Console\Application;
+use Symfony\Component\Finder\Finder;
 abstract class Bundle implements BundleInterface {
     protected $container;
     protected $name;
@@ -49,7 +49,7 @@ abstract class Bundle implements BundleInterface {
         $prefix = $this->namespacePrefix.'\\'.$this->name.'\\Command';
         foreach ($finder as $file) {
             $r = new \ReflectionClass($prefix.strtr($file->getPath(), array($dir => '', '/' => '\\')).'\\'.basename($file, '.php'));
-            if ($r->isSubclassOf('Symfony\\Components\\Console\\Command\\Command') && !$r->isAbstract()) {
+            if ($r->isSubclassOf('Symfony\\Component\\Console\\Command\\Command') && !$r->isAbstract()) {
                 $application->addCommand($r->newInstance()); } } }
     protected function initReflection() {
         $tmp = dirname(str_replace('\\', '/', get_class($this)));
@@ -58,7 +58,7 @@ abstract class Bundle implements BundleInterface {
         $this->reflection = new \ReflectionObject($this);
         $this->path = dirname($this->reflection->getFilename()); } }
 namespace Symfony\Framework\Bundle;
-use Symfony\Components\DependencyInjection\ContainerInterface;
+use Symfony\Component\DependencyInjection\ContainerInterface;
 interface BundleInterface {
     public function boot();
     public function shutdown();
@@ -70,9 +70,9 @@ class KernelBundle extends Bundle {
         if ($this->container->has('error_handler')) {
             $this->container['error_handler']; } } }
 namespace Symfony\Framework\DependencyInjection;
-use Symfony\Components\DependencyInjection\Extension\Extension;
-use Symfony\Components\DependencyInjection\Loader\XmlFileLoader;
-use Symfony\Components\DependencyInjection\ContainerBuilder;
+use Symfony\Component\DependencyInjection\Extension\Extension;
+use Symfony\Component\DependencyInjection\Loader\XmlFileLoader;
+use Symfony\Component\DependencyInjection\ContainerBuilder;
 class KernelExtension extends Extension {
     public function testLoad($config, ContainerBuilder $container) {
         $loader = new XmlFileLoader($container, array(__DIR__.'/../Resources/config', __DIR__.'/Resources/config'));
@@ -91,7 +91,7 @@ class KernelExtension extends Extension {
         if (isset($config['session']['class'])) {
             $class = $config['session']['class'];
             if (in_array($class, array('Native', 'Pdo'))) {
-                $class = 'Symfony\\Components\\HttpFoundation\\SessionStorage\\'.$class.'SessionStorage'; }
+                $class = 'Symfony\\Component\\HttpFoundation\\SessionStorage\\'.$class.'SessionStorage'; }
             $container->setParameter('session.session', 'session.session.'.strtolower($class)); } }
     public function configLoad($config, ContainerBuilder $container) {
         if (!$container->hasDefinition('event_dispatcher')) {
@@ -183,9 +183,9 @@ class ClassCollectionLoader {
             return; }
         throw new \RuntimeException(sprintf('Failed to write cache file "%s".', $file)); } }
 namespace Symfony\Framework;
-use Symfony\Components\EventDispatcher\EventDispatcher as BaseEventDispatcher;
-use Symfony\Components\EventDispatcher\Event;
-use Symfony\Components\DependencyInjection\ContainerInterface;
+use Symfony\Component\EventDispatcher\EventDispatcher as BaseEventDispatcher;
+use Symfony\Component\EventDispatcher\Event;
+use Symfony\Component\DependencyInjection\ContainerInterface;
 class EventDispatcher extends BaseEventDispatcher {
     public function __construct(ContainerInterface $container) {
         foreach ($container->findTaggedServiceIds('kernel.listener') as $id => $attributes) {

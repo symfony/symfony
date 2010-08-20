@@ -5,11 +5,11 @@ namespace Symfony\Bundle\PropelBundle\Command;
 use Symfony\Bundle\PropelBundle\Command\PhingCommand;
 use Symfony\Bundle\PropelBundle\Command\BuildModelCommand;
 use Symfony\Bundle\PropelBundle\Command\BuildSqlCommand;
-use Symfony\Components\Console\Input\InputArgument;
-use Symfony\Components\Console\Input\InputOption;
-use Symfony\Components\Console\Input\InputInterface;
-use Symfony\Components\Console\Output\OutputInterface;
-use Symfony\Components\Console\Output\Output;
+use Symfony\Component\Console\Input\InputArgument;
+use Symfony\Component\Console\Input\InputOption;
+use Symfony\Component\Console\Input\InputInterface;
+use Symfony\Component\Console\Output\OutputInterface;
+use Symfony\Component\Console\Output\Output;
 
 /*
  * This file is part of the Symfony framework.

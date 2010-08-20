@@ -3,9 +3,9 @@
 namespace Symfony\Bundle\FrameworkBundle\Routing;
 
 use Symfony\Bundle\FrameworkBundle\Controller\ControllerNameConverter;
-use Symfony\Components\Routing\Loader\DelegatingLoader as BaseDelegatingLoader;
-use Symfony\Components\Routing\Loader\LoaderResolverInterface;
-use Symfony\Components\HttpKernel\Log\LoggerInterface;
+use Symfony\Component\Routing\Loader\DelegatingLoader as BaseDelegatingLoader;
+use Symfony\Component\Routing\Loader\LoaderResolverInterface;
+use Symfony\Component\HttpKernel\Log\LoggerInterface;
 
 /*
  * This file is part of the Symfony framework.

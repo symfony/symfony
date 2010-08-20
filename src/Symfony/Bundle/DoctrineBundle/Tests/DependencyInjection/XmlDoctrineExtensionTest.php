@@ -11,8 +11,8 @@
 
 namespace Symfony\Bundle\DoctrineBundle\Tests\DependencyInjection;
 
-use Symfony\Components\DependencyInjection\ContainerBuilder;
-use Symfony\Components\DependencyInjection\Loader\XmlFileLoader;
+use Symfony\Component\DependencyInjection\ContainerBuilder;
+use Symfony\Component\DependencyInjection\Loader\XmlFileLoader;
 
 class XmlDoctrineExtensionTest extends AbstractDoctrineExtensionTest
 {

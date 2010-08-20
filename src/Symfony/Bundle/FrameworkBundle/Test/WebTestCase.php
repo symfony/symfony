@@ -3,9 +3,9 @@
 namespace Symfony\Bundle\FrameworkBundle\Test;
 
 use Symfony\Framework\Test\WebTestCase as BaseWebTestCase;
-use Symfony\Components\Finder\Finder;
-use Symfony\Components\HttpFoundation\Response;
-use Symfony\Components\HttpKernel\HttpKernelInterface;
+use Symfony\Component\Finder\Finder;
+use Symfony\Component\HttpFoundation\Response;
+use Symfony\Component\HttpKernel\HttpKernelInterface;
 
 /*
  * This file is part of the Symfony package.

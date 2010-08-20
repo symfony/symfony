@@ -2,8 +2,8 @@
 
 namespace Symfony\Bundle\FrameworkBundle\Templating\Helper;
 
-use Symfony\Components\Templating\Helper\Helper;
-use Symfony\Components\HttpFoundation\Request;
+use Symfony\Component\Templating\Helper\Helper;
+use Symfony\Component\HttpFoundation\Request;
 
 /*
  * This file is part of the Symfony framework.
@@ -39,7 +39,7 @@ class RequestHelper extends Helper
      * @param string $key     The name of the parameter
      * @param string $default A default value
      *
-     * @see Symfony\Components\HttpFoundation\Request::get()
+     * @see Symfony\Component\HttpFoundation\Request::get()
      */
     public function getParameter($key, $default = null)
     {

@@ -8,12 +8,12 @@
         <parameter key="request_listener.class">Symfony\Bundle\FrameworkBundle\RequestListener</parameter>
         <parameter key="controller_resolver.class">Symfony\Bundle\FrameworkBundle\Controller\ControllerResolver</parameter>
         <parameter key="controller_name_converter.class">Symfony\Bundle\FrameworkBundle\Controller\ControllerNameConverter</parameter>
-        <parameter key="response_listener.class">Symfony\Components\HttpKernel\ResponseListener</parameter>
+        <parameter key="response_listener.class">Symfony\Component\HttpKernel\ResponseListener</parameter>
         <parameter key="exception_listener.class">Symfony\Bundle\FrameworkBundle\Debug\ExceptionListener</parameter>
         <parameter key="exception_listener.controller">Symfony\Bundle\FrameworkBundle\Controller\ExceptionController::exceptionAction</parameter>
         <parameter key="exception_manager.class">Symfony\Bundle\FrameworkBundle\Debug\ExceptionManager</parameter>
-        <parameter key="esi.class">Symfony\Components\HttpKernel\Cache\Esi</parameter>
-        <parameter key="esi_listener.class">Symfony\Components\HttpKernel\Cache\EsiListener</parameter>
+        <parameter key="esi.class">Symfony\Component\HttpKernel\Cache\Esi</parameter>
+        <parameter key="esi_listener.class">Symfony\Component\HttpKernel\Cache\EsiListener</parameter>
     </parameters>
 
     <services>

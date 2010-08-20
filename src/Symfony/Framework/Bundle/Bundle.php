@@ -2,11 +2,11 @@
 
 namespace Symfony\Framework\Bundle;
 
-use Symfony\Components\DependencyInjection\ContainerInterface;
-use Symfony\Components\DependencyInjection\ContainerBuilder;
-use Symfony\Components\DependencyInjection\ParameterBag\ParameterBagInterface;
-use Symfony\Components\Console\Application;
-use Symfony\Components\Finder\Finder;
+use Symfony\Component\DependencyInjection\ContainerInterface;
+use Symfony\Component\DependencyInjection\ContainerBuilder;
+use Symfony\Component\DependencyInjection\ParameterBag\ParameterBagInterface;
+use Symfony\Component\Console\Application;
+use Symfony\Component\Finder\Finder;
 
 /*
  * This file is part of the Symfony framework.
@@ -156,7 +156,7 @@ abstract class Bundle implements BundleInterface
         $prefix = $this->namespacePrefix.'\\'.$this->name.'\\Command';
         foreach ($finder as $file) {
             $r = new \ReflectionClass($prefix.strtr($file->getPath(), array($dir => '', '/' => '\\')).'\\'.basename($file, '.php'));
-            if ($r->isSubclassOf('Symfony\\Components\\Console\\Command\\Command') && !$r->isAbstract()) {
+            if ($r->isSubclassOf('Symfony\\Component\\Console\\Command\\Command') && !$r->isAbstract()) {
                 $application->addCommand($r->newInstance());
             }
         }

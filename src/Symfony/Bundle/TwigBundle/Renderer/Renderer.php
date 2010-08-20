@@ -2,8 +2,8 @@
 
 namespace Symfony\Bundle\TwigBundle\Renderer;
 
-use Symfony\Components\Templating\Renderer\Renderer as BaseRenderer;
-use Symfony\Components\Templating\Storage\Storage;
+use Symfony\Component\Templating\Renderer\Renderer as BaseRenderer;
+use Symfony\Component\Templating\Storage\Storage;
 
 /*
  * This file is part of the Symfony package.

@@ -5,10 +5,10 @@
     xsi:schemaLocation="http://www.symfony-project.org/schema/dic/services http://www.symfony-project.org/schema/dic/services/services-1.0.xsd">
 
     <parameters>
-        <parameter key="session.class">Symfony\Components\HttpFoundation\Session</parameter>
+        <parameter key="session.class">Symfony\Component\HttpFoundation\Session</parameter>
         <parameter key="session.default_locale">en</parameter>
-        <parameter key="session.storage.class">Symfony\Components\HttpFoundation\SessionStorage\NativeSessionStorage</parameter>
-        <parameter key="session.storage.pdo.class">Symfony\Components\HttpFoundation\SessionStorage\PdoSessionStorage</parameter>
+        <parameter key="session.storage.class">Symfony\Component\HttpFoundation\SessionStorage\NativeSessionStorage</parameter>
+        <parameter key="session.storage.pdo.class">Symfony\Component\HttpFoundation\SessionStorage\PdoSessionStorage</parameter>
         <parameter key="session.options.name">SYMFONY_SESSION</parameter>
         <parameter key="session.options.lifetime">false</parameter>
         <parameter key="session.options.path">/</parameter>

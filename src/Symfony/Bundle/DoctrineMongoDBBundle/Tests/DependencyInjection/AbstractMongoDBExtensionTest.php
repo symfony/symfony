@@ -13,10 +13,10 @@ namespace Symfony\Bundle\DoctrineMongoDBBundle\Tests\DependencyInjection;
 
 use Symfony\Bundle\DoctrineMongoDBBundle\Tests\TestCase;
 use Symfony\Bundle\DoctrineMongoDBBundle\DependencyInjection\DoctrineMongoDBExtension;
-use Symfony\Components\DependencyInjection\ContainerBuilder;
-use Symfony\Components\DependencyInjection\Loader\XmlFileLoader;
-use Symfony\Components\DependencyInjection\Loader\YamlFileLoader;
-use Symfony\Components\DependencyInjection\ParameterBag\ParameterBag;
+use Symfony\Component\DependencyInjection\ContainerBuilder;
+use Symfony\Component\DependencyInjection\Loader\XmlFileLoader;
+use Symfony\Component\DependencyInjection\Loader\YamlFileLoader;
+use Symfony\Component\DependencyInjection\ParameterBag\ParameterBag;
 
 abstract class AbstractMongoDBExtensionTest extends TestCase
 {
@@ -66,9 +66,9 @@ abstract class AbstractMongoDBExtensionTest extends TestCase
         $this->assertEquals('create', $definition->getFactoryMethod());
 
         $arguments = $definition->getArguments();
-        $this->assertInstanceOf('Symfony\Components\DependencyInjection\Reference', $arguments[0]);
+        $this->assertInstanceOf('Symfony\Component\DependencyInjection\Reference', $arguments[0]);
         $this->assertEquals('doctrine.odm.mongodb.default_connection', (string) $arguments[0]);
-        $this->assertInstanceOf('Symfony\Components\DependencyInjection\Reference', $arguments[1]);
+        $this->assertInstanceOf('Symfony\Component\DependencyInjection\Reference', $arguments[1]);
         $this->assertEquals('doctrine.odm.mongodb.default_configuration', (string) $arguments[1]);
     }
 
@@ -92,9 +92,9 @@ abstract class AbstractMongoDBExtensionTest extends TestCase
         $this->assertEquals('create', $definition->getFactoryMethod());
 
         $arguments = $definition->getArguments();
-        $this->assertInstanceOf('Symfony\Components\DependencyInjection\Reference', $arguments[0]);
+        $this->assertInstanceOf('Symfony\Component\DependencyInjection\Reference', $arguments[0]);
         $this->assertEquals('doctrine.odm.mongodb.default_connection', (string) $arguments[0]);
-        $this->assertInstanceOf('Symfony\Components\DependencyInjection\Reference', $arguments[1]);
+        $this->assertInstanceOf('Symfony\Component\DependencyInjection\Reference', $arguments[1]);
         $this->assertEquals('doctrine.odm.mongodb.default_configuration', (string) $arguments[1]);
     }
 
@@ -123,9 +123,9 @@ abstract class AbstractMongoDBExtensionTest extends TestCase
         $this->assertEquals('create', $definition->getFactoryMethod());
 
         $arguments = $definition->getArguments();
-        $this->assertInstanceOf('Symfony\Components\DependencyInjection\Reference', $arguments[0]);
+        $this->assertInstanceOf('Symfony\Component\DependencyInjection\Reference', $arguments[0]);
         $this->assertEquals('doctrine.odm.mongodb.default_connection', (string) $arguments[0]);
-        $this->assertInstanceOf('Symfony\Components\DependencyInjection\Reference', $arguments[1]);
+        $this->assertInstanceOf('Symfony\Component\DependencyInjection\Reference', $arguments[1]);
         $this->assertEquals('doctrine.odm.mongodb.default_configuration', (string) $arguments[1]);
     }
 
@@ -148,9 +148,9 @@ abstract class AbstractMongoDBExtensionTest extends TestCase
         $this->assertEquals('create', $definition->getFactoryMethod());
 
         $arguments = $definition->getArguments();
-        $this->assertInstanceOf('Symfony\Components\DependencyInjection\Reference', $arguments[0]);
+        $this->assertInstanceOf('Symfony\Component\DependencyInjection\Reference', $arguments[0]);
         $this->assertEquals('doctrine.odm.mongodb.default_connection', (string) $arguments[0]);
-        $this->assertInstanceOf('Symfony\Components\DependencyInjection\Reference', $arguments[1]);
+        $this->assertInstanceOf('Symfony\Component\DependencyInjection\Reference', $arguments[1]);
         $this->assertEquals('doctrine.odm.mongodb.default_configuration', (string) $arguments[1]);
     }
 
@@ -175,9 +175,9 @@ abstract class AbstractMongoDBExtensionTest extends TestCase
         $this->assertEquals('create', $definition->getFactoryMethod());
 
         $arguments = $definition->getArguments();
-        $this->assertInstanceOf('Symfony\Components\DependencyInjection\Reference', $arguments[0]);
+        $this->assertInstanceOf('Symfony\Component\DependencyInjection\Reference', $arguments[0]);
         $this->assertEquals('doctrine.odm.mongodb.conn1_connection', (string) $arguments[0]);
-        $this->assertInstanceOf('Symfony\Components\DependencyInjection\Reference', $arguments[1]);
+        $this->assertInstanceOf('Symfony\Component\DependencyInjection\Reference', $arguments[1]);
         $this->assertEquals('doctrine.odm.mongodb.dm1_configuration', (string) $arguments[1]);
 
         $definition = $container->getDefinition('doctrine.odm.mongodb.conn2_connection');
@@ -189,9 +189,9 @@ abstract class AbstractMongoDBExtensionTest extends TestCase
         $this->assertEquals('create', $definition->getFactoryMethod());
 
         $arguments = $definition->getArguments();
-        $this->assertInstanceOf('Symfony\Components\DependencyInjection\Reference', $arguments[0]);
+        $this->assertInstanceOf('Symfony\Component\DependencyInjection\Reference', $arguments[0]);
         $this->assertEquals('doctrine.odm.mongodb.conn2_connection', (string) $arguments[0]);
-        $this->assertInstanceOf('Symfony\Components\DependencyInjection\Reference', $arguments[1]);
+        $this->assertInstanceOf('Symfony\Component\DependencyInjection\Reference', $arguments[1]);
         $this->assertEquals('doctrine.odm.mongodb.dm2_configuration', (string) $arguments[1]);
     }
 

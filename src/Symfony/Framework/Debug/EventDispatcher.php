@@ -3,10 +3,10 @@
 namespace Symfony\Framework\Debug;
 
 use Symfony\Framework\EventDispatcher as BaseEventDispatcher;
-use Symfony\Components\EventDispatcher\EventDispatcherInterface;
-use Symfony\Components\EventDispatcher\Event;
-use Symfony\Components\HttpKernel\Log\LoggerInterface;
-use Symfony\Components\DependencyInjection\ContainerInterface;
+use Symfony\Component\EventDispatcher\EventDispatcherInterface;
+use Symfony\Component\EventDispatcher\Event;
+use Symfony\Component\HttpKernel\Log\LoggerInterface;
+use Symfony\Component\DependencyInjection\ContainerInterface;
 
 /*
  * This file is part of the Symfony package.

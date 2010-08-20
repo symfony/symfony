@@ -6,9 +6,9 @@
 
     <parameters>
         <parameter key="event_dispatcher.class">Symfony\Framework\EventDispatcher</parameter>
-        <parameter key="http_kernel.class">Symfony\Components\HttpKernel\HttpKernel</parameter>
-        <parameter key="request.class">Symfony\Components\HttpFoundation\Request</parameter>
-        <parameter key="response.class">Symfony\Components\HttpFoundation\Response</parameter>
+        <parameter key="http_kernel.class">Symfony\Component\HttpKernel\HttpKernel</parameter>
+        <parameter key="request.class">Symfony\Component\HttpFoundation\Request</parameter>
+        <parameter key="response.class">Symfony\Component\HttpFoundation\Response</parameter>
         <parameter key="error_handler.class">Symfony\Framework\Debug\ErrorHandler</parameter>
         <parameter key="error_handler.level">null</parameter>
         <parameter key="error_handler.enable">true</parameter>

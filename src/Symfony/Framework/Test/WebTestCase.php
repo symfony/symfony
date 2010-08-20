@@ -2,7 +2,7 @@
 
 namespace Symfony\Framework\Test;
 
-use Symfony\Components\HttpKernel\Test\WebTestCase as BaseWebTestCase;
+use Symfony\Component\HttpKernel\Test\WebTestCase as BaseWebTestCase;
 use Symfony\Framework\Client;
 
 /*

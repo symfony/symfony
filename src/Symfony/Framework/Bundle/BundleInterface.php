@@ -2,7 +2,7 @@
 
 namespace Symfony\Framework\Bundle;
 
-use Symfony\Components\DependencyInjection\ContainerInterface;
+use Symfony\Component\DependencyInjection\ContainerInterface;
 
 /*
  * This file is part of the Symfony framework.

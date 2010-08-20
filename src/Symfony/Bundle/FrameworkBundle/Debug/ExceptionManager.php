@@ -2,11 +2,11 @@
 
 namespace Symfony\Bundle\FrameworkBundle\Debug;
 
-use Symfony\Components\DependencyInjection\ContainerInterface;
-use Symfony\Components\HttpKernel\Exception\HttpException;
-use Symfony\Components\HttpFoundation\Request;
-use Symfony\Components\HttpFoundation\Response;
-use Symfony\Components\HttpKernel\Log\DebugLoggerInterface;
+use Symfony\Component\DependencyInjection\ContainerInterface;
+use Symfony\Component\HttpKernel\Exception\HttpException;
+use Symfony\Component\HttpFoundation\Request;
+use Symfony\Component\HttpFoundation\Response;
+use Symfony\Component\HttpKernel\Log\DebugLoggerInterface;
 
 /*
  * This file is part of the Symfony framework.

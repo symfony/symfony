@@ -2,8 +2,8 @@
 
 namespace Symfony\Bundle\FrameworkBundle\Templating\Helper;
 
-use Symfony\Components\Templating\Helper\Helper;
-use Symfony\Components\Routing\Router;
+use Symfony\Component\Templating\Helper\Helper;
+use Symfony\Component\Routing\Router;
 
 /*
  * This file is part of the Symfony framework.

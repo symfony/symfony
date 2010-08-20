@@ -2,9 +2,9 @@
 
 namespace Symfony\Framework\DependencyInjection;
 
-use Symfony\Components\DependencyInjection\Extension\Extension;
-use Symfony\Components\DependencyInjection\Loader\XmlFileLoader;
-use Symfony\Components\DependencyInjection\ContainerBuilder;
+use Symfony\Component\DependencyInjection\Extension\Extension;
+use Symfony\Component\DependencyInjection\Loader\XmlFileLoader;
+use Symfony\Component\DependencyInjection\ContainerBuilder;
 
 /*
  * This file is part of the Symfony package.
@@ -64,7 +64,7 @@ class KernelExtension extends Extension
         if (isset($config['session']['class'])) {
             $class = $config['session']['class'];
             if (in_array($class, array('Native', 'Pdo'))) {
-                $class = 'Symfony\\Components\\HttpFoundation\\SessionStorage\\'.$class.'SessionStorage';
+                $class = 'Symfony\\Component\\HttpFoundation\\SessionStorage\\'.$class.'SessionStorage';
             }
 
             $container->setParameter('session.session', 'session.session.'.strtolower($class));

@@ -13,7 +13,7 @@ namespace Symfony\Bundle\ZendBundle\Tests\DependencyInjection;
 
 use Symfony\Bundle\ZendBundle\Tests\TestCase;
 use Symfony\Bundle\ZendBundle\DependencyInjection\ZendExtension;
-use Symfony\Components\DependencyInjection\ContainerBuilder;
+use Symfony\Component\DependencyInjection\ContainerBuilder;
 
 class ZendExtensionTest extends TestCase
 {

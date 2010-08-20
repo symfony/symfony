@@ -2,7 +2,7 @@
 
 namespace Symfony\Bundle\FrameworkBundle\Templating\Helper;
 
-use Symfony\Components\Templating\Helper\Helper;
+use Symfony\Component\Templating\Helper\Helper;
 
 /*
  * This file is part of the Symfony framework.

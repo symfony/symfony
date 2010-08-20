@@ -2,7 +2,7 @@
 
 namespace Symfony\Bundle\TwigBundle;
 
-use Symfony\Components\DependencyInjection\ContainerInterface;
+use Symfony\Component\DependencyInjection\ContainerInterface;
 
 /*
  * This file is part of the Symfony framework.

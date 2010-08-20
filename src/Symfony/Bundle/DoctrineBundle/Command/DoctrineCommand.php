@@ -3,12 +3,12 @@
 namespace Symfony\Bundle\DoctrineBundle\Command;
 
 use Symfony\Bundle\FrameworkBundle\Command\Command;
-use Symfony\Components\Console\Input\ArrayInput;
-use Symfony\Components\Console\Input\InputArgument;
-use Symfony\Components\Console\Input\InputOption;
-use Symfony\Components\Console\Input\InputInterface;
-use Symfony\Components\Console\Output\OutputInterface;
-use Symfony\Components\Console\Output\Output;
+use Symfony\Component\Console\Input\ArrayInput;
+use Symfony\Component\Console\Input\InputArgument;
+use Symfony\Component\Console\Input\InputOption;
+use Symfony\Component\Console\Input\InputInterface;
+use Symfony\Component\Console\Output\OutputInterface;
+use Symfony\Component\Console\Output\Output;
 use Symfony\Bundle\FrameworkBundle\Console\Application;
 use Symfony\Framework\Bundle\Bundle;
 use Doctrine\DBAL\Tools\Console\Helper\ConnectionHelper;

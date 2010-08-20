@@ -2,11 +2,11 @@
 
 namespace Symfony\Bundle\FrameworkBundle\Debug;
 
-use Symfony\Components\DependencyInjection\ContainerInterface;
-use Symfony\Components\EventDispatcher\EventDispatcher;
-use Symfony\Components\EventDispatcher\Event;
-use Symfony\Components\HttpKernel\Log\LoggerInterface;
-use Symfony\Components\HttpKernel\HttpKernelInterface;
+use Symfony\Component\DependencyInjection\ContainerInterface;
+use Symfony\Component\EventDispatcher\EventDispatcher;
+use Symfony\Component\EventDispatcher\Event;
+use Symfony\Component\HttpKernel\Log\LoggerInterface;
+use Symfony\Component\HttpKernel\HttpKernelInterface;
 
 /*
  * This file is part of the Symfony framework.

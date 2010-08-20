@@ -11,8 +11,8 @@
 
 namespace Symfony\Bundle\DoctrineBundle\Tests\DependencyInjection;
 
-use Symfony\Components\DependencyInjection\ContainerBuilder;
-use Symfony\Components\DependencyInjection\Loader\YamlFileLoader;
+use Symfony\Component\DependencyInjection\ContainerBuilder;
+use Symfony\Component\DependencyInjection\Loader\YamlFileLoader;
 
 class YamlDoctrineExtensionTest extends AbstractDoctrineExtensionTest
 {

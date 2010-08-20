@@ -2,12 +2,12 @@
 
 namespace Symfony\Bundle\FrameworkBundle\Controller;
 
-use Symfony\Components\HttpKernel\Log\LoggerInterface;
-use Symfony\Components\HttpKernel\Controller\ControllerResolver as BaseControllerResolver;
-use Symfony\Components\HttpKernel\HttpKernelInterface;
-use Symfony\Components\HttpFoundation\Request;
-use Symfony\Components\EventDispatcher\Event;
-use Symfony\Components\DependencyInjection\ContainerInterface;
+use Symfony\Component\HttpKernel\Log\LoggerInterface;
+use Symfony\Component\HttpKernel\Controller\ControllerResolver as BaseControllerResolver;
+use Symfony\Component\HttpKernel\HttpKernelInterface;
+use Symfony\Component\HttpFoundation\Request;
+use Symfony\Component\EventDispatcher\Event;
+use Symfony\Component\DependencyInjection\ContainerInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\ControllerNameConverter;
 
 /*
@@ -90,7 +90,7 @@ class ControllerResolver extends BaseControllerResolver
      * Renders a Controller and returns the Response content.
      *
      * Note that this method generates an esi:include tag only when both the standalone
-     * option is set to true and the request has ESI capability (@see Symfony\Components\HttpKernel\Cache\ESI).
+     * option is set to true and the request has ESI capability (@see Symfony\Component\HttpKernel\Cache\ESI).
      *
      * Available options:
      *

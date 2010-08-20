@@ -2,8 +2,8 @@
 
 namespace Symfony\Bundle\FrameworkBundle;
 
-use Symfony\Components\DependencyInjection\ContainerInterface;
-use Symfony\Components\HttpFoundation\Response;
+use Symfony\Component\DependencyInjection\ContainerInterface;
+use Symfony\Component\HttpFoundation\Response;
 
 /*
  * This file is part of the Symfony framework.

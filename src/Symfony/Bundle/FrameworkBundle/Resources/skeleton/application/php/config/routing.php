@@ -1,7 +1,7 @@
 <?php
 
-use Symfony\Components\Routing\RouteCollection;
-use Symfony\Components\Routing\Route;
+use Symfony\Component\Routing\RouteCollection;
+use Symfony\Component\Routing\Route;
 
 $collection = new RouteCollection();
 

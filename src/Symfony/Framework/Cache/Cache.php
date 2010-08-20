@@ -2,12 +2,12 @@
 
 namespace Symfony\Framework\Cache;
 
-use Symfony\Components\HttpKernel\HttpKernelInterface;
-use Symfony\Components\HttpKernel\Cache\Cache as BaseCache;
-use Symfony\Components\HttpKernel\Cache\Esi;
-use Symfony\Components\HttpKernel\Cache\Store;
-use Symfony\Components\HttpFoundation\Request;
-use Symfony\Components\HttpFoundation\Response;
+use Symfony\Component\HttpKernel\HttpKernelInterface;
+use Symfony\Component\HttpKernel\Cache\Cache as BaseCache;
+use Symfony\Component\HttpKernel\Cache\Esi;
+use Symfony\Component\HttpKernel\Cache\Store;
+use Symfony\Component\HttpFoundation\Request;
+use Symfony\Component\HttpFoundation\Response;
 
 /*
  * This file is part of the Symfony package.

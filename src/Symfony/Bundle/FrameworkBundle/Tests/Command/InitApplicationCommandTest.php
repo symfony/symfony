@@ -14,8 +14,8 @@ namespace Symfony\Bundle\FrameworkBundle\Tests\Command;
 use Symfony\Bundle\FrameworkBundle\Tests\TestCase;
 use Symfony\Bundle\FrameworkBundle\Command\InitApplicationCommand;
 use Symfony\Bundle\FrameworkBundle\Util\Filesystem;
-use Symfony\Components\Console\Tester\CommandTester;
-use Symfony\Components\HttpFoundation\Request;
+use Symfony\Component\Console\Tester\CommandTester;
+use Symfony\Component\HttpFoundation\Request;
 
 require_once __DIR__.'/../TestCase.php';
 

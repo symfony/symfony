@@ -5,12 +5,12 @@
     xsi:schemaLocation="http://www.symfony-project.org/schema/dic/services http://www.symfony-project.org/schema/dic/services/services-1.0.xsd">
 
     <parameters>
-        <parameter key="router.class">Symfony\Components\Routing\Router</parameter>
+        <parameter key="router.class">Symfony\Component\Routing\Router</parameter>
         <parameter key="routing.loader.class">Symfony\Bundle\FrameworkBundle\Routing\DelegatingLoader</parameter>
         <parameter key="routing.resolver.class">Symfony\Bundle\FrameworkBundle\Routing\LoaderResolver</parameter>
-        <parameter key="routing.loader.xml.class">Symfony\Components\Routing\Loader\XmlFileLoader</parameter>
-        <parameter key="routing.loader.yml.class">Symfony\Components\Routing\Loader\YamlFileLoader</parameter>
-        <parameter key="routing.loader.php.class">Symfony\Components\Routing\Loader\PhpFileLoader</parameter>
+        <parameter key="routing.loader.xml.class">Symfony\Component\Routing\Loader\XmlFileLoader</parameter>
+        <parameter key="routing.loader.yml.class">Symfony\Component\Routing\Loader\YamlFileLoader</parameter>
+        <parameter key="routing.loader.php.class">Symfony\Component\Routing\Loader\PhpFileLoader</parameter>
     </parameters>
 
     <services>

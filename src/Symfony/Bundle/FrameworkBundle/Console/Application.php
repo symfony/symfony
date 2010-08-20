@@ -2,10 +2,10 @@
 
 namespace Symfony\Bundle\FrameworkBundle\Console;
 
-use Symfony\Components\Console\Application as BaseApplication;
-use Symfony\Components\Console\Input\InputInterface;
-use Symfony\Components\Console\Input\InputOption;
-use Symfony\Components\Console\Output\OutputInterface;
+use Symfony\Component\Console\Application as BaseApplication;
+use Symfony\Component\Console\Input\InputInterface;
+use Symfony\Component\Console\Input\InputOption;
+use Symfony\Component\Console\Output\OutputInterface;
 use Symfony\Framework\Kernel;
 
 /*

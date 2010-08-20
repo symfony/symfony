@@ -2,21 +2,21 @@
 
 namespace Symfony\Framework;
 
-use Symfony\Components\DependencyInjection\ContainerInterface;
-use Symfony\Components\DependencyInjection\ContainerBuilder;
-use Symfony\Components\DependencyInjection\Dumper\PhpDumper;
-use Symfony\Components\DependencyInjection\Resource\FileResource;
-use Symfony\Components\DependencyInjection\ParameterBag\ParameterBag;
-use Symfony\Components\DependencyInjection\Loader\DelegatingLoader;
-use Symfony\Components\DependencyInjection\Loader\LoaderResolver;
-use Symfony\Components\DependencyInjection\Loader\LoaderInterface;
-use Symfony\Components\DependencyInjection\Loader\XmlFileLoader;
-use Symfony\Components\DependencyInjection\Loader\YamlFileLoader;
-use Symfony\Components\DependencyInjection\Loader\IniFileLoader;
-use Symfony\Components\DependencyInjection\Loader\PhpFileLoader;
-use Symfony\Components\DependencyInjection\Loader\ClosureLoader;
-use Symfony\Components\HttpFoundation\Request;
-use Symfony\Components\HttpKernel\HttpKernelInterface;
+use Symfony\Component\DependencyInjection\ContainerInterface;
+use Symfony\Component\DependencyInjection\ContainerBuilder;
+use Symfony\Component\DependencyInjection\Dumper\PhpDumper;
+use Symfony\Component\DependencyInjection\Resource\FileResource;
+use Symfony\Component\DependencyInjection\ParameterBag\ParameterBag;
+use Symfony\Component\DependencyInjection\Loader\DelegatingLoader;
+use Symfony\Component\DependencyInjection\Loader\LoaderResolver;
+use Symfony\Component\DependencyInjection\Loader\LoaderInterface;
+use Symfony\Component\DependencyInjection\Loader\XmlFileLoader;
+use Symfony\Component\DependencyInjection\Loader\YamlFileLoader;
+use Symfony\Component\DependencyInjection\Loader\IniFileLoader;
+use Symfony\Component\DependencyInjection\Loader\PhpFileLoader;
+use Symfony\Component\DependencyInjection\Loader\ClosureLoader;
+use Symfony\Component\HttpFoundation\Request;
+use Symfony\Component\HttpKernel\HttpKernelInterface;
 use Symfony\Framework\ClassCollectionLoader;
 
 /*

@@ -2,7 +2,7 @@
 
 namespace Symfony\Bundle\TwigBundle\Extension;
 
-use Symfony\Components\Templating\Engine;
+use Symfony\Component\Templating\Engine;
 use Symfony\Bundle\TwigBundle\TokenParser\HelperTokenParser;
 
 /*

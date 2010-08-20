@@ -2,14 +2,14 @@
 
 namespace Symfony\Framework;
 
-use Symfony\Components\DependencyInjection\ContainerInterface;
-use Symfony\Components\HttpKernel\HttpKernelInterface;
-use Symfony\Components\HttpKernel\Client as BaseClient;
-use Symfony\Components\BrowserKit\History;
-use Symfony\Components\BrowserKit\CookieJar;
-use Symfony\Components\HttpKernel\Profiler\Profiler;
-use Symfony\Components\HttpFoundation\Request;
-use Symfony\Components\HttpFoundation\Response;
+use Symfony\Component\DependencyInjection\ContainerInterface;
+use Symfony\Component\HttpKernel\HttpKernelInterface;
+use Symfony\Component\HttpKernel\Client as BaseClient;
+use Symfony\Component\BrowserKit\History;
+use Symfony\Component\BrowserKit\CookieJar;
+use Symfony\Component\HttpKernel\Profiler\Profiler;
+use Symfony\Component\HttpFoundation\Request;
+use Symfony\Component\HttpFoundation\Response;
 
 /*
  * This file is part of the Symfony package.

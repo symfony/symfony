@@ -3,8 +3,8 @@
 namespace Symfony\Bundle\FrameworkBundle\DataCollector;
 
 use Symfony\Framework\Kernel;
-use Symfony\Components\HttpKernel\Profiler\DataCollector\DataCollector;
-use Symfony\Components\DependencyInjection\ContainerInterface;
+use Symfony\Component\HttpKernel\Profiler\DataCollector\DataCollector;
+use Symfony\Component\DependencyInjection\ContainerInterface;
 
 /*
  * This file is part of the Symfony framework.

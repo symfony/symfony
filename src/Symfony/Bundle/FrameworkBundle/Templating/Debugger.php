@@ -2,8 +2,8 @@
 
 namespace Symfony\Bundle\FrameworkBundle\Templating;
 
-use Symfony\Components\Templating\DebuggerInterface;
-use Symfony\Components\HttpKernel\Log\LoggerInterface;
+use Symfony\Component\Templating\DebuggerInterface;
+use Symfony\Component\HttpKernel\Log\LoggerInterface;
 
 /*
  * This file is part of the Symfony package.

@@ -2,11 +2,11 @@
 
 namespace Symfony\Bundle\FrameworkBundle\Templating;
 
-use Symfony\Components\Templating\Engine as BaseEngine;
-use Symfony\Components\Templating\Loader\LoaderInterface;
-use Symfony\Components\OutputEscaper\Escaper;
-use Symfony\Components\DependencyInjection\ContainerInterface;
-use Symfony\Components\HttpFoundation\Response;
+use Symfony\Component\Templating\Engine as BaseEngine;
+use Symfony\Component\Templating\Loader\LoaderInterface;
+use Symfony\Component\OutputEscaper\Escaper;
+use Symfony\Component\DependencyInjection\ContainerInterface;
+use Symfony\Component\HttpFoundation\Response;
 
 /*
  * This file is part of the Symfony package.

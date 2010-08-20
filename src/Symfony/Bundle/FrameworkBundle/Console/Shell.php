@@ -2,7 +2,7 @@
 
 namespace Symfony\Bundle\FrameworkBundle\Console;
 
-use Symfony\Components\Console\Shell as BaseShell;
+use Symfony\Component\Console\Shell as BaseShell;
 
 /*
  * This file is part of the Symfony framework.

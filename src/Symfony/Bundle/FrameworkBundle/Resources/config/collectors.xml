@@ -8,7 +8,7 @@
         <parameter key="data_collector.config.class">Symfony\Bundle\FrameworkBundle\DataCollector\ConfigDataCollector</parameter>
         <parameter key="data_collector.app.class">Symfony\Bundle\FrameworkBundle\DataCollector\AppDataCollector</parameter>
         <parameter key="data_collector.timer.class">Symfony\Bundle\FrameworkBundle\DataCollector\TimerDataCollector</parameter>
-        <parameter key="data_collector.memory.class">Symfony\Components\HttpKernel\Profiler\DataCollector\MemoryDataCollector</parameter>
+        <parameter key="data_collector.memory.class">Symfony\Component\HttpKernel\Profiler\DataCollector\MemoryDataCollector</parameter>
     </parameters>
 
     <services>

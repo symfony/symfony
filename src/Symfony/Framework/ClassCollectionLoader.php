@@ -38,17 +38,17 @@ class ClassCollectionLoader
             return;
         }
 
+        self::$loaded[$name] = true;
+
         $classes = array_unique($classes);
 
         if ($adaptive) {
             // don't include already declared classes
-            $classes = array_diff($classes, get_declared_classes());
+            $classes = array_diff($classes, get_declared_classes(), get_declared_interfaces());
 
             // the cache is different depending on which classes are already declared
             $name = $name.'-'.substr(md5(implode('|', $classes)), 0, 5);
         }
-
-        self::$loaded[$name] = true;
 
         $cache = $cacheDir.'/'.$name.'.php';
 

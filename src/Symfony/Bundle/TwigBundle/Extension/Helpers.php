@@ -48,6 +48,9 @@ class Helpers extends \Twig_Extension
 
             // {% render 'BlogBundle:Post:list' with ['path': ['limit': 2], 'alt': 'BlogBundle:Post:error'] %}
             new HelperTokenParser('render', '<template> [with <arguments:array>]', 'actions', 'render'),
+
+            // {% flash 'notice' %}
+            new HelperTokenParser('flash', '<name>', 'session', 'flash'),
         );
     }
 

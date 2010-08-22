@@ -55,7 +55,7 @@ class HelperTokenParser extends \Twig_SimpleTokenParser
     {
         return $this->output(
             $this->markAsSafe(
-                $this->getAttribute(
+                $this->call(
                     $this->getAttribute('_view', $this->helper),
                     $this->method,
                     $this->getNodeValues($values)

@@ -9,6 +9,7 @@ use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\EventDispatcher\Event;
 use Symfony\Component\DependencyInjection\ContainerInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\ControllerNameConverter;
+use Symfony\Bundle\FrameworkBundle\Controller\ControllerInterface;
 
 /*
  * This file is part of the Symfony framework.
@@ -66,7 +67,12 @@ class ControllerResolver extends BaseControllerResolver
             throw new \InvalidArgumentException(sprintf('Class "%s" does not exist.', $class));
         }
 
-        return array(new $class($this->container), $method);
+        $controller = new $class();
+        if ($controller instanceof ControllerInterface) {
+            $controller->setContainer($this->container);
+        }
+
+        return array($controller, $method);
     }
 
     /**

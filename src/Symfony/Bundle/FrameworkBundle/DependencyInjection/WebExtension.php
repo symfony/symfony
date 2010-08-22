@@ -122,7 +122,9 @@ class WebExtension extends Extension
 
             'Symfony\\Component\\EventDispatcher\\Event',
 
-            'Symfony\\Bundle\\FrameworkBundle\\Controller',
+            'Symfony\\Bundle\\FrameworkBundle\\Controller\\ControllerInterface',
+            'Symfony\\Bundle\\FrameworkBundle\\Controller\\BaseController',
+            'Symfony\\Bundle\\FrameworkBundle\\Controller\\Controller',
         ));
     }
 

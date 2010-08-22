@@ -1,8 +1,7 @@
 <?php
 
-namespace Symfony\Bundle\FrameworkBundle;
+namespace Symfony\Bundle\FrameworkBundle\Controller;
 
-use Symfony\Component\DependencyInjection\ContainerInterface;
 use Symfony\Component\HttpFoundation\Response;
 
 /*
@@ -19,20 +18,8 @@ use Symfony\Component\HttpFoundation\Response;
  *
  * @author     Fabien Potencier <fabien.potencier@symfony-project.com>
  */
-class Controller implements \ArrayAccess
+class Controller extends BaseController implements \ArrayAccess
 {
-    protected $container;
-
-    /**
-     * Constructor.
-     *
-     * @param ContainerInterface $container A ContainerInterface instance
-     */
-    function __construct(ContainerInterface $container)
-    {
-        $this->container = $container;
-    }
-
     /**
      * Creates a Response instance.
      *

@@ -12,6 +12,8 @@
     <parameter key="doctrine.odm.mongodb.connection_class">Doctrine\ODM\MongoDB\Mongo</parameter>
     <parameter key="doctrine.odm.mongodb.configuration_class">Doctrine\ODM\MongoDB\Configuration</parameter>
     <parameter key="doctrine.odm.mongodb.document_manager_class">Doctrine\ODM\MongoDB\DocumentManager</parameter>
+    <parameter key="doctrine.odm.mongodb.logger_class">Symfony\Bundle\DoctrineMongoDBBundle\Logger\DoctrineMongoDBLogger</parameter>
+    <parameter key="doctrine.odm.mongodb.data_collector_class">Symfony\Bundle\DoctrineMongoDBBundle\DataCollector\DoctrineMongoDBDataCollector</parameter>
 
     <!-- proxies -->
     <parameter key="doctrine.odm.mongodb.proxy_namespace">Proxies</parameter>
@@ -61,5 +63,14 @@
 
     <!-- cache -->
     <service id="doctrine.odm.mongodb.cache.array" class="%doctrine.odm.mongodb.cache.array_class%" />
+
+    <!-- logger -->
+    <service id="doctrine.odm.mongodb.logger" class="%doctrine.odm.mongodb.logger_class%">
+      <argument type="service" id="logger" on-invalid="null" />
+     </service>
+    <service id="doctrine.odm.mongodb.data_collector" class="%doctrine.odm.mongodb.data_collector_class%">
+      <tag name="data_collector" />
+      <argument type="service" id="doctrine.odm.mongodb.logger" />
+    </service>
   </services>
 </container>

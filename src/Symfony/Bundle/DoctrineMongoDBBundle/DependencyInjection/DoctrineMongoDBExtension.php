@@ -129,6 +129,7 @@ class DoctrineMongoDBExtension extends Extension
             'setProxyNamespace' => $container->getParameter('doctrine.odm.mongodb.proxy_namespace'),
             'setAutoGenerateProxyClasses' => $container->getParameter('doctrine.odm.mongodb.auto_generate_proxy_classes'),
             'setDefaultDB' => $defaultDatabase,
+            'setLoggerCallable' => array(new Reference('doctrine.odm.mongodb.logger'), 'logQuery'),
         );
         foreach ($methods as $method => $arg) {
             $odmConfigDef->addMethodCall($method, array($arg));

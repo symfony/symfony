@@ -27,12 +27,14 @@ class Profiler implements \ArrayAccess
     protected $collectors;
     protected $response;
     protected $logger;
+    protected $enabled;
 
     public function __construct(ProfilerStorage $profilerStorage, LoggerInterface $logger = null)
     {
         $this->profilerStorage = $profilerStorage;
         $this->logger = $logger;
         $this->collectors = array();
+        $this->enabled = true;
     }
 
     /**
@@ -75,6 +77,11 @@ class Profiler implements \ArrayAccess
         return $profiler;
     }
 
+    public function disable()
+    {
+        $this->enabled = false;
+    }
+
     /**
      * Collects data for the given Response.
      *
@@ -82,6 +89,10 @@ class Profiler implements \ArrayAccess
      */
     public function collect(Response $response)
     {
+        if (false === $this->enabled) {
+            return;
+        }
+
         $this->response = $response;
         $this->response->headers->set('X-Debug-Token', $this->profilerStorage->getToken());
 

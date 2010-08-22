@@ -48,8 +48,8 @@ class WebDebugToolbarListener
         }
 
         $request = $event->getParameter('request');
-
-        if ('3' === substr($response->getStatusCode(), 0, 1)
+        if (!$response->headers->has('X-Debug-Token')
+            || '3' === substr($response->getStatusCode(), 0, 1)
             || ($response->headers->has('Content-Type') && false === strpos($response->headers->get('Content-Type'), 'html'))
             || 'html' !== $request->getRequestFormat()
             || $request->isXmlHttpRequest()

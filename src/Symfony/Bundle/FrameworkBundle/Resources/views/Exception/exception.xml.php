@@ -1,15 +1,13 @@
 <?php echo sprintf('<?xml version="1.0" encoding="%s" ?>', $view->getCharset())."\n" ?>
 <error code="<?php echo $manager->getStatusCode() ?>" message="<?php echo $manager->getStatusText() ?>">
-    <debug>
-        <name><?php echo $manager->getName() ?></name>
-        <message><?php echo htmlspecialchars($manager->getMessage(), ENT_QUOTES, $view->getCharset()) ?></message>
-        <traces>
-<?php foreach ($manager->getTraces() as $i => $trace): ?>
-                <trace>
-                <?php echo $view->render('FrameworkBundle:Exception:trace.txt', array('i' => $i, 'trace' => $trace)) ?>
-
-                </trace>
+    <exception class="<?php echo $manager->getName() ?>" message="<?php echo $manager->getMessage() ?>">
+        <?php echo $view->render('FrameworkBundle:Exception:traces', array('manager' => $manager, 'position' => 0, 'count' => count($managers))) ?>
+    </exception>
+<?php if (count($managers)): ?>
+<?php foreach ($managers as $i => $previous): ?>
+    <exception class="<?php echo $previous->getName() ?>" message="<?php echo $previous->getMessage() ?>">
+        <?php echo $view->render('FrameworkBundle:Exception:traces', array('manager' => $previous, 'position' => $i + 1, 'count' => count($managers))) ?>
+    </exception>
 <?php endforeach; ?>
-        </traces>
-    </debug>
+<?php endif; ?>
 </error>

@@ -21,15 +21,51 @@ use Symfony\Component\Templating\Helper\Helper;
 class CodeHelper extends Helper
 {
     protected $fileLinkFormat;
+    protected $rootDir;
 
     /**
      * Constructor.
      *
      * @param string $fileLinkFormat The format for links to source files
+     * @param string $rootDir        The project root directory
      */
-    public function __construct($fileLinkFormat)
+    public function __construct($fileLinkFormat, $rootDir)
     {
         $this->fileLinkFormat = null !== $fileLinkFormat ? $fileLinkFormat : ini_get('xdebug.file_link_format');
+        $this->rootDir = str_replace('\\', '/', $rootDir).'/';
+    }
+
+    /**
+     * Formats an array as a string.
+     *
+     * @param array $args The argument array
+     *
+     * @return string
+     */
+    public function formatArgsAsText($args)
+    {
+        $result = array();
+        foreach ($args as $key => $value) {
+            if (is_object($value)) {
+                $formattedValue = sprintf("object('%s')", get_class($value));
+            } elseif (is_array($value)) {
+                $formattedValue = sprintf("array(%s)", $this->formatArgs($value));
+            } elseif (is_string($value)) {
+                $formattedValue = sprintf("'%s'", $value);
+            } elseif (null === $value) {
+                $formattedValue = 'null';
+            } elseif (false === $value) {
+                $formattedValue = 'false';
+            } elseif (true === $value) {
+                $formattedValue = 'true';
+            } else {
+                $formattedValue = $value;
+            }
+
+            $result[] = is_int($key) ? $formattedValue : sprintf("'%s' => %s", $key, $formattedValue);
+        }
+
+        return implode(', ', $result);
     }
 
     /**
@@ -44,13 +80,20 @@ class CodeHelper extends Helper
         $result = array();
         foreach ($args as $key => $value) {
             if (is_object($value)) {
-                $formattedValue = sprintf("object('%s')", get_class($value));
+                $class = get_class($value);
+                $parts = explode('\\', $class);
+                $short = array_pop($parts);
+                $formattedValue = sprintf("<em>object</em>(<abbr title=\"%s\">%s</abbr>)", $class, $short);
             } elseif (is_array($value)) {
-                $formattedValue = sprintf("array(%s)", $this->formatArgs($value));
+                $formattedValue = sprintf("<em>array</em>(%s)", $this->formatArgs($value));
             } elseif (is_string($value)) {
                 $formattedValue = sprintf("'%s'", $value);
             } elseif (null === $value) {
-                $formattedValue = 'null';
+                $formattedValue = '<em>null</em>';
+            } elseif (false === $value) {
+                $formattedValue = '<em>false</em>';
+            } elseif (true === $value) {
+                $formattedValue = '<em>true</em>';
             } else {
                 $formattedValue = $value;
             }
@@ -95,13 +138,18 @@ class CodeHelper extends Helper
      */
     public function formatFile($file, $line)
     {
+        if (0 === strpos($file, $this->rootDir)) {
+            $file = str_replace($this->rootDir, '', str_replace('\\', '/', $file));
+            $file = sprintf('<abbr title="%s">kernel.root_dir</abbr>/%s', $this->rootDir, $file);
+        }
+
         if (!$this->fileLinkFormat) {
             return $file;
         }
 
         $link = strtr($this->fileLinkFormat, array('%f' => $file, '%l' => $line));
 
-        return sprintf('<a href="%s" title="Click to open this file" class="file_link">%s</a>', $link, $file);
+        return sprintf('<a href="%s" title="Click to open this file" class="file_link">%s</a>', $link, $this->rootDir, $file);
     }
 
     /**

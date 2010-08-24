@@ -32,9 +32,18 @@ class ExceptionController extends Controller
     {
         $this['request']->setRequestFormat($manager->getFormat());
 
+        $currentContent = '';
+        while (false !== $content = ob_get_clean()) {
+            $currentContent .= $content;
+        }
+
         $response = $this->render(
             'FrameworkBundle:Exception:'.($this['kernel']->isDebug() ? 'exception' : 'error'),
-            array('manager' => $manager)
+            array(
+                'manager'        => $manager,
+                'managers'       => $manager->getLinkedManagers(),
+                'currentContent' => $currentContent,
+            )
         );
         $response->setStatusCode($manager->getStatusCode());
 

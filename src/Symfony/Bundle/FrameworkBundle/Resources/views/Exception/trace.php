@@ -1,10 +1,10 @@
 <?php if ($trace['function']): ?>
-    at <strong><?php echo $trace['class'] ?><?php echo $trace['type'] ?><?php echo $trace['function'] ?></strong>(<?php echo $view['code']->formatArgs($trace['args']) ?>)<br />
+    at <strong><abbr title="<?php echo $trace['class'] ?>"><?php echo $trace['short_class'] ?></abbr><?php echo $trace['type'] ?><?php echo $trace['function'] ?></strong>(<?php echo $view['code']->formatArgs($trace['args']) ?>)<br />
 <?php endif; ?>
 <?php if ($trace['file'] && $trace['line']): ?>
     in <em><?php echo $view['code']->formatFile($trace['file'], $trace['line']) ?></em> line <?php echo $trace['line'] ?>
-    <a href="#" onclick="toggle('trace_<?php echo $i ?>'); return false;">...</a><br />
-    <ul class="code" id="trace_<?php echo $i ?>" style="display: <?php echo 0 === $i ? 'block' : 'none' ?>">
+    <a href="#" onclick="toggle('trace_<?php echo $prefix.'_'.$i ?>'); return false;">&raquo;</a><br />
+    <ul class="code" id="trace_<?php echo $prefix.'_'.$i ?>" style="display: <?php echo 0 === $i ? 'block' : 'none' ?>">
         <?php echo $view['code']->fileExcerpt($trace['file'], $trace['line']) ?>
     </ul>
 <?php endif; ?>

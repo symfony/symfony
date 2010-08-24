@@ -89,7 +89,7 @@ class Yaml
         try {
             $ret = $yaml->parse($input);
         } catch (\Exception $e) {
-            throw new \InvalidArgumentException(sprintf('Unable to parse %s: %s', $file ? sprintf('file "%s"', $file) : 'string', $e->getMessage()));
+            throw new \InvalidArgumentException(sprintf('Unable to parse %s: %s', $file ? sprintf('file "%s"', $file) : 'string', $e->getMessage()), 0, $e);
         }
 
         return $ret;

@@ -75,7 +75,7 @@ class Parser
         } catch (\Exception $e) {
             $class = get_class($e);
 
-            throw new $class(sprintf('%s at %s -> %s', $e->getMessage(), implode($stream->getUsed(), ''), $stream->peek()));
+            throw new $class(sprintf('%s at %s -> %s', $e->getMessage(), implode($stream->getUsed(), ''), $stream->peek()), 0, $e);
         }
     }
 

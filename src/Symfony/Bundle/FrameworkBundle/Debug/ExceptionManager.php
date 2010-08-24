@@ -27,28 +27,28 @@ class ExceptionManager
     protected $exception;
     protected $request;
     protected $logger;
-    protected $currentContent;
 
     public function __construct(\Exception $exception, Request $request, DebugLoggerInterface $logger = null)
     {
         $this->exception = $exception;
         $this->request = $request;
         $this->logger = $logger;
+    }
 
-        $this->currentContent = '';
-        while (false !== $content = ob_get_clean()) {
-            $this->currentContent .= $content;
+    public function getLinkedManagers()
+    {
+        $managers = array();
+        $e = $this->exception;
+        while ($e = $e->getPrevious()) {
+            $managers[] = new $this($e, $this->request);
         }
+
+        return $managers;
     }
 
     public function getException()
     {
         return $this->exception;
-    }
-
-    public function getCurrentContent()
-    {
-        return $this->currentContent;
     }
 
     public function getLogger()
@@ -126,13 +126,23 @@ class ExceptionManager
             'args'     => array(),
         );
         foreach ($this->exception->getTrace() as $entry) {
+            $class = '';
+            $namespace = '';
+            if (isset($entry['class'])) {
+                $parts = explode('\\', $entry['class']);
+                $class = array_pop($parts);
+                $namespace = implode('\\', $parts);
+            }
+
             $traces[] = array(
-                'class'    => isset($entry['class']) ? $entry['class'] : '',
-                'type'     => isset($entry['type']) ? $entry['type'] : '',
-                'function' => $entry['function'],
-                'file'     => isset($entry['file']) ? $entry['file'] : null,
-                'line'     => isset($entry['line']) ? $entry['line'] : null,
-                'args'     => isset($entry['args']) ? $entry['args'] : array(),
+                'namespace'   => $namespace,
+                'short_class' => $class,
+                'class'       => isset($entry['class']) ? $entry['class'] : '',
+                'type'        => isset($entry['type']) ? $entry['type'] : '',
+                'function'    => $entry['function'],
+                'file'        => isset($entry['file']) ? $entry['file'] : null,
+                'line'        => isset($entry['line']) ? $entry['line'] : null,
+                'args'        => isset($entry['args']) ? $entry['args'] : array(),
             );
         }
 

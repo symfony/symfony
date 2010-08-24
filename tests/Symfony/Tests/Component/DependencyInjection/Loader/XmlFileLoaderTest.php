@@ -231,15 +231,6 @@ class XmlFileLoaderTest extends \PHPUnit_Framework_TestCase
             $this->assertInstanceOf('\InvalidArgumentException', $e, '->load() throws an InvalidArgumentException if the tag is not valid');
             $this->assertStringStartsWith('There is no extension able to load the configuration for "project:bar" (in', $e->getMessage(), '->load() throws an InvalidArgumentException if the tag is not valid');
         }
-
-        // non-existent tag for a known extension
-        try {
-            $loader->load('extensions/services5.xml');
-            $this->fail('->load() throws an InvalidArgumentException if a tag is not valid for a given extension');
-        } catch (\Exception $e) {
-            $this->assertInstanceOf('\InvalidArgumentException', $e, '->load() throws an InvalidArgumentException if a tag is not valid for a given extension');
-            $this->assertStringStartsWith('The tag "projectwithxsd:foobar" is not defined in the "projectwithxsd" extension.', $e->getMessage(), '->load() throws an InvalidArgumentException if a tag is not valid for a given extension');
-        }
     }
 
     /**

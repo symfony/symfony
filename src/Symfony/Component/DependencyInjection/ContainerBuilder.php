@@ -24,11 +24,11 @@ class ContainerBuilder extends Container implements TaggedContainerInterface
 {
     static protected $extensions = array();
 
-    protected $definitions         = array();
-    protected $aliases             = array();
-    protected $loading             = array();
-    protected $resources           = array();
-    protected $extensionContainers = array();
+    protected $definitions      = array();
+    protected $aliases          = array();
+    protected $loading          = array();
+    protected $resources        = array();
+    protected $extensionConfigs = array();
 
     /**
      * Registers an extension.
@@ -114,19 +114,13 @@ class ContainerBuilder extends Container implements TaggedContainerInterface
             throw new \LogicException('Cannot load from an extension on a frozen container.');
         }
 
-        $extension = $this->getExtension($extension);
-        $namespace = $extension->getAlias();
+        $namespace = $this->getExtension($extension)->getAlias();
 
-        $this->addObjectResource($extension);
-
-        if (!isset($this->extensionContainers[$namespace])) {
-            $this->extensionContainers[$namespace] = new self($this->parameterBag);
-
-            $r = new \ReflectionObject($extension);
-            $this->extensionContainers[$namespace]->addResource(new FileResource($r->getFileName()));
+        if (!isset($this->extensionConfigs[$namespace.':'.$tag])) {
+            $this->extensionConfigs[$namespace.':'.$tag] = array();
         }
 
-        $extension->load($tag, $values, $this->extensionContainers[$namespace]);
+        $this->extensionConfigs[$namespace.':'.$tag][] = $values;
 
         return $this;
     }
@@ -235,11 +229,11 @@ class ContainerBuilder extends Container implements TaggedContainerInterface
             $this->addResource($resource);
         }
 
-        foreach ($container->getExtensionContainers() as $name => $container) {
-            if (isset($this->extensionContainers[$name])) {
-                $this->extensionContainers[$name]->merge($container);
+        foreach ($container->getExtensionConfigs() as $name => $configs) {
+            if (isset($this->extensionConfigs[$name])) {
+                $this->extensionConfigs[$name] = array_merge($this->extensionConfigs[$name], $configs);
             } else {
-                $this->extensionContainers[$name] = $container;
+                $this->extensionConfigs[$name] = $configs;
             }
         }
     }
@@ -249,9 +243,9 @@ class ContainerBuilder extends Container implements TaggedContainerInterface
      *
      * @return ExtensionInterface[] An array of extension containers
      */
-    public function getExtensionContainers()
+    public function getExtensionConfigs()
     {
-        return $this->extensionContainers;
+        return $this->extensionConfigs;
     }
 
     /**
@@ -270,10 +264,20 @@ class ContainerBuilder extends Container implements TaggedContainerInterface
         $definitions = $this->definitions;
         $aliases = $this->aliases;
 
-        foreach ($this->extensionContainers as $container) {
+        foreach ($this->extensionConfigs as $name => $configs) {
+            list($namespace, $tag) = explode(':', $name);
+
+            $extension = $this->getExtension($namespace);
+
+            $container = new self($this->parameterBag);
+            $container->addObjectResource($extension);
+            foreach ($configs as $config) {
+                $extension->load($tag, $config, $container);
+            }
+
             $this->merge($container);
         }
-        $this->extensionContainers = array();
+        $this->extensionConfigs = array();
 
         $this->addDefinitions($definitions);
         $this->addAliases($aliases);

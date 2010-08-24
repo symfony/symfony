@@ -41,9 +41,9 @@ class SessionHelper extends Helper
      *
      * @return mixed
      */
-    public function getAttribute($name, $default = null)
+    public function get($name, $default = null)
     {
-        return $this->session->getAttribute($name, $default);
+        return $this->session->get($name, $default);
     }
 
     /**

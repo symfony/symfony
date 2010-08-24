@@ -117,7 +117,7 @@ class ControllerResolver extends BaseControllerResolver
         $options = array_merge(array(
             'path'          => array(),
             'query'         => array(),
-            'ignore_errors' => true,
+            'ignore_errors' => !$this->container->getParameter('kernel.debug'),
             'alt'           => array(),
             'standalone'    => false,
             'comment'       => '',

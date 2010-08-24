@@ -82,7 +82,7 @@ class XmlFileLoader extends FileLoader
 
         foreach ($xml->imports->import as $import) {
             $this->currentDir = dirname($file);
-            $this->import((string) $import['resource']);
+            $this->import((string) $import['resource'], (Boolean) $import->getAttributeAsPhp('ignore-errors'));
         }
     }
 

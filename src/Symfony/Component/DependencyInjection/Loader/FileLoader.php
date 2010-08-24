@@ -45,15 +45,21 @@ abstract class FileLoader extends Loader
      *
      * @param mixed $resource A Resource
      */
-    public function import($resource)
+    public function import($resource, $ignoreErrors = false)
     {
-        $loader = $this->resolve($resource);
+        try {
+            $loader = $this->resolve($resource);
 
-        if ($loader instanceof FileLoader && null !== $this->currentDir) {
-            $resource = $this->getAbsolutePath($resource, $this->currentDir);
+            if ($loader instanceof FileLoader && null !== $this->currentDir) {
+                $resource = $this->getAbsolutePath($resource, $this->currentDir);
+            }
+
+            $loader->load($resource);
+        } catch (\Exception $e) {
+            if (!$ignoreErrors) {
+                throw $e;
+            }
         }
-
-        $loader->load($resource);
     }
 
     /**

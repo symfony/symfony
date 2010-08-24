@@ -61,13 +61,7 @@
       ]]></xsd:documentation>
     </xsd:annotation>
     <xsd:attribute name="resource" type="xsd:string" use="required" />
-    <xsd:attribute name="class" type="xsd:string">
-      <xsd:annotation>
-        <xsd:documentation><![CDATA[
-          The PHP class able to load the resource. If not defined, the loader uses the current loader.
-        ]]></xsd:documentation>
-      </xsd:annotation>
-    </xsd:attribute>
+    <xsd:attribute name="ignore-errors" type="boolean" />
   </xsd:complexType>
 
   <xsd:complexType name="configurator">

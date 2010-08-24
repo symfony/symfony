@@ -197,12 +197,14 @@ class Route
     {
         $this->requirements = array();
         foreach ($requirements as $key => $regex) {
-            if ('^' == $regex[0]) {
-                $regex = substr($regex, 1);
-            }
+            if (!is_array($regex)) {
+                if ('^' == $regex[0]) {
+                    $regex = substr($regex, 1);
+                }
 
-            if ('$' == substr($regex, -1)) {
-                $regex = substr($regex, 0, -1);
+                if ('$' == substr($regex, -1)) {
+                    $regex = substr($regex, 0, -1);
+                }
             }
 
             $this->requirements[$key] = $regex;

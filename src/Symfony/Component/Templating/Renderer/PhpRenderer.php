@@ -32,18 +32,19 @@ class PhpRenderer extends Renderer
      */
     public function evaluate(Storage $template, array $parameters = array())
     {
-        if ($template instanceof FileStorage) {
+        $__template__ = $template;
+        if ($__template__ instanceof FileStorage) {
             extract($parameters);
             $view = $this->engine;
             ob_start();
-            require $template;
+            require $__template__;
 
             return ob_get_clean();
-        } else if ($template instanceof StringStorage) {
+        } elseif ($__template__ instanceof StringStorage) {
             extract($parameters);
             $view = $this->engine;
             ob_start();
-            eval('; ?>'.$template.'<?php ;');
+            eval('; ?>'.$__template__.'<?php ;');
 
             return ob_get_clean();
         }

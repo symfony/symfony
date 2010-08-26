@@ -4,7 +4,6 @@ namespace Symfony\Bundle\FrameworkBundle\Debug;
 
 use Symfony\Component\DependencyInjection\ContainerInterface;
 use Symfony\Component\HttpKernel\Exception\HttpException;
-use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpKernel\Log\DebugLoggerInterface;
 
@@ -25,13 +24,11 @@ use Symfony\Component\HttpKernel\Log\DebugLoggerInterface;
 class ExceptionManager
 {
     protected $exception;
-    protected $request;
     protected $logger;
 
-    public function __construct(\Exception $exception, Request $request, DebugLoggerInterface $logger = null)
+    public function __construct(\Exception $exception, DebugLoggerInterface $logger = null)
     {
         $this->exception = $exception;
-        $this->request = $request;
         $this->logger = $logger;
     }
 
@@ -40,7 +37,7 @@ class ExceptionManager
         $managers = array();
         $e = $this->exception;
         while ($e = $e->getPrevious()) {
-            $managers[] = new $this($e, $this->request);
+            $managers[] = new $this($e);
         }
 
         return $managers;
@@ -75,18 +72,6 @@ class ExceptionManager
         }
 
         return $errors;
-    }
-
-    public function getFormat()
-    {
-        $format = $this->request->getRequestFormat();
-
-        // when using CLI, we force the format to be TXT
-        if (0 === strncasecmp(PHP_SAPI, 'cli', 3)) {
-            $format = 'txt';
-        }
-
-        return $format;
     }
 
     public function getStatusCode()

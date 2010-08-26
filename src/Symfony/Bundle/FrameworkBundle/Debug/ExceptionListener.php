@@ -7,6 +7,7 @@ use Symfony\Component\EventDispatcher\EventDispatcher;
 use Symfony\Component\EventDispatcher\Event;
 use Symfony\Component\HttpKernel\Log\LoggerInterface;
 use Symfony\Component\HttpKernel\HttpKernelInterface;
+use Symfony\Component\HttpFoundation\Request;
 
 /*
  * This file is part of the Symfony framework.
@@ -53,6 +54,7 @@ class ExceptionListener
         }
 
         $exception = $event->getParameter('exception');
+        $request = $event->getParameter('request');
 
         if (null !== $this->logger) {
             $this->logger->err(sprintf('%s: %s (uncaught exception)', get_class($exception), $exception->getMessage()));
@@ -65,10 +67,12 @@ class ExceptionListener
 
         $attributes = array(
             '_controller' => $this->controller,
-            'manager'     => new $class($exception, $event->getParameter('request'), $logger),
+            'manager'     => new $class($exception, $logger),
+            // when using CLI, we force the format to be TXT
+            'format'      => 0 === strncasecmp(PHP_SAPI, 'cli', 3) ? 'txt' : $request->getRequestFormat(),
         );
 
-        $request = $event->getParameter('request')->duplicate(null, null, $attributes);
+        $request = $request->duplicate(null, null, $attributes);
 
         try {
             $response = $event->getSubject()->handle($request, HttpKernelInterface::SUB_REQUEST, true);

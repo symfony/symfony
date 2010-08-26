@@ -28,9 +28,9 @@ class ExceptionController extends Controller
      *
      * @throws \InvalidArgumentException When the exception template does not exist
      */
-    public function exceptionAction(ExceptionManager $manager)
+    public function exceptionAction(ExceptionManager $manager, $format)
     {
-        $this['request']->setRequestFormat($manager->getFormat());
+        $this['request']->setRequestFormat($format);
 
         $currentContent = '';
         while (false !== $content = ob_get_clean()) {

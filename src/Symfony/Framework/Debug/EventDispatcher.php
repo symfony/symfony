@@ -67,7 +67,7 @@ class EventDispatcher extends BaseEventDispatcher
      */
     public function notifyUntil(Event $event)
     {
-        foreach ($this->getListeners($event->getName()) as $listener) {
+        foreach ($this->getListeners($event->getName()) as $i => $listener) {
             if (null !== $this->logger) {
                 $this->logger->debug(sprintf('Notifying (until) event "%s" to listener "%s"', $event->getName(), $this->listenerToString($listener)));
             }
@@ -75,6 +75,11 @@ class EventDispatcher extends BaseEventDispatcher
             if (call_user_func($listener, $event)) {
                 if (null !== $this->logger) {
                     $this->logger->debug(sprintf('Listener "%s" processed the event "%s"', $this->listenerToString($listener), $event->getName()));
+
+                    $listeners = $this->getListeners($event->getName());
+                    while (++$i < count($listeners)) {
+                        $this->logger->debug(sprintf('Listener "%s" was not called for event "%s"', $this->listenerToString($listeners[$i]), $event->getName()));
+                    }
                 }
 
                 $event->setProcessed(true);

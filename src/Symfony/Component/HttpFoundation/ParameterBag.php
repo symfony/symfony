@@ -41,6 +41,16 @@ class ParameterBag
     }
 
     /**
+     * Returns the parameter keys.
+     *
+     * @return array An array of parameter keys
+     */
+    public function keys()
+    {
+        return array_keys($this->parameters);
+    }
+
+    /**
      * Replaces the current parameters by a new set.
      *
      * @param array $parameters An array of parameters

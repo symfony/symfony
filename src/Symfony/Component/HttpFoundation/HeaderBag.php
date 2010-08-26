@@ -49,6 +49,16 @@ class HeaderBag
     }
 
     /**
+     * Returns the parameter keys.
+     *
+     * @return array An array of parameter keys
+     */
+    public function keys()
+    {
+        return array_keys($this->headers);
+    }
+
+    /**
      * Replaces the current HTTP headers by a new set.
      *
      * @param array  $headers An array of HTTP headers

@@ -149,7 +149,7 @@ class CodeHelper extends Helper
 
         $link = strtr($this->fileLinkFormat, array('%f' => $file, '%l' => $line));
 
-        return sprintf('<a href="%s" title="Click to open this file" class="file_link">%s</a>', $link, $this->rootDir, $file);
+        return sprintf('<a href="%s" title="Click to open this file" class="file_link">%s</a>', $link, $file);
     }
 
     /**

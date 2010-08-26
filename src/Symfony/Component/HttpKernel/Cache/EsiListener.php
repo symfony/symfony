@@ -39,12 +39,13 @@ class EsiListener
      * Registers a core.response listener to add the Surrogate-Control header to a Response when needed.
      *
      * @param EventDispatcher $dispatcher An EventDispatcher instance
+     * @param integer         $priority   The priority
      */
-    public function register(EventDispatcher $dispatcher)
+    public function register(EventDispatcher $dispatcher, $priority = 0)
     {
         if (null !== $this->esi)
         {
-            $dispatcher->connect('core.response', array($this, 'filter'));
+            $dispatcher->connect('core.response', array($this, 'filter'), $priority);
         }
     }
 

@@ -29,7 +29,9 @@ class EventDispatcher extends BaseEventDispatcher
     public function __construct(ContainerInterface $container)
     {
         foreach ($container->findTaggedServiceIds('kernel.listener') as $id => $attributes) {
-            $container->get($id)->register($this);
+            $priority = isset($attributes[0]['priority']) ? $attributes[0]['priority'] : 0;
+
+            $container->get($id)->register($this, $priority);
         }
     }
 }

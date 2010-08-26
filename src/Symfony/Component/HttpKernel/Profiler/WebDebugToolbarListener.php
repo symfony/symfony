@@ -35,10 +35,11 @@ class WebDebugToolbarListener
      * Registers a core.response listener.
      *
      * @param EventDispatcher $dispatcher An EventDispatcher instance
+     * @param integer         $priority   The priority
      */
-    public function register(EventDispatcher $dispatcher)
+    public function register(EventDispatcher $dispatcher, $priority = 0)
     {
-        $dispatcher->connect('core.response', array($this, 'handle'));
+        $dispatcher->connect('core.response', array($this, 'handle'), $priority);
     }
 
     public function handle(Event $event, Response $response)

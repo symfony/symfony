@@ -37,10 +37,11 @@ class RequestListener
      * Registers a core.request listener.
      *
      * @param EventDispatcher $dispatcher An EventDispatcher instance
+     * @param integer         $priority   The priority
      */
-    public function register(EventDispatcher $dispatcher)
+    public function register(EventDispatcher $dispatcher, $priority = 0)
     {
-        $dispatcher->connect('core.request', array($this, 'resolve'));
+        $dispatcher->connect('core.request', array($this, 'resolve'), $priority);
     }
 
     public function resolve(Event $event)

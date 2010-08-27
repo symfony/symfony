@@ -99,7 +99,8 @@ class KernelExtension extends Extension {
             $loader->load('services.xml');
             if ($container->getParameter('kernel.debug')) {
                 $loader->load('debug.xml');
-                $container->setDefinition('event_dispatcher', $container->findDefinition('debug.event_dispatcher')); } }
+                $container->setDefinition('event_dispatcher', $container->findDefinition('debug.event_dispatcher'));
+                $container->setAlias('debug.event_dispatcher', 'event_dispatcher'); } }
         if (isset($config['charset'])) {
             $container->setParameter('kernel.charset', $config['charset']); }
         if (array_key_exists('error_handler', $config)) {
@@ -187,6 +188,7 @@ use Symfony\Component\EventDispatcher\EventDispatcher as BaseEventDispatcher;
 use Symfony\Component\EventDispatcher\Event;
 use Symfony\Component\DependencyInjection\ContainerInterface;
 class EventDispatcher extends BaseEventDispatcher {
-    public function __construct(ContainerInterface $container) {
+    public function setContainer(ContainerInterface $container) {
         foreach ($container->findTaggedServiceIds('kernel.listener') as $id => $attributes) {
-            $container->get($id)->register($this); } } }
+            $priority = isset($attributes[0]['priority']) ? $attributes[0]['priority'] : 0;
+            $container->get($id)->register($this, $priority); } } }

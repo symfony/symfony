@@ -68,6 +68,24 @@ class CodeHelper extends Helper
         return implode(', ', $result);
     }
 
+    public function abbrClass($class)
+    {
+        $parts = explode('\\', $class);
+        $short = array_pop($parts);
+
+        return sprintf("<abbr title=\"%s\">%s</abbr>", $class, $short);
+    }
+
+    public function abbrMethod($method)
+    {
+        list($class, $method) = explode('::', $method);
+
+        $parts = explode('\\', $class);
+        $short = array_pop($parts);
+
+        return sprintf("<abbr title=\"%s\">%s</abbr>::%s", $class, $short, $method);
+    }
+
     /**
      * Formats an array as a string.
      *

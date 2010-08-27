@@ -6,7 +6,6 @@ use Symfony\Framework\EventDispatcher as BaseEventDispatcher;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 use Symfony\Component\EventDispatcher\Event;
 use Symfony\Component\HttpKernel\Log\LoggerInterface;
-use Symfony\Component\DependencyInjection\ContainerInterface;
 
 /*
  * This file is part of the Symfony package.
@@ -22,20 +21,20 @@ use Symfony\Component\DependencyInjection\ContainerInterface;
  *
  * @author     Fabien Potencier <fabien.potencier@symfony-project.com>
  */
-class EventDispatcher extends BaseEventDispatcher
+class EventDispatcher extends BaseEventDispatcher implements EventDispatcherTraceableInterface
 {
     protected $logger;
+    protected $called;
 
     /**
      * Constructor.
      *
      * @param LoggerInterface $logger A LoggerInterface instance
      */
-    public function __construct(ContainerInterface $container, LoggerInterface $logger = null)
+    public function __construct(LoggerInterface $logger = null)
     {
         $this->logger = $logger;
-
-        parent::__construct($container);
+        $this->called = array();
     }
 
     /**
@@ -48,9 +47,7 @@ class EventDispatcher extends BaseEventDispatcher
     public function notify(Event $event)
     {
         foreach ($this->getListeners($event->getName()) as $listener) {
-            if (null !== $this->logger) {
-                $this->logger->debug(sprintf('Notifying event "%s" to listener "%s"', $event->getName(), $this->listenerToString($listener)));
-            }
+            $this->addCall($event, $listener, 'notify');
 
             call_user_func($listener, $event);
         }
@@ -68,9 +65,7 @@ class EventDispatcher extends BaseEventDispatcher
     public function notifyUntil(Event $event)
     {
         foreach ($this->getListeners($event->getName()) as $i => $listener) {
-            if (null !== $this->logger) {
-                $this->logger->debug(sprintf('Notifying (until) event "%s" to listener "%s"', $event->getName(), $this->listenerToString($listener)));
-            }
+            $this->addCall($event, $listener, 'notifyUntil');
 
             if (call_user_func($listener, $event)) {
                 if (null !== $this->logger) {
@@ -101,9 +96,7 @@ class EventDispatcher extends BaseEventDispatcher
     public function filter(Event $event, $value)
     {
         foreach ($this->getListeners($event->getName()) as $listener) {
-            if (null !== $this->logger) {
-                $this->logger->debug(sprintf('Notifying (filter) event "%s" to listener "%s"', $event->getName(), $this->listenerToString($listener)));
-            }
+            $this->addCall($event, $listener, 'filter');
 
             $value = call_user_func($listener, $event, $value);
         }
@@ -111,6 +104,31 @@ class EventDispatcher extends BaseEventDispatcher
         $event->setReturnValue($value);
 
         return $event;
+    }
+
+    public function getCalledEvents()
+    {
+        return $this->called;
+    }
+
+    public function getNotCalledEvents()
+    {
+        $notCalled = array();
+
+        foreach (array_keys($this->listeners) as $name) {
+            foreach ($this->getListeners($name) as $listener) {
+                $listener = $this->listenerToString($listener);
+
+                if (!isset($this->called[$name.'.'.$listener])) {
+                    $notCalled[] = array(
+                        'event'    => $name,
+                        'listener' => $listener,
+                    );
+                }
+            }
+        }
+
+        return $notCalled;
     }
 
     protected function listenerToString($listener)
@@ -124,7 +142,22 @@ class EventDispatcher extends BaseEventDispatcher
         }
 
         if (is_array($listener)) {
-            return sprintf('(%s, %s)', is_object($listener[0]) ? get_class($listener[0]) : $listener[0], $listener[1]);
+            return sprintf('%s::%s', is_object($listener[0]) ? get_class($listener[0]) : $listener[0], $listener[1]);
         }
+    }
+
+    protected function addCall(Event $event, $listener, $type)
+    {
+        $listener = $this->listenerToString($listener);
+
+        if (null !== $this->logger) {
+            $this->logger->debug(sprintf('Notified event "%s" to listener "%s" (%s)', $event->getName(), $listener, $type));
+        }
+
+        $this->called[$event->getName().'.'.$listener] = array(
+            'event'    => $event->getName(),
+            'caller'   => null !== $event->getSubject() ? get_class($event->getSubject()) : null,
+            'listener' => $listener,
+        );
     }
 }

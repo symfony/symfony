@@ -10,8 +10,10 @@
 
     <services>
         <service id="debug.event_dispatcher" class="%debug.event_dispatcher.class%">
-            <argument type="service" id="service_container" />
             <argument type="service" id="logger" on-invalid="null" />
+            <call method="setContainer">
+                <argument type="service" id="service_container" />
+            </call>
         </service>
     </services>
 </container>

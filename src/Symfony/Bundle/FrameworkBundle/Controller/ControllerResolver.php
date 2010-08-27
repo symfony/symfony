@@ -143,6 +143,7 @@ class ControllerResolver extends BaseControllerResolver
         // controller or URI?
         if (0 === strpos($controller, '/')) {
             $subRequest = Request::create($controller, 'get', array(), $request->cookies->all(), array(), $request->server->all());
+            $subRequest->setSession($request->getSession());
         } else {
             $options['path']['_controller'] = $controller;
             $options['path']['_format'] = $request->getRequestFormat();

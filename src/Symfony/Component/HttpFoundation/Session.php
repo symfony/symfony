@@ -18,7 +18,7 @@ use Symfony\Component\HttpFoundation\SessionStorage\SessionStorageInterface;
  *
  * @author     Fabien Potencier <fabien.potencier@symfony-project.com>
  */
-class Session
+class Session implements \Serializable
 {
     protected $storage;
     protected $locale;
@@ -232,12 +232,28 @@ class Session
         return array_key_exists($name, $this->attributes['_flash']);
     }
 
-    public function __destruct()
+    public function save()
     {
         if (true === $this->started) {
             $this->attributes['_flash'] = array_diff_key($this->attributes['_flash'], $this->oldFlashes);
-
             $this->storage->write('_symfony2', $this->attributes);
         }
+    }
+
+    public function __destruct()
+    {
+        $this->save();
+    }
+
+    public function serialize()
+    {
+        return serialize(array($this->storage, $this->options));
+    }
+
+    public function unserialize($serialized)
+    {
+        list($this->storage, $this->options) = unserialize($serialized);
+        $this->attributes = array();
+        $this->started = false;
     }
 }

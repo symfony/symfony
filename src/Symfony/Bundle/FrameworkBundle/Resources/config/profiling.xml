@@ -6,7 +6,7 @@
 
     <parameters>
         <parameter key="profiler.class">Symfony\Bundle\FrameworkBundle\Profiler</parameter>
-        <parameter key="profiler.storage.class">Symfony\Component\HttpKernel\Profiler\ProfilerStorage</parameter>
+        <parameter key="profiler.storage.class">Symfony\Component\HttpKernel\Profiler\SQLiteProfilerStorage</parameter>
         <parameter key="profiler.storage.file">%kernel.cache_dir%/profiler.db</parameter>
         <parameter key="profiler.storage.lifetime">86400</parameter>
         <parameter key="profiler_listener.class">Symfony\Component\HttpKernel\Profiler\ProfilerListener</parameter>
@@ -21,7 +21,6 @@
 
         <service id="profiler.storage" class="%profiler.storage.class%">
             <argument>%profiler.storage.file%</argument>
-            <argument>null</argument>
             <argument>%profiler.storage.lifetime%</argument>
         </service>
 

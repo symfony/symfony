@@ -2,9 +2,10 @@
 
 namespace Symfony\Component\HttpKernel\Profiler;
 
+use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
-use Symfony\Component\HttpKernel\Profiler\ProfilerStorage;
-use Symfony\Component\HttpKernel\Profiler\DataCollector\DataCollectorInterface;
+use Symfony\Component\HttpKernel\Profiler\ProfilerStorageInterface;
+use Symfony\Component\HttpKernel\DataCollector\DataCollectorInterface;
 use Symfony\Component\HttpKernel\Log\LoggerInterface;
 
 /*
@@ -21,132 +22,193 @@ use Symfony\Component\HttpKernel\Log\LoggerInterface;
  *
  * @author     Fabien Potencier <fabien.potencier@symfony-project.com>
  */
-class Profiler implements \ArrayAccess
+class Profiler
 {
-    protected $profilerStorage;
+    protected $storage;
     protected $collectors;
-    protected $response;
     protected $logger;
     protected $enabled;
+    protected $token;
+    protected $data;
+    protected $ip;
+    protected $url;
+    protected $time;
+    protected $empty;
 
-    public function __construct(ProfilerStorage $profilerStorage, LoggerInterface $logger = null)
+    /**
+     * Constructor.
+     *
+     * @param ProfilerStorageInterface $storage A ProfilerStorageInterface instance
+     * @param LoggerInterface          $logger  A LoggerInterface instance
+     */
+    public function __construct(ProfilerStorageInterface $storage, LoggerInterface $logger = null)
     {
-        $this->profilerStorage = $profilerStorage;
+        $this->storage = $storage;
         $this->logger = $logger;
         $this->collectors = array();
         $this->enabled = true;
+        $this->empty = true;
     }
 
     /**
-     * Clones the Profiler instance.
+     * Disables the profiler.
      */
-    public function __clone()
-    {
-        $this->profilerStorage = clone $this->profilerStorage;
-    }
-
-    /**
-     * Returns a new Profiler for the given Response.
-     *
-     * @param Response $response A Response instance
-     *
-     * @return Profiler A new Profiler instance
-     */
-    public function load(Response $response)
-    {
-        if (!$token = $response->headers->get('X-Debug-Token')) {
-            return null;
-        }
-
-        return $this->getProfilerForToken($token);
-    }
-
-    /**
-     * Returns a new Profiler for the given token.
-     *
-     * @param string $token A token
-     *
-     * @return Profiler A new Profiler instance
-     */
-    public function getProfilerForToken($token)
-    {
-        $profiler = clone $this;
-        $profiler->profilerStorage->setToken($token);
-        $profiler->loadCollectorData();
-
-        return $profiler;
-    }
-
     public function disable()
     {
         $this->enabled = false;
     }
 
     /**
-     * Collects data for the given Response.
+     * Loads a Profiler for the given Response.
      *
      * @param Response $response A Response instance
+     *
+     * @return Profiler A new Profiler instance
      */
-    public function collect(Response $response)
+    public function loadFromResponse(Response $response)
+    {
+        if (!$token = $response->headers->get('X-Debug-Token')) {
+            return null;
+        }
+
+        return $this->loadFromToken($token);
+    }
+
+    /**
+     * Loads a Profiler for the given token.
+     *
+     * @param string $token A token
+     *
+     * @return Profiler A new Profiler instance
+     */
+    public function loadFromToken($token)
+    {
+        $profiler = new self($this->storage, $this->logger);
+        $profiler->setToken($token);
+
+        return $profiler;
+    }
+
+    /**
+     * Sets the token.
+     *
+     * @param string $token The token
+     */
+    public function setToken($token)
+    {
+        $this->token = $token;
+
+        if (false !== $items = $this->storage->read($token)) {
+            list($collectors, $this->ip, $this->url, $this->time) = $items;
+            $this->setCollectors($collectors);
+
+            $this->empty = false;
+        } else {
+            $this->empty = true;
+        }
+    }
+
+    /**
+     * Gets the token.
+     *
+     * @return string The token
+     */
+    public function getToken()
+    {
+        if (null === $this->token) {
+            $this->token = uniqid();
+        }
+
+        return $this->token;
+    }
+
+    /**
+     * Checks if the profiler is empty.
+     *
+     * @return Boolean Whether the profiler is empty or not
+     */
+    public function isEmpty()
+    {
+        return $this->empty;
+    }
+
+    /**
+     * Returns the IP.
+     *
+     * @return string The IP
+     */
+    public function getIp()
+    {
+        return $this->ip;
+    }
+
+    /**
+     * Returns the URL.
+     *
+     * @return string The URL
+     */
+    public function getUrl()
+    {
+        return $this->url;
+    }
+
+    /**
+     * Returns the time.
+     *
+     * @return string The time
+     */
+    public function getTime()
+    {
+        return $this->time;
+    }
+
+    /**
+     * Finds profiler tokens for the given criteria.
+     *
+     * @param string $ip    The IP
+     * @param string $url   The URL
+     * @param string $limit The maximum number of tokens to return
+     *
+     * @return array An array of tokens
+     */
+    public function find($ip, $url, $limit)
+    {
+        return $this->storage->find($ip, $url, $limit);
+    }
+
+    /**
+     * Collects data for the given Response.
+     *
+     * @param Request    $request   A Request instance
+     * @param Response   $response  A Response instance
+     * @param \Exception $exception An exception instance if the request threw one
+     */
+    public function collect(Request $request, Response $response, \Exception $exception = null)
     {
         if (false === $this->enabled) {
             return;
         }
 
-        $this->response = $response;
-        $this->response->headers->set('X-Debug-Token', $this->profilerStorage->getToken());
+        $response = $response;
+        $response->headers->set('X-Debug-Token', $this->getToken());
 
-        $data = array();
-        foreach ($this->collectors as $name => $collector) {
-            $collector->collect();
-
-            $data[$name] = $collector->getData();
+        foreach ($this->collectors as $collector) {
+            $collector->collect($request, $response, $exception);
         }
+
+        $this->ip   = $request->server->get('REMOTE_ADDR');
+        $this->url  = $request->getUri();
+        $this->time = time();
 
         try {
-            $this->profilerStorage->write($data);
-            $this->profilerStorage->purge();
+            $this->storage->write($this->token, $this->collectors, $this->ip, $this->url, $this->time);
+
+            $this->empty = false;
         } catch (\Exception $e) {
             if (null !== $this->logger) {
-                $this->logger->err('Unable to store the profiler information.');
+                $this->logger->err(sprintf('Unable to store the profiler information (%s).', $e->getMessage()));
             }
         }
-    }
-
-    /**
-     * Loads the data stored in the storage for all collectors.
-     */
-    public function loadCollectorData()
-    {
-        try {
-            foreach ($this->collectors as $name => $collector) {
-                $collector->setData($this->profilerStorage->getData($name));
-            }
-        } catch (\Exception $e) {
-            if (null !== $this->logger) {
-                $this->logger->err('Unable to read the profiler information.');
-            }
-        }
-    }
-
-    /**
-     * Gets the profiler storage.
-     *
-     * @return ProfilerStorage A ProfilerStorage instance
-     */
-    public function getProfilerStorage()
-    {
-        return $this->profilerStorage;
-    }
-
-    /**
-     * Gets the Response.
-     *
-     * @return Response A Response instance
-     */
-    public function getResponse()
-    {
-        return $this->response;
     }
 
     /**
@@ -208,54 +270,5 @@ class Profiler implements \ArrayAccess
         }
 
         return $this->collectors[$name];
-    }
-
-    /**
-     * Returns true if the named collector exists.
-     *
-     * @param string $name The collector name
-     *
-     * @return Boolean true if the collector exists, false otherwise
-     */
-    public function offsetExists($name)
-    {
-        return $this->hasCollector($name);
-    }
-
-    /**
-     * Gets a collector.
-     *
-     * @param string $name The collector name
-     *
-     * @throws \InvalidArgumentException if the collector does not exist
-     */
-    public function offsetGet($name)
-    {
-        return $this->getCollector($name);
-    }
-
-    /**
-     * Unimplemented.
-     *
-     * @param string       $name  The collector name
-     * @param string|array $value The collector
-     *
-     * @throws \LogicException
-     */
-    public function offsetSet($name, $value)
-    {
-        throw new \LogicException('A Collector cannot be set.');
-    }
-
-    /**
-     * Unimplemented.
-     *
-     * @param string $name The collector name
-     *
-     * @throws \LogicException
-     */
-    public function offsetUnset($name)
-    {
-        throw new \LogicException('A Collector cannot be removed.');
     }
 }

@@ -4,6 +4,7 @@ namespace Symfony\Bundle\ZendBundle\Logger;
 
 use Zend\Log\Logger as BaseLogger;
 use Symfony\Component\HttpKernel\Log\LoggerInterface;
+use Symfony\Component\HttpKernel\Log\DebugLoggerInterface;
 
 /*
  * This file is part of the Symfony framework.
@@ -21,6 +22,22 @@ use Symfony\Component\HttpKernel\Log\LoggerInterface;
  */
 class Logger extends BaseLogger implements LoggerInterface
 {
+    /**
+     * Returns a DebugLoggerInterface instance if one is registered with this logger.
+     *
+     * @return DebugLoggerInterface A DebugLoggerInterface instance or null if none is registered
+     */
+    public function getDebugLogger()
+    {
+        foreach ($this->_writers as $writer) {
+            if ($writer instanceof DebugLoggerInterface) {
+                return $writer;
+            }
+        }
+
+        return null;
+    }
+
     public function emerg($message)
     {
         return parent::log($message, 0);

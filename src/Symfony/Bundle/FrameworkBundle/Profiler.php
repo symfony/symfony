@@ -4,7 +4,7 @@ namespace Symfony\Bundle\FrameworkBundle;
 
 use Symfony\Component\DependencyInjection\ContainerInterface;
 use Symfony\Component\HttpKernel\Profiler\Profiler as BaseProfiler;
-use Symfony\Component\HttpKernel\Profiler\ProfilerStorage;
+use Symfony\Component\HttpKernel\Profiler\ProfilerStorageInterface;
 use Symfony\Component\HttpKernel\Log\LoggerInterface;
 
 /*
@@ -23,34 +23,12 @@ use Symfony\Component\HttpKernel\Log\LoggerInterface;
  */
 class Profiler extends BaseProfiler
 {
-    protected $container;
-
-    public function __construct(ContainerInterface $container, ProfilerStorage $profilerStorage, LoggerInterface $logger = null)
+    public function __construct(ContainerInterface $container, ProfilerStorageInterface $storage, LoggerInterface $logger = null)
     {
-        parent::__construct($profilerStorage, $logger);
+        parent::__construct($storage, $logger);
 
-        $this->container = $container;
-        $this->initCollectors();
-        $this->loadCollectorData();
-    }
-
-    protected function initCollectors()
-    {
-        $config = $this->container->findTaggedServiceIds('data_collector');
-        $ids = array();
-        $coreCollectors = array();
-        $userCollectors = array();
-        foreach ($config as $id => $attributes) {
-            $collector = $this->container->get($id);
-            $collector->setProfiler($this);
-
-            if (isset($attributes[0]['core']) && $attributes[0]['core']) {
-                $coreCollectors[$collector->getName()] = $collector;
-            } else {
-                $userCollectors[$collector->getName()] = $collector;
-            }
+        foreach ($container->findTaggedServiceIds('data_collector') as $id => $attributes) {
+            $this->addCollector($container->get($id));
         }
-
-        $this->setCollectors(array_merge($coreCollectors, $userCollectors));
     }
 }

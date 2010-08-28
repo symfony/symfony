@@ -2,10 +2,9 @@
 
 namespace Symfony\Bundle\FrameworkBundle\DataCollector;
 
-use Symfony\Component\HttpKernel\DataCollector\DataCollector;
-use Symfony\Framework\Kernel;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
+use Symfony\Component\HttpKernel\DataCollector\RequestDataCollector as BaseRequestDataCollector;
 
 /*
  * This file is part of the Symfony framework.
@@ -17,44 +16,29 @@ use Symfony\Component\HttpFoundation\Response;
  */
 
 /**
- * TimerDataCollector.
+ * RequestDataCollector.
  *
  * @author     Fabien Potencier <fabien.potencier@symfony-project.com>
  */
-class TimerDataCollector extends DataCollector
+class RequestDataCollector extends BaseRequestDataCollector
 {
-    protected $kernel;
-
-    public function __construct(Kernel $kernel)
-    {
-        $this->kernel = $kernel;
-    }
-
     /**
      * {@inheritdoc}
      */
     public function collect(Request $request, Response $response, \Exception $exception = null)
     {
-        $this->data = array(
-            'time' => microtime(true) - $this->kernel->getStartTime(),
-        );
+        parent::collect($request, $response, $exception);
+
+        $this->data['route'] = $request->attributes->get('_route');
     }
 
     /**
-     * Gets the request time.
+     * Gets the route.
      *
-     * @return integer The time
+     * @return string The route
      */
-    public function getTime()
+    public function getRoute()
     {
-        return $this->data['time'];
-    }
-
-    /**
-     * {@inheritdoc}
-     */
-    public function getName()
-    {
-        return 'timer';
+        return $this->data['route'];
     }
 }

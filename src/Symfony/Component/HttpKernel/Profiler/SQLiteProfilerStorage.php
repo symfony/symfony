@@ -2,6 +2,8 @@
 
 namespace Symfony\Component\HttpKernel\Profiler;
 
+use Symfony\Component\HttpKernel\DataCollector\DataCollectorInterface;
+
 /*
  * This file is part of the Symfony framework.
  *
@@ -12,77 +14,99 @@ namespace Symfony\Component\HttpKernel\Profiler;
  */
 
 /**
- * ProfilerStorage.
+ * SQLiteProfilerStorage stores profiling information in a SQLite database.
  *
  * @author     Fabien Potencier <fabien.potencier@symfony-project.com>
  */
-class ProfilerStorage
+class SQLiteProfilerStorage implements ProfilerStorageInterface
 {
-    protected $token;
-    protected $data;
     protected $store;
     protected $lifetime;
 
-    public function __construct($store, $token = null, $lifetime = 86400)
+    /**
+     * Constructor.
+     *
+     * @param string  $store    The path to the SQLite DB
+     * @param integer $lifetime The lifetime to use for the purge
+     */
+    public function __construct($store, $lifetime = 86400)
     {
         $this->store = $store;
-        $this->token = null === $token ? uniqid() : $token;
-        $this->data = null;
         $this->lifetime = (int) $lifetime;
     }
 
-    public function hasData()
+    /**
+     * {@inheritdoc}
+     */
+    public function find($ip, $url, $limit)
     {
-        return null !== $this->data;
-    }
+        $criteria = array();
 
-    public function getData($name = null)
-    {
-        if (null === $this->data) {
-            $this->data = $this->read();
+        if ($ip = preg_replace('/[^\d\.]/', '', $ip)) {
+            $criteria[] = ' ip LIKE "%'.$ip.'%"';
         }
 
-        if (null === $name) {
-            return $this->data;
+        if ($url) {
+            $criteria[] = ' url LIKE "%'.$url.'%"';
         }
 
-        return isset($this->data[$name]) ? $this->data[$name] : array();
+        $criteria = $criteria ? 'WHERE '.implode(' AND ', $criteria) : '';
+
+        $db = $this->initDb();
+        $tokens = $this->fetch($db, 'SELECT token, ip, url, time FROM data '.$criteria.' ORDER BY time DESC LIMIT '.((integer) $limit));
+        $this->close($db);
+
+        return $tokens;
     }
 
-    public function setToken($token)
-    {
-        $this->token = $token;
-        $this->data = null;
-    }
-
-    public function getToken()
-    {
-        return $this->token;
-    }
-
-    protected function read()
+    /**
+     * {@inheritdoc}
+     */
+    public function read($token)
     {
         $db = $this->initDb();
-        $args = array(':token' => $this->token);
-        $data = $this->fetch($db, 'SELECT data FROM data WHERE token = :token ORDER BY created_at DESC LIMIT 1', $args);
+        $args = array(':token' => $token);
+        $data = $this->fetch($db, 'SELECT data, ip, url, time FROM data WHERE token = :token ORDER BY time DESC LIMIT 1', $args);
         $this->close($db);
         if (isset($data[0]['data'])) {
-            return unserialize(pack('H*', $data[0]['data']));
+            return array(unserialize(pack('H*', $data[0]['data'])), $data[0]['ip'], $data[0]['url'], $data[0]['time']);
+        } else {
+            return false;
         }
     }
 
-    public function write($data)
+    /**
+     * {@inheritdoc}
+     */
+    public function write($token, $collectors, $ip, $url, $time)
     {
-        $unpack = unpack('H*', serialize($data));
+        $unpack = unpack('H*', serialize($collectors));
         $data = $unpack[1];
 
         $db = $this->initDb();
         $args = array(
-            ':token' => $this->token,
-            ':data' => (string) $data,
-            ':time' => time()
+            ':token' => $token,
+            ':data'  => $data,
+            ':ip'    => $ip,
+            ':url'   => $url,
+            ':time'  => $time,
         );
-        $this->exec($db, 'INSERT INTO data (token, data, created_at) VALUES (:token, :data, :time)', $args);
+        $this->exec($db, 'INSERT INTO data (token, data, ip, url, time) VALUES (:token, :data, :ip, :url, :time)', $args);
+        $this->purge();
+        $this->close($db);
+    }
+
+    public function purge($all = false)
+    {
+        $db = $this->initDb();
+
+        if (true === $all) {
+            $this->exec($db, 'DELETE FROM data');
+        } else {
+            $args = array(':time' => time() - $this->lifetime);
+            $this->exec($db, 'DELETE FROM data WHERE time < :time', $args);
+        }
+
         $this->close($db);
     }
 
@@ -99,8 +123,8 @@ class ProfilerStorage
             throw new \RuntimeException('You need to enable either the SQLite or PDO_SQLite extension for the profiler to run properly.');
         }
 
-        $db->exec('CREATE TABLE IF NOT EXISTS data (token STRING, data STRING, created_at INTEGER)');
-        $db->exec('CREATE INDEX IF NOT EXISTS data_data ON data (created_at)');
+        $db->exec('CREATE TABLE IF NOT EXISTS data (token STRING, data STRING, ip STRING, url STRING, time INTEGER)');
+        $db->exec('CREATE INDEX IF NOT EXISTS data_data ON data (time)');
 
         return $db;
     }
@@ -154,13 +178,5 @@ class ProfilerStorage
         if ($db instanceof \SQLite3) {
             $db->close();
         }
-    }
-
-    public function purge()
-    {
-        $db = $this->initDb();
-        $args = array(':time' => time() - $this->lifetime);
-        $this->exec($db, 'DELETE FROM data WHERE created_at < :time', $args);
-        $this->close($db);
     }
 }

@@ -1,6 +1,6 @@
 <?php
 
-namespace Symfony\Component\HttpKernel\Profiler\DataCollector;
+namespace Symfony\Component\HttpKernel\DataCollector;
 
 use Symfony\Component\HttpKernel\Profiler\Profiler;
 
@@ -16,25 +16,21 @@ use Symfony\Component\HttpKernel\Profiler\Profiler;
 /**
  * DataCollector.
  *
+ * Children of this class must store the collected data in the data property.
+ *
  * @author     Fabien Potencier <fabien.potencier@symfony-project.com>
  */
-abstract class DataCollector implements DataCollectorInterface
+abstract class DataCollector implements DataCollectorInterface, \Serializable
 {
-    protected $profiler;
     protected $data;
 
-    public function getData()
+    public function serialize()
     {
-        return $this->data;
+        return serialize($this->data);
     }
 
-    public function setData($data)
+    public function unserialize($data)
     {
-        $this->data = $data;
-    }
-
-    public function setProfiler(Profiler $profiler)
-    {
-        $this->profiler = $profiler;
+        $this->data = unserialize($data);
     }
 }

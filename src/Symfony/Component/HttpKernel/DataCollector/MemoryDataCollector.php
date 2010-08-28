@@ -1,11 +1,9 @@
 <?php
 
-namespace Symfony\Bundle\DoctrineBundle\DataCollector;
+namespace Symfony\Component\HttpKernel\DataCollector;
 
-use Symfony\Component\HttpKernel\DataCollector\DataCollector;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
-use Symfony\Bundle\DoctrineBundle\Logger\DbalLogger;
 
 /*
  * This file is part of the Symfony framework.
@@ -17,37 +15,30 @@ use Symfony\Bundle\DoctrineBundle\Logger\DbalLogger;
  */
 
 /**
- * DoctrineDataCollector.
+ * MemoryDataCollector.
  *
  * @author     Fabien Potencier <fabien.potencier@symfony-project.com>
  */
-class DoctrineDataCollector extends DataCollector
+class MemoryDataCollector extends DataCollector
 {
-    protected $logger;
-
-    public function __construct(DbalLogger $logger = null)
-    {
-        $this->logger = $logger;
-    }
-
     /**
      * {@inheritdoc}
      */
     public function collect(Request $request, Response $response, \Exception $exception = null)
     {
         $this->data = array(
-            'queries' => null !== $this->logger ? $this->logger->queries : array(),
+            'memory' => memory_get_peak_usage(true),
         );
     }
 
-    public function getQueryCount()
+    /**
+     * Gets the memory.
+     *
+     * @return integer The memory
+     */
+    public function getMemory()
     {
-        return count($this->data['queries']);
-    }
-
-    public function getQueries()
-    {
-        return $this->data['queries'];
+        return $this->data['memory'];
     }
 
     /**
@@ -55,6 +46,6 @@ class DoctrineDataCollector extends DataCollector
      */
     public function getName()
     {
-        return 'db';
+        return 'memory';
     }
 }

@@ -31,10 +31,6 @@ class WebExtensionTest extends TestCase
 
         $loader->configLoad(array('profiler' => true), $container);
         $this->assertEquals('Symfony\\Bundle\\FrameworkBundle\\Profiler', $container->getParameter('profiler.class'), '->configLoad() loads the collectors.xml file if not already loaded');
-        $this->assertFalse($container->getParameterBag()->has('debug.toolbar.class'), '->configLoad() does not load the toolbar.xml file');
-
-        $loader->configLoad(array('toolbar' => true), $container);
-        $this->assertEquals('Symfony\\Component\\HttpKernel\\Profiler\\WebDebugToolbarListener', $container->getParameter('debug.toolbar.class'), '->configLoad() loads the collectors.xml file if the toolbar option is given');
     }
 
     public function testTemplatingLoad()

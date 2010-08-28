@@ -2,7 +2,7 @@
 
 namespace Symfony\Framework\Bundle;
 
-use Symfony\Component\DependencyInjection\ContainerInterface;
+use Symfony\Component\DependencyInjection\ContainerAware;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\DependencyInjection\ParameterBag\ParameterBagInterface;
 use Symfony\Component\Console\Application;
@@ -22,23 +22,12 @@ use Symfony\Component\Finder\Finder;
  *
  * @author     Fabien Potencier <fabien.potencier@symfony-project.com>
  */
-abstract class Bundle implements BundleInterface
+abstract class Bundle extends ContainerAware implements BundleInterface
 {
-    protected $container;
     protected $name;
     protected $namespacePrefix;
     protected $path;
     protected $reflection;
-
-    /**
-     * Sets the Container associated with this bundle.
-     *
-     * @param ContainerInterface $container A ContainerInterface instance
-     */
-    public function setContainer(ContainerInterface $container = null)
-    {
-        $this->container = $container;
-    }
 
     /**
      * Boots the Bundle.

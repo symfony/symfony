@@ -2,8 +2,6 @@
 
 namespace Symfony\Framework\Bundle;
 
-use Symfony\Component\DependencyInjection\ContainerInterface;
-
 /*
  * This file is part of the Symfony framework.
  *
@@ -29,11 +27,4 @@ interface BundleInterface
      * Shutdowns the Bundle.
      */
     public function shutdown();
-
-    /**
-     * Sets the Container associated with this bundle.
-     *
-     * @param ContainerInterface $container A ContainerInterface instance
-     */
-    public function setContainer(ContainerInterface $container);
 }

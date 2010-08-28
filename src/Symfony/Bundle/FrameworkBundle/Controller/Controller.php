@@ -3,6 +3,7 @@
 namespace Symfony\Bundle\FrameworkBundle\Controller;
 
 use Symfony\Component\HttpFoundation\Response;
+use Symfony\Component\DependencyInjection\ContainerAware;
 
 /*
  * This file is part of the Symfony framework.
@@ -14,11 +15,14 @@ use Symfony\Component\HttpFoundation\Response;
  */
 
 /**
- * FrameworkBundle Controller gives you convenient access to all commonly needed services.
+ * Controller is a simple implementation of a Controller.
+ *
+ * It provides methods to common features needed in controllers
+ * and an array access to the container services.
  *
  * @author     Fabien Potencier <fabien.potencier@symfony-project.com>
  */
-class Controller extends BaseController implements \ArrayAccess
+class Controller extends ContainerAware implements \ArrayAccess
 {
     /**
      * Creates a Response instance.

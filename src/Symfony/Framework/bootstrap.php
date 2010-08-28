@@ -1,18 +1,15 @@
 <?php
 namespace Symfony\Framework\Bundle;
-use Symfony\Component\DependencyInjection\ContainerInterface;
+use Symfony\Component\DependencyInjection\ContainerAware;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\DependencyInjection\ParameterBag\ParameterBagInterface;
 use Symfony\Component\Console\Application;
 use Symfony\Component\Finder\Finder;
-abstract class Bundle implements BundleInterface {
-    protected $container;
+abstract class Bundle extends ContainerAware implements BundleInterface {
     protected $name;
     protected $namespacePrefix;
     protected $path;
     protected $reflection;
-    public function setContainer(ContainerInterface $container = null) {
-        $this->container = $container; }
     public function boot() { }
     public function shutdown() { }
     public function getName() {
@@ -58,11 +55,9 @@ abstract class Bundle implements BundleInterface {
         $this->reflection = new \ReflectionObject($this);
         $this->path = dirname($this->reflection->getFilename()); } }
 namespace Symfony\Framework\Bundle;
-use Symfony\Component\DependencyInjection\ContainerInterface;
 interface BundleInterface {
     public function boot();
-    public function shutdown();
-    public function setContainer(ContainerInterface $container); }
+    public function shutdown(); }
 namespace Symfony\Framework;
 use Symfony\Framework\Bundle\Bundle;
 class KernelBundle extends Bundle {

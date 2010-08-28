@@ -9,7 +9,7 @@ use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\EventDispatcher\Event;
 use Symfony\Component\DependencyInjection\ContainerInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\ControllerNameConverter;
-use Symfony\Bundle\FrameworkBundle\Controller\ControllerInterface;
+use Symfony\Component\DependencyInjection\ContainerAwareInterface;
 
 /*
  * This file is part of the Symfony framework.
@@ -68,7 +68,7 @@ class ControllerResolver extends BaseControllerResolver
         }
 
         $controller = new $class();
-        if ($controller instanceof ControllerInterface) {
+        if ($controller instanceof ContainerAwareInterface) {
             $controller->setContainer($this->container);
         }
 

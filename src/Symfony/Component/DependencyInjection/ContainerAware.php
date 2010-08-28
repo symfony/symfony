@@ -1,8 +1,6 @@
 <?php
 
-namespace Symfony\Bundle\FrameworkBundle\Controller;
-
-use Symfony\Component\DependencyInjection\ContainerInterface;
+namespace Symfony\Component\DependencyInjection;
 
 /*
  * This file is part of the Symfony framework.
@@ -14,11 +12,11 @@ use Symfony\Component\DependencyInjection\ContainerInterface;
  */
 
 /**
- * FrameworkBundle Controller gives you convenient access to all commonly needed services.
+ * A simple implementation of ContainerAwareInterface.
  *
  * @author     Fabien Potencier <fabien.potencier@symfony-project.com>
  */
-class BaseController implements ControllerInterface
+class ContainerAware implements ContainerAwareInterface
 {
     protected $container;
 
@@ -27,7 +25,7 @@ class BaseController implements ControllerInterface
      *
      * @param ContainerInterface $container A ContainerInterface instance
      */
-    public function setContainer(ContainerInterface $container)
+    public function setContainer(ContainerInterface $container = null)
     {
         $this->container = $container;
     }

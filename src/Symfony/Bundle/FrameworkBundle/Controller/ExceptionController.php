@@ -24,11 +24,13 @@ class ExceptionController extends Controller
     /**
      * Converts an Exception to a Response.
      *
-     * @param ExceptionManager $manager An ExceptionManager instance
+     * @param ExceptionManager $manager  An ExceptionManager instance
+     * @param string           $format   The format to use for rendering (html, xml, ...)
+     * @param Boolean          $embedded Whether the rendered Response will be embedded or not
      *
      * @throws \InvalidArgumentException When the exception template does not exist
      */
-    public function exceptionAction(ExceptionManager $manager, $format)
+    public function exceptionAction(ExceptionManager $manager, $format, $embedded = false)
     {
         $this['request']->setRequestFormat($format);
 
@@ -43,6 +45,7 @@ class ExceptionController extends Controller
                 'manager'        => $manager,
                 'managers'       => $manager->getLinkedManagers(),
                 'currentContent' => $currentContent,
+                'embedded'       => $embedded,
             )
         );
         $response->setStatusCode($manager->getStatusCode());

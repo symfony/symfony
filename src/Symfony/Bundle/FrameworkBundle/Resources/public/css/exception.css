@@ -1,0 +1,36 @@
+/*
+Copyright (c) 2010, Yahoo! Inc. All rights reserved.
+Code licensed under the BSD License:
+http://developer.yahoo.com/yui/license.html
+version: 3.1.2
+build: 56
+*/
+.sf-exceptionreset html{color:#000;background:#FFF;}.sf-exceptionreset body,.sf-exceptionreset div,.sf-exceptionreset dl,.sf-exceptionreset dt,.sf-exceptionreset dd,.sf-exceptionreset ul,.sf-exceptionreset ol,.sf-exceptionreset li,.sf-exceptionreset h1,.sf-exceptionreset h2,.sf-exceptionreset h3,.sf-exceptionreset h4,.sf-exceptionreset h5,.sf-exceptionreset h6,.sf-exceptionreset pre,.sf-exceptionreset code,.sf-exceptionreset form,.sf-exceptionreset fieldset,.sf-exceptionreset legend,.sf-exceptionreset input,.sf-exceptionreset textarea,.sf-exceptionreset p,.sf-exceptionreset blockquote,.sf-exceptionreset th,.sf-exceptionreset td{margin:0;padding:0;}.sf-exceptionreset table{border-collapse:collapse;border-spacing:0;}.sf-exceptionreset fieldset,.sf-exceptionreset img{border:0;}.sf-exceptionreset address,.sf-exceptionreset caption,.sf-exceptionreset cite,.sf-exceptionreset code,.sf-exceptionreset dfn,.sf-exceptionreset em,.sf-exceptionreset strong,.sf-exceptionreset th,.sf-exceptionreset var{font-style:normal;font-weight:normal;}.sf-exceptionreset li{list-style:none;}.sf-exceptionreset caption,.sf-exceptionreset th{text-align:left;}.sf-exceptionreset h1,.sf-exceptionreset h2,.sf-exceptionreset h3,.sf-exceptionreset h4,.sf-exceptionreset h5,.sf-exceptionreset h6{font-size:100%;font-weight:normal;}.sf-exceptionreset q:before,.sf-exceptionreset q:after{content:'';}.sf-exceptionreset abbr,.sf-exceptionreset acronym{border:0;font-variant:normal;}.sf-exceptionreset sup{vertical-align:text-top;}.sf-exceptionreset sub{vertical-align:text-bottom;}.sf-exceptionreset input,.sf-exceptionreset textarea,.sf-exceptionreset select{font-family:inherit;font-size:inherit;font-weight:inherit;}.sf-exceptionreset input,.sf-exceptionreset textarea,.sf-exceptionreset select{*font-size:100%;}.sf-exceptionreset legend{color:#000;}
+
+.sf-exceptionreset strong { font-weight: bold }
+.sf-exceptionreset em { font-style: italic }
+.sf-exceptionreset a { color: #333 }
+.sf-exceptionreset abbr { border-bottom: 1px dotted #000000; cursor: help }
+.sf-exceptionreset h1 { font-size: 170%; letter-spacing: -0.03em; }
+.sf-exceptionreset h2 { margin-top: 4px; font-size: 90%; letter-spacing: -0.02em; }
+.sf-exceptionreset h3 { font-size: 130%; font-weight: bold; letter-spacing: -0.02em; }
+.sf-exceptionreset h3 span { float: right; font-size: 80%; background: #eee; color: #333; padding: 5px; -moz-border-radius: 5px; -webkit-border-radius: 5px; border-radius: 5px; }
+.sf-exceptionreset ul { padding-left: 20px }
+.sf-exceptionreset ul li { padding-bottom: 5px; list-style: decimal }
+.sf-exceptionreset ol { font-family: monospace; white-space: pre; padding: 10px 0 }
+.sf-exceptionreset ol li { margin: -5px; list-style: decimal; list-style-position: inside }
+.sf-exceptionreset ol .selected { font-weight: bold; background-color: #ffd; padding: 2px 0 }
+.sf-exceptionreset p.error { padding: 10px; background-color: #f00; font-weight: bold; text-align: center; -moz-border-radius: 10px; -webkit-border-radius: 10px; border-radius: 10px; }
+.sf-exceptionreset p.error a { color: #fff }
+.sf-exceptionreset .block { padding: 20px 25px; margin-bottom: 10px; border: 1px solid #ddd; background-color: #fff; text-align:left; -moz-border-radius: 10px; -webkit-border-radius: 10px; border-radius: 10px; min-width: 770px; max-width: 770px }
+.sf-exceptionreset .traces { display: none; margin-top: 10px }
+.sf-exceptionreset #message { margin-top: 30px; margin-bottom: 10px; padding: 20px 25px; border: 1px solid #ddd; text-align:left; background-color: #c8e8f3; -moz-border-radius: 10px; -webkit-border-radius: 10px; border-radius: 10px; min-width: 770px; max-width: 770px }
+.sf-exceptionreset #content { border: 1px solid #ddd; margin-top: 10px; padding: 7px; overflow: auto; }
+.sf-exceptionreset a.file_link { text-decoration: none; }
+.sf-exceptionreset a.file_link:hover { text-decoration: underline; }
+.sf-exceptionreset .code { overflow: auto; }
+.sf-exceptionreset img { vertical-align: middle; }
+.sf-exceptionreset .error { background-color: #f66 }
+.sf-exceptionreset .linked ul, .sf-exceptionreset .linked li { padding-left: 0; display: inline }
+.sf-exceptionreset .linked li { padding-right: 7px }
+.sf-exceptionreset #logs { margin-top: 10px }

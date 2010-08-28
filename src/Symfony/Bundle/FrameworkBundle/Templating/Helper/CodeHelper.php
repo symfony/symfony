@@ -162,12 +162,21 @@ class CodeHelper extends Helper
         }
 
         if (!$this->fileLinkFormat) {
-            return $file;
+            return "$file line $line";
         }
 
         $link = strtr($this->fileLinkFormat, array('%f' => $file, '%l' => $line));
 
-        return sprintf('<a href="%s" title="Click to open this file" class="file_link">%s</a>', $link, $file);
+        return sprintf('<a href="%s" title="Click to open this file" class="file_link">%s line %s</a>', $link, $file, $line);
+    }
+
+    public function formatFileFromText($text)
+    {
+        $that = $this;
+
+        return preg_replace_callback('/(called|defined) in (.*?)(?: on)? line (\d+)/', function ($match) use ($that) {
+            return $match[1].' in '.$that->formatFile($match[2], $match[3]);
+        }, $text);
     }
 
     /**

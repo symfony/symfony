@@ -45,21 +45,21 @@ class CodeHelper extends Helper
     public function formatArgsAsText($args)
     {
         $result = array();
-        foreach ($args as $key => $value) {
-            if (is_object($value)) {
-                $formattedValue = sprintf("object('%s')", get_class($value));
-            } elseif (is_array($value)) {
-                $formattedValue = sprintf("array(%s)", $this->formatArgs($value));
-            } elseif (is_string($value)) {
-                $formattedValue = sprintf("'%s'", $value);
-            } elseif (null === $value) {
+        foreach ($args as $key => $item) {
+            if ('object' === $item[0]) {
+                $formattedValue = sprintf("object(%s)", $item[1]);
+            } elseif ('array' === $item[0]) {
+                $formattedValue = sprintf("array(%s)", $this->formatArgsAsText($item[1]));
+            } elseif ('string'  === $item[0]) {
+                $formattedValue = sprintf("'%s'", $item[1]);
+            } elseif ('null' === $item[0]) {
                 $formattedValue = 'null';
-            } elseif (false === $value) {
-                $formattedValue = 'false';
-            } elseif (true === $value) {
-                $formattedValue = 'true';
+            } elseif ('boolean' === $item[0]) {
+                $formattedValue = strtolower(var_export($item[1], true));
+            } elseif ('resource' === $item[0]) {
+                $formattedValue = 'resource';
             } else {
-                $formattedValue = $value;
+                $formattedValue = str_replace("\n", '', var_export((string) $item[1], true));
             }
 
             $result[] = is_int($key) ? $formattedValue : sprintf("'%s' => %s", $key, $formattedValue);
@@ -96,24 +96,23 @@ class CodeHelper extends Helper
     public function formatArgs($args)
     {
         $result = array();
-        foreach ($args as $key => $value) {
-            if (is_object($value)) {
-                $class = get_class($value);
-                $parts = explode('\\', $class);
+        foreach ($args as $key => $item) {
+            if ('object' === $item[0]) {
+                $parts = explode('\\', $item[1]);
                 $short = array_pop($parts);
-                $formattedValue = sprintf("<em>object</em>(<abbr title=\"%s\">%s</abbr>)", $class, $short);
-            } elseif (is_array($value)) {
-                $formattedValue = sprintf("<em>array</em>(%s)", $this->formatArgs($value));
-            } elseif (is_string($value)) {
-                $formattedValue = sprintf("'%s'", $value);
-            } elseif (null === $value) {
+                $formattedValue = sprintf("<em>object</em>(<abbr title=\"%s\">%s</abbr>)", $item[1], $short);
+            } elseif ('array' === $item[0]) {
+                $formattedValue = sprintf("<em>array</em>(%s)", $this->formatArgs($item[1]));
+            } elseif ('string'  === $item[0]) {
+                $formattedValue = sprintf("'%s'", $item[1]);
+            } elseif ('null' === $item[0]) {
                 $formattedValue = '<em>null</em>';
-            } elseif (false === $value) {
-                $formattedValue = '<em>false</em>';
-            } elseif (true === $value) {
-                $formattedValue = '<em>true</em>';
+            } elseif ('boolean' === $item[0]) {
+                $formattedValue = '<em>'.strtolower(var_export($item[1], true)).'</em>';
+            } elseif ('resource' === $item[0]) {
+                $formattedValue = '<em>resource</em>';
             } else {
-                $formattedValue = $value;
+                $formattedValue = str_replace("\n", '', var_export((string) $item[1], true));
             }
 
             $result[] = is_int($key) ? $formattedValue : sprintf("'%s' => %s", $key, $formattedValue);

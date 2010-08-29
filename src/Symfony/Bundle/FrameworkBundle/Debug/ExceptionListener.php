@@ -7,6 +7,7 @@ use Symfony\Component\EventDispatcher\EventDispatcher;
 use Symfony\Component\EventDispatcher\Event;
 use Symfony\Component\HttpKernel\Log\LoggerInterface;
 use Symfony\Component\HttpKernel\HttpKernelInterface;
+use Symfony\Component\HttpKernel\Exception\FlattenException;
 use Symfony\Component\HttpFoundation\Request;
 
 /*
@@ -62,12 +63,12 @@ class ExceptionListener
             error_log(sprintf('Uncaught PHP Exception %s: "%s" at %s line %s', get_class($exception), $exception->getMessage(), $exception->getFile(), $exception->getLine()));
         }
 
-        $class = $this->container->getParameter('exception_manager.class');
-        $logger = $this->container->has('logger.debug') ? $this->container->get('logger.debug') : null;
+        $logger = $this->container->has('logger') ? $this->container->get('logger')->getDebugLogger() : null;
 
         $attributes = array(
             '_controller' => $this->controller,
-            'manager'     => new $class($exception, $logger),
+            'exception'   => FlattenException::create($exception),
+            'logger'      => $logger,
             // when using CLI, we force the format to be TXT
             'format'      => 0 === strncasecmp(PHP_SAPI, 'cli', 3) ? 'txt' : $request->getRequestFormat(),
         );

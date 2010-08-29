@@ -1,3 +1,3 @@
 /*
-<?php echo $manager->getStatusCode().' '.$manager->getStatusText()."\n" ?>
+<?php echo $exception->getStatusCode().' '.$exception->getStatusText()."\n" ?>
 */

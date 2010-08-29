@@ -4,6 +4,7 @@ namespace Symfony\Component\HttpKernel\DataCollector;
 
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
+use Symfony\Component\HttpKernel\Exception\FlattenException;
 
 /*
  * This file is part of the Symfony framework.
@@ -28,7 +29,7 @@ class ExceptionDataCollector extends DataCollector
     {
         if (null !== $exception) {
             $this->data = array(
-                'exception' => $exception,
+                'exception' => FlattenException::create($exception),
             );
         }
     }

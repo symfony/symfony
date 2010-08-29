@@ -1,1 +1,1 @@
-<?php echo $view->render('FrameworkBundle:Exception:error.xml', array('manager' => $manager)) ?>
+<?php echo $view->render('FrameworkBundle:Exception:error.xml', array('exception' => $exception)) ?>

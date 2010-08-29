@@ -2,22 +2,22 @@
 
 $vars = array(
     'error'       => array(
-        'code'      => $manager->getStatusCode(),
-        'message'   => $manager->getName(),
+        'code'      => $exception->getStatusCode(),
+        'message'   => $exception->getMessage(),
         'exception' => array(
-            'name'    => $manager->getName(),
-            'message' => $manager->getMessage(),
-            'traces'  => $manager->getTraces(),
+            'name'    => $exception->getClass(),
+            'message' => $exception->getMessage(),
+            'trace'   => $exception->getTrace(),
         ),
 ));
 
-if (count($managers)) {
+if (count($exception->getPreviouses())) {
     $vars['exceptions'] = array();
-    foreach ($managers as $i => $previous) {
+    foreach ($exception->getPreviouses() as $i => $previous) {
         $vars['exceptions'][] = array(
-            'name'    => $previous->getName(),
+            'name'    => $previous->getClass(),
             'message' => $previous->getMessage(),
-            'traces'  => $previous->getTraces(),
+            'trace'   => $previous->getTrace(),
         );
     }
 }

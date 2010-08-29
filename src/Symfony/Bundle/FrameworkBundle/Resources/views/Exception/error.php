@@ -6,7 +6,7 @@
     </head>
     <body>
         <h1>Oops! An Error Occurred</h1>
-        <h2>The server returned a "<?php echo $manager->getStatusCode() ?> <?php echo $manager->getStatusText() ?>".</h2>
+        <h2>The server returned a "<?php echo $exception->getStatusCode() ?> <?php echo $exception->getStatusText() ?>".</h2>
 
         <div>
             Something is broken. Please e-mail us at [email] and let us know

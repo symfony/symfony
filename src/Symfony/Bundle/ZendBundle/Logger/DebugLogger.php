@@ -32,6 +32,21 @@ class DebugLogger extends AbstractWriter implements DebugLoggerInterface
     }
 
     /**
+     * {@inheritdoc}
+     */
+    public function countErrors()
+    {
+        $count = 0;
+        foreach ($this->getLogs() as $log) {
+            if ('ERR' === $log['priorityName']) {
+                ++$count;
+            }
+        }
+
+        return $count;
+    }
+
+    /**
      * Write a message to the log.
      *
      * @param array $event Event data

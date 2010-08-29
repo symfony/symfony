@@ -1,5 +1,5 @@
 <traces>
-<?php foreach ($manager->getTraces() as $i => $trace): ?>
+<?php foreach ($exception->getTrace() as $i => $trace): ?>
         <trace>
         <?php echo $view->render('FrameworkBundle:Exception:trace.txt', array('i' => $i, 'trace' => $trace)) ?>
 

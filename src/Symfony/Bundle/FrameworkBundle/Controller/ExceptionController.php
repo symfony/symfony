@@ -3,7 +3,9 @@
 namespace Symfony\Bundle\FrameworkBundle\Controller;
 
 use Symfony\Bundle\FrameworkBundle\Controller\Controller;
-use Symfony\Bundle\FrameworkBundle\Debug\ExceptionManager;
+use Symfony\Component\HttpKernel\Exception\FlattenException;
+use Symfony\Component\HttpKernel\Log\DebugLoggerInterface;
+use Symfony\Component\OutputEscaper\SafeDecorator;
 
 /*
  * This file is part of the Symfony framework.
@@ -24,13 +26,14 @@ class ExceptionController extends Controller
     /**
      * Converts an Exception to a Response.
      *
-     * @param ExceptionManager $manager  An ExceptionManager instance
-     * @param string           $format   The format to use for rendering (html, xml, ...)
-     * @param Boolean          $embedded Whether the rendered Response will be embedded or not
+     * @param FlattenException     $exception A FlattenException instance
+     * @param DebugLoggerInterface $logger    A DebugLoggerInterface instance
+     * @param string               $format    The format to use for rendering (html, xml, ...)
+     * @param Boolean              $embedded  Whether the rendered Response will be embedded or not
      *
      * @throws \InvalidArgumentException When the exception template does not exist
      */
-    public function exceptionAction(ExceptionManager $manager, $format, $embedded = false)
+    public function exceptionAction(FlattenException $exception, DebugLoggerInterface $logger, $format, $embedded = false)
     {
         $this['request']->setRequestFormat($format);
 
@@ -42,13 +45,13 @@ class ExceptionController extends Controller
         $response = $this->render(
             'FrameworkBundle:Exception:'.($this['kernel']->isDebug() ? 'exception' : 'error'),
             array(
-                'manager'        => $manager,
-                'managers'       => $manager->getLinkedManagers(),
+                'exception'      => new SafeDecorator($exception),
+                'logger'         => $logger,
                 'currentContent' => $currentContent,
                 'embedded'       => $embedded,
             )
         );
-        $response->setStatusCode($manager->getStatusCode());
+        $response->setStatusCode($exception->getStatusCode());
 
         return $response;
     }

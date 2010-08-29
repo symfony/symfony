@@ -21,7 +21,6 @@ use Symfony\Component\HttpFoundation\SessionStorage\SessionStorageInterface;
 class Session implements \Serializable
 {
     protected $storage;
-    protected $locale;
     protected $attributes;
     protected $oldFlashes;
     protected $started;
@@ -171,7 +170,7 @@ class Session implements \Serializable
             $this->start();
         }
 
-        return $this->getAttribute('_locale');
+        return $this->attributes['_locale'];
     }
 
     /**
@@ -181,9 +180,11 @@ class Session implements \Serializable
      */
     public function setLocale($locale)
     {
-        if ($this->locale != $locale) {
-            $this->setAttribute('_locale', $locale);
+        if (false === $this->started) {
+            $this->start();
         }
+
+        $this->attributes['_locale'] = $locale;
     }
 
     public function getFlashMessages()

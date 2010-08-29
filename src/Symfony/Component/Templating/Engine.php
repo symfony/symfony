@@ -124,6 +124,28 @@ class Engine implements \ArrayAccess
     }
 
     /**
+     * Returns true if the template exists.
+     *
+     * @param string $name A template name
+     *
+     * @return Boolean true if the template exists, false otherwise
+     */
+    public function exists($name)
+    {
+        list($tpl, $options) = $this->splitTemplateName($name);
+
+        $template = $this->loader->load($tpl, $options);
+
+        if (false === $template) {
+            return false;
+        }
+
+        $this->cache[$name] = array($tpl, $options, $template);
+
+        return true;
+    }
+
+    /**
      * Outputs a rendered template.
      *
      * @param string $name       A template name

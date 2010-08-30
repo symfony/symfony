@@ -82,7 +82,8 @@ class ExceptionListener
                 $this->logger->err(sprintf('Exception thrown when handling an exception (%s: %s)', get_class($e), $e->getMessage()));
             }
 
-            return false;
+            // re-throw the exception as this is a catch-all
+            throw new \RuntimeException(sprintf('Exception thrown when handling an exception.', 0, $e));
         }
 
         $event->setReturnValue($response);

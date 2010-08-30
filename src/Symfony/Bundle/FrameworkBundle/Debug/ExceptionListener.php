@@ -83,7 +83,7 @@ class ExceptionListener
             }
 
             // re-throw the exception as this is a catch-all
-            throw new \RuntimeException(sprintf('Exception thrown when handling an exception.', 0, $e));
+            throw new \RuntimeException('Exception thrown when handling an exception.', 0, $e);
         }
 
         $event->setReturnValue($response);

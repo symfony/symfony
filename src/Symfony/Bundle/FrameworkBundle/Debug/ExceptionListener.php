@@ -6,6 +6,7 @@ use Symfony\Component\DependencyInjection\ContainerInterface;
 use Symfony\Component\EventDispatcher\EventDispatcher;
 use Symfony\Component\EventDispatcher\Event;
 use Symfony\Component\HttpKernel\Log\LoggerInterface;
+use Symfony\Component\HttpKernel\Log\DebugLoggerInterface;
 use Symfony\Component\HttpKernel\HttpKernelInterface;
 use Symfony\Component\HttpKernel\Exception\FlattenException;
 use Symfony\Component\HttpFoundation\Request;
@@ -61,7 +62,7 @@ class ExceptionListener
             error_log(sprintf('Uncaught PHP Exception %s: "%s" at %s line %s', get_class($exception), $exception->getMessage(), $exception->getFile(), $exception->getLine()));
         }
 
-        $logger = null !== $this->logger ? $this->logger->getDebugLogger() : null;
+        $logger = null !== $this->logger && $this->logger instanceof DebugLoggerInterface ? $this->logger->getDebugLogger() : null;
 
         $attributes = array(
             '_controller' => $this->controller,

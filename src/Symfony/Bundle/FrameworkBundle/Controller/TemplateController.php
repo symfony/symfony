@@ -2,7 +2,7 @@
 
 namespace Symfony\Bundle\FrameworkBundle\Controller;
 
-use Symfony\Bundle\FrameworkBundle\Controller\Controller;
+use Symfony\Component\DependencyInjection\ContainerAware;
 use Symfony\Component\HttpFoundation\Response;
 
 /*
@@ -19,7 +19,7 @@ use Symfony\Component\HttpFoundation\Response;
  *
  * @author     Fabien Potencier <fabien.potencier@symfony-project.com>
  */
-class TemplateController extends Controller
+class TemplateController extends ContainerAware
 {
     /**
      * Renders a template.
@@ -30,6 +30,6 @@ class TemplateController extends Controller
      */
     public function templateAction($template)
     {
-        return $this['templating']->renderResponse($template);
+        return $this->container->get('templating')->renderResponse($template);
     }
 }

@@ -2,7 +2,7 @@
 
 namespace Symfony\Bundle\FrameworkBundle\Controller;
 
-use Symfony\Bundle\FrameworkBundle\Controller\Controller;
+use Symfony\Component\DependencyInjection\ContainerAware;
 use Symfony\Component\HttpFoundation\Response;
 
 /*
@@ -19,7 +19,7 @@ use Symfony\Component\HttpFoundation\Response;
  *
  * @author     Fabien Potencier <fabien.potencier@symfony-project.com>
  */
-class RedirectController extends Controller
+class RedirectController extends ContainerAware
 {
     /**
      * Redirects to another route.
@@ -38,7 +38,7 @@ class RedirectController extends Controller
     public function redirectAction($route, $permanent = false)
     {
         if (!$route) {
-            $response = $this['response'];
+            $response = $this->container->get('response');
             $response->setStatusCode(410);
 
             return $response;
@@ -46,10 +46,10 @@ class RedirectController extends Controller
 
         $code = $permanent ? 301 : 302;
 
-        $attributes = $this['request']->attributes->all();
+        $attributes = $this->container->get('request')->attributes->all();
         unset($attributes['_route'], $attributes['route']);
 
-        $response = $this['response'];
+        $response = $this->container->get('response');
         $response->setRedirect($this['router']->generate($route, $attributes), $code);
 
         return $response;

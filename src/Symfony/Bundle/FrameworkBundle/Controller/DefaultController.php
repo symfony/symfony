@@ -2,8 +2,8 @@
 
 namespace Symfony\Bundle\FrameworkBundle\Controller;
 
-use Symfony\Bundle\FrameworkBundle\Controller\Controller;
 use Symfony\Component\HttpFoundation\Response;
+use Symfony\Component\DependencyInjection\ContainerAware;
 
 /*
  * This file is part of the Symfony framework.
@@ -19,7 +19,7 @@ use Symfony\Component\HttpFoundation\Response;
  *
  * @author     Fabien Potencier <fabien.potencier@symfony-project.com>
  */
-class DefaultController extends Controller
+class DefaultController extends ContainerAware
 {
     /**
      * Renders the Symfony2 welcome page.
@@ -28,6 +28,6 @@ class DefaultController extends Controller
      */
     public function indexAction()
     {
-        return $this['templating']->renderResponse('FrameworkBundle:Default:index');
+        return $this->container->get('templating')->renderResponse('FrameworkBundle:Default:index');
     }
 }

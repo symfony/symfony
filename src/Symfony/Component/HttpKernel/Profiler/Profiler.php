@@ -89,6 +89,28 @@ class Profiler
         return $profiler;
     }
 
+    public function export()
+    {
+        $unpack = unpack('H*', serialize(array($this->token, $this->collectors, $this->ip, $this->url, $this->time)));
+
+        return $unpack[1];
+    }
+
+    public function import($data)
+    {
+        list($token, $collectors, $ip, $url, $time) = unserialize(pack('H*', $data));
+
+        if (false !== $this->storage->read($token)) {
+            return false;
+        }
+
+        $unpack = unpack('H*', serialize($this->collectors));
+
+        $this->storage->write($token, $unpack[1], $ip, $url, $time);
+
+        return $token;
+    }
+
     /**
      * Sets the token.
      *
@@ -99,8 +121,8 @@ class Profiler
         $this->token = $token;
 
         if (false !== $items = $this->storage->read($token)) {
-            list($collectors, $this->ip, $this->url, $this->time) = $items;
-            $this->setCollectors($collectors);
+            list($data, $this->ip, $this->url, $this->time) = $items;
+            $this->setCollectors(unserialize(pack('H*', $data)));
 
             $this->empty = false;
         } else {
@@ -200,9 +222,9 @@ class Profiler
         $this->url  = $request->getUri();
         $this->time = time();
 
+        $unpack = unpack('H*', serialize($this->collectors));
         try {
-            $this->storage->write($this->token, $this->collectors, $this->ip, $this->url, $this->time);
-
+            $this->storage->write($this->token, $unpack[1], $this->ip, $this->url, $this->time);
             $this->empty = false;
         } catch (\Exception $e) {
             if (null !== $this->logger) {

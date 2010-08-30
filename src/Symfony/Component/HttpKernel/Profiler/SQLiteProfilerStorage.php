@@ -69,7 +69,7 @@ class SQLiteProfilerStorage implements ProfilerStorageInterface
         $data = $this->fetch($db, 'SELECT data, ip, url, time FROM data WHERE token = :token ORDER BY time DESC LIMIT 1', $args);
         $this->close($db);
         if (isset($data[0]['data'])) {
-            return array(unserialize(pack('H*', $data[0]['data'])), $data[0]['ip'], $data[0]['url'], $data[0]['time']);
+            return array($data[0]['data'], $data[0]['ip'], $data[0]['url'], $data[0]['time']);
         } else {
             return false;
         }
@@ -78,11 +78,8 @@ class SQLiteProfilerStorage implements ProfilerStorageInterface
     /**
      * {@inheritdoc}
      */
-    public function write($token, $collectors, $ip, $url, $time)
+    public function write($token, $data, $ip, $url, $time)
     {
-        $unpack = unpack('H*', serialize($collectors));
-        $data = $unpack[1];
-
         $db = $this->initDb();
         $args = array(
             ':token' => $token,
@@ -125,6 +122,7 @@ class SQLiteProfilerStorage implements ProfilerStorageInterface
 
         $db->exec('CREATE TABLE IF NOT EXISTS data (token STRING, data STRING, ip STRING, url STRING, time INTEGER)');
         $db->exec('CREATE INDEX IF NOT EXISTS data_data ON data (time)');
+        $db->exec('CREATE UNIQUE INDEX IF NOT EXISTS data_token ON data (token)');
 
         return $db;
     }

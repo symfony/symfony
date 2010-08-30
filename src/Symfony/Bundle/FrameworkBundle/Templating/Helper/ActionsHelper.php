@@ -27,7 +27,7 @@ class ActionsHelper extends Helper
     /**
      * Constructor.
      *
-     * @param Constructor $container A ContainerInterface instance
+     * @param Constructor $resolver A ControllerResolver instance
      */
     public function __construct(ControllerResolver $resolver)
     {

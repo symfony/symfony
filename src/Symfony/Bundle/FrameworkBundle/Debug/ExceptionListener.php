@@ -26,13 +26,11 @@ use Symfony\Component\HttpFoundation\Request;
  */
 class ExceptionListener
 {
-    protected $container;
     protected $controller;
     protected $logger;
 
-    public function __construct(ContainerInterface $container, $controller, LoggerInterface $logger = null)
+    public function __construct($controller, LoggerInterface $logger = null)
     {
-        $this->container = $container;
         $this->controller = $controller;
         $this->logger = $logger;
     }
@@ -63,7 +61,7 @@ class ExceptionListener
             error_log(sprintf('Uncaught PHP Exception %s: "%s" at %s line %s', get_class($exception), $exception->getMessage(), $exception->getFile(), $exception->getLine()));
         }
 
-        $logger = $this->container->has('logger') ? $this->container->get('logger')->getDebugLogger() : null;
+        $logger = null !== $this->logger ? $this->logger->getDebugLogger() : null;
 
         $attributes = array(
             '_controller' => $this->controller,

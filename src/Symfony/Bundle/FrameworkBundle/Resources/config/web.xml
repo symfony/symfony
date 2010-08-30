@@ -46,7 +46,6 @@
 
         <service id="exception_listener" class="%exception_listener.class%">
             <tag name="kernel.listener" priority="128" />
-            <argument type="service" id="service_container" />
             <argument>%exception_listener.controller%</argument>
             <argument type="service" id="logger" on-invalid="null" />
         </service>

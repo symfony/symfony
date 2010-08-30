@@ -186,6 +186,43 @@ class Definition
     }
 
     /**
+     * Removes a method to call after service initialization.
+     *
+     * @param  string $method    The method name to remove
+     *
+     * @return Definition The current instance
+     */
+    public function removeMethodCall($method)
+    {
+        foreach ($this->calls as $i => $call) {
+            if ($call[0] === $method) {
+                unset($this->calls[$i]);
+                break;
+            }
+        }
+
+        return $this;
+    }
+
+    /**
+     * Check if the current definition has a given method to call after service initialization.
+     *
+     * @param  string $method    The method name to search for
+     *
+     * @return boolean
+     */
+    public function hasMethodCall($method)
+    {
+        foreach ($this->calls as $i => $call) {
+            if ($call[0] === $method) {
+                return true;
+            }
+        }
+
+        return false;
+    }
+
+    /**
      * Gets the methods to call after service initialization.
      *
      * @return  array An array of method calls

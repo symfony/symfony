@@ -44,7 +44,9 @@ class FlattenException
 
     public function getStatusCode()
     {
-        return $this->getClass() instanceof HttpException ? $this->getCode() : 500;
+        return $this->getClass() == 'Symfony\Component\HttpKernel\Exception\HttpException' ||
+               is_subclass_of($this->getClass(), 'Symfony\Component\HttpKernel\Exception\HttpException') ?
+               $this->getCode():500;
     }
 
     public function getStatusText()

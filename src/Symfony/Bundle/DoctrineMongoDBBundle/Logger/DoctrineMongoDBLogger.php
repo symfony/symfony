@@ -26,18 +26,62 @@ class DoctrineMongoDBLogger
         ++$this->nbQueries;
 
         if (null !== $this->logger) {
-            switch (key($query)) {
-                case 'batchInsert':
-                    $this->logger->info(Yaml::dump(array('data' => '[omitted]') + $query, 0));
-                    break;
-                default:
-                    $this->logger->info(Yaml::dump($query, 0));
-            }
+            $this->logger->info(static::formatQuery($query));
         }
     }
 
     public function getNbQueries()
     {
         return $this->nbQueries;
+    }
+
+    /**
+     * Formats the supplied query array recursively.
+     * 
+     * @param array $query All or part of a query array
+     * 
+     * @return string A serialized object for the log
+     */
+    static protected function formatQuery(array $query)
+    {
+        $parts = array();
+
+        $array = true;
+        foreach ($query as $key => $value) {
+            if (!is_numeric($key)) {
+                $array = false;
+            }
+
+            if (is_scalar($value)) {
+                $formatted = json_encode($value);
+            } elseif (is_array($value)) {
+                $formatted = static::formatQuery($value);
+            } elseif ($value instanceof \MongoId) {
+                $formatted = 'ObjectId('.json_encode((string) $value).')';
+            } elseif ($value instanceof \MongoDate) {
+                $formatted = 'new Date('.date('r', $value->sec).')';
+            } elseif ($value instanceof \MongoRegex) {
+                $formatted = 'new RegExp('.json_encode($value->regex).', '.json_encode($value->flags).')';
+            } else {
+                $formatted = (string) $value;
+            }
+
+            $parts[json_encode($key)] = $formatted;
+        }
+
+        if (0 == count($parts)) {
+            return $array ? '[ ]' : '{ }';
+        }
+
+        if ($array) {
+            return '[ '.implode(', ', $parts).' ]';
+        } else {
+            $mapper = function($key, $value)
+            {
+                return $key.': '.$value;
+            };
+
+            return '{ '.implode(', ', array_map($mapper, array_keys($parts), array_values($parts))).' }';
+        }
     }
 }

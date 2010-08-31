@@ -25,15 +25,18 @@ class ProfilerListener
 {
     protected $profiler;
     protected $exception;
+    protected $onlyException;
 
     /**
      * Constructor.
      *
-     * @param Profiler $profiler A Profiler instance
+     * @param Profiler $profiler      A Profiler instance
+     * @param Boolean  $onlyException true if the profiler only collects data when an exception occurs, false otherwise
      */
-    public function __construct(Profiler $profiler)
+    public function __construct(Profiler $profiler, $onlyException = false)
     {
         $this->profiler = $profiler;
+        $this->onlyException = $onlyException;
     }
 
     /**
@@ -74,6 +77,10 @@ class ProfilerListener
     public function handleResponse(Event $event, Response $response)
     {
         if (HttpKernelInterface::MASTER_REQUEST !== $event->getParameter('request_type')) {
+            return $response;
+        }
+
+        if ($this->onlyException && null === $this->exception) {
             return $response;
         }
 

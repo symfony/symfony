@@ -81,6 +81,12 @@ class WebExtension extends Extension
                     $loader->load('profiling.xml');
                     $loader->load('collectors.xml');
                 }
+
+                if (isset($config['profiler']['only-exceptions'])) {
+                    $container->setParameter('profiler_listener.only_exceptions', $config['profiler']['only-exceptions']);
+                } elseif (isset($config['profiler']['only_exceptions'])) {
+                    $container->setParameter('profiler_listener.only_exceptions', $config['profiler']['only_exceptions']);
+                }
             } elseif ($container->hasDefinition('profiler')) {
                 $container->getDefinition('profiling')->clearTags();
             }

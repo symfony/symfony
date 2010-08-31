@@ -3,6 +3,7 @@
 namespace Symfony\Component\HttpKernel\Exception;
 
 use Symfony\Component\HttpFoundation\Response;
+use Symfony\Component\HttpKernel\Exception\HttpException;
 
 /*
  * This file is part of the Symfony framework.

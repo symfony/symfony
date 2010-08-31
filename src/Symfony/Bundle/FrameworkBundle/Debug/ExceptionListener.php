@@ -62,7 +62,7 @@ class ExceptionListener
             error_log(sprintf('Uncaught PHP Exception %s: "%s" at %s line %s', get_class($exception), $exception->getMessage(), $exception->getFile(), $exception->getLine()));
         }
 
-        $logger = null !== $this->logger && $this->logger instanceof DebugLoggerInterface ? $this->logger->getDebugLogger() : null;
+        $logger = null !== $this->logger ? $this->logger->getDebugLogger() : null;
 
         $attributes = array(
             '_controller' => $this->controller,

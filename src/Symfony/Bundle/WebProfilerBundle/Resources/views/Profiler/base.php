@@ -6,6 +6,7 @@
         <?php echo $view->get('stylesheets') ?>
         <?php echo $view->get('javascripts') ?>
         <link href="<?php echo $view->get('assets')->getUrl('bundles/webprofiler/css/profiler.css') ?>" rel="stylesheet" type="text/css" media="screen" />
+        <link rel="shortcut icon" type="image/x-icon" href="<?php echo $view->get('assets')->getUrl('bundles/webprofiler/favicon.ico', true) ?>" />
     </head>
     <body>
         <?php $view->get('slots')->output('_content') ?>

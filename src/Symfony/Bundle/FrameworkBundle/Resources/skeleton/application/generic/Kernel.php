@@ -28,11 +28,10 @@ class {{ class }}Kernel extends Kernel
             //new Symfony\Bundle\TwigBundle\TwigBundle(),
 
             // register your bundles
-            new Application\HelloBundle\HelloBundle(),
         );
 
         if ($this->isDebug()) {
-            $bundles[] = new Symfony\Bundle\WebProfilerBundle\WebProfilerBundle(),
+            $bundles[] = new Symfony\Bundle\WebProfilerBundle\WebProfilerBundle();
         }
 
         return $bundles;

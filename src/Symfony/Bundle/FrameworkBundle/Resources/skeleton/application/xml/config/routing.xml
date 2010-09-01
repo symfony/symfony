@@ -7,6 +7,4 @@
     <route id="homepage" pattern="/">
         <default key="_controller">FrameworkBundle:Default:index</default>
     </route>
-
-    <import resource="HelloBundle/Resources/config/routing.xml" />
 </routes>

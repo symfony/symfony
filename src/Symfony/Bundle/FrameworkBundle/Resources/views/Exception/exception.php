@@ -49,13 +49,15 @@
         </div>
     <?php endif; ?>
 
-    <div class="block">
-        <h3>Content of the Output <a href="#" onclick="toggle('content'); return false;">&raquo;</a></h3>
+    <?php if ($currentContent): ?>
+        <div class="block">
+            <h3>Content of the Output <a href="#" onclick="toggle('content'); return false;">&raquo;</a></h3>
 
-        <div id="content" style="display: none">
-            <?php echo $currentContent ?>
+            <div id="content" style="display: none">
+                <?php echo $currentContent ?>
+            </div>
+
+            <div style="clear: both"></div>
         </div>
-
-        <div style="clear: both"></div>
-    </div>
+    <?php endif; ?>
 </div>

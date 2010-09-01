@@ -254,7 +254,7 @@ class Request
 
     public function hasSession()
     {
-        return '' !== session_id();
+        return $this->cookies->has(session_name());
     }
 
     public function setSession(Session $session)

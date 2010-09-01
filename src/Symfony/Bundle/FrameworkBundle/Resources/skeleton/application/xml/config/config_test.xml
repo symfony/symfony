@@ -12,8 +12,9 @@
         <import resource="config_dev.xml" />
     </imports>
 
-    <web:config
+    <webprofiler:config
         toolbar="false"
+        intercept-redirects="false"
     />
 
     <kernel:config

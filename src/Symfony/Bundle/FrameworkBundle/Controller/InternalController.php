@@ -2,7 +2,7 @@
 
 namespace Symfony\Bundle\FrameworkBundle\Controller;
 
-use Symfony\Bundle\FrameworkBundle\Controller\Controller;
+use Symfony\Component\DependencyInjection\ContainerAware;
 use Symfony\Component\HttpFoundation\Response;
 
 /*
@@ -19,7 +19,7 @@ use Symfony\Component\HttpFoundation\Response;
  *
  * @author     Fabien Potencier <fabien.potencier@symfony-project.com>
  */
-class InternalController extends Controller
+class InternalController extends ContainerAware
 {
     /**
      * Forwards to the given controller with the given path.
@@ -31,7 +31,7 @@ class InternalController extends Controller
      */
     public function indexAction($path, $controller)
     {
-        $request = $this['request'];
+        $request = $this->container->get('request');
         $attributes = $request->attributes;
 
         $attributes->delete('path');
@@ -42,6 +42,6 @@ class InternalController extends Controller
             $attributes->add($tmp);
         }
 
-        return $this['controller_resolver']->forward($controller, $attributes->all(), $request->query->all());
+        return $this->container->get('controller_resolver')->forward($controller, $attributes->all(), $request->query->all());
     }
 }

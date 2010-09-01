@@ -254,12 +254,32 @@ class Request
 
     public function hasSession()
     {
-        return '' !== session_id();
+        return $this->cookies->has(session_name());
     }
 
     public function setSession(Session $session)
     {
         $this->session = $session;
+    }
+
+    /**
+     * Returns the client IP address.
+     *
+     * @param  Boolean $proxy Whether the current request has been made behind a proxy or not
+     *
+     * @return string The client IP address
+     */
+    public function getClientIp($proxy = false)
+    {
+        if ($proxy) {
+            if ($this->server->has('HTTP_CLIENT_IP')) {
+                return $this->server->get('HTTP_CLIENT_IP');
+            } elseif ($this->server->has('HTTP_X_FORWARDED_FOR')) {
+                return $this->server->get('HTTP_X_FORWARDED_FOR');
+            }
+        }
+
+        return $this->server->get('REMOTE_ADDR');
     }
 
     /**

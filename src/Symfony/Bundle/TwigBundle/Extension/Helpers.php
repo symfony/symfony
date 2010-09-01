@@ -46,8 +46,8 @@ class Helpers extends \Twig_Extension
             // {% route 'blog_post' with ['id': post.id] %}
             new HelperTokenParser('route', '<route> [with <arguments:array>]', 'router', 'generate'),
 
-            // {% render 'BlogBundle:Post:list' with ['path': ['limit': 2], 'alt': 'BlogBundle:Post:error'] %}
-            new HelperTokenParser('render', '<template> [with <arguments:array>]', 'actions', 'render'),
+            // {% render 'BlogBundle:Post:list' with ['limit': 2], ['alt': 'BlogBundle:Post:error'] %}
+            new HelperTokenParser('render', '<template> [with <attributes:array>[, <options:array>]]', 'actions', 'render'),
 
             // {% flash 'notice' %}
             new HelperTokenParser('flash', '<name>', 'session', 'flash'),

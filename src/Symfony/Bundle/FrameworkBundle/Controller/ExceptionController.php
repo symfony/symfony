@@ -2,7 +2,7 @@
 
 namespace Symfony\Bundle\FrameworkBundle\Controller;
 
-use Symfony\Bundle\FrameworkBundle\Controller\Controller;
+use Symfony\Component\DependencyInjection\ContainerAware;
 use Symfony\Component\HttpKernel\Exception\FlattenException;
 use Symfony\Component\HttpKernel\Log\DebugLoggerInterface;
 use Symfony\Component\OutputEscaper\SafeDecorator;
@@ -21,7 +21,7 @@ use Symfony\Component\OutputEscaper\SafeDecorator;
  *
  * @author     Fabien Potencier <fabien.potencier@symfony-project.com>
  */
-class ExceptionController extends Controller
+class ExceptionController extends ContainerAware
 {
     /**
      * Converts an Exception to a Response.
@@ -33,17 +33,17 @@ class ExceptionController extends Controller
      *
      * @throws \InvalidArgumentException When the exception template does not exist
      */
-    public function exceptionAction(FlattenException $exception, DebugLoggerInterface $logger, $format, $embedded = false)
+    public function exceptionAction(FlattenException $exception, DebugLoggerInterface $logger = null, $format = 'html', $embedded = false)
     {
-        $this['request']->setRequestFormat($format);
+        $this->container->get('request')->setRequestFormat($format);
 
         $currentContent = '';
         while (false !== $content = ob_get_clean()) {
             $currentContent .= $content;
         }
 
-        $response = $this->render(
-            'FrameworkBundle:Exception:'.($this['kernel']->isDebug() ? 'exception' : 'error'),
+        $response = $this->container->get('templating')->renderResponse(
+            'FrameworkBundle:Exception:'.($this->container->get('kernel')->isDebug() ? 'exception' : 'error'),
             array(
                 'exception'      => new SafeDecorator($exception),
                 'logger'         => $logger,

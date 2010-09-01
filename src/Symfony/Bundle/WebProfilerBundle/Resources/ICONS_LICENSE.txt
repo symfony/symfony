@@ -1,0 +1,6 @@
+Icons License
+=============
+
+Glyphish icons (http://glyphish.com/) created by Joseph Wain
+(http://www.penandthink.com/) are shared under a Creative Commons Attribution
+license (http://creativecommons.org/licenses/by/3.0/us/).

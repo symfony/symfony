@@ -2,8 +2,6 @@
 
 namespace Symfony\Component\HttpKernel\Profiler;
 
-use Symfony\Component\HttpKernel\DataCollector\DataCollectorInterface;
-
 /*
  * This file is part of the Symfony framework.
  *
@@ -38,18 +36,23 @@ interface ProfilerStorageInterface
      *
      * @param string $token A token
      *
-     * @return DataCollectorInterface[] An array of DataCollectorInterface instance
+     * @return string The data associated with token
      */
     function read($token);
 
     /**
      * Reads data associated with the given token.
      *
-     * @param string                   $token A token
-     * @param DataCollectorInterface[] $collectors An array of DataCollectorInterface instances
-     * @param string                   $ip    An IP
-     * @param string                   $url   An URL
-     * @param integer                  $time  The time of the data
+     * @param string  $token A token
+     * @param string  $data  The data associated with token
+     * @param string  $ip    An IP
+     * @param string  $url   An URL
+     * @param integer $time  The time of the data
      */
-    function write($token, $collectors, $ip, $url, $time);
+    function write($token, $data, $ip, $url, $time);
+
+    /**
+     * Purges all data from the database.
+     */
+    function purge();
 }

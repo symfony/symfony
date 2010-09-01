@@ -1,0 +1,203 @@
+/*
+Copyright (c) 2010, Yahoo! Inc. All rights reserved.
+Code licensed under the BSD License:
+http://developer.yahoo.com/yui/license.html
+version: 3.1.2
+build: 56
+*/
+html{color:#000;background:#FFF;}body,div,dl,dt,dd,ul,ol,li,h1,h2,h3,h4,h5,h6,pre,code,form,fieldset,legend,input,textarea,p,blockquote,th,td{margin:0;padding:0;}table{border-collapse:collapse;border-spacing:0;}fieldset,img{border:0;}address,caption,cite,code,dfn,em,strong,th,var{font-style:normal;font-weight:normal;}li{list-style:none;}caption,th{text-align:left;}h1,h2,h3,h4,h5,h6{font-size:100%;font-weight:normal;}q:before,q:after{content:'';}abbr,acronym{border:0;font-variant:normal;}sup{vertical-align:text-top;}sub{vertical-align:text-bottom;}input,textarea,select{font-family:inherit;font-size:inherit;font-weight:inherit;}input,textarea,select{*font-size:100%;}legend{color:#000;}
+
+.clearfix:after {
+  content: "\0020";
+  display: block;
+  height: 0;
+  clear: both;
+  visibility: hidden;
+  overflow: hidden;
+}
+.clearfix {display: inline-block;}
+* html .clearfix {height: 1%;}
+.clearfix {display: block;}
+
+html {
+    background: #fff;
+}
+
+body {
+    font: 11px Verdana, Arial, sans-serif;
+    color: #222;
+}
+
+strong {
+    font-weight: bold;
+}
+
+em {
+    font-style: italic;
+}
+
+a {
+    color: #222;
+}
+
+abbr {
+    border-bottom: 1px dotted #000000;
+    cursor: help;
+}
+
+h1 {
+    font-size: 190%;
+    letter-spacing: -0.03em;
+}
+
+h1 img {
+    margin: 0 5px 0 0;
+    height: 32px;
+}
+
+h2 {
+    font-size: 180%;
+    letter-spacing: -0.02em;
+    padding: 10px 0;
+}
+
+h3 {
+    font-size: 160%;
+    letter-spacing: -0.02em;
+    padding: 10px 0;
+}
+
+img {
+    vertical-align: middle;
+}
+
+.header {
+    padding: 10px;
+    background: #333;
+    color: #fff;
+}
+
+.header div {
+    margin-left: 45px;
+}
+
+.menu, td.menu {
+    width: 240px;
+}
+
+.content {
+    padding: 15px;
+    padding-left: 35px;
+    padding-top: 15px;
+}
+
+.search, .import {
+    background: #efefef;
+    color: #333;
+}
+
+.search h3, .import h3 {
+    padding: 4px 10px;
+    background-image: -moz-linear-gradient(-90deg, #ededed, #a3a2a2);
+    background-image: -webkit-gradient(linear, 0% 0%, 0% 100%, from(#ededed), to(#a3a2a2));
+    font-size: 115%;
+}
+
+.search form, .import form {
+    padding: 10px;
+}
+
+.search input, .import input {
+    float: left;
+    margin-bottom: 7px;
+}
+
+.search input.submit, .import input.submit {
+    float: right;
+}
+
+.search label {
+    float: left;
+    width: 50px;
+}
+
+th, td {
+    padding: 5px;
+    border: 1px solid #b4b4b4;
+}
+
+th {
+    font-weight: bold;
+    background: #edf3fe;
+}
+
+pre {
+    overflow: auto;
+}
+
+table {
+    width: 100%;
+}
+
+.menu ul {
+    background: #dde4eb;
+    font-size: 130%;
+    padding: 15px 0;
+}
+
+.menu li {
+    padding: 5px 10px;
+}
+
+.menu li.selected {
+    background: #0065bd;
+    color: #fff;
+    background-image: -moz-linear-gradient(-90deg, #5fa3e0, #0065bd);
+    background-image: -webkit-gradient(linear, 0% 0%, 0% 100%, from(#5fa3e0), to(#0065bd));
+}
+
+.menu li a {
+    color: #000;
+    text-decoration: none;
+}
+
+.menu li.selected a {
+    color: #fff;
+}
+
+.count {
+    font-family: monospace;
+    font-weight: bold;
+    padding: 4px;
+    margin-left: 5px;
+    margin-top: 5px;
+    font-size: 80%;
+    float: right;
+    background-color: #9cc2e8;
+    color: #fff;
+    -moz-border-radius: 7px; -webkit-border-radius: 7px; border-radius: 7px;
+}
+
+.sf-toolbarreset {
+    border-top: 0;
+}
+
+ul.alt li {
+    padding: 5px 7px;
+}
+
+ul.alt li.even {
+    background: #edf3fe;
+}
+
+ul.alt li.error {
+    background-color: #f66;
+}
+
+td.main, td.menu {
+    text-align: left;
+    margin: 0;
+    padding: 0;
+    border: 0;
+    vertical-align: top;
+}

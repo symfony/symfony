@@ -5,10 +5,10 @@
 <div class="sf-exceptionreset">
     <div id="message">
         <div style="float: left; margin-right: 20px">
-            <img src="data:image/png;base64,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" />
+            <img src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAACAAAAAgCAYAAABzenr0AAAAGXRFWHRTb2Z0d2FyZQBBZG9iZSBJbWFnZVJlYWR5ccllPAAABHpJREFUeNrsV1tIY1cUzUvzMJOJk/isjkYnOlLBVE1spjQElXb6U/yyklGL1hedD7FFjDBQbBGrfohfgyhSKgYKLfhX2qotUzrWDnUCo7VgjTA2iI4ZNY+bh1G7Tri3pGn05tKB+egcWJzXPvusu8/e+5zLPzs74z3PIuA95/KCAI/4QCxiym3ge6CDg9oOes1ttr1EbJpmZmaKhUKheXFxsWBqaqoWQxabzRaOJ2uxWIg+W1tbW1V1dfXVk5OTR01NTRfqZyXA5/Otp6enlNls7isvL8/o7u6eQP+9eLJJSUkT4+PjbysUCjFkhrH2Yzb9rATI5qiswGdyuXx9cHCwvrGx8S76l4GrtNhj4GhkZKQeMmTzEvR/T+SsWAnAjEyTKDSmpaUt6fX6KXxlclZWlpRM7Ozs+N1udwhzcsgbE92cKwEezvb68PAw1dnZWRZPdm9vj+rr67sOX/n5mYUhIUCAzW80NDR8pFQqZcxYLMgckSGyzNh/scDrADHp15G46ugw6nS6fDalJpMpH8djhNx9eugtwAv8GNfJ490F8N5ko9G4IpVKRQi/eQx9V1FRccdgMHhLSkrMFxFYX1//YXl5+crKysoHhA/C8R2/3x9eWloqx16hhAiMjY1JUPnpc32ysbHxS1VV1c21tbXd+fn5P0tLSwOwRopEIhETmUAgELTb7b7V1VVJbW1tTllZWTbkviosLKzUaDR5tFppT09PIFEL8EZHRx+iqfN6va79/f2j3NzcfCSkiM+g7wUpF0VRkYQkk8lEWq1WpVar5YyOLRT0L6Go0bX39va+Enev8wiQMjQ0dAtVvcvlMqlUKiWXFI81HqxZQPPL/v7+WSYVJ0pAQz4MIF+YbLVaH6SkpIi5EAiHw6cDAwNash4QAhT22kooCnJycr4Qi8VCePIZztmDFJt8fHwcmfN4PFuHh4cbCDktzKu5KMSLi4u7Q6HQawKBgB8MBkn4GBIi0NzcrGfacDCf0+l0ZGZmFpL+9va2GwrDIOIuKio6d3dsHEIkmbKzs3Wc8wDM50T1UkRAJLLjSPIxFplDjGt2d3dVGRkZCmbsHB1Uenr6b6gZAk4ueeAfCamlpWXuCkqsHMzqRiT8gUjZwSWUhWi4hqNTkLnNzU3H3NxcM5o/Rb8HuKRictPdrays/BBKJeRrY4ELyHFwcPAY/nFMatJn5nBkauSKO0RH1K2ZsAVEMN+9mpqal+GIFCLAj6/7l8M5HI77cNA9pg8e6QUFBTdoZ/0VRK5BP39hYWENCc2EdjghH+jq6hJA2AAiQnKW8IPP4VPvIxGlRcvBMnk+ny8MEkfY/DKI5tGX0BMQnoWOT0lar6ure5VEAicfaG9vn0DzXaCVPLOAN4BvouWQ44MwvQemp+CcstTU1Eu4P0i+eBP4FmgkrzryWJmcnFRyzoSktLa2Rj8qZzFnYXnk2iBzi+lPT0/zLnJCTg8S2iIku+nPEX9Ayzy7/wK876IRBgzAJ8DTqPGn9JiBlvl7Deuj98W/4f+ewF8CDADfMn9DHK75mAAAAABJRU5ErkJggg==" />
         </div>
         <div style="float: left; width: 600px">
-            <h1><?php echo $view['code']->formatFileFromText(str_replace("\n", '<br />', htmlspecialchars($exception->getMessage(), ENT_QUOTES, $view->getCharset()))) ?></h1>
+            <h1><?php echo $view->get('code')->formatFileFromText(str_replace("\n", '<br />', htmlspecialchars($exception->getMessage(), ENT_QUOTES, $view->getCharset()))) ?></h1>
             <h2><strong><?php echo $exception->getStatusCode() ?></strong> <?php echo $exception->getStatusText() ?> - <?php echo $exception->getClass() ?></h2>
 
             <?php if ($previousCount = count($exception->getPreviouses())): ?>
@@ -16,7 +16,7 @@
                     <ul>
                         <?php foreach ($exception->getPreviouses() as $i => $previous): ?>
                             <li>
-                                <?php echo $previous->getClass() ?> <a href="#traces_link_<?php echo $i + 1 ?>" onclick="toggle('traces_<?php echo $i + 1 ?>', 'traces');">&raquo;</a>
+                                <?php echo $view->get('code')->abbrClass($previous->getClass()) ?> <a href="#traces_link_<?php echo $i + 1 ?>" onclick="toggle('traces_<?php echo $i + 1 ?>', 'traces');">&raquo;</a>
                             </li>
                         <?php endforeach; ?>
                     </ul>
@@ -49,13 +49,15 @@
         </div>
     <?php endif; ?>
 
-    <div class="block">
-        <h3>Content of the Output <a href="#" onclick="toggle('content'); return false;">&raquo;</a></h3>
+    <?php if ($currentContent): ?>
+        <div class="block">
+            <h3>Content of the Output <a href="#" onclick="toggle('content'); return false;">&raquo;</a></h3>
 
-        <div id="content" style="display: none">
-            <?php echo $currentContent ?>
+            <div id="content" style="display: none">
+                <?php echo $currentContent ?>
+            </div>
+
+            <div style="clear: both"></div>
         </div>
-
-        <div style="clear: both"></div>
-    </div>
+    <?php endif; ?>
 </div>

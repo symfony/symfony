@@ -1,0 +1,20 @@
+<?xml version="1.0" ?>
+
+<container xmlns="http://www.symfony-project.org/schema/dic/services"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xsi:schemaLocation="http://www.symfony-project.org/schema/dic/services http://www.symfony-project.org/schema/dic/services/services-1.0.xsd">
+
+    <parameters>
+        <parameter key="data_collector.templates" type="collection">
+            <parameter key="config">WebProfilerBundle:Profiler:config</parameter>
+            <parameter key="request">WebProfilerBundle:Profiler:request</parameter>
+            <parameter key="exception">WebProfilerBundle:Profiler:exception</parameter>
+            <parameter key="events">WebProfilerBundle:Profiler:events</parameter>
+            <parameter key="logger">WebProfilerBundle:Profiler:logger</parameter>
+            <parameter key="timer">WebProfilerBundle:Profiler:timer</parameter>
+            <parameter key="memory">WebProfilerBundle:Profiler:memory</parameter>
+            <parameter key="db">DoctrineBundle:Profiler:db</parameter>
+            <parameter key="mongodb">DoctrineMongoDBBundle:Profiler:mongodb</parameter>
+        </parameter>
+    </parameters>
+</container>

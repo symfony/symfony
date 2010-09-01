@@ -13,6 +13,7 @@ use Doctrine\Common\Cli\Configuration;
 use Doctrine\Common\Cli\CliController as DoctrineCliController;
 use Doctrine\ORM\EntityManager;
 use Doctrine\ORM\Internal\CommitOrderCalculator;
+use Doctrine\ORM\Mapping\ClassMetadata;
 
 /*
  * This file is part of the Symfony framework.
@@ -124,10 +125,6 @@ EOT
                 $output->writeln(sprintf('<info>Persisting "%s" '.($numEntities > 1 ? 'entities' : 'entity').'</info>', count($entities)));
 
                 foreach ($entities as $entity) {
-                    $output->writeln(sprintf('<info>Persisting "%s" entity:</info>', get_class($entity)));
-                    $output->writeln('');
-                    $output->writeln(var_dump($entity));
-
                     $em->persist($entity);
                 }
                 $output->writeln('<info>Flushing entity manager</info>');
@@ -146,15 +143,26 @@ EOT
                 $classes[] = $metadata;
             }
         }
-        $cmf = $em->getMetadataFactory();
-        $classes = $this->getCommitOrder($em, $classes);
-        for ($i = count($classes) - 1; $i >= 0; --$i) {
-            $class = $classes[$i];
-            if ($cmf->hasMetadataFor($class->name)) {
-                try {
-                    $em->createQuery('DELETE FROM '.$class->name.' a')->execute();
-                } catch (Exception $e) {}
+
+        $commitOrder = $this->getCommitOrder($em, $classes);
+
+        // Drop association tables first
+        $orderedTables = $this->getAssociationTables($commitOrder);
+
+        // Drop tables in reverse commit order
+        for ($i = count($commitOrder) - 1; $i >= 0; --$i) {
+            $class = $commitOrder[$i];
+
+            if (($class->isInheritanceTypeSingleTable() && $class->name != $class->rootEntityName)
+                || $class->isMappedSuperclass) {
+                continue;
             }
+
+            $orderedTables[] = $class->getTableName();
+        }
+
+        foreach($orderedTables as $tbl) {
+            $em->getConnection()->executeUpdate("DELETE FROM $tbl");
         }
     }
 
@@ -180,5 +188,20 @@ EOT
         }
 
         return $calc->getCommitOrder();
+    }
+
+    protected function getAssociationTables(array $classes)
+    {
+        $associationTables = array();
+
+        foreach ($classes as $class) {
+            foreach ($class->associationMappings as $assoc) {
+                if ($assoc['isOwningSide'] && $assoc['type'] == ClassMetadata::MANY_TO_MANY) {
+                    $associationTables[] = $assoc['joinTable']['name'];
+                }
+            }
+        }
+
+        return $associationTables;
     }
 }

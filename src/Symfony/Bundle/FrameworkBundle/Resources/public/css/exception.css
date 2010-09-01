@@ -22,9 +22,9 @@ build: 56
 .sf-exceptionreset ol .selected { font-weight: bold; background-color: #ffd; padding: 2px 0 }
 .sf-exceptionreset p.error { padding: 10px; background-color: #f00; font-weight: bold; text-align: center; -moz-border-radius: 10px; -webkit-border-radius: 10px; border-radius: 10px; }
 .sf-exceptionreset p.error a { color: #fff }
-.sf-exceptionreset .block { padding: 20px 25px; margin-bottom: 10px; border: 1px solid #ddd; background-color: #fff; text-align:left; -moz-border-radius: 10px; -webkit-border-radius: 10px; border-radius: 10px; min-width: 770px; max-width: 770px }
+.sf-exceptionreset .block { padding: 20px 25px; margin-bottom: 10px; border: 1px solid #ddd; background-color: #fff; text-align:left; -moz-border-radius: 10px; -webkit-border-radius: 10px; border-radius: 10px; min-width: 770px; max-width: 770px; box-shadow: 0 1px 2px rgba(0,0,0,0.15); -webkit-box-shadow: 0 1px 2px rgba(0,0,0,0.15); -moz-box-shadow: 0 1px 3px rgba(0,0,0,0.3); }
 .sf-exceptionreset .traces { display: none; margin-top: 10px }
-.sf-exceptionreset #message { margin-top: 30px; margin-bottom: 10px; padding: 20px 25px; border: 1px solid #ddd; text-align:left; background-color: #c8e8f3; -moz-border-radius: 10px; -webkit-border-radius: 10px; border-radius: 10px; min-width: 770px; max-width: 770px }
+.sf-exceptionreset #message { margin-top: 30px; margin-bottom: 10px; padding: 20px 25px; text-align:left; -moz-border-radius: 10px; -webkit-border-radius: 10px; border-radius: 10px; min-width: 770px; max-width: 770px; background-color: #c8e8f3; border: 1px solid #ddd; background-image: -moz-linear-gradient(-90deg, #fff, #c8e8f3); background-image: -webkit-gradient(linear, 0% 0%, 0% 100%, from(#fff), to(#c8e8f3)); box-shadow: 0 1px 2px rgba(0,0,0,0.15); -webkit-box-shadow: 0 1px 2px rgba(0,0,0,0.15); -moz-box-shadow: 0 1px 3px rgba(0,0,0,0.3); }
 .sf-exceptionreset #content { border: 1px solid #ddd; margin-top: 10px; padding: 7px; overflow: auto; }
 .sf-exceptionreset a.file_link { text-decoration: none; }
 .sf-exceptionreset a.file_link:hover { text-decoration: underline; }

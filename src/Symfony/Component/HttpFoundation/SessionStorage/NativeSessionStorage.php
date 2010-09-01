@@ -52,6 +52,8 @@ class NativeSessionStorage implements SessionStorageInterface
             'session_cookie_httponly' => isset($cookieDefaults['httponly']) ? $cookieDefaults['httponly'] : false,
             'session_cache_limiter'   => 'none',
         ), $options);
+
+        session_name($this->options['session_name']);
     }
 
     /**
@@ -70,7 +72,6 @@ class NativeSessionStorage implements SessionStorageInterface
             $this->options['session_cookie_secure'],
             $this->options['session_cookie_httponly']
         );
-        session_name($this->options['session_name']);
 
         if (null !== $this->options['session_cache_limiter']) {
             session_cache_limiter($this->options['session_cache_limiter']);

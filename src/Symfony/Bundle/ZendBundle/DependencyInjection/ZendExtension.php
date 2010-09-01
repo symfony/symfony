@@ -52,6 +52,16 @@ class ZendExtension extends Extension
         if (isset($config['path'])) {
             $container->setParameter('zend.logger.path', $config['path']);
         }
+
+        if (isset($config['log_errors'])) {
+            $definition = $container->findDefinition('zend.logger');
+            if (false === $config['log_errors'] && $definition->hasMethodCall('registerErrorHandler')) {
+                $container->findDefinition('zend.logger')->removeMethodCall('registerErrorHandler');
+            }
+            else {
+                $container->findDefinition('zend.logger')->addMethodCall('registerErrorHandler');
+            }
+        }
     }
 
     /**

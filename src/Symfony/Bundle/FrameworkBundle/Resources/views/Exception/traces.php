@@ -2,7 +2,7 @@
     <?php if ($count > 0): ?>
         <h3>
             <span><?php echo $count - $position + 1 ?>/<?php echo $count + 1 ?></span>
-            <?php echo $exception->getClass() ?>: <?php echo str_replace("\n", '<br />', htmlspecialchars($exception->getMessage(), ENT_QUOTES, $view->getCharset())) ?>
+            <?php echo $view->get('code')->abbrClass($exception->getClass()) ?>: <?php echo str_replace("\n", '<br />', htmlspecialchars($exception->getMessage(), ENT_QUOTES, $view->getCharset())) ?>
             <a href="#" onclick="toggle('traces_<?php echo $position ?>', 'traces'); return false;">&raquo;</a><br />
         </h3>
     <?php else: ?>

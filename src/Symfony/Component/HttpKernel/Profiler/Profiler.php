@@ -90,6 +90,48 @@ class Profiler
     }
 
     /**
+     * Purges all data from the storage.
+     */
+    public function purge()
+    {
+        $this->storage->purge();
+    }
+
+    /**
+     * Exports the current profiler data.
+     *
+     * @return string The exported data
+     */
+    public function export()
+    {
+        $unpack = unpack('H*', serialize(array($this->token, $this->collectors, $this->ip, $this->url, $this->time)));
+
+        return $unpack[1];
+    }
+
+    /**
+     * Imports data into the profiler storage.
+     *
+     * @param string $data A data string as exported by the export() method
+     *
+     * @return string The token associated with the imported data
+     */
+    public function import($data)
+    {
+        list($token, $collectors, $ip, $url, $time) = unserialize(pack('H*', $data));
+
+        if (false !== $this->storage->read($token)) {
+            return false;
+        }
+
+        $unpack = unpack('H*', serialize($this->collectors));
+
+        $this->storage->write($token, $unpack[1], $ip, $url, $time);
+
+        return $token;
+    }
+
+    /**
      * Sets the token.
      *
      * @param string $token The token
@@ -99,8 +141,8 @@ class Profiler
         $this->token = $token;
 
         if (false !== $items = $this->storage->read($token)) {
-            list($collectors, $this->ip, $this->url, $this->time) = $items;
-            $this->setCollectors($collectors);
+            list($data, $this->ip, $this->url, $this->time) = $items;
+            $this->setCollectors(unserialize(pack('H*', $data)));
 
             $this->empty = false;
         } else {
@@ -200,9 +242,9 @@ class Profiler
         $this->url  = $request->getUri();
         $this->time = time();
 
+        $unpack = unpack('H*', serialize($this->collectors));
         try {
-            $this->storage->write($this->token, $this->collectors, $this->ip, $this->url, $this->time);
-
+            $this->storage->write($this->token, $unpack[1], $this->ip, $this->url, $this->time);
             $this->empty = false;
         } catch (\Exception $e) {
             if (null !== $this->logger) {

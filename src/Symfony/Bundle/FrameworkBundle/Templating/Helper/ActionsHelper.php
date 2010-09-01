@@ -27,7 +27,7 @@ class ActionsHelper extends Helper
     /**
      * Constructor.
      *
-     * @param Constructor $container A ContainerInterface instance
+     * @param Constructor $resolver A ControllerResolver instance
      */
     public function __construct(ControllerResolver $resolver)
     {
@@ -42,25 +42,23 @@ class ActionsHelper extends Helper
      *
      * @see render()
      */
-    public function output($controller, array $options = array())
+    public function output($controller, array $attributes = array(), array $options = array())
     {
-        echo $this->render($controller, $options);
+        echo $this->render($controller, $attributes, $options);
     }
 
     /**
      * Returns the Response content for a given controller or URI.
      *
      * @param string $controller A controller name to execute (a string like BlogBundle:Post:index), or a relative URI
+     * @param array  $attributes An array of request attributes
      * @param array  $options    An array of options
      *
      * @see Symfony\Bundle\FrameworkBundle\Controller\ControllerResolver::render()
      */
-    public function render($controller, array $options = array())
+    public function render($controller, array $attributes = array(), array $options = array())
     {
-        if (isset($options['path']))
-        {
-            $options['path'] = Escaper::unescape($options['path']);
-        }
+        $options['attributes'] = Escaper::unescape($attributes);
 
         if (isset($options['query']))
         {

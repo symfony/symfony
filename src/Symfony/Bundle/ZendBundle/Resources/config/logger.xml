@@ -7,6 +7,7 @@
     <parameters>
         <parameter key="zend.logger.class">Symfony\Bundle\ZendBundle\Logger\Logger</parameter>
         <parameter key="zend.logger.priority" type="constant">Zend\Log\Logger::CRIT</parameter>
+        <parameter key="zend.logger.log_errors">true</parameter>
         <parameter key="zend.logger.writer.debug.class">Symfony\Bundle\ZendBundle\Logger\DebugLogger</parameter>
         <parameter key="zend.logger.writer.filesystem.class">Zend\Log\Writer\Stream</parameter>
         <parameter key="zend.formatter.filesystem.class">Zend\Log\Formatter\Simple</parameter>
@@ -37,7 +38,5 @@
         <service id="zend.logger.filter" class="Zend\Log\Filter\Priority">
             <argument>%zend.logger.priority%</argument>
         </service>
-
-        <service id="logger.debug" alias="zend.logger.writer.debug" />
     </services>
 </container>

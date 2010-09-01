@@ -5,12 +5,6 @@ require_once __DIR__.'/../src/autoload.php';
 use Symfony\Framework\Kernel;
 use Symfony\Component\DependencyInjection\Loader\LoaderInterface;
 
-use Symfony\Framework\KernelBundle;
-use Symfony\Bundle\FrameworkBundle\FrameworkBundle;
-use Symfony\Bundle\ZendBundle\ZendBundle;
-use Symfony\Bundle\DoctrineBundle\DoctrineBundle;
-use Symfony\Bundle\SwiftmailerBundle\SwiftmailerBundle;
-
 class {{ class }}Kernel extends Kernel
 {
     public function registerRootDir()
@@ -21,18 +15,23 @@ class {{ class }}Kernel extends Kernel
     public function registerBundles()
     {
         $bundles = array(
-            new KernelBundle(),
-            new FrameworkBundle(),
+            new Symfony\Framework\KernelBundle(),
+            new Symfony\Bundle\FrameworkBundle\FrameworkBundle(),
 
             // enable third-party bundles
-            new ZendBundle(),
-            new DoctrineBundle(),
-            new SwiftmailerBundle(),
+            new Symfony\Bundle\ZendBundle\ZendBundle(),
+            new Symfony\Bundle\SwiftmailerBundle\SwiftmailerBundle(),
+            new Symfony\Bundle\DoctrineBundle\DoctrineBundle(),
+            //new Symfony\Bundle\DoctrineMigrationsBundle\DoctrineMigrationsBundle(),
+            //new Symfony\Bundle\DoctrineMongoDBBundle\DoctrineMongoDBBundle(),
+            //new Symfony\Bundle\PropelBundle\PropelBundle(),
+            //new Symfony\Bundle\TwigBundle\TwigBundle(),
 
-            // register your bundles here
+            // register your bundles
         );
 
         if ($this->isDebug()) {
+            $bundles[] = new Symfony\Bundle\WebProfilerBundle\WebProfilerBundle();
         }
 
         return $bundles;

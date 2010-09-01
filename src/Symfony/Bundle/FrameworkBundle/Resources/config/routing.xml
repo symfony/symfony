@@ -46,7 +46,7 @@
                 <argument key="cache_dir">%kernel.cache_dir%</argument>
                 <argument key="debug">%kernel.debug%</argument>
                 <argument key="matcher_cache_class">%kernel.name%UrlMatcher</argument>
-                <argument key="generator_cache_class">%kernel.name%UrlGenerator</argument>
+                <argument key="generator_cache_class">%kernel.name%_%kernel.environment%UrlGenerator</argument>
             </argument>
         </service>
     </services>

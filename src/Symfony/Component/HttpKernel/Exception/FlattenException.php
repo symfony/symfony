@@ -28,6 +28,7 @@ class FlattenException
     protected $previous;
     protected $trace;
     protected $class;
+    protected $status;
 
     static public function create(\Exception $exception)
     {
@@ -39,13 +40,19 @@ class FlattenException
         if ($exception->getPrevious()) {
             $e->setPrevious(static::create($exception->getPrevious()));
         }
+        $e->setStatusCode($exception instanceof HttpException ? $exception->getCode() : 500);
 
         return $e;
     }
 
     public function getStatusCode()
     {
-        return $this->getClass() instanceof HttpException ? $this->getCode() : 500;
+        return $this->status;
+    }
+
+    public function setStatusCode($status)
+    {
+        $this->status = $status;
     }
 
     public function getStatusText()

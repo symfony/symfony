@@ -16,7 +16,7 @@
                     <ul>
                         <?php foreach ($exception->getPreviouses() as $i => $previous): ?>
                             <li>
-                                <?php echo $previous->getClass() ?> <a href="#traces_link_<?php echo $i + 1 ?>" onclick="toggle('traces_<?php echo $i + 1 ?>', 'traces');">&raquo;</a>
+                                <?php echo $view['code']->abbrClass($previous->getClass()) ?> <a href="#traces_link_<?php echo $i + 1 ?>" onclick="toggle('traces_<?php echo $i + 1 ?>', 'traces');">&raquo;</a>
                             </li>
                         <?php endforeach; ?>
                     </ul>

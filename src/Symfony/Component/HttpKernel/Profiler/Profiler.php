@@ -142,7 +142,7 @@ class Profiler
 
         if (false !== $items = $this->storage->read($token)) {
             list($data, $this->ip, $this->url, $this->time) = $items;
-            $this->setCollectors(unserialize(pack('H*', $data)));
+            $this->set(unserialize(pack('H*', $data)));
 
             $this->empty = false;
         } else {
@@ -258,7 +258,7 @@ class Profiler
      *
      * @return array An array of collectors
      */
-    public function getCollectors()
+    public function all()
     {
         return $this->collectors;
     }
@@ -268,11 +268,11 @@ class Profiler
      *
      * @param array $collectors An array of collectors
      */
-    public function setCollectors(array $collectors = array())
+    public function set(array $collectors = array())
     {
         $this->collectors = array();
         foreach ($collectors as $name => $collector) {
-            $this->addCollector($collector);
+            $this->add($collector);
         }
     }
 
@@ -281,7 +281,7 @@ class Profiler
      *
      * @param DataCollectorInterface $collector A DataCollectorInterface instance
      */
-    public function addCollector(DataCollectorInterface $collector)
+    public function add(DataCollectorInterface $collector)
     {
         $this->collectors[$collector->getName()] = $collector;
     }
@@ -291,7 +291,7 @@ class Profiler
      *
      * @param string $name A collector name
      */
-    public function hasCollector($name)
+    public function has($name)
     {
         return isset($this->collectors[$name]);
     }
@@ -305,7 +305,7 @@ class Profiler
      *
      * @throws \InvalidArgumentException if the collector does not exist
      */
-    public function getCollector($name)
+    public function get($name)
     {
         if (!isset($this->collectors[$name])) {
             throw new \InvalidArgumentException(sprintf('Collector "%s" does not exist.', $name));

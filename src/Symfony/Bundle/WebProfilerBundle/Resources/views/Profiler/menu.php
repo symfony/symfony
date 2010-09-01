@@ -4,7 +4,7 @@
             <?php if ($name == $panel): ?>class="selected"<?php endif; ?>
         >
             <a href="<?php echo $view->get('router')->generate('_profiler_panel', array('token' => $token, 'panel' => $name)) ?>">
-                <?php echo $view->render($template, array('data' => $profiler->getCollector($name))) ?>
+                <?php echo $view->render($template, array('data' => $profiler->get($name))) ?>
             </a>
         </li>
     <?php endforeach; ?>

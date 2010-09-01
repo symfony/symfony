@@ -24,7 +24,7 @@
     <?php endif; ?>
 >
 <?php foreach ($templates as $name => $template): ?>
-    <?php echo $view->render($template, array('data' => $profiler->getCollector($name))) ?>
+    <?php echo $view->render($template, array('data' => $profiler->get($name))) ?>
 <?php endforeach; ?>
 </div>
 <!-- END of Symfony 2 Web Debug Toolbar -->

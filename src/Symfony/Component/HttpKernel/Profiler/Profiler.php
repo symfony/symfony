@@ -89,6 +89,19 @@ class Profiler
         return $profiler;
     }
 
+    /**
+     * Purges all data from the storage.
+     */
+    public function purge()
+    {
+        $this->storage->purge();
+    }
+
+    /**
+     * Exports the current profiler data.
+     *
+     * @return string The exported data
+     */
     public function export()
     {
         $unpack = unpack('H*', serialize(array($this->token, $this->collectors, $this->ip, $this->url, $this->time)));
@@ -96,6 +109,13 @@ class Profiler
         return $unpack[1];
     }
 
+    /**
+     * Imports data into the profiler storage.
+     *
+     * @param string $data A data string as exported by the export() method
+     *
+     * @return string The token associated with the imported data
+     */
     public function import($data)
     {
         list($token, $collectors, $ip, $url, $time) = unserialize(pack('H*', $data));

@@ -50,4 +50,9 @@ interface ProfilerStorageInterface
      * @param integer $time  The time of the data
      */
     function write($token, $data, $ip, $url, $time);
+
+    /**
+     * Purges all data from the database.
+     */
+    function purge();
 }

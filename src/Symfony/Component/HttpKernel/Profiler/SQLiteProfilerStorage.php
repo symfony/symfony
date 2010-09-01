@@ -89,21 +89,24 @@ class SQLiteProfilerStorage implements ProfilerStorageInterface
             ':time'  => $time,
         );
         $this->exec($db, 'INSERT INTO data (token, data, ip, url, time) VALUES (:token, :data, :ip, :url, :time)', $args);
-        $this->purge();
+        $this->cleanup();
         $this->close($db);
     }
 
-    public function purge($all = false)
+    /**
+     * {@inheritdoc}
+     */
+    public function purge()
     {
         $db = $this->initDb();
+        $this->exec($db, 'DELETE FROM data');
+        $this->close($db);
+    }
 
-        if (true === $all) {
-            $this->exec($db, 'DELETE FROM data');
-        } else {
-            $args = array(':time' => time() - $this->lifetime);
-            $this->exec($db, 'DELETE FROM data WHERE time < :time', $args);
-        }
-
+    protected function cleanup()
+    {
+        $db = $this->initDb();
+        $this->exec($db, 'DELETE FROM data WHERE time < :time', array(':time' => time() - $this->lifetime));
         $this->close($db);
     }
 

@@ -53,20 +53,20 @@ class DoctrineMongoDBLogger
             }
 
             if (is_scalar($value)) {
-                $formatted = json_encode($value);
+                $formatted = '"'.$value.'"';
             } elseif (is_array($value)) {
                 $formatted = static::formatQuery($value);
             } elseif ($value instanceof \MongoId) {
-                $formatted = 'ObjectId('.json_encode((string) $value).')';
+                $formatted = 'ObjectId("'.$value.'")';
             } elseif ($value instanceof \MongoDate) {
-                $formatted = 'new Date('.date('r', $value->sec).')';
+                $formatted = 'new Date("'.date('r', $value->sec).'")';
             } elseif ($value instanceof \MongoRegex) {
-                $formatted = 'new RegExp('.json_encode($value->regex).', '.json_encode($value->flags).')';
+                $formatted = 'new RegExp("'.$value->regex.'", "'.$value->flags.'")';
             } else {
                 $formatted = (string) $value;
             }
 
-            $parts[json_encode($key)] = $formatted;
+            $parts['"'.$key.'"'] = $formatted;
         }
 
         if (0 == count($parts)) {

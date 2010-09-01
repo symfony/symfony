@@ -42,9 +42,9 @@ class ActionsHelper extends Helper
      *
      * @see render()
      */
-    public function output($controller, array $options = array())
+    public function output($controller, array $attributes = array(), array $options = array())
     {
-        echo $this->render($controller, $options);
+        echo $this->render($controller, $attributes, $options);
     }
 
     /**

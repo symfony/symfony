@@ -29,7 +29,7 @@
     </head>
     <body>
         <center>
-            <?php echo $view['slots']->get('_content') ?>
+            <?php echo $view->get('slots')->get('_content') ?>
         </center>
     </body>
 </html>

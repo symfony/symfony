@@ -40,12 +40,12 @@ class EventDispatcher
     /**
      * Disconnects a listener for a given event name.
      *
-     * @param string   $name      An event name
-     * @param mixed    $listener  A PHP callable
+     * @param string     $name      An event name
+     * @param mixed|null $listener  A PHP callable or null to disconnect all listeners
      *
      * @return mixed false if listener does not exist, null otherwise
      */
-    public function disconnect($name, $listener)
+    public function disconnect($name, $listener = null)
     {
         if (!isset($this->listeners[$name])) {
             return false;

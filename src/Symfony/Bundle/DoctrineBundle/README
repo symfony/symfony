@@ -89,7 +89,7 @@ path for the **GuestbookBundle** we created above:
 Any files found in here that have a suffix of **.dcm.xml** (or whatever
 mapping_driver you picked) are used as your entities mapping information.
 
-In the **GuestbookBundle** we have a file named **Bundle.GuestbookBundle.Entities.Entry.dcm.xml**
+In the **GuestbookBundle** we have a file named **Bundle.GuestbookBundle.Entity.Entry.dcm.xml**
 which contains the following XML:
 
     <?xml version="1.0" encoding="UTF-8"?>
@@ -99,7 +99,7 @@ which contains the following XML:
           xsi:schemaLocation="http://doctrine-project.org/schemas/orm/doctrine-mapping
                               http://www.doctrine-project.org/schemas/orm/doctrine-mapping.xsd">
 
-        <entity name="Bundle\GuestbookBundle\Entities\Entry" table="guestbook_entry">
+        <entity name="Bundle\GuestbookBundle\Entity\Entry" table="guestbook_entry">
 
             <id name="id" type="integer" column="id">
                 <generator strategy="AUTO"/>
@@ -121,13 +121,13 @@ mapping information with the command:
 
     $ php console doctrine:generate:entities
 
-Now if you have a look in the bundles **Entities** directory you will see a new
+Now if you have a look in the bundles **Entity** directory you will see a new
 file named **Entry.php** with some code like the following:
 
     [php]
-    // Bundle/GuestbookBundle/Entities/Entry.php
+    // Bundle/GuestbookBundle/Entity/Entry.php
 
-    namespace Bundle\GuestbookBundle\Entities;
+    namespace Bundle\GuestbookBundle\Entity;
 
     /**
      * @Entity
@@ -214,7 +214,7 @@ You can easily generate a new Doctrine entity for a bundle by using the
     $ php console doctrine:generate:entity "Bundle\MySampleBundle" "User\Group"  --fields="name:string(255) description:text"
 
 Now if you have a look inside the bundle you will see that you have a **Group** class
-located here **Bundle/MySampleBundle/Entities/User/Group.php**.
+located here **Bundle/MySampleBundle/Entity/User/Group.php**.
 
 Now you can customize the mapping information for the entity by editing the metadata
 information inside **Bundle/MySampleBundle/Resources/config/doctrine/metadata** and

@@ -2,7 +2,12 @@ imports:
     - { resource: config.yml }
 
 web.config:
+    router:   { resource: "%kernel.root_dir%/config/routing_dev.yml" }
+    profiler: { only_exceptions: false }
+
+webprofiler.config:
     toolbar: true
+    intercept_redirects: true
 
 zend.logger:
     priority: debug

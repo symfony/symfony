@@ -4,8 +4,9 @@ imports:
 kernel.config:
     error_handler: false
 
-web.config:
+webprofiler.config:
     toolbar: false
+    intercept_redirects: false
 
 zend.logger:
     priority: debug

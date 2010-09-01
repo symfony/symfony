@@ -6,8 +6,9 @@ $container->loadFromExtension('kernel', 'config', array(
     'error_handler' => false,
 ));
 
-$container->loadFromExtension('web', 'config', array(
+$container->loadFromExtension('webprofiler', 'config', array(
     'toolbar' => false,
+    'intercept-redirects' => false,
 ));
 
 $container->loadFromExtension('zend', 'logger', array(

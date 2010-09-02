@@ -317,7 +317,7 @@ class FormTest extends \PHPUnit_Framework_TestCase
                 'returns an empty URI if the action is empty',
                 '<form><input type="submit" /></form>',
                 array(),
-                '', 
+                '',
             ),
             array(
                 'appends the form values even if the action is empty',

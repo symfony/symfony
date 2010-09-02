@@ -140,6 +140,16 @@ class ContainerBuilder extends Container implements TaggedContainerInterface
     }
 
     /**
+     * Removes a service.
+     *
+     * @param string $id The service identifier
+     */
+    public function remove($id)
+    {
+        unset($this->definitions[$id]);
+    }
+
+    /**
      * Returns true if the given service is defined.
      *
      * @param  string  $id      The service identifier
@@ -330,6 +340,16 @@ class ContainerBuilder extends Container implements TaggedContainerInterface
         unset($this->definitions[$alias]);
 
         $this->aliases[$alias] = $id;
+    }
+
+    /**
+     * Removes an alias.
+     *
+     * @param string $alias The alias to remove
+     */
+    public function removeAlias($alias)
+    {
+        unset($this->aliases[$alias]);
     }
 
     /**

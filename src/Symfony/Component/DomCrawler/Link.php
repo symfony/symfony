@@ -67,8 +67,13 @@ class Link
         $uri = $this->node->getAttribute('href');
         $urlHaveScheme = 'http' === substr($uri, 0, 4);
 
+        $path = $this->path;
+        if ('?' !== substr($uri, 0, 1) && '/' !== substr($path, -1)) {
+            $path = substr($path, 0, strrpos($path, '/') + 1);
+        }
+
         if ($uri && '/' !== $uri[0] && !$urlHaveScheme) {
-            $uri = $this->path.$uri;
+            $uri = $path.$uri;
         }
 
         if ($absolute && null !== $this->host && !$urlHaveScheme) {

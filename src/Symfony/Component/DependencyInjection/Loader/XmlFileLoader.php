@@ -179,12 +179,24 @@ class XmlFileLoader extends FileLoader
 
         // find anonymous service definitions
         $xml->registerXPathNamespace('container', 'http://www.symfony-project.org/schema/dic/services');
+
+        // anonymous services as arguments
         $nodes = $xml->xpath('//container:argument[@type="service"][not(@id)]');
         foreach ($nodes as $node) {
-            // give it a unique names
+            // give it a unique name
             $node['id'] = sprintf('_%s_%d', md5($file), ++$count);
 
-            $definitions[(string) $node['id']] = array($node->service, $file);
+            $definitions[(string) $node['id']] = array($node->service, $file, false);
+            $node->service['id'] = (string) $node['id'];
+        }
+
+        // anonymous services "in the wild"
+        $nodes = $xml->xpath('//container:service[not(@id)]');
+        foreach ($nodes as $node) {
+            // give it a unique name
+            $node['id'] = sprintf('_%s_%d', md5($file), ++$count);
+
+            $definitions[(string) $node['id']] = array($node, $file, true);
             $node->service['id'] = (string) $node['id'];
         }
 
@@ -194,7 +206,13 @@ class XmlFileLoader extends FileLoader
             $this->parseDefinition($id, $def[0], $def[1]);
 
             $oNode = dom_import_simplexml($def[0]);
-            $oNode->parentNode->removeChild($oNode);
+            if (true === $def[2]) {
+                $nNode = new \DOMElement('_services');
+                $oNode->parentNode->replaceChild($nNode, $oNode);
+                $nNode->setAttribute('id', $id);
+            } else {
+                $oNode->parentNode->removeChild($oNode);
+            }
         }
 
         return $xml;
@@ -350,13 +368,20 @@ EOF
                     $empty = false;
                 }
             } elseif (!$node instanceof \DOMComment) {
-                if (isset($config[$node->localName])) {
-                    if (!is_array($config[$node->localName]) || !is_int(key($config[$node->localName]))) {
-                        $config[$node->localName] = array($config[$node->localName]);
-                    }
-                    $config[$node->localName][] = static::convertDomElementToArray($node);
+                if ($node instanceof \DOMElement && '_services' === $node->nodeName) {
+                    $value = new Reference($node->getAttribute('id'));
                 } else {
-                    $config[$node->localName] = static::convertDomElementToArray($node);
+                    $value = static::convertDomElementToArray($node);
+                }
+
+                $key = $node->localName;
+                if (isset($config[$key])) {
+                    if (!is_array($config[$key]) || !is_int(key($config[$key]))) {
+                        $config[$key] = array($config[$key]);
+                    }
+                    $config[$key][] = $value;
+                } else {
+                    $config[$key] = $value;
                 }
 
                 $empty = false;

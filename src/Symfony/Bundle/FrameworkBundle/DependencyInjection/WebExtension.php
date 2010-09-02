@@ -75,21 +75,7 @@ class WebExtension extends Extension
         }
 
         if (isset($config['profiler'])) {
-            if ($config['profiler']) {
-                if (!$container->hasDefinition('profiler')) {
-                    $loader = new XmlFileLoader($container, __DIR__.'/../Resources/config');
-                    $loader->load('profiling.xml');
-                    $loader->load('collectors.xml');
-                }
-
-                if (isset($config['profiler']['only-exceptions'])) {
-                    $container->setParameter('profiler_listener.only_exceptions', $config['profiler']['only-exceptions']);
-                } elseif (isset($config['profiler']['only_exceptions'])) {
-                    $container->setParameter('profiler_listener.only_exceptions', $config['profiler']['only_exceptions']);
-                }
-            } elseif ($container->hasDefinition('profiler')) {
-                $container->getDefinition('profiling')->clearTags();
-            }
+            $this->registerProfilerConfiguration($config, $container);
         }
 
         if (isset($config['validation']['enabled'])) {
@@ -202,6 +188,54 @@ class WebExtension extends Extension
             'Symfony\\Bundle\\FrameworkBundle\\Templating\\Helper\\RouterHelper',
             'Symfony\\Bundle\\FrameworkBundle\\Templating\\Helper\\RouterHelper',
         ));
+    }
+
+    /*
+        <profiler only-exceptions="false">
+            <matcher ip="192.168.0.0/24" path="#/admin/#i" />
+            <matcher>
+                <service class="MyMatcher" />
+            </matcher>
+            <matcher service="my_matcher" />
+        </profiler>
+    */
+    protected function registerProfilerConfiguration($config, ContainerBuilder $container)
+    {
+        if ($config['profiler']) {
+            if (!$container->hasDefinition('profiler')) {
+                $loader = new XmlFileLoader($container, __DIR__.'/../Resources/config');
+                $loader->load('profiling.xml');
+                $loader->load('collectors.xml');
+            }
+
+            if (isset($config['profiler']['only-exceptions'])) {
+                $container->setParameter('profiler_listener.only_exceptions', $config['profiler']['only-exceptions']);
+            } elseif (isset($config['profiler']['only_exceptions'])) {
+                $container->setParameter('profiler_listener.only_exceptions', $config['profiler']['only_exceptions']);
+            }
+
+            if (isset($config['profiler']['matcher'])) {
+                if (isset($config['profiler']['matcher']['service'])) {
+                    $container->setAlias('profiler.request_matcher', $config['profiler']['matcher']['service']);
+                } elseif (isset($config['profiler']['matcher']['_services'])) {
+                    $container->setAlias('profiler.request_matcher', (string) $config['profiler']['matcher']['_services'][0]);
+                } else {
+                    $definition = $container->register('profiler.request_matcher', 'Symfony\\Component\\HttpFoundation\\RequestMatcher');
+
+                    if (isset($config['profiler']['matcher']['ip'])) {
+                        $definition->addMethodCall('matchIp', array($config['profiler']['matcher']['ip']));
+                    }
+
+                    if (isset($config['profiler']['matcher']['path'])) {
+                        $definition->addMethodCall('matchPath', array($config['profiler']['matcher']['path']));
+                    }
+                }
+            } else {
+                $container->removeAlias('profiler.request_matcher');
+            }
+        } elseif ($container->hasDefinition('profiler')) {
+            $container->getDefinition('profiling')->clearTags();
+        }
     }
 
     protected function registerValidationConfiguration($config, ContainerBuilder $container)

@@ -30,12 +30,12 @@ class ProfilerTest extends \PHPUnit_Framework_TestCase
         $storage->purge(true);
 
         $profiler = new Profiler($storage);
-        $profiler->addCollector($collector);
+        $profiler->add($collector);
         $profiler->setToken('foobar');
         $profiler->collect($request, $response);
 
         $profiler = new Profiler($storage);
         $profiler->setToken('foobar');
-        $this->assertEquals(array('foo' => 'bar'), $profiler->getCollector('request')->getRequestQuery()->all());
+        $this->assertEquals(array('foo' => 'bar'), $profiler->get('request')->getRequestQuery()->all());
     }
 }

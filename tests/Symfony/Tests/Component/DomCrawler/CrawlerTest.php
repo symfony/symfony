@@ -297,7 +297,7 @@ class CrawlerTest extends \PHPUnit_Framework_TestCase
         $this->assertEquals('http://example.com/bar/foo', $crawler->link()->getUri(), '->link() returns a Link instance');
 
         $crawler = $this->createTestCrawler('http://example.com/bar')->selectLink('Foo');
-        $this->assertEquals('http://example.com/foo', $crawler->link()->getUri(), '->form() linketurns a Link instance');
+        $this->assertEquals('http://example.com/foo', $crawler->link()->getUri(), '->link() returns a Link instance');
 
         try {
             $this->createTestCrawler()->filter('ol')->link();

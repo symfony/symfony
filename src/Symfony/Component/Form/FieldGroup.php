@@ -57,8 +57,7 @@ class FieldGroup extends Field implements \IteratorAggregate, FieldGroupInterfac
      */
     public function __clone()
     {
-        foreach ($this->fields as $name => $field)
-        {
+        foreach ($this->fields as $name => $field) {
             $field = clone $field;
             $field->setParent($this);
             $this->fields[$name] = $field;

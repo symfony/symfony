@@ -280,6 +280,14 @@ class FormTest extends \PHPUnit_Framework_TestCase
         $this->assertEquals('/foo', $form->getUri(true), '->getUri() returns absolute URIs only if the host has been defined in the constructor');
     }
 
+    public function testGetUriWithOnlyQueryString()
+    {
+        $form = $this->createForm('<form action="?get=param"><input type="submit" /></form>', null, 'http://localhost', '/foo/bar');
+        $this->assertEquals('http://localhost/foo/bar?get=param', $form->getUri(true), '->getUri() returns absolute URIs only if the host has been defined in the constructor');
+
+        $this->assertEquals('/foo/bar?get=param', $form->getUri(false), '->getUri() returns absolute URIs only if the host has been defined in the constructor');
+    }
+
     public function provideGetUriValues()
     {
         return array(

@@ -78,4 +78,33 @@ class RequestTest extends \PHPUnit_Framework_TestCase
         $this->assertEquals('js', $request->getFormat('application/x-javascript'), '->getFormat() returns correct format when format have multiple mime-type');
         $this->assertEquals('js', $request->getFormat('text/javascript'), '->getFormat() returns correct format when format have multiple mime-type (last)');
     }
+
+    /**
+     * @covers Symfony\Component\HttpFoundation\Request::getQueryString
+     */
+    public function testGetQueryString()
+    {
+        $request = new Request();
+
+        $request->server->set('QUERY_STRING', 'foo');
+        $this->assertEquals('foo', $request->getQueryString(), '->getQueryString() works with valueless parameters');
+
+        $request->server->set('QUERY_STRING', 'foo=');
+        $this->assertEquals('foo=', $request->getQueryString(), '->getQueryString() includes a dangling equal sign');
+
+        $request->server->set('QUERY_STRING', 'bar=&foo=bar');
+        $this->assertEquals('bar=&foo=bar', $request->getQueryString(), '->getQueryString() works when empty parameters');
+
+        $request->server->set('QUERY_STRING', 'foo=bar&bar=');
+        $this->assertEquals('bar=&foo=bar', $request->getQueryString(), '->getQueryString() sorts keys alphabetically');
+
+        $request->server->set('QUERY_STRING', 'him=John%20Doe&her=Jane+Doe');
+        $this->assertEquals('her=Jane+Doe&him=John+Doe', $request->getQueryString(), '->getQueryString() normalizes encoding');
+
+        $request->server->set('QUERY_STRING', 'foo[]=1&foo[]=2');
+        $this->assertEquals('foo%5B%5D=1&foo%5B%5D=2', $request->getQueryString(), '->getQueryString() allows array notation');
+
+        $request->server->set('QUERY_STRING', 'foo=1&foo=2');
+        $this->assertEquals('foo=1&foo=2', $request->getQueryString(), '->getQueryString() allows repeated parameters');
+    }
 }

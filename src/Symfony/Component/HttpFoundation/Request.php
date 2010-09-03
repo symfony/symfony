@@ -388,13 +388,21 @@ class Request
         }
 
         $parts = array();
-        foreach (explode('&', $qs) as $segment) {
-            $tmp = explode('=', urldecode($segment), 2);
-            $parts[urlencode($tmp[0])] = urlencode($tmp[1]);
-        }
-        ksort($parts);
+        $order = array();
 
-        return http_build_query($parts);
+        foreach (explode('&', $qs) as $segment) {
+            if (false === strpos($segment, '=')) {
+                $parts[] = $segment;
+                $order[] = $segment;
+            } else {
+                $tmp = explode('=', urldecode($segment), 2);
+                $parts[] = urlencode($tmp[0]).'='.urlencode($tmp[1]);
+                $order[] = $tmp[0];
+            }
+        }
+        array_multisort($order, SORT_ASC, $parts);
+
+        return implode('&', $parts);
     }
 
     public function isSecure()

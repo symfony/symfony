@@ -412,7 +412,7 @@ EOF;
 
     public function dumpParameter($name)
     {
-        if ($this->container->isFrozen() && $this->container->getParameterBag()->has($name)) {
+        if ($this->container->isFrozen() && $this->container->has($name)) {
             return $this->dumpValue($this->container->getParameter($name), false);
         }
 

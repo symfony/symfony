@@ -481,7 +481,7 @@ class DoctrineExtension extends Extension
     static protected function detectMetadataDriver($dir, ContainerBuilder $container)
     {
         // add the closest existing directory as a resource
-        $resource = $dir.'/Resources/config/doctrine/metadata';
+        $resource = $dir.'/Resources/config/doctrine/metadata/orm';
         while (!is_dir($resource)) {
             $resource = dirname($resource);
         }

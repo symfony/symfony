@@ -85,7 +85,7 @@ class DoctrineMongoDBExtension extends Extension
                 $container->setParameter('doctrine.odm.mongodb.'.$key, $config[$key]);
             }
         }
-        $container->setParameter('doctrine.odm.mongodb.mapping_dirs', $this->findBundleSubpaths('Resources/config/doctrine/metadata', $container));
+        $container->setParameter('doctrine.odm.mongodb.mapping_dirs', $this->findBundleSubpaths('Resources/config/doctrine/metadata/mongodb', $container));
         $container->setParameter('doctrine.odm.mongodb.document_dirs', $this->findBundleSubpaths('Document', $container));
     }
 
@@ -338,9 +338,9 @@ class DoctrineMongoDBExtension extends Extension
         }
         $container->addResource(new FileResource($resource));
 
-        if (count(glob($dir.'/Resources/config/doctrine/metadata/*.xml'))) {
+        if (count(glob($dir.'/Resources/config/doctrine/metadata/mongodb/*.xml'))) {
             return 'xml';
-        } elseif (count(glob($dir.'/Resources/config/doctrine/metadata/*.yml'))) {
+        } elseif (count(glob($dir.'/Resources/config/doctrine/metadata/mongodb/*.yml'))) {
             return 'yml';
         }
 

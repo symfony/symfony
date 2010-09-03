@@ -59,7 +59,10 @@ class FieldGroup extends Field implements \IteratorAggregate, FieldGroupInterfac
     {
         foreach ($this->fields as $name => $field) {
             $field = clone $field;
-            $field->setParent($this);
+            // this condition is only to "bypass" a PHPUnit bug with mocks
+            if (null !== $field->getParent()) {
+                $field->setParent($this);
+            }
             $this->fields[$name] = $field;
         }
     }

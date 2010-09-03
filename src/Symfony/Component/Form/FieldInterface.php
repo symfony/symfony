@@ -37,6 +37,13 @@ interface FieldInterface extends Localizable, Translatable
     public function setParent(FieldInterface $parent = null);
 
     /**
+     * Returns the parent field.
+     *
+     * @return FieldInterface  The parent field
+     */
+    public function getParent();
+
+    /**
      * Sets the key by which the field is identified in field groups.
      *
      * Once this field is nested in a field group, i.e. after setParent() was

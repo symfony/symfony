@@ -60,8 +60,16 @@ class DoctrineMongoDBLogger
                 $formatted = 'ObjectId("'.$value.'")';
             } elseif ($value instanceof \MongoDate) {
                 $formatted = 'new Date("'.date('r', $value->sec).'")';
+            } elseif ($value instanceof \DateTime) {
+                $formatted = 'new Date("'.date('r', $value->getTimestamp()).'")';
             } elseif ($value instanceof \MongoRegex) {
                 $formatted = 'new RegExp("'.$value->regex.'", "'.$value->flags.'")';
+            } elseif ($value instanceof \MongoMinKey) {
+                $formatted = 'new MinKey()';
+            } elseif ($value instanceof \MongoMaxKey) {
+                $formatted = 'new MaxKey()';
+            } elseif ($value instanceof \MongoBinData) {
+                $formatted = 'new BinData("'.$formatted->bin.'", "'.$formatted->type.'")';
             } else {
                 $formatted = (string) $value;
             }

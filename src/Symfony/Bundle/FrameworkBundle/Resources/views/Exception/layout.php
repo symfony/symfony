@@ -6,10 +6,12 @@
         <style type="text/css">
             html { background: #eee }
             body { font: 11px Verdana, Arial, sans-serif; color: #333 }
+            .sf-exceptionreset, .sf-exceptionreset .block, .sf-exceptionreset #message { margin: auto }
 
             <?php echo $view->render('FrameworkBundle:Exception:styles') ?>
         </style>
         <script type="text/javascript">
+            //<![CDATA[
             function toggle(id, clazz) {
                 el = document.getElementById(id);
                 current = el.style.display
@@ -25,11 +27,10 @@
 
                 el.style.display = current == 'none' ? 'block' : 'none';
             }
+            //]]>
         </script>
     </head>
     <body>
-        <center>
-            <?php echo $view->get('slots')->get('_content') ?>
-        </center>
+        <?php echo $view->get('slots')->get('_content') ?>
     </body>
 </html>

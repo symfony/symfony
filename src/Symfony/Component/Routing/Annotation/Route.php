@@ -22,6 +22,7 @@ class Route
     protected $name;
     protected $requirements;
     protected $options;
+    protected $defaults;
 
     /**
      * Constructor.
@@ -32,6 +33,7 @@ class Route
     {
         $this->requirements = array();
         $this->options = array();
+        $this->defaults = array();
 
         if (isset($data['value'])) {
             $data['pattern'] = $data['value'];
@@ -85,5 +87,15 @@ class Route
     public function getOptions()
     {
         return $this->options;
+    }
+
+    public function setDefaults($defaults)
+    {
+        $this->defaults = $defaults;
+    }
+
+    public function getDefaults()
+    {
+        return $this->defaults;
     }
 }

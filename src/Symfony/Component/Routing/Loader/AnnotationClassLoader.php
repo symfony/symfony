@@ -87,6 +87,7 @@ abstract class AnnotationClassLoader implements LoaderInterface
             'pattern'      => '',
             'requirements' => array(),
             'options'      => array(),
+            'defaults'     => array(),
         );
 
         if ($annot = $this->reader->getClassAnnotation($class, $annotClass)) {
@@ -101,6 +102,10 @@ abstract class AnnotationClassLoader implements LoaderInterface
             if (null !== $annot->getOptions()) {
                 $globals['options'] = $annot->getOptions();
             }
+
+            if (null !== $annot->getDefaults()) {
+                $globals['defaults'] = $annot->getDefaults();
+            }
         }
 
         $this->reader->setDefaultAnnotationNamespace('Symfony\\Component\\Routing\\Annotation\\');
@@ -111,7 +116,7 @@ abstract class AnnotationClassLoader implements LoaderInterface
                     $annot->setName($this->getDefaultRouteName($class, $method));
                 }
 
-                $defaults = $this->getRouteDefaults($class, $method, $annot);
+                $defaults = array_merge($globals['defaults'], $annot->getDefaults(), $this->getRouteDefaults($class, $method, $annot));
                 $requirements = array_merge($globals['requirements'], $annot->getRequirements());
                 $options = array_merge($globals['options'], $annot->getOptions());
 

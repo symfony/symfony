@@ -81,7 +81,7 @@ abstract class AnnotationClassLoader implements LoaderInterface
         }
 
         $class = new \ReflectionClass($class);
-        class_exists($annotClass = 'Symfony\\Component\\Routing\\Annotation\\Route');
+        $annotClass = 'Symfony\\Component\\Routing\\Annotation\\Route';
 
         $globals = array(
             'pattern'      => '',

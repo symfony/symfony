@@ -22,7 +22,7 @@ class DropSchemaDoctrineODMCommand extends DropCommand
 
         $this
             ->setName('doctrine:odm:schema:drop')
-            ->addOption('dm', null, InputOption::PARAMETER_OPTIONAL, 'The document manager to use for this command.')
+            ->addOption('dm', null, InputOption::PARAMETER_REQUIRED, 'The document manager to use for this command.')
             ->setHelp(<<<EOT
 The <info>doctrine:odm:schema:drop</info> command drops the default document manager's schema:
 

@@ -59,7 +59,7 @@ class XliffMessageInterpolator implements MessageInterpolatorInterface
             throw new \Exception(implode("\n", $this->getXmlErrors()));
         }
 
-        $parts = explode('/', __DIR__.'/schema/dic/xliff-core/xml.xsd');
+        $parts = explode('/', str_replace('\\', '/', __DIR__).'/schema/dic/xliff-core/xml.xsd');
         $drive = '\\' === DIRECTORY_SEPARATOR ? array_shift($parts).'/' : '';
         $location = 'file:///'.$drive.implode('/', array_map('rawurlencode', $parts));
 

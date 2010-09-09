@@ -1,10 +1,10 @@
 <?php
 
-namespace Symfony\Component\File;
+namespace Symfony\Component\HttpFoundation\File;
 
-use Symfony\Component\File\Exception\FileException;
-use Symfony\Component\File\Exception\FileNotFoundException;
-use Symfony\Component\File\MimeType\MimeTypeGuesser;
+use Symfony\Component\HttpFoundation\File\Exception\FileException;
+use Symfony\Component\HttpFoundation\File\Exception\FileNotFoundException;
+use Symfony\Component\HttpFoundation\File\MimeType\MimeTypeGuesser;
 
 /*
  * This file is part of the symfony package.

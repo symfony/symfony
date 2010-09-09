@@ -1,9 +1,9 @@
 <?php
 
-namespace Symfony\Component\File\MimeType;
+namespace Symfony\Component\HttpFoundation\File\MimeType;
 
-use Symfony\Component\File\Exception\FileNotFoundException;
-use Symfony\Component\File\Exception\AccessDeniedException;
+use Symfony\Component\HttpFoundation\File\Exception\FileNotFoundException;
+use Symfony\Component\HttpFoundation\File\Exception\AccessDeniedException;
 
 /*
  * This file is part of the symfony package.
@@ -14,11 +14,11 @@ use Symfony\Component\File\Exception\AccessDeniedException;
  */
 
 /**
- * Guesses the mime type using the PHP function mime_content_type().
+ * Guesses the mime type using the PECL extension FileInfo
  *
  * @author Bernhard Schussek <bernhard.schussek@symfony-project.com>
  */
-class ContentTypeMimeTypeGuesser implements MimeTypeGuesserInterface
+class FileinfoMimeTypeGuesser implements MimeTypeGuesserInterface
 {
     /**
      * Returns whether this guesser is supported on the corrent OS/PHP setup
@@ -27,7 +27,7 @@ class ContentTypeMimeTypeGuesser implements MimeTypeGuesserInterface
      */
     static public function isSupported()
     {
-        return function_exists('mime_content_type');
+        return function_exists('finfo_open');
     }
 
     /**
@@ -45,11 +45,15 @@ class ContentTypeMimeTypeGuesser implements MimeTypeGuesserInterface
             throw new AccessDeniedException($path);
         }
 
-        if (!self::isSupported() || !is_readable($path)) {
+        if (!self::isSupported()) {
             return null;
         }
 
-        $type = mime_content_type($path);
+        if (!$finfo = new \finfo(FILEINFO_MIME)) {
+            return null;
+        }
+
+        $type = $finfo->file($path);
 
         // remove charset (added as of PHP 5.3)
         if (false !== $pos = strpos($type, ';')) {

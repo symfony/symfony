@@ -12,6 +12,7 @@
 namespace Symfony\Tests\Component\HttpFoundation;
 
 use Symfony\Component\HttpFoundation\Request;
+use Symfony\Component\HttpFoundation\File\UploadedFile;
 
 class RequestTest extends \PHPUnit_Framework_TestCase
 {
@@ -106,5 +107,84 @@ class RequestTest extends \PHPUnit_Framework_TestCase
 
         $request->server->set('QUERY_STRING', 'foo=1&foo=2');
         $this->assertEquals('foo=1&foo=2', $request->getQueryString(), '->getQueryString() allows repeated parameters');
+    }
+
+    public function testInitializeConvertsUploadedFiles()
+    {
+        $tmpFile = $this->createTempFile();
+        $file = new UploadedFile($tmpFile, basename($tmpFile), 'text/plain', 100, 0);
+
+        $request = Request::create('', 'get', array(), array(), array('file' => array(
+            'name' => basename($tmpFile),
+            'type' => 'text/plain',
+            'tmp_name' => $tmpFile,
+            'error' => 0,
+            'size' => 100
+        )));
+
+        $this->assertEquals($file, $request->files->get('file'));
+    }
+
+    public function testInitializeConvertsUploadedFilesWithPhpBug()
+    {
+        $tmpFile = $this->createTempFile();
+        $file = new UploadedFile($tmpFile, basename($tmpFile), 'text/plain', 100, 0);
+
+        $request = Request::create('', 'get', array(), array(), array(
+            'child' => array(
+                'name' => array(
+                    'file' => basename($tmpFile),
+                ),
+                'type' => array(
+                    'file' => 'text/plain',
+                ),
+                'tmp_name' => array(
+                    'file' => $tmpFile,
+                ),
+                'error' => array(
+                    'file' => 0,
+                ),
+                'size' => array(
+                    'file' => 100,
+                ),
+            )
+        ));
+
+        $files = $request->files->all();
+        $this->assertEquals($file, $files['child']['file']);
+    }
+
+    public function testInitializeConvertsNestedUploadedFilesWithPhpBug()
+    {
+        $tmpFile = $this->createTempFile();
+        $file = new UploadedFile($tmpFile, basename($tmpFile), 'text/plain', 100, 0);
+
+        $request = Request::create('', 'get', array(), array(), array(
+            'child' => array(
+                'name' => array(
+                    'sub' => array('file' => basename($tmpFile))
+                ),
+                'type' => array(
+                    'sub' => array('file' => 'text/plain')
+                ),
+                'tmp_name' => array(
+                    'sub' => array('file' => $tmpFile)
+                ),
+                'error' => array(
+                    'sub' => array('file' => 0)
+                ),
+                'size' => array(
+                    'sub' => array('file' => 100)
+                ),
+            )
+        ));
+
+        $files = $request->files->all();
+        $this->assertEquals($file, $files['child']['sub']['file']);
+    }
+
+    protected function createTempFile()
+    {
+        return tempnam(sys_get_temp_dir(), 'FormTest');
     }
 }

@@ -6,7 +6,7 @@ use Symfony\Component\Validator\Constraint;
 use Symfony\Component\Validator\ConstraintValidator;
 use Symfony\Component\Validator\Exception\ConstraintDefinitionException;
 use Symfony\Component\Validator\Exception\UnexpectedTypeException;
-use Symfony\Component\File\File as FileObject;
+use Symfony\Component\HttpFoundation\File\File as FileObject;
 
 class FileValidator extends ConstraintValidator
 {

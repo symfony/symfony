@@ -1,6 +1,6 @@
 <?php
 
-namespace Symfony\Component\File\MimeType;
+namespace Symfony\Component\HttpFoundation\File\MimeType;
 
 /*
  * This file is part of the symfony package.

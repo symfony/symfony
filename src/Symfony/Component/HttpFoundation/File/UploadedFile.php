@@ -1,8 +1,8 @@
 <?php
 
-namespace Symfony\Component\File;
+namespace Symfony\Component\HttpFoundation\File;
 
-use Symfony\Component\File\Exception\FileException;
+use Symfony\Component\HttpFoundation\File\Exception\FileException;
 
 /*
  * This file is part of the symfony package.

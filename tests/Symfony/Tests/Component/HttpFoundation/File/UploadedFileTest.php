@@ -1,8 +1,8 @@
 <?php
 
-namespace Symfony\Tests\Component\File;
+namespace Symfony\Tests\Component\HttpFoundation\File;
 
-use Symfony\Component\File\UploadedFile;
+use Symfony\Component\HttpFoundation\File\UploadedFile;
 
 
 class UploadedFileTest extends \PHPUnit_Framework_TestCase
@@ -11,7 +11,7 @@ class UploadedFileTest extends \PHPUnit_Framework_TestCase
     {
         // we can't change this setting without modifying php.ini :(
         if (!ini_get('file_uploads')) {
-            $this->setExpectedException('Symfony\Component\File\Exception\FileException');
+            $this->setExpectedException('Symfony\Component\HttpFoundation\File\Exception\FileException');
 
             new UploadedFile(
                 __DIR__.'/Fixtures/test.gif',

@@ -1,6 +1,6 @@
 <?php
 
-namespace Symfony\Component\File\Exception;
+namespace Symfony\Component\HttpFoundation\File\Exception;
 
 /*
  * This file is part of the symfony package.
@@ -11,19 +11,19 @@ namespace Symfony\Component\File\Exception;
  */
 
 /**
- * Thrown when a file was not found
+ * Thrown when the access on a file was denied.
  *
  * @author Bernhard Schussek <bernhard.schussek@symfony-project.com>
  */
-class FileNotFoundException extends FileException
+class AccessDeniedException extends FileException
 {
     /**
      * Constructor.
      *
-     * @param string $path  The path to the file that was not found
+     * @param string $path  The path to the accessed file
      */
     public function __construct($path)
     {
-        parent::__construct(sprintf('The file %s does not exist', $path));
+        parent::__construct(sprintf('The file %s could not be accessed', $path));
     }
 }

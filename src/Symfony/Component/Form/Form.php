@@ -177,6 +177,10 @@ class Form extends FieldGroup
             $taintedFiles = self::convertFileInformation(self::fixPhpFilesArray($taintedFiles));
         }
 
+        if (null === $taintedValues) {
+            $taintedValues = array();
+        }
+
         $this->doBind(self::deepArrayUnion($taintedValues, $taintedFiles));
 
         if ($this->getParent() === null) {

@@ -2,12 +2,6 @@
 
 namespace Symfony\Component\Form;
 
-use Symfony\Component\Form\Renderer\SelectRenderer;
-use Symfony\Component\Form\Renderer\InputRadioRenderer;
-use Symfony\Component\Form\Renderer\InputCheckboxRenderer;
-use Symfony\Component\Form\ValueTransformer\ValueTransformerInterface;
-use Symfony\Component\Form\ValueTransformer\BooleanToStringTransformer;
-
 /**
  * Lets the user select between different choices
  *

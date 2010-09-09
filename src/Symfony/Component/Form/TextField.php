@@ -2,8 +2,6 @@
 
 namespace Symfony\Component\Form;
 
-use Symfony\Component\Form\Renderer\InputTextRenderer;
-
 /*
  * This file is part of the symfony package.
  * (c) Fabien Potencier <fabien.potencier@symfony-project.com>

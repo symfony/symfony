@@ -3,9 +3,7 @@
 namespace Symfony\Component\Form;
 
 use Symfony\Component\Validator\ValidatorInterface;
-use Symfony\Component\Validator\ConstraintViolation;
 use Symfony\Component\I18N\TranslatorInterface;
-use Symfony\Component\File\UploadedFile;
 
 /*
  * This file is part of the symfony package.

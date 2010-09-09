@@ -3,7 +3,6 @@
 namespace Symfony\Component\Form\Renderer;
 
 use Symfony\Component\Form\FieldInterface;
-use Symfony\Component\Form\Field\ChoiceField;
 
 /*
  * This file is part of the symfony package.

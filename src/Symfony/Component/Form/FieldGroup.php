@@ -4,8 +4,6 @@ namespace Symfony\Component\Form;
 
 use Symfony\Component\Form\Exception\AlreadyBoundException;
 use Symfony\Component\Form\Exception\UnexpectedTypeException;
-use Symfony\Component\Form\Exception\InvalidPropertyException;
-use Symfony\Component\Form\Exception\PropertyAccessDeniedException;
 use Symfony\Component\Form\Renderer\RendererInterface;
 use Symfony\Component\Form\Renderer\TableRenderer;
 use Symfony\Component\Form\Iterator\RecursiveFieldsWithPropertyPathIterator;

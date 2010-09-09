@@ -2,7 +2,6 @@
 
 namespace Symfony\Component\Form;
 
-use Symfony\Component\Form\Renderer\InputCheckboxRenderer;
 use Symfony\Component\Form\ValueTransformer\BooleanToStringTransformer;
 
 /*

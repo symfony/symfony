@@ -1,6 +1,6 @@
 <?php
 
-namespace Symfony\Component\File\Exception;
+namespace Symfony\Component\HttpFoundation\File\Exception;
 
 /*
  * This file is part of the symfony package.

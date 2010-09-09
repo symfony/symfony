@@ -1,9 +1,9 @@
 <?php
 
-namespace Symfony\Component\File\MimeType;
+namespace Symfony\Component\HttpFoundation\File\MimeType;
 
-use Symfony\Component\File\Exception\FileNotFoundException;
-use Symfony\Component\File\Exception\AccessDeniedException;
+use Symfony\Component\HttpFoundation\File\Exception\FileNotFoundException;
+use Symfony\Component\HttpFoundation\File\Exception\AccessDeniedException;
 
 /*
  * This file is part of the symfony package.

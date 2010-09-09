@@ -6,7 +6,7 @@ use Symfony\Component\Validator\Constraint;
 use Symfony\Component\Validator\ConstraintValidator;
 use Symfony\Component\Validator\Exception\ConstraintDefinitionException;
 use Symfony\Component\Validator\Exception\UnexpectedTypeException;
-use Symfony\Component\File\File as FileObject;
+use Symfony\Component\HttpFoundation\File\File as FileObject;
 
 class FileValidator extends ConstraintValidator
 {
@@ -18,6 +18,10 @@ class FileValidator extends ConstraintValidator
 
         if (!is_scalar($value) && !$value instanceof FileObject && !(is_object($value) && method_exists($value, '__toString()'))) {
             throw new UnexpectedTypeException($value, 'string');
+        }
+
+        if ($value instanceof FileObject && null === $value->getPath()) {
+            return true;
         }
 
         $path = $value instanceof FileObject ? $value->getPath() : (string)$value;
@@ -39,11 +43,11 @@ class FileValidator extends ConstraintValidator
                 $size = filesize($path);
                 $limit = $constraint->maxSize;
                 $suffix = ' bytes';
-            } else if (preg_match('/^(\d)k$/', $constraint->maxSize, $matches)) {
+            } else if (preg_match('/^(\d+)k$/', $constraint->maxSize, $matches)) {
                 $size = round(filesize($path) / 1000, 2);
                 $limit = $matches[1];
                 $suffix = ' kB';
-            } else if (preg_match('/^(\d)M$/', $constraint->maxSize, $matches)) {
+            } else if (preg_match('/^(\d+)M$/', $constraint->maxSize, $matches)) {
                 $size = round(filesize($path) / 1000000, 2);
                 $limit = $matches[1];
                 $suffix = ' MB';

@@ -1,9 +1,9 @@
 <?php
 
-namespace Symfony\Tests\Component\File;
+namespace Symfony\Tests\Component\HttpFoundation\File;
 
-use Symfony\Component\File\File;
-use Symfony\Component\File\MimeType\MimeTypeGuesser;
+use Symfony\Component\HttpFoundation\File\File;
+use Symfony\Component\HttpFoundation\File\MimeType\MimeTypeGuesser;
 
 
 class FileTest extends \PHPUnit_Framework_TestCase
@@ -61,7 +61,7 @@ class FileTest extends \PHPUnit_Framework_TestCase
 
     protected function createMockGuesser($path, $mimeType)
     {
-        $guesser = $this->getMock('Symfony\Component\File\MimeType\MimeTypeGuesserInterface');
+        $guesser = $this->getMock('Symfony\Component\HttpFoundation\File\MimeType\MimeTypeGuesserInterface');
         $guesser->expects($this->once())
                         ->method('guess')
                         ->with($this->equalTo($path))

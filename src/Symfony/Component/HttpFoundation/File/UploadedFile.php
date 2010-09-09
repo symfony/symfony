@@ -1,8 +1,8 @@
 <?php
 
-namespace Symfony\Component\File;
+namespace Symfony\Component\HttpFoundation\File;
 
-use Symfony\Component\File\Exception\FileException;
+use Symfony\Component\HttpFoundation\File\Exception\FileException;
 
 /*
  * This file is part of the symfony package.
@@ -43,7 +43,9 @@ class UploadedFile extends File
             throw new FileException(sprintf('Unable to create UploadedFile because "file_uploads" is disabled in your php.ini file (%s)', get_cfg_var('cfg_file_path')));
         }
 
-        parent::__construct($path);
+        if (is_file($path)) {
+            $this->path = realpath($path);
+        }
 
         if (is_null($error)) {
             $error = UPLOAD_ERR_OK;

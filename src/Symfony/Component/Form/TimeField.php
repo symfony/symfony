@@ -107,25 +107,23 @@ class TimeField extends FieldGroup
         $this->setValueTransformer(new ValueTransformerChain($transformers));
     }
 
+    public function isField()
+    {
+        return self::INPUT === $this->getOption('widget');
+    }
+
     /**
      * {@inheritDoc}
      */
-    public function render(array $attributes = array())
+    public function getAttributes()
     {
-        if ($this->getOption('widget') == self::INPUT) {
-            $attributes = array_merge(array(
+        if ($this->isField()) {
+            return array_merge(parent::getAttributes(), array(
                 'size' => '1',
-            ), $attributes);
+            ));
         }
 
-        $html = $this->get('hour')->render($attributes);
-        $html .= ':' . $this->get('minute')->render($attributes);
-
-        if ($this->getOption('with_seconds')) {
-            $html .= ':' . $this->get('second')->render($attributes);
-        }
-
-        return $html;
+        return parent::getAttributes();
     }
 
     /**

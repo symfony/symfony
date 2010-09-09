@@ -143,4 +143,9 @@ abstract class Configurable
     {
         return isset($this->options[$name]);
     }
+
+    public function getOptions()
+    {
+        return $this->options;
+    }
 }

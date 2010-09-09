@@ -13,6 +13,7 @@
         </parameter>
         <parameter key="twig.loader.class">Symfony\Bundle\TwigBundle\Loader\Loader</parameter>
         <parameter key="twig.renderer.class">Symfony\Bundle\TwigBundle\Renderer\Renderer</parameter>
+        <parameter key="twig.form.resources" type="collection"></parameter>
     </parameters>
 
     <services>
@@ -42,9 +43,20 @@
             <argument type="service" id="translator" />
         </service>
 
+        <service id="twig.extension.html" class="Symfony\Bundle\TwigBundle\Extension\HtmlExtension">
+            <tag name="twig.extension" />
+            <argument type="service" id="templating.html.generator" />
+        </service>
+
         <service id="twig.extension.helpers" class="Symfony\Bundle\TwigBundle\Extension\HelpersExtension">
             <tag name="twig.extension" />
             <argument type="service" id="service_container" />
+        </service>
+
+        <service id="twig.extension.form" class="Symfony\Bundle\TwigBundle\Extension\FormExtension">
+            <tag name="twig.extension" />
+            <argument type="service" id="templating.html.generator" />
+            <argument>%twig.form.resources%</argument>
         </service>
     </services>
 </container>

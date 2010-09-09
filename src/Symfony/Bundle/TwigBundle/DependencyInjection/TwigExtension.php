@@ -36,6 +36,17 @@ class TwigExtension extends Extension
         }
 
         $container->setParameter('twig.options', array_replace($container->getParameter('twig.options'), $config));
+
+        // form resources
+        foreach (array('resources', 'resource') as $key) {
+            if (isset($config['form'][$key])) {
+                $resources = $config['form'][$key];
+                if (!is_array($resources)) {
+                    $resources = array($resources);
+                }
+                $container->setParameter('twig.form.resources', array_merge($container->getParameter('twig.form.resources'), $resources));
+            }
+        }
     }
 
     /**

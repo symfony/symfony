@@ -15,24 +15,15 @@ use Symfony\Component\Form\Exception\InvalidPropertyException;
 use Symfony\Component\Form\Exception\PropertyAccessDeniedException;
 use Symfony\Component\Form\ValueTransformer\ValueTransformerInterface;
 use Symfony\Component\Form\ValueTransformer\TransformationFailedException;
-use Symfony\Component\I18N\TranslatorInterface;
 
 abstract class Field extends Configurable implements FieldInterface
 {
-    /**
-     * The object used for generating HTML code
-     * @var HtmlGeneratorInterface
-     */
-    protected $generator = null;
-
     protected $taintedData = null;
     protected $locale = null;
-    protected $translator = null;
 
     private $errors = array();
     private $key = '';
     private $parent = null;
-    private $renderer = null;
     private $bound = false;
     private $required = null;
     private $data = null;
@@ -48,7 +39,6 @@ abstract class Field extends Configurable implements FieldInterface
         $this->addOption('property_path', (string)$key);
 
         $this->key = (string)$key;
-        $this->generator = new HtmlGenerator();
 
         if ($this->locale === null) {
             $this->locale = class_exists('\Locale', false) ? \Locale::getDefault() : 'en';
@@ -68,6 +58,11 @@ abstract class Field extends Configurable implements FieldInterface
     public function __clone()
     {
         // TODO
+    }
+
+    public function getAttributes()
+    {
+        return array();
     }
 
     /**
@@ -170,14 +165,6 @@ abstract class Field extends Configurable implements FieldInterface
         } else {
             return true;
         }
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    public function setGenerator(HtmlGeneratorInterface $generator)
-    {
-        $this->generator = $generator;
     }
 
     /**
@@ -287,9 +274,9 @@ abstract class Field extends Configurable implements FieldInterface
      *
      * @see FieldInterface
      */
-    public function addError($message, PropertyPath $path = null, $type = null)
+    public function addError($messageTemplate, array $messageParameters = array(), PropertyPath $path = null, $type = null)
     {
-        $this->errors[] = $message;
+        $this->errors[] = array($messageTemplate, $messageParameters);
     }
 
     /**
@@ -347,54 +334,16 @@ abstract class Field extends Configurable implements FieldInterface
     }
 
     /**
-     * Sets the translator of this field.
+     * Injects the locale into the given object, if set.
      *
-     * @see Translatable
-     */
-    public function setTranslator(TranslatorInterface $translator)
-    {
-        $this->translator = $translator;
-
-        if ($this->valueTransformer !== null && $this->valueTransformer instanceof Translatable) {
-            $this->valueTransformer->setTranslator($translator);
-        }
-    }
-
-    /**
-     * Translates the text using the associated translator, if available
-     *
-     * If no translator is available, the original text is returned without
-     * modification.
-     *
-     * @param  string $text         The text to translate
-     * @param  array $parameters    The parameters to insert in the text
-     * @return string               The translated text
-     */
-    protected function translate($text, array $parameters = array())
-    {
-        if ($this->translator !== null) {
-            $text = $this->translator->translate($text, $parameters);
-        }
-
-        return $text;
-    }
-
-    /**
-     * Injects the locale and the translator into the given object, if set.
-     *
-     * The locale is injected only if the object implements Localizable. The
-     * translator is injected only if the object implements Translatable.
+     * The locale is injected only if the object implements Localizable.
      *
      * @param object $object
      */
-    protected function injectLocaleAndTranslator($object)
+    protected function injectLocale($object)
     {
         if ($object instanceof Localizable) {
             $object->setLocale($this->locale);
-        }
-
-        if (!is_null($this->translator) && $object instanceof Translatable) {
-            $object->setTranslator($this->translator);
         }
     }
 
@@ -405,7 +354,7 @@ abstract class Field extends Configurable implements FieldInterface
      */
     public function setValueTransformer(ValueTransformerInterface $valueTransformer)
     {
-        $this->injectLocaleAndTranslator($valueTransformer);
+        $this->injectLocale($valueTransformer);
 
         $this->valueTransformer = $valueTransformer;
     }
@@ -629,25 +578,5 @@ abstract class Field extends Configurable implements FieldInterface
         } else {
             $objectOrArray[$propertyPath->getCurrent()] = $this->getData();
         }
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    public function renderErrors()
-    {
-        $html = '';
-
-        if ($this->hasErrors()) {
-            $html .= "<ul>\n";
-
-            foreach ($this->getErrors() as $error) {
-                $html .= "<li>" . $error . "</li>\n";
-            }
-
-            $html .= "</ul>\n";
-        }
-
-        return $html;
     }
 }

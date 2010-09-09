@@ -48,6 +48,21 @@ class HybridField extends FieldGroup
         $this->mode = $mode;
     }
 
+    public function isField()
+    {
+        return self::FIELD === $this->mode;
+    }
+
+    public function isGroup()
+    {
+        return self::GROUP === $this->mode;
+    }
+
+    public function getFieldMode()
+    {
+        return $this->mode;
+    }
+
     /**
      * {@inheritDoc}
      *

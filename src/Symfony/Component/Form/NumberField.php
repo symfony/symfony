@@ -40,10 +40,10 @@ class NumberField extends InputField
     /**
      * {@inheritDoc}
      */
-    public function render(array $attributes = array())
+    public function getAttributes(array $attributes = array())
     {
-        return parent::render(array_merge(array(
+        return array_merge(parent::getAttributes(), array(
             'type'  => 'text',
-        ), $attributes));
+        ));
     }
 }

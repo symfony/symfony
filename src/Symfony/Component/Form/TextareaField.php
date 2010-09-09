@@ -21,15 +21,13 @@ class TextareaField extends Field
     /**
      * {@inheritDoc}
      */
-    public function render(array $attributes = array())
+    public function getAttributes()
     {
-        $content = $this->generator->escape($this->getDisplayedData());
-
-        return $this->generator->contentTag('textarea', $content, array_merge(array(
+        return array_merge(parent::getAttributes(), array(
             'id'    => $this->getId(),
             'name'  => $this->getName(),
             'rows'  => 4,
             'cols'  => 30,
-        ), $attributes));
+        ));
     }
 }

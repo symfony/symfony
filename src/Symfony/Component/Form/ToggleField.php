@@ -27,7 +27,6 @@ abstract class ToggleField extends InputField
     {
         $this->addOption('value');
         $this->addOption('label');
-        $this->addOption('translate_label', false);
 
         $this->setValueTransformer(new BooleanToStringTransformer());
     }
@@ -35,23 +34,11 @@ abstract class ToggleField extends InputField
     /**
      * {@inheritDoc}
      */
-    public function render(array $attributes = array())
+    public function getAttributes()
     {
-        $html = parent::render(array_merge(array(
-            'value'     => $this->getOption('value'),
-            'checked'	  => ((string)$this->getDisplayedData() !== '' && $this->getDisplayedData() !== 0),
-        ), $attributes));
-
-        if ($label = $this->getOption('label')) {
-            if ($this->getOption('translate_label')) {
-                $label = $this->translate($label);
-            }
-
-            $html .= ' '.$this->generator->contentTag('label', $label, array(
-                'for' => $this->getId(),
-            ));
-        }
-
-        return $html;
+        return array_merge(parent::getAttributes(), array(
+            'value'   => $this->getOption('value'),
+            'checked' => (string) $this->getDisplayedData() !== '' && $this->getDisplayedData() !== 0,
+        ));
     }
 }

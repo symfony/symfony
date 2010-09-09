@@ -18,7 +18,7 @@ use Symfony\Component\I18N\TranslatorInterface;
  *
  * @author     Bernhard Schussek <bernhard.schussek@symfony-project.com>
  */
-interface FieldInterface extends Localizable, Translatable
+interface FieldInterface extends Localizable
 {
     /**
      * Marks a constraint violation in a form field
@@ -185,23 +185,7 @@ interface FieldInterface extends Localizable, Translatable
      * @param PropertyPath $path
      * @param ConstraintViolation$violation
      */
-    public function addError($message, PropertyPath $path = null, $type = null);
-
-    /**
-     * Renders this field.
-     *
-     * @param  array $attributes  The attributes to include in the rendered
-     *                            output
-     * @return string             The rendered output of this field
-     */
-    public function render(array $attributes = array());
-
-    /**
-     * Renders the errors of this field.
-     *
-     * @return string  The rendered output of the field errors
-     */
-    public function renderErrors();
+    function addError($messageTemplate, array $messageParameters = array(), PropertyPath $path = null, $type = null);
 
     /**
      * Returns whether the field is bound.
@@ -261,14 +245,4 @@ interface FieldInterface extends Localizable, Translatable
      * @param boolean $required
      */
     public function setRequired($required);
-
-    /**
-     * Sets the generator used for rendering HTML.
-     *
-     * Usually there is one generator instance shared between all fields of a
-     * form.
-     *
-     * @param string $charset
-     */
-    public function setGenerator(HtmlGeneratorInterface $generator);
 }

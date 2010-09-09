@@ -120,15 +120,4 @@ class DateTimeField extends FieldGroup
     {
         return parent::reverseTransform(array_merge($value['date'], $value['time']));
     }
-
-    /**
-     * {@inheritDoc}
-     */
-    public function render(array $attributes = array())
-    {
-        $html = $this->get('date')->render($attributes)."\n";
-        $html .= $this->get('time')->render($attributes);
-
-        return $html;
-    }
 }

@@ -36,12 +36,4 @@ class PercentField extends NumberField
             'type' => $this->getOption('type'),
         )));
     }
-
-    /**
-     * {@inheritDoc}
-     */
-    public function render(array $attributes = array())
-    {
-        return parent::render($attributes).' %';
-    }
 }

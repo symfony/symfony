@@ -1,6 +1,6 @@
 <?php
 
-namespace Symfony\Component\Form;
+namespace Symfony\Bundle\FrameworkBundle\Templating;
 
 /**
  * An implementation of HtmlGeneratorInterface
@@ -94,6 +94,52 @@ class HtmlGenerator implements HtmlGeneratorInterface
     public function attributes(array $attributes)
     {
         return implode('', array_map(array($this, 'attributesCallback'), array_keys($attributes), array_values($attributes)));
+    }
+
+    public function choices(array $preferredChoices, array $choices, $empty, array $selected)
+    {
+        $html = '';
+
+        if (false !== $empty) {
+            $html .= $this->doChoices(array('' => $empty), $selected)."\n";
+        }
+
+        if (count($preferredChoices) > 0) {
+            $html .= $this->doChoices($preferredChoices, $selected)."\n";
+            $html .= $this->contentTag('option', $origin->getOption('separator'), array('disabled' => true))."\n";
+        }
+
+        $html .= $this->doChoices($choices, $selected)."\n";
+
+        return $html;
+    }
+
+    protected function doChoices(array $choices, array $selected)
+    {
+        $options = array();
+        foreach ($choices as $key => $option) {
+            if (is_array($option)) {
+                $options[] = $this->contentTag(
+                    'optgroup',
+                    "\n".renderChoices($option, $selected)."\n",
+                    array('label' => $this->escape($key))
+                );
+            } else {
+                $attributes = array('value' => $this->escape($key));
+
+                if (isset($selected[strval($key)])) {
+                    $attributes['selected'] = true;
+                }
+
+                $options[] = $this->contentTag(
+                    'option',
+                    $this->escape($option),
+                    $attributes
+                );
+            }
+        }
+
+        return implode("\n", $options);
     }
 
     /**

@@ -1,6 +1,6 @@
 <?php
 
-namespace Symfony\Component\Form;
+namespace Symfony\Bundle\FrameworkBundle\Templating;
 
 /**
  * Marks classes able to generate HTML code

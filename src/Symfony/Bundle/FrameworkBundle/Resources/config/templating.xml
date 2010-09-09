@@ -19,6 +19,8 @@
         <parameter key="templating.helper.session.class">Symfony\Bundle\FrameworkBundle\Templating\Helper\SessionHelper</parameter>
         <parameter key="templating.helper.code.class">Symfony\Bundle\FrameworkBundle\Templating\Helper\CodeHelper</parameter>
         <parameter key="templating.helper.translator.class">Symfony\Bundle\FrameworkBundle\Templating\Helper\TranslatorHelper</parameter>
+        <parameter key="templating.form.class">Symfony\Bundle\FrameworkBundle\Templating\Form\Form</parameter>
+        <parameter key="templating.html.generator.class">Symfony\Bundle\FrameworkBundle\Templating\HtmlGenerator</parameter>
         <parameter key="templating.output_escaper">false</parameter>
         <parameter key="templating.assets.version">null</parameter>
         <parameter key="templating.assets.base_urls" type="collection"></parameter>
@@ -26,6 +28,8 @@
     </parameters>
 
     <services>
+        <service id="templating.html.generator" class="%templating.html.generator.class%" />
+
         <service id="templating.engine" class="%templating.engine.class%">
             <argument type="service" id="service_container" />
             <argument type="service" id="templating.loader" />
@@ -99,6 +103,11 @@
         <service id="templating.helper.translator" class="%templating.helper.translator.class%">
             <tag name="templating.helper" alias="translator" />
             <argument type="service" id="translator" />
+        </service>
+
+        <service id="templating.form" class="%templating.form.class%">
+            <argument type="service" id="templating" />
+            <argument type="service" id="templating.html.generator" />
         </service>
 
         <service id="templating.loader" alias="templating.loader.filesystem" />

@@ -1,0 +1,57 @@
+{% block input_field %}
+    {% tag "input" with attributes %}
+{% endblock input_field %}
+
+{% block textarea_field %}
+    {% contenttag "textarea" with attributes %}{{ field.displayedData }}{% endcontenttag %}
+{% endblock textarea_field %}
+
+{% block choice_field %}
+    {% if field.options.expanded %}
+        {% for child in field %}
+            {{ child|render_widget }}
+        {% endfor %}
+    {% else %}
+        {% contenttag "select" with attributes %}
+            {{ field|render_choices }}
+        {% endcontenttag %}
+    {% endif %}
+{% endblock choice_field %}
+
+{% block toggle_field %}
+    {% display input_field %}
+    {% if field.options.label %}
+        {% contenttag "label" with ['for': field.id] %}{% trans field.options.label %}{% endcontenttag %}
+    {% endif %}
+{% endblock toggle_field %}
+
+{% block date_time_field %}
+    {{ field.date|render_widget }}
+    {{ field.time|render_widget }}
+{% endblock date_time_field %}
+
+{% block date_field %}
+    {% if field.field %}
+        {% display input_field %}
+    {% else %}
+        {{ field.pattern|replace(['{{ year }}': field.year|render_widget, '{{ month }}': field.month|render_widget, '{{ day }}': field.day|render_widget,]) }}
+    {% endif %}
+{% endblock date_field %}
+
+{% block time_field %}
+    {% if field.isfield %}
+        {% display input_field %}
+    {% else %}
+        {{ field.hour|render_widget }}:{{ field.minute|render_widget }}
+        {% if field.options.with_seconds %}:{{ field.second|render_widget }}{% endif %}
+    {% endif %}
+{% endblock time_field %}
+
+{% block money_field %}
+    {% set widget %}{% display input_field %}{% endset %}
+    {{ field.pattern|replace(['{{ widget }}': widget]) }}
+{% endblock money_field %}
+
+{% block percent_field %}
+    {% display input_field %} %
+{% endblock percent_field %}

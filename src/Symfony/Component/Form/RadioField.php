@@ -21,11 +21,11 @@ class RadioField extends ToggleField
     /**
      * {@inheritDoc}
      */
-    public function render(array $attributes = array())
+    public function getAttributes()
     {
-        return parent::render(array_merge(array(
+        return array_merge(parent::getAttributes(), array(
             'type' => 'radio',
             'name' => $this->getParent() ? $this->getParent()->getName() : $this->getName(),
-        ), $attributes));
+        ));
     }
 }

@@ -35,15 +35,15 @@ class HelperNode extends \Twig_Node
             ->raw("\$this->env->getExtension(")
             ->string('symfony.helpers')
             ->raw(")->getContainer()->get(")
-            ->string($this['helper'])
+            ->string($this->getAttribute('helper'))
             ->raw(")->")
-            ->raw($this['method'])
+            ->raw($this->getAttribute('method'))
             ->raw("(")
         ;
 
-        foreach ($this->values as $i => $value) {
+        foreach ($this->getNode('values') as $i => $value) {
             $compiler->subcompile($value);
-            if ($i !== count($this->values) - 1) {
+            if ($i !== count($this->getNode('values')) - 1) {
                 $compiler->raw(', ');
             }
         }

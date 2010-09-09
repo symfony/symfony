@@ -12,7 +12,6 @@ namespace Symfony\Component\Form;
  */
 
 use Symfony\Component\Validator\ValidatorInterface;
-use Symfony\Component\I18N\TranslatorInterface;
 
 /**
  * Form represents a form.
@@ -34,7 +33,6 @@ class Form extends FieldGroup
     protected static $defaultCsrfProtection = false;
     protected static $defaultCsrfFieldName = '_token';
     protected static $defaultLocale = null;
-    protected static $defaultTranslator = null;
 
     protected $validator = null;
     protected $validationGroups = null;
@@ -51,7 +49,6 @@ class Form extends FieldGroup
      */
     public function __construct($name, $object, ValidatorInterface $validator, array $options = array())
     {
-        $this->generator = new HtmlGenerator();
         $this->validator = $validator;
 
         $this->setData($object);
@@ -71,24 +68,7 @@ class Form extends FieldGroup
             $this->setLocale(self::$defaultLocale);
         }
 
-        if (self::$defaultTranslator !== null) {
-            $this->setTranslator(self::$defaultTranslator);
-        }
-
         parent::__construct($name, $options);
-    }
-
-    /**
-     * Sets the charset used for rendering HTML
-     *
-     * This method overrides the internal HTML generator! If you want to use
-     * your own generator, use setGenerator() instead.
-     *
-     * @param string $charset
-     */
-    public function setCharset($charset)
-    {
-        $this->setGenerator(new HtmlGenerator($charset));
     }
 
     /**
@@ -132,26 +112,6 @@ class Form extends FieldGroup
     }
 
     /**
-     * Sets the default translator for newly created forms.
-     *
-     * @param TranslatorInterface $defaultTranslator
-     */
-    static public function setDefaultTranslator(TranslatorInterface $defaultTranslator)
-    {
-        self::$defaultTranslator = $defaultTranslator;
-    }
-
-    /**
-     * Returns the default translator for newly created forms.
-     *
-     * @return TranslatorInterface
-     */
-    static public function getDefaultTranslator()
-    {
-        return self::$defaultTranslator;
-    }
-
-    /**
      * Binds the form with values and files.
      *
      * This method is final because it is very easy to break a form when
@@ -191,7 +151,7 @@ class Form extends FieldGroup
                         $type = self::FIELD_ERROR;
                     }
 
-                    $this->addError($violation->getMessage(), $propertyPath, $type);
+                    $this->addError($violation->getMessageTemplate(), $violation->getMessageParameters(), $propertyPath, $type);
                 }
             }
         }
@@ -206,26 +166,6 @@ class Form extends FieldGroup
     protected function doBind(array $taintedData)
     {
         parent::bind($taintedData);
-    }
-
-    /**
-     * Gets the stylesheet paths associated with the form.
-     *
-     * @return array An array of stylesheet paths
-     */
-    public function getStylesheets()
-    {
-        return $this->getWidget()->getStylesheets();
-    }
-
-    /**
-     * Gets the JavaScript paths associated with the form.
-     *
-     * @return array An array of JavaScript paths
-     */
-    public function getJavaScripts()
-    {
-        return $this->getWidget()->getJavaScripts();
     }
 
     /**
@@ -383,28 +323,6 @@ class Form extends FieldGroup
     static public function getDefaultCsrfSecret()
     {
         return self::$defaultCsrfSecret;
-    }
-
-    /**
-     * Renders the form tag.
-     *
-     * This method only renders the opening form tag.
-     * You need to close it after the form rendering.
-     *
-     * This method takes into account the multipart widgets.
-     *
-     * @param  string $url         The URL for the action
-     * @param  array  $attributes  An array of HTML attributes
-     *
-     * @return string An HTML representation of the opening form tag
-     */
-    public function renderFormTag($url, array $attributes = array())
-    {
-        return sprintf('<form%s>', $this->generator->attributes(array_merge(array(
-            'action' => $url,
-            'method' => isset($attributes['method']) ? strtolower($attributes['method']) : 'post',
-            'enctype' => $this->isMultipart() ? 'multipart/form-data' : null,
-        ), $attributes)));
     }
 
     /**

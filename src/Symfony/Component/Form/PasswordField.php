@@ -31,11 +31,11 @@ class PasswordField extends TextField
     /**
      * {@inheritDoc}
      */
-    public function render(array $attributes = array())
+    public function getAttributes()
     {
-        return parent::render(array_merge(array(
+        return array_merge(parent::getAttributes(), array(
             'value'       => $this->getOption('always_empty') && !$this->isBound() ? '' : $this->getDisplayedData(),
             'type'        => 'password',
-        ), $attributes));
+        ));
     }
 }

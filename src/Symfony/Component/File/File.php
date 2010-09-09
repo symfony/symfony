@@ -466,7 +466,7 @@ class File
      */
     public function __toString()
     {
-        return $this->getPath();
+        return null === $this->getPath() ? '' : $this->getPath();
     }
 
     /**

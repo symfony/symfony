@@ -43,7 +43,9 @@ class UploadedFile extends File
             throw new FileException(sprintf('Unable to create UploadedFile because "file_uploads" is disabled in your php.ini file (%s)', get_cfg_var('cfg_file_path')));
         }
 
-        parent::__construct($path);
+        if (is_file($path)) {
+            $this->path = realpath($path);
+        }
 
         if (is_null($error)) {
             $error = UPLOAD_ERR_OK;

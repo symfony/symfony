@@ -20,6 +20,10 @@ class FileValidator extends ConstraintValidator
             throw new UnexpectedTypeException($value, 'string');
         }
 
+        if ($value instanceof FileObject && null === $value->getPath()) {
+            return true;
+        }
+
         $path = $value instanceof FileObject ? $value->getPath() : (string)$value;
 
         if (!file_exists($path)) {
@@ -39,11 +43,11 @@ class FileValidator extends ConstraintValidator
                 $size = filesize($path);
                 $limit = $constraint->maxSize;
                 $suffix = ' bytes';
-            } else if (preg_match('/^(\d)k$/', $constraint->maxSize, $matches)) {
+            } else if (preg_match('/^(\d+)k$/', $constraint->maxSize, $matches)) {
                 $size = round(filesize($path) / 1000, 2);
                 $limit = $matches[1];
                 $suffix = ' kB';
-            } else if (preg_match('/^(\d)M$/', $constraint->maxSize, $matches)) {
+            } else if (preg_match('/^(\d+)M$/', $constraint->maxSize, $matches)) {
                 $size = round(filesize($path) / 1000000, 2);
                 $limit = $matches[1];
                 $suffix = ' MB';

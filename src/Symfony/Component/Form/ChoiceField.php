@@ -2,6 +2,8 @@
 
 namespace Symfony\Component\Form;
 
+use Symfony\Component\Form\Exception\UnexpectedTypeException;
+
 /**
  * Lets the user select between different choices
  *
@@ -28,12 +30,16 @@ class ChoiceField extends HybridField
         $this->addOption('empty_value', '');
         $this->addOption('translate_choices', false);
 
+        if (!is_array($this->getOption('choices'))) {
+            throw new UnexpectedTypeException('The choices option must be an array');
+        }
+
+        if (!is_array($this->getOption('preferred_choices'))) {
+            throw new UnexpectedTypeException('The preferred_choices option must be an array');
+        }
+
         if (count($this->getOption('preferred_choices')) > 0) {
             $this->preferredChoices = array_flip($this->getOption('preferred_choices'));
-
-            if (false && $diff = array_diff_key($this->options, $this->knownOptions)) {
-                //throw new InvalidOptionsException(sprintf('%s does not support the following options: "%s".', get_class($this), implode('", "', array_keys($diff))), array_keys($diff));
-            }
         }
 
         if ($this->getOption('expanded')) {
@@ -41,11 +47,11 @@ class ChoiceField extends HybridField
 
             $choices = $this->getOption('choices');
 
-            foreach ($this->getOption('preferred_choices') as $choice) {
+            foreach ($this->preferredChoices as $choice => $_) {
                 $this->add($this->newChoiceField($choice, $choices[$choice]));
             }
 
-            foreach ($this->getOption('choices') as $choice => $value) {
+            foreach ($choices as $choice => $value) {
                 if (!isset($this->preferredChoices[$choice])) {
                     $this->add($this->newChoiceField($choice, $value));
                 }

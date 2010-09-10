@@ -3,6 +3,7 @@
 namespace Symfony\Tests\Component\Form;
 
 use Symfony\Component\Form\ChoiceField;
+use Symfony\Component\Form\Exception\UnexpectedTypeException;
 
 class ChoiceFieldTest extends \PHPUnit_Framework_TestCase
 {
@@ -36,18 +37,25 @@ class ChoiceFieldTest extends \PHPUnit_Framework_TestCase
         4 => 'Roman',
     );
 
-    public function testConfigureChoicesWithArrayObject()
+    /**
+     * @expectedException Symfony\Component\Form\Exception\UnexpectedTypeException
+     */
+    public function testConfigureChoicesWithNonArray()
     {
-        $choices = new \ArrayObject($this->choices);
-
         $field = new ChoiceField('name', array(
-            'multiple' => false,
-            'expanded' => true,
-            'choices' => $choices,
-            'preferred_choices' => $this->preferredChoices,
+            'choices' => new \ArrayObject(),
         ));
+    }
 
-        $this->assertEquals($this->choices, $choices->getArrayCopy());
+    /**
+     * @expectedException Symfony\Component\Form\Exception\UnexpectedTypeException
+     */
+    public function testConfigurePreferredChoicesWithNonArray()
+    {
+        $field = new ChoiceField('name', array(
+            'choices' => $this->choices,
+            'preferred_choices' => new \ArrayObject(),
+        ));
     }
 
     public function testBindSingleNonExpanded()

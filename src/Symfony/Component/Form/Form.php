@@ -32,7 +32,7 @@ class Form extends FieldGroup
 {
     protected static $defaultCsrfSecret = null;
     protected static $defaultCsrfProtection = false;
-    protected static $defaultCsrfFieldName = '_csrf_token';
+    protected static $defaultCsrfFieldName = '_token';
     protected static $defaultLocale = null;
     protected static $defaultTranslator = null;
 

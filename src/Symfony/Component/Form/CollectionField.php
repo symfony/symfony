@@ -61,6 +61,10 @@ class CollectionField extends FieldGroup
             }
         }
 
+        foreach ($collection as $name => $value) {
+            $this->add($this->newField($name, $name));
+        }
+
         parent::setData($collection);
     }
 

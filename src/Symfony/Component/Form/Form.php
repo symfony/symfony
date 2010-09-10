@@ -60,7 +60,7 @@ class Form extends FieldGroup
         if (self::$defaultCsrfSecret !== null) {
             $this->setCsrfSecret(self::$defaultCsrfSecret);
         } else {
-            $this->setCsrfSecret(md5(__FILE__.php_uname()));
+            $this->setCsrfSecret(md5(__FILE__.session_id()));
         }
 
         if (self::$defaultCsrfProtection !== false) {

@@ -26,8 +26,8 @@ class FrameworkBundle extends Bundle
      */
     public function boot()
     {
-        if ($secret = $this->container->getParameter('csrf_secret')) {
-            Form::setDefaultCsrfSecret($secret);
+        if ($this->container->hasParameter('csrf_secret')) {
+            Form::setDefaultCsrfSecret($this->container->getParameter('csrf_secret'));
             Form::enableDefaultCsrfProtection();
         }
     }

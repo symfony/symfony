@@ -2,6 +2,8 @@
 
 namespace Symfony\Component\Form;
 
+use Symfony\Component\Form\Exception\FormException;
+
 /**
  * A field that can dynamically act like a field or like a field group
  *

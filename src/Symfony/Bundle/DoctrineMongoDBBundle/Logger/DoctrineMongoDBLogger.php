@@ -52,7 +52,9 @@ class DoctrineMongoDBLogger
                 $array = false;
             }
 
-            if (is_scalar($value)) {
+            if (is_bool($value)) {
+                $formatted = $value ? 'true' : 'false';
+            } elseif (is_scalar($value)) {
                 $formatted = '"'.$value.'"';
             } elseif (is_array($value)) {
                 $formatted = static::formatQuery($value);

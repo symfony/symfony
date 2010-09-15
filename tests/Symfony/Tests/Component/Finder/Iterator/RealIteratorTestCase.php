@@ -16,10 +16,11 @@ require_once __DIR__.'/IteratorTestCase.php';
 class RealIteratorTestCase extends IteratorTestCase
 {
     static protected $files;
-
+    static protected $callCount = 0;
+    
     static public function setUpBeforeClass()
     {
-        $tmpDir = sys_get_temp_dir().'/symfony2_finder';
+        $tmpDir = sys_get_temp_dir().'/symfony2_finder'.(self::$callCount++);
         self::$files = array(
             $tmpDir.'/.git/',
             $tmpDir.'/test.py',
@@ -46,8 +47,8 @@ class RealIteratorTestCase extends IteratorTestCase
         file_put_contents($tmpDir.'/test.php', str_repeat(' ', 800));
         file_put_contents($tmpDir.'/test.py', str_repeat(' ', 2000));
 
-        touch(sys_get_temp_dir().'/symfony2_finder/foo/bar.tmp', strtotime('2005-10-15'));
-        touch(sys_get_temp_dir().'/symfony2_finder/test.php', strtotime('2005-10-15'));
+        touch($tmpDir.'/foo/bar.tmp', strtotime('2005-10-15'));
+        touch($tmpDir.'/test.php', strtotime('2005-10-15'));
     }
 
     static public function tearDownAfterClass()

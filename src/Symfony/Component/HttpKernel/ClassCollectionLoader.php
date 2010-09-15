@@ -1,6 +1,6 @@
 <?php
 
-namespace Symfony\Framework;
+namespace Symfony\Component\HttpKernel;
 
 /*
  * This file is part of the Symfony framework.

@@ -1,8 +1,7 @@
 <?php
 
-namespace Symfony\Bundle\FrameworkBundle\Debug;
+namespace Symfony\Component\HttpKernel\Debug;
 
-use Symfony\Component\DependencyInjection\ContainerInterface;
 use Symfony\Component\EventDispatcher\EventDispatcher;
 use Symfony\Component\EventDispatcher\Event;
 use Symfony\Component\HttpKernel\Log\LoggerInterface;

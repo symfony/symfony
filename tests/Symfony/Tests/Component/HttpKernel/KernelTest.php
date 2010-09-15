@@ -9,9 +9,9 @@
  * file that was distributed with this source code.
  */
 
-namespace Symfony\Tests\Framework;
+namespace Symfony\Tests\Component\HttpKernel;
 
-use Symfony\Framework\Kernel;
+use Symfony\Component\HttpKernel\Kernel;
 use Symfony\Component\DependencyInjection\Loader\LoaderInterface;
 
 class KernelTest extends \PHPUnit_Framework_TestCase

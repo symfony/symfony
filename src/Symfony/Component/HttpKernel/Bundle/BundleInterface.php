@@ -1,8 +1,6 @@
 <?php
 
-namespace Symfony\Framework;
-
-use Symfony\Framework\Bundle\Bundle;
+namespace Symfony\Component\HttpKernel\Bundle;
 
 /*
  * This file is part of the Symfony framework.
@@ -14,19 +12,19 @@ use Symfony\Framework\Bundle\Bundle;
  */
 
 /**
- * KernelBundle.
+ * BundleInterface.
  *
  * @author     Fabien Potencier <fabien.potencier@symfony-project.com>
  */
-class KernelBundle extends Bundle
+interface BundleInterface
 {
     /**
      * Boots the Bundle.
      */
-    public function boot()
-    {
-        if ($this->container->has('error_handler')) {
-            $this->container['error_handler'];
-        }
-    }
+    public function boot();
+
+    /**
+     * Shutdowns the Bundle.
+     */
+    public function shutdown();
 }

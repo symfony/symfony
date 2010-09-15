@@ -1,6 +1,6 @@
 <?php
 
-namespace Symfony\Framework;
+namespace Symfony\Bundle\FrameworkBundle;
 
 use Symfony\Component\DependencyInjection\ContainerInterface;
 use Symfony\Component\HttpKernel\HttpKernelInterface;

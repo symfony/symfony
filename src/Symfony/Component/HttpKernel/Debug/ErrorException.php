@@ -1,6 +1,6 @@
 <?php
 
-namespace Symfony\Framework\Bundle;
+namespace Symfony\Component\HttpKernel\Debug;
 
 /*
  * This file is part of the Symfony framework.
@@ -12,19 +12,10 @@ namespace Symfony\Framework\Bundle;
  */
 
 /**
- * BundleInterface.
+ * ErrorException.
  *
  * @author     Fabien Potencier <fabien.potencier@symfony-project.com>
  */
-interface BundleInterface
+class ErrorException extends \Exception
 {
-    /**
-     * Boots the Bundle.
-     */
-    public function boot();
-
-    /**
-     * Shutdowns the Bundle.
-     */
-    public function shutdown();
 }

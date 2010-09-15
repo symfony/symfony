@@ -1,6 +1,6 @@
 <?php
 
-namespace Symfony\Framework\Cache;
+namespace Symfony\Bundle\FrameworkBundle\Cache;
 
 use Symfony\Component\HttpKernel\HttpKernelInterface;
 use Symfony\Component\HttpKernel\Cache\Cache as BaseCache;

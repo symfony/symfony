@@ -1,6 +1,6 @@
 <?php
 
-namespace Symfony\Framework\Debug;
+namespace Symfony\Component\HttpKernel\Debug;
 
 /*
  * This file is part of the Symfony framework.

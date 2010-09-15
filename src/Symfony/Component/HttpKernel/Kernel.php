@@ -1,6 +1,6 @@
 <?php
 
-namespace Symfony\Framework;
+namespace Symfony\Component\HttpKernel;
 
 use Symfony\Component\DependencyInjection\ContainerInterface;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
@@ -17,7 +17,7 @@ use Symfony\Component\DependencyInjection\Loader\PhpFileLoader;
 use Symfony\Component\DependencyInjection\Loader\ClosureLoader;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpKernel\HttpKernelInterface;
-use Symfony\Framework\ClassCollectionLoader;
+use Symfony\Component\HttpKernel\ClassCollectionLoader;
 
 /*
  * This file is part of the Symfony package.

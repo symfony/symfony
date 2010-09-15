@@ -2,7 +2,6 @@
 
 <container xmlns="http://www.symfony-project.org/schema/dic/services"
     xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-    xmlns:kernel="http://www.symfony-project.org/schema/dic/symfony/kernel"
     xmlns:web="http://www.symfony-project.org/schema/dic/symfony"
     xmlns:doctrine="http://www.symfony-project.org/schema/dic/doctrine"
     xmlns:twig="http://www.symfony-project.org/schema/dic/twig"
@@ -15,12 +14,7 @@
                         http://www.symfony-project.org/schema/dic/twig http://www.symfony-project.org/schema/dic/twig/twig-1.0.xsd
                         http://www.symfony-project.org/schema/dic/swiftmailer http://www.symfony-project.org/schema/dic/swiftmailer/swiftmailer-1.0.xsd">
 
-    <kernel:config
-        charset="UTF-8"
-        error_handler="null"
-    />
-
-    <web:config csrf-secret="xxxxxxxxxx">
+    <web:config csrf-secret="xxxxxxxxxx" charset="UTF-8" error-handler="null">
         <web:router resource="%kernel.root_dir%/config/routing.xml" />
         <web:validation enabled="true" annotations="true" />
     </web:config>

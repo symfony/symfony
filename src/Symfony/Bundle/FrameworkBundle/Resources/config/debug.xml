@@ -5,7 +5,7 @@
     xsi:schemaLocation="http://www.symfony-project.org/schema/dic/services http://www.symfony-project.org/schema/dic/services/services-1.0.xsd">
 
     <parameters>
-        <parameter key="debug.event_dispatcher.class">Symfony\Framework\Debug\EventDispatcher</parameter>
+        <parameter key="debug.event_dispatcher.class">Symfony\Bundle\FrameworkBundle\Debug\EventDispatcher</parameter>
     </parameters>
 
     <services>

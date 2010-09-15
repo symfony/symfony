@@ -5,11 +5,11 @@
     xsi:schemaLocation="http://www.symfony-project.org/schema/dic/services http://www.symfony-project.org/schema/dic/services/services-1.0.xsd">
 
     <parameters>
-        <parameter key="event_dispatcher.class">Symfony\Framework\EventDispatcher</parameter>
+        <parameter key="event_dispatcher.class">Symfony\Bundle\FrameworkBundle\EventDispatcher</parameter>
         <parameter key="http_kernel.class">Symfony\Component\HttpKernel\HttpKernel</parameter>
         <parameter key="request.class">Symfony\Component\HttpFoundation\Request</parameter>
         <parameter key="response.class">Symfony\Component\HttpFoundation\Response</parameter>
-        <parameter key="error_handler.class">Symfony\Framework\Debug\ErrorHandler</parameter>
+        <parameter key="error_handler.class">Symfony\Component\HttpKernel\Debug\ErrorHandler</parameter>
         <parameter key="error_handler.level">null</parameter>
     </parameters>
 

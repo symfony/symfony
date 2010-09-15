@@ -1,14 +1,11 @@
 <?php
 
-$container->loadFromExtension('kernel', 'config', array(
+$container->loadFromExtension('web', 'config', array(
     'charset'       => 'UTF-8',
     'error_handler' => null,
-));
-
-$container->loadFromExtension('web', 'config', array(
-    'csrf-secret' => 'xxxxxxxxxx',
-    'router'      => array('resource' => '%kernel.root_dir%/config/routing.php'),
-    'validation'  => array('enabled' => true, 'annotations' => true),
+    'csrf-secret'   => 'xxxxxxxxxx',
+    'router'        => array('resource' => '%kernel.root_dir%/config/routing.php'),
+    'validation'    => array('enabled' => true, 'annotations' => true),
 ));
 
 $container->loadFromExtension('web', 'templating', array(

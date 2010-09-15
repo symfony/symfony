@@ -5,7 +5,7 @@
     xsi:schemaLocation="http://www.symfony-project.org/schema/dic/services http://www.symfony-project.org/schema/dic/services/services-1.0.xsd">
 
     <parameters>
-        <parameter key="test.client.class">Symfony\Framework\Client</parameter>
+        <parameter key="test.client.class">Symfony\Bundle\FrameworkBundle\Client</parameter>
         <parameter key="test.client.parameters" type="collection"></parameter>
         <parameter key="test.client.history.class">Symfony\Component\BrowserKit\History</parameter>
         <parameter key="test.client.cookiejar.class">Symfony\Component\BrowserKit\CookieJar</parameter>

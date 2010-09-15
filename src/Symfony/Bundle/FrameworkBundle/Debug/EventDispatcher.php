@@ -1,8 +1,8 @@
 <?php
 
-namespace Symfony\Framework\Debug;
+namespace Symfony\Bundle\FrameworkBundle\Debug;
 
-use Symfony\Framework\EventDispatcher as BaseEventDispatcher;
+use Symfony\Bundle\FrameworkBundle\EventDispatcher as BaseEventDispatcher;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 use Symfony\Component\EventDispatcher\Event;
 use Symfony\Component\HttpKernel\Log\LoggerInterface;

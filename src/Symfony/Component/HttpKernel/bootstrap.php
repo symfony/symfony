@@ -1,5 +1,5 @@
 <?php
-namespace Symfony\Framework\Bundle;
+namespace Symfony\Component\HttpKernel\Bundle;
 use Symfony\Component\DependencyInjection\ContainerAware;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\DependencyInjection\ParameterBag\ParameterBagInterface;
@@ -54,62 +54,11 @@ abstract class Bundle extends ContainerAware implements BundleInterface {
         $this->name = basename($tmp);
         $this->reflection = new \ReflectionObject($this);
         $this->path = dirname($this->reflection->getFilename()); } }
-namespace Symfony\Framework\Bundle;
+namespace Symfony\Component\HttpKernel\Bundle;
 interface BundleInterface {
     public function boot();
     public function shutdown(); }
-namespace Symfony\Framework;
-use Symfony\Framework\Bundle\Bundle;
-class KernelBundle extends Bundle {
-    public function boot() {
-        if ($this->container->has('error_handler')) {
-            $this->container['error_handler']; } } }
-namespace Symfony\Framework\DependencyInjection;
-use Symfony\Component\DependencyInjection\Extension\Extension;
-use Symfony\Component\DependencyInjection\Loader\XmlFileLoader;
-use Symfony\Component\DependencyInjection\ContainerBuilder;
-class KernelExtension extends Extension {
-    public function testLoad($config, ContainerBuilder $container) {
-        $loader = new XmlFileLoader($container, array(__DIR__.'/../Resources/config', __DIR__.'/Resources/config'));
-        $loader->load('test.xml'); }
-    public function sessionLoad($config, ContainerBuilder $container) {
-        if (!$container->hasDefinition('session')) {
-            $loader = new XmlFileLoader($container, array(__DIR__.'/../Resources/config', __DIR__.'/Resources/config'));
-            $loader->load('session.xml'); }
-        if (isset($config['default_locale'])) {
-            $container->setParameter('session.default_locale', $config['default_locale']); }
-        if (isset($config['class'])) {
-            $container->setParameter('session.class', $config['class']); }
-        foreach (array('name', 'lifetime', 'path', 'domain', 'secure', 'httponly', 'cache_limiter', 'pdo.db_table') as $name) {
-            if (isset($config['session'][$name])) {
-                $container->setParameter('session.options.'.$name, $config['session'][$name]); } }
-        if (isset($config['session']['class'])) {
-            $class = $config['session']['class'];
-            if (in_array($class, array('Native', 'Pdo'))) {
-                $class = 'Symfony\\Component\\HttpFoundation\\SessionStorage\\'.$class.'SessionStorage'; }
-            $container->setParameter('session.session', 'session.session.'.strtolower($class)); } }
-    public function configLoad($config, ContainerBuilder $container) {
-        if (!$container->hasDefinition('event_dispatcher')) {
-            $loader = new XmlFileLoader($container, array(__DIR__.'/../Resources/config', __DIR__.'/Resources/config'));
-            $loader->load('services.xml');
-            if ($container->getParameter('kernel.debug')) {
-                $loader->load('debug.xml');
-                $container->setDefinition('event_dispatcher', $container->findDefinition('debug.event_dispatcher'));
-                $container->setAlias('debug.event_dispatcher', 'event_dispatcher'); } }
-        if (isset($config['charset'])) {
-            $container->setParameter('kernel.charset', $config['charset']); }
-        if (array_key_exists('error_handler', $config)) {
-            if (false === $config['error_handler']) {
-                $container->getDefinition('error_handler')->setMethodCalls(array()); } else {
-                $container->getDefinition('error_handler')->addMethodCall('register', array());
-                $container->setParameter('error_handler.level', $config['error_handler']); } } }
-    public function getXsdValidationBasePath() {
-        return false; }
-    public function getNamespace() {
-        return 'http://www.symfony-project.org/schema/dic/symfony/kernel'; }
-    public function getAlias() {
-        return 'kernel'; } }
-namespace Symfony\Framework\Debug;
+namespace Symfony\Component\HttpKernel\Debug;
 class ErrorHandler {
     protected $levels = array(
         E_WARNING           => 'Warning',
@@ -131,7 +80,7 @@ class ErrorHandler {
         if (error_reporting() & $level && $this->level & $level) {
             throw new \ErrorException(sprintf('%s: %s in %s line %d', isset($this->levels[$level]) ? $this->levels[$level] : $level, $message, $file, $line)); }
         return false; } }
-namespace Symfony\Framework;
+namespace Symfony\Component\HttpKernel;
 class ClassCollectionLoader {
     static protected $loaded;
     static public function load($classes, $cacheDir, $name, $autoReload, $adaptive = false) {
@@ -178,12 +127,3 @@ class ClassCollectionLoader {
             chmod($file, 0644);
             return; }
         throw new \RuntimeException(sprintf('Failed to write cache file "%s".', $file)); } }
-namespace Symfony\Framework;
-use Symfony\Component\EventDispatcher\EventDispatcher as BaseEventDispatcher;
-use Symfony\Component\EventDispatcher\Event;
-use Symfony\Component\DependencyInjection\ContainerInterface;
-class EventDispatcher extends BaseEventDispatcher {
-    public function setContainer(ContainerInterface $container) {
-        foreach ($container->findTaggedServiceIds('kernel.listener') as $id => $attributes) {
-            $priority = isset($attributes[0]['priority']) ? $attributes[0]['priority'] : 0;
-            $container->get($id)->register($this, $priority); } } }

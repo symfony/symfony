@@ -1,6 +1,6 @@
 <?php
 
-namespace Symfony\Framework;
+namespace Symfony\Bundle\FrameworkBundle;
 
 use Symfony\Component\EventDispatcher\EventDispatcher as BaseEventDispatcher;
 use Symfony\Component\EventDispatcher\Event;

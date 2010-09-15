@@ -1,6 +1,6 @@
 <?php
 
-namespace Symfony\Framework\Bundle;
+namespace Symfony\Component\HttpKernel\Bundle;
 
 use Symfony\Component\DependencyInjection\ContainerAware;
 use Symfony\Component\DependencyInjection\ContainerBuilder;

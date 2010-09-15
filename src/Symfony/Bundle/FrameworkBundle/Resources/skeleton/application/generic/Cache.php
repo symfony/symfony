@@ -2,7 +2,7 @@
 
 require_once __DIR__.'/{{ class }}Kernel.php';
 
-use Symfony\Framework\Cache\Cache;
+use Symfony\Bundle\FrameworkBundle\Cache\Cache;
 
 class {{ class }}Cache extends Cache
 {

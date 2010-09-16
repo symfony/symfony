@@ -195,6 +195,16 @@ class Process
     }
 
     /**
+     * Checks if the process ended successfully.
+     *
+     * @return Boolean true if the process ended successfully, false otherwise
+     */
+    public function isSuccessful()
+    {
+        return 0 == $this->exitcode;
+    }
+
+    /**
      * Returns true if the child process has been terminated by an uncaught signal.
      *
      * It always returns false on Windows.

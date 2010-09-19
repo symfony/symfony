@@ -13,7 +13,7 @@ namespace Symfony\Component\Process;
 
 /**
  * Process is a thin wrapper around proc_* functions to ease
- * the forking processes from PHP.
+ * start independent PHP processes.
  *
  * @author     Fabien Potencier <fabien.potencier@symfony-project.com>
  */
@@ -60,11 +60,11 @@ class Process
     }
 
     /**
-     * Forks and run the process.
+     * run the process.
      *
      * The callback receives the type of output (out or err) and
      * some bytes from the output in real-time. It allows to have feedback
-     * from the forked process during execution.
+     * from the independent process during execution.
      *
      * If you don't provide a callback, the STDOUT and STDERR are available only after
      * the process is finished via the getOutput() and getErrorOutput() methods.

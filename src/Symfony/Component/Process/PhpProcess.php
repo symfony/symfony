@@ -12,7 +12,7 @@ namespace Symfony\Component\Process;
  */
 
 /**
- * PhpProcess runs a PHP script in a forked process.
+ * PhpProcess runs a PHP script in an independent process.
  *
  * @author     Fabien Potencier <fabien.potencier@symfony-project.com>
  */
@@ -41,7 +41,7 @@ class PhpProcess extends Process
     }
 
     /**
-     * Forks and run the process.
+     * run the process.
      *
      * @param Closure|string|array $callback A PHP callback to run whenever there is some
      *                                       output available on STDOUT or STDERR

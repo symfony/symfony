@@ -6,6 +6,7 @@ use Symfony\Bundle\FrameworkBundle\EventDispatcher as BaseEventDispatcher;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 use Symfony\Component\EventDispatcher\Event;
 use Symfony\Component\HttpKernel\Log\LoggerInterface;
+use Symfony\Component\HttpKernel\Debug\EventDispatcherTraceableInterface;
 
 /*
  * This file is part of the Symfony package.

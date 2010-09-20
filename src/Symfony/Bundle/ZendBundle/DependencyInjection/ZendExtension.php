@@ -22,10 +22,28 @@ use Symfony\Component\DependencyInjection\ContainerBuilder;
  */
 class ZendExtension extends Extension
 {
-    protected $resources = array(
-        'logger' => 'logger.xml',
-        'i18n'   => 'i18n.xml',
-    );
+    /**
+     * Loads the Zend Framework configuration.
+     *
+     * Usage example:
+     *
+     *      <zend:config>
+     *          <zend:logger priority="info" path="/path/to/some.log" />
+     *      </zend:config>
+     *
+     * @param array            $config    An array of configuration settings
+     * @param ContainerBuilder $container A ContainerBuilder instance
+     */
+    public function configLoad($config, ContainerBuilder $container)
+    {
+        if (isset($config['logger'])) {
+            $this->registerLoggerConfiguration($config, $container);
+        }
+
+        if (isset($config['i18n'])) {
+            $this->registerI18nConfiguration($config, $container);
+        }
+    }
 
     /**
      * Loads the logger configuration.
@@ -37,11 +55,13 @@ class ZendExtension extends Extension
      * @param array            $config    An array of configuration settings
      * @param ContainerBuilder $container A ContainerBuilder instance
      */
-    public function loggerLoad($config, ContainerBuilder $container)
+    protected function registerLoggerConfiguration($config, ContainerBuilder $container)
     {
+        $config = $config['logger'];
+
         if (!$container->hasDefinition('zend.logger')) {
             $loader = new XmlFileLoader($container, __DIR__.'/../Resources/config');
-            $loader->load($this->resources['logger']);
+            $loader->load('logger.xml');
             $container->setAlias('logger', 'zend.logger');
         }
 
@@ -74,11 +94,13 @@ class ZendExtension extends Extension
      * @param array            $config    An array of configuration settings
      * @param ContainerBuilder $container A ContainerBuilder instance
      */
-    public function i18nLoad($config, ContainerBuilder $container)
+    protected function registerI18nConfiguration($config, ContainerBuilder $container)
     {
+        $config = $config['i18n'];
+
         if (!$container->hasDefinition('zend.i18n')) {
             $loader = new XmlFileLoader($container, __DIR__.'/../Resources/config');
-            $loader->load($this->resources['i18n']);
+            $loader->load('i18n.xml');
             $container->setAlias('i18n', 'zend.i18n');
         }
 

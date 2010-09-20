@@ -1,29 +1,24 @@
 <?php
 
-$container->loadFromExtension('web', 'config', array(
+$container->loadFromExtension('app', 'config', array(
     'charset'       => 'UTF-8',
     'error_handler' => null,
     'csrf-secret'   => 'xxxxxxxxxx',
     'router'        => array('resource' => '%kernel.root_dir%/config/routing.php'),
     'validation'    => array('enabled' => true, 'annotations' => true),
+    'templating'    => array(
+        'escaping'        => 'htmlspecialchars'
+        #'assets_version' => "SomeVersionScheme",
+    ),
+    #'user' => array(
+    #    'default_locale' => "fr",
+    #    'session' => array(
+    #        'name' => "SYMFONY",
+    #        'type' => "Native",
+    #        'lifetime' => "3600",
+    #    )
+    #),
 ));
-
-$container->loadFromExtension('web', 'templating', array(
-    'escaping'       => "htmlspecialchars",
-#    'assets_version' => "SomeVersionScheme",
-));
-
-// Sessions
-/*
-$container->loadFromExtension('kernel', 'session', array(
-    'default_locale' => "fr",
-    'session' => array(
-        'name' => "SYMFONY",
-        'type' => "Native",
-        'lifetime' => "3600",
-    )
-));
-*/
 
 // Twig Configuration
 /*
@@ -42,7 +37,7 @@ $container->loadFromExtension('doctrine', 'orm');
 
 // Swiftmailer Configuration
 /*
-$container->loadFromExtension('swift', 'mailer', array(
+$container->loadFromExtension('swiftmailer', 'config', array(
     'transport'  => "smtp",
     'encryption' => "ssl",
     'auth_mode'  => "login",

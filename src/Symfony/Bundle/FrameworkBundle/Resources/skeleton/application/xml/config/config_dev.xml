@@ -3,7 +3,7 @@
 <container xmlns="http://www.symfony-project.org/schema/dic/services"
     xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
     xmlns:zend="http://www.symfony-project.org/schema/dic/zend"
-    xmlns:web="http://www.symfony-project.org/schema/dic/symfony"
+    xmlns:app="http://www.symfony-project.org/schema/dic/symfony"
     xmlns:webprofiler="http://www.symfony-project.org/schema/dic/webprofiler"
     xsi:schemaLocation="http://www.symfony-project.org/schema/dic/services http://www.symfony-project.org/schema/dic/services/services-1.0.xsd
                         http://www.symfony-project.org/schema/dic/webprofiler http://www.symfony-project.org/schema/dic/webprofiler/webprofiler-1.0.xsd
@@ -13,18 +13,17 @@
         <import resource="config.xml" />
     </imports>
 
-    <web:config>
-        <web:router resource="%kernel.root_dir%/config/routing_dev.xml" />
-        <profiler only-exceptions="false" />
-    </web:config>
+    <app:config>
+        <app:router resource="%kernel.root_dir%/config/routing_dev.xml" />
+        <app:profiler only-exceptions="false" />
+    </app:config>
 
     <webprofiler:config
         toolbar="true"
         intercept-redirects="true"
     />
 
-    <zend:logger
-        priority="info"
-        path="%kernel.logs_dir%/%kernel.environment%.log"
-    />
+    <zend:config>
+        <zend:logger priority="info" path="%kernel.logs_dir%/%kernel.environment%.log" />
+    </zend:config>
 </container>

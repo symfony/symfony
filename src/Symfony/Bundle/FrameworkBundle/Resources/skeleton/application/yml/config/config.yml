@@ -1,13 +1,18 @@
-web.config:
+app.config:
     charset:       UTF-8
     error_handler: null
     csrf_secret:   xxxxxxxxxx
     router:        { resource: "%kernel.root_dir%/config/routing.yml" }
     validation:    { enabled: true, annotations: true }
-
-web.templating:
-    escaping:       htmlspecialchars
-    #assets_version: SomeVersionScheme
+    templating:
+        escaping:       htmlspecialchars
+        #assets_version: SomeVersionScheme
+    #user:
+    #    default_locale: fr
+    #    session:
+    #        name:     SYMFONY
+    #        type:     Native
+    #        lifetime: 3600
 
 ## Twig Configuration
 #twig.config:
@@ -21,7 +26,7 @@ web.templating:
 #doctrine.orm: ~
 
 ## Swiftmailer Configuration
-#swift.mailer:
+#swiftmailer.config:
 #    transport:  smtp
 #    encryption: ssl
 #    auth_mode:  login

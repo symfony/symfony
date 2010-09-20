@@ -2,7 +2,7 @@
 
 <container xmlns="http://www.symfony-project.org/schema/dic/services"
     xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-    xmlns:web="http://www.symfony-project.org/schema/dic/symfony"
+    xmlns:app="http://www.symfony-project.org/schema/dic/symfony"
     xmlns:doctrine="http://www.symfony-project.org/schema/dic/doctrine"
     xmlns:twig="http://www.symfony-project.org/schema/dic/twig"
     xmlns:swift="http://www.symfony-project.org/schema/dic/swiftmailer"
@@ -14,14 +14,16 @@
                         http://www.symfony-project.org/schema/dic/twig http://www.symfony-project.org/schema/dic/twig/twig-1.0.xsd
                         http://www.symfony-project.org/schema/dic/swiftmailer http://www.symfony-project.org/schema/dic/swiftmailer/swiftmailer-1.0.xsd">
 
-    <web:config csrf-secret="xxxxxxxxxx" charset="UTF-8" error-handler="null">
-        <web:router resource="%kernel.root_dir%/config/routing.xml" />
-        <web:validation enabled="true" annotations="true" />
-    </web:config>
-
-    <web:templating
-        escaping="htmlspecialchars"
-    />
+    <app:config csrf-secret="xxxxxxxxxx" charset="UTF-8" error-handler="null">
+        <app:router resource="%kernel.root_dir%/config/routing.xml" />
+        <app:validation enabled="true" annotations="true" />
+        <app:templating escaping="htmlspecialchars" />
+        <!--
+        <app:user default-locale="fr">
+            <app:session name="SYMFONY" type="Native" lifetime="3600" />
+        </app:user>
+        //-->
+    </app:config>
 
     <!-- Twig Configuration -->
     <!--
@@ -36,7 +38,7 @@
 
     <!-- Swiftmailer Configuration -->
     <!--
-    <swift:mailer
+    <swiftmailer:config
         transport="smtp"
         encryption="ssl"
         auth_mode="login"

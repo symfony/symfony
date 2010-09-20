@@ -17,17 +17,17 @@ use Symfony\Component\DependencyInjection\ContainerBuilder;
 
 class SwiftmailerExtensionTest extends TestCase
 {
-    public function testMailerLoad()
+    public function testConfigLoad()
     {
         $container = new ContainerBuilder();
         $loader = new SwiftmailerExtension();
 
-        $loader->mailerLoad(array(), $container);
+        $loader->configLoad(array(), $container);
         $this->assertEquals('Swift_Mailer', $container->getParameter('swiftmailer.class'), '->mailerLoad() loads the swiftmailer.xml file if not already loaded');
 
-        $loader->mailerLoad(array('transport' => 'sendmail'), $container);
+        $loader->configLoad(array('transport' => 'sendmail'), $container);
         $this->assertEquals('sendmail', $container->getParameter('swiftmailer.transport.name'), '->mailerLoad() overrides existing configuration options');
-        $loader->mailerLoad(array(), $container);
+        $loader->configLoad(array(), $container);
         $this->assertEquals('sendmail', $container->getParameter('swiftmailer.transport.name'), '->mailerLoad() overrides existing configuration options');
     }
 }

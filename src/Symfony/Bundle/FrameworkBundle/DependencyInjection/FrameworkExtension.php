@@ -19,21 +19,12 @@ use Symfony\Component\DependencyInjection\Definition;
  */
 
 /**
- * WebExtension.
+ * FrameworkExtension.
  *
  * @author     Fabien Potencier <fabien.potencier@symfony-project.com>
  */
-class WebExtension extends Extension
+class FrameworkExtension extends Extension
 {
-    protected $resources = array(
-        'templating' => 'templating.xml',
-        'web'        => 'web.xml',
-        'routing'    => 'routing.xml',
-        // validation.xml conflicts with the naming convention for XML
-        // validation mapping files, so call it validator.xml
-        'validation' => 'validator.xml',
-    );
-
     /**
      * Loads the web configuration.
      *
@@ -45,7 +36,7 @@ class WebExtension extends Extension
         $loader = new XmlFileLoader($container, __DIR__.'/../Resources/config');
 
         if (!$container->hasDefinition('controller_manager')) {
-            $loader->load($this->resources['web']);
+            $loader->load('web.xml');
         }
 
         if (isset($config['ide']) && 'textmate' === $config['ide']) {
@@ -56,36 +47,6 @@ class WebExtension extends Extension
             if (isset($config[$key])) {
                 $container->setParameter('csrf_secret', $config[$key]);
             }
-        }
-
-        if (isset($config['router'])) {
-            if (!$container->hasDefinition('router')) {
-                $loader->load($this->resources['routing']);
-            }
-
-            $container->setParameter('routing.resource', $config['router']['resource']);
-
-            $this->addCompiledClasses($container, array(
-                'Symfony\\Component\\Routing\\RouterInterface',
-                'Symfony\\Component\\Routing\\Router',
-                'Symfony\\Component\\Routing\\Matcher\\UrlMatcherInterface',
-                'Symfony\\Component\\Routing\\Matcher\\UrlMatcher',
-                'Symfony\\Component\\Routing\\Generator\\UrlGeneratorInterface',
-                'Symfony\\Component\\Routing\\Generator\\UrlGenerator',
-                'Symfony\\Component\\Routing\\Loader\\Loader',
-                'Symfony\\Component\\Routing\\Loader\\DelegatingLoader',
-                'Symfony\\Component\\Routing\\Loader\\LoaderResolver',
-                'Symfony\\Bundle\\FrameworkBundle\\Routing\\LoaderResolver',
-                'Symfony\\Bundle\\FrameworkBundle\\Routing\\DelegatingLoader',
-            ));
-        }
-
-        if (isset($config['profiler'])) {
-            $this->registerProfilerConfiguration($config, $container);
-        }
-
-        if (isset($config['validation']['enabled'])) {
-            $this->registerValidationConfiguration($config, $container);
         }
 
         if (!$container->hasDefinition('event_dispatcher')) {
@@ -112,6 +73,30 @@ class WebExtension extends Extension
                     $container->setParameter('error_handler.level', $config[$key]);
                 }
             }
+        }
+
+        if (isset($config['router'])) {
+            $this->registerRouterConfiguration($config, $container);
+        }
+
+        if (isset($config['profiler'])) {
+            $this->registerProfilerConfiguration($config, $container);
+        }
+
+        if (isset($config['validation']['enabled'])) {
+            $this->registerValidationConfiguration($config, $container);
+        }
+
+        if (isset($config['templating'])) {
+            $this->registerTemplatingConfiguration($config, $container);
+        }
+
+        if (isset($config['test'])) {
+            $this->registerTestConfiguration($config, $container);
+        }
+
+        if (isset($config['user'])) {
+            $this->registerUserConfiguration($config, $container);
         }
 
         $this->addCompiledClasses($container, array(
@@ -142,11 +127,13 @@ class WebExtension extends Extension
      * @param array            $config        An array of configuration settings
      * @param ContainerBuilder $container A ContainerBuilder instance
      */
-    public function templatingLoad($config, ContainerBuilder $container)
+    protected function registerTemplatingConfiguration($config, ContainerBuilder $container)
     {
+        $config = $config['templating'];
+
         if (!$container->hasDefinition('templating')) {
             $loader = new XmlFileLoader($container, __DIR__.'/../Resources/config');
-            $loader->load($this->resources['templating']);
+            $loader->load('templating.xml');
 
             if ($container->getParameter('kernel.debug')) {
                 $loader->load('templating_debug.xml');
@@ -228,7 +215,7 @@ class WebExtension extends Extension
      * @param array            $config    A configuration array
      * @param ContainerBuilder $container A ContainerBuilder instance
      */
-    public function testLoad($config, ContainerBuilder $container)
+    protected function registerTestConfiguration($config, ContainerBuilder $container)
     {
         $loader = new XmlFileLoader($container, array(__DIR__.'/../Resources/config', __DIR__.'/Resources/config'));
         $loader->load('test.xml');
@@ -240,22 +227,26 @@ class WebExtension extends Extension
      * @param array            $config    A configuration array
      * @param ContainerBuilder $container A ContainerBuilder instance
      */
-    public function sessionLoad($config, ContainerBuilder $container)
+    protected function registerUserConfiguration($config, ContainerBuilder $container)
     {
+        $config = $config['user'];
+
         if (!$container->hasDefinition('session')) {
             $loader = new XmlFileLoader($container, array(__DIR__.'/../Resources/config', __DIR__.'/Resources/config'));
             $loader->load('session.xml');
         }
 
-        if (isset($config['default_locale'])) {
-            $container->setParameter('session.default_locale', $config['default_locale']);
+        foreach (array('default_locale', 'default-locale') as $key) {
+            if (isset($config[$key])) {
+                $container->setParameter('session.default_locale', $config[$key]);
+            }
         }
 
         if (isset($config['class'])) {
             $container->setParameter('session.class', $config['class']);
         }
 
-        foreach (array('name', 'lifetime', 'path', 'domain', 'secure', 'httponly', 'cache_limiter', 'pdo.db_table') as $name) {
+        foreach (array('name', 'lifetime', 'path', 'domain', 'secure', 'httponly', 'cache_limiter', 'cache-limiter', 'pdo.db_table') as $name) {
             if (isset($config['session'][$name])) {
                 $container->setParameter('session.options.'.$name, $config['session'][$name]);
             }
@@ -269,6 +260,30 @@ class WebExtension extends Extension
 
             $container->setParameter('session.session', 'session.session.'.strtolower($class));
         }
+    }
+
+    protected function registerRouterConfiguration($config, ContainerBuilder $container)
+    {
+        if (!$container->hasDefinition('router')) {
+            $loader = new XmlFileLoader($container, __DIR__.'/../Resources/config');
+            $loader->load('routing.xml');
+        }
+
+        $container->setParameter('routing.resource', $config['router']['resource']);
+
+        $this->addCompiledClasses($container, array(
+            'Symfony\\Component\\Routing\\RouterInterface',
+            'Symfony\\Component\\Routing\\Router',
+            'Symfony\\Component\\Routing\\Matcher\\UrlMatcherInterface',
+            'Symfony\\Component\\Routing\\Matcher\\UrlMatcher',
+            'Symfony\\Component\\Routing\\Generator\\UrlGeneratorInterface',
+            'Symfony\\Component\\Routing\\Generator\\UrlGenerator',
+            'Symfony\\Component\\Routing\\Loader\\Loader',
+            'Symfony\\Component\\Routing\\Loader\\DelegatingLoader',
+            'Symfony\\Component\\Routing\\Loader\\LoaderResolver',
+            'Symfony\\Bundle\\FrameworkBundle\\Routing\\LoaderResolver',
+            'Symfony\\Bundle\\FrameworkBundle\\Routing\\DelegatingLoader',
+        ));
     }
 
     /*
@@ -324,7 +339,7 @@ class WebExtension extends Extension
         if ($config['validation']['enabled']) {
             if (!$container->hasDefinition('validator')) {
                 $loader = new XmlFileLoader($container, __DIR__.'/../Resources/config');
-                $loader->load($this->resources['validation']);
+                $loader->load('validator.xml');
             }
 
             $xmlMappingFiles = array();
@@ -418,6 +433,6 @@ class WebExtension extends Extension
 
     public function getAlias()
     {
-        return 'web';
+        return 'app';
     }
 }

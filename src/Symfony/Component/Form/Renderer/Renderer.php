@@ -4,7 +4,6 @@ namespace Symfony\Component\Form\Renderer;
 
 use Symfony\Component\I18N\TranslatorInterface;
 use Symfony\Component\Form\FieldInterface;
-use Symfony\Component\Form\HtmlGenerator;
 use Symfony\Component\Form\HtmlGeneratorInterface;
 use Symfony\Component\Form\Configurable;
 

@@ -3,7 +3,6 @@
 namespace Symfony\Bundle\FrameworkBundle;
 
 use Symfony\Component\HttpKernel\Log\LoggerInterface;
-use Symfony\Component\EventDispatcher\EventDispatcher;
 use Symfony\Component\EventDispatcher\Event;
 use Symfony\Component\Routing\RouterInterface;
 use Symfony\Component\HttpKernel\HttpKernelInterface;

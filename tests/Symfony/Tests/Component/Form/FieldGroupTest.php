@@ -156,6 +156,21 @@ class FieldGroupTest extends \PHPUnit_Framework_TestCase
         $group->addError('Message', new PropertyPath('fields[firstName].data'), FieldGroup::FIELD_ERROR);
     }
 
+    public function testAddErrorMapsFieldValidationErrorsOntoFieldsWithinNestedFieldGroups()
+    {
+        $field = $this->createMockField('firstName');
+        $field->expects($this->once())
+                    ->method('addError')
+                    ->with($this->equalTo('Message'));
+
+        $group = new FieldGroup('author');
+        $innerGroup = new FieldGroup('names');
+        $innerGroup->add($field);
+        $group->add($innerGroup);
+
+        $group->addError('Message', new PropertyPath('fields[names].fields[firstName].data'), FieldGroup::FIELD_ERROR);
+    }
+
     public function testAddErrorKeepsFieldValidationErrorsIfFieldNotFound()
     {
         $field = $this->createMockField('foo');

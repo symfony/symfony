@@ -5,7 +5,7 @@ namespace Symfony\Component\HttpKernel\DataCollector;
 use Symfony\Component\EventDispatcher\EventDispatcher;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
-use Symfony\Framework\Debug\EventDispatcherTraceableInterface;
+use Symfony\Component\HttpKernel\Debug\EventDispatcherTraceableInterface;
 
 /*
  * This file is part of the Symfony framework.

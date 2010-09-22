@@ -132,11 +132,14 @@ class CodeHelper extends Helper
     public function fileExcerpt($file, $line)
     {
         if (is_readable($file)) {
-            $content = preg_split('#<br />#', highlight_file($file, true));
+            $code = highlight_file($file, true);
+            // remove main code/span tags
+            $code = preg_replace('#^<code.*?>\s*<span.*?>(.*)</span>\s*</code>#s', '\\1', $code);
+            $content = preg_split('#<br />#', $code);
 
             $lines = array();
             for ($i = max($line - 3, 1), $max = min($line + 3, count($content)); $i <= $max; $i++) {
-                $lines[] = '<li'.($i == $line ? ' class="selected"' : '').'>'.$content[$i - 1].'</li>';
+                $lines[] = '<li'.($i == $line ? ' class="selected"' : '').'><code>'.self::fixCodeMarkup($content[$i - 1]).'</code></li>';
             }
 
             return '<ol start="'.max($line - 3, 1).'">'.implode("\n", $lines).'</ol>';
@@ -186,5 +189,24 @@ class CodeHelper extends Helper
     public function getName()
     {
         return 'code';
+    }
+
+    protected static function fixCodeMarkup($line)
+    {
+        // </span> ending tag from previous line
+        $opening = strpos($line, '<span');
+        $closing = strpos($line, '</span>');
+        if (false !== $closing && (false === $opening || $closing < $opening)) {
+            $line = substr_replace($line, '', $closing, 7);
+        }
+
+        // missing </span> tag at the end of line
+        $opening = strpos($line, '<span');
+        $closing = strpos($line, '</span>');
+        if (false !== $opening && (false === $closing || $closing > $opening)) {
+            $line .= '</span>';
+        }
+
+        return $line;
     }
 }

@@ -297,7 +297,10 @@ class CrawlerTest extends \PHPUnit_Framework_TestCase
         $this->assertEquals('http://example.com/bar/foo', $crawler->link()->getUri(), '->link() returns a Link instance');
 
         $crawler = $this->createTestCrawler('http://example.com/bar')->selectLink('Foo');
-        $this->assertEquals('http://example.com/foo', $crawler->link()->getUri(), '->form() linketurns a Link instance');
+        $this->assertEquals('http://example.com/foo', $crawler->link()->getUri(), '->link() returns a Link instance');
+
+        $crawler = $this->createTestCrawler('http://example.com/bar')->selectLink('GetLink');
+        $this->assertEquals('http://example.com/bar?get=param', $crawler->link()->getUri(), '->link() returns a Link instance');
 
         try {
             $this->createTestCrawler()->filter('ol')->link();
@@ -474,6 +477,8 @@ class CrawlerTest extends \PHPUnit_Framework_TestCase
                     <a href="/bar"><img alt="   Fabien\'s Bar   "/></a>
                     <a href="/bar"><img alt="Fabien&quot;s Bar"/></a>
                     <a href="/bar"><img alt="\' Fabien&quot;s Bar"/></a>
+
+                    <a href="?get=param">GetLink</a>
 
                     <form action="foo">
                         <input type="submit" value="FooValue" name="FooName" id="FooId" />

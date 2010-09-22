@@ -6,6 +6,7 @@ use Symfony\Component\EventDispatcher\EventDispatcher;
 use Symfony\Component\EventDispatcher\Event;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpKernel\HttpKernelInterface;
+use Symfony\Component\HttpFoundation\RequestMatcherInterface;
 
 /*
  * This file is part of the Symfony framework.
@@ -26,16 +27,19 @@ class ProfilerListener
     protected $profiler;
     protected $exception;
     protected $onlyException;
+    protected $matcher;
 
     /**
      * Constructor.
      *
-     * @param Profiler $profiler      A Profiler instance
-     * @param Boolean  $onlyException true if the profiler only collects data when an exception occurs, false otherwise
+     * @param Profiler                $profiler      A Profiler instance
+     * @param RequestMatcherInterface $matcher       A RequestMatcher instance
+     * @param Boolean                 $onlyException true if the profiler only collects data when an exception occurs, false otherwise
      */
-    public function __construct(Profiler $profiler, $onlyException = false)
+    public function __construct(Profiler $profiler, RequestMatcherInterface $matcher = null, $onlyException = false)
     {
         $this->profiler = $profiler;
+        $this->matcher = $matcher;
         $this->onlyException = $onlyException;
     }
 
@@ -77,6 +81,10 @@ class ProfilerListener
     public function handleResponse(Event $event, Response $response)
     {
         if (HttpKernelInterface::MASTER_REQUEST !== $event->getParameter('request_type')) {
+            return $response;
+        }
+
+        if (null !== $this->matcher && !$this->matcher->matches($event->getParameter('request'))) {
             return $response;
         }
 

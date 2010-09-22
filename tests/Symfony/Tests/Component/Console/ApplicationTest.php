@@ -267,12 +267,18 @@ class ApplicationTest extends \PHPUnit_Framework_TestCase
         $tester->run(array('--help' => true));
         $this->assertStringEqualsFile(self::$fixturesPath.'/application_run2.txt', $tester->getDisplay(), '->run() runs the help command if --help is passed');
 
+        $tester->run(array('-h' => true));
+        $this->assertStringEqualsFile(self::$fixturesPath.'/application_run2.txt', $tester->getDisplay(), '->run() runs the help command if -h is passed');
+
         $application = new Application();
         $application->setAutoExit(false);
         $application->setCatchExceptions(false);
         $tester = new ApplicationTester($application);
         $tester->run(array('command' => 'list', '--help' => true));
         $this->assertStringEqualsFile(self::$fixturesPath.'/application_run3.txt', $tester->getDisplay(), '->run() displays the help if --help is passed');
+
+        $tester->run(array('command' => 'list', '-h' => true));
+        $this->assertStringEqualsFile(self::$fixturesPath.'/application_run3.txt', $tester->getDisplay(), '->run() displays the help if -h is passed');
 
         $application = new Application();
         $application->setAutoExit(false);
@@ -281,12 +287,18 @@ class ApplicationTest extends \PHPUnit_Framework_TestCase
         $tester->run(array('--ansi' => true));
         $this->assertTrue($tester->getOutput()->isDecorated(), '->run() forces color output if --ansi is passed');
 
+        $tester->run(array('-a' => true));
+        $this->assertTrue($tester->getOutput()->isDecorated(), '->run() forces color output if -a is passed');
+
         $application = new Application();
         $application->setAutoExit(false);
         $application->setCatchExceptions(false);
         $tester = new ApplicationTester($application);
         $tester->run(array('--version' => true));
         $this->assertStringEqualsFile(self::$fixturesPath.'/application_run4.txt', $tester->getDisplay(), '->run() displays the program version if --version is passed');
+
+        $tester->run(array('-V' => true));
+        $this->assertStringEqualsFile(self::$fixturesPath.'/application_run4.txt', $tester->getDisplay(), '->run() displays the program version if -v is passed');
 
         $application = new Application();
         $application->setAutoExit(false);
@@ -295,12 +307,18 @@ class ApplicationTest extends \PHPUnit_Framework_TestCase
         $tester->run(array('command' => 'list', '--quiet' => true));
         $this->assertEquals('', $tester->getDisplay(), '->run() removes all output if --quiet is passed');
 
+        $tester->run(array('command' => 'list', '-q' => true));
+        $this->assertEquals('', $tester->getDisplay(), '->run() removes all output if -q is passed');
+
         $application = new Application();
         $application->setAutoExit(false);
         $application->setCatchExceptions(false);
         $tester = new ApplicationTester($application);
         $tester->run(array('command' => 'list', '--verbose' => true));
         $this->assertEquals(Output::VERBOSITY_VERBOSE, $tester->getOutput()->getVerbosity(), '->run() sets the output to verbose is --verbose is passed');
+
+        $tester->run(array('command' => 'list', '-v' => true));
+        $this->assertEquals(Output::VERBOSITY_VERBOSE, $tester->getOutput()->getVerbosity(), '->run() sets the output to verbose is -v is passed');
 
         $application = new Application();
         $application->setAutoExit(false);
@@ -309,6 +327,9 @@ class ApplicationTest extends \PHPUnit_Framework_TestCase
         $tester = new ApplicationTester($application);
         $tester->run(array('command' => 'foo:bar', '--no-interaction' => true));
         $this->assertEquals("called\n", $tester->getDisplay(), '->run() does not called interact() if --no-interaction is passed');
+
+        $tester->run(array('command' => 'foo:bar', '-n' => true));
+        $this->assertEquals("called\n", $tester->getDisplay(), '->run() does not called interact() if -n is passed');
     }
 }
 

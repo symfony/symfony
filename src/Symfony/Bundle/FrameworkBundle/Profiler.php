@@ -28,7 +28,7 @@ class Profiler extends BaseProfiler
         parent::__construct($storage, $logger);
 
         foreach ($container->findTaggedServiceIds('data_collector') as $id => $attributes) {
-            $this->addCollector($container->get($id));
+            $this->add($container->get($id));
         }
     }
 }

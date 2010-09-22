@@ -1,7 +1,7 @@
 imports:
     - { resource: config_dev.yml }
 
-kernel.config:
+web.config:
     error_handler: false
 
 webprofiler.config:
@@ -11,4 +11,4 @@ webprofiler.config:
 zend.logger:
     priority: debug
 
-kernel.test: ~
+web.test: ~

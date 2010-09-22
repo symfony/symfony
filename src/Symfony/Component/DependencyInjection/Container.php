@@ -119,6 +119,18 @@ class Container implements ContainerInterface, \ArrayAccess
     }
 
     /**
+     * Checks if a parameter exists.
+     *
+     * @param  string $name The parameter name
+     *
+     * @return boolean  The presense of parameter in container
+     */
+    public function hasParameter($name)
+    {
+        return $this->parameterBag->has($name);
+    }
+
+    /**
      * Sets a parameter.
      *
      * @param string $name       The parameter name

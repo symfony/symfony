@@ -3,6 +3,7 @@
 namespace Symfony\Component\HttpFoundation;
 
 use Symfony\Component\HttpFoundation\SessionStorage\NativeSessionStorage;
+use Symfony\Component\HttpFoundation\File\UploadedFile;
 
 /*
  * This file is part of the Symfony package.
@@ -134,7 +135,7 @@ class Request
             'SERVER_NAME'          => 'localhost',
             'SERVER_PORT'          => 80,
             'HTTP_HOST'            => 'localhost',
-            'HTTP_USER_AGENT'      => 'Symfony/X.X',
+            'HTTP_USER_AGENT'      => 'Symfony/2.X',
             'HTTP_ACCEPT'          => 'text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8',
             'HTTP_ACCEPT_LANGUAGE' => 'en-us,en;q=0.5',
             'HTTP_ACCEPT_CHARSET'  => 'ISO-8859-1,utf-8;q=0.7,*;q=0.7',
@@ -388,13 +389,21 @@ class Request
         }
 
         $parts = array();
-        foreach (explode('&', $qs) as $segment) {
-            $tmp = explode('=', urldecode($segment), 2);
-            $parts[urlencode($tmp[0])] = urlencode($tmp[1]);
-        }
-        ksort($parts);
+        $order = array();
 
-        return http_build_query($parts);
+        foreach (explode('&', $qs) as $segment) {
+            if (false === strpos($segment, '=')) {
+                $parts[] = $segment;
+                $order[] = $segment;
+            } else {
+                $tmp = explode('=', urldecode($segment), 2);
+                $parts[] = urlencode($tmp[0]).'='.urlencode($tmp[1]);
+                $order[] = $tmp[0];
+            }
+        }
+        array_multisort($order, SORT_ASC, $parts);
+
+        return implode('&', $parts);
     }
 
     public function isSecure()
@@ -838,19 +847,78 @@ class Request
     }
 
     /**
-     * Converts uploaded file array to a format following the $_GET and $POST naming convention.
+     * Converts uploaded files to UploadedFile instances.
      *
-     * It's safe to pass an already converted array, in which case this method just returns the original array unmodified.
+     * @param  array $files A (multi-dimensional) array of uploaded file information
      *
-     * @param  array $taintedFiles An array representing uploaded file information
-     *
-     * @return array An array of re-ordered uploaded file information
+     * @return array A (multi-dimensional) array of UploadedFile instances
      */
-    protected function convertFileInformation(array $taintedFiles)
+    protected function convertFileInformation(array $files)
     {
-        $files = array();
-        foreach ($taintedFiles as $key => $data) {
-            $files[$key] = $this->fixPhpFilesArray($data);
+        $fixedFiles = array();
+
+        foreach ($files as $key => $data) {
+            $fixedFiles[$key] = $this->fixPhpFilesArray($data);
+        }
+
+        $fileKeys = array('error', 'name', 'size', 'tmp_name', 'type');
+        foreach ($fixedFiles as $key => $data) {
+            if (is_array($data)) {
+                $keys = array_keys($data);
+                sort($keys);
+
+                if ($keys == $fileKeys) {
+                    $fixedFiles[$key] = new UploadedFile($data['tmp_name'], $data['name'], $data['type'], $data['size'], $data['error']);
+                } else {
+                    $fixedFiles[$key] = $this->convertFileInformation($data);
+                }
+            }
+        }
+
+        return $fixedFiles;
+    }
+
+    /**
+     * Fixes a malformed PHP $_FILES array.
+     *
+     * PHP has a bug that the format of the $_FILES array differs, depending on
+     * whether the uploaded file fields had normal field names or array-like
+     * field names ("normal" vs. "parent[child]").
+     *
+     * This method fixes the array to look like the "normal" $_FILES array.
+     *
+     * It's safe to pass an already converted array, in which case this method
+     * just returns the original array unmodified.
+     *
+     * @param  array $data
+     * @return array
+     */
+    protected function fixPhpFilesArray($data)
+    {
+        if (!is_array($data)) {
+            return $data;
+        }    
+        
+        $fileKeys = array('error', 'name', 'size', 'tmp_name', 'type');
+        $keys = array_keys($data);
+        sort($keys);
+
+        if ($fileKeys != $keys || !isset($data['name']) || !is_array($data['name'])) {
+            return $data;
+        }
+
+        $files = $data;
+        foreach ($fileKeys as $k) {
+            unset($files[$k]);
+        }
+        foreach (array_keys($data['name']) as $key) {
+            $files[$key] = $this->fixPhpFilesArray(array(
+                'error'    => $data['error'][$key],
+                'name'     => $data['name'][$key],
+                'type'     => $data['type'][$key],
+                'tmp_name' => $data['tmp_name'][$key],
+                'size'     => $data['size'][$key],
+            ));
         }
 
         return $files;
@@ -879,32 +947,5 @@ class Request
             'rdf'  => 'application/rdf+xml',
             'atom' => 'application/atom+xml',
         );
-    }
-
-    static protected function fixPhpFilesArray($data)
-    {
-        $fileKeys = array('error', 'name', 'size', 'tmp_name', 'type');
-        $keys = array_keys($data);
-        sort($keys);
-
-        if ($fileKeys != $keys || !isset($data['name']) || !is_array($data['name'])) {
-            return $data;
-        }
-
-        $files = $data;
-        foreach ($fileKeys as $k) {
-            unset($files[$k]);
-        }
-        foreach (array_keys($data['name']) as $key) {
-            $files[$key] = self::fixPhpFilesArray(array(
-                'error'    => $data['error'][$key],
-                'name'     => $data['name'][$key],
-                'type'     => $data['type'][$key],
-                'tmp_name' => $data['tmp_name'][$key],
-                'size'     => $data['size'][$key],
-            ));
-        }
-
-        return $files;
     }
 }

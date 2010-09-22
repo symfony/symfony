@@ -27,7 +27,7 @@ class PropelExtension extends Extension
             $loader->load($this->resources['propel']);
         }
 
-        if (!$container->getParameterBag()->has('propel.path')) {
+        if (!$container->hasParameter('propel.path')) {
             if (!isset($config['path'])) {
                 throw new \InvalidArgumentException('The "path" parameter is mandatory.');
             }

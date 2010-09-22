@@ -339,7 +339,7 @@ abstract class AbstractDoctrineExtensionTest extends TestCase
         $loader->dbalLoad(array(), $container);
         $loader->ormLoad(array(), $container);
 
-        $this->assertEquals(array(__DIR__.'/Fixtures/Bundles/YamlBundle/Resources/config/doctrine/metadata'), $container->getParameter('doctrine.orm.metadata_driver.mapping_dirs'));
+        $this->assertEquals(array(__DIR__.'/Fixtures/Bundles/YamlBundle/Resources/config/doctrine/metadata/orm'), $container->getParameter('doctrine.orm.metadata_driver.mapping_dirs'));
         $this->assertEquals('%doctrine.orm.metadata_driver.mapping_dirs%', $container->getParameter('doctrine.orm.xml_mapping_dirs'));
         $this->assertEquals('%doctrine.orm.metadata_driver.mapping_dirs%', $container->getParameter('doctrine.orm.yml_mapping_dirs'));
         $this->assertEquals(array(__DIR__.'/Fixtures/Bundles/YamlBundle/Entity'), $container->getParameter('doctrine.orm.metadata_driver.entity_dirs'));
@@ -357,7 +357,7 @@ abstract class AbstractDoctrineExtensionTest extends TestCase
         $loader->dbalLoad(array(), $container);
         $loader->ormLoad(array(), $container);
 
-        $this->assertEquals(array(__DIR__.'/Fixtures/Bundles/XmlBundle/Resources/config/doctrine/metadata'), $container->getParameter('doctrine.orm.metadata_driver.mapping_dirs'));
+        $this->assertEquals(array(__DIR__.'/Fixtures/Bundles/XmlBundle/Resources/config/doctrine/metadata/orm'), $container->getParameter('doctrine.orm.metadata_driver.mapping_dirs'));
         $this->assertEquals('%doctrine.orm.metadata_driver.mapping_dirs%', $container->getParameter('doctrine.orm.xml_mapping_dirs'));
         $this->assertEquals('%doctrine.orm.metadata_driver.mapping_dirs%', $container->getParameter('doctrine.orm.yml_mapping_dirs'));
         $this->assertEquals(array(__DIR__.'/Fixtures/Bundles/XmlBundle/Entity'), $container->getParameter('doctrine.orm.metadata_driver.entity_dirs'));

@@ -12,6 +12,7 @@
 namespace Symfony\Tests\Component\HttpFoundation;
 
 use Symfony\Component\HttpFoundation\Request;
+use Symfony\Component\HttpFoundation\File\UploadedFile;
 
 class RequestTest extends \PHPUnit_Framework_TestCase
 {
@@ -77,5 +78,113 @@ class RequestTest extends \PHPUnit_Framework_TestCase
         $this->assertEquals('js', $request->getFormat('application/javascript'), '->getFormat() returns correct format when format have multiple mime-type (first)');
         $this->assertEquals('js', $request->getFormat('application/x-javascript'), '->getFormat() returns correct format when format have multiple mime-type');
         $this->assertEquals('js', $request->getFormat('text/javascript'), '->getFormat() returns correct format when format have multiple mime-type (last)');
+    }
+
+    /**
+     * @covers Symfony\Component\HttpFoundation\Request::getQueryString
+     */
+    public function testGetQueryString()
+    {
+        $request = new Request();
+
+        $request->server->set('QUERY_STRING', 'foo');
+        $this->assertEquals('foo', $request->getQueryString(), '->getQueryString() works with valueless parameters');
+
+        $request->server->set('QUERY_STRING', 'foo=');
+        $this->assertEquals('foo=', $request->getQueryString(), '->getQueryString() includes a dangling equal sign');
+
+        $request->server->set('QUERY_STRING', 'bar=&foo=bar');
+        $this->assertEquals('bar=&foo=bar', $request->getQueryString(), '->getQueryString() works when empty parameters');
+
+        $request->server->set('QUERY_STRING', 'foo=bar&bar=');
+        $this->assertEquals('bar=&foo=bar', $request->getQueryString(), '->getQueryString() sorts keys alphabetically');
+
+        $request->server->set('QUERY_STRING', 'him=John%20Doe&her=Jane+Doe');
+        $this->assertEquals('her=Jane+Doe&him=John+Doe', $request->getQueryString(), '->getQueryString() normalizes encoding');
+
+        $request->server->set('QUERY_STRING', 'foo[]=1&foo[]=2');
+        $this->assertEquals('foo%5B%5D=1&foo%5B%5D=2', $request->getQueryString(), '->getQueryString() allows array notation');
+
+        $request->server->set('QUERY_STRING', 'foo=1&foo=2');
+        $this->assertEquals('foo=1&foo=2', $request->getQueryString(), '->getQueryString() allows repeated parameters');
+    }
+
+    public function testInitializeConvertsUploadedFiles()
+    {
+        $tmpFile = $this->createTempFile();
+        $file = new UploadedFile($tmpFile, basename($tmpFile), 'text/plain', 100, 0);
+
+        $request = Request::create('', 'get', array(), array(), array('file' => array(
+            'name' => basename($tmpFile),
+            'type' => 'text/plain',
+            'tmp_name' => $tmpFile,
+            'error' => 0,
+            'size' => 100
+        )));
+
+        $this->assertEquals($file, $request->files->get('file'));
+    }
+
+    public function testInitializeConvertsUploadedFilesWithPhpBug()
+    {
+        $tmpFile = $this->createTempFile();
+        $file = new UploadedFile($tmpFile, basename($tmpFile), 'text/plain', 100, 0);
+
+        $request = Request::create('', 'get', array(), array(), array(
+            'child' => array(
+                'name' => array(
+                    'file' => basename($tmpFile),
+                ),
+                'type' => array(
+                    'file' => 'text/plain',
+                ),
+                'tmp_name' => array(
+                    'file' => $tmpFile,
+                ),
+                'error' => array(
+                    'file' => 0,
+                ),
+                'size' => array(
+                    'file' => 100,
+                ),
+            )
+        ));
+
+        $files = $request->files->all();
+        $this->assertEquals($file, $files['child']['file']);
+    }
+
+    public function testInitializeConvertsNestedUploadedFilesWithPhpBug()
+    {
+        $tmpFile = $this->createTempFile();
+        $file = new UploadedFile($tmpFile, basename($tmpFile), 'text/plain', 100, 0);
+
+        $request = Request::create('', 'get', array(), array(), array(
+            'child' => array(
+                'name' => array(
+                    'sub' => array('file' => basename($tmpFile))
+                ),
+                'type' => array(
+                    'sub' => array('file' => 'text/plain')
+                ),
+                'tmp_name' => array(
+                    'sub' => array('file' => $tmpFile)
+                ),
+                'error' => array(
+                    'sub' => array('file' => 0)
+                ),
+                'size' => array(
+                    'sub' => array('file' => 100)
+                ),
+            )
+        ));
+
+        $files = $request->files->all();
+        $this->assertEquals($file, $files['child']['sub']['file']);
+    }
+
+    protected function createTempFile()
+    {
+        return tempnam(sys_get_temp_dir(), 'FormTest');
     }
 }

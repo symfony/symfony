@@ -7,7 +7,7 @@ use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Output\OutputInterface;
 use Symfony\Component\Console\Output\Output;
-use Symfony\Framework\Bundle\Bundle;
+use Symfony\Component\HttpKernel\Bundle\Bundle;
 use Doctrine\ORM\Tools\EntityGenerator;
 
 /*
@@ -55,7 +55,7 @@ EOT
     protected function execute(InputInterface $input, OutputInterface $output)
     {
         $filterBundle = $input->getOption('bundle') ? str_replace('/', '\\', $input->getOption('bundle')) : false;
-        $filterEntity = $filterBundle ? $filterBundle . '\\Entities\\' . str_replace('/', '\\', $input->getOption('entity')) : false;
+        $filterEntity = $filterBundle ? $filterBundle . '\\Entity\\' . str_replace('/', '\\', $input->getOption('entity')) : false;
 
         if (!isset($filterBundle) && isset($filterEntity)) {
             throw new \InvalidArgumentException(sprintf('Unable to specify an entity without also specifying a bundle.'));

@@ -42,7 +42,7 @@ The <info>doctrine:generate:entity</info> task initializes a new Doctrine entity
 
   <info>./symfony doctrine:generate:entity "Bundle\MyCustomBundle" "User\Group"</info>
 
-The above would initialize a new entity in the following entity namespace <info>Bundle\MyCustomBundle\Entities\User\Group</info>.
+The above would initialize a new entity in the following entity namespace <info>Bundle\MyCustomBundle\Entity\User\Group</info>.
 
 You can also optionally specify the fields you want to generate in the new entity:
 
@@ -71,7 +71,7 @@ EOT
         }
 
         $entity = $input->getArgument('entity');
-        $entityNamespace = $namespace.'\\'.$bundle.'\\Entities';
+        $entityNamespace = $namespace.'\\'.$bundle.'\\Entity';
         $fullEntityClassName = $entityNamespace.'\\'.$entity;
         $tmp = str_replace('\\', '/', $fullEntityClassName);
         $tmp = str_replace('/', '\\', dirname($tmp));
@@ -108,12 +108,12 @@ EOT
         $exporter = $cme->getExporter($mappingType);
 
         if ($mappingType === 'annotation') {
-            $path = $dirs[$namespace].'/'.$bundle.'/Entities/'.str_replace($entityNamespace.'\\', null, $fullEntityClassName).'.php';
+            $path = $dirs[$namespace].'/'.$bundle.'/Entity/'.str_replace($entityNamespace.'\\', null, $fullEntityClassName).'.php';
 
             $exporter->setEntityGenerator($this->getEntityGenerator());
         } else {
             $mappingType = $mappingType == 'yaml' ? 'yml' : $mappingType;
-            $path = $dirs[$namespace].'/'.$bundle.'/Resources/config/doctrine/metadata/'.str_replace('\\', '.', $fullEntityClassName).'.dcm.'.$mappingType;
+            $path = $dirs[$namespace].'/'.$bundle.'/Resources/config/doctrine/metadata/orm/'.str_replace('\\', '.', $fullEntityClassName).'.dcm.'.$mappingType;
         }
 
         $code = $exporter->exportClassMetadata($class);

@@ -2,7 +2,7 @@
 
 $loader->import('config_dev.php');
 
-$container->loadFromExtension('kernel', 'config', array(
+$container->loadFromExtension('web', 'config', array(
     'error_handler' => false,
 ));
 
@@ -15,4 +15,4 @@ $container->loadFromExtension('zend', 'logger', array(
     'priority' => 'debug',
 ));
 
-$container->loadFromExtension('kernel', 'test');
+$container->loadFromExtension('web', 'test');

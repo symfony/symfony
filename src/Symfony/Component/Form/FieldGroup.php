@@ -4,8 +4,6 @@ namespace Symfony\Component\Form;
 
 use Symfony\Component\Form\Exception\AlreadyBoundException;
 use Symfony\Component\Form\Exception\UnexpectedTypeException;
-use Symfony\Component\Form\Exception\InvalidPropertyException;
-use Symfony\Component\Form\Exception\PropertyAccessDeniedException;
 use Symfony\Component\Form\Renderer\RendererInterface;
 use Symfony\Component\Form\Renderer\TableRenderer;
 use Symfony\Component\Form\Iterator\RecursiveFieldsWithPropertyPathIterator;
@@ -58,7 +56,12 @@ class FieldGroup extends Field implements \IteratorAggregate, FieldGroupInterfac
     public function __clone()
     {
         foreach ($this->fields as $name => $field) {
-            $this->fields[$name] = clone $field;
+            $field = clone $field;
+            // this condition is only to "bypass" a PHPUnit bug with mocks
+            if (null !== $field->getParent()) {
+                $field->setParent($this);
+            }
+            $this->fields[$name] = $field;
         }
     }
 
@@ -369,6 +372,10 @@ class FieldGroup extends Field implements \IteratorAggregate, FieldGroupInterfac
         if ($path !== null) {
             if ($type === self::FIELD_ERROR && $path->hasNext()) {
                 $path->next();
+
+                if ($path->isProperty() && $path->getCurrent() === 'fields') {
+                    $path->next();
+                }
 
                 if ($this->has($path->getCurrent()) && !$this->get($path->getCurrent())->isHidden()) {
                     $this->get($path->getCurrent())->addError($message, $path, $type);

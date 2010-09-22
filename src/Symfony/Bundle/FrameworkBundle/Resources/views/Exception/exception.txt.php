@@ -15,5 +15,5 @@
 <?php endforeach; ?>
 <?php endif; ?>
 
-[symfony] v. <?php echo \Symfony\Framework\Kernel::VERSION ?> (symfony-project.org)
+[symfony] v. <?php echo \Symfony\Component\HttpKernel\Kernel::VERSION ?> (symfony-project.org)
 [PHP]     v. <?php echo PHP_VERSION ?>

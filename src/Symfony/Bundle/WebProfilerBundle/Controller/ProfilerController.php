@@ -44,7 +44,7 @@ class ProfilerController extends ContainerAware
             return $this->container->get('templating')->renderResponse('WebProfilerBundle:Profiler:index', array(
                 'token'     => $token,
                 'profiler'  => new SafeDecorator($profiler),
-                'collector' => $profiler->getCollector('request'),
+                'collector' => $profiler->get('request'),
                 'template'  => $this->getTemplate($profiler, '_panel', 'request'),
                 'panel'     => 'request',
             ));
@@ -164,7 +164,7 @@ class ProfilerController extends ContainerAware
         $this->container->get('profiler')->disable();
 
         $profiler = $this->container->get('profiler')->loadFromToken($token);
-        if (!$profiler->hasCollector($panel)) {
+        if (!$profiler->has($panel)) {
             throw new NotFoundHttpException(sprintf('Panel "%s" is not registered.', $panel));
         }
 
@@ -176,7 +176,7 @@ class ProfilerController extends ContainerAware
             return $this->container->get('templating')->renderResponse('WebProfilerBundle:Profiler:panel', array(
                 'token'     => $token,
                 'profiler'  => new SafeDecorator($profiler),
-                'collector' => new SafeDecorator($profiler->getCollector($panel)),
+                'collector' => new SafeDecorator($profiler->get($panel)),
                 'template'  => $this->getTemplate($profiler, '_panel', $panel),
                 'panel'     => $panel,
             ));
@@ -292,7 +292,7 @@ class ProfilerController extends ContainerAware
     {
         $templates = array();
         foreach ($this->container->getParameter('data_collector.templates') as $name => $template) {
-            if ($profiler->hasCollector($name)) {
+            if ($profiler->has($name)) {
                 if (!$this->container->get('templating')->exists($template.$suffix)) {
                     continue;
                 }

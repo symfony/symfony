@@ -2,7 +2,8 @@
 
 namespace Symfony\Bundle\FrameworkBundle\Test;
 
-use Symfony\Framework\Test\WebTestCase as BaseWebTestCase;
+use Symfony\Bundle\FrameworkBundle\Client;
+use Symfony\Bundle\FrameworkBundle\WebTestCase as BaseWebTestCase;
 use Symfony\Component\Finder\Finder;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpKernel\HttpKernelInterface;
@@ -23,6 +24,27 @@ use Symfony\Component\HttpKernel\HttpKernelInterface;
  */
 abstract class WebTestCase extends BaseWebTestCase
 {
+    protected $kernel;
+
+    /**
+     * Creates a Client.
+     *
+     * @param array   $options An array of options to pass to the createKernel class
+     * @param array   $server  An array of server parameters
+     *
+     * @return Client A Client instance
+     */
+    public function createClient(array $options = array(), array $server = array())
+    {
+        $this->kernel = $this->createKernel($options);
+        $this->kernel->boot();
+
+        $client = $this->kernel->getContainer()->getTest_ClientService();
+        $client->setServerParameters($server);
+
+        return $client;
+    }
+
     /**
      * Creates a Kernel.
      *

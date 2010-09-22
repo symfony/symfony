@@ -2,7 +2,7 @@
 
 namespace Symfony\Bundle\PropelBundle;
 
-use Symfony\Framework\Bundle\Bundle;
+use Symfony\Component\HttpKernel\Bundle\Bundle;
 
 class PropelBundle extends Bundle
 {

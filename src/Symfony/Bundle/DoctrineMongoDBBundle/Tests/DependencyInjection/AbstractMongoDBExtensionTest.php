@@ -215,7 +215,7 @@ abstract class AbstractMongoDBExtensionTest extends TestCase
 
         $loader->mongodbLoad(array(), $container);
 
-        $this->assertEquals(array(__DIR__.'/Fixtures/Bundles/YamlBundle/Resources/config/doctrine/metadata'), $container->getParameter('doctrine.odm.mongodb.mapping_dirs'));
+        $this->assertEquals(array(__DIR__.'/Fixtures/Bundles/YamlBundle/Resources/config/doctrine/metadata/mongodb'), $container->getParameter('doctrine.odm.mongodb.mapping_dirs'));
         $this->assertEquals('%doctrine.odm.mongodb.mapping_dirs%', $container->getParameter('doctrine.odm.mongodb.xml_mapping_dirs'));
         $this->assertEquals('%doctrine.odm.mongodb.mapping_dirs%', $container->getParameter('doctrine.odm.mongodb.yml_mapping_dirs'));
         $this->assertEquals(array(__DIR__.'/Fixtures/Bundles/YamlBundle/Document'), $container->getParameter('doctrine.odm.mongodb.document_dirs'));
@@ -232,7 +232,7 @@ abstract class AbstractMongoDBExtensionTest extends TestCase
 
         $loader->mongodbLoad(array(), $container);
 
-        $this->assertEquals(array(__DIR__.'/Fixtures/Bundles/XmlBundle/Resources/config/doctrine/metadata'), $container->getParameter('doctrine.odm.mongodb.mapping_dirs'));
+        $this->assertEquals(array(__DIR__.'/Fixtures/Bundles/XmlBundle/Resources/config/doctrine/metadata/mongodb'), $container->getParameter('doctrine.odm.mongodb.mapping_dirs'));
         $this->assertEquals('%doctrine.odm.mongodb.mapping_dirs%', $container->getParameter('doctrine.odm.mongodb.xml_mapping_dirs'));
         $this->assertEquals('%doctrine.odm.mongodb.mapping_dirs%', $container->getParameter('doctrine.odm.mongodb.yml_mapping_dirs'));
         $this->assertEquals(array(__DIR__.'/Fixtures/Bundles/XmlBundle/Document'), $container->getParameter('doctrine.odm.mongodb.document_dirs'));

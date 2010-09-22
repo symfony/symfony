@@ -1,115 +1,115 @@
 <?xml version="1.0"?>
 <xliff version="1.2" xmlns="urn:oasis:names:tc:xliff:document:1.2">
-  <file source-language="en" datatype="plaintext" original="file.ext">
-    <body>
-      <trans-unit id="1">
-        <source>Symfony.Validator.AssertFalse.message</source>
-        <target>This value should be false</target>
-      </trans-unit>
-      <trans-unit id="2">
-        <source>Symfony.Validator.AssertTrue.message</source>
-        <target>This value should be true</target>
-      </trans-unit>
-      <trans-unit id="3">
-        <source>Symfony.Validator.AssertType.message</source>
-        <target>This value should be of type %type%</target>
-      </trans-unit>
-      <trans-unit id="4">
-        <source>Symfony.Validator.Blank.message</source>
-        <target>This value should be blank</target>
-      </trans-unit>
-      <trans-unit id="5">
-        <source>Symfony.Validator.Choice.message</source>
-        <target>This value should be one of the given choices</target>
-      </trans-unit>
-      <trans-unit id="6">
-        <source>Symfony.Validator.Choice.minMessage</source>
-        <target>You should select at least %limit% choices</target>
-      </trans-unit>
-      <trans-unit id="7">
-        <source>Symfony.Validator.Choice.maxMessage</source>
-        <target>You should select at most %limit% choices</target>
-      </trans-unit>
-      <trans-unit id="8">
-        <source>Symfony.Validator.Collection.extraFieldsMessage</source>
-        <target>The fields %fields% were not expected</target>
-      </trans-unit>
-      <trans-unit id="9">
-        <source>Symfony.Validator.Collection.missingFieldsMessage</source>
-        <target>The fields %fields% are missing</target>
-      </trans-unit>
-      <trans-unit id="10">
-        <source>Symfony.Validator.Date.message</source>
-        <target>This value is not a valid date</target>
-      </trans-unit>
-      <trans-unit id="11">
-        <source>Symfony.Validator.DateTime.message</source>
-        <target>This value is not a valid datetime</target>
-      </trans-unit>
-      <trans-unit id="12">
-        <source>Symfony.Validator.Email.message</source>
-        <target>This value is not a valid email address</target>
-      </trans-unit>
-      <trans-unit id="13">
-        <source>Symfony.Validator.File.notFoundMessage</source>
-        <target>The file could not be found</target>
-      </trans-unit>
-      <trans-unit id="14">
-        <source>Symfony.Validator.File.notReadableMessage</source>
-        <target>The file is not readable</target>
-      </trans-unit>
-      <trans-unit id="15">
-        <source>Symfony.Validator.File.maxSizeMessage</source>
-        <target>The file is too large (%size%). Allowed maximum size is %limit%</target>
-      </trans-unit>
-      <trans-unit id="16">
-        <source>Symfony.Validator.File.mimeTypesMessage</source>
-        <target>The mime type of the file is invalid (%type%). Allowed mime types are %types%</target>
-      </trans-unit>
-      <trans-unit id="17">
-        <source>Symfony.Validator.Max.message</source>
-        <target>This value should be %limit% or less</target>
-      </trans-unit>
-      <trans-unit id="18">
-        <source>Symfony.Validator.MaxLength.message</source>
-        <target>This value is too long. It should have %limit% characters or less</target>
-      </trans-unit>
-      <trans-unit id="19">
-        <source>Symfony.Validator.Min.message</source>
-        <target>This value should be %limit% or more</target>
-      </trans-unit>
-      <trans-unit id="20">
-        <source>Symfony.Validator.MinLength.message</source>
-        <target>This value is too short. It should have %limit% characters or more</target>
-      </trans-unit>
-      <trans-unit id="21">
-        <source>Symfony.Validator.NotBlank.message</source>
-        <target>This value should not be blank</target>
-      </trans-unit>
-      <trans-unit id="22">
-        <source>Symfony.Validator.NotNull.message</source>
-        <target>This value should not be null</target>
-      </trans-unit>
-      <trans-unit id="23">
-        <source>Symfony.Validator.Null.message</source>
-        <target>This value should be null</target>
-      </trans-unit>
-      <trans-unit id="24">
-        <source>Symfony.Validator.Regex.message</source>
-        <target>This value is not valid</target>
-      </trans-unit>
-      <trans-unit id="25">
-        <source>Symfony.Validator.Time.message</source>
-        <target>This value is not a valid time</target>
-      </trans-unit>
-      <trans-unit id="26">
-        <source>Symfony.Validator.Url.message</source>
-        <target>This value is not a valid URL</target>
-      </trans-unit>
-      <trans-unit id="27">
-        <source>Symfony.Validator.Valid.message</source>
-        <target>This value should be instance of class %class%</target>
-      </trans-unit>
-    </body>
-  </file>
+    <file source-language="en" datatype="plaintext" original="file.ext">
+        <body>
+            <trans-unit id="1">
+                <source>Symfony.Validator.AssertFalse.message</source>
+                <target>This value should be false</target>
+            </trans-unit>
+            <trans-unit id="2">
+                <source>Symfony.Validator.AssertTrue.message</source>
+                <target>This value should be true</target>
+            </trans-unit>
+            <trans-unit id="3">
+                <source>Symfony.Validator.AssertType.message</source>
+                <target>This value should be of type %type%</target>
+            </trans-unit>
+            <trans-unit id="4">
+                <source>Symfony.Validator.Blank.message</source>
+                <target>This value should be blank</target>
+            </trans-unit>
+            <trans-unit id="5">
+                <source>Symfony.Validator.Choice.message</source>
+                <target>This value should be one of the given choices</target>
+            </trans-unit>
+            <trans-unit id="6">
+                <source>Symfony.Validator.Choice.minMessage</source>
+                <target>You should select at least %limit% choices</target>
+            </trans-unit>
+            <trans-unit id="7">
+                <source>Symfony.Validator.Choice.maxMessage</source>
+                <target>You should select at most %limit% choices</target>
+            </trans-unit>
+            <trans-unit id="8">
+                <source>Symfony.Validator.Collection.extraFieldsMessage</source>
+                <target>The fields %fields% were not expected</target>
+            </trans-unit>
+            <trans-unit id="9">
+                <source>Symfony.Validator.Collection.missingFieldsMessage</source>
+                <target>The fields %fields% are missing</target>
+            </trans-unit>
+            <trans-unit id="10">
+                <source>Symfony.Validator.Date.message</source>
+                <target>This value is not a valid date</target>
+            </trans-unit>
+            <trans-unit id="11">
+                <source>Symfony.Validator.DateTime.message</source>
+                <target>This value is not a valid datetime</target>
+            </trans-unit>
+            <trans-unit id="12">
+                <source>Symfony.Validator.Email.message</source>
+                <target>This value is not a valid email address</target>
+            </trans-unit>
+            <trans-unit id="13">
+                <source>Symfony.Validator.File.notFoundMessage</source>
+                <target>The file could not be found</target>
+            </trans-unit>
+            <trans-unit id="14">
+                <source>Symfony.Validator.File.notReadableMessage</source>
+                <target>The file is not readable</target>
+            </trans-unit>
+            <trans-unit id="15">
+                <source>Symfony.Validator.File.maxSizeMessage</source>
+                <target>The file is too large (%size%). Allowed maximum size is %limit%</target>
+            </trans-unit>
+            <trans-unit id="16">
+                <source>Symfony.Validator.File.mimeTypesMessage</source>
+                <target>The mime type of the file is invalid (%type%). Allowed mime types are %types%</target>
+            </trans-unit>
+            <trans-unit id="17">
+                <source>Symfony.Validator.Max.message</source>
+                <target>This value should be %limit% or less</target>
+            </trans-unit>
+            <trans-unit id="18">
+                <source>Symfony.Validator.MaxLength.message</source>
+                <target>This value is too long. It should have %limit% characters or less</target>
+            </trans-unit>
+            <trans-unit id="19">
+                <source>Symfony.Validator.Min.message</source>
+                <target>This value should be %limit% or more</target>
+            </trans-unit>
+            <trans-unit id="20">
+                <source>Symfony.Validator.MinLength.message</source>
+                <target>This value is too short. It should have %limit% characters or more</target>
+            </trans-unit>
+            <trans-unit id="21">
+              <source>Symfony.Validator.NotBlank.message</source>
+                <target>This value should not be blank</target>
+            </trans-unit>
+            <trans-unit id="22">
+              <source>Symfony.Validator.NotNull.message</source>
+                <target>This value should not be null</target>
+            </trans-unit>
+            <trans-unit id="23">
+              <source>Symfony.Validator.Null.message</source>
+                <target>This value should be null</target>
+            </trans-unit>
+            <trans-unit id="24">
+              <source>Symfony.Validator.Regex.message</source>
+                <target>This value is not valid</target>
+            </trans-unit>
+            <trans-unit id="25">
+              <source>Symfony.Validator.Time.message</source>
+                <target>This value is not a valid time</target>
+            </trans-unit>
+            <trans-unit id="26">
+              <source>Symfony.Validator.Url.message</source>
+                <target>This value is not a valid URL</target>
+            </trans-unit>
+            <trans-unit id="27">
+              <source>Symfony.Validator.Valid.message</source>
+                <target>This value should be instance of class %class%</target>
+            </trans-unit>
+        </body>
+    </file>
 </xliff>

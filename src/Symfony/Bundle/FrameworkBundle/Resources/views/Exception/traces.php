@@ -10,11 +10,11 @@
     <?php endif; ?>
 
     <a id="traces_link_<?php echo $position ?>"></a>
-    <ul class="traces" id="traces_<?php echo $position ?>" style="display: <?php echo 0 === $position ? 'block' : 'none' ?>">
+    <ol class="traces" id="traces_<?php echo $position ?>" style="display: <?php echo 0 === $position ? 'block' : 'none' ?>">
         <?php foreach ($exception->getTrace() as $i => $trace): ?>
             <li>
                 <?php echo $view->render('FrameworkBundle:Exception:trace', array('prefix' => $position, 'i' => $i, 'trace' => $trace)) ?>
             </li>
         <?php endforeach; ?>
-    </ul>
+    </ol>
 </div>

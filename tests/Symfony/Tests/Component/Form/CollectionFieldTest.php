@@ -5,6 +5,7 @@ namespace Symfony\Tests\Component\Form;
 require_once __DIR__ . '/Fixtures/TestField.php';
 
 use Symfony\Component\Form\CollectionField;
+use Symfony\Component\Form\FieldGroup;
 use Symfony\Tests\Component\Form\Fixtures\TestField;
 
 
@@ -26,6 +27,31 @@ class CollectionFieldTest extends \PHPUnit_Framework_TestCase
         $this->assertEquals(2, count($field));
         $this->assertEquals('foo@foo.com', $field[0]->getData());
         $this->assertEquals('foo@bar.com', $field[1]->getData());
+
+        $field->setData(array('foo@baz.com'));
+        $this->assertTrue($field[0] instanceof TestField);
+        $this->assertFalse(isset($field[1]));
+        $this->assertEquals(1, count($field));
+        $this->assertEquals('foo@baz.com', $field[0]->getData());
+    }
+
+    public function testSetDataAdjustsSizeIfModifiable()
+    {
+        $field = new CollectionField(new TestField('emails'), array(
+            'modifiable' => true,
+        ));
+        $field->setData(array('foo@foo.com', 'foo@bar.com'));
+
+        $this->assertTrue($field[0] instanceof TestField);
+        $this->assertTrue($field[1] instanceof TestField);
+        $this->assertTrue($field['$$key$$'] instanceof TestField);
+        $this->assertEquals(3, count($field));
+
+        $field->setData(array('foo@baz.com'));
+        $this->assertTrue($field[0] instanceof TestField);
+        $this->assertFalse(isset($field[1]));
+        $this->assertTrue($field['$$key$$'] instanceof TestField);
+        $this->assertEquals(2, count($field));
     }
 
     public function testThrowsExceptionIfObjectIsNotTraversable()
@@ -95,5 +121,26 @@ class CollectionFieldTest extends \PHPUnit_Framework_TestCase
         $this->assertTrue($field->has('1'));
         $this->assertEquals('foo@foo.com', $field[0]->getData());
         $this->assertEquals('bar@bar.com', $field[1]->getData());
+    }
+
+    public function testCollectionOfFieldGroupsBoundWithArrayObjectContainingObjects()
+    {
+        $fieldGroup = new FieldGroup('name');
+        $fieldGroup->add(new TestField('first'));
+        $fieldGroup->add(new TestField('last'));
+
+        $field = new CollectionField($fieldGroup);
+
+        $nameData = (object) array('first' => 'Foo', 'last' => 'Bar');
+        $collectionData = new \ArrayObject(array($nameData));
+        $field->setData($collectionData);
+
+        $boundNameData = (object) array('first' => 'Foo', 'last' => 'Baz');
+        $boundCollectionData = new \ArrayObject(array($nameData));
+        $field->bind($boundCollectionData);
+
+        $this->assertTrue($field->has('0'));
+        $this->assertFalse($field->has('1'));
+        $this->assertEquals($boundNameData, $field[0]->getData());
     }
 }

@@ -2,7 +2,7 @@
 
 namespace Symfony\Bundle\ZendBundle;
 
-use Symfony\Framework\Bundle\Bundle;
+use Symfony\Component\HttpKernel\Bundle\Bundle;
 
 /*
  * This file is part of the Symfony framework.

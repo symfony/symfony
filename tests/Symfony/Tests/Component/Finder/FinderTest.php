@@ -205,14 +205,21 @@ class FinderTest extends Iterator\RealIteratorTestCase
             $dirs[] = (string) $dir;
         }
 
-        $this->assertEquals($this->toAbsolute(array('foo', 'toto')), $dirs, 'implements the \IteratorAggregate interface');
+        $expected = $this->toAbsolute(array('foo', 'toto'));
+
+        sort($dirs);
+        sort($expected);
+
+        $this->assertEquals($expected, $dirs, 'implements the \IteratorAggregate interface');
 
         $finder = new Finder();
         $this->assertEquals(2, iterator_count($finder->directories()->in(self::$tmpDir)), 'implements the \IteratorAggregate interface');
 
         $finder = new Finder();
         $a = iterator_to_array($finder->directories()->in(self::$tmpDir));
-        $this->assertEquals($this->toAbsolute(array('foo', 'toto')), array_values(array_map(function ($a) { return (string) $a; }, $a)), 'implements the \IteratorAggregate interface');
+        $a = array_values(array_map(function ($a) { return (string) $a; }, $a));
+        sort($a);
+        $this->assertEquals($expected, $a, 'implements the \IteratorAggregate interface');
     }
 
     protected function toAbsolute($files)

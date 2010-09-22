@@ -85,7 +85,7 @@ class DoctrineMongoDBExtension extends Extension
                 $container->setParameter('doctrine.odm.mongodb.'.$key, $config[$key]);
             }
         }
-        $container->setParameter('doctrine.odm.mongodb.mapping_dirs', $this->findBundleSubpaths('Resources/config/doctrine/metadata', $container));
+        $container->setParameter('doctrine.odm.mongodb.mapping_dirs', $this->findBundleSubpaths('Resources/config/doctrine/metadata/mongodb', $container));
         $container->setParameter('doctrine.odm.mongodb.document_dirs', $this->findBundleSubpaths('Document', $container));
     }
 
@@ -332,15 +332,15 @@ class DoctrineMongoDBExtension extends Extension
     static protected function detectMetadataDriver($dir, ContainerBuilder $container)
     {
         // add the closest existing directory as a resource
-        $resource = $dir.'/Resources/config/doctrine/metadata';
+        $resource = $dir.'/Resources/config/doctrine/metadata/mongodb';
         while (!is_dir($resource)) {
             $resource = dirname($resource);
         }
         $container->addResource(new FileResource($resource));
 
-        if (count(glob($dir.'/Resources/config/doctrine/metadata/*.xml'))) {
+        if (count(glob($dir.'/Resources/config/doctrine/metadata/mongodb/*.xml'))) {
             return 'xml';
-        } elseif (count(glob($dir.'/Resources/config/doctrine/metadata/*.yml'))) {
+        } elseif (count(glob($dir.'/Resources/config/doctrine/metadata/mongodb/*.yml'))) {
             return 'yml';
         }
 

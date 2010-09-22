@@ -67,7 +67,7 @@ class Client extends BaseClient
         $kernel = serialize($this->kernel);
         $request = serialize($request);
 
-        $r = new \ReflectionClass('\\Symfony\\Framework\\UniversalClassLoader');
+        $r = new \ReflectionClass('\\Symfony\\Component\\HttpFoundation\\UniversalClassLoader');
         $requirePath = $r->getFileName();
 
         $symfonyPath = realpath(__DIR__.'/../../..');
@@ -77,7 +77,7 @@ class Client extends BaseClient
 
 require_once '$requirePath';
 
-\$loader = new Symfony\Framework\UniversalClassLoader();
+\$loader = new Symfony\Component\HttpFoundation\UniversalClassLoader();
 \$loader->registerNamespaces(array('Symfony' => '$symfonyPath'));
 \$loader->register();
 

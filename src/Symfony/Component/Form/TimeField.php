@@ -2,7 +2,6 @@
 
 namespace Symfony\Component\Form;
 
-use Symfony\Component\Form\Exception\InvalidOptionsException;
 use Symfony\Component\Form\ValueTransformer\ReversedTransformer;
 use Symfony\Component\Form\ValueTransformer\DateTimeToArrayTransformer;
 use Symfony\Component\Form\ValueTransformer\StringToDateTimeTransformer;

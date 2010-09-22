@@ -11,7 +11,7 @@
 
 namespace Symfony\Bundle\FrameworkBundle\Tests;
 
-use Symfony\Framework\Kernel as BaseKernel;
+use Symfony\Component\HttpKernel\Kernel as BaseKernel;
 use Symfony\Component\DependencyInjection\Loader\LoaderInterface;
 use Symfony\Bundle\FrameworkBundle\Util\Filesystem;
 
@@ -45,7 +45,6 @@ class Kernel extends BaseKernel
     public function registerBundles()
     {
         return array(
-            new \Symfony\Framework\KernelBundle(),
             new \Symfony\Bundle\FrameworkBundle\FrameworkBundle(),
         );
     }

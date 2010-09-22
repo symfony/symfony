@@ -52,6 +52,12 @@ class WebExtension extends Extension
             $container->setParameter('debug.file_link_format', 'txmt://open?url=file://%%f&line=%%l');
         }
 
+        foreach (array('csrf_secret', 'csrf-secret') as $key) {
+            if (isset($config[$key])) {
+                $container->setParameter('csrf_secret', $config[$key]);
+            }
+        }
+
         if (isset($config['router'])) {
             if (!$container->hasDefinition('router')) {
                 $loader->load($this->resources['routing']);
@@ -75,25 +81,37 @@ class WebExtension extends Extension
         }
 
         if (isset($config['profiler'])) {
-            if ($config['profiler']) {
-                if (!$container->hasDefinition('profiler')) {
-                    $loader = new XmlFileLoader($container, __DIR__.'/../Resources/config');
-                    $loader->load('profiling.xml');
-                    $loader->load('collectors.xml');
-                }
-
-                if (isset($config['profiler']['only-exceptions'])) {
-                    $container->setParameter('profiler_listener.only_exceptions', $config['profiler']['only-exceptions']);
-                } elseif (isset($config['profiler']['only_exceptions'])) {
-                    $container->setParameter('profiler_listener.only_exceptions', $config['profiler']['only_exceptions']);
-                }
-            } elseif ($container->hasDefinition('profiler')) {
-                $container->getDefinition('profiling')->clearTags();
-            }
+            $this->registerProfilerConfiguration($config, $container);
         }
 
         if (isset($config['validation']['enabled'])) {
             $this->registerValidationConfiguration($config, $container);
+        }
+
+        if (!$container->hasDefinition('event_dispatcher')) {
+            $loader = new XmlFileLoader($container, array(__DIR__.'/../Resources/config', __DIR__.'/Resources/config'));
+            $loader->load('services.xml');
+
+            if ($container->getParameter('kernel.debug')) {
+                $loader->load('debug.xml');
+                $container->setDefinition('event_dispatcher', $container->findDefinition('debug.event_dispatcher'));
+                $container->setAlias('debug.event_dispatcher', 'event_dispatcher');
+            }
+        }
+
+        if (isset($config['charset'])) {
+            $container->setParameter('kernel.charset', $config['charset']);
+        }
+
+        foreach (array('error_handler', 'error-handler') as $key) {
+            if (array_key_exists($key, $config)) {
+                if (false === $config[$key]) {
+                    $container->getDefinition('error_handler')->setMethodCalls(array());
+                } else {
+                    $container->getDefinition('error_handler')->addMethodCall('register', array());
+                    $container->setParameter('error_handler.level', $config[$key]);
+                }
+            }
         }
 
         $this->addCompiledClasses($container, array(
@@ -202,6 +220,103 @@ class WebExtension extends Extension
             'Symfony\\Bundle\\FrameworkBundle\\Templating\\Helper\\RouterHelper',
             'Symfony\\Bundle\\FrameworkBundle\\Templating\\Helper\\RouterHelper',
         ));
+    }
+
+    /**
+     * Loads the test configuration.
+     *
+     * @param array            $config    A configuration array
+     * @param ContainerBuilder $container A ContainerBuilder instance
+     */
+    public function testLoad($config, ContainerBuilder $container)
+    {
+        $loader = new XmlFileLoader($container, array(__DIR__.'/../Resources/config', __DIR__.'/Resources/config'));
+        $loader->load('test.xml');
+    }
+
+    /**
+     * Loads the session configuration.
+     *
+     * @param array            $config    A configuration array
+     * @param ContainerBuilder $container A ContainerBuilder instance
+     */
+    public function sessionLoad($config, ContainerBuilder $container)
+    {
+        if (!$container->hasDefinition('session')) {
+            $loader = new XmlFileLoader($container, array(__DIR__.'/../Resources/config', __DIR__.'/Resources/config'));
+            $loader->load('session.xml');
+        }
+
+        if (isset($config['default_locale'])) {
+            $container->setParameter('session.default_locale', $config['default_locale']);
+        }
+
+        if (isset($config['class'])) {
+            $container->setParameter('session.class', $config['class']);
+        }
+
+        foreach (array('name', 'lifetime', 'path', 'domain', 'secure', 'httponly', 'cache_limiter', 'pdo.db_table') as $name) {
+            if (isset($config['session'][$name])) {
+                $container->setParameter('session.options.'.$name, $config['session'][$name]);
+            }
+        }
+
+        if (isset($config['session']['class'])) {
+            $class = $config['session']['class'];
+            if (in_array($class, array('Native', 'Pdo'))) {
+                $class = 'Symfony\\Component\\HttpFoundation\\SessionStorage\\'.$class.'SessionStorage';
+            }
+
+            $container->setParameter('session.session', 'session.session.'.strtolower($class));
+        }
+    }
+
+    /*
+        <profiler only-exceptions="false">
+            <matcher ip="192.168.0.0/24" path="#/admin/#i" />
+            <matcher>
+                <service class="MyMatcher" />
+            </matcher>
+            <matcher service="my_matcher" />
+        </profiler>
+    */
+    protected function registerProfilerConfiguration($config, ContainerBuilder $container)
+    {
+        if ($config['profiler']) {
+            if (!$container->hasDefinition('profiler')) {
+                $loader = new XmlFileLoader($container, __DIR__.'/../Resources/config');
+                $loader->load('profiling.xml');
+                $loader->load('collectors.xml');
+            }
+
+            if (isset($config['profiler']['only-exceptions'])) {
+                $container->setParameter('profiler_listener.only_exceptions', $config['profiler']['only-exceptions']);
+            } elseif (isset($config['profiler']['only_exceptions'])) {
+                $container->setParameter('profiler_listener.only_exceptions', $config['profiler']['only_exceptions']);
+            }
+
+            if (isset($config['profiler']['matcher'])) {
+                if (isset($config['profiler']['matcher']['service'])) {
+                    $container->setAlias('profiler.request_matcher', $config['profiler']['matcher']['service']);
+                } elseif (isset($config['profiler']['matcher']['_services'])) {
+                    $container->setAlias('profiler.request_matcher', (string) $config['profiler']['matcher']['_services'][0]);
+                } else {
+                    $definition = $container->register('profiler.request_matcher', 'Symfony\\Component\\HttpFoundation\\RequestMatcher');
+
+                    if (isset($config['profiler']['matcher']['ip'])) {
+                        $definition->addMethodCall('matchIp', array($config['profiler']['matcher']['ip']));
+                    }
+
+                    if (isset($config['profiler']['matcher']['path'])) {
+                        $definition->addMethodCall('matchPath', array($config['profiler']['matcher']['path']));
+                    }
+                }
+            } else {
+                $container->removeAlias('profiler.request_matcher');
+            }
+        } elseif ($container->hasDefinition('profiler')) {
+            $container->getDefinition('profiling')->clearTags();
+        }
     }
 
     protected function registerValidationConfiguration($config, ContainerBuilder $container)

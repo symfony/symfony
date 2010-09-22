@@ -120,7 +120,7 @@ class FileValidatorTest extends \PHPUnit_Framework_TestCase
 
     public function testValidMimeType()
     {
-        $file = $this->getMock('Symfony\Component\File\File', array(), array(), '', false);
+        $file = $this->getMock('Symfony\Component\HttpFoundation\File\File', array(), array(), '', false);
         $file->expects($this->any())
                  ->method('getPath')
                  ->will($this->returnValue($this->path));
@@ -137,7 +137,7 @@ class FileValidatorTest extends \PHPUnit_Framework_TestCase
 
     public function testInvalidMimeType()
     {
-        $file = $this->getMock('Symfony\Component\File\File', array(), array(), '', false);
+        $file = $this->getMock('Symfony\Component\HttpFoundation\File\File', array(), array(), '', false);
         $file->expects($this->any())
                  ->method('getPath')
                  ->will($this->returnValue($this->path));

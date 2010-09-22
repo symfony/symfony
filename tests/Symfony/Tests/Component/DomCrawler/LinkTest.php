@@ -72,5 +72,15 @@ class LinkTest extends \PHPUnit_Framework_TestCase
 
         $link = new Link($node, 'get','http://www.foo.com','/bar/');
         $this->assertEquals('http://login.foo.com/foo', $link->getUri(), '->getUri() returns the absolute URI of the link, regardless of the context of the object');
+
+        $dom = new \DOMDocument();
+        $dom->loadHTML('<html><a href="?get=param">foo</a></html>');
+        $node = $dom->getElementsByTagName('a')->item(0);
+
+        $link = new Link($node, 'get', 'http://www.foo.com', '/foo/bar');
+        $this->assertEquals('http://www.foo.com/foo/bar?get=param', $link->getUri(), '->getUri() returns the absolute URI of the link, regardless of the context of the object');
+
+        $link = new Link($node, 'get', 'http://www.foo.com', '/foo/bar');
+        $this->assertEquals('/foo/bar?get=param', $link->getUri(false), '->getUri() returns the relative URI of the link if false is the first argument');
     }
 }

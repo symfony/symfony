@@ -38,7 +38,7 @@ class RequestDataCollector extends DataCollector
             'request_server'     => $request->server->all(),
             'request_cookies'    => $request->cookies->all(),
             'response_headers'   => $response->headers->all(),
-            'session_attributes' => $request->getSession()->getAttributes(),
+            'session_attributes' => $request->hasSession() ? $request->getSession()->getAttributes() : array(),
         );
     }
 

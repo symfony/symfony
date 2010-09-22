@@ -60,6 +60,10 @@ class ControllerResolver implements ControllerResolverInterface
             return false;
         }
 
+        if ($controller instanceof \Closure) {
+            return $controller;
+        }
+
         list($controller, $method) = $this->createController($controller);
 
         if (!method_exists($controller, $method)) {
@@ -85,17 +89,25 @@ class ControllerResolver implements ControllerResolverInterface
     {
         $attributes = $request->attributes->all();
 
-        list($controller, $method) = $controller;
+        if (is_array($controller)) {
+            list($controller, $method) = $controller;
+            $r = new \ReflectionObject($controller);
+            $parameters = $r->getMethod($method)->getParameters();
+            $repr = sprintf('%s::%s()', get_class($controller), $method);
+        } else {
+            $r = new \ReflectionFunction($controller);
+            $parameters = $r->getParameters();
+            $repr = 'Closure';
+        }
 
-        $r = new \ReflectionObject($controller);
         $arguments = array();
-        foreach ($r->getMethod($method)->getParameters() as $param) {
+        foreach ($parameters as $param) {
             if (array_key_exists($param->getName(), $attributes)) {
                 $arguments[] = $attributes[$param->getName()];
             } elseif ($param->isDefaultValueAvailable()) {
                 $arguments[] = $param->getDefaultValue();
             } else {
-                throw new \RuntimeException(sprintf('Controller "%s::%s()" requires that you provide a value for the "$%s" argument (because there is no default value or because there is a non optional argument after this one).', get_class($controller), $method, $param->getName()));
+                throw new \RuntimeException(sprintf('Controller "%s" requires that you provide a value for the "$%s" argument (because there is no default value or because there is a non optional argument after this one).', $repr, $param->getName()));
             }
         }
 

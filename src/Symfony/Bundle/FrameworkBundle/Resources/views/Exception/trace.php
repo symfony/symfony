@@ -4,7 +4,7 @@
 <?php if ($trace['file'] && $trace['line']): ?>
     in <em><?php echo $view->get('code')->formatFile($trace['file'], $trace['line']) ?></em>
     <a href="#" onclick="toggle('trace_<?php echo $prefix.'_'.$i ?>'); return false;">&raquo;</a><br />
-    <ul class="code" id="trace_<?php echo $prefix.'_'.$i ?>" style="display: <?php echo 0 === $i ? 'block' : 'none' ?>">
+    <div id="trace_<?php echo $prefix.'_'.$i ?>" class="trace" style="display: <?php echo 0 === $i ? 'block' : 'none' ?>">
         <?php echo $view->get('code')->fileExcerpt($trace['file'], $trace['line']) ?>
-    </ul>
+    </div>
 <?php endif; ?>

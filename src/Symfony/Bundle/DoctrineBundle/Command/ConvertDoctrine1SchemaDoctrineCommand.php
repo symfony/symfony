@@ -73,9 +73,9 @@ EOT
 
         $type = $input->getArgument('mapping-type') ? $input->getArgument('mapping-type') : 'xml';
         if ($type === 'annotation') {
-            $destPath .= '/Entities';
+            $destPath .= '/Entity';
         } else {
-            $destPath .= '/Resources/config/doctrine/metadata';
+            $destPath .= '/Resources/config/doctrine/metadata/orm';
         }
 
         // adjust so file naming works
@@ -98,7 +98,7 @@ EOT
             $output->writeln(sprintf('Converting Doctrine 1 schema "<info>%s</info>"', $input->getArgument('d1-schema')));
             foreach ($metadata as $class) {
                 $className = $class->name;
-                $class->name = $namespace.'\\'.$bundleClass.'\\Entities\\'.$className;
+                $class->name = $namespace.'\\'.$bundleClass.'\\Entity\\'.$className;
                 if ($type === 'annotation') {
                     $path = $destPath.'/'.$className.'.php';
                 } else {

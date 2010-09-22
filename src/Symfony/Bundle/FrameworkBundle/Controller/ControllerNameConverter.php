@@ -2,7 +2,7 @@
 
 namespace Symfony\Bundle\FrameworkBundle\Controller;
 
-use Symfony\Framework\Kernel;
+use Symfony\Component\HttpKernel\Kernel;
 use Symfony\Component\HttpKernel\Log\LoggerInterface;
 
 /*

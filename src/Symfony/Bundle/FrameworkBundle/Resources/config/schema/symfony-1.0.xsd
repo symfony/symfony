@@ -17,6 +17,7 @@
         </xsd:sequence>
 
         <xsd:attribute name="ide" type="xsd:string" />
+        <xsd:attribute name="csrf-secret" type="xsd:string" />
     </xsd:complexType>
 
     <xsd:complexType name="profiler">

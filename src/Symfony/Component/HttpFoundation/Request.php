@@ -895,6 +895,10 @@ class Request
      */
     protected function fixPhpFilesArray($data)
     {
+        if (!is_array($data)) {
+            return $data;
+        }    
+        
         $fileKeys = array('error', 'name', 'size', 'tmp_name', 'type');
         $keys = array_keys($data);
         sort($keys);

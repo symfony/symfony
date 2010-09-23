@@ -24,4 +24,12 @@ class FileField extends InputField
             'type' => 'file',
         ), $attributes));
     }
+
+    /**
+     * {@inheritDoc}
+     */
+    public function isMultipart()
+    {
+        return true;
+    }
 }

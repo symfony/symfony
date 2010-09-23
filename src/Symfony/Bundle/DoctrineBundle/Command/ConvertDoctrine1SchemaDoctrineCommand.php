@@ -75,7 +75,7 @@ EOT
         if ($type === 'annotation') {
             $destPath .= '/Entity';
         } else {
-            $destPath .= '/Resources/config/doctrine/metadata';
+            $destPath .= '/Resources/config/doctrine/metadata/orm';
         }
 
         // adjust so file naming works

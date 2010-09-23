@@ -3,6 +3,7 @@
 namespace Symfony\Bundle\FrameworkBundle;
 
 use Symfony\Framework\Bundle\Bundle;
+use Symfony\Component\Form\Form;
 
 /*
  * This file is part of the Symfony framework.
@@ -20,4 +21,14 @@ use Symfony\Framework\Bundle\Bundle;
  */
 class FrameworkBundle extends Bundle
 {
+    /**
+     * Boots the Bundle.
+     */
+    public function boot()
+    {
+        if ($this->container->hasParameter('csrf_secret')) {
+            Form::setDefaultCsrfSecret($this->container->getParameter('csrf_secret'));
+            Form::enableDefaultCsrfProtection();
+        }
+    }
 }

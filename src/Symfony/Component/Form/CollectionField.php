@@ -19,8 +19,6 @@ use Symfony\Component\Form\Exception\UnexpectedTypeException;
  */
 class CollectionField extends FieldGroup
 {
-    CONST PLACEHOLDER_KEY = '$$key$$';
-
     /**
      * The prototype for the inner fields
      * @var FieldInterface
@@ -42,6 +40,13 @@ class CollectionField extends FieldGroup
     protected function configure()
     {
         $this->addOption('modifiable', false);
+
+        if ($this->getOption('modifiable')) {
+            $field = $this->newField('$$key$$', null);
+            // TESTME
+            $field->setRequired(false);
+            $this->add($field);
+        }
     }
 
     public function setData($collection)
@@ -50,13 +55,13 @@ class CollectionField extends FieldGroup
             throw new UnexpectedTypeException('The data must be an array');
         }
 
-        foreach ($this as $name => $field)
-        {
-            $this->remove($name);
+        foreach ($this as $name => $field) {
+            if (!$this->getOption('modifiable') || $name != '$$key$$') {
+                $this->remove($name);
+            }
         }
 
-        foreach ($collection as $name => $value)
-        {
+        foreach ($collection as $name => $value) {
             $this->add($this->newField($name, $name));
         }
 
@@ -69,25 +74,15 @@ class CollectionField extends FieldGroup
             $taintedData = array();
         }
 
-        if ($this->getOption('modifiable'))
-        {
-            unset($taintedData[self::PLACEHOLDER_KEY]);
-            parent::setData(null);
-
-            foreach ($this as $name => $field)
-            {
-                if (!isset($taintedData[$name]))
-                {
-                    $this->remove($name);
-                }
+        foreach ($this as $name => $field) {
+            if (!isset($taintedData[$name]) && $this->getOption('modifiable') && $name != '$$key$$') {
+                $this->remove($name);
             }
+        }
 
-            foreach ($taintedData as $name => $value)
-            {
-                if (!isset($this[$name]))
-                {
-                    $this->add($this->newField($name, $name));
-                }
+        foreach ($taintedData as $name => $value) {
+            if (!isset($this[$name]) && $this->getOption('modifiable')) {
+                $this->add($this->newField($name, $name));
             }
         }
 
@@ -99,13 +94,6 @@ class CollectionField extends FieldGroup
         $field = clone $this->prototype;
         $field->setKey($key);
         $field->setPropertyPath($propertyPath === null ? null : '['.$propertyPath.']');
-        return $field;
-    }
-
-    public function getPlaceholderField()
-    {
-        $field = $this->newField(self::PLACEHOLDER_KEY, null);
-        $field->setParent($this);
         return $field;
     }
 }

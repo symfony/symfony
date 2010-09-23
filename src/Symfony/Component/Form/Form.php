@@ -3,9 +3,7 @@
 namespace Symfony\Component\Form;
 
 use Symfony\Component\Validator\ValidatorInterface;
-use Symfony\Component\Validator\ConstraintViolation;
 use Symfony\Component\I18N\TranslatorInterface;
-use Symfony\Component\File\UploadedFile;
 
 /*
  * This file is part of the symfony package.
@@ -34,7 +32,7 @@ class Form extends FieldGroup
 {
     protected static $defaultCsrfSecret = null;
     protected static $defaultCsrfProtection = false;
-    protected static $defaultCsrfFieldName = '_csrf_token';
+    protected static $defaultCsrfFieldName = '_token';
     protected static $defaultLocale = null;
     protected static $defaultTranslator = null;
 

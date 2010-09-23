@@ -4,9 +4,6 @@ namespace Symfony\Component\Form;
 
 use Symfony\Component\Form\Exception\InvalidPropertyException;
 use Symfony\Component\Form\Exception\PropertyAccessDeniedException;
-use Symfony\Component\Form\Exception\NotBoundException;
-use Symfony\Component\Form\Exception\NotValidException;
-use Symfony\Component\Form\Exception\InvalidConfigurationException;
 use Symfony\Component\Form\ValueTransformer\ValueTransformerInterface;
 use Symfony\Component\Form\ValueTransformer\TransformationFailedException;
 use Symfony\Component\I18N\TranslatorInterface;

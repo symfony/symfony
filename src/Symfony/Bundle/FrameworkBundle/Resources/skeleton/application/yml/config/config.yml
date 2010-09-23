@@ -3,8 +3,9 @@ kernel.config:
     error_handler: null
 
 web.config:
-    router:     { resource: "%kernel.root_dir%/config/routing.yml" }
-    validation: { enabled: true, annotations: true }
+    csrf_secret: xxxxxxxxxx
+    router:      { resource: "%kernel.root_dir%/config/routing.yml" }
+    validation:  { enabled: true, annotations: true }
 
 web.templating:
     escaping:       htmlspecialchars

@@ -227,7 +227,7 @@ class DoctrineExtension extends Extension
                 $container->setParameter('doctrine.orm.'.$key, $config[$key]);
             }
         }
-        $container->setParameter('doctrine.orm.metadata_driver.mapping_dirs', $this->findBundleSubpaths('Resources/config/doctrine/metadata', $container));
+        $container->setParameter('doctrine.orm.metadata_driver.mapping_dirs', $this->findBundleSubpaths('Resources/config/doctrine/metadata/orm', $container));
         $container->setParameter('doctrine.orm.metadata_driver.entity_dirs', $this->findBundleSubpaths('Entity', $container));
     }
 
@@ -481,15 +481,15 @@ class DoctrineExtension extends Extension
     static protected function detectMetadataDriver($dir, ContainerBuilder $container)
     {
         // add the closest existing directory as a resource
-        $resource = $dir.'/Resources/config/doctrine/metadata';
+        $resource = $dir.'/Resources/config/doctrine/metadata/orm';
         while (!is_dir($resource)) {
             $resource = dirname($resource);
         }
         $container->addResource(new FileResource($resource));
 
-        if (count(glob($dir.'/Resources/config/doctrine/metadata/*.xml'))) {
+        if (count(glob($dir.'/Resources/config/doctrine/metadata/orm/*.xml'))) {
             return 'xml';
-        } elseif (count(glob($dir.'/Resources/config/doctrine/metadata/*.yml'))) {
+        } elseif (count(glob($dir.'/Resources/config/doctrine/metadata/orm/*.yml'))) {
             return 'yml';
         }
 

@@ -29,7 +29,7 @@ class EmailValidator extends ConstraintValidator
         }
 
         if ($constraint->checkMX) {
-            $host = substr($value, strpos($value, '@'));
+            $host = substr($value, strpos($value, '@') + 1);
 
             if (!$this->checkMX($host)) {
                 $this->setMessage($constraint->message, array('value' => $value));

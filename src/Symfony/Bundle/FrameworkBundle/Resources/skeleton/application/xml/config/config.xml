@@ -20,7 +20,7 @@
         error_handler="null"
     />
 
-    <web:config>
+    <web:config csrf-secret="xxxxxxxxxx">
         <web:router resource="%kernel.root_dir%/config/routing.xml" />
         <web:validation enabled="true" annotations="true" />
     </web:config>

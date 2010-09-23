@@ -96,7 +96,7 @@ abstract class WebTestCase extends BaseWebTestCase
 
         return new $class(
             isset($options['environment']) ? $options['environment'] : 'test',
-            isset($options['debug']) ? $debug : true
+            isset($options['debug']) ? $options['debug'] : true
         );
     }
 }

@@ -37,10 +37,7 @@ class Filesystem
             $options['override'] = false;
         }
 
-        // we create target_dir if needed
-        if (!is_dir(dirname($targetFile))) {
-            $this->mkdirs(dirname($targetFile));
-        }
+        $this->mkdirs(dirname($targetFile));
 
         $mostRecent = false;
         if (file_exists($targetFile)) {
@@ -206,8 +203,16 @@ class Filesystem
             $iterator = new \RecursiveIteratorIterator(new \RecursiveDirectoryIterator($originDir, \FilesystemIterator::SKIP_DOTS), \RecursiveIteratorIterator::SELF_FIRST);
         }
 
+        if ('/' === substr($targetDir, -1) || '\\' === substr($targetDir, -1)) {
+            $targetDir = substr($targetDir, 0, -1);
+        }
+
+        if ('/' === substr($originDir, -1) || '\\' === substr($originDir, -1)) {
+            $originDir = substr($originDir, 0, -1);
+        }
+
         foreach ($iterator as $file) {
-            $target = $targetDir.DIRECTORY_SEPARATOR.str_replace(realpath($originDir), '', $file->getRealPath());
+            $target = $targetDir.'/'.str_replace($originDir.'/', '', $file->getPathname());
 
             if (is_dir($file)) {
                 $this->mkdirs($target);

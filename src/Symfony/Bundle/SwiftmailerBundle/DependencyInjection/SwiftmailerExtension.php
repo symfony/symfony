@@ -32,16 +32,16 @@ class SwiftMailerExtension extends Extension
      *
      * Usage example:
      *
-     *      <swift:mailer transport="gmail" delivery_strategy="spool">
-     *        <swift:username>fabien</swift:username>
-     *        <swift:password>xxxxx</swift:password>
-     *        <swift:spool path="/path/to/spool/" />
-     *      </swift:mailer>
+     *      <swiftmailer:config transport="gmail" delivery_strategy="spool">
+     *        <swiftmailer:username>fabien</swift:username>
+     *        <swiftmailer:password>xxxxx</swift:password>
+     *        <swiftmailer:spool path="/path/to/spool/" />
+     *      </swiftmailer:config>
      *
      * @param array            $config    An array of configuration settings
      * @param ContainerBuilder $container A ContainerBuilder instance
      */
-    public function mailerLoad($config, ContainerBuilder $container)
+    public function configLoad($config, ContainerBuilder $container)
     {
         if (!$container->hasDefinition('swiftmailer.mailer')) {
             $loader = new XmlFileLoader($container, __DIR__.'/../Resources/config');
@@ -134,6 +134,6 @@ class SwiftMailerExtension extends Extension
      */
     public function getAlias()
     {
-        return 'swift';
+        return 'swiftmailer';
     }
 }

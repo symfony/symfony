@@ -1,0 +1,26 @@
+<?xml version="1.0" ?>
+
+<container xmlns="http://www.symfony-project.org/schema/dic/services"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xsi:schemaLocation="http://www.symfony-project.org/schema/dic/services http://www.symfony-project.org/schema/dic/services/services-1.0.xsd">
+
+    <parameters>
+        <parameter key="test.client.class">Symfony\Bundle\FrameworkBundle\Client</parameter>
+        <parameter key="test.client.parameters" type="collection"></parameter>
+        <parameter key="test.client.history.class">Symfony\Component\BrowserKit\History</parameter>
+        <parameter key="test.client.cookiejar.class">Symfony\Component\BrowserKit\CookieJar</parameter>
+    </parameters>
+
+    <services>
+        <service id="test.client" class="%test.client.class%" shared="false">
+            <argument type="service" id="kernel" />
+            <argument>%test.client.parameters%</argument>
+            <argument type="service" id="test.client.history" />
+            <argument type="service" id="test.client.cookiejar" />
+        </service>
+
+        <service id="test.client.history" class="%test.client.history.class%" shared="false" />
+
+        <service id="test.client.cookiejar" class="%test.client.cookiejar.class%" shared="false" />
+    </services>
+</container>

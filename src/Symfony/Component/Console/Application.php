@@ -147,7 +147,7 @@ class Application
             $output->setDecorated(true);
         }
 
-        if (true === $input->hasParameterOption(array('--help', '-H'))) {
+        if (true === $input->hasParameterOption(array('--help', '-h'))) {
             if (!$name) {
                 $name = 'help';
                 $input = new ArrayInput(array('command' => 'help'));

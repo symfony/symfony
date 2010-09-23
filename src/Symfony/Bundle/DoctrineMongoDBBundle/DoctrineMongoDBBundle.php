@@ -2,7 +2,7 @@
 
 namespace Symfony\Bundle\DoctrineMongoDBBundle;
 
-use Symfony\Framework\Bundle\Bundle;
+use Symfony\Component\HttpKernel\Bundle\Bundle;
 
 /**
  * Doctrine MongoDB ODM bundle.

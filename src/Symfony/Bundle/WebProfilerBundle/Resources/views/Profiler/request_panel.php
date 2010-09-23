@@ -36,4 +36,4 @@
 
 <h2>Response Session Attributes</h2>
 
-<?php //echo $view->render('WebProfilerBundle:Profiler:bag', array('bag' => $data->getSessionAttributes())) ?>
+<?php echo $view->render('WebProfilerBundle:Profiler:bag', array('bag' => $data->getSessionAttributes())) ?>

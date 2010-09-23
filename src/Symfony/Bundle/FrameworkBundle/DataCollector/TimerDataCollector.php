@@ -3,7 +3,7 @@
 namespace Symfony\Bundle\FrameworkBundle\DataCollector;
 
 use Symfony\Component\HttpKernel\DataCollector\DataCollector;
-use Symfony\Framework\Kernel;
+use Symfony\Component\HttpKernel\Kernel;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 

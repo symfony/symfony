@@ -235,7 +235,7 @@ abstract class Client
         $process = new PhpProcess($this->getScript($request));
         $process->run();
 
-        if ($process->getExitCode() > 0) {
+        if (!$process->isSuccessful()) {
             throw new \RuntimeException($process->getErrorOutput());
         }
 

@@ -12,6 +12,8 @@ use Symfony\Component\Yaml\Yaml;
  */
 class DoctrineMongoDBLogger
 {
+    const LOG_PREFIX = 'MongoDB query: ';
+
     protected $logger;
     protected $nbQueries;
 
@@ -26,13 +28,33 @@ class DoctrineMongoDBLogger
         ++$this->nbQueries;
 
         if (null !== $this->logger) {
-            $this->logger->info(static::formatQuery($query));
+            $this->logger->info(static::LOG_PREFIX.static::formatQuery($query));
         }
     }
 
     public function getNbQueries()
     {
         return $this->nbQueries;
+    }
+
+    public function getQueries()
+    {
+        $logger = $this->logger->getDebugLogger();
+
+        if (!$logger) {
+            return false;
+        }
+
+        $offset = strlen(static::LOG_PREFIX);
+        $mapper = function($log) use($offset)
+        {
+            if (0 === strpos($log['message'], DoctrineMongoDBLogger::LOG_PREFIX)) {
+                return substr($log['message'], $offset);
+            }
+        };
+
+        // map queries from logs, remove empty entries and re-index the array
+        return array_values(array_filter(array_map($mapper, $logger->getLogs())));
     }
 
     /**
@@ -52,7 +74,9 @@ class DoctrineMongoDBLogger
                 $array = false;
             }
 
-            if (is_scalar($value)) {
+            if (is_bool($value)) {
+                $formatted = $value ? 'true' : 'false';
+            } elseif (is_scalar($value)) {
                 $formatted = '"'.$value.'"';
             } elseif (is_array($value)) {
                 $formatted = static::formatQuery($value);

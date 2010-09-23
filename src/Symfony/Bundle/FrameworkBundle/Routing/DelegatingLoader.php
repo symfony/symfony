@@ -60,7 +60,7 @@ class DelegatingLoader extends BaseDelegatingLoader
                 try {
                     $controller = $this->converter->fromShortNotation($controller);
                 } catch (\Exception $e) {
-                    throw new \RuntimeException(sprintf('%s (for route "%s" in resource "%s")', $e->getMessage(), $name, is_string($resource) ? $resource : 'RESOURCE'), $e->getCode(), $e);
+                    // unable to optimize unknown notation
                 }
 
                 $route->setDefault('_controller', $controller);

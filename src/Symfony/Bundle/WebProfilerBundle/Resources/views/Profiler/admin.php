@@ -1,6 +1,6 @@
 <div class="import clearfix">
     <h3>
-        <img style="margin: 0 5px 0 0; vertical-align: middle; height: 16px" alt="" src="<?php echo $view->get('assets')->getUrl('bundles/webprofiler/images/import.png') ?>" />
+        <img style="margin: 0 5px 0 0; vertical-align: middle; height: 16px" width="16" height="16" alt="Import" src="<?php echo $view->get('assets')->getUrl('bundles/webprofiler/images/import.png') ?>" />
         Admin
     </h3>
 

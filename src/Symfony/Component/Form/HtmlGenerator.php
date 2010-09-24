@@ -120,18 +120,6 @@ class HtmlGenerator implements HtmlGeneratorInterface
      */
     public function escape($value)
     {
-        return $this->fixDoubleEscape(htmlspecialchars((string) $value, ENT_QUOTES, $this->charset));
-    }
-
-    /**
-     * Fixes double escaped strings.
-     *
-     * @param  string $escaped  string to fix
-     *
-     * @return string A single escaped string
-     */
-    protected function fixDoubleEscape($escaped)
-    {
-        return preg_replace('/&amp;([a-z]+|(#\d+)|(#x[\da-f]+));/i', '&$1;', $escaped);
+        return htmlspecialchars((string) $value, ENT_QUOTES, $this->charset, false);
     }
 }

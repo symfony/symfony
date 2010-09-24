@@ -48,9 +48,9 @@ class ExcludeDirectoryFilterIterator extends \FilterIterator
             $inner = $inner->getInnerIterator();
         }
 
+        $method = $inner->current()->isDir() ? 'getSubPathname' : 'getSubPath';
         foreach ($this->patterns as $pattern) {
-            $method = $inner->current()->isDir() ? 'getSubPathname' : 'getSubPath';
-            if (preg_match($pattern, $this->getInnerIterator()->$method())) {
+            if (preg_match($pattern, strtr($this->getInnerIterator()->$method(), '\\', '/'))) {
                 return false;
             }
         }

@@ -27,11 +27,17 @@ class DoctrineMongoDBDataCollector extends DataCollector
     public function collect(Request $request, Response $response, \Exception $exception = null)
     {
         $this->data['nb_queries'] = $this->logger->getNbQueries();
+        $this->data['queries'] = $this->logger->getQueries();
     }
 
     public function getQueryCount()
     {
         return $this->data['nb_queries'];
+    }
+
+    public function getQueries()
+    {
+        return $this->data['queries'];
     }
 
     /**

@@ -6,14 +6,14 @@
     elementFormDefault="qualified">
 
     <xsd:element name="config" type="config" />
-    <xsd:element name="templating" type="templating" />
-    <xsd:element name="user" type="user" />
 
     <xsd:complexType name="config">
         <xsd:sequence>
             <xsd:element name="router" type="router" minOccurs="0" maxOccurs="1" />
             <xsd:element name="validation" type="validation" minOccurs="0" maxOccurs="1" />
             <xsd:element name="profiler" type="profiler" minOccurs="0" maxOccurs="1" />
+            <xsd:element name="user" type="user" minOccurs="0" maxOccurs="1" />
+            <xsd:element name="templating" type="templating" minOccurs="0" maxOccurs="1" />
         </xsd:sequence>
 
         <xsd:attribute name="ide" type="xsd:string" />

@@ -136,7 +136,7 @@ class CollectionFieldTest extends \PHPUnit_Framework_TestCase
         $field->setData($collectionData);
 
         $boundNameData = (object) array('first' => 'Foo', 'last' => 'Baz');
-        $boundCollectionData = new \ArrayObject(array($nameData));
+        $boundCollectionData = new \ArrayObject(array($boundNameData));
         $field->bind($boundCollectionData);
 
         $this->assertTrue($field->has('0'));

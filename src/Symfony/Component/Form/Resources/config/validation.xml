@@ -10,7 +10,7 @@
     </property>
     <getter property="boundWithExtraFields">
       <constraint name="AssertFalse">
-        <option name="message">Symfony.Form.FieldGroup.extraFieldsMessage</option>
+        <option name="message">This field group should not contain extra fields</option>
       </constraint>
     </getter>
   </class>
@@ -21,12 +21,12 @@
     </getter>
     <getter property="postMaxSizeReached">
       <constraint name="AssertFalse">
-        <option name="message">Symfony.Form.Form.postMaxSizeMessage</option>
+        <option name="message">The uploaded file was too large. Please try to upload a smaller file</option>
       </constraint>
     </getter>
     <getter property="csrfTokenValid">
       <constraint name="AssertTrue">
-        <option name="message">Symfony.Form.Form.csrfInvalidMessage</option>
+        <option name="message">The CSRF token is invalid</option>
       </constraint>
     </getter>
   </class>
@@ -34,7 +34,7 @@
   <class name="Symfony\Component\Form\RepeatedField">
     <getter property="firstEqualToSecond">
       <constraint name="AssertTrue">
-        <option name="message">Symfony.Form.RepeatedField.invalidMessage</option>
+        <option name="message">The two values should be equal</option>
       </constraint>
     </getter>
   </class>

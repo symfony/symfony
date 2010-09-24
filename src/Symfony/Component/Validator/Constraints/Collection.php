@@ -7,8 +7,8 @@ class Collection extends \Symfony\Component\Validator\Constraint
     public $fields;
     public $allowExtraFields = false;
     public $allowMissingFields = false;
-    public $extraFieldsMessage = 'Symfony.Validator.Collection.extraFieldsMessage';
-    public $missingFieldsMessage = 'Symfony.Validator.Collection.missingFieldsMessage';
+    public $extraFieldsMessage = 'The fields %fields% were not expected';
+    public $missingFieldsMessage = 'The fields %fields% are missing';
 
     public function requiredOptions()
     {

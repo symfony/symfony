@@ -4,7 +4,7 @@ namespace Symfony\Component\Validator\Constraints;
 
 class Max extends \Symfony\Component\Validator\Constraint
 {
-    public $message = 'Symfony.Validator.Max.message';
+    public $message = 'This value should be %limit% or less';
     public $limit;
 
     /**

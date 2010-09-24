@@ -344,12 +344,9 @@ class FrameworkExtension extends Extension
 
             $xmlMappingFiles = array();
             $yamlMappingFiles = array();
-            $messageFiles = array();
 
             // default entries by the framework
             $xmlMappingFiles[] = __DIR__.'/../../../Component/Form/Resources/config/validation.xml';
-            $messageFiles[] = __DIR__ . '/../../../Component/Validator/Resources/i18n/messages.en.xml';
-            $messageFiles[] = __DIR__ . '/../../../Component/Form/Resources/i18n/messages.en.xml';
 
             foreach ($container->getParameter('kernel.bundles') as $className) {
                 $tmp = dirname(str_replace('\\', '/', $className));
@@ -362,11 +359,6 @@ class FrameworkExtension extends Extension
                     }
                     if (file_exists($file = $dir.'/'.$bundle.'/Resources/config/validation.yml')) {
                         $yamlMappingFiles[] = realpath($file);
-                    }
-
-                    // TODO do we really want the message files of all cultures?
-                    foreach (glob($dir.'/'.$bundle.'/Resources/i18n/messages.*.xml') as $file) {
-                        $messageFiles[] = realpath($file);
                     }
                 }
             }
@@ -383,17 +375,12 @@ class FrameworkExtension extends Extension
 
             $container->setDefinition('validator.mapping.loader.xml_files_loader', $xmlFilesLoader);
             $container->setDefinition('validator.mapping.loader.yaml_files_loader', $yamlFilesLoader);
-            $container->setParameter('validator.message_interpolator.files', $messageFiles);
 
             foreach ($xmlMappingFiles as $file) {
                 $container->addResource(new FileResource($file));
             }
 
             foreach ($yamlMappingFiles as $file) {
-                $container->addResource(new FileResource($file));
-            }
-
-            foreach ($messageFiles as $file) {
                 $container->addResource(new FileResource($file));
             }
 

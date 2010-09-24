@@ -22,10 +22,9 @@ class ChoiceValidatorTest extends \PHPUnit_Framework_TestCase
 
     public function setUp()
     {
-        $interpolator = $this->getMock('Symfony\Component\Validator\MessageInterpolator\MessageInterpolatorInterface');
         $walker = $this->getMock('Symfony\Component\Validator\GraphWalker', array(), array(), '', false);
         $factory = $this->getMock('Symfony\Component\Validator\Mapping\ClassMetadataFactoryInterface');
-        $context = new ValidationContext('root', $walker, $factory, $interpolator);
+        $context = new ValidationContext('root', $walker, $factory);
         $context->setCurrentClass(__CLASS__);
         $this->validator = new ChoiceValidator();
         $this->validator->initialize($context);

@@ -4,7 +4,7 @@ namespace Symfony\Component\Validator\Constraints;
 
 class Regex extends \Symfony\Component\Validator\Constraint
 {
-    public $message = 'Symfony.Validator.Regex.message';
+    public $message = 'This value is not valid';
     public $pattern;
     public $match = true;
 

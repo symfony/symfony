@@ -10,7 +10,6 @@ use Symfony\Component\Validator\Exception\UnexpectedTypeException;
 use Symfony\Component\Validator\Mapping\ClassMetadataFactoryInterface;
 use Symfony\Component\Validator\Mapping\ClassMetadata;
 use Symfony\Component\Validator\Mapping\MemberMetadata;
-use Symfony\Component\Validator\MessageInterpolator\MessageInterpolatorInterface;
 
 class GraphWalker
 {
@@ -18,9 +17,9 @@ class GraphWalker
     protected $validatorFactory;
     protected $metadataFactory;
 
-    public function __construct($root, ClassMetadataFactoryInterface $metadataFactory, ConstraintValidatorFactoryInterface $factory, MessageInterpolatorInterface $messageInterpolator)
+    public function __construct($root, ClassMetadataFactoryInterface $metadataFactory, ConstraintValidatorFactoryInterface $factory)
     {
-        $this->context = new ValidationContext($root, $this, $metadataFactory, $messageInterpolator);
+        $this->context = new ValidationContext($root, $this, $metadataFactory);
         $this->validatorFactory = $factory;
         $this->metadataFactory = $metadataFactory;
     }

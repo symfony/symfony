@@ -22,15 +22,13 @@ class GraphWalkerTest extends \PHPUnit_Framework_TestCase
 {
     const CLASSNAME = 'Symfony\Tests\Component\Validator\Fixtures\Entity';
 
-    protected $interpolator;
     protected $factory;
     protected $metadata;
 
     public function setUp()
     {
-        $this->interpolator = $this->getMock('Symfony\Component\Validator\MessageInterpolator\MessageInterpolatorInterface');
         $this->factory = $this->getMock('Symfony\Component\Validator\Mapping\ClassMetadataFactoryInterface');
-        $this->walker = new GraphWalker('Root', $this->factory, new ConstraintValidatorFactory(), $this->interpolator);
+        $this->walker = new GraphWalker('Root', $this->factory, new ConstraintValidatorFactory());
         $this->metadata = new ClassMetadata(self::CLASSNAME);
     }
 
@@ -74,16 +72,12 @@ class GraphWalkerTest extends \PHPUnit_Framework_TestCase
     {
         $constraint = new ConstraintA();
 
-        $this->interpolator->expects($this->once())
-                                             ->method('interpolate')
-                                             ->with($this->equalTo('message'), $this->equalTo(array('param' => 'value')))
-                                             ->will($this->returnValue('interpolated text'));
-
         $this->walker->walkConstraint($constraint, 'foobar', 'Default', 'firstName.path');
 
         $violations = new ConstraintViolationList();
         $violations->add(new ConstraintViolation(
-            'interpolated text',
+            'message',
+            array('param' => 'value'),
             'Root',
             'firstName.path',
             'foobar'

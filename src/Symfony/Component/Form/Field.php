@@ -573,6 +573,9 @@ abstract class Field extends Configurable implements FieldInterface
                 }
 
                 return $object->$property;
+            } else if (property_exists($object, $property)) {
+                // needed to support \stdClass instances
+                return $object->$property;
             } else {
                 throw new InvalidPropertyException(sprintf('Neither property "%s" nor method "%s()" nor method "%s()" exists in class "%s"', $property, $getter, $isser, $reflClass->getName()));
             }
@@ -603,6 +606,9 @@ abstract class Field extends Configurable implements FieldInterface
                     throw new PropertyAccessDeniedException(sprintf('Property "%s" is not public in class "%s". Maybe you should create the method "set%s()"?', $property, $reflClass->getName(), ucfirst($property)));
                 }
 
+                $objectOrArray->$property = $this->getData();
+            } else if (property_exists($objectOrArray, $property)) {
+                // needed to support \stdClass instances
                 $objectOrArray->$property = $this->getData();
             } else {
                 throw new InvalidPropertyException(sprintf('Neither element "%s" nor method "%s()" exists in class "%s"', $property, $setter, $reflClass->getName()));

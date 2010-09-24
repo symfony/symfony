@@ -197,6 +197,8 @@ EOF;
             'pattern' => '%day%---%month%---%year%',
         ));
 
+        $field->setLocale('de_AT');
+
         $html = <<<EOF
 <select id="name_day" name="name[day]">
 <option value="1">01</option>

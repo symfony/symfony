@@ -27,10 +27,12 @@ class NumberField extends InputField
         // default precision is locale specific (usually around 3)
         $this->addOption('precision');
         $this->addOption('grouping', false);
+        $this->addOption('rounding-mode', NumberToLocalizedStringTransformer::ROUND_HALFUP);
 
         $this->setValueTransformer(new NumberToLocalizedStringTransformer(array(
             'precision' => $this->getOption('precision'),
             'grouping' => $this->getOption('grouping'),
+            'rounding-mode' => $this->getOption('rounding-mode'),
         )));
     }
 

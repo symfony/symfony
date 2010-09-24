@@ -96,11 +96,7 @@ class DateField extends HybridField
         $this->addOption('widget', self::CHOICE, self::$widgets);
         $this->addOption('pattern');
 
-        $this->formatter = new \IntlDateFormatter(
-            $this->locale,
-            self::$intlFormats[$this->getOption('format')],
-            \IntlDateFormatter::NONE
-        );
+        $this->initFormatter();
 
         $transformers = array();
 
@@ -140,15 +136,7 @@ class DateField extends HybridField
 
             $this->setFieldMode(self::GROUP);
 
-            $this->add(new ChoiceField('year', array(
-                'choices' => $this->generatePaddedChoices($this->getOption('years'), 4),
-            )));
-            $this->add(new ChoiceField('month', array(
-                'choices' => $this->generateMonthChoices($this->getOption('months')),
-            )));
-            $this->add(new ChoiceField('day', array(
-                'choices' => $this->generatePaddedChoices($this->getOption('days'), 2),
-            )));
+            $this->addChoiceFields();
         }
 
         if (count($transformers) > 0) {
@@ -238,5 +226,50 @@ class DateField extends HybridField
                 $this->get('day')->render($attributes),
             ), $pattern);
         }
+    }
+
+
+    /**
+     * Sets the locale of this field.
+     *
+     * @see Localizable
+     */
+    public function setLocale($locale)
+    {
+        parent::setLocale($locale);
+
+        $this->initFormatter();
+
+        if ($this->getOption('widget') === self::CHOICE) {
+            $this->addChoiceFields();
+        }
+    }
+
+    /**
+     * Initializes (or reinitializes) the formatter
+     */
+    protected function initFormatter()
+    {
+        $this->formatter = new \IntlDateFormatter(
+            $this->locale,
+            self::$intlFormats[$this->getOption('format')],
+            \IntlDateFormatter::NONE
+        );
+    }
+
+    /**
+     * Adds (or replaces if already added) the fields used when widget=CHOICE
+     */
+    protected function addChoiceFields()
+    {
+        $this->add(new ChoiceField('year', array(
+            'choices' => $this->generatePaddedChoices($this->getOption('years'), 4),
+        )));
+        $this->add(new ChoiceField('month', array(
+            'choices' => $this->generateMonthChoices($this->getOption('months')),
+        )));
+        $this->add(new ChoiceField('day', array(
+            'choices' => $this->generatePaddedChoices($this->getOption('days'), 2),
+        )));
     }
 }

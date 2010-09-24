@@ -169,6 +169,7 @@ class DateTimeFieldTest extends DateTimeTestCase
             'with_seconds' => true,
         ));
 
+        $field->setLocale('de_AT');
         $field->setData(new \DateTime('2010-06-02 03:04:05 UTC'));
 
         $html = <<<EOF

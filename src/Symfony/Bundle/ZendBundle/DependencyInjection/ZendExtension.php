@@ -39,10 +39,6 @@ class ZendExtension extends Extension
         if (isset($config['logger'])) {
             $this->registerLoggerConfiguration($config, $container);
         }
-
-        if (isset($config['translator'])) {
-            $this->registerTranslatorConfiguration($config, $container);
-        }
     }
 
     /**
@@ -80,44 +76,6 @@ class ZendExtension extends Extension
             }
             else {
                 $container->findDefinition('zend.logger')->addMethodCall('registerErrorHandler');
-            }
-        }
-    }
-
-    /**
-     * Loads the translator configuration.
-     *
-     * Usage example:
-     *
-     *      <zend:translator locale="en" adapter="Zend\Translator\Adapter\Xliff" />
-     *
-     * @param array            $config    An array of configuration settings
-     * @param ContainerBuilder $container A ContainerBuilder instance
-     */
-    protected function registerTranslatorConfiguration($config, ContainerBuilder $container)
-    {
-        $config = $config['translator'];
-
-        if (!$container->hasDefinition('zend.translator')) {
-            $loader = new XmlFileLoader($container, __DIR__.'/../Resources/config');
-            $loader->load('translator.xml');
-            $container->setAlias('translator', 'zend.translator');
-        }
-
-        if (isset($config['locale'])) {
-            $container->setParameter('zend.translator.locale', $config['locale']);
-        }
-
-        if (isset($config['adapter'])) {
-            $container->setParameter('zend.translator.adapter', $config['adapter']);
-        }
-
-        if (isset($config['translation']) && is_array($config['translation'])) {
-            foreach ($config['translation'] as $locale => $catalogue) {
-                if ($locale == $container->getParameter('zend.translator.locale')) {
-                  $container->setParameter('zend.translator.catalogue', $catalogue);
-                }
-                $container->findDefinition('zend.translator')->addMethodCall('addTranslation', array($catalogue, $locale));
             }
         }
     }

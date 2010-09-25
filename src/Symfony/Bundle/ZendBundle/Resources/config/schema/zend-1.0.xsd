@@ -10,6 +10,7 @@
     <xsd:complexType name="config">
         <xsd:sequence>
             <xsd:element name="logger" type="logger" minOccurs="0" maxOccurs="1" />
+            <xsd:element name="translator" type="translator" minOccurs="0" maxOccurs="1" />
         </xsd:sequence>
     </xsd:complexType>
 
@@ -39,4 +40,17 @@
             <xsd:enumeration value="7" />
         </xsd:restriction>
     </xsd:simpleType>
+
+    <xsd:complexType name="translator">
+        <xsd:sequence>
+            <xsd:element name="translation" type="translation" minOccurs="0" maxOccurs="unbounded" />
+        </xsd:sequence>
+        <xsd:attribute name="locale" type="xsd:string" />
+        <xsd:attribute name="adapter" type="xsd:string" />
+    </xsd:complexType>
+
+    <xsd:complexType name="translation">
+        <xsd:attribute name="key" type="xsd:string" />
+        <xsd:attribute name="catalog" type="xsd:string" />
+    </xsd:complexType>
 </xsd:schema>

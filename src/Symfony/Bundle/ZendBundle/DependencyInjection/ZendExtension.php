@@ -40,8 +40,8 @@ class ZendExtension extends Extension
             $this->registerLoggerConfiguration($config, $container);
         }
 
-        if (isset($config['i18n'])) {
-            $this->registerI18nConfiguration($config, $container);
+        if (isset($config['translator'])) {
+            $this->registerTranslatorConfiguration($config, $container);
         }
     }
 
@@ -85,23 +85,23 @@ class ZendExtension extends Extension
     }
 
     /**
-     * Loads the i18n configuration.
+     * Loads the translator configuration.
      *
      * Usage example:
      *
-     *      <zend:i18n locale="en" adapter="xliff" data="/path/to/messages.xml" />
+     *      <zend:translator locale="en" adapter="Zend\Translator\Adapter\Xliff" />
      *
      * @param array            $config    An array of configuration settings
      * @param ContainerBuilder $container A ContainerBuilder instance
      */
-    protected function registerI18nConfiguration($config, ContainerBuilder $container)
+    protected function registerTranslatorConfiguration($config, ContainerBuilder $container)
     {
-        $config = $config['i18n'];
+        $config = $config['translator'];
 
-        if (!$container->hasDefinition('zend.i18n')) {
+        if (!$container->hasDefinition('zend.translator')) {
             $loader = new XmlFileLoader($container, __DIR__.'/../Resources/config');
-            $loader->load('i18n.xml');
-            $container->setAlias('i18n', 'zend.i18n');
+            $loader->load('translator.xml');
+            $container->setAlias('translator', 'zend.translator');
         }
 
         if (isset($config['locale'])) {
@@ -109,11 +109,11 @@ class ZendExtension extends Extension
         }
 
         if (isset($config['adapter'])) {
-            $container->setParameter('zend.translator.adapter', constant($config['adapter']));
+            $container->setParameter('zend.translator.adapter', $config['adapter']);
         }
 
-        if (isset($config['translations']) && is_array($config['translations'])) {
-            foreach ($config['translations'] as $locale => $catalogue) {
+        if (isset($config['translation']) && is_array($config['translation'])) {
+            foreach ($config['translation'] as $locale => $catalogue) {
                 if ($locale == $container->getParameter('zend.translator.locale')) {
                   $container->setParameter('zend.translator.catalogue', $catalogue);
                 }

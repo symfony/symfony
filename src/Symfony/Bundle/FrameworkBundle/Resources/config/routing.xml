@@ -11,6 +11,7 @@
         <parameter key="routing.loader.xml.class">Symfony\Component\Routing\Loader\XmlFileLoader</parameter>
         <parameter key="routing.loader.yml.class">Symfony\Component\Routing\Loader\YamlFileLoader</parameter>
         <parameter key="routing.loader.php.class">Symfony\Component\Routing\Loader\PhpFileLoader</parameter>
+        <parameter key="routing.generator.base.class">Symfony\Component\Routing\Generator\UrlGenerator</parameter>
     </parameters>
 
     <services>
@@ -47,6 +48,7 @@
                 <argument key="debug">%kernel.debug%</argument>
                 <argument key="matcher_cache_class">%kernel.name%UrlMatcher</argument>
                 <argument key="generator_cache_class">%kernel.name%_%kernel.environment%UrlGenerator</argument>
+                <argument key="generator_base_class">%routing.generator.base.class%</argument>
             </argument>
         </service>
     </services>

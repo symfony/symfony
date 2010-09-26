@@ -11,6 +11,12 @@
         <parameter key="routing.loader.xml.class">Symfony\Component\Routing\Loader\XmlFileLoader</parameter>
         <parameter key="routing.loader.yml.class">Symfony\Component\Routing\Loader\YamlFileLoader</parameter>
         <parameter key="routing.loader.php.class">Symfony\Component\Routing\Loader\PhpFileLoader</parameter>
+        <parameter key="router.options.generator_class">Symfony\Component\Routing\Generator\UrlGenerator</parameter>
+        <parameter key="router.options.generator_base_class">Symfony\Component\Routing\Generator\UrlGenerator</parameter>
+        <parameter key="router.options.generator_dumper_class">Symfony\Component\Routing\Generator\Dumper\PhpGeneratorDumper</parameter>
+        <parameter key="router.options.matcher_class">Symfony\Component\Routing\Matcher\UrlMatcher</parameter>
+        <parameter key="router.options.matcher_base_class">Symfony\Component\Routing\Matcher\UrlMatcher</parameter>
+        <parameter key="router.options.matcher_dumper_class">Symfony\Component\Routing\Matcher\Dumper\PhpMatcherDumper</parameter>
     </parameters>
 
     <services>
@@ -45,8 +51,14 @@
             <argument type="collection">
                 <argument key="cache_dir">%kernel.cache_dir%</argument>
                 <argument key="debug">%kernel.debug%</argument>
-                <argument key="matcher_cache_class">%kernel.name%UrlMatcher</argument>
+                <argument key="generator_class">%router.options.generator_class%</argument>
+                <argument key="generator_base_class">%router.options.generator_base_class%</argument>
+                <argument key="generator_dumper_class">%router.options.generator_dumper_class%</argument>
                 <argument key="generator_cache_class">%kernel.name%_%kernel.environment%UrlGenerator</argument>
+                <argument key="matcher_class">%router.options.matcher_class%</argument>
+                <argument key="matcher_base_class">%router.options.matcher_base_class%</argument>
+                <argument key="matcher_dumper_class">%router.options.matcher_dumper_class%</argument>
+                <argument key="matcher_cache_class">%kernel.name%UrlMatcher</argument>
             </argument>
         </service>
     </services>

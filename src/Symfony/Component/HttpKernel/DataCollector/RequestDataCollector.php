@@ -74,7 +74,7 @@ class RequestDataCollector extends DataCollector
 
     public function getSessionAttributes()
     {
-        return new HeaderBag($this->data['session_attributes']);
+        return $this->data['session_attributes'];
     }
 
     public function getContentType()

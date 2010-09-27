@@ -36,4 +36,28 @@
 
 <h2>Response Session Attributes</h2>
 
-<?php echo $view->render('WebProfilerBundle:Profiler:bag', array('bag' => $data->getSessionAttributes())) ?>
+<table>
+    <tr>
+        <th>Key</th>
+        <th>Value</th>
+    </tr>
+
+    <?php foreach ($data->getSessionAttributes()->getRawValue() as $key => $value): ?>
+        <tr>
+            <th><?php echo $key ?></th>
+            <td>
+                <?php if (is_object($value)): ?>
+                    <em>Object</em>
+                <?php elseif (is_resource($value)): ?>
+                    <em>Resource</em>
+                <?php elseif (is_array($value)): ?>
+                    <em>Array</em>
+                <?php else: ?>
+                    <?php echo $value ?>
+                <?php endif; ?>
+            </td>
+        </tr>
+    <?php endforeach; ?>
+</table>
+
+<?php //echo $view->render('WebProfilerBundle:Profiler:bag', array('bag' => $data->getSessionAttributes())) ?>

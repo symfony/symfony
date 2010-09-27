@@ -34,7 +34,7 @@ class ConstraintViolation
         $sources = array();
         $targets = array();
         foreach ($this->messageParameters as $key => $value) {
-            $sources[] = '%'.$key.'%';
+            $sources[] = '{{ '.$key.' }}';
             $targets[] = (string) $value;
         }
 

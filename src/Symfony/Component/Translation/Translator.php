@@ -25,15 +25,18 @@ class Translator implements TranslatorInterface
     protected $fallbackLocale;
     protected $loaders;
     protected $resources;
+    protected $selector;
 
     /**
      * Constructor.
      *
-     * @param string $locale The locale
+     * @param string          $locale   The locale
+     * @param MessageSelector $selector The message selector for pluralization
      */
-    public function __construct($locale = null)
+    public function __construct($locale = null, MessageSelector $selector)
     {
         $this->locale = $locale;
+        $this->selector = $selector;
         $this->loaders = array();
         $this->resources = array();
         $this->catalogues = array();
@@ -119,39 +122,7 @@ class Translator implements TranslatorInterface
             $this->loadCatalogue($locale);
         }
 
-        return strtr($this->chooseMessage($this->catalogues[$locale]->getMessage($id, $domain), (int) $number, $locale), $parameters);
-    }
-
-    protected function chooseMessage($message, $number, $locale)
-    {
-        $parts = explode('|', $message);
-        $explicitRules = array();
-        $standardRules = array();
-        foreach ($parts as $part) {
-            $part = trim($part);
-
-            if (preg_match('/^(?<range>'.Range::getRangeRegexp().')\s+(?<message>.+?)$/x', $part, $matches)) {
-                $explicitRules[$matches['range']] = $matches['message'];
-            } elseif (preg_match('/^\w+\: +(.+)$/', $part, $matches)) {
-                $standardRules[] = $matches[1];
-            } else {
-                $standardRules[] = $part;
-            }
-        }
-
-        // try to match an explicit rule, then fallback to the standard ones
-        foreach ($explicitRules as $range => $m) {
-            if (Range::test($number, $range)) {
-                return $m;
-            }
-        }
-
-        $position = PluralizationRules::get($number, $locale);
-        if (!isset($standardRules[$position])) {
-            throw new \InvalidArgumentException('Unable to choose a translation.');
-        }
-
-        return $standardRules[$position];
+        return strtr($this->selector->choose($this->catalogues[$locale]->getMessage($id, $domain), (int) $number, $locale), $parameters);
     }
 
     protected function loadCatalogue($locale)

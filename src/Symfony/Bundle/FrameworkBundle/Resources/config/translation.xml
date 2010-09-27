@@ -6,14 +6,17 @@
 
     <parameters>
         <parameter key="translator.class">Symfony\Bundle\FrameworkBundle\Translation\Translator</parameter>
+        <parameter key="translator.identity.class">Symfony\Component\Translation\IdentityTranslator</parameter>
+        <parameter key="translator.selector.class">Symfony\Component\Translation\MessageSelector</parameter>
         <parameter key="translation.loader.php.class">Symfony\Component\Translation\Loader\PhpFileLoader</parameter>
         <parameter key="translation.loader.xliff.class">Symfony\Component\Translation\Loader\XliffFileLoader</parameter>
         <parameter key="translator.fallback_locale">en</parameter>
     </parameters>
 
     <services>
-        <service id="translator" class="%translator.class%">
+        <service id="translator.real" class="%translator.class%">
             <argument type="service" id="service_container" />
+            <argument type="service" id="translator.selector" />
             <argument type="collection">
                 <argument key="cache_dir">%kernel.cache_dir%/translations</argument>
                 <argument key="debug">%kernel.debug%</argument>
@@ -21,6 +24,12 @@
             <argument type="service" id="session" on-invalid="ignore" />
             <call method="setFallbackLocale"><argument>%translator.fallback_locale%</argument></call>
         </service>
+
+        <service id="translator" class="%translator.identity.class%">
+            <argument type="service" id="translator.selector" />
+        </service>
+
+        <service id="translator.selector" class="%translator.selector.class%" />
 
         <service id="translation.loader.php" class="%translation.loader.php.class%">
             <tag name="translation.loader" alias="php" />

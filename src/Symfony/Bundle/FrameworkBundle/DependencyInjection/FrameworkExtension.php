@@ -100,9 +100,7 @@ class FrameworkExtension extends Extension
             $this->registerUserConfiguration($config, $container);
         }
 
-        if (array_key_exists('translator', $config)) {
-            $this->registerTranslatorConfiguration($config, $container);
-        }
+        $this->registerTranslatorConfiguration($config, $container);
 
         $this->addCompiledClasses($container, array(
             'Symfony\\Component\\HttpFoundation\\ParameterBag',
@@ -234,40 +232,49 @@ class FrameworkExtension extends Extension
      */
     protected function registerTranslatorConfiguration($config, ContainerBuilder $container)
     {
-        $config = $config['translator'];
+        $first = false;
+        if (!$container->hasDefinition('translator')) {
+            $first = true;
+            $loader = new XmlFileLoader($container, array(__DIR__.'/../Resources/config', __DIR__.'/Resources/config'));
+            $loader->load('translation.xml');
+        }
+
+        $config = array_key_exists('translator', $config) ? $config['translator'] : array();
         if (!is_array($config)) {
             $config = array();
         }
 
-        if (!$container->hasDefinition('translator')) {
-            $loader = new XmlFileLoader($container, array(__DIR__.'/../Resources/config', __DIR__.'/Resources/config'));
-            $loader->load('translation.xml');
+        if (!isset($config['translator']['enabled']) || $config['translator']['enabled']) {
+            // use the "real" translator
+            $container->setDefinition('translator', $container->findDefinition('translator.real'));
 
-            // translation directories
-            $dirs = array();
-            foreach (array_reverse($container->getParameter('kernel.bundles')) as $bundle) {
-                $reflection = new \ReflectionClass($bundle);
-                if (is_dir($dir = dirname($reflection->getFilename()).'/Resources/translations')) {
+            if ($first) {
+                // translation directories
+                $dirs = array();
+                foreach (array_reverse($container->getParameter('kernel.bundles')) as $bundle) {
+                    $reflection = new \ReflectionClass($bundle);
+                    if (is_dir($dir = dirname($reflection->getFilename()).'/Resources/translations')) {
+                        $dirs[] = $dir;
+                    }
+                }
+                if (is_dir($dir = $container->getParameter('kernel.root_dir').'/translations')) {
                     $dirs[] = $dir;
                 }
-            }
-            if (is_dir($dir = $container->getParameter('kernel.root_dir').'/translations')) {
-                $dirs[] = $dir;
-            }
 
-            // translation resources
-            $resources = array();
-            if ($dirs) {
-                $finder = new Finder();
-                $finder->files()->filter(function (\SplFileInfo $file) { return 2 === substr_count($file->getBasename(), '.'); })->in($dirs);
-                foreach ($finder as $file) {
-                    // filename is domain.locale.format
-                    list($domain, $locale, $format) = explode('.', $file->getBasename());
+                // translation resources
+                $resources = array();
+                if ($dirs) {
+                    $finder = new Finder();
+                    $finder->files()->filter(function (\SplFileInfo $file) { return 2 === substr_count($file->getBasename(), '.'); })->in($dirs);
+                    foreach ($finder as $file) {
+                        // filename is domain.locale.format
+                        list($domain, $locale, $format) = explode('.', $file->getBasename());
 
-                    $resources[] = array($format, (string) $file, $locale, $domain);
+                        $resources[] = array($format, (string) $file, $locale, $domain);
+                    }
                 }
+                $container->setParameter('translation.resources', $resources);
             }
-            $container->setParameter('translation.resources', $resources);
         }
 
         if (array_key_exists('fallback', $config)) {

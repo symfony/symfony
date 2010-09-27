@@ -12,6 +12,7 @@
 namespace Symfony\Tests\Component\Translation;
 
 use Symfony\Component\Translation\Translator;
+use Symfony\Component\Translation\MessageSelector;
 use Symfony\Component\Translation\Loader\ArrayLoader;
 
 class TranslatorTest extends \PHPUnit_Framework_TestCase
@@ -21,7 +22,7 @@ class TranslatorTest extends \PHPUnit_Framework_TestCase
      */
     public function testTrans($expected, $id, $translation, $parameters, $locale, $domain)
     {
-        $translator = new Translator();
+        $translator = new Translator('en', new MessageSelector());
         $translator->addLoader('array', new ArrayLoader());
         $translator->addResource('array', array($id => $translation), $locale, $domain);
 
@@ -33,7 +34,7 @@ class TranslatorTest extends \PHPUnit_Framework_TestCase
      */
     public function testTransChoice($expected, $id, $translation, $number, $parameters, $locale, $domain)
     {
-        $translator = new Translator();
+        $translator = new Translator('en', new MessageSelector());
         $translator->addLoader('array', new ArrayLoader());
         $translator->addResource('array', array($id => $translation), $locale, $domain);
 

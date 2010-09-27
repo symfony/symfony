@@ -4,6 +4,7 @@ namespace Symfony\Bundle\FrameworkBundle\Translation;
 
 use Symfony\Component\Translation\Translator as BaseTranslator;
 use Symfony\Component\Translation\Loader\LoaderInterface;
+use Symfony\Component\Translation\MessageSelector;
 use Symfony\Component\DependencyInjection\ContainerInterface;
 use Symfony\Component\HttpFoundation\Session;
 
@@ -35,13 +36,14 @@ class Translator extends BaseTranslator
      *   * debug:     Whether to enable debugging or not (false by default)
      *
      * @param ContainerInterface $container A ContainerInterface instance
+     * @param MessageSelector    $selector  The message selector for pluralization
      * @param array              $options   An array of options
      * @param Session            $session   A Session instance
      */
-    public function __construct(ContainerInterface $container, array $options = array(), Session $session = null)
+    public function __construct(ContainerInterface $container, MessageSelector $selector, array $options = array(), Session $session = null)
     {
         if (null !== $session) {
-            parent::__construct($session->getLocale());
+            parent::__construct($session->getLocale(), $selector);
         }
 
         $this->container = $container;

@@ -110,6 +110,22 @@
                 <source>This value should be instance of class {{ class }}</source>
                 <target></target>
             </trans-unit>
+            <trans-unit id="28">
+                <source>This field group should not contain extra fields</source>
+                <target></target>
+            </trans-unit>
+            <trans-unit id="29">
+                <source>The uploaded file was too large. Please try to upload a smaller file</source>
+                <target></target>
+            </trans-unit>
+            <trans-unit id="30">
+                <source>The CSRF token is invalid</source>
+                <target></target>
+            </trans-unit>
+            <trans-unit id="31">
+                <source>The two values should be equal</source>
+                <target></target>
+            </trans-unit>
         </body>
     </file>
 </xliff>

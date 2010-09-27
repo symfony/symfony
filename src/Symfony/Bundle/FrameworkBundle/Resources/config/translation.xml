@@ -1,0 +1,33 @@
+<?xml version="1.0" ?>
+
+<container xmlns="http://www.symfony-project.org/schema/dic/services"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xsi:schemaLocation="http://www.symfony-project.org/schema/dic/services http://www.symfony-project.org/schema/dic/services/services-1.0.xsd">
+
+    <parameters>
+        <parameter key="translator.class">Symfony\Bundle\FrameworkBundle\Translation\Translator</parameter>
+        <parameter key="translation.loader.php.class">Symfony\Component\Translation\Loader\PhpFileLoader</parameter>
+        <parameter key="translation.loader.xliff.class">Symfony\Component\Translation\Loader\XliffFileLoader</parameter>
+        <parameter key="translator.fallback_locale">en</parameter>
+    </parameters>
+
+    <services>
+        <service id="translator" class="%translator.class%">
+            <argument type="service" id="service_container" />
+            <argument type="collection">
+                <argument key="cache_dir">%kernel.cache_dir%/translations</argument>
+                <argument key="debug">%kernel.debug%</argument>
+            </argument>
+            <argument type="service" id="session" on-invalid="ignore" />
+            <call method="setFallbackLocale"><argument>%translator.fallback_locale%</argument></call>
+        </service>
+
+        <service id="translation.loader.php" class="%translation.loader.php.class%">
+            <tag name="translation.loader" alias="php" />
+        </service>
+
+        <service id="translation.loader.xliff" class="%translation.loader.xliff.class%">
+            <tag name="translation.loader" alias="xliff" />
+        </service>
+    </services>
+</container>

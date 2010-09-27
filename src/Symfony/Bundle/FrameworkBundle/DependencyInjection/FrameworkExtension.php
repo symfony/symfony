@@ -8,6 +8,7 @@ use Symfony\Component\DependencyInjection\Resource\FileResource;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\DependencyInjection\Reference;
 use Symfony\Component\DependencyInjection\Definition;
+use Symfony\Component\Finder\Finder;
 
 /*
  * This file is part of the Symfony framework.
@@ -97,6 +98,10 @@ class FrameworkExtension extends Extension
 
         if (isset($config['user'])) {
             $this->registerUserConfiguration($config, $container);
+        }
+
+        if (array_key_exists('translator', $config)) {
+            $this->registerTranslatorConfiguration($config, $container);
         }
 
         $this->addCompiledClasses($container, array(
@@ -219,6 +224,55 @@ class FrameworkExtension extends Extension
     {
         $loader = new XmlFileLoader($container, array(__DIR__.'/../Resources/config', __DIR__.'/Resources/config'));
         $loader->load('test.xml');
+    }
+
+    /**
+     * Loads the translator configuration.
+     *
+     * @param array            $config    A configuration array
+     * @param ContainerBuilder $container A ContainerBuilder instance
+     */
+    protected function registerTranslatorConfiguration($config, ContainerBuilder $container)
+    {
+        $config = $config['translator'];
+        if (!is_array($config)) {
+            $config = array();
+        }
+
+        if (!$container->hasDefinition('translator')) {
+            $loader = new XmlFileLoader($container, array(__DIR__.'/../Resources/config', __DIR__.'/Resources/config'));
+            $loader->load('translation.xml');
+
+            // translation directories
+            $dirs = array();
+            foreach (array_reverse($container->getParameter('kernel.bundles')) as $bundle) {
+                $reflection = new \ReflectionClass($bundle);
+                if (is_dir($dir = dirname($reflection->getFilename()).'/Resources/translations')) {
+                    $dirs[] = $dir;
+                }
+            }
+            if (is_dir($dir = $container->getParameter('kernel.root_dir').'/translations')) {
+                $dirs[] = $dir;
+            }
+
+            // translation resources
+            $resources = array();
+            if ($dirs) {
+                $finder = new Finder();
+                $finder->files()->filter(function (\SplFileInfo $file) { return 2 === substr_count($file->getBasename(), '.'); })->in($dirs);
+                foreach ($finder as $file) {
+                    // filename is domain.locale.format
+                    list($domain, $locale, $format) = explode('.', $file->getBasename());
+
+                    $resources[] = array($format, (string) $file, $locale, $domain);
+                }
+            }
+            $container->setParameter('translation.resources', $resources);
+        }
+
+        if (array_key_exists('fallback', $config)) {
+            $container->setParameter('translator.fallback_locale', $config['fallback']);
+        }
     }
 
     /**

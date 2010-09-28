@@ -12,13 +12,13 @@ namespace Symfony\Component\Translation;
  */
 
 /**
- * Range tests if a given number belongs to a given range.
+ * Tests if a given number belongs to a given math interval.
  *
- * A range can represent a finite set of numbers:
+ * An interval can represent a finite set of numbers:
  *
  *  {1,2,3,4}
  *
- * A range can represent numbers between two numbers:
+ * An interval can represent numbers between two numbers:
  *
  *  [1, +Inf]
  *  ]-1,2[
@@ -27,22 +27,24 @@ namespace Symfony\Component\Translation;
  * The right delimiter can be [ (exclusive) or ] (inclusive).
  * Beside numbers, you can use -Inf and +Inf for the infinite.
  *
+ * @see http://en.wikipedia.org/wiki/Interval_%28mathematics%29#The_ISO_notation
+ *
  * @author Fabien Potencier <fabien.potencier@symfony-project.com>
  */
-class Range
+class Interval
 {
     /**
-     * Tests if the given number is in the range.
+     * Tests if the given number is in the math interval.
      *
-     * @param integer $number A number
-     * @param string  $range  A range of numbers
+     * @param integer $number   A number
+     * @param string  $interval An interval
      */
-    static public function test($number, $range)
+    static public function test($number, $interval)
     {
-        $range = trim($range);
+        $interval = trim($interval);
 
-        if (!preg_match('/^'.self::getRangeRegexp().'$/x', $range, $matches)) {
-            throw new \InvalidArgumentException(sprintf('"%s" is not a valid range expression.', $range));
+        if (!preg_match('/^'.self::getIntervalRegexp().'$/x', $interval, $matches)) {
+            throw new \InvalidArgumentException(sprintf('"%s" is not a valid interval.', $interval));
         }
 
         if ($matches[1]) {
@@ -66,11 +68,11 @@ class Range
     }
 
     /**
-     * Returns a Regexp that matches valid ranges.
+     * Returns a Regexp that matches valid intervals.
      *
      * @return string A Regexp (without the delimiters)
      */
-    static public function getRangeRegexp()
+    static public function getIntervalRegexp()
     {
         return <<<EOF
         ({\s*

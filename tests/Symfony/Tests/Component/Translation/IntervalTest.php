@@ -11,16 +11,16 @@
 
 namespace Symfony\Tests\Component\Translation;
 
-use Symfony\Component\Translation\Range;
+use Symfony\Component\Translation\Interval;
 
-class RangeTest extends \PHPUnit_Framework_TestCase
+class IntervalTest extends \PHPUnit_Framework_TestCase
 {
     /**
      * @dataProvider getTests
      */
-    public function testTest($expected, $number, $range)
+    public function testTest($expected, $number, $interval)
     {
-        $this->assertEquals($expected, Range::test($number, $range));
+        $this->assertEquals($expected, Interval::test($number, $interval));
     }
 
     /**
@@ -28,7 +28,7 @@ class RangeTest extends \PHPUnit_Framework_TestCase
      */
     public function testTestException()
     {
-        Range::test(1, 'foobar');
+        Interval::test(1, 'foobar');
     }
 
     public function getTests()

@@ -26,8 +26,8 @@ class MessageSelector
         foreach ($parts as $part) {
             $part = trim($part);
 
-            if (preg_match('/^(?<range>'.Range::getRangeRegexp().')\s+(?<message>.+?)$/x', $part, $matches)) {
-                $explicitRules[$matches['range']] = $matches['message'];
+            if (preg_match('/^(?<interval>'.Interval::getIntervalRegexp().')\s+(?<message>.+?)$/x', $part, $matches)) {
+                $explicitRules[$matches['interval']] = $matches['message'];
             } elseif (preg_match('/^\w+\: +(.+)$/', $part, $matches)) {
                 $standardRules[] = $matches[1];
             } else {
@@ -36,8 +36,8 @@ class MessageSelector
         }
 
         // try to match an explicit rule, then fallback to the standard ones
-        foreach ($explicitRules as $range => $m) {
-            if (Range::test($number, $range)) {
+        foreach ($explicitRules as $interval => $m) {
+            if (Interval::test($number, $interval)) {
                 return $m;
             }
         }

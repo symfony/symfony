@@ -212,7 +212,7 @@ class Filesystem
         }
 
         foreach ($iterator as $file) {
-            $target = $targetDir.'/'.str_replace($originDir.'/', '', $file->getPathname());
+            $target = $targetDir.'/'.str_replace($originDir.DIRECTORY_SEPARATOR, '', $file->getPathname());
 
             if (is_dir($file)) {
                 $this->mkdirs($target);

@@ -37,11 +37,11 @@ class ProfilerController extends ContainerAware
         $profiler = $this->container->get('profiler')->loadFromToken($token);
 
         if ($profiler->isEmpty()) {
-            return $this->container->get('templating')->renderResponse('WebProfilerBundle:Profiler:notfound', array(
+            return $this->container->get('templating')->renderResponse('WebProfilerBundle:Profiler:notfound.php', array(
                 'token'     => $token,
             ));
         } else {
-            return $this->container->get('templating')->renderResponse('WebProfilerBundle:Profiler:index', array(
+            return $this->container->get('templating')->renderResponse('WebProfilerBundle:Profiler:index.php', array(
                 'token'     => $token,
                 'profiler'  => new SafeDecorator($profiler),
                 'collector' => $profiler->get('request'),
@@ -145,7 +145,7 @@ class ProfilerController extends ContainerAware
             $position = false === strpos($this->container->get('request')->headers->get('user-agent'), 'Mobile') ? 'fixed' : 'absolute';
         }
 
-        return $this->container->get('templating')->renderResponse('WebProfilerBundle:Profiler:toolbar', array(
+        return $this->container->get('templating')->renderResponse('WebProfilerBundle:Profiler:toolbar.php', array(
             'position'  => $position,
             'profiler'  => new SafeDecorator($profiler),
             'templates' => $this->getTemplates($profiler, '_bar'),
@@ -169,11 +169,11 @@ class ProfilerController extends ContainerAware
         }
 
         if ($profiler->isEmpty()) {
-            return $this->container->get('templating')->renderResponse('WebProfilerBundle:Profiler:notfound', array(
+            return $this->container->get('templating')->renderResponse('WebProfilerBundle:Profiler:notfound.php', array(
                 'token'     => $token,
             ));
         } else {
-            return $this->container->get('templating')->renderResponse('WebProfilerBundle:Profiler:panel', array(
+            return $this->container->get('templating')->renderResponse('WebProfilerBundle:Profiler:panel.php', array(
                 'token'     => $token,
                 'profiler'  => new SafeDecorator($profiler),
                 'collector' => new SafeDecorator($profiler->get($panel)),
@@ -195,7 +195,7 @@ class ProfilerController extends ContainerAware
     {
         $profiler = $this->container->get('profiler')->loadFromToken($token);
 
-        return $this->container->get('templating')->renderResponse('WebProfilerBundle:Profiler:menu', array(
+        return $this->container->get('templating')->renderResponse('WebProfilerBundle:Profiler:menu.php', array(
             'token'     => $token,
             'profiler'  => new SafeDecorator($profiler),
             'templates' => $this->getTemplates($profiler, '_menu'),
@@ -218,7 +218,7 @@ class ProfilerController extends ContainerAware
         $url = $session->get('_profiler_search_url');
         $limit = $session->get('_profiler_search_limit');
 
-        return $this->container->get('templating')->renderResponse('WebProfilerBundle:Profiler:search', array(
+        return $this->container->get('templating')->renderResponse('WebProfilerBundle:Profiler:search.php', array(
             'token'    => $token,
             'profiler' => new SafeDecorator($profiler),
             'tokens'   => $profiler->find($ip, $url, 10),
@@ -243,7 +243,7 @@ class ProfilerController extends ContainerAware
         $url = $session->get('_profiler_search_url');
         $limit = $session->get('_profiler_search_limit');
 
-        return $this->container->get('templating')->renderResponse('WebProfilerBundle:Profiler:results', array(
+        return $this->container->get('templating')->renderResponse('WebProfilerBundle:Profiler:results.php', array(
             'token'    => $token,
             'profiler' => new SafeDecorator($this->container->get('profiler')->loadFromToken($token)),
             'tokens'   => $profiler->find($ip, $url, 10),
@@ -293,11 +293,12 @@ class ProfilerController extends ContainerAware
         $templates = array();
         foreach ($this->container->getParameter('data_collector.templates') as $name => $template) {
             if ($profiler->has($name)) {
-                if (!$this->container->get('templating')->exists($template.$suffix)) {
+                $tpl = preg_replace('/\.(.+?)$/', $suffix.'.$1', $template);
+                if (!$this->container->get('templating')->exists($tpl)) {
                     continue;
                 }
 
-                $templates[$name] = $template.$suffix;
+                $templates[$name] = $tpl;
             }
         }
 

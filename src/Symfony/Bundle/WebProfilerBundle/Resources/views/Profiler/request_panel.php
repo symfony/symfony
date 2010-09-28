@@ -17,22 +17,22 @@
 <h2>Request Cookies</h2>
 
 <?php if (count($data->getRequestCookies()->all())): ?>
-    <?php echo $view->render('WebProfilerBundle:Profiler:bag', array('bag' => $data->getRequestCookies())) ?>
+    <?php echo $view->render('WebProfilerBundle:Profiler:bag.php', array('bag' => $data->getRequestCookies())) ?>
 <?php else: ?>
     <em>No cookies</em>
 <?php endif; ?>
 
 <h2>Requests Headers</h2>
 
-<?php echo $view->render('WebProfilerBundle:Profiler:bag', array('bag' => $data->getRequestHeaders())) ?>
+<?php echo $view->render('WebProfilerBundle:Profiler:bag.php', array('bag' => $data->getRequestHeaders())) ?>
 
 <h2>Requests Server Parameters</h2>
 
-<?php echo $view->render('WebProfilerBundle:Profiler:bag', array('bag' => $data->getRequestServer())) ?>
+<?php echo $view->render('WebProfilerBundle:Profiler:bag.php', array('bag' => $data->getRequestServer())) ?>
 
 <h2>Response Headers</h2>
 
-<?php echo $view->render('WebProfilerBundle:Profiler:bag', array('bag' => $data->getResponseHeaders())) ?>
+<?php echo $view->render('WebProfilerBundle:Profiler:bag.php', array('bag' => $data->getResponseHeaders())) ?>
 
 <h2>Response Session Attributes</h2>
 
@@ -59,5 +59,3 @@
         </tr>
     <?php endforeach; ?>
 </table>
-
-<?php //echo $view->render('WebProfilerBundle:Profiler:bag', array('bag' => $data->getSessionAttributes())) ?>

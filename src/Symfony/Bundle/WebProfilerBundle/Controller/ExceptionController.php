@@ -32,7 +32,7 @@ class ExceptionController extends ContainerAware
     public function showAction(FlattenException $exception, $format)
     {
         return $this->container->get('templating')->renderResponse(
-            'FrameworkBundle:Exception:'.($this->container->get('kernel')->isDebug() ? 'exception' : 'error'),
+            'FrameworkBundle:Exception:'.($this->container->get('kernel')->isDebug() ? 'exception.php' : 'error.php'),
             array(
                 'exception'      => new SafeDecorator($exception),
                 'logger'         => null,

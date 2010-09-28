@@ -1,4 +1,4 @@
-<?php $view->extend('WebProfilerBundle:Profiler:layout') ?>
+<?php $view->extend('WebProfilerBundle:Profiler:layout.php') ?>
 
 <h2>Search Results</h2>
 

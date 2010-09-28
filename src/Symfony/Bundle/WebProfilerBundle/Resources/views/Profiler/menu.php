@@ -12,4 +12,4 @@
 
 <?php echo $view->get('actions')->render('WebProfilerBundle:Profiler:menu', array('token' => $token)) ?>
 
-<?php echo $view->render('WebProfilerBundle:Profiler:admin', array('token' => $token)) ?>
+<?php echo $view->render('WebProfilerBundle:Profiler:admin.php', array('token' => $token)) ?>

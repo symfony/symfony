@@ -199,22 +199,69 @@ class FieldGroup extends Field implements \IteratorAggregate, FieldGroupInterfac
     }
 
     /**
+     * Returns an array of visible fields from the current schema.
+     *
+     * @return array
+     */
+    public function getVisibleFields()
+    {
+        return $this->getFieldsByVisibility(false, false);
+    }
+
+    /**
+     * Returns an array of visible fields from the current schema.
+     *
+     * This variant of the method will recursively get all the
+     * fields from the nested forms or field groups
+     *
+     * @return array
+     */
+    public function getVisibleFieldsRecursively()
+    {
+        return $this->getFieldsByVisibility(false, true);
+    }
+
+    /**
      * Returns an array of hidden fields from the current schema.
      *
+     * @return array
+     */
+    public function getHiddenFields()
+    {
+        return $this->getFieldsByVisibility(true, false);
+    }
+
+    /**
+     * Returns an array of hidden fields from the current schema.
+     *
+     * This variant of the method will recursively get all the
+     * fields from the nested forms or field groups
+     *
+     * @return array
+     */
+    public function getHiddenFieldsRecursively()
+    {
+        return $this->getFieldsByVisibility(true, true);
+    }
+
+    /**
+     * Returns a filtered array of fields from the current schema.
+     *
+     * @param boolean $hidden Whether to return hidden fields only or visible fields only
      * @param boolean $recursive Whether to recur through embedded schemas
      *
      * @return array
      */
-    public function getHiddenFields($recursive = true)
+    protected function getFieldsByVisibility($hidden, $recursive)
     {
         $fields = array();
 
         foreach ($this->fields as $field) {
             if ($field instanceof FieldGroup) {
                 if ($recursive) {
-                    $fields = array_merge($fields, $field->getHiddenFields($recursive));
+                    $fields = array_merge($fields, $field->getFieldsByVisibility($hidden, $recursive));
                 }
-            } else if ($field->isHidden()) {
+            } else if (($hidden && $field->isHidden()) || !$field->isHidden()) {
                 $fields[] = $field;
             }
         }

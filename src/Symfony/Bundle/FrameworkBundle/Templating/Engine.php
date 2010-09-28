@@ -137,7 +137,7 @@ class Engine extends BaseEngine
     }
 
     // parses template names following the following pattern:
-    // bundle:controller:action(.format)(.renderer)
+    // bundle:section:template(.format)(.renderer)
     public function splitTemplateName($name, array $defaults = array())
     {
         $parts = explode(':', $name);

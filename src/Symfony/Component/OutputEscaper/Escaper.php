@@ -118,16 +118,16 @@ abstract class Escaper
                 return $copy;
             }
 
-            if (self::isClassMarkedAsSafe(get_class($value))) {
-                // the class or one of its children is marked as safe
-                // return the unescaped object
-                return $value;
-            }
-
             if ($value instanceof SafeDecorator) {
                 // do not escape objects marked as safe
                 // return the original object
                 return $value->getValue();
+            }
+
+            if (self::isClassMarkedAsSafe(get_class($value)) || $value instanceof SafeDecoratorInterface) {
+                // the class or one of its children is marked as safe
+                // return the unescaped object
+                return $value;
             }
 
             if ($value instanceof \Traversable) {

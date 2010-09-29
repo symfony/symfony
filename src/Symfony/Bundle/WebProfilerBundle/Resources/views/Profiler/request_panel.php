@@ -1,7 +1,7 @@
 <h2>Request GET Parameters</h2>
 
 <?php if (count($data->getRequestQuery()->all())): ?>
-    <?php echo $view->render('WebProfilerBundle:Profiler:bag', array('bag' => $data->getRequestQuery())) ?>
+    <?php echo $view->render('WebProfilerBundle:Profiler:bag.php', array('bag' => $data->getRequestQuery())) ?>
 <?php else: ?>
     <em>No GET parameters</em>
 <?php endif; ?>
@@ -9,7 +9,7 @@
 <h2>Request POST Parameters</h2>
 
 <?php if (count($data->getRequestRequest()->all())): ?>
-    <?php echo $view->render('WebProfilerBundle:Profiler:bag', array('bag' => $data->getRequestRequest())) ?>
+    <?php echo $view->render('WebProfilerBundle:Profiler:bag.php', array('bag' => $data->getRequestRequest())) ?>
 <?php else: ?>
     <em>No POST parameters</em>
 <?php endif; ?>

@@ -50,7 +50,7 @@ class TransTokenParser extends \Twig_TokenParser
                     $stream->expect(\Twig_Token::BLOCK_END_TYPE);
                     $body = $this->parser->subparse(array($this, 'decideTransFork'), true);
                 }
-            } else {
+            } elseif (!$stream->test(\Twig_Token::BLOCK_END_TYPE)) {
                 throw new \Twig_SyntaxError(sprintf('Unexpected token. Twig was looking for the "from" keyword line %s)', $lineno), -1);
             }
         } else {

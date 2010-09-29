@@ -27,7 +27,7 @@ class ValidValidator extends ConstraintValidator
         } else if (!is_object($value)) {
             throw new UnexpectedTypeException($value, 'object or array');
         } else if ($constraint->class && !$value instanceof $constraint->class) {
-            $this->setMessage($constraint->message, array('class' => $constraint->class));
+            $this->setMessage($constraint->message, array('{{ class }}' => $constraint->class));
 
             return false;
         } else {

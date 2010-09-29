@@ -31,14 +31,7 @@ class ConstraintViolation
 
     public function getMessage()
     {
-        $sources = array();
-        $targets = array();
-        foreach ($this->messageParameters as $key => $value) {
-            $sources[] = '{{ '.$key.' }}';
-            $targets[] = (string) $value;
-        }
-
-        return str_replace($sources, $targets, $this->messageTemplate);
+        return str_replace(array_keys($sources), array_values($targets), $this->messageTemplate);
     }
 
     public function getRoot()

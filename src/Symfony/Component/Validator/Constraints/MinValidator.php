@@ -20,8 +20,8 @@ class MinValidator extends ConstraintValidator
 
         if ($value < $constraint->limit) {
             $this->setMessage($constraint->message, array(
-                'value' => $value,
-                'limit' => $constraint->limit,
+                '{{ value }}' => $value,
+                '{{ limit }}' => $constraint->limit,
             ));
 
             return false;

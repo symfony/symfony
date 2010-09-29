@@ -23,8 +23,8 @@ class AssertTypeValidator extends ConstraintValidator
         }
 
         $this->setMessage($constraint->message, array(
-            'value' => $value,
-            'type' => $constraint->type,
+            '{{ value }}' => $value,
+            '{{ type }}'  => $constraint->type,
         ));
 
         return false;

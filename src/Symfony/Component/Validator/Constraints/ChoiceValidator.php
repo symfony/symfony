@@ -53,7 +53,7 @@ class ChoiceValidator extends ConstraintValidator
         if ($constraint->multiple) {
             foreach ($value as $_value) {
                 if (!in_array($_value, $choices, true)) {
-                    $this->setMessage($constraint->message, array('value' => $_value));
+                    $this->setMessage($constraint->message, array('{{ value }}' => $_value));
 
                     return false;
                 }
@@ -62,18 +62,18 @@ class ChoiceValidator extends ConstraintValidator
             $count = count($value);
 
             if ($constraint->min !== null && $count < $constraint->min) {
-                $this->setMessage($constraint->minMessage, array('limit' => $constraint->min));
+                $this->setMessage($constraint->minMessage, array('{{ limit }}' => $constraint->min));
 
                 return false;
             }
 
             if ($constraint->max !== null && $count > $constraint->max) {
-                $this->setMessage($constraint->maxMessage, array('limit' => $constraint->max));
+                $this->setMessage($constraint->maxMessage, array('{{ limit }}' => $constraint->max));
 
                 return false;
             }
         } elseif (!in_array($value, $choices, true)) {
-            $this->setMessage($constraint->message, array('value' => $value));
+            $this->setMessage($constraint->message, array('{{ value }}' => $value));
 
             return false;
         }

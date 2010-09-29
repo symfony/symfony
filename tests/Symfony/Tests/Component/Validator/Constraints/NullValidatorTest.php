@@ -46,7 +46,7 @@ class NullValidatorTest extends \PHPUnit_Framework_TestCase
         $this->assertFalse($this->validator->isValid(1, $constraint));
         $this->assertEquals($this->validator->getMessageTemplate(), 'myMessage');
         $this->assertEquals($this->validator->getMessageParameters(), array(
-            'value' => 1,
+            '{{ value }}' => 1,
         ));
     }
 }

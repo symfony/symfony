@@ -23,7 +23,7 @@ class TimeValidator extends ConstraintValidator
         $value = (string)$value;
 
         if (!preg_match(self::PATTERN, $value)) {
-            $this->setMessage($constraint->message, array('value' => $value));
+            $this->setMessage($constraint->message, array('{{ value }}' => $value));
 
             return false;
         }

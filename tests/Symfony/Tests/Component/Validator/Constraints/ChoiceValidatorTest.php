@@ -118,7 +118,7 @@ class ChoiceValidatorTest extends \PHPUnit_Framework_TestCase
         $this->assertFalse($this->validator->isValid('baz', $constraint));
         $this->assertEquals($this->validator->getMessageTemplate(), 'myMessage');
         $this->assertEquals($this->validator->getMessageParameters(), array(
-            'value' => 'baz',
+            '{{ value }}' => 'baz',
         ));
     }
 
@@ -133,7 +133,7 @@ class ChoiceValidatorTest extends \PHPUnit_Framework_TestCase
         $this->assertFalse($this->validator->isValid(array('foo', 'baz'), $constraint));
         $this->assertEquals($this->validator->getMessageTemplate(), 'myMessage');
         $this->assertEquals($this->validator->getMessageParameters(), array(
-            'value' => 'baz',
+            '{{ value }}' => 'baz',
         ));
     }
 
@@ -149,7 +149,7 @@ class ChoiceValidatorTest extends \PHPUnit_Framework_TestCase
         $this->assertFalse($this->validator->isValid(array('foo'), $constraint));
         $this->assertEquals($this->validator->getMessageTemplate(), 'myMessage');
         $this->assertEquals($this->validator->getMessageParameters(), array(
-            'limit' => 2,
+            '{{ limit }}' => 2,
         ));
     }
 
@@ -165,7 +165,7 @@ class ChoiceValidatorTest extends \PHPUnit_Framework_TestCase
         $this->assertFalse($this->validator->isValid(array('foo', 'bar', 'moo'), $constraint));
         $this->assertEquals($this->validator->getMessageTemplate(), 'myMessage');
         $this->assertEquals($this->validator->getMessageParameters(), array(
-            'limit' => 2,
+            '{{ limit }}' => 2,
         ));
     }
 }

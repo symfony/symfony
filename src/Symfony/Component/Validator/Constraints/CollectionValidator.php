@@ -48,7 +48,7 @@ class CollectionValidator extends ConstraintValidator
 
         if (count($extraFields) > 0 && !$constraint->allowExtraFields) {
             $this->setMessage($constraint->extraFieldsMessage, array(
-                'fields' => '"'.implode('", "', array_keys($extraFields)).'"'
+                '{{ fields }}' => '"'.implode('", "', array_keys($extraFields)).'"'
             ));
 
             return false;
@@ -56,7 +56,7 @@ class CollectionValidator extends ConstraintValidator
 
         if (count($missingFields) > 0 && !$constraint->allowMissingFields) {
             $this->setMessage($constraint->missingFieldsMessage, array(
-                'fields' => '"'.implode('", "', $missingFields).'"'
+                '{{ fields }}' => '"'.implode('", "', $missingFields).'"'
             ));
 
             return false;

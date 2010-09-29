@@ -52,9 +52,9 @@ class FileValidatorTest extends \PHPUnit_Framework_TestCase
         $this->assertFalse($this->validator->isValid($this->path, $constraint));
         $this->assertEquals($this->validator->getMessageTemplate(), 'myMessage');
         $this->assertEquals($this->validator->getMessageParameters(), array(
-            'limit' => '10 bytes',
-            'size' => '11 bytes',
-            'file' => $this->path,
+            '{{ limit }}' => '10 bytes',
+            '{{ size }}' => '11 bytes',
+            '{{ file }}' => $this->path,
         ));
     }
 
@@ -70,9 +70,9 @@ class FileValidatorTest extends \PHPUnit_Framework_TestCase
         $this->assertFalse($this->validator->isValid($this->path, $constraint));
         $this->assertEquals($this->validator->getMessageTemplate(), 'myMessage');
         $this->assertEquals($this->validator->getMessageParameters(), array(
-            'limit' => '1 kB',
-            'size' => '1.4 kB',
-            'file' => $this->path,
+            '{{ limit }}' => '1 kB',
+            '{{ size }}' => '1.4 kB',
+            '{{ file }}' => $this->path,
         ));
     }
 
@@ -88,9 +88,9 @@ class FileValidatorTest extends \PHPUnit_Framework_TestCase
         $this->assertFalse($this->validator->isValid($this->path, $constraint));
         $this->assertEquals($this->validator->getMessageTemplate(), 'myMessage');
         $this->assertEquals($this->validator->getMessageParameters(), array(
-            'limit' => '1 MB',
-            'size' => '1.4 MB',
-            'file' => $this->path,
+            '{{ limit }}' => '1 MB',
+            '{{ size }}' => '1.4 MB',
+            '{{ file }}' => $this->path,
         ));
     }
 
@@ -114,7 +114,7 @@ class FileValidatorTest extends \PHPUnit_Framework_TestCase
         $this->assertFalse($this->validator->isValid('foobar', $constraint));
         $this->assertEquals($this->validator->getMessageTemplate(), 'myMessage');
         $this->assertEquals($this->validator->getMessageParameters(), array(
-            'file' => 'foobar',
+            '{{ file }}' => 'foobar',
         ));
     }
 
@@ -153,9 +153,9 @@ class FileValidatorTest extends \PHPUnit_Framework_TestCase
         $this->assertFalse($this->validator->isValid($file, $constraint));
         $this->assertEquals($this->validator->getMessageTemplate(), 'myMessage');
         $this->assertEquals($this->validator->getMessageParameters(), array(
-            'type' => '"application/pdf"',
-            'types' => '"image/png", "image/jpg"',
-            'file' => $this->path,
+            '{{ type }}' => '"application/pdf"',
+            '{{ types }}' => '"image/png", "image/jpg"',
+            '{{ file }}' => $this->path,
         ));
     }
 }

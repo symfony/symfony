@@ -23,7 +23,7 @@ class EmailValidator extends ConstraintValidator
         $value = (string)$value;
 
         if (!preg_match(self::PATTERN, $value)) {
-            $this->setMessage($constraint->message, array('value' => $value));
+            $this->setMessage($constraint->message, array('{{ value }}' => $value));
 
             return false;
         }
@@ -32,7 +32,7 @@ class EmailValidator extends ConstraintValidator
             $host = substr($value, strpos($value, '@') + 1);
 
             if (!$this->checkMX($host)) {
-                $this->setMessage($constraint->message, array('value' => $value));
+                $this->setMessage($constraint->message, array('{{ value }}' => $value));
 
                 return false;
             }

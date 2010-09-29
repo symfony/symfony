@@ -72,8 +72,8 @@ class MaxValidatorTest extends \PHPUnit_Framework_TestCase
         $this->assertFalse($this->validator->isValid(11, $constraint));
         $this->assertEquals($this->validator->getMessageTemplate(), 'myMessage');
         $this->assertEquals($this->validator->getMessageParameters(), array(
-            'value' => 11,
-            'limit' => 10,
+            '{{ value }}' => 11,
+            '{{ limit }}' => 10,
         ));
     }
 }

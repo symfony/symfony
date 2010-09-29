@@ -34,17 +34,29 @@ class TransTokenParser extends \Twig_TokenParser
 
         $domain = new \Twig_Node_Expression_Constant('messages', $lineno);
         if (!$stream->test(\Twig_Token::BLOCK_END_TYPE)) {
+            $body = null;
             if (!$stream->test('from')) {
+                // {% trans "message" %}
                 $body = $this->parser->getExpressionParser()->parseExpression();
             }
 
             if ($stream->test('from')) {
+                // {% trans "message" from "messages" %}
                 $stream->next();
                 $domain = $this->parser->getExpressionParser()->parseExpression();
+
+                // {% trans from "messages" %}message{% endtrans %}
+                if (null === $body) {
+                    $stream->expect(\Twig_Token::BLOCK_END_TYPE);
+                    $body = $this->parser->subparse(array($this, 'decideTransFork'), true);
+                }
+            } else {
+                throw new \Twig_SyntaxError(sprintf('Unexpected token. Twig was looking for the "from" keyword line %s)', $lineno), -1);
             }
         } else {
+            // {% trans %}message{% endtrans %}
             $stream->expect(\Twig_Token::BLOCK_END_TYPE);
-            $body = $this->parser->subparse(array($this, 'decideTransFork'));
+            $body = $this->parser->subparse(array($this, 'decideTransFork'), true);
         }
 
         $stream->expect(\Twig_Token::BLOCK_END_TYPE);

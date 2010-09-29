@@ -20,7 +20,7 @@ use Symfony\Bundle\TwigBundle\TokenParser\TransChoiceTokenParser;
  *
  * @author     Fabien Potencier <fabien.potencier@symfony-project.com>
  */
-class Helpers extends \Twig_Extension
+class HelpersExtension extends \Twig_Extension
 {
     /**
      * Returns the token parser instance to add to the existing list.

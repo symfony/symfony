@@ -36,7 +36,7 @@ class FrameworkExtension extends Extension
     {
         $loader = new XmlFileLoader($container, __DIR__.'/../Resources/config');
 
-        if (!$container->hasDefinition('controller_manager')) {
+        if (!$container->hasDefinition('controller_resolver')) {
             $loader->load('web.xml');
         }
 

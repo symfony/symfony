@@ -543,6 +543,10 @@ abstract class Field extends Configurable implements FieldInterface
      */
     protected function readProperty($object, PropertyPath $propertyPath)
     {
+        $camelizer = function ($path) {
+            return preg_replace(array('/(^|_)+(.)/e', '/\.(.)/e'), array("strtoupper('\\2')", "'_'.strtoupper('\\1')"), $path);
+        };
+
         if ($propertyPath->isIndex()) {
             if (!$object instanceof \ArrayAccess) {
                 throw new InvalidPropertyException(sprintf('Index "%s" cannot be read from object of type "%s" because it doesn\'t implement \ArrayAccess', $propertyPath->getCurrent(), get_class($object)));
@@ -551,8 +555,8 @@ abstract class Field extends Configurable implements FieldInterface
             return $object[$propertyPath->getCurrent()];
         } else {
             $reflClass = new \ReflectionClass($object);
-            $getter = 'get'.ucfirst($propertyPath->getCurrent());
-            $isser = 'is'.ucfirst($propertyPath->getCurrent());
+            $getter = 'get'.$camelizer($propertyPath->getCurrent());
+            $isser = 'is'.$camelizer($propertyPath->getCurrent());
             $property = $propertyPath->getCurrent();
 
             if ($reflClass->hasMethod($getter)) {

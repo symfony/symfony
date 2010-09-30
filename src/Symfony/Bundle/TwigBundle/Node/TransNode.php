@@ -37,7 +37,7 @@ class TransNode extends \Twig_Node
         $method = null === $this->count ? 'trans' : 'transChoice';
 
         $compiler
-            ->write('echo $context[\'_view\'][\'translator\']->'.$method.'(')
+            ->write('echo $this->env->getExtension(\'translator\')->getTranslator()->'.$method.'(')
             ->subcompile($msg)
         ;
 

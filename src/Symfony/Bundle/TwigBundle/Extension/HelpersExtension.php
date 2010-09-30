@@ -2,10 +2,7 @@
 
 namespace Symfony\Bundle\TwigBundle\Extension;
 
-use Symfony\Component\Templating\Engine;
 use Symfony\Bundle\TwigBundle\TokenParser\HelperTokenParser;
-use Symfony\Bundle\TwigBundle\TokenParser\TransTokenParser;
-use Symfony\Bundle\TwigBundle\TokenParser\TransChoiceTokenParser;
 
 /*
  * This file is part of the Symfony package.
@@ -53,14 +50,6 @@ class HelpersExtension extends \Twig_Extension
 
             // {% flash 'notice' %}
             new HelperTokenParser('flash', '<name>', 'session', 'flash'),
-
-            // {% trans "Symfony is great!" %}
-            new TransTokenParser(),
-
-            // {% transchoice count %}
-            //     {0} There is no apples|{1} There is one apple|]1,Inf] There is {{ count }} apples
-            // {% endtranschoice %}
-            new TransChoiceTokenParser(),
         );
     }
 

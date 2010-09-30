@@ -18,9 +18,9 @@ namespace Symfony\Bundle\TwigBundle\Node;
  */
 class TransNode extends \Twig_Node
 {
-    public function __construct(\Twig_NodeInterface $body, \Twig_NodeInterface $domain, \Twig_Node_Expression $count = null, $lineno, $tag = null)
+    public function __construct(\Twig_NodeInterface $body, \Twig_NodeInterface $domain, \Twig_Node_Expression $count = null, \Twig_Node_Expression $vars = null, $lineno, $tag = null)
     {
-        parent::__construct(array('count' => $count, 'body' => $body, 'domain' => $domain), array(), $lineno, $tag);
+        parent::__construct(array('count' => $count, 'body' => $body, 'domain' => $domain, 'vars' => $vars), array(), $lineno, $tag);
     }
 
     /**
@@ -32,7 +32,12 @@ class TransNode extends \Twig_Node
     {
         $compiler->addDebugInfo($this);
 
-        list($msg, $vars) = $this->compileString($this->body);
+        if ($this->isSimpleString($this->body)) {
+            list($msg, $vars) = $this->compileString($this->body);
+        } else {
+            $msg = $this->body;
+            $vars = $this->vars;
+        }
 
         $method = null === $this->count ? 'trans' : 'transChoice';
 
@@ -52,13 +57,19 @@ class TransNode extends \Twig_Node
 
         $compiler->raw('array(');
 
-        foreach ($vars as $var) {
-            $compiler
-                ->string('{{ '.$var['name'].' }}')
-                ->raw(' => ')
-                ->subcompile($var)
-                ->raw(', ')
-            ;
+        if (is_array($vars)) {
+            foreach ($vars as $var) {
+                $compiler
+                    ->string('{{ '.$var['name'].' }}')
+                    ->raw(' => ')
+                    ->subcompile($var)
+                    ->raw(', ')
+                ;
+            }
+        } elseif (null !== $vars) {
+            $compiler->subcompile($vars);
+        } else {
+            $compiler->raw('array()');
         }
 
         $compiler
@@ -90,5 +101,22 @@ class TransNode extends \Twig_Node
         }
 
         return array(new \Twig_Node(array(new \Twig_Node_Expression_Constant(trim($msg), $node->getLine()))), $vars);
+    }
+
+    protected function isSimpleString(\Twig_NodeInterface $body)
+    {
+        foreach ($body as $i => $node) {
+            if (
+                $node instanceof \Twig_Node_Text
+                ||
+                ($node instanceof \Twig_Node_Print && $node->expr instanceof \Twig_Node_Expression_Name)
+            ) {
+                continue;
+            }
+
+            return false;
+        }
+
+        return true;
     }
 }

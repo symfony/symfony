@@ -34,6 +34,16 @@ class TransExtension extends \Twig_Extension
     }
 
     /**
+     * {@inheritdoc}
+     */
+    public function getFilters()
+    {
+        return array(
+            'trans' => new \Twig_Filter_Method($this, 'trans'),
+        );
+    }
+
+    /**
      * Returns the token parser instance to add to the existing list.
      *
      * @return array An array of Twig_TokenParser instances
@@ -49,6 +59,11 @@ class TransExtension extends \Twig_Extension
             // {% endtranschoice %}
             new TransChoiceTokenParser(),
         );
+    }
+
+    public function trans($message, array $arguments = array(), $domain = "messages")
+    {
+        return $this->translator->trans($message, $arguments, $domain);
     }
 
     /**

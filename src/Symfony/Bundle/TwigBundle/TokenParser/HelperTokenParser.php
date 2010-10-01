@@ -56,7 +56,11 @@ class HelperTokenParser extends \Twig_SimpleTokenParser
         return $this->output(
             $this->markAsSafe(
                 $this->call(
-                    $this->getAttribute('_view', $this->helper),
+                    $this->call(
+                        $this->call(new \Twig_Node_Expression_ExtensionReference('symfony.helpers', 0), 'getContainer'),
+                        'get',
+                        array(new \Twig_Node_Expression_Constant($this->helper, 0))
+                    ),
                     $this->method,
                     $this->getNodeValues($values)
                 )

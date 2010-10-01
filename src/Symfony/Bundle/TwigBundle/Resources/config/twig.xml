@@ -44,6 +44,7 @@
 
         <service id="twig.extension.helpers" class="Symfony\Bundle\TwigBundle\Extension\HelpersExtension">
             <tag name="twig.extension" />
+            <argument type="service" id="service_container" />
         </service>
     </services>
 </container>

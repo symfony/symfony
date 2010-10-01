@@ -3,6 +3,7 @@
 namespace Symfony\Bundle\TwigBundle\Extension;
 
 use Symfony\Bundle\TwigBundle\TokenParser\HelperTokenParser;
+use Symfony\Component\DependencyInjection\ContainerInterface;
 
 /*
  * This file is part of the Symfony package.
@@ -19,6 +20,18 @@ use Symfony\Bundle\TwigBundle\TokenParser\HelperTokenParser;
  */
 class HelpersExtension extends \Twig_Extension
 {
+    protected $container;
+
+    public function __construct(ContainerInterface $container)
+    {
+        $this->container = $container;
+    }
+
+    public function getContainer()
+    {
+        return $this->container;
+    }
+
     /**
      * Returns the token parser instance to add to the existing list.
      *
@@ -28,28 +41,28 @@ class HelpersExtension extends \Twig_Extension
     {
         return array(
             // {% javascript 'bundles/blog/js/blog.js' %}
-            new HelperTokenParser('javascript', '<js> [with <arguments:array>]', 'javascripts', 'add'),
+            new HelperTokenParser('javascript', '<js> [with <arguments:array>]', 'templating.helper.javascripts', 'add'),
 
             // {% javascripts %}
-            new HelperTokenParser('javascripts', '', 'javascripts', 'render'),
+            new HelperTokenParser('javascripts', '', 'templating.helper.javascripts', 'render'),
 
             // {% stylesheet 'bundles/blog/css/blog.css' with ['media': 'screen'] %}
-            new HelperTokenParser('stylesheet', '<css> [with <arguments:array>]', 'stylesheets', 'add'),
+            new HelperTokenParser('stylesheet', '<css> [with <arguments:array>]', 'templating.helper.stylesheets', 'add'),
 
             // {% stylesheets %}
-            new HelperTokenParser('stylesheets', '', 'stylesheets', 'render'),
+            new HelperTokenParser('stylesheets', '', 'templating.helper.stylesheets', 'render'),
 
             // {% asset 'css/blog.css' %}
-            new HelperTokenParser('asset', '<location>', 'assets', 'getUrl'),
+            new HelperTokenParser('asset', '<location>', 'templating.helper.assets', 'getUrl'),
 
             // {% route 'blog_post' with ['id': post.id] %}
-            new HelperTokenParser('route', '<route> [with <arguments:array>]', 'router', 'generate'),
+            new HelperTokenParser('route', '<route> [with <arguments:array>]', 'templating.helper.router', 'generate'),
 
             // {% render 'BlogBundle:Post:list' with ['limit': 2], ['alt': 'BlogBundle:Post:error'] %}
-            new HelperTokenParser('render', '<template> [with <attributes:array>[, <options:array>]]', 'actions', 'render'),
+            new HelperTokenParser('render', '<template> [with <attributes:array>[, <options:array>]]', 'templating.helper.actions', 'render'),
 
             // {% flash 'notice' %}
-            new HelperTokenParser('flash', '<name>', 'session', 'flash'),
+            new HelperTokenParser('flash', '<name>', 'templating.helper.session', 'flash'),
         );
     }
 

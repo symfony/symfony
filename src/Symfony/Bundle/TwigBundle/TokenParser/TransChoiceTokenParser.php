@@ -56,7 +56,7 @@ class TransChoiceTokenParser extends TransTokenParser
 
         $stream->expect(\Twig_Token::BLOCK_END_TYPE);
 
-        return new TransNode($body, $domain, $count, $vars, $lineno, $this->getTag());
+        return new TransNode($body, $domain, $count, $vars, $this->isSimpleString($body), $lineno, $this->getTag());
     }
 
     public function decideTransChoiceFork($token)

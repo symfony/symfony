@@ -69,12 +69,33 @@ class TransTokenParser extends \Twig_TokenParser
 
         $stream->expect(\Twig_Token::BLOCK_END_TYPE);
 
-        return new TransNode($body, $domain, null, $vars, $lineno, $this->getTag());
+        return new TransNode($body, $domain, null, $vars, $this->isSimpleString($body), $lineno, $this->getTag());
     }
 
     public function decideTransFork($token)
     {
         return $token->test(array('endtrans'));
+    }
+
+    protected function isSimpleString(\Twig_NodeInterface $body)
+    {
+        if (0 === count($body)) {
+            return false;
+        }
+
+        foreach ($body as $i => $node) {
+            if (
+                $node instanceof \Twig_Node_Text
+                ||
+                ($node instanceof \Twig_Node_Print && $node->expr instanceof \Twig_Node_Expression_Name)
+            ) {
+                continue;
+            }
+
+            return false;
+        }
+
+        return true;
     }
 
     /**

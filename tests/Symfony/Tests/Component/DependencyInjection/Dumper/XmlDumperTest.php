@@ -12,6 +12,7 @@ namespace Symfony\Tests\Component\DependencyInjection\Dumper;
 
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\DependencyInjection\Dumper\XmlDumper;
+use Symfony\Component\DependencyInjection\InterfaceInjector;
 
 class XmlDumperTest extends \PHPUnit_Framework_TestCase
 {
@@ -61,5 +62,42 @@ class XmlDumperTest extends \PHPUnit_Framework_TestCase
             $this->assertInstanceOf('\RuntimeException', $e, '->dump() throws a RuntimeException if the container to be dumped has reference to objects or resources');
             $this->assertEquals('Unable to dump a service container if a parameter is an object or a resource.', $e->getMessage(), '->dump() throws a RuntimeException if the container to be dumped has reference to objects or resources');
         }
+    }
+
+    public function testInterfaceInjectors()
+    {
+        $interfaceInjector = new InterfaceInjector('FooClass');
+        $interfaceInjector->addMethodCall('setBar', array('someValue'));
+        $container = include self::$fixturesPath.'/containers/interfaces1.php';
+        $container->addInterfaceInjector($interfaceInjector);
+
+        $dumper = new XmlDumper($container);
+
+        $classBody = $dumper->dump();
+        //TODO: find a better way to test dumper
+        //var_dump($classBody);
+
+        $this->assertEquals("<?xml version=\"1.0\" ?>
+
+<container xmlns=\"http://www.symfony-project.org/schema/dic/services\"
+    xmlns:xsi=\"http://www.w3.org/2001/XMLSchema-instance\"
+    xsi:schemaLocation=\"http://www.symfony-project.org/schema/dic/services http://www.symfony-project.org/schema/dic/services/services-1.0.xsd\">
+  <parameters>
+    <parameter key=\"cla\">Fo</parameter>
+    <parameter key=\"ss\">Class</parameter>
+  </parameters>
+  <interfaces>
+    <interface class=\"FooClass\">
+      <call method=\"setBar\">
+        <argument>someValue</argument>
+      </call>
+    </interface>
+  </interfaces>
+  <services>
+    <service id=\"foo\" class=\"%cla%o%ss%\">
+    </service>
+  </services>
+</container>
+", $classBody);
     }
 }

@@ -5,6 +5,7 @@ namespace Symfony\Component\DependencyInjection;
 use Symfony\Component\DependencyInjection\Extension\ExtensionInterface;
 use Symfony\Component\DependencyInjection\Resource\ResourceInterface;
 use Symfony\Component\DependencyInjection\Resource\FileResource;
+use Symfony\Component\DependencyInjection\InterfaceInjector;
 
 /*
  * This file is part of the Symfony framework.
@@ -29,6 +30,7 @@ class ContainerBuilder extends Container implements TaggedContainerInterface
     protected $loading          = array();
     protected $resources        = array();
     protected $extensionConfigs = array();
+    protected $injectors        = array();
 
     /**
      * Registers an extension.
@@ -130,9 +132,15 @@ class ContainerBuilder extends Container implements TaggedContainerInterface
      *
      * @param string $id      The service identifier
      * @param object $service The service instance
+     *
+     * @throws BadMethodCallException
      */
     public function set($id, $service)
     {
+        if ($this->isFrozen()) {
+            throw new \BadMethodCallException('Setting service on a frozen container is not allowed');
+        }
+
         unset($this->definitions[$id]);
         unset($this->aliases[$id]);
 
@@ -287,11 +295,24 @@ class ContainerBuilder extends Container implements TaggedContainerInterface
 
             $this->merge($container);
         }
-        $this->extensionConfigs = array();
 
+        $this->extensionConfigs = array();
         $this->addDefinitions($definitions);
         $this->addAliases($aliases);
         $this->parameterBag->add($parameters);
+
+        foreach ($this->definitions as $definition) {
+            foreach ($this->injectors as $injector) {
+                if (null !== $definition->getFactoryService()) {
+                    continue;
+                }
+                $defClass = $this->parameterBag->resolveValue($definition->getClass());
+                $definition->setClass($defClass);
+                if ($injector->supports($defClass)) {
+                    $injector->processDefinition($definition);
+                }
+            }
+        }
 
         parent::freeze();
     }
@@ -392,6 +413,34 @@ class ContainerBuilder extends Container implements TaggedContainerInterface
         return $this->aliases[$id];
     }
 
+    public function addInterfaceInjectors(array $injectors)
+    {
+        foreach ($injectors as $injector) {
+            $this->addInterfaceInjector($injector);
+        }
+    }
+
+    public function addInterfaceInjector(InterfaceInjector $injector)
+    {
+        $class = $injector->getClass();
+        if (isset($this->injectors[$class])) {
+            return $this->injectors[$class]->merge($injector);
+        }
+
+        $this->injectors[$class] = $injector;
+    }
+
+    public function getInterfaceInjectors($service = null)
+    {
+        if (null === $service) {
+            return $this->injectors;
+        }
+
+        return array_filter($this->injectors, function(InterfaceInjector $injector) use ($service) {
+            return $injector->supports($service);
+        });
+    }
+
     /**
      * Registers a service definition.
      *
@@ -446,9 +495,15 @@ class ContainerBuilder extends Container implements TaggedContainerInterface
      *
      * @param  string     $id         The service identifier
      * @param  Definition $definition A Definition instance
+     *
+     * @throws BadMethodCallException
      */
     public function setDefinition($id, Definition $definition)
     {
+        if ($this->isFrozen()) {
+            throw new \BadMethodCallException('Adding definition to a frozen container is not allowed');
+        }
+
         unset($this->aliases[$id]);
 
         return $this->definitions[$id] = $definition;
@@ -534,6 +589,10 @@ class ContainerBuilder extends Container implements TaggedContainerInterface
             $r = new \ReflectionClass($this->getParameterBag()->resolveValue($definition->getClass()));
 
             $service = null === $r->getConstructor() ? $r->newInstance() : $r->newInstanceArgs($arguments);
+        }
+
+        foreach ($this->getInterfaceInjectors($service) as $injector) {
+            $injector->processDefinition($definition, $service);
         }
 
         if ($definition->isShared()) {

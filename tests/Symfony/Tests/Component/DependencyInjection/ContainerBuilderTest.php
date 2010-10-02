@@ -406,4 +406,62 @@ class ContainerBuilderTest extends \PHPUnit_Framework_TestCase
         $this->setExpectedException('LogicException');
         $container->getExtension('no_registered');
     }
+
+    /**
+     * @covers Symfony\Component\DependencyInjection\ContainerBuilder::addInterfaceInjector
+     * @covers Symfony\Component\DependencyInjection\ContainerBuilder::getInterfaceInjectors
+     * @covers Symfony\Component\DependencyInjection\ContainerBuilder::setDefinition
+     */
+    public function testInterfaceInjection()
+    {
+        $definition = new Definition('Symfony\Tests\Component\DependencyInjection\FooClass');
+
+        $injector = $this->getMockInterfaceInjector('Symfony\Tests\Component\DependencyInjection\FooClass', 1);
+        $injector2 = $this->getMockInterfaceInjector('Symfony\Tests\Component\DependencyInjection\FooClass', 0);
+
+        $container = new ContainerBuilder();
+        $container->addInterfaceInjector($injector);
+        $container->addInterfaceInjector($injector2);
+        $this->assertEquals(1, count($container->getInterfaceInjectors('Symfony\Tests\Component\DependencyInjection\FooClass')));
+
+        $container->setDefinition('test', $definition);
+        $test = $container->get('test');
+    }
+
+    /**
+     * @expectedException BadMethodCallException
+     */
+    public function testThrowsExceptionWhenSetServiceOnAFrozenContainer()
+    {
+        $container = new ContainerBuilder();
+        $container->freeze();
+        $container->set('a', new \stdClass());
+    }
+
+    /**
+     * @expectedException BadMethodCallException
+     */
+    public function testThrowsExceptionWhenSetDefinitionOnAFrozenContainer()
+    {
+        $container = new ContainerBuilder();
+        $container->freeze();
+        $container->setDefinition('a', new Definition());
+    }
+
+    /**
+     * @param string $class
+     * @param int $methodCallsCount
+     * @return Symfony\Component\DependencyInjection\InterfaceInjector
+     */
+    private function getMockInterfaceInjector($class, $methodCallsCount)
+    {
+        $injector = $this->getMock('Symfony\Component\DependencyInjection\InterfaceInjector', array('processDefinition'), array('Symfony\Tests\Component\DependencyInjection\FooClass'), '', true, false);
+        $injector->expects($this->exactly($methodCallsCount))
+            ->method('processDefinition')
+        ;
+        return $injector;
+    }
 }
+
+
+class FooClass {}

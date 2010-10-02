@@ -5,6 +5,7 @@ namespace Symfony\Component\DependencyInjection\Dumper;
 use Symfony\Component\DependencyInjection\ContainerInterface;
 use Symfony\Component\DependencyInjection\Parameter;
 use Symfony\Component\DependencyInjection\Reference;
+use Symfony\Component\DependencyInjection\InterfaceInjector;
 
 /*
  * This file is part of the Symfony framework.
@@ -31,7 +32,7 @@ class XmlDumper extends Dumper
      */
     public function dump(array $options = array())
     {
-        return $this->startXml().$this->addParameters().$this->addServices().$this->endXml();
+        return $this->startXml().$this->addParameters().$this->addInterfaceInjectors().$this->addServices().$this->endXml();
     }
 
     protected function addParameters()
@@ -47,6 +48,37 @@ class XmlDumper extends Dumper
         }
 
         return sprintf("  <parameters>\n%s  </parameters>\n", $this->convertParameters($parameters, 'parameter', 4));
+    }
+
+    protected function addInterfaceInjector(InterfaceInjector $injector)
+    {
+        $code = \sprintf("    <interface class=\"%s\">\n", $injector->getClass());
+
+        foreach ($injector->getMethodCalls() as $call) {
+            if (count($call[1])) {
+                $code .= sprintf("      <call method=\"%s\">\n%s      </call>\n", $call[0], $this->convertParameters($call[1], 'argument', 8));
+            } else {
+                $code .= sprintf("      <call method=\"%s\" />\n", $call[0]);
+            }
+        }
+
+        $code .= "    </interface>\n";
+
+        return $code;
+    }
+
+    protected function addInterfaceInjectors()
+    {
+        if (!$this->container->getInterfaceInjectors()) {
+            return '';
+        }
+
+        $code = '';
+        foreach ($this->container->getInterfaceInjectors() as $injector) {
+            $code .= $this->addInterfaceInjector($injector);
+        }
+
+        return sprintf("  <interfaces>\n%s  </interfaces>\n", $code);
     }
 
     protected function addService($id, $definition)

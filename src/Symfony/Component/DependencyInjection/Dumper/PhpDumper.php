@@ -49,8 +49,43 @@ class PhpDumper extends Dumper
             $this->addServices().
             $this->addTags().
             $this->addDefaultParametersMethod().
+            $this->addInterfaceInjectors().
             $this->endClass()
         ;
+    }
+
+    protected function addInterfaceInjectors()
+    {
+        if ($this->container->isFrozen() || 0 === count($this->container->getInterfaceInjectors())) {
+            return;
+        }
+
+        $code = <<<EOF
+
+    /**
+     * Applies all known interface injection calls
+     *
+     * @param Object \$instance
+     */
+    protected function applyIntrefaceInjectors(\$instance)
+    {
+
+EOF;
+        foreach ($this->container->getInterfaceInjectors() as $injector) {
+            $code .= sprintf("        if (\$instance instanceof \\%s) {\n", $injector->getClass());
+            foreach ($injector->getMethodCalls() as $call) {
+                foreach ($call[1] as $value) {
+                    $arguments[] = $this->dumpValue($value);
+                }
+                $code .= $this->wrapServiceConditionals($call[1], sprintf("            \$instance->%s(%s);\n", $call[0], implode(', ', $arguments)));
+            }
+            $code .= sprintf("        }\n");
+        }
+        $code .= <<<EOF
+    }
+
+EOF;
+        return $code;
     }
 
     protected function addServiceInclude($id, $definition)
@@ -123,6 +158,10 @@ class PhpDumper extends Dumper
             }
 
             $calls .= $this->wrapServiceConditionals($call[1], sprintf("        \$instance->%s(%s);\n", $call[0], implode(', ', $arguments)));
+        }
+
+        if (!$this->container->isFrozen() && count($this->container->getInterfaceInjectors()) > 0) {
+            $calls = sprintf("\n        \$this->applyInterfaceInjection(\$instance);\n");
         }
 
         return $calls;

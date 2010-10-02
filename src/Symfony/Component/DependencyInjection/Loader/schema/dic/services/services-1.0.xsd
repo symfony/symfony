@@ -28,7 +28,19 @@
       <xsd:element name="imports" type="imports" minOccurs="0" maxOccurs="1" />
       <xsd:element name="parameters" type="parameters" minOccurs="0" maxOccurs="1" />
       <xsd:element name="services" type="services" minOccurs="0" maxOccurs="1" />
+      <xsd:element name="interfaces" type="interfaces" minOccurs="0" maxOccurs="1" />
       <xsd:any namespace="##other" processContents="lax" minOccurs="0" maxOccurs="unbounded" />
+    </xsd:sequence>
+  </xsd:complexType>
+
+  <xsd:complexType name="interfaces">
+    <xsd:annotation>
+      <xsd:documentation><![CDATA[
+        Enclosing element for the definition of all interface injectors
+      ]]></xsd:documentation>
+    </xsd:annotation>
+    <xsd:sequence>
+      <xsd:element name="interface" type="interface" minOccurs="0" maxOccurs="unbounded" />
     </xsd:sequence>
   </xsd:complexType>
 
@@ -70,6 +82,13 @@
     <xsd:attribute name="class" type="xsd:string" />
     <xsd:attribute name="method" type="xsd:string" />
     <xsd:attribute name="function" type="xsd:string" />
+  </xsd:complexType>
+
+  <xsd:complexType name="interface">
+    <xsd:sequence maxOccurs="unbounded">
+      <xsd:element name="call" type="call" minOccurs="1" maxOccurs="unbounded" />
+    </xsd:sequence>
+    <xsd:attribute name="class" type="xsd:string" use="required" />
   </xsd:complexType>
 
   <xsd:complexType name="service">

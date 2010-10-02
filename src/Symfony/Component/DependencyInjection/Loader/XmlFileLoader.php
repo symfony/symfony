@@ -2,6 +2,7 @@
 
 namespace Symfony\Component\DependencyInjection\Loader;
 
+use Symfony\Component\DependencyInjection\InterfaceInjector;
 use Symfony\Component\DependencyInjection\Definition;
 use Symfony\Component\DependencyInjection\Reference;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
@@ -49,6 +50,9 @@ class XmlFileLoader extends FileLoader
         // parameters
         $this->parseParameters($xml, $file);
 
+        // interface injectors
+        $this->parseInterfaceInjectors($xml, $file);
+
         // services
         $this->parseDefinitions($xml, $file);
     }
@@ -84,6 +88,26 @@ class XmlFileLoader extends FileLoader
             $this->currentDir = dirname($file);
             $this->import((string) $import['resource'], (Boolean) $import->getAttributeAsPhp('ignore-errors'));
         }
+    }
+
+    protected function parseInterfaceInjectors($xml, $file)
+    {
+        if (!$xml->interfaces) {
+            return;
+        }
+
+        foreach ($xml->interfaces->interface as $interface) {
+            $this->parseInterfaceInjector((string) $interface['class'], $interface, $file);
+        }
+    }
+
+    protected function parseInterfaceInjector($class, $interface, $file)
+    {
+        $injector = new InterfaceInjector($class);
+        foreach ($interface->call as $call) {
+            $injector->addMethodCall((string) $call['method'], $call->getArgumentsAsPhp('argument'));
+        }
+        $this->container->addInterfaceInjector($injector);
     }
 
     protected function parseDefinitions($xml, $file)
@@ -286,7 +310,7 @@ EOF
     protected function validateExtensions($dom, $file)
     {
         foreach ($dom->documentElement->childNodes as $node) {
-            if (!$node instanceof \DOMElement || in_array($node->tagName, array('imports', 'parameters', 'services'))) {
+            if (!$node instanceof \DOMElement || in_array($node->tagName, array('imports', 'parameters', 'services', 'interfaces'))) {
                 continue;
             }
 

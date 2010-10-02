@@ -3,6 +3,7 @@
 namespace Symfony\Component\DependencyInjection\Loader;
 
 use Symfony\Component\DependencyInjection\ContainerInterface;
+use Symfony\Component\DependencyInjection\InterfaceInjector;
 use Symfony\Component\DependencyInjection\Definition;
 use Symfony\Component\DependencyInjection\Reference;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
@@ -57,6 +58,9 @@ class YamlFileLoader extends FileLoader
             }
         }
 
+        // interface injectors
+        $this->parseInterfaceInjectors($content, $file);
+
         // services
         $this->parseDefinitions($content, $file);
     }
@@ -83,6 +87,28 @@ class YamlFileLoader extends FileLoader
             $this->currentDir = dirname($file);
             $this->import($import['resource'], isset($import['ignore_errors']) ? (Boolean) $import['ignore_errors'] : false);
         }
+    }
+
+    protected function parseInterfaceInjectors($content, $file)
+    {
+        if (!isset($content['interfaces'])) {
+            return;
+        }
+
+        foreach ($content['interfaces'] as $class => $interface) {
+            $this->parseInterfaceInjector($class, $interface, $file);
+        }
+    }
+
+    protected function parseInterfaceInjector($class, $interface, $file)
+    {
+        $injector = new InterfaceInjector($class);
+        if (isset($interface['calls'])) {
+            foreach ($interface['calls'] as $call) {
+                $injector->addMethodCall($call[0], $this->resolveServices($call[1]));
+            }
+        }
+        $this->container->addInterfaceInjector($injector);
     }
 
     protected function parseDefinitions($content, $file)
@@ -175,7 +201,7 @@ class YamlFileLoader extends FileLoader
         }
 
         foreach (array_keys($content) as $key) {
-            if (in_array($key, array('imports', 'parameters', 'services'))) {
+            if (in_array($key, array('imports', 'parameters', 'services', 'interfaces'))) {
                 continue;
             }
 
@@ -211,7 +237,7 @@ class YamlFileLoader extends FileLoader
     protected function loadFromExtensions($content)
     {
         foreach ($content as $key => $values) {
-            if (in_array($key, array('imports', 'parameters', 'services'))) {
+            if (in_array($key, array('imports', 'parameters', 'services', 'interfaces'))) {
                 continue;
             }
 

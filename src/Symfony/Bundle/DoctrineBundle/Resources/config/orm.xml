@@ -45,6 +45,11 @@
         <service id="doctrine.orm.metadata_driver.annotation" class="Doctrine\ORM\Mapping\Driver\AnnotationDriver">
             <argument type="service" id="doctrine.orm.metadata_driver.annotation.reader" />
             <argument>%doctrine.orm.metadata_driver.entity_dirs%</argument>
+            <call method="setDefaultAnnotationNamespace"><argument>%doctrine.orm.metadata.annotation_default_namespace%</argument></call>
+            <call method="setAnnotationNamespaceAlias">
+              <argument>Doctrine\ORM\Mapping\</argument>
+              <argument>orm</argument>
+            </call>
         </service>
 
         <service id="doctrine.orm.metadata_driver.annotation.reader" class="Doctrine\Common\Annotations\AnnotationReader">

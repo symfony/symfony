@@ -32,14 +32,14 @@ class TransNode extends \Twig_Node
     {
         $compiler->addDebugInfo($this);
 
-        if ($this['is_simple']) {
-            list($msg, $vars) = $this->compileString($this->body);
+        if ($this->getAttribute('is_simple')) {
+            list($msg, $vars) = $this->compileString($this->getNode('body'));
         } else {
-            $msg = $this->body;
-            $vars = $this->vars;
+            $msg = $this->getNode('body');
+            $vars = $this->getNode('vars');
         }
 
-        $method = null === $this->count ? 'trans' : 'transChoice';
+        $method = null === $this->getNode('count') ? 'trans' : 'transChoice';
 
         $compiler
             ->write('echo $this->env->getExtension(\'translator\')->getTranslator()->'.$method.'(')
@@ -48,9 +48,9 @@ class TransNode extends \Twig_Node
 
         $compiler->raw(', ');
 
-        if (null !== $this->count) {
+        if (null !== $this->getNode('count')) {
             $compiler
-                ->subcompile($this->count)
+                ->subcompile($this->getNode('count'))
                 ->raw(', ')
             ;
         }
@@ -74,7 +74,7 @@ class TransNode extends \Twig_Node
 
         $compiler
             ->raw("), ")
-            ->subcompile($this->domain)
+            ->subcompile($this->getNode('domain'))
             ->raw(");\n")
         ;
     }
@@ -89,14 +89,14 @@ class TransNode extends \Twig_Node
         $vars = array();
         foreach ($body as $node) {
             if ($node instanceof \Twig_Node_Print) {
-                $n = $node->expr;
+                $n = $node->getNode('expr');
                 while ($n instanceof \Twig_Node_Expression_Filter) {
-                    $n = $n->node;
+                    $n = $n->getNode('node');
                 }
-                $msg .= sprintf('{{ %s }}', $n['name']);
-                $vars[] = new \Twig_Node_Expression_Name($n['name'], $n->getLine());
+                $msg .= sprintf('{{ %s }}', $n->getAttribute('name'));
+                $vars[] = new \Twig_Node_Expression_Name($n->getAttribute('name'), $n->getLine());
             } else {
-                $msg .= $node['data'];
+                $msg .= $node->getAttribute('data');
             }
         }
 

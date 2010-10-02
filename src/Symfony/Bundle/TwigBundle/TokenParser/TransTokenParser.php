@@ -33,10 +33,11 @@ class TransTokenParser extends \Twig_TokenParser
         $stream = $this->parser->getStream();
 
         $vars = null;
+        $body = null;
+        $isSimple = false;
         $domain = new \Twig_Node_Expression_Constant('messages', $lineno);
         if (!$stream->test(\Twig_Token::BLOCK_END_TYPE)) {
-            $body = null;
-            if (!$stream->test('from')) {
+            if (!$stream->test('from') && !$stream->test('with')) {
                 // {% trans "message" %}
                 // {% trans message %}
                 $body = $this->parser->getExpressionParser()->parseExpression();
@@ -52,24 +53,21 @@ class TransTokenParser extends \Twig_TokenParser
                 // {% trans "message" from "messages" %}
                 $stream->next();
                 $domain = $this->parser->getExpressionParser()->parseExpression();
-
-                // {% trans from "messages" %}message{% endtrans %}
-                if (null === $body) {
-                    $stream->expect(\Twig_Token::BLOCK_END_TYPE);
-                    $body = $this->parser->subparse(array($this, 'decideTransFork'), true);
-                }
             } elseif (!$stream->test(\Twig_Token::BLOCK_END_TYPE)) {
                 throw new \Twig_SyntaxError(sprintf('Unexpected token. Twig was looking for the "from" keyword line %s)', $lineno), -1);
             }
-        } else {
+        }
+
+        if (null === $body) {
             // {% trans %}message{% endtrans %}
             $stream->expect(\Twig_Token::BLOCK_END_TYPE);
             $body = $this->parser->subparse(array($this, 'decideTransFork'), true);
+            $isSimple = $this->isSimpleString($body);
         }
 
         $stream->expect(\Twig_Token::BLOCK_END_TYPE);
 
-        return new TransNode($body, $domain, null, $vars, $this->isSimpleString($body), $lineno, $this->getTag());
+        return new TransNode($body, $domain, null, $vars, $isSimple, $lineno, $this->getTag());
     }
 
     public function decideTransFork($token)
@@ -79,15 +77,11 @@ class TransTokenParser extends \Twig_TokenParser
 
     protected function isSimpleString(\Twig_NodeInterface $body)
     {
-        if (0 === count($body)) {
-            return false;
-        }
-
         foreach ($body as $i => $node) {
             if (
                 $node instanceof \Twig_Node_Text
                 ||
-                ($node instanceof \Twig_Node_Print && $node->expr instanceof \Twig_Node_Expression_Name)
+                ($node instanceof \Twig_Node_Print && $node->getNode('expr') instanceof \Twig_Node_Expression_Name)
             ) {
                 continue;
             }

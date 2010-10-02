@@ -32,11 +32,11 @@ class TransNode extends \Twig_Node
     {
         $compiler->addDebugInfo($this);
 
+        $defaults = null;
         if ($this->getAttribute('is_simple')) {
-            list($msg, $vars) = $this->compileString($this->getNode('body'));
+            list($msg, $defaults) = $this->compileString($this->getNode('body'));
         } else {
             $msg = $this->getNode('body');
-            $vars = $this->getNode('vars');
         }
 
         $method = null === $this->getNode('count') ? 'trans' : 'transChoice';
@@ -55,25 +55,33 @@ class TransNode extends \Twig_Node
             ;
         }
 
-        $compiler->raw('array(');
+        $compiler->raw('array_merge(');
 
-        if (is_array($vars)) {
-            foreach ($vars as $var) {
+        if (null === $defaults) {
+            $compiler->raw('array()');
+        } else {
+            $compiler->raw('array(');
+            foreach ($defaults as $default) {
                 $compiler
-                    ->string('{{ '.$var['name'].' }}')
+                    ->string('{{ '.$default->getAttribute('name').' }}')
                     ->raw(' => ')
-                    ->subcompile($var)
+                    ->subcompile($default)
                     ->raw(', ')
                 ;
             }
-        } elseif (null !== $vars) {
-            $compiler->subcompile($vars);
-        } else {
+            $compiler->raw(')');
+        }
+
+        $compiler->raw(', ');
+
+        if (null === $this->getNode('vars')) {
             $compiler->raw('array()');
+        } else {
+            $compiler->subcompile($this->getNode('vars'));
         }
 
         $compiler
-            ->raw("), ")
+            ->raw('), ')
             ->subcompile($this->getNode('domain'))
             ->raw(");\n")
         ;

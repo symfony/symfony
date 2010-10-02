@@ -2,13 +2,21 @@
 
 namespace Symfony\Component\Form;
 
+/*
+ * This file is part of the Symfony framework.
+ *
+ * (c) Fabien Potencier <fabien.potencier@symfony-project.com>
+ *
+ * This source file is subject to the MIT license that is bundled
+ * with this source code in the file LICENSE.
+ */
+
 use Symfony\Component\I18N\TranslatorInterface;
 
 /**
  * A form field that can be embedded in a form.
  *
  * @author     Bernhard Schussek <bernhard.schussek@symfony-project.com>
- * @version    SVN: $Id: FieldInterface.php 247 2010-02-01 09:24:55Z bernhard $
  */
 interface FieldInterface extends Localizable, Translatable
 {

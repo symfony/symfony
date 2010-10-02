@@ -2,6 +2,15 @@
 
 namespace Symfony\Component\Form;
 
+/*
+ * This file is part of the Symfony framework.
+ *
+ * (c) Fabien Potencier <fabien.potencier@symfony-project.com>
+ *
+ * This source file is subject to the MIT license that is bundled
+ * with this source code in the file LICENSE.
+ */
+
 use Symfony\Component\Form\Exception\AlreadyBoundException;
 use Symfony\Component\Form\Exception\UnexpectedTypeException;
 use Symfony\Component\Form\Renderer\RendererInterface;
@@ -9,19 +18,10 @@ use Symfony\Component\Form\Renderer\TableRenderer;
 use Symfony\Component\Form\Iterator\RecursiveFieldsWithPropertyPathIterator;
 use Symfony\Component\I18N\TranslatorInterface;
 
-/*
- * This file is part of the symfony package.
- * (c) Fabien Potencier <fabien.potencier@symfony-project.com>
- *
- * For the full copyright and license information, please view the LICENSE
- * file that was distributed with this source code.
- */
-
 /**
  * FieldGroup represents an array of widgets bind to names and values.
  *
  * @author     Fabien Potencier <fabien.potencier@symfony-project.com>
- * @version    SVN: $Id: FieldGroup.php 247 2010-02-01 09:24:55Z bernhard $
  */
 class FieldGroup extends Field implements \IteratorAggregate, FieldGroupInterface
 {

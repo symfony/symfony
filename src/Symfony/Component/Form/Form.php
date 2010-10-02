@@ -2,16 +2,17 @@
 
 namespace Symfony\Component\Form;
 
-use Symfony\Component\Validator\ValidatorInterface;
-use Symfony\Component\I18N\TranslatorInterface;
-
 /*
- * This file is part of the symfony package.
+ * This file is part of the Symfony framework.
+ *
  * (c) Fabien Potencier <fabien.potencier@symfony-project.com>
  *
- * For the full copyright and license information, please view the LICENSE
- * file that was distributed with this source code.
+ * This source file is subject to the MIT license that is bundled
+ * with this source code in the file LICENSE.
  */
+
+use Symfony\Component\Validator\ValidatorInterface;
+use Symfony\Component\I18N\TranslatorInterface;
 
 /**
  * Form represents a form.
@@ -26,7 +27,6 @@ use Symfony\Component\I18N\TranslatorInterface;
  * is generated on the fly.
  *
  * @author     Fabien Potencier <fabien.potencier@symfony-project.com>
- * @version    SVN: $Id: Form.php 245 2010-01-31 22:22:39Z flo $
  */
 class Form extends FieldGroup
 {

@@ -101,7 +101,7 @@ class DateTimeToArrayTransformerTest extends DateTimeTestCase
 
         $this->setExpectedException('\InvalidArgumentException');
 
-        $transformer->reverseTransform('12345');
+        $transformer->reverseTransform('12345', null);
     }
 
     public function testReverseTransform()
@@ -122,7 +122,7 @@ class DateTimeToArrayTransformerTest extends DateTimeTestCase
 
         $output = new \DateTime('2010-02-03 04:05:06 UTC');
 
-        $this->assertDateTimeEquals($output, $transformer->reverseTransform($input));
+        $this->assertDateTimeEquals($output, $transformer->reverseTransform($input, null));
     }
 
     public function testReverseTransform_differentTimezones()
@@ -144,7 +144,7 @@ class DateTimeToArrayTransformerTest extends DateTimeTestCase
         $output = new \DateTime('2010-02-03 04:05:06 Asia/Hong_Kong');
         $output->setTimezone(new \DateTimeZone('America/New_York'));
 
-        $this->assertDateTimeEquals($output, $transformer->reverseTransform($input));
+        $this->assertDateTimeEquals($output, $transformer->reverseTransform($input, null));
     }
 
     public function testReverseTransformToDifferentTimezone()
@@ -166,7 +166,7 @@ class DateTimeToArrayTransformerTest extends DateTimeTestCase
         $output = new \DateTime('2010-02-03 04:05:06 UTC');
         $output->setTimezone(new \DateTimeZone('Asia/Hong_Kong'));
 
-        $this->assertDateTimeEquals($output, $transformer->reverseTransform($input));
+        $this->assertDateTimeEquals($output, $transformer->reverseTransform($input, null));
     }
 
     public function testReverseTransformRequiresArray()
@@ -175,6 +175,6 @@ class DateTimeToArrayTransformerTest extends DateTimeTestCase
 
         $this->setExpectedException('\InvalidArgumentException');
 
-        $transformer->reverseTransform('12345');
+        $transformer->reverseTransform('12345', null);
     }
 }

@@ -84,7 +84,7 @@ class DateTimeToArrayTransformer extends BaseDateTimeTransformer
      * @param  array $value  Localized date string/array
      * @return DateTime      Normalized date
      */
-    public function reverseTransform($value)
+    public function reverseTransform($value, $originalValue)
     {
         $inputTimezone = $this->getOption('input_timezone');
         $outputTimezone = $this->getOption('output_timezone');

@@ -54,7 +54,7 @@ class TimestampToDateTimeTransformerTest extends DateTimeTestCase
         $input = new \DateTime('2010-02-03 04:05:06 UTC');
         $output = $input->format('U');
 
-        $this->assertEquals($output, $transformer->reverseTransform($input));
+        $this->assertEquals($output, $transformer->reverseTransform($input, null));
     }
 
     public function testReverseTransform_differentTimezones()
@@ -68,7 +68,7 @@ class TimestampToDateTimeTransformerTest extends DateTimeTestCase
         $output = $input->format('U');
         $input->setTimezone(new \DateTimeZone('America/New_York'));
 
-        $this->assertEquals($output, $transformer->reverseTransform($input));
+        $this->assertEquals($output, $transformer->reverseTransform($input, null));
     }
 
     public function testReverseTransformFromDifferentTimezone()
@@ -84,7 +84,7 @@ class TimestampToDateTimeTransformerTest extends DateTimeTestCase
         $dateTime->setTimezone(new \DateTimeZone('UTC'));
         $output = $dateTime->format('U');
 
-        $this->assertEquals($output, $transformer->reverseTransform($input));
+        $this->assertEquals($output, $transformer->reverseTransform($input, null));
     }
 
     public function testReverseTransformExpectsDateTime()
@@ -92,6 +92,6 @@ class TimestampToDateTimeTransformerTest extends DateTimeTestCase
         $transformer = new TimestampToDateTimeTransformer();
 
         $this->setExpectedException('\InvalidArgumentException');
-        $transformer->reverseTransform('1234');
+        $transformer->reverseTransform('1234', null);
     }
 }

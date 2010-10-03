@@ -40,7 +40,7 @@ class BooleanToStringTransformer extends BaseValueTransformer
      * @param  string $value  String value.
      * @return boolean        Boolean value.
      */
-    public function reverseTransform($value)
+    public function reverseTransform($value, $originalValue)
     {
         if (!is_string($value)) {
             throw new \InvalidArgumentException(sprintf('Expected argument of type string but got %s.', gettype($value)));

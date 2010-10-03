@@ -60,7 +60,7 @@ class TimestampToDateTimeTransformer extends BaseValueTransformer
      * @param  DateTime $value  A DateTime object
      * @return integer          A timestamp
      */
-    public function reverseTransform($value)
+    public function reverseTransform($value, $originalValue)
     {
         if (!$value instanceof \DateTime) {
             throw new \InvalidArgumentException('Expected value of type \DateTime');

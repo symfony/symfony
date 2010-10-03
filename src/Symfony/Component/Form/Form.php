@@ -43,15 +43,16 @@ class Form extends FieldGroup
     /**
      * Constructor.
      *
-     * @param array  $defaults    An array of field default values
-     * @param array  $options     An array of options
-     * @param string $defaultCsrfSecret  A Csrf secret
+     * @param string $name
+     * @param array|object $data
+     * @param ValidatorInterface $validator
+     * @param array $options
      */
-    public function __construct($name, $object, ValidatorInterface $validator, array $options = array())
+    public function __construct($name, $data, ValidatorInterface $validator, array $options = array())
     {
         $this->validator = $validator;
 
-        $this->setData($object);
+        $this->setData($data);
         $this->setCsrfFieldName(self::$defaultCsrfFieldName);
 
         if (self::$defaultCsrfSecret !== null) {

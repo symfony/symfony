@@ -62,7 +62,7 @@ class StringToDateTimeTransformer extends BaseValueTransformer
      * @param  DateTime $value  A DateTime object
      * @return string           A value as produced by PHP's date() function
      */
-    public function reverseTransform($value)
+    public function reverseTransform($value, $originalValue)
     {
         if (!$value instanceof \DateTime) {
             throw new \InvalidArgumentException('Expected value of type \DateTime');

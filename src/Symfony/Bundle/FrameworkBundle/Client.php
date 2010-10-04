@@ -7,7 +7,7 @@ use Symfony\Component\HttpKernel\HttpKernelInterface;
 use Symfony\Component\HttpKernel\Client as BaseClient;
 use Symfony\Component\BrowserKit\History;
 use Symfony\Component\BrowserKit\CookieJar;
-use Symfony\Component\HttpKernel\Profiler\Profiler;
+use Symfony\Component\HttpKernel\Profiler\Profiler as HttpProfiler;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 
@@ -67,7 +67,7 @@ class Client extends BaseClient
     /**
      * Gets a profiler for the current Response.
      *
-     * @return Profiler A Profiler instance
+     * @return HttpProfiler A Profiler instance
      */
     public function getProfiler()
     {

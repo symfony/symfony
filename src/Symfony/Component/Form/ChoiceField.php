@@ -174,10 +174,9 @@ class ChoiceField extends HybridField
                     : ($choice === $value);
             }
 
-            return $choices;
-        } else {
-            return parent::transform($value);
+            $value = $choices;
         }
+        return parent::transform($value);
     }
 
     /**
@@ -205,12 +204,11 @@ class ChoiceField extends HybridField
             }
 
             if ($this->getOption('multiple')) {
-                return $choices;
+                $value = $choices;
             } else {
-                return count($choices) > 0 ? current($choices) : null;
+                $value =  count($choices) > 0 ? current($choices) : null;
             }
-        } else {
-            return parent::reverseTransform($value);
         }
+        return parent::reverseTransform($value);
     }
 }

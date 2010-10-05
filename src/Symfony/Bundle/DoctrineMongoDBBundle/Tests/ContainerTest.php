@@ -9,7 +9,7 @@
  * file that was distributed with this source code.
  */
 
-namespace Symfony\Bundle\DoctrineBundle\Tests;
+namespace Symfony\Bundle\DoctrineMongoDBBundle\Tests;
 
 use Symfony\Component\DependencyInjection\Dumper\PhpDumper;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
@@ -31,7 +31,7 @@ class ContainerTest extends TestCase
         $loader->mongodbLoad(array(), $container);
 
         $dumper = new PhpDumper($container);
-        $code = $dumper->dump();
+        $code = $dumper->dump(array('class' => 'DoctrineMongoDBBundleTestsProjectServiceContainer'));
         eval(str_replace('<?php', null, $code));
         return new \ProjectServiceContainer;
     }

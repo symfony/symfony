@@ -32,7 +32,7 @@ class ContainerTest extends TestCase
         $loader->ormLoad(array(), $container);
 
         $dumper = new PhpDumper($container);
-        $code = $dumper->dump();
+        $code = $dumper->dump(array('class' => 'DoctrineBundleTestsProjectServiceContainer'));
         eval(str_replace('<?php', null, $code));
         return new \ProjectServiceContainer;
     }

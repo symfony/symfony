@@ -28,7 +28,6 @@ class CollectionToChoiceTransformerTest extends \Symfony\Bundle\DoctrineBundle\T
         try {
             $schemaTool->createSchema($classes);
         } catch(\Exception $e) {
-            echo $e->getMessage();
         }
     }
 

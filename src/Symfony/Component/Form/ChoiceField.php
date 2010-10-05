@@ -166,6 +166,7 @@ class ChoiceField extends HybridField
     protected function transform($value)
     {
         if ($this->getOption('expanded')) {
+            $value = parent::transform($value);
             $choices = $this->getOption('choices');
 
             foreach ($choices as $choice => $_) {
@@ -174,9 +175,10 @@ class ChoiceField extends HybridField
                     : ($choice === $value);
             }
 
-            $value = $choices;
+            return $choices;
+        } else {
+            return parent::transform($value);
         }
-        return parent::transform($value);
     }
 
     /**

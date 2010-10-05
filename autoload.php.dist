@@ -6,14 +6,14 @@ use Symfony\Component\HttpFoundation\UniversalClassLoader;
 
 $loader = new UniversalClassLoader();
 $loader->registerNamespaces(array(
-    'Symfony'                     => __DIR__.'/src',
-    'Doctrine\\ODM\\MongoDB'      => __DIR__.'/vendor/doctrine-mongodb/lib',
-    'Doctrine\\Common'            => __DIR__.'/vendor/doctrine-common/lib',
-    'Doctrine\\DBAL\\Migrations'  => __DIR__.'/vendor/doctrine-migrations/lib',
-    'Doctrine\\DBAL'              => __DIR__.'/vendor/doctrine-dbal/lib',
-    'Doctrine\\ORM\\DataFixtures' => __DIR__.'/vendor/doctrine-orm-data-fixtures',
-    'Doctrine'                    => __DIR__.'/vendor/doctrine/lib',
-    'Zend'                        => __DIR__.'/vendor/zend/library',
+    'Symfony'                        => __DIR__.'/src',
+    'Doctrine\\ODM\\MongoDB'         => __DIR__.'/vendor/doctrine-mongodb/lib',
+    'Doctrine\\Common'               => __DIR__.'/vendor/doctrine-common/lib',
+    'Doctrine\\DBAL\\Migrations'     => __DIR__.'/vendor/doctrine-migrations/lib',
+    'Doctrine\\DBAL'                 => __DIR__.'/vendor/doctrine-dbal/lib',
+    'Doctrine\\Common\\DataFixtures' => __DIR__.'/vendor/doctrine-data-fixtures/lib',
+    'Doctrine'                       => __DIR__.'/vendor/doctrine/lib',
+    'Zend'                           => __DIR__.'/vendor/zend/library',
 ));
 $loader->registerPrefixes(array(
     'Swift_' => __DIR__.'/vendor/swiftmailer/lib/classes',

@@ -34,7 +34,7 @@ class ContainerTest extends TestCase
         $dumper = new PhpDumper($container);
         $code = $dumper->dump(array('class' => 'DoctrineBundleTestsProjectServiceContainer'));
         eval(str_replace('<?php', null, $code));
-        return new \ProjectServiceContainer;
+        return new \DoctrineBundleTestsProjectServiceContainer;
     }
 
     public function testContainer()

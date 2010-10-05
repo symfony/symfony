@@ -5,8 +5,8 @@ CURRENT=`pwd`/vendor
 # Doctrine ORM
 cd $CURRENT/doctrine && git pull
 
-# Doctrine ORM Data Fixtures Extension
-cd $CURRENT/doctrine-orm-data-fixtures && git pull
+# Doctrine Data Fixtures Extension
+cd $CURRENT/doctrine-data-fixtures && git pull
 
 # Doctrine DBAL
 cd $CURRENT/doctrine-dbal && git pull

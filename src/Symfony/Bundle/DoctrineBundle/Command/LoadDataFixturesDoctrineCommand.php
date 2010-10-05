@@ -86,6 +86,9 @@ EOT
         $fixtures = $loader->getFixtures();
         $purger = new \Doctrine\Common\DataFixtures\Purger\ORMPurger($em);
         $executor = new \Doctrine\Common\DataFixtures\Executor\ORMExecutor($em, $purger);
+        $executor->setLogger(function($message) use ($output) {
+            $output->writeln(sprintf('  <comment>></comment> <info>%s</info>', $message));
+        });
         $executor->execute($fixtures, $input->getOption('append'));
     }
 }

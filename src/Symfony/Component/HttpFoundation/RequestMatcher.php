@@ -22,6 +22,7 @@ class RequestMatcher implements RequestMatcherInterface
     protected $host;
     protected $methods;
     protected $ip;
+    protected $attributes = array();
 
     /**
      * Adds a check for the URL host name.
@@ -64,12 +65,29 @@ class RequestMatcher implements RequestMatcherInterface
     }
 
     /**
+     * Adds a check for request attribute.
+     *
+     * @param string $key    The request attribute name
+     * @param string $regexp A Regexp
+     */
+    public function matchAttribute($key, $regexp)
+    {
+        $this->attributes[$key] = $regexp;
+    }
+
+    /**
      * {@inheritdoc}
      */
     public function matches(Request $request)
     {
         if (null !== $this->methods && !in_array(strtolower($request->getMethod()), $this->methods)) {
             return false;
+        }
+
+        foreach ($this->attributes as $key => $pattern) {
+            if (!preg_match($pattern, $request->attributes->get($key))) {
+                return false;
+            }
         }
 
         if (null !== $this->path && !preg_match($this->path, $request->getPathInfo())) {

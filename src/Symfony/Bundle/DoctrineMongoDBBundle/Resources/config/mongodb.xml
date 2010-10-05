@@ -56,7 +56,6 @@
     </service>
     <service id="doctrine.odm.mongodb.metadata.annotation_reader" class="%doctrine.odm.mongodb.metadata.annotation_reader_class%">
       <argument type="service" id="doctrine.odm.mongodb.cache" />
-      <call method="setDefaultAnnotationNamespace"><argument>%doctrine.odm.mongodb.metadata.annotation_default_namespace%</argument></call>
       <call method="setAnnotationNamespaceAlias">
         <argument>Doctrine\ODM\MongoDB\Mapping\</argument>
         <argument>mongodb</argument>

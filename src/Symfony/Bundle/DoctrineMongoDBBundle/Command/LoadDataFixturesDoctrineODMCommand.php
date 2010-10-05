@@ -1,6 +1,6 @@
 <?php
 
-namespace Symfony\Bundle\DoctrineBundle\Command;
+namespace Symfony\Bundle\DoctrineMongoDBBundle\Command;
 
 use Symfony\Component\Console\Input\InputArgument;
 use Symfony\Component\Console\Input\InputOption;
@@ -11,9 +11,9 @@ use Symfony\Component\Finder\Finder;
 use Symfony\Bundle\FrameworkBundle\Util\Filesystem;
 use Doctrine\Common\Cli\Configuration;
 use Doctrine\Common\Cli\CliController as DoctrineCliController;
-use Doctrine\ORM\EntityManager;
-use Doctrine\ORM\Internal\CommitOrderCalculator;
-use Doctrine\ORM\Mapping\ClassMetadata;
+use Doctrine\ODM\MongoDB\DocumentManager;
+use Doctrine\ODM\MongoDB\Internal\CommitOrderCalculator;
+use Doctrine\ODM\MongoDB\Mapping\ClassMetadata;
 
 /*
  * This file is part of the Symfony framework.
@@ -30,38 +30,38 @@ use Doctrine\ORM\Mapping\ClassMetadata;
  * @author     Fabien Potencier <fabien.potencier@symfony-project.com>
  * @author     Jonathan H. Wage <jonwage@gmail.com>
  */
-class LoadDataFixturesDoctrineCommand extends DoctrineCommand
+class LoadDataFixturesDoctrineODMCommand extends DoctrineODMCommand
 {
     protected function configure()
     {
         $this
-            ->setName('doctrine:data:load')
+            ->setName('doctrine:mongodb:data:load')
             ->setDescription('Load data fixtures to your database.')
             ->addOption('fixtures', null, InputOption::PARAMETER_OPTIONAL | InputOption::PARAMETER_IS_ARRAY, 'The directory or file to load data fixtures from.')
             ->addOption('append', null, InputOption::PARAMETER_OPTIONAL, 'Whether or not to append the data fixtures.', false)
-            ->addOption('em', null, InputOption::PARAMETER_REQUIRED, 'The entity manager to use for this command.')
+            ->addOption('dm', null, InputOption::PARAMETER_REQUIRED, 'The document manager to use for this command.')
             ->setHelp(<<<EOT
-The <info>doctrine:data:load</info> command loads data fixtures from your bundles:
+The <info>doctrine:mongodb:data:load</info> command loads data fixtures from your bundles:
 
-  <info>./symfony doctrine:data:load</info>
+  <info>./symfony doctrine:mongodb:data:load</info>
 
 You can also optionally specify the path to fixtures with the <info>--fixtures</info> option:
 
-  <info>./symfony doctrine:data:load --fixtures=/path/to/fixtures1 --fixtures=/path/to/fixtures2</info>
+  <info>./symfony doctrine:mongodb:data:load --fixtures=/path/to/fixtures1 --fixtures=/path/to/fixtures2</info>
 
 If you want to append the fixtures instead of flushing the database first you can use the <info>--append</info> option:
 
-  <info>./symfony doctrine:data:load --append</info>
+  <info>./symfony doctrine:mongodb:data:load --append</info>
 EOT
         );
     }
 
     protected function execute(InputInterface $input, OutputInterface $output)
     {
-        $emName = $input->getOption('em');
-        $emName = $emName ? $emName : 'default';
-        $emServiceName = sprintf('doctrine.orm.%s_entity_manager', $emName);
-        $em = $this->container->get($emServiceName);
+        $dmName = $input->getOption('dm');
+        $dmName = $dmName ? $dmName : 'default';
+        $dmServiceName = sprintf('doctrine.odm.mongodb.%s_document_manager', $dmName);
+        $dm = $this->container->get($dmServiceName);
         $dirOrFile = $input->getOption('fixtures');
         if ($dirOrFile) {
             $paths = is_array($dirOrFile) ? $dirOrFile : array($dirOrFile);
@@ -73,7 +73,7 @@ EOT
                 $namespace = str_replace('/', '\\', dirname($tmp));
                 $class = basename($tmp);
 
-                if (isset($bundleDirs[$namespace]) && is_dir($dir = $bundleDirs[$namespace].'/'.$class.'/DataFixtures/ORM')) {
+                if (isset($bundleDirs[$namespace]) && is_dir($dir = $bundleDirs[$namespace].'/'.$class.'/DataFixtures/MongoDB')) {
                     $paths[] = $dir;
                 }
             }
@@ -84,8 +84,8 @@ EOT
             $loader->loadFromDirectory($path);
         }
         $fixtures = $loader->getFixtures();
-        $purger = new \Doctrine\Common\DataFixtures\Purger\ORMPurger($em);
-        $executor = new \Doctrine\Common\DataFixtures\Executor\ORMExecutor($em, $purger);
+        $purger = new \Doctrine\Common\DataFixtures\Purger\MongoDBPurger($dm);
+        $executor = new \Doctrine\Common\DataFixtures\Executor\MongoDBExecutor($dm, $purger);
         $executor->execute($fixtures, $input->getOption('append'));
     }
 }

@@ -12,6 +12,9 @@ cd vendor
 # Doctrine ORM
 git clone git://github.com/doctrine/doctrine2.git doctrine
 
+# Doctrine ORM Data Fixtures Extension
+git clone git://github.com/doctrine/orm-data-fixtures doctrine-orm-data-fixtures
+
 # Doctrine DBAL
 git clone git://github.com/doctrine/dbal.git doctrine-dbal
 

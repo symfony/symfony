@@ -21,16 +21,16 @@ class DropSchemaDoctrineODMCommand extends DropCommand
         parent::configure();
 
         $this
-            ->setName('doctrine:odm:schema:drop')
+            ->setName('doctrine:mongodb:schema:drop')
             ->addOption('dm', null, InputOption::PARAMETER_REQUIRED, 'The document manager to use for this command.')
             ->setHelp(<<<EOT
-The <info>doctrine:odm:schema:drop</info> command drops the default document manager's schema:
+The <info>doctrine:mongodb:schema:drop</info> command drops the default document manager's schema:
 
-  <info>./symfony doctrine:odm:schema:drop</info>
+  <info>./symfony doctrine:mongodb:schema:drop</info>
 
 You can also optionally specify the name of a document manager to drop the schema for:
 
-  <info>./symfony doctrine:odm:schema:drop --dm=default</info>
+  <info>./symfony doctrine:mongodb:schema:drop --dm=default</info>
 EOT
         );
     }

@@ -43,13 +43,13 @@ class Engine extends BaseEngine
         $this->container = $container;
         $this->escaper = $escaper;
 
+        parent::__construct($loader);
+
         foreach ($this->container->findTaggedServiceIds('templating.renderer') as $id => $attributes) {
             if (isset($attributes[0]['alias'])) {
-                $renderers[$attributes[0]['alias']] = $this->container->get($id);
+                $this->renderers[$attributes[0]['alias']] = $id;
             }
         }
-
-        parent::__construct($loader, $renderers);
 
         $this->helpers = array();
         foreach ($this->container->findTaggedServiceIds('templating.helper') as $id => $attributes) {
@@ -64,7 +64,15 @@ class Engine extends BaseEngine
         ++$this->level;
 
         list(, $options) = $this->splitTemplateName($name);
-        if ('php' === $options['renderer']) {
+
+        $renderer = $options['renderer'];
+
+        if (isset($this->renderers[$renderer]) && is_string($this->renderers[$renderer])) {
+            $this->renderers[$renderer] = $this->container->get($this->renderers[$renderer]);
+            $this->renderers[$renderer]->setEngine($this);
+        }
+
+        if ('php' === $renderer) {
             // escape only once
             if (1 === $this->level && !isset($parameters['_data'])) {
                 $parameters = $this->escapeParameters($parameters);

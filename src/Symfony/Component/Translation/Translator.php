@@ -79,6 +79,14 @@ class Translator implements TranslatorInterface
     }
 
     /**
+     * {@inheritdoc}
+     */
+    public function getLocale()
+    {
+        return $this->locale;
+    }
+
+    /**
      * Sets the fallback locale.
      *
      * @param string $locale The fallback locale

@@ -67,7 +67,7 @@ class Translator extends BaseTranslator
     public function getLocale()
     {
         if (null === $this->locale && null !== $this->session) {
-            $this->locale = $session->getLocale();
+            $this->locale = $this->session->getLocale();
         }
 
         return $this->locale;

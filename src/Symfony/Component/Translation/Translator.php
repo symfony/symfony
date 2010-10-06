@@ -99,7 +99,7 @@ class Translator implements TranslatorInterface
     public function trans($id, array $parameters = array(), $domain = 'messages', $locale = null)
     {
         if (!isset($locale)) {
-            $locale = $this->locale;
+            $locale = $this->getLocale();
         }
 
         if (!isset($this->catalogues[$locale])) {
@@ -115,7 +115,7 @@ class Translator implements TranslatorInterface
     public function transChoice($id, $number, array $parameters = array(), $domain = 'messages', $locale = null)
     {
         if (!isset($locale)) {
-            $locale = $this->locale;
+            $locale = $this->getLocale();
         }
 
         if (!isset($this->catalogues[$locale])) {

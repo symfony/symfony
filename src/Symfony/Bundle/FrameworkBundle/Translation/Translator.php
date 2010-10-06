@@ -26,6 +26,7 @@ class Translator extends BaseTranslator
 {
     protected $container;
     protected $options;
+    protected $session;
 
     /**
      * Constructor.
@@ -42,10 +43,7 @@ class Translator extends BaseTranslator
      */
     public function __construct(ContainerInterface $container, MessageSelector $selector, array $options = array(), Session $session = null)
     {
-        if (null !== $session) {
-            parent::__construct($session->getLocale(), $selector);
-        }
-
+        $this->session = $session;
         $this->container = $container;
 
         $this->options = array(
@@ -59,6 +57,18 @@ class Translator extends BaseTranslator
         }
 
         $this->options = array_merge($this->options, $options);
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function getLocale()
+    {
+        if (null === $this->locale && null !== $this->session) {
+            $this->locale = $session->getLocale();
+        }
+
+        return $this->locale;
     }
 
     /**

@@ -43,6 +43,8 @@ class Translator extends BaseTranslator
      */
     public function __construct(ContainerInterface $container, MessageSelector $selector, array $options = array(), Session $session = null)
     {
+        parent::__construct(null, $selector);
+
         $this->session = $session;
         $this->container = $container;
 

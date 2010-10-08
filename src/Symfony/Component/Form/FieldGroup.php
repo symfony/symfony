@@ -261,7 +261,7 @@ class FieldGroup extends Field implements \IteratorAggregate, FieldGroupInterfac
                 if ($recursive) {
                     $fields = array_merge($fields, $field->getFieldsByVisibility($hidden, $recursive));
                 }
-            } else if (($hidden && $field->isHidden()) || !$field->isHidden()) {
+            } else if ((bool)$hidden === $field->isHidden()) {
                 $fields[] = $field;
             }
         }

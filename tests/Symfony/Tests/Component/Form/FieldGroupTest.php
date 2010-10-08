@@ -603,6 +603,50 @@ class FieldGroupTest extends \PHPUnit_Framework_TestCase
         $this->assertEquals(array('firstName' => 'Bernhard'), $group->getData());
     }
 
+    public function testGetHiddenFieldsReturnsOnlyHiddenFields()
+    {
+        $group = $this->getGroupWithBothVisibleAndHiddenField();
+
+        $hiddenFields = $group->getHiddenFields(true, false);
+
+        $this->assertSame(array($group['hiddenField']), $hiddenFields);
+    }
+
+    public function testGetVisibleFieldsReturnsOnlyVisibleFields()
+    {
+        $group = $this->getGroupWithBothVisibleAndHiddenField();
+
+        $visibleFields = $group->getVisibleFields(true, false);
+
+        $this->assertSame(array($group['visibleField']), $visibleFields);
+    }
+
+    /**
+     * Create a group containing two fields, "visibleField" and "hiddenField"
+     *
+     * @return FieldGroup
+     */
+    protected function getGroupWithBothVisibleAndHiddenField()
+    {
+        $group = new FieldGroup('testGroup');
+
+        // add a visible field
+        $visibleField = $this->createMockField('visibleField');
+        $visibleField->expects($this->once())
+                    ->method('isHidden')
+                    ->will($this->returnValue(false));
+        $group->add($visibleField);
+
+        // add a hidden field
+        $hiddenField = $this->createMockField('hiddenField');
+        $hiddenField->expects($this->once())
+                    ->method('isHidden')
+                    ->will($this->returnValue(true));
+        $group->add($hiddenField);
+
+        return $group;
+    }
+
     protected function createMockField($key)
     {
         $field = $this->getMock(

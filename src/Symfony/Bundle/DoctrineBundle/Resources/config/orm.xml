@@ -52,6 +52,9 @@
               <argument>Doctrine\ORM\Mapping\</argument>
               <argument>orm</argument>
             </call>
+            <call method="setDefaultAnnotationNamespace">
+              <argument>Doctrine\ORM\Mapping\</argument>
+            </call>
         </service>
 
         <!--- XML Metadata Driver Service -->

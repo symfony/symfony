@@ -74,7 +74,7 @@ class UrlValidatorTest extends \PHPUnit_Framework_TestCase
         $this->assertFalse($this->validator->isValid('foobar', $constraint));
         $this->assertEquals($this->validator->getMessageTemplate(), 'myMessage');
         $this->assertEquals($this->validator->getMessageParameters(), array(
-            'value' => 'foobar',
+            '{{ value }}' => 'foobar',
         ));
     }
 }

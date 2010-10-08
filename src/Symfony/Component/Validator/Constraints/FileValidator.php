@@ -2,6 +2,15 @@
 
 namespace Symfony\Component\Validator\Constraints;
 
+/*
+ * This file is part of the Symfony framework.
+ *
+ * (c) Fabien Potencier <fabien.potencier@symfony-project.com>
+ *
+ * This source file is subject to the MIT license that is bundled
+ * with this source code in the file LICENSE.
+ */
+
 use Symfony\Component\Validator\Constraint;
 use Symfony\Component\Validator\ConstraintValidator;
 use Symfony\Component\Validator\Exception\ConstraintDefinitionException;
@@ -27,13 +36,13 @@ class FileValidator extends ConstraintValidator
         $path = $value instanceof FileObject ? $value->getPath() : (string)$value;
 
         if (!file_exists($path)) {
-            $this->setMessage($constraint->notFoundMessage, array('file' => $path));
+            $this->setMessage($constraint->notFoundMessage, array('{{ file }}' => $path));
 
             return false;
         }
 
         if (!is_readable($path)) {
-            $this->setMessage($constraint->notReadableMessage, array('file' => $path));
+            $this->setMessage($constraint->notReadableMessage, array('{{ file }}' => $path));
 
             return false;
         }
@@ -57,9 +66,9 @@ class FileValidator extends ConstraintValidator
 
             if ($size > $limit) {
                 $this->setMessage($constraint->maxSizeMessage, array(
-                    'size' => $size . $suffix,
-                    'limit' => $limit . $suffix,
-                    'file' => $path,
+                    '{{ size }}' => $size . $suffix,
+                    '{{ limit }}' => $limit . $suffix,
+                    '{{ file }}' => $path,
                 ));
 
                 return false;
@@ -73,9 +82,9 @@ class FileValidator extends ConstraintValidator
 
             if (!in_array($value->getMimeType(), (array)$constraint->mimeTypes)) {
                 $this->setMessage($constraint->mimeTypesMessage, array(
-                    'type' => '"'.$value->getMimeType().'"',
-                    'types' => '"'.implode('", "', (array)$constraint->mimeTypes).'"',
-                    'file' => $path,
+                    '{{ type }}' => '"'.$value->getMimeType().'"',
+                    '{{ types }}' => '"'.implode('", "', (array)$constraint->mimeTypes).'"',
+                    '{{ file }}' => $path,
                 ));
 
                 return false;

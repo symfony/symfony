@@ -2,28 +2,28 @@
 
 namespace Symfony\Component\Form;
 
+/*
+ * This file is part of the Symfony framework.
+ *
+ * (c) Fabien Potencier <fabien.potencier@symfony-project.com>
+ *
+ * This source file is subject to the MIT license that is bundled
+ * with this source code in the file LICENSE.
+ */
+
 use Symfony\Component\Form\Exception\InvalidPropertyException;
 use Symfony\Component\Form\Exception\PropertyAccessDeniedException;
 use Symfony\Component\Form\ValueTransformer\ValueTransformerInterface;
 use Symfony\Component\Form\ValueTransformer\TransformationFailedException;
-use Symfony\Component\I18N\TranslatorInterface;
 
 abstract class Field extends Configurable implements FieldInterface
 {
-    /**
-     * The object used for generating HTML code
-     * @var HtmlGeneratorInterface
-     */
-    protected $generator = null;
-
     protected $taintedData = null;
     protected $locale = null;
-    protected $translator = null;
 
     private $errors = array();
     private $key = '';
     private $parent = null;
-    private $renderer = null;
     private $bound = false;
     private $required = null;
     private $data = null;
@@ -39,7 +39,6 @@ abstract class Field extends Configurable implements FieldInterface
         $this->addOption('property_path', (string)$key);
 
         $this->key = (string)$key;
-        $this->generator = new HtmlGenerator();
 
         if ($this->locale === null) {
             $this->locale = class_exists('\Locale', false) ? \Locale::getDefault() : 'en';
@@ -59,6 +58,11 @@ abstract class Field extends Configurable implements FieldInterface
     public function __clone()
     {
         // TODO
+    }
+
+    public function getAttributes()
+    {
+        return array();
     }
 
     /**
@@ -161,14 +165,6 @@ abstract class Field extends Configurable implements FieldInterface
         } else {
             return true;
         }
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    public function setGenerator(HtmlGeneratorInterface $generator)
-    {
-        $this->generator = $generator;
     }
 
     /**
@@ -278,9 +274,9 @@ abstract class Field extends Configurable implements FieldInterface
      *
      * @see FieldInterface
      */
-    public function addError($message, PropertyPath $path = null, $type = null)
+    public function addError($messageTemplate, array $messageParameters = array(), PropertyPath $path = null, $type = null)
     {
-        $this->errors[] = $message;
+        $this->errors[] = array($messageTemplate, $messageParameters);
     }
 
     /**
@@ -338,54 +334,16 @@ abstract class Field extends Configurable implements FieldInterface
     }
 
     /**
-     * Sets the translator of this field.
+     * Injects the locale into the given object, if set.
      *
-     * @see Translatable
-     */
-    public function setTranslator(TranslatorInterface $translator)
-    {
-        $this->translator = $translator;
-
-        if ($this->valueTransformer !== null && $this->valueTransformer instanceof Translatable) {
-            $this->valueTransformer->setTranslator($translator);
-        }
-    }
-
-    /**
-     * Translates the text using the associated translator, if available
-     *
-     * If no translator is available, the original text is returned without
-     * modification.
-     *
-     * @param  string $text         The text to translate
-     * @param  array $parameters    The parameters to insert in the text
-     * @return string               The translated text
-     */
-    protected function translate($text, array $parameters = array())
-    {
-        if ($this->translator !== null) {
-            $text = $this->translator->translate($text, $parameters);
-        }
-
-        return $text;
-    }
-
-    /**
-     * Injects the locale and the translator into the given object, if set.
-     *
-     * The locale is injected only if the object implements Localizable. The
-     * translator is injected only if the object implements Translatable.
+     * The locale is injected only if the object implements Localizable.
      *
      * @param object $object
      */
-    protected function injectLocaleAndTranslator($object)
+    protected function injectLocale($object)
     {
         if ($object instanceof Localizable) {
             $object->setLocale($this->locale);
-        }
-
-        if (!is_null($this->translator) && $object instanceof Translatable) {
-            $object->setTranslator($this->translator);
         }
     }
 
@@ -396,7 +354,7 @@ abstract class Field extends Configurable implements FieldInterface
      */
     public function setValueTransformer(ValueTransformerInterface $valueTransformer)
     {
-        $this->injectLocaleAndTranslator($valueTransformer);
+        $this->injectLocale($valueTransformer);
 
         $this->valueTransformer = $valueTransformer;
     }
@@ -543,6 +501,10 @@ abstract class Field extends Configurable implements FieldInterface
      */
     protected function readProperty($object, PropertyPath $propertyPath)
     {
+        $camelizer = function ($path) {
+            return preg_replace(array('/(^|_)+(.)/e', '/\.(.)/e'), array("strtoupper('\\2')", "'_'.strtoupper('\\1')"), $path);
+        };
+
         if ($propertyPath->isIndex()) {
             if (!$object instanceof \ArrayAccess) {
                 throw new InvalidPropertyException(sprintf('Index "%s" cannot be read from object of type "%s" because it doesn\'t implement \ArrayAccess', $propertyPath->getCurrent(), get_class($object)));
@@ -551,8 +513,8 @@ abstract class Field extends Configurable implements FieldInterface
             return $object[$propertyPath->getCurrent()];
         } else {
             $reflClass = new \ReflectionClass($object);
-            $getter = 'get'.ucfirst($propertyPath->getCurrent());
-            $isser = 'is'.ucfirst($propertyPath->getCurrent());
+            $getter = 'get'.$camelizer($propertyPath->getCurrent());
+            $isser = 'is'.$camelizer($propertyPath->getCurrent());
             $property = $propertyPath->getCurrent();
 
             if ($reflClass->hasMethod($getter)) {
@@ -572,6 +534,9 @@ abstract class Field extends Configurable implements FieldInterface
                     throw new PropertyAccessDeniedException(sprintf('Property "%s" is not public in class "%s". Maybe you should create the method "get%s()" or "is%s()"?', $property, $reflClass->getName(), ucfirst($property), ucfirst($property)));
                 }
 
+                return $object->$property;
+            } else if (property_exists($object, $property)) {
+                // needed to support \stdClass instances
                 return $object->$property;
             } else {
                 throw new InvalidPropertyException(sprintf('Neither property "%s" nor method "%s()" nor method "%s()" exists in class "%s"', $property, $getter, $isser, $reflClass->getName()));
@@ -604,31 +569,14 @@ abstract class Field extends Configurable implements FieldInterface
                 }
 
                 $objectOrArray->$property = $this->getData();
+            } else if (property_exists($objectOrArray, $property)) {
+                // needed to support \stdClass instances
+                $objectOrArray->$property = $this->getData();
             } else {
                 throw new InvalidPropertyException(sprintf('Neither element "%s" nor method "%s()" exists in class "%s"', $property, $setter, $reflClass->getName()));
             }
         } else {
             $objectOrArray[$propertyPath->getCurrent()] = $this->getData();
         }
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    public function renderErrors()
-    {
-        $html = '';
-
-        if ($this->hasErrors()) {
-            $html .= "<ul>\n";
-
-            foreach ($this->getErrors() as $error) {
-                $html .= "<li>" . $error . "</li>\n";
-            }
-
-            $html .= "</ul>\n";
-        }
-
-        return $html;
     }
 }

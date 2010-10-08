@@ -14,6 +14,7 @@
             <xsd:element name="profiler" type="profiler" minOccurs="0" maxOccurs="1" />
             <xsd:element name="user" type="user" minOccurs="0" maxOccurs="1" />
             <xsd:element name="templating" type="templating" minOccurs="0" maxOccurs="1" />
+            <xsd:element name="translator" type="translator" minOccurs="0" maxOccurs="1" />
         </xsd:sequence>
 
         <xsd:attribute name="ide" type="xsd:string" />
@@ -74,5 +75,9 @@
         <xsd:attribute name="assets_version" type="xsd:string" />
         <xsd:attribute name="path" type="xsd:string" />
         <xsd:attribute name="cache" type="xsd:string" />
+    </xsd:complexType>
+
+    <xsd:complexType name="translator">
+        <xsd:attribute name="fallback" type="xsd:string" />
     </xsd:complexType>
 </xsd:schema>

@@ -1,4 +1,4 @@
-<?php $view->extend('WebProfilerBundle:Profiler:base') ?>
+<?php $view->extend('WebProfilerBundle:Profiler:base.php') ?>
 
 <div class="header">
     <h1>

@@ -2,6 +2,15 @@
 
 namespace Symfony\Component\Form;
 
+/*
+ * This file is part of the Symfony framework.
+ *
+ * (c) Fabien Potencier <fabien.potencier@symfony-project.com>
+ *
+ * This source file is subject to the MIT license that is bundled
+ * with this source code in the file LICENSE.
+ */
+
 use Symfony\Component\Form\Exception\FormException;
 
 /**
@@ -37,6 +46,21 @@ class HybridField extends FieldGroup
         }
 
         $this->mode = $mode;
+    }
+
+    public function isField()
+    {
+        return self::FIELD === $this->mode;
+    }
+
+    public function isGroup()
+    {
+        return self::GROUP === $this->mode;
+    }
+
+    public function getFieldMode()
+    {
+        return $this->mode;
     }
 
     /**

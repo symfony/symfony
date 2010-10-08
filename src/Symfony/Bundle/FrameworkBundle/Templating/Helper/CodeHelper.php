@@ -158,9 +158,11 @@ class CodeHelper extends Helper
      */
     public function formatFile($file, $line)
     {
-        if (0 === strpos($file, $this->rootDir)) {
-            $file = str_replace($this->rootDir, '', str_replace('\\', '/', $file));
-            $file = sprintf('<abbr title="%s">kernel.root_dir</abbr>/%s', $this->rootDir, $file);
+        $file = trim($file);
+        $fileStr = $file;
+        if (0 === strpos($fileStr, $this->rootDir)) {
+            $fileStr = str_replace($this->rootDir, '', str_replace('\\', '/', $fileStr));
+            $fileStr = sprintf('<abbr title="%s">kernel.root_dir</abbr>/%s', $this->rootDir, $fileStr);
         }
 
         if (!$this->fileLinkFormat) {
@@ -169,15 +171,15 @@ class CodeHelper extends Helper
 
         $link = strtr($this->fileLinkFormat, array('%f' => $file, '%l' => $line));
 
-        return sprintf('<a href="%s" title="Click to open this file" class="file_link">%s line %s</a>', $link, $file, $line);
+        return sprintf('<a href="%s" title="Click to open this file" class="file_link">%s line %s</a>', $link, $fileStr, $line);
     }
 
     public function formatFileFromText($text)
     {
         $that = $this;
 
-        return preg_replace_callback('/(called|defined) in (.*?)(?: on)? line (\d+)/', function ($match) use ($that) {
-            return $match[1].' in '.$that->formatFile($match[2], $match[3]);
+        return preg_replace_callback('/in (.*?)(?: on|at)? line (\d+)/', function ($match) use ($that) {
+            return 'in '.$that->formatFile($match[1], $match[2]);
         }, $text);
     }
 

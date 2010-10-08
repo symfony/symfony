@@ -2,6 +2,15 @@
 
 namespace Symfony\Component\Form\ValueTransformer;
 
+/*
+ * This file is part of the Symfony framework.
+ *
+ * (c) Fabien Potencier <fabien.potencier@symfony-project.com>
+ *
+ * This source file is subject to the MIT license that is bundled
+ * with this source code in the file LICENSE.
+ */
+
 use \Symfony\Component\Form\ValueTransformer\ValueTransformerException;
 
 /**
@@ -13,6 +22,14 @@ use \Symfony\Component\Form\ValueTransformer\ValueTransformerException;
  */
 class NumberToLocalizedStringTransformer extends BaseValueTransformer
 {
+    const ROUND_FLOOR    = \NumberFormatter::ROUND_FLOOR;
+    const ROUND_DOWN     = \NumberFormatter::ROUND_DOWN;
+    const ROUND_HALFDOWN = \NumberFormatter::ROUND_HALFDOWN;
+    const ROUND_HALFEVEN = \NumberFormatter::ROUND_HALFEVEN;
+    const ROUND_HALFUP   = \NumberFormatter::ROUND_HALFUP;
+    const ROUND_UP       = \NumberFormatter::ROUND_UP;
+    const ROUND_CEILING  = \NumberFormatter::ROUND_CEILING;
+
     /**
      * {@inheritDoc}
      */
@@ -20,6 +37,7 @@ class NumberToLocalizedStringTransformer extends BaseValueTransformer
     {
         $this->addOption('precision', null);
         $this->addOption('grouping', false);
+        $this->addOption('rounding-mode', self::ROUND_HALFUP);
 
         parent::configure();
     }
@@ -78,6 +96,7 @@ class NumberToLocalizedStringTransformer extends BaseValueTransformer
 
         if ($this->getOption('precision') !== null) {
             $formatter->setAttribute(\NumberFormatter::FRACTION_DIGITS, $this->getOption('precision'));
+            $formatter->setAttribute(\NumberFormatter::ROUNDING_MODE, $this->getOption('rounding-mode'));
         }
 
         $formatter->setAttribute(\NumberFormatter::GROUPING_USED, $this->getOption('grouping'));

@@ -153,7 +153,7 @@ class FieldGroupTest extends \PHPUnit_Framework_TestCase
         $group = new FieldGroup('author');
         $group->add($field);
 
-        $group->addError('Message', new PropertyPath('fields[firstName].data'), FieldGroup::FIELD_ERROR);
+        $group->addError('Message', array(), new PropertyPath('fields[firstName].data'), FieldGroup::FIELD_ERROR);
     }
 
     public function testAddErrorMapsFieldValidationErrorsOntoFieldsWithinNestedFieldGroups()
@@ -168,7 +168,7 @@ class FieldGroupTest extends \PHPUnit_Framework_TestCase
         $innerGroup->add($field);
         $group->add($innerGroup);
 
-        $group->addError('Message', new PropertyPath('fields[names].fields[firstName].data'), FieldGroup::FIELD_ERROR);
+        $group->addError('Message', array(), new PropertyPath('fields[names].fields[firstName].data'), FieldGroup::FIELD_ERROR);
     }
 
     public function testAddErrorKeepsFieldValidationErrorsIfFieldNotFound()
@@ -180,9 +180,9 @@ class FieldGroupTest extends \PHPUnit_Framework_TestCase
         $group = new FieldGroup('author');
         $group->add($field);
 
-        $group->addError('Message', new PropertyPath('fields[bar].data'), FieldGroup::FIELD_ERROR);
+        $group->addError('Message', array(), new PropertyPath('fields[bar].data'), FieldGroup::FIELD_ERROR);
 
-        $this->assertEquals(array('Message'), $group->getErrors());
+        $this->assertEquals(array(array('Message', array())), $group->getErrors());
     }
 
     public function testAddErrorKeepsFieldValidationErrorsIfFieldIsHidden()
@@ -197,9 +197,9 @@ class FieldGroupTest extends \PHPUnit_Framework_TestCase
         $group = new FieldGroup('author');
         $group->add($field);
 
-        $group->addError('Message', new PropertyPath('fields[firstName].data'), FieldGroup::FIELD_ERROR);
+        $group->addError('Message', array(), new PropertyPath('fields[firstName].data'), FieldGroup::FIELD_ERROR);
 
-        $this->assertEquals(array('Message'), $group->getErrors());
+        $this->assertEquals(array(array('Message', array())), $group->getErrors());
     }
 
     public function testAddErrorMapsDataValidationErrorsOntoFields()
@@ -213,12 +213,12 @@ class FieldGroupTest extends \PHPUnit_Framework_TestCase
                     ->will($this->returnValue(new PropertyPath('firstName')));
         $field->expects($this->once())
                     ->method('addError')
-                    ->with($this->equalTo('Message'), $this->equalTo($expectedPath), $this->equalTo(FieldGroup::DATA_ERROR));
+                    ->with($this->equalTo('Message'), array(), $this->equalTo($expectedPath), $this->equalTo(FieldGroup::DATA_ERROR));
 
         $group = new FieldGroup('author');
         $group->add($field);
 
-        $group->addError('Message', new PropertyPath('firstName'), FieldGroup::DATA_ERROR);
+        $group->addError('Message', array(), new PropertyPath('firstName'), FieldGroup::DATA_ERROR);
     }
 
     public function testAddErrorKeepsDataValidationErrorsIfFieldNotFound()
@@ -233,7 +233,7 @@ class FieldGroupTest extends \PHPUnit_Framework_TestCase
         $group = new FieldGroup('author');
         $group->add($field);
 
-        $group->addError('Message', new PropertyPath('bar'), FieldGroup::DATA_ERROR);
+        $group->addError('Message', array(), new PropertyPath('bar'), FieldGroup::DATA_ERROR);
     }
 
     public function testAddErrorKeepsDataValidationErrorsIfFieldIsHidden()
@@ -251,7 +251,7 @@ class FieldGroupTest extends \PHPUnit_Framework_TestCase
         $group = new FieldGroup('author');
         $group->add($field);
 
-        $group->addError('Message', new PropertyPath('firstName'), FieldGroup::DATA_ERROR);
+        $group->addError('Message', array(), new PropertyPath('firstName'), FieldGroup::DATA_ERROR);
     }
 
     public function testAddErrorMapsDataValidationErrorsOntoNestedFields()
@@ -266,12 +266,12 @@ class FieldGroupTest extends \PHPUnit_Framework_TestCase
                     ->will($this->returnValue(new PropertyPath('address')));
         $field->expects($this->once())
                     ->method('addError')
-                    ->with($this->equalTo('Message'), $this->equalTo($expectedPath), $this->equalTo(FieldGroup::DATA_ERROR));
+                    ->with($this->equalTo('Message'), array(), $this->equalTo($expectedPath), $this->equalTo(FieldGroup::DATA_ERROR));
 
         $group = new FieldGroup('author');
         $group->add($field);
 
-        $group->addError('Message', new PropertyPath('address.street'), FieldGroup::DATA_ERROR);
+        $group->addError('Message', array(), new PropertyPath('address.street'), FieldGroup::DATA_ERROR);
     }
 
     public function testAddErrorMapsErrorsOntoFieldsInAnonymousGroups()
@@ -285,14 +285,14 @@ class FieldGroupTest extends \PHPUnit_Framework_TestCase
                     ->will($this->returnValue(new PropertyPath('address')));
         $field->expects($this->once())
                     ->method('addError')
-                    ->with($this->equalTo('Message'), $this->equalTo($expectedPath), $this->equalTo(FieldGroup::DATA_ERROR));
+                    ->with($this->equalTo('Message'), array(), $this->equalTo($expectedPath), $this->equalTo(FieldGroup::DATA_ERROR));
 
         $group = new FieldGroup('author');
         $group2 = new FieldGroup('anonymous', array('property_path' => null));
         $group2->add($field);
         $group->add($group2);
 
-        $group->addError('Message', new PropertyPath('address'), FieldGroup::DATA_ERROR);
+        $group->addError('Message', array(), new PropertyPath('address'), FieldGroup::DATA_ERROR);
     }
 
     public function testAddThrowsExceptionIfAlreadyBound()
@@ -540,80 +540,6 @@ class FieldGroupTest extends \PHPUnit_Framework_TestCase
         $this->assertFalse($group->isMultipart());
     }
 
-    public function testRenderForwardsToRenderer()
-    {
-        $group = new FieldGroup('author');
-
-        $renderer = $this->createMockRenderer();
-        $renderer->expects($this->once())
-                         ->method('render')
-                         ->with($this->equalTo($group), $this->equalTo(array('foo' => 'bar')))
-                         ->will($this->returnValue('HTML'));
-
-        $group->setRenderer($renderer);
-
-        // test
-        $output = $group->render(array('foo' => 'bar'));
-
-        $this->assertEquals('HTML', $output);
-    }
-
-    public function testRenderErrorsForwardsToRenderer()
-    {
-        $group = new FieldGroup('author');
-
-        $renderer = $this->createMockRenderer();
-        $renderer->expects($this->once())
-                         ->method('renderErrors')
-                         ->with($this->equalTo($group))
-                         ->will($this->returnValue('HTML'));
-
-        $group->setRenderer($renderer);
-
-        // test
-        $output = $group->renderErrors();
-
-        $this->assertEquals('HTML', $output);
-    }
-
-    public function testLocaleIsPassedToRenderer()
-    {
-        $renderer = $this->getMock('Symfony\Component\Form\Renderer\RendererInterface');
-        $renderer->expects($this->once())
-                         ->method('setLocale')
-                         ->with($this->equalTo('de_DE'));
-
-        $group = new FieldGroup('author');
-        $group->setRenderer($renderer);
-        $group->setLocale('de_DE');
-        $group->render();
-    }
-
-    public function testTranslatorIsPassedToRenderer()
-    {
-        $translator = $this->getMock('Symfony\Component\I18N\TranslatorInterface');
-        $renderer = $this->getMock('Symfony\Component\Form\Renderer\RendererInterface');
-        $renderer->expects($this->once())
-                         ->method('setTranslator')
-                         ->with($this->equalTo($translator));
-
-        $group = new FieldGroup('author');
-        $group->setRenderer($renderer);
-        $group->setTranslator($translator);
-        $group->render();
-    }
-
-    public function testTranslatorIsNotPassedToRendererIfNotSet()
-    {
-        $renderer = $this->getMock('Symfony\Component\Form\Renderer\RendererInterface');
-        $renderer->expects($this->never())
-                         ->method('setTranslator');
-
-        $group = new FieldGroup('author');
-        $group->setRenderer($renderer);
-        $group->render();
-    }
-
     public function testLocaleIsPassedToField_SetBeforeAddingTheField()
     {
         $field = $this->getMock('Symfony\Component\Form\Field', array(), array(), '', false, false);
@@ -651,51 +577,6 @@ class FieldGroupTest extends \PHPUnit_Framework_TestCase
         $this->assertEquals(array(class_exists('\Locale', false) ? \Locale::getDefault() : 'en', 'de_DE'), $field->locales);
     }
 
-    public function testTranslatorIsPassedToField_SetBeforeAddingTheField()
-    {
-        $translator = $this->getMock('Symfony\Component\I18N\TranslatorInterface');
-        $field = $this->getMock('Symfony\Component\Form\Field', array(), array(), '', false, false);
-        $field->expects($this->any())
-                    ->method('getKey')
-                    ->will($this->returnValue('firstName'));
-        $field->expects($this->once())
-                    ->method('setTranslator')
-                    ->with($this->equalTo($translator));
-
-        $group = new FieldGroup('author');
-        $group->setTranslator($translator);
-        $group->add($field);
-    }
-
-    public function testTranslatorIsPassedToField_SetAfterAddingTheField()
-    {
-        $translator = $this->getMock('Symfony\Component\I18N\TranslatorInterface');
-        $field = $this->getMock('Symfony\Component\Form\Field', array(), array(), '', false, false);
-        $field->expects($this->any())
-                    ->method('getKey')
-                    ->will($this->returnValue('firstName'));
-        $field->expects($this->once())
-                    ->method('setTranslator')
-                    ->with($this->equalTo($translator));
-
-        $group = new FieldGroup('author');
-        $group->add($field);
-        $group->setTranslator($translator);
-    }
-
-    public function testTranslatorIsNotPassedToFieldIfNotSet()
-    {
-        $field = $this->getMock('Symfony\Component\Form\Field', array(), array(), '', false, false);
-        $field->expects($this->any())
-                    ->method('getKey')
-                    ->will($this->returnValue('firstName'));
-        $field->expects($this->never())
-                    ->method('setTranslator');
-
-        $group = new FieldGroup('author');
-        $group->add($field);
-    }
-
     public function testSupportsClone()
     {
         $group = new FieldGroup('author');
@@ -720,33 +601,6 @@ class FieldGroupTest extends \PHPUnit_Framework_TestCase
         $group->bind(array('firstName' => 'Bernhard'));
 
         $this->assertEquals(array('firstName' => 'Bernhard'), $group->getData());
-    }
-
-    public function testSetGenerator_calledBeforeAdding()
-    {
-        $generator = $this->getMock('Symfony\Component\Form\HtmlGeneratorInterface');
-
-        $field = $this->createMockField('firstName');
-        $field->expects($this->once())
-                    ->method('setGenerator')
-                    ->with($this->equalTo($generator));
-
-        $group = new FieldGroup('author');
-        $group->setGenerator($generator);
-        $group->add($field);
-    }
-
-    public function testSetGenerator_calledAfterAdding()
-    {
-        $generator = $this->getMock('Symfony\Component\Form\HtmlGeneratorInterface');
-
-        $field = $this->createMockField('firstName');
-        $field->expects($this->exactly(2)) // cannot test different arguments :(
-                    ->method('setGenerator');
-
-        $group = new FieldGroup('author');
-        $group->add($field);
-        $group->setGenerator($generator);
     }
 
     protected function createMockField($key)
@@ -805,11 +659,6 @@ class FieldGroupTest extends \PHPUnit_Framework_TestCase
                     ->will($this->returnValue(true));
 
         return $field;
-    }
-
-    protected function createMockRenderer()
-    {
-        return $this->getMock('Symfony\Component\Form\Renderer\RendererInterface');
     }
 
     protected function createMockTransformer()

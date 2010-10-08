@@ -2,6 +2,8 @@
 
 namespace Symfony\Bundle\TwigBundle\TokenParser;
 
+use Symfony\Bundle\TwigBundle\Node\HelperNode;
+
 /*
  * This file is part of the Symfony package.
  *
@@ -55,12 +57,7 @@ class HelperTokenParser extends \Twig_SimpleTokenParser
     {
         return $this->output(
             $this->markAsSafe(
-                $this->call(
-                    $this->getAttribute('_view', $this->helper),
-                    $this->method,
-                    $this->getNodeValues($values)
-                )
-            )
-        );
+                new HelperNode($this->helper, $this->method, new \Twig_Node_Expression_Array($this->getNodeValues($values), $line), $line)
+        ));
     }
 }

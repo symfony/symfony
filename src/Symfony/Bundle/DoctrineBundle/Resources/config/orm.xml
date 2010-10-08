@@ -42,22 +42,25 @@
 
     <services>
         <!--- Annotation Metadata Driver Service -->
-        <service id="doctrine.orm.metadata_driver.annotation" class="Doctrine\ORM\Mapping\Driver\AnnotationDriver">
+        <service id="doctrine.orm.metadata_driver.annotation" class="%doctrine.orm.metadata.annotation_class%">
             <argument type="service" id="doctrine.orm.metadata_driver.annotation.reader" />
             <argument>%doctrine.orm.metadata_driver.entity_dirs%</argument>
         </service>
 
-        <service id="doctrine.orm.metadata_driver.annotation.reader" class="Doctrine\Common\Annotations\AnnotationReader">
-            <call method="setDefaultAnnotationNamespace"><argument>Doctrine\ORM\Mapping\</argument></call>
+        <service id="doctrine.orm.metadata_driver.annotation.reader" class="%doctrine.orm.metadata.annotation_reader_class%">
+            <call method="setAnnotationNamespaceAlias">
+              <argument>Doctrine\ORM\Mapping\</argument>
+              <argument>orm</argument>
+            </call>
         </service>
 
         <!--- XML Metadata Driver Service -->
-        <service id="doctrine.orm.metadata_driver.xml" class="Doctrine\ORM\Mapping\Driver\XmlDriver">
+        <service id="doctrine.orm.metadata_driver.xml" class="%doctrine.orm.metadata.xml_class%">
             <argument>%doctrine.orm.metadata_driver.mapping_dirs%</argument>
         </service>
 
         <!--- YAML Metadata Driver Service -->
-        <service id="doctrine.orm.metadata_driver.yml" class="Doctrine\ORM\Mapping\Driver\YamlDriver">
+        <service id="doctrine.orm.metadata_driver.yml" class="%doctrine.orm.metadata.yml_class%">
             <argument>%doctrine.orm.metadata_driver.mapping_dirs%</argument>
         </service>
     </services>

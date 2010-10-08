@@ -9,7 +9,6 @@ use Symfony\Component\Form\Form;
 use Symfony\Component\Form\Field;
 use Symfony\Component\Form\HiddenField;
 use Symfony\Component\Form\FieldGroup;
-use Symfony\Component\Form\HtmlGenerator;
 use Symfony\Component\Form\PropertyPath;
 use Symfony\Component\Validator\ConstraintViolation;
 use Symfony\Component\Validator\ConstraintViolationList;
@@ -175,23 +174,6 @@ class FormTest extends \PHPUnit_Framework_TestCase
         $form->add($field);
     }
 
-    public function testDefaultTranslatorCanBeSet()
-    {
-        $translator = $this->getMock('Symfony\Component\I18N\TranslatorInterface');
-        Form::setDefaultTranslator($translator);
-        $form = new Form('author', new Author(), $this->validator);
-
-        $field = $this->getMock('Symfony\Component\Form\Field', array(), array(), '', false, false);
-        $field->expects($this->any())
-                    ->method('getKey')
-                    ->will($this->returnValue('firstName'));
-        $field->expects($this->once())
-                    ->method('setTranslator')
-                    ->with($this->equalTo($translator));
-
-        $form->add($field);
-    }
-
     public function testValidationGroupsCanBeSet()
     {
         $form = new Form('author', new Author(), $this->validator);
@@ -239,30 +221,6 @@ class FormTest extends \PHPUnit_Framework_TestCase
 
         // files are expected to be converted by the parent
         $form->bind(array('file' => 'test.txt'));
-    }
-
-    public function testRenderFormTagProducesValidXhtml()
-    {
-        $form = new Form('author', new Author(), $this->validator);
-
-        $this->assertEquals('<form action="url" method="post">', $form->renderFormTag('url'));
-    }
-
-    public function testSetCharsetAdjustsGenerator()
-    {
-        $form = $this->getMock(
-            'Symfony\Component\Form\Form',
-            array('setGenerator'),
-            array(),
-            '',
-            false // don't call original constructor
-        );
-
-        $form->expects($this->once())
-                 ->method('setGenerator')
-                 ->with($this->equalTo(new HtmlGenerator('iso-8859-1')));
-
-        $form->setCharset('iso-8859-1');
     }
 
     protected function createMockField($key)

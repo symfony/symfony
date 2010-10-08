@@ -2,15 +2,16 @@
 
 namespace Symfony\Component\Form;
 
-use Symfony\Component\Form\ValueTransformer\NumberToLocalizedStringTransformer;
-
 /*
- * This file is part of the symfony package.
+ * This file is part of the Symfony framework.
+ *
  * (c) Fabien Potencier <fabien.potencier@symfony-project.com>
  *
- * For the full copyright and license information, please view the LICENSE
- * file that was distributed with this source code.
+ * This source file is subject to the MIT license that is bundled
+ * with this source code in the file LICENSE.
  */
+
+use Symfony\Component\Form\ValueTransformer\NumberToLocalizedStringTransformer;
 
 /**
  * A localized field for entering numbers.
@@ -27,20 +28,22 @@ class NumberField extends InputField
         // default precision is locale specific (usually around 3)
         $this->addOption('precision');
         $this->addOption('grouping', false);
+        $this->addOption('rounding-mode', NumberToLocalizedStringTransformer::ROUND_HALFUP);
 
         $this->setValueTransformer(new NumberToLocalizedStringTransformer(array(
             'precision' => $this->getOption('precision'),
             'grouping' => $this->getOption('grouping'),
+            'rounding-mode' => $this->getOption('rounding-mode'),
         )));
     }
 
     /**
      * {@inheritDoc}
      */
-    public function render(array $attributes = array())
+    public function getAttributes(array $attributes = array())
     {
-        return parent::render(array_merge(array(
+        return array_merge(parent::getAttributes(), array(
             'type'  => 'text',
-        ), $attributes));
+        ));
     }
 }

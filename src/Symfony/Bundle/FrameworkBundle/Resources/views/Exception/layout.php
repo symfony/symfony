@@ -8,7 +8,7 @@
             body { font: 11px Verdana, Arial, sans-serif; color: #333 }
             .sf-exceptionreset, .sf-exceptionreset .block, .sf-exceptionreset #message { margin: auto }
 
-            <?php echo $view->render('FrameworkBundle:Exception:styles') ?>
+            <?php echo $view->render('FrameworkBundle:Exception:styles.php') ?>
         </style>
         <script type="text/javascript">
             //<![CDATA[

@@ -53,8 +53,9 @@ class FrameworkExtensionTest extends TestCase
                 'Symfony\\Framework' => __DIR__ . '/../../../Framework',
             ),
             'kernel.bundles'          => array(
-                'FrameworkBundle',
+                'Symfony\\Bundle\\FrameworkBundle\\FrameworkBundle',
             ),
+            'kernel.root_dir'         => __DIR__,
             'kernel.debug'            => false,
             'kernel.compiled_classes' => array(),
         )));

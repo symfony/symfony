@@ -2,18 +2,19 @@
 
 namespace Symfony\Component\Validator\Constraints;
 
+/*
+ * This file is part of the Symfony framework.
+ *
+ * (c) Fabien Potencier <fabien.potencier@symfony-project.com>
+ *
+ * This source file is subject to the MIT license that is bundled
+ * with this source code in the file LICENSE.
+ */
+
 use Symfony\Component\Validator\Constraint;
 use Symfony\Component\Validator\ConstraintValidator;
 use Symfony\Component\Validator\Exception\ConstraintDefinitionException;
 use Symfony\Component\Validator\Exception\UnexpectedTypeException;
-
-/*
- * This file is part of the symfony package.
- * (c) Fabien Potencier <fabien.potencier@symfony-project.com>
- *
- * For the full copyright and license information, please view the LICENSE
- * file that was distributed with this source code.
- */
 
 /**
  * ChoiceValidator validates that the value is one of the expected values.
@@ -53,7 +54,7 @@ class ChoiceValidator extends ConstraintValidator
         if ($constraint->multiple) {
             foreach ($value as $_value) {
                 if (!in_array($_value, $choices, true)) {
-                    $this->setMessage($constraint->message, array('value' => $_value));
+                    $this->setMessage($constraint->message, array('{{ value }}' => $_value));
 
                     return false;
                 }
@@ -62,18 +63,18 @@ class ChoiceValidator extends ConstraintValidator
             $count = count($value);
 
             if ($constraint->min !== null && $count < $constraint->min) {
-                $this->setMessage($constraint->minMessage, array('limit' => $constraint->min));
+                $this->setMessage($constraint->minMessage, array('{{ limit }}' => $constraint->min));
 
                 return false;
             }
 
             if ($constraint->max !== null && $count > $constraint->max) {
-                $this->setMessage($constraint->maxMessage, array('limit' => $constraint->max));
+                $this->setMessage($constraint->maxMessage, array('{{ limit }}' => $constraint->max));
 
                 return false;
             }
         } elseif (!in_array($value, $choices, true)) {
-            $this->setMessage($constraint->message, array('value' => $value));
+            $this->setMessage($constraint->message, array('{{ value }}' => $value));
 
             return false;
         }

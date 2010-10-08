@@ -1,0 +1,41 @@
+{% block group %}
+    {{ group|render_errors }}
+    <table>
+        {% for field in group %}
+            {% if not field.ishidden %}
+                {{ field|render }}
+            {% endif %}
+        {% endfor %}
+    </table>
+    {{ group|render_hidden }}
+{% endblock group %}
+
+{% block field %}
+    <tr>
+        <th>{{ field|render_label }}</th>
+        <td>
+            {{ field|render_errors }}
+            {{ field|render_widget }}
+        </td>
+    </tr>
+{% endblock field %}
+
+{% block errors %}
+    {% if errors %}
+    <ul>
+        {% for error in errors %}
+            <li>{% trans error.0 with error.1 from validators %}</li>
+        {% endfor %}
+    </ul>
+    {% endif %}
+{% endblock errors %}
+
+{% block hidden %}
+    {% for field in fields %}
+        {{ field|render_widget }}
+    {% endfor %}
+{% endblock hidden %}
+
+{% block label %}
+    <label for="{{ id }}">{% trans label %}</label>
+{% endblock label %}

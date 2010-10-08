@@ -151,49 +151,4 @@ class DateTimeFieldTest extends DateTimeTestCase
 
         $this->assertEquals($dateTime->format('Y-m-d H:i:s'), $field->getData());
     }
-
-    public function testRender()
-    {
-        $field = new DateTimeField('name', array(
-            'years' => array(2010, 2011),
-            'months' => array(6, 7),
-            'days' => array(1, 2),
-            'hours' => array(3, 4),
-            'minutes' => array(5, 6),
-            'seconds' => array(7, 8),
-            'data_timezone' => 'UTC',
-            'user_timezone' => 'UTC',
-            'date_widget' => DateField::CHOICE,
-            'time_widget' => TimeField::CHOICE,
-            'type' => DateTimeField::DATETIME,
-            'with_seconds' => true,
-        ));
-
-        $field->setData(new \DateTime('2010-06-02 03:04:05 UTC'));
-
-        $html = <<<EOF
-<select id="name_date_day" name="name[date][day]" class="foobar">
-<option value="1">01</option>
-<option value="2" selected="selected">02</option>
-</select>.<select id="name_date_month" name="name[date][month]" class="foobar">
-<option value="6" selected="selected">06</option>
-<option value="7">07</option>
-</select>.<select id="name_date_year" name="name[date][year]" class="foobar">
-<option value="2010" selected="selected">2010</option>
-<option value="2011">2011</option>
-</select>
-<select id="name_time_hour" name="name[time][hour]" class="foobar">
-<option value="3" selected="selected">03</option>
-<option value="4">04</option>
-</select>:<select id="name_time_minute" name="name[time][minute]" class="foobar">
-<option value="5">05</option>
-<option value="6">06</option>
-</select>:<select id="name_time_second" name="name[time][second]" class="foobar">
-<option value="7">07</option>
-<option value="8">08</option>
-</select>
-EOF;
-
-	$this->assertEquals($html, $field->render(array('class' => 'foobar')));
-    }
 }

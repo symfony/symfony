@@ -2,6 +2,15 @@
 
 namespace Symfony\Component\Validator\Constraints;
 
+/*
+ * This file is part of the Symfony framework.
+ *
+ * (c) Fabien Potencier <fabien.potencier@symfony-project.com>
+ *
+ * This source file is subject to the MIT license that is bundled
+ * with this source code in the file LICENSE.
+ */
+
 use Symfony\Component\Validator\Constraint;
 use Symfony\Component\Validator\ConstraintValidator;
 use Symfony\Component\Validator\Exception\ConstraintDefinitionException;
@@ -48,7 +57,7 @@ class CollectionValidator extends ConstraintValidator
 
         if (count($extraFields) > 0 && !$constraint->allowExtraFields) {
             $this->setMessage($constraint->extraFieldsMessage, array(
-                'fields' => '"'.implode('", "', array_keys($extraFields)).'"'
+                '{{ fields }}' => '"'.implode('", "', array_keys($extraFields)).'"'
             ));
 
             return false;
@@ -56,7 +65,7 @@ class CollectionValidator extends ConstraintValidator
 
         if (count($missingFields) > 0 && !$constraint->allowMissingFields) {
             $this->setMessage($constraint->missingFieldsMessage, array(
-                'fields' => '"'.implode('", "', $missingFields).'"'
+                '{{ fields }}' => '"'.implode('", "', $missingFields).'"'
             ));
 
             return false;

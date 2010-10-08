@@ -3,11 +3,12 @@
 namespace Symfony\Component\Form;
 
 /*
- * This file is part of the symfony package.
+ * This file is part of the Symfony framework.
+ *
  * (c) Fabien Potencier <fabien.potencier@symfony-project.com>
  *
- * For the full copyright and license information, please view the LICENSE
- * file that was distributed with this source code.
+ * This source file is subject to the MIT license that is bundled
+ * with this source code in the file LICENSE.
  */
 
 /**
@@ -18,11 +19,11 @@ class FileField extends InputField
     /**
      * {@inheritDoc}
      */
-    public function render(array $attributes = array())
+    public function getAttributes()
     {
-        return parent::render(array_merge(array(
+        return array_merge(parent::getAttributes(), array(
             'type' => 'file',
-        ), $attributes));
+        ));
     }
 
     /**

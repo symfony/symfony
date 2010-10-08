@@ -2,26 +2,31 @@
 
 namespace Symfony\Component\Validator;
 
+/*
+ * This file is part of the Symfony framework.
+ *
+ * (c) Fabien Potencier <fabien.potencier@symfony-project.com>
+ *
+ * This source file is subject to the MIT license that is bundled
+ * with this source code in the file LICENSE.
+ */
+
 use Symfony\Component\Validator\Mapping\ElementMetadata;
 use Symfony\Component\Validator\Mapping\ClassMetadata;
 use Symfony\Component\Validator\Mapping\ClassMetadataFactoryInterface;
-use Symfony\Component\Validator\MessageInterpolator\MessageInterpolatorInterface;
 
 class Validator implements ValidatorInterface
 {
     protected $metadataFactory;
     protected $validatorFactory;
-    protected $messageInterpolator;
 
     public function __construct(
         ClassMetadataFactoryInterface $metadataFactory,
-        ConstraintValidatorFactoryInterface $validatorFactory,
-        MessageInterpolatorInterface $messageInterpolator
+        ConstraintValidatorFactoryInterface $validatorFactory
     )
     {
         $this->metadataFactory = $metadataFactory;
         $this->validatorFactory = $validatorFactory;
-        $this->messageInterpolator = $messageInterpolator;
     }
 
     public function validate($object, $groups = null)
@@ -73,7 +78,7 @@ class Validator implements ValidatorInterface
 
     protected function validateGraph($root, \Closure $closure, GroupChain $groupChain)
     {
-        $walker = new GraphWalker($root, $this->metadataFactory, $this->validatorFactory, $this->messageInterpolator);
+        $walker = new GraphWalker($root, $this->metadataFactory, $this->validatorFactory);
 
         foreach ($groupChain->getGroups() as $group) {
             $closure($walker, $group);

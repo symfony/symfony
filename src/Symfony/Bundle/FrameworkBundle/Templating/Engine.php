@@ -37,7 +37,7 @@ class Engine extends BaseEngine
      * @param array              $renderers An array of renderer instances
      * @param mixed              $escaper   The escaper to use (or false to disable escaping)
      */
-    public function __construct(ContainerInterface $container, LoaderInterface $loader, array $renderers = array(), $escaper)
+    public function __construct(ContainerInterface $container, LoaderInterface $loader, array $renderers = array(), $escaper = false)
     {
         $this->level = 0;
         $this->container = $container;
@@ -136,19 +136,18 @@ class Engine extends BaseEngine
         return $parameters;
     }
 
-    // Bundle:controller:action(.format)(:renderer)
+    // parses template names following the following pattern:
+    // bundle:section:template(.format).renderer
     public function splitTemplateName($name, array $defaults = array())
     {
-        $parts = explode(':', $name, 4);
-
-        if (sizeof($parts) < 3) {
+        $parts = explode(':', $name);
+        if (3 !== count($parts)) {
             throw new \InvalidArgumentException(sprintf('Template name "%s" is not valid.', $name));
         }
 
         $options = array_replace(
             array(
-                'renderer' => 'php',
-                'format'   => '',
+                'format' => '',
             ),
             $defaults,
             array(
@@ -157,18 +156,20 @@ class Engine extends BaseEngine
             )
         );
 
-        if (false !== $pos = strpos($parts[2], '.')) {
-            $options['format'] = substr($parts[2], $pos);
-            $parts[2] = substr($parts[2], 0, $pos);
-        } else {
-            $format = $this->container->getRequestService()->getRequestFormat();
+        $elements = explode('.', $parts[2]);
+        if (3 === count($elements)) {
+            $parts[2] = $elements[0];
+            $options['format'] = $elements[1];
+            $options['renderer'] = $elements[2];
+        } elseif (2 === count($elements)) {
+            $parts[2] = $elements[0];
+            $options['renderer'] = $elements[1];
+            $format = $this->container->get('request')->getRequestFormat();
             if (null !== $format && 'html' !== $format) {
                 $options['format'] = '.'.$format;
             }
-        }
-
-        if (isset($parts[3]) && $parts[3]) {
-            $options['renderer'] = $parts[3];
+        } else {
+            throw new \InvalidArgumentException(sprintf('Template name "%s" is not valid.', $name));
         }
 
         return array($parts[2], $options);

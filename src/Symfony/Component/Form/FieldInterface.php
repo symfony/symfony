@@ -2,15 +2,23 @@
 
 namespace Symfony\Component\Form;
 
+/*
+ * This file is part of the Symfony framework.
+ *
+ * (c) Fabien Potencier <fabien.potencier@symfony-project.com>
+ *
+ * This source file is subject to the MIT license that is bundled
+ * with this source code in the file LICENSE.
+ */
+
 use Symfony\Component\I18N\TranslatorInterface;
 
 /**
  * A form field that can be embedded in a form.
  *
  * @author     Bernhard Schussek <bernhard.schussek@symfony-project.com>
- * @version    SVN: $Id: FieldInterface.php 247 2010-02-01 09:24:55Z bernhard $
  */
-interface FieldInterface extends Localizable, Translatable
+interface FieldInterface extends Localizable
 {
     /**
      * Marks a constraint violation in a form field
@@ -177,23 +185,7 @@ interface FieldInterface extends Localizable, Translatable
      * @param PropertyPath $path
      * @param ConstraintViolation$violation
      */
-    public function addError($message, PropertyPath $path = null, $type = null);
-
-    /**
-     * Renders this field.
-     *
-     * @param  array $attributes  The attributes to include in the rendered
-     *                            output
-     * @return string             The rendered output of this field
-     */
-    public function render(array $attributes = array());
-
-    /**
-     * Renders the errors of this field.
-     *
-     * @return string  The rendered output of the field errors
-     */
-    public function renderErrors();
+    function addError($messageTemplate, array $messageParameters = array(), PropertyPath $path = null, $type = null);
 
     /**
      * Returns whether the field is bound.
@@ -253,14 +245,4 @@ interface FieldInterface extends Localizable, Translatable
      * @param boolean $required
      */
     public function setRequired($required);
-
-    /**
-     * Sets the generator used for rendering HTML.
-     *
-     * Usually there is one generator instance shared between all fields of a
-     * form.
-     *
-     * @param string $charset
-     */
-    public function setGenerator(HtmlGeneratorInterface $generator);
 }

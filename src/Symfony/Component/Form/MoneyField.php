@@ -48,36 +48,24 @@ class MoneyField extends NumberField
     }
 
     /**
-     * {@inheritDoc}
-     */
-    public function render(array $attributes = array())
-    {
-        $input = parent::render($attributes);
-
-        if ($this->getOption('currency')) {
-            return str_replace('%widget%', $input, $this->getPattern($this->locale, $this->getOption('currency')));
-        } else {
-            return $input;
-        }
-    }
-
-    /**
      * Returns the pattern for this locale
      *
-     * The pattern contains the placeholder "%widget%" where the HTML tag should
+     * The pattern contains the placeholder "{{ widget }}" where the HTML tag should
      * be inserted
-     *
-     * @param string $locale
      */
-    protected static function getPattern($locale, $currency)
+    protected function getPattern()
     {
-        if (!isset(self::$patterns[$locale])) {
-            self::$patterns[$locale] = array();
+        if (!$this->getOption('currency')) {
+            return '{{ widget }}';
         }
 
-        if (!isset(self::$patterns[$locale][$currency])) {
-            $format = new \NumberFormatter($locale, \NumberFormatter::CURRENCY);
-            $pattern = $format->formatCurrency('123', $currency);
+        if (!isset(self::$patterns[$this->locale])) {
+            self::$patterns[$this->locale] = array();
+        }
+
+        if (!isset(self::$patterns[$this->locale][$this->getOption('currency')])) {
+            $format = new \NumberFormatter($this->locale, \NumberFormatter::CURRENCY);
+            $pattern = $format->formatCurrency('123', $this->getOption('currency'));
 
             // the spacings between currency symbol and number are ignored, because
             // a single space leads to better readability in combination with input
@@ -88,14 +76,14 @@ class MoneyField extends NumberField
             preg_match('/^([^\s\xc2\xa0]*)[\s\xc2\xa0]*123[,.]00[\s\xc2\xa0]*([^\s\xc2\xa0]*)$/', $pattern, $matches);
 
             if (!empty($matches[1])) {
-                self::$patterns[$locale] = $matches[1].' %widget%';
+                self::$patterns[$this->locale] = $matches[1].' {{ widget }}';
             } else if (!empty($matches[2])) {
-                self::$patterns[$locale] = '%widget% '.$matches[2];
+                self::$patterns[$this->locale] = '{{ widget }} '.$matches[2];
             } else {
-                self::$patterns[$locale] = '%widget%';
+                self::$patterns[$this->locale] = '{{ widget }}';
             }
         }
 
-        return self::$patterns[$locale];
+        return self::$patterns[$this->locale];
     }
 }

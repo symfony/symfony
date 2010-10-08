@@ -86,7 +86,7 @@ EOF;
         $class = $this->dumpValue($definition->getClass());
 
         if (0 === strpos($class, "'") && !preg_match('/^\'[a-zA-Z_\x7f-\xff][a-zA-Z0-9_\x7f-\xff]*(\\\{2}[a-zA-Z_\x7f-\xff][a-zA-Z0-9_\x7f-\xff]*)*\'$/', $class)) {
-            throw new \InvalidArgumentException(sprintf('"%s" is not a valid class name.', $class));
+            throw new \InvalidArgumentException(sprintf('"%s" is not a valid class name for the "%s" service.', $class, $id));
         }
 
         $arguments = array();

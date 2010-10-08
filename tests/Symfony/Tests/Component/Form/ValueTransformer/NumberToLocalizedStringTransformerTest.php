@@ -43,6 +43,23 @@ class NumberToLocalizedStringTransformerTest extends LocalizedTestCase
         $this->assertEquals('678,92', $transformer->transform(678.916));
     }
 
+    public function testTransformWithRoundingMode()
+    {
+        $transformer = new NumberToLocalizedStringTransformer(array(
+            'rounding-mode' => NumberToLocalizedStringTransformer::ROUND_DOWN,
+        ));
+        $transformer->setLocale('de_AT');
+        $this->assertEquals('1234,547', $transformer->transform(1234.547), '->transform() only applies rounding mode if precision set');
+
+        $transformer = new NumberToLocalizedStringTransformer(array(
+            'rounding-mode' => NumberToLocalizedStringTransformer::ROUND_DOWN,
+            'precision' => 2,
+        ));
+        $transformer->setLocale('de_AT');
+        $this->assertEquals('1234,54', $transformer->transform(1234.547), '->transform() rounding-mode works');
+
+    }
+
     public function testReverseTransform()
     {
         $transformer = new NumberToLocalizedStringTransformer();

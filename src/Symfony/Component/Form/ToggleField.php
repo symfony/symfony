@@ -2,15 +2,16 @@
 
 namespace Symfony\Component\Form;
 
-use Symfony\Component\Form\ValueTransformer\BooleanToStringTransformer;
-
 /*
- * This file is part of the symfony package.
+ * This file is part of the Symfony framework.
+ *
  * (c) Fabien Potencier <fabien.potencier@symfony-project.com>
  *
- * For the full copyright and license information, please view the LICENSE
- * file that was distributed with this source code.
+ * This source file is subject to the MIT license that is bundled
+ * with this source code in the file LICENSE.
  */
+
+use Symfony\Component\Form\ValueTransformer\BooleanToStringTransformer;
 
 /**
  * An input field for selecting boolean values.
@@ -26,7 +27,6 @@ abstract class ToggleField extends InputField
     {
         $this->addOption('value');
         $this->addOption('label');
-        $this->addOption('translate_label', false);
 
         $this->setValueTransformer(new BooleanToStringTransformer());
     }
@@ -34,23 +34,11 @@ abstract class ToggleField extends InputField
     /**
      * {@inheritDoc}
      */
-    public function render(array $attributes = array())
+    public function getAttributes()
     {
-        $html = parent::render(array_merge(array(
-            'value'     => $this->getOption('value'),
-            'checked'	  => ((string)$this->getDisplayedData() !== '' && $this->getDisplayedData() !== 0),
-        ), $attributes));
-
-        if ($label = $this->getOption('label')) {
-            if ($this->getOption('translate_label')) {
-                $label = $this->translate($label);
-            }
-
-            $html .= ' '.$this->generator->contentTag('label', $label, array(
-                'for' => $this->getId(),
-            ));
-        }
-
-        return $html;
+        return array_merge(parent::getAttributes(), array(
+            'value'   => $this->getOption('value'),
+            'checked' => (string) $this->getDisplayedData() !== '' && $this->getDisplayedData() !== 0,
+        ));
     }
 }

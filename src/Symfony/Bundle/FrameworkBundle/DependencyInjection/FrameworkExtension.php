@@ -8,6 +8,7 @@ use Symfony\Component\DependencyInjection\Resource\FileResource;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\DependencyInjection\Reference;
 use Symfony\Component\DependencyInjection\Definition;
+use Symfony\Component\Finder\Finder;
 
 /*
  * This file is part of the Symfony framework.
@@ -35,7 +36,7 @@ class FrameworkExtension extends Extension
     {
         $loader = new XmlFileLoader($container, __DIR__.'/../Resources/config');
 
-        if (!$container->hasDefinition('controller_manager')) {
+        if (!$container->hasDefinition('controller_resolver')) {
             $loader->load('web.xml');
         }
 
@@ -98,6 +99,8 @@ class FrameworkExtension extends Extension
         if (isset($config['user'])) {
             $this->registerUserConfiguration($config, $container);
         }
+
+        $this->registerTranslatorConfiguration($config, $container);
 
         $this->addCompiledClasses($container, array(
             'Symfony\\Component\\HttpFoundation\\ParameterBag',
@@ -219,6 +222,64 @@ class FrameworkExtension extends Extension
     {
         $loader = new XmlFileLoader($container, array(__DIR__.'/../Resources/config', __DIR__.'/Resources/config'));
         $loader->load('test.xml');
+    }
+
+    /**
+     * Loads the translator configuration.
+     *
+     * @param array            $config    A configuration array
+     * @param ContainerBuilder $container A ContainerBuilder instance
+     */
+    protected function registerTranslatorConfiguration($config, ContainerBuilder $container)
+    {
+        $first = false;
+        if (!$container->hasDefinition('translator')) {
+            $first = true;
+            $loader = new XmlFileLoader($container, array(__DIR__.'/../Resources/config', __DIR__.'/Resources/config'));
+            $loader->load('translation.xml');
+        }
+
+        $config = array_key_exists('translator', $config) ? $config['translator'] : array();
+        if (!is_array($config)) {
+            $config = array();
+        }
+
+        if (!isset($config['translator']['enabled']) || $config['translator']['enabled']) {
+            // use the "real" translator
+            $container->setDefinition('translator', $container->findDefinition('translator.real'));
+
+            if ($first) {
+                // translation directories
+                $dirs = array();
+                foreach (array_reverse($container->getParameter('kernel.bundles')) as $bundle) {
+                    $reflection = new \ReflectionClass($bundle);
+                    if (is_dir($dir = dirname($reflection->getFilename()).'/Resources/translations')) {
+                        $dirs[] = $dir;
+                    }
+                }
+                if (is_dir($dir = $container->getParameter('kernel.root_dir').'/translations')) {
+                    $dirs[] = $dir;
+                }
+
+                // translation resources
+                $resources = array();
+                if ($dirs) {
+                    $finder = new Finder();
+                    $finder->files()->filter(function (\SplFileInfo $file) { return 2 === substr_count($file->getBasename(), '.'); })->in($dirs);
+                    foreach ($finder as $file) {
+                        // filename is domain.locale.format
+                        list($domain, $locale, $format) = explode('.', $file->getBasename());
+
+                        $resources[] = array($format, (string) $file, $locale, $domain);
+                    }
+                }
+                $container->setParameter('translation.resources', $resources);
+            }
+        }
+
+        if (array_key_exists('fallback', $config)) {
+            $container->setParameter('translator.fallback_locale', $config['fallback']);
+        }
     }
 
     /**
@@ -344,12 +405,9 @@ class FrameworkExtension extends Extension
 
             $xmlMappingFiles = array();
             $yamlMappingFiles = array();
-            $messageFiles = array();
 
             // default entries by the framework
             $xmlMappingFiles[] = __DIR__.'/../../../Component/Form/Resources/config/validation.xml';
-            $messageFiles[] = __DIR__ . '/../../../Component/Validator/Resources/i18n/messages.en.xml';
-            $messageFiles[] = __DIR__ . '/../../../Component/Form/Resources/i18n/messages.en.xml';
 
             foreach ($container->getParameter('kernel.bundles') as $className) {
                 $tmp = dirname(str_replace('\\', '/', $className));
@@ -362,11 +420,6 @@ class FrameworkExtension extends Extension
                     }
                     if (file_exists($file = $dir.'/'.$bundle.'/Resources/config/validation.yml')) {
                         $yamlMappingFiles[] = realpath($file);
-                    }
-
-                    // TODO do we really want the message files of all cultures?
-                    foreach (glob($dir.'/'.$bundle.'/Resources/i18n/messages.*.xml') as $file) {
-                        $messageFiles[] = realpath($file);
                     }
                 }
             }
@@ -383,17 +436,12 @@ class FrameworkExtension extends Extension
 
             $container->setDefinition('validator.mapping.loader.xml_files_loader', $xmlFilesLoader);
             $container->setDefinition('validator.mapping.loader.yaml_files_loader', $yamlFilesLoader);
-            $container->setParameter('validator.message_interpolator.files', $messageFiles);
 
             foreach ($xmlMappingFiles as $file) {
                 $container->addResource(new FileResource($file));
             }
 
             foreach ($yamlMappingFiles as $file) {
-                $container->addResource(new FileResource($file));
-            }
-
-            foreach ($messageFiles as $file) {
                 $container->addResource(new FileResource($file));
             }
 

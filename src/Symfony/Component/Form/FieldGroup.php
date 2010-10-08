@@ -2,26 +2,23 @@
 
 namespace Symfony\Component\Form;
 
-use Symfony\Component\Form\Exception\AlreadyBoundException;
-use Symfony\Component\Form\Exception\UnexpectedTypeException;
-use Symfony\Component\Form\Renderer\RendererInterface;
-use Symfony\Component\Form\Renderer\TableRenderer;
-use Symfony\Component\Form\Iterator\RecursiveFieldsWithPropertyPathIterator;
-use Symfony\Component\I18N\TranslatorInterface;
-
 /*
- * This file is part of the symfony package.
+ * This file is part of the Symfony framework.
+ *
  * (c) Fabien Potencier <fabien.potencier@symfony-project.com>
  *
- * For the full copyright and license information, please view the LICENSE
- * file that was distributed with this source code.
+ * This source file is subject to the MIT license that is bundled
+ * with this source code in the file LICENSE.
  */
+
+use Symfony\Component\Form\Exception\AlreadyBoundException;
+use Symfony\Component\Form\Exception\UnexpectedTypeException;
+use Symfony\Component\Form\Iterator\RecursiveFieldsWithPropertyPathIterator;
 
 /**
  * FieldGroup represents an array of widgets bind to names and values.
  *
  * @author     Fabien Potencier <fabien.potencier@symfony-project.com>
- * @version    SVN: $Id: FieldGroup.php 247 2010-02-01 09:24:55Z bernhard $
  */
 class FieldGroup extends Field implements \IteratorAggregate, FieldGroupInterface
 {
@@ -36,19 +33,6 @@ class FieldGroup extends Field implements \IteratorAggregate, FieldGroupInterfac
      * @var array
      */
     protected $extraFields = array();
-
-    /**
-     * Constructor
-     *
-     * @see FieldInterface::__construct()
-     */
-    public function __construct($key, array $options = array())
-    {
-        // set the default renderer before calling the configure() method
-        $this->setRenderer(new TableRenderer());
-
-        parent::__construct($key, $options);
-    }
 
     /**
      * Clones this group
@@ -109,11 +93,6 @@ class FieldGroup extends Field implements \IteratorAggregate, FieldGroupInterfac
 
         $field->setParent($this);
         $field->setLocale($this->locale);
-        $field->setGenerator($this->generator);
-
-        if ($this->translator !== null) {
-            $field->setTranslator($this->translator);
-        }
 
         $data = $this->getTransformedData();
 
@@ -367,7 +346,7 @@ class FieldGroup extends Field implements \IteratorAggregate, FieldGroupInterfac
     /**
      * {@inheritDoc}
      */
-    public function addError($message, PropertyPath $path = null, $type = null)
+    public function addError($messageTemplate, array $messageParameters = array(), PropertyPath $path = null, $type = null)
     {
         if ($path !== null) {
             if ($type === self::FIELD_ERROR && $path->hasNext()) {
@@ -378,7 +357,7 @@ class FieldGroup extends Field implements \IteratorAggregate, FieldGroupInterfac
                 }
 
                 if ($this->has($path->getCurrent()) && !$this->get($path->getCurrent())->isHidden()) {
-                    $this->get($path->getCurrent())->addError($message, $path, $type);
+                    $this->get($path->getCurrent())->addError($messageTemplate, $messageParameters, $path, $type);
 
                     return;
                 }
@@ -395,7 +374,7 @@ class FieldGroup extends Field implements \IteratorAggregate, FieldGroupInterfac
                                 $path->next();
                             }
 
-                            $field->addError($message, $path, $type);
+                            $field->addError($messageTemplate, $messageParameters, $path, $type);
 
                             return;
                         }
@@ -404,7 +383,7 @@ class FieldGroup extends Field implements \IteratorAggregate, FieldGroupInterfac
             }
         }
 
-        parent::addError($message);
+        parent::addError($messageTemplate, $messageParameters);
     }
 
     /**
@@ -421,67 +400,6 @@ class FieldGroup extends Field implements \IteratorAggregate, FieldGroupInterfac
         }
 
         return false;
-    }
-
-    /**
-     * Sets the renderer.
-     *
-     * @param RendererInterface $renderer
-     */
-    public function setRenderer(RendererInterface $renderer)
-    {
-        $this->renderer = $renderer;
-    }
-
-    /**
-     * Returns the current renderer.
-     *
-     * @return RendererInterface
-     */
-    public function getRenderer()
-    {
-        return $this->renderer;
-    }
-
-    /**
-     * Delegates the rendering of the field to the renderer set.
-     *
-     * @return string The rendered widget
-     */
-    public function render(array $attributes = array())
-    {
-        $this->injectLocaleAndTranslator($this->renderer);
-
-        return $this->renderer->render($this, $attributes);
-    }
-
-    /**
-     * Delegates the rendering of the field to the renderer set.
-     *
-     * @return string The rendered widget
-     */
-    public function renderErrors()
-    {
-        $this->injectLocaleAndTranslator($this->renderer);
-
-        return $this->renderer->renderErrors($this);
-    }
-    /**
-     * Renders hidden form fields.
-     *
-     * @param boolean $recursive False will prevent hidden fields from embedded forms from rendering
-     *
-     * @return string
-     */
-    public function renderHiddenFields($recursive = true)
-    {
-        $output = '';
-
-        foreach ($this->getHiddenFields($recursive) as $field) {
-            $output .= $field->render();
-        }
-
-        return $output;
     }
 
     /**
@@ -564,35 +482,6 @@ class FieldGroup extends Field implements \IteratorAggregate, FieldGroupInterfac
 
         foreach ($this->fields as $field) {
             $field->setLocale($locale);
-        }
-    }
-
-    /**
-     * Sets the translator of this field.
-     *
-     * @see Translatable
-     */
-    public function setTranslator(TranslatorInterface $translator)
-    {
-        parent::setTranslator($translator);
-
-        foreach ($this->fields as $field) {
-            $field->setTranslator($translator);
-        }
-    }
-
-    /**
-     * Distributes the generator among all nested fields
-     *
-     * @param HtmlGeneratorInterface $generator
-     */
-    public function setGenerator(HtmlGeneratorInterface $generator)
-    {
-        parent::setGenerator($generator);
-
-        // TESTME
-        foreach ($this->fields as $field) {
-            $field->setGenerator($generator);
         }
     }
 }

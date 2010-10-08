@@ -3,11 +3,12 @@
 namespace Symfony\Component\Form;
 
 /*
- * This file is part of the symfony package.
+ * This file is part of the Symfony framework.
+ *
  * (c) Fabien Potencier <fabien.potencier@symfony-project.com>
  *
- * For the full copyright and license information, please view the LICENSE
- * file that was distributed with this source code.
+ * This source file is subject to the MIT license that is bundled
+ * with this source code in the file LICENSE.
  */
 
 /**
@@ -20,15 +21,13 @@ class TextareaField extends Field
     /**
      * {@inheritDoc}
      */
-    public function render(array $attributes = array())
+    public function getAttributes()
     {
-        $content = $this->generator->escape($this->getDisplayedData());
-
-        return $this->generator->contentTag('textarea', $content, array_merge(array(
+        return array_merge(parent::getAttributes(), array(
             'id'    => $this->getId(),
             'name'  => $this->getName(),
             'rows'  => 4,
             'cols'  => 30,
-        ), $attributes));
+        ));
     }
 }

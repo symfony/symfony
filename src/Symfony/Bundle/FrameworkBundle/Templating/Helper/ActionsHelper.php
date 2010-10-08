@@ -16,7 +16,7 @@ use Symfony\Bundle\FrameworkBundle\Controller\ControllerResolver;
  */
 
 /**
- * ActionsHelper.
+ * ActionsHelper manages action inclusions.
  *
  * @author     Fabien Potencier <fabien.potencier@symfony-project.com>
  */

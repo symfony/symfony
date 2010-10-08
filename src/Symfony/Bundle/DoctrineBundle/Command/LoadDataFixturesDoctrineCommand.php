@@ -39,6 +39,7 @@ class LoadDataFixturesDoctrineCommand extends DoctrineCommand
             ->setDescription('Load data fixtures to your database.')
             ->addOption('fixtures', null, InputOption::PARAMETER_OPTIONAL | InputOption::PARAMETER_IS_ARRAY, 'The directory or file to load data fixtures from.')
             ->addOption('append', null, InputOption::PARAMETER_OPTIONAL, 'Whether or not to append the data fixtures.', false)
+            ->addOption('em', null, InputOption::PARAMETER_REQUIRED, 'The entity manager to use for this command.')
             ->setHelp(<<<EOT
 The <info>doctrine:data:load</info> command loads data fixtures from your bundles:
 
@@ -57,7 +58,10 @@ EOT
 
     protected function execute(InputInterface $input, OutputInterface $output)
     {
-        $defaultEm = $this->container->getDoctrine_ORM_EntityManagerService();
+        $emName = $input->getOption('em');
+        $emName = $emName ? $emName : 'default';
+        $emServiceName = sprintf('doctrine.orm.%s_entity_manager', $emName);
+        $em = $this->container->get($emServiceName);
         $dirOrFile = $input->getOption('fixtures');
         if ($dirOrFile) {
             $paths = is_array($dirOrFile) ? $dirOrFile : array($dirOrFile);
@@ -69,139 +73,22 @@ EOT
                 $namespace = str_replace('/', '\\', dirname($tmp));
                 $class = basename($tmp);
 
-                if (isset($bundleDirs[$namespace]) && is_dir($dir = $bundleDirs[$namespace].'/'.$class.'/Resources/data/fixtures/doctrine/orm')) {
+                if (isset($bundleDirs[$namespace]) && is_dir($dir = $bundleDirs[$namespace].'/'.$class.'/DataFixtures/ORM')) {
                     $paths[] = $dir;
                 }
             }
         }
 
-        $files = array();
+        $loader = new \Doctrine\Common\DataFixtures\Loader();
         foreach ($paths as $path) {
-            if (is_dir($path)) {
-                $finder = new Finder();
-                $found = iterator_to_array($finder
-                    ->files()
-                    ->name('*.php')
-                    ->in($path));
-            } else {
-                $found = array($path);
-            }
-            $files = array_merge($files, $found);
+            $loader->loadFromDirectory($path);
         }
-
-        $ems = array();
-        $emEntities = array();
-        $files = array_unique($files);
-        foreach ($files as $file) {
-            $em = $defaultEm;
-            $output->writeln(sprintf('<info>Loading data fixtures from <comment>"%s"</comment></info>', $file));
-
-            $before = array_keys(get_defined_vars());
-            include($file);
-            $after = array_keys(get_defined_vars());
-            $new = array_diff($after, $before);
-            $params = $em->getConnection()->getParams();
-            $emName = isset($params['path']) ? $params['path']:$params['dbname'];
-
-            $ems[$emName] = $em;
-            $emEntities[$emName] = array();
-            $variables = array_values($new);
-
-            foreach ($variables as $variable) {
-                $value = $$variable;
-                if (!is_object($value) || $value instanceof \Doctrine\ORM\EntityManager) {
-                    continue;
-                }
-                $emEntities[$emName][] = $value;
-            }
-            foreach ($ems as $emName => $em) {
-                if (!$input->getOption('append')) {
-                    $output->writeln(sprintf('<info>Purging data from entity manager named <comment>"%s"</comment></info>', $emName));
-                    $this->purgeEntityManager($em);
-                }
-
-                $entities = $emEntities[$emName];
-                $numEntities = count($entities);
-                $output->writeln(sprintf('<info>Persisting "%s" '.($numEntities > 1 ? 'entities' : 'entity').'</info>', count($entities)));
-
-                foreach ($entities as $entity) {
-                    $em->persist($entity);
-                }
-                $output->writeln('<info>Flushing entity manager</info>');
-                $em->flush();
-            }
-        }
-    }
-
-    protected function purgeEntityManager(EntityManager $em)
-    {
-        $classes = array();
-        $metadatas = $em->getMetadataFactory()->getAllMetadata();
-
-        foreach ($metadatas as $metadata) {
-            if (!$metadata->isMappedSuperclass) {
-                $classes[] = $metadata;
-            }
-        }
-
-        $commitOrder = $this->getCommitOrder($em, $classes);
-
-        // Drop association tables first
-        $orderedTables = $this->getAssociationTables($commitOrder);
-
-        // Drop tables in reverse commit order
-        for ($i = count($commitOrder) - 1; $i >= 0; --$i) {
-            $class = $commitOrder[$i];
-
-            if (($class->isInheritanceTypeSingleTable() && $class->name != $class->rootEntityName)
-                || $class->isMappedSuperclass) {
-                continue;
-            }
-
-            $orderedTables[] = $class->getTableName();
-        }
-
-        foreach($orderedTables as $tbl) {
-            $em->getConnection()->executeUpdate("DELETE FROM $tbl");
-        }
-    }
-
-    protected function getCommitOrder(EntityManager $em, array $classes)
-    {
-        $calc = new CommitOrderCalculator;
-
-        foreach ($classes as $class) {
-            $calc->addClass($class);
-
-            foreach ($class->associationMappings as $assoc) {
-                if ($assoc['isOwningSide']) {
-                    $targetClass = $em->getClassMetadata($assoc['targetEntity']);
-
-                    if ( ! $calc->hasClass($targetClass->name)) {
-                            $calc->addClass($targetClass);
-                    }
-
-                    // add dependency ($targetClass before $class)
-                    $calc->addDependency($targetClass, $class);
-                }
-            }
-        }
-
-        return $calc->getCommitOrder();
-    }
-
-    protected function getAssociationTables(array $classes)
-    {
-        $associationTables = array();
-
-        foreach ($classes as $class) {
-            foreach ($class->associationMappings as $assoc) {
-                if ($assoc['isOwningSide'] && $assoc['type'] == ClassMetadata::MANY_TO_MANY) {
-                    $associationTables[] = $assoc['joinTable']['name'];
-                }
-            }
-        }
-
-        return $associationTables;
+        $fixtures = $loader->getFixtures();
+        $purger = new \Doctrine\Common\DataFixtures\Purger\ORMPurger($em);
+        $executor = new \Doctrine\Common\DataFixtures\Executor\ORMExecutor($em, $purger);
+        $executor->setLogger(function($message) use ($output) {
+            $output->writeln(sprintf('  <comment>></comment> <info>%s</info>', $message));
+        });
+        $executor->execute($fixtures, $input->getOption('append'));
     }
 }

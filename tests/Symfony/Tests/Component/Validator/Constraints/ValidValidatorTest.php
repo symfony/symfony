@@ -22,9 +22,8 @@ class ValidValidatorTest extends \PHPUnit_Framework_TestCase
     {
         $this->walker = $this->getMock('Symfony\Component\Validator\GraphWalker', array(), array(), '', false);
         $this->factory = $this->getMock('Symfony\Component\Validator\Mapping\ClassMetadataFactoryInterface');
-        $messageInterpolator = $this->getMock('Symfony\Component\Validator\MessageInterpolator\MessageInterpolatorInterface');
 
-        $this->context = new ValidationContext('Root', $this->walker, $this->factory, $messageInterpolator);
+        $this->context = new ValidationContext('Root', $this->walker, $this->factory);
 
         $this->validator = new ValidValidator();
         $this->validator->initialize($this->context);

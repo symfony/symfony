@@ -39,10 +39,6 @@ class ZendExtension extends Extension
         if (isset($config['logger'])) {
             $this->registerLoggerConfiguration($config, $container);
         }
-
-        if (isset($config['i18n'])) {
-            $this->registerI18nConfiguration($config, $container);
-        }
     }
 
     /**
@@ -80,44 +76,6 @@ class ZendExtension extends Extension
             }
             else {
                 $container->findDefinition('zend.logger')->addMethodCall('registerErrorHandler');
-            }
-        }
-    }
-
-    /**
-     * Loads the i18n configuration.
-     *
-     * Usage example:
-     *
-     *      <zend:i18n locale="en" adapter="xliff" data="/path/to/messages.xml" />
-     *
-     * @param array            $config    An array of configuration settings
-     * @param ContainerBuilder $container A ContainerBuilder instance
-     */
-    protected function registerI18nConfiguration($config, ContainerBuilder $container)
-    {
-        $config = $config['i18n'];
-
-        if (!$container->hasDefinition('zend.i18n')) {
-            $loader = new XmlFileLoader($container, __DIR__.'/../Resources/config');
-            $loader->load('i18n.xml');
-            $container->setAlias('i18n', 'zend.i18n');
-        }
-
-        if (isset($config['locale'])) {
-            $container->setParameter('zend.translator.locale', $config['locale']);
-        }
-
-        if (isset($config['adapter'])) {
-            $container->setParameter('zend.translator.adapter', constant($config['adapter']));
-        }
-
-        if (isset($config['translations']) && is_array($config['translations'])) {
-            foreach ($config['translations'] as $locale => $catalogue) {
-                if ($locale == $container->getParameter('zend.translator.locale')) {
-                  $container->setParameter('zend.translator.catalogue', $catalogue);
-                }
-                $container->findDefinition('zend.translator')->addMethodCall('addTranslation', array($catalogue, $locale));
             }
         }
     }

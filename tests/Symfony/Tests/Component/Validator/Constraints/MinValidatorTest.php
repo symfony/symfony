@@ -72,8 +72,8 @@ class MinValidatorTest extends \PHPUnit_Framework_TestCase
         $this->assertFalse($this->validator->isValid(9, $constraint));
         $this->assertEquals($this->validator->getMessageTemplate(), 'myMessage');
         $this->assertEquals($this->validator->getMessageParameters(), array(
-            'value' => 9,
-            'limit' => 10,
+            '{{ value }}' => 9,
+            '{{ limit }}' => 10,
         ));
     }
 }

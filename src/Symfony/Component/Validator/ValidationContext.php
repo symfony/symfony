@@ -2,7 +2,15 @@
 
 namespace Symfony\Component\Validator;
 
-use Symfony\Component\Validator\MessageInterpolator\MessageInterpolatorInterface;
+/*
+ * This file is part of the Symfony framework.
+ *
+ * (c) Fabien Potencier <fabien.potencier@symfony-project.com>
+ *
+ * This source file is subject to the MIT license that is bundled
+ * with this source code in the file LICENSE.
+ */
+
 use Symfony\Component\Validator\Mapping\ClassMetadataFactoryInterface;
 
 class ValidationContext
@@ -15,18 +23,15 @@ class ValidationContext
     protected $violations;
     protected $graphWalker;
     protected $metadataFactory;
-    protected $messageInterpolator;
 
     public function __construct(
         $root,
         GraphWalker $graphWalker,
-        ClassMetadataFactoryInterface $metadataFactory,
-        MessageInterpolatorInterface $messageInterpolator
+        ClassMetadataFactoryInterface $metadataFactory
     )
     {
         $this->root = $root;
         $this->graphWalker = $graphWalker;
-        $this->messageInterpolator = $messageInterpolator;
         $this->metadataFactory = $metadataFactory;
         $this->violations = new ConstraintViolationList();
     }
@@ -39,7 +44,8 @@ class ValidationContext
     public function addViolation($message, array $params, $invalidValue)
     {
         $this->violations->add(new ConstraintViolation(
-            $this->messageInterpolator->interpolate($message, $params),
+            $message,
+            $params,
             $this->root,
             $this->propertyPath,
             $invalidValue

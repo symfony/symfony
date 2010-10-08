@@ -17,8 +17,8 @@ namespace Symfony\Component\Templating\Helper;
  * Usage:
  *
  * <code>
- *   $this->stylesheets->add('foo.css', array('media' => 'print'));
- *   echo $this->stylesheets;
+ *   $view['stylesheets']->add('foo.css', array('media' => 'print'));
+ *   echo $view['stylesheets'];
  * </code>
  *
  * @author     Fabien Potencier <fabien.potencier@symfony-project.com>

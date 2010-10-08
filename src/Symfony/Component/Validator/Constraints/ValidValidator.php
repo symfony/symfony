@@ -2,6 +2,15 @@
 
 namespace Symfony\Component\Validator\Constraints;
 
+/*
+ * This file is part of the Symfony framework.
+ *
+ * (c) Fabien Potencier <fabien.potencier@symfony-project.com>
+ *
+ * This source file is subject to the MIT license that is bundled
+ * with this source code in the file LICENSE.
+ */
+
 use Symfony\Component\Validator\Constraint;
 use Symfony\Component\Validator\ConstraintValidator;
 use Symfony\Component\Validator\Exception\ConstraintDefinitionException;
@@ -27,7 +36,7 @@ class ValidValidator extends ConstraintValidator
         } else if (!is_object($value)) {
             throw new UnexpectedTypeException($value, 'object or array');
         } else if ($constraint->class && !$value instanceof $constraint->class) {
-            $this->setMessage($constraint->message, array('class' => $constraint->class));
+            $this->setMessage($constraint->message, array('{{ class }}' => $constraint->class));
 
             return false;
         } else {

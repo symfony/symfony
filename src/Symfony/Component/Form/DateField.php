@@ -2,20 +2,21 @@
 
 namespace Symfony\Component\Form;
 
+/*
+ * This file is part of the Symfony framework.
+ *
+ * (c) Fabien Potencier <fabien.potencier@symfony-project.com>
+ *
+ * This source file is subject to the MIT license that is bundled
+ * with this source code in the file LICENSE.
+ */
+
 use Symfony\Component\Form\ValueTransformer\ReversedTransformer;
 use Symfony\Component\Form\ValueTransformer\StringToDateTimeTransformer;
 use Symfony\Component\Form\ValueTransformer\TimestampToDateTimeTransformer;
 use Symfony\Component\Form\ValueTransformer\ValueTransformerChain;
 use Symfony\Component\Form\ValueTransformer\DateTimeToLocalizedStringTransformer;
 use Symfony\Component\Form\ValueTransformer\DateTimeToArrayTransformer;
-
-/*
- * This file is part of the symfony package.
- * (c) Fabien Potencier <fabien.potencier@symfony-project.com>
- *
- * For the full copyright and license information, please view the LICENSE
- * file that was distributed with this source code.
- */
 
 class DateField extends HybridField
 {
@@ -78,7 +79,7 @@ class DateField extends HybridField
      *  * data_timezone:  The timezone of the data
      *  * user_timezone:  The timezone of the user entering a new value
      *  * pattern:        The pattern for the select boxes when "widget" is "select".
-     *                    You can use the placeholders "%year%", "%month%" and "%day%".
+     *                    You can use the placeholders "{{ year }}", "{{ month }}" and "{{ day }}".
      *                    Default: locale dependent
      *
      * @param array $options Options for this field
@@ -96,11 +97,7 @@ class DateField extends HybridField
         $this->addOption('widget', self::CHOICE, self::$widgets);
         $this->addOption('pattern');
 
-        $this->formatter = new \IntlDateFormatter(
-            $this->locale,
-            self::$intlFormats[$this->getOption('format')],
-            \IntlDateFormatter::NONE
-        );
+        $this->initFormatter();
 
         $transformers = array();
 
@@ -140,20 +137,29 @@ class DateField extends HybridField
 
             $this->setFieldMode(self::GROUP);
 
-            $this->add(new ChoiceField('year', array(
-                'choices' => $this->generatePaddedChoices($this->getOption('years'), 4),
-            )));
-            $this->add(new ChoiceField('month', array(
-                'choices' => $this->generateMonthChoices($this->getOption('months')),
-            )));
-            $this->add(new ChoiceField('day', array(
-                'choices' => $this->generatePaddedChoices($this->getOption('days'), 2),
-            )));
+            $this->addChoiceFields();
         }
 
         if (count($transformers) > 0) {
             $this->setValueTransformer(new ValueTransformerChain($transformers));
         }
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    public function getAttributes()
+    {
+        if ($this->isField()) {
+            return array_merge(parent::getAttributes(), array(
+                'id'    => $this->getId(),
+                'name'  => $this->getName(),
+                'value' => $this->getDisplayedData(),
+                'type'  => 'text',
+            ));
+        }
+
+        return parent::getAttributes();
     }
 
     /**
@@ -205,38 +211,64 @@ class DateField extends HybridField
         return $choices;
     }
 
-    /**
-     * {@inheritDoc}
-     */
-    public function render(array $attributes = array())
+    public function getPattern()
     {
-        if ($this->getOption('widget') === self::INPUT) {
-            return $this->generator->tag('input', array_merge(array(
-                'id'    => $this->getId(),
-                'name'  => $this->getName(),
-                'value' => $this->getDisplayedData(),
-                'type'  => 'text',
-            ), $attributes));
-        } else {
-            // set order as specified in the pattern
-            if ($this->getOption('pattern')) {
-                $pattern = $this->getOption('pattern');
-            }
-            // set right order with respect to locale (e.g.: de_DE=dd.MM.yy; en_US=M/d/yy)
-            // lookup various formats at http://userguide.icu-project.org/formatparse/datetime
-            else if (preg_match('/^([yMd]+).+([yMd]+).+([yMd]+)$/', $this->formatter->getPattern())) {
-                $pattern = preg_replace(array('/y+/', '/M+/', '/d+/'), array('%year%', '%month%', '%day%'), $this->formatter->getPattern());
-            }
-            // default fallback
-            else {
-                $pattern = '%year%-%month%-%day%';
-            }
-
-            return str_replace(array('%year%', '%month%', '%day%'), array(
-                $this->get('year')->render($attributes),
-                $this->get('month')->render($attributes),
-                $this->get('day')->render($attributes),
-            ), $pattern);
+        // set order as specified in the pattern
+        if ($this->getOption('pattern')) {
+            return $this->getOption('pattern');
         }
+
+        // set right order with respect to locale (e.g.: de_DE=dd.MM.yy; en_US=M/d/yy)
+        // lookup various formats at http://userguide.icu-project.org/formatparse/datetime
+        if (preg_match('/^([yMd]+).+([yMd]+).+([yMd]+)$/', $this->formatter->getPattern())) {
+            return preg_replace(array('/y+/', '/M+/', '/d+/'), array('{{ year }}', '{{ month }}', '{{ day }}'), $this->formatter->getPattern());
+        }
+
+        // default fallback
+        return '{{ year }}-{{ month }}-{{ day }}';
+    }
+
+    /**
+     * Sets the locale of this field.
+     *
+     * @see Localizable
+     */
+    public function setLocale($locale)
+    {
+        parent::setLocale($locale);
+
+        $this->initFormatter();
+
+        if ($this->getOption('widget') === self::CHOICE) {
+            $this->addChoiceFields();
+        }
+    }
+
+    /**
+     * Initializes (or reinitializes) the formatter
+     */
+    protected function initFormatter()
+    {
+        $this->formatter = new \IntlDateFormatter(
+            $this->locale,
+            self::$intlFormats[$this->getOption('format')],
+            \IntlDateFormatter::NONE
+        );
+    }
+
+    /**
+     * Adds (or replaces if already added) the fields used when widget=CHOICE
+     */
+    protected function addChoiceFields()
+    {
+        $this->add(new ChoiceField('year', array(
+            'choices' => $this->generatePaddedChoices($this->getOption('years'), 4),
+        )));
+        $this->add(new ChoiceField('month', array(
+            'choices' => $this->generateMonthChoices($this->getOption('months')),
+        )));
+        $this->add(new ChoiceField('day', array(
+            'choices' => $this->generatePaddedChoices($this->getOption('days'), 2),
+        )));
     }
 }

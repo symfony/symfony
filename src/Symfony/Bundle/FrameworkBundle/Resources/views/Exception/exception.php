@@ -1,5 +1,5 @@
 <?php if (!$embedded): ?>
-    <?php $view->extend('FrameworkBundle:Exception:layout') ?>
+    <?php $view->extend('FrameworkBundle:Exception:layout.php') ?>
 <?php endif; ?>
 
 <div class="sf-exceptionreset">
@@ -27,10 +27,10 @@
         <div style="clear: both"></div>
     </div>
 
-    <?php echo $view->render('FrameworkBundle:Exception:traces', array('exception' => $exception, 'position' => 0, 'count' => $previousCount)) ?>
+    <?php echo $view->render('FrameworkBundle:Exception:traces.php', array('exception' => $exception, 'position' => 0, 'count' => $previousCount)) ?>
 
     <?php foreach ($exception->getPreviouses() as $i => $previous): ?>
-        <?php echo $view->render('FrameworkBundle:Exception:traces', array('exception' => $previous, 'position' => $i + 1, 'count' => $previousCount)) ?>
+        <?php echo $view->render('FrameworkBundle:Exception:traces.php', array('exception' => $previous, 'position' => $i + 1, 'count' => $previousCount)) ?>
     <?php endforeach; ?>
 
     <?php if (null !== $logger): ?>
@@ -43,7 +43,7 @@
             </h3>
 
             <div id="logs" style="display: none">
-                <?php echo $view->render('FrameworkBundle:Exception:logs', array('logs' => $logger->getLogs())) ?>
+                <?php echo $view->render('FrameworkBundle:Exception:logs.php', array('logs' => $logger->getLogs())) ?>
             </div>
 
         </div>

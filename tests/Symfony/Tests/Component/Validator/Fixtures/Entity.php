@@ -6,25 +6,23 @@ require_once __DIR__.'/EntityParent.php';
 require_once __DIR__.'/EntityInterface.php';
 
 /**
- * @Validation({
- *   @NotNull,
- *   @Symfony\Tests\Component\Validator\Fixtures\ConstraintA,
- *   @Min(3),
- *   @Choice({"A", "B"}),
- *   @All({@NotNull, @Min(3)}),
- *   @All(constraints={@NotNull, @Min(3)}),
- *   @Collection(fields={
- *     "foo" = {@NotNull, @Min(3)},
- *     "bar" = @Min(5)
- *   })
+ * @validation:NotNull
+ * @Symfony\Tests\Component\Validator\Fixtures\ConstraintA
+ * @validation:Min(3)
+ * @validation:Choice({"A", "B"})
+ * @validation:Validation({
+ *   @validation:All({@validation:NotNull, @validation:Min(3)}),
+ *   @validation:All(constraints={@validation:NotNull, @validation:Min(3)})
+ * })
+ * @validation:Collection(fields={
+ *   "foo" = {@validation:NotNull, @validation:Min(3)},
+ *   "bar" = @validation:Min(5)
  * })
  */
 class Entity extends EntityParent implements EntityInterface
 {
     /**
-     * @Validation({
-     *   @Choice(choices={"A", "B"}, message="Must be one of %choices%")
-     * })
+     * @validation:Choice(choices={"A", "B"}, message="Must be one of %choices%")
      */
     protected $firstName;
 
@@ -43,9 +41,7 @@ class Entity extends EntityParent implements EntityInterface
     }
 
     /**
-     * @Validation({
-     *   @NotNull
-     * })
+     * @validation:NotNull
      */
     public function getLastName()
     {

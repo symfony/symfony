@@ -2,12 +2,21 @@
 
 namespace Symfony\Component\Validator\Constraints;
 
+/*
+ * This file is part of the Symfony framework.
+ *
+ * (c) Fabien Potencier <fabien.potencier@symfony-project.com>
+ *
+ * This source file is subject to the MIT license that is bundled
+ * with this source code in the file LICENSE.
+ */
+
 class File extends \Symfony\Component\Validator\Constraint
 {
     public $maxSize = null;
     public $mimeTypes = array();
-    public $notFoundMessage = 'Symfony.Validator.File.notFoundMessage';
-    public $notReadableMessage = 'Symfony.Validator.File.notReadableMessage';
-    public $maxSizeMessage = 'Symfony.Validator.File.maxSizeMessage';
-    public $mimeTypesMessage = 'Symfony.Validator.File.mimeTypesMessage';
+    public $notFoundMessage = 'The file could not be found';
+    public $notReadableMessage = 'The file is not readable';
+    public $maxSizeMessage = 'The file is too large ({{ size }}). Allowed maximum size is {{ limit }}';
+    public $mimeTypesMessage = 'The mime type of the file is invalid ({{ type }}). Allowed mime types are {{ types }}';
 }

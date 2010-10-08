@@ -56,7 +56,7 @@ class Field extends BaseField
         ));
     }
 
-    public function label($label, $template = null)
+    public function label($label = false, $template = null)
     {
         if (null === $template) {
             $template = 'FrameworkBundle:Form:label.php';

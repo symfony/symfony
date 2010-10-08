@@ -108,7 +108,7 @@ class CacheTestCase extends \PHPUnit_Framework_TestCase
     public function getMetaStorageValues()
     {
         $values = array();
-        foreach (new \RecursiveIteratorIterator(new \RecursiveDirectoryIterator(sys_get_temp_dir().'/http_cache/md'), \RecursiveIteratorIterator::LEAVES_ONLY) as $file) {
+        foreach (new \RecursiveIteratorIterator(new \RecursiveDirectoryIterator(sys_get_temp_dir().'/http_cache/md', \RecursiveDirectoryIterator::SKIP_DOTS), \RecursiveIteratorIterator::LEAVES_ONLY) as $file) {
             $values[] = file_get_contents($file);
         }
 

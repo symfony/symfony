@@ -20,6 +20,14 @@
     </tr>
 {% endblock field %}
 
+{% block collection %}
+    <table>
+        {% for field in collection %}
+            {{ field|render }}
+        {% endfor %}
+    </table>
+{% endblock collection %}
+
 {% block errors %}
     {% if errors %}
     <ul>

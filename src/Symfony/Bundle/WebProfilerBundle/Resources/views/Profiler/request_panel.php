@@ -42,7 +42,8 @@
         <th>Value</th>
     </tr>
 
-    <?php foreach ($data->getSessionAttributes()->getRawValue() as $key => $value): ?>
+    <?php if (count($sessionAttributes = $data->getSessionAttributes())):?>
+    <?php foreach ($sessionAttributes->getRawValue() as $key => $value): ?>
         <tr>
             <th><?php echo $key ?></th>
             <td>
@@ -58,4 +59,5 @@
             </td>
         </tr>
     <?php endforeach; ?>
+    <?php endif; ?>
 </table>

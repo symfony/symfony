@@ -393,18 +393,18 @@ class FieldGroup extends Field implements \IteratorAggregate, FieldGroupInterfac
     /**
      * {@inheritDoc}
      */
-    public function addError($messageTemplate, array $messageParameters = array(), PropertyPath $path = null, $type = null)
+    public function addError($messageTemplate, array $messageParameters = array(), PropertyPathIterator $pathIterator = null, $type = null)
     {
-        if ($path !== null) {
-            if ($type === self::FIELD_ERROR && $path->hasNext()) {
-                $path->next();
+        if ($pathIterator !== null) {
+            if ($type === self::FIELD_ERROR && $pathIterator->hasNext()) {
+                $pathIterator->next();
 
-                if ($path->isProperty() && $path->getCurrent() === 'fields') {
-                    $path->next();
+                if ($pathIterator->isProperty() && $pathIterator->current() === 'fields') {
+                    $pathIterator->next();
                 }
 
-                if ($this->has($path->getCurrent()) && !$this->get($path->getCurrent())->isHidden()) {
-                    $this->get($path->getCurrent())->addError($messageTemplate, $messageParameters, $path, $type);
+                if ($this->has($pathIterator->current()) && !$this->get($pathIterator->current())->isHidden()) {
+                    $this->get($pathIterator->current())->addError($messageTemplate, $messageParameters, $pathIterator, $type);
 
                     return;
                 }
@@ -414,14 +414,12 @@ class FieldGroup extends Field implements \IteratorAggregate, FieldGroupInterfac
 
                 foreach ($iterator as $field) {
                     if (null !== ($fieldPath = $field->getPropertyPath())) {
-                        $fieldPath->rewind();
-
-                        if ($fieldPath->getCurrent() === $path->getCurrent() && !$field->isHidden()) {
-                            if ($path->hasNext()) {
-                                $path->next();
+                        if ($fieldPath->getElement(0) === $pathIterator->current() && !$field->isHidden()) {
+                            if ($pathIterator->hasNext()) {
+                                $pathIterator->next();
                             }
 
-                            $field->addError($messageTemplate, $messageParameters, $path, $type);
+                            $field->addError($messageTemplate, $messageParameters, $pathIterator, $type);
 
                             return;
                         }

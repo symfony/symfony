@@ -12,20 +12,16 @@ namespace Symfony\Component\Form;
  */
 
 use Symfony\Component\Form\Exception\InvalidPropertyPathException;
+use Symfony\Component\Form\Exception\InvalidPropertyException;
+use Symfony\Component\Form\Exception\PropertyAccessDeniedException;
 
 /**
  * Allows easy traversing of a property path
  *
  * @author Bernhard Schussek <bernhard.schussek@symfony-project.com>
  */
-class PropertyPath
+class PropertyPath implements \IteratorAggregate
 {
-    /**
-     * The current index of the traversal
-     * @var integer
-     */
-    protected $currentIndex = 0;
-
     /**
      * The elements of the property path
      * @var array
@@ -33,11 +29,17 @@ class PropertyPath
     protected $elements = array();
 
     /**
+     * The number of elements in the property path
+     * @var integer
+     */
+    protected $length;
+
+    /**
      * Contains a boolean for each property in $elements denoting whether this
-     * element is a property. It is an index otherwise.
+     * element is an index. It is a property otherwise.
      * @var array
      */
-    protected $isProperty = array();
+    protected $isIndex = array();
 
     /**
      * String representation of the path
@@ -48,7 +50,7 @@ class PropertyPath
     /**
      * Parses the given property path
      *
-     * @param string $propertyPath
+     * @param string $this
      */
     public function __construct($propertyPath)
     {
@@ -66,10 +68,10 @@ class PropertyPath
         while (preg_match($pattern, $remaining, $matches)) {
             if ($matches[2] !== '') {
                 $this->elements[] = $matches[2];
-                $this->isProperty[] = true;
+                $this->isIndex[] = false;
             } else {
                 $this->elements[] = $matches[3];
-                $this->isProperty[] = false;
+                $this->isIndex[] = true;
             }
 
             $position += strlen($matches[1]);
@@ -85,6 +87,8 @@ class PropertyPath
                 $position
             ));
         }
+
+        $this->length = count($this->elements);
     }
 
     /**
@@ -98,67 +102,284 @@ class PropertyPath
     }
 
     /**
-     * Returns the current element of the path
+     * Returns a new iterator for this path
      *
-     * @return string
+     * @return PropertyPathIterator
      */
-    public function getCurrent()
+    public function getIterator()
     {
-        return $this->elements[$this->currentIndex];
+        return new PropertyPathIterator($this);
     }
 
     /**
-     * Returns whether the current element is a property
+     * Returns the elements of the property path as array
      *
-     * @return boolean
+     * @return array   An array of property/index names
      */
-    public function isProperty()
+    public function getElements()
     {
-        return $this->isProperty[$this->currentIndex];
+        return $this->elements;
     }
 
     /**
-     * Returns whether the currente element is an array index
+     * Returns the element at the given index in the property path
      *
-     * @return boolean
+     * @return string  A property or index name
      */
-    public function isIndex()
+    public function getElement($index)
     {
-        return !$this->isProperty();
+        return $this->elements[$index];
     }
 
     /**
-     * Returns whether there is a next element in the path
+     * Returns whether the element at the given index is a property
      *
-     * @return boolean
+     * @param  integer $index  The index in the property path
+     * @return boolean         Whether the element at this index is a property
      */
-    public function hasNext()
+    public function isProperty($index)
     {
-        return isset($this->elements[$this->currentIndex + 1]);
+        return !$this->isIndex($index);
     }
 
     /**
-     * Sets the internal cursor to the next element in the path
+     * Returns whether the element at the given index is an array index
      *
-     * Use hasNext() to verify whether there is a next element before calling this
-     * method, otherwise an exception will be thrown.
-     *
-     * @throws OutOfBoundsException  If there is no next element
+     * @param  integer $index  The index in the property path
+     * @return boolean         Whether the element at this index is an array index
      */
-    public function next()
+    public function isIndex($index)
     {
-        if (!$this->hasNext()) {
-            throw new \OutOfBoundsException('There is no next element in the path');
+        return $this->isIndex[$index];
+    }
+
+    /**
+     * Returns the value at the end of the property path of the object
+     *
+     * Example:
+     * <code>
+     * $path = new PropertyPath('child.name');
+     *
+     * echo $path->getValue($object);
+     * // equals echo $object->getChild()->getName();
+     * </code>
+     *
+     * This method first tries to find a public getter for each property in the
+     * path. The name of the getter must be the camel-cased property name
+     * prefixed with "get" or "is".
+     *
+     * If the getter does not exist, this method tries to find a public
+     * property. The value of the property is then returned.
+     *
+     * If neither is found, an exception is thrown.
+     *
+     * @param  object|array $objectOrArray    The object or array to traverse
+     * @return mixed                          The value at the end of the
+     *                                        property path
+     * @throws InvalidPropertyException       If the property/getter does not
+     *                                        exist
+     * @throws PropertyAccessDeniedException  If the property/getter exists but
+     *                                        is not public
+     */
+    public function getValue($objectOrArray)
+    {
+        return $this->readPropertyPath($objectOrArray, 0);
+    }
+
+    /**
+     * Sets the value at the end of the property path of the object
+     *
+     * Example:
+     * <code>
+     * $path = new PropertyPath('child.name');
+     *
+     * echo $path->setValue($object, 'Fabien');
+     * // equals echo $object->getChild()->setName('Fabien');
+     * </code>
+     *
+     * This method first tries to find a public setter for each property in the
+     * path. The name of the setter must be the camel-cased property name
+     * prefixed with "set".
+     *
+     * If the setter does not exist, this method tries to find a public
+     * property. The value of the property is then changed.
+     *
+     * If neither is found, an exception is thrown.
+     *
+     * @param  object|array $objectOrArray    The object or array to traverse
+     * @return mixed                          The value at the end of the
+     *                                        property path
+     * @throws InvalidPropertyException       If the property/setter does not
+     *                                        exist
+     * @throws PropertyAccessDeniedException  If the property/setter exists but
+     *                                        is not public
+     */
+    public function setValue(&$objectOrArray, $value)
+    {
+        $this->updatePropertyPath($objectOrArray, 0, $value);
+    }
+
+    /**
+     * Recursive implementation of getValue()
+     *
+     * @param  object|array $objectOrArray  The object or array to traverse
+     * @param  integer $currentIndex        The current index in the property path
+     * @return mixed                        The value at the end of the path
+     */
+    protected function readPropertyPath(&$objectOrArray, $currentIndex)
+    {
+        $property = $this->elements[$currentIndex];
+
+        if (is_object($objectOrArray)) {
+            $value = $this->readProperty($objectOrArray, $currentIndex);
+        }
+        // arrays need to be treated separately (due to PHP bug?)
+        // http://bugs.php.net/bug.php?id=52133
+        else {
+            if (!array_key_exists($property, $objectOrArray)) {
+                $objectOrArray[$property] = array();
+            }
+
+            $value =& $objectOrArray[$property];
         }
 
-        ++$this->currentIndex;
+        ++$currentIndex;
+
+        if ($currentIndex < $this->length) {
+            return $this->readPropertyPath($value, $currentIndex);
+        } else {
+            return $value;
+        }
     }
 
     /**
-     * Sets the internal cursor to the first element in the path
+     * Recursive implementation of setValue()
+     *
+     * @param object|array $objectOrArray  The object or array to traverse
+     * @param integer $currentIndex        The current index in the property path
+     * @param mixed $value                 The value to set at the end of the
+     *                                     property path
      */
-    public function rewind()
+    protected function updatePropertyPath(&$objectOrArray, $currentIndex, $value)
     {
-        $this->currentIndex = 0;
+        $property = $this->elements[$currentIndex];
+
+        if ($currentIndex + 1 < $this->length) {
+            if (is_object($objectOrArray)) {
+                $nestedObject = $this->readProperty($objectOrArray, $currentIndex);
+            }
+            // arrays need to be treated separately (due to PHP bug?)
+            // http://bugs.php.net/bug.php?id=52133
+            else {
+                if (!array_key_exists($property, $objectOrArray)) {
+                    $objectOrArray[$property] = array();
+                }
+
+                $nestedObject =& $objectOrArray[$property];
+            }
+
+            $this->updatePropertyPath($nestedObject, $currentIndex + 1, $value);
+        } else {
+            $this->updateProperty($objectOrArray, $currentIndex, $value);
+        }
+    }
+
+    /**
+     * Reads the value of the property at the given index in the path
+     *
+     * @param  object $object         The object to read from
+     * @param  integer $currentIndex  The index of the read property in the path
+     * @return mixed                  The value of the property
+     */
+    protected function readProperty($object, $currentIndex)
+    {
+        $property = $this->elements[$currentIndex];
+
+        if ($this->isIndex[$currentIndex]) {
+            if (!$object instanceof \ArrayAccess) {
+                throw new InvalidPropertyException(sprintf('Index "%s" cannot be read from object of type "%s" because it doesn\'t implement \ArrayAccess', $property, get_class($object)));
+            }
+
+            return $object[$property];
+        } else {
+            $reflClass = new \ReflectionClass($object);
+            $getter = 'get'.$this->camelize($property);
+            $isser = 'is'.$this->camelize($property);
+
+            if ($reflClass->hasMethod($getter)) {
+                if (!$reflClass->getMethod($getter)->isPublic()) {
+                    throw new PropertyAccessDeniedException(sprintf('Method "%s()" is not public in class "%s"', $getter, $reflClass->getName()));
+                }
+
+                return $object->$getter();
+            } else if ($reflClass->hasMethod($isser)) {
+                if (!$reflClass->getMethod($isser)->isPublic()) {
+                    throw new PropertyAccessDeniedException(sprintf('Method "%s()" is not public in class "%s"', $isser, $reflClass->getName()));
+                }
+
+                return $object->$isser();
+            } else if ($reflClass->hasProperty($property)) {
+                if (!$reflClass->getProperty($property)->isPublic()) {
+                    throw new PropertyAccessDeniedException(sprintf('Property "%s" is not public in class "%s". Maybe you should create the method "get%s()" or "is%s()"?', $property, $reflClass->getName(), ucfirst($property), ucfirst($property)));
+                }
+
+                return $object->$property;
+            } else if (property_exists($object, $property)) {
+                // needed to support \stdClass instances
+                return $object->$property;
+            } else {
+                throw new InvalidPropertyException(sprintf('Neither property "%s" nor method "%s()" nor method "%s()" exists in class "%s"', $property, $getter, $isser, $reflClass->getName()));
+            }
+        }
+    }
+
+    /**
+     * Sets the value of the property at the given index in the path
+     *
+     * @param object $object         The object or array to traverse
+     * @param integer $currentIndex  The index of the modified property in the
+     *                               path
+     * @param mixed $value           The value to set
+     */
+    protected function updateProperty(&$objectOrArray, $currentIndex, $value)
+    {
+        $property = $this->elements[$currentIndex];
+
+        if (is_object($objectOrArray) && $this->isIndex[$currentIndex]) {
+            if (!$objectOrArray instanceof \ArrayAccess) {
+                throw new InvalidPropertyException(sprintf('Index "%s" cannot be modified in object of type "%s" because it doesn\'t implement \ArrayAccess', $property, get_class($objectOrArray)));
+            }
+
+            $objectOrArray[$property] = $value;
+        } else if (is_object($objectOrArray)) {
+            $reflClass = new \ReflectionClass($objectOrArray);
+            $setter = 'set'.ucfirst($property); // TODO camelize correctly
+
+            if ($reflClass->hasMethod($setter)) {
+                if (!$reflClass->getMethod($setter)->isPublic()) {
+                    throw new PropertyAccessDeniedException(sprintf('Method "%s()" is not public in class "%s"', $setter, $reflClass->getName()));
+                }
+
+                $objectOrArray->$setter($value);
+            } else if ($reflClass->hasProperty($property)) {
+                if (!$reflClass->getProperty($property)->isPublic()) {
+                    throw new PropertyAccessDeniedException(sprintf('Property "%s" is not public in class "%s". Maybe you should create the method "set%s()"?', $property, $reflClass->getName(), ucfirst($property)));
+                }
+
+                $objectOrArray->$property = $value;
+            } else if (property_exists($objectOrArray, $property)) {
+                // needed to support \stdClass instances
+                $objectOrArray->$property = $value;
+            } else {
+                throw new InvalidPropertyException(sprintf('Neither element "%s" nor method "%s()" exists in class "%s"', $property, $setter, $reflClass->getName()));
+            }
+        } else {
+            $objectOrArray[$property] = $value;
+        }
+    }
+
+    protected function camelize($property)
+    {
+       return preg_replace(array('/(^|_)+(.)/e', '/\.(.)/e'), array("strtoupper('\\2')", "'_'.strtoupper('\\1')"), $property);
     }
 }

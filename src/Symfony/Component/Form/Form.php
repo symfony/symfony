@@ -142,17 +142,19 @@ class Form extends FieldGroup
 
         if ($this->getParent() === null) {
             if ($violations = $this->validator->validate($this, $this->getValidationGroups())) {
+                // TODO: test me
                 foreach ($violations as $violation) {
                     $propertyPath = new PropertyPath($violation->getPropertyPath());
+                    $iterator = $propertyPath->getIterator();
 
-                    if ($propertyPath->getCurrent() == 'data') {
+                    if ($iterator->current() == 'data') {
                         $type = self::DATA_ERROR;
-                        $propertyPath->next(); // point at the first data element
+                        $iterator->next(); // point at the first data element
                     } else {
                         $type = self::FIELD_ERROR;
                     }
 
-                    $this->addError($violation->getMessageTemplate(), $violation->getMessageParameters(), $propertyPath, $type);
+                    $this->addError($violation->getMessageTemplate(), $violation->getMessageParameters(), $iterator, $type);
                 }
             }
         }

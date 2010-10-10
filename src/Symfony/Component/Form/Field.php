@@ -11,8 +11,6 @@ namespace Symfony\Component\Form;
  * with this source code in the file LICENSE.
  */
 
-use Symfony\Component\Form\Exception\InvalidPropertyException;
-use Symfony\Component\Form\Exception\PropertyAccessDeniedException;
 use Symfony\Component\Form\ValueTransformer\ValueTransformerInterface;
 use Symfony\Component\Form\ValueTransformer\TransformationFailedException;
 
@@ -274,7 +272,7 @@ abstract class Field extends Configurable implements FieldInterface
      *
      * @see FieldInterface
      */
-    public function addError($messageTemplate, array $messageParameters = array(), PropertyPath $path = null, $type = null)
+    public function addError($messageTemplate, array $messageParameters = array(), PropertyPathIterator $pathIterator = null, $type = null)
     {
         $this->errors[] = array($messageTemplate, $messageParameters);
     }
@@ -410,8 +408,7 @@ abstract class Field extends Configurable implements FieldInterface
     {
         // TODO throw exception if not object or array
         if ($this->propertyPath !== null) {
-            $this->propertyPath->rewind();
-            $this->setData($this->readPropertyPath($objectOrArray, $this->propertyPath));
+            $this->setData($this->propertyPath->getValue($objectOrArray));
         } else {
             // pass object through if the property path is empty
             $this->setData($objectOrArray);
@@ -426,157 +423,7 @@ abstract class Field extends Configurable implements FieldInterface
         // TODO throw exception if not object or array
 
         if ($this->propertyPath !== null) {
-            $this->propertyPath->rewind();
-            $this->updatePropertyPath($objectOrArray, $this->propertyPath);
-        }
-    }
-
-    /**
-     * Recursively reads the value of the property path in the data
-     *
-     * @param array|object $objectOrArray  An object or array
-     * @param PropertyPath $propertyPath   A property path pointing to a property
-     *                                     in the object/array.
-     */
-    protected function readPropertyPath(&$objectOrArray, PropertyPath $propertyPath)
-    {
-        if (is_object($objectOrArray)) {
-            $value = $this->readProperty($objectOrArray, $propertyPath);
-        }
-        // arrays need to be treated separately (due to PHP bug?)
-        // http://bugs.php.net/bug.php?id=52133
-        else {
-            if (!array_key_exists($propertyPath->getCurrent(), $objectOrArray)) {
-                $objectOrArray[$propertyPath->getCurrent()] = array();
-            }
-
-            $value =& $objectOrArray[$propertyPath->getCurrent()];
-        }
-
-        if ($propertyPath->hasNext()) {
-            $propertyPath->next();
-
-            return $this->readPropertyPath($value, $propertyPath);
-        } else {
-            return $value;
-        }
-    }
-
-    protected function updatePropertyPath(&$objectOrArray, PropertyPath $propertyPath)
-    {
-        if ($propertyPath->hasNext()) {
-            if (is_object($objectOrArray)) {
-                $value = $this->readProperty($objectOrArray, $propertyPath);
-            }
-            // arrays need to be treated separately (due to PHP bug?)
-            // http://bugs.php.net/bug.php?id=52133
-            else {
-                if (!array_key_exists($propertyPath->getCurrent(), $objectOrArray)) {
-                    $objectOrArray[$propertyPath->getCurrent()] = array();
-                }
-
-                $value =& $objectOrArray[$propertyPath->getCurrent()];
-            }
-
-            $propertyPath->next();
-
-            $this->updatePropertyPath($value, $propertyPath);
-        } else {
-            $this->updateProperty($objectOrArray, $propertyPath);
-        }
-    }
-
-    /**
-     * Reads a specific element of the given data
-     *
-     * If the data is an array, the value at index $element is returned.
-     *
-     * If the data is an object, either the result of get{$element}(),
-     * is{$element}() or the property $element is returned. If none of these
-     * is publicly available, an exception is thrown
-     *
-     * @param  object $object  The data to read
-     * @param  string $element              The element to read from the data
-     * @return mixed                        The value of the element
-     */
-    protected function readProperty($object, PropertyPath $propertyPath)
-    {
-        $camelizer = function ($path) {
-            return preg_replace(array('/(^|_)+(.)/e', '/\.(.)/e'), array("strtoupper('\\2')", "'_'.strtoupper('\\1')"), $path);
-        };
-
-        if ($propertyPath->isIndex()) {
-            if (!$object instanceof \ArrayAccess) {
-                throw new InvalidPropertyException(sprintf('Index "%s" cannot be read from object of type "%s" because it doesn\'t implement \ArrayAccess', $propertyPath->getCurrent(), get_class($object)));
-            }
-
-            return $object[$propertyPath->getCurrent()];
-        } else {
-            $reflClass = new \ReflectionClass($object);
-            $getter = 'get'.$camelizer($propertyPath->getCurrent());
-            $isser = 'is'.$camelizer($propertyPath->getCurrent());
-            $property = $propertyPath->getCurrent();
-
-            if ($reflClass->hasMethod($getter)) {
-                if (!$reflClass->getMethod($getter)->isPublic()) {
-                    throw new PropertyAccessDeniedException(sprintf('Method "%s()" is not public in class "%s"', $getter, $reflClass->getName()));
-                }
-
-                return $object->$getter();
-            } else if ($reflClass->hasMethod($isser)) {
-                if (!$reflClass->getMethod($isser)->isPublic()) {
-                    throw new PropertyAccessDeniedException(sprintf('Method "%s()" is not public in class "%s"', $isser, $reflClass->getName()));
-                }
-
-                return $object->$isser();
-            } else if ($reflClass->hasProperty($property)) {
-                if (!$reflClass->getProperty($property)->isPublic()) {
-                    throw new PropertyAccessDeniedException(sprintf('Property "%s" is not public in class "%s". Maybe you should create the method "get%s()" or "is%s()"?', $property, $reflClass->getName(), ucfirst($property), ucfirst($property)));
-                }
-
-                return $object->$property;
-            } else if (property_exists($object, $property)) {
-                // needed to support \stdClass instances
-                return $object->$property;
-            } else {
-                throw new InvalidPropertyException(sprintf('Neither property "%s" nor method "%s()" nor method "%s()" exists in class "%s"', $property, $getter, $isser, $reflClass->getName()));
-            }
-        }
-    }
-
-    protected function updateProperty(&$objectOrArray, PropertyPath $propertyPath)
-    {
-        if (is_object($objectOrArray) && $propertyPath->isIndex()) {
-            if (!$objectOrArray instanceof \ArrayAccess) {
-                throw new InvalidPropertyException(sprintf('Index "%s" cannot be modified in object of type "%s" because it doesn\'t implement \ArrayAccess', $propertyPath->getCurrent(), get_class($objectOrArray)));
-            }
-
-            $objectOrArray[$propertyPath->getCurrent()] = $this->getData();
-        } else if (is_object($objectOrArray)) {
-            $reflClass = new \ReflectionClass($objectOrArray);
-            $setter = 'set'.ucfirst($propertyPath->getCurrent());
-            $property = $propertyPath->getCurrent();
-
-            if ($reflClass->hasMethod($setter)) {
-                if (!$reflClass->getMethod($setter)->isPublic()) {
-                    throw new PropertyAccessDeniedException(sprintf('Method "%s()" is not public in class "%s"', $setter, $reflClass->getName()));
-                }
-
-                $objectOrArray->$setter($this->getData());
-            } else if ($reflClass->hasProperty($property)) {
-                if (!$reflClass->getProperty($property)->isPublic()) {
-                    throw new PropertyAccessDeniedException(sprintf('Property "%s" is not public in class "%s". Maybe you should create the method "set%s()"?', $property, $reflClass->getName(), ucfirst($property)));
-                }
-
-                $objectOrArray->$property = $this->getData();
-            } else if (property_exists($objectOrArray, $property)) {
-                // needed to support \stdClass instances
-                $objectOrArray->$property = $this->getData();
-            } else {
-                throw new InvalidPropertyException(sprintf('Neither element "%s" nor method "%s()" exists in class "%s"', $property, $setter, $reflClass->getName()));
-            }
-        } else {
-            $objectOrArray[$propertyPath->getCurrent()] = $this->getData();
+            $this->propertyPath->setValue($objectOrArray, $this->getData());
         }
     }
 }

@@ -42,7 +42,7 @@
         <th>Value</th>
     </tr>
 
-    <?php foreach ($data->getSessionAttributes()->getRawValue() as $key => $value): ?>
+    <?php foreach ($data->getSessionAttributes() as $key => $value): ?>
         <tr>
             <th><?php echo $key ?></th>
             <td>

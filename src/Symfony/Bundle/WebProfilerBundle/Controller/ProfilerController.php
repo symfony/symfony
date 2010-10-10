@@ -44,7 +44,7 @@ class ProfilerController extends ContainerAware
             return $this->container->get('templating')->renderResponse('WebProfilerBundle:Profiler:index.php', array(
                 'token'     => $token,
                 'profiler'  => new SafeDecorator($profiler),
-                'collector' => $profiler->get('request'),
+                'collector' => new SafeDecorator($profiler->get('request')),
                 'template'  => $this->getTemplate($profiler, '_panel', 'request'),
                 'panel'     => 'request',
             ));

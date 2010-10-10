@@ -97,6 +97,16 @@ class PropertyPathTest extends \PHPUnit_Framework_TestCase
         $this->assertEquals('Schussek', $path->getValue($object));
     }
 
+    public function testGetValueCamelizesGetterNames()
+    {
+        $path = new PropertyPath('last_name');
+
+        $object = new Author();
+        $object->setLastName('Schussek');
+
+        $this->assertEquals('Schussek', $path->getValue($object));
+    }
+
     public function testGetValueThrowsExceptionIfGetterIsNotPublic()
     {
         $path = new PropertyPath('privateGetter');
@@ -200,6 +210,16 @@ class PropertyPathTest extends \PHPUnit_Framework_TestCase
         $object = new Author();
 
         $path = new PropertyPath('lastName');
+        $path->setValue($object, 'Schussek');
+
+        $this->assertEquals('Schussek', $object->getLastName());
+    }
+
+    public function testSetValueCamelizesSetterNames()
+    {
+        $object = new Author();
+
+        $path = new PropertyPath('last_name');
         $path->setValue($object, 'Schussek');
 
         $this->assertEquals('Schussek', $object->getLastName());

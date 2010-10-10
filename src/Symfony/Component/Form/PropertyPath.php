@@ -353,7 +353,7 @@ class PropertyPath implements \IteratorAggregate
             $objectOrArray[$property] = $value;
         } else if (is_object($objectOrArray)) {
             $reflClass = new \ReflectionClass($objectOrArray);
-            $setter = 'set'.ucfirst($property); // TODO camelize correctly
+            $setter = 'set'.$this->camelize($property);
 
             if ($reflClass->hasMethod($setter)) {
                 if (!$reflClass->getMethod($setter)->isPublic()) {

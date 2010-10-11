@@ -237,7 +237,7 @@ class PropertyPath implements \IteratorAggregate
         // http://bugs.php.net/bug.php?id=52133
         else {
             if (!array_key_exists($property, $objectOrArray)) {
-                $objectOrArray[$property] = array();
+                $objectOrArray[$property] = $currentIndex + 1 < $this->length ? array() : null;
             }
 
             $value =& $objectOrArray[$property];

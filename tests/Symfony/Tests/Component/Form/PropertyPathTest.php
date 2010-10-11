@@ -37,6 +37,15 @@ class PropertyPathTest extends \PHPUnit_Framework_TestCase
         $this->assertEquals('Bernhard', $path->getValue($array));
     }
 
+    public function testGetValueReadsArrayWithMissingIndexForCustomPropertyPath()
+    {
+        $array = array('child' => array('index' => array()));
+
+        $path = new PropertyPath('child[index].firstName');
+
+        $this->assertNull($path->getValue($array));
+    }
+
     public function testGetValueReadsProperty()
     {
         $object = new Author();

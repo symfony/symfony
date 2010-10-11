@@ -14,10 +14,16 @@ namespace Symfony\Component\DependencyInjection\Loader;
 /**
  * DelegatingLoader delegates loading to other loaders using a loader resolver.
  *
+ * This loader acts as an array of LoaderInterface objects - each having
+ * a chance to load a given resource (handled by the resolver)
+ *
  * @author     Fabien Potencier <fabien.potencier@symfony-project.com>
  */
 class DelegatingLoader extends Loader
 {
+    /**
+     * @var LoaderResolverInterface
+     */
     protected $resolver;
 
     /**

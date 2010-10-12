@@ -62,29 +62,28 @@ EOT
         }
 
         $entityGenerator = $this->getEntityGenerator();
-        $bundleDirs = $this->container->getKernelService()->getBundleDirs();
         foreach ($this->container->getKernelService()->getBundles() as $bundle) {
-            $tmp = dirname(str_replace('\\', '/', get_class($bundle)));
-            $namespace = str_replace('/', '\\', dirname($tmp));
-            $class = basename($tmp);
 
-            if ($filterBundle && $filterBundle != $namespace . '\\' . $class) {
+            // retrieve the full bundle classname
+            $class = $bundle->getReflection()->getName();
+
+            if ($filterBundle && $filterBundle != $class) {
                 continue;
             }
 
-            if (isset($bundleDirs[$namespace])) {
-                $destination = realpath($bundleDirs[$namespace].'/..');
-                if ($metadatas = $this->getBundleMetadatas($bundle)) {
-                    $output->writeln(sprintf('Generating entities for "<info>%s</info>"', $class));
+            // transform classname to a path and substract it to get the destination
+            $path = dirname(str_replace('\\', '/', $class));
+            $destination = str_replace('/'.$path, "", $bundle->getPath());
 
-                    foreach ($metadatas as $metadata) {
-                        if ($filterEntity && strpos($metadata->name, $filterEntity) !== 0) {
-                            continue;
-                        }
+            if ($metadatas = $this->getBundleMetadatas($bundle)) {
+                $output->writeln(sprintf('Generating entities for "<info>%s</info>"', $class));
 
-                        $output->writeln(sprintf('  > generating <comment>%s</comment>', $metadata->name));
-                        $entityGenerator->generate(array($metadata), $destination);
+                foreach ($metadatas as $metadata) {
+                    if ($filterEntity && strpos($metadata->name, $filterEntity) !== 0) {
+                        continue;
                     }
+                    $output->writeln(sprintf('  > generating <comment>%s</comment>', $metadata->name));
+                    $entityGenerator->generate(array($metadata), $destination);
                 }
             }
         }

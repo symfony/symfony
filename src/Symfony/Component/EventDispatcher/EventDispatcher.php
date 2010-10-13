@@ -51,6 +51,11 @@ class EventDispatcher
             return false;
         }
 
+        if (null === $listener) {
+        	unset($this->listeners[$name]);
+        	return;
+        }
+
         foreach ($this->listeners[$name] as $priority => $callables) {
             foreach ($callables as $i => $callable) {
                 if ($listener === $callable) {

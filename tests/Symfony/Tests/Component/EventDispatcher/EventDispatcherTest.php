@@ -30,6 +30,9 @@ class EventDispatcherTest extends \PHPUnit_Framework_TestCase
         $this->assertEquals(array('listenToBarBar'), $dispatcher->getListeners('barbar'), '->disconnect() disconnects a listener for an event name');
 
         $this->assertFalse($dispatcher->disconnect('foobar', 'listen'), '->disconnect() returns false if the listener does not exist');
+        
+        $dispatcher->disconnect('bar');
+        $this->assertEquals(array(), $dispatcher->getListeners('bar'), '->disconnect() without a listener disconnects all listeners of for an event name');
     }
 
     public function testGetHasListeners()
@@ -100,6 +103,7 @@ class EventDispatcherTest extends \PHPUnit_Framework_TestCase
         $e = $dispatcher->filter($event = new Event(new \stdClass(), 'foo'), 'foo');
         $this->assertEquals('*-foo-*', $e->getReturnValue(), '->filter() filters a value');
     }
+
 }
 
 class Listener

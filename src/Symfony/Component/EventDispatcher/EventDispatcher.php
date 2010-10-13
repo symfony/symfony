@@ -24,9 +24,9 @@ class EventDispatcher
     /**
      * Connects a listener to a given event name.
      *
-     * @param string  $name      An event name
-     * @param mixed   $listener  A PHP callable
-     * @param integer $priority  The priority (between -10 and 10 -- defaults to 0)
+     * @param string|null $name      An event name or null to make the listener listen to all events
+     * @param mixed       $listener  A PHP callable
+     * @param integer     $priority  The priority (between -10 and 10 -- defaults to 0)
      */
     public function connect($name, $listener, $priority = 0)
     {
@@ -40,12 +40,12 @@ class EventDispatcher
     /**
      * Disconnects a listener for a given event name.
      *
-     * @param string     $name      An event name
-     * @param mixed|null $listener  A PHP callable or null to disconnect all listeners
+     * @param string|null     $name      An event name or null to disconnect a global listener
+     * @param mixed|null      $listener  A PHP callable or null to disconnect all listeners
      *
      * @return mixed false if listener does not exist, null otherwise
      */
-    public function disconnect($name, $listener = null)
+    public function disconnect($name=null, $listener = null)
     {
         if (!isset($this->listeners[$name])) {
             return false;
@@ -74,7 +74,7 @@ class EventDispatcher
      */
     public function notify(Event $event)
     {
-        foreach ($this->getListeners($event->getName()) as $listener) {
+        foreach ($this->getListeners($event->getName(), true) as $listener) {
             call_user_func($listener, $event);
         }
 
@@ -90,7 +90,7 @@ class EventDispatcher
      */
     public function notifyUntil(Event $event)
     {
-        foreach ($this->getListeners($event->getName()) as $listener) {
+        foreach ($this->getListeners($event->getName(), true) as $listener) {
             if (call_user_func($listener, $event)) {
                 $event->setProcessed(true);
                 break;
@@ -110,7 +110,7 @@ class EventDispatcher
      */
     public function filter(Event $event, $value)
     {
-        foreach ($this->getListeners($event->getName()) as $listener) {
+        foreach ($this->getListeners($event->getName(), true) as $listener) {
             $value = call_user_func($listener, $event, $value);
         }
 
@@ -122,30 +122,47 @@ class EventDispatcher
     /**
      * Returns true if the given event name has some listeners.
      *
-     * @param  string   $name    The event name
+     * @param  string   $name             The event name
+     * @param  boolean  $includeGlobals   Flag whether the global listeners 
+     *                                    (name=null)  should be included
      *
      * @return Boolean true if some listeners are connected, false otherwise
      */
-    public function hasListeners($name)
+    public function hasListeners($name, $includeGlobals=false)
     {
-        return (Boolean) count($this->getListeners($name));
+        return (Boolean) count($this->getListeners($name, $includeGlobals));
     }
 
     /**
      * Returns all listeners associated with a given event name.
      *
-     * @param  string   $name    The event name
-     *
+     * @param  string   $name             The event name
+     * @param  boolean  $includeGlobals   Flag whether the global listeners 
+     *                                    (name=null)  should be included
      * @return array  An array of listeners
      */
-    public function getListeners($name)
+    public function getListeners($name, $includeGlobals=false)
     {
         if (!isset($this->listeners[$name])) {
             return array();
         }
-
+        
         $listeners = array();
         $all = $this->listeners[$name];
+        
+        // add global listeners if required and existing, but only if the
+        // it's not global collection which is requested
+        if (isset($this->listeners[null]) && $includeGlobals && $name != null) {
+			foreach ($this->listeners[null] as $prio => $globalListeners) {
+				if (isset($all[$prio])) {
+					$all[$prio] = array_merge($all[$prio], $globalListeners);
+				} else {
+					$all[$prio] = $globalListeners;
+				}
+			}
+        }
+        
+        // sort with respect to priority and flatten array
         ksort($all);
         foreach ($all as $l) {
             $listeners = array_merge($listeners, $l);

@@ -104,6 +104,22 @@ class EventDispatcherTest extends \PHPUnit_Framework_TestCase
         $e = $dispatcher->filter($event = new Event(new \stdClass(), 'foo'), 'foo');
         $this->assertEquals('*-foo-*', $e->getReturnValue(), '->filter() filters a value');
     }
+    
+    public function testGlobalConnectAndDisconnect()
+    {
+		$dispatcher = new EventDispatcher();
+		$dispatcher->connect('bar', 'listenToBar');
+		$dispatcher->connect('barbar', 'listenToBar');
+        $dispatcher->connect(null, 'listenToBarBar');
+        $this->assertEquals(array('listenToBar', 'listenToBarBar'), $dispatcher->getListeners('bar', true), '->connect() with event name null connects a global listener (1)');
+        $this->assertEquals(array('listenToBar', 'listenToBarBar'), $dispatcher->getListeners('barbar', true), '->connect() with event name null connects a global listener (2)');
+        $this->assertEquals(array('listenToBar'), $dispatcher->getListeners('bar', false), '->connect() with event name null connects a global listener (3)');
+        $this->assertEquals(array('listenToBar'), $dispatcher->getListeners('barbar', false), '->connect() with event name null connects a global listener (4)');
+        
+        $dispatcher->disconnect(null, 'listenToBarBar');
+        $this->assertEquals(array('listenToBar'), $dispatcher->getListeners('bar', true), '->disconnect() with event name null disconnects a global listener');
+    }
+    
 }
 
 class Listener

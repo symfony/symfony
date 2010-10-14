@@ -49,14 +49,14 @@ class Field extends BaseField
         }
 
         return $this->engine->render($template, array(
-            'field'      => $this,
+            'field'      => $this->field,
             'origin'     => $this->field,
             'attributes' => array_merge($this->field->getAttributes(), $attributes),
             'generator'  => $this->generator,
         ));
     }
 
-    public function label($label, $template = null)
+    public function label($label = false, $template = null)
     {
         if (null === $template) {
             $template = 'FrameworkBundle:Form:label.php';

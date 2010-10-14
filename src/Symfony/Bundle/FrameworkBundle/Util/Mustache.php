@@ -28,7 +28,8 @@ class Mustache
      */
     static public function renderString($string, array $parameters)
     {
-        $replacer = function ($match) use ($parameters) {
+        $replacer = function ($match) use ($parameters)
+        {
             return isset($parameters[$match[1]]) ? $parameters[$match[1]] : $match[0];
         };
 

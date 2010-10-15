@@ -13,10 +13,33 @@ namespace Symfony\Bundle\FrameworkBundle\Tests\Validator;
 
 use Symfony\Bundle\FrameworkBundle\Validator\ConstraintValidatorFactory;
 use Symfony\Component\DependencyInjection\Container;
+use Symfony\Component\Validator\Constraints\Blank as BlankConstraint;
 
 class ConstraintValidatorFactoryTest extends \PHPUnit_Framework_TestCase
 {
-    public function testLoadTaggedServiceIdsSetsValidators()
+    public function testGetInstanceCreatesValidator()
+    {
+        $class = get_class($this->getMockForAbstractClass('Symfony\\Component\\Validator\\ConstraintValidator'));
+
+        $constraint = $this->getMock('Symfony\\Component\\Validator\\Constraint');
+        $constraint
+            ->expects($this->once())
+            ->method('validatedBy')
+            ->will($this->returnValue($class));
+
+        $factory = new ConstraintValidatorFactory(new Container());
+        $this->assertInstanceOf($class, $factory->getInstance($constraint));
+    }
+
+    public function testGetInstanceReturnsExistingValidator()
+    {
+        $factory = new ConstraintValidatorFactory(new Container());
+        $v1 = $factory->getInstance(new BlankConstraint());
+        $v2 = $factory->getInstance(new BlankConstraint());
+        $this->assertSame($v1, $v2);
+    }
+
+    public function testGetInstanceReturnsService()
     {
         $service = 'validator_constraint_service';
         $alias = 'validator_constraint_alias';
@@ -46,19 +69,5 @@ class ConstraintValidatorFactoryTest extends \PHPUnit_Framework_TestCase
         $factory = new ConstraintValidatorFactory($container);
         $factory->loadTaggedServiceIds($container);
         $this->assertSame($validator, $factory->getInstance($constraint));
-    }
-
-    public function testGetInstanceException()
-    {
-        $this->setExpectedException('InvalidArgumentException');
-
-        $constraint = $this->getMock('Symfony\\Component\\Validator\\Constraint');
-        $constraint
-            ->expects($this->once())
-            ->method('validatedBy')
-            ->will($this->returnValue('foo'));
-
-        $factory = new ConstraintValidatorFactory(new Container());
-        $factory->getInstance($constraint);
     }
 }

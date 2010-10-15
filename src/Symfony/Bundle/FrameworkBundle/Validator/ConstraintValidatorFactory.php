@@ -19,6 +19,21 @@ use Symfony\Component\Validator\ConstraintValidatorFactoryInterface;
 /**
  * Uses a service container to create constraint validators.
  *
+ * A constraint validator should be tagged as "validator.constraint_validator"
+ * in the service container and include an "alias" attribute:
+ *
+ *     <service id="some_doctrine_validator">
+ *         <argument type="service" id="doctrine.orm.some_entity_manager" />
+ *         <tag name="validator.constraint_validator" alias="some_alias" />
+ *     </service>
+ *
+ * A constraint may then return this alias in its validatedBy() method:
+ *
+ *     public function validatedBy()
+ *     {
+ *         return 'some_alias';
+ *     }
+ *
  * @author Kris Wallsmith <kris.wallsmith@symfony-project.com>
  */
 class ConstraintValidatorFactory implements ConstraintValidatorFactoryInterface
@@ -56,18 +71,14 @@ class ConstraintValidatorFactory implements ConstraintValidatorFactoryInterface
      * @param Constraint $constraint A constraint
      *
      * @return Symfony\Component\Validator\ConstraintValidator A validator for the supplied constraint
-     *
-     * @throws InvalidArgumentException If no validator for the supplied constraint is found
      */
     public function getInstance(Constraint $constraint)
     {
         $name = $constraint->validatedBy();
 
         if (!isset($this->validators[$name])) {
-            throw new \InvalidArgumentException(sprintf('There is no "%s" constraint validator.', $name));
-        }
-
-        if (is_string($this->validators[$name])) {
+            $this->validators[$name] = new $name();
+        } elseif (is_string($this->validators[$name])) {
             $this->validators[$name] = $this->container->get($this->validators[$name]);
         }
 

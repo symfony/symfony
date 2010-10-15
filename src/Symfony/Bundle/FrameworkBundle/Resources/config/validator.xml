@@ -6,7 +6,6 @@
 
     <parameters>
         <parameter key="validator.class">Symfony\Component\Validator\Validator</parameter>
-        <parameter key="validator.validator_factory.class">Symfony\Component\Validator\Extension\DependencyInjectionValidatorFactory</parameter>
         <parameter key="validator.mapping.class_metadata_factory.class">Symfony\Component\Validator\Mapping\ClassMetadataFactory</parameter>
         <parameter key="validator.mapping.loader.loader_chain.class">Symfony\Component\Validator\Mapping\Loader\LoaderChain</parameter>
         <parameter key="validator.mapping.loader.static_method_loader.class">Symfony\Component\Validator\Mapping\Loader\StaticMethodLoader</parameter>
@@ -16,6 +15,7 @@
         <parameter key="validator.mapping.loader.xml_files_loader.class">Symfony\Component\Validator\Mapping\Loader\XmlFilesLoader</parameter>
         <parameter key="validator.mapping.loader.yaml_files_loader.class">Symfony\Component\Validator\Mapping\Loader\YamlFilesLoader</parameter>
         <parameter key="validator.mapping.loader.static_method_loader.method_name">loadValidatorMetadata</parameter>
+        <parameter key="validator.validator_factory.class">Symfony\Bundle\FrameworkBundle\Validator\ConstraintValidatorFactory</parameter>
     </parameters>
 
     <services>
@@ -30,6 +30,9 @@
 
         <service id="validator.validator_factory" class="%validator.validator_factory.class%">
             <argument type="service" id="service_container" />
+            <call method="loadTaggedServiceIds">
+                <argument type="service" id="service_container" />
+            </call>
         </service>
 
         <service id="validator.mapping.loader.loader_chain" class="%validator.mapping.loader.loader_chain.class%">

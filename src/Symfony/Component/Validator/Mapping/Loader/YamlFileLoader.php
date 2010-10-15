@@ -28,7 +28,7 @@ class YamlFileLoader extends FileLoader
      */
     public function loadClassMetadata(ClassMetadata $metadata)
     {
-        if (is_null($this->classes)) {
+        if (null === $this->classes) {
             $this->classes = Yaml::load($this->file);
         }
 
@@ -68,8 +68,9 @@ class YamlFileLoader extends FileLoader
     /**
      * Parses a collection of YAML nodes
      *
-     * @param  array $nodes  The YAML nodes
-     * @return array         An array of values or Constraint instances
+     * @param array $nodes The YAML nodes
+     *
+     * @return array An array of values or Constraint instances
      */
     protected function parseNodes(array $nodes)
     {

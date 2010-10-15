@@ -23,9 +23,9 @@ abstract class MemberMetadata extends ElementMetadata
     /**
      * Constructor.
      *
-     * @param string $class     The name of the class this member is defined on
-     * @param string $name      The name of the member
-     * @param string $property  The property the member belongs to
+     * @param string $class    The name of the class this member is defined on
+     * @param string $name     The name of the member
+     * @param string $property The property the member belongs to
      */
     public function __construct($class, $name, $property)
     {
@@ -71,7 +71,7 @@ abstract class MemberMetadata extends ElementMetadata
     /**
      * Returns the name of the property this member belongs to
      *
-     * @return string  The property name
+     * @return string The property name
      */
     public function getPropertyName()
     {
@@ -111,8 +111,9 @@ abstract class MemberMetadata extends ElementMetadata
     /**
      * Returns the value of this property in the given object
      *
-     * @param  object $object  The object
-     * @return mixed           The property value
+     * @param object $object The object
+     *
+     * @return mixed The property value
      */
     abstract public function getValue($object);
 

@@ -19,7 +19,7 @@ abstract class ElementMetadata
     public $constraintsByGroup = array();
 
     /**
-     * Returns the names of the properties that should be serialized
+     * Returns the names of the properties that should be serialized.
      *
      * @return array
      */
@@ -32,7 +32,7 @@ abstract class ElementMetadata
     }
 
     /**
-     * Clones this object
+     * Clones this object.
      */
     public function __clone()
     {
@@ -47,7 +47,7 @@ abstract class ElementMetadata
     }
 
     /**
-     * Adds a constraint to this element
+     * Adds a constraint to this element.
      *
      * @param Constraint $constraint
      */
@@ -67,7 +67,7 @@ abstract class ElementMetadata
     }
 
     /**
-     * Returns all constraints of this element
+     * Returns all constraints of this element.
      *
      * @return array  An array of Constraint instances
      */
@@ -77,7 +77,7 @@ abstract class ElementMetadata
     }
 
     /**
-     * Returns whether this element has any constraints
+     * Returns whether this element has any constraints.
      *
      * @return boolean
      */
@@ -87,11 +87,11 @@ abstract class ElementMetadata
     }
 
     /**
-     * Returns the constraints of the given group
+     * Returns the constraints of the given group.
      *
-     * @param  string $group  The group name
-     * @return array  An array with all Constraint instances belonging to
-     *                the group
+     * @param string $group The group name
+     *
+     * @return array An array with all Constraint instances belonging to the group
      */
     public function findConstraints($group)
     {

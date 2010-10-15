@@ -25,21 +25,21 @@ interface CacheInterface
      *
      * @param string $class
      */
-    public function has($class);
+    function has($class);
 
     /**
      * Returns the metadata for the given class from the cache
      *
-     * @param string $class
+     * @param string $class Class Name
+     *
      * @return ClassMetadata
      */
-    public function read($class);
+    function read($class);
 
     /**
      * Stores a class metadata in the cache
      *
-     * @param $class
-     * @param $metadata
+     * @param ClassMetadata $metadata A Class Metadata
      */
-    public function write(ClassMetadata $metadata);
+    function write(ClassMetadata $metadata);
 }

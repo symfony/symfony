@@ -29,11 +29,11 @@ class LoaderChain implements LoaderInterface
     protected $loaders;
 
     /**
-     * Acccepts a list of LoaderInterface instances
+     * Accepts a list of LoaderInterface instances
      *
-     * @param  array $loaders    An array of LoaderInterface instances
-     * @throws MappingException  If any of the loaders does not implement
-     *                           LoaderInterface
+     * @param array $loaders An array of LoaderInterface instances
+     *
+     * @throws MappingException If any of the loaders does not implement LoaderInterface
      */
     public function __construct(array $loaders)
     {

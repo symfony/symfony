@@ -16,7 +16,7 @@ use Symfony\Component\Translation\Resource\ResourceInterface;
 /**
  * MessageCatalogueInterface.
  *
- * @author     Fabien Potencier <fabien.potencier@symfony-project.com>
+ * @author Fabien Potencier <fabien.potencier@symfony-project.com>
  */
 interface MessageCatalogueInterface
 {
@@ -29,8 +29,6 @@ interface MessageCatalogueInterface
 
     /**
      * Gets the domains.
-     *
-     * @param array An array of domains
      */
     function getDomains();
 
@@ -41,7 +39,7 @@ interface MessageCatalogueInterface
      *
      * @param string $domain The domain name
      *
-     * @param array An array of messages
+     * @return array An array of messages
      */
     function getMessages($domain = null);
 

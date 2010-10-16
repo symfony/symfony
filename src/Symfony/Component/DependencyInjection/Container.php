@@ -123,7 +123,7 @@ class Container implements ContainerInterface, \ArrayAccess
      *
      * @param  string $name The parameter name
      *
-     * @return boolean  The presense of parameter in container
+     * @return boolean The presence of parameter in container
      */
     public function hasParameter($name)
     {

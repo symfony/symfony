@@ -200,7 +200,7 @@ EOF;
     }
 
     /**
-     * @throws \RuntimeException When trying to dump object or ressource
+     * @throws \RuntimeException When trying to dump object or resource
      */
     static public function phpToXml($value)
     {

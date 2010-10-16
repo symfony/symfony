@@ -21,7 +21,7 @@ use Symfony\Component\Routing\Route;
 class ApacheMatcherDumper extends MatcherDumper
 {
     /**
-     * Dumps a set of routes to a .htacces format.
+     * Dumps a set of routes to a .htaccess format.
      *
      * Available options:
      *

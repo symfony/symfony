@@ -29,6 +29,8 @@ interface MessageCatalogueInterface
 
     /**
      * Gets the domains.
+     *
+     * @return array An array of domains
      */
     function getDomains();
 

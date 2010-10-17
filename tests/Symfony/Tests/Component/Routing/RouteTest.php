@@ -49,12 +49,25 @@ class RouteTest extends \PHPUnit_Framework_TestCase
         $this->assertEquals($route, $route->setOptions(array()), '->setOptions() implements a fluent interface');
     }
 
+    /**
+     * @covers Symfony\Component\Routing\Route::setDefaults
+     * @covers Symfony\Component\Routing\Route::getDefaults
+     * @covers Symfony\Component\Routing\Route::setDefault
+     * @covers Symfony\Component\Routing\Route::getDefault
+     */
     public function testDefaults()
     {
         $route = new Route('/:foo');
         $route->setDefaults(array('foo' => 'bar'));
         $this->assertEquals(array('foo' => 'bar'), $route->getDefaults(), '->setDefaults() sets the defaults');
         $this->assertEquals($route, $route->setDefaults(array()), '->setDefaults() implements a fluent interface');
+
+        $route->setDefault('foo', 'bar');
+        $this->assertEquals('bar', $route->getDefault('foo'), '->setDefault() sets a default value');
+
+        $route->setDefault('foo2', 'bar2');
+        $this->assertEquals('bar2', $route->getDefault('foo2'), '->getDefault() return the default value');
+        $this->assertNull($route->getDefault('not_defined'), '->getDefault() return null if default value is not setted');
     }
 
     public function testRequirements()

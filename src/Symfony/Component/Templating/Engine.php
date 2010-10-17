@@ -19,7 +19,7 @@ use Symfony\Component\Templating\Helper\HelperInterface;
 /**
  * Engine is the main class of the templating component.
  *
- * @author     Fabien Potencier <fabien.potencier@symfony-project.com>
+ * @author Fabien Potencier <fabien.potencier@symfony-project.com>
  */
 class Engine implements \ArrayAccess
 {

@@ -20,7 +20,7 @@ use Symfony\Component\Routing\RouterInterface;
 /**
  * ConfigDataCollector.
  *
- * @author     Fabien Potencier <fabien.potencier@symfony-project.com>
+ * @author Fabien Potencier <fabien.potencier@symfony-project.com>
  */
 class ConfigDataCollector extends DataCollector
 {

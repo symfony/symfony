@@ -21,7 +21,7 @@ use Symfony\Component\Routing\Matcher\Dumper\ApacheMatcherDumper;
 /**
  * RouterDebugCommand.
  *
- * @author     Fabien Potencier <fabien.potencier@symfony-project.com>
+ * @author Fabien Potencier <fabien.potencier@symfony-project.com>
  */
 class RouterDebugCommand extends Command
 {

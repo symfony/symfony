@@ -14,9 +14,9 @@ namespace Symfony\Component\OutputEscaper;
 /**
  * Abstract output escaping decorator class for "getter" objects.
  *
- * @see        Escaper
- * @author     Fabien Potencier <fabien.potencier@symfony-project.com>
- * @author     Mike Squire <mike@somosis.co.uk>
+ * @see    Escaper
+ * @author Fabien Potencier <fabien.potencier@symfony-project.com>
+ * @author Mike Squire <mike@somosis.co.uk>
  */
 abstract class GetterDecorator extends Escaper
 {

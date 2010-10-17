@@ -19,8 +19,8 @@ use Doctrine\DBAL\Migrations\Tools\Console\Command\GenerateCommand;
 /**
  * Command for generating new blank migration classes
  *
- * @author     Fabien Potencier <fabien.potencier@symfony-project.com>
- * @author     Jonathan H. Wage <jonwage@gmail.com>
+ * @author Fabien Potencier <fabien.potencier@symfony-project.com>
+ * @author Jonathan H. Wage <jonwage@gmail.com>
  */
 class MigrationsGenerateDoctrineCommand extends GenerateCommand
 {

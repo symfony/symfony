@@ -21,7 +21,7 @@ use Symfony\Component\Console\Application;
 /**
  * Base class for all commands.
  *
- * @author     Fabien Potencier <fabien.potencier@symfony-project.com>
+ * @author Fabien Potencier <fabien.potencier@symfony-project.com>
  */
 class Command
 {

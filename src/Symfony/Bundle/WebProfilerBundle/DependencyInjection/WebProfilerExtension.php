@@ -28,7 +28,7 @@ use Symfony\Component\DependencyInjection\Definition;
  *        intercept-redirects="true"
  *    />
  *
- * @author     Fabien Potencier <fabien.potencier@symfony-project.com>
+ * @author Fabien Potencier <fabien.potencier@symfony-project.com>
  */
 class WebProfilerExtension extends Extension
 {

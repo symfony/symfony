@@ -20,7 +20,7 @@ use Symfony\Component\DependencyInjection\Resource\FileResource;
 /**
  * XmlFileLoader loads XML files service definitions.
  *
- * @author     Fabien Potencier <fabien.potencier@symfony-project.com>
+ * @author Fabien Potencier <fabien.potencier@symfony-project.com>
  */
 class XmlFileLoader extends FileLoader
 {

@@ -15,9 +15,9 @@ namespace Symfony\Component\OutputEscaper;
  * Output escaping object decorator that intercepts all method calls and escapes
  * their return values.
  *
- * @see        Escaper
- * @author     Fabien Potencier <fabien.potencier@symfony-project.com>
- * @author     Mike Squire <mike@somosis.co.uk>
+ * @see    Escaper
+ * @author Fabien Potencier <fabien.potencier@symfony-project.com>
+ * @author Mike Squire <mike@somosis.co.uk>
  */
 class ObjectDecorator extends GetterDecorator
 {

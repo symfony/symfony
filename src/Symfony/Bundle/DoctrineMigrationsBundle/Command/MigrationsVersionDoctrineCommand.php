@@ -19,8 +19,8 @@ use Doctrine\DBAL\Migrations\Tools\Console\Command\VersionCommand;
 /**
  * Command for manually adding and deleting migration versions from the version table.
  *
- * @author     Fabien Potencier <fabien.potencier@symfony-project.com>
- * @author     Jonathan H. Wage <jonwage@gmail.com>
+ * @author Fabien Potencier <fabien.potencier@symfony-project.com>
+ * @author Jonathan H. Wage <jonwage@gmail.com>
  */
 class MigrationsVersionDoctrineCommand extends VersionCommand
 {

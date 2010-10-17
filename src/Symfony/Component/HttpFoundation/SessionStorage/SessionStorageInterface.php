@@ -14,7 +14,7 @@ namespace Symfony\Component\HttpFoundation\SessionStorage;
 /**
  * SessionStorageInterface.
  *
- * @author     Fabien Potencier <fabien.potencier@symfony-project.com>
+ * @author Fabien Potencier <fabien.potencier@symfony-project.com>
  */
 interface SessionStorageInterface
 {

@@ -14,7 +14,7 @@ namespace Symfony\Component\BrowserKit;
 /**
  * Cookie represents an HTTP cookie.
  *
- * @author     Fabien Potencier <fabien.potencier@symfony-project.com>
+ * @author Fabien Potencier <fabien.potencier@symfony-project.com>
  */
 class Cookie
 {

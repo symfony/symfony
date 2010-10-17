@@ -14,7 +14,7 @@ namespace Symfony\Component\Templating\Loader;
 /**
  * LoaderInterface is the interface all loaders must implement.
  *
- * @author     Fabien Potencier <fabien.potencier@symfony-project.com>
+ * @author Fabien Potencier <fabien.potencier@symfony-project.com>
  */
 interface LoaderInterface
 {

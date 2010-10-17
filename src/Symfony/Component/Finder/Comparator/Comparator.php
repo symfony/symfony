@@ -14,7 +14,7 @@ namespace Symfony\Component\Finder\Comparator;
 /**
  * Comparator.
  *
- * @author     Fabien Potencier <fabien.potencier@symfony-project.com> PHP port
+ * @author Fabien Potencier <fabien.potencier@symfony-project.com> PHP port
  */
 class Comparator
 {

@@ -21,7 +21,7 @@ use Symfony\Bundle\FrameworkBundle\Controller\ControllerResolver;
 /**
  * WebDebugToolbarListener injects the Web Debug Toolbar.
  *
- * @author     Fabien Potencier <fabien.potencier@symfony-project.com>
+ * @author Fabien Potencier <fabien.potencier@symfony-project.com>
  */
 class WebDebugToolbarListener
 {

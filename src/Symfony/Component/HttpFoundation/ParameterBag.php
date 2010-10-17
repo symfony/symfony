@@ -14,7 +14,7 @@ namespace Symfony\Component\HttpFoundation;
 /**
  * ParameterBag is a container for key/value pairs.
  *
- * @author     Fabien Potencier <fabien.potencier@symfony-project.com>
+ * @author Fabien Potencier <fabien.potencier@symfony-project.com>
  */
 class ParameterBag
 {

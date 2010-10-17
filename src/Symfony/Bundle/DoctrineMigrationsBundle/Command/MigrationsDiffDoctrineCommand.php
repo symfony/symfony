@@ -20,8 +20,8 @@ use Doctrine\DBAL\Migrations\Tools\Console\Command\DiffCommand;
  * Command for generate migration classes by comparing your current database schema
  * to your mapping information.
  *
- * @author     Fabien Potencier <fabien.potencier@symfony-project.com>
- * @author     Jonathan H. Wage <jonwage@gmail.com>
+ * @author Fabien Potencier <fabien.potencier@symfony-project.com>
+ * @author Jonathan H. Wage <jonwage@gmail.com>
  */
 class MigrationsDiffDoctrineCommand extends DiffCommand
 {

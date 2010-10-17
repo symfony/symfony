@@ -22,7 +22,7 @@ use Symfony\Component\Finder\Finder;
 /**
  * FrameworkExtension.
  *
- * @author     Fabien Potencier <fabien.potencier@symfony-project.com>
+ * @author Fabien Potencier <fabien.potencier@symfony-project.com>
  */
 class FrameworkExtension extends Extension
 {

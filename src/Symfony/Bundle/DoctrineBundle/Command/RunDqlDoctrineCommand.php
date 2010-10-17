@@ -21,8 +21,8 @@ use Doctrine\ORM\Tools\Console\Command\RunDqlCommand;
 /**
  * Execute a Doctrine DQL query and output the results.
  *
- * @author     Fabien Potencier <fabien.potencier@symfony-project.com>
- * @author     Jonathan H. Wage <jonwage@gmail.com>
+ * @author Fabien Potencier <fabien.potencier@symfony-project.com>
+ * @author Jonathan H. Wage <jonwage@gmail.com>
  */
 class RunDqlDoctrineCommand extends RunDqlCommand
 {

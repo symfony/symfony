@@ -14,7 +14,7 @@ namespace Symfony\Component\HttpKernel\Bundle;
 /**
  * BundleInterface.
  *
- * @author     Fabien Potencier <fabien.potencier@symfony-project.com>
+ * @author Fabien Potencier <fabien.potencier@symfony-project.com>
  */
 interface BundleInterface
 {

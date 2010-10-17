@@ -49,7 +49,7 @@ namespace Symfony\Component\HttpFoundation;
  * directory, and it will then fallback to the framework/ directory if not
  * found before giving up.
  *
- * @author     Fabien Potencier <fabien.potencier@symfony-project.org>
+ * @author Fabien Potencier <fabien.potencier@symfony-project.org>
  */
 class UniversalClassLoader
 {

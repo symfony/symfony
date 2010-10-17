@@ -19,8 +19,8 @@ use Doctrine\DBAL\Migrations\Tools\Console\Command\StatusCommand;
 /**
  * Command to view the status of a set of migrations.
  *
- * @author     Fabien Potencier <fabien.potencier@symfony-project.com>
- * @author     Jonathan H. Wage <jonwage@gmail.com>
+ * @author Fabien Potencier <fabien.potencier@symfony-project.com>
+ * @author Jonathan H. Wage <jonwage@gmail.com>
  */
 class MigrationsStatusDoctrineCommand extends StatusCommand
 {

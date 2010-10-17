@@ -23,7 +23,7 @@ use Symfony\Component\Finder\Finder;
 /**
  * Wrapper command for Phing tasks
  *
- * @author     Fabien Potencier <fabien.potencier@symfony-project.com>
+ * @author Fabien Potencier <fabien.potencier@symfony-project.com>
  */
 abstract class PhingCommand extends Command
 {

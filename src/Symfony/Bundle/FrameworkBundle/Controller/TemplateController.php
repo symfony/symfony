@@ -17,7 +17,7 @@ use Symfony\Component\HttpFoundation\Response;
 /**
  * TemplateController.
  *
- * @author     Fabien Potencier <fabien.potencier@symfony-project.com>
+ * @author Fabien Potencier <fabien.potencier@symfony-project.com>
  */
 class TemplateController extends ContainerAware
 {

@@ -16,7 +16,7 @@ use Symfony\Component\HttpFoundation\SessionStorage\SessionStorageInterface;
 /**
  * Session.
  *
- * @author     Fabien Potencier <fabien.potencier@symfony-project.com>
+ * @author Fabien Potencier <fabien.potencier@symfony-project.com>
  */
 class Session implements \Serializable
 {

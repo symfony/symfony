@@ -19,7 +19,7 @@ use Symfony\Component\Routing\RouteCollection;
  * This loader acts as an array of LoaderInterface objects - each having
  * a chance to load a given resource (handled by the resolver)
  *
- * @author     Fabien Potencier <fabien.potencier@symfony-project.com>
+ * @author Fabien Potencier <fabien.potencier@symfony-project.com>
  */
 class DelegatingLoader extends Loader
 {

@@ -17,7 +17,7 @@ use Symfony\Component\DependencyInjection\ContainerAware;
 /**
  * DefaultController.
  *
- * @author     Fabien Potencier <fabien.potencier@symfony-project.com>
+ * @author Fabien Potencier <fabien.potencier@symfony-project.com>
  */
 class DefaultController extends ContainerAware
 {

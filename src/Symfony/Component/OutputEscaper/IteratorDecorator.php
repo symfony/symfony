@@ -17,9 +17,9 @@ namespace Symfony\Component\OutputEscaper;
  * This takes an object that implements the Traversable interface and turns it
  * into an iterator with each value escaped.
  *
- * @see        Escaper
- * @author     Fabien Potencier <fabien.potencier@symfony-project.com>
- * @author     Mike Squire <mike@somosis.co.uk>
+ * @see    Escaper
+ * @author Fabien Potencier <fabien.potencier@symfony-project.com>
+ * @author Mike Squire <mike@somosis.co.uk>
  */
 class IteratorDecorator extends ObjectDecorator implements \Iterator, \Countable, \ArrayAccess
 {

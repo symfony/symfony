@@ -21,8 +21,8 @@ use Doctrine\ORM\Tools\Console\Command\EnsureProductionSettingsCommand;
 /**
  * Ensure the Doctrine ORM is configured properly for a production environment.
  *
- * @author     Fabien Potencier <fabien.potencier@symfony-project.com>
- * @author     Jonathan H. Wage <jonwage@gmail.com>
+ * @author Fabien Potencier <fabien.potencier@symfony-project.com>
+ * @author Jonathan H. Wage <jonwage@gmail.com>
  */
 class EnsureProductionSettingsDoctrineCommand extends EnsureProductionSettingsCommand
 {

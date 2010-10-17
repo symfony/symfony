@@ -21,7 +21,7 @@ use Symfony\Component\Console\Output\Output;
 /**
  * BuildCommand.
  *
- * @author     Fabien Potencier <fabien.potencier@symfony-project.com>
+ * @author Fabien Potencier <fabien.potencier@symfony-project.com>
  */
 class BuildModelCommand extends PhingCommand
 {

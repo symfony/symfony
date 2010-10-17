@@ -14,7 +14,7 @@ namespace Symfony\Component\Process;
 /**
  * PhpProcess runs a PHP script in an independent process.
  *
- * @author     Fabien Potencier <fabien.potencier@symfony-project.com>
+ * @author Fabien Potencier <fabien.potencier@symfony-project.com>
  */
 class PhpProcess extends Process
 {

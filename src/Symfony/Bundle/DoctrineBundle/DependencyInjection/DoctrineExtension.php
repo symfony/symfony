@@ -21,8 +21,8 @@ use Symfony\Component\DependencyInjection\Resource\FileResource;
 /**
  * DoctrineExtension is an extension for the Doctrine DBAL and ORM library.
  *
- * @author     Jonathan H. Wage <jonwage@gmail.com>
- * @author     Fabien Potencier <fabien.potencier@symfony-project.com>
+ * @author Jonathan H. Wage <jonwage@gmail.com>
+ * @author Fabien Potencier <fabien.potencier@symfony-project.com>
  */
 class DoctrineExtension extends Extension
 {

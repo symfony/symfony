@@ -17,7 +17,7 @@ use Symfony\Component\Routing\Router;
 /**
  * RouterHelper manages links between pages in a template context.
  *
- * @author     Fabien Potencier <fabien.potencier@symfony-project.com>
+ * @author Fabien Potencier <fabien.potencier@symfony-project.com>
  */
 class RouterHelper extends Helper
 {

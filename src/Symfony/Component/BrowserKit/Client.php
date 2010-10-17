@@ -27,7 +27,7 @@ use Symfony\Component\BrowserKit\Client;
  * If you want to be able to run requests in their own process (insulated flag),
  * you need to also implement the getScript() method.
  *
- * @author     Fabien Potencier <fabien.potencier@symfony-project.com>
+ * @author Fabien Potencier <fabien.potencier@symfony-project.com>
  */
 abstract class Client
 {

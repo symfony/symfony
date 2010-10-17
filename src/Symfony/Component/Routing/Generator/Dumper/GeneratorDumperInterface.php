@@ -14,7 +14,7 @@ namespace Symfony\Component\Routing\Generator\Dumper;
 /**
  * GeneratorDumperInterface is the interface that all generator dumper classes must implement.
  *
- * @author     Fabien Potencier <fabien.potencier@symfony-project.com>
+ * @author Fabien Potencier <fabien.potencier@symfony-project.com>
  */
 interface GeneratorDumperInterface
 {

@@ -20,7 +20,7 @@ use Symfony\Component\HttpFoundation\Response;
 
 /**
  *
- * @author     Fabien Potencier <fabien.potencier@symfony-project.org>
+ * @author Fabien Potencier <fabien.potencier@symfony-project.org>
  */
 abstract class Cache extends BaseCache
 {

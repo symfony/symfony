@@ -21,8 +21,8 @@ use Doctrine\DBAL\Tools\Console\Command\RunSqlCommand;
 /**
  * Execute a SQL query and output the results.
  *
- * @author     Fabien Potencier <fabien.potencier@symfony-project.com>
- * @author     Jonathan H. Wage <jonwage@gmail.com>
+ * @author Fabien Potencier <fabien.potencier@symfony-project.com>
+ * @author Jonathan H. Wage <jonwage@gmail.com>
  */
 class RunSqlDoctrineCommand extends RunSqlCommand
 {

@@ -21,7 +21,7 @@ use Symfony\Component\Routing\Loader\LoaderInterface;
  *
  * If also lazy-loads them.
  *
- * @author     Fabien Potencier <fabien.potencier@symfony-project.com>
+ * @author Fabien Potencier <fabien.potencier@symfony-project.com>
  */
 class LoaderResolver extends BaseLoaderResolver
 {

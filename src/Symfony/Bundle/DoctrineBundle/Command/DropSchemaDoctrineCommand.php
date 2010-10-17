@@ -21,8 +21,8 @@ use Doctrine\ORM\Tools\Console\Command\SchemaTool\DropCommand;
 /**
  * Command to drop the database schema for a set of classes based on their mappings.
  *
- * @author     Fabien Potencier <fabien.potencier@symfony-project.com>
- * @author     Jonathan H. Wage <jonwage@gmail.com>
+ * @author Fabien Potencier <fabien.potencier@symfony-project.com>
+ * @author Jonathan H. Wage <jonwage@gmail.com>
  */
 class DropSchemaDoctrineCommand extends DropCommand
 {

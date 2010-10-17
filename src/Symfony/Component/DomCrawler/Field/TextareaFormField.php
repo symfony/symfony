@@ -14,7 +14,7 @@ namespace Symfony\Component\DomCrawler\Field;
 /**
  * TextareaFormField represents a textarea form field (an HTML textarea tag).
  *
- * @author     Fabien Potencier <fabien.potencier@symfony-project.com>
+ * @author Fabien Potencier <fabien.potencier@symfony-project.com>
  */
 class TextareaFormField extends FormField
 {

@@ -19,8 +19,8 @@ use Doctrine\ORM\Tools\Console\Command\ClearCache\MetadataCommand;
 /**
  * Command to clear the metadata cache of the various cache drivers.
  *
- * @author     Fabien Potencier <fabien.potencier@symfony-project.com>
- * @author     Jonathan H. Wage <jonwage@gmail.com>
+ * @author Fabien Potencier <fabien.potencier@symfony-project.com>
+ * @author Jonathan H. Wage <jonwage@gmail.com>
  */
 class ClearMetadataCacheDoctrineCommand extends MetadataCommand
 {

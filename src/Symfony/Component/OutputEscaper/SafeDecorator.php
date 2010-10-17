@@ -14,7 +14,7 @@ namespace Symfony\Component\OutputEscaper;
 /**
  * Marks a variable as being safe for output.
  *
- * @author     Fabien Potencier <fabien.potencier@symfony-project.com>
+ * @author Fabien Potencier <fabien.potencier@symfony-project.com>
  */
 class SafeDecorator extends \ArrayIterator implements SafeDecoratorInterface
 {

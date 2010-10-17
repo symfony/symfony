@@ -14,7 +14,7 @@ namespace Symfony\Component\DependencyInjection;
 /**
  * ContainerInterface is the interface implemented by service container classes.
  *
- * @author     Fabien Potencier <fabien.potencier@symfony-project.com>
+ * @author Fabien Potencier <fabien.potencier@symfony-project.com>
  */
 interface ContainerInterface
 {

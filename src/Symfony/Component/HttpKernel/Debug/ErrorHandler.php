@@ -14,7 +14,7 @@ namespace Symfony\Component\HttpKernel\Debug;
 /**
  * ErrorHandler.
  *
- * @author     Fabien Potencier <fabien.potencier@symfony-project.com>
+ * @author Fabien Potencier <fabien.potencier@symfony-project.com>
  */
 class ErrorHandler
 {

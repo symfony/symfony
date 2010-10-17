@@ -24,8 +24,8 @@ use Doctrine\DBAL\Connection;
 /**
  * Database tool allows you to easily drop and create your configured databases.
  *
- * @author     Fabien Potencier <fabien.potencier@symfony-project.com>
- * @author     Jonathan H. Wage <jonwage@gmail.com>
+ * @author Fabien Potencier <fabien.potencier@symfony-project.com>
+ * @author Jonathan H. Wage <jonwage@gmail.com>
  */
 class DropDatabaseDoctrineCommand extends DoctrineCommand
 {

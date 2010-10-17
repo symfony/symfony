@@ -27,8 +27,8 @@ use Doctrine\ORM\Mapping\ClassMetadata;
 /**
  * Load data fixtures from bundles.
  *
- * @author     Fabien Potencier <fabien.potencier@symfony-project.com>
- * @author     Jonathan H. Wage <jonwage@gmail.com>
+ * @author Fabien Potencier <fabien.potencier@symfony-project.com>
+ * @author Jonathan H. Wage <jonwage@gmail.com>
  */
 class LoadDataFixturesDoctrineCommand extends DoctrineCommand
 {

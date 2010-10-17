@@ -18,7 +18,7 @@ use Symfony\Component\HttpKernel\Exception\FlattenException;
 /**
  * ExceptionDataCollector.
  *
- * @author     Fabien Potencier <fabien.potencier@symfony-project.com>
+ * @author Fabien Potencier <fabien.potencier@symfony-project.com>
  */
 class ExceptionDataCollector extends DataCollector
 {

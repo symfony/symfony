@@ -17,7 +17,7 @@ use Symfony\Component\Templating\Storage\FileStorage;
 /**
  * FilesystemLoader is a loader that read templates from the filesystem.
  *
- * @author     Fabien Potencier <fabien.potencier@symfony-project.com>
+ * @author Fabien Potencier <fabien.potencier@symfony-project.com>
  */
 class FilesystemLoader extends Loader
 {

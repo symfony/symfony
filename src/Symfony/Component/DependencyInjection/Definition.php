@@ -14,7 +14,7 @@ namespace Symfony\Component\DependencyInjection;
 /**
  * Definition represents a service definition.
  *
- * @author     Fabien Potencier <fabien.potencier@symfony-project.com>
+ * @author Fabien Potencier <fabien.potencier@symfony-project.com>
  */
 class Definition
 {

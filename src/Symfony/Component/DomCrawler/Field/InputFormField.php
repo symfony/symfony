@@ -17,7 +17,7 @@ namespace Symfony\Component\DomCrawler\Field;
  * For inputs with type of file, checkbox, or radio, there are other more
  * specialized classes (cf. FileFormField and ChoiceFormField).
  *
- * @author     Fabien Potencier <fabien.potencier@symfony-project.com>
+ * @author Fabien Potencier <fabien.potencier@symfony-project.com>
  */
 class InputFormField extends FormField
 {

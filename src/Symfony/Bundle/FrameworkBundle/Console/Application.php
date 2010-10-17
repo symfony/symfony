@@ -20,7 +20,7 @@ use Symfony\Component\HttpKernel\Kernel;
 /**
  * Application.
  *
- * @author     Fabien Potencier <fabien.potencier@symfony-project.com>
+ * @author Fabien Potencier <fabien.potencier@symfony-project.com>
  */
 class Application extends BaseApplication
 {

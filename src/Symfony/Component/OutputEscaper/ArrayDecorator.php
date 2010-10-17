@@ -14,9 +14,9 @@ namespace Symfony\Component\OutputEscaper;
 /**
  * Output escaping decorator class for arrays.
  *
- * @see        Escaper
- * @author     Fabien Potencier <fabien.potencier@symfony-project.com>
- * @author     Mike Squire <mike@somosis.co.uk>
+ * @see    Escaper
+ * @author Fabien Potencier <fabien.potencier@symfony-project.com>
+ * @author Mike Squire <mike@somosis.co.uk>
  */
 class ArrayDecorator extends GetterDecorator implements \Iterator, \ArrayAccess, \Countable
 {

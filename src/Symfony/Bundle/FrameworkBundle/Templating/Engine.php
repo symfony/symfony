@@ -21,7 +21,7 @@ use Symfony\Component\HttpFoundation\Response;
  * This engine knows how to render Symfony templates and automatically
  * escapes template parameters.
  *
- * @author     Fabien Potencier <fabien.potencier@symfony-project.com>
+ * @author Fabien Potencier <fabien.potencier@symfony-project.com>
  */
 class Engine extends BaseEngine
 {

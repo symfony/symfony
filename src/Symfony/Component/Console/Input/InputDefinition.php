@@ -21,7 +21,7 @@ namespace Symfony\Component\Console\Input;
  *       new InputOption('foo', 'f', InputOption::PARAMETER_REQUIRED),
  *     ));
  *
- * @author     Fabien Potencier <fabien.potencier@symfony-project.com>
+ * @author Fabien Potencier <fabien.potencier@symfony-project.com>
  */
 class InputDefinition
 {

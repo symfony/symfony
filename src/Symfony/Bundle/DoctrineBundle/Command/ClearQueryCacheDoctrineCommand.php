@@ -19,8 +19,8 @@ use Doctrine\ORM\Tools\Console\Command\ClearCache\QueryCommand;
 /**
  * Command to clear the query cache of the various cache drivers.
  *
- * @author     Fabien Potencier <fabien.potencier@symfony-project.com>
- * @author     Jonathan H. Wage <jonwage@gmail.com>
+ * @author Fabien Potencier <fabien.potencier@symfony-project.com>
+ * @author Jonathan H. Wage <jonwage@gmail.com>
  */
 class ClearQueryCacheDoctrineCommand extends QueryCommand
 {

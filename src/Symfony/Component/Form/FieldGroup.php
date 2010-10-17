@@ -18,7 +18,7 @@ use Symfony\Component\Form\Iterator\RecursiveFieldsWithPropertyPathIterator;
 /**
  * FieldGroup represents an array of widgets bind to names and values.
  *
- * @author     Fabien Potencier <fabien.potencier@symfony-project.com>
+ * @author Fabien Potencier <fabien.potencier@symfony-project.com>
  */
 class FieldGroup extends Field implements \IteratorAggregate, FieldGroupInterface
 {

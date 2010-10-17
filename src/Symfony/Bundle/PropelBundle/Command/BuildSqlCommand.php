@@ -22,7 +22,7 @@ use Symfony\Bundle\FrameworkBundle\Util\Filesystem;
 /**
  * BuildCommand.
  *
- * @author     Fabien Potencier <fabien.potencier@symfony-project.com>
+ * @author Fabien Potencier <fabien.potencier@symfony-project.com>
  */
 class BuildSqlCommand extends PhingCommand
 {

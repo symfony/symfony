@@ -37,6 +37,13 @@ class SafeDecoratorTest extends \PHPUnit_Framework_TestCase
         $this->assertEquals('ok', $safe->doSomething(), '->__call() invokes the embedded method');
     }
 
+    public function testMagicToString()
+    {
+        $safe = new SafeDecorator(new TestClass4());
+
+        $this->assertEquals('TestClass4', (string)$safe, '->__toString() invokes the embedded __toString method');
+    }
+
     public function testMagicIssetAndUnset()
     {
         $safe = new SafeDecorator(new TestClass3());
@@ -92,4 +99,12 @@ class TestClass3
     public
         $boolValue = true,
         $nullValue = null;
+}
+
+class TestClass4
+{
+    public function __toString()
+    {
+        return 'TestClass4';
+    }
 }

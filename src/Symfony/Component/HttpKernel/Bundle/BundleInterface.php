@@ -21,10 +21,10 @@ interface BundleInterface
     /**
      * Boots the Bundle.
      */
-    public function boot();
+    function boot();
 
     /**
      * Shutdowns the Bundle.
      */
-    public function shutdown();
+    function shutdown();
 }

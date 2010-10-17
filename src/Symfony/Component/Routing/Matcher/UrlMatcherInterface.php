@@ -27,5 +27,5 @@ interface UrlMatcherInterface
      *
      * @return array|false An array of parameters or false if no route matches
      */
-    public function match($url);
+    function match($url);
 }

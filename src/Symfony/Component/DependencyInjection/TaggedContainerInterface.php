@@ -25,5 +25,5 @@ interface TaggedContainerInterface
      *
      * @return array An array of tags
      */
-    public function findTaggedServiceIds($name);
+    function findTaggedServiceIds($name);
 }

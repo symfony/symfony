@@ -21,21 +21,21 @@ interface ParameterBagInterface
     /**
      * Clears all parameters.
      */
-    public function clear();
+    function clear();
 
     /**
      * Adds parameters to the service container parameters.
      *
      * @param array $parameters An array of parameters
      */
-    public function add(array $parameters);
+    function add(array $parameters);
 
     /**
      * Gets the service container parameters.
      *
      * @return array An array of parameters
      */
-    public function all();
+    function all();
 
     /**
      * Gets a service container parameter.
@@ -46,7 +46,7 @@ interface ParameterBagInterface
      *
      * @throws  \InvalidArgumentException if the parameter is not defined
      */
-    public function get($name);
+    function get($name);
 
     /**
      * Sets a service container parameter.
@@ -54,7 +54,7 @@ interface ParameterBagInterface
      * @param string $name       The parameter name
      * @param mixed  $parameters The parameter value
      */
-    public function set($name, $value);
+    function set($name, $value);
 
     /**
      * Returns true if a parameter name is defined.
@@ -63,5 +63,5 @@ interface ParameterBagInterface
      *
      * @return Boolean true if the parameter name is defined, false otherwise
      */
-    public function has($name);
+    function has($name);
 }

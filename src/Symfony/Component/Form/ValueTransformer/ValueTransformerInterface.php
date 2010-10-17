@@ -36,7 +36,7 @@ interface ValueTransformerInterface extends Localizable
      * @throws InvalidArgument  Exception when the argument is no string
      * @throws ValueTransformer Exception when the transformation fails
      */
-    public function transform($value);
+    function transform($value);
 
     /**
      * Transforms a value from the transformed representation to its original
@@ -54,5 +54,5 @@ interface ValueTransformerInterface extends Localizable
      *                              expected type
      * @throws ValueTransformer     Exception when the transformation fails
      */
-    public function reverseTransform($value, $originalValue);
+    function reverseTransform($value, $originalValue);
 }

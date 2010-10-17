@@ -23,5 +23,5 @@ interface Localizable
      *
      * @param string $locale
      */
-    public function setLocale($locale);
+    function setLocale($locale);
 }

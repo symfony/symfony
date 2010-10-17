@@ -28,7 +28,7 @@ interface ContainerInterface
      * @param string $id      The service identifier
      * @param object $service The service instance
      */
-    public function set($id, $service);
+    function set($id, $service);
 
     /**
      * Gets a service.
@@ -42,7 +42,7 @@ interface ContainerInterface
      *
      * @see Reference
      */
-    public function get($id, $invalidBehavior = self::EXCEPTION_ON_INVALID_REFERENCE);
+    function get($id, $invalidBehavior = self::EXCEPTION_ON_INVALID_REFERENCE);
 
     /**
      * Returns true if the given service is defined.
@@ -51,5 +51,5 @@ interface ContainerInterface
      *
      * @return Boolean true if the service is defined, false otherwise
      */
-    public function has($id);
+    function has($id);
 }

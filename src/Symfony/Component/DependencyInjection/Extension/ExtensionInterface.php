@@ -31,21 +31,21 @@ interface ExtensionInterface
      *
      * @throws \InvalidArgumentException When provided tag is not defined in this extension
      */
-    public function load($tag, array $config, ContainerBuilder $configuration);
+    function load($tag, array $config, ContainerBuilder $configuration);
 
     /**
      * Returns the namespace to be used for this extension (XML namespace).
      *
      * @return string The XML namespace
      */
-    public function getNamespace();
+    function getNamespace();
 
     /**
      * Returns the base path for the XSD files.
      *
      * @return string The XSD base path
      */
-    public function getXsdValidationBasePath();
+    function getXsdValidationBasePath();
 
     /**
      * Returns the recommended alias to use in XML.
@@ -54,5 +54,5 @@ interface ExtensionInterface
      *
      * @return string The alias
      */
-    public function getAlias();
+    function getAlias();
 }

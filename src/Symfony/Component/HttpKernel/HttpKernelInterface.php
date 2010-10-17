@@ -32,12 +32,12 @@ interface HttpKernelInterface
      *
      * @return Response $response A Response instance
      */
-    public function handle(Request $request = null, $type = self::MASTER_REQUEST, $raw = false);
+    function handle(Request $request = null, $type = self::MASTER_REQUEST, $raw = false);
 
     /**
      * Gets the Request instance associated with the master request.
      *
      * @return Request A Request instance
      */
-    public function getRequest();
+    function getRequest();
 }

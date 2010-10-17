@@ -13,11 +13,11 @@ namespace Symfony\Component\Form\Configurator;
 
 interface ConfiguratorInterface
 {
-    public function initialize($object);
+    function initialize($object);
 
-    public function getClass($fieldName);
+    function getClass($fieldName);
 
-    public function getOptions($fieldName);
+    function getOptions($fieldName);
 
-    public function isRequired($fieldName);
+    function isRequired($fieldName);
 }

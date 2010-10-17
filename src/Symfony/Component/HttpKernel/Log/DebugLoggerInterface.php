@@ -26,12 +26,12 @@ interface DebugLoggerInterface
      *
      * @return array An array of logs
      */
-    public function getLogs();
+    function getLogs();
 
     /**
      * Returns the number of errors.
      *
      * @return integer The number of errors
      */
-    public function countErrors();
+    function countErrors();
 }

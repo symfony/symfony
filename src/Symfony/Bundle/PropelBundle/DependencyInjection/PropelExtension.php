@@ -10,10 +10,6 @@ use Symfony\Component\DependencyInjection\Reference;
 
 class PropelExtension extends Extension
 {
-    protected $resources = array(
-        'propel' => 'propel.xml',
-    );
-
     /**
      * Loads the Propel configuration.
      *
@@ -24,7 +20,7 @@ class PropelExtension extends Extension
     {
         if (!$container->hasDefinition('propel')) {
             $loader = new XmlFileLoader($container, __DIR__.'/../Resources/config');
-            $loader->load($this->resources['propel']);
+            $loader->load('propel.xml');
         }
 
         if (!$container->hasParameter('propel.path')) {
@@ -54,7 +50,7 @@ class PropelExtension extends Extension
     {
         if (!$container->hasDefinition('propel')) {
             $loader = new XmlFileLoader($container, __DIR__.'/../Resources/config');
-            $loader->load($this->resources['propel']);
+            $loader->load('propel.xml');
         }
 
         $defaultConnection = array(

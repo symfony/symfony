@@ -23,10 +23,6 @@ use Symfony\Component\DependencyInjection\Reference;
  */
 class SwiftMailerExtension extends Extension
 {
-    protected $resources = array(
-        'mailer' => 'swiftmailer.xml',
-    );
-
     /**
      * Loads the Swift Mailer configuration.
      *
@@ -45,7 +41,7 @@ class SwiftMailerExtension extends Extension
     {
         if (!$container->hasDefinition('swiftmailer.mailer')) {
             $loader = new XmlFileLoader($container, __DIR__.'/../Resources/config');
-            $loader->load($this->resources['mailer']);
+            $loader->load('swiftmailer.xml');
             $container->setAlias('mailer', 'swiftmailer.mailer');
         }
 

@@ -113,7 +113,7 @@ class Tokenizer
             if ('\\' === $result[strlen($result) - 1]) {
                 // next quote character is escaped
                 $pos = $next + 1;
-                $continue;
+                continue;
             }
 
             if (false !== strpos($result, '\\')) {

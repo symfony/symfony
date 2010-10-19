@@ -31,7 +31,7 @@ class AnonymousAuthenticationProvider implements AuthenticationProviderInterface
      */
     public function __construct($key)
     {
-        $this->key;
+        $this->key = $key;
     }
 
     /**

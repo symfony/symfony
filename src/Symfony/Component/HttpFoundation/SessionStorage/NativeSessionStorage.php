@@ -149,7 +149,6 @@ class NativeSessionStorage implements SessionStorageInterface
             return;
         }
 
-        // regenerate a new session id once per object
         session_regenerate_id($destroy);
 
         self::$sessionIdRegenerated = true;

@@ -61,7 +61,7 @@
 
         <service id="twig.security.form" class="Symfony\Bundle\TwigBundle\Extension\SecurityExtension">
             <tag name="twig.extension" />
-            <argument type="service" id="security.context" />
+            <argument type="service" id="security.context" on-invalid="ignore" />
         </service>
     </services>
 </container>

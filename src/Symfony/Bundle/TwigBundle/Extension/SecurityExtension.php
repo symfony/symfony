@@ -22,7 +22,7 @@ class SecurityExtension extends \Twig_Extension
 {
     protected $context;
 
-    public function __construct(SecurityContext $context)
+    public function __construct(SecurityContext $context = null)
     {
         $this->context = $context;
     }

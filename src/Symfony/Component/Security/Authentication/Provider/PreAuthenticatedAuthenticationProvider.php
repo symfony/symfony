@@ -26,8 +26,7 @@ use Symfony\Component\Security\Authentication\Token\TokenInterface;
  * requests, as they should already be pre-authenticated. However, the
  * AuthenticationUserDetailsService implementation may still throw a UsernameNotFoundException, for example.
  *
- * @author Ruud Senden
- * @since 2.0
+ * @author Fabien Potencier <fabien.potencier@symfony-project.com>
  */
 class PreAuthenticatedAuthenticationProvider implements AuthenticationProviderInterface
 {
@@ -37,8 +36,8 @@ class PreAuthenticatedAuthenticationProvider implements AuthenticationProviderIn
     /**
      * Constructor.
      *
-     * @param UserProviderInterface   $userProvider    A UserProviderInterface instance
-     * @param AccountCheckerInterface $accountChecker  An AccountCheckerInterface instance
+     * @param UserProviderInterface   $userProvider   A UserProviderInterface instance
+     * @param AccountCheckerInterface $accountChecker An AccountCheckerInterface instance
      */
     public function __construct(UserProviderInterface $userProvider, AccountCheckerInterface $accountChecker)
     {
@@ -51,9 +50,9 @@ class PreAuthenticatedAuthenticationProvider implements AuthenticationProviderIn
       */
      public function authenticate(TokenInterface $token)
      {
-        if (!$this->supports($token)) {
-            return null;
-        }
+         if (!$this->supports($token)) {
+             return null;
+         }
 
         if (null === $token->getUser()) {
             throw new BadCredentialsException('No pre-authenticated principal found in request.');

@@ -25,7 +25,7 @@ interface AuthenticationManagerInterface
     /**
      * Attempts to authenticates a TokenInterface object.
      *
-     * @param TokenInterface The TokenInterface instance to authenticate
+     * @param TokenInterface $token The TokenInterface instance to authenticate
      *
      * @return TokenInterface An authenticated TokenInterface instance
      *

@@ -35,8 +35,8 @@ class DaoAuthenticationProvider extends UserAuthenticationProvider
      * Constructor.
      *
      * @param UserProviderInterface    $userProvider    A UserProviderInterface instance
-     * @param PasswordEncoderInterface $passwordEncoder A PasswordEncoderInterface instance
      * @param AccountCheckerInterface  $accountChecker  An AccountCheckerInterface instance
+     * @param PasswordEncoderInterface $passwordEncoder A PasswordEncoderInterface instance
      */
     public function __construct(UserProviderInterface $userProvider, AccountCheckerInterface $accountChecker, PasswordEncoderInterface $passwordEncoder = null)
     {

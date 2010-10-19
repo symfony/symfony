@@ -33,7 +33,7 @@ class AccountChecker implements AccountCheckerInterface
         }
 
         if (!$account->isCredentialsNonExpired()) {
-            throw new CredentialsExpiredException("User credentials have expired.", $account);
+            throw new CredentialsExpiredException('User credentials have expired.', $account);
         }
     }
 
@@ -47,15 +47,15 @@ class AccountChecker implements AccountCheckerInterface
         }
 
         if (!$account->isAccountNonLocked()) {
-            throw new LockedException("User account is locked.", $account);
+            throw new LockedException('User account is locked.', $account);
         }
 
         if (!$account->isEnabled()) {
-            throw new DisabledException("User account is disabled.", $account);
+            throw new DisabledException('User account is disabled.', $account);
         }
 
         if (!$account->isAccountNonExpired()) {
-            throw new AccountExpiredException("User account has expired.", $account);
+            throw new AccountExpiredException('User account has expired.', $account);
         }
     }
 }

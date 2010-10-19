@@ -46,12 +46,13 @@ abstract class BasePasswordEncoder implements PasswordEncoderInterface
     /**
      * Merges a password and a salt.
      *
-     * @param password the password to be used (can be <code>null</code>)
-     * @param salt the salt to be used (can be <code>null</code>)
+     * @param string $password the password to be used
+     * @param string $salt the salt to be used
      *
-     * @return a merged password and salt <code>String</code>
+     * @return string a merged password and salt
      */
-    protected function mergePasswordAndSalt($password, $salt) {
+    protected function mergePasswordAndSalt($password, $salt)
+    {
         if (empty($salt)) {
             return $password;
         }

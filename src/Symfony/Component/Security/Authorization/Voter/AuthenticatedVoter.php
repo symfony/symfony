@@ -21,8 +21,8 @@ use Symfony\Component\Security\Authentication\Token\AnonymousToken;
  */
 class AuthenticatedVoter implements VoterInterface
 {
-    const IS_AUTHENTICATED_FULLY = "IS_AUTHENTICATED_FULLY";
-    const IS_AUTHENTICATED_ANONYMOUSLY = "IS_AUTHENTICATED_ANONYMOUSLY";
+    const IS_AUTHENTICATED_FULLY = 'IS_AUTHENTICATED_FULLY';
+    const IS_AUTHENTICATED_ANONYMOUSLY = 'IS_AUTHENTICATED_ANONYMOUSLY';
 
     /**
      * {@inheritdoc}

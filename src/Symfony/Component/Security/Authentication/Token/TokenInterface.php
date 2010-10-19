@@ -63,7 +63,7 @@ interface TokenInterface extends \Serializable
     /**
      * Sets the authenticated flag.
      *
-     * @param Boolean The authenticated flag
+     * @param Boolean $isAuthenticated The authenticated flag
      */
     function setAuthenticated($isAuthenticated);
 }

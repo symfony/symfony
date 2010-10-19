@@ -25,7 +25,7 @@ interface RoleHierarchyInterface
      * roles that are transitively reachable from them in the role
      * hierarchy.
      *
-     * @param  array $roles An array of directly assigned roles
+     * @param array $roles An array of directly assigned roles
      *
      * @return array An array of all reachable roles
      */

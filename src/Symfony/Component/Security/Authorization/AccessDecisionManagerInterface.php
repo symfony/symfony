@@ -26,8 +26,8 @@ interface AccessDecisionManagerInterface
      * Decides whether the access is possible or not.
      *
      * @param TokenInterface $token      A TokenInterface instance
-     * @param object         $object     The object to secure
      * @param array          $attributes An array of attributes associated with the method being invoked
+     * @param object         $object     The object to secure
      *
      * @return Boolean true if the access is granted, false otherwise
      */

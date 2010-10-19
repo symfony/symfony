@@ -123,6 +123,10 @@ class UniversalClassLoader
      */
     public function loadClass($class)
     {
+        if ('\\' === $class[0]) {
+            $class = substr($class, 1);
+        }
+
         if (false !== ($pos = strripos($class, '\\'))) {
             // namespaced class name
             $namespace = substr($class, 0, $pos);

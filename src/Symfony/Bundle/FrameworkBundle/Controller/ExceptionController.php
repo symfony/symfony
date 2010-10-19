@@ -42,6 +42,10 @@ class ExceptionController extends ContainerAware
             $currentContent .= $content;
         }
 
+        if ('Symfony\Component\Security\Exception\AccessDeniedException' === $exception->getClass()) {
+            $exception->setStatusCode($exception->getCode());
+        }
+
         $response = $this->container->get('templating')->renderResponse(
             'FrameworkBundle:Exception:'.($this->container->get('kernel')->isDebug() ? 'exception.php' : 'error.php'),
             array(
@@ -51,6 +55,7 @@ class ExceptionController extends ContainerAware
                 'embedded'       => $embedded,
             )
         );
+
         $response->setStatusCode($exception->getStatusCode());
 
         return $response;

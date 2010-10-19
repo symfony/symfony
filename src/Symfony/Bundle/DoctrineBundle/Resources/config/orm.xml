@@ -38,6 +38,9 @@
         <parameter key="doctrine.orm.xml_mapping_dirs">%doctrine.orm.metadata_driver.mapping_dirs%</parameter>
         <parameter key="doctrine.orm.yml_mapping_dirs">%doctrine.orm.metadata_driver.mapping_dirs%</parameter>
         <parameter key="doctrine.orm.metadata_driver.entity_dirs" type="collection"></parameter>
+
+        <!-- security/user -->
+        <parameter key="security.user.provider.entity.class">Symfony\Bundle\DoctrineBundle\Security\EntityUserProvider</parameter>
     </parameters>
 
     <services>
@@ -63,5 +66,7 @@
         <service id="doctrine.orm.metadata_driver.yml" class="%doctrine.orm.metadata.yml_class%">
             <argument>%doctrine.orm.metadata_driver.mapping_dirs%</argument>
         </service>
+
+        <service id="security.user.entity_manager" alias="doctrine.orm.default_entity_manager" />
     </services>
 </container>

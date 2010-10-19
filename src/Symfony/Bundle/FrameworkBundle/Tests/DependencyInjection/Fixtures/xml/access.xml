@@ -1,0 +1,17 @@
+<?xml version="1.0" ?>
+
+<srv:container xmlns="http://www.symfony-project.org/schema/dic/security"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xmlns:srv="http://www.symfony-project.org/schema/dic/services"
+    xsi:schemaLocation="http://www.symfony-project.org/schema/dic/services http://www.symfony-project.org/schema/dic/services/services-1.0.xsd">
+
+    <config>
+        <access-control>
+            <rule path="/blog/524" role="ROLE_USER" requires-channel="https" />
+            <rule role='IS_AUTHENTICATED_ANONYMOUSLY'>
+                <attribute key="_controller" pattern=".*\\BlogBundle\\.*" />
+                <path pattern="/blog/.*" />
+            </rule>
+        </access-control>
+    </config>
+</srv:container>

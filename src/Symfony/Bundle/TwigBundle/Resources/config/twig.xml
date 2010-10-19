@@ -58,5 +58,10 @@
             <argument type="service" id="templating.html.generator" />
             <argument>%twig.form.resources%</argument>
         </service>
+
+        <service id="twig.security.form" class="Symfony\Bundle\TwigBundle\Extension\SecurityExtension">
+            <tag name="twig.extension" />
+            <argument type="service" id="security.context" />
+        </service>
     </services>
 </container>

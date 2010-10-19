@@ -12,6 +12,7 @@
         <parameter key="data_collector.logger.class">Symfony\Component\HttpKernel\DataCollector\LoggerDataCollector</parameter>
         <parameter key="data_collector.exception.class">Symfony\Component\HttpKernel\DataCollector\ExceptionDataCollector</parameter>
         <parameter key="data_collector.events.class">Symfony\Component\HttpKernel\DataCollector\EventDataCollector</parameter>
+        <parameter key="data_collector.security.class">Symfony\Component\HttpKernel\DataCollector\SecurityDataCollector</parameter>
     </parameters>
 
     <services>
@@ -48,6 +49,11 @@
             <call method="setEventDispatcher">
                 <argument type="service" id="event_dispatcher" />
             </call>
+        </service>
+
+        <service id="data_collector.security" class="%data_collector.security.class%">
+            <tag name="data_collector" />
+            <argument type="service" id="security.context" on-invalid="ignore" />
         </service>
     </services>
 </container>

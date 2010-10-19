@@ -21,6 +21,13 @@ class NumberToLocalizedStringTransformerTest extends LocalizedTestCase
         $this->assertEquals('12345,912', $transformer->transform(12345.9123));
     }
 
+    public function testTransform_empty()
+    {
+        $transformer = new NumberToLocalizedStringTransformer();
+
+        $this->assertSame('', $transformer->transform(null));
+    }
+
     public function testTransformWithGrouping()
     {
         $transformer = new NumberToLocalizedStringTransformer(array(
@@ -69,6 +76,13 @@ class NumberToLocalizedStringTransformerTest extends LocalizedTestCase
         $this->assertEquals(1.5, $transformer->reverseTransform('1,5', null));
         $this->assertEquals(1234.5, $transformer->reverseTransform('1234,5', null));
         $this->assertEquals(12345.912, $transformer->reverseTransform('12345,912', null));
+    }
+
+    public function testReverseTransform_empty()
+    {
+        $transformer = new NumberToLocalizedStringTransformer();
+
+        $this->assertSame(null, $transformer->reverseTransform('', null));
     }
 
     public function testReverseTransformWithGrouping()

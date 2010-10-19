@@ -17,6 +17,7 @@ class BooleanToStringTransformerTest extends \PHPUnit_Framework_TestCase
     {
         $this->assertEquals('1', $this->transformer->transform(true));
         $this->assertEquals('', $this->transformer->transform(false));
+        $this->assertSame('', $this->transformer->transform(null));
     }
 
     public function testTransformExpectsBoolean()

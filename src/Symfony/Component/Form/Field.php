@@ -375,10 +375,8 @@ abstract class Field extends Configurable implements FieldInterface
      */
     protected function transform($value)
     {
-        if ($value === null) {
-            return '';
-        } else if (null === $this->valueTransformer) {
-            return $value;
+        if (null === $this->valueTransformer) {
+            return $value === null ? '' : $value;
         } else {
             return $this->valueTransformer->transform($value);
         }
@@ -392,10 +390,8 @@ abstract class Field extends Configurable implements FieldInterface
      */
     protected function reverseTransform($value)
     {
-        if ($value === '') {
-            return null;
-        } else if (null === $this->valueTransformer) {
-            return $value;
+        if (null === $this->valueTransformer) {
+            return $value === '' ? null : $value;
         } else {
             return $this->valueTransformer->reverseTransform($value, $this->data);
         }

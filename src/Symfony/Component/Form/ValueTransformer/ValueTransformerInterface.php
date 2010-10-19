@@ -31,10 +31,20 @@ interface ValueTransformerInterface extends Localizable
      *    it you might accept this value because its easily parsed, but the transformer still writes back
      *    "2009/10/10" onto the form field (for further displaying or other purposes).
      *
-     * @param  mixed $value     The value in the original representation
-     * @return mixed            The value in the transformed representation
-     * @throws InvalidArgument  Exception when the argument is no string
-     * @throws ValueTransformer Exception when the transformation fails
+     * This method must be able to deal with empty values. Usually this will
+     * be NULL, but depending on your implementation other empty values are
+     * possible as well (such as empty strings). The reasoning behind this is
+     * that value transformers must be chainable. If the transform() method
+     * of the first value transformer outputs NULL, the second value transformer
+     * must be able to process that value.
+     *
+     * By convention, transform() should return an empty string if NULL is
+     * passed.
+     *
+     * @param  mixed $value               The value in the original representation
+     * @return mixed                      The value in the transformed representation
+     * @throws InvalidArgumentException   when the argument is no string
+     * @throws ValueTransformerException  when the transformation fails
      */
     function transform($value);
 
@@ -42,17 +52,26 @@ interface ValueTransformerInterface extends Localizable
      * Transforms a value from the transformed representation to its original
      * representation.
      *
-     * This method must be able to deal with null values.
-     *
      * This method is called when {@link Field::bind()} is called to transform the requests tainted data
      * into an acceptable format for your data processing/model layer.
      *
-     * @param  mixed $value         The value in the transformed representation
-     * @param  mixed $originalValue The original value from the datasource that is about to be overwritten by the new value.
-     * @return mixed                The value in the original representation
-     * @throws InvalidArgument      Exception when the argument is not of the
-     *                              expected type
-     * @throws ValueTransformer     Exception when the transformation fails
+     * This method must be able to deal with empty values. Usually this will
+     * be an empty string, but depending on your implementation other empty
+     * values are possible as well (such as empty strings). The reasoning behind
+     * this is that value transformers must be chainable. If the
+     * reverseTransform() method of the first value transformer outputs an
+     * empty string, the second value transformer must be able to process that
+     * value.
+     *
+     * By convention, reverseTransform() should return NULL if an empty string
+     * is passed.
+     *
+     * @param  mixed $value               The value in the transformed representation
+     * @param  mixed $originalValue       The original value from the datasource that is about to be overwritten by the new value.
+     * @return mixed                      The value in the original representation
+     * @throws InvalidArgumentException   when the argument is not of the
+     *                                    expected type
+     * @throws ValueTransformerException  when the transformation fails
      */
     function reverseTransform($value, $originalValue);
 }

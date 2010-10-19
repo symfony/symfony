@@ -85,7 +85,6 @@ class TimeFieldTest extends DateTimeTestCase
         $data = array(
             'hour' => '3',
             'minute' => '4',
-            'second' => '0',
         );
 
         $field->bind($input);

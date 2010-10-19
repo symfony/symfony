@@ -11,8 +11,9 @@ namespace Symfony\Component\Form;
  * with this source code in the file LICENSE.
  */
 
-use Symfony\Component\Form\ValueTransformer\StringToDateTimeTransformer;
-use Symfony\Component\Form\ValueTransformer\TimestampToDateTimeTransformer;
+use Symfony\Component\Form\ValueTransformer\ReversedTransformer;
+use Symfony\Component\Form\ValueTransformer\DateTimeToStringTransformer;
+use Symfony\Component\Form\ValueTransformer\DateTimeToTimestampTransformer;
 use Symfony\Component\Form\ValueTransformer\DateTimeToArrayTransformer;
 use Symfony\Component\Form\ValueTransformer\ValueTransformerChain;
 
@@ -84,15 +85,15 @@ class DateTimeField extends FieldGroup
         $transformers = array();
 
         if ($this->getOption('type') == self::STRING) {
-            $transformers[] = new StringToDateTimeTransformer(array(
+            $transformers[] = new ReversedTransformer(new DateTimeToStringTransformer(array(
                 'input_timezone' => $this->getOption('data_timezone'),
                 'output_timezone' => $this->getOption('data_timezone'),
-            ));
+            )));
         } else if ($this->getOption('type') == self::TIMESTAMP) {
-            $transformers[] = new TimestampToDateTimeTransformer(array(
+            $transformers[] = new ReversedTransformer(new DateTimeToTimestampTransformer(array(
                 'input_timezone' => $this->getOption('data_timezone'),
                 'output_timezone' => $this->getOption('data_timezone'),
-            ));
+            )));
         }
 
         $transformers[] = new DateTimeToArrayTransformer(array(

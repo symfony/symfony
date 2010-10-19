@@ -13,8 +13,8 @@ namespace Symfony\Component\Form;
 
 use Symfony\Component\Form\ValueTransformer\ReversedTransformer;
 use Symfony\Component\Form\ValueTransformer\DateTimeToArrayTransformer;
-use Symfony\Component\Form\ValueTransformer\StringToDateTimeTransformer;
-use Symfony\Component\Form\ValueTransformer\TimestampToDateTimeTransformer;
+use Symfony\Component\Form\ValueTransformer\DateTimeToStringTransformer;
+use Symfony\Component\Form\ValueTransformer\DateTimeToTimestampTransformer;
 use Symfony\Component\Form\ValueTransformer\ValueTransformerChain;
 
 class TimeField extends FieldGroup
@@ -77,22 +77,28 @@ class TimeField extends FieldGroup
 
         $transformers = array();
 
+        $fields = array('hour', 'minute');
+
+        if ($this->getOption('with_seconds')) {
+            $fields[] = 'second';
+        }
+
         if ($this->getOption('type') == self::STRING) {
-            $transformers[] = new StringToDateTimeTransformer(array(
+            $transformers[] = new ReversedTransformer(new DateTimeToStringTransformer(array(
                 'format' => 'H:i:s',
                 'input_timezone' => $this->getOption('data_timezone'),
                 'output_timezone' => $this->getOption('data_timezone'),
-            ));
+            )));
         } else if ($this->getOption('type') == self::TIMESTAMP) {
-            $transformers[] = new TimestampToDateTimeTransformer(array(
+            $transformers[] = new ReversedTransformer(new DateTimeToTimestampTransformer(array(
                 'input_timezone' => $this->getOption('data_timezone'),
                 'output_timezone' => $this->getOption('data_timezone'),
-            ));
+            )));
         } else if ($this->getOption('type') === self::RAW) {
             $transformers[] = new ReversedTransformer(new DateTimeToArrayTransformer(array(
                 'input_timezone' => $this->getOption('data_timezone'),
                 'output_timezone' => $this->getOption('data_timezone'),
-                'fields' => array('hour', 'minute', 'second'),
+                'fields' => $fields,
             )));
         }
 
@@ -102,6 +108,7 @@ class TimeField extends FieldGroup
             // if the field is rendered as choice field, the values should be trimmed
             // of trailing zeros to render the selected choices correctly
             'pad' => $this->getOption('widget') == self::INPUT,
+            'fields' => $fields,
         ));
 
         $this->setValueTransformer(new ValueTransformerChain($transformers));

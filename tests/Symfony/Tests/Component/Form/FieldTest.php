@@ -221,21 +221,6 @@ class FieldTest extends \PHPUnit_Framework_TestCase
         $this->assertEquals('', $this->field->getDisplayedData());
     }
 
-    public function testValuesAreTransformedCorrectlyIfNull()
-    {
-        // The value is converted to an empty string and NOT passed to the
-        // value transformer
-        $transformer = $this->createMockTransformer();
-        $transformer->expects($this->never())
-                                ->method('transform');
-
-        $this->field->setValueTransformer($transformer);
-        $this->field->setData(null);
-
-        $this->assertSame(null, $this->field->getData());
-        $this->assertSame('', $this->field->getDisplayedData());
-    }
-
     public function testValuesAreTransformedCorrectlyIfNull_noValueTransformer()
     {
         $this->field->setData(null);
@@ -287,11 +272,12 @@ class FieldTest extends \PHPUnit_Framework_TestCase
             array('title')
         );
 
-        // 1. Empty values are always converted to NULL. They are never passed to
-        //    the value transformer
+        // 1. Empty values are converted to NULL by convention
         $transformer = $this->createMockTransformer();
-        $transformer->expects($this->never())
-                                ->method('reverseTransform');
+        $transformer->expects($this->once())
+                                ->method('reverseTransform')
+                                ->with($this->identicalTo(''))
+                                ->will($this->returnValue(null));
 
         $field->setValueTransformer($transformer);
 
@@ -315,18 +301,21 @@ class FieldTest extends \PHPUnit_Framework_TestCase
 
     public function testBoundValuesAreTransformedCorrectlyIfEmpty_processDataReturnsNull()
     {
-        // 1. Empty values are always converted to NULL. They are never passed to
-        //    the value transformer
+        // 1. Empty values are converted to NULL by convention
         $transformer = $this->createMockTransformer();
-        $transformer->expects($this->never())
-                                ->method('reverseTransform');
+        $transformer->expects($this->once())
+                                ->method('reverseTransform')
+                                ->with($this->identicalTo(''))
+                                ->will($this->returnValue(null));
 
         $this->field->setValueTransformer($transformer);
 
         // 2. The processed data is NULL and therefore transformed to an empty
-        //    string. It is NOT passed to the value transformer
-        $transformer->expects($this->never())
-                                ->method('transform');
+        //    string by convention
+        $transformer->expects($this->once())
+                                ->method('transform')
+                                ->with($this->identicalTo(null))
+                                ->will($this->returnValue(''));
 
         $this->field->bind('');
 

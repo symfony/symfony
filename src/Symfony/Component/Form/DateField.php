@@ -12,8 +12,8 @@ namespace Symfony\Component\Form;
  */
 
 use Symfony\Component\Form\ValueTransformer\ReversedTransformer;
-use Symfony\Component\Form\ValueTransformer\StringToDateTimeTransformer;
-use Symfony\Component\Form\ValueTransformer\TimestampToDateTimeTransformer;
+use Symfony\Component\Form\ValueTransformer\DateTimeToStringTransformer;
+use Symfony\Component\Form\ValueTransformer\DateTimeToTimestampTransformer;
 use Symfony\Component\Form\ValueTransformer\ValueTransformerChain;
 use Symfony\Component\Form\ValueTransformer\DateTimeToLocalizedStringTransformer;
 use Symfony\Component\Form\ValueTransformer\DateTimeToArrayTransformer;
@@ -102,16 +102,16 @@ class DateField extends HybridField
         $transformers = array();
 
         if ($this->getOption('type') === self::STRING) {
-            $transformers[] = new StringToDateTimeTransformer(array(
+            $transformers[] = new ReversedTransformer(new DateTimeToStringTransformer(array(
                 'input_timezone' => $this->getOption('data_timezone'),
                 'output_timezone' => $this->getOption('data_timezone'),
                 'format' => 'Y-m-d',
-            ));
+            )));
         } else if ($this->getOption('type') === self::TIMESTAMP) {
-            $transformers[] = new TimestampToDateTimeTransformer(array(
+            $transformers[] = new ReversedTransformer(new DateTimeToTimestampTransformer(array(
                 'output_timezone' => $this->getOption('data_timezone'),
                 'input_timezone' => $this->getOption('data_timezone'),
-            ));
+            )));
         } else if ($this->getOption('type') === self::RAW) {
             $transformers[] = new ReversedTransformer(new DateTimeToArrayTransformer(array(
                 'input_timezone' => $this->getOption('data_timezone'),

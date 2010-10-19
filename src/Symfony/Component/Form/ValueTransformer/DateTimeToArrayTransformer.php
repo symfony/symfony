@@ -49,6 +49,17 @@ class DateTimeToArrayTransformer extends BaseDateTimeTransformer
      */
     public function transform($dateTime)
     {
+        if ($dateTime === null) {
+            return array(
+                'year'    => '',
+                'month'   => '',
+                'day'     => '',
+                'hour'    => '',
+                'minute'  => '',
+                'second'  => '',
+            );
+        }
+
         if (!$dateTime instanceof \DateTime) {
             throw new \InvalidArgumentException('Expected value of type \DateTime');
         }
@@ -71,7 +82,8 @@ class DateTimeToArrayTransformer extends BaseDateTimeTransformer
 
         if (!$this->getOption('pad')) {
             foreach ($result as &$entry) {
-                $entry = (int)$entry;
+                // remove leading zeros
+                $entry = (string)(int)$entry;
             }
         }
 
@@ -86,6 +98,10 @@ class DateTimeToArrayTransformer extends BaseDateTimeTransformer
      */
     public function reverseTransform($value, $originalValue)
     {
+        if ($value === null) {
+            return null;
+        }
+
         $inputTimezone = $this->getOption('input_timezone');
         $outputTimezone = $this->getOption('output_timezone');
 
@@ -93,14 +109,18 @@ class DateTimeToArrayTransformer extends BaseDateTimeTransformer
             throw new \InvalidArgumentException(sprintf('Expected argument of type array, %s given', gettype($value)));
         }
 
+        if (implode('', $value) === '') {
+            return null;
+        }
+
         $dateTime = new \DateTime(sprintf(
             '%s-%s-%s %s:%s:%s %s',
-            isset($value['year']) ? $value['year'] : 1970,
-            isset($value['month']) ? $value['month'] : 1,
-            isset($value['day']) ? $value['day'] : 1,
-            isset($value['hour']) ? $value['hour'] : 0,
-            isset($value['minute']) ? $value['minute'] : 0,
-            isset($value['second']) ? $value['second'] : 0,
+            empty($value['year']) ? '1970' : $value['year'],
+            empty($value['month']) ? '1' : $value['month'],
+            empty($value['day']) ? '1' : $value['day'],
+            empty($value['hour']) ? '0' : $value['hour'],
+            empty($value['minute']) ? '0' : $value['minute'],
+            empty($value['second']) ? '0' : $value['second'],
             $outputTimezone
         ));
 

@@ -27,6 +27,10 @@ class BooleanToStringTransformer extends BaseValueTransformer
      */
     public function transform($value)
     {
+        if ($value === null) {
+            return '';
+        }
+
         if (!is_bool($value)) {
             throw new \InvalidArgumentException(sprintf('Expected argument of type boolean but got %s.', gettype($value)));
         }

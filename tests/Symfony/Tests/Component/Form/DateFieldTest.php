@@ -84,6 +84,23 @@ class DateFieldTest extends DateTimeTestCase
         $this->assertEquals($input, $field->getDisplayedData());
     }
 
+    public function testBind_fromChoice_empty()
+    {
+        $field = new DateField('name', array('widget' => DateField::CHOICE, 'required' => false));
+
+        $input = array(
+            'day' => '',
+            'month' => '',
+            'year' => '',
+        );
+
+        $field->setLocale('de_AT');
+        $field->bind($input);
+
+        $this->assertSame(null, $field->getData());
+        $this->assertEquals($input, $field->getDisplayedData());
+    }
+
     public function testSetData_differentTimezones()
     {
         $field = new DateField('name', array(

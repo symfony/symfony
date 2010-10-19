@@ -375,6 +375,18 @@ class Request
     }
 
     /**
+     * Generates a normalized URI for the given path.
+     *
+     * @param string $path A path to use instead of the current one
+     *
+     * @return string The normalized URI for the path
+     */
+    public function getUriForPath($path)
+    {
+        return $this->getScheme().'://'.$this->getHost().':'.$this->getPort().$this->getScriptName().$path;
+    }
+
+    /**
      * Generates the normalized query string for the Request.
      *
      * It builds a normalized query string, where keys/value pairs are alphabetized

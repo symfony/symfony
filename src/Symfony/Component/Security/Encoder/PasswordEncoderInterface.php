@@ -22,7 +22,7 @@ interface PasswordEncoderInterface
      * Encodes the raw password.
      *
      * @param string $raw  The password to encode
-     * @param stirng $salt The salt
+     * @param string $salt The salt
      *
      * @return string The encoded password
      */

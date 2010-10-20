@@ -55,6 +55,8 @@
         <parameter key="security.logout_listener.class">Symfony\Component\HttpKernel\Security\Firewall\LogoutListener</parameter>
 
         <parameter key="security.authentication.switchuser_listener.class">Symfony\Component\HttpKernel\Security\Firewall\SwitchUserListener</parameter>
+        <parameter key="security.authentication.switchuser.role">ROLE_ALLOWED_TO_SWITCH</parameter>
+        <parameter key="security.authentication.switchuser.parameter">_switch_user</parameter>
 
         <parameter key="security.access.decision_manager.class">Symfony\Bundle\FrameworkBundle\Security\Authorization\AccessDecisionManager</parameter>
         <parameter key="security.access.simple_role_voter.class">Symfony\Component\Security\Authorization\Voter\RoleVoter</parameter>

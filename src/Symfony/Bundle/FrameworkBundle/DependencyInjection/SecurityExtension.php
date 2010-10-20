@@ -535,6 +535,14 @@ class SecurityExtension extends Extension
         $arguments[1] = new Reference($userProvider);
         $listener->setArguments($arguments);
 
+        if (isset($config['role'])) {
+            $container->setParameter('security.authentication.switchuser.role', $config['role']);
+        }
+
+        if (isset($config['parameter'])) {
+            $container->setParameter('security.authentication.switchuser.parameter', $config['parameter']);
+        }
+
         return $switchUserListenerId;
     }
 

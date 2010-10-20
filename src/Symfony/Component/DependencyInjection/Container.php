@@ -195,8 +195,6 @@ class Container implements ContainerInterface, \ArrayAccess
 
         if (self::EXCEPTION_ON_INVALID_REFERENCE === $invalidBehavior) {
             throw new \InvalidArgumentException(sprintf('The service "%s" does not exist.', $id));
-        } else {
-            return null;
         }
     }
 

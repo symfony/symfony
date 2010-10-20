@@ -204,6 +204,14 @@ class SecurityExtension extends Extension
         // Logout listener
         if (array_key_exists('logout', $firewall)) {
             $listeners[] = new Reference('security.logout_listener');
+
+            if (isset($firewall['logout']['path'])) {
+                $container->setParameter('security.authentication.form.logout_path', $firewall['logout']['path']);
+            }
+
+            if (isset($firewall['logout']['target'])) {
+                $container->setParameter('security.authentication.form.target_path', $firewall['logout']['target']);
+            }
         }
 
         // Authentication listeners

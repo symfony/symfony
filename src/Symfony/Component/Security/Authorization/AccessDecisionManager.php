@@ -185,7 +185,7 @@ class AccessDecisionManager implements AccessDecisionManagerInterface
         }
 
         if ($grant > $deny) {
-            return;
+            return true;
         }
 
         if ($deny > $grant) {

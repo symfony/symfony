@@ -18,13 +18,11 @@ use Symfony\Component\Security\Authentication\Token\TokenInterface;
  */
 
 /**
- * Processes a pre-authenticated authentication request. The request will
- * typically originate from a {@link org.springframework.security.web.authentication.preauth.AbstractPreAuthenticatedProcessingFilter}
- * subclass.
+ * Processes a pre-authenticated authentication request.
  *
  * This authentication provider will not perform any checks on authentication
  * requests, as they should already be pre-authenticated. However, the
- * AuthenticationUserDetailsService implementation may still throw a UsernameNotFoundException, for example.
+ * UserProviderInterface implementation may still throw a UsernameNotFoundException, for example.
  *
  * @author Fabien Potencier <fabien.potencier@symfony-project.com>
  */

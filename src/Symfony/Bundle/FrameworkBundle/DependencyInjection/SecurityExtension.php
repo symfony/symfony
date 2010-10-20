@@ -206,11 +206,11 @@ class SecurityExtension extends Extension
             $listeners[] = new Reference('security.logout_listener');
 
             if (isset($firewall['logout']['path'])) {
-                $container->setParameter('security.authentication.form.logout_path', $firewall['logout']['path']);
+                $container->setParameter('security.logout.path', $firewall['logout']['path']);
             }
 
             if (isset($firewall['logout']['target'])) {
-                $container->setParameter('security.authentication.form.target_path', $firewall['logout']['target']);
+                $container->setParameter('security.logout.target_path', $firewall['logout']['target']);
             }
         }
 
@@ -445,6 +445,24 @@ class SecurityExtension extends Extension
         $arguments = $listener->getArguments();
         $arguments[1] = new Reference($provider);
         $listener->setArguments($arguments);
+
+        $options = array(
+            'check_path'                     => '/login_check',
+            'login_path'                     => '/login',
+            'always_use_default_target_path' => false,
+            'default_target_path'            => '/',
+            'target_path_parameter'          => '_target_path',
+            'use_referer'                    => false,
+            'failure_path'                   => null,
+            'failure_forward'                => false,
+        );
+        foreach (array_keys($options) as $key) {
+            if (isset($config[$key])) {
+                $options[$key] = $config[$key];
+            }
+        }
+        $container->setParameter('security.authentication.form.options', $options);
+        $container->setParameter('security.authentication.form.login_path', $options['login_path']);
 
         return array($provider, $listenerId);
     }

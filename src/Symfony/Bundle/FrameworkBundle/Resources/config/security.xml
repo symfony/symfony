@@ -25,14 +25,7 @@
 
         <parameter key="security.authentication.form_entry_point.class">Symfony\Component\HttpKernel\Security\EntryPoint\FormAuthenticationEntryPoint</parameter>
         <parameter key="security.authentication.form.login_path">/login</parameter>
-        <parameter key="security.authentication.form.check_path">/login_check</parameter>
-        <parameter key="security.authentication.form.logout_path">/logout</parameter>
-        <parameter key="security.authentication.form.target_path">/</parameter>
         <parameter key="security.authentication.listener.form.class">Symfony\Component\HttpKernel\Security\Firewall\UsernamePasswordFormAuthenticationListener</parameter>
-        <parameter key="security.authentication.listener.options">
-            <parameter key="login_path">%security.authentication.form.login_path%</parameter>
-            <parameter key="check_path">%security.authentication.form.check_path%</parameter>
-        </parameter>
 
         <parameter key="security.authentication.basic_entry_point.class">Symfony\Component\HttpKernel\Security\EntryPoint\BasicAuthenticationEntryPoint</parameter>
         <parameter key="security.authentication.basic_entry_point.realm">Symfony2</parameter>
@@ -53,6 +46,8 @@
         <parameter key="security.channel_listener.class">Symfony\Component\HttpKernel\Security\Firewall\ChannelListener</parameter>
 
         <parameter key="security.logout_listener.class">Symfony\Component\HttpKernel\Security\Firewall\LogoutListener</parameter>
+        <parameter key="security.logout.path">/logout</parameter>
+        <parameter key="security.logout.target_path">/</parameter>
 
         <parameter key="security.authentication.switchuser_listener.class">Symfony\Component\HttpKernel\Security\Firewall\SwitchUserListener</parameter>
         <parameter key="security.authentication.switchuser.role">ROLE_ALLOWED_TO_SWITCH</parameter>
@@ -118,8 +113,8 @@
 
         <service id="security.logout_listener" class="%security.logout_listener.class%">
             <argument type="service" id="security.context" />
-            <argument>%security.authentication.form.logout_path%</argument>
-            <argument>%security.authentication.form.target_path%</argument>
+            <argument>%security.logout.path%</argument>
+            <argument>%security.logout.target_path%</argument>
         </service>
 
         <service id="security.channel_listener" class="%security.channel_listener.class%">

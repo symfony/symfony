@@ -49,14 +49,14 @@ abstract class FormAuthenticationListener
         $this->logger = $logger;
 
         $this->options = array_merge(array(
-            'check_path'                    => '/login_check',
-            'login_path'                    => '/login',
-            'always_use_default_target_url' => false,
-            'default_target_url'            => '/',
-            'target_url_parameter'          => '_target_url',
-            'use_referer'                   => false,
-            'failure_url'                   => null,
-            'failure_forward'               => false,
+            'check_path'                     => '/login_check',
+            'login_path'                     => '/login',
+            'always_use_default_target_path' => false,
+            'default_target_path'            => '/',
+            'target_path_parameter'          => '_target_path',
+            'use_referer'                    => false,
+            'failure_path'                   => null,
+            'failure_forward'                => false,
         ), $options);
     }
 
@@ -118,28 +118,28 @@ abstract class FormAuthenticationListener
 
         $this->securityContext->setToken(null);
 
-        if (null === $this->options['failure_url']) {
-            $this->options['failure_url'] = $this->options['login_path'];
+        if (null === $this->options['failure_path']) {
+            $this->options['failure_path'] = $this->options['login_path'];
         }
 
         if ($this->options['failure_forward']) {
             if (null !== $this->logger) {
-                $this->logger->debug(sprintf('Forwarding to %s', $this->options['failure_url']));
+                $this->logger->debug(sprintf('Forwarding to %s', $this->options['failure_path']));
             }
 
-            $subRequest = Request::create($this->options['failure_url']);
+            $subRequest = Request::create($this->options['failure_path']);
             $subRequest->attributes->set(SecurityContext::AUTHENTICATION_ERROR, $failed->getMessage());
 
             return $event->getSubject()->handle($subRequest, HttpKernelInterface::SUB_REQUEST);
         } else {
             if (null !== $this->logger) {
-                $this->logger->debug(sprintf('Redirecting to %s', $this->options['failure_url']));
+                $this->logger->debug(sprintf('Redirecting to %s', $this->options['failure_path']));
             }
 
             $request->getSession()->set(SecurityContext::AUTHENTICATION_ERROR, $failed->getMessage());
 
             $response = new Response();
-            $response->setRedirect(0 !== strpos($this->options['failure_url'], 'http') ? $request->getUriForPath($this->options['failure_url']) : $this->options['failure_url'], 302);
+            $response->setRedirect(0 !== strpos($this->options['failure_path'], 'http') ? $request->getUriForPath($this->options['failure_path']) : $this->options['failure_path'], 302);
 
             return $response;
         }
@@ -169,17 +169,17 @@ abstract class FormAuthenticationListener
      */
     protected function determineTargetUrl(Request $request)
     {
-        if ($this->options['always_use_default_target_url']) {
-            return $this->options['default_target_url'];
+        if ($this->options['always_use_default_target_path']) {
+            return $this->options['default_target_path'];
         }
 
-        if ($targetUrl = $request->get($this->options['target_url_parameter'])) {
+        if ($targetUrl = $request->get($this->options['target_path_parameter'])) {
             return $targetUrl;
         }
 
         $session = $request->getSession();
-        if ($targetUrl = $session->get('_security.target_url')) {
-            $session->remove('_security.target_url');
+        if ($targetUrl = $session->get('_security.target_path')) {
+            $session->remove('_security.target_path');
 
             return $targetUrl;
         }
@@ -189,6 +189,6 @@ abstract class FormAuthenticationListener
             return $targetUrl;
         }
 
-        return $this->options['default_target_url'];
+        return $this->options['default_target_path'];
     }
 }

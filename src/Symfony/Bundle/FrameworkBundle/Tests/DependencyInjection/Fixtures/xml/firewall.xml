@@ -10,7 +10,7 @@
             <user name="foo" password="foo" roles="ROLE_USER" />
         </provider>
 
-        <firewall pattern="/login" security="none" />
+        <firewall pattern="/login" security="false" />
 
         <firewall stateless="true">
             <http-basic />

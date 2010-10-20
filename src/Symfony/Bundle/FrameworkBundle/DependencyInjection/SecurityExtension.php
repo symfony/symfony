@@ -174,7 +174,7 @@ class SecurityExtension extends Extension
         }
 
         // Security disabled?
-        if (isset($firewall['security']) && ('none' === $firewall['security'] || !$firewall['security'])) {
+        if (isset($firewall['security']) && !$firewall['security']) {
             return array($matcher, array(), null);
         }
 

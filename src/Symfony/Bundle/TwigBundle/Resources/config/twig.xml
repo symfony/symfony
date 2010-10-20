@@ -48,7 +48,7 @@
             <argument type="service" id="templating.html.generator" />
         </service>
 
-        <service id="twig.extension.helpers" class="Symfony\Bundle\TwigBundle\Extension\HelpersExtension">
+        <service id="twig.extension.helpers" class="Symfony\Bundle\TwigBundle\Extension\TemplatingExtension">
             <tag name="twig.extension" />
             <argument type="service" id="service_container" />
         </service>

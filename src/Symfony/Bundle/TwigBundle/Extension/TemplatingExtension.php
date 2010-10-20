@@ -4,6 +4,7 @@ namespace Symfony\Bundle\TwigBundle\Extension;
 
 use Symfony\Bundle\TwigBundle\TokenParser\HelperTokenParser;
 use Symfony\Component\DependencyInjection\ContainerInterface;
+use Symfony\Bundle\TwigBundle\TokenParser\IncludeTokenParser;
 
 /*
  * This file is part of the Symfony package.
@@ -18,18 +19,25 @@ use Symfony\Component\DependencyInjection\ContainerInterface;
  *
  * @author Fabien Potencier <fabien.potencier@symfony-project.com>
  */
-class HelpersExtension extends \Twig_Extension
+class TemplatingExtension extends \Twig_Extension
 {
     protected $container;
+    protected $templating;
 
     public function __construct(ContainerInterface $container)
     {
         $this->container = $container;
+        $this->templating = $container->get('templating.engine');
     }
 
     public function getContainer()
     {
         return $this->container;
+    }
+
+    public function getTemplating()
+    {
+        return $this->templating;
     }
 
     /**
@@ -65,7 +73,7 @@ class HelpersExtension extends \Twig_Extension
             new HelperTokenParser('flash', '<name>', 'templating.helper.session', 'getFlash'),
 
             // {% include 'sometemplate.php' with ['something' : 'something2'] %}
-            new HelperTokenParser('include', '<name> [with <arguments:array>]', 'templating.engine', 'render'),
+            new IncludeTokenParser(),
         );
     }
 
@@ -76,6 +84,6 @@ class HelpersExtension extends \Twig_Extension
      */
     public function getName()
     {
-        return 'symfony.helpers';
+        return 'templating';
     }
 }

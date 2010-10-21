@@ -56,6 +56,6 @@ class MessageDigestPasswordEncoder extends BasePasswordEncoder
      */
     public function isPasswordValid($encoded, $raw, $salt)
     {
-        return $encoded === $this->encodePassword($raw, $salt);
+        return $this->comparePasswords($encoded, $this->encodePassword($raw, $salt));
     }
 }

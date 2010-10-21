@@ -41,9 +41,9 @@ class PlaintextPasswordEncoder extends BasePasswordEncoder
         $pass2 = $this->mergePasswordAndSalt($raw, $salt);
 
         if (!$this->ignorePasswordCase) {
-            return $encoded === $pass2;
+            return $this->comparePasswords($encoded, $pass2);
         } else {
-            return strtolower($encoded) === strtolower($pass2);
+            return $this->comparePasswords(strtolower($encoded), strtolower($pass2));
         }
     }
 }

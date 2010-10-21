@@ -63,4 +63,29 @@ abstract class BasePasswordEncoder implements PasswordEncoderInterface
 
         return $password.'{'.$salt.'}';
     }
+
+    /**
+     * Compares two passwords.
+     *
+     * This method implements a constant-time algorithm to compare
+     * passwords to avoid (remote) timing attacks.
+     *
+     * @param string $password1 The first password
+     * @param string $password2 The second password
+     *
+     * @return Boolean true if the two passwords are the same, false otherwise
+     */
+    protected function comparePasswords($password1, $password2)
+    {
+        if (strlen($password1) !== strlen($password2)) {
+            return false;
+        }
+
+        $result = 0;
+        for ($i = 0; $i < strlen($password1); $i++) {
+            $result |= ord($password1[$i]) ^ ord($password2[$i]);
+        }
+
+        return 0 === $result;
+    }
 }

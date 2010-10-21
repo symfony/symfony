@@ -271,4 +271,49 @@ class DateField extends HybridField
             'choices' => $this->generatePaddedChoices($this->getOption('days'), 2),
         )));
     }
+
+    /**
+     * Returns whether the year of the field's data is validd
+     *
+     * The year is valid if it is contained in the list passed to the field's
+     * option "years".
+     *
+     * @return boolean
+     */
+    public function isYearWithinRange()
+    {
+        $date = $this->getNormalizedData();
+
+        return $date === null || in_array($date->format('Y'), $this->getOption('years'));
+    }
+
+    /**
+     * Returns whether the month of the field's data is validd
+     *
+     * The month is valid if it is contained in the list passed to the field's
+     * option "months".
+     *
+     * @return boolean
+     */
+    public function isMonthWithinRange()
+    {
+        $date = $this->getNormalizedData();
+
+        return $date === null || in_array($date->format('m'), $this->getOption('months'));
+    }
+
+    /**
+     * Returns whether the day of the field's data is validd
+     *
+     * The day is valid if it is contained in the list passed to the field's
+     * option "days".
+     *
+     * @return boolean
+     */
+    public function isDayWithinRange()
+    {
+        $date = $this->getNormalizedData();
+
+        return $date === null || in_array($date->format('d'), $this->getOption('days'));
+    }
 }

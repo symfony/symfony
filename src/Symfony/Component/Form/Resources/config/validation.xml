@@ -38,4 +38,22 @@
       </constraint>
     </getter>
   </class>
+
+  <class name="Symfony\Component\Form\DateField">
+    <getter property="yearWithinRange">
+      <constraint name="AssertTrue">
+        <option name="message">The year is invalid</option>
+      </constraint>
+    </getter>
+    <getter property="monthWithinRange">
+      <constraint name="AssertTrue">
+        <option name="message">The month is invalid</option>
+      </constraint>
+    </getter>
+    <getter property="dayWithinRange">
+      <constraint name="AssertTrue">
+        <option name="message">The day is invalid</option>
+      </constraint>
+    </getter>
+  </class>
 </constraint-mapping>

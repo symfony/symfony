@@ -116,4 +116,121 @@ class DateFieldTest extends DateTimeTestCase
 
         $this->assertEquals('01.06.2010', $field->getDisplayedData());
     }
+
+    public function testIsYearWithinRange_returnsTrueIfWithin()
+    {
+        $field = new DateField('name', array(
+            'widget' => 'input',
+            'years' => array(2010, 2011),
+        ));
+
+        $field->setLocale('de_AT');
+        $field->bind('2.6.2010');
+
+        $this->assertTrue($field->isYearWithinRange());
+    }
+
+    public function testIsYearWithinRange_returnsTrueIfEmpty()
+    {
+        $field = new DateField('name', array(
+            'widget' => 'input',
+            'years' => array(2010, 2011),
+        ));
+
+        $field->setLocale('de_AT');
+        $field->bind('');
+
+        $this->assertTrue($field->isYearWithinRange());
+    }
+
+    public function testIsYearWithinRange_returnsFalseIfNotContained()
+    {
+        $field = new DateField('name', array(
+            'widget' => 'input',
+            'years' => array(2010, 2012),
+        ));
+
+        $field->setLocale('de_AT');
+        $field->bind('2.6.2011');
+
+        $this->assertFalse($field->isYearWithinRange());
+    }
+
+    public function testIsMonthWithinRange_returnsTrueIfWithin()
+    {
+        $field = new DateField('name', array(
+            'widget' => 'input',
+            'months' => array(6, 7),
+        ));
+
+        $field->setLocale('de_AT');
+        $field->bind('2.6.2010');
+
+        $this->assertTrue($field->isMonthWithinRange());
+    }
+
+    public function testIsMonthWithinRange_returnsTrueIfEmpty()
+    {
+        $field = new DateField('name', array(
+            'widget' => 'input',
+            'months' => array(6, 7),
+        ));
+
+        $field->setLocale('de_AT');
+        $field->bind('');
+
+        $this->assertTrue($field->isMonthWithinRange());
+    }
+
+    public function testIsMonthWithinRange_returnsFalseIfNotContained()
+    {
+        $field = new DateField('name', array(
+            'widget' => 'input',
+            'months' => array(6, 8),
+        ));
+
+        $field->setLocale('de_AT');
+        $field->bind('2.7.2010');
+
+        $this->assertFalse($field->isMonthWithinRange());
+    }
+
+    public function testIsDayWithinRange_returnsTrueIfWithin()
+    {
+        $field = new DateField('name', array(
+            'widget' => 'input',
+            'days' => array(6, 7),
+        ));
+
+        $field->setLocale('de_AT');
+        $field->bind('6.6.2010');
+
+        $this->assertTrue($field->isDayWithinRange());
+    }
+
+    public function testIsDayWithinRange_returnsTrueIfEmpty()
+    {
+        $field = new DateField('name', array(
+            'widget' => 'input',
+            'days' => array(6, 7),
+        ));
+
+        $field->setLocale('de_AT');
+        $field->bind('');
+
+        $this->assertTrue($field->isDayWithinRange());
+    }
+
+    public function testIsDayWithinRange_returnsFalseIfNotContained()
+    {
+        $field = new DateField('name', array(
+            'widget' => 'input',
+            'days' => array(6, 8),
+        ));
+
+        $field->setLocale('de_AT');
+        $field->bind('7.6.2010');
+
+        $this->assertFalse($field->isDayWithinRange());
+    }
 }

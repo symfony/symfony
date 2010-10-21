@@ -21,11 +21,11 @@ class HiddenField extends InputField
     /**
      * {@inheritDoc}
      */
-    public function getAttributes()
+    public function __construct($key, array $options = array())
     {
-        return array_merge(parent::getAttributes(), array(
-            'type' => 'hidden',
-        ));
+        $options['type'] = 'hidden';
+
+        parent::__construct($key, $options);
     }
 
     /**

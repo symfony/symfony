@@ -16,13 +16,15 @@ namespace Symfony\Component\Form;
  *
  * @author Bernhard Schussek <bernhard.schussek@symfony-project.com>
  */
-class UrlField extends InputField
+class UrlField extends TextField
 {
     /**
      * {@inheritDoc}
      */
     protected function configure()
     {
+        parent::configure();
+
         $this->addOption('default_protocol', 'http');
     }
 

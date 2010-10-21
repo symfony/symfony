@@ -23,8 +23,20 @@ class NumberField extends InputField
     /**
      * {@inheritDoc}
      */
+    public function __construct($key, array $options = array())
+    {
+        $options['type'] = 'text';
+
+        parent::__construct($key, $options);
+    }
+
+    /**
+     * {@inheritDoc}
+     */
     protected function configure()
     {
+        parent::configure();
+
         // default precision is locale specific (usually around 3)
         $this->addOption('precision');
         $this->addOption('grouping', false);
@@ -35,15 +47,5 @@ class NumberField extends InputField
             'grouping' => $this->getOption('grouping'),
             'rounding-mode' => $this->getOption('rounding-mode'),
         )));
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    public function getAttributes(array $attributes = array())
-    {
-        return array_merge(parent::getAttributes(), array(
-            'type'  => 'text',
-        ));
     }
 }

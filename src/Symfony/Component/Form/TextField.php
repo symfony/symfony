@@ -21,6 +21,16 @@ class TextField extends InputField
     /**
      * {@inheritDoc}
      */
+    public function __construct($key, array $options = array())
+    {
+        $options['type'] = 'text';
+
+        parent::__construct($key, $options);
+    }
+
+    /**
+     * {@inheritDoc}
+     */
     protected function configure()
     {
         parent::configure();
@@ -34,7 +44,6 @@ class TextField extends InputField
     public function getAttributes()
     {
         return array_merge(parent::getAttributes(), array(
-            'type'        => 'text',
             'maxlength'   => $this->getOption('max_length'),
         ));
     }

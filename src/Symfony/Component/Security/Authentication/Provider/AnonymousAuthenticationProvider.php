@@ -53,7 +53,7 @@ class AnonymousAuthenticationProvider implements AuthenticationProviderInterface
     /**
      * {@inheritdoc}
      */
-    public function supports($token)
+    public function supports(TokenInterface $token)
     {
         return $token instanceof AnonymousToken;
     }

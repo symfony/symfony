@@ -59,6 +59,25 @@ class FileTest extends \PHPUnit_Framework_TestCase
         $this->assertEquals(filesize($this->file->getPath()), $this->file->size());
     }
 
+    public function testMove()
+    {
+        $path = __DIR__.'/Fixtures/test.copy.gif';
+        $targetPath = __DIR__.'/Fixtures/test.target.gif';
+        @unlink($path);
+        @unlink($targetPath);
+        copy(__DIR__.'/Fixtures/test.gif', $path);
+
+        $file = new File($path);
+        $file->move($targetPath);
+
+        $this->assertTrue(file_exists($targetPath));
+        $this->assertFalse(file_exists($path));
+        $this->assertEquals($targetPath, $file->getPath());
+
+        @unlink($path);
+        @unlink($targetPath);
+    }
+
     protected function createMockGuesser($path, $mimeType)
     {
         $guesser = $this->getMock('Symfony\Component\HttpFoundation\File\MimeType\MimeTypeGuesserInterface');

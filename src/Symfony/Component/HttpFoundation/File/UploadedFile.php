@@ -117,6 +117,7 @@ class UploadedFile extends File
             }
 
             $this->moved = true;
+            $this->path = realpath($newPath);
         } else {
             parent::move($newPath);
         }

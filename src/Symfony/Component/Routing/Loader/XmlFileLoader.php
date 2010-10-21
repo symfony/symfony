@@ -95,8 +95,7 @@ class XmlFileLoader extends FileLoader
                     $options[(string) $node->getAttribute('key')] = trim((string) $node->nodeValue);
                     break;
                 case 'requirement':
-                    $requirement = explode(',', trim((string) $node->nodeValue));
-                    $requirements[(string) $node->getAttribute('key')] = $requirement;
+                    $requirements[(string) $node->getAttribute('key')] = trim((string) $node->nodeValue);
                     break;
                 default:
                     throw new \InvalidArgumentException(sprintf('Unable to parse tag "%s"', $node->tagName));

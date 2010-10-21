@@ -75,8 +75,6 @@ class TimeField extends FieldGroup
             }
         }
 
-        $transformers = array();
-
         $fields = array('hour', 'minute');
 
         if ($this->getOption('with_seconds')) {
@@ -157,5 +155,50 @@ class TimeField extends FieldGroup
         }
 
         return $choices;
+    }
+
+    /**
+     * Returns whether the hour of the field's data is valid
+     *
+     * The hour is valid if it is contained in the list passed to the field's
+     * option "hours".
+     *
+     * @return boolean
+     */
+    public function isHourWithinRange()
+    {
+        $date = $this->getNormalizedData();
+
+        return $date === null || in_array($date->format('H'), $this->getOption('hours'));
+    }
+
+    /**
+     * Returns whether the minute of the field's data is valid
+     *
+     * The minute is valid if it is contained in the list passed to the field's
+     * option "minutes".
+     *
+     * @return boolean
+     */
+    public function isMinuteWithinRange()
+    {
+        $date = $this->getNormalizedData();
+
+        return $date === null || in_array($date->format('i'), $this->getOption('minutes'));
+    }
+
+    /**
+     * Returns whether the second of the field's data is valid
+     *
+     * The second is valid if it is contained in the list passed to the field's
+     * option "seconds".
+     *
+     * @return boolean
+     */
+    public function isSecondWithinRange()
+    {
+        $date = $this->getNormalizedData();
+
+        return $date === null || in_array($date->format('s'), $this->getOption('seconds'));
     }
 }

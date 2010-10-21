@@ -56,4 +56,22 @@
       </constraint>
     </getter>
   </class>
+
+  <class name="Symfony\Component\Form\TimeField">
+    <getter property="hourWithinRange">
+      <constraint name="AssertTrue">
+        <option name="message">The hour is invalid</option>
+      </constraint>
+    </getter>
+    <getter property="minuteWithinRange">
+      <constraint name="AssertTrue">
+        <option name="message">The minutes are invalid</option>
+      </constraint>
+    </getter>
+    <getter property="secondWithinRange">
+      <constraint name="AssertTrue">
+        <option name="message">The seconds are invalid</option>
+      </constraint>
+    </getter>
+  </class>
 </constraint-mapping>

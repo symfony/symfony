@@ -132,4 +132,106 @@ class TimeFieldTest extends DateTimeTestCase
 
         $this->assertEquals($displayedData, $field->getDisplayedData());
     }
+
+    public function testIsHourWithinRange_returnsTrueIfWithin()
+    {
+        $field = new TimeField('name', array(
+            'hours' => array(6, 7),
+        ));
+
+        $field->bind(array('hour' => '06', 'minute' => '12'));
+
+        $this->assertTrue($field->isHourWithinRange());
+    }
+
+    public function testIsHourWithinRange_returnsTrueIfEmpty()
+    {
+        $field = new TimeField('name', array(
+            'hours' => array(6, 7),
+        ));
+
+        $field->bind(array('hour' => '', 'minute' => ''));
+
+        $this->assertTrue($field->isHourWithinRange());
+    }
+
+    public function testIsHourWithinRange_returnsFalseIfNotContained()
+    {
+        $field = new TimeField('name', array(
+            'hours' => array(6, 7),
+        ));
+
+        $field->bind(array('hour' => '08', 'minute' => '12'));
+
+        $this->assertFalse($field->isHourWithinRange());
+    }
+
+    public function testIsMinuteWithinRange_returnsTrueIfWithin()
+    {
+        $field = new TimeField('name', array(
+            'minutes' => array(6, 7),
+        ));
+
+        $field->bind(array('hour' => '06', 'minute' => '06'));
+
+        $this->assertTrue($field->isMinuteWithinRange());
+    }
+
+    public function testIsMinuteWithinRange_returnsTrueIfEmpty()
+    {
+        $field = new TimeField('name', array(
+            'minutes' => array(6, 7),
+        ));
+
+        $field->bind(array('hour' => '', 'minute' => ''));
+
+        $this->assertTrue($field->isMinuteWithinRange());
+    }
+
+    public function testIsMinuteWithinRange_returnsFalseIfNotContained()
+    {
+        $field = new TimeField('name', array(
+            'minutes' => array(6, 7),
+        ));
+
+        $field->bind(array('hour' => '06', 'minute' => '08'));
+
+        $this->assertFalse($field->isMinuteWithinRange());
+    }
+
+    public function testIsSecondWithinRange_returnsTrueIfWithin()
+    {
+        $field = new TimeField('name', array(
+            'seconds' => array(6, 7),
+            'with_seconds' => true,
+        ));
+
+        $field->bind(array('hour' => '04', 'minute' => '05', 'second' => '06'));
+
+        $this->assertTrue($field->isSecondWithinRange());
+    }
+
+    public function testIsSecondWithinRange_returnsTrueIfEmpty()
+    {
+        $field = new TimeField('name', array(
+            'seconds' => array(6, 7),
+            'with_seconds' => true,
+        ));
+
+        $field->bind(array('hour' => '', 'minute' => ''));
+
+        $this->assertTrue($field->isSecondWithinRange());
+    }
+
+    public function testIsSecondWithinRange_returnsFalseIfNotContained()
+    {
+        $field = new TimeField('name', array(
+            'seconds' => array(6, 7),
+            'with_seconds' => true,
+        ));
+
+        $field->bind(array('hour' => '04', 'minute' => '05', 'second' => '08'));
+
+        $this->assertFalse($field->isSecondWithinRange());
+    }
 }

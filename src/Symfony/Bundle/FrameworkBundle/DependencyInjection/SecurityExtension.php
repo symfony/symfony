@@ -379,8 +379,13 @@ class SecurityExtension extends Extension
                 $username = $user['name'];
             }
 
-            if (!isset($user['password'])) {
-                $user['password'] = '';
+            if (!array_key_exists('password', $user)) {
+                // if no password is provided explicitly, it means that
+                // the user will be used with OpenID, X.509 certificates, ...
+                // Let's generate a random password just to be sure this
+                // won't be used accidentally with other authentication schemes.
+                // If you want an empty password, just say so explicitly
+                $user['password'] = uniqid();
             }
 
             if (!isset($user['roles'])) {

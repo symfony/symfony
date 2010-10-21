@@ -36,7 +36,7 @@ abstract class BasePasswordEncoder implements PasswordEncoderInterface
         $saltBegins = strrpos($mergedPasswordSalt, '{');
 
         if (false !== $saltBegins && $saltBegins + 1 < strlen($mergedPasswordSalt)) {
-            $salt = substr($mergedPasswordSalt, $saltBegins + 1, strlen($mergedPasswordSalt) - 1);
+            $salt = substr($mergedPasswordSalt, $saltBegins + 1, -1);
             $password = substr($mergedPasswordSalt, 0, $saltBegins);
         }
 

@@ -53,24 +53,15 @@ class AuthenticatedVoter implements VoterInterface
 
             $result = VoterInterface::ACCESS_DENIED;
 
-            if (self::IS_AUTHENTICATED_FULLY === $attribute) {
-                if ($this->isFullyAuthenticated($token)) {
-                    return VoterInterface::ACCESS_GRANTED;
-                }
+            if (self::IS_AUTHENTICATED_FULLY === $attribute && !$token instanceof AnonymousToken) {
+                return VoterInterface::ACCESS_GRANTED;
             }
 
             if (self::IS_AUTHENTICATED_ANONYMOUSLY === $attribute) {
-                if (null === $token || $token instanceof AnonymousToken || $this->isFullyAuthenticated($token)) {
-                    return VoterInterface::ACCESS_GRANTED;
-                }
+                return VoterInterface::ACCESS_GRANTED;
             }
         }
 
         return $result;
-    }
-
-    protected function isFullyAuthenticated(TokenInterface $token)
-    {
-        return null !== $token && !$token instanceof AnonymousToken;
     }
 }

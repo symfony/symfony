@@ -14,6 +14,38 @@ namespace Symfony\Component\Form;
 use Symfony\Component\Form\ValueTransformer\ValueTransformerInterface;
 use Symfony\Component\Form\ValueTransformer\TransformationFailedException;
 
+/**
+ * Base class for form fields
+ *
+ * To implement your own form fields, you need to have a thorough understanding
+ * of the data flow within a form field. A form field stores its data in three
+ * different representations:
+ *
+ *   (1) the format required by the form's object
+ *   (2) a normalized format for internal processing
+ *   (3) the format used for display
+ *
+ * A date field, for example, may store a date as "Y-m-d" string (1) in the
+ * object. To facilitate processing in the field, this value is normalized
+ * to a DateTime object (2). In the HTML representation of your form, a
+ * localized string (3) is presented to and modified by the user.
+ *
+ * In most cases, format (1) and format (2) will be the same. For example,
+ * a checkbox field uses a boolean value both for internal processing as for
+ * storage in the object. In these cases you simply need to set a value
+ * transformer to convert between formats (2) and (3). You can do this by
+ * calling setValueTransformer() in the configure() method.
+ *
+ * In some cases though it makes sense to make format (1) configurable. To
+ * demonstrate this, let's extend our above date field to store the value
+ * either as "Y-m-d" string or as timestamp. Internally we still want to
+ * use a DateTime object for processing. To convert the data from string/integer
+ * to DateTime you can set a normalization transformer by calling
+ * setNormalizationTransformer() in configure(). The normalized data is then
+ * converted to the displayed data as described before.
+ *
+ * @author Bernhard Schussek <bernhard.schussek@symfony-project.com>
+ */
 abstract class Field extends Configurable implements FieldInterface
 {
     protected $taintedData = null;
@@ -25,7 +57,9 @@ abstract class Field extends Configurable implements FieldInterface
     private $bound = false;
     private $required = null;
     private $data = null;
+    private $normalizedData = null;
     private $transformedData = null;
+    private $normalizationTransformer = null;
     private $valueTransformer = null;
     private $propertyPath = null;
 
@@ -44,7 +78,8 @@ abstract class Field extends Configurable implements FieldInterface
 
         parent::__construct($options);
 
-        $this->transformedData = $this->transform($this->data);
+        $this->normalizedData = $this->normalize($this->data);
+        $this->transformedData = $this->transform($this->normalizedData);
         $this->required = $this->getOption('required');
 
         $this->setPropertyPath($this->getOption('property_path'));
@@ -209,7 +244,8 @@ abstract class Field extends Configurable implements FieldInterface
     public function setData($data)
     {
         $this->data = $data;
-        $this->transformedData = $this->transform($data);
+        $this->normalizedData = $this->normalize($data);
+        $this->transformedData = $this->transform($this->normalizedData);
     }
 
     /**
@@ -230,8 +266,9 @@ abstract class Field extends Configurable implements FieldInterface
         }
 
         try {
-            $this->data = $this->processData($this->reverseTransform($this->transformedData));
-            $this->transformedData = $this->transform($this->data);
+            $this->normalizedData = $this->processData($this->reverseTransform($this->transformedData));
+            $this->data = $this->denormalize($this->normalizedData);
+            $this->transformedData = $this->transform($this->normalizedData);
         } catch (TransformationFailedException $e) {
             // TODO better text
             // TESTME
@@ -265,6 +302,11 @@ abstract class Field extends Configurable implements FieldInterface
     public function getData()
     {
         return $this->data;
+    }
+
+    protected function getNormalizedData()
+    {
+        return $this->normalizedData;
     }
 
     /**
@@ -350,7 +392,29 @@ abstract class Field extends Configurable implements FieldInterface
      *
      * @param ValueTransformerInterface $valueTransformer
      */
-    public function setValueTransformer(ValueTransformerInterface $valueTransformer)
+    protected function setNormalizationTransformer(ValueTransformerInterface $normalizationTransformer)
+    {
+        $this->injectLocale($normalizationTransformer);
+
+        $this->normalizationTransformer = $normalizationTransformer;
+    }
+
+    /**
+     * Returns the ValueTransformer.
+     *
+     * @return ValueTransformerInterface
+     */
+    protected function getNormalizationTransformer()
+    {
+        return $this->normalizationTransformer;
+    }
+
+    /**
+     * Sets the ValueTransformer.
+     *
+     * @param ValueTransformerInterface $valueTransformer
+     */
+    protected function setValueTransformer(ValueTransformerInterface $valueTransformer)
     {
         $this->injectLocale($valueTransformer);
 
@@ -362,9 +426,39 @@ abstract class Field extends Configurable implements FieldInterface
      *
      * @return ValueTransformerInterface
      */
-    public function getValueTransformer()
+    protected function getValueTransformer()
     {
         return $this->valueTransformer;
+    }
+
+    /**
+     * Normalizes the value if a normalization transformer is set
+     *
+     * @param  mixed $value  The value to transform
+     * @return string
+     */
+    protected function normalize($value)
+    {
+        if (null === $this->normalizationTransformer) {
+            return $value;
+        } else {
+            return $this->normalizationTransformer->transform($value);
+        }
+    }
+
+    /**
+     * Reverse transforms a value if a normalization transformer is set.
+     *
+     * @param  string $value  The value to reverse transform
+     * @return mixed
+     */
+    protected function denormalize($value)
+    {
+        if (null === $this->normalizationTransformer) {
+            return $value;
+        } else {
+            return $this->normalizationTransformer->reverseTransform($value, $this->data);
+        }
     }
 
     /**

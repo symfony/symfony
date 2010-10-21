@@ -237,30 +237,43 @@ class FieldTest extends \PHPUnit_Framework_TestCase
             array('title')
         );
 
-        // 1. The value is converted to a string and passed to the value transformer
-        $transformer = $this->createMockTransformer();
-        $transformer->expects($this->once())
+        // 1a. The value is converted to a string and passed to the value transformer
+        $valueTransformer = $this->createMockTransformer();
+        $valueTransformer->expects($this->once())
                                 ->method('reverseTransform')
                                 ->with($this->identicalTo('0'))
                                 ->will($this->returnValue('reverse[0]'));
 
-        $field->setValueTransformer($transformer);
+        $field->setValueTransformer($valueTransformer);
 
         // 2. The output of the reverse transformation is passed to processData()
+        //    The processed data is accessible through getNormalizedData()
         $field->expects($this->once())
                     ->method('processData')
                     ->with($this->equalTo('reverse[0]'))
                     ->will($this->returnValue('processed[reverse[0]]'));
 
-        // 3. The processed data is transformed again (for displayed data)
-        $transformer->expects($this->once())
+        // 3. The processed data is denormalized and then accessible through
+        //    getData()
+        $normTransformer = $this->createMockTransformer();
+        $normTransformer->expects($this->once())
+                                ->method('reverseTransform')
+                                ->with($this->identicalTo('processed[reverse[0]]'))
+                                ->will($this->returnValue('denorm[processed[reverse[0]]]'));
+
+        $field->setNormalizationTransformer($normTransformer);
+
+        // 4. The processed data is transformed again and then accessible
+        //    through getDisplayedData()
+        $valueTransformer->expects($this->once())
                                 ->method('transform')
                                 ->with($this->equalTo('processed[reverse[0]]'))
                                 ->will($this->returnValue('transform[processed[reverse[0]]]'));
 
         $field->bind(0);
 
-        $this->assertEquals('processed[reverse[0]]', $field->getData());
+        $this->assertEquals('denorm[processed[reverse[0]]]', $field->getData());
+        $this->assertEquals('processed[reverse[0]]', $field->getNormalizedData());
         $this->assertEquals('transform[processed[reverse[0]]]', $field->getDisplayedData());
     }
 
@@ -333,18 +346,27 @@ class FieldTest extends \PHPUnit_Framework_TestCase
 
     public function testValuesAreTransformedCorrectly()
     {
-        // The value is passed to the value transformer
-        $transformer = $this->createMockTransformer();
-        $transformer->expects($this->once())
+        // The value is first passed to the normalization transformer...
+        $normTransformer = $this->createMockTransformer();
+        $normTransformer->expects($this->once())
                                 ->method('transform')
                                 ->with($this->identicalTo(0))
-                                ->will($this->returnValue('transform[0]'));
+                                ->will($this->returnValue('norm[0]'));
 
-        $this->field->setValueTransformer($transformer);
+        // ...and then to the value transformer
+        $valueTransformer = $this->createMockTransformer();
+        $valueTransformer->expects($this->once())
+                                ->method('transform')
+                                ->with($this->identicalTo('norm[0]'))
+                                ->will($this->returnValue('transform[norm[0]]'));
+
+        $this->field->setNormalizationTransformer($normTransformer);
+        $this->field->setValueTransformer($valueTransformer);
         $this->field->setData(0);
 
         $this->assertEquals(0, $this->field->getData());
-        $this->assertEquals('transform[0]', $this->field->getDisplayedData());
+        $this->assertEquals('norm[0]', $this->field->getNormalizedData());
+        $this->assertEquals('transform[norm[0]]', $this->field->getDisplayedData());
     }
 
     public function testBoundValuesAreTrimmedBeforeTransforming()

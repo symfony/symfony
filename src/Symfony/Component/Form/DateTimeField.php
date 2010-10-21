@@ -85,23 +85,25 @@ class DateTimeField extends FieldGroup
         $transformers = array();
 
         if ($this->getOption('type') == self::STRING) {
-            $transformers[] = new ReversedTransformer(new DateTimeToStringTransformer(array(
-                'input_timezone' => $this->getOption('data_timezone'),
-                'output_timezone' => $this->getOption('data_timezone'),
-            )));
+            $this->setNormalizationTransformer(new ReversedTransformer(
+                new DateTimeToStringTransformer(array(
+                    'input_timezone' => $this->getOption('data_timezone'),
+                    'output_timezone' => $this->getOption('data_timezone'),
+                ))
+            ));
         } else if ($this->getOption('type') == self::TIMESTAMP) {
-            $transformers[] = new ReversedTransformer(new DateTimeToTimestampTransformer(array(
-                'input_timezone' => $this->getOption('data_timezone'),
-                'output_timezone' => $this->getOption('data_timezone'),
-            )));
+            $this->setNormalizationTransformer(new ReversedTransformer(
+                new DateTimeToTimestampTransformer(array(
+                    'input_timezone' => $this->getOption('data_timezone'),
+                    'output_timezone' => $this->getOption('data_timezone'),
+                ))
+            ));
         }
 
-        $transformers[] = new DateTimeToArrayTransformer(array(
+        $this->setValueTransformer(new DateTimeToArrayTransformer(array(
             'input_timezone' => $this->getOption('data_timezone'),
             'output_timezone' => $this->getOption('user_timezone'),
-        ));
-
-        $this->setValueTransformer(new ValueTransformerChain($transformers));
+        )));
     }
 
     /**

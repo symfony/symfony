@@ -99,49 +99,49 @@ class DateField extends HybridField
 
         $this->initFormatter();
 
-        $transformers = array();
-
         if ($this->getOption('type') === self::STRING) {
-            $transformers[] = new ReversedTransformer(new DateTimeToStringTransformer(array(
-                'input_timezone' => $this->getOption('data_timezone'),
-                'output_timezone' => $this->getOption('data_timezone'),
-                'format' => 'Y-m-d',
-            )));
+            $this->setNormalizationTransformer(new ReversedTransformer(
+                new DateTimeToStringTransformer(array(
+                    'input_timezone' => $this->getOption('data_timezone'),
+                    'output_timezone' => $this->getOption('data_timezone'),
+                    'format' => 'Y-m-d',
+                ))
+            ));
         } else if ($this->getOption('type') === self::TIMESTAMP) {
-            $transformers[] = new ReversedTransformer(new DateTimeToTimestampTransformer(array(
-                'output_timezone' => $this->getOption('data_timezone'),
-                'input_timezone' => $this->getOption('data_timezone'),
-            )));
+            $this->setNormalizationTransformer(new ReversedTransformer(
+                new DateTimeToTimestampTransformer(array(
+                    'output_timezone' => $this->getOption('data_timezone'),
+                    'input_timezone' => $this->getOption('data_timezone'),
+                ))
+            ));
         } else if ($this->getOption('type') === self::RAW) {
-            $transformers[] = new ReversedTransformer(new DateTimeToArrayTransformer(array(
-                'input_timezone' => $this->getOption('data_timezone'),
-                'output_timezone' => $this->getOption('data_timezone'),
-                'fields' => array('year', 'month', 'day'),
-            )));
+            $this->setNormalizationTransformer(new ReversedTransformer(
+                new DateTimeToArrayTransformer(array(
+                    'input_timezone' => $this->getOption('data_timezone'),
+                    'output_timezone' => $this->getOption('data_timezone'),
+                    'fields' => array('year', 'month', 'day'),
+                ))
+            ));
         }
 
         if ($this->getOption('widget') === self::INPUT) {
-            $transformers[] = new DateTimeToLocalizedStringTransformer(array(
+            $this->setValueTransformer(new DateTimeToLocalizedStringTransformer(array(
                 'date_format' => $this->getOption('format'),
                 'time_format' => DateTimeToLocalizedStringTransformer::NONE,
                 'input_timezone' => $this->getOption('data_timezone'),
                 'output_timezone' => $this->getOption('user_timezone'),
-            ));
+            )));
 
             $this->setFieldMode(self::FIELD);
         } else {
-            $transformers[] = new DateTimeToArrayTransformer(array(
+            $this->setValueTransformer(new DateTimeToArrayTransformer(array(
                 'input_timezone' => $this->getOption('data_timezone'),
                 'output_timezone' => $this->getOption('user_timezone'),
-            ));
+            )));
 
             $this->setFieldMode(self::GROUP);
 
             $this->addChoiceFields();
-        }
-
-        if (count($transformers) > 0) {
-            $this->setValueTransformer(new ValueTransformerChain($transformers));
         }
     }
 

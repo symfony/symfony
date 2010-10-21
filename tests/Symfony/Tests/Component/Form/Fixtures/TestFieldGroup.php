@@ -2,15 +2,11 @@
 
 namespace Symfony\Tests\Component\Form\Fixtures;
 
-use Symfony\Component\Form\Field;
+use Symfony\Component\Form\FieldGroup;
 use Symfony\Component\Form\ValueTransformer\ValueTransformerInterface;
 
-class TestField extends Field
+class TestFieldGroup extends FieldGroup
 {
-    public function render(array $attributes = array())
-    {
-    }
-
     /**
      * Expose method for testing purposes
      */

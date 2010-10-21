@@ -1,31 +1,27 @@
 {% block group %}
     {{ group|render_errors }}
-    <table>
-        {% for field in group %}
-            {% if not field.ishidden %}
-                {{ field|render }}
-            {% endif %}
-        {% endfor %}
-    </table>
+    {% for field in group %}
+        {% if not field.ishidden %}
+            {{ field|render }}
+        {% endif %}
+    {% endfor %}
     {{ group|render_hidden }}
 {% endblock group %}
 
 {% block field %}
-    <tr>
-        <th>{{ field|render_label }}</th>
-        <td>
-            {{ field|render_errors }}
-            {{ field|render_widget }}
-        </td>
-    </tr>
+    <div>
+        {{ field|render_label }}
+        {{ field|render_errors }}
+        {{ field|render_widget }}
+    </div>
 {% endblock field %}
 
 {% block collection %}
-    <table>
+    <div>
         {% for field in collection %}
             {{ field|render }}
         {% endfor %}
-    </table>
+    </div>
 {% endblock collection %}
 
 {% block errors %}

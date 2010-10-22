@@ -63,6 +63,9 @@ class HelpersExtension extends \Twig_Extension
 
             // {% flash 'notice' %}
             new HelperTokenParser('flash', '<name>', 'templating.helper.session', 'getFlash'),
+
+            // {% include 'sometemplate.php' with ['something' : 'something2'] %}
+            new HelperTokenParser('include', '<name> [with <arguments:array>]', 'templating.engine', 'render'),
         );
     }
 

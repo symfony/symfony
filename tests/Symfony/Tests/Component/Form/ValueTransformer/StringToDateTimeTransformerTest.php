@@ -56,7 +56,7 @@ class StringToDateTimeTransformerTest extends DateTimeTestCase
         $output->setTimezone(new \DateTimeZone('UTC'));
         $output = $output->format('Y-m-d H:i:s');
 
-        $this->assertEquals($output, $transformer->reverseTransform($input));
+        $this->assertEquals($output, $transformer->reverseTransform($input, null));
     }
 
     public function testReverseTransform_differentTimezones()
@@ -70,7 +70,7 @@ class StringToDateTimeTransformerTest extends DateTimeTestCase
         $output = $input->format('Y-m-d H:i:s');
         $input->setTimezone(new \DateTimeZone('America/New_York'));
 
-        $this->assertEquals($output, $transformer->reverseTransform($input));
+        $this->assertEquals($output, $transformer->reverseTransform($input, null));
     }
 
     public function testReverseTransformExpectsDateTime()
@@ -78,6 +78,6 @@ class StringToDateTimeTransformerTest extends DateTimeTestCase
         $transformer = new StringToDateTimeTransformer();
 
         $this->setExpectedException('\InvalidArgumentException');
-        $transformer->reverseTransform('1234');
+        $transformer->reverseTransform('1234', null);
     }
 }

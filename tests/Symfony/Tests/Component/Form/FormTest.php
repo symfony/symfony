@@ -96,6 +96,7 @@ class FormTest extends \PHPUnit_Framework_TestCase
     public function testGeneratedCsrfSecretByDefault()
     {
         $form = new Form('author', new Author(), $this->validator);
+        $form->enableCsrfProtection();
 
         $this->assertTrue(strlen($form->getCsrfSecret()) >= 32);
     }
@@ -104,6 +105,7 @@ class FormTest extends \PHPUnit_Framework_TestCase
     {
         Form::setDefaultCsrfSecret('foobar');
         $form = new Form('author', new Author(), $this->validator);
+        $form->enableCsrfProtection();
 
         $this->assertEquals('foobar', $form->getCsrfSecret());
     }
@@ -112,6 +114,7 @@ class FormTest extends \PHPUnit_Framework_TestCase
     {
         Form::setDefaultCsrfFieldName('foobar');
         $form = new Form('author', new Author(), $this->validator);
+        $form->enableCsrfProtection();
 
         $this->assertEquals('foobar', $form->getCsrfFieldName());
     }

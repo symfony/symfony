@@ -166,6 +166,7 @@ class ChoiceField extends HybridField
     protected function transform($value)
     {
         if ($this->getOption('expanded')) {
+            $value = parent::transform($value);
             $choices = $this->getOption('choices');
 
             foreach ($choices as $choice => $_) {
@@ -205,12 +206,11 @@ class ChoiceField extends HybridField
             }
 
             if ($this->getOption('multiple')) {
-                return $choices;
+                $value = $choices;
             } else {
-                return count($choices) > 0 ? current($choices) : null;
+                $value =  count($choices) > 0 ? current($choices) : null;
             }
-        } else {
-            return parent::reverseTransform($value);
         }
+        return parent::reverseTransform($value);
     }
 }

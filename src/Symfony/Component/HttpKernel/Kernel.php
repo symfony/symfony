@@ -196,21 +196,7 @@ abstract class Kernel implements HttpKernelInterface, \Serializable
             $this->boot();
         }
 
-        if (null === $request) {
-            $request = $this->container->get('request');
-        } else {
-            $this->container->set('request', $request);
-        }
-
-        if (HttpKernelInterface::MASTER_REQUEST === $type) {
-            $this->request = $request;
-        }
-
-        $response = $this->container->getHttpKernelService()->handle($request, $type, $raw);
-
-        $this->container->set('request', $this->request);
-
-        return $response;
+        return $this->container->getHttpKernelService()->handle($request, $type, $raw);
     }
 
     /**

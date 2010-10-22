@@ -158,6 +158,11 @@ class Session implements \Serializable
         }
     }
 
+    public function invalidate()
+    {
+        $this->storage->regenerate();
+    }
+
     /**
      * Returns the locale
      *

@@ -14,13 +14,21 @@ namespace Symfony\Bundle\FrameworkBundle\Util;
 /**
  * Mustache.
  *
- * @author     Fabien Potencier <fabien.potencier@symfony-project.com>
+ * @author Fabien Potencier <fabien.potencier@symfony-project.com>
  */
 class Mustache
 {
-    static public function renderString($string, $parameters)
+    /**
+     * Renders a single line. Looks for {{ var }}
+     *
+     * @param string $string
+     * @param array $parameters
+     *
+     * @return string
+     */
+    static public function renderString($string, array $parameters)
     {
-        $replacer = function ($match) use($parameters)
+        $replacer = function ($match) use ($parameters)
         {
             return isset($parameters[$match[1]]) ? $parameters[$match[1]] : $match[0];
         };
@@ -28,12 +36,24 @@ class Mustache
         return preg_replace_callback('/{{\s*(.+?)\s*}}/', $replacer, $string);
     }
 
-    static public function renderFile($file, $parameters)
+    /**
+     * Renders a file by replacing the contents of $file with rendered output.
+     *
+     * @param string $file filename for the file to be rendered
+     * @param array $parameters
+     */
+    static public function renderFile($file, array $parameters)
     {
         file_put_contents($file, static::renderString(file_get_contents($file), $parameters));
     }
 
-    static public function renderDir($dir, $parameters)
+    /**
+     * Renders a directory recursively
+     *
+     * @param string $dir Path to the directory that will be recursively rendered
+     * @param array $parameters
+     */
+    static public function renderDir($dir, array $parameters)
     {
         foreach (new \RecursiveIteratorIterator(new \RecursiveDirectoryIterator($dir), \RecursiveIteratorIterator::LEAVES_ONLY) as $file) {
             if ($file->isFile()) {

@@ -121,7 +121,7 @@ class HtmlGenerator implements HtmlGeneratorInterface
             if (is_array($option)) {
                 $options[] = $this->contentTag(
                     'optgroup',
-                    "\n".renderChoices($option, $selected)."\n",
+                    "\n".$this->doChoices($option, $selected)."\n",
                     array('label' => $this->escape($key))
                 );
             } else {

@@ -32,7 +32,6 @@ class TransTest extends TestCase
 
             echo $twig->compile($twig->parse($twig->tokenize($twig->getLoader()->getSource('index'), 'index')))."\n\n";
             $this->assertEquals($expected, $this->getTemplate($template)->render($variables));
-            exit();
         }
 
         $this->assertEquals($expected, $this->getTemplate($template)->render($variables));

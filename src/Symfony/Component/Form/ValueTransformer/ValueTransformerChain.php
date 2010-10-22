@@ -66,10 +66,10 @@ class ValueTransformerChain implements ValueTransformerInterface
      * @param  mixed $value  The transformed value
      * @return mixed         The reverse-transformed value
      */
-    public function reverseTransform($value)
+    public function reverseTransform($value, $originalValue)
     {
         for ($i = count($this->transformers) - 1; $i >= 0; --$i) {
-            $value = $this->transformers[$i]->reverseTransform($value);
+            $value = $this->transformers[$i]->reverseTransform($value, $originalValue);
         }
 
         return $value;

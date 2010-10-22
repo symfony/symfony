@@ -31,6 +31,9 @@ class EventDispatcher
     public function connect($name, $listener, $priority = 0)
     {
         if (!isset($this->listeners[$name][$priority])) {
+            if (!isset($this->listeners[$name])) {
+                $this->listeners[$name] = array();
+            }
             $this->listeners[$name][$priority] = array();
         }
 
@@ -49,6 +52,11 @@ class EventDispatcher
     {
         if (!isset($this->listeners[$name])) {
             return false;
+        }
+
+        if (null === $listener) {
+            unset($this->listeners[$name]);
+            return;
         }
 
         foreach ($this->listeners[$name] as $priority => $callables) {

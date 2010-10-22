@@ -5,6 +5,7 @@ namespace Symfony\Bundle\TwigBundle\Extension;
 use Symfony\Component\Form\Form;
 use Symfony\Component\Form\FieldGroupInterface;
 use Symfony\Component\Form\FieldInterface;
+use Symfony\Component\Form\CollectionField;
 use Symfony\Bundle\TwigBundle\TokenParser\FormThemeTokenParser;
 use Symfony\Bundle\FrameworkBundle\Templating\HtmlGeneratorInterface;
 
@@ -96,6 +97,13 @@ class FormExtension extends \Twig_Extension
         if ($field instanceof Form || get_class($field) === 'Symfony\Component\Form\FieldGroup') {
             return $this->templates['group']->getBlock('group', array(
                 'group'      => $field,
+                'attributes' => $attributes,
+            ));
+        }
+
+        if ($field instanceof CollectionField) {
+            return $this->templates['group']->getBlock('collection', array(
+                'collection' => $field,
                 'attributes' => $attributes,
             ));
         }

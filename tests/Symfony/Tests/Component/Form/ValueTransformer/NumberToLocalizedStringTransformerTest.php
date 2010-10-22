@@ -65,10 +65,10 @@ class NumberToLocalizedStringTransformerTest extends LocalizedTestCase
         $transformer = new NumberToLocalizedStringTransformer();
         $transformer->setLocale('de_AT');
 
-        $this->assertEquals(1, $transformer->reverseTransform('1'));
-        $this->assertEquals(1.5, $transformer->reverseTransform('1,5'));
-        $this->assertEquals(1234.5, $transformer->reverseTransform('1234,5'));
-        $this->assertEquals(12345.912, $transformer->reverseTransform('12345,912'));
+        $this->assertEquals(1, $transformer->reverseTransform('1', null));
+        $this->assertEquals(1.5, $transformer->reverseTransform('1,5', null));
+        $this->assertEquals(1234.5, $transformer->reverseTransform('1234,5', null));
+        $this->assertEquals(12345.912, $transformer->reverseTransform('12345,912', null));
     }
 
     public function testReverseTransformWithGrouping()
@@ -78,10 +78,10 @@ class NumberToLocalizedStringTransformerTest extends LocalizedTestCase
         ));
         $transformer->setLocale('de_AT');
 
-        $this->assertEquals(1234.5, $transformer->reverseTransform('1.234,5'));
-        $this->assertEquals(12345.912, $transformer->reverseTransform('12.345,912'));
-        $this->assertEquals(1234.5, $transformer->reverseTransform('1234,5'));
-        $this->assertEquals(12345.912, $transformer->reverseTransform('12345,912'));
+        $this->assertEquals(1234.5, $transformer->reverseTransform('1.234,5', null));
+        $this->assertEquals(12345.912, $transformer->reverseTransform('12.345,912', null));
+        $this->assertEquals(1234.5, $transformer->reverseTransform('1234,5', null));
+        $this->assertEquals(12345.912, $transformer->reverseTransform('12345,912', null));
     }
 
     public function testTransformExpectsNumeric()
@@ -99,6 +99,6 @@ class NumberToLocalizedStringTransformerTest extends LocalizedTestCase
 
         $this->setExpectedException('\InvalidArgumentException');
 
-        $transformer->reverseTransform(1);
+        $transformer->reverseTransform(1, null);
     }
 }

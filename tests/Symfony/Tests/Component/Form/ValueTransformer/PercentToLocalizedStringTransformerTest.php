@@ -49,10 +49,10 @@ class PercentToLocalizedStringTransformerTest extends LocalizedTestCase
         $transformer = new PercentToLocalizedStringTransformer();
         $transformer->setLocale('de_AT');
 
-        $this->assertEquals(0.1, $transformer->reverseTransform('10'));
-        $this->assertEquals(0.15, $transformer->reverseTransform('15'));
-        $this->assertEquals(0.12, $transformer->reverseTransform('12'));
-        $this->assertEquals(2, $transformer->reverseTransform('200'));
+        $this->assertEquals(0.1, $transformer->reverseTransform('10', null));
+        $this->assertEquals(0.15, $transformer->reverseTransform('15', null));
+        $this->assertEquals(0.12, $transformer->reverseTransform('12', null));
+        $this->assertEquals(2, $transformer->reverseTransform('200', null));
     }
 
     public function testReverseTransformWithInteger()
@@ -62,10 +62,10 @@ class PercentToLocalizedStringTransformerTest extends LocalizedTestCase
         ));
         $transformer->setLocale('de_AT');
 
-        $this->assertEquals(10, $transformer->reverseTransform('10'));
-        $this->assertEquals(15, $transformer->reverseTransform('15'));
-        $this->assertEquals(12, $transformer->reverseTransform('12'));
-        $this->assertEquals(200, $transformer->reverseTransform('200'));
+        $this->assertEquals(10, $transformer->reverseTransform('10', null));
+        $this->assertEquals(15, $transformer->reverseTransform('15', null));
+        $this->assertEquals(12, $transformer->reverseTransform('12', null));
+        $this->assertEquals(200, $transformer->reverseTransform('200', null));
     }
 
     public function testReverseTransformWithPrecision()
@@ -75,7 +75,7 @@ class PercentToLocalizedStringTransformerTest extends LocalizedTestCase
         ));
         $transformer->setLocale('de_AT');
 
-        $this->assertEquals(0.1234, $transformer->reverseTransform('12,34'));
+        $this->assertEquals(0.1234, $transformer->reverseTransform('12,34', null));
     }
 
     public function testTransformExpectsNumeric()
@@ -93,6 +93,6 @@ class PercentToLocalizedStringTransformerTest extends LocalizedTestCase
 
         $this->setExpectedException('\InvalidArgumentException');
 
-        $transformer->reverseTransform(1);
+        $transformer->reverseTransform(1, null);
     }
 }

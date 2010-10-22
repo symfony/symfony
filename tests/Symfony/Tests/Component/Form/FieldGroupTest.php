@@ -153,7 +153,9 @@ class FieldGroupTest extends \PHPUnit_Framework_TestCase
         $group = new FieldGroup('author');
         $group->add($field);
 
-        $group->addError('Message', array(), new PropertyPath('fields[firstName].data'), FieldGroup::FIELD_ERROR);
+        $path = new PropertyPath('fields[firstName].data');
+
+        $group->addError('Message', array(), $path->getIterator(), FieldGroup::FIELD_ERROR);
     }
 
     public function testAddErrorMapsFieldValidationErrorsOntoFieldsWithinNestedFieldGroups()
@@ -168,7 +170,9 @@ class FieldGroupTest extends \PHPUnit_Framework_TestCase
         $innerGroup->add($field);
         $group->add($innerGroup);
 
-        $group->addError('Message', array(), new PropertyPath('fields[names].fields[firstName].data'), FieldGroup::FIELD_ERROR);
+        $path = new PropertyPath('fields[names].fields[firstName].data');
+
+        $group->addError('Message', array(), $path->getIterator(), FieldGroup::FIELD_ERROR);
     }
 
     public function testAddErrorKeepsFieldValidationErrorsIfFieldNotFound()
@@ -180,7 +184,9 @@ class FieldGroupTest extends \PHPUnit_Framework_TestCase
         $group = new FieldGroup('author');
         $group->add($field);
 
-        $group->addError('Message', array(), new PropertyPath('fields[bar].data'), FieldGroup::FIELD_ERROR);
+        $path = new PropertyPath('fields[bar].data');
+
+        $group->addError('Message', array(), $path->getIterator(), FieldGroup::FIELD_ERROR);
 
         $this->assertEquals(array(array('Message', array())), $group->getErrors());
     }
@@ -197,7 +203,9 @@ class FieldGroupTest extends \PHPUnit_Framework_TestCase
         $group = new FieldGroup('author');
         $group->add($field);
 
-        $group->addError('Message', array(), new PropertyPath('fields[firstName].data'), FieldGroup::FIELD_ERROR);
+        $path = new PropertyPath('fields[firstName].data');
+
+        $group->addError('Message', array(), $path->getIterator(), FieldGroup::FIELD_ERROR);
 
         $this->assertEquals(array(array('Message', array())), $group->getErrors());
     }
@@ -206,6 +214,7 @@ class FieldGroupTest extends \PHPUnit_Framework_TestCase
     {
         // path is expected to point at "firstName"
         $expectedPath = new PropertyPath('firstName');
+        $expectedPathIterator = $expectedPath->getIterator();
 
         $field = $this->createMockField('firstName');
         $field->expects($this->any())
@@ -213,12 +222,14 @@ class FieldGroupTest extends \PHPUnit_Framework_TestCase
                     ->will($this->returnValue(new PropertyPath('firstName')));
         $field->expects($this->once())
                     ->method('addError')
-                    ->with($this->equalTo('Message'), array(), $this->equalTo($expectedPath), $this->equalTo(FieldGroup::DATA_ERROR));
+                    ->with($this->equalTo('Message'), array(), $this->equalTo($expectedPathIterator), $this->equalTo(FieldGroup::DATA_ERROR));
 
         $group = new FieldGroup('author');
         $group->add($field);
 
-        $group->addError('Message', array(), new PropertyPath('firstName'), FieldGroup::DATA_ERROR);
+        $path = new PropertyPath('firstName');
+
+        $group->addError('Message', array(), $path->getIterator(), FieldGroup::DATA_ERROR);
     }
 
     public function testAddErrorKeepsDataValidationErrorsIfFieldNotFound()
@@ -233,7 +244,9 @@ class FieldGroupTest extends \PHPUnit_Framework_TestCase
         $group = new FieldGroup('author');
         $group->add($field);
 
-        $group->addError('Message', array(), new PropertyPath('bar'), FieldGroup::DATA_ERROR);
+        $path = new PropertyPath('bar');
+
+        $group->addError('Message', array(), $path->getIterator(), FieldGroup::DATA_ERROR);
     }
 
     public function testAddErrorKeepsDataValidationErrorsIfFieldIsHidden()
@@ -251,14 +264,17 @@ class FieldGroupTest extends \PHPUnit_Framework_TestCase
         $group = new FieldGroup('author');
         $group->add($field);
 
-        $group->addError('Message', array(), new PropertyPath('firstName'), FieldGroup::DATA_ERROR);
+        $path = new PropertyPath('firstName');
+
+        $group->addError('Message', array(), $path->getIterator(), FieldGroup::DATA_ERROR);
     }
 
     public function testAddErrorMapsDataValidationErrorsOntoNestedFields()
     {
         // path is expected to point at "street"
         $expectedPath = new PropertyPath('address.street');
-        $expectedPath->next();
+        $expectedPathIterator = $expectedPath->getIterator();
+        $expectedPathIterator->next();
 
         $field = $this->createMockField('address');
         $field->expects($this->any())
@@ -266,18 +282,21 @@ class FieldGroupTest extends \PHPUnit_Framework_TestCase
                     ->will($this->returnValue(new PropertyPath('address')));
         $field->expects($this->once())
                     ->method('addError')
-                    ->with($this->equalTo('Message'), array(), $this->equalTo($expectedPath), $this->equalTo(FieldGroup::DATA_ERROR));
+                    ->with($this->equalTo('Message'), array(), $this->equalTo($expectedPathIterator), $this->equalTo(FieldGroup::DATA_ERROR));
 
         $group = new FieldGroup('author');
         $group->add($field);
 
-        $group->addError('Message', array(), new PropertyPath('address.street'), FieldGroup::DATA_ERROR);
+        $path = new PropertyPath('address.street');
+
+        $group->addError('Message', array(), $path->getIterator(), FieldGroup::DATA_ERROR);
     }
 
     public function testAddErrorMapsErrorsOntoFieldsInAnonymousGroups()
     {
         // path is expected to point at "address"
         $expectedPath = new PropertyPath('address');
+        $expectedPathIterator = $expectedPath->getIterator();
 
         $field = $this->createMockField('address');
         $field->expects($this->any())
@@ -285,14 +304,16 @@ class FieldGroupTest extends \PHPUnit_Framework_TestCase
                     ->will($this->returnValue(new PropertyPath('address')));
         $field->expects($this->once())
                     ->method('addError')
-                    ->with($this->equalTo('Message'), array(), $this->equalTo($expectedPath), $this->equalTo(FieldGroup::DATA_ERROR));
+                    ->with($this->equalTo('Message'), array(), $this->equalTo($expectedPathIterator), $this->equalTo(FieldGroup::DATA_ERROR));
 
         $group = new FieldGroup('author');
         $group2 = new FieldGroup('anonymous', array('property_path' => null));
         $group2->add($field);
         $group->add($group2);
 
-        $group->addError('Message', array(), new PropertyPath('address'), FieldGroup::DATA_ERROR);
+        $path = new PropertyPath('address');
+
+        $group->addError('Message', array(), $path->getIterator(), FieldGroup::DATA_ERROR);
     }
 
     public function testAddThrowsExceptionIfAlreadyBound()
@@ -601,6 +622,50 @@ class FieldGroupTest extends \PHPUnit_Framework_TestCase
         $group->bind(array('firstName' => 'Bernhard'));
 
         $this->assertEquals(array('firstName' => 'Bernhard'), $group->getData());
+    }
+
+    public function testGetHiddenFieldsReturnsOnlyHiddenFields()
+    {
+        $group = $this->getGroupWithBothVisibleAndHiddenField();
+
+        $hiddenFields = $group->getHiddenFields(true, false);
+
+        $this->assertSame(array($group['hiddenField']), $hiddenFields);
+    }
+
+    public function testGetVisibleFieldsReturnsOnlyVisibleFields()
+    {
+        $group = $this->getGroupWithBothVisibleAndHiddenField();
+
+        $visibleFields = $group->getVisibleFields(true, false);
+
+        $this->assertSame(array($group['visibleField']), $visibleFields);
+    }
+
+    /**
+     * Create a group containing two fields, "visibleField" and "hiddenField"
+     *
+     * @return FieldGroup
+     */
+    protected function getGroupWithBothVisibleAndHiddenField()
+    {
+        $group = new FieldGroup('testGroup');
+
+        // add a visible field
+        $visibleField = $this->createMockField('visibleField');
+        $visibleField->expects($this->once())
+                    ->method('isHidden')
+                    ->will($this->returnValue(false));
+        $group->add($visibleField);
+
+        // add a hidden field
+        $hiddenField = $this->createMockField('hiddenField');
+        $hiddenField->expects($this->once())
+                    ->method('isHidden')
+                    ->will($this->returnValue(true));
+        $group->add($hiddenField);
+
+        return $group;
     }
 
     protected function createMockField($key)

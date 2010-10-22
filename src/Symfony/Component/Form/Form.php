@@ -43,22 +43,16 @@ class Form extends FieldGroup
     /**
      * Constructor.
      *
-     * @param array  $defaults    An array of field default values
-     * @param array  $options     An array of options
-     * @param string $defaultCsrfSecret  A Csrf secret
+     * @param string $name
+     * @param array|object $data
+     * @param ValidatorInterface $validator
+     * @param array $options
      */
-    public function __construct($name, $object, ValidatorInterface $validator, array $options = array())
+    public function __construct($name, $data, ValidatorInterface $validator, array $options = array())
     {
         $this->validator = $validator;
 
-        $this->setData($object);
-        $this->setCsrfFieldName(self::$defaultCsrfFieldName);
-
-        if (self::$defaultCsrfSecret !== null) {
-            $this->setCsrfSecret(self::$defaultCsrfSecret);
-        } else {
-            $this->setCsrfSecret(md5(__FILE__.php_uname()));
-        }
+        $this->setData($data);
 
         if (self::$defaultCsrfProtection !== false) {
             $this->enableCsrfProtection();
@@ -141,17 +135,19 @@ class Form extends FieldGroup
 
         if ($this->getParent() === null) {
             if ($violations = $this->validator->validate($this, $this->getValidationGroups())) {
+                // TODO: test me
                 foreach ($violations as $violation) {
                     $propertyPath = new PropertyPath($violation->getPropertyPath());
+                    $iterator = $propertyPath->getIterator();
 
-                    if ($propertyPath->getCurrent() == 'data') {
+                    if ($iterator->current() == 'data') {
                         $type = self::DATA_ERROR;
-                        $propertyPath->next(); // point at the first data element
+                        $iterator->next(); // point at the first data element
                     } else {
                         $type = self::FIELD_ERROR;
                     }
 
-                    $this->addError($violation->getMessageTemplate(), $violation->getMessageParameters(), $propertyPath, $type);
+                    $this->addError($violation->getMessageTemplate(), $violation->getMessageParameters(), $iterator, $type);
                 }
             }
         }
@@ -169,18 +165,18 @@ class Form extends FieldGroup
     }
 
     /**
-     * Returns a CSRF token for the set CSRF secret
+     * Returns a CSRF token for the given CSRF secret
      *
      * If you want to change the algorithm used to compute the token, you
      * can override this method.
      *
-     * @param  string $secret The secret string to use (null to use the current secret)
+     * @param  string $secret The secret string to use
      *
      * @return string A token string
      */
-    protected function getCsrfToken()
+    protected function generateCsrfToken($secret)
     {
-        return md5($this->csrfSecret.session_id().get_class($this));
+        return md5($secret.session_id().get_class($this));
     }
 
     /**
@@ -194,14 +190,29 @@ class Form extends FieldGroup
     /**
      * Enables CSRF protection for this form.
      */
-    public function enableCsrfProtection()
+    public function enableCsrfProtection($csrfFieldName = null, $csrfSecret = null)
     {
         if (!$this->isCsrfProtected()) {
-            $field = new HiddenField($this->getCsrfFieldName(), array(
+            if ($csrfFieldName === null) {
+                $csrfFieldName = self::$defaultCsrfFieldName;
+            }
+
+            if ($csrfSecret === null) {
+                if (self::$defaultCsrfSecret !== null) {
+                    $csrfSecret = self::$defaultCsrfSecret;
+                } else {
+                    $csrfSecret = md5(__FILE__.php_uname());
+                }
+            }
+
+            $field = new HiddenField($csrfFieldName, array(
                 'property_path' => null,
             ));
-            $field->setData($this->getCsrfToken());
+            $field->setData($this->generateCsrfToken($csrfSecret));
             $this->add($field);
+
+            $this->csrfFieldName = $csrfFieldName;
+            $this->csrfSecret = $csrfSecret;
         }
     }
 
@@ -212,17 +223,10 @@ class Form extends FieldGroup
     {
         if ($this->isCsrfProtected()) {
             $this->remove($this->getCsrfFieldName());
-        }
-    }
 
-    /**
-     * Sets the CSRF field name used in this form
-     *
-     * @param string $name The CSRF field name
-     */
-    public function setCsrfFieldName($name)
-    {
-        $this->csrfFieldName = $name;
+            $this->csrfFieldName = null;
+            $this->csrfSecret = null;
+        }
     }
 
     /**
@@ -236,19 +240,9 @@ class Form extends FieldGroup
     }
 
     /**
-     * Sets the CSRF secret used in this form
-     *
-     * @param string $secret
-     */
-    public function setCsrfSecret($secret)
-    {
-        $this->csrfSecret = $secret;
-    }
-
-    /**
      * Returns the CSRF secret used in this form
      *
-     * @return string
+     * @return string The CSRF secret
      */
     public function getCsrfSecret()
     {
@@ -265,7 +259,7 @@ class Form extends FieldGroup
         if (!$this->isCsrfProtected()) {
             return true;
         } else {
-            return $this->get($this->getCsrfFieldName())->getDisplayedData() === $this->getCsrfToken();
+            return $this->get($this->getCsrfFieldName())->getDisplayedData() === $this->generateCsrfToken($this->getCsrfSecret());
         }
     }
 

@@ -49,4 +49,11 @@ interface TranslatorInterface
      * @param string $locale The locale
      */
     function setLocale($locale);
+
+    /**
+     * Returns the current locale.
+     *
+     * @return stringThe locale
+     */
+    function getLocale();
 }

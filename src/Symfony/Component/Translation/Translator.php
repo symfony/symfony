@@ -79,6 +79,14 @@ class Translator implements TranslatorInterface
     }
 
     /**
+     * {@inheritdoc}
+     */
+    public function getLocale()
+    {
+        return $this->locale;
+    }
+
+    /**
      * Sets the fallback locale.
      *
      * @param string $locale The fallback locale
@@ -99,7 +107,7 @@ class Translator implements TranslatorInterface
     public function trans($id, array $parameters = array(), $domain = 'messages', $locale = null)
     {
         if (!isset($locale)) {
-            $locale = $this->locale;
+            $locale = $this->getLocale();
         }
 
         if (!isset($this->catalogues[$locale])) {
@@ -115,7 +123,7 @@ class Translator implements TranslatorInterface
     public function transChoice($id, $number, array $parameters = array(), $domain = 'messages', $locale = null)
     {
         if (!isset($locale)) {
-            $locale = $this->locale;
+            $locale = $this->getLocale();
         }
 
         if (!isset($this->catalogues[$locale])) {

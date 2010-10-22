@@ -58,7 +58,10 @@ class InitBundleCommand extends Command
         $bundle = basename($tmp);
 
         if (!isset($dirs[$namespace])) {
-            throw new \InvalidArgumentException(sprintf('Unable to initialize the bundle (%s not defined).', $namespace));
+            throw new \InvalidArgumentException(sprintf(
+                "Unable to initialize the bundle (%s is not a defined namespace).\n" .
+                "Defined namespaces are: %s",
+                $namespace, implode(', ', array_keys($dirs))));
         }
 
         $dir = $dirs[$namespace];

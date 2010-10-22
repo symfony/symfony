@@ -128,7 +128,7 @@ class XmlFileLoader extends FileLoader
     /**
      * @throws \InvalidArgumentException When xml doesn't validate its xsd schema
      */
-    protected function validate($dom, $file)
+    protected function validate(\DOMDocument $dom, $file)
     {
         $parts = explode('/', str_replace('\\', '/', __DIR__.'/schema/routing/routing-1.0.xsd'));
         $drive = '\\' === DIRECTORY_SEPARATOR ? array_shift($parts).'/' : '';

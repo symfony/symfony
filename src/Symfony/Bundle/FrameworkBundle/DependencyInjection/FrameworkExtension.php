@@ -93,11 +93,6 @@ class FrameworkExtension extends Extension
             $this->registerTemplatingConfiguration($config, $container);
         }
 
-        if (isset($config['security'])) {
-            $security = new SecurityLoader();
-            $security->registerSecurityConfiguration($config, $container);
-        }
-
         if (array_key_exists('test', $config)) {
             $this->registerTestConfiguration($config, $container);
         }

@@ -2,8 +2,6 @@
 
 namespace Symfony\Component\Security\Exception;
 
-use Symfony\Component\Security\Authentication\Token\TokenInterface;
-
 /*
  * This file is part of the Symfony package.
  *
@@ -20,22 +18,22 @@ use Symfony\Component\Security\Authentication\Token\TokenInterface;
  */
 class AuthenticationException extends \RuntimeException
 {
-    protected $token;
+    protected $extraInformation;
 
-    public function __construct($message, TokenInterface $token = null, $code = 0, \Exception $previous = null)
+    public function __construct($message, $extraInformation = null, $code = 0, \Exception $previous = null)
     {
         parent::__construct($message, $code, $previous);
 
-        $this->token = $token;
+        $this->extraInformation = $extraInformation;
     }
 
-    public function getToken()
+    public function getExtraInformation()
     {
-        return $this->token;
+        return $this->extraInformation;
     }
 
-    public function setToken(TokenInterface $token)
+    public function setExtraInformation($extraInformation)
     {
-        $this->token = $token;
+        $this->extraInformation = $extraInformation;
     }
 }

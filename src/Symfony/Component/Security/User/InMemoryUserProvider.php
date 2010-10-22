@@ -30,7 +30,7 @@ class InMemoryUserProvider implements UserProviderInterface
     /**
      * Constructor.
      *
-     * The user array is hash where the keys are usernames and the values are
+     * The user array is a hash where the keys are usernames and the values are
      * an array of attributes: 'password', 'enabled', and 'roles'.
      *
      * @param array $users An array of users

@@ -17,11 +17,12 @@ use Symfony\Component\HttpFoundation\Request;
  */
 
 /**
- * Firewall uses a FirewallMap to register security listeners for the given request.
+ * Firewall uses a FirewallMap to register security listeners for the given
+ * request.
  *
  * It allows for different security strategies within the same application
- * (a Basic authentication for the /api, and a web based authentication for everything else
- * for instance).
+ * (a Basic authentication for the /api, and a web based authentication for
+ * everything else for instance).
  *
  * @author Fabien Potencier <fabien.potencier@symfony-project.com>
  */

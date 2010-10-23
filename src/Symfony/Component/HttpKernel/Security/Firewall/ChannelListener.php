@@ -18,7 +18,8 @@ use Symfony\Component\HttpFoundation\Request;
  */
 
 /**
- * ChannelListener switches the HTTP protocol based on the access control configuration.
+ * ChannelListener switches the HTTP protocol based on the access control
+ * configuration.
  *
  * @author Fabien Potencier <fabien.potencier@symfony-project.com>
  */

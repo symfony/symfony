@@ -37,7 +37,8 @@ class ContextListener
     }
 
     /**
-     * Registers a core.security listener to load the SecurityContext from the session.
+     * Registers a core.security listener to load the SecurityContext from the
+     * session.
      *
      * @param EventDispatcher $dispatcher An EventDispatcher instance
      * @param integer         $priority   The priority

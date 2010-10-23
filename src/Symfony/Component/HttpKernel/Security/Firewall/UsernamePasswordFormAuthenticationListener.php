@@ -19,8 +19,8 @@ use Symfony\Component\Security\Authentication\Token\UsernamePasswordToken;
  */
 
 /**
- * UsernamePasswordFormAuthenticationListener is the default implementation of an authentication via a simple form
- * composed of a username and a password.
+ * UsernamePasswordFormAuthenticationListener is the default implementation of
+ * an authentication via a simple form composed of a username and a password.
  *
  * @author Fabien Potencier <fabien.potencier@symfony-project.com>
  */

@@ -21,8 +21,9 @@ use Symfony\Component\EventDispatcher\Event;
  */
 
 /**
- * PreAuthenticatedListener is the base class for all listener that authenticates users based
- * on a pre-authenticated request (like a certificate for instance).
+ * PreAuthenticatedListener is the base class for all listener that
+ * authenticates users based on a pre-authenticated request (like a certificate
+ * for instance).
  *
  * @author Fabien Potencier <fabien.potencier@symfony-project.com>
  */

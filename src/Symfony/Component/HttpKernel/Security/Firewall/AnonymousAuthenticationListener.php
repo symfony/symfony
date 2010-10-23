@@ -19,7 +19,8 @@ use Symfony\Component\Security\Authentication\Token\AnonymousToken;
  */
 
 /**
- * AnonymousAuthenticationListener automatically addds a Token if none is already present.
+ * AnonymousAuthenticationListener automatically addds a Token if none is
+ * already present.
  *
  * @author Fabien Potencier <fabien.potencier@symfony-project.com>
  */
@@ -37,7 +38,8 @@ class AnonymousAuthenticationListener
     }
 
     /**
-     * Registers a core.security listener to load the SecurityContext from the session.
+     * Registers a core.security listener to load the SecurityContext from the
+     * session.
      *
      * @param EventDispatcher $dispatcher An EventDispatcher instance
      * @param integer         $priority   The priority

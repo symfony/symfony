@@ -25,7 +25,8 @@ use Symfony\Component\Security\Authentication\EntryPoint\AuthenticationEntryPoin
  */
 
 /**
- * ExceptionListener catches authentication exception and converts them to Response instances.
+ * ExceptionListener catches authentication exception and converts them to
+ * Response instances.
  *
  * @author Fabien Potencier <fabien.potencier@symfony-project.com>
  */

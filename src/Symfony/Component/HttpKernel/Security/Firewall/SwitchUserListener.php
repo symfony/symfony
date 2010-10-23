@@ -24,7 +24,8 @@ use Symfony\Component\Security\Authentication\Token\TokenInterface;
  */
 
 /**
- * SwitchUserListener allows a user to impersonate another one temporarly (like the Unix su command).
+ * SwitchUserListener allows a user to impersonate another one temporarly
+ * (like the Unix su command).
  *
  * @author Fabien Potencier <fabien.potencier@symfony-project.com>
  */

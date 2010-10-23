@@ -2,14 +2,17 @@
 
 namespace Symfony\Component\HttpKernel\Security\Firewall;
 
-use Symfony\Component\EventDispatcher\EventDispatcher;
-use Symfony\Component\EventDispatcher\Event;
 use Symfony\Component\Security\SecurityContext;
-use Symfony\Component\HttpFoundation\Request;
-use Symfony\Component\HttpFoundation\Response;
-use Symfony\Component\Security\Role\SwitchUserRole;
 use Symfony\Component\Security\User\UserProviderInterface;
 use Symfony\Component\Security\User\AccountCheckerInterface;
+use Symfony\Component\Security\Authorization\AccessDecisionManagerInterface;
+use Symfony\Component\HttpKernel\Log\LoggerInterface;
+use Symfony\Component\EventDispatcher\EventDispatcher;
+use Symfony\Component\EventDispatcher\Event;
+use Symfony\Component\Security\Exception\AuthenticationException;
+use Symfony\Component\HttpFoundation\Response;
+use Symfony\Component\HttpFoundation\Request;
+use Symfony\Component\Security\Role\SwitchUserRole;
 use Symfony\Component\Security\Authentication\Token\UsernamePasswordToken;
 use Symfony\Component\Security\Exception\AuthenticationCredentialsNotFoundException;
 use Symfony\Component\Security\Authentication\Token\TokenInterface;
@@ -31,18 +34,18 @@ use Symfony\Component\Security\Authentication\Token\TokenInterface;
  */
 class SwitchUserListener
 {
-    protected $usernameParameter;
     protected $securityContext;
     protected $provider;
     protected $accountChecker;
     protected $accessDecisionManager;
-    protected $logger;
+    protected $usernameParameter;
     protected $role;
+    protected $logger;
 
     /**
      * Constructor.
      */
-    public function __construct(SecurityContext $securityContext, UserProviderInterface $provider, AccountCheckerInterface $accountChecker, $accessDecisionManager, $logger = null, $usernameParameter = '_switch_user', $role = 'ROLE_ALLOWED_TO_SWITCH')
+    public function __construct(SecurityContext $securityContext, UserProviderInterface $provider, AccountCheckerInterface $accountChecker, AccessDecisionManagerInterface $accessDecisionManager, LoggerInterface $logger = null, $usernameParameter = '_switch_user', $role = 'ROLE_ALLOWED_TO_SWITCH')
     {
         $this->securityContext = $securityContext;
         $this->provider = $provider;

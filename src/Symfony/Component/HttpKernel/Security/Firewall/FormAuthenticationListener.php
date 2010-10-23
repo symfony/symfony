@@ -2,15 +2,15 @@
 
 namespace Symfony\Component\HttpKernel\Security\Firewall;
 
-use Symfony\Component\EventDispatcher\EventDispatcher;
-use Symfony\Component\EventDispatcher\Event;
-use Symfony\Component\HttpKernel\HttpKernelInterface;
-use Symfony\Component\HttpKernel\Log\LoggerInterface;
-use Symfony\Component\HttpFoundation\Request;
-use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Security\SecurityContext;
 use Symfony\Component\Security\Authentication\AuthenticationManagerInterface;
+use Symfony\Component\HttpKernel\Log\LoggerInterface;
+use Symfony\Component\EventDispatcher\EventDispatcher;
+use Symfony\Component\EventDispatcher\Event;
 use Symfony\Component\Security\Exception\AuthenticationException;
+use Symfony\Component\HttpFoundation\Request;
+use Symfony\Component\HttpKernel\HttpKernelInterface;
+use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Security\Authentication\Token\TokenInterface;
 
 /*
@@ -46,8 +46,6 @@ abstract class FormAuthenticationListener
     {
         $this->securityContext = $securityContext;
         $this->authenticationManager = $authenticationManager;
-        $this->logger = $logger;
-
         $this->options = array_merge(array(
             'check_path'                     => '/login_check',
             'login_path'                     => '/login',
@@ -58,6 +56,7 @@ abstract class FormAuthenticationListener
             'failure_path'                   => null,
             'failure_forward'                => false,
         ), $options);
+        $this->logger = $logger;
     }
 
     /**
@@ -98,17 +97,6 @@ abstract class FormAuthenticationListener
 
         return true;
     }
-
-    /**
-     * Performs authentication.
-     *
-     * @param  Request $request A Request instance
-     *
-     * @return TokenInterface The authenticated token, or null if full authentication is not possible
-     *
-     * @throws AuthenticationException if the authentication fails
-     */
-    abstract protected function attemptAuthentication(Request $request);
 
     protected function onFailure(Request $request, \Exception $failed)
     {
@@ -191,4 +179,15 @@ abstract class FormAuthenticationListener
 
         return $this->options['default_target_path'];
     }
+
+    /**
+     * Performs authentication.
+     *
+     * @param  Request $request A Request instance
+     *
+     * @return TokenInterface The authenticated token, or null if full authentication is not possible
+     *
+     * @throws AuthenticationException if the authentication fails
+     */
+    abstract protected function attemptAuthentication(Request $request);
 }

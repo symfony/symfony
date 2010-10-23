@@ -2,11 +2,11 @@
 
 namespace Symfony\Component\HttpKernel\Security\Firewall;
 
+use Symfony\Component\HttpKernel\Security\AccessMap;
+use Symfony\Component\Security\Authentication\EntryPoint\AuthenticationEntryPointInterface;
+use Symfony\Component\HttpKernel\Log\LoggerInterface;
 use Symfony\Component\EventDispatcher\EventDispatcher;
 use Symfony\Component\EventDispatcher\Event;
-use Symfony\Component\Security\Authentication\EntryPoint\AuthenticationEntryPointInterface;
-use Symfony\Component\HttpKernel\Security\AccessMap;
-use Symfony\Component\HttpFoundation\Request;
 
 /*
  * This file is part of the Symfony framework.
@@ -25,11 +25,11 @@ use Symfony\Component\HttpFoundation\Request;
  */
 class ChannelListener
 {
-    protected $authenticationEntryPoint;
     protected $map;
+    protected $authenticationEntryPoint;
     protected $logger;
 
-    public function __construct(AccessMap $map, AuthenticationEntryPointInterface $authenticationEntryPoint, $logger = null)
+    public function __construct(AccessMap $map, AuthenticationEntryPointInterface $authenticationEntryPoint, LoggerInterface $logger = null)
     {
         $this->map = $map;
         $this->authenticationEntryPoint = $authenticationEntryPoint;

@@ -25,7 +25,7 @@ class FirewallMap
 {
     protected $map = array();
 
-    public function add(RequestMatcherInterface $requestMatcher = null, array $listeners, ExceptionListener $listener = null)
+    public function add(RequestMatcherInterface $requestMatcher = null, array $listeners = array(), ExceptionListener $listener = null)
     {
         $this->map[] = array($requestMatcher, $listeners, $listener);
     }

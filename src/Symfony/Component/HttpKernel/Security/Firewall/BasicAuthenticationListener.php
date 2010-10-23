@@ -2,17 +2,14 @@
 
 namespace Symfony\Component\HttpKernel\Security\Firewall;
 
-use Symfony\Component\EventDispatcher\EventDispatcher;
-use Symfony\Component\EventDispatcher\Event;
-use Symfony\Component\HttpFoundation\Request;
-use Symfony\Component\HttpKernel\Log\LoggerInterface;
-use Symfony\Component\HttpKernel\HttpKernelInterface;
-use Symfony\Component\Security\Exception\AuthenticationException;
 use Symfony\Component\Security\SecurityContext;
 use Symfony\Component\Security\Authentication\AuthenticationManagerInterface;
-use Symfony\Component\Security\Authentication\Token\UsernamePasswordToken;
 use Symfony\Component\Security\Authentication\EntryPoint\AuthenticationEntryPointInterface;
-use Symfony\Component\Security\Authentication\Token\AnonymousToken;
+use Symfony\Component\HttpKernel\Log\LoggerInterface;
+use Symfony\Component\EventDispatcher\EventDispatcher;
+use Symfony\Component\EventDispatcher\Event;
+use Symfony\Component\Security\Authentication\Token\UsernamePasswordToken;
+use Symfony\Component\Security\Exception\AuthenticationException;
 
 /*
  * This file is part of the Symfony framework.
@@ -31,10 +28,10 @@ use Symfony\Component\Security\Authentication\Token\AnonymousToken;
 class BasicAuthenticationListener
 {
     protected $securityContext;
-    protected $authenticationEntryPoint;
     protected $authenticationManager;
-    protected $ignoreFailure;
+    protected $authenticationEntryPoint;
     protected $logger;
+    protected $ignoreFailure;
 
     public function __construct(SecurityContext $securityContext, AuthenticationManagerInterface $authenticationManager, AuthenticationEntryPointInterface $authenticationEntryPoint, LoggerInterface $logger = null)
     {

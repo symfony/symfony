@@ -2,11 +2,10 @@
 
 namespace Symfony\Component\HttpKernel\Security\Firewall;
 
-use Symfony\Component\HttpKernel\Log\LoggerInterface;
-use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\Security\SecurityContext;
 use Symfony\Component\Security\Authentication\AuthenticationManagerInterface;
-use Symfony\Component\Security\Exception\AuthenticationServiceException;
+use Symfony\Component\HttpKernel\Log\LoggerInterface;
+use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\Security\Authentication\Token\UsernamePasswordToken;
 
 /*

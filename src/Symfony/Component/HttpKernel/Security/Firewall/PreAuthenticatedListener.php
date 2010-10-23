@@ -4,12 +4,12 @@ namespace Symfony\Component\HttpKernel\Security\Firewall;
 
 use Symfony\Component\Security\SecurityContext;
 use Symfony\Component\Security\Authentication\AuthenticationManagerInterface;
-use Symfony\Component\Security\Exception\AuthenticationException;
-use Symfony\Component\Security\Authentication\Token\PreAuthenticatedToken;
-use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpKernel\Log\LoggerInterface;
 use Symfony\Component\EventDispatcher\EventDispatcher;
 use Symfony\Component\EventDispatcher\Event;
+use Symfony\Component\Security\Authentication\Token\PreAuthenticatedToken;
+use Symfony\Component\Security\Exception\AuthenticationException;
+use Symfony\Component\HttpFoundation\Request;
 
 /*
  * This file is part of the Symfony framework.
@@ -33,7 +33,7 @@ abstract class PreAuthenticatedListener
     protected $authenticationManager;
     protected $logger;
 
-    public function __construct(SecurityContext $securityContext, AuthenticationManagerInterface $authenticationManager, $logger = null)
+    public function __construct(SecurityContext $securityContext, AuthenticationManagerInterface $authenticationManager, LoggerInterface $logger = null)
     {
         $this->securityContext = $securityContext;
         $this->authenticationManager = $authenticationManager;

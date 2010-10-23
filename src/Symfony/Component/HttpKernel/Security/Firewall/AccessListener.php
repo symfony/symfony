@@ -2,13 +2,15 @@
 
 namespace Symfony\Component\HttpKernel\Security\Firewall;
 
+use Symfony\Component\Security\SecurityContext;
+use Symfony\Component\Security\Authorization\AccessDecisionManagerInterface;
+use Symfony\Component\HttpKernel\Security\AccessMap;
+use Symfony\Component\Security\Authentication\AuthenticationManagerInterface;
 use Symfony\Component\HttpKernel\Log\LoggerInterface;
 use Symfony\Component\EventDispatcher\EventDispatcher;
 use Symfony\Component\EventDispatcher\Event;
 use Symfony\Component\Security\Exception\AuthenticationCredentialsNotFoundException;
 use Symfony\Component\Security\Exception\AccessDeniedException;
-use Symfony\Component\HttpFoundation\RequestMatcherInterface;
-use Symfony\Component\HttpKernel\Security\AccessMap;
 
 /*
  * This file is part of the Symfony framework.
@@ -29,10 +31,10 @@ class AccessListener
     protected $context;
     protected $accessDecisionManager;
     protected $map;
-    protected $logger;
     protected $authManager;
+    protected $logger;
 
-    public function __construct($context, $accessDecisionManager, AccessMap $map, $authManager, LoggerInterface $logger = null)
+    public function __construct(SecurityContext $context, AccessDecisionManagerInterface $accessDecisionManager, AccessMap $map, AuthenticationManagerInterface $authManager, LoggerInterface $logger = null)
     {
         $this->context = $context;
         $this->accessDecisionManager = $accessDecisionManager;

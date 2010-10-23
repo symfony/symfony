@@ -3,10 +3,9 @@
 namespace Symfony\Component\HttpKernel\Security\Firewall;
 
 use Symfony\Component\Security\SecurityContext;
+use Symfony\Component\HttpKernel\Log\LoggerInterface;
 use Symfony\Component\EventDispatcher\EventDispatcher;
 use Symfony\Component\EventDispatcher\Event;
-use Symfony\Component\HttpFoundation\Request;
-use Symfony\Component\HttpKernel\LoggerInterface;
 use Symfony\Component\Security\Authentication\Token\AnonymousToken;
 
 /*
@@ -26,15 +25,15 @@ use Symfony\Component\Security\Authentication\Token\AnonymousToken;
  */
 class AnonymousAuthenticationListener
 {
-    protected $key;
     protected $context;
+    protected $key;
     protected $logger;
 
-    public function __construct(SecurityContext $context, $key, $logger = null)
+    public function __construct(SecurityContext $context, $key, LoggerInterface $logger = null)
     {
         $this->context = $context;
-        $this->key = $key;
-        $this->logger = $logger;
+        $this->key     = $key;
+        $this->logger  = $logger;
     }
 
     /**

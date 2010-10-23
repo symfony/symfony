@@ -2,17 +2,19 @@
 
 namespace Symfony\Component\HttpKernel\Security\Firewall;
 
-use Symfony\Component\EventDispatcher\EventDispatcher;
-use Symfony\Component\EventDispatcher\Event;
-use Symfony\Component\HttpFoundation\Request;
-use Symfony\Component\HttpKernel\Log\LoggerInterface;
-use Symfony\Component\HttpKernel\Security\EntryPoint\DigestAuthenticationEntryPoint;
-use Symfony\Component\Security\Exception\AuthenticationException;
-use Symfony\Component\Security\Exception\BadCredentialsException;
-use Symfony\Component\Security\Exception\AuthenticationServiceException;
 use Symfony\Component\Security\SecurityContext;
 use Symfony\Component\Security\User\UserProviderInterface;
+use Symfony\Component\HttpKernel\Security\EntryPoint\DigestAuthenticationEntryPoint;
+use Symfony\Component\HttpKernel\Log\LoggerInterface;
+use Symfony\Component\EventDispatcher\EventDispatcher;
+use Symfony\Component\EventDispatcher\Event;
 use Symfony\Component\Security\Authentication\Token\UsernamePasswordToken;
+use Symfony\Component\Security\Exception\BadCredentialsException;
+use Symfony\Component\Security\Exception\AuthenticationServiceException;
+use Symfony\Component\Security\Exception\UsernameNotFoundException;
+use Symfony\Component\HttpKernel\Security\EntryPoint\NonceExpiredException;
+use Symfony\Component\HttpFoundation\Request;
+use Symfony\Component\Security\Exception\AuthenticationException;
 
 /*
  * This file is part of the Symfony framework.
@@ -31,11 +33,11 @@ use Symfony\Component\Security\Authentication\Token\UsernamePasswordToken;
 class DigestAuthenticationListener
 {
     protected $securityContext;
+    protected $provider;
     protected $authenticationEntryPoint;
     protected $logger;
-    protected $provider;
 
-    public function __construct(SecurityContext $securityContext, UserProviderInterface $provider, DigestAuthenticationEntryPoint $authenticationEntryPoint, $logger = null)
+    public function __construct(SecurityContext $securityContext, UserProviderInterface $provider, DigestAuthenticationEntryPoint $authenticationEntryPoint, LoggerInterface $logger = null)
     {
         $this->securityContext = $securityContext;
         $this->provider = $provider;

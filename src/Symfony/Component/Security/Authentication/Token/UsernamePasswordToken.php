@@ -36,8 +36,7 @@ class UsernamePasswordToken extends Token
      */
     public function setAuthenticated($isAuthenticated)
     {
-        if ($isAuthenticated)
-        {
+        if ($isAuthenticated) {
             throw new \LogicException('Cannot set this token to trusted after instantiation.');
         }
 

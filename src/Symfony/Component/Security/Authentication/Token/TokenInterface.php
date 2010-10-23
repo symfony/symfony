@@ -23,7 +23,7 @@ interface TokenInterface extends \Serializable
      *
      * @return string A string representation
      */
-    public function __toString();
+    function __toString();
 
     /**
      * Returns the user roles.

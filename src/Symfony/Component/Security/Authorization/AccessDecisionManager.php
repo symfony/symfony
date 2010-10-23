@@ -23,9 +23,9 @@ use Symfony\Component\Security\Authentication\Token\TokenInterface;
 class AccessDecisionManager implements AccessDecisionManagerInterface
 {
     protected $voters;
+    protected $strategy;
     protected $allowIfAllAbstainDecisions;
     protected $allowIfEqualGrantedDeniedDecisions;
-    protected $strategy;
 
     /**
      * Constructor.
@@ -104,7 +104,8 @@ class AccessDecisionManager implements AccessDecisionManagerInterface
     /**
      * {@inheritdoc}
      */
-    public function supportsClass($class) {
+    public function supportsClass($class)
+    {
         foreach ($this->voters as $voter) {
             if ($voter->supportsClass($class)) {
                 return true;

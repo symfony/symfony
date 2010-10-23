@@ -42,16 +42,6 @@ abstract class UserAuthenticationProvider implements AuthenticationProviderInter
     }
 
     /**
-     * Does additional checks on the user and token (like validating the credentials).
-     *
-     * @param AccountInterface      $account The retrieved AccountInterface instance
-     * @param UsernamePasswordToken $token   The UsernamePasswordToken token to be authenticated
-     *
-     * @throws AuthenticationException if the credentials could not be validated
-     */
-    abstract protected function checkAuthentication(AccountInterface $account, UsernamePasswordToken $token);
-
-    /**
      * {@inheritdoc}
      */
     public function authenticate(TokenInterface $token)
@@ -89,6 +79,14 @@ abstract class UserAuthenticationProvider implements AuthenticationProviderInter
     }
 
     /**
+     * {@inheritdoc}
+     */
+    public function supports(TokenInterface $token)
+    {
+        return $token instanceof UsernamePasswordToken;
+    }
+
+    /**
      * Retrieves the user from an implementation-specific location.
      *
      * @param string                $username The username to retrieve
@@ -101,10 +99,13 @@ abstract class UserAuthenticationProvider implements AuthenticationProviderInter
     abstract protected function retrieveUser($username, UsernamePasswordToken $token);
 
     /**
-     * {@inheritdoc}
+     * Does additional checks on the user and token (like validating the
+     * credentials).
+     *
+     * @param AccountInterface      $account The retrieved AccountInterface instance
+     * @param UsernamePasswordToken $token   The UsernamePasswordToken token to be authenticated
+     *
+     * @throws AuthenticationException if the credentials could not be validated
      */
-    public function supports(TokenInterface $token)
-    {
-        return $token instanceof UsernamePasswordToken;
-    }
+    abstract protected function checkAuthentication(AccountInterface $account, UsernamePasswordToken $token);
 }

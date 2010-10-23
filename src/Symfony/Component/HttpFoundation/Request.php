@@ -294,6 +294,17 @@ class Request
         return $this->server->get('SCRIPT_NAME', $this->server->get('ORIG_SCRIPT_NAME', ''));
     }
 
+    /**
+     * Returns the path being requested relative to the executed script.
+     *
+     * Suppose this request is instantiated from /mysite on localhost:
+     *
+     *  * http://localhost/mysite              returns an empty string
+     *  * http://localhost/mysite/about        returns '/about'
+     *  * http://localhost/mysite/about?var=1  returns '/about'
+     *
+     * @return string
+     */
     public function getPathInfo()
     {
         if (null === $this->pathInfo) {
@@ -303,6 +314,17 @@ class Request
         return $this->pathInfo;
     }
 
+    /**
+     * Returns the root path from which this request is executed.
+     *
+     * Suppose that an index.php file instantiates this request object:
+     *
+     *  * http://localhost/index.php        returns an empty string
+     *  * http://localhost/index.php/page   returns an empty string
+     *  * http://localhost/web/index.php    return '/web'
+     *
+     * @return string
+     */
     public function getBasePath()
     {
         if (null === $this->basePath) {
@@ -312,6 +334,14 @@ class Request
         return $this->basePath;
     }
 
+    /**
+     * Returns the root url from which this request is executed.
+     *
+     * This is similar to getBasePath(), except that it also includes the
+     * script filename (e.g. index.php) if one exists.
+     *
+     * @return string
+     */
     public function getBaseUrl()
     {
         if (null === $this->baseUrl) {
@@ -331,6 +361,13 @@ class Request
         return $this->server->get('SERVER_PORT');
     }
 
+    /**
+     * Returns the HTTP host being requested.
+     *
+     * The port name will be appended to the host if it's non-standard.
+     *
+     * @return string
+     */
     public function getHttpHost()
     {
         $host = $this->headers->get('HOST');
@@ -756,8 +793,6 @@ class Request
 
     protected function prepareBaseUrl()
     {
-        $baseUrl = '';
-
         $filename = basename($this->server->get('SCRIPT_FILENAME'));
 
         if (basename($this->server->get('SCRIPT_NAME')) === $filename) {
@@ -819,7 +854,6 @@ class Request
 
     protected function prepareBasePath()
     {
-        $basePath = '';
         $filename = basename($this->server->get('SCRIPT_FILENAME'));
         $baseUrl = $this->getBaseUrl();
         if (empty($baseUrl)) {

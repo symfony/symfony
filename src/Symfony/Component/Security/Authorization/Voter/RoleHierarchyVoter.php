@@ -15,7 +15,8 @@ use Symfony\Component\Security\Role\RoleHierarchyInterface;
  */
 
 /**
- * RoleHierarchyVoter uses a RoleHierarchy to determine the roles granted to the user before voting.
+ * RoleHierarchyVoter uses a RoleHierarchy to determine the roles granted to
+ * the user before voting.
  *
  * @author Fabien Potencier <fabien.potencier@symfony-project.com>
  */

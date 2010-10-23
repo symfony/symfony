@@ -22,7 +22,8 @@ use Symfony\Component\Security\Authentication\Token\UsernamePasswordToken;
  */
 
 /**
- * DaoAuthenticationProvider uses a UserProviderInterface to retrieve the user for a UsernamePasswordToken.
+ * DaoAuthenticationProvider uses a UserProviderInterface to retrieve the user
+ * for a UsernamePasswordToken.
  *
  * @author Fabien Potencier <fabien.potencier@symfony-project.com>
  */

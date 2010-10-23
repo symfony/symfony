@@ -22,7 +22,8 @@ use Symfony\Component\Security\Authentication\Token\TokenInterface;
  *
  * This authentication provider will not perform any checks on authentication
  * requests, as they should already be pre-authenticated. However, the
- * UserProviderInterface implementation may still throw a UsernameNotFoundException, for example.
+ * UserProviderInterface implementation may still throw a
+ * UsernameNotFoundException, for example.
  *
  * @author Fabien Potencier <fabien.potencier@symfony-project.com>
  */

@@ -67,8 +67,8 @@ abstract class BasePasswordEncoder implements PasswordEncoderInterface
     /**
      * Compares two passwords.
      *
-     * This method implements a constant-time algorithm to compare
-     * passwords to avoid (remote) timing attacks.
+     * This method implements a constant-time algorithm to compare passwords to
+     * avoid (remote) timing attacks.
      *
      * @param string $password1 The first password
      * @param string $password2 The second password

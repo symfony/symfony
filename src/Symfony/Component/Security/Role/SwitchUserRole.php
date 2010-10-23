@@ -14,7 +14,8 @@ use Symfony\Component\Security\Authentication\Token\TokenInterface;
  */
 
 /**
- * SwitchUserRole is used when the current user temporarily impersonates another one.
+ * SwitchUserRole is used when the current user temporarily impersonates
+ * another one.
  *
  * @author Fabien Potencier <fabien.potencier@symfony-project.com>
  */

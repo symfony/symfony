@@ -14,7 +14,8 @@ use Symfony\Component\Security\Exception\UsernameNotFoundException;
  */
 
 /**
- * UserProviderInterface is the implementation that all user provider must implement.
+ * UserProviderInterface is the implementation that all user provider must
+ * implement.
  *
  * @author Fabien Potencier <fabien.potencier@symfony-project.com>
  */
@@ -23,7 +24,8 @@ interface UserProviderInterface
     /**
      * Loads the user for the given username.
      *
-     * This method must throw UsernameNotFoundException if the user is not found.
+     * This method must throw UsernameNotFoundException if the user is not
+     * found.
      *
      * @param  string $username The username
      *

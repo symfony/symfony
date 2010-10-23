@@ -15,7 +15,8 @@ use Symfony\Component\Security\Authentication\Token\AnonymousToken;
  */
 
 /**
- * AuthenticatedVoter votes if an attribute like IS_AUTHENTICATED_FULLY or IS_AUTHENTICATED_ANONYMOUSLY is present.
+ * AuthenticatedVoter votes if an attribute like IS_AUTHENTICATED_FULLY or
+ * IS_AUTHENTICATED_ANONYMOUSLY is present.
  *
  * @author Fabien Potencier <fabien.potencier@symfony-project.com>
  */

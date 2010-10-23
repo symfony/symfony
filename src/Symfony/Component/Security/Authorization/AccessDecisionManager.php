@@ -150,11 +150,13 @@ class AccessDecisionManager implements AccessDecisionManagerInterface
     /**
      * Grants access if there is consensus of granted against denied responses.
      *
-     * Consensus means majority-rule (ignoring abstains) rather than unanimous agreement (ignoring abstains).
-     * If you require unanimity, see UnanimousBased.
+     * Consensus means majority-rule (ignoring abstains) rather than unanimous
+     * agreement (ignoring abstains). If you require unanimity, see
+     * UnanimousBased.
      *
-     * If there were an equal number of grant and deny votes, the decision will be based on the
-     * allowIfEqualGrantedDeniedDecisions property value (defaults to true).
+     * If there were an equal number of grant and deny votes, the decision will
+     * be based on the allowIfEqualGrantedDeniedDecisions property value
+     * (defaults to true).
      *
      * If all voters abstained from voting, the decision will be based on the
      * allowIfAllAbstainDecisions property value (defaults to false).

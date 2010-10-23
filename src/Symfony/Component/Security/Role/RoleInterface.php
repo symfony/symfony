@@ -14,9 +14,8 @@ namespace Symfony\Component\Security\Role;
 /**
  * RoleInterface represents a role granted to a user.
  *
- * A role must either have a string representation or
- * it needs to be explicitly supported by an at least
- * one AccessDecisionManager.
+ * A role must either have a string representation or it needs to be explicitly
+ * supported by an at least one AccessDecisionManager.
  *
  * @author Fabien Potencier <fabien.potencier@symfony-project.com>
  */
@@ -27,8 +26,8 @@ interface RoleInterface
      *
      * This method returns a string representation whenever possible.
      *
-     * When the role cannot be represented with sufficient precision
-     * by a string, it should return null.
+     * When the role cannot be represented with sufficient precision by a
+     * string, it should return null.
      *
      * @return string|null A string representation of the role, or null
      */

@@ -18,8 +18,8 @@ use Symfony\Component\Security\Authentication\Token\UsernamePasswordToken;
 /**
  * InMemoryUserProvider is a simple non persistent user provider.
  *
- * Useful for testing, demonstration, prototyping, and for
- * simple needs (a backend with a unique admin for instance)
+ * Useful for testing, demonstration, prototyping, and for simple needs
+ * (a backend with a unique admin for instance)
  *
  * @author Fabien Potencier <fabien.potencier@symfony-project.com>
  */

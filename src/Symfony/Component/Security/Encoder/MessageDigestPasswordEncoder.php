@@ -26,7 +26,7 @@ class MessageDigestPasswordEncoder extends BasePasswordEncoder
      *
      * @param string  $algorithm          The digest algorithm to use
      * @param Boolean $encodeHashAsBase64 Whether to base64 encode the password hash
-     * @param integer $iterations         The number of iterations to use to stretch the password
+     * @param integer $iterations         The number of iterations to use to stretch the password hash
      */
     public function __construct($algorithm = 'sha256', $encodeHashAsBase64 = false, $iterations = 1)
     {
@@ -45,14 +45,14 @@ class MessageDigestPasswordEncoder extends BasePasswordEncoder
         }
 
         $salted = $this->mergePasswordAndSalt($raw, $salt);
-        $digest = hash($this->algorithm, $salted);
+        $digest = hash($this->algorithm, $salted, true);
 
         // "stretch" hash
         for ($i = 1; $i < $this->iterations; $i++) {
-            $digest = hash($this->algorithm, $digest);
+            $digest = hash($this->algorithm, $digest, true);
         }
 
-        return $this->encodeHashAsBase64 ? base64_encode($digest) : $digest;
+        return $this->encodeHashAsBase64 ? base64_encode($digest) : bin2hex($digest);
     }
 
     /**

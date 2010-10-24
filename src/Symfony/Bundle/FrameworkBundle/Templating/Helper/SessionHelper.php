@@ -61,6 +61,11 @@ class SessionHelper extends Helper
         return $this->session->getFlash($name, $default);
     }
 
+    public function getFlashes()
+    {
+        return $this->session->getFlashes();
+    }
+
     public function hasFlash($name)
     {
         return $this->session->hasFlash($name);

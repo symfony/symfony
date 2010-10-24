@@ -176,7 +176,11 @@ class Form extends FieldGroup
      */
     protected function generateCsrfToken($secret)
     {
-        return md5($secret.session_id().get_class($this));
+        $sessId = session_id();
+        if (!$sessId) {
+            throw new \LogicException('The session must be started in order to generate a proper CSRF Token');
+        }
+        return md5($secret.$sessId.get_class($this));
     }
 
     /**

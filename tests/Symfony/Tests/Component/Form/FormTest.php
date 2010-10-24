@@ -47,6 +47,11 @@ class FormTest extends \PHPUnit_Framework_TestCase
     protected $validator;
     protected $form;
 
+    public static function setUpBeforeClass()
+    {
+        @session_start();
+    }
+
     protected function setUp()
     {
         Form::disableDefaultCsrfProtection();

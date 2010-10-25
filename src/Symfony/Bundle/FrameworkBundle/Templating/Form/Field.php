@@ -52,7 +52,7 @@ class Field extends BaseField
         }
 
         return $this->engine->render($template, array(
-            'field'      => $this->field,
+            'field'      => $this,
             'origin'     => $this->field,
             'attributes' => array_merge($this->field->getAttributes(), $attributes),
             'generator'  => $this->generator,

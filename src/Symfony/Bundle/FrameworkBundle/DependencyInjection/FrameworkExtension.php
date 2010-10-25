@@ -45,6 +45,10 @@ class FrameworkExtension extends Extension
             $container->setParameter('debug.file_link_format', 'txmt://open?url=file://%%f&line=%%l');
         }
 
+        if (isset($config['ide']) && 'macvim' === $config['ide']) {
+            $container->setParameter('debug.file_link_format', 'mvim://open?url=file://%%f&line=%%l');
+        }
+
         foreach (array('csrf_secret', 'csrf-secret') as $key) {
             if (isset($config[$key])) {
                 $container->setParameter('csrf_secret', $config[$key]);

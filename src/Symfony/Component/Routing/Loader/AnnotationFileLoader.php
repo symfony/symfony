@@ -18,7 +18,7 @@ use Symfony\Component\Routing\Resource\FileResource;
  * AnnotationFileLoader loads routing information from annotations set
  * on a PHP class and its methods.
  *
- * @author     Fabien Potencier <fabien.potencier@symfony-project.com>
+ * @author Fabien Potencier <fabien.potencier@symfony-project.com>
  */
 class AnnotationFileLoader extends FileLoader
 {

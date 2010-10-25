@@ -14,7 +14,7 @@ namespace Symfony\Component\HttpFoundation\SessionStorage;
 /**
  * NativeSessionStorage.
  *
- * @author     Fabien Potencier <fabien.potencier@symfony-project.com>
+ * @author Fabien Potencier <fabien.potencier@symfony-project.com>
  */
 class NativeSessionStorage implements SessionStorageInterface
 {
@@ -149,7 +149,6 @@ class NativeSessionStorage implements SessionStorageInterface
             return;
         }
 
-        // regenerate a new session id once per object
         session_regenerate_id($destroy);
 
         self::$sessionIdRegenerated = true;

@@ -22,7 +22,7 @@ use Symfony\Component\HttpKernel\Log\LoggerInterface;
  * This implementation resolves the _controller attribute from the short notation
  * to the fully-qualified form (from a:b:c to class:method).
  *
- * @author     Fabien Potencier <fabien.potencier@symfony-project.com>
+ * @author Fabien Potencier <fabien.potencier@symfony-project.com>
  */
 class DelegatingLoader extends BaseDelegatingLoader
 {

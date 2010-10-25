@@ -14,7 +14,7 @@ namespace Symfony\Component\OutputEscaper;
 /**
  * Marks a class as being safe for output.
  *
- * @author     Fabien Potencier <fabien.potencier@symfony-project.com>
+ * @author Fabien Potencier <fabien.potencier@symfony-project.com>
  */
 interface SafeDecoratorInterface
 {

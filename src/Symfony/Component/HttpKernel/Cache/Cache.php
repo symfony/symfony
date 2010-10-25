@@ -22,7 +22,7 @@ use Symfony\Component\HttpFoundation\Response;
 /**
  * Cache provides HTTP caching.
  *
- * @author     Fabien Potencier <fabien.potencier@symfony-project.com>
+ * @author Fabien Potencier <fabien.potencier@symfony-project.com>
  */
 class Cache implements HttpKernelInterface
 {
@@ -59,12 +59,12 @@ class Cache implements HttpKernelInterface
      *   * stale_while_revalidate Specifies the default number of seconds (the granularity is the second as the
      *                            Response TTL precision is a second) during which the cache can immediately return
      *                            a stale response while it revalidates it in the background (default: 2).
-     *                            This setting is overriden by the stale-while-revalidate HTTP Cache-Control
+     *                            This setting is overridden by the stale-while-revalidate HTTP Cache-Control
      *                            extension (see RFC 5861).
      *
-     *   * stale_if_error         Specifies the default number of seconds (the granularit is the second) during which
+     *   * stale_if_error         Specifies the default number of seconds (the granularity is the second) during which
      *                            the cache can server a stale response when an error is encountered (default: 60).
-     *                            This setting is overriden by the stale-if-error HTTP Cache-Control extension
+     *                            This setting is overridden by the stale-if-error HTTP Cache-Control extension
      *                            (see RFC 5861).
      *
      * @param HttpKernelInterface $kernel An HttpKernelInterface instance
@@ -138,7 +138,7 @@ class Cache implements HttpKernelInterface
      */
     public function handle(Request $request = null, $type = HttpKernelInterface::MASTER_REQUEST, $raw = false)
     {
-        // FIXME: catch exceptions and implement a 500 error page here? -> in Varnish, there is a built-it error page mechanism
+        // FIXME: catch exceptions and implement a 500 error page here? -> in Varnish, there is a built-in error page mechanism
         if (null === $request) {
             $request = new Request();
         }

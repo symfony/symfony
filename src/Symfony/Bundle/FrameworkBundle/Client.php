@@ -23,7 +23,7 @@ use Symfony\Component\HttpFoundation\Response;
 /**
  * Client simulates a browser and makes requests to a Kernel object.
  *
- * @author     Fabien Potencier <fabien.potencier@symfony-project.com>
+ * @author Fabien Potencier <fabien.potencier@symfony-project.com>
  */
 class Client extends BaseClient
 {
@@ -87,9 +87,10 @@ class Client extends BaseClient
      */
     protected function doRequest($request)
     {
+        $returnValue = $this->kernel->handle($request);
         $this->kernel->reboot();
 
-        return $this->kernel->handle($request);
+        return $returnValue;
     }
 
     /**

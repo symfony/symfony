@@ -14,7 +14,7 @@ namespace Symfony\Component\Routing\Loader;
 /**
  * LoaderResolver selects a loader for a given resource..
  *
- * @author     Fabien Potencier <fabien.potencier@symfony-project.com>
+ * @author Fabien Potencier <fabien.potencier@symfony-project.com>
  */
 class LoaderResolver implements LoaderResolverInterface
 {

@@ -20,7 +20,7 @@ use Symfony\Component\DependencyInjection\ContainerAware;
  * It provides methods to common features needed in controllers
  * and an array access to the container services.
  *
- * @author     Fabien Potencier <fabien.potencier@symfony-project.com>
+ * @author Fabien Potencier <fabien.potencier@symfony-project.com>
  */
 class Controller extends ContainerAware implements \ArrayAccess
 {

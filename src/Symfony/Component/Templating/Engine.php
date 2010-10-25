@@ -19,13 +19,14 @@ use Symfony\Component\Templating\Helper\HelperInterface;
 /**
  * Engine is the main class of the templating component.
  *
- * @author     Fabien Potencier <fabien.potencier@symfony-project.com>
+ * @author Fabien Potencier <fabien.potencier@symfony-project.com>
  */
 class Engine implements \ArrayAccess
 {
     protected $loader;
     protected $renderers;
     protected $current;
+    protected $currentRenderer;
     protected $helpers;
     protected $parents;
     protected $stack;
@@ -94,15 +95,20 @@ class Engine implements \ArrayAccess
             $this->cache[$name] = array($tpl, $options, $template);
         }
 
-        $this->current = $name;
-        $this->parents[$name] = null;
-
         // renderer
         $renderer = $template->getRenderer() ? $template->getRenderer() : $options['renderer'];
+
+        // a decorator must use the same renderer as its children
+        if (null !== $this->currentRenderer && $renderer !== $this->currentRenderer) {
+            throw new \LogicException(sprintf('A "%s" template cannot extend a "%s" template.', $this->currentRenderer, $renderer));
+        }
 
         if (!isset($this->renderers[$options['renderer']])) {
             throw new \InvalidArgumentException(sprintf('The renderer "%s" is not registered.', $renderer));
         }
+
+        $this->current = $name;
+        $this->parents[$name] = null;
 
         // render
         if (false === $content = $this->renderers[$renderer]->evaluate($template, $parameters)) {
@@ -115,7 +121,9 @@ class Engine implements \ArrayAccess
             $this->stack[] = $slots->get('_content');
             $slots->set('_content', $content);
 
+            $this->currentRenderer = $renderer;
             $content = $this->render($this->parents[$name], $parameters);
+            $this->currentRenderer = null;
 
             $slots->set('_content', array_pop($this->stack));
         }

@@ -50,7 +50,7 @@ use Symfony\Component\DependencyInjection\ParameterBag\FrozenParameterBag;
  *  * IGNORE_ON_INVALID_REFERENCE:    Ignores the wrapping command asking for the reference
  *                                    (for instance, ignore a setter if the service does not exist)
  *
- * @author     Fabien Potencier <fabien.potencier@symfony-project.com>
+ * @author Fabien Potencier <fabien.potencier@symfony-project.com>
  */
 class Container implements ContainerInterface, \ArrayAccess
 {
@@ -123,7 +123,7 @@ class Container implements ContainerInterface, \ArrayAccess
      *
      * @param  string $name The parameter name
      *
-     * @return boolean  The presense of parameter in container
+     * @return boolean The presence of parameter in container
      */
     public function hasParameter($name)
     {
@@ -195,8 +195,6 @@ class Container implements ContainerInterface, \ArrayAccess
 
         if (self::EXCEPTION_ON_INVALID_REFERENCE === $invalidBehavior) {
             throw new \InvalidArgumentException(sprintf('The service "%s" does not exist.', $id));
-        } else {
-            return null;
         }
     }
 
@@ -284,7 +282,7 @@ class Container implements ContainerInterface, \ArrayAccess
 
     static public function camelize($id)
     {
-        return preg_replace(array('/(^|_)+(.)/e', '/\.(.)/e'), array("strtoupper('\\2')", "'_'.strtoupper('\\1')"), $id);
+        return preg_replace(array('/(?:^|_)+(.)/e', '/\.(.)/e'), array("strtoupper('\\1')", "'_'.strtoupper('\\1')"), $id);
     }
 
     static public function underscore($id)

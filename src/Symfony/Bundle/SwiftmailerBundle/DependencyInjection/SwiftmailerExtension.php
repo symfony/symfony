@@ -19,14 +19,10 @@ use Symfony\Component\DependencyInjection\Reference;
 /**
  * SwiftMailerExtension is an extension for the SwiftMailer library.
  *
- * @author     Fabien Potencier <fabien.potencier@symfony-project.com>
+ * @author Fabien Potencier <fabien.potencier@symfony-project.com>
  */
 class SwiftMailerExtension extends Extension
 {
-    protected $resources = array(
-        'mailer' => 'swiftmailer.xml',
-    );
-
     /**
      * Loads the Swift Mailer configuration.
      *
@@ -45,7 +41,7 @@ class SwiftMailerExtension extends Extension
     {
         if (!$container->hasDefinition('swiftmailer.mailer')) {
             $loader = new XmlFileLoader($container, __DIR__.'/../Resources/config');
-            $loader->load($this->resources['mailer']);
+            $loader->load('swiftmailer.xml');
             $container->setAlias('mailer', 'swiftmailer.mailer');
         }
 

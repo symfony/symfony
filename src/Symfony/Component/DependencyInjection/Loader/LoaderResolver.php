@@ -18,7 +18,7 @@ namespace Symfony\Component\DependencyInjection\Loader;
  * instance (e.g. a full path to a config file or a Closure). Each
  * loader determines whether it can load a resource and how.
  *
- * @author     Fabien Potencier <fabien.potencier@symfony-project.com>
+ * @author Fabien Potencier <fabien.potencier@symfony-project.com>
  */
 class LoaderResolver implements LoaderResolverInterface
 {

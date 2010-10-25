@@ -14,7 +14,7 @@ namespace Symfony\Component\Routing\Generator;
 /**
  * UrlGeneratorInterface is the interface that all URL generator classes must implements.
  *
- * @author     Fabien Potencier <fabien.potencier@symfony-project.com>
+ * @author Fabien Potencier <fabien.potencier@symfony-project.com>
  */
 interface UrlGeneratorInterface
 {
@@ -27,5 +27,5 @@ interface UrlGeneratorInterface
      *
      * @return string The generated URL
      */
-    public function generate($name, array $parameters, $absolute = false);
+    function generate($name, array $parameters, $absolute = false);
 }

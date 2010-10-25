@@ -32,7 +32,7 @@ use Symfony\Component\HttpKernel\ClassCollectionLoader;
  * The Kernel is the heart of the Symfony system. It manages an environment
  * that can host bundles.
  *
- * @author     Fabien Potencier <fabien.potencier@symfony-project.org>
+ * @author Fabien Potencier <fabien.potencier@symfony-project.org>
  */
 abstract class Kernel implements HttpKernelInterface, \Serializable
 {

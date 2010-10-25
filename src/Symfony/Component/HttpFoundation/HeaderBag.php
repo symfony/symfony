@@ -14,7 +14,7 @@ namespace Symfony\Component\HttpFoundation;
 /**
  * HeaderBag is a container for HTTP headers.
  *
- * @author     Fabien Potencier <fabien.potencier@symfony-project.com>
+ * @author Fabien Potencier <fabien.potencier@symfony-project.com>
  */
 class HeaderBag
 {

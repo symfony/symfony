@@ -14,7 +14,7 @@ namespace Symfony\Component\Translation;
 /**
  * Returns the plural rules for a given locale.
  *
- * @author     Fabien Potencier <fabien.potencier@symfony-project.com>
+ * @author Fabien Potencier <fabien.potencier@symfony-project.com>
  */
 class PluralizationRules
 {

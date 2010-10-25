@@ -14,7 +14,7 @@ namespace Symfony\Component\DependencyInjection;
 /**
  * Reference represents a service reference.
  *
- * @author     Fabien Potencier <fabien.potencier@symfony-project.com>
+ * @author Fabien Potencier <fabien.potencier@symfony-project.com>
  */
 class Reference
 {

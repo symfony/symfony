@@ -17,7 +17,7 @@ use Symfony\Component\Translation\Resource\FileResource;
 /**
  * PhpFileLoader loads translations from PHP files returning an array of translations.
  *
- * @author     Fabien Potencier <fabien.potencier@symfony-project.com>
+ * @author Fabien Potencier <fabien.potencier@symfony-project.com>
  */
 class PhpFileLoader implements LoaderInterface
 {

@@ -14,7 +14,7 @@ namespace Symfony\Component\Routing\Annotation;
 /**
  * Annotation class for @Route().
  *
- * @author     Fabien Potencier <fabien.potencier@symfony-project.com>
+ * @author Fabien Potencier <fabien.potencier@symfony-project.com>
  */
 class Route
 {

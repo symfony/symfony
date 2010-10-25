@@ -18,6 +18,7 @@ use Symfony\Component\DependencyInjection\ParameterBag\ParameterBag;
 use Symfony\Component\DependencyInjection\Resource\FileResource;
 
 require_once __DIR__.'/Fixtures/includes/classes.php';
+require_once __DIR__.'/Fixtures/includes/ProjectExtension.php';
 
 class ContainerBuilderTest extends \PHPUnit_Framework_TestCase
 {
@@ -341,6 +342,17 @@ class ContainerBuilderTest extends \PHPUnit_Framework_TestCase
     }
 
     /**
+     * @covers Symfony\Component\DependencyInjection\ContainerBuilder::merge
+     * @expectedException LogicException
+     */
+    public function testMergeLogicException()
+    {
+        $container = new ContainerBuilder();
+        $container->freeze();
+        $container->merge(new ContainerBuilder());
+    }
+
+    /**
      * @covers Symfony\Component\DependencyInjection\ContainerBuilder::findTaggedServiceIds
      */
     public function testfindTaggedServiceIds()
@@ -395,5 +407,8 @@ class ContainerBuilderTest extends \PHPUnit_Framework_TestCase
 
         $container->registerExtension($extension = new \ProjectExtension());
         $this->assertTrue($container->getExtension('project') === $extension, '->registerExtension() registers an extension');
+
+        $this->setExpectedException('LogicException');
+        $container->getExtension('no_registered');
     }
 }

@@ -19,7 +19,7 @@ use Symfony\Component\DependencyInjection\Resource\FileResource;
  * The PHP file is required and the $container variable can be
  * used form the file to change the container.
  *
- * @author     Fabien Potencier <fabien.potencier@symfony-project.com>
+ * @author Fabien Potencier <fabien.potencier@symfony-project.com>
  */
 class PhpFileLoader extends FileLoader
 {

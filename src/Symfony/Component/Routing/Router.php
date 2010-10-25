@@ -17,7 +17,7 @@ use Symfony\Component\Routing\Loader\LoaderInterface;
  * The Router class is an example of the integration of all pieces of the
  * routing system for easier use.
  *
- * @author     Fabien Potencier <fabien.potencier@symfony-project.com>
+ * @author Fabien Potencier <fabien.potencier@symfony-project.com>
  */
 class Router implements RouterInterface
 {

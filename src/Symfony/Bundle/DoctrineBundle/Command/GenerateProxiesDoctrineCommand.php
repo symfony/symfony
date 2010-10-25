@@ -21,8 +21,8 @@ use Doctrine\ORM\Tools\Console\Command\GenerateProxiesCommand;
 /**
  * Generate the Doctrine ORM entity proxies to your cache directory.
  *
- * @author     Fabien Potencier <fabien.potencier@symfony-project.com>
- * @author     Jonathan H. Wage <jonwage@gmail.com>
+ * @author Fabien Potencier <fabien.potencier@symfony-project.com>
+ * @author Jonathan H. Wage <jonwage@gmail.com>
  */
 class GenerateProxiesDoctrineCommand extends GenerateProxiesCommand
 {

@@ -16,7 +16,7 @@ use Symfony\Bundle\TwigBundle\Node\HelperNode;
 /**
  * Wrapper for Symfony helpers.
  *
- * @author     Fabien Potencier <fabien.potencier@symfony-project.com>
+ * @author Fabien Potencier <fabien.potencier@symfony-project.com>
  */
 class HelperTokenParser extends \Twig_SimpleTokenParser
 {

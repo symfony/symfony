@@ -1,6 +1,7 @@
 <?php
 
 use Symfony\Component\DependencyInjection\ContainerInterface;
+use Symfony\Component\DependencyInjection\TaggedContainerInterface;
 use Symfony\Component\DependencyInjection\Container;
 use Symfony\Component\DependencyInjection\Reference;
 use Symfony\Component\DependencyInjection\Parameter;
@@ -12,7 +13,7 @@ use Symfony\Component\DependencyInjection\ParameterBag\ParameterBag;
  * This class has been auto-generated
  * by the Symfony Dependency Injection Component.
  */
-class ProjectServiceContainer extends Container
+class ProjectServiceContainer extends Container implements TaggedContainerInterface
 {
     protected $shared = array();
 

@@ -14,7 +14,7 @@ namespace Symfony\Component\HttpFoundation;
 /**
  * Response represents an HTTP response.
  *
- * @author     Fabien Potencier <fabien.potencier@symfony-project.com>
+ * @author Fabien Potencier <fabien.potencier@symfony-project.com>
  */
 class Response
 {
@@ -295,7 +295,7 @@ class Response
      *
      * This method indicates that the response must not be served stale by a
      * cache in any circumstance without first revalidating with the origin.
-     * When present, the TTL of the response should not be overriden to be
+     * When present, the TTL of the response should not be overridden to be
      * greater than the value provided by the origin.
      *
      * @return Boolean true if the response must be revalidated by a cache, false otherwise

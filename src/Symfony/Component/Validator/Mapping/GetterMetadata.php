@@ -18,8 +18,8 @@ class GetterMetadata extends MemberMetadata
     /**
      * Constructor.
      *
-     * @param string $class     The class the getter is defined on
-     * @param string $property  The property which the getter returns
+     * @param string $class    The class the getter is defined on
+     * @param string $property The property which the getter returns
      */
     public function __construct($class, $property)
     {

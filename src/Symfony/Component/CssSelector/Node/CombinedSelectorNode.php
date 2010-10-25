@@ -19,7 +19,7 @@ use Symfony\Component\CssSelector\SyntaxError;
  * This component is a port of the Python lxml library,
  * which is copyright Infrae and distributed under the BSD license.
  *
- * @author     Fabien Potencier <fabien.potencier@symfony-project.com>
+ * @author Fabien Potencier <fabien.potencier@symfony-project.com>
  */
 class CombinedSelectorNode implements NodeInterface
 {

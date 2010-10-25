@@ -31,7 +31,7 @@ class EngineTest extends TestCase
         return array(
             array('BlogBundle:Post:index.php', array('index', array('bundle' => 'BlogBundle', 'controller' => 'Post', 'renderer' => 'php', 'format' => ''))),
             array('BlogBundle:Post:index.twig', array('index', array('bundle' => 'BlogBundle', 'controller' => 'Post', 'renderer' => 'twig', 'format' => ''))),
-            array('BlogBundle:Post:index.xml.php', array('index', array('bundle' => 'BlogBundle', 'controller' => 'Post', 'renderer' => 'php', 'format' => 'xml'))),
+            array('BlogBundle:Post:index.xml.php', array('index', array('bundle' => 'BlogBundle', 'controller' => 'Post', 'renderer' => 'php', 'format' => '.xml'))),
         );
     }
 

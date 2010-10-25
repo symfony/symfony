@@ -21,10 +21,10 @@ class CheckboxField extends ToggleField
     /**
      * {@inheritDoc}
      */
-    public function getAttributes()
+    public function __construct($key, array $options = array())
     {
-        return array_merge(parent::getAttributes(), array(
-            'type' => 'checkbox',
-        ));
+        $options['type'] = 'checkbox';
+
+        parent::__construct($key, $options);
     }
 }

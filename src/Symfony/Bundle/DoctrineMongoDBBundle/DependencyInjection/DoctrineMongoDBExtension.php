@@ -18,10 +18,6 @@ use Symfony\Component\DependencyInjection\Resource\FileResource;
  */
 class DoctrineMongoDBExtension extends Extension
 {
-    protected $resources = array(
-        'mongodb' => 'mongodb.xml',
-    );
-
     /**
      * Loads the MongoDB ODM configuration.
      *
@@ -67,7 +63,7 @@ class DoctrineMongoDBExtension extends Extension
         if (!$container->hasDefinition('doctrine.odm.mongodb.metadata.annotation')) {
             // Load DoctrineMongoDBBundle/Resources/config/mongodb.xml
             $loader = new XmlFileLoader($container, __DIR__.'/../Resources/config');
-            $loader->load($this->resources['mongodb']);
+            $loader->load('mongodb.xml');
         }
 
         // Allow these application configuration options to override the defaults

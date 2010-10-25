@@ -73,6 +73,8 @@ class DefinitionTest extends \PHPUnit_Framework_TestCase
     /**
      * @covers Symfony\Component\DependencyInjection\Definition::setMethodCalls
      * @covers Symfony\Component\DependencyInjection\Definition::addMethodCall
+     * @covers Symfony\Component\DependencyInjection\Definition::hasMethodCall
+     * @covers Symfony\Component\DependencyInjection\Definition::removeMethodCall
      */
     public function testMethodCalls()
     {
@@ -81,6 +83,10 @@ class DefinitionTest extends \PHPUnit_Framework_TestCase
         $this->assertEquals(array(array('foo', array('foo'))), $def->getMethodCalls(), '->getMethodCalls() returns the methods to call');
         $this->assertEquals(spl_object_hash($def), spl_object_hash($def->addMethodCall('bar', array('bar'))), '->addMethodCall() implements a fluent interface');
         $this->assertEquals(array(array('foo', array('foo')), array('bar', array('bar'))), $def->getMethodCalls(), '->addMethodCall() adds a method to call');
+        $this->assertTrue($def->hasMethodCall('bar'), '->hasMethodCall() returns true if first argument is a method to call registered');
+        $this->assertFalse($def->hasMethodCall('no_registered'), '->hasMethodCall() returns false if first argument is not a method to call registered');
+        $this->assertEquals(spl_object_hash($def), spl_object_hash($def->removeMethodCall('bar')), '->removeMethodCall() implements a fluent interface');
+        $this->assertEquals(array(array('foo', array('foo'))), $def->getMethodCalls(), '->removeMethodCall() removes a method to call');
     }
 
     /**

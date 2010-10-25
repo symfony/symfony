@@ -57,6 +57,10 @@ class DateTimeToLocalizedStringTransformer extends BaseDateTimeTransformer
      */
     public function transform($dateTime)
     {
+        if ($dateTime === null) {
+            return '';
+        }
+
         if (!$dateTime instanceof \DateTime) {
             throw new \InvalidArgumentException('Expected value of type \DateTime');
         }
@@ -89,6 +93,10 @@ class DateTimeToLocalizedStringTransformer extends BaseDateTimeTransformer
 
         if (!is_string($value)) {
             throw new \InvalidArgumentException(sprintf('Expected argument of type string, %s given', gettype($value)));
+        }
+
+        if ($value === '') {
+            return null;
         }
 
         $timestamp = $this->getIntlDateFormatter()->parse($value);

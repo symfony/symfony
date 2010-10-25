@@ -123,7 +123,7 @@ abstract class BaseField implements FieldInterface, SafeDecoratorInterface
 
     protected function createField(FormFieldInterface $field)
     {
-        if ($field instanceof Form || get_class($field) === 'Symfony\Component\Form\FieldGroup') {
+        if ($field instanceof FieldGroupInterface && !$field instanceof HybridField) {
             return new FieldGroup($field, $this->engine, $this->generator, $this->theme, $this->doctype);
         }
 

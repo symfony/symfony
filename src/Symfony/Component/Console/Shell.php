@@ -21,7 +21,7 @@ use Symfony\Component\Console\Output\ConsoleOutput;
  * This class only works with a PHP compiled with readline support
  * (either --with-readline or --with-libedit)
  *
- * @author     Fabien Potencier <fabien.potencier@symfony-project.com>
+ * @author Fabien Potencier <fabien.potencier@symfony-project.com>
  */
 class Shell
 {

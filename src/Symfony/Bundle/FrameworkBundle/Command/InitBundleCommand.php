@@ -22,7 +22,7 @@ use Symfony\Bundle\FrameworkBundle\Util\Mustache;
 /**
  * Initializes a new bundle.
  *
- * @author     Fabien Potencier <fabien.potencier@symfony-project.com>
+ * @author Fabien Potencier <fabien.potencier@symfony-project.com>
  */
 class InitBundleCommand extends Command
 {

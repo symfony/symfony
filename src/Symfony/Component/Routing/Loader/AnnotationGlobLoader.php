@@ -17,7 +17,7 @@ use Symfony\Component\Routing\RouteCollection;
  * AnnotationGlobLoader loads routing information from annotations set
  * on PHP classes and methods.
  *
- * @author     Fabien Potencier <fabien.potencier@symfony-project.com>
+ * @author Fabien Potencier <fabien.potencier@symfony-project.com>
  */
 class AnnotationGlobLoader extends AnnotationDirectoryLoader
 {

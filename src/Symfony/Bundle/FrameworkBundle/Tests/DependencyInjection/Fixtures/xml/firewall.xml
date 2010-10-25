@@ -1,0 +1,25 @@
+<?xml version="1.0" ?>
+
+<srv:container xmlns="http://www.symfony-project.org/schema/dic/security"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xmlns:srv="http://www.symfony-project.org/schema/dic/services"
+    xsi:schemaLocation="http://www.symfony-project.org/schema/dic/services http://www.symfony-project.org/schema/dic/services/services-1.0.xsd">
+
+    <config>
+        <provider>
+            <user name="foo" password="foo" roles="ROLE_USER" />
+        </provider>
+
+        <firewall pattern="/login" security="false" />
+
+        <firewall stateless="true">
+            <http-basic />
+            <http-digest />
+            <form-login />
+            <anonymous />
+            <switch-user />
+            <x509 />
+            <logout />
+        </firewall>
+    </config>
+</srv:container>

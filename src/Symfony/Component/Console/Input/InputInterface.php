@@ -14,7 +14,7 @@ namespace Symfony\Component\Console\Input;
 /**
  * InputInterface is the interface implemented by all input classes.
  *
- * @author     Fabien Potencier <fabien.potencier@symfony-project.com>
+ * @author Fabien Potencier <fabien.potencier@symfony-project.com>
  */
 interface InputInterface
 {

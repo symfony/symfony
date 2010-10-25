@@ -43,8 +43,6 @@ class UrlValidatorTest extends \PHPUnit_Framework_TestCase
             array('http://www.symfony-project.com/'),
             array('http://127.0.0.1/'),
             array('http://127.0.0.1:80/'),
-            array('ftp://google.com/foo.tgz'),
-            array('ftps://google.com/foo.tgz'),
         );
     }
 

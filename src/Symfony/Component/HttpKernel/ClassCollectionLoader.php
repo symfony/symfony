@@ -14,7 +14,7 @@ namespace Symfony\Component\HttpKernel;
 /**
  * ClassCollectionLoader.
  *
- * @author     Fabien Potencier <fabien.potencier@symfony-project.com>
+ * @author Fabien Potencier <fabien.potencier@symfony-project.com>
  */
 class ClassCollectionLoader
 {

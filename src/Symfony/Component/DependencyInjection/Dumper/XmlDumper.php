@@ -18,7 +18,7 @@ use Symfony\Component\DependencyInjection\Reference;
 /**
  * XmlDumper dumps a service container as an XML string.
  *
- * @author     Fabien Potencier <fabien.potencier@symfony-project.com>
+ * @author Fabien Potencier <fabien.potencier@symfony-project.com>
  */
 class XmlDumper extends Dumper
 {
@@ -200,7 +200,7 @@ EOF;
     }
 
     /**
-     * @throws \RuntimeException When trying to dump object or ressource
+     * @throws \RuntimeException When trying to dump object or resource
      */
     static public function phpToXml($value)
     {

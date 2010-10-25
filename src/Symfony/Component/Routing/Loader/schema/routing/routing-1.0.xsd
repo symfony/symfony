@@ -8,7 +8,7 @@
   <xsd:element name="routes" type="routes" />
 
   <xsd:complexType name="routes">
-    <xsd:choice maxOccurs="unbounded">
+    <xsd:choice maxOccurs="unbounded" minOccurs="0">
       <xsd:element name="import" type="import" />
       <xsd:element name="route" type="route" />
     </xsd:choice>

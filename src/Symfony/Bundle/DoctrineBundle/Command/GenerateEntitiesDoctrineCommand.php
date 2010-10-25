@@ -22,8 +22,8 @@ use Doctrine\ORM\Tools\EntityGenerator;
 /**
  * Generate entity classes from mapping information
  *
- * @author     Fabien Potencier <fabien.potencier@symfony-project.com>
- * @author     Jonathan H. Wage <jonwage@gmail.com>
+ * @author Fabien Potencier <fabien.potencier@symfony-project.com>
+ * @author Jonathan H. Wage <jonwage@gmail.com>
  */
 class GenerateEntitiesDoctrineCommand extends DoctrineCommand
 {

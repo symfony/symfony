@@ -40,7 +40,7 @@ use Symfony\Component\Console\Helper\DialogHelper;
  *     $app->addCommand(new SimpleCommand());
  *     $app->run();
  *
- * @author     Fabien Potencier <fabien.potencier@symfony-project.com>
+ * @author Fabien Potencier <fabien.potencier@symfony-project.com>
  */
 class Application
 {

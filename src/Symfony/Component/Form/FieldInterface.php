@@ -35,21 +35,21 @@ interface FieldInterface extends Localizable
     /**
      * Clones this field.
      */
-    public function __clone();
+    function __clone();
 
     /**
      * Sets the parent field.
      *
      * @param FieldInterface $parent  The parent field
      */
-    public function setParent(FieldInterface $parent = null);
+    function setParent(FieldInterface $parent = null);
 
     /**
      * Returns the parent field.
      *
      * @return FieldInterface  The parent field
      */
-    public function getParent();
+    function getParent();
 
     /**
      * Sets the key by which the field is identified in field groups.
@@ -60,14 +60,14 @@ interface FieldInterface extends Localizable
      * @param  string $key             The key of the field
      * @throws BadMethodCallException  When the field already has a parent
      */
-    public function setKey($key);
+    function setKey($key);
 
     /**
      * Returns the key by which the field is identified in field groups.
      *
      * @return string  The key of the field.
      */
-    public function getKey();
+    function getKey();
 
     /**
      * Returns the name of the field.
@@ -78,7 +78,7 @@ interface FieldInterface extends Localizable
      *                 key is wrapped in squared brackets
      *                 (e.g. "parent_name[field_key]")
      */
-    public function getName();
+    function getName();
 
     /**
      * Returns the ID of the field.
@@ -88,7 +88,7 @@ interface FieldInterface extends Localizable
      *                 underscore (e.g. if the name is "parent_name[field_key]",
      *                 the ID is "parent_name_field_key").
      */
-    public function getId();
+    function getId();
 
     /**
      * Sets the property path
@@ -98,14 +98,14 @@ interface FieldInterface extends Localizable
      *
      * @param string $propertyPath
      */
-    public function setPropertyPath($propertyPath);
+    function setPropertyPath($propertyPath);
 
     /**
      * Returns the property path of the field
      *
      * @return PropertyPath
      */
-    public function getPropertyPath();
+    function getPropertyPath();
 
     /**
      * Writes a property value of the object into the field
@@ -114,7 +114,7 @@ interface FieldInterface extends Localizable
      *
      * @param array|object $objectOrArray
      */
-    public function updateFromObject(&$objectOrArray);
+    function updateFromObject(&$objectOrArray);
 
     /**
      * Writes a the field value into a property of the object
@@ -123,7 +123,7 @@ interface FieldInterface extends Localizable
      *
      * @param array|object $objectOrArray
      */
-    public function updateObject(&$objectOrArray);
+    function updateObject(&$objectOrArray);
 
     /**
      * Returns the normalized data of the field.
@@ -132,7 +132,7 @@ interface FieldInterface extends Localizable
      *                When the field is bound, the normalized bound data is
      *                returned if the field is valid, null otherwise.
      */
-    public function getData();
+    function getData();
 
     /**
      * Returns the data of the field as it is displayed to the user.
@@ -141,7 +141,7 @@ interface FieldInterface extends Localizable
      *                       default data is returned. When the field is bound,
      *                       the bound data is returned.
      */
-    public function getDisplayedData();
+    function getDisplayedData();
 
     /**
      * Sets the default data
@@ -149,7 +149,7 @@ interface FieldInterface extends Localizable
      * @param mixed $default            The default data
      * @throws UnexpectedTypeException  If the default data is invalid
      */
-    public function setData($default);
+    function setData($default);
 
     /**
      * Binds POST data to the field, transforms and validates it.
@@ -159,7 +159,7 @@ interface FieldInterface extends Localizable
      * @throws InvalidConfigurationException when the field is not configured
      *                                       correctly
      */
-    public function bind($taintedData);
+    function bind($taintedData);
 
     /**
      * Recursively adds constraint violations to the fields
@@ -192,21 +192,21 @@ interface FieldInterface extends Localizable
      *
      * @return boolean
      */
-    public function isBound();
+    function isBound();
 
     /**
      * Returns whether the field is valid.
      *
      * @return boolean
      */
-    public function isValid();
+    function isValid();
 
     /**
      * Returns whether the field requires a multipart form.
      *
      * @return boolean
      */
-    public function isMultipart();
+    function isMultipart();
 
     /**
      * Returns whether the field is required to be filled out.
@@ -217,7 +217,7 @@ interface FieldInterface extends Localizable
      *
      * @return boolean
      */
-    public function isRequired();
+    function isRequired();
 
     /**
      * Returns whether this field is disabled
@@ -230,19 +230,19 @@ interface FieldInterface extends Localizable
      *
      * @return boolean
      */
-    public function isDisabled();
+    function isDisabled();
 
     /**
      * Returns whether the field is hidden
      *
      * @return boolean
      */
-    public function isHidden();
+    function isHidden();
 
     /**
      * Sets whether this field is required to be filled out when submitted.
      *
      * @param boolean $required
      */
-    public function setRequired($required);
+    function setRequired($required);
 }

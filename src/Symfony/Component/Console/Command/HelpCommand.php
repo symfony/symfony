@@ -21,7 +21,7 @@ use Symfony\Component\Console\Command\Command;
 /**
  * HelpCommand displays the help for a given command.
  *
- * @author     Fabien Potencier <fabien.potencier@symfony-project.com>
+ * @author Fabien Potencier <fabien.potencier@symfony-project.com>
  */
 class HelpCommand extends Command
 {

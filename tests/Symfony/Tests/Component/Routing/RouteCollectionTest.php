@@ -27,6 +27,17 @@ class RouteCollectionTest extends \PHPUnit_Framework_TestCase
         $this->assertNull($collection->getRoute('bar'), '->getRoute() returns null if a route does not exist');
     }
 
+    /**
+     * @covers Symfony\Component\Routing\RouteCollection::addRoute
+     * @expectedException InvalidArgumentException
+     */
+    public function testAddInvalidRoute()
+    {
+        $collection = new RouteCollection();
+        $route = new Route('/foo');
+        $collection->addRoute('f o o', $route);
+    }
+
     public function testAddCollection()
     {
         $collection = new RouteCollection();

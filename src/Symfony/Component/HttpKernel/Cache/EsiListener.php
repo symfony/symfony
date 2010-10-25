@@ -18,7 +18,7 @@ use Symfony\Component\EventDispatcher\EventDispatcher;
 /**
  * EsiListener adds a Surrogate-Control HTTP header when the Response needs to be parsed for ESI.
  *
- * @author     Fabien Potencier <fabien.potencier@symfony-project.com>
+ * @author Fabien Potencier <fabien.potencier@symfony-project.com>
  */
 class EsiListener
 {

@@ -16,7 +16,7 @@ use Symfony\Component\Translation\MessageCatalogue;
 /**
  * LoaderInterface is the interface implemented by all translation loaders.
  *
- * @author     Fabien Potencier <fabien.potencier@symfony-project.com>
+ * @author Fabien Potencier <fabien.potencier@symfony-project.com>
  */
 interface LoaderInterface
 {

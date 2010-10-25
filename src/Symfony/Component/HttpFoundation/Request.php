@@ -17,7 +17,7 @@ use Symfony\Component\HttpFoundation\File\UploadedFile;
 /**
  * Request represents an HTTP request.
  *
- * @author     Fabien Potencier <fabien.potencier@symfony-project.com>
+ * @author Fabien Potencier <fabien.potencier@symfony-project.com>
  */
 class Request
 {
@@ -372,6 +372,18 @@ class Request
         }
 
         return $this->getScheme().'://'.$this->getHost().':'.$this->getPort().$this->getScriptName().$this->getPathInfo().$qs;
+    }
+
+    /**
+     * Generates a normalized URI for the given path.
+     *
+     * @param string $path A path to use instead of the current one
+     *
+     * @return string The normalized URI for the path
+     */
+    public function getUriForPath($path)
+    {
+        return $this->getScheme().'://'.$this->getHost().':'.$this->getPort().$this->getScriptName().$path;
     }
 
     /**

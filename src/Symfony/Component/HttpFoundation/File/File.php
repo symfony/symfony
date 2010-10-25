@@ -573,5 +573,7 @@ class File
         if (!rename($this->getPath(), $newPath)) {
             throw new FileException(sprintf('Could not move file %s to %s', $this->getPath(), $newPath));
         }
+
+        $this->path = realpath($newPath);
     }
 }

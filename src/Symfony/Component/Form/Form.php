@@ -25,7 +25,7 @@ use Symfony\Component\Validator\ValidatorInterface;
  * Csrf secret. If the global Csrf secret is also null, then a random one
  * is generated on the fly.
  *
- * @author     Fabien Potencier <fabien.potencier@symfony-project.com>
+ * @author Fabien Potencier <fabien.potencier@symfony-project.com>
  */
 class Form extends FieldGroup
 {

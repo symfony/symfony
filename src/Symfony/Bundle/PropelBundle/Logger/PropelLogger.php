@@ -16,7 +16,7 @@ use Symfony\Component\HttpKernel\Log\LoggerInterface;
 /**
  * PropelLogger.
  *
- * @author     Fabien Potencier <fabien.potencier@symfony-project.com>
+ * @author Fabien Potencier <fabien.potencier@symfony-project.com>
  */
 class PropelLogger implements \BasicLogger
 {

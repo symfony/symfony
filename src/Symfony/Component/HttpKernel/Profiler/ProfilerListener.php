@@ -20,7 +20,7 @@ use Symfony\Component\HttpFoundation\RequestMatcherInterface;
 /**
  * ProfilerListener collects data for the current request by listening to the core.response event.
  *
- * @author     Fabien Potencier <fabien.potencier@symfony-project.com>
+ * @author Fabien Potencier <fabien.potencier@symfony-project.com>
  */
 class ProfilerListener
 {

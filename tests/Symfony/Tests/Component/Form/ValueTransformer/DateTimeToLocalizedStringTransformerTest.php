@@ -128,6 +128,13 @@ class DateTimeToLocalizedStringTransformerTest extends DateTimeTestCase
         $this->assertEquals('Feb 3, 2010 4:05 AM', $transformer->transform($this->dateTime));
     }
 
+    public function testTransform_empty()
+    {
+        $transformer = new DateTimeToLocalizedStringTransformer();
+
+        $this->assertSame('', $transformer->transform(null));
+    }
+
     public function testTransform_differentTimezones()
     {
         $transformer = new DateTimeToLocalizedStringTransformer(array(
@@ -274,6 +281,13 @@ class DateTimeToLocalizedStringTransformerTest extends DateTimeTestCase
         $dateTime->setTimezone(new \DateTimeZone('America/New_York'));
 
         $this->assertDateTimeEquals($dateTime, $transformer->reverseTransform('03.02.2010 04:05', null));
+    }
+
+    public function testReverseTransform_empty()
+    {
+        $transformer = new DateTimeToLocalizedStringTransformer();
+
+        $this->assertSame(null, $transformer->reverseTransform('', null));
     }
 
     public function testReverseTransformRequiresString()

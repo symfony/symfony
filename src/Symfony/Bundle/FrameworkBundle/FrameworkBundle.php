@@ -17,7 +17,7 @@ use Symfony\Component\Form\Form;
 /**
  * Bundle.
  *
- * @author     Fabien Potencier <fabien.potencier@symfony-project.com>
+ * @author Fabien Potencier <fabien.potencier@symfony-project.com>
  */
 class FrameworkBundle extends Bundle
 {

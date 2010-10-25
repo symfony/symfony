@@ -33,7 +33,7 @@ class HelperNode extends \Twig_Node
         $compiler
             ->addDebugInfo($this)
             ->raw("\$this->env->getExtension(")
-            ->string('symfony.helpers')
+            ->string('templating')
             ->raw(")->getContainer()->get(")
             ->string($this->getAttribute('helper'))
             ->raw(")->")

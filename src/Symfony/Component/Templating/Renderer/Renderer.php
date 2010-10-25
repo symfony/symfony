@@ -16,7 +16,7 @@ use Symfony\Component\Templating\Engine;
 /**
  * Renderer is the base class for all template renderer.
  *
- * @author     Fabien Potencier <fabien.potencier@symfony-project.com>
+ * @author Fabien Potencier <fabien.potencier@symfony-project.com>
  */
 abstract class Renderer implements RendererInterface
 {

@@ -4,6 +4,7 @@ namespace Symfony\Tests\Component\Form;
 
 require_once __DIR__ . '/Fixtures/Author.php';
 require_once __DIR__ . '/Fixtures/TestField.php';
+require_once __DIR__ . '/Fixtures/TestFieldGroup.php';
 
 use Symfony\Component\Form\Field;
 use Symfony\Component\Form\FieldInterface;
@@ -11,9 +12,10 @@ use Symfony\Component\Form\FieldGroup;
 use Symfony\Component\Form\PropertyPath;
 use Symfony\Tests\Component\Form\Fixtures\Author;
 use Symfony\Tests\Component\Form\Fixtures\TestField;
+use Symfony\Tests\Component\Form\Fixtures\TestFieldGroup;
 
 
-abstract class FieldGroupTest_Field implements FieldInterface
+abstract class FieldGroupTest_Field extends TestField
 {
     public $locales = array();
 
@@ -28,7 +30,7 @@ class FieldGroupTest extends \PHPUnit_Framework_TestCase
 {
     public function testSupportsArrayAccess()
     {
-        $group = new FieldGroup('author');
+        $group = new TestFieldGroup('author');
         $group->add($this->createMockField('firstName'));
         $this->assertEquals($group->get('firstName'), $group['firstName']);
         $this->assertTrue(isset($group['firstName']));
@@ -36,7 +38,7 @@ class FieldGroupTest extends \PHPUnit_Framework_TestCase
 
     public function testSupportsUnset()
     {
-        $group = new FieldGroup('author');
+        $group = new TestFieldGroup('author');
         $group->add($this->createMockField('firstName'));
         unset($group['firstName']);
         $this->assertFalse(isset($group['firstName']));
@@ -44,14 +46,14 @@ class FieldGroupTest extends \PHPUnit_Framework_TestCase
 
     public function testDoesNotSupportAddingFields()
     {
-        $group = new FieldGroup('author');
+        $group = new TestFieldGroup('author');
         $this->setExpectedException('LogicException');
         $group[] = $this->createMockField('lastName');
     }
 
     public function testSupportsCountable()
     {
-        $group = new FieldGroup('group');
+        $group = new TestFieldGroup('group');
         $group->add($this->createMockField('firstName'));
         $group->add($this->createMockField('lastName'));
         $this->assertEquals(2, count($group));
@@ -62,7 +64,7 @@ class FieldGroupTest extends \PHPUnit_Framework_TestCase
 
     public function testSupportsIterable()
     {
-        $group = new FieldGroup('group');
+        $group = new TestFieldGroup('group');
         $group->add($field1 = $this->createMockField('field1'));
         $group->add($field2 = $this->createMockField('field2'));
         $group->add($field3 = $this->createMockField('field3'));
@@ -78,7 +80,7 @@ class FieldGroupTest extends \PHPUnit_Framework_TestCase
 
     public function testIsBound()
     {
-        $group = new FieldGroup('author');
+        $group = new TestFieldGroup('author');
         $this->assertFalse($group->isBound());
         $group->bind(array('firstName' => 'Bernhard'));
         $this->assertTrue($group->isBound());
@@ -86,7 +88,7 @@ class FieldGroupTest extends \PHPUnit_Framework_TestCase
 
     public function testValidIfAllFieldsAreValid()
     {
-        $group = new FieldGroup('author');
+        $group = new TestFieldGroup('author');
         $group->add($this->createValidMockField('firstName'));
         $group->add($this->createValidMockField('lastName'));
 
@@ -97,7 +99,7 @@ class FieldGroupTest extends \PHPUnit_Framework_TestCase
 
     public function testInvalidIfFieldIsInvalid()
     {
-        $group = new FieldGroup('author');
+        $group = new TestFieldGroup('author');
         $group->add($this->createInvalidMockField('firstName'));
         $group->add($this->createValidMockField('lastName'));
 
@@ -108,7 +110,7 @@ class FieldGroupTest extends \PHPUnit_Framework_TestCase
 
     public function testInvalidIfBoundWithExtraFields()
     {
-        $group = new FieldGroup('author');
+        $group = new TestFieldGroup('author');
         $group->add($this->createValidMockField('firstName'));
         $group->add($this->createValidMockField('lastName'));
 
@@ -124,7 +126,7 @@ class FieldGroupTest extends \PHPUnit_Framework_TestCase
                     ->method('bind')
                     ->with($this->equalTo('Bernhard'));
 
-        $group = new FieldGroup('author');
+        $group = new TestFieldGroup('author');
         $group->add($field);
 
         $group->bind(array('firstName' => 'Bernhard'));
@@ -137,7 +139,7 @@ class FieldGroupTest extends \PHPUnit_Framework_TestCase
                     ->method('bind')
                     ->with($this->equalTo(null));
 
-        $group = new FieldGroup('author');
+        $group = new TestFieldGroup('author');
         $group->add($field);
 
         $group->bind(array());
@@ -150,7 +152,7 @@ class FieldGroupTest extends \PHPUnit_Framework_TestCase
                     ->method('addError')
                     ->with($this->equalTo('Message'));
 
-        $group = new FieldGroup('author');
+        $group = new TestFieldGroup('author');
         $group->add($field);
 
         $path = new PropertyPath('fields[firstName].data');
@@ -165,8 +167,8 @@ class FieldGroupTest extends \PHPUnit_Framework_TestCase
                     ->method('addError')
                     ->with($this->equalTo('Message'));
 
-        $group = new FieldGroup('author');
-        $innerGroup = new FieldGroup('names');
+        $group = new TestFieldGroup('author');
+        $innerGroup = new TestFieldGroup('names');
         $innerGroup->add($field);
         $group->add($innerGroup);
 
@@ -181,7 +183,7 @@ class FieldGroupTest extends \PHPUnit_Framework_TestCase
         $field->expects($this->never())
                     ->method('addError');
 
-        $group = new FieldGroup('author');
+        $group = new TestFieldGroup('author');
         $group->add($field);
 
         $path = new PropertyPath('fields[bar].data');
@@ -200,7 +202,7 @@ class FieldGroupTest extends \PHPUnit_Framework_TestCase
         $field->expects($this->never())
                     ->method('addError');
 
-        $group = new FieldGroup('author');
+        $group = new TestFieldGroup('author');
         $group->add($field);
 
         $path = new PropertyPath('fields[firstName].data');
@@ -224,7 +226,7 @@ class FieldGroupTest extends \PHPUnit_Framework_TestCase
                     ->method('addError')
                     ->with($this->equalTo('Message'), array(), $this->equalTo($expectedPathIterator), $this->equalTo(FieldGroup::DATA_ERROR));
 
-        $group = new FieldGroup('author');
+        $group = new TestFieldGroup('author');
         $group->add($field);
 
         $path = new PropertyPath('firstName');
@@ -241,7 +243,7 @@ class FieldGroupTest extends \PHPUnit_Framework_TestCase
         $field->expects($this->never())
                     ->method('addError');
 
-        $group = new FieldGroup('author');
+        $group = new TestFieldGroup('author');
         $group->add($field);
 
         $path = new PropertyPath('bar');
@@ -261,7 +263,7 @@ class FieldGroupTest extends \PHPUnit_Framework_TestCase
         $field->expects($this->never())
                     ->method('addError');
 
-        $group = new FieldGroup('author');
+        $group = new TestFieldGroup('author');
         $group->add($field);
 
         $path = new PropertyPath('firstName');
@@ -284,7 +286,7 @@ class FieldGroupTest extends \PHPUnit_Framework_TestCase
                     ->method('addError')
                     ->with($this->equalTo('Message'), array(), $this->equalTo($expectedPathIterator), $this->equalTo(FieldGroup::DATA_ERROR));
 
-        $group = new FieldGroup('author');
+        $group = new TestFieldGroup('author');
         $group->add($field);
 
         $path = new PropertyPath('address.street');
@@ -306,8 +308,8 @@ class FieldGroupTest extends \PHPUnit_Framework_TestCase
                     ->method('addError')
                     ->with($this->equalTo('Message'), array(), $this->equalTo($expectedPathIterator), $this->equalTo(FieldGroup::DATA_ERROR));
 
-        $group = new FieldGroup('author');
-        $group2 = new FieldGroup('anonymous', array('property_path' => null));
+        $group = new TestFieldGroup('author');
+        $group2 = new TestFieldGroup('anonymous', array('property_path' => null));
         $group2->add($field);
         $group->add($group2);
 
@@ -318,7 +320,7 @@ class FieldGroupTest extends \PHPUnit_Framework_TestCase
 
     public function testAddThrowsExceptionIfAlreadyBound()
     {
-        $group = new FieldGroup('author');
+        $group = new TestFieldGroup('author');
         $group->add($this->createMockField('firstName'));
         $group->bind(array('firstName' => 'Bernhard'));
 
@@ -328,7 +330,7 @@ class FieldGroupTest extends \PHPUnit_Framework_TestCase
 
     public function testAddSetsFieldParent()
     {
-        $group = new FieldGroup('author');
+        $group = new TestFieldGroup('author');
 
         $field = $this->createMockField('firstName');
         $field->expects($this->once())
@@ -341,7 +343,7 @@ class FieldGroupTest extends \PHPUnit_Framework_TestCase
 
     public function testRemoveUnsetsFieldParent()
     {
-        $group = new FieldGroup('author');
+        $group = new TestFieldGroup('author');
 
         $field = $this->createMockField('firstName');
         $field->expects($this->exactly(2))
@@ -354,10 +356,10 @@ class FieldGroupTest extends \PHPUnit_Framework_TestCase
 
     public function testMergeAddsFieldsFromAnotherGroup()
     {
-        $group1 = new FieldGroup('author');
+        $group1 = new TestFieldGroup('author');
         $group1->add($field1 = new TestField('firstName'));
 
-        $group2 = new FieldGroup('publisher');
+        $group2 = new TestFieldGroup('publisher');
         $group2->add($field2 = new TestField('lastName'));
 
         $group1->merge($group2);
@@ -368,8 +370,8 @@ class FieldGroupTest extends \PHPUnit_Framework_TestCase
 
     public function testMergeThrowsExceptionIfOtherGroupAlreadyBound()
     {
-        $group1 = new FieldGroup('author');
-        $group2 = new FieldGroup('publisher');
+        $group1 = new TestFieldGroup('author');
+        $group2 = new TestFieldGroup('publisher');
         $group2->add($this->createMockField('firstName'));
 
         $group2->bind(array('firstName' => 'Bernhard'));
@@ -385,7 +387,7 @@ class FieldGroupTest extends \PHPUnit_Framework_TestCase
         // the authors should differ to make sure the test works
         $transformedAuthor->firstName = 'Foo';
 
-        $group = new FieldGroup('author');
+        $group = new TestFieldGroup('author');
 
         $transformer = $this->createMockTransformer();
         $transformer->expects($this->once())
@@ -409,7 +411,7 @@ class FieldGroupTest extends \PHPUnit_Framework_TestCase
 
     public function testAddDoesNotUpdateFieldsWithEmptyPropertyPath()
     {
-        $group = new FieldGroup('author');
+        $group = new TestFieldGroup('author');
         $group->setData(new Author());
 
         $field = $this->createMockField('firstName');
@@ -426,7 +428,7 @@ class FieldGroupTest extends \PHPUnit_Framework_TestCase
     {
         $originalAuthor = new Author();
 
-        $group = new FieldGroup('author');
+        $group = new TestFieldGroup('author');
 
         $transformer = $this->createMockTransformer();
         $transformer->expects($this->once())
@@ -451,7 +453,7 @@ class FieldGroupTest extends \PHPUnit_Framework_TestCase
         // the authors should differ to make sure the test works
         $transformedAuthor->firstName = 'Foo';
 
-        $group = new FieldGroup('author');
+        $group = new TestFieldGroup('author');
 
         $transformer = $this->createMockTransformer();
         $transformer->expects($this->once())
@@ -480,7 +482,7 @@ class FieldGroupTest extends \PHPUnit_Framework_TestCase
 
     public function testSetDataThrowsAnExceptionIfArgumentIsNotObjectOrArray()
     {
-        $group = new FieldGroup('author');
+        $group = new TestFieldGroup('author');
 
         $this->setExpectedException('InvalidArgumentException');
 
@@ -494,12 +496,15 @@ class FieldGroupTest extends \PHPUnit_Framework_TestCase
         // the authors should differ to make sure the test works
         $transformedAuthor->firstName = 'Foo';
 
-        $group = new FieldGroup('author');
+        $group = new TestFieldGroup('author');
 
         $transformer = $this->createMockTransformer();
-        $transformer->expects($this->once())
+        $transformer->expects($this->exactly(2))
                                 ->method('transform')
-                                ->with($this->equalTo($originalAuthor))
+                                // the method is first called with NULL, then
+                                // with $originalAuthor -> not testable by PHPUnit
+                                // ->with($this->equalTo(null))
+                                // ->with($this->equalTo($originalAuthor))
                                 ->will($this->returnValue($transformedAuthor));
 
         $group->setValueTransformer($transformer);
@@ -524,7 +529,7 @@ class FieldGroupTest extends \PHPUnit_Framework_TestCase
 
     public function testGetDataReturnsObject()
     {
-        $group = new FieldGroup('author');
+        $group = new TestFieldGroup('author');
         $object = new \stdClass();
         $group->setData($object);
         $this->assertEquals($object, $group->getData());
@@ -537,7 +542,7 @@ class FieldGroupTest extends \PHPUnit_Framework_TestCase
                     ->method('getDisplayedData')
                     ->will($this->returnValue('Bernhard'));
 
-        $group = new FieldGroup('author');
+        $group = new TestFieldGroup('author');
         $group->add($field);
 
         $this->assertEquals(array('firstName' => 'Bernhard'), $group->getDisplayedData());
@@ -545,7 +550,7 @@ class FieldGroupTest extends \PHPUnit_Framework_TestCase
 
     public function testIsMultipartIfAnyFieldIsMultipart()
     {
-        $group = new FieldGroup('author');
+        $group = new TestFieldGroup('author');
         $group->add($this->createMultipartMockField('firstName'));
         $group->add($this->createNonMultipartMockField('lastName'));
 
@@ -554,7 +559,7 @@ class FieldGroupTest extends \PHPUnit_Framework_TestCase
 
     public function testIsNotMultipartIfNoFieldIsMultipart()
     {
-        $group = new FieldGroup('author');
+        $group = new TestFieldGroup('author');
         $group->add($this->createNonMultipartMockField('firstName'));
         $group->add($this->createNonMultipartMockField('lastName'));
 
@@ -571,7 +576,7 @@ class FieldGroupTest extends \PHPUnit_Framework_TestCase
                     ->method('setLocale')
                     ->with($this->equalTo('de_DE'));
 
-        $group = new FieldGroup('author');
+        $group = new TestFieldGroup('author');
         $group->setLocale('de_DE');
         $group->add($field);
     }
@@ -591,7 +596,7 @@ class FieldGroupTest extends \PHPUnit_Framework_TestCase
 //          ->method('setLocale')
 //          ->with($this->equalTo('de_DE'));
 
-        $group = new FieldGroup('author');
+        $group = new TestFieldGroup('author');
         $group->add($field);
         $group->setLocale('de_DE');
 
@@ -600,7 +605,7 @@ class FieldGroupTest extends \PHPUnit_Framework_TestCase
 
     public function testSupportsClone()
     {
-        $group = new FieldGroup('author');
+        $group = new TestFieldGroup('author');
         $group->add($this->createMockField('firstName'));
 
         $clone = clone $group;
@@ -616,7 +621,7 @@ class FieldGroupTest extends \PHPUnit_Framework_TestCase
                     ->method('getData')
                     ->will($this->returnValue('Bernhard'));
 
-        $group = new FieldGroup('author');
+        $group = new TestFieldGroup('author');
         $group->add($field);
 
         $group->bind(array('firstName' => 'Bernhard'));
@@ -649,7 +654,7 @@ class FieldGroupTest extends \PHPUnit_Framework_TestCase
      */
     protected function getGroupWithBothVisibleAndHiddenField()
     {
-        $group = new FieldGroup('testGroup');
+        $group = new TestFieldGroup('testGroup');
 
         // add a visible field
         $visibleField = $this->createMockField('visibleField');

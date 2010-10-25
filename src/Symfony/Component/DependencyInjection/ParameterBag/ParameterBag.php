@@ -13,7 +13,7 @@ namespace Symfony\Component\DependencyInjection\ParameterBag;
 
 /**
  * 
- * @author     Fabien Potencier <fabien.potencier@symfony-project.com>
+ * @author Fabien Potencier <fabien.potencier@symfony-project.com>
  */
 class ParameterBag implements ParameterBagInterface
 {

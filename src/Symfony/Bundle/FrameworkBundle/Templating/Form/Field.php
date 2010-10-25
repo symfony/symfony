@@ -2,6 +2,9 @@
 
 namespace Symfony\Bundle\FrameworkBundle\Templating\Form;
 
+use Symfony\Component\Form\FieldGroupInterface;
+use Symfony\Component\Form\HybridField;
+
 /*
  * This file is part of the Symfony framework.
  *
@@ -22,7 +25,7 @@ class Field extends BaseField
 
     public function render($template = null)
     {
-        if ($this->field instanceof Form || get_class($this->field) === 'Symfony\Component\Form\FieldGroup') {
+        if ($this->field instanceof FieldGroupInterface && !$this->field instanceof HybridField) {
             throw new \LogicException(sprintf('Cannot render a group field as a row (%s)', $this->field->getKey()));
         }
 
@@ -40,7 +43,7 @@ class Field extends BaseField
 
     public function widget(array $attributes = array(), $template = null)
     {
-        if ($this->field instanceof Form || get_class($this->field) === 'Symfony\Component\Form\FieldGroup') {
+        if ($this->field instanceof FieldGroupInterface && !$this->field instanceof HybridField) {
             throw new \LogicException(sprintf('Cannot render a group field (%s)', $this->field->getKey()));
         }
 

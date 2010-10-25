@@ -23,8 +23,8 @@ use Doctrine\ORM\Mapping\ClassMetadataInfo;
 /**
  * Initialize a new Doctrine entity inside a bundle.
  *
- * @author     Fabien Potencier <fabien.potencier@symfony-project.com>
- * @author     Jonathan H. Wage <jonwage@gmail.com>
+ * @author Fabien Potencier <fabien.potencier@symfony-project.com>
+ * @author Jonathan H. Wage <jonwage@gmail.com>
  */
 class GenerateEntityDoctrineCommand extends DoctrineCommand
 {

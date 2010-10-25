@@ -34,6 +34,7 @@ class PasswordField extends TextField
     public function getAttributes()
     {
         return array_merge(parent::getAttributes(), array(
+            // override getDisplayedData() instead?
             'value'       => $this->getOption('always_empty') && !$this->isBound() ? '' : $this->getDisplayedData(),
             'type'        => 'password',
         ));

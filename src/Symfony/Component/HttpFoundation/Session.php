@@ -16,7 +16,7 @@ use Symfony\Component\HttpFoundation\SessionStorage\SessionStorageInterface;
 /**
  * Session.
  *
- * @author     Fabien Potencier <fabien.potencier@symfony-project.com>
+ * @author Fabien Potencier <fabien.potencier@symfony-project.com>
  */
 class Session implements \Serializable
 {
@@ -153,13 +153,30 @@ class Session implements \Serializable
         if (false === $this->started) {
             $this->start();
         }
+
         if (array_key_exists($name, $this->attributes)) {
             unset($this->attributes[$name]);
         }
     }
 
+    /**
+     * Clears all attributes.
+     */
+    public function clear()
+    {
+        if (false === $this->started) {
+            $this->start();
+        }
+
+        $this->attributes = array();
+    }
+
+    /**
+     * Invalidates the current session.
+     */
     public function invalidate()
     {
+        $this->clear();
         $this->storage->regenerate();
     }
 
@@ -240,7 +257,9 @@ class Session implements \Serializable
     public function save()
     {
         if (true === $this->started) {
-            $this->attributes['_flash'] = array_diff_key($this->attributes['_flash'], $this->oldFlashes);
+            if (isset($this->attributes['_flash'])) {
+                $this->attributes['_flash'] = array_diff_key($this->attributes['_flash'], $this->oldFlashes);
+            }
             $this->storage->write('_symfony2', $this->attributes);
         }
     }

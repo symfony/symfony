@@ -17,7 +17,7 @@ use Symfony\Component\Validator\Mapping\ClassMetadata;
 class XmlFileLoader extends FileLoader
 {
     /**
-     * An array of SimpleXMLElement instances
+     * An array of SimpleXMLElement instances.
      * @val array
      */
     protected $classes = null;
@@ -27,7 +27,7 @@ class XmlFileLoader extends FileLoader
      */
     public function loadClassMetadata(ClassMetadata $metadata)
     {
-        if (is_null($this->classes)) {
+        if (null === $this->classes) {
             $this->classes = array();
             $xml = $this->parseFile($this->file);
 
@@ -62,10 +62,11 @@ class XmlFileLoader extends FileLoader
     }
 
     /**
-     * Parses a collection of "constraint" XML nodes
+     * Parses a collection of "constraint" XML nodes.
      *
-     * @param  SimpleXMLElement $nodes   The XML nodes
-     * @return array                     The Constraint instances
+     * @param SimpleXMLElement $nodes The XML nodes
+     *
+     * @return array The Constraint instances
      */
     protected function parseConstraints(\SimpleXMLElement $nodes)
     {
@@ -95,10 +96,11 @@ class XmlFileLoader extends FileLoader
     }
 
     /**
-     * Parses a collection of "value" XML nodes
+     * Parses a collection of "value" XML nodes.
      *
-     * @param  SimpleXMLElement $nodes   The XML nodes
-     * @return array                     The values
+     * @param SimpleXMLElement $nodes The XML nodes
+     *
+     * @return array The values
      */
     protected function parseValues(\SimpleXMLElement $nodes)
     {
@@ -128,10 +130,11 @@ class XmlFileLoader extends FileLoader
     }
 
     /**
-     * Parses a collection of "option" XML nodes
+     * Parses a collection of "option" XML nodes.
      *
-     * @param  SimpleXMLElement $nodes   The XML nodes
-     * @return array                     The options
+     * @param SimpleXMLElement $nodes The XML nodes
+     *
+     * @return array The options
      */
     protected function parseOptions(\SimpleXMLElement $nodes)
     {
@@ -157,8 +160,13 @@ class XmlFileLoader extends FileLoader
     }
 
     /**
-     * @param  string $file
+     * Parse a XML File.
+     *
+     * @param string $file Path of file
+     *
      * @return SimpleXMLElement
+     *
+     * @throws MappingException
      */
     protected function parseFile($file)
     {

@@ -18,7 +18,7 @@ use Symfony\Component\Templating\Storage\StringStorage;
 /**
  * PhpRenderer is a renderer for PHP templates.
  *
- * @author     Fabien Potencier <fabien.potencier@symfony-project.com>
+ * @author Fabien Potencier <fabien.potencier@symfony-project.com>
  */
 class PhpRenderer extends Renderer
 {

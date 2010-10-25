@@ -14,17 +14,17 @@ namespace Symfony\Component\HttpKernel\Bundle;
 /**
  * BundleInterface.
  *
- * @author     Fabien Potencier <fabien.potencier@symfony-project.com>
+ * @author Fabien Potencier <fabien.potencier@symfony-project.com>
  */
 interface BundleInterface
 {
     /**
      * Boots the Bundle.
      */
-    public function boot();
+    function boot();
 
     /**
      * Shutdowns the Bundle.
      */
-    public function shutdown();
+    function shutdown();
 }

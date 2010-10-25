@@ -8,6 +8,7 @@
         <parameter key="data_collector.templates" type="collection">
             <parameter key="config">WebProfilerBundle:Profiler:config.php</parameter>
             <parameter key="request">WebProfilerBundle:Profiler:request.php</parameter>
+            <parameter key="security">WebProfilerBundle:Profiler:security.php</parameter>
             <parameter key="exception">WebProfilerBundle:Profiler:exception.php</parameter>
             <parameter key="events">WebProfilerBundle:Profiler:events.php</parameter>
             <parameter key="logger">WebProfilerBundle:Profiler:logger.php</parameter>

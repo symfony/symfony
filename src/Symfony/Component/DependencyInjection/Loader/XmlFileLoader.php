@@ -25,7 +25,7 @@ use Symfony\Component\DependencyInjection\Resource\FileResource;
 class XmlFileLoader extends FileLoader
 {
     /**
-     * Loads an array of XML files.
+     * Loads an XML file.
      *
      * @param mixed $resource The resource
      */

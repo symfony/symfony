@@ -28,7 +28,7 @@ use Symfony\Component\Yaml\Yaml;
 class YamlFileLoader extends FileLoader
 {
     /**
-     * Loads an array of Yaml files.
+     * Loads a Yaml file.
      *
      * @param mixed $resource The resource
      */

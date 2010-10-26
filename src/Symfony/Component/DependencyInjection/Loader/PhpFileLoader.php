@@ -24,7 +24,7 @@ use Symfony\Component\DependencyInjection\Resource\FileResource;
 class PhpFileLoader extends FileLoader
 {
     /**
-     * Loads an array of PHP files.
+     * Loads a PHP file.
      *
      * @param mixed $resource The resource
      */

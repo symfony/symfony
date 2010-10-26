@@ -120,7 +120,7 @@ class EscaperTest extends \PHPUnit_Framework_TestCase
         $this->assertEquals('<strong>escaped!</strong>', $output->title, '::unescape() unescapes all properties of the original object');
         $this->assertEquals('<strong>escaped!</strong>', $output->getTitleTitle(), '::unescape() is recursive');
 
-        $this->assertInstanceOf('\DirectoryIterator', IteratorDecorator::unescape(Escaper::escape('entities', new \DirectoryIterator('.'))), '::unescape() unescapes IteratorDecorator objects');
+        $this->assertInstanceOf('\DirectoryIterator', Escaper::unescape(Escaper::escape('entities', new \DirectoryIterator('.'))), '::unescape() unescapes IteratorDecorator objects');
     }
 
     public function testUnescapeDoesNotUnescapeObjectMarkedAsBeingSafe()

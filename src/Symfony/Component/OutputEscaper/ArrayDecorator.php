@@ -18,7 +18,7 @@ namespace Symfony\Component\OutputEscaper;
  * @author Fabien Potencier <fabien.potencier@symfony-project.com>
  * @author Mike Squire <mike@somosis.co.uk>
  */
-class ArrayDecorator extends GetterDecorator implements \Iterator, \ArrayAccess, \Countable
+class ArrayDecorator extends BaseEscaper implements \Iterator, \ArrayAccess, \Countable
 {
     /**
      * Used by the iterator to know if the current element is valid.
@@ -142,6 +142,17 @@ class ArrayDecorator extends GetterDecorator implements \Iterator, \ArrayAccess,
     }
 
     /**
+     * Escapes a key from the array using the specified escaper.
+     *
+     * @param string $key     The array key
+     * @param mixed  $escaper The escaping method (a PHP callable or a named escaper)
+     */
+    public function getEscapedKey($key, $escaper)
+    {
+        return Escaper::escape($escaper, $this->value[$key]);
+    }
+
+    /**
      * Returns the size of the array (are required by the Countable interface).
      *
      * @return int The size of the array
@@ -149,17 +160,5 @@ class ArrayDecorator extends GetterDecorator implements \Iterator, \ArrayAccess,
     public function count()
     {
         return count($this->value);
-    }
-
-    /**
-     * Returns the (unescaped) value from the array associated with the key supplied.
-     *
-     * @param  string $key  The key into the array to use
-     *
-     * @return mixed The value
-     */
-    public function getRaw($key)
-    {
-        return $this->value[$key];
     }
 }

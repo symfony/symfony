@@ -50,21 +50,6 @@ class ObjectDecoratorTest extends \PHPUnit_Framework_TestCase
         $this->assertTrue(isset(self::$escaped->someMember), 'The escaped object behaves like the real object');
         $this->assertFalse(isset(self::$escaped->invalidMember), 'The escaped object behaves like the real object');
     }
-
-    public function testGetRaw()
-    {
-        $this->assertEquals('<em>escape me</em>', self::$escaped->getRaw('someMember'), '->getRaw() returns result with any escaping');
-    }
-
-    /**
-     * @expectedException LogicException
-     */
-    public function testGetRawException()
-    {
-        $object = new \stdClass();
-        $escaped = Escaper::escape('entities', $object);
-        $escaped->getRaw('something');
-    }
 }
 
 class OutputEscaperTest

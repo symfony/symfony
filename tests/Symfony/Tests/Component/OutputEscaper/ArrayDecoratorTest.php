@@ -24,9 +24,9 @@ class ArrayDecoratorTest extends \PHPUnit_Framework_TestCase
         self::$escaped = Escaper::escape('entities', $a);
     }
 
-    public function testGetRaw()
+    public function testGetEscapedKey()
     {
-        $this->assertEquals('<strong>escaped!</strong>', self::$escaped->getRaw(0), '->getRaw() returns the raw value');
+        $this->assertEquals('<strong>escaped!</strong>', self::$escaped->getEscapedKey(0, 'raw'), '->getEscapedKey() returns the value with an other escaper');
     }
 
     public function testArrayAccessInterface()

@@ -12,50 +12,16 @@ namespace Symfony\Component\OutputEscaper;
  */
 
 /**
- * Abstract class that provides an interface for escaping of output.
+ * Escaper provides output escaping features.
  *
  * @author Fabien Potencier <fabien.potencier@symfony-project.com>
  * @author Mike Squire <mike@somosis.co.uk>
  */
-abstract class Escaper
+class Escaper
 {
-    /**
-     * The value that is to be escaped.
-     *
-     * @var mixed
-     */
-    protected $value;
-
-    /**
-     * The escaper (a PHP callable) that is going to be applied to the value and its
-     * children.
-     *
-     * @var string
-     */
-    protected $escaper;
-
     static protected $charset = 'UTF-8';
     static protected $safeClasses = array();
     static protected $escapers;
-
-    /**
-     * Constructor.
-     *
-     * Since Escaper is an abstract class, instances cannot be created
-     * directly but the constructor will be inherited by sub-classes.
-     *
-     * @param string $callable A PHP callable
-     * @param string $value    Escaping value
-     */
-    public function __construct($escaper, $value)
-    {
-        if (null === self::$escapers) {
-            self::initializeEscapers();
-        }
-
-        $this->escaper = is_string($escaper) && isset(self::$escapers[$escaper]) ? self::$escapers[$escaper] : $escaper;
-        $this->value = $value;
-    }
 
     /**
      * Decorates a PHP variable with something that will escape any data obtained
@@ -78,7 +44,7 @@ abstract class Escaper
      * The escaping method is actually a PHP callable. This class hosts a set
      * of standard escaping strategies.
      *
-     * @param  string $escaper The escaping method (a PHP callable) to apply to the value
+     * @param  mixed  $escaper The escaping method (a PHP callable or a named escaper) to apply to the value
      * @param  mixed  $value   The value to escape
      *
      * @return mixed Escaped value
@@ -109,11 +75,10 @@ abstract class Escaper
         }
 
         if (is_object($value)) {
-            if ($value instanceof Escaper) {
+            if ($value instanceof BaseEscaper) {
                 // avoid double decoration
                 $copy = clone $value;
-
-                $copy->escaper = $escaper;
+                $copy->setEscaper($escaper);
 
                 return $copy;
             }
@@ -121,7 +86,7 @@ abstract class Escaper
             if ($value instanceof SafeDecorator) {
                 // do not escape objects marked as safe
                 // return the original object
-                return $value->getValue();
+                return $value->getRawValue();
             }
 
             if (self::isClassMarkedAsSafe(get_class($value)) || $value instanceof SafeDecoratorInterface) {
@@ -170,7 +135,7 @@ abstract class Escaper
         }
 
         if (is_object($value)) {
-            return $value instanceof Escaper ? $value->getRawValue() : $value;
+            return $value instanceof BaseEscaper ? $value->getRawValue() : $value;
         }
 
         return $value;
@@ -219,19 +184,6 @@ abstract class Escaper
     }
 
     /**
-     * Returns the raw value associated with this instance.
-     *
-     * Concrete instances of Escaper classes decorate a value which is
-     * stored by the constructor. This returns that original, unescaped, value.
-     *
-     * @return mixed The original value used to construct the decorator
-     */
-    public function getRawValue()
-    {
-        return $this->value;
-    }
-
-    /**
      * Sets the current charset.
      *
      * @param string $charset The current charset
@@ -260,6 +212,22 @@ abstract class Escaper
     static public function setEscaper($name, $escaper)
     {
         self::$escapers[$name] = $escaper;
+    }
+
+    /**
+     * Gets a named escaper.
+     *
+     * @param  string $name    The escaper name
+     *
+     * @return mixed  $escaper A PHP callable
+     */
+    static public function getEscaper($escaper)
+    {
+        if (null === self::$escapers) {
+            self::initializeEscapers();
+        }
+
+        return is_string($escaper) && isset(self::$escapers[$escaper]) ? self::$escapers[$escaper] : $escaper;
     }
 
     /**

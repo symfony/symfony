@@ -66,10 +66,11 @@ class Field extends BaseField
         }
 
         return $this->engine->render($template, array(
-            'field' => $this,
-            'id'    => $this->field->getId(),
-            'key'   => $this->field->getKey(),
-            'label' => $label ? $label : ucfirst(strtolower(str_replace('_', ' ', $this->field->getKey())))
+            'field'     => $this,
+            'origin'    => $this->field,
+            'id'        => $this->field->getId(),
+            'key'       => $this->field->getKey(),
+            'label'     => $label ? $label : ucfirst(strtolower(str_replace('_', ' ', $this->field->getKey())))
         ));
     }
 

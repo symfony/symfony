@@ -145,11 +145,11 @@ class ArrayDecorator extends BaseEscaper implements \Iterator, \ArrayAccess, \Co
      * Escapes a key from the array using the specified escaper.
      *
      * @param string $key     The array key
-     * @param mixed  $escaper The escaping method (a PHP callable or a named escaper)
+     * @param string $escaper The escaping strategy prefixed with esc_ (see __call())
      */
     public function getEscapedKey($key, $escaper)
     {
-        return Escaper::escape($escaper, $this->value[$key]);
+        return Escaper::escape(substr($escaper, 4), $this->value[$key]);
     }
 
     /**

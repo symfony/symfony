@@ -26,7 +26,7 @@ class ArrayDecoratorTest extends \PHPUnit_Framework_TestCase
 
     public function testGetEscapedKey()
     {
-        $this->assertEquals('<strong>escaped!</strong>', self::$escaped->getEscapedKey(0, 'raw'), '->getEscapedKey() returns the value with an other escaper');
+        $this->assertEquals('<strong>escaped!</strong>', self::$escaped->getEscapedKey(0, 'esc_raw'), '->getEscapedKey() returns the value with an other escaper');
     }
 
     public function testArrayAccessInterface()

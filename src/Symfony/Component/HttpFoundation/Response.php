@@ -317,8 +317,8 @@ class Response
     public function getDate()
     {
         if (null === $date = $this->headers->getDate('Date')) {
-            $date = new \DateTime();
-            $this->headers->set('Date', $date->format(DATE_RFC2822));
+            $date = new \DateTime(null, new \DateTimeZone('UTC'));
+            $this->headers->set('Date', $date->format('D, d M Y H:i:s').' GMT');
         }
 
         return $date;
@@ -370,7 +370,9 @@ class Response
         if (null === $date) {
             $this->headers->delete('Expires');
         } else {
-            $this->headers->set('Expires', $date->format(DATE_RFC2822));
+            $date = clone $date;
+            $date->setTimezone(new \DateTimeZone('UTC'));
+            $this->headers->set('Expires', $date->format('D, d M Y H:i:s').' GMT');
         }
     }
 
@@ -489,7 +491,9 @@ class Response
         if (null === $date) {
             $this->headers->delete('Last-Modified');
         } else {
-            $this->headers->set('Last-Modified', $date->format(DATE_RFC2822));
+            $date = clone $date;
+            $date->setTimezone(new \DateTimeZone('UTC'));
+            $this->headers->set('Last-Modified', $date->format('D, d M Y H:i:s').' GMT');
         }
     }
 

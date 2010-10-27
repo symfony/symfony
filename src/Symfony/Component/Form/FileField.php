@@ -19,6 +19,16 @@ class FileField extends InputField
     /**
      * {@inheritDoc}
      */
+    public function __construct($key, array $options = array())
+    {
+        $options['type'] = 'file';
+
+        parent::__construct($key, $options);
+    }
+
+    /**
+     * {@inheritDoc}
+     */
     public function getAttributes()
     {
         return array_merge(parent::getAttributes(), array(

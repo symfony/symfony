@@ -109,6 +109,53 @@ class RequestTest extends \PHPUnit_Framework_TestCase
         $this->assertEquals('foo=1&foo=2', $request->getQueryString(), '->getQueryString() allows repeated parameters');
     }
 
+    /**
+     * @covers Symfony\Component\HttpFoundation\Request::getHost
+     */
+    public function testGetHost()
+    {
+        $request = new Request();
+
+        $request->initialize(array('foo' => 'bar'));
+        $this->assertEquals('', $request->getHost(), '->getHost() return empty string if not initialized');
+
+        $request->initialize(null, null, null, null, null, array('HTTP_HOST' => 'www.exemple.com'));
+        $this->assertEquals('www.exemple.com', $request->getHost(), '->getHost() from Host Header');
+
+        // Host header with port number.
+        $request->initialize(null, null, null, null, null, array('HTTP_HOST' => 'www.exemple.com:8080'));
+        $this->assertEquals('www.exemple.com', $request->getHost(), '->getHost() from Host Header with port number');
+
+        // Server values.
+        $request->initialize(null, null, null, null, null, array('SERVER_NAME' => 'www.exemple.com'));
+        $this->assertEquals('www.exemple.com', $request->getHost(), '->getHost() from server name');
+
+        // X_FORWARDED_HOST.
+        $request->initialize(null, null, null, null, null, array('HTTP_X_FORWARDED_HOST' => 'www.exemple.com'));
+        $this->assertEquals('www.exemple.com', $request->getHost(), '->getHost() from X_FORWARDED_HOST');
+
+        // X_FORWARDED_HOST
+        $request->initialize(null, null, null, null, null, array('HTTP_X_FORWARDED_HOST' => 'www.exemple.com, www.second.com'));
+        $this->assertEquals('www.second.com', $request->getHost(), '->getHost() value from X_FORWARDED_HOST use last value');
+
+        // X_FORWARDED_HOST with port number
+        $request->initialize(null, null, null, null, null, array('HTTP_X_FORWARDED_HOST' => 'www.exemple.com, www.second.com:8080'));
+        $this->assertEquals('www.second.com', $request->getHost(), '->getHost() value from X_FORWARDED_HOST with port number');
+
+        $request->initialize(null, null, null, null, null, array('HTTP_HOST' => 'www.exemple.com', 'HTTP_X_FORWARDED_HOST' => 'www.forward.com'));
+        $this->assertEquals('www.forward.com', $request->getHost(), '->getHost() value from X_FORWARDED_HOST has priority over Host');
+
+        $request->initialize(null, null, null, null, null, array('SERVER_NAME' => 'www.exemple.com', 'HTTP_X_FORWARDED_HOST' => 'www.forward.com'));
+        $this->assertEquals('www.forward.com', $request->getHost(), '->getHost() value from X_FORWARDED_HOST has priority over SERVER_NAME ');
+
+
+        $request->initialize(null, null, null, null, null, array('SERVER_NAME' => 'www.exemple.com', 'HTTP_HOST' => 'www.host.com'));
+        $this->assertEquals('www.host.com', $request->getHost(), '->getHost() value from Host header has priority over SERVER_NAME ');
+
+
+    }
+
+
     public function testInitializeConvertsUploadedFiles()
     {
         $tmpFile = $this->createTempFile();

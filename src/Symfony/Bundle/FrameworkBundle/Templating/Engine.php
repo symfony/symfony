@@ -167,7 +167,9 @@ class Engine extends BaseEngine
         $elements = explode('.', $parts[2]);
         if (3 === count($elements)) {
             $parts[2] = $elements[0];
-            $options['format'] = '.'.$elements[1];
+            if ('html' !== $elements[1]) {
+                $options['format'] = '.'.$elements[1];
+            }
             $options['renderer'] = $elements[2];
         } elseif (2 === count($elements)) {
             $parts[2] = $elements[0];

@@ -87,7 +87,7 @@ abstract class ElementMetadata
     }
 
     /**
-     * Returns the constraints of the given group.
+     * Returns the constraints of the given group and global ones (* group).
      *
      * @param string $group The group name
      *
@@ -95,8 +95,14 @@ abstract class ElementMetadata
      */
     public function findConstraints($group)
     {
-        return isset($this->constraintsByGroup[$group])
+        $globalConstraints  = isset($this->constraintsByGroup['*'])
+                ? $this->constraintsByGroup['*']
+                : array();
+
+        $groupConstraints   = isset($this->constraintsByGroup[$group])
                 ? $this->constraintsByGroup[$group]
                 : array();
+
+        return array_merge((array) $globalConstraints, (array) $groupConstraints);
     }
 }

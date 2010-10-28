@@ -25,7 +25,7 @@ class ArrayDecorator extends BaseEscaper implements \Iterator, \ArrayAccess, \Co
      *
      * @var int
      */
-    private $count;
+    private $count = 0;
 
     /**
      * Reset the array to the beginning (as required for the Iterator interface).

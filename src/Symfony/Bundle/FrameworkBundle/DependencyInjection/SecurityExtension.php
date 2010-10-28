@@ -372,6 +372,19 @@ class SecurityExtension extends Extension
             return array($name, $encoder);
         }
 
+        // Doctrine Document DAO provider
+        if (isset($provider['document'])) {
+            $container
+                ->register($name, '%security.user.provider.document.class%')
+                ->setArguments(array(
+                    new Reference('security.user.document_manager'),
+                    $provider['document']['class'],
+                    isset($provider['document']['property']) ? $provider['document']['property'] : null,
+            ));
+
+            return array($name, $encoder);
+        }
+
         // In-memory DAO provider
         $definition = $container->register($name, '%security.user.provider.in_memory.class%');
         foreach ($this->fixConfig($provider, 'user') as $username => $user) {

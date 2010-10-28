@@ -1,11 +1,11 @@
 <?php
 
-namespace Symfony\Bundle\DoctrineBundle\Security;
+namespace Symfony\Bundle\DoctrineMongoDBBundle\Security;
 
 use Symfony\Component\Security\User\UserProviderInterface;
 use Symfony\Component\Security\Exception\UsernameNotFoundException;
 
-class EntityUserProvider implements UserProviderInterface
+class DocumentUserProvider implements UserProviderInterface
 {
     protected $repository;
     protected $property;

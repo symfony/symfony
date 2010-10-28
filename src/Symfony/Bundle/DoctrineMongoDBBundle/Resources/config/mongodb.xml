@@ -41,6 +41,9 @@
     <parameter key="doctrine.odm.mongodb.xml_mapping_dirs">%doctrine.odm.mongodb.mapping_dirs%</parameter>
     <parameter key="doctrine.odm.mongodb.yml_mapping_dirs">%doctrine.odm.mongodb.mapping_dirs%</parameter>
     <parameter key="doctrine.odm.mongodb.document_dirs" type="collection"></parameter>
+
+    <!-- security/user -->
+    <parameter key="security.user.provider.document.class">Symfony\Bundle\DoctrineMongoDBBundle\Security\DocumentUserProvider</parameter>
   </parameters>
 
   <services>
@@ -75,5 +78,7 @@
       <tag name="data_collector" />
       <argument type="service" id="doctrine.odm.mongodb.logger" />
     </service>
+
+    <service id="security.user.document_manager" alias="doctrine.odm.mongodb.default_document_manager" />
   </services>
 </container>

@@ -48,8 +48,6 @@ class FormExtension extends \Twig_Extension
     public function initRuntime(\Twig_Environment $environment)
     {
         $this->environment = $environment;
-
-        $this->templates = $this->resolveResources($this->resources);
     }
 
     public function setTheme(FieldGroupInterface $group, array $resources)
@@ -94,6 +92,10 @@ class FormExtension extends \Twig_Extension
 
     public function render(FieldInterface $field, array $attributes = array())
     {
+        if (null === $this->templates) {
+            $this->templates = $this->resolveResources($this->resources);
+        }
+
         if ($field instanceof Form || get_class($field) === 'Symfony\Component\Form\FieldGroup') {
             return $this->templates['group']->getBlock('group', array(
                 'group'      => $field,
@@ -116,6 +118,10 @@ class FormExtension extends \Twig_Extension
 
     public function renderHidden(FieldGroupInterface $form)
     {
+        if (null === $this->templates) {
+            $this->templates = $this->resolveResources($this->resources);
+        }
+
         return $this->templates['hidden']->getBlock('hidden', array(
             'fields' => $form->getHiddenFields()
         ));
@@ -123,6 +129,10 @@ class FormExtension extends \Twig_Extension
 
     public function renderErrors($formOrField)
     {
+        if (null === $this->templates) {
+            $this->templates = $this->resolveResources($this->resources);
+        }
+
         return $this->templates['errors']->getBlock('errors', array(
             'errors' => $formOrField->getErrors()
         ));
@@ -130,6 +140,10 @@ class FormExtension extends \Twig_Extension
 
     public function renderLabel(FieldInterface $field, $label = null, array $attributes = array())
     {
+        if (null === $this->templates) {
+            $this->templates = $this->resolveResources($this->resources);
+        }
+
         return $this->templates['label']->getBlock('label', array(
             'id'         => $field->getId(),
             'key'        => $field->getKey(),

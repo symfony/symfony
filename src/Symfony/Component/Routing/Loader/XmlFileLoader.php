@@ -132,7 +132,7 @@ class XmlFileLoader extends FileLoader
     {
         $parts = explode('/', str_replace('\\', '/', __DIR__.'/schema/routing/routing-1.0.xsd'));
         $drive = '\\' === DIRECTORY_SEPARATOR ? array_shift($parts).'/' : '';
-        $location = 'file:///'.$drive.implode('/', array_map('rawurlencode', $parts));
+        $location = 'file:///'.$drive.implode('/', $parts);
 
         $current = libxml_use_internal_errors(true);
         if (!$dom->schemaValidate($location)) {

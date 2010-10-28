@@ -206,6 +206,9 @@ class Escaper
     /**
      * Adds a named escaper.
      *
+     * Warning: An escaper must be able to deal with
+     * double-escaping correctly.
+     *
      * @param string $name    The escaper name
      * @param mixed  $escaper A PHP callable
      */
@@ -262,7 +265,7 @@ class Escaper
                 {
                     // Numbers and boolean values get turned into strings which can cause problems
                     // with type comparisons (e.g. === or is_int() etc).
-                    return is_string($value) ? htmlspecialchars($value, ENT_QUOTES, Escaper::getCharset()) : $value;
+                    return is_string($value) ? htmlspecialchars($value, ENT_QUOTES, Escaper::getCharset(), false) : $value;
                 },
 
             'entities' =>
@@ -276,7 +279,7 @@ class Escaper
                 {
                     // Numbers and boolean values get turned into strings which can cause problems
                     // with type comparisons (e.g. === or is_int() etc).
-                    return is_string($value) ? htmlentities($value, ENT_QUOTES, Escaper::getCharset()) : $value;
+                    return is_string($value) ? htmlentities($value, ENT_QUOTES, Escaper::getCharset(), false) : $value;
                 },
 
             'raw' =>

@@ -43,7 +43,7 @@ class Engine extends BaseEngine
         $this->container = $container;
         $this->escaper = $escaper;
 
-        parent::__construct($loader);
+        parent::__construct($loader, $renderers);
 
         foreach ($this->container->findTaggedServiceIds('templating.renderer') as $id => $attributes) {
             if (isset($attributes[0]['alias'])) {

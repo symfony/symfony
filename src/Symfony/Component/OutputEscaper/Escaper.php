@@ -294,34 +294,54 @@ class Escaper
 
             'js' =>
                 /**
-                 * A function that c-escapes a string after applying (cf. entities). The
-                 * assumption is that the value will be used to generate dynamic HTML in some
-                 * way and the safest way to prevent mishap is to assume the value should have
-                 * HTML entities set properly.
-                 *
-                 * The (cf. js_no_entities) method should be used to escape a string
-                 * that is ultimately not going to end up as text in an HTML document.
+                 * A function that escape all non-alphanumeric characters
+                 * into their \xHH or \uHHHH representations
                  *
                  * @param string $value the value to escape
                  * @return string the escaped value
                  */
                 function ($value)
                 {
-                    return str_replace(array("\\"  , "\n"  , "\r" , "\""  , "'"  ), array("\\\\", "\\n" , "\\r", "\\\"", "\\'"), (is_string($value) ? htmlentities($value, ENT_QUOTES, Escaper::getCharset()) : $value));
-                },
+                    if ('UTF-8' != Escaper::getCharset()) {
+                        $string = Escaper::convertEncoding($string, 'UTF-8', Escaper::getCharset());
+                    }
 
-            'js_no_entities' =>
-                /**
-                 * A function the c-escapes a string, making it suitable to be placed in a
-                 * JavaScript string.
-                 *
-                 * @param string $value the value to escape
-                 * @return string the escaped value
-                 */
-                function ($value)
-                {
-                    return str_replace(array("\\"  , "\n"  , "\r" , "\""  , "'"  ), array("\\\\", "\\n" , "\\r", "\\\"", "\\'"), $value);
+                    $callback = function ($matches)
+                    {
+                        $char = $matches[0];
+
+                        // \xHH
+                        if (!isset($char[1])) {
+                            return '\\x'.substr('00'.bin2hex($char), -2);
+                        }
+
+                        // \uHHHH
+                        $char = Escaper::convertEncoding($char, 'UTF-16BE', 'UTF-8');
+
+                        return '\\u'.substr('0000'.bin2hex($char), -4);
+                    };
+
+                    if (null === $string = preg_replace_callback('#[^\p{L}\p{N} ]#u', $callback, $string)) {
+                        throw new InvalidArgumentException('The string to escape is not a valid UTF-8 string.');
+                    }
+
+                    if ('UTF-8' != Escaper::getCharset()) {
+                        $string = Escaper::convertEncoding($string, Escaper::getCharset(), 'UTF-8');
+                    }
+
+                    return $string;
                 },
         );
+    }
+
+    static public function convertEncoding($string, $to, $from)
+    {
+        if (function_exists('iconv')) {
+            return iconv($from, $to, $string);
+        } elseif (function_exists('mb_convert_encoding')) {
+            return mb_convert_encoding($string, $to, $from);
+        } else {
+            throw new RuntimeException('No suitable convert encoding function (use UTF-8 as your encoding or install the iconv or mbstring extension).');
+        }
     }
 }

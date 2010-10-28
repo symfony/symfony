@@ -39,6 +39,8 @@ class CollectionToStringTransformer extends BaseValueTransformer
     {
         $this->addOption('trim', true);
         $this->addOption('separator', ',');
+        $this->addOption('explodeCallback', 'explode');
+        $this->addOption('implodeCallback', 'implode');
         $this->addOption('createInstanceCallback', null);
         $this->addRequiredOption('em');
         $this->addRequiredOption('className');
@@ -57,14 +59,16 @@ class CollectionToStringTransformer extends BaseValueTransformer
             return $collection;
         }
 
-        $className = $this->getOption('className');
-        $values = explode($this->getOption('separator'), $value);
+        $callback = $this->getOption('explodeCallback');
+        $values = call_user_func($callback, $this->getOption('separator'), $value);
+
         if ($this->getOption('trim') === true) {
             $values = array_map('trim', $values);
         }
 
         /* @var $em Doctrine\ORM\EntityManager */
         $em = $this->getOption('em');
+        $className = $this->getOption('className');
         $reflField = $em->getClassMetadata($className)
                         ->getReflectionProperty($this->getOption('fieldName'));
 
@@ -141,6 +145,7 @@ class CollectionToStringTransformer extends BaseValueTransformer
         foreach ($value AS $object) {
             $values[] = $reflField->getValue($object);
         }
-        return implode($this->getOption('separator'), $values);
+        $callback = $this->getOption('implodeCallback');
+        return call_user_func($callback, $this->getOption('separator'), $values);
     }
 }

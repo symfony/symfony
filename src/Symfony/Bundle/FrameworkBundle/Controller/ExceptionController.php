@@ -49,7 +49,7 @@ class ExceptionController extends ContainerAware
         $response = $this->container->get('templating')->renderResponse(
             'FrameworkBundle:Exception:'.($this->container->get('kernel')->isDebug() ? 'exception.php' : 'error.php'),
             array(
-                'exception'      => new SafeDecorator($exception),
+                'exception'      => $exception,
                 'logger'         => $logger,
                 'currentContent' => $currentContent,
                 'embedded'       => $embedded,

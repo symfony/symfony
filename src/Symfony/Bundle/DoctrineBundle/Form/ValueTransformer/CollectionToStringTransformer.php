@@ -19,7 +19,7 @@ use Doctrine\Common\Collections\Collection;
  * Transforms an instance of Doctrine\Common\Collections\Collection into a string of unique names.
  *
  * Use-Cases for this transformer include: List of Tag-Names, List Of Group/User-Names or the like.
- * 
+ *
  * This transformer only makes sense if you know the list of related collections to be small and
  * that they have a unique identifier field that is of meaning to the user (Tag Names) and is
  * enforced to be unique in the storage.
@@ -74,7 +74,7 @@ class CollectionToStringTransformer extends BaseValueTransformer
                         ->getReflectionProperty($this->getOption('field_name'));
 
         // 1. removing elements that are not yet present anymore
-        foreach ($collection AS $object) {
+        foreach ($collection as $object) {
             $uniqueIdent = $reflField->getValue($object);
             $key = array_search($uniqueIdent, $values);
             if ($key === false) {
@@ -91,7 +91,7 @@ class CollectionToStringTransformer extends BaseValueTransformer
             $query = $em->createQuery();
             $needles = array();
             $i = 0;
-            foreach ($values AS $val) {
+            foreach ($values as $val) {
                 $query->setParameter(++$i, $val);
                 $needles[] = '?'.$i;
             }
@@ -99,7 +99,7 @@ class CollectionToStringTransformer extends BaseValueTransformer
             $query->setDql($dql);
             $newElements = $query->getResult();
 
-            foreach ($newElements AS $object) {
+            foreach ($newElements as $object) {
                 $collection->add($object);
 
                 $uniqueIdent = $reflField->getValue($object);
@@ -115,7 +115,7 @@ class CollectionToStringTransformer extends BaseValueTransformer
                 throw new TransformationFailedException('Cannot transform list of identifiers, because a new element was detected and it is unknown how to create an instance of this element.');
             }
 
-            foreach ($values AS $newValue) {
+            foreach ($values as $newValue) {
                 $newInstance = call_user_func($callback, $newValue);
                 if (!($newInstance instanceof $className)) {
                     throw new TransformationFailedException(sprintf('Error while trying to create a new instance for the identifier "%s". No new instance was created.', $newValue));
@@ -141,7 +141,7 @@ class CollectionToStringTransformer extends BaseValueTransformer
         $reflField = $em->getClassMetadata($this->getOption('class_name'))
                         ->getReflectionProperty($this->getOption('field_name'));
 
-        foreach ($value AS $object) {
+        foreach ($value as $object) {
             $values[] = $reflField->getValue($object);
         }
         $callback = $this->getOption('implode_callback');

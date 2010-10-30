@@ -224,9 +224,7 @@ class HeaderBag
             $cookie .= '; domain='.$domain;
         }
 
-        if ('/' !== $path) {
-            $cookie .= '; path='.$path;
-        }
+        $cookie .= '; path='.$path;
 
         if ($secure) {
             $cookie .= '; secure';

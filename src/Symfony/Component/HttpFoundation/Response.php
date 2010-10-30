@@ -580,7 +580,18 @@ class Response
             return array();
         }
 
-        return preg_split('/[\s,]+/', $vary);
+        return is_array($vary) ? $vary : preg_split('/[\s,]+/', $vary);
+    }
+
+    /**
+     * Sets the Vary header.
+     *
+     * @param string|array $headers
+     * @param Boolean      $replace Whether to replace the actual value of not (true by default)
+     */
+    public function setVary($headers, $replace = true)
+    {
+        $this->headers->set('Vary', $headers, $replace);
     }
 
     /**

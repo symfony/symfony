@@ -52,8 +52,10 @@ class CacheStoreTest extends \PHPUnit_Framework_TestCase
         $this->store->write($request, new Response('foo'));
         $this->assertNotEmpty($this->store->getMetadata($this->store->getCacheKey($request)));
 
-        $this->assertNull($this->store->purge('/foo'));
+        $this->assertTrue($this->store->purge('/foo'));
         $this->assertEmpty($this->store->getMetadata($this->store->getCacheKey($request)));
+
+        $this->assertFalse($this->store->purge('/bar'));
     }
 
     public function testStoresACacheEntry()

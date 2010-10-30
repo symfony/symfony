@@ -49,12 +49,12 @@ class Cache implements HttpKernelInterface
      *                            public or private via a Cache-Control directive. (default: Authorization and Cookie)
      *
      *   * allow_reload           Specifies whether the client can force a cache reload by including a
-     *                            Cache-Control "no-cache" directive in the request. This is enabled by
-     *                            default for compliance with RFC 2616. (default: false)
+     *                            Cache-Control "no-cache" directive in the request. Set it to ``true``
+     *                            for compliance with RFC 2616. (default: false)
      *
      *   * allow_revalidate       Specifies whether the client can force a cache revalidate by including
-     *                            a Cache-Control "max-age=0" directive in the request. This is enabled by
-     *                            default for compliance with RFC 2616. (default: false)
+     *                            a Cache-Control "max-age=0" directive in the request. Set it to ``true``
+      *                            for compliance with RFC 2616. (default: false)
      *
      *   * stale_while_revalidate Specifies the default number of seconds (the granularity is the second as the
      *                            Response TTL precision is a second) during which the cache can immediately return
@@ -63,7 +63,7 @@ class Cache implements HttpKernelInterface
      *                            extension (see RFC 5861).
      *
      *   * stale_if_error         Specifies the default number of seconds (the granularity is the second) during which
-     *                            the cache can server a stale response when an error is encountered (default: 60).
+     *                            the cache can serve a stale response when an error is encountered (default: 60).
      *                            This setting is overridden by the stale-if-error HTTP Cache-Control extension
      *                            (see RFC 5861).
      *

@@ -94,9 +94,7 @@ class MessageCatalogue implements MessageCatalogueInterface
      */
     public function setMessages($messages, $domain = 'messages')
     {
-        if (isset($this->messages[$domain])) {
-            $this->messages[$domain] = array();
-        }
+        $this->messages[$domain] = array();
 
         $this->addMessages($messages, $domain);
     }
@@ -118,6 +116,10 @@ class MessageCatalogue implements MessageCatalogueInterface
      */
     public function addCatalogue(MessageCatalogueInterface $catalogue)
     {
+        if ($catalogue->getLocale() !== $this->locale) {
+            throw new \LogicException(sprintf('Cannot add a catalogue for locale "%s" as the current locale for this catalogue is "%s"', $catalogue->getLocale(), $this->locale));
+        }
+
         foreach ($catalogue->getMessages() as $domain => $messages) {
             $this->addMessages($messages, $domain);
         }
@@ -130,9 +132,27 @@ class MessageCatalogue implements MessageCatalogueInterface
     /**
      * {@inheritdoc}
      */
+    public function addFallbackCatalogue(MessageCatalogueInterface $catalogue)
+    {
+        foreach ($catalogue->getDomains() as $domain) {
+            foreach ($catalogue->getMessages($domain) as $id => $translation) {
+                if (false === $this->hasMessage($id, $domain)) {
+                    $this->setMessage($id, $translation, $domain);
+                }
+            }
+        }
+
+        foreach ($catalogue->getResources() as $resource) {
+            $this->addResource($resource);
+        }
+    }
+
+    /**
+     * {@inheritdoc}
+     */
     public function getResources()
     {
-        return array_unique($this->resources);
+        return array_values(array_unique($this->resources));
     }
 
     /**

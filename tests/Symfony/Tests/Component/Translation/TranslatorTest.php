@@ -17,6 +17,51 @@ use Symfony\Component\Translation\Loader\ArrayLoader;
 
 class TranslatorTest extends \PHPUnit_Framework_TestCase
 {
+    public function testSetGetLocale()
+    {
+        $translator = new Translator('en', new MessageSelector());
+
+        $this->assertEquals('en', $translator->getLocale());
+
+        $translator->setLocale('fr');
+        $this->assertEquals('fr', $translator->getLocale());
+    }
+
+    public function testSetFallbackLocale()
+    {
+        $translator = new Translator('en', new MessageSelector());
+        $translator->addLoader('array', new ArrayLoader());
+        $translator->addResource('array', array('foo' => 'foofoo'), 'en');
+        $translator->addResource('array', array('bar' => 'foobar'), 'fr');
+
+        // force catalogue loading
+        $translator->trans('bar');
+
+        $translator->setFallbackLocale('fr');
+        $this->assertEquals('foobar', $translator->trans('bar'));
+    }
+
+    public function testTransWithFallbackLocale()
+    {
+        $translator = new Translator('en_US', new MessageSelector());
+        $translator->addLoader('array', new ArrayLoader());
+        $translator->addResource('array', array('foo' => 'foofoo'), 'en_US');
+        $translator->addResource('array', array('bar' => 'foobar'), 'en');
+
+        $this->assertEquals('foobar', $translator->trans('bar'));
+    }
+
+    /**
+     * @expectedException RuntimeException
+     */
+    public function testWhenAResourceHasNoRegisteredLoader()
+    {
+        $translator = new Translator('en', new MessageSelector());
+        $translator->addResource('array', array('foo' => 'foofoo'), 'en');
+
+        $translator->trans('foo');
+    }
+
     /**
      * @dataProvider getTransTests
      */

@@ -59,8 +59,7 @@ class Interval
 
             return 
                 ('[' === $matches['left_delimiter'] ? $number >= $leftNumber : $number > $leftNumber)
-                &&
-                (']' === $matches['right_delimiter'] ? $number <= $rightNumber : $number < $rightNumber)
+                && (']' === $matches['right_delimiter'] ? $number <= $rightNumber : $number < $rightNumber)
             ;
         }
 

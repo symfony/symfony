@@ -18,6 +18,7 @@ namespace Symfony\Component\Translation;
  */
 class PluralizationRules
 {
+    // @codeCoverageIgnoreStart
     static protected $rules = array();
 
     /**
@@ -211,4 +212,6 @@ class PluralizationRules
 
         self::$rules[$locale] = $rule;
     }
+
+    // @codeCoverageIgnoreEnd
 }

@@ -28,8 +28,7 @@ class WebDebugToolbarListenerTest extends \PHPUnit_Framework_TestCase
         ;
         $request = $this->getMock('Symfony\Component\HttpFoundation\Request');
         $listener = new WebDebugToolbarListener($resolver);
-        $r = new \ReflectionObject($listener);
-        $m = $r->getMethod('injectToolbar');
+        $m = new \ReflectionMethod($listener, 'injectToolbar');
         $m->setAccessible(true);
 
         $response = new Response($content);

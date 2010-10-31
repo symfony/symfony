@@ -7,6 +7,7 @@ use Symfony\Component\Security\User\AccountCheckerInterface;
 use Symfony\Component\Security\Exception\UsernameNotFoundException;
 use Symfony\Component\Security\Exception\AuthenticationException;
 use Symfony\Component\Security\Exception\BadCredentialsException;
+use Symfony\Component\Security\Exception\AuthenticationServiceException;
 use Symfony\Component\Security\Authentication\Token\UsernamePasswordToken;
 use Symfony\Component\Security\Authentication\Token\TokenInterface;
 
@@ -62,17 +63,12 @@ abstract class UserAuthenticationProvider implements AuthenticationProviderInter
             throw $notFound;
         }
 
-        if (null === $user) {
-            throw new \LogicException('The retrieveUser() methods returned null which should not be possible.');
+        if (!$user instanceof AccountInterface) {
+            throw new AuthenticationServiceException('The retrieveUser() methods must return an AccountInterface object.');
         }
 
-        try {
-            $this->accountChecker->checkPreAuth($user);
-            $this->checkAuthentication($user, $token);
-        } catch (AuthenticationException $e) {
-            throw $e;
-        }
-
+        $this->accountChecker->checkPreAuth($user);
+        $this->checkAuthentication($user, $token);
         $this->accountChecker->checkPostAuth($user);
 
         return new UsernamePasswordToken($user, $token->getCredentials(), $user->getRoles());
@@ -92,7 +88,7 @@ abstract class UserAuthenticationProvider implements AuthenticationProviderInter
      * @param string                $username The username to retrieve
      * @param UsernamePasswordToken $token    The Token
      *
-     * @return mixed The user
+     * @return AccountInterface The user
      *
      * @throws AuthenticationException if the credentials could not be validated
      */

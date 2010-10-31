@@ -55,11 +55,9 @@ class DaoAuthenticationProvider extends UserAuthenticationProvider
      */
     protected function checkAuthentication(AccountInterface $account, UsernamePasswordToken $token)
     {
-        if (null === $token->getCredentials()) {
+        if (!$presentedPassword = (string) $token->getCredentials()) {
             throw new BadCredentialsException('Bad credentials');
         }
-
-        $presentedPassword = (string) $token->getCredentials();
 
         if (!$this->passwordEncoder->isPasswordValid($account->getPassword(), $presentedPassword, $account->getSalt())) {
             throw new BadCredentialsException('Bad credentials');
@@ -80,8 +78,8 @@ class DaoAuthenticationProvider extends UserAuthenticationProvider
             throw new AuthenticationServiceException($repositoryProblem->getMessage(), $token, 0, $repositoryProblem);
         }
 
-        if (null === $user) {
-            throw new AuthenticationServiceException('UserProvider returned null.');
+        if (!$user instanceof AccountInterface) {
+            throw new AuthenticationServiceException('The user provider must return an AccountInterface object.');
         }
 
         return $user;

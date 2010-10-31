@@ -91,12 +91,12 @@ class ControllerResolver implements ControllerResolverInterface
 
         if (is_array($controller)) {
             list($controller, $method) = $controller;
-            $r = new \ReflectionObject($controller);
-            $parameters = $r->getMethod($method)->getParameters();
+            $m = new \ReflectionMethod($controller, $method);
+            $parameters = $m->getParameters();
             $repr = sprintf('%s::%s()', get_class($controller), $method);
         } else {
-            $r = new \ReflectionFunction($controller);
-            $parameters = $r->getParameters();
+            $f = new \ReflectionFunction($controller);
+            $parameters = $f->getParameters();
             $repr = 'Closure';
         }
 

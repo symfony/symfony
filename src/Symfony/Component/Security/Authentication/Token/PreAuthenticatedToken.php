@@ -23,8 +23,8 @@ class PreAuthenticatedToken extends Token
      */
     public function __construct($user, $credentials, array $roles = null)
     {
+        parent::__construct(null === $roles ? array() : $roles);
         if (null !== $roles) {
-            parent::__construct($roles);
             $this->setAuthenticated(true);
         }
 

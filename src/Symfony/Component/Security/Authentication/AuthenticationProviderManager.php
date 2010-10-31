@@ -37,7 +37,7 @@ class AuthenticationProviderManager implements AuthenticationManagerInterface
     public function __construct(array $providers = array(), $eraseCredentials = true)
     {
         $this->setProviders($providers);
-        $this->eraseCredentials = $eraseCredentials;
+        $this->eraseCredentials = (Boolean) $eraseCredentials;
     }
 
     /**
@@ -60,7 +60,7 @@ class AuthenticationProviderManager implements AuthenticationManagerInterface
             try {
                 $result = $provider->authenticate($token);
             } catch (AccountStatusException $e) {
-                $e->setToken($token);
+                $e->setExtraInformation($token);
 
                 throw $e;
             } catch (AuthenticationException $e) {
@@ -69,7 +69,7 @@ class AuthenticationProviderManager implements AuthenticationManagerInterface
         }
 
         if (null !== $result) {
-            if ($this->eraseCredentials) {
+            if (true === $this->eraseCredentials) {
                 $result->eraseCredentials();
             }
 
@@ -80,7 +80,7 @@ class AuthenticationProviderManager implements AuthenticationManagerInterface
             $lastException = new ProviderNotFoundException(sprintf('No Authentication Provider found for token of class "%s".', get_class($token)));
         }
 
-        $lastException->setToken($token);
+        $lastException->setExtraInformation($token);
 
         throw $lastException;
     }

@@ -42,6 +42,8 @@ abstract class Token implements TokenInterface
             }
             $this->addRole($role);
         }
+        $this->authenticated = false;
+        $this->immutable = false;
     }
 
     /**
@@ -107,7 +109,7 @@ abstract class Token implements TokenInterface
     }
 
     /**
-     * Removes sensitive information from the token.
+     * {@inheritdoc}
      */
     public function eraseCredentials()
     {

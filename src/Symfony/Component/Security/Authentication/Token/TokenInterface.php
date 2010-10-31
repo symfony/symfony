@@ -66,4 +66,9 @@ interface TokenInterface extends \Serializable
      * @param Boolean $isAuthenticated The authenticated flag
      */
     function setAuthenticated($isAuthenticated);
+
+    /**
+     * Removes sensitive information from the token.
+     */
+    function eraseCredentials();
 }

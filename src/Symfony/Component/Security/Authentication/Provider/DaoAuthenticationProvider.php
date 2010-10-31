@@ -39,9 +39,9 @@ class DaoAuthenticationProvider extends UserAuthenticationProvider
      * @param AccountCheckerInterface  $accountChecker  An AccountCheckerInterface instance
      * @param PasswordEncoderInterface $passwordEncoder A PasswordEncoderInterface instance
      */
-    public function __construct(UserProviderInterface $userProvider, AccountCheckerInterface $accountChecker, PasswordEncoderInterface $passwordEncoder = null)
+    public function __construct(UserProviderInterface $userProvider, AccountCheckerInterface $accountChecker, PasswordEncoderInterface $passwordEncoder = null, $hideUserNotFoundExceptions = true)
     {
-        parent::__construct($accountChecker);
+        parent::__construct($accountChecker, $hideUserNotFoundExceptions);
 
         if (null === $passwordEncoder) {
             $passwordEncoder = new PlaintextPasswordEncoder();

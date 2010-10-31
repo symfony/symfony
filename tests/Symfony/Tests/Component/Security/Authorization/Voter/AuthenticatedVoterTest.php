@@ -16,6 +16,12 @@ use Symfony\Component\Security\Role\Role;
 
 class AuthenticatedVoterTest extends \PHPUnit_Framework_TestCase
 {
+    public function testSupportsClass()
+    {
+        $voter = new AuthenticatedVoter();
+        $this->assertTrue($voter->supportsClass('stdClass'));
+    }
+
     /**
      * @dataProvider getVoteTests
      */

@@ -71,8 +71,10 @@ abstract class Token implements TokenInterface
     {
         if (!is_object($this->user)) {
             return (string) $this->user;
-        } else {
+        } elseif ($this->user instanceof AccountInterface) {
             return $this->user->getUsername();
+        } else {
+            return 'n/a';
         }
     }
 

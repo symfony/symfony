@@ -8,7 +8,7 @@
         <service id="security.authentication.listener.form" class="%security.authentication.listener.form.class%">
             <argument type="service" id="security.context" />
             <argument type="service" id="security.authentication.manager" />
-            <argument type="collection">%security.authentication.form.options%</argument>
+            <argument>%security.authentication.form.options%</argument>
             <argument type="service" id="logger" on-invalid="null" />
         </service>
 

@@ -32,6 +32,10 @@ class ControllerResolverTest extends \PHPUnit_Framework_TestCase
         $this->assertInstanceOf('Symfony\Tests\Component\HttpKernel\ControllerResolverTest', $controller[0], '->getController() returns a PHP callable');
         $this->assertEquals(array('Using controller "Symfony\Tests\Component\HttpKernel\ControllerResolverTest::testGetController"'), $logger->getLogs('info'));
 
+        $request->attributes->set('_controller', $lambda = function () {});
+        $controller = $resolver->getController($request);
+        $this->assertSame($lambda, $controller);
+
         $request->attributes->set('_controller', 'foo');
         try {
             $resolver->getController($request);
@@ -77,6 +81,11 @@ class ControllerResolverTest extends \PHPUnit_Framework_TestCase
 
         $request->attributes->set('bar', 'bar');
         $this->assertEquals(array('foo', 'bar'), $resolver->getArguments($request, $controller), '->getArguments() overrides default values if provided in the request attributes');
+
+        $request = Request::create('/');
+        $request->attributes->set('foo', 'foo');
+        $controller = function ($foo) {};
+        $this->assertEquals(array('foo'), $resolver->getArguments($request, $controller));
 
         $request = Request::create('/');
         $request->attributes->set('foo', 'foo');

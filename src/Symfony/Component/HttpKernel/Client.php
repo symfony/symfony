@@ -100,7 +100,7 @@ EOF;
             $uri = '/'.$matches[2];
         }
 
-        return Request::create($uri, $request->getMethod(), $request->getParameters(), $request->getFiles(), $request->getCookies(), $request->getServer());
+        return Request::create($uri, $request->getMethod(), $request->getParameters(), $request->getCookies(), $request->getFiles(), $request->getServer());
     }
 
     /**

@@ -168,7 +168,7 @@ abstract class Client
     {
         $form->setValues($values);
 
-        return $this->request($form->getMethod(), $form->getUri(), $form->getPhpValues(), array(), $form->getPhpFiles());
+        return $this->request($form->getMethod(), $form->getUri(), $form->getPhpValues(), $form->getPhpFiles());
     }
 
     /**

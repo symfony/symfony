@@ -5,6 +5,8 @@ namespace Symfony\Bundle\TwigBundle\Extension;
 use Symfony\Bundle\TwigBundle\TokenParser\HelperTokenParser;
 use Symfony\Component\DependencyInjection\ContainerInterface;
 use Symfony\Bundle\TwigBundle\TokenParser\IncludeTokenParser;
+use Symfony\Bundle\TwigBundle\TokenParser\UrlTokenParser;
+use Symfony\Bundle\TwigBundle\TokenParser\PathTokenParser;
 
 /*
  * This file is part of the Symfony package.
@@ -63,14 +65,17 @@ class TemplatingExtension extends \Twig_Extension
             // {% asset 'css/blog.css' %}
             new HelperTokenParser('asset', '<location>', 'templating.helper.assets', 'getUrl'),
 
-            // {% route 'blog_post' with ['id': post.id] %}
-            new HelperTokenParser('route', '<route> [with <arguments:array>]', 'templating.helper.router', 'generate'),
-
             // {% render 'BlogBundle:Post:list' with ['limit': 2], ['alt': 'BlogBundle:Post:error'] %}
             new HelperTokenParser('render', '<template> [with <attributes:array>[, <options:array>]]', 'templating.helper.actions', 'render'),
 
             // {% flash 'notice' %}
             new HelperTokenParser('flash', '<name>', 'templating.helper.session', 'getFlash'),
+
+            // {% path 'blog_post' with ['id': post.id] %}
+            new PathTokenParser(),
+
+            // {% url 'blog_post' with ['id': post.id] %}
+            new UrlTokenParser(),
 
             // {% include 'sometemplate.php' with ['something' : 'something2'] %}
             new IncludeTokenParser(),

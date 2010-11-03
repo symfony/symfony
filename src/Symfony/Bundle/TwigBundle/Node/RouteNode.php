@@ -35,8 +35,15 @@ class RouteNode extends \Twig_Node
             ->write('echo $this->env->getExtension(\'templating\')->getContainer()->get(\'router\')->generate(')
             ->subcompile($this->getNode('route'))
             ->raw(', ')
-            ->subcompile($this->getNode('route_attributes'))
-            ->raw(', ')
+        ;
+
+        $attr = $this->getNode('route_attributes');
+        if ($attr) {
+            $compiler->subcompile($attr);
+        } else {
+            $compiler->raw('array()');
+        }
+        $compiler->raw(', ')
             ->raw($this->getAttribute('absolute') ? 'true' : 'false')
             ->raw(");")
         ;

@@ -154,6 +154,10 @@ class FormExtension extends \Twig_Extension
 
     public function renderWidget(FieldInterface $field, array $attributes = array(), $resources = null)
     {
+        if (null === $this->templates) {
+            $this->templates = $this->resolveResources($this->resources);
+        }
+
         if (null === $resources) {
             $parent = $field;
             $resources = array();

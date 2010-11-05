@@ -56,8 +56,8 @@ abstract class Bundle extends ContainerAware implements BundleInterface {
         $this->path = dirname($this->reflection->getFilename()); } }
 namespace Symfony\Component\HttpKernel\Bundle;
 interface BundleInterface {
-    public function boot();
-    public function shutdown(); }
+    function boot();
+    function shutdown(); }
 namespace Symfony\Component\HttpKernel\Debug;
 class ErrorHandler {
     protected $levels = array(

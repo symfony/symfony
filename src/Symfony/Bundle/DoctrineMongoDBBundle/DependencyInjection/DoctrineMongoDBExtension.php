@@ -131,14 +131,30 @@ class DoctrineMongoDBExtension extends Extension
             $odmConfigDef->addMethodCall($method, array($arg));
         }
 
+        // event manager
+        $eventManagerName = isset($documentManager['event_manager']) ? $documentManager['event_manager'] : $documentManager['name'];
+        $eventManagerId = sprintf('doctrine.odm.mongodb.%s_event_manager', $eventManagerName);
+        if (!$container->hasDefinition($eventManagerId)) {
+            $eventManagerDef = new Definition('%doctrine.odm.mongodb.event_manager_class%');
+            $eventManagerDef->addMethodCall('loadTaggedEventListeners', array(
+                new Reference('service_container'),
+                sprintf('doctrine.odm.mongodb.%s_event_listener', $eventManagerName),
+            ));
+            $eventManagerDef->addMethodCall('loadTaggedEventSubscribers', array(
+                new Reference('service_container'),
+                sprintf('doctrine.odm.mongodb.%s_event_subscriber', $eventManagerName),
+            ));
+            $container->setDefinition($eventManagerId, $eventManagerDef);
+        }
+
         $odmDmArgs = array(
             new Reference(sprintf('doctrine.odm.mongodb.%s_connection', isset($documentManager['connection']) ? $documentManager['connection'] : $documentManager['name'])),
             new Reference(sprintf('doctrine.odm.mongodb.%s_configuration', $documentManager['name'])),
-            new Reference('doctrine.odm.mongodb.event_manager'),
+            new Reference($eventManagerId),
         );
         $odmDmDef = new Definition('%doctrine.odm.mongodb.document_manager_class%', $odmDmArgs);
         $odmDmDef->setFactoryMethod('create');
-        $container->setDefinition(sprintf('doctrine.odm.mongodb.%s_document_manager', $documentManager['name']), $odmDmDef );
+        $container->setDefinition(sprintf('doctrine.odm.mongodb.%s_document_manager', $documentManager['name']), $odmDmDef);
 
         if ($documentManager['name'] == $defaultDocumentManager) {
             $container->setAlias(

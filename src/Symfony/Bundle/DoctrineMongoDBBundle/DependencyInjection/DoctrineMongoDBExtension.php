@@ -133,7 +133,8 @@ class DoctrineMongoDBExtension extends Extension
 
         $odmDmArgs = array(
             new Reference(sprintf('doctrine.odm.mongodb.%s_connection', isset($documentManager['connection']) ? $documentManager['connection'] : $documentManager['name'])),
-            new Reference(sprintf('doctrine.odm.mongodb.%s_configuration', $documentManager['name']))
+            new Reference(sprintf('doctrine.odm.mongodb.%s_configuration', $documentManager['name'])),
+            new Reference('doctrine.odm.mongodb.event_manager'),
         );
         $odmDmDef = new Definition('%doctrine.odm.mongodb.document_manager_class%', $odmDmArgs);
         $odmDmDef->setFactoryMethod('create');

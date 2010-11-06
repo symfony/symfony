@@ -36,8 +36,8 @@ class CollectionToStringTransformerTest extends \Symfony\Bundle\DoctrineBundle\T
     {
         $this->setExpectedException('Symfony\Component\Form\Exception\MissingOptionsException');
         $transformer = new CollectionToStringTransformer(array(
-            'className' => 'Symfony\Bundle\DoctrineBundle\Tests\Form\ValueTransformer\Tag',
-            'fieldName' => 'name',
+            'class_name' => 'Symfony\Bundle\DoctrineBundle\Tests\Form\ValueTransformer\Tag',
+            'field_name' => 'name',
         ));
     }
 
@@ -45,7 +45,7 @@ class CollectionToStringTransformerTest extends \Symfony\Bundle\DoctrineBundle\T
     {
         $this->setExpectedException('Symfony\Component\Form\Exception\MissingOptionsException');
         $transformer = new CollectionToStringTransformer(array(
-            'fieldName' => 'name',
+            'field_name' => 'name',
             'em' => $this->em,
         ));
     }
@@ -54,7 +54,7 @@ class CollectionToStringTransformerTest extends \Symfony\Bundle\DoctrineBundle\T
     {
         $this->setExpectedException('Symfony\Component\Form\Exception\MissingOptionsException');
         $transformer = new CollectionToStringTransformer(array(
-            'className' => 'Symfony\Bundle\DoctrineBundle\Tests\Form\ValueTransformer\Tag',
+            'class_name' => 'Symfony\Bundle\DoctrineBundle\Tests\Form\ValueTransformer\Tag',
             'em' => $this->em,
         ));
     }
@@ -62,10 +62,10 @@ class CollectionToStringTransformerTest extends \Symfony\Bundle\DoctrineBundle\T
     public function createTransformer()
     {
         $transformer = new CollectionToStringTransformer(array(
-            'className' => 'Symfony\Bundle\DoctrineBundle\Tests\Form\ValueTransformer\Tag',
-            'fieldName' => 'name',
+            'class_name' => 'Symfony\Bundle\DoctrineBundle\Tests\Form\ValueTransformer\Tag',
+            'field_name' => 'name',
             'em' => $this->em,
-            'createInstanceCallback' => function($tagName) {
+            'create_instance_callback' => function($tagName) {
                 return new Tag($tagName);
             }
         ));

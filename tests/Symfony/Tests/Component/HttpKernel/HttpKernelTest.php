@@ -19,27 +19,11 @@ use Symfony\Component\EventDispatcher\EventDispatcher;
 
 class HttpKernelTest extends \PHPUnit_Framework_TestCase
 {
-    public function testHandleGetsTheRequestFromTheContainer()
+    public function testHandleSetsTheRequest()
     {
         $request = Request::create('/');
         $container = $this->getMock('Symfony\Component\DependencyInjection\ContainerInterface');
-        $container->expects($this->any())
-                  ->method('get')
-                  ->will($this->returnValue($request))
-        ;
-
-        $kernel = new HttpKernel($container, new EventDispatcher(), $this->getResolver());
-
-        $kernel->handle();
-
-        $this->assertEquals($request, $kernel->getRequest());
-    }
-
-    public function testHandleSetsTheRequestIfPassed()
-    {
-        $request = Request::create('/');
-        $container = $this->getMock('Symfony\Component\DependencyInjection\ContainerInterface');
-        $container->expects($this->exactly(2))
+        $container->expects($this->exactly(1))
                   ->method('set')
                   ->with('request', $request)
         ;

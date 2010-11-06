@@ -43,21 +43,20 @@ class HttpKernel extends BaseHttpKernel
     /**
      * {@inheritdoc}
      */
-    public function handle(Request $request = null, $type = HttpKernelInterface::MASTER_REQUEST, $raw = false)
+    public function handle(Request $request, $type = HttpKernelInterface::MASTER_REQUEST, $catch = true)
     {
-        if (null === $request) {
-            $request = $this->container->get('request');
-        } else {
-            $this->container->set('request', $request);
-        }
-
+        $currentRequest = null;
         if (HttpKernelInterface::MASTER_REQUEST === $type) {
-            $this->request = $request;
+            $currentRequest = $this->container->get('request');
         }
 
-        $response = parent::handle($request, $type, $raw);
+        $this->container->set('request', $request);
 
-        $this->container->set('request', $this->request);
+        $response = parent::handle($request, $type, $catch);
+
+        if (null !== $currentRequest) {
+            $this->container->set('request', $currentRequest);
+        }
 
         return $response;
     }

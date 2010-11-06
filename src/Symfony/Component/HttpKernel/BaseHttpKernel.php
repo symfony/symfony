@@ -27,7 +27,6 @@ class BaseHttpKernel implements HttpKernelInterface
 {
     protected $dispatcher;
     protected $resolver;
-    protected $request;
 
     /**
      * Constructor
@@ -42,44 +41,14 @@ class BaseHttpKernel implements HttpKernelInterface
     }
 
     /**
-     * Gets the Request instance associated with the master request.
-     *
-     * @return Request A Request instance
+     * {@inheritdoc}
      */
-    public function getRequest()
+    public function handle(Request $request, $type = HttpKernelInterface::MASTER_REQUEST, $catch = true)
     {
-        return $this->request;
-    }
-
-    /**
-     * Handles a Request to convert it to a Response.
-     *
-     * All exceptions are caught, and a core.exception event is notified
-     * for user management.
-     *
-     * @param Request $request A Request instance
-     * @param integer $type The type of the request (one of HttpKernelInterface::MASTER_REQUEST or HttpKernelInterface::SUB_REQUEST)
-     * @param Boolean $raw Whether to catch exceptions or not
-     *
-     * @return Response A Response instance
-     *
-     * @throws \Exception When an Exception occurs during processing
-     *                    and couldn't be caught by event processing or $raw is true
-     */
-    public function handle(Request $request = null, $type = HttpKernelInterface::MASTER_REQUEST, $raw = false)
-    {
-        if (null === $request) {
-            $request = new Request();
-        }
-
-        if (HttpKernelInterface::MASTER_REQUEST === $type) {
-            $this->request = $request;
-        }
-
         try {
             return $this->handleRaw($request, $type);
         } catch (\Exception $e) {
-            if (true === $raw) {
+            if (false === $catch) {
                 throw $e;
             }
 

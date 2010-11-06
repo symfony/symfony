@@ -19,22 +19,6 @@ use Symfony\Component\EventDispatcher\EventDispatcher;
 
 class BaseHttpKernelTest extends \PHPUnit_Framework_TestCase
 {
-    public function testHandleChangingMasterRequest()
-    {
-        $kernel = new BaseHttpKernel(new EventDispatcher(), $this->getResolver());
-
-        $kernel->handle();
-        $this->assertInstanceof('Symfony\Component\HttpFoundation\Request', $kernel->getRequest());
-
-        $request = Request::create('/');
-        $kernel->handle($request);
-        $this->assertSame($request, $kernel->getRequest());
-
-        $subRequest = Request::create('/');
-        $kernel->handle($subRequest, HttpKernelInterface::SUB_REQUEST);
-        $this->assertSame($request, $kernel->getRequest());
-    }
-
     /**
      * @expectedException RuntimeException
      */
@@ -42,7 +26,7 @@ class BaseHttpKernelTest extends \PHPUnit_Framework_TestCase
     {
         $kernel = new BaseHttpKernel(new EventDispatcher(), $this->getResolver(function () { throw new \RuntimeException(); }));
 
-        $kernel->handle(null, HttpKernelInterface::MASTER_REQUEST, true);
+        $kernel->handle(new Request(), HttpKernelInterface::MASTER_REQUEST, true);
     }
 
     /**
@@ -52,7 +36,7 @@ class BaseHttpKernelTest extends \PHPUnit_Framework_TestCase
     {
         $kernel = new BaseHttpKernel(new EventDispatcher(), $this->getResolver(function () { throw new \RuntimeException(); }));
 
-        $kernel->handle(null, HttpKernelInterface::MASTER_REQUEST, false);
+        $kernel->handle(new Request(), HttpKernelInterface::MASTER_REQUEST, false);
     }
 
     public function testHandleWhenControllerThrowsAnExceptionAndRawIsFalse()
@@ -67,7 +51,7 @@ class BaseHttpKernelTest extends \PHPUnit_Framework_TestCase
 
         $kernel = new BaseHttpKernel($dispatcher, $this->getResolver(function () { throw new \RuntimeException('foo'); }));
 
-        $this->assertEquals('foo', $kernel->handle()->getContent());
+        $this->assertEquals('foo', $kernel->handle(new Request())->getContent());
     }
 
     public function testHandleWhenAListenerReturnsAResponse()
@@ -82,7 +66,7 @@ class BaseHttpKernelTest extends \PHPUnit_Framework_TestCase
 
         $kernel = new BaseHttpKernel($dispatcher, $this->getResolver());
 
-        $this->assertEquals('hello', $kernel->handle()->getContent());
+        $this->assertEquals('hello', $kernel->handle(new Request())->getContent());
     }
 
     /**
@@ -93,7 +77,7 @@ class BaseHttpKernelTest extends \PHPUnit_Framework_TestCase
         $dispatcher = new EventDispatcher();
         $kernel = new BaseHttpKernel($dispatcher, $this->getResolver(false));
 
-        $kernel->handle();
+        $kernel->handle(new Request());
     }
 
     /**
@@ -104,7 +88,7 @@ class BaseHttpKernelTest extends \PHPUnit_Framework_TestCase
         $dispatcher = new EventDispatcher();
         $kernel = new BaseHttpKernel($dispatcher, $this->getResolver('foobar'));
 
-        $kernel->handle();
+        $kernel->handle(new Request());
     }
 
     /**
@@ -115,7 +99,7 @@ class BaseHttpKernelTest extends \PHPUnit_Framework_TestCase
         $dispatcher = new EventDispatcher();
         $kernel = new BaseHttpKernel($dispatcher, $this->getResolver(function () { return 'foo'; }));
 
-        $kernel->handle();
+        $kernel->handle(new Request());
     }
 
     public function testHandleWhenControllerDoesNotReturnAResponseButAViewIsRegistered()
@@ -127,7 +111,7 @@ class BaseHttpKernelTest extends \PHPUnit_Framework_TestCase
         });
         $kernel = new BaseHttpKernel($dispatcher, $this->getResolver(function () { return 'foo'; }));
 
-        $this->assertEquals('foo', $kernel->handle()->getContent());
+        $this->assertEquals('foo', $kernel->handle(new Request())->getContent());
     }
 
     /**
@@ -142,7 +126,7 @@ class BaseHttpKernelTest extends \PHPUnit_Framework_TestCase
         });
         $kernel = new BaseHttpKernel($dispatcher, $this->getResolver(function () { return 'foo'; }));
 
-        $kernel->handle();
+        $kernel->handle(new Request());
     }
 
     /**
@@ -157,7 +141,7 @@ class BaseHttpKernelTest extends \PHPUnit_Framework_TestCase
         });
         $kernel = new BaseHttpKernel($dispatcher, $this->getResolver());
 
-        $kernel->handle();
+        $kernel->handle(new Request());
     }
 
     public function testHandleWithAResponseListener()
@@ -169,7 +153,7 @@ class BaseHttpKernelTest extends \PHPUnit_Framework_TestCase
         });
         $kernel = new BaseHttpKernel($dispatcher, $this->getResolver());
 
-        $this->assertEquals('foo', $kernel->handle()->getContent());
+        $this->assertEquals('foo', $kernel->handle(new Request())->getContent());
     }
 
     protected function getResolver($controller = null)

@@ -128,21 +128,11 @@ class Cache implements HttpKernelInterface
     }
 
     /**
-     * Handles a Request.
-     *
-     * @param Request $request A Request instance
-     * @param integer $type    The type of the request (one of HttpKernelInterface::MASTER_REQUEST or HttpKernelInterface::SUB_REQUEST)
-     * @param Boolean $raw     Whether to catch exceptions or not (this is NOT used in this context)
-     *
-     * @return Symfony\Component\HttpFoundation\Response A Response instance
+     * {@inheritdoc}
      */
-    public function handle(Request $request = null, $type = HttpKernelInterface::MASTER_REQUEST, $raw = false)
+    public function handle(Request $request, $type = HttpKernelInterface::MASTER_REQUEST, $catch = true)
     {
         // FIXME: catch exceptions and implement a 500 error page here? -> in Varnish, there is a built-in error page mechanism
-        if (null === $request) {
-            $request = new Request();
-        }
-
         if (HttpKernelInterface::MASTER_REQUEST === $type) {
             $this->traces = array();
             $this->request = $request;
@@ -370,19 +360,19 @@ class Cache implements HttpKernelInterface
      * Forwards the Request to the backend and returns the Response.
      *
      * @param Request  $request  A Request instance
-     * @param Boolean  $raw      Whether to catch exceptions or not
+     * @param Boolean  $catch    Whether to catch exceptions or not
      * @param Response $response A Response instance (the stale entry if present, null otherwise)
      *
      * @return Response A Response instance
      */
-    protected function forward(Request $request, $raw = false, Response $entry = null)
+    protected function forward(Request $request, $catch = false, Response $entry = null)
     {
         if ($this->esi) {
             $this->esi->addSurrogateEsiCapability($request);
         }
 
         // always a "master" request (as the real master request can be in cache)
-        $response = $this->kernel->handle($request, HttpKernelInterface::MASTER_REQUEST, $raw);
+        $response = $this->kernel->handle($request, HttpKernelInterface::MASTER_REQUEST, $catch);
         // FIXME: we probably need to also catch exceptions if raw === true
 
         // we don't implement the stale-if-error on Requests, which is nonetheless part of the RFC

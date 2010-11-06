@@ -45,7 +45,6 @@ abstract class Kernel implements HttpKernelInterface, \Serializable
     protected $booted;
     protected $name;
     protected $startTime;
-    protected $request;
 
     const VERSION = '2.0.0-DEV';
 
@@ -81,7 +80,6 @@ abstract class Kernel implements HttpKernelInterface, \Serializable
 
         $this->booted = false;
         $this->container = null;
-        $this->request = null;
     }
 
     abstract public function registerRootDir();
@@ -172,31 +170,15 @@ abstract class Kernel implements HttpKernelInterface, \Serializable
     }
 
     /**
-     * Gets the Request instance associated with the master request.
-     *
-     * @return Request A Request instance
+     * {@inheritdoc}
      */
-    public function getRequest()
-    {
-        return $this->request;
-    }
-
-    /**
-     * Handles a request to convert it to a response by calling the HttpKernel service.
-     *
-     * @param  Request $request A Request instance
-     * @param  integer $type    The type of the request (one of HttpKernelInterface::MASTER_REQUEST or HttpKernelInterface::SUB_REQUEST)
-     * @param  Boolean $raw     Whether to catch exceptions or not
-     *
-     * @return Response $response A Response instance
-     */
-    public function handle(Request $request = null, $type = HttpKernelInterface::MASTER_REQUEST, $raw = false)
+    public function handle(Request $request, $type = HttpKernelInterface::MASTER_REQUEST, $catch = true)
     {
         if (false === $this->booted) {
             $this->boot();
         }
 
-        return $this->container->getHttpKernelService()->handle($request, $type, $raw);
+        return $this->container->getHttpKernelService()->handle($request, $type, $catch);
     }
 
     /**

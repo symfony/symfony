@@ -14,6 +14,14 @@
     <em>No POST parameters</em>
 <?php endif; ?>
 
+<h2>Request Attributes</h2>
+
+<?php if (count($data->getRequestAttributes()->all())): ?>
+    <?php echo $view->render('WebProfilerBundle:Profiler:bag.php', array('bag' => $data->getRequestAttributes())) ?>
+<?php else: ?>
+    <em>No attributes</em>
+<?php endif; ?>
+
 <h2>Request Cookies</h2>
 
 <?php if (count($data->getRequestCookies()->all())): ?>

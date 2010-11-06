@@ -271,7 +271,7 @@ class Profiler
     public function set(array $collectors = array())
     {
         $this->collectors = array();
-        foreach ($collectors as $name => $collector) {
+        foreach ($collectors as $collector) {
             $this->add($collector);
         }
     }

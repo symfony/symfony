@@ -37,6 +37,7 @@ class RequestDataCollector extends DataCollector
             'request_headers'    => $request->headers->all(),
             'request_server'     => $request->server->all(),
             'request_cookies'    => $request->cookies->all(),
+            'request_attributes' => $request->attributes->all(),
             'response_headers'   => $response->headers->all(),
             'session_attributes' => $request->hasSession() ? $request->getSession()->getAttributes() : array(),
         );
@@ -65,6 +66,11 @@ class RequestDataCollector extends DataCollector
     public function getRequestCookies()
     {
         return new ParameterBag($this->data['request_cookies']);
+    }
+
+    public function getRequestAttributes()
+    {
+        return new ParameterBag($this->data['request_attributes']);
     }
 
     public function getResponseHeaders()

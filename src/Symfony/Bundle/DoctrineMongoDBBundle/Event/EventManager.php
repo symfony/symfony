@@ -5,6 +5,11 @@ namespace Symfony\Bundle\DoctrineMongoDBBundle\Event;
 use Doctrine\Common\EventManager as BaseEventManager;
 use Symfony\Component\DependencyInjection\TaggedContainerInterface;
 
+/**
+ * An event manager that can pull listeners and subscribers from the service container.
+ *
+ * @author Kris Wallsmith <kris.wallsmith@symfony-project.com>
+ */
 class EventManager extends BaseEventManager
 {
     /**

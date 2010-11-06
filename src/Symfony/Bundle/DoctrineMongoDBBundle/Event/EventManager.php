@@ -10,10 +10,15 @@ class EventManager extends BaseEventManager
     /**
      * Loads event listeners from the service container.
      *
+     *     <service class="MyListener">
+     *         <tag name="doctrine.odm.mongodb.event_listener" event="prePersist" />
+     *         <tag name="doctrine.odm.mongodb.event_listener" event="preUpdate" />
+     *     </service>
+     *
      * @param TaggedContainerInterface $container The service container
      * @param string $tagName The name of the tag to load
      */
-    public function loadTaggedEventListeners(TaggedContainerInterface $container, $tagName)
+    public function loadTaggedEventListeners(TaggedContainerInterface $container, $tagName = 'doctrine.odm.mongodb.event_listener')
     {
         foreach ($container->findTaggedServiceIds($tagName) as $id => $instances) {
             $events = array();
@@ -32,13 +37,14 @@ class EventManager extends BaseEventManager
     /**
      * Loads event subscribers from the service container.
      *
-     * A service can be marked as an event subscriber using the
-     * "doctrine.odm.mongodb.event_subscriber" tag:
+     *     <service class="MySubscriber">
+     *         <tag name="doctrine.odm.mongodb.event_subscriber" />
+     *     </service>
      *
      * @param TaggedContainerInterface $container The service container
      * @param string $tagName The name of the tag to load
      */
-    public function loadTaggedEventSubscribers(TaggedContainerInterface $container, $tagName)
+    public function loadTaggedEventSubscribers(TaggedContainerInterface $container, $tagName = 'doctrine.odm.mongodb.event_subscriber')
     {
         foreach ($container->findTaggedServiceIds($tagName) as $id => $instances) {
             $this->addEventSubscriber($container->get($id));

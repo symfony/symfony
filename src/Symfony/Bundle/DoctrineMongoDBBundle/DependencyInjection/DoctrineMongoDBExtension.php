@@ -138,7 +138,13 @@ class DoctrineMongoDBExtension extends Extension
             $eventManagerDef = new Definition('%doctrine.odm.mongodb.event_manager_class%');
             $eventManagerDef->addMethodCall('loadTaggedEventListeners', array(
                 new Reference('service_container'),
+            ));
+            $eventManagerDef->addMethodCall('loadTaggedEventListeners', array(
+                new Reference('service_container'),
                 sprintf('doctrine.odm.mongodb.%s_event_listener', $eventManagerName),
+            ));
+            $eventManagerDef->addMethodCall('loadTaggedEventSubscribers', array(
+                new Reference('service_container'),
             ));
             $eventManagerDef->addMethodCall('loadTaggedEventSubscribers', array(
                 new Reference('service_container'),

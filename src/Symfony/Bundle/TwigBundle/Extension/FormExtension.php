@@ -74,14 +74,14 @@ class FormExtension extends \Twig_Extension
     public function getFilters()
     {
         return array(
-            'render_enctype' => new \Twig_Filter_Method($this, 'renderEnctype', array('is_escaper' => true)),
-            'render'         => new \Twig_Filter_Method($this, 'render', array('is_escaper' => true)),
-            'render_hidden'  => new \Twig_Filter_Method($this, 'renderHidden', array('is_escaper' => true)),
-            'render_errors'  => new \Twig_Filter_Method($this, 'renderErrors', array('is_escaper' => true)),
-            'render_widget'  => new \Twig_Filter_Method($this, 'renderWidget', array('is_escaper' => true)),
-            'render_label'   => new \Twig_Filter_Method($this, 'renderLabel', array('is_escaper' => true)),
-            'render_data'    => new \Twig_Filter_Method($this, 'renderData', array('is_escaper' => true)),
-            'render_choices' => new \Twig_Filter_Method($this, 'renderChoices', array('is_escaper' => true)),
+            'render_enctype' => new \Twig_Filter_Method($this, 'renderEnctype', array('is_safe' => array('html'))),
+            'render'         => new \Twig_Filter_Method($this, 'render', array('is_safe' => array('html'))),
+            'render_hidden'  => new \Twig_Filter_Method($this, 'renderHidden', array('is_safe' => array('html'))),
+            'render_errors'  => new \Twig_Filter_Method($this, 'renderErrors', array('is_safe' => array('html'))),
+            'render_widget'  => new \Twig_Filter_Method($this, 'renderWidget', array('is_safe' => array('html'))),
+            'render_label'   => new \Twig_Filter_Method($this, 'renderLabel', array('is_safe' => array('html'))),
+            'render_data'    => new \Twig_Filter_Method($this, 'renderData', array('is_safe' => array('html'))),
+            'render_choices' => new \Twig_Filter_Method($this, 'renderChoices', array('is_safe' => array('html'))),
         );
     }
 

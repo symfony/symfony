@@ -8,6 +8,7 @@ use Symfony\Component\DependencyInjection\Resource\FileResource;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\DependencyInjection\Reference;
 use Symfony\Component\DependencyInjection\Definition;
+use Symfony\Component\DependencyInjection\Parameter;
 use Symfony\Component\Finder\Finder;
 use Symfony\Component\HttpFoundation\RequestMatcher;
 
@@ -457,8 +458,17 @@ class FrameworkExtension extends Extension
                 $container->addResource(new FileResource($file));
             }
 
-            if (isset($config['validation']['annotations']) && $config['validation']['annotations'] === true) {
+            if (isset($config['validation']['annotations'])) {
+                if (isset($config['validation']['annotations']['namespaces']) && is_array($config['validation']['annotations']['namespaces'])) {
+                    $container->setParameter('validator.annotations.namespaces', array_merge(
+                        $container->getParameter('validator.annotations.namespaces'),
+                        $config['validation']['annotations']['namespaces']
+                    ));
+                }
+
                 $annotationLoader = new Definition($container->getParameter('validator.mapping.loader.annotation_loader.class'));
+                $annotationLoader->addArgument(new Parameter('validator.annotations.namespaces'));
+                
                 $container->setDefinition('validator.mapping.loader.annotation_loader', $annotationLoader);
 
                 $loader = $container->getDefinition('validator.mapping.loader.loader_chain');

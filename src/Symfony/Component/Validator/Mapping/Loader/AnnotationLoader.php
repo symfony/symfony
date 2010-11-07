@@ -21,11 +21,18 @@ class AnnotationLoader implements LoaderInterface
 {
     protected $reader;
 
-    public function __construct()
+    public function __construct(array $paths = null)
     {
+        if (null === $paths) {
+            $paths = array('validation' => 'Symfony\\Component\\Validator\\Constraints\\');
+        }
+
         $this->reader = new AnnotationReader();
         $this->reader->setAutoloadAnnotations(true);
-        $this->reader->setAnnotationNamespaceAlias('Symfony\Component\Validator\Constraints\\', 'validation');
+
+        foreach ($paths as $prefix => $path) {
+            $this->reader->setAnnotationNamespaceAlias($path, $prefix);
+        }
     }
 
     /**

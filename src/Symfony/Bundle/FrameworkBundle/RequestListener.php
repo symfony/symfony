@@ -99,6 +99,10 @@ class RequestListener
             }
 
             $request->attributes->add($parameters);
+
+            if ($locale = $request->attributes->get('_locale')) {
+                $request->getSession()->setLocale($locale);
+            }
         } elseif (null !== $this->logger) {
             $this->logger->err(sprintf('No route found for %s', $request->getPathInfo()));
         }

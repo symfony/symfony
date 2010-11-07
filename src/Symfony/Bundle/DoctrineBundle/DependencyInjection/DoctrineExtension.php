@@ -424,11 +424,11 @@ class DoctrineExtension extends Extension
     {
         $type = is_array($cacheDriver) && isset($cacheDriver['type']) ? $cacheDriver['type'] : $cacheDriver;
         if ($type === 'memcache') {
-            $memcacheClass = isset($cacheDriver['class']) ? $cacheDriver['class'] : '%'.sprintf('doctrine.orm.cache.%s_class', $type).'%';
+            $memcacheClass = '%'.sprintf('doctrine.orm.cache.%s_class', $type).'%';
             $cacheDef = new Definition($memcacheClass);
-            $memcacheHost = isset($cacheDriver['host']) ? $cacheDriver['host'] : '%doctrine.orm.cache.memcache_host%';
-            $memcachePort = isset($cacheDriver['port']) ? $cacheDriver['port'] : '%doctrine.orm.cache.memcache_port%';
-            $memcacheInstanceClass = isset($cacheDriver['instance_class']) ? $cacheDriver['instance_class'] : '%doctrine.orm.cache.memcache_instance_class%';
+            $memcacheHost = '%doctrine.orm.cache.memcache_host%';
+            $memcachePort = '%doctrine.orm.cache.memcache_port%';
+            $memcacheInstanceClass = '%doctrine.orm.cache.memcache_instance_class%';
             $memcacheInstance = new Definition($memcacheInstanceClass);
             $memcacheInstance->addMethodCall('connect', array($memcacheHost, $memcachePort));
             $container->setDefinition(sprintf('doctrine.orm.%s_memcache_instance', $entityManager['name']), $memcacheInstance);

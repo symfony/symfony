@@ -82,8 +82,6 @@ class DateTimeField extends FieldGroup
             'seconds' => $this->getOption('seconds'),
         )));
 
-        $transformers = array();
-
         if ($this->getOption('type') == self::STRING) {
             $this->setNormalizationTransformer(new ReversedTransformer(
                 new DateTimeToStringTransformer(array(

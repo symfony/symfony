@@ -200,6 +200,12 @@ class Request
         return $dup;
     }
 
+    /**
+     * Clones the current request.
+     *
+     * Note that the session is not cloned as duplicated requests
+     * are most of the time sub-requests of the main one.
+     */
     public function __clone()
     {
         $this->query      = clone $this->query;
@@ -245,11 +251,6 @@ class Request
 
     public function getSession()
     {
-        if (null === $this->session) {
-            $this->session = new Session(new NativeSessionStorage());
-        }
-        $this->session->start();
-
         return $this->session;
     }
 

@@ -36,7 +36,7 @@ class Session implements \Serializable
     {
         $this->storage = $storage;
         $this->options = $options;
-        $this->attributes = array();
+        $this->attributes = array('_flash' => array(), '_locale' => $this->getDefaultLocale());
         $this->started = false;
     }
 
@@ -58,7 +58,7 @@ class Session implements \Serializable
         }
 
         if (!isset($this->attributes['_locale'])) {
-            $this->attributes['_locale'] = isset($this->options['default_locale']) ? $this->options['default_locale'] : 'en';
+            $this->attributes['_locale'] = $this->getDefaultLocale();
         }
 
         // flag current flash messages to be removed at shutdown
@@ -76,10 +76,6 @@ class Session implements \Serializable
      */
     public function has($name)
     {
-        if (false === $this->started) {
-            $this->start();
-        }
-
         return array_key_exists($name, $this->attributes);
     }
 
@@ -93,10 +89,6 @@ class Session implements \Serializable
      */
     public function get($name, $default = null)
     {
-        if (false === $this->started) {
-            $this->start();
-        }
-
         return array_key_exists($name, $this->attributes) ? $this->attributes[$name] : $default;
     }
 
@@ -122,10 +114,6 @@ class Session implements \Serializable
      */
     public function getAttributes()
     {
-        if (false === $this->started) {
-            $this->start();
-        }
-
         return $this->attributes;
     }
 
@@ -187,10 +175,6 @@ class Session implements \Serializable
      */
     public function getLocale()
     {
-        if (false === $this->started) {
-            $this->start();
-        }
-
         return $this->attributes['_locale'];
     }
 
@@ -201,6 +185,10 @@ class Session implements \Serializable
      */
     public function setLocale($locale)
     {
+        if ($locale === $this->getDefaultLocale()) {
+            return;
+        }
+
         if (false === $this->started) {
             $this->start();
         }
@@ -210,10 +198,6 @@ class Session implements \Serializable
 
     public function getFlashMessages()
     {
-        if (false === $this->started) {
-            $this->start();
-        }
-
         return $this->attributes['_flash'];
     }
 
@@ -228,10 +212,6 @@ class Session implements \Serializable
 
     public function getFlash($name, $default = null)
     {
-        if (false === $this->started) {
-            $this->start();
-        }
-
         return array_key_exists($name, $this->attributes['_flash']) ? $this->attributes['_flash'][$name] : $default;
     }
 
@@ -247,10 +227,6 @@ class Session implements \Serializable
 
     public function hasFlash($name)
     {
-        if (false === $this->started) {
-            $this->start();
-        }
-
         return array_key_exists($name, $this->attributes['_flash']);
     }
 
@@ -279,5 +255,10 @@ class Session implements \Serializable
         list($this->storage, $this->options) = unserialize($serialized);
         $this->attributes = array();
         $this->started = false;
+    }
+
+    protected function getDefaultLocale()
+    {
+        return isset($this->options['default_locale']) ? $this->options['default_locale'] : 'en';
     }
 }

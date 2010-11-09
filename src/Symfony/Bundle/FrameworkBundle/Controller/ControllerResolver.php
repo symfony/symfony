@@ -42,7 +42,6 @@ class ControllerResolver extends BaseControllerResolver
     {
         $this->container = $container;
         $this->converter = $converter;
-        $this->esiSupport = $container->has('esi') && $container->getEsiService()->hasSurrogateEsiCapability($container->getRequestService());
 
         parent::__construct($logger);
     }
@@ -135,6 +134,10 @@ class ControllerResolver extends BaseControllerResolver
 
         if (!is_array($options['alt'])) {
             $options['alt'] = array($options['alt']);
+        }
+
+        if (null === $this->esiSupport) {
+            $this->esiSupport = $this->container->has('esi') && $this->container->getEsiService()->hasSurrogateEsiCapability($this->container->getRequestService());
         }
 
         if ($this->esiSupport && $options['standalone']) {

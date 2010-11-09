@@ -7,7 +7,6 @@
     <parameters>
         <parameter key="event_dispatcher.class">Symfony\Bundle\FrameworkBundle\EventDispatcher</parameter>
         <parameter key="http_kernel.class">Symfony\Component\HttpKernel\HttpKernel</parameter>
-        <parameter key="request.class">Symfony\Component\HttpFoundation\Request</parameter>
         <parameter key="response.class">Symfony\Component\HttpFoundation\Response</parameter>
         <parameter key="error_handler.class">Symfony\Component\HttpKernel\Debug\ErrorHandler</parameter>
         <parameter key="error_handler.level">null</parameter>
@@ -28,12 +27,6 @@
             <argument type="service" id="service_container" />
             <argument type="service" id="event_dispatcher" />
             <argument type="service" id="controller_resolver" />
-        </service>
-
-        <service id="request" class="%request.class%">
-            <call method="setSession">
-                <argument type="service" id="session" on-invalid="ignore"></argument>
-            </call>
         </service>
 
         <service id="response" class="%response.class%" shared="false" />

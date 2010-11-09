@@ -47,6 +47,8 @@ class CollectionField extends FieldGroup
             $field->setRequired(false);
             $this->add($field);
         }
+
+        parent::configure();
     }
 
     public function setData($collection)

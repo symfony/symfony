@@ -28,6 +28,8 @@ class DateTimeToTimestampTransformer extends BaseValueTransformer
     {
         $this->addOption('input_timezone', 'UTC');
         $this->addOption('output_timezone', 'UTC');
+
+        parent::configure();
     }
 
     /**

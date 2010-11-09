@@ -33,12 +33,12 @@ class DateTimeToArrayTransformer extends BaseDateTimeTransformer
      */
     protected function configure()
     {
-        parent::configure();
-
         $this->addOption('input_timezone', 'UTC');
         $this->addOption('output_timezone', 'UTC');
         $this->addOption('pad', false);
         $this->addOption('fields', array('year', 'month', 'day', 'hour', 'minute', 'second'));
+
+        parent::configure();
     }
 
     /**

@@ -50,6 +50,8 @@ class RepeatedField extends FieldGroup
         $field->setKey('second');
         $field->setPropertyPath('second');
         $this->add($field);
+
+        parent::configure();
     }
 
     /**

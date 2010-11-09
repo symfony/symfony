@@ -10,6 +10,8 @@ class RequiredOptionsField extends Field
     {
         $this->addOption('foo');
         $this->addRequiredOption('bar');
+
+        parent::configure();
     }
 
     public function render(array $attributes = array())

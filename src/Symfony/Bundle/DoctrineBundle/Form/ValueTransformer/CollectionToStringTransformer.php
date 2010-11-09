@@ -46,6 +46,8 @@ class CollectionToStringTransformer extends BaseValueTransformer
         $this->addRequiredOption('em');
         $this->addRequiredOption('class_name');
         $this->addRequiredOption('field_name');
+
+        parent::configure();
     }
 
     /**

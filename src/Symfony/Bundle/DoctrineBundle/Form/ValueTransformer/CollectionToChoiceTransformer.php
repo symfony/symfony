@@ -25,6 +25,8 @@ class CollectionToChoiceTransformer extends BaseValueTransformer
     {
         $this->addRequiredOption('em');
         $this->addRequiredOption('className');
+
+        parent::configure();
     }
 
     /**

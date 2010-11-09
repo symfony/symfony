@@ -23,9 +23,9 @@ class UrlField extends TextField
      */
     protected function configure()
     {
-        parent::configure();
-
         $this->addOption('default_protocol', 'http');
+
+        parent::configure();
     }
 
     /**

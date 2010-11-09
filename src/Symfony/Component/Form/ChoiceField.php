@@ -67,6 +67,8 @@ class ChoiceField extends HybridField
         } else {
             $this->setFieldMode(self::FIELD);
         }
+
+        parent::configure();
     }
 
     /**

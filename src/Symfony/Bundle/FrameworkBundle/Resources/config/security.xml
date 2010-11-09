@@ -25,6 +25,7 @@
 
         <parameter key="security.authentication.form_entry_point.class">Symfony\Component\HttpKernel\Security\EntryPoint\FormAuthenticationEntryPoint</parameter>
         <parameter key="security.authentication.form.login_path">/login</parameter>
+        <parameter key="security.authentication.form.use_forward">false</parameter>
         <parameter key="security.authentication.listener.form.class">Symfony\Component\HttpKernel\Security\Firewall\UsernamePasswordFormAuthenticationListener</parameter>
 
         <parameter key="security.authentication.basic_entry_point.class">Symfony\Component\HttpKernel\Security\EntryPoint\BasicAuthenticationEntryPoint</parameter>
@@ -100,6 +101,7 @@
 
         <service id="security.authentication.form_entry_point" class="%security.authentication.form_entry_point.class%">
             <argument>%security.authentication.form.login_path%</argument>
+            <argument>%security.authentication.form.use_forward%</argument>
         </service>
 
         <service id="security.authentication.basic_entry_point" class="%security.authentication.basic_entry_point.class%">

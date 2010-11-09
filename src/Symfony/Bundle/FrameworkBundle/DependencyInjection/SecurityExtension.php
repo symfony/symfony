@@ -467,6 +467,7 @@ class SecurityExtension extends Extension
         $options = array(
             'check_path'                     => '/login_check',
             'login_path'                     => '/login',
+            'use_forward'                    => false,
             'always_use_default_target_path' => false,
             'default_target_path'            => '/',
             'target_path_parameter'          => '_target_path',
@@ -481,6 +482,7 @@ class SecurityExtension extends Extension
         }
         $container->setParameter('security.authentication.form.options', $options);
         $container->setParameter('security.authentication.form.login_path', $options['login_path']);
+        $container->setParameter('security.authentication.form.use_forward', $options['use_forward']);
 
         return array($provider, $listenerId);
     }

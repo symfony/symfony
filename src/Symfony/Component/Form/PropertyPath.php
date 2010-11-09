@@ -324,7 +324,7 @@ class PropertyPath implements \IteratorAggregate
                 }
 
                 return $object->$property;
-            } else if (property_exists($object, $property)) {
+            } else if (property_exists($object, $property) || $reflClass->hasMethod('__get')) {
                 // needed to support \stdClass instances
                 return $object->$property;
             } else {
@@ -367,7 +367,7 @@ class PropertyPath implements \IteratorAggregate
                 }
 
                 $objectOrArray->$property = $value;
-            } else if (property_exists($objectOrArray, $property)) {
+            } else if (property_exists($objectOrArray, $property) || $reflClass->hasMethod('__get')) {
                 // needed to support \stdClass instances
                 $objectOrArray->$property = $value;
             } else {

@@ -183,9 +183,8 @@ abstract class Field extends Configurable implements FieldInterface
     {
         if (is_null($this->parent) || $this->parent->isRequired()) {
             return $this->required;
-        } else {
-            return false;
         }
+        return false;
     }
 
     /**
@@ -195,9 +194,8 @@ abstract class Field extends Configurable implements FieldInterface
     {
         if (is_null($this->parent) || !$this->parent->isDisabled()) {
             return $this->getOption('disabled');
-        } else {
-            return true;
         }
+        return true;
     }
 
     /**
@@ -441,9 +439,8 @@ abstract class Field extends Configurable implements FieldInterface
     {
         if (null === $this->normalizationTransformer) {
             return $value;
-        } else {
-            return $this->normalizationTransformer->transform($value);
         }
+        return $this->normalizationTransformer->transform($value);
     }
 
     /**
@@ -456,9 +453,8 @@ abstract class Field extends Configurable implements FieldInterface
     {
         if (null === $this->normalizationTransformer) {
             return $value;
-        } else {
-            return $this->normalizationTransformer->reverseTransform($value, $this->data);
         }
+        return $this->normalizationTransformer->reverseTransform($value, $this->data);
     }
 
     /**
@@ -471,9 +467,8 @@ abstract class Field extends Configurable implements FieldInterface
     {
         if (null === $this->valueTransformer) {
             return $value === null ? '' : $value;
-        } else {
-            return $this->valueTransformer->transform($value);
         }
+        return $this->valueTransformer->transform($value);
     }
 
     /**
@@ -486,9 +481,8 @@ abstract class Field extends Configurable implements FieldInterface
     {
         if (null === $this->valueTransformer) {
             return $value === '' ? null : $value;
-        } else {
-            return $this->valueTransformer->reverseTransform($value, $this->data);
         }
+        return $this->valueTransformer->reverseTransform($value, $this->data);
     }
 
     /**

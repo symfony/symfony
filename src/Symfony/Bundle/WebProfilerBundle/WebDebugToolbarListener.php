@@ -52,14 +52,12 @@ class WebDebugToolbarListener
         }
 
         if ($response->headers->has('X-Debug-Token') && $response->isRedirect() && $this->interceptRedirects) {
-            $r = new Response();
-            $r->setContent(
+            $response->setContent(
                 sprintf('<html><head></head><body><h1>This Request redirects to<br /><a href="%s">%s</a>.</h1></body></html>',
                 $response->headers->get('location'), $response->headers->get('location'))
             );
-            $r->headers->set('X-Debug-Token', $response->headers->get('X-Debug-Token'));
-
-            $response = $r;
+            $response->setStatusCode(200);
+            $response->headers->delete('Location');
         }
 
         $request = $event->getParameter('request');

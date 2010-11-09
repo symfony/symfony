@@ -20,19 +20,21 @@ class ValidValidator extends ConstraintValidator
         $propertyPath = $this->context->getPropertyPath();
         $factory = $this->context->getClassMetadataFactory();
 
-        if (is_array($value)) {
-            foreach ($value as $key => $element) {
-                $walker->walkConstraint($constraint, $element, $group, $propertyPath.'['.$key.']');
-            }
-        } else if (!is_object($value)) {
+        if (!is_array($value) && !is_object($value)) {
             throw new UnexpectedTypeException($value, 'object or array');
         } else if ($constraint->class && !$value instanceof $constraint->class) {
             $this->setMessage($constraint->message, array('class' => $constraint->class));
 
             return false;
-        } else {
+        } else if (!is_array($value)) {
             $metadata = $factory->getClassMetadata(get_class($value));
             $walker->walkClass($metadata, $value, $group, $propertyPath);
+        }
+
+        if (is_array($value) || $value instanceof \Traversable) {
+            foreach ($value as $key => $element) {
+                $walker->walkConstraint($constraint, $element, $group, $propertyPath.'['.$key.']');
+            }
         }
 
         return true;

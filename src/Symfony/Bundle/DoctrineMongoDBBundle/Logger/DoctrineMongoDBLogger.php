@@ -93,7 +93,7 @@ class DoctrineMongoDBLogger
             } elseif ($value instanceof \MongoMaxKey) {
                 $formatted = 'new MaxKey()';
             } elseif ($value instanceof \MongoBinData) {
-                $formatted = 'new BinData("'.$formatted->bin.'", "'.$formatted->type.'")';
+                $formatted = 'new BinData("'.$value->bin.'", "'.$value->type.'")';
             } else {
                 $formatted = (string) $value;
             }

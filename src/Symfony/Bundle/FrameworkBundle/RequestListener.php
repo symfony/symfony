@@ -19,7 +19,7 @@ use Symfony\Component\HttpKernel\HttpKernelInterface;
 /**
  * RequestListener.
  *
- * @author     Fabien Potencier <fabien.potencier@symfony-project.com>
+ * @author Fabien Potencier <fabien.potencier@symfony-project.com>
  */
 class RequestListener
 {
@@ -67,7 +67,7 @@ class RequestListener
                 $this->logger->info(sprintf('Matched route "%s" (parameters: %s)', $parameters['_route'], str_replace("\n", '', var_export($parameters, true))));
             }
 
-            $request->attributes->replace($parameters);
+            $request->attributes->add($parameters);
         } elseif (null !== $this->logger) {
             $this->logger->err(sprintf('No route found for %s', $request->getPathInfo()));
         }

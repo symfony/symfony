@@ -21,7 +21,7 @@ use Symfony\Bundle\FrameworkBundle\Util\Filesystem;
 /**
  * AssetsInstallCommand.
  *
- * @author     Fabien Potencier <fabien.potencier@symfony-project.com>
+ * @author Fabien Potencier <fabien.potencier@symfony-project.com>
  */
 class AssetsInstallCommand extends Command
 {
@@ -34,6 +34,7 @@ class AssetsInstallCommand extends Command
             ->setDefinition(array(
                 new InputArgument('target', InputArgument::REQUIRED, 'The target directory'),
             ))
+            ->addOption('symlink', null, InputOption::PARAMETER_NONE, 'Symlinks the assets instead of copying it')
             ->setName('assets:install')
         ;
     }
@@ -58,8 +59,13 @@ class AssetsInstallCommand extends Command
                 $targetDir = $input->getArgument('target').'/bundles/'.preg_replace('/bundle$/', '', strtolower($bundle->getName()));
 
                 $filesystem->remove($targetDir);
-                mkdir($targetDir, 0777, true);
-                $filesystem->mirror($originDir, $targetDir);
+
+                if ($input->getOption('symlink')) {
+                    $filesystem->symlink($originDir, $targetDir);
+                } else {
+                    mkdir($targetDir, 0777, true);
+                    $filesystem->mirror($originDir, $targetDir);
+                }
             }
         }
     }

@@ -16,7 +16,7 @@ use Symfony\Component\Templating\Storage;
 /**
  * ChainLoader is a loader that calls other loaders to load templates.
  *
- * @author     Fabien Potencier <fabien.potencier@symfony-project.com>
+ * @author Fabien Potencier <fabien.potencier@symfony-project.com>
  */
 class ChainLoader extends Loader
 {

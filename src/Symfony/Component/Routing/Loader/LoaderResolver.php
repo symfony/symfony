@@ -14,7 +14,7 @@ namespace Symfony\Component\Routing\Loader;
 /**
  * LoaderResolver selects a loader for a given resource..
  *
- * @author     Fabien Potencier <fabien.potencier@symfony-project.com>
+ * @author Fabien Potencier <fabien.potencier@symfony-project.com>
  */
 class LoaderResolver implements LoaderResolverInterface
 {
@@ -38,7 +38,7 @@ class LoaderResolver implements LoaderResolverInterface
      *
      * @param mixed  $resource A resource
      *
-     * @return LoaderInterface A LoaderInterface instance
+     * @return LoaderInterface|false A LoaderInterface instance
      */
     public function resolve($resource)
     {
@@ -52,7 +52,7 @@ class LoaderResolver implements LoaderResolverInterface
     }
 
     /**
-     * Sets a loader.
+     * Adds a loader.
      *
      * @param LoaderInterface $loader A LoaderInterface instance
      */
@@ -65,7 +65,7 @@ class LoaderResolver implements LoaderResolverInterface
     /**
      * Returns the registered loaders.
      *
-     * @return LoaderInterface[] A array of LoaderInterface instances
+     * @return LoaderInterface[] An array of LoaderInterface instances
      */
     public function getLoaders()
     {

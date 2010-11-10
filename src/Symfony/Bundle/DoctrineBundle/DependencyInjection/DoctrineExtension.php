@@ -21,16 +21,11 @@ use Symfony\Component\DependencyInjection\Resource\FileResource;
 /**
  * DoctrineExtension is an extension for the Doctrine DBAL and ORM library.
  *
- * @author     Jonathan H. Wage <jonwage@gmail.com>
- * @author     Fabien Potencier <fabien.potencier@symfony-project.com>
+ * @author Jonathan H. Wage <jonwage@gmail.com>
+ * @author Fabien Potencier <fabien.potencier@symfony-project.com>
  */
 class DoctrineExtension extends Extension
 {
-    protected $resources = array(
-        'dbal' => 'dbal.xml',
-        'orm'  => 'orm.xml',
-    );
-
     /**
      * Loads the DBAL configuration.
      *
@@ -74,7 +69,7 @@ class DoctrineExtension extends Extension
     {
         if (!$container->hasDefinition('doctrine.dbal.logger')) {
             $loader = new XmlFileLoader($container, __DIR__.'/../Resources/config');
-            $loader->load($this->resources['dbal']);
+            $loader->load('dbal.xml');
         }
 
         $defaultConnectionName = isset($config['default_connection']) ? $config['default_connection'] : $container->getParameter('doctrine.dbal.default_connection');
@@ -209,7 +204,7 @@ class DoctrineExtension extends Extension
     {
         if (!$container->hasDefinition('doctrine.orm.metadata_driver.annotation')) {
             $loader = new XmlFileLoader($container, __DIR__.'/../Resources/config');
-            $loader->load($this->resources['orm']);
+            $loader->load('orm.xml');
         }
 
         // Allow these application configuration options to override the defaults

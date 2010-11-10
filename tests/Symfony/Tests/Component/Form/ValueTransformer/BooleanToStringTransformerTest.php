@@ -17,6 +17,7 @@ class BooleanToStringTransformerTest extends \PHPUnit_Framework_TestCase
     {
         $this->assertEquals('1', $this->transformer->transform(true));
         $this->assertEquals('', $this->transformer->transform(false));
+        $this->assertSame('', $this->transformer->transform(null));
     }
 
     public function testTransformExpectsBoolean()
@@ -30,13 +31,13 @@ class BooleanToStringTransformerTest extends \PHPUnit_Framework_TestCase
     {
         $this->setExpectedException('\InvalidArgumentException');
 
-        $this->transformer->reverseTransform(1);
+        $this->transformer->reverseTransform(1, null);
     }
 
     public function testReverseTransform()
     {
-        $this->assertEquals(true, $this->transformer->reverseTransform('1'));
-        $this->assertEquals(true, $this->transformer->reverseTransform('0'));
-        $this->assertEquals(false, $this->transformer->reverseTransform(''));
+        $this->assertEquals(true, $this->transformer->reverseTransform('1', null));
+        $this->assertEquals(true, $this->transformer->reverseTransform('0', null));
+        $this->assertEquals(false, $this->transformer->reverseTransform('', null));
     }
 }

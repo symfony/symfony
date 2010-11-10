@@ -14,7 +14,7 @@ namespace Symfony\Component\HttpFoundation;
 /**
  * HeaderBag is a container for HTTP headers.
  *
- * @author     Fabien Potencier <fabien.potencier@symfony-project.com>
+ * @author Fabien Potencier <fabien.potencier@symfony-project.com>
  */
 class HeaderBag
 {
@@ -75,21 +75,26 @@ class HeaderBag
     /**
      * Returns a header value by name.
      *
-     * @param string  $key   The header name
-     * @param Boolean $first Whether to return the first value or all header values
+     * @param string  $key     The header name
+     * @param mixed   $default The default value
+     * @param Boolean $first   Whether to return the first value or all header values
      *
      * @return string|array The first header value if $first is true, an array of values otherwise
      */
-    public function get($key, $first = true)
+    public function get($key, $default = null, $first = true)
     {
         $key = strtr(strtolower($key), '_', '-');
 
         if (!array_key_exists($key, $this->headers)) {
-            return $first ? null : array();
+            if (null === $default) {
+                return $first ? null : array();
+            } else {
+                return $first ? $default : array($default);
+            }
         }
 
         if ($first) {
-            return count($this->headers[$key]) ? $this->headers[$key][0] : '';
+            return count($this->headers[$key]) ? $this->headers[$key][0] : $default;
         } else {
             return $this->headers[$key];
         }
@@ -139,7 +144,7 @@ class HeaderBag
      */
     public function contains($key, $value)
     {
-        return in_array($value, $this->get($key, false));
+        return in_array($value, $this->get($key, null, false));
     }
 
     /**

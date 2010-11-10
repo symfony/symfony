@@ -17,7 +17,7 @@ use Symfony\Component\HttpFoundation\File\UploadedFile;
 /**
  * Request represents an HTTP request.
  *
- * @author     Fabien Potencier <fabien.potencier@symfony-project.com>
+ * @author Fabien Potencier <fabien.potencier@symfony-project.com>
  */
 class Request
 {
@@ -375,6 +375,18 @@ class Request
     }
 
     /**
+     * Generates a normalized URI for the given path.
+     *
+     * @param string $path A path to use instead of the current one
+     *
+     * @return string The normalized URI for the path
+     */
+    public function getUriForPath($path)
+    {
+        return $this->getScheme().'://'.$this->getHost().':'.$this->getPort().$this->getScriptName().$path;
+    }
+
+    /**
      * Generates the normalized query string for the Request.
      *
      * It builds a normalized query string, where keys/value pairs are alphabetized
@@ -427,10 +439,15 @@ class Request
         if ($host = $this->headers->get('X_FORWARDED_HOST')) {
             $elements = explode(',', $host);
 
-            return trim($elements[count($elements) - 1]);
+            $host = trim($elements[count($elements) - 1]);
         } else {
-            return $this->headers->get('HOST', $this->server->get('SERVER_NAME', $this->server->get('SERVER_ADDR', '')));
+            $host = $this->headers->get('HOST', $this->server->get('SERVER_NAME', $this->server->get('SERVER_ADDR', '')));
         }
+
+        // Remove port number from host
+        $elements = explode(':', $host);
+
+        return trim($elements[0]);
     }
 
     public function setMethod($method)

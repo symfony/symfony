@@ -51,7 +51,7 @@ use Symfony\Component\Routing\Loader\LoaderResolver;
  *         }
  *     }
  *
- * @author     Fabien Potencier <fabien.potencier@symfony-project.com>
+ * @author Fabien Potencier <fabien.potencier@symfony-project.com>
  */
 abstract class AnnotationClassLoader implements LoaderInterface
 {

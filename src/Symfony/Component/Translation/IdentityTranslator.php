@@ -40,6 +40,13 @@ class IdentityTranslator implements TranslatorInterface
     /**
      * {@inheritdoc}
      */
+    public function getLocale()
+    {
+    }
+
+    /**
+     * {@inheritdoc}
+     */
     public function trans($id, array $parameters = array(), $domain = 'messages', $locale = null)
     {
         return strtr($id, $parameters);

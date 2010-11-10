@@ -1,0 +1,62 @@
+<?xml version="1.0" ?>
+
+<container xmlns="http://www.symfony-project.org/schema/dic/services"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xsi:schemaLocation="http://www.symfony-project.org/schema/dic/services http://www.symfony-project.org/schema/dic/services/services-1.0.xsd">
+
+    <services>
+        <service id="security.authentication.listener.form" class="%security.authentication.listener.form.class%">
+            <argument type="service" id="security.context" />
+            <argument type="service" id="security.authentication.manager" />
+            <argument>%security.authentication.form.options%</argument>
+            <argument type="service" id="logger" on-invalid="null" />
+        </service>
+
+        <service id="security.authentication.listener.x509" class="%security.authentication.listener.x509.class%">
+            <argument type="service" id="security.context" />
+            <argument type="service" id="security.authentication.manager" />
+            <argument>%security.authentication.x509.user%</argument>
+            <argument>%security.authentication.x509.credentials%</argument>
+            <argument type="service" id="logger" on-invalid="null" />
+        </service>
+
+        <service id="security.authentication.listener.basic" class="%security.authentication.listener.basic.class%">
+            <argument type="service" id="security.context" />
+            <argument type="service" id="security.authentication.manager" />
+            <argument type="service" id="security.authentication.basic_entry_point" />
+            <argument type="service" id="logger" on-invalid="null" />
+        </service>
+
+        <service id="security.authentication.listener.digest" class="%security.authentication.listener.digest.class%">
+            <argument type="service" id="security.context" />
+            <argument type="service" id="security.user.provider.in_memory" />
+            <argument type="service" id="security.authentication.digest_entry_point" />
+            <argument type="service" id="logger" on-invalid="null" />
+        </service>
+
+        <service id="security.exception_listener" class="%security.exception_listener.class%">
+            <argument type="service" id="security.context" />
+            <argument type="service" id="security.authentication.entry_point" on-invalid="null" />
+            <argument>%security.access_denied.url%</argument>
+            <argument type="service" id="logger" on-invalid="null" />
+        </service>
+
+        <service id="security.authentication.switchuser_listener" class="%security.authentication.switchuser_listener.class%">
+            <argument type="service" id="security.context" />
+            <argument type="service" id="security.user.provider.in_memory" />
+            <argument type="service" id="security.account_checker" />
+            <argument type="service" id="security.access.decision_manager" />
+            <argument type="service" id="logger" on-invalid="null" />
+            <argument>%security.authentication.switchuser.parameter%</argument>
+            <argument>%security.authentication.switchuser.role%</argument>
+        </service>
+
+        <service id="security.access_listener" class="%security.access_listener.class%">
+            <argument type="service" id="security.context" />
+            <argument type="service" id="security.access.decision_manager" />
+            <argument type="service" id="security.access_map" />
+            <argument type="service" id="security.authentication.manager" />
+            <argument type="service" id="logger" on-invalid="null" />
+        </service>
+    </services>
+</container>

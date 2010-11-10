@@ -221,21 +221,6 @@ class FieldTest extends \PHPUnit_Framework_TestCase
         $this->assertEquals('', $this->field->getDisplayedData());
     }
 
-    public function testValuesAreTransformedCorrectlyIfNull()
-    {
-        // The value is converted to an empty string and NOT passed to the
-        // value transformer
-        $transformer = $this->createMockTransformer();
-        $transformer->expects($this->never())
-                                ->method('transform');
-
-        $this->field->setValueTransformer($transformer);
-        $this->field->setData(null);
-
-        $this->assertSame(null, $this->field->getData());
-        $this->assertSame('', $this->field->getDisplayedData());
-    }
-
     public function testValuesAreTransformedCorrectlyIfNull_noValueTransformer()
     {
         $this->field->setData(null);
@@ -252,30 +237,43 @@ class FieldTest extends \PHPUnit_Framework_TestCase
             array('title')
         );
 
-        // 1. The value is converted to a string and passed to the value transformer
-        $transformer = $this->createMockTransformer();
-        $transformer->expects($this->once())
+        // 1a. The value is converted to a string and passed to the value transformer
+        $valueTransformer = $this->createMockTransformer();
+        $valueTransformer->expects($this->once())
                                 ->method('reverseTransform')
                                 ->with($this->identicalTo('0'))
                                 ->will($this->returnValue('reverse[0]'));
 
-        $field->setValueTransformer($transformer);
+        $field->setValueTransformer($valueTransformer);
 
         // 2. The output of the reverse transformation is passed to processData()
+        //    The processed data is accessible through getNormalizedData()
         $field->expects($this->once())
                     ->method('processData')
                     ->with($this->equalTo('reverse[0]'))
                     ->will($this->returnValue('processed[reverse[0]]'));
 
-        // 3. The processed data is transformed again (for displayed data)
-        $transformer->expects($this->once())
+        // 3. The processed data is denormalized and then accessible through
+        //    getData()
+        $normTransformer = $this->createMockTransformer();
+        $normTransformer->expects($this->once())
+                                ->method('reverseTransform')
+                                ->with($this->identicalTo('processed[reverse[0]]'))
+                                ->will($this->returnValue('denorm[processed[reverse[0]]]'));
+
+        $field->setNormalizationTransformer($normTransformer);
+
+        // 4. The processed data is transformed again and then accessible
+        //    through getDisplayedData()
+        $valueTransformer->expects($this->once())
                                 ->method('transform')
                                 ->with($this->equalTo('processed[reverse[0]]'))
                                 ->will($this->returnValue('transform[processed[reverse[0]]]'));
 
         $field->bind(0);
 
-        $this->assertEquals('processed[reverse[0]]', $field->getData());
+        $this->assertEquals('denorm[processed[reverse[0]]]', $field->getData());
+        $this->assertEquals('processed[reverse[0]]', $field->getNormalizedData());
         $this->assertEquals('transform[processed[reverse[0]]]', $field->getDisplayedData());
     }
 
@@ -287,11 +285,12 @@ class FieldTest extends \PHPUnit_Framework_TestCase
             array('title')
         );
 
-        // 1. Empty values are always converted to NULL. They are never passed to
-        //    the value transformer
+        // 1. Empty values are converted to NULL by convention
         $transformer = $this->createMockTransformer();
-        $transformer->expects($this->never())
-                                ->method('reverseTransform');
+        $transformer->expects($this->once())
+                                ->method('reverseTransform')
+                                ->with($this->identicalTo(''))
+                                ->will($this->returnValue(null));
 
         $field->setValueTransformer($transformer);
 
@@ -315,18 +314,21 @@ class FieldTest extends \PHPUnit_Framework_TestCase
 
     public function testBoundValuesAreTransformedCorrectlyIfEmpty_processDataReturnsNull()
     {
-        // 1. Empty values are always converted to NULL. They are never passed to
-        //    the value transformer
+        // 1. Empty values are converted to NULL by convention
         $transformer = $this->createMockTransformer();
-        $transformer->expects($this->never())
-                                ->method('reverseTransform');
+        $transformer->expects($this->once())
+                                ->method('reverseTransform')
+                                ->with($this->identicalTo(''))
+                                ->will($this->returnValue(null));
 
         $this->field->setValueTransformer($transformer);
 
         // 2. The processed data is NULL and therefore transformed to an empty
-        //    string. It is NOT passed to the value transformer
-        $transformer->expects($this->never())
-                                ->method('transform');
+        //    string by convention
+        $transformer->expects($this->once())
+                                ->method('transform')
+                                ->with($this->identicalTo(null))
+                                ->will($this->returnValue(''));
 
         $this->field->bind('');
 
@@ -344,18 +346,27 @@ class FieldTest extends \PHPUnit_Framework_TestCase
 
     public function testValuesAreTransformedCorrectly()
     {
-        // The value is passed to the value transformer
-        $transformer = $this->createMockTransformer();
-        $transformer->expects($this->once())
+        // The value is first passed to the normalization transformer...
+        $normTransformer = $this->createMockTransformer();
+        $normTransformer->expects($this->once())
                                 ->method('transform')
                                 ->with($this->identicalTo(0))
-                                ->will($this->returnValue('transform[0]'));
+                                ->will($this->returnValue('norm[0]'));
 
-        $this->field->setValueTransformer($transformer);
+        // ...and then to the value transformer
+        $valueTransformer = $this->createMockTransformer();
+        $valueTransformer->expects($this->once())
+                                ->method('transform')
+                                ->with($this->identicalTo('norm[0]'))
+                                ->will($this->returnValue('transform[norm[0]]'));
+
+        $this->field->setNormalizationTransformer($normTransformer);
+        $this->field->setValueTransformer($valueTransformer);
         $this->field->setData(0);
 
         $this->assertEquals(0, $this->field->getData());
-        $this->assertEquals('transform[0]', $this->field->getDisplayedData());
+        $this->assertEquals('norm[0]', $this->field->getNormalizedData());
+        $this->assertEquals('transform[norm[0]]', $this->field->getDisplayedData());
     }
 
     public function testBoundValuesAreTrimmedBeforeTransforming()
@@ -401,69 +412,6 @@ class FieldTest extends \PHPUnit_Framework_TestCase
         $this->assertEquals('reverse[ a ]', $field->getData());
     }
 
-    public function testUpdateFromObjectReadsArray()
-    {
-        $array = array('firstName' => 'Bernhard');
-
-        $field = new TestField('firstName');
-        $field->updateFromObject($array);
-
-        $this->assertEquals('Bernhard', $field->getData());
-    }
-
-    public function testUpdateFromObjectReadsArrayWithCustomPropertyPath()
-    {
-        $array = array('child' => array('index' => array('firstName' => 'Bernhard')));
-
-        $field = new TestField('firstName', array('property_path' => 'child[index].firstName'));
-        $field->updateFromObject($array);
-
-        $this->assertEquals('Bernhard', $field->getData());
-    }
-
-    public function testUpdateFromObjectReadsProperty()
-    {
-        $object = new Author();
-        $object->firstName = 'Bernhard';
-
-        $field = new TestField('firstName');
-        $field->updateFromObject($object);
-
-        $this->assertEquals('Bernhard', $field->getData());
-    }
-
-    public function testUpdateFromObjectReadsPropertyWithCustomPropertyPath()
-    {
-        $object = new Author();
-        $object->child = array();
-        $object->child['index'] = new Author();
-        $object->child['index']->firstName = 'Bernhard';
-
-        $field = new TestField('firstName', array('property_path' => 'child[index].firstName'));
-        $field->updateFromObject($object);
-
-        $this->assertEquals('Bernhard', $field->getData());
-    }
-
-    public function testUpdateFromObjectReadsArrayAccess()
-    {
-        $object = new \ArrayObject();
-        $object['firstName'] = 'Bernhard';
-
-        $field = new TestField('firstName', array('property_path' => '[firstName]'));
-        $field->updateFromObject($object);
-
-        $this->assertEquals('Bernhard', $field->getData());
-    }
-
-    public function testUpdateFromObjectThrowsExceptionIfArrayAccessExpected()
-    {
-        $field = new TestField('firstName', array('property_path' => '[firstName]'));
-
-        $this->setExpectedException('Symfony\Component\Form\Exception\InvalidPropertyException');
-        $field->updateFromObject(new Author());
-    }
-
     /*
      * The use case of this test is a field group with an empty property path.
      * Even if the field group itself is not associated to a specific property,
@@ -478,82 +426,6 @@ class FieldTest extends \PHPUnit_Framework_TestCase
         $field->updateFromObject($object);
 
         $this->assertEquals($object, $field->getData());
-    }
-
-    public function testUpdateFromObjectThrowsExceptionIfPropertyIsNotPublic()
-    {
-        $field = new TestField('privateProperty');
-
-        $this->setExpectedException('Symfony\Component\Form\Exception\PropertyAccessDeniedException');
-        $field->updateFromObject(new Author());
-    }
-
-    public function testUpdateFromObjectReadsGetters()
-    {
-        $object = new Author();
-        $object->setLastName('Schussek');
-
-        $field = new TestField('lastName');
-        $field->updateFromObject($object);
-
-        $this->assertEquals('Schussek', $field->getData());
-    }
-
-    public function testUpdateFromObjectThrowsExceptionIfGetterIsNotPublic()
-    {
-        $field = new TestField('privateGetter');
-
-        $this->setExpectedException('Symfony\Component\Form\Exception\PropertyAccessDeniedException');
-        $field->updateFromObject(new Author());
-    }
-
-    public function testUpdateFromObjectReadsIssers()
-    {
-        $object = new Author();
-        $object->setAustralian(false);
-
-        $field = new TestField('australian');
-        $field->updateFromObject($object);
-
-        $this->assertSame(false, $field->getData());
-    }
-
-    public function testUpdateFromObjectThrowsExceptionIfIsserIsNotPublic()
-    {
-        $field = new TestField('privateIsser');
-
-        $this->setExpectedException('Symfony\Component\Form\Exception\PropertyAccessDeniedException');
-        $field->updateFromObject(new Author());
-    }
-
-    public function testUpdateFromObjectThrowsExceptionIfPropertyDoesNotExist()
-    {
-        $field = new TestField('foobar');
-
-        $this->setExpectedException('Symfony\Component\Form\Exception\InvalidPropertyException');
-        $field->updateFromObject(new Author());
-    }
-
-    public function testUpdateObjectUpdatesArrays()
-    {
-        $array = array();
-
-        $field = new TestField('firstName');
-        $field->bind('Bernhard');
-        $field->updateObject($array);
-
-        $this->assertEquals(array('firstName' => 'Bernhard'), $array);
-    }
-
-    public function testUpdateObjectUpdatesArraysWithCustomPropertyPath()
-    {
-        $array = array();
-
-        $field = new TestField('firstName', array('property_path' => 'child[index].firstName'));
-        $field->bind('Bernhard');
-        $field->updateObject($array);
-
-        $this->assertEquals(array('child' => array('index' => array('firstName' => 'Bernhard'))), $array);
     }
 
     /*
@@ -571,50 +443,6 @@ class FieldTest extends \PHPUnit_Framework_TestCase
         $this->assertEquals(array('firstName' => 'Bernhard'), $array);
     }
 
-    public function testUpdateObjectUpdatesProperties()
-    {
-        $object = new Author();
-
-        $field = new TestField('firstName');
-        $field->bind('Bernhard');
-        $field->updateObject($object);
-
-        $this->assertEquals('Bernhard', $object->firstName);
-    }
-
-    public function testUpdateObjectUpdatesPropertiesWithCustomPropertyPath()
-    {
-        $object = new Author();
-        $object->child = array();
-        $object->child['index'] = new Author();
-
-        $field = new TestField('firstName', array('property_path' => 'child[index].firstName'));
-        $field->bind('Bernhard');
-        $field->updateObject($object);
-
-        $this->assertEquals('Bernhard', $object->child['index']->firstName);
-    }
-
-    public function testUpdateObjectUpdatesArrayAccess()
-    {
-        $object = new \ArrayObject();
-
-        $field = new TestField('firstName', array('property_path' => '[firstName]'));
-        $field->bind('Bernhard');
-        $field->updateObject($object);
-
-        $this->assertEquals('Bernhard', $object['firstName']);
-    }
-
-    public function testUpdateObjectThrowsExceptionIfArrayAccessExpected()
-    {
-        $field = new TestField('firstName', array('property_path' => '[firstName]'));
-        $field->bind('Bernhard');
-
-        $this->setExpectedException('Symfony\Component\Form\Exception\InvalidPropertyException');
-        $field->updateObject(new Author());
-    }
-
     public function testUpdateObjectDoesNotUpdatePropertyIfPropertyPathIsEmpty()
     {
         $object = new Author();
@@ -624,26 +452,6 @@ class FieldTest extends \PHPUnit_Framework_TestCase
         $field->updateObject($object);
 
         $this->assertEquals(null, $object->firstName);
-    }
-
-    public function testUpdateObjectUpdatesSetters()
-    {
-        $object = new Author();
-
-        $field = new TestField('lastName');
-        $field->bind('Schussek');
-        $field->updateObject($object);
-
-        $this->assertEquals('Schussek', $object->getLastName());
-    }
-
-    public function testUpdateObjectThrowsExceptionIfGetterIsNotPublic()
-    {
-        $field = new TestField('privateSetter');
-        $field->bind('foobar');
-
-        $this->setExpectedException('Symfony\Component\Form\Exception\PropertyAccessDeniedException');
-        $field->updateObject(new Author());
     }
 
     protected function createMockTransformer()

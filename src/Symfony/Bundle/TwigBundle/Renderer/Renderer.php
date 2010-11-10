@@ -16,7 +16,7 @@ use Symfony\Component\Templating\Storage\Storage;
 
 /**
  *
- * @author     Fabien Potencier <fabien.potencier@symfony-project.com>
+ * @author Fabien Potencier <fabien.potencier@symfony-project.com>
  */
 class Renderer extends BaseRenderer
 {

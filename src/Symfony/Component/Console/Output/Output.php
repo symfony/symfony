@@ -20,7 +20,7 @@ namespace Symfony\Component\Console\Output;
  *  * verbose: -v (more output - debug)
  *  * quiet: -q (no output)
  *
- * @author     Fabien Potencier <fabien.potencier@symfony-project.com>
+ * @author Fabien Potencier <fabien.potencier@symfony-project.com>
  */
 abstract class Output implements OutputInterface
 {

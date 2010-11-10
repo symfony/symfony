@@ -14,7 +14,7 @@ namespace Symfony\Component\BrowserKit;
 /**
  * Request object.
  *
- * @author     Fabien Potencier <fabien.potencier@symfony-project.com>
+ * @author Fabien Potencier <fabien.potencier@symfony-project.com>
  */
 class Request
 {

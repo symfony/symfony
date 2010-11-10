@@ -16,7 +16,7 @@ namespace Symfony\Component\HttpKernel\Exception;
  *
  * By convention, exception code == response status code.
  *
- * @author     Fabien Potencier <fabien.potencier@symfony-project.com>
+ * @author Fabien Potencier <fabien.potencier@symfony-project.com>
  */
 class HttpException extends \Exception
 {

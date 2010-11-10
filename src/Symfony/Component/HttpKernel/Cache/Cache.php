@@ -22,7 +22,7 @@ use Symfony\Component\HttpFoundation\Response;
 /**
  * Cache provides HTTP caching.
  *
- * @author     Fabien Potencier <fabien.potencier@symfony-project.com>
+ * @author Fabien Potencier <fabien.potencier@symfony-project.com>
  */
 class Cache implements HttpKernelInterface
 {
@@ -49,22 +49,22 @@ class Cache implements HttpKernelInterface
      *                            public or private via a Cache-Control directive. (default: Authorization and Cookie)
      *
      *   * allow_reload           Specifies whether the client can force a cache reload by including a
-     *                            Cache-Control "no-cache" directive in the request. This is enabled by
-     *                            default for compliance with RFC 2616. (default: false)
+     *                            Cache-Control "no-cache" directive in the request. Set it to ``true``
+     *                            for compliance with RFC 2616. (default: false)
      *
      *   * allow_revalidate       Specifies whether the client can force a cache revalidate by including
-     *                            a Cache-Control "max-age=0" directive in the request. This is enabled by
-     *                            default for compliance with RFC 2616. (default: false)
+     *                            a Cache-Control "max-age=0" directive in the request. Set it to ``true``
+      *                            for compliance with RFC 2616. (default: false)
      *
      *   * stale_while_revalidate Specifies the default number of seconds (the granularity is the second as the
      *                            Response TTL precision is a second) during which the cache can immediately return
      *                            a stale response while it revalidates it in the background (default: 2).
-     *                            This setting is overriden by the stale-while-revalidate HTTP Cache-Control
+     *                            This setting is overridden by the stale-while-revalidate HTTP Cache-Control
      *                            extension (see RFC 5861).
      *
-     *   * stale_if_error         Specifies the default number of seconds (the granularit is the second) during which
-     *                            the cache can server a stale response when an error is encountered (default: 60).
-     *                            This setting is overriden by the stale-if-error HTTP Cache-Control extension
+     *   * stale_if_error         Specifies the default number of seconds (the granularity is the second) during which
+     *                            the cache can serve a stale response when an error is encountered (default: 60).
+     *                            This setting is overridden by the stale-if-error HTTP Cache-Control extension
      *                            (see RFC 5861).
      *
      * @param HttpKernelInterface $kernel An HttpKernelInterface instance
@@ -138,7 +138,7 @@ class Cache implements HttpKernelInterface
      */
     public function handle(Request $request = null, $type = HttpKernelInterface::MASTER_REQUEST, $raw = false)
     {
-        // FIXME: catch exceptions and implement a 500 error page here? -> in Varnish, there is a built-it error page mechanism
+        // FIXME: catch exceptions and implement a 500 error page here? -> in Varnish, there is a built-in error page mechanism
         if (null === $request) {
             $request = new Request();
         }

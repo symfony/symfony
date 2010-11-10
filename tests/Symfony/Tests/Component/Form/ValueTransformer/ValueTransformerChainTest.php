@@ -40,7 +40,7 @@ class ValueTransformerChainTest extends \PHPUnit_Framework_TestCase
 
         $chain = new ValueTransformerChain(array($transformer1, $transformer2));
 
-        $this->assertEquals('baz', $chain->reverseTransform('foo'));
+        $this->assertEquals('baz', $chain->reverseTransform('foo', null));
     }
 
     public function testSetLocale()

@@ -18,7 +18,7 @@ use Symfony\Component\Routing\Resource\FileResource;
  *
  * The file must return a RouteCollection instance.
  *
- * @author     Fabien Potencier <fabien.potencier@symfony-project.com>
+ * @author Fabien Potencier <fabien.potencier@symfony-project.com>
  */
 class PhpFileLoader extends FileLoader
 {

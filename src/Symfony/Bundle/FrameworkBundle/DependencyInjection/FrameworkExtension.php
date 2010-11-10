@@ -9,6 +9,7 @@ use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\DependencyInjection\Reference;
 use Symfony\Component\DependencyInjection\Definition;
 use Symfony\Component\Finder\Finder;
+use Symfony\Component\HttpFoundation\RequestMatcher;
 
 /*
  * This file is part of the Symfony framework.
@@ -22,7 +23,7 @@ use Symfony\Component\Finder\Finder;
 /**
  * FrameworkExtension.
  *
- * @author     Fabien Potencier <fabien.potencier@symfony-project.com>
+ * @author Fabien Potencier <fabien.potencier@symfony-project.com>
  */
 class FrameworkExtension extends Extension
 {
@@ -40,8 +41,22 @@ class FrameworkExtension extends Extension
             $loader->load('web.xml');
         }
 
-        if (isset($config['ide']) && 'textmate' === $config['ide']) {
-            $container->setParameter('debug.file_link_format', 'txmt://open?url=file://%%f&line=%%l');
+        if (isset($config['ide'])) {
+            switch ($config['ide']) {
+                case 'textmate':
+                    $pattern = 'txmt://open?url=file://%%f&line=%%l';
+                    break;
+
+                case 'macvim':
+                    $pattern = 'mvim://open?url=file://%%f&line=%%l';
+                    break;
+
+                default:
+                    // should be the link pattern then
+                    $pattern = $config['ide'];
+            }
+
+            $container->setParameter('debug.file_link_format', $pattern);
         }
 
         foreach (array('csrf_secret', 'csrf-secret') as $key) {
@@ -92,7 +107,7 @@ class FrameworkExtension extends Extension
             $this->registerTemplatingConfiguration($config, $container);
         }
 
-        if (isset($config['test'])) {
+        if (array_key_exists('test', $config)) {
             $this->registerTestConfiguration($config, $container);
         }
 

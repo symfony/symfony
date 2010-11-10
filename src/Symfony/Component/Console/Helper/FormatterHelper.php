@@ -14,7 +14,7 @@ namespace Symfony\Component\Console\Helper;
 /**
  * The Formatter class provides helpers to format messages.
  *
- * @author     Fabien Potencier <fabien.potencier@symfony-project.com>
+ * @author Fabien Potencier <fabien.potencier@symfony-project.com>
  */
 class FormatterHelper extends Helper
 {

@@ -15,5 +15,5 @@ use Symfony\Component\Validator\Constraint;
 
 interface ConstraintValidatorFactoryInterface
 {
-    public function getInstance(Constraint $constraint);
+    function getInstance(Constraint $constraint);
 }

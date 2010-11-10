@@ -1,0 +1,152 @@
+<?xml version="1.0" ?>
+
+<container xmlns="http://www.symfony-project.org/schema/dic/services"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xsi:schemaLocation="http://www.symfony-project.org/schema/dic/services http://www.symfony-project.org/schema/dic/services/services-1.0.xsd">
+
+    <parameters>
+        <parameter key="security.context.class">Symfony\Component\Security\SecurityContext</parameter>
+
+        <parameter key="security.account_checker.class">Symfony\Component\Security\User\AccountChecker</parameter>
+
+        <parameter key="security.access_denied.url">null</parameter>
+
+        <parameter key="security.encoder.digest.class">Symfony\Component\Security\Encoder\MessageDigestPasswordEncoder</parameter>
+        <parameter key="security.encoder.plain.class">Symfony\Component\Security\Encoder\PlaintextPasswordEncoder</parameter>
+
+        <parameter key="security.user.provider.in_memory.class">Symfony\Component\Security\User\InMemoryUserProvider</parameter>
+
+        <parameter key="security.authentication.provider.dao.class">Symfony\Component\Security\Authentication\Provider\DaoAuthenticationProvider</parameter>
+        <parameter key="security.authentication.provider.pre_authenticated.class">Symfony\Component\Security\Authentication\Provider\PreAuthenticatedAuthenticationProvider</parameter>
+
+        <parameter key="security.authentication.manager.class">Symfony\Component\Security\Authentication\AuthenticationProviderManager</parameter>
+
+        <parameter key="security.authentication.retry_entry_point.class">Symfony\Component\HttpKernel\Security\EntryPoint\RetryAuthenticationEntryPoint</parameter>
+
+        <parameter key="security.authentication.form_entry_point.class">Symfony\Component\HttpKernel\Security\EntryPoint\FormAuthenticationEntryPoint</parameter>
+        <parameter key="security.authentication.form.login_path">/login</parameter>
+        <parameter key="security.authentication.listener.form.class">Symfony\Component\HttpKernel\Security\Firewall\UsernamePasswordFormAuthenticationListener</parameter>
+
+        <parameter key="security.authentication.basic_entry_point.class">Symfony\Component\HttpKernel\Security\EntryPoint\BasicAuthenticationEntryPoint</parameter>
+        <parameter key="security.authentication.basic_entry_point.realm">Symfony2</parameter>
+
+        <parameter key="security.authentication.digest_entry_point.class">Symfony\Component\HttpKernel\Security\EntryPoint\DigestAuthenticationEntryPoint</parameter>
+        <parameter key="security.authentication.digest_entry_point.realm">Symfony2</parameter>
+        <parameter key="security.authentication.digest_entry_point.key">SomethingUnique</parameter>
+
+        <parameter key="security.authentication.listener.x509.class">Symfony\Component\HttpKernel\Security\Firewall\X509AuthenticationListener</parameter>
+        <parameter key="security.authentication.x509.user">SSL_CLIENT_S_DN_Email</parameter>
+        <parameter key="security.authentication.x509.credentials">SSL_CLIENT_S_DN</parameter>
+
+        <parameter key="security.authentication.listener.basic.class">Symfony\Component\HttpKernel\Security\Firewall\BasicAuthenticationListener</parameter>
+        <parameter key="security.authentication.listener.digest.class">Symfony\Component\HttpKernel\Security\Firewall\DigestAuthenticationListener</parameter>
+        <parameter key="security.authentication.listener.anonymous.class">Symfony\Component\HttpKernel\Security\Firewall\AnonymousAuthenticationListener</parameter>
+        <parameter key="security.anonymous.key">SomeRandomValue</parameter>
+
+        <parameter key="security.channel_listener.class">Symfony\Component\HttpKernel\Security\Firewall\ChannelListener</parameter>
+
+        <parameter key="security.logout_listener.class">Symfony\Component\HttpKernel\Security\Firewall\LogoutListener</parameter>
+        <parameter key="security.logout.path">/logout</parameter>
+        <parameter key="security.logout.target_path">/</parameter>
+
+        <parameter key="security.authentication.switchuser_listener.class">Symfony\Component\HttpKernel\Security\Firewall\SwitchUserListener</parameter>
+        <parameter key="security.authentication.switchuser.role">ROLE_ALLOWED_TO_SWITCH</parameter>
+        <parameter key="security.authentication.switchuser.parameter">_switch_user</parameter>
+
+        <parameter key="security.access.decision_manager.class">Symfony\Bundle\FrameworkBundle\Security\Authorization\AccessDecisionManager</parameter>
+        <parameter key="security.access.simple_role_voter.class">Symfony\Component\Security\Authorization\Voter\RoleVoter</parameter>
+        <parameter key="security.access.authenticated_voter.class">Symfony\Component\Security\Authorization\Voter\AuthenticatedVoter</parameter>
+        <parameter key="security.access.role_hierarchy_voter.class">Symfony\Component\Security\Authorization\Voter\RoleHierarchyVoter</parameter>
+
+        <parameter key="security.access_listener.class">Symfony\Component\HttpKernel\Security\Firewall\AccessListener</parameter>
+        <parameter key="security.access_map.class">Symfony\Component\HttpKernel\Security\AccessMap</parameter>
+        <parameter key="security.exception_listener.class">Symfony\Component\HttpKernel\Security\Firewall\ExceptionListener</parameter>
+        <parameter key="security.context_listener.class">Symfony\Component\HttpKernel\Security\Firewall\ContextListener</parameter>
+        <parameter key="security.firewall.class">Symfony\Component\HttpKernel\Security\Firewall</parameter>
+        <parameter key="security.firewall.map.class">Symfony\Component\HttpKernel\Security\FirewallMap</parameter>
+        <parameter key="security.matcher.class">Symfony\Component\HttpFoundation\RequestMatcher</parameter>
+
+        <parameter key="security.role_hierarchy.class">Symfony\Component\Security\Role\RoleHierarchy</parameter>
+    </parameters>
+
+    <services>
+        <service id="security.context" class="%security.context.class%">
+            <argument type="service" id="security.access.decision_manager" />
+        </service>
+
+        <service id="security.role_hierarchy" class="%security.role_hierarchy.class%">
+            <argument>%security.role_hierarchy.roles%</argument>
+        </service>
+
+        <service id="security.account_checker" class="%security.account_checker.class%" />
+
+        <service id="security.encoder.sha1" class="%security.encoder.digest.class%">
+            <argument>sha1</argument>
+        </service>
+
+        <service id="security.encoder.md5" class="%security.encoder.digest.class%">
+            <argument>md5</argument>
+        </service>
+
+        <service id="security.encoder.plain" class="%security.encoder.plain.class%" />
+
+        <service id="security.authentication.listener.anonymous" class="%security.authentication.listener.anonymous.class%">
+            <argument type="service" id="security.context" />
+            <argument>%security.anonymous.key%</argument>
+            <argument type="service" id="logger" on-invalid="null" />
+        </service>
+
+        <service id="security.authentication.retry_entry_point" class="%security.authentication.retry_entry_point.class%" />
+
+        <service id="security.authentication.form_entry_point" class="%security.authentication.form_entry_point.class%">
+            <argument>%security.authentication.form.login_path%</argument>
+        </service>
+
+        <service id="security.authentication.basic_entry_point" class="%security.authentication.basic_entry_point.class%">
+            <argument>%security.authentication.basic_entry_point.realm%</argument>
+        </service>
+
+        <service id="security.authentication.digest_entry_point" class="%security.authentication.digest_entry_point.class%">
+            <argument>%security.authentication.digest_entry_point.realm%</argument>
+            <argument>%security.authentication.digest_entry_point.key%</argument>
+        </service>
+
+        <service id="security.logout_listener" class="%security.logout_listener.class%">
+            <argument type="service" id="security.context" />
+            <argument>%security.logout.path%</argument>
+            <argument>%security.logout.target_path%</argument>
+        </service>
+
+        <service id="security.channel_listener" class="%security.channel_listener.class%">
+            <argument type="service" id="security.access_map" />
+            <argument type="service" id="security.authentication.retry_entry_point" />
+            <argument type="service" id="logger" on-invalid="null" />
+        </service>
+
+        <service id="security.access.decision_manager" class="%security.access.decision_manager.class%">
+            <argument type="service" id="service_container" />
+        </service>
+        <service id="security.access_map" class="%security.access_map.class%" />
+
+        <service id="security.access.simple_role_voter" class="%security.access.simple_role_voter.class%">
+            <tag name="security.voter" />
+        </service>
+        <service id="security.access.authenticated_voter" class="%security.access.authenticated_voter.class%">
+            <tag name="security.voter" />
+        </service>
+        <service id="security.access.role_hierarchy_voter" class="%security.access.role_hierarchy_voter.class%">
+            <argument type="service" id="security.role_hierarchy" />
+        </service>
+
+        <service id="security.firewall" class="%security.firewall.class%">
+            <tag name="kernel.listener" priority="128" />
+            <argument type="service" id="security.firewall.map" />
+        </service>
+        <service id="security.firewall.map" class="%security.firewall.map.class%" />
+
+        <service id="security.context_listener" class="%security.context_listener.class%">
+            <argument type="service" id="security.context" />
+            <argument type="service" id="logger" on-invalid="null" />
+        </service>
+    </services>
+</container>

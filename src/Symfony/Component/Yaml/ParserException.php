@@ -14,7 +14,7 @@ namespace Symfony\Component\Yaml;
 /**
  * Exception class used by all exceptions thrown by the component.
  *
- * @author     Fabien Potencier <fabien.potencier@symfony-project.com>
+ * @author Fabien Potencier <fabien.potencier@symfony-project.com>
  */
 class ParserException extends Exception
 {

@@ -57,6 +57,10 @@ class DateTimeToLocalizedStringTransformer extends BaseDateTimeTransformer
      */
     public function transform($dateTime)
     {
+        if ($dateTime === null) {
+            return '';
+        }
+
         if (!$dateTime instanceof \DateTime) {
             throw new \InvalidArgumentException('Expected value of type \DateTime');
         }
@@ -83,12 +87,16 @@ class DateTimeToLocalizedStringTransformer extends BaseDateTimeTransformer
      * @param  string|array $value Localized date string/array
      * @return DateTime Normalized date
      */
-    public function reverseTransform($value)
+    public function reverseTransform($value, $originalValue)
     {
         $inputTimezone = $this->getOption('input_timezone');
 
         if (!is_string($value)) {
             throw new \InvalidArgumentException(sprintf('Expected argument of type string, %s given', gettype($value)));
+        }
+
+        if ($value === '') {
+            return null;
         }
 
         $timestamp = $this->getIntlDateFormatter()->parse($value);

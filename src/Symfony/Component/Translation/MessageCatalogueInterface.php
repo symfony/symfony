@@ -16,7 +16,7 @@ use Symfony\Component\Translation\Resource\ResourceInterface;
 /**
  * MessageCatalogueInterface.
  *
- * @author     Fabien Potencier <fabien.potencier@symfony-project.com>
+ * @author Fabien Potencier <fabien.potencier@symfony-project.com>
  */
 interface MessageCatalogueInterface
 {
@@ -30,7 +30,7 @@ interface MessageCatalogueInterface
     /**
      * Gets the domains.
      *
-     * @param array An array of domains
+     * @return array An array of domains
      */
     function getDomains();
 
@@ -41,7 +41,7 @@ interface MessageCatalogueInterface
      *
      * @param string $domain The domain name
      *
-     * @param array An array of messages
+     * @return array An array of messages
      */
     function getMessages($domain = null);
 
@@ -93,9 +93,21 @@ interface MessageCatalogueInterface
     /**
      * Merges translations from the given Catalogue into the current one.
      *
+     * The two catalogues must have the same locale.
+     *
      * @param MessageCatalogueInterface $catalogue A MessageCatalogueInterface instance
      */
     function addCatalogue(MessageCatalogueInterface $catalogue);
+
+    /**
+     * Merges translations from the given Catalogue into the current one
+     * only when the translation does not exist.
+     *
+     * This is used to provide default translations when they do not exist for the current locale.
+     *
+     * @param MessageCatalogueInterface $catalogue A MessageCatalogueInterface instance
+     */
+    function addFallbackCatalogue(MessageCatalogueInterface $catalogue);
 
     /**
      * Returns an array of resources loaded to build this collection.

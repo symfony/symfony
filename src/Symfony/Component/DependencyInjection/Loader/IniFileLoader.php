@@ -17,7 +17,7 @@ use Symfony\Component\DependencyInjection\Resource\FileResource;
 /**
  * IniFileLoader loads parameters from INI files.
  *
- * @author     Fabien Potencier <fabien.potencier@symfony-project.com>
+ * @author Fabien Potencier <fabien.potencier@symfony-project.com>
  */
 class IniFileLoader extends FileLoader
 {

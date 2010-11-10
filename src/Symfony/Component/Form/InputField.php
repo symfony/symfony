@@ -16,8 +16,18 @@ namespace Symfony\Component\Form;
  *
  * @author Bernhard Schussek <bernhard.schussek@symfony-project.com>
  */
-abstract class InputField extends Field
+class InputField extends Field
 {
+    /**
+     * {@inheritDoc}
+     */
+    protected function configure()
+    {
+        parent::configure();
+
+        $this->addRequiredOption('type');
+    }
+
     /**
      * {@inheritDoc}
      */
@@ -28,6 +38,7 @@ abstract class InputField extends Field
             'name'     => $this->getName(),
             'value'    => $this->getDisplayedData(),
             'disabled' => $this->isDisabled(),
+            'type'     => $this->getOption('type'),
         ));
     }
 }

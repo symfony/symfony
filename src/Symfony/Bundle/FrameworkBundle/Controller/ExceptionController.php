@@ -19,7 +19,7 @@ use Symfony\Component\OutputEscaper\SafeDecorator;
 /**
  * ExceptionController.
  *
- * @author     Fabien Potencier <fabien.potencier@symfony-project.com>
+ * @author Fabien Potencier <fabien.potencier@symfony-project.com>
  */
 class ExceptionController extends ContainerAware
 {
@@ -42,15 +42,27 @@ class ExceptionController extends ContainerAware
             $currentContent .= $content;
         }
 
-        $response = $this->container->get('templating')->renderResponse(
-            'FrameworkBundle:Exception:'.($this->container->get('kernel')->isDebug() ? 'exception.php' : 'error.php'),
+        if ('Symfony\Component\Security\Exception\AccessDeniedException' === $exception->getClass()) {
+            $exception->setStatusCode($exception->getCode());
+        }
+
+        $templating = $this->container->get('templating');
+        $template = 'FrameworkBundle:Exception:'.($this->container->get('kernel')->isDebug() ? 'exception.php' : 'error.php');
+
+        if (!$templating->exists($template)) {
+            $this->container->get('request')->setRequestFormat('html');
+        }
+
+        $response = $templating->renderResponse(
+            $template,
             array(
-                'exception'      => new SafeDecorator($exception),
+                'exception'      => $exception,
                 'logger'         => $logger,
                 'currentContent' => $currentContent,
                 'embedded'       => $embedded,
             )
         );
+
         $response->setStatusCode($exception->getStatusCode());
 
         return $response;

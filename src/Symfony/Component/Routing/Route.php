@@ -14,7 +14,7 @@ namespace Symfony\Component\Routing;
 /**
  * A Route describes a route and its parameters.
  *
- * @author     Fabien Potencier <fabien.potencier@symfony-project.com>
+ * @author Fabien Potencier <fabien.potencier@symfony-project.com>
  */
 class Route
 {

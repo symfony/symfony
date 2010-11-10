@@ -14,7 +14,7 @@ namespace Symfony\Component\DependencyInjection;
 /**
  * SimpleXMLElement class.
  *
- * @author     Fabien Potencier <fabien.potencier@symfony-project.com>
+ * @author Fabien Potencier <fabien.potencier@symfony-project.com>
  */
 class SimpleXMLElement extends \SimpleXMLElement
 {

@@ -101,7 +101,7 @@ class Validator implements ValidatorInterface
 
     protected function buildSimpleGroupChain($groups)
     {
-        if (is_null($groups)) {
+        if (null === $groups) {
             $groups = array(Constraint::DEFAULT_GROUP);
         } else {
             $groups = (array)$groups;
@@ -118,7 +118,7 @@ class Validator implements ValidatorInterface
 
     protected function buildGroupChain(ClassMetadata $metadata, $groups)
     {
-        if (is_null($groups)) {
+        if (null === $groups) {
             $groups = array(Constraint::DEFAULT_GROUP);
         } else {
             $groups = (array)$groups;

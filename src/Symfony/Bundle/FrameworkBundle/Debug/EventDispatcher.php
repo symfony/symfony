@@ -20,7 +20,7 @@ use Symfony\Component\HttpKernel\Debug\EventDispatcherTraceableInterface;
 /**
  * EventDispatcher extends the original EventDispatcher class to add some debugging tools.
  *
- * @author     Fabien Potencier <fabien.potencier@symfony-project.com>
+ * @author Fabien Potencier <fabien.potencier@symfony-project.com>
  */
 class EventDispatcher extends BaseEventDispatcher implements EventDispatcherTraceableInterface
 {

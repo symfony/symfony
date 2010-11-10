@@ -17,7 +17,7 @@ use Symfony\Component\HttpFoundation\Response;
 /**
  *
  *
- * @author     Fabien Potencier <fabien.potencier@symfony-project.com>
+ * @author Fabien Potencier <fabien.potencier@symfony-project.com>
  */
 class RedirectController extends ContainerAware
 {
@@ -50,7 +50,7 @@ class RedirectController extends ContainerAware
         unset($attributes['_route'], $attributes['route']);
 
         $response = $this->container->get('response');
-        $response->setRedirect($this['router']->generate($route, $attributes), $code);
+        $response->setRedirect($this->container->get('router')->generate($route, $attributes), $code);
 
         return $response;
     }

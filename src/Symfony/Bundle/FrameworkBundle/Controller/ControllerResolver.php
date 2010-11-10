@@ -145,7 +145,7 @@ class ControllerResolver extends BaseControllerResolver
                 $alt = $this->generateInternalUri($options['alt'][0], isset($options['alt'][1]) ? $options['alt'][1] : array(), isset($options['alt'][2]) ? $options['alt'][2] : array());
             }
 
-            return $this->container->getEsiService()->renderTag($uri, $alt, $options['ignore_errors'], $options['comment']);
+            return $this->container->getEsiService()->renderIncludeTag($uri, $alt, $options['ignore_errors'], $options['comment']);
         }
 
         $request = $this->container->getRequestService();

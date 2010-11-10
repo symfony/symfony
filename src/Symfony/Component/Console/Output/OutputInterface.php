@@ -14,7 +14,7 @@ namespace Symfony\Component\Console\Output;
 /**
  * OutputInterface is the interface implemented by all Output classes.
  *
- * @author     Fabien Potencier <fabien.potencier@symfony-project.com>
+ * @author Fabien Potencier <fabien.potencier@symfony-project.com>
  */
 interface OutputInterface
 {
@@ -27,19 +27,19 @@ interface OutputInterface
      *
      * @throws \InvalidArgumentException When unknown output type is given
      */
-    public function write($messages, $newline = false, $type = 0);
+    function write($messages, $newline = false, $type = 0);
 
     /**
      * Sets the verbosity of the output.
      *
      * @param integer $level The level of verbosity
      */
-    public function setVerbosity($level);
+    function setVerbosity($level);
 
     /**
      * Sets the decorated flag.
      *
      * @param Boolean $decorated Whether to decorated the messages or not
      */
-    public function setDecorated($decorated);
+    function setDecorated($decorated);
 }

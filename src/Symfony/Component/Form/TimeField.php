@@ -13,8 +13,8 @@ namespace Symfony\Component\Form;
 
 use Symfony\Component\Form\ValueTransformer\ReversedTransformer;
 use Symfony\Component\Form\ValueTransformer\DateTimeToArrayTransformer;
-use Symfony\Component\Form\ValueTransformer\StringToDateTimeTransformer;
-use Symfony\Component\Form\ValueTransformer\TimestampToDateTimeTransformer;
+use Symfony\Component\Form\ValueTransformer\DateTimeToStringTransformer;
+use Symfony\Component\Form\ValueTransformer\DateTimeToTimestampTransformer;
 use Symfony\Component\Form\ValueTransformer\ValueTransformerChain;
 
 class TimeField extends FieldGroup
@@ -75,36 +75,45 @@ class TimeField extends FieldGroup
             }
         }
 
-        $transformers = array();
+        $fields = array('hour', 'minute');
 
-        if ($this->getOption('type') == self::STRING) {
-            $transformers[] = new StringToDateTimeTransformer(array(
-                'format' => 'H:i:s',
-                'input_timezone' => $this->getOption('data_timezone'),
-                'output_timezone' => $this->getOption('data_timezone'),
-            ));
-        } else if ($this->getOption('type') == self::TIMESTAMP) {
-            $transformers[] = new TimestampToDateTimeTransformer(array(
-                'input_timezone' => $this->getOption('data_timezone'),
-                'output_timezone' => $this->getOption('data_timezone'),
-            ));
-        } else if ($this->getOption('type') === self::RAW) {
-            $transformers[] = new ReversedTransformer(new DateTimeToArrayTransformer(array(
-                'input_timezone' => $this->getOption('data_timezone'),
-                'output_timezone' => $this->getOption('data_timezone'),
-                'fields' => array('hour', 'minute', 'second'),
-            )));
+        if ($this->getOption('with_seconds')) {
+            $fields[] = 'second';
         }
 
-        $transformers[] = new DateTimeToArrayTransformer(array(
+        if ($this->getOption('type') == self::STRING) {
+            $this->setNormalizationTransformer(new ReversedTransformer(
+                new DateTimeToStringTransformer(array(
+                    'format' => 'H:i:s',
+                    'input_timezone' => $this->getOption('data_timezone'),
+                    'output_timezone' => $this->getOption('data_timezone'),
+                ))
+            ));
+        } else if ($this->getOption('type') == self::TIMESTAMP) {
+            $this->setNormalizationTransformer(new ReversedTransformer(
+                new DateTimeToTimestampTransformer(array(
+                    'input_timezone' => $this->getOption('data_timezone'),
+                    'output_timezone' => $this->getOption('data_timezone'),
+                ))
+            ));
+        } else if ($this->getOption('type') === self::RAW) {
+            $this->setNormalizationTransformer(new ReversedTransformer(
+                new DateTimeToArrayTransformer(array(
+                    'input_timezone' => $this->getOption('data_timezone'),
+                    'output_timezone' => $this->getOption('data_timezone'),
+                    'fields' => $fields,
+                ))
+            ));
+        }
+
+        $this->setValueTransformer(new DateTimeToArrayTransformer(array(
             'input_timezone' => $this->getOption('data_timezone'),
             'output_timezone' => $this->getOption('user_timezone'),
             // if the field is rendered as choice field, the values should be trimmed
             // of trailing zeros to render the selected choices correctly
             'pad' => $this->getOption('widget') == self::INPUT,
-        ));
-
-        $this->setValueTransformer(new ValueTransformerChain($transformers));
+            'fields' => $fields,
+        )));
     }
 
     public function isField()
@@ -146,5 +155,50 @@ class TimeField extends FieldGroup
         }
 
         return $choices;
+    }
+
+    /**
+     * Returns whether the hour of the field's data is valid
+     *
+     * The hour is valid if it is contained in the list passed to the field's
+     * option "hours".
+     *
+     * @return boolean
+     */
+    public function isHourWithinRange()
+    {
+        $date = $this->getNormalizedData();
+
+        return $date === null || in_array($date->format('H'), $this->getOption('hours'));
+    }
+
+    /**
+     * Returns whether the minute of the field's data is valid
+     *
+     * The minute is valid if it is contained in the list passed to the field's
+     * option "minutes".
+     *
+     * @return boolean
+     */
+    public function isMinuteWithinRange()
+    {
+        $date = $this->getNormalizedData();
+
+        return $date === null || in_array($date->format('i'), $this->getOption('minutes'));
+    }
+
+    /**
+     * Returns whether the second of the field's data is valid
+     *
+     * The second is valid if it is contained in the list passed to the field's
+     * option "seconds".
+     *
+     * @return boolean
+     */
+    public function isSecondWithinRange()
+    {
+        $date = $this->getNormalizedData();
+
+        return $date === null || in_array($date->format('s'), $this->getOption('seconds'));
     }
 }

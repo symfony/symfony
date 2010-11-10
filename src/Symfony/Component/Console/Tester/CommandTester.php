@@ -16,7 +16,7 @@ use Symfony\Component\Console\Output\StreamOutput;
  */
 
 /**
- * @author     Fabien Potencier <fabien.potencier@symfony-project.com>
+ * @author Fabien Potencier <fabien.potencier@symfony-project.com>
  */
 class CommandTester
 {

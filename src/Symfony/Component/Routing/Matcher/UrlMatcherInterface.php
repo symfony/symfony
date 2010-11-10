@@ -14,7 +14,7 @@ namespace Symfony\Component\Routing\Matcher;
 /**
  * UrlMatcherInterface is the interface that all URL matcher classes must implements.
  *
- * @author     Fabien Potencier <fabien.potencier@symfony-project.com>
+ * @author Fabien Potencier <fabien.potencier@symfony-project.com>
  */
 interface UrlMatcherInterface
 {
@@ -27,5 +27,5 @@ interface UrlMatcherInterface
      *
      * @return array|false An array of parameters or false if no route matches
      */
-    public function match($url);
+    function match($url);
 }

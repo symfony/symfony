@@ -48,7 +48,7 @@
             <argument type="service" id="templating.html.generator" />
         </service>
 
-        <service id="twig.extension.helpers" class="Symfony\Bundle\TwigBundle\Extension\HelpersExtension">
+        <service id="twig.extension.helpers" class="Symfony\Bundle\TwigBundle\Extension\TemplatingExtension">
             <tag name="twig.extension" />
             <argument type="service" id="service_container" />
         </service>
@@ -57,6 +57,11 @@
             <tag name="twig.extension" />
             <argument type="service" id="templating.html.generator" />
             <argument>%twig.form.resources%</argument>
+        </service>
+
+        <service id="twig.security.form" class="Symfony\Bundle\TwigBundle\Extension\SecurityExtension">
+            <tag name="twig.extension" />
+            <argument type="service" id="security.context" on-invalid="ignore" />
         </service>
     </services>
 </container>

@@ -14,25 +14,25 @@ namespace Symfony\Component\HttpKernel\Log;
 /**
  * LoggerInterface.
  *
- * @author     Fabien Potencier <fabien.potencier@symfony-project.com>
+ * @author Fabien Potencier <fabien.potencier@symfony-project.com>
  */
 interface LoggerInterface
 {
-    public function log($message, $priority);
+    function log($message, $priority);
 
-    public function emerg($message);
+    function emerg($message);
 
-    public function alert($message);
+    function alert($message);
 
-    public function crit($message);
+    function crit($message);
 
-    public function err($message);
+    function err($message);
 
-    public function warn($message);
+    function warn($message);
 
-    public function notice($message);
+    function notice($message);
 
-    public function info($message);
+    function info($message);
 
-    public function debug($message);
+    function debug($message);
 }

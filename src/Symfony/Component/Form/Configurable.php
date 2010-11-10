@@ -47,12 +47,6 @@ abstract class Configurable
     private $requiredOptions = array();
 
     /**
-     * The allowed values for each option
-     * @var array
-     */
-    private $allowedValues = array();
-
-    /**
      * Reads, validates and stores the given options
      *
      * @param array $options
@@ -93,7 +87,7 @@ abstract class Configurable
      */
     public function getOption($name)
     {
-        return array_key_exists($name, $this->options) ? $this->options[$name] : null;
+        return isset($this->options[$name]) ? $this->options[$name] : null;
     }
 
     /**

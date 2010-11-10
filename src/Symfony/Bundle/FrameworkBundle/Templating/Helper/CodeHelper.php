@@ -16,7 +16,7 @@ use Symfony\Component\Templating\Helper\Helper;
 /**
  * CodeHelper.
  *
- * @author     Fabien Potencier <fabien.potencier@symfony-project.com>
+ * @author Fabien Potencier <fabien.potencier@symfony-project.com>
  */
 class CodeHelper extends Helper
 {

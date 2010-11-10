@@ -42,13 +42,13 @@ class ReversedTransformer implements ValueTransformerInterface
      */
     public function transform($value)
     {
-        return $this->reversedTransformer->reverseTransform($value);
+        return $this->reversedTransformer->reverseTransform($value, null);
     }
 
     /**
      * {@inheritDoc}
      */
-    public function reverseTransform($value)
+    public function reverseTransform($value, $originalValue)
     {
         return $this->reversedTransformer->transform($value);
     }

@@ -14,7 +14,7 @@ namespace Symfony\Component\HttpFoundation;
 /**
  * Response represents an HTTP response.
  *
- * @author     Fabien Potencier <fabien.potencier@symfony-project.com>
+ * @author Fabien Potencier <fabien.potencier@symfony-project.com>
  */
 class Response
 {
@@ -295,7 +295,7 @@ class Response
      *
      * This method indicates that the response must not be served stale by a
      * cache in any circumstance without first revalidating with the origin.
-     * When present, the TTL of the response should not be overriden to be
+     * When present, the TTL of the response should not be overridden to be
      * greater than the value provided by the origin.
      *
      * @return Boolean true if the response must be revalidated by a cache, false otherwise
@@ -317,8 +317,8 @@ class Response
     public function getDate()
     {
         if (null === $date = $this->headers->getDate('Date')) {
-            $date = new \DateTime();
-            $this->headers->set('Date', $date->format(DATE_RFC2822));
+            $date = new \DateTime(null, new \DateTimeZone('UTC'));
+            $this->headers->set('Date', $date->format('D, d M Y H:i:s').' GMT');
         }
 
         return $date;
@@ -370,7 +370,9 @@ class Response
         if (null === $date) {
             $this->headers->delete('Expires');
         } else {
-            $this->headers->set('Expires', $date->format(DATE_RFC2822));
+            $date = clone $date;
+            $date->setTimezone(new \DateTimeZone('UTC'));
+            $this->headers->set('Expires', $date->format('D, d M Y H:i:s').' GMT');
         }
     }
 
@@ -489,7 +491,9 @@ class Response
         if (null === $date) {
             $this->headers->delete('Last-Modified');
         } else {
-            $this->headers->set('Last-Modified', $date->format(DATE_RFC2822));
+            $date = clone $date;
+            $date->setTimezone(new \DateTimeZone('UTC'));
+            $this->headers->set('Last-Modified', $date->format('D, d M Y H:i:s').' GMT');
         }
     }
 
@@ -576,7 +580,18 @@ class Response
             return array();
         }
 
-        return preg_split('/[\s,]+/', $vary);
+        return is_array($vary) ? $vary : preg_split('/[\s,]+/', $vary);
+    }
+
+    /**
+     * Sets the Vary header.
+     *
+     * @param string|array $headers
+     * @param Boolean      $replace Whether to replace the actual value of not (true by default)
+     */
+    public function setVary($headers, $replace = true)
+    {
+        $this->headers->set('Vary', $headers, $replace);
     }
 
     /**

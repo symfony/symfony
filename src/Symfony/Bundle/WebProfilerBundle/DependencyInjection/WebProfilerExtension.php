@@ -28,7 +28,7 @@ use Symfony\Component\DependencyInjection\Definition;
  *        intercept-redirects="true"
  *    />
  *
- * @author     Fabien Potencier <fabien.potencier@symfony-project.com>
+ * @author Fabien Potencier <fabien.potencier@symfony-project.com>
  */
 class WebProfilerExtension extends Extension
 {
@@ -54,10 +54,10 @@ class WebProfilerExtension extends Extension
             }
         }
 
-        if (isset($config['intercept-redirects'])) {
-            $container->setParameter('debug.toolbar.intercept_redirects', (Boolean) $config['intercept-redirects']);
-        } elseif (isset($config['intercept_redirects'])) {
-            $container->setParameter('debug.toolbar.intercept_redirects', (Boolean) $config['intercept_redirects']);
+        foreach (array('intercept-redirects', 'intercept_redirects') as $key) {
+            if (isset($config[$key])) {
+                $container->setParameter('debug.toolbar.intercept_redirects', (Boolean) $config[$key]);
+            }
         }
     }
 

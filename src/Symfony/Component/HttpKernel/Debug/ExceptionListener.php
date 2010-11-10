@@ -22,7 +22,7 @@ use Symfony\Component\HttpFoundation\Request;
 /**
  * ExceptionListener.
  *
- * @author     Fabien Potencier <fabien.potencier@symfony-project.com>
+ * @author Fabien Potencier <fabien.potencier@symfony-project.com>
  */
 class ExceptionListener
 {

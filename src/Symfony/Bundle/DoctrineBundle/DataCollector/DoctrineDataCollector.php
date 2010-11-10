@@ -19,7 +19,7 @@ use Symfony\Bundle\DoctrineBundle\Logger\DbalLogger;
 /**
  * DoctrineDataCollector.
  *
- * @author     Fabien Potencier <fabien.potencier@symfony-project.com>
+ * @author Fabien Potencier <fabien.potencier@symfony-project.com>
  */
 class DoctrineDataCollector extends DataCollector
 {

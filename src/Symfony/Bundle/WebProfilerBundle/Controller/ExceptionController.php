@@ -18,7 +18,7 @@ use Symfony\Component\OutputEscaper\SafeDecorator;
 /**
  * ExceptionController.
  *
- * @author     Fabien Potencier <fabien.potencier@symfony-project.com>
+ * @author Fabien Potencier <fabien.potencier@symfony-project.com>
  */
 class ExceptionController extends ContainerAware
 {

@@ -14,7 +14,7 @@ namespace Symfony\Component\Routing;
 /**
  * CompiledRoutes are returned by the RouteCompiler class.
  *
- * @author     Fabien Potencier <fabien.potencier@symfony-project.com>
+ * @author Fabien Potencier <fabien.potencier@symfony-project.com>
  */
 class CompiledRoute
 {

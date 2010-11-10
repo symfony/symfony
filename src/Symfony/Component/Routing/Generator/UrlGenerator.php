@@ -17,7 +17,7 @@ use Symfony\Component\Routing\RouteCollection;
 /**
  * UrlGenerator generates URL based on a set of routes.
  *
- * @author     Fabien Potencier <fabien.potencier@symfony-project.com>
+ * @author Fabien Potencier <fabien.potencier@symfony-project.com>
  */
 class UrlGenerator implements UrlGeneratorInterface
 {

@@ -11,4 +11,5 @@ namespace Symfony\Component\Validator\Exception;
  * with this source code in the file LICENSE.
  */
 
-class MappingException extends ValidatorException {}
+class MappingException extends ValidatorException {
+}

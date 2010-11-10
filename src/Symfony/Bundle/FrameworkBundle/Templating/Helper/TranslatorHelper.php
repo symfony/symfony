@@ -17,7 +17,7 @@ use Symfony\Component\Translation\TranslatorInterface;
 /**
  * TranslatorHelper.
  *
- * @author     Fabien Potencier <fabien.potencier@symfony-project.com>
+ * @author Fabien Potencier <fabien.potencier@symfony-project.com>
  */
 class TranslatorHelper extends Helper
 {

@@ -50,11 +50,11 @@ class RequestMatcherTest extends \PHPUnit_Framework_TestCase
     {
         $matcher = new RequestMatcher();
 
-        $matcher->matchHost('#.*\.example\.com#i');
+        $matcher->matchHost('.*\.example\.com');
         $request = Request::create('', 'get', array(), array(), array(), array('HTTP_HOST' => 'foo.example.com'));
         $this->assertTrue($matcher->matches($request));
 
-        $matcher->matchMethod('#sensio\.com#i');
+        $matcher->matchMethod('.*\.sensio\.com');
         $this->assertFalse($matcher->matches($request));
     }
 
@@ -62,11 +62,11 @@ class RequestMatcherTest extends \PHPUnit_Framework_TestCase
     {
         $matcher = new RequestMatcher();
 
-        $matcher->matchPath('#^/admin#');
+        $matcher->matchPath('/admin/.*');
         $request = Request::create('/admin/foo');
         $this->assertTrue($matcher->matches($request));
 
-        $matcher->matchMethod('#^/blog#i');
+        $matcher->matchMethod('/blog/.*');
         $this->assertFalse($matcher->matches($request));
     }
 }

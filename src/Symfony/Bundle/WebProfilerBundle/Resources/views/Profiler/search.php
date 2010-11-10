@@ -14,7 +14,7 @@
         <input type="text" name="token" id="token" />
         <div class="clearfix"></div>
         <label for="limit">Limit</label>
-        <select name="limit">
+        <select name="limit" id="limit">
             <?php foreach (array(10, 50, 100) as $l): ?>
                 <option<?php echo $l == $limit ? ' selected="selected"' : '' ?>><?php echo $l ?></option>
             <?php endforeach; ?>

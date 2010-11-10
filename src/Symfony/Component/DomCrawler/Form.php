@@ -16,7 +16,7 @@ use Symfony\Component\DomCrawler\FormField;
 /**
  * Form represents an HTML form.
  *
- * @author     Fabien Potencier <fabien.potencier@symfony-project.com>
+ * @author Fabien Potencier <fabien.potencier@symfony-project.com>
  */
 class Form implements \ArrayAccess
 {

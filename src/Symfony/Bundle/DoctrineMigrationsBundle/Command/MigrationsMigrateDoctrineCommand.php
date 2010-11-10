@@ -19,8 +19,8 @@ use Doctrine\DBAL\Migrations\Tools\Console\Command\MigrateCommand;
 /**
  * Command for executing a migration to a specified version or the latest available version.
  *
- * @author     Fabien Potencier <fabien.potencier@symfony-project.com>
- * @author     Jonathan H. Wage <jonwage@gmail.com>
+ * @author Fabien Potencier <fabien.potencier@symfony-project.com>
+ * @author Jonathan H. Wage <jonwage@gmail.com>
  */
 class MigrationsMigrateDoctrineCommand extends MigrateCommand
 {

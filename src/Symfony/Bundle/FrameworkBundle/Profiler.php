@@ -19,7 +19,7 @@ use Symfony\Component\HttpKernel\Log\LoggerInterface;
 /**
  * Profiler.
  *
- * @author     Fabien Potencier <fabien.potencier@symfony-project.com>
+ * @author Fabien Potencier <fabien.potencier@symfony-project.com>
  */
 class Profiler extends BaseProfiler
 {

@@ -18,7 +18,7 @@ use Symfony\Component\HttpKernel\Log\DebugLoggerInterface;
 /**
  * Logger.
  *
- * @author     Fabien Potencier <fabien.potencier@symfony-project.com>
+ * @author Fabien Potencier <fabien.potencier@symfony-project.com>
  */
 class Logger extends BaseLogger implements LoggerInterface
 {

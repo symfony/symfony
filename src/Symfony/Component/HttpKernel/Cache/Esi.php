@@ -24,7 +24,7 @@ use Symfony\Component\HttpKernel\HttpKernelInterface;
  *
  *  * Edge Architecture Specification (http://www.w3.org/TR/edge-arch)
  *
- * @author     Fabien Potencier <fabien.potencier@symfony-project.com>
+ * @author Fabien Potencier <fabien.potencier@symfony-project.com>
  */
 class Esi
 {
@@ -54,7 +54,7 @@ class Esi
             return false;
         }
 
-        return preg_match('#ESI/1.0#', $value);
+        return (Boolean) preg_match('#ESI/1.0#', $value);
     }
 
     /**
@@ -97,7 +97,7 @@ class Esi
             return false;
         }
 
-        return preg_match('#content="[^"]*ESI/1.0[^"]*"#', $control);
+        return (Boolean) preg_match('#content="[^"]*ESI/1.0[^"]*"#', $control);
     }
 
     /**
@@ -108,7 +108,7 @@ class Esi
      * @param Boolean $ignoreErrors Whether to ignore errors or not
      * @param string  $comment      A comment to add as an esi:include tag
      */
-    public function renderTag($uri, $alt, $ignoreErrors = true, $comment = '')
+    public function renderIncludeTag($uri, $alt = null, $ignoreErrors = true, $comment = '')
     {
         $html = sprintf('<esi:include src="%s"%s%s />',
             $uri,
@@ -117,7 +117,7 @@ class Esi
         );
 
         if (!empty($comment)) {
-            $html .= sprintf("<esi:comment text=\"%s\" />\n%s", $comment, $output);
+            return sprintf("<esi:comment text=\"%s\" />\n%s", $comment, $html);
         }
 
         return $html;
@@ -144,7 +144,7 @@ class Esi
 
         // we don't use a proper XML parser here as we can have ESI tags in a plain text response
         $content = $response->getContent();
-        $content = preg_replace_callback('#<esi\:include\s+(.+?)\s*/>#', array($this, 'handleEsiIncludeTag'), $content);
+        $content = preg_replace_callback('#<esi\:include\s+(.*?)\s*/>#', array($this, 'handleEsiIncludeTag'), $content);
         $content = preg_replace('#<esi\:comment[^>]*/>#', '', $content);
         $content = preg_replace('#<esi\:remove>.*?</esi\:remove>#', '', $content);
 
@@ -152,11 +152,15 @@ class Esi
         $response->headers->set('X-Body-Eval', 'ESI');
 
         // remove ESI/1.0 from the Surrogate-Control header
-        $value = $response->headers->get('Surrogate-Control');
-        if (preg_match('#^content="ESI/1.0"$#', $value)) {
-            $response->headers->delete('Surrogate-Control');
-        } else {
-            $response->headers->set('Surrogate-Control', preg_replace('#ESI/1.0#', '', $value));
+        if ($response->headers->has('Surrogate-Control')) {
+            $value = $response->headers->get('Surrogate-Control');
+            if ('content="ESI/1.0"' == $value) {
+                $response->headers->delete('Surrogate-Control');
+            } elseif (preg_match('#,\s*content="ESI/1.0"#', $value)) {
+                $response->headers->set('Surrogate-Control', preg_replace('#,\s*content="ESI/1.0"#', '', $value));
+            } elseif (preg_match('#content="ESI/1.0",\s*#', $value)) {
+                $response->headers->set('Surrogate-Control', preg_replace('#content="ESI/1.0",\s*#', '', $value));
+            }
         }
     }
 

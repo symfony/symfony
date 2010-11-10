@@ -14,7 +14,7 @@ namespace Symfony\Component\DependencyInjection;
 /**
  * A simple implementation of ContainerAwareInterface.
  *
- * @author     Fabien Potencier <fabien.potencier@symfony-project.com>
+ * @author Fabien Potencier <fabien.potencier@symfony-project.com>
  */
 class ContainerAware implements ContainerAwareInterface
 {

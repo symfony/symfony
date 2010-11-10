@@ -17,7 +17,7 @@ use Symfony\Component\HttpKernel\Log\DebugLoggerInterface;
 /**
  * DebugLogger.
  *
- * @author     Fabien Potencier <fabien.potencier@symfony-project.com>
+ * @author Fabien Potencier <fabien.potencier@symfony-project.com>
  */
 class DebugLogger extends AbstractWriter implements DebugLoggerInterface
 {

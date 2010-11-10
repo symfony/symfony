@@ -18,7 +18,7 @@ interface HtmlGeneratorInterface
      *
      * @return string  The fully escaped value
      */
-    public function escape($value);
+    function escape($value);
 
     /**
      * Generates the HTML code for a tag attribute
@@ -28,7 +28,7 @@ interface HtmlGeneratorInterface
      *
      * @return string  The HTML code of the attribute
      */
-    public function attribute($name, $value);
+    function attribute($name, $value);
 
     /**
      * Generates the HTML code for multiple tag attributes
@@ -38,7 +38,7 @@ interface HtmlGeneratorInterface
      *
      * @return string  The HTML code of the attribute list
      */
-    public function attributes(array $attributes);
+    function attributes(array $attributes);
 
     /**
      * Generates the HTML code for a tag without content
@@ -48,7 +48,7 @@ interface HtmlGeneratorInterface
      *
      * @return string  The HTML code for the tag
      */
-    public function tag($tag, $attributes = array());
+    function tag($tag, $attributes = array());
 
     /**
      * Generates the HTML code for a tag with content
@@ -59,5 +59,5 @@ interface HtmlGeneratorInterface
      *
      * @return string  The HTML code for the tag
      */
-    public function contentTag($tag, $content, $attributes = array());
+    function contentTag($tag, $content, $attributes = array());
 }

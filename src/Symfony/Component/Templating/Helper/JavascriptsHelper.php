@@ -21,7 +21,7 @@ namespace Symfony\Component\Templating\Helper;
  *   echo $view['javascripts'];
  * </code>
  *
- * @author     Fabien Potencier <fabien.potencier@symfony-project.com>
+ * @author Fabien Potencier <fabien.potencier@symfony-project.com>
  */
 class JavascriptsHelper extends Helper
 {

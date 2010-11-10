@@ -16,12 +16,12 @@ use Symfony\Component\Routing\Route;
 /**
  * ApacheMatcherDumper dumps a matcher in the Apache .htaccess format.
  *
- * @author     Fabien Potencier <fabien.potencier@symfony-project.com>
+ * @author Fabien Potencier <fabien.potencier@symfony-project.com>
  */
 class ApacheMatcherDumper extends MatcherDumper
 {
     /**
-     * Dumps a set of routes to a .htacces format.
+     * Dumps a set of routes to a .htaccess format.
      *
      * Available options:
      *

@@ -14,7 +14,7 @@ namespace Symfony\Component\Translation;
 /**
  * TranslatorInterface.
  *
- * @author     Fabien Potencier <fabien.potencier@symfony-project.com>
+ * @author Fabien Potencier <fabien.potencier@symfony-project.com>
  */
 interface TranslatorInterface
 {
@@ -49,4 +49,11 @@ interface TranslatorInterface
      * @param string $locale The locale
      */
     function setLocale($locale);
+
+    /**
+     * Returns the current locale.
+     *
+     * @return string The locale
+     */
+    function getLocale();
 }

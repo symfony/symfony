@@ -16,7 +16,7 @@ use Symfony\Component\DependencyInjection\ContainerInterface;
 /**
  * TwigExtension.
  *
- * @author     Fabien Potencier <fabien.potencier@symfony-project.com>
+ * @author Fabien Potencier <fabien.potencier@symfony-project.com>
  */
 class Environment extends \Twig_Environment
 {

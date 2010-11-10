@@ -19,7 +19,7 @@ use Symfony\Component\HttpFoundation\Response;
 /**
  * RequestDataCollector.
  *
- * @author     Fabien Potencier <fabien.potencier@symfony-project.com>
+ * @author Fabien Potencier <fabien.potencier@symfony-project.com>
  */
 class RequestDataCollector extends DataCollector
 {

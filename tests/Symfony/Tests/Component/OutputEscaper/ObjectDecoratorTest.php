@@ -30,6 +30,9 @@ class ObjectDecoratorTest extends \PHPUnit_Framework_TestCase
 
         $array = self::$escaped->getTitles();
         $this->assertEquals('&lt;strong&gt;escaped!&lt;/strong&gt;', $array[2], 'The escaped object behaves like the real object');
+
+        $this->assertEquals('Hello &lt;strong&gt;Fabien&lt;/strong&gt;', self::$escaped->sayHello('Fabien'), 'The escaped object behaves like the real object');
+        $this->assertEquals('Hello <strong>Fabien</strong>', self::$escaped->sayHello('Fabien', 'esc_raw'), 'The escaped object behaves like the real object');
     }
 
     public function testMagicToString()
@@ -63,8 +66,18 @@ class OutputEscaperTest
         return '<strong>escaped!</strong>';
     }
 
+    public function sayHello($name)
+    {
+        return sprintf('Hello <strong>%s</strong>', $name);
+    }
+
     public function getTitles()
     {
         return array(1, 2, '<strong>escaped!</strong>');
+    }
+
+    public function get($key)
+    {
+        return isset($this->{$key}) ? $this->{$key} : null;
     }
 }

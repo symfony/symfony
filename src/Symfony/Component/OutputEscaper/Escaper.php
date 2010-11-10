@@ -12,50 +12,16 @@ namespace Symfony\Component\OutputEscaper;
  */
 
 /**
- * Abstract class that provides an interface for escaping of output.
+ * Escaper provides output escaping features.
  *
- * @author     Fabien Potencier <fabien.potencier@symfony-project.com>
- * @author     Mike Squire <mike@somosis.co.uk>
+ * @author Fabien Potencier <fabien.potencier@symfony-project.com>
+ * @author Mike Squire <mike@somosis.co.uk>
  */
-abstract class Escaper
+class Escaper
 {
-    /**
-     * The value that is to be escaped.
-     *
-     * @var mixed
-     */
-    protected $value;
-
-    /**
-     * The escaper (a PHP callable) that is going to be applied to the value and its
-     * children.
-     *
-     * @var string
-     */
-    protected $escaper;
-
     static protected $charset = 'UTF-8';
     static protected $safeClasses = array();
     static protected $escapers;
-
-    /**
-     * Constructor.
-     *
-     * Since Escaper is an abstract class, instances cannot be created
-     * directly but the constructor will be inherited by sub-classes.
-     *
-     * @param string $callable A PHP callable
-     * @param string $value    Escaping value
-     */
-    public function __construct($escaper, $value)
-    {
-        if (null === self::$escapers) {
-            self::initializeEscapers();
-        }
-
-        $this->escaper = is_string($escaper) && isset(self::$escapers[$escaper]) ? self::$escapers[$escaper] : $escaper;
-        $this->value = $value;
-    }
 
     /**
      * Decorates a PHP variable with something that will escape any data obtained
@@ -78,7 +44,7 @@ abstract class Escaper
      * The escaping method is actually a PHP callable. This class hosts a set
      * of standard escaping strategies.
      *
-     * @param  string $escaper The escaping method (a PHP callable) to apply to the value
+     * @param  mixed  $escaper The escaping method (a PHP callable or a named escaper) to apply to the value
      * @param  mixed  $value   The value to escape
      *
      * @return mixed Escaped value
@@ -109,11 +75,10 @@ abstract class Escaper
         }
 
         if (is_object($value)) {
-            if ($value instanceof Escaper) {
+            if ($value instanceof BaseEscaper) {
                 // avoid double decoration
                 $copy = clone $value;
-
-                $copy->escaper = $escaper;
+                $copy->setEscaper($escaper);
 
                 return $copy;
             }
@@ -121,7 +86,7 @@ abstract class Escaper
             if ($value instanceof SafeDecorator) {
                 // do not escape objects marked as safe
                 // return the original object
-                return $value->getValue();
+                return $value->getRawValue();
             }
 
             if (self::isClassMarkedAsSafe(get_class($value)) || $value instanceof SafeDecoratorInterface) {
@@ -170,7 +135,7 @@ abstract class Escaper
         }
 
         if (is_object($value)) {
-            return $value instanceof Escaper ? $value->getRawValue() : $value;
+            return $value instanceof BaseEscaper ? $value->getRawValue() : $value;
         }
 
         return $value;
@@ -219,19 +184,6 @@ abstract class Escaper
     }
 
     /**
-     * Returns the raw value associated with this instance.
-     *
-     * Concrete instances of Escaper classes decorate a value which is
-     * stored by the constructor. This returns that original, unescaped, value.
-     *
-     * @return mixed The original value used to construct the decorator
-     */
-    public function getRawValue()
-    {
-        return $this->value;
-    }
-
-    /**
      * Sets the current charset.
      *
      * @param string $charset The current charset
@@ -254,12 +206,31 @@ abstract class Escaper
     /**
      * Adds a named escaper.
      *
+     * Warning: An escaper must be able to deal with
+     * double-escaping correctly.
+     *
      * @param string $name    The escaper name
      * @param mixed  $escaper A PHP callable
      */
     static public function setEscaper($name, $escaper)
     {
         self::$escapers[$name] = $escaper;
+    }
+
+    /**
+     * Gets a named escaper.
+     *
+     * @param  string $name    The escaper name
+     *
+     * @return mixed  $escaper A PHP callable
+     */
+    static public function getEscaper($escaper)
+    {
+        if (null === self::$escapers) {
+            self::initializeEscapers();
+        }
+
+        return is_string($escaper) && isset(self::$escapers[$escaper]) ? self::$escapers[$escaper] : $escaper;
     }
 
     /**
@@ -294,7 +265,7 @@ abstract class Escaper
                 {
                     // Numbers and boolean values get turned into strings which can cause problems
                     // with type comparisons (e.g. === or is_int() etc).
-                    return is_string($value) ? htmlspecialchars($value, ENT_QUOTES, Escaper::getCharset()) : $value;
+                    return is_string($value) ? htmlspecialchars($value, ENT_QUOTES, Escaper::getCharset(), false) : $value;
                 },
 
             'entities' =>
@@ -308,7 +279,7 @@ abstract class Escaper
                 {
                     // Numbers and boolean values get turned into strings which can cause problems
                     // with type comparisons (e.g. === or is_int() etc).
-                    return is_string($value) ? htmlentities($value, ENT_QUOTES, Escaper::getCharset()) : $value;
+                    return is_string($value) ? htmlentities($value, ENT_QUOTES, Escaper::getCharset(), false) : $value;
                 },
 
             'raw' =>
@@ -326,34 +297,54 @@ abstract class Escaper
 
             'js' =>
                 /**
-                 * A function that c-escapes a string after applying (cf. entities). The
-                 * assumption is that the value will be used to generate dynamic HTML in some
-                 * way and the safest way to prevent mishap is to assume the value should have
-                 * HTML entities set properly.
-                 *
-                 * The (cf. js_no_entities) method should be used to escape a string
-                 * that is ultimately not going to end up as text in an HTML document.
+                 * A function that escape all non-alphanumeric characters
+                 * into their \xHH or \uHHHH representations
                  *
                  * @param string $value the value to escape
                  * @return string the escaped value
                  */
                 function ($value)
                 {
-                    return str_replace(array("\\"  , "\n"  , "\r" , "\""  , "'"  ), array("\\\\", "\\n" , "\\r", "\\\"", "\\'"), (is_string($value) ? htmlentities($value, ENT_QUOTES, Escaper::getCharset()) : $value));
-                },
+                    if ('UTF-8' != Escaper::getCharset()) {
+                        $string = Escaper::convertEncoding($string, 'UTF-8', Escaper::getCharset());
+                    }
 
-            'js_no_entities' =>
-                /**
-                 * A function the c-escapes a string, making it suitable to be placed in a
-                 * JavaScript string.
-                 *
-                 * @param string $value the value to escape
-                 * @return string the escaped value
-                 */
-                function ($value)
-                {
-                    return str_replace(array("\\"  , "\n"  , "\r" , "\""  , "'"  ), array("\\\\", "\\n" , "\\r", "\\\"", "\\'"), $value);
+                    $callback = function ($matches)
+                    {
+                        $char = $matches[0];
+
+                        // \xHH
+                        if (!isset($char[1])) {
+                            return '\\x'.substr('00'.bin2hex($char), -2);
+                        }
+
+                        // \uHHHH
+                        $char = Escaper::convertEncoding($char, 'UTF-16BE', 'UTF-8');
+
+                        return '\\u'.substr('0000'.bin2hex($char), -4);
+                    };
+
+                    if (null === $string = preg_replace_callback('#[^\p{L}\p{N} ]#u', $callback, $string)) {
+                        throw new InvalidArgumentException('The string to escape is not a valid UTF-8 string.');
+                    }
+
+                    if ('UTF-8' != Escaper::getCharset()) {
+                        $string = Escaper::convertEncoding($string, Escaper::getCharset(), 'UTF-8');
+                    }
+
+                    return $string;
                 },
         );
+    }
+
+    static public function convertEncoding($string, $to, $from)
+    {
+        if (function_exists('iconv')) {
+            return iconv($from, $to, $string);
+        } elseif (function_exists('mb_convert_encoding')) {
+            return mb_convert_encoding($string, $to, $from);
+        } else {
+            throw new RuntimeException('No suitable convert encoding function (use UTF-8 as your encoding or install the iconv or mbstring extension).');
+        }
     }
 }

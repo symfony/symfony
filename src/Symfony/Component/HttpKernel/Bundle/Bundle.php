@@ -18,9 +18,10 @@ use Symfony\Component\Finder\Finder;
  */
 
 /**
- * Bundle.
+ * An implementation of the BundleInterface that follows a few conventions
+ * for the DependencyInjection extensions and the Console commands. 
  *
- * @author     Fabien Potencier <fabien.potencier@symfony-project.com>
+ * @author Fabien Potencier <fabien.potencier@symfony-project.com>
  */
 abstract class Bundle extends ContainerAware implements BundleInterface
 {
@@ -131,6 +132,11 @@ abstract class Bundle extends ContainerAware implements BundleInterface
     /**
      * Finds and registers Commands.
      *
+     * Override this method if your bundle commands do not follow the conventions:
+     *
+     * * Commands are in the 'Command' sub-directory
+     * * Commands extend Symfony\Component\Console\Command\Command
+     *
      * @param Application $application An Application instance
      */
     public function registerCommands(Application $application)
@@ -151,6 +157,10 @@ abstract class Bundle extends ContainerAware implements BundleInterface
         }
     }
 
+    /**
+     * Initializes the properties on this object that require a reflection
+     * object to have been created.
+     */
     protected function initReflection()
     {
         $tmp = dirname(str_replace('\\', '/', get_class($this)));

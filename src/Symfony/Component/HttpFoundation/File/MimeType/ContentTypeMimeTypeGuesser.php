@@ -21,7 +21,7 @@ use Symfony\Component\HttpFoundation\File\Exception\AccessDeniedException;
 class ContentTypeMimeTypeGuesser implements MimeTypeGuesserInterface
 {
     /**
-     * Returns whether this guesser is supported on the corrent OS/PHP setup
+     * Returns whether this guesser is supported on the current OS/PHP setup
      *
      * @return boolean
      */

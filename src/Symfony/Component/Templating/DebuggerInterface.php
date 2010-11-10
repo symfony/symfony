@@ -15,7 +15,7 @@ namespace Symfony\Component\Templating;
  * DebuggerInterface is the interface you need to implement
  * to debug template loader instances.
  *
- * @author     Fabien Potencier <fabien.potencier@symfony-project.com>
+ * @author Fabien Potencier <fabien.potencier@symfony-project.com>
  */
 interface DebuggerInterface
 {

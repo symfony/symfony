@@ -18,7 +18,7 @@ namespace Symfony\Component\Console\Input;
  *
  *     $input = new StringInput('foo --bar="foobar"');
  *
- * @author     Fabien Potencier <fabien.potencier@symfony-project.com>
+ * @author Fabien Potencier <fabien.potencier@symfony-project.com>
  */
 class StringInput extends ArgvInput
 {

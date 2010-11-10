@@ -18,7 +18,7 @@ use Symfony\Component\HttpKernel\Profiler\Profiler;
  *
  * Children of this class must store the collected data in the data property.
  *
- * @author     Fabien Potencier <fabien.potencier@symfony-project.com>
+ * @author Fabien Potencier <fabien.potencier@symfony-project.com>
  */
 abstract class DataCollector implements DataCollectorInterface, \Serializable
 {

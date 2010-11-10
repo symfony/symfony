@@ -79,16 +79,22 @@ class Translator implements TranslatorInterface
     }
 
     /**
+     * {@inheritdoc}
+     */
+    public function getLocale()
+    {
+        return $this->locale;
+    }
+
+    /**
      * Sets the fallback locale.
      *
      * @param string $locale The fallback locale
      */
     public function setFallbackLocale($locale)
     {
-        if (null !== $this->fallbackLocale) {
-            // needed as the fallback locale is used to fill-in non-yet translated messages
-            $this->catalogues = array();
-        }
+        // needed as the fallback locale is used to fill-in non-yet translated messages
+        $this->catalogues = array();
 
         $this->fallbackLocale = $locale;
     }
@@ -99,7 +105,7 @@ class Translator implements TranslatorInterface
     public function trans($id, array $parameters = array(), $domain = 'messages', $locale = null)
     {
         if (!isset($locale)) {
-            $locale = $this->locale;
+            $locale = $this->getLocale();
         }
 
         if (!isset($this->catalogues[$locale])) {
@@ -115,7 +121,7 @@ class Translator implements TranslatorInterface
     public function transChoice($id, $number, array $parameters = array(), $domain = 'messages', $locale = null)
     {
         if (!isset($locale)) {
-            $locale = $this->locale;
+            $locale = $this->getLocale();
         }
 
         if (!isset($this->catalogues[$locale])) {
@@ -127,10 +133,6 @@ class Translator implements TranslatorInterface
 
     protected function loadCatalogue($locale)
     {
-        if (isset($this->catalogues[$locale])) {
-            return;
-        }
-
         $this->catalogues[$locale] = new MessageCatalogue($locale);
         if (!isset($this->resources[$locale])) {
             return;
@@ -154,19 +156,14 @@ class Translator implements TranslatorInterface
             $fallback = $this->fallbackLocale;
         }
 
+        if (!$fallback) {
+            return;
+        }
+
         if (!isset($this->catalogues[$fallback])) {
             $this->loadCatalogue($fallback);
         }
 
-        foreach ($this->catalogues[$fallback]->getResources() as $resource) {
-            $this->catalogues[$locale]->addResource($resource);
-        }
-        foreach ($this->catalogues[$fallback]->getDomains() as $domain) {
-            foreach ($this->catalogues[$fallback]->getMessages($domain) as $id => $translation) {
-                if (false === $this->catalogues[$locale]->hasMessage($id, $domain)) {
-                    $this->catalogues[$locale]->setMessage($id, $translation, $domain);
-                }
-            }
-        }
+        $this->catalogues[$locale]->addFallbackCatalogue($this->catalogues[$fallback]);
     }
 }

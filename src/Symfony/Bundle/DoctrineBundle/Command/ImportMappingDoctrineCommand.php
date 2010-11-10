@@ -26,8 +26,8 @@ use Doctrine\ORM\Tools\Export\ClassMetadataExporter;
 /**
  * Import Doctrine ORM metadata mapping information from an existing database.
  *
- * @author     Fabien Potencier <fabien.potencier@symfony-project.com>
- * @author     Jonathan H. Wage <jonwage@gmail.com>
+ * @author Fabien Potencier <fabien.potencier@symfony-project.com>
+ * @author Jonathan H. Wage <jonwage@gmail.com>
  */
 class ImportMappingDoctrineCommand extends DoctrineCommand
 {

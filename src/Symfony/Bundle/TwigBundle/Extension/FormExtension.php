@@ -5,6 +5,7 @@ namespace Symfony\Bundle\TwigBundle\Extension;
 use Symfony\Component\Form\Form;
 use Symfony\Component\Form\FieldGroupInterface;
 use Symfony\Component\Form\FieldInterface;
+use Symfony\Component\Form\CollectionField;
 use Symfony\Bundle\TwigBundle\TokenParser\FormThemeTokenParser;
 use Symfony\Bundle\FrameworkBundle\Templating\HtmlGeneratorInterface;
 
@@ -47,8 +48,6 @@ class FormExtension extends \Twig_Extension
     public function initRuntime(\Twig_Environment $environment)
     {
         $this->environment = $environment;
-
-        $this->templates = $this->resolveResources($this->resources);
     }
 
     public function setTheme(FieldGroupInterface $group, array $resources)
@@ -93,9 +92,20 @@ class FormExtension extends \Twig_Extension
 
     public function render(FieldInterface $field, array $attributes = array())
     {
+        if (null === $this->templates) {
+            $this->templates = $this->resolveResources($this->resources);
+        }
+
         if ($field instanceof Form || get_class($field) === 'Symfony\Component\Form\FieldGroup') {
             return $this->templates['group']->getBlock('group', array(
                 'group'      => $field,
+                'attributes' => $attributes,
+            ));
+        }
+
+        if ($field instanceof CollectionField) {
+            return $this->templates['group']->getBlock('collection', array(
+                'collection' => $field,
                 'attributes' => $attributes,
             ));
         }
@@ -108,6 +118,10 @@ class FormExtension extends \Twig_Extension
 
     public function renderHidden(FieldGroupInterface $form)
     {
+        if (null === $this->templates) {
+            $this->templates = $this->resolveResources($this->resources);
+        }
+
         return $this->templates['hidden']->getBlock('hidden', array(
             'fields' => $form->getHiddenFields()
         ));
@@ -115,6 +129,10 @@ class FormExtension extends \Twig_Extension
 
     public function renderErrors($formOrField)
     {
+        if (null === $this->templates) {
+            $this->templates = $this->resolveResources($this->resources);
+        }
+
         return $this->templates['errors']->getBlock('errors', array(
             'errors' => $formOrField->getErrors()
         ));
@@ -122,6 +140,10 @@ class FormExtension extends \Twig_Extension
 
     public function renderLabel(FieldInterface $field, $label = null, array $attributes = array())
     {
+        if (null === $this->templates) {
+            $this->templates = $this->resolveResources($this->resources);
+        }
+
         return $this->templates['label']->getBlock('label', array(
             'id'         => $field->getId(),
             'key'        => $field->getKey(),
@@ -132,6 +154,10 @@ class FormExtension extends \Twig_Extension
 
     public function renderWidget(FieldInterface $field, array $attributes = array(), $resources = null)
     {
+        if (null === $this->templates) {
+            $this->templates = $this->resolveResources($this->resources);
+        }
+
         if (null === $resources) {
             $parent = $field;
             $resources = array();

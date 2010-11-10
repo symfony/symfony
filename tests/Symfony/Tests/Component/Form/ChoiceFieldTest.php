@@ -97,11 +97,11 @@ class ChoiceFieldTest extends \PHPUnit_Framework_TestCase
         $field->bind('b');
 
         $this->assertSame('b', $field->getData());
-        $this->assertSame(null, $field['a']->getData());
+        $this->assertSame(false, $field['a']->getData());
         $this->assertSame(true, $field['b']->getData());
-        $this->assertSame(null, $field['c']->getData());
-        $this->assertSame(null, $field['d']->getData());
-        $this->assertSame(null, $field['e']->getData());
+        $this->assertSame(false, $field['c']->getData());
+        $this->assertSame(false, $field['d']->getData());
+        $this->assertSame(false, $field['e']->getData());
         $this->assertSame('', $field['a']->getDisplayedData());
         $this->assertSame('1', $field['b']->getDisplayedData());
         $this->assertSame('', $field['c']->getDisplayedData());
@@ -121,11 +121,11 @@ class ChoiceFieldTest extends \PHPUnit_Framework_TestCase
         $field->bind('1');
 
         $this->assertSame(1, $field->getData());
-        $this->assertSame(null, $field[0]->getData());
+        $this->assertSame(false, $field[0]->getData());
         $this->assertSame(true, $field[1]->getData());
-        $this->assertSame(null, $field[2]->getData());
-        $this->assertSame(null, $field[3]->getData());
-        $this->assertSame(null, $field[4]->getData());
+        $this->assertSame(false, $field[2]->getData());
+        $this->assertSame(false, $field[3]->getData());
+        $this->assertSame(false, $field[4]->getData());
         $this->assertSame('', $field[0]->getDisplayedData());
         $this->assertSame('1', $field[1]->getDisplayedData());
         $this->assertSame('', $field[2]->getDisplayedData());
@@ -147,9 +147,9 @@ class ChoiceFieldTest extends \PHPUnit_Framework_TestCase
         $this->assertSame(array('a', 'b'), $field->getData());
         $this->assertSame(true, $field['a']->getData());
         $this->assertSame(true, $field['b']->getData());
-        $this->assertSame(null, $field['c']->getData());
-        $this->assertSame(null, $field['d']->getData());
-        $this->assertSame(null, $field['e']->getData());
+        $this->assertSame(false, $field['c']->getData());
+        $this->assertSame(false, $field['d']->getData());
+        $this->assertSame(false, $field['e']->getData());
         $this->assertSame('1', $field['a']->getDisplayedData());
         $this->assertSame('1', $field['b']->getDisplayedData());
         $this->assertSame('', $field['c']->getDisplayedData());
@@ -169,11 +169,11 @@ class ChoiceFieldTest extends \PHPUnit_Framework_TestCase
         $field->bind(array(1 => 1, 2 => 2));
 
         $this->assertSame(array(1, 2), $field->getData());
-        $this->assertSame(null, $field[0]->getData());
+        $this->assertSame(false, $field[0]->getData());
         $this->assertSame(true, $field[1]->getData());
         $this->assertSame(true, $field[2]->getData());
-        $this->assertSame(null, $field[3]->getData());
-        $this->assertSame(null, $field[4]->getData());
+        $this->assertSame(false, $field[3]->getData());
+        $this->assertSame(false, $field[4]->getData());
         $this->assertSame('', $field[0]->getDisplayedData());
         $this->assertSame('1', $field[1]->getDisplayedData());
         $this->assertSame('1', $field[2]->getDisplayedData());

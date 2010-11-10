@@ -18,7 +18,7 @@ use Symfony\Component\Form\Iterator\RecursiveFieldsWithPropertyPathIterator;
 /**
  * FieldGroup represents an array of widgets bind to names and values.
  *
- * @author     Fabien Potencier <fabien.potencier@symfony-project.com>
+ * @author Fabien Potencier <fabien.potencier@symfony-project.com>
  */
 class FieldGroup extends Field implements \IteratorAggregate, FieldGroupInterface
 {
@@ -199,22 +199,69 @@ class FieldGroup extends Field implements \IteratorAggregate, FieldGroupInterfac
     }
 
     /**
+     * Returns an array of visible fields from the current schema.
+     *
+     * @return array
+     */
+    public function getVisibleFields()
+    {
+        return $this->getFieldsByVisibility(false, false);
+    }
+
+    /**
+     * Returns an array of visible fields from the current schema.
+     *
+     * This variant of the method will recursively get all the
+     * fields from the nested forms or field groups
+     *
+     * @return array
+     */
+    public function getVisibleFieldsRecursively()
+    {
+        return $this->getFieldsByVisibility(false, true);
+    }
+
+    /**
      * Returns an array of hidden fields from the current schema.
      *
+     * @return array
+     */
+    public function getHiddenFields()
+    {
+        return $this->getFieldsByVisibility(true, false);
+    }
+
+    /**
+     * Returns an array of hidden fields from the current schema.
+     *
+     * This variant of the method will recursively get all the
+     * fields from the nested forms or field groups
+     *
+     * @return array
+     */
+    public function getHiddenFieldsRecursively()
+    {
+        return $this->getFieldsByVisibility(true, true);
+    }
+
+    /**
+     * Returns a filtered array of fields from the current schema.
+     *
+     * @param boolean $hidden Whether to return hidden fields only or visible fields only
      * @param boolean $recursive Whether to recur through embedded schemas
      *
      * @return array
      */
-    public function getHiddenFields($recursive = true)
+    protected function getFieldsByVisibility($hidden, $recursive)
     {
         $fields = array();
 
         foreach ($this->fields as $field) {
             if ($field instanceof FieldGroup) {
                 if ($recursive) {
-                    $fields = array_merge($fields, $field->getHiddenFields($recursive));
+                    $fields = array_merge($fields, $field->getFieldsByVisibility($hidden, $recursive));
                 }
-            } else if ($field->isHidden()) {
+            } else if ((bool)$hidden === $field->isHidden()) {
                 $fields[] = $field;
             }
         }
@@ -346,18 +393,18 @@ class FieldGroup extends Field implements \IteratorAggregate, FieldGroupInterfac
     /**
      * {@inheritDoc}
      */
-    public function addError($messageTemplate, array $messageParameters = array(), PropertyPath $path = null, $type = null)
+    public function addError($messageTemplate, array $messageParameters = array(), PropertyPathIterator $pathIterator = null, $type = null)
     {
-        if ($path !== null) {
-            if ($type === self::FIELD_ERROR && $path->hasNext()) {
-                $path->next();
+        if ($pathIterator !== null) {
+            if ($type === self::FIELD_ERROR && $pathIterator->hasNext()) {
+                $pathIterator->next();
 
-                if ($path->isProperty() && $path->getCurrent() === 'fields') {
-                    $path->next();
+                if ($pathIterator->isProperty() && $pathIterator->current() === 'fields') {
+                    $pathIterator->next();
                 }
 
-                if ($this->has($path->getCurrent()) && !$this->get($path->getCurrent())->isHidden()) {
-                    $this->get($path->getCurrent())->addError($messageTemplate, $messageParameters, $path, $type);
+                if ($this->has($pathIterator->current()) && !$this->get($pathIterator->current())->isHidden()) {
+                    $this->get($pathIterator->current())->addError($messageTemplate, $messageParameters, $pathIterator, $type);
 
                     return;
                 }
@@ -367,14 +414,12 @@ class FieldGroup extends Field implements \IteratorAggregate, FieldGroupInterfac
 
                 foreach ($iterator as $field) {
                     if (null !== ($fieldPath = $field->getPropertyPath())) {
-                        $fieldPath->rewind();
-
-                        if ($fieldPath->getCurrent() === $path->getCurrent() && !$field->isHidden()) {
-                            if ($path->hasNext()) {
-                                $path->next();
+                        if ($fieldPath->getElement(0) === $pathIterator->current() && !$field->isHidden()) {
+                            if ($pathIterator->hasNext()) {
+                                $pathIterator->next();
                             }
 
-                            $field->addError($messageTemplate, $messageParameters, $path, $type);
+                            $field->addError($messageTemplate, $messageParameters, $pathIterator, $type);
 
                             return;
                         }

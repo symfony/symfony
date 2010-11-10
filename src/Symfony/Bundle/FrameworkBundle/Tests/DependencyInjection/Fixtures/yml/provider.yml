@@ -1,0 +1,14 @@
+security.config:
+    providers:
+        digest:
+            users:
+                foo: { password: foo, roles: 'ROLE_USER, ROLE_ADMIN' }
+
+        basic:
+            password_encoder: sha1
+            users:
+                foo: { password: 0beec7b5ea3f0fdbc95d0dd47f3c5bc275da8a33, roles: ROLE_SUPER_ADMIN }
+                bar: { password: 0beec7b5ea3f0fdbc95d0dd47f3c5bc275da8a33, roles: [ROLE_USER, ROLE_ADMIN] }
+
+        doctrine:
+            entity: { class: SecurityBundle:User, property: username }

@@ -20,12 +20,12 @@ use Symfony\Component\DependencyInjection\Resource\FileResource;
 /**
  * XmlFileLoader loads XML files service definitions.
  *
- * @author     Fabien Potencier <fabien.potencier@symfony-project.com>
+ * @author Fabien Potencier <fabien.potencier@symfony-project.com>
  */
 class XmlFileLoader extends FileLoader
 {
     /**
-     * Loads an array of XML files.
+     * Loads an XML file.
      *
      * @param mixed $resource The resource
      */
@@ -105,9 +105,9 @@ class XmlFileLoader extends FileLoader
             return;
         }
 
-        $definition = new Definition((string) $service['class']);
+        $definition = new Definition();
 
-        foreach (array('shared', 'factory-method', 'factory-service', 'factory-class') as $key) {
+        foreach (array('class', 'shared', 'factory-method', 'factory-service') as $key) {
             if (isset($service[$key])) {
                 $method = 'set'.str_replace('-', '', $key);
                 $definition->$method((string) $service->getAttributeAsPhp($key));

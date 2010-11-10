@@ -37,8 +37,7 @@ class EventTest extends \PHPUnit_Framework_TestCase
         $event->setParameter('foo', 'foo');
         $this->assertEquals('foo', $event->getParameter('foo'), '->setParameter() changes the value of a parameter');
         $this->assertTrue($event->hasParameter('foo'), '->hasParameter() returns true if the parameter is defined');
-        unset($event['foo']);
-        $this->assertFalse($event->hasParameter('foo'), '->hasParameter() returns false if the parameter is not defined');
+        $this->assertFalse($event->hasParameter('oof'), '->hasParameter() returns false if the parameter is not defined');
 
         try {
             $event->getParameter('foobar');
@@ -64,27 +63,6 @@ class EventTest extends \PHPUnit_Framework_TestCase
         $this->assertTrue($event->isProcessed(), '->isProcessed() returns true if the event has been processed');
         $event->setProcessed(false);
         $this->assertFalse($event->isProcessed(), '->setProcessed() changes the processed status');
-    }
-
-    public function testArrayAccessInterface()
-    {
-        $event = $this->createEvent();
-
-        $this->assertEquals('bar', $event['foo'], 'Event implements the ArrayAccess interface');
-        $event['foo'] = 'foo';
-        $this->assertEquals('foo', $event['foo'], 'Event implements the ArrayAccess interface');
-
-        try {
-            $event['foobar'];
-            $this->fail('::offsetGet() throws an \InvalidArgumentException exception when the parameter does not exist');
-        } catch (\Exception $e) {
-            $this->assertInstanceOf('\InvalidArgumentException', $e, '::offsetGet() throws an \InvalidArgumentException exception when the parameter does not exist');
-            $this->assertEquals('The event "name" has no "foobar" parameter.', $e->getMessage(), '::offsetGet() throws an \InvalidArgumentException exception when the parameter does not exist');
-        }
-
-        $this->assertTrue(isset($event['foo']), 'Event implements the ArrayAccess interface');
-        unset($event['foo']);
-        $this->assertFalse(isset($event['foo']), 'Event implements the ArrayAccess interface');
     }
 
     protected function createEvent()

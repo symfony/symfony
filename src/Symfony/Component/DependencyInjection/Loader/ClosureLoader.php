@@ -16,7 +16,7 @@ namespace Symfony\Component\DependencyInjection\Loader;
  *
  * The Closure has access to the container as its first argument.
  *
- * @author     Fabien Potencier <fabien.potencier@symfony-project.com>
+ * @author Fabien Potencier <fabien.potencier@symfony-project.com>
  */
 class ClosureLoader extends Loader
 {

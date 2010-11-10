@@ -14,7 +14,7 @@ namespace Symfony\Component\Translation\Resource;
 /**
  * FileResource represents a resource stored on the filesystem.
  *
- * @author     Fabien Potencier <fabien.potencier@symfony-project.com>
+ * @author Fabien Potencier <fabien.potencier@symfony-project.com>
  */
 class FileResource implements ResourceInterface
 {
@@ -27,13 +27,15 @@ class FileResource implements ResourceInterface
      */
     public function __construct($resource)
     {
+        if (!file_exists($resource)) {
+            throw new \InvalidArgumentException(sprintf('Resource "%s" does not exist.', $resource));
+        }
+
         $this->resource = realpath($resource);
     }
 
     /**
-     * Returns a string representation of the Resource.
-     *
-     * @return string A string representation of the Resource
+     * {@inheritdoc}
      */
     public function __toString()
     {
@@ -41,9 +43,7 @@ class FileResource implements ResourceInterface
     }
 
     /**
-     * Returns the resource tied to this Resource.
-     *
-     * @return mixed The resource
+     * {@inheritdoc}
      */
     public function getResource()
     {
@@ -51,18 +51,10 @@ class FileResource implements ResourceInterface
     }
 
     /**
-     * Returns true if the resource has not been updated since the given timestamp.
-     *
-     * @param timestamp $timestamp The last time the resource was loaded
-     *
-     * @return Boolean true if the resource has not been updated, false otherwise
+     * {@inheritdoc}
      */
     public function isUptodate($timestamp)
     {
-        if (!file_exists($this->resource)) {
-            return false;
-        }
-
         return filemtime($this->resource) < $timestamp;
     }
 }

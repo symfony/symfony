@@ -33,12 +33,12 @@ abstract class FileLoader implements LoaderInterface
     }
 
     /**
-     * Creates a new constraint instance for the given constraint name
+     * Creates a new constraint instance for the given constraint name.
      *
      * @param string $name    The constraint name. Either a constraint relative
      *                        to the default constraint namespace, or a fully
      *                        qualified class name
-     * @param array $options  The constraint options
+     * @param array  $options The constraint options
      *
      * @return Constraint
      */

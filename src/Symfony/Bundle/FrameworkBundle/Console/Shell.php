@@ -16,7 +16,7 @@ use Symfony\Component\Console\Shell as BaseShell;
 /**
  * Shell.
  *
- * @author     Fabien Potencier <fabien.potencier@symfony-project.com>
+ * @author Fabien Potencier <fabien.potencier@symfony-project.com>
  */
 class Shell extends BaseShell
 {

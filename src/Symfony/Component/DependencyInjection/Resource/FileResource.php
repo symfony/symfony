@@ -14,7 +14,7 @@ namespace Symfony\Component\DependencyInjection\Resource;
 /**
  * FileResource represents a resource stored on the filesystem.
  *
- * @author     Fabien Potencier <fabien.potencier@symfony-project.com>
+ * @author Fabien Potencier <fabien.potencier@symfony-project.com>
  */
 class FileResource implements ResourceInterface
 {

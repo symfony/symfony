@@ -18,7 +18,7 @@ use Symfony\Component\HttpKernel\DataCollector\RequestDataCollector as BaseReque
 /**
  * RequestDataCollector.
  *
- * @author     Fabien Potencier <fabien.potencier@symfony-project.com>
+ * @author Fabien Potencier <fabien.potencier@symfony-project.com>
  */
 class RequestDataCollector extends BaseRequestDataCollector
 {

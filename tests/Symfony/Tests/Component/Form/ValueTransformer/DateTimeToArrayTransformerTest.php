@@ -19,15 +19,31 @@ class DateTimeToArrayTransformerTest extends DateTimeTestCase
         $input = new \DateTime('2010-02-03 04:05:06 UTC');
 
         $output = array(
-            'year' => 2010,
-            'month' => 2,
-            'day' => 3,
-            'hour' => 4,
-            'minute' => 5,
-            'second' => 6,
+            'year' => '2010',
+            'month' => '2',
+            'day' => '3',
+            'hour' => '4',
+            'minute' => '5',
+            'second' => '6',
         );
 
         $this->assertSame($output, $transformer->transform($input));
+    }
+
+    public function testTransform_empty()
+    {
+        $transformer = new DateTimeToArrayTransformer();
+
+        $output = array(
+            'year' => '',
+            'month' => '',
+            'day' => '',
+            'hour' => '',
+            'minute' => '',
+            'second' => '',
+        );
+
+        $this->assertSame($output, $transformer->transform(null));
     }
 
     public function testTransform_withFields()
@@ -41,10 +57,10 @@ class DateTimeToArrayTransformerTest extends DateTimeTestCase
         $input = new \DateTime('2010-02-03 04:05:06 UTC');
 
         $output = array(
-            'year' => 2010,
-            'month' => 2,
-            'minute' => 5,
-            'second' => 6,
+            'year' => '2010',
+            'month' => '2',
+            'minute' => '5',
+            'second' => '6',
         );
 
         $this->assertSame($output, $transformer->transform($input));
@@ -84,12 +100,12 @@ class DateTimeToArrayTransformerTest extends DateTimeTestCase
         $dateTime = new \DateTime('2010-02-03 04:05:06 America/New_York');
         $dateTime->setTimezone(new \DateTimeZone('Asia/Hong_Kong'));
         $output = array(
-            'year' => (int)$dateTime->format('Y'),
-            'month' => (int)$dateTime->format('m'),
-            'day' => (int)$dateTime->format('d'),
-            'hour' => (int)$dateTime->format('H'),
-            'minute' => (int)$dateTime->format('i'),
-            'second' => (int)$dateTime->format('s'),
+            'year' => (string)(int)$dateTime->format('Y'),
+            'month' => (string)(int)$dateTime->format('m'),
+            'day' => (string)(int)$dateTime->format('d'),
+            'hour' => (string)(int)$dateTime->format('H'),
+            'minute' => (string)(int)$dateTime->format('i'),
+            'second' => (string)(int)$dateTime->format('s'),
         );
 
         $this->assertSame($output, $transformer->transform($input));
@@ -101,7 +117,7 @@ class DateTimeToArrayTransformerTest extends DateTimeTestCase
 
         $this->setExpectedException('\InvalidArgumentException');
 
-        $transformer->reverseTransform('12345');
+        $transformer->reverseTransform('12345', null);
     }
 
     public function testReverseTransform()
@@ -112,17 +128,40 @@ class DateTimeToArrayTransformerTest extends DateTimeTestCase
         ));
 
         $input = array(
-            'year' => 2010,
-            'month' => 2,
-            'day' => 3,
-            'hour' => 4,
-            'minute' => 5,
-            'second' => 6,
+            'year' => '2010',
+            'month' => '2',
+            'day' => '3',
+            'hour' => '4',
+            'minute' => '5',
+            'second' => '6',
         );
 
         $output = new \DateTime('2010-02-03 04:05:06 UTC');
 
-        $this->assertDateTimeEquals($output, $transformer->reverseTransform($input));
+        $this->assertDateTimeEquals($output, $transformer->reverseTransform($input, null));
+    }
+
+    public function testReverseTransform_empty()
+    {
+        $transformer = new DateTimeToArrayTransformer();
+
+        $input = array(
+            'year' => '',
+            'month' => '',
+            'day' => '',
+            'hour' => '',
+            'minute' => '',
+            'second' => '',
+        );
+
+        $this->assertSame(null, $transformer->reverseTransform($input, null));
+    }
+
+    public function testReverseTransform_null()
+    {
+        $transformer = new DateTimeToArrayTransformer();
+
+        $this->assertSame(null, $transformer->reverseTransform(null, null));
     }
 
     public function testReverseTransform_differentTimezones()
@@ -133,18 +172,18 @@ class DateTimeToArrayTransformerTest extends DateTimeTestCase
         ));
 
         $input = array(
-            'year' => 2010,
-            'month' => 2,
-            'day' => 3,
-            'hour' => 4,
-            'minute' => 5,
-            'second' => 6,
+            'year' => '2010',
+            'month' => '2',
+            'day' => '3',
+            'hour' => '4',
+            'minute' => '5',
+            'second' => '6',
         );
 
         $output = new \DateTime('2010-02-03 04:05:06 Asia/Hong_Kong');
         $output->setTimezone(new \DateTimeZone('America/New_York'));
 
-        $this->assertDateTimeEquals($output, $transformer->reverseTransform($input));
+        $this->assertDateTimeEquals($output, $transformer->reverseTransform($input, null));
     }
 
     public function testReverseTransformToDifferentTimezone()
@@ -155,18 +194,18 @@ class DateTimeToArrayTransformerTest extends DateTimeTestCase
         ));
 
         $input = array(
-            'year' => 2010,
-            'month' => 2,
-            'day' => 3,
-            'hour' => 4,
-            'minute' => 5,
-            'second' => 6,
+            'year' => '2010',
+            'month' => '2',
+            'day' => '3',
+            'hour' => '4',
+            'minute' => '5',
+            'second' => '6',
         );
 
         $output = new \DateTime('2010-02-03 04:05:06 UTC');
         $output->setTimezone(new \DateTimeZone('Asia/Hong_Kong'));
 
-        $this->assertDateTimeEquals($output, $transformer->reverseTransform($input));
+        $this->assertDateTimeEquals($output, $transformer->reverseTransform($input, null));
     }
 
     public function testReverseTransformRequiresArray()
@@ -175,6 +214,6 @@ class DateTimeToArrayTransformerTest extends DateTimeTestCase
 
         $this->setExpectedException('\InvalidArgumentException');
 
-        $transformer->reverseTransform('12345');
+        $transformer->reverseTransform('12345', null);
     }
 }

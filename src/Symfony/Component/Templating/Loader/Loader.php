@@ -16,7 +16,7 @@ use Symfony\Component\Templating\DebuggerInterface;
 /**
  * Loader is the base class for all template loader classes.
  *
- * @author     Fabien Potencier <fabien.potencier@symfony-project.com>
+ * @author Fabien Potencier <fabien.potencier@symfony-project.com>
  */
 abstract class Loader implements LoaderInterface
 {

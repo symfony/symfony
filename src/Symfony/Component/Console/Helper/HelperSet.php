@@ -16,7 +16,7 @@ use Symfony\Component\Console\Command\Command;
 /**
  * HelperSet represents a set of helpers to be used with a command.
  *
- * @author     Fabien Potencier <fabien.potencier@symfony-project.com>
+ * @author Fabien Potencier <fabien.potencier@symfony-project.com>
  */
 class HelperSet
 {

@@ -22,7 +22,7 @@ use Symfony\Component\BrowserKit\CookieJar;
 /**
  * Client simulates a browser and makes requests to a Kernel object.
  *
- * @author     Fabien Potencier <fabien.potencier@symfony-project.com>
+ * @author Fabien Potencier <fabien.potencier@symfony-project.com>
  */
 class Client extends BaseClient
 {
@@ -100,7 +100,7 @@ EOF;
             $uri = '/'.$matches[2];
         }
 
-        return Request::create($uri, $request->getMethod(), $request->getParameters(), $request->getFiles(), $request->getCookies(), $request->getServer());
+        return Request::create($uri, $request->getMethod(), $request->getParameters(), $request->getCookies(), $request->getFiles(), $request->getServer());
     }
 
     /**

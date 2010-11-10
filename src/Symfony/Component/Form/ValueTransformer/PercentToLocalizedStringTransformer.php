@@ -52,6 +52,10 @@ class PercentToLocalizedStringTransformer extends BaseValueTransformer
      */
     public function transform($value)
     {
+        if ($value === null) {
+            return '';
+        }
+
         if (!is_numeric($value)) {
             throw new \InvalidArgumentException(sprintf('Numeric argument expected, %s given', gettype($value)));
         }
@@ -77,10 +81,14 @@ class PercentToLocalizedStringTransformer extends BaseValueTransformer
      * @param  number $value  Percentage value.
      * @return number         Normalized value.
      */
-    public function reverseTransform($value)
+    public function reverseTransform($value, $originalValue)
     {
         if (!is_string($value)) {
             throw new \InvalidArgumentException(sprintf('Expected argument of type string, %s given', gettype($value)));
+        }
+
+        if ($value === '') {
+            return null;
         }
 
         $formatter = $this->getNumberFormatter();

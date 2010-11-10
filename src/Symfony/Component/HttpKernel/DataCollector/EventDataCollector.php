@@ -19,7 +19,7 @@ use Symfony\Component\HttpKernel\Debug\EventDispatcherTraceableInterface;
 /**
  * EventDataCollector.
  *
- * @author     Fabien Potencier <fabien.potencier@symfony-project.com>
+ * @author Fabien Potencier <fabien.potencier@symfony-project.com>
  */
 class EventDataCollector extends DataCollector
 {

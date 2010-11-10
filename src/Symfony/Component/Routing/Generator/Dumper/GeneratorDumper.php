@@ -17,7 +17,7 @@ use Symfony\Component\Routing\Route;
 /**
  * GeneratorDumper is the base class for all built-in generator dumpers.
  *
- * @author     Fabien Potencier <fabien.potencier@symfony-project.com>
+ * @author Fabien Potencier <fabien.potencier@symfony-project.com>
  */
 abstract class GeneratorDumper implements GeneratorDumperInterface
 {
@@ -31,19 +31,5 @@ abstract class GeneratorDumper implements GeneratorDumperInterface
     public function __construct(RouteCollection $routes)
     {
         $this->routes = $routes;
-    }
-
-    /**
-     * Dumps the routing.
-     *
-     * @param  array  $options An array of options
-     *
-     * @return string The representation of the routing
-     *
-     * @throws \LogicException When this abstract class is not implemented
-     */
-    public function dump(array $options = array())
-    {
-        throw new \LogicException('You must extend this abstract class and implement the dump() method.');
     }
 }

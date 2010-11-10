@@ -1,4 +1,5 @@
 <?php
+
 /*
  * This file is part of the Symfony package.
  *
@@ -20,24 +21,7 @@ class HeaderBagTest extends \PHPUnit_Framework_TestCase
     public function testConstructor()
     {
         $bag = new HeaderBag(array('foo' => 'bar'));
-        $this->assertTrue( $bag->has('foo'));
-        try {
-            $bag = new HeaderBag(array('foo' => 'bar'), 'nope');
-            $this->assertFalse(TRUE,'nope is not a valid type'); // --> enfore request or response
-        } catch ( \InvalidArgumentException $e) {
-            // ignore
-        }
-        try {
-            $bag = new HeaderBag(array('foo' => 'bar'), 'request');
-        } catch ( \Exception $e) {
-            $this->assertFalse(TRUE,'request should be a valid type'); // --> enforce request or response
-        }
-        try {
-            $bag = new HeaderBag(array('foo' => 'bar'), 'response');
-        } catch ( \Exception $e) {
-            $this->assertFalse(TRUE,'response should be a valid type'); // --> enforce request or response
-        }
-
+        $this->assertTrue($bag->has('foo'));
     }
 
     /**
@@ -63,7 +47,6 @@ class HeaderBagTest extends \PHPUnit_Framework_TestCase
         $this->assertEquals(array('nope' => array('BAR')), $bag->all(), '->replace() replaces the input with the argument');
         $this->assertFalse($bag->has('foo'), '->replace() overrides previously set the input');
     }
-
 
     /**
      * @covers Symfony\Component\HttpFoundation\HeaderBag::get
@@ -103,5 +86,45 @@ class HeaderBagTest extends \PHPUnit_Framework_TestCase
         $this->assertFalse(  $bag->contains('foo', 'nope'), '->contains unknown value');
     }
 
+    public function testCacheControlDirectiveAccessors()
+    {
+        $bag = new HeaderBag();
+        $bag->addCacheControlDirective('public');
 
+        $this->assertTrue($bag->hasCacheControlDirective('public'));
+        $this->assertEquals(true, $bag->getCacheControlDirective('public'));
+        $this->assertEquals('public', $bag->get('cache-control'));
+
+        $bag->addCacheControlDirective('max-age', 10);
+        $this->assertTrue($bag->hasCacheControlDirective('max-age'));
+        $this->assertEquals(10, $bag->getCacheControlDirective('max-age'));
+        $this->assertEquals('max-age=10, public', $bag->get('cache-control'));
+
+        $bag->removeCacheControlDirective('max-age');
+        $this->assertFalse($bag->hasCacheControlDirective('max-age'));
+    }
+
+    public function testCacheControlDirectiveParsing()
+    {
+        $bag = new HeaderBag(array('cache-control' => 'public, max-age=10'));
+        $this->assertTrue($bag->hasCacheControlDirective('public'));
+        $this->assertEquals(true, $bag->getCacheControlDirective('public'));
+
+        $this->assertTrue($bag->hasCacheControlDirective('max-age'));
+        $this->assertEquals(10, $bag->getCacheControlDirective('max-age'));
+
+        $bag->addCacheControlDirective('s-maxage', 100);
+        $this->assertEquals('max-age=10, public, s-maxage=100', $bag->get('cache-control'));
+    }
+
+    public function testCacheControlDirectiveOverrideWithReplace()
+    {
+        $bag = new HeaderBag(array('cache-control' => 'private, max-age=100'));
+        $bag->replace(array('cache-control' => 'public, max-age=10'));
+        $this->assertTrue($bag->hasCacheControlDirective('public'));
+        $this->assertEquals(true, $bag->getCacheControlDirective('public'));
+
+        $this->assertTrue($bag->hasCacheControlDirective('max-age'));
+        $this->assertEquals(10, $bag->getCacheControlDirective('max-age'));
+    }
 }

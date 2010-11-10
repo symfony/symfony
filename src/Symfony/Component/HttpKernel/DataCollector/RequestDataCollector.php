@@ -75,7 +75,7 @@ class RequestDataCollector extends DataCollector
 
     public function getResponseHeaders()
     {
-        return new HeaderBag($this->data['response_headers']);
+        return new ResponseHeaderBag($this->data['response_headers']);
     }
 
     public function getSessionAttributes()

@@ -65,16 +65,16 @@ class ResponseTest extends \PHPUnit_Framework_TestCase
     {
         $response = new Response();
         $response->headers->set('Cache-Control', 'max-age=100');
-        $response->setPrivate(true);
-        $this->assertEquals(100, $response->headers->getCacheControl()->getMaxAge(), '->isPrivate() adds the private Cache-Control directive when set to true');
-        $this->assertTrue($response->headers->getCacheControl()->isPrivate(), '->isPrivate() adds the private Cache-Control directive when set to true');
+        $response->setPrivate();
+        $this->assertEquals(100, $response->headers->getCacheControlDirective('max-age'), '->isPrivate() adds the private Cache-Control directive when set to true');
+        $this->assertTrue($response->headers->getCacheControlDirective('private'), '->isPrivate() adds the private Cache-Control directive when set to true');
 
         $response = new Response();
         $response->headers->set('Cache-Control', 'public, max-age=100');
-        $response->setPrivate(true);
-        $this->assertEquals(100, $response->headers->getCacheControl()->getMaxAge(), '->isPrivate() adds the private Cache-Control directive when set to true');
-        $this->assertTrue($response->headers->getCacheControl()->isPrivate(), '->isPrivate() adds the private Cache-Control directive when set to true');
-        $this->assertFalse($response->headers->getCacheControl()->isPublic(), '->isPrivate() removes the public Cache-Control directive');
+        $response->setPrivate();
+        $this->assertEquals(100, $response->headers->getCacheControlDirective('max-age'), '->isPrivate() adds the private Cache-Control directive when set to true');
+        $this->assertTrue($response->headers->getCacheControlDirective('private'), '->isPrivate() adds the private Cache-Control directive when set to true');
+        $this->assertFalse($response->headers->hasCacheControlDirective('public'), '->isPrivate() removes the public Cache-Control directive');
     }
 
     public function testExpire()

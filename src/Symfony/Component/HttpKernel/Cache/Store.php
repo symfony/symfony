@@ -242,7 +242,7 @@ class Store
         }
 
         foreach (preg_split('/[\s,]+/', $vary) as $header) {
-            $key = HeaderBag::normalizeHeaderName($header);
+            $key = strtr(strtolower($header), '_', '-');
             $v1 = isset($env1[$key]) ? $env1[$key] : null;
             $v2 = isset($env2[$key]) ? $env2[$key] : null;
             if ($v1 !== $v2) {

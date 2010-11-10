@@ -49,7 +49,6 @@ class NativeSessionStorage implements SessionStorageInterface
             'domain'        => $cookieDefaults['domain'],
             'secure'        => $cookieDefaults['secure'],
             'httponly'      => isset($cookieDefaults['httponly']) ? $cookieDefaults['httponly'] : false,
-            'cache_limiter' => 'none',
         ), $options);
 
         session_name($this->options['name']);
@@ -72,9 +71,8 @@ class NativeSessionStorage implements SessionStorageInterface
             $this->options['httponly']
         );
 
-        if (null !== $this->options['cache_limiter']) {
-            session_cache_limiter($this->options['cache_limiter']);
-        }
+        // disable native cache limiter as this is managed by HeaderBag directly
+        session_cache_limiter(false);
 
         if (!ini_get('session.use_cookies') && $this->options['id'] && $this->options['id'] != session_id()) {
             session_id($this->options['id']);

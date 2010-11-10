@@ -83,7 +83,7 @@ class Response
         $this->setContent($content);
         $this->setStatusCode($status);
         $this->setProtocolVersion('1.0');
-        $this->headers = new HeaderBag($headers, 'response');
+        $this->headers = new ResponseHeaderBag($headers);
     }
 
     /**
@@ -244,7 +244,7 @@ class Response
             return false;
         }
 
-        if ($this->headers->getCacheControl()->isNoStore() || $this->headers->getCacheControl()->isPrivate()) {
+        if ($this->headers->hasCacheControlDirective('no-store') || $this->headers->getCacheControlDirective('private')) {
             return false;
         }
 
@@ -283,8 +283,8 @@ class Response
      */
     public function setPrivate()
     {
-        $this->headers->getCacheControl()->setPublic(false);
-        $this->headers->getCacheControl()->setPrivate(true);
+        $this->headers->removeCacheControlDirective('public');
+        $this->headers->addCacheControlDirective('private');
     }
 
     /**
@@ -294,8 +294,8 @@ class Response
      */
     public function setPublic()
     {
-        $this->headers->getCacheControl()->setPublic(true);
-        $this->headers->getCacheControl()->setPrivate(false);
+        $this->headers->addCacheControlDirective('public');
+        $this->headers->removeCacheControlDirective('private');
     }
 
     /**
@@ -310,7 +310,7 @@ class Response
      */
     public function mustRevalidate()
     {
-        return $this->headers->getCacheControl()->mustRevalidate() || $this->headers->getCacheControl()->mustProxyRevalidate();
+        return $this->headers->hasCacheControlDirective('must-revalidate') || $this->headers->has('must-proxy-revalidate');
     }
 
     /**
@@ -395,11 +395,11 @@ class Response
      */
     public function getMaxAge()
     {
-        if ($age = $this->headers->getCacheControl()->getSharedMaxAge()) {
+        if ($age = $this->headers->getCacheControlDirective('s-maxage')) {
             return $age;
         }
 
-        if ($age = $this->headers->getCacheControl()->getMaxAge()) {
+        if ($age = $this->headers->getCacheControlDirective('max-age')) {
             return $age;
         }
 
@@ -419,7 +419,7 @@ class Response
      */
     public function setMaxAge($value)
     {
-        $this->headers->getCacheControl()->setMaxAge($value);
+        $this->headers->addCacheControlDirective('max-age', $value);
     }
 
     /**
@@ -431,7 +431,7 @@ class Response
      */
     public function setSharedMaxAge($value)
     {
-        $this->headers->getCacheControl()->setSharedMaxAge($value);
+        $this->headers->addCacheControlDirective('s-maxage', $value);
     }
 
     /**

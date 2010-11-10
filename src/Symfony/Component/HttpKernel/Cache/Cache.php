@@ -343,9 +343,9 @@ class Cache implements HttpKernelInterface
 
         $response = $this->forward($subRequest);
 
-        if ($this->isPrivateRequest($request) && !$response->headers->getCacheControl()->isPublic()) {
+        if ($this->isPrivateRequest($request) && !$response->headers->hasCacheControlDirective('public')) {
             $response->setPrivate(true);
-        } elseif ($this->options['default_ttl'] > 0 && null === $response->getTtl() && !$response->headers->getCacheControl()->mustRevalidate()) {
+        } elseif ($this->options['default_ttl'] > 0 && null === $response->getTtl() && !$response->headers->getCacheControlDirective('must-revalidate')) {
             $response->setTtl($this->options['default_ttl']);
         }
 
@@ -377,7 +377,7 @@ class Cache implements HttpKernelInterface
 
         // we don't implement the stale-if-error on Requests, which is nonetheless part of the RFC
         if (null !== $entry && in_array($response->getStatusCode(), array(500, 502, 503, 504))) {
-            if (null === $age = $entry->headers->getCacheControl()->getStaleIfError()) {
+            if (null === $age = $entry->headers->getCacheControlDirective('stale-if-error')) {
                 $age = $this->options['stale_if_error'];
             }
 
@@ -407,7 +407,7 @@ class Cache implements HttpKernelInterface
             return $this->lock($request, $entry);
         }
 
-        if ($this->options['allow_revalidate'] && null !== $maxAge = $request->headers->getCacheControl()->getMaxAge()) {
+        if ($this->options['allow_revalidate'] && null !== $maxAge = $request->headers->getCacheControlDirective('max-age')) {
             return $maxAge > 0 && $maxAge >= $entry->getAge();
         }
 
@@ -430,7 +430,7 @@ class Cache implements HttpKernelInterface
         // there is already another process calling the backend
         if (true !== $lock) {
             // check if we can serve the stale entry
-            if (null === $age = $entry->headers->getCacheControl()->getStaleWhileRevalidate()) {
+            if (null === $age = $entry->headers->getCacheControlDirective('stale-while-revalidate')) {
                 $age = $this->options['stale_while_revalidate'];
             }
 

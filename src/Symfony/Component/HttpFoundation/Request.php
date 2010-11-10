@@ -104,7 +104,7 @@ class Request
         $this->cookies = new ParameterBag(null !== $cookies ? $cookies : $_COOKIE);
         $this->files = new ParameterBag($this->convertFileInformation(null !== $files ? $files : $_FILES));
         $this->server = new ParameterBag(null !== $server ? $server : $_SERVER);
-        $this->headers = new HeaderBag($this->initializeHeaders(), 'request');
+        $this->headers = new HeaderBag($this->initializeHeaders());
 
         $this->languages = null;
         $this->charsets = null;
@@ -617,7 +617,7 @@ class Request
 
     public function isNoCache()
     {
-        return $this->headers->getCacheControl()->isNoCache() || 'no-cache' == $this->headers->get('Pragma');
+        return $this->headers->hasCacheControlDirective('no-cache') || 'no-cache' == $this->headers->get('Pragma');
     }
 
     /**

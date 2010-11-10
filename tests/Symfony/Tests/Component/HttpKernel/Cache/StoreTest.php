@@ -16,7 +16,6 @@ require_once __DIR__.'/CacheTestCase.php';
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpKernel\Cache\Store;
-use Symfony\Tests\Component\HttpKernel\Cache\CacheTestCase;
 
 class CacheStoreTest extends \PHPUnit_Framework_TestCase
 {

@@ -61,4 +61,69 @@ class AnnotationLoaderTest extends \PHPUnit_Framework_TestCase
 
         $this->assertEquals($expected, $metadata);
     }
+
+    /**
+     * Test MetaData merge with parent annotation.
+     */
+    public function testLoadParentClassMetadata()
+    {
+        $loader = new AnnotationLoader();
+
+        // Load Parent MetaData
+        $parent_metadata = new ClassMetadata('Symfony\Tests\Component\Validator\Fixtures\EntityParent');
+        $loader->loadClassMetadata($parent_metadata);
+
+        $expected_parent = new ClassMetadata('Symfony\Tests\Component\Validator\Fixtures\EntityParent');
+        $expected_parent->addPropertyConstraint('other', new NotNull());
+        $expected_parent->getReflectionClass();
+
+        $this->assertEquals($expected_parent, $parent_metadata);
+    }
+    /**
+     * Test MetaData merge with parent annotation.
+     */
+    public function testLoadClassMetadataAndMerge()
+    {
+        $loader = new AnnotationLoader();
+
+        // Load Parent MetaData
+        $parent_metadata = new ClassMetadata('Symfony\Tests\Component\Validator\Fixtures\EntityParent');
+        $loader->loadClassMetadata($parent_metadata);
+         
+        $metadata = new ClassMetadata('Symfony\Tests\Component\Validator\Fixtures\Entity');
+
+        // Merge parent metaData.
+        $metadata->mergeConstraints($parent_metadata);
+        
+        $loader->loadClassMetadata($metadata);
+
+        $expected_parent = new ClassMetadata('Symfony\Tests\Component\Validator\Fixtures\EntityParent');
+        $expected_parent->addPropertyConstraint('other', new NotNull());
+        $expected_parent->getReflectionClass();
+
+        $expected = new ClassMetadata('Symfony\Tests\Component\Validator\Fixtures\Entity');
+        $expected->mergeConstraints($expected_parent);
+        
+        $expected->addConstraint(new NotNull());
+        $expected->addConstraint(new ConstraintA());
+        $expected->addConstraint(new Min(3));
+        $expected->addConstraint(new Choice(array('A', 'B')));
+        $expected->addConstraint(new All(array(new NotNull(), new Min(3))));
+        $expected->addConstraint(new All(array('constraints' => array(new NotNull(), new Min(3)))));
+        $expected->addConstraint(new Collection(array('fields' => array(
+            'foo' => array(new NotNull(), new Min(3)),
+            'bar' => new Min(5),
+        ))));
+        $expected->addPropertyConstraint('firstName', new Choice(array(
+            'message' => 'Must be one of %choices%',
+            'choices' => array('A', 'B'),
+        )));
+        $expected->addGetterConstraint('lastName', new NotNull());
+
+        // load reflection class so that the comparison passes
+        $expected->getReflectionClass();
+
+        $this->assertEquals($expected, $metadata);
+    }
+
 }

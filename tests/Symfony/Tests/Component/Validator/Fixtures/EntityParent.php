@@ -6,4 +6,9 @@ class EntityParent
 {
     protected $firstName;
     private $internal;
+
+    /**
+     * @validation:NotNull
+     */
+    protected $other;
 }

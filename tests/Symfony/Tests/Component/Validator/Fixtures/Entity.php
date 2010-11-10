@@ -25,7 +25,6 @@ class Entity extends EntityParent implements EntityInterface
      * @validation:Choice(choices={"A", "B"}, message="Must be one of %choices%")
      */
     protected $firstName;
-
     protected $lastName;
 
     private $internal;

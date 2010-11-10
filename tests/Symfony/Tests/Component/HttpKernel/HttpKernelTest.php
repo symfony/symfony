@@ -23,7 +23,7 @@ class HttpKernelTest extends \PHPUnit_Framework_TestCase
     {
         $request = Request::create('/');
         $container = $this->getMock('Symfony\Component\DependencyInjection\ContainerInterface');
-        $container->expects($this->exactly(1))
+        $container->expects($this->exactly(2))
                   ->method('set')
                   ->with('request', $request)
         ;

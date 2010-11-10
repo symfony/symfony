@@ -111,8 +111,8 @@ class FrameworkExtension extends Extension
             $this->registerTestConfiguration($config, $container);
         }
 
-        if (isset($config['user'])) {
-            $this->registerUserConfiguration($config, $container);
+        if (isset($config['session'])) {
+            $this->registerSessionConfiguration($config, $container);
         }
 
         $this->registerTranslatorConfiguration($config, $container);
@@ -303,9 +303,9 @@ class FrameworkExtension extends Extension
      * @param array            $config    A configuration array
      * @param ContainerBuilder $container A ContainerBuilder instance
      */
-    protected function registerUserConfiguration($config, ContainerBuilder $container)
+    protected function registerSessionConfiguration($config, ContainerBuilder $container)
     {
-        $config = $config['user'];
+        $config = $config['session'];
 
         if (!$container->hasDefinition('session')) {
             $loader = new XmlFileLoader($container, array(__DIR__.'/../Resources/config', __DIR__.'/Resources/config'));
@@ -322,20 +322,19 @@ class FrameworkExtension extends Extension
             $container->setParameter('session.class', $config['class']);
         }
 
+        if (isset($config['storage_id'])) {
+            $container->setAlias('session.storage', 'session.storage.'.$config['storage_id']);
+        } else {
+            $config['storage_id'] = 'native';
+        }
+
+        $options = $container->getParameter('session.storage.'.strtolower($config['storage_id']).'.options');
         foreach (array('name', 'lifetime', 'path', 'domain', 'secure', 'httponly', 'cache_limiter', 'cache-limiter', 'pdo.db_table') as $name) {
             if (isset($config['session'][$name])) {
-                $container->setParameter('session.options.'.$name, $config['session'][$name]);
+                $options[$name] = $config['session'][$name];
             }
         }
-
-        if (isset($config['session']['class'])) {
-            $class = $config['session']['class'];
-            if (in_array($class, array('Native', 'Pdo'))) {
-                $class = 'Symfony\\Component\\HttpFoundation\\SessionStorage\\'.$class.'SessionStorage';
-            }
-
-            $container->setParameter('session.session', 'session.session.'.strtolower($class));
-        }
+        $container->setParameter('session.storage.'.strtolower($config['storage_id']).'.options', $options);
     }
 
     protected function registerRouterConfiguration($config, ContainerBuilder $container)

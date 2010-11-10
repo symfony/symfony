@@ -7,16 +7,10 @@
     <parameters>
         <parameter key="session.class">Symfony\Component\HttpFoundation\Session</parameter>
         <parameter key="session.default_locale">en</parameter>
-        <parameter key="session.storage.class">Symfony\Component\HttpFoundation\SessionStorage\NativeSessionStorage</parameter>
+        <parameter key="session.storage.native.class">Symfony\Component\HttpFoundation\SessionStorage\NativeSessionStorage</parameter>
+        <parameter key="session.storage.native.options" type="collection" />
         <parameter key="session.storage.pdo.class">Symfony\Component\HttpFoundation\SessionStorage\PdoSessionStorage</parameter>
-        <parameter key="session.options.name">SYMFONY_SESSION</parameter>
-        <parameter key="session.options.lifetime">false</parameter>
-        <parameter key="session.options.path">/</parameter>
-        <parameter key="session.options.domain" />
-        <parameter key="session.options.secure">false</parameter>
-        <parameter key="session.options.httponly">false</parameter>
-        <parameter key="session.options.cache_limiter">none</parameter>
-        <parameter key="session.options.pdo.db_table">session</parameter>
+        <parameter key="session.storage.pdo.options" type="collection" />
     </parameters>
 
     <services>
@@ -27,30 +21,13 @@
             </argument>
         </service>
 
-        <service id="session.storage.native" class="%session.storage.class%">
-            <argument type="collection">
-                <argument key="session_name">%session.options.name%</argument>
-                <argument key="session_cookie_lifetime">%session.options.lifetime%</argument>
-                <argument key="session_cookie_path">%session.options.path%</argument>
-                <argument key="session_cookie_domain">%session.options.domain%</argument>
-                <argument key="session_cookie_secure">%session.options.secure%</argument>
-                <argument key="session_cookie_httponly">%session.options.httponly%</argument>
-                <argument key="session_cache_limiter">%session.options.cache_limiter%</argument>
-            </argument>
+        <service id="session.storage.native" class="%session.storage.native.class%">
+            <argument>%session.storage.native.options%</argument>
         </service>
 
         <service id="session.storage.pdo" class="%session.storage.pdo.class%">
             <argument type="service" id="pdo_connection" />
-            <argument type="collection">
-                <argument key="session_name">%session.options.name%</argument>
-                <argument key="session_cookie_lifetime">%session.options.lifetime%</argument>
-                <argument key="session_cookie_path">%session.options.path%</argument>
-                <argument key="session_cookie_domain">%session.options.domain%</argument>
-                <argument key="session_cookie_secure">%session.options.secure%</argument>
-                <argument key="session_cookie_httponly">%session.options.httponly%</argument>
-                <argument key="session_cache_limiter">%session.options.cache_limiter%</argument>
-                <argument key="db_table">%session.options.pdo.db_table%</argument>
-            </argument>
+            <argument>%session.storage.pdo.options%</argument>
         </service>
 
         <service id="session.storage" alias="session.storage.native" />

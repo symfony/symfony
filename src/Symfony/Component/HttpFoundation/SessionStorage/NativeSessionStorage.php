@@ -26,7 +26,7 @@ class NativeSessionStorage implements SessionStorageInterface
     /**
      * Available options:
      *
-     *  * session_name:            The cookie name (symfony by default)
+     *  * session_name:            The cookie name (_SESSION by default)
      *  * session_id:              The session id (null by default)
      *  * session_cookie_lifetime: Cookie lifetime
      *  * session_cookie_path:     Cookie path
@@ -44,7 +44,7 @@ class NativeSessionStorage implements SessionStorageInterface
         $cookieDefaults = session_get_cookie_params();
 
         $this->options = array_merge(array(
-            'session_name'            => 'SYMFONY_SESSION',
+            'session_name'            => '_SESSION',
             'session_cookie_lifetime' => $cookieDefaults['lifetime'],
             'session_cookie_path'     => $cookieDefaults['path'],
             'session_cookie_domain'   => $cookieDefaults['domain'],

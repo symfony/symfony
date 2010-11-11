@@ -36,7 +36,7 @@ class ApacheMatcherDumper extends MatcherDumper
     public function dump(array $options = array())
     {
         $options = array_merge(array(
-            'script_name' => 'index.php',
+            'script_name' => 'app.php',
         ), $options);
 
         $regexes = array();

@@ -515,6 +515,12 @@ class Response
         return $this->headers->get('ETag');
     }
 
+    /**
+     * Sets the ETag value.
+     *
+     * @param string  $etag The ETag unique identifier
+     * @param Boolean $weak Whether you want a weak ETag or not
+     */
     public function setEtag($etag = null, $weak = false)
     {
         if (null === $etag) {

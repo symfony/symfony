@@ -535,6 +535,44 @@ class Response
     }
 
     /**
+     * Sets Response cache headers.
+     *
+     * Available options are: etag, last_modified, private, and public.
+     *
+     * @param array $options An array of cache options
+     */
+    public function setCache(array $options)
+    {
+        if ($diff = array_diff_key($options, array('etag', 'last_modified', 'private', 'public'))) {
+            throw new \InvalidArgumentException(sprintf('Response does not support the following options: "%s".', implode('", "', array_keys($diff))));
+        }
+
+        if (isset($options['etag'])) {
+            $this->setEtag($options['etag']);
+        }
+
+        if (isset($options['last_modified'])) {
+            $this->setLastModified($options['last_modified']);
+        }
+
+        if (isset($options['public'])) {
+            if ($options['public']) {
+                $this->setPublic();
+            } else {
+                $this->setPrivate();
+            }
+        }
+
+        if (isset($options['private'])) {
+            if ($options['private']) {
+                $this->setPrivate();
+            } else {
+                $this->setPublic();
+            }
+        }
+    }
+
+    /**
      * Modifies the response so that it conforms to the rules defined for a 304 status code.
      *
      * This sets the status, removes the body, and discards any headers

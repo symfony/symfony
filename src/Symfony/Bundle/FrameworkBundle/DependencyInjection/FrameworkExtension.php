@@ -111,9 +111,7 @@ class FrameworkExtension extends Extension
             $this->registerTestConfiguration($config, $container);
         }
 
-        if (isset($config['session'])) {
-            $this->registerSessionConfiguration($config, $container);
-        }
+        $this->registerSessionConfiguration($config, $container);
 
         $this->registerTranslatorConfiguration($config, $container);
 
@@ -305,12 +303,12 @@ class FrameworkExtension extends Extension
      */
     protected function registerSessionConfiguration($config, ContainerBuilder $container)
     {
-        $config = $config['session'];
-
         if (!$container->hasDefinition('session')) {
             $loader = new XmlFileLoader($container, array(__DIR__.'/../Resources/config', __DIR__.'/Resources/config'));
             $loader->load('session.xml');
         }
+
+        $config = isset($config['session']) ? $config['session'] : array();
 
         foreach (array('default_locale', 'default-locale') as $key) {
             if (isset($config[$key])) {

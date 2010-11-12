@@ -29,6 +29,8 @@
             <argument type="service" id="controller_resolver" />
         </service>
 
+        <service id="request" class="WillNeverBeCalled" />
+
         <service id="response" class="%response.class%" shared="false" />
     </services>
 </container>

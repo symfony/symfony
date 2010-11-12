@@ -277,17 +277,25 @@ class Response
     }
 
     /**
-     * Marks the response "private".
+     * Marks the response as "private".
      *
      * It makes the response ineligible for serving other clients.
-     *
-     * @param Boolean $value Whether to set the response to be private or public.
      */
-    public function setPrivate($value)
+    public function setPrivate()
     {
-        $value = (Boolean) $value;
-        $this->headers->getCacheControl()->setPublic(!$value);
-        $this->headers->getCacheControl()->setPrivate($value);
+        $this->headers->getCacheControl()->setPublic(false);
+        $this->headers->getCacheControl()->setPrivate(true);
+    }
+
+    /**
+     * Marks the response as "public".
+     *
+     * It makes the response eligible for serving other clients.
+     */
+    public function setPublic()
+    {
+        $this->headers->getCacheControl()->setPublic(true);
+        $this->headers->getCacheControl()->setPrivate(false);
     }
 
     /**

@@ -535,15 +535,15 @@ class Response
     }
 
     /**
-     * Sets Response cache headers.
+     * Sets Response cache headers (validation and/or expiration).
      *
-     * Available options are: etag, last_modified, private, and public.
+     * Available options are: etag, last_modified, max_age, s_maxage, private, and public.
      *
      * @param array $options An array of cache options
      */
     public function setCache(array $options)
     {
-        if ($diff = array_diff_key($options, array('etag', 'last_modified', 'private', 'public'))) {
+        if ($diff = array_diff_key($options, array('etag', 'last_modified', 'max_age', 's_maxage', 'private', 'public'))) {
             throw new \InvalidArgumentException(sprintf('Response does not support the following options: "%s".', implode('", "', array_keys($diff))));
         }
 
@@ -553,6 +553,14 @@ class Response
 
         if (isset($options['last_modified'])) {
             $this->setLastModified($options['last_modified']);
+        }
+
+        if (isset($options['max_age'])) {
+            $this->setMaxAge($options['max_age']);
+        }
+
+        if (isset($options['s_maxage'])) {
+            $this->setSharedMaxAge($options['s_maxage']);
         }
 
         if (isset($options['public'])) {

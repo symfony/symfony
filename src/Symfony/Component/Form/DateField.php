@@ -273,7 +273,7 @@ class DateField extends HybridField
     }
 
     /**
-     * Returns whether the year of the field's data is validd
+     * Returns whether the year of the field's data is valid
      *
      * The year is valid if it is contained in the list passed to the field's
      * option "years".
@@ -288,7 +288,7 @@ class DateField extends HybridField
     }
 
     /**
-     * Returns whether the month of the field's data is validd
+     * Returns whether the month of the field's data is valid
      *
      * The month is valid if it is contained in the list passed to the field's
      * option "months".
@@ -303,7 +303,7 @@ class DateField extends HybridField
     }
 
     /**
-     * Returns whether the day of the field's data is validd
+     * Returns whether the day of the field's data is valid
      *
      * The day is valid if it is contained in the list passed to the field's
      * option "days".

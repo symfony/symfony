@@ -328,8 +328,8 @@ class FrameworkExtension extends Extension
 
         $options = $container->getParameter('session.storage.'.strtolower($config['storage_id']).'.options');
         foreach (array('name', 'lifetime', 'path', 'domain', 'secure', 'httponly', 'cache_limiter', 'cache-limiter', 'pdo.db_table') as $name) {
-            if (isset($config['session'][$name])) {
-                $options[$name] = $config['session'][$name];
+            if (isset($config[$name])) {
+                $options[$name] = $config[$name];
             }
         }
         $container->setParameter('session.storage.'.strtolower($config['storage_id']).'.options', $options);

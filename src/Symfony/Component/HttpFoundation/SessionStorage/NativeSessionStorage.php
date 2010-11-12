@@ -26,34 +26,33 @@ class NativeSessionStorage implements SessionStorageInterface
     /**
      * Available options:
      *
-     *  * session_name:            The cookie name (_SESSION by default)
-     *  * session_id:              The session id (null by default)
-     *  * session_cookie_lifetime: Cookie lifetime
-     *  * session_cookie_path:     Cookie path
-     *  * session_cookie_domain:   Cookie domain
-     *  * session_cookie_secure:   Cookie secure
-     *  * session_cookie_httponly: Cookie http only
+     *  * name:     The cookie name (_SESSION by default)
+     *  * id:       The session id (null by default)
+     *  * lifetime: Cookie lifetime
+     *  * path:     Cookie path
+     *  * domain:   Cookie domain
+     *  * secure:   Cookie secure
+     *  * httponly: Cookie http only
      *
-     * The default values for all 'session_cookie_*' options are those returned by the session_get_cookie_params() function
+     * The default values for most options are those returned by the session_get_cookie_params() function
      *
      * @param array $options  An associative array of options
-     *
      */
     public function __construct(array $options = array())
     {
         $cookieDefaults = session_get_cookie_params();
 
         $this->options = array_merge(array(
-            'session_name'            => '_SESSION',
-            'session_cookie_lifetime' => $cookieDefaults['lifetime'],
-            'session_cookie_path'     => $cookieDefaults['path'],
-            'session_cookie_domain'   => $cookieDefaults['domain'],
-            'session_cookie_secure'   => $cookieDefaults['secure'],
-            'session_cookie_httponly' => isset($cookieDefaults['httponly']) ? $cookieDefaults['httponly'] : false,
-            'session_cache_limiter'   => 'none',
+            'name'          => '_SESSION',
+            'lifetime'      => $cookieDefaults['lifetime'],
+            'path'          => $cookieDefaults['path'],
+            'domain'        => $cookieDefaults['domain'],
+            'secure'        => $cookieDefaults['secure'],
+            'httponly'      => isset($cookieDefaults['httponly']) ? $cookieDefaults['httponly'] : false,
+            'cache_limiter' => 'none',
         ), $options);
 
-        session_name($this->options['session_name']);
+        session_name($this->options['name']);
     }
 
     /**
@@ -66,19 +65,19 @@ class NativeSessionStorage implements SessionStorageInterface
         }
 
         session_set_cookie_params(
-            $this->options['session_cookie_lifetime'],
-            $this->options['session_cookie_path'],
-            $this->options['session_cookie_domain'],
-            $this->options['session_cookie_secure'],
-            $this->options['session_cookie_httponly']
+            $this->options['lifetime'],
+            $this->options['path'],
+            $this->options['domain'],
+            $this->options['secure'],
+            $this->options['httponly']
         );
 
-        if (null !== $this->options['session_cache_limiter']) {
-            session_cache_limiter($this->options['session_cache_limiter']);
+        if (null !== $this->options['cache_limiter']) {
+            session_cache_limiter($this->options['cache_limiter']);
         }
 
-        if (!ini_get('session.use_cookies') && $this->options['session_id'] && $this->options['session_id'] != session_id()) {
-            session_id($this->options['session_id']);
+        if (!ini_get('session.use_cookies') && $this->options['id'] && $this->options['id'] != session_id()) {
+            session_id($this->options['id']);
         }
 
         session_start();

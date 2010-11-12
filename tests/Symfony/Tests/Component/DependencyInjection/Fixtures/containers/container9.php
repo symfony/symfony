@@ -14,9 +14,8 @@ $container->
     addTag('foo', array('bar' => 'bar'))->
     setFactoryMethod('getInstance')->
     setArguments(array('foo', new Reference('foo.baz'), array('%foo%' => 'foo is %foo%', 'bar' => '%foo%'), true, new Reference('service_container')))->
-    setFile(realpath(__DIR__.'/../includes/foo.php'))->
     setShared(false)->
-    addMethodCall('setBar', array('bar'))->
+    addMethodCall('setBar', array(new Reference('bar')))->
     addMethodCall('initialize')->
     setConfigurator('sc_configure')
 ;
@@ -41,6 +40,7 @@ $container->getParameterBag()->add(array(
 $container->setAlias('alias_for_foo', 'foo');
 $container->
     register('method_call1', 'FooClass')->
+    setFile(realpath(__DIR__.'/../includes/foo.php'))->
     addMethodCall('setBar', array(new Reference('foo')))->
     addMethodCall('setBar', array(new Reference('foo', ContainerInterface::NULL_ON_INVALID_REFERENCE)))->
     addMethodCall('setBar', array(new Reference('foo', ContainerInterface::IGNORE_ON_INVALID_REFERENCE)))->

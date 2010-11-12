@@ -9,11 +9,10 @@ services:
     tags:
       - { name: foo, foo: foo }
       - { name: foo, bar: bar }
-    file: %path%foo.php
     factory_method: getInstance
     arguments: [foo, '@foo.baz', { '%foo%': 'foo is %foo%', bar: '%foo%' }, true, '@service_container']
     calls:
-      - [setBar, [bar]]
+      - [setBar, ['@bar']]
       - [initialize, {  }]
       
     shared: false
@@ -30,6 +29,7 @@ services:
     class: %foo_class%
   method_call1:
     class: FooClass
+    file: %path%foo.php
     calls:
       - [setBar, ['@foo']]
       - [setBar, ['@@foo']]

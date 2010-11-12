@@ -32,10 +32,8 @@ class ProjectServiceContainer extends Container implements TaggedContainerInterf
      */
     protected function getFooService()
     {
-        require_once '%path%foo.php';
-
-        $instance = call_user_func(array('FooClass', 'getInstance'), 'foo', $this->getFoo_BazService(), array($this->getParameter('foo') => 'foo is '.$this->getParameter('foo'), 'bar' => $this->getParameter('foo')), true, $this);
-        $instance->setBar('bar');
+        $instance = call_user_func(array('FooClass', 'getInstance'), 'foo', $this->get('foo.baz'), array($this->getParameter('foo') => 'foo is '.$this->getParameter('foo'), 'bar' => $this->getParameter('foo')), true, $this);
+        $instance->setBar($this->get('bar'));
         $instance->initialize();
         sc_configure($instance);
 
@@ -54,9 +52,9 @@ class ProjectServiceContainer extends Container implements TaggedContainerInterf
     {
         if (isset($this->shared['bar'])) return $this->shared['bar'];
 
-        $instance = new FooClass('foo', $this->getFoo_BazService(), $this->getParameter('foo_bar'));
+        $instance = new FooClass('foo', $this->get('foo.baz'), $this->getParameter('foo_bar'));
         $this->shared['bar'] = $instance;
-        $this->getFoo_BazService()->configure($instance);
+        $this->get('foo.baz')->configure($instance);
 
         return $instance;
     }
@@ -109,11 +107,13 @@ class ProjectServiceContainer extends Container implements TaggedContainerInterf
      */
     protected function getMethodCall1Service()
     {
+        require_once '%path%foo.php';
+
         if (isset($this->shared['method_call1'])) return $this->shared['method_call1'];
 
         $instance = new FooClass();
         $this->shared['method_call1'] = $instance;
-        $instance->setBar($this->getFooService());
+        $instance->setBar($this->get('foo'));
         $instance->setBar($this->get('foo', ContainerInterface::NULL_ON_INVALID_REFERENCE));
         if ($this->has('foo')) {
             $instance->setBar($this->get('foo', ContainerInterface::NULL_ON_INVALID_REFERENCE));
@@ -137,7 +137,7 @@ class ProjectServiceContainer extends Container implements TaggedContainerInterf
     {
         if (isset($this->shared['factory_service'])) return $this->shared['factory_service'];
 
-        $instance = $this->getFoo_BazService()->getInstance();
+        $instance = $this->get('foo.baz')->getInstance();
         $this->shared['factory_service'] = $instance;
 
         return $instance;
@@ -150,7 +150,7 @@ class ProjectServiceContainer extends Container implements TaggedContainerInterf
      */
     protected function getAliasForFooService()
     {
-        return $this->getFooService();
+        return $this->get('foo');
     }
 
     /**

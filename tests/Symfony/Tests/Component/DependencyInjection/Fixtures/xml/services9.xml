@@ -12,7 +12,6 @@
     <service id="foo" class="FooClass" factory-method="getInstance" shared="false">
       <tag name="foo" foo="foo" />
       <tag name="foo" bar="bar" />
-      <file>%path%foo.php</file>
       <argument>foo</argument>
       <argument type="service" id="foo.baz" />
       <argument type="collection">
@@ -22,7 +21,7 @@
       <argument>true</argument>
       <argument type="service" id="service_container" />
       <call method="setBar">
-        <argument>bar</argument>
+        <argument type="service" id="bar" />
       </call>
       <call method="initialize" />
       <configurator function="sc_configure" />
@@ -39,6 +38,7 @@
     <service id="foo_bar" class="%foo_class%">
     </service>
     <service id="method_call1" class="FooClass">
+      <file>%path%foo.php</file>
       <call method="setBar">
         <argument type="service" id="foo" />
       </call>

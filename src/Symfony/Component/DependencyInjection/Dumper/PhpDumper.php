@@ -433,10 +433,6 @@ EOF;
                 $id = $this->container->getAlias($id);
             }
 
-            if ($this->container->hasDefinition($id)) {
-                return sprintf('$this->get%sService()', Container::camelize($id));
-            }
-
             return sprintf('$this->get(\'%s\')', $id);
         }
     }

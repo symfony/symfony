@@ -23,9 +23,9 @@ class InputField extends Field
      */
     protected function configure()
     {
-        parent::configure();
-
         $this->addRequiredOption('type');
+
+        parent::configure();
     }
 
     /**

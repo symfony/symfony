@@ -33,12 +33,12 @@ class IntegerField extends NumberField
      */
     protected function configure()
     {
-        parent::configure();
-
         $this->addOption('precision', 0);
 
         // Integer cast rounds towards 0, so do the same when displaying fractions
         $this->addOption('rounding-mode', NumberToLocalizedStringTransformer::ROUND_DOWN);
+
+        parent::configure();
     }
 
     /**

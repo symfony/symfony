@@ -25,10 +25,10 @@ abstract class ToggleField extends InputField
      */
     protected function configure()
     {
-        parent::configure();
-
         $this->addOption('value');
         $this->addOption('label');
+
+        parent::configure();
 
         $this->setValueTransformer(new BooleanToStringTransformer());
     }

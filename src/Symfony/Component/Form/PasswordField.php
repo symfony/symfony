@@ -23,9 +23,9 @@ class PasswordField extends TextField
      */
     protected function configure()
     {
-        parent::configure();
-
         $this->addOption('always_empty', true);
+
+        parent::configure();
     }
 
     /**

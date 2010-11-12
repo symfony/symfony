@@ -33,9 +33,9 @@ class TextField extends InputField
      */
     protected function configure()
     {
-        parent::configure();
-
         $this->addOption('max_length');
+
+        parent::configure();
     }
 
     /**

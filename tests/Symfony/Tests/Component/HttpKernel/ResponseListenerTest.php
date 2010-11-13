@@ -25,7 +25,7 @@ class ResponseListenerTest extends \PHPUnit_Framework_TestCase
         $event = new Event(null, 'core.response', array('request_type' => HttpKernelInterface::SUB_REQUEST));
         $this->getDispatcher()->filter($event, $response = new Response('foo'));
 
-        $this->assertEquals(array(), $response->headers->all());
+        $this->assertEquals('', $response->headers->get('content-type'));
     }
 
     public function testFilterDoesNothingIfContentTypeIsSet()
@@ -35,7 +35,7 @@ class ResponseListenerTest extends \PHPUnit_Framework_TestCase
         $response->headers->set('Content-Type', 'text/plain');
         $this->getDispatcher()->filter($event, $response);
 
-        $this->assertEquals(array('content-type' => array('text/plain')), $response->headers->all());
+        $this->assertEquals('text/plain', $response->headers->get('content-type'));
     }
 
     public function testFilterDoesNothingIfRequestFormatIsNotDefined()
@@ -43,7 +43,7 @@ class ResponseListenerTest extends \PHPUnit_Framework_TestCase
         $event = new Event(null, 'core.response', array('request_type' => HttpKernelInterface::MASTER_REQUEST, 'request' => Request::create('/')));
         $this->getDispatcher()->filter($event, $response = new Response('foo'));
 
-        $this->assertEquals(array(), $response->headers->all());
+        $this->assertEquals('', $response->headers->get('content-type'));
     }
 
     public function testFilterSetContentType()
@@ -53,7 +53,7 @@ class ResponseListenerTest extends \PHPUnit_Framework_TestCase
         $event = new Event(null, 'core.response', array('request_type' => HttpKernelInterface::MASTER_REQUEST, 'request' => $request));
         $this->getDispatcher()->filter($event, $response = new Response('foo'));
 
-        $this->assertEquals(array('content-type' => array('application/json')), $response->headers->all());
+        $this->assertEquals('application/json', $response->headers->get('content-type'));
     }
 
     protected function getDispatcher()

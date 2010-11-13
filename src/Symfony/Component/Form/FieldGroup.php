@@ -447,6 +447,11 @@ class FieldGroup extends Field implements \IteratorAggregate, FieldGroupInterfac
         return false;
     }
 
+    public function isGroup()
+    {
+        return true;
+    }
+
     /**
      * Returns true if the bound field exists (implements the \ArrayAccess interface).
      *

@@ -6,6 +6,7 @@ use Symfony\Component\Form\Form;
 use Symfony\Component\Form\FieldGroupInterface;
 use Symfony\Component\Form\FieldInterface;
 use Symfony\Component\Form\CollectionField;
+use Symfony\Component\Form\HybridField;
 use Symfony\Bundle\TwigBundle\TokenParser\FormThemeTokenParser;
 use Symfony\Bundle\FrameworkBundle\Templating\HtmlGeneratorInterface;
 
@@ -96,16 +97,18 @@ class FormExtension extends \Twig_Extension
             $this->templates = $this->resolveResources($this->resources);
         }
 
-        if ($field instanceof FieldGroupInterface) {
-            return $this->templates['group']->getBlock('group', array(
-                'group'      => $field,
+        if ($field instanceof CollectionField) {
+            return $this->templates['group']->getBlock('collection', array(
+                'collection' => $field,
                 'attributes' => $attributes,
             ));
         }
 
-        if ($field instanceof CollectionField) {
-            return $this->templates['group']->getBlock('collection', array(
-                'collection' => $field,
+        // FieldGroupInterface instances that need to be rendered as
+        // a field instead of group should return false in isGroup()
+        if ($field instanceof FieldGroupInterface && true === $field->isGroup()) {
+            return $this->templates['group']->getBlock('group', array(
+                'group'      => $field,
                 'attributes' => $attributes,
             ));
         }

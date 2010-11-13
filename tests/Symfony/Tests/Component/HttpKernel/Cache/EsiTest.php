@@ -89,7 +89,7 @@ class EsiTest extends \PHPUnit_Framework_TestCase
         $response->headers->set('Content-Type', 'text/plain');
         $esi->process($request, $response);
 
-        $this->assertEquals(array('content-type' => array('text/plain')), $response->headers->all());
+        $this->assertFalse($response->headers->has('x-body-eval'));
     }
 
     public function testProcess()
@@ -101,7 +101,7 @@ class EsiTest extends \PHPUnit_Framework_TestCase
         $esi->process($request, $response);
 
         $this->assertEquals('foo <?php echo $this->esi->handle($this, \'...\', \'alt\', true) ?>'."\n", $response->getContent());
-        $this->assertEquals(array('x-body-eval' => array('ESI')), $response->headers->all());
+        $this->assertEquals('ESI', $response->headers->get('x-body-eval'));
 
         $response = new Response('foo <esi:include src="..." />');
         $esi->process($request, $response);
@@ -129,15 +129,17 @@ class EsiTest extends \PHPUnit_Framework_TestCase
         $response = new Response('foo <esi:include src="..." />');
         $response->headers->set('Surrogate-Control', 'content="ESI/1.0"');
         $esi->process($request, $response);
-        $this->assertEquals(array('x-body-eval' => array('ESI')), $response->headers->all());
+        $this->assertEquals('ESI', $response->headers->get('x-body-eval'));
 
         $response->headers->set('Surrogate-Control', 'no-store, content="ESI/1.0"');
         $esi->process($request, $response);
-        $this->assertEquals(array('surrogate-control' => array('no-store'), 'x-body-eval' => array('ESI')), $response->headers->all());
+        $this->assertEquals('ESI', $response->headers->get('x-body-eval'));
+        $this->assertEquals('no-store', $response->headers->get('surrogate-control'));
 
         $response->headers->set('Surrogate-Control', 'content="ESI/1.0", no-store');
         $esi->process($request, $response);
-        $this->assertEquals(array('surrogate-control' => array('no-store'), 'x-body-eval' => array('ESI')), $response->headers->all());
+        $this->assertEquals('ESI', $response->headers->get('x-body-eval'));
+        $this->assertEquals('no-store', $response->headers->get('surrogate-control'));
     }
 
     public function testHandle()

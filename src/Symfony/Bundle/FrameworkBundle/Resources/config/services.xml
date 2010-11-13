@@ -29,6 +29,14 @@
             <argument type="service" id="controller_resolver" />
         </service>
 
+        <!--
+            The request service is overwritten by the HttpKernel::handle() method,
+            this is just present to let the DI Container compile without errors.
+
+            If you want to use another Request class, you should modify the code in
+            your front controller (app.php) so that it passes an instance of
+            YourRequestClass to the Kernel.
+        -->
         <service id="request" class="WillNeverBeCalled" />
 
         <service id="response" class="%response.class%" shared="false" />

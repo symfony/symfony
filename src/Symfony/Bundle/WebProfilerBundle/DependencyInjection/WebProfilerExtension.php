@@ -59,6 +59,11 @@ class WebProfilerExtension extends Extension
                 $container->setParameter('debug.toolbar.intercept_redirects', (Boolean) $config[$key]);
             }
         }
+
+        if (isset($config['templates']) && $container->hasParameter('data_collector.templates')) {
+            $templates = array_merge($container->getParameter('data_collector.templates'), $config['templates']);
+            $container->setParameter('data_collector.templates', $templates);
+        }
     }
 
     /**

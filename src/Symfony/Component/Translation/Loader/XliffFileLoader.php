@@ -24,7 +24,7 @@ class XliffFileLoader implements LoaderInterface
     /**
      * {@inheritdoc}
      */
-    function load($resource, $locale, $domain = 'messages')
+    public function load($resource, $locale, $domain = 'messages')
     {
         $xml = $this->parseFile($resource);
         $xml->registerXPathNamespace('xliff', 'urn:oasis:names:tc:xliff:document:1.2');

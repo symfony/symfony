@@ -23,7 +23,7 @@ class ArrayLoader implements LoaderInterface
     /**
      * {@inheritdoc}
      */
-    function load($resource, $locale, $domain = 'messages')
+    public function load($resource, $locale, $domain = 'messages')
     {
         $catalogue = new MessageCatalogue($locale);
         $catalogue->addMessages($resource, $domain);

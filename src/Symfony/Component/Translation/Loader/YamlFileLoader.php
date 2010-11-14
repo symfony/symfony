@@ -2,7 +2,6 @@
 
 namespace Symfony\Component\Translation\Loader;
 
-use Symfony\Component\Translation\MessageCatalogue;
 use Symfony\Component\Translation\Resource\FileResource;
 use Symfony\Component\Yaml\Yaml;
 
@@ -20,7 +19,7 @@ use Symfony\Component\Yaml\Yaml;
  *
  * @author Fabien Potencier <fabien.potencier@symfony-project.com>
  */
-class YamlFileLoader implements LoaderInterface
+class YamlFileLoader extends ArrayLoader implements LoaderInterface
 {
     /**
      * {@inheritdoc}
@@ -29,8 +28,7 @@ class YamlFileLoader implements LoaderInterface
     {
         $messages = Yaml::load($resource);
 
-        $catalogue = new MessageCatalogue($locale);
-        $catalogue->addMessages($messages, $domain);
+        $catalogue = parent::load($messages, $locale, $domain);
         $catalogue->addResource(new FileResource($resource));
 
         return $catalogue;

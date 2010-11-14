@@ -75,6 +75,18 @@ class TranslatorTest extends \PHPUnit_Framework_TestCase
     }
 
     /**
+     * @dataProvider getFlattenedTransTests
+     */
+    public function testFlattenedTrans($expected, $messages, $id)
+    {
+        $translator = new Translator('en', new MessageSelector());
+        $translator->addLoader('array', new ArrayLoader());
+        $translator->addResource('array', $messages, 'fr', '');
+
+        $this->assertEquals($expected, $translator->trans($id, array(), '', 'fr'));
+    }
+
+    /**
      * @dataProvider getTransChoiceTests
      */
     public function testTransChoice($expected, $id, $translation, $number, $parameters, $locale, $domain)
@@ -91,6 +103,29 @@ class TranslatorTest extends \PHPUnit_Framework_TestCase
         return array(
             array('Symfony2 est super !', 'Symfony2 is great!', 'Symfony2 est super !', array(), 'fr', ''),
             array('Symfony2 est awesome !', 'Symfony2 is %what%!', 'Symfony2 est %what% !', array('%what%' => 'awesome'), 'fr', ''),
+        );
+    }
+
+    public function getFlattenedTransTests()
+    {
+        $messages = array(
+            'symfony2' => array(
+                'is' => array(
+                    'great' => 'Symfony2 est super!'
+                )
+            ),
+            'foo' => array(
+                'bar' => array(
+                    'baz' => 'Foo Bar Baz'
+                ),
+                'baz' => 'Foo Baz',
+            ),
+        );
+
+        return array(
+            array('Symfony2 est super!', $messages, 'symfony2.is.great'),
+            array('Foo Bar Baz', $messages, 'foo.bar.baz'),
+            array('Foo Baz', $messages, 'foo.baz'),
         );
     }
 

@@ -25,9 +25,42 @@ class ArrayLoader implements LoaderInterface
      */
     public function load($resource, $locale, $domain = 'messages')
     {
+        $catalogue = $this->flatten($resource);
         $catalogue = new MessageCatalogue($locale);
         $catalogue->addMessages($resource, $domain);
 
         return $catalogue;
+    }
+
+    /**
+     * Flattens an nested array of translations
+     *
+     * The scheme used is:
+     *   'key' => array('key2' => array('key3' => 'value'))
+     * Becomes:
+     *   'key.key2.key3' => 'value'
+     *
+     * This function takes an array by reference and will modify it
+     *
+     * @param array $messages the array that will be flattened
+     * @param array $subnode current subnode being parsed, used internally for recursive calls
+     * @param string $path current path being parsed, used internally for recursive calls
+     */
+    protected function flatten(array &$messages, array $subnode = null, $path = null)
+    {
+        if ($subnode === null) {
+            $subnode =& $messages;
+        }
+        foreach ($subnode as $key => $value) {
+            if (is_array($value)) {
+                $nodePath = $path ? $path.'.'.$key : $key;
+                $this->flatten($messages, $value, $nodePath);
+                if ($path === null) {
+                    unset($messages[$key]);
+                }
+            } elseif ($path !== null) {
+                $messages[$path.'.'.$key] = $value;
+            }
+        }
     }
 }

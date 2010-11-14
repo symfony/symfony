@@ -2,7 +2,6 @@
 
 namespace Symfony\Component\Translation\Loader;
 
-use Symfony\Component\Translation\MessageCatalogue;
 use Symfony\Component\Translation\Resource\FileResource;
 
 /*
@@ -19,15 +18,16 @@ use Symfony\Component\Translation\Resource\FileResource;
  *
  * @author Fabien Potencier <fabien.potencier@symfony-project.com>
  */
-class PhpFileLoader implements LoaderInterface
+class PhpFileLoader extends ArrayLoader implements LoaderInterface
 {
     /**
      * {@inheritdoc}
      */
     public function load($resource, $locale, $domain = 'messages')
     {
-        $catalogue = new MessageCatalogue($locale);
-        $catalogue->addMessages(require($resource), $domain);
+        $messages = require($resource);
+
+        $catalogue = parent::load($messages, $locale, $domain);
         $catalogue->addResource(new FileResource($resource));
 
         return $catalogue;

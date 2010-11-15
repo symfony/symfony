@@ -3,7 +3,6 @@
 namespace Symfony\Bundle\FrameworkBundle;
 
 use Symfony\Component\EventDispatcher\EventDispatcher as BaseEventDispatcher;
-use Symfony\Component\EventDispatcher\Event;
 use Symfony\Component\DependencyInjection\ContainerInterface;
 
 /*

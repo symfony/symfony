@@ -41,37 +41,19 @@ class EventDispatcher
     }
 
     /**
-     * Disconnects a listener for a given event name.
+     * Disconnects all listeners for the given event name.
      *
-     * @param string     $name      An event name
-     * @param mixed|null $listener  A PHP callable or null to disconnect all listeners
-     *
-     * @return mixed false if listener does not exist, null otherwise
+     * @param string $name An event name
      */
-    public function disconnect($name, $listener = null)
+    public function disconnect($name)
     {
-        if (!isset($this->listeners[$name])) {
-            return false;
-        }
-
-        if (null === $listener) {
-            unset($this->listeners[$name]);
-            return;
-        }
-
-        foreach ($this->listeners[$name] as $priority => $callables) {
-            foreach ($callables as $i => $callable) {
-                if ($listener === $callable) {
-                    unset($this->listeners[$name][$priority][$i]);
-                }
-            }
-        }
+        unset($this->listeners[$name]);
     }
 
     /**
      * Notifies all listeners of a given event.
      *
-     * @param Event $event A Event instance
+     * @param Event $event An Event instance
      *
      * @return Event The Event instance
      */
@@ -87,7 +69,7 @@ class EventDispatcher
     /**
      * Notifies all listeners of a given event until one returns a non null value.
      *
-     * @param  Event $event A Event instance
+     * @param  Event $event An Event instance
      *
      * @return Event The Event instance
      */
@@ -106,8 +88,8 @@ class EventDispatcher
     /**
      * Filters a value by calling all listeners of a given event.
      *
-     * @param  Event  $event   A Event instance
-     * @param  mixed    $value   The value to be filtered
+     * @param  Event $event An Event instance
+     * @param  mixed $value The value to be filtered
      *
      * @return Event The Event instance
      */
@@ -125,7 +107,7 @@ class EventDispatcher
     /**
      * Returns true if the given event name has some listeners.
      *
-     * @param  string   $name    The event name
+     * @param  string $name The event name
      *
      * @return Boolean true if some listeners are connected, false otherwise
      */
@@ -137,7 +119,7 @@ class EventDispatcher
     /**
      * Returns all listeners associated with a given event name.
      *
-     * @param  string   $name    The event name
+     * @param  string $name The event name
      *
      * @return array  An array of listeners
      */

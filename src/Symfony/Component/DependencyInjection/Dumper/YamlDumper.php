@@ -161,7 +161,7 @@ class YamlDumper extends Dumper
     protected function getServiceCall($id, Reference $reference = null)
     {
         if (null !== $reference && ContainerInterface::EXCEPTION_ON_INVALID_REFERENCE !== $reference->getInvalidBehavior()) {
-            return sprintf('@@%s', $id);
+            return sprintf('@?%s', $id);
         } else {
             return sprintf('@%s', $id);
         }

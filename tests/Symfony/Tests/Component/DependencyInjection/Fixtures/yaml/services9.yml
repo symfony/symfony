@@ -32,9 +32,9 @@ services:
     file: %path%foo.php
     calls:
       - [setBar, ['@foo']]
-      - [setBar, ['@@foo']]
-      - [setBar, ['@@foo']]
-      - [setBar, ['@@foobaz']]
+      - [setBar, ['@?foo']]
+      - [setBar, ['@?foo']]
+      - [setBar, ['@?foobaz']]
       
   factory_service:
     factory_method: getInstance

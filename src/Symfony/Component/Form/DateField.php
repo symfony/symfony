@@ -146,23 +146,6 @@ class DateField extends HybridField
     }
 
     /**
-     * {@inheritDoc}
-     */
-    public function getAttributes()
-    {
-        if ($this->isField()) {
-            return array_merge(parent::getAttributes(), array(
-                'id'    => $this->getId(),
-                'name'  => $this->getName(),
-                'value' => $this->getDisplayedData(),
-                'type'  => 'text',
-            ));
-        }
-
-        return parent::getAttributes();
-    }
-
-    /**
      * Generates an array of choices for the given values
      *
      * If the values are shorter than $padLength characters, they are padded with

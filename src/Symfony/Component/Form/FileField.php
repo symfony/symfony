@@ -14,28 +14,8 @@ namespace Symfony\Component\Form;
 /**
  * A file field to upload files.
  */
-class FileField extends InputField
+class FileField extends Field
 {
-    /**
-     * {@inheritDoc}
-     */
-    public function __construct($key, array $options = array())
-    {
-        $options['type'] = 'file';
-
-        parent::__construct($key, $options);
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    public function getAttributes()
-    {
-        return array_merge(parent::getAttributes(), array(
-            'type' => 'file',
-        ));
-    }
-
     /**
      * {@inheritDoc}
      */

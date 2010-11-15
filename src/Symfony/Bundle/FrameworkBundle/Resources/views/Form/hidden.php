@@ -1,3 +1,3 @@
-<?php foreach ($hidden as $field): ?>
-    <?php echo $field->widget() ?>
+<?php foreach ($field->getAllHiddenFields() as $child): ?>
+    <?php echo $view['form']->render($child) ?>
 <?php endforeach; ?>

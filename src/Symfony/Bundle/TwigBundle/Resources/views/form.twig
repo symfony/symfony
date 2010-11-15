@@ -1,28 +1,16 @@
-{% block group %}
-    {{ group|render_errors }}
-    {% for field in group %}
-        {% if not field.ishidden %}
-            {{ field|render }}
+{% block field_group %}
+    {{ field|render_errors }}
+    {% for child in field %}
+        {% if not child.ishidden %}
+            <div>
+                {{ child|render_label }}
+                {{ child|render_errors }}
+                {{ child|render }}
+            </div>
         {% endif %}
     {% endfor %}
-    {{ group|render_hidden }}
-{% endblock group %}
-
-{% block field %}
-    <div>
-        {{ field|render_label }}
-        {{ field|render_errors }}
-        {{ field|render_widget }}
-    </div>
-{% endblock field %}
-
-{% block collection %}
-    <div>
-        {% for field in collection %}
-            {{ field|render }}
-        {% endfor %}
-    </div>
-{% endblock collection %}
+    {{ field|render_hidden }}
+{% endblock field_group %}
 
 {% block errors %}
     {% if errors %}
@@ -35,11 +23,117 @@
 {% endblock errors %}
 
 {% block hidden %}
-    {% for field in fields %}
-        {{ field|render_widget }}
+    {% for child in field.allHiddenFields %}
+        {{ child|render }}
     {% endfor %}
 {% endblock hidden %}
 
 {% block label %}
-    <label for="{{ id }}">{% trans label %}</label>
+    <label for="{{ field.id }}">{% trans label %}</label>
 {% endblock label %}
+
+{% block attributes %}
+    {% for key, value in attr %}
+        {{ key }}="{{ value}}"
+    {% endfor %}
+{% endblock attributes %}
+
+{% block field_attributes %}
+    id="{{ field.id }}" name="{{ field.name }}"{% if field.disabled %} disabled="disabled"{% endif %}
+    {% display attributes %}
+{% endblock field_attributes %}
+
+{% block text_field %}
+    {#{% set attr.maxlength = attr.maxlength|default(field.maxlength) %}#}
+    <input type="text" {% display field_attributes %} value="{{ field.displayedData }}" />
+{% endblock text_field %}
+
+{% block password_field %}
+    {#{% set attr.maxlength = attr.maxlength|default(field.maxlength) %}#}
+    <input type="password" {% display field_attributes %} value="{{ field.displayedData }}" />
+{% endblock password_field %}
+
+{% block hidden_field %}
+    <input type="hidden" {% display field_attributes %} value="{{ field.displayedData }}" />
+{% endblock hidden_field %}
+
+{% block textarea_field %}
+    <textarea {% display field_attributes %}>{{ field.displayedData }}</textarea>
+{% endblock textarea_field %}
+
+{% block options %}
+    {% for choice, label in options %}
+        {% if field.isChoiceGroup(label) %}
+            <optgroup label="{{ choice }}">
+                {% for nestedChoice, nestedLabel in label %}
+                    <option value="{{ nestedChoice }}"{% if field.isChoiceSelected(nestedChoice) %} selected="selected"{% endif %}>{{ nestedLabel }}</option>
+                {% endfor %}
+            </optgroup>
+        {% else %}
+            <option value="{{ choice }}"{% if field.isChoiceSelected(choice) %} selected="selected"{% endif %}>{{ label }}</option>
+        {% endif %}
+    {% endfor %}
+{% endblock options %}
+
+{% block choice_field %}
+    {% if field.isExpanded %}
+        {% for choice, child in field %}
+            {{ child|render }}
+            <label for="{{ child.id }}">{{ field.label(choice) }}</label>
+        {% endfor %}
+    {% else %}
+        <select {% display field_attributes %}{% if field.isMultipleChoice %} multiple="multiple"{% endif %}>
+            {% if field.preferredChoices|length > 0 %}
+                {% set options = field.preferredChoices %}
+                {% display options %}
+                <option disabled="disabled">{{ params.separator|default('-------------------') }}</option>
+            {% endif %}
+            {% set options = field.otherChoices %}
+            {% display options %}
+        </select>
+    {% endif %}
+{% endblock choice_field %}
+
+{% block checkbox_field %}
+    <input type="checkbox" {% display field_attributes %}{% if field.hasValue %} value="{{ field.value }}"{% endif %}{% if field.ischecked %} checked="checked"{% endif %} />
+{% endblock checkbox_field %}
+
+{% block radio_field %}
+    <input type="radio" {% display field_attributes %}{% if field.hasValue %} value="{{ field.value }}"{% endif %}{% if field.ischecked %} checked="checked"{% endif %} />
+{% endblock radio_field %}
+
+{% block date_time_field %}
+    {{ field.date|render }}
+    {{ field.time|render }}
+{% endblock date_time_field %}
+
+{% block date_field %}
+    {% if field.isfield %}
+        {% display text_field %}
+    {% else %}
+        {{ field.pattern|replace(['{{ year }}': field.year|render, '{{ month }}': field.month|render, '{{ day }}': field.day|render]) }}
+    {% endif %}
+{% endblock date_field %}
+
+{% block time_field %}
+    {# TODO the next line should be set attr.size = 1, but that's not supported yet by Twig #}
+    {% if field.isfield %}{% set attr = ['size': 1] %}{% endif %}
+    {{ field.hour|render(attr) }}:{{ field.minute|render(attr) }}{% if field.isWithSeconds %}:{{ field.second|render(attr) }}{% endif %}
+{% endblock time_field %}
+
+{% block number_field %}
+    <input type="text" {% display field_attributes %} value="{{ field.displayedData }}" />
+{% endblock number_field %}
+
+{% block money_field %}
+    {% set widget %}{% display number_field %}{% endset %}
+    {{ field.pattern|replace(['{{ widget }}': widget])|raw }}
+{% endblock money_field %}
+
+{% block percent_field %}
+    {% display text_field %} %
+{% endblock percent_field %}
+
+{% block file_field %}
+    <input type="file" {% display field_attributes %} />
+{% endblock file_field %}

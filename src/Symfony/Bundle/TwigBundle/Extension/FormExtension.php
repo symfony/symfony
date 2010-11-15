@@ -22,6 +22,7 @@ use Symfony\Bundle\FrameworkBundle\Templating\HtmlGeneratorInterface;
 /**
  *
  * @author Fabien Potencier <fabien.potencier@symfony-project.com>
+ * @author Bernhard Schussek <bernhard.schussek@symfony-project.com>
  */
 class FormExtension extends \Twig_Extension
 {
@@ -31,15 +32,12 @@ class FormExtension extends \Twig_Extension
     protected $templates;
     protected $environment;
     protected $themes;
-    protected $generator;
 
-    public function __construct(HtmlGeneratorInterface $generator, array $resources = array())
+    public function __construct(array $resources = array())
     {
-        $this->generator = $generator;
         $this->themes = new \SplObjectStorage();
         $this->resources = array_merge(array(
             'TwigBundle::form.twig',
-            'TwigBundle::widgets.twig',
         ), $resources);
     }
 
@@ -79,89 +77,51 @@ class FormExtension extends \Twig_Extension
             'render'         => new \Twig_Filter_Method($this, 'render', array('is_safe' => array('html'))),
             'render_hidden'  => new \Twig_Filter_Method($this, 'renderHidden', array('is_safe' => array('html'))),
             'render_errors'  => new \Twig_Filter_Method($this, 'renderErrors', array('is_safe' => array('html'))),
-            'render_widget'  => new \Twig_Filter_Method($this, 'renderWidget', array('is_safe' => array('html'))),
             'render_label'   => new \Twig_Filter_Method($this, 'renderLabel', array('is_safe' => array('html'))),
             'render_data'    => new \Twig_Filter_Method($this, 'renderData', array('is_safe' => array('html'))),
-            'render_choices' => new \Twig_Filter_Method($this, 'renderChoices', array('is_safe' => array('html'))),
         );
     }
 
+    /**
+     * Renders the HTML enctype in the form tag, if necessary
+     *
+     * Example usage in Twig templates:
+     *
+     *     <form action="..." method="post" {{ form|render_enctype }}>
+     *
+     * @param Form $form   The form for which to render the encoding type
+     */
     public function renderEnctype(Form $form)
     {
         return $form->isMultipart() ? 'enctype="multipart/form-data"' : '';
     }
 
-    public function render(FieldInterface $field, array $attributes = array())
+    /**
+     * Renders the HTML for an individual form field
+     *
+     * Example usage in Twig:
+     *
+     *     {{ field|render }}
+     *
+     * You can pass additional variables during the call:
+     *
+     *     {{ field|render(['param': 'value']) }}
+     *
+     * @param FieldInterface $field  The field to render
+     * @param array $params          Additional variables passed to the template
+     * @param string $resources
+     */
+    public function render(FieldInterface $field, array $attributes = array(), array $parameters = array(), $resources = null)
     {
         if (null === $this->templates) {
             $this->templates = $this->resolveResources($this->resources);
         }
 
-        if ($field instanceof CollectionField) {
-            return $this->templates['group']->getBlock('collection', array(
-                'collection' => $field,
-                'attributes' => $attributes,
-            ));
-        }
-
-        // FieldGroupInterface instances that need to be rendered as
-        // a field instead of group should return false in isGroup()
-        if ($field instanceof FieldGroupInterface && true === $field->isGroup()) {
-            return $this->templates['group']->getBlock('group', array(
-                'group'      => $field,
-                'attributes' => $attributes,
-            ));
-        }
-
-        return $this->templates['field']->getBlock('field', array(
-            'field'      => $field,
-            'attributes' => $attributes,
-        ));
-    }
-
-    public function renderHidden(FieldGroupInterface $form)
-    {
-        if (null === $this->templates) {
-            $this->templates = $this->resolveResources($this->resources);
-        }
-
-        return $this->templates['hidden']->getBlock('hidden', array(
-            'fields' => $form->getHiddenFields()
-        ));
-    }
-
-    public function renderErrors($formOrField)
-    {
-        if (null === $this->templates) {
-            $this->templates = $this->resolveResources($this->resources);
-        }
-
-        return $this->templates['errors']->getBlock('errors', array(
-            'errors' => $formOrField->getErrors()
-        ));
-    }
-
-    public function renderLabel(FieldInterface $field, $label = null, array $attributes = array())
-    {
-        if (null === $this->templates) {
-            $this->templates = $this->resolveResources($this->resources);
-        }
-
-        return $this->templates['label']->getBlock('label', array(
-            'id'         => $field->getId(),
-            'key'        => $field->getKey(),
-            'label'      => null !== $label ? $label : ucfirst(strtolower(str_replace('_', ' ', $field->getKey()))),
-            'attributes' => $attributes,
-        ));
-    }
-
-    public function renderWidget(FieldInterface $field, array $attributes = array(), $resources = null)
-    {
-        if (null === $this->templates) {
-            $this->templates = $this->resolveResources($this->resources);
-        }
-
-        if (null === $resources) {
+        if (null !== $resources) {
+            // The developer provided a custom theme in the filter call
+            $resources = array($resources);
+        } else {
+            // The default theme is used
             $parent = $field;
             $resources = array();
             while ($parent = $parent->getParent()) {
@@ -169,31 +129,71 @@ class FormExtension extends \Twig_Extension
                     $resources = $this->themes[$parent];
                 }
             }
-        } else {
-            $resources = array($resources);
         }
 
         list($widget, $template) = $this->getWidget($field, $resources);
 
         return $template->getBlock($widget, array(
-            'field'      => $field,
-            'attributes' => array_merge($field->getAttributes(), $attributes),
+            'field'  => $field,
+            'attr'   => $attributes,
+            'params' => $parameters,
         ));
     }
 
-    public function renderData(FieldInterface $field)
+    /**
+     * Renders all hidden fields of the given field group
+     *
+     * @param FieldGroupInterface $group   The field group
+     * @param array $params                Additional variables passed to the
+     *                                     template
+     */
+    public function renderHidden(FieldGroupInterface $group, array $parameters = array())
     {
-        return $field->getData();
+        if (null === $this->templates) {
+            $this->templates = $this->resolveResources($this->resources);
+        }
+
+        return $this->templates['hidden']->getBlock('hidden', array(
+            'field'  => $group,
+            'params' => $parameters,
+        ));
     }
 
-    public function renderChoices(FieldInterface $field)
+    /**
+     * Renders the errors of the given field
+     *
+     * @param FieldInterface $field  The field to render the errors for
+     * @param array $params          Additional variables passed to the template
+     */
+    public function renderErrors(FieldInterface $field, array $parameters = array())
     {
-        return $this->generator->choices(
-            $field->getPreferredChoices(),
-            $field->getOtherChoices(),
-            $field->getEmptyValue(),
-            $field->getSelected()
-        );
+        if (null === $this->templates) {
+            $this->templates = $this->resolveResources($this->resources);
+        }
+
+        return $this->templates['errors']->getBlock('errors', array(
+            'field'  => $field,
+            'params' => $parameters,
+        ));
+    }
+
+    /**
+     * Renders the label of the given field
+     *
+     * @param FieldInterface $field  The field to render the label for
+     * @param array $params          Additional variables passed to the template
+     */
+    public function renderLabel(FieldInterface $field, $label = null, array $parameters = array())
+    {
+        if (null === $this->templates) {
+            $this->templates = $this->resolveResources($this->resources);
+        }
+
+        return $this->templates['label']->getBlock('label', array(
+            'field'  => $field,
+            'params' => $parameters,
+            'label'  => null !== $label ? $label : ucfirst(strtolower(str_replace('_', ' ', $field->getKey()))),
+        ));
     }
 
     protected function getWidget(FieldInterface $field, array $resources = array())

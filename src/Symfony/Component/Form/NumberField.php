@@ -18,18 +18,8 @@ use Symfony\Component\Form\ValueTransformer\NumberToLocalizedStringTransformer;
  *
  * @author Bernhard Schussek <bernhard.schussek@symfony-project.com>
  */
-class NumberField extends InputField
+class NumberField extends Field
 {
-    /**
-     * {@inheritDoc}
-     */
-    public function __construct($key, array $options = array())
-    {
-        $options['type'] = 'text';
-
-        parent::__construct($key, $options);
-    }
-
     /**
      * {@inheritDoc}
      */

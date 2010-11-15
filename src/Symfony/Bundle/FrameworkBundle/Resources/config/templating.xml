@@ -20,8 +20,7 @@
         <parameter key="templating.helper.code.class">Symfony\Bundle\FrameworkBundle\Templating\Helper\CodeHelper</parameter>
         <parameter key="templating.helper.translator.class">Symfony\Bundle\FrameworkBundle\Templating\Helper\TranslatorHelper</parameter>
         <parameter key="templating.helper.security.class">Symfony\Bundle\FrameworkBundle\Templating\Helper\SecurityHelper</parameter>
-        <parameter key="templating.form.class">Symfony\Bundle\FrameworkBundle\Templating\Form\Form</parameter>
-        <parameter key="templating.html.generator.class">Symfony\Bundle\FrameworkBundle\Templating\HtmlGenerator</parameter>
+        <parameter key="templating.helper.form.class">Symfony\Bundle\FrameworkBundle\Templating\Helper\FormHelper</parameter>
         <parameter key="templating.output_escaper">false</parameter>
         <parameter key="templating.assets.version">null</parameter>
         <parameter key="templating.assets.base_urls" type="collection"></parameter>
@@ -29,8 +28,6 @@
     </parameters>
 
     <services>
-        <service id="templating.html.generator" class="%templating.html.generator.class%" />
-
         <service id="templating.engine" class="%templating.engine.class%">
             <argument type="service" id="service_container" />
             <argument type="service" id="templating.loader" />
@@ -111,9 +108,9 @@
             <argument type="service" id="security.context" on-invalid="ignore" />
         </service>
 
-        <service id="templating.form" class="%templating.form.class%">
+        <service id="templating.helper.form" class="%templating.helper.form.class%">
+            <tag name="templating.helper" alias="form" />
             <argument type="service" id="templating" />
-            <argument type="service" id="templating.html.generator" />
         </service>
 
         <service id="templating.loader" alias="templating.loader.filesystem" />

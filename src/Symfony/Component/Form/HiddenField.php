@@ -16,18 +16,8 @@ namespace Symfony\Component\Form;
  *
  * @author Bernhard Schussek <bernhard.schussek@symfony-project.com>
  */
-class HiddenField extends InputField
+class HiddenField extends Field
 {
-    /**
-     * {@inheritDoc}
-     */
-    public function __construct($key, array $options = array())
-    {
-        $options['type'] = 'hidden';
-
-        parent::__construct($key, $options);
-    }
-
     /**
      * {@inheritDoc}
      */

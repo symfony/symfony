@@ -18,9 +18,4 @@ namespace Symfony\Component\Form;
  */
 interface FieldGroupInterface extends FieldInterface, \ArrayAccess, \Traversable, \Countable
 {
-    /**
-     * Returns whether the Field instance really is a group
-     * @return bool
-     */
-    public function isGroup();
 }

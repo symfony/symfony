@@ -121,18 +121,9 @@ class TimeField extends FieldGroup
         return self::INPUT === $this->getOption('widget');
     }
 
-    /**
-     * {@inheritDoc}
-     */
-    public function getAttributes()
+    public function isWithSeconds()
     {
-        if ($this->isField()) {
-            return array_merge(parent::getAttributes(), array(
-                'size' => '1',
-            ));
-        }
-
-        return parent::getAttributes();
+        return $this->getOption('with_seconds');
     }
 
     /**

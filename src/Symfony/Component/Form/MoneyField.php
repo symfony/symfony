@@ -53,7 +53,7 @@ class MoneyField extends NumberField
      * The pattern contains the placeholder "{{ widget }}" where the HTML tag should
      * be inserted
      */
-    protected function getPattern()
+    public function getPattern()
     {
         if (!$this->getOption('currency')) {
             return '{{ widget }}';

@@ -50,7 +50,7 @@ class ChoiceField extends HybridField
             $this->preferredChoices = array_flip($this->getOption('preferred_choices'));
         }
 
-        if ($this->getOption('expanded')) {
+        if ($this->isExpanded()) {
             $this->setFieldMode(self::GROUP);
 
             $choices = $this->getOption('choices');
@@ -71,34 +71,19 @@ class ChoiceField extends HybridField
         parent::configure();
     }
 
-    /**
-     * {@inheritDoc}
-     */
-    public function getAttributes()
+    public function getName()
     {
-        $attributes = array(
-            'id'       => $this->getId(),
-            'name'     => $this->getName(),
-            'disabled' => $this->isDisabled(),
-        );
+        // TESTME
+        $name = parent::getName();
 
         // Add "[]" to the name in case a select tag with multiple options is
         // displayed. Otherwise only one of the selected options is sent in the
         // POST request.
-        if ($this->getOption('multiple') && !$this->getOption('expanded')) {
-            $attributes['name'] .= '[]';
+        if ($this->isMultipleChoice() && !$this->isExpanded()) {
+            $name .= '[]';
         }
 
-        if ($this->getOption('multiple')) {
-            $attributes['multiple'] = 'multiple';
-        }
-
-        return array_merge(parent::getAttributes(), $attributes);
-    }
-
-    public function getSelected()
-    {
-        return array_flip(array_map('strval', (array) $this->getDisplayedData()));
+        return $name;
     }
 
     public function getPreferredChoices()
@@ -116,6 +101,33 @@ class ChoiceField extends HybridField
         return $this->isRequired() ? false : $this->getOption('empty_value');
     }
 
+    public function getLabel($choice)
+    {
+        $choices = $this->getOption('choices');
+
+        return isset($choices[$choice]) ? $choices[$choice] : null;
+    }
+
+    public function isChoiceGroup($choice)
+    {
+        return is_array($choice) || $choice instanceof \Traversable;
+    }
+
+    public function isChoiceSelected($choice)
+    {
+        return in_array($choice, (array) $this->getDisplayedData());
+    }
+
+    public function isMultipleChoice()
+    {
+        return $this->getOption('multiple');
+    }
+
+    public function isExpanded()
+    {
+        return $this->getOption('expanded');
+    }
+
     /**
      * Returns a new field of type radio button or checkbox.
      *
@@ -124,16 +136,15 @@ class ChoiceField extends HybridField
      */
     protected function newChoiceField($choice, $label)
     {
-        if ($this->getOption('multiple')) {
+        if ($this->isMultipleChoice()) {
             return new CheckboxField($choice, array(
                 'value' => $choice,
-                'label' => $label,
+            ));
+        } else {
+            return new RadioField($choice, array(
+                'value' => $choice,
             ));
         }
-        return new RadioField($choice, array(
-            'value' => $choice,
-            'label' => $label,
-        ));
     }
 
     /**
@@ -144,7 +155,7 @@ class ChoiceField extends HybridField
      */
     public function bind($value)
     {
-        if (!$this->getOption('multiple') && $this->getOption('expanded')) {
+        if (!$this->isMultipleChoice() && $this->isExpanded()) {
             $value = $value === null ? array() : array($value => true);
         }
 
@@ -166,12 +177,12 @@ class ChoiceField extends HybridField
      */
     protected function transform($value)
     {
-        if ($this->getOption('expanded')) {
+        if ($this->isExpanded()) {
             $value = parent::transform($value);
             $choices = $this->getOption('choices');
 
             foreach ($choices as $choice => $_) {
-                $choices[$choice] = $this->getOption('multiple')
+                $choices[$choice] = $this->isMultipleChoice()
                     ? in_array($choice, (array)$value, true)
                     : ($choice === $value);
             }
@@ -196,7 +207,7 @@ class ChoiceField extends HybridField
      */
     protected function reverseTransform($value)
     {
-        if ($this->getOption('expanded')) {
+        if ($this->isExpanded()) {
             $choices = array();
 
             foreach ($value as $choice => $selected) {
@@ -205,7 +216,7 @@ class ChoiceField extends HybridField
                 }
             }
 
-            if ($this->getOption('multiple')) {
+            if ($this->isMultipleChoice()) {
                 $value = $choices;
             } else {
                 $value =  count($choices) > 0 ? current($choices) : null;

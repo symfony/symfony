@@ -103,11 +103,6 @@ abstract class Field extends Configurable implements FieldInterface
         // TODO
     }
 
-    public function getAttributes()
-    {
-        return array();
-    }
-
     /**
      * Returns the data of the field as it is displayed to the user.
      *

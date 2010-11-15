@@ -21,21 +21,9 @@ class RadioField extends ToggleField
     /**
      * {@inheritDoc}
      */
-    public function __construct($key, array $options = array())
+    public function getName()
     {
-        $options['type'] = 'radio';
-
-        parent::__construct($key, $options);
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    public function getAttributes()
-    {
-        return array_merge(parent::getAttributes(), array(
-            // TODO: should getName() be overridden instead?
-            'name' => $this->getParent() ? $this->getParent()->getName() : $this->getName(),
-        ));
+        // TESTME
+        return $this->getParent() ? $this->getParent()->getName() : $this->getName();
     }
 }

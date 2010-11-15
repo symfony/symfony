@@ -28,15 +28,11 @@ class PasswordField extends TextField
         parent::configure();
     }
 
-    /**
-     * {@inheritDoc}
-     */
-    public function getAttributes()
+    public function getDisplayedData()
     {
-        return array_merge(parent::getAttributes(), array(
-            // override getDisplayedData() instead?
-            'value'       => $this->getOption('always_empty') && !$this->isBound() ? '' : $this->getDisplayedData(),
-            'type'        => 'password',
-        ));
+        // TESTME
+        return $this->getOption('always_empty') && !$this->isBound()
+                ? ''
+                : parent::getDisplayedData();
     }
 }

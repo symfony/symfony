@@ -43,11 +43,6 @@
             <argument type="service" id="translator" />
         </service>
 
-        <service id="twig.extension.html" class="Symfony\Bundle\TwigBundle\Extension\HtmlExtension">
-            <tag name="twig.extension" />
-            <argument type="service" id="templating.html.generator" />
-        </service>
-
         <service id="twig.extension.helpers" class="Symfony\Bundle\TwigBundle\Extension\TemplatingExtension">
             <tag name="twig.extension" />
             <argument type="service" id="service_container" />
@@ -55,7 +50,6 @@
 
         <service id="twig.extension.form" class="Symfony\Bundle\TwigBundle\Extension\FormExtension">
             <tag name="twig.extension" />
-            <argument type="service" id="templating.html.generator" />
             <argument>%twig.form.resources%</argument>
         </service>
 

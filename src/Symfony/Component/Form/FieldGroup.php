@@ -216,7 +216,7 @@ class FieldGroup extends Field implements \IteratorAggregate, FieldGroupInterfac
      *
      * @return array
      */
-    public function getVisibleFieldsRecursively()
+    public function getAllVisibleFields()
     {
         return $this->getFieldsByVisibility(false, true);
     }
@@ -239,7 +239,7 @@ class FieldGroup extends Field implements \IteratorAggregate, FieldGroupInterfac
      *
      * @return array
      */
-    public function getHiddenFieldsRecursively()
+    public function getAllHiddenFields()
     {
         return $this->getFieldsByVisibility(true, true);
     }
@@ -255,13 +255,12 @@ class FieldGroup extends Field implements \IteratorAggregate, FieldGroupInterfac
     protected function getFieldsByVisibility($hidden, $recursive)
     {
         $fields = array();
+        $hidden = (bool)$hidden;
 
         foreach ($this->fields as $field) {
-            if ($field instanceof FieldGroup) {
-                if ($recursive) {
-                    $fields = array_merge($fields, $field->getFieldsByVisibility($hidden, $recursive));
-                }
-            } else if ((bool)$hidden === $field->isHidden()) {
+            if ($field instanceof FieldGroup && $recursive) {
+                $fields = array_merge($fields, $field->getFieldsByVisibility($hidden, $recursive));
+            } else if ($hidden === $field->isHidden()) {
                 $fields[] = $field;
             }
         }
@@ -445,11 +444,6 @@ class FieldGroup extends Field implements \IteratorAggregate, FieldGroupInterfac
         }
 
         return false;
-    }
-
-    public function isGroup()
-    {
-        return true;
     }
 
     /**

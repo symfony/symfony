@@ -18,16 +18,4 @@ namespace Symfony\Component\Form;
  */
 class TextareaField extends Field
 {
-    /**
-     * {@inheritDoc}
-     */
-    public function getAttributes()
-    {
-        return array_merge(parent::getAttributes(), array(
-            'id'    => $this->getId(),
-            'name'  => $this->getName(),
-            'rows'  => 4,
-            'cols'  => 30,
-        ));
-    }
 }

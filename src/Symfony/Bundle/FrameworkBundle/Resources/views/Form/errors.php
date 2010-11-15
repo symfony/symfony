@@ -1,7 +1,7 @@
-<?php if ($errors): ?>
+<?php if ($field->hasErrors()): ?>
     <ul>
-        <?php foreach ($errors as $error): ?>
+        <?php foreach ($field->getErrors() as $error): ?>
             <li><?php echo $view['translator']->trans($error[0], $error[1], 'validators') ?></li>
         <?php endforeach; ?>
     </ul>
-<?php endif; ?>
+<?php endif ?>

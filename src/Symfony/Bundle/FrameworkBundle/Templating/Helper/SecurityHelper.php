@@ -28,7 +28,7 @@ class SecurityHelper extends Helper
      *
      * @param SecurityContext $context A SecurityContext instance
      */
-    public function __construct(SecurityContext $context)
+    public function __construct(SecurityContext $context = null)
     {
         $this->context = $context;
     }

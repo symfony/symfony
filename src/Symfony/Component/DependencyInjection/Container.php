@@ -52,7 +52,7 @@ use Symfony\Component\DependencyInjection\ParameterBag\FrozenParameterBag;
  *
  * @author Fabien Potencier <fabien.potencier@symfony-project.com>
  */
-class Container implements ContainerInterface, \ArrayAccess
+class Container implements ContainerInterface
 {
     protected $parameterBag;
     protected $services;
@@ -214,51 +214,6 @@ class Container implements ContainerInterface, \ArrayAccess
         }
 
         return array_merge($ids, array_keys($this->services));
-    }
-
-    /**
-     * Returns true if the service id is defined (implements the ArrayAccess interface).
-     *
-     * @param  string  $id The service id
-     *
-     * @return Boolean true if the service id is defined, false otherwise
-     */
-    public function offsetExists($id)
-    {
-        return $this->has($id);
-    }
-
-    /**
-     * Gets a service by id (implements the ArrayAccess interface).
-     *
-     * @param  string $id The service id
-     *
-     * @return mixed  The parameter value
-     */
-    public function offsetGet($id)
-    {
-        return $this->get($id);
-    }
-
-    /**
-     * Sets a service (implements the ArrayAccess interface).
-     *
-     * @param string $id    The service id
-     * @param object $value The service
-     */
-    public function offsetSet($id, $value)
-    {
-        $this->set($id, $value);
-    }
-
-    /**
-     * Removes a service (implements the ArrayAccess interface).
-     *
-     * @param string $id The service id
-     */
-    public function offsetUnset($id)
-    {
-        throw new \LogicException(sprintf('You can\'t unset a service (%s).', $id));
     }
 
     /**

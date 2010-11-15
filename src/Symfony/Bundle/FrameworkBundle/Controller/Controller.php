@@ -22,7 +22,7 @@ use Symfony\Component\DependencyInjection\ContainerAware;
  *
  * @author Fabien Potencier <fabien.potencier@symfony-project.com>
  */
-class Controller extends ContainerAware implements \ArrayAccess
+class Controller extends ContainerAware
 {
     /**
      * Creates a Response instance.
@@ -113,47 +113,26 @@ class Controller extends ContainerAware implements \ArrayAccess
     }
 
     /**
-     * Returns true if the service id is defined (implements the ArrayAccess interface).
+     * Returns true if the service id is defined.
      *
      * @param  string  $id The service id
      *
      * @return Boolean true if the service id is defined, false otherwise
      */
-    public function offsetExists($id)
+    public function has($id)
     {
         return $this->container->has($id);
     }
 
     /**
-     * Gets a service by id (implements the ArrayAccess interface).
+     * Gets a service by id.
      *
      * @param  string $id The service id
      *
-     * @return mixed  The parameter value
+     * @return object  The service
      */
-    public function offsetGet($id)
+    public function get($id)
     {
         return $this->container->get($id);
-    }
-
-    /**
-     * Sets a service (implements the ArrayAccess interface).
-     *
-     * @param string $id    The service id
-     * @param object $value The service
-     */
-    public function offsetSet($id, $value)
-    {
-        throw new \LogicException(sprintf('You can\'t set a service from a controller (%s).', $id));
-    }
-
-    /**
-     * Removes a service (implements the ArrayAccess interface).
-     *
-     * @param string $id The service id
-     */
-    public function offsetUnset($id)
-    {
-        throw new \LogicException(sprintf('You can\'t unset a service from a controller (%s).', $id));
     }
 }

@@ -118,31 +118,17 @@ class ContainerTest extends \PHPUnit_Framework_TestCase
     }
 
     /**
-     * @covers Symfony\Component\DependencyInjection\Container::offsetUnset
-     * @expectedException LogicException
-     */
-    public function testOffetUnset()
-    {
-        $sc = new Container();
-        unset($sc['foo']);
-    }
-
-    /**
      * @covers Symfony\Component\DependencyInjection\Container::set
-     * @covers Symfony\Component\DependencyInjection\Container::offsetSet
      */
     public function testSet()
     {
         $sc = new Container();
         $sc->set('foo', $foo = new \stdClass());
         $this->assertEquals($foo, $sc->get('foo'), '->set() sets a service');
-        $sc['bar'] = $foo = new \stdClass();
-        $this->assertEquals($foo, $sc->get('bar'), '->offsetSet() sets a service');
     }
 
     /**
      * @covers Symfony\Component\DependencyInjection\Container::get
-     * @covers Symfony\Component\DependencyInjection\Container::offsetGet
      */
     public function testGet()
     {
@@ -171,19 +157,10 @@ class ContainerTest extends \PHPUnit_Framework_TestCase
             $this->assertEquals('The service "" does not exist.', $e->getMessage(), '->get() throws a \InvalidArgumentException exception if the service is empty');
         }
         $this->assertNull($sc->get('', ContainerInterface::NULL_ON_INVALID_REFERENCE));
-
-        try {
-            $sc[''];
-            $this->fail('->get() throws a \InvalidArgumentException exception if the service is empty');
-        } catch (\Exception $e) {
-            $this->assertInstanceOf('\InvalidArgumentException', $e, '->get() throws a \InvalidArgumentException exception if the service is empty');
-            $this->assertEquals('The service "" does not exist.', $e->getMessage(), '->get() throws a \InvalidArgumentException exception if the service is empty');
-        }
     }
 
     /**
      * @covers Symfony\Component\DependencyInjection\Container::has
-     * @covers Symfony\Component\DependencyInjection\Container::offsetExists
      */
     public function testHas()
     {
@@ -194,12 +171,6 @@ class ContainerTest extends \PHPUnit_Framework_TestCase
         $this->assertTrue($sc->has('bar'), '->has() returns true if a get*Method() is defined');
         $this->assertTrue($sc->has('foo_bar'), '->has() returns true if a get*Method() is defined');
         $this->assertTrue($sc->has('foo.baz'), '->has() returns true if a get*Method() is defined');
-
-        $this->assertFalse(isset($sc['foo1']), '->offsetExists() returns false if the service does not exist');
-        $this->assertTrue(isset($sc['foo']), '->offsetExists() returns true if the service exists');
-        $this->assertTrue(isset($sc['bar']), '->offsetExists() returns true if a get*Method() is defined');
-        $this->assertTrue(isset($sc['foo_bar']), '->offsetExists() returns true if a get*Method() is defined');
-        $this->assertTrue(isset($sc['foo.baz']), '->offsetExists() returns true if a get*Method() is defined');
     }
 }
 

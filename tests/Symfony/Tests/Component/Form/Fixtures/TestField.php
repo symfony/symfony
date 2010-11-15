@@ -14,22 +14,6 @@ class TestField extends Field
     /**
      * Expose method for testing purposes
      */
-    public function setNormalizationTransformer(ValueTransformerInterface $normalizationTransformer)
-    {
-        parent::setNormalizationTransformer($normalizationTransformer);
-    }
-
-    /**
-     * Expose method for testing purposes
-     */
-    public function setValueTransformer(ValueTransformerInterface $valueTransformer)
-    {
-        parent::setValueTransformer($valueTransformer);
-    }
-
-    /**
-     * Expose method for testing purposes
-     */
     public function getNormalizedData()
     {
         return parent::getNormalizedData();

@@ -184,7 +184,7 @@ class XmlFileLoader extends FileLoader
         $nodes = $xml->xpath('//container:argument[@type="service"][not(@id)]');
         foreach ($nodes as $node) {
             // give it a unique name
-            $node['id'] = sprintf('_%s_%d', md5($file), ++$count);
+            $node['id'] = sprintf('%s_%d', md5($file), ++$count);
 
             $definitions[(string) $node['id']] = array($node->service, $file, false);
             $node->service['id'] = (string) $node['id'];
@@ -194,7 +194,7 @@ class XmlFileLoader extends FileLoader
         $nodes = $xml->xpath('//container:service[not(@id)]');
         foreach ($nodes as $node) {
             // give it a unique name
-            $node['id'] = sprintf('_%s_%d', md5($file), ++$count);
+            $node['id'] = sprintf('%s_%d', md5($file), ++$count);
 
             $definitions[(string) $node['id']] = array($node, $file, true);
             $node->service['id'] = (string) $node['id'];

@@ -119,6 +119,16 @@ class FieldGroupTest extends \PHPUnit_Framework_TestCase
         $this->assertTrue($group->isBoundWithExtraFields());
     }
 
+    public function testHasNoErrorsIfOnlyFieldHasErrors()
+    {
+        $group = new TestFieldGroup('author');
+        $group->add($this->createInvalidMockField('firstName'));
+
+        $group->bind(array('firstName' => 'Bernhard'));
+
+        $this->assertFalse($group->hasErrors());
+    }
+
     public function testBindForwardsBoundValues()
     {
         $field = $this->createMockField('firstName');

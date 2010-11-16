@@ -349,7 +349,11 @@ abstract class Field extends Configurable implements FieldInterface
      */
     public function hasErrors()
     {
-        return $this->isBound() && !$this->isValid();
+        // Don't call isValid() here, as its semantics are slightly different
+        // Field groups are not valid if their children are invalid, but
+        // hasErrors() returns only true if a field/field group itself has
+        // errors
+        return count($this->errors) > 0;
     }
 
     /**

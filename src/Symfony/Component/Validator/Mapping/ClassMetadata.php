@@ -12,7 +12,8 @@ namespace Symfony\Component\Validator\Mapping;
  */
 
 use Symfony\Component\Validator\Constraint;
-use Symfony\Component\Validator\Exception\ValidatorException;
+use Symfony\Component\Validator\Constraints\Valid;
+use Symfony\Component\Validator\Exception\ConstraintDefinitionException;
 
 class ClassMetadata extends ElementMetadata
 {
@@ -77,6 +78,10 @@ class ClassMetadata extends ElementMetadata
      */
     public function addConstraint(Constraint $constraint)
     {
+        if ($constraint instanceof Valid) {
+            throw new ConstraintDefinitionException('The constraint Valid can only be put on properties or getters');
+        }
+
         $constraint->addImplicitGroupName($this->getShortClassName());
 
         parent::addConstraint($constraint);

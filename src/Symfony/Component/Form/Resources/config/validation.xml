@@ -17,9 +17,7 @@
 
   <class name="Symfony\Component\Form\Form">
     <getter property="data">
-      <constraint name="Valid">
-        <option name="groups">*</option>
-      </constraint>
+      <constraint name="Valid" />
     </getter>
     <getter property="postMaxSizeReached">
       <constraint name="AssertFalse">

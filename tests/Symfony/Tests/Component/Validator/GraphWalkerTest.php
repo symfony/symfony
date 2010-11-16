@@ -5,17 +5,19 @@ namespace Symfony\Tests\Component\Validator;
 require_once __DIR__.'/Fixtures/Entity.php';
 require_once __DIR__.'/Fixtures/ConstraintA.php';
 require_once __DIR__.'/Fixtures/ConstraintAValidator.php';
+require_once __DIR__.'/Fixtures/FailingConstraint.php';
+require_once __DIR__.'/Fixtures/FailingConstraintValidator.php';
+require_once __DIR__.'/Fixtures/FakeClassMetadataFactory.php';
 
 use Symfony\Tests\Component\Validator\Fixtures\Entity;
+use Symfony\Tests\Component\Validator\Fixtures\FakeClassMetadataFactory;
 use Symfony\Tests\Component\Validator\Fixtures\ConstraintA;
+use Symfony\Tests\Component\Validator\Fixtures\FailingConstraint;
 use Symfony\Component\Validator\GraphWalker;
 use Symfony\Component\Validator\ConstraintViolation;
 use Symfony\Component\Validator\ConstraintViolationList;
 use Symfony\Component\Validator\ConstraintValidatorFactory;
 use Symfony\Component\Validator\Mapping\ClassMetadata;
-use Symfony\Component\Validator\Mapping\PropertyMetadata;
-use Symfony\Component\Validator\Constraints\All;
-use Symfony\Component\Validator\Constraints\Any;
 use Symfony\Component\Validator\Constraints\Valid;
 
 class GraphWalkerTest extends \PHPUnit_Framework_TestCase
@@ -27,7 +29,7 @@ class GraphWalkerTest extends \PHPUnit_Framework_TestCase
 
     public function setUp()
     {
-        $this->factory = $this->getMock('Symfony\Component\Validator\Mapping\ClassMetadataFactoryInterface');
+        $this->factory = new FakeClassMetadataFactory();
         $this->walker = new GraphWalker('Root', $this->factory, new ConstraintValidatorFactory());
         $this->metadata = new ClassMetadata(self::CLASSNAME);
     }
@@ -66,6 +68,101 @@ class GraphWalkerTest extends \PHPUnit_Framework_TestCase
         $this->walker->walkPropertyValue($this->metadata, 'firstName', 'value', 'Default', '');
 
         $this->assertEquals(1, count($this->walker->getViolations()));
+    }
+
+    public function testWalkCascadedPropertyValidatesReferences()
+    {
+        $entity = new Entity();
+        $entityMetadata = new ClassMetadata(get_class($entity));
+        $this->factory->addClassMetadata($entityMetadata);
+
+        // add a constraint for the entity that always fails
+        $entityMetadata->addConstraint(new FailingConstraint());
+
+        // validate entity when validating the property "reference"
+        $this->metadata->addPropertyConstraint('reference', new Valid());
+
+        // invoke validation on an object
+        $this->walker->walkPropertyValue(
+            $this->metadata,
+            'reference',
+            $entity,  // object!
+            'Default',
+            'path'
+        );
+
+        $violations = new ConstraintViolationList();
+        $violations->add(new ConstraintViolation(
+            '',
+            array(),
+            'Root',
+            'path',
+            $entity
+        ));
+
+        $this->assertEquals($violations, $this->walker->getViolations());
+    }
+
+    public function testWalkCascadedPropertyValidatesArrays()
+    {
+        $entity = new Entity();
+        $entityMetadata = new ClassMetadata(get_class($entity));
+        $this->factory->addClassMetadata($entityMetadata);
+
+        // add a constraint for the entity that always fails
+        $entityMetadata->addConstraint(new FailingConstraint());
+
+        // validate array when validating the property "reference"
+        $this->metadata->addPropertyConstraint('reference', new Valid());
+
+        $this->walker->walkPropertyValue(
+            $this->metadata,
+            'reference',
+            array('key' => $entity), // array!
+            'Default',
+            'path'
+        );
+
+        $violations = new ConstraintViolationList();
+        $violations->add(new ConstraintViolation(
+            '',
+            array(),
+            'Root',
+            'path[key]',
+            $entity
+        ));
+
+        $this->assertEquals($violations, $this->walker->getViolations());
+    }
+
+    public function testWalkCascadedPropertyDoesNotValidateNullValues()
+    {
+        $this->metadata->addPropertyConstraint('reference', new Valid());
+
+        $this->walker->walkPropertyValue(
+            $this->metadata,
+            'reference',
+            null,
+            'Default',
+            ''
+        );
+
+        $this->assertEquals(0, count($this->walker->getViolations()));
+    }
+
+    public function testWalkCascadedPropertyRequiresObjectOrArray()
+    {
+        $this->metadata->addPropertyConstraint('reference', new Valid());
+
+        $this->setExpectedException('Symfony\Component\Validator\Exception\UnexpectedTypeException');
+
+        $this->walker->walkPropertyValue(
+            $this->metadata,
+            'reference',
+            'no object',
+            'Default',
+            ''
+        );
     }
 
     public function testWalkConstraintBuildsAViolationIfFailed()

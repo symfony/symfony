@@ -9,6 +9,7 @@ require_once __DIR__.'/../Fixtures/ConstraintB.php';
 use Symfony\Tests\Component\Validator\Fixtures\Entity;
 use Symfony\Tests\Component\Validator\Fixtures\ConstraintA;
 use Symfony\Tests\Component\Validator\Fixtures\ConstraintB;
+use Symfony\Component\Validator\Constraints\Valid;
 use Symfony\Component\Validator\Mapping\ClassMetadata;
 use Symfony\Component\Validator\Mapping\PropertyMetadata;
 
@@ -22,6 +23,13 @@ class ClassMetadataTest extends \PHPUnit_Framework_TestCase
     public function setUp()
     {
         $this->metadata = new ClassMetadata(self::CLASSNAME);
+    }
+
+    public function testAddConstraintDoesNotAcceptValid()
+    {
+        $this->setExpectedException('Symfony\Component\Validator\Exception\ConstraintDefinitionException');
+
+        $this->metadata->addConstraint(new Valid());
     }
 
     public function testAddPropertyConstraints()

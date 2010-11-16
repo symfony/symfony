@@ -7,6 +7,7 @@ require_once __DIR__.'/../Fixtures/ConstraintB.php';
 
 use Symfony\Tests\Component\Validator\Fixtures\ConstraintA;
 use Symfony\Tests\Component\Validator\Fixtures\ConstraintB;
+use Symfony\Component\Validator\Constraints\Valid;
 use Symfony\Component\Validator\Mapping\MemberMetadata;
 
 class MemberMetadataTest extends \PHPUnit_Framework_TestCase
@@ -20,6 +21,24 @@ class MemberMetadataTest extends \PHPUnit_Framework_TestCase
             'getLastName',
             'lastName'
         );
+    }
+
+    public function testAddValidSetsMemberToCascaded()
+    {
+        $result = $this->metadata->addConstraint(new Valid());
+
+        $this->assertEquals(array(), $this->metadata->getConstraints());
+        $this->assertEquals($result, $this->metadata);
+        $this->assertTrue($this->metadata->isCascaded());
+    }
+
+    public function testAddOtherConstraintDoesNotSetMemberToCascaded()
+    {
+        $result = $this->metadata->addConstraint($constraint = new ConstraintA());
+
+        $this->assertEquals(array($constraint), $this->metadata->getConstraints());
+        $this->assertEquals($result, $this->metadata);
+        $this->assertFalse($this->metadata->isCascaded());
     }
 
     public function testSerialize()

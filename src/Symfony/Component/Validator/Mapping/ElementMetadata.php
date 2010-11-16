@@ -95,14 +95,8 @@ abstract class ElementMetadata
      */
     public function findConstraints($group)
     {
-        $globalConstraints  = isset($this->constraintsByGroup['*'])
-                ? $this->constraintsByGroup['*']
-                : array();
-
-        $groupConstraints   = isset($this->constraintsByGroup[$group])
+        return isset($this->constraintsByGroup[$group])
                 ? $this->constraintsByGroup[$group]
                 : array();
-
-        return array_merge((array) $globalConstraints, (array) $groupConstraints);
     }
 }

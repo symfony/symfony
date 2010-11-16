@@ -11,6 +11,8 @@ namespace Symfony\Component\Validator\Mapping;
  * with this source code in the file LICENSE.
  */
 
+use Symfony\Component\Validator\Constraint;
+use Symfony\Component\Validator\Constraints\Valid;
 use Symfony\Component\Validator\Exception\ValidatorException;
 
 abstract class MemberMetadata extends ElementMetadata
@@ -18,6 +20,7 @@ abstract class MemberMetadata extends ElementMetadata
     public $class;
     public $name;
     public $property;
+    public $cascaded = false;
     private $reflMember;
 
     /**
@@ -35,6 +38,20 @@ abstract class MemberMetadata extends ElementMetadata
     }
 
     /**
+     * {@inheritDoc}
+     */
+    public function addConstraint(Constraint $constraint)
+    {
+        if ($constraint instanceof Valid) {
+            $this->cascaded = true;
+        } else {
+            parent::addConstraint($constraint);
+        }
+
+        return $this;
+    }
+
+    /**
      * Returns the names of the properties that should be serialized
      *
      * @return array
@@ -44,7 +61,8 @@ abstract class MemberMetadata extends ElementMetadata
         return array_merge(parent::__sleep(), array(
             'class',
             'name',
-            'property'
+            'property',
+            'cascaded', // TESTME
         ));
     }
 
@@ -106,6 +124,16 @@ abstract class MemberMetadata extends ElementMetadata
     public function isPrivate()
     {
         return $this->getReflectionMember()->isPrivate();
+    }
+
+    /**
+     * Returns whether objects stored in this member should be validated
+     *
+     * @return boolean
+     */
+    public function isCascaded()
+    {
+        return $this->cascaded;
     }
 
     /**

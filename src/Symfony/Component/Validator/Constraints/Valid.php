@@ -11,8 +11,21 @@ namespace Symfony\Component\Validator\Constraints;
  * with this source code in the file LICENSE.
  */
 
+use Symfony\Component\Validator\Exception\InvalidOptionsException;
+
 class Valid extends \Symfony\Component\Validator\Constraint
 {
-    public $message = 'This value should be instance of class {{ class }}';
-    public $class;
+    /**
+     * This constraint does not accept any options
+     *
+     * @param  mixed $options           Unsupported argument!
+     *
+     * @throws InvalidOptionsException  When the parameter $options is not NULL
+     */
+    public function __construct($options = null)
+    {
+        if (null !== $options) {
+            throw new InvalidOptionsException('The constraint Valid does not accept any options');
+        }
+    }
 }

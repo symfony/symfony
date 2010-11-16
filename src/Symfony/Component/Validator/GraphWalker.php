@@ -76,6 +76,26 @@ class GraphWalker
         foreach ($metadata->findConstraints($group) as $constraint) {
             $this->walkConstraint($constraint, $value, $group, $propertyPath);
         }
+
+        if ($metadata->isCascaded()) {
+            $this->walkReference($value, $group, $propertyPath);
+        }
+    }
+
+    protected function walkReference($value, $group, $propertyPath)
+    {
+        if (null !== $value) {
+            if (is_array($value)) {
+                foreach ($value as $key => $element) {
+                    $this->walkReference($element, $group, $propertyPath.'['.$key.']');
+                }
+            } else if (!is_object($value)) {
+                throw new UnexpectedTypeException($value, 'object or array');
+            } else {
+                $metadata = $this->metadataFactory->getClassMetadata(get_class($value));
+                $this->walkClass($metadata, $value, $group, $propertyPath);
+            }
+        }
     }
 
     public function walkConstraint(Constraint $constraint, $value, $group, $propertyPath)

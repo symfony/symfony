@@ -3,6 +3,7 @@
 namespace Symfony\Tests\Component\Validator;
 
 require_once __DIR__.'/Fixtures/Entity.php';
+require_once __DIR__.'/Fixtures/Reference.php';
 require_once __DIR__.'/Fixtures/ConstraintA.php';
 require_once __DIR__.'/Fixtures/ConstraintAValidator.php';
 require_once __DIR__.'/Fixtures/FailingConstraint.php';
@@ -10,6 +11,7 @@ require_once __DIR__.'/Fixtures/FailingConstraintValidator.php';
 require_once __DIR__.'/Fixtures/FakeClassMetadataFactory.php';
 
 use Symfony\Tests\Component\Validator\Fixtures\Entity;
+use Symfony\Tests\Component\Validator\Fixtures\Reference;
 use Symfony\Tests\Component\Validator\Fixtures\FakeClassMetadataFactory;
 use Symfony\Tests\Component\Validator\Fixtures\ConstraintA;
 use Symfony\Tests\Component\Validator\Fixtures\FailingConstraint;
@@ -25,6 +27,7 @@ class GraphWalkerTest extends \PHPUnit_Framework_TestCase
     const CLASSNAME = 'Symfony\Tests\Component\Validator\Fixtures\Entity';
 
     protected $factory;
+    protected $walker;
     protected $metadata;
 
     public function setUp()
@@ -59,6 +62,93 @@ class GraphWalkerTest extends \PHPUnit_Framework_TestCase
         $this->walker->walkClass($this->metadata, new Entity(), 'Default', '');
 
         $this->assertEquals(1, count($this->walker->getViolations()));
+    }
+
+    public function testWalkClassInDefaultGroupTraversesGroupSequence()
+    {
+        $entity = new Entity();
+
+        $this->metadata->addPropertyConstraint('firstName', new FailingConstraint(array(
+            'groups' => 'First',
+        )));
+        $this->metadata->addGetterConstraint('lastName', new FailingConstraint(array(
+            'groups' => 'Second',
+        )));
+        $this->metadata->setGroupSequence(array('First', 'Second'));
+
+        $this->walker->walkClass($this->metadata, $entity, 'Default', '');
+
+        // After validation of group "First" failed, no more group was
+        // validated
+        $violations = new ConstraintViolationList();
+        $violations->add(new ConstraintViolation(
+            '',
+            array(),
+            'Root',
+            'firstName',
+            ''
+        ));
+
+        $this->assertEquals($violations, $this->walker->getViolations());
+    }
+
+    public function testWalkClassInGroupSequencePropagatesDefaultGroup()
+    {
+        $entity = new Entity();
+        $entity->reference = new Reference();
+
+        $this->metadata->addPropertyConstraint('reference', new Valid());
+        $this->metadata->setGroupSequence(array('First'));
+
+        $referenceMetadata = new ClassMetadata(get_class($entity->reference));
+        $referenceMetadata->addConstraint(new FailingConstraint(array(
+            // this constraint is only evaluated if group "Default" is
+            // propagated to the reference
+            'groups' => 'Default',
+        )));
+        $this->factory->addClassMetadata($referenceMetadata);
+
+        $this->walker->walkClass($this->metadata, $entity, 'Default', '');
+
+        // The validation of the reference's FailingConstraint in group
+        // "Default" was launched
+        $violations = new ConstraintViolationList();
+        $violations->add(new ConstraintViolation(
+            '',
+            array(),
+            'Root',
+            'reference',
+            $entity->reference
+        ));
+
+        $this->assertEquals($violations, $this->walker->getViolations());
+    }
+
+    public function testWalkClassInOtherGroupTraversesNoGroupSequence()
+    {
+        $entity = new Entity();
+
+        $this->metadata->addPropertyConstraint('firstName', new FailingConstraint(array(
+            'groups' => 'First',
+        )));
+        $this->metadata->addGetterConstraint('lastName', new FailingConstraint(array(
+            'groups' => 'Second',
+        )));
+        $this->metadata->setGroupSequence(array('First', 'Second'));
+
+        $this->walker->walkClass($this->metadata, $entity, 'Second', '');
+
+        // Only group "Second" was validated
+        $violations = new ConstraintViolationList();
+        $violations->add(new ConstraintViolation(
+            '',
+            array(),
+            'Root',
+            'lastName',
+            ''
+        ));
+
+        $this->assertEquals($violations, $this->walker->getViolations());
     }
 
     public function testWalkPropertyValueValidatesConstraints()

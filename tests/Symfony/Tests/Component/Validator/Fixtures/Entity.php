@@ -26,7 +26,7 @@ class Entity extends EntityParent implements EntityInterface
      */
     protected $firstName;
     protected $lastName;
-    protected $reference;
+    public $reference;
 
     private $internal;
 

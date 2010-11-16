@@ -74,6 +74,8 @@ abstract class WebTestCase extends BaseWebTestCase
             $dir = $dir.'/'.$matches[1];
         } elseif (preg_match('/\-c +([^ ]+)/', $cli, $matches)) {
             $dir = $dir.'/'.$matches[1];
+        } elseif (file_exists(getcwd().'/phpunit.xml') || file_exists(getcwd().'/phpunit.xml.dist')) {
+            $dir = getcwd();
         } else {
             throw new \RuntimeException('Unable to guess the Kernel directory.');
         }

@@ -25,7 +25,7 @@ class ArrayLoader implements LoaderInterface
      */
     public function load($resource, $locale, $domain = 'messages')
     {
-        $catalogue = $this->flatten($resource);
+        $this->flatten($resource);
         $catalogue = new MessageCatalogue($locale);
         $catalogue->addMessages($resource, $domain);
 

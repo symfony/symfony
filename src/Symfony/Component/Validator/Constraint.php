@@ -26,7 +26,7 @@ use Symfony\Component\Validator\Exception\ConstraintDefinitionException;
  *
  * @author Bernhard Schussek <bernhard.schussek@symfony-project.com>
  */
-class Constraint
+abstract class Constraint
 {
     const DEFAULT_GROUP = 'Default';
 

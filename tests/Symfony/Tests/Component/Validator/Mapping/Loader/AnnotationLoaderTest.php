@@ -16,6 +16,13 @@ use Symfony\Tests\Component\Validator\Fixtures\ConstraintA;
 
 class AnnotationLoaderTest extends \PHPUnit_Framework_TestCase
 {
+    public function setUp()
+    {
+        if (!class_exists('Doctrine\Common\Annotations\AnnotationReader')) {
+            $this->markTestSkipped('Unmet dependency: doctrine-common is required for this test');
+        }
+    }
+
     public function testLoadClassMetadataReturnsTrueIfSuccessful()
     {
         $loader = new AnnotationLoader();
@@ -89,12 +96,12 @@ class AnnotationLoaderTest extends \PHPUnit_Framework_TestCase
         // Load Parent MetaData
         $parent_metadata = new ClassMetadata('Symfony\Tests\Component\Validator\Fixtures\EntityParent');
         $loader->loadClassMetadata($parent_metadata);
-         
+
         $metadata = new ClassMetadata('Symfony\Tests\Component\Validator\Fixtures\Entity');
 
         // Merge parent metaData.
         $metadata->mergeConstraints($parent_metadata);
-        
+
         $loader->loadClassMetadata($metadata);
 
         $expected_parent = new ClassMetadata('Symfony\Tests\Component\Validator\Fixtures\EntityParent');
@@ -103,7 +110,7 @@ class AnnotationLoaderTest extends \PHPUnit_Framework_TestCase
 
         $expected = new ClassMetadata('Symfony\Tests\Component\Validator\Fixtures\Entity');
         $expected->mergeConstraints($expected_parent);
-        
+
         $expected->addConstraint(new NotNull());
         $expected->addConstraint(new ConstraintA());
         $expected->addConstraint(new Min(3));

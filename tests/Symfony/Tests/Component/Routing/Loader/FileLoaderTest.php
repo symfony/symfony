@@ -40,7 +40,7 @@ class FileLoaderTest extends \PHPUnit_Framework_TestCase
 
         $this->assertEquals(__DIR__.DIRECTORY_SEPARATOR.'FileLoaderTest.php', $loader->getAbsolutePath('FileLoaderTest.php', __DIR__), '->getAbsolutePath() returns an absolute filename if the file exists in the current path');
 
-        $this->assertEquals(__DIR__.'/../Fixtures/foo.xml', $loader->getAbsolutePath('foo.xml', __DIR__), '->getAbsolutePath() returns an absolute filename if the file exists in one of the paths given in the constructor');
+        $this->assertEquals(__DIR__.'/../Fixtures'.DIRECTORY_SEPARATOR.'foo.xml', $loader->getAbsolutePath('foo.xml', __DIR__), '->getAbsolutePath() returns an absolute filename if the file exists in one of the paths given in the constructor');
 
         $this->assertEquals('foobar.xml', $loader->getAbsolutePath('foobar.xml', __DIR__), '->getAbsolutePath() returns the path unmodified if it is unable to find it in the given paths');
     }

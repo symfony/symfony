@@ -11,7 +11,7 @@ namespace Symfony\Component\Validator\Constraints;
  * with this source code in the file LICENSE.
  */
 
-use Symfony\Component\Validator\Exception\InvalidOptionsException;
+use Symfony\Component\Validator\Exception\ConstraintDefinitionException;
 
 class Valid extends \Symfony\Component\Validator\Constraint
 {
@@ -24,8 +24,8 @@ class Valid extends \Symfony\Component\Validator\Constraint
      */
     public function __construct($options = null)
     {
-        if (null !== $options) {
-            throw new InvalidOptionsException('The constraint Valid does not accept any options');
+        if ($options !== null && count($options) > 0) {
+            throw new ConstraintDefinitionException('The constraint Valid does not accept any options');
         }
     }
 }

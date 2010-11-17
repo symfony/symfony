@@ -35,18 +35,18 @@ class ExcludeDirectoryFilterIteratorTest extends RealIteratorTestCase
 
         return array(
             array(array('foo'), array(
-                $tmpDir.'/.git',
-                $tmpDir.'/test.py',
-                $tmpDir.'/test.php',
-                $tmpDir.'/toto'
+                $tmpDir.DIRECTORY_SEPARATOR.'.git',
+                $tmpDir.DIRECTORY_SEPARATOR.'test.py',
+                $tmpDir.DIRECTORY_SEPARATOR.'test.php',
+                $tmpDir.DIRECTORY_SEPARATOR.'toto'
             )),
             array(array('fo'), array(
-                $tmpDir.'/.git',
-                $tmpDir.'/test.py',
-                $tmpDir.'/foo',
-                $tmpDir.'/foo/bar.tmp',
-                $tmpDir.'/test.php',
-                $tmpDir.'/toto'
+                $tmpDir.DIRECTORY_SEPARATOR.'.git',
+                $tmpDir.DIRECTORY_SEPARATOR.'test.py',
+                $tmpDir.DIRECTORY_SEPARATOR.'foo',
+                $tmpDir.DIRECTORY_SEPARATOR.'foo'.DIRECTORY_SEPARATOR.'bar.tmp',
+                $tmpDir.DIRECTORY_SEPARATOR.'test.php',
+                $tmpDir.DIRECTORY_SEPARATOR.'toto'
             )),
         );
     }

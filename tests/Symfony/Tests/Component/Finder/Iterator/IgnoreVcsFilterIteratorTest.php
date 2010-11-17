@@ -26,11 +26,11 @@ class IgnoreVcsFilterIteratorTest extends RealIteratorTestCase
         $tmpDir = sys_get_temp_dir().'/symfony2_finder';
 
         $this->assertIterator(array(
-            $tmpDir.'/test.py',
-            $tmpDir.'/foo',
-            $tmpDir.'/foo/bar.tmp',
-            $tmpDir.'/test.php',
-            $tmpDir.'/toto'
+            $tmpDir.DIRECTORY_SEPARATOR.'test.py',
+            $tmpDir.DIRECTORY_SEPARATOR.'foo',
+            $tmpDir.DIRECTORY_SEPARATOR.'foo'.DIRECTORY_SEPARATOR.'bar.tmp',
+            $tmpDir.DIRECTORY_SEPARATOR.'test.php',
+            $tmpDir.DIRECTORY_SEPARATOR.'toto'
         ), $iterator);
     }
 }

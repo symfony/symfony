@@ -23,7 +23,7 @@ class FinderTest extends Iterator\RealIteratorTestCase
     {
         parent::setUpBeforeClass();
 
-        self::$tmpDir = sys_get_temp_dir().'/symfony2_finder/';
+        self::$tmpDir = sys_get_temp_dir().'/symfony2_finder';
     }
 
     public function testDirectories()
@@ -186,7 +186,7 @@ class FinderTest extends Iterator\RealIteratorTestCase
         $finder = new Finder();
         $iterator = $finder->files()->name('*.php')->depth('< 1')->in(array(self::$tmpDir, __DIR__))->getIterator();
 
-        $this->assertIterator(array(self::$tmpDir.'test.php', __DIR__.'/FinderTest.php', __DIR__.'/GlobTest.php'), $iterator);
+        $this->assertIterator(array(self::$tmpDir.DIRECTORY_SEPARATOR.'test.php', __DIR__.DIRECTORY_SEPARATOR.'FinderTest.php', __DIR__.DIRECTORY_SEPARATOR.'GlobTest.php'), $iterator);
     }
 
     public function testGetIterator()
@@ -226,7 +226,7 @@ class FinderTest extends Iterator\RealIteratorTestCase
     {
         $f = array();
         foreach ($files as $file) {
-            $f[] = self::$tmpDir.$file;
+            $f[] = self::$tmpDir . DIRECTORY_SEPARATOR . str_replace('/', DIRECTORY_SEPARATOR, $file);
         }
 
         return $f;

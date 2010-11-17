@@ -23,7 +23,7 @@ class DepthRangeFilterIteratorTest extends RealIteratorTestCase
      */
     public function testAccept($size, $expected)
     {
-        $inner = new \RecursiveIteratorIterator(new \RecursiveDirectoryIterator(sys_get_temp_dir().'/symfony2_finder', \FilesystemIterator::SKIP_DOTS), \RecursiveIteratorIterator::SELF_FIRST);
+        $inner = new \RecursiveIteratorIterator(new \RecursiveDirectoryIterator($this->getAbsolutePath(''), \FilesystemIterator::SKIP_DOTS), \RecursiveIteratorIterator::SELF_FIRST);
 
         $iterator = new DepthRangeFilterIterator($inner, $size);
 
@@ -36,11 +36,16 @@ class DepthRangeFilterIteratorTest extends RealIteratorTestCase
     public function getAcceptData()
     {
         return array(
-            array(array(new NumberComparator('< 1')), array(sys_get_temp_dir().'/symfony2_finder/.git', sys_get_temp_dir().'/symfony2_finder/test.py', sys_get_temp_dir().'/symfony2_finder/foo', sys_get_temp_dir().'/symfony2_finder/test.php', sys_get_temp_dir().'/symfony2_finder/toto')),
-            array(array(new NumberComparator('<= 1')), array(sys_get_temp_dir().'/symfony2_finder/.git', sys_get_temp_dir().'/symfony2_finder/test.py', sys_get_temp_dir().'/symfony2_finder/foo', sys_get_temp_dir().'/symfony2_finder/foo/bar.tmp', sys_get_temp_dir().'/symfony2_finder/test.php', sys_get_temp_dir().'/symfony2_finder/toto')),
+            array(array(new NumberComparator('< 1')), array($this->getAbsolutePath('/.git'), $this->getAbsolutePath('/test.py'), $this->getAbsolutePath('/foo'), $this->getAbsolutePath('/test.php'), $this->getAbsolutePath('/toto'))),
+            array(array(new NumberComparator('<= 1')), array($this->getAbsolutePath('/.git'), $this->getAbsolutePath('/test.py'), $this->getAbsolutePath('/foo'), $this->getAbsolutePath('/foo/bar.tmp'), $this->getAbsolutePath('/test.php'), $this->getAbsolutePath('/toto'))),
             array(array(new NumberComparator('> 1')), array()),
-            array(array(new NumberComparator('>= 1')), array(sys_get_temp_dir().'/symfony2_finder/foo/bar.tmp')),
-            array(array(new NumberComparator('1')), array(sys_get_temp_dir().'/symfony2_finder/foo/bar.tmp')),
+            array(array(new NumberComparator('>= 1')), array($this->getAbsolutePath('/foo/bar.tmp'))),
+            array(array(new NumberComparator('1')), array($this->getAbsolutePath('/foo/bar.tmp'))),
         );
+    }
+
+    protected function getAbsolutePath($path)
+    {
+        return sys_get_temp_dir().'/symfony2_finder'.str_replace('/', DIRECTORY_SEPARATOR, $path);
     }
 }

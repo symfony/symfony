@@ -31,9 +31,9 @@ class RealIteratorTestCase extends IteratorTestCase
 
         if (is_dir($tmpDir)) {
             self::tearDownAfterClass();
-            rmdir($tmpDir);
+        } else {
+            mkdir($tmpDir);
         }
-        mkdir($tmpDir);
 
         foreach (self::$files as $file) {
             if ('/' === $file[strlen($file) - 1]) {
@@ -46,8 +46,8 @@ class RealIteratorTestCase extends IteratorTestCase
         file_put_contents($tmpDir.'/test.php', str_repeat(' ', 800));
         file_put_contents($tmpDir.'/test.py', str_repeat(' ', 2000));
 
-        touch(sys_get_temp_dir().'/symfony2_finder/foo/bar.tmp', strtotime('2005-10-15'));
-        touch(sys_get_temp_dir().'/symfony2_finder/test.php', strtotime('2005-10-15'));
+        touch($tmpDir.'/foo/bar.tmp', strtotime('2005-10-15'));
+        touch($tmpDir.'/test.php', strtotime('2005-10-15'));
     }
 
     static public function tearDownAfterClass()

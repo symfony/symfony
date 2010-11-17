@@ -95,7 +95,7 @@ class CacheTest extends CacheTestCase
     {
         $time = new \DateTime();
 
-        $this->setNextResponse(200, array('Last-Modified' => $time->format(DATE_RFC2822), 'Content-Type', 'text/plain'), 'Hello World');
+        $this->setNextResponse(200, array('Last-Modified' => $time->format(DATE_RFC2822), 'Content-Type' => 'text/plain'), 'Hello World');
         $this->request('GET', '/', array('HTTP_IF_MODIFIED_SINCE' => $time->format(DATE_RFC2822)));
 
         $this->assertHttpKernelIsCalled();
@@ -109,7 +109,7 @@ class CacheTest extends CacheTestCase
 
     public function testRespondsWith304WhenIfNoneMatchMatchesETag()
     {
-        $this->setNextResponse(200, array('ETag' => '12345', 'Content-Type', 'text/plain'), 'Hello World');
+        $this->setNextResponse(200, array('ETag' => '12345', 'Content-Type' => 'text/plain'), 'Hello World');
         $this->request('GET', '/', array('HTTP_IF_NONE_MATCH' => '12345'));
 
         $this->assertHttpKernelIsCalled();

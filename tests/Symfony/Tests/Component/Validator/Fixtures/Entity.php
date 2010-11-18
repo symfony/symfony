@@ -18,6 +18,7 @@ require_once __DIR__.'/EntityInterface.php';
  *   "foo" = {@validation:NotNull, @validation:Min(3)},
  *   "bar" = @validation:Min(5)
  * })
+ * @validation:GroupSequence({"Foo", "Entity"})
  */
 class Entity extends EntityParent implements EntityInterface
 {

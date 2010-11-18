@@ -47,6 +47,7 @@ class AnnotationLoaderTest extends \PHPUnit_Framework_TestCase
         $loader->loadClassMetadata($metadata);
 
         $expected = new ClassMetadata('Symfony\Tests\Component\Validator\Fixtures\Entity');
+        $expected->setGroupSequence(array('Foo', 'Entity'));
         $expected->addConstraint(new NotNull());
         $expected->addConstraint(new ConstraintA());
         $expected->addConstraint(new Min(3));
@@ -111,6 +112,7 @@ class AnnotationLoaderTest extends \PHPUnit_Framework_TestCase
         $expected = new ClassMetadata('Symfony\Tests\Component\Validator\Fixtures\Entity');
         $expected->mergeConstraints($expected_parent);
 
+        $expected->setGroupSequence(array('Foo', 'Entity'));
         $expected->addConstraint(new NotNull());
         $expected->addConstraint(new ConstraintA());
         $expected->addConstraint(new Min(3));

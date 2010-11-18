@@ -22,6 +22,7 @@ class Escaper
     static protected $charset = 'UTF-8';
     static protected $safeClasses = array();
     static protected $escapers;
+    static protected $safeObjects = array();
 
     /**
      * Decorates a PHP variable with something that will escape any data obtained
@@ -75,6 +76,10 @@ class Escaper
         }
 
         if (is_object($value)) {
+            if (isset(self::$safeObjects[spl_object_hash($value)])) {
+                return $value;
+            }
+
             if ($value instanceof BaseEscaper) {
                 // avoid double decoration
                 $copy = clone $value;
@@ -86,7 +91,7 @@ class Escaper
             if ($value instanceof SafeDecorator) {
                 // do not escape objects marked as safe
                 // return the original object
-                return $value->getRawValue();
+                return self::$safeObjects[spl_object_hash($value->getRawValue())] = $value->getRawValue();
             }
 
             if (self::isClassMarkedAsSafe(get_class($value)) || $value instanceof SafeDecoratorInterface) {

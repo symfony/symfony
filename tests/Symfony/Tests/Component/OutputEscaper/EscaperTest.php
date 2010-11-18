@@ -153,6 +153,19 @@ class EscaperTest extends \PHPUnit_Framework_TestCase
         );
         $this->assertEquals($output, Escaper::unescape($input), '::unescape() unescapes values with some escaped and unescaped values');
     }
+
+    public function testEscaperRememberSafeDecoratedObjects()
+    {
+        $object = new \stdClass();
+        $object->foo = '<br />';
+
+        $var = new SafeDecorator($object);
+        Escaper::escape('entities', $var);
+
+        $escaped = Escaper::escape('entities', $object);
+
+        $this->assertEquals('<br />', $escaped->foo);
+    }
 }
 
 class OutputEscaperTestClass

@@ -50,7 +50,7 @@ class MimeTypeGuesser implements MimeTypeGuesserInterface
      */
     static public function getInstance()
     {
-        if (is_null(self::$instance)) {
+        if (null === self::$instance) {
             self::$instance = new self();
         }
 
@@ -112,7 +112,7 @@ class MimeTypeGuesser implements MimeTypeGuesserInterface
         foreach ($this->guessers as $guesser) {
             $mimeType = $guesser->guess($path);
 
-            if (!is_null($mimeType)) {
+            if (null !== $mimeType) {
                 break;
             }
         }

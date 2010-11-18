@@ -47,11 +47,11 @@ class UploadedFile extends File
             $this->path = realpath($path);
         }
 
-        if (is_null($error)) {
+        if (null === $error) {
             $error = UPLOAD_ERR_OK;
         }
 
-        if (is_null($mimeType)) {
+        if (null === $mimeType) {
             $mimeType = 'application/octet-stream';
         }
 
@@ -74,7 +74,7 @@ class UploadedFile extends File
     {
         $mimeType = parent::getMimeType();
 
-        if (is_null($mimeType)) {
+        if (null === $mimeType) {
             $mimeType = $this->mimeType;
         }
 

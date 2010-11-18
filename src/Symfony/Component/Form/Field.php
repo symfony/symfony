@@ -162,7 +162,7 @@ abstract class Field extends Configurable implements FieldInterface
      */
     public function getName()
     {
-        return is_null($this->parent) ? $this->key : $this->parent->getName().'['.$this->key.']';
+        return null === $this->parent ? $this->key : $this->parent->getName().'['.$this->key.']';
     }
 
     /**
@@ -170,7 +170,7 @@ abstract class Field extends Configurable implements FieldInterface
      */
     public function getId()
     {
-        return is_null($this->parent) ? $this->key : $this->parent->getId().'_'.$this->key;
+        return null === $this->parent ? $this->key : $this->parent->getId().'_'.$this->key;
     }
 
     /**
@@ -186,7 +186,7 @@ abstract class Field extends Configurable implements FieldInterface
      */
     public function isRequired()
     {
-        if (is_null($this->parent) || $this->parent->isRequired()) {
+        if (null === $this->parent || $this->parent->isRequired()) {
             return $this->required;
         }
         return false;
@@ -197,7 +197,7 @@ abstract class Field extends Configurable implements FieldInterface
      */
     public function isDisabled()
     {
-        if (is_null($this->parent) || !$this->parent->isDisabled()) {
+        if (null === $this->parent || !$this->parent->isDisabled()) {
             return $this->getOption('disabled');
         }
         return true;

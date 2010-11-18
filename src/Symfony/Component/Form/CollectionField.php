@@ -72,7 +72,7 @@ class CollectionField extends FieldGroup
 
     public function bind($taintedData)
     {
-        if (is_null($taintedData)) {
+        if (null === $taintedData) {
             $taintedData = array();
         }
 

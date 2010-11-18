@@ -2,16 +2,17 @@
 
 namespace Symfony\Tests\Component\Validator\Mapping;
 
-require_once __DIR__.'/../Fixtures/Entity.php';
-require_once __DIR__.'/../Fixtures/ConstraintA.php';
-require_once __DIR__.'/../Fixtures/ConstraintB.php';
-
-use Symfony\Tests\Component\Validator\Fixtures\Entity;
-use Symfony\Tests\Component\Validator\Fixtures\ConstraintA;
-use Symfony\Tests\Component\Validator\Fixtures\ConstraintB;
+use Symfony\Component\Validator\Constraint;
 use Symfony\Component\Validator\Constraints\Valid;
 use Symfony\Component\Validator\Mapping\ClassMetadata;
 use Symfony\Component\Validator\Mapping\PropertyMetadata;
+use Symfony\Tests\Component\Validator\Fixtures\Entity;
+use Symfony\Tests\Component\Validator\Fixtures\ConstraintA;
+use Symfony\Tests\Component\Validator\Fixtures\ConstraintB;
+
+require_once __DIR__.'/../Fixtures/Entity.php';
+require_once __DIR__.'/../Fixtures/ConstraintA.php';
+require_once __DIR__.'/../Fixtures/ConstraintB.php';
 
 class ClassMetadataTest extends \PHPUnit_Framework_TestCase
 {
@@ -138,6 +139,25 @@ class ClassMetadataTest extends \PHPUnit_Framework_TestCase
         $metadata = unserialize(serialize($this->metadata));
 
         $this->assertEquals($this->metadata, $metadata);
+    }
+
+    public function testGroupSequencesWorkIfContainingDefaultGroup()
+    {
+        $this->metadata->setGroupSequence(array('Foo', $this->metadata->getDefaultGroup()));
+    }
+
+    public function testGroupSequencesFailIfNotContainingDefaultGroup()
+    {
+        $this->setExpectedException('Symfony\Component\Validator\Exception\GroupDefinitionException');
+
+        $this->metadata->setGroupSequence(array('Foo', 'Bar'));
+    }
+
+    public function testGroupSequencesFailIfContainingDefault()
+    {
+        $this->setExpectedException('Symfony\Component\Validator\Exception\GroupDefinitionException');
+
+        $this->metadata->setGroupSequence(array('Foo', $this->metadata->getDefaultGroup(), Constraint::DEFAULT_GROUP));
     }
 }
 

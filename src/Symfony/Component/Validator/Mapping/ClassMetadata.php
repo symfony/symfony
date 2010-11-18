@@ -14,11 +14,12 @@ namespace Symfony\Component\Validator\Mapping;
 use Symfony\Component\Validator\Constraint;
 use Symfony\Component\Validator\Constraints\Valid;
 use Symfony\Component\Validator\Exception\ConstraintDefinitionException;
+use Symfony\Component\Validator\Exception\GroupDefinitionException;
 
 class ClassMetadata extends ElementMetadata
 {
     public $name;
-    public $shortName;
+    public $defaultGroup;
     public $members = array();
     public $properties = array();
     public $getters = array();
@@ -33,7 +34,8 @@ class ClassMetadata extends ElementMetadata
     public function __construct($class)
     {
         $this->name = $class;
-        $this->shortName = substr($class, strrpos($class, '\\') + 1);
+        // class name without namespace
+        $this->defaultGroup = substr($class, strrpos($class, '\\') + 1);
     }
 
     /**
@@ -49,7 +51,7 @@ class ClassMetadata extends ElementMetadata
             'members',
             'name',
             'properties',
-            'shortName'
+            'defaultGroup'
         ));
     }
 
@@ -64,13 +66,23 @@ class ClassMetadata extends ElementMetadata
     }
 
     /**
-     * Returns the class name without namespace
+     * Returns the name of the default group for this class
      *
-     * @return string  The local class name in the namespace
+     * For each class, the group "Default" is an alias for the group
+     * "<ClassName>", where <ClassName> is the non-namespaced name of the
+     * class. All constraints implicitely or explicitely assigned to group
+     * "Default" belong to both of these groups, unless the class defines
+     * a group sequence.
+     *
+     * If a class defines a group sequence, validating the class in "Default"
+     * will validate the group sequence. The constraints assinged to "Default"
+     * can still be validated by validating the class in "<ClassName>".
+     *
+     * @return string  The name of the default group
      */
-    public function getShortClassName()
+    public function getDefaultGroup()
     {
-        return $this->shortName;
+        return $this->defaultGroup;
     }
 
     /**
@@ -82,7 +94,7 @@ class ClassMetadata extends ElementMetadata
             throw new ConstraintDefinitionException('The constraint Valid can only be put on properties or getters');
         }
 
-        $constraint->addImplicitGroupName($this->getShortClassName());
+        $constraint->addImplicitGroupName($this->getDefaultGroup());
 
         parent::addConstraint($constraint);
     }
@@ -103,7 +115,7 @@ class ClassMetadata extends ElementMetadata
             $this->addMemberMetadata($this->properties[$property]);
         }
 
-        $constraint->addImplicitGroupName($this->getShortClassName());
+        $constraint->addImplicitGroupName($this->getDefaultGroup());
 
         $this->properties[$property]->addConstraint($constraint);
 
@@ -129,7 +141,7 @@ class ClassMetadata extends ElementMetadata
             $this->addMemberMetadata($this->getters[$property]);
         }
 
-        $constraint->addImplicitGroupName($this->getShortClassName());
+        $constraint->addImplicitGroupName($this->getDefaultGroup());
 
         $this->getters[$property]->addConstraint($constraint);
 
@@ -152,7 +164,7 @@ class ClassMetadata extends ElementMetadata
                 $member = clone $member;
 
                 foreach ($member->getConstraints() as $constraint) {
-                    $constraint->addImplicitGroupName($this->getShortClassName());
+                    $constraint->addImplicitGroupName($this->getDefaultGroup());
                 }
 
                 $this->addMemberMetadata($member);
@@ -213,6 +225,14 @@ class ClassMetadata extends ElementMetadata
      */
     public function setGroupSequence(array $groups)
     {
+        if (in_array(Constraint::DEFAULT_GROUP, $groups, true)) {
+            throw new GroupDefinitionException(sprintf('The group "%s" is not allowed in group sequences', Constraint::DEFAULT_GROUP));
+        }
+
+        if (!in_array($this->getDefaultGroup(), $groups, true)) {
+            throw new GroupDefinitionException(sprintf('The group "%s" is missing in the group sequence', $this->getDefaultGroup()));
+        }
+
         $this->groupSequence = $groups;
 
         return $this;

@@ -72,9 +72,9 @@ class GraphWalkerTest extends \PHPUnit_Framework_TestCase
             'groups' => 'First',
         )));
         $this->metadata->addGetterConstraint('lastName', new FailingConstraint(array(
-            'groups' => 'Second',
+            'groups' => 'Default',
         )));
-        $this->metadata->setGroupSequence(array('First', 'Second'));
+        $this->metadata->setGroupSequence(array('First', $this->metadata->getDefaultGroup()));
 
         $this->walker->walkClass($this->metadata, $entity, 'Default', '');
 
@@ -98,7 +98,7 @@ class GraphWalkerTest extends \PHPUnit_Framework_TestCase
         $entity->reference = new Reference();
 
         $this->metadata->addPropertyConstraint('reference', new Valid());
-        $this->metadata->setGroupSequence(array('First'));
+        $this->metadata->setGroupSequence(array($this->metadata->getDefaultGroup()));
 
         $referenceMetadata = new ClassMetadata(get_class($entity->reference));
         $referenceMetadata->addConstraint(new FailingConstraint(array(
@@ -132,11 +132,11 @@ class GraphWalkerTest extends \PHPUnit_Framework_TestCase
             'groups' => 'First',
         )));
         $this->metadata->addGetterConstraint('lastName', new FailingConstraint(array(
-            'groups' => 'Second',
+            'groups' => $this->metadata->getDefaultGroup(),
         )));
-        $this->metadata->setGroupSequence(array('First', 'Second'));
+        $this->metadata->setGroupSequence(array('First', $this->metadata->getDefaultGroup()));
 
-        $this->walker->walkClass($this->metadata, $entity, 'Second', '');
+        $this->walker->walkClass($this->metadata, $entity, $this->metadata->getDefaultGroup(), '');
 
         // Only group "Second" was validated
         $violations = new ConstraintViolationList();

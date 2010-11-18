@@ -6,6 +6,7 @@ use Symfony\Component\HttpFoundation\ParameterBag;
 use Symfony\Component\HttpFoundation\HeaderBag;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
+use Symfony\Component\HttpFoundation\ResponseHeaderBag;
 
 /*
  * This file is part of the Symfony framework.

@@ -9,6 +9,7 @@ require_once __DIR__ . '/Fixtures/RequiredOptionsField.php';
 
 use Symfony\Component\Form\ValueTransformer\ValueTransformerInterface;
 use Symfony\Component\Form\PropertyPath;
+use Symfony\Component\Form\FieldError;
 use Symfony\Tests\Component\Form\Fixtures\Author;
 use Symfony\Tests\Component\Form\Fixtures\TestField;
 use Symfony\Tests\Component\Form\Fixtures\InvalidField;
@@ -91,14 +92,14 @@ class FieldTest extends \PHPUnit_Framework_TestCase
     public function testFieldWithErrorsIsInvalid()
     {
         $this->field->bind('data');
-        $this->field->addError('Some error');
+        $this->field->addError(new FieldError('Some error'));
 
         $this->assertFalse($this->field->isValid());
     }
 
     public function testBindResetsErrors()
     {
-        $this->field->addError('Some error');
+        $this->field->addError(new FieldError('Some error'));
         $this->field->bind('data');
 
         $this->assertTrue($this->field->isValid());

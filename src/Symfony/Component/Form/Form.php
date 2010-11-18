@@ -147,7 +147,7 @@ class Form extends FieldGroup
                         $type = self::FIELD_ERROR;
                     }
 
-                    $this->addError($violation->getMessageTemplate(), $violation->getMessageParameters(), $iterator, $type);
+                    $this->addError(new FieldError($violation->getMessageTemplate(), $violation->getMessageParameters()), $iterator, $type);
                 }
             }
         }

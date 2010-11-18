@@ -16,7 +16,7 @@
     {% if field.hasErrors %}
     <ul>
         {% for error in field.errors %}
-            <li>{% trans error.0 with error.1 from validators %}</li>
+            <li>{% trans error.messageTemplate with error.messageParameters from validators %}</li>
         {% endfor %}
     </ul>
     {% endif %}

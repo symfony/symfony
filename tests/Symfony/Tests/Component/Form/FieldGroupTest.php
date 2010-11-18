@@ -7,6 +7,7 @@ require_once __DIR__ . '/Fixtures/TestField.php';
 require_once __DIR__ . '/Fixtures/TestFieldGroup.php';
 
 use Symfony\Component\Form\Field;
+use Symfony\Component\Form\FieldError;
 use Symfony\Component\Form\FieldInterface;
 use Symfony\Component\Form\FieldGroup;
 use Symfony\Component\Form\PropertyPath;
@@ -157,25 +158,29 @@ class FieldGroupTest extends \PHPUnit_Framework_TestCase
 
     public function testAddErrorMapsFieldValidationErrorsOntoFields()
     {
+        $error = new FieldError('Message');
+
         $field = $this->createMockField('firstName');
         $field->expects($this->once())
                     ->method('addError')
-                    ->with($this->equalTo('Message'));
+                    ->with($this->equalTo($error));
 
         $group = new TestFieldGroup('author');
         $group->add($field);
 
         $path = new PropertyPath('fields[firstName].data');
 
-        $group->addError('Message', array(), $path->getIterator(), FieldGroup::FIELD_ERROR);
+        $group->addError($error, $path->getIterator(), FieldGroup::FIELD_ERROR);
     }
 
     public function testAddErrorMapsFieldValidationErrorsOntoFieldsWithinNestedFieldGroups()
     {
+        $error = new FieldError('Message');
+
         $field = $this->createMockField('firstName');
         $field->expects($this->once())
                     ->method('addError')
-                    ->with($this->equalTo('Message'));
+                    ->with($this->equalTo($error));
 
         $group = new TestFieldGroup('author');
         $innerGroup = new TestFieldGroup('names');
@@ -184,11 +189,13 @@ class FieldGroupTest extends \PHPUnit_Framework_TestCase
 
         $path = new PropertyPath('fields[names].fields[firstName].data');
 
-        $group->addError('Message', array(), $path->getIterator(), FieldGroup::FIELD_ERROR);
+        $group->addError($error, $path->getIterator(), FieldGroup::FIELD_ERROR);
     }
 
     public function testAddErrorKeepsFieldValidationErrorsIfFieldNotFound()
     {
+        $error = new FieldError('Message');
+
         $field = $this->createMockField('foo');
         $field->expects($this->never())
                     ->method('addError');
@@ -198,13 +205,15 @@ class FieldGroupTest extends \PHPUnit_Framework_TestCase
 
         $path = new PropertyPath('fields[bar].data');
 
-        $group->addError('Message', array(), $path->getIterator(), FieldGroup::FIELD_ERROR);
+        $group->addError($error, $path->getIterator(), FieldGroup::FIELD_ERROR);
 
-        $this->assertEquals(array(array('Message', array())), $group->getErrors());
+        $this->assertEquals(array($error), $group->getErrors());
     }
 
     public function testAddErrorKeepsFieldValidationErrorsIfFieldIsHidden()
     {
+        $error = new FieldError('Message');
+
         $field = $this->createMockField('firstName');
         $field->expects($this->any())
                     ->method('isHidden')
@@ -217,13 +226,15 @@ class FieldGroupTest extends \PHPUnit_Framework_TestCase
 
         $path = new PropertyPath('fields[firstName].data');
 
-        $group->addError('Message', array(), $path->getIterator(), FieldGroup::FIELD_ERROR);
+        $group->addError($error, $path->getIterator(), FieldGroup::FIELD_ERROR);
 
-        $this->assertEquals(array(array('Message', array())), $group->getErrors());
+        $this->assertEquals(array($error), $group->getErrors());
     }
 
     public function testAddErrorMapsDataValidationErrorsOntoFields()
     {
+        $error = new FieldError('Message');
+
         // path is expected to point at "firstName"
         $expectedPath = new PropertyPath('firstName');
         $expectedPathIterator = $expectedPath->getIterator();
@@ -234,18 +245,20 @@ class FieldGroupTest extends \PHPUnit_Framework_TestCase
                     ->will($this->returnValue(new PropertyPath('firstName')));
         $field->expects($this->once())
                     ->method('addError')
-                    ->with($this->equalTo('Message'), array(), $this->equalTo($expectedPathIterator), $this->equalTo(FieldGroup::DATA_ERROR));
+                    ->with($this->equalTo($error), $this->equalTo($expectedPathIterator), $this->equalTo(FieldGroup::DATA_ERROR));
 
         $group = new TestFieldGroup('author');
         $group->add($field);
 
         $path = new PropertyPath('firstName');
 
-        $group->addError('Message', array(), $path->getIterator(), FieldGroup::DATA_ERROR);
+        $group->addError($error, $path->getIterator(), FieldGroup::DATA_ERROR);
     }
 
     public function testAddErrorKeepsDataValidationErrorsIfFieldNotFound()
     {
+        $error = new FieldError('Message');
+
         $field = $this->createMockField('foo');
         $field->expects($this->any())
                     ->method('getPropertyPath')
@@ -258,11 +271,13 @@ class FieldGroupTest extends \PHPUnit_Framework_TestCase
 
         $path = new PropertyPath('bar');
 
-        $group->addError('Message', array(), $path->getIterator(), FieldGroup::DATA_ERROR);
+        $group->addError($error, $path->getIterator(), FieldGroup::DATA_ERROR);
     }
 
     public function testAddErrorKeepsDataValidationErrorsIfFieldIsHidden()
     {
+        $error = new FieldError('Message');
+
         $field = $this->createMockField('firstName');
         $field->expects($this->any())
                     ->method('isHidden')
@@ -278,11 +293,13 @@ class FieldGroupTest extends \PHPUnit_Framework_TestCase
 
         $path = new PropertyPath('firstName');
 
-        $group->addError('Message', array(), $path->getIterator(), FieldGroup::DATA_ERROR);
+        $group->addError($error, $path->getIterator(), FieldGroup::DATA_ERROR);
     }
 
     public function testAddErrorMapsDataValidationErrorsOntoNestedFields()
     {
+        $error = new FieldError('Message');
+
         // path is expected to point at "street"
         $expectedPath = new PropertyPath('address.street');
         $expectedPathIterator = $expectedPath->getIterator();
@@ -294,18 +311,20 @@ class FieldGroupTest extends \PHPUnit_Framework_TestCase
                     ->will($this->returnValue(new PropertyPath('address')));
         $field->expects($this->once())
                     ->method('addError')
-                    ->with($this->equalTo('Message'), array(), $this->equalTo($expectedPathIterator), $this->equalTo(FieldGroup::DATA_ERROR));
+                    ->with($this->equalTo($error), $this->equalTo($expectedPathIterator), $this->equalTo(FieldGroup::DATA_ERROR));
 
         $group = new TestFieldGroup('author');
         $group->add($field);
 
         $path = new PropertyPath('address.street');
 
-        $group->addError('Message', array(), $path->getIterator(), FieldGroup::DATA_ERROR);
+        $group->addError($error, $path->getIterator(), FieldGroup::DATA_ERROR);
     }
 
     public function testAddErrorMapsErrorsOntoFieldsInAnonymousGroups()
     {
+        $error = new FieldError('Message');
+
         // path is expected to point at "address"
         $expectedPath = new PropertyPath('address');
         $expectedPathIterator = $expectedPath->getIterator();
@@ -316,7 +335,7 @@ class FieldGroupTest extends \PHPUnit_Framework_TestCase
                     ->will($this->returnValue(new PropertyPath('address')));
         $field->expects($this->once())
                     ->method('addError')
-                    ->with($this->equalTo('Message'), array(), $this->equalTo($expectedPathIterator), $this->equalTo(FieldGroup::DATA_ERROR));
+                    ->with($this->equalTo($error), $this->equalTo($expectedPathIterator), $this->equalTo(FieldGroup::DATA_ERROR));
 
         $group = new TestFieldGroup('author');
         $group2 = new TestFieldGroup('anonymous', array('property_path' => null));
@@ -325,7 +344,7 @@ class FieldGroupTest extends \PHPUnit_Framework_TestCase
 
         $path = new PropertyPath('address');
 
-        $group->addError('Message', array(), $path->getIterator(), FieldGroup::DATA_ERROR);
+        $group->addError($error, $path->getIterator(), FieldGroup::DATA_ERROR);
     }
 
     public function testAddThrowsExceptionIfAlreadyBound()

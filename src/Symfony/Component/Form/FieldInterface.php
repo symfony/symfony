@@ -181,11 +181,11 @@ interface FieldInterface extends Localizable
      * ...
      * </code>
      *
-     * @param FieldInterface $field
+     * @param FieldError $error
      * @param PropertyPathIterator $pathIterator
      * @param ConstraintViolation$violation
      */
-    function addError($messageTemplate, array $messageParameters = array(), PropertyPathIterator $pathIterator = null, $type = null);
+    function addError(FieldError $error, PropertyPathIterator $pathIterator = null, $type = null);
 
     /**
      * Returns whether the field is bound.

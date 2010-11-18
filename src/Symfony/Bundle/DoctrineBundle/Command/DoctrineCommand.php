@@ -133,7 +133,7 @@ abstract class DoctrineCommand extends Command
     protected function getBundleMetadatas(Bundle $bundle)
     {
         $tmp = dirname(str_replace('\\', '/', get_class($bundle)));
-        $namespace = str_replace('/', '\\', dirname($tmp));
+        $namespace = $bundle->getNamespacePrefix().'\\'.$bundle->getName();
         $class = basename($tmp);
 
         $bundleMetadatas = array();
@@ -142,11 +142,13 @@ abstract class DoctrineCommand extends Command
             $cmf = new SymfonyDisconnectedClassMetadataFactory($em);
             $metadatas = $cmf->getAllMetadata();
             foreach ($metadatas as $metadata) {
-                if (strpos($metadata->name, $namespace) !== false) {
-                    $bundleMetadatas[] = $metadata;
+
+                if (strpos($metadata->name, $namespace) === 0) {
+                    $bundleMetadatas[$metadata->name] = $metadata;
                 }
             }
         }
+
         return $bundleMetadatas;
     }
 }

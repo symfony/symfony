@@ -8,7 +8,6 @@ use Symfony\Component\Form\FieldInterface;
 use Symfony\Component\Form\CollectionField;
 use Symfony\Component\Form\HybridField;
 use Symfony\Bundle\TwigBundle\TokenParser\FormThemeTokenParser;
-use Symfony\Bundle\FrameworkBundle\Templating\HtmlGeneratorInterface;
 
 /*
  * This file is part of the Symfony package.

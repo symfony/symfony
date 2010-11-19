@@ -49,7 +49,7 @@ class TemplatingExtension extends \Twig_Extension
     public function getFilters()
     {
         return array(
-            'yaml' => new \Twig_Filter_Method($this, 'yaml'),
+            'yaml_encode' => new \Twig_Filter_Method($this, 'yamlEncode'),
             'dump' => new \Twig_Filter_Method($this, 'dump'),
             'abbr_class' => new \Twig_Filter_Method($this, 'abbrClass', array('is_safe' => array('html'))),
             'abbr_method' => new \Twig_Filter_Method($this, 'abbrMethod', array('is_safe' => array('html'))),
@@ -101,7 +101,7 @@ class TemplatingExtension extends \Twig_Extension
         );
     }
 
-    public function yaml($input, $inline = 0)
+    public function yamlEncode($input, $inline = 0)
     {
         static $dumper;
 
@@ -154,7 +154,7 @@ class TemplatingExtension extends \Twig_Extension
         }
 
         if (is_array($value) || is_object($value)) {
-            return '%'.gettype($value).'% '.$this->yaml($value);
+            return '%'.gettype($value).'% '.$this->yamlEncode($value);
         }
 
         return $value;

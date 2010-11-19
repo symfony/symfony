@@ -50,6 +50,14 @@ class TemplatingExtension extends \Twig_Extension
     {
         return array(
             'yaml' => new \Twig_Filter_Method($this, 'yaml'),
+            'dump' => new \Twig_Filter_Method($this, 'dump'),
+            'abbr_class' => new \Twig_Filter_Method($this, 'abbrClass', array('is_safe' => array('html'))),
+            'abbr_method' => new \Twig_Filter_Method($this, 'abbrMethod', array('is_safe' => array('html'))),
+            'format_args' => new \Twig_Filter_Method($this, 'formatArgs', array('is_safe' => array('html'))),
+            'format_args_as_text' => new \Twig_Filter_Method($this, 'formatArgsAsText', array('is_safe' => array('html'))),
+            'file_excerpt' => new \Twig_Filter_Method($this, 'fileExcerpt', array('is_safe' => array('html'))),
+            'format_file' => new \Twig_Filter_Method($this, 'formatFile', array('is_safe' => array('html'))),
+            'format_file_from_text' => new \Twig_Filter_Method($this, 'formatFileFromText', array('is_safe' => array('html'))),
         );
     }
 
@@ -102,6 +110,54 @@ class TemplatingExtension extends \Twig_Extension
         }
 
         return $dumper->dump($input, $inline);
+    }
+
+    public function abbrClass($class)
+    {
+        return $this->templating->get('code')->abbrClass($class);
+    }
+
+    public function abbrMethod($method)
+    {
+        return $this->templating->get('code')->abbrMethod($method);
+    }
+
+    public function formatArgs($args)
+    {
+        return $this->templating->get('code')->formatArgs($args);
+    }
+
+    public function formatArgsAsText($args)
+    {
+        return $this->templating->get('code')->formatArgsAsText($args);
+    }
+
+    public function fileExcerpt($file, $line)
+    {
+        return $this->templating->get('code')->fileExcerpt($file, $line);
+    }
+
+    public function formatFile($file, $line)
+    {
+        return $this->templating->get('code')->formatFile($file, $line);
+    }
+
+    public function formatFileFromText($text)
+    {
+        return $this->templating->get('code')->formatFileFromText($text);
+    }
+
+    public function dump($value)
+    {
+        if (is_resource($value)) {
+            return '%Resource%';
+        }
+
+        if (is_array($value) || is_object($value)) {
+            return '%'.gettype($value).'% '.$this->yaml($value);
+        }
+
+        return $value;
     }
 
     /**

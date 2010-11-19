@@ -7,6 +7,7 @@ use Symfony\Component\DependencyInjection\ContainerInterface;
 use Symfony\Bundle\TwigBundle\TokenParser\IncludeTokenParser;
 use Symfony\Bundle\TwigBundle\TokenParser\UrlTokenParser;
 use Symfony\Bundle\TwigBundle\TokenParser\PathTokenParser;
+use Symfony\Component\Yaml\Dumper as YamlDumper;
 
 /*
  * This file is part of the Symfony package.
@@ -40,6 +41,16 @@ class TemplatingExtension extends \Twig_Extension
     public function getTemplating()
     {
         return $this->templating;
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function getFilters()
+    {
+        return array(
+            'yaml' => new \Twig_Filter_Method($this, 'yaml'),
+        );
     }
 
     /**
@@ -80,6 +91,17 @@ class TemplatingExtension extends \Twig_Extension
             // {% include 'sometemplate.php' with ['something' : 'something2'] %}
             new IncludeTokenParser(),
         );
+    }
+
+    public function yaml($input, $inline = 0)
+    {
+        static $dumper;
+
+        if (null === $dumper) {
+            $dumper = new YamlDumper();
+        }
+
+        return $dumper->dump($input, $inline);
     }
 
     /**

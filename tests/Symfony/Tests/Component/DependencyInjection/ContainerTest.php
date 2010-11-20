@@ -22,7 +22,7 @@ class ContainerTest extends \PHPUnit_Framework_TestCase
     public function testConstructor()
     {
         $sc = new Container();
-        $this->assertEquals(spl_object_hash($sc), spl_object_hash($sc->get('service_container')), '__construct() automatically registers itself as a service');
+        $this->assertSame($sc, $sc->get('service_container'), '__construct() automatically registers itself as a service');
 
         $sc = new Container(new ParameterBag(array('foo' => 'bar')));
         $this->assertEquals(array('foo' => 'bar'), $sc->getParameterBag()->all(), '__construct() takes an array of parameters as its first argument');
@@ -140,7 +140,7 @@ class ContainerTest extends \PHPUnit_Framework_TestCase
         $this->assertEquals($sc->__foo_baz, $sc->get('foo.baz'), '->get() returns the service if a get*Method() is defined');
 
         $sc->set('bar', $bar = new \stdClass());
-        $this->assertEquals(spl_object_hash($sc->get('bar')), spl_object_hash($bar), '->getServiceIds() prefers to return a service defined with a getXXXService() method than one defined with set()');
+        $this->assertSame($sc->get('bar'), $bar, '->getServiceIds() prefers to return a service defined with a getXXXService() method than one defined with set()');
 
         try {
             $sc->get(new \stdClass());

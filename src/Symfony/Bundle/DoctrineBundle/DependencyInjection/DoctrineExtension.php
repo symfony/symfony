@@ -277,7 +277,7 @@ class DoctrineExtension extends Extension
         );
         $ormEmDef = new Definition('%doctrine.orm.entity_manager_class%', $ormEmArgs);
         $ormEmDef->setFactoryMethod('create');
-		$ormEmDef->addTag('doctrine.orm.entity_manager');
+        $ormEmDef->addTag('doctrine.orm.entity_manager');
         $container->setDefinition(sprintf('doctrine.orm.%s_entity_manager', $entityManager['name']), $ormEmDef);
 
         if ($entityManager['name'] == $defaultEntityManager) {

@@ -1,0 +1,12 @@
+<table>
+    <tr>
+        <th>Key</th>
+        <th>Value</th>
+    </tr>
+    {% for key in bag.keys %}
+        <tr>
+            <th>{{ key }}</th>
+            <td>{{ bag.get(key)|dump }}</td>
+        </tr>
+    {% endfor %}
+</table>

@@ -25,7 +25,7 @@
     </route>
 
     <route id="_profiler" pattern="/:token">
-        <default key="_controller">WebProfilerBundle:Profiler:index</default>
+        <default key="_controller">WebProfilerBundle:Profiler:panel</default>
     </route>
 
     <route id="_profiler_panel" pattern="/:token/:panel">

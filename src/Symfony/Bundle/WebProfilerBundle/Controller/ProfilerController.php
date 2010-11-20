@@ -5,7 +5,6 @@ namespace Symfony\Bundle\WebProfilerBundle\Controller;
 use Symfony\Component\DependencyInjection\ContainerAware;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
-use Symfony\Component\OutputEscaper\SafeDecorator;
 
 /*
  * This file is part of the Symfony framework.
@@ -24,31 +23,33 @@ use Symfony\Component\OutputEscaper\SafeDecorator;
 class ProfilerController extends ContainerAware
 {
     /**
-     * Renders the main profiler page for the given token.
+     * Renders a profiler panel for the given token.
      *
      * @param string $token The profiler token
      *
      * @return Response A Response instance
      */
-    public function indexAction($token)
+    public function panelAction($token, $panel = 'request')
     {
         $this->container->get('profiler')->disable();
 
         $profiler = $this->container->get('profiler')->loadFromToken($token);
 
         if ($profiler->isEmpty()) {
-            return $this->container->get('templating')->renderResponse('WebProfilerBundle:Profiler:notfound.php', array(
-                'token'     => $token,
-            ));
-        } else {
-            return $this->container->get('templating')->renderResponse('WebProfilerBundle:Profiler:index.php', array(
-                'token'     => $token,
-                'profiler'  => new SafeDecorator($profiler),
-                'collector' => $profiler->get('request'),
-                'template'  => $this->getTemplate($profiler, '_panel', 'request'),
-                'panel'     => 'request',
-            ));
+            return $this->container->get('templating')->renderResponse('WebProfilerBundle:Profiler:notfound.twig', array('token' => $token));
         }
+
+        if (!$profiler->has($panel)) {
+            throw new NotFoundHttpException(sprintf('Panel "%s" is not registered.', $panel));
+        }
+
+        return $this->container->get('templating')->renderResponse($this->getTemplateName($profiler, $panel), array(
+            'token'     => $token,
+            'profiler'  => $profiler,
+            'collector' => $profiler->get($panel),
+            'panel'     => $panel,
+            'templates' => $this->getTemplates($profiler),
+        ));
     }
 
     /**
@@ -145,61 +146,10 @@ class ProfilerController extends ContainerAware
             $position = false === strpos($this->container->get('request')->headers->get('user-agent'), 'Mobile') ? 'fixed' : 'absolute';
         }
 
-        return $this->container->get('templating')->renderResponse('WebProfilerBundle:Profiler:toolbar.php', array(
+        return $this->container->get('templating')->renderResponse('WebProfilerBundle:Profiler:toolbar.twig', array(
             'position'  => $position,
-            'profiler'  => new SafeDecorator($profiler),
-            'templates' => $this->getTemplates($profiler, '_bar'),
-        ));
-    }
-
-    /**
-     * Renders a profiler panel for the given token.
-     *
-     * @param string $token The profiler token
-     *
-     * @return Response A Response instance
-     */
-    public function panelAction($token, $panel)
-    {
-        $this->container->get('profiler')->disable();
-
-        $profiler = $this->container->get('profiler')->loadFromToken($token);
-        if (!$profiler->has($panel)) {
-            throw new NotFoundHttpException(sprintf('Panel "%s" is not registered.', $panel));
-        }
-
-        if ($profiler->isEmpty()) {
-            return $this->container->get('templating')->renderResponse('WebProfilerBundle:Profiler:notfound.php', array(
-                'token'     => $token,
-            ));
-        } else {
-            return $this->container->get('templating')->renderResponse('WebProfilerBundle:Profiler:panel.php', array(
-                'token'     => $token,
-                'profiler'  => new SafeDecorator($profiler),
-                'collector' => new SafeDecorator($profiler->get($panel)),
-                'template'  => $this->getTemplate($profiler, '_panel', $panel),
-                'panel'     => $panel,
-            ));
-        }
-    }
-
-    /**
-     * Renders the profiler menu for the given token.
-     *
-     * @param string $token The profiler token
-     * @param string $panel The current panel
-     *
-     * @return Response A Response instance
-     */
-    public function listAction($token, $panel)
-    {
-        $profiler = $this->container->get('profiler')->loadFromToken($token);
-
-        return $this->container->get('templating')->renderResponse('WebProfilerBundle:Profiler:menu.php', array(
-            'token'     => $token,
-            'profiler'  => new SafeDecorator($profiler),
-            'templates' => $this->getTemplates($profiler, '_menu'),
-            'panel'     => $panel,
+            'profiler'  => $profiler,
+            'templates' => $this->getTemplates($profiler),
         ));
     }
 
@@ -208,7 +158,7 @@ class ProfilerController extends ContainerAware
      *
      * @return Response A Response instance
      */
-    public function menuAction($token)
+    public function searchBarAction($token)
     {
         $profiler = $this->container->get('profiler');
         $profiler->disable();
@@ -218,9 +168,9 @@ class ProfilerController extends ContainerAware
         $url = $session->get('_profiler_search_url');
         $limit = $session->get('_profiler_search_limit');
 
-        return $this->container->get('templating')->renderResponse('WebProfilerBundle:Profiler:search.php', array(
+        return $this->container->get('templating')->renderResponse('WebProfilerBundle:Profiler:search.twig', array(
             'token'    => $token,
-            'profiler' => new SafeDecorator($profiler),
+            'profiler' => $profiler,
             'tokens'   => $profiler->find($ip, $url, 10),
             'ip'       => $ip,
             'url'      => $url,
@@ -243,9 +193,9 @@ class ProfilerController extends ContainerAware
         $url = $session->get('_profiler_search_url');
         $limit = $session->get('_profiler_search_limit');
 
-        return $this->container->get('templating')->renderResponse('WebProfilerBundle:Profiler:results.php', array(
+        return $this->container->get('templating')->renderResponse('WebProfilerBundle:Profiler:results.twig', array(
             'token'    => $token,
-            'profiler' => new SafeDecorator($this->container->get('profiler')->loadFromToken($token)),
+            'profiler' => $this->container->get('profiler')->loadFromToken($token),
             'tokens'   => $profiler->find($ip, $url, 10),
             'ip'       => $ip,
             'url'      => $url,
@@ -288,31 +238,40 @@ class ProfilerController extends ContainerAware
         return $response;
     }
 
-    protected function getTemplates($profiler, $suffix)
+    protected function getTemplateNames($profiler)
     {
         $templates = array();
         foreach ($this->container->getParameter('data_collector.templates') as $name => $template) {
             if ($profiler->has($name)) {
-                $tpl = preg_replace('/\.(.+?)$/', $suffix.'.$1', $template);
-                if (!$this->container->get('templating')->exists($tpl)) {
+                if (!$this->container->get('templating')->exists($template.'.twig')) {
                     continue;
                 }
 
-                $templates[$name] = $tpl;
+                $templates[$name] = $template.'.twig';
             }
         }
 
         return $templates;
     }
 
-    protected function getTemplate($profiler, $suffix, $panel)
+    protected function getTemplateName($profiler, $panel)
     {
-        $templates = $this->getTemplates($profiler, $suffix);
+        $templates = $this->getTemplateNames($profiler);
 
         if (!isset($templates[$panel])) {
             throw new NotFoundHttpException(sprintf('Panel "%s" is not registered.', $panel));
         }
 
         return $templates[$panel];
+    }
+
+    protected function getTemplates($profiler)
+    {
+        $templates = $this->getTemplateNames($profiler);
+        foreach ($templates as $name => $template) {
+            $templates[$name] = $this->container->get('twig')->loadTemplate($template);
+        }
+
+        return $templates;
     }
 }

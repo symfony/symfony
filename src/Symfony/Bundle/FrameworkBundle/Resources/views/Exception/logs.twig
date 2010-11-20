@@ -1,0 +1,8 @@
+<ol>
+    {% for log in logs %}
+        <li{% if 'ERR' == log.priorityname %} class="error"{% endif %}>
+            {{ log.priorityname }}
+            {{ log.message }}
+        </li>
+    {% endfor %}
+</ol>

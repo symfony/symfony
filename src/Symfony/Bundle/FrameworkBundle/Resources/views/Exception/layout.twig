@@ -1,0 +1,35 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <meta http-equiv="Content-Type" content="text/html; charset={{ _charset }}"/>
+        <title>{{ exception.message }} ({{ exception.statuscode }} {{ exception.statustext }})</title>
+        <style type="text/css">
+            html { background: #eee }
+            body { font: 11px Verdana, Arial, sans-serif; color: #333 }
+            .sf-exceptionreset, .sf-exceptionreset .block, .sf-exceptionreset #message { margin: auto }
+        </style>
+        <link href="{% asset 'bundles/framework/css/exception.css' %}" rel="stylesheet" type="text/css" media="screen" />
+        <script type="text/javascript">
+            //<![CDATA[
+            function toggle(id, clazz) {
+                el = document.getElementById(id);
+                current = el.style.display
+
+                if (clazz) {
+                    var tags = document.getElementsByTagName('*');
+                    for (i = 0; i < tags.length; i++) {
+                        if (tags[i].className == clazz) {
+                            tags[i].style.display = 'none';
+                        }
+                    }
+                }
+
+                el.style.display = current == 'none' ? 'block' : 'none';
+            }
+            //]]>
+        </script>
+    </head>
+    <body>
+        {% block body '' %}
+    </body>
+</html>

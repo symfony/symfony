@@ -5,7 +5,6 @@ namespace Symfony\Bundle\FrameworkBundle\Controller;
 use Symfony\Component\DependencyInjection\ContainerAware;
 use Symfony\Component\HttpKernel\Exception\FlattenException;
 use Symfony\Component\HttpKernel\Log\DebugLoggerInterface;
-use Symfony\Component\OutputEscaper\SafeDecorator;
 
 /*
  * This file is part of the Symfony framework.
@@ -29,11 +28,10 @@ class ExceptionController extends ContainerAware
      * @param FlattenException     $exception A FlattenException instance
      * @param DebugLoggerInterface $logger    A DebugLoggerInterface instance
      * @param string               $format    The format to use for rendering (html, xml, ...)
-     * @param Boolean              $embedded  Whether the rendered Response will be embedded or not
      *
      * @throws \InvalidArgumentException When the exception template does not exist
      */
-    public function exceptionAction(FlattenException $exception, DebugLoggerInterface $logger = null, $format = 'html', $embedded = false)
+    public function exceptionAction(FlattenException $exception, DebugLoggerInterface $logger = null, $format = 'html')
     {
         $this->container->get('request')->setRequestFormat($format);
 
@@ -46,9 +44,13 @@ class ExceptionController extends ContainerAware
             $exception->setStatusCode($exception->getCode());
         }
 
-        $templating = $this->container->get('templating');
-        $template = 'FrameworkBundle:Exception:'.($this->container->get('kernel')->isDebug() ? 'exception.php' : 'error.php');
+        $template = $this->container->get('kernel')->isDebug() ? 'exception' : 'error';
+        if ($this->container->get('kernel')->isDebug() && 'html' == $format) {
+            $template = 'exception_full';
+        }
+        $template = 'FrameworkBundle:Exception:'.$template.'.twig';
 
+        $templating = $this->container->get('templating');
         if (!$templating->exists($template)) {
             $this->container->get('request')->setRequestFormat('html');
         }
@@ -59,7 +61,6 @@ class ExceptionController extends ContainerAware
                 'exception'      => $exception,
                 'logger'         => $logger,
                 'currentContent' => $currentContent,
-                'embedded'       => $embedded,
             )
         );
 

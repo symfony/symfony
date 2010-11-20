@@ -1,0 +1,20 @@
+<div class="block">
+    {% if count > 0 %}
+        <h3>
+            <span>{{ count - position + 1 }}/{{ count + 1 }}</span>
+            {{ exception.class|abbr_class }}: {{ exception.message|replace(["\n": '<br />']) }}
+            <a href="#" onclick="toggle('traces_{{ position }}', 'traces'); return false;">&raquo;</a><br />
+        </h3>
+    {% else %}
+        <h3>Stack Trace</h3>
+    {% endif %}
+
+    <a id="traces_link_{{ position }}"></a>
+    <ol class="traces" id="traces_{{ position }}" style="display: {{ 0 == position ? 'block' : 'none' }}">
+        {% for i, trace in exception.trace %}
+            <li>
+                {% include 'FrameworkBundle:Exception:trace.twig' with ['prefix': position, 'i': i, 'trace': trace] only %}
+            </li>
+        {% endfor %}
+    </ol>
+</div>

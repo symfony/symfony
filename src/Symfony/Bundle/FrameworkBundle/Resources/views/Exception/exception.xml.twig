@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="{{ _charset }}" ?>
+
+<error code="{{ exception.statuscode }}" message="{{ exception.statustext }}">
+{% for e in exception.toarray %}
+    <exception class="{{ e.class }}" message="{{ e.message }}">
+{% include 'FrameworkBundle:Exception:traces.twig' with ['exception': e] only %}
+    </exception>
+{% endfor %}
+</error>

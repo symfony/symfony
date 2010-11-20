@@ -1,0 +1,42 @@
+{% extends 'WebProfilerBundle:Profiler:layout.twig' %}
+
+{% block menu %}
+<img style="margin: 0 5px 0 0; vertical-align: middle; width: 32px" width="32" height="32" alt="Events" src="{% asset 'bundles/webprofiler/images/events.png' %}" />
+Events
+{% endblock %}
+
+{% block content %}
+    <h2>Called Events</h2>
+
+    <table>
+        <tr>
+            <th>Event</th>
+            <th>Caller</th>
+            <th>Listener</th>
+        </tr>
+        {% for event in collector.calledevents %}
+            <tr>
+                <td><code>{{ event.event }}</code></td>
+                <td><code>{{ event.caller|abbr_class }}</code></td>
+                <td><code>{{ event.listener|abbr_method }}()</code></td>
+            </tr>
+        {% endfor %}
+    </table>
+
+    {% if collector.notcalledevents %}
+        <h2>Not Called Events</h2>
+
+        <table>
+            <tr>
+                <th>Event</th>
+                <th>Listener</th>
+            </tr>
+            {% for event in collector.notcalledevents %}
+                <tr>
+                    <td><code>{{ event.event }}</code></td>
+                    <td><code>{{ event.listener|abbr_method }}()</code></td>
+                </tr>
+            {% endfor %}
+        </table>
+    {% endif %}
+{% endblock %}

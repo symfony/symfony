@@ -1,0 +1,10 @@
+{% if trace.function %}
+    at <strong><abbr title="{{ trace.class }}">{{ trace.short_class }}</abbr>{{ trace.type ~ trace.function }}</strong>({{ trace.args|format_args }})<br />
+{% endif %}
+{% if trace.file and trace.line %}
+    in <em>{{ trace.file|format_file(trace.line) }}</em>
+    <a href="#" onclick="toggle('trace_{{ prefix ~ '_' ~ i }}'); return false;">&raquo;</a><br />
+    <div id="trace_{{ prefix ~ '_' ~ i }}" class="trace" style="display: {{ 0 == i ? 'block' : 'none' }}">
+        {{ trace.file|file_excerpt(trace.line) }}
+    </div>
+{% endif %}

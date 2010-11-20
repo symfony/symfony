@@ -6,16 +6,16 @@
 
     <parameters>
         <parameter key="data_collector.templates" type="collection">
-            <parameter key="config">WebProfilerBundle:Profiler:config.php</parameter>
-            <parameter key="request">WebProfilerBundle:Profiler:request.php</parameter>
-            <parameter key="security">WebProfilerBundle:Profiler:security.php</parameter>
-            <parameter key="exception">WebProfilerBundle:Profiler:exception.php</parameter>
-            <parameter key="events">WebProfilerBundle:Profiler:events.php</parameter>
-            <parameter key="logger">WebProfilerBundle:Profiler:logger.php</parameter>
-            <parameter key="timer">WebProfilerBundle:Profiler:timer.php</parameter>
-            <parameter key="memory">WebProfilerBundle:Profiler:memory.php</parameter>
-            <parameter key="db">DoctrineBundle:Profiler:db.php</parameter>
-            <parameter key="mongodb">DoctrineMongoDBBundle:Profiler:mongodb.php</parameter>
+            <parameter key="config">WebProfilerBundle:Collector:config</parameter>
+            <parameter key="request">WebProfilerBundle:Collector:request</parameter>
+            <parameter key="security">WebProfilerBundle:Collector:security</parameter>
+            <parameter key="exception">WebProfilerBundle:Collector:exception</parameter>
+            <parameter key="events">WebProfilerBundle:Collector:events</parameter>
+            <parameter key="logger">WebProfilerBundle:Collector:logger</parameter>
+            <parameter key="timer">WebProfilerBundle:Collector:timer</parameter>
+            <parameter key="memory">WebProfilerBundle:Collector:memory</parameter>
+            <parameter key="db">DoctrineBundle:Collector:db</parameter>
+            <parameter key="mongodb">DoctrineMongoDBBundle:Collector:mongodb</parameter>
         </parameter>
     </parameters>
 </container>

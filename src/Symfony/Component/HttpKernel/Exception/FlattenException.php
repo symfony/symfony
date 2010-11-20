@@ -45,6 +45,21 @@ class FlattenException
         return $e;
     }
 
+    public function toArray()
+    {
+        $exceptions = array();
+        foreach (array_merge(array($this), $this->getPreviouses()) as $exception) {
+            $exceptions[] = array(
+                'code'     => $exception->getStatusCode(),
+                'message'  => $exception->getMessage(),
+                'class'    => $exception->getClass(),
+                'trace'    => $exception->getTrace(),
+            );
+        }
+
+        return $exceptions;
+    }
+
     public function getStatusCode()
     {
         return $this->status;

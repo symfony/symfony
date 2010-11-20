@@ -1,0 +1,27 @@
+[submodule "vendor/doctrine"]
+	path = vendor/doctrine
+	url = git://github.com/doctrine/doctrine2.git
+[submodule "vendor/doctrine-data-fixtures"]
+	path = vendor/doctrine-data-fixtures
+	url = git://github.com/doctrine/data-fixtures
+[submodule "vendor/doctrine-dbal"]
+	path = vendor/doctrine-dbal
+	url = git://github.com/doctrine/dbal.git
+[submodule "vendor/doctrine-common"]
+	path = vendor/doctrine-common
+	url = git://github.com/doctrine/common.git
+[submodule "vendor/doctrine-migrations"]
+	path = vendor/doctrine-migrations
+	url = git://github.com/doctrine/migrations.git
+[submodule "vendor/doctrine-mongodb"]
+	path = vendor/doctrine-mongodb
+	url = git://github.com/doctrine/mongodb-odm.git
+[submodule "vendor/swiftmailer"]
+	path = vendor/swiftmailer
+	url = git://github.com/swiftmailer/swiftmailer.git
+[submodule "vendor/twig"]
+	path = vendor/twig
+	url = git://github.com/fabpot/Twig.git
+[submodule "vendor/zend"]
+	path = vendor/zend
+	url = git://github.com/zendframework/zf2.git

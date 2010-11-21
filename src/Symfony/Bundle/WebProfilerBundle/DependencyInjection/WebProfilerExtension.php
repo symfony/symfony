@@ -42,12 +42,15 @@ class WebProfilerExtension extends Extension
     {
         $loader = new XmlFileLoader($container, __DIR__.'/../Resources/config');
 
+        if (!$container->hasParameter('data_collector.templates')) {
+            $loader->load('web_profiler.xml');
+        }
+
         if (isset($config['toolbar'])) {
             if ($config['toolbar']) {
                 if (!$container->hasDefinition('debug.toolbar')) {
                     $loader = new XmlFileLoader($container, __DIR__.'/../Resources/config');
                     $loader->load('toolbar.xml');
-                    $loader->load('web_profiler.xml');
                 }
             } elseif ($container->hasDefinition('debug.toolbar')) {
                 $container->getDefinition('debug.toolbar')->clearTags();
@@ -60,9 +63,8 @@ class WebProfilerExtension extends Extension
             }
         }
 
-        if (isset($config['templates']) && $container->hasParameter('data_collector.templates')) {
-            $templates = array_merge($container->getParameter('data_collector.templates'), $config['templates']);
-            $container->setParameter('data_collector.templates', $templates);
+        if (isset($config['templates'])) {
+            $container->setParameter('data_collector.templates', array_merge($container->getParameter('data_collector.templates'), $config['templates']));
         }
     }
 

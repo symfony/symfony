@@ -140,17 +140,34 @@ class Engine implements \ArrayAccess
      */
     public function exists($name)
     {
-        list($tpl, $options) = $this->splitTemplateName($name);
+        return false !== $this->load($name);
+    }
 
-        $template = $this->loader->load($tpl, $options);
+    /**
+     * Returns true if the template exists.
+     *
+     * @param string $name A template name
+     *
+     * @return Boolean true if the template exists, false otherwise
+     */
+    public function load($name)
+    {
+        if (isset($this->cache[$name])) {
+            list($tpl, $options, $template) = $this->cache[$name];
+        } else {
+            list($tpl, $options) = $this->splitTemplateName($name);
 
-        if (false === $template) {
-            return false;
+            // load
+            $template = $this->loader->load($tpl, $options);
+
+            if (false === $template) {
+                return false;
+            }
+
+            $this->cache[$name] = array($tpl, $options, $template);
         }
 
-        $this->cache[$name] = array($tpl, $options, $template);
-
-        return true;
+        return $template;
     }
 
     /**

@@ -63,7 +63,7 @@ class ResponseHeaderBag extends HeaderBag
      */
     public function setCookie($name, $value, $domain = null, $expires = null, $path = '/', $secure = false, $httponly = true)
     {
-        $this->validateCookieName($name, $value);
+        $this->validateCookie($name, $value);
 
         $cookie = sprintf('%s=%s', $name, urlencode($value));
 

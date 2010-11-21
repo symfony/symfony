@@ -175,7 +175,7 @@ class HeaderBag
      */
     public function setCookie($name, $value, $domain = null, $expires = null, $path = '/', $secure = false, $httponly = true)
     {
-        $this->validateCookieName($name, $value);
+        $this->validateCookie($name, $value);
 
         return $this->set('Cookie', sprintf('%s=%s', $name, urlencode($value)));
     }

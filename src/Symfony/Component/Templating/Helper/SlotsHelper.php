@@ -51,15 +51,13 @@ class SlotsHelper extends Helper
      */
     public function stop()
     {
-        $content = ob_get_clean();
-
         if (!$this->openSlots) {
             throw new \LogicException('No slot started.');
         }
 
         $name = array_pop($this->openSlots);
 
-        $this->slots[$name] = $content;
+        $this->slots[$name] = ob_get_clean();
     }
 
     /**

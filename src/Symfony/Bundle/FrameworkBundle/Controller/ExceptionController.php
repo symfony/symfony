@@ -36,7 +36,7 @@ class ExceptionController extends ContainerAware
         $this->container->get('request')->setRequestFormat($format);
 
         $currentContent = '';
-        while (false !== $content = ob_get_clean()) {
+        while (false !== $content = @ob_get_clean()) {
             $currentContent .= $content;
         }
 

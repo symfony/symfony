@@ -30,13 +30,38 @@ class IncludeNode extends \Twig_Node
      */
     public function compile($compiler)
     {
+        // template
         $compiler
             ->addDebugInfo($this)
-            ->write('echo $this->env->getExtension(\'templating\')->getTemplating()->render(')
+            ->write("\$template = ")
             ->subcompile($this->getNode('expr'))
-            ->raw(', ')
+            ->raw(";\n")
+            ->write("if (\$template instanceof Twig_Template) {\n")
+            ->indent()
         ;
 
+        // template is a Twig_Template instance
+        $compiler->write("\$template->display(");
+        $this->compileTemplateVariables($compiler);
+        $compiler
+            ->raw(");\n")
+            ->outdent()
+            ->write("} else {\n")
+            ->indent()
+        ;
+
+        // else use the templating engine
+        $compiler->write("echo \$this->env->getExtension('templating')->getTemplating()->render(\$template, ");
+        $this->compileTemplateVariables($compiler);
+        $compiler
+            ->raw(");\n")
+            ->outdent()
+            ->write("}\n")
+        ;
+    }
+
+    protected function compileTemplateVariables($compiler)
+    {
         if (false === $this->getAttribute('only')) {
             if (null === $this->getNode('variables')) {
                 $compiler->raw('$context');
@@ -54,7 +79,5 @@ class IncludeNode extends \Twig_Node
                 $compiler->subcompile($this->getNode('variables'));
             }
         }
-
-        $compiler->raw(");\n");
     }
 }

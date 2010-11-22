@@ -40,9 +40,8 @@ class RouteTest extends \PHPUnit_Framework_TestCase
     {
         $route = new Route('/:foo');
         $route->setOptions(array('foo' => 'bar'));
-        $this->assertEquals(array_merge(array('variable_prefixes'  => array(':'),
+        $this->assertEquals(array_merge(array(
         'segment_separators' => array('/', '.'),
-        'variable_regex'     => '[\w\d_]+',
         'text_regex'         => '.+?',
         'compiler_class'     => 'Symfony\\Component\\Routing\\RouteCompiler',
         ), array('foo' => 'bar')), $route->getOptions(), '->setOptions() sets the options');

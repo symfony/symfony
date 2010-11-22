@@ -9,7 +9,7 @@ class RouteCompiler extends BaseRouteCompiler
 {
     protected function tokenizeBufferBefore(&$buffer, &$tokens, &$afterASeparator, &$currentSeparator)
     {
-        if ($afterASeparator && preg_match('#^=('.$this->options['variable_regex'].')#', $buffer, $match)) {
+        if ($afterASeparator && preg_match('#^=([\w\d_]+)#', $buffer, $match)) {
             // a labelled variable
             $this->tokens[] = array('label', $currentSeparator, $match[0], $match[1]);
 

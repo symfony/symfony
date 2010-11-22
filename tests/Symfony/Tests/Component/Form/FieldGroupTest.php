@@ -130,15 +130,27 @@ class FieldGroupTest extends \PHPUnit_Framework_TestCase
         $this->assertFalse($group->hasErrors());
     }
 
-    public function testBindForwardsBoundValues()
+    public function testBindForwardsPreprocessedData()
     {
         $field = $this->createMockField('firstName');
+
+        $group = $this->getMock(
+            'Symfony\Tests\Component\Form\Fixtures\TestFieldGroup',
+            array('preprocessData'), // only mock preprocessData()
+            array('author')
+        );
+
+        // The data array is prepared directly after binding
+        $group->expects($this->once())
+              ->method('preprocessData')
+              ->with($this->equalTo(array('firstName' => 'Bernhard')))
+              ->will($this->returnValue(array('firstName' => 'preprocessed[Bernhard]')));
+        $group->add($field);
+
+        // The preprocessed data is then forwarded to the fields
         $field->expects($this->once())
                     ->method('bind')
-                    ->with($this->equalTo('Bernhard'));
-
-        $group = new TestFieldGroup('author');
-        $group->add($field);
+                    ->with($this->equalTo('preprocessed[Bernhard]'));
 
         $group->bind(array('firstName' => 'Bernhard'));
     }

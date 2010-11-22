@@ -332,6 +332,8 @@ class FieldGroup extends Field implements \IteratorAggregate, FieldGroupInterfac
             }
         }
 
+        $taintedData = $this->preprocessData($taintedData);
+
         foreach ($taintedData as $key => $value) {
             if ($this->has($key)) {
                 $this->fields[$key]->bind($value);
@@ -356,6 +358,19 @@ class FieldGroup extends Field implements \IteratorAggregate, FieldGroupInterfac
                 $this->extraFields[] = $key;
             }
         }
+    }
+
+    /**
+     * Processes the bound data before it is passed to the individual fields
+     *
+     * The data is in the user format.
+     *
+     * @param  array $data
+     * @return array
+     */
+    protected function preprocessData(array $data)
+    {
+        return $data;
     }
 
     /**

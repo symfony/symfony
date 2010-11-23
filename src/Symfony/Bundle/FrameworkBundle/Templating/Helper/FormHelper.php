@@ -145,10 +145,6 @@ class FormHelper extends Helper
 
     protected function lookupTemplate(/*FieldInterface */$field)
     {
-        if ($field instanceof \Symfony\Component\OutputEscaper\ObjectDecorator) {
-            $field = $field->getRawValue();
-        }
-
         $fqClassName = get_class($field);
         $template = null;
 

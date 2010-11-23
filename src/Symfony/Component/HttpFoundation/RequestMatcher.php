@@ -61,7 +61,13 @@ class RequestMatcher implements RequestMatcherInterface
      */
     public function matchMethod($method)
     {
-        $this->methods = array_map(function ($m) { return strtolower($m); }, is_array($method) ? $method : array($method));
+        $this->methods = array_map(
+            function ($m)
+            {
+                return strtolower($m);
+            },
+            is_array($method) ? $method : array($method)
+        );
     }
 
     /**
@@ -98,7 +104,7 @@ class RequestMatcher implements RequestMatcherInterface
             return false;
         }
 
-        if (null !== $this->ip && !$this->checkIp($this->host, $request->getClientIp())) {
+        if (null !== $this->ip && !$this->checkIp($request->getClientIp())) {
             return false;
         }
 
@@ -108,9 +114,9 @@ class RequestMatcher implements RequestMatcherInterface
     protected function checkIp($ip)
     {
         if (false !== strpos($this->ip, '/')) {
-            list($address, $netmask) = $this->ip;
+            list($address, $netmask) = explode('/', $this->ip);
 
-            if ($netmask <= 0) {
+            if ($netmask < 1 || $netmask > 32) {
                 return false;
             }
         } else {

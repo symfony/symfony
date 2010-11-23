@@ -89,6 +89,9 @@ class AssetsHelper extends Helper
     /**
      * Gets the base URL.
      *
+     * If multiple base URLs have been defined a random one will be picked for each asset.
+     * In other words: for one asset path the same base URL will always be picked among the available base URLs.
+     *
      * @param  string $path The path
      *
      * @return string The base URL
@@ -123,7 +126,7 @@ class AssetsHelper extends Helper
      * Sets the base URLs.
      *
      * If you pass an array, the getBaseURL() will return a
-     * random one each time it is called.
+     * randomly pick one to use for each asset.
      *
      * @param string|array $baseURLs The base URLs
      */

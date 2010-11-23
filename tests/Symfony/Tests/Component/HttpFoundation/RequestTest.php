@@ -155,7 +155,6 @@ class RequestTest extends \PHPUnit_Framework_TestCase
 
     }
 
-
     public function testInitializeConvertsUploadedFiles()
     {
         $tmpFile = $this->createTempFile();
@@ -170,6 +169,19 @@ class RequestTest extends \PHPUnit_Framework_TestCase
         )));
 
         $this->assertEquals($file, $request->files->get('file'));
+    }
+
+    public function testInitializeDoesNotConvertEmptyUploadedFiles()
+    {
+        $request = Request::create('', 'get', array(), array(), array('file' => array(
+            'name' => '',
+            'type' => '',
+            'tmp_name' => '',
+            'error' => UPLOAD_ERR_NO_FILE,
+            'size' => 0
+        )));
+
+        $this->assertEquals(null, $request->files->get('file'));
     }
 
     public function testInitializeConvertsUploadedFilesWithPhpBug()

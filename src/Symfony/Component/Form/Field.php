@@ -46,7 +46,7 @@ use Symfony\Component\Form\ValueTransformer\TransformationFailedException;
  *
  * @author Bernhard Schussek <bernhard.schussek@symfony-project.com>
  */
-abstract class Field extends Configurable implements FieldInterface
+class Field extends Configurable implements FieldInterface
 {
     protected $taintedData = null;
     protected $locale = null;

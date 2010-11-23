@@ -4,7 +4,6 @@ namespace Symfony\Bundle\FrameworkBundle\Templating;
 
 use Symfony\Component\Templating\Engine as BaseEngine;
 use Symfony\Component\Templating\Loader\LoaderInterface;
-use Symfony\Component\OutputEscaper\Escaper;
 use Symfony\Component\DependencyInjection\ContainerInterface;
 use Symfony\Component\HttpFoundation\Response;
 
@@ -18,15 +17,13 @@ use Symfony\Component\HttpFoundation\Response;
  */
 
 /**
- * This engine knows how to render Symfony templates and automatically
- * escapes template parameters.
+ * This engine knows how to render Symfony templates.
  *
  * @author Fabien Potencier <fabien.potencier@symfony-project.com>
  */
 class Engine extends BaseEngine
 {
     protected $container;
-    protected $escaper;
 
     /**
      * Constructor.
@@ -34,12 +31,10 @@ class Engine extends BaseEngine
      * @param ContainerInterface $container A ContainerInterface instance
      * @param LoaderInterface    $loader    A loader instance
      * @param array              $renderers An array of renderer instances
-     * @param mixed              $escaper   The escaper to use (or false to disable escaping)
      */
-    public function __construct(ContainerInterface $container, LoaderInterface $loader, array $renderers = array(), $escaper = false)
+    public function __construct(ContainerInterface $container, LoaderInterface $loader, array $renderers = array())
     {
         $this->container = $container;
-        $this->escaper = $escaper;
 
         parent::__construct($loader, $renderers);
 
@@ -66,10 +61,6 @@ class Engine extends BaseEngine
         if (isset($this->renderers[$renderer]) && is_string($this->renderers[$renderer])) {
             $this->renderers[$renderer] = $this->container->get($this->renderers[$renderer]);
             $this->renderers[$renderer]->setEngine($this);
-        }
-
-        if ('php' === $renderer) {
-            $parameters = $this->escapeParameters($parameters);
         }
 
         return parent::render($name, $parameters);
@@ -115,22 +106,6 @@ class Engine extends BaseEngine
         }
 
         return $this->helpers[$name];
-    }
-
-    protected function escapeParameters(array $parameters)
-    {
-        if (false !== $this->escaper) {
-            Escaper::setCharset($this->getCharset());
-
-            $parameters['_data'] = Escaper::escape($this->escaper, $parameters);
-            foreach ($parameters['_data'] as $key => $value) {
-                $parameters[$key] = $value;
-            }
-        } else {
-            $parameters['_data'] = Escaper::escape('raw', $parameters);
-        }
-
-        return $parameters;
     }
 
     // parses template names following the following pattern:

@@ -31,10 +31,8 @@ class Route
      *
      * Available options:
      *
-     *  * variable_prefixes:  An array of characters that starts a variable name (: by default)
      *  * segment_separators: An array of allowed characters for segment separators (/ by default)
-     *  * variable_regex:     A regex that match a valid variable name ([\w\d_]+ by default)
-     *  * text_regex:         A regex that match a valid text  name (.+? by default)
+     *  * text_regex:         A regex that match a valid text name (.+? by default)
      *  * compiler_class:     A class name able to compile this route instance (RouteCompiler by default)
      *
      * @param string $pattern       The pattern to match
@@ -103,9 +101,7 @@ class Route
     public function setOptions(array $options)
     {
         $this->options = array_merge(array(
-            'variable_prefixes'  => array(':'),
             'segment_separators' => array('/', '.'),
-            'variable_regex'     => '[\w\d_]+',
             'text_regex'         => '.+?',
             'compiler_class'     => 'Symfony\\Component\\Routing\\RouteCompiler',
         ), $options);

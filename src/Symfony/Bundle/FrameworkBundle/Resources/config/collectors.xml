@@ -7,53 +7,53 @@
     <parameters>
         <parameter key="data_collector.config.class">Symfony\Bundle\FrameworkBundle\DataCollector\ConfigDataCollector</parameter>
         <parameter key="data_collector.request.class">Symfony\Bundle\FrameworkBundle\DataCollector\RequestDataCollector</parameter>
-        <parameter key="data_collector.timer.class">Symfony\Bundle\FrameworkBundle\DataCollector\TimerDataCollector</parameter>
-        <parameter key="data_collector.memory.class">Symfony\Component\HttpKernel\DataCollector\MemoryDataCollector</parameter>
-        <parameter key="data_collector.logger.class">Symfony\Component\HttpKernel\DataCollector\LoggerDataCollector</parameter>
+        <parameter key="data_collector.security.class">Symfony\Component\HttpKernel\DataCollector\SecurityDataCollector</parameter>
         <parameter key="data_collector.exception.class">Symfony\Component\HttpKernel\DataCollector\ExceptionDataCollector</parameter>
         <parameter key="data_collector.events.class">Symfony\Component\HttpKernel\DataCollector\EventDataCollector</parameter>
-        <parameter key="data_collector.security.class">Symfony\Component\HttpKernel\DataCollector\SecurityDataCollector</parameter>
+        <parameter key="data_collector.logger.class">Symfony\Component\HttpKernel\DataCollector\LoggerDataCollector</parameter>
+        <parameter key="data_collector.timer.class">Symfony\Bundle\FrameworkBundle\DataCollector\TimerDataCollector</parameter>
+        <parameter key="data_collector.memory.class">Symfony\Component\HttpKernel\DataCollector\MemoryDataCollector</parameter>
     </parameters>
 
     <services>
         <service id="data_collector.config" class="%data_collector.config.class%">
-            <tag name="data_collector" />
+            <tag name="data_collector" template="WebProfilerBundle:Collector:config" />
             <argument type="service" id="kernel" />
             <argument type="service" id="router" on-invalid="ignore" />
         </service>
 
         <service id="data_collector.request" class="%data_collector.request.class%">
-            <tag name="data_collector" />
+            <tag name="data_collector" template="WebProfilerBundle:Collector:request" />
         </service>
 
-        <service id="data_collector.timer" class="%data_collector.timer.class%">
-            <tag name="data_collector" />
-            <argument type="service" id="kernel" />
-        </service>
-
-        <service id="data_collector.memory" class="%data_collector.memory.class%">
-            <tag name="data_collector" />
-        </service>
-
-        <service id="data_collector.logger" class="%data_collector.logger.class%">
-            <tag name="data_collector" />
-            <argument type="service" id="logger" on-invalid="ignore" />
+        <service id="data_collector.security" class="%data_collector.security.class%">
+            <tag name="data_collector" template="WebProfilerBundle:Collector:security" />
+            <argument type="service" id="security.context" on-invalid="ignore" />
         </service>
 
         <service id="data_collector.exception" class="%data_collector.exception.class%">
-            <tag name="data_collector" />
+            <tag name="data_collector" template="WebProfilerBundle:Collector:exception" />
         </service>
 
         <service id="data_collector.events" class="%data_collector.events.class%">
-            <tag name="data_collector" />
+            <tag name="data_collector" template="WebProfilerBundle:Collector:events" />
             <call method="setEventDispatcher">
                 <argument type="service" id="event_dispatcher" />
             </call>
         </service>
 
-        <service id="data_collector.security" class="%data_collector.security.class%">
-            <tag name="data_collector" />
-            <argument type="service" id="security.context" on-invalid="ignore" />
+        <service id="data_collector.logger" class="%data_collector.logger.class%">
+            <tag name="data_collector" template="WebProfilerBundle:Collector:logger" />
+            <argument type="service" id="logger" on-invalid="ignore" />
+        </service>
+
+        <service id="data_collector.timer" class="%data_collector.timer.class%">
+            <tag name="data_collector" template="WebProfilerBundle:Collector:timer" />
+            <argument type="service" id="kernel" />
+        </service>
+
+        <service id="data_collector.memory" class="%data_collector.memory.class%">
+            <tag name="data_collector" template="WebProfilerBundle:Collector:memory" />
         </service>
     </services>
 </container>

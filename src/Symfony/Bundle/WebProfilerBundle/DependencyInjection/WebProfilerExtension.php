@@ -42,10 +42,6 @@ class WebProfilerExtension extends Extension
     {
         $loader = new XmlFileLoader($container, __DIR__.'/../Resources/config');
 
-        if (!$container->hasParameter('data_collector.templates')) {
-            $loader->load('web_profiler.xml');
-        }
-
         if (isset($config['toolbar'])) {
             if ($config['toolbar']) {
                 if (!$container->hasDefinition('debug.toolbar')) {
@@ -61,10 +57,6 @@ class WebProfilerExtension extends Extension
             if (isset($config[$key])) {
                 $container->setParameter('debug.toolbar.intercept_redirects', (Boolean) $config[$key]);
             }
-        }
-
-        if (isset($config['templates'])) {
-            $container->setParameter('data_collector.templates', array_merge($container->getParameter('data_collector.templates'), $config['templates']));
         }
     }
 

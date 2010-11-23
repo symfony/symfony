@@ -63,7 +63,6 @@
             <xsd:element name="loader" type="xsd:string" minOccurs="0" maxOccurs="unbounded" />
         </xsd:sequence>
 
-        <xsd:attribute name="escaping" type="xsd:string" />
         <xsd:attribute name="assets_version" type="xsd:string" />
         <xsd:attribute name="path" type="xsd:string" />
         <xsd:attribute name="cache" type="xsd:string" />

@@ -32,6 +32,7 @@ class Engine implements \ArrayAccess
     protected $stack;
     protected $charset;
     protected $cache;
+    protected $escapers;
 
     /**
      * Constructor.
@@ -39,8 +40,9 @@ class Engine implements \ArrayAccess
      * @param LoaderInterface $loader    A loader instance
      * @param array           $renderers An array of renderer instances
      * @param array           $helpers   A array of helper instances
+     * @param array           $escapers  An array of escapers
      */
-    public function __construct(LoaderInterface $loader, array $renderers = array(), array $helpers = array())
+    public function __construct(LoaderInterface $loader, array $renderers = array(), array $helpers = array(), array $escapers = array())
     {
         $this->loader    = $loader;
         $this->renderers = $renderers;
@@ -58,6 +60,12 @@ class Engine implements \ArrayAccess
 
         foreach ($this->renderers as $renderer) {
             $renderer->setEngine($this);
+        }
+
+        $this->initializeEscapers();
+
+        foreach ($this->escapers as $context => $escaper) {
+            $this->setEscaper($context, $escaper);
         }
     }
 
@@ -299,13 +307,13 @@ class Engine implements \ArrayAccess
     /**
      * Escapes a string by using the current charset.
      *
-     * @param string $value A string to escape
+     * @param mixed $value A variable to escape
      *
-     * @return string The escaped string or the original value if not a string
+     * @return string The escaped value
      */
-    public function escape($value)
+    public function escape($value, $context = 'html')
     {
-        return is_string($value) || (is_object($value) && method_exists($value, '__toString')) ? htmlspecialchars($value, ENT_QUOTES, $this->charset) : $value;
+        return call_user_func($this->getEscaper($context), $value);
     }
 
     /**
@@ -360,5 +368,122 @@ class Engine implements \ArrayAccess
         }
 
         return array($name, array('renderer' => $renderer));
+    }
+
+    /**
+     * Adds an escaper for the given context.
+     *
+     * @param string $name    The escaper context (html, js, ...)
+     * @param mixed  $escaper A PHP callable
+     */
+    public function setEscaper($context, $escaper)
+    {
+        $this->escapers[$context] = $escaper;
+    }
+
+    /**
+     * Gets an escaper for a given context.
+     *
+     * @param  string $name The context name
+     *
+     * @return mixed  $escaper A PHP callable
+     */
+    public function getEscaper($context)
+    {
+        if (!isset($this->escapers[$context])) {
+            throw new \InvalidArgumentException(sprintf('No registered escaper for context "%s".', $context));
+        }
+
+        return $this->escapers[$context];
+    }
+
+    /**
+     * Initializes the built-in escapers.
+     *
+     * Each function specifies a way for applying a transformation to a string
+     * passed to it. The purpose is for the string to be "escaped" so it is
+     * suitable for the format it is being displayed in.
+     *
+     * For example, the string: "It's required that you enter a username & password.\n"
+     * If this were to be displayed as HTML it would be sensible to turn the
+     * ampersand into '&amp;' and the apostrophe into '&aps;'. However if it were
+     * going to be used as a string in JavaScript to be displayed in an alert box
+     * it would be right to leave the string as-is, but c-escape the apostrophe and
+     * the new line.
+     *
+     * For each function there is a define to avoid problems with strings being
+     * incorrectly specified.
+     */
+    protected function initializeEscapers()
+    {
+        $that = $this;
+
+        $this->escapers = array(
+            'html' =>
+                /**
+                 * Runs the PHP function htmlspecialchars on the value passed.
+                 *
+                 * @param string $value the value to escape
+                 *
+                 * @return string the escaped value
+                 */
+                function ($value) use ($that)
+                {
+                    // Numbers and boolean values get turned into strings which can cause problems
+                    // with type comparisons (e.g. === or is_int() etc).
+                    return is_string($value) ? htmlspecialchars($value, ENT_QUOTES, $that->getCharset(), false) : $value;
+                },
+
+            'js' =>
+                /**
+                 * A function that escape all non-alphanumeric characters
+                 * into their \xHH or \uHHHH representations
+                 *
+                 * @param string $value the value to escape
+                 * @return string the escaped value
+                 */
+                function ($value) use ($that)
+                {
+                    if ('UTF-8' != $that->getCharset()) {
+                        $string = $that->convertEncoding($string, 'UTF-8', $that->getCharset());
+                    }
+
+                    $callback = function ($matches) use ($that)
+                    {
+                        $char = $matches[0];
+
+                        // \xHH
+                        if (!isset($char[1])) {
+                            return '\\x'.substr('00'.bin2hex($char), -2);
+                        }
+
+                        // \uHHHH
+                        $char = $that->convertEncoding($char, 'UTF-16BE', 'UTF-8');
+
+                        return '\\u'.substr('0000'.bin2hex($char), -4);
+                    };
+
+                    if (null === $string = preg_replace_callback('#[^\p{L}\p{N} ]#u', $callback, $string)) {
+                        throw new \InvalidArgumentException('The string to escape is not a valid UTF-8 string.');
+                    }
+
+                    if ('UTF-8' != $that->getCharset()) {
+                        $string = $that->convertEncoding($string, $that->getCharset(), 'UTF-8');
+                    }
+
+                    return $string;
+                },
+        );
+    }
+
+    public function convertEncoding($string, $to, $from)
+    {
+        if (function_exists('iconv')) {
+            return iconv($from, $to, $string);
+        } elseif (function_exists('mb_convert_encoding')) {
+            return mb_convert_encoding($string, $to, $from);
+        } else {
+            throw new \RuntimeException('No suitable convert encoding function (use UTF-8 as your encoding or install the iconv or mbstring extension).');
+        }
     }
 }

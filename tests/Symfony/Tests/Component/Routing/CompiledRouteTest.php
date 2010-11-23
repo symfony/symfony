@@ -37,9 +37,7 @@ class CompiledRouteTest extends \PHPUnit_Framework_TestCase
         $this->assertEquals(array('foo' => 'bar'), $compiled->getDefaults(), '->getDefaults() returns the route defaults');
         $this->assertEquals(array('foo' => '\d+'), $compiled->getRequirements(), '->getRequirements() returns the route requirements');
         $this->assertEquals(array_merge(array(
-            'variable_prefixes'  => array(':'),
             'segment_separators' => array('/', '.'),
-            'variable_regex'     => '[\w\d_]+',
             'text_regex'         => '.+?',
             'compiler_class'     => 'Symfony\\Component\\Routing\\RouteCompiler',
         ), array('foo' => 'bar')), $compiled->getOptions(), '->getOptions() returns the route options');

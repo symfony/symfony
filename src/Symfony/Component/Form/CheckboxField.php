@@ -18,4 +18,13 @@ namespace Symfony\Component\Form;
  */
 class CheckboxField extends ToggleField
 {
+    /**
+     * {@inheritDoc}
+     */
+    protected function configure()
+    {
+        $this->addOption('value', '1');
+
+        parent::configure();
+    }
 }

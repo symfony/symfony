@@ -135,5 +135,9 @@
 {% endblock percent_field %}
 
 {% block file_field %}
+    {% set group = field %}
+    {% set field = group.file %}
     <input type="file" {% display field_attributes %} />
+    {{ group.token|render }}
+    {{ group.original_name|render }}
 {% endblock file_field %}

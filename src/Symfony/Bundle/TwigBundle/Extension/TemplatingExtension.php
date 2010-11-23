@@ -25,7 +25,6 @@ use Symfony\Component\Yaml\Dumper as YamlDumper;
 class TemplatingExtension extends \Twig_Extension
 {
     protected $container;
-    protected $templating;
 
     public function __construct(ContainerInterface $container)
     {
@@ -113,37 +112,37 @@ class TemplatingExtension extends \Twig_Extension
 
     public function abbrClass($class)
     {
-        return $this->templating->get('code')->abbrClass($class);
+        return $this->getTemplating()->get('code')->abbrClass($class);
     }
 
     public function abbrMethod($method)
     {
-        return $this->templating->get('code')->abbrMethod($method);
+        return $this->getTemplating()->get('code')->abbrMethod($method);
     }
 
     public function formatArgs($args)
     {
-        return $this->templating->get('code')->formatArgs($args);
+        return $this->getTemplating()->get('code')->formatArgs($args);
     }
 
     public function formatArgsAsText($args)
     {
-        return $this->templating->get('code')->formatArgsAsText($args);
+        return $this->getTemplating()->get('code')->formatArgsAsText($args);
     }
 
     public function fileExcerpt($file, $line)
     {
-        return $this->templating->get('code')->fileExcerpt($file, $line);
+        return $this->getTemplating()->get('code')->fileExcerpt($file, $line);
     }
 
     public function formatFile($file, $line)
     {
-        return $this->templating->get('code')->formatFile($file, $line);
+        return $this->getTemplating()->get('code')->formatFile($file, $line);
     }
 
     public function formatFileFromText($text)
     {
-        return $this->templating->get('code')->formatFileFromText($text);
+        return $this->getTemplating()->get('code')->formatFileFromText($text);
     }
 
     public function dump($value)

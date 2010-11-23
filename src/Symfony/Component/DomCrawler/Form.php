@@ -215,7 +215,7 @@ class Form implements \ArrayAccess
      *
      * @return Boolean true if the field exists, false otherwise
      */
-    public function hasField($name)
+    public function has($name)
     {
         return isset($this->fields[$name]);
     }
@@ -229,9 +229,9 @@ class Form implements \ArrayAccess
      *
      * @throws \InvalidArgumentException When field is not present in this form
      */
-    public function getField($name)
+    public function get($name)
     {
-        if (!$this->hasField($name)) {
+        if (!$this->has($name)) {
             throw new \InvalidArgumentException(sprintf('The form has no "%s" field', $name));
         }
 
@@ -245,7 +245,7 @@ class Form implements \ArrayAccess
      *
      * @return FormField The field instance
      */
-    public function setField(Field\FormField $field)
+    public function set(Field\FormField $field)
     {
         $this->fields[$field->getName()] = $field;
     }
@@ -255,7 +255,7 @@ class Form implements \ArrayAccess
      *
      * @return array An array of fields
      */
-    public function getFields()
+    public function all()
     {
         return $this->fields;
     }
@@ -280,21 +280,21 @@ class Form implements \ArrayAccess
             $nodeName = $node->nodeName;
 
             if ($node === $button) {
-                $this->setField(new Field\InputFormField($node));
+                $this->set(new Field\InputFormField($node));
             } elseif ('select' == $nodeName || 'input' == $nodeName && 'checkbox' == $node->getAttribute('type')) {
-                $this->setField(new Field\ChoiceFormField($node));
+                $this->set(new Field\ChoiceFormField($node));
             } elseif ('input' == $nodeName && 'radio' == $node->getAttribute('type')) {
-                if ($this->hasField($node->getAttribute('name'))) {
-                    $this->getField($node->getAttribute('name'))->addChoice($node);
+                if ($this->has($node->getAttribute('name'))) {
+                    $this->get($node->getAttribute('name'))->addChoice($node);
                 } else {
-                    $this->setField(new Field\ChoiceFormField($node));
+                    $this->set(new Field\ChoiceFormField($node));
                 }
             } elseif ('input' == $nodeName && 'file' == $node->getAttribute('type')) {
-                $this->setField(new Field\FileFormField($node));
+                $this->set(new Field\FileFormField($node));
             } elseif ('input' == $nodeName && !in_array($node->getAttribute('type'), array('submit', 'button', 'image'))) {
-                $this->setField(new Field\InputFormField($node));
+                $this->set(new Field\InputFormField($node));
             } elseif ('textarea' == $nodeName) {
-                $this->setField(new Field\TextareaFormField($node));
+                $this->set(new Field\TextareaFormField($node));
             }
         }
     }
@@ -308,7 +308,7 @@ class Form implements \ArrayAccess
      */
     public function offsetExists($name)
     {
-        return $this->hasField($name);
+        return $this->has($name);
     }
 
     /**
@@ -322,7 +322,7 @@ class Form implements \ArrayAccess
      */
     public function offsetGet($name)
     {
-        if (!$this->hasField($name)) {
+        if (!$this->has($name)) {
             throw new \InvalidArgumentException(sprintf('The form field "%s" does not exist', $name));
         }
 
@@ -339,7 +339,7 @@ class Form implements \ArrayAccess
      */
     public function offsetSet($name, $value)
     {
-        if (!$this->hasField($name)) {
+        if (!$this->has($name)) {
             throw new \InvalidArgumentException(sprintf('The form field "%s" does not exist', $name));
         }
 

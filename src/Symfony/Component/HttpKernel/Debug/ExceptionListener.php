@@ -48,12 +48,12 @@ class ExceptionListener
 
     public function handle(Event $event)
     {
-        if (HttpKernelInterface::MASTER_REQUEST !== $event->getParameter('request_type')) {
+        if (HttpKernelInterface::MASTER_REQUEST !== $event->get('request_type')) {
             return false;
         }
 
-        $exception = $event->getParameter('exception');
-        $request = $event->getParameter('request');
+        $exception = $event->get('exception');
+        $request = $event->get('request');
 
         if (null !== $this->logger) {
             $this->logger->err(sprintf('%s: %s (uncaught exception)', get_class($exception), $exception->getMessage()));

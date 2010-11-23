@@ -31,7 +31,7 @@ class XliffFileLoader implements LoaderInterface
 
         $catalogue = new MessageCatalogue($locale);
         foreach ($xml->xpath('//xliff:trans-unit') as $translation) {
-            $catalogue->setMessage((string) $translation->source, (string) $translation->target, $domain);
+            $catalogue->set((string) $translation->source, (string) $translation->target, $domain);
         }
         $catalogue->addResource(new FileResource($resource));
 

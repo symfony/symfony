@@ -54,7 +54,7 @@ class UrlGenerator implements UrlGeneratorInterface
      */
     public function generate($name, array $parameters, $absolute = false)
     {
-        if (null === $route = $this->routes->getRoute($name)) {
+        if (null === $route = $this->routes->get($name)) {
             throw new \InvalidArgumentException(sprintf('Route "%s" does not exist.', $name));
         }
 

@@ -77,7 +77,7 @@ abstract class FormAuthenticationListener
      */
     public function handle(Event $event)
     {
-        $request = $event->getParameter('request');
+        $request = $event->get('request');
 
         if ($this->options['check_path'] !== $request->getPathInfo()) {
             return;

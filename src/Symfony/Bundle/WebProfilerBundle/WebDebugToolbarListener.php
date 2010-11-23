@@ -47,7 +47,7 @@ class WebDebugToolbarListener
 
     public function handle(Event $event, Response $response)
     {
-        if (HttpKernelInterface::MASTER_REQUEST !== $event->getParameter('request_type')) {
+        if (HttpKernelInterface::MASTER_REQUEST !== $event->get('request_type')) {
             return $response;
         }
 
@@ -57,10 +57,10 @@ class WebDebugToolbarListener
                 $response->headers->get('location'), $response->headers->get('location'))
             );
             $response->setStatusCode(200);
-            $response->headers->delete('Location');
+            $response->headers->remove('Location');
         }
 
-        $request = $event->getParameter('request');
+        $request = $event->get('request');
         if (!$response->headers->has('X-Debug-Token')
             || '3' === substr($response->getStatusCode(), 0, 1)
             || ($response->headers->has('Content-Type') && false === strpos($response->headers->get('Content-Type'), 'html'))

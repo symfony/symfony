@@ -65,7 +65,7 @@ class AccessListener
             throw new AuthenticationCredentialsNotFoundException('A Token was not found in the SecurityContext.');
         }
 
-        $request = $event->getParameter('request');
+        $request = $event->get('request');
 
         list($attributes, $channel) = $this->map->getPatterns($request);
 

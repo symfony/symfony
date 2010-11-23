@@ -102,7 +102,7 @@ class Event
      *
      * @return array The event parameters
      */
-    public function getParameters()
+    public function all()
     {
         return $this->parameters;
     }
@@ -114,7 +114,7 @@ class Event
      *
      * @return Boolean true if the parameter exists, false otherwise
      */
-    public function hasParameter($name)
+    public function has($name)
     {
         return array_key_exists($name, $this->parameters);
     }
@@ -128,7 +128,7 @@ class Event
      *
      * @throws \InvalidArgumentException When parameter doesn't exists for this event
      */
-    public function getParameter($name)
+    public function get($name)
     {
         if (!array_key_exists($name, $this->parameters)) {
             throw new \InvalidArgumentException(sprintf('The event "%s" has no "%s" parameter.', $this->name, $name));
@@ -143,7 +143,7 @@ class Event
      * @param string  $name   The parameter name
      * @param mixed   $value  The parameter value
      */
-    public function setParameter($name, $value)
+    public function set($name, $value)
     {
         $this->parameters[$name] = $value;
     }

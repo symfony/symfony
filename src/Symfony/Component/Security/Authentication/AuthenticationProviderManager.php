@@ -90,7 +90,7 @@ class AuthenticationProviderManager implements AuthenticationManagerInterface
      *
      * @return AuthenticationProviderInterface[] An array of AuthenticationProviderInterface instances
      */
-    public function getProviders()
+    public function all()
     {
         return $this->providers;
     }
@@ -104,7 +104,7 @@ class AuthenticationProviderManager implements AuthenticationManagerInterface
     {
         $this->providers = array();
         foreach ($providers as $provider) {
-            $this->addProvider($provider);
+            $this->add($provider);
         }
     }
 
@@ -113,7 +113,7 @@ class AuthenticationProviderManager implements AuthenticationManagerInterface
      *
      * @param AuthenticationProviderInterface $provider A AuthenticationProviderInterface instance
      */
-    public function addProvider(AuthenticationProviderInterface $provider)
+    public function add(AuthenticationProviderInterface $provider)
     {
         $this->providers[] = $provider;
     }

@@ -769,7 +769,7 @@ class CacheTest extends CacheTestCase
             } elseif ('POST' == $request->getMethod()) {
                 $response->setStatusCode(303);
                 $response->headers->set('Location', '/');
-                $response->headers->delete('Cache-Control');
+                $response->headers->remove('Cache-Control');
                 $response->setContent('');
             }
         });

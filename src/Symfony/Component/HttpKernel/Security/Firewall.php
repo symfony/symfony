@@ -60,11 +60,11 @@ class Firewall
      */
     public function handle(Event $event)
     {
-        if (HttpKernelInterface::MASTER_REQUEST !== $event->getParameter('request_type')) {
+        if (HttpKernelInterface::MASTER_REQUEST !== $event->get('request_type')) {
             return;
         }
 
-        $request = $event->getParameter('request');
+        $request = $event->get('request');
 
         $this->dispatcher->disconnect('core.security');
         list($listeners, $exception) = $this->map->getListeners($request);

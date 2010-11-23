@@ -21,11 +21,11 @@ class AuthenticationProviderManagerTest extends \PHPUnit_Framework_TestCase
     public function testProviderAccessors()
     {
         $manager = new AuthenticationProviderManager();
-        $manager->addProvider($provider = $this->getMock('Symfony\Component\Security\Authentication\Provider\AuthenticationProviderInterface'));
-        $this->assertSame(array($provider), $manager->getProviders());
+        $manager->add($provider = $this->getMock('Symfony\Component\Security\Authentication\Provider\AuthenticationProviderInterface'));
+        $this->assertSame(array($provider), $manager->all());
 
         $manager->setProviders($providers = array($this->getMock('Symfony\Component\Security\Authentication\Provider\AuthenticationProviderInterface')));
-        $this->assertSame($providers, $manager->getProviders());
+        $this->assertSame($providers, $manager->all());
     }
 
     /**

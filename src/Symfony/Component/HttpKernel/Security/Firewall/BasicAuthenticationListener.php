@@ -60,7 +60,7 @@ class BasicAuthenticationListener
      */
     public function handle(Event $event)
     {
-        $request = $event->getParameter('request');
+        $request = $event->get('request');
 
         if (false === $username = $request->server->get('PHP_AUTH_USER', false)) {
             return;

@@ -369,14 +369,14 @@ class Response
     /**
      * Sets the Expires HTTP header with a \DateTime instance.
      *
-     * If passed a null value, it deletes the header.
+     * If passed a null value, it removes the header.
      *
      * @param \DateTime $date A \DateTime instance
      */
     public function setExpires(\DateTime $date = null)
     {
         if (null === $date) {
-            $this->headers->delete('Expires');
+            $this->headers->remove('Expires');
         } else {
             $date = clone $date;
             $date->setTimezone(new \DateTimeZone('UTC'));
@@ -490,14 +490,14 @@ class Response
     /**
      * Sets the Last-Modified HTTP header with a \DateTime instance.
      *
-     * If passed a null value, it deletes the header.
+     * If passed a null value, it removes the header.
      *
      * @param \DateTime $date A \DateTime instance
      */
     public function setLastModified(\DateTime $date = null)
     {
         if (null === $date) {
-            $this->headers->delete('Last-Modified');
+            $this->headers->remove('Last-Modified');
         } else {
             $date = clone $date;
             $date->setTimezone(new \DateTimeZone('UTC'));
@@ -524,7 +524,7 @@ class Response
     public function setEtag($etag = null, $weak = false)
     {
         if (null === $etag) {
-            $this->headers->delete('Etag');
+            $this->headers->remove('Etag');
         } else {
             if (0 !== strpos($etag, '"')) {
                 $etag = '"'.$etag.'"';
@@ -595,7 +595,7 @@ class Response
 
         // remove headers that MUST NOT be included with 304 Not Modified responses
         foreach (array('Allow', 'Content-Encoding', 'Content-Language', 'Content-Length', 'Content-MD5', 'Content-Type', 'Last-Modified') as $header) {
-            $this->headers->delete($header);
+            $this->headers->remove($header);
         }
     }
 

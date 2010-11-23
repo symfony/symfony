@@ -49,9 +49,9 @@ class ResponseHeaderBag extends HeaderBag
     /**
      * {@inheritdoc}
      */
-    public function delete($key)
+    public function remove($key)
     {
-        parent::delete($key);
+        parent::remove($key);
 
         if ('cache-control' === strtr(strtolower($key), '_', '-')) {
             $this->computedCacheControl = array();

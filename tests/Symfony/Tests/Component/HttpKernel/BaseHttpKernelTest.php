@@ -44,7 +44,7 @@ class BaseHttpKernelTest extends \PHPUnit_Framework_TestCase
         $dispatcher = new EventDispatcher();
         $dispatcher->connect('core.exception', function ($event)
         {
-            $event->setReturnValue(new Response($event->getParameter('exception')->getMessage()));
+            $event->setReturnValue(new Response($event->get('exception')->getMessage()));
 
             return true;
         });

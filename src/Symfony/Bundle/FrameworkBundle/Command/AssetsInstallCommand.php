@@ -52,7 +52,7 @@ class AssetsInstallCommand extends Command
 
         $filesystem = new Filesystem();
 
-        foreach ($this->container->getKernelService()->getBundles() as $bundle) {
+        foreach ($this->container->get('kernel')->getBundles() as $bundle) {
             if (is_dir($originDir = $bundle->getPath().'/Resources/public')) {
                 $output->writeln(sprintf('Installing assets for <comment>%s\\%s</comment>', $bundle->getNamespacePrefix(), $bundle->getName()));
 

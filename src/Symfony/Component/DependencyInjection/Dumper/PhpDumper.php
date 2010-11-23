@@ -60,17 +60,6 @@ class PhpDumper extends Dumper
         }
     }
 
-    protected function addServiceShared($id, $definition)
-    {
-        if ($definition->isShared()) {
-            return <<<EOF
-        if (isset(\$this->shared['$id'])) return \$this->shared['$id'];
-
-
-EOF;
-        }
-    }
-
     protected function addServiceReturn($id, $definition)
     {
         return <<<EOF
@@ -94,20 +83,22 @@ EOF;
             $arguments[] = $this->dumpValue($value);
         }
 
-        if (null !== $definition->getFactoryMethod()) {
-            if (null !== $definition->getFactoryService()) {
-                $code = sprintf("        \$instance = %s->%s(%s);\n", $this->getServiceCall($definition->getFactoryService()), $definition->getFactoryMethod(), implode(', ', $arguments));
-            } else {
-                $code = sprintf("        \$instance = call_user_func(array(%s, '%s')%s);\n", $class, $definition->getFactoryMethod(), $arguments ? ', '.implode(', ', $arguments) : '');
-            }
-        } elseif ($class != "'".str_replace('\\', '\\\\', $definition->getClass())."'") {
-            $code = sprintf("        \$class = %s;\n        \$instance = new \$class(%s);\n", $class, implode(', ', $arguments));
+        if ($definition->isShared()) {
+            $instantiation = sprintf("        \$this->services['$id'] = \$instance");
         } else {
-            $code = sprintf("        \$instance = new %s(%s);\n", $definition->getClass(), implode(', ', $arguments));
+            $instantiation = sprintf("        \$instance");
         }
 
-        if ($definition->isShared()) {
-            $code .= sprintf("        \$this->shared['$id'] = \$instance;\n");
+        if (null !== $definition->getFactoryMethod()) {
+            if (null !== $definition->getFactoryService()) {
+                $code = sprintf("$instantiation = %s->%s(%s);\n", $this->getServiceCall($definition->getFactoryService()), $definition->getFactoryMethod(), implode(', ', $arguments));
+            } else {
+                $code = sprintf("$instantiation = call_user_func(array(%s, '%s')%s);\n", $class, $definition->getFactoryMethod(), $arguments ? ', '.implode(', ', $arguments) : '');
+            }
+        } elseif (false !== strpos($class, '$')) {
+            $code = sprintf("        \$class = %s;\n$instantiation = new \$class(%s);\n", $class, implode(', ', $arguments));
+        } else {
+            $code = sprintf("$instantiation = new \\%s(%s);\n", substr(str_replace('\\\\', '\\', $class), 1, -1), implode(', ', $arguments));
         }
 
         return $code;
@@ -180,7 +171,6 @@ EOF;
 
         $code .=
             $this->addServiceInclude($id, $definition).
-            $this->addServiceShared($id, $definition).
             $this->addServiceInstance($id, $definition).
             $this->addServiceMethodCalls($id, $definition).
             $this->addServiceConfigurator($id, $definition).
@@ -284,8 +274,6 @@ use Symfony\Component\DependencyInjection\ParameterBag\\$bagClass;
  */
 class $class extends $baseClass implements TaggedContainerInterface
 {
-    protected \$shared = array();
-
 EOF;
     }
 

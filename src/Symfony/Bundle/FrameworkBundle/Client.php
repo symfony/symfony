@@ -75,7 +75,7 @@ class Client extends BaseClient
             return false;
         }
 
-        return $this->container->getProfilerService()->loadFromResponse($this->response);
+        return $this->container->get('profiler')->loadFromResponse($this->response);
     }
 
     /**

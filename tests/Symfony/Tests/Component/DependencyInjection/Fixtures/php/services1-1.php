@@ -15,8 +15,6 @@ use Symfony\Component\DependencyInjection\ParameterBag\ParameterBag;
  */
 class Container extends AbstractContainer implements TaggedContainerInterface
 {
-    protected $shared = array();
-
     /**
      * Constructor.
      */

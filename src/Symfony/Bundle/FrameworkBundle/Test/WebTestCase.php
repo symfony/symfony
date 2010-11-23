@@ -39,7 +39,7 @@ abstract class WebTestCase extends BaseWebTestCase
         $this->kernel = $this->createKernel($options);
         $this->kernel->boot();
 
-        $client = $this->kernel->getContainer()->getTest_ClientService();
+        $client = $this->kernel->getContainer()->get('test.client');
         $client->setServerParameters($server);
 
         return $client;

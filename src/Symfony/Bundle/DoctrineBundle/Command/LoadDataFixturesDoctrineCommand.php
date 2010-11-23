@@ -67,8 +67,8 @@ EOT
             $paths = is_array($dirOrFile) ? $dirOrFile : array($dirOrFile);
         } else {
             $paths = array();
-            $bundleDirs = $this->container->getKernelService()->getBundleDirs();
-            foreach ($this->container->getKernelService()->getBundles() as $bundle) {
+            $bundleDirs = $this->container->get('kernel')->getBundleDirs();
+            foreach ($this->container->get('kernel')->getBundles() as $bundle) {
                 $tmp = dirname(str_replace('\\', '/', get_class($bundle)));
                 $namespace = str_replace('/', '\\', dirname($tmp));
                 $class = basename($tmp);

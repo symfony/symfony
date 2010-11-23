@@ -77,7 +77,6 @@ class PhpDumperTest extends \PHPUnit_Framework_TestCase
         $container->set('bar', $bar = new \stdClass());
         $container->setParameter('foo_bar', 'foo_bar');
 
-        $this->assertEquals($bar, $container->getBarService(), '->set() overrides an already defined service');
         $this->assertEquals($bar, $container->get('bar'), '->set() overrides an already defined service');
     }
 
@@ -90,6 +89,6 @@ class PhpDumperTest extends \PHPUnit_Framework_TestCase
         $container = new \ProjectServiceContainer();
         $container->set('bar', $bar = new \stdClass());
 
-        $this->assertSame($bar, $container->getFooService()->bar, '->set() overrides an already defined service');
+        $this->assertSame($bar, $container->get('foo')->bar, '->set() overrides an already defined service');
     }
 }

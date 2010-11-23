@@ -15,8 +15,6 @@ use Symfony\Component\DependencyInjection\ParameterBag\ParameterBag;
  */
 class ProjectServiceContainer extends Container implements TaggedContainerInterface
 {
-    protected $shared = array();
-
     /**
      * Constructor.
      */
@@ -50,10 +48,7 @@ class ProjectServiceContainer extends Container implements TaggedContainerInterf
      */
     protected function getBarService()
     {
-        if (isset($this->shared['bar'])) return $this->shared['bar'];
-
-        $instance = new FooClass('foo', $this->get('foo.baz'), $this->getParameter('foo_bar'));
-        $this->shared['bar'] = $instance;
+        $this->services['bar'] = $instance = new \FooClass('foo', $this->get('foo.baz'), $this->getParameter('foo_bar'));
         $this->get('foo.baz')->configure($instance);
 
         return $instance;
@@ -69,10 +64,7 @@ class ProjectServiceContainer extends Container implements TaggedContainerInterf
      */
     protected function getFoo_BazService()
     {
-        if (isset($this->shared['foo.baz'])) return $this->shared['foo.baz'];
-
-        $instance = call_user_func(array($this->getParameter('baz_class'), 'getInstance'));
-        $this->shared['foo.baz'] = $instance;
+        $this->services['foo.baz'] = $instance = call_user_func(array($this->getParameter('baz_class'), 'getInstance'));
         call_user_func(array($this->getParameter('baz_class'), 'configureStatic1'), $instance);
 
         return $instance;
@@ -88,11 +80,8 @@ class ProjectServiceContainer extends Container implements TaggedContainerInterf
      */
     protected function getFooBarService()
     {
-        if (isset($this->shared['foo_bar'])) return $this->shared['foo_bar'];
-
         $class = $this->getParameter('foo_class');
-        $instance = new $class();
-        $this->shared['foo_bar'] = $instance;
+        $this->services['foo_bar'] = $instance = new $class();
 
         return $instance;
     }
@@ -109,10 +98,7 @@ class ProjectServiceContainer extends Container implements TaggedContainerInterf
     {
         require_once '%path%foo.php';
 
-        if (isset($this->shared['method_call1'])) return $this->shared['method_call1'];
-
-        $instance = new FooClass();
-        $this->shared['method_call1'] = $instance;
+        $this->services['method_call1'] = $instance = new \FooClass();
         $instance->setBar($this->get('foo'));
         $instance->setBar($this->get('foo', ContainerInterface::NULL_ON_INVALID_REFERENCE));
         if ($this->has('foo')) {
@@ -135,10 +121,7 @@ class ProjectServiceContainer extends Container implements TaggedContainerInterf
      */
     protected function getFactoryServiceService()
     {
-        if (isset($this->shared['factory_service'])) return $this->shared['factory_service'];
-
-        $instance = $this->get('foo.baz')->getInstance();
-        $this->shared['factory_service'] = $instance;
+        $this->services['factory_service'] = $instance = $this->get('foo.baz')->getInstance();
 
         return $instance;
     }

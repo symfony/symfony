@@ -88,7 +88,7 @@ abstract class DoctrineCommand extends Command
 
     protected function runCommand($name, array $input = array())
     {
-        $application = new Application($this->container->getKernelService());
+        $application = new Application($this->container->get('kernel'));
         $arguments = array();
         $arguments = array_merge(array($name), $input);
         $input = new ArrayInput($arguments);

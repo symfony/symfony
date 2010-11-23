@@ -51,7 +51,7 @@ class InitBundleCommand extends Command
             throw new \InvalidArgumentException('The namespace must end with Bundle.');
         }
 
-        $dirs = $this->container->getKernelService()->getBundleDirs();
+        $dirs = $this->container->get('kernel')->getBundleDirs();
 
         $tmp = str_replace('\\', '/', $namespace);
         $namespace = str_replace('/', '\\', dirname($tmp));

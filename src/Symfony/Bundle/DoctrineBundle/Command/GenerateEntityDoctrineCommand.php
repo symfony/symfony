@@ -60,7 +60,7 @@ EOT
             throw new \InvalidArgumentException('The bundle name must end with Bundle. Example: "Bundle\MySampleBundle".');
         }
 
-        $dirs = $this->container->getKernelService()->getBundleDirs();
+        $dirs = $this->container->get('kernel')->getBundleDirs();
 
         $tmp = str_replace('\\', '/', $bundle);
         $namespace = str_replace('/', '\\', dirname($tmp));

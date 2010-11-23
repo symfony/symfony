@@ -30,7 +30,6 @@ class TemplatingExtension extends \Twig_Extension
     public function __construct(ContainerInterface $container)
     {
         $this->container = $container;
-        $this->templating = $container->get('templating.engine');
     }
 
     public function getContainer()
@@ -40,7 +39,7 @@ class TemplatingExtension extends \Twig_Extension
 
     public function getTemplating()
     {
-        return $this->templating;
+        return $this->container->get('templating.engine');
     }
 
     /**

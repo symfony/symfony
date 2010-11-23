@@ -30,17 +30,17 @@ class Engine extends BaseEngine
      *
      * @param ContainerInterface $container A ContainerInterface instance
      * @param LoaderInterface    $loader    A loader instance
-     * @param array              $renderers An array of renderer instances
      */
-    public function __construct(ContainerInterface $container, LoaderInterface $loader, array $renderers = array())
+    public function __construct(ContainerInterface $container, LoaderInterface $loader)
     {
         $this->container = $container;
 
-        parent::__construct($loader, $renderers);
+        parent::__construct($loader);
 
         foreach ($this->container->findTaggedServiceIds('templating.renderer') as $id => $attributes) {
             if (isset($attributes[0]['alias'])) {
-                $this->renderers[$attributes[0]['alias']] = $id;
+                $this->renderers[$attributes[0]['alias']] = $this->container->get($id);
+                $this->renderers[$attributes[0]['alias']]->setEngine($this);
             }
         }
 
@@ -50,20 +50,6 @@ class Engine extends BaseEngine
                 $this->helpers[$attributes[0]['alias']] = $id;
             }
         }
-    }
-
-    public function render($name, array $parameters = array())
-    {
-        list(, $options) = $this->splitTemplateName($name);
-
-        $renderer = $options['renderer'];
-
-        if (isset($this->renderers[$renderer]) && is_string($this->renderers[$renderer])) {
-            $this->renderers[$renderer] = $this->container->get($this->renderers[$renderer]);
-            $this->renderers[$renderer]->setEngine($this);
-        }
-
-        return parent::render($name, $parameters);
     }
 
     /**

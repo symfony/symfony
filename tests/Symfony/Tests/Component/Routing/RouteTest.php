@@ -17,8 +17,8 @@ class RouteTest extends \PHPUnit_Framework_TestCase
 {
     public function testConstructor()
     {
-        $route = new Route('/:foo', array('foo' => 'bar'), array('foo' => '\d+'), array('foo' => 'bar'));
-        $this->assertEquals('/:foo', $route->getPattern(), '__construct() takes a pattern as its first argument');
+        $route = new Route('/{foo}', array('foo' => 'bar'), array('foo' => '\d+'), array('foo' => 'bar'));
+        $this->assertEquals('/{foo}', $route->getPattern(), '__construct() takes a pattern as its first argument');
         $this->assertEquals(array('foo' => 'bar'), $route->getDefaults(), '__construct() takes defaults as its second argument');
         $this->assertEquals(array('foo' => '\d+'), $route->getRequirements(), '__construct() takes requirements as its third argument');
         $this->assertEquals('bar', $route->getOption('foo'), '__construct() takes options as its fourth argument');
@@ -26,9 +26,9 @@ class RouteTest extends \PHPUnit_Framework_TestCase
 
     public function testPattern()
     {
-        $route = new Route('/:foo');
-        $route->setPattern('/:bar');
-        $this->assertEquals('/:bar', $route->getPattern(), '->setPattern() sets the pattern');
+        $route = new Route('/{foo}');
+        $route->setPattern('/{bar}');
+        $this->assertEquals('/{bar}', $route->getPattern(), '->setPattern() sets the pattern');
         $route->setPattern('');
         $this->assertEquals('/', $route->getPattern(), '->setPattern() adds a / at the beginning of the pattern if needed');
         $route->setPattern('bar');
@@ -38,7 +38,7 @@ class RouteTest extends \PHPUnit_Framework_TestCase
 
     public function testOptions()
     {
-        $route = new Route('/:foo');
+        $route = new Route('/{foo}');
         $route->setOptions(array('foo' => 'bar'));
         $this->assertEquals(array_merge(array(
         'segment_separators' => array('/', '.'),
@@ -56,7 +56,7 @@ class RouteTest extends \PHPUnit_Framework_TestCase
      */
     public function testDefaults()
     {
-        $route = new Route('/:foo');
+        $route = new Route('/{foo}');
         $route->setDefaults(array('foo' => 'bar'));
         $this->assertEquals(array('foo' => 'bar'), $route->getDefaults(), '->setDefaults() sets the defaults');
         $this->assertEquals($route, $route->setDefaults(array()), '->setDefaults() implements a fluent interface');
@@ -71,7 +71,7 @@ class RouteTest extends \PHPUnit_Framework_TestCase
 
     public function testRequirements()
     {
-        $route = new Route('/:foo');
+        $route = new Route('/{foo}');
         $route->setRequirements(array('foo' => '\d+'));
         $this->assertEquals(array('foo' => '\d+'), $route->getRequirements(), '->setRequirements() sets the requirements');
         $this->assertEquals('\d+', $route->getRequirement('foo'), '->getRequirement() returns a requirement');
@@ -87,7 +87,7 @@ class RouteTest extends \PHPUnit_Framework_TestCase
 
     public function testCompile()
     {
-        $route = new Route('/:foo');
+        $route = new Route('/{foo}');
         $this->assertEquals('Symfony\\Component\\Routing\\CompiledRoute', get_class($compiled = $route->compile()), '->compile() returns a compiled route');
         $this->assertEquals($compiled, $route->compile(), '->compile() only compiled the route once');
     }

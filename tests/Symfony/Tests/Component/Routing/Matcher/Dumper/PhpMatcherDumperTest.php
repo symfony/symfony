@@ -29,12 +29,12 @@ class PhpMatcherDumperTest extends \PHPUnit_Framework_TestCase
         $collection = new RouteCollection();
 
         $collection->add('foo', new Route(
-            '/foo/:bar',
+            '/foo/{bar}',
             array('def' => 'test'),
             array('bar' => 'baz|symfony')
         ));
         $collection->add('bar', new Route(
-            '/bar/:foo',
+            '/bar/{foo}',
             array(),
             array('_method' => 'GET|head')
         ));

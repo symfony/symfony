@@ -131,7 +131,7 @@ class RouteCompiler implements RouteCompilerInterface
             if (false !== $this->tokenizeBufferBefore($buffer, $tokens, $afterASeparator, $currentSeparator)) {
                 // a custom token
                 $this->customToken = true;
-            } else if ($afterASeparator && preg_match('#^\:([\w\d_]+)#', $buffer, $match)) {
+            } else if ($afterASeparator && preg_match('#^\{([\w\d_]+)\}#', $buffer, $match)) {
                 // a variable
                 $this->tokens[] = array('variable', $currentSeparator, $match[0], $match[1]);
 

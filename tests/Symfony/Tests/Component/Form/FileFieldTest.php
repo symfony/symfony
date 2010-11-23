@@ -40,7 +40,7 @@ class FileFieldTest extends \PHPUnit_Framework_TestCase
             'tmp_dir' => self::$tmpDir,
         ));
 
-        $tmpPath = self::$tmpDir . '/' . md5(session_id() . '$secret$' . '12345');
+        $tmpPath = realpath(self::$tmpDir) . '/' . md5(session_id() . '$secret$' . '12345');
         $that = $this;
 
         $file = $this->getMock('Symfony\Component\HttpFoundation\File\UploadedFile', array(), array(), '', false);
@@ -91,7 +91,7 @@ class FileFieldTest extends \PHPUnit_Framework_TestCase
             'token' => '12345',
             'original_name' => 'original_name.jpg',
         ), $field->getDisplayedData());
-        $this->assertEquals($tmpPath, $field->getData());
+        $this->assertEquals(realpath($tmpPath), realpath($field->getData()));
     }
 
     public function testBindKeepsOldFileIfNotOverwritten()

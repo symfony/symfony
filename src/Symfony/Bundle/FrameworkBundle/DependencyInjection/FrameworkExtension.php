@@ -104,7 +104,7 @@ class FrameworkExtension extends Extension
             $this->registerValidationConfiguration($config, $container);
         }
 
-        if (isset($config['templating'])) {
+        if (array_key_exists('templating', $config)) {
             $this->registerTemplatingConfiguration($config, $container);
         }
 

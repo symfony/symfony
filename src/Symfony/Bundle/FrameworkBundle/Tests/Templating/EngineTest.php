@@ -16,7 +16,6 @@ use Symfony\Bundle\FrameworkBundle\Templating\Engine;
 use Symfony\Component\Templating\Storage\StringStorage;
 use Symfony\Component\Templating\Storage\Storage;
 use Symfony\Component\Templating\Renderer\PhpRenderer;
-use Symfony\Component\OutputEscaper\Escaper;
 
 // simulate the rendering of another controller
 function foo($engine)
@@ -26,37 +25,6 @@ function foo($engine)
 
 class EngineTest extends TestCase
 {
-    public function testRenderEscaping()
-    {
-        $templates = array(
-            'tpl1'  => '<?php echo $foo ?>',
-            'tpl2'  => '<?php echo $foo.$view->render("FooBundle:Foo:tpl1.php", array("foo" => $foo)) ?>',
-            'tpl3'  => '<?php echo $foo.$view->render("FooBundle:Foo:tpl1.php", array("foo" => "foo <br />")) ?>',
-            'tpl4'  => '<?php echo $foo.Symfony\Bundle\FrameworkBundle\Tests\Templating\foo($view) ?>',
-        );
-
-        $loader = $this->getMock('Symfony\Component\Templating\Loader\LoaderInterface');
-        $loader->expects($this->exactly(4))
-            ->method('load')
-            ->with($this->anything(), $this->anything())
-            ->will($this->onConsecutiveCalls(
-                new StringStorage($templates['tpl1']),
-                new StringStorage($templates['tpl2']),
-                new StringStorage($templates['tpl3']),
-                new StringStorage($templates['tpl4'])
-            ))
-        ;
-
-        $engine = new Engine($this->getContainerMock(), $loader, array('php' => new PhpRenderer()), 'htmlspecialchars');
-
-        $this->assertEquals('foo &lt;br /&gt;', $engine->render('FooBundle:Foo:tpl1.php', array('foo' => 'foo <br />')));
-        $this->assertEquals('foo &lt;br /&gt;', $engine->render('FooBundle:Foo:tpl1.php', array('foo' => 'foo <br />')));
-
-        $this->assertEquals('foo &lt;br /&gt;foo &lt;br /&gt;', $engine->render('FooBundle:Foo:tpl2.php', array('foo' => 'foo <br />')));
-        $this->assertEquals('foo &lt;br /&gt;foo &lt;br /&gt;', $engine->render('FooBundle:Foo:tpl3.php', array('foo' => 'foo <br />')));
-        $this->assertEquals('foo &lt;br /&gt;foo &lt;br /&gt;', $engine->render('FooBundle:Foo:tpl4.php', array('foo' => 'foo <br />')));
-    }
-
     /**
      * @dataProvider getSplitTemplateNameTests
      */

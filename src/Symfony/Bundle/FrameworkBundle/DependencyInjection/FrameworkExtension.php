@@ -157,10 +157,6 @@ class FrameworkExtension extends Extension
             }
         }
 
-        if (array_key_exists('escaping', $config)) {
-            $container->setParameter('templating.output_escaper', $config['escaping']);
-        }
-
         if (array_key_exists('assets_version', $config)) {
             $container->setParameter('templating.assets.version', $config['assets_version']);
         }

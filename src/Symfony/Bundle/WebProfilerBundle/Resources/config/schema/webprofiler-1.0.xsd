@@ -8,14 +8,7 @@
     <xsd:element name="config" type="config" />
 
     <xsd:complexType name="config">
-        <xsd:sequence>
-            <xsd:element name="templates" type="templates" minOccurs="0" maxOccurs="1" />
-        </xsd:sequence>
         <xsd:attribute name="toolbar" type="xsd:boolean" />
         <xsd:attribute name="intercept-redirects" type="xsd:boolean" />
-    </xsd:complexType>
-
-    <xsd:complexType name="templates">
-        <xsd:anyAttribute processContents="lax" />
     </xsd:complexType>
 </xsd:schema>

@@ -178,7 +178,7 @@ abstract class Kernel implements HttpKernelInterface, \Serializable
             $this->boot();
         }
 
-        return $this->container->getHttpKernelService()->handle($request, $type, $catch);
+        return $this->container->get('http_kernel')->handle($request, $type, $catch);
     }
 
     /**

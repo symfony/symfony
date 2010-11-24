@@ -96,7 +96,7 @@ class ControllerResolver extends BaseControllerResolver
     public function forward($controller, array $attributes = array(), array $query = array())
     {
         $attributes['_controller'] = $controller;
-        $subRequest = $this->container->getRequestService()->duplicate($query, null, $attributes);
+        $subRequest = $this->container->get('request')->duplicate($query, null, $attributes);
 
         return $this->container->get('kernel')->handle($subRequest, HttpKernelInterface::SUB_REQUEST);
     }
@@ -137,7 +137,7 @@ class ControllerResolver extends BaseControllerResolver
         }
 
         if (null === $this->esiSupport) {
-            $this->esiSupport = $this->container->has('esi') && $this->container->getEsiService()->hasSurrogateEsiCapability($this->container->getRequestService());
+            $this->esiSupport = $this->container->has('esi') && $this->container->get('esi')->hasSurrogateEsiCapability($this->container->get('request'));
         }
 
         if ($this->esiSupport && $options['standalone']) {
@@ -148,10 +148,10 @@ class ControllerResolver extends BaseControllerResolver
                 $alt = $this->generateInternalUri($options['alt'][0], isset($options['alt'][1]) ? $options['alt'][1] : array(), isset($options['alt'][2]) ? $options['alt'][2] : array());
             }
 
-            return $this->container->getEsiService()->renderIncludeTag($uri, $alt, $options['ignore_errors'], $options['comment']);
+            return $this->container->get('esi')->renderIncludeTag($uri, $alt, $options['ignore_errors'], $options['comment']);
         }
 
-        $request = $this->container->getRequestService();
+        $request = $this->container->get('request');
 
         // controller or URI?
         if (0 === strpos($controller, '/')) {
@@ -164,7 +164,7 @@ class ControllerResolver extends BaseControllerResolver
         }
 
         try {
-            $response = $this->container->getKernelService()->handle($subRequest, HttpKernelInterface::SUB_REQUEST, true);
+            $response = $this->container->get('kernel')->handle($subRequest, HttpKernelInterface::SUB_REQUEST, true);
 
             if (200 != $response->getStatusCode()) {
                 throw new \RuntimeException(sprintf('Error when rendering "%s" (Status code is %s).', $request->getUri(), $response->getStatusCode()));
@@ -204,10 +204,10 @@ class ControllerResolver extends BaseControllerResolver
             return $controller;
         }
 
-        $uri = $this->container->getRouterService()->generate('_internal', array(
+        $uri = $this->container->get('router')->generate('_internal', array(
             'controller' => $controller,
             'path'       => $attributes ? http_build_query($attributes) : 'none',
-            '_format'    => $this->container->getRequestService()->getRequestFormat(),
+            '_format'    => $this->container->get('request')->getRequestFormat(),
         ), true);
 
         if ($query) {

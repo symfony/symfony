@@ -15,8 +15,6 @@ use Symfony\Component\DependencyInjection\ParameterBag\ParameterBag;
  */
 class ProjectServiceContainer extends Container implements TaggedContainerInterface
 {
-    protected $shared = array();
-
     /**
      * Constructor.
      */

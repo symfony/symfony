@@ -62,7 +62,7 @@ EOT
         }
 
         $entityGenerator = $this->getEntityGenerator();
-        foreach ($this->container->getKernelService()->getBundles() as $bundle) {
+        foreach ($this->container->get('kernel')->getBundles() as $bundle) {
 
             // retrieve the full bundle classname
             $class = $bundle->getReflection()->getName();

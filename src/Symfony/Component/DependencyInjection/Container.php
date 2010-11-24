@@ -181,9 +181,7 @@ class Container implements ContainerInterface
      */
     public function get($id, $invalidBehavior = self::EXCEPTION_ON_INVALID_REFERENCE)
     {
-        if (!is_string($id)) {
-            throw new \InvalidArgumentException(sprintf('A service id should be a string (%s given).', str_replace("\n", '', var_export($id, true))));
-        }
+        $id = (string) $id;
 
         if (isset($this->services[$id])) {
             return $this->services[$id];
@@ -214,25 +212,6 @@ class Container implements ContainerInterface
         }
 
         return array_merge($ids, array_keys($this->services));
-    }
-
-    /**
-     * Catches unknown methods.
-     *
-     * @param string $method    The called method name
-     * @param array  $arguments The method arguments
-     *
-     * @return mixed
-     *
-     * @throws \BadMethodCallException When calling to an undefined method
-     */
-    public function __call($method, $arguments)
-    {
-        if (!preg_match('/^get(.+)Service$/', $method, $match)) {
-            throw new \BadMethodCallException(sprintf('Call to undefined method %s::%s.', get_class($this), $method));
-        }
-
-        return $this->get(self::underscore($match[1]));
     }
 
     static public function camelize($id)

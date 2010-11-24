@@ -100,24 +100,6 @@ class ContainerTest extends \PHPUnit_Framework_TestCase
     }
 
     /**
-     * @covers Symfony\Component\DependencyInjection\Container::__call
-     */
-    public function testGetCall()
-    {
-        $sc = new Container();
-        $sc->set('foo_bar.foo', $foo = new \stdClass());
-        $this->assertEquals($foo, $sc->getFooBar_FooService(), '__call() finds services is the method is getXXXService()');
-
-        try {
-            $sc->getFooBar_Foo();
-            $this->fail('__call() throws a \BadMethodCallException exception if the method is not a service method');
-        } catch (\Exception $e) {
-            $this->assertInstanceOf('\BadMethodCallException', $e, '__call() throws a \BadMethodCallException exception if the method is not a service method');
-            $this->assertEquals('Call to undefined method Symfony\Component\DependencyInjection\Container::getFooBar_Foo.', $e->getMessage(), '__call() throws a \BadMethodCallException exception if the method is not a service method');
-        }
-    }
-
-    /**
      * @covers Symfony\Component\DependencyInjection\Container::set
      */
     public function testSet()
@@ -141,13 +123,6 @@ class ContainerTest extends \PHPUnit_Framework_TestCase
 
         $sc->set('bar', $bar = new \stdClass());
         $this->assertSame($sc->get('bar'), $bar, '->getServiceIds() prefers to return a service defined with a getXXXService() method than one defined with set()');
-
-        try {
-            $sc->get(new \stdClass());
-            $this->fail('->get() throws a \InvalidArgumentException exception if the service id is not a string');
-        } catch (\Exception $e) {
-            $this->assertInstanceOf('\InvalidArgumentException', $e, '->get() throws a \InvalidArgumentException exception if the service id is not a string');
-        }
 
         try {
             $sc->get('');

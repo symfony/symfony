@@ -346,11 +346,8 @@ class FrameworkExtension extends Extension
             'Symfony\\Component\\Routing\\Matcher\\UrlMatcher',
             'Symfony\\Component\\Routing\\Generator\\UrlGeneratorInterface',
             'Symfony\\Component\\Routing\\Generator\\UrlGenerator',
-            'Symfony\\Component\\Routing\\Loader\\Loader',
-            'Symfony\\Component\\Routing\\Loader\\DelegatingLoader',
-            'Symfony\\Component\\Routing\\Loader\\LoaderResolver',
-            'Symfony\\Bundle\\FrameworkBundle\\Routing\\LoaderResolver',
-            'Symfony\\Bundle\\FrameworkBundle\\Routing\\DelegatingLoader',
+            'Symfony\\Component\\Routing\\Loader\\LoaderInterface',
+            'Symfony\\Bundle\\FrameworkBundle\\Routing\\LazyLoader',
         ));
     }
 

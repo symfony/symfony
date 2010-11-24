@@ -39,10 +39,15 @@
             <argument>%kernel.bundle_dirs%</argument>
         </service>
 
-        <service id="routing.loader" class="%routing.loader.class%">
+        <service id="routing.loader.real" class="%routing.loader.class%">
             <argument type="service" id="controller_name_converter" />
             <argument type="service" id="logger" on-invalid="null" />
             <argument type="service" id="routing.resolver" />
+        </service>
+
+        <service id="routing.loader" class="Symfony\Bundle\FrameworkBundle\Routing\LazyLoader">
+            <argument type="service" id="service_container" />
+            <argument>routing.loader.real</argument>
         </service>
 
         <service id="router" class="%router.class%">

@@ -132,8 +132,6 @@ class FrameworkExtension extends Extension
 
             'Symfony\\Component\\EventDispatcher\\Event',
 
-            'Symfony\\Bundle\\FrameworkBundle\\Controller\\ControllerInterface',
-            'Symfony\\Bundle\\FrameworkBundle\\Controller\\BaseController',
             'Symfony\\Bundle\\FrameworkBundle\\Controller\\Controller',
         ));
     }
@@ -479,7 +477,8 @@ class FrameworkExtension extends Extension
 
     protected function addCompiledClasses($container, array $classes)
     {
-        $container->setParameter('kernel.compiled_classes', array_merge($container->getParameter('kernel.compiled_classes'), $classes));
+        $current = $container->hasParameter('kernel.compiled_classes') ? $container->getParameter('kernel.compiled_classes') : array();
+        $container->setParameter('kernel.compiled_classes', array_merge($current, $classes));
     }
 
     /**

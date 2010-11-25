@@ -122,15 +122,19 @@ class FrameworkExtension extends Extension
             'Symfony\\Component\\HttpFoundation\\Request',
             'Symfony\\Component\\HttpFoundation\\Response',
 
+            'Symfony\\Component\\HttpKernel\\BaseHttpKernel',
             'Symfony\\Component\\HttpKernel\\HttpKernel',
             'Symfony\\Component\\HttpKernel\\ResponseListener',
             'Symfony\\Component\\HttpKernel\\Controller\\ControllerResolver',
+            'Symfony\\Component\\HttpKernel\\Controller\\ControllerResolverInterface',
 
             'Symfony\\Bundle\\FrameworkBundle\\RequestListener',
             'Symfony\\Bundle\\FrameworkBundle\\Controller\\ControllerNameConverter',
             'Symfony\\Bundle\\FrameworkBundle\\Controller\\ControllerResolver',
 
             'Symfony\\Component\\EventDispatcher\\Event',
+            'Symfony\\Component\\EventDispatcher\\EventDispatcher',
+            'Symfony\\Bundle\\FrameworkBundle\\EventDispatcher',
 
             'Symfony\\Bundle\\FrameworkBundle\\Controller\\Controller',
         ));
@@ -328,6 +332,11 @@ class FrameworkExtension extends Extension
             }
         }
         $container->setParameter('session.storage.'.strtolower($config['storage_id']).'.options', $options);
+
+        $this->addCompiledClasses($container, array(
+            'Symfony\\Component\\HttpFoundation\\Session',
+            'Symfony\\Component\\HttpFoundation\\SessionStorage\\SessionStorageInterface',
+        ));
     }
 
     protected function registerRouterConfiguration($config, ContainerBuilder $container)

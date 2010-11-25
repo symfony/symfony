@@ -29,6 +29,40 @@ class UrlMatcherTest extends \PHPUnit_Framework_TestCase
         $this->assertEquals('/foo', $matcher->normalizeUrl('/foo?foo=bar'), '->normalizeUrl() removes the query string');
         $this->assertEquals('/foo/bar', $matcher->normalizeUrl('/foo//bar'), '->normalizeUrl() removes duplicated /');
     }
+
+    public function testMatch()
+    {
+      // test the patterns are matched are parameters are returned
+      $collection = new RouteCollection();
+      $collection->addRoute('foo', new Route('/foo/:bar'));
+      $matcher = new UrlMatcher($collection, array(), array());
+      $this->assertEquals(false, $matcher->match('/no-match'));
+      $this->assertEquals(array('_route' => 'foo', 'bar' => 'baz'), $matcher->match('/foo/baz'));
+
+      // test that defaults are merged
+      $collection = new RouteCollection();
+      $collection->addRoute('foo', new Route('/foo/:bar', array('def' => 'test')));
+      $matcher = new UrlMatcher($collection, array(), array());
+      $this->assertEquals(array('_route' => 'foo', 'bar' => 'baz', 'def' => 'test'), $matcher->match('/foo/baz'));
+
+      // test that route "metod" is ignore if no method is given in the context
+      $collection = new RouteCollection();
+      $collection->addRoute('foo', new Route('/foo', array(), array('_method' => array('GET', 'HEAD'))));
+
+      // route matches with no context
+      $matcher = new UrlMatcher($collection, array(), array());
+      $this->assertNotEquals(false, $matcher->match('/foo'));
+
+      // route does not match with POST method context
+      $matcher = new UrlMatcher($collection, array('method' => 'POST'), array());
+      $this->assertEquals(false, $matcher->match('/foo'));
+
+      // route does match with GET or HEAD method context
+      $matcher = new UrlMatcher($collection, array('method' => 'GET'), array());
+      $this->assertNotEquals(false, $matcher->match('/foo'));
+      $matcher = new UrlMatcher($collection, array('method' => 'HEAD'), array());
+      $this->assertNotEquals(false, $matcher->match('/foo'));
+    }
 }
 
 class UrlMatcherForTests extends UrlMatcher

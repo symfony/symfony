@@ -25,11 +25,11 @@ class ApacheMatcherDumper extends MatcherDumper
      *
      * Available options:
      *
-     *  * script_name: The script name (index.php by default)
+     *  * script_name: The script name (app.php by default)
      *
      * @param  array  $options An array of options
      *
-     * @return string A PHP class representing the matcher class
+     * @return string A string to be used as Apache rewrite rules.
      *
      * @throws \RuntimeException When a route has more than 9 variables
      */

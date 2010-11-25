@@ -3,7 +3,7 @@
 namespace Symfony\Bundle\FrameworkBundle;
 
 use Symfony\Component\HttpKernel\Bundle\Bundle;
-use Symfony\Component\Form\Form;
+use Symfony\Component\Form\FormConfiguration;
 
 /*
  * This file is part of the Symfony framework.
@@ -29,10 +29,9 @@ class FrameworkBundle extends Bundle
         if ($this->container->has('error_handler')) {
             $this->container->get('error_handler');
         }
-
         if ($this->container->hasParameter('csrf_secret')) {
-            Form::setDefaultCsrfSecret($this->container->getParameter('csrf_secret'));
-            Form::enableDefaultCsrfProtection();
+            FormConfiguration::setDefaultCsrfSecret($this->container->getParameter('csrf_secret'));
+            FormConfiguration::enableDefaultCsrfProtection();
         }
     }
 }

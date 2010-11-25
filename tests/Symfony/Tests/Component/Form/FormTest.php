@@ -6,6 +6,7 @@ require_once __DIR__ . '/Fixtures/Author.php';
 require_once __DIR__ . '/Fixtures/TestField.php';
 
 use Symfony\Component\Form\Form;
+use Symfony\Component\Form\FormConfiguration;
 use Symfony\Component\Form\Field;
 use Symfony\Component\Form\HiddenField;
 use Symfony\Component\Form\FieldGroup;
@@ -58,8 +59,8 @@ class FormTest extends \PHPUnit_Framework_TestCase
 
     protected function setUp()
     {
-        Form::disableDefaultCsrfProtection();
-        Form::setDefaultCsrfSecret(null);
+        FormConfiguration::disableDefaultCsrfProtection();
+        FormConfiguration::setDefaultCsrfSecret(null);
         $this->validator = $this->createMockValidator();
         $this->form = new Form('author', new Author(), $this->validator);
     }
@@ -96,7 +97,7 @@ class FormTest extends \PHPUnit_Framework_TestCase
 
     public function testDefaultCsrfProtectionCanBeEnabled()
     {
-        Form::enableDefaultCsrfProtection();
+        FormConfiguration::enableDefaultCsrfProtection();
         $form = new Form('author', new Author(), $this->validator);
 
         $this->assertTrue($form->isCsrfProtected());
@@ -112,7 +113,7 @@ class FormTest extends \PHPUnit_Framework_TestCase
 
     public function testDefaultCsrfSecretCanBeSet()
     {
-        Form::setDefaultCsrfSecret('foobar');
+        FormConfiguration::setDefaultCsrfSecret('foobar');
         $form = new Form('author', new Author(), $this->validator);
         $form->enableCsrfProtection();
 
@@ -121,7 +122,7 @@ class FormTest extends \PHPUnit_Framework_TestCase
 
     public function testDefaultCsrfFieldNameCanBeSet()
     {
-        Form::setDefaultCsrfFieldName('foobar');
+        FormConfiguration::setDefaultCsrfFieldName('foobar');
         $form = new Form('author', new Author(), $this->validator);
         $form->enableCsrfProtection();
 
@@ -172,7 +173,7 @@ class FormTest extends \PHPUnit_Framework_TestCase
 
     public function testDefaultLocaleCanBeSet()
     {
-        Form::setDefaultLocale('de-DE-1996');
+        FormConfiguration::setDefaultLocale('de-DE-1996');
         $form = new Form('author', new Author(), $this->validator);
 
         $field = $this->getMock('Symfony\Component\Form\Field', array(), array(), '', false, false);

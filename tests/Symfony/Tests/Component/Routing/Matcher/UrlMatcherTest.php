@@ -34,20 +34,20 @@ class UrlMatcherTest extends \PHPUnit_Framework_TestCase
     {
       // test the patterns are matched are parameters are returned
       $collection = new RouteCollection();
-      $collection->addRoute('foo', new Route('/foo/:bar'));
+      $collection->add('foo', new Route('/foo/:bar'));
       $matcher = new UrlMatcher($collection, array(), array());
       $this->assertEquals(false, $matcher->match('/no-match'));
       $this->assertEquals(array('_route' => 'foo', 'bar' => 'baz'), $matcher->match('/foo/baz'));
 
       // test that defaults are merged
       $collection = new RouteCollection();
-      $collection->addRoute('foo', new Route('/foo/:bar', array('def' => 'test')));
+      $collection->add('foo', new Route('/foo/:bar', array('def' => 'test')));
       $matcher = new UrlMatcher($collection, array(), array());
       $this->assertEquals(array('_route' => 'foo', 'bar' => 'baz', 'def' => 'test'), $matcher->match('/foo/baz'));
 
       // test that route "metod" is ignore if no method is given in the context
       $collection = new RouteCollection();
-      $collection->addRoute('foo', new Route('/foo', array(), array('_method' => array('GET', 'HEAD'))));
+      $collection->add('foo', new Route('/foo', array(), array('_method' => 'GET|head')));
 
       // route matches with no context
       $matcher = new UrlMatcher($collection, array(), array());

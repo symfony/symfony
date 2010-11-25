@@ -146,7 +146,7 @@ class FrameworkExtension extends Extension
      */
     protected function registerTemplatingConfiguration($config, ContainerBuilder $container)
     {
-        $config = $config['templating'];
+        $config = isset($config['templating']) ? $config['templating'] : array();
 
         if (!$container->hasDefinition('templating')) {
             $loader = new XmlFileLoader($container, __DIR__.'/../Resources/config');

@@ -65,11 +65,11 @@ class ApacheMatcherDumper extends MatcherDumper
                 $conditions[] = sprintf('RewriteCond %%{REQUEST_METHOD} =%s', strtoupper($method));
             }
 
-            $conditions = implode(" [OR]\n", $conditions)."\n";
+            $conditions = count($conditions) ? implode(" [OR]\n", $conditions)."\n" : '';
 
             $regexes[] = sprintf("%sRewriteCond %%{PATH_INFO} %s\nRewriteRule .* %s [QSA,L,%s]", $conditions, $regex, $options['script_name'], $variables);
         }
 
-        return implode("\n", $regexes);
+        return implode("\n\n", $regexes);
     }
 }

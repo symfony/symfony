@@ -51,7 +51,7 @@ class PhpMatcherDumper extends MatcherDumper
     {
         $code = array();
 
-        foreach ($this->routes->getRoutes() as $name => $route) {
+        foreach ($this->routes->all() as $name => $route) {
             $compiledRoute = $route->compile();
 
             $conditions = array();

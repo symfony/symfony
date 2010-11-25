@@ -52,7 +52,7 @@ class UrlMatcher implements UrlMatcherInterface
     {
         $url = $this->normalizeUrl($url);
 
-        foreach ($this->routes->getRoutes() as $name => $route) {
+        foreach ($this->routes->all() as $name => $route) {
             $compiledRoute = $route->compile();
 
             // check HTTP method requirement

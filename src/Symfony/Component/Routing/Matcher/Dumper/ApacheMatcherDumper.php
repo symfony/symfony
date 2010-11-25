@@ -41,7 +41,7 @@ class ApacheMatcherDumper extends MatcherDumper
 
         $regexes = array();
 
-        foreach ($this->routes->getRoutes() as $name => $route) {
+        foreach ($this->routes->all() as $name => $route) {
             $compiledRoute = $route->compile();
 
             // Apache "only" supports 9 variables

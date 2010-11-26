@@ -117,7 +117,7 @@ class Translator extends BaseTranslator
         $this->writeCacheFile($this->getCacheFile($locale), sprintf(
             "<?php use Symfony\Component\Translation\MessageCatalogue; return new MessageCatalogue('%s', %s);",
             $locale,
-            var_export($this->catalogues[$locale]->getMessages(), true)
+            var_export($this->catalogues[$locale]->all(), true)
         ));
 
         if ($this->options['debug']) {

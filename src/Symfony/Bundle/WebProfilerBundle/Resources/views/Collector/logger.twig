@@ -17,8 +17,8 @@ Logs
     {% if collector.logs %}
         <ul class="alt">
             {% for i, log in collector.logs %}
-                <li class="{{ i is odd ? 'odd' : 'even' }}{% if 'ERR' == log.priorityname %} error{% endif %}">
-                    {{ log.priorityname }}
+                <li class="{{ i is odd ? 'odd' : 'even' }}{% if 'ERR' == log.priorityName %} error{% endif %}">
+                    {{ log.priorityName }}
                     {{ log.message }}
                 </li>
             {% endfor %}

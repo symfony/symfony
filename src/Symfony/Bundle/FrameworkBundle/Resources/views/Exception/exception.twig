@@ -28,7 +28,7 @@
         {% include 'FrameworkBundle:Exception:traces.twig' with ['exception': e, 'position': position, 'count': previous_count] only %}
     {% endfor %}
 
-    {% if null != logger %}
+    {% if logger %}
         <div class="block">
             <h3>
                 {% if logger.counterrors %}

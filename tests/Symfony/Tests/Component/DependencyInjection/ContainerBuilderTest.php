@@ -50,8 +50,7 @@ class ContainerBuilderTest extends \PHPUnit_Framework_TestCase
         try {
             $builder->getDefinition('baz');
             $this->fail('->getDefinition() throws an InvalidArgumentException if the service definition does not exist');
-        } catch (\Exception $e) {
-            $this->assertInstanceOf('\InvalidArgumentException', $e, '->getDefinition() throws an InvalidArgumentException if the service definition does not exist');
+        } catch (\InvalidArgumentException $e) {
             $this->assertEquals('The service definition "baz" does not exist.', $e->getMessage(), '->getDefinition() throws an InvalidArgumentException if the service definition does not exist');
         }
     }
@@ -89,8 +88,7 @@ class ContainerBuilderTest extends \PHPUnit_Framework_TestCase
         try {
             $builder->get('foo');
             $this->fail('->get() throws an InvalidArgumentException if the service does not exist');
-        } catch (\Exception $e) {
-            $this->assertInstanceOf('\InvalidArgumentException', $e, '->get() throws an InvalidArgumentException if the service does not exist');
+        } catch (\InvalidArgumentException $e) {
             $this->assertEquals('The service definition "foo" does not exist.', $e->getMessage(), '->get() throws an InvalidArgumentException if the service does not exist');
         }
 
@@ -107,8 +105,7 @@ class ContainerBuilderTest extends \PHPUnit_Framework_TestCase
         try {
             @$builder->get('baz');
             $this->fail('->get() throws a LogicException if the service has a circular reference to itself');
-        } catch (\Exception $e) {
-            $this->assertInstanceOf('\LogicException', $e, '->get() throws a LogicException if the service has a circular reference to itself');
+        } catch (\LogicException $e) {
             $this->assertEquals('The service "baz" has a circular reference to itself.', $e->getMessage(), '->get() throws a LogicException if the service has a circular reference to itself');
         }
 
@@ -147,8 +144,7 @@ class ContainerBuilderTest extends \PHPUnit_Framework_TestCase
         try {
             $builder->getAlias('foobar');
             $this->fail('->getAlias() throws an InvalidArgumentException if the alias does not exist');
-        } catch (\Exception $e) {
-            $this->assertInstanceOf('\InvalidArgumentException', $e, '->getAlias() throws an InvalidArgumentException if the alias does not exist');
+        } catch (\InvalidArgumentException $e) {
             $this->assertEquals('The service alias "foobar" does not exist.', $e->getMessage(), '->getAlias() throws an InvalidArgumentException if the alias does not exist');
         }
     }
@@ -283,8 +279,7 @@ class ContainerBuilderTest extends \PHPUnit_Framework_TestCase
         try {
             $builder->get('foo4');
             $this->fail('->createService() throws an InvalidArgumentException if the configure callable is not a valid callable');
-        } catch (\Exception $e) {
-            $this->assertInstanceOf('\InvalidArgumentException', $e, '->createService() throws an InvalidArgumentException if the configure callable is not a valid callable');
+        } catch (\InvalidArgumentException $e) {
             $this->assertEquals('The configure callable for class "FooClass" is not a callable.', $e->getMessage(), '->createService() throws an InvalidArgumentException if the configure callable is not a valid callable');
         }
     }

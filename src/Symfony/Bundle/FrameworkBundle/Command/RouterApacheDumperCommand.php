@@ -31,7 +31,19 @@ class RouterApacheDumperCommand extends Command
     protected function configure()
     {
         $this
+            ->setDefinition(array(
+                new InputArgument('script_name', InputArgument::OPTIONAL, 'The script name of the application\'s front controller.')
+            ))
             ->setName('router:dump-apache')
+            ->setDescription('Dumps all routes as Apache rewrite rules')
+            ->setHelp(<<<EOF
+The <info>router:dump-apache</info> dumps all routes as Apache rewrite rules.
+These can then be used with the ApacheUrlMatcher to use Apache for route
+matching.
+
+  <info>router:dump-apache</info>
+EOF
+            )
         ;
     }
 
@@ -42,8 +54,13 @@ class RouterApacheDumperCommand extends Command
     {
         $router = $this->container->get('router');
 
+        $dumpOptions = array();
+        if ($input->getArgument('script_name')) {
+            $dumpOptions['script_name'] = $input->getArgument('script_name');
+        }
+
         $dumper = new ApacheMatcherDumper($router->getRouteCollection());
 
-        $output->writeln($dumper->dump(), Output::OUTPUT_RAW);
+        $output->writeln($dumper->dump($dumpOptions), Output::OUTPUT_RAW);
     }
 }

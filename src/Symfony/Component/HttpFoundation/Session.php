@@ -236,6 +236,16 @@ class Session implements \Serializable
         return array_key_exists($name, $this->attributes['_flash']);
     }
 
+    public function removeFlash($name)
+    {
+        unset($this->attributes['_flash'][$name]);
+    }
+
+    public function clearFlashes()
+    {
+        $this->attributes['_flash'] = array();
+    }
+
     public function save()
     {
         if (true === $this->started) {

@@ -192,12 +192,12 @@ class Session implements \Serializable
         $this->attributes['_locale'] = $locale;
     }
 
-    public function getFlashMessages()
+    public function getFlashes()
     {
         return $this->attributes['_flash'];
     }
 
-    public function setFlashMessages($values)
+    public function setFlashes($values)
     {
         if (false === $this->started) {
             $this->start();

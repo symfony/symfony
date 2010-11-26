@@ -36,8 +36,8 @@ class ExceptionController extends ContainerAware
         $this->container->get('request')->setRequestFormat($format);
 
         $currentContent = '';
-        while (false !== $content = @ob_get_clean()) {
-            $currentContent .= $content;
+        while (ob_get_level()) {
+            $currentContent .= ob_get_clean();
         }
 
         if ('Symfony\Component\Security\Exception\AccessDeniedException' === $exception->getClass()) {

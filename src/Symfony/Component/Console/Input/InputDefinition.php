@@ -18,7 +18,7 @@ namespace Symfony\Component\Console\Input;
  *
  *     $definition = new InputDefinition(array(
  *       new InputArgument('name', InputArgument::REQUIRED),
- *       new InputOption('foo', 'f', InputOption::PARAMETER_REQUIRED),
+ *       new InputOption('foo', 'f', InputOption::VALUE_REQUIRED),
  *     ));
  *
  * @author Fabien Potencier <fabien.potencier@symfony-project.com>
@@ -347,7 +347,7 @@ class InputDefinition
         $elements = array();
         foreach ($this->getOptions() as $option) {
             $shortcut = $option->getShortcut() ? sprintf('-%s|', $option->getShortcut()) : '';
-            $elements[] = sprintf('['.($option->isParameterRequired() ? '%s--%s="..."' : ($option->isParameterOptional() ? '%s--%s[="..."]' : '%s--%s')).']', $shortcut, $option->getName());
+            $elements[] = sprintf('['.($option->isValueRequired() ? '%s--%s="..."' : ($option->isValueOptional() ? '%s--%s[="..."]' : '%s--%s')).']', $shortcut, $option->getName());
         }
 
         foreach ($this->getArguments() as $argument) {
@@ -399,7 +399,7 @@ class InputDefinition
             $text[] = '<comment>Options:</comment>';
 
             foreach ($this->getOptions() as $option) {
-                if ($option->acceptParameter() && null !== $option->getDefault() && (!is_array($option->getDefault()) || count($option->getDefault()))) {
+                if ($option->acceptValue() && null !== $option->getDefault() && (!is_array($option->getDefault()) || count($option->getDefault()))) {
                     $default = sprintf('<comment> (default: %s)</comment>', is_array($option->getDefault()) ? str_replace("\n", '', print_r($option->getDefault(), true)): $option->getDefault());
                 } else {
                     $default = '';
@@ -450,13 +450,13 @@ class InputDefinition
             $optionsXML->appendChild($optionXML = $dom->createElement('option'));
             $optionXML->setAttribute('name', '--'.$option->getName());
             $optionXML->setAttribute('shortcut', $option->getShortcut() ? '-'.$option->getShortcut() : '');
-            $optionXML->setAttribute('accept_parameter', $option->acceptParameter() ? 1 : 0);
-            $optionXML->setAttribute('is_parameter_required', $option->isParameterRequired() ? 1 : 0);
+            $optionXML->setAttribute('accept_value', $option->acceptValue() ? 1 : 0);
+            $optionXML->setAttribute('is_value_required', $option->isValueRequired() ? 1 : 0);
             $optionXML->setAttribute('is_multiple', $option->isArray() ? 1 : 0);
             $optionXML->appendChild($descriptionXML = $dom->createElement('description'));
             $descriptionXML->appendChild($dom->createTextNode($option->getDescription()));
 
-            if ($option->acceptParameter()) {
+            if ($option->acceptValue()) {
                 $optionXML->appendChild($defaultsXML = $dom->createElement('defaults'));
                 $defaults = is_array($option->getDefault()) ? $option->getDefault() : ($option->getDefault() ? array($option->getDefault()) : array());
                 foreach ($defaults as $default) {

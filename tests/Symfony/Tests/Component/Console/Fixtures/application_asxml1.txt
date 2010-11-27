@@ -23,7 +23,7 @@
     </argument>
   </arguments>
   <options>
-    <option name="--xml" shortcut="" accept_parameter="0" is_parameter_required="0" is_multiple="0">
+    <option name="--xml" shortcut="" accept_value="0" is_value_required="0" is_multiple="0">
       <description>To output help as XML</description>
     </option>
   </options>
@@ -50,7 +50,7 @@
     </argument>
   </arguments>
   <options>
-    <option name="--xml" shortcut="" accept_parameter="0" is_parameter_required="0" is_multiple="0">
+    <option name="--xml" shortcut="" accept_value="0" is_value_required="0" is_multiple="0">
       <description>To output help as XML</description>
     </option>
   </options>

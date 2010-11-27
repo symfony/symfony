@@ -37,7 +37,7 @@ class HelpCommand extends Command
         $this
             ->setDefinition(array(
                 new InputArgument('command_name', InputArgument::OPTIONAL, 'The command name', 'help'),
-                new InputOption('xml', null, InputOption::PARAMETER_NONE, 'To output help as XML'),
+                new InputOption('xml', null, InputOption::VALUE_NONE, 'To output help as XML'),
             ))
             ->setName('help')
             ->setAliases(array('?'))

@@ -34,7 +34,7 @@ class AssetsInstallCommand extends Command
             ->setDefinition(array(
                 new InputArgument('target', InputArgument::REQUIRED, 'The target directory'),
             ))
-            ->addOption('symlink', null, InputOption::PARAMETER_NONE, 'Symlinks the assets instead of copying it')
+            ->addOption('symlink', null, InputOption::VALUE_NONE, 'Symlinks the assets instead of copying it')
             ->setName('assets:install')
         ;
     }

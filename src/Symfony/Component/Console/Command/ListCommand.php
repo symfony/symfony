@@ -33,7 +33,7 @@ class ListCommand extends Command
         $this
             ->setDefinition(array(
                 new InputArgument('namespace', InputArgument::OPTIONAL, 'The namespace name'),
-                new InputOption('xml', null, InputOption::PARAMETER_NONE, 'To output help as XML'),
+                new InputOption('xml', null, InputOption::VALUE_NONE, 'To output help as XML'),
             ))
             ->setName('list')
             ->setDescription('Lists commands')

@@ -35,53 +35,53 @@ class ArgvInputTest extends \PHPUnit_Framework_TestCase
 
         $input = new TestInput(array('cli.php', '--foo'));
         $input->bind(new InputDefinition(array(new InputOption('foo'))));
-        $this->assertEquals(array('foo' => true), $input->getOptions(), '->parse() parses long options without parameter');
+        $this->assertEquals(array('foo' => true), $input->getOptions(), '->parse() parses long options without a value');
 
         $input = new TestInput(array('cli.php', '--foo=bar'));
-        $input->bind(new InputDefinition(array(new InputOption('foo', 'f', InputOption::PARAMETER_REQUIRED))));
-        $this->assertEquals(array('foo' => 'bar'), $input->getOptions(), '->parse() parses long options with a required parameter (with a = separator)');
+        $input->bind(new InputDefinition(array(new InputOption('foo', 'f', InputOption::VALUE_REQUIRED))));
+        $this->assertEquals(array('foo' => 'bar'), $input->getOptions(), '->parse() parses long options with a required value (with a = separator)');
 
         $input = new TestInput(array('cli.php', '--foo', 'bar'));
-        $input->bind(new InputDefinition(array(new InputOption('foo', 'f', InputOption::PARAMETER_REQUIRED))));
-        $this->assertEquals(array('foo' => 'bar'), $input->getOptions(), '->parse() parses long options with a required parameter (with a space separator)');
+        $input->bind(new InputDefinition(array(new InputOption('foo', 'f', InputOption::VALUE_REQUIRED))));
+        $this->assertEquals(array('foo' => 'bar'), $input->getOptions(), '->parse() parses long options with a required value (with a space separator)');
 
         try {
             $input = new TestInput(array('cli.php', '--foo'));
-            $input->bind(new InputDefinition(array(new InputOption('foo', 'f', InputOption::PARAMETER_REQUIRED))));
-            $this->fail('->parse() throws a \RuntimeException if no parameter is passed to an option when it is required');
+            $input->bind(new InputDefinition(array(new InputOption('foo', 'f', InputOption::VALUE_REQUIRED))));
+            $this->fail('->parse() throws a \RuntimeException if no value is passed to an option when it is required');
         } catch (\Exception $e) {
-            $this->assertInstanceOf('\RuntimeException', $e, '->parse() throws a \RuntimeException if no parameter is passed to an option when it is required');
-            $this->assertEquals('The "--foo" option requires a value.', $e->getMessage(), '->parse() throws a \RuntimeException if no parameter is passed to an option when it is required');
+            $this->assertInstanceOf('\RuntimeException', $e, '->parse() throws a \RuntimeException if no value is passed to an option when it is required');
+            $this->assertEquals('The "--foo" option requires a value.', $e->getMessage(), '->parse() throws a \RuntimeException if no value is passed to an option when it is required');
         }
 
         $input = new TestInput(array('cli.php', '-f'));
         $input->bind(new InputDefinition(array(new InputOption('foo', 'f'))));
-        $this->assertEquals(array('foo' => true), $input->getOptions(), '->parse() parses short options without parameter');
+        $this->assertEquals(array('foo' => true), $input->getOptions(), '->parse() parses short options without a value');
 
         $input = new TestInput(array('cli.php', '-fbar'));
-        $input->bind(new InputDefinition(array(new InputOption('foo', 'f', InputOption::PARAMETER_REQUIRED))));
-        $this->assertEquals(array('foo' => 'bar'), $input->getOptions(), '->parse() parses short options with a required parameter (with no separator)');
+        $input->bind(new InputDefinition(array(new InputOption('foo', 'f', InputOption::VALUE_REQUIRED))));
+        $this->assertEquals(array('foo' => 'bar'), $input->getOptions(), '->parse() parses short options with a required value (with no separator)');
 
         $input = new TestInput(array('cli.php', '-f', 'bar'));
-        $input->bind(new InputDefinition(array(new InputOption('foo', 'f', InputOption::PARAMETER_REQUIRED))));
-        $this->assertEquals(array('foo' => 'bar'), $input->getOptions(), '->parse() parses short options with a required parameter (with a space separator)');
+        $input->bind(new InputDefinition(array(new InputOption('foo', 'f', InputOption::VALUE_REQUIRED))));
+        $this->assertEquals(array('foo' => 'bar'), $input->getOptions(), '->parse() parses short options with a required value (with a space separator)');
 
         $input = new TestInput(array('cli.php', '-f', '-b', 'foo'));
-        $input->bind(new InputDefinition(array(new InputArgument('name'), new InputOption('foo', 'f', InputOption::PARAMETER_OPTIONAL), new InputOption('bar', 'b'))));
-        $this->assertEquals(array('foo' => null, 'bar' => true), $input->getOptions(), '->parse() parses short options with an optional parameter which is not present');
+        $input->bind(new InputDefinition(array(new InputArgument('name'), new InputOption('foo', 'f', InputOption::VALUE_OPTIONAL), new InputOption('bar', 'b'))));
+        $this->assertEquals(array('foo' => null, 'bar' => true), $input->getOptions(), '->parse() parses short options with an optional value which is not present');
 
         try {
             $input = new TestInput(array('cli.php', '-f'));
-            $input->bind(new InputDefinition(array(new InputOption('foo', 'f', InputOption::PARAMETER_REQUIRED))));
-            $this->fail('->parse() throws a \RuntimeException if no parameter is passed to an option when it is required');
+            $input->bind(new InputDefinition(array(new InputOption('foo', 'f', InputOption::VALUE_REQUIRED))));
+            $this->fail('->parse() throws a \RuntimeException if no value is passed to an option when it is required');
         } catch (\Exception $e) {
-            $this->assertInstanceOf('\RuntimeException', $e, '->parse() throws a \RuntimeException if no parameter is passed to an option when it is required');
-            $this->assertEquals('The "--foo" option requires a value.', $e->getMessage(), '->parse() throws a \RuntimeException if no parameter is passed to an option when it is required');
+            $this->assertInstanceOf('\RuntimeException', $e, '->parse() throws a \RuntimeException if no value is passed to an option when it is required');
+            $this->assertEquals('The "--foo" option requires a value.', $e->getMessage(), '->parse() throws a \RuntimeException if no value is passed to an option when it is required');
         }
 
         try {
             $input = new TestInput(array('cli.php', '-ffoo'));
-            $input->bind(new InputDefinition(array(new InputOption('foo', 'f', InputOption::PARAMETER_NONE))));
+            $input->bind(new InputDefinition(array(new InputOption('foo', 'f', InputOption::VALUE_NONE))));
             $this->fail('->parse() throws a \RuntimeException if a value is passed to an option which does not take one');
         } catch (\Exception $e) {
             $this->assertInstanceOf('\RuntimeException', $e, '->parse() throws a \RuntimeException if a value is passed to an option which does not take one');
@@ -120,20 +120,20 @@ class ArgvInputTest extends \PHPUnit_Framework_TestCase
         $this->assertEquals(array('foo' => true, 'bar' => true), $input->getOptions(), '->parse() parses short options when they are aggregated as a single one');
 
         $input = new TestInput(array('cli.php', '-fb', 'bar'));
-        $input->bind(new InputDefinition(array(new InputOption('foo', 'f'), new InputOption('bar', 'b', InputOption::PARAMETER_REQUIRED))));
-        $this->assertEquals(array('foo' => true, 'bar' => 'bar'), $input->getOptions(), '->parse() parses short options when they are aggregated as a single one and the last one has a required parameter');
+        $input->bind(new InputDefinition(array(new InputOption('foo', 'f'), new InputOption('bar', 'b', InputOption::VALUE_REQUIRED))));
+        $this->assertEquals(array('foo' => true, 'bar' => 'bar'), $input->getOptions(), '->parse() parses short options when they are aggregated as a single one and the last one has a required value');
 
         $input = new TestInput(array('cli.php', '-fb', 'bar'));
-        $input->bind(new InputDefinition(array(new InputOption('foo', 'f'), new InputOption('bar', 'b', InputOption::PARAMETER_OPTIONAL))));
-        $this->assertEquals(array('foo' => true, 'bar' => 'bar'), $input->getOptions(), '->parse() parses short options when they are aggregated as a single one and the last one has an optional parameter');
+        $input->bind(new InputDefinition(array(new InputOption('foo', 'f'), new InputOption('bar', 'b', InputOption::VALUE_OPTIONAL))));
+        $this->assertEquals(array('foo' => true, 'bar' => 'bar'), $input->getOptions(), '->parse() parses short options when they are aggregated as a single one and the last one has an optional value');
 
         $input = new TestInput(array('cli.php', '-fbbar'));
-        $input->bind(new InputDefinition(array(new InputOption('foo', 'f'), new InputOption('bar', 'b', InputOption::PARAMETER_OPTIONAL))));
-        $this->assertEquals(array('foo' => true, 'bar' => 'bar'), $input->getOptions(), '->parse() parses short options when they are aggregated as a single one and the last one has an optional parameter with no separator');
+        $input->bind(new InputDefinition(array(new InputOption('foo', 'f'), new InputOption('bar', 'b', InputOption::VALUE_OPTIONAL))));
+        $this->assertEquals(array('foo' => true, 'bar' => 'bar'), $input->getOptions(), '->parse() parses short options when they are aggregated as a single one and the last one has an optional value with no separator');
 
         $input = new TestInput(array('cli.php', '-fbbar'));
-        $input->bind(new InputDefinition(array(new InputOption('foo', 'f', InputOption::PARAMETER_OPTIONAL), new InputOption('bar', 'b', InputOption::PARAMETER_OPTIONAL))));
-        $this->assertEquals(array('foo' => 'bbar', 'bar' => null), $input->getOptions(), '->parse() parses short options when they are aggregated as a single one and one of them takes a parameter');
+        $input->bind(new InputDefinition(array(new InputOption('foo', 'f', InputOption::VALUE_OPTIONAL), new InputOption('bar', 'b', InputOption::VALUE_OPTIONAL))));
+        $this->assertEquals(array('foo' => 'bbar', 'bar' => null), $input->getOptions(), '->parse() parses short options when they are aggregated as a single one and one of them takes a value');
     }
 
     public function testGetFirstArgument()

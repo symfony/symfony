@@ -80,12 +80,12 @@ class Application
         $this->definition = new InputDefinition(array(
             new InputArgument('command', InputArgument::REQUIRED, 'The command to execute'),
 
-            new InputOption('--help',           '-h', InputOption::PARAMETER_NONE, 'Display this help message.'),
-            new InputOption('--quiet',          '-q', InputOption::PARAMETER_NONE, 'Do not output any message.'),
-            new InputOption('--verbose',        '-v', InputOption::PARAMETER_NONE, 'Increase verbosity of messages.'),
-            new InputOption('--version',        '-V', InputOption::PARAMETER_NONE, 'Display this program version.'),
-            new InputOption('--ansi',           '-a', InputOption::PARAMETER_NONE, 'Force ANSI output.'),
-            new InputOption('--no-interaction', '-n', InputOption::PARAMETER_NONE, 'Do not ask any interactive question.'),
+            new InputOption('--help',           '-h', InputOption::VALUE_NONE, 'Display this help message.'),
+            new InputOption('--quiet',          '-q', InputOption::VALUE_NONE, 'Do not output any message.'),
+            new InputOption('--verbose',        '-v', InputOption::VALUE_NONE, 'Increase verbosity of messages.'),
+            new InputOption('--version',        '-V', InputOption::VALUE_NONE, 'Display this program version.'),
+            new InputOption('--ansi',           '-a', InputOption::VALUE_NONE, 'Force ANSI output.'),
+            new InputOption('--no-interaction', '-n', InputOption::VALUE_NONE, 'Do not ask any interactive question.'),
         ));
     }
 

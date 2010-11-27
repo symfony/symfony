@@ -277,13 +277,13 @@ class InputDefinitionTest extends \PHPUnit_Framework_TestCase
     public function testGetOptionDefaults()
     {
         $definition = new InputDefinition(array(
-            new InputOption('foo1', null, InputOption::PARAMETER_NONE),
-            new InputOption('foo2', null, InputOption::PARAMETER_REQUIRED),
-            new InputOption('foo3', null, InputOption::PARAMETER_REQUIRED, '', 'default'),
-            new InputOption('foo4', null, InputOption::PARAMETER_OPTIONAL),
-            new InputOption('foo5', null, InputOption::PARAMETER_OPTIONAL, '', 'default'),
-            new InputOption('foo6', null, InputOption::PARAMETER_OPTIONAL | InputOption::PARAMETER_IS_ARRAY),
-            new InputOption('foo7', null, InputOption::PARAMETER_OPTIONAL | InputOption::PARAMETER_IS_ARRAY, '', array(1, 2)),
+            new InputOption('foo1', null, InputOption::VALUE_NONE),
+            new InputOption('foo2', null, InputOption::VALUE_REQUIRED),
+            new InputOption('foo3', null, InputOption::VALUE_REQUIRED, '', 'default'),
+            new InputOption('foo4', null, InputOption::VALUE_OPTIONAL),
+            new InputOption('foo5', null, InputOption::VALUE_OPTIONAL, '', 'default'),
+            new InputOption('foo6', null, InputOption::VALUE_OPTIONAL | InputOption::VALUE_IS_ARRAY),
+            new InputOption('foo7', null, InputOption::VALUE_OPTIONAL | InputOption::VALUE_IS_ARRAY, '', array(1, 2)),
         ));
         $defaults = array(
             'foo1' => null,
@@ -303,9 +303,9 @@ class InputDefinitionTest extends \PHPUnit_Framework_TestCase
         $this->assertEquals('[--foo]', $definition->getSynopsis(), '->getSynopsis() returns a synopsis of arguments and options');
         $definition = new InputDefinition(array(new InputOption('foo', 'f')));
         $this->assertEquals('[-f|--foo]', $definition->getSynopsis(), '->getSynopsis() returns a synopsis of arguments and options');
-        $definition = new InputDefinition(array(new InputOption('foo', 'f', InputOption::PARAMETER_REQUIRED)));
+        $definition = new InputDefinition(array(new InputOption('foo', 'f', InputOption::VALUE_REQUIRED)));
         $this->assertEquals('[-f|--foo="..."]', $definition->getSynopsis(), '->getSynopsis() returns a synopsis of arguments and options');
-        $definition = new InputDefinition(array(new InputOption('foo', 'f', InputOption::PARAMETER_OPTIONAL)));
+        $definition = new InputDefinition(array(new InputOption('foo', 'f', InputOption::VALUE_OPTIONAL)));
         $this->assertEquals('[-f|--foo[="..."]]', $definition->getSynopsis(), '->getSynopsis() returns a synopsis of arguments and options');
 
         $definition = new InputDefinition(array(new InputArgument('foo')));
@@ -323,8 +323,8 @@ class InputDefinitionTest extends \PHPUnit_Framework_TestCase
         $definition = new InputDefinition(array(
             new InputArgument('foo', InputArgument::OPTIONAL, 'The bar argument'),
             new InputArgument('bar', InputArgument::OPTIONAL | InputArgument::IS_ARRAY, 'The foo argument', array('bar')),
-            new InputOption('foo', 'f', InputOption::PARAMETER_REQUIRED, 'The foo option'),
-            new InputOption('bar', 'b', InputOption::PARAMETER_OPTIONAL, 'The foo option', 'bar'),
+            new InputOption('foo', 'f', InputOption::VALUE_REQUIRED, 'The foo option'),
+            new InputOption('bar', 'b', InputOption::VALUE_OPTIONAL, 'The foo option', 'bar'),
         ));
         $this->assertStringEqualsFile(self::$fixtures.'/definition_astext.txt', $definition->asText(), '->asText() returns a textual representation of the InputDefinition');
     }
@@ -334,8 +334,8 @@ class InputDefinitionTest extends \PHPUnit_Framework_TestCase
         $definition = new InputDefinition(array(
             new InputArgument('foo', InputArgument::OPTIONAL, 'The bar argument'),
             new InputArgument('bar', InputArgument::OPTIONAL | InputArgument::IS_ARRAY, 'The foo argument', array('bar')),
-            new InputOption('foo', 'f', InputOption::PARAMETER_REQUIRED, 'The foo option'),
-            new InputOption('bar', 'b', InputOption::PARAMETER_OPTIONAL, 'The foo option', 'bar'),
+            new InputOption('foo', 'f', InputOption::VALUE_REQUIRED, 'The foo option'),
+            new InputOption('bar', 'b', InputOption::VALUE_OPTIONAL, 'The foo option', 'bar'),
         ));
         $this->assertXmlStringEqualsXmlFile(self::$fixtures.'/definition_asxml.txt', $definition->asXml(), '->asText() returns a textual representation of the InputDefinition');
     }

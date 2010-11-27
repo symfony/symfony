@@ -22,16 +22,16 @@ class InputArgumentTest extends \PHPUnit_Framework_TestCase
 
         // mode argument
         $argument = new InputArgument('foo');
-        $this->assertFalse($argument->isRequired(), '__construct() gives a "Argument::OPTIONAL" mode by default');
+        $this->assertFalse($argument->isRequired(), '__construct() gives a "InputArgument::OPTIONAL" mode by default');
 
         $argument = new InputArgument('foo', null);
-        $this->assertFalse($argument->isRequired(), '__construct() can take "Argument::OPTIONAL" as its mode');
+        $this->assertFalse($argument->isRequired(), '__construct() can take "InputArgument::OPTIONAL" as its mode');
 
         $argument = new InputArgument('foo', InputArgument::OPTIONAL);
-        $this->assertFalse($argument->isRequired(), '__construct() can take "Argument::PARAMETER_OPTIONAL" as its mode');
+        $this->assertFalse($argument->isRequired(), '__construct() can take "InputArgument::OPTIONAL" as its mode');
 
         $argument = new InputArgument('foo', InputArgument::REQUIRED);
-        $this->assertTrue($argument->isRequired(), '__construct() can take "Argument::PARAMETER_REQUIRED" as its mode');
+        $this->assertTrue($argument->isRequired(), '__construct() can take "InputArgument::REQUIRED" as its mode');
 
         try {
             $argument = new InputArgument('foo', 'ANOTHER_ONE');

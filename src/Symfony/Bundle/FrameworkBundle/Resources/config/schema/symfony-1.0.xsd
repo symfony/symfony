@@ -55,6 +55,7 @@
         <xsd:attribute name="secure" type="xsd:string" />
         <xsd:attribute name="httponly" type="xsd:string" />
         <xsd:attribute name="cache-limiter" type="xsd:string" />
+        <xsd:attribute name="auto-start" type="xsd:boolean" />
         <xsd:attribute name="pdo.db_table" type="xsd:string" />
     </xsd:complexType>
 

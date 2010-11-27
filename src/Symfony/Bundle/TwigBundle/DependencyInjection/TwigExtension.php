@@ -35,15 +35,21 @@ class TwigExtension extends Extension
             $loader->load('twig.xml');
         }
 
-        $container->setParameter('twig.options', array_replace($container->getParameter('twig.options'), $config));
-
         // form resources
         foreach (array('resources', 'resource') as $key) {
             if (isset($config['form'][$key])) {
                 $resources = (array) $config['form'][$key];
                 $container->setParameter('twig.form.resources', array_merge($container->getParameter('twig.form.resources'), $resources));
+                unset($config['form'][$key]);
             }
         }
+
+        // convert - to _
+        foreach ($config as $key => $value) {
+            $config[str_replace('-', '_', $key)] = $value;
+        }
+
+        $container->setParameter('twig.options', array_replace($container->getParameter('twig.options'), $config));
     }
 
     /**

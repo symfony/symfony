@@ -15,9 +15,9 @@
         <xsd:attribute name="charset" type="xsd:string" />
         <xsd:attribute name="debug" type="xsd:string" />
         <xsd:attribute name="cache" type="xsd:string" />
-        <xsd:attribute name="trim_blocks" type="xsd:string" />
-        <xsd:attribute name="auto_reload" type="xsd:string" />
-        <xsd:attribute name="base_template_class" type="xsd:string" />
+        <xsd:attribute name="strict-variables" type="xsd:string" />
+        <xsd:attribute name="auto-reload" type="xsd:string" />
+        <xsd:attribute name="base-template-class" type="xsd:string" />
     </xsd:complexType>
 
     <xsd:complexType name="form">

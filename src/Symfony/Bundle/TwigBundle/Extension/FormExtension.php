@@ -35,9 +35,7 @@ class FormExtension extends \Twig_Extension
     public function __construct(array $resources = array())
     {
         $this->themes = new \SplObjectStorage();
-        $this->resources = array_merge(array(
-            'TwigBundle::form.twig',
-        ), $resources);
+        $this->resources = $resources;
     }
 
     /**

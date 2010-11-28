@@ -13,7 +13,9 @@
         </parameter>
         <parameter key="twig.loader.class">Symfony\Bundle\TwigBundle\Loader\Loader</parameter>
         <parameter key="twig.renderer.class">Symfony\Bundle\TwigBundle\Renderer\Renderer</parameter>
-        <parameter key="twig.form.resources" type="collection"></parameter>
+        <parameter key="twig.form.resources" type="collection">
+            <parameter>TwigBundle::form.twig</parameter>
+        </parameter>
     </parameters>
 
     <services>

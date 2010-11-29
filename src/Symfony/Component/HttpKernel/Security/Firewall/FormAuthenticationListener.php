@@ -90,7 +90,7 @@ abstract class FormAuthenticationListener
 
             $response = $this->onSuccess($request, $token);
         } catch (AuthenticationException $failed) {
-            $response = $this->onFailure($request, $failed);
+            $response = $this->onFailure($event->getSubject(), $request, $failed);
         }
 
         $event->setReturnValue($response);
@@ -98,7 +98,7 @@ abstract class FormAuthenticationListener
         return true;
     }
 
-    protected function onFailure(Request $request, \Exception $failed)
+    protected function onFailure($kernel, Request $request, \Exception $failed)
     {
         if (null !== $this->logger) {
             $this->logger->debug(sprintf('Authentication request failed: %s', $failed->getMessage()));
@@ -118,7 +118,7 @@ abstract class FormAuthenticationListener
             $subRequest = Request::create($this->options['failure_path']);
             $subRequest->attributes->set(SecurityContext::AUTHENTICATION_ERROR, $failed->getMessage());
 
-            return $event->getSubject()->handle($subRequest, HttpKernelInterface::SUB_REQUEST);
+            return $kernel->handle($subRequest, HttpKernelInterface::SUB_REQUEST);
         } else {
             if (null !== $this->logger) {
                 $this->logger->debug(sprintf('Redirecting to %s', $this->options['failure_path']));

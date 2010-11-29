@@ -143,3 +143,17 @@ yaml: |
     0123
 php: |
   array('foo' => "0123\n")
+---
+test: Document as a simple hash
+brief: Document as a simple hash
+yaml: |
+  { foo: bar }
+php: |
+  array('foo' => 'bar')
+---
+test: Document as a simple array
+brief: Document as a simple array
+yaml: |
+  [ foo, bar ]
+php: |
+  array('foo', 'bar')

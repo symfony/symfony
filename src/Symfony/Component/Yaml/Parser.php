@@ -80,7 +80,7 @@ class Parser
                 } else {
                     if (isset($values['leadspaces'])
                         && ' ' == $values['leadspaces']
-                        && preg_match('#^(?P<key>'.Inline::REGEX_QUOTED_STRING.'|[^ \'"\{].*?) *\:(\s+(?P<value>.+?))?\s*$#u', $values['value'], $matches)
+                        && preg_match('#^(?P<key>'.Inline::REGEX_QUOTED_STRING.'|[^ \'"\{\[].*?) *\:(\s+(?P<value>.+?))?\s*$#u', $values['value'], $matches)
                     ) {
                         // this is a compact notation element, add to next block and parse
                         $c = $this->getRealCurrentLineNb();
@@ -97,7 +97,7 @@ class Parser
                         $data[] = $this->parseValue($values['value']);
                     }
                 }
-            } else if (preg_match('#^(?P<key>'.Inline::REGEX_QUOTED_STRING.'|[^ \'"].*?) *\:(\s+(?P<value>.+?))?\s*$#u', $this->currentLine, $values)) {
+            } else if (preg_match('#^(?P<key>'.Inline::REGEX_QUOTED_STRING.'|[^ \'"\[\{].*?) *\:(\s+(?P<value>.+?))?\s*$#u', $this->currentLine, $values)) {
                 $key = Inline::parseScalar($values['key']);
 
                 if ('<<' === $key) {

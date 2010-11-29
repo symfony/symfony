@@ -61,8 +61,7 @@ class ApacheMatcherDumper extends MatcherDumper
             $variables = implode(',', $variables);
 
             $conditions = array();
-            if ($req = $route->getRequirement('_method'))
-            {
+            if ($req = $route->getRequirement('_method')) {
                 $conditions[] = sprintf('RewriteCond %%{REQUEST_METHOD} ^(%s) [NC]', $req);
             }
 

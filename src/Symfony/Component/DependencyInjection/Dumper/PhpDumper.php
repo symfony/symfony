@@ -240,7 +240,7 @@ EOF;
                 $tags[$name][$id] = $ann;
             }
         }
-        $tags = var_export($tags, true);
+        $tags = $this->exportParameters($tags);
 
         return <<<EOF
 

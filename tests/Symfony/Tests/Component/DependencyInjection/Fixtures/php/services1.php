@@ -32,8 +32,9 @@ class ProjectServiceContainer extends Container implements TaggedContainerInterf
      */
     public function findTaggedServiceIds($name)
     {
-        static $tags = array (
-);
+        static $tags = array(
+
+        );
 
         return isset($tags[$name]) ? $tags[$name] : array();
     }

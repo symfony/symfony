@@ -32,8 +32,9 @@ class Container extends AbstractContainer implements TaggedContainerInterface
      */
     public function findTaggedServiceIds($name)
     {
-        static $tags = array (
-);
+        static $tags = array(
+
+        );
 
         return isset($tags[$name]) ? $tags[$name] : array();
     }

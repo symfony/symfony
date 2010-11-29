@@ -16,7 +16,7 @@
     {% if field.hasErrors %}
     <ul>
         {% for error in field.errors %}
-            <li>{% trans error.messageTemplate with error.messageParameters from validators %}</li>
+            <li>{% trans error.messageTemplate with error.messageParameters from 'validators' %}</li>
         {% endfor %}
     </ul>
     {% endif %}
@@ -141,3 +141,4 @@
     {{ group.token|render }}
     {{ group.original_name|render }}
 {% endblock file_field %}
+

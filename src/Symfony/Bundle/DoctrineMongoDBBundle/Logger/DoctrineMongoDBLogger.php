@@ -39,9 +39,9 @@ class DoctrineMongoDBLogger
 
     public function getQueries()
     {
-        /*if (null === $this->logger) {
+        if (null === $this->logger) {
             return false;
-        }*/
+        }
         
         $logger = $this->logger->getDebugLogger();
 

@@ -193,19 +193,7 @@ class Route
     {
         $this->requirements = array();
         foreach ($requirements as $key => $regex) {
-            if (is_array($regex)) {
-                throw new \InvalidArgumentException(sprintf('Routing requirements must be a string, array given for "%s"', $key));
-            }
-
-            if ('^' == $regex[0]) {
-                $regex = substr($regex, 1);
-            }
-
-            if ('$' == substr($regex, -1)) {
-                $regex = substr($regex, 0, -1);
-            }
-
-            $this->requirements[$key] = $regex;
+            $this->requirements[$key] = $this->sanitizeRequirement($key, $regex);
         }
 
         return $this;
@@ -219,6 +207,17 @@ class Route
     public function getRequirement($key)
     {
         return isset($this->requirements[$key]) ? $this->requirements[$key] : null;
+    }
+
+    /**
+     * Sets a requirement for the given key.
+     *
+     * @param string The key
+     * @param string The regex
+     */
+    public function setRequirement($key, $regex)
+    {
+        return $this->requirements[$key] = $this->sanitizeRequirement($key, $regex);
     }
 
     /**
@@ -239,5 +238,22 @@ class Route
         }
 
         return $this->compiled = static::$compilers[$class]->compile($this);
+    }
+
+    protected function sanitizeRequirement($key, $regex)
+    {
+        if (is_array($regex)) {
+            throw new \InvalidArgumentException(sprintf('Routing requirements must be a string, array given for "%s"', $key));
+        }
+
+        if ('^' == $regex[0]) {
+            $regex = substr($regex, 1);
+        }
+
+        if ('$' == substr($regex, -1)) {
+            $regex = substr($regex, 0, -1);
+        }
+
+        return $regex;
     }
 }

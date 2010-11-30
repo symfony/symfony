@@ -50,6 +50,7 @@ class PhpGeneratorDumper extends GeneratorDumper
     protected function addGenerator()
     {
         $methods = array();
+        $routes  = array();
 
         foreach ($this->routes->all() as $name => $route) {
             $compiledRoute = $route->compile();
@@ -67,19 +68,24 @@ class PhpGeneratorDumper extends GeneratorDumper
 
 EOF
             ;
+
+            $routes[$name] = true;
         }
 
         $methods = implode("\n", $methods);
+        $routes  = $this->exportParameters($routes);
 
         return <<<EOF
 
     public function generate(\$name, array \$parameters, \$absolute = false)
     {
-        if (!method_exists(\$this, \$method = 'get'.\$name.'RouteInfo')) {
+        static \$routes = $routes;
+
+        if (!isset(\$routes[\$name])) {
             throw new \InvalidArgumentException(sprintf('Route "%s" does not exist.', \$name));
         }
 
-        list(\$variables, \$defaults, \$requirements, \$tokens) = \$this->\$method();
+        list(\$variables, \$defaults, \$requirements, \$tokens) = \$this->{'get'.\$name.'RouteInfo'}();
 
         return \$this->doGenerate(\$variables, \$defaults, \$requirements, \$tokens, \$parameters, \$name, \$absolute);
     }
@@ -126,5 +132,21 @@ EOF;
 }
 
 EOF;
+    }
+
+    protected function exportParameters($parameters, $indent = 12)
+    {
+        $php = array();
+        foreach ($parameters as $key => $value) {
+            if (is_array($value)) {
+                $value = $this->exportParameters($value, $indent + 4);
+            } else {
+                $value = var_export($value, true);
+            }
+
+            $php[] = sprintf('%s%s => %s,', str_repeat(' ', $indent), var_export($key, true), $value);
+        }
+
+        return sprintf("array(\n%s\n%s)", implode("\n", $php), str_repeat(' ', $indent - 4));
     }
 }

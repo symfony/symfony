@@ -39,6 +39,10 @@ class DoctrineMongoDBLogger
 
     public function getQueries()
     {
+        if (null === $this->logger) {
+            return false;
+        }
+
         $logger = $this->logger->getDebugLogger();
 
         if (!$logger) {

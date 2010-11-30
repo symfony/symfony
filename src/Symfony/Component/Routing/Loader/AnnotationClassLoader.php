@@ -116,11 +116,14 @@ abstract class AnnotationClassLoader implements LoaderInterface
                     $annot->setName($this->getDefaultRouteName($class, $method));
                 }
 
-                $defaults = array_merge($globals['defaults'], $annot->getDefaults(), $this->getRouteDefaults($class, $method, $annot));
+                $defaults = array_merge($globals['defaults'], $annot->getDefaults());
                 $requirements = array_merge($globals['requirements'], $annot->getRequirements());
                 $options = array_merge($globals['options'], $annot->getOptions());
 
                 $route = new Route($globals['pattern'].$annot->getPattern(), $defaults, $requirements, $options);
+
+                $this->configureRoute($route, $class, $method);
+
                 $collection->add($annot->getName(), $route);
             }
         }
@@ -163,5 +166,5 @@ abstract class AnnotationClassLoader implements LoaderInterface
     {
     }
 
-    abstract protected function getRouteDefaults(\ReflectionClass $class, \ReflectionMethod $method, RouteAnnotation $annot);
+    abstract protected function configureRoute(Route $route, \ReflectionClass $class, \ReflectionMethod $method);
 }

@@ -30,7 +30,7 @@ class IfRoleNode extends \Twig_Node
     {
         $compiler
             ->addDebugInfo($this)
-            ->write('if ($this->env->getExtension(\'security\')->getContext()->vote(')
+            ->write('if ($this->env->getExtension(\'security\')->vote(')
             ->subcompile($this->getNode('role'))
         ;
 

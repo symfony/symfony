@@ -3,6 +3,6 @@
 {% else %}
                 at n/a
 {% endif %}
-{% if trace.file and trace.line %}
+{% if trace.file is defined and trace.line is defined %}
                     in {{ trace.file }} line {{ trace.line }}
 {% endif %}

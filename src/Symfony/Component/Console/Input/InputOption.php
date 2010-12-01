@@ -18,10 +18,10 @@ namespace Symfony\Component\Console\Input;
  */
 class InputOption
 {
-    const PARAMETER_NONE     = 1;
-    const PARAMETER_REQUIRED = 2;
-    const PARAMETER_OPTIONAL = 4;
-    const PARAMETER_IS_ARRAY = 8;
+    const VALUE_NONE     = 1;
+    const VALUE_REQUIRED = 2;
+    const VALUE_OPTIONAL = 4;
+    const VALUE_IS_ARRAY = 8;
 
     protected $name;
     protected $shortcut;
@@ -34,9 +34,9 @@ class InputOption
      *
      * @param string  $name        The option name
      * @param string  $shortcut    The shortcut (can be null)
-     * @param integer $mode        The option mode: self::PARAMETER_REQUIRED, self::PARAMETER_NONE or self::PARAMETER_OPTIONAL
+     * @param integer $mode        The option mode: One of the VALUE_* constants
      * @param string  $description A description text
-     * @param mixed   $default     The default value (must be null for self::PARAMETER_REQUIRED or self::PARAMETER_NONE)
+     * @param mixed   $default     The default value (must be null for self::VALUE_REQUIRED or self::VALUE_NONE)
      *
      * @throws \InvalidArgumentException If option mode is invalid or incompatible
      */
@@ -57,7 +57,7 @@ class InputOption
         }
 
         if (null === $mode) {
-            $mode = self::PARAMETER_NONE;
+            $mode = self::VALUE_NONE;
         } else if (!is_int($mode) || $mode > 15) {
             throw new \InvalidArgumentException(sprintf('Option mode "%s" is not valid.', $mode));
         }
@@ -67,8 +67,8 @@ class InputOption
         $this->mode        = $mode;
         $this->description = $description;
 
-        if ($this->isArray() && !$this->acceptParameter()) {
-            throw new \InvalidArgumentException('Impossible to have an option mode PARAMETER_IS_ARRAY if the option does not accept a parameter.');
+        if ($this->isArray() && !$this->acceptValue()) {
+            throw new \InvalidArgumentException('Impossible to have an option mode VALUE_IS_ARRAY if the option does not accept a value.');
         }
 
         $this->setDefault($default);
@@ -95,43 +95,43 @@ class InputOption
     }
 
     /**
-     * Returns true if the option accept a parameter.
+     * Returns true if the option accepts a value.
      *
-     * @return Boolean true if parameter mode is not self::PARAMETER_NONE, false otherwise
+     * @return Boolean true if value mode is not self::VALUE_NONE, false otherwise
      */
-    public function acceptParameter()
+    public function acceptValue()
     {
-        return $this->isParameterRequired() || $this->isParameterOptional();
+        return $this->isValueRequired() || $this->isValueOptional();
     }
 
     /**
-     * Returns true if the option requires a parameter.
+     * Returns true if the option requires a value.
      *
-     * @return Boolean true if parameter mode is self::PARAMETER_REQUIRED, false otherwise
+     * @return Boolean true if value mode is self::VALUE_REQUIRED, false otherwise
      */
-    public function isParameterRequired()
+    public function isValueRequired()
     {
-        return self::PARAMETER_REQUIRED === (self::PARAMETER_REQUIRED & $this->mode);
+        return self::VALUE_REQUIRED === (self::VALUE_REQUIRED & $this->mode);
     }
 
     /**
-     * Returns true if the option takes an optional parameter.
+     * Returns true if the option takes an optional value.
      *
-     * @return Boolean true if parameter mode is self::PARAMETER_OPTIONAL, false otherwise
+     * @return Boolean true if value mode is self::VALUE_OPTIONAL, false otherwise
      */
-    public function isParameterOptional()
+    public function isValueOptional()
     {
-        return self::PARAMETER_OPTIONAL === (self::PARAMETER_OPTIONAL & $this->mode);
+        return self::VALUE_OPTIONAL === (self::VALUE_OPTIONAL & $this->mode);
     }
 
     /**
      * Returns true if the option can take multiple values.
      *
-     * @return Boolean true if mode is self::PARAMETER_IS_ARRAY, false otherwise
+     * @return Boolean true if mode is self::VALUE_IS_ARRAY, false otherwise
      */
     public function isArray()
     {
-        return self::PARAMETER_IS_ARRAY === (self::PARAMETER_IS_ARRAY & $this->mode);
+        return self::VALUE_IS_ARRAY === (self::VALUE_IS_ARRAY & $this->mode);
     }
 
     /**
@@ -141,8 +141,8 @@ class InputOption
      */
     public function setDefault($default = null)
     {
-        if (self::PARAMETER_NONE === (self::PARAMETER_NONE & $this->mode) && null !== $default) {
-            throw new \LogicException('Cannot set a default value when using Option::PARAMETER_NONE mode.');
+        if (self::VALUE_NONE === (self::VALUE_NONE & $this->mode) && null !== $default) {
+            throw new \LogicException('Cannot set a default value when using Option::VALUE_NONE mode.');
         }
 
         if ($this->isArray()) {
@@ -153,7 +153,7 @@ class InputOption
             }
         }
 
-        $this->default = $this->acceptParameter() ? $default : false;
+        $this->default = $this->acceptValue() ? $default : false;
     }
 
     /**

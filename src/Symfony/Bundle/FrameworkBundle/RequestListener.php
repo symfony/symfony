@@ -49,8 +49,8 @@ class RequestListener
 
     public function handle(Event $event)
     {
-        $request = $event->getParameter('request');
-        $master = HttpKernelInterface::MASTER_REQUEST === $event->getParameter('request_type');
+        $request = $event->get('request');
+        $master = HttpKernelInterface::MASTER_REQUEST === $event->get('request_type');
 
         $this->initializeSession($request, $master);
 

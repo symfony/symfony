@@ -32,7 +32,7 @@ class ConvertMappingDoctrineCommand extends ConvertMappingCommand
         parent::configure();
         $this
             ->setName('doctrine:mapping:convert')
-            ->addOption('em', null, InputOption::PARAMETER_OPTIONAL, 'The entity manager to use for this command.')
+            ->addOption('em', null, InputOption::VALUE_OPTIONAL, 'The entity manager to use for this command.')
             ->setHelp(<<<EOT
 The <info>doctrine:mapping:convert</info> command converts mapping information between supported formats:
 

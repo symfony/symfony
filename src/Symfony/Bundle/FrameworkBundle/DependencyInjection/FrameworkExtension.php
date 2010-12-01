@@ -121,20 +121,24 @@ class FrameworkExtension extends Extension
             'Symfony\\Component\\HttpFoundation\\HeaderBag',
             'Symfony\\Component\\HttpFoundation\\Request',
             'Symfony\\Component\\HttpFoundation\\Response',
+            'Symfony\\Component\\HttpFoundation\\ResponseHeaderBag',
 
+            'Symfony\\Component\\HttpKernel\\BaseHttpKernel',
             'Symfony\\Component\\HttpKernel\\HttpKernel',
             'Symfony\\Component\\HttpKernel\\ResponseListener',
             'Symfony\\Component\\HttpKernel\\Controller\\ControllerResolver',
+            'Symfony\\Component\\HttpKernel\\Controller\\ControllerResolverInterface',
 
             'Symfony\\Bundle\\FrameworkBundle\\RequestListener',
             'Symfony\\Bundle\\FrameworkBundle\\Controller\\ControllerNameConverter',
             'Symfony\\Bundle\\FrameworkBundle\\Controller\\ControllerResolver',
+            'Symfony\\Bundle\\FrameworkBundle\\Controller\\Controller',
 
             'Symfony\\Component\\EventDispatcher\\Event',
+            'Symfony\\Component\\EventDispatcher\\EventDispatcher',
+            'Symfony\\Bundle\\FrameworkBundle\\EventDispatcher',
 
-            'Symfony\\Bundle\\FrameworkBundle\\Controller\\ControllerInterface',
-            'Symfony\\Bundle\\FrameworkBundle\\Controller\\BaseController',
-            'Symfony\\Bundle\\FrameworkBundle\\Controller\\Controller',
+            'Symfony\\Component\\Form\\FormConfiguration',
         ));
     }
 
@@ -146,7 +150,7 @@ class FrameworkExtension extends Extension
      */
     protected function registerTemplatingConfiguration($config, ContainerBuilder $container)
     {
-        $config = $config['templating'];
+        $config = isset($config['templating']) ? $config['templating'] : array();
 
         if (!$container->hasDefinition('templating')) {
             $loader = new XmlFileLoader($container, __DIR__.'/../Resources/config');
@@ -313,6 +317,10 @@ class FrameworkExtension extends Extension
             }
         }
 
+        if (isset($config['auto_start']) || isset($config['auto-start'])) {
+            $container->getDefinition('session')->addMethodCall('start');
+        }
+
         if (isset($config['class'])) {
             $container->setParameter('session.class', $config['class']);
         }
@@ -330,6 +338,11 @@ class FrameworkExtension extends Extension
             }
         }
         $container->setParameter('session.storage.'.strtolower($config['storage_id']).'.options', $options);
+
+        $this->addCompiledClasses($container, array(
+            'Symfony\\Component\\HttpFoundation\\Session',
+            'Symfony\\Component\\HttpFoundation\\SessionStorage\\SessionStorageInterface',
+        ));
     }
 
     protected function registerRouterConfiguration($config, ContainerBuilder $container)
@@ -348,11 +361,8 @@ class FrameworkExtension extends Extension
             'Symfony\\Component\\Routing\\Matcher\\UrlMatcher',
             'Symfony\\Component\\Routing\\Generator\\UrlGeneratorInterface',
             'Symfony\\Component\\Routing\\Generator\\UrlGenerator',
-            'Symfony\\Component\\Routing\\Loader\\Loader',
-            'Symfony\\Component\\Routing\\Loader\\DelegatingLoader',
-            'Symfony\\Component\\Routing\\Loader\\LoaderResolver',
-            'Symfony\\Bundle\\FrameworkBundle\\Routing\\LoaderResolver',
-            'Symfony\\Bundle\\FrameworkBundle\\Routing\\DelegatingLoader',
+            'Symfony\\Component\\Routing\\Loader\\LoaderInterface',
+            'Symfony\\Bundle\\FrameworkBundle\\Routing\\LazyLoader',
         ));
     }
 
@@ -479,7 +489,8 @@ class FrameworkExtension extends Extension
 
     protected function addCompiledClasses($container, array $classes)
     {
-        $container->setParameter('kernel.compiled_classes', array_merge($container->getParameter('kernel.compiled_classes'), $classes));
+        $current = $container->hasParameter('kernel.compiled_classes') ? $container->getParameter('kernel.compiled_classes') : array();
+        $container->setParameter('kernel.compiled_classes', array_merge($current, $classes));
     }
 
     /**

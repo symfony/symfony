@@ -63,7 +63,7 @@ class DigestAuthenticationListener
      */
     public function handle(Event $event)
     {
-        $request = $event->getParameter('request');
+        $request = $event->get('request');
 
         if (!$header = $request->server->get('PHP_AUTH_DIGEST')) {
             return;

@@ -301,7 +301,7 @@ class Cache implements HttpKernelInterface
             }
 
             $entry = clone $entry;
-            $entry->headers->delete('Date');
+            $entry->headers->remove('Date');
 
             foreach (array('Date', 'Expires', 'Cache-Control', 'ETag', 'Last-Modified') as $name) {
                 if ($response->headers->has($name)) {
@@ -338,8 +338,8 @@ class Cache implements HttpKernelInterface
         $subRequest->setMethod('get');
 
         // avoid that the backend sends no content
-        $subRequest->headers->delete('if_modified_since');
-        $subRequest->headers->delete('if_none_match');
+        $subRequest->headers->remove('if_modified_since');
+        $subRequest->headers->remove('if_none_match');
 
         $response = $this->forward($subRequest);
 
@@ -516,14 +516,14 @@ class Cache implements HttpKernelInterface
             }
 
             $response->setContent(ob_get_clean());
-            $response->headers->delete('X-Body-Eval');
+            $response->headers->remove('X-Body-Eval');
         } elseif ($response->headers->has('X-Body-File')) {
             $response->setContent(file_get_contents($response->headers->get('X-Body-File')));
         } else {
             return;
         }
 
-        $response->headers->delete('X-Body-File');
+        $response->headers->remove('X-Body-File');
 
         if (!$response->headers->has('Transfer-Encoding')) {
             $response->headers->set('Content-Length', strlen($response->getContent()));

@@ -29,11 +29,6 @@ use Symfony\Component\Validator\ValidatorInterface;
  */
 class Form extends FieldGroup
 {
-    protected static $defaultCsrfSecret = null;
-    protected static $defaultCsrfProtection = false;
-    protected static $defaultCsrfFieldName = '_token';
-    protected static $defaultLocale = null;
-
     protected $validator = null;
     protected $validationGroups = null;
 
@@ -54,12 +49,12 @@ class Form extends FieldGroup
 
         $this->setData($data);
 
-        if (self::$defaultCsrfProtection !== false) {
+        if (FormConfiguration::isDefaultCsrfProtectionEnabled()) {
             $this->enableCsrfProtection();
         }
 
-        if (self::$defaultLocale !== null) {
-            $this->setLocale(self::$defaultLocale);
+        if (FormConfiguration::getDefaultLocale() !== null) {
+            $this->setLocale(FormConfiguration::getDefaultLocale());
         }
 
         parent::__construct($name, $options);
@@ -83,26 +78,6 @@ class Form extends FieldGroup
     public function getValidationGroups()
     {
         return $this->validationGroups;
-    }
-
-    /**
-     * Sets the default locale for newly created forms.
-     *
-     * @param string $defaultLocale
-     */
-    static public function setDefaultLocale($defaultLocale)
-    {
-        self::$defaultLocale = $defaultLocale;
-    }
-
-    /**
-     * Returns the default locale for newly created forms.
-     *
-     * @return string
-     */
-    static public function getDefaultLocale()
-    {
-        return self::$defaultLocale;
     }
 
     /**
@@ -198,12 +173,12 @@ class Form extends FieldGroup
     {
         if (!$this->isCsrfProtected()) {
             if ($csrfFieldName === null) {
-                $csrfFieldName = self::$defaultCsrfFieldName;
+                $csrfFieldName = FormConfiguration::getDefaultCsrfFieldName();
             }
 
             if ($csrfSecret === null) {
-                if (self::$defaultCsrfSecret !== null) {
-                    $csrfSecret = self::$defaultCsrfSecret;
+                if (FormConfiguration::getDefaultCsrfSecret() !== null) {
+                    $csrfSecret = FormConfiguration::getDefaultCsrfSecret();
                 } else {
                     $csrfSecret = md5(__FILE__.php_uname());
                 }
@@ -265,62 +240,6 @@ class Form extends FieldGroup
         } else {
             return $this->get($this->getCsrfFieldName())->getDisplayedData() === $this->generateCsrfToken($this->getCsrfSecret());
         }
-    }
-
-    /**
-     * Enables CSRF protection for all new forms
-     */
-    static public function enableDefaultCsrfProtection()
-    {
-        self::$defaultCsrfProtection = true;
-    }
-
-    /**
-     * Disables Csrf protection for all forms.
-     */
-    static public function disableDefaultCsrfProtection()
-    {
-        self::$defaultCsrfProtection = false;
-    }
-
-    /**
-     * Sets the CSRF field name used in all new CSRF protected forms
-     *
-     * @param string $name The CSRF field name
-     */
-    static public function setDefaultCsrfFieldName($name)
-    {
-        self::$defaultCsrfFieldName = $name;
-    }
-
-    /**
-     * Returns the default CSRF field name
-     *
-     * @return string The CSRF field name
-     */
-    static public function getDefaultCsrfFieldName()
-    {
-        return self::$defaultCsrfFieldName;
-    }
-
-    /**
-     * Sets the CSRF secret used in all new CSRF protected forms
-     *
-     * @param string $secret
-     */
-    static public function setDefaultCsrfSecret($secret)
-    {
-        self::$defaultCsrfSecret = $secret;
-    }
-
-    /**
-     * Returns the default CSRF secret
-     *
-     * @return string
-     */
-    static public function getDefaultCsrfSecret()
-    {
-        return self::$defaultCsrfSecret;
     }
 
     /**

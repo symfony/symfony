@@ -37,7 +37,7 @@ class HelpCommand extends Command
         $this
             ->setDefinition(array(
                 new InputArgument('command_name', InputArgument::OPTIONAL, 'The command name', 'help'),
-                new InputOption('xml', null, InputOption::PARAMETER_NONE, 'To output help as XML'),
+                new InputOption('xml', null, InputOption::VALUE_NONE, 'To output help as XML'),
             ))
             ->setName('help')
             ->setAliases(array('?'))
@@ -65,7 +65,7 @@ EOF
     protected function execute(InputInterface $input, OutputInterface $output)
     {
         if (null === $this->command) {
-            $this->command = $this->application->getCommand($input->getArgument('command_name'));
+            $this->command = $this->application->get($input->getArgument('command_name'));
         }
 
         if ($input->getOption('xml')) {

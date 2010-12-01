@@ -74,7 +74,7 @@ class SwitchUserListener
      */
     public function handle(Event $event)
     {
-        $request = $event->getParameter('request');
+        $request = $event->get('request');
 
         if (!$request->get($this->usernameParameter)) {
             return;

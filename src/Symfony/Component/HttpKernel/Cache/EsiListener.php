@@ -57,7 +57,7 @@ class EsiListener
      */
     public function filter($event, Response $response)
     {
-        if (HttpKernelInterface::MASTER_REQUEST !== $event->getParameter('request_type')) {
+        if (HttpKernelInterface::MASTER_REQUEST !== $event->get('request_type')) {
             return $response;
         }
 

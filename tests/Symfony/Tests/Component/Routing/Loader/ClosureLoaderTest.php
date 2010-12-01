@@ -40,11 +40,11 @@ class ClosureLoaderTest extends \PHPUnit_Framework_TestCase
         {
             $routes = new RouteCollection();
 
-            $routes->addRoute('foo', $route);
+            $routes->add('foo', $route);
 
             return $routes;
         });
 
-        $this->assertEquals($route, $routes->getRoute('foo'), '->load() loads a \Closure resource');
+        $this->assertEquals($route, $routes->get('foo'), '->load() loads a \Closure resource');
     }
 }

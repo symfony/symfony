@@ -105,11 +105,11 @@ class ParameterBag
     }
 
     /**
-     * Deletes a parameter.
+     * Removes a parameter.
      *
      * @param string $key The key
      */
-    public function delete($key)
+    public function remove($key)
     {
         unset($this->parameters[$key]);
     }

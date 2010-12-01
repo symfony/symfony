@@ -51,7 +51,7 @@ class PhpGeneratorDumper extends GeneratorDumper
     {
         $methods = array();
 
-        foreach ($this->routes->getRoutes() as $name => $route) {
+        foreach ($this->routes->all() as $name => $route) {
             $compiledRoute = $route->compile();
 
             $variables = str_replace("\n", '', var_export($compiledRoute->getVariables(), true));

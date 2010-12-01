@@ -62,11 +62,11 @@ class ProfilerListener
      */
     public function handleException(Event $event)
     {
-        if (HttpKernelInterface::MASTER_REQUEST !== $event->getParameter('request_type')) {
+        if (HttpKernelInterface::MASTER_REQUEST !== $event->get('request_type')) {
             return false;
         }
 
-        $this->exception = $event->getParameter('exception');
+        $this->exception = $event->get('exception');
 
         return false;
     }
@@ -80,11 +80,11 @@ class ProfilerListener
      */
     public function handleResponse(Event $event, Response $response)
     {
-        if (HttpKernelInterface::MASTER_REQUEST !== $event->getParameter('request_type')) {
+        if (HttpKernelInterface::MASTER_REQUEST !== $event->get('request_type')) {
             return $response;
         }
 
-        if (null !== $this->matcher && !$this->matcher->matches($event->getParameter('request'))) {
+        if (null !== $this->matcher && !$this->matcher->matches($event->get('request'))) {
             return $response;
         }
 
@@ -92,7 +92,7 @@ class ProfilerListener
             return $response;
         }
 
-        $this->profiler->collect($event->getParameter('request'), $response, $this->exception);
+        $this->profiler->collect($event->get('request'), $response, $this->exception);
         $this->exception = null;
 
         return $response;

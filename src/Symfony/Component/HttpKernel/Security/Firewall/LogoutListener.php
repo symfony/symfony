@@ -58,7 +58,7 @@ class LogoutListener
      */
     public function handle(Event $event)
     {
-        $request = $event->getParameter('request');
+        $request = $event->get('request');
 
         if ($this->logoutPath !== $request->getPathInfo()) {
             return;

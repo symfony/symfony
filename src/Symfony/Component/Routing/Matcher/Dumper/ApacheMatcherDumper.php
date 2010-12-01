@@ -25,11 +25,11 @@ class ApacheMatcherDumper extends MatcherDumper
      *
      * Available options:
      *
-     *  * script_name: The script name (index.php by default)
+     *  * script_name: The script name (app.php by default)
      *
      * @param  array  $options An array of options
      *
-     * @return string A PHP class representing the matcher class
+     * @return string A string to be used as Apache rewrite rules.
      *
      * @throws \RuntimeException When a route has more than 9 variables
      */
@@ -41,7 +41,7 @@ class ApacheMatcherDumper extends MatcherDumper
 
         $regexes = array();
 
-        foreach ($this->routes->getRoutes() as $name => $route) {
+        foreach ($this->routes->all() as $name => $route) {
             $compiledRoute = $route->compile();
 
             // Apache "only" supports 9 variables
@@ -61,15 +61,15 @@ class ApacheMatcherDumper extends MatcherDumper
             $variables = implode(',', $variables);
 
             $conditions = array();
-            foreach ((array) $route->getRequirement('_method') as $method) {
-                $conditions[] = sprintf('RewriteCond %%{REQUEST_METHOD} =%s', strtoupper($method));
+            if ($req = $route->getRequirement('_method')) {
+                $conditions[] = sprintf('RewriteCond %%{REQUEST_METHOD} ^(%s) [NC]', $req);
             }
 
-            $conditions = implode(" [OR]\n", $conditions)."\n";
+            $conditions = count($conditions) ? implode(" [OR]\n", $conditions)."\n" : '';
 
             $regexes[] = sprintf("%sRewriteCond %%{PATH_INFO} %s\nRewriteRule .* %s [QSA,L,%s]", $conditions, $regex, $options['script_name'], $variables);
         }
 
-        return implode("\n", $regexes);
+        return implode("\n\n", $regexes);
     }
 }

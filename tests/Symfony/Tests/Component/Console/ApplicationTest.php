@@ -38,7 +38,7 @@ class ApplicationTest extends \PHPUnit_Framework_TestCase
         $application = new Application('foo', 'bar');
         $this->assertEquals('foo', $application->getName(), '__construct() takes the application name as its first argument');
         $this->assertEquals('bar', $application->getVersion(), '__construct() takes the application version as its first argument');
-        $this->assertEquals(array('help', 'list'), array_keys($application->getCommands()), '__construct() registered the help and list commands by default');
+        $this->assertEquals(array('help', 'list'), array_keys($application->all()), '__construct() registered the help and list commands by default');
     }
 
     public function testSetGetName()
@@ -67,15 +67,15 @@ class ApplicationTest extends \PHPUnit_Framework_TestCase
         $this->assertStringEqualsFile(self::$fixturesPath.'/application_gethelp.txt', $application->getHelp(), '->setHelp() returns a help message');
     }
 
-    public function testGetCommands()
+    public function testAll()
     {
         $application = new Application();
-        $commands = $application->getCommands();
-        $this->assertEquals('Symfony\\Component\\Console\\Command\\HelpCommand', get_class($commands['help']), '->getCommands() returns the registered commands');
+        $commands = $application->all();
+        $this->assertEquals('Symfony\\Component\\Console\\Command\\HelpCommand', get_class($commands['help']), '->all() returns the registered commands');
 
-        $application->addCommand(new \FooCommand());
-        $commands = $application->getCommands('foo');
-        $this->assertEquals(1, count($commands), '->getCommands() takes a namespace as its first argument');
+        $application->add(new \FooCommand());
+        $commands = $application->all('foo');
+        $this->assertEquals(1, count($commands), '->all() takes a namespace as its first argument');
     }
 
     public function testRegister()
@@ -85,60 +85,60 @@ class ApplicationTest extends \PHPUnit_Framework_TestCase
         $this->assertEquals('foo', $command->getName(), '->register() registers a new command');
     }
 
-    public function testAddCommand()
+    public function testAdd()
     {
         $application = new Application();
-        $application->addCommand($foo = new \FooCommand());
-        $commands = $application->getCommands();
-        $this->assertEquals($foo, $commands['foo:bar'], '->addCommand() registers a command');
+        $application->add($foo = new \FooCommand());
+        $commands = $application->all();
+        $this->assertEquals($foo, $commands['foo:bar'], '->add() registers a command');
 
         $application = new Application();
         $application->addCommands(array($foo = new \FooCommand(), $foo1 = new \Foo1Command()));
-        $commands = $application->getCommands();
+        $commands = $application->all();
         $this->assertEquals(array($foo, $foo1), array($commands['foo:bar'], $commands['foo:bar1']), '->addCommands() registers an array of commands');
     }
 
-    public function testHasGetCommand()
+    public function testHasGet()
     {
         $application = new Application();
-        $this->assertTrue($application->hasCommand('list'), '->hasCommand() returns true if a named command is registered');
-        $this->assertFalse($application->hasCommand('afoobar'), '->hasCommand() returns false if a named command is not registered');
+        $this->assertTrue($application->has('list'), '->has() returns true if a named command is registered');
+        $this->assertFalse($application->has('afoobar'), '->has() returns false if a named command is not registered');
 
-        $application->addCommand($foo = new \FooCommand());
-        $this->assertTrue($application->hasCommand('afoobar'), '->hasCommand() returns true if an alias is registered');
-        $this->assertEquals($foo, $application->getCommand('foo:bar'), '->getCommand() returns a command by name');
-        $this->assertEquals($foo, $application->getCommand('afoobar'), '->getCommand() returns a command by alias');
+        $application->add($foo = new \FooCommand());
+        $this->assertTrue($application->has('afoobar'), '->has() returns true if an alias is registered');
+        $this->assertEquals($foo, $application->get('foo:bar'), '->get() returns a command by name');
+        $this->assertEquals($foo, $application->get('afoobar'), '->get() returns a command by alias');
 
         try {
-            $application->getCommand('foofoo');
-            $this->fail('->getCommand() throws an \InvalidArgumentException if the command does not exist');
+            $application->get('foofoo');
+            $this->fail('->get() throws an \InvalidArgumentException if the command does not exist');
         } catch (\Exception $e) {
-            $this->assertInstanceOf('\InvalidArgumentException', $e, '->getCommand() throws an \InvalidArgumentException if the command does not exist');
-            $this->assertEquals('The command "foofoo" does not exist.', $e->getMessage(), '->getCommand() throws an \InvalidArgumentException if the command does not exist');
+            $this->assertInstanceOf('\InvalidArgumentException', $e, '->get() throws an \InvalidArgumentException if the command does not exist');
+            $this->assertEquals('The command "foofoo" does not exist.', $e->getMessage(), '->get() throws an \InvalidArgumentException if the command does not exist');
         }
 
         $application = new TestApplication();
-        $application->addCommand($foo = new \FooCommand());
+        $application->add($foo = new \FooCommand());
         $application->setWantHelps();
-        $command = $application->getCommand('foo:bar');
-        $this->assertEquals('Symfony\Component\Console\Command\HelpCommand', get_class($command), '->getCommand() returns the help command if --help is provided as the input');
+        $command = $application->get('foo:bar');
+        $this->assertEquals('Symfony\Component\Console\Command\HelpCommand', get_class($command), '->get() returns the help command if --help is provided as the input');
     }
 
     public function testGetNamespaces()
     {
         $application = new TestApplication();
-        $application->addCommand(new \FooCommand());
-        $application->addCommand(new \Foo1Command());
+        $application->add(new \FooCommand());
+        $application->add(new \Foo1Command());
         $this->assertEquals(array('foo'), $application->getNamespaces(), '->getNamespaces() returns an array of unique used namespaces');
     }
 
     public function testFindNamespace()
     {
         $application = new TestApplication();
-        $application->addCommand(new \FooCommand());
+        $application->add(new \FooCommand());
         $this->assertEquals('foo', $application->findNamespace('foo'), '->findNamespace() returns the given namespace if it exists');
         $this->assertEquals('foo', $application->findNamespace('f'), '->findNamespace() finds a namespace given an abbreviation');
-        $application->addCommand(new \Foo2Command());
+        $application->add(new \Foo2Command());
         $this->assertEquals('foo', $application->findNamespace('foo'), '->findNamespace() returns the given namespace if it exists');
         try {
             $application->findNamespace('f');
@@ -157,41 +157,41 @@ class ApplicationTest extends \PHPUnit_Framework_TestCase
         }
     }
 
-    public function testFindCommand()
+    public function testFind()
     {
         $application = new TestApplication();
-        $application->addCommand(new \FooCommand());
-        $this->assertEquals('FooCommand', get_class($application->findCommand('foo:bar')), '->findCommand() returns a command if its name exists');
-        $this->assertEquals('Symfony\Component\Console\Command\HelpCommand', get_class($application->findCommand('h')), '->findCommand() returns a command if its name exists');
-        $this->assertEquals('FooCommand', get_class($application->findCommand('f:bar')), '->findCommand() returns a command if the abbreviation for the namespace exists');
-        $this->assertEquals('FooCommand', get_class($application->findCommand('f:b')), '->findCommand() returns a command if the abbreviation for the namespace and the command name exist');
-        $this->assertEquals('FooCommand', get_class($application->findCommand('a')), '->findCommand() returns a command if the abbreviation exists for an alias');
+        $application->add(new \FooCommand());
+        $this->assertEquals('FooCommand', get_class($application->find('foo:bar')), '->find() returns a command if its name exists');
+        $this->assertEquals('Symfony\Component\Console\Command\HelpCommand', get_class($application->find('h')), '->find() returns a command if its name exists');
+        $this->assertEquals('FooCommand', get_class($application->find('f:bar')), '->find() returns a command if the abbreviation for the namespace exists');
+        $this->assertEquals('FooCommand', get_class($application->find('f:b')), '->find() returns a command if the abbreviation for the namespace and the command name exist');
+        $this->assertEquals('FooCommand', get_class($application->find('a')), '->find() returns a command if the abbreviation exists for an alias');
 
-        $application->addCommand(new \Foo1Command());
-        $application->addCommand(new \Foo2Command());
+        $application->add(new \Foo1Command());
+        $application->add(new \Foo2Command());
 
         try {
-            $application->findCommand('f');
-            $this->fail('->findCommand() throws an \InvalidArgumentException if the abbreviation is ambiguous for a namespace');
+            $application->find('f');
+            $this->fail('->find() throws an \InvalidArgumentException if the abbreviation is ambiguous for a namespace');
         } catch (\Exception $e) {
-            $this->assertInstanceOf('\InvalidArgumentException', $e, '->findCommand() throws an \InvalidArgumentException if the abbreviation is ambiguous for a namespace');
-            $this->assertEquals('Command "f" is not defined.', $e->getMessage(), '->findCommand() throws an \InvalidArgumentException if the abbreviation is ambiguous for a namespace');
+            $this->assertInstanceOf('\InvalidArgumentException', $e, '->find() throws an \InvalidArgumentException if the abbreviation is ambiguous for a namespace');
+            $this->assertEquals('Command "f" is not defined.', $e->getMessage(), '->find() throws an \InvalidArgumentException if the abbreviation is ambiguous for a namespace');
         }
 
         try {
-            $application->findCommand('a');
-            $this->fail('->findCommand() throws an \InvalidArgumentException if the abbreviation is ambiguous for an alias');
+            $application->find('a');
+            $this->fail('->find() throws an \InvalidArgumentException if the abbreviation is ambiguous for an alias');
         } catch (\Exception $e) {
-            $this->assertInstanceOf('\InvalidArgumentException', $e, '->findCommand() throws an \InvalidArgumentException if the abbreviation is ambiguous for an alias');
-            $this->assertEquals('Command "a" is ambiguous (afoobar, afoobar1 and 1 more).', $e->getMessage(), '->findCommand() throws an \InvalidArgumentException if the abbreviation is ambiguous for an alias');
+            $this->assertInstanceOf('\InvalidArgumentException', $e, '->find() throws an \InvalidArgumentException if the abbreviation is ambiguous for an alias');
+            $this->assertEquals('Command "a" is ambiguous (afoobar, afoobar1 and 1 more).', $e->getMessage(), '->find() throws an \InvalidArgumentException if the abbreviation is ambiguous for an alias');
         }
 
         try {
-            $application->findCommand('foo:b');
-            $this->fail('->findCommand() throws an \InvalidArgumentException if the abbreviation is ambiguous for a command');
+            $application->find('foo:b');
+            $this->fail('->find() throws an \InvalidArgumentException if the abbreviation is ambiguous for a command');
         } catch (\Exception $e) {
-            $this->assertInstanceOf('\InvalidArgumentException', $e, '->findCommand() throws an \InvalidArgumentException if the abbreviation is ambiguous for a command');
-            $this->assertEquals('Command "foo:b" is ambiguous (foo:bar, foo:bar1).', $e->getMessage(), '->findCommand() throws an \InvalidArgumentException if the abbreviation is ambiguous for a command');
+            $this->assertInstanceOf('\InvalidArgumentException', $e, '->find() throws an \InvalidArgumentException if the abbreviation is ambiguous for a command');
+            $this->assertEquals('Command "foo:b" is ambiguous (foo:bar, foo:bar1).', $e->getMessage(), '->find() throws an \InvalidArgumentException if the abbreviation is ambiguous for a command');
         }
     }
 
@@ -218,7 +218,7 @@ class ApplicationTest extends \PHPUnit_Framework_TestCase
     public function testAsText()
     {
         $application = new Application();
-        $application->addCommand(new \FooCommand);
+        $application->add(new \FooCommand);
         $this->assertStringEqualsFile(self::$fixturesPath.'/application_astext1.txt', $application->asText(), '->asText() returns a text representation of the application');
         $this->assertStringEqualsFile(self::$fixturesPath.'/application_astext2.txt', $application->asText('foo'), '->asText() returns a text representation of the application');
     }
@@ -226,7 +226,7 @@ class ApplicationTest extends \PHPUnit_Framework_TestCase
     public function testAsXml()
     {
         $application = new Application();
-        $application->addCommand(new \FooCommand);
+        $application->add(new \FooCommand);
         $this->assertXmlStringEqualsXmlFile(self::$fixturesPath.'/application_asxml1.txt', $application->asXml(), '->asXml() returns an XML representation of the application');
         $this->assertXmlStringEqualsXmlFile(self::$fixturesPath.'/application_asxml2.txt', $application->asXml('foo'), '->asXml() returns an XML representation of the application');
     }
@@ -252,7 +252,7 @@ class ApplicationTest extends \PHPUnit_Framework_TestCase
         $application = new Application();
         $application->setAutoExit(false);
         $application->setCatchExceptions(false);
-        $application->addCommand($command = new \Foo1Command());
+        $application->add($command = new \Foo1Command());
         $_SERVER['argv'] = array('cli.php', 'foo:bar1');
 
         ob_start();
@@ -328,7 +328,7 @@ class ApplicationTest extends \PHPUnit_Framework_TestCase
         $application = new Application();
         $application->setAutoExit(false);
         $application->setCatchExceptions(false);
-        $application->addCommand(new \FooCommand());
+        $application->add(new \FooCommand());
         $tester = new ApplicationTester($application);
         $tester->run(array('command' => 'foo:bar', '--no-interaction' => true));
         $this->assertEquals("called\n", $this->normalize($tester->getDisplay()), '->run() does not called interact() if --no-interaction is passed');

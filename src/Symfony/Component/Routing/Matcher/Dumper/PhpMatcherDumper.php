@@ -51,15 +51,13 @@ class PhpMatcherDumper extends MatcherDumper
     {
         $code = array();
 
-        foreach ($this->routes->getRoutes() as $name => $route) {
+        foreach ($this->routes->all() as $name => $route) {
             $compiledRoute = $route->compile();
 
             $conditions = array();
 
             if ($req = $route->getRequirement('_method')) {
-                $req = array_map('strtolower', (array) $req);
-
-                $conditions[] = sprintf("isset(\$this->context['method']) && in_array(strtolower(\$this->context['method']), %s)", str_replace("\n", '', var_export($req, true)));
+                $conditions[] = sprintf("isset(\$this->context['method']) && preg_match('#^(%s)$#xi', \$this->context['method'])", $req);
             }
 
             if ($compiledRoute->getStaticPrefix()) {

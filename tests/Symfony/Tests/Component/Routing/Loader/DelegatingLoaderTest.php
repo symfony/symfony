@@ -71,12 +71,12 @@ class DelegatingLoaderTest extends \PHPUnit_Framework_TestCase
         {
             $routes = new RouteCollection();
 
-            $routes->addRoute('foo', $route);
+            $routes->add('foo', $route);
 
             return $routes;
         });
 
-        $this->assertSame($route, $routes->getRoute('foo'), '->load() loads a resource using the loaders from the resolver');
+        $this->assertSame($route, $routes->get('foo'), '->load() loads a resource using the loaders from the resolver');
 
         try {
             $loader->load('foo.foo');

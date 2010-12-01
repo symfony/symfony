@@ -62,12 +62,11 @@ class PhpDumper extends Dumper
 
     protected function addServiceReturn($id, $definition)
     {
-        return <<<EOF
+        if (!$definition->getMethodCalls() && !$definition->getConfigurator()) {
+            return "    }\n";
+        }
 
-        return \$instance;
-    }
-
-EOF;
+        return "\n        return \$instance;\n    }\n";
     }
 
     protected function addServiceInstance($id, $definition)
@@ -83,22 +82,32 @@ EOF;
             $arguments[] = $this->dumpValue($value);
         }
 
+        $simple = !$definition->getMethodCalls() && !$definition->getConfigurator();
+
+        $instantiation = '';
         if ($definition->isShared()) {
-            $instantiation = sprintf("        \$this->services['$id'] = \$instance");
+            $instantiation = "\$this->services['$id'] = ".($simple ? '' : '$instance');
+        } elseif (!$simple) {
+            $instantiation = '$instance';
+        }
+
+        $return = '';
+        if ($simple) {
+            $return = 'return ';
         } else {
-            $instantiation = sprintf("        \$instance");
+            $instantiation .= ' = ';
         }
 
         if (null !== $definition->getFactoryMethod()) {
             if (null !== $definition->getFactoryService()) {
-                $code = sprintf("$instantiation = %s->%s(%s);\n", $this->getServiceCall($definition->getFactoryService()), $definition->getFactoryMethod(), implode(', ', $arguments));
+                $code = sprintf("        $return{$instantiation}%s->%s(%s);\n", $this->getServiceCall($definition->getFactoryService()), $definition->getFactoryMethod(), implode(', ', $arguments));
             } else {
-                $code = sprintf("$instantiation = call_user_func(array(%s, '%s')%s);\n", $class, $definition->getFactoryMethod(), $arguments ? ', '.implode(', ', $arguments) : '');
+                $code = sprintf("        $return{$instantiation}call_user_func(array(%s, '%s')%s);\n", $class, $definition->getFactoryMethod(), $arguments ? ', '.implode(', ', $arguments) : '');
             }
         } elseif (false !== strpos($class, '$')) {
-            $code = sprintf("        \$class = %s;\n$instantiation = new \$class(%s);\n", $class, implode(', ', $arguments));
+            $code = sprintf("        \$class = %s;\n        $return{$instantiation}new \$class(%s);\n", $class, implode(', ', $arguments));
         } else {
-            $code = sprintf("$instantiation = new \\%s(%s);\n", substr(str_replace('\\\\', '\\', $class), 1, -1), implode(', ', $arguments));
+            $code = sprintf("        $return{$instantiation}new \\%s(%s);\n", substr(str_replace('\\\\', '\\', $class), 1, -1), implode(', ', $arguments));
         }
 
         return $code;

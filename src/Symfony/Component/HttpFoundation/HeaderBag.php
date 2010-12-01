@@ -145,11 +145,11 @@ class HeaderBag
     }
 
     /**
-     * Deletes a header.
+     * Removes a header.
      *
      * @param string $key The HTTP header name
      */
-    public function delete($key)
+    public function remove($key)
     {
         $key = strtr(strtolower($key), '_', '-');
 

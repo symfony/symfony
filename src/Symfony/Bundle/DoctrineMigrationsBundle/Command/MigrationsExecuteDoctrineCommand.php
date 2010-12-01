@@ -30,8 +30,8 @@ class MigrationsExecuteDoctrineCommand extends ExecuteCommand
 
         $this
             ->setName('doctrine:migrations:execute')
-            ->addOption('bundle', null, InputOption::PARAMETER_REQUIRED, 'The bundle to load migrations configuration from.')
-            ->addOption('em', null, InputOption::PARAMETER_OPTIONAL, 'The entity manager to use for this command.')
+            ->addOption('bundle', null, InputOption::VALUE_REQUIRED, 'The bundle to load migrations configuration from.')
+            ->addOption('em', null, InputOption::VALUE_OPTIONAL, 'The entity manager to use for this command.')
         ;
     }
 

@@ -236,9 +236,9 @@ class Command
      *
      * @param string  $name        The option name
      * @param string  $shortcut    The shortcut (can be null)
-     * @param integer $mode        The option mode: self::PARAMETER_REQUIRED, self::PARAMETER_NONE or self::PARAMETER_OPTIONAL
+     * @param integer $mode        The option mode: One of the InputOption::VALUE_* constants
      * @param string  $description A description text
-     * @param mixed   $default     The default value (must be null for self::PARAMETER_REQUIRED or self::PARAMETER_NONE)
+     * @param mixed   $default     The default value (must be null for InputOption::VALUE_REQUIRED or self::VALUE_NONE)
      *
      * @return Command The current instance
      */

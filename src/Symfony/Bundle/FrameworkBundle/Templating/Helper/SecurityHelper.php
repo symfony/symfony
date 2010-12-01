@@ -35,6 +35,10 @@ class SecurityHelper extends Helper
 
     public function vote($role, $object = null)
     {
+        if (null === $this->context) {
+            return false;
+        }
+
         return $this->context->vote($role, $object);
     }
 

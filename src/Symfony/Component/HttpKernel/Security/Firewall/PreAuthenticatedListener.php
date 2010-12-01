@@ -58,7 +58,7 @@ abstract class PreAuthenticatedListener
      */
     public function handle(Event $event)
     {
-        $request = $event->getParameter('request');
+        $request = $event->get('request');
 
         if (null !== $this->logger) {
             $this->logger->debug(sprintf('Checking secure context token: %s', $this->securityContext->getToken()));

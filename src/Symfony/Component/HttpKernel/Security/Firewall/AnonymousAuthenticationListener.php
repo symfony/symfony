@@ -55,7 +55,7 @@ class AnonymousAuthenticationListener
      */
     public function handle(Event $event)
     {
-        $request = $event->getParameter('request');
+        $request = $event->get('request');
 
         if (null !== $this->context->getToken()) {
             return;

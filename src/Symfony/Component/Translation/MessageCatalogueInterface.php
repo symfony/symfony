@@ -43,7 +43,7 @@ interface MessageCatalogueInterface
      *
      * @return array An array of messages
      */
-    function getMessages($domain = null);
+    function all($domain = null);
 
     /**
      * Sets a message translation.
@@ -52,7 +52,7 @@ interface MessageCatalogueInterface
      * @param string $translation The messages translation
      * @param string $domain      The domain name
      */
-    function setMessage($id, $translation, $domain = 'messages');
+    function set($id, $translation, $domain = 'messages');
 
     /**
      * Checks if a message has a translation.
@@ -62,7 +62,7 @@ interface MessageCatalogueInterface
      *
      * @return Boolean true if the message has a translation, false otherwise
      */
-    function hasMessage($id, $domain = 'messages');
+    function has($id, $domain = 'messages');
 
     /**
      * Gets a message translation.
@@ -72,7 +72,7 @@ interface MessageCatalogueInterface
      *
      * @return string The message translation
      */
-    function getMessage($id, $domain = 'messages');
+    function get($id, $domain = 'messages');
 
     /**
      * Sets translations for a given domain.
@@ -80,7 +80,7 @@ interface MessageCatalogueInterface
      * @param string $messages An array of translations
      * @param string $domain   The domain name
      */
-    function setMessages($messages, $domain = 'messages');
+    function replace($messages, $domain = 'messages');
 
     /**
      * Adds translations for a given domain.
@@ -88,7 +88,7 @@ interface MessageCatalogueInterface
      * @param string $messages An array of translations
      * @param string $domain   The domain name
      */
-    function addMessages($messages, $domain = 'messages');
+    function add($messages, $domain = 'messages');
 
     /**
      * Merges translations from the given Catalogue into the current one.

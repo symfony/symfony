@@ -35,8 +35,8 @@ class GenerateEntityDoctrineCommand extends DoctrineCommand
             ->setDescription('Generate a new Doctrine entity inside a bundle.')
             ->addArgument('bundle', null, InputArgument::REQUIRED, 'The bundle to initialize the entity in.')
             ->addArgument('entity', null, InputArgument::REQUIRED, 'The entity class to initialize.')
-            ->addOption('mapping-type', null, InputOption::PARAMETER_OPTIONAL, 'The mapping type to to use for the entity.')
-            ->addOption('fields', null, InputOption::PARAMETER_OPTIONAL, 'The fields to create with the new entity.')
+            ->addOption('mapping-type', null, InputOption::VALUE_OPTIONAL, 'The mapping type to to use for the entity.')
+            ->addOption('fields', null, InputOption::VALUE_OPTIONAL, 'The fields to create with the new entity.')
             ->setHelp(<<<EOT
 The <info>doctrine:generate:entity</info> task initializes a new Doctrine entity inside a bundle:
 

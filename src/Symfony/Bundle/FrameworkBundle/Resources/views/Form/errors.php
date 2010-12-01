@@ -3,7 +3,7 @@
         <?php foreach ($field->getErrors() as $error): ?>
             <li><?php echo $view['translator']->trans(
                 $error->getMessageTemplate(),
-                $error->getMessageParameters()->getRawValue(),
+                $error->getMessageParameters(),
                 'validators'
             ) ?></li>
         <?php endforeach; ?>

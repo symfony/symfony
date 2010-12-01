@@ -56,7 +56,7 @@ class MessageCatalogue implements MessageCatalogueInterface
     /**
      * {@inheritdoc}
      */
-    public function getMessages($domain = null)
+    public function all($domain = null)
     {
         if (null === $domain) {
             return $this->messages;
@@ -68,15 +68,15 @@ class MessageCatalogue implements MessageCatalogueInterface
     /**
      * {@inheritdoc}
      */
-    public function setMessage($id, $translation, $domain = 'messages')
+    public function set($id, $translation, $domain = 'messages')
     {
-        $this->addMessages(array($id => $translation), $domain);
+        $this->add(array($id => $translation), $domain);
     }
 
     /**
      * {@inheritdoc}
      */
-    public function hasMessage($id, $domain = 'messages')
+    public function has($id, $domain = 'messages')
     {
         return isset($this->messages[$domain][$id]);
     }
@@ -84,7 +84,7 @@ class MessageCatalogue implements MessageCatalogueInterface
     /**
      * {@inheritdoc}
      */
-    public function getMessage($id, $domain = 'messages')
+    public function get($id, $domain = 'messages')
     {
         return isset($this->messages[$domain][$id]) ? $this->messages[$domain][$id] : $id;
     }
@@ -92,17 +92,17 @@ class MessageCatalogue implements MessageCatalogueInterface
     /**
      * {@inheritdoc}
      */
-    public function setMessages($messages, $domain = 'messages')
+    public function replace($messages, $domain = 'messages')
     {
         $this->messages[$domain] = array();
 
-        $this->addMessages($messages, $domain);
+        $this->add($messages, $domain);
     }
 
     /**
      * {@inheritdoc}
      */
-    public function addMessages($messages, $domain = 'messages')
+    public function add($messages, $domain = 'messages')
     {
         if (!isset($this->messages[$domain])) {
             $this->messages[$domain] = $messages;
@@ -120,8 +120,8 @@ class MessageCatalogue implements MessageCatalogueInterface
             throw new \LogicException(sprintf('Cannot add a catalogue for locale "%s" as the current locale for this catalogue is "%s"', $catalogue->getLocale(), $this->locale));
         }
 
-        foreach ($catalogue->getMessages() as $domain => $messages) {
-            $this->addMessages($messages, $domain);
+        foreach ($catalogue->all() as $domain => $messages) {
+            $this->add($messages, $domain);
         }
 
         foreach ($catalogue->getResources() as $resource) {
@@ -135,9 +135,9 @@ class MessageCatalogue implements MessageCatalogueInterface
     public function addFallbackCatalogue(MessageCatalogueInterface $catalogue)
     {
         foreach ($catalogue->getDomains() as $domain) {
-            foreach ($catalogue->getMessages($domain) as $id => $translation) {
-                if (false === $this->hasMessage($id, $domain)) {
-                    $this->setMessage($id, $translation, $domain);
+            foreach ($catalogue->all($domain) as $id => $translation) {
+                if (false === $this->has($id, $domain)) {
+                    $this->set($id, $translation, $domain);
                 }
             }
         }

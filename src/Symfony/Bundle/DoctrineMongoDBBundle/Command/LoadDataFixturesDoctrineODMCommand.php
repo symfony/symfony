@@ -37,9 +37,9 @@ class LoadDataFixturesDoctrineODMCommand extends DoctrineODMCommand
         $this
             ->setName('doctrine:mongodb:data:load')
             ->setDescription('Load data fixtures to your database.')
-            ->addOption('fixtures', null, InputOption::PARAMETER_OPTIONAL | InputOption::PARAMETER_IS_ARRAY, 'The directory or file to load data fixtures from.')
-            ->addOption('append', null, InputOption::PARAMETER_OPTIONAL, 'Whether or not to append the data fixtures.', false)
-            ->addOption('dm', null, InputOption::PARAMETER_REQUIRED, 'The document manager to use for this command.')
+            ->addOption('fixtures', null, InputOption::VALUE_OPTIONAL | InputOption::VALUE_IS_ARRAY, 'The directory or file to load data fixtures from.')
+            ->addOption('append', null, InputOption::VALUE_OPTIONAL, 'Whether or not to append the data fixtures.', false)
+            ->addOption('dm', null, InputOption::VALUE_REQUIRED, 'The document manager to use for this command.')
             ->setHelp(<<<EOT
 The <info>doctrine:mongodb:data:load</info> command loads data fixtures from your bundles:
 

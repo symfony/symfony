@@ -47,7 +47,7 @@ abstract class Bundle extends ContainerAware implements BundleInterface {
         foreach ($finder as $file) {
             $r = new \ReflectionClass($prefix.strtr($file->getPath(), array($dir => '', '/' => '\\')).'\\'.basename($file, '.php'));
             if ($r->isSubclassOf('Symfony\\Component\\Console\\Command\\Command') && !$r->isAbstract()) {
-                $application->addCommand($r->newInstance()); } } }
+                $application->add($r->newInstance()); } } }
     protected function initReflection() {
         $tmp = dirname(str_replace('\\', '/', get_class($this)));
         $this->namespacePrefix = str_replace('/', '\\', dirname($tmp));
@@ -127,3 +127,83 @@ class ClassCollectionLoader {
             chmod($file, 0644);
             return; }
         throw new \RuntimeException(sprintf('Failed to write cache file "%s".', $file)); } }
+namespace Symfony\Component\DependencyInjection;
+use Symfony\Component\DependencyInjection\ParameterBag\ParameterBagInterface;
+use Symfony\Component\DependencyInjection\ParameterBag\ParameterBag;
+use Symfony\Component\DependencyInjection\ParameterBag\FrozenParameterBag;
+class Container implements ContainerInterface {
+    protected $parameterBag;
+    protected $services;
+    public function __construct(ParameterBagInterface $parameterBag = null) {
+        $this->parameterBag = null === $parameterBag ? new ParameterBag() : $parameterBag;
+        $this->services = array();
+        $this->set('service_container', $this); }
+    public function freeze() {
+        $this->parameterBag->resolve();
+        $this->parameterBag = new FrozenParameterBag($this->parameterBag->all()); }
+    public function isFrozen() {
+        return $this->parameterBag instanceof FrozenParameterBag; }
+    public function getParameterBag() {
+        return $this->parameterBag; }
+    public function getParameter($name) {
+        return $this->parameterBag->get($name); }
+    public function hasParameter($name) {
+        return $this->parameterBag->has($name); }
+    public function setParameter($name, $value) {
+        $this->parameterBag->set($name, $value); }
+    public function set($id, $service) {
+        $this->services[$id] = $service; }
+    public function has($id) {
+        return isset($this->services[$id]) || method_exists($this, 'get'.strtr($id, array('_' => '', '.' => '_')).'Service'); }
+    public function get($id, $invalidBehavior = self::EXCEPTION_ON_INVALID_REFERENCE) {
+        $id = (string) $id;
+        if (isset($this->services[$id])) {
+            return $this->services[$id]; }
+        if (method_exists($this, $method = 'get'.strtr($id, array('_' => '', '.' => '_')).'Service')) {
+            return $this->$method(); }
+        if (self::EXCEPTION_ON_INVALID_REFERENCE === $invalidBehavior) {
+            throw new \InvalidArgumentException(sprintf('The service "%s" does not exist.', $id)); } }
+    public function getServiceIds() {
+        $ids = array();
+        $r = new \ReflectionClass($this);
+        foreach ($r->getMethods() as $method) {
+            if (preg_match('/^get(.+)Service$/', $name = $method->getName(), $match)) {
+                $ids[] = self::underscore($match[1]); } }
+        return array_merge($ids, array_keys($this->services)); }
+    static public function camelize($id) {
+        return preg_replace(array('/(?:^|_)+(.)/e', '/\.(.)/e'), array("strtoupper('\\1')", "'_'.strtoupper('\\1')"), $id); }
+    static public function underscore($id) {
+        return strtolower(preg_replace(array('/([A-Z]+)([A-Z][a-z])/', '/([a-z\d])([A-Z])/'), array('\\1_\\2', '\\1_\\2'), strtr($id, '_', '.'))); } }
+namespace Symfony\Component\DependencyInjection;
+interface ContainerAwareInterface {
+    function setContainer(ContainerInterface $container = null); }
+namespace Symfony\Component\DependencyInjection;
+interface ContainerInterface {
+    const EXCEPTION_ON_INVALID_REFERENCE = 1;
+    const NULL_ON_INVALID_REFERENCE      = 2;
+    const IGNORE_ON_INVALID_REFERENCE    = 3;
+    function set($id, $service);
+    function get($id, $invalidBehavior = self::EXCEPTION_ON_INVALID_REFERENCE);
+    function has($id); }
+namespace Symfony\Component\DependencyInjection\ParameterBag;
+class FrozenParameterBag extends ParameterBag {
+    public function __construct(array $parameters = array()) {
+        foreach ($parameters as $key => $value) {
+            $this->parameters[strtolower($key)] = $value; } }
+    public function clear() {
+        throw new \LogicException('Impossible to call clear() on a frozen ParameterBag.'); }
+    public function add(array $parameters) {
+        throw new \LogicException('Impossible to call add() on a frozen ParameterBag.'); }
+    public function set($name, $value) {
+        throw new \LogicException('Impossible to call set() on a frozen ParameterBag.'); } }
+namespace Symfony\Component\DependencyInjection\ParameterBag;
+interface ParameterBagInterface {
+    function clear();
+    function add(array $parameters);
+    function all();
+    function get($name);
+    function set($name, $value);
+    function has($name); }
+namespace Symfony\Component\DependencyInjection;
+interface TaggedContainerInterface extends ContainerInterface {
+    function findTaggedServiceIds($name); }

@@ -52,11 +52,12 @@ class UrlMatcher implements UrlMatcherInterface
     {
         $url = $this->normalizeUrl($url);
 
-        foreach ($this->routes->getRoutes() as $name => $route) {
+        foreach ($this->routes->all() as $name => $route) {
             $compiledRoute = $route->compile();
 
             // check HTTP method requirement
-            if (isset($this->context['method']) && (($req = $route->getRequirement('_method')) && !in_array(strtolower($this->context['method']), array_map('strtolower', (array) $req)))) {
+
+            if (isset($this->context['method']) && (($req = $route->getRequirement('_method')) && !preg_match(sprintf('#^(%s)$#xi', $req), $this->context['method']))) {
                 continue;
             }
 

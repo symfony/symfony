@@ -27,4 +27,12 @@ ClassCollectionLoader::load(array(
     'Symfony\\Component\\HttpKernel\\Bundle\\BundleInterface',
     'Symfony\\Component\\HttpKernel\\Debug\\ErrorHandler',
     'Symfony\\Component\\HttpKernel\\ClassCollectionLoader',
+
+    'Symfony\\Component\\DependencyInjection\\Container',
+    'Symfony\\Component\\DependencyInjection\\ContainerAwareInterface',
+    'Symfony\\Component\\DependencyInjection\\ContainerInterface',
+    'Symfony\\Component\\DependencyInjection\\ParameterBag\\FrozenParameterBag',
+    'Symfony\\Component\\DependencyInjection\\ParameterBag\\ParameterBagInterface',
+    'Symfony\\Component\\DependencyInjection\\TaggedContainerInterface',
+
 ), __DIR__.'/../..', 'bootstrap', false);

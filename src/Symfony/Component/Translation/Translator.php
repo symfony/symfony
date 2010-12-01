@@ -112,7 +112,7 @@ class Translator implements TranslatorInterface
             $this->loadCatalogue($locale);
         }
 
-        return strtr($this->catalogues[$locale]->getMessage($id, $domain), $parameters);
+        return strtr($this->catalogues[$locale]->get($id, $domain), $parameters);
     }
 
     /**
@@ -128,7 +128,7 @@ class Translator implements TranslatorInterface
             $this->loadCatalogue($locale);
         }
 
-        return strtr($this->selector->choose($this->catalogues[$locale]->getMessage($id, $domain), (int) $number, $locale), $parameters);
+        return strtr($this->selector->choose($this->catalogues[$locale]->get($id, $domain), (int) $number, $locale), $parameters);
     }
 
     protected function loadCatalogue($locale)

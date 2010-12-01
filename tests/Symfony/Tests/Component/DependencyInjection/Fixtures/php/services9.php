@@ -81,9 +81,7 @@ class ProjectServiceContainer extends Container implements TaggedContainerInterf
     protected function getFooBarService()
     {
         $class = $this->getParameter('foo_class');
-        $this->services['foo_bar'] = $instance = new $class();
-
-        return $instance;
+        return $this->services['foo_bar'] = new $class();
     }
 
     /**
@@ -121,9 +119,7 @@ class ProjectServiceContainer extends Container implements TaggedContainerInterf
      */
     protected function getFactoryServiceService()
     {
-        $this->services['factory_service'] = $instance = $this->get('foo.baz')->getInstance();
-
-        return $instance;
+        return $this->services['factory_service'] = $this->get('foo.baz')->getInstance();
     }
 
     /**

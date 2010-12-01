@@ -32,8 +32,8 @@ class GenerateEntitiesDoctrineCommand extends DoctrineCommand
         $this
             ->setName('doctrine:generate:entities')
             ->setDescription('Generate entity classes and method stubs from your mapping information.')
-            ->addOption('bundle', null, InputOption::PARAMETER_OPTIONAL, 'The bundle to initialize the entity or entities in.')
-            ->addOption('entity', null, InputOption::PARAMETER_OPTIONAL, 'The entity class to initialize (requires bundle parameter).')
+            ->addOption('bundle', null, InputOption::VALUE_OPTIONAL, 'The bundle to initialize the entity or entities in.')
+            ->addOption('entity', null, InputOption::VALUE_OPTIONAL, 'The entity class to initialize (requires bundle parameter).')
             ->setHelp(<<<EOT
 The <info>doctrine:generate:entities</info> command generates entity classes and method stubs from your mapping information:
 

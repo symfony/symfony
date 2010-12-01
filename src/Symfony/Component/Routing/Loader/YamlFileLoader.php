@@ -83,7 +83,7 @@ class YamlFileLoader extends FileLoader
 
         $route = new Route($config['pattern'], $defaults, $requirements, $options);
 
-        $collection->addRoute($name, $route);
+        $collection->add($name, $route);
     }
 
     protected function loadFile($file)

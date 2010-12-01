@@ -53,7 +53,7 @@ EOF
         $router = $this->container->get('router');
 
         $routes = array();
-        foreach ($router->getRouteCollection()->getRoutes() as $name => $route) {
+        foreach ($router->getRouteCollection()->all() as $name => $route) {
             $routes[$name] = $route->compile();
         }
 

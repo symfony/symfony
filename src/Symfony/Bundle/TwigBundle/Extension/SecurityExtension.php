@@ -27,9 +27,13 @@ class SecurityExtension extends \Twig_Extension
         $this->context = $context;
     }
 
-    public function getContext()
+    public function vote($role, $object = null)
     {
-        return $this->context;
+        if (null === $this->context) {
+            return false;
+        }
+
+        return $this->context->vote($role, $object);
     }
 
     /**

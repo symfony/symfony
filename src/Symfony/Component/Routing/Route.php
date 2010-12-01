@@ -193,14 +193,16 @@ class Route
     {
         $this->requirements = array();
         foreach ($requirements as $key => $regex) {
-            if (!is_array($regex)) {
-                if ('^' == $regex[0]) {
-                    $regex = substr($regex, 1);
-                }
+            if (is_array($regex)) {
+                throw new \InvalidArgumentException(sprintf('Routing requirements must be a string, array given for "%s"', $key));
+            }
 
-                if ('$' == substr($regex, -1)) {
-                    $regex = substr($regex, 0, -1);
-                }
+            if ('^' == $regex[0]) {
+                $regex = substr($regex, 1);
+            }
+
+            if ('$' == substr($regex, -1)) {
+                $regex = substr($regex, 0, -1);
             }
 
             $this->requirements[$key] = $regex;

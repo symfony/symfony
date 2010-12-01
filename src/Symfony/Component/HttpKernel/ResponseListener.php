@@ -41,11 +41,11 @@ class ResponseListener
      */
     public function filter(Event $event, Response $response)
     {
-        if (HttpKernelInterface::MASTER_REQUEST !== $event->getParameter('request_type') || $response->headers->has('Content-Type')) {
+        if (HttpKernelInterface::MASTER_REQUEST !== $event->get('request_type') || $response->headers->has('Content-Type')) {
             return $response;
         }
 
-        $request = $event->getParameter('request');
+        $request = $event->get('request');
         $format = $request->getRequestFormat();
         if ((null !== $format) && $mimeType = $request->getMimeType($format)) {
             $response->headers->set('Content-Type', $mimeType);

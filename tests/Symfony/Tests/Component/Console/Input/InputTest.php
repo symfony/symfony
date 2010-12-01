@@ -32,7 +32,7 @@ class InputTest extends \PHPUnit_Framework_TestCase
         $this->assertEquals('bar', $input->getOption('name'), '->setOption() sets the value for a given option');
         $this->assertEquals(array('name' => 'bar'), $input->getOptions(), '->getOptions() returns all option values');
 
-        $input = new ArrayInput(array('--name' => 'foo'), new InputDefinition(array(new InputOption('name'), new InputOption('bar', '', InputOption::PARAMETER_OPTIONAL, '', 'default'))));
+        $input = new ArrayInput(array('--name' => 'foo'), new InputDefinition(array(new InputOption('name'), new InputOption('bar', '', InputOption::VALUE_OPTIONAL, '', 'default'))));
         $this->assertEquals('default', $input->getOption('bar'), '->getOption() returns the default value for optional options');
         $this->assertEquals(array('name' => 'foo', 'bar' => 'default'), $input->getOptions(), '->getOptions() returns all option values, even optional ones');
 

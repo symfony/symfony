@@ -55,7 +55,7 @@ class ContextListener
      */
     public function read(Event $event)
     {
-        $request = $event->getParameter('request');
+        $request = $event->get('request');
 
         $session = $request->hasSession() ? $request->getSession() : null;
 
@@ -83,7 +83,7 @@ class ContextListener
      */
     public function write(Event $event, Response $response)
     {
-        if (HttpKernelInterface::MASTER_REQUEST !== $event->getParameter('request_type')) {
+        if (HttpKernelInterface::MASTER_REQUEST !== $event->get('request_type')) {
             return $response;
         }
 
@@ -99,7 +99,7 @@ class ContextListener
             $this->logger->debug('Write SecurityContext in the session');
         }
 
-        $event->getParameter('request')->getSession()->set('_security', serialize($token));
+        $event->get('request')->getSession()->set('_security', serialize($token));
 
         return $response;
     }

@@ -60,7 +60,7 @@ class FormTest extends \PHPUnit_Framework_TestCase
     public function testConstructor($message, $form, $values)
     {
         $form = $this->createForm('<form>'.$form.'</form>');
-        $this->assertEquals($values, array_map(function ($field) { return array(get_class($field), $field->getValue()); }, $form->getFields()), '->getDefaultValues() '.$message);
+        $this->assertEquals($values, array_map(function ($field) { return array(get_class($field), $field->getValue()); }, $form->all()), '->getDefaultValues() '.$message);
     }
 
     public function provideInitializeValues()
@@ -336,35 +336,35 @@ class FormTest extends \PHPUnit_Framework_TestCase
         );
     }
 
-    public function testHasField()
+    public function testHas()
     {
         $form = $this->createForm('<form method="post"><input type="text" name="bar" value="bar" /><input type="submit" /></form>');
 
-        $this->assertFalse($form->hasField('foo'), '->hasField() returns false if a field is not in the form');
-        $this->assertTrue($form->hasField('bar'), '->hasField() returns true if a field is in the form');
+        $this->assertFalse($form->has('foo'), '->has() returns false if a field is not in the form');
+        $this->assertTrue($form->has('bar'), '->has() returns true if a field is in the form');
     }
 
-    public function testGetField()
+    public function testGet()
     {
         $form = $this->createForm('<form method="post"><input type="text" name="bar" value="bar" /><input type="submit" /></form>');
 
-        $this->assertEquals('Symfony\\Component\\DomCrawler\\Field\\InputFormField', get_class($form->getField('bar')), '->getField() returns the field object associated with the given name');
+        $this->assertEquals('Symfony\\Component\\DomCrawler\\Field\\InputFormField', get_class($form->get('bar')), '->get() returns the field object associated with the given name');
 
         try {
-            $form->getField('foo');
-            $this->fail('->getField() throws an \InvalidArgumentException if the field does not exist');
+            $form->get('foo');
+            $this->fail('->get() throws an \InvalidArgumentException if the field does not exist');
         } catch (\InvalidArgumentException $e) {
-            $this->assertTrue(true, '->getField() throws an \InvalidArgumentException if the field does not exist');
+            $this->assertTrue(true, '->get() throws an \InvalidArgumentException if the field does not exist');
         }
     }
 
-    public function testGetFields()
+    public function testAll()
     {
         $form = $this->createForm('<form method="post"><input type="text" name="bar" value="bar" /><input type="submit" /></form>');
 
-        $fields = $form->getFields();
-        $this->assertEquals(1, count($fields), '->getFields() return an array of form field objects');
-        $this->assertEquals('Symfony\\Component\\DomCrawler\\Field\\InputFormField', get_class($fields['bar']), '->getFields() return an array of form field objects');
+        $fields = $form->all();
+        $this->assertEquals(1, count($fields), '->all() return an array of form field objects');
+        $this->assertEquals('Symfony\\Component\\DomCrawler\\Field\\InputFormField', get_class($fields['bar']), '->all() return an array of form field objects');
     }
 
     protected function createForm($form, $method = null, $host = null, $path = '/')

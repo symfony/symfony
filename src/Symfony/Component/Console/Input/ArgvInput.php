@@ -88,7 +88,7 @@ class ArgvInput extends Input
         $name = substr($token, 1);
 
         if (strlen($name) > 1) {
-            if ($this->definition->hasShortcut($name[0]) && $this->definition->getOptionForShortcut($name[0])->acceptParameter()) {
+            if ($this->definition->hasShortcut($name[0]) && $this->definition->getOptionForShortcut($name[0])->acceptValue()) {
                 // an option with a value (with no space)
                 $this->addShortOption($name[0], substr($name, 1));
             } else {
@@ -115,7 +115,7 @@ class ArgvInput extends Input
             }
 
             $option = $this->definition->getOptionForShortcut($name[$i]);
-            if ($option->acceptParameter()) {
+            if ($option->acceptValue()) {
                 $this->addLongOption($option->getName(), $i === $len - 1 ? null : substr($name, $i + 1));
 
                 break;
@@ -190,7 +190,7 @@ class ArgvInput extends Input
 
         $option = $this->definition->getOption($name);
 
-        if (null === $value && $option->acceptParameter()) {
+        if (null === $value && $option->acceptValue()) {
             // if option accepts an optional or mandatory argument
             // let's see if there is one provided
             $next = array_shift($this->parsed);
@@ -202,11 +202,11 @@ class ArgvInput extends Input
         }
 
         if (null === $value) {
-            if ($option->isParameterRequired()) {
+            if ($option->isValueRequired()) {
                 throw new \RuntimeException(sprintf('The "--%s" option requires a value.', $name));
             }
 
-            $value = $option->isParameterOptional() ? $option->getDefault() : true;
+            $value = $option->isValueOptional() ? $option->getDefault() : true;
         }
 
         $this->options[$name] = $value;

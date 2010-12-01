@@ -35,7 +35,7 @@ class Application extends BaseApplication
 
         parent::__construct('Symfony', Kernel::VERSION.' - '.$kernel->getName());
 
-        $this->definition->addOption(new InputOption('--shell', '-s', InputOption::PARAMETER_NONE, 'Launch the shell.'));
+        $this->definition->addOption(new InputOption('--shell', '-s', InputOption::VALUE_NONE, 'Launch the shell.'));
 
         if (!$this->kernel->isBooted()) {
             $this->kernel->boot();

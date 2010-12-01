@@ -53,14 +53,14 @@ class ArrayInputTest extends \PHPUnit_Framework_TestCase
         $input = new ArrayInput(array('--foo' => 'bar'), new InputDefinition(array(new InputOption('foo'))));
         $this->assertEquals(array('foo' => 'bar'), $input->getOptions(), '->parse() parses long options');
 
-        $input = new ArrayInput(array('--foo' => 'bar'), new InputDefinition(array(new InputOption('foo', 'f', InputOption::PARAMETER_OPTIONAL, '', 'default'))));
+        $input = new ArrayInput(array('--foo' => 'bar'), new InputDefinition(array(new InputOption('foo', 'f', InputOption::VALUE_OPTIONAL, '', 'default'))));
         $this->assertEquals(array('foo' => 'bar'), $input->getOptions(), '->parse() parses long options with a default value');
 
-        $input = new ArrayInput(array('--foo' => null), new InputDefinition(array(new InputOption('foo', 'f', InputOption::PARAMETER_OPTIONAL, '', 'default'))));
+        $input = new ArrayInput(array('--foo' => null), new InputDefinition(array(new InputOption('foo', 'f', InputOption::VALUE_OPTIONAL, '', 'default'))));
         $this->assertEquals(array('foo' => 'default'), $input->getOptions(), '->parse() parses long options with a default value');
 
         try {
-            $input = new ArrayInput(array('--foo' => null), new InputDefinition(array(new InputOption('foo', 'f', InputOption::PARAMETER_REQUIRED))));
+            $input = new ArrayInput(array('--foo' => null), new InputDefinition(array(new InputOption('foo', 'f', InputOption::VALUE_REQUIRED))));
             $this->fail('->parse() throws an \InvalidArgumentException exception if a required option is passed without a value');
         } catch (\Exception $e) {
             $this->assertInstanceOf('\InvalidArgumentException', $e, '->parse() throws an \InvalidArgumentException exception if a required option is passed without a value');

@@ -155,7 +155,7 @@ class Esi
         if ($response->headers->has('Surrogate-Control')) {
             $value = $response->headers->get('Surrogate-Control');
             if ('content="ESI/1.0"' == $value) {
-                $response->headers->delete('Surrogate-Control');
+                $response->headers->remove('Surrogate-Control');
             } elseif (preg_match('#,\s*content="ESI/1.0"#', $value)) {
                 $response->headers->set('Surrogate-Control', preg_replace('#,\s*content="ESI/1.0"#', '', $value));
             } elseif (preg_match('#content="ESI/1.0",\s*#', $value)) {

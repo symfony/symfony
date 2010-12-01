@@ -97,7 +97,7 @@ class Shell
 
         // task name?
         if (false === strpos($text, ' ') || !$text) {
-            return array_keys($this->application->getCommands());
+            return array_keys($this->application->all());
         }
 
         // options and arguments?

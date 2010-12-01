@@ -34,8 +34,8 @@ class InternalController extends ContainerAware
         $request = $this->container->get('request');
         $attributes = $request->attributes;
 
-        $attributes->delete('path');
-        $attributes->delete('controller');
+        $attributes->remove('path');
+        $attributes->remove('controller');
         if ('none' !== $path)
         {
             parse_str($path, $tmp);

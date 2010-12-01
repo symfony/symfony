@@ -62,8 +62,8 @@ class ExceptionListener
      */
     public function handleException(Event $event)
     {
-        $exception = $event->getParameter('exception');
-        $request = $event->getParameter('request');
+        $exception = $event->get('exception');
+        $request = $event->get('request');
 
         if ($exception instanceof AuthenticationException) {
             if (null !== $this->logger) {
@@ -73,7 +73,7 @@ class ExceptionListener
             try {
                 $response = $this->startAuthentication($request, $exception);
             } catch (\Exception $e) {
-                $event->setParameter('exception', $e);
+                $event->set('exception', $e);
 
                 return;
             }
@@ -87,7 +87,7 @@ class ExceptionListener
                 try {
                     $response = $this->startAuthentication($request, new InsufficientAuthenticationException('Full authentication is required to access this resource.', $token, 0, $exception));
                 } catch (\Exception $e) {
-                    $event->setParameter('exception', $e);
+                    $event->set('exception', $e);
 
                     return;
                 }
@@ -110,7 +110,7 @@ class ExceptionListener
                         $this->logger->err(sprintf('Exception thrown when handling an exception (%s: %s)', get_class($e), $e->getMessage()));
                     }
 
-                    $event->setParameter('exception', new \RuntimeException('Exception thrown when handling an exception.', 0, $e));
+                    $event->set('exception', new \RuntimeException('Exception thrown when handling an exception.', 0, $e));
 
                     return;
                 }

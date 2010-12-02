@@ -137,7 +137,7 @@ class ExceptionListener
             $this->logger->debug('Calling Authentication entry point');
         }
 
-        $request->getSession()->set('_security.target_url', $request->getUri());
+        $request->getSession()->set('_security.target_path', $request->getUri());
 
         return $this->authenticationEntryPoint->start($request, $reason);
     }

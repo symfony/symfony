@@ -318,13 +318,16 @@ class PropertyPath implements \IteratorAggregate
                 }
 
                 return $object->$isser();
+            } else if ($reflClass->hasMethod('__get')) {
+	            // needed to support magic method __get
+	            return $object->$property;
             } else if ($reflClass->hasProperty($property)) {
                 if (!$reflClass->getProperty($property)->isPublic()) {
                     throw new PropertyAccessDeniedException(sprintf('Property "%s" is not public in class "%s". Maybe you should create the method "get%s()" or "is%s()"?', $property, $reflClass->getName(), ucfirst($property), ucfirst($property)));
                 }
 
                 return $object->$property;
-            } else if (property_exists($object, $property) || $reflClass->hasMethod('__get')) {
+            } else if (property_exists($object, $property)) {
                 // needed to support \stdClass instances
                 return $object->$property;
             } else {
@@ -361,13 +364,16 @@ class PropertyPath implements \IteratorAggregate
                 }
 
                 $objectOrArray->$setter($value);
+            } else if ($reflClass->hasMethod('__set')) {
+                // needed to support magic method __set
+                $objectOrArray->$property = $value;
             } else if ($reflClass->hasProperty($property)) {
                 if (!$reflClass->getProperty($property)->isPublic()) {
                     throw new PropertyAccessDeniedException(sprintf('Property "%s" is not public in class "%s". Maybe you should create the method "set%s()"?', $property, $reflClass->getName(), ucfirst($property)));
                 }
 
                 $objectOrArray->$property = $value;
-            } else if (property_exists($objectOrArray, $property) || $reflClass->hasMethod('__get')) {
+            } else if (property_exists($objectOrArray, $property)) {
                 // needed to support \stdClass instances
                 $objectOrArray->$property = $value;
             } else {

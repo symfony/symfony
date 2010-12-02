@@ -4,15 +4,15 @@ namespace Symfony\Tests\Component\Form\Fixtures;
 
 class Magician
 {
-    private $properties = array();
+    private $foobar;
 
-    public function __set($name, $value)
+    public function __set($property, $value)
     {
-        $this->properties[$name] = $value;
+        $this->$property = $value;
     }
 
-    public function __get($name)
+    public function __get($property)
     {
-        return isset($this->properties[$name]) ? $this->properties[$name] : null;
+        return isset($this->$property) ? $this->$property : null;
     }
 }

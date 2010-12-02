@@ -150,6 +150,10 @@ class SecurityExtension extends Extension
             'security.authentication.listener.digest',
             'security.access_listener',
             'security.exception_listener',
+            'security.authentication.factory.form',
+            'security.authentication.factory.x509',
+            'security.authentication.factory.basic',
+            'security.authentication.factory.digest',
         );
         foreach ($ids as $id) {
             $container->remove($id);
@@ -243,55 +247,37 @@ class SecurityExtension extends Extension
         $hasListeners = false;
         $defaultEntryPoint = null;
 
-        // X509
-        if (array_key_exists('x509', $firewall)) {
-            list($provider, $listener) = $this->createX509Listener($container, $id, $firewall['x509'], $defaultProvider, $providerIds);
+        $positions = array('pre_auth', 'form', 'http');
 
-            $listeners[] = new Reference($listener);
-            $providers[] = new Reference($provider);
-            $hasListeners = true;
+        $tags = $container->findTaggedServiceIds('security.listener.factory');
+        $factories = array();
+        foreach ($positions as $position) {
+            $factories[$position] = array();
         }
 
-        // Form
-        if (array_key_exists('form_login', $firewall)) {
-            $firewall['form-login'] = $firewall['form_login'];
-        }
-        if (array_key_exists('form-login', $firewall)) {
-            list($provider, $listener) = $this->createFormLoginListener($container, $id, $firewall['form-login'], $defaultProvider, $providerIds);
+        foreach (array_keys($tags) as $tag) {
+            $factory = $container->get($tag);
 
-            $listeners[] = new Reference($listener);
-            $providers[] = new Reference($provider);
-            $hasListeners = true;
-            $defaultEntryPoint = 'security.authentication.form_entry_point';
+            $factories[$factory->getPosition()][] = $factory;
         }
 
-        // HTTP Basic
-        if (array_key_exists('http_basic', $firewall)) {
-            $firewall['http-basic'] = $firewall['http_basic'];
-        }
-        if (array_key_exists('http-basic', $firewall)) {
-            list($provider, $listener) = $this->createHttpBasicListener($container, $id, $firewall['http-basic'], $defaultProvider, $providerIds);
+        foreach ($positions as $position) {
+            foreach ($factories[$position] as $factory) {
+                $key = $factory->getKey();
+                $keybis = str_replace('-', '_', $key);
 
-            $listeners[] = new Reference($listener);
-            $providers[] = new Reference($provider);
-            $hasListeners = true;
-            if (null === $defaultEntryPoint) {
-                $defaultEntryPoint = 'security.authentication.basic_entry_point';
-            }
-        }
+                if (array_key_exists($keybis, $firewall)) {
+                    $firewall[$key] = $firewall[$keybis];
+                }
+                if (array_key_exists($key, $firewall)) {
+                    $userProvider = isset($firewall[$key]['provider']) ? $this->getUserProviderId($firewall[$key]['provider']) : $defaultProvider;
 
-        // HTTP Digest
-        if (array_key_exists('http_digest', $firewall)) {
-            $firewall['http-digest'] = $firewall['http_digest'];
-        }
-        if (array_key_exists('http-digest', $firewall)) {
-            list($provider, $listener) = $this->createHttpDigestListener($container, $id, $firewall['http-digest'], $defaultProvider, $providerIds);
+                    list($provider, $listener, $defaultEntryPoint) = $factory->create($container, $id, $firewall[$key], $userProvider, $providerIds, $defaultEntryPoint);
 
-            $listeners[] = new Reference($listener);
-            $providers[] = new Reference($provider);
-            $hasListeners = true;
-            if (null === $defaultEntryPoint) {
-                $defaultEntryPoint = 'security.authentication.digest_entry_point';
+                    $listeners[] = new Reference($listener);
+                    $providers[] = new Reference($provider);
+                    $hasListeners = true;
+                }
             }
         }
 
@@ -423,114 +409,6 @@ class SecurityExtension extends Extension
     protected function getUserProviderId($name)
     {
         return 'security.authentication.provider.'.$name;
-    }
-
-    protected function createX509Listener($container, $id, $config, $defaultProvider, $providerIds)
-    {
-        // provider
-        $userProvider = isset($config['provider']) ? $this->getUserProviderId($config['provider']) : $defaultProvider;
-
-        $provider = 'security.authentication.provider.pre_authenticated.'.$id;
-        $container
-            ->register($provider, '%security.authentication.provider.pre_authenticated.class%')
-            ->setArguments(array(new Reference($userProvider), new Reference('security.account_checker')))
-        ;
-
-        // listener
-        $listenerId = 'security.authentication.listener.x509.'.$id;
-        $listener = $container->setDefinition($listenerId, clone $container->getDefinition('security.authentication.listener.x509'));
-        $arguments = $listener->getArguments();
-        $arguments[1] = new Reference($provider);
-        $listener->setArguments($arguments);
-
-        return array($provider, $listenerId);
-    }
-
-    protected function createFormLoginListener($container, $id, $config, $defaultProvider, $providerIds)
-    {
-        // provider
-        $userProvider = isset($config['provider']) ? $this->getUserProviderId($config['provider']) : $defaultProvider;
-
-        $provider = 'security.authentication.provider.dao.'.$id;
-        $container
-            ->register($provider, '%security.authentication.provider.dao.class%')
-            ->setArguments(array(new Reference($userProvider), new Reference('security.account_checker'), new Reference('security.encoder.'.$providerIds[$userProvider])));
-        ;
-
-        // listener
-        $listenerId = 'security.authentication.listener.form.'.$id;
-        $listener = $container->setDefinition($listenerId, clone $container->getDefinition('security.authentication.listener.form'));
-        $arguments = $listener->getArguments();
-        $arguments[1] = new Reference($provider);
-        $listener->setArguments($arguments);
-
-        $options = array(
-            'check_path'                     => '/login_check',
-            'login_path'                     => '/login',
-            'use_forward'                    => false,
-            'always_use_default_target_path' => false,
-            'default_target_path'            => '/',
-            'target_path_parameter'          => '_target_path',
-            'use_referer'                    => false,
-            'failure_path'                   => null,
-            'failure_forward'                => false,
-        );
-        foreach (array_keys($options) as $key) {
-            if (isset($config[$key])) {
-                $options[$key] = $config[$key];
-            }
-        }
-        $container->setParameter('security.authentication.form.options', $options);
-        $container->setParameter('security.authentication.form.login_path', $options['login_path']);
-        $container->setParameter('security.authentication.form.use_forward', $options['use_forward']);
-
-        return array($provider, $listenerId);
-    }
-
-    protected function createHttpBasicListener($container, $id, $config, $defaultProvider, $providerIds)
-    {
-        // provider
-        $userProvider = isset($config['provider']) ? $this->getUserProviderId($config['provider']) : $defaultProvider;
-
-        $provider = 'security.authentication.provider.dao.'.$id;
-        $container
-            ->register($provider, '%security.authentication.provider.dao.class%')
-            ->setArguments(array(new Reference($userProvider), new Reference('security.account_checker'), new Reference('security.encoder.'.$providerIds[$userProvider])));
-        ;
-
-        // listener
-        $listenerId = 'security.authentication.listener.basic.'.$id;
-        $listener = $container->setDefinition($listenerId, clone $container->getDefinition('security.authentication.listener.basic'));
-        $arguments = $listener->getArguments();
-        $arguments[1] = new Reference($provider);
-        $listener->setArguments($arguments);
-
-        if (isset($config['path'])) {
-            $container->setParameter('security.authentication.form.path', $config['path']);
-        }
-
-        return array($provider, $listenerId);
-    }
-
-    protected function createHttpDigestListener($container, $id, $config, $defaultProvider, $providerIds)
-    {
-        // provider
-        $userProvider = isset($config['provider']) ? $this->getUserProviderId($config['provider']) : $defaultProvider;
-
-        $provider = 'security.authentication.provider.dao.'.$id;
-        $container
-            ->register($provider, '%security.authentication.provider.dao.class%')
-            ->setArguments(array(new Reference($userProvider), new Reference('security.account_checker'), new Reference('security.encoder.'.$providerIds[$userProvider])));
-        ;
-
-        // listener
-        $listenerId = 'security.authentication.listener.digest.'.$id;
-        $listener = $container->setDefinition($listenerId, clone $container->getDefinition('security.authentication.listener.digest'));
-        $arguments = $listener->getArguments();
-        $arguments[1] = new Reference($userProvider);
-        $listener->setArguments($arguments);
-
-        return array($provider, $listenerId);
     }
 
     protected function createAccessListener($container, $id, $providers)

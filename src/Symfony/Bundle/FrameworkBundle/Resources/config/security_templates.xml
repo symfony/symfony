@@ -5,6 +5,22 @@
     xsi:schemaLocation="http://www.symfony-project.org/schema/dic/services http://www.symfony-project.org/schema/dic/services/services-1.0.xsd">
 
     <services>
+        <service id="security.authentication.factory.form" class="Symfony\Bundle\FrameworkBundle\DependencyInjection\Security\Factory\FormLoginFactory">
+            <tag name="security.listener.factory" />
+        </service>
+
+        <service id="security.authentication.factory.x509" class="Symfony\Bundle\FrameworkBundle\DependencyInjection\Security\Factory\X509Factory">
+            <tag name="security.listener.factory" />
+        </service>
+
+        <service id="security.authentication.factory.basic" class="Symfony\Bundle\FrameworkBundle\DependencyInjection\Security\Factory\HttpBasicFactory">
+            <tag name="security.listener.factory" />
+        </service>
+
+        <service id="security.authentication.factory.digest" class="Symfony\Bundle\FrameworkBundle\DependencyInjection\Security\Factory\HttpDigestFactory">
+            <tag name="security.listener.factory" />
+        </service>
+
         <service id="security.authentication.listener.form" class="%security.authentication.listener.form.class%">
             <argument type="service" id="security.context" />
             <argument type="service" id="security.authentication.manager" />

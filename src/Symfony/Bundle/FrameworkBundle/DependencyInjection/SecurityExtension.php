@@ -133,12 +133,12 @@ class SecurityExtension extends Extension
         }
 
         // load service templates
-        $c = new ContainerBuilder(new ParameterBag());
+        $c = new ContainerBuilder($container->getParameterBag());
         $loader = new XmlFileLoader($c, array(__DIR__.'/../Resources/config', __DIR__.'/Resources/config'));
         $loader->load('security_templates.xml');
 
         foreach ($this->fixConfig($config, 'template') as $template) {
-            $loader->load($template);
+            $loader->load($container->getParameterBag()->resolveValue($template));
         }
         $container->merge($c);
 

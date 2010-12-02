@@ -7,7 +7,8 @@ use Symfony\Component\HttpFoundation\UniversalClassLoader;
 $loader = new UniversalClassLoader();
 $loader->registerNamespaces(array(
     'Symfony'                        => __DIR__.'/src',
-    'Doctrine\\ODM\\MongoDB'         => __DIR__.'/vendor/doctrine-mongodb/lib',
+    'Doctrine\\MongoDB'         => __DIR__.'/vendor/doctrine-mongodb/lib',
+    'Doctrine\\ODM\\MongoDB'         => __DIR__.'/vendor/doctrine-mongodb-odm/lib',
     'Doctrine\\Common\\DataFixtures' => __DIR__.'/vendor/doctrine-data-fixtures/lib',
     'Doctrine\\Common'               => __DIR__.'/vendor/doctrine-common/lib',
     'Doctrine\\DBAL\\Migrations'     => __DIR__.'/vendor/doctrine-migrations/lib',

@@ -47,7 +47,7 @@ class ContainerTest extends TestCase
         $this->assertInstanceOf('Doctrine\Common\Cache\ArrayCache', $container->get('doctrine.odm.mongodb.cache.array'));
         $this->assertInstanceOf('Symfony\Bundle\DoctrineMongoDBBundle\Logger\DoctrineMongoDBLogger', $container->get('doctrine.odm.mongodb.logger'));
         $this->assertInstanceOf('Symfony\Bundle\DoctrineMongoDBBundle\DataCollector\DoctrineMongoDBDataCollector', $container->get('doctrine.odm.mongodb.data_collector'));
-        $this->assertInstanceOf('Doctrine\ODM\MongoDB\Mongo', $container->get('doctrine.odm.mongodb.default_connection'));
+        $this->assertInstanceOf('Doctrine\MongoDB\Connection', $container->get('doctrine.odm.mongodb.default_connection'));
         $this->assertInstanceOf('Doctrine\ODM\MongoDB\Configuration', $container->get('doctrine.odm.mongodb.default_configuration'));
         $this->assertInstanceOf('Doctrine\ODM\MongoDB\Mapping\Driver\DriverChain', $container->get('doctrine.odm.mongodb.metadata'));
         $this->assertInstanceOf('Doctrine\Common\Cache\ArrayCache', $container->get('doctrine.odm.mongodb.default_metadata_cache'));

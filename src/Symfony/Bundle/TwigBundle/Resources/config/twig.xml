@@ -34,14 +34,6 @@
             <argument type="service" id="twig" />
         </service>
 
-        <service id="twig.extension.escaper" class="Twig_Extension_Escaper">
-            <tag name="twig.extension" />
-        </service>
-
-        <service id="twig.extension.optimizer" class="Twig_Extension_Optimizer">
-            <tag name="twig.extension" />
-        </service>
-
         <service id="twig.extension.trans" class="Symfony\Bundle\TwigBundle\Extension\TransExtension">
             <tag name="twig.extension" />
             <argument type="service" id="translator" />

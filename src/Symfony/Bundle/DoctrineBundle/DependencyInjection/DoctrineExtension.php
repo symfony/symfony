@@ -415,8 +415,8 @@ class DoctrineExtension extends Extension
     /**
      * Gets an entity manager cache driver definition for metadata, query and result caches.
      *
-     * @param array $entityManager
-     * @param string $cacheDriver
+     * @param array $entityManager The array configuring an entity manager.
+     * @param string|array $cacheDriver The cache driver configuration.
      * @param ContainerBuilder $container
      * @return Definition $cacheDef
      */
@@ -424,11 +424,11 @@ class DoctrineExtension extends Extension
     {
         $type = is_array($cacheDriver) && isset($cacheDriver['type']) ? $cacheDriver['type'] : $cacheDriver;
         if ($type === 'memcache') {
-            $memcacheClass = '%'.sprintf('doctrine.orm.cache.%s_class', $type).'%';
+            $memcacheClass = isset($cacheDriver['class']) ? $cacheDriver['class'] : '%'.sprintf('doctrine.orm.cache.%s_class', $type).'%';
             $cacheDef = new Definition($memcacheClass);
-            $memcacheHost = '%doctrine.orm.cache.memcache_host%';
-            $memcachePort = '%doctrine.orm.cache.memcache_port%';
-            $memcacheInstanceClass = '%doctrine.orm.cache.memcache_instance_class%';
+            $memcacheHost = is_array($cacheDriver) && isset($cacheDriver['host']) ? $cacheDriver['host'] : '%doctrine.orm.cache.memcache_host%';
+            $memcachePort = is_array($cacheDriver) && isset($cacheDriver['port']) ? $cacheDriver['port'] : '%doctrine.orm.cache.memcache_port%';
+            $memcacheInstanceClass = is_array($cacheDriver) && isset($cacheDriver['instance_class']) ? $cacheDriver['instance_class'] : '%doctrine.orm.cache.memcache_instance_class%';
             $memcacheInstance = new Definition($memcacheInstanceClass);
             $memcacheInstance->addMethodCall('connect', array($memcacheHost, $memcachePort));
             $container->setDefinition(sprintf('doctrine.orm.%s_memcache_instance', $entityManager['name']), $memcacheInstance);

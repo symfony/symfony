@@ -139,7 +139,8 @@ abstract class DoctrineCommand extends Command
         $bundleMetadatas = array();
         $entityManagers = $this->getDoctrineEntityManagers();
         foreach ($entityManagers as $key => $em) {
-            $cmf = new SymfonyDisconnectedClassMetadataFactory($em);
+            $cmf = new SymfonyDisconnectedClassMetadataFactory();
+            $cmf->setEntityManager($em);
             $metadatas = $cmf->getAllMetadata();
             foreach ($metadatas as $metadata) {
 

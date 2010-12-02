@@ -8,6 +8,7 @@ use Symfony\Component\DependencyInjection\Resource\FileResource;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\DependencyInjection\Reference;
 use Symfony\Component\DependencyInjection\Definition;
+use Symfony\Component\DependencyInjection\ParameterBag\ParameterBag;
 use Symfony\Component\HttpFoundation\RequestMatcher;
 
 /*
@@ -132,8 +133,14 @@ class SecurityExtension extends Extension
         }
 
         // load service templates
-        $loader = new XmlFileLoader($container, array(__DIR__.'/../Resources/config', __DIR__.'/Resources/config'));
+        $c = new ContainerBuilder(new ParameterBag());
+        $loader = new XmlFileLoader($c, array(__DIR__.'/../Resources/config', __DIR__.'/Resources/config'));
         $loader->load('security_templates.xml');
+
+        foreach ($this->fixConfig($config, 'template') as $template) {
+            $loader->load($template);
+        }
+        $container->merge($c);
 
         // load firewall map
         $map = $container->getDefinition('security.firewall.map');
@@ -144,18 +151,7 @@ class SecurityExtension extends Extension
         }
 
         // remove all service templates
-        $ids = array(
-            'security.authentication.listener.x509',
-            'security.authentication.listener.basic',
-            'security.authentication.listener.digest',
-            'security.access_listener',
-            'security.exception_listener',
-            'security.authentication.factory.form',
-            'security.authentication.factory.x509',
-            'security.authentication.factory.basic',
-            'security.authentication.factory.digest',
-        );
-        foreach ($ids as $id) {
+        foreach ($c->getServiceIds() as $id) {
             $container->remove($id);
         }
     }

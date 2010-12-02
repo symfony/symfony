@@ -138,7 +138,7 @@ class SecurityExtension extends Extension
         $loader->load('security_templates.xml');
 
         foreach ($this->fixConfig($config, 'template') as $template) {
-            $loader->load($container->getParameterBag()->resolveValue($template));
+            $loader->load($c->getParameterBag()->resolveValue($template));
         }
         $container->merge($c);
 

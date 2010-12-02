@@ -5,6 +5,20 @@ namespace Symfony\Bundle\FrameworkBundle\DependencyInjection\Security\Factory;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\DependencyInjection\Reference;
 
+/*
+ * This file is part of the Symfony framework.
+ *
+ * (c) Fabien Potencier <fabien.potencier@symfony-project.com>
+ *
+ * This source file is subject to the MIT license that is bundled
+ * with this source code in the file LICENSE.
+ */
+
+/**
+ * X509Factory creates services for X509 certificate authentication.
+ *
+ * @author Fabien Potencier <fabien.potencier@symfony-project.com>
+ */
 class X509Factory implements SecurityFactoryInterface
 {
     public function create(ContainerBuilder $container, $id, $config, $userProvider, $providerIds, $defaultEntryPoint)

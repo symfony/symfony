@@ -20,6 +20,16 @@
         <service id="security.authentication.factory.digest" class="Symfony\Bundle\FrameworkBundle\DependencyInjection\Security\Factory\HttpDigestFactory">
             <tag name="security.listener.factory" />
         </service>
+        
+        <service id="security.logout_listener" class="%security.logout_listener.class%">
+            <argument type="service" id="security.context" />
+            <argument>%security.logout.path%</argument>
+            <argument>%security.logout.target_path%</argument>
+        </service>
+        
+        <service id="security.logout.handler.cookie_clearing" class="%security.logout.handler.cookie_clearing.class%">
+            <argument type="collection"></argument>
+        </service>        
 
         <service id="security.authentication.listener.form" class="%security.authentication.listener.form.class%">
             <argument type="service" id="security.context" />

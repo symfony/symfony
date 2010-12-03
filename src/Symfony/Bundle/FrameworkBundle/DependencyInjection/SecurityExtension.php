@@ -203,14 +203,31 @@ class SecurityExtension extends Extension
 
         // Logout listener
         if (array_key_exists('logout', $firewall)) {
-            $listeners[] = new Reference('security.logout_listener');
+            $listenerId = 'security.logout_listener.'.$id;
+            $listener = $container->setDefinition($listenerId, clone $container->getDefinition('security.logout_listener'));          
+            
+            $listeners[] = new Reference($listenerId);
 
+            $arguments = $listener->getArguments();
             if (isset($firewall['logout']['path'])) {
-                $container->setParameter('security.logout.path', $firewall['logout']['path']);
+                $arguments[1] = $firewall['logout']['path'];
             }
 
             if (isset($firewall['logout']['target'])) {
-                $container->setParameter('security.logout.target_path', $firewall['logout']['target']);
+                $arguments[2] = $firewall['logout']['target'];
+            }
+            $listener->setArguments($arguments);
+            
+            if (!isset($firewall['stateless']) || !$firewall['stateless']) {
+                $listener->addMethodCall('addHandler', array(new Reference('security.logout.handler.session')));
+            }
+            
+            if (count($cookies = $this->fixConfig($firewall['logout'], 'cookie')) > 0) {
+                $cookieHandlerId = 'security.logout.handler.cookie_clearing.'.$id;
+                $cookieHandler = $container->setDefinition($cookieHandlerId, clone $container->getDefinition('security.logout.handler.cookie_clearing'));
+                $cookieHandler->setArguments(array($cookies));
+
+                $listener->addMethodCall('addHandler', array(new Reference($cookieHandlerId)));
             }
         }
 
@@ -426,6 +443,8 @@ class SecurityExtension extends Extension
         return $listenerId;
     }
 
+    
+    
     protected function createExceptionListener($container, $id, $defaultEntryPoint)
     {
         $exceptionListenerId = 'security.exception_listener.'.$id;

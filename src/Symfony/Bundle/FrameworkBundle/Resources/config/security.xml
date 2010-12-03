@@ -49,6 +49,8 @@
         <parameter key="security.logout_listener.class">Symfony\Component\HttpKernel\Security\Firewall\LogoutListener</parameter>
         <parameter key="security.logout.path">/logout</parameter>
         <parameter key="security.logout.target_path">/</parameter>
+        <parameter key="security.logout.handler.session.class">Symfony\Component\HttpKernel\Security\Logout\SessionLogoutHandler</parameter>
+        <parameter key="security.logout.handler.cookie_clearing.class">Symfony\Component\HttpKernel\Security\Logout\CookieClearingLogoutHandler</parameter>
 
         <parameter key="security.authentication.switchuser_listener.class">Symfony\Component\HttpKernel\Security\Firewall\SwitchUserListener</parameter>
         <parameter key="security.authentication.switchuser.role">ROLE_ALLOWED_TO_SWITCH</parameter>
@@ -91,6 +93,8 @@
 
         <service id="security.encoder.plain" class="%security.encoder.plain.class%" />
 
+        <service id="security.logout.handler.session" class="%security.logout.handler.session.class%"></service>
+
         <service id="security.authentication.listener.anonymous" class="%security.authentication.listener.anonymous.class%">
             <argument type="service" id="security.context" />
             <argument>%security.anonymous.key%</argument>
@@ -111,12 +115,6 @@
         <service id="security.authentication.digest_entry_point" class="%security.authentication.digest_entry_point.class%">
             <argument>%security.authentication.digest_entry_point.realm%</argument>
             <argument>%security.authentication.digest_entry_point.key%</argument>
-        </service>
-
-        <service id="security.logout_listener" class="%security.logout_listener.class%">
-            <argument type="service" id="security.context" />
-            <argument>%security.logout.path%</argument>
-            <argument>%security.logout.target_path%</argument>
         </service>
 
         <service id="security.channel_listener" class="%security.channel_listener.class%">

@@ -20,4 +20,13 @@ namespace Symfony\Component\HttpKernel\Exception;
  */
 class HttpException extends \Exception
 {
+    /**
+     * Constructor overridden to require the code, which is the status code.
+     *
+     * @see \Exception
+     */
+    public function __construct($message, $code, \Exception $previous = null)
+    {
+        parent::__construct($message, $code, $previous);
+    }
 }

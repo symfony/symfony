@@ -24,7 +24,7 @@ use Symfony\Component\Security\Authentication\Token\AnonymousToken;
  *
  * @author Fabien Potencier <fabien.potencier@symfony-project.com>
  */
-class ContextListener
+class ContextListener implements ListenerInterface
 {
     protected $context;
     protected $logger;
@@ -42,10 +42,18 @@ class ContextListener
      * @param EventDispatcher $dispatcher An EventDispatcher instance
      * @param integer         $priority   The priority
      */
-    public function register(EventDispatcher $dispatcher, $priority = 0)
+    public function register(EventDispatcher $dispatcher)
     {
-        $dispatcher->connect('core.security', array($this, 'read'), $priority);
-        $dispatcher->connect('core.response', array($this, 'write'), $priority);
+        $dispatcher->connect('core.security', array($this, 'read'), 0);
+        $dispatcher->connect('core.response', array($this, 'write'), 0);
+    }
+    
+    /**
+     * {@inheritDoc}
+     */
+    public function unregister(EventDispatcher $dispatcher)
+    {
+        $dispatcher->disconnect('core.response', array($this, 'write'));
     }
 
     /**

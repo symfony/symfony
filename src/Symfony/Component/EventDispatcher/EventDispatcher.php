@@ -41,13 +41,30 @@ class EventDispatcher
     }
 
     /**
-     * Disconnects all listeners for the given event name.
+     * Disconnects one, or all listeners for the given event name.
      *
      * @param string $name An event name
+     * @param mixed|null $listener the listener to remove, or null to remove all
+     * @return void
      */
-    public function disconnect($name)
+    public function disconnect($name, $listener = null)
     {
-        unset($this->listeners[$name]);
+        if (!isset($this->listeners[$name])) {
+            return false;
+        }
+
+        if (null === $listener) {
+            unset($this->listeners[$name]);
+            return;
+        }
+
+        foreach ($this->listeners[$name] as $priority => $callables) {
+            foreach ($callables as $i => $callable) {
+                if ($listener === $callable) {
+                    unset($this->listeners[$name][$priority][$i]);
+                }
+            }
+        }
     }
 
     /**

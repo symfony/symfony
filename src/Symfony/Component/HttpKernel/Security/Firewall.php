@@ -30,6 +30,7 @@ class Firewall
 {
     protected $map;
     protected $dispatcher;
+    protected $currentListeners;
 
     /**
      * Constructor.
@@ -39,6 +40,7 @@ class Firewall
     public function __construct(FirewallMap $map)
     {
         $this->map = $map;
+        $this->currentListeners = array();
     }
 
     /**
@@ -66,7 +68,16 @@ class Firewall
 
         $request = $event->get('request');
 
+        // disconnect all listeners from core.security to avoid the overhead
+        // of most listeners having to do this manually
         $this->dispatcher->disconnect('core.security');
+        
+        // ensure that listeners disconnect from wherever they have connected to
+        foreach ($this->currentListeners as $listener) {
+            $listener->unregister($this->dispatcher);
+        }
+        
+        // register listeners for this firewall
         list($listeners, $exception) = $this->map->getListeners($request);
         if (null !== $exception) {
             $exception->register($this->dispatcher);
@@ -74,7 +85,12 @@ class Firewall
         foreach ($listeners as $listener) {
             $listener->register($this->dispatcher);
         }
+        
+        // save current listener instances
+        $this->currentListeners = $listeners;
+        $this->currentListeners[] = $exception;
 
+        // initiate the listener chain
         $e = $this->dispatcher->notifyUntil(new Event($request, 'core.security', array('request' => $request)));
         if ($e->isProcessed()) {
             $event->setReturnValue($e->getReturnValue());

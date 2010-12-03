@@ -25,7 +25,7 @@ use Symfony\Component\Security\Exception\AuthenticationException;
  *
  * @author Fabien Potencier <fabien.potencier@symfony-project.com>
  */
-class BasicAuthenticationListener
+class BasicAuthenticationListener implements ListenerInterface
 {
     protected $securityContext;
     protected $authenticationManager;
@@ -48,9 +48,16 @@ class BasicAuthenticationListener
      * @param EventDispatcher $dispatcher An EventDispatcher instance
      * @param integer         $priority   The priority
      */
-    public function register(EventDispatcher $dispatcher, $priority = 0)
+    public function register(EventDispatcher $dispatcher)
     {
-        $dispatcher->connect('core.security', array($this, 'handle'), $priority);
+        $dispatcher->connect('core.security', array($this, 'handle'), 0);
+    }
+    
+    /**
+     * {@inheritDoc}
+     */
+    public function unregister(EventDispatcher $dispatcher)
+    {
     }
 
     /**

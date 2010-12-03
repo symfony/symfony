@@ -220,14 +220,14 @@ class Request
     /**
      * Overrides the PHP global variables according to this request instance.
      *
-     * It overrides $_GET, $_POST, $_REQUEST, $_SERVER, $_COOKIES, and $_FILES.
+     * It overrides $_GET, $_POST, $_REQUEST, $_SERVER, $_COOKIE, and $_FILES.
      */
     public function overrideGlobals()
     {
         $_GET = $this->query->all();
         $_POST = $this->request->all();
         $_SERVER = $this->server->all();
-        $_COOKIES = $this->cookies->all();
+        $_COOKIE = $this->cookies->all();
         // FIXME: populate $_FILES
 
         foreach ($this->headers->all() as $key => $value) {

@@ -215,6 +215,7 @@ class DoctrineExtension extends Extension
             'query_cache_driver',
             'result_cache_driver',
             'proxy_namespace',
+            'proxy_dir',
             'auto_generate_proxy_classes'
         );
         foreach ($options as $key) {
@@ -250,7 +251,6 @@ class DoctrineExtension extends Extension
     protected function loadOrmEntityManager(array $entityManager, ContainerBuilder $container)
     {
         $defaultEntityManager = $container->getParameter('doctrine.orm.default_entity_manager');
-        $proxyCacheDir = $container->getParameter('kernel.cache_dir').'/doctrine/orm/Proxies';
 
         $ormConfigDef = new Definition('Doctrine\ORM\Configuration');
         $container->setDefinition(sprintf('doctrine.orm.%s_configuration', $entityManager['name']), $ormConfigDef);
@@ -263,7 +263,7 @@ class DoctrineExtension extends Extension
             'setQueryCacheImpl' => new Reference(sprintf('doctrine.orm.%s_query_cache', $entityManager['name'])),
             'setResultCacheImpl' => new Reference(sprintf('doctrine.orm.%s_result_cache', $entityManager['name'])),
             'setMetadataDriverImpl' => new Reference('doctrine.orm.metadata_driver'),
-            'setProxyDir' => $proxyCacheDir,
+            'setProxyDir' => $container->getParameter('doctrine.orm.proxy_dir'),
             'setProxyNamespace' => $container->getParameter('doctrine.orm.proxy_namespace'),
             'setAutoGenerateProxyClasses' => $container->getParameter('doctrine.orm.auto_generate_proxy_classes')
         );

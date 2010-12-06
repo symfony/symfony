@@ -45,6 +45,23 @@ class RequestTest extends \PHPUnit_Framework_TestCase
     }
 
     /**
+     * @covers Symfony\Component\HttpFoundation\Request::create
+     */
+    public function testCreate()
+    {
+        $request = Request::create('http://test.com/foo?bar=baz');
+        $this->assertEquals('http://test.com:80/foo?bar=baz', $request->getUri());
+        $this->assertEquals('/foo', $request->getPathInfo());
+        $this->assertEquals('bar=baz', $request->getQueryString());
+
+        $request = Request::create('test.com:90/foo');
+        $this->assertEquals('http://test.com:90/foo', $request->getUri());
+        $this->assertEquals('/foo', $request->getPathInfo());
+        $this->assertEquals('test.com', $request->getHost());
+        $this->assertEquals(90, $request->getPort());
+    }
+
+    /**
      * @covers Symfony\Component\HttpFoundation\Request::duplicate
      */
     public function testDuplicate()

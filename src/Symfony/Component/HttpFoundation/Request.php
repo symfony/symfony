@@ -144,7 +144,15 @@ class Request
             'SCRIPT_FILENAME'      => '',
         );
 
-        if (in_array(strtolower($method), array('post', 'put', 'delete'))) {
+        $components = parse_url($uri);
+        if (isset($components['host'])) {
+            $defaults['HTTP_HOST'] = $components['host'];
+        }
+        if (isset($components['port'])) {
+            $defaults['SERVER_PORT'] = $components['port'];
+        }
+
+        if (in_array(strtoupper($method), array('POST', 'PUT', 'DELETE'))) {
             $request = $parameters;
             $query = array();
             $defaults['CONTENT_TYPE'] = 'application/x-www-form-urlencoded';
@@ -159,11 +167,13 @@ class Request
             }
         }
 
-        $queryString = false !== ($pos = strpos($uri, '?')) ? html_entity_decode(substr($uri, $pos + 1)) : '';
+        $queryString = isset($components['query']) ? html_entity_decode($components['query']) : '';
         parse_str($queryString, $qs);
         if (is_array($qs)) {
             $query = array_replace($qs, $query);
         }
+
+        $uri = $components['path'] . ($queryString ? '?'.$queryString : '');
 
         $server = array_replace($defaults, $server, array(
             'REQUEST_METHOD'       => strtoupper($method),

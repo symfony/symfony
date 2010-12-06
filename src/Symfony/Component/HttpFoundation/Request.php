@@ -129,7 +129,7 @@ class Request
      *
      * @return Request A Request instance
      */
-    static public function create($uri, $method = 'get', $parameters = array(), $cookies = array(), $files = array(), $server = array())
+    static public function create($uri, $method = 'GET', $parameters = array(), $cookies = array(), $files = array(), $server = array())
     {
         $defaults = array(
             'SERVER_NAME'          => 'localhost',
@@ -591,7 +591,7 @@ class Request
 
     public function isMethodSafe()
     {
-        return in_array(strtolower($this->getMethod()), array('get', 'head'));
+        return in_array($this->getMethod(), array('GET', 'HEAD'));
     }
 
     public function getETags()

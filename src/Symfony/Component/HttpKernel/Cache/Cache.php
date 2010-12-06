@@ -138,7 +138,11 @@ class Cache implements HttpKernelInterface
             $this->request = $request;
         }
 
-        $this->traces[$request->getMethod().' '.$request->getPathInfo()] = array();
+        $path = $request->getPathInfo();
+        if ($qs = $request->getQueryString()) {
+            $path .= '?'.$qs;
+        }
+        $this->traces[$request->getMethod().' '.$path] = array();
 
         if (!$request->isMethodSafe($request)) {
             $response = $this->invalidate($request);
@@ -569,6 +573,10 @@ class Cache implements HttpKernelInterface
      */
     protected function record(Request $request, $event)
     {
-        $this->traces[$request->getMethod().' '.$request->getPathInfo()][] = $event;
+        $path = $request->getPathInfo();
+        if ($qs = $request->getQueryString()) {
+            $path .= '?'.$qs;
+        }
+        $this->traces[$request->getMethod().' '.$path][] = $event;
     }
 }

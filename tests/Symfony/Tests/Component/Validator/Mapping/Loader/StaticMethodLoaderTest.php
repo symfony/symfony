@@ -4,6 +4,7 @@ namespace Symfony\Tests\Component\Validator\Mapping\Loader;
 
 use Symfony\Component\Validator\Mapping\ClassMetadata;
 use Symfony\Component\Validator\Mapping\Loader\StaticMethodLoader;
+use Symfony\Component\Validator\Constraints\NotNull;
 
 class StaticMethodLoaderTest extends \PHPUnit_Framework_TestCase
 {
@@ -32,6 +33,19 @@ class StaticMethodLoaderTest extends \PHPUnit_Framework_TestCase
 
         $this->assertEquals(StaticLoaderEntity::$invokedWith, $metadata);
     }
+
+    public function testLoadClassMetadataDoesNotRepeatLoadWithParentClasses()
+    {
+        $loader = new StaticMethodLoader('loadMetadata');
+        $metadata = new ClassMetadata(__NAMESPACE__.'\StaticLoaderDocument');
+        $loader->loadClassMetadata($metadata);
+        $this->assertSame(0, count($metadata->getConstraints()));
+
+        $loader = new StaticMethodLoader('loadMetadata');
+        $metadata = new ClassMetadata(__NAMESPACE__.'\BaseStaticLoaderDocument');
+        $loader->loadClassMetadata($metadata);
+        $this->assertSame(1, count($metadata->getConstraints()));
+    }
 }
 
 class StaticLoaderEntity
@@ -41,5 +55,17 @@ class StaticLoaderEntity
     public static function loadMetadata(ClassMetadata $metadata)
     {
         self::$invokedWith = $metadata;
+    }
+}
+
+class StaticLoaderDocument extends BaseStaticLoaderDocument
+{
+}
+
+class BaseStaticLoaderDocument
+{
+    static public function loadMetadata(ClassMetadata $metadata)
+    {
+        $metadata->addConstraint(new NotNull());
     }
 }

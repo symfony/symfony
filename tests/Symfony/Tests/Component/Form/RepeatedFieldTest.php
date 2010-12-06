@@ -11,7 +11,7 @@ class RepeatedFieldTest extends \PHPUnit_Framework_TestCase
 {
     protected $field;
 
-    public function setUp()
+    protected function setUp()
     {
         $this->field = new RepeatedField(new TestField('name'));
     }

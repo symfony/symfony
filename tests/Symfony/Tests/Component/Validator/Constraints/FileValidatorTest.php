@@ -11,14 +11,14 @@ class FileValidatorTest extends \PHPUnit_Framework_TestCase
     protected $path;
     protected $file;
 
-    public function setUp()
+    protected function setUp()
     {
         $this->validator = new FileValidator();
         $this->path = sys_get_temp_dir() . DIRECTORY_SEPARATOR . 'FileValidatorTest';
         $this->file = fopen($this->path, 'w');
     }
 
-    public function tearDown()
+    protected function tearDown()
     {
         fclose($this->file);
     }

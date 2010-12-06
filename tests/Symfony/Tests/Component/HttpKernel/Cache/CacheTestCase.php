@@ -27,7 +27,7 @@ class CacheTestCase extends \PHPUnit_Framework_TestCase
     protected $response;
     protected $responses;
 
-    public function setUp()
+    protected function setUp()
     {
         $this->kernel = null;
 
@@ -42,7 +42,7 @@ class CacheTestCase extends \PHPUnit_Framework_TestCase
         $this->clearDirectory(sys_get_temp_dir().'/http_cache');
     }
 
-    public function tearDown()
+    protected function tearDown()
     {
         $this->kernel = null;
         $this->cache = null;

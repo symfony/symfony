@@ -30,7 +30,7 @@ class GraphWalkerTest extends \PHPUnit_Framework_TestCase
     protected $walker;
     protected $metadata;
 
-    public function setUp()
+    protected function setUp()
     {
         $this->factory = new FakeClassMetadataFactory();
         $this->walker = new GraphWalker('Root', $this->factory, new ConstraintValidatorFactory());

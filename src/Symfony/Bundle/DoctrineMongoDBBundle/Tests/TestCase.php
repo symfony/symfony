@@ -13,7 +13,7 @@ namespace Symfony\Bundle\DoctrineMongoDBBundle\Tests;
 
 class TestCase extends \PHPUnit_Framework_TestCase
 {
-    public function setUp()
+    protected function setUp()
     {
         if (!class_exists('Doctrine\\ODM\\MongoDB\\Version')) {
             $this->markTestSkipped('Doctrine MongoDB ODM is not available.');

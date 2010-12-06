@@ -23,7 +23,7 @@ class CacheStoreTest extends \PHPUnit_Framework_TestCase
     protected $response;
     protected $store;
 
-    public function setUp()
+    protected function setUp()
     {
         $this->request = Request::create('/');
         $this->response = new Response('hello world', 200, array());
@@ -33,7 +33,7 @@ class CacheStoreTest extends \PHPUnit_Framework_TestCase
         $this->store = new Store(sys_get_temp_dir().'/http_cache');
     }
 
-    public function tearDown()
+    protected function tearDown()
     {
         $this->store = null;
 

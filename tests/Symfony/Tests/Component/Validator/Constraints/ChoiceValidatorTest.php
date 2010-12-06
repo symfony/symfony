@@ -20,7 +20,7 @@ class ChoiceValidatorTest extends \PHPUnit_Framework_TestCase
         return array('foo', 'bar');
     }
 
-    public function setUp()
+    protected function setUp()
     {
         $walker = $this->getMock('Symfony\Component\Validator\GraphWalker', array(), array(), '', false);
         $factory = $this->getMock('Symfony\Component\Validator\Mapping\ClassMetadataFactoryInterface');

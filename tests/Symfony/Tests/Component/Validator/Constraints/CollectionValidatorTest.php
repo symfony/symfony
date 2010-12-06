@@ -13,7 +13,7 @@ class CollectionValidatorTest extends \PHPUnit_Framework_TestCase
     protected $walker;
     protected $context;
 
-    public function setUp()
+    protected function setUp()
     {
         $this->walker = $this->getMock('Symfony\Component\Validator\GraphWalker', array(), array(), '', false);
         $metadataFactory = $this->getMock('Symfony\Component\Validator\Mapping\ClassMetadataFactoryInterface');

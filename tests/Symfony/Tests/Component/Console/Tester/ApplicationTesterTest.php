@@ -19,7 +19,7 @@ class ApplicationTesterTest extends \PHPUnit_Framework_TestCase
     protected $application;
     protected $tester;
 
-    public function setUp()
+    protected function setUp()
     {
         $this->application = new Application();
         $this->application->setAutoExit(false);

@@ -16,7 +16,7 @@ use Symfony\Tests\Component\Validator\Fixtures\ConstraintA;
 
 class AnnotationLoaderTest extends \PHPUnit_Framework_TestCase
 {
-    public function setUp()
+    protected function setUp()
     {
         if (!class_exists('Doctrine\Common\Annotations\AnnotationReader')) {
             $this->markTestSkipped('Unmet dependency: doctrine-common is required for this test');

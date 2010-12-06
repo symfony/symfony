@@ -21,7 +21,7 @@ class ValidatorTest extends \PHPUnit_Framework_TestCase
     protected $factory;
     protected $validator;
 
-    public function setUp()
+    protected function setUp()
     {
         $this->factory = new FakeClassMetadataFactory();
         $this->validator = new Validator($this->factory, new ConstraintValidatorFactory());

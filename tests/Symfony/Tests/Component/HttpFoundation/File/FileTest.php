@@ -10,7 +10,7 @@ class FileTest extends \PHPUnit_Framework_TestCase
 {
     protected $file;
 
-    public function setUp()
+    protected function setUp()
     {
         $this->file = new File(__DIR__.'/Fixtures/test.gif');
     }

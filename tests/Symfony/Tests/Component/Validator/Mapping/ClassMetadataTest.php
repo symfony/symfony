@@ -21,7 +21,7 @@ class ClassMetadataTest extends \PHPUnit_Framework_TestCase
 
     protected $metadata;
 
-    public function setUp()
+    protected function setUp()
     {
         $this->metadata = new ClassMetadata(self::CLASSNAME);
     }

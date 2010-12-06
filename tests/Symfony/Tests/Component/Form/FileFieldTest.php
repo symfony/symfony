@@ -19,7 +19,7 @@ class FileFieldTest extends \PHPUnit_Framework_TestCase
         @session_start();
     }
 
-    public function tearDown()
+    protected function tearDown()
     {
         foreach (self::$tmpFiles as $key => $file) {
             @unlink($file);

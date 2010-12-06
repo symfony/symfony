@@ -19,7 +19,7 @@ class CommandTesterTest extends \PHPUnit_Framework_TestCase
     protected $application;
     protected $tester;
 
-    public function setUp()
+    protected function setUp()
     {
         $this->command = new Command('foo');
         $this->command->addArgument('command');

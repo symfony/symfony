@@ -12,7 +12,7 @@ class DateTimeToLocalizedStringTransformerTest extends DateTimeTestCase
     protected $dateTime;
     protected $dateTimeWithoutSeconds;
 
-    public function setUp()
+    protected function setUp()
     {
         parent::setUp();
 

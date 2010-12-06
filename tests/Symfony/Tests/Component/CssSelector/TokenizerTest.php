@@ -17,7 +17,7 @@ class TokenizerTest extends \PHPUnit_Framework_TestCase
 {
     protected $tokenizer;
 
-    public function setUp()
+    protected function setUp()
     {
         $this->tokenizer = new Tokenizer();
     }

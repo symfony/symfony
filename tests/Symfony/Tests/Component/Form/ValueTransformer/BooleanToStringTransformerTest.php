@@ -8,7 +8,7 @@ class BooleanToStringTransformerTest extends \PHPUnit_Framework_TestCase
 {
     protected $transformer;
 
-    public function setUp()
+    protected function setUp()
     {
         $this->transformer = new BooleanToStringTransformer();
     }

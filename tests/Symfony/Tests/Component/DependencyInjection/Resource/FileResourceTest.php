@@ -17,14 +17,14 @@ class FileResourceTest extends \PHPUnit_Framework_TestCase
     protected $resource;
     protected $file;
 
-    public function setUp()
+    protected function setUp()
     {
         $this->file = sys_get_temp_dir().'/tmp.xml';
         touch($this->file);
         $this->resource = new FileResource($this->file);
     }
 
-    public function tearDown()
+    protected function tearDown()
     {
         unlink($this->file);
     }

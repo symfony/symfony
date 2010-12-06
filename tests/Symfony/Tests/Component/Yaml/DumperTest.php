@@ -25,7 +25,7 @@ class DumperTest extends \PHPUnit_Framework_TestCase
         Yaml::setSpecVersion('1.1');
     }
 
-    public function setUp()
+    protected function setUp()
     {
         $this->parser = new Parser();
         $this->dumper = new Dumper();

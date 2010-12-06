@@ -17,7 +17,7 @@ class StreamOutputTest extends \PHPUnit_Framework_TestCase
 {
     protected $stream;
 
-    public function setUp()
+    protected function setUp()
     {
         $this->stream = fopen('php://memory', 'a', false);
     }

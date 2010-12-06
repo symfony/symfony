@@ -13,7 +13,7 @@ class CollectionToChoiceTransformerTest extends \Symfony\Bundle\DoctrineBundle\T
      */
     private $em;
 
-    public function setUp()
+    protected function setUp()
     {
         parent::setUp();
         $this->em = $this->createTestEntityManager();

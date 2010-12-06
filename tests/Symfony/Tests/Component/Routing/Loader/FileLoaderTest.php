@@ -50,13 +50,17 @@ class ProjectLoader extends FileLoader
 {
     public $paths;
 
-    public function load($resource)
+    public function load($resource, $type = null)
     {
     }
 
-    public function supports($resource)
+    public function supports($resource, $type = null)
     {
         return true;
+    }
+
+    public function getType()
+    {
     }
 
     public function getAbsolutePath($file, $currentPath = null)

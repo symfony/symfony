@@ -53,12 +53,16 @@ class LoaderTest extends \PHPUnit_Framework_TestCase
 
 class ProjectLoader1 extends Loader
 {
-    public function load($resource)
+    public function load($resource, $type = null)
     {
     }
 
-    public function supports($resource)
+    public function supports($resource, $type = null)
     {
         return is_string($resource) && 'foo' === pathinfo($resource, PATHINFO_EXTENSION);
+    }
+
+    public function getType()
+    {
     }
 }

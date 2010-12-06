@@ -59,6 +59,8 @@ abstract class AnnotationClassLoader implements LoaderInterface
 
     /**
      * Constructor.
+     *
+     * @param AnnotationReader $reader
      */
     public function __construct(AnnotationReader $reader)
     {
@@ -68,13 +70,14 @@ abstract class AnnotationClassLoader implements LoaderInterface
     /**
      * Loads from annotations from a class.
      *
-     * @param  string $class A class name
+     * @param string $class A class name
+     * @param string $type  The resource type
      *
      * @return RouteCollection A RouteCollection instance
      *
      * @throws \InvalidArgumentException When route can't be parsed
      */
-    public function load($class)
+    public function load($class, $type = null)
     {
         if (!class_exists($class)) {
             throw new \InvalidArgumentException(sprintf('Class "%s" does not exist.', $class));
@@ -131,21 +134,17 @@ abstract class AnnotationClassLoader implements LoaderInterface
         return $collection;
     }
 
-    protected function getDefaultRouteName(\ReflectionClass $class, \ReflectionMethod $method)
-    {
-        return strtolower(str_replace('\\', '_', $class->getName()).'_'.$method->getName());
-    }
-
     /**
      * Returns true if this class supports the given resource.
      *
-     * @param  mixed $resource A resource
+     * @param mixed  $resource A resource
+     * @param string $type     The resource type
      *
-     * @return Boolean true if this class supports the given resource, false otherwise
+     * @return boolean True if this class supports the given resource, false otherwise
      */
-    public function supports($resource)
+    public function supports($resource, $type = null)
     {
-        return is_string($resource) && class_exists($resource);
+        return is_string($resource) && preg_match('/^(?:\\\\?[a-zA-Z_\x7f-\xff][a-zA-Z0-9_\x7f-\xff]*)+$/', $resource) && (!$type || 'annotation' === $type);
     }
 
     /**
@@ -164,6 +163,19 @@ abstract class AnnotationClassLoader implements LoaderInterface
      */
     public function getResolver()
     {
+    }
+
+    /**
+     * Gets the default route name for a class method.
+     *
+     * @param \ReflectionClass $class
+     * @param \ReflectionMethod $method
+     *
+     * @return string
+     */
+    protected function getDefaultRouteName(\ReflectionClass $class, \ReflectionMethod $method)
+    {
+        return strtolower(str_replace('\\', '_', $class->getName()).'_'.$method->getName());
     }
 
     abstract protected function configureRoute(Route $route, \ReflectionClass $class, \ReflectionMethod $method);

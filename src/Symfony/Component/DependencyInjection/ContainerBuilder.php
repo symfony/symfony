@@ -122,7 +122,7 @@ class ContainerBuilder extends Container implements TaggedContainerInterface
             $this->extensionConfigs[$namespace.':'.$tag] = array();
         }
 
-        $this->extensionConfigs[$namespace.':'.$tag][] = $values;
+        $this->extensionConfigs[$namespace.':'.$tag][] = $this->getParameterBag()->resolveValue($values);
 
         return $this;
     }

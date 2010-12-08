@@ -19,18 +19,141 @@ use Symfony\Component\EventDispatcher\EventDispatcher;
 
 class HttpKernelTest extends \PHPUnit_Framework_TestCase
 {
-    public function testHandleSetsTheRequest()
+    /**
+     * @expectedException RuntimeException
+     */
+    public function testHandleWhenControllerThrowsAnExceptionAndRawIsTrue()
     {
-        $request = Request::create('/');
-        $container = $this->getMock('Symfony\Component\DependencyInjection\ContainerInterface');
-        $container->expects($this->exactly(2))
-                  ->method('set')
-                  ->with('request', $request)
-        ;
+        $kernel = new HttpKernel(new EventDispatcher(), $this->getResolver(function () { throw new \RuntimeException(); }));
 
-        $kernel = new HttpKernel($container, new EventDispatcher(), $this->getResolver());
+        $kernel->handle(new Request(), HttpKernelInterface::MASTER_REQUEST, true);
+    }
 
-        $kernel->handle($request);
+    /**
+     * @expectedException RuntimeException
+     */
+    public function testHandleWhenControllerThrowsAnExceptionAndRawIsFalseAndNoListenerIsRegistered()
+    {
+        $kernel = new HttpKernel(new EventDispatcher(), $this->getResolver(function () { throw new \RuntimeException(); }));
+
+        $kernel->handle(new Request(), HttpKernelInterface::MASTER_REQUEST, false);
+    }
+
+    public function testHandleWhenControllerThrowsAnExceptionAndRawIsFalse()
+    {
+        $dispatcher = new EventDispatcher();
+        $dispatcher->connect('core.exception', function ($event)
+        {
+            $event->setReturnValue(new Response($event->get('exception')->getMessage()));
+
+            return true;
+        });
+
+        $kernel = new HttpKernel($dispatcher, $this->getResolver(function () { throw new \RuntimeException('foo'); }));
+
+        $this->assertEquals('foo', $kernel->handle(new Request())->getContent());
+    }
+
+    public function testHandleWhenAListenerReturnsAResponse()
+    {
+        $dispatcher = new EventDispatcher();
+        $dispatcher->connect('core.request', function ($event)
+        {
+            $event->setReturnValue(new Response('hello'));
+
+            return true;
+        });
+
+        $kernel = new HttpKernel($dispatcher, $this->getResolver());
+
+        $this->assertEquals('hello', $kernel->handle(new Request())->getContent());
+    }
+
+    /**
+     * @expectedException Symfony\Component\HttpKernel\Exception\NotFoundHttpException
+     */
+    public function testHandleWhenNoControllerIsFound()
+    {
+        $dispatcher = new EventDispatcher();
+        $kernel = new HttpKernel($dispatcher, $this->getResolver(false));
+
+        $kernel->handle(new Request());
+    }
+
+    /**
+     * @expectedException LogicException
+     */
+    public function testHandleWhenNoControllerIsNotACallable()
+    {
+        $dispatcher = new EventDispatcher();
+        $kernel = new HttpKernel($dispatcher, $this->getResolver('foobar'));
+
+        $kernel->handle(new Request());
+    }
+
+    /**
+     * @expectedException RuntimeException
+     */
+    public function testHandleWhenControllerDoesNotReturnAResponse()
+    {
+        $dispatcher = new EventDispatcher();
+        $kernel = new HttpKernel($dispatcher, $this->getResolver(function () { return 'foo'; }));
+
+        $kernel->handle(new Request());
+    }
+
+    public function testHandleWhenControllerDoesNotReturnAResponseButAViewIsRegistered()
+    {
+        $dispatcher = new EventDispatcher();
+        $dispatcher->connect('core.view', function ($event, $retval)
+        {
+            return new Response($retval);
+        });
+        $kernel = new HttpKernel($dispatcher, $this->getResolver(function () { return 'foo'; }));
+
+        $this->assertEquals('foo', $kernel->handle(new Request())->getContent());
+    }
+
+    /**
+     * @expectedException RuntimeException
+     */
+    public function testHandleWhenAViewDoesNotReturnAResponse()
+    {
+        $dispatcher = new EventDispatcher();
+        $dispatcher->connect('core.view', function ($event, $retval)
+        {
+            return $retval;
+        });
+        $kernel = new HttpKernel($dispatcher, $this->getResolver(function () { return 'foo'; }));
+
+        $kernel->handle(new Request());
+    }
+
+    /**
+     * @expectedException RuntimeException
+     */
+    public function testHandleWhenAResponseListenerDoesNotReturnAResponse()
+    {
+        $dispatcher = new EventDispatcher();
+        $dispatcher->connect('core.response', function ($event, $response)
+        {
+            return 'foo';
+        });
+        $kernel = new HttpKernel($dispatcher, $this->getResolver());
+
+        $kernel->handle(new Request());
+    }
+
+    public function testHandleWithAResponseListener()
+    {
+        $dispatcher = new EventDispatcher();
+        $dispatcher->connect('core.response', function ($event, $response)
+        {
+            return new Response('foo');
+        });
+        $kernel = new HttpKernel($dispatcher, $this->getResolver());
+
+        $this->assertEquals('foo', $kernel->handle(new Request())->getContent());
     }
 
     protected function getResolver($controller = null)

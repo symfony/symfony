@@ -11,13 +11,13 @@
 
 namespace Symfony\Tests\Component\HttpKernel\Cache;
 
-use Symfony\Component\HttpKernel\BaseHttpKernel;
+use Symfony\Component\HttpKernel\HttpKernel;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\EventDispatcher\EventDispatcher;
 use Symfony\Component\HttpKernel\Controller\ControllerResolverInterface;
 
-class TestHttpKernel extends BaseHttpKernel implements ControllerResolverInterface
+class TestHttpKernel extends HttpKernel implements ControllerResolverInterface
 {
     protected $body;
     protected $status;

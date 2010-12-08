@@ -56,7 +56,7 @@ class InterfaceInjectorTest extends \PHPUnit_Framework_TestCase
     }
 
     /**
-     * @covers Symfony\Component\DependencyInjection\InterfaceInjector::supported
+     * @covers Symfony\Component\DependencyInjection\InterfaceInjector::supports
      *
      * @dataProvider getInjectorsAndClasses
      *
@@ -64,7 +64,7 @@ class InterfaceInjectorTest extends \PHPUnit_Framework_TestCase
      * @param string $class
      * @param string $expectedResult
      */
-    public function testSupported(InterfaceInjector $injector, $class, $expectedResult)
+    public function testSupports(InterfaceInjector $injector, $class, $expectedResult)
     {
         $this->assertEquals($expectedResult, $injector->supports($class), '->supports() must return true if injector is to be used on a class, false otherwise');
     }

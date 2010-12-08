@@ -491,7 +491,7 @@ class Request
     public function setMethod($method)
     {
         $this->method = null;
-        $this->server->set('REQUEST_METHOD', 'GET');
+        $this->server->set('REQUEST_METHOD', $method);
     }
 
     /**
@@ -502,25 +502,9 @@ class Request
     public function getMethod()
     {
         if (null === $this->method) {
-            switch ($this->server->get('REQUEST_METHOD', 'GET')) {
-                case 'POST':
-                    $this->method = strtoupper($this->request->get('_method', 'POST'));
-                    break;
-
-                case 'PUT':
-                    $this->method = 'PUT';
-                    break;
-
-                case 'DELETE':
-                    $this->method = 'DELETE';
-                    break;
-
-                case 'HEAD':
-                    $this->method = 'HEAD';
-                    break;
-
-                default:
-                    $this->method = 'GET';
+            $this->method = strtoupper($this->server->get('REQUEST_METHOD', 'GET'));
+            if ('POST' === $this->method) {
+                $this->method = strtoupper($this->request->get('_method', 'POST'));
             }
         }
 

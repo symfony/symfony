@@ -148,11 +148,32 @@ class RequestTest extends \PHPUnit_Framework_TestCase
         $request->initialize(null, null, null, null, null, array('SERVER_NAME' => 'www.exemple.com', 'HTTP_X_FORWARDED_HOST' => 'www.forward.com'));
         $this->assertEquals('www.forward.com', $request->getHost(), '->getHost() value from X_FORWARDED_HOST has priority over SERVER_NAME ');
 
-
         $request->initialize(null, null, null, null, null, array('SERVER_NAME' => 'www.exemple.com', 'HTTP_HOST' => 'www.host.com'));
         $this->assertEquals('www.host.com', $request->getHost(), '->getHost() value from Host header has priority over SERVER_NAME ');
+    }
 
+    /**
+     * @covers Symfony\Component\HttpFoundation\Request::setMethod
+     * @covers Symfony\Component\HttpFoundation\Request::getMethod
+     */
+    public function testGetSetMethod()
+    {
+        $request = new Request();
 
+        $this->assertEquals('GET', $request->getMethod(), '->getMethod() returns GET if no method is defined');
+
+        $request->setMethod('get');
+        $this->assertEquals('GET', $request->getMethod(), '->getMethod() returns an uppercased string');
+
+        $request->setMethod('PURGE');
+        $this->assertEquals('PURGE', $request->getMethod(), '->getMethod() returns the method even if it is not a standard one');
+
+        $request->setMethod('POST');
+        $this->assertEquals('POST', $request->getMethod(), '->getMethod() returns the method POST if no _method is defined');
+
+        $request->setMethod('POST');
+        $request->request->set('_method', 'purge');
+        $this->assertEquals('PURGE', $request->getMethod(), '->getMethod() returns the method from _method if defined and POST');
     }
 
     public function testInitializeConvertsUploadedFiles()

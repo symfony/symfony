@@ -40,7 +40,7 @@ class UserTest extends \PHPUnit_Framework_TestCase
      * @covers Symfony\Component\Security\User\User::__construct
      * @covers Symfony\Component\Security\User\User::getPassword
      */
-    public function testGetPassord()
+    public function testGetPassword()
     {
         $user = new User('fabien', 'superpass');
         $this->assertEquals('superpass', $user->getPassword());

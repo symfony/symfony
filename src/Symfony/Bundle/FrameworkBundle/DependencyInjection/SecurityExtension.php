@@ -484,7 +484,7 @@ class SecurityExtension extends Extension
         if (isset($config[$key.'s'])) {
             $values = $config[$key.'s'];
         } elseif (isset($config[$key])) {
-            if (!is_int(key($config[$key]))) {
+            if (is_string($config[$key]) || !is_int(key($config[$key]))) {
                 // only one
                 $values = array($config[$key]);
             } else {

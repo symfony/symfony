@@ -126,11 +126,21 @@ class SecurityExtension extends Extension
 
     protected function createFirewalls($config, ContainerBuilder $container)
     {
-        $providerIds = $this->createAuthenticationProviders($config, $container);
+        $providerIds = $this->createUserProviders($config, $container);
 
         if (!$firewalls = $this->fixConfig($config, 'firewall')) {
             return;
         }
+
+        // make the ContextListener aware of the configured user providers
+        $definition = $container->getDefinition('security.context_listener');
+        $arguments = $definition->getArguments();
+        $userProviders = array();
+        foreach (array_keys($providerIds) as $userProviderId) {
+            $userProviders[] = new Reference($userProviderId);
+        }
+        $arguments[1] = $userProviders;
+        $definition->setArguments($arguments);
 
         // load service templates
         $c = new ContainerBuilder($container->getParameterBag());
@@ -204,8 +214,8 @@ class SecurityExtension extends Extension
         // Logout listener
         if (array_key_exists('logout', $firewall)) {
             $listenerId = 'security.logout_listener.'.$id;
-            $listener = $container->setDefinition($listenerId, clone $container->getDefinition('security.logout_listener'));          
-            
+            $listener = $container->setDefinition($listenerId, clone $container->getDefinition('security.logout_listener'));
+
             $listeners[] = new Reference($listenerId);
 
             $arguments = $listener->getArguments();
@@ -217,11 +227,11 @@ class SecurityExtension extends Extension
                 $arguments[2] = $firewall['logout']['target'];
             }
             $listener->setArguments($arguments);
-            
+
             if (!isset($firewall['stateless']) || !$firewall['stateless']) {
                 $listener->addMethodCall('addHandler', array(new Reference('security.logout.handler.session')));
             }
-            
+
             if (count($cookies = $this->fixConfig($firewall['logout'], 'cookie')) > 0) {
                 $cookieHandlerId = 'security.logout.handler.cookie_clearing.'.$id;
                 $cookieHandler = $container->setDefinition($cookieHandlerId, clone $container->getDefinition('security.logout.handler.cookie_clearing'));
@@ -308,7 +318,7 @@ class SecurityExtension extends Extension
     }
 
     // Parses user providers and returns an array of their ids
-    protected function createAuthenticationProviders($config, ContainerBuilder $container)
+    protected function createUserProviders($config, ContainerBuilder $container)
     {
         $providers = $this->fixConfig($config, 'provider');
         if (!$providers) {
@@ -318,6 +328,11 @@ class SecurityExtension extends Extension
         $providerIds = array();
         foreach ($providers as $name => $provider) {
             list($id, $encoder) = $this->createUserDaoProvider($name, $provider, $container);
+
+            if (isset($providerIds[$id])) {
+                throw new \RuntimeException(sprintf('Provider names must be unique. Duplicate entry for %s.', $id));
+            }
+
             $providerIds[$id] = $encoder;
         }
 
@@ -340,16 +355,14 @@ class SecurityExtension extends Extension
         }
 
         if (!$name) {
-            $name = md5(serialize($provider));
+            throw new \RuntimeException('You must define a name for each user provider.');
         }
 
-        $name = $this->getUserProviderId($name);
+        $name = $this->getUserProviderId(strtolower($name));
 
         // Existing DAO service provider
         if (isset($provider['id'])) {
-            $container->setAlias($name, $provider['id']);
-
-            return array($name, $encoder);
+            return array($provider['id'], $encoder);
         }
 
         // Chain provider
@@ -364,6 +377,7 @@ class SecurityExtension extends Extension
                 ->register($name, '%security.user.provider.entity.class%')
                 ->setArguments(array(
                     new Reference('security.user.entity_manager'),
+                    $name,
                     $provider['entity']['class'],
                     isset($provider['entity']['property']) ? $provider['entity']['property'] : null,
             ));
@@ -377,6 +391,7 @@ class SecurityExtension extends Extension
                 ->register($name, '%security.user.provider.document.class%')
                 ->setArguments(array(
                     new Reference('security.user.document_manager'),
+                    $name,
                     $provider['document']['class'],
                     isset($provider['document']['property']) ? $provider['document']['property'] : null,
             ));
@@ -385,7 +400,10 @@ class SecurityExtension extends Extension
         }
 
         // In-memory DAO provider
-        $definition = $container->register($name, '%security.user.provider.in_memory.class%');
+        $definition = $container
+                        ->register($name, '%security.user.provider.in_memory.class%')
+                        ->setArguments(array($name))
+        ;
         foreach ($this->fixConfig($provider, 'user') as $username => $user) {
             if (isset($user['name'])) {
                 $username = $user['name'];
@@ -443,8 +461,6 @@ class SecurityExtension extends Extension
         return $listenerId;
     }
 
-    
-    
     protected function createExceptionListener($container, $id, $defaultEntryPoint)
     {
         $exceptionListenerId = 'security.exception_listener.'.$id;

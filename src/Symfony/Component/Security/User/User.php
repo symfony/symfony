@@ -121,4 +121,44 @@ class User implements AdvancedAccountInterface
     {
         $this->password = null;
     }
+
+    /**
+     * {@inheritDoc}
+     */
+    public function equals(AccountInterface $account)
+    {
+        if (!$account instanceof User) {
+            return false;
+        }
+
+        if ($this->password !== $account->getPassword()) {
+            return false;
+        }
+
+        if ($this->getSalt() !== $account->getSalt()) {
+            return false;
+        }
+
+        if ($this->username !== $account->getUsername()) {
+            return false;
+        }
+
+        if ($this->accountNonExpired !== $account->isAccountNonExpired()) {
+            return false;
+        }
+
+        if ($this->accountNonLocked !== $account->isAccountNonLocked()) {
+            return false;
+        }
+
+        if ($this->credentialsNonExpired !== $account->isCredentialsNonExpired()) {
+            return false;
+        }
+
+        if ($this->enabled !== $account->isEnabled()) {
+            return false;
+        }
+
+        return true;
+    }
 }

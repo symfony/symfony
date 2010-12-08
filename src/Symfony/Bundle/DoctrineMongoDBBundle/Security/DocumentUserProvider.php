@@ -9,11 +9,21 @@ class DocumentUserProvider implements UserProviderInterface
 {
     protected $repository;
     protected $property;
+    protected $name;
 
-    public function __construct($em, $class, $property = null)
+    public function __construct($em, $name, $class, $property = null)
     {
         $this->repository = $em->getRepository($class);
         $this->property = $property;
+        $this->name = $name;
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    public function isAggregate()
+    {
+        return false;
     }
 
     /**
@@ -35,6 +45,14 @@ class DocumentUserProvider implements UserProviderInterface
             throw new UsernameNotFoundException(sprintf('User "%s" not found.', $username));
         }
 
-        return $user;
+        return array($user, $this->name);
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    public function supports($providerName)
+    {
+        return $this->name === $providerName;
     }
 }

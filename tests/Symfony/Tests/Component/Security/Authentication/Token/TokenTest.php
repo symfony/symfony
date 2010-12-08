@@ -15,14 +15,24 @@ use Symfony\Component\Security\Role\Role;
 
 class Token extends BaseToken
 {
-    public function setUser($user)
-    {
-        $this->user = $user;
-    }
-
     public function setCredentials($credentials)
     {
         $this->credentials = $credentials;
+    }
+}
+
+class TestUser
+{
+    protected $name;
+
+    public function __construct($name)
+    {
+        $this->name = $name;
+    }
+
+    public function __toString()
+    {
+        return $this->name;
     }
 }
 
@@ -34,7 +44,7 @@ class TokenTest extends \PHPUnit_Framework_TestCase
         $token->setUser('fabien');
         $this->assertEquals('fabien', (string) $token);
 
-        $token->setUser(new \stdClass('fabien'));
+        $token->setUser(new TestUser('fabien'));
         $this->assertEquals('n/a', (string) $token);
 
         $user = $this->getMock('Symfony\Component\Security\User\AccountInterface');
@@ -120,10 +130,30 @@ class TokenTest extends \PHPUnit_Framework_TestCase
         $token = new Token();
         $this->assertFalse($token->isImmutable());
 
-        $token->setImmutable(true);
+        $token->setImmutable();
         $this->assertTrue($token->isImmutable());
+    }
 
-        $token->setImmutable(false);
-        $this->assertFalse($token->isImmutable());
+    /**
+     * @expectedException \LogicException
+     * @dataProvider getImmutabilityTests
+     */
+    public function testImmutabilityIsEnforced($setter, $value)
+    {
+        $token = new Token();
+        $token->setImmutable(true);
+        $token->$setter($value);
+    }
+
+    public function getImmutabilityTests()
+    {
+        return array(
+            array('setUser', 'foo'),
+            array('eraseCredentials', null),
+            array('setAuthenticated', true),
+            array('setAuthenticated', false),
+            array('addRole', new Role('foo')),
+            array('setRoles', array('foo', 'asdf')),
+        );
     }
 }

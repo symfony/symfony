@@ -55,12 +55,19 @@ class DaoAuthenticationProvider extends UserAuthenticationProvider
      */
     protected function checkAuthentication(AccountInterface $account, UsernamePasswordToken $token)
     {
-        if (!$presentedPassword = (string) $token->getCredentials()) {
-            throw new BadCredentialsException('Bad credentials');
-        }
+        $user = $token->getUser();
+        if ($user instanceof AccountInterface) {
+            if ($account->getPassword() !== $user->getPassword()) {
+                throw new BadCredentialsException('The credentials were changed from another session.');
+            }
+        } else {
+            if (!$presentedPassword = (string) $token->getCredentials()) {
+                throw new BadCredentialsException('Bad credentials');
+            }
 
-        if (!$this->passwordEncoder->isPasswordValid($account->getPassword(), $presentedPassword, $account->getSalt())) {
-            throw new BadCredentialsException('Bad credentials');
+            if (!$this->passwordEncoder->isPasswordValid($account->getPassword(), $presentedPassword, $account->getSalt())) {
+                throw new BadCredentialsException('Bad credentials');
+            }
         }
     }
 
@@ -69,19 +76,30 @@ class DaoAuthenticationProvider extends UserAuthenticationProvider
      */
     protected function retrieveUser($username, UsernamePasswordToken $token)
     {
-        $user = null;
+        $user = $token->getUser();
+        if ($user instanceof AccountInterface) {
+            return array($user, $token->getUserProviderName());
+        }
+
+        $result = null;
         try {
-            $user = $this->userProvider->loadUserByUsername($username);
+            $result = $this->userProvider->loadUserByUsername($username);
         } catch (UsernameNotFoundException $notFound) {
             throw $notFound;
         } catch (\Exception $repositoryProblem) {
             throw new AuthenticationServiceException($repositoryProblem->getMessage(), $token, 0, $repositoryProblem);
         }
 
-        if (!$user instanceof AccountInterface) {
+        if (!is_array($result) || 2 !== count($result)) {
+            throw new AuthenticationServiceException('User provider did not return an array, or array had invalid format.');
+        }
+        if (!$result[0] instanceof AccountInterface) {
             throw new AuthenticationServiceException('The user provider must return an AccountInterface object.');
         }
+        if (empty($result[1])) {
+            throw new AuthenticationServiceException('The user provider must return a non-empty user provider name.');
+        }
 
-        return $user;
+        return $result;
     }
 }

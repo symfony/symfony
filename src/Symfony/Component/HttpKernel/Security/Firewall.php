@@ -88,7 +88,9 @@ class Firewall
         
         // save current listener instances
         $this->currentListeners = $listeners;
-        $this->currentListeners[] = $exception;
+        if (null !== $exception) {
+            $this->currentListeners[] = $exception;
+        }
 
         // initiate the listener chain
         $e = $this->dispatcher->notifyUntil(new Event($request, 'core.security', array('request' => $request)));

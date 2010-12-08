@@ -17,7 +17,7 @@ class InMemoryUserProviderTest extends \PHPUnit_Framework_TestCase
 {
     public function testConstructor()
     {
-        $provider = new InMemoryUserProvider(array(
+        $provider = new InMemoryUserProvider('foo', array(
             'fabien' => array(
                 'password' => 'foo',
                 'enabled'  => false,
@@ -25,7 +25,8 @@ class InMemoryUserProviderTest extends \PHPUnit_Framework_TestCase
             ),
         ));
 
-        $user = $provider->loadUserByUsername('fabien');
+        list($user, $providerName) = $provider->loadUserByUsername('fabien');
+        $this->assertSame('foo', $providerName);
         $this->assertEquals('foo', $user->getPassword());
         $this->assertEquals(array('ROLE_USER'), $user->getRoles());
         $this->assertFalse($user->isEnabled());
@@ -33,10 +34,11 @@ class InMemoryUserProviderTest extends \PHPUnit_Framework_TestCase
 
     public function testCreateUser()
     {
-        $provider = new InMemoryUserProvider();
+        $provider = new InMemoryUserProvider('foo');
         $provider->createUser(new User('fabien', 'foo'));
 
-        $this->assertEquals('foo', $provider->loadUserByUsername('fabien')->getPassword());
+        list($user, $providerName) = $provider->loadUserByUsername('fabien');
+        $this->assertEquals('foo', $user->getPassword());
     }
 
     /**
@@ -44,7 +46,7 @@ class InMemoryUserProviderTest extends \PHPUnit_Framework_TestCase
      */
     public function testCreateUserAlreadyExist()
     {
-        $provider = new InMemoryUserProvider();
+        $provider = new InMemoryUserProvider('foo');
         $provider->createUser(new User('fabien', 'foo'));
         $provider->createUser(new User('fabien', 'foo'));
     }
@@ -54,7 +56,7 @@ class InMemoryUserProviderTest extends \PHPUnit_Framework_TestCase
      */
     public function testLoadUserByUsernameDoesNotExist()
     {
-        $provider = new InMemoryUserProvider();
+        $provider = new InMemoryUserProvider('foo');
         $provider->loadUserByUsername('fabien');
     }
 }

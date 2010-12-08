@@ -24,6 +24,7 @@ use Symfony\Component\Security\Exception\UsernameNotFoundException;
 class InMemoryUserProvider implements UserProviderInterface
 {
     protected $users;
+    protected $name;
 
     /**
      * Constructor.
@@ -32,8 +33,9 @@ class InMemoryUserProvider implements UserProviderInterface
      * an array of attributes: 'password', 'enabled', and 'roles'.
      *
      * @param array $users An array of users
+     * @param string $name
      */
-    public function __construct(array $users = array())
+    public function __construct($name, array $users = array())
     {
         foreach ($users as $username => $attributes) {
             $password = isset($attributes['password']) ? $attributes['password'] : null;
@@ -43,6 +45,8 @@ class InMemoryUserProvider implements UserProviderInterface
 
             $this->createUser($user);
         }
+
+        $this->name = $name;
     }
 
     /**
@@ -60,6 +64,14 @@ class InMemoryUserProvider implements UserProviderInterface
     }
 
     /**
+     * {@inheritDoc}
+     */
+    public function isAggregate()
+    {
+        return false;
+    }
+
+    /**
      * {@inheritdoc}
      */
     public function loadUserByUsername($username)
@@ -70,7 +82,15 @@ class InMemoryUserProvider implements UserProviderInterface
 
         $user = $this->users[strtolower($username)];
 
-        return new User($user->getUsername(), $user->getPassword(), $user->getRoles(), $user->isEnabled(), $user->isAccountNonExpired(),
-                $user->isCredentialsNonExpired(), $user->isAccountNonLocked());
+        return array(new User($user->getUsername(), $user->getPassword(), $user->getRoles(), $user->isEnabled(), $user->isAccountNonExpired(),
+                $user->isCredentialsNonExpired(), $user->isAccountNonLocked()), $this->name);
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    public function supports($providerName)
+    {
+        return $this->name === $providerName;
     }
 }

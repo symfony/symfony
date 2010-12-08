@@ -6,7 +6,7 @@
     xsi:schemaLocation="http://www.symfony-project.org/schema/dic/services http://www.symfony-project.org/schema/dic/services/services-1.0.xsd">
 
     <config>
-        <provider>
+        <provider name="foo">
             <user name="foo" password="foo" roles="ROLE_USER" />
         </provider>
 

@@ -29,10 +29,7 @@
         </service>
 
         <!--
-            The request service is overwritten by the HttpKernel::handle() method,
-            this is just present to let the DI Container compile without errors.
-
-            If you want to use another Request class, you should modify the code in
+            If you want to change the Request class, modify the code in
             your front controller (app.php) so that it passes an instance of
             YourRequestClass to the Kernel.
         -->

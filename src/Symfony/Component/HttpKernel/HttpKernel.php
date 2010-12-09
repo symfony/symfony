@@ -27,6 +27,7 @@ class HttpKernel implements HttpKernelInterface
 {
     protected $dispatcher;
     protected $resolver;
+    protected $request;
 
     /**
      * Constructor
@@ -45,9 +46,16 @@ class HttpKernel implements HttpKernelInterface
      */
     public function handle(Request $request, $type = HttpKernelInterface::MASTER_REQUEST, $catch = true)
     {
+        // set the current request, stash the previous one
+        $previousRequest = $this->request;
+        $this->request = $request;
+
         try {
-            return $this->handleRaw($request, $type);
+            $response = $this->handleRaw($request, $type);
         } catch (\Exception $e) {
+            // restore the previous request
+            $this->request = $previousRequest;
+
             if (false === $catch) {
                 throw $e;
             }
@@ -61,6 +69,19 @@ class HttpKernel implements HttpKernelInterface
 
             throw $e;
         }
+
+        // restore the previous request
+        $this->request = $previousRequest;
+
+        return $response;
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function getRequest()
+    {
+        return $this->request;
     }
 
     /**

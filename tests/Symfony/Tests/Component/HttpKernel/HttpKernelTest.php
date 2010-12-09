@@ -156,20 +156,135 @@ class HttpKernelTest extends \PHPUnit_Framework_TestCase
         $this->assertEquals('foo', $kernel->handle(new Request())->getContent());
     }
 
+    /**
+     * @testdox A master request should be set on the kernel for the duration of handle(), then unset
+     */
+    public function testHandleSetsTheCurrentRequest()
+    {
+        $dispatcher = new EventDispatcher();
+        $resolver = $this->getMock('Symfony\\Component\\HttpKernel\\Controller\\ControllerResolverInterface');
+        $kernel = new HttpKernel($dispatcher, $resolver);
+
+        $request = new Request();
+        $expected = new Response();
+
+        $testCase = $this;
+        $controller = function() use($expected, $kernel, $testCase, $request)
+        {
+            $testCase->assertSame($request, $kernel->getRequest(), '->handle() sets the current request when there is no parent request');
+            return $expected;
+        };
+
+        $resolver->expects($this->once())
+            ->method('getController')
+            ->with($request)
+            ->will($this->returnValue($controller));
+        $resolver->expects($this->once())
+            ->method('getArguments')
+            ->with($request, $controller)
+            ->will($this->returnValue(array()));
+
+        $actual = $kernel->handle($request);
+
+        $this->assertSame($expected, $actual, '->handle() returns the response');
+        $this->assertNull($kernel->getRequest(), '->handle() restores the parent (null) request');
+    }
+
+    /**
+     * @testdox The parent request is restored following a sub request
+     * @dataProvider provideRequestTypes
+     */
+    public function testHandleRestoresThePreviousRequest($requestType)
+    {
+        $dispatcher = new EventDispatcher();
+        $resolver = $this->getMock('Symfony\\Component\\HttpKernel\\Controller\\ControllerResolverInterface');
+        $kernel = new HttpKernel($dispatcher, $resolver);
+
+        $parentRequest = new Request(array('name' => 'parent_request'));
+        $request = new Request(array('name' => 'current_request'));
+        $expected = new Response();
+
+        // sets a parent request to emulate a subrequest
+        $reflProp = new \ReflectionProperty($kernel, 'request');
+        $reflProp->setAccessible(true);
+        $reflProp->setValue($kernel, $parentRequest);
+
+        $testCase = $this;
+        $controller = function() use($expected, $kernel, $testCase, $request)
+        {
+            $testCase->assertSame($request, $kernel->getRequest(), '->handle() sets the current request when there is a parent request');
+            return $expected;
+        };
+
+        $resolver->expects($this->once())
+            ->method('getController')
+            ->with($request)
+            ->will($this->returnValue($controller));
+        $resolver->expects($this->once())
+            ->method('getArguments')
+            ->with($request, $controller)
+            ->will($this->returnValue(array()));
+
+        // the behavior should be the same, regardless of request type
+        $actual = $kernel->handle($request, $requestType);
+
+        $this->assertSame($expected, $actual, '->handle() returns the response');
+        $this->assertSame($parentRequest, $kernel->getRequest(), '->handle() restores the parent request');
+    }
+
+    public function provideRequestTypes()
+    {
+        return array(
+            array(HttpKernelInterface::MASTER_REQUEST),
+            array(HttpKernelInterface::SUB_REQUEST),
+        );
+    }
+
+    public function testHandleRestoresThePreviousRequestOnException()
+    {
+        $dispatcher = new EventDispatcher();
+        $resolver = $this->getMock('Symfony\\Component\\HttpKernel\\Controller\\ControllerResolverInterface');
+        $kernel = new HttpKernel($dispatcher, $resolver);
+        $request = new Request();
+
+        $expected = new \Exception();
+        $controller = function() use ($expected)
+        {
+            throw $expected;
+        };
+
+        $resolver->expects($this->once())
+            ->method('getController')
+            ->with($request)
+            ->will($this->returnValue($controller));
+        $resolver->expects($this->once())
+            ->method('getArguments')
+            ->with($request, $controller)
+            ->will($this->returnValue(array()));
+
+        try {
+            $kernel->handle($request);
+            $this->fail('->handle() suppresses the controller exception');
+        } catch (\Exception $actual) {
+            $this->assertSame($expected, $actual, '->handle() throws the controller exception');
+        }
+
+        $this->assertNull($kernel->getRequest(), '->handle() restores the parent (null) request when the controller throws an exception');
+    }
+
     protected function getResolver($controller = null)
     {
         if (null === $controller) {
-            $controller = function () { return new Response('Hello'); };
+            $controller = function() { return new Response('Hello'); };
         }
-        $resolver = $this->getMock('Symfony\Component\HttpKernel\Controller\ControllerResolverInterface');
+
+        $resolver = $this->getMock('Symfony\\Component\\HttpKernel\\Controller\\ControllerResolverInterface');
         $resolver->expects($this->any())
-                 ->method('getController')
-                 ->will($this->returnValue($controller))
-        ;
+            ->method('getController')
+            ->will($this->returnValue($controller));
         $resolver->expects($this->any())
-                 ->method('getArguments')
-                 ->will($this->returnValue(array()))
-        ;
+            ->method('getArguments')
+            ->will($this->returnValue(array()));
 
         return $resolver;
     }

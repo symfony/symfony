@@ -207,7 +207,7 @@ abstract class AbstractMongoDBExtensionTest extends TestCase
         $container = $this->getContainer();
         $loader = new DoctrineMongoDBExtension();
 
-        $loader->mongodbLoad(array(), $container);
+        $loader->mongodbLoad(array('mappings' => array('YamlBundle' => array())), $container);
 
         $definition = $container->getDefinition('doctrine.odm.mongodb.default_configuration');
         $calls = $definition->getMethodCalls();
@@ -220,15 +220,10 @@ abstract class AbstractMongoDBExtensionTest extends TestCase
         $container = $this->getContainer();
         $loader = new DoctrineMongoDBExtension('YamlBundle');
 
-        $loader->mongodbLoad(array(), $container);
+        $loader->mongodbLoad(array('mappings' => array('YamlBundle' => array())), $container);
 
-        $this->assertEquals(array(__DIR__.'/Fixtures/Bundles/YamlBundle/Resources/config/doctrine/metadata/mongodb'), $container->getParameter('doctrine.odm.mongodb.mapping_dirs'));
-        $this->assertEquals('%doctrine.odm.mongodb.mapping_dirs%', $container->getParameter('doctrine.odm.mongodb.xml_mapping_dirs'));
-        $this->assertEquals('%doctrine.odm.mongodb.mapping_dirs%', $container->getParameter('doctrine.odm.mongodb.yml_mapping_dirs'));
-        $this->assertEquals(array(__DIR__.'/Fixtures/Bundles/YamlBundle/Document'), $container->getParameter('doctrine.odm.mongodb.document_dirs'));
-
-        $calls = $container->getDefinition('doctrine.odm.mongodb.metadata')->getMethodCalls();
-        $this->assertEquals('doctrine.odm.mongodb.metadata.yml', (string) $calls[0][1][0]);
+        $calls = $container->getDefinition('doctrine.odm.mongodb.default_metadata_driver')->getMethodCalls();
+        $this->assertEquals('doctrine.odm.mongodb.default_yml_metadata_driver', (string) $calls[0][1][0]);
         $this->assertEquals('DoctrineMongoDBBundle\Tests\DependencyInjection\Fixtures\Bundles\YamlBundle\Document', $calls[0][1][1]);
     }
 
@@ -237,15 +232,10 @@ abstract class AbstractMongoDBExtensionTest extends TestCase
         $container = $this->getContainer('XmlBundle');
         $loader = new DoctrineMongoDBExtension();
 
-        $loader->mongodbLoad(array(), $container);
+        $loader->mongodbLoad(array('mappings' => array('XmlBundle' => array())), $container);
 
-        $this->assertEquals(array(__DIR__.'/Fixtures/Bundles/XmlBundle/Resources/config/doctrine/metadata/mongodb'), $container->getParameter('doctrine.odm.mongodb.mapping_dirs'));
-        $this->assertEquals('%doctrine.odm.mongodb.mapping_dirs%', $container->getParameter('doctrine.odm.mongodb.xml_mapping_dirs'));
-        $this->assertEquals('%doctrine.odm.mongodb.mapping_dirs%', $container->getParameter('doctrine.odm.mongodb.yml_mapping_dirs'));
-        $this->assertEquals(array(__DIR__.'/Fixtures/Bundles/XmlBundle/Document'), $container->getParameter('doctrine.odm.mongodb.document_dirs'));
-
-        $calls = $container->getDefinition('doctrine.odm.mongodb.metadata')->getMethodCalls();
-        $this->assertEquals('doctrine.odm.mongodb.metadata.xml', (string) $calls[0][1][0]);
+        $calls = $container->getDefinition('doctrine.odm.mongodb.default_metadata_driver')->getMethodCalls();
+        $this->assertEquals('doctrine.odm.mongodb.default_xml_metadata_driver', (string) $calls[0][1][0]);
         $this->assertEquals('DoctrineMongoDBBundle\Tests\DependencyInjection\Fixtures\Bundles\XmlBundle\Document', $calls[0][1][1]);
     }
 
@@ -254,15 +244,10 @@ abstract class AbstractMongoDBExtensionTest extends TestCase
         $container = $this->getContainer('AnnotationsBundle');
         $loader = new DoctrineMongoDBExtension();
 
-        $loader->mongodbLoad(array(), $container);
+        $loader->mongodbLoad(array('mappings' => array('AnnotationsBundle' => array())), $container);
 
-        $this->assertEquals(array(), $container->getParameter('doctrine.odm.mongodb.mapping_dirs'));
-        $this->assertEquals('%doctrine.odm.mongodb.mapping_dirs%', $container->getParameter('doctrine.odm.mongodb.xml_mapping_dirs'));
-        $this->assertEquals('%doctrine.odm.mongodb.mapping_dirs%', $container->getParameter('doctrine.odm.mongodb.yml_mapping_dirs'));
-        $this->assertEquals(array(__DIR__.'/Fixtures/Bundles/AnnotationsBundle/Document'), $container->getParameter('doctrine.odm.mongodb.document_dirs'));
-
-        $calls = $container->getDefinition('doctrine.odm.mongodb.metadata')->getMethodCalls();
-        $this->assertEquals('doctrine.odm.mongodb.metadata.annotation', (string) $calls[0][1][0]);
+        $calls = $container->getDefinition('doctrine.odm.mongodb.default_metadata_driver')->getMethodCalls();
+        $this->assertEquals('doctrine.odm.mongodb.default_annotation_metadata_driver', (string) $calls[0][1][0]);
         $this->assertEquals('DoctrineMongoDBBundle\Tests\DependencyInjection\Fixtures\Bundles\AnnotationsBundle\Document', $calls[0][1][1]);
     }
 

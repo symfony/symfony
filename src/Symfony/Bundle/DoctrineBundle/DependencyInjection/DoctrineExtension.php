@@ -27,6 +27,20 @@ use Symfony\Component\DependencyInjection\Resource\FileResource;
 class DoctrineExtension extends Extension
 {
     /**
+     * Used inside metadata driver method to simplify aggregation of data.
+     * 
+     * @var array
+     */
+    private $aliasMap = array();
+
+    /**
+     * Used inside metadata driver method to simplify aggregation of data.
+     *
+     * @var array
+     */
+    private $drivers = array();
+
+    /**
      * Loads the DBAL configuration.
      *
      * Usage example:
@@ -67,6 +81,8 @@ class DoctrineExtension extends Extension
      */
     protected function loadDbalDefaults(array $config, ContainerBuilder $container)
     {
+        // arbitrary service that is always part of the "dbal" services. Its used to check if the
+        // defaults have to applied (first time run) or ignored (second or n-th run due to imports)
         if (!$container->hasDefinition('doctrine.dbal.logger')) {
             $loader = new XmlFileLoader($container, __DIR__.'/../Resources/config');
             $loader->load('dbal.xml');
@@ -195,10 +211,10 @@ class DoctrineExtension extends Extension
         // Create entity proxy directory
         if (!is_dir($proxyCacheDir)) {
             if (false === @mkdir($proxyCacheDir, 0777, true)) {
-                die(sprintf('Unable to create the Doctrine Proxy directory (%s)', dirname($proxyCacheDir)));
+                throw new \RuntimeException(sprintf('Unable to create the Doctrine Proxy directory (%s)', dirname($proxyCacheDir)));
             }
-        } elseif (!is_writable($proxyCacheDir)) {
-            die(sprintf('Unable to write in the Doctrine Proxy directory (%s)', $proxyCacheDir));
+        } elseif (!is_writable($proxyCacheDir) && $container->getParameter('auto_generate_proxy_classes') == true) {
+            throw new \RuntimeException(sprintf('Unable to write in the Doctrine Proxy directory (%s)', $proxyCacheDir));
         }
     }
 
@@ -210,7 +226,9 @@ class DoctrineExtension extends Extension
      */
     protected function loadOrmDefaults(array $config, ContainerBuilder $container)
     {
-        if (!$container->hasDefinition('doctrine.orm.metadata_driver.annotation')) {
+        // arbitrary service that is always part of the "orm" services. Its used to check if the
+        // defaults have to applied (first time run) or ignored (second or n-th run due to imports)
+        if (!$container->hasDefinition('doctrine.orm.metadata_driver.annotation.reader')) {
             $loader = new XmlFileLoader($container, __DIR__.'/../Resources/config');
             $loader->load('orm.xml');
         }
@@ -236,8 +254,6 @@ class DoctrineExtension extends Extension
                 $container->setParameter('doctrine.orm.'.$key, $config[$nKey]);
             }
         }
-        $container->setParameter('doctrine.orm.metadata_driver.mapping_dirs', $this->findBundleSubpaths('Resources/config/doctrine/metadata/orm', $container));
-        $container->setParameter('doctrine.orm.metadata_driver.entity_dirs', $this->findBundleSubpaths('Entity', $container));
     }
 
     /**
@@ -258,46 +274,64 @@ class DoctrineExtension extends Extension
     /**
      * Loads a configured ORM entity manager.
      *
+     * You need to be aware that ormLoad() can be called multiple times, which makes this method tricky to implement.
+     * There are two possible runtime scenarios:
+     *
+     * 1. If the EntityManager was defined before, override only the new calls to Doctrine\ORM\Configuration
+     * 2. If the EntityManager was not defined before, gather all the defaults for not specified options and set all the information.
+     *
      * @param array $entityManager A configured ORM entity manager.
      * @param ContainerBuilder $container A ContainerBuilder instance
      */
     protected function loadOrmEntityManager(array $entityManager, ContainerBuilder $container)
     {
         $defaultEntityManager = $container->getParameter('doctrine.orm.default_entity_manager');
+        $configServiceName = sprintf('doctrine.orm.%s_configuration', $entityManager['name']);
 
-        $ormConfigDef = new Definition('Doctrine\ORM\Configuration');
-        $container->setDefinition(sprintf('doctrine.orm.%s_configuration', $entityManager['name']), $ormConfigDef);
+        if ($container->hasDefinition($configServiceName)) {
+            $ormConfigDef = $container->getDefinition($configServiceName);
+        } else {
+            $ormConfigDef = new Definition('Doctrine\ORM\Configuration');
+            $container->setDefinition($configServiceName, $ormConfigDef);
+        }
 
-        $this->loadOrmEntityManagerBundlesMappingInformation($entityManager, $ormConfigDef, $container);
+        $this->loadOrmEntityManagerMappingInformation($entityManager, $ormConfigDef, $container);
         $this->loadOrmCacheDrivers($entityManager, $container);
 
-        $methods = array(
-            'setMetadataCacheImpl' => new Reference(sprintf('doctrine.orm.%s_metadata_cache', $entityManager['name'])),
-            'setQueryCacheImpl' => new Reference(sprintf('doctrine.orm.%s_query_cache', $entityManager['name'])),
-            'setResultCacheImpl' => new Reference(sprintf('doctrine.orm.%s_result_cache', $entityManager['name'])),
-            'setMetadataDriverImpl' => new Reference('doctrine.orm.metadata_driver'),
-            'setProxyDir' => $container->getParameter('doctrine.orm.proxy_dir'),
-            'setProxyNamespace' => $container->getParameter('doctrine.orm.proxy_namespace'),
-            'setAutoGenerateProxyClasses' => $container->getParameter('doctrine.orm.auto_generate_proxy_classes')
+        $uniqueMethods = array(
+            'setMetadataCacheImpl'          => new Reference(sprintf('doctrine.orm.%s_metadata_cache', $entityManager['name'])),
+            'setQueryCacheImpl'             => new Reference(sprintf('doctrine.orm.%s_query_cache', $entityManager['name'])),
+            'setResultCacheImpl'            => new Reference(sprintf('doctrine.orm.%s_result_cache', $entityManager['name'])),
+            'setMetadataDriverImpl'         => new Reference('doctrine.orm.'.$entityManager['name'].'_metadata_driver'),
+            'setProxyDir'                   => $container->getParameter('doctrine.orm.proxy_dir'),
+            'setProxyNamespace'             => $container->getParameter('doctrine.orm.proxy_namespace'),
+            'setAutoGenerateProxyClasses'   => $container->getParameter('doctrine.orm.auto_generate_proxy_classes')
         );
-        foreach ($methods as $method => $arg) {
+        foreach ($uniqueMethods as $method => $arg) {
+            if ($ormConfigDef->hasMethodCall($method)) {
+                $ormConfigDef->removeMethodCall($method);
+            }
             $ormConfigDef->addMethodCall($method, array($arg));
         }
 
-        $ormEmArgs = array(
-            new Reference(sprintf('doctrine.dbal.%s_connection', isset($entityManager['connection']) ? $entityManager['connection'] : $entityManager['name'])),
-            new Reference(sprintf('doctrine.orm.%s_configuration', $entityManager['name']))
-        );
-        $ormEmDef = new Definition('%doctrine.orm.entity_manager_class%', $ormEmArgs);
-        $ormEmDef->setFactoryMethod('create');
-        $ormEmDef->addTag('doctrine.orm.entity_manager');
-        $container->setDefinition(sprintf('doctrine.orm.%s_entity_manager', $entityManager['name']), $ormEmDef);
+        $entityManagerService = sprintf('doctrine.orm.%s_entity_manager', $entityManager['name']);
 
-        if ($entityManager['name'] == $defaultEntityManager) {
-            $container->setAlias(
-                'doctrine.orm.entity_manager',
-                sprintf('doctrine.orm.%s_entity_manager', $entityManager['name'])
+        if (!$container->hasDefinition($entityManagerService) || isset($entityManager['connection'])) {
+            $ormEmArgs = array(
+                new Reference(sprintf('doctrine.dbal.%s_connection', isset($entityManager['connection']) ? $entityManager['connection'] : $entityManager['name'])),
+                new Reference(sprintf('doctrine.orm.%s_configuration', $entityManager['name']))
             );
+            $ormEmDef = new Definition('%doctrine.orm.entity_manager_class%', $ormEmArgs);
+            $ormEmDef->setFactoryMethod('create');
+            $ormEmDef->addTag('doctrine.orm.entity_manager');
+            $container->setDefinition($entityManagerService, $ormEmDef);
+
+            if ($entityManager['name'] == $defaultEntityManager) {
+                $container->setAlias(
+                    'doctrine.orm.entity_manager',
+                    sprintf('doctrine.orm.%s_entity_manager', $entityManager['name'])
+                );
+            }
         }
     }
 
@@ -337,45 +371,327 @@ class DoctrineExtension extends Extension
     /**
      * Loads an ORM entity managers bundle mapping information.
      *
+     * There are two distinct configuration possibilities for mapping information:
+     *
+     * 1. Specifiy a bundle and optionally details where the entity and mapping information reside.
+     * 2. Specifiy an arbitrary mapping location.
+     *
+     * @example
+     *
+     *  doctrine.orm:
+     *     mappings:
+     *         MyBundle1: ~
+     *         MyBundle2: yml
+     *         MyBundle3: { type: annotation, dir: Entities/ }
+     *         MyBundle4: { type: xml, dir: Resources/config/doctrine/mapping }
+     *         MyBundle5:
+     *             type: yml
+     *             dir: [bundle-mappings1/, bundle-mappings2/]
+     *             alias: BundleAlias
+     *         arbitrary_key:
+     *             type: xml
+     *             dir: %kernel.dir%/../src/vendor/DoctrineExtensions/lib/DoctrineExtensions/Entities
+     *             prefix: DoctrineExtensions\Entities\
+     *             alias: DExt
+     *
+     * In the case of bundles everything is really optional (which leads to autodetection for this bundle) but
+     * in the mappings key everything except alias is a required argument.
+     *
      * @param array $entityManager A configured ORM entity manager.
      * @param ContainerBuilder $container A ContainerBuilder instance
      */
-    protected function loadOrmEntityManagerBundlesMappingInformation(array $entityManager, Definition $ormConfigDef, ContainerBuilder $container)
+    protected function loadOrmEntityManagerMappingInformation(array $entityManager, Definition $ormConfigDef, ContainerBuilder $container)
     {
-        // configure metadata driver for each bundle based on the type of mapping files found
-        $mappingDriverDef = new Definition('%doctrine.orm.metadata.driver_chain_class%');
-        $bundleEntityMappings = array();
-        $bundleDirs = $container->getParameter('kernel.bundle_dirs');
-        $aliasMap = array();
-        foreach ($container->getParameter('kernel.bundles') as $className) {
-            $tmp = dirname(str_replace('\\', '/', $className));
-            $namespace = str_replace('/', '\\', dirname($tmp));
-            $class = basename($tmp);
+        // reset state of drivers and alias map. They are only used by this methods and children.
+        $this->drivers = array();
+        $this->aliasMap = array();
 
-            if (!isset($bundleDirs[$namespace])) {
-                continue;
-            }
+        $this->loadMappingInformation($entityManager, $container);
+        $this->registerMappingDrivers($entityManager, $container);
 
-            $type = $this->detectMetadataDriver($bundleDirs[$namespace].'/'.$class, $container);
-
-            if (is_dir($dir = $bundleDirs[$namespace].'/'.$class.'/Entity')) {
-                if (null === $type) {
-                    $type = 'annotation';
+        if ($ormConfigDef->hasMethodCall('setEntityNamespaces')) {
+            // TODO: Can we make a method out of it on Definition? replaceMethodArguments() or something.
+            $calls = $ormConfigDef->getMethodCalls();
+            foreach ($calls AS $call) {
+                if ($call[0] == 'setEntityNamespaces') {
+                    $this->aliasMap = array_merge($call[1][0], $this->aliasMap);
                 }
-                $aliasMap[$class] = $namespace.'\\'.$class.'\\Entity';
+            }
+            $method = $ormConfigDef->removeMethodCall('setEntityNamespaces');
+        }
+        $ormConfigDef->addMethodCall('setEntityNamespaces', array($this->aliasMap));
+    }
+
+    /*
+     * @param array $entityManager A configured ORM entity manager.
+     * @param ContainerBuilder $container A ContainerBuilder instance
+     */
+    protected function loadMappingInformation(array $objectManager, $container)
+    {
+        if (isset($objectManager['mappings'])) {
+            // fix inconsistency between yaml and xml naming
+            if (isset($objectManager['mappings']['mapping'])) {
+                if (isset($objectManager['mappings']['mapping'][0])) {
+                    $objectManager['mappings'] = $objectManager['mappings']['mapping'];
+                } else {
+                    $objectManager['mappings'] = array($objectManager['mappings']['mapping']);
+                }
             }
 
-            if (null !== $type) {
-                $mappingDriverDef->addMethodCall('addDriver', array(
-                        new Reference(sprintf('doctrine.orm.metadata_driver.%s', $type)),
-                        $namespace.'\\'.$class.'\\Entity'
-                    )
-                );
+            foreach ($objectManager['mappings'] as $mappingName => $mappingConfig) {
+                if (is_string($mappingConfig)) {
+                    $mappingConfig['type'] = $mappingConfig;
+                }
+                if (!isset($mappingConfig['dir'])) {
+                    $mappingConfig['dir'] = false;
+                }
+                if (!isset($mappingConfig['type'])) {
+                    $mappingConfig['type'] = false;
+                }
+                if (!isset($mappingConfig['prefix'])) {
+                    $mappingConfig['prefix'] = false;
+                }
+
+                $mappingConfig['dir'] = $container->getParameterBag()->resolveValue($mappingConfig['dir']);
+                // a bundle configuration is detected by realizing that the specified dir is not absolute and existing
+                if (isset($mappingConfig['is-bundle'])) {
+                    $mappingConfig['is_bundle'] = $mappingConfig['is-bundle'];
+                }
+                if (!isset($mappingConfig['is_bundle'])) {
+                    $mappingConfig['is_bundle'] = !file_exists($mappingConfig['dir']);
+                }
+
+                if (isset($mappingConfig['name'])) {
+                    $mappingName = $mappingConfig['name'];
+                } else if ($mappingConfig === null) {
+                    $mappingConfig = array();
+                }
+
+                if ($mappingConfig['is_bundle']) {
+                    $namespace = $this->getBundleNamespace($mappingName, $container);
+                    $mappingConfig = $this->getMappingDriverBundleConfigDefaults($mappingConfig, $namespace, $mappingName, $container);
+                    if (!$mappingConfig) {
+                        continue;
+                    }
+                }
+
+                $this->assertValidMappingConfiguration($mappingConfig, $objectManager['name']);
+                $this->setMappingDriverConfig($mappingConfig, $mappingName);
+                $this->setMappingDriverAlias($mappingConfig, $mappingName);
             }
         }
-        $ormConfigDef->addMethodCall('setEntityNamespaces', array($aliasMap));
+    }
 
-        $container->setDefinition('doctrine.orm.metadata_driver', $mappingDriverDef);
+    /**
+     * Register the alias for this mapping driver.
+     *
+     * Aliases can be used in the Query languages of all the Doctrine object managers to simplify writing tasks.
+     *
+     * @param array $mappingConfig
+     * @param string $mappingName
+     * @return void
+     */
+    protected function setMappingDriverAlias($mappingConfig, $mappingName)
+    {
+        if (isset($mappingConfig['alias'])) {
+            $this->aliasMap[$mappingConfig['alias']] = $mappingConfig['prefix'];
+        } else {
+            $this->aliasMap[$mappingName] = $mappingConfig['prefix'];
+        }
+    }
+
+    /**
+     * Registter the mapping driver configuration for later use with the object managers metadata driver chain.
+     *
+     * @param array $mappingConfig
+     * @param string $mappingName
+     * @return void
+     */
+    protected function setMappingDriverConfig(array $mappingConfig, $mappingName)
+    {
+        if (is_dir($mappingConfig['dir'])) {
+            if (!isset($this->drivers[$mappingConfig['type']])) {
+                $this->drivers[$mappingConfig['type']] = array();
+            }
+            $this->drivers[$mappingConfig['type']][$mappingConfig['prefix']] = realpath($mappingConfig['dir']);
+        } else {
+            throw new \InvalidArgumentException("Invalid mapping path given. ".
+                "Cannot load mapping/bundle named '" . $mappingName . "'.");
+        }
+    }
+
+     /**
+     * Finds the bundle directory for a namespace.
+     *
+     * If the namespace does not yield a direct match, this method will attempt
+     * to match parent namespaces exhaustively.
+     *
+     * @param string           $namespace A bundle namespace omitting the bundle name part
+     * @param ContainerBuilder $container A ContainerBuilder instance
+     *
+     * @return string|false The bundle directory if found, false otherwise
+     */
+    protected function findBundleDirForNamespace($namespace, ContainerBuilder $container)
+    {
+        $bundleDirs = $container->getParameter('kernel.bundle_dirs');
+
+        $segment = $namespace;
+        do {
+            if (isset($bundleDirs[$segment])) {
+                return $bundleDirs[$segment] . str_replace('\\', '/', substr($namespace, strlen($segment)));
+            }
+        } while ($segment = substr($segment, 0, ($pos = strrpos($segment, '\\'))));
+
+        return false;
+    }
+
+    /**
+     * Get the namespace a bundle resides into.
+     *
+     * @param string $bundleName
+     * @param ContainerBuilder $container
+     * @return string
+     */
+    private function getBundleNamespace($bundleName, $container)
+    {
+        foreach ($container->getParameter('kernel.bundles') AS $bundleClassName) {
+            $tmp = dirname(str_replace('\\', '/', $bundleClassName));
+            $namespace = str_replace('/', '\\', dirname($tmp));
+            $actualBundleName = basename($tmp);
+
+            if ($actualBundleName == $bundleName) {
+                return $namespace;
+            }
+        }
+        return null;
+    }
+
+    /**
+     * If this is a bundle controlled mapping all the missing information can be autodetected by this method.
+     *
+     * Returns false when autodetection failed, an array of the completed information otherwise.
+     *
+     * @param array $bundleConfig
+     * @param string $namespace
+     * @param string $bundleName
+     * @param Container $container
+     * @return array|false
+     */
+    protected function getMappingDriverBundleConfigDefaults(array $bundleConfig, $namespace, $bundleName, $container)
+    {
+        $bundleDir = $this->findBundleDirForNamespace($namespace, $container);
+
+        if (!$bundleDir) {
+            // skip this bundle if we cannot find its location, it must be misspelled or something.
+            return false;
+        }
+
+        if (!$bundleConfig['type']) {
+            $bundleConfig['type'] = $this->detectMetadataDriver($bundleDir.'/'.$bundleName, $container);
+        }
+        if (!$bundleConfig['type']) {
+            // skip this bundle, no mapping information was found.
+            return false;
+        }
+
+        if (!$bundleConfig['dir']) {
+            if (in_array($bundleConfig['type'], array('annotation', 'static-php'))) {
+                $bundleConfig['dir'] = $bundleDir.'/'.$bundleName.'/' . $this->getMappingObjectDefaultName();
+            } else {
+                $bundleConfig['dir'] = $bundleDir.'/'.$bundleName.'/' . $this->getMappingResourceConfigDirectory();
+            }
+        } else {
+            $bundleConfig['dir'] = $bundleDir.'/'.$bundleName.'/' . $bundleConfig['dir'];
+        }
+        
+        if (!$bundleConfig['prefix']) {
+            $bundleConfig['prefix'] = $namespace.'\\'. $bundleName . '\\' . $this->getMappingObjectDefaultName();
+        }
+        return $bundleConfig;
+    }
+
+    /**
+     * Register all the collected mapping information with the object manager by registering the appropiate mapping drivers.
+     *
+     * @param array $objectManager
+     * @param Container $container
+     */
+    protected function registerMappingDrivers($objectManager, $container)
+    {
+        // configure metadata driver for each bundle based on the type of mapping files found
+        if ($container->hasDefinition($this->getObjectManagerElementName($objectManager['name'] . '_metadata_driver'))) {
+            $chainDriverDef = $container->getDefinition($this->getObjectManagerElementName($objectManager['name'] . '_metadata_driver'));
+        } else {
+            $chainDriverDef = new Definition('%'.$this->getObjectManagerElementName('metadata.driver_chain_class%'));
+        }
+
+        foreach ($this->drivers as $driverType => $driverPaths) {
+            $mappingService = $this->getObjectManagerElementName($objectManager['name'] . '_'.$driverType.'_metadata_driver');
+            if ($container->hasDefinition($mappingService)) {
+                $mappingDriverDef = $container->getDefinition($mappingService);
+                $args = $mappingDriverDef->getArguments();
+                if ($driverType == 'annotation') {
+                    $args[1] = array_merge($driverPaths, $args[1]);
+                } else {
+                    $args[0] = array_merge($driverPaths, $args[0]);
+                }
+                $mappingDriverDef->setArguments($args);
+            } else if ($driverType == 'annotation') {
+                $mappingDriverDef = new Definition('%'.$this->getObjectManagerElementName('metadata.' . $driverType . '_class%'), array(
+                    new Reference($this->getObjectManagerElementName('metadata_driver.annotation.reader')),
+                    array_values($driverPaths)
+                ));
+            } else {
+                $mappingDriverDef = new Definition('%'.$this->getObjectManagerElementName('metadata.' . $driverType . '_class%'), array(
+                    array_values($driverPaths)
+                ));
+            }
+            
+            $container->setDefinition($mappingService, $mappingDriverDef);
+
+            foreach ($driverPaths as $prefix => $driverPath) {
+                $chainDriverDef->addMethodCall('addDriver', array(new Reference($mappingService), $prefix));
+            }
+        }
+
+        $container->setDefinition($this->getObjectManagerElementName($objectManager['name'] . '_metadata_driver'), $chainDriverDef);
+    }
+
+    /**
+     * Assertion if the specified mapping information is valid.
+     * 
+     * @param array $mappingConfig
+     * @param string $objectManagerName
+     */
+    protected function assertValidMappingConfiguration(array $mappingConfig, $objectManagerName)
+    {
+        if (!$mappingConfig['type'] || !$mappingConfig['dir'] || !$mappingConfig['prefix']) {
+            throw new \InvalidArgumentException("Mapping definitions for manager '".$objectManagerName."' ".
+                "require at least the 'type', 'dir' and 'prefix' options.");
+        }
+
+        if (!in_array($mappingConfig['type'], array('xml', 'yml', 'annotation', 'php', 'staticphp'))) {
+            throw new \InvalidArgumentException("Can only configure 'xml', 'yml', 'annotation', 'php' or ".
+                "'static-php' through the DoctrineBundle. Use your own bundle to configure other metadata drivers. " .
+                "You can register them by adding a a new driver to the ".
+                "'" . $this->getObjectManagerElementName($objectManagerName . ".metadata_driver")."' service definition."
+            );
+        }
+    }
+
+    protected function getObjectManagerElementName($name)
+    {
+        return 'doctrine.orm.' . $name;
+    }
+
+    protected function getMappingObjectDefaultName()
+    {
+        return 'Entity';
+    }
+
+    protected function getMappingResourceConfigDirectory()
+    {
+        return 'Resources/config/doctrine/metadata/orm';
     }
 
     /**
@@ -399,10 +715,13 @@ class DoctrineExtension extends Extension
      */
     protected function loadOrmEntityManagerMetadataCacheDriver(array $entityManager, ContainerBuilder $container)
     {
-        $cacheDriver = $container->getParameter('doctrine.orm.metadata_cache_driver');
-        $cacheDriver = isset($entityManager['metadata-cache-driver']) ? $entityManager['metadata-cache-driver'] : (isset($entityManager['metadata_cache_driver']) ? $entityManager['metadata_cache_driver'] : $cacheDriver);
-        $cacheDef = $this->getEntityManagerCacheDefinition($entityManager, $cacheDriver, $container);
-        $container->setDefinition(sprintf('doctrine.orm.%s_metadata_cache', $entityManager['name']), $cacheDef);
+        $metadataCacheDriverService = sprintf('doctrine.orm.%s_metadata_cache', $entityManager['name']);
+        if (!$container->hasDefinition($metadataCacheDriverService) || isset($entityManager['metadata-cache-driver']) || (isset($entityManager['metadata_cache_driver']))) {
+            $cacheDriver = $container->getParameter('doctrine.orm.metadata_cache_driver');
+            $cacheDriver = isset($entityManager['metadata-cache-driver']) ? $entityManager['metadata-cache-driver'] : (isset($entityManager['metadata_cache_driver']) ? $entityManager['metadata_cache_driver'] : $cacheDriver);
+            $cacheDef = $this->getEntityManagerCacheDefinition($entityManager, $cacheDriver, $container);
+            $container->setDefinition($metadataCacheDriverService, $cacheDef);
+        }
     }
 
     /**
@@ -413,10 +732,13 @@ class DoctrineExtension extends Extension
      */
     protected function loadOrmEntityManagerQueryCacheDriver(array $entityManager, ContainerBuilder $container)
     {
-        $cacheDriver = $container->getParameter('doctrine.orm.query_cache_driver');
-        $cacheDriver = isset($entityManager['query-cache-driver']) ? $entityManager['query-cache-driver'] : (isset($entityManager['query_cache_driver']) ? $entityManager['query_cache_driver'] : $cacheDriver);
-        $cacheDef = $this->getEntityManagerCacheDefinition($entityManager, $cacheDriver, $container);
-        $container->setDefinition(sprintf('doctrine.orm.%s_query_cache', $entityManager['name']), $cacheDef);
+        $queryCacheDriverService = sprintf('doctrine.orm.%s_query_cache', $entityManager['name']);
+        if (!$container->hasDefinition($queryCacheDriverService) || isset($entityManager['query-cache-driver']) || isset($entityManager['query_cache_driver'])) {
+            $cacheDriver = $container->getParameter('doctrine.orm.query_cache_driver');
+            $cacheDriver = isset($entityManager['query-cache-driver']) ? $entityManager['query-cache-driver'] : (isset($entityManager['query_cache_driver']) ? $entityManager['query_cache_driver'] : $cacheDriver);
+            $cacheDef = $this->getEntityManagerCacheDefinition($entityManager, $cacheDriver, $container);
+            $container->setDefinition($queryCacheDriverService, $cacheDef);
+        }
     }
 
     /**
@@ -427,10 +749,13 @@ class DoctrineExtension extends Extension
      */
     protected function loadOrmEntityManagerResultCacheDriver(array $entityManager, ContainerBuilder $container)
     {
-        $cacheDriver = $container->getParameter('doctrine.orm.result_cache_driver');
-        $cacheDriver = isset($entityManager['result-cache-driver']) ? $entityManager['result-cache-driver'] : (isset($entityManager['result_cache_driver']) ? $entityManager['result_cache_driver'] : $cacheDriver);
-        $cacheDef = $this->getEntityManagerCacheDefinition($entityManager, $cacheDriver, $container);
-        $container->setDefinition(sprintf('doctrine.orm.%s_result_cache', $entityManager['name']), $cacheDef);
+        $resultCacheDriverService = sprintf('doctrine.orm.%s_result_cache', $entityManager['name']);
+        if (!$container->hasDefinition($resultCacheDriverService) || isset($entityManager['result-cache-driver']) || isset($entityManager['result_cache_driver'])) {
+            $cacheDriver = $container->getParameter('doctrine.orm.result_cache_driver');
+            $cacheDriver = isset($entityManager['result-cache-driver']) ? $entityManager['result-cache-driver'] : (isset($entityManager['result_cache_driver']) ? $entityManager['result_cache_driver'] : $cacheDriver);
+            $cacheDef = $this->getEntityManagerCacheDefinition($entityManager, $cacheDriver, $container);
+            $container->setDefinition($resultCacheDriverService, $cacheDef);
+        }
     }
 
     /**
@@ -461,33 +786,6 @@ class DoctrineExtension extends Extension
     }
 
     /**
-     * Finds existing bundle subpaths.
-     *
-     * @param string $path A subpath to check for
-     * @param ContainerBuilder $container A ContainerBuilder configuration
-     *
-     * @return array An array of absolute directory paths
-     */
-    protected function findBundleSubpaths($path, ContainerBuilder $container)
-    {
-        $dirs = array();
-        foreach ($container->getParameter('kernel.bundles') as $bundle) {
-            $reflection = new \ReflectionClass($bundle);
-            if (is_dir($dir = dirname($reflection->getFilename()).'/'.$path)) {
-                $dirs[] = $dir;
-                $container->addResource(new FileResource($dir));
-            } else {
-                // add the closest existing parent directory as a file resource
-                do {
-                    $dir = dirname($dir);
-                } while (!is_dir($dir));
-                $container->addResource(new FileResource($dir));
-            }
-        }
-        return $dirs;
-    }
-
-    /**
      * Detects what metadata driver to use for the supplied directory.
      *
      * @param string $dir A directory path
@@ -508,6 +806,8 @@ class DoctrineExtension extends Extension
             return 'xml';
         } elseif (count(glob($dir.'/Resources/config/doctrine/metadata/orm/*.yml'))) {
             return 'yml';
+        } elseif (count(glob($dir.'/Resources/config/doctrine/metadata/orm/*.php'))) {
+            return 'php';
         }
 
         // add the directory itself as a resource
@@ -516,6 +816,8 @@ class DoctrineExtension extends Extension
         if (is_dir($dir.'/Entity')) {
             return 'annotation';
         }
+
+        return null;
     }
 
     /**

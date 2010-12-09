@@ -53,7 +53,6 @@
 
   <services>
     <!-- defaults -->
-    <service id="doctrine.odm.mongodb.metadata" alias="doctrine.odm.mongodb.metadata.annotation" />
     <service id="doctrine.odm.mongodb.cache" alias="doctrine.odm.mongodb.cache.array" />
 
     <!-- metadata -->

@@ -33,39 +33,20 @@
         <parameter key="doctrine.orm.metadata.annotation_default_namespace">Doctrine\ORM\Mapping\</parameter>
         <parameter key="doctrine.orm.metadata.xml_class">Doctrine\ORM\Mapping\Driver\XmlDriver</parameter>
         <parameter key="doctrine.orm.metadata.yml_class">Doctrine\ORM\Mapping\Driver\YamlDriver</parameter>
-
-        <!-- directories -->
-        <parameter key="doctrine.orm.metadata_driver.mapping_dirs" type="collection"></parameter>
-        <parameter key="doctrine.orm.xml_mapping_dirs">%doctrine.orm.metadata_driver.mapping_dirs%</parameter>
-        <parameter key="doctrine.orm.yml_mapping_dirs">%doctrine.orm.metadata_driver.mapping_dirs%</parameter>
-        <parameter key="doctrine.orm.metadata_driver.entity_dirs" type="collection"></parameter>
+        <parameter key="doctrine.orm.metadata.php_class">Doctrine\ORM\Mapping\Driver\PHPDriver</parameter>
+        <parameter key="doctrine.orm.metadata.staticphp_class">Doctrine\ORM\Mapping\Driver\StaticPHPDriver</parameter>
 
         <!-- security/user -->
         <parameter key="security.user.provider.entity.class">Symfony\Bundle\DoctrineBundle\Security\EntityUserProvider</parameter>
     </parameters>
 
     <services>
-        <!--- Annotation Metadata Driver Service -->
-        <service id="doctrine.orm.metadata_driver.annotation" class="%doctrine.orm.metadata.annotation_class%">
-            <argument type="service" id="doctrine.orm.metadata_driver.annotation.reader" />
-            <argument>%doctrine.orm.metadata_driver.entity_dirs%</argument>
-        </service>
-
+        <!--- Annotation Metadata Reader Service -->
         <service id="doctrine.orm.metadata_driver.annotation.reader" class="%doctrine.orm.metadata.annotation_reader_class%">
             <call method="setAnnotationNamespaceAlias">
               <argument>Doctrine\ORM\Mapping\</argument>
               <argument>orm</argument>
             </call>
-        </service>
-
-        <!--- XML Metadata Driver Service -->
-        <service id="doctrine.orm.metadata_driver.xml" class="%doctrine.orm.metadata.xml_class%">
-            <argument>%doctrine.orm.metadata_driver.mapping_dirs%</argument>
-        </service>
-
-        <!--- YAML Metadata Driver Service -->
-        <service id="doctrine.orm.metadata_driver.yml" class="%doctrine.orm.metadata.yml_class%">
-            <argument>%doctrine.orm.metadata_driver.mapping_dirs%</argument>
         </service>
 
         <service id="security.user.entity_manager" alias="doctrine.orm.default_entity_manager" />

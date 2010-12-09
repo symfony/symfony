@@ -45,6 +45,7 @@ abstract class Kernel implements HttpKernelInterface, \Serializable
     protected $booted;
     protected $name;
     protected $startTime;
+    protected $request;
 
     const VERSION = '2.0.0-DEV';
 
@@ -174,11 +175,29 @@ abstract class Kernel implements HttpKernelInterface, \Serializable
      */
     public function handle(Request $request, $type = HttpKernelInterface::MASTER_REQUEST, $catch = true)
     {
+        $masterRequest = HttpKernelInterface::MASTER_REQUEST === $type ? $request : $this->request;
+
+        $this->request = $request;
+
         if (false === $this->booted) {
             $this->boot();
         }
 
-        return $this->container->get('http_kernel')->handle($request, $type, $catch);
+        $response = $this->container->get('http_kernel')->handle($this->request, $type, $catch);
+
+        $this->request = $masterRequest;
+
+        return $response;
+    }
+
+    /**
+     * Gets the current request.
+     *
+     * @return Request
+     */
+    public function getRequest()
+    {
+        return $this->request;
     }
 
     /**

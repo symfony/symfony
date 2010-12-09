@@ -37,7 +37,7 @@
             your front controller (app.php) so that it passes an instance of
             YourRequestClass to the Kernel.
         -->
-        <service id="request" class="WillNeverBeCalled" />
+        <service id="request" factory-service="kernel" factory-method="getRequest" shared="false" />
 
         <service id="response" class="%response.class%" shared="false" />
     </services>

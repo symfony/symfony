@@ -1,10 +1,10 @@
 <?php if ($field->isField()): ?>
-	<input type="text"
-		id="<?php echo $field->getId() ?>"
-		name="<?php echo $field->getName() ?>"
-		value="<?php echo $field->getDisplayedData() ?>"
-		<?php if ($field->isDisabled()): ?>disabled="disabled"<?php endif ?>
-	/>
+    <input type="text"
+        id="<?php echo $field->getId() ?>"
+        name="<?php echo $field->getName() ?>"
+        value="<?php echo $field->getDisplayedData() ?>"
+        <?php if ($field->isDisabled()): ?>disabled="disabled"<?php endif ?>
+    />
 <?php else: ?>
     <?php echo str_replace(array('{{ year }}', '{{ month }}', '{{ day }}'), array(
         $view['form']->render($field['year']),

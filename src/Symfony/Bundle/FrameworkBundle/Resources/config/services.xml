@@ -24,7 +24,6 @@
         </service>
 
         <service id="http_kernel" class="%http_kernel.class%">
-            <argument type="service" id="service_container" />
             <argument type="service" id="event_dispatcher" />
             <argument type="service" id="controller_resolver" />
         </service>

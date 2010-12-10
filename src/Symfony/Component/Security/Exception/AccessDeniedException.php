@@ -18,7 +18,7 @@ namespace Symfony\Component\Security\Exception;
  */
 class AccessDeniedException extends \RuntimeException
 {
-    public function __construct($message = '', $code = 403, \Exception $previous = null)
+    public function __construct($message = 'Access Denied', \Exception $previous = null)
     {
         parent::__construct($message, 403, $previous);
     }

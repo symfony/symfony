@@ -3,8 +3,6 @@
 namespace Symfony\Component\Security\Authorization;
 
 use Symfony\Component\Security\Authentication\Token\TokenInterface;
-use Symfony\Component\Security\Exception\AccessDeniedException;
-use Symfony\Component\Security\Exception\InsufficientAuthenticationException;
 
 /*
  * This file is part of the Symfony package.

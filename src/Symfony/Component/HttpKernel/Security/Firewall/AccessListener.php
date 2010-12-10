@@ -86,7 +86,7 @@ class AccessListener implements ListenerInterface
         }
 
         if (!$this->accessDecisionManager->decide($token, $attributes, $request)) {
-            throw new AccessDeniedException('Access is denied.');
+            throw new AccessDeniedException();
         }
     }
 }

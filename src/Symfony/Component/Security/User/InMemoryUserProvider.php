@@ -3,8 +3,6 @@
 namespace Symfony\Component\Security\User;
 
 use Symfony\Component\Security\Exception\UsernameNotFoundException;
-use Symfony\Component\Security\Exception\AccessDeniedException;
-use Symfony\Component\Security\Authentication\Token\UsernamePasswordToken;
 
 /*
  * This file is part of the Symfony package.

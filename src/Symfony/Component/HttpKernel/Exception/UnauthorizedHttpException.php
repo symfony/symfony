@@ -18,12 +18,8 @@ namespace Symfony\Component\HttpKernel\Exception;
  */
 class UnauthorizedHttpException extends HttpException
 {
-    public function __construct($message = '', \Exception $previous = null)
+    public function __construct($message = 'Unauthorized', \Exception $previous = null)
     {
-        if (!$message) {
-            $message = 'Unauthorized';
-        }
-
         parent::__construct($message, 401, $previous);
     }
 }

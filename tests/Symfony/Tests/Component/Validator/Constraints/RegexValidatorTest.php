@@ -19,6 +19,11 @@ class RegexValidatorTest extends \PHPUnit_Framework_TestCase
         $this->assertTrue($this->validator->isValid(null, new Regex(array('pattern' => '/^[0-9]+$/'))));
     }
 
+    public function testEmptyStringIsValid()
+    {
+        $this->assertTrue($this->validator->isValid('', new Regex(array('pattern' => '/^[0-9]+$/'))));
+    }
+
     public function testExpectsStringCompatibleType()
     {
         $this->setExpectedException('Symfony\Component\Validator\Exception\UnexpectedTypeException');

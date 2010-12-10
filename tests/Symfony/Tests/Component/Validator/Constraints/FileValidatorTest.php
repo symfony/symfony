@@ -28,6 +28,11 @@ class FileValidatorTest extends \PHPUnit_Framework_TestCase
         $this->assertTrue($this->validator->isValid(null, new File()));
     }
 
+    public function testEmptyStringIsValid()
+    {
+        $this->assertTrue($this->validator->isValid('', new File()));
+    }
+
     public function testExpectsStringCompatibleTypeOrFile()
     {
         $this->setExpectedException('Symfony\Component\Validator\Exception\UnexpectedTypeException');

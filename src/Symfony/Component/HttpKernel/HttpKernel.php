@@ -60,14 +60,11 @@ class HttpKernel implements HttpKernelInterface
             // exception
             $event = new Event($this, 'core.exception', array('request_type' => $type, 'request' => $request, 'exception' => $e));
             $this->dispatcher->notifyUntil($event);
-            if ($event->isProcessed()) {
-                return $this->filterResponse($event->getReturnValue(), $request, 'A "core.exception" listener returned a non response object.', $type);
+            if (!$event->isProcessed()) {
+                throw $e;
             }
 
-            // restore the previous request
-            $this->request = $previousRequest;
-
-            throw $e;
+            $response = $this->filterResponse($event->getReturnValue(), $request, 'A "core.exception" listener returned a non response object.', $type);
         }
 
         // restore the previous request

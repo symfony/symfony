@@ -5,7 +5,7 @@
         </div>
         <div style="float: left; width: 600px">
             <h1>{{ exception.message|replace(["\n": '<br />'])|format_file_from_text }}</h1>
-            <h2><strong>{{ exception.statuscode }}</strong> {{ exception.statustext }} - {{ exception.class|abbr_class }}</h2>
+            <h2><strong>{{ status_code }}</strong> {{ status_text }} - {{ exception.class|abbr_class }}</h2>
 
             {% set previous_count = exception.previouses|length %}
             {% if previous_count %}

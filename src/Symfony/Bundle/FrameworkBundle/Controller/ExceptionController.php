@@ -5,6 +5,7 @@ namespace Symfony\Bundle\FrameworkBundle\Controller;
 use Symfony\Component\DependencyInjection\ContainerAware;
 use Symfony\Component\HttpKernel\Exception\FlattenException;
 use Symfony\Component\HttpKernel\Log\DebugLoggerInterface;
+use Symfony\Component\HttpFoundation\Response;
 
 /*
  * This file is part of the Symfony framework.
@@ -40,9 +41,7 @@ class ExceptionController extends ContainerAware
             $currentContent .= ob_get_clean();
         }
 
-        if ('Symfony\Component\Security\Exception\AccessDeniedException' === $exception->getClass()) {
-            $exception->setStatusCode($exception->getCode());
-        }
+        $code = $this->getStatusCode($exception);
 
         $template = $this->container->get('kernel')->isDebug() ? 'exception' : 'error';
         if ($this->container->get('kernel')->isDebug() && 'html' == $format) {
@@ -58,14 +57,28 @@ class ExceptionController extends ContainerAware
         $response = $templating->renderResponse(
             $template,
             array(
+                'status_code'    => $code,
+                'status_text'    => Response::$statusTexts[$code],
                 'exception'      => $exception,
                 'logger'         => $logger,
                 'currentContent' => $currentContent,
             )
         );
 
-        $response->setStatusCode($exception->getStatusCode());
+        $response->setStatusCode($code);
 
         return $response;
+    }
+
+    protected function getStatusCode(FlattenException $exception)
+    {
+        switch ($exception->getClass()) {
+            case 'Symfony\Component\Security\Exception\AccessDeniedException':
+                return 403;
+            case 'Symfony\Component\HttpKernel\Exception\HttpNotFoundException':
+                return 404;
+            default:
+                return 500;
+        }
     }
 }

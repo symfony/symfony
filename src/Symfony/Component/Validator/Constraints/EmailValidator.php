@@ -51,36 +51,15 @@ class EmailValidator extends ConstraintValidator
     }
 
     /**
-     * Check DNA Records for MX type (from Doctrine EmailValidator).
+     * Check DNS Records for MX type.
      *
      * @param string $host Host name
      *
      * @return boolean
-     *
-     * @licence This software consists of voluntary contributions made by many individuals
-     * and is licensed under the LGPL. For more information, see
-     * <http://www.phpdoctrine.org>.
      */
     private function checkMX($host)
     {
-        // We have different behavior here depending of OS and PHP version
-        if (strtolower(substr(PHP_OS, 0, 3)) === 'win' && version_compare(PHP_VERSION, '5.3.0', '<'))  {
-            $output = array();
-
-            @exec('nslookup -type=MX '.escapeshellcmd($host) . ' 2>&1', $output);
-
-            if (empty($output)) {
-                throw new ValidatorError('Unable to execute DNS lookup. Are you sure PHP can call exec()?');
-            }
-
-            foreach ($output as $line) {
-                if (preg_match('/^'.$host.'/', $line)) {
-                    return true;
-                }
-            }
-
-            return false;
-        } else if (function_exists('checkdnsrr')) {
+        if (function_exists('checkdnsrr')) {
             return checkdnsrr($host, 'MX');
         }
 

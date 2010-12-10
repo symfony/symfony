@@ -54,6 +54,8 @@ class HttpKernel implements HttpKernelInterface
             $response = $this->handleRaw($request, $type);
         } catch (\Exception $e) {
             if (false === $catch) {
+                $this->request = $previousRequest;
+
                 throw $e;
             }
 
@@ -61,6 +63,8 @@ class HttpKernel implements HttpKernelInterface
             $event = new Event($this, 'core.exception', array('request_type' => $type, 'request' => $request, 'exception' => $e));
             $this->dispatcher->notifyUntil($event);
             if (!$event->isProcessed()) {
+                $this->request = $previousRequest;
+
                 throw $e;
             }
 

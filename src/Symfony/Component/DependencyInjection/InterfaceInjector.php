@@ -79,8 +79,11 @@ class InterfaceInjector
     public function supports($object)
     {
         if (is_string($object)) {
-            $class = new \ReflectionClass($object);
-            $object = $class->newInstance();
+            $reflection = new \ReflectionClass($object);
+
+            return $reflection->implementsInterface($this->class)
+                   || $reflection->isSubClassOf($this->class)
+                   || $object === $this->class;
         }
 
         if ( ! is_object($object)) {

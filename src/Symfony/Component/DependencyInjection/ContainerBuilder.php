@@ -241,6 +241,7 @@ class ContainerBuilder extends Container implements TaggedContainerInterface
 
         $this->addDefinitions($container->getDefinitions());
         $this->addAliases($container->getAliases());
+        $this->addInterfaceInjectors($container->getInterfaceInjectors());
         $this->parameterBag->add($container->getParameterBag()->all());
 
         foreach ($container->getResources() as $resource) {

@@ -114,7 +114,7 @@ interface FieldInterface extends Localizable
      *
      * @param array|object $objectOrArray
      */
-    function updateFromObject(&$objectOrArray);
+    function updateFromProperty(&$objectOrArray);
 
     /**
      * Writes a the field value into a property of the object
@@ -123,7 +123,7 @@ interface FieldInterface extends Localizable
      *
      * @param array|object $objectOrArray
      */
-    function updateObject(&$objectOrArray);
+    function updateProperty(&$objectOrArray);
 
     /**
      * Returns the normalized data of the field.

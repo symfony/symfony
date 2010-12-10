@@ -99,7 +99,7 @@ class FieldGroup extends Field implements \IteratorAggregate, FieldGroupInterfac
         // if the property "data" is NULL, getTransformedData() returns an empty
         // string
         if (!empty($data) && $field->getPropertyPath() !== null) {
-            $field->updateFromObject($data);
+            $field->updateFromProperty($data);
         }
 
         return $field;
@@ -285,12 +285,7 @@ class FieldGroup extends Field implements \IteratorAggregate, FieldGroupInterfac
         }
 
         if (!empty($data)) {
-            $iterator = new RecursiveFieldsWithPropertyPathIterator($this);
-            $iterator = new \RecursiveIteratorIterator($iterator);
-
-            foreach ($iterator as $field) {
-                $field->updateFromObject($data);
-            }
+            $this->updateFromObject($data);
         }
     }
 
@@ -341,12 +336,8 @@ class FieldGroup extends Field implements \IteratorAggregate, FieldGroupInterfac
         }
 
         $data = $this->getTransformedData();
-        $iterator = new RecursiveFieldsWithPropertyPathIterator($this);
-        $iterator = new \RecursiveIteratorIterator($iterator);
 
-        foreach ($iterator as $field) {
-            $field->updateObject($data);
-        }
+        $this->updateObject($data);
 
         // bind and reverse transform the data
         parent::bind($data);
@@ -357,6 +348,45 @@ class FieldGroup extends Field implements \IteratorAggregate, FieldGroupInterfac
             if (!$this->has($key)) {
                 $this->extraFields[] = $key;
             }
+        }
+    }
+
+    /**
+     * Updates the chield fields from the properties of the given data
+     *
+     * This method calls updateFromProperty() on all child fields that have a
+     * property path set. If a child field has no property path set but
+     * implements FieldGroupInterface, updateProperty() is called on its
+     * children instead.
+     *
+     * @param array|object $objectOrArray
+     */
+    protected function updateFromObject(&$objectOrArray)
+    {
+        $iterator = new RecursiveFieldsWithPropertyPathIterator($this);
+        $iterator = new \RecursiveIteratorIterator($iterator);
+
+        foreach ($iterator as $field) {
+            $field->updateFromProperty($objectOrArray);
+        }
+    }
+
+    /**
+     * Updates all properties of the given data from the child fields
+     *
+     * This method calls updateProperty() on all child fields that have a property
+     * path set. If a child field has no property path set but implements
+     * FieldGroupInterface, updateProperty() is called on its children instead.
+     *
+     * @param array|object $objectOrArray
+     */
+    protected function updateObject(&$objectOrArray)
+    {
+        $iterator = new RecursiveFieldsWithPropertyPathIterator($this);
+        $iterator = new \RecursiveIteratorIterator($iterator);
+
+        foreach ($iterator as $field) {
+            $field->updateProperty($objectOrArray);
         }
     }
 

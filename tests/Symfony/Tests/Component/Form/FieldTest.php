@@ -438,13 +438,13 @@ class FieldTest extends \PHPUnit_Framework_TestCase
      * Even if the field group itself is not associated to a specific property,
      * nested fields might be.
      */
-    public function testUpdateFromObjectPassesObjectThroughIfPropertyPathIsEmpty()
+    public function testUpdateFromPropertyPassesObjectThroughIfPropertyPathIsEmpty()
     {
         $object = new Author();
         $object->firstName = 'Bernhard';
 
         $field = new TestField('firstName', array('property_path' => null));
-        $field->updateFromObject($object);
+        $field->updateFromProperty($object);
 
         $this->assertEquals($object, $field->getData());
     }
@@ -453,24 +453,24 @@ class FieldTest extends \PHPUnit_Framework_TestCase
      * This is important so that bind() can work even if setData() was not called
      * before
      */
-    public function testUpdateObjectTreatsEmptyValuesAsArrays()
+    public function testUpdatePropertyTreatsEmptyValuesAsArrays()
     {
         $array = null;
 
         $field = new TestField('firstName');
         $field->bind('Bernhard');
-        $field->updateObject($array);
+        $field->updateProperty($array);
 
         $this->assertEquals(array('firstName' => 'Bernhard'), $array);
     }
 
-    public function testUpdateObjectDoesNotUpdatePropertyIfPropertyPathIsEmpty()
+    public function testUpdatePropertyDoesNotUpdatePropertyIfPropertyPathIsEmpty()
     {
         $object = new Author();
 
         $field = new TestField('firstName', array('property_path' => null));
         $field->bind('Bernhard');
-        $field->updateObject($object);
+        $field->updateProperty($object);
 
         $this->assertEquals(null, $object->firstName);
     }

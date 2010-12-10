@@ -497,7 +497,7 @@ class Field extends Configurable implements FieldInterface
     /**
      * {@inheritDoc}
      */
-    public function updateFromObject(&$objectOrArray)
+    public function updateFromProperty(&$objectOrArray)
     {
         // TODO throw exception if not object or array
         if ($this->propertyPath !== null) {
@@ -511,7 +511,7 @@ class Field extends Configurable implements FieldInterface
     /**
      * {@inheritDoc}
      */
-    public function updateObject(&$objectOrArray)
+    public function updateProperty(&$objectOrArray)
     {
         // TODO throw exception if not object or array
 

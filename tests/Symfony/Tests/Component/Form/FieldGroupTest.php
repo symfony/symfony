@@ -444,7 +444,7 @@ class FieldGroupTest extends \PHPUnit_Framework_TestCase
                     ->method('getPropertyPath')
                     ->will($this->returnValue(new PropertyPath('firstName')));
         $field->expects($this->once())
-                    ->method('updateFromObject')
+                    ->method('updateFromProperty')
                     ->with($this->equalTo($transformedAuthor));
 
         $group->add($field);
@@ -460,7 +460,7 @@ class FieldGroupTest extends \PHPUnit_Framework_TestCase
                     ->method('getPropertyPath')
                     ->will($this->returnValue(null));
         $field->expects($this->never())
-                    ->method('updateFromObject');
+                    ->method('updateFromProperty');
 
         $group->add($field);
     }
@@ -482,7 +482,7 @@ class FieldGroupTest extends \PHPUnit_Framework_TestCase
 
         $field = $this->createMockField('firstName');
         $field->expects($this->never())
-                    ->method('updateFromObject');
+                    ->method('updateFromProperty');
 
         $group->add($field);
     }
@@ -506,14 +506,14 @@ class FieldGroupTest extends \PHPUnit_Framework_TestCase
 
         $field = $this->createMockField('firstName');
         $field->expects($this->once())
-                    ->method('updateFromObject')
+                    ->method('updateFromProperty')
                     ->with($this->equalTo($transformedAuthor));
 
         $group->add($field);
 
         $field = $this->createMockField('lastName');
         $field->expects($this->once())
-                    ->method('updateFromObject')
+                    ->method('updateFromProperty')
                     ->with($this->equalTo($transformedAuthor));
 
         $group->add($field);
@@ -553,14 +553,14 @@ class FieldGroupTest extends \PHPUnit_Framework_TestCase
 
         $field = $this->createMockField('firstName');
         $field->expects($this->once())
-                    ->method('updateObject')
+                    ->method('updateProperty')
                     ->with($this->equalTo($transformedAuthor));
 
         $group->add($field);
 
         $field = $this->createMockField('lastName');
         $field->expects($this->once())
-                    ->method('updateObject')
+                    ->method('updateProperty')
                     ->with($this->equalTo($transformedAuthor));
 
         $group->add($field);

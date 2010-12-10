@@ -47,7 +47,7 @@
     <xsd:complexType name="session">
         <xsd:attribute name="class" type="xsd:string" />
         <xsd:attribute name="storage_id" type="xsd:string" />
-        <xsd:attribute name="default_locale" type="xsd:string" />
+        <xsd:attribute name="default-locale" type="xsd:string" />
         <xsd:attribute name="name" type="xsd:string" />
         <xsd:attribute name="lifetime" type="xsd:integer" />
         <xsd:attribute name="path" type="xsd:string" />

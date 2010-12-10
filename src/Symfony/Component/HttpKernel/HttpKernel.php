@@ -53,9 +53,6 @@ class HttpKernel implements HttpKernelInterface
         try {
             $response = $this->handleRaw($request, $type);
         } catch (\Exception $e) {
-            // restore the previous request
-            $this->request = $previousRequest;
-
             if (false === $catch) {
                 throw $e;
             }
@@ -66,6 +63,9 @@ class HttpKernel implements HttpKernelInterface
             if ($event->isProcessed()) {
                 return $this->filterResponse($event->getReturnValue(), $request, 'A "core.exception" listener returned a non response object.', $type);
             }
+
+            // restore the previous request
+            $this->request = $previousRequest;
 
             throw $e;
         }

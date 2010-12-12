@@ -146,6 +146,9 @@ class InterfaceInjectorTest extends \PHPUnit_Framework_TestCase
             array(new InterfaceInjector('Symfony\Tests\Component\DependencyInjection\SubService'), 'Symfony\Tests\Component\DependencyInjection\Service', false),
             array(new InterfaceInjector('Symfony\Tests\Component\DependencyInjection\Service'), 'Symfony\Tests\Component\DependencyInjection\SubService', true),
             array(new InterfaceInjector('Symfony\Tests\Component\DependencyInjection\SubService'), 'Symfony\Tests\Component\DependencyInjection\SubService', true),
+            array(new InterfaceInjector('Symfony\Tests\Component\DependencyInjection\FooInterface'), 'Symfony\Tests\Component\DependencyInjection\SubService', true),
+            array(new InterfaceInjector('Symfony\Tests\Component\DependencyInjection\FooInterface'), 'Symfony\Tests\Component\DependencyInjection\Service', false),
+            array(new InterfaceInjector('Symfony\Tests\Component\DependencyInjection\FooInterface'), 'Symfony\Tests\Component\DependencyInjection\ServiceWithConstructor', false),
         );
     }
 
@@ -168,5 +171,7 @@ class InterfaceInjectorTest extends \PHPUnit_Framework_TestCase
     }
 }
 
+class ServiceWithConstructor { public function __construct(\DateTime $required) {} }
 class Service {}
-class SubService extends Service {}
+class SubService extends Service implements FooInterface {}
+interface FooInterface {}

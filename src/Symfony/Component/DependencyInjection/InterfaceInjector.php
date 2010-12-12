@@ -80,9 +80,8 @@ class InterfaceInjector
     {
         if (is_string($object)) {
             $reflection = new \ReflectionClass($object);
-
-            return $reflection->implementsInterface($this->class)
-                   || $reflection->isSubClassOf($this->class)
+            
+            return $reflection->isSubClassOf($this->class)
                    || $object === $this->class;
         }
 

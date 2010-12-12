@@ -63,7 +63,7 @@
                 <argument key="matcher_class">%router.options.matcher_class%</argument>
                 <argument key="matcher_base_class">%router.options.matcher_base_class%</argument>
                 <argument key="matcher_dumper_class">%router.options.matcher_dumper_class%</argument>
-                <argument key="matcher_cache_class">%kernel.name%UrlMatcher</argument>
+                <argument key="matcher_cache_class">%kernel.name%_%kernel.environment%UrlMatcher</argument>
             </argument>
         </service>
     </services>

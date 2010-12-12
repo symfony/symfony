@@ -14,6 +14,7 @@ use Symfony\Component\Routing\Loader\LoaderResolver;
 use Symfony\Component\Routing\Loader\YamlFileLoader;
 use Symfony\Component\Routing\Route;
 use Symfony\Component\Routing\RouteCollection;
+use Symfony\Component\Routing\Resource\FileResource;
 
 class YamlFileLoaderTest extends \PHPUnit_Framework_TestCase
 {
@@ -29,5 +30,23 @@ class YamlFileLoaderTest extends \PHPUnit_Framework_TestCase
 
         $this->assertTrue($loader->supports('foo.yml', 'yaml'), '->supports() checks the resource type if specified');
         $this->assertFalse($loader->supports('foo.yml', 'foo'), '->supports() checks the resource type if specified');
+    }
+
+    public function testLoadDoesNothingIfEmpty()
+    {
+        $loader = new YamlFileLoader(array(__DIR__.'/../Fixtures'));
+        $collection = $loader->load('empty.yml');
+
+        $this->assertEquals(array(), $collection->all());
+        $this->assertEquals(array(new FileResource(realpath(__DIR__.'/../Fixtures/empty.yml'))), $collection->getResources());
+    }
+
+    /**
+     * @expectedException \InvalidArgumentException
+     */
+    public function testLoadThrowsExceptionIfNotAnArray()
+    {
+        $loader = new YamlFileLoader(array(__DIR__.'/../Fixtures'));
+        $loader->load('nonvalid.yml');
     }
 }

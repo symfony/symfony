@@ -16,6 +16,24 @@ use Symfony\Tests\Component\Validator\Fixtures\ConstraintA;
 
 class YamlFileLoaderTest extends \PHPUnit_Framework_TestCase
 {
+    public function testLoadClassMetadataReturnsFalseIfEmpty()
+    {
+        $loader = new YamlFileLoader(__DIR__.'/empty-mapping.yml');
+        $metadata = new ClassMetadata('Symfony\Tests\Component\Validator\Fixtures\Entity');
+
+        $this->assertFalse($loader->loadClassMetadata($metadata));
+    }
+
+    /**
+     * @expectedException \InvalidArgumentException
+     */
+    public function testLoadClassMetadataThrowsExceptionIfNotAnArray()
+    {
+        $loader = new YamlFileLoader(__DIR__.'/nonvalid-mapping.yml');
+        $metadata = new ClassMetadata('Symfony\Tests\Component\Validator\Fixtures\Entity');
+        $loader->loadClassMetadata($metadata);
+    }
+
     public function testLoadClassMetadataReturnsTrueIfSuccessful()
     {
         $loader = new YamlFileLoader(__DIR__.'/constraint-mapping.yml');

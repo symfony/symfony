@@ -41,7 +41,8 @@ class YamlFileLoader extends FileLoader
 
         $this->container->addResource(new FileResource($path));
 
-        if (!$content) {
+        // empty file
+        if (null === $content) {
             return;
         }
 

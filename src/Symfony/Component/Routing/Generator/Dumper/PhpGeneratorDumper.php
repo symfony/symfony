@@ -50,7 +50,6 @@ class PhpGeneratorDumper extends GeneratorDumper
     protected function addGenerator()
     {
         $methods = array();
-        $routes  = array();
         foreach ($this->routes->all() as $name => $route) {
             $compiledRoute = $route->compile();
 
@@ -67,22 +66,15 @@ class PhpGeneratorDumper extends GeneratorDumper
 
 EOF
             ;
-
-            $routes[] = "            '$name' => true,";
         }
 
         $methods = implode("\n", $methods);
-        $routes  = implode("\n", $routes);
 
         return <<<EOF
 
     public function generate(\$name, array \$parameters, \$absolute = false)
     {
-        static \$routes = array(
-$routes
-        );
-
-        if (!isset(\$routes[\$name])) {
+        if (!isset(self::\$declaredRouteNames[\$name])) {
             throw new \InvalidArgumentException(sprintf('Route "%s" does not exist.', \$name));
         }
 
@@ -97,6 +89,12 @@ EOF;
 
     protected function startClass($class, $baseClass)
     {
+        $routes = array();
+        foreach ($this->routes->all() as $name => $route) {
+            $routes[] = "       '$name' => true,";
+        }
+        $routes  = implode("\n", $routes);
+
         return <<<EOF
 <?php
 
@@ -108,6 +106,10 @@ EOF;
  */
 class $class extends $baseClass
 {
+    static protected \$declaredRouteNames = array(
+$routes
+    );
+
 
 EOF;
     }

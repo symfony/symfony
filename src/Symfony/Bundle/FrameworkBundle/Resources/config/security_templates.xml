@@ -62,6 +62,7 @@
 
         <service id="security.exception_listener" class="%security.exception_listener.class%">
             <argument type="service" id="security.context" />
+            <argument type="service" id="security.authentication.trust_resolver" />
             <argument type="service" id="security.authentication.entry_point" on-invalid="null" />
             <argument>%security.access_denied.url%</argument>
             <argument type="service" id="logger" on-invalid="null" />

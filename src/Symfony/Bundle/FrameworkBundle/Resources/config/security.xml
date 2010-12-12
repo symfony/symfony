@@ -16,6 +16,10 @@
 
         <parameter key="security.user.provider.in_memory.class">Symfony\Component\Security\User\InMemoryUserProvider</parameter>
 
+        <parameter key="security.authentication.trust_resolver.class">Symfony\Component\Security\Authentication\AuthenticationTrustResolver</parameter>
+        <parameter key="security.authentication.trust_resolver.anonymous_class">Symfony\Component\Security\Authentication\Token\AnonymousToken</parameter>
+        <parameter key="security.authentication.trust_resolver.rememberme_class">Symfony\Component\Security\Authentication\Token\RememberMeToken</parameter>
+
         <parameter key="security.authentication.provider.dao.class">Symfony\Component\Security\Authentication\Provider\DaoAuthenticationProvider</parameter>
         <parameter key="security.authentication.provider.pre_authenticated.class">Symfony\Component\Security\Authentication\Provider\PreAuthenticatedAuthenticationProvider</parameter>
 
@@ -101,6 +105,11 @@
             <argument type="service" id="logger" on-invalid="null" />
         </service>
 
+        <service id="security.authentication.trust_resolver" class="%security.authentication.trust_resolver.class%">
+            <argument>%security.authentication.trust_resolver.anonymous_class%</argument>
+            <argument>%security.authentication.trust_resolver.rememberme_class%</argument>
+        </service>
+
         <service id="security.authentication.retry_entry_point" class="%security.authentication.retry_entry_point.class%" />
 
         <service id="security.authentication.form_entry_point" class="%security.authentication.form_entry_point.class%">
@@ -132,6 +141,7 @@
             <tag name="security.voter" />
         </service>
         <service id="security.access.authenticated_voter" class="%security.access.authenticated_voter.class%">
+            <argument type="service" id="security.authentication.trust_resolver" />
             <tag name="security.voter" />
         </service>
         <service id="security.access.role_hierarchy_voter" class="%security.access.role_hierarchy_voter.class%">

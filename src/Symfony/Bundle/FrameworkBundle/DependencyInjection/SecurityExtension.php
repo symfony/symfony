@@ -450,7 +450,7 @@ class SecurityExtension extends Extension
         $exceptionListenerId = 'security.exception_listener.'.$id;
         $listener = $container->setDefinition($exceptionListenerId, clone $container->getDefinition('security.exception_listener'));
         $arguments = $listener->getArguments();
-        $arguments[1] = null === $defaultEntryPoint ? null : new Reference($defaultEntryPoint);
+        $arguments[2] = null === $defaultEntryPoint ? null : new Reference($defaultEntryPoint);
         $listener->setArguments($arguments);
 
         return $exceptionListenerId;

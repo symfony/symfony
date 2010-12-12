@@ -18,6 +18,7 @@
         <xsd:attribute name="strict-variables" type="xsd:string" />
         <xsd:attribute name="auto-reload" type="xsd:string" />
         <xsd:attribute name="base-template-class" type="xsd:string" />
+        <xsd:attribute name="autoescape" type="xsd:string" />
     </xsd:complexType>
 
     <xsd:complexType name="form">

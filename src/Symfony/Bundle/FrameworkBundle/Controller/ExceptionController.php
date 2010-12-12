@@ -75,7 +75,7 @@ class ExceptionController extends ContainerAware
         switch ($exception->getClass()) {
             case 'Symfony\Component\Security\Exception\AccessDeniedException':
                 return 403;
-            case 'Symfony\Component\HttpKernel\Exception\HttpNotFoundException':
+            case 'Symfony\Component\HttpKernel\Exception\NotFoundHttpException':
                 return 404;
             default:
                 return 500;

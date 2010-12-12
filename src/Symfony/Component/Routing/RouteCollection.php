@@ -42,7 +42,7 @@ class RouteCollection
      */
     public function add($name, Route $route)
     {
-        if (!preg_match('/^[a-z0-9A-Z_]+$/', $name)) {
+        if (!preg_match('/^[a-z0-9A-Z_.]+$/', $name)) {
             throw new \InvalidArgumentException(sprintf('Name "%s" contains non valid characters for a route name.', $name));
         }
 

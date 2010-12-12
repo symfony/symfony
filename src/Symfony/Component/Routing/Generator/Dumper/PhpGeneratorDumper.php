@@ -58,6 +58,8 @@ class PhpGeneratorDumper extends GeneratorDumper
             $requirements = str_replace("\n", '', var_export($compiledRoute->getRequirements(), true));
             $tokens = str_replace("\n", '', var_export($compiledRoute->getTokens(), true));
 
+            $name = str_replace('.', '__', $name);
+
             $methods[] = <<<EOF
     protected function get{$name}RouteInfo()
     {
@@ -77,6 +79,8 @@ EOF
         if (!isset(self::\$declaredRouteNames[\$name])) {
             throw new \InvalidArgumentException(sprintf('Route "%s" does not exist.', \$name));
         }
+
+        \$name = str_replace('.', '__', \$name);
 
         list(\$variables, \$defaults, \$requirements, \$tokens) = \$this->{'get'.\$name.'RouteInfo'}();
 

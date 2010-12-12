@@ -478,6 +478,42 @@ class RequestTest extends \PHPUnit_Framework_TestCase
         $this->assertEquals($file, $files['child']['sub']['file']);
     }
 
+    public function testGetContentWorksTwiceInDefaultMode()
+    {
+        $req = new Request;
+        $this->assertEquals('', $req->getContent());
+        $this->assertEquals('', $req->getContent());
+    }
+
+    public function testGetContentReturnsResource()
+    {
+        $req = new Request;
+        $retval = $req->getContent(true);
+        $this->assertType('resource', $retval);
+        $this->assertEquals("", fread($retval, 1));
+        $this->assertTrue(feof($retval));
+    }
+
+    /**
+     * @expectedException LogicException
+     * @dataProvider getContentCantBeCalledTwiceWithResourcesProvider
+     */
+    public function testGetContentCantBeCalledTwiceWithResources($first, $second)
+    {
+        $req = new Request;
+        $req->getContent($first);
+        $req->getContent($second);
+    }
+
+    public function getContentCantBeCalledTwiceWithResourcesProvider()
+    {
+        return array(
+            'Resource then fetch' => array(true, false),
+            'Resource then resource' => array(true, true),
+            'Fetch then resource' => array(false, true),
+        );
+    }
+
     protected function createTempFile()
     {
         return tempnam(sys_get_temp_dir(), 'FormTest');

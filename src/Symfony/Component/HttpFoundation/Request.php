@@ -56,6 +56,7 @@ class Request
      */
     public $headers;
 
+    protected $content;
     protected $languages;
     protected $charsets;
     protected $acceptableContentTypes;
@@ -106,6 +107,7 @@ class Request
         $this->server = new ParameterBag(null !== $server ? $server : $_SERVER);
         $this->headers = new HeaderBag($this->initializeHeaders());
 
+        $this->content = null;
         $this->languages = null;
         $this->charsets = null;
         $this->acceptableContentTypes = null;
@@ -602,6 +604,20 @@ class Request
     public function isMethodSafe()
     {
         return in_array($this->getMethod(), array('GET', 'HEAD'));
+    }
+
+    /**
+     * Return the request body content.
+     *
+     * @return string The request body content.
+     */
+    public function getContent()
+    {
+        if (null === $this->content) {
+            $this->content = file_get_contents('php://input');
+        }
+
+        return $this->content;
     }
 
     public function getETags()

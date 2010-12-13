@@ -55,7 +55,7 @@ class DoctrineExtension extends Extension
     public function ormLoad($config, ContainerBuilder $container)
     {
         $this->loadOrmDefaults($config, $container);
-        $this->createOrmProxyDirectory($container->getParameter('doctrine.orm.proxy_dir'));
+        $this->createOrmProxyDirectory($container);
         $this->loadOrmEntityManagers($config, $container);
     }
 
@@ -181,8 +181,9 @@ class DoctrineExtension extends Extension
     /**
      * Create the Doctrine ORM Entity proxy directory
      */
-    protected function createOrmProxyDirectory($proxyCacheDir)
+    protected function createOrmProxyDirectory(ContainerBuilder $container)
     {
+        $proxyCacheDir = $container->getParameterBag()->resolveValue($container->getParameter('doctrine.orm.proxy_dir'));
         // Create entity proxy directory
         if (!is_dir($proxyCacheDir)) {
             if (false === @mkdir($proxyCacheDir, 0777, true)) {

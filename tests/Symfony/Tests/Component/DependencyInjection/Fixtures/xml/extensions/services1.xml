@@ -13,6 +13,7 @@
 
     <project:bar babar="babar">
         <another />
+        <another2>%project.parameter.foo%</another2>
     </project:bar>
 
 </container>

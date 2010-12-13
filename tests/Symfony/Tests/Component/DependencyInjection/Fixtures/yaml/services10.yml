@@ -5,4 +5,5 @@ services:
     project.service.foo:
         class: BAR
 
-project.bar: ~
+project.bar:
+    test: %project.parameter.foo%

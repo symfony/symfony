@@ -49,15 +49,15 @@ class YamlFileLoader extends FileLoader
         // imports
         $this->parseImports($content, $file);
 
-        // extensions
-        $this->loadFromExtensions($content);
-
         // parameters
         if (isset($content['parameters'])) {
             foreach ($content['parameters'] as $key => $value) {
                 $this->container->setParameter($key, $this->resolveServices($value));
             }
         }
+
+        // extensions
+        $this->loadFromExtensions($content);
 
         // interface injectors
         $this->parseInterfaceInjectors($content, $file);

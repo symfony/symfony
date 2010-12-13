@@ -44,11 +44,11 @@ class XmlFileLoader extends FileLoader
         // imports
         $this->parseImports($xml, $file);
 
-        // extensions
-        $this->loadFromExtensions($xml);
-
         // parameters
         $this->parseParameters($xml, $file);
+
+        // extensions
+        $this->loadFromExtensions($xml);
 
         // interface injectors
         $this->parseInterfaceInjectors($xml, $file);

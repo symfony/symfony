@@ -161,7 +161,7 @@ EOF;
         }
 
         if (!$this->container->isFrozen() && count($this->container->getInterfaceInjectors()) > 0) {
-            $calls = sprintf("\n        \$this->applyInterfaceInjection(\$instance);\n");
+            $calls = sprintf("\n        \$this->applyIntrefaceInjectors(\$instance);\n");
         }
 
         return $calls;

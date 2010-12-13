@@ -36,7 +36,7 @@ class ProjectServiceContainer extends Container implements TaggedContainerInterf
         $class = $this->getParameter('cla').'o'.$this->getParameter('ss');
         return $this->services['foo'] = new $class();
 
-        $this->applyInterfaceInjection($instance);
+        $this->applyIntrefaceInjectors($instance);
     }
 
     /**

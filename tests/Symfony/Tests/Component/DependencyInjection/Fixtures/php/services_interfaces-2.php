@@ -35,7 +35,7 @@ class ProjectServiceContainer extends Container implements TaggedContainerInterf
     {
         return $this->services['barFactory'] = new \BarClassFactory();
 
-        $this->applyInterfaceInjection($instance);
+        $this->applyIntrefaceInjectors($instance);
     }
 
     /**
@@ -50,7 +50,7 @@ class ProjectServiceContainer extends Container implements TaggedContainerInterf
     {
         return $this->services['bar'] = $this->get('barFactory')->createBarClass();
 
-        $this->applyInterfaceInjection($instance);
+        $this->applyIntrefaceInjectors($instance);
     }
 
     /**

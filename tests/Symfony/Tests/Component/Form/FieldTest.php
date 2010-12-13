@@ -423,7 +423,7 @@ class FieldTest extends \PHPUnit_Framework_TestCase
                                 ->will($this->returnValue(' a '));
 
         $field = new TestField('title', array(
-        	'trim' => false,
+            'trim' => false,
             'value_transformer' => $transformer,
         ));
 

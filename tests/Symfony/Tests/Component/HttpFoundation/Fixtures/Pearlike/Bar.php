@@ -1,5 +1,5 @@
 <?php
 
 class Pearlike_Bar {
-	public static $loaded = true;
+    public static $loaded = true;
 }

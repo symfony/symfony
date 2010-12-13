@@ -17,7 +17,7 @@ class MemberMetadataTest extends \PHPUnit_Framework_TestCase
     protected function setUp()
     {
         $this->metadata = new TestMemberMetadata(
-        	'Symfony\Tests\Component\Validator\Fixtures\Entity',
+            'Symfony\Tests\Component\Validator\Fixtures\Entity',
             'getLastName',
             'lastName'
         );

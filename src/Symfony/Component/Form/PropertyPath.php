@@ -319,8 +319,8 @@ class PropertyPath implements \IteratorAggregate
 
                 return $object->$isser();
             } else if ($reflClass->hasMethod('__get')) {
-	            // needed to support magic method __get
-	            return $object->$property;
+                // needed to support magic method __get
+                return $object->$property;
             } else if ($reflClass->hasProperty($property)) {
                 if (!$reflClass->getProperty($property)->isPublic()) {
                     throw new PropertyAccessDeniedException(sprintf('Property "%s" is not public in class "%s". Maybe you should create the method "get%s()" or "is%s()"?', $property, $reflClass->getName(), ucfirst($property), ucfirst($property)));

@@ -74,4 +74,22 @@
       </constraint>
     </getter>
   </class>
+
+  <class name="Symfony\Component\Form\FileField">
+    <getter property="iniSizeExceeded">
+      <constraint name="AssertFalse">
+        <option name="message">The file is too large. Please upload a smaller file</option>
+      </constraint>
+    </getter>
+    <getter property="formSizeExceeded">
+      <constraint name="AssertFalse">
+        <option name="message">The file is too large. Please upload a smaller file</option>
+      </constraint>
+    </getter>
+    <getter property="uploadComplete">
+      <constraint name="AssertTrue">
+        <option name="message">The file was only partially uploaded. Please try again</option>
+      </constraint>
+    </getter>
+  </class>
 </constraint-mapping>

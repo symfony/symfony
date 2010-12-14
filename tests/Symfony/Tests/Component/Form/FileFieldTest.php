@@ -2,7 +2,6 @@
 
 namespace Symfony\Tests\Component\Form;
 
-use Symfony\Component\HttpFoundation\File\File;
 use Symfony\Component\Form\FileField;
 
 class FileFieldTest extends \PHPUnit_Framework_TestCase
@@ -11,12 +10,22 @@ class FileFieldTest extends \PHPUnit_Framework_TestCase
 
     protected static $tmpDir;
 
+    protected $field;
+
     public static function setUpBeforeClass()
     {
         self::$tmpDir = sys_get_temp_dir();
 
         // we need a session ID
         @session_start();
+    }
+
+    protected function setUp()
+    {
+        $this->field = new FileField('file', array(
+            'secret' => '$secret$',
+            'tmp_dir' => self::$tmpDir,
+        ));
     }
 
     protected function tearDown()
@@ -35,11 +44,6 @@ class FileFieldTest extends \PHPUnit_Framework_TestCase
 
     public function testBindUploadsNewFiles()
     {
-        $field = new FileField('file', array(
-            'secret' => '$secret$',
-            'tmp_dir' => self::$tmpDir,
-        ));
-
         $tmpPath = realpath(self::$tmpDir) . '/' . md5(session_id() . '$secret$' . '12345');
         $that = $this;
 
@@ -54,7 +58,7 @@ class FileFieldTest extends \PHPUnit_Framework_TestCase
              ->method('getOriginalName')
              ->will($this->returnValue('original_name.jpg'));
 
-        $field->bind(array(
+        $this->field->bind(array(
             'file' => $file,
             'token' => '12345',
             'original_name' => '',
@@ -65,21 +69,19 @@ class FileFieldTest extends \PHPUnit_Framework_TestCase
             'file' => '',
             'token' => '12345',
             'original_name' => 'original_name.jpg',
-        ), $field->getDisplayedData());
-        $this->assertEquals($tmpPath, $field->getData());
+        ), $this->field->getDisplayedData());
+        $this->assertEquals($tmpPath, $this->field->getData());
+        $this->assertFalse($this->field->isIniSizeExceeded());
+        $this->assertFalse($this->field->isFormSizeExceeded());
+        $this->assertTrue($this->field->isUploadComplete());
     }
 
     public function testBindKeepsUploadedFilesOnErrors()
     {
-        $field = new FileField('file', array(
-            'secret' => '$secret$',
-            'tmp_dir' => self::$tmpDir,
-        ));
-
         $tmpPath = self::$tmpDir . '/' . md5(session_id() . '$secret$' . '12345');
         $this->createTmpFile($tmpPath);
 
-        $field->bind(array(
+        $this->field->bind(array(
             'file' => '',
             'token' => '12345',
             'original_name' => 'original_name.jpg',
@@ -90,25 +92,20 @@ class FileFieldTest extends \PHPUnit_Framework_TestCase
             'file' => '',
             'token' => '12345',
             'original_name' => 'original_name.jpg',
-        ), $field->getDisplayedData());
-        $this->assertEquals(realpath($tmpPath), realpath($field->getData()));
+        ), $this->field->getDisplayedData());
+        $this->assertEquals(realpath($tmpPath), realpath($this->field->getData()));
     }
 
     public function testBindKeepsOldFileIfNotOverwritten()
     {
-        $field = new FileField('file', array(
-            'secret' => '$secret$',
-            'tmp_dir' => self::$tmpDir,
-        ));
-
         $oldPath = tempnam(sys_get_temp_dir(), 'FileFieldTest');
         $this->createTmpFile($oldPath);
 
-        $field->setData($oldPath);
+        $this->field->setData($oldPath);
 
-        $this->assertEquals($oldPath, $field->getData());
+        $this->assertEquals($oldPath, $this->field->getData());
 
-        $field->bind(array(
+        $this->field->bind(array(
             'file' => '',
             'token' => '12345',
             'original_name' => '',
@@ -119,7 +116,103 @@ class FileFieldTest extends \PHPUnit_Framework_TestCase
             'file' => '',
             'token' => '12345',
             'original_name' => '',
-        ), $field->getDisplayedData());
-        $this->assertEquals($oldPath, $field->getData());
+        ), $this->field->getDisplayedData());
+        $this->assertEquals($oldPath, $this->field->getData());
+    }
+
+    public function testBindHandlesUploadErrIniSize()
+    {
+        $file = $this->getMock('Symfony\Component\HttpFoundation\File\UploadedFile', array(), array(), '', false);
+        $file->expects($this->any())
+             ->method('getError')
+             ->will($this->returnValue(UPLOAD_ERR_INI_SIZE));
+
+        $this->field->bind(array(
+            'file' => $file,
+            'token' => '12345',
+            'original_name' => ''
+        ));
+
+        $this->assertTrue($this->field->isIniSizeExceeded());
+    }
+
+    public function testBindHandlesUploadErrFormSize()
+    {
+        $file = $this->getMock('Symfony\Component\HttpFoundation\File\UploadedFile', array(), array(), '', false);
+        $file->expects($this->any())
+             ->method('getError')
+             ->will($this->returnValue(UPLOAD_ERR_FORM_SIZE));
+
+        $this->field->bind(array(
+            'file' => $file,
+            'token' => '12345',
+            'original_name' => ''
+        ));
+
+        $this->assertTrue($this->field->isFormSizeExceeded());
+    }
+
+    public function testBindHandlesUploadErrPartial()
+    {
+        $file = $this->getMock('Symfony\Component\HttpFoundation\File\UploadedFile', array(), array(), '', false);
+        $file->expects($this->any())
+             ->method('getError')
+             ->will($this->returnValue(UPLOAD_ERR_PARTIAL));
+
+        $this->field->bind(array(
+            'file' => $file,
+            'token' => '12345',
+            'original_name' => ''
+        ));
+
+        $this->assertFalse($this->field->isUploadComplete());
+    }
+
+    public function testBindThrowsExceptionOnUploadErrNoTmpDir()
+    {
+        $file = $this->getMock('Symfony\Component\HttpFoundation\File\UploadedFile', array(), array(), '', false);
+        $file->expects($this->any())
+             ->method('getError')
+             ->will($this->returnValue(UPLOAD_ERR_NO_TMP_DIR));
+
+        $this->setExpectedException('Symfony\Component\Form\Exception\FormException');
+
+        $this->field->bind(array(
+            'file' => $file,
+            'token' => '12345',
+            'original_name' => ''
+        ));
+    }
+
+    public function testBindThrowsExceptionOnUploadErrCantWrite()
+    {
+        $file = $this->getMock('Symfony\Component\HttpFoundation\File\UploadedFile', array(), array(), '', false);
+        $file->expects($this->any())
+             ->method('getError')
+             ->will($this->returnValue(UPLOAD_ERR_CANT_WRITE));
+
+        $this->setExpectedException('Symfony\Component\Form\Exception\FormException');
+
+        $this->field->bind(array(
+            'file' => $file,
+            'token' => '12345',
+            'original_name' => ''
+        ));
+    }
+
+    public function testBindThrowsExceptionOnUploadErrExtension()
+    {
+        $file = $this->getMock('Symfony\Component\HttpFoundation\File\UploadedFile', array(), array(), '', false);
+        $file->expects($this->any())
+             ->method('getError')
+             ->will($this->returnValue(UPLOAD_ERR_EXTENSION));
+
+        $this->setExpectedException('Symfony\Component\Form\Exception\FormException');
+
+        $this->field->bind(array(
+            'file' => $file,
+            'token' => '12345',
+            'original_name' => ''
+        ));
     }
 }

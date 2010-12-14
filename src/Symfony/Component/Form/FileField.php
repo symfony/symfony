@@ -3,6 +3,7 @@
 namespace Symfony\Component\Form;
 
 use Symfony\Component\HttpFoundation\File\File;
+use Symfony\Component\Form\Exception\FormException;
 
 /*
  * This file is part of the Symfony framework.
@@ -18,6 +19,26 @@ use Symfony\Component\HttpFoundation\File\File;
  */
 class FileField extends FieldGroup
 {
+    /**
+     * Whether the size of the uploaded file exceeds the upload_max_filesize
+     * directive in php.ini
+     * @var boolean
+     */
+    protected $iniSizeExceeded = false;
+
+    /**
+     * Whether the size of the uploaded file exceeds the MAX_FILE_SIZE
+     * directive specified in the HTML form
+     * @var boolean
+     */
+    protected $formSizeExceeded = false;
+
+    /**
+     * Whether the file was completely uploaded
+     * @var boolean
+     */
+    protected $uploadComplete = true;
+
     /**
      * {@inheritDoc}
      */
@@ -45,9 +66,29 @@ class FileField extends FieldGroup
     protected function preprocessData(array $data)
     {
         if ($data['file']) {
-            $data['file']->move($this->getTmpPath($data['token']));
-            $data['original_name'] = $data['file']->getOriginalName();
-            $data['file'] = '';
+            switch ($data['file']->getError()) {
+                case UPLOAD_ERR_INI_SIZE:
+                    $this->iniSizeExceeded = true;
+                    break;
+                case UPLOAD_ERR_FORM_SIZE:
+                    $this->formSizeExceeded = true;
+                    break;
+                case UPLOAD_ERR_PARTIAL:
+                    $this->uploadComplete = false;
+                    break;
+                case UPLOAD_ERR_NO_TMP_DIR:
+                    throw new FormException('Could not upload a file because a temporary directory is missing (UPLOAD_ERR_NO_TMP_DIR)');
+                case UPLOAD_ERR_CANT_WRITE:
+                    throw new FormException('Could not write file to disk (UPLOAD_ERR_CANT_WRITE)');
+                case UPLOAD_ERR_EXTENSION:
+                    throw new FormException('A PHP extension stopped the file upload (UPLOAD_ERR_EXTENSION)');
+                case UPLOAD_ERR_OK:
+                default:
+                    $data['file']->move($this->getTmpPath($data['token']));
+                    $data['original_name'] = $data['file']->getOriginalName();
+                    $data['file'] = '';
+                    break;
+            }
         }
 
         return $data;
@@ -119,5 +160,37 @@ class FileField extends FieldGroup
     public function isMultipart()
     {
         return true;
+    }
+
+    /**
+     * Returns true if the size of the uploaded file exceeds the
+     * upload_max_filesize directive in php.ini
+     *
+     * @return boolean
+     */
+    public function isIniSizeExceeded()
+    {
+        return $this->iniSizeExceeded;
+    }
+
+    /**
+     * Returns true if the size of the uploaded file exceeds the
+     * MAX_FILE_SIZE directive specified in the HTML form
+     *
+     * @return boolean
+     */
+    public function isFormSizeExceeded()
+    {
+        return $this->formSizeExceeded;
+    }
+
+    /**
+     * Returns true if the file was completely uploaded
+     *
+     * @return boolean
+     */
+    public function isUploadComplete()
+    {
+        return $this->uploadComplete;
     }
 }

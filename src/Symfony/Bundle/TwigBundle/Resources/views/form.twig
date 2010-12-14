@@ -111,13 +111,13 @@
     {% if field.isfield %}
         {% display text_field %}
     {% else %}
-        {{ field.pattern|replace(['{{ year }}': field.year|render, '{{ month }}': field.month|render, '{{ day }}': field.day|render]) }}
+        {{ field.pattern|replace({ '{{ year }}': field.year|render, '{{ month }}': field.month|render, '{{ day }}': field.day|render }) }}
     {% endif %}
 {% endblock date_field %}
 
 {% block time_field %}
     {# TODO the next line should be set attr.size = 1, but that's not supported yet by Twig #}
-    {% if field.isfield %}{% set attr = ['size': 1] %}{% endif %}
+    {% if field.isfield %}{% set attr = { 'size': 1 } %}{% endif %}
     {{ field.hour|render(attr) }}:{{ field.minute|render(attr) }}{% if field.isWithSeconds %}:{{ field.second|render(attr) }}{% endif %}
 {% endblock time_field %}
 
@@ -127,7 +127,7 @@
 
 {% block money_field %}
     {% set widget %}{% display number_field %}{% endset %}
-    {{ field.pattern|replace(['{{ widget }}': widget])|raw }}
+    {{ field.pattern|replace({ '{{ widget }}': widget })|raw }}
 {% endblock money_field %}
 
 {% block percent_field %}

@@ -12,7 +12,7 @@
         </tr>
         {% for elements in tokens %}
             <tr>
-                <td><a href="{% path '_profiler' with ['token': elements.token] %}">{{ elements.token }}</a></td>
+                <td><a href="{% path '_profiler' with { 'token': elements.token } %}">{{ elements.token }}</a></td>
                 <td>{{ elements.ip }}</td>
                 <td>{{ elements.url }}</td>
                 <td>{{ elements.time|date('r') }}</td>

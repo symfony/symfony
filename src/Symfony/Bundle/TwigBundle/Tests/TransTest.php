@@ -23,7 +23,6 @@ class TransTest extends TestCase
      */
     public function testTrans($template, $expected, array $variables = array())
     {
-
         if ($expected != $this->getTemplate($template)->render($variables)) {
             print $template."\n";
             $loader = new \Twig_Loader_Array(array('index' => $template));
@@ -43,8 +42,8 @@ class TransTest extends TestCase
             // trans tag
             array('{% trans "Hello" %}', 'Hello'),
             array('{% trans name %}', 'Symfony2', array('name' => 'Symfony2')),
-            array('{% trans hello with [\'{{ name }}\': \'Symfony2\'] %}', 'Hello Symfony2', array('hello' => 'Hello {{ name }}')),
-            array('{% set vars = [\'{{ name }}\': \'Symfony2\'] %}{% trans hello with vars %}', 'Hello Symfony2', array('hello' => 'Hello {{ name }}')),
+            array('{% trans hello with { \'{{ name }}\': \'Symfony2\' } %}', 'Hello Symfony2', array('hello' => 'Hello {{ name }}')),
+            array('{% set vars = { \'{{ name }}\': \'Symfony2\' } %}{% trans hello with vars %}', 'Hello Symfony2', array('hello' => 'Hello {{ name }}')),
 
             array('{% trans %}Hello{% endtrans %}', 'Hello'),
             array('{% trans %}{{ name }}{% endtrans %}', 'Symfony2', array('name' => 'Symfony2')),
@@ -53,8 +52,8 @@ class TransTest extends TestCase
             array('{% trans from elsewhere %}Hello{% endtrans %}', 'Hello'),
 
             array('{% trans %}Hello {{ name }}{% endtrans %}', 'Hello Symfony2', array('name' => 'Symfony2')),
-            array('{% trans with [\'{{ name }}\': \'Symfony2\'] %}Hello {{ name }}{% endtrans %}', 'Hello Symfony2'),
-            array('{% set vars = [\'{{ name }}\': \'Symfony2\'] %}{% trans with vars %}Hello {{ name }}{% endtrans %}', 'Hello Symfony2'),
+            array('{% trans with { \'{{ name }}\': \'Symfony2\' } %}Hello {{ name }}{% endtrans %}', 'Hello Symfony2'),
+            array('{% set vars = { \'{{ name }}\': \'Symfony2\' } %}{% trans with vars %}Hello {{ name }}{% endtrans %}', 'Hello Symfony2'),
 
             // transchoice
             array('{% transchoice count from "messages" %}{0} There is no apples|{1} There is one apple|]1,Inf] There is {{ count }} apples{% endtranschoice %}',
@@ -63,14 +62,14 @@ class TransTest extends TestCase
                 'There is 5 apples', array('count' => 5)),
             array('{% transchoice count %}{0} There is no apples|{1} There is one apple|]1,Inf] There is {{ count }} apples ({{ name }}){% endtranschoice %}',
                 'There is 5 apples (Symfony2)', array('count' => 5, 'name' => 'Symfony2')),
-            array('{% transchoice count with [\'{{ name }}\': \'Symfony2\'] %}{0} There is no apples|{1} There is one apple|]1,Inf] There is {{ count }} apples ({{ name }}){% endtranschoice %}',
+            array('{% transchoice count with { \'{{ name }}\': \'Symfony2\' } %}{0} There is no apples|{1} There is one apple|]1,Inf] There is {{ count }} apples ({{ name }}){% endtranschoice %}',
                 'There is 5 apples (Symfony2)', array('count' => 5)),
 
             // trans filter
             array('{{ "Hello"|trans }}', 'Hello'),
             array('{{ name|trans }}', 'Symfony2', array('name' => 'Symfony2')),
-            array('{{ hello|trans([\'{{ name }}\': \'Symfony2\']) }}', 'Hello Symfony2', array('hello' => 'Hello {{ name }}')),
-            array('{% set vars = [\'{{ name }}\': \'Symfony2\'] %}{{ hello|trans(vars) }}', 'Hello Symfony2', array('hello' => 'Hello {{ name }}')),
+            array('{{ hello|trans({ \'{{ name }}\': \'Symfony2\' }) }}', 'Hello Symfony2', array('hello' => 'Hello {{ name }}')),
+            array('{% set vars = { \'{{ name }}\': \'Symfony2\' } %}{{ hello|trans(vars) }}', 'Hello Symfony2', array('hello' => 'Hello {{ name }}')),
         );
     }
 

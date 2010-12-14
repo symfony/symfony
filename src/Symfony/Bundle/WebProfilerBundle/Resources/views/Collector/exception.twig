@@ -18,6 +18,6 @@ Exception
     {% if not collector.hasexception %}
         <em>No exception was thrown and uncaught during the request.</em>
     {% else %}
-        {% render 'WebProfilerBundle:Exception:show' with ['exception': collector.exception, 'format': 'html'] %}
+        {% render 'WebProfilerBundle:Exception:show' with { 'exception': collector.exception, 'format': 'html' } %}
     {% endif %}
 {% endblock %}

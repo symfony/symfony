@@ -14,7 +14,7 @@ Request
     <h2>Request GET Parameters</h2>
 
     {% if collector.requestquery.all|length %}
-        {% include 'WebProfilerBundle:Profiler:bag.twig' with ['bag': collector.requestquery] only %}
+        {% include 'WebProfilerBundle:Profiler:bag.twig' with { 'bag': collector.requestquery } only %}
     {% else %}
         <em>No GET parameters</em>
     {% endif %}
@@ -22,7 +22,7 @@ Request
     <h2>Request POST Parameters</h2>
 
     {% if collector.requestrequest.all|length %}
-        {% include 'WebProfilerBundle:Profiler:bag.twig' with ['bag': collector.requestrequest] only %}
+        {% include 'WebProfilerBundle:Profiler:bag.twig' with { 'bag': collector.requestrequest } only %}
     {% else %}
         <em>No POST parameters</em>
     {% endif %}
@@ -30,7 +30,7 @@ Request
     <h2>Request Attributes</h2>
 
     {% if collector.requestattributes.all|length %}
-        {% include 'WebProfilerBundle:Profiler:bag.twig' with ['bag': collector.requestattributes] only %}
+        {% include 'WebProfilerBundle:Profiler:bag.twig' with { 'bag': collector.requestattributes } only %}
     {% else %}
         <em>No attributes</em>
     {% endif %}
@@ -38,22 +38,22 @@ Request
     <h2>Request Cookies</h2>
 
     {% if collector.requestcookies.all|length %}
-        {% include 'WebProfilerBundle:Profiler:bag.twig' with ['bag': collector.requestcookies] only %}
+        {% include 'WebProfilerBundle:Profiler:bag.twig' with { 'bag': collector.requestcookies } only %}
     {% else %}
         <em>No cookies</em>
     {% endif %}
 
     <h2>Requests Headers</h2>
 
-    {% include 'WebProfilerBundle:Profiler:bag.twig' with ['bag': collector.requestheaders] only %}
+    {% include 'WebProfilerBundle:Profiler:bag.twig' with { 'bag': collector.requestheaders } only %}
 
     <h2>Requests Server Parameters</h2>
 
-    {% include 'WebProfilerBundle:Profiler:bag.twig' with ['bag': collector.requestserver] only %}
+    {% include 'WebProfilerBundle:Profiler:bag.twig' with { 'bag': collector.requestserver } only %}
 
     <h2>Response Headers</h2>
 
-    {% include 'WebProfilerBundle:Profiler:bag.twig' with ['bag': collector.responseheaders] only %}
+    {% include 'WebProfilerBundle:Profiler:bag.twig' with { 'bag': collector.responseheaders } only %}
 
     <h2>Response Session Attributes</h2>
 

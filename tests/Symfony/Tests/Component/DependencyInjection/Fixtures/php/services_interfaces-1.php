@@ -36,7 +36,7 @@ class ProjectServiceContainer extends Container implements TaggedContainerInterf
         $class = $this->getParameter('cla').'o'.$this->getParameter('ss');
         return $this->services['foo'] = new $class();
 
-        $this->applyIntrefaceInjectors($instance);
+        $this->applyInterfaceInjectors($instance);
     }
 
     /**
@@ -73,7 +73,7 @@ class ProjectServiceContainer extends Container implements TaggedContainerInterf
      *
      * @param Object $instance
      */
-    protected function applyIntrefaceInjectors($instance)
+    protected function applyInterfaceInjectors($instance)
     {
         if ($instance instanceof \FooClass) {
             $instance->setBar('someValue');

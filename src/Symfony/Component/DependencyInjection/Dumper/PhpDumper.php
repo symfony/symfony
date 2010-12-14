@@ -67,7 +67,7 @@ class PhpDumper extends Dumper
      *
      * @param Object \$instance
      */
-    protected function applyIntrefaceInjectors(\$instance)
+    protected function applyInterfaceInjectors(\$instance)
     {
 
 EOF;
@@ -161,7 +161,7 @@ EOF;
         }
 
         if (!$this->container->isFrozen() && count($this->container->getInterfaceInjectors()) > 0) {
-            $calls = sprintf("\n        \$this->applyIntrefaceInjectors(\$instance);\n");
+            $calls = sprintf("\n        \$this->applyInterfaceInjectors(\$instance);\n");
         }
 
         return $calls;

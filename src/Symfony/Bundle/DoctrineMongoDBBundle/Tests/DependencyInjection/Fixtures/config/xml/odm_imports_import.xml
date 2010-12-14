@@ -7,8 +7,8 @@
                         http://www.symfony-project.org/schema/dic/doctrine/odm/mongodb http://www.symfony-project.org/schema/dic/doctrine/odm/mongodb/mongodb-1.0.xsd">
 
     <doctrine:mongodb
-        auto_generate_proxy_classes="false"
-        metadata_cache_driver="apc"
+        auto-generate-proxy-classes="false"
+        metadata-cache-driver="apc"
     >
     </doctrine:mongodb>
 </container>

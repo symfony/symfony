@@ -11,7 +11,7 @@
     </imports>
 
     <doctrine:mongodb
-        auto_generate_proxy_classes="true"
+        auto-generate-proxy-classes="true"
     >
     </doctrine:mongodb>
 </container>

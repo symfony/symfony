@@ -20,21 +20,21 @@
     </doctrine:dbal>
 
     <doctrine:orm
-            metadata_cache_driver="apc"
-            default_entity_manager="dm2"
-            default_connection="conn1"
-            proxy_namespace="Proxies"
-            auto_generate_proxy_classes="true"
+            metadata-cache-driver="apc"
+            default-entity-manager="dm2"
+            default-connection="conn1"
+            proxy-namespace="Proxies"
+            auto-generate-proxy-classes="true"
         >
-        <doctrine:entity_managers>
-            <doctrine:entity_manager id="default" connection="default">
-                <metadata_cache_driver type="memcache">
+        <doctrine:entity-managers>
+            <doctrine:entity-manager id="default" connection="default">
+                <metadata-cache-driver type="memcache">
                     <class>Doctrine\Common\Cache\MemcacheCache</class>
                     <host>localhost</host>
                     <port>11211</port>
-                    <instance_class>Memcache</instance_class>
-                </metadata_cache_driver>
-            </doctrine:entity_manager>
-        </doctrine:entity_managers>
+                    <instance-class>Memcache</instance-class>
+                </metadata-cache-driver>
+            </doctrine:entity-manager>
+        </doctrine:entity-managers>
     </doctrine:orm>
 </container>

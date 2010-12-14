@@ -8,8 +8,8 @@
                         http://www.symfony-project.org/schema/dic/doctrine/dbal http://www.symfony-project.org/schema/dic/doctrine/dbal/doctrine-1.0.xsd">
 
     <doctrine:orm
-        auto_generate_proxy_classes="false"
-        metadata_cache_driver="apc"
+        auto-generate-proxy-classes="false"
+        metadata-cache-driver="apc"
     >
     </doctrine:orm>
 </container>

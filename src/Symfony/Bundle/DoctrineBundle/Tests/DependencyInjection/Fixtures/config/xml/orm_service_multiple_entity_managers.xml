@@ -27,15 +27,15 @@
     </doctrine:dbal>
 
     <doctrine:orm
-            metadata_cache_driver="apc"
-            default_entity_manager="dm2"
-            default_connection="conn1"
-            proxy_namespace="Proxies"
-            auto_generate_proxy_classes="true"
+            metadata-cache-driver="apc"
+            default-entity-manager="dm2"
+            default-connection="conn1"
+            proxy-namespace="Proxies"
+            auto-generate-proxy-classes="true"
         >
-        <doctrine:entity_managers>
-            <doctrine:entity_manager id="dm1" metadata_cache_driver="xcache" connection="conn1" />
-            <doctrine:entity_manager id="dm2" connection="conn2" />
-        </doctrine:entity_managers>
+        <doctrine:entity-managers>
+            <doctrine:entity-manager id="dm1" metadata-cache-driver="xcache" connection="conn1" />
+            <doctrine:entity-manager id="dm2" connection="conn2" />
+        </doctrine:entity-managers>
     </doctrine:orm>
 </container>

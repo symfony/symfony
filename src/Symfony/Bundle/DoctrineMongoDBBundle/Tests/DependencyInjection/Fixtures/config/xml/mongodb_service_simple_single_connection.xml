@@ -7,12 +7,12 @@
                         http://www.symfony-project.org/schema/dic/doctrine/odm/mongodb http://www.symfony-project.org/schema/dic/doctrine/odm/mongodb/mongodb-1.0.xsd">
 
     <doctrine:mongodb server="mongodb://localhost:27017" default_database="mydb">
-        <metadata_cache_driver type="memcache">
+        <metadata-cache-driver type="memcache">
             <class>Doctrine\Common\Cache\MemcacheCache</class>
             <host>localhost</host>
             <port>11211</port>
-            <instance_class>Memcache</instance_class>
-        </metadata_cache_driver>
+            <instance-class>Memcache</instance-class>
+        </metadata-cache-driver>
         <options>
             <connect>true</connect>
         </options>

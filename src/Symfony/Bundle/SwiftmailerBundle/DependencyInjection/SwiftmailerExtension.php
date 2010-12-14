@@ -28,7 +28,7 @@ class SwiftMailerExtension extends Extension
      *
      * Usage example:
      *
-     *      <swiftmailer:config transport="gmail" delivery_strategy="spool">
+     *      <swiftmailer:config transport="gmail">
      *        <swiftmailer:username>fabien</swift:username>
      *        <swiftmailer:password>xxxxx</swift:password>
      *        <swiftmailer:spool path="/path/to/spool/" />
@@ -91,9 +91,17 @@ class SwiftMailerExtension extends Extension
             }
         }
 
+        if (array_key_exists('delivery-address', $config)) {
+            $config['delivery-address'] = $config['delivery_address'];
+        }
+
         if (isset($config['delivery_address'])) {
             $container->setParameter('swiftmailer.single_address', $config['delivery_address']);
             $container->findDefinition('swiftmailer.transport')->addMethodCall('registerPlugin', array(new Reference('swiftmailer.plugin.redirecting')));
+        }
+
+        if (array_key_exists('disable-delivery', $config)) {
+            $config['disable_delivery'] = $config['disable-delivery'];
         }
 
         if (isset($config['disable_delivery']) && $config['disable_delivery']) {

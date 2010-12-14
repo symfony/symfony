@@ -12,7 +12,7 @@
     </imports>
 
     <doctrine:orm
-        auto_generate_proxy_classes="true"
+        auto-generate-proxy-classes="true"
     >
     </doctrine:orm>
 </container>

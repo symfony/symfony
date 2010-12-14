@@ -9,11 +9,11 @@
 
     <doctrine:dbal />
     <doctrine:orm>
-        <metadata_cache_driver type="memcache">
+        <metadata-cache-driver type="memcache">
             <class>Doctrine\Common\Cache\MemcacheCache</class>
             <host>localhost</host>
             <port>11211</port>
-            <instance_class>Memcache</instance_class>
-        </metadata_cache_driver>
+            <instance-class>Memcache</instance-class>
+        </metadata-cache-driver>
     </doctrine:orm>
 </container>

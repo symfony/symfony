@@ -80,6 +80,11 @@ class DoctrineMongoDBExtension extends Extension
             if (isset($config[$key])) {
                 $container->setParameter('doctrine.odm.mongodb.'.$key, $config[$key]);
             }
+
+            $nKey = str_replace('_', '-', $key);
+            if (isset($config[$nKey])) {
+                $container->setParameter('doctrine.odm.mongodb.'.$key, $config[$nKey]);
+            }
         }
         $container->setParameter('doctrine.odm.mongodb.mapping_dirs', $this->findBundleSubpaths('Resources/config/doctrine/metadata/mongodb', $container));
         $container->setParameter('doctrine.odm.mongodb.document_dirs', $this->findBundleSubpaths('Document', $container));
@@ -182,8 +187,18 @@ class DoctrineMongoDBExtension extends Extension
         $defaultDocumentManager = $container->getParameter('doctrine.odm.mongodb.default_document_manager');
 
         $documentManagers = array();
+
+        if (isset($config['document-managers'])) {
+            $config['document_managers'] = $config['document-managers'];
+        }
+
         if (isset($config['document_managers'])) {
             $configDocumentManagers = $config['document_managers'];
+
+            if (isset($config['document_managers']['document-manager'])) {
+                $config['document_managers']['document_manager'] = $config['document_managers']['document-manager'];
+            }
+
             if (isset($config['document_managers']['document_manager']) && isset($config['document_managers']['document_manager'][0])) {
                 // Multiple document managers
                 $configDocumentManagers = $config['document_managers']['document_manager'];
@@ -250,7 +265,7 @@ class DoctrineMongoDBExtension extends Extension
     protected function loadDocumentManagerMetadataCacheDriver(array $documentManager, ContainerBuilder $container)
     {
         $metadataCacheDriver = $container->getParameter('doctrine.odm.mongodb.metadata_cache_driver');
-        $dmMetadataCacheDriver = isset($documentManager['metadata_cache_driver']) ? $documentManager['metadata_cache_driver'] : $metadataCacheDriver;
+        $dmMetadataCacheDriver = isset($documentManager['metadata-cache-driver']) ? $documentManager['metadata-cache-driver'] : (isset($documentManager['metadata_cache_driver']) ? $documentManager['metadata_cache_driver'] : $metadataCacheDriver);
         $type = is_array($dmMetadataCacheDriver) && isset($dmMetadataCacheDriver['type']) ? $dmMetadataCacheDriver['type'] : $dmMetadataCacheDriver;
 
         if ($type === 'memcache') {
@@ -258,7 +273,7 @@ class DoctrineMongoDBExtension extends Extension
             $cacheDef = new Definition($memcacheClass);
             $memcacheHost = isset($dmMetadataCacheDriver['host']) ? $dmMetadataCacheDriver['host'] : '%doctrine.odm.mongodb.cache.memcache_host%';
             $memcachePort = isset($dmMetadataCacheDriver['port']) ? $dmMetadataCacheDriver['port'] : '%doctrine.odm.mongodb.cache.memcache_port%';
-            $memcacheInstanceClass = isset($dmMetadataCacheDriver['instance_class']) ? $dmMetadataCacheDriver['instance_class'] : '%doctrine.odm.mongodb.cache.memcache_instance_class%';
+            $memcacheInstanceClass = isset($dmMetadataCacheDriver['instance-class']) ? $dmMetadataCacheDriver['instance-class'] : (isset($dmMetadataCacheDriver['instance_class']) ? $dmMetadataCacheDriver['instance_class'] : '%doctrine.odm.mongodb.cache.memcache_instance_class%');
             $memcacheInstance = new Definition($memcacheInstanceClass);
             $memcacheInstance->addMethodCall('connect', array($memcacheHost, $memcachePort));
             $container->setDefinition(sprintf('doctrine.odm.mongodb.%s_memcache_instance', $documentManager['name']), $memcacheInstance);

@@ -72,7 +72,7 @@ class DoctrineExtension extends Extension
             $loader->load('dbal.xml');
         }
 
-        $defaultConnectionName = isset($config['default_connection']) ? $config['default_connection'] : $container->getParameter('doctrine.dbal.default_connection');
+        $defaultConnectionName = isset($config['default-connection']) ? $config['default-connection'] : (isset($config['default_connection']) ? $config['default_connection'] : $container->getParameter('doctrine.dbal.default_connection'));
         $container->setAlias('database_connection', sprintf('doctrine.dbal.%s_connection', $defaultConnectionName));
         $container->setParameter('doctrine.dbal.default_connection', $defaultConnectionName);
     }
@@ -106,12 +106,12 @@ class DoctrineExtension extends Extension
             $arguments = $driverDef->getArguments();
             $driverOptions = $arguments[0];
         } else {
-            $containerClass = isset($connection['configuration_class']) ? $connection['configuration_class'] : 'Doctrine\DBAL\Configuration';
+            $containerClass = isset($connection['configuration-class']) ? $connection['configuration-class'] : (isset($connection['configuration_class']) ? $connection['configuration_class'] : 'Doctrine\DBAL\Configuration');
             $containerDef = new Definition($containerClass);
             $containerDef->addMethodCall('setSqlLogger', array(new Reference('doctrine.dbal.logger')));
             $container->setDefinition(sprintf('doctrine.dbal.%s_connection.configuration', $connection['name']), $containerDef);
 
-            $eventManagerDef = new Definition($connection['event_manager_class']);
+            $eventManagerDef = new Definition(isset($connection['event-manager-class']) ? $connection['event-manager-class'] : $connection['event_manager_class']);
             $container->setDefinition(sprintf('doctrine.dbal.%s_connection.event_manager', $connection['name']), $eventManagerDef);
 
             $driverOptions = array();
@@ -123,6 +123,9 @@ class DoctrineExtension extends Extension
         if (isset($connection['driver'])) {
             $driverOptions['driverClass'] = sprintf('Doctrine\\DBAL\\Driver\\%s\\Driver', $connection['driver']);
         }
+        if (isset($connection['wrapper-class'])) {
+            $driverOptions['wrapperClass'] = $connection['wrapper-class'];
+        }
         if (isset($connection['wrapper_class'])) {
             $driverOptions['wrapperClass'] = $connection['wrapper_class'];
         }
@@ -132,6 +135,11 @@ class DoctrineExtension extends Extension
         foreach (array('dbname', 'host', 'user', 'password', 'path', 'memory', 'port', 'unix_socket', 'charset') as $key) {
             if (isset($connection[$key])) {
                 $driverOptions[$key] = $connection[$key];
+            }
+
+            $nKey = str_replace('_', '-', $key);
+            if (isset($connection[$nKey])) {
+                $driverOptions[$key] = $connection[$nKey];
             }
         }
 
@@ -222,6 +230,11 @@ class DoctrineExtension extends Extension
             if (isset($config[$key])) {
                 $container->setParameter('doctrine.orm.'.$key, $config[$key]);
             }
+
+            $nKey = str_replace('_', '-', $key);
+            if (isset($config[$nKey])) {
+                $container->setParameter('doctrine.orm.'.$key, $config[$nKey]);
+            }
         }
         $container->setParameter('doctrine.orm.metadata_driver.mapping_dirs', $this->findBundleSubpaths('Resources/config/doctrine/metadata/orm', $container));
         $container->setParameter('doctrine.orm.metadata_driver.entity_dirs', $this->findBundleSubpaths('Entity', $container));
@@ -298,8 +311,16 @@ class DoctrineExtension extends Extension
     {
         $defaultEntityManager = $container->getParameter('doctrine.orm.default_entity_manager');
         $entityManagers = array();
+        if (isset($config['entity-managers'])) {
+            $config['entity_managers'] = $config['entity-managers'];
+        }
+
         if (isset($config['entity_managers'])) {
             $configEntityManagers = $config['entity_managers'];
+            if (isset($config['entity_managers']['entity-manager'])) {
+                $config['entity_managers']['entity_manager'] = $config['entity_managers']['entity-manager'];
+            }
+
             if (isset($config['entity_managers']['entity_manager']) && isset($config['entity_managers']['entity_manager'][0])) {
                 // Multiple entity managers
                 $configEntityManagers = $config['entity_managers']['entity_manager'];
@@ -379,7 +400,7 @@ class DoctrineExtension extends Extension
     protected function loadOrmEntityManagerMetadataCacheDriver(array $entityManager, ContainerBuilder $container)
     {
         $cacheDriver = $container->getParameter('doctrine.orm.metadata_cache_driver');
-        $cacheDriver = isset($entityManager['metadata_cache_driver']) ? $entityManager['metadata_cache_driver'] : $cacheDriver;
+        $cacheDriver = isset($entityManager['metadata-cache-driver']) ? $entityManager['metadata-cache-driver'] : (isset($entityManager['metadata_cache_driver']) ? $entityManager['metadata_cache_driver'] : $cacheDriver);
         $cacheDef = $this->getEntityManagerCacheDefinition($entityManager, $cacheDriver, $container);
         $container->setDefinition(sprintf('doctrine.orm.%s_metadata_cache', $entityManager['name']), $cacheDef);
     }
@@ -393,7 +414,7 @@ class DoctrineExtension extends Extension
     protected function loadOrmEntityManagerQueryCacheDriver(array $entityManager, ContainerBuilder $container)
     {
         $cacheDriver = $container->getParameter('doctrine.orm.query_cache_driver');
-        $cacheDriver = isset($entityManager['query_cache_driver']) ? $entityManager['query_cache_driver'] : $cacheDriver;
+        $cacheDriver = isset($entityManager['query-cache-driver']) ? $entityManager['query-cache-driver'] : (isset($entityManager['query_cache_driver']) ? $entityManager['query_cache_driver'] : $cacheDriver);
         $cacheDef = $this->getEntityManagerCacheDefinition($entityManager, $cacheDriver, $container);
         $container->setDefinition(sprintf('doctrine.orm.%s_query_cache', $entityManager['name']), $cacheDef);
     }
@@ -407,7 +428,7 @@ class DoctrineExtension extends Extension
     protected function loadOrmEntityManagerResultCacheDriver(array $entityManager, ContainerBuilder $container)
     {
         $cacheDriver = $container->getParameter('doctrine.orm.result_cache_driver');
-        $cacheDriver = isset($entityManager['result_cache_driver']) ? $entityManager['result_cache_driver'] : $cacheDriver;
+        $cacheDriver = isset($entityManager['result-cache-driver']) ? $entityManager['result-cache-driver'] : (isset($entityManager['result_cache_driver']) ? $entityManager['result_cache_driver'] : $cacheDriver);
         $cacheDef = $this->getEntityManagerCacheDefinition($entityManager, $cacheDriver, $container);
         $container->setDefinition(sprintf('doctrine.orm.%s_result_cache', $entityManager['name']), $cacheDef);
     }
@@ -428,7 +449,7 @@ class DoctrineExtension extends Extension
             $cacheDef = new Definition($memcacheClass);
             $memcacheHost = is_array($cacheDriver) && isset($cacheDriver['host']) ? $cacheDriver['host'] : '%doctrine.orm.cache.memcache_host%';
             $memcachePort = is_array($cacheDriver) && isset($cacheDriver['port']) ? $cacheDriver['port'] : '%doctrine.orm.cache.memcache_port%';
-            $memcacheInstanceClass = is_array($cacheDriver) && isset($cacheDriver['instance_class']) ? $cacheDriver['instance_class'] : '%doctrine.orm.cache.memcache_instance_class%';
+            $memcacheInstanceClass = is_array($cacheDriver) && isset($cacheDriver['instance-class']) ? $cacheDriver['instance-class'] : (is_array($cacheDriver) && isset($cacheDriver['instance_class']) ? $cacheDriver['instance_class'] : '%doctrine.orm.cache.memcache_instance_class%');
             $memcacheInstance = new Definition($memcacheInstanceClass);
             $memcacheInstance->addMethodCall('connect', array($memcacheHost, $memcachePort));
             $container->setDefinition(sprintf('doctrine.orm.%s_memcache_instance', $entityManager['name']), $memcacheInstance);

@@ -160,8 +160,16 @@ class FrameworkExtension extends Extension
             }
         }
 
+        if (array_key_exists('assets-version', $config)) {
+            $container->setParameter('templating.assets.version', $config['assets-version']);
+        }
+
         if (array_key_exists('assets_version', $config)) {
             $container->setParameter('templating.assets.version', $config['assets_version']);
+        }
+
+        if (array_key_exists('assets-base-urls', $config)) {
+            $container->setParameter('templating.assets.base_urls', $config['assets-base-urls']);
         }
 
         if (array_key_exists('assets_base_urls', $config)) {
@@ -324,6 +332,10 @@ class FrameworkExtension extends Extension
             $container->setParameter('session.class', $config['class']);
         }
 
+        if (isset($config['storage-id'])) {
+            $config['storage_id'] = $config['storage-id'];
+        }
+
         if (isset($config['storage_id'])) {
             $container->setAlias('session.storage', 'session.storage.'.$config['storage_id']);
         } else {
@@ -331,9 +343,14 @@ class FrameworkExtension extends Extension
         }
 
         $options = $container->getParameter('session.storage.'.strtolower($config['storage_id']).'.options');
-        foreach (array('name', 'lifetime', 'path', 'domain', 'secure', 'httponly', 'cache_limiter', 'cache-limiter', 'pdo.db_table') as $name) {
+        foreach (array('name', 'lifetime', 'path', 'domain', 'secure', 'httponly', 'cache_limiter', 'pdo.db_table') as $name) {
             if (isset($config[$name])) {
                 $options[$name] = $config[$name];
+            }
+
+            $nName = str_replace('_', '-', $name);
+            if (isset($config[$nName])) {
+                $options[$name] = $config[$nName];
             }
         }
         $container->setParameter('session.storage.'.strtolower($config['storage_id']).'.options', $options);

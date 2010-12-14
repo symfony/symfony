@@ -2,10 +2,14 @@
 
 namespace Symfony\Component\DependencyInjection;
 
+use Symfony\Component\DependencyInjection\Compiler\ResolveInterfaceInjectorsPass;
+use Symfony\Component\DependencyInjection\Compiler\MergeExtensionConfigurationPass;
+use Symfony\Component\DependencyInjection\Compiler\CompilerPassInterface;
 use Symfony\Component\DependencyInjection\Extension\ExtensionInterface;
-use Symfony\Component\DependencyInjection\Resource\ResourceInterface;
-use Symfony\Component\DependencyInjection\Resource\FileResource;
 use Symfony\Component\DependencyInjection\InterfaceInjector;
+use Symfony\Component\DependencyInjection\ParameterBag\ParameterBagInterface;
+use Symfony\Component\DependencyInjection\Resource\FileResource;
+use Symfony\Component\DependencyInjection\Resource\ResourceInterface;
 
 /*
  * This file is part of the Symfony framework.
@@ -31,6 +35,21 @@ class ContainerBuilder extends Container implements TaggedContainerInterface
     protected $resources        = array();
     protected $extensionConfigs = array();
     protected $injectors        = array();
+    protected $compilerPasses;
+
+    /**
+     * Constructor
+     * @param ParameterBagInterface $parameterBag
+     */
+    public function __construct(ParameterBagInterface $parameterBag = null)
+    {
+        parent::__construct($parameterBag);
+
+        $passes = array();
+        $passes[] = new MergeExtensionConfigurationPass();
+        $passes[] = new ResolveInterfaceInjectorsPass();
+        $this->compilerPasses = $passes;
+    }
 
     /**
      * Registers an extension.
@@ -125,6 +144,38 @@ class ContainerBuilder extends Container implements TaggedContainerInterface
         $this->extensionConfigs[$namespace.':'.$tag][] = $this->getParameterBag()->resolveValue($values);
 
         return $this;
+    }
+
+    /**
+     * Adds a compiler pass at the end of the current passes
+     *
+     * @param CompilerPassInterface $pass
+     * @return void
+     */
+    public function addCompilerPass(CompilerPassInterface $pass)
+    {
+        $this->compilerPasses[] = $pass;
+    }
+
+    /**
+     * Returns the currently registered compiler passes
+     *
+     * @return array
+     */
+    public function getCompilerPasses()
+    {
+        return $this->compilerPasses;
+    }
+
+    /**
+     * Overwrites all existing passes
+     *
+     * @param array $passes
+     * @return void
+     */
+    public function setCompilerPasses(array $passes)
+    {
+        $this->compilerPasses = $passes;
     }
 
     /**
@@ -268,6 +319,17 @@ class ContainerBuilder extends Container implements TaggedContainerInterface
     }
 
     /**
+     * Sets the extension configs array
+     *
+     * @param array $config
+     * @return void
+     */
+    public function setExtensionConfigs(array $config)
+    {
+        $this->extensionConfigs = $config;
+    }
+
+    /**
      * Freezes the container.
      *
      * This method does four things:
@@ -279,40 +341,8 @@ class ContainerBuilder extends Container implements TaggedContainerInterface
      */
     public function freeze()
     {
-        $parameters = $this->parameterBag->all();
-        $definitions = $this->definitions;
-        $aliases = $this->aliases;
-
-        foreach ($this->extensionConfigs as $name => $configs) {
-            list($namespace, $tag) = explode(':', $name);
-
-            $extension = $this->getExtension($namespace);
-
-            $container = new self($this->parameterBag);
-            $container->addObjectResource($extension);
-            foreach ($configs as $config) {
-                $extension->load($tag, $config, $container);
-            }
-
-            $this->merge($container);
-        }
-
-        $this->extensionConfigs = array();
-        $this->addDefinitions($definitions);
-        $this->addAliases($aliases);
-        $this->parameterBag->add($parameters);
-
-        foreach ($this->definitions as $definition) {
-            foreach ($this->injectors as $injector) {
-                if (null !== $definition->getFactoryService()) {
-                    continue;
-                }
-                $defClass = $this->parameterBag->resolveValue($definition->getClass());
-                $definition->setClass($defClass);
-                if ($injector->supports($defClass)) {
-                    $injector->processDefinition($definition);
-                }
-            }
+        foreach ($this->compilerPasses as $pass) {
+            $pass->process($this);
         }
 
         parent::freeze();

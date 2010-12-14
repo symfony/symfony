@@ -16,7 +16,7 @@ use Symfony\Component\DependencyInjection\Exception\InvalidArgumentException;
 /**
  * InterfaceInjector is used for Interface Injection.
  *
- * @author     Bulat Shakirzyanov <mallluhuct@gmail.com>
+ * @author Bulat Shakirzyanov <mallluhuct@gmail.com>
  */
 class InterfaceInjector
 {

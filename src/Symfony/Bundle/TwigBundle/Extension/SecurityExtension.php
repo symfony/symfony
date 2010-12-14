@@ -27,10 +27,18 @@ class SecurityExtension extends \Twig_Extension
         $this->context = $context;
     }
 
-    public function vote($role, $object = null)
+    public function vote($role, $object = null, $field = null)
     {
         if (null === $this->context) {
             return false;
+        }
+        
+        if ($field !== null) {
+            if (null === $object) {
+                throw new \InvalidArgumentException('$object cannot be null when field is not null.');
+            }
+            
+            $object = new FieldVote($object, $field);
         }
 
         return $this->context->vote($role, $object);

@@ -1,0 +1,76 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<container xmlns="http://www.symfony-project.org/schema/dic/services"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xsi:schemaLocation="http://www.symfony-project.org/schema/dic/services http://www.symfony-project.org/schema/dic/services/services-1.0.xsd">
+
+    <parameters>
+        <parameter key="security.acl.dbal.class_table_name">acl_classes</parameter>
+        <parameter key="security.acl.dbal.entry_table_name">acl_entries</parameter>
+        <parameter key="security.acl.dbal.oid_table_name">acl_object_identities</parameter>
+        <parameter key="security.acl.dbal.oid_ancestors_table_name">acl_object_identity_ancestors</parameter>
+        <parameter key="security.acl.dbal.sid_table_name">acl_security_identities</parameter>
+        <parameter key="security.acl.dbal.provider.class">Symfony\Component\Security\Acl\Dbal\MutableAclProvider</parameter>
+        
+        <parameter key="security.acl.permission_granting_strategy.class">Symfony\Component\Security\Acl\Domain\PermissionGrantingStrategy</parameter>
+        
+        <parameter key="security.acl.voter.class">Symfony\Component\Security\Acl\Voter\AclVoter</parameter>
+        <parameter key="security.acl.permission.map.class">Symfony\Component\Security\Acl\Permission\BasicPermissionMap</parameter>
+        
+        <parameter key="security.acl.object_identity_retrieval_strategy.class">Symfony\Component\Security\Acl\Domain\ObjectIdentityRetrievalStrategy</parameter>
+        <parameter key="security.acl.security_identity_retrieval_strategy.class">Symfony\Component\Security\Acl\Domain\SecurityIdentityRetrievalStrategy</parameter>
+        
+        <parameter key="security.acl.cache.doctrine.class">Symfony\Component\Security\Acl\Domain\DoctrineAclCache</parameter>
+        <parameter key="security.acl.cache.doctrine.prefix">sf2_acl_</parameter>
+    </parameters>
+
+    <services>
+        <service id="security.acl.dbal.connection" alias="doctrine.dbal.default_connection" />
+    
+        <service id="security.acl.object_identity_retrieval_strategy" class="%security.acl.object_identity_retrieval_strategy.class%"></service>
+        
+        <service id="security.acl.security_identity_retrieval_strategy" class="%security.acl.security_identity_retrieval_strategy.class%">
+            <argument type="service" id="security.role_hierarchy" />
+            <argument type="service" id="security.authentication.trust_resolver" />
+        </service>
+    
+        <service id="security.acl.dbal.provider" class="%security.acl.dbal.provider.class%">
+            <argument type="service" id="security.acl.dbal.connection" />
+            <argument type="service" id="security.acl.permission_granting_strategy" />
+            <argument type="collection">
+                <argument key="class_table_name">%security.acl.dbal.class_table_name%</argument>
+                <argument key="entry_table_name">%security.acl.dbal.entry_table_name%</argument>
+                <argument key="oid_table_name">%security.acl.dbal.oid_table_name%</argument>
+                <argument key="oid_ancestors_table_name">%security.acl.dbal.oid_ancestors_table_name%</argument>
+                <argument key="sid_table_name">%security.acl.dbal.sid_table_name%</argument>
+            </argument>
+            <argument type="service" id="security.acl.cache" on-invalid="null" />
+        </service>
+
+        <service id="security.acl.provider" alias="security.acl.dbal.provider" />
+        
+        <service id="security.acl.permission_granting_strategy" class="%security.acl.permission_granting_strategy.class%">
+            <call method="setAuditLogger">
+                <argument type="service" id="security.acl.audit_logger" on-invalid="ignore" />
+            </call>
+        </service>
+        
+        <service id="security.acl.cache.doctrine" class="%security.acl.cache.doctrine.class%">
+            <argument type="service" id="security.acl.cache.doctrine_cache_impl" />
+            <argument type="service" id="security.acl.permission_granting_strategy" />        
+            <argument>%security.acl.cache.doctrine.prefix%</argument>
+        </service>
+        
+        <service id="security.acl.cache.doctrine.cache_impl" alias="doctrine.orm.default_result_cache" />
+        
+        <service id="security.acl.permission.map" class="%security.acl.permission.map.class%"></service>
+        
+        <service id="security.acl.voter.basic_permissions" class="%security.acl.voter.class%">
+            <argument type="service" id="security.acl.provider" />
+            <argument type="service" id="security.acl.object_identity_retrieval_strategy" />
+            <argument type="service" id="security.acl.security_identity_retrieval_strategy" />
+            <argument type="service" id="security.acl.permission.map" />
+            <tag name="security.voter" />
+        </service>
+    </services>
+</container>

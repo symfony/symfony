@@ -2,6 +2,7 @@
 
 namespace Symfony\Bundle\FrameworkBundle\DependencyInjection;
 
+use Symfony\Component\DependencyInjection\Parameter;
 use Symfony\Component\DependencyInjection\Extension\Extension;
 use Symfony\Component\DependencyInjection\Loader\XmlFileLoader;
 use Symfony\Component\DependencyInjection\Resource\FileResource;
@@ -486,6 +487,25 @@ class SecurityExtension extends Extension
         }
 
         return $switchUserListenerId;
+    }
+    
+    public function aclLoad(array $config, ContainerBuilder $container)
+    {
+        if (!$container->hasDefinition('security.acl')) {
+            $loader = new XmlFileLoader($container, array(__DIR__.'/../Resources/config', __DIR__.'/Resources/config'));
+            $loader->load('security_acl.xml');
+        }
+        
+        if (isset($config['connection'])) {
+            $container->setAlias(sprintf('doctrine.dbal.%s_connection', $config['connection']), 'security.acl.dbal.connection');
+        }
+        
+        if (isset($config['cache'])) {
+            $container->setAlias('security.acl.cache', sprintf('security.acl.cache.%s', $config['cache']));
+        } else {
+            $container->remove('security.acl.cache.doctrine');
+            $container->removeAlias('security.acl.cache.doctrine.cache_impl');
+        }
     }
 
     /**

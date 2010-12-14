@@ -38,6 +38,9 @@
 
         <!-- security/user -->
         <parameter key="security.user.provider.entity.class">Symfony\Bundle\DoctrineBundle\Security\EntityUserProvider</parameter>
+        
+        <!--  security/acl -->
+        <parameter key="security.acl.collection_cache.class">Symfony\Bundle\DoctrineBundle\Security\AclCollectionCache</parameter>
     </parameters>
 
     <services>

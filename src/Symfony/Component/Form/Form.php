@@ -12,6 +12,7 @@ namespace Symfony\Component\Form;
  */
 
 use Symfony\Component\Validator\ValidatorInterface;
+use Symfony\Component\Form\Exception\FormException;
 
 /**
  * Form represents a form.
@@ -43,11 +44,14 @@ class Form extends FieldGroup
      * @param ValidatorInterface $validator
      * @param array $options
      */
-    public function __construct($name, $data, ValidatorInterface $validator, array $options = array())
+    public function __construct($name, $data = null, ValidatorInterface $validator = null, array $options = array())
     {
         $this->validator = $validator;
 
-        $this->setData($data);
+        // Prefill the form with the given data
+        if ($data !== null) {
+            $this->setData($data);
+        }
 
         if (FormConfiguration::isDefaultCsrfProtectionEnabled()) {
             $this->enableCsrfProtection();
@@ -58,6 +62,12 @@ class Form extends FieldGroup
         }
 
         parent::__construct($name, $options);
+
+        // If data is passed to this constructor, objects from parent forms
+        // should be ignored
+        if ($data !== null) {
+            $this->setPropertyPath(null);
+        }
     }
 
     /**
@@ -109,6 +119,10 @@ class Form extends FieldGroup
         $this->doBind(self::deepArrayUnion($taintedValues, $taintedFiles));
 
         if ($this->getParent() === null) {
+            if ($this->validator === null) {
+                throw new FormException('A validator is required for binding. Forgot to pass it to the constructor of the form?');
+            }
+
             if ($violations = $this->validator->validate($this, $this->getValidationGroups())) {
                 // TODO: test me
                 foreach ($violations as $violation) {

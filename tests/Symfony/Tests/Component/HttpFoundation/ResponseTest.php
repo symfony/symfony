@@ -136,6 +136,28 @@ class ResponseTest extends \PHPUnit_Framework_TestCase
         $this->assertEquals(array('Accept-Language', 'User-Agent', 'X-Foo'), $response->getVary(), '->getVary() parses multiple header name values separated by commas');
     }
 
+    public function testDefaultContentType()
+    {
+        $headerMock = $this->getMock('Symfony\Component\HttpFoundation\ResponseHeaderBag', array('set'));
+        $headerMock->expects($this->at(0))
+            ->method('set')
+            ->with('Content-Type', 'text/html; charset=UTF-8');
+        $headerMock->expects($this->at(1))
+            ->method('set')
+            ->with('Content-Type', 'text/html; charset=Foo');
+
+        $response = new Response();
+        $response->headers = $headerMock;
+
+        // verify first set()
+        $response->sendHeaders();
+
+        $response->headers->remove('Content-Type');
+        $response->setCharset('Foo');
+        // verify second set()
+        $response->__toString();
+    }
+
     protected function createDateTimeOneHourAgo()
     {
         $date = new \DateTime();

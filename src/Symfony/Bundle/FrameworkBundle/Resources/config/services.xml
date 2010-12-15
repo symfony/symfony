@@ -35,6 +35,10 @@
         -->
         <service id="request" factory-service="http_kernel" factory-method="getRequest" shared="false" />
 
-        <service id="response" class="%response.class%" shared="false" />
+        <service id="response" class="%response.class%" shared="false">
+            <call method="setCharset">
+                <argument>%kernel.charset%</argument>
+            </call>
+        </service>
     </services>
 </container>

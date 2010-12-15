@@ -27,6 +27,7 @@ class Response
     protected $version;
     protected $statusCode;
     protected $statusText;
+    protected $charset = 'UTF-8';
 
     static public $statusTexts = array(
         100 => 'Continue',
@@ -96,7 +97,7 @@ class Response
         $content = '';
 
         if (!$this->headers->has('Content-Type')) {
-            $this->headers->set('Content-Type', 'text/html');
+            $this->headers->set('Content-Type', 'text/html; charset='.$this->charset);
         }
 
         // status
@@ -128,7 +129,7 @@ class Response
     public function sendHeaders()
     {
         if (!$this->headers->has('Content-Type')) {
-            $this->headers->set('Content-Type', 'text/html');
+            $this->headers->set('Content-Type', 'text/html; charset='.$this->charset);
         }
 
         // status
@@ -225,6 +226,26 @@ class Response
     public function getStatusCode()
     {
         return $this->statusCode;
+    }
+
+    /**
+     * Sets response charset.
+     *
+     * @param string $charset Character set
+     */
+    public function setCharset($charset)
+    {
+        $this->charset = $charset;
+    }
+
+    /**
+     * Retrieves the response charset.
+     *
+     * @return string Character set
+     */
+    public function getCharset()
+    {
+        return $this->charset;
     }
 
     /**

@@ -18,7 +18,7 @@ use Symfony\Component\I18N\TranslatorInterface;
  *
  * @author     Bernhard Schussek <bernhard.schussek@symfony-project.com>
  */
-interface FieldInterface extends Localizable
+interface FieldInterface
 {
     /**
      * Marks a constraint violation in a form field

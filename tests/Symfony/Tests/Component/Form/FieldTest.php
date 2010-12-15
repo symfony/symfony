@@ -10,6 +10,7 @@ require_once __DIR__ . '/Fixtures/RequiredOptionsField.php';
 use Symfony\Component\Form\ValueTransformer\ValueTransformerInterface;
 use Symfony\Component\Form\PropertyPath;
 use Symfony\Component\Form\FieldError;
+use Symfony\Component\Form\FormConfiguration;
 use Symfony\Tests\Component\Form\Fixtures\Author;
 use Symfony\Tests\Component\Form\Fixtures\TestField;
 use Symfony\Tests\Component\Form\Fixtures\InvalidField;
@@ -134,28 +135,18 @@ class FieldTest extends \PHPUnit_Framework_TestCase
         $this->assertEquals('news_article_title', $this->field->getId());
     }
 
-//    public function testLocaleIsPassedToLocalizableValueTransformer_setLocaleCalledBefore()
-//    {
-//        $transformer = $this->getMock('Symfony\Component\Form\ValueTransformer\ValueTransformerInterface');
-//        $transformer->expects($this->once())
-//                         ->method('setLocale')
-//                         ->with($this->equalTo('de_DE'));
-//
-//        $this->field->setLocale('de_DE');
-//        $this->field->setValueTransformer($transformer);
-//    }
-
-    public function testLocaleIsPassedToValueTransformer_setLocaleCalledAfter()
+    public function testLocaleIsPassedToValueTransformer()
     {
+        FormConfiguration::setDefaultLocale('de_DE');
+
         $transformer = $this->getMock('Symfony\Component\Form\ValueTransformer\ValueTransformerInterface');
-        $transformer->expects($this->exactly(2))
-                         ->method('setLocale'); // we can't test the params cause they differ :(
+        $transformer->expects($this->exactly(1))
+                         ->method('setLocale')
+                         ->with($this->equalTo('de_DE'));
 
         $field = new TestField('title', array(
             'value_transformer' => $transformer,
         ));
-
-        $field->setLocale('de_DE');
     }
 
     public function testIsRequiredReturnsOwnValueIfNoParent()

@@ -171,22 +171,6 @@ class FormTest extends \PHPUnit_Framework_TestCase
         $this->assertFalse($this->form->isCsrfTokenValid());
     }
 
-    public function testDefaultLocaleCanBeSet()
-    {
-        FormConfiguration::setDefaultLocale('de-DE-1996');
-        $form = new Form('author', new Author(), $this->validator);
-
-        $field = $this->getMock('Symfony\Component\Form\Field', array(), array(), '', false, false);
-        $field->expects($this->any())
-                    ->method('getKey')
-                    ->will($this->returnValue('firstName'));
-        $field->expects($this->once())
-                    ->method('setLocale')
-                    ->with($this->equalTo('de-DE-1996'));
-
-        $form->add($field);
-    }
-
     public function testValidationGroupsCanBeSet()
     {
         $form = new Form('author', new Author(), $this->validator);

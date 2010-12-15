@@ -92,7 +92,6 @@ class FieldGroup extends Field implements \IteratorAggregate, FieldGroupInterfac
         $this->fields[$field->getKey()] = $field;
 
         $field->setParent($this);
-        $field->setLocale($this->locale);
 
         $data = $this->getTransformedData();
 
@@ -513,19 +512,5 @@ class FieldGroup extends Field implements \IteratorAggregate, FieldGroupInterfac
     public function count()
     {
         return count($this->fields);
-    }
-
-    /**
-     * Sets the locale of this field.
-     *
-     * @see Localizable
-     */
-    public function setLocale($locale)
-    {
-        parent::setLocale($locale);
-
-        foreach ($this->fields as $field) {
-            $field->setLocale($locale);
-        }
     }
 }

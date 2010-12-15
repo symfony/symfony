@@ -16,17 +16,6 @@ use Symfony\Tests\Component\Form\Fixtures\TestField;
 use Symfony\Tests\Component\Form\Fixtures\TestFieldGroup;
 
 
-abstract class FieldGroupTest_Field extends TestField
-{
-    public $locales = array();
-
-    public function setLocale($locale)
-    {
-        $this->locales[] = $locale;
-    }
-}
-
-
 class FieldGroupTest extends \PHPUnit_Framework_TestCase
 {
     public function testSupportsArrayAccess()
@@ -564,43 +553,6 @@ class FieldGroupTest extends \PHPUnit_Framework_TestCase
         $group->add($this->createNonMultipartMockField('lastName'));
 
         $this->assertFalse($group->isMultipart());
-    }
-
-    public function testLocaleIsPassedToField_SetBeforeAddingTheField()
-    {
-        $field = $this->getMock('Symfony\Component\Form\Field', array(), array(), '', false, false);
-        $field->expects($this->any())
-                    ->method('getKey')
-                    ->will($this->returnValue('firstName'));
-        $field->expects($this->once())
-                    ->method('setLocale')
-                    ->with($this->equalTo('de_DE'));
-
-        $group = new TestFieldGroup('author');
-        $group->setLocale('de_DE');
-        $group->add($field);
-    }
-
-    public function testLocaleIsPassedToField_SetAfterAddingTheField()
-    {
-        $field = $this->getMockForAbstractClass(__NAMESPACE__ . '\FieldGroupTest_Field', array(), '', false, false);
-        $field->expects($this->any())
-                    ->method('getKey')
-                    ->will($this->returnValue('firstName'));
-// DOESN'T WORK!
-//    $field = $this->getMock(__NAMESPACE__ . '\Fixtures\Field', array(), array(), '', false, false);
-//    $field->expects($this->once())
-//          ->method('setLocale')
-//          ->with($this->equalTo('de_AT'));
-//    $field->expects($this->once())
-//          ->method('setLocale')
-//          ->with($this->equalTo('de_DE'));
-
-        $group = new TestFieldGroup('author');
-        $group->add($field);
-        $group->setLocale('de_DE');
-
-        $this->assertEquals(array(class_exists('\Locale', false) ? \Locale::getDefault() : 'en', 'de_DE'), $field->locales);
     }
 
     public function testSupportsClone()

@@ -57,10 +57,6 @@ class Form extends FieldGroup
             $this->enableCsrfProtection();
         }
 
-        if (FormConfiguration::getDefaultLocale() !== null) {
-            $this->setLocale(FormConfiguration::getDefaultLocale());
-        }
-
         parent::__construct($name, $options);
 
         // If data is passed to this constructor, objects from parent forms

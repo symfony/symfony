@@ -73,10 +73,7 @@ class Field extends Configurable implements FieldInterface
         $this->addOption('normalization_transformer');
 
         $this->key = (string)$key;
-
-        if ($this->locale === null) {
-            $this->locale = class_exists('\Locale', false) ? \Locale::getDefault() : 'en';
-        }
+        $this->locale = FormConfiguration::getDefaultLocale();
 
         parent::__construct($options);
 
@@ -364,20 +361,6 @@ class Field extends Configurable implements FieldInterface
     public function getErrors()
     {
         return $this->errors;
-    }
-
-    /**
-     * Sets the locale of this field.
-     *
-     * @see Localizable
-     */
-    public function setLocale($locale)
-    {
-        $this->locale = $locale;
-
-        if ($this->valueTransformer !== null && $this->valueTransformer instanceof Localizable) {
-            $this->valueTransformer->setLocale($locale);
-        }
     }
 
     /**

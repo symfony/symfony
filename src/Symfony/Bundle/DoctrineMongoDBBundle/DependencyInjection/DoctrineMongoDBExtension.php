@@ -296,7 +296,8 @@ class DoctrineMongoDBExtension extends Extension
         foreach ($connections as $name => $connection) {
             $odmConnArgs = array(
                 isset($connection['server']) ? $connection['server'] : null,
-                isset($connection['options']) ? $connection['options'] : array()
+                isset($connection['options']) ? $connection['options'] : array(),
+                new Reference(sprintf('doctrine.odm.mongodb.%s_configuration', $name))
             );
             $odmConnDef = new Definition('%doctrine.odm.mongodb.connection_class%', $odmConnArgs);
             $container->setDefinition(sprintf('doctrine.odm.mongodb.%s_connection', $name), $odmConnDef);

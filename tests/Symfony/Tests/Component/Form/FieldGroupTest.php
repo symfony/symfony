@@ -395,32 +395,6 @@ class FieldGroupTest extends \PHPUnit_Framework_TestCase
         $group->remove('firstName');
     }
 
-    public function testMergeAddsFieldsFromAnotherGroup()
-    {
-        $group1 = new TestFieldGroup('author');
-        $group1->add($field1 = new TestField('firstName'));
-
-        $group2 = new TestFieldGroup('publisher');
-        $group2->add($field2 = new TestField('lastName'));
-
-        $group1->merge($group2);
-
-        $this->assertTrue($group1->has('lastName'));
-        $this->assertEquals(new PropertyPath('publisher.lastName'), $group1->get('lastName')->getPropertyPath());
-    }
-
-    public function testMergeThrowsExceptionIfOtherGroupAlreadyBound()
-    {
-        $group1 = new TestFieldGroup('author');
-        $group2 = new TestFieldGroup('publisher');
-        $group2->add($this->createMockField('firstName'));
-
-        $group2->bind(array('firstName' => 'Bernhard'));
-
-        $this->setExpectedException('Symfony\Component\Form\Exception\AlreadyBoundException');
-        $group1->merge($group2);
-    }
-
     public function testAddUpdatesFieldFromTransformedData()
     {
         $originalAuthor = new Author();
@@ -446,21 +420,6 @@ class FieldGroupTest extends \PHPUnit_Framework_TestCase
         $field->expects($this->once())
                     ->method('updateFromProperty')
                     ->with($this->equalTo($transformedAuthor));
-
-        $group->add($field);
-    }
-
-    public function testAddDoesNotUpdateFieldsWithEmptyPropertyPath()
-    {
-        $group = new TestFieldGroup('author');
-        $group->setData(new Author());
-
-        $field = $this->createMockField('firstName');
-        $field->expects($this->any())
-                    ->method('getPropertyPath')
-                    ->will($this->returnValue(null));
-        $field->expects($this->never())
-                    ->method('updateFromProperty');
 
         $group->add($field);
     }

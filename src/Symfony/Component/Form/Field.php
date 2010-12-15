@@ -500,11 +500,9 @@ class Field extends Configurable implements FieldInterface
     public function updateFromProperty(&$objectOrArray)
     {
         // TODO throw exception if not object or array
+
         if ($this->propertyPath !== null) {
             $this->setData($this->propertyPath->getValue($objectOrArray));
-        } else {
-            // pass object through if the property path is empty
-            $this->setData($objectOrArray);
         }
     }
 

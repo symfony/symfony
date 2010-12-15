@@ -434,22 +434,6 @@ class FieldTest extends \PHPUnit_Framework_TestCase
     }
 
     /*
-     * The use case of this test is a field group with an empty property path.
-     * Even if the field group itself is not associated to a specific property,
-     * nested fields might be.
-     */
-    public function testUpdateFromPropertyPassesObjectThroughIfPropertyPathIsEmpty()
-    {
-        $object = new Author();
-        $object->firstName = 'Bernhard';
-
-        $field = new TestField('firstName', array('property_path' => null));
-        $field->updateFromProperty($object);
-
-        $this->assertEquals($object, $field->getData());
-    }
-
-    /*
      * This is important so that bind() can work even if setData() was not called
      * before
      */

@@ -160,7 +160,7 @@ class ContextListener implements ListenerInterface
                     throw new \RuntimeException(sprintf('User was loaded from different provider. Requested "%s", Used: "%s"', $providerName, $cProviderName));
                 }
 
-                $token->setRoles($user->getRoles());
+                $token->setRoles($cUser->getRoles());
                 $token->setUser($cUser);
 
                 if (false === $cUser->equals($user)) {

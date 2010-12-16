@@ -150,7 +150,7 @@ class ResponseTest extends \PHPUnit_Framework_TestCase
         $response->headers = $headerMock;
 
         // verify first set()
-        $response->sendHeaders();
+        $response->__toString();
 
         $response->headers->remove('Content-Type');
         $response->setCharset('Foo');

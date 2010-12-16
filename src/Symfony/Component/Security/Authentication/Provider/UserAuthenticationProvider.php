@@ -54,7 +54,17 @@ abstract class UserAuthenticationProvider implements AuthenticationProviderInter
         $username = null === $token->getUser() ? 'NONE_PROVIDED' : (string) $token;
 
         try {
-            $result = $this->retrieveUser($username, $token);
+            $user = $this->retrieveUser($username, $token);
+
+            if (!$user instanceof AccountInterface) {
+                throw new AuthenticationServiceException('retrieveUser() must return an AccountInterface.');
+            }
+            
+            $this->accountChecker->checkPreAuth($user);
+            $this->checkAuthentication($user, $token);
+            $this->accountChecker->checkPostAuth($user);
+    
+            return new UsernamePasswordToken($user, $token->getCredentials(), $user->getRoles());
         } catch (UsernameNotFoundException $notFound) {
             if ($this->hideUserNotFoundExceptions) {
                 throw new BadCredentialsException('Bad credentials', 0, $notFound);
@@ -62,17 +72,6 @@ abstract class UserAuthenticationProvider implements AuthenticationProviderInter
 
             throw $notFound;
         }
-
-        if (!is_array($result) || 2 !== count($result)) {
-            throw new AuthenticationServiceException('retrieveUser() did not return an array, or array had invalid format.'); 
-        }
-        list($user, $userProviderName) = $result;
-
-        $this->accountChecker->checkPreAuth($user);
-        $this->checkAuthentication($user, $token);
-        $this->accountChecker->checkPostAuth($user);
-
-        return new UsernamePasswordToken($user, $token->getCredentials(), $userProviderName,  $user->getRoles());
     }
 
     /**

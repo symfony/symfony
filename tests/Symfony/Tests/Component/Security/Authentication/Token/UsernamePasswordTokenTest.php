@@ -20,7 +20,7 @@ class UsernamePasswordTokenTest extends \PHPUnit_Framework_TestCase
         $token = new UsernamePasswordToken('foo', 'bar');
         $this->assertFalse($token->isAuthenticated());
 
-        $token = new UsernamePasswordToken('foo', 'bar', null, array('ROLE_FOO'));
+        $token = new UsernamePasswordToken('foo', 'bar', array('ROLE_FOO'));
         $this->assertEquals(array(new Role('ROLE_FOO')), $token->getRoles());
         $this->assertTrue($token->isAuthenticated());
     }

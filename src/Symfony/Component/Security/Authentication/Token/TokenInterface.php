@@ -66,13 +66,6 @@ interface TokenInterface extends \Serializable
     function setUser($user);
 
     /**
-     * Returns a unique id for the user provider that was used to retrieve the user
-     *
-     * @return string
-     */
-    function getUserProviderName();
-
-    /**
      * Checks if the user is authenticated or not.
      *
      * @return Boolean true if the token has been authenticated, false otherwise

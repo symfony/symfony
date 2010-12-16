@@ -75,17 +75,13 @@ class DaoAuthenticationProviderTest extends \PHPUnit_Framework_TestCase
               ->method('getUser')
               ->will($this->returnValue($user))
         ;
-        $token->expects($this->once())
-              ->method('getUserProviderName')
-              ->will($this->returnValue('foo'))
-        ;
 
         $provider = new DaoAuthenticationProvider($userProvider, $this->getMock('Symfony\Component\Security\User\AccountCheckerInterface'));
         $reflection = new \ReflectionMethod($provider, 'retrieveUser');
         $reflection->setAccessible(true);
         $result = $reflection->invoke($provider, null, $token);
 
-        $this->assertSame(array($user, 'foo'), $result);
+        $this->assertSame($user, $result);
     }
 
     public function testRetrieveUser()
@@ -95,14 +91,14 @@ class DaoAuthenticationProviderTest extends \PHPUnit_Framework_TestCase
         $userProvider = $this->getMock('Symfony\Component\Security\User\UserProviderInterface');
         $userProvider->expects($this->once())
                      ->method('loadUserByUsername')
-                     ->will($this->returnValue($result = array($user, 'foo')))
+                     ->will($this->returnValue($user))
         ;
 
         $provider = new DaoAuthenticationProvider($userProvider, $this->getMock('Symfony\Component\Security\User\AccountCheckerInterface'));
         $method = new \ReflectionMethod($provider, 'retrieveUser');
         $method->setAccessible(true);
 
-        $this->assertSame($result, $method->invoke($provider, 'fabien', $this->getSupportedToken()));
+        $this->assertSame($user, $method->invoke($provider, 'fabien', $this->getSupportedToken()));
     }
 
     /**
@@ -223,7 +219,7 @@ class DaoAuthenticationProviderTest extends \PHPUnit_Framework_TestCase
 
     protected function getSupportedToken()
     {
-        return $this->getMock('Symfony\Component\Security\Authentication\Token\UsernamePasswordToken', array('getCredentials', 'getUser', 'getUserProviderName'), array(), '', false);
+        return $this->getMock('Symfony\Component\Security\Authentication\Token\UsernamePasswordToken', array('getCredentials', 'getUser'), array(), '', false);
     }
 
     protected function getProvider($user = false, $userChecker = false, $passwordEncoder = null)

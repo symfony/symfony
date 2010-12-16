@@ -21,13 +21,12 @@ class UsernamePasswordToken extends Token
     /**
      * Constructor.
      */
-    public function __construct($user, $credentials, $userProviderName = null, array $roles = array())
+    public function __construct($user, $credentials, array $roles = array())
     {
         parent::__construct($roles);
 
         $this->setUser($user);
         $this->credentials = $credentials;
-        $this->userProviderName = $userProviderName;
 
         parent::setAuthenticated((Boolean) count($roles));
     }

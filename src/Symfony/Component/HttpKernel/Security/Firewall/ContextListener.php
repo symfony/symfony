@@ -2,15 +2,17 @@
 
 namespace Symfony\Component\HttpKernel\Security\Firewall;
 
-use Symfony\Component\Security\User\AccountInterface;
-use Symfony\Component\Security\Authentication\Token\TokenInterface;
-use Symfony\Component\Security\SecurityContext;
-use Symfony\Component\HttpKernel\Log\LoggerInterface;
-use Symfony\Component\EventDispatcher\EventDispatcher;
 use Symfony\Component\EventDispatcher\Event;
+use Symfony\Component\EventDispatcher\EventDispatcher;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpKernel\HttpKernelInterface;
+use Symfony\Component\HttpKernel\Log\LoggerInterface;
 use Symfony\Component\Security\Authentication\Token\AnonymousToken;
+use Symfony\Component\Security\Authentication\Token\TokenInterface;
+use Symfony\Component\Security\Exception\UsernameNotFoundException;
+use Symfony\Component\Security\Exception\UnsupportedAccountException;
+use Symfony\Component\Security\SecurityContext;
+use Symfony\Component\Security\User\AccountInterface;
 
 /*
  * This file is part of the Symfony framework.
@@ -128,37 +130,15 @@ class ContextListener implements ListenerInterface
         $user = $token->getUser();
         if (!$user instanceof AccountInterface) {
             return $token;
-        } else if (0 === strlen($username = (string) $token)) {
-            return $token;
-        } else if (null === $providerName = $token->getUserProviderName()) {
-            return $token;
         }
 
         if (null !== $this->logger) {
-            $this->logger->debug(sprintf('Reloading user from user provider "%s".', $providerName));
+            $this->logger->debug(sprintf('Reloading user from user provider.'));
         }
 
         foreach ($this->userProviders as $provider) {
-            if (!$provider->isAggregate() && $provider->supports($providerName)) {
-                try {
-                    $result = $provider->loadUserByUsername($username);
-
-                    if (!is_array($result) || 2 !== count($result)) {
-                        throw new \RuntimeException('Provider returned an invalid result.');
-                    }
-
-                    list($cUser, $cProviderName) = $result;
-                } catch (\Exception $ex) {
-                    if (null !== $this->logger) {
-                        $this->logger->debug(sprintf('An exception occurred while reloading the user: '.$ex->getMessage()));
-                    }
-
-                    return null;
-                }
-
-                if ($providerName !== $cProviderName) {
-                    throw new \RuntimeException(sprintf('User was loaded from different provider. Requested "%s", Used: "%s"', $providerName, $cProviderName));
-                }
+            try {
+                $cUser = $provider->reloadUserByAccount($user);
 
                 $token->setRoles($cUser->getRoles());
                 $token->setUser($cUser);
@@ -168,9 +148,13 @@ class ContextListener implements ListenerInterface
                 }
 
                 return $token;
+            } catch (UnsupportedAccountException $unsupported) {
+            } catch (UsernameNotFoundException $notFound) {
+                
+                return null;
             }
         }
 
-        throw new \RuntimeException(sprintf('There is no user provider named "%s".', $providerName));
+        throw new \RuntimeException(sprintf('There is no user provider for user "%s".', get_class($user)));
     }
 }

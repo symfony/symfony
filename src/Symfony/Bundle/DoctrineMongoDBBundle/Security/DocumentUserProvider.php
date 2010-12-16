@@ -2,28 +2,22 @@
 
 namespace Symfony\Bundle\DoctrineMongoDBBundle\Security;
 
+use Symfony\Component\Security\User\AccountInterface;
 use Symfony\Component\Security\User\UserProviderInterface;
+use Symfony\Component\Security\Exception\UnsupportedAccountException;
 use Symfony\Component\Security\Exception\UsernameNotFoundException;
 
 class DocumentUserProvider implements UserProviderInterface
 {
+    protected $class;
     protected $repository;
     protected $property;
-    protected $name;
 
-    public function __construct($em, $name, $class, $property = null)
+    public function __construct($em, $class, $property = null)
     {
+        $this->class = $class;
         $this->repository = $em->getRepository($class);
         $this->property = $property;
-        $this->name = $name;
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    public function isAggregate()
-    {
-        return false;
     }
 
     /**
@@ -45,14 +39,18 @@ class DocumentUserProvider implements UserProviderInterface
             throw new UsernameNotFoundException(sprintf('User "%s" not found.', $username));
         }
 
-        return array($user, $this->name);
+        return $user;
     }
 
     /**
      * {@inheritDoc}
      */
-    public function supports($providerName)
+    public function reloadUserByAccount(AccountInterface $account)
     {
-        return $this->name === $providerName;
+        if (!$account instanceof $this->class) {
+            throw new UnsupportedAccountException(sprintf('Instances of "%s" are not supported.', get_class($account)));
+        }
+
+        return $this->loadUserByUsername((string) $account);
     }
 }

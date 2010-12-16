@@ -20,33 +20,27 @@ namespace Symfony\Component\Security\User;
 interface UserProviderInterface
 {
     /**
-     * Whether this provider is an aggregate of user providers
-     *
-     * @return Boolean
-     */
-    function isAggregate();
-
-    /**
      * Loads the user for the given username.
      *
      * This method must throw UsernameNotFoundException if the user is not
      * found.
      *
-     * @param  string $username The username
-     *
-     * @return array of the form: array(AccountInterface, string) with the
-     *               implementation of AccountInterface, and the name of the provider
-     *               that was used to retrieve it
-     *
      * @throws UsernameNotFoundException if the user is not found
+     * @param string $username The username
+     * @return AccountInterface
      */
      function loadUserByUsername($username);
 
      /**
-      * Determines whether this provider supports the given provider name
-      *
-      * @param string $providerName
-      * @return Boolean
+      * Loads the user for the account interface.
+      * 
+      * It is up to the implementation if it decides to reload the user data
+      * from the database, or if it simply merges the passed User into the 
+      * identity map of an entity manager.
+      * 
+      * @throws UnsupportedAccountException if the account is not supported
+      * @param AccountInterface $user
+      * @return AccountInterface
       */
-     function supports($providerName);
+     function reloadUserByAccount(AccountInterface $user);
 }

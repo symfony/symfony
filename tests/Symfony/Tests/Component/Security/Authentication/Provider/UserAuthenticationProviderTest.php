@@ -86,7 +86,7 @@ class UserAuthenticationProviderTest extends \PHPUnit_Framework_TestCase
         $provider = $this->getProvider($userChecker);
         $provider->expects($this->once())
                  ->method('retrieveUser')
-                 ->will($this->returnValue(array($this->getMock('Symfony\Component\Security\User\AccountInterface'), 'foo')))
+                 ->will($this->returnValue($this->getMock('Symfony\Component\Security\User\AccountInterface')))
         ;
 
         $provider->authenticate($this->getSupportedToken());
@@ -106,7 +106,7 @@ class UserAuthenticationProviderTest extends \PHPUnit_Framework_TestCase
         $provider = $this->getProvider($userChecker);
         $provider->expects($this->once())
                  ->method('retrieveUser')
-                 ->will($this->returnValue(array($this->getMock('Symfony\Component\Security\User\AccountInterface'), 'foo')))
+                 ->will($this->returnValue($this->getMock('Symfony\Component\Security\User\AccountInterface')))
         ;
 
         $provider->authenticate($this->getSupportedToken());
@@ -120,7 +120,7 @@ class UserAuthenticationProviderTest extends \PHPUnit_Framework_TestCase
         $provider = $this->getProvider();
         $provider->expects($this->once())
                  ->method('retrieveUser')
-                 ->will($this->returnValue(array($this->getMock('Symfony\Component\Security\User\AccountInterface'), 'foo')))
+                 ->will($this->returnValue($this->getMock('Symfony\Component\Security\User\AccountInterface')))
         ;
         $provider->expects($this->once())
                  ->method('checkAuthentication')
@@ -141,7 +141,7 @@ class UserAuthenticationProviderTest extends \PHPUnit_Framework_TestCase
         $provider = $this->getProvider();
         $provider->expects($this->once())
                  ->method('retrieveUser')
-                 ->will($this->returnValue(array($user, 'foo')))
+                 ->will($this->returnValue($user))
         ;
 
         $token = $this->getSupportedToken();
@@ -154,7 +154,6 @@ class UserAuthenticationProviderTest extends \PHPUnit_Framework_TestCase
 
         $this->assertInstanceOf('Symfony\Component\Security\Authentication\Token\UsernamePasswordToken', $authToken);
         $this->assertSame($user, $authToken->getUser());
-        $this->assertSame('foo', $authToken->getUserProviderName());
         $this->assertEquals(array(new Role('ROLE_FOO')), $authToken->getRoles());
         $this->assertEquals('foo', $authToken->getCredentials());
     }

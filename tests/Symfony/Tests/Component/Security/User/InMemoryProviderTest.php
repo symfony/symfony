@@ -17,7 +17,7 @@ class InMemoryUserProviderTest extends \PHPUnit_Framework_TestCase
 {
     public function testConstructor()
     {
-        $provider = new InMemoryUserProvider('foo', array(
+        $provider = new InMemoryUserProvider(array(
             'fabien' => array(
                 'password' => 'foo',
                 'enabled'  => false,
@@ -25,8 +25,7 @@ class InMemoryUserProviderTest extends \PHPUnit_Framework_TestCase
             ),
         ));
 
-        list($user, $providerName) = $provider->loadUserByUsername('fabien');
-        $this->assertSame('foo', $providerName);
+        $user = $provider->loadUserByUsername('fabien');
         $this->assertEquals('foo', $user->getPassword());
         $this->assertEquals(array('ROLE_USER'), $user->getRoles());
         $this->assertFalse($user->isEnabled());
@@ -34,10 +33,10 @@ class InMemoryUserProviderTest extends \PHPUnit_Framework_TestCase
 
     public function testCreateUser()
     {
-        $provider = new InMemoryUserProvider('foo');
+        $provider = new InMemoryUserProvider();
         $provider->createUser(new User('fabien', 'foo'));
 
-        list($user, $providerName) = $provider->loadUserByUsername('fabien');
+        $user = $provider->loadUserByUsername('fabien');
         $this->assertEquals('foo', $user->getPassword());
     }
 
@@ -46,7 +45,7 @@ class InMemoryUserProviderTest extends \PHPUnit_Framework_TestCase
      */
     public function testCreateUserAlreadyExist()
     {
-        $provider = new InMemoryUserProvider('foo');
+        $provider = new InMemoryUserProvider();
         $provider->createUser(new User('fabien', 'foo'));
         $provider->createUser(new User('fabien', 'foo'));
     }
@@ -56,7 +55,7 @@ class InMemoryUserProviderTest extends \PHPUnit_Framework_TestCase
      */
     public function testLoadUserByUsernameDoesNotExist()
     {
-        $provider = new InMemoryUserProvider('foo');
+        $provider = new InMemoryUserProvider();
         $provider->loadUserByUsername('fabien');
     }
 }

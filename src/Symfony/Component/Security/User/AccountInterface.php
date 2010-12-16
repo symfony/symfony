@@ -55,6 +55,8 @@ interface AccountInterface
 
     /**
      * Removes sensitive data from the user.
+     *
+     * @return void
      */
     function eraseCredentials();
 

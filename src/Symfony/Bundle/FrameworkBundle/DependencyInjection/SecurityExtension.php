@@ -377,7 +377,6 @@ class SecurityExtension extends Extension
                 ->register($name, '%security.user.provider.entity.class%')
                 ->setArguments(array(
                     new Reference('security.user.entity_manager'),
-                    $name,
                     $provider['entity']['class'],
                     isset($provider['entity']['property']) ? $provider['entity']['property'] : null,
             ));
@@ -391,7 +390,6 @@ class SecurityExtension extends Extension
                 ->register($name, '%security.user.provider.document.class%')
                 ->setArguments(array(
                     new Reference('security.user.document_manager'),
-                    $name,
                     $provider['document']['class'],
                     isset($provider['document']['property']) ? $provider['document']['property'] : null,
             ));
@@ -400,10 +398,7 @@ class SecurityExtension extends Extension
         }
 
         // In-memory DAO provider
-        $definition = $container
-                        ->register($name, '%security.user.provider.in_memory.class%')
-                        ->setArguments(array($name))
-        ;
+        $definition = $container->register($name, '%security.user.provider.in_memory.class%');
         foreach ($this->fixConfig($provider, 'user') as $username => $user) {
             if (isset($user['name'])) {
                 $username = $user['name'];

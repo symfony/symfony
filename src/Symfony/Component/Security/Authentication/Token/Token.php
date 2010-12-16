@@ -26,7 +26,6 @@ abstract class Token implements TokenInterface
     protected $roles;
     protected $authenticated;
     protected $user;
-    protected $userProviderName;
     protected $credentials;
     protected $immutable;
 
@@ -167,14 +166,6 @@ abstract class Token implements TokenInterface
     }
 
     /**
-     * {@inheritDoc}
-     */
-    public function getUserProviderName()
-    {
-        return $this->userProviderName;
-    }
-
-    /**
      * {@inheritdoc}
      */
     public function isImmutable()
@@ -195,7 +186,7 @@ abstract class Token implements TokenInterface
      */
     public function serialize()
     {
-        return serialize(array($this->user, $this->userProviderName, $this->credentials, $this->authenticated, $this->roles, $this->immutable));
+        return serialize(array($this->user, $this->credentials, $this->authenticated, $this->roles, $this->immutable));
     }
 
     /**
@@ -203,6 +194,6 @@ abstract class Token implements TokenInterface
      */
     public function unserialize($serialized)
     {
-        list($this->user, $this->userProviderName, $this->credentials, $this->authenticated, $this->roles, $this->immutable) = unserialize($serialized);
+        list($this->user, $this->credentials, $this->authenticated, $this->roles, $this->immutable) = unserialize($serialized);
     }
 }

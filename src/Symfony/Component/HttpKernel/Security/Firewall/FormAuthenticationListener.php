@@ -179,7 +179,7 @@ abstract class FormAuthenticationListener
             return $targetUrl;
         }
 
-        if ($this->options['use_referer'] && $targetUrl = $request->getHeader('Referer')) {
+        if ($this->options['use_referer'] && $targetUrl = $request->headers->get('Referer')) {
 
             return $targetUrl;
         }

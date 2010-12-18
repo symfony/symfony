@@ -53,6 +53,7 @@ class RequestTest extends \PHPUnit_Framework_TestCase
         $this->assertEquals('http://test.com/foo?bar=baz', $request->getUri());
         $this->assertEquals('/foo', $request->getPathInfo());
         $this->assertEquals('bar=baz', $request->getQueryString());
+        $this->assertEquals(80, $request->getPort());
 
         $request = Request::create('https://test.com/foo?bar=baz');
         $this->assertEquals('https://test.com/foo?bar=baz', $request->getUri());

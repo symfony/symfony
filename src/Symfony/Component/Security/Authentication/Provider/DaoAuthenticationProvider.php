@@ -87,7 +87,7 @@ class DaoAuthenticationProvider extends UserAuthenticationProvider
             if (!$user instanceof AccountInterface) {
                 throw new AuthenticationServiceException('The user provider must return an AccountInterface object.');
             }
-    
+
             return $user;
         } catch (UsernameNotFoundException $notFound) {
             throw $notFound;

@@ -79,7 +79,7 @@ class InMemoryUserProvider implements UserProviderInterface
     /**
      * {@inheritDoc}
      */
-    public function reloadUserByAccount(AccountInterface $account)
+    public function loadUserByAccount(AccountInterface $account)
     {
         if (!$account instanceof User) {
             throw new UnsupportedAccountException(sprintf('Instances of "%s" are not supported.', get_class($account)));

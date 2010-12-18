@@ -59,11 +59,11 @@ abstract class UserAuthenticationProvider implements AuthenticationProviderInter
             if (!$user instanceof AccountInterface) {
                 throw new AuthenticationServiceException('retrieveUser() must return an AccountInterface.');
             }
-            
+
             $this->accountChecker->checkPreAuth($user);
             $this->checkAuthentication($user, $token);
             $this->accountChecker->checkPostAuth($user);
-    
+
             return new UsernamePasswordToken($user, $token->getCredentials(), $user->getRoles());
         } catch (UsernameNotFoundException $notFound) {
             if ($this->hideUserNotFoundExceptions) {

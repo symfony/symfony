@@ -27,20 +27,22 @@ interface UserProviderInterface
      *
      * @throws UsernameNotFoundException if the user is not found
      * @param string $username The username
+     *
      * @return AccountInterface
      */
      function loadUserByUsername($username);
 
      /**
       * Loads the user for the account interface.
-      * 
+      *
       * It is up to the implementation if it decides to reload the user data
       * from the database, or if it simply merges the passed User into the 
       * identity map of an entity manager.
-      * 
+      *
       * @throws UnsupportedAccountException if the account is not supported
       * @param AccountInterface $user
+      *
       * @return AccountInterface
       */
-     function reloadUserByAccount(AccountInterface $user);
+     function loadUserByAccount(AccountInterface $user);
 }

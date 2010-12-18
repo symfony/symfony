@@ -123,6 +123,7 @@ class ContextListener implements ListenerInterface
      * Refreshes the user by reloading it from the user provider
      *
      * @param TokenInterface $token
+     *
      * @return TokenInterface|null
      */
     protected function refreshUser(TokenInterface $token)
@@ -138,7 +139,7 @@ class ContextListener implements ListenerInterface
 
         foreach ($this->userProviders as $provider) {
             try {
-                $cUser = $provider->reloadUserByAccount($user);
+                $cUser = $provider->loadUserByAccount($user);
 
                 $token->setRoles($cUser->getRoles());
                 $token->setUser($cUser);
@@ -149,8 +150,8 @@ class ContextListener implements ListenerInterface
 
                 return $token;
             } catch (UnsupportedAccountException $unsupported) {
+                // let's try the next user provider
             } catch (UsernameNotFoundException $notFound) {
-                
                 return null;
             }
         }

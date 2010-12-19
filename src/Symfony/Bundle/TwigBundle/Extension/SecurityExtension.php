@@ -42,7 +42,7 @@ class SecurityExtension extends \Twig_Extension
     public function getGlobals()
     {
         return array(
-            'has_role' => new \Twig_Function($this, 'vote'),
+            'fn_has_role' => new \Twig_Function($this, 'vote'),
         );
     }
 

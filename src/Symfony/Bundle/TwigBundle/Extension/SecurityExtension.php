@@ -39,20 +39,10 @@ class SecurityExtension extends \Twig_Extension
     /**
      * {@inheritdoc}
      */
-    public function getFilters()
+    public function getGlobals()
     {
         return array(
-        );
-    }
-
-    /**
-     * {@inheritdoc}
-     */
-    public function getTokenParsers()
-    {
-        return array(
-            // {% ifrole "ROLE_ADMIN" %}something{% endifrole %}
-            new IfRoleTokenParser(),
+            'has_role' => new \Twig_Function($this, 'vote'),
         );
     }
 

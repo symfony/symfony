@@ -22,8 +22,7 @@
     {% endif %}
 >
 {% for name, template in templates %}
-    {% set content %}{{ template.block('toolbar', { 'collector': profiler.get(name) })|raw }}{% endset %}
-    {% if content %}{{ content|raw }}{% endif %}
+    {{ template.block('toolbar', { 'collector': profiler.get(name) }) }}
 {% endfor %}
 </div>
 <!-- END of Symfony2 Web Debug Toolbar -->

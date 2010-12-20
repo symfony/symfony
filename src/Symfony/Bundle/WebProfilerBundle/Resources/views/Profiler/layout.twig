@@ -17,7 +17,7 @@
         <tr><td class="menu">
             <ul>
                 {% for name, template in templates %}
-                    {% set menu %}{{ template.block('menu', { 'collector': profiler.get(name)})|raw }}{% endset %}
+                    {% set menu %}{{ template.block('menu', { 'collector': profiler.get(name)}) }}{% endset %}
                     {% if menu %}
                         <li
                             {% if name == panel %}class="selected"{% endif %}

@@ -4,12 +4,12 @@
         Admin
     </h3>
 
-    <form action="{% path '_profiler_import' %}" method="post" enctype="multipart/form-data">
+    <form action="{{ path('_profiler_import') }}" method="post" enctype="multipart/form-data">
         <div style="margin-bottom: 10px">
-            &raquo;&nbsp;<a href="{% path '_profiler_purge' with { 'token': token } %}">Purge</a>
+            &raquo;&nbsp;<a href="{{ path('_profiler_purge', { 'token': token }) }}">Purge</a>
         </div>
         <div style="margin-bottom: 10px">
-            &raquo;&nbsp;<a href="{% path '_profiler_export' with { 'token': token } %}">Export</a>
+            &raquo;&nbsp;<a href="{{ path('_profiler_export', { 'token': token }) }}">Export</a>
         </div>
         &raquo;&nbsp;<label for="file">Import</label><br />
         <input type="file" name="file" id="file" /><br />

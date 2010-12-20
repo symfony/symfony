@@ -22,7 +22,7 @@
                         <li
                             {% if name == panel %}class="selected"{% endif %}
                         >
-                            <a href="{% path '_profiler_panel' with { 'token': token, 'panel': name } %}">{{ menu|raw }}</a>
+                            <a href="{{ path('_profiler_panel', { 'token': token, 'panel': name }) }}">{{ menu|raw }}</a>
                         </li>
                     {% endif %}
                 {% endfor %}

@@ -60,6 +60,29 @@ class TemplatingExtension extends \Twig_Extension
     }
 
     /**
+     * Returns a list of global functions to add to the existing list.
+     *
+     * @return array An array of global functions
+     */
+    public function getGlobals()
+    {
+        return array(
+            'fn_url'  => new \Twig_Function($this, 'getUrl'),
+            'fn_path' => new \Twig_Function($this, 'getPath'),
+        );
+    }
+
+    public function getPath($name, array $parameters = array())
+    {
+        return $this->container->get('router')->generate($name, $parameters, false);
+    }
+
+    public function getUrl($name, array $parameters = array())
+    {
+        return $this->container->get('router')->generate($name, $parameters, true);
+    }
+
+    /**
      * Returns the token parser instance to add to the existing list.
      *
      * @return array An array of Twig_TokenParser instances
@@ -87,12 +110,6 @@ class TemplatingExtension extends \Twig_Extension
 
             // {% flash 'notice' %}
             new HelperTokenParser('flash', '<name>', 'templating.helper.session', 'getFlash'),
-
-            // {% path 'blog_post' with { 'id': post.id } %}
-            new PathTokenParser(),
-
-            // {% url 'blog_post' with { 'id': post.id } %}
-            new UrlTokenParser(),
 
             // {% include 'sometemplate.php' with { 'something' : 'something2' } %}
             new IncludeTokenParser(),

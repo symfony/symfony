@@ -123,9 +123,7 @@ abstract class Bundle extends ContainerAware implements BundleInterface
         foreach ($finder as $file) {
             $class = $prefix.strtr($file->getPath(), array($dir => '', '/' => '\\')).'\\'.$file->getBasename('.php');
 
-            if ('Extension' === substr($class, -9)) {
-                $container->registerExtension(new $class());
-            }
+            $container->registerExtension(new $class());
         }
     }
 

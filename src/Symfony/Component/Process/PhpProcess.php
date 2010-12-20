@@ -14,6 +14,10 @@ namespace Symfony\Component\Process;
 /**
  * PhpProcess runs a PHP script in an independent process.
  *
+ * $p = new PhpProcess('<?php echo "foo"; ?>');
+ * $p->run();
+ * print $p->getOutput()."\n";
+ *
  * @author Fabien Potencier <fabien.potencier@symfony-project.com>
  */
 class PhpProcess extends Process
@@ -41,7 +45,7 @@ class PhpProcess extends Process
     }
 
     /**
-     * run the process.
+     * Runs the process.
      *
      * @param Closure|string|array $callback A PHP callback to run whenever there is some
      *                                       output available on STDOUT or STDERR
@@ -54,7 +58,7 @@ class PhpProcess extends Process
             $this->commandline = $this->getPhpBinary();
         }
 
-        parent::run($callback);
+        return parent::run($callback);
     }
 
     /**

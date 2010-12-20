@@ -60,7 +60,7 @@ class Process
     }
 
     /**
-     * run the process.
+     * Runs the process.
      *
      * The callback receives the type of output (out or err) and
      * some bytes from the output in real-time. It allows to have feedback

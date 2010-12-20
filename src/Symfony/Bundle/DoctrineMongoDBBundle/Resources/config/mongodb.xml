@@ -20,6 +20,10 @@
     <parameter key="doctrine.odm.mongodb.proxy_namespace">Proxies</parameter>
     <parameter key="doctrine.odm.mongodb.auto_generate_proxy_classes">false</parameter>
 
+    <!-- hydrators -->
+    <parameter key="doctrine.odm.mongodb.hydrator_namespace">Proxies</parameter>
+    <parameter key="doctrine.odm.mongodb.auto_generate_hydrator_classes">false</parameter>
+
     <!-- cache -->
     <parameter key="doctrine.odm.mongodb.cache.array_class">Doctrine\Common\Cache\ArrayCache</parameter>
     <parameter key="doctrine.odm.mongodb.cache.apc_class">Doctrine\Common\Cache\ApcCache</parameter>

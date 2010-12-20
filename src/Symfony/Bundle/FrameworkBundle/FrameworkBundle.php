@@ -2,6 +2,8 @@
 
 namespace Symfony\Bundle\FrameworkBundle;
 
+use Symfony\Bundle\FrameworkBundle\DependencyInjection\Compiler\AddSecurityVotersPass;
+use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\HttpKernel\Bundle\Bundle;
 use Symfony\Component\Form\FormConfiguration;
 
@@ -33,5 +35,12 @@ class FrameworkBundle extends Bundle
             FormConfiguration::setDefaultCsrfSecret($this->container->getParameter('csrf_secret'));
             FormConfiguration::enableDefaultCsrfProtection();
         }
+    }
+
+    public function registerExtensions(ContainerBuilder $container)
+    {
+        parent::registerExtensions($container);
+
+        $container->addCompilerPass(new AddSecurityVotersPass());
     }
 }

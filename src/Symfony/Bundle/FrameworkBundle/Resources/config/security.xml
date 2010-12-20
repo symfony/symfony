@@ -60,7 +60,11 @@
         <parameter key="security.authentication.switchuser.role">ROLE_ALLOWED_TO_SWITCH</parameter>
         <parameter key="security.authentication.switchuser.parameter">_switch_user</parameter>
 
-        <parameter key="security.access.decision_manager.class">Symfony\Bundle\FrameworkBundle\Security\Authorization\AccessDecisionManager</parameter>
+        <parameter key="security.access.decision_manager.class">Symfony\Component\Security\Authorization\AccessDecisionManager</parameter>
+        <parameter key="security.access.decision_manager.strategy">affirmative</parameter>
+        <parameter key="security.access.decision_manager.allow_if_all_abstain">false</parameter>
+        <parameter key="security.access.decision_manager.allow_if_equal_granted_denied">true</parameter>
+        
         <parameter key="security.access.simple_role_voter.class">Symfony\Component\Security\Authorization\Voter\RoleVoter</parameter>
         <parameter key="security.access.authenticated_voter.class">Symfony\Component\Security\Authorization\Voter\AuthenticatedVoter</parameter>
         <parameter key="security.access.role_hierarchy_voter.class">Symfony\Component\Security\Authorization\Voter\RoleHierarchyVoter</parameter>
@@ -133,7 +137,10 @@
         </service>
 
         <service id="security.access.decision_manager" class="%security.access.decision_manager.class%">
-            <argument type="service" id="service_container" />
+            <argument type="collection"></argument>
+            <argument>%security.access.decision_manager.strategy%</argument>
+            <argument>%security.access.decision_manager.allow_if_all_abstain%</argument>
+            <argument>%security.access.decision_manager.allow_if_equal_granted_denied%</argument>
         </service>
         <service id="security.access_map" class="%security.access_map.class%" />
 

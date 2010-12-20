@@ -131,6 +131,51 @@ class EngineTest extends \PHPUnit_Framework_TestCase
         $engine->setCharset('ISO-8859-1');
         $this->assertEquals('ISO-8859-1', $engine->getCharset(), '->setCharset() changes the default charset to use');
     }
+
+    public function testGlobalVariables()
+    {
+        $engine = new ProjectTemplateEngine(self::$loader);
+        $engine->addGlobal('global_variable', 'lorem ipsum');
+
+        $this->assertEquals(array(
+            'global_variable' => 'lorem ipsum',
+        ), $engine->getGlobals());
+    }
+
+    public function testGlobalVariablesGetPassedFromHelpers()
+    {
+        $engine = new ProjectTemplateEngine(self::$loader);
+        $engine->set(new \SimpleHelper('value'));
+        $engine->addGlobal('global_variable', 'lorem ipsum');
+
+        $this->assertEquals(array(
+            'global_variable' => 'lorem ipsum',
+            'global_from_helper' => 'helper lorem ipsum',
+        ), $engine->getGlobals());
+    }
+
+    public function testEngineGlobalOverwritesHelperGlobals()
+    {
+        $engine = new ProjectTemplateEngine(self::$loader);
+        $engine->set(new \SimpleHelper('value'));
+        $engine->addGlobal('global_from_helper', 'engine wins');
+
+        $this->assertEquals(array(
+            'global_from_helper' => 'engine wins',
+        ), $engine->getGlobals());
+    }
+
+    public function testGlobalsGetPassedToTemplate()
+    {
+        $engine = new ProjectTemplateEngine(self::$loader);
+        $engine->addGlobal('global', 'global variable');
+
+        self::$loader->setTemplate('global.php', '<?php echo $global; ?>');
+
+        $this->assertEquals($engine->render('global:php'), 'global variable');
+
+        $this->assertEquals($engine->render('global:php', array('global' => 'overwritten')), 'overwritten');
+    }
 }
 
 class ProjectTemplateEngine extends Engine

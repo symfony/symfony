@@ -33,6 +33,7 @@ class Engine implements \ArrayAccess
     protected $charset;
     protected $cache;
     protected $escapers;
+    protected $globals;
 
     /**
      * Constructor.
@@ -117,6 +118,9 @@ class Engine implements \ArrayAccess
 
         $this->current = $name;
         $this->parents[$name] = null;
+
+        // Attach the global variables
+        $parameters = array_replace($this->getGlobals(), $parameters);
 
         // render
         if (false === $content = $this->renderers[$renderer]->evaluate($template, $parameters)) {
@@ -395,6 +399,36 @@ class Engine implements \ArrayAccess
         }
 
         return $this->escapers[$context];
+    }
+
+    /**
+     * @param string $name
+     * @param mixed $value
+     */
+    public function addGlobal($name, $value)
+    {
+        if (null === $this->globals) {
+            $this->getGlobals();
+        }
+
+        $this->globals[$name] = $value;
+    }
+
+    /**
+     * Returns the assigned globals. If no globals are set yet it calls all assigned helpers for theirs.
+     *
+     * @return array
+     */
+    public function getGlobals()
+    {
+        if (null === $this->globals) {
+            $this->globals = array();
+            foreach ($this->helpers as $helper) {
+                $this->globals = array_replace($this->globals, $helper->getGlobals());
+            }
+        }
+
+        return $this->globals;
     }
 
     /**

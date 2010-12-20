@@ -42,4 +42,14 @@ abstract class Helper implements HelperInterface
     {
         return $this->charset;
     }
+
+    /**
+     * Get global variables for templates
+     *
+     * @return array
+     */
+    public function getGlobals()
+    {
+        return array();
+    }
 }

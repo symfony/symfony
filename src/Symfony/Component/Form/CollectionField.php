@@ -64,7 +64,7 @@ class CollectionField extends FieldGroup
         }
 
         foreach ($this as $name => $field) {
-            if (!$this->getOption('modifiable') || $name != '$$key$$') {
+            if (!$this->getOption('modifiable') || '$$key$$' != $name) {
                 $this->remove($name);
             }
         }
@@ -85,7 +85,7 @@ class CollectionField extends FieldGroup
         }
 
         foreach ($this as $name => $field) {
-            if (!isset($taintedData[$name]) && $this->getOption('modifiable') && $name != '$$key$$') {
+            if (!isset($taintedData[$name]) && $this->getOption('modifiable') && '$$key$$' != $name) {
                 $this->remove($name);
                 $this->removedFields[] = $name;
             }

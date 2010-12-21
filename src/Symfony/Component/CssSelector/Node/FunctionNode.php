@@ -177,7 +177,7 @@ class FunctionNode implements NodeInterface
             $s = $s->formatElement();
         }
 
-        if (!$s || $s == '*') {
+        if (!$s || '*' == $s) {
             // Happens when there's nothing, which the CSS parser thinks of as *
             return array(0, 0);
         }
@@ -187,15 +187,15 @@ class FunctionNode implements NodeInterface
             return array(0, $s);
         }
 
-        if ($s == 'odd') {
+        if ('odd' == $s) {
             return array(2, 1);
         }
 
-        if ($s == 'even') {
+        if ('even' == $s) {
             return array(2, 0);
         }
 
-        if ($s == 'n') {
+        if ('n' == $s) {
             return array(1, 0);
         }
 
@@ -208,7 +208,7 @@ class FunctionNode implements NodeInterface
         list($a, $b) = explode('n', $s);
         if (!$a) {
             $a = 1;
-        } elseif ($a == '-' || $a == '+') {
+        } elseif ('-' == $a || '+' == $a) {
             $a = intval($a.'1');
         } else {
             $a = intval($a);
@@ -216,7 +216,7 @@ class FunctionNode implements NodeInterface
 
         if (!$b) {
             $b = 0;
-        } elseif ($b == '-' || $b == '+') {
+        } elseif ('-' == $b || '+' == $b) {
             $b = intval($b.'1');
         } else {
             $b = intval($b);

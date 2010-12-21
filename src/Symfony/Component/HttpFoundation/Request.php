@@ -401,7 +401,7 @@ class Request
         $name   = $this->server->get('SERVER_NAME');
         $port   = $this->getPort();
 
-        if (($scheme == 'http' && $port == 80) || ($scheme == 'https' && $port == 443)) {
+        if (('http' == $scheme && $port == 80) || ('https' == $scheme && $port == 443)) {
             return $name;
         } else {
             return $name.':'.$port;

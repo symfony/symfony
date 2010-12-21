@@ -107,7 +107,7 @@ class Parser
 
         while (1) {
             $peek = $stream->peek();
-            if ($peek == ',' || null === $peek) {
+            if (',' == $peek || null === $peek) {
                 return $result;
             } elseif (in_array($peek, array('+', '>', '~'))) {
                 // A combinator
@@ -133,11 +133,11 @@ class Parser
     protected function parseSimpleSelector($stream)
     {
         $peek = $stream->peek();
-        if ($peek != '*' && !$peek->isType('Symbol')) {
+        if ('*' != $peek && !$peek->isType('Symbol')) {
             $element = $namespace = '*';
         } else {
             $next = $stream->next();
-            if ($next != '*' && !$next->isType('Symbol')) {
+            if ('*' != $next && !$next->isType('Symbol')) {
                 throw new SyntaxError(sprintf("Expected symbol, got '%s'", $next));
             }
 
@@ -145,7 +145,7 @@ class Parser
                 $namespace = $next;
                 $stream->next();
                 $element = $stream->next();
-                if ($element != '*' && !$next->isType('Symbol')) {
+                if ('*' != $element && !$next->isType('Symbol')) {
                     throw new SyntaxError(sprintf("Expected symbol, got '%s'", $next));
                 }
             } else {
@@ -158,7 +158,7 @@ class Parser
         $has_hash = false;
         while (1) {
             $peek = $stream->peek();
-            if ($peek == '#') {
+            if ('#' == $peek) {
                 if ($has_hash) {
                     /* You can't have two hashes
                         (FIXME: is there some more general rule I'm missing?) */
@@ -171,21 +171,21 @@ class Parser
                 $has_hash = true;
 
                 continue;
-            } elseif ($peek == '.') {
+            } elseif ('.' == $peek) {
                 $stream->next();
                 $result = new Node\ClassNode($result, $stream->next());
 
                 continue;
-            } elseif ($peek == '[') {
+            } elseif ('[' == $peek) {
                 $stream->next();
                 $result = $this->parseAttrib($result, $stream);
                 $next = $stream->next();
-                if ($next != ']') {
+                if (']' != $next) {
                     throw new SyntaxError(sprintf("] expected, got '%s'", $next));
                 }
 
                 continue;
-            } elseif ($peek == ':' || $peek == '::') {
+            } elseif (':' == $peek || '::' == $peek) {
                 $type = $stream->next();
                 $ident = $stream->next();
                 if (!$ident || !$ident->isType('Symbol')) {
@@ -204,7 +204,7 @@ class Parser
                         $selector = $this->parseSimpleSelector($stream);
                     }
                     $next = $stream->next();
-                    if ($next != ')') {
+                    if (')' != $next) {
                         throw new SyntaxError(sprintf("Expected ')', got '%s' and '%s'", $next, $selector));
                     }
 
@@ -215,7 +215,7 @@ class Parser
 
                 continue;
             } else {
-                if ($peek == ' ') {
+                if (' ' == $peek) {
                     $stream->next();
                 }
 

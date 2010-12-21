@@ -134,7 +134,7 @@ class XPathExpr
 
         /* We don't need a star prefix if we are joining to this other
              prefix; so we'll get rid of it */
-        if ($other->hasStarPrefix() && $path == '*/') {
+        if ($other->hasStarPrefix() && '*/' == $path) {
             $path = '';
         }
         $this->prefix = $prefix;

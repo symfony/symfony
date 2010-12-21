@@ -68,7 +68,7 @@ class DateTimeToLocalizedStringTransformer extends BaseDateTimeTransformer
         $inputTimezone = $this->getOption('input_timezone');
 
         // convert time to UTC before passing it to the formatter
-        if ($inputTimezone != 'UTC') {
+        if ('UTC' != $inputTimezone) {
             $dateTime->setTimezone(new \DateTimeZone('UTC'));
         }
 
@@ -108,7 +108,7 @@ class DateTimeToLocalizedStringTransformer extends BaseDateTimeTransformer
         // read timestamp into DateTime object - the formatter delivers in UTC
         $dateTime = new \DateTime(sprintf('@%s UTC', $timestamp));
 
-        if ($inputTimezone != 'UTC') {
+        if ('UTC' != $inputTimezone) {
             $dateTime->setTimezone(new \DateTimeZone($inputTimezone));
         }
 

@@ -112,6 +112,10 @@ class FrameworkExtension extends Extension
             $this->registerTestConfiguration($config, $container);
         }
 
+        if (array_key_exists('param_converter', $config)) {
+            $this->registerParamConverterConfiguration($config, $container);
+        }
+
         $this->registerSessionConfiguration($config, $container);
 
         $this->registerTranslatorConfiguration($config, $container);
@@ -139,6 +143,18 @@ class FrameworkExtension extends Extension
 
             'Symfony\\Component\\Form\\FormConfiguration',
         ));
+    }
+
+    /**
+     * Loads the parameter converter configuration.
+     *
+     * @param array            $config    An array of configuration settings
+     * @param ContainerBuilder $container A ContainerBuilder instance
+     */
+    protected function registerParamConverterConfiguration($config, ContainerBuilder $container)
+    {
+        $loader = new XmlFileLoader($container, __DIR__.'/../Resources/config');
+        $loader->load('param_converter.xml');
     }
 
     /**

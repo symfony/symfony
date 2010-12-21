@@ -56,6 +56,7 @@ use Symfony\Component\Routing\Loader\LoaderResolver;
 abstract class AnnotationClassLoader implements LoaderInterface
 {
     protected $reader;
+    protected $annotationClass = 'Symfony\\Component\\Routing\\Annotation\\Route';
 
     /**
      * Constructor.
@@ -65,6 +66,16 @@ abstract class AnnotationClassLoader implements LoaderInterface
     public function __construct(AnnotationReader $reader)
     {
         $this->reader = $reader;
+    }
+
+    /**
+     * Sets the annotation class to read route properties from.
+     *
+     * @param string $annotationClass A fully-qualified class name
+     */
+    public function setAnnotationClass($annotationClass)
+    {
+        $this->annotationClass = $annotationClass;
     }
 
     /**
@@ -83,9 +94,6 @@ abstract class AnnotationClassLoader implements LoaderInterface
             throw new \InvalidArgumentException(sprintf('Class "%s" does not exist.', $class));
         }
 
-        $class = new \ReflectionClass($class);
-        $annotClass = 'Symfony\\Component\\Routing\\Annotation\\Route';
-
         $globals = array(
             'pattern'      => '',
             'requirements' => array(),
@@ -93,7 +101,8 @@ abstract class AnnotationClassLoader implements LoaderInterface
             'defaults'     => array(),
         );
 
-        if ($annot = $this->reader->getClassAnnotation($class, $annotClass)) {
+        $class = new \ReflectionClass($class);
+        if ($annot = $this->reader->getClassAnnotation($class, $this->annotationClass)) {
             if (null !== $annot->getPattern()) {
                 $globals['pattern'] = $annot->getPattern();
             }
@@ -111,10 +120,9 @@ abstract class AnnotationClassLoader implements LoaderInterface
             }
         }
 
-        $this->reader->setDefaultAnnotationNamespace('Symfony\\Component\\Routing\\Annotation\\');
         $collection = new RouteCollection();
         foreach ($class->getMethods() as $method) {
-            if ($annot = $this->reader->getMethodAnnotation($method, $annotClass)) {
+            if ($annot = $this->reader->getMethodAnnotation($method, $this->annotationClass)) {
                 if (null === $annot->getName()) {
                     $annot->setName($this->getDefaultRouteName($class, $method));
                 }

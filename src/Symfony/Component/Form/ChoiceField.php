@@ -156,7 +156,7 @@ class ChoiceField extends HybridField
     public function bind($value)
     {
         if (!$this->isMultipleChoice() && $this->isExpanded()) {
-            $value = $value === null ? array() : array($value => true);
+            $value = null === $value ? array() : array($value => true);
         }
 
         parent::bind($value);

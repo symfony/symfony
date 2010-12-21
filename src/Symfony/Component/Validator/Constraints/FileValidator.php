@@ -21,7 +21,7 @@ class FileValidator extends ConstraintValidator
 {
     public function isValid($value, Constraint $constraint)
     {
-        if ($value === null || $value === '') {
+        if (null === $value || '' === $value) {
             return true;
         }
 

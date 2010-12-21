@@ -267,7 +267,7 @@ class FieldGroup extends Field implements \IteratorAggregate, FieldGroupInterfac
      */
     public function bind($taintedData)
     {
-        if ($taintedData === null) {
+        if (null === $taintedData) {
             $taintedData = array();
         }
 
@@ -393,7 +393,7 @@ class FieldGroup extends Field implements \IteratorAggregate, FieldGroupInterfac
      */
     public function addError(FieldError $error, PropertyPathIterator $pathIterator = null, $type = null)
     {
-        if ($pathIterator !== null) {
+        if (null !== $pathIterator) {
             if ($type === self::FIELD_ERROR && $pathIterator->hasNext()) {
                 $pathIterator->next();
 

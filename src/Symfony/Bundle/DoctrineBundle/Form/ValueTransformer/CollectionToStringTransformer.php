@@ -79,7 +79,7 @@ class CollectionToStringTransformer extends BaseValueTransformer
         foreach ($collection as $object) {
             $uniqueIdent = $reflField->getValue($object);
             $key = array_search($uniqueIdent, $values);
-            if ($key === false) {
+            if (false === $key) {
                 $collection->removeElement($object);
             } else {
                 // found in the collection, no need to do anything with it so remove it

@@ -127,7 +127,7 @@ class Field extends Configurable implements FieldInterface
      */
     public function setPropertyPath($propertyPath)
     {
-        $this->propertyPath = $propertyPath === null || $propertyPath === '' ? null : new PropertyPath($propertyPath);
+        $this->propertyPath = null === $propertyPath || '' === $propertyPath ? null : new PropertyPath($propertyPath);
     }
 
     /**
@@ -458,7 +458,7 @@ class Field extends Configurable implements FieldInterface
     protected function transform($value)
     {
         if (null === $this->valueTransformer) {
-            return $value === null ? '' : $value;
+            return null === $value ? '' : $value;
         }
         return $this->valueTransformer->transform($value);
     }
@@ -472,7 +472,7 @@ class Field extends Configurable implements FieldInterface
     protected function reverseTransform($value)
     {
         if (null === $this->valueTransformer) {
-            return $value === '' ? null : $value;
+            return '' === $value ? null : $value;
         }
         return $this->valueTransformer->reverseTransform($value, $this->data);
     }

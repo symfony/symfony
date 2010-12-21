@@ -24,7 +24,7 @@ class Valid extends \Symfony\Component\Validator\Constraint
      */
     public function __construct($options = null)
     {
-        if ($options !== null && count($options) > 0) {
+        if (null !== $options && count($options) > 0) {
             throw new ConstraintDefinitionException('The constraint Valid does not accept any options');
         }
     }

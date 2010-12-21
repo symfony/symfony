@@ -18,7 +18,7 @@ class BlankValidator extends ConstraintValidator
 {
     public function isValid($value, Constraint $constraint)
     {
-        if ($value !== '' && $value !== null) {
+        if ('' !== $value && null !== $value) {
             $this->setMessage($constraint->message, array('{{ value }}' => $value));
 
             return false;

@@ -75,7 +75,7 @@ class Tokenizer
                 continue;
             }
 
-            if ($c === '"' || $c === "'") {
+            if ('"' === $c || "'" === $c) {
                 // Quoted string
                 $old_pos = $pos;
                 list($sym, $pos) = $this->tokenizeEscapedString($s, $pos);

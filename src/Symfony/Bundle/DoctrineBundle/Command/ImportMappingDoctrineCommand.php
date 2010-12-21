@@ -70,19 +70,19 @@ EOT
         }
 
         $type = $input->getArgument('mapping-type') ? $input->getArgument('mapping-type') : 'xml';
-        if ($type === 'annotation') {
+        if ('annotation' === $type) {
             $destPath .= '/Entity';
         } else {
             $destPath .= '/Resources/config/doctrine/metadata/orm';
         }
-        if ($type === 'yaml') {
+        if ('yaml' === $type) {
             $type = 'yml';
         }
 
         $cme = new ClassMetadataExporter();
         $exporter = $cme->getExporter($type);
 
-        if ($type === 'annotation') {
+        if ('annotation' === $type) {
             $entityGenerator = $this->getEntityGenerator();
             $exporter->setEntityGenerator($entityGenerator);
         }
@@ -100,7 +100,7 @@ EOT
             foreach ($metadata as $class) {
                 $className = $class->name;
                 $class->name = $namespace.'\\'.$bundleClass.'\\Entity\\'.$className;
-                if ($type === 'annotation') {
+                if ('annotation' === $type) {
                     $path = $destPath.'/'.$className.'.php';
                 } else {
                     $path = $destPath.'/'.str_replace('\\', '.', $class->name).'.dcm.'.$type;

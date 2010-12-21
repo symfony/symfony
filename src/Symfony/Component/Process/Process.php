@@ -115,7 +115,7 @@ class Process
 
             $n = @stream_select($r, $w, $e, $this->timeout);
 
-            if ($n === false) {
+            if (false === $n) {
                 break;
             } elseif ($n === 0) {
                 proc_terminate($process);

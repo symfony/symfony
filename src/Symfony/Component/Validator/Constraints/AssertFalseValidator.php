@@ -18,7 +18,7 @@ class AssertFalseValidator extends ConstraintValidator
 {
     public function isValid($value, Constraint $constraint)
     {
-        if ($value === null) {
+        if (null === $value) {
             return true;
         }
 

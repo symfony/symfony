@@ -359,13 +359,13 @@ class DoctrineExtension extends Extension
             $type = $this->detectMetadataDriver($bundleDirs[$namespace].'/'.$class, $container);
 
             if (is_dir($dir = $bundleDirs[$namespace].'/'.$class.'/Entity')) {
-                if ($type === null) {
+                if (null === $type) {
                     $type = 'annotation';
                 }
                 $aliasMap[$class] = $namespace.'\\'.$class.'\\Entity';
             }
 
-            if ($type !== null) {
+            if (null !== $type) {
                 $mappingDriverDef->addMethodCall('addDriver', array(
                         new Reference(sprintf('doctrine.orm.metadata_driver.%s', $type)),
                         $namespace.'\\'.$class.'\\Entity'
@@ -444,7 +444,7 @@ class DoctrineExtension extends Extension
     protected function getEntityManagerCacheDefinition(array $entityManager, $cacheDriver, ContainerBuilder $container)
     {
         $type = is_array($cacheDriver) && isset($cacheDriver['type']) ? $cacheDriver['type'] : $cacheDriver;
-        if ($type === 'memcache') {
+        if ('memcache' === $type) {
             $memcacheClass = isset($cacheDriver['class']) ? $cacheDriver['class'] : '%'.sprintf('doctrine.orm.cache.%s_class', $type).'%';
             $cacheDef = new Definition($memcacheClass);
             $memcacheHost = is_array($cacheDriver) && isset($cacheDriver['host']) ? $cacheDriver['host'] : '%doctrine.orm.cache.memcache_host%';

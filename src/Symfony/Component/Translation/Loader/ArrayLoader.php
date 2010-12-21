@@ -48,17 +48,17 @@ class ArrayLoader implements LoaderInterface
      */
     protected function flatten(array &$messages, array $subnode = null, $path = null)
     {
-        if ($subnode === null) {
+        if (null === $subnode) {
             $subnode =& $messages;
         }
         foreach ($subnode as $key => $value) {
             if (is_array($value)) {
                 $nodePath = $path ? $path.'.'.$key : $key;
                 $this->flatten($messages, $value, $nodePath);
-                if ($path === null) {
+                if (null === $path) {
                     unset($messages[$key]);
                 }
-            } elseif ($path !== null) {
+            } elseif (null !== $path) {
                 $messages[$path.'.'.$key] = $value;
             }
         }

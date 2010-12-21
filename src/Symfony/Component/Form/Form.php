@@ -49,7 +49,7 @@ class Form extends FieldGroup
         $this->validator = $validator;
 
         // Prefill the form with the given data
-        if ($data !== null) {
+        if (null !== $data) {
             $this->setData($data);
         }
 
@@ -61,7 +61,7 @@ class Form extends FieldGroup
 
         // If data is passed to this constructor, objects from parent forms
         // should be ignored
-        if ($data !== null) {
+        if (null !== $data) {
             $this->setPropertyPath(null);
         }
     }
@@ -73,7 +73,7 @@ class Form extends FieldGroup
      */
     public function setValidationGroups($validationGroups)
     {
-        $this->validationGroups = $validationGroups === null ? $validationGroups : (array) $validationGroups;
+        $this->validationGroups = null === $validationGroups ? $validationGroups : (array) $validationGroups;
     }
 
     /**
@@ -100,7 +100,7 @@ class Form extends FieldGroup
      */
     final public function bind($taintedValues, array $taintedFiles = null)
     {
-        if ($taintedFiles === null) {
+        if (null === $taintedFiles) {
             if ($this->isMultipart() && $this->getParent() === null) {
                 throw new \InvalidArgumentException('You must provide a files array for multipart forms');
             }
@@ -182,11 +182,11 @@ class Form extends FieldGroup
     public function enableCsrfProtection($csrfFieldName = null, $csrfSecret = null)
     {
         if (!$this->isCsrfProtected()) {
-            if ($csrfFieldName === null) {
+            if (null === $csrfFieldName) {
                 $csrfFieldName = FormConfiguration::getDefaultCsrfFieldName();
             }
 
-            if ($csrfSecret === null) {
+            if (null === $csrfSecret) {
                 if (FormConfiguration::getDefaultCsrfSecret() !== null) {
                     $csrfSecret = FormConfiguration::getDefaultCsrfSecret();
                 } else {

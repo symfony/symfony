@@ -37,7 +37,7 @@ class Locale extends \Locale
         if (!isset(self::$countries[$locale])) {
             $bundle = new \ResourceBundle($locale, __DIR__.'/Resources/data/region');
 
-            if ($bundle === null) {
+            if (null === $bundle) {
                 throw new \RuntimeException('The country resource bundle could not be loaded');
             }
 
@@ -48,7 +48,7 @@ class Locale extends \Locale
                 // Global countries (f.i. "America") have numeric codes
                 // Countries have alphabetic codes
                 // "ZZ" is the code for unknown country
-                if (ctype_alpha($code) && $code !== 'ZZ') {
+                if (ctype_alpha($code) && 'ZZ' !== $code) {
                     $countries[$code] = $name;
                 }
             }
@@ -84,7 +84,7 @@ class Locale extends \Locale
         if (!isset(self::$languages[$locale])) {
             $bundle = new \ResourceBundle($locale, __DIR__.'/Resources/data/lang');
 
-            if ($bundle === null) {
+            if (null === $bundle) {
                 throw new \RuntimeException('The language resource bundle could not be loaded');
             }
 
@@ -93,7 +93,7 @@ class Locale extends \Locale
 
             foreach ($bundle->get('Languages') as $code => $name) {
                 // "mul" is the code for multiple languages
-                if ($code !== 'mul') {
+                if ('mul' !== $code) {
                     $languages[$code] = $name;
                 }
             }

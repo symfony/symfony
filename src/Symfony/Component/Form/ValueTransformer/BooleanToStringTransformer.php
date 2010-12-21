@@ -27,7 +27,7 @@ class BooleanToStringTransformer extends BaseValueTransformer
      */
     public function transform($value)
     {
-        if ($value === null) {
+        if (null === $value) {
             return '';
         }
 
@@ -50,7 +50,7 @@ class BooleanToStringTransformer extends BaseValueTransformer
             throw new \InvalidArgumentException(sprintf('Expected argument of type string but got %s.', gettype($value)));
         }
 
-        return $value !== '';
+        return '' !== $value;
     }
 
 }

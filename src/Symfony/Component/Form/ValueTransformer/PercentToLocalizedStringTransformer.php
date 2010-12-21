@@ -52,7 +52,7 @@ class PercentToLocalizedStringTransformer extends BaseValueTransformer
      */
     public function transform($value)
     {
-        if ($value === null) {
+        if (null === $value) {
             return '';
         }
 
@@ -87,7 +87,7 @@ class PercentToLocalizedStringTransformer extends BaseValueTransformer
             throw new \InvalidArgumentException(sprintf('Expected argument of type string, %s given', gettype($value)));
         }
 
-        if ($value === '') {
+        if ('' === $value) {
             return null;
         }
 

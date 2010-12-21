@@ -243,7 +243,7 @@ class DateField extends HybridField
     {
         $date = $this->getNormalizedData();
 
-        return $date === null || in_array($date->format('Y'), $this->getOption('years'));
+        return null === $date || in_array($date->format('Y'), $this->getOption('years'));
     }
 
     /**
@@ -258,7 +258,7 @@ class DateField extends HybridField
     {
         $date = $this->getNormalizedData();
 
-        return $date === null || in_array($date->format('m'), $this->getOption('months'));
+        return null === $date || in_array($date->format('m'), $this->getOption('months'));
     }
 
     /**
@@ -273,6 +273,6 @@ class DateField extends HybridField
     {
         $date = $this->getNormalizedData();
 
-        return $date === null || in_array($date->format('d'), $this->getOption('days'));
+        return null === $date || in_array($date->format('d'), $this->getOption('days'));
     }
 }

@@ -40,7 +40,7 @@ class DateTimeToTimestampTransformer extends BaseValueTransformer
      */
     public function transform($value)
     {
-        if ($value === null) {
+        if (null === $value) {
             return null;
         }
 
@@ -61,7 +61,7 @@ class DateTimeToTimestampTransformer extends BaseValueTransformer
      */
     public function reverseTransform($value, $originalValue)
     {
-        if ($value === null) {
+        if (null === $value) {
             return null;
         }
 

@@ -57,7 +57,7 @@ class DateTimeToLocalizedStringTransformer extends BaseDateTimeTransformer
      */
     public function transform($dateTime)
     {
-        if ($dateTime === null) {
+        if (null === $dateTime) {
             return '';
         }
 
@@ -95,7 +95,7 @@ class DateTimeToLocalizedStringTransformer extends BaseDateTimeTransformer
             throw new \InvalidArgumentException(sprintf('Expected argument of type string, %s given', gettype($value)));
         }
 
-        if ($value === '') {
+        if ('' === $value) {
             return null;
         }
 

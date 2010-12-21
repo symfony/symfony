@@ -41,7 +41,7 @@ class MoneyToLocalizedStringTransformer extends NumberToLocalizedStringTransform
      */
     public function transform($value)
     {
-        if ($value !== null) {
+        if (null !== $value) {
             if (!is_numeric($value)) {
                 throw new \InvalidArgumentException(sprintf('Numeric argument expected, %s given', gettype($value)));
             }
@@ -62,7 +62,7 @@ class MoneyToLocalizedStringTransformer extends NumberToLocalizedStringTransform
     {
         $value = parent::reverseTransform($value, $originalValue);
 
-        if ($value !== null) {
+        if (null !== $value) {
             $value *= $this->getOption('divisor');
         }
 

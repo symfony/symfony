@@ -160,7 +160,7 @@ class TimeField extends FieldGroup
     {
         $date = $this->getNormalizedData();
 
-        return $date === null || in_array($date->format('H'), $this->getOption('hours'));
+        return null === $date || in_array($date->format('H'), $this->getOption('hours'));
     }
 
     /**
@@ -175,7 +175,7 @@ class TimeField extends FieldGroup
     {
         $date = $this->getNormalizedData();
 
-        return $date === null || in_array($date->format('i'), $this->getOption('minutes'));
+        return null === $date || in_array($date->format('i'), $this->getOption('minutes'));
     }
 
     /**
@@ -190,6 +190,6 @@ class TimeField extends FieldGroup
     {
         $date = $this->getNormalizedData();
 
-        return $date === null || in_array($date->format('s'), $this->getOption('seconds'));
+        return null === $date || in_array($date->format('s'), $this->getOption('seconds'));
     }
 }

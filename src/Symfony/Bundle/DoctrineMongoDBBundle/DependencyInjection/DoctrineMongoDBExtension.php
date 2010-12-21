@@ -237,13 +237,13 @@ class DoctrineMongoDBExtension extends Extension
             $type = $this->detectMetadataDriver($bundleDirs[$namespace].'/'.$class, $container);
 
             if (is_dir($dir = $bundleDirs[$namespace].'/'.$class.'/Document')) {
-                if ($type === null) {
+                if (null === $type) {
                     $type = 'annotation';
                 }
                 $aliasMap[$class] = $namespace.'\\'.$class.'\\Document';
             }
 
-            if ($type !== null) {
+            if (null !== $type) {
                 $mappingDriverDef->addMethodCall('addDriver', array(
                         new Reference(sprintf('doctrine.odm.mongodb.metadata.%s', $type)),
                         $namespace.'\\'.$class.'\\Document'
@@ -268,7 +268,7 @@ class DoctrineMongoDBExtension extends Extension
         $dmMetadataCacheDriver = isset($documentManager['metadata-cache-driver']) ? $documentManager['metadata-cache-driver'] : (isset($documentManager['metadata_cache_driver']) ? $documentManager['metadata_cache_driver'] : $metadataCacheDriver);
         $type = is_array($dmMetadataCacheDriver) && isset($dmMetadataCacheDriver['type']) ? $dmMetadataCacheDriver['type'] : $dmMetadataCacheDriver;
 
-        if ($type === 'memcache') {
+        if ('memcache' === $type) {
             $memcacheClass = isset($dmMetadataCacheDriver['class']) ? $dmMetadataCacheDriver['class'] : sprintf('%%doctrine.odm.mongodb.cache.%s_class%%', $type);
             $cacheDef = new Definition($memcacheClass);
             $memcacheHost = isset($dmMetadataCacheDriver['host']) ? $dmMetadataCacheDriver['host'] : '%doctrine.odm.mongodb.cache.memcache_host%';

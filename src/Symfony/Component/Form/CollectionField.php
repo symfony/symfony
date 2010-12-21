@@ -113,7 +113,7 @@ class CollectionField extends FieldGroup
     {
         $field = clone $this->prototype;
         $field->setKey($key);
-        $field->setPropertyPath($propertyPath === null ? null : '['.$propertyPath.']');
+        $field->setPropertyPath(null === $propertyPath ? null : '['.$propertyPath.']');
         return $field;
     }
 }

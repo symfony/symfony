@@ -62,7 +62,7 @@ class GraphWalker
             $this->walkConstraint($constraint, $object, $group, $propertyPath);
         }
 
-        if ($object !== null) {
+        if (null !== $object) {
             foreach ($metadata->getConstrainedProperties() as $property) {
                 $localPropertyPath = empty($propertyPath) ? $property : $propertyPath.'.'.$property;
 

@@ -107,7 +107,7 @@ EOT
         $cme = new ClassMetadataExporter();
         $exporter = $cme->getExporter($mappingType);
 
-        if ($mappingType === 'annotation') {
+        if ('annotation' === $mappingType) {
             $path = $dirs[$namespace].'/'.$bundle.'/Entity/'.str_replace($entityNamespace.'\\', null, $fullEntityClassName).'.php';
 
             $exporter->setEntityGenerator($this->getEntityGenerator());

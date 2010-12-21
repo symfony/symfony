@@ -107,7 +107,7 @@ class Parser
 
         while (1) {
             $peek = $stream->peek();
-            if ($peek == ',' || $peek === null) {
+            if ($peek == ',' || null === $peek) {
                 return $result;
             } elseif (in_array($peek, array('+', '>', '~'))) {
                 // A combinator

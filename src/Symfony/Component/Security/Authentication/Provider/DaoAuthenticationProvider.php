@@ -2,11 +2,10 @@
 
 namespace Symfony\Component\Security\Authentication\Provider;
 
+use Symfony\Component\Security\Encoder\EncoderFactoryInterface;
 use Symfony\Component\Security\User\UserProviderInterface;
 use Symfony\Component\Security\User\AccountCheckerInterface;
 use Symfony\Component\Security\User\AccountInterface;
-use Symfony\Component\Security\Encoder\PasswordEncoderInterface;
-use Symfony\Component\Security\Encoder\PlaintextPasswordEncoder;
 use Symfony\Component\Security\Exception\UsernameNotFoundException;
 use Symfony\Component\Security\Exception\AuthenticationServiceException;
 use Symfony\Component\Security\Exception\BadCredentialsException;
@@ -29,7 +28,7 @@ use Symfony\Component\Security\Authentication\Token\UsernamePasswordToken;
  */
 class DaoAuthenticationProvider extends UserAuthenticationProvider
 {
-    protected $passwordEncoder;
+    protected $encoderFactory;
     protected $userProvider;
 
     /**
@@ -37,16 +36,13 @@ class DaoAuthenticationProvider extends UserAuthenticationProvider
      *
      * @param UserProviderInterface    $userProvider    A UserProviderInterface instance
      * @param AccountCheckerInterface  $accountChecker  An AccountCheckerInterface instance
-     * @param PasswordEncoderInterface $passwordEncoder A PasswordEncoderInterface instance
+     * @param EncoderFactoryInterface  $encoderFactory  A EncoderFactoryInterface instance
      */
-    public function __construct(UserProviderInterface $userProvider, AccountCheckerInterface $accountChecker, PasswordEncoderInterface $passwordEncoder = null, $hideUserNotFoundExceptions = true)
+    public function __construct(UserProviderInterface $userProvider, AccountCheckerInterface $accountChecker, EncoderFactoryInterface $encoderFactory, $hideUserNotFoundExceptions = true)
     {
         parent::__construct($accountChecker, $hideUserNotFoundExceptions);
 
-        if (null === $passwordEncoder) {
-            $passwordEncoder = new PlaintextPasswordEncoder();
-        }
-        $this->passwordEncoder = $passwordEncoder;
+        $this->encoderFactory = $encoderFactory;
         $this->userProvider = $userProvider;
     }
 
@@ -65,7 +61,7 @@ class DaoAuthenticationProvider extends UserAuthenticationProvider
                 throw new BadCredentialsException('Bad credentials');
             }
 
-            if (!$this->passwordEncoder->isPasswordValid($account->getPassword(), $presentedPassword, $account->getSalt())) {
+            if (!$this->encoderFactory->getEncoder($account)->isPasswordValid($account->getPassword(), $presentedPassword, $account->getSalt())) {
                 throw new BadCredentialsException('Bad credentials');
             }
         }

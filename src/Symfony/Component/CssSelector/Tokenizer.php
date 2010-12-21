@@ -32,7 +32,7 @@ class Tokenizer
         $pos = 0;
         $s = preg_replace('#/\*.*?\*/#s', '', $s);
 
-        while (1) {
+        while (true) {
             if (preg_match('#\s+#A', $s, $match, 0, $pos)) {
                 $preceding_whitespace_pos = $pos;
                 $pos += strlen($match[0]);
@@ -103,7 +103,7 @@ class Tokenizer
 
         $pos = $pos + 1;
         $start = $pos;
-        while (1) {
+        while (true) {
             $next = strpos($s, $quote, $pos);
             if (false === $next) {
                 throw new SyntaxError(sprintf('Expected closing %s for string in: %s', $quote, substr($s, $start)));

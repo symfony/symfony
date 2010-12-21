@@ -82,7 +82,7 @@ class Parser
     protected function parseSelectorGroup($stream)
     {
         $result = array();
-        while (1) {
+        while (true) {
             $result[] = $this->parseSelector($stream);
             if ($stream->peek() == ',') {
                 $stream->next();
@@ -105,7 +105,7 @@ class Parser
     {
         $result = $this->parseSimpleSelector($stream);
 
-        while (1) {
+        while (true) {
             $peek = $stream->peek();
             if (',' == $peek || null === $peek) {
                 return $result;
@@ -156,7 +156,7 @@ class Parser
 
         $result = new Node\ElementNode($namespace, $element);
         $has_hash = false;
-        while (1) {
+        while (true) {
             $peek = $stream->peek();
             if ('#' == $peek) {
                 if ($has_hash) {

@@ -69,5 +69,10 @@
         </service>
 
         <service id="security.user.entity_manager" alias="doctrine.orm.default_entity_manager" />
+
+        <service id="request.param_converter.doctrine" class="Symfony\Bundle\DoctrineBundle\Request\ParamConverter\DoctrineConverter">
+            <tag name="request.param_converter" />
+            <argument type="service" id="doctrine.orm.default_entity_manager" />
+        </service>
     </services>
 </container>

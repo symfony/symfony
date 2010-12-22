@@ -11,6 +11,8 @@
         <parameter key="session.storage.native.options" type="collection" />
         <parameter key="session.storage.pdo.class">Symfony\Component\HttpFoundation\SessionStorage\PdoSessionStorage</parameter>
         <parameter key="session.storage.pdo.options" type="collection" />
+        <parameter key="session.storage.array.class">Symfony\Component\HttpFoundation\SessionStorage\ArraySessionStorage</parameter>
+        <parameter key="session.storage.array.options" type="collection" />
     </parameters>
 
     <services>
@@ -28,6 +30,10 @@
         <service id="session.storage.pdo" class="%session.storage.pdo.class%">
             <argument type="service" id="pdo_connection" />
             <argument>%session.storage.pdo.options%</argument>
+        </service>
+
+        <service id="session.storage.array" class="%session.storage.array.class%">
+            <argument>%session.storage.array.options%</argument>
         </service>
 
         <service id="session.storage" alias="session.storage.native" />

@@ -1,13 +1,12 @@
 <?php
 
-namespace Symfony\Bundle\FrameworkBundle\ParamConverter;
+namespace Symfony\Bundle\FrameworkBundle\Request\ParamConverter;
 
-use Symfony\Bundle\FrameworkBundle\ParamConverter\Converter\ConverterInterface;
+use Symfony\Bundle\FrameworkBundle\Request\ParamConverter\ConverterInterface;
 use Symfony\Component\HttpFoundation\Request;
 
 /**
- * ConverterManager
- * Keeps track of converters
+ * Keeps track of param converters.
  *
  * @author Fabien Potencier <fabien.potencier@symfony-project.com>
  * @author Henrik Bjornskov <hb@peytz.dk>
@@ -26,6 +25,7 @@ class ConverterManager
      *
      * @param  Request $request
      * @param  array   $reflectionParam An array of ReflectionParameter objects
+     *
      * @throws InvalidArgumentException
      */
     public function apply(Request $request, \ReflectionParameter $reflectionParam)
@@ -40,7 +40,7 @@ class ConverterManager
                 $converted = true;
             }
         }
-        
+
         if (true !== $converted) {
             throw new \InvalidArgumentException(sprintf('Could not convert attribute "%s" into an instance of "%s"', $reflectionParam->getName(), $reflectionClass->getName()));
         }

@@ -112,7 +112,7 @@ class FrameworkExtension extends Extension
             $this->registerTestConfiguration($config, $container);
         }
 
-        if (array_key_exists('param_converter', $config)) {
+        if (array_key_exists('param_converter', $config) || array_key_exists('param-converter', $config)) {
             $this->registerParamConverterConfiguration($config, $container);
         }
 

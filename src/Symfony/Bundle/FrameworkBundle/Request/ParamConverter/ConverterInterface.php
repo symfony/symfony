@@ -1,13 +1,13 @@
 <?php
 
-namespace Symfony\Bundle\FrameworkBundle\ParamConverter\Converter;
+namespace Symfony\Bundle\FrameworkBundle\Request\ParamConverter;
 
 use Symfony\Component\HttpFoundation\Request;
 
 interface ConverterInterface
 {
     /**
-     * Convert the \ReflectionPropertt to something else.
+     * Convert the \ReflectionParameter to something else.
      *
      * @param Request              $request
      * @param \ReflectionParameter $property
@@ -15,9 +15,10 @@ interface ConverterInterface
     function apply(Request $request, \ReflectionParameter $parameter);
 
     /**
-     * Returns boolean true if the ReflectionProperty is supported. Else false
+     * Returns boolean true if the ReflectionClass is supported, false otherwise
      *
      * @param  \ReflectionParameter $parameter
+     *
      * @return boolean
      */
     function supports(\ReflectionClass $class);

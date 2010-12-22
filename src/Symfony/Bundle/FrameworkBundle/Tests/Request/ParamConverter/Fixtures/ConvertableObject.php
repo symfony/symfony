@@ -1,6 +1,6 @@
 <?php
 
-namespace Symfony\Bundle\FrameworkBundle\Tests\ParamConverter\Fixtures;
+namespace Symfony\Bundle\FrameworkBundle\Tests\Request\ParamConverter\Fixtures;
 
 class ConvertableObject
 {

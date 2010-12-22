@@ -5,18 +5,18 @@
     xsi:schemaLocation="http://www.symfony-project.org/schema/dic/services http://www.symfony-project.org/schema/dic/services/services-1.0.xsd">
 
     <parameters>
-        <parameter key="param_converter.converter_manager.class">Symfony\Bundle\FrameworkBundle\ParamConverter\ConverterManager</parameter>
-        <parameter key="param_converter.controller.param_converter_listener.class">Symfony\Bundle\FrameworkBundle\Controller\ParamConverterListener</parameter>
+        <parameter key="request.param_converter.manager.class">Symfony\Bundle\FrameworkBundle\Request\ParamConverter\ConverterManager</parameter>
+        <parameter key="request.param_converter.listener.class">Symfony\Bundle\FrameworkBundle\Controller\ParamConverterListener</parameter>
     </parameters>
 
     <services>
         <!-- ConverterManager -->
-        <service id="param_converter.converter_manager" class="%param_converter.converter_manager.class%" />
+        <service id="request.param_converter.manager" class="%request.param_converter.manager.class%" />
 
         <!-- ParamConverterListener -->
-        <service id="param_converter.controller.param_converter_listener" class="%param_converter.controller.param_converter_listener.class%">
+        <service id="request.param_converter.listener" class="%request.param_converter.listener.class%">
             <tag name="kernel.listener" />
-            <argument type="service" id="param_converter.converter_manager" />
+            <argument type="service" id="request.param_converter.manager" />
             <argument type="service" id="service_container" />
         </service>
     </services>

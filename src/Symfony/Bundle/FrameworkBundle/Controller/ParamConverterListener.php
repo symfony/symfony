@@ -2,7 +2,7 @@
 
 namespace Symfony\Bundle\FrameworkBundle\Controller;
 
-use Symfony\Bundle\FrameworkBundle\ParamConverter\ConverterManager;
+use Symfony\Bundle\FrameworkBundle\Request\ParamConverter\ConverterManager;
 
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
@@ -11,7 +11,7 @@ use Symfony\Component\EventDispatcher\EventDispatcher;
 use Symfony\Component\EventDispatcher\Event;
 
 /**
- * Converts \ReflectionParameters for Controller actions into Objects if the ReflectionParameter have a class
+ * Converts \ReflectionParameters for Controller actions into Objects if the \ReflectionParameter have a class
  * (Typehinted).
  *
  * @author Fabien Potencier <fabien.potencier@symfony-project.org>
@@ -30,7 +30,7 @@ class ParamConverterListener
      */
     public function __construct(ConverterManager $manager, ContainerInterface $container)
     {
-        foreach ($container->findTaggedServiceIds('param_converter.converter') as $id => $attributes) {
+        foreach ($container->findTaggedServiceIds('request.param_converter') as $id => $attributes) {
             $priority = isset($attributes['priority']) ? (integer) $attributes['priority'] : 0;
             $manager->add($container->get($id), $priority);
         }
@@ -50,8 +50,10 @@ class ParamConverterListener
     /**
      * @param  Event $event
      * @param  mixed $controller
-     * @throws NotFoundHttpException
+     *
      * @return mixed
+     *
+     * @throws NotFoundHttpException
      */
     public function filterController(Event $event, $controller)
     {
@@ -67,8 +69,8 @@ class ParamConverterListener
                 try {
                     $this->manager->apply($request, $param);
                 } catch (\InvalidArgumentException $e) {
-                    if (false == $param->isOptional()) {
-                        throw new NotFoundHttpException($e->getMessage());
+                    if (false === $param->isOptional()) {
+                        throw new NotFoundHttpException(sprintf('Unable to convert parameter "%s".', $param->getName()), 0, $e);
                     }
                 }
             }

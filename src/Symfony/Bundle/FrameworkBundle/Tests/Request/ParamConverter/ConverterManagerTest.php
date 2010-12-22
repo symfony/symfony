@@ -1,9 +1,9 @@
 <?php
 
-namespace Symfony\Bundle\FrameworkBundle\Tests\ParamConverter;
+namespace Symfony\Bundle\FrameworkBundle\Tests\Request\ParamConverter;
 
 use Symfony\Component\HttpFoundation\Request;
-use Symfony\Bundle\FrameworkBundle\ParamConverter\ConverterManager;
+use Symfony\Bundle\FrameworkBundle\Request\ParamConverter\ConverterManager;
 
 class ConverterManagerTest extends \PHPUnit_Framework_TestCase
 {
@@ -18,7 +18,7 @@ class ConverterManagerTest extends \PHPUnit_Framework_TestCase
         $this->assertEquals($manager->all(), array($importantConverter));
 
         $manager->add($lessImportantConverter);
-        
+
         $this->assertEquals($manager->all(), array(
             $importantConverter,
             $lessImportantConverter,
@@ -67,11 +67,11 @@ class ConverterManagerTest extends \PHPUnit_Framework_TestCase
 
     private function getReflectionParameter()
     {
-        return new \ReflectionParameter(array('Symfony\Bundle\FrameworkBundle\Tests\ParamConverter\Fixtures\ConvertableObject', 'typehintedMethod'), 'object');
+        return new \ReflectionParameter(array('Symfony\Bundle\FrameworkBundle\Tests\Request\ParamConverter\Fixtures\ConvertableObject', 'typehintedMethod'), 'object');
     }
 
     private function getConverterInterfaceMock()
     {
-        return $this->getMock('Symfony\Bundle\FrameworkBundle\ParamConverter\Converter\ConverterInterface');
+        return $this->getMock('Symfony\Bundle\FrameworkBundle\Request\ParamConverter\ConverterInterface');
     }
 }

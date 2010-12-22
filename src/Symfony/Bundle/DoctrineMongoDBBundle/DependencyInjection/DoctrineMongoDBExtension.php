@@ -188,20 +188,19 @@ class DoctrineMongoDBExtension extends Extension
         // configure metadata driver for each bundle based on the type of mapping files found
         $mappingDriverDef = new Definition('%doctrine.odm.mongodb.metadata.driver_chain_class%');
         $bundleDocumentMappings = array();
-        $bundleDirs = $container->getParameter('kernel.bundle_dirs');
         $aliasMap = array();
         foreach ($container->getParameter('kernel.bundles') as $className) {
             $tmp = dirname(str_replace('\\', '/', $className));
             $namespace = str_replace('/', '\\', dirname($tmp));
             $class = basename($tmp);
 
-            if (!isset($bundleDirs[$namespace])) {
+            if (! $bundleDir = $this->findBundleDirForNamespace($namespace, $container)) {
                 continue;
             }
 
-            $type = $this->detectMetadataDriver($bundleDirs[$namespace].'/'.$class, $container);
+            $type = $this->detectMetadataDriver($bundleDir.'/'.$class, $container);
 
-            if (is_dir($dir = $bundleDirs[$namespace].'/'.$class.'/Document')) {
+            if (is_dir($dir = $bundleDir.'/'.$class.'/Document')) {
                 if ($type === null) {
                     $type = 'annotation';
                 }
@@ -292,6 +291,31 @@ class DoctrineMongoDBExtension extends Extension
             $connections = array($defaultConnection => $config);
         }
         return $connections;
+    }
+
+    /**
+     * Finds the bundle directory for a namespace.
+     *
+     * If the namespace does not yield a direct match, this method will attempt
+     * to match parent namespaces exhaustively.
+     *
+     * @param string           $namespace A bundle namespace omitting the bundle name part
+     * @param ContainerBuilder $container A ContainerBuilder instance
+     *
+     * @return string|false The bundle directory if found, false otherwise
+     */
+    protected function findBundleDirForNamespace($namespace, ContainerBuilder $container)
+    {
+        $bundleDirs = $container->getParameter('kernel.bundle_dirs');
+        $segment = $namespace;
+
+        do {
+            if (isset($bundleDirs[$segment])) {
+                return $bundleDirs[$segment] . str_replace('\\', '/', substr($namespace, strlen($segment)));
+            }
+        } while ($segment = substr($segment, 0, ($pos = strrpos($segment, '\\'))));
+
+        return false;
     }
 
     /**

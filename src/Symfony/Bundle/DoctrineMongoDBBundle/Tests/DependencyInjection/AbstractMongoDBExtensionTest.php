@@ -259,6 +259,23 @@ abstract class AbstractMongoDBExtensionTest extends TestCase
         $this->assertEquals('DoctrineMongoDBBundle\Tests\DependencyInjection\Fixtures\Bundles\AnnotationsBundle\Document', $calls[0][1][1]);
     }
 
+    public function testAnnotationsBundleMappingDetectionWithVendorNamespace()
+    {
+        $container = $this->getContainer('AnnotationsBundle', 'Vendor');
+        $loader = new DoctrineMongoDBExtension();
+
+        $loader->mongodbLoad(array(), $container);
+
+        $this->assertEquals(array(), $container->getParameter('doctrine.odm.mongodb.mapping_dirs'));
+        $this->assertEquals('%doctrine.odm.mongodb.mapping_dirs%', $container->getParameter('doctrine.odm.mongodb.xml_mapping_dirs'));
+        $this->assertEquals('%doctrine.odm.mongodb.mapping_dirs%', $container->getParameter('doctrine.odm.mongodb.yml_mapping_dirs'));
+        $this->assertEquals(array(__DIR__.'/Fixtures/Bundles/Vendor/AnnotationsBundle/Document'), $container->getParameter('doctrine.odm.mongodb.document_dirs'));
+
+        $calls = $container->getDefinition('doctrine.odm.mongodb.metadata')->getMethodCalls();
+        $this->assertEquals('doctrine.odm.mongodb.metadata.annotation', (string) $calls[0][1][0]);
+        $this->assertEquals('DoctrineMongoDBBundle\Tests\DependencyInjection\Fixtures\Bundles\Vendor\AnnotationsBundle\Document', $calls[0][1][1]);
+    }
+
     public function testDocumentManagerMetadataCacheDriverConfiguration()
     {
         $container = $this->getContainer();
@@ -316,13 +333,13 @@ abstract class AbstractMongoDBExtensionTest extends TestCase
         $this->assertTrue($container->getParameter('doctrine.odm.mongodb.auto_generate_proxy_classes'));
     }
 
-    protected function getContainer($bundle = 'YamlBundle')
+    protected function getContainer($bundle = 'YamlBundle', $vendor = null)
     {
-        require_once __DIR__.'/Fixtures/Bundles/'.$bundle.'/'.$bundle.'.php';
+        require_once __DIR__.'/Fixtures/Bundles/'.($vendor ? $vendor.'/' : '').$bundle.'/'.$bundle.'.php';
 
         return new ContainerBuilder(new ParameterBag(array(
             'kernel.bundle_dirs' => array('DoctrineMongoDBBundle\\Tests\\DependencyInjection\\Fixtures\\Bundles' => __DIR__.'/Fixtures/Bundles'),
-            'kernel.bundles'     => array('DoctrineMongoDBBundle\\Tests\\DependencyInjection\\Fixtures\\Bundles\\'.$bundle.'\\'.$bundle),
+            'kernel.bundles'     => array('DoctrineMongoDBBundle\\Tests\\DependencyInjection\\Fixtures\\Bundles\\'.($vendor ? $vendor.'\\' : '').$bundle.'\\'.$bundle),
             'kernel.cache_dir'   => sys_get_temp_dir(),
         )));
     }

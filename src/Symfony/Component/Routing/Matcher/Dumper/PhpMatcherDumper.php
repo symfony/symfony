@@ -61,7 +61,7 @@ class PhpMatcherDumper extends MatcherDumper
             }
 
             if (!count($compiledRoute->getVariables()) && false !== preg_match('#^(.)\^(?P<url>.*?)\$\1#', $compiledRoute->getRegex(), $m)) {
-                $conditions[] = sprintf("\$url === '%s'", $m['url']);
+                $conditions[] = sprintf("\$url === '%s'", str_replace('\\', '', $m['url']));
 
                 $matches = 'array()';
             } else {

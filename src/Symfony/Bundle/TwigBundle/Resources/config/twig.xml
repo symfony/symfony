@@ -5,7 +5,7 @@
     xsi:schemaLocation="http://www.symfony-project.org/schema/dic/services http://www.symfony-project.org/schema/dic/services/services-1.0.xsd">
 
     <parameters>
-        <parameter key="twig.class">Symfony\Bundle\TwigBundle\Environment</parameter>
+        <parameter key="twig.class">Twig_Environment</parameter>
         <parameter key="twig.options" type="collection">
             <parameter key="charset">%kernel.charset%</parameter>
             <parameter key="debug">%kernel.debug%</parameter>
@@ -20,7 +20,6 @@
 
     <services>
         <service id="twig" class="%twig.class%">
-            <argument type="service" id="service_container" />
             <argument type="service" id="twig.loader" />
             <argument>%twig.options%</argument>
         </service>

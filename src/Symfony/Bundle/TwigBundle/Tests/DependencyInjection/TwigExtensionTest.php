@@ -23,7 +23,7 @@ class TwigExtensionTest extends TestCase
         $loader = new TwigExtension();
 
         $loader->configLoad(array(), $container);
-        $this->assertEquals('Symfony\\Bundle\\TwigBundle\\Environment', $container->getParameter('twig.class'), '->configLoad() loads the twig.xml file if not already loaded');
+        $this->assertEquals('Twig_Environment', $container->getParameter('twig.class'), '->configLoad() loads the twig.xml file if not already loaded');
 
         $loader->configLoad(array('charset' => 'ISO-8859-1'), $container);
         $options = $container->getParameter('twig.options');

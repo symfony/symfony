@@ -70,7 +70,7 @@ class ParamConverterListener
                     $this->manager->apply($request, $param);
                 } catch (\InvalidArgumentException $e) {
                     if (false === $param->isOptional()) {
-                        throw new NotFoundHttpException(sprintf('Unable to convert parameter "%s".', $param->getName()), 0, $e);
+                        throw new NotFoundHttpException(sprintf('Unable to convert parameter "%s".', $param->getName()), $e);
                     }
                 }
             }

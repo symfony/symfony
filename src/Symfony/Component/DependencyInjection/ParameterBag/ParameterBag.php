@@ -118,7 +118,7 @@ class ParameterBag implements ParameterBagInterface
      *
      * @param  mixed $value A value
      *
-     * @throws \RuntimeException if a placeholder references a parameter that does not exist
+     * @throws \InvalidArgumentException if a placeholder references a parameter that does not exist
      */
     public function resolveValue($value)
     {

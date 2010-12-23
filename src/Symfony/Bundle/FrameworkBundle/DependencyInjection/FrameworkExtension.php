@@ -259,6 +259,8 @@ class FrameworkExtension extends Extension
     {
         $loader = new XmlFileLoader($container, array(__DIR__.'/../Resources/config', __DIR__.'/Resources/config'));
         $loader->load('test.xml');
+
+        $container->setAlias('session.storage', 'session.storage.array');
     }
 
     /**

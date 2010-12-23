@@ -26,15 +26,9 @@ class ParamConverterListener
 
     /**
      * @param ConverterManager   $manager
-     * @param ContainerInterface $container
      */
-    public function __construct(ConverterManager $manager, ContainerInterface $container)
+    public function __construct(ConverterManager $manager)
     {
-        foreach ($container->findTaggedServiceIds('request.param_converter') as $id => $attributes) {
-            $priority = isset($attributes['priority']) ? (integer) $attributes['priority'] : 0;
-            $manager->add($container->get($id), $priority);
-        }
-
         $this->manager = $manager;
     }
 

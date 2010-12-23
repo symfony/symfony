@@ -17,7 +17,6 @@
         <service id="request.param_converter.listener" class="%request.param_converter.listener.class%">
             <tag name="kernel.listener" />
             <argument type="service" id="request.param_converter.manager" />
-            <argument type="service" id="service_container" />
         </service>
     </services>
 </container>

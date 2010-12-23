@@ -115,10 +115,9 @@ class ContainerBuilder extends Container implements TaggedContainerInterface
     public function addObjectResource($object)
     {
         $parent = new \ReflectionObject($object);
-        $this->addResource(new FileResource($parent->getFileName()));
-        while ($parent = $parent->getParentClass()) {
+        do {
             $this->addResource(new FileResource($parent->getFileName()));
-        }
+        } while ($parent = $parent->getParentClass());
     }
 
     /**
@@ -182,8 +181,7 @@ class ContainerBuilder extends Container implements TaggedContainerInterface
             throw new \BadMethodCallException('Setting service on a frozen container is not allowed');
         }
 
-        unset($this->definitions[$id]);
-        unset($this->aliases[$id]);
+        unset($this->definitions[$id], $this->aliases[$id]);
 
         parent::set($id, $service);
     }

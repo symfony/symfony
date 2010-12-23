@@ -4,6 +4,7 @@ namespace Symfony\Bundle\FrameworkBundle;
 
 use Symfony\Bundle\FrameworkBundle\DependencyInjection\Compiler\AddSecurityVotersPass;
 use Symfony\Bundle\FrameworkBundle\DependencyInjection\Compiler\ConverterManagerPass;
+use Symfony\Bundle\FrameworkBundle\DependencyInjection\Compiler\RoutingResolverPass;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\HttpKernel\Bundle\Bundle;
 use Symfony\Component\Form\FormConfiguration;
@@ -44,5 +45,6 @@ class FrameworkBundle extends Bundle
 
         $container->addCompilerPass(new AddSecurityVotersPass());
         $container->addCompilerPass(new ConverterManagerPass());
+        $container->addCompilerPass(new RoutingResolverPass());
     }
 }

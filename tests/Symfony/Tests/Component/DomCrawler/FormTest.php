@@ -288,6 +288,14 @@ class FormTest extends \PHPUnit_Framework_TestCase
         $this->assertEquals('/foo/bar?get=param', $form->getUri(false), '->getUri() returns absolute URIs only if the host has been defined in the constructor');
     }
 
+    public function testGetUriWithoutAction()
+    {
+        $form = $this->createForm('<form><input type="submit" /></form>', null, 'http://localhost', '/foo/bar');
+        $this->assertEquals('http://localhost/foo/bar', $form->getUri(true), '->getUri() returns path if no action defined');
+
+        $this->assertEquals('/foo/bar', $form->getUri(false), '->getUri() returns path if no action defined');
+    }
+
     public function provideGetUriValues()
     {
         return array(
@@ -325,7 +333,7 @@ class FormTest extends \PHPUnit_Framework_TestCase
                 'returns an empty URI if the action is empty',
                 '<form><input type="submit" /></form>',
                 array(),
-                '',
+                '/',
             ),
             array(
                 'appends the form values even if the action is empty',

@@ -38,6 +38,7 @@ class ConverterManager
             if ($converter->supports($reflectionClass)) {
                 $converter->apply($request, $reflectionParam);
                 $converted = true;
+                break;
             }
         }
 

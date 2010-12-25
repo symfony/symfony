@@ -36,11 +36,7 @@ class ConverterManagerPass implements CompilerPassInterface
         $definition = $container->getDefinition('request.param_converter.manager');
 
         foreach ($container->findTaggedServiceIds('request.param_converter') as $serviceId => $attributes) {
-            $priority = 0;
-            if (isset($attributes['priority'])) {
-                $priority = (integer) $attributes['priority'];
-            }
-
+            $priority = isset($attributes[0]['priority']) ? $attributes[0]['priority'] : 0;
             $definition->addMethodCall('add', array(new Reference($serviceId), $priority));
         }
     }

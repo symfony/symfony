@@ -1,13 +1,16 @@
+{% block field_row %}
+    <div>
+        {# TODO: would be nice to rename this variable to "field" #}
+        {{ child|render_label }}
+        {{ child|render_errors }}
+        {{ child|render }}
+    </div>
+{% endblock field_row %}
+
 {% block field_group %}
     {{ field|render_errors }}
-    {% for child in field %}
-        {% if not child.ishidden %}
-            <div>
-                {{ child|render_label }}
-                {{ child|render_errors }}
-                {{ child|render }}
-            </div>
-        {% endif %}
+    {% for child in field.visibleFields %}
+        {{ block('field_row') }}
     {% endfor %}
     {{ field|render_hidden }}
 {% endblock field_group %}

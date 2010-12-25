@@ -2,11 +2,7 @@
 
 <div>
     <?php foreach ($field->getVisibleFields() as $child): ?>
-        <div>
-            <?php echo $view['form']->label($child) ?>
-            <?php echo $view['form']->errors($child) ?>
-            <?php echo $view['form']->render($child) ?>
-        </div>
+        <?php echo $view['form']->render($child, array(), array(), 'FrameworkBundle:Form:field_row.php') ?>
     <?php endforeach; ?>
 </div>
 

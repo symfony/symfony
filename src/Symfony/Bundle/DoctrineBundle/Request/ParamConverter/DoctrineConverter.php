@@ -59,6 +59,10 @@ class DoctrineConverter implements ConverterInterface
 
     protected function find($class, Request $request)
     {
+        if (!$request->attributes->has('id')) {
+            return null;
+        }
+
         return $this->manager->getRepository($class)->find($request->attributes->get('id'));
     }
 

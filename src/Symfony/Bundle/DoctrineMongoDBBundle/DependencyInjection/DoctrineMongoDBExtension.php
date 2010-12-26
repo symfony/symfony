@@ -397,9 +397,9 @@ class DoctrineMongoDBExtension extends Extension
         }
         $container->addResource(new FileResource($resource));
 
-        if (count(glob($dir.'/Resources/config/doctrine/metadata/mongodb/*.xml'))) {
+        if (($files = glob($dir.'/Resources/config/doctrine/metadata/mongodb/*.xml')) && count($files)) {
             return 'xml';
-        } elseif (count(glob($dir.'/Resources/config/doctrine/metadata/mongodb/*.yml'))) {
+        } elseif (($files = glob($dir.'/Resources/config/doctrine/metadata/mongodb/*.yml')) && count($files)) {
             return 'yml';
         }
 

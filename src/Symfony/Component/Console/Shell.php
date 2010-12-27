@@ -102,7 +102,7 @@ class Shell
 
         // options and arguments?
         try {
-            $command = $this->application->findCommand(substr($text, 0, strpos($text, ' ')));
+            $command = $this->application->find(substr($text, 0, strpos($text, ' ')));
         } catch (\Exception $e) {
             return true;
         }

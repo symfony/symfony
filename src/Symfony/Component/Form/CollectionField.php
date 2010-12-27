@@ -59,18 +59,20 @@ class CollectionField extends FieldGroup
 
     public function setData($collection)
     {
-        if (!is_array($collection) && !$collection instanceof \Traversable) {
-            throw new UnexpectedTypeException('The data passed to the CollectionField must be an array or a Traversable');
-        }
-
-        foreach ($this as $name => $field) {
-            if (!$this->getOption('modifiable') || '$$key$$' != $name) {
-                $this->remove($name);
+        if (null !== $collection) {
+            if (!is_array($collection) && !$collection instanceof \Traversable) {
+                throw new UnexpectedTypeException('The data passed to the CollectionField must be an array or a Traversable');
             }
-        }
-
-        foreach ($collection as $name => $value) {
-            $this->add($this->newField($name, $name));
+    
+            foreach ($this as $name => $field) {
+                if (!$this->getOption('modifiable') || '$$key$$' != $name) {
+                    $this->remove($name);
+                }
+            }
+    
+            foreach ($collection as $name => $value) {
+                $this->add($this->newField($name, $name));
+            }
         }
 
         parent::setData($collection);

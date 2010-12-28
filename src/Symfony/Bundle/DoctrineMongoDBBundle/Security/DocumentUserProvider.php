@@ -16,6 +16,11 @@ class DocumentUserProvider implements UserProviderInterface
     public function __construct($em, $class, $property = null)
     {
         $this->class = $class;
+
+        if (false !== strpos($this->class, ':')) {
+            $this->class = $em->getClassMetadata($class)->getName();
+        }
+
         $this->repository = $em->getRepository($class);
         $this->property = $property;
     }

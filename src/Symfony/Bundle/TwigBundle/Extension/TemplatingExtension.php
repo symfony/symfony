@@ -60,15 +60,15 @@ class TemplatingExtension extends \Twig_Extension
     }
 
     /**
-     * Returns a list of global functions to add to the existing list.
+     * Returns a list of functions to add to the existing list.
      *
-     * @return array An array of global functions
+     * @return array An array of functions
      */
-    public function getGlobals()
+    public function getFunctions()
     {
         return array(
-            'fn_url'  => new \Twig_Function($this, 'getUrl'),
-            'fn_path' => new \Twig_Function($this, 'getPath'),
+            'url'  => new \Twig_Function_Method($this, 'getUrl'),
+            'path' => new \Twig_Function_Method($this, 'getPath'),
         );
     }
 

@@ -39,10 +39,10 @@ class SecurityExtension extends \Twig_Extension
     /**
      * {@inheritdoc}
      */
-    public function getGlobals()
+    public function getFunctions()
     {
         return array(
-            'fn_has_role' => new \Twig_Function($this, 'vote'),
+            'has_role' => new \Twig_Function_Method($this, 'vote'),
         );
     }
 

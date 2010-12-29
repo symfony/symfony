@@ -43,9 +43,9 @@ class DoctrineConverter implements ConverterInterface
         $class = $parameter->getClass()->getName();
 
         // find by identifier?
-        if (false === $object = $this->find($class, $request)) {
+        if (null === $object = $this->find($class, $request)) {
             // find by criteria
-            if (false === $object = $this->findOneBy($class, $request)) {
+            if (null === $object = $this->findOneBy($class, $request)) {
                 throw new \LogicException('Unable to guess how to get a Doctrine instance from the request information.');
             }
         }

@@ -30,9 +30,8 @@ class ResolveInterfaceInjectorsPass implements CompilerPassInterface
                 if (null !== $definition->getFactoryService()) {
                     continue;
                 }
-                $defClass = $container->getParameterBag()->resolveValue($definition->getClass());
-                $definition->setClass($defClass);
-                if ($injector->supports($defClass)) {
+
+                if ($injector->supports($definition->getClass())) {
                     $injector->processDefinition($definition);
                 }
             }

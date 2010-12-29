@@ -109,6 +109,8 @@ abstract class AbstractMongoDBExtensionTest extends TestCase
 
         $this->loadFromFile($container, 'mongodb_service_simple_single_connection');
 
+        $container->getCompilerPassConfig()->setOptimizationPasses(array());
+        $container->getCompilerPassConfig()->setRemovingPasses(array());
         $container->freeze();
 
         $definition = $container->getDefinition('doctrine.odm.mongodb.default_connection');
@@ -141,6 +143,8 @@ abstract class AbstractMongoDBExtensionTest extends TestCase
 
         $this->loadFromFile($container, 'mongodb_service_single_connection');
 
+        $container->getCompilerPassConfig()->setOptimizationPasses(array());
+        $container->getCompilerPassConfig()->setRemovingPasses(array());
         $container->freeze();
 
         $definition = $container->getDefinition('doctrine.odm.mongodb.default_connection');
@@ -167,6 +171,8 @@ abstract class AbstractMongoDBExtensionTest extends TestCase
 
         $this->loadFromFile($container, 'mongodb_service_multiple_connections');
 
+        $container->getCompilerPassConfig()->setOptimizationPasses(array());
+        $container->getCompilerPassConfig()->setRemovingPasses(array());
         $container->freeze();
 
         $definition = $container->getDefinition('doctrine.odm.mongodb.conn1_connection');
@@ -259,6 +265,8 @@ abstract class AbstractMongoDBExtensionTest extends TestCase
 
         $this->loadFromFile($container, 'mongodb_service_multiple_connections');
 
+        $container->getCompilerPassConfig()->setOptimizationPasses(array());
+        $container->getCompilerPassConfig()->setRemovingPasses(array());
         $container->freeze();
 
         $definition = $container->getDefinition('doctrine.odm.mongodb.dm1_metadata_cache');
@@ -276,6 +284,8 @@ abstract class AbstractMongoDBExtensionTest extends TestCase
 
         $this->loadFromFile($container, 'mongodb_service_simple_single_connection');
 
+        $container->getCompilerPassConfig()->setOptimizationPasses(array());
+        $container->getCompilerPassConfig()->setRemovingPasses(array());
         $container->freeze();
 
         $definition = $container->getDefinition('doctrine.odm.mongodb.default_metadata_cache');
@@ -302,6 +312,8 @@ abstract class AbstractMongoDBExtensionTest extends TestCase
 
         $this->loadFromFile($container, 'odm_imports');
 
+        $container->getCompilerPassConfig()->setOptimizationPasses(array());
+        $container->getCompilerPassConfig()->setRemovingPasses(array());
         $container->freeze();
 
         $this->assertEquals('apc', $container->getParameter('doctrine.odm.mongodb.metadata_cache_driver'));

@@ -27,6 +27,7 @@ class Definition
     protected $calls;
     protected $configurator;
     protected $tags;
+    protected $public;
 
     /**
      * Constructor.
@@ -41,6 +42,7 @@ class Definition
         $this->calls = array();
         $this->shared = true;
         $this->tags = array();
+        $this->public = true;
     }
 
     /**
@@ -335,6 +337,29 @@ class Definition
     public function isShared()
     {
         return $this->shared;
+    }
+
+    /**
+     * Sets the visibility of this service.
+     *
+     * @param Boolean $boolean
+     * @return Definition The current instance
+     */
+    public function setPublic($boolean)
+    {
+        $this->public = (Boolean) $boolean;
+
+        return $this;
+    }
+
+    /**
+     * Whether this service is public facing
+     *
+     * @return Boolean
+     */
+    public function isPublic()
+    {
+        return $this->public;
     }
 
     /**

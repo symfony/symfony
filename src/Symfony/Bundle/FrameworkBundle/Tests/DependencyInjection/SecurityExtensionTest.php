@@ -95,6 +95,9 @@ abstract class SecurityExtensionTest extends TestCase
         $security = new SecurityExtension();
         $container->registerExtension($security);
         $this->loadFromFile($container, $file);
+
+        $container->getCompilerPassConfig()->setOptimizationPasses(array());
+        $container->getCompilerPassConfig()->setRemovingPasses(array());
         $container->freeze();
 
         return $container;

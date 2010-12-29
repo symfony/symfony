@@ -141,6 +141,10 @@ class YamlFileLoader extends FileLoader
             $definition->setShared($service['shared']);
         }
 
+        if (isset($service['public'])) {
+            $definition->setPublic($service['public']);
+        }
+
         if (isset($service['factory_method'])) {
             $definition->setFactoryMethod($service['factory_method']);
         }

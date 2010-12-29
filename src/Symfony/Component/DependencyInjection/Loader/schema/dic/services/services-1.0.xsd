@@ -102,6 +102,7 @@
     <xsd:attribute name="id" type="xsd:string" />
     <xsd:attribute name="class" type="xsd:string" />
     <xsd:attribute name="shared" type="boolean" />
+    <xsd:attribute name="public" type="boolean" />
     <xsd:attribute name="factory-method" type="xsd:string" />
     <xsd:attribute name="factory-service" type="xsd:string" />
     <xsd:attribute name="alias" type="xsd:string" />

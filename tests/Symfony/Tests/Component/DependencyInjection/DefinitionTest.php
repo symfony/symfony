@@ -113,6 +113,18 @@ class DefinitionTest extends \PHPUnit_Framework_TestCase
     }
 
     /**
+     * @covers Symfony\Component\DependencyInjection\Definition::setPublic
+     * @covers Symfony\Component\DependencyInjection\Definition::isPublic
+     */
+    public function testSetIsPublic()
+    {
+        $def = new Definition('stdClass');
+        $this->assertTrue($def->isPublic(), '->isPublic() returns true by default');
+        $this->assertSame($def, $def->setPublic(false), '->setPublic() implements a fluent interface');
+        $this->assertFalse($def->isPublic(), '->isPublic() returns false if the instance must not be public.');
+    }
+
+    /**
      * @covers Symfony\Component\DependencyInjection\Definition::setConfigurator
      * @covers Symfony\Component\DependencyInjection\Definition::getConfigurator
      */

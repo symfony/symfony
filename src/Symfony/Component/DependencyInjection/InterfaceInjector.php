@@ -45,6 +45,17 @@ class InterfaceInjector
     }
 
     /**
+     * Sets the interface class
+     *
+     * @param string $class
+     * @return void
+     */
+    public function setClass($class)
+    {
+        $this->class = $class;
+    }
+
+    /**
      * Adds method calls if Definition is of required interface
      *
      * @param Definition $definition
@@ -80,7 +91,7 @@ class InterfaceInjector
     {
         if (is_string($object)) {
             $reflection = new \ReflectionClass($object);
-            
+
             return $reflection->isSubClassOf($this->class)
                    || $object === $this->class;
         }

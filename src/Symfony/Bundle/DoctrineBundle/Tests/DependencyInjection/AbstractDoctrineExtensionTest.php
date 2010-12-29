@@ -62,6 +62,9 @@ abstract class AbstractDoctrineExtensionTest extends TestCase
         $loadXml = new XmlFileLoader($container, __DIR__.'/Fixtures/config/xml');
         $loadXml->load('dbal_service_multiple_connections.xml');
         $loader->dbalLoad(array(), $container);
+
+        $container->getCompilerPassConfig()->setOptimizationPasses(array());
+        $container->getCompilerPassConfig()->setRemovingPasses(array());
         $container->freeze();
 
         // doctrine.dbal.mysql_connection
@@ -82,6 +85,9 @@ abstract class AbstractDoctrineExtensionTest extends TestCase
         $loadXml = new XmlFileLoader($container, __DIR__.'/Fixtures/config/xml');
         $loadXml->load('dbal_service_single_connection.xml');
         $loader->dbalLoad(array(), $container);
+
+        $container->getCompilerPassConfig()->setOptimizationPasses(array());
+        $container->getCompilerPassConfig()->setRemovingPasses(array());
         $container->freeze();
 
         // doctrine.dbal.mysql_connection
@@ -126,7 +132,7 @@ abstract class AbstractDoctrineExtensionTest extends TestCase
             'auto_generate_proxy_classes' => true,
             'mappings' => array('YamlBundle' => array()),
         );
-        
+
         $loader->dbalLoad(array(), $container);
         $loader->ormLoad($config, $container);
 
@@ -203,6 +209,8 @@ abstract class AbstractDoctrineExtensionTest extends TestCase
 
         $this->loadFromFile($container, 'orm_service_simple_single_entity_manager');
 
+        $container->getCompilerPassConfig()->setOptimizationPasses(array());
+        $container->getCompilerPassConfig()->setRemovingPasses(array());
         $container->freeze();
 
         $definition = $container->getDefinition('doctrine.dbal.default_connection');
@@ -237,6 +245,8 @@ abstract class AbstractDoctrineExtensionTest extends TestCase
 
         $this->loadFromFile($container, 'orm_service_single_entity_manager');
 
+        $container->getCompilerPassConfig()->setOptimizationPasses(array());
+        $container->getCompilerPassConfig()->setRemovingPasses(array());
         $container->freeze();
 
         $definition = $container->getDefinition('doctrine.dbal.default_connection');
@@ -274,6 +284,8 @@ abstract class AbstractDoctrineExtensionTest extends TestCase
 
         $this->loadFromFile($container, 'orm_service_multiple_entity_managers');
 
+        $container->getCompilerPassConfig()->setOptimizationPasses(array());
+        $container->getCompilerPassConfig()->setRemovingPasses(array());
         $container->freeze();
 
         $definition = $container->getDefinition('doctrine.dbal.conn1_connection');
@@ -440,6 +452,8 @@ abstract class AbstractDoctrineExtensionTest extends TestCase
 
         $this->loadFromFile($container, 'orm_service_multiple_entity_managers');
 
+        $container->getCompilerPassConfig()->setOptimizationPasses(array());
+        $container->getCompilerPassConfig()->setRemovingPasses(array());
         $container->freeze();
 
         $definition = $container->getDefinition('doctrine.orm.dm1_metadata_cache');
@@ -457,6 +471,8 @@ abstract class AbstractDoctrineExtensionTest extends TestCase
 
         $this->loadFromFile($container, 'orm_service_simple_single_entity_manager');
 
+        $container->getCompilerPassConfig()->setOptimizationPasses(array());
+        $container->getCompilerPassConfig()->setRemovingPasses(array());
         $container->freeze();
 
         $definition = $container->getDefinition('doctrine.orm.default_metadata_cache');
@@ -478,6 +494,8 @@ abstract class AbstractDoctrineExtensionTest extends TestCase
 
         $this->loadFromFile($container, 'orm_imports');
 
+        $container->getCompilerPassConfig()->setOptimizationPasses(array());
+        $container->getCompilerPassConfig()->setRemovingPasses(array());
         $container->freeze();
 
         $this->assertEquals('apc', $container->getParameter('doctrine.orm.metadata_cache_driver'));

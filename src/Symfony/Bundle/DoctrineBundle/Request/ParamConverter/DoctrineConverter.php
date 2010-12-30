@@ -73,7 +73,7 @@ class DoctrineConverter implements ConverterInterface
         }
 
         if (!$criteria) {
-            return false;
+            return null;
         }
 
         return $this->manager->getRepository($class)->findOneBy($criteria);

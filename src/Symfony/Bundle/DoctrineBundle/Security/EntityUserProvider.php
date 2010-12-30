@@ -18,7 +18,7 @@ class EntityUserProvider implements UserProviderInterface
         $this->class = $class;
 
         if (false !== strpos($this->class, ':')) {
-            $this->class = $em->getClassMetadata($class)->getName();
+            $this->class = $em->getClassMetadata($class)->name;
         }
 
         $this->repository = $em->getRepository($class);

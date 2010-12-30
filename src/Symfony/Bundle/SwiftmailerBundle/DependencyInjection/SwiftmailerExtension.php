@@ -92,7 +92,7 @@ class SwiftMailerExtension extends Extension
         }
 
         if (array_key_exists('delivery-address', $config)) {
-            $config['delivery-address'] = $config['delivery_address'];
+            $config['delivery_address'] = $config['delivery-address'];
         }
 
         if (isset($config['delivery_address'])) {

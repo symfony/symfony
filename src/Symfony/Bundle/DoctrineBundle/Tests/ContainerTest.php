@@ -51,7 +51,7 @@ class ContainerTest extends TestCase
         $this->assertInstanceOf('Doctrine\DBAL\Configuration', $container->get('doctrine.dbal.default_connection.configuration'));
         $this->assertInstanceOf('Doctrine\Common\EventManager', $container->get('doctrine.dbal.default_connection.event_manager'));
         $this->assertInstanceOf('Doctrine\DBAL\Connection', $container->get('doctrine.dbal.default_connection'));
-        $this->assertInstanceOf('Doctrine\Common\Annotations\AnnotationReader', $container->get('doctrine.orm.metadata_driver.annotation.reader'));
+        $this->assertInstanceOf('Doctrine\Common\Annotations\AnnotationReader', $container->get('doctrine.orm.metadata.annotation_reader'));
         $this->assertInstanceOf('Doctrine\ORM\Configuration', $container->get('doctrine.orm.default_configuration'));
         $this->assertInstanceOf('Doctrine\ORM\Mapping\Driver\DriverChain', $container->get('doctrine.orm.default_metadata_driver'));
         $this->assertInstanceOf('Doctrine\Common\Cache\ArrayCache', $container->get('doctrine.orm.default_metadata_cache'));

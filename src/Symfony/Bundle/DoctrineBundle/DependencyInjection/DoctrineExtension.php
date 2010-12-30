@@ -228,7 +228,7 @@ class DoctrineExtension extends Extension
     {
         // arbitrary service that is always part of the "orm" services. Its used to check if the
         // defaults have to applied (first time run) or ignored (second or n-th run due to imports)
-        if (!$container->hasDefinition('doctrine.orm.metadata_driver.annotation.reader')) {
+        if (!$container->hasDefinition('doctrine.orm.metadata.annotation_reader')) {
             $loader = new XmlFileLoader($container, __DIR__.'/../Resources/config');
             $loader->load('orm.xml');
         }
@@ -638,7 +638,7 @@ class DoctrineExtension extends Extension
                 $mappingDriverDef->setArguments($args);
             } else if ($driverType == 'annotation') {
                 $mappingDriverDef = new Definition('%'.$this->getObjectManagerElementName('metadata.' . $driverType . '_class%'), array(
-                    new Reference($this->getObjectManagerElementName('metadata_driver.annotation.reader')),
+                    new Reference($this->getObjectManagerElementName('metadata.annotation_reader')),
                     array_values($driverPaths)
                 ));
             } else {

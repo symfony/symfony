@@ -42,7 +42,7 @@
 
     <services>
         <!--- Annotation Metadata Reader Service -->
-        <service id="doctrine.orm.metadata_driver.annotation.reader" class="%doctrine.orm.metadata.annotation_reader_class%">
+        <service id="doctrine.orm.metadata.annotation_reader" class="%doctrine.orm.metadata.annotation_reader_class%">
             <call method="setAnnotationNamespaceAlias">
               <argument>Doctrine\ORM\Mapping\</argument>
               <argument>orm</argument>

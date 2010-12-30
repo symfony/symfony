@@ -532,7 +532,7 @@ abstract class AbstractDoctrineExtensionTest extends TestCase
 
         $annDef = $container->getDefinition('doctrine.orm.default_annotation_metadata_driver');
         $this->assertDICConstructorArguments($annDef, array(
-            new Reference('doctrine.orm.metadata_driver.annotation.reader'),
+            new Reference('doctrine.orm.metadata.annotation_reader'),
             array(__DIR__ . '/Fixtures/Bundles/AnnotationsBundle/Entity')
         ));
 
@@ -578,7 +578,7 @@ abstract class AbstractDoctrineExtensionTest extends TestCase
 
         $annDef = $container->getDefinition('doctrine.orm.em1_annotation_metadata_driver');
         $this->assertDICConstructorArguments($annDef, array(
-            new Reference('doctrine.orm.metadata_driver.annotation.reader'),
+            new Reference('doctrine.orm.metadata.annotation_reader'),
             array(__DIR__ . '/Fixtures/Bundles/AnnotationsBundle/Entity')
         ));
 

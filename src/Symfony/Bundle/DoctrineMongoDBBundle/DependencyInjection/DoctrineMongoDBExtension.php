@@ -567,7 +567,7 @@ class DoctrineMongoDBExtension extends Extension
         foreach ($this->drivers as $driverType => $driverPaths) {
             if ($driverType == 'annotation') {
                 $mappingDriverDef = new Definition('%'.$this->getObjetManagerElementName('metadata.' . $driverType . '_class%'), array(
-                    new Reference($this->getObjetManagerElementName('metadata_driver.annotation.reader')),
+                    new Reference($this->getObjetManagerElementName('metadata.annotation_reader')),
                     array_values($driverPaths)
                 ));
             } else {

@@ -95,9 +95,11 @@ class SwiftMailerExtension extends Extension
             $config['delivery_address'] = $config['delivery-address'];
         }
 
-        if (isset($config['delivery_address'])) {
+        if (isset($config['delivery_address']) && $config['delivery_address']) {
             $container->setParameter('swiftmailer.single_address', $config['delivery_address']);
             $container->findDefinition('swiftmailer.transport')->addMethodCall('registerPlugin', array(new Reference('swiftmailer.plugin.redirecting')));
+        } else {
+            $container->setParameter('swiftmailer.single_address', null);
         }
 
         if (array_key_exists('disable-delivery', $config)) {

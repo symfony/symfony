@@ -40,25 +40,25 @@
 
 {% block field_attributes %}
     id="{{ field.id }}" name="{{ field.name }}"{% if field.disabled %} disabled="disabled"{% endif %}
-    {% display attributes %}
+    {{ block('attributes') }}
 {% endblock field_attributes %}
 
 {% block text_field %}
     {#{% set attr.maxlength = attr.maxlength|default(field.maxlength) %}#}
-    <input type="text" {% display field_attributes %} value="{{ field.displayedData }}" />
+    <input type="text" {{ block('field_attributes') }} value="{{ field.displayedData }}" />
 {% endblock text_field %}
 
 {% block password_field %}
     {#{% set attr.maxlength = attr.maxlength|default(field.maxlength) %}#}
-    <input type="password" {% display field_attributes %} value="{{ field.displayedData }}" />
+    <input type="password" {{ block('field_attributes') }} value="{{ field.displayedData }}" />
 {% endblock password_field %}
 
 {% block hidden_field %}
-    <input type="hidden" {% display field_attributes %} value="{{ field.displayedData }}" />
+    <input type="hidden" {{ block('field_attributes') }} value="{{ field.displayedData }}" />
 {% endblock hidden_field %}
 
 {% block textarea_field %}
-    <textarea {% display field_attributes %}>{{ field.displayedData }}</textarea>
+    <textarea {{ block('field_attributes') }}>{{ field.displayedData }}</textarea>
 {% endblock textarea_field %}
 
 {% block options %}
@@ -82,24 +82,24 @@
             <label for="{{ child.id }}">{{ field.label(choice) }}</label>
         {% endfor %}
     {% else %}
-        <select {% display field_attributes %}{% if field.isMultipleChoice %} multiple="multiple"{% endif %}>
+        <select {{ block('field_attributes') }}{% if field.isMultipleChoice %} multiple="multiple"{% endif %}>
             {% if field.preferredChoices|length > 0 %}
                 {% set options = field.preferredChoices %}
-                {% display options %}
+                {{ block('options') }}
                 <option disabled="disabled">{{ params.separator|default('-------------------') }}</option>
             {% endif %}
             {% set options = field.otherChoices %}
-            {% display options %}
+            {{ block('options') }}
         </select>
     {% endif %}
 {% endblock choice_field %}
 
 {% block checkbox_field %}
-    <input type="checkbox" {% display field_attributes %}{% if field.hasValue %} value="{{ field.value }}"{% endif %}{% if field.ischecked %} checked="checked"{% endif %} />
+    <input type="checkbox" {{ block('field_attributes') }}{% if field.hasValue %} value="{{ field.value }}"{% endif %}{% if field.ischecked %} checked="checked"{% endif %} />
 {% endblock checkbox_field %}
 
 {% block radio_field %}
-    <input type="radio" {% display field_attributes %}{% if field.hasValue %} value="{{ field.value }}"{% endif %}{% if field.ischecked %} checked="checked"{% endif %} />
+    <input type="radio" {{ block('field_attributes') }}{% if field.hasValue %} value="{{ field.value }}"{% endif %}{% if field.ischecked %} checked="checked"{% endif %} />
 {% endblock radio_field %}
 
 {% block date_time_field %}
@@ -109,7 +109,7 @@
 
 {% block date_field %}
     {% if field.isfield %}
-        {% display text_field %}
+        {{ block('text_field') }}
     {% else %}
         {{ field.pattern|replace({ '{{ year }}': field.year|render, '{{ month }}': field.month|render, '{{ day }}': field.day|render }) }}
     {% endif %}
@@ -122,22 +122,22 @@
 {% endblock time_field %}
 
 {% block number_field %}
-    <input type="text" {% display field_attributes %} value="{{ field.displayedData }}" />
+    <input type="text" {{ block('field_attributes') }} value="{{ field.displayedData }}" />
 {% endblock number_field %}
 
 {% block money_field %}
-    {% set widget %}{% display number_field %}{% endset %}
+    {% set widget %}{{ block('number_field') }}{% endset %}
     {{ field.pattern|replace({ '{{ widget }}': widget })|raw }}
 {% endblock money_field %}
 
 {% block percent_field %}
-    {% display text_field %} %
+    {{ block('text_field') }} %
 {% endblock percent_field %}
 
 {% block file_field %}
     {% set group = field %}
     {% set field = group.file %}
-    <input type="file" {% display field_attributes %} />
+    <input type="file" {{ block('field_attributes') }} />
     {{ group.token|render }}
     {{ group.original_name|render }}
 {% endblock file_field %}

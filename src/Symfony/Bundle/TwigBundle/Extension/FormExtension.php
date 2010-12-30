@@ -130,7 +130,7 @@ class FormExtension extends \Twig_Extension
 
         list($widget, $template) = $this->getWidget($field, $resources);
 
-        return $template->getBlock($widget, array(
+        return $template->renderBlock($widget, array(
             'field'  => $field,
             'attr'   => $attributes,
             'params' => $parameters,
@@ -150,7 +150,7 @@ class FormExtension extends \Twig_Extension
             $this->templates = $this->resolveResources($this->resources);
         }
 
-        return $this->templates['hidden']->getBlock('hidden', array(
+        return $this->templates['hidden']->renderBlock('hidden', array(
             'field'  => $group,
             'params' => $parameters,
         ));
@@ -168,7 +168,7 @@ class FormExtension extends \Twig_Extension
             $this->templates = $this->resolveResources($this->resources);
         }
 
-        return $this->templates['errors']->getBlock('errors', array(
+        return $this->templates['errors']->renderBlock('errors', array(
             'field'  => $field,
             'params' => $parameters,
         ));
@@ -186,7 +186,7 @@ class FormExtension extends \Twig_Extension
             $this->templates = $this->resolveResources($this->resources);
         }
 
-        return $this->templates['label']->getBlock('label', array(
+        return $this->templates['label']->renderBlock('label', array(
             'field'  => $field,
             'params' => $parameters,
             'label'  => null !== $label ? $label : ucfirst(strtolower(str_replace('_', ' ', $field->getKey()))),

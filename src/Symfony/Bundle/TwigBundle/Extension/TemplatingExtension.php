@@ -67,8 +67,9 @@ class TemplatingExtension extends \Twig_Extension
     public function getFunctions()
     {
         return array(
-            'url'  => new \Twig_Function_Method($this, 'getUrl'),
-            'path' => new \Twig_Function_Method($this, 'getPath'),
+            'url'   => new \Twig_Function_Method($this, 'getUrl'),
+            'path'  => new \Twig_Function_Method($this, 'getPath'),
+            'asset' => new \Twig_Function_Method($this, 'getAssetUrl'),
         );
     }
 
@@ -80,6 +81,11 @@ class TemplatingExtension extends \Twig_Extension
     public function getUrl($name, array $parameters = array())
     {
         return $this->container->get('router')->generate($name, $parameters, true);
+    }
+
+    public function getAssetUrl($location)
+    {
+        return $this->container->get('templating.helper.assets')->getUrl($location);
     }
 
     /**
@@ -101,9 +107,6 @@ class TemplatingExtension extends \Twig_Extension
 
             // {% stylesheets %}
             new HelperTokenParser('stylesheets', '', 'templating.helper.stylesheets', 'render'),
-
-            // {% asset 'css/blog.css' %}
-            new HelperTokenParser('asset', '<location>', 'templating.helper.assets', 'getUrl'),
 
             // {% render 'BlogBundle:Post:list' with { 'limit': 2 }, { 'alt': 'BlogBundle:Post:error' } %}
             new HelperTokenParser('render', '<template> [with <attributes:hash>[, <options:hash>]]', 'templating.helper.actions', 'render'),

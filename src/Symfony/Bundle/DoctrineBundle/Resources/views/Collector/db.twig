@@ -8,7 +8,7 @@
 {% block menu %}
 <div class="count">{{ '%0.0f'|format(collector.time * 1000) }} ms</div>
 <div class="count">{{ collector.querycount }}</div>
-<img style="margin: 0 5px 0 0; vertical-align: middle; width: 32px" width="32" height="32" alt="Database" src="{% asset 'bundles/webprofiler/images/db.png' %}" />
+<img style="margin: 0 5px 0 0; vertical-align: middle; width: 32px" width="32" height="32" alt="Database" src="{{ asset('bundles/webprofiler/images/db.png') }}" />
 Doctrine
 {% endblock %}
 

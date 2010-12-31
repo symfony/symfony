@@ -7,7 +7,7 @@
 
 {% block menu %}
 <div class="count">{{ collector.querycount }}</div>
-<img style="margin: 0 5px 0 0; vertical-align: middle; width: 32px" width="32" height="32" alt="Mongo" src="{% asset 'bundles/webprofiler/images/db.png' %}" />
+<img style="margin: 0 5px 0 0; vertical-align: middle; width: 32px" width="32" height="32" alt="Mongo" src="{{ asset('bundles/webprofiler/images/db.png') }}" />
 Doctrine MongoDB
 {% endblock %}
 

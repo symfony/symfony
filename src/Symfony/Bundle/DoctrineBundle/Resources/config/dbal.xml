@@ -25,17 +25,5 @@
             <tag name="data_collector" template="DoctrineBundle:Collector:db" />
             <argument type="service" id="doctrine.dbal.logger" />
         </service>
-
-        <!-- events -->
-        <service id="doctrine.dbal.event_manager" class="%doctrine.dbal.event_manager_class%">
-          <call method="loadTaggedEventListeners">
-            <argument type="service" id="service_container" />
-            <argument>doctrine.dbal.event_listener</argument>
-          </call>
-          <call method="loadTaggedEventSubscribers">
-            <argument type="service" id="service_container" />
-            <argument>doctrine.dbal.event_listener</argument>
-          </call>
-        </service>
     </services>
 </container>

@@ -115,9 +115,6 @@ class DoctrineExtension extends AbstractDoctrineExtension
             $containerDef->addMethodCall('setSqlLogger', array(new Reference('doctrine.dbal.logger')));
             $container->setDefinition(sprintf('doctrine.dbal.%s_connection.configuration', $connection['name']), $containerDef);
 
-            $eventManagerDef = new Definition(isset($connection['event-manager-class']) ? $connection['event-manager-class'] : $connection['event_manager_class']);
-            $container->setDefinition(sprintf('doctrine.dbal.%s_connection.event_manager', $connection['name']), $eventManagerDef);
-
             $driverOptions = array();
             $driverDef = new Definition('Doctrine\DBAL\DriverManager');
             $driverDef->setFactoryMethod('getConnection');
@@ -145,6 +142,32 @@ class DoctrineExtension extends AbstractDoctrineExtension
             if (isset($connection[$nKey])) {
                 $driverOptions[$key] = $connection[$nKey];
             }
+        }
+
+        // event manager
+        $eventManagerName = isset($connection['event_manager']) ? $connection['event_manager'] : $connection['name'];
+        $eventManagerId = sprintf('doctrine.dbal.%s_connection.event_manager', $eventManagerName);
+        if (!$container->hasDefinition($eventManagerId)) {
+            $eventManagerDef = new Definition('%doctrine.dbal.event_manager_class%');
+            $eventManagerDef->addMethodCall('loadTaggedEventListeners', array(
+                new Reference('service_container'),
+            ));
+            $eventManagerDef->addMethodCall('loadTaggedEventListeners', array(
+                new Reference('service_container'),
+                sprintf('doctrine.dbal.%s_event_listener', $eventManagerName),
+            ));
+            $eventManagerDef->addMethodCall('loadTaggedEventSubscribers', array(
+                new Reference('service_container'),
+            ));
+            $eventManagerDef->addMethodCall('loadTaggedEventSubscribers', array(
+                new Reference('service_container'),
+                sprintf('doctrine.dbal.%s_event_subscriber', $eventManagerName),
+            ));
+            $container->setDefinition($eventManagerId, $eventManagerDef);
+        }
+
+        if ($container->getParameter('doctrine.dbal.default_connection') == $connection['name']) {
+            $container->setAlias('doctrine.dbal.event_manager', sprintf('doctrine.dbal.%s_connection.event_manager', $connection['name']));
         }
 
         $driverDef->setArguments(array(
@@ -305,8 +328,10 @@ class DoctrineExtension extends AbstractDoctrineExtension
         $entityManagerService = sprintf('doctrine.orm.%s_entity_manager', $entityManager['name']);
 
         if (!$container->hasDefinition($entityManagerService) || isset($entityManager['connection'])) {
+            $connectionName = isset($entityManager['connection']) ? $entityManager['connection'] : $entityManager['name'];
+
             $ormEmArgs = array(
-                new Reference(sprintf('doctrine.dbal.%s_connection', isset($entityManager['connection']) ? $entityManager['connection'] : $entityManager['name'])),
+                new Reference(sprintf('doctrine.dbal.%s_connection', $connectionName)),
                 new Reference(sprintf('doctrine.orm.%s_configuration', $entityManager['name']))
             );
             $ormEmDef = new Definition('%doctrine.orm.entity_manager_class%', $ormEmArgs);
@@ -320,6 +345,10 @@ class DoctrineExtension extends AbstractDoctrineExtension
                     sprintf('doctrine.orm.%s_entity_manager', $entityManager['name'])
                 );
             }
+            $container->setAlias(
+                sprintf('doctrine.orm.%s_entity_manager.event_manager', $entityManager['name']),
+                sprintf('doctrine.dbal.%s_connection.event_manager', $connectionName)
+            );
         }
     }
 

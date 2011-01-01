@@ -93,7 +93,8 @@ EOT
         $databaseDriver = new DatabaseDriver($em->getConnection()->getSchemaManager());
         $em->getConfiguration()->setMetadataDriverImpl($databaseDriver);
 
-        $cmf = new DisconnectedClassMetadataFactory($em);
+        $cmf = new DisconnectedClassMetadataFactory();
+        $cmf->setEntityManager($em);
         $metadata = $cmf->getAllMetadata();
         if ($metadata) {
             $output->writeln(sprintf('Importing mapping information from "<info>%s</info>" entity manager', $emName));

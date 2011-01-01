@@ -14,7 +14,6 @@ namespace Symfony\Component\Validator\Constraints;
 use Symfony\Component\Validator\Constraint;
 use Symfony\Component\Validator\ConstraintValidator;
 use Symfony\Component\Validator\Exception\UnexpectedTypeException;
-use Symfony\Component\Locale\Locale;
 
 /**
  * Validates whether a value is a valid language code
@@ -35,7 +34,7 @@ class LanguageValidator extends ConstraintValidator
 
         $value = (string)$value;
 
-        if (!in_array($value, Locale::getLanguages())) {
+        if (!in_array($value, \Symfony\Component\Locale\Locale::getLanguages())) {
             $this->setMessage($constraint->message, array('{{ value }}' => $value));
 
             return false;

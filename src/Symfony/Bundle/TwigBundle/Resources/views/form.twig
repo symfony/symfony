@@ -1,21 +1,26 @@
 {% block field_row %}
+{% spaceless %}
     <div>
         {# TODO: would be nice to rename this variable to "field" #}
         {{ child|render_label }}
         {{ child|render_errors }}
         {{ child|render }}
     </div>
+{% endspaceless %}
 {% endblock field_row %}
 
 {% block field_group %}
+{% spaceless %}
     {{ field|render_errors }}
     {% for child in field.visibleFields %}
         {{ block('field_row') }}
     {% endfor %}
     {{ field|render_hidden }}
+{% endspaceless %}
 {% endblock field_group %}
 
 {% block errors %}
+{% spaceless %}
     {% if field.hasErrors %}
     <ul>
         {% for error in field.errors %}
@@ -23,48 +28,66 @@
         {% endfor %}
     </ul>
     {% endif %}
+{% endspaceless %}
 {% endblock errors %}
 
 {% block hidden %}
+{% spaceless %}
     {% for child in field.allHiddenFields %}
         {{ child|render }}
     {% endfor %}
+{% endspaceless %}
 {% endblock hidden %}
 
 {% block label %}
+{% spaceless %}
     <label for="{{ field.id }}">{% trans label %}</label>
+{% endspaceless %}
 {% endblock label %}
 
 {% block attributes %}
+{% spaceless %}
     {% for key, value in attr %}
         {{ key }}="{{ value}}"
     {% endfor %}
+{% endspaceless %}
 {% endblock attributes %}
 
 {% block field_attributes %}
+{% spaceless %}
     id="{{ field.id }}" name="{{ field.name }}"{% if field.disabled %} disabled="disabled"{% endif %}
     {{ block('attributes') }}
+{% endspaceless %}
 {% endblock field_attributes %}
 
 {% block text_field %}
+{% spaceless %}
     {#{% set attr.maxlength = attr.maxlength|default(field.maxlength) %}#}
     <input type="text" {{ block('field_attributes') }} value="{{ field.displayedData }}" />
+{% endspaceless %}
 {% endblock text_field %}
 
 {% block password_field %}
+{% spaceless %}
     {#{% set attr.maxlength = attr.maxlength|default(field.maxlength) %}#}
     <input type="password" {{ block('field_attributes') }} value="{{ field.displayedData }}" />
+{% endspaceless %}
 {% endblock password_field %}
 
 {% block hidden_field %}
+{% spaceless %}
     <input type="hidden" {{ block('field_attributes') }} value="{{ field.displayedData }}" />
+{% endspaceless %}
 {% endblock hidden_field %}
 
 {% block textarea_field %}
+{% spaceless %}
     <textarea {{ block('field_attributes') }}>{{ field.displayedData }}</textarea>
+{% endspaceless %}
 {% endblock textarea_field %}
 
 {% block options %}
+{% spaceless %}
     {% for choice, label in options %}
         {% if field.isChoiceGroup(label) %}
             <optgroup label="{{ choice }}">
@@ -76,9 +99,11 @@
             <option value="{{ choice }}"{% if field.isChoiceSelected(choice) %} selected="selected"{% endif %}>{{ label }}</option>
         {% endif %}
     {% endfor %}
+{% endspaceless %}
 {% endblock options %}
 
 {% block choice_field %}
+{% spaceless %}
     {% if field.isExpanded %}
         {% for choice, child in field %}
             {{ child|render }}
@@ -95,53 +120,72 @@
             {{ block('options') }}
         </select>
     {% endif %}
+{% endspaceless %}
 {% endblock choice_field %}
 
 {% block checkbox_field %}
+{% spaceless %}
     <input type="checkbox" {{ block('field_attributes') }}{% if field.hasValue %} value="{{ field.value }}"{% endif %}{% if field.ischecked %} checked="checked"{% endif %} />
+{% endspaceless %}
 {% endblock checkbox_field %}
 
 {% block radio_field %}
+{% spaceless %}
     <input type="radio" {{ block('field_attributes') }}{% if field.hasValue %} value="{{ field.value }}"{% endif %}{% if field.ischecked %} checked="checked"{% endif %} />
+{% endspaceless %}
 {% endblock radio_field %}
 
 {% block date_time_field %}
+{% spaceless %}
     {{ field.date|render }}
     {{ field.time|render }}
+{% endspaceless %}
 {% endblock date_time_field %}
 
 {% block date_field %}
+{% spaceless %}
     {% if field.isfield %}
         {{ block('text_field') }}
     {% else %}
-        {{ field.pattern|replace({ '{{ year }}': field.year|render, '{{ month }}': field.month|render, '{{ day }}': field.day|render }) }}
+        {{ field.pattern|replace({ '{{ year }}': field.year|render, '{{ month }}': field.month|render, '{{ day }}': field.day|render })|raw }}
     {% endif %}
+{% endspaceless %}
 {% endblock date_field %}
 
 {% block time_field %}
+{% spaceless %}
     {# TODO the next line should be set attr.size = 1, but that's not supported yet by Twig #}
     {% if field.isfield %}{% set attr = { 'size': 1 } %}{% endif %}
     {{ field.hour|render(attr) }}:{{ field.minute|render(attr) }}{% if field.isWithSeconds %}:{{ field.second|render(attr) }}{% endif %}
+{% endspaceless %}
 {% endblock time_field %}
 
 {% block number_field %}
+{% spaceless %}
     <input type="text" {{ block('field_attributes') }} value="{{ field.displayedData }}" />
+{% endspaceless %}
 {% endblock number_field %}
 
 {% block money_field %}
+{% spaceless %}
     {% set widget %}{{ block('number_field') }}{% endset %}
     {{ field.pattern|replace({ '{{ widget }}': widget })|raw }}
+{% endspaceless %}
 {% endblock money_field %}
 
 {% block percent_field %}
+{% spaceless %}
     {{ block('text_field') }} %
+{% endspaceless %}
 {% endblock percent_field %}
 
 {% block file_field %}
+{% spaceless %}
     {% set group = field %}
     {% set field = group.file %}
     <input type="file" {{ block('field_attributes') }} />
     {{ group.token|render }}
     {{ group.original_name|render }}
+{% endspaceless %}
 {% endblock file_field %}
 

@@ -14,7 +14,7 @@
     <parameter key="doctrine.odm.mongodb.document_manager_class">Doctrine\ODM\MongoDB\DocumentManager</parameter>
     <parameter key="doctrine.odm.mongodb.logger_class">Symfony\Bundle\DoctrineMongoDBBundle\Logger\DoctrineMongoDBLogger</parameter>
     <parameter key="doctrine.odm.mongodb.data_collector_class">Symfony\Bundle\DoctrineMongoDBBundle\DataCollector\DoctrineMongoDBDataCollector</parameter>
-    <parameter key="doctrine.odm.mongodb.event_manager_class">Symfony\Bundle\DoctrineMongoDBBundle\Event\EventManager</parameter>
+    <parameter key="doctrine.odm.mongodb.event_manager_class">Symfony\Bundle\DoctrineAbstractBundle\Event\EventManager</parameter>
 
     <!-- proxies -->
     <parameter key="doctrine.odm.mongodb.proxy_namespace">Proxies</parameter>
@@ -89,9 +89,11 @@
     <service id="doctrine.odm.mongodb.event_manager" class="%doctrine.odm.mongodb.event_manager_class%">
       <call method="loadTaggedEventListeners">
         <argument type="service" id="service_container" />
+        <argument>doctrine.odm.mongodb.event_listener</argument>
       </call>
       <call method="loadTaggedEventSubscribers">
         <argument type="service" id="service_container" />
+        <argument>doctrine.odm.mongodb.event_listener</argument>
       </call>
     </service>
   </services>

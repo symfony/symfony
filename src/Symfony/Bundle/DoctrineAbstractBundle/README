@@ -1,0 +1,16 @@
+This is a meta-bundle. It does not contain a Bundle nor a DependencyInjection file. The code is only
+ever used by the following bundles:
+
+* DoctrineBundle
+* DoctrineMigrationsBundle
+* DoctrineMongoDBBundle
+
+Future benefactors:
+
+* DoctrineCouchDBBundle
+* DoctrinePHPCRBundle
+
+Additional code that could be put here:
+
+* General Doctrine Form code
+* General Doctrine Validator code

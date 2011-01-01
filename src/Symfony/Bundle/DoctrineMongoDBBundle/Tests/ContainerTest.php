@@ -55,5 +55,6 @@ class ContainerTest extends TestCase
         $this->assertInstanceOf('Doctrine\Common\Cache\ArrayCache', $container->get('doctrine.odm.mongodb.cache'));
         $this->assertInstanceOf('Doctrine\ODM\MongoDB\DocumentManager', $container->get('doctrine.odm.mongodb.document_manager'));
         $this->assertInstanceof('Doctrine\Common\Annotations\AnnotationReader', $container->get('doctrine.odm.mongodb.metadata.annotation_reader'));
+        $this->assertInstanceof('Symfony\Bundle\DoctrineAbstractBundle\Event\EventManager', $container->get('doctrine.odm.mongodb.event_manager'));
     }
 }

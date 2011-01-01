@@ -1,6 +1,6 @@
 <?php
 
-namespace Symfony\Bundle\DoctrineMongoDBBundle\Event;
+namespace Symfony\Bundle\DoctrineAbstractBundle\Event;
 
 use Doctrine\Common\EventManager as BaseEventManager;
 use Symfony\Component\DependencyInjection\TaggedContainerInterface;
@@ -23,7 +23,7 @@ class EventManager extends BaseEventManager
      * @param TaggedContainerInterface $container The service container
      * @param string $tagName The name of the tag to load
      */
-    public function loadTaggedEventListeners(TaggedContainerInterface $container, $tagName = 'doctrine.odm.mongodb.event_listener')
+    public function loadTaggedEventListeners(TaggedContainerInterface $container, $tagName = 'doctrine.common.event_listener')
     {
         foreach ($container->findTaggedServiceIds($tagName) as $id => $instances) {
             $events = array();
@@ -49,7 +49,7 @@ class EventManager extends BaseEventManager
      * @param TaggedContainerInterface $container The service container
      * @param string $tagName The name of the tag to load
      */
-    public function loadTaggedEventSubscribers(TaggedContainerInterface $container, $tagName = 'doctrine.odm.mongodb.event_subscriber')
+    public function loadTaggedEventSubscribers(TaggedContainerInterface $container, $tagName = 'doctrine.common.event_listener')
     {
         foreach ($container->findTaggedServiceIds($tagName) as $id => $instances) {
             $this->addEventSubscriber($container->get($id));

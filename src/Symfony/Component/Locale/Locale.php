@@ -26,6 +26,12 @@ class Locale extends \Locale
     protected static $languages = array();
 
     /**
+     * Caches the different locales
+     * @var array
+     */
+    protected static $locales = array();
+
+    /**
      * Returns the country names for a locale
      *
      * @param  string $locale     The locale to use for the country names
@@ -115,5 +121,47 @@ class Locale extends \Locale
     public static function getLanguages()
     {
         return array_keys(self::getDisplayLanguages(self::getDefault()));
+    }
+
+    /**
+     * Returns the locale names for a locale
+     *
+     * @param  string $locale     The locale to use for the locale names
+     * @return array              The locale names with their codes as keys
+     * @throws RuntimeException   When the resource bundles cannot be loaded
+     */
+    public static function getDisplayLocales($locale)
+    {
+        if (!isset(self::$locales[$locale])) {
+            $bundle = new \ResourceBundle($locale, __DIR__.'/Resources/data/names');
+
+            if (null === $bundle) {
+                throw new \RuntimeException('The locale resource bundle could not be loaded');
+            }
+
+            $collator = new \Collator($locale);
+            $locales = array();
+
+            foreach ($bundle->get('Locales') as $code => $name) {
+                $locales[$code] = $name;
+            }
+
+            $collator->asort($locales);
+
+            self::$locales[$locale] = $locales;
+        }
+
+        return self::$locales[$locale];
+    }
+
+    /**
+     * Returns all available locale codes
+     *
+     * @return array              The locale codes
+     * @throws RuntimeException   When the resource bundles cannot be loaded
+     */
+    public static function getLocales()
+    {
+        return array_keys(self::getDisplayLocales(self::getDefault()));
     }
 }

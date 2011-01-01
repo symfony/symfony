@@ -5,13 +5,9 @@ How to update the ICU data
 
    $ svn co http://source.icu-project.org/repos/icu/icu/trunk/source/data icu-data
 
-2. Build the region resource bundles
+2. Execute the build script
 
-   $ cd icu-data/region
-   $ mkdir build
-   $ genrb -d build *.txt
-   
-3a. Replace the *.res files bundled with Symfony2 with the new ones.
+   $ php update-data.php /path/to/icu-data
 
 .dat-package
 ------------

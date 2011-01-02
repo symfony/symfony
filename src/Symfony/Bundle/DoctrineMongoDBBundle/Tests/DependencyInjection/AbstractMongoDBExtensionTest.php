@@ -120,7 +120,7 @@ abstract class AbstractMongoDBExtensionTest extends TestCase
         $definition = $container->getDefinition('doctrine.odm.mongodb.default_configuration');
         $methodCalls = $definition->getMethodCalls();
         $methodNames = array_map(function($call) { return $call[0]; }, $methodCalls);
-        $this->assertType('integer', $pos = array_search('setDefaultDB', $methodNames));
+        $this->assertInternalType('integer', $pos = array_search('setDefaultDB', $methodNames));
         $this->assertEquals('mydb', $methodCalls[$pos][1][0]);
 
         $definition = $container->getDefinition('doctrine.odm.mongodb.default_document_manager');

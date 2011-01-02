@@ -95,7 +95,7 @@ class ContainerBuilderTest extends \PHPUnit_Framework_TestCase
         $this->assertNull($builder->get('foo', ContainerInterface::NULL_ON_INVALID_REFERENCE), '->get() returns null if the service does not exist and NULL_ON_INVALID_REFERENCE is passed as a second argument');
 
         $builder->register('foo', 'stdClass');
-        $this->assertType('object', $builder->get('foo'), '->get() returns the service definition associated with the id');
+        $this->assertInternalType('object', $builder->get('foo'), '->get() returns the service definition associated with the id');
         $builder->set('bar', $bar = new \stdClass());
         $this->assertEquals($bar, $builder->get('bar'), '->get() returns the service associated with the id');
         $builder->register('bar', 'stdClass');
@@ -243,7 +243,7 @@ class ContainerBuilderTest extends \PHPUnit_Framework_TestCase
         $builder->register('baz_service')->setFactoryService('baz_factory')->setFactoryMethod('getInstance');
         $builder->register('baz_factory', 'BazClass');
 
-        $this->assertType('BazClass', $builder->get('baz_service'));
+        $this->assertInstanceOf('BazClass', $builder->get('baz_service'));
     }
 
     /**

@@ -313,7 +313,7 @@ class CrawlerTest extends \PHPUnit_Framework_TestCase
     public function testLinks()
     {
         $crawler = $this->createTestCrawler()->selectLink('Foo');
-        $this->assertType('array', $crawler->links(), '->links() returns an array');
+        $this->assertInternalType('array', $crawler->links(), '->links() returns an array');
 
         $this->assertEquals(4, count($crawler->links()), '->links() returns an array');
         $links = $crawler->links();

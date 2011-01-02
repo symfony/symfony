@@ -1,6 +1,6 @@
 <?php
 
-namespace Symfony\Component\Form\Iterator;
+namespace Symfony\Component\Form;
 
 /*
  * This file is part of the Symfony framework.
@@ -11,9 +11,15 @@ namespace Symfony\Component\Form\Iterator;
  * with this source code in the file LICENSE.
  */
 
-use Symfony\Component\Form\FieldGroupInterface;
-
-class RecursiveFieldsWithPropertyPathIterator extends \IteratorIterator implements \RecursiveIterator
+/**
+ * Iterator that traverses fields of a field group
+ *
+ * If the iterator encounters a virtual field group, it enters the field
+ * group and traverses its children as well.
+ *
+ * @author Bernhard Schussek <bernhard.schussek@symfony-project.com>
+ */
+class RecursiveFieldIterator extends \IteratorIterator implements \RecursiveIterator
 {
     public function __construct(FieldGroupInterface $group)
     {
@@ -27,6 +33,7 @@ class RecursiveFieldsWithPropertyPathIterator extends \IteratorIterator implemen
 
     public function hasChildren()
     {
-        return $this->current() instanceof FieldGroupInterface && $this->current()->getPropertyPath() === null;
+        return $this->current() instanceof FieldGroupInterface
+                && $this->current()->isVirtual();
     }
 }

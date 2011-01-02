@@ -322,7 +322,7 @@ class FieldGroupTest extends \PHPUnit_Framework_TestCase
         $group->addError($error, $path->getIterator(), FieldGroup::DATA_ERROR);
     }
 
-    public function testAddErrorMapsErrorsOntoFieldsInAnonymousGroups()
+    public function testAddErrorMapsErrorsOntoFieldsInVirtualGroups()
     {
         $error = new FieldError('Message');
 
@@ -339,9 +339,9 @@ class FieldGroupTest extends \PHPUnit_Framework_TestCase
                     ->with($this->equalTo($error), $this->equalTo($expectedPathIterator), $this->equalTo(FieldGroup::DATA_ERROR));
 
         $group = new TestFieldGroup('author');
-        $group2 = new TestFieldGroup('anonymous', array('property_path' => null));
-        $group2->add($field);
-        $group->add($group2);
+        $nestedGroup = new TestFieldGroup('nested', array('virtual' => true));
+        $nestedGroup->add($field);
+        $group->add($nestedGroup);
 
         $path = new PropertyPath('address');
 
@@ -467,6 +467,56 @@ class FieldGroupTest extends \PHPUnit_Framework_TestCase
         $group->add($field);
 
         $group->setData($originalAuthor);
+    }
+
+    /**
+     * The use case for this test are groups whose fields should be mapped
+     * directly onto properties of the form's object.
+     *
+     * Example:
+     *
+     * <code>
+     * $dateRangeField = new FieldGroup('dateRange');
+     * $dateRangeField->add(new DateField('startDate'));
+     * $dateRangeField->add(new DateField('endDate'));
+     * $form->add($dateRangeField);
+     * </code>
+     *
+     * If $dateRangeField is not virtual, the property "dateRange" must be
+     * present on the form's object. In this property, an object or array
+     * with the properties "startDate" and "endDate" is expected.
+     *
+     * If $dateRangeField is virtual though, it's children are mapped directly
+     * onto the properties "startDate" and "endDate" of the form's object.
+     */
+    public function testSetDataSkipsVirtualFieldGroups()
+    {
+        $author = new Author();
+        $author->firstName = 'Foo';
+
+        $group = new TestFieldGroup('author');
+        $nestedGroup = new TestFieldGroup('personal_data', array(
+            'virtual' => true,
+        ));
+
+        // both fields are in the nested group but receive the object of the
+        // top-level group because the nested group is virtual
+        $field = $this->createMockField('firstName');
+        $field->expects($this->once())
+                    ->method('updateFromProperty')
+                    ->with($this->equalTo($author));
+
+        $nestedGroup->add($field);
+
+        $field = $this->createMockField('lastName');
+        $field->expects($this->once())
+                    ->method('updateFromProperty')
+                    ->with($this->equalTo($author));
+
+        $nestedGroup->add($field);
+
+        $group->add($nestedGroup);
+        $group->setData($author);
     }
 
     public function testSetDataThrowsAnExceptionIfArgumentIsNotObjectOrArray()

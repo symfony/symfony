@@ -13,7 +13,6 @@ namespace Symfony\Component\Form;
 
 use Symfony\Component\Form\Exception\AlreadyBoundException;
 use Symfony\Component\Form\Exception\UnexpectedTypeException;
-use Symfony\Component\Form\Iterator\RecursiveFieldsWithPropertyPathIterator;
 
 /**
  * FieldGroup represents an array of widgets bind to names and values.
@@ -33,6 +32,16 @@ class FieldGroup extends Field implements \IteratorAggregate, FieldGroupInterfac
      * @var array
      */
     protected $extraFields = array();
+
+    /**
+     * @inheritDoc
+     */
+    public function __construct($key, array $options = array())
+    {
+        $this->addOption('virtual', false);
+
+        parent::__construct($key, $options);
+    }
 
     /**
      * Clones this group
@@ -317,7 +326,7 @@ class FieldGroup extends Field implements \IteratorAggregate, FieldGroupInterfac
      */
     protected function updateFromObject(&$objectOrArray)
     {
-        $iterator = new RecursiveFieldsWithPropertyPathIterator($this);
+        $iterator = new RecursiveFieldIterator($this);
         $iterator = new \RecursiveIteratorIterator($iterator);
 
         foreach ($iterator as $field) {
@@ -336,7 +345,7 @@ class FieldGroup extends Field implements \IteratorAggregate, FieldGroupInterfac
      */
     protected function updateObject(&$objectOrArray)
     {
-        $iterator = new RecursiveFieldsWithPropertyPathIterator($this);
+        $iterator = new RecursiveFieldIterator($this);
         $iterator = new \RecursiveIteratorIterator($iterator);
 
         foreach ($iterator as $field) {
@@ -355,6 +364,14 @@ class FieldGroup extends Field implements \IteratorAggregate, FieldGroupInterfac
     protected function preprocessData(array $data)
     {
         return $data;
+    }
+
+    /**
+     * @inheritDoc
+     */
+    public function isVirtual()
+    {
+        return $this->getOption('virtual');
     }
 
     /**
@@ -407,7 +424,7 @@ class FieldGroup extends Field implements \IteratorAggregate, FieldGroupInterfac
                     return;
                 }
             } else if ($type === self::DATA_ERROR) {
-                $iterator = new RecursiveFieldsWithPropertyPathIterator($this);
+                $iterator = new RecursiveFieldIterator($this);
                 $iterator = new \RecursiveIteratorIterator($iterator);
 
                 foreach ($iterator as $field) {

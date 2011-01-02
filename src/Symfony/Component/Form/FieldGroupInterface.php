@@ -18,4 +18,27 @@ namespace Symfony\Component\Form;
  */
 interface FieldGroupInterface extends FieldInterface, \ArrayAccess, \Traversable, \Countable
 {
+    /**
+     * Returns whether this field group is virtual
+     *
+     * Virtual field groups are skipped when mapping property paths of a form
+     * tree to an object.
+     *
+     * Example:
+     *
+     * <code>
+     * $group = new FieldGroup('address');
+     * $group->add(new TextField('street'));
+     * $group->add(new TextField('postal_code'));
+     * $form->add($group);
+     * </code>
+     *
+     * If $group is non-virtual, the fields "street" and "postal_code"
+     * are mapped to the property paths "address.street" and
+     * "address.postal_code". If $group is virtual though, the fields are
+     * mapped directly to "street" and "postal_code".
+     *
+     * @return boolean  Whether the group is virtual
+     */
+    public function isVirtual();
 }

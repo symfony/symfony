@@ -28,7 +28,7 @@ class IncludeNode extends \Twig_Node
      *
      * @param \Twig_Compiler A Twig_Compiler instance
      */
-    public function compile($compiler)
+    public function compile(\Twig_Compiler $compiler)
     {
         // template
         $compiler

@@ -14,7 +14,7 @@ namespace Symfony\Component\Validator\Mapping\Loader;
 use Symfony\Component\Validator\Exception\MappingException;
 use Symfony\Component\Validator\Mapping\ClassMetadata;
 use Doctrine\Common\Annotations\AnnotationReader;
-use Symfony\Component\Validator\Constraints\Validation;
+use Symfony\Component\Validator\Constraints\Set;
 use Symfony\Component\Validator\Constraints\GroupSequence;
 use Symfony\Component\Validator\Constraint;
 
@@ -46,7 +46,7 @@ class AnnotationLoader implements LoaderInterface
         $loaded = false;
 
         foreach ($this->reader->getClassAnnotations($reflClass) as $constraint) {
-            if ($constraint instanceof Validation) {
+            if ($constraint instanceof Set) {
                 foreach ($constraint->constraints as $constraint) {
                     $metadata->addConstraint($constraint);
                 }
@@ -62,7 +62,7 @@ class AnnotationLoader implements LoaderInterface
         foreach ($reflClass->getProperties() as $property) {
             if ($property->getDeclaringClass()->getName() == $className) {
                 foreach ($this->reader->getPropertyAnnotations($property) as $constraint) {
-                    if ($constraint instanceof Validation) {
+                    if ($constraint instanceof Set) {
                         foreach ($constraint->constraints as $constraint) {
                             $metadata->addPropertyConstraint($property->getName(), $constraint);
                         }
@@ -81,7 +81,7 @@ class AnnotationLoader implements LoaderInterface
                     // TODO: clean this up
                     $name = lcfirst(substr($method->getName(), 0, 3)=='get' ? substr($method->getName(), 3) : substr($method->getName(), 2));
 
-                    if ($constraint instanceof Validation) {
+                    if ($constraint instanceof Set) {
                         foreach ($constraint->constraints as $constraint) {
                             $metadata->addGetterConstraint($name, $constraint);
                         }

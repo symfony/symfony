@@ -10,7 +10,7 @@ require_once __DIR__.'/EntityInterface.php';
  * @Symfony\Tests\Component\Validator\Fixtures\ConstraintA
  * @validation:Min(3)
  * @validation:Choice({"A", "B"})
- * @validation:Validation({
+ * @validation:Set({
  *   @validation:All({@validation:NotNull, @validation:Min(3)}),
  *   @validation:All(constraints={@validation:NotNull, @validation:Min(3)})
  * })

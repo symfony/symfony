@@ -11,7 +11,7 @@ namespace Symfony\Component\Validator\Constraints;
  * with this source code in the file LICENSE.
  */
 
-class Validation
+class Set
 {
     public $constraints;
 

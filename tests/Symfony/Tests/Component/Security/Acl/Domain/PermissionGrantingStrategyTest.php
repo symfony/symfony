@@ -30,7 +30,7 @@ class PermissionGrantingStrategyTest extends \PHPUnit_Framework_TestCase
     {
         $strategy = new PermissionGrantingStrategy();
         $acl = $this->getAcl($strategy);
-        $sid = new UserSecurityIdentity('johannes');
+        $sid = new UserSecurityIdentity('johannes', 'Foo');
 
         $acl->insertClassAce($sid, 1);
         $acl->insertObjectAce($sid, 1, 0, false);
@@ -41,7 +41,7 @@ class PermissionGrantingStrategyTest extends \PHPUnit_Framework_TestCase
     {
         $strategy = new PermissionGrantingStrategy();
         $acl = $this->getAcl($strategy);
-        $sid = new UserSecurityIdentity('johannes');
+        $sid = new UserSecurityIdentity('johannes', 'Foo');
 
         $acl->insertClassAce($sid, 1);
         $this->assertTrue($strategy->isGranted($acl, array(1), array($sid)));
@@ -50,7 +50,7 @@ class PermissionGrantingStrategyTest extends \PHPUnit_Framework_TestCase
     public function testIsGrantedFavorsLocalAcesOverParentAclAces()
     {
         $strategy = new PermissionGrantingStrategy();
-        $sid = new UserSecurityIdentity('johannes');
+        $sid = new UserSecurityIdentity('johannes', 'Foo');
 
         $acl = $this->getAcl($strategy);
         $acl->insertClassAce($sid, 1);
@@ -65,8 +65,8 @@ class PermissionGrantingStrategyTest extends \PHPUnit_Framework_TestCase
     public function testIsGrantedFallsBackToParentAcesIfNoLocalAcesAreApplicable()
     {
         $strategy = new PermissionGrantingStrategy();
-        $sid = new UserSecurityIdentity('johannes');
-        $anotherSid = new UserSecurityIdentity('ROLE_USER');
+        $sid = new UserSecurityIdentity('johannes', 'Foo');
+        $anotherSid = new UserSecurityIdentity('ROLE_USER', 'Foo');
 
         $acl = $this->getAcl($strategy);
         $acl->insertClassAce($anotherSid, 1, 0, false);
@@ -85,7 +85,7 @@ class PermissionGrantingStrategyTest extends \PHPUnit_Framework_TestCase
     {
         $strategy = new PermissionGrantingStrategy();
         $acl = $this->getAcl($strategy);
-        $sid = new UserSecurityIdentity('johannes');
+        $sid = new UserSecurityIdentity('johannes', 'Foo');
 
         $strategy->isGranted($acl, array(1), array($sid));
     }
@@ -94,7 +94,7 @@ class PermissionGrantingStrategyTest extends \PHPUnit_Framework_TestCase
     {
         $strategy = new PermissionGrantingStrategy();
         $acl = $this->getAcl($strategy);
-        $sid = new UserSecurityIdentity('johannes');
+        $sid = new UserSecurityIdentity('johannes', 'Foo');
         $aSid = new RoleSecurityIdentity('ROLE_USER');
 
         $acl->insertClassAce($aSid, 1);
@@ -111,7 +111,7 @@ class PermissionGrantingStrategyTest extends \PHPUnit_Framework_TestCase
     {
         $strategy = new PermissionGrantingStrategy();
         $acl = $this->getAcl($strategy);
-        $sid = new UserSecurityIdentity('johannes');
+        $sid = new UserSecurityIdentity('johannes', 'Foo');
 
         $logger = $this->getMock('Symfony\Component\Security\Acl\Model\AuditLoggerInterface');
         $logger
@@ -130,7 +130,7 @@ class PermissionGrantingStrategyTest extends \PHPUnit_Framework_TestCase
     {
         $strategy = new PermissionGrantingStrategy();
         $acl = $this->getAcl($strategy);
-        $sid = new UserSecurityIdentity('johannes');
+        $sid = new UserSecurityIdentity('johannes', 'Foo');
 
         $logger = $this->getMock('Symfony\Component\Security\Acl\Model\AuditLoggerInterface');
         $logger
@@ -152,7 +152,7 @@ class PermissionGrantingStrategyTest extends \PHPUnit_Framework_TestCase
     {
         $strategy = new PermissionGrantingStrategy();
         $acl = $this->getAcl($strategy);
-        $sid = new UserSecurityIdentity('johannes');
+        $sid = new UserSecurityIdentity('johannes', 'Foo');
 
         $acl->insertObjectAce($sid, $aceMask, 0, true, $maskStrategy);
 

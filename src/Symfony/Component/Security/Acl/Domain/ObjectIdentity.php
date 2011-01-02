@@ -34,10 +34,10 @@ class ObjectIdentity implements ObjectIdentityInterface
      */
     public function __construct($identifier, $type)
     {
-        if (0 === strlen($identifier)) {
+        if (empty($identifier)) {
             throw new \InvalidArgumentException('$identifier cannot be empty.');
         }
-        if (0 === strlen($type)) {
+        if (empty($type)) {
             throw new \InvalidArgumentException('$type cannot be empty.');
         }
 

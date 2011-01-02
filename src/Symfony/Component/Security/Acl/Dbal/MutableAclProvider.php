@@ -591,7 +591,7 @@ QUERY;
     protected function getInsertSecurityIdentitySql(SecurityIdentityInterface $sid)
     {
         if ($sid instanceof UserSecurityIdentity) {
-            $identifier = $sid->getUsername();
+            $identifier = $sid->getClass().'-'.$sid->getUsername();
             $username = true;
         } else if ($sid instanceof RoleSecurityIdentity) {
             $identifier = $sid->getRole();
@@ -659,7 +659,7 @@ QUERY;
     protected function getSelectSecurityIdentityIdSql(SecurityIdentityInterface $sid)
     {
         if ($sid instanceof UserSecurityIdentity) {
-            $identifier = $sid->getUsername();
+            $identifier = $sid->getClass().'-'.$sid->getUsername();
             $username = true;
         } else if ($sid instanceof RoleSecurityIdentity) {
             $identifier = $sid->getRole();

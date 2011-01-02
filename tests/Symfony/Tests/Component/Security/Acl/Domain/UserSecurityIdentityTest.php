@@ -10,25 +10,12 @@ class UserSecurityIdentityTest extends \PHPUnit_Framework_TestCase
 {
     public function testConstructor()
     {
-        $id = new UserSecurityIdentity('foo');
-        
+        $id = new UserSecurityIdentity('foo', 'Foo');
+
         $this->assertEquals('foo', $id->getUsername());
+        $this->assertEquals('Foo', $id->getClass());
     }
-    
-    public function testConstructorWithToken()
-    {
-        $token = $this->getMock('Symfony\Component\Security\Authentication\Token\TokenInterface');
-        $token
-            ->expects($this->once())
-            ->method('__toString')
-            ->will($this->returnValue('foo'))
-        ;
-        
-        $id = new UserSecurityIdentity($token);
-        
-        $this->assertEquals('foo', $id->getUsername());
-    }
-    
+
     /**
      * @dataProvider getCompareData
      */
@@ -41,21 +28,23 @@ class UserSecurityIdentityTest extends \PHPUnit_Framework_TestCase
             $this->assertFalse($id1->equals($id2));
         }
     }
-    
+
     public function getCompareData()
     {
-        $token = $this->getMock('Symfony\Component\Security\Authentication\Token\TokenInterface');
-        $token
+        $account = $this->getMock('Symfony\Component\Security\User\AccountInterface');
+        $account
             ->expects($this->once())
             ->method('__toString')
             ->will($this->returnValue('foo'))
         ;
-        
+
         return array(
-            array(new UserSecurityIdentity('foo'), new UserSecurityIdentity('foo'), true),
-            array(new UserSecurityIdentity('foo'), new UserSecurityIdentity($token), true),
-            array(new UserSecurityIdentity('bla'), new UserSecurityIdentity('blub'), false),
-            array(new UserSecurityIdentity('foo'), new RoleSecurityIdentity('foo'), false),
+            array(new UserSecurityIdentity('foo', 'Foo'), new UserSecurityIdentity('foo', 'Foo'), true),
+            array(new UserSecurityIdentity('foo', 'Bar'), new UserSecurityIdentity('foo', 'Foo'), false),
+            array(new UserSecurityIdentity('foo', 'Foo'), new UserSecurityIdentity('bar', 'Foo'), false),
+            array(new UserSecurityIdentity('foo', 'Foo'), UserSecurityIdentity::fromAccount($account), false),
+            array(new UserSecurityIdentity('bla', 'Foo'), new UserSecurityIdentity('blub', 'Foo'), false),
+            array(new UserSecurityIdentity('foo', 'Foo'), new RoleSecurityIdentity('foo'), false),
         );
     }
 }

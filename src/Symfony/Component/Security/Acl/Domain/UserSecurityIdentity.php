@@ -2,8 +2,8 @@
 
 namespace Symfony\Component\Security\Acl\Domain;
 
+use Symfony\Component\Security\User\AccountInterface;
 use Symfony\Component\Security\Acl\Model\SecurityIdentityInterface;
-use Symfony\Component\Security\Authentication\Token\TokenInterface;
 
 /*
  * This file is part of the Symfony framework.
@@ -17,34 +17,41 @@ use Symfony\Component\Security\Authentication\Token\TokenInterface;
 /**
  * A SecurityIdentity implementation used for actual users
  *
- * FIXME: We need to also store the user provider id since the
- *        username might not be unique across all available user
- *        providers.
- *
  * @author Johannes M. Schmitt <schmittjoh@gmail.com>
  */
 class UserSecurityIdentity implements SecurityIdentityInterface
 {
     protected $username;
+    protected $class;
 
     /**
      * Constructor
      *
-     * @param mixed $username the username representation, or a TokenInterface
-     *              implementation
-     * @return void
+     * @param string $username the username representation
+     * @param string $class the user's fully qualified class name
      */
-    public function __construct($username)
+    public function __construct($username, $class)
     {
-        if ($username instanceof TokenInterface) {
-            $username = (string) $username;
-        }
-
-        if (0 === strlen($username)) {
+        if (empty($username)) {
             throw new \InvalidArgumentException('$username must not be empty.');
+        }
+        if (empty($class)) {
+            throw new \InvalidArgumentException('$class must not be empty.');
         }
 
         $this->username = $username;
+        $this->class = $class;
+    }
+
+    /**
+     * Creates a user security identity from an AccountInterface
+     *
+     * @param AccountInterface $user
+     * @return UserSecurityIdentity
+     */
+    public static function fromAccount(AccountInterface $user)
+    {
+        return new self((string) $user, get_class($user));
     }
 
     /**
@@ -58,6 +65,16 @@ class UserSecurityIdentity implements SecurityIdentityInterface
     }
 
     /**
+     * Returns the user's class name
+     *
+     * @return string
+     */
+    public function getClass()
+    {
+        return $this->class;
+    }
+
+    /**
      * {@inheritDoc}
      */
     public function equals(SecurityIdentityInterface $sid)
@@ -66,7 +83,8 @@ class UserSecurityIdentity implements SecurityIdentityInterface
             return false;
         }
 
-        return $this->username === $sid->getUsername();
+        return $this->username === $sid->getUsername()
+               && $this->class === $sid->getClass();
     }
 
     /**
@@ -78,6 +96,6 @@ class UserSecurityIdentity implements SecurityIdentityInterface
      */
     public function __toString()
     {
-        return sprintf('UserSecurityIdentity(%s)', $this->username);
+        return sprintf('UserSecurityIdentity(%s, %s)', $this->username, $this->class);
     }
 }

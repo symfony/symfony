@@ -2,6 +2,7 @@
 
 namespace Symfony\Component\Security\Acl\Domain;
 
+use Symfony\Component\Security\User\AccountInterface;
 use Symfony\Component\Security\Authentication\Token\TokenInterface;
 use Symfony\Component\Security\Acl\Model\SecurityIdentityRetrievalStrategyInterface;
 use Symfony\Component\Security\Authentication\AuthenticationTrustResolver;
@@ -46,9 +47,11 @@ class SecurityIdentityRetrievalStrategy implements SecurityIdentityRetrievalStra
     public function getSecurityIdentities(TokenInterface $token)
     {
         $sids = array();
-        
-        if (false === $this->authenticationTrustResolver->isAnonymous($token)) {
-            $sids[] = new UserSecurityIdentity($token);
+
+        // add user security identity
+        $user = $token->getUser();
+        if ($user instanceof AccountInterface) {
+            $sids[] = UserSecurityIdentity::fromAccount($user);
         }
 
         // add all reachable roles

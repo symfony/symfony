@@ -185,8 +185,8 @@ class MutableAclProviderTest extends \PHPUnit_Framework_TestCase
     {
         $provider = $this->getProvider();
         $acl = $provider->createAcl(new ObjectIdentity(1, 'Foo'));
-        $ace = new Entry(1, $acl, new UserSecurityIdentity('foo'), 'all', 1, true, true, true);
-        $ace2 = new Entry(2, $acl, new UserSecurityIdentity('foo'), 'all', 1, true, true, true);
+        $ace = new Entry(1, $acl, new UserSecurityIdentity('foo', 'FooClass'), 'all', 1, true, true, true);
+        $ace2 = new Entry(2, $acl, new UserSecurityIdentity('foo', 'FooClass'), 'all', 1, true, true, true);
         $propertyChanges = $this->getField($provider, 'propertyChanges');
 
         $provider->propertyChanged($ace, 'mask', 1, 3);
@@ -286,7 +286,7 @@ class MutableAclProviderTest extends \PHPUnit_Framework_TestCase
     {
         $provider = $this->getProvider();
         $acl = $provider->createAcl(new ObjectIdentity(1, 'Foo'));
-        $sid = new UserSecurityIdentity('johannes');
+        $sid = new UserSecurityIdentity('johannes', 'FooClass');
         $acl->setEntriesInheriting(!$acl->isEntriesInheriting());
 
         $acl->insertObjectAce($sid, 1);

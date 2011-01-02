@@ -259,25 +259,25 @@ class AclTest extends \PHPUnit_Framework_TestCase
     {
         $acl = $this->getAcl();
 
-        $this->assertTrue($acl->isSidLoaded(new UserSecurityIdentity('foo')));
-        $this->assertTrue($acl->isSidLoaded(new RoleSecurityIdentity('ROLE_FOO')));
+        $this->assertTrue($acl->isSidLoaded(new UserSecurityIdentity('foo', 'Foo')));
+        $this->assertTrue($acl->isSidLoaded(new RoleSecurityIdentity('ROLE_FOO', 'Foo')));
     }
 
     public function testIsSidLoaded()
     {
-        $acl = new Acl(1, new ObjectIdentity('1', 'foo'), new PermissionGrantingStrategy(), array(new UserSecurityIdentity('foo'), new UserSecurityIdentity('johannes')), true);
+        $acl = new Acl(1, new ObjectIdentity('1', 'foo'), new PermissionGrantingStrategy(), array(new UserSecurityIdentity('foo', 'Foo'), new UserSecurityIdentity('johannes', 'Bar')), true);
 
-        $this->assertTrue($acl->isSidLoaded(new UserSecurityIdentity('foo')));
-        $this->assertTrue($acl->isSidLoaded(new UserSecurityIdentity('johannes')));
+        $this->assertTrue($acl->isSidLoaded(new UserSecurityIdentity('foo', 'Foo')));
+        $this->assertTrue($acl->isSidLoaded(new UserSecurityIdentity('johannes', 'Bar')));
         $this->assertTrue($acl->isSidLoaded(array(
-            new UserSecurityIdentity('foo'),
-            new UserSecurityIdentity('johannes'),
+            new UserSecurityIdentity('foo', 'Foo'),
+            new UserSecurityIdentity('johannes', 'Bar'),
         )));
         $this->assertFalse($acl->isSidLoaded(new RoleSecurityIdentity('ROLE_FOO')));
-        $this->assertFalse($acl->isSidLoaded(new UserSecurityIdentity('schmittjoh@gmail.com')));
+        $this->assertFalse($acl->isSidLoaded(new UserSecurityIdentity('schmittjoh@gmail.com', 'Moo')));
         $this->assertFalse($acl->isSidLoaded(array(
-            new UserSecurityIdentity('foo'),
-            new UserSecurityIdentity('johannes'),
+            new UserSecurityIdentity('foo', 'Foo'),
+            new UserSecurityIdentity('johannes', 'Bar'),
             new RoleSecurityIdentity('ROLE_FOO'),
         )));
     }
@@ -343,7 +343,7 @@ class AclTest extends \PHPUnit_Framework_TestCase
     public function testUpdateFieldAce($type)
     {
         $acl = $this->getAcl();
-        $acl->{'insert'.$type}('foo', new UserSecurityIdentity('foo'), 1);
+        $acl->{'insert'.$type}('foo', new UserSecurityIdentity('foo', 'Foo'), 1);
 
         $listener = $this->getListener(array(
             'mask', 'mask', 'strategy'

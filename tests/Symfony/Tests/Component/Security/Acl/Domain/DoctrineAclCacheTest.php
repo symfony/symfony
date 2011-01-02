@@ -60,7 +60,7 @@ class DoctrineAclCacheTest extends \PHPUnit_Framework_TestCase
         $acl = new Acl($id, new ObjectIdentity($id, 'foo'), $this->getPermissionGrantingStrategy(), array(), $depth > 0);
 
         // insert some ACEs
-        $sid = new UserSecurityIdentity('johannes');
+        $sid = new UserSecurityIdentity('johannes', 'Foo');
         $acl->insertClassAce($sid, 1);
         $acl->insertClassFieldAce('foo', $sid, 1);
         $acl->insertObjectAce($sid, 1);

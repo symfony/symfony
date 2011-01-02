@@ -15,6 +15,7 @@
         <parameter key="security.acl.permission_granting_strategy.class">Symfony\Component\Security\Acl\Domain\PermissionGrantingStrategy</parameter>
         
         <parameter key="security.acl.voter.class">Symfony\Component\Security\Acl\Voter\AclVoter</parameter>
+        <parameter key="security.acl.voter.allow_if_object_identity_unavailable">true</parameter>
         <parameter key="security.acl.permission.map.class">Symfony\Component\Security\Acl\Permission\BasicPermissionMap</parameter>
         
         <parameter key="security.acl.object_identity_retrieval_strategy.class">Symfony\Component\Security\Acl\Domain\ObjectIdentityRetrievalStrategy</parameter>
@@ -70,6 +71,8 @@
             <argument type="service" id="security.acl.object_identity_retrieval_strategy" />
             <argument type="service" id="security.acl.security_identity_retrieval_strategy" />
             <argument type="service" id="security.acl.permission.map" />
+            <argument type="service" id="logger" on-invalid="null" />
+            <argument>%security.acl.voter.allow_if_object_identity_unavailable%</argument>
             <tag name="security.voter" />
         </service>
     </services>

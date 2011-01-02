@@ -58,10 +58,14 @@ class ObjectIdentity implements ObjectIdentityInterface
             throw new InvalidDomainObjectException('$domainObject must be an object.');
         }
 
-        if ($domainObject instanceof DomainObjectInterface) {
-            return new self($domainObject->getObjectIdentifier(), get_class($domainObject));
-        } else if (method_exists($domainObject, 'getId')) {
-            return new self($domainObject->getId(), get_class($domainObject));
+        try {
+            if ($domainObject instanceof DomainObjectInterface) {
+                return new self($domainObject->getObjectIdentifier(), get_class($domainObject));
+            } else if (method_exists($domainObject, 'getId')) {
+                return new self($domainObject->getId(), get_class($domainObject));
+            }
+        } catch (\InvalidArgumentException $invalid) {
+            throw new InvalidDomainObjectException($invalid->getMessage(), 0, $invalid);
         }
 
         throw new InvalidDomainObjectException('$domainObject must either implement the DomainObjectInterface, or have a method named "getId".');

@@ -73,7 +73,7 @@ EOT
 
             // transform classname to a path and substract it to get the destination
             $path = dirname(str_replace('\\', '/', $class));
-            $destination = str_replace('/'.$path, "", $bundle->getPath());
+            $destination = str_replace('/'.$path, "", str_replace('\\', '/', $bundle->getPath()));
 
             if ($metadatas = $this->getBundleMetadatas($bundle)) {
                 $output->writeln(sprintf('Generating entities for "<info>%s</info>"', $class));

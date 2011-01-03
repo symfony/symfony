@@ -2,20 +2,20 @@
 {% spaceless %}
     <div>
         {# TODO: would be nice to rename this variable to "field" #}
-        {{ child|render_label }}
-        {{ child|render_errors }}
-        {{ child|render }}
+        {{ form_label(child) }}
+        {{ form_errors(child) }}
+        {{ form_field(child) }}
     </div>
 {% endspaceless %}
 {% endblock field_row %}
 
 {% block field_group %}
 {% spaceless %}
-    {{ field|render_errors }}
+    {{ form_errors(field) }}
     {% for child in field.visibleFields %}
         {{ block('field_row') }}
     {% endfor %}
-    {{ field|render_hidden }}
+    {{ form_hidden(field) }}
 {% endspaceless %}
 {% endblock field_group %}
 
@@ -34,7 +34,7 @@
 {% block hidden %}
 {% spaceless %}
     {% for child in field.allHiddenFields %}
-        {{ child|render }}
+        {{ form_field(child) }}
     {% endfor %}
 {% endspaceless %}
 {% endblock hidden %}
@@ -106,7 +106,7 @@
 {% spaceless %}
     {% if field.isExpanded %}
         {% for choice, child in field %}
-            {{ child|render }}
+            {{ form_field(child) }}
             <label for="{{ child.id }}">{{ field.label(choice) }}</label>
         {% endfor %}
     {% else %}
@@ -137,8 +137,8 @@
 
 {% block date_time_field %}
 {% spaceless %}
-    {{ field.date|render }}
-    {{ field.time|render }}
+    {{ form_field(field.date) }}
+    {{ form_field(field.time) }}
 {% endspaceless %}
 {% endblock date_time_field %}
 
@@ -147,7 +147,7 @@
     {% if field.isfield %}
         {{ block('text_field') }}
     {% else %}
-        {{ field.pattern|replace({ '{{ year }}': field.year|render, '{{ month }}': field.month|render, '{{ day }}': field.day|render })|raw }}
+        {{ field.pattern|replace({ '{{ year }}': form_field(field.year), '{{ month }}': form_field(field.month), '{{ day }}': form_field(field.day) })|raw }}
     {% endif %}
 {% endspaceless %}
 {% endblock date_field %}
@@ -156,7 +156,7 @@
 {% spaceless %}
     {# TODO the next line should be set attr.size = 1, but that's not supported yet by Twig #}
     {% if field.isfield %}{% set attr = { 'size': 1 } %}{% endif %}
-    {{ field.hour|render(attr) }}:{{ field.minute|render(attr) }}{% if field.isWithSeconds %}:{{ field.second|render(attr) }}{% endif %}
+    {{ form_field(field.hour, attr) }}:{{ form_field(field.minute, attr) }}{% if field.isWithSeconds %}:{{ form_field(field.second, attr) }}{% endif %}
 {% endspaceless %}
 {% endblock time_field %}
 
@@ -184,8 +184,8 @@
     {% set group = field %}
     {% set field = group.file %}
     <input type="file" {{ block('field_attributes') }} />
-    {{ group.token|render }}
-    {{ group.original_name|render }}
+    {{ form_field(group.token) }}
+    {{ form_field(group.original_name) }}
 {% endspaceless %}
 {% endblock file_field %}
 

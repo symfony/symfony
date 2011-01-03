@@ -64,18 +64,15 @@ class FormExtension extends \Twig_Extension
         );
     }
 
-    /**
-     * {@inheritdoc}
-     */
-    public function getFilters()
+    public function getFunctions()
     {
         return array(
-            'render_enctype' => new \Twig_Filter_Method($this, 'renderEnctype', array('is_safe' => array('html'))),
-            'render'         => new \Twig_Filter_Method($this, 'render', array('is_safe' => array('html'))),
-            'render_hidden'  => new \Twig_Filter_Method($this, 'renderHidden', array('is_safe' => array('html'))),
-            'render_errors'  => new \Twig_Filter_Method($this, 'renderErrors', array('is_safe' => array('html'))),
-            'render_label'   => new \Twig_Filter_Method($this, 'renderLabel', array('is_safe' => array('html'))),
-            'render_data'    => new \Twig_Filter_Method($this, 'renderData', array('is_safe' => array('html'))),
+            'form_enctype' => new \Twig_Function_Method($this, 'renderEnctype', array('is_safe' => array('html'))),
+            'form_field'   => new \Twig_Function_Method($this, 'renderField', array('is_safe' => array('html'))),
+            'form_hidden'  => new \Twig_Function_Method($this, 'renderHidden', array('is_safe' => array('html'))),
+            'form_errors'  => new \Twig_Function_Method($this, 'renderErrors', array('is_safe' => array('html'))),
+            'form_label'   => new \Twig_Function_Method($this, 'renderLabel', array('is_safe' => array('html'))),
+            'form_data'    => new \Twig_Function_Method($this, 'renderData', array('is_safe' => array('html'))),
         );
     }
 
@@ -84,7 +81,7 @@ class FormExtension extends \Twig_Extension
      *
      * Example usage in Twig templates:
      *
-     *     <form action="..." method="post" {{ form|render_enctype }}>
+     *     <form action="..." method="post" {{ render_enctype(form) }}>
      *
      * @param Form $form   The form for which to render the encoding type
      */
@@ -98,17 +95,17 @@ class FormExtension extends \Twig_Extension
      *
      * Example usage in Twig:
      *
-     *     {{ field|render }}
+     *     {{ form_field(field) }}
      *
      * You can pass additional variables during the call:
      *
-     *     {{ field|render(['param': 'value']) }}
+     *     {{ form_field(field, {'param': 'value'}) }}
      *
      * @param FieldInterface $field  The field to render
      * @param array $params          Additional variables passed to the template
      * @param string $resources
      */
-    public function render(FieldInterface $field, array $attributes = array(), array $parameters = array(), $resources = null)
+    public function renderField(FieldInterface $field, array $attributes = array(), array $parameters = array(), $resources = null)
     {
         if (null === $this->templates) {
             $this->templates = $this->resolveResources($this->resources);
@@ -191,6 +188,16 @@ class FormExtension extends \Twig_Extension
             'params' => $parameters,
             'label'  => null !== $label ? $label : ucfirst(strtolower(str_replace('_', ' ', $field->getKey()))),
         ));
+    }
+
+    /**
+     * Renders the widget data of the given field
+     *
+     * @param FieldInterface $field The field to render the data for
+     */
+    public function renderData(FieldInterface $field)
+    {
+        return $field->getData();
     }
 
     protected function getWidget(FieldInterface $field, array $resources = array())

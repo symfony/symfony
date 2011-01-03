@@ -32,7 +32,7 @@ class TransChoiceTokenParser extends TransTokenParser
         $lineno = $token->getLine();
         $stream = $this->parser->getStream();
 
-        $vars = null;
+        $vars = new \Twig_Node_Expression_Array(array(), $lineno);
 
         $count = $this->parser->getExpressionParser()->parseExpression();
 
@@ -53,13 +53,14 @@ class TransChoiceTokenParser extends TransTokenParser
         $stream->expect(\Twig_Token::BLOCK_END_TYPE);
 
         $body = $this->parser->subparse(array($this, 'decideTransChoiceFork'), true);
-        if ('Twig_Node' !== get_class($body)) {
-            $body = new \Twig_Node(array($body), array(), $body->getLine());
+
+        if (!$body instanceof \Twig_Node_Text && !$body instanceof \Twig_Node_Expression) {
+            throw new \Twig_Error_Syntax('A message must be a simple text', -1);
         }
 
         $stream->expect(\Twig_Token::BLOCK_END_TYPE);
 
-        return new TransNode($body, $domain, $count, $vars, $this->isSimpleString($body), $lineno, $this->getTag());
+        return new TransNode($body, $domain, $count, $vars, $lineno, $this->getTag());
     }
 
     public function decideTransChoiceFork($token)

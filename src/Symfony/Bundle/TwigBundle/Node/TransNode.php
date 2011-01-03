@@ -18,9 +18,9 @@ namespace Symfony\Bundle\TwigBundle\Node;
  */
 class TransNode extends \Twig_Node
 {
-    public function __construct(\Twig_NodeInterface $body, \Twig_NodeInterface $domain, \Twig_Node_Expression $count = null, \Twig_Node_Expression $vars = null, $isSimple, $lineno, $tag = null)
+    public function __construct(\Twig_NodeInterface $body, \Twig_NodeInterface $domain, \Twig_Node_Expression $count = null, \Twig_Node_Expression $vars = null, $lineno, $tag = null)
     {
-        parent::__construct(array('count' => $count, 'body' => $body, 'domain' => $domain, 'vars' => $vars), array('is_simple' => $isSimple), $lineno, $tag);
+        parent::__construct(array('count' => $count, 'body' => $body, 'domain' => $domain, 'vars' => $vars), array(), $lineno, $tag);
     }
 
     /**
@@ -32,12 +32,14 @@ class TransNode extends \Twig_Node
     {
         $compiler->addDebugInfo($this);
 
-        $defaults = null;
-        if ($this->getAttribute('is_simple')) {
-            list($msg, $defaults) = $this->compileString($this->getNode('body'));
-        } else {
-            $msg = $this->getNode('body');
+        $vars = $this->getNode('vars');
+        $defaults = new \Twig_Node_Expression_Array(array(), -1);
+        if ($vars instanceof \Twig_Node_Expression_Array) {
+            $defaults = $this->getNode('vars');
+            $vars = null;
         }
+
+        list($msg, $defaults) = $this->compileString($this->getNode('body'), $defaults);
 
         $method = null === $this->getNode('count') ? 'trans' : 'transChoice';
 
@@ -55,56 +57,58 @@ class TransNode extends \Twig_Node
             ;
         }
 
-        $compiler->raw('array_merge(');
-
-        if (null === $defaults) {
-            $compiler->raw('array()');
+        if (null !== $vars) {
+            $compiler->raw('array_merge(');
+            $this->compileDefaults($compiler, $defaults);
+            $compiler
+                ->raw(', ')
+                ->subcompile($this->getNode('vars'))
+                ->raw(')')
+            ;
         } else {
-            $compiler->raw('array(');
-            foreach ($defaults as $default) {
-                $compiler
-                    ->string('{{ '.$default->getAttribute('name').' }}')
-                    ->raw(' => ')
-                    ->subcompile($default)
-                    ->raw(', ')
-                ;
-            }
-            $compiler->raw(')');
-        }
-
-        $compiler->raw(', ');
-
-        if (null === $this->getNode('vars')) {
-            $compiler->raw('array()');
-        } else {
-            $compiler->subcompile($this->getNode('vars'));
+            $this->compileDefaults($compiler, $defaults);
         }
 
         $compiler
-            ->raw('), ')
+            ->raw(', ')
             ->subcompile($this->getNode('domain'))
             ->raw(");\n")
         ;
     }
 
-    protected function compileString(\Twig_NodeInterface $body)
+    protected function compileDefaults(\Twig_Compiler $compiler, \Twig_Node_Expression_Array $defaults)
     {
-        if ($body instanceof \Twig_Node_Expression_Name || $body instanceof \Twig_Node_Expression_Constant) {
-            return array($body, array());
+        $compiler->raw('array(');
+        foreach ($defaults as $name => $default) {
+            $compiler
+                ->repr($name)
+                ->raw(' => ')
+                ->subcompile($default)
+                ->raw(', ')
+            ;
+        }
+        $compiler->raw(')');
+    }
+
+    protected function compileString(\Twig_NodeInterface $body, \Twig_Node_Expression_Array $vars)
+    {
+        if ($body instanceof \Twig_Node_Expression_Constant) {
+            $msg = $body->getAttribute('value');
+        } elseif ($body instanceof \Twig_Node_Text) {
+            $msg = $body->getAttribute('data');
+        } else {
+            return array($body, $vars);
         }
 
-        $msg = '';
-        $vars = array();
-        foreach ($body as $node) {
-            if ($node instanceof \Twig_Node_Print) {
-                $n = $node->getNode('expr');
-                while ($n instanceof \Twig_Node_Expression_Filter) {
-                    $n = $n->getNode('node');
-                }
-                $msg .= sprintf('{{ %s }}', $n->getAttribute('name'));
-                $vars[] = new \Twig_Node_Expression_Name($n->getAttribute('name'), $n->getLine());
-            } else {
-                $msg .= $node->getAttribute('data');
+        $current = array();
+        foreach ($vars as $name => $var) {
+            $current[$name] = true;
+        }
+
+        preg_match_all('/\%([^\%]+)\%/', $msg, $matches);
+        foreach ($matches[1] as $var) {
+            if (!isset($current['%'.$var.'%'])) {
+                $vars->setNode('%'.$var.'%', new \Twig_Node_Expression_Name($var, $body->getLine()));
             }
         }
 

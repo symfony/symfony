@@ -32,9 +32,8 @@ class TransTokenParser extends \Twig_TokenParser
         $lineno = $token->getLine();
         $stream = $this->parser->getStream();
 
-        $vars = null;
         $body = null;
-        $isSimple = false;
+        $vars = new \Twig_Node_Expression_Array(array(), $lineno);
         $domain = new \Twig_Node_Expression_Constant('messages', $lineno);
         if (!$stream->test(\Twig_Token::BLOCK_END_TYPE)) {
             if (!$stream->test('from') && !$stream->test('with')) {
@@ -54,7 +53,7 @@ class TransTokenParser extends \Twig_TokenParser
                 $stream->next();
                 $domain = $this->parser->getExpressionParser()->parseExpression();
             } elseif (!$stream->test(\Twig_Token::BLOCK_END_TYPE)) {
-                throw new \Twig_SyntaxError(sprintf('Unexpected token. Twig was looking for the "from" keyword line %s)', $lineno), -1);
+                throw new \Twig_Error_Syntax(sprintf('Unexpected token. Twig was looking for the "from" keyword line %s)', $lineno), -1);
             }
         }
 
@@ -62,37 +61,20 @@ class TransTokenParser extends \Twig_TokenParser
             // {% trans %}message{% endtrans %}
             $stream->expect(\Twig_Token::BLOCK_END_TYPE);
             $body = $this->parser->subparse(array($this, 'decideTransFork'), true);
-            if ('Twig_Node' !== get_class($body)) {
-                $body = new \Twig_Node(array($body), array(), $body->getLine());
-            }
-            $isSimple = $this->isSimpleString($body);
+        }
+
+        if (!$body instanceof \Twig_Node_Text && !$body instanceof \Twig_Node_Expression) {
+            throw new \Twig_Error_Syntax('A message must be a simple text', -1);
         }
 
         $stream->expect(\Twig_Token::BLOCK_END_TYPE);
 
-        return new TransNode($body, $domain, null, $vars, $isSimple, $lineno, $this->getTag());
+        return new TransNode($body, $domain, null, $vars, $lineno, $this->getTag());
     }
 
     public function decideTransFork($token)
     {
         return $token->test(array('endtrans'));
-    }
-
-    protected function isSimpleString(\Twig_NodeInterface $body)
-    {
-        foreach ($body as $i => $node) {
-            if (
-                $node instanceof \Twig_Node_Text
-                ||
-                ($node instanceof \Twig_Node_Print && $node->getNode('expr') instanceof \Twig_Node_Expression_Name)
-            ) {
-                continue;
-            }
-
-            return false;
-        }
-
-        return true;
     }
 
     /**

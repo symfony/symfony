@@ -2,7 +2,6 @@
 
 namespace Symfony\Bundle\TwigBundle\Extension;
 
-use Symfony\Bundle\TwigBundle\TokenParser\HelperTokenParser;
 use Symfony\Component\DependencyInjection\ContainerInterface;
 use Symfony\Bundle\TwigBundle\TokenParser\IncludeTokenParser;
 use Symfony\Bundle\TwigBundle\TokenParser\UrlTokenParser;

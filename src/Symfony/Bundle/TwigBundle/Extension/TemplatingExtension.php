@@ -55,7 +55,7 @@ class TemplatingExtension extends \Twig_Extension
             'dump' => new \Twig_Filter_Method($this, 'dump'),
             'abbr_class' => new \Twig_Filter_Method($this, 'abbrClass', array('is_safe' => array('html'))),
             'abbr_method' => new \Twig_Filter_Method($this, 'abbrMethod', array('is_safe' => array('html'))),
-            'format_args' => new \Twig_Filter_Method($this, 'formatArgs', array('is_safe' => array('html'))),
+            'format_args' => new \Twig_Filter_Method($this, 'formatArgs'),
             'format_args_as_text' => new \Twig_Filter_Method($this, 'formatArgsAsText', array('is_safe' => array('html'))),
             'file_excerpt' => new \Twig_Filter_Method($this, 'fileExcerpt', array('is_safe' => array('html'))),
             'format_file' => new \Twig_Filter_Method($this, 'formatFile', array('is_safe' => array('html'))),

@@ -7,6 +7,7 @@ use Symfony\Component\DependencyInjection\ContainerInterface;
 use Symfony\Bundle\TwigBundle\TokenParser\IncludeTokenParser;
 use Symfony\Bundle\TwigBundle\TokenParser\UrlTokenParser;
 use Symfony\Bundle\TwigBundle\TokenParser\PathTokenParser;
+use Symfony\Bundle\TwigBundle\TokenParser\RenderTokenParser;
 use Symfony\Component\Yaml\Dumper as YamlDumper;
 
 /*
@@ -109,7 +110,7 @@ class TemplatingExtension extends \Twig_Extension
             new HelperTokenParser('stylesheets', '', 'templating.helper.stylesheets', 'render'),
 
             // {% render 'BlogBundle:Post:list' with { 'limit': 2 }, { 'alt': 'BlogBundle:Post:error' } %}
-            new HelperTokenParser('render', '<template> [with <attributes:hash>[, <options:hash>]]', 'templating.helper.actions', 'render'),
+            new RenderTokenParser(),
 
             // {% flash 'notice' %}
             new HelperTokenParser('flash', '<name>', 'templating.helper.session', 'getFlash'),

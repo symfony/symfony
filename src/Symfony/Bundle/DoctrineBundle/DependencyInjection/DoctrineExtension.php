@@ -253,7 +253,8 @@ class DoctrineExtension extends AbstractDoctrineExtension
             'result_cache_driver',
             'proxy_namespace',
             'proxy_dir',
-            'auto_generate_proxy_classes'
+            'auto_generate_proxy_classes',
+            'class_metadata_factory_name',
         );
         foreach ($options as $key) {
             if (isset($config[$key])) {
@@ -316,7 +317,8 @@ class DoctrineExtension extends AbstractDoctrineExtension
             'setMetadataDriverImpl'         => new Reference('doctrine.orm.'.$entityManager['name'].'_metadata_driver'),
             'setProxyDir'                   => $container->getParameter('doctrine.orm.proxy_dir'),
             'setProxyNamespace'             => $container->getParameter('doctrine.orm.proxy_namespace'),
-            'setAutoGenerateProxyClasses'   => $container->getParameter('doctrine.orm.auto_generate_proxy_classes')
+            'setAutoGenerateProxyClasses'   => $container->getParameter('doctrine.orm.auto_generate_proxy_classes'),
+            'setClassMetadataFactoryName'   => $container->getParameter('doctrine.orm.class_metadata_factory_name'),
         );
         foreach ($uniqueMethods as $method => $arg) {
             if ($ormConfigDef->hasMethodCall($method)) {

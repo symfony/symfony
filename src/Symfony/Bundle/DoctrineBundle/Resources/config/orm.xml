@@ -35,6 +35,7 @@
         <parameter key="doctrine.orm.metadata.yml_class">Doctrine\ORM\Mapping\Driver\YamlDriver</parameter>
         <parameter key="doctrine.orm.metadata.php_class">Doctrine\ORM\Mapping\Driver\PHPDriver</parameter>
         <parameter key="doctrine.orm.metadata.staticphp_class">Doctrine\ORM\Mapping\Driver\StaticPHPDriver</parameter>
+        <parameter key="doctrine.orm.class_metadata_factory_name">Doctrine\ORM\Mapping\ClassMetadataFactory</parameter>
 
         <!-- security/user -->
         <parameter key="security.user.provider.entity.class">Symfony\Bundle\DoctrineBundle\Security\EntityUserProvider</parameter>

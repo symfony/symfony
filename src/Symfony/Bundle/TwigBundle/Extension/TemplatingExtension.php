@@ -95,7 +95,7 @@ class TemplatingExtension extends \Twig_Extension
 
     public function getFlash($name, $default = null)
     {
-        return $this->container->get('request')->getSession()->getFlash($name, $default = null);
+        return $this->container->get('request')->getSession()->getFlash($name, $default);
     }
 
     /**

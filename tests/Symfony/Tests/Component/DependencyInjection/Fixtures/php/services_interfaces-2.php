@@ -24,16 +24,16 @@ class ProjectServiceContainer extends Container implements TaggedContainerInterf
     }
 
     /**
-     * Gets the 'barFactory' service.
+     * Gets the 'barfactory' service.
      *
      * This service is shared.
      * This method always returns the same instance of the service.
      *
      * @return BarClassFactory A BarClassFactory instance.
      */
-    protected function getBarFactoryService()
+    protected function getBarfactoryService()
     {
-        return $this->services['barFactory'] = new \BarClassFactory();
+        return $this->services['barfactory'] = new \BarClassFactory();
 
         $this->applyInterfaceInjectors($instance);
     }

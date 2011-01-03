@@ -93,9 +93,9 @@ class TemplatingExtension extends \Twig_Extension
         return $this->container->get('templating.helper.assets')->getUrl($location);
     }
 
-    public function getFlash($name)
+    public function getFlash($name, $default = null)
     {
-        return $this->container->get('templating.helper.session')->getFlash($name);
+        return $this->container->get('request')->getSession()->getFlash($name, $default = null);
     }
 
     /**

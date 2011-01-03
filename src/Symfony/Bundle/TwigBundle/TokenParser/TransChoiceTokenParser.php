@@ -53,6 +53,9 @@ class TransChoiceTokenParser extends TransTokenParser
         $stream->expect(\Twig_Token::BLOCK_END_TYPE);
 
         $body = $this->parser->subparse(array($this, 'decideTransChoiceFork'), true);
+        if ('Twig_Node' !== get_class($body)) {
+            $body = new \Twig_Node(array($body), array(), $body->getLine());
+        }
 
         $stream->expect(\Twig_Token::BLOCK_END_TYPE);
 

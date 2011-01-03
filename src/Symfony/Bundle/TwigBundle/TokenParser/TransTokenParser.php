@@ -62,6 +62,9 @@ class TransTokenParser extends \Twig_TokenParser
             // {% trans %}message{% endtrans %}
             $stream->expect(\Twig_Token::BLOCK_END_TYPE);
             $body = $this->parser->subparse(array($this, 'decideTransFork'), true);
+            if ('Twig_Node' !== get_class($body)) {
+                $body = new \Twig_Node(array($body), array(), $body->getLine());
+            }
             $isSimple = $this->isSimpleString($body);
         }
 

@@ -2,6 +2,7 @@
 
 namespace Symfony\Tests\Component\Form;
 
+
 require_once __DIR__ . '/Fixtures/Author.php';
 require_once __DIR__ . '/Fixtures/TestField.php';
 require_once __DIR__ . '/Fixtures/InvalidField.php';
@@ -11,6 +12,7 @@ use Symfony\Component\Form\ValueTransformer\ValueTransformerInterface;
 use Symfony\Component\Form\PropertyPath;
 use Symfony\Component\Form\FieldError;
 use Symfony\Component\Form\FormConfiguration;
+use Symfony\Component\Form\ValueTransformer\TransformationFailedException;
 use Symfony\Tests\Component\Form\Fixtures\Author;
 use Symfony\Tests\Component\Form\Fixtures\TestField;
 use Symfony\Tests\Component\Form\Fixtures\InvalidField;
@@ -448,6 +450,37 @@ class FieldTest extends \PHPUnit_Framework_TestCase
         $field->updateProperty($object);
 
         $this->assertEquals(null, $object->firstName);
+    }
+
+    public function testIsTransformationSuccessfulReturnsTrueIfReverseTransformSucceeded()
+    {
+        $field = new TestField('title', array(
+            'trim' => false,
+        ));
+
+        $field->bind('a');
+
+        $this->assertEquals('a', $field->getDisplayedData());
+        $this->assertTrue($field->isTransformationSuccessful());
+    }
+
+    public function testIsTransformationSuccessfulReturnsFalseIfReverseTransformThrowsException()
+    {
+        // The value is passed to the value transformer
+        $transformer = $this->createMockTransformer();
+        $transformer->expects($this->once())
+                ->method('reverseTransform')
+                ->will($this->throwException(new TransformationFailedException()));
+
+        $field = new TestField('title', array(
+            'trim' => false,
+            'value_transformer' => $transformer,
+        ));
+
+        $field->bind('a');
+
+        $this->assertEquals('a', $field->getDisplayedData());
+        $this->assertFalse($field->isTransformationSuccessful());
     }
 
     protected function createMockTransformer()

@@ -4,6 +4,14 @@
     xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
     xsi:schemaLocation="http://www.symfony-project.org/schema/dic/constraint-mapping http://www.symfony-project.org/schema/dic/services/constraint-mapping-1.0.xsd">
 
+  <class name="Symfony\Component\Form\Field">
+    <getter property="transformationSuccessful">
+      <constraint name="AssertTrue">
+        <option name="message">This value is invalid</option>
+      </constraint>
+    </getter>
+  </class>
+
   <class name="Symfony\Component\Form\FieldGroup">
     <property name="fields">
       <constraint name="Valid" />

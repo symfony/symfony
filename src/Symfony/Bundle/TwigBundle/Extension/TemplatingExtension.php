@@ -75,6 +75,7 @@ class TemplatingExtension extends \Twig_Extension
             'url'   => new \Twig_Function_Method($this, 'getUrl'),
             'path'  => new \Twig_Function_Method($this, 'getPath'),
             'asset' => new \Twig_Function_Method($this, 'getAssetUrl'),
+            'flash' => new \Twig_Function_Method($this, 'getFlash'),
         );
     }
 
@@ -91,6 +92,11 @@ class TemplatingExtension extends \Twig_Extension
     public function getAssetUrl($location)
     {
         return $this->container->get('templating.helper.assets')->getUrl($location);
+    }
+
+    public function getFlash($name)
+    {
+        return $this->container->get('templating.helper.session')->getFlash($name);
     }
 
     /**
@@ -115,9 +121,6 @@ class TemplatingExtension extends \Twig_Extension
 
             // {% render 'BlogBundle:Post:list' with { 'limit': 2 }, { 'alt': 'BlogBundle:Post:error' } %}
             new RenderTokenParser(),
-
-            // {% flash 'notice' %}
-            new HelperTokenParser('flash', '<name>', 'templating.helper.session', 'getFlash'),
 
             // {% include 'sometemplate.php' with { 'something' : 'something2' } %}
             new IncludeTokenParser(),

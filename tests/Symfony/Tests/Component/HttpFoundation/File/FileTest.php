@@ -20,6 +20,20 @@ class FileTest extends \PHPUnit_Framework_TestCase
         $this->assertEquals(__DIR__.DIRECTORY_SEPARATOR.'Fixtures'.DIRECTORY_SEPARATOR.'test.gif', $this->file->getPath());
     }
 
+    public function testGetWebPathReturnsPathRelativeToDocumentRoot()
+    {
+        File::setDocumentRoot(__DIR__);
+
+        $this->assertEquals('/Fixtures/test.gif', $this->file->getWebPath());
+    }
+
+    public function testGetWebPathReturnsEmptyPathIfOutsideDocumentRoot()
+    {
+        File::setDocumentRoot(__DIR__.'/Fixtures/directory');
+
+        $this->assertEquals('', $this->file->getWebPath());
+    }
+
     public function testGetNameReturnsNameWithExtension()
     {
         $this->assertEquals('test.gif', $this->file->getName());
@@ -62,13 +76,33 @@ class FileTest extends \PHPUnit_Framework_TestCase
     public function testMove()
     {
         $path = __DIR__.'/Fixtures/test.copy.gif';
-        $targetPath = __DIR__.DIRECTORY_SEPARATOR.'Fixtures'.DIRECTORY_SEPARATOR.'test.target.gif';
+        $targetDir = __DIR__.DIRECTORY_SEPARATOR.'Fixtures'.DIRECTORY_SEPARATOR.'directory';
+        $targetPath = $targetDir.DIRECTORY_SEPARATOR.'test.copy.gif';
         @unlink($path);
         @unlink($targetPath);
         copy(__DIR__.'/Fixtures/test.gif', $path);
 
         $file = new File($path);
-        $file->move($targetPath);
+        $file->move($targetDir);
+
+        $this->assertTrue(file_exists($targetPath));
+        $this->assertFalse(file_exists($path));
+        $this->assertEquals($targetPath, $file->getPath());
+
+        @unlink($path);
+        @unlink($targetPath);
+    }
+
+    public function testRename()
+    {
+        $path = __DIR__.'/Fixtures/test.copy.gif';
+        $targetPath = __DIR__.'/Fixtures/test.target.gif';
+        @unlink($path);
+        @unlink($targetPath);
+        copy(__DIR__.'/Fixtures/test.gif', $path);
+
+        $file = new File($path);
+        $file->rename('test.target.gif');
 
         $this->assertTrue(file_exists($targetPath));
         $this->assertFalse(file_exists($path));

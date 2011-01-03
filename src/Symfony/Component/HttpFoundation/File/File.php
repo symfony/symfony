@@ -439,10 +439,40 @@ class File
     );
 
     /**
+     * Stores the absolute path to the document root directory
+     * @var string
+     */
+    static protected $documentRoot;
+
+    /**
      * The absolute path to the file without dots
      * @var string
      */
     protected $path;
+
+    /**
+     * Sets the path t the document root directory
+     *
+     * @param string $documentRoot
+     */
+    static public function setDocumentRoot($documentRoot)
+    {
+        if (!is_dir($documentRoot)) {
+            throw new \LogicException($documentRoot . ' is no directory');
+        }
+
+        self::$documentRoot = realpath($documentRoot);
+    }
+
+    /**
+     * Returns the path to the document root directory
+     *
+     * @return string
+     */
+    static public function getDocumentRoot()
+    {
+        return self::$documentRoot;
+    }
 
     /**
      * Constructs a new file from the given path.
@@ -534,6 +564,26 @@ class File
     }
 
     /**
+     * Returns the path relative to the document root
+     *
+     * You can set the document root using the static method setDocumentRoot().
+     * If the file is outside of the document root, this method returns an
+     * empty string.
+     *
+     * @return string  The relative file path
+     */
+    public function getWebPath()
+    {
+        $root = self::$documentRoot;
+
+        if (strpos($this->path, $root) === false) {
+            return '';
+        }
+
+        return str_replace(array($root, DIRECTORY_SEPARATOR), array('', '/'), $this->path);
+    }
+
+    /**
      * Returns the mime type of the file.
      *
      * The mime type is guessed using the functions finfo(), mime_content_type()
@@ -564,16 +614,40 @@ class File
     }
 
     /**
-     * Moves the file to a new location.
+     * Moves the file to a new directory and gives it a new filename
      *
-     * @param string $newPath
+     * @param  string $directory   The new directory
+     * @param  string $filename    The new file name
+     * @throws FileException       When the file could not be moved
      */
-    public function move($newPath)
+    protected function doMove($directory, $filename)
     {
+        $newPath = $directory . DIRECTORY_SEPARATOR . $filename;
+
         if (!rename($this->getPath(), $newPath)) {
             throw new FileException(sprintf('Could not move file %s to %s', $this->getPath(), $newPath));
         }
 
         $this->path = realpath($newPath);
+    }
+
+    /**
+     * Moves the file to a new location.
+     *
+     * @param string $directory
+     */
+    public function move($directory)
+    {
+        $this->doMove($directory, $this->getName());
+    }
+
+    /**
+     * Renames the file
+     *
+     * @param string $name  The new file name
+     */
+    public function rename($name)
+    {
+        $this->doMove($this->getDirectory(), $name);
     }
 }

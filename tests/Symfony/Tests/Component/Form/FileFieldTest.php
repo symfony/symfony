@@ -3,6 +3,7 @@
 namespace Symfony\Tests\Component\Form;
 
 use Symfony\Component\Form\FileField;
+use Symfony\Component\HttpFoundation\File\File;
 
 class FileFieldTest extends \PHPUnit_Framework_TestCase
 {
@@ -44,15 +45,20 @@ class FileFieldTest extends \PHPUnit_Framework_TestCase
 
     public function testBindUploadsNewFiles()
     {
-        $tmpPath = realpath(self::$tmpDir) . '/' . md5(session_id() . '$secret$' . '12345');
+        $tmpDir = realpath(self::$tmpDir);
+        $tmpName = md5(session_id() . '$secret$' . '12345');
+        $tmpPath = $tmpDir . DIRECTORY_SEPARATOR . $tmpName;
         $that = $this;
 
         $file = $this->getMock('Symfony\Component\HttpFoundation\File\UploadedFile', array(), array(), '', false);
         $file->expects($this->once())
              ->method('move')
-             ->with($this->equalTo($tmpPath))
-             ->will($this->returnCallback(function ($path) use ($that) {
-                $that->createTmpFile($path);
+             ->with($this->equalTo($tmpDir));
+        $file->expects($this->once())
+             ->method('rename')
+             ->with($this->equalTo($tmpName))
+             ->will($this->returnCallback(function ($directory) use ($that, $tmpPath) {
+                $that->createTmpFile($tmpPath);
              }));
         $file->expects($this->any())
              ->method('getOriginalName')

@@ -84,7 +84,8 @@ class FileField extends FieldGroup
                     throw new FormException('A PHP extension stopped the file upload (UPLOAD_ERR_EXTENSION)');
                 case UPLOAD_ERR_OK:
                 default:
-                    $data['file']->move($this->getTmpPath($data['token']));
+                    $data['file']->move($this->getTmpDir());
+                    $data['file']->rename($this->getTmpName($data['token']));
                     $data['original_name'] = $data['file']->getOriginalName();
                     $data['file'] = '';
                     break;
@@ -123,13 +124,23 @@ class FileField extends FieldGroup
     }
 
     /**
-     * Returns the absolute temporary file path for the given token
+     * Returns the absolute temporary path to the uploaded file
      *
      * @param string $token
      */
     protected function getTmpPath($token)
     {
-        return realpath($this->getOption('tmp_dir')) . '/' . $this->getTmpName($token);
+        return $this->getTmpDir() . DIRECTORY_SEPARATOR . $this->getTmpName($token);
+    }
+
+    /**
+     * Returns the temporary directory where files are stored
+     *
+     * @param string $token
+     */
+    protected function getTmpDir()
+    {
+        return realpath($this->getOption('tmp_dir'));
     }
 
     /**

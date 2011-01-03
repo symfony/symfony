@@ -20,10 +20,34 @@ use Symfony\Component\HttpFoundation\File\Exception\FileException;
  */
 class UploadedFile extends File
 {
+    /**
+     * The original name of the uploaded file
+     * @var string
+     */
     protected $originalName;
+
+    /**
+     * The mime type provided by the uploader
+     * @var string
+     */
     protected $mimeType;
+
+    /**
+     * The file size provided by the uploader
+     * @var integer
+     */
     protected $size;
+
+    /**
+     * The UPLOAD_ERR_XXX constant provided by the uploader
+     * @var integer
+     */
     protected $error;
+
+    /**
+     * Whether the uploaded file has already been moved
+     * @var boolean
+     */
     protected $moved = false;
 
     /**
@@ -35,7 +59,7 @@ class UploadedFile extends File
      * @param string  $type     The type of the file as provided by PHP
      * @param integer $size     The file size
      * @param string  $error    The error constant of the upload. Should be
-     *                          one of PHP's UPLOAD_XXX constants.
+     *                          one of PHP's UPLOAD_ERR_XXX constants.
      */
     public function __construct($path, $originalName, $mimeType, $size, $error)
     {
@@ -62,13 +86,7 @@ class UploadedFile extends File
     }
 
     /**
-     * Returns the mime type of the file.
-     *
-     * The mime type is guessed using the functions finfo(), mime_content_type()
-     * and the system binary "file" (in this order), depending on which of those
-     * is available on the current operating system.
-     *
-     * @returns string  The guessed mime type, e.g. "application/pdf"
+     * @inheritDoc
      */
     public function getMimeType()
     {
@@ -105,13 +123,13 @@ class UploadedFile extends File
     }
 
     /**
-     * Moves the file to a new location.
-     *
-     * @param string $newPath
+     * @inheritDoc
      */
-    public function move($newPath)
+    protected function doMove($directory, $filename)
     {
         if (!$this->moved) {
+            $newPath = $directory . DIRECTORY_SEPARATOR . $filename;
+
             if (!move_uploaded_file($this->getPath(), $newPath)) {
                 throw new FileException(sprintf('Could not move file %s to %s', $this->getPath(), $newPath));
             }
@@ -119,7 +137,19 @@ class UploadedFile extends File
             $this->moved = true;
             $this->path = realpath($newPath);
         } else {
-            parent::move($newPath);
+            parent::doMove($directory, $filename);
+        }
+    }
+
+    /**
+     * @inheritDoc
+     */
+    public function move($directory)
+    {
+        if (!$this->moved) {
+            $this->doMove($directory, $this->originalName);
+        } else {
+            parent::move($directory);
         }
     }
 }

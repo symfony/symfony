@@ -161,11 +161,18 @@ class Form extends FieldGroup
      */
     protected function generateCsrfToken($secret)
     {
-        $sessId = session_id();
-        if (!$sessId) {
-            throw new \LogicException('The session must be started in order to generate a proper CSRF Token');
+        $secret .= get_class($this);
+        $defaultSecrets = FormConfiguration::getDefaultCsrfSecrets();
+
+        foreach ($defaultSecrets as $defaultSecret) {
+            if ($defaultSecret instanceof \Closure) {
+                $defaultSecret = $defaultSecret();
+            }
+
+            $secret .= $defaultSecret;
         }
-        return md5($secret.$sessId.get_class($this));
+
+        return md5($secret);
     }
 
     /**
@@ -187,11 +194,7 @@ class Form extends FieldGroup
             }
 
             if (null === $csrfSecret) {
-                if (FormConfiguration::getDefaultCsrfSecret() !== null) {
-                    $csrfSecret = FormConfiguration::getDefaultCsrfSecret();
-                } else {
-                    $csrfSecret = md5(__FILE__.php_uname());
-                }
+                $csrfSecret = md5(__FILE__.php_uname());
             }
 
             $field = new HiddenField($csrfFieldName, array(

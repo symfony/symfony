@@ -18,7 +18,7 @@ namespace Symfony\Component\Form;
  */
 class FormConfiguration
 {
-    protected static $defaultCsrfSecret = null;
+    protected static $defaultCsrfSecrets = array();
     protected static $defaultCsrfProtection = false;
     protected static $defaultCsrfFieldName = '_token';
 
@@ -89,22 +89,32 @@ class FormConfiguration
     }
 
     /**
-     * Sets the CSRF secret used in all new CSRF protected forms
+     * Sets the default CSRF secrets to be used in all new CSRF protected forms
      *
-     * @param string $secret
+     * @param array $secrets
      */
-    static public function setDefaultCsrfSecret($secret)
+    static public function setDefaultCsrfSecrets(array $secrets)
     {
-        self::$defaultCsrfSecret = $secret;
+        self::$defaultCsrfSecrets = $secrets;
     }
 
     /**
-     * Returns the default CSRF secret
+     * Adds CSRF secrets to be used in all new CSRF protected forms
+     *
+     * @param string $secret
+     */
+    static public function addDefaultCsrfSecret($secret)
+    {
+        self::$defaultCsrfSecrets[] = $secret;
+    }
+
+    /**
+     * Returns the default CSRF secrets
      *
      * @return string
      */
-    static public function getDefaultCsrfSecret()
+    static public function getDefaultCsrfSecrets()
     {
-        return self::$defaultCsrfSecret;
+        return self::$defaultCsrfSecrets;
     }
 }

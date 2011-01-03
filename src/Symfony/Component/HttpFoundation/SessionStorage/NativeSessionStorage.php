@@ -84,6 +84,18 @@ class NativeSessionStorage implements SessionStorageInterface
     }
 
     /**
+     * @inheritDoc
+     */
+    public function getId()
+    {
+        if (!self::$sessionStarted) {
+            throw new \RuntimeException('The session must be started before reading its ID');
+        }
+
+        return session_id();
+    }
+
+    /**
      * Reads data from this storage.
      *
      * The preferred format for a key is directory style so naming conflicts can be avoided.

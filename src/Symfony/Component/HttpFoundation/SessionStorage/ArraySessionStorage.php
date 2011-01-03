@@ -44,6 +44,10 @@ class ArraySessionStorage implements SessionStorageInterface
     {
     }
 
+    public function getId()
+    {
+    }
+
     public function write($key, $data)
     {
         $this->data[$key] = $data;

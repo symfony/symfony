@@ -24,6 +24,15 @@ interface SessionStorageInterface
     function start();
 
     /**
+     * Returns the session ID
+     *
+     * @return mixed  The session ID
+     *
+     * @throws \RuntimeException If the session was not started yet
+     */
+    function getId();
+
+    /**
      * Reads data from this storage.
      *
      * The preferred format for a key is directory style so naming conflicts can be avoided.

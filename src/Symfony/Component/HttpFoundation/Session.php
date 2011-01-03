@@ -169,6 +169,16 @@ class Session implements \Serializable
     }
 
     /**
+     * Returns the session ID
+     *
+     * @return mixed  The session ID
+     */
+    public function getId()
+    {
+        return $this->storage->getId();
+    }
+
+    /**
      * Returns the locale
      *
      * @return string

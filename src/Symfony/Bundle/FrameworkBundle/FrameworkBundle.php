@@ -35,9 +35,21 @@ class FrameworkBundle extends Bundle
             $this->container->get('error_handler');
         }
         if ($this->container->hasParameter('csrf_secret')) {
-            FormConfiguration::setDefaultCsrfSecret($this->container->getParameter('csrf_secret'));
+            FormConfiguration::addDefaultCsrfSecret($this->container->getParameter('csrf_secret'));
             FormConfiguration::enableDefaultCsrfProtection();
         }
+
+        $container = $this->container;
+
+        // the session ID should always be included in the CSRF token, even
+        // if default CSRF protection is not enabled
+        FormConfiguration::addDefaultCsrfSecret(function () use ($container) {
+            // automatically starts the session when the CSRF token is
+            // generated
+            $container->get('session')->start();
+
+            return $container->get('session')->getId();
+        });
     }
 
     public function registerExtensions(ContainerBuilder $container)

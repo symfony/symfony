@@ -60,7 +60,7 @@ class FormTest extends \PHPUnit_Framework_TestCase
     protected function setUp()
     {
         FormConfiguration::disableDefaultCsrfProtection();
-        FormConfiguration::setDefaultCsrfSecret(null);
+        FormConfiguration::setDefaultCsrfSecrets(array());
         $this->validator = $this->createMockValidator();
         $this->form = new Form('author', new Author(), $this->validator);
     }
@@ -111,13 +111,26 @@ class FormTest extends \PHPUnit_Framework_TestCase
         $this->assertTrue(strlen($form->getCsrfSecret()) >= 32);
     }
 
-    public function testDefaultCsrfSecretCanBeSet()
+    public function testDefaultCsrfSecretsCanBeAdded()
     {
-        FormConfiguration::setDefaultCsrfSecret('foobar');
-        $form = new Form('author', new Author(), $this->validator);
-        $form->enableCsrfProtection();
+        FormConfiguration::addDefaultCsrfSecret('foobar');
 
-        $this->assertEquals('foobar', $form->getCsrfSecret());
+        $form = new Form('author', new Author(), $this->validator);
+        $form->enableCsrfProtection('_token', 'secret');
+
+        $this->assertEquals(md5('secret'.get_class($form).'foobar'), $form['_token']->getData());
+    }
+
+    public function testDefaultCsrfSecretsCanBeAddedAsClosures()
+    {
+        FormConfiguration::addDefaultCsrfSecret(function () {
+            return 'foobar';
+        });
+
+        $form = new Form('author', new Author(), $this->validator);
+        $form->enableCsrfProtection('_token', 'secret');
+
+        $this->assertEquals(md5('secret'.get_class($form).'foobar'), $form['_token']->getData());
     }
 
     public function testDefaultCsrfFieldNameCanBeSet()

@@ -20,13 +20,13 @@ class MoneyToLocalizedStringTransformerTest extends LocalizedTestCase
         $this->assertEquals('1,23', $transformer->transform(123));
     }
 
-    public function testTransformThrowsExceptionIfNotNumeric()
+    public function testTransformExpectsNumeric()
     {
         $transformer = new MoneyToLocalizedStringTransformer(array(
             'divisor' => 100,
         ));
 
-        $this->setExpectedException('InvalidArgumentException');
+        $this->setExpectedException('Symfony\Component\Form\Exception\UnexpectedTypeException');
 
         $transformer->transform('abcd');
     }
@@ -46,6 +46,17 @@ class MoneyToLocalizedStringTransformerTest extends LocalizedTestCase
         $transformer->setLocale('de_AT');
 
         $this->assertEquals(123, $transformer->reverseTransform('1,23', null));
+    }
+
+    public function testReverseTransformExpectsString()
+    {
+        $transformer = new MoneyToLocalizedStringTransformer(array(
+            'divisor' => 100,
+        ));
+
+        $this->setExpectedException('Symfony\Component\Form\Exception\UnexpectedTypeException');
+
+        $transformer->reverseTransform(12345, null);
     }
 
     public function testReverseTransform_empty()

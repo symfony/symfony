@@ -11,7 +11,7 @@ namespace Symfony\Component\Form\ValueTransformer;
  * with this source code in the file LICENSE.
  */
 
-use \Symfony\Component\Form\ValueTransformer\ValueTransformerException;
+use Symfony\Component\Form\Exception\UnexpectedTypeException;
 
 /**
  * Transforms between a normalized format and a localized money string.
@@ -43,7 +43,7 @@ class MoneyToLocalizedStringTransformer extends NumberToLocalizedStringTransform
     {
         if (null !== $value) {
             if (!is_numeric($value)) {
-                throw new \InvalidArgumentException(sprintf('Numeric argument expected, %s given', gettype($value)));
+                throw new UnexpectedTypeException($value, 'numeric');
             }
 
             $value /= $this->getOption('divisor');

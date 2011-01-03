@@ -11,7 +11,7 @@ namespace Symfony\Component\Form\ValueTransformer;
  * with this source code in the file LICENSE.
  */
 
-use \Symfony\Component\Form\ValueTransformer\ValueTransformerException;
+use Symfony\Component\Form\Exception\UnexpectedTypeException;
 
 /**
  * Transforms between a number type and a localized number with grouping
@@ -55,7 +55,7 @@ class NumberToLocalizedStringTransformer extends BaseValueTransformer
         }
 
         if (!is_numeric($value)) {
-            throw new \InvalidArgumentException(sprintf('Numeric argument expected, %s given', gettype($value)));
+            throw new UnexpectedTypeException($value, 'numeric');
         }
 
         $formatter = $this->getNumberFormatter();
@@ -76,7 +76,7 @@ class NumberToLocalizedStringTransformer extends BaseValueTransformer
     public function reverseTransform($value, $originalValue)
     {
         if (!is_string($value)) {
-            throw new \InvalidArgumentException(sprintf('Expected argument of type string, %s given', gettype($value)));
+            throw new UnexpectedTypeException($value, 'string');
         }
 
         if ('' === $value) {

@@ -63,7 +63,8 @@ class DateTimeToTimestampTransformerTest extends DateTimeTestCase
     {
         $transformer = new DateTimeToTimestampTransformer();
 
-        $this->setExpectedException('\InvalidArgumentException');
+        $this->setExpectedException('Symfony\Component\Form\Exception\UnexpectedTypeException');
+
         $transformer->transform('1234');
     }
 
@@ -105,7 +106,8 @@ class DateTimeToTimestampTransformerTest extends DateTimeTestCase
     {
         $reverseTransformer = new DateTimeToTimestampTransformer();
 
-        $this->setExpectedException('\InvalidArgumentException');
+        $this->setExpectedException('Symfony\Component\Form\Exception\UnexpectedTypeException');
+
         $reverseTransformer->reverseTransform('2010-2010-2010', null);
     }
 }

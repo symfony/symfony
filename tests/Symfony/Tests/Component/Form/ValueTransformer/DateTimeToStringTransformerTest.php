@@ -49,7 +49,8 @@ class DateTimeToStringTransformerTest extends DateTimeTestCase
     {
         $transformer = new DateTimeToStringTransformer();
 
-        $this->setExpectedException('\InvalidArgumentException');
+        $this->setExpectedException('Symfony\Component\Form\Exception\UnexpectedTypeException');
+
         $transformer->transform('1234');
     }
 
@@ -87,11 +88,21 @@ class DateTimeToStringTransformerTest extends DateTimeTestCase
         $this->assertDateTimeEquals($output, $reverseTransformer->reverseTransform($input, null));
     }
 
-    public function testReverseTransformExpectsValidString()
+    public function testReverseTransformExpectsString()
+    {
+        $reverseTransformer = new DateTimeToStringTransformer();
+
+        $this->setExpectedException('Symfony\Component\Form\Exception\UnexpectedTypeException');
+
+        $reverseTransformer->reverseTransform(1234, null);
+    }
+
+    public function testReverseTransformExpectsValidDateString()
     {
         $reverseTransformer = new DateTimeToStringTransformer();
 
         $this->setExpectedException('\InvalidArgumentException');
+
         $reverseTransformer->reverseTransform('2010-2010-2010', null);
     }
 }

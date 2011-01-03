@@ -102,7 +102,7 @@ class NumberToLocalizedStringTransformerTest extends LocalizedTestCase
     {
         $transformer = new NumberToLocalizedStringTransformer();
 
-        $this->setExpectedException('\InvalidArgumentException');
+        $this->setExpectedException('Symfony\Component\Form\Exception\UnexpectedTypeException');
 
         $transformer->transform('foo');
     }
@@ -111,7 +111,7 @@ class NumberToLocalizedStringTransformerTest extends LocalizedTestCase
     {
         $transformer = new NumberToLocalizedStringTransformer();
 
-        $this->setExpectedException('\InvalidArgumentException');
+        $this->setExpectedException('Symfony\Component\Form\Exception\UnexpectedTypeException');
 
         $transformer->reverseTransform(1, null);
     }

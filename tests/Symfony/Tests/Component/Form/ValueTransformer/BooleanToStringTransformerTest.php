@@ -22,14 +22,14 @@ class BooleanToStringTransformerTest extends \PHPUnit_Framework_TestCase
 
     public function testTransformExpectsBoolean()
     {
-        $this->setExpectedException('\InvalidArgumentException');
+        $this->setExpectedException('Symfony\Component\Form\Exception\UnexpectedTypeException');
 
         $this->transformer->transform('1');
     }
 
     public function testReverseTransformExpectsString()
     {
-        $this->setExpectedException('\InvalidArgumentException');
+        $this->setExpectedException('Symfony\Component\Form\Exception\UnexpectedTypeException');
 
         $this->transformer->reverseTransform(1, null);
     }

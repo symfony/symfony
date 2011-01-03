@@ -155,7 +155,7 @@ class DateTimeToLocalizedStringTransformerTest extends DateTimeTestCase
     {
         $transformer = new DateTimeToLocalizedStringTransformer();
 
-        $this->setExpectedException('\InvalidArgumentException');
+        $this->setExpectedException('Symfony\Component\Form\Exception\UnexpectedTypeException');
 
         $transformer->transform('2010-01-01');
     }
@@ -294,7 +294,7 @@ class DateTimeToLocalizedStringTransformerTest extends DateTimeTestCase
     {
         $transformer = new DateTimeToLocalizedStringTransformer();
 
-        $this->setExpectedException('\InvalidArgumentException');
+        $this->setExpectedException('Symfony\Component\Form\Exception\UnexpectedTypeException');
 
         $transformer->reverseTransform(12345, null);
     }

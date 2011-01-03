@@ -11,7 +11,7 @@ namespace Symfony\Component\Form\ValueTransformer;
  * with this source code in the file LICENSE.
  */
 
-use \Symfony\Component\Form\ValueTransformer\ValueTransformerException;
+use Symfony\Component\Form\Exception\UnexpectedTypeException;
 
 /**
  * Transforms between a normalized format (integer or float) and a percentage value.
@@ -57,7 +57,7 @@ class PercentToLocalizedStringTransformer extends BaseValueTransformer
         }
 
         if (!is_numeric($value)) {
-            throw new \InvalidArgumentException(sprintf('Numeric argument expected, %s given', gettype($value)));
+            throw new UnexpectedTypeException($value, 'numeric');
         }
 
         if (self::FRACTIONAL == $this->getOption('type')) {
@@ -84,7 +84,7 @@ class PercentToLocalizedStringTransformer extends BaseValueTransformer
     public function reverseTransform($value, $originalValue)
     {
         if (!is_string($value)) {
-            throw new \InvalidArgumentException(sprintf('Expected argument of type string, %s given', gettype($value)));
+            throw new UnexpectedTypeException($value, 'string');
         }
 
         if ('' === $value) {

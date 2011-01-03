@@ -281,7 +281,7 @@ class FieldGroup extends Field implements \IteratorAggregate, FieldGroupInterfac
         }
 
         if (!is_array($taintedData)) {
-            throw new UnexpectedTypeException('You must pass an array parameter to the bind() method');
+            throw new UnexpectedTypeException($taintedData, 'array');
         }
 
         foreach ($this->fields as $key => $field) {

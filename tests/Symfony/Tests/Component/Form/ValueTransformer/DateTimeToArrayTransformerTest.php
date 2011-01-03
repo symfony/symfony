@@ -115,7 +115,7 @@ class DateTimeToArrayTransformerTest extends DateTimeTestCase
     {
         $transformer = new DateTimeToArrayTransformer();
 
-        $this->setExpectedException('\InvalidArgumentException');
+        $this->setExpectedException('Symfony\Component\Form\Exception\UnexpectedTypeException');
 
         $transformer->reverseTransform('12345', null);
     }
@@ -212,7 +212,7 @@ class DateTimeToArrayTransformerTest extends DateTimeTestCase
     {
         $transformer = new DateTimeToArrayTransformer();
 
-        $this->setExpectedException('\InvalidArgumentException');
+        $this->setExpectedException('Symfony\Component\Form\Exception\UnexpectedTypeException');
 
         $transformer->reverseTransform('12345', null);
     }

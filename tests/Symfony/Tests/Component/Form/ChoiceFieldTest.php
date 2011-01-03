@@ -38,7 +38,7 @@ class ChoiceFieldTest extends \PHPUnit_Framework_TestCase
     );
 
     /**
-     * @expectedException Symfony\Component\Form\Exception\UnexpectedTypeException
+     * @expectedException Symfony\Component\Form\Exception\InvalidOptionsException
      */
     public function testConfigureChoicesWithNonArray()
     {
@@ -48,7 +48,7 @@ class ChoiceFieldTest extends \PHPUnit_Framework_TestCase
     }
 
     /**
-     * @expectedException Symfony\Component\Form\Exception\UnexpectedTypeException
+     * @expectedException Symfony\Component\Form\Exception\InvalidOptionsException
      */
     public function testConfigurePreferredChoicesWithNonArray()
     {

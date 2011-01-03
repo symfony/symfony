@@ -43,7 +43,7 @@ interface ValueTransformerInterface extends Localizable
      *
      * @param  mixed $value               The value in the original representation
      * @return mixed                      The value in the transformed representation
-     * @throws InvalidArgumentException   when the argument is no string
+     * @throws UnexpectedTypeException    when the argument is no string
      * @throws ValueTransformerException  when the transformation fails
      */
     function transform($value);
@@ -69,7 +69,7 @@ interface ValueTransformerInterface extends Localizable
      * @param  mixed $value               The value in the transformed representation
      * @param  mixed $originalValue       The original value from the datasource that is about to be overwritten by the new value.
      * @return mixed                      The value in the original representation
-     * @throws InvalidArgumentException   when the argument is not of the
+     * @throws UnexpectedTypeException    when the argument is not of the
      *                                    expected type
      * @throws ValueTransformerException  when the transformation fails
      */

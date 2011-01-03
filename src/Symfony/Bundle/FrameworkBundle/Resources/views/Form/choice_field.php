@@ -9,6 +9,7 @@
         name="<?php echo $field->getName() ?>"
         <?php if ($field->isDisabled()): ?> disabled="disabled"<?php endif ?>
         <?php if ($field->isMultipleChoice()): ?> multiple="multiple"<?php endif ?>
+        <?php echo $view['form']->attributes($attr) ?>
     >
         <?php if (count($field->getPreferredChoices()) > 0): ?>
             <?php foreach ($field->getPreferredChoices() as $choice => $label): ?>

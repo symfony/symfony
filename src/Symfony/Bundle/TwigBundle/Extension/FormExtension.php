@@ -81,7 +81,7 @@ class FormExtension extends \Twig_Extension
      *
      * Example usage in Twig templates:
      *
-     *     <form action="..." method="post" {{ render_enctype(form) }}>
+     *     <form action="..." method="post" {{ form_enctype(form) }}>
      *
      * @param Form $form   The form for which to render the encoding type
      */

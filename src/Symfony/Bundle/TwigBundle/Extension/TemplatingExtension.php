@@ -8,6 +8,10 @@ use Symfony\Bundle\TwigBundle\TokenParser\IncludeTokenParser;
 use Symfony\Bundle\TwigBundle\TokenParser\UrlTokenParser;
 use Symfony\Bundle\TwigBundle\TokenParser\PathTokenParser;
 use Symfony\Bundle\TwigBundle\TokenParser\RenderTokenParser;
+use Symfony\Bundle\TwigBundle\TokenParser\StylesheetTokenParser;
+use Symfony\Bundle\TwigBundle\TokenParser\StylesheetsTokenParser;
+use Symfony\Bundle\TwigBundle\TokenParser\JavascriptTokenParser;
+use Symfony\Bundle\TwigBundle\TokenParser\JavascriptsTokenParser;
 use Symfony\Component\Yaml\Dumper as YamlDumper;
 
 /*
@@ -98,16 +102,16 @@ class TemplatingExtension extends \Twig_Extension
     {
         return array(
             // {% javascript 'bundles/blog/js/blog.js' %}
-            new HelperTokenParser('javascript', '<js> [with <arguments:hash>]', 'templating.helper.javascripts', 'add'),
+            new JavascriptTokenParser(),
 
             // {% javascripts %}
-            new HelperTokenParser('javascripts', '', 'templating.helper.javascripts', 'render'),
+            new JavascriptsTokenParser(),
 
             // {% stylesheet 'bundles/blog/css/blog.css' with { 'media': 'screen' } %}
-            new HelperTokenParser('stylesheet', '<css> [with <arguments:hash>]', 'templating.helper.stylesheets', 'add'),
+            new StylesheetTokenParser(),
 
             // {% stylesheets %}
-            new HelperTokenParser('stylesheets', '', 'templating.helper.stylesheets', 'render'),
+            new StylesheetsTokenParser(),
 
             // {% render 'BlogBundle:Post:list' with { 'limit': 2 }, { 'alt': 'BlogBundle:Post:error' } %}
             new RenderTokenParser(),

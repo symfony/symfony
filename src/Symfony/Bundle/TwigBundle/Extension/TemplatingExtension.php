@@ -7,10 +7,6 @@ use Symfony\Bundle\TwigBundle\TokenParser\IncludeTokenParser;
 use Symfony\Bundle\TwigBundle\TokenParser\UrlTokenParser;
 use Symfony\Bundle\TwigBundle\TokenParser\PathTokenParser;
 use Symfony\Bundle\TwigBundle\TokenParser\RenderTokenParser;
-use Symfony\Bundle\TwigBundle\TokenParser\StylesheetTokenParser;
-use Symfony\Bundle\TwigBundle\TokenParser\StylesheetsTokenParser;
-use Symfony\Bundle\TwigBundle\TokenParser\JavascriptTokenParser;
-use Symfony\Bundle\TwigBundle\TokenParser\JavascriptsTokenParser;
 use Symfony\Component\Yaml\Dumper as YamlDumper;
 
 /*
@@ -100,18 +96,6 @@ class TemplatingExtension extends \Twig_Extension
     public function getTokenParsers()
     {
         return array(
-            // {% javascript 'bundles/blog/js/blog.js' %}
-            new JavascriptTokenParser(),
-
-            // {% javascripts %}
-            new JavascriptsTokenParser(),
-
-            // {% stylesheet 'bundles/blog/css/blog.css' with { 'media': 'screen' } %}
-            new StylesheetTokenParser(),
-
-            // {% stylesheets %}
-            new StylesheetsTokenParser(),
-
             // {% render 'BlogBundle:Post:list' with { 'limit': 2 }, { 'alt': 'BlogBundle:Post:error' } %}
             new RenderTokenParser(),
 

@@ -37,7 +37,10 @@ class Renderer extends BaseRenderer
      */
     public function evaluate(Storage $template, array $parameters = array())
     {
-        $parameters['_view'] = $this->engine;
+        // cannot be set in the constructor as we need the current request
+        $request = $this->engine->getContainer()->get('request');
+        $this->environment->addGlobal('request', $request);
+        $this->environment->addGlobal('session', $request->getSession());
 
         return $this->environment->loadTemplate($template)->render($parameters);
     }

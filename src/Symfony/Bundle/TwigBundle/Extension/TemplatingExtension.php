@@ -74,7 +74,6 @@ class TemplatingExtension extends \Twig_Extension
             'url'   => new \Twig_Function_Method($this, 'getUrl'),
             'path'  => new \Twig_Function_Method($this, 'getPath'),
             'asset' => new \Twig_Function_Method($this, 'getAssetUrl'),
-            'flash' => new \Twig_Function_Method($this, 'getFlash'),
         );
     }
 
@@ -91,11 +90,6 @@ class TemplatingExtension extends \Twig_Extension
     public function getAssetUrl($location)
     {
         return $this->container->get('templating.helper.assets')->getUrl($location);
-    }
-
-    public function getFlash($name, $default = null)
-    {
-        return $this->container->get('request')->getSession()->getFlash($name, $default);
     }
 
     /**

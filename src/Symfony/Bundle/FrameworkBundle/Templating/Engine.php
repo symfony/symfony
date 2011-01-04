@@ -52,6 +52,11 @@ class Engine extends BaseEngine
         }
     }
 
+    public function getContainer()
+    {
+        return $this->container;
+    }
+
     /**
      * Renders a view and returns a Response.
      *

@@ -165,6 +165,6 @@ abstract class Bundle extends ContainerAware implements BundleInterface
         $this->namespacePrefix = str_replace('/', '\\', dirname($tmp));
         $this->name = basename($tmp);
         $this->reflection = new \ReflectionObject($this);
-        $this->path = dirname($this->reflection->getFilename());
+        $this->path = str_replace('\\', '/', dirname($this->reflection->getFilename()));
     }
 }

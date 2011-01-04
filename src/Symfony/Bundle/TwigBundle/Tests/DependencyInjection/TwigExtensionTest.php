@@ -30,4 +30,23 @@ class TwigExtensionTest extends TestCase
         $this->assertEquals('ISO-8859-1', $options['charset'], '->configLoad() overrides existing configuration options');
         $this->assertEquals('%kernel.debug%', $options['debug'], '->configLoad() merges the new values with the old ones');
     }
+
+    public function testConfigGlobals()
+    {
+        // XML
+        $container = new ContainerBuilder();
+        $loader = new TwigExtension();
+        $loader->configLoad(array('global' => array(array('key' => 'foo', 'id' => 'bar'))), $container);
+        $config = $container->getDefinition('twig')->getMethodCalls();
+        $this->assertEquals('foo', $config[0][1][0]);
+        $this->assertEquals('bar', (string) $config[0][1][1]);
+
+        // YAML, PHP
+        $container = new ContainerBuilder();
+        $loader = new TwigExtension();
+        $loader->configLoad(array('globals' => array('foo' => 'bar')), $container);
+        $config = $container->getDefinition('twig')->getMethodCalls();
+        $this->assertEquals('foo', $config[0][1][0]);
+        $this->assertEquals('bar', (string) $config[0][1][1]);
+    }
 }

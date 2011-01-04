@@ -3,6 +3,8 @@
 namespace Symfony\Bundle\ZendBundle;
 
 use Symfony\Component\HttpKernel\Bundle\Bundle;
+use Symfony\Component\DependencyInjection\ContainerBuilder;
+use Symfony\Bundle\ZendBundle\DependencyInjection\Compiler\ZendLoggerWriterPass;
 
 /*
  * This file is part of the Symfony framework.
@@ -20,4 +22,10 @@ use Symfony\Component\HttpKernel\Bundle\Bundle;
  */
 class ZendBundle extends Bundle
 {
+    public function registerExtensions(ContainerBuilder $container)
+    {
+        parent::registerExtensions($container);
+
+        $container->addCompilerPass(new ZendLoggerWriterPass());
+    }
 }

@@ -16,12 +16,10 @@
     </parameters>
 
     <services>
-        <service id="zend.logger" class="%zend.logger.class%">
-            <call method="addWriter"><argument type="service" id="zend.logger.writer.filesystem" /></call>
-            <call method="addWriter"><argument type="service" id="zend.logger.writer.debug" /></call>
-        </service>
+        <service id="zend.logger" class="%zend.logger.class%" />
 
         <service id="zend.logger.writer.filesystem" class="%zend.logger.writer.filesystem.class%">
+            <tag name="zend.logger.writer" />
             <argument>%zend.logger.path%</argument>
             <call method="addFilter"><argument type="service" id="zend.logger.filter" /></call>
             <call method="setFormatter"><argument type="service" id="zend.formatter.filesystem" /></call>
@@ -32,6 +30,7 @@
         </service>
 
         <service id="zend.logger.writer.debug" class="%zend.logger.writer.debug.class%">
+            <tag name="zend.logger.writer" />
             <call method="addFilter"><argument type="service" id="zend.logger.filter" /></call>
         </service>
 

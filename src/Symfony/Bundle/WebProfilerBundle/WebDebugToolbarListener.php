@@ -53,7 +53,7 @@ class WebDebugToolbarListener
 
         if ($response->headers->has('X-Debug-Token') && $response->isRedirect() && $this->interceptRedirects) {
             $response->setContent(
-                sprintf('<html><head></head><body><h1>This Request redirects to<br /><a href="%s">%s</a>.</h1></body></html>',
+                sprintf('<html><head></head><body><h1>This Request redirects to<br /><a href="%s">%s</a>.</h1><h4>The redirect was intercepted by the web debug toolbar to help debugging.<br/>For more information, see the "intercept-redirects" option of the Profiler.</h4></body></html>',
                 $response->headers->get('location'), $response->headers->get('location'))
             );
             $response->setStatusCode(200);

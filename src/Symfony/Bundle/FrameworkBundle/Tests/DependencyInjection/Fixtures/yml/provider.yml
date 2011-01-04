@@ -12,3 +12,6 @@ security.config:
 
         doctrine:
             entity: { class: SecurityBundle:User, property: username }
+
+        service:
+            id: user.manager

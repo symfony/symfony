@@ -19,5 +19,7 @@
         <provider name="doctrine">
             <entity class="SecurityBundle:User" property="username" />
         </provider>
+
+        <provider name="service" id="user.manager" />
     </config>
 </srv:container>

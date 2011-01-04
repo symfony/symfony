@@ -17,5 +17,8 @@ $container->loadFromExtension('security', 'config', array(
         'doctrine' => array(
             'entity' => array('class' => 'SecurityBundle:User', 'property' => 'username')
         ),
+        'service' => array(
+            'id' => 'user.manager',
+        ),
     )
 ));

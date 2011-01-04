@@ -33,7 +33,7 @@ abstract class SecurityExtensionTest extends TestCase
     {
         $container = $this->getContainer('provider');
 
-        $providers = array_values(array_filter(array_keys($container->getDefinitions()), function ($key) { return 0 === strpos($key, 'security.authentication.provider.'); }));
+        $providers = array_values(array_filter($container->getServiceIds(), function ($key) { return 0 === strpos($key, 'security.authentication.provider.'); }));
 
         $this->assertEquals(array(
             'security.authentication.provider.digest',
@@ -42,6 +42,7 @@ abstract class SecurityExtensionTest extends TestCase
             'security.authentication.provider.basic_b7f0cf21802ffc8b22cadbb255f07213',
             'security.authentication.provider.basic_98e44377704554700e68c22094b51ca4',
             'security.authentication.provider.doctrine',
+            'security.authentication.provider.service',
         ), $providers);
     }
 

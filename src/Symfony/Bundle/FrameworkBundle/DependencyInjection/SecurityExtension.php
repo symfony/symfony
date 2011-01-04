@@ -363,7 +363,9 @@ class SecurityExtension extends Extension
 
         // Existing DAO service provider
         if (isset($provider['id'])) {
-            return array($provider['id'], $encoder);
+            $container->setAlias($name, $provider['id']);
+
+            return array($name, $encoder);
         }
 
         // Chain provider

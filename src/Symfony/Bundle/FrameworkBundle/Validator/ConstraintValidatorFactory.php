@@ -39,30 +39,17 @@ use Symfony\Component\Validator\ConstraintValidatorFactoryInterface;
 class ConstraintValidatorFactory implements ConstraintValidatorFactoryInterface
 {
     protected $container;
-    protected $validators = array();
+    protected $validators;
 
     /**
      * Constructor.
      *
      * @param ContainerInterface $container The service container
      */
-    public function __construct(ContainerInterface $container)
+    public function __construct(ContainerInterface $container, array $validators = array())
     {
         $this->container = $container;
-    }
-
-    /**
-     * Loads ids for services tagged as constraint validators.
-     *
-     * @param TaggedContainerInterface $container The tagged service container
-     */
-    public function loadTaggedServiceIds(TaggedContainerInterface $container)
-    {
-        foreach ($container->findTaggedServiceIds('validator.constraint_validator') as $id => $attributes) {
-            if (isset($attributes[0]['alias'])) {
-                $this->validators[$attributes[0]['alias']] = $id;
-            }
-        }
+        $this->validators = $validators;
     }
 
     /**

@@ -30,7 +30,7 @@ class EngineTest extends TestCase
      */
     public function testSplitTemplateName($name, $parameters)
     {
-        $engine = new Engine($this->getContainerMock(), $this->getLoaderMock());
+        $engine = new Engine($this->getContainerMock(), $this->getLoaderMock(), array());
 
         $this->assertEquals($parameters, $engine->splitTemplateName($name));
     }
@@ -50,7 +50,7 @@ class EngineTest extends TestCase
      */
     public function testSplitTemplateNameInvalid($name)
     {
-        $engine = new Engine($this->getContainerMock(), $this->getLoaderMock());
+        $engine = new Engine($this->getContainerMock(), $this->getLoaderMock(), array());
 
         $engine->splitTemplateName($name);
     }
@@ -75,11 +75,6 @@ class EngineTest extends TestCase
         ;
 
         $container = $this->getMock('Symfony\Component\DependencyInjection\ContainerBuilder');
-        $container
-            ->expects($this->exactly(2))
-            ->method('findTaggedServiceIds')
-            ->will($this->returnValue(array()))
-        ;
         $container
             ->expects($this->any())
             ->method('get')

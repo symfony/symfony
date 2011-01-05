@@ -38,7 +38,7 @@ class TemplatingExtension extends \Twig_Extension
 
     public function getTemplating()
     {
-        return $this->container->get('templating.engine');
+        return $this->container->get('templating');
     }
 
     /**

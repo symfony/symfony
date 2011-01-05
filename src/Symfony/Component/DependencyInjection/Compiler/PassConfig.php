@@ -31,10 +31,13 @@ class PassConfig
 
         $this->optimizationPasses = array(
             new ResolveParameterPlaceHoldersPass(),
+            new ResolveReferencesToAliasesPass(),
             new ResolveInterfaceInjectorsPass(),
+            new ResolveInvalidReferencesPass(),
         );
 
         $this->removingPasses = array(
+            new InlineServiceDefinitionsPass(),
             new RemoveUnusedDefinitionsPass(),
         );
     }

@@ -6,8 +6,17 @@ use Symfony\Component\DependencyInjection\Reference;
 use Symfony\Component\DependencyInjection\Definition;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 
+/*
+ * This file is part of the Symfony framework.
+ *
+ * (c) Fabien Potencier <fabien.potencier@symfony-project.com>
+ *
+ * This source file is subject to the MIT license that is bundled
+ * with this source code in the file LICENSE.
+ */
+
 /**
- * Removes unused service definitions from the container
+ * Removes unused service definitions from the container.
  *
  * @author Johannes M. Schmitt <schmittjoh@gmail.com>
  */
@@ -22,7 +31,14 @@ class RemoveUnusedDefinitionsPass implements CompilerPassInterface
                 continue;
             }
 
-            if (!in_array($id, $aliases, true) && !$this->isReferenced($container, $id)) {
+            $referencingAliases = array_keys($aliases, $id, true);
+            $isReferenced = $this->isReferenced($container, $id);
+
+            if (1 === count($referencingAliases) && false === $isReferenced) {
+                $container->setDefinition(reset($referencingAliases), $definition);
+                $definition->setPublic(true);
+                $container->remove($id);
+            } else if (0 === count($referencingAliases) && false === $isReferenced) {
                 $container->remove($id);
                 $hasChanged = true;
             }
@@ -40,11 +56,8 @@ class RemoveUnusedDefinitionsPass implements CompilerPassInterface
                 return true;
             }
 
-            foreach ($definition->getMethodCalls() as $arguments)
-            {
-                if ($this->isReferencedByArgument($id, $arguments)) {
-                    return true;
-                }
+            if ($this->isReferencedByArgument($id, $definition->getMethodCalls())) {
+                return true;
             }
         }
 
@@ -61,6 +74,14 @@ class RemoveUnusedDefinitionsPass implements CompilerPassInterface
             }
         } else if ($argument instanceof Reference) {
             if ($id === (string) $argument) {
+                return true;
+            }
+        } else if ($argument instanceof Definition) {
+            if ($this->isReferencedByArgument($id, $argument->getArguments())) {
+                return true;
+            }
+
+            if ($this->isReferencedByArgument($id, $argument->getMethodCalls())) {
                 return true;
             }
         }

@@ -32,8 +32,8 @@ services:
     file: %path%foo.php
     calls:
       - [setBar, ['@foo']]
-      - [setBar, ['@?foo']]
-      - [setBar, ['@?foo']]
+      - [setBar, ['@?foo2']]
+      - [setBar, ['@?foo3']]
       - [setBar, ['@?foobaz']]
       
   factory_service:

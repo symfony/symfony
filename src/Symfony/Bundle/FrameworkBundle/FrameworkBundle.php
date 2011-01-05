@@ -2,6 +2,8 @@
 
 namespace Symfony\Bundle\FrameworkBundle;
 
+use Symfony\Bundle\FrameworkBundle\DependencyInjection\Compiler\AddTemplatingRenderersPass;
+use Symfony\Bundle\FrameworkBundle\DependencyInjection\Compiler\RegisterKernelListenersPass;
 use Symfony\Bundle\FrameworkBundle\DependencyInjection\Compiler\AddSecurityVotersPass;
 use Symfony\Bundle\FrameworkBundle\DependencyInjection\Compiler\ConverterManagerPass;
 use Symfony\Bundle\FrameworkBundle\DependencyInjection\Compiler\RoutingResolverPass;
@@ -60,5 +62,7 @@ class FrameworkBundle extends Bundle
         $container->addCompilerPass(new ConverterManagerPass());
         $container->addCompilerPass(new RoutingResolverPass());
         $container->addCompilerPass(new ProfilerPass());
+        $container->addCompilerPass(new RegisterKernelListenersPass());
+        $container->addCompilerPass(new AddTemplatingRenderersPass());
     }
 }

@@ -34,6 +34,7 @@ class ProjectServiceContainer extends Container implements TaggedContainerInterf
     protected function getFooService()
     {
         $this->services['foo'] = $instance = new \FooClass();
+
         $instance->setBar('someValue');
 
         return $instance;

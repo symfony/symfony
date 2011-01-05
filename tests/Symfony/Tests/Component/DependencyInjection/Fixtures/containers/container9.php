@@ -42,8 +42,8 @@ $container->
     register('method_call1', 'FooClass')->
     setFile(realpath(__DIR__.'/../includes/foo.php'))->
     addMethodCall('setBar', array(new Reference('foo')))->
-    addMethodCall('setBar', array(new Reference('foo', ContainerInterface::NULL_ON_INVALID_REFERENCE)))->
-    addMethodCall('setBar', array(new Reference('foo', ContainerInterface::IGNORE_ON_INVALID_REFERENCE)))->
+    addMethodCall('setBar', array(new Reference('foo2', ContainerInterface::NULL_ON_INVALID_REFERENCE)))->
+    addMethodCall('setBar', array(new Reference('foo3', ContainerInterface::IGNORE_ON_INVALID_REFERENCE)))->
     addMethodCall('setBar', array(new Reference('foobaz', ContainerInterface::IGNORE_ON_INVALID_REFERENCE)))
 ;
 $container->

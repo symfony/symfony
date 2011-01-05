@@ -49,13 +49,6 @@ class ConstraintValidatorFactoryTest extends \PHPUnit_Framework_TestCase
         $container = $this->getMock('Symfony\\Component\\DependencyInjection\\ContainerBuilder');
         $container
             ->expects($this->once())
-            ->method('findTaggedServiceIds')
-            ->with('validator.constraint_validator')
-            ->will($this->returnValue(array(
-                $service => array(array('alias' => $alias)),
-            )));
-        $container
-            ->expects($this->once())
             ->method('get')
             ->with($service)
             ->will($this->returnValue($validator));
@@ -66,8 +59,7 @@ class ConstraintValidatorFactoryTest extends \PHPUnit_Framework_TestCase
             ->method('validatedBy')
             ->will($this->returnValue($alias));
 
-        $factory = new ConstraintValidatorFactory($container);
-        $factory->loadTaggedServiceIds($container);
+        $factory = new ConstraintValidatorFactory($container, array('validator_constraint_alias' => 'validator_constraint_service'));
         $this->assertSame($validator, $factory->getInstance($constraint));
     }
 }

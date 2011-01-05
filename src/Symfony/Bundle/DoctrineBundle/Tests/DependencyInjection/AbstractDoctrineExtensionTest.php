@@ -439,7 +439,7 @@ abstract class AbstractDoctrineExtensionTest extends TestCase
             new Reference('doctrine.orm.default_annotation_metadata_driver'),
             'DoctrineBundle\Tests\DependencyInjection\Fixtures\Bundles\XmlBundle\Entity'
         ));
-        
+
         $configDef = $container->getDefinition('doctrine.orm.default_configuration');
         $this->assertDICDefinitionMethodCallOnce($configDef, 'setAutoGenerateProxyClasses', array(false));
     }
@@ -505,12 +505,13 @@ abstract class AbstractDoctrineExtensionTest extends TestCase
     public function testSingleEntityManagerMultipleMappingBundleDefinitions()
     {
         $container = $this->getContainer(array('YamlBundle', 'AnnotationsBundle', 'XmlBundle'));
-        
+
         $loader = new DoctrineExtension();
         $container->registerExtension($loader);
 
         $this->loadFromFile($container, 'orm_single_em_bundle_mappings');
 
+        $container->getCompilerPassConfig()->setRemovingPasses(array());
         $container->freeze();
 
         $definition = $container->getDefinition('doctrine.orm.default_metadata_driver');
@@ -556,6 +557,7 @@ abstract class AbstractDoctrineExtensionTest extends TestCase
 
         $this->loadFromFile($container, 'orm_multiple_em_bundle_mappings');
 
+        $container->getCompilerPassConfig()->setRemovingPasses(array());
         $container->freeze();
 
         $def1 = $container->getDefinition('doctrine.orm.em1_metadata_driver');
@@ -628,7 +630,7 @@ abstract class AbstractDoctrineExtensionTest extends TestCase
 
     /**
      * Assertion on the Class of a DIC Service Definition.
-     * 
+     *
      * @param \Symfony\Component\DependencyInjection\Definition $definition
      * @param string $expectedClass
      */

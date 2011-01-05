@@ -73,6 +73,7 @@ class FormExtension extends \Twig_Extension
             'form_errors'  => new \Twig_Function_Method($this, 'renderErrors', array('is_safe' => array('html'))),
             'form_label'   => new \Twig_Function_Method($this, 'renderLabel', array('is_safe' => array('html'))),
             'form_data'    => new \Twig_Function_Method($this, 'renderData', array('is_safe' => array('html'))),
+            'form_row'     => new \Twig_Function_Method($this, 'renderRow', array('is_safe' => array('html'))),
         );
     }
 
@@ -88,6 +89,22 @@ class FormExtension extends \Twig_Extension
     public function renderEnctype(Form $form)
     {
         return $form->isMultipart() ? 'enctype="multipart/form-data"' : '';
+    }
+
+    /**
+     * Renders a field row.
+     *
+     * @param FieldInterface $field  The field to render as a row
+     */
+    public function renderRow(FieldInterface $field)
+    {
+        if (null === $this->templates) {
+            $this->templates = $this->resolveResources($this->resources);
+        }
+
+        return $this->templates['field_row']->renderBlock('field_row', array(
+            'child'  => $field,
+        ));
     }
 
     /**

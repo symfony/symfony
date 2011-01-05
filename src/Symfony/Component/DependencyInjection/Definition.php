@@ -253,11 +253,7 @@ class Definition
      */
     public function getTag($name)
     {
-        if (!isset($this->tags[$name])) {
-            $this->tags[$name] = array();
-        }
-
-        return $this->tags[$name];
+        return isset($this->tags[$name]) ? $this->tags[$name] : array();
     }
 
     /**

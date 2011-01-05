@@ -4,14 +4,19 @@ namespace Symfony\Component\DependencyInjection\Exception;
 
 use \InvalidArgumentException as BaseInvalidArgumentException;
 
+/*
+ * This file is part of the Symfony framework.
+ *
+ * (c) Fabien Potencier <fabien.potencier@symfony-project.com>
+ *
+ * This source file is subject to the MIT license that is bundled
+ * with this source code in the file LICENSE.
+ */
+
 /**
  * InvalidArgumentException
  *
- * @package OpenSky Messaging
- * @version $Id$
  * @author Bulat Shakirzyanov <bulat@theopenskyproject.com>
- * @copyright (c) 2010 OpenSky Project Inc
- * @license http://www.gnu.org/licenses/agpl.txt GNU Affero General Public License
  */
 class InvalidArgumentException extends BaseInvalidArgumentException implements Exception
 {

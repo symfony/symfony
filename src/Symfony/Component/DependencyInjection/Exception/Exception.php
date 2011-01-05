@@ -14,7 +14,7 @@ namespace Symfony\Component\DependencyInjection\Exception;
 /**
  * Exception
  *
- * @author     Fabien Potencier <fabien.potencier@symfony-project.com>
+ * @author Fabien Potencier <fabien.potencier@symfony-project.com>
  * @author Bulat Shakirzyanov <bulat@theopenskyproject.com>
  */
 interface Exception

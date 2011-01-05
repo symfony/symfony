@@ -5,9 +5,9 @@
     targetNamespace="http://www.symfony-project.org/schema/dic/swiftmailer"
     elementFormDefault="qualified">
 
-  <xsd:element name="mailer" type="mailer" />
+  <xsd:element name="config" type="config" />
 
-  <xsd:complexType name="mailer">
+  <xsd:complexType name="config">
     <xsd:sequence>
       <xsd:element name="spool" type="spool" minOccurs="0" maxOccurs="1" />
     </xsd:sequence>

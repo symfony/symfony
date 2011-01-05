@@ -26,16 +26,24 @@ class AclProviderTest extends \PHPUnit_Framework_TestCase
         $this->getProvider()->findAcl(new ObjectIdentity('foo', 'foo'));
     }
 
-    /**
-     * @expectedException Symfony\Component\Security\Acl\Exception\AclNotFoundException
-     */
     public function testFindAclsThrowsExceptionUnlessAnACLIsFoundForEveryOID()
     {
         $oids = array();
         $oids[] = new ObjectIdentity('1', 'foo');
         $oids[] = new ObjectIdentity('foo', 'foo');
 
-        $this->getProvider()->findAcls($oids);
+        try {
+            $this->getProvider()->findAcls($oids);
+
+            $this->fail('Provider did not throw an expected exception.');
+        } catch (\Exception $ex) {
+            $this->assertInstanceOf('Symfony\Component\Security\Acl\Exception\AclNotFoundException', $ex);
+            $this->assertInstanceOf('Symfony\Component\Security\Acl\Exception\NotAllAclsFoundException', $ex);
+
+            $partialResult = $ex->getPartialResult();
+            $this->assertTrue($partialResult->contains($oids[0]));
+            $this->assertFalse($partialResult->contains($oids[1]));
+        }
     }
 
     public function testFindAcls()

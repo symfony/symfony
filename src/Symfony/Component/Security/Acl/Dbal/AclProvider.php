@@ -11,6 +11,7 @@ use Symfony\Component\Security\Acl\Domain\ObjectIdentity;
 use Symfony\Component\Security\Acl\Domain\RoleSecurityIdentity;
 use Symfony\Component\Security\Acl\Domain\UserSecurityIdentity;
 use Symfony\Component\Security\Acl\Exception\AclNotFoundException;
+use Symfony\Component\Security\Acl\Exception\NotAllAclsFoundException;
 use Symfony\Component\Security\Acl\Model\AclCacheInterface;
 use Symfony\Component\Security\Acl\Model\AclProviderInterface;
 use Symfony\Component\Security\Acl\Model\ObjectIdentityInterface;
@@ -184,7 +185,14 @@ class AclProvider implements AclProviderInterface
         // check that we got ACLs for all the identities
         foreach ($oids as $oid) {
             if (!$result->contains($oid)) {
-                throw new AclNotFoundException(sprintf('No ACL found for %s.', $oid));
+                if (1 === count($oids)) {
+                    throw new AclNotFoundException(sprintf('No ACL found for %s.', $oid));
+                }
+
+                $partialResultException = new NotAllAclsFoundException('The provider could not find ACLs for all object identities.');
+                $partialResultException->setPartialResult($result);
+
+                throw $partialResultException;
             }
         }
 

@@ -35,22 +35,22 @@
             <argument type="service" id="twig" />
         </service>
 
-        <service id="twig.extension.trans" class="Symfony\Bundle\TwigBundle\Extension\TransExtension">
+        <service id="twig.extension.trans" class="Symfony\Bundle\TwigBundle\Extension\TransExtension" public="false">
             <tag name="twig.extension" />
             <argument type="service" id="translator" />
         </service>
 
-        <service id="twig.extension.helpers" class="Symfony\Bundle\TwigBundle\Extension\TemplatingExtension">
+        <service id="twig.extension.helpers" class="Symfony\Bundle\TwigBundle\Extension\TemplatingExtension" public="false">
             <tag name="twig.extension" />
             <argument type="service" id="service_container" />
         </service>
 
-        <service id="twig.extension.form" class="Symfony\Bundle\TwigBundle\Extension\FormExtension">
+        <service id="twig.extension.form" class="Symfony\Bundle\TwigBundle\Extension\FormExtension" public="false">
             <tag name="twig.extension" />
             <argument>%twig.form.resources%</argument>
         </service>
 
-        <service id="twig.security.form" class="Symfony\Bundle\TwigBundle\Extension\SecurityExtension">
+        <service id="twig.security.form" class="Symfony\Bundle\TwigBundle\Extension\SecurityExtension" public="false">
             <tag name="twig.extension" />
             <argument type="service" id="security.context" on-invalid="ignore" />
         </service>

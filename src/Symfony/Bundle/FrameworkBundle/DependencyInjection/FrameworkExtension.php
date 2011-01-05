@@ -432,6 +432,7 @@ class FrameworkExtension extends Extension
                     $container->setAlias('profiler.request_matcher', (string) $config['profiler']['matcher']['_services'][0]);
                 } else {
                     $definition = $container->register('profiler.request_matcher', 'Symfony\\Component\\HttpFoundation\\RequestMatcher');
+                    $definition->setPublic(false);
 
                     if (isset($config['profiler']['matcher']['ip'])) {
                         $definition->addMethodCall('matchIp', array($config['profiler']['matcher']['ip']));
@@ -482,11 +483,13 @@ class FrameworkExtension extends Extension
                 $container->getParameter('validator.mapping.loader.xml_files_loader.class'),
                 array($xmlMappingFiles)
             );
+            $xmlFilesLoader->setPublic(false);
 
             $yamlFilesLoader = new Definition(
                 $container->getParameter('validator.mapping.loader.yaml_files_loader.class'),
                 array($yamlMappingFiles)
             );
+            $yamlFilesLoader->setPublic(false);
 
             $container->setDefinition('validator.mapping.loader.xml_files_loader', $xmlFilesLoader);
             $container->setDefinition('validator.mapping.loader.yaml_files_loader', $yamlFilesLoader);
@@ -508,8 +511,9 @@ class FrameworkExtension extends Extension
                 }
 
                 $annotationLoader = new Definition($container->getParameter('validator.mapping.loader.annotation_loader.class'));
+                $annotationLoader->setPublic(false);
                 $annotationLoader->addArgument(new Parameter('validator.annotations.namespaces'));
-                
+
                 $container->setDefinition('validator.mapping.loader.annotation_loader', $annotationLoader);
 
                 $loader = $container->getDefinition('validator.mapping.loader.loader_chain');

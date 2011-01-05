@@ -27,6 +27,7 @@ class X509Factory implements SecurityFactoryInterface
         $container
             ->register($provider, '%security.authentication.provider.pre_authenticated.class%')
             ->setArguments(array(new Reference($userProvider), new Reference('security.account_checker')))
+            ->setPublic(false)
         ;
 
         // listener

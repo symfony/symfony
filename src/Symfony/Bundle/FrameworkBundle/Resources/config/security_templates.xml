@@ -21,24 +21,24 @@
             <tag name="security.listener.factory" />
         </service>
         
-        <service id="security.logout_listener" class="%security.logout_listener.class%">
+        <service id="security.logout_listener" class="%security.logout_listener.class%" public="false">
             <argument type="service" id="security.context" />
             <argument>%security.logout.path%</argument>
             <argument>%security.logout.target_path%</argument>
         </service>
         
-        <service id="security.logout.handler.cookie_clearing" class="%security.logout.handler.cookie_clearing.class%">
+        <service id="security.logout.handler.cookie_clearing" class="%security.logout.handler.cookie_clearing.class%" public="false">
             <argument type="collection"></argument>
         </service>        
 
-        <service id="security.authentication.listener.form" class="%security.authentication.listener.form.class%">
+        <service id="security.authentication.listener.form" class="%security.authentication.listener.form.class%" public="false">
             <argument type="service" id="security.context" />
             <argument type="service" id="security.authentication.manager" />
             <argument>%security.authentication.form.options%</argument>
             <argument type="service" id="logger" on-invalid="null" />
         </service>
 
-        <service id="security.authentication.listener.x509" class="%security.authentication.listener.x509.class%">
+        <service id="security.authentication.listener.x509" class="%security.authentication.listener.x509.class%" public="false">
             <argument type="service" id="security.context" />
             <argument type="service" id="security.authentication.manager" />
             <argument>%security.authentication.x509.user%</argument>
@@ -46,21 +46,21 @@
             <argument type="service" id="logger" on-invalid="null" />
         </service>
 
-        <service id="security.authentication.listener.basic" class="%security.authentication.listener.basic.class%">
+        <service id="security.authentication.listener.basic" class="%security.authentication.listener.basic.class%" public="false">
             <argument type="service" id="security.context" />
             <argument type="service" id="security.authentication.manager" />
             <argument type="service" id="security.authentication.basic_entry_point" />
             <argument type="service" id="logger" on-invalid="null" />
         </service>
 
-        <service id="security.authentication.listener.digest" class="%security.authentication.listener.digest.class%">
+        <service id="security.authentication.listener.digest" class="%security.authentication.listener.digest.class%" public="false">
             <argument type="service" id="security.context" />
             <argument type="service" id="security.user.provider.in_memory" />
             <argument type="service" id="security.authentication.digest_entry_point" />
             <argument type="service" id="logger" on-invalid="null" />
         </service>
 
-        <service id="security.exception_listener" class="%security.exception_listener.class%">
+        <service id="security.exception_listener" class="%security.exception_listener.class%" public="false">
             <argument type="service" id="security.context" />
             <argument type="service" id="security.authentication.trust_resolver" />
             <argument type="service" id="security.authentication.entry_point" on-invalid="null" />
@@ -68,7 +68,7 @@
             <argument type="service" id="logger" on-invalid="null" />
         </service>
 
-        <service id="security.authentication.switchuser_listener" class="%security.authentication.switchuser_listener.class%">
+        <service id="security.authentication.switchuser_listener" class="%security.authentication.switchuser_listener.class%" public="false">
             <argument type="service" id="security.context" />
             <argument type="service" id="security.user.provider.in_memory" />
             <argument type="service" id="security.account_checker" />
@@ -78,7 +78,7 @@
             <argument>%security.authentication.switchuser.role%</argument>
         </service>
 
-        <service id="security.access_listener" class="%security.access_listener.class%">
+        <service id="security.access_listener" class="%security.access_listener.class%" public="false">
             <argument type="service" id="security.context" />
             <argument type="service" id="security.access.decision_manager" />
             <argument type="service" id="security.access_map" />

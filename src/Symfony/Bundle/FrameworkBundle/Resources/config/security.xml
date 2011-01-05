@@ -91,15 +91,15 @@
 
         <service id="security.account_checker" class="%security.account_checker.class%" public="false" />
 
-        <service id="security.encoder.sha1" class="%security.encoder.digest.class%">
+        <service id="security.encoder.sha1" class="%security.encoder.digest.class%" public="false">
             <argument>sha1</argument>
         </service>
 
-        <service id="security.encoder.md5" class="%security.encoder.digest.class%">
+        <service id="security.encoder.md5" class="%security.encoder.digest.class%" public="false">
             <argument>md5</argument>
         </service>
 
-        <service id="security.encoder.plain" class="%security.encoder.plain.class%" />
+        <service id="security.encoder.plain" class="%security.encoder.plain.class%" public="false" />
 
         <service id="security.logout.handler.session" class="%security.logout.handler.session.class%" public="false"></service>
 
@@ -155,7 +155,7 @@
             <argument type="service" id="security.role_hierarchy" />
         </service>
 
-        <service id="security.firewall" class="%security.firewall.class%">
+        <service id="security.firewall" class="%security.firewall.class%" public="false">
             <tag name="kernel.listener" priority="128" />
             <argument type="service" id="security.firewall.map" />
         </service>

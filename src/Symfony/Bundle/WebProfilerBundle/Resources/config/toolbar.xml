@@ -10,7 +10,7 @@
     </parameters>
 
     <services>
-        <service id="debug.toolbar" class="%debug.toolbar.class%">
+        <service id="debug.toolbar" class="%debug.toolbar.class%" public="false">
             <tag name="kernel.listener" priority="128" />
             <argument type="service" id="controller_resolver" />
             <argument>%debug.toolbar.intercept_redirects%</argument>

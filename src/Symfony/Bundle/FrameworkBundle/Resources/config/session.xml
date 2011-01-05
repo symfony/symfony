@@ -23,16 +23,16 @@
             </argument>
         </service>
 
-        <service id="session.storage.native" class="%session.storage.native.class%">
+        <service id="session.storage.native" class="%session.storage.native.class%" public="false">
             <argument>%session.storage.native.options%</argument>
         </service>
 
-        <service id="session.storage.pdo" class="%session.storage.pdo.class%">
+        <service id="session.storage.pdo" class="%session.storage.pdo.class%" public="false">
             <argument type="service" id="pdo_connection" />
             <argument>%session.storage.pdo.options%</argument>
         </service>
 
-        <service id="session.storage.array" class="%session.storage.array.class%">
+        <service id="session.storage.array" class="%session.storage.array.class%" public="false">
             <argument>%session.storage.array.options%</argument>
         </service>
 

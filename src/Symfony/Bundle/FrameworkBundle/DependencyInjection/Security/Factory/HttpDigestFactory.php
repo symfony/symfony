@@ -26,7 +26,8 @@ class HttpDigestFactory implements SecurityFactoryInterface
         $provider = 'security.authentication.provider.dao.'.$id;
         $container
             ->register($provider, '%security.authentication.provider.dao.class%')
-            ->setArguments(array(new Reference($userProvider), new Reference('security.account_checker'), new Reference('security.encoder.'.$providerIds[$userProvider])));
+            ->setArguments(array(new Reference($userProvider), new Reference('security.account_checker'), new Reference('security.encoder.'.$providerIds[$userProvider])))
+            ->setPublic(false)
         ;
 
         // listener

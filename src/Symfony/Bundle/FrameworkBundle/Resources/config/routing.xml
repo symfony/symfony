@@ -20,19 +20,19 @@
     </parameters>
 
     <services>
-        <service id="routing.resolver" class="%routing.resolver.class%" />
+        <service id="routing.resolver" class="%routing.resolver.class%" public="false" />
 
-        <service id="routing.loader.xml" class="%routing.loader.xml.class%">
+        <service id="routing.loader.xml" class="%routing.loader.xml.class%" public="false">
             <tag name="routing.loader" />
             <argument>%kernel.bundle_dirs%</argument>
         </service>
 
-        <service id="routing.loader.yml" class="%routing.loader.yml.class%">
+        <service id="routing.loader.yml" class="%routing.loader.yml.class%" public="false">
             <tag name="routing.loader" />
             <argument>%kernel.bundle_dirs%</argument>
         </service>
 
-        <service id="routing.loader.php" class="%routing.loader.php.class%">
+        <service id="routing.loader.php" class="%routing.loader.php.class%" public="false">
             <tag name="routing.loader" />
             <argument>%kernel.bundle_dirs%</argument>
         </service>
@@ -43,7 +43,7 @@
             <argument type="service" id="routing.resolver" />
         </service>
 
-        <service id="routing.loader" class="Symfony\Bundle\FrameworkBundle\Routing\LazyLoader">
+        <service id="routing.loader" class="Symfony\Bundle\FrameworkBundle\Routing\LazyLoader" public="false">
             <argument type="service" id="service_container" />
             <argument>routing.loader.real</argument>
         </service>

@@ -9,7 +9,7 @@
     </parameters>
 
     <services>
-        <service id="templating.debugger" class="%templating.debugger.class%">
+        <service id="templating.debugger" class="%templating.debugger.class%" public="false">
             <argument type="service" id="logger" on-invalid="null" />
         </service>
     </services>

@@ -109,6 +109,7 @@ class SecurityExtension extends Extension
             // matcher
             $id = 'security.matcher.url.'.$i;
             $definition = $container->register($id, '%security.matcher.class%');
+            $definition->setPublic(false);
             if (isset($access['path'])) {
                 $definition->addMethodCall('matchPath', array(is_array($access['path']) ? $access['path']['pattern'] : $access['path']));
             }
@@ -179,6 +180,7 @@ class SecurityExtension extends Extension
             $id = 'security.matcher.map'.$id.'.'.++$i;
             $matcher = $container
                 ->register($id, '%security.matcher.class%')
+                ->setPublic(false)
                 ->addMethodCall('matchPath', array($firewall['pattern']))
             ;
             $matcher = new Reference($id);
@@ -378,6 +380,7 @@ class SecurityExtension extends Extension
         if (isset($provider['entity'])) {
             $container
                 ->register($name, '%security.user.provider.entity.class%')
+                ->setPublic(false)
                 ->setArguments(array(
                     new Reference('security.user.entity_manager'),
                     $provider['entity']['class'],
@@ -391,6 +394,7 @@ class SecurityExtension extends Extension
         if (isset($provider['document'])) {
             $container
                 ->register($name, '%security.user.provider.document.class%')
+                ->setPublic(false)
                 ->setArguments(array(
                     new Reference('security.user.document_manager'),
                     $provider['document']['class'],
@@ -402,6 +406,7 @@ class SecurityExtension extends Extension
 
         // In-memory DAO provider
         $definition = $container->register($name, '%security.user.provider.in_memory.class%');
+        $definition->setPublic(false);
         foreach ($this->fixConfig($provider, 'user') as $username => $user) {
             if (isset($user['name'])) {
                 $username = $user['name'];
@@ -427,6 +432,7 @@ class SecurityExtension extends Extension
             $container
                 ->register($userId, 'Symfony\Component\Security\User\User')
                 ->setArguments(array($username, $user['password'], $user['roles']))
+                ->setPublic(false)
             ;
 
             $definition->addMethodCall('createUser', array(new Reference($userId)));
@@ -447,6 +453,7 @@ class SecurityExtension extends Extension
         $container
             ->register($authManager, '%security.authentication.manager.class%')
             ->addArgument($providers)
+            ->setPublic(false)
         ;
 
         // Access listener

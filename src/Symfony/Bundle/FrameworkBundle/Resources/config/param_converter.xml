@@ -11,10 +11,10 @@
 
     <services>
         <!-- ConverterManager -->
-        <service id="request.param_converter.manager" class="%request.param_converter.manager.class%" />
+        <service id="request.param_converter.manager" class="%request.param_converter.manager.class%" public="false" />
 
         <!-- ParamConverterListener -->
-        <service id="request.param_converter.listener" class="%request.param_converter.listener.class%">
+        <service id="request.param_converter.listener" class="%request.param_converter.listener.class%" public="false">
             <tag name="kernel.listener" />
             <argument type="service" id="request.param_converter.manager" />
         </service>

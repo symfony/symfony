@@ -19,12 +19,12 @@
             <argument type="service" id="logger" on-invalid="null" />
         </service>
 
-        <service id="profiler.storage" class="%profiler.storage.class%">
+        <service id="profiler.storage" class="%profiler.storage.class%" public="false">
             <argument>%profiler.storage.file%</argument>
             <argument>%profiler.storage.lifetime%</argument>
         </service>
 
-        <service id="profiler_listener" class="%profiler_listener.class%">
+        <service id="profiler_listener" class="%profiler_listener.class%" public="false">
             <tag name="kernel.listener" />
             <argument type="service" id="profiler" />
             <argument type="service" id="profiler.request_matcher" on-invalid="null" />

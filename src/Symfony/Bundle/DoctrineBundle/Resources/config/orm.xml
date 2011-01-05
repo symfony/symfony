@@ -46,7 +46,7 @@
 
     <services>
         <!--- Annotation Metadata Reader Service -->
-        <service id="doctrine.orm.metadata.annotation_reader" class="%doctrine.orm.metadata.annotation_reader_class%">
+        <service id="doctrine.orm.metadata.annotation_reader" class="%doctrine.orm.metadata.annotation_reader_class%" public="false">
             <call method="setAnnotationNamespaceAlias">
               <argument>Doctrine\ORM\Mapping\</argument>
               <argument>orm</argument>
@@ -55,7 +55,7 @@
 
         <service id="security.user.entity_manager" alias="doctrine.orm.default_entity_manager" />
 
-        <service id="request.param_converter.doctrine" class="Symfony\Bundle\DoctrineBundle\Request\ParamConverter\DoctrineConverter">
+        <service id="request.param_converter.doctrine" class="Symfony\Bundle\DoctrineBundle\Request\ParamConverter\DoctrineConverter" public="false">
             <tag name="request.param_converter" />
             <argument type="service" id="doctrine.orm.default_entity_manager" />
         </service>

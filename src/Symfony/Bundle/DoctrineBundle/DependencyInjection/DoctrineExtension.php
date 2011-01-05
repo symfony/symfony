@@ -112,11 +112,13 @@ class DoctrineExtension extends AbstractDoctrineExtension
         } else {
             $containerClass = isset($connection['configuration-class']) ? $connection['configuration-class'] : (isset($connection['configuration_class']) ? $connection['configuration_class'] : 'Doctrine\DBAL\Configuration');
             $containerDef = new Definition($containerClass);
+            $containerDef->setPublic(false);
             $containerDef->addMethodCall('setSqlLogger', array(new Reference('doctrine.dbal.logger')));
             $container->setDefinition(sprintf('doctrine.dbal.%s_connection.configuration', $connection['name']), $containerDef);
 
             $driverOptions = array();
             $driverDef = new Definition('Doctrine\DBAL\DriverManager');
+            $driverDef->setPublic(false);
             $driverDef->setFactoryMethod('getConnection');
             $container->setDefinition(sprintf('doctrine.dbal.%s_connection', $connection['name']), $driverDef);
         }
@@ -304,6 +306,7 @@ class DoctrineExtension extends AbstractDoctrineExtension
             $ormConfigDef = $container->getDefinition($configServiceName);
         } else {
             $ormConfigDef = new Definition('Doctrine\ORM\Configuration');
+            $ormConfigDef->setPublic(false);
             $container->setDefinition($configServiceName, $ormConfigDef);
         }
 
@@ -534,6 +537,7 @@ class DoctrineExtension extends AbstractDoctrineExtension
         if ('memcache' === $type) {
             $memcacheClass = isset($cacheDriver['class']) ? $cacheDriver['class'] : '%'.sprintf('doctrine.orm.cache.%s_class', $type).'%';
             $cacheDef = new Definition($memcacheClass);
+            $cacheDef->setPublic(false);
             $memcacheHost = is_array($cacheDriver) && isset($cacheDriver['host']) ? $cacheDriver['host'] : '%doctrine.orm.cache.memcache_host%';
             $memcachePort = is_array($cacheDriver) && isset($cacheDriver['port']) ? $cacheDriver['port'] : '%doctrine.orm.cache.memcache_port%';
             $memcacheInstanceClass = is_array($cacheDriver) && isset($cacheDriver['instance-class']) ? $cacheDriver['instance-class'] : (is_array($cacheDriver) && isset($cacheDriver['instance_class']) ? $cacheDriver['instance_class'] : '%doctrine.orm.cache.memcache_instance_class%');
@@ -543,6 +547,7 @@ class DoctrineExtension extends AbstractDoctrineExtension
             $cacheDef->addMethodCall('setMemcache', array(new Reference(sprintf('doctrine.orm.%s_memcache_instance', $entityManager['name']))));
         } else {
             $cacheDef = new Definition('%'.sprintf('doctrine.orm.cache.%s_class', $type).'%');
+            $cacheDef->setPublic(false);
         }
         return $cacheDef;
     }

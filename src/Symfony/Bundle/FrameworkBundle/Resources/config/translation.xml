@@ -30,7 +30,7 @@
             <argument type="service" id="translator.selector" />
         </service>
 
-        <service id="translator.selector" class="%translator.selector.class%" />
+        <service id="translator.selector" class="%translator.selector.class%" public="false" />
 
         <service id="translation.loader.php" class="%translation.loader.php.class%">
             <tag name="translation.loader" alias="php" />

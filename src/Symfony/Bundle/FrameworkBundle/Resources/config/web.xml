@@ -16,36 +16,36 @@
     </parameters>
 
     <services>
-        <service id="controller_name_converter" class="%controller_name_converter.class%">
+        <service id="controller_name_converter" class="%controller_name_converter.class%" public="false">
             <argument type="service" id="kernel" />
             <argument type="service" id="logger" on-invalid="ignore" />
         </service>
 
-        <service id="controller_resolver" class="%controller_resolver.class%">
+        <service id="controller_resolver" class="%controller_resolver.class%" public="false">
             <argument type="service" id="service_container" />
             <argument type="service" id="controller_name_converter" />
             <argument type="service" id="logger" on-invalid="ignore" />
         </service>
 
-        <service id="request_listener" class="%request_listener.class%">
+        <service id="request_listener" class="%request_listener.class%" public="false">
             <tag name="kernel.listener" />
             <argument type="service" id="service_container" />
             <argument type="service" id="router" />
             <argument type="service" id="logger" on-invalid="ignore" />
         </service>
 
-        <service id="esi" class="%esi.class%" />
+        <service id="esi" class="%esi.class%" public="false" />
 
-        <service id="esi_listener" class="%esi_listener.class%">
+        <service id="esi_listener" class="%esi_listener.class%" public="false">
           <tag name="kernel.listener" />
           <argument type="service" id="esi" on-invalid="ignore" />
         </service>
 
-        <service id="response_listener" class="%response_listener.class%">
+        <service id="response_listener" class="%response_listener.class%" public="false">
             <tag name="kernel.listener" />
         </service>
 
-        <service id="exception_listener" class="%exception_listener.class%">
+        <service id="exception_listener" class="%exception_listener.class%" public="false">
             <tag name="kernel.listener" priority="128" />
             <argument>%exception_listener.controller%</argument>
             <argument type="service" id="logger" on-invalid="null" />

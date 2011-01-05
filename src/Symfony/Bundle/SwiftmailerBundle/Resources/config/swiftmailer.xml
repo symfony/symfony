@@ -70,9 +70,9 @@
 
     <service id="swiftmailer.transport.authhandler" class="Swift_Transport_Esmtp_AuthHandler" public="false">
       <argument type="collection">
-        <argument type="service"><service class="Swift_Transport_Esmtp_Auth_CramMd5Authenticator" /></argument>
-        <argument type="service"><service class="Swift_Transport_Esmtp_Auth_LoginAuthenticator" /></argument>
-        <argument type="service"><service class="Swift_Transport_Esmtp_Auth_PlainAuthenticator" /></argument>
+        <argument type="service"><service class="Swift_Transport_Esmtp_Auth_CramMd5Authenticator" public="false" /></argument>
+        <argument type="service"><service class="Swift_Transport_Esmtp_Auth_LoginAuthenticator" public="false" /></argument>
+        <argument type="service"><service class="Swift_Transport_Esmtp_Auth_PlainAuthenticator" public="false" /></argument>
       </argument>
     </service>
 

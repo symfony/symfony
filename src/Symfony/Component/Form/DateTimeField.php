@@ -57,7 +57,7 @@ class DateTimeField extends FieldGroup
         $this->addOption('seconds', range(0, 59));
         $this->addOption('data_timezone', 'UTC');
         $this->addOption('user_timezone', 'UTC');
-        $this->addOption('date_widget', DateField::INPUT, self::$dateWidgets);
+        $this->addOption('date_widget', DateField::CHOICE, self::$dateWidgets);
         $this->addOption('time_widget', TimeField::CHOICE, self::$timeWidgets);
         $this->addOption('type', self::DATETIME, self::$types);
         $this->addOption('with_seconds', false);

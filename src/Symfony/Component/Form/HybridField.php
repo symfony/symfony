@@ -69,7 +69,7 @@ class HybridField extends FieldGroup
      * @throws FormException  When the field is in mode HybridField::FIELD adding
      *                        subfields is not allowed
      */
-    public function add(FieldInterface $field)
+    public function add($field)
     {
         if ($this->mode === self::FIELD) {
             throw new FormException('You cannot add nested fields while in mode FIELD');

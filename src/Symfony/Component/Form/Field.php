@@ -238,6 +238,16 @@ class Field extends Configurable implements FieldInterface
     }
 
     /**
+     * Returns the root of the form tree
+     *
+     * @return FieldInterface  The root of the tree
+     */
+    public function getRoot()
+    {
+        return $this->parent ? $this->parent->getRoot() : $this;
+    }
+
+    /**
      * Updates the field with default data
      *
      * @see FieldInterface

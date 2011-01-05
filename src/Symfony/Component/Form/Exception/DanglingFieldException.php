@@ -1,6 +1,6 @@
 <?php
 
-namespace Symfony\Component\Form\Configurator;
+namespace Symfony\Component\Form\Exception;
 
 /*
  * This file is part of the Symfony framework.
@@ -11,13 +11,11 @@ namespace Symfony\Component\Form\Configurator;
  * with this source code in the file LICENSE.
  */
 
-interface ConfiguratorInterface
+/**
+ * Thrown when a field is expected to be added to a form but is not
+ *
+ * @author Bernhard Schussek <bernhard.schussek@symfony-project.com>
+ */
+class DanglingFieldException extends FormException
 {
-    function initialize($object);
-
-    function getClass($fieldName);
-
-    function getOptions($fieldName);
-
-    function isRequired($fieldName);
 }

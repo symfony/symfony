@@ -435,6 +435,64 @@ class FieldGroupTest extends \PHPUnit_Framework_TestCase
         $group->add($field);
     }
 
+    /**
+     * @expectedException Symfony\Component\Form\Exception\UnexpectedTypeException
+     */
+    public function testAddThrowsExceptionIfNoFieldOrString()
+    {
+        $group = new TestFieldGroup('author');
+
+        $group->add(1234);
+    }
+
+    /**
+     * @expectedException Symfony\Component\Form\Exception\DanglingFieldException
+     */
+    public function testAddThrowsExceptionIfStringButNoRootForm()
+    {
+        $group = new TestFieldGroup('author');
+
+        $group->add('firstName');
+    }
+
+    public function testAddThrowsExceptionIfStringButNoFieldFactory()
+    {
+        $form = $this->createMockForm();
+        $form->expects($this->once())
+                ->method('getFieldFactory')
+                ->will($this->returnValue(null));
+
+        $group = new TestFieldGroup('author');
+        $group->setParent($form);
+
+        $this->setExpectedException('\LogicException');
+
+        $group->add('firstName');
+    }
+
+    public function testAddUsesFieldFromFactoryIfStringIsGiven()
+    {
+        $author = new \stdClass();
+        $field = $this->createMockField('firstName');
+
+        $factory = $this->getMock('Symfony\Component\Form\FieldFactory\FieldFactoryInterface');
+        $factory->expects($this->once())
+                ->method('getInstance')
+                ->with($this->equalTo($author), $this->equalTo('firstName'), $this->equalTo(array('foo' => 'bar')))
+                ->will($this->returnValue($field));
+        $form = $this->createMockForm();
+        $form->expects($this->once())
+                ->method('getFieldFactory')
+                ->will($this->returnValue($factory));
+
+        $group = new TestFieldGroup('author');
+        $group->setParent($form);
+        $group->setData($author);
+        $group->add('firstName', array('foo' => 'bar'));
+
+        $this->assertSame($field, $group['firstName']);
+    }
+
     public function testSetDataUpdatesAllFieldsFromTransformedData()
     {
         $originalAuthor = new Author();
@@ -691,6 +749,24 @@ class FieldGroupTest extends \PHPUnit_Framework_TestCase
                     ->will($this->returnValue($key));
 
         return $field;
+    }
+
+    protected function createMockForm()
+    {
+        $form = $this->getMock(
+        	'Symfony\Component\Form\Form',
+            array(),
+            array(),
+            '',
+            false, // don't use constructor
+            false  // don't call parent::__clone)
+        );
+
+        $form->expects($this->any())
+                ->method('getRoot')
+                ->will($this->returnValue($form));
+
+        return $form;
     }
 
     protected function createInvalidMockField($key)

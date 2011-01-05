@@ -57,6 +57,8 @@ class Form extends FieldGroup
             $this->enableCsrfProtection();
         }
 
+        $this->addOption('field_factory');
+
         parent::__construct($name, $options);
 
         // If data is passed to this constructor, objects from parent forms
@@ -84,6 +86,17 @@ class Form extends FieldGroup
     public function getValidationGroups()
     {
         return $this->validationGroups;
+    }
+
+    /**
+     * Returns a factory for automatically creating fields based on metadata
+     * available for a form's object
+     *
+     * @return FieldFactoryInterface  The factory
+     */
+    public function getFieldFactory()
+    {
+        return $this->getOption('field_factory');
     }
 
     /**

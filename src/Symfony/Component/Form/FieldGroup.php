@@ -13,6 +13,7 @@ namespace Symfony\Component\Form;
 
 use Symfony\Component\Form\Exception\AlreadyBoundException;
 use Symfony\Component\Form\Exception\UnexpectedTypeException;
+use Symfony\Component\Form\Exception\DanglingFieldException;
 
 /**
  * FieldGroup represents an array of widgets bind to names and values.
@@ -90,12 +91,33 @@ class FieldGroup extends Field implements \IteratorAggregate, FieldGroupInterfac
      * $form->add($locationGroup);
      * </code>
      *
-     * @param FieldInterface $field
+     * @param FieldInterface|string $field
      */
-    public function add(FieldInterface $field)
+    public function add($field)
     {
         if ($this->isBound()) {
             throw new AlreadyBoundException('You cannot add fields after binding a form');
+        }
+
+        // if the field is given as string, ask the field factory of the form
+        // to create a field
+        if (!$field instanceof FieldInterface) {
+            if (!is_string($field)) {
+                throw new UnexpectedTypeException($field, 'FieldInterface or string');
+            }
+
+            if (!$this->getRoot() instanceof Form) {
+                throw new DanglingFieldException('Field groups must be added to a form before fields can be created automatically');
+            }
+
+            $factory = $this->getRoot()->getFieldFactory();
+
+            if (!$factory) {
+                throw new \LogicException('A field factory must be available for automatically creating fields');
+            }
+
+            $options = func_num_args() > 1 ? func_get_arg(1) : array();
+            $field = $factory->getInstance($this->getData(), $field, $options);
         }
 
         $this->fields[$field->getKey()] = $field;

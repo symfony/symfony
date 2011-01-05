@@ -483,6 +483,23 @@ class FieldTest extends \PHPUnit_Framework_TestCase
         $this->assertFalse($field->isTransformationSuccessful());
     }
 
+    public function testGetRootReturnsRootOfParentIfSet()
+    {
+        $parent = $this->createMockGroup();
+        $parent->expects($this->any())
+                ->method('getRoot')
+                ->will($this->returnValue('ROOT'));
+
+        $this->field->setParent($parent);
+
+        $this->assertEquals('ROOT', $this->field->getRoot());
+    }
+
+    public function testGetRootReturnsFieldIfNoParent()
+    {
+        $this->assertEquals($this->field, $this->field->getRoot());
+    }
+
     protected function createMockTransformer()
     {
         return $this->getMock('Symfony\Component\Form\ValueTransformer\ValueTransformerInterface', array(), array(), '', false, false);

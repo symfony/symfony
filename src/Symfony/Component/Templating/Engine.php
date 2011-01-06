@@ -52,6 +52,7 @@ class Engine implements \ArrayAccess
         $this->stack     = array();
         $this->charset   = 'UTF-8';
         $this->cache     = array();
+        $this->globals   = array();
 
         $this->addHelpers($helpers);
 
@@ -407,27 +408,16 @@ class Engine implements \ArrayAccess
      */
     public function addGlobal($name, $value)
     {
-        if (null === $this->globals) {
-            $this->getGlobals();
-        }
-
         $this->globals[$name] = $value;
     }
 
     /**
-     * Returns the assigned globals. If no globals are set yet it calls all assigned helpers for theirs.
+     * Returns the assigned globals.
      *
      * @return array
      */
     public function getGlobals()
     {
-        if (null === $this->globals) {
-            $this->globals = array();
-            foreach ($this->helpers as $helper) {
-                $this->globals = array_replace($this->globals, $helper->getGlobals());
-            }
-        }
-
         return $this->globals;
     }
 

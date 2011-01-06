@@ -142,29 +142,6 @@ class EngineTest extends \PHPUnit_Framework_TestCase
         ), $engine->getGlobals());
     }
 
-    public function testGlobalVariablesGetPassedFromHelpers()
-    {
-        $engine = new ProjectTemplateEngine(self::$loader);
-        $engine->set(new \SimpleHelper('value'));
-        $engine->addGlobal('global_variable', 'lorem ipsum');
-
-        $this->assertEquals(array(
-            'global_variable' => 'lorem ipsum',
-            'global_from_helper' => 'helper lorem ipsum',
-        ), $engine->getGlobals());
-    }
-
-    public function testEngineGlobalOverwritesHelperGlobals()
-    {
-        $engine = new ProjectTemplateEngine(self::$loader);
-        $engine->set(new \SimpleHelper('value'));
-        $engine->addGlobal('global_from_helper', 'engine wins');
-
-        $this->assertEquals(array(
-            'global_from_helper' => 'engine wins',
-        ), $engine->getGlobals());
-    }
-
     public function testGlobalsGetPassedToTemplate()
     {
         $engine = new ProjectTemplateEngine(self::$loader);

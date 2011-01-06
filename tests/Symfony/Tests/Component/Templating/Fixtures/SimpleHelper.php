@@ -20,11 +20,4 @@ class SimpleHelper extends Helper
     {
         return 'foo';
     }
-
-    public function getGlobals()
-    {
-        return array(
-            'global_from_helper' => 'helper lorem ipsum',
-        );
-    }
 }

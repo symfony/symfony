@@ -38,12 +38,4 @@ interface HelperInterface
      * @return string The default charset
      */
     function getCharset();
-
-    /**
-     * Returns a key value array with variables that should be accessible
-     * in templates.
-     *
-     * @return array
-     */
-    function getGlobals();
 }

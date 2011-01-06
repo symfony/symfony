@@ -171,7 +171,7 @@ class ProfilerController extends ContainerAware
         return $this->container->get('templating')->renderResponse('WebProfilerBundle:Profiler:search.twig', array(
             'token'    => $token,
             'profiler' => $profiler,
-            'tokens'   => $profiler->find($ip, $url, 10),
+            'tokens'   => $profiler->find($ip, $url, $limit),
             'ip'       => $ip,
             'url'      => $url,
             'limit'    => $limit,
@@ -196,7 +196,7 @@ class ProfilerController extends ContainerAware
         return $this->container->get('templating')->renderResponse('WebProfilerBundle:Profiler:results.twig', array(
             'token'    => $token,
             'profiler' => $this->container->get('profiler')->loadFromToken($token),
-            'tokens'   => $profiler->find($ip, $url, 10),
+            'tokens'   => $profiler->find($ip, $url, $limit),
             'ip'       => $ip,
             'url'      => $url,
             'limit'    => $limit,

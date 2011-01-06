@@ -90,6 +90,10 @@ class InterfaceInjector
     public function supports($object)
     {
         if (is_string($object)) {
+            if (!class_exists($object)) {
+                return false;
+            }
+
             $reflection = new \ReflectionClass($object);
 
             return $reflection->isSubClassOf($this->class)

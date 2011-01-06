@@ -18,7 +18,6 @@ class AddTemplatingRenderersPass implements CompilerPassInterface
         foreach ($container->findTaggedServiceIds('templating.renderer') as $id => $attributes) {
             if (isset($attributes[0]['alias'])) {
                 $renderers[$attributes[0]['alias']] = new Reference($id);
-                $container->getDefinition($id)->addMethodCall('setEngine', array(new Reference('templating.engine')));
             }
         }
 

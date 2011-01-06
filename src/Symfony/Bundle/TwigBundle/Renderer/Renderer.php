@@ -37,9 +37,10 @@ class Renderer extends BaseRenderer
      */
     public function evaluate(Storage $template, array $parameters = array())
     {
-        if ($this->engine->getContainer()->has('request')) {
-            // cannot be set in the constructor as we need the current request
-            $request = $this->engine->getContainer()->get('request');
+        $container = $this->engine->getContainer();
+
+        // cannot be set in the constructor as we need the current request
+        if ($container->has('request') && ($request = $container->get('request'))) {
             $this->environment->addGlobal('request', $request);
             $this->environment->addGlobal('session', $request->getSession());
         }

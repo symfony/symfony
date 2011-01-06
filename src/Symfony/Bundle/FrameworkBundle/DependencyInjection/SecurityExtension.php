@@ -161,11 +161,6 @@ class SecurityExtension extends Extension
 
             $map->addMethodCall('add', array($matcher, $listeners, $exceptionListener));
         }
-
-        // remove all service templates
-        foreach ($c->getServiceIds() as $id) {
-            $container->remove($id);
-        }
     }
 
     protected function createFirewall(ContainerBuilder $container, $firewall, $providerIds)

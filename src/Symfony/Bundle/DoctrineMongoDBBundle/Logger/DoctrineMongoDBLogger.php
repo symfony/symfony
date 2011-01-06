@@ -7,7 +7,7 @@ use Symfony\Component\Yaml\Yaml;
 
 /**
  * Logger for the Doctrine MongoDB ODM.
- * 
+ *
  * @author Kris Wallsmith <kris.wallsmith@symfony-project.com>
  */
 class DoctrineMongoDBLogger
@@ -63,16 +63,15 @@ class DoctrineMongoDBLogger
 
     /**
      * Formats the supplied query array recursively.
-     * 
+     *
      * @param array $query All or part of a query array
-     * 
+     *
      * @return string A serialized object for the log
      */
-    static protected function formatQuery(array $query)
+    static protected function formatQuery(array $query, $array = true)
     {
         $parts = array();
 
-        $array = true;
         foreach ($query as $key => $value) {
             if (!is_numeric($key)) {
                 $array = false;
@@ -98,6 +97,8 @@ class DoctrineMongoDBLogger
                 $formatted = 'new MaxKey()';
             } elseif ($value instanceof \MongoBinData) {
                 $formatted = 'new BinData("'.$value->bin.'", "'.$value->type.'")';
+            } elseif ($value instanceof \stdClass) {
+                $formatted = static::formatQuery((array) $value, false);
             } else {
                 $formatted = (string) $value;
             }

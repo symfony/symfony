@@ -20,7 +20,7 @@ use Symfony\Component\DependencyInjection\ContainerBuilder;
  */
 interface SecurityFactoryInterface
 {
-    function create(ContainerBuilder $container, $id, $config, $userProvider, $providerIds, $defaultEntryPoint);
+    function create(ContainerBuilder $container, $id, $config, $userProvider, $defaultEntryPoint);
 
     function getPosition();
 

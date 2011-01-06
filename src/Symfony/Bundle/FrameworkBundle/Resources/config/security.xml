@@ -11,6 +11,7 @@
 
         <parameter key="security.access_denied.url">null</parameter>
 
+        <parameter key="security.encoder_factory.generic.class">Symfony\Component\Security\Encoder\EncoderFactory</parameter>
         <parameter key="security.encoder.digest.class">Symfony\Component\Security\Encoder\MessageDigestPasswordEncoder</parameter>
         <parameter key="security.encoder.plain.class">Symfony\Component\Security\Encoder\PlaintextPasswordEncoder</parameter>
 
@@ -91,15 +92,11 @@
 
         <service id="security.account_checker" class="%security.account_checker.class%" public="false" />
 
-        <service id="security.encoder.sha1" class="%security.encoder.digest.class%" public="false">
-            <argument>sha1</argument>
+        <service id="security.encoder_factory.generic" class="%security.encoder_factory.generic.class%" public="false">
+            <argument type="collection"></argument>
         </service>
-
-        <service id="security.encoder.md5" class="%security.encoder.digest.class%" public="false">
-            <argument>md5</argument>
-        </service>
-
-        <service id="security.encoder.plain" class="%security.encoder.plain.class%" public="false" />
+        
+        <service id="security.encoder_factory" alias="security.encoder_factory.generic" public="false"></service>
 
         <service id="security.logout.handler.session" class="%security.logout.handler.session.class%" public="false"></service>
 

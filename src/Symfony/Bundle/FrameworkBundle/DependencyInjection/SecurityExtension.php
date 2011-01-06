@@ -130,6 +130,8 @@ class SecurityExtension extends Extension
     {
         $providerIds = $this->createUserProviders($config, $container);
 
+        $encoders = $this->createEncoders($config, $container);
+
         if (!$firewalls = $this->fixConfig($config, 'firewall')) {
             return;
         }
@@ -138,7 +140,7 @@ class SecurityExtension extends Extension
         $definition = $container->getDefinition('security.context_listener');
         $arguments = $definition->getArguments();
         $userProviders = array();
-        foreach (array_keys($providerIds) as $userProviderId) {
+        foreach ($providerIds as $userProviderId) {
             $userProviders[] = new Reference($userProviderId);
         }
         $arguments[1] = $userProviders;
@@ -193,8 +195,7 @@ class SecurityExtension extends Extension
             if (!$providerIds) {
                 throw new \InvalidArgumentException('You must provide at least one authentication provider.');
             }
-            $keys = array_keys($providerIds);
-            $defaultProvider = current($keys);
+            $defaultProvider = reset($providerIds);
         }
 
         // Register listeners
@@ -240,7 +241,7 @@ class SecurityExtension extends Extension
         }
 
         // Authentication listeners
-        list($authListeners, $providers, $defaultEntryPoint) = $this->createAuthenticationListeners($container, $id, $firewall, $defaultProvider, $providerIds);
+        list($authListeners, $providers, $defaultEntryPoint) = $this->createAuthenticationListeners($container, $id, $firewall, $defaultProvider);
 
         $listeners = array_merge($listeners, $authListeners);
 
@@ -261,7 +262,7 @@ class SecurityExtension extends Extension
         return array($matcher, $listeners, $exceptionListener);
     }
 
-    protected function createAuthenticationListeners($container, $id, $firewall, $defaultProvider, $providerIds)
+    protected function createAuthenticationListeners($container, $id, $firewall, $defaultProvider)
     {
         $listeners = array();
         $providers = array();
@@ -293,7 +294,7 @@ class SecurityExtension extends Extension
                 if (array_key_exists($key, $firewall)) {
                     $userProvider = isset($firewall[$key]['provider']) ? $this->getUserProviderId($firewall[$key]['provider']) : $defaultProvider;
 
-                    list($provider, $listener, $defaultEntryPoint) = $factory->create($container, $id, $firewall[$key], $userProvider, $providerIds, $defaultEntryPoint);
+                    list($provider, $listener, $defaultEntryPoint) = $factory->create($container, $id, $firewall[$key], $userProvider, $defaultEntryPoint);
 
                     $listeners[] = new Reference($listener);
                     $providers[] = new Reference($provider);
@@ -325,29 +326,111 @@ class SecurityExtension extends Extension
 
         $providerIds = array();
         foreach ($providers as $name => $provider) {
-            list($id, $encoder) = $this->createUserDaoProvider($name, $provider, $container);
+            $id = $this->createUserDaoProvider($name, $provider, $container);
 
-            if (isset($providerIds[$id])) {
+            if (in_array($id, $providerIds, true)) {
                 throw new \RuntimeException(sprintf('Provider names must be unique. Duplicate entry for %s.', $id));
             }
 
-            $providerIds[$id] = $encoder;
+            $providerIds[] = $id;
         }
 
         return $providerIds;
     }
 
+    protected function createEncoders($config, ContainerBuilder $container)
+    {
+        $encoders = $this->fixConfig($config, 'encoder');
+        if (!$encoders) {
+            return array();
+        }
+
+        $encoderMap = array();
+        foreach ($encoders as $class => $encoder) {
+            $encoderMap = $this->createEncoder($encoderMap, $class, $encoder, $container);
+        }
+
+        $container
+            ->getDefinition('security.encoder_factory.generic')
+            ->setArguments(array($encoderMap))
+        ;
+    }
+
+    protected function createEncoder(array $encoderMap, $accountClass, $config, ContainerBuilder $container)
+    {
+        if (is_array($config) && isset($config['class'])) {
+            $accountClass = $config['class'];
+        }
+
+        if (empty($accountClass)) {
+            throw new \RuntimeException('Each encoder needs an account class.');
+        }
+
+        // a minimal message digest, or plaintext encoder
+        if (is_string($config)) {
+            $config = array(
+                'algorithm' => $config,
+            );
+        }
+
+        // a custom encoder service
+        if (isset($config['id'])) {
+            $container
+                ->getDefinition('security.encoder_factory.generic')
+                ->addMethodCall('addEncoder', array($accountClass, new Reference($config['id'])))
+            ;
+
+            return $encoderMap;
+        }
+
+        // a lazy loaded, message digest or plaintext encoder
+        if (!isset($config['algorithm'])) {
+            throw new \RuntimeException('"algoritm" must be defined.');
+        }
+
+        // plaintext encoder
+        if ('plaintext' === $config['algorithm']) {
+            $arguments = array();
+
+            if (array_key_exists('ignore-case', $config)) {
+                $arguments[0] = (Boolean) $config['ignore-case'];
+            }
+
+            $encoderMap[$accountClass] = array(
+                'class' => new Parameter('security.encoder.plain.class'),
+                'arguments' => $arguments,
+            );
+
+            return $encoderMap;
+        }
+
+        // message digest encoder
+        $arguments = array($config['algorithm']);
+
+        // add optional arguments
+        if (isset($config['encode-as-base64'])) {
+            $arguments[1] = (Boolean) $config['encode-as-base64'];
+        } else {
+            $arguments[1] = false;
+        }
+
+        if (isset($config['iterations'])) {
+            $arguments[2] = $config['iterations'];
+        } else {
+            $arguments[2] = 1;
+        }
+
+        $encoderMap[$accountClass] = array(
+            'class' => new Parameter('security.encoder.digest.class'),
+            'arguments' => $arguments,
+        );
+
+        return $encoderMap;
+    }
+
     // Parses a <provider> tag and returns the id for the related user provider service
     protected function createUserDaoProvider($name, $provider, ContainerBuilder $container, $master = true)
     {
-        // encoder
-        $encoder = 'plain';
-        if (isset($provider['password-encoder'])) {
-            $encoder = $provider['password-encoder'];
-        } elseif (isset($provider['password_encoder'])) {
-            $encoder = $provider['password_encoder'];
-        }
-
         if (isset($provider['name'])) {
             $name = $provider['name'];
         }
@@ -362,7 +445,7 @@ class SecurityExtension extends Extension
         if (isset($provider['id'])) {
             $container->setAlias($name, $provider['id']);
 
-            return array($name, $encoder);
+            return $provider['id'];
         }
 
         // Chain provider
@@ -382,7 +465,7 @@ class SecurityExtension extends Extension
                     isset($provider['entity']['property']) ? $provider['entity']['property'] : null,
             ));
 
-            return array($name, $encoder);
+            return $name;
         }
 
         // Doctrine Document DAO provider
@@ -396,7 +479,7 @@ class SecurityExtension extends Extension
                     isset($provider['document']['property']) ? $provider['document']['property'] : null,
             ));
 
-            return array($name, $encoder);
+            return $name;
         }
 
         // In-memory DAO provider
@@ -433,7 +516,7 @@ class SecurityExtension extends Extension
             $definition->addMethodCall('createUser', array(new Reference($userId)));
         }
 
-        return array($name, $encoder);
+        return $name;
     }
 
     protected function getUserProviderId($name)
@@ -492,18 +575,18 @@ class SecurityExtension extends Extension
 
         return $switchUserListenerId;
     }
-    
+
     public function aclLoad(array $config, ContainerBuilder $container)
     {
         if (!$container->hasDefinition('security.acl')) {
             $loader = new XmlFileLoader($container, array(__DIR__.'/../Resources/config', __DIR__.'/Resources/config'));
             $loader->load('security_acl.xml');
         }
-        
+
         if (isset($config['connection'])) {
             $container->setAlias(sprintf('doctrine.dbal.%s_connection', $config['connection']), 'security.acl.dbal.connection');
         }
-        
+
         if (isset($config['cache'])) {
             $container->setAlias('security.acl.cache', sprintf('security.acl.cache.%s', $config['cache']));
         } else {

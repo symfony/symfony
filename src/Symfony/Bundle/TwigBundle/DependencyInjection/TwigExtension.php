@@ -59,6 +59,19 @@ class TwigExtension extends Extension
         }
         unset($config['globals'], $config['global']);
 
+        // extensions
+        $extensions = $this->fixConfig($config, 'extension');
+        if (isset($extensions[0]) && is_array($extensions[0])) {
+            foreach ($extensions as $extension) {
+                $container->getDefinition($extension['id'])->addTag('twig.extension');
+            }
+        } else {
+            foreach ($extensions as $id) {
+                $container->getDefinition($id)->addTag('twig.extension');
+            }
+        }
+        unset($config['extensions'], $config['extension']);
+
         // convert - to _
         foreach ($config as $key => $value) {
             $config[str_replace('-', '_', $key)] = $value;

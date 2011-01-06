@@ -49,4 +49,23 @@ class TwigExtensionTest extends TestCase
         $this->assertEquals('foo', $config[0][1][0]);
         $this->assertEquals('bar', (string) $config[0][1][1]);
     }
+
+    public function testConfigExtensions()
+    {
+        // XML
+        $container = new ContainerBuilder();
+        $container->register('foo', 'stdClass');
+        $loader = new TwigExtension();
+        $loader->configLoad(array('extensions' => array(array('id' => 'foo'))), $container);
+        $config = $container->getDefinition('foo');
+        $this->assertEquals(array('twig.extension'), array_keys($config->getTags()));
+
+        // YAML, PHP
+        $container = new ContainerBuilder();
+        $container->register('foo', 'stdClass');
+        $loader = new TwigExtension();
+        $loader->configLoad(array('extensions' => array('foo')), $container);
+        $config = $container->getDefinition('foo');
+        $this->assertEquals(array('twig.extension'), array_keys($config->getTags()));
+    }
 }

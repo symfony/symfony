@@ -11,6 +11,7 @@
         <xsd:sequence>
             <xsd:element name="form" type="form" minOccurs="0" maxOccurs="1" />
             <xsd:element name="global" type="global" minOccurs="0" maxOccurs="1" />
+            <xsd:element name="extension" type="extension" minOccurs="0" maxOccurs="unbounded" />
         </xsd:sequence>
 
         <xsd:attribute name="charset" type="xsd:string" />
@@ -30,6 +31,10 @@
 
     <xsd:complexType name="global">
         <xsd:attribute name="key" type="xsd:string" />
+        <xsd:attribute name="id" type="xsd:string" />
+    </xsd:complexType>
+
+    <xsd:complexType name="extension">
         <xsd:attribute name="id" type="xsd:string" />
     </xsd:complexType>
 </xsd:schema>

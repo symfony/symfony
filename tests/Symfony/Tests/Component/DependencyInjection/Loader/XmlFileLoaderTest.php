@@ -29,6 +29,7 @@ class XmlFileLoaderTest extends \PHPUnit_Framework_TestCase
         require_once self::$fixturesPath.'/includes/foo.php';
         require_once self::$fixturesPath.'/includes/ProjectExtension.php';
         require_once self::$fixturesPath.'/includes/ProjectWithXsdExtension.php';
+        require_once self::$fixturesPath.'/includes/ProjectWithXsdExtensionInPhar.phar';
     }
 
     public function testLoad()
@@ -237,6 +238,24 @@ class XmlFileLoaderTest extends \PHPUnit_Framework_TestCase
         } catch (\Exception $e) {
             $this->assertInstanceOf('\InvalidArgumentException', $e, '->load() throws an InvalidArgumentException if the tag is not valid');
             $this->assertStringStartsWith('There is no extension able to load the configuration for "project:bar" (in', $e->getMessage(), '->load() throws an InvalidArgumentException if the tag is not valid');
+        }
+    }
+
+    public function testExtensionInPhar()
+    {
+        // extension with an XSD in PHAR archive
+        $container = new ContainerBuilder();
+        $container->registerExtension(new \ProjectWithXsdExtensionInPhar());
+        $loader = new ProjectLoader2($container, self::$fixturesPath.'/xml');
+        $loader->load('extensions/services6.xml');
+
+        // extension with an XSD in PHAR archive (does not validate)
+        try {
+            $loader->load('extensions/services7.xml');
+            $this->fail('->load() throws an InvalidArgumentException if the configuration does not validate the XSD');
+        } catch (\Exception $e) {
+            $this->assertInstanceOf('\InvalidArgumentException', $e, '->load() throws an InvalidArgumentException if the configuration does not validate the XSD');
+            $this->assertRegexp('/The attribute \'bar\' is not allowed/', $e->getMessage(), '->load() throws an InvalidArgumentException if the configuration does not validate the XSD');
         }
     }
 

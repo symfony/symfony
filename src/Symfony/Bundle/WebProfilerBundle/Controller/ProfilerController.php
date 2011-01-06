@@ -106,11 +106,11 @@ class ProfilerController extends ContainerAware
         $profiler->disable();
 
         $file = $this->container->get('request')->files->get('file');
-        if (!$file || 0 !== $file['error']) {
+        if (!$file || UPLOAD_ERR_OK !== $file->getError()) {
             throw new \RuntimeException('Problem uploading the data.');
         }
 
-        $token = $profiler->import(file_get_contents($file['tmp_name']));
+        $token = $profiler->import(file_get_contents($file->getPath()));
 
         if (false === $token) {
             throw new \RuntimeException('Problem uploading the data (token already exists).');

@@ -96,7 +96,7 @@ class FileTest extends \PHPUnit_Framework_TestCase
     public function testRename()
     {
         $path = __DIR__.'/Fixtures/test.copy.gif';
-        $targetPath = __DIR__.'/Fixtures/test.target.gif';
+        $targetPath = __DIR__.strtr('/Fixtures/test.target.gif', '/', DIRECTORY_SEPARATOR);
         @unlink($path);
         @unlink($targetPath);
         copy(__DIR__.'/Fixtures/test.gif', $path);

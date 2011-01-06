@@ -409,20 +409,23 @@ class ContainerBuilderTest extends \PHPUnit_Framework_TestCase
 
     /**
      * @covers Symfony\Component\DependencyInjection\ContainerBuilder::addInterfaceInjector
+     * @covers Symfony\Component\DependencyInjection\ContainerBuilder::addInterfaceInjectors
      * @covers Symfony\Component\DependencyInjection\ContainerBuilder::getInterfaceInjectors
+     * @covers Symfony\Component\DependencyInjection\ContainerBuilder::hasInterfaceInjectorForClass
      * @covers Symfony\Component\DependencyInjection\ContainerBuilder::setDefinition
      */
     public function testInterfaceInjection()
     {
         $definition = new Definition('Symfony\Tests\Component\DependencyInjection\FooClass');
 
-        $injector = $this->getMockInterfaceInjector('Symfony\Tests\Component\DependencyInjection\FooClass', 1);
-        $injector2 = $this->getMockInterfaceInjector('Symfony\Tests\Component\DependencyInjection\FooClass', 0);
+        $injectors[] = $this->getMockInterfaceInjector('Symfony\Tests\Component\DependencyInjection\FooClass', 1);
+        $injectors[] = $this->getMockInterfaceInjector('Symfony\Tests\Component\DependencyInjection\FooClass', 0);
 
         $container = new ContainerBuilder();
-        $container->addInterfaceInjector($injector);
-        $container->addInterfaceInjector($injector2);
+        $container->addInterfaceInjectors($injectors);
         $this->assertEquals(1, count($container->getInterfaceInjectors('Symfony\Tests\Component\DependencyInjection\FooClass')));
+        $this->assertTrue($container->hasInterfaceInjectorForClass('Symfony\Tests\Component\DependencyInjection\FooClass'));
+        $this->assertFalse($container->hasInterfaceInjectorForClass('\Foo'));
 
         $container->setDefinition('test', $definition);
         $test = $container->get('test');

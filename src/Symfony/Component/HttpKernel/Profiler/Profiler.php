@@ -124,7 +124,7 @@ class Profiler
             return false;
         }
 
-        $unpack = unpack('H*', serialize($this->collectors));
+        $unpack = unpack('H*', serialize($collectors));
 
         $this->storage->write($token, $unpack[1], $ip, $url, $time);
 

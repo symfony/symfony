@@ -35,13 +35,17 @@ class EngineTest extends \PHPUnit_Framework_TestCase
     {
         $engine = new ProjectTemplateEngine(self::$loader);
         $this->assertEquals(self::$loader, $engine->getLoader(), '__construct() takes a loader instance as its second first argument');
-        $this->assertEquals(array('php'), array_keys($engine->getRenderers()), '__construct() automatically registers a PHP renderer if none is given');
+    }
 
-        $engine = new ProjectTemplateEngine(self::$loader, array('foo' => self::$renderer));
+    public function testSetRenderers()
+    {
+        $engine = new ProjectTemplateEngine(self::$loader);
+        $engine->setRenderers(array('foo' => self::$renderer));
         $this->assertEquals(array('foo', 'php'), array_keys($engine->getRenderers()), '__construct() takes an array of renderers as its third argument');
         $this->assertTrue(self::$renderer->getEngine() === $engine, '__construct() registers itself on all renderers');
 
-        $engine = new ProjectTemplateEngine(self::$loader, array('php' => self::$renderer));
+        $engine = new ProjectTemplateEngine(self::$loader);
+        $engine->setRenderers(array('php' => self::$renderer));
         $this->assertTrue($engine->getRenderers() === array('php' => self::$renderer), '__construct() can overridde the default PHP renderer');
     }
 

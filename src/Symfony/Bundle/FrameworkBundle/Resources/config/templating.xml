@@ -29,7 +29,6 @@
         <service id="templating.engine" class="%templating.engine.class%" public="false">
             <argument type="service" id="service_container" />
             <argument type="service" id="templating.loader" />
-            <argument type="collection" />
             <call method="setCharset"><argument>%kernel.charset%</argument></call>
         </service>
 

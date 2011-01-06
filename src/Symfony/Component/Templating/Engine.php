@@ -39,14 +39,11 @@ class Engine implements \ArrayAccess
      * Constructor.
      *
      * @param LoaderInterface $loader    A loader instance
-     * @param array           $renderers An array of renderer instances
      * @param array           $helpers   A array of helper instances
-     * @param array           $escapers  An array of escapers
      */
-    public function __construct(LoaderInterface $loader, array $renderers = array(), array $helpers = array(), array $escapers = array())
+    public function __construct(LoaderInterface $loader, array $helpers = array())
     {
         $this->loader    = $loader;
-        $this->renderers = $renderers;
         $this->helpers   = array();
         $this->parents   = array();
         $this->stack     = array();
@@ -56,18 +53,23 @@ class Engine implements \ArrayAccess
 
         $this->addHelpers($helpers);
 
+        $this->initializeEscapers();
+
+        foreach ($this->escapers as $context => $escaper) {
+            $this->setEscaper($context, $escaper);
+        }
+    }
+
+    public function setRenderers(array $renderers = array())
+    {
+        $this->renderers = $renderers;
+
         if (!isset($this->renderers['php'])) {
             $this->renderers['php'] = new PhpRenderer();
         }
 
         foreach ($this->renderers as $renderer) {
             $renderer->setEngine($this);
-        }
-
-        $this->initializeEscapers();
-
-        foreach ($this->escapers as $context => $escaper) {
-            $this->setEscaper($context, $escaper);
         }
     }
 

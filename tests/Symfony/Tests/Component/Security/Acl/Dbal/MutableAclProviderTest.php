@@ -396,6 +396,9 @@ class MutableAclProviderTest extends \PHPUnit_Framework_TestCase
 
     protected function setUp()
     {
+        if (!class_exists('Doctrine\DBAL\DriverManager')) {
+            $this->markTestSkipped('The Doctrine2 DBAL is required for this test');
+        }
         $this->con = DriverManager::getConnection(array(
             'driver' => 'pdo_sqlite',
             'memory' => true,

@@ -9,11 +9,11 @@ class ObjectIdentityTest extends \PHPUnit_Framework_TestCase
     public function testConstructor()
     {
         $id = new ObjectIdentity('fooid', 'footype');
-        
+
         $this->assertEquals('fooid', $id->getIdentifier());
         $this->assertEquals('footype', $id->getType());
     }
-    
+
     public function testFromDomainObjectPrefersInterfaceOverGetId()
     {
         $domainObject = $this->getMock('Symfony\Component\Security\Acl\Model\DomainObjectInterface');
@@ -27,17 +27,17 @@ class ObjectIdentityTest extends \PHPUnit_Framework_TestCase
             ->method('getId')
             ->will($this->returnValue('getId()'))
         ;
-        
+
         $id = ObjectIdentity::fromDomainObject($domainObject);
         $this->assertEquals('getObjectIdentifier()', $id->getIdentifier());
     }
-    
+
     public function testFromDomainObjectWithoutInterface()
     {
         $id = ObjectIdentity::fromDomainObject(new TestDomainObject());
         $this->assertEquals('getId()', $id->getIdentifier());
     }
-    
+
     /**
      * @dataProvider getCompareData
      */
@@ -50,7 +50,7 @@ class ObjectIdentityTest extends \PHPUnit_Framework_TestCase
             $this->assertFalse($oid1->equals($oid2));
         }
     }
-    
+
     public function getCompareData()
     {
         return array(
@@ -60,6 +60,13 @@ class ObjectIdentityTest extends \PHPUnit_Framework_TestCase
             array(new ObjectIdentity('1', 'bla'), new ObjectIdentity('1', 'blub'), false),
         );
     }
+
+    public function setUp()
+    {
+        if (!class_exists('Doctrine\DBAL\DriverManager')) {
+            $this->markTestSkipped('The Doctrine2 DBAL is required for this test');
+        }
+    }
 }
 
 class TestDomainObject
@@ -68,7 +75,7 @@ class TestDomainObject
     {
         return 'getObjectIdentifier()';
     }
-    
+
     public function getId()
     {
         return 'getId()';

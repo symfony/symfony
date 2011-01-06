@@ -91,4 +91,11 @@ class DoctrineAclCacheTest extends \PHPUnit_Framework_TestCase
 
         return new DoctrineAclCache($cacheDriver, $this->getPermissionGrantingStrategy(), $prefix);
     }
+
+    public function setUp()
+    {
+        if (!class_exists('Doctrine\DBAL\DriverManager')) {
+            $this->markTestSkipped('The Doctrine2 DBAL is required for this test');
+        }
+    }
 }

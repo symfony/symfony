@@ -499,4 +499,11 @@ class AclTest extends \PHPUnit_Framework_TestCase
     {
         return new Acl(1, new ObjectIdentity(1, 'foo'), new PermissionGrantingStrategy(), array(), true);
     }
+
+    public function setUp()
+    {
+        if (!class_exists('Doctrine\DBAL\DriverManager')) {
+            $this->markTestSkipped('The Doctrine2 DBAL is required for this test');
+        }
+    }
 }

@@ -25,9 +25,8 @@
         </service>
 
         <service id="twig.loader" class="%twig.loader.class%">
-            <call method="setEngine">
-                <argument type="service" id="templating" />
-            </call>
+            <argument type="service" id="templating.name_converter" />
+            <argument type="service" id="templating.loader" />
         </service>
 
         <service id="twig.renderer" class="%twig.renderer.class%">

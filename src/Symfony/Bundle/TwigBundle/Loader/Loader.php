@@ -2,9 +2,10 @@
 
 namespace Symfony\Bundle\TwigBundle\Loader;
 
-use Symfony\Component\Templating\Engine;
 use Symfony\Component\Templating\Storage\Storage;
 use Symfony\Component\Templating\Storage\FileStorage;
+use Symfony\Bundle\FrameworkBundle\Templating\TemplateNameConverter;
+use Symfony\Component\Templating\Loader\LoaderInterface;
 
 /*
  * This file is part of the Symfony package.
@@ -21,11 +22,13 @@ use Symfony\Component\Templating\Storage\FileStorage;
  */
 class Loader implements \Twig_LoaderInterface
 {
-    protected $engine;
+    protected $converter;
+    protected $loader;
 
-    public function setEngine(Engine $engine)
+    public function __construct(TemplateNameConverter $converter, LoaderInterface $loader)
     {
-        $this->engine = $engine;
+        $this->converter = $converter;
+        $this->loader = $loader;
     }
 
     /**
@@ -41,13 +44,13 @@ class Loader implements \Twig_LoaderInterface
             return $name->getContent();
         }
 
-        list($name, $options) = $this->engine->splitTemplateName($name);
+        list($name, $options) = $this->converter->fromShortNotation($name);
 
         if ('twig' !== $options['renderer']) {
             throw new \LogicException(sprintf('A "%s" template cannot extend a "Twig" template.', $options['renderer']));
         }
 
-        $template = $this->engine->getLoader()->load($name, $options);
+        $template = $this->loader->load($name, $options);
 
         if (false === $template) {
             throw new \InvalidArgumentException(sprintf('The template "%s" does not exist (renderer: %s).', $name, $options['renderer']));
@@ -69,7 +72,7 @@ class Loader implements \Twig_LoaderInterface
             return (string) $name;
         }
 
-        list($name, $options) = $this->engine->splitTemplateName($name);
+        list($name, $options) = $this->converter->fromShortNotation($name);
 
         return $name.'_'.serialize($options);
     }
@@ -90,8 +93,8 @@ class Loader implements \Twig_LoaderInterface
             return false;
         }
 
-        list($name, $options) = $this->engine->splitTemplateName($name);
+        list($name, $options) = $this->converter->fromShortNotation($name);
 
-        return $this->engine->getLoader()->isFresh($name, $options, $time);
+        return $this->loader->isFresh($name, $options, $time);
     }
 }

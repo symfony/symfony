@@ -91,44 +91,11 @@ class Engine extends BaseEngine
         $this->helpers = $helpers;
     }
 
-    // parses template names following the following pattern:
-    // bundle:section:template(.format).renderer
+    /**
+     * {@inheritdoc}
+     */
     public function splitTemplateName($name, array $defaults = array())
     {
-        $parts = explode(':', $name);
-        if (3 !== count($parts)) {
-            throw new \InvalidArgumentException(sprintf('Template name "%s" is not valid.', $name));
-        }
-
-        $options = array_replace(
-            array(
-                'format' => '',
-            ),
-            $defaults,
-            array(
-                'bundle'     => str_replace('\\', '/', $parts[0]),
-                'controller' => $parts[1],
-            )
-        );
-
-        $elements = explode('.', $parts[2]);
-        if (3 === count($elements)) {
-            $parts[2] = $elements[0];
-            if ('html' !== $elements[1]) {
-                $options['format'] = '.'.$elements[1];
-            }
-            $options['renderer'] = $elements[2];
-        } elseif (2 === count($elements)) {
-            $parts[2] = $elements[0];
-            $options['renderer'] = $elements[1];
-            $format = $this->container->get('request')->getRequestFormat();
-            if (null !== $format && 'html' !== $format) {
-                $options['format'] = '.'.$format;
-            }
-        } else {
-            throw new \InvalidArgumentException(sprintf('Template name "%s" is not valid.', $name));
-        }
-
-        return array($parts[2], $options);
+        return $this->container->get('templating.name_converter')->fromShortNotation($name, $defaults);
     }
 }

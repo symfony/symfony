@@ -363,6 +363,14 @@ class Engine implements \ArrayAccess
         $renderer->setEngine($this);
     }
 
+    /**
+     * Converts a short template notation to a template name and an array of options.
+     *
+     * @param string $name     A short template template
+     * @param array  $defaults An array of default options
+     *
+     * @return array An array composed of the template name and an array of options
+     */
     public function splitTemplateName($name)
     {
         if (false !== $pos = strpos($name, ':')) {

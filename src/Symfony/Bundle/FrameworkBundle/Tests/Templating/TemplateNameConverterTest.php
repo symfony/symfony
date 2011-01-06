@@ -12,30 +12,21 @@
 namespace Symfony\Bundle\FrameworkBundle\Tests\Templating;
 
 use Symfony\Bundle\FrameworkBundle\Tests\TestCase;
-use Symfony\Bundle\FrameworkBundle\Templating\Engine;
-use Symfony\Component\Templating\Storage\StringStorage;
-use Symfony\Component\Templating\Storage\Storage;
-use Symfony\Component\Templating\Renderer\PhpRenderer;
+use Symfony\Bundle\FrameworkBundle\Templating\TemplateNameConverter;
 
-// simulate the rendering of another controller
-function foo($engine)
-{
-    return $engine->render('FooBundle:Foo:tpl1.php', array('foo' => 'foo <br />'));
-}
-
-class EngineTest extends TestCase
+class TemplateNameConverterTest extends TestCase
 {
     /**
-     * @dataProvider getSplitTemplateNameTests
+     * @dataProvider getFromShortNotationTests
      */
-    public function testSplitTemplateName($name, $parameters)
+    public function testFromShortNotation($name, $parameters)
     {
-        $engine = new Engine($this->getContainerMock(), $this->getLoaderMock(), array());
+        $converter = new TemplateNameConverter($this->getContainerMock(), $this->getLoaderMock(), array());
 
-        $this->assertEquals($parameters, $engine->splitTemplateName($name));
+        $this->assertEquals($parameters, $converter->fromShortNotation($name));
     }
 
-    public function getSplitTemplateNameTests()
+    public function getFromShortNotationTests()
     {
         return array(
             array('BlogBundle:Post:index.php', array('index', array('bundle' => 'BlogBundle', 'controller' => 'Post', 'renderer' => 'php', 'format' => ''))),
@@ -45,17 +36,17 @@ class EngineTest extends TestCase
     }
 
     /**
-     * @dataProvider      getSplitTemplateNameInvalidTests
+     * @dataProvider      getFromShortNotationInvalidTests
      * @expectedException \InvalidArgumentException
      */
-    public function testSplitTemplateNameInvalid($name)
+    public function testFromShortNotationInvalid($name)
     {
-        $engine = new Engine($this->getContainerMock(), $this->getLoaderMock(), array());
+        $converter = new TemplateNameConverter($this->getContainerMock(), $this->getLoaderMock(), array());
 
-        $engine->splitTemplateName($name);
+        $converter->fromShortNotation($name);
     }
 
-    public function getSplitTemplateNameInvalidTests()
+    public function getFromShortNotationInvalidTests()
     {
         return array(
             array('BlogBundle:Post:index'),

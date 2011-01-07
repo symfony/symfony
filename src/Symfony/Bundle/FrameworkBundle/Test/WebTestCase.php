@@ -62,26 +62,30 @@ abstract class WebTestCase extends BaseWebTestCase
      */
     protected function createKernel(array $options = array())
     {
-        // black magic below, you have been warned!
-        $dir = getcwd();
-        if (!isset($_SERVER['argv']) || false === strpos($_SERVER['argv'][0], 'phpunit')) {
-            throw new \RuntimeException('You must override the WebTestCase::createKernel() method.');
-        }
-
-        // find the --configuration flag from PHPUnit
-        $cli = implode(' ', $_SERVER['argv']);
-        if (preg_match('/\-\-configuration[= ]+([^ ]+)/', $cli, $matches)) {
-            $dir = $dir.'/'.$matches[1];
-        } elseif (preg_match('/\-c +([^ ]+)/', $cli, $matches)) {
-            $dir = $dir.'/'.$matches[1];
-        } elseif (file_exists(getcwd().'/phpunit.xml') || file_exists(getcwd().'/phpunit.xml.dist')) {
-            $dir = getcwd();
+        if (isset($_SERVER['KERNEL_DIR'])) {
+            $dir = $_SERVER['KERNEL_DIR'];
         } else {
-            throw new \RuntimeException('Unable to guess the Kernel directory.');
-        }
+            // black magic below, you have been warned!
+            $dir = getcwd();
+            if (!isset($_SERVER['argv']) || false === strpos($_SERVER['argv'][0], 'phpunit')) {
+                throw new \RuntimeException('You must override the WebTestCase::createKernel() method.');
+            }
 
-        if (!is_dir($dir)) {
-            $dir = dirname($dir);
+            // find the --configuration flag from PHPUnit
+            $cli = implode(' ', $_SERVER['argv']);
+            if (preg_match('/\-\-configuration[= ]+([^ ]+)/', $cli, $matches)) {
+                $dir = $dir.'/'.$matches[1];
+            } elseif (preg_match('/\-c +([^ ]+)/', $cli, $matches)) {
+                $dir = $dir.'/'.$matches[1];
+            } elseif (file_exists(getcwd().'/phpunit.xml') || file_exists(getcwd().'/phpunit.xml.dist')) {
+                $dir = getcwd();
+            } else {
+                throw new \RuntimeException('Unable to guess the Kernel directory.');
+            }
+
+            if (!is_dir($dir)) {
+                $dir = dirname($dir);
+            }
         }
 
         $finder = new Finder();

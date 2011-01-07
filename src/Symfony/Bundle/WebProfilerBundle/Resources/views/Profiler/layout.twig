@@ -15,18 +15,20 @@
 
     <table>
         <tr><td class="menu">
-            <ul>
-                {% for name, template in templates %}
-                    {% set menu %}{{ template.renderBlock('menu', { 'collector': profiler.get(name)}) }}{% endset %}
-                    {% if menu %}
-                        <li
-                            {% if name == panel %}class="selected"{% endif %}
-                        >
-                            <a href="{{ path('_profiler_panel', { 'token': token, 'panel': name }) }}">{{ menu|raw }}</a>
-                        </li>
-                    {% endif %}
-                {% endfor %}
-            </ul>
+            {% if templates is defined %}
+                <ul>
+                    {% for name, template in templates %}
+                        {% set menu %}{{ template.renderBlock('menu', { 'collector': profiler.get(name)}) }}{% endset %}
+                        {% if menu %}
+                            <li
+                                {% if name == panel %}class="selected"{% endif %}
+                            >
+                                <a href="{{ path('_profiler_panel', { 'token': token, 'panel': name }) }}">{{ menu|raw }}</a>
+                            </li>
+                        {% endif %}
+                    {% endfor %}
+                </ul>
+            {% endif %}
 
             {% render 'WebProfilerBundle:Profiler:searchBar' with { 'token': token } %}
 

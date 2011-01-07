@@ -32,16 +32,8 @@ class SecurityExtension extends \Twig_Extension
         if (null === $this->context) {
             return false;
         }
-        
-        if ($field !== null) {
-            if (null === $object) {
-                throw new \InvalidArgumentException('$object cannot be null when field is not null.');
-            }
-            
-            $object = new FieldVote($object, $field);
-        }
 
-        return $this->context->vote($role, $object);
+        return $this->context->vote($role, $object, $field);
     }
 
     /**

@@ -4,6 +4,7 @@ namespace Symfony\Component\Security;
 
 use Symfony\Component\Security\Authentication\Token\TokenInterface;
 use Symfony\Component\Security\Authorization\AccessDecisionManager;
+use Symfony\Component\Security\Acl\Voter\FieldVote;
 
 /*
  * This file is part of the Symfony package.
@@ -45,10 +46,18 @@ class SecurityContext
         return null === $this->token ? null : $this->token->getUser();
     }
 
-    public function vote($attributes, $object = null)
+    public function vote($attributes, $object = null, $field = null)
     {
         if (null === $this->token || null === $this->accessDecisionManager) {
             return false;
+        }
+
+        if ($field !== null) {
+            if (null === $object) {
+                throw new \InvalidArgumentException('$object cannot be null when field is not null.');
+            }
+
+            $object = new FieldVote($object, $field);
         }
 
         return $this->accessDecisionManager->decide($this->token, (array) $attributes, $object);

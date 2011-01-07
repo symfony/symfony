@@ -2,7 +2,6 @@
 
 namespace Symfony\Bundle\FrameworkBundle\Templating\Helper;
 
-use Symfony\Component\Security\Acl\Voter\FieldVote;
 use Symfony\Component\Templating\Helper\Helper;
 use Symfony\Component\Security\SecurityContext;
 
@@ -39,16 +38,8 @@ class SecurityHelper extends Helper
         if (null === $this->context) {
             return false;
         }
-        
-        if ($field !== null) {
-            if (null === $object) {
-                throw new \InvalidArgumentException('$object cannot be null when field is not null.');
-            }
-            
-            $object = new FieldVote($object, $field);
-        }
 
-        return $this->context->vote($role, $object);
+        return $this->context->vote($role, $object, $field);
     }
 
     /**

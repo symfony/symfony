@@ -285,7 +285,7 @@ class XmlFileLoader extends FileLoader
         $imports = '';
         foreach ($schemaLocations as $namespace => $location) {
             $parts = explode('/', $location);
-            if (preg_match('/^[a-z][a-z\d\+\.\-]*:/i', $location)) { // URI scheme http://tools.ietf.org/html/rfc3986
+            if (preg_match('#^phar://#i', $location)) {
                 $tmpfile = tempnam(sys_get_temp_dir(), 'sf2');
                 if ($tmpfile) {
                     file_put_contents($tmpfile, file_get_contents($location));

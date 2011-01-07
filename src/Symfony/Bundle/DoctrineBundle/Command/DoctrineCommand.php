@@ -106,7 +106,7 @@ abstract class DoctrineCommand extends Command
         $connections = array();
         $ids = $this->container->getServiceIds();
         foreach ($ids as $id) {
-            preg_match('/doctrine.dbal.(.*)_connection/', $id, $matches);
+            preg_match('^doctrine\.dbal\.(.*)_connection$', $id, $matches);
             if ($matches) {
                 $name = $matches[1];
                 $connections[$name] = $this->container->get($id);
@@ -121,12 +121,13 @@ abstract class DoctrineCommand extends Command
         $entityManagers = array();
         $ids = $this->container->getServiceIds();
         foreach ($ids as $id) {
-            preg_match('/doctrine.orm.(.*)_entity_manager/', $id, $matches);
+            preg_match('/^doctrine\.orm\.(.*)_entity_manager$/', $id, $matches);
             if ($matches) {
                 $name = $matches[1];
                 $entityManagers[$name] = $this->container->get($id);
             }
         }
+
         return $entityManagers;
     }
 

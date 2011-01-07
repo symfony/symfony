@@ -22,6 +22,7 @@
         <parameter key="templating.assets.version">null</parameter>
         <parameter key="templating.assets.base_urls" type="collection"></parameter>
         <parameter key="templating.name_converter.class">Symfony\Bundle\FrameworkBundle\Templating\TemplateNameConverter</parameter>
+        <parameter key="templating.renderer.php.class">Symfony\Component\Templating\Renderer\PhpRenderer</parameter>
         <parameter key="debug.file_link_format">null</parameter>
     </parameters>
 
@@ -101,6 +102,10 @@
 
         <service id="templating.name_converter" class="%templating.name_converter.class%">
             <argument type="service" id="service_container" />
+        </service>
+
+        <service id="templating.renderer.php" class="%templating.renderer.php.class%">
+            <tag name="templating.renderer" alias="php" />
         </service>
 
         <service id="templating.loader" alias="templating.loader.filesystem" />

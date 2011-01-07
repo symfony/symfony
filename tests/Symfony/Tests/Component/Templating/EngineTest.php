@@ -41,12 +41,8 @@ class EngineTest extends \PHPUnit_Framework_TestCase
     {
         $engine = new ProjectTemplateEngine(self::$loader);
         $engine->setRenderers(array('foo' => self::$renderer));
-        $this->assertEquals(array('foo', 'php'), array_keys($engine->getRenderers()), '__construct() takes an array of renderers as its third argument');
-        $this->assertTrue(self::$renderer->getEngine() === $engine, '__construct() registers itself on all renderers');
-
-        $engine = new ProjectTemplateEngine(self::$loader);
-        $engine->setRenderers(array('php' => self::$renderer));
-        $this->assertTrue($engine->getRenderers() === array('php' => self::$renderer), '__construct() can overridde the default PHP renderer');
+        $this->assertEquals(array('foo'), array_keys($engine->getRenderers()));
+        $this->assertTrue(self::$renderer->getEngine() === $engine, 'setRenderers() registers itself on all renderers');
     }
 
     public function testOffsetGet()
@@ -106,13 +102,15 @@ class EngineTest extends \PHPUnit_Framework_TestCase
             $this->assertEquals('The template "foo:name" does not exist (renderer: name).', $e->getMessage(), '->render() throws an InvalidArgumentException if no renderer is registered for the given renderer');
         }
 
-        $engine = new ProjectTemplateEngine(self::$loader, array(), array(new SlotsHelper()));
+        $engine = new ProjectTemplateEngine(self::$loader, array(new SlotsHelper()));
+        $engine->setRenderer('php', new PhpRenderer());
         $engine->set(new \SimpleHelper('bar'));
         self::$loader->setTemplate('foo.php', '<?php $view->extend("layout"); echo $view[\'foo\'].$foo ?>');
         self::$loader->setTemplate('layout.php', '-<?php echo $view[\'slots\']->get("_content") ?>-');
         $this->assertEquals('-barfoo-', $engine->render('foo', array('foo' => 'foo')), '->render() uses the decorator to decorate the template');
 
-        $engine = new ProjectTemplateEngine(self::$loader, array(), array(new SlotsHelper()));
+        $engine = new ProjectTemplateEngine(self::$loader, array(new SlotsHelper()));
+        $engine->setRenderer('php', new PhpRenderer());
         $engine->set(new \SimpleHelper('bar'));
         self::$loader->setTemplate('bar.php', 'bar');
         self::$loader->setTemplate('foo.php', '<?php $view->extend("layout"); echo $foo ?>');
@@ -149,6 +147,7 @@ class EngineTest extends \PHPUnit_Framework_TestCase
     public function testGlobalsGetPassedToTemplate()
     {
         $engine = new ProjectTemplateEngine(self::$loader);
+        $engine->setRenderer('php', new PhpRenderer());
         $engine->addGlobal('global', 'global variable');
 
         self::$loader->setTemplate('global.php', '<?php echo $global; ?>');

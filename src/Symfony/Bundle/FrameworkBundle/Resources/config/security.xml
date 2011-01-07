@@ -32,6 +32,7 @@
         <parameter key="security.authentication.form.login_path">/login</parameter>
         <parameter key="security.authentication.form.use_forward">false</parameter>
         <parameter key="security.authentication.listener.form.class">Symfony\Component\HttpKernel\Security\Firewall\UsernamePasswordFormAuthenticationListener</parameter>
+        <parameter key="security.authentication.form.options" type="collection" />
 
         <parameter key="security.authentication.basic_entry_point.class">Symfony\Component\HttpKernel\Security\EntryPoint\BasicAuthenticationEntryPoint</parameter>
         <parameter key="security.authentication.basic_entry_point.realm">Symfony2</parameter>

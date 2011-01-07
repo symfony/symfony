@@ -23,8 +23,19 @@ use Symfony\Component\DependencyInjection\ContainerBuilder;
  */
 class InlineServiceDefinitionsPass implements CompilerPassInterface
 {
+    protected $aliasMap;
+
     public function process(ContainerBuilder $container)
     {
+        $this->aliasMap = array();
+        foreach ($container->getAliases() as $id => $alias) {
+            if (!$alias->isPublic()) {
+                continue;
+            }
+
+            $this->aliasMap[$id] = (string) $alias;
+        }
+
         foreach ($container->getDefinitions() as $id => $definition) {
             $definition->setArguments(
                 $this->inlineArguments($container, $definition->getArguments())
@@ -65,7 +76,7 @@ class InlineServiceDefinitionsPass implements CompilerPassInterface
             return false;
         }
 
-        $references = count(array_keys($container->getAliases(), $id, true));
+        $references = count(array_keys($this->aliasMap, $id, true));
         foreach ($container->getDefinitions() as $cDefinition)
         {
             if ($references > 1) {

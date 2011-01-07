@@ -2,6 +2,7 @@
 
 namespace Symfony\Component\DependencyInjection\Compiler;
 
+use Symfony\Component\DependencyInjection\Alias;
 use Symfony\Component\DependencyInjection\Reference;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 
@@ -32,6 +33,13 @@ class ResolveReferencesToAliasesPass implements CompilerPassInterface
             $definition->setArguments($this->processArguments($definition->getArguments()));
             $definition->setMethodCalls($this->processArguments($definition->getMethodCalls()));
         }
+
+        foreach ($container->getAliases() as $id => $alias) {
+            $aliasId = (string) $alias;
+            if ($aliasId !== $defId = $this->getDefinitionId($aliasId)) {
+                $container->setAlias($id, new Alias($defId, $alias->isPublic()));
+            }
+        }
     }
 
     protected function processArguments(array $arguments)
@@ -54,7 +62,7 @@ class ResolveReferencesToAliasesPass implements CompilerPassInterface
     protected function getDefinitionId($id)
     {
         if ($this->container->hasAlias($id)) {
-            return $this->getDefinitionId($this->container->getAlias($id));
+            return $this->getDefinitionId((string) $this->container->getAlias($id));
         }
 
         return $id;

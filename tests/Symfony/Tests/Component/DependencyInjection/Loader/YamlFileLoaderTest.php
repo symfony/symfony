@@ -110,7 +110,11 @@ class YamlFileLoaderTest extends \PHPUnit_Framework_TestCase
 
         $aliases = $container->getAliases();
         $this->assertTrue(isset($aliases['alias_for_foo']), '->load() parses aliases');
-        $this->assertEquals('foo', $aliases['alias_for_foo'], '->load() parses aliases');
+        $this->assertEquals('foo', (string) $aliases['alias_for_foo'], '->load() parses aliases');
+        $this->assertTrue($aliases['alias_for_foo']->isPublic());
+        $this->assertTrue(isset($aliases['another_alias_for_foo']));
+        $this->assertEquals('foo', (string) $aliases['another_alias_for_foo']);
+        $this->assertFalse($aliases['another_alias_for_foo']->isPublic());
     }
 
     public function testExtensions()

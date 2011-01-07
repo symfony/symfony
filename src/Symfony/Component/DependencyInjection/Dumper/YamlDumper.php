@@ -116,7 +116,11 @@ class YamlDumper extends Dumper
 
     protected function addServiceAlias($alias, $id)
     {
-        return sprintf("  %s: @%s\n", $alias, $id);
+        if ($id->isPublic()) {
+            return sprintf("  %s: @%s\n", $alias, $id);
+        } else {
+            return sprintf("  %s:\n    alias: %s\n    public: false", $alias, $id);
+        }
     }
 
     protected function addServices()

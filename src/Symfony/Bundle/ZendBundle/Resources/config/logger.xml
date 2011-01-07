@@ -16,7 +16,7 @@
     </parameters>
 
     <services>
-        <service id="zend.logger" class="%zend.logger.class%" />
+        <service id="zend.logger" class="%zend.logger.class%" public="false" />
 
         <service id="zend.logger.writer.filesystem" class="%zend.logger.writer.filesystem.class%" public="false">
             <tag name="zend.logger.writer" />

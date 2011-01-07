@@ -179,7 +179,7 @@ abstract class AbstractMongoDBExtensionTest extends TestCase
         $this->assertEquals('%doctrine.odm.mongodb.connection_class%', $definition->getClass());
         $this->assertEquals(array('mongodb://localhost:27017', array('connect' => true), new Reference('doctrine.odm.mongodb.conn1_configuration')), $definition->getArguments());
 
-        $this->assertEquals('doctrine.odm.mongodb.dm2_document_manager', $container->getAlias('doctrine.odm.mongodb.document_manager'));
+        $this->assertEquals('doctrine.odm.mongodb.dm2_document_manager', (string) $container->getAlias('doctrine.odm.mongodb.document_manager'));
 
         $definition = $container->getDefinition('doctrine.odm.mongodb.dm1_document_manager');
         $this->assertEquals('%doctrine.odm.mongodb.document_manager_class%', $definition->getClass());

@@ -26,7 +26,7 @@
     </parameters>
 
     <services>
-        <service id="security.acl.dbal.connection" alias="doctrine.dbal.default_connection" />
+        <service id="security.acl.dbal.connection" alias="doctrine.dbal.default_connection" public="false" />
     
         <service id="security.acl.object_identity_retrieval_strategy" class="%security.acl.object_identity_retrieval_strategy.class%" public="false"></service>
         
@@ -62,7 +62,7 @@
             <argument>%security.acl.cache.doctrine.prefix%</argument>
         </service>
         
-        <service id="security.acl.cache.doctrine.cache_impl" alias="doctrine.orm.default_result_cache" />
+        <service id="security.acl.cache.doctrine.cache_impl" alias="doctrine.orm.default_result_cache" public="false" />
         
         <service id="security.acl.permission.map" class="%security.acl.permission.map.class%" public="false"></service>
         

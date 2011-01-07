@@ -10,6 +10,8 @@
 
 namespace Symfony\Tests\Component\DependencyInjection;
 
+use Symfony\Component\DependencyInjection\Alias;
+
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\DependencyInjection\ContainerInterface;
 use Symfony\Component\DependencyInjection\Definition;
@@ -137,7 +139,7 @@ class ContainerBuilderTest extends \PHPUnit_Framework_TestCase
         $builder->setAlias('bar', 'foo');
         $this->assertTrue($builder->hasAlias('bar'), '->hasAlias() returns true if the alias exists');
         $this->assertFalse($builder->hasAlias('foobar'), '->hasAlias() returns false if the alias does not exist');
-        $this->assertEquals('foo', $builder->getAlias('bar'), '->getAlias() returns the aliased service');
+        $this->assertEquals('foo', (string) $builder->getAlias('bar'), '->getAlias() returns the aliased service');
         $this->assertTrue($builder->has('bar'), '->setAlias() defines a new service');
         $this->assertTrue($builder->get('bar') === $builder->get('foo'), '->setAlias() creates a service that is an alias to another one');
 
@@ -157,11 +159,21 @@ class ContainerBuilderTest extends \PHPUnit_Framework_TestCase
         $builder = new ContainerBuilder();
         $builder->setAlias('bar', 'foo');
         $builder->setAlias('foobar', 'foo');
-        $this->assertEquals(array('bar' => 'foo', 'foobar' => 'foo'), $builder->getAliases(), '->getAliases() returns all service aliases');
+        $builder->setAlias('moo', new Alias('foo', false));
+
+        $aliases = $builder->getAliases();
+        $this->assertEquals('foo', (string) $aliases['bar']);
+        $this->assertTrue($aliases['bar']->isPublic());
+        $this->assertEquals('foo', (string) $aliases['foobar']);
+        $this->assertEquals('foo', (string) $aliases['moo']);
+        $this->assertFalse($aliases['moo']->isPublic());
+
         $builder->register('bar', 'stdClass');
-        $this->assertEquals(array('foobar' => 'foo'), $builder->getAliases(), '->getAliases() does not return aliased services that have been overridden');
+        $this->assertFalse($builder->hasAlias('bar'));
+
         $builder->set('foobar', 'stdClass');
-        $this->assertEquals(array(), $builder->getAliases(), '->getAliases() does not return aliased services that have been overridden');
+        $builder->set('moo', 'stdClass');
+        $this->assertEquals(0, count($builder->getAliases()), '->getAliases() does not return aliased services that have been overridden');
     }
 
     /**
@@ -171,7 +183,10 @@ class ContainerBuilderTest extends \PHPUnit_Framework_TestCase
     {
         $builder = new ContainerBuilder();
         $builder->setAliases(array('bar' => 'foo', 'foobar' => 'foo'));
-        $this->assertEquals(array('bar' => 'foo', 'foobar' => 'foo'), $builder->getAliases(), '->getAliases() returns all service aliases');
+
+        $aliases = $builder->getAliases();
+        $this->assertTrue(isset($aliases['bar']));
+        $this->assertTrue(isset($aliases['foobar']));
     }
 
     /**
@@ -182,7 +197,10 @@ class ContainerBuilderTest extends \PHPUnit_Framework_TestCase
         $builder = new ContainerBuilder();
         $builder->setAliases(array('bar' => 'foo'));
         $builder->addAliases(array('foobar' => 'foo'));
-        $this->assertEquals(array('bar' => 'foo', 'foobar' => 'foo'), $builder->getAliases(), '->getAliases() returns all service aliases');
+
+        $aliases = $builder->getAliases();
+        $this->assertTrue(isset($aliases['bar']));
+        $this->assertTrue(isset($aliases['foobar']));
     }
 
     /**
@@ -327,7 +345,10 @@ class ContainerBuilderTest extends \PHPUnit_Framework_TestCase
         $config->setAlias('alias_for_foo', 'foo');
         $container->merge($config);
         $this->assertEquals(array('foo', 'bar', 'baz'), array_keys($container->getDefinitions()), '->merge() merges definitions already defined ones');
-        $this->assertEquals(array('alias_for_foo' => 'foo'), $container->getAliases(), '->merge() registers defined aliases');
+
+        $aliases = $container->getAliases();
+        $this->assertTrue(isset($aliases['alias_for_foo']));
+        $this->assertEquals('foo', (string) $aliases['alias_for_foo']);
 
         $container = new ContainerBuilder();
         $container->register('foo', 'FooClass');

@@ -298,7 +298,7 @@ abstract class AbstractDoctrineExtensionTest extends TestCase
         $this->assertEquals('doctrine.dbal.conn1_connection.configuration', (string) $args[1]);
         $this->assertEquals('doctrine.dbal.conn1_connection.event_manager', (string) $args[2]);
 
-        $this->assertEquals('doctrine.orm.dm2_entity_manager', $container->getAlias('doctrine.orm.entity_manager'));
+        $this->assertEquals('doctrine.orm.dm2_entity_manager', (string) $container->getAlias('doctrine.orm.entity_manager'));
 
         $definition = $container->getDefinition('doctrine.orm.dm1_entity_manager');
         $this->assertEquals('%doctrine.orm.entity_manager_class%', $definition->getClass());

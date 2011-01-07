@@ -782,7 +782,7 @@ EOF;
             return sprintf('$this->get(\'%s\', ContainerInterface::NULL_ON_INVALID_REFERENCE)', $id);
         } else {
             if ($this->container->hasAlias($id)) {
-                $id = $this->container->getAlias($id);
+                $id = (string) $this->container->getAlias($id);
             }
 
             return sprintf('$this->get(\'%s\')', $id);

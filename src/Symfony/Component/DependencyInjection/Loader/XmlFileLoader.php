@@ -2,6 +2,8 @@
 
 namespace Symfony\Component\DependencyInjection\Loader;
 
+use Symfony\Component\DependencyInjection\Alias;
+
 use Symfony\Component\DependencyInjection\InterfaceInjector;
 use Symfony\Component\DependencyInjection\Definition;
 use Symfony\Component\DependencyInjection\Reference;
@@ -124,7 +126,11 @@ class XmlFileLoader extends FileLoader
     protected function parseDefinition($id, $service, $file)
     {
         if ((string) $service['alias']) {
-            $this->container->setAlias($id, (string) $service['alias']);
+            $public = true;
+            if (isset($service['public'])) {
+                $public = $service->getAttributeAsPhp('public');
+            }
+            $this->container->setAlias($id, new Alias((string) $service['alias'], $public));
 
             return;
         }

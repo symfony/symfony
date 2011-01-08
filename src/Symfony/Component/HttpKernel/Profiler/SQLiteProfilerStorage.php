@@ -40,19 +40,20 @@ class SQLiteProfilerStorage implements ProfilerStorageInterface
      */
     public function find($ip, $url, $limit)
     {
+        $db = $this->initDb();
+
         $criteria = array();
 
         if ($ip = preg_replace('/[^\d\.]/', '', $ip)) {
-            $criteria[] = ' ip LIKE "%'.$ip.'%"';
+            $criteria[] = " ip LIKE '%".$ip."%'";
         }
 
         if ($url) {
-            $criteria[] = ' url LIKE "%'.$url.'%"';
+            $criteria[] = " url LIKE '%".$db->escapeString($url)."%'";
         }
 
         $criteria = $criteria ? 'WHERE '.implode(' AND ', $criteria) : '';
 
-        $db = $this->initDb();
         $tokens = $this->fetch($db, 'SELECT token, ip, url, time FROM data '.$criteria.' ORDER BY time DESC LIMIT '.((integer) $limit));
         $this->close($db);
 

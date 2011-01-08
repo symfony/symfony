@@ -233,7 +233,7 @@ class ProfilerController extends ContainerAware
         $tokens = $profiler->find($ip, $url, $limit);
 
         $response = $this->container->get('response');
-        $response->setRedirect($this->container->get('router')->generate('_profiler_search_results', array('token' => $tokens[0]['token'])));
+        $response->setRedirect($this->container->get('router')->generate('_profiler_search_results', array('token' => $tokens ? $tokens[0]['token'] : '')));
 
         return $response;
     }

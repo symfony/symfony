@@ -21,9 +21,15 @@ use Symfony\Component\DependencyInjection\ContainerBuilder;
  *
  * @author Johannes M. Schmitt <schmittjoh@gmail.com>
  */
-class InlineServiceDefinitionsPass implements CompilerPassInterface
+class InlineServiceDefinitionsPass implements RepeatablePassInterface
 {
     protected $aliasMap;
+    protected $repeatedPass;
+
+    public function setRepeatedPass(RepeatedPass $repeatedPass)
+    {
+        $this->repeatedPass = $repeatedPass;
+    }
 
     public function process(ContainerBuilder $container)
     {

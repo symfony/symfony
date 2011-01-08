@@ -39,8 +39,10 @@ class PassConfig
         $this->removingPasses = array(
             new RemovePrivateAliasesPass(),
             new ReplaceAliasByActualDefinitionPass(),
-            new InlineServiceDefinitionsPass(),
-            new RemoveUnusedDefinitionsPass(),
+            new RepeatedPass(array(
+                new InlineServiceDefinitionsPass(),
+                new RemoveUnusedDefinitionsPass(),
+            )),
         );
     }
 

@@ -2,6 +2,8 @@
 
 namespace Symfony\Tests\Component\DependencyInjection\Compiler;
 
+use Symfony\Component\DependencyInjection\Compiler\RepeatedPass;
+
 use Symfony\Component\DependencyInjection\Compiler\RemoveUnusedDefinitionsPass;
 use Symfony\Component\DependencyInjection\Definition;
 use Symfony\Component\DependencyInjection\Reference;
@@ -72,6 +74,7 @@ class RemoveUnusedDefinitionsPassTest extends \PHPUnit_Framework_TestCase
     protected function process(ContainerBuilder $container)
     {
         $pass = new RemoveUnusedDefinitionsPass();
+        $repeatedPass = new RepeatedPass(array($pass));
         $pass->process($container);
     }
 }

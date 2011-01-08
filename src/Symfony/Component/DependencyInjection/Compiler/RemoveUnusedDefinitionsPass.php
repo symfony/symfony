@@ -20,8 +20,15 @@ use Symfony\Component\DependencyInjection\ContainerBuilder;
  *
  * @author Johannes M. Schmitt <schmittjoh@gmail.com>
  */
-class RemoveUnusedDefinitionsPass implements CompilerPassInterface
+class RemoveUnusedDefinitionsPass implements RepeatablePassInterface
 {
+    protected $repeatedPass;
+
+    public function setRepeatedPass(RepeatedPass $repeatedPass)
+    {
+        $this->repeatedPass = $repeatedPass;
+    }
+
     public function process(ContainerBuilder $container)
     {
         $hasChanged = false;
@@ -45,7 +52,7 @@ class RemoveUnusedDefinitionsPass implements CompilerPassInterface
         }
 
         if ($hasChanged) {
-            $this->process($container);
+            $this->repeatedPass->setRepeat();
         }
     }
 

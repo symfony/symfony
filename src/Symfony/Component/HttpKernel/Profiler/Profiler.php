@@ -104,9 +104,9 @@ class Profiler
      */
     public function export()
     {
-        $unpack = unpack('H*', serialize(array($this->token, $this->collectors, $this->ip, $this->url, $this->time)));
-
-        return $unpack[1];
+        $data = base64_encode(serialize(array($this->token, $this->collectors, $this->ip, $this->url, $this->time)));
+        
+        return $data;
     }
 
     /**
@@ -118,15 +118,15 @@ class Profiler
      */
     public function import($data)
     {
-        list($token, $collectors, $ip, $url, $time) = unserialize(pack('H*', $data));
+        list($token, $collectors, $ip, $url, $time) = unserialize(base64_decode($data));
 
         if (false !== $this->storage->read($token)) {
             return false;
         }
 
-        $unpack = unpack('H*', serialize($collectors));
+        $data = base64_encode(serialize($collectors));
 
-        $this->storage->write($token, $unpack[1], $ip, $url, $time);
+        $this->storage->write($token, $data, $ip, $url, $time);
 
         return $token;
     }
@@ -142,7 +142,7 @@ class Profiler
 
         if (false !== $items = $this->storage->read($token)) {
             list($data, $this->ip, $this->url, $this->time) = $items;
-            $this->set(unserialize(pack('H*', $data)));
+            $this->set(unserialize(base64_decode($data)));
 
             $this->empty = false;
         } else {
@@ -242,9 +242,9 @@ class Profiler
         $this->url  = $request->getUri();
         $this->time = time();
 
-        $unpack = unpack('H*', serialize($this->collectors));
+        $data = base64_encode(serialize($this->collectors));
         try {
-            $this->storage->write($this->token, $unpack[1], $this->ip, $this->url, $this->time);
+            $this->storage->write($this->token, $data, $this->ip, $this->url, $this->time);
             $this->empty = false;
         } catch (\Exception $e) {
             if (null !== $this->logger) {

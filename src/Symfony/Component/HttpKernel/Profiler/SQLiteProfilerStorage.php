@@ -69,7 +69,7 @@ class SQLiteProfilerStorage implements ProfilerStorageInterface
     {
         $db = $this->initDb();
         $args = array(':token' => $token);
-        $data = $this->fetch($db, 'SELECT data, ip, url, time FROM data WHERE token = :token ORDER BY time DESC LIMIT 1', $args);
+        $data = $this->fetch($db, 'SELECT data, ip, url, time FROM data WHERE token = :token LIMIT 1', $args);
         $this->close($db);
         if (isset($data[0]['data'])) {
             return array($data[0]['data'], $data[0]['ip'], $data[0]['url'], $data[0]['time']);
@@ -85,13 +85,14 @@ class SQLiteProfilerStorage implements ProfilerStorageInterface
     {
         $db = $this->initDb();
         $args = array(
-            ':token' => $token,
-            ':data'  => $data,
-            ':ip'    => $ip,
-            ':url'   => $url,
-            ':time'  => $time,
+            ':token'        => $token,
+            ':data'         => $data,
+            ':ip'           => $ip,
+            ':url'          => $url,
+            ':time'         => $time,
+            ':created_at'   => time(),
         );
-        $this->exec($db, 'INSERT INTO data (token, data, ip, url, time) VALUES (:token, :data, :ip, :url, :time)', $args);
+        $this->exec($db, 'INSERT INTO data (token, data, ip, url, time, created_at) VALUES (:token, :data, :ip, :url, :time, :created_at)', $args);
         $this->cleanup();
         $this->close($db);
     }
@@ -109,7 +110,7 @@ class SQLiteProfilerStorage implements ProfilerStorageInterface
     protected function cleanup()
     {
         $db = $this->initDb();
-        $this->exec($db, 'DELETE FROM data WHERE time < :time', array(':time' => time() - $this->lifetime));
+        $this->exec($db, 'DELETE FROM data WHERE created_at < :time', array(':time' => time() - $this->lifetime));
         $this->close($db);
     }
 
@@ -126,8 +127,10 @@ class SQLiteProfilerStorage implements ProfilerStorageInterface
             throw new \RuntimeException('You need to enable either the SQLite or PDO_SQLite extension for the profiler to run properly.');
         }
 
-        $db->exec('CREATE TABLE IF NOT EXISTS data (token STRING, data STRING, ip STRING, url STRING, time INTEGER)');
-        $db->exec('CREATE INDEX IF NOT EXISTS data_data ON data (time)');
+        $db->exec('CREATE TABLE IF NOT EXISTS data (token STRING, data STRING, ip STRING, url STRING, time INTEGER, created_at INTEGER)');
+        $db->exec('CREATE INDEX IF NOT EXISTS data_created_at ON data (created_at)');
+        $db->exec('CREATE INDEX IF NOT EXISTS data_ip ON data (ip)');
+        $db->exec('CREATE INDEX IF NOT EXISTS data_url ON data (url)');
         $db->exec('CREATE UNIQUE INDEX IF NOT EXISTS data_token ON data (token)');
 
         return $db;

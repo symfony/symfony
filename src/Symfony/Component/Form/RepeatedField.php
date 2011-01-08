@@ -41,17 +41,20 @@ class RepeatedField extends FieldGroup
      */
     protected function configure()
     {
-        $field = clone $this->prototype;
-        $field->setKey('first');
-        $field->setPropertyPath('first');
-        $this->add($field);
-
-        $field = clone $this->prototype;
-        $field->setKey('second');
-        $field->setPropertyPath('second');
-        $this->add($field);
+        $this->addOption('first_key', 'first');
+        $this->addOption('second_key', 'second');
 
         parent::configure();
+
+        $field = clone $this->prototype;
+        $field->setKey($this->getOption('first_key'));
+        $field->setPropertyPath($this->getOption('first_key'));
+        $this->add($field);
+
+        $field = clone $this->prototype;
+        $field->setKey($this->getOption('second_key'));
+        $field->setPropertyPath($this->getOption('second_key'));
+        $this->add($field);
     }
 
     /**
@@ -61,7 +64,7 @@ class RepeatedField extends FieldGroup
      */
     public function isFirstEqualToSecond()
     {
-        return $this->get('first')->getData() === $this->get('second')->getData();
+        return $this->get($this->getOption('first_key'))->getData() === $this->get($this->getOption('second_key'))->getData();
     }
 
     /**
@@ -71,7 +74,10 @@ class RepeatedField extends FieldGroup
      */
     public function setData($data)
     {
-        parent::setData(array('first' => $data, 'second' => $data));
+        parent::setData(array(
+            $this->getOption('first_key') => $data,
+            $this->getOption('second_key') => $data
+        ));
     }
 
     /**
@@ -82,7 +88,7 @@ class RepeatedField extends FieldGroup
     public function getData()
     {
         if ($this->isBound() && $this->isFirstEqualToSecond()) {
-            return $this->get('first')->getData();
+            return $this->get($this->getOption('first_key'))->getData();
         }
 
         return null;

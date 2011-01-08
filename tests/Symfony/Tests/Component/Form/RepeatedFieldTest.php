@@ -29,18 +29,18 @@ class RepeatedFieldTest extends \PHPUnit_Framework_TestCase
     {
         $this->field->setData('foobar');
 
-        $this->assertEquals('foobar', $this->field['first']->getData());
-        $this->assertEquals('foobar', $this->field['second']->getData());
+        $this->assertEquals('foobar', $this->field['name']->getData());
+        $this->assertEquals('foobar', $this->field['name_repeat']->getData());
     }
 
     public function testBindUnequal()
     {
-        $input = array('first' => 'foo', 'second' => 'bar');
+        $input = array('name' => 'foo', 'name_repeat' => 'bar');
 
         $this->field->bind($input);
 
-        $this->assertEquals('foo', $this->field['first']->getDisplayedData());
-        $this->assertEquals('bar', $this->field['second']->getDisplayedData());
+        $this->assertEquals('foo', $this->field['name']->getDisplayedData());
+        $this->assertEquals('bar', $this->field['name_repeat']->getDisplayedData());
         $this->assertFalse($this->field->isFirstEqualToSecond());
         $this->assertEquals($input, $this->field->getDisplayedData());
         $this->assertEquals(null, $this->field->getData());
@@ -48,12 +48,12 @@ class RepeatedFieldTest extends \PHPUnit_Framework_TestCase
 
     public function testBindEqual()
     {
-        $input = array('first' => 'foo', 'second' => 'foo');
+        $input = array('name' => 'foo', 'name_repeat' => 'foo');
 
         $this->field->bind($input);
 
-        $this->assertEquals('foo', $this->field['first']->getDisplayedData());
-        $this->assertEquals('foo', $this->field['second']->getDisplayedData());
+        $this->assertEquals('foo', $this->field['name']->getDisplayedData());
+        $this->assertEquals('foo', $this->field['name_repeat']->getDisplayedData());
         $this->assertTrue($this->field->isFirstEqualToSecond());
         $this->assertEquals($input, $this->field->getDisplayedData());
         $this->assertEquals('foo', $this->field->getData());

@@ -278,6 +278,7 @@ class FieldGroup extends Field implements \IteratorAggregate, FieldGroupInterfac
      * Returns the data of the field as it is displayed to the user.
      *
      * @see FieldInterface
+     * @return array of field name => value
      */
     public function getDisplayedData()
     {
@@ -294,7 +295,6 @@ class FieldGroup extends Field implements \IteratorAggregate, FieldGroupInterfac
      * Binds POST data to the field, transforms and validates it.
      *
      * @param  string|array $taintedData  The POST data
-     * @return boolean                    Whether the form is valid
      */
     public function bind($taintedData)
     {

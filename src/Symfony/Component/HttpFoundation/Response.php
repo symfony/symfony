@@ -19,7 +19,7 @@ namespace Symfony\Component\HttpFoundation;
 class Response
 {
     /**
-     * @var \Symfony\Component\HttpFoundation\HeaderBag
+     * @var \Symfony\Component\HttpFoundation\ResponseHeaderBag
      */
     public $headers;
 

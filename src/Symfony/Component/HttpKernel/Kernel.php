@@ -446,9 +446,6 @@ abstract class Kernel implements HttpKernelInterface, \Serializable
         // replace multiple new lines with a single newline
         $output = preg_replace(array('/\s+$/Sm', '/\n+/S'), "\n", $output);
 
-        // reformat {} "a la python"
-        $output = preg_replace(array('/\n\s*\{/', '/\n\s*\}/'), array(' {', ' }'), $output);
-
         return $output;
     }
 

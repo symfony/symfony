@@ -2,6 +2,12 @@
 
 namespace Symfony\Tests\Component\DependencyInjection\Compiler;
 
+use Symfony\Component\DependencyInjection\Compiler\AnalyzeServiceReferencesPass;
+
+use Symfony\Component\DependencyInjection\Compiler\Compiler;
+
+use Symfony\Component\DependencyInjection\Compiler\RepeatedPass;
+
 use Symfony\Component\DependencyInjection\Compiler\InlineServiceDefinitionsPass;
 use Symfony\Component\DependencyInjection\Reference;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
@@ -77,7 +83,8 @@ class InlineServiceDefinitionsPassTest extends \PHPUnit_Framework_TestCase
 
     protected function process(ContainerBuilder $container)
     {
-        $pass = new InlineServiceDefinitionsPass();
-        $pass->process($container);
+        $repeatedPass = new RepeatedPass(array(new AnalyzeServiceReferencesPass(), new InlineServiceDefinitionsPass()));
+        $repeatedPass->setCompiler(new Compiler());
+        $repeatedPass->process($container);
     }
 }

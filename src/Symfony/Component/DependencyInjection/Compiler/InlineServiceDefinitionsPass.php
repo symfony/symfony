@@ -23,8 +23,8 @@ use Symfony\Component\DependencyInjection\ContainerBuilder;
  */
 class InlineServiceDefinitionsPass implements RepeatablePassInterface
 {
-    protected $aliasMap;
     protected $repeatedPass;
+    protected $graph;
 
     public function setRepeatedPass(RepeatedPass $repeatedPass)
     {
@@ -33,14 +33,7 @@ class InlineServiceDefinitionsPass implements RepeatablePassInterface
 
     public function process(ContainerBuilder $container)
     {
-        $this->aliasMap = array();
-        foreach ($container->getAliases() as $id => $alias) {
-            if (!$alias->isPublic()) {
-                continue;
-            }
-
-            $this->aliasMap[$id] = (string) $alias;
-        }
+        $this->graph = $this->repeatedPass->getCompiler()->getServiceReferenceGraph();
 
         foreach ($container->getDefinitions() as $id => $definition) {
             $definition->setArguments(
@@ -82,43 +75,15 @@ class InlineServiceDefinitionsPass implements RepeatablePassInterface
             return false;
         }
 
-        $references = count(array_keys($this->aliasMap, $id, true));
-        foreach ($container->getDefinitions() as $cDefinition)
-        {
-            if ($references > 1) {
-                break;
-            }
-
-            if ($this->isReferencedByArgument($id, $cDefinition->getArguments())) {
-                $references += 1;
-                continue;
-            }
-
-            foreach ($cDefinition->getMethodCalls() as $call) {
-                if ($this->isReferencedByArgument($id, $call[1])) {
-                    $references += 1;
-                    continue 2;
-                }
-            }
+        if (!$this->graph->hasNode($id)) {
+            return true;
         }
 
-        return $references <= 1;
-    }
-
-    protected function isReferencedByArgument($id, $argument)
-    {
-        if (is_array($argument)) {
-            foreach ($argument as $arg) {
-                if ($this->isReferencedByArgument($id, $arg)) {
-                    return true;
-                }
-            }
-        } else if ($argument instanceof Reference) {
-            if ($id === (string) $argument) {
-                return true;
-            }
+        $ids = array();
+        foreach ($this->graph->getNode($id)->getInEdges() as $edge) {
+            $ids[] = $edge->getSourceNode()->getId();
         }
 
-        return false;
+        return count(array_unique($ids)) <= 1;
     }
 }

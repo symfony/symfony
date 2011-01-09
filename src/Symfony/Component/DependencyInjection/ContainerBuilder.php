@@ -2,12 +2,7 @@
 
 namespace Symfony\Component\DependencyInjection;
 
-use Symfony\Component\DependencyInjection\Compiler\PassConfig;
-
-use Symfony\Component\DependencyInjection\Compiler\RemoveUnusedDefinitionsPass;
-
-use Symfony\Component\DependencyInjection\Compiler\ResolveInterfaceInjectorsPass;
-use Symfony\Component\DependencyInjection\Compiler\MergeExtensionConfigurationPass;
+use Symfony\Component\DependencyInjection\Compiler\Compiler;
 use Symfony\Component\DependencyInjection\Compiler\CompilerPassInterface;
 use Symfony\Component\DependencyInjection\Extension\ExtensionInterface;
 use Symfony\Component\DependencyInjection\InterfaceInjector;
@@ -39,7 +34,7 @@ class ContainerBuilder extends Container implements TaggedContainerInterface
     protected $resources        = array();
     protected $extensionConfigs = array();
     protected $injectors        = array();
-    protected $compilerPassConfig;
+    protected $compiler;
 
     /**
      * Constructor
@@ -49,7 +44,7 @@ class ContainerBuilder extends Container implements TaggedContainerInterface
     {
         parent::__construct($parameterBag);
 
-        $this->compilerPassConfig = new PassConfig();
+        $this->compiler = new Compiler();
     }
 
     /**
@@ -154,7 +149,7 @@ class ContainerBuilder extends Container implements TaggedContainerInterface
      */
     public function addCompilerPass(CompilerPassInterface $pass)
     {
-        $this->compilerPassConfig->addPass($pass);
+        $this->compiler->addPass($pass);
     }
 
     /**
@@ -164,7 +159,17 @@ class ContainerBuilder extends Container implements TaggedContainerInterface
      */
     public function getCompilerPassConfig()
     {
-        return $this->compilerPassConfig;
+        return $this->compiler->getPassConfig();
+    }
+
+    /**
+     * Returns the compiler instance
+     *
+     * @return Compiler
+     */
+    public function getCompiler()
+    {
+        return $this->compiler;
     }
 
     /**
@@ -335,9 +340,7 @@ class ContainerBuilder extends Container implements TaggedContainerInterface
      */
     public function freeze()
     {
-        foreach ($this->compilerPassConfig->getPasses() as $pass) {
-            $pass->process($this);
-        }
+        $this->compiler->compile($this);
 
         parent::freeze();
     }

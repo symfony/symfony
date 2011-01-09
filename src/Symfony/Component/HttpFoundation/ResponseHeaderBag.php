@@ -39,6 +39,7 @@ class ResponseHeaderBag extends HeaderBag
     {
         parent::set($key, $values, $replace);
 
+        // ensure the cache-control header has sensible defaults
         if ('cache-control' === strtr(strtolower($key), '_', '-')) {
             $computed = $this->computeCacheControlValue();
             $this->headers['cache-control'] = array($computed);
@@ -115,6 +116,14 @@ class ResponseHeaderBag extends HeaderBag
         return array_key_exists($key, $this->computedCacheControl) ? $this->computedCacheControl[$key] : null;
     }
 
+    /**
+     * Returns the calculated value of the cache-control header.
+     *
+     * This considers several other headers and calculates or modifies the
+     * cache-control header to a sensible, conservative value.
+     *
+     * @return string
+     */
     protected function computeCacheControlValue()
     {
         if (!$this->cacheControl && !$this->has('ETag') && !$this->has('Last-Modified') && !$this->has('Expires')) {

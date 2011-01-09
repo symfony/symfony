@@ -182,11 +182,27 @@ EOF;
     {
         $code = '';
         $variableMap = $this->definitionVariables;
+        $nbOccurrences = new \SplObjectStorage();
+        $processed = new \SplObjectStorage();
+        $inlinedDefinitions = $this->getInlinedDefinitions($definition);
 
-        $c = 1;
-        foreach ($this->getInlinedDefinitions($definition) as $sDefinition) {
+        foreach ($inlinedDefinitions as $definition) {
+            if (false === $nbOccurrences->contains($definition)) {
+                $nbOccurrences->offsetSet($definition, 1);
+            } else {
+                $i = $nbOccurrences->offsetGet($definition);
+                $nbOccurrences->offsetSet($definition, $i+1);
+            }
+        }
+
+        foreach ($inlinedDefinitions as $sDefinition) {
+            if ($processed->contains($sDefinition)) {
+                continue;
+            }
+            $processed->offsetSet($sDefinition);
+
             $class = $this->dumpValue($sDefinition->getClass());
-            if (count($sDefinition->getMethodCalls()) > 0 || null !== $sDefinition->getConfigurator() || false !== strpos($class, '$')) {
+            if ($nbOccurrences->offsetGet($sDefinition) > 1 || count($sDefinition->getMethodCalls()) > 0 || null !== $sDefinition->getConfigurator() || false !== strpos($class, '$')) {
                 $name = $this->getNextVariableName();
                 $variableMap->offsetSet($sDefinition, new Variable($name));
 
@@ -326,7 +342,13 @@ EOF;
         $this->referenceVariables[$id] = new Variable('instance');
 
         $code = '';
+        $processed = new \SplObjectStorage();
         foreach ($this->getInlinedDefinitions($definition) as $iDefinition) {
+            if ($processed->contains($iDefinition)) {
+                continue;
+            }
+            $processed->offsetSet($iDefinition);
+
             if (!$this->hasReference($id, $iDefinition->getMethodCalls())) {
                 continue;
             }

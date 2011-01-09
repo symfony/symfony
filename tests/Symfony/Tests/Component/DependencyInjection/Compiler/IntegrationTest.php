@@ -72,4 +72,32 @@ class IntegrationTest extends \PHPUnit_Framework_TestCase
         $this->assertFalse($container->hasAlias('b'));
         $this->assertFalse($container->hasDefinition('c'));
     }
+
+    public function testProcessInlinesWhenThereAreMultipleReferencesButFromTheSameDefinition()
+    {
+        $container = new ContainerBuilder();
+
+        $container
+            ->register('a')
+            ->addArgument(new Reference('b'))
+            ->addMethodCall('setC', array(new Reference('c')))
+        ;
+
+        $container
+            ->register('b')
+            ->addArgument(new Reference('c'))
+            ->setPublic(false)
+        ;
+
+        $container
+            ->register('c')
+            ->setPublic(false)
+        ;
+
+        $container->freeze();
+
+        $this->assertTrue($container->hasDefinition('a'));
+        $this->assertFalse($container->hasDefinition('b'));
+        $this->assertFalse($container->hasDefinition('c'), 'Service C was not inlined.');
+    }
 }

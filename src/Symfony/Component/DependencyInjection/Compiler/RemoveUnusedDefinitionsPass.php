@@ -3,7 +3,6 @@
 namespace Symfony\Component\DependencyInjection\Compiler;
 
 use Symfony\Component\DependencyInjection\Alias;
-
 use Symfony\Component\DependencyInjection\Reference;
 use Symfony\Component\DependencyInjection\Definition;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
@@ -45,13 +44,16 @@ class RemoveUnusedDefinitionsPass implements RepeatablePassInterface
             if ($this->graph->hasNode($id)) {
                 $edges = $this->graph->getNode($id)->getInEdges();
                 $referencingAliases = array();
+                $sourceIds = array();
                 foreach ($edges as $edge) {
                     $node = $edge->getSourceNode();
+                    $sourceIds[] = $node->getId();
+
                     if ($node->isAlias()) {
                         $referencingAlias[] = $node->getValue();
                     }
                 }
-                $isReferenced = (count($edges) - count($referencingAliases)) > 0;
+                $isReferenced = (count(array_unique($sourceIds)) - count($referencingAliases)) > 0;
             } else {
                 $referencingAliases = array();
                 $isReferenced = false;

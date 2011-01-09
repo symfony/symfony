@@ -3,7 +3,6 @@
 namespace Symfony\Component\DependencyInjection\Compiler;
 
 use Symfony\Component\DependencyInjection\Definition;
-
 use Symfony\Component\DependencyInjection\Reference;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 
@@ -57,8 +56,15 @@ class InlineServiceDefinitionsPass implements RepeatablePassInterface
                 }
 
                 if ($this->isInlinableDefinition($container, $id, $definition = $container->getDefinition($id))) {
-                    $arguments[$k] = $definition;
+                    if ($definition->isShared()) {
+                        $arguments[$k] = $definition;
+                    } else {
+                        $arguments[$k] = clone $definition;
+                    }
                 }
+            } else if ($argument instanceof Definition) {
+                $argument->setArguments($this->inlineArguments($container, $argument->getArguments()));
+                $argument->setMethodCalls($this->inlineArguments($container, $argument->getMethodCalls()));
             }
         }
 

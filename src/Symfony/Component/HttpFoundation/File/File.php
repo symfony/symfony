@@ -516,10 +516,8 @@ class File
      */
     public function getExtension()
     {
-        $name = $this->getName();
-
-        if (false !== ($pos = strrpos($name, '.'))) {
-            return substr($name, $pos);
+        if ($ext = pathinfo($this->getName(), \PATHINFO_EXTENSION)) {
+            return '.' . $ext;
         } else {
             return '';
         }
@@ -634,11 +632,16 @@ class File
     /**
      * Moves the file to a new location.
      *
-     * @param string $directory
+     * @param string $directory   The destination folder
+     * @param string $name        The new file name
      */
-    public function move($directory)
+    public function move($directory, $name = null)
     {
         $this->doMove($directory, $this->getName());
+
+        if (null !== $name) {
+            $this->rename($name);
+        }
     }
 
     /**

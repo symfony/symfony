@@ -93,6 +93,26 @@ class FileTest extends \PHPUnit_Framework_TestCase
         @unlink($targetPath);
     }
 
+    public function testMoveWithNewName()
+    {
+        $path = __DIR__.'/Fixtures/test.copy.gif';
+        $targetDir = __DIR__.DIRECTORY_SEPARATOR.'Fixtures'.DIRECTORY_SEPARATOR.'directory';
+        $targetPath = $targetDir.DIRECTORY_SEPARATOR.'test.newname.gif';
+        @unlink($path);
+        @unlink($targetPath);
+        copy(__DIR__.'/Fixtures/test.gif', $path);
+
+        $file = new File($path);
+        $file->move($targetDir, 'test.newname.gif');
+
+        $this->assertTrue(file_exists($targetPath));
+        $this->assertFalse(file_exists($path));
+        $this->assertEquals($targetPath, $file->getPath());
+
+        @unlink($path);
+        @unlink($targetPath);
+    }
+
     public function testRename()
     {
         $path = __DIR__.'/Fixtures/test.copy.gif';

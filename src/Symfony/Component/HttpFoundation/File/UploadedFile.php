@@ -144,12 +144,16 @@ class UploadedFile extends File
     /**
      * @inheritDoc
      */
-    public function move($directory)
+    public function move($directory, $name = null)
     {
         if (!$this->moved) {
             $this->doMove($directory, $this->originalName);
+
+            if (null !== $name) {
+                $this->rename($name);
+            }
         } else {
-            parent::move($directory);
+            parent::move($directory, $name);
         }
     }
 }

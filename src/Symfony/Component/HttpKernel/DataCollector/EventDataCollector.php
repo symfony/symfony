@@ -38,33 +38,33 @@ class EventDataCollector extends DataCollector
     public function collect(Request $request, Response $response, \Exception $exception = null)
     {
         $this->data = array(
-            'called_events'     => null !== $this->dispatcher ? $this->dispatcher->getCalledEvents() : array(),
-            'not_called_events' => null !== $this->dispatcher ? $this->dispatcher->getNotCalledEvents() : array(),
+            'called_listeners'     => null !== $this->dispatcher ? $this->dispatcher->getCalledListeners() : array(),
+            'not_called_listeners' => null !== $this->dispatcher ? $this->dispatcher->getNotCalledListeners() : array(),
         );
     }
 
     /**
-     * Gets the called events.
+     * Gets the called listeners.
      *
-     * @return array An array of called events
+     * @return array An array of called listeners
      *
      * @see EventDispatcherTraceableInterface
      */
-    public function getCalledEvents()
+    public function getCalledListeners()
     {
-        return $this->data['called_events'];
+        return $this->data['called_listeners'];
     }
 
     /**
-     * Gets the not called events.
+     * Gets the not called listeners.
      *
-     * @return array An array of not called events
+     * @return array An array of not called listeners
      *
      * @see EventDispatcherTraceableInterface
      */
-    public function getNotCalledEvents()
+    public function getNotCalledListeners()
     {
-        return $this->data['not_called_events'];
+        return $this->data['not_called_listeners'];
     }
 
     /**

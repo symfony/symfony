@@ -39,11 +39,7 @@ class EventDispatcher extends BaseEventDispatcher implements EventDispatcherTrac
     }
 
     /**
-     * Notifies all listeners of a given event.
-     *
-     * @param Event $event A Event instance
-     *
-     * @return Event The Event instance
+     * {@inheritDoc}
      */
     public function notify(Event $event)
     {
@@ -57,11 +53,7 @@ class EventDispatcher extends BaseEventDispatcher implements EventDispatcherTrac
     }
 
     /**
-     * Notifies all listeners of a given event until one returns a non null value.
-     *
-     * @param  Event $event A Event instance
-     *
-     * @return Event The Event instance
+     * {@inheritDoc}
      */
     public function notifyUntil(Event $event)
     {
@@ -87,12 +79,7 @@ class EventDispatcher extends BaseEventDispatcher implements EventDispatcherTrac
     }
 
     /**
-     * Filters a value by calling all listeners of a given event.
-     *
-     * @param  Event  $event   A Event instance
-     * @param  mixed    $value   The value to be filtered
-     *
-     * @return Event The Event instance
+     * {@inheritDoc}
      */
     public function filter(Event $event, $value)
     {
@@ -107,12 +94,18 @@ class EventDispatcher extends BaseEventDispatcher implements EventDispatcherTrac
         return $event;
     }
 
-    public function getCalledEvents()
+    /**
+     * {@inheritDoc}
+     */
+    public function getCalledListeners()
     {
         return $this->called;
     }
 
-    public function getNotCalledEvents()
+    /**
+     * {@inheritDoc}
+     */
+    public function getNotCalledListeners()
     {
         $notCalled = array();
 

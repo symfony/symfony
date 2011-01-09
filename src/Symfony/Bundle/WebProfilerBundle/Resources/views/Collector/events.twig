@@ -6,7 +6,7 @@ Events
 {% endblock %}
 
 {% block panel %}
-    <h2>Called Events</h2>
+    <h2>Called Listeners</h2>
 
     <table>
         <tr>
@@ -14,27 +14,27 @@ Events
             <th>Caller</th>
             <th>Listener</th>
         </tr>
-        {% for event in collector.calledevents %}
+        {% for elements in collector.calledlisteners %}
             <tr>
-                <td><code>{{ event.event }}</code></td>
-                <td><code>{{ event.caller|abbr_class }}</code></td>
-                <td><code>{{ event.listener|abbr_method }}()</code></td>
+                <td><code>{{ elements.event }}</code></td>
+                <td><code>{{ elements.caller|abbr_class }}</code></td>
+                <td><code>{{ elements.listener|abbr_method }}()</code></td>
             </tr>
         {% endfor %}
     </table>
 
-    {% if collector.notcalledevents %}
-        <h2>Not Called Events</h2>
+    {% if collector.notcalledlisteners %}
+        <h2>Not Called Listeners</h2>
 
         <table>
             <tr>
                 <th>Event</th>
                 <th>Listener</th>
             </tr>
-            {% for event in collector.notcalledevents %}
+            {% for elements in collector.notcalledlisteners %}
                 <tr>
-                    <td><code>{{ event.event }}</code></td>
-                    <td><code>{{ event.listener|abbr_method }}()</code></td>
+                    <td><code>{{ elements.event }}</code></td>
+                    <td><code>{{ elements.listener|abbr_method }}()</code></td>
                 </tr>
             {% endfor %}
         </table>

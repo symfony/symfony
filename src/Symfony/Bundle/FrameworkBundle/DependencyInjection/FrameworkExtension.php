@@ -481,18 +481,13 @@ class FrameworkExtension extends Extension
             // default entries by the framework
             $xmlMappingFiles[] = __DIR__.'/../../../Component/Form/Resources/config/validation.xml';
 
-            foreach ($container->getParameter('kernel.bundles') as $className) {
-                $tmp = dirname(str_replace('\\', '/', $className));
-                $namespace = str_replace('/', '\\', dirname($tmp));
-                $bundle = basename($tmp);
-
-                foreach ($container->getParameter('kernel.bundle_dirs') as $dir) {
-                    if (file_exists($file = $dir.'/'.$bundle.'/Resources/config/validation.xml')) {
-                        $xmlMappingFiles[] = realpath($file);
-                    }
-                    if (file_exists($file = $dir.'/'.$bundle.'/Resources/config/validation.yml')) {
-                        $yamlMappingFiles[] = realpath($file);
-                    }
+            foreach ($container->getParameter('kernel.bundles') as $bundle) {
+                $reflection = new \ReflectionClass($bundle);
+                if (file_exists($file = dirname($reflection->getFilename()).'/Resources/config/validation.xml')) {
+                    $xmlMappingFiles[] = realpath($file);
+                }
+                if (file_exists($file = dirname($reflection->getFilename()).'/Resources/config/validation.yml')) {
+                    $yamlMappingFiles[] = realpath($file);
                 }
             }
 

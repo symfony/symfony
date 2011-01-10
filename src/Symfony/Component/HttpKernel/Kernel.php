@@ -297,7 +297,8 @@ abstract class Kernel implements HttpKernelInterface, \Serializable
         $reload = $this->debug ? $this->needsReload($class, $location) : false;
 
         if ($reload || !file_exists($location.'.php')) {
-            $this->buildContainer($class, $location.'.php');
+            $container = $this->buildContainer();
+            $this->dumpContainer($container, $class, $location.'.php');
         }
 
         require_once $location.'.php';
@@ -360,7 +361,7 @@ abstract class Kernel implements HttpKernelInterface, \Serializable
         return false;
     }
 
-    protected function buildContainer($class, $file)
+    protected function buildContainer()
     {
         $parameterBag = new ParameterBag($this->getKernelParameters());
 
@@ -377,7 +378,11 @@ abstract class Kernel implements HttpKernelInterface, \Serializable
             $container->merge($cont);
         }
         $container->freeze();
+        return $container;
+    }
 
+    protected function dumpContainer(ContainerBuilder $container, $class, $file)
+    {
         foreach (array('cache', 'logs') as $name) {
             $dir = $container->getParameter(sprintf('kernel.%s_dir', $name));
             if (!is_dir($dir)) {

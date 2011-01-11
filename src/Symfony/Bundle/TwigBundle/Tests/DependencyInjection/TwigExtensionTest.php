@@ -14,6 +14,7 @@ namespace Symfony\Bundle\TwigBundle\Tests\DependencyInjection;
 use Symfony\Bundle\TwigBundle\Tests\TestCase;
 use Symfony\Bundle\TwigBundle\DependencyInjection\TwigExtension;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
+use Symfony\Component\DependencyInjection\Reference;
 
 class TwigExtensionTest extends TestCase
 {
@@ -36,18 +37,28 @@ class TwigExtensionTest extends TestCase
         // XML
         $container = new ContainerBuilder();
         $loader = new TwigExtension();
-        $loader->configLoad(array('global' => array(array('key' => 'foo', 'id' => 'bar'))), $container);
+        $loader->configLoad(array('global' => array(
+            array('key' => 'foo', 'type' => 'service', 'id' => 'bar'),
+            array('key' => 'pi', 'value' => 3.14),
+        )), $container);
         $config = $container->getDefinition('twig')->getMethodCalls();
         $this->assertEquals('foo', $config[0][1][0]);
-        $this->assertEquals('bar', (string) $config[0][1][1]);
+        $this->assertEquals(new Reference('bar'), $config[0][1][1]);
+        $this->assertEquals('pi', $config[1][1][0]);
+        $this->assertEquals(3.14, $config[1][1][1]);
 
         // YAML, PHP
         $container = new ContainerBuilder();
         $loader = new TwigExtension();
-        $loader->configLoad(array('globals' => array('foo' => 'bar')), $container);
+        $loader->configLoad(array('globals' => array(
+            'foo' => '@bar',
+            'pi'  => 3.14,
+        )), $container);
         $config = $container->getDefinition('twig')->getMethodCalls();
         $this->assertEquals('foo', $config[0][1][0]);
-        $this->assertEquals('bar', (string) $config[0][1][1]);
+        $this->assertEquals(new Reference('bar'), $config[0][1][1]);
+        $this->assertEquals('pi', $config[1][1][0]);
+        $this->assertEquals(3.14, $config[1][1][1]);
     }
 
     public function testConfigExtensions()

@@ -10,7 +10,7 @@
     <xsd:complexType name="config">
         <xsd:sequence>
             <xsd:element name="form" type="form" minOccurs="0" maxOccurs="1" />
-            <xsd:element name="global" type="global" minOccurs="0" maxOccurs="1" />
+            <xsd:element name="global" type="global" minOccurs="0" maxOccurs="unbounded" />
             <xsd:element name="extension" type="extension" minOccurs="0" maxOccurs="unbounded" />
         </xsd:sequence>
 
@@ -29,8 +29,9 @@
         </xsd:sequence>
     </xsd:complexType>
 
-    <xsd:complexType name="global">
-        <xsd:attribute name="key" type="xsd:string" />
+    <xsd:complexType name="global" mixed="true">
+        <xsd:attribute name="key" type="xsd:string" use="required" />
+        <xsd:attribute name="type" type="xsd:string" />
         <xsd:attribute name="id" type="xsd:string" />
     </xsd:complexType>
 

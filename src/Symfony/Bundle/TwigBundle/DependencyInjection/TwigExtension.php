@@ -84,7 +84,10 @@ class TwigExtension extends Extension
 
         // convert - to _
         foreach ($config as $key => $value) {
-            $config[str_replace('-', '_', $key)] = $value;
+            if (false !== strpos($key, '-')) {
+                unset($config[$key]);
+                $config[str_replace('-', '_', $key)] = $value;
+            }            
         }
 
         $container->setParameter('twig.options', array_replace($container->getParameter('twig.options'), $config));

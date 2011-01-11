@@ -55,6 +55,11 @@ class FrameworkBundle extends Bundle
         });
     }
 
+    public function shutdown()
+    {
+        FormConfiguration::clearDefaultCsrfSecrets();
+    }
+
     public function registerExtensions(ContainerBuilder $container)
     {
         parent::registerExtensions($container);

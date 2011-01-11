@@ -44,7 +44,7 @@ class InterfaceInjectorTest extends \PHPUnit_Framework_TestCase
     /**
      * @covers Symfony\Component\DependencyInjection\InterfaceInjector::processDefinition
      *
-     * @dataProvider getInjectorsAndDefintions
+     * @dataProvider getInjectorsAndDefinitions
      *
      * @param InterfaceInjector $injector
      * @param Definition $definition
@@ -122,7 +122,7 @@ class InterfaceInjectorTest extends \PHPUnit_Framework_TestCase
         );
     }
 
-    public function getInjectorsAndDefintions()
+    public function getInjectorsAndDefinitions()
     {
         $injector = new InterfaceInjector('Symfony\Tests\Component\DependencyInjection\Service');
         $injector->addMethodCall('method');

@@ -26,6 +26,7 @@ class ApplicationTest extends \PHPUnit_Framework_TestCase
         require_once self::$fixturesPath.'/FooCommand.php';
         require_once self::$fixturesPath.'/Foo1Command.php';
         require_once self::$fixturesPath.'/Foo2Command.php';
+        require_once self::$fixturesPath.'/Foo3Command.php';
     }
 
     protected function normalize($text)
@@ -245,6 +246,12 @@ class ApplicationTest extends \PHPUnit_Framework_TestCase
 
         $tester->run(array('command' => 'list', '--foo' => true));
         $this->assertStringEqualsFile(self::$fixturesPath.'/application_renderexception2.txt', $this->normalize($tester->getDisplay()), '->renderException() renders the command synopsis when an exception occurs in the context of a command');
+
+        $application->add(new \Foo3Command);
+        $tester = new ApplicationTester($application);
+        $tester->run(array('command' => 'foo3:bar'));
+        $this->assertStringEqualsFile(self::$fixturesPath.'/application_renderexception3.txt', $this->normalize($tester->getDisplay()), '->renderException() renders a pretty exceptions with previous exceptions');
+
     }
 
     public function testRun()

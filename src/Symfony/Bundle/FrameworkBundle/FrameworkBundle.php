@@ -37,6 +37,9 @@ class FrameworkBundle extends Bundle
         if ($this->container->has('error_handler')) {
             $this->container->get('error_handler');
         }
+
+        FormConfiguration::clearDefaultCsrfSecrets();
+
         if ($this->container->hasParameter('csrf_secret')) {
             FormConfiguration::addDefaultCsrfSecret($this->container->getParameter('csrf_secret'));
             FormConfiguration::enableDefaultCsrfProtection();

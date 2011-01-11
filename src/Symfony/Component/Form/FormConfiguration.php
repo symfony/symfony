@@ -108,6 +108,11 @@ class FormConfiguration
         self::$defaultCsrfSecrets[] = $secret;
     }
 
+    static public function clearDefaultCsrfSecrets()
+    {
+        self::$defaultCsrfSecrets = array();
+    }
+
     /**
      * Returns the default CSRF secrets
      *

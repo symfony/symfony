@@ -37,7 +37,7 @@ class SwiftMailerExtension extends Extension
      * @param array            $config    An array of configuration settings
      * @param ContainerBuilder $container A ContainerBuilder instance
      */
-    public function configLoad($config, ContainerBuilder $container)
+    public function configLoad(array $config, ContainerBuilder $container)
     {
         if (!$container->hasDefinition('swiftmailer.mailer')) {
             $loader = new XmlFileLoader($container, __DIR__.'/../Resources/config');

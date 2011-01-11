@@ -13,6 +13,7 @@
         </parameter>
         <parameter key="twig.loader.class">Symfony\Bundle\TwigBundle\Loader\Loader</parameter>
         <parameter key="twig.renderer.class">Symfony\Bundle\TwigBundle\Renderer\Renderer</parameter>
+        <parameter key="twig.globals.class">Symfony\Bundle\TwigBundle\GlobalVariables</parameter>
         <parameter key="twig.form.resources" type="collection">
             <parameter>TwigBundle::form.twig</parameter>
         </parameter>
@@ -29,9 +30,14 @@
             <argument type="service" id="templating.loader" />
         </service>
 
+        <service id="twig.globals" class="%twig.globals.class%">
+            <argument type="service" id="service_container" />
+        </service>
+
         <service id="twig.renderer" class="%twig.renderer.class%">
             <tag name="templating.renderer" alias="twig" />
             <argument type="service" id="twig" />
+            <argument type="service" id="twig.globals" />
         </service>
 
         <service id="twig.extension.trans" class="Symfony\Bundle\TwigBundle\Extension\TransExtension" public="false">

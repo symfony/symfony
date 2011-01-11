@@ -45,9 +45,9 @@ class ResolveInvalidReferencesPass implements CompilerPassInterface
             );
 
             $calls = array();
-            foreach ($definition->getMethodCalls() as $k => $call) {
+            foreach ($definition->getMethodCalls() as $call) {
                 try {
-                    $calls[$k] = $this->processArguments($call, true);
+                    $calls[] = array($call[0], $this->processArguments($call[1], true));
                 } catch (\RuntimeException $ignore) {
                     // this call is simply removed
                 }

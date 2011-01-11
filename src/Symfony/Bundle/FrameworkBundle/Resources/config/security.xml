@@ -97,7 +97,7 @@
             <argument type="collection"></argument>
         </service>
         
-        <service id="security.encoder_factory" alias="security.encoder_factory.generic" public="false"></service>
+        <service id="security.encoder_factory" alias="security.encoder_factory.generic"></service>
 
         <service id="security.logout.handler.session" class="%security.logout.handler.session.class%" public="false"></service>
 

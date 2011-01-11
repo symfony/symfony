@@ -46,6 +46,58 @@ abstract class WebTestCase extends BaseWebTestCase
     }
 
     /**
+     * Find the directory where the phpunit.xml(.dist) is stored
+     *
+     * @return string directory with the phpunit.xml(.dist)
+     */
+    protected function findPhpUnitXmlDir()
+    {
+        $dir = getcwd();
+        if (!isset($_SERVER['argv']) || false === strpos($_SERVER['argv'][0], 'phpunit')) {
+            throw new \RuntimeException('You must override the WebTestCase::createKernel() method.');
+        }
+
+        // find the --configuration flag from PHPUnit
+        $cli = implode(' ', $_SERVER['argv']);
+        if (preg_match('/\-\-configuration[= ]+([^ ]+)/', $cli, $matches)) {
+            $dir = $dir.'/'.$matches[1];
+        } elseif (preg_match('/\-c +([^ ]+)/', $cli, $matches)) {
+            $dir = $dir.'/'.$matches[1];
+        } elseif (file_exists(getcwd().'/phpunit.xml') || file_exists(getcwd().'/phpunit.xml.dist')) {
+            $dir = getcwd();
+        } else {
+            throw new \RuntimeException('Unable to guess the Kernel directory.');
+        }
+
+        if (!is_dir($dir)) {
+            $dir = dirname($dir);
+        }
+
+        return $dir;
+    }
+
+    /**
+     * Attempts to guess the kernel location
+     *
+     * @return array file and class name
+     */
+    protected function findKernel()
+    {
+        $dir = isset($_SERVER['KERNEL_DIR']) ? $_SERVER['KERNEL_DIR'] : $this->findPhpUnitXmlDir();
+
+        $finder = new Finder();
+        $finder->name('*Kernel.php')->in($dir);
+        if (!count($finder)) {
+            throw new \RuntimeException('You must override the WebTestCase::createKernel() method.');
+        }
+
+        $file = current(iterator_to_array($finder));
+        $class = $file->getBasename('.php');
+
+        return array($file, $class);
+    }
+
+    /**
      * Creates a Kernel.
      *
      * If you run tests with the PHPUnit CLI tool, everything will work as expected.
@@ -62,41 +114,7 @@ abstract class WebTestCase extends BaseWebTestCase
      */
     protected function createKernel(array $options = array())
     {
-        if (isset($_SERVER['KERNEL_DIR'])) {
-            $dir = $_SERVER['KERNEL_DIR'];
-        } else {
-            // black magic below, you have been warned!
-            $dir = getcwd();
-            if (!isset($_SERVER['argv']) || false === strpos($_SERVER['argv'][0], 'phpunit')) {
-                throw new \RuntimeException('You must override the WebTestCase::createKernel() method.');
-            }
-
-            // find the --configuration flag from PHPUnit
-            $cli = implode(' ', $_SERVER['argv']);
-            if (preg_match('/\-\-configuration[= ]+([^ ]+)/', $cli, $matches)) {
-                $dir = $dir.'/'.$matches[1];
-            } elseif (preg_match('/\-c +([^ ]+)/', $cli, $matches)) {
-                $dir = $dir.'/'.$matches[1];
-            } elseif (file_exists(getcwd().'/phpunit.xml') || file_exists(getcwd().'/phpunit.xml.dist')) {
-                $dir = getcwd();
-            } else {
-                throw new \RuntimeException('Unable to guess the Kernel directory.');
-            }
-
-            if (!is_dir($dir)) {
-                $dir = dirname($dir);
-            }
-        }
-
-        $finder = new Finder();
-        $finder->name('*Kernel.php')->in($dir);
-        if (!count($finder)) {
-            throw new \RuntimeException('You must override the WebTestCase::createKernel() method.');
-        }
-
-        $file = current(iterator_to_array($finder));
-        $class = $file->getBasename('.php');
-        unset($finder);
+        list($file, $class) = $this->findKernel();
 
         require_once $file;
 

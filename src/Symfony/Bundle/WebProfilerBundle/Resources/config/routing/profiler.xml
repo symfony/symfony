@@ -16,19 +16,19 @@
         <default key="_controller">WebProfilerBundle:Profiler:import</default>
     </route>
 
-    <route id="_profiler_export" pattern="/export/:token.txt">
+    <route id="_profiler_export" pattern="/export/{token}.txt">
         <default key="_controller">WebProfilerBundle:Profiler:export</default>
     </route>
 
-    <route id="_profiler_search_results" pattern="/:token/search/results">
+    <route id="_profiler_search_results" pattern="/{token}/search/results">
         <default key="_controller">WebProfilerBundle:Profiler:searchResults</default>
     </route>
 
-    <route id="_profiler" pattern="/:token">
+    <route id="_profiler" pattern="/{token}">
         <default key="_controller">WebProfilerBundle:Profiler:panel</default>
     </route>
 
-    <route id="_profiler_panel" pattern="/:token/:panel">
+    <route id="_profiler_panel" pattern="/{token}/{panel}">
         <default key="_controller">WebProfilerBundle:Profiler:panel</default>
     </route>
 </routes>

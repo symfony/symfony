@@ -30,7 +30,7 @@ class GlobalVariables
     public function getSecurity()
     {
         if ($this->container->has('security.context')) {
-            return $this->security = $this->container->get('security.context');
+            return $this->container->get('security.context');
         }
     }
 
@@ -38,7 +38,7 @@ class GlobalVariables
     {
         $security = $this->getSecurity();
         if ($security && $user = $security->getUser()) {
-            return $this->user = $user;
+            return $user;
         }
     }
 

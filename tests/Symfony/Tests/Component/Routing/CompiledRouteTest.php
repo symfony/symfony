@@ -18,7 +18,7 @@ class CompiledRouteTest extends \PHPUnit_Framework_TestCase
 {
     public function testAccessors()
     {
-        $route = new Route('/:foo', array('foo' => 'bar'), array('foo' => '\d+'), array('foo' => 'bar'));
+        $route = new Route('/{foo}', array('foo' => 'bar'), array('foo' => '\d+'), array('foo' => 'bar'));
 
         $compiled = new CompiledRoute($route, 'prefix', 'regex', array('tokens'), array('variables'));
         $this->assertEquals($route, $compiled->getRoute(), '__construct() takes a route as its first argument');
@@ -30,10 +30,10 @@ class CompiledRouteTest extends \PHPUnit_Framework_TestCase
 
     public function testgetPatterngetDefaultsgetOptionsgetRequirements()
     {
-        $route = new Route('/:foo', array('foo' => 'bar'), array('foo' => '\d+'), array('foo' => 'bar'));
+        $route = new Route('/{foo}', array('foo' => 'bar'), array('foo' => '\d+'), array('foo' => 'bar'));
 
         $compiled = new CompiledRoute($route, 'prefix', 'regex', array('tokens'), array('variables'));
-        $this->assertEquals('/:foo', $compiled->getPattern(), '->getPattern() returns the route pattern');
+        $this->assertEquals('/{foo}', $compiled->getPattern(), '->getPattern() returns the route pattern');
         $this->assertEquals(array('foo' => 'bar'), $compiled->getDefaults(), '->getDefaults() returns the route defaults');
         $this->assertEquals(array('foo' => '\d+'), $compiled->getRequirements(), '->getRequirements() returns the route requirements');
         $this->assertEquals(array_merge(array(

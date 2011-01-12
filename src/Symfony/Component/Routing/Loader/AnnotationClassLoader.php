@@ -45,7 +45,7 @@ use Symfony\Component\Routing\RouteCollection;
  *         }
  *
  *         /**
- *          * @Route("/:id", name="blog_post", requirements = {"id" = "\d+"})
+ *          * @Route("/{id}", name="blog_post", requirements = {"id" = "\d+"})
  *          * /
  *         public function show()
  *         {

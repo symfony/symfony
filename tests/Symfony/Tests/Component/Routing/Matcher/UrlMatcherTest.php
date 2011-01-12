@@ -20,7 +20,7 @@ class UrlMatcherTest extends \PHPUnit_Framework_TestCase
     public function testNormalizeUrl()
     {
         $collection = new RouteCollection();
-        $collection->add('foo', new Route('/:foo'));
+        $collection->add('foo', new Route('/{foo}'));
 
         $matcher = new UrlMatcherForTests($collection, array(), array());
 

@@ -47,14 +47,14 @@ class TemplatingExtension extends \Twig_Extension
     public function getFilters()
     {
         return array(
-            'yaml_encode' => new \Twig_Filter_Method($this, 'yamlEncode'),
-            'dump' => new \Twig_Filter_Method($this, 'dump'),
-            'abbr_class' => new \Twig_Filter_Method($this, 'abbrClass', array('is_safe' => array('html'))),
-            'abbr_method' => new \Twig_Filter_Method($this, 'abbrMethod', array('is_safe' => array('html'))),
-            'format_args' => new \Twig_Filter_Method($this, 'formatArgs', array('is_safe' => array('html'))),
-            'format_args_as_text' => new \Twig_Filter_Method($this, 'formatArgsAsText', array('is_safe' => array('html'))),
-            'file_excerpt' => new \Twig_Filter_Method($this, 'fileExcerpt', array('is_safe' => array('html'))),
-            'format_file' => new \Twig_Filter_Method($this, 'formatFile', array('is_safe' => array('html'))),
+            'yaml_encode'           => new \Twig_Filter_Method($this, 'yamlEncode'),
+            'dump'                  => new \Twig_Filter_Method($this, 'dump'),
+            'abbr_class'            => new \Twig_Filter_Method($this, 'abbrClass', array('is_safe' => array('html'))),
+            'abbr_method'           => new \Twig_Filter_Method($this, 'abbrMethod', array('is_safe' => array('html'))),
+            'format_args'           => new \Twig_Filter_Method($this, 'formatArgs', array('is_safe' => array('html'))),
+            'format_args_as_text'   => new \Twig_Filter_Method($this, 'formatArgsAsText', array('is_safe' => array('html'))),
+            'file_excerpt'          => new \Twig_Filter_Method($this, 'fileExcerpt', array('is_safe' => array('html'))),
+            'format_file'           => new \Twig_Filter_Method($this, 'formatFile', array('is_safe' => array('html'))),
             'format_file_from_text' => new \Twig_Filter_Method($this, 'formatFileFromText', array('is_safe' => array('html'))),
         );
     }
@@ -86,6 +86,27 @@ class TemplatingExtension extends \Twig_Extension
     public function getAssetUrl($location)
     {
         return $this->container->get('templating.helper.assets')->getUrl($location);
+    }
+
+    /**
+     * Returns the Response content for a given controller or URI.
+     *
+     * @param string $controller A controller name to execute (a string like BlogBundle:Post:index), or a relative URI
+     * @param array  $attributes An array of request attributes
+     * @param array  $options    An array of options
+     *
+     * @see Symfony\Bundle\FrameworkBundle\Controller\ControllerResolver::render()
+     */
+    public function renderAction($controller, array $attributes = array(), array $options = array())
+    {
+        $options['attributes'] = $attributes;
+
+        if (isset($options['query']))
+        {
+            $options['query'] = $options['query'];
+        }
+
+        return $this->container->get('controller_resolver')->render($controller, $options);
     }
 
     /**

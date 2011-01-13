@@ -36,23 +36,22 @@ class CacheLoader extends Loader
      */
     public function __construct(Loader $loader, $dir)
     {
+        parent::__construct($loader->getTemplateNameParser());
+
         $this->loader = $loader;
         $this->dir = $dir;
-
-        parent::__construct();
     }
 
     /**
      * Loads a template.
      *
      * @param string $template The logical template name
-     * @param array  $options  An array of options
      *
      * @return Storage|Boolean false if the template cannot be loaded, a Storage instance otherwise
      */
-    public function load($template, array $options = array())
+    public function load($template)
     {
-        $options = $this->mergeDefaultOptions($options);
+        list($template, $options) = $this->nameParser->parse($template);
 
         $tmp = md5($template.serialize($options)).'.tpl';
         $dir = $this->dir.DIRECTORY_SEPARATOR.substr($tmp, 0, 2);
@@ -64,7 +63,7 @@ class CacheLoader extends Loader
                 $this->debugger->log(sprintf('Fetching template "%s" from cache', $template));
             }
 
-            return new FileStorage($path, $options['renderer']);
+            return new FileStorage($path);
         }
 
         if (false === $storage = $this->loader->load($template, $options)) {
@@ -83,18 +82,17 @@ class CacheLoader extends Loader
             $this->debugger->log(sprintf('Storing template "%s" in cache', $template));
         }
 
-        return new FileStorage($path, $options['renderer']);
+        return new FileStorage($path);
     }
 
     /**
      * Returns true if the template is still fresh.
      *
      * @param string    $template The template name
-     * @param array     $options  An array of options
      * @param timestamp $time     The last modification time of the cached template
      */
-    public function isFresh($template, array $options = array(), $time)
+    public function isFresh($template, $time)
     {
-        return $this->loader->isFresh($template, $options);
+        return $this->loader->isFresh($template, $time);
     }
 }

@@ -19,6 +19,7 @@ use Symfony\Bundle\TwigBundle\TokenParser\FormThemeTokenParser;
  */
 
 /**
+ * FormExtension extends Twig with form capabilities.
  *
  * @author Fabien Potencier <fabien.potencier@symfony-project.com>
  * @author Bernhard Schussek <bernhard.schussek@symfony-project.com>

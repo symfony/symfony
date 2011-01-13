@@ -33,8 +33,6 @@ class ChainLoader extends Loader
         foreach ($loaders as $loader) {
             $this->addLoader($loader);
         }
-
-        parent::__construct();
     }
 
     /**
@@ -51,14 +49,13 @@ class ChainLoader extends Loader
      * Loads a template.
      *
      * @param string $template The logical template name
-     * @param array  $options  An array of options
      *
      * @return Storage|Boolean false if the template cannot be loaded, a Storage instance otherwise
      */
-    public function load($template, array $options = array())
+    public function load($template)
     {
         foreach ($this->loaders as $loader) {
-            if (false !== $ret = $loader->load($template, $options)) {
+            if (false !== $ret = $loader->load($template)) {
                 return $ret;
             }
         }
@@ -70,15 +67,12 @@ class ChainLoader extends Loader
      * Returns true if the template is still fresh.
      *
      * @param string    $template The template name
-     * @param array     $options  An array of options
      * @param timestamp $time     The last modification time of the cached template
      */
-    public function isFresh($template, array $options = array(), $time)
+    public function isFresh($template, $time)
     {
         foreach ($this->loaders as $loader) {
-            if (false !== $ret = $loader->load($template, $options)) {
-                return $loader->isFresh($template, $options);
-            }
+            return $loader->isFresh($template);
         }
 
         return false;

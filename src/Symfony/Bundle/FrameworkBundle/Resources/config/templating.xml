@@ -5,7 +5,8 @@
     xsi:schemaLocation="http://www.symfony-project.org/schema/dic/services http://www.symfony-project.org/schema/dic/services/services-1.0.xsd">
 
     <parameters>
-        <parameter key="templating.engine.class">Symfony\Bundle\FrameworkBundle\Templating\Engine</parameter>
+        <parameter key="templating.engine.delegating.class">Symfony\Bundle\FrameworkBundle\Templating\DelegatingEngine</parameter>
+        <parameter key="templating.engine.php.class">Symfony\Bundle\FrameworkBundle\Templating\PhpEngine</parameter>
         <parameter key="templating.loader.filesystem.class">Symfony\Component\Templating\Loader\FilesystemLoader</parameter>
         <parameter key="templating.loader.cache.class">Symfony\Component\Templating\Loader\CacheLoader</parameter>
         <parameter key="templating.loader.chain.class">Symfony\Component\Templating\Loader\ChainLoader</parameter>
@@ -21,19 +22,25 @@
         <parameter key="templating.helper.form.class">Symfony\Bundle\FrameworkBundle\Templating\Helper\FormHelper</parameter>
         <parameter key="templating.assets.version">null</parameter>
         <parameter key="templating.assets.base_urls" type="collection"></parameter>
-        <parameter key="templating.name_converter.class">Symfony\Bundle\FrameworkBundle\Templating\TemplateNameConverter</parameter>
+        <parameter key="templating.name_parser.class">Symfony\Bundle\FrameworkBundle\Templating\TemplateNameParser</parameter>
         <parameter key="templating.renderer.php.class">Symfony\Component\Templating\Renderer\PhpRenderer</parameter>
         <parameter key="debug.file_link_format">null</parameter>
     </parameters>
 
     <services>
-        <service id="templating.engine" class="%templating.engine.class%" public="false">
+        <service id="templating.engine.delegating" class="%templating.engine.delegating.class%" public="false">
+            <argument type="service" id="service_container" />
+        </service>
+
+        <service id="templating.engine.php" class="%templating.engine.php.class%">
+            <tag name="templating.engine" priority="128" />
             <argument type="service" id="service_container" />
             <argument type="service" id="templating.loader" />
             <call method="setCharset"><argument>%kernel.charset%</argument></call>
         </service>
 
         <service id="templating.loader.filesystem" class="%templating.loader.filesystem.class%" public="false">
+            <argument type="service" id="templating.name_parser" />
             <argument>%templating.loader.filesystem.path%</argument>
             <call method="setDebugger"><argument type="service" id="templating.debugger" on-invalid="ignore" /></call>
         </service>
@@ -100,16 +107,12 @@
             <argument type="service" id="templating" />
         </service>
 
-        <service id="templating.name_converter" class="%templating.name_converter.class%">
+        <service id="templating.name_parser" class="%templating.name_parser.class%">
             <argument type="service" id="service_container" />
-        </service>
-
-        <service id="templating.renderer.php" class="%templating.renderer.php.class%">
-            <tag name="templating.renderer" alias="php" />
         </service>
 
         <service id="templating.loader" alias="templating.loader.filesystem" />
 
-        <service id="templating" alias="templating.engine" />
+        <service id="templating" alias="templating.engine.delegating" />
     </services>
 </container>

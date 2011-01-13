@@ -35,7 +35,7 @@ class FrameworkExtensionTest extends TestCase
 
         // templating
         $loader->configLoad(array('templating' => array()), $container);
-        $this->assertEquals('Symfony\\Bundle\\FrameworkBundle\\Templating\\Engine', $container->getParameter('templating.engine.class'), '->templatingLoad() loads the templating.xml file if not already loaded');
+        $this->assertEquals('Symfony\\Bundle\\FrameworkBundle\\Templating\\PhpEngine', $container->getParameter('templating.engine.php.class'), '->templatingLoad() loads the templating.xml file if not already loaded');
 
         // validation
         $loader->configLoad(array('validation' => array('enabled' => true)), $container);

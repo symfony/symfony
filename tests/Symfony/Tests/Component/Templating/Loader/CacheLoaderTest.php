@@ -16,12 +16,13 @@ require_once __DIR__.'/../Fixtures/ProjectTemplateDebugger.php';
 use Symfony\Component\Templating\Loader\Loader;
 use Symfony\Component\Templating\Loader\CacheLoader;
 use Symfony\Component\Templating\Storage\StringStorage;
+use Symfony\Component\Templating\TemplateNameParser;
 
 class CacheLoaderTest extends \PHPUnit_Framework_TestCase
 {
     public function testConstructor()
     {
-        $loader = new ProjectTemplateLoader($varLoader = new ProjectTemplateLoaderVar(), sys_get_temp_dir());
+        $loader = new ProjectTemplateLoader($varLoader = new ProjectTemplateLoaderVar(new TemplateNameParser()), sys_get_temp_dir());
         $this->assertTrue($loader->getLoader() === $varLoader, '__construct() takes a template loader as its first argument');
         $this->assertEquals(sys_get_temp_dir(), $loader->getDir(), '__construct() takes a directory where to store the cache as its second argument');
     }
@@ -31,7 +32,7 @@ class CacheLoaderTest extends \PHPUnit_Framework_TestCase
         $dir = sys_get_temp_dir().DIRECTORY_SEPARATOR.rand(111111, 999999);
         mkdir($dir, 0777, true);
 
-        $loader = new ProjectTemplateLoader($varLoader = new ProjectTemplateLoaderVar(), $dir);
+        $loader = new ProjectTemplateLoader($varLoader = new ProjectTemplateLoaderVar(new TemplateNameParser()), $dir);
         $loader->setDebugger($debugger = new \ProjectTemplateDebugger());
         $this->assertFalse($loader->load('foo'), '->load() returns false if the embed loader is not able to load the template');
         $loader->load('index');
@@ -66,16 +67,16 @@ class ProjectTemplateLoaderVar extends Loader
         return 'Hello {{ name }}';
     }
 
-    public function load($template, array $options = array())
+    public function load($template)
     {
         if (method_exists($this, $method = 'get'.ucfirst($template).'Template')) {
-            return new StringStorage($this->$method(), '.php');
+            return new StringStorage($this->$method());
         }
 
         return false;
     }
 
-    public function isFresh($template, array $options = array(), $time)
+    public function isFresh($template, $time)
     {
         return false;
     }

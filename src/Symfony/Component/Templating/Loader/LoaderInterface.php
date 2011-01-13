@@ -22,18 +22,16 @@ interface LoaderInterface
      * Loads a template.
      *
      * @param string $template The logical template name
-     * @param array  $options  An array of options
      *
      * @return Storage|Boolean false if the template cannot be loaded, a Storage instance otherwise
      */
-    function load($template, array $options = array());
+    function load($template);
 
     /**
      * Returns true if the template is still fresh.
      *
      * @param string    $template The template name
-     * @param array     $options  An array of options
      * @param timestamp $time     The last modification time of the cached template
      */
-    function isFresh($template, array $options = array(), $time);
+    function isFresh($template, $time);
 }

@@ -3,6 +3,7 @@
 namespace Symfony\Bundle\FrameworkBundle\Templating;
 
 use Symfony\Component\DependencyInjection\ContainerInterface;
+use Symfony\Component\Templating\TemplateNameParser as BaseTemplateNameParser;
 
 /*
  * This file is part of the Symfony package.
@@ -14,13 +15,13 @@ use Symfony\Component\DependencyInjection\ContainerInterface;
  */
 
 /**
- * TemplateNameConverter converts template name from the short notation
+ * TemplateNameParser parsers template name from the short notation
  * "bundle:section:template(.format).renderer" to a template name
  * and an array of options.
  *
  * @author Fabien Potencier <fabien.potencier@symfony-project.com>
  */
-class TemplateNameConverter
+class TemplateNameParser extends BaseTemplateNameParser
 {
     protected $container;
 
@@ -35,14 +36,14 @@ class TemplateNameConverter
     }
 
     /**
-     * Converts a short template notation to a template name and an array of options.
+     * Parses a template to a template name and an array of options.
      *
-     * @param string $name     A short template template
+     * @param string $name     A template name
      * @param array  $defaults An array of default options
      *
      * @return array An array composed of the template name and an array of options
      */
-    public function fromShortNotation($name, array $defaults = array())
+    public function parse($name, array $defaults = array())
     {
         $parts = explode(':', $name);
         if (3 !== count($parts)) {

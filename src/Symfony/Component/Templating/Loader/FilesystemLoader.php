@@ -4,6 +4,7 @@ namespace Symfony\Component\Templating\Loader;
 
 use Symfony\Component\Templating\Storage\Storage;
 use Symfony\Component\Templating\Storage\FileStorage;
+use Symfony\Component\Templating\TemplateNameParserInterface;
 
 /*
  * This file is part of the Symfony package.
@@ -26,34 +27,35 @@ class FilesystemLoader extends Loader
     /**
      * Constructor.
      *
-     * @param array $templatePathPatterns An array of path patterns to look for templates
+     * @param TemplateNameParserInterface $nameParser           A TemplateNameParserInterface instance
+     * @param array                       $templatePathPatterns An array of path patterns to look for templates
      */
-    public function __construct($templatePathPatterns)
+    public function __construct(TemplateNameParserInterface $nameParser, $templatePathPatterns)
     {
+        parent::__construct($nameParser);
+
         if (!is_array($templatePathPatterns)) {
             $templatePathPatterns = array($templatePathPatterns);
         }
 
         $this->templatePathPatterns = $templatePathPatterns;
-
-        parent::__construct();
     }
 
     /**
      * Loads a template.
      *
      * @param string $template The logical template name
-     * @param array  $options  An array of options
      *
      * @return Storage|Boolean false if the template cannot be loaded, a Storage instance otherwise
      */
-    public function load($template, array $options = array())
+    public function load($template)
     {
+        list($template, $options) = $this->nameParser->parse($template);
+
         if (self::isAbsolutePath($template) && file_exists($template)) {
-            return new FileStorage($template, $options['renderer']);
+            return new FileStorage($template);
         }
 
-        $options = $this->mergeDefaultOptions($options);
         $options['name'] = $template;
 
         $replacements = array();
@@ -65,14 +67,14 @@ class FilesystemLoader extends Loader
         foreach ($this->templatePathPatterns as $templatePathPattern) {
             if (is_file($file = strtr($templatePathPattern, $replacements))) {
                 if (null !== $this->debugger) {
-                    $this->debugger->log(sprintf('Loaded template file "%s" (renderer: %s)', $file, $options['renderer']));
+                    $this->debugger->log(sprintf('Loaded template file "%s"', $file));
                 }
 
-                return new FileStorage($file, $options['renderer']);
+                return new FileStorage($file);
             }
 
             if (null !== $this->debugger) {
-                $logs[] = sprintf('Failed loading template file "%s" (renderer: %s)', $file, $options['renderer']);
+                $logs[] = sprintf('Failed loading template file "%s"', $file);
             }
         }
 
@@ -92,9 +94,9 @@ class FilesystemLoader extends Loader
      * @param array     $options  An array of options
      * @param timestamp $time     The last modification time of the cached template
      */
-    public function isFresh($template, array $options = array(), $time)
+    public function isFresh($template, $time)
     {
-        if (false === $template = $this->load($template, $options))
+        if (false === $template = $this->load($template))
         {
             return false;
         }

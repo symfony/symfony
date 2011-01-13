@@ -32,7 +32,7 @@ class RenderNode extends \Twig_Node
     {
         $compiler
             ->addDebugInfo($this)
-            ->write("echo \$this->env->getExtension('templating')->getContainer()->get('templating.helper.actions')->render(")
+            ->write("echo \$this->env->getExtension('templating')->renderAction(")
             ->subcompile($this->getNode('expr'))
             ->raw(', ')
             ->subcompile($this->getNode('attributes'))

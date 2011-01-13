@@ -2,7 +2,7 @@
 
 namespace Symfony\Bundle\FrameworkBundle\Templating;
 
-use Symfony\Component\Templating\Engine as BaseEngine;
+use Symfony\Component\Templating\PhpEngine as BasePhpEngine;
 use Symfony\Component\Templating\Loader\LoaderInterface;
 use Symfony\Component\DependencyInjection\ContainerInterface;
 use Symfony\Component\HttpFoundation\Response;
@@ -21,7 +21,7 @@ use Symfony\Component\HttpFoundation\Response;
  *
  * @author Fabien Potencier <fabien.potencier@symfony-project.com>
  */
-class Engine extends BaseEngine
+class PhpEngine extends BasePhpEngine implements EngineInterface
 {
     protected $container;
 
@@ -30,7 +30,6 @@ class Engine extends BaseEngine
      *
      * @param ContainerInterface $container The DI container
      * @param LoaderInterface    $loader    A loader instance
-     * @param array              $renderers All templating renderers
      */
     public function __construct(ContainerInterface $container, LoaderInterface $loader)
     {
@@ -39,9 +38,29 @@ class Engine extends BaseEngine
         parent::__construct($loader);
     }
 
-    public function getContainer()
+    /**
+     * @throws \InvalidArgumentException When the helper is not defined
+     */
+    public function get($name)
     {
-        return $this->container;
+        if (!isset($this->helpers[$name])) {
+            throw new \InvalidArgumentException(sprintf('The helper "%s" is not defined.', $name));
+        }
+
+        if (is_string($this->helpers[$name])) {
+            $this->helpers[$name] = $this->container->get($this->helpers[$name]);
+            $this->helpers[$name]->setCharset($this->charset);
+        }
+
+        return $this->helpers[$name];
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function setHelpers(array $helpers)
+    {
+        $this->helpers = $helpers;
     }
 
     /**
@@ -62,40 +81,5 @@ class Engine extends BaseEngine
         $response->setContent($this->render($view, $parameters));
 
         return $response;
-    }
-
-    public function has($name)
-    {
-        return isset($this->helpers[$name]);
-    }
-
-    /**
-     * @throws \InvalidArgumentException When the helper is not defined
-     */
-    public function get($name)
-    {
-        if (!isset($this->helpers[$name])) {
-            throw new \InvalidArgumentException(sprintf('The helper "%s" is not defined.', $name));
-        }
-
-        if (is_string($this->helpers[$name])) {
-            $this->helpers[$name] = $this->container->get($this->helpers[$name]);
-            $this->helpers[$name]->setCharset($this->charset);
-        }
-
-        return $this->helpers[$name];
-    }
-
-    public function setHelpers(array $helpers)
-    {
-        $this->helpers = $helpers;
-    }
-
-    /**
-     * {@inheritdoc}
-     */
-    public function splitTemplateName($name, array $defaults = array())
-    {
-        return $this->container->get('templating.name_converter')->fromShortNotation($name, $defaults);
     }
 }

@@ -2,9 +2,11 @@
 
 namespace Symfony\Component\Templating;
 
-use Symfony\Component\Templating\Loader\LoaderInterface;
-use Symfony\Component\Templating\Renderer\RendererInterface;
+use Symfony\Component\Templating\Storage\Storage;
+use Symfony\Component\Templating\Storage\FileStorage;
+use Symfony\Component\Templating\Storage\StringStorage;
 use Symfony\Component\Templating\Helper\HelperInterface;
+use Symfony\Component\Templating\Loader\LoaderInterface;
 
 /*
  * This file is part of the Symfony package.
@@ -16,14 +18,13 @@ use Symfony\Component\Templating\Helper\HelperInterface;
  */
 
 /**
- * Engine is the main class of the templating component.
+ * PhpEngine is an engine able to render PHP templates.
  *
  * @author Fabien Potencier <fabien.potencier@symfony-project.com>
  */
-class Engine implements \ArrayAccess
+class PhpEngine implements EngineInterface, \ArrayAccess
 {
     protected $loader;
-    protected $renderers;
     protected $current;
     protected $helpers;
     protected $parents;
@@ -41,16 +42,14 @@ class Engine implements \ArrayAccess
      */
     public function __construct(LoaderInterface $loader, array $helpers = array())
     {
-        $this->loader    = $loader;
-        $this->helpers   = array();
-        $this->parents   = array();
-        $this->stack     = array();
-        $this->charset   = 'UTF-8';
-        $this->cache     = array();
-        $this->globals   = array();
-        $this->renderers = array();
+        $this->loader  = $loader;
+        $this->parents = array();
+        $this->stack   = array();
+        $this->charset = 'UTF-8';
+        $this->cache   = array();
+        $this->globals = array();
 
-        $this->addHelpers($helpers);
+        $this->setHelpers($helpers);
 
         $this->initializeEscapers();
         foreach ($this->escapers as $context => $escaper) {
@@ -58,51 +57,30 @@ class Engine implements \ArrayAccess
         }
     }
 
-    public function setRenderers(array $renderers = array())
-    {
-        $this->renderers = array();
-        foreach ($renderers as $name => $renderer) {
-            $this->setRenderer($name, $renderer);
-        }
-    }
-
     /**
      * Renders a template.
-     *
-     * The template name is composed of segments separated by a colon (:).
-     * By default, this engine knows how to parse templates with one or two segments:
-     *
-     *  * index:      The template logical name is index and the renderer is php
-     *  * index:twig: The template logical name is index and the renderer is twig
      *
      * @param string $name       A template name
      * @param array  $parameters An array of parameters to pass to the template
      *
      * @return string The evaluated template as a string
      *
-     * @throws \InvalidArgumentException if the renderer does not exist or if the template does not exist
-     * @throws \RuntimeException if the template cannot be rendered
+     * @throws \InvalidArgumentException if the template does not exist
+     * @throws \RuntimeException         if the template cannot be rendered
      */
     public function render($name, array $parameters = array())
     {
         $template = $this->load($name);
 
-        // renderer
-        $renderer = $template->getRenderer();
-
-        if (!isset($this->renderers[$renderer])) {
-            throw new \InvalidArgumentException(sprintf('The renderer "%s" is not registered.', $renderer));
-        }
-
         $this->current = $name;
         $this->parents[$name] = null;
 
-        // Attach the global variables
+        // attach the global variables
         $parameters = array_replace($this->getGlobals(), $parameters);
 
         // render
-        if (false === $content = $this->renderers[$renderer]->evaluate($template, $parameters)) {
-            throw new \RuntimeException(sprintf('The template "%s" cannot be rendered (renderer: %s).', $name, $renderer));
+        if (false === $content = $this->evaluate($template, $parameters)) {
+            throw new \RuntimeException(sprintf('The template "%s" cannot be rendered.', $name));
         }
 
         // decorator
@@ -111,11 +89,6 @@ class Engine implements \ArrayAccess
             $this->stack[] = $slots->get('_content');
             $slots->set('_content', $content);
 
-            // a decorator must use the same renderer as its children
-            $parent = $this->load($this->parents[$name]);
-            if ($renderer !== $parentRenderer = ($parent->getRenderer() ? $parent->getRenderer() : $renderer)) {
-                throw new \LogicException(sprintf('Template "%s" extends "%s" but a "%s" template cannot extend a "%s" one.', $name, $this->parents[$name], $renderer, $parentRenderer));
-            }
             $content = $this->render($this->parents[$name], $parameters);
 
             $slots->set('_content', array_pop($this->stack));
@@ -157,18 +130,58 @@ class Engine implements \ArrayAccess
             return $this->cache[$name];
         }
 
-        list($tpl, $options) = $this->splitTemplateName($name);
-
         // load
-        $template = $this->loader->load($tpl, $options);
+        $template = $this->loader->load($name);
 
         if (false === $template) {
-            throw new \InvalidArgumentException(sprintf('The template "%s" does not exist (renderer: %s).', $name, $options['renderer']));
+            throw new \InvalidArgumentException(sprintf('The template "%s" does not exist.', $name));
         }
 
         $this->cache[$name] = $template;
 
         return $template;
+    }
+
+    /**
+     * Returns true if this class is able to render the given template.
+     *
+     * @param string $name A template name
+     *
+     * @return boolean True if this class supports the given resource, false otherwise
+     */
+    public function supports($name)
+    {
+        return false !== strpos($name, '.php');
+    }
+
+    /**
+     * Evaluates a template.
+     *
+     * @param Storage $template   The template to render
+     * @param array   $parameters An array of parameters to pass to the template
+     *
+     * @return string|false The evaluated template, or false if the engine is unable to render the template
+     */
+    protected function evaluate(Storage $template, array $parameters = array())
+    {
+        $__template__ = $template;
+        if ($__template__ instanceof FileStorage) {
+            extract($parameters);
+            $view = $this;
+            ob_start();
+            require $__template__;
+
+            return ob_get_clean();
+        } elseif ($__template__ instanceof StringStorage) {
+            extract($parameters);
+            $view = $this;
+            ob_start();
+            eval('; ?>'.$__template__.'<?php ;');
+
+            return ob_get_clean();
+        }
+
+        return false;
     }
 
     /**
@@ -226,6 +239,12 @@ class Engine implements \ArrayAccess
         foreach ($helpers as $alias => $helper) {
             $this->set($helper, is_int($alias) ? null : $alias);
         }
+    }
+
+    public function setHelpers(array $helpers)
+    {
+        $this->helpers = array();
+        $this->addHelpers($helpers);
     }
 
     /**
@@ -314,48 +333,6 @@ class Engine implements \ArrayAccess
     public function getCharset()
     {
         return $this->charset;
-    }
-
-    /**
-     * Gets the loader associated with this engine.
-     *
-     * @return LoaderInterface A LoaderInterface instance
-     */
-    public function getLoader()
-    {
-        return $this->loader;
-    }
-
-    /**
-     * Sets a template renderer.
-     *
-     * @param string            $name     The renderer name
-     * @param RendererInterface $renderer A RendererInterface instance
-     */
-    public function setRenderer($name, RendererInterface $renderer)
-    {
-        $this->renderers[$name] = $renderer;
-        $renderer->setEngine($this);
-    }
-
-    /**
-     * Converts a short template notation to a template name and an array of options.
-     *
-     * @param string $name     A short template template
-     * @param array  $defaults An array of default options
-     *
-     * @return array An array composed of the template name and an array of options
-     */
-    public function splitTemplateName($name)
-    {
-        if (false !== $pos = strpos($name, ':')) {
-            $renderer = substr($name, $pos + 1);
-            $name = substr($name, 0, $pos);
-        } else {
-            $renderer = 'php';
-        }
-
-        return array($name, array('renderer' => $renderer));
     }
 
     /**
@@ -492,5 +469,15 @@ class Engine implements \ArrayAccess
         } else {
             throw new \RuntimeException('No suitable convert encoding function (use UTF-8 as your encoding or install the iconv or mbstring extension).');
         }
+    }
+
+    /**
+     * Gets the loader associated with this engine.
+     *
+     * @return LoaderInterface A LoaderInterface instance
+     */
+    public function getLoader()
+    {
+        return $this->loader;
     }
 }

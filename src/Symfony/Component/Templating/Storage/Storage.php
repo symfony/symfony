@@ -18,19 +18,16 @@ namespace Symfony\Component\Templating\Storage;
  */
 abstract class Storage
 {
-    protected $renderer;
     protected $template;
 
     /**
      * Constructor.
      *
      * @param string $template The template name
-     * @param string $renderer The renderer name
      */
-    public function __construct($template, $renderer)
+    public function __construct($template)
     {
         $this->template = $template;
-        $this->renderer = $renderer;
     }
 
     /**
@@ -49,14 +46,4 @@ abstract class Storage
      * @return string The template content
      */
     abstract public function getContent();
-
-    /**
-     * Gets the renderer.
-     *
-     * @return string|null The renderer name or null if no renderer is stored for this template
-     */
-    public function getRenderer()
-    {
-        return $this->renderer;
-    }
 }

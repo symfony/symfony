@@ -15,8 +15,9 @@ use Symfony\Component\Security\SecurityContext;
  */
 
 /**
+ * SecurityExtension exposes security context features.
  *
- * @author     Fabien Potencier <fabien.potencier@symfony-project.com>
+ * @author Fabien Potencier <fabien.potencier@symfony-project.com>
  */
 class SecurityExtension extends \Twig_Extension
 {

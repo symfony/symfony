@@ -27,6 +27,7 @@ class Form implements \ArrayAccess
     protected $method;
     protected $host;
     protected $path;
+    protected $base;
 
     /**
      * Constructor.
@@ -35,10 +36,11 @@ class Form implements \ArrayAccess
      * @param string   $method The method to use for the link (if null, it defaults to the method defined by the form)
      * @param string   $host   The base URI to use for absolute links (like http://localhost)
      * @param string   $path   The base path for relative links (/ by default)
+     * @param string   $base   An optional base href for generating the submit uri
      *
      * @throws \LogicException if the node is not a button inside a form tag
      */
-    public function __construct(\DOMNode $node, $method = null, $host = null, $path = '/')
+    public function __construct(\DOMNode $node, $method = null, $host = null, $path = '/', $base = null)
     {
         $this->button = $node;
         if ('button' == $node->nodeName || ('input' == $node->nodeName && in_array($node->getAttribute('type'), array('submit', 'button', 'image')))) {
@@ -55,6 +57,7 @@ class Form implements \ArrayAccess
         $this->method = $method;
         $this->host = $host;
         $this->path = empty($path) ? '/' : $path;
+        $this->base = $base;
 
         $this->initialize();
     }
@@ -185,11 +188,13 @@ class Form implements \ArrayAccess
             $path = substr($path, 0, strrpos($path, '/') + 1);
         }
 
-        if ($uri && '/' !== $uri[0] && !$urlHaveScheme) {
+        if (!$this->base && $uri && '/' !== $uri[0] && !$urlHaveScheme) {
             $uri = $path.$uri;
+        } elseif ($this->base) {
+            $uri = $this->base.$uri;
         }
 
-        if ($absolute && null !== $this->host && !$urlHaveScheme) {
+        if (!$this->base && $absolute && null !== $this->host && !$urlHaveScheme) {
             return $this->host.$uri;
         }
 

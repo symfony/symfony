@@ -384,4 +384,14 @@ class FormTest extends \PHPUnit_Framework_TestCase
 
         return new Form($nodes->item($nodes->length - 1), $method, $host, $path);
     }
+
+    public function testBase()
+    {
+        $dom = new \DOMDocument();
+        $dom->loadHTML('<html><form method="post" action="foo.php"><input type="text" name="bar" value="bar" /><input type="submit" /></form></html>');
+
+        $nodes = $dom->getElementsByTagName('input');
+        $form = new Form($nodes->item($nodes->length - 1), null, 'http://www.bar.com/foobar/', '/', 'http://www.foo.com/');
+        $this->assertEquals('http://www.foo.com/foo.php', $form->getUri());
+    }
 }

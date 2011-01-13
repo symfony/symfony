@@ -46,10 +46,6 @@ class Loader implements \Twig_LoaderInterface
 
         list($name, $options) = $this->converter->fromShortNotation($name);
 
-        if ('twig' !== $options['renderer']) {
-            throw new \LogicException(sprintf('A "%s" template cannot extend a "Twig" template.', $options['renderer']));
-        }
-
         $template = $this->loader->load($name, $options);
 
         if (false === $template) {

@@ -191,7 +191,7 @@ class ProjectTemplateLoader extends Loader
     public function load($template, array $options = array())
     {
         if (isset($this->templates[$template.'.'.$options['renderer']])) {
-            return new StringStorage($this->templates[$template.'.'.$options['renderer']]);
+            return new StringStorage($this->templates[$template.'.'.$options['renderer']], $options['renderer']);
         }
 
         return false;

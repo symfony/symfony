@@ -27,7 +27,7 @@ abstract class Storage
      * @param string $template The template name
      * @param string $renderer The renderer name
      */
-    public function __construct($template, $renderer = null)
+    public function __construct($template, $renderer)
     {
         $this->template = $template;
         $this->renderer = $renderer;

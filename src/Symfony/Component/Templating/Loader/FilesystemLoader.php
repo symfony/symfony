@@ -50,7 +50,7 @@ class FilesystemLoader extends Loader
     public function load($template, array $options = array())
     {
         if (self::isAbsolutePath($template) && file_exists($template)) {
-            return new FileStorage($template);
+            return new FileStorage($template, $options['renderer']);
         }
 
         $options = $this->mergeDefaultOptions($options);
@@ -68,7 +68,7 @@ class FilesystemLoader extends Loader
                     $this->debugger->log(sprintf('Loaded template file "%s" (renderer: %s)', $file, $options['renderer']));
                 }
 
-                return new FileStorage($file);
+                return new FileStorage($file, $options['renderer']);
             }
 
             if (null !== $this->debugger) {

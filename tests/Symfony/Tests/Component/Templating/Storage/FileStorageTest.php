@@ -18,9 +18,9 @@ class FileStorageTest extends \PHPUnit_Framework_TestCase
 {
     public function testGetContent()
     {
-        $storage = new FileStorage('foo');
+        $storage = new FileStorage('foo', 'php');
         $this->assertInstanceOf('Symfony\Component\Templating\Storage\Storage', $storage, 'FileStorage is an instance of Storage');
-        $storage = new FileStorage(__DIR__.'/../Fixtures/templates/foo.php');
+        $storage = new FileStorage(__DIR__.'/../Fixtures/templates/foo.php', 'php');
         $this->assertEquals('<?php echo $foo ?>', $storage->getContent(), '->getContent() returns the content of the template');
     }
 }

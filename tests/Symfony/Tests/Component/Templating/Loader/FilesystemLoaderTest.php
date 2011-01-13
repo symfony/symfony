@@ -48,7 +48,7 @@ class FilesystemLoaderTest extends \PHPUnit_Framework_TestCase
         $pathPattern = self::$fixturesPath.'/templates/%name%.%renderer%';
         $path = self::$fixturesPath.'/templates';
         $loader = new ProjectTemplateLoader2($pathPattern);
-        $storage = $loader->load($path.'/foo.php');
+        $storage = $loader->load($path.'/foo.php', array('renderer' => 'php'));
         $this->assertInstanceOf('Symfony\Component\Templating\Storage\FileStorage', $storage, '->load() returns a FileStorage if you pass an absolute path');
         $this->assertEquals($path.'/foo.php', (string) $storage, '->load() returns a FileStorage pointing to the passed absolute path');
 

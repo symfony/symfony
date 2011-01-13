@@ -22,10 +22,10 @@ class PhpRendererTest extends \PHPUnit_Framework_TestCase
     {
         $renderer = new PhpRenderer();
 
-        $template = new StringStorage('<?php echo $foo ?>');
+        $template = new StringStorage('<?php echo $foo ?>', 'php');
         $this->assertEquals('bar', $renderer->evaluate($template, array('foo' => 'bar')), '->evaluate() renders templates that are instances of StringStorage');
 
-        $template = new FileStorage(__DIR__.'/../Fixtures/templates/foo.php');
+        $template = new FileStorage(__DIR__.'/../Fixtures/templates/foo.php', 'php');
         $this->assertEquals('bar', $renderer->evaluate($template, array('foo' => 'bar')), '->evaluate() renders templates that are instances of FileStorage');
     }
 }

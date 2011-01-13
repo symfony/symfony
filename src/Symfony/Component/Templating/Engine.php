@@ -25,7 +25,6 @@ class Engine implements \ArrayAccess
     protected $loader;
     protected $renderers;
     protected $current;
-    protected $currentRenderer;
     protected $helpers;
     protected $parents;
     protected $stack;
@@ -86,30 +85,12 @@ class Engine implements \ArrayAccess
      */
     public function render($name, array $parameters = array())
     {
-        if (isset($this->cache[$name])) {
-            list($tpl, $options, $template) = $this->cache[$name];
-        } else {
-            list($tpl, $options) = $this->splitTemplateName($name);
-
-            // load
-            $template = $this->loader->load($tpl, $options);
-
-            if (false === $template) {
-                throw new \InvalidArgumentException(sprintf('The template "%s" does not exist (renderer: %s).', $name, $options['renderer']));
-            }
-
-            $this->cache[$name] = array($tpl, $options, $template);
-        }
+        $template = $this->load($name);
 
         // renderer
-        $renderer = $template->getRenderer() ? $template->getRenderer() : $options['renderer'];
+        $renderer = $template->getRenderer();
 
-        // a decorator must use the same renderer as its children
-        if (null !== $this->currentRenderer && $renderer !== $this->currentRenderer) {
-            throw new \LogicException(sprintf('A "%s" template cannot extend a "%s" template.', $this->currentRenderer, $renderer));
-        }
-
-        if (!isset($this->renderers[$options['renderer']])) {
+        if (!isset($this->renderers[$renderer])) {
             throw new \InvalidArgumentException(sprintf('The renderer "%s" is not registered.', $renderer));
         }
 
@@ -130,9 +111,12 @@ class Engine implements \ArrayAccess
             $this->stack[] = $slots->get('_content');
             $slots->set('_content', $content);
 
-            $this->currentRenderer = $renderer;
+            // a decorator must use the same renderer as its children
+            $parent = $this->load($this->parents[$name]);
+            if ($renderer !== $parentRenderer = ($parent->getRenderer() ? $parent->getRenderer() : $renderer)) {
+                throw new \LogicException(sprintf('Template "%s" extends "%s" but a "%s" template cannot extend a "%s" one.', $name, $this->parents[$name], $renderer, $parentRenderer));
+            }
             $content = $this->render($this->parents[$name], $parameters);
-            $this->currentRenderer = null;
 
             $slots->set('_content', array_pop($this->stack));
         }
@@ -162,19 +146,19 @@ class Engine implements \ArrayAccess
     public function load($name)
     {
         if (isset($this->cache[$name])) {
-            list($tpl, $options, $template) = $this->cache[$name];
-        } else {
-            list($tpl, $options) = $this->splitTemplateName($name);
-
-            // load
-            $template = $this->loader->load($tpl, $options);
-
-            if (false === $template) {
-                return false;
-            }
-
-            $this->cache[$name] = array($tpl, $options, $template);
+            return $this->cache[$name];
         }
+
+        list($tpl, $options) = $this->splitTemplateName($name);
+
+        // load
+        $template = $this->loader->load($tpl, $options);
+
+        if (false === $template) {
+            throw new \InvalidArgumentException(sprintf('The template "%s" does not exist (renderer: %s).', $name, $options['renderer']));
+        }
+
+        $this->cache[$name] = $template;
 
         return $template;
     }

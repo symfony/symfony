@@ -133,7 +133,13 @@ class Engine implements \ArrayAccess
      */
     public function exists($name)
     {
-        return false !== $this->load($name);
+        try {
+            $this->load($name);
+        } catch (\InvalidArgumentException $e) {
+            return false;
+        }
+
+        return true;
     }
 
     /**

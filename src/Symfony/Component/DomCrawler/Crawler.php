@@ -23,19 +23,27 @@ class Crawler extends \SplObjectStorage
     protected $uri;
     protected $host;
     protected $path;
+    protected $base;
 
     /**
      * Constructor.
      *
      * @param mixed  $node A Node to use as the base for the crawling
      * @param string $uri  The base URI to use for absolute links or form actions
+     * @param string $base An optional base href for generating the uris for Form and Link.
+     *                     This will be autodetected if $node has a <base> tag.
      */
-    public function __construct($node = null, $uri = null)
+    public function __construct($node = null, $uri = null, $base = null)
     {
         $this->uri = $uri;
+
         list($this->host, $this->path) = $this->parseUri($this->uri);
 
         $this->add($node);
+
+        if ($base) {
+            $this->base = $base;
+        }
     }
 
     /**
@@ -103,6 +111,12 @@ class Crawler extends \SplObjectStorage
 
         @$dom->loadHTML($content);
         $this->addDocument($dom);
+
+        $base = $this->filter('base')->extract(array('href'));
+
+        if (count($base)) {
+            $this->base = current($base);
+        }
     }
 
     /**
@@ -430,7 +444,7 @@ class Crawler extends \SplObjectStorage
 
         $domxpath = new \DOMXPath($document);
 
-        return new static($domxpath->query($xpath), $this->uri);
+        return new static($domxpath->query($xpath), $this->uri, $this->base);
     }
 
     /**
@@ -503,7 +517,7 @@ class Crawler extends \SplObjectStorage
 
         $node = $this->getNode(0);
 
-        return new Link($node, $method, $this->host, $this->path);
+        return new Link($node, $method, $this->host, $this->path, $this->base);
     }
 
     /**
@@ -537,7 +551,7 @@ class Crawler extends \SplObjectStorage
             throw new \InvalidArgumentException('The current node list is empty.');
         }
 
-        $form = new Form($this->getNode(0), $method, $this->host, $this->path);
+        $form = new Form($this->getNode(0), $method, $this->host, $this->path, $this->base);
 
         if (null !== $values) {
             $form->setValues($values);

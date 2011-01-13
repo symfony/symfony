@@ -5,6 +5,7 @@ namespace Symfony\Component\DependencyInjection\Dumper;
 use Symfony\Component\DependencyInjection\ContainerInterface;
 use Symfony\Component\DependencyInjection\Parameter;
 use Symfony\Component\DependencyInjection\Reference;
+use Symfony\Component\DependencyInjection\Definition;
 use Symfony\Component\DependencyInjection\InterfaceInjector;
 
 /*
@@ -81,10 +82,12 @@ class XmlDumper extends Dumper
         return sprintf("  <interfaces>\n%s  </interfaces>\n", $code);
     }
 
-    protected function addService($id, $definition)
+    protected function addService($definition, $id = null, $depth = 4)
     {
-        $code = sprintf("    <service id=\"%s\"%s%s%s%s>\n",
-            $id,
+        $white = str_repeat(' ', $depth);
+        $code = sprintf("%s<service%s%s%s%s%s>\n",
+            $white,
+            (null !== $id ? sprintf(' id="%s"', $id): ''),
             $definition->getClass() ? sprintf(' class="%s"', $definition->getClass()) : '',
             $definition->getFactoryMethod() ? sprintf(' factory-method="%s"', $definition->getFactoryMethod()) : '',
             $definition->getFactoryService() ? sprintf(' factory-service="%s"', $definition->getFactoryService()) : '',
@@ -99,39 +102,39 @@ class XmlDumper extends Dumper
                 }
                 $att = $att ? ' '.implode(' ', $att) : '';
 
-                $code .= sprintf("      <tag name=\"%s\"%s />\n", $name, $att);
+                $code .= sprintf("%s  <tag name=\"%s\"%s />\n", $white, $name, $att);
             }
         }
 
         if ($definition->getFile()) {
-            $code .= sprintf("      <file>%s</file>\n", $definition->getFile());
+            $code .= sprintf("%s  <file>%s</file>\n", $white, $definition->getFile());
         }
 
         if ($definition->getArguments()) {
-            $code .= $this->convertParameters($definition->getArguments(), 'argument', 6);
+            $code .= $this->convertParameters($definition->getArguments(), 'argument', $depth + 2);
         }
 
         foreach ($definition->getMethodCalls() as $call) {
             if (count($call[1])) {
-                $code .= sprintf("      <call method=\"%s\">\n%s      </call>\n", $call[0], $this->convertParameters($call[1], 'argument', 8));
+                $code .= sprintf("%s  <call method=\"%s\">\n%s%s  </call>\n", $white, $call[0], $this->convertParameters($call[1], 'argument', $depth + 4), $white);
             } else {
-                $code .= sprintf("      <call method=\"%s\" />\n", $call[0]);
+                $code .= sprintf("%s  <call method=\"%s\" />\n", $white, $call[0]);
             }
         }
 
         if ($callable = $definition->getConfigurator()) {
             if (is_array($callable)) {
                 if (is_object($callable[0]) && $callable[0] instanceof Reference) {
-                    $code .= sprintf("      <configurator service=\"%s\" method=\"%s\" />\n", $callable[0], $callable[1]);
+                    $code .= sprintf("%s  <configurator service=\"%s\" method=\"%s\" />\n", $white, $callable[0], $callable[1]);
                 } else {
-                    $code .= sprintf("      <configurator class=\"%s\" method=\"%s\" />\n", $callable[0], $callable[1]);
+                    $code .= sprintf("%s  <configurator class=\"%s\" method=\"%s\" />\n", $white, $callable[0], $callable[1]);
                 }
             } else {
-                $code .= sprintf("      <configurator function=\"%s\" />\n", $callable);
+                $code .= sprintf("%s  <configurator function=\"%s\" />\n", $white, $callable);
             }
         }
 
-        $code .= "    </service>\n";
+        $code .= $white . "</service>\n";
 
         return $code;
     }
@@ -152,7 +155,7 @@ class XmlDumper extends Dumper
 
         $code = '';
         foreach ($this->container->getDefinitions() as $id => $definition) {
-            $code .= $this->addService($id, $definition);
+            $code .= $this->addService($definition, $id);
         }
 
         foreach ($this->container->getAliases() as $alias => $id) {
@@ -177,6 +180,9 @@ class XmlDumper extends Dumper
 
             if (is_object($value) && $value instanceof Reference) {
                 $xml .= sprintf("%s<%s%s type=\"service\" id=\"%s\" %s/>\n", $white, $type, $key, (string) $value, $this->getXmlInvalidBehavior($value));
+
+            } else if (is_object($value) && $value instanceof Definition) {
+                $xml .= sprintf("%s<%s%s type=\"service\">\n%s%s</%s>\n", $white, $type, $key, $this->addService($value, null, $depth + 2), $white, $type);
             } else {
                 if (in_array($value, array('null', 'true', 'false'), true)) {
                     $attributes = ' type="string"';

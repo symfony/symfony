@@ -143,11 +143,13 @@ class Engine implements \ArrayAccess
     }
 
     /**
-     * Returns true if the template exists.
+     * Loads the given template.
      *
      * @param string $name A template name
      *
-     * @return Boolean true if the template exists, false otherwise
+     * @return Storage A Storage instance
+     *
+     * @throws \InvalidArgumentException if the template cannot be found
      */
     public function load($name)
     {

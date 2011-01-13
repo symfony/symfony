@@ -46,11 +46,14 @@ abstract class WebTestCase extends BaseWebTestCase
     }
 
     /**
-     * Find the directory where the phpunit.xml(.dist) is stored
+     * Finds the directory where the phpunit.xml(.dist) is stored.
      *
-     * @return string directory with the phpunit.xml(.dist)
+     * If you run tests with the PHPUnit CLI tool, everything will work as expected.
+     * If not, override this method in your test classes.
+     *
+     * @return string The directory where phpunit.xml(.dist) is stored
      */
-    protected function findPhpUnitXmlDir()
+    protected function getPhpUnitXmlDir()
     {
         $dir = getcwd();
         if (!isset($_SERVER['argv']) || false === strpos($_SERVER['argv'][0], 'phpunit')) {
@@ -77,13 +80,15 @@ abstract class WebTestCase extends BaseWebTestCase
     }
 
     /**
-     * Attempts to guess the kernel location
+     * Attempts to guess the kernel location.
      *
-     * @return array file and class name
+     * When the Kernel is located, the file is required.
+     *
+     * @return string The Kernel class name
      */
-    protected function findKernel()
+    protected function getKernelClass()
     {
-        $dir = isset($_SERVER['KERNEL_DIR']) ? $_SERVER['KERNEL_DIR'] : $this->findPhpUnitXmlDir();
+        $dir = isset($_SERVER['KERNEL_DIR']) ? $_SERVER['KERNEL_DIR'] : $this->getPhpUnitXmlDir();
 
         $finder = new Finder();
         $finder->name('*Kernel.php')->in($dir);
@@ -94,14 +99,13 @@ abstract class WebTestCase extends BaseWebTestCase
         $file = current(iterator_to_array($finder));
         $class = $file->getBasename('.php');
 
-        return array($file, $class);
+        require_once $file;
+
+        return $class;
     }
 
     /**
      * Creates a Kernel.
-     *
-     * If you run tests with the PHPUnit CLI tool, everything will work as expected.
-     * If not, override this method in your test classes.
      *
      * Available options:
      *
@@ -114,9 +118,7 @@ abstract class WebTestCase extends BaseWebTestCase
      */
     protected function createKernel(array $options = array())
     {
-        list($file, $class) = $this->findKernel();
-
-        require_once $file;
+        $class = $this->getKernelClass();
 
         return new $class(
             isset($options['environment']) ? $options['environment'] : 'test',

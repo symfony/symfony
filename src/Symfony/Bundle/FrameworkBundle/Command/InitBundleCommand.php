@@ -7,7 +7,6 @@ use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Output\OutputInterface;
 use Symfony\Component\Console\Output\Output;
-use Symfony\Bundle\FrameworkBundle\Util\Filesystem;
 use Symfony\Bundle\FrameworkBundle\Util\Mustache;
 
 /*
@@ -71,7 +70,7 @@ class InitBundleCommand extends Command
             throw new \RuntimeException(sprintf('Bundle "%s" already exists.', $bundle));
         }
 
-        $filesystem = new Filesystem();
+        $filesystem = $this->container->get('filesystem');
         $filesystem->mirror(__DIR__.'/../Resources/skeleton/bundle', $targetDir);
 
         Mustache::renderDir($targetDir, array(

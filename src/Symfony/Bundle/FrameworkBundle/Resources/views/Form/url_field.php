@@ -1,4 +1,4 @@
-<input type="number"
+<input type="url"
     id="<?php echo $field->getId() ?>"
     name="<?php echo $field->getName() ?>"
     value="<?php echo $field->getDisplayedData() ?>"

@@ -77,11 +77,8 @@ class XmlDumperTest extends \PHPUnit_Framework_TestCase
         //TODO: find a better way to test dumper
         //var_dump($classBody);
 
-        $this->assertEquals("<?xml version=\"1.0\" ?>
-
-<container xmlns=\"http://www.symfony-project.org/schema/dic/services\"
-    xmlns:xsi=\"http://www.w3.org/2001/XMLSchema-instance\"
-    xsi:schemaLocation=\"http://www.symfony-project.org/schema/dic/services http://www.symfony-project.org/schema/dic/services/services-1.0.xsd\">
+        $this->assertEquals("<?xml version=\"1.0\" encoding=\"utf-8\"?>
+<container xmlns=\"http://www.symfony-project.org/schema/dic/services\" xmlns:xsi=\"http://www.w3.org/2001/XMLSchema-instance\" xsi:schemaLocation=\"http://www.symfony-project.org/schema/dic/services http://www.symfony-project.org/schema/dic/services/services-1.0.xsd\">
   <parameters>
     <parameter key=\"cla\">Fo</parameter>
     <parameter key=\"ss\">Class</parameter>
@@ -94,8 +91,7 @@ class XmlDumperTest extends \PHPUnit_Framework_TestCase
     </interface>
   </interfaces>
   <services>
-    <service id=\"foo\" class=\"%cla%o%ss%\">
-    </service>
+    <service id=\"foo\" class=\"%cla%o%ss%\"/>
   </services>
 </container>
 ", $classBody);
@@ -105,21 +101,33 @@ class XmlDumperTest extends \PHPUnit_Framework_TestCase
     {
         include self::$fixturesPath.'/containers/container11.php';
         $dumper = new XmlDumper($container);
-        $this->assertEquals("<?xml version=\"1.0\" ?>
-
-<container xmlns=\"http://www.symfony-project.org/schema/dic/services\"
-    xmlns:xsi=\"http://www.w3.org/2001/XMLSchema-instance\"
-    xsi:schemaLocation=\"http://www.symfony-project.org/schema/dic/services http://www.symfony-project.org/schema/dic/services/services-1.0.xsd\">
+        $this->assertEquals("<?xml version=\"1.0\" encoding=\"utf-8\"?>
+<container xmlns=\"http://www.symfony-project.org/schema/dic/services\" xmlns:xsi=\"http://www.w3.org/2001/XMLSchema-instance\" xsi:schemaLocation=\"http://www.symfony-project.org/schema/dic/services http://www.symfony-project.org/schema/dic/services/services-1.0.xsd\">
   <services>
     <service id=\"foo\" class=\"FooClass\">
       <argument type=\"service\">
         <service class=\"BarClass\">
           <argument type=\"service\">
-            <service class=\"BazClass\">
-            </service>
+            <service class=\"BazClass\"/>
           </argument>
         </service>
       </argument>
+    </service>
+  </services>
+</container>
+", $dumper->dump());
+    }
+
+    public function testDumpEntities()
+    {
+        include self::$fixturesPath.'/containers/container12.php';
+        $dumper = new XmlDumper($container);
+        $this->assertEquals("<?xml version=\"1.0\" encoding=\"utf-8\"?>
+<container xmlns=\"http://www.symfony-project.org/schema/dic/services\" xmlns:xsi=\"http://www.w3.org/2001/XMLSchema-instance\" xsi:schemaLocation=\"http://www.symfony-project.org/schema/dic/services http://www.symfony-project.org/schema/dic/services/services-1.0.xsd\">
+  <services>
+    <service id=\"foo\" class=\"FooClass\Foo\">
+      <tag name=\"foo&quot;bar\bar\" foo=\"foo&quot;barřž€\"/>
+      <argument>foo&lt;&gt;&amp;bar</argument>
     </service>
   </services>
 </container>

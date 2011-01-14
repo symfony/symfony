@@ -2,7 +2,6 @@
 
 namespace Symfony\Bundle\FrameworkBundle\Templating;
 
-use Symfony\Component\DependencyInjection\ContainerInterface;
 use Symfony\Component\Templating\TemplateNameParser as BaseTemplateNameParser;
 
 /*
@@ -16,25 +15,13 @@ use Symfony\Component\Templating\TemplateNameParser as BaseTemplateNameParser;
 
 /**
  * TemplateNameParser parsers template name from the short notation
- * "bundle:section:template(.format).renderer" to a template name
+ * "bundle:section:template.format.renderer" to a template name
  * and an array of options.
  *
  * @author Fabien Potencier <fabien.potencier@symfony-project.com>
  */
 class TemplateNameParser extends BaseTemplateNameParser
 {
-    protected $container;
-
-    /**
-     * Constructor.
-     *
-     * @param ContainerInterface $container The DI container
-     */
-    public function __construct(ContainerInterface $container)
-    {
-        $this->container = $container;
-    }
-
     /**
      * Parses a template to a template name and an array of options.
      *
@@ -64,17 +51,11 @@ class TemplateNameParser extends BaseTemplateNameParser
         $elements = explode('.', $parts[2]);
         if (3 === count($elements)) {
             $parts[2] = $elements[0];
-            if ('html' !== $elements[1]) {
-                $options['format'] = '.'.$elements[1];
-            }
+            $options['format'] = '.'.$elements[1];
             $options['renderer'] = $elements[2];
         } elseif (2 === count($elements)) {
             $parts[2] = $elements[0];
             $options['renderer'] = $elements[1];
-            $format = $this->container->get('request')->getRequestFormat();
-            if (null !== $format && 'html' !== $format) {
-                $options['format'] = '.'.$format;
-            }
         } else {
             throw new \InvalidArgumentException(sprintf('Template name "%s" is not valid.', $name));
         }

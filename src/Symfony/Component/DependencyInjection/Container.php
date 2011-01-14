@@ -75,7 +75,7 @@ class Container implements ContainerInterface
      * This method does two things:
      *
      *  * Parameter values are resolved;
-     *  * The parameter bag is freezed.
+     *  * The parameter bag is frozen.
      */
     public function freeze()
     {

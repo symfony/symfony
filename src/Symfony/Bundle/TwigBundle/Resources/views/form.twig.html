@@ -55,7 +55,7 @@
 
 {% block field_attributes %}
 {% spaceless %}
-    id="{{ field.id }}" name="{{ field.name }}"{% if field.disabled %} disabled="disabled"{% endif %}
+    id="{{ field.id }}" name="{{ field.name }}"{% if field.disabled %} disabled="disabled"{% endif %}{% if field.required %} required="required"{% endif %}
     {{ block('attributes') }}
 {% endspaceless %}
 {% endblock field_attributes %}

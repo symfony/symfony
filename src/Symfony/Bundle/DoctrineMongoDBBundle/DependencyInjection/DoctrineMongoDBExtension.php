@@ -29,6 +29,13 @@ use Symfony\Bundle\DoctrineAbstractBundle\DependencyInjection\AbstractDoctrineEx
  */
 class DoctrineMongoDBExtension extends AbstractDoctrineExtension
 {
+    public function mongodbLoad(array $configs, ContainerBuilder $container)
+    {
+        foreach ($configs as $config) {
+            $this->doMongodbLoad($config, $container);
+        }
+    }
+
     /**
      * Loads the MongoDB ODM configuration.
      *
@@ -39,7 +46,7 @@ class DoctrineMongoDBExtension extends AbstractDoctrineExtension
      * @param array $config An array of configuration settings
      * @param ContainerBuilder $container A ContainerBuilder instance
      */
-    public function mongodbLoad($config, ContainerBuilder $container)
+    protected function doMongodbLoad($config, ContainerBuilder $container)
     {
         $this->loadDefaults($config, $container);
         $this->loadConnections($config, $container);

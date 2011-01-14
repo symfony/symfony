@@ -26,7 +26,7 @@ class ContainerTest extends TestCase
         )));
         $loader = new DoctrineExtension();
         $container->registerExtension($loader);
-        $loader->dbalLoad(array(
+        $loader->dbalLoad(array(array(
             'connections' => array(
                 'default' => array(
                     'driver' => 'pdo_mysql',
@@ -34,7 +34,7 @@ class ContainerTest extends TestCase
                     'platform-service' => 'my.platform',
                 )
             )
-        ), $container);
+        )), $container);
         $loader->ormLoad(array('bundles' => array('YamlBundle' => array())), $container);
 
         $container->setDefinition('my.platform', new \Symfony\Component\DependencyInjection\Definition('Doctrine\DBAL\Platforms\MySqlPlatform'));

@@ -22,6 +22,13 @@ use Symfony\Component\DependencyInjection\ContainerBuilder;
  */
 class ZendExtension extends Extension
 {
+    public function configLoad(array $configs, ContainerBuilder $container)
+    {
+        foreach ($configs as $config) {
+            $this->doConfigLoad($config, $container);
+        }
+    }
+
     /**
      * Loads the Zend Framework configuration.
      *
@@ -34,7 +41,7 @@ class ZendExtension extends Extension
      * @param array            $config    An array of configuration settings
      * @param ContainerBuilder $container A ContainerBuilder instance
      */
-    public function configLoad($config, ContainerBuilder $container)
+    protected function doConfigLoad($config, ContainerBuilder $container)
     {
         if (isset($config['logger'])) {
             $this->registerLoggerConfiguration($config, $container);

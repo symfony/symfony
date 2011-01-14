@@ -23,26 +23,26 @@ class FrameworkExtensionTest extends TestCase
         $container = $this->getContainer();
         $loader = new FrameworkExtension();
 
-        $loader->configLoad(array(), $container);
+        $loader->configLoad(array(array()), $container);
         $this->assertEquals('Symfony\\Bundle\\FrameworkBundle\\RequestListener', $container->getParameter('request_listener.class'), '->webLoad() loads the web.xml file if not already loaded');
 
         $container = $this->getContainer();
         $loader = new FrameworkExtension();
 
         // profiler
-        $loader->configLoad(array('profiler' => true), $container);
+        $loader->configLoad(array(array('profiler' => true)), $container);
         $this->assertEquals('Symfony\Component\HttpKernel\Profiler\Profiler', $container->getParameter('profiler.class'), '->configLoad() loads the collectors.xml file if not already loaded');
 
         // templating
-        $loader->configLoad(array('templating' => array()), $container);
+        $loader->configLoad(array(array('templating' => array())), $container);
         $this->assertEquals('Symfony\\Bundle\\FrameworkBundle\\Templating\\PhpEngine', $container->getParameter('templating.engine.php.class'), '->templatingLoad() loads the templating.xml file if not already loaded');
 
         // validation
-        $loader->configLoad(array('validation' => array('enabled' => true)), $container);
+        $loader->configLoad(array(array('validation' => array('enabled' => true))), $container);
         $this->assertEquals('Symfony\Component\Validator\Validator', $container->getParameter('validator.class'), '->validationLoad() loads the validation.xml file if not already loaded');
         $this->assertFalse($container->hasDefinition('validator.mapping.loader.annotation_loader'), '->validationLoad() doesn\'t load the annotations service unless its needed');
 
-        $loader->configLoad(array('validation' => array('enabled' => true, 'annotations' => true)), $container);
+        $loader->configLoad(array(array('validation' => array('enabled' => true, 'annotations' => true))), $container);
         $this->assertTrue($container->hasDefinition('validator.mapping.loader.annotation_loader'), '->validationLoad() loads the annotations service');
     }
 

@@ -32,13 +32,20 @@ use Symfony\Component\DependencyInjection\Definition;
  */
 class WebProfilerExtension extends Extension
 {
+    public function configLoad(array $configs, ContainerBuilder $container)
+    {
+        foreach ($configs as $config) {
+            $this->doConfigLoad($config, $container);
+        }
+    }
+
     /**
      * Loads the web profiler configuration.
      *
      * @param array            $config    An array of configuration settings
      * @param ContainerBuilder $container A ContainerBuilder instance
      */
-    public function configLoad(array $config, ContainerBuilder $container)
+    protected function doConfigLoad(array $config, ContainerBuilder $container)
     {
         $loader = new XmlFileLoader($container, __DIR__.'/../Resources/config');
 

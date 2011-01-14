@@ -29,6 +29,20 @@ use Symfony\Bundle\DoctrineAbstractBundle\DependencyInjection\AbstractDoctrineEx
  */
 class DoctrineExtension extends AbstractDoctrineExtension
 {
+    public function dbalLoad(array $configs, ContainerBuilder $container)
+    {
+        foreach ($configs as $config) {
+            $this->doDbalLoad($config, $container);
+        }
+    }
+
+    public function ormLoad(array $configs, ContainerBuilder $container)
+    {
+        foreach ($configs as $config) {
+            $this->doOrmLoad($config, $container);
+        }
+    }
+
     /**
      * Loads the DBAL configuration.
      *
@@ -39,7 +53,7 @@ class DoctrineExtension extends AbstractDoctrineExtension
      * @param array $config An array of configuration settings
      * @param ContainerBuilder $container A ContainerBuilder instance
      */
-    public function dbalLoad($config, ContainerBuilder $container)
+    protected function doDbalLoad($config, ContainerBuilder $container)
     {
         $this->loadDbalDefaults($config, $container);
         $this->loadDbalConnections($config, $container);
@@ -55,7 +69,7 @@ class DoctrineExtension extends AbstractDoctrineExtension
      * @param array $config An array of configuration settings
      * @param ContainerBuilder $container A ContainerBuilder instance
      */
-    public function ormLoad($config, ContainerBuilder $container)
+    protected function doOrmLoad($config, ContainerBuilder $container)
     {
         $this->loadOrmDefaults($config, $container);
         $this->loadOrmEntityManagers($config, $container);

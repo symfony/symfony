@@ -22,12 +22,12 @@ class SwiftmailerExtensionTest extends TestCase
         $container = new ContainerBuilder();
         $loader = new SwiftmailerExtension();
 
-        $loader->configLoad(array(), $container);
+        $loader->configLoad(array(array()), $container);
         $this->assertEquals('Swift_Mailer', $container->getParameter('swiftmailer.class'), '->mailerLoad() loads the swiftmailer.xml file if not already loaded');
 
-        $loader->configLoad(array('transport' => 'sendmail'), $container);
+        $loader->configLoad(array(array('transport' => 'sendmail')), $container);
         $this->assertEquals('sendmail', $container->getParameter('swiftmailer.transport.name'), '->mailerLoad() overrides existing configuration options');
-        $loader->configLoad(array(), $container);
+        $loader->configLoad(array(array()), $container);
         $this->assertEquals('sendmail', $container->getParameter('swiftmailer.transport.name'), '->mailerLoad() overrides existing configuration options');
     }
 }

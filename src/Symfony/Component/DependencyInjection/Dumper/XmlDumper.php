@@ -47,8 +47,8 @@ class XmlDumper extends Dumper
         $container->setAttribute('xsi:schemaLocation', 'http://www.symfony-project.org/schema/dic/services http://www.symfony-project.org/schema/dic/services/services-1.0.xsd');
 
         $this->addParameters($container);
-        $this->addInterfaceInjectors($container);
         $this->addServices($container);
+        $this->addInterfaceInjectors($container);
 
         $this->document->appendChild($container);
         $xml = $this->document->saveXML();
@@ -195,8 +195,9 @@ class XmlDumper extends Dumper
         $withKeys = array_keys($parameters) !== range(0, count($parameters) - 1);
         foreach ($parameters as $key => $value) {
             $element = $this->document->createElement($type);
-            if ($withKeys)
+            if ($withKeys) {
                 $element->setAttribute('key', $key);
+            }
 
             if (is_array($value)) {
                 $element->setAttribute('type', 'collection');

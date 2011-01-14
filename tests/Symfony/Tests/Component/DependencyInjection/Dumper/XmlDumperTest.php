@@ -83,6 +83,9 @@ class XmlDumperTest extends \PHPUnit_Framework_TestCase
     <parameter key=\"cla\">Fo</parameter>
     <parameter key=\"ss\">Class</parameter>
   </parameters>
+  <services>
+    <service id=\"foo\" class=\"%cla%o%ss%\"/>
+  </services>
   <interfaces>
     <interface class=\"FooClass\">
       <call method=\"setBar\">
@@ -90,11 +93,11 @@ class XmlDumperTest extends \PHPUnit_Framework_TestCase
       </call>
     </interface>
   </interfaces>
-  <services>
-    <service id=\"foo\" class=\"%cla%o%ss%\"/>
-  </services>
 </container>
 ", $classBody);
+        $dom = new \DOMDocument();
+        $dom->loadXML($classBody);
+        $this->assertTrue($dom->schemaValidate(__DIR__ . '/../../../../../../src/Symfony/Component/DependencyInjection/Loader/schema/dic/services/services-1.0.xsd'));
     }
 
     public function testDumpAnonymousServices()

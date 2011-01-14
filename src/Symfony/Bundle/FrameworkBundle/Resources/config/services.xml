@@ -10,7 +10,7 @@
         <parameter key="response.class">Symfony\Component\HttpFoundation\Response</parameter>
         <parameter key="error_handler.class">Symfony\Component\HttpKernel\Debug\ErrorHandler</parameter>
         <parameter key="error_handler.level">null</parameter>
-        <parameter key="filesystem.class">Symfony\Bundle\FrameworkBundle\Util\FileSystem</parameter>
+        <parameter key="filesystem.class">Symfony\Bundle\FrameworkBundle\Util\Filesystem</parameter>
     </parameters>
 
     <services>

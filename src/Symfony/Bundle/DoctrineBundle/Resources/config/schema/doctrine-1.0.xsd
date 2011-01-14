@@ -75,6 +75,7 @@
         <xsd:attribute name="default-entity-manager" type="xsd:string" />
         <xsd:attribute name="metadata-driver" type="xsd:string" />
         <xsd:attribute name="cache-driver" type="xsd:string" />
+        <xsd:attribute name="auto-generate-proxy-classes" type="xsd:string" />
     </xsd:complexType>
 
     <xsd:complexType name="entity_managers">

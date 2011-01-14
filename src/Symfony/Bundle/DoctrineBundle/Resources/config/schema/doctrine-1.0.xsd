@@ -54,6 +54,7 @@
 
     <xsd:complexType name="mapping">
         <xsd:attribute name="name" type="xsd:string" use="required" />
+        <xsd:attribute name="type" type="xsd:string" />
         <xsd:attribute name="dir" type="xsd:string" />
         <xsd:attribute name="alias" type="xsd:string" />
         <xsd:attribute name="prefix" type="xsd:string" />

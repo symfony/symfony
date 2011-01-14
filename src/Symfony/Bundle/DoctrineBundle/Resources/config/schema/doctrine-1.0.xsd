@@ -70,12 +70,12 @@
         <xsd:sequence>
             <xsd:element name="entity-managers" type="entity_managers" minOccurs="0" maxOccurs="1" />
             <xsd:element name="mappings" type="mappings" minOccurs="0" maxOccurs="1" />
+            <xsd:element name="auto-generate-proxy-classes" type="xsd:string" minOccurs="0" maxOccurs="1" />
         </xsd:sequence>
 
         <xsd:attribute name="default-entity-manager" type="xsd:string" />
         <xsd:attribute name="metadata-driver" type="xsd:string" />
         <xsd:attribute name="cache-driver" type="xsd:string" />
-        <xsd:attribute name="auto-generate-proxy-classes" type="xsd:string" />
     </xsd:complexType>
 
     <xsd:complexType name="entity_managers">

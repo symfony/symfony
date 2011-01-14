@@ -154,7 +154,7 @@
         </service>
 
         <service id="security.firewall" class="%security.firewall.class%" public="false">
-            <tag name="kernel.listener" priority="128" />
+            <tag name="kernel.listener" priority="-128" />
             <argument type="service" id="security.firewall.map" />
         </service>
         <service id="security.firewall.map" class="%security.firewall.map.class%" public="false" />

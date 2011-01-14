@@ -24,6 +24,8 @@ class EventDispatcher
     /**
      * Connects a listener to a given event name.
      *
+     * Listeners with a higher priority are executed first.
+     *
      * @param string  $name      An event name
      * @param mixed   $listener  A PHP callable
      * @param integer $priority  The priority (between -10 and 10 -- defaults to 0)
@@ -148,7 +150,7 @@ class EventDispatcher
 
         $listeners = array();
         $all = $this->listeners[$name];
-        ksort($all);
+        krsort($all);
         foreach ($all as $l) {
             $listeners = array_merge($listeners, $l);
         }

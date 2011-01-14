@@ -117,37 +117,37 @@ class TemplatingExtension extends \Twig_Extension
 
     public function abbrClass($class)
     {
-        return $this->getTemplating()->get('code')->abbrClass($class);
+        return $this->container->get('templating.helper.code')->abbrClass($class);
     }
 
     public function abbrMethod($method)
     {
-        return $this->getTemplating()->get('code')->abbrMethod($method);
+        return $this->container->get('templating.helper.code')->abbrMethod($method);
     }
 
     public function formatArgs($args)
     {
-        return $this->getTemplating()->get('code')->formatArgs($args);
+        return $this->container->get('templating.helper.code')->formatArgs($args);
     }
 
     public function formatArgsAsText($args)
     {
-        return $this->getTemplating()->get('code')->formatArgsAsText($args);
+        return $this->container->get('templating.helper.code')->formatArgsAsText($args);
     }
 
     public function fileExcerpt($file, $line)
     {
-        return $this->getTemplating()->get('code')->fileExcerpt($file, $line);
+        return $this->container->get('templating.helper.code')->fileExcerpt($file, $line);
     }
 
     public function formatFile($file, $line)
     {
-        return $this->getTemplating()->get('code')->formatFile($file, $line);
+        return $this->container->get('templating.helper.code')->formatFile($file, $line);
     }
 
     public function formatFileFromText($text)
     {
-        return $this->getTemplating()->get('code')->formatFileFromText($text);
+        return $this->container->get('templating.helper.code')->formatFileFromText($text);
     }
 
     public function dump($value)

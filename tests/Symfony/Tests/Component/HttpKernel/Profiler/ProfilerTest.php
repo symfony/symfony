@@ -26,7 +26,11 @@ class ProfilerTest extends \PHPUnit_Framework_TestCase
         $response = new Response();
         $collector = new RequestDataCollector();
 
-        $storage = new SQLiteProfilerStorage(sys_get_temp_dir().'/sf2_profiler.db');
+        $tmp = tempnam(sys_get_temp_dir(), 'sf2_profiler');
+        if (file_exists($tmp)) {
+            @unlink($tmp);
+        }
+        $storage = new SQLiteProfilerStorage($tmp);
         $storage->purge(true);
 
         $profiler = new Profiler($storage);
@@ -37,5 +41,7 @@ class ProfilerTest extends \PHPUnit_Framework_TestCase
         $profiler = new Profiler($storage);
         $profiler->setToken('foobar');
         $this->assertEquals(array('foo' => 'bar'), $profiler->get('request')->getRequestQuery()->all());
+
+        @unlink($tmp);
     }
 }

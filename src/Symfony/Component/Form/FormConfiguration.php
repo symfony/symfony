@@ -45,7 +45,7 @@ class FormConfiguration
     }
 
     /**
-     * Enables CSRF protection for all new forms
+     * Enables CSRF protection for all new forms.
      */
     static public function enableDefaultCsrfProtection()
     {
@@ -69,7 +69,7 @@ class FormConfiguration
     }
 
     /**
-     * Sets the CSRF field name used in all new CSRF protected forms
+     * Sets the CSRF field name used in all new CSRF protected forms.
      *
      * @param string $name The CSRF field name
      */
@@ -79,7 +79,7 @@ class FormConfiguration
     }
 
     /**
-     * Returns the default CSRF field name
+     * Returns the default CSRF field name.
      *
      * @return string The CSRF field name
      */
@@ -89,7 +89,7 @@ class FormConfiguration
     }
 
     /**
-     * Sets the default CSRF secrets to be used in all new CSRF protected forms
+     * Sets the default CSRF secrets to be used in all new CSRF protected forms.
      *
      * @param array $secrets
      */
@@ -99,7 +99,7 @@ class FormConfiguration
     }
 
     /**
-     * Adds CSRF secrets to be used in all new CSRF protected forms
+     * Adds CSRF secrets to be used in all new CSRF protected forms.
      *
      * @param string $secret
      */
@@ -109,7 +109,7 @@ class FormConfiguration
     }
 
     /**
-     * Clear the default CSRF secrets
+     * Clears the default CSRF secrets.
      */
     static public function clearDefaultCsrfSecrets()
     {
@@ -117,7 +117,7 @@ class FormConfiguration
     }
 
     /**
-     * Returns the default CSRF secrets
+     * Returns the default CSRF secrets.
      *
      * @return array
      */

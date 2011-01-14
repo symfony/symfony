@@ -34,6 +34,13 @@ class DateTimeField extends FieldGroup
         self::TIMESTAMP,
     );
 
+    protected static $dateFormats = array(
+        DateField::FULL,
+        DateField::LONG,
+        DateField::MEDIUM,
+        DateField::SHORT,
+    );
+
     protected static $dateWidgets = array(
         DateField::CHOICE,
         DateField::INPUT,
@@ -57,6 +64,7 @@ class DateTimeField extends FieldGroup
         $this->addOption('seconds', range(0, 59));
         $this->addOption('data_timezone', 'UTC');
         $this->addOption('user_timezone', 'UTC');
+        $this->addOption('date_format', DateField::MEDIUM, self::$dateFormats);
         $this->addOption('date_widget', DateField::CHOICE, self::$dateWidgets);
         $this->addOption('time_widget', TimeField::CHOICE, self::$timeWidgets);
         $this->addOption('type', self::DATETIME, self::$types);
@@ -65,6 +73,7 @@ class DateTimeField extends FieldGroup
         $this->add(new DateField('date', array(
             'type' => DateField::RAW,
             'widget' => $this->getOption('date_widget'),
+            'format' => $this->getOption('date_format'),
             'data_timezone' => $this->getOption('user_timezone'),
             'user_timezone' => $this->getOption('user_timezone'),
             'years' => $this->getOption('years'),

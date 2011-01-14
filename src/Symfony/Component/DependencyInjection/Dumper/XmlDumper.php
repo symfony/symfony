@@ -53,6 +53,7 @@ class XmlDumper extends Dumper
         $this->document->appendChild($container);
         $xml = $this->document->saveXML();
         $this->document = null;
+
         return $xml;
     }
 
@@ -108,16 +109,21 @@ class XmlDumper extends Dumper
     protected function addService($definition, $id, \DOMElement $parent)
     {
         $service = $this->document->createElement('service');
-        if (null !== $id)
+        if (null !== $id) {
             $service->setAttribute('id', $id);
-        if ($definition->getClass())
+        }
+        if ($definition->getClass()) {
             $service->setAttribute('class', $definition->getClass());
-        if ($definition->getFactoryMethod())
+        }
+        if ($definition->getFactoryMethod()) {
             $service->setAttribute ('factory-method', $definition->getFactoryMethod());
-        if ($definition->getFactoryService())
+        }
+        if ($definition->getFactoryService()) {
             $service->setAttribute ('factory-service', $definition->getFactoryService());
-        if (!$definition->isShared())
+        }
+        if (!$definition->isShared()) {
             $service->setAttribute ('shared', 'false');
+        }
 
         foreach ($definition->getTags() as $name => $tags) {
             foreach ($tags as $attributes) {

@@ -386,7 +386,7 @@ class SecurityExtension extends Extension
 
         // a lazy loaded, message digest or plaintext encoder
         if (!isset($config['algorithm'])) {
-            throw new \RuntimeException('"algoritm" must be defined.');
+            throw new \RuntimeException('"algorithm" must be defined.');
         }
 
         // plaintext encoder

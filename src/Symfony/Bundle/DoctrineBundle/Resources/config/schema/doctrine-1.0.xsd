@@ -19,6 +19,7 @@
         <xsd:attribute name="user" type="xsd:string" />
         <xsd:attribute name="password" type="xsd:string" />
         <xsd:attribute name="driver" type="xsd:string" />
+        <xsd:attribute name="driver-class" type="xsd:string" />
         <xsd:attribute name="options" type="xsd:string" />
         <xsd:attribute name="path" type="xsd:string" />
         <xsd:attribute name="unix-socket" type="xsd:string" />
@@ -40,6 +41,7 @@
         <xsd:attribute name="user" type="xsd:string" />
         <xsd:attribute name="password" type="xsd:string" />
         <xsd:attribute name="driver" type="xsd:string" />
+        <xsd:attribute name="driver-class" type="xsd:string" />
         <xsd:attribute name="options" type="xsd:string" />
         <xsd:attribute name="path" type="xsd:string" />
         <xsd:attribute name="unix-socket" type="xsd:string" />

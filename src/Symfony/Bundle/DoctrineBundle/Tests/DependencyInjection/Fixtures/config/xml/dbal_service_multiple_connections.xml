@@ -16,14 +16,14 @@
             unix-socket="/path/to/mysqld.sock" /><!--  -->
         <doctrine:connection
             id="sqlite"
-            driver="PDOSqlite"
+            driver="pdo_sqlite"
             dbname="sqlite_db"
             user="sqlite_user"
             password="sqlite_s3cr3t"
             memory="true" />
         <doctrine:connection
             id="oci"
-            driver="OCI8"
+            driver="oci8"
             dbname="oracle_db"
             user="oracle_user"
             password="oracle_s3cr3t"

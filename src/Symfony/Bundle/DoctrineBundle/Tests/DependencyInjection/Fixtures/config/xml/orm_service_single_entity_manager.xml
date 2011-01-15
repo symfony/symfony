@@ -11,7 +11,7 @@
         <doctrine:connections>
             <doctrine:connection
                 id="default"
-                driver="PDOSqlite"
+                driver="pdo_sqlite"
                 dbname="sqlite_db"
                 user="sqlite_user"
                 password="sqlite_s3cr3t"

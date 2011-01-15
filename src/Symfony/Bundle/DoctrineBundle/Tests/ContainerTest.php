@@ -33,7 +33,14 @@ class ContainerTest extends TestCase
         )));
         $loader = new DoctrineExtension();
         $container->registerExtension($loader);
-        $loader->dbalLoad(array(), $container);
+        $loader->dbalLoad(array(
+            'connections' => array(
+                'default' => array(
+                    'driver' => 'pdo_mysql',
+                    'charset' => 'UTF-8',
+                )
+            )
+        ), $container);
         $loader->ormLoad(array('bundles' => array('YamlBundle' => array())), $container);
 
         $dumper = new PhpDumper($container);
@@ -62,5 +69,6 @@ class ContainerTest extends TestCase
         $this->assertInstanceOf('Doctrine\ORM\EntityManager', $container->get('doctrine.orm.entity_manager'));
         $this->assertInstanceOf('Symfony\Bundle\DoctrineAbstractBundle\Event\EventManager', $container->get('doctrine.orm.default_entity_manager.event_manager'));
         $this->assertInstanceOf('Symfony\Bundle\DoctrineAbstractBundle\Event\EventManager', $container->get('doctrine.dbal.event_manager'));
+        $this->assertInstanceOf('Doctrine\DBAL\Event\Listeners\MysqlSessionInit', $container->get('doctrine.dbal.default_connection.events.mysqlsessioninit'));
     }
 }

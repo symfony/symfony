@@ -78,6 +78,17 @@ abstract class AbstractDoctrineExtensionTest extends TestCase
 
         // doctrine.dbal.sqlite_connection
         $arguments = $container->getDefinition('doctrine.dbal.sqlite_connection')->getArguments();
+        $config = $arguments[0];
+        $this->assertArrayHasKey('memory', $config);
+
+        // doctrine.dbal.oci8_connection
+        $arguments = $container->getDefinition('doctrine.dbal.oci_connection')->getArguments();
+        $config = $arguments[0];
+        $this->assertArrayHasKey('charset', $config);
+    }
+
+    public function testDbalLoadFromXmlSingleConnections()
+    {
         $container = $this->getContainer();
         $loader = new DoctrineExtension();
         $container->registerExtension($loader);
@@ -143,7 +154,7 @@ abstract class AbstractDoctrineExtensionTest extends TestCase
         $this->assertEquals('Doctrine\DBAL\DriverManager', $definition->getClass());
 
         $args = $definition->getArguments();
-        $this->assertEquals('Doctrine\DBAL\Driver\PDOMySql\Driver', $args[0]['driverClass']);
+        $this->assertEquals('pdo_mysql', $args[0]['driver']);
         $this->assertEquals('localhost', $args[0]['host']);
         $this->assertEquals('root', $args[0]['user']);
         $this->assertEquals('doctrine.dbal.default_connection.configuration', (string) $args[1]);
@@ -218,7 +229,7 @@ abstract class AbstractDoctrineExtensionTest extends TestCase
 
         $this->assertDICConstructorArguments($definition, array(
             array(
-                'driverClass' => 'Doctrine\DBAL\Driver\PDOMySql\Driver',
+                'driver' => 'pdo_mysql',
                 'driverOptions' => array(),
                 'host' => 'localhost',
                 'user' => 'root',
@@ -254,7 +265,7 @@ abstract class AbstractDoctrineExtensionTest extends TestCase
 
         $this->assertDICConstructorArguments($definition, array(
             array(
-                'driverClass' => 'Doctrine\DBAL\Driver\PDOSqlite\Driver',
+                'driver' => 'pdo_sqlite',
                 'driverOptions' => array(),
                 'dbname' => 'sqlite_db',
                 'host' => 'localhost',
@@ -292,7 +303,7 @@ abstract class AbstractDoctrineExtensionTest extends TestCase
         $this->assertEquals('Doctrine\DBAL\DriverManager', $definition->getClass());
 
         $args = $definition->getArguments();
-        $this->assertEquals('Doctrine\DBAL\Driver\PDOSqlite\Driver', $args[0]['driverClass']);
+        $this->assertEquals('pdo_sqlite', $args[0]['driver']);
         $this->assertEquals('localhost', $args[0]['host']);
         $this->assertEquals('sqlite_user', $args[0]['user']);
         $this->assertEquals('doctrine.dbal.conn1_connection.configuration', (string) $args[1]);
@@ -315,7 +326,7 @@ abstract class AbstractDoctrineExtensionTest extends TestCase
         $this->assertEquals('Doctrine\DBAL\DriverManager', $definition->getClass());
 
         $args = $definition->getArguments();
-        $this->assertEquals('Doctrine\DBAL\Driver\PDOSqlite\Driver', $args[0]['driverClass']);
+        $this->assertEquals('pdo_sqlite', $args[0]['driver']);
         $this->assertEquals('localhost', $args[0]['host']);
         $this->assertEquals('sqlite_user', $args[0]['user']);
         $this->assertEquals('doctrine.dbal.conn2_connection.configuration', (string) $args[1]);

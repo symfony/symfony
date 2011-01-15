@@ -11,14 +11,14 @@
         <doctrine:connections>
             <doctrine:connection
                 id="conn1"
-                driver="PDOSqlite"
+                driver="pdo_sqlite"
                 dbname="sqlite_db"
                 user="sqlite_user"
                 password="sqlite_s3cr3t"
                 memory="true" />
             <doctrine:connection
                 id="conn2"
-                driver="PDOSqlite"
+                driver="pdo_sqlite"
                 dbname="sqlite_db"
                 user="sqlite_user"
                 password="sqlite_s3cr3t"

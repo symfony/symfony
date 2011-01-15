@@ -6,13 +6,10 @@ doctrine.dbal:
       password: mysql_s3cr3t
       unix_socket: /path/to/mysqld.sock
     sqlite:
-      driver: PDOSqlite
-      dbname: sqlite_db
-      user: sqlite_user
-      password: sqlite_s3cr3t
+      driver: pdo_sqlite
       memory: true
     oci:
-      driver: OCI8
+      driver: oci8
       dbname: oracle_db
       user: oracle_user
       password: oracle_s3cr3t

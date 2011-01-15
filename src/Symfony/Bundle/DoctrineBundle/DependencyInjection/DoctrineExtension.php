@@ -123,7 +123,13 @@ class DoctrineExtension extends AbstractDoctrineExtension
         }
 
         if (isset($connection['driver'])) {
-            $driverOptions['driverClass'] = sprintf('Doctrine\\DBAL\\Driver\\%s\\Driver', $connection['driver']);
+            $driverOptions['driver'] = $connection['driver'];
+        }
+        if (isset($connection['driver-class'])) {
+            $driverOptions['driverClass'] = $connection['driver-class'];
+        }
+        if (isset($connection['driver_class'])) {
+            $driverOptions['driverClass'] = $connection['driver_class'];
         }
         if (isset($connection['wrapper-class'])) {
             $driverOptions['wrapperClass'] = $connection['wrapper-class'];
@@ -171,6 +177,21 @@ class DoctrineExtension extends AbstractDoctrineExtension
             $container->setAlias('doctrine.dbal.event_manager', sprintf('doctrine.dbal.%s_connection.event_manager', $connection['name']));
         }
 
+        if (isset($driverOptions['charset'])) {
+            if ( (isset($driverOptions['driver']) && stripos($driverOptions['driver'], 'mysql') !== false) ||
+                 (isset($driverOptions['driverClass']) && stripos($driverOptions['driverClass'], 'mysql') !== false)) {
+                $mysqlSessionInit = new Definition('%doctrine.dbal.events.mysql_session_init.class%');
+                $mysqlSessionInit->setArguments(array($driverOptions['charset']));
+                $mysqlSessionInit->addTag($eventManagerName);
+
+                $container->setDefinition(
+                    sprintf('doctrine.dbal.%s_connection.events.mysqlsessioninit', $connection['name']),
+                    $mysqlSessionInit
+                );
+                unset($driverOptions['charset']);
+            }
+        }
+
         $driverDef->setArguments(array(
             $driverOptions,
             new Reference(sprintf('doctrine.dbal.%s_connection.configuration', $connection['name'])),
@@ -188,7 +209,7 @@ class DoctrineExtension extends AbstractDoctrineExtension
     {
         $defaultConnectionName = $container->getParameter('doctrine.dbal.default_connection');
         $defaultConnection = array(
-            'driver'              => 'PDOMySql',
+            'driver'              => 'pdo_mysql',
             'user'                => 'root',
             'password'            => null,
             'host'                => 'localhost',

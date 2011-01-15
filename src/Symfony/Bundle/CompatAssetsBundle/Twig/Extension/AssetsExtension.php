@@ -1,13 +1,5 @@
 <?php
 
-namespace Symfony\Bundle\CompatAssetsBundle\Twig\Extension;
-
-use Symfony\Component\DependencyInjection\ContainerInterface;
-use Symfony\Bundle\CompatAssetsBundle\Twig\TokenParser\StylesheetTokenParser;
-use Symfony\Bundle\CompatAssetsBundle\Twig\TokenParser\StylesheetsTokenParser;
-use Symfony\Bundle\CompatAssetsBundle\Twig\TokenParser\JavascriptTokenParser;
-use Symfony\Bundle\CompatAssetsBundle\Twig\TokenParser\JavascriptsTokenParser;
-
 /*
  * This file is part of the Symfony package.
  *
@@ -16,6 +8,14 @@ use Symfony\Bundle\CompatAssetsBundle\Twig\TokenParser\JavascriptsTokenParser;
  * For the full copyright and license information, please view the LICENSE
  * file that was distributed with this source code.
  */
+
+namespace Symfony\Bundle\CompatAssetsBundle\Twig\Extension;
+
+use Symfony\Component\DependencyInjection\ContainerInterface;
+use Symfony\Bundle\CompatAssetsBundle\Twig\TokenParser\StylesheetTokenParser;
+use Symfony\Bundle\CompatAssetsBundle\Twig\TokenParser\StylesheetsTokenParser;
+use Symfony\Bundle\CompatAssetsBundle\Twig\TokenParser\JavascriptTokenParser;
+use Symfony\Bundle\CompatAssetsBundle\Twig\TokenParser\JavascriptsTokenParser;
 
 /**
  *

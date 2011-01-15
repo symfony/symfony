@@ -1,14 +1,5 @@
 <?php
 
-namespace Symfony\Bundle\TwigBundle\Extension;
-
-use Symfony\Component\Form\Form;
-use Symfony\Component\Form\FieldGroupInterface;
-use Symfony\Component\Form\FieldInterface;
-use Symfony\Component\Form\CollectionField;
-use Symfony\Component\Form\HybridField;
-use Symfony\Bundle\TwigBundle\TokenParser\FormThemeTokenParser;
-
 /*
  * This file is part of the Symfony package.
  *
@@ -17,6 +8,15 @@ use Symfony\Bundle\TwigBundle\TokenParser\FormThemeTokenParser;
  * For the full copyright and license information, please view the LICENSE
  * file that was distributed with this source code.
  */
+
+namespace Symfony\Bundle\TwigBundle\Extension;
+
+use Symfony\Component\Form\Form;
+use Symfony\Component\Form\FieldGroupInterface;
+use Symfony\Component\Form\FieldInterface;
+use Symfony\Component\Form\CollectionField;
+use Symfony\Component\Form\HybridField;
+use Symfony\Bundle\TwigBundle\TokenParser\FormThemeTokenParser;
 
 /**
  * FormExtension extends Twig with form capabilities.

@@ -1,10 +1,5 @@
 <?php
 
-namespace Symfony\Component\Templating\Loader;
-
-use Symfony\Component\Templating\Storage\Storage;
-use Symfony\Component\Templating\Storage\FileStorage;
-
 /*
  * This file is part of the Symfony package.
  *
@@ -13,6 +8,11 @@ use Symfony\Component\Templating\Storage\FileStorage;
  * For the full copyright and license information, please view the LICENSE
  * file that was distributed with this source code.
  */
+
+namespace Symfony\Component\Templating\Loader;
+
+use Symfony\Component\Templating\Storage\Storage;
+use Symfony\Component\Templating\Storage\FileStorage;
 
 /**
  * CacheLoader is a loader that caches other loaders responses

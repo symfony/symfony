@@ -1,10 +1,5 @@
 <?php
 
-namespace Symfony\Bundle\FrameworkBundle\Templating;
-
-use Symfony\Component\Templating\TemplateNameParser as BaseTemplateNameParser;
-use Symfony\Component\HttpKernel\Kernel;
-
 /*
  * This file is part of the Symfony package.
  *
@@ -13,6 +8,11 @@ use Symfony\Component\HttpKernel\Kernel;
  * For the full copyright and license information, please view the LICENSE
  * file that was distributed with this source code.
  */
+
+namespace Symfony\Bundle\FrameworkBundle\Templating;
+
+use Symfony\Component\Templating\TemplateNameParser as BaseTemplateNameParser;
+use Symfony\Component\HttpKernel\Kernel;
 
 /**
  * TemplateNameParser parsers template name from the short notation

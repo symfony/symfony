@@ -1,9 +1,5 @@
 <?php
 
-namespace Symfony\Component\Security\Role;
-
-use Symfony\Component\Security\Authentication\Token\TokenInterface;
-
 /*
  * This file is part of the Symfony package.
  *
@@ -12,6 +8,10 @@ use Symfony\Component\Security\Authentication\Token\TokenInterface;
  * For the full copyright and license information, please view the LICENSE
  * file that was distributed with this source code.
  */
+
+namespace Symfony\Component\Security\Role;
+
+use Symfony\Component\Security\Authentication\Token\TokenInterface;
 
 /**
  * SwitchUserRole is used when the current user temporarily impersonates

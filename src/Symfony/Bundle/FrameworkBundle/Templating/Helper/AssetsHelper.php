@@ -1,10 +1,5 @@
 <?php
 
-namespace Symfony\Bundle\FrameworkBundle\Templating\Helper;
-
-use Symfony\Component\HttpFoundation\Request;
-use Symfony\Component\Templating\Helper\AssetsHelper as BaseAssetsHelper;
-
 /*
  * This file is part of the Symfony package.
  *
@@ -13,6 +8,11 @@ use Symfony\Component\Templating\Helper\AssetsHelper as BaseAssetsHelper;
  * For the full copyright and license information, please view the LICENSE
  * file that was distributed with this source code.
  */
+
+namespace Symfony\Bundle\FrameworkBundle\Templating\Helper;
+
+use Symfony\Component\HttpFoundation\Request;
+use Symfony\Component\Templating\Helper\AssetsHelper as BaseAssetsHelper;
 
 /**
  * AssetsHelper is the base class for all helper classes that manages assets.

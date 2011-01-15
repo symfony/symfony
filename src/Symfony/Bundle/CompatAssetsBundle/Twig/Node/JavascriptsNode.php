@@ -1,7 +1,5 @@
 <?php
 
-namespace Symfony\Bundle\CompatAssetsBundle\Twig\Node;
-
 /*
  * This file is part of the Symfony package.
  *
@@ -10,6 +8,8 @@ namespace Symfony\Bundle\CompatAssetsBundle\Twig\Node;
  * For the full copyright and license information, please view the LICENSE
  * file that was distributed with this source code.
  */
+
+namespace Symfony\Bundle\CompatAssetsBundle\Twig\Node;
 
 /**
  * Represents a javascripts node.

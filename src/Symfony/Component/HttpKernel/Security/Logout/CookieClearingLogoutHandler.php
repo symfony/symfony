@@ -1,11 +1,5 @@
 <?php
 
-namespace Symfony\Component\HttpKernel\Security\Logout;
-
-use Symfony\Component\Security\Authentication\Token\TokenInterface;
-use Symfony\Component\HttpFoundation\Response;
-use Symfony\Component\HttpFoundation\Request;
-
 /*
  * This file is part of the Symfony package.
  *
@@ -14,6 +8,12 @@ use Symfony\Component\HttpFoundation\Request;
  * For the full copyright and license information, please view the LICENSE
  * file that was distributed with this source code.
  */
+
+namespace Symfony\Component\HttpKernel\Security\Logout;
+
+use Symfony\Component\Security\Authentication\Token\TokenInterface;
+use Symfony\Component\HttpFoundation\Response;
+use Symfony\Component\HttpFoundation\Request;
 
 /**
  * This handler cleares the passed cookies when a user logs out.

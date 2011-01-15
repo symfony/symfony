@@ -1,12 +1,5 @@
 <?php
 
-namespace Symfony\Component\Security\User;
-
-use Symfony\Component\Security\Exception\CredentialsExpiredException;
-use Symfony\Component\Security\Exception\LockedException;
-use Symfony\Component\Security\Exception\DisabledException;
-use Symfony\Component\Security\Exception\AccountExpiredException;
-
 /*
  * This file is part of the Symfony package.
  *
@@ -15,6 +8,13 @@ use Symfony\Component\Security\Exception\AccountExpiredException;
  * For the full copyright and license information, please view the LICENSE
  * file that was distributed with this source code.
  */
+
+namespace Symfony\Component\Security\User;
+
+use Symfony\Component\Security\Exception\CredentialsExpiredException;
+use Symfony\Component\Security\Exception\LockedException;
+use Symfony\Component\Security\Exception\DisabledException;
+use Symfony\Component\Security\Exception\AccountExpiredException;
 
 /**
  * AccountChecker checks the user account flags.

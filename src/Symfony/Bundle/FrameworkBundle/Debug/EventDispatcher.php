@@ -1,13 +1,5 @@
 <?php
 
-namespace Symfony\Bundle\FrameworkBundle\Debug;
-
-use Symfony\Bundle\FrameworkBundle\EventDispatcher as BaseEventDispatcher;
-use Symfony\Component\EventDispatcher\EventDispatcherInterface;
-use Symfony\Component\EventDispatcher\Event;
-use Symfony\Component\HttpKernel\Log\LoggerInterface;
-use Symfony\Component\HttpKernel\Debug\EventDispatcherTraceableInterface;
-
 /*
  * This file is part of the Symfony package.
  *
@@ -16,6 +8,14 @@ use Symfony\Component\HttpKernel\Debug\EventDispatcherTraceableInterface;
  * For the full copyright and license information, please view the LICENSE
  * file that was distributed with this source code.
  */
+
+namespace Symfony\Bundle\FrameworkBundle\Debug;
+
+use Symfony\Bundle\FrameworkBundle\EventDispatcher as BaseEventDispatcher;
+use Symfony\Component\EventDispatcher\EventDispatcherInterface;
+use Symfony\Component\EventDispatcher\Event;
+use Symfony\Component\HttpKernel\Log\LoggerInterface;
+use Symfony\Component\HttpKernel\Debug\EventDispatcherTraceableInterface;
 
 /**
  * EventDispatcher extends the original EventDispatcher class to add some debugging tools.

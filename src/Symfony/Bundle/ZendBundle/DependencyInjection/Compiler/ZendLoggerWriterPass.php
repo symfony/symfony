@@ -1,11 +1,5 @@
 <?php
 
-namespace Symfony\Bundle\ZendBundle\DependencyInjection\Compiler;
-
-use Symfony\Component\DependencyInjection\Reference;
-use Symfony\Component\DependencyInjection\ContainerBuilder;
-use Symfony\Component\DependencyInjection\Compiler\CompilerPassInterface;
-
 /*
  * This file is part of the Symfony package.
  *
@@ -14,6 +8,12 @@ use Symfony\Component\DependencyInjection\Compiler\CompilerPassInterface;
  * For the full copyright and license information, please view the LICENSE
  * file that was distributed with this source code.
  */
+
+namespace Symfony\Bundle\ZendBundle\DependencyInjection\Compiler;
+
+use Symfony\Component\DependencyInjection\Reference;
+use Symfony\Component\DependencyInjection\ContainerBuilder;
+use Symfony\Component\DependencyInjection\Compiler\CompilerPassInterface;
 
 /**
  * Adds tagged zend.logger.writer services to zend.logger service

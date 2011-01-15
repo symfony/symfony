@@ -1,7 +1,5 @@
 <?php
 
-namespace Symfony\Component\Templating\Storage;
-
 /*
  * This file is part of the Symfony package.
  *
@@ -10,6 +8,8 @@ namespace Symfony\Component\Templating\Storage;
  * For the full copyright and license information, please view the LICENSE
  * file that was distributed with this source code.
  */
+
+namespace Symfony\Component\Templating\Storage;
 
 /**
  * FileStorage represents a template stored on the filesystem.

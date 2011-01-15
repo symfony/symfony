@@ -1,11 +1,5 @@
 <?php
 
-namespace Symfony\Component\Security;
-
-use Symfony\Component\Security\Authentication\Token\TokenInterface;
-use Symfony\Component\Security\Authorization\AccessDecisionManager;
-use Symfony\Component\Security\Acl\Voter\FieldVote;
-
 /*
  * This file is part of the Symfony package.
  *
@@ -14,6 +8,12 @@ use Symfony\Component\Security\Acl\Voter\FieldVote;
  * For the full copyright and license information, please view the LICENSE
  * file that was distributed with this source code.
  */
+
+namespace Symfony\Component\Security;
+
+use Symfony\Component\Security\Authentication\Token\TokenInterface;
+use Symfony\Component\Security\Authorization\AccessDecisionManager;
+use Symfony\Component\Security\Acl\Voter\FieldVote;
 
 /**
  * SecurityContext is the main entry point of the Security component.

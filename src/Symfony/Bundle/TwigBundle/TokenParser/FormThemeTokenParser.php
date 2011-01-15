@@ -1,9 +1,5 @@
 <?php
 
-namespace Symfony\Bundle\TwigBundle\TokenParser;
-
-use Symfony\Bundle\TwigBundle\Node\FormThemeNode;
-
 /*
  * This file is part of the Symfony package.
  *
@@ -12,6 +8,10 @@ use Symfony\Bundle\TwigBundle\Node\FormThemeNode;
  * For the full copyright and license information, please view the LICENSE
  * file that was distributed with this source code.
  */
+
+namespace Symfony\Bundle\TwigBundle\TokenParser;
+
+use Symfony\Bundle\TwigBundle\Node\FormThemeNode;
 
 /**
  * 

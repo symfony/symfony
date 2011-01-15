@@ -1,14 +1,5 @@
 <?php
 
-namespace Symfony\Bundle\TwigBundle\Extension;
-
-use Symfony\Component\DependencyInjection\ContainerInterface;
-use Symfony\Bundle\TwigBundle\TokenParser\IncludeTokenParser;
-use Symfony\Bundle\TwigBundle\TokenParser\UrlTokenParser;
-use Symfony\Bundle\TwigBundle\TokenParser\PathTokenParser;
-use Symfony\Bundle\TwigBundle\TokenParser\RenderTokenParser;
-use Symfony\Component\Yaml\Dumper as YamlDumper;
-
 /*
  * This file is part of the Symfony package.
  *
@@ -17,6 +8,15 @@ use Symfony\Component\Yaml\Dumper as YamlDumper;
  * For the full copyright and license information, please view the LICENSE
  * file that was distributed with this source code.
  */
+
+namespace Symfony\Bundle\TwigBundle\Extension;
+
+use Symfony\Component\DependencyInjection\ContainerInterface;
+use Symfony\Bundle\TwigBundle\TokenParser\IncludeTokenParser;
+use Symfony\Bundle\TwigBundle\TokenParser\UrlTokenParser;
+use Symfony\Bundle\TwigBundle\TokenParser\PathTokenParser;
+use Symfony\Bundle\TwigBundle\TokenParser\RenderTokenParser;
+use Symfony\Component\Yaml\Dumper as YamlDumper;
 
 /**
  *

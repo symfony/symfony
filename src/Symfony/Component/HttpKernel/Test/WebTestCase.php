@@ -1,10 +1,5 @@
 <?php
 
-namespace Symfony\Component\HttpKernel\Test;
-
-use Symfony\Component\DomCrawler\Crawler;
-use Symfony\Component\HttpKernel\Client;
-
 /*
  * This file is part of the Symfony package.
  *
@@ -13,6 +8,11 @@ use Symfony\Component\HttpKernel\Client;
  * For the full copyright and license information, please view the LICENSE
  * file that was distributed with this source code.
  */
+
+namespace Symfony\Component\HttpKernel\Test;
+
+use Symfony\Component\DomCrawler\Crawler;
+use Symfony\Component\HttpKernel\Client;
 
 /**
  * WebTestCase is the base class for functional tests.

@@ -1,11 +1,5 @@
 <?php
 
-namespace Symfony\Bundle\TwigBundle\Extension;
-
-use Symfony\Bundle\TwigBundle\TokenParser\TransTokenParser;
-use Symfony\Bundle\TwigBundle\TokenParser\TransChoiceTokenParser;
-use Symfony\Component\Translation\TranslatorInterface;
-
 /*
  * This file is part of the Symfony package.
  *
@@ -14,6 +8,12 @@ use Symfony\Component\Translation\TranslatorInterface;
  * For the full copyright and license information, please view the LICENSE
  * file that was distributed with this source code.
  */
+
+namespace Symfony\Bundle\TwigBundle\Extension;
+
+use Symfony\Bundle\TwigBundle\TokenParser\TransTokenParser;
+use Symfony\Bundle\TwigBundle\TokenParser\TransChoiceTokenParser;
+use Symfony\Component\Translation\TranslatorInterface;
 
 /**
  *

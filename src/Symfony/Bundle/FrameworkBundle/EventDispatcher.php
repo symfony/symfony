@@ -1,9 +1,5 @@
 <?php
 
-namespace Symfony\Bundle\FrameworkBundle;
-
-use Symfony\Component\EventDispatcher\EventDispatcher as BaseEventDispatcher;
-
 /*
  * This file is part of the Symfony package.
  *
@@ -12,6 +8,10 @@ use Symfony\Component\EventDispatcher\EventDispatcher as BaseEventDispatcher;
  * For the full copyright and license information, please view the LICENSE
  * file that was distributed with this source code.
  */
+
+namespace Symfony\Bundle\FrameworkBundle;
+
+use Symfony\Component\EventDispatcher\EventDispatcher as BaseEventDispatcher;
 
 /**
  * This EventDispatcher automatically gets the kernel listeners injected

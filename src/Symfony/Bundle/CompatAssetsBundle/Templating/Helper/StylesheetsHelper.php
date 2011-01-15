@@ -1,10 +1,5 @@
 <?php
 
-namespace Symfony\Bundle\CompatAssetsBundle\Templating\Helper;
-
-use Symfony\Component\Templating\Helper\Helper;
-use Symfony\Component\Templating\Helper\AssetsHelper;
-
 /*
  * This file is part of the Symfony package.
  *
@@ -13,6 +8,11 @@ use Symfony\Component\Templating\Helper\AssetsHelper;
  * For the full copyright and license information, please view the LICENSE
  * file that was distributed with this source code.
  */
+
+namespace Symfony\Bundle\CompatAssetsBundle\Templating\Helper;
+
+use Symfony\Component\Templating\Helper\Helper;
+use Symfony\Component\Templating\Helper\AssetsHelper;
 
 /**
  * StylesheetsHelper is a helper that manages stylesheets.

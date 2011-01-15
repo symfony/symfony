@@ -1,9 +1,5 @@
 <?php
 
-namespace Symfony\Component\CssSelector\Node;
-
-use Symfony\Component\CssSelector\SyntaxError;
-
 /*
  * This file is part of the Symfony package.
  *
@@ -12,6 +8,10 @@ use Symfony\Component\CssSelector\SyntaxError;
  * For the full copyright and license information, please view the LICENSE
  * file that was distributed with this source code.
  */
+
+namespace Symfony\Component\CssSelector\Node;
+
+use Symfony\Component\CssSelector\SyntaxError;
 
 /**
  * CombinedSelectorNode represents a combinator node.

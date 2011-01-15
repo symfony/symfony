@@ -1,7 +1,5 @@
 <?php
 
-namespace Symfony\Component\Templating\Loader;
-
 /*
  * This file is part of the Symfony package.
  *
@@ -10,6 +8,8 @@ namespace Symfony\Component\Templating\Loader;
  * For the full copyright and license information, please view the LICENSE
  * file that was distributed with this source code.
  */
+
+namespace Symfony\Component\Templating\Loader;
 
 /**
  * LoaderInterface is the interface all loaders must implement.

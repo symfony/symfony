@@ -1,10 +1,5 @@
 <?php
 
-namespace Symfony\Component\Templating\Loader;
-
-use Symfony\Component\Templating\DebuggerInterface;
-use Symfony\Component\Templating\TemplateNameParserInterface;
-
 /*
  * This file is part of the Symfony package.
  *
@@ -13,6 +8,11 @@ use Symfony\Component\Templating\TemplateNameParserInterface;
  * For the full copyright and license information, please view the LICENSE
  * file that was distributed with this source code.
  */
+
+namespace Symfony\Component\Templating\Loader;
+
+use Symfony\Component\Templating\DebuggerInterface;
+use Symfony\Component\Templating\TemplateNameParserInterface;
 
 /**
  * Loader is the base class for all template loader classes.

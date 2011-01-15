@@ -1,17 +1,17 @@
 <?php
 
-namespace Symfony\Component\DependencyInjection\Loader;
-
-use Symfony\Component\DependencyInjection\ContainerBuilder;
-
 /*
- * This file is part of the Symfony framework.
+ * This file is part of the Symfony package.
  *
  * (c) Fabien Potencier <fabien.potencier@symfony-project.com>
  *
- * This source file is subject to the MIT license that is bundled
- * with this source code in the file LICENSE.
+ * For the full copyright and license information, please view the LICENSE
+ * file that was distributed with this source code.
  */
+
+namespace Symfony\Component\DependencyInjection\Loader;
+
+use Symfony\Component\DependencyInjection\ContainerBuilder;
 
 /**
  * Loader is the abstract class used by all built-in loaders.

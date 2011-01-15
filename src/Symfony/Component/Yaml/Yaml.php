@@ -1,14 +1,15 @@
 <?php
 
-namespace Symfony\Component\Yaml;
-
 /*
  * This file is part of the Symfony package.
- * (c) 2004-2006 Fabien Potencier <fabien.potencier@symfony-project.com>
+ *
+ * (c) Fabien Potencier <fabien.potencier@symfony-project.com>
  *
  * For the full copyright and license information, please view the LICENSE
  * file that was distributed with this source code.
  */
+
+namespace Symfony\Component\Yaml;
 
 /**
  * Yaml offers convenience methods to load and dump YAML.

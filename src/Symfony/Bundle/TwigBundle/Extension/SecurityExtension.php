@@ -1,10 +1,5 @@
 <?php
 
-namespace Symfony\Bundle\TwigBundle\Extension;
-
-use Symfony\Bundle\TwigBundle\TokenParser\IfRoleTokenParser;
-use Symfony\Component\Security\SecurityContext;
-
 /*
  * This file is part of the Symfony package.
  *
@@ -13,6 +8,11 @@ use Symfony\Component\Security\SecurityContext;
  * For the full copyright and license information, please view the LICENSE
  * file that was distributed with this source code.
  */
+
+namespace Symfony\Bundle\TwigBundle\Extension;
+
+use Symfony\Bundle\TwigBundle\TokenParser\IfRoleTokenParser;
+use Symfony\Component\Security\SecurityContext;
 
 /**
  * SecurityExtension exposes security context features.

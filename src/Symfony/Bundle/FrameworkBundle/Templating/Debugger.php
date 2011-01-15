@@ -1,10 +1,5 @@
 <?php
 
-namespace Symfony\Bundle\FrameworkBundle\Templating;
-
-use Symfony\Component\Templating\DebuggerInterface;
-use Symfony\Component\HttpKernel\Log\LoggerInterface;
-
 /*
  * This file is part of the Symfony package.
  *
@@ -13,6 +8,11 @@ use Symfony\Component\HttpKernel\Log\LoggerInterface;
  * For the full copyright and license information, please view the LICENSE
  * file that was distributed with this source code.
  */
+
+namespace Symfony\Bundle\FrameworkBundle\Templating;
+
+use Symfony\Component\Templating\DebuggerInterface;
+use Symfony\Component\HttpKernel\Log\LoggerInterface;
 
 /**
  * Binds the Symfony templating loader debugger to the Symfony logger.

@@ -1,5 +1,14 @@
 <?php
 
+/*
+ * This file is part of the Symfony package.
+ *
+ * (c) Fabien Potencier <fabien.potencier@symfony-project.com>
+ *
+ * For the full copyright and license information, please view the LICENSE
+ * file that was distributed with this source code.
+ */
+
 namespace Symfony\Component\HttpKernel\Security\Firewall;
 
 use Symfony\Component\Security\SecurityContext;
@@ -15,15 +24,6 @@ use Symfony\Component\Security\Exception\UsernameNotFoundException;
 use Symfony\Component\HttpKernel\Security\EntryPoint\NonceExpiredException;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\Security\Exception\AuthenticationException;
-
-/*
- * This file is part of the Symfony framework.
- *
- * (c) Fabien Potencier <fabien.potencier@symfony-project.com>
- *
- * This source file is subject to the MIT license that is bundled
- * with this source code in the file LICENSE.
- */
 
 /**
  * DigestAuthenticationListener implements Digest HTTP authentication.

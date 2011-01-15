@@ -1,10 +1,5 @@
 <?php
 
-namespace Symfony\Component\Security\Authorization\Voter;
-
-use Symfony\Component\Security\Authentication\Token\TokenInterface;
-use Symfony\Component\Security\Role\RoleHierarchyInterface;
-
 /*
  * This file is part of the Symfony package.
  *
@@ -13,6 +8,11 @@ use Symfony\Component\Security\Role\RoleHierarchyInterface;
  * For the full copyright and license information, please view the LICENSE
  * file that was distributed with this source code.
  */
+
+namespace Symfony\Component\Security\Authorization\Voter;
+
+use Symfony\Component\Security\Authentication\Token\TokenInterface;
+use Symfony\Component\Security\Role\RoleHierarchyInterface;
 
 /**
  * RoleHierarchyVoter uses a RoleHierarchy to determine the roles granted to

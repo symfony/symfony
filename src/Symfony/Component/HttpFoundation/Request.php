@@ -1,10 +1,5 @@
 <?php
 
-namespace Symfony\Component\HttpFoundation;
-
-use Symfony\Component\HttpFoundation\SessionStorage\NativeSessionStorage;
-use Symfony\Component\HttpFoundation\File\UploadedFile;
-
 /*
  * This file is part of the Symfony package.
  *
@@ -13,6 +8,11 @@ use Symfony\Component\HttpFoundation\File\UploadedFile;
  * For the full copyright and license information, please view the LICENSE
  * file that was distributed with this source code.
  */
+
+namespace Symfony\Component\HttpFoundation;
+
+use Symfony\Component\HttpFoundation\SessionStorage\NativeSessionStorage;
+use Symfony\Component\HttpFoundation\File\UploadedFile;
 
 /**
  * Request represents an HTTP request.

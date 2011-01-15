@@ -1,9 +1,5 @@
 <?php
 
-namespace Symfony\Component\DomCrawler;
-
-use Symfony\Component\CssSelector\Parser as CssParser;
-
 /*
  * This file is part of the Symfony package.
  *
@@ -12,6 +8,10 @@ use Symfony\Component\CssSelector\Parser as CssParser;
  * For the full copyright and license information, please view the LICENSE
  * file that was distributed with this source code.
  */
+
+namespace Symfony\Component\DomCrawler;
+
+use Symfony\Component\CssSelector\Parser as CssParser;
 
 /**
  * Crawler eases navigation of a list of \DOMNode objects.

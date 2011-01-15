@@ -1,9 +1,5 @@
 <?php
 
-namespace Symfony\Component\Security\Encoder;
-
-use Symfony\Component\Security\User\AccountInterface;
-
 /*
  * This file is part of the Symfony package.
  *
@@ -12,6 +8,10 @@ use Symfony\Component\Security\User\AccountInterface;
  * For the full copyright and license information, please view the LICENSE
  * file that was distributed with this source code.
  */
+
+namespace Symfony\Component\Security\Encoder;
+
+use Symfony\Component\Security\User\AccountInterface;
 
 /**
  * EncoderFactoryInterface to support different encoders for different accounts.

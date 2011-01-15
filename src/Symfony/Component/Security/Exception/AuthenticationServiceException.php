@@ -1,7 +1,5 @@
 <?php
 
-namespace Symfony\Component\Security\Exception;
-
 /*
  * This file is part of the Symfony package.
  *
@@ -10,6 +8,8 @@ namespace Symfony\Component\Security\Exception;
  * For the full copyright and license information, please view the LICENSE
  * file that was distributed with this source code.
  */
+
+namespace Symfony\Component\Security\Exception;
 
 /**
  * AuthenticationServiceException is thrown when an authentication request could not be processed due to a system problem.

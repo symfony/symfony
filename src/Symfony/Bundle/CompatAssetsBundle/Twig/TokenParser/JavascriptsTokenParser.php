@@ -1,9 +1,5 @@
 <?php
 
-namespace Symfony\Bundle\CompatAssetsBundle\Twig\TokenParser;
-
-use Symfony\Bundle\CompatAssetsBundle\Twig\Node\JavascriptsNode;
-
 /*
  * This file is part of the Symfony package.
  *
@@ -12,6 +8,10 @@ use Symfony\Bundle\CompatAssetsBundle\Twig\Node\JavascriptsNode;
  * For the full copyright and license information, please view the LICENSE
  * file that was distributed with this source code.
  */
+
+namespace Symfony\Bundle\CompatAssetsBundle\Twig\TokenParser;
+
+use Symfony\Bundle\CompatAssetsBundle\Twig\Node\JavascriptsNode;
 
 /**
  * 

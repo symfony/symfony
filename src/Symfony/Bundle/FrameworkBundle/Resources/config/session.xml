@@ -36,6 +36,6 @@
             <argument>%session.storage.array.options%</argument>
         </service>
 
-        <service id="session.storage" alias="session.storage.native" />
+        <service id="session.storage" alias="session.storage.native" public="false" />
     </services>
 </container>

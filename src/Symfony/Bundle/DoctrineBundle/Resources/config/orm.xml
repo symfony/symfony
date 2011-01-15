@@ -53,7 +53,7 @@
             </call>
         </service>
 
-        <service id="security.user.entity_manager" alias="doctrine.orm.default_entity_manager" />
+        <service id="security.user.entity_manager" alias="doctrine.orm.default_entity_manager" public="false" />
 
         <service id="request.param_converter.doctrine" class="Symfony\Bundle\DoctrineBundle\Request\ParamConverter\DoctrineConverter" public="false">
             <tag name="request.param_converter" />

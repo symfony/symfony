@@ -2,6 +2,10 @@
 
 namespace Symfony\Bundle\DoctrineBundle;
 
+use Symfony\Bundle\DoctrineBundle\DependencyInjection\Compiler\CreateProxyDirectoryPass;
+use Symfony\Component\DependencyInjection\Compiler\PassConfig;
+use Symfony\Bundle\DoctrineBundle\DependencyInjection\Compiler\RegisterEventListenersAndSubscribersPass;
+use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\HttpKernel\Bundle\Bundle;
 
 /*
@@ -21,4 +25,12 @@ use Symfony\Component\HttpKernel\Bundle\Bundle;
  */
 class DoctrineBundle extends Bundle
 {
+    public function registerExtensions(ContainerBuilder $container)
+    {
+        parent::registerExtensions($container);
+
+        $passConfig = $container->getCompilerPassConfig();
+        $passConfig->addPass(new RegisterEventListenersAndSubscribersPass(), PassConfig::TYPE_BEFORE_OPTIMIZATION);
+        $passConfig->addPass(new CreateProxyDirectoryPass(), PassConfig::TYPE_BEFORE_REMOVING);
+    }
 }

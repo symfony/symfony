@@ -62,8 +62,8 @@
             <argument type="service" id="security.context" on-invalid="ignore" />
         </service>
 
-        <service id="twig.extension.text" class="Twig_Extensions_Extension_Text" />
+        <service id="twig.extension.text" class="Twig_Extensions_Extension_Text" public="false" />
 
-        <service id="twig.extension.debug" class="Twig_Extensions_Extension_Debug" />
+        <service id="twig.extension.debug" class="Twig_Extensions_Extension_Debug" public="false" />
     </services>
 </container>

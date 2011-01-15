@@ -5,19 +5,19 @@
     xsi:schemaLocation="http://www.symfony-project.org/schema/dic/services http://www.symfony-project.org/schema/dic/services/services-1.0.xsd">
 
     <services>
-        <service id="security.authentication.factory.form" class="Symfony\Bundle\FrameworkBundle\DependencyInjection\Security\Factory\FormLoginFactory">
+        <service id="security.authentication.factory.form" class="Symfony\Bundle\FrameworkBundle\DependencyInjection\Security\Factory\FormLoginFactory" public="false">
             <tag name="security.listener.factory" />
         </service>
 
-        <service id="security.authentication.factory.x509" class="Symfony\Bundle\FrameworkBundle\DependencyInjection\Security\Factory\X509Factory">
+        <service id="security.authentication.factory.x509" class="Symfony\Bundle\FrameworkBundle\DependencyInjection\Security\Factory\X509Factory" public="false">
             <tag name="security.listener.factory" />
         </service>
 
-        <service id="security.authentication.factory.basic" class="Symfony\Bundle\FrameworkBundle\DependencyInjection\Security\Factory\HttpBasicFactory">
+        <service id="security.authentication.factory.basic" class="Symfony\Bundle\FrameworkBundle\DependencyInjection\Security\Factory\HttpBasicFactory" public="false">
             <tag name="security.listener.factory" />
         </service>
 
-        <service id="security.authentication.factory.digest" class="Symfony\Bundle\FrameworkBundle\DependencyInjection\Security\Factory\HttpDigestFactory">
+        <service id="security.authentication.factory.digest" class="Symfony\Bundle\FrameworkBundle\DependencyInjection\Security\Factory\HttpDigestFactory" public="false">
             <tag name="security.listener.factory" />
         </service>
         

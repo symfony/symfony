@@ -50,6 +50,11 @@ class ResolveParameterPlaceHoldersPass implements CompilerPassInterface
             $injectors[$this->resolveValue($class)] = $injector;
         }
         $container->setInterfaceInjectors($injectors);
+
+        $parameterBag = $container->getParameterBag();
+        foreach ($parameterBag->all() as $key => $value) {
+            $parameterBag->set($key, $this->resolveValue($value));
+        }
     }
 
     protected function resolveValue($value)

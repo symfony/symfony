@@ -19,6 +19,7 @@ namespace Symfony\Component\HttpFoundation;
 class HeaderBag
 {
     protected $headers;
+    protected $cookies;
     protected $cacheControl;
 
     /**
@@ -29,6 +30,7 @@ class HeaderBag
     public function __construct(array $headers = array())
     {
         $this->cacheControl = array();
+        $this->cookies = array();
         $this->replace($headers);
     }
 
@@ -163,21 +165,62 @@ class HeaderBag
     /**
      * Sets a cookie.
      *
-     * @param  string $name     The cookie name
-     * @param  string $value    The value of the cookie
-     * @param  string $domain   The domain that the cookie is available
-     * @param  string $expire   The time the cookie expires
-     * @param  string $path     The path on the server in which the cookie will be available on
-     * @param  bool   $secure   Indicates that the cookie should only be transmitted over a secure HTTPS connection from the client
-     * @param  bool   $httponly When TRUE the cookie will not be made accessible to JavaScript, preventing XSS attacks from stealing cookies
+     * @param Cookie $cookie
      *
      * @throws \InvalidArgumentException When the cookie expire parameter is not valid
+     *
+     * @return void
      */
-    public function setCookie($name, $value, $domain = null, $expires = null, $path = '/', $secure = false, $httponly = true)
+    public function setCookie(Cookie $cookie)
     {
-        $this->validateCookie($name, $value);
+        $this->cookies[$cookie->getName()] = $cookie;
+    }
 
-        return $this->set('Cookie', sprintf('%s=%s', $name, urlencode($value)));
+    /**
+     * Removes a cookie from the array, but does not unset it in the browser
+     *
+     * @param string $name
+     * @return void
+     */
+    public function removeCookie($name)
+    {
+        unset($this->cookies[$name]);
+    }
+
+    /**
+     * Whether the array contains any cookie with this name
+     *
+     * @param string $name
+     * @return Boolean
+     */
+    public function hasCookie($name)
+    {
+        return isset($this->cookies[$name]);
+    }
+
+    /**
+     * Returns a cookie
+     *
+     * @param string $name
+     * @return Cookie
+     */
+    public function getCookie($name)
+    {
+        if (!$this->hasCookie($name)) {
+            throw new \InvalidArgumentException(sprintf('There is no cookie with name "%s".', $name));
+        }
+
+        return $this->cookies[$name];
+    }
+
+    /**
+     * Returns an array with all cookies
+     *
+     * @return array
+     */
+    public function getCookies()
+    {
+        return $this->cookies;
     }
 
     /**
@@ -260,21 +303,5 @@ class HeaderBag
         }
 
         return $cacheControl;
-    }
-
-    protected function validateCookie($name, $value)
-    {
-        // from PHP source code
-        if (preg_match("/[=,; \t\r\n\013\014]/", $name)) {
-            throw new \InvalidArgumentException(sprintf('The cookie name "%s" contains invalid characters.', $name));
-        }
-
-        if (preg_match("/[,; \t\r\n\013\014]/", $value)) {
-            throw new \InvalidArgumentException(sprintf('The cookie value "%s" contains invalid characters.', $name));
-        }
-
-        if (!$name) {
-            throw new \InvalidArgumentException('The cookie name cannot be empty');
-        }
     }
 }

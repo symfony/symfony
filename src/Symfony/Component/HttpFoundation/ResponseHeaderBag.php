@@ -62,47 +62,6 @@ class ResponseHeaderBag extends HeaderBag
     /**
      * {@inheritdoc}
      */
-    public function setCookie($name, $value, $domain = null, $expires = null, $path = '/', $secure = false, $httponly = true)
-    {
-        $this->validateCookie($name, $value);
-
-        $cookie = sprintf('%s=%s', $name, urlencode($value));
-
-        if (null !== $expires) {
-            if (is_numeric($expires)) {
-                $expires = (int) $expires;
-            } elseif ($expires instanceof \DateTime) {
-                $expires = $expires->getTimestamp();
-            } else {
-                $expires = strtotime($expires);
-                if (false === $expires || -1 == $expires) {
-                    throw new \InvalidArgumentException(sprintf('The "expires" cookie parameter is not valid.', $expires));
-                }
-            }
-
-            $cookie .= '; expires='.substr(\DateTime::createFromFormat('U', $expires, new \DateTimeZone('UTC'))->format('D, d-M-Y H:i:s T'), 0, -5);
-        }
-
-        if ($domain) {
-            $cookie .= '; domain='.$domain;
-        }
-
-        $cookie .= '; path='.$path;
-
-        if ($secure) {
-            $cookie .= '; secure';
-        }
-
-        if ($httponly) {
-            $cookie .= '; httponly';
-        }
-
-        $this->set('Set-Cookie', $cookie, false);
-    }
-
-    /**
-     * {@inheritdoc}
-     */
     public function hasCacheControlDirective($key)
     {
         return array_key_exists($key, $this->computedCacheControl);
@@ -114,6 +73,17 @@ class ResponseHeaderBag extends HeaderBag
     public function getCacheControlDirective($key)
     {
         return array_key_exists($key, $this->computedCacheControl) ? $this->computedCacheControl[$key] : null;
+    }
+
+    /**
+     * Clears a cookie in the browser
+     *
+     * @param string $name
+     * @return void
+     */
+    public function clearCookie($name)
+    {
+        $this->setCookie(new Cookie($name, null, time() - 86400));
     }
 
     /**

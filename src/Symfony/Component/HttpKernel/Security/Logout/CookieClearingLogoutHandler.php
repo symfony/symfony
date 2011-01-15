@@ -17,13 +17,13 @@ use Symfony\Component\HttpFoundation\Request;
 
 /**
  * This handler cleares the passed cookies when a user logs out.
- * 
+ *
  * @author Johannes M. Schmitt <schmittjoh@gmail.com>
  */
 class CookieClearingLogoutHandler implements LogoutHandlerInterface
 {
     protected $cookieNames;
-    
+
     /**
      * Constructor
      * @param array $cookieNames An array of cookie names to unset
@@ -32,7 +32,7 @@ class CookieClearingLogoutHandler implements LogoutHandlerInterface
     {
         $this->cookieNames = $cookieNames;
     }
-    
+
     /**
      * Returns the names of the cookies to unset
      * @return array
@@ -41,10 +41,10 @@ class CookieClearingLogoutHandler implements LogoutHandlerInterface
     {
         return $this->cookieNames;
     }
-    
+
     /**
      * Implementation for the LogoutHandlerInterface. Deletes all requested cookies.
-     * 
+     *
      * @param Request $request
      * @param Response $response
      * @param TokenInterface $token
@@ -52,10 +52,8 @@ class CookieClearingLogoutHandler implements LogoutHandlerInterface
      */
     public function logout(Request $request, Response $response, TokenInterface $token)
     {
-        $expires = time() - 86400;
-        
         foreach ($this->cookieNames as $cookieName) {
-            $response->headers->setCookie($cookieName, '', null, $expires);
+            $response->headers->clearCookie($cookieName);
         }
     }
 }

@@ -117,7 +117,7 @@ class AclProviderTest extends \PHPUnit_Framework_TestCase
         if (!class_exists('Doctrine\MongoDB\Connection')) {
             $this->markTestSkipped('Doctrine2 MongoDB is required for this test');
         }
-        $database = 'test';
+        $database = 'aclTest';
         $mongo = new \Doctrine\MongoDB\Connection();
         $this->con = $mongo->selectDatabase($database);
 
@@ -125,33 +125,44 @@ class AclProviderTest extends \PHPUnit_Framework_TestCase
 
         // populate the db with some test data
         $this->classCollection = $this->con->selectCollection($options['class_table_name']);
+        $fields = array('id', 'class_type');
         foreach ($this->getClassData() as $data) {
-            $this->classCollection->insert($data);
+            $query = array_combine($fields, $data);
+            $this->classCollection->insert($query);
         }
 
         $this->sidCollection = $this->con->selectCollection($options['sid_table_name']);
+        $fields = array('id', 'identifier', 'username');
         foreach ($this->getSidData() as $data) {
-            $this->sidCollection->insert($data);
+            $query = array_combine($fields, $data);
+            $this->sidCollection->insert($query);
         }
 
-        $this->oidCollection = $this->con->selectCollection($$options['oid_table_name']);
+        $this->oidCollection = $this->con->selectCollection($options['oid_table_name']);
+        $fields = array('id', 'class_id', 'object_identifier', 'parent_object_identity_id', 'entries_inheriting');
         foreach ($this->getOidData() as $data) {
-            $this->oidCollection->insert($data);
+            $query = array_combine($fields, $data);
+            $this->oidCollection->insert($query);
         }
 
+        $fields = array('id', 'class_id', 'object_identity_id', 'field_name', 'ace_order', 'security_identity_id', 'mask', 'granting', 'granting_strategy', 'audit_success', 'audit_failure');
         $this->entryCollection = $this->con->selectCollection($options['entry_table_name']);
         foreach ($this->getEntryData() as $data) {
-            $this->entryCollection->insert($data);
+            $query = array_combine($fields, $data);
+            $this->entryCollection->insert($query);
         }
 
+        $fields = array('object_identity_id', 'ancestor_id');
         $this->oidAncestorCollection = $this->con->selectCollection($options['oid_ancestors_table_name']);
         foreach ($this->getOidAncestorData() as $data) {
-            $this->oidAncestorCollection->insert($data);
+            $query = array_combine($fields, $data);
+            $this->oidAncestorCollection->insert($query);
         }
     }
 
     protected function tearDown()
     {
+        $this->con->drop();
         $this->con = null;
     }
 

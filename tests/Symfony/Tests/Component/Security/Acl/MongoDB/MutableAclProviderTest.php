@@ -399,13 +399,14 @@ class MutableAclProviderTest extends \PHPUnit_Framework_TestCase
         if (!class_exists('Doctrine\MongoDB\Connection')) {
             $this->markTestSkipped('Doctrine2 MongoDB is required for this test');
         }
-        $database = 'test';
+        $database = 'aclTest';
         $mongo = new \Doctrine\MongoDB\Connection();
         $this->con = $mongo->selectDatabase($database);
     }
 
     protected function tearDown()
     {
+        $this->con->drop();
         $this->con = null;
     }
 

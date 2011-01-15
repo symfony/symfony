@@ -38,10 +38,13 @@ class ContainerTest extends TestCase
                 'default' => array(
                     'driver' => 'pdo_mysql',
                     'charset' => 'UTF-8',
+                    'platform-service' => 'my.platform',
                 )
             )
         ), $container);
         $loader->ormLoad(array('bundles' => array('YamlBundle' => array())), $container);
+
+        $container->setDefinition('my.platform', new \Symfony\Component\DependencyInjection\Definition('Doctrine\DBAL\Platforms\MySqlPlatform'));
 
         $dumper = new PhpDumper($container);
         $code = $dumper->dump(array('class' => 'DoctrineBundleTestsProjectServiceContainer'));
@@ -70,5 +73,7 @@ class ContainerTest extends TestCase
         $this->assertInstanceOf('Symfony\Bundle\DoctrineAbstractBundle\Event\EventManager', $container->get('doctrine.orm.default_entity_manager.event_manager'));
         $this->assertInstanceOf('Symfony\Bundle\DoctrineAbstractBundle\Event\EventManager', $container->get('doctrine.dbal.event_manager'));
         $this->assertInstanceOf('Doctrine\DBAL\Event\Listeners\MysqlSessionInit', $container->get('doctrine.dbal.default_connection.events.mysqlsessioninit'));
+
+        $this->assertSame($container->get('my.platform'), $container->get('doctrine.dbal.default_connection')->getDatabasePlatform());
     }
 }

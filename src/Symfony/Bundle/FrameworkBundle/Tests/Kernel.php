@@ -55,6 +55,7 @@ class Kernel extends BaseKernel
             new \Symfony\Bundle\FrameworkBundle\FrameworkBundle(),
             new \TestBundle\FooBundle\FooBundle(),
             new \TestBundle\Sensio\FooBundle\SensioFooBundle(),
+            new \TestBundle\Sensio\Cms\FooBundle\SensioCmsFooBundle(),
         );
     }
 

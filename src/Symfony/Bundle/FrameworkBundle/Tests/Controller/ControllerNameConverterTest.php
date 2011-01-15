@@ -29,6 +29,7 @@ class ControllerNameConverterTest extends TestCase
 
         $this->assertEquals('FooBundle:Default:index', $converter->toShortNotation('TestBundle\FooBundle\Controller\DefaultController::indexAction'), '->toShortNotation() converts a class::method string to the short a:b:c notation');
         $this->assertEquals('SensioFooBundle:Default:index', $converter->toShortNotation('TestBundle\Sensio\FooBundle\Controller\DefaultController::indexAction'), '->toShortNotation() converts a class::method string to the short a:b:c notation');
+        $this->assertEquals('SensioCmsFooBundle:Default:index', $converter->toShortNotation('TestBundle\Sensio\Cms\FooBundle\Controller\DefaultController::indexAction'), '->toShortNotation() converts a class::method string to the short a:b:c notation');
 
         try {
             $converter->toShortNotation('foo');
@@ -68,6 +69,7 @@ class ControllerNameConverterTest extends TestCase
 
         $this->assertEquals('TestBundle\FooBundle\Controller\DefaultController::indexAction', $converter->fromShortNotation('FooBundle:Default:index'), '->fromShortNotation() converts a short a:b:c notation string to a class::method string');
         $this->assertEquals('TestBundle\Sensio\FooBundle\Controller\DefaultController::indexAction', $converter->fromShortNotation('SensioFooBundle:Default:index'), '->fromShortNotation() converts a short a:b:c notation string to a class::method string');
+        $this->assertEquals('TestBundle\Sensio\Cms\FooBundle\Controller\DefaultController::indexAction', $converter->fromShortNotation('SensioCmsFooBundle:Default:index'), '->fromShortNotation() converts a short a:b:c notation string to a class::method string');
 
         try {
             $converter->fromShortNotation('foo:');

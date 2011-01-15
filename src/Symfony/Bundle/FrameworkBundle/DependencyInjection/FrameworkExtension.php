@@ -193,9 +193,9 @@ class FrameworkExtension extends Extension
         }
 
         // template paths
-        $dirs = array('%kernel.root_dir%/views/%%bundle%%/%%controller%%/%%name%%%%format%%.%%renderer%%');
+        $dirs = array('%kernel.root_dir%/views/%%bundle%%/%%controller%%/%%name%%.%%renderer%%.%%format%%');
         foreach ($container->getParameter('kernel.bundle_dirs') as $dir) {
-            $dirs[] = $dir.'/%%bundle%%/Resources/views/%%controller%%/%%name%%%%format%%.%%renderer%%';
+            $dirs[] = $dir.'/%%bundle%%/Resources/views/%%controller%%/%%name%%.%%renderer%%.%%format%%';
         }
         $container->setParameter('templating.loader.filesystem.path', $dirs);
 

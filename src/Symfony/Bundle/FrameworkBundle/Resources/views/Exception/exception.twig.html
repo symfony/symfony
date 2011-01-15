@@ -25,7 +25,7 @@
     </div>
 
     {% for position, e in exception.toarray %}
-        {% include 'FrameworkBundle:Exception:traces.twig' with { 'exception': e, 'position': position, 'count': previous_count } only %}
+        {% include 'FrameworkBundle:Exception:traces.twig.html' with { 'exception': e, 'position': position, 'count': previous_count } only %}
     {% endfor %}
 
     {% if logger %}
@@ -38,7 +38,7 @@
             </h3>
 
             <div id="logs" style="display: none">
-                {% include 'FrameworkBundle:Exception:logs.twig' with { 'logs': logger.logs } only %}
+                {% include 'FrameworkBundle:Exception:logs.twig.html' with { 'logs': logger.logs } only %}
             </div>
 
         </div>

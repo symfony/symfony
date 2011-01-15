@@ -15,7 +15,7 @@ use Symfony\Component\Templating\TemplateNameParser as BaseTemplateNameParser;
 
 /**
  * TemplateNameParser parsers template name from the short notation
- * "bundle:section:template.format.renderer" to a template name
+ * "bundle:section:template.renderer.format" to a template name
  * and an array of options.
  *
  * @author Fabien Potencier <fabien.potencier@symfony-project.com>
@@ -34,7 +34,7 @@ class TemplateNameParser extends BaseTemplateNameParser
     {
         $parts = explode(':', $name);
         if (3 !== count($parts)) {
-            throw new \InvalidArgumentException(sprintf('Template name "%s" is not valid.', $name));
+            throw new \InvalidArgumentException(sprintf('Template name "%s" is not valid (format is "bundle:section:template.renderer.format").', $name));
         }
 
         $options = array_replace(
@@ -49,16 +49,13 @@ class TemplateNameParser extends BaseTemplateNameParser
         );
 
         $elements = explode('.', $parts[2]);
-        if (3 === count($elements)) {
-            $parts[2] = $elements[0];
-            $options['format'] = '.'.$elements[1];
-            $options['renderer'] = $elements[2];
-        } elseif (2 === count($elements)) {
-            $parts[2] = $elements[0];
-            $options['renderer'] = $elements[1];
-        } else {
-            throw new \InvalidArgumentException(sprintf('Template name "%s" is not valid.', $name));
+        if (3 !== count($elements)) {
+            throw new \InvalidArgumentException(sprintf('Template name "%s" is not valid (format is "bundle:section:template.renderer.format").', $name));
         }
+
+        $parts[2] = $elements[0];
+        $options['renderer'] = $elements[1];
+        $options['format'] = $elements[2];
 
         return array($parts[2], $options);
     }

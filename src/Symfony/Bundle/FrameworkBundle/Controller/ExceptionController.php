@@ -32,7 +32,7 @@ class ExceptionController extends ContainerAware
      *
      * @throws \InvalidArgumentException When the exception template does not exist
      */
-    public function exceptionAction(FlattenException $exception, DebugLoggerInterface $logger = null, $format = 'html')
+    public function showAction(FlattenException $exception, DebugLoggerInterface $logger = null, $format = 'html')
     {
         $this->container->get('request')->setRequestFormat($format);
 
@@ -43,15 +43,16 @@ class ExceptionController extends ContainerAware
 
         $code = $this->getStatusCode($exception);
 
-        $template = $this->container->get('kernel')->isDebug() ? 'exception' : 'error';
+        $name = $this->container->get('kernel')->isDebug() ? 'exception' : 'error';
         if ($this->container->get('kernel')->isDebug() && 'html' == $format) {
-            $template = 'exception_full';
+            $name = 'exception_full';
         }
-        $template = 'FrameworkBundle:Exception:'.$template.'.twig';
+        $template = 'FrameworkBundle:Exception:'.$name.'.twig.'.$format;
 
         $templating = $this->container->get('templating');
         if (!$templating->exists($template)) {
             $this->container->get('request')->setRequestFormat('html');
+            $template = 'FrameworkBundle:Exception:'.$name.'.twig.html';
         }
 
         $response = $templating->renderResponse(

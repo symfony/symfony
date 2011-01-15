@@ -1,4 +1,4 @@
-{% extends 'WebProfilerBundle:Profiler:base.twig' %}
+{% extends 'WebProfilerBundle:Profiler:base.twig.html' %}
 
 {% block body %}
     <div class="header">
@@ -32,7 +32,7 @@
 
             {% render 'WebProfilerBundle:Profiler:searchBar' with { 'token': token } %}
 
-            {% include 'WebProfilerBundle:Profiler:admin.twig' with { 'token': token } only %}
+            {% include 'WebProfilerBundle:Profiler:admin.twig.html' with { 'token': token } only %}
         </td><td class="main">
             <div class="content">
                 {% block panel '' %}

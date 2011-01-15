@@ -28,6 +28,6 @@ class DefaultController extends ContainerAware
      */
     public function indexAction()
     {
-        return $this->container->get('templating')->renderResponse('FrameworkBundle:Default:index.php');
+        return $this->container->get('templating')->renderResponse('FrameworkBundle:Default:index.twig.html');
     }
 }

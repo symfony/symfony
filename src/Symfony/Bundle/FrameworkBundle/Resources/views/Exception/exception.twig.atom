@@ -1,0 +1,1 @@
+{% include 'FrameworkBundle:Exception:exception.twig.xml' with { 'exception': exception } %}

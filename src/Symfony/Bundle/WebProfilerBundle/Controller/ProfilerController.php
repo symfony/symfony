@@ -36,7 +36,7 @@ class ProfilerController extends ContainerAware
         $profiler = $this->container->get('profiler')->loadFromToken($token);
 
         if ($profiler->isEmpty()) {
-            return $this->container->get('templating')->renderResponse('WebProfilerBundle:Profiler:notfound.twig', array('token' => $token));
+            return $this->container->get('templating')->renderResponse('WebProfilerBundle:Profiler:notfound.twig.html', array('token' => $token));
         }
 
         if (!$profiler->has($panel)) {
@@ -146,7 +146,7 @@ class ProfilerController extends ContainerAware
             $position = false === strpos($this->container->get('request')->headers->get('user-agent'), 'Mobile') ? 'fixed' : 'absolute';
         }
 
-        return $this->container->get('templating')->renderResponse('WebProfilerBundle:Profiler:toolbar.twig', array(
+        return $this->container->get('templating')->renderResponse('WebProfilerBundle:Profiler:toolbar.twig.html', array(
             'position'  => $position,
             'profiler'  => $profiler,
             'templates' => $this->getTemplates($profiler),
@@ -168,7 +168,7 @@ class ProfilerController extends ContainerAware
         $url = $session->get('_profiler_search_url');
         $limit = $session->get('_profiler_search_limit');
 
-        return $this->container->get('templating')->renderResponse('WebProfilerBundle:Profiler:search.twig', array(
+        return $this->container->get('templating')->renderResponse('WebProfilerBundle:Profiler:search.twig.html', array(
             'token'    => $token,
             'profiler' => $profiler,
             'tokens'   => $profiler->find($ip, $url, $limit),
@@ -193,7 +193,7 @@ class ProfilerController extends ContainerAware
         $url = $session->get('_profiler_search_url');
         $limit = $session->get('_profiler_search_limit');
 
-        return $this->container->get('templating')->renderResponse('WebProfilerBundle:Profiler:results.twig', array(
+        return $this->container->get('templating')->renderResponse('WebProfilerBundle:Profiler:results.twig.html', array(
             'token'    => $token,
             'profiler' => $this->container->get('profiler')->loadFromToken($token),
             'tokens'   => $profiler->find($ip, $url, $limit),
@@ -246,11 +246,11 @@ class ProfilerController extends ContainerAware
                 $name = $this->container->get($id)->getName();
                 $template = $tags[0]['template'];
                 if ($profiler->has($name)) {
-                    if (!$this->container->get('templating')->exists($template.'.twig')) {
+                    if (!$this->container->get('templating')->exists($template.'.twig.html')) {
                         continue;
                     }
 
-                    $templates[$name] = $template.'.twig';
+                    $templates[$name] = $template.'.twig.html';
                 }
             }
         }

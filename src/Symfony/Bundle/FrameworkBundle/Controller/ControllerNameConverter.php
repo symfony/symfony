@@ -102,7 +102,7 @@ class ControllerNameConverter
             $prefix = null;
             foreach ($this->kernel->getBundles() as $b) {
                 if ($bundle === $b->getName()) {
-                    $prefix = $b->getNamespaceName();
+                    $prefix = $b->getNamespace();
 
                     break;
                 }

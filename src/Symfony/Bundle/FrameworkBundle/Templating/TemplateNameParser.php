@@ -58,8 +58,8 @@ class TemplateNameParser extends BaseTemplateNameParser
                 }
 
                 foreach (array_keys($this->kernel->getBundleDirs()) as $prefix) {
-                    if (0 === $pos = strpos($b->getNamespaceName(), $prefix)) {
-                        $bundle = str_replace($prefix.'\\', '', $b->getNamespaceName());
+                    if (0 === $pos = strpos($b->getNamespace(), $prefix)) {
+                        $bundle = str_replace($prefix.'\\', '', $b->getNamespace());
 
                         break 2;
                     }

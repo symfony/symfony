@@ -63,7 +63,7 @@ abstract class Bundle extends ContainerAware implements BundleInterface
      *
      * @return string The Bundle namespace
      */
-    public function getNamespaceName()
+    public function getNamespace()
     {
         if (null === $this->name) {
             $this->initReflection();

@@ -9,7 +9,6 @@ abstract class Bundle extends ContainerAware implements BundleInterface
 {
     protected $name;
     protected $namespace;
-    protected $namespacePrefix;
     protected $path;
     protected $reflection;
     public function boot()
@@ -25,7 +24,7 @@ abstract class Bundle extends ContainerAware implements BundleInterface
         }
         return $this->name;
     }
-    public function getNamespaceName()
+    public function getNamespace()
     {
         if (null === $this->name) {
             $this->initReflection();

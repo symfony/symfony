@@ -68,14 +68,14 @@ class ControllerNameConverterTest extends TestCase
         $converter = new ControllerNameConverter($kernel, $logger);
 
         $this->assertEquals('TestBundle\FooBundle\Controller\DefaultController::indexAction', $converter->fromShortNotation('FooBundle:Default:index'), '->fromShortNotation() converts a short a:b:c notation string to a class::method string');
-        $this->assertEquals('TestBundle\Sensio\FooBundle\Controller\DefaultController::indexAction', $converter->fromShortNotation('SensioFooBundle:Default:index'), '->fromShortNotation() converts a short a:b:c notation string to a class::method string');
+        $this->assertEquals('TestApplication\Sensio\FooBundle\Controller\DefaultController::indexAction', $converter->fromShortNotation('SensioFooBundle:Default:index'), '->fromShortNotation() converts a short a:b:c notation string to a class::method string');
         $this->assertEquals('TestBundle\Sensio\Cms\FooBundle\Controller\DefaultController::indexAction', $converter->fromShortNotation('SensioCmsFooBundle:Default:index'), '->fromShortNotation() converts a short a:b:c notation string to a class::method string');
 
         try {
             $converter->fromShortNotation('foo:');
             $this->fail('->fromShortNotation() throws an \InvalidArgumentException if the controller is not an a:b:c string');
         } catch (\Exception $e) {
-            $this->assertInstanceOf('\InvalidArgumentException', $e, '->toShortNotation() throws an \InvalidArgumentException if the controller is not an a:b:c string');
+            $this->assertInstanceOf('\InvalidArgumentException', $e, '->fromShortNotation() throws an \InvalidArgumentException if the controller is not an a:b:c string');
         }
 
         try {

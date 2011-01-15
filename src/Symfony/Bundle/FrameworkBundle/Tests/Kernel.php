@@ -33,7 +33,8 @@ class Kernel extends BaseKernel
 
         $loader = new UniversalClassLoader();
         $loader->registerNamespaces(array(
-            'TestBundle' => __DIR__.'/Fixtures/',
+            'TestBundle'      => __DIR__.'/Fixtures/',
+            'TestApplication' => __DIR__.'/Fixtures/',
         ));
         $loader->register();
     }
@@ -55,6 +56,7 @@ class Kernel extends BaseKernel
             new \Symfony\Bundle\FrameworkBundle\FrameworkBundle(),
             new \TestBundle\FooBundle\FooBundle(),
             new \TestBundle\Sensio\FooBundle\SensioFooBundle(),
+            new \TestApplication\Sensio\FooBundle\SensioFooBundle(),
             new \TestBundle\Sensio\Cms\FooBundle\SensioCmsFooBundle(),
         );
     }
@@ -64,6 +66,7 @@ class Kernel extends BaseKernel
         return array(
             'Application'     => __DIR__.'/../src/Application',
             'Bundle'          => __DIR__.'/../src/Bundle',
+            'TestApplication' => __DIR__.'/Fixtures/TestApplication',
             'TestBundle'      => __DIR__.'/Fixtures/TestBundle',
             'Symfony\\Bundle' => __DIR__.'/../src/vendor/symfony/src/Symfony/Bundle',
         );

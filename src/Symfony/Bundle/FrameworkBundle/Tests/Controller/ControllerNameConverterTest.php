@@ -27,7 +27,8 @@ class ControllerNameConverterTest extends TestCase
         $kernel->boot();
         $converter = new ControllerNameConverter($kernel);
 
-        $this->assertEquals('FooBundle:Foo:index', $converter->toShortNotation('Symfony\Bundle\FooBundle\Controller\FooController::indexAction'), '->toShortNotation() converts a class::method string to the short a:b:c notation');
+        $this->assertEquals('FooBundle:Default:index', $converter->toShortNotation('TestBundle\FooBundle\Controller\DefaultController::indexAction'), '->toShortNotation() converts a class::method string to the short a:b:c notation');
+        $this->assertEquals('Sensio\\FooBundle:Default:index', $converter->toShortNotation('TestBundle\Sensio\FooBundle\Controller\DefaultController::indexAction'), '->toShortNotation() converts a class::method string to the short a:b:c notation');
 
         try {
             $converter->toShortNotation('foo');
@@ -65,7 +66,9 @@ class ControllerNameConverterTest extends TestCase
         $logger = new Logger();
         $converter = new ControllerNameConverter($kernel, $logger);
 
-        $this->assertEquals('Symfony\Bundle\FrameworkBundle\Controller\DefaultController::indexAction', $converter->fromShortNotation('FrameworkBundle:Default:index'), '->fromShortNotation() converts a short a:b:c notation string to a class::method string');
+        $this->assertEquals('TestBundle\FooBundle\Controller\DefaultController::indexAction', $converter->fromShortNotation('FooBundle:Default:index'), '->fromShortNotation() converts a short a:b:c notation string to a class::method string');
+        $this->assertEquals('TestBundle\Sensio\FooBundle\Controller\DefaultController::indexAction', $converter->fromShortNotation('Sensio/FooBundle:Default:index'), '->fromShortNotation() converts a short a:b:c notation string to a class::method string');
+        $this->assertEquals('TestBundle\Sensio\FooBundle\Controller\DefaultController::indexAction', $converter->fromShortNotation('Sensio\\FooBundle:Default:index'), '->fromShortNotation() converts a short a:b:c notation string to a class::method string');
 
         try {
             $converter->fromShortNotation('foo:');
@@ -75,7 +78,7 @@ class ControllerNameConverterTest extends TestCase
         }
 
         try {
-            $converter->fromShortNotation('FooBundle:Default:index');
+            $converter->fromShortNotation('BarBundle:Default:index');
             $this->fail('->fromShortNotation() throws a \InvalidArgumentException if the class is found but does not exist');
         } catch (\Exception $e) {
             $this->assertInstanceOf('\InvalidArgumentException', $e, '->fromShortNotation() throws a \LogicException if the class is found but does not exist');

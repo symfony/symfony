@@ -32,6 +32,7 @@ class TemplateNameParserTest extends TestCase
             array('BlogBundle:Post:index.php.html', array('index', array('bundle' => 'BlogBundle', 'controller' => 'Post', 'renderer' => 'php', 'format' => 'html'))),
             array('BlogBundle:Post:index.twig.html', array('index', array('bundle' => 'BlogBundle', 'controller' => 'Post', 'renderer' => 'twig', 'format' => 'html'))),
             array('BlogBundle:Post:index.php.xml', array('index', array('bundle' => 'BlogBundle', 'controller' => 'Post', 'renderer' => 'php', 'format' => 'xml'))),
+            array('Sensio\\BlogBundle:Post:index.php.html', array('index', array('bundle' => 'Sensio/BlogBundle', 'controller' => 'Post', 'renderer' => 'php', 'format' => 'html'))),
         );
     }
 

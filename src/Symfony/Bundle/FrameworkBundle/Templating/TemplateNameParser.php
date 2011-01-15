@@ -3,6 +3,7 @@
 namespace Symfony\Bundle\FrameworkBundle\Templating;
 
 use Symfony\Component\Templating\TemplateNameParser as BaseTemplateNameParser;
+use Symfony\Component\HttpKernel\Kernel;
 
 /*
  * This file is part of the Symfony package.
@@ -22,6 +23,18 @@ use Symfony\Component\Templating\TemplateNameParser as BaseTemplateNameParser;
  */
 class TemplateNameParser extends BaseTemplateNameParser
 {
+    protected $kernel;
+
+    /**
+     * Constructor.
+     *
+     * @param Kernel $kernel A Kernel instance
+     */
+    public function __construct(Kernel $kernel)
+    {
+        $this->kernel = $kernel;
+    }
+
     /**
      * Parses a template to a template name and an array of options.
      *
@@ -37,13 +50,34 @@ class TemplateNameParser extends BaseTemplateNameParser
             throw new \InvalidArgumentException(sprintf('Template name "%s" is not valid (format is "bundle:section:template.renderer.format").', $name));
         }
 
+        $bundle = null;
+        if ($parts[0]) {
+            foreach ($this->kernel->getBundles() as $b) {
+                if ($parts[0] !== $b->getName()) {
+                    continue;
+                }
+
+                foreach (array_keys($this->kernel->getBundleDirs()) as $prefix) {
+                    if (0 === $pos = strpos($b->getNamespaceName(), $prefix)) {
+                        $bundle = str_replace($prefix.'\\', '', $b->getNamespaceName());
+
+                        break 2;
+                    }
+                }
+            }
+
+            if (null === $bundle) {
+                throw new \InvalidArgumentException(sprintf('Unable to find a valid bundle name for template "%s".', $name));
+            }
+        }
+
         $options = array_replace(
             array(
                 'format' => '',
             ),
             $defaults,
             array(
-                'bundle'     => str_replace('\\', '/', $parts[0]),
+                'bundle'     => $bundle,
                 'controller' => $parts[1],
             )
         );

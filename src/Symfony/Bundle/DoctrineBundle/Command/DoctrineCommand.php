@@ -134,7 +134,7 @@ abstract class DoctrineCommand extends Command
     protected function getBundleMetadatas(Bundle $bundle)
     {
         $tmp = dirname(str_replace('\\', '/', get_class($bundle)));
-        $namespace = $bundle->getNamespacePrefix().'\\'.$bundle->getName();
+        $namespace = $bundle->getNamespace();
         $class = basename($tmp);
 
         $bundleMetadatas = array();

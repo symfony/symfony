@@ -56,7 +56,7 @@ class AssetsInstallCommand extends Command
 
         foreach ($this->container->get('kernel')->getBundles() as $bundle) {
             if (is_dir($originDir = $bundle->getPath().'/Resources/public')) {
-                $output->writeln(sprintf('Installing assets for <comment>%s\\%s</comment>', $bundle->getNamespacePrefix(), $bundle->getName()));
+                $output->writeln(sprintf('Installing assets for <comment>%s\\%s</comment>', $bundle->getNamespace()));
 
                 $targetDir = $input->getArgument('target').'/bundles/'.preg_replace('/bundle$/', '', strtolower($bundle->getName()));
 

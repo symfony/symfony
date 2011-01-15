@@ -107,7 +107,9 @@
             <argument type="service" id="templating" />
         </service>
 
-        <service id="templating.name_parser" class="%templating.name_parser.class%" />
+        <service id="templating.name_parser" class="%templating.name_parser.class%">
+            <argument type="service" id="kernel" />
+        </service>
 
         <service id="templating.loader" alias="templating.loader.filesystem" />
 

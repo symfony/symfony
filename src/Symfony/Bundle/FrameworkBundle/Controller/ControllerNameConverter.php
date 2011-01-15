@@ -26,7 +26,6 @@ class ControllerNameConverter
 {
     protected $kernel;
     protected $logger;
-    protected $namespaces;
 
     /**
      * Constructor.
@@ -79,7 +78,7 @@ class ControllerNameConverter
             throw new \InvalidArgumentException(sprintf('The "%s" class does not belong to a known bundle namespace.', $class));
         }
 
-        return $bundle.':'.$controller.':'.$action;
+        return str_replace('\\', '', $bundle).':'.$controller.':'.$action;
     }
 
     /**
@@ -96,11 +95,24 @@ class ControllerNameConverter
         }
 
         list($bundle, $controller, $action) = $parts;
-        $bundle = strtr($bundle, array('/' => '\\'));
         $class = null;
         $logs = array();
+
         foreach ($this->namespaces as $namespace) {
-            $try = $namespace.'\\'.$bundle.'\\Controller\\'.$controller.'Controller';
+            $prefix = null;
+            foreach ($this->kernel->getBundles() as $b) {
+                if ($bundle === $b->getName()) {
+                    $prefix = $b->getNamespaceName();
+
+                    break;
+                }
+            }
+
+            if (null === $prefix) {
+                continue;
+            }
+
+            $try = $prefix.'\\Controller\\'.$controller.'Controller';
             if (!class_exists($try)) {
                 if (null !== $this->logger) {
                     $logs[] = sprintf('Failed finding controller "%s:%s" from namespace "%s" (%s)', $bundle, $controller, $namespace, $try);

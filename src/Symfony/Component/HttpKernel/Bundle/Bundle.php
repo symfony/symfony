@@ -26,7 +26,7 @@ use Symfony\Component\Finder\Finder;
 abstract class Bundle extends ContainerAware implements BundleInterface
 {
     protected $name;
-    protected $namespacePrefix;
+    protected $namespace;
     protected $path;
     protected $reflection;
 
@@ -59,17 +59,17 @@ abstract class Bundle extends ContainerAware implements BundleInterface
     }
 
     /**
-     * Gets the Bundle namespace prefix.
+     * Gets the Bundle namespace.
      *
-     * @return string The Bundle namespace prefix
+     * @return string The Bundle namespace
      */
-    public function getNamespacePrefix()
+    public function getNamespaceName()
     {
         if (null === $this->name) {
             $this->initReflection();
         }
 
-        return $this->namespacePrefix;
+        return $this->namespace;
     }
 
     /**
@@ -119,7 +119,7 @@ abstract class Bundle extends ContainerAware implements BundleInterface
         $finder = new Finder();
         $finder->files()->name('*Extension.php')->in($dir);
 
-        $prefix = $this->namespacePrefix.'\\'.$this->name.'\\DependencyInjection';
+        $prefix = $this->namespace.'\\DependencyInjection';
         foreach ($finder as $file) {
             $class = $prefix.strtr($file->getPath(), array($dir => '', '/' => '\\')).'\\'.$file->getBasename('.php');
 
@@ -146,7 +146,7 @@ abstract class Bundle extends ContainerAware implements BundleInterface
         $finder = new Finder();
         $finder->files()->name('*Command.php')->in($dir);
 
-        $prefix = $this->namespacePrefix.'\\'.$this->name.'\\Command';
+        $prefix = $this->namespace.'\\Command';
         foreach ($finder as $file) {
             $r = new \ReflectionClass($prefix.strtr($file->getPath(), array($dir => '', '/' => '\\')).'\\'.$file->getBasename('.php'));
             if ($r->isSubclassOf('Symfony\\Component\\Console\\Command\\Command') && !$r->isAbstract()) {
@@ -161,10 +161,9 @@ abstract class Bundle extends ContainerAware implements BundleInterface
      */
     protected function initReflection()
     {
-        $tmp = dirname(str_replace('\\', '/', get_class($this)));
-        $this->namespacePrefix = str_replace('/', '\\', dirname($tmp));
-        $this->name = basename($tmp);
         $this->reflection = new \ReflectionObject($this);
+        $this->namespace = $this->reflection->getNamespaceName();
+        $this->name = $this->reflection->getShortName();
         $this->path = str_replace('\\', '/', dirname($this->reflection->getFilename()));
     }
 }

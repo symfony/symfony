@@ -77,7 +77,8 @@ class TemplateNameParser extends BaseTemplateNameParser
             ),
             $defaults,
             array(
-                'bundle'     => $bundle,
+                // bundle is used as part of the template path, so we need /
+                'bundle'     => str_replace('\\', '/', $bundle),
                 'controller' => $parts[1],
             )
         );

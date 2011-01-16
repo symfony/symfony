@@ -125,38 +125,59 @@ class AclProviderTest extends \PHPUnit_Framework_TestCase
 
         // populate the db with some test data
         $this->classCollection = $this->con->selectCollection($options['class_table_name']);
-        $fields = array('id', 'class_type');
+        $fields = array('class_type');
+        $classes = array();
         foreach ($this->getClassData() as $data) {
+            $id = array_shift($data);
             $query = array_combine($fields, $data);
             $this->classCollection->insert($query);
+            $classes[$id] = $query;
         }
 
         $this->sidCollection = $this->con->selectCollection($options['sid_table_name']);
-        $fields = array('id', 'identifier', 'username');
+        $fields = array('identifier', 'username');
+        $sids = array();
         foreach ($this->getSidData() as $data) {
+            $id = array_shift($data);
             $query = array_combine($fields, $data);
             $this->sidCollection->insert($query);
+            $sids[$id] = $query;
         }
 
         $this->oidCollection = $this->con->selectCollection($options['oid_table_name']);
-        $fields = array('id', 'class_id', 'object_identifier', 'parent_object_identity_id', 'entries_inheriting');
+        $oids = array();
         foreach ($this->getOidData() as $data) {
-            $query = array_combine($fields, $data);
+            $query = array();
+            $id = $data[0];
+            $classId = $data[1];
+            $query['class'] = $classes[$classId];
+            $query['object_identifier'] = $data[2];
+            $parentId = $data[3];
+            if($parentId) {
+                $parent = $oids[$parentId];
+                if( isset($parent['ancestors'])) {
+                  $ancestors = $parent['ancestors'];
+                }
+                $ancestors[] = $parent['_id'];
+                $query['ancestors'] = $ancestors;
+                $query['parent'] = $parent;
+            }
+            $query['entries_inheriting'] = $data[4];
             $this->oidCollection->insert($query);
+            $oids[$id] = $query;
         }
-
-        $fields = array('id', 'class_id', 'object_identity_id', 'field_name', 'ace_order', 'security_identity_id', 'mask', 'granting', 'granting_strategy', 'audit_success', 'audit_failure');
+        
+        $fields = array('id', 'class', 'object_identity', 'field_name', 'ace_order', 'security_identity', 'mask', 'granting', 'granting_strategy', 'audit_success', 'audit_failure');
         $this->entryCollection = $this->con->selectCollection($options['entry_table_name']);
         foreach ($this->getEntryData() as $data) {
             $query = array_combine($fields, $data);
+            $classId = $query['class'];
+            $query['class'] = $classes[$classId];
+            $oid = $query['object_identity'];
+            $query['object_identity'] = $oids[$oid];
+            $sid = $query['security_identity'];
+            $query['security_identity'] = $sids[$sid];
             $this->entryCollection->insert($query);
-        }
-
-        $fields = array('object_identity_id', 'ancestor_id');
-        $this->oidAncestorCollection = $this->con->selectCollection($options['oid_ancestors_table_name']);
-        foreach ($this->getOidAncestorData() as $data) {
-            $query = array_combine($fields, $data);
-            $this->oidAncestorCollection->insert($query);
         }
     }
 
@@ -195,23 +216,6 @@ class AclProviderTest extends \PHPUnit_Framework_TestCase
             array(3, 2, 'i:3:123', 1, 1),
             array(4, 3, '1', 2, 1),
             array(5, 3, '2', 2, 1),
-        );
-    }
-
-    protected function getOidAncestorData()
-    {
-        return array(
-            array(1, 1),
-            array(2, 1),
-            array(2, 2),
-            array(3, 1),
-            array(3, 3),
-            array(4, 2),
-            array(4, 1),
-            array(4, 4),
-            array(5, 2),
-            array(5, 1),
-            array(5, 5),
         );
     }
 

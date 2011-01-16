@@ -45,6 +45,9 @@ class ContainerBuilder extends Container implements TaggedContainerInterface
         parent::__construct($parameterBag);
 
         $this->compiler = new Compiler();
+        foreach ($this->compiler->getPassConfig()->getPasses() as $pass) {
+            $this->addObjectResource($pass);
+        }
     }
 
     /**
@@ -150,6 +153,8 @@ class ContainerBuilder extends Container implements TaggedContainerInterface
     public function addCompilerPass(CompilerPassInterface $pass)
     {
         $this->compiler->addPass($pass);
+
+        $this->addObjectResource($pass);
     }
 
     /**

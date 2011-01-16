@@ -5,6 +5,7 @@ namespace Symfony\Bundle\DoctrineMongoDBBundle\DependencyInjection;
 use Symfony\Component\DependencyInjection\Extension\Extension;
 use Symfony\Component\DependencyInjection\Loader\XmlFileLoader;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
+use Symfony\Component\DependencyInjection\Alias;
 use Symfony\Component\DependencyInjection\Reference;
 use Symfony\Component\DependencyInjection\Definition;
 use Symfony\Component\DependencyInjection\Resource\FileResource;
@@ -31,43 +32,9 @@ class DoctrineMongoDBExtension extends AbstractDoctrineExtension
      */
     public function mongodbLoad($config, ContainerBuilder $container)
     {
-        $this->createProxyDirectory($container->getParameter('kernel.cache_dir'));
-        $this->createHydratorDirectory($container->getParameter('kernel.cache_dir'));
         $this->loadDefaults($config, $container);
         $this->loadConnections($config, $container);
         $this->loadDocumentManagers($config, $container);
-    }
-
-    /**
-     * Create the Doctrine MongoDB ODM Document proxy directory
-     */
-    protected function createProxyDirectory($tmpDir)
-    {
-        // Create document proxy directory
-        $proxyCacheDir = $tmpDir.'/doctrine/odm/mongodb/Proxies';
-        if (!is_dir($proxyCacheDir)) {
-            if (false === @mkdir($proxyCacheDir, 0777, true)) {
-                die(sprintf('Unable to create the Doctrine Proxy directory (%s)', dirname($proxyCacheDir)));
-            }
-        } elseif (!is_writable($proxyCacheDir)) {
-            die(sprintf('Unable to write in the Doctrine Proxy directory (%s)', $proxyCacheDir));
-        }
-    }
-
-    /**
-     * Create the Doctrine MongoDB ODM Document hydrator directory
-     */
-    protected function createHydratorDirectory($tmpDir)
-    {
-        // Create document hydrator directory
-        $hydratorCacheDir = $tmpDir.'/doctrine/odm/mongodb/Hydrators';
-        if (!is_dir($hydratorCacheDir)) {
-            if (false === @mkdir($hydratorCacheDir, 0777, true)) {
-                die(sprintf('Unable to create the Doctrine Hydrator directory (%s)', dirname($hydratorCacheDir)));
-            }
-        } elseif (!is_writable($hydratorCacheDir)) {
-            die(sprintf('Unable to write in the Doctrine Hydrator directory (%s)', $hydratorCacheDir));
-        }
     }
 
     /**
@@ -171,20 +138,8 @@ class DoctrineMongoDBExtension extends AbstractDoctrineExtension
         $eventManagerId = sprintf('doctrine.odm.mongodb.%s_event_manager', $eventManagerName);
         if (!$container->hasDefinition($eventManagerId)) {
             $eventManagerDef = new Definition('%doctrine.odm.mongodb.event_manager_class%');
-            $eventManagerDef->addMethodCall('loadTaggedEventListeners', array(
-                new Reference('service_container'),
-            ));
-            $eventManagerDef->addMethodCall('loadTaggedEventListeners', array(
-                new Reference('service_container'),
-                sprintf('doctrine.odm.mongodb.%s_event_listener', $eventManagerName),
-            ));
-            $eventManagerDef->addMethodCall('loadTaggedEventSubscribers', array(
-                new Reference('service_container'),
-            ));
-            $eventManagerDef->addMethodCall('loadTaggedEventSubscribers', array(
-                new Reference('service_container'),
-                sprintf('doctrine.odm.mongodb.%s_event_subscriber', $eventManagerName),
-            ));
+            $eventManagerDef->addTag('doctrine.odm.mongodb.event_manager');
+            $eventManagerDef->setPublic(false);
             $container->setDefinition($eventManagerId, $eventManagerDef);
         }
 
@@ -201,7 +156,11 @@ class DoctrineMongoDBExtension extends AbstractDoctrineExtension
         if ($documentManager['name'] == $defaultDocumentManager) {
             $container->setAlias(
                 'doctrine.odm.mongodb.document_manager',
-                sprintf('doctrine.odm.mongodb.%s_document_manager', $documentManager['name'])
+                new Alias(sprintf('doctrine.odm.mongodb.%s_document_manager', $documentManager['name']))
+            );
+            $container->setAlias(
+                'doctrine.odm.mongodb.event_manager',
+                new Alias(sprintf('doctrine.odm.mongodb.%s_event_manager', $documentManager['name']))
             );
         }
     }

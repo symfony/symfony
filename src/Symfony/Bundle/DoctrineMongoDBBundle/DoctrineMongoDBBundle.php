@@ -2,7 +2,12 @@
 
 namespace Symfony\Bundle\DoctrineMongoDBBundle;
 
+use Symfony\Component\DependencyInjection\Compiler\PassConfig;
+use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\HttpKernel\Bundle\Bundle;
+use Symfony\Bundle\DoctrineMongoDBBundle\DependencyInjection\Compiler\CreateHydratorDirectoryPass;
+use Symfony\Bundle\DoctrineMongoDBBundle\DependencyInjection\Compiler\CreateProxyDirectoryPass;
+use Symfony\Bundle\DoctrineMongoDBBundle\DependencyInjection\Compiler\RegisterEventListenersAndSubscribersPass;
 
 /**
  * Doctrine MongoDB ODM bundle.
@@ -13,4 +18,12 @@ use Symfony\Component\HttpKernel\Bundle\Bundle;
  */
 class DoctrineMongoDBBundle extends Bundle
 {
+    public function registerExtensions(ContainerBuilder $container)
+    {
+        parent::registerExtensions($container);
+
+        $container->addCompilerPass(new RegisterEventListenersAndSubscribersPass(), PassConfig::TYPE_BEFORE_OPTIMIZATION);
+        $container->addCompilerPass(new CreateProxyDirectoryPass(), PassConfig::TYPE_BEFORE_REMOVING);
+        $container->addCompilerPass(new CreateHydratorDirectoryPass(), PassConfig::TYPE_BEFORE_REMOVING);
+    }
 }

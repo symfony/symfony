@@ -14,14 +14,16 @@
     <parameter key="doctrine.odm.mongodb.document_manager_class">Doctrine\ODM\MongoDB\DocumentManager</parameter>
     <parameter key="doctrine.odm.mongodb.logger_class">Symfony\Bundle\DoctrineMongoDBBundle\Logger\DoctrineMongoDBLogger</parameter>
     <parameter key="doctrine.odm.mongodb.data_collector_class">Symfony\Bundle\DoctrineMongoDBBundle\DataCollector\DoctrineMongoDBDataCollector</parameter>
-    <parameter key="doctrine.odm.mongodb.event_manager_class">Symfony\Bundle\DoctrineAbstractBundle\Event\EventManager</parameter>
+    <parameter key="doctrine.odm.mongodb.event_manager_class">Doctrine\Common\EventManager</parameter>
 
     <!-- proxies -->
     <parameter key="doctrine.odm.mongodb.proxy_namespace">Proxies</parameter>
+    <parameter key="doctrine.odm.mongodb.proxy_dir">%kernel.cache_dir%/doctrine/odm/mongodb/Proxies</parameter>
     <parameter key="doctrine.odm.mongodb.auto_generate_proxy_classes">false</parameter>
 
     <!-- hydrators -->
     <parameter key="doctrine.odm.mongodb.hydrator_namespace">Proxies</parameter>
+    <parameter key="doctrine.odm.mongodb.hydrator_dir">%kernel.cache_dir%/doctrine/odm/mongodb/Hydrators</parameter>
     <parameter key="doctrine.odm.mongodb.auto_generate_hydrator_classes">false</parameter>
 
     <!-- cache -->
@@ -85,16 +87,5 @@
 
     <service id="security.user.document_manager" alias="doctrine.odm.mongodb.default_document_manager" />
 
-    <!-- events -->
-    <service id="doctrine.odm.mongodb.event_manager" class="%doctrine.odm.mongodb.event_manager_class%">
-      <call method="loadTaggedEventListeners">
-        <argument type="service" id="service_container" />
-        <argument>doctrine.odm.mongodb.event_listener</argument>
-      </call>
-      <call method="loadTaggedEventSubscribers">
-        <argument type="service" id="service_container" />
-        <argument>doctrine.odm.mongodb.event_listener</argument>
-      </call>
-    </service>
   </services>
 </container>

@@ -29,8 +29,7 @@ class DoctrineBundle extends Bundle
     {
         parent::registerExtensions($container);
 
-        $passConfig = $container->getCompilerPassConfig();
-        $passConfig->addPass(new RegisterEventListenersAndSubscribersPass(), PassConfig::TYPE_BEFORE_OPTIMIZATION);
-        $passConfig->addPass(new CreateProxyDirectoryPass(), PassConfig::TYPE_BEFORE_REMOVING);
+        $container->addCompilerPass(new RegisterEventListenersAndSubscribersPass(), PassConfig::TYPE_BEFORE_OPTIMIZATION);
+        $container->addCompilerPass(new CreateProxyDirectoryPass(), PassConfig::TYPE_BEFORE_REMOVING);
     }
 }

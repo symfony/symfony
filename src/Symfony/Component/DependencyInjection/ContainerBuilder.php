@@ -4,6 +4,7 @@ namespace Symfony\Component\DependencyInjection;
 
 use Symfony\Component\DependencyInjection\Compiler\Compiler;
 use Symfony\Component\DependencyInjection\Compiler\CompilerPassInterface;
+use Symfony\Component\DependencyInjection\Compiler\PassConfig;
 use Symfony\Component\DependencyInjection\Extension\ExtensionInterface;
 use Symfony\Component\DependencyInjection\InterfaceInjector;
 use Symfony\Component\DependencyInjection\ParameterBag\ParameterBagInterface;
@@ -148,11 +149,11 @@ class ContainerBuilder extends Container implements TaggedContainerInterface
      * Adds a compiler pass at the end of the current passes
      *
      * @param CompilerPassInterface $pass
-     * @return void
+     * @param string                $type
      */
-    public function addCompilerPass(CompilerPassInterface $pass)
+    public function addCompilerPass(CompilerPassInterface $pass, $type = PassConfig::TYPE_BEFORE_OPTIMIZATION)
     {
-        $this->compiler->addPass($pass);
+        $this->compiler->addPass($pass, $type);
 
         $this->addObjectResource($pass);
     }

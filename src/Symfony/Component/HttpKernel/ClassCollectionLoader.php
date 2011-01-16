@@ -92,7 +92,17 @@ class ClassCollectionLoader
             $r = new \ReflectionClass($class);
             $files[] = $r->getFileName();
 
-            $content .= preg_replace(array('/^\s*<\?php/', '/\?>\s*$/'), '', file_get_contents($r->getFileName()));
+            $c = preg_replace(array('/^\s*<\?php/', '/\?>\s*$/'), '', file_get_contents($r->getFileName()));
+
+            // add namespace declaration for global code
+            if (!$r->inNamespace()) {
+                $c = "\nnamespace\n{\n$c\n}\n";
+            } else {
+                $c = self::fixNamespaceDeclarations('<?php '.$c);
+                $c = preg_replace('/^\s*<\?php/', '', $c);
+            }
+
+            $content .= $c;
         }
 
         // cache the core classes
@@ -105,6 +115,51 @@ class ClassCollectionLoader
             // save the resources
             self::writeCacheFile($metadata, serialize(array($files, $classes)));
         }
+    }
+
+    /**
+     * Adds brackets around each namespace if it's not already the case.
+     */
+    static public function fixNamespaceDeclarations($source)
+    {
+        if (!function_exists('token_get_all')) {
+            return $source;
+        }
+
+        $output = '';
+        $inNamespace = false;
+        $tokens = token_get_all($source);
+
+        while ($token = array_shift($tokens)) {
+            if (is_string($token)) {
+                $output .= $token;
+            } elseif (T_NAMESPACE === $token[0]) {
+                if ($inNamespace) {
+                    $output .= "}\n";
+                }
+                $output .= $token[1];
+
+                // namespace name and whitespaces
+                while (($t = array_shift($tokens)) && is_array($t) && in_array($t[0], array(T_WHITESPACE, T_NS_SEPARATOR, T_STRING))) {
+                    $output .= $t[1];
+                }
+                if (is_string($t) && '{' === $t) {
+                    $inNamespace = false;
+                    array_unshift($tokens, $t);
+                } else {
+                    $output .= "\n{";
+                    $inNamespace = true;
+                }
+            } else {
+                $output .= $token[1];
+            }
+        }
+
+        if ($inNamespace) {
+            $output .= "}\n";
+        }
+
+        return $output;
     }
 
     static protected function writeCacheFile($file, $content)

@@ -1,5 +1,6 @@
 <?php
-namespace Symfony\Component\HttpKernel\Bundle;
+namespace Symfony\Component\HttpKernel\Bundle
+{
 use Symfony\Component\DependencyInjection\ContainerAware;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\DependencyInjection\ParameterBag\ParameterBagInterface;
@@ -81,13 +82,17 @@ abstract class Bundle extends ContainerAware implements BundleInterface
         $this->path = str_replace('\\', '/', dirname($this->reflection->getFilename()));
     }
 }
-namespace Symfony\Component\HttpKernel\Bundle;
+}
+namespace Symfony\Component\HttpKernel\Bundle
+{
 interface BundleInterface
 {
     function boot();
     function shutdown();
 }
-namespace Symfony\Component\HttpKernel\Debug;
+}
+namespace Symfony\Component\HttpKernel\Debug
+{
 class ErrorHandler
 {
     protected $levels = array(
@@ -119,7 +124,9 @@ class ErrorHandler
         return false;
     }
 }
-namespace Symfony\Component\HttpKernel;
+}
+namespace Symfony\Component\HttpKernel
+{
 class ClassCollectionLoader
 {
     static protected $loaded;
@@ -167,7 +174,14 @@ class ClassCollectionLoader
             }
             $r = new \ReflectionClass($class);
             $files[] = $r->getFileName();
-            $content .= preg_replace(array('/^\s*<\?php/', '/\?>\s*$/'), '', file_get_contents($r->getFileName()));
+            $c = preg_replace(array('/^\s*<\?php/', '/\?>\s*$/'), '', file_get_contents($r->getFileName()));
+                        if (!$r->inNamespace()) {
+                $c = "\nnamespace\n{\n$c\n}\n";
+            } else {
+                $c = self::fixNamespaceDeclarations('<?php '.$c);
+                $c = preg_replace('/^\s*<\?php/', '', $c);
+            }
+            $content .= $c;
         }
                 if (!is_dir(dirname($cache))) {
             mkdir(dirname($cache), 0777, true);
@@ -176,6 +190,41 @@ class ClassCollectionLoader
         if ($autoReload) {
                         self::writeCacheFile($metadata, serialize(array($files, $classes)));
         }
+    }
+    static public function fixNamespaceDeclarations($source)
+    {
+        if (!function_exists('token_get_all')) {
+            return $source;
+        }
+        $output = '';
+        $inNamespace = false;
+        $tokens = token_get_all($source);
+        while ($token = array_shift($tokens)) {
+            if (is_string($token)) {
+                $output .= $token;
+            } elseif (T_NAMESPACE === $token[0]) {
+                if ($inNamespace) {
+                    $output .= "}\n";
+                }
+                $output .= $token[1];
+                                while (($t = array_shift($tokens)) && is_array($t) && in_array($t[0], array(T_WHITESPACE, T_NS_SEPARATOR, T_STRING))) {
+                    $output .= $t[1];
+                }
+                if (is_string($t) && '{' === $t) {
+                    $inNamespace = false;
+                    array_unshift($tokens, $t);
+                } else {
+                    $output .= "\n{";
+                    $inNamespace = true;
+                }
+            } else {
+                $output .= $token[1];
+            }
+        }
+        if ($inNamespace) {
+            $output .= "}\n";
+        }
+        return $output;
     }
     static protected function writeCacheFile($file, $content)
     {
@@ -187,7 +236,9 @@ class ClassCollectionLoader
         throw new \RuntimeException(sprintf('Failed to write cache file "%s".', $file));
     }
 }
-namespace Symfony\Component\DependencyInjection;
+}
+namespace Symfony\Component\DependencyInjection
+{
 use Symfony\Component\DependencyInjection\ParameterBag\ParameterBagInterface;
 use Symfony\Component\DependencyInjection\ParameterBag\ParameterBag;
 use Symfony\Component\DependencyInjection\ParameterBag\FrozenParameterBag;
@@ -275,12 +326,16 @@ class Container implements ContainerInterface
         return strtolower(preg_replace(array('/([A-Z]+)([A-Z][a-z])/', '/([a-z\d])([A-Z])/'), array('\\1_\\2', '\\1_\\2'), strtr($id, '_', '.')));
     }
 }
-namespace Symfony\Component\DependencyInjection;
+}
+namespace Symfony\Component\DependencyInjection
+{
 interface ContainerAwareInterface
 {
     function setContainer(ContainerInterface $container = null);
 }
-namespace Symfony\Component\DependencyInjection;
+}
+namespace Symfony\Component\DependencyInjection
+{
 interface ContainerInterface
 {
     const EXCEPTION_ON_INVALID_REFERENCE = 1;
@@ -290,7 +345,9 @@ interface ContainerInterface
     function get($id, $invalidBehavior = self::EXCEPTION_ON_INVALID_REFERENCE);
     function has($id);
 }
-namespace Symfony\Component\DependencyInjection\ParameterBag;
+}
+namespace Symfony\Component\DependencyInjection\ParameterBag
+{
 class FrozenParameterBag extends ParameterBag
 {
     public function __construct(array $parameters = array())
@@ -312,7 +369,9 @@ class FrozenParameterBag extends ParameterBag
         throw new \LogicException('Impossible to call set() on a frozen ParameterBag.');
     }
 }
-namespace Symfony\Component\DependencyInjection\ParameterBag;
+}
+namespace Symfony\Component\DependencyInjection\ParameterBag
+{
 interface ParameterBagInterface
 {
     function clear();
@@ -322,8 +381,11 @@ interface ParameterBagInterface
     function set($name, $value);
     function has($name);
 }
-namespace Symfony\Component\DependencyInjection;
+}
+namespace Symfony\Component\DependencyInjection
+{
 interface TaggedContainerInterface extends ContainerInterface
 {
     function findTaggedServiceIds($name);
+}
 }

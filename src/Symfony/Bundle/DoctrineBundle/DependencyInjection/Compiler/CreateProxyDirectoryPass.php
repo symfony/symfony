@@ -9,6 +9,9 @@ class CreateProxyDirectoryPass implements CompilerPassInterface
 {
     public function process(ContainerBuilder $container)
     {
+        if (!$container->hasParameter('doctrine.orm.proxy_dir')) {
+            return;
+        }
         $proxyCacheDir = $container->getParameter('doctrine.orm.proxy_dir');
         // Create entity proxy directory
         if (!is_dir($proxyCacheDir)) {

@@ -227,6 +227,7 @@ class Cache implements HttpKernelInterface
      */
     protected function lookup(Request $request)
     {
+        // if allow_reload and no-cache Cache-Control, allow a cache reload
         if ($this->options['allow_reload'] && $request->isNoCache()) {
             $this->record($request, 'reload');
 
@@ -275,7 +276,7 @@ class Cache implements HttpKernelInterface
      *
      * @return Response A Response instance
      */
-    protected function validate(Request $request, $entry)
+    protected function validate(Request $request, Response $entry)
     {
         $subRequest = clone $request;
 

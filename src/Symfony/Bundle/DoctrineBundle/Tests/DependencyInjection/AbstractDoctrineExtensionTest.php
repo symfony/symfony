@@ -65,7 +65,7 @@ abstract class AbstractDoctrineExtensionTest extends TestCase
 
         $container->getCompilerPassConfig()->setOptimizationPasses(array());
         $container->getCompilerPassConfig()->setRemovingPasses(array());
-        $container->freeze();
+        $container->compile();
 
         // doctrine.dbal.mysql_connection
         $arguments = $container->getDefinition('doctrine.dbal.mysql_connection')->getArguments();
@@ -99,7 +99,7 @@ abstract class AbstractDoctrineExtensionTest extends TestCase
 
         $container->getCompilerPassConfig()->setOptimizationPasses(array());
         $container->getCompilerPassConfig()->setRemovingPasses(array());
-        $container->freeze();
+        $container->compile();
 
         // doctrine.dbal.mysql_connection
         $arguments = $container->getDefinition('doctrine.dbal.mysql_connection')->getArguments();
@@ -222,7 +222,7 @@ abstract class AbstractDoctrineExtensionTest extends TestCase
 
         $container->getCompilerPassConfig()->setOptimizationPasses(array());
         $container->getCompilerPassConfig()->setRemovingPasses(array());
-        $container->freeze();
+        $container->compile();
 
         $definition = $container->getDefinition('doctrine.dbal.default_connection');
         $this->assertEquals('Doctrine\DBAL\DriverManager', $definition->getClass());
@@ -258,7 +258,7 @@ abstract class AbstractDoctrineExtensionTest extends TestCase
 
         $container->getCompilerPassConfig()->setOptimizationPasses(array());
         $container->getCompilerPassConfig()->setRemovingPasses(array());
-        $container->freeze();
+        $container->compile();
 
         $definition = $container->getDefinition('doctrine.dbal.default_connection');
         $this->assertEquals('Doctrine\DBAL\DriverManager', $definition->getClass());
@@ -297,7 +297,7 @@ abstract class AbstractDoctrineExtensionTest extends TestCase
 
         $container->getCompilerPassConfig()->setOptimizationPasses(array());
         $container->getCompilerPassConfig()->setRemovingPasses(array());
-        $container->freeze();
+        $container->compile();
 
         $definition = $container->getDefinition('doctrine.dbal.conn1_connection');
         $this->assertEquals('Doctrine\DBAL\DriverManager', $definition->getClass());
@@ -465,7 +465,7 @@ abstract class AbstractDoctrineExtensionTest extends TestCase
 
         $container->getCompilerPassConfig()->setOptimizationPasses(array());
         $container->getCompilerPassConfig()->setRemovingPasses(array());
-        $container->freeze();
+        $container->compile();
 
         $definition = $container->getDefinition('doctrine.orm.dm1_metadata_cache');
         $this->assertDICDefinitionClass($definition, '%doctrine.orm.cache.xcache_class%');
@@ -484,7 +484,7 @@ abstract class AbstractDoctrineExtensionTest extends TestCase
 
         $container->getCompilerPassConfig()->setOptimizationPasses(array());
         $container->getCompilerPassConfig()->setRemovingPasses(array());
-        $container->freeze();
+        $container->compile();
 
         $definition = $container->getDefinition('doctrine.orm.default_metadata_cache');
         $this->assertDICDefinitionClass($definition, 'Doctrine\Common\Cache\MemcacheCache');
@@ -507,7 +507,7 @@ abstract class AbstractDoctrineExtensionTest extends TestCase
 
         $container->getCompilerPassConfig()->setOptimizationPasses(array());
         $container->getCompilerPassConfig()->setRemovingPasses(array());
-        $container->freeze();
+        $container->compile();
 
         $this->assertEquals('apc', $container->getParameter('doctrine.orm.metadata_cache_driver'));
         $this->assertTrue($container->getParameter('doctrine.orm.auto_generate_proxy_classes'));
@@ -523,7 +523,7 @@ abstract class AbstractDoctrineExtensionTest extends TestCase
         $this->loadFromFile($container, 'orm_single_em_bundle_mappings');
 
         $container->getCompilerPassConfig()->setRemovingPasses(array());
-        $container->freeze();
+        $container->compile();
 
         $definition = $container->getDefinition('doctrine.orm.default_metadata_driver');
 
@@ -569,7 +569,7 @@ abstract class AbstractDoctrineExtensionTest extends TestCase
         $this->loadFromFile($container, 'orm_multiple_em_bundle_mappings');
 
         $container->getCompilerPassConfig()->setRemovingPasses(array());
-        $container->freeze();
+        $container->compile();
 
         $def1 = $container->getDefinition('doctrine.orm.em1_metadata_driver');
         $def2 = $container->getDefinition('doctrine.orm.em2_metadata_driver');

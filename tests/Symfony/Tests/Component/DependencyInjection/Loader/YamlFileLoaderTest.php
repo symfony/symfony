@@ -123,7 +123,7 @@ class YamlFileLoaderTest extends \PHPUnit_Framework_TestCase
         $container->registerExtension(new \ProjectExtension());
         $loader = new ProjectLoader3($container, self::$fixturesPath.'/yaml');
         $loader->load('services10.yml');
-        $container->freeze();
+        $container->compile();
         $services = $container->getDefinitions();
         $parameters = $container->getParameterBag()->all();
 

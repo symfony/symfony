@@ -70,14 +70,14 @@ class Container implements ContainerInterface
     }
 
     /**
-     * Freezes the container.
+     * Compiles the container.
      *
      * This method does two things:
      *
      *  * Parameter values are resolved;
      *  * The parameter bag is frozen.
      */
-    public function freeze()
+    public function compile()
     {
         $this->parameterBag->resolve();
 

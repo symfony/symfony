@@ -329,20 +329,24 @@ class ContainerBuilder extends Container implements TaggedContainerInterface
     }
 
     /**
-     * Freezes the container.
+     * Compiles the container.
      *
-     * This method does four things:
+     * This method passes the container to compiler
+     * passes whose job is to manipulate and optimize
+     * the container.
+     *
+     * The main compiler passes roughly do four things:
      *
      *  * The extension configurations are merged;
      *  * Parameter values are resolved;
-     *  * The parameter bag is freezed;
+     *  * The parameter bag is frozen;
      *  * Extension loading is disabled.
      */
-    public function freeze()
+    public function compile()
     {
         $this->compiler->compile($this);
 
-        parent::freeze();
+        parent::compile();
     }
 
     /**

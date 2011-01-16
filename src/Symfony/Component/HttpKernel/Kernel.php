@@ -360,7 +360,8 @@ abstract class Kernel implements HttpKernelInterface, \Serializable
         if (null !== $cont = $this->registerContainerConfiguration($this->getContainerLoader($container))) {
             $container->merge($cont);
         }
-        $container->freeze();
+        $container->compile();
+
         return $container;
     }
 

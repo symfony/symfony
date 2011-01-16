@@ -327,14 +327,14 @@ class ContainerBuilderTest extends \PHPUnit_Framework_TestCase
         $config = new ContainerBuilder(new ParameterBag(array('foo' => '%bar%')));
         $container->merge($config);
 ////// FIXME
-        $container->freeze();
+        $container->compile();
         $this->assertEquals(array('bar' => 'foo', 'foo' => 'foo'), $container->getParameterBag()->all(), '->merge() evaluates the values of the parameters towards already defined ones');
 
         $container = new ContainerBuilder(new ParameterBag(array('bar' => 'foo')));
         $config = new ContainerBuilder(new ParameterBag(array('foo' => '%bar%', 'baz' => '%foo%')));
         $container->merge($config);
 ////// FIXME
-        $container->freeze();
+        $container->compile();
         $this->assertEquals(array('bar' => 'foo', 'foo' => 'foo', 'baz' => 'foo'), $container->getParameterBag()->all(), '->merge() evaluates the values of the parameters towards already defined ones');
 
         $container = new ContainerBuilder();
@@ -364,7 +364,7 @@ class ContainerBuilderTest extends \PHPUnit_Framework_TestCase
     public function testMergeLogicException()
     {
         $container = new ContainerBuilder();
-        $container->freeze();
+        $container->compile();
         $container->merge(new ContainerBuilder());
     }
 
@@ -458,7 +458,7 @@ class ContainerBuilderTest extends \PHPUnit_Framework_TestCase
     public function testThrowsExceptionWhenSetServiceOnAFrozenContainer()
     {
         $container = new ContainerBuilder();
-        $container->freeze();
+        $container->compile();
         $container->set('a', new \stdClass());
     }
 
@@ -468,7 +468,7 @@ class ContainerBuilderTest extends \PHPUnit_Framework_TestCase
     public function testThrowsExceptionWhenSetDefinitionOnAFrozenContainer()
     {
         $container = new ContainerBuilder();
-        $container->freeze();
+        $container->compile();
         $container->setDefinition('a', new Definition());
     }
 

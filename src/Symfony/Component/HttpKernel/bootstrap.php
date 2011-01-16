@@ -201,7 +201,7 @@ class Container implements ContainerInterface
         $this->services = array();
         $this->set('service_container', $this);
     }
-    public function freeze()
+    public function compile()
     {
         $this->parameterBag->resolve();
         $this->parameterBag = new FrozenParameterBag($this->parameterBag->all());

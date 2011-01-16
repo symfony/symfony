@@ -29,14 +29,14 @@ class ContainerTest extends \PHPUnit_Framework_TestCase
     }
 
     /**
-     * @covers Symfony\Component\DependencyInjection\Container::freeze
+     * @covers Symfony\Component\DependencyInjection\Container::compile
      */
-    public function testFreeze()
+    public function testcompile()
     {
         $sc = new Container(new ParameterBag(array('foo' => 'bar')));
-        $sc->freeze();
-        $this->assertInstanceOf('Symfony\Component\DependencyInjection\ParameterBag\FrozenParameterBag', $sc->getParameterBag(), '->freeze() changes the parameter bag to a FrozenParameterBag instance');
-        $this->assertEquals(array('foo' => 'bar'), $sc->getParameterBag()->all(), '->freeze() copies the current parameters to the new parameter bag');
+        $sc->compile();
+        $this->assertInstanceOf('Symfony\Component\DependencyInjection\ParameterBag\FrozenParameterBag', $sc->getParameterBag(), '->compile() changes the parameter bag to a FrozenParameterBag instance');
+        $this->assertEquals(array('foo' => 'bar'), $sc->getParameterBag()->all(), '->compile() copies the current parameters to the new parameter bag');
     }
 
     /**
@@ -46,7 +46,7 @@ class ContainerTest extends \PHPUnit_Framework_TestCase
     {
         $sc = new Container(new ParameterBag(array('foo' => 'bar')));
         $this->assertFalse($sc->isFrozen(), '->isFrozen() returns false if the parameters are not frozen');
-        $sc->freeze();
+        $sc->compile();
         $this->assertTrue($sc->isFrozen(), '->isFrozen() returns true if the parameters are frozen');
     }
 

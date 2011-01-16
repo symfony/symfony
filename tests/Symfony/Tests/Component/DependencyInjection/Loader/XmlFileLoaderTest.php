@@ -194,7 +194,7 @@ class XmlFileLoaderTest extends \PHPUnit_Framework_TestCase
 
         // extension without an XSD
         $loader->load('extensions/services1.xml');
-        $container->freeze();
+        $container->compile();
         $services = $container->getDefinitions();
         $parameters = $container->getParameterBag()->all();
 
@@ -210,7 +210,7 @@ class XmlFileLoaderTest extends \PHPUnit_Framework_TestCase
         $container->registerExtension(new \ProjectWithXsdExtension());
         $loader = new ProjectLoader2($container, self::$fixturesPath.'/xml');
         $loader->load('extensions/services2.xml');
-        $container->freeze();
+        $container->compile();
         $services = $container->getDefinitions();
         $parameters = $container->getParameterBag()->all();
 

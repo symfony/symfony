@@ -99,7 +99,7 @@ abstract class SecurityExtensionTest extends TestCase
 
         $container->getCompilerPassConfig()->setOptimizationPasses(array());
         $container->getCompilerPassConfig()->setRemovingPasses(array());
-        $container->freeze();
+        $container->compile();
 
         return $container;
     }

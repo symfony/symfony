@@ -123,7 +123,7 @@ class PhpDumperTest extends \PHPUnit_Framework_TestCase
         $interfaceInjector->addMethodCall('setBar', array('someValue'));
         $container = include self::$fixturesPath.'/containers/interfaces1.php';
         $container->addInterfaceInjector($interfaceInjector);
-        $container->freeze();
+        $container->compile();
 
         $dumper = new PhpDumper($container);
 

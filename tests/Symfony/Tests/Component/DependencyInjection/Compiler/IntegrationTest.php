@@ -39,7 +39,7 @@ class IntegrationTest extends \PHPUnit_Framework_TestCase
             ->setPublic(false)
         ;
 
-        $container->freeze();
+        $container->compile();
 
         $this->assertTrue($container->hasDefinition('a'));
         $arguments = $a->getArguments();
@@ -64,7 +64,7 @@ class IntegrationTest extends \PHPUnit_Framework_TestCase
             ->setPublic(false)
         ;
 
-        $container->freeze();
+        $container->compile();
 
         $this->assertTrue($container->hasDefinition('a'));
         $arguments = $a->getArguments();
@@ -94,7 +94,7 @@ class IntegrationTest extends \PHPUnit_Framework_TestCase
             ->setPublic(false)
         ;
 
-        $container->freeze();
+        $container->compile();
 
         $this->assertTrue($container->hasDefinition('a'));
         $this->assertFalse($container->hasDefinition('b'));

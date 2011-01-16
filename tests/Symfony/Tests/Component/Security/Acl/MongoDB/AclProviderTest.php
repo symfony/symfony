@@ -16,13 +16,16 @@ class AclProviderTest extends \PHPUnit_Framework_TestCase
     protected $oidAncestorCollection;
     protected $sidCollection;
 
-    /**
-     * @expectedException Symfony\Component\Security\Acl\Exception\AclNotFoundException
-     * @expectedMessage There is no ACL for the given object identity.
-     */
     public function testFindAclThrowsExceptionWhenNoAclExists()
     {
-        $this->getProvider()->findAcl(new ObjectIdentity('foo', 'foo'));
+        try {
+            $this->getProvider()->findAcl(new ObjectIdentity('foo', 'foo'));
+
+            $this->fail('Provider did not throw an expected exception.');
+        } catch (\Exception $ex) {
+            $this->assertInstanceOf('Symfony\Component\Security\Acl\Exception\AclNotFoundException', $ex);
+            $this->assertEquals('There is no ACL for the given object identity.',$ex->getMessage());
+        }
     }
 
     public function testFindAclsThrowsExceptionUnlessAnACLIsFoundForEveryOID()
@@ -150,8 +153,11 @@ class AclProviderTest extends \PHPUnit_Framework_TestCase
             $query = array();
             $id = $data[0];
             $classId = $data[1];
-            $query['class'] = $classes[$classId];
-            $query['object_identifier'] = $data[2];
+            $objectIdentity = array(
+              "identifier" => $data[2],
+              "type" => $classes[$classId]['class_type']
+            );
+            $query['object_identity'] = $objectIdentity;
             $parentId = $data[3];
             if($parentId) {
                 $parent = $oids[$parentId];
@@ -244,7 +250,6 @@ class AclProviderTest extends \PHPUnit_Framework_TestCase
     {
         return array(
             'oid_table_name' => 'acl_object_identities',
-            'oid_ancestors_table_name' => 'acl_object_identity_ancestors',
             'class_table_name' => 'acl_classes',
             'sid_table_name' => 'acl_security_identities',
             'entry_table_name' => 'acl_entries',

@@ -18,4 +18,12 @@ Security
 
 {% block panel %}
     <h2>Security</h2>
+    {% if collector.authenticated %}
+        <strong>{{ collector.user }}</strong><br />
+        <strong>Roles</strong>: {{ collector.roles|yaml_encode }}
+    {% elseif collector.enabled %}
+        <em>No token.</em>
+    {% else %}
+        <em>The security component is disabled.</em>
+    {% endif %}
 {% endblock %}

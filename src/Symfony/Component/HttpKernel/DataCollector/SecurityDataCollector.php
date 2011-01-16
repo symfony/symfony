@@ -39,18 +39,21 @@ class SecurityDataCollector extends DataCollector
                 'enabled'       => false,
                 'authenticated' => false,
                 'user'          => '',
+                'roles'         => array(),
             );
         } elseif (null === $token = $this->context->getToken()) {
             $this->data = array(
                 'enabled'       => true,
                 'authenticated' => false,
                 'user'          => '',
+                'roles'         => array(),
             );
         } else {
             $this->data = array(
                 'enabled'       => true,
                 'authenticated' => $token->isAuthenticated(),
                 'user'          => (string) $token->getUser(),
+                'roles'         => array_map(function ($role){ return $role->getRole();}, $token->getRoles()),
             );
         }
     }
@@ -73,6 +76,16 @@ class SecurityDataCollector extends DataCollector
     public function getUser()
     {
         return $this->data['user'];
+    }
+
+    /**
+     * Gets the roles of the user.
+     *
+     * @return array The roles
+     */
+    public function getRoles()
+    {
+        return $this->data['roles'];
     }
 
     /**

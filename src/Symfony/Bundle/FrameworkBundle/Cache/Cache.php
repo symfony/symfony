@@ -31,10 +31,10 @@ abstract class Cache extends BaseCache
      */
     public function __construct(HttpKernelInterface $kernel)
     {
-        $this->store = new Store($kernel->getCacheDir().'/http_cache');
+        $store = new Store($kernel->getCacheDir().'/http_cache');
         $esi = new Esi();
 
-        parent::__construct($kernel, $this->store, $esi, array_merge(array('debug' => $kernel->isDebug()), $this->getOptions()));
+        parent::__construct($kernel, $store, $esi, array_merge(array('debug' => $kernel->isDebug()), $this->getOptions()));
     }
 
     /**

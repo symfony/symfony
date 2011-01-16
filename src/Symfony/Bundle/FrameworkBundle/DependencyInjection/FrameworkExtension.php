@@ -2,7 +2,6 @@
 
 namespace Symfony\Bundle\FrameworkBundle\DependencyInjection;
 
-use Symfony\Component\DependencyInjection\Extension\Extension;
 use Symfony\Component\DependencyInjection\Loader\XmlFileLoader;
 use Symfony\Component\DependencyInjection\Resource\FileResource;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
@@ -11,6 +10,7 @@ use Symfony\Component\DependencyInjection\Definition;
 use Symfony\Component\DependencyInjection\Parameter;
 use Symfony\Component\Finder\Finder;
 use Symfony\Component\HttpFoundation\RequestMatcher;
+use Symfony\Component\HttpKernel\DependencyInjection\Extension;
 
 /*
  * This file is part of the Symfony framework.
@@ -120,7 +120,7 @@ class FrameworkExtension extends Extension
 
         $this->registerTranslatorConfiguration($config, $container);
 
-        $this->addCompiledClasses($container, array(
+        $this->addClassesToCompile(array(
             'Symfony\\Component\\HttpFoundation\\ParameterBag',
             'Symfony\\Component\\HttpFoundation\\HeaderBag',
             'Symfony\\Component\\HttpFoundation\\Request',
@@ -230,7 +230,7 @@ class FrameworkExtension extends Extension
         }
 
         // compilation
-        $this->addCompiledClasses($container, array(
+        $this->addClassesToCompile(array(
             'Symfony\\Component\\Templating\\DelegatingEngine',
             'Symfony\\Bundle\\FrameworkBundle\\Templating\\EngineInterface',
         ));
@@ -361,7 +361,7 @@ class FrameworkExtension extends Extension
         }
         $container->setParameter('session.storage.'.strtolower($config['storage_id']).'.options', $options);
 
-        $this->addCompiledClasses($container, array(
+        $this->addClassesToCompile(array(
             'Symfony\\Component\\HttpFoundation\\Session',
             'Symfony\\Component\\HttpFoundation\\SessionStorage\\SessionStorageInterface',
         ));
@@ -382,7 +382,7 @@ class FrameworkExtension extends Extension
 
         $container->setParameter('routing.resource', $config['router']['resource']);
 
-        $this->addCompiledClasses($container, array(
+        $this->addClassesToCompile(array(
             'Symfony\\Component\\Routing\\RouterInterface',
             'Symfony\\Component\\Routing\\Router',
             'Symfony\\Component\\Routing\\Matcher\\UrlMatcherInterface',
@@ -523,18 +523,6 @@ class FrameworkExtension extends Extension
         } elseif ($container->hasDefinition('validator')) {
             $container->getDefinition('validator')->clearTags();
         }
-    }
-
-    /**
-     * Add class to be compiled when debug mode is not activated
-     *
-     * @param ContainerBuilder $container A ContainerBuilder instance
-     * @param array            $classes   Classes to be compiled
-     */
-    protected function addCompiledClasses(ContainerBuilder $container, array $classes)
-    {
-        $current = $container->hasParameter('kernel.compiled_classes') ? $container->getParameter('kernel.compiled_classes') : array();
-        $container->setParameter('kernel.compiled_classes', array_merge($current, $classes));
     }
 
     /**

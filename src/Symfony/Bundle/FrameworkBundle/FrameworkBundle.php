@@ -9,7 +9,9 @@ use Symfony\Bundle\FrameworkBundle\DependencyInjection\Compiler\AddSecurityVoter
 use Symfony\Bundle\FrameworkBundle\DependencyInjection\Compiler\ConverterManagerPass;
 use Symfony\Bundle\FrameworkBundle\DependencyInjection\Compiler\RoutingResolverPass;
 use Symfony\Bundle\FrameworkBundle\DependencyInjection\Compiler\ProfilerPass;
+use Symfony\Bundle\FrameworkBundle\DependencyInjection\Compiler\AddClassesToCachePass;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
+use Symfony\Component\DependencyInjection\Compiler\PassConfig;
 use Symfony\Component\HttpKernel\Bundle\Bundle;
 use Symfony\Component\Form\FormConfiguration;
 
@@ -69,5 +71,6 @@ class FrameworkBundle extends Bundle
         $container->addCompilerPass(new RegisterKernelListenersPass());
         $container->addCompilerPass(new TemplatingPass());
         $container->addCompilerPass(new AddConstraintValidatorsPass());
+        $container->addCompilerPass(new AddClassesToCachePass());
     }
 }

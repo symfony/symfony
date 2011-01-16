@@ -2,7 +2,7 @@
 
 namespace Symfony\Bundle\TwigBundle\DependencyInjection;
 
-use Symfony\Component\DependencyInjection\Extension\Extension;
+use Symfony\Component\HttpKernel\DependencyInjection\Extension;
 use Symfony\Component\DependencyInjection\Loader\XmlFileLoader;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\DependencyInjection\Reference;
@@ -34,6 +34,20 @@ class TwigExtension extends Extension
         if (!$container->hasDefinition('twig')) {
             $loader = new XmlFileLoader($container, __DIR__.'/../Resources/config');
             $loader->load('twig.xml');
+
+            $this->addClassesToCompile(array(
+                'Twig_Environment',
+                'Twig_ExtensionInterface',
+                'Twig_Extension',
+                'Twig_Extension_Core',
+                'Twig_Extension_Escaper',
+                'Twig_Extension_Optimizer',
+                'Twig_LoaderInterface',
+                'Twig_Loader_Filesystem',
+                'Twig_Markup',
+                'Twig_TemplateInterface',
+                'Twig_Template',
+            ));
         }
 
         // form resources
@@ -87,7 +101,7 @@ class TwigExtension extends Extension
             if (false !== strpos($key, '-')) {
                 unset($config[$key]);
                 $config[str_replace('-', '_', $key)] = $value;
-            }            
+            }
         }
 
         $container->setParameter('twig.options', array_replace($container->getParameter('twig.options'), $config));

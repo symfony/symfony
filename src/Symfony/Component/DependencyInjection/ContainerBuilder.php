@@ -352,6 +352,8 @@ class ContainerBuilder extends Container implements TaggedContainerInterface
     {
         $this->compiler->compile($this);
 
+        $this->setExtensionConfigs(array());
+
         parent::compile();
     }
 

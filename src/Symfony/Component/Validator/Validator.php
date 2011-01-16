@@ -15,6 +15,15 @@ use Symfony\Component\Validator\Mapping\ElementMetadata;
 use Symfony\Component\Validator\Mapping\ClassMetadata;
 use Symfony\Component\Validator\Mapping\ClassMetadataFactoryInterface;
 
+/**
+ * The default implementation of the ValidatorInterface.
+ *
+ * This service can be used to validate objects, properties and raw values
+ * against constraints.
+ *
+ * @author Fabien Potencier <fabien.potencier@symfony-project.com>
+ * @author Bernhard Schussek <bernhard.schussek@symfony-project.com>
+ */
 class Validator implements ValidatorInterface
 {
     protected $metadataFactory;
@@ -29,6 +38,9 @@ class Validator implements ValidatorInterface
         $this->validatorFactory = $validatorFactory;
     }
 
+    /**
+     * {@inheritDoc}
+     */
     public function validate($object, $groups = null)
     {
         $metadata = $this->metadataFactory->getClassMetadata(get_class($object));
@@ -40,6 +52,9 @@ class Validator implements ValidatorInterface
         return $this->validateGraph($object, $walk, $groups);
     }
 
+    /**
+     * {@inheritDoc}
+     */
     public function validateProperty($object, $property, $groups = null)
     {
         $metadata = $this->metadataFactory->getClassMetadata(get_class($object));
@@ -51,6 +66,9 @@ class Validator implements ValidatorInterface
         return $this->validateGraph($object, $walk, $groups);
     }
 
+    /**
+     * {@inheritDoc}
+     */
     public function validatePropertyValue($class, $property, $value, $groups = null)
     {
         $metadata = $this->metadataFactory->getClassMetadata($class);
@@ -62,6 +80,9 @@ class Validator implements ValidatorInterface
         return $this->validateGraph($class, $walk, $groups);
     }
 
+    /**
+     * {@inheritDoc}
+     */
     public function validateValue($value, Constraint $constraint, $groups = null)
     {
         $walk = function(GraphWalker $walker, $group) use ($constraint, $value) {

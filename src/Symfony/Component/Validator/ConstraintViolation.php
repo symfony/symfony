@@ -11,6 +11,9 @@ namespace Symfony\Component\Validator;
  * with this source code in the file LICENSE.
  */
 
+/**
+ * Represents a single violation of a constraint.
+ */
 class ConstraintViolation
 {
     protected $messageTemplate;
@@ -28,16 +31,27 @@ class ConstraintViolation
         $this->invalidValue = $invalidValue;
     }
 
+    /**
+     * @return string
+     */
     public function getMessageTemplate()
     {
         return $this->messageTemplate;
     }
 
+    /**
+     * @return array
+     */
     public function getMessageParameters()
     {
         return $this->messageParameters;
     }
 
+    /**
+     * Returns the violation message.
+     *
+     * @return string
+     */
     public function getMessage()
     {
         return str_replace(array_keys($this->messageParameters), array_values($this->messageParameters), $this->messageTemplate);

@@ -13,6 +13,15 @@ namespace Symfony\Component\Validator;
 
 use Symfony\Component\Validator\Mapping\ClassMetadataFactoryInterface;
 
+/**
+ * The central object representing a single validation process.
+ *
+ * This object is used by the GraphWalker to initialize validation of different
+ * items and keep track of the violations.
+ *
+ * @author Fabien Potencier <fabien.potencier@symfony-project.com>
+ * @author Bernhard Schussek <bernhard.schussek@symfony-project.com>
+ */
 class ValidationContext
 {
     protected $root;
@@ -52,6 +61,9 @@ class ValidationContext
         ));
     }
 
+    /**
+     * @return ConstraintViolationList
+     */
     public function getViolations()
     {
         return $this->violations;
@@ -102,11 +114,17 @@ class ValidationContext
         return $this->group;
     }
 
+    /**
+     * @return GraphWalker
+     */
     public function getGraphWalker()
     {
         return $this->graphWalker;
     }
 
+    /**
+     * @return ClassMetadataFactoryInterface
+     */
     public function getClassMetadataFactory()
     {
         return $this->metadataFactory;

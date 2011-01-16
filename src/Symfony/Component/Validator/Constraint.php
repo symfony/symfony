@@ -30,6 +30,9 @@ abstract class Constraint
 {
     const DEFAULT_GROUP = 'Default';
 
+    /**
+     * @var array
+     */
     public $groups = array(self::DEFAULT_GROUP);
 
     /**

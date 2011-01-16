@@ -20,6 +20,13 @@ use Symfony\Component\Validator\Mapping\ClassMetadataFactoryInterface;
 use Symfony\Component\Validator\Mapping\ClassMetadata;
 use Symfony\Component\Validator\Mapping\MemberMetadata;
 
+/**
+ * Responsible for walking over and initializing validation on different
+ * types of items.
+ *
+ * @author Fabien Potencier <fabien.potencier@symfony-project.com>
+ * @author Bernhard Schussek <bernhard.schussek@symfony-project.com>
+ */
 class GraphWalker
 {
     protected $context;
@@ -33,11 +40,23 @@ class GraphWalker
         $this->metadataFactory = $metadataFactory;
     }
 
+    /**
+     * @return ConstraintViolationList
+     */
     public function getViolations()
     {
         return $this->context->getViolations();
     }
 
+    /**
+     * Initialize validation on the given object using the given metadata
+     * instance and validation group.
+     *
+     * @param ClassMetadata $metadata
+     * @param  object $object The object to validate
+     * @param  string $group The validator group to use for validation
+     * @param  string $propertyPath
+     */
     public function walkClass(ClassMetadata $metadata, $object, $group, $propertyPath)
     {
         $this->context->setCurrentClass($metadata->getClassName());

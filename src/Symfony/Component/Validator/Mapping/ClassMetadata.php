@@ -16,6 +16,12 @@ use Symfony\Component\Validator\Constraints\Valid;
 use Symfony\Component\Validator\Exception\ConstraintDefinitionException;
 use Symfony\Component\Validator\Exception\GroupDefinitionException;
 
+/**
+ * Represents all the configured constraints on a given class.
+ *
+ * @author Bernhard Schussek <bernhard.schussek@symfony-project.com>
+ * @author Fabien Potencier <fabien.potencier@symfony-project.com>
+ */
 class ClassMetadata extends ElementMetadata
 {
     public $name;
@@ -70,12 +76,12 @@ class ClassMetadata extends ElementMetadata
      *
      * For each class, the group "Default" is an alias for the group
      * "<ClassName>", where <ClassName> is the non-namespaced name of the
-     * class. All constraints implicitely or explicitely assigned to group
+     * class. All constraints implicitly or explicitly assigned to group
      * "Default" belong to both of these groups, unless the class defines
      * a group sequence.
      *
      * If a class defines a group sequence, validating the class in "Default"
-     * will validate the group sequence. The constraints assinged to "Default"
+     * will validate the group sequence. The constraints assigned to "Default"
      * can still be validated by validating the class in "<ClassName>".
      *
      * @return string  The name of the default group
@@ -202,6 +208,7 @@ class ClassMetadata extends ElementMetadata
      * Returns all metadatas of members describing the given property
      *
      * @param string $property The name of the property
+     * @array of MemberMetadata
      */
     public function getMemberMetadatas($property)
     {

@@ -11,10 +11,16 @@ namespace Symfony\Component\Validator;
  * with this source code in the file LICENSE.
  */
 
+/**
+ * An array-acting object that holds many ConstrainViolation instances.
+ */
 class ConstraintViolationList implements \IteratorAggregate, \Countable
 {
     protected $violations = array();
 
+    /**
+     * @return string
+     */
     public function __toString()
     {
         $string = '';
@@ -32,11 +38,21 @@ EOF;
         return $string;
     }
 
+    /**
+     * Add a ConstraintViolation to this list.
+     *
+     * @param ConstraintViolation $violation
+     */
     public function add(ConstraintViolation $violation)
     {
         $this->violations[] = $violation;
     }
 
+    /**
+     * Merge an existing ConstraintViolationList into this list.
+     *
+     * @param ConstraintViolationList $violations
+     */
     public function addAll(ConstraintViolationList $violations)
     {
         foreach ($violations->violations as $violation) {
@@ -44,11 +60,17 @@ EOF;
         }
     }
 
+    /**
+     * @see IteratorAggregate
+     */
     public function getIterator()
     {
         return new \ArrayIterator($this->violations);
     }
 
+    /**
+     * @see Countable
+     */
     public function count()
     {
         return count($this->violations);

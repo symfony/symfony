@@ -17,6 +17,9 @@ abstract class ConstraintValidator implements ConstraintValidatorInterface
     private $messageTemplate;
     private $messageParameters;
 
+    /**
+     * {@inheritDoc}
+     */
     public function initialize(ValidationContext $context)
     {
         $this->context = $context;
@@ -24,11 +27,17 @@ abstract class ConstraintValidator implements ConstraintValidatorInterface
         $this->messageParameters = array();
     }
 
+    /**
+     * {@inheritDoc}
+     */
     public function getMessageTemplate()
     {
         return $this->messageTemplate;
     }
 
+    /**
+     * {@inheritDoc}
+     */
     public function getMessageParameters()
     {
         return $this->messageParameters;

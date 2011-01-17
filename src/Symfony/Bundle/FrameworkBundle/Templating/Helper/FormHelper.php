@@ -112,9 +112,11 @@ class FormHelper extends Helper
      * @param  FieldInterface $field
      * @return string
      */
-    public function row(/*FieldInterface*/ $field)
+    public function row(/*FieldInterface*/ $field, $template = null)
     {
-        $template = 'FrameworkBundle:Form:field_row.php.html';
+        if (null === $template) {
+            $template = 'FrameworkBundle:Form:field_row.php.html';
+        }
 
         return $this->engine->render($template, array(
             'field' => $field,

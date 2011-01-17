@@ -85,6 +85,14 @@ abstract class Kernel implements HttpKernelInterface, \Serializable
 
     abstract public function registerBundles();
 
+    /**
+     * Registers the directories where bundles can be found.
+     *
+     * The order is significant and can be used by the application.
+     * For instance, it can be used to override templates.
+     *
+     * @return array A hash with namespaces as keys and directories as values
+     */
     abstract public function registerBundleDirs();
 
     abstract public function registerContainerConfiguration(LoaderInterface $loader);

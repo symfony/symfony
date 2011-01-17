@@ -31,7 +31,7 @@ class TransExtension extends \Twig_Extension
     public function getTranslator()
     {
         if (null === $this->translator) {
-            throw \RuntimeException('Translator is not enabled.');
+            throw new \RuntimeException('Translator is not enabled.');
         }
 
         return $this->translator;

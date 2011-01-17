@@ -39,7 +39,7 @@ class TranslatorHelper extends Helper
     public function trans($id, array $parameters = array(), $domain = 'messages', $locale = null)
     {
         if (null === $this->translator) {
-            throw \RuntimeException('Translator is not enabled.');
+            throw new \RuntimeException('Translator is not enabled.');
         }
 
         return $this->translator->trans($id, $parameters, $domain, $locale);
@@ -51,7 +51,7 @@ class TranslatorHelper extends Helper
     public function transChoice($id, $number, array $parameters = array(), $domain = 'messages', $locale = null)
     {
         if (null === $this->translator) {
-            throw \RuntimeException('Translator is not enabled.');
+            throw new \RuntimeException('Translator is not enabled.');
         }
 
         return $this->translator->transChoice($id, $number, $parameters, $domain, $locale);

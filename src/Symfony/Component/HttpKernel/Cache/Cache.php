@@ -145,11 +145,11 @@ class Cache implements HttpKernelInterface
         $this->traces[$request->getMethod().' '.$path] = array();
 
         if (!$request->isMethodSafe($request)) {
-            $response = $this->invalidate($request);
+            $response = $this->invalidate($request, $catch);
         } elseif ($request->headers->has('expect')) {
-            $response = $this->pass($request);
+            $response = $this->pass($request, $catch);
         } else {
-            $response = $this->lookup($request);
+            $response = $this->lookup($request, $catch);
         }
 
         $response->isNotModified($request);
@@ -171,33 +171,35 @@ class Cache implements HttpKernelInterface
      * Forwards the Request to the backend without storing the Response in the cache.
      *
      * @param Request $request A Request instance
+     * @param Boolean  $catch   whether to process exceptions
      *
      * @return Response A Response instance
      */
-    protected function pass(Request $request)
+    protected function pass(Request $request, $catch = false)
     {
         $this->record($request, 'pass');
 
-        return $this->forward($request);
+        return $this->forward($request, $catch);
     }
 
     /**
      * Invalidates non-safe methods (like POST, PUT, and DELETE).
      *
      * @param Request $request A Request instance
+     * @param Boolean  $catch   whether to process exceptions
      *
      * @return Response A Response instance
      *
      * @see RFC2616 13.10
      */
-    protected function invalidate(Request $request)
+    protected function invalidate(Request $request, $catch = false)
     {
-        $response = $this->pass($request);
+        $response = $this->pass($request, $catch);
 
         // invalidate only when the response is successful
         if ($response->isSuccessful() || $response->isRedirect()) {
             try {
-                $this->store->invalidate($request);
+                $this->store->invalidate($request, $catch);
 
                 $this->record($request, 'invalidate');
             } catch (\Exception $e) {
@@ -222,10 +224,11 @@ class Cache implements HttpKernelInterface
      * it triggers "miss" processing.
      *
      * @param Request $request A Request instance
+     * @param Boolean  $catch   whether to process exceptions
      *
      * @return Response A Response instance
      */
-    protected function lookup(Request $request)
+    protected function lookup(Request $request, $catch = false)
     {
         // if allow_reload and no-cache Cache-Control, allow a cache reload
         if ($this->options['allow_reload'] && $request->isNoCache()) {
@@ -243,13 +246,13 @@ class Cache implements HttpKernelInterface
                 throw $e;
             }
 
-            return $this->pass($request);
+            return $this->pass($request, $catch);
         }
 
         if (null === $entry) {
             $this->record($request, 'miss');
 
-            return $this->fetch($request);
+            return $this->fetch($request, $catch);
         }
 
         if (!$this->isFreshEnough($request, $entry)) {
@@ -332,10 +335,11 @@ class Cache implements HttpKernelInterface
      * This methods is trigered when the cache missed or a reload is required.
      *
      * @param Request  $request A Request instance
+     * @param Boolean  $catch   whether to process exceptions
      *
      * @return Response A Response instance
      */
-    protected function fetch(Request $request)
+    protected function fetch(Request $request, $catch = false)
     {
         $subRequest = clone $request;
 
@@ -346,7 +350,7 @@ class Cache implements HttpKernelInterface
         $subRequest->headers->remove('if_modified_since');
         $subRequest->headers->remove('if_none_match');
 
-        $response = $this->forward($subRequest);
+        $response = $this->forward($subRequest, $catch);
 
         if ($this->isPrivateRequest($request) && !$response->headers->hasCacheControlDirective('public')) {
             $response->setPrivate(true);

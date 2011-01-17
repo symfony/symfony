@@ -870,4 +870,24 @@ class CacheTest extends CacheTestCase
         $this->assertEquals('Bob/2.0', $this->response->getContent());
         $this->assertEquals(3, $this->response->headers->get('X-Response-Count'));
     }
+
+    public function testShouldCatchExceptions()
+    {
+        $this->catchExceptions();
+
+        $this->setNextResponse();
+        $this->request('GET', '/');
+
+        $this->assertExceptionsAreCaught();
+    }
+
+    public function testShouldNotCatchExceptions()
+    {
+        $this->catchExceptions(false);
+
+        $this->setNextResponse();
+        $this->request('GET', '/');
+
+        $this->assertExceptionsAreNotCaught();
+    }
 }

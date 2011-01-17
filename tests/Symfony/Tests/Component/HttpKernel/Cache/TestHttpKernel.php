@@ -12,6 +12,7 @@
 namespace Symfony\Tests\Component\HttpKernel\Cache;
 
 use Symfony\Component\HttpKernel\HttpKernel;
+use Symfony\Component\HttpKernel\HttpKernelInterface;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\EventDispatcher\EventDispatcher;
@@ -24,6 +25,7 @@ class TestHttpKernel extends HttpKernel implements ControllerResolverInterface
     protected $headers;
     protected $called;
     protected $customizer;
+    protected $catch;
 
     public function __construct($body, $status, $headers, \Closure $customizer = null)
     {
@@ -32,8 +34,20 @@ class TestHttpKernel extends HttpKernel implements ControllerResolverInterface
         $this->headers = $headers;
         $this->customizer = $customizer;
         $this->called = false;
+        $this->catch = false;
 
         parent::__construct(new EventDispatcher(), $this);
+    }
+
+    public function handle(Request $request, $type = HttpKernelInterface::MASTER_REQUEST, $catch = false)
+    {
+        $this->catch = $catch;
+        return parent::handle($request, $type, $catch);
+    }
+
+    public function isCatchingExceptions()
+    {
+        return $this->catch;
     }
 
     public function getController(Request $request)

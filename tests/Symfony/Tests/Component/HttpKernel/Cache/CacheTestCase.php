@@ -16,6 +16,7 @@ require_once __DIR__.'/TestHttpKernel.php';
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpKernel\Cache\Cache;
 use Symfony\Component\HttpKernel\Cache\Store;
+use Symfony\Component\HttpKernel\HttpKernelInterface;
 
 class CacheTestCase extends \PHPUnit_Framework_TestCase
 {
@@ -26,6 +27,7 @@ class CacheTestCase extends \PHPUnit_Framework_TestCase
     protected $request;
     protected $response;
     protected $responses;
+    protected $catch;
 
     protected function setUp()
     {
@@ -39,6 +41,8 @@ class CacheTestCase extends \PHPUnit_Framework_TestCase
         $this->response = null;
         $this->responses = array();
 
+        $this->catch = false;
+
         $this->clearDirectory(sys_get_temp_dir().'/http_cache');
     }
 
@@ -51,6 +55,7 @@ class CacheTestCase extends \PHPUnit_Framework_TestCase
         $this->response = null;
         $this->responses = null;
         $this->cacheConfig = null;
+        $this->catch = null;
 
         $this->clearDirectory(sys_get_temp_dir().'/http_cache');
     }
@@ -86,6 +91,16 @@ class CacheTestCase extends \PHPUnit_Framework_TestCase
         $this->assertNotRegExp('/'.$trace.'/', implode(', ', $traces));
     }
 
+    public function assertExceptionsAreCaught()
+    {
+        $this->assertTrue($this->kernel->isCatchingExceptions());
+    }
+
+    public function assertExceptionsAreNotCaught()
+    {
+        $this->assertFalse($this->kernel->isCatchingExceptions());
+    }
+
     public function request($method, $uri = '/', $server = array(), $cookies = array())
     {
         if (null === $this->kernel) {
@@ -100,7 +115,7 @@ class CacheTestCase extends \PHPUnit_Framework_TestCase
         $this->cache = new Cache($this->kernel, $this->store, null, $this->cacheConfig);
         $this->request = Request::create($uri, $method, array(), $cookies, array(), $server);
 
-        $this->response = $this->cache->handle($this->request);
+        $this->response = $this->cache->handle($this->request, HttpKernelInterface::MASTER_REQUEST, $this->catch);
 
         $this->responses[] = $this->response;
     }
@@ -121,6 +136,11 @@ class CacheTestCase extends \PHPUnit_Framework_TestCase
         $called = false;
 
         $this->kernel = new TestHttpKernel($body, $statusCode, $headers, $customizer);
+    }
+
+    public function catchExceptions($catch = true)
+    {
+        $this->catch = $catch;
     }
 
     static public function clearDirectory($directory)

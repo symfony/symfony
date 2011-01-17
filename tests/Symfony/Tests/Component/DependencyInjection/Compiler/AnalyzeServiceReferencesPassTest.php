@@ -87,9 +87,8 @@ class AnalyzeServiceReferencesPassTest extends \PHPUnit_Framework_TestCase
     protected function process(ContainerBuilder $container)
     {
         $pass = new RepeatedPass(array(new AnalyzeServiceReferencesPass()));
-        $pass->setCompiler($compiler = new Compiler());
         $pass->process($container);
 
-        return $compiler->getServiceReferenceGraph();
+        return $container->getCompiler()->getServiceReferenceGraph();
     }
 }

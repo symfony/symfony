@@ -288,7 +288,11 @@ class Container implements ContainerInterface
     public function __construct(ParameterBagInterface $parameterBag = null)
     {
         $this->parameterBag = null === $parameterBag ? new ParameterBag() : $parameterBag;
-        $this->services = array();
+        $this->services =
+        $this->scopes =
+        $this->scopeChildren =
+        $this->scopedServices =
+        $this->scopeStacks = array();
         $this->set('service_container', $this);
     }
     public function compile()
@@ -316,9 +320,19 @@ class Container implements ContainerInterface
     {
         $this->parameterBag->set($name, $value);
     }
-    public function set($id, $service)
+    public function set($id, $service, $scope = self::SCOPE_CONTAINER)
     {
-        $this->services[strtolower($id)] = $service;
+        if (self::SCOPE_PROTOTYPE === $scope) {
+            throw new \InvalidArgumentException('You cannot set services of scope "prototype".');
+        }
+        $id = strtolower($id);
+        if (self::SCOPE_CONTAINER !== $scope) {
+            if (!isset($this->scopedServices[$scope])) {
+                throw new \RuntimeException('You cannot set services of inactive scopes.');
+            }
+            $this->scopedServices[$scope][$id] = $service;
+        }
+        $this->services[$id] = $service;
     }
     public function has($id)
     {
@@ -355,6 +369,82 @@ class Container implements ContainerInterface
         }
         return array_merge($ids, array_keys($this->services));
     }
+    public function enterScope($name)
+    {
+        if (!isset($this->scopes[$name])) {
+            throw new \InvalidArgumentException(sprintf('The scope "%s" does not exist.', $name));
+        }
+        if (self::SCOPE_CONTAINER !== $this->scopes[$name] && !isset($this->scopedServices[$this->scopes[$name]])) {
+            throw new \RuntimeException(sprintf('The parent scope "%s" must be active when entering this scope.', $this->scopes[$name]));
+        }
+                                if (isset($this->scopedServices[$name])) {
+            $services = array($this->services, $name => $this->scopedServices[$name]);
+            unset($this->scopedServices[$name]);
+            foreach ($this->scopeChildren[$name] as $child) {
+                $services[$child] = $this->scopedServices[$child];
+                unset($this->scopedServices[$child]);
+            }
+                        $this->services = call_user_func_array('array_diff_key', $services);
+            array_shift($services);
+                        if (!isset($this->scopeStacks[$name])) {
+                $this->scopeStacks[$name] = new \SplStack();
+            }
+            $this->scopeStacks[$name]->push($services);
+        }
+        $this->scopedServices[$name] = array();
+    }
+    public function leaveScope($name)
+    {
+        if (!isset($this->scopedServices[$name])) {
+            throw new \InvalidArgumentException(sprintf('The scope "%s" is not active.', $name));
+        }
+                        $services = array($this->services, $this->scopedServices[$name]);
+        unset($this->scopedServices[$name]);
+        foreach ($this->scopeChildren[$name] as $child) {
+            if (!isset($this->scopedServices[$child])) {
+                continue;
+            }
+            $services[] = $this->scopedServices[$child];
+            unset($this->scopedServices[$child]);
+        }
+        $this->services = call_user_func_array('array_diff_key', $services);
+                if (isset($this->scopeStacks[$name]) && count($this->scopeStacks[$name]) > 0) {
+            $services = $this->scopeStacks[$name]->pop();
+            $this->scopedServices += $services;
+            array_unshift($services, $this->services);
+            $this->services = call_user_func_array('array_merge', $services);
+        }
+    }
+    public function addScope($name, $parentScope = self::SCOPE_CONTAINER)
+    {
+        if (self::SCOPE_CONTAINER === $name || self::SCOPE_PROTOTYPE === $name) {
+            throw new \InvalidArgumentException(sprintf('The scope "%s" is reserved.', $name));
+        }
+        if (isset($this->scopes[$name])) {
+            throw new \InvalidArgumentException(sprintf('A scope with name "%s" already exists.', $name));
+        }
+        if (self::SCOPE_CONTAINER !== $parentScope && !isset($this->scopes[$parentScope])) {
+            throw new \InvalidArgumentException(sprintf('The parent scope "%s" does not exist, or is invalid.', $parentScope));
+        }
+        $this->scopes[$name] = $parentScope;
+        $this->scopeChildren[$name] = array();
+                if ($parentScope !== self::SCOPE_CONTAINER) {
+            $this->scopeChildren[$parentScope][] = $name;
+            foreach ($this->scopeChildren as $pName => $childScopes) {
+                if (in_array($parentScope, $childScopes, true)) {
+                    $this->scopeChildren[$pName][] = $name;
+                }
+            }
+        }
+    }
+    public function hasScope($name)
+    {
+        return isset($this->scopes[$name]);
+    }
+    public function isScopeActive($name)
+    {
+        return isset($this->scopedServices[$name]);
+    }
     static public function camelize($id)
     {
         return preg_replace(array('/(?:^|_)+(.)/e', '/\.(.)/e'), array("strtoupper('\\1')", "'_'.strtoupper('\\1')"), $id);
@@ -379,9 +469,16 @@ interface ContainerInterface
     const EXCEPTION_ON_INVALID_REFERENCE = 1;
     const NULL_ON_INVALID_REFERENCE      = 2;
     const IGNORE_ON_INVALID_REFERENCE    = 3;
-    function set($id, $service);
+    const SCOPE_CONTAINER                = 'container';
+    const SCOPE_PROTOTYPE                = 'prototype';
+    function set($id, $service, $scope = self::SCOPE_CONTAINER);
     function get($id, $invalidBehavior = self::EXCEPTION_ON_INVALID_REFERENCE);
     function has($id);
+    function enterScope($name);
+    function leaveScope($name);
+    function addScope($name, $parentScope = self::SCOPE_CONTAINER);
+    function hasScope($name);
+    function isScopeActive($name);
 }
 }
 namespace Symfony\Component\DependencyInjection\ParameterBag

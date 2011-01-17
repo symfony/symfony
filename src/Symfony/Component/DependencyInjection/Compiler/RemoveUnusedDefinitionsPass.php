@@ -24,7 +24,6 @@ use Symfony\Component\DependencyInjection\ContainerBuilder;
 class RemoveUnusedDefinitionsPass implements RepeatablePassInterface
 {
     protected $repeatedPass;
-    protected $graph;
 
     public function setRepeatedPass(RepeatedPass $repeatedPass)
     {
@@ -33,7 +32,7 @@ class RemoveUnusedDefinitionsPass implements RepeatablePassInterface
 
     public function process(ContainerBuilder $container)
     {
-        $this->graph = $this->repeatedPass->getCompiler()->getServiceReferenceGraph();
+        $graph = $container->getCompiler()->getServiceReferenceGraph();
 
         $hasChanged = false;
         foreach ($container->getDefinitions() as $id => $definition) {
@@ -41,8 +40,8 @@ class RemoveUnusedDefinitionsPass implements RepeatablePassInterface
                 continue;
             }
 
-            if ($this->graph->hasNode($id)) {
-                $edges = $this->graph->getNode($id)->getInEdges();
+            if ($graph->hasNode($id)) {
+                $edges = $graph->getNode($id)->getInEdges();
                 $referencingAliases = array();
                 $sourceIds = array();
                 foreach ($edges as $edge) {

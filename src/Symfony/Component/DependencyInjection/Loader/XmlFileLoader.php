@@ -11,6 +11,8 @@
 
 namespace Symfony\Component\DependencyInjection\Loader;
 
+use Symfony\Component\DependencyInjection\ContainerInterface;
+
 use Symfony\Component\DependencyInjection\Alias;
 
 use Symfony\Component\DependencyInjection\InterfaceInjector;
@@ -137,7 +139,7 @@ class XmlFileLoader extends FileLoader
 
         $definition = new Definition();
 
-        foreach (array('class', 'shared', 'public', 'factory-method', 'factory-service') as $key) {
+        foreach (array('class', 'scope', 'public', 'factory-method', 'factory-service') as $key) {
             if (isset($service[$key])) {
                 $method = 'set'.str_replace('-', '', $key);
                 $definition->$method((string) $service->getAttributeAsPhp($key));
@@ -155,7 +157,7 @@ class XmlFileLoader extends FileLoader
                 $definition->setConfigurator((string) $service->configurator['function']);
             } else {
                 if (isset($service->configurator['service'])) {
-                    $class = new Reference((string) $service->configurator['service']);
+                    $class = new Reference((string) $service->configurator['service'], ContainerInterface::EXCEPTION_ON_INVALID_REFERENCE, false);
                 } else {
                     $class = (string) $service->configurator['class'];
                 }

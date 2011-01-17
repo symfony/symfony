@@ -15,6 +15,7 @@ use Symfony\Component\DependencyInjection\Definition;
 use Symfony\Component\DependencyInjection\Reference;
 use Symfony\Component\DependencyInjection\Parameter;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
+use Symfony\Component\DependencyInjection\ContainerInterface;
 
 /**
  * GraphvizDumper dumps a service container as a graphviz file.
@@ -135,7 +136,7 @@ class GraphvizDumper extends Dumper
         $container = clone $this->container;
 
         foreach ($container->getDefinitions() as $id => $definition) {
-            $nodes[$id] = array('class' => str_replace('\\', '\\\\', $this->container->getParameterBag()->resolveValue($definition->getClass())), 'attributes' => array_merge($this->options['node.definition'], array('style' => $definition->isShared() ? 'filled' : 'dotted')));
+            $nodes[$id] = array('class' => str_replace('\\', '\\\\', $this->container->getParameterBag()->resolveValue($definition->getClass())), 'attributes' => array_merge($this->options['node.definition'], array('style' => ContainerInterface::SCOPE_PROTOTYPE !== $definition->getScope() ? 'filled' : 'dotted')));
 
             $container->setDefinition($id, new Definition('stdClass'));
         }

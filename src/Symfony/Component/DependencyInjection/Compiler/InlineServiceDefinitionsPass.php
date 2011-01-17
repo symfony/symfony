@@ -11,6 +11,7 @@
 
 namespace Symfony\Component\DependencyInjection\Compiler;
 
+use Symfony\Component\DependencyInjection\ContainerInterface;
 use Symfony\Component\DependencyInjection\Definition;
 use Symfony\Component\DependencyInjection\Reference;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
@@ -32,7 +33,7 @@ class InlineServiceDefinitionsPass implements RepeatablePassInterface
 
     public function process(ContainerBuilder $container)
     {
-        $this->graph = $this->repeatedPass->getCompiler()->getServiceReferenceGraph();
+        $this->graph = $container->getCompiler()->getServiceReferenceGraph();
 
         foreach ($container->getDefinitions() as $id => $definition) {
             $definition->setArguments(
@@ -56,7 +57,7 @@ class InlineServiceDefinitionsPass implements RepeatablePassInterface
                 }
 
                 if ($this->isInlinableDefinition($container, $id, $definition = $container->getDefinition($id))) {
-                    if ($definition->isShared()) {
+                    if (ContainerInterface::SCOPE_PROTOTYPE !== $definition->getScope()) {
                         $arguments[$k] = $definition;
                     } else {
                         $arguments[$k] = clone $definition;
@@ -73,7 +74,7 @@ class InlineServiceDefinitionsPass implements RepeatablePassInterface
 
     protected function isInlinableDefinition(ContainerBuilder $container, $id, Definition $definition)
     {
-        if (!$definition->isShared()) {
+        if (ContainerInterface::SCOPE_PROTOTYPE === $definition->getScope()) {
             return true;
         }
 

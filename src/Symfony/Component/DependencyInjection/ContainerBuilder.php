@@ -178,6 +178,16 @@ class ContainerBuilder extends Container implements TaggedContainerInterface
         return $this->compiler;
     }
 
+    public function getScopes()
+    {
+        return $this->scopes;
+    }
+
+    public function getScopeChildren()
+    {
+        return $this->scopeChildren;
+    }
+
     /**
      * Sets a service.
      *
@@ -186,7 +196,7 @@ class ContainerBuilder extends Container implements TaggedContainerInterface
      *
      * @throws BadMethodCallException
      */
-    public function set($id, $service)
+    public function set($id, $service, $scope = self::SCOPE_CONTAINER)
     {
         if ($this->isFrozen()) {
             throw new \BadMethodCallException('Setting service on a frozen container is not allowed');
@@ -196,7 +206,7 @@ class ContainerBuilder extends Container implements TaggedContainerInterface
 
         unset($this->definitions[$id], $this->aliases[$id]);
 
-        parent::set($id, $service);
+        parent::set($id, $service, $scope);
     }
 
     /**
@@ -691,8 +701,16 @@ class ContainerBuilder extends Container implements TaggedContainerInterface
             $injector->processDefinition($definition, $service);
         }
 
-        if ($definition->isShared()) {
-            $this->services[strtolower($id)] = $service;
+        if (self::SCOPE_PROTOTYPE !== $scope = $definition->getScope()) {
+            if (self::SCOPE_CONTAINER !== $scope && !isset($this->scopedServices[$scope])) {
+                throw new \RuntimeException('You tried to create a service of an inactive scope.');
+            }
+
+            $this->services[$lowerId = strtolower($id)] = $service;
+
+            if (self::SCOPE_CONTAINER !== $scope) {
+                $this->scopedServices[$scope][$lowerId] = $service;
+            }
         }
 
         foreach ($definition->getMethodCalls() as $call) {

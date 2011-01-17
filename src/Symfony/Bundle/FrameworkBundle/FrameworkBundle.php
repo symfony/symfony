@@ -70,6 +70,8 @@ class FrameworkBundle extends Bundle
     {
         parent::registerExtensions($container);
 
+        $container->addScope('request');
+
         $container->addCompilerPass(new AddSecurityVotersPass());
         $container->addCompilerPass(new ConverterManagerPass());
         $container->addCompilerPass(new RoutingResolverPass());

@@ -102,15 +102,15 @@ class DefinitionTest extends \PHPUnit_Framework_TestCase
     }
 
     /**
-     * @covers Symfony\Component\DependencyInjection\Definition::setShared
-     * @covers Symfony\Component\DependencyInjection\Definition::isShared
+     * @covers Symfony\Component\DependencyInjection\Definition::setScope
+     * @covers Symfony\Component\DependencyInjection\Definition::getScope
      */
-    public function testSetIsShared()
+    public function testSetGetScope()
     {
         $def = new Definition('stdClass');
-        $this->assertTrue($def->isShared(), '->isShared() returns true by default');
-        $this->assertSame($def, $def->setShared(false), '->setShared() implements a fluent interface');
-        $this->assertFalse($def->isShared(), '->isShared() returns false if the instance must not be shared');
+        $this->assertEquals('container', $def->getScope());
+        $this->assertSame($def, $def->setScope('foo'));
+        $this->assertEquals('foo', $def->getScope());
     }
 
     /**

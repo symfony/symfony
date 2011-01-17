@@ -43,7 +43,7 @@ class PhpDumper extends Dumper
     protected $definitionVariables;
     protected $referenceVariables;
     protected $variableCount;
-    protected $reservedVariables = array('instance');
+    protected $reservedVariables = array('instance', 'class');
 
     public function __construct(ContainerBuilder $container)
     {
@@ -270,8 +270,10 @@ EOF;
         $simple = $this->isSimpleInstance($id, $definition);
 
         $instantiation = '';
-        if ($definition->isShared()) {
+        if (ContainerInterface::SCOPE_CONTAINER === $definition->getScope()) {
             $instantiation = "\$this->services['$id'] = ".($simple ? '' : '$instance');
+        } else if (ContainerInterface::SCOPE_PROTOTYPE !== $scope = $definition->getScope()) {
+            $instantiation = "\$this->services['$id'] = \$this->scopedServices['$scope']['$id'] = ".($simple ? '' : '$instance');
         } elseif (!$simple) {
             $instantiation = '$instance';
         }
@@ -399,7 +401,7 @@ EOF;
         }
 
         $doc = '';
-        if ($definition->isShared()) {
+        if (ContainerInterface::SCOPE_PROTOTYPE !== $definition->getScope()) {
             $doc .= <<<EOF
 
      *
@@ -429,6 +431,17 @@ EOF;
     {
 
 EOF;
+
+        $scope = $definition->getScope();
+        if (ContainerInterface::SCOPE_CONTAINER !== $scope && ContainerInterface::SCOPE_PROTOTYPE !== $scope) {
+            $code .= <<<EOF
+        if (!isset(\$this->scopedServices['$scope'])) {
+            throw new \RuntimeException('You cannot create a service ("$id") of an inactive scope ("$scope").');
+        }
+
+
+EOF;
+        }
 
         $code .=
             $this->addServiceInclude($id, $definition).
@@ -518,7 +531,7 @@ EOF;
     {
         $bagClass = $this->container->isFrozen() ? 'FrozenParameterBag' : 'ParameterBag';
 
-        return <<<EOF
+        $code = <<<EOF
 
     /**
      * Constructor.
@@ -526,9 +539,21 @@ EOF;
     public function __construct()
     {
         parent::__construct(new $bagClass(\$this->getDefaultParameters()));
+
+EOF;
+
+        if (count($scopes = $this->container->getScopes()) > 0) {
+            $code .= "\n";
+            $code .= "        \$this->scopes = ".$this->dumpValue($scopes).";\n";
+            $code .= "        \$this->scopeChildren = ".$this->dumpValue($this->container->getScopeChildren()).";\n";
+        }
+
+        $code .= <<<EOF
     }
 
 EOF;
+
+        return $code;
     }
 
     protected function addDefaultParametersMethod()

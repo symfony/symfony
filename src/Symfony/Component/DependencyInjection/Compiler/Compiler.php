@@ -70,10 +70,6 @@ class Compiler
 
     protected function startPass(CompilerPassInterface $pass)
     {
-        if ($pass instanceof CompilerAwareInterface) {
-            $pass->setCompiler($this);
-        }
-
         $this->currentPass = $pass;
         $this->currentStartTime = microtime(true);
     }

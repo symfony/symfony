@@ -11,6 +11,19 @@
 
 namespace Symfony\Component\DependencyInjection;
 
+/**
+ * Represents a variable.
+ *
+ *     $var = new Variable('a');
+ *
+ * will be dumped as
+ *
+ *     $a
+ *
+ * by the PHP dumper.
+ *
+ * @author Johannes M. Schmitt <schmittjoh@gmail.com>
+ */
 class Variable
 {
     protected $name;

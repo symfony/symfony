@@ -27,7 +27,6 @@ class HttpKernel implements HttpKernelInterface
 {
     protected $dispatcher;
     protected $resolver;
-    protected $request;
 
     /**
      * Constructor
@@ -46,16 +45,10 @@ class HttpKernel implements HttpKernelInterface
      */
     public function handle(Request $request, $type = HttpKernelInterface::MASTER_REQUEST, $catch = true)
     {
-        // set the current request, stash the previous one
-        $previousRequest = $this->request;
-        $this->request = $request;
-
         try {
             $response = $this->handleRaw($request, $type);
         } catch (\Exception $e) {
             if (false === $catch) {
-                $this->request = $previousRequest;
-
                 throw $e;
             }
 
@@ -63,26 +56,13 @@ class HttpKernel implements HttpKernelInterface
             $event = new Event($this, 'core.exception', array('request_type' => $type, 'request' => $request, 'exception' => $e));
             $this->dispatcher->notifyUntil($event);
             if (!$event->isProcessed()) {
-                $this->request = $previousRequest;
-
                 throw $e;
             }
 
             $response = $this->filterResponse($event->getReturnValue(), $request, 'A "core.exception" listener returned a non response object.', $type);
         }
 
-        // restore the previous request
-        $this->request = $previousRequest;
-
         return $response;
-    }
-
-    /**
-     * {@inheritdoc}
-     */
-    public function getRequest()
-    {
-        return $this->request;
     }
 
     /**

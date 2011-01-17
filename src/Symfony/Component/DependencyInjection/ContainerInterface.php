@@ -15,20 +15,24 @@ namespace Symfony\Component\DependencyInjection;
  * ContainerInterface is the interface implemented by service container classes.
  *
  * @author Fabien Potencier <fabien.potencier@symfony-project.com>
+ * @author Johannes M. Schmitt <schmittjoh@gmail.com>
  */
 interface ContainerInterface
 {
     const EXCEPTION_ON_INVALID_REFERENCE = 1;
     const NULL_ON_INVALID_REFERENCE      = 2;
     const IGNORE_ON_INVALID_REFERENCE    = 3;
+    const SCOPE_CONTAINER                = 'container';
+    const SCOPE_PROTOTYPE                = 'prototype';
 
     /**
      * Sets a service.
      *
      * @param string $id      The service identifier
      * @param object $service The service instance
+     * @param string $scope   The scope of the service
      */
-    function set($id, $service);
+    function set($id, $service, $scope = self::SCOPE_CONTAINER);
 
     /**
      * Gets a service.
@@ -52,4 +56,46 @@ interface ContainerInterface
      * @return Boolean true if the service is defined, false otherwise
      */
     function has($id);
+
+    /**
+     * Enters the given scope
+     *
+     * @param string $name
+     * @return void
+     */
+    function enterScope($name);
+
+    /**
+     * Leaves the current scope, and re-enters the parent scope
+     *
+     * @param string $name
+     * @return void
+     */
+    function leaveScope($name);
+
+    /**
+     * Adds a scope to the container
+     *
+     * @param string $name
+     * @param string $parentScope
+     * @return void
+     */
+    function addScope($name, $parentScope = self::SCOPE_CONTAINER);
+
+    /**
+     * Whether this container has the given scope
+     *
+     * @param string $name
+     * @return Boolean
+     */
+    function hasScope($name);
+
+    /**
+     * Determines whether the given scope is currently active.
+     *
+     * It does however not check if the scope actually exists.
+     *
+     * @return Boolean
+     */
+    function isScopeActive($name);
 }

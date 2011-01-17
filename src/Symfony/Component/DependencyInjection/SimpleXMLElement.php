@@ -42,7 +42,14 @@ class SimpleXMLElement extends \SimpleXMLElement
                     } elseif (isset($arg['on-invalid']) && 'null' == $arg['on-invalid']) {
                         $invalidBehavior = ContainerInterface::NULL_ON_INVALID_REFERENCE;
                     }
-                    $arguments[$key] = new Reference((string) $arg['id'], $invalidBehavior);
+
+                    if (isset($arg['strict'])) {
+                        $strict = self::phpize($arg['strict']);
+                    } else {
+                        $strict = true;
+                    }
+
+                    $arguments[$key] = new Reference((string) $arg['id'], $invalidBehavior, $strict);
                     break;
                 case 'collection':
                     $arguments[$key] = $arg->getArgumentsAsPhp($name);

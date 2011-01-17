@@ -46,6 +46,9 @@ class PassConfig
             new ResolveReferencesToAliasesPass(),
             new ResolveInterfaceInjectorsPass(),
             new ResolveInvalidReferencesPass(),
+            new AnalyzeServiceReferencesPass(true),
+            new CheckCircularReferencesPass(),
+            new CheckReferenceScopePass(),
         );
 
         $this->removingPasses = array(

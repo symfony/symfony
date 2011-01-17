@@ -20,19 +20,22 @@ class Reference
 {
     protected $id;
     protected $invalidBehavior;
+    protected $strict;
 
     /**
      * Constructor.
      *
-     * @param string $id              The service identifier
-     * @param int    $invalidBehavior The behavior when the service does not exist
+     * @param string  $id              The service identifier
+     * @param int     $invalidBehavior The behavior when the service does not exist
+     * @param Boolean $strict          Sets how this reference is validated
      *
      * @see Container
      */
-    public function __construct($id, $invalidBehavior = ContainerInterface::EXCEPTION_ON_INVALID_REFERENCE)
+    public function __construct($id, $invalidBehavior = ContainerInterface::EXCEPTION_ON_INVALID_REFERENCE, $strict = true)
     {
         $this->id = $id;
         $this->invalidBehavior = $invalidBehavior;
+        $this->strict = $strict;
     }
 
     /**
@@ -48,5 +51,10 @@ class Reference
     public function getInvalidBehavior()
     {
         return $this->invalidBehavior;
+    }
+
+    public function isStrict()
+    {
+        return $this->strict;
     }
 }

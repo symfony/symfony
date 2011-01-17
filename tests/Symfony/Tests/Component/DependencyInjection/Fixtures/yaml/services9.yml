@@ -15,7 +15,7 @@ services:
       - [setBar, ['@bar']]
       - [initialize, {  }]
       
-    shared: false
+    scope: prototype
     configurator: sc_configure
   bar:
     class: FooClass

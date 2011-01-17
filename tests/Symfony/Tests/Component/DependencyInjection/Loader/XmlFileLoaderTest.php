@@ -11,6 +11,8 @@
 
 namespace Symfony\Tests\Component\DependencyInjection\Loader;
 
+use Symfony\Component\DependencyInjection\ContainerInterface;
+
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\DependencyInjection\Reference;
 use Symfony\Component\DependencyInjection\Definition;
@@ -132,13 +134,14 @@ class XmlFileLoaderTest extends \PHPUnit_Framework_TestCase
         $this->assertTrue(isset($services['foo']), '->load() parses <service> elements');
         $this->assertEquals('Symfony\\Component\\DependencyInjection\\Definition', get_class($services['foo']), '->load() converts <service> element to Definition instances');
         $this->assertEquals('FooClass', $services['foo']->getClass(), '->load() parses the class attribute');
-        $this->assertTrue($services['shared']->isShared(), '->load() parses the shared attribute');
-        $this->assertFalse($services['non_shared']->isShared(), '->load() parses the shared attribute');
+        $this->assertEquals('container', $services['scope.container']->getScope());
+        $this->assertEquals('custom', $services['scope.custom']->getScope());
+        $this->assertEquals('prototype', $services['scope.prototype']->getScope());
         $this->assertEquals('getInstance', $services['constructor']->getFactoryMethod(), '->load() parses the factory-method attribute');
         $this->assertEquals('%path%/foo.php', $services['file']->getFile(), '->load() parses the file tag');
         $this->assertEquals(array('foo', new Reference('foo'), array(true, false)), $services['arguments']->getArguments(), '->load() parses the argument tags');
         $this->assertEquals('sc_configure', $services['configurator1']->getConfigurator(), '->load() parses the configurator tag');
-        $this->assertEquals(array(new Reference('baz'), 'configure'), $services['configurator2']->getConfigurator(), '->load() parses the configurator tag');
+        $this->assertEquals(array(new Reference('baz', ContainerInterface::EXCEPTION_ON_INVALID_REFERENCE, false), 'configure'), $services['configurator2']->getConfigurator(), '->load() parses the configurator tag');
         $this->assertEquals(array('BazClass', 'configureStatic'), $services['configurator3']->getConfigurator(), '->load() parses the configurator tag');
         $this->assertEquals(array(array('setBar', array())), $services['method_call1']->getMethodCalls(), '->load() parses the method_call tag');
         $this->assertEquals(array(array('setBar', array('foo', new Reference('foo'), array(true, false)))), $services['method_call2']->getMethodCalls(), '->load() parses the method_call tag');

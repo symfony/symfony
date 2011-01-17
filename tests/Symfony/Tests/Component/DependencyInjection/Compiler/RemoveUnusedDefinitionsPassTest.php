@@ -84,7 +84,6 @@ class RemoveUnusedDefinitionsPassTest extends \PHPUnit_Framework_TestCase
     protected function process(ContainerBuilder $container)
     {
         $repeatedPass = new RepeatedPass(array(new AnalyzeServiceReferencesPass(), new RemoveUnusedDefinitionsPass()));
-        $repeatedPass->setCompiler(new Compiler());
         $repeatedPass->process($container);
     }
 }

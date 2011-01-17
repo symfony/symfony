@@ -14,7 +14,7 @@ $container->
     addTag('foo', array('bar' => 'bar'))->
     setFactoryMethod('getInstance')->
     setArguments(array('foo', new Reference('foo.baz'), array('%foo%' => 'foo is %foo%', 'bar' => '%foo%'), true, new Reference('service_container')))->
-    setShared(false)->
+    setScope('prototype')->
     addMethodCall('setBar', array(new Reference('bar')))->
     addMethodCall('initialize')->
     setConfigurator('sc_configure')
@@ -22,7 +22,7 @@ $container->
 $container->
     register('bar', 'FooClass')->
     setArguments(array('foo', new Reference('foo.baz'), new Parameter('foo_bar')))->
-    setShared(true)->
+    setScope('container')->
     setConfigurator(array(new Reference('foo.baz'), 'configure'))
 ;
 $container->

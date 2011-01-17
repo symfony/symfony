@@ -97,8 +97,9 @@ class YamlFileLoaderTest extends \PHPUnit_Framework_TestCase
         $this->assertTrue(isset($services['foo']), '->load() parses service elements');
         $this->assertEquals('Symfony\\Component\\DependencyInjection\\Definition', get_class($services['foo']), '->load() converts service element to Definition instances');
         $this->assertEquals('FooClass', $services['foo']->getClass(), '->load() parses the class attribute');
-        $this->assertTrue($services['shared']->isShared(), '->load() parses the shared attribute');
-        $this->assertFalse($services['non_shared']->isShared(), '->load() parses the shared attribute');
+        $this->assertEquals('container', $services['scope.container']->getScope());
+        $this->assertEquals('custom', $services['scope.custom']->getScope());
+        $this->assertEquals('prototype', $services['scope.prototype']->getScope());
         $this->assertEquals('getInstance', $services['constructor']->getFactoryMethod(), '->load() parses the factory_method attribute');
         $this->assertEquals('%path%/foo.php', $services['file']->getFile(), '->load() parses the file tag');
         $this->assertEquals(array('foo', new Reference('foo'), array(true, false)), $services['arguments']->getArguments(), '->load() parses the argument tags');

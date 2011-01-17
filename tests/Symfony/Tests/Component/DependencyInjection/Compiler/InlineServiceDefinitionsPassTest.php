@@ -41,7 +41,7 @@ class InlineServiceDefinitionsPassTest extends \PHPUnit_Framework_TestCase
         $this->assertSame($container->getDefinition('inlinable.service'), $arguments[0]);
     }
 
-    public function testProcessDoesNotInlinesWhenAliasedServiceIsNotShared()
+    public function testProcessDoesNotInlineWhenAliasedServiceIsNotOfPrototypeScope()
     {
         $container = new ContainerBuilder();
         $container
@@ -61,17 +61,17 @@ class InlineServiceDefinitionsPassTest extends \PHPUnit_Framework_TestCase
         $this->assertSame($ref, $arguments[0]);
     }
 
-    public function testProcessDoesInlineNonSharedService()
+    public function testProcessDoesInlineServiceOfPrototypeScope()
     {
         $container = new ContainerBuilder();
         $container
             ->register('foo')
-            ->setShared(false)
+            ->setScope('prototype')
         ;
         $container
             ->register('bar')
             ->setPublic(false)
-            ->setShared(false)
+            ->setScope('prototype')
         ;
         $container->setAlias('moo', 'bar');
 
@@ -113,7 +113,6 @@ class InlineServiceDefinitionsPassTest extends \PHPUnit_Framework_TestCase
     protected function process(ContainerBuilder $container)
     {
         $repeatedPass = new RepeatedPass(array(new AnalyzeServiceReferencesPass(), new InlineServiceDefinitionsPass()));
-        $repeatedPass->setCompiler(new Compiler());
         $repeatedPass->process($container);
     }
 }

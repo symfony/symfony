@@ -70,19 +70,19 @@
 
         <service id="templating.helper.assets" class="%templating.helper.assets.class%">
             <tag name="templating.helper" alias="assets" />
-            <argument type="service" id="request" />
+            <argument type="service" id="request" strict="false" />
             <argument>%templating.assets.base_urls%</argument>
             <argument>%templating.assets.version%</argument>
         </service>
 
         <service id="templating.helper.request" class="%templating.helper.request.class%">
             <tag name="templating.helper" alias="request" />
-            <argument type="service" id="request" />
+            <argument type="service" id="request" strict="false" />
         </service>
 
         <service id="templating.helper.session" class="%templating.helper.session.class%">
             <tag name="templating.helper" alias="session" />
-            <argument type="service" id="request" />
+            <argument type="service" id="request" strict="false" />
         </service>
 
         <service id="templating.helper.router" class="%templating.helper.router.class%">

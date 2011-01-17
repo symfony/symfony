@@ -95,8 +95,8 @@ class YamlDumper extends Dumper
             $code .= sprintf("    calls:\n      %s\n", str_replace("\n", "\n      ", Yaml::dump($this->dumpValue($definition->getMethodCalls()), 1)));
         }
 
-        if (!$definition->isShared()) {
-            $code .= "    shared: false\n";
+        if (ContainerInterface::SCOPE_CONTAINER !== $scope = $definition->getScope()) {
+            $code .= sprintf("    scope: %s\n", $scope);
         }
 
         if ($callable = $definition->getConfigurator()) {

@@ -144,8 +144,8 @@ class YamlFileLoader extends FileLoader
             $definition->setClass($service['class']);
         }
 
-        if (isset($service['shared'])) {
-            $definition->setShared($service['shared']);
+        if (isset($service['scope'])) {
+            $definition->setScope($service['scope']);
         }
 
         if (isset($service['public'])) {
@@ -237,10 +237,23 @@ class YamlFileLoader extends FileLoader
     {
         if (is_array($value)) {
             $value = array_map(array($this, 'resolveServices'), $value);
-        } else if (is_string($value) && 0 === strpos($value, '@?')) {
-            $value = new Reference(substr($value, 2), ContainerInterface::IGNORE_ON_INVALID_REFERENCE);
-        } else if (is_string($value) && 0 === strpos($value, '@')) {
-            $value = new Reference(substr($value, 1));
+        } else if (is_string($value) &&  0 === strpos($value, '@')) {
+            if (0 === strpos($value, '@?')) {
+                $value = substr($value, 2);
+                $invalidBehavior = ContainerInterface::IGNORE_ON_INVALID_REFERENCE;
+            } else {
+                $value = substr($value, 1);
+                $invalidBehavior = ContainerInterface::EXCEPTION_ON_INVALID_REFERENCE;
+            }
+
+            if ('=' === substr($value, -1)) {
+                $value = substr($value, 0, -1);
+                $strict = false;
+            } else {
+                $strict = true;
+            }
+
+            $value = new Reference($value, $invalidBehavior, $strict);
         }
 
         return $value;

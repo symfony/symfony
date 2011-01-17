@@ -116,7 +116,9 @@ class FrameworkExtension extends Extension
             $this->registerParamConverterConfiguration($config, $container);
         }
 
-        $this->registerSessionConfiguration($config, $container);
+        if (array_key_exists('session', $config)) {
+            $this->registerSessionConfiguration($config, $container);
+        }
 
         if (array_key_exists('translator', $config)) {
             $this->registerTranslatorConfiguration($config, $container);

@@ -64,7 +64,7 @@ class RequestListener
         }
 
         // inject the session object if none is present
-        if (null === $request->getSession()) {
+        if (null === $request->getSession() && $this->container->has('session')) {
             $request->setSession($this->container->get('session'));
         }
 

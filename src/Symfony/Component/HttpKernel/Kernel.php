@@ -5,7 +5,6 @@ namespace Symfony\Component\HttpKernel;
 use Symfony\Component\DependencyInjection\ContainerInterface;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\DependencyInjection\Dumper\PhpDumper;
-use Symfony\Component\DependencyInjection\Resource\FileResource;
 use Symfony\Component\DependencyInjection\ParameterBag\ParameterBag;
 use Symfony\Component\DependencyInjection\Loader\DelegatingLoader;
 use Symfony\Component\DependencyInjection\Loader\LoaderResolver;

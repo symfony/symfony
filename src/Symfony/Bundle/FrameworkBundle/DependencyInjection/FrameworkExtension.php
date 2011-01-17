@@ -122,6 +122,10 @@ class FrameworkExtension extends Extension
             $this->registerTranslatorConfiguration($config, $container);
         }
 
+        if (array_key_exists('esi', $config)) {
+            $this->registerEsiConfiguration($config, $container);
+        }
+
         $this->addClassesToCompile(array(
             'Symfony\\Component\\HttpFoundation\\ParameterBag',
             'Symfony\\Component\\HttpFoundation\\HeaderBag',
@@ -250,6 +254,20 @@ class FrameworkExtension extends Extension
         $loader->load('test.xml');
 
         $container->setAlias('session.storage', 'session.storage.array');
+    }
+
+    /**
+     * Loads the ESI configuration.
+     *
+     * @param array            $config    A configuration array
+     * @param ContainerBuilder $container A ContainerBuilder instance
+     */
+    protected function registerEsiConfiguration(array $config, ContainerBuilder $container)
+    {
+        if (!$container->hasDefinition('esi')) {
+            $loader = new XmlFileLoader($container, array(__DIR__.'/../Resources/config', __DIR__.'/Resources/config'));
+            $loader->load('esi.xml');
+        }
     }
 
     /**

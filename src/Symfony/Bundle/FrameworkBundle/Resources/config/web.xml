@@ -11,8 +11,6 @@
         <parameter key="response_listener.class">Symfony\Component\HttpKernel\ResponseListener</parameter>
         <parameter key="exception_listener.class">Symfony\Component\HttpKernel\Debug\ExceptionListener</parameter>
         <parameter key="exception_listener.controller">Symfony\Bundle\FrameworkBundle\Controller\ExceptionController::showAction</parameter>
-        <parameter key="esi.class">Symfony\Component\HttpKernel\Cache\Esi</parameter>
-        <parameter key="esi_listener.class">Symfony\Component\HttpKernel\Cache\EsiListener</parameter>
     </parameters>
 
     <services>
@@ -32,13 +30,6 @@
             <argument type="service" id="service_container" />
             <argument type="service" id="router" />
             <argument type="service" id="logger" on-invalid="ignore" />
-        </service>
-
-        <service id="esi" class="%esi.class%" public="false" />
-
-        <service id="esi_listener" class="%esi_listener.class%" public="false">
-          <tag name="kernel.listener" />
-          <argument type="service" id="esi" on-invalid="ignore" />
         </service>
 
         <service id="response_listener" class="%response_listener.class%" public="false">

@@ -3,9 +3,9 @@
 namespace Symfony\Bundle\FrameworkBundle\Templating\Helper;
 
 use Symfony\Component\Templating\Helper\Helper;
-use Symfony\Component\Templating\Engine;
 use Symfony\Component\Form\FieldInterface;
 use Symfony\Component\Form\FieldGroupInterface;
+use Symfony\Bundle\FrameworkBundle\Templating\DelegatingEngine;
 
 /*
  * This file is part of the Symfony framework.
@@ -28,7 +28,7 @@ class FormHelper extends Helper
 
     protected $engine;
 
-    public function __construct(Engine $engine)
+    public function __construct(DelegatingEngine $engine)
     {
         $this->engine = $engine;
     }
@@ -109,7 +109,7 @@ class FormHelper extends Helper
     public function label(/*FieldInterface */$field, $label = false, array $parameters = array(), $template = null)
     {
         if (null === $template) {
-            $template = 'FrameworkBundle:Form:label.php';
+            $template = 'FrameworkBundle:Form:label.php.html';
         }
 
         return $this->engine->render($template, array(
@@ -122,7 +122,7 @@ class FormHelper extends Helper
     public function errors(/*FieldInterface */$field, array $parameters = array(), $template = null)
     {
         if (null === $template) {
-            $template = 'FrameworkBundle:Form:errors.php';
+            $template = 'FrameworkBundle:Form:errors.php.html';
         }
 
         return $this->engine->render($template, array(
@@ -134,7 +134,7 @@ class FormHelper extends Helper
     public function hidden(/*FieldGroupInterface */$group, array $parameters = array(), $template = null)
     {
         if (null === $template) {
-            $template = 'FrameworkBundle:Form:hidden.php';
+            $template = 'FrameworkBundle:Form:hidden.php.html';
         }
 
         return $this->engine->render($template, array(
@@ -161,7 +161,7 @@ class FormHelper extends Helper
 
             $underscoredName = strtolower(preg_replace(array('/([A-Z]+)([A-Z][a-z])/', '/([a-z\d])([A-Z])/'), array('\\1_\\2', '\\1_\\2'), strtr($className, '_', '.')));
 
-            if ($this->engine->exists($guess = 'FrameworkBundle:Form:'.$underscoredName.'.php')) {
+            if ($this->engine->exists($guess = 'FrameworkBundle:Form:'.$underscoredName.'.php.html')) {
                 $template = $guess;
             }
 
@@ -169,7 +169,7 @@ class FormHelper extends Helper
         } while (null === $template && false !== $currentFqClassName);
 
         if (null === $template && $field instanceof FieldGroupInterface) {
-            $template = 'FrameworkBundle:Form:field_group.php';
+            $template = 'FrameworkBundle:Form:field_group.php.html';
         }
 
         self::$cache[$fqClassName] = $template;

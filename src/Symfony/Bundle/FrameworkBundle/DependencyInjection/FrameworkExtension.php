@@ -120,9 +120,9 @@ class FrameworkExtension extends Extension
             $this->registerSessionConfiguration($config, $container);
         }
 
-        if (array_key_exists('translator', $config)) {
-            $this->registerTranslatorConfiguration($config, $container);
-        }
+        // translator must always be registered (as support is included by default for forms for instance)
+        // if you disable it, an identity translator will be used and everything will still work as expected
+        $this->registerTranslatorConfiguration($config, $container);
 
         if (array_key_exists('esi', $config)) {
             $this->registerEsiConfiguration($config, $container);

@@ -44,7 +44,7 @@
 
         <service id="twig.extension.trans" class="Symfony\Bundle\TwigBundle\Extension\TransExtension" public="false">
             <tag name="twig.extension" />
-            <argument type="service" id="translator" on-invalid="ignore" />
+            <argument type="service" id="translator" />
         </service>
 
         <service id="twig.extension.helpers" class="Symfony\Bundle\TwigBundle\Extension\TemplatingExtension" public="false">

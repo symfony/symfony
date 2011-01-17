@@ -241,18 +241,17 @@ class ProfilerController extends ContainerAware
     protected function getTemplateNames($profiler)
     {
         $templates = array();
-        foreach ($this->container->findTaggedServiceIds('data_collector') as $id => $tags) {
-            if ($this->container->has($id) && isset($tags[0]['template'])) {
-                $name = $this->container->get($id)->getName();
-                $template = $tags[0]['template'];
-                if ($profiler->has($name)) {
-                    if (!$this->container->get('templating')->exists($template.'.twig.html')) {
-                        continue;
-                    }
-
-                    $templates[$name] = $template.'.twig.html';
-                }
+        foreach ($this->container->getParameter('data_collector.templates') as $id => $template) {
+            if (!$this->container->has($id)) {
+                continue;
             }
+
+            $name = $this->container->get($id)->getName();
+            if (!$profiler->has($name) || !$this->container->get('templating')->exists($template.'.twig.html')) {
+                continue;
+            }
+
+            $templates[$name] = $template.'.twig.html';
         }
 
         return $templates;

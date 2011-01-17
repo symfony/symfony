@@ -17,43 +17,43 @@
 
     <services>
         <service id="data_collector.config" class="%data_collector.config.class%">
-            <tag name="data_collector" template="WebProfilerBundle:Collector:config" />
+            <tag name="data_collector" template="WebProfilerBundle:Collector:config" priority="255" />
             <argument type="service" id="kernel" />
             <argument type="service" id="router" on-invalid="ignore" />
         </service>
 
         <service id="data_collector.request" class="%data_collector.request.class%">
-            <tag name="data_collector" template="WebProfilerBundle:Collector:request" />
+            <tag name="data_collector" template="WebProfilerBundle:Collector:request" priority="250" />
         </service>
 
         <service id="data_collector.security" class="%data_collector.security.class%">
-            <tag name="data_collector" template="WebProfilerBundle:Collector:security" />
+            <tag name="data_collector" template="WebProfilerBundle:Collector:security" priority="245" />
             <argument type="service" id="security.context" on-invalid="ignore" />
         </service>
 
         <service id="data_collector.exception" class="%data_collector.exception.class%">
-            <tag name="data_collector" template="WebProfilerBundle:Collector:exception" />
+            <tag name="data_collector" template="WebProfilerBundle:Collector:exception" priority="240" />
         </service>
 
         <service id="data_collector.events" class="%data_collector.events.class%">
-            <tag name="data_collector" template="WebProfilerBundle:Collector:events" />
+            <tag name="data_collector" template="WebProfilerBundle:Collector:events" priority="235" />
             <call method="setEventDispatcher">
                 <argument type="service" id="event_dispatcher" />
             </call>
         </service>
 
         <service id="data_collector.logger" class="%data_collector.logger.class%">
-            <tag name="data_collector" template="WebProfilerBundle:Collector:logger" />
+            <tag name="data_collector" template="WebProfilerBundle:Collector:logger" priority="230" />
             <argument type="service" id="logger" on-invalid="ignore" />
         </service>
 
         <service id="data_collector.timer" class="%data_collector.timer.class%">
-            <tag name="data_collector" template="WebProfilerBundle:Collector:timer" />
+            <tag name="data_collector" template="WebProfilerBundle:Collector:timer" priority="225" />
             <argument type="service" id="kernel" />
         </service>
 
         <service id="data_collector.memory" class="%data_collector.memory.class%">
-            <tag name="data_collector" template="WebProfilerBundle:Collector:memory" />
+            <tag name="data_collector" template="WebProfilerBundle:Collector:memory" priority="220" />
         </service>
     </services>
 </container>

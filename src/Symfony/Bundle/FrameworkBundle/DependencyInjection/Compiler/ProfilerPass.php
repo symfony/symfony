@@ -30,8 +30,22 @@ class ProfilerPass implements CompilerPassInterface
 
         $definition = $container->getDefinition('profiler');
 
+        $collectors = array();
+        $priorities = array();
+        $templates = array();
         foreach ($container->findTaggedServiceIds('data_collector') as $id => $attributes) {
-            $definition->addMethodCall('add', array(new Reference($id)));
+            $priorities[] = isset($attributes[0]['priority']) ? $attributes[0]['priority'] : 0;
+            $collectors[] = $id;
+            if (isset($attributes[0]['template'])) {
+                $templates[] = $attributes[0]['template'];
+            }
         }
+
+        array_multisort($priorities, SORT_DESC, $collectors, SORT_DESC, $templates);
+        foreach ($collectors as $collector) {
+            $definition->addMethodCall('add', array(new Reference($collector)));
+        }
+
+        $container->setParameter('data_collector.templates', array_combine($collectors, $templates));
     }
 }

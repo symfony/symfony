@@ -75,7 +75,6 @@ class PhpDumper extends Dumper
             $this->startClass($options['class'], $options['base_class']).
             $this->addConstructor().
             $this->addServices().
-            $this->addTags().
             $this->addDefaultParametersMethod().
             $this->addInterfaceInjectors().
             $this->endClass()
@@ -491,39 +490,6 @@ EOF;
         return $publicServices.$aliasServices.$privateServices;
     }
 
-    protected function addTags()
-    {
-        $tags = array();
-        foreach ($this->container->getDefinitions() as $id => $definition) {
-            foreach ($definition->getTags() as $name => $ann) {
-                if (!isset($tags[$name])) {
-                    $tags[$name] = array();
-                }
-
-                $tags[$name][$id] = $ann;
-            }
-        }
-        $tags = $this->exportParameters($tags);
-
-        return <<<EOF
-
-    /**
-     * Returns service ids for a given tag.
-     *
-     * @param string \$name The tag name
-     *
-     * @return array An array of tags
-     */
-    public function findTaggedServiceIds(\$name)
-    {
-        static \$tags = $tags;
-
-        return isset(\$tags[\$name]) ? \$tags[\$name] : array();
-    }
-
-EOF;
-    }
-
     protected function startClass($class, $baseClass)
     {
         $bagClass = $this->container->isFrozen() ? 'FrozenParameterBag' : 'ParameterBag';
@@ -532,7 +498,6 @@ EOF;
 <?php
 
 use Symfony\Component\DependencyInjection\ContainerInterface;
-use Symfony\Component\DependencyInjection\TaggedContainerInterface;
 use Symfony\Component\DependencyInjection\Container;
 use Symfony\Component\DependencyInjection\Reference;
 use Symfony\Component\DependencyInjection\Parameter;
@@ -544,7 +509,7 @@ use Symfony\Component\DependencyInjection\ParameterBag\\$bagClass;
  * This class has been auto-generated
  * by the Symfony Dependency Injection Component.
  */
-class $class extends $baseClass implements TaggedContainerInterface
+class $class extends $baseClass
 {
 EOF;
     }

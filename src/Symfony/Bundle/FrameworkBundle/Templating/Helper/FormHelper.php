@@ -106,6 +106,21 @@ class FormHelper extends Helper
         )));
     }
 
+    /**
+     * Renders the entire form field "row".
+     *
+     * @param  FieldInterface $field
+     * @return string
+     */
+    public function row(/*FieldInterface*/ $field)
+    {
+        $template = 'FrameworkBundle:Form:field_row.php.html';
+
+        return $this->engine->render($template, array(
+            'field' => $field,
+        ));
+    }
+
     public function label(/*FieldInterface */$field, $label = false, array $parameters = array(), $template = null)
     {
         if (null === $template) {

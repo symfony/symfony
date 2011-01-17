@@ -78,4 +78,22 @@ class Kernel extends BaseKernel
             $container->setParameter('kernel.compiled_classes', array());
         });
     }
+
+    public function boot()
+    {
+        if (true === $this->booted) {
+            throw new \LogicException('The kernel is already booted.');
+        }
+
+        $this->bundles = $this->registerBundles();
+        $this->bundleDirs = $this->registerBundleDirs();
+        $this->container = $this->initializeContainer();
+
+        foreach ($this->bundles as $bundle) {
+            $bundle->setContainer($this->container);
+            $bundle->boot();
+        }
+
+        $this->booted = true;
+    }
 }

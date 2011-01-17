@@ -23,13 +23,17 @@ class TransExtension extends \Twig_Extension
 {
     protected $translator;
 
-    public function __construct(TranslatorInterface $translator)
+    public function __construct(TranslatorInterface $translator = null)
     {
         $this->translator = $translator;
     }
 
     public function getTranslator()
     {
+        if (null === $this->translator) {
+            throw \RuntimeException('Translator is not enabled.');
+        }
+
         return $this->translator;
     }
 

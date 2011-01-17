@@ -93,7 +93,7 @@
         </service>
 
         <service id="templating.helper.translator" class="%templating.helper.translator.class%">
-            <tag name="templating.helper" alias="translator" />
+            <tag name="templating.helper" alias="translator" on-invalid="ignore" />
             <argument type="service" id="translator" />
         </service>
 

@@ -3,6 +3,7 @@
 namespace Symfony\Component\Security\Acl\MongoDB;
 
 use Doctrine\MongoDB\Database;
+use Doctrine\MongoDB\Cursor;
 
 use Symfony\Component\Security\Acl\Domain\Acl;
 use Symfony\Component\Security\Acl\Domain\Entry;
@@ -155,7 +156,7 @@ class AclProvider implements AclProviderInterface
             if (!$aclFound) {
                 $currentBatch[] = $oid;
             }
-
+//var_dump($oid);var_dump($oidLookup);exit;
             // Is it time to load the current batch?
             if ((self::MAX_BATCH_SIZE === count($currentBatch) || ($i + 1) === $c) && count($currentBatch) > 0) {
                 $loadedBatch = $this->lookupObjectIdentities($currentBatch, $sids, $oidLookup);
@@ -205,11 +206,32 @@ class AclProvider implements AclProviderInterface
      */
     protected function lookupObjectIdentities(array $batch, array $sids, array $oidLookup)
     {
+        /*
+        needed fields
+                o.id as acl_id,
+                o.object_identity,
+                o.parent_object_identity_id,
+                o.entries_inheriting,
+                e.id as ace_id,
+                e.object_identity_id, // unless this is specifically used , it should reference the above o ie. e.object_identity
+                e.field_name,
+                e.ace_order,
+                e.mask,
+                e.granting,
+                e.granting_strategy,
+                e.audit_success,
+                e.audit_failure,
+                e.security_identity
+ basically, its pulling everything from acl_entries except ancestors using ancestors cursor to look for for acl_entries referencing object_identities
+
+ */
+        $fields = array(
+            'ancestors' => false
+        );
         $query = $this->getLookupQuery($batch, $sids);
-
- //       $stmt = $this->connection->executeQuery($sql);
-
-//        return $this->hydrateObjectIdentities($stmt, $oidLookup, $sids);
+        $cursor = $this->connection->selectCollection($this->options['entry_table_name'])->find($query);//, $fields);
+$size = $cursor->count();
+        return $this->hydrateObjectIdentities($cursor, $oidLookup, $sids);
     }
 
     /**
@@ -224,12 +246,12 @@ class AclProvider implements AclProviderInterface
         $batchSet = array();
         for ($i=0,$c=count($batch); $i<$c; $i++) {
             $batchSet[] = array(
-                "object_identifier.identifier" => $batch[$i]->getIdentifier(),
-                "object_identifier.type" => $batch[$i]->getType(),
+                "object_identity.identifier" => $batch[$i]->getIdentifier(),
+                "object_identity.type" => $batch[$i]->getType(),
             );
         }
         $query = array('$or'=> $batchSet);
-        $fields = array('_id'=> true); // get the ids only
+        $fields = array('ancestors'=> true); // get the ancestors only
 
         return $this->connection->selectCollection($this->options['oid_table_name'])->find($query, $fields);
     }
@@ -241,15 +263,235 @@ class AclProvider implements AclProviderInterface
      * @param array $batch
      * @param array $sids
      * @throws AclNotFoundException
-     * @return string
+     * @return array $query
      */
     protected function getLookupQuery(array $batch, array $sids)
     {
         // FIXME: add support for filtering by sids (right now we select all sids)
 
-        $ancestors = $this->getAncestors($batch);
-        if (0 === count($ancestors)) {
+        $cursor = $this->getAncestors($batch);
+        if (0 === $cursor->count()) {
             throw new AclNotFoundException('There is no ACL for the given object identity.');
         }
+        $ancestorIds = array();
+        foreach($cursor as $result) {
+            $ancestorIds[] = $result['_id'];
+            $ancestorIds = array_merge($ancestorIds, $result['ancestors']);
+        }
+
+        return array("object_identity._id" => array('$in'=>$ancestorIds));
     }
+
+
+    /**
+     * This method is called to hydrate ACLs and ACEs.
+     *
+     * This method was designed for performance; thus, a lot of code has been
+     * inlined at the cost of readability, and maintainability.
+     *
+     * Keep in mind that changes to this method might severely reduce the
+     * performance of the entire ACL system.
+     *
+     * @param Cursor $cursor
+     * @param array $oidLookup
+     * @param array $sids
+     * @throws \RuntimeException
+     * @return \SplObjectStorage
+     */
+    protected function hydrateObjectIdentities(Cursor $cursor, array $oidLookup, array $sids) {
+        $parentIdToFill = new \SplObjectStorage();
+        $acls = $aces = $emptyArray = array();
+        $oidCache = $oidLookup;
+        $result = new \SplObjectStorage();
+        $loadedAces =& $this->loadedAces;
+        $loadedAcls =& $this->loadedAcls;
+        $permissionGrantingStrategy = $this->permissionGrantingStrategy;
+
+        // we need these to set protected properties on hydrated objects
+        $aclReflection = new \ReflectionClass('Symfony\Component\Security\Acl\Domain\Acl');
+        $aclClassAcesProperty = $aclReflection->getProperty('classAces');
+        $aclClassAcesProperty->setAccessible(true);
+        $aclClassFieldAcesProperty = $aclReflection->getProperty('classFieldAces');
+        $aclClassFieldAcesProperty->setAccessible(true);
+        $aclObjectAcesProperty = $aclReflection->getProperty('objectAces');
+        $aclObjectAcesProperty->setAccessible(true);
+        $aclObjectFieldAcesProperty = $aclReflection->getProperty('objectFieldAces');
+        $aclObjectFieldAcesProperty->setAccessible(true);
+        $aclParentAclProperty = $aclReflection->getProperty('parentAcl');
+        $aclParentAclProperty->setAccessible(true);
+
+        // fetchAll() consumes more memory than consecutive calls to fetch(),
+        // but it is faster
+        $size = $cursor->count();
+        if(1<$size) {
+            $cursor->batchNum($size);
+        }
+        foreach ($cursor->current() as $data) {
+            list($aclId,
+                 $objectIdentity,
+                 $parentObjectIdentityId,
+                 $entriesInheriting,
+                 $aceId,
+                 $objectIdentityId,
+                 $fieldName,
+                 $aceOrder,
+                 $mask,
+                 $granting,
+                 $grantingStrategy,
+                 $auditSuccess,
+                 $auditFailure,
+                 $securityIdentity) = $data;
+
+            // has the ACL been hydrated during this hydration cycle?
+            if (isset($acls[$aclId])) {
+                $acl = $acls[$aclId];
+            }
+
+            // has the ACL been hydrated during any previous cycle, or was possibly loaded
+            // from cache?
+            else if (isset($loadedAcls[$classType][$objectIdentifier])) {
+                $acl = $loadedAcls[$classType][$objectIdentifier];
+
+                // keep reference in local array (saves us some hash calculations)
+                $acls[$aclId] = $acl;
+
+                // attach ACL to the result set; even though we do not enforce that every
+                // object identity has only one instance, we must make sure to maintain
+                // referential equality with the oids passed to findAcls()
+                $oidLookupKey = $objectIdentity['_id'];
+                if (!isset($oidCache[$oidLookupKey])) {
+                    $oidCache[$oidLookupKey] = $acl->getObjectIdentity();
+                }
+                $result->attach($oidCache[$oidLookupKey], $acl);
+            }
+
+            // so, this hasn't been hydrated yet
+            else {
+                // create object identity if we haven't done so yet
+                $oidLookupKey = $objectIdentity['_id'];
+                if (!isset($oidCache[$oidLookupKey])) {
+                    $oidCache[$oidLookupKey] = new ObjectIdentity($objectIdentifier, $classType);
+                }
+
+                $acl = new Acl((integer) $aclId, $oidCache[$oidLookupKey], $permissionGrantingStrategy, $emptyArray, !!$entriesInheriting);
+
+                // keep a local, and global reference to this ACL
+                $loadedAcls[$classType][$objectIdentifier] = $acl;
+                $acls[$aclId] = $acl;
+
+                // try to fill in parent ACL, or defer until all ACLs have been hydrated
+                if (null !== $parentObjectIdentityId) {
+                    if (isset($acls[$parentObjectIdentityId])) {
+                        $aclParentAclProperty->setValue($acl, $acls[$parentObjectIdentityId]);
+                    } else {
+                        $parentIdToFill->attach($acl, $parentObjectIdentityId);
+                    }
+                }
+
+                $result->attach($oidCache[$oidLookupKey], $acl);
+            }
+
+            // check if this row contains an ACE record
+            if (null !== $aceId) {
+                // have we already hydrated ACEs for this ACL?
+                if (!isset($aces[$aclId])) {
+                    $aces[$aclId] = array($emptyArray, $emptyArray, $emptyArray, $emptyArray);
+                }
+
+                // has this ACE already been hydrated during a previous cycle, or
+                // possible been loaded from cache?
+                // It is important to only ever have one ACE instance per actual row since
+                // some ACEs are shared between ACL instances
+                if (!isset($loadedAces[$aceId])) {
+                    if (!isset($sids[$key = ($username?'1':'0').$securityIdentifier])) {
+                        if ($username) {
+                            $sids[$key] = new UserSecurityIdentity(
+                                substr($securityIdentifier, 1 + $pos = strpos($securityIdentifier, '-')),
+                                substr($securityIdentifier, 0, $pos)
+                            );
+                        } else {
+                            $sids[$key] = new RoleSecurityIdentity($securityIdentifier);
+                        }
+                    }
+
+                    if (null === $fieldName) {
+                        $loadedAces[$aceId] = new Entry((integer) $aceId, $acl, $sids[$key], $grantingStrategy, (integer) $mask, !!$granting, !!$auditFailure, !!$auditSuccess);
+                    } else {
+                        $loadedAces[$aceId] = new FieldEntry((integer) $aceId, $acl, $fieldName, $sids[$key], $grantingStrategy, (integer) $mask, !!$granting, !!$auditFailure, !!$auditSuccess);
+                    }
+                }
+                $ace = $loadedAces[$aceId];
+
+                // assign ACE to the correct property
+                if (null === $objectIdentityId) {
+                    if (null === $fieldName) {
+                        $aces[$aclId][0][$aceOrder] = $ace;
+                    } else {
+                        $aces[$aclId][1][$fieldName][$aceOrder] = $ace;
+                    }
+                } else {
+                    if (null === $fieldName) {
+                        $aces[$aclId][2][$aceOrder] = $ace;
+                    } else {
+                        $aces[$aclId][3][$fieldName][$aceOrder] = $ace;
+                    }
+                }
+            }
+        }
+
+        // We do not sort on database level since we only want certain subsets to be sorted,
+        // and we are going to read the entire result set anyway.
+        // Sorting on DB level increases query time by an order of magnitude while it is
+        // almost negligible when we use PHPs array sort functions.
+        foreach ($aces as $aclId => $aceData) {
+            $acl = $acls[$aclId];
+
+            ksort($aceData[0]);
+            $aclClassAcesProperty->setValue($acl, $aceData[0]);
+
+            foreach (array_keys($aceData[1]) as $fieldName) {
+                ksort($aceData[1][$fieldName]);
+            }
+            $aclClassFieldAcesProperty->setValue($acl, $aceData[1]);
+
+            ksort($aceData[2]);
+            $aclObjectAcesProperty->setValue($acl, $aceData[2]);
+
+            foreach (array_keys($aceData[3]) as $fieldName) {
+                ksort($aceData[3][$fieldName]);
+            }
+            $aclObjectFieldAcesProperty->setValue($acl, $aceData[3]);
+        }
+
+        // fill-in parent ACLs where this hasn't been done yet cause the parent ACL was not
+        // yet available
+        $processed = 0;
+        foreach ($parentIdToFill as $acl)
+        {
+            $parentId = $parentIdToFill->offsetGet($acl);
+
+            // let's see if we have already hydrated this
+            if (isset($acls[$parentId])) {
+                $aclParentAclProperty->setValue($acl, $acls[$parentId]);
+                $processed += 1;
+
+                continue;
+            }
+        }
+
+        // reset reflection changes
+        $aclClassAcesProperty->setAccessible(false);
+        $aclClassFieldAcesProperty->setAccessible(false);
+        $aclObjectAcesProperty->setAccessible(false);
+        $aclObjectFieldAcesProperty->setAccessible(false);
+        $aclParentAclProperty->setAccessible(false);
+
+        // this should never be true if the database integrity hasn't been compromised
+        if ($processed < count($parentIdToFill)) {
+            throw new \RuntimeException('Not all parent ids were populated. This implies an integrity problem.');
+        }
+
+        return $result;
+    }
+
 }

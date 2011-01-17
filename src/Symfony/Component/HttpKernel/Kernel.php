@@ -81,12 +81,24 @@ abstract class Kernel implements HttpKernelInterface, \Serializable
         $this->container = null;
     }
 
+    /**
+     * Returns the root directory of this application.
+     *
+     * Most of the time, this is just __DIR__.
+     *
+     * @return string A directory path
+     */
     abstract public function registerRootDir();
 
+    /**
+     * Returns an array of bundles to registers.
+     *
+     * @return array An array of bundle instances.
+     */
     abstract public function registerBundles();
 
     /**
-     * Registers the directories where bundles can be found.
+     * Returns the directories where bundles can be found.
      *
      * The order is significant and can be used by the application.
      * For instance, it can be used to override templates.
@@ -95,6 +107,11 @@ abstract class Kernel implements HttpKernelInterface, \Serializable
      */
     abstract public function registerBundleDirs();
 
+    /**
+     * Loads the container configuration
+     *
+     * @param LoaderInterface $loader A LoaderInterface instance
+     */
     abstract public function registerContainerConfiguration(LoaderInterface $loader);
 
     /**
@@ -243,36 +260,71 @@ abstract class Kernel implements HttpKernelInterface, \Serializable
         return preg_replace('/[^a-zA-Z0-9_]+/', '', $this->name);
     }
 
+    /**
+     * Gets the environment.
+     *
+     * @return string The current environment
+     */
     public function getEnvironment()
     {
         return $this->environment;
     }
 
+    /**
+     * Checks if debug mode is enabled.
+     *
+     * @return Boolean true if debug mode is enabled, false otherwise
+     */
     public function isDebug()
     {
         return $this->debug;
     }
 
+    /**
+     * Gets the application root dir.
+     *
+     * @return string The application root dir
+     */
     public function getRootDir()
     {
         return $this->rootDir;
     }
 
+    /**
+     * Gets the current container.
+     *
+     * @return ContainerInterface A ContainerInterface instance
+     */
     public function getContainer()
     {
         return $this->container;
     }
 
+    /**
+     * Gets the request start time (not available if debug is disabled).
+     *
+     * @return integer The request start timestamp
+     */
     public function getStartTime()
     {
         return $this->debug ? $this->startTime : -INF;
     }
 
+    /**
+     * Gets the cache directory.
+     *
+     * @return string The cache directory
+     */
     public function getCacheDir()
     {
         return $this->rootDir.'/cache/'.$this->environment;
     }
 
+    /**
+     * Gets the log directory.
+     *
+     * @return string The log directory
+     */
     public function getLogDir()
     {
         return $this->rootDir.'/logs';

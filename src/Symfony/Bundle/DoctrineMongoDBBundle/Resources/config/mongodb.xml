@@ -80,8 +80,8 @@
     <service id="doctrine.odm.mongodb.logger" class="%doctrine.odm.mongodb.logger_class%">
       <argument type="service" id="logger" on-invalid="null" />
      </service>
-    <service id="doctrine.odm.mongodb.data_collector" class="%doctrine.odm.mongodb.data_collector_class%">
-      <tag name="data_collector" template="DoctrineMongoDBBundle:Collector:mongodb" />
+    <service id="doctrine.odm.mongodb.data_collector" class="%doctrine.odm.mongodb.data_collector_class%" public="false">
+      <tag name="data_collector" template="DoctrineMongoDBBundle:Collector:mongodb" id="mongodb" />
       <argument type="service" id="doctrine.odm.mongodb.logger" />
     </service>
 

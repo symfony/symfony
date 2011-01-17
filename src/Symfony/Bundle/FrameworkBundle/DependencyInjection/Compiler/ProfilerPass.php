@@ -36,8 +36,10 @@ class ProfilerPass implements CompilerPassInterface
         foreach ($container->findTaggedServiceIds('data_collector') as $id => $attributes) {
             $priorities[] = isset($attributes[0]['priority']) ? $attributes[0]['priority'] : 0;
             $collectors[] = $id;
-            if (isset($attributes[0]['template'])) {
-                $templates[] = $attributes[0]['template'];
+            if (isset($attributes[0]['template']) && isset($attributes[0]['id'])) {
+                $templates[] = array($attributes[0]['id'], $attributes[0]['template']);
+            } else {
+                $templates[] = null;
             }
         }
 

@@ -33,8 +33,9 @@ class TemplatingPass implements CompilerPassInterface
 
         if ($container->hasDefinition('templating.engine.delegating')) {
             $queue = new \SplPriorityQueue();
+            $order = PHP_INT_MAX;
             foreach ($container->findTaggedServiceIds('templating.engine') as $id => $attributes) {
-                $queue->insert($id, isset($attributes[0]['priority']) ? $attributes[0]['priority'] : 0);
+                $queue->insert($id, array(isset($attributes[0]['priority']) ? $attributes[0]['priority'] : 0, --$order));
             }
 
             $engines = array();

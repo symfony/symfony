@@ -30,24 +30,24 @@ class ProfilerPass implements CompilerPassInterface
 
         $definition = $container->getDefinition('profiler');
 
-        $collectors = array();
-        $priorities = array();
-        $templates = array();
+        $collectors = new \SplPriorityQueue();
+        $order = PHP_INT_MAX;
         foreach ($container->findTaggedServiceIds('data_collector') as $id => $attributes) {
-            $priorities[] = isset($attributes[0]['priority']) ? $attributes[0]['priority'] : 0;
-            $collectors[] = $id;
+            $priority = isset($attributes[0]['priority']) ? $attributes[0]['priority'] : 0;
+            $template = null;
             if (isset($attributes[0]['template']) && isset($attributes[0]['id'])) {
-                $templates[] = array($attributes[0]['id'], $attributes[0]['template']);
-            } else {
-                $templates[] = null;
+                $template = array($attributes[0]['id'], $attributes[0]['template']);
             }
+
+            $collectors->insert(array($id, $template), array($priority, --$order));
         }
 
-        array_multisort($priorities, SORT_DESC, $collectors, SORT_DESC, $templates);
+        $templates = array();
         foreach ($collectors as $collector) {
-            $definition->addMethodCall('add', array(new Reference($collector)));
+            $definition->addMethodCall('add', array(new Reference($collector[0])));
+            $templates[$collector[0]] = $collector[1];
         }
 
-        $container->setParameter('data_collector.templates', array_combine($collectors, $templates));
+        $container->setParameter('data_collector.templates', $templates);
     }
 }

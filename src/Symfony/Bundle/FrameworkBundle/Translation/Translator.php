@@ -103,8 +103,8 @@ class Translator extends BaseTranslator
 
     protected function initialize()
     {
-        foreach ($this->container->findTaggedServiceIds('translation.loader') as $id => $attributes) {
-            $this->addLoader($attributes[0]['alias'], $this->container->get($id));
+        foreach ($this->container->getParameter('translation.loaders') as $id => $alias) {
+            $this->addLoader($alias, $this->container->get($id));
         }
 
         foreach ($this->container->getParameter('translation.resources') as $resource) {

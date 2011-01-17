@@ -48,9 +48,13 @@ class ExceptionListener
 
     public function handle(Event $event)
     {
-        if (HttpKernelInterface::MASTER_REQUEST !== $event->get('request_type')) {
+        static $handling;
+
+        if (true === $handling) {
             return false;
         }
+
+        $handling = true;
 
         $exception = $event->get('exception');
         $request = $event->get('request');
@@ -76,15 +80,20 @@ class ExceptionListener
         try {
             $response = $event->getSubject()->handle($request, HttpKernelInterface::SUB_REQUEST, true);
         } catch (\Exception $e) {
+            $message = sprintf('Exception thrown when handling an exception (%s: %s)', get_class($e), $e->getMessage());
             if (null !== $this->logger) {
-                $this->logger->err(sprintf('Exception thrown when handling an exception (%s: %s)', get_class($e), $e->getMessage()));
+                $this->logger->err($message);
+            } else {
+                error_log($message);
             }
 
             // re-throw the exception as this is a catch-all
-            throw new \RuntimeException('Exception thrown when handling an exception.', 0, $e);
+            throw $exception;
         }
 
         $event->setReturnValue($response);
+
+        $handling = false;
 
         return true;
     }

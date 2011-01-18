@@ -109,7 +109,7 @@ class ContainerBuilderTest extends \PHPUnit_Framework_TestCase
             @$builder->get('baz');
             $this->fail('->get() throws a LogicException if the service has a circular reference to itself');
         } catch (\LogicException $e) {
-            $this->assertEquals('The service "baz" has a circular reference to itself.', $e->getMessage(), '->get() throws a LogicException if the service has a circular reference to itself');
+            $this->assertEquals('Circular reference detected for service "baz" (services currently loading: baz).', $e->getMessage(), '->get() throws a LogicException if the service has a circular reference to itself');
         }
 
         $builder->register('foobar', 'stdClass')->setShared(true);

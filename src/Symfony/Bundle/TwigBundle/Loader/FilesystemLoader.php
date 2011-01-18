@@ -59,17 +59,15 @@ class FilesystemLoader extends \Twig_Loader_Filesystem
             return $this->cache[$name];
         }
 
-        list($tpl, $options) = $this->nameParser->parse($name);
+        $parameters = $this->nameParser->parse($name);
 
-        $this->validateName($tpl);
-        $this->validateName($options['bundle']);
-        $this->validateName($options['controller']);
-        $this->validateName($options['format']);
-
-        $options['name'] = $tpl;
+        $this->validateName($parameters['name']);
+        $this->validateName($parameters['bundle']);
+        $this->validateName($parameters['controller']);
+        $this->validateName($parameters['format']);
 
         $replacements = array();
-        foreach ($options as $key => $value) {
+        foreach ($parameters as $key => $value) {
             $replacements['%'.$key.'%'] = $value;
         }
 

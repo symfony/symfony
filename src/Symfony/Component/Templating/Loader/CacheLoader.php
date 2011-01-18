@@ -51,22 +51,22 @@ class CacheLoader extends Loader
      */
     public function load($template)
     {
-        list($template, $options) = $this->nameParser->parse($template);
+        $parameters = $this->nameParser->parse($template);
 
-        $tmp = md5($template.serialize($options)).'.tpl';
+        $tmp = md5(serialize($parameters)).'.tpl';
         $dir = $this->dir.DIRECTORY_SEPARATOR.substr($tmp, 0, 2);
         $file = substr($tmp, 2);
         $path = $dir.DIRECTORY_SEPARATOR.$file;
 
         if (file_exists($path)) {
             if (null !== $this->debugger) {
-                $this->debugger->log(sprintf('Fetching template "%s" from cache', $template));
+                $this->debugger->log(sprintf('Fetching template "%s" from cache', $parameters['name']));
             }
 
             return new FileStorage($path);
         }
 
-        if (false === $storage = $this->loader->load($template, $options)) {
+        if (false === $storage = $this->loader->load($parameters['name'], $parameters)) {
             return false;
         }
 
@@ -79,7 +79,7 @@ class CacheLoader extends Loader
         file_put_contents($path, $content);
 
         if (null !== $this->debugger) {
-            $this->debugger->log(sprintf('Storing template "%s" in cache', $template));
+            $this->debugger->log(sprintf('Storing template "%s" in cache', $parameters['name']));
         }
 
         return new FileStorage($path);

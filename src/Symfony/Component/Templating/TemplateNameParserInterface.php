@@ -19,11 +19,13 @@ namespace Symfony\Component\Templating;
 interface TemplateNameParserInterface
 {
     /**
-     * Parses a template to a template name and an array of options.
+     * Parses a template to an array of parameters.
+     *
+     * The only mandatory parameter is the template name (name).
      *
      * @param string $name A template name
      *
-     * @return array An array composed of the template name and an array of options
+     * @return array An array of parameters
      */
     function parse($name);
 }

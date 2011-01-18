@@ -50,16 +50,14 @@ class FilesystemLoader extends Loader
      */
     public function load($template)
     {
-        list($template, $options) = $this->nameParser->parse($template);
+        $parameters = $this->nameParser->parse($template);
 
-        if (self::isAbsolutePath($template) && file_exists($template)) {
-            return new FileStorage($template);
+        if (self::isAbsolutePath($parameters['name']) && file_exists($parameters['name'])) {
+            return new FileStorage($parameters['name']);
         }
 
-        $options['name'] = $template;
-
         $replacements = array();
-        foreach ($options as $key => $value) {
+        foreach ($parameters as $key => $value) {
             $replacements['%'.$key.'%'] = $value;
         }
 
@@ -91,7 +89,6 @@ class FilesystemLoader extends Loader
      * Returns true if the template is still fresh.
      *
      * @param string    $template The template name
-     * @param array     $options  An array of options
      * @param timestamp $time     The last modification time of the cached template
      */
     public function isFresh($template, $time)

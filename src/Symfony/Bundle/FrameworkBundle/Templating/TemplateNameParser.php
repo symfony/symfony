@@ -16,8 +16,8 @@ use Symfony\Component\HttpKernel\Kernel;
 
 /**
  * TemplateNameParser parsers template name from the short notation
- * "bundle:section:template.renderer.format" to a template name
- * and an array of options.
+ * "bundle:section:template.renderer.format" to an array of
+ * template parameters.
  *
  * @author Fabien Potencier <fabien.potencier@symfony-project.com>
  */
@@ -36,11 +36,7 @@ class TemplateNameParser extends BaseTemplateNameParser
     }
 
     /**
-     * Parses a template to a template name and an array of options.
-     *
-     * @param string $name A template name
-     *
-     * @return array An array composed of the template name and an array of options
+     * {@inheritdoc}
      */
     public function parse($name)
     {
@@ -70,21 +66,21 @@ class TemplateNameParser extends BaseTemplateNameParser
             }
         }
 
-        $options = array(
-            // bundle is used as part of the template path, so we need /
-            'bundle'     => str_replace('\\', '/', $bundle),
-            'controller' => $parts[1],
-        );
-
         $elements = explode('.', $parts[2]);
         if (3 !== count($elements)) {
             throw new \InvalidArgumentException(sprintf('Template name "%s" is not valid (format is "bundle:section:template.renderer.format").', $name));
         }
 
-        $parts[2] = $elements[0];
-        $options['renderer'] = $elements[1];
-        $options['format'] = $elements[2];
+        $parameters = array(
+            // bundle is used as part of the template path, so we need /
+            'bundle'     => str_replace('\\', '/', $bundle),
+            'controller' => $parts[1],
+            'name'       => $elements[0],
+            'renderer'   => $elements[1],
+            'format'     => $elements[2],
+        );
 
-        return array($parts[2], $options);
+
+        return $parameters;
     }
 }

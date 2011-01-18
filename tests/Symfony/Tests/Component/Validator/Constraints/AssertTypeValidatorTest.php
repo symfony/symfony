@@ -30,6 +30,16 @@ class AssertTypeValidatorTest extends \PHPUnit_Framework_TestCase
         $this->assertTrue($this->validator->isValid(null, new AssertType(array('type' => 'integer'))));
     }
 
+    public function testEmptyIsValidIfString()
+    {
+        $this->assertTrue($this->validator->isValid('', new AssertType(array('type' => 'string'))));
+    }
+
+    public function testEmptyIsInvalidIfNoString()
+    {
+        $this->assertFalse($this->validator->isValid('', new AssertType(array('type' => 'integer'))));
+    }
+
     /**
      * @dataProvider getValidValues
      */

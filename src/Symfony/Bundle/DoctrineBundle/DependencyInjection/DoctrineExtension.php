@@ -217,7 +217,7 @@ class DoctrineExtension extends AbstractDoctrineExtension
         $connections = array();
         if (isset($config['connections'])) {
             $configConnections = $config['connections'];
-            if(isset($config['connections']['connection']) && isset($config['connections']['connection'][0])) {
+            if (isset($config['connections']['connection']) && isset($config['connections']['connection'][0])) {
                 // Multiple connections
                 $configConnections = $config['connections']['connection'];
             }

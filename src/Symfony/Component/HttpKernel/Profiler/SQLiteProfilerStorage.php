@@ -50,7 +50,7 @@ class SQLiteProfilerStorage implements ProfilerStorageInterface
 
         if ($url) {
             $criteria[] = 'url LIKE :url ESCAPE "\"';
-            $args[':url'] = '%'.addcslashes($url, '%_').'%';
+            $args[':url'] = '%'.addcslashes($url, '%_\\').'%';
         }
 
         $criteria = $criteria ? 'WHERE '.implode(' AND ', $criteria) : '';

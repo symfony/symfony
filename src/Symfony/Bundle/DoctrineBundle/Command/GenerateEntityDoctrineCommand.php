@@ -33,9 +33,9 @@ class GenerateEntityDoctrineCommand extends DoctrineCommand
         $this
             ->setName('doctrine:generate:entity')
             ->setDescription('Generate a new Doctrine entity inside a bundle.')
-            ->addArgument('bundle', null, InputArgument::REQUIRED, 'The bundle to initialize the entity in.')
-            ->addArgument('entity', null, InputArgument::REQUIRED, 'The entity class to initialize.')
-            ->addOption('mapping-type', null, InputOption::VALUE_OPTIONAL, 'The mapping type to to use for the entity.')
+            ->addArgument('bundle', InputArgument::REQUIRED, 'The bundle to initialize the entity in.')
+            ->addArgument('entity', InputArgument::REQUIRED, 'The entity class to initialize.')
+            ->addOption('mapping-type', null, InputOption::VALUE_OPTIONAL, 'The mapping type to to use for the entity.', 'xml')
             ->addOption('fields', null, InputOption::VALUE_OPTIONAL, 'The fields to create with the new entity.')
             ->setHelp(<<<EOT
 The <info>doctrine:generate:entity</info> task initializes a new Doctrine entity inside a bundle:
@@ -73,11 +73,7 @@ EOT
         $entity = $input->getArgument('entity');
         $entityNamespace = $namespace.'\\'.$bundle.'\\Entity';
         $fullEntityClassName = $entityNamespace.'\\'.$entity;
-        $tmp = str_replace('\\', '/', $fullEntityClassName);
-        $tmp = str_replace('/', '\\', dirname($tmp));
-        $className = basename($tmp);
         $mappingType = $input->getOption('mapping-type');
-        $mappingType = $mappingType ? $mappingType : 'xml';
 
         $class = new ClassMetadataInfo($fullEntityClassName);
         $class->mapField(array('fieldName' => 'id', 'type' => 'integer', 'id' => true));
@@ -85,22 +81,21 @@ EOT
 
         // Map the specified fields
         $fields = $input->getOption('fields');
-        if ($fields)
-        {
-          $e = explode(' ', $fields);
-          foreach ($e as $value) {
-              $e = explode(':', $value);
-              $name = $e[0];
-              $type = isset($e[1]) ? $e[1] : 'string';
-              preg_match_all('/(.*)\((.*)\)/', $type, $matches);
-              $type = isset($matches[1][0]) ? $matches[1][0] : $type;
-              $length = isset($matches[2][0]) ? $matches[2][0] : null;
-              $class->mapField(array(
-                  'fieldName' => $name,
-                  'type' => $type,
-                  'length' => $length
-              ));
-          }
+        if ($fields) {
+            $e = explode(' ', $fields);
+            foreach ($e as $value) {
+                $e = explode(':', $value);
+                $name = $e[0];
+                $type = isset($e[1]) ? $e[1] : 'string';
+                preg_match_all('/(.*)\((.*)\)/', $type, $matches);
+                $type = isset($matches[1][0]) ? $matches[1][0] : $type;
+                $length = isset($matches[2][0]) ? $matches[2][0] : null;
+                $class->mapField(array(
+                    'fieldName' => $name,
+                    'type' => $type,
+                    'length' => $length
+                ));
+            }
         }
 
         // Setup a new exporter for the mapping type specified

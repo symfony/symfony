@@ -21,10 +21,9 @@ interface TemplateNameParserInterface
     /**
      * Parses a template to a template name and an array of options.
      *
-     * @param string $name     A template name
-     * @param array  $defaults An array of default options
+     * @param string $name A template name
      *
      * @return array An array composed of the template name and an array of options
      */
-    function parse($name, array $defaults = array());
+    function parse($name);
 }

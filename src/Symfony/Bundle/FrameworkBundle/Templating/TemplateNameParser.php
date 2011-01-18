@@ -38,12 +38,11 @@ class TemplateNameParser extends BaseTemplateNameParser
     /**
      * Parses a template to a template name and an array of options.
      *
-     * @param string $name     A template name
-     * @param array  $defaults An array of default options
+     * @param string $name A template name
      *
      * @return array An array composed of the template name and an array of options
      */
-    public function parse($name, array $defaults = array())
+    public function parse($name)
     {
         $parts = explode(':', $name);
         if (3 !== count($parts)) {
@@ -71,16 +70,10 @@ class TemplateNameParser extends BaseTemplateNameParser
             }
         }
 
-        $options = array_replace(
-            array(
-                'format' => '',
-            ),
-            $defaults,
-            array(
-                // bundle is used as part of the template path, so we need /
-                'bundle'     => str_replace('\\', '/', $bundle),
-                'controller' => $parts[1],
-            )
+        $options = array(
+            // bundle is used as part of the template path, so we need /
+            'bundle'     => str_replace('\\', '/', $bundle),
+            'controller' => $parts[1],
         );
 
         $elements = explode('.', $parts[2]);

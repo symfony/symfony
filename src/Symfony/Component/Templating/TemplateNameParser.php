@@ -18,29 +18,15 @@ namespace Symfony\Component\Templating;
  */
 class TemplateNameParser implements TemplateNameParserInterface
 {
-    protected $defaultOptions = array();
-
     /**
      * Parses a template to a template name and an array of options.
      *
-     * @param string $name     A template name
-     * @param array  $defaults An array of default options
+     * @param string $name A template name
      *
      * @return array An array composed of the template name and an array of options
      */
-    public function parse($name, array $defaults = array())
+    public function parse($name)
     {
-        return array($name, array_merge($this->defaultOptions, $defaults));
-    }
-
-    /**
-     * Sets a default option.
-     *
-     * @param string $name  The option name
-     * @param mixed  $value The option value
-     */
-    public function setDefaultOption($name, $value)
-    {
-        $this->defaultOptions[$name] = $value;
+        return array($name, array());
     }
 }

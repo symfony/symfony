@@ -131,7 +131,7 @@ class SecurityExtension extends Extension
     {
         $providerIds = $this->createUserProviders($config, $container);
 
-        $encoders = $this->createEncoders($config, $container);
+        $this->createEncoders($config, $container);
 
         if (!$firewalls = $this->fixConfig($config, 'firewall')) {
             return;
@@ -176,7 +176,7 @@ class SecurityExtension extends Extension
         $matcher = null;
         if (isset($firewall['pattern'])) {
             $id = 'security.matcher.map'.$id.'.'.++$i;
-            $matcher = $container
+            $container
                 ->register($id, '%security.matcher.class%')
                 ->setPublic(false)
                 ->addMethodCall('matchPath', array($firewall['pattern']))
@@ -292,7 +292,7 @@ class SecurityExtension extends Extension
                 if (array_key_exists($keybis, $firewall)) {
                     $firewall[$key] = $firewall[$keybis];
                 }
-                if (array_key_exists($key, $firewall)) {
+                if (array_key_exists($key, $firewall) && $firewall[$key] !== false) {
                     $userProvider = isset($firewall[$key]['provider']) ? $this->getUserProviderId($firewall[$key]['provider']) : $defaultProvider;
 
                     list($provider, $listener, $defaultEntryPoint) = $factory->create($container, $id, $firewall[$key], $userProvider, $defaultEntryPoint);

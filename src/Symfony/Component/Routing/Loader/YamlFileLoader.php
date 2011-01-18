@@ -35,7 +35,7 @@ class YamlFileLoader extends FileLoader
      */
     public function load($file, $type = null)
     {
-        $path = $this->findFile($file);
+        $path = $this->locator->locate($file);
 
         $config = $this->loadFile($path);
 
@@ -57,7 +57,8 @@ class YamlFileLoader extends FileLoader
                 $type = isset($config['type']) ? $config['type'] : null;
                 $prefix = isset($config['prefix']) ? $config['prefix'] : null;
                 $this->currentDir = dirname($path);
-                $collection->addCollection($this->import($config['resource'], $type), $prefix);
+                $file = $this->locator->locate($config['resource']);
+                $collection->addCollection($this->import($file, $type), $prefix);
             } elseif (isset($config['pattern'])) {
                 $this->parseRoute($collection, $name, $config, $path);
             } else {

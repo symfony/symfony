@@ -49,7 +49,7 @@ class DelegatingLoaderTest extends \PHPUnit_Framework_TestCase
     public function testSupports()
     {
         $resolver = new LoaderResolver(array(
-            $ini = new XmlFileLoader(array()),
+            $ini = new XmlFileLoader($this->getMock('Symfony\Component\Routing\Loader\FileLocator')),
         ));
         $loader = new DelegatingLoader($resolver);
 

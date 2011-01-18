@@ -27,4 +27,27 @@ interface BundleInterface
      * Shutdowns the Bundle.
      */
     function shutdown();
+
+    /**
+     * Returns the bundle parent class.
+     *
+     * @return string The Bundle parent class name it overrides or null if no parent
+     */
+    function getParent();
+
+    /**
+     * Gets the Bundle namespace.
+     *
+     * @return string The Bundle namespace
+     */
+    function getNamespace();
+
+    /**
+     * Gets the Bundle directory path.
+     *
+     * The path should always be returned as a Unix path (with /).
+     *
+     * @return string The Bundle absolute path
+     */
+    function getPath();
 }

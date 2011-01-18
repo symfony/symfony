@@ -23,7 +23,7 @@ class PhpFileLoaderTest extends \PHPUnit_Framework_TestCase
      */
     public function testSupports()
     {
-        $loader = new PhpFileLoader();
+        $loader = new PhpFileLoader($this->getMock('Symfony\Component\Routing\Loader\FileLocator'));
 
         $this->assertTrue($loader->supports('foo.php'), '->supports() returns true if the resource is loadable');
         $this->assertFalse($loader->supports('foo.foo'), '->supports() returns true if the resource is loadable');

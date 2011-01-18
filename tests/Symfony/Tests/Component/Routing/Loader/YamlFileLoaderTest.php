@@ -16,6 +16,7 @@ use Symfony\Component\Routing\Loader\YamlFileLoader;
 use Symfony\Component\Routing\Route;
 use Symfony\Component\Routing\RouteCollection;
 use Symfony\Component\Routing\Resource\FileResource;
+use Symfony\Component\Routing\Loader\FileLocator;
 
 class YamlFileLoaderTest extends \PHPUnit_Framework_TestCase
 {
@@ -24,7 +25,7 @@ class YamlFileLoaderTest extends \PHPUnit_Framework_TestCase
      */
     public function testSupports()
     {
-        $loader = new YamlFileLoader();
+        $loader = new YamlFileLoader($this->getMock('Symfony\Component\Routing\Loader\FileLocator'));
 
         $this->assertTrue($loader->supports('foo.yml'), '->supports() returns true if the resource is loadable');
         $this->assertFalse($loader->supports('foo.foo'), '->supports() returns true if the resource is loadable');
@@ -35,7 +36,7 @@ class YamlFileLoaderTest extends \PHPUnit_Framework_TestCase
 
     public function testLoadDoesNothingIfEmpty()
     {
-        $loader = new YamlFileLoader(array(__DIR__.'/../Fixtures'));
+        $loader = new YamlFileLoader(new FileLocator(array(__DIR__.'/../Fixtures')));
         $collection = $loader->load('empty.yml');
 
         $this->assertEquals(array(), $collection->all());
@@ -47,7 +48,7 @@ class YamlFileLoaderTest extends \PHPUnit_Framework_TestCase
      */
     public function testLoadThrowsExceptionIfNotAnArray()
     {
-        $loader = new YamlFileLoader(array(__DIR__.'/../Fixtures'));
+        $loader = new YamlFileLoader(new FileLocator(array(__DIR__.'/../Fixtures')));
         $loader->load('nonvalid.yml');
     }
 }

@@ -26,9 +26,7 @@
         </service>
 
         <service id="twig.loader" class="%twig.loader.class%">
-            <argument type="service" id="templating.name_parser" />
-            <argument>%templating.loader.filesystem.path%</argument>
-            <argument type="service" id="logger" on-invalid="ignore" />
+            <argument type="service" id="templating.locator" />
         </service>
 
         <service id="templating.engine.twig" class="%templating.engine.twig.class%">

@@ -1,6 +1,6 @@
 <?php
 
-namespace TestApplication\Sensio\FooBundle\Controller;
+namespace TestBundle\Fabpot\FooBundle\Controller;
 
 /*
  * This file is part of the Symfony framework.

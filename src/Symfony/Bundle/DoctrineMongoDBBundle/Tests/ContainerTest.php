@@ -20,9 +20,10 @@ class ContainerTest extends TestCase
 {
     public function getContainer()
     {
+        require_once __DIR__.'/DependencyInjection/Fixtures/Bundles/YamlBundle/YamlBundle.php';
+
         $container = new ContainerBuilder(new ParameterBag(array(
-            'kernel.bundle_dirs' => array(),
-            'kernel.bundles'     => array(),
+            'kernel.bundles'     => array('YamlBundle' => 'DoctrineMongoDBBundle\Tests\DependencyInjection\Fixtures\Bundles\YamlBundle\YamlBundle'),
             'kernel.cache_dir'   => sys_get_temp_dir(),
         )));
         $loader = new DoctrineMongoDBExtension();

@@ -27,7 +27,7 @@ class AnnotationGlobLoaderTest extends \PHPUnit_Framework_TestCase
            ->disableOriginalConstructor()
            ->getMockForAbstractClass();
 
-        $loader = new AnnotationGlobLoader($annotationClassLoader);
+        $loader = new AnnotationGlobLoader($this->getMock('Symfony\Component\Routing\Loader\FileLocator'), $annotationClassLoader);
 
         $this->assertTrue($loader->supports('*'), '->supports() returns true if the resource is loadable');
         $this->assertFalse($loader->supports('foo.foo'), '->supports() returns true if the resource is loadable');

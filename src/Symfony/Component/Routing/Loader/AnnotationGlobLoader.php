@@ -34,7 +34,7 @@ class AnnotationGlobLoader extends AnnotationDirectoryLoader
     public function load($glob, $type = null)
     {
         $collection = new RouteCollection();
-        foreach ($this->getAbsolutePaths($glob) as $path) {
+        foreach ($this->locator->getAbsolutePaths($glob) as $path) {
             $collection->addCollection(parent::load($path, $type));
         }
 

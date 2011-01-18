@@ -32,7 +32,7 @@ class PhpFileLoader extends FileLoader
     {
         $loader = $this;
 
-        $path = $this->findFile($file);
+        $path = $this->locator->locate($file);
 
         $collection = include $path;
         $this->currentDir = dirname($path);

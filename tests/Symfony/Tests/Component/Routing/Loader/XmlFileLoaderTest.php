@@ -23,7 +23,7 @@ class XmlFileLoaderTest extends \PHPUnit_Framework_TestCase
      */
     public function testSupports()
     {
-        $loader = new XmlFileLoader();
+        $loader = new XmlFileLoader($this->getMock('Symfony\Component\Routing\Loader\FileLocator'));
 
         $this->assertTrue($loader->supports('foo.xml'), '->supports() returns true if the resource is loadable');
         $this->assertFalse($loader->supports('foo.foo'), '->supports() returns true if the resource is loadable');

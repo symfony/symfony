@@ -83,8 +83,20 @@ abstract class AbstractDoctrineExtension extends Extension
                 }
 
                 if ($mappingConfig['is_bundle']) {
-                    $namespace = $this->getBundleNamespace($mappingName, $container);
-                    $mappingConfig = $this->getMappingDriverBundleConfigDefaults($mappingConfig, $namespace, $mappingName, $container);
+                    $bundle = null;
+                    foreach ($container->getParameter('kernel.bundles') as $name => $class) {
+                        if ($mappingName === $name) {
+                            $bundle = new \ReflectionClass($class);
+
+                            break;
+                        }
+                    }
+
+                    if (null === $bundle) {
+                        throw new \InvalidArgumentException(sprintf('Bundle "%s" does not exist or it is not enabled.', $mappingName));
+                    }
+
+                    $mappingConfig = $this->getMappingDriverBundleConfigDefaults($mappingConfig, $bundle, $container);
                     if (!$mappingConfig) {
                         continue;
                     }
@@ -135,75 +147,25 @@ abstract class AbstractDoctrineExtension extends Extension
         }
     }
 
-     /**
-     * Finds the bundle directory for a namespace.
-     *
-     * If the namespace does not yield a direct match, this method will attempt
-     * to match parent namespaces exhaustively.
-     *
-     * @param string           $namespace A bundle namespace omitting the bundle name part
-     * @param ContainerBuilder $container A ContainerBuilder instance
-     *
-     * @return string|false The bundle directory if found, false otherwise
-     */
-    protected function findBundleDirForNamespace($namespace, $container)
-    {
-        $bundleDirs = $container->getParameter('kernel.bundle_dirs');
-
-        $segment = $namespace;
-        do {
-            if (isset($bundleDirs[$segment])) {
-                return $bundleDirs[$segment] . str_replace('\\', '/', substr($namespace, strlen($segment)));
-            }
-        } while ($segment = substr($segment, 0, ($pos = strrpos($segment, '\\'))));
-
-        return false;
-    }
-
-    /**
-     * Get the namespace a bundle resides into.
-     *
-     * @param string $bundleName
-     * @param ContainerBuilder $container
-     * @return string
-     */
-    protected function getBundleNamespace($bundleName, $container)
-    {
-        foreach ($container->getParameter('kernel.bundles') AS $bundleClassName) {
-            $tmp = dirname(str_replace('\\', '/', $bundleClassName));
-            $namespace = str_replace('/', '\\', dirname($tmp));
-            $actualBundleName = basename($tmp);
-
-            if ($actualBundleName == $bundleName) {
-                return $namespace;
-            }
-        }
-        return null;
-    }
-
     /**
      * If this is a bundle controlled mapping all the missing information can be autodetected by this method.
      *
      * Returns false when autodetection failed, an array of the completed information otherwise.
      *
-     * @param array $bundleConfig
-     * @param string $namespace
-     * @param string $bundleName
-     * @param Container $container
+     * @param array            $bundleConfig
+     * @param \ReflectionClass $bundle
+     * @param Container        $container
+     *
      * @return array|false
      */
-    protected function getMappingDriverBundleConfigDefaults(array $bundleConfig, $namespace, $bundleName, $container)
+    protected function getMappingDriverBundleConfigDefaults(array $bundleConfig, \ReflectionClass $bundle, $container)
     {
-        $bundleDir = $this->findBundleDirForNamespace($namespace, $container);
-
-        if (!$bundleDir) {
-            // skip this bundle if we cannot find its location, it must be misspelled or something.
-            return false;
-        }
+        $bundleDir = dirname($bundle->getFilename());
 
         if (!$bundleConfig['type']) {
-            $bundleConfig['type'] = $this->detectMetadataDriver($bundleDir.'/'.$bundleName, $container);
+            $bundleConfig['type'] = $this->detectMetadataDriver($bundleDir, $container);
         }
+
         if (!$bundleConfig['type']) {
             // skip this bundle, no mapping information was found.
             return false;
@@ -211,16 +173,16 @@ abstract class AbstractDoctrineExtension extends Extension
 
         if (!$bundleConfig['dir']) {
             if (in_array($bundleConfig['type'], array('annotation', 'static-php'))) {
-                $bundleConfig['dir'] = $bundleDir.'/'.$bundleName.'/' . $this->getMappingObjectDefaultName();
+                $bundleConfig['dir'] = $bundleDir.'/'.$this->getMappingObjectDefaultName();
             } else {
-                $bundleConfig['dir'] = $bundleDir.'/'.$bundleName.'/' . $this->getMappingResourceConfigDirectory();
+                $bundleConfig['dir'] = $bundleDir.'/'.$this->getMappingResourceConfigDirectory();
             }
         } else {
-            $bundleConfig['dir'] = $bundleDir.'/'.$bundleName.'/' . $bundleConfig['dir'];
+            $bundleConfig['dir'] = $bundleDir.'/'.$bundleConfig['dir'];
         }
 
         if (!$bundleConfig['prefix']) {
-            $bundleConfig['prefix'] = $namespace.'\\'. $bundleName . '\\' . $this->getMappingObjectDefaultName();
+            $bundleConfig['prefix'] = $bundle->getNamespaceName().'\\'.$this->getMappingObjectDefaultName();
         }
         return $bundleConfig;
     }
@@ -325,7 +287,7 @@ abstract class AbstractDoctrineExtension extends Extension
         // add the directory itself as a resource
         $container->addResource(new FileResource($dir));
 
-        if (is_dir($dir . '/' . $this->getMappingObjectDefaultName())) {
+        if (is_dir($dir.'/'.$this->getMappingObjectDefaultName())) {
             return 'annotation';
         }
 

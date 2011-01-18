@@ -27,7 +27,7 @@ class AnnotationFileLoaderTest extends \PHPUnit_Framework_TestCase
            ->disableOriginalConstructor()
            ->getMockForAbstractClass();
 
-        $loader = new AnnotationFileLoader($annotationClassLoader);
+        $loader = new AnnotationFileLoader($this->getMock('Symfony\Component\Routing\Loader\FileLocator'), $annotationClassLoader);
 
         $fixture = __DIR__.'/../Fixtures/annotated.php';
 

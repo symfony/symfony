@@ -428,7 +428,7 @@ abstract class AbstractDoctrineExtensionTest extends TestCase
 
     public function testMultipleOrmLoadCalls()
     {
-        $container = $this->getContainer('AnnotationsBundle');
+        $container = $this->getContainer(array('XmlBundle', 'AnnotationsBundle'));
         $loader = new DoctrineExtension();
 
         $loader->dbalLoad(array(), $container);
@@ -447,7 +447,7 @@ abstract class AbstractDoctrineExtensionTest extends TestCase
             'DoctrineBundle\Tests\DependencyInjection\Fixtures\Bundles\AnnotationsBundle\Entity'
         ));
         $this->assertDICDefinitionMethodCallAt(1, $definition, 'addDriver', array(
-            new Reference('doctrine.orm.default_annotation_metadata_driver'),
+            new Reference('doctrine.orm.default_xml_metadata_driver'),
             'DoctrineBundle\Tests\DependencyInjection\Fixtures\Bundles\XmlBundle\Entity'
         ));
 
@@ -625,15 +625,15 @@ abstract class AbstractDoctrineExtensionTest extends TestCase
             $bundles = array($bundles);
         }
 
-        foreach ($bundles AS $key => $bundle) {
+        $map = array();
+        foreach ($bundles as $bundle) {
             require_once __DIR__.'/Fixtures/Bundles/'.($vendor ? $vendor.'/' : '').$bundle.'/'.$bundle.'.php';
 
-            $bundles[$key] = 'DoctrineBundle\\Tests\DependencyInjection\\Fixtures\\Bundles\\'.($vendor ? $vendor.'\\' : '').$bundle.'\\'.$bundle;
+            $map[$bundle] = 'DoctrineBundle\\Tests\DependencyInjection\\Fixtures\\Bundles\\'.($vendor ? $vendor.'\\' : '').$bundle.'\\'.$bundle;
         }
 
         return new ContainerBuilder(new ParameterBag(array(
-            'kernel.bundle_dirs' => array('DoctrineBundle\\Tests\\DependencyInjection\\Fixtures\\Bundles' => __DIR__.'/Fixtures/Bundles'),
-            'kernel.bundles'     => $bundles,
+            'kernel.bundles'     => $map,
             'kernel.cache_dir'   => sys_get_temp_dir(),
             'kernel.root_dir'    => __DIR__ . "/../../../../../" // src dir
         )));

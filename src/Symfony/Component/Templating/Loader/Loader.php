@@ -12,7 +12,6 @@
 namespace Symfony\Component\Templating\Loader;
 
 use Symfony\Component\Templating\DebuggerInterface;
-use Symfony\Component\Templating\TemplateNameParserInterface;
 
 /**
  * Loader is the base class for all template loader classes.

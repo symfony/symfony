@@ -40,13 +40,13 @@ class GenerateEntityDoctrineCommand extends DoctrineCommand
             ->setHelp(<<<EOT
 The <info>doctrine:generate:entity</info> task initializes a new Doctrine entity inside a bundle:
 
-  <info>./app/console doctrine:generate:entity "Bundle\MyCustomBundle" "User\Group"</info>
+  <info>./app/console doctrine:generate:entity "MyCustomBundle" "User\Group"</info>
 
 The above would initialize a new entity in the following entity namespace <info>Bundle\MyCustomBundle\Entity\User\Group</info>.
 
 You can also optionally specify the fields you want to generate in the new entity:
 
-  <info>./app/console doctrine:generate:entity "Bundle\MyCustomBundle" "User\Group" --fields="name:string(255) description:text"</info>
+  <info>./app/console doctrine:generate:entity "MyCustomBundle" "User\Group" --fields="name:string(255) description:text"</info>
 EOT
         );
     }
@@ -56,23 +56,10 @@ EOT
      */
     protected function execute(InputInterface $input, OutputInterface $output)
     {
-        if (!preg_match('/Bundle$/', $bundle = $input->getArgument('bundle'))) {
-            throw new \InvalidArgumentException('The bundle name must end with Bundle. Example: "Bundle\MySampleBundle".');
-        }
-
-        $dirs = $this->container->get('kernel')->getBundleDirs();
-
-        $tmp = str_replace('\\', '/', $bundle);
-        $namespace = str_replace('/', '\\', dirname($tmp));
-        $bundle = basename($tmp);
-
-        if (!isset($dirs[$namespace])) {
-            throw new \InvalidArgumentException(sprintf('Unable to initialize the bundle entity (%s not defined).', $namespace));
-        }
+        $bundle = $this->application->getKernel()->getBundle($input->getArgument('bundle'));
 
         $entity = $input->getArgument('entity');
-        $entityNamespace = $namespace.'\\'.$bundle.'\\Entity';
-        $fullEntityClassName = $entityNamespace.'\\'.$entity;
+        $fullEntityClassName = $bundle->getNamespace().'\\Entity\\'.$entity;
         $mappingType = $input->getOption('mapping-type');
 
         $class = new ClassMetadataInfo($fullEntityClassName);
@@ -103,22 +90,21 @@ EOT
         $exporter = $cme->getExporter($mappingType);
 
         if ('annotation' === $mappingType) {
-            $path = $dirs[$namespace].'/'.$bundle.'/Entity/'.str_replace($entityNamespace.'\\', null, $fullEntityClassName).'.php';
-
+            $path = $bundle->getPath().'/Entity/'.$entity.'.php';
             $exporter->setEntityGenerator($this->getEntityGenerator());
         } else {
             $mappingType = 'yaml' == $mappingType ? 'yml' : $mappingType;
-            $path = $dirs[$namespace].'/'.$bundle.'/Resources/config/doctrine/metadata/orm/'.str_replace('\\', '.', $fullEntityClassName).'.dcm.'.$mappingType;
+            $path = $bundle->getPath().'/Resources/config/doctrine/metadata/orm/'.str_replace('\\', '.', $fullEntityClassName).'.dcm.'.$mappingType;
         }
 
         $code = $exporter->exportClassMetadata($class);
 
+        $output->writeln(sprintf('Generating entity for "<info>%s</info>"', $bundle->getName()));
+        $output->writeln(sprintf('  > generating <comment>%s</comment>', $fullEntityClassName));
+
         if (!is_dir($dir = dirname($path))) {
             mkdir($dir, 0777, true);
         }
-
-        $output->writeln(sprintf('Generating entity for "<info>%s</info>"', $bundle));
-        $output->writeln(sprintf('  > generating <comment>%s</comment>', $fullEntityClassName));
         file_put_contents($path, $code);
     }
 }

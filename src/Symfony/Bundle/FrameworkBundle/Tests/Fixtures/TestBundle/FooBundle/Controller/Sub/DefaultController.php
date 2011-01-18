@@ -1,8 +1,6 @@
 <?php
 
-namespace TestApplication\Sensio\FooBundle;
-
-use Symfony\Component\HttpKernel\Bundle\Bundle;
+namespace TestBundle\FooBundle\Controller\Sub;
 
 /*
  * This file is part of the Symfony framework.
@@ -14,10 +12,10 @@ use Symfony\Component\HttpKernel\Bundle\Bundle;
  */
 
 /**
- * Bundle.
+ * DefaultController.
  *
  * @author Fabien Potencier <fabien.potencier@symfony-project.com>
  */
-class SensioFooBundle extends Bundle
+class DefaultController
 {
 }

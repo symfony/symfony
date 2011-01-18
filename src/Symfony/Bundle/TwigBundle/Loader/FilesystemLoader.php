@@ -11,8 +11,7 @@
 
 namespace Symfony\Bundle\TwigBundle\Loader;
 
-use Symfony\Component\Templating\TemplateNameParserInterface;
-use Symfony\Component\HttpKernel\Log\LoggerInterface;
+use Symfony\Bundle\FrameworkBundle\Templating\Loader\TemplateLocator;
 
 /**
  * FilesystemLoader extends the default Twig filesystem loader
@@ -20,78 +19,62 @@ use Symfony\Component\HttpKernel\Log\LoggerInterface;
  *
  * @author Fabien Potencier <fabien.potencier@symfony-project.com>
  */
-class FilesystemLoader extends \Twig_Loader_Filesystem
+class FilesystemLoader implements \Twig_LoaderInterface
 {
-    protected $nameParser;
-    protected $logger;
-
     /**
      * Constructor.
      *
+     * @param Kernel                      $kernel     A Kernel instance
      * @param TemplateNameParserInterface $nameParser A TemplateNameParserInterface instance
+     * @param string                      $path       A global fallback path
+     * @param LoggerInterface             $logger     A LoggerInterface instance
      */
-    public function __construct(TemplateNameParserInterface $nameParser, array $paths = array(), LoggerInterface $logger = null)
+    public function __construct(TemplateLocator $locator)
     {
-        parent::__construct($paths);
-
-        $this->nameParser = $nameParser;
-        $this->logger = $logger;
+        $this->locator = $locator;
     }
 
     /**
-     * {@inheritdoc}
+     * Gets the source code of a template, given its name.
+     *
+     * @param  string $name The name of the template to load
+     *
+     * @return string The template source code
      */
-    public function setPaths($paths)
+    public function getSource($name)
     {
-        // invalidate the cache
-        $this->cache = array();
+        return file_get_contents($this->findTemplate($name));
+    }
 
-        // we don't check if the directory exists here as we have path patterns, not paths
-        $this->paths = is_array($paths) ? $paths : array($paths);
+    /**
+     * Gets the cache key to use for the cache for a given template name.
+     *
+     * @param  string $name The name of the template to load
+     *
+     * @return string The cache key
+     */
+    public function getCacheKey($name)
+    {
+        return $this->findTemplate($name);
+    }
+
+    /**
+     * Returns true if the template is still fresh.
+     *
+     * @param string    $name The template name
+     * @param timestamp $time The last modification time of the cached template
+     */
+    public function isFresh($name, $time)
+    {
+        return filemtime($this->findTemplate($name)) < $time;
     }
 
     protected function findTemplate($name)
     {
-        // normalize name
-        $name = str_replace(':/' , ':', preg_replace('#/{2,}#', '/', strtr($name, '\\', '/')));
-
-        if (isset($this->cache[$name])) {
-            return $this->cache[$name];
+        if (false === $file = $this->locator->locate($name)) {
+            throw new \Twig_Error_Loader(sprintf('Unable to find template "%s".', $name));
         }
 
-        $parameters = $this->nameParser->parse($name);
-
-        $this->validateName($parameters['name']);
-        $this->validateName($parameters['bundle']);
-        $this->validateName($parameters['controller']);
-        $this->validateName($parameters['format']);
-
-        $replacements = array();
-        foreach ($parameters as $key => $value) {
-            $replacements['%'.$key.'%'] = $value;
-        }
-
-        $logs = array();
-        foreach ($this->paths as $path) {
-            if (is_file($file = strtr($path, $replacements))) {
-                if (null !== $this->logger) {
-                    $this->logger->info(sprintf('Loaded template file "%s"', $file));
-                }
-
-                return $this->cache[$name] = $file;
-            }
-
-            if (null !== $this->logger) {
-                $logs[] = sprintf('Failed loading template file "%s"', $file);
-            }
-        }
-
-        if (null !== $this->logger) {
-            foreach ($logs as $log) {
-                $this->logger->debug($log);
-            }
-        }
-
-        throw new \Twig_Error_Loader(sprintf('Unable to find template "%s".', $name));
+        return $file;
     }
 }

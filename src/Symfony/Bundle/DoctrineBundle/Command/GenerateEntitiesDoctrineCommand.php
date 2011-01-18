@@ -62,10 +62,10 @@ EOT
         }
 
         $entityGenerator = $this->getEntityGenerator();
-        foreach ($this->container->get('kernel')->getBundles() as $bundle) {
+        foreach ($this->application->getKernel()->getBundles() as $bundle) {
 
             // retrieve the full bundle classname
-            $class = $bundle->getReflection()->getName();
+            $class = get_class($bundle);
 
             if ($filterBundle && $filterBundle != $class) {
                 continue;

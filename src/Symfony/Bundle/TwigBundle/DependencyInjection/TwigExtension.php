@@ -43,7 +43,6 @@ class TwigExtension extends Extension
                 'Twig_Extension_Escaper',
                 'Twig_Extension_Optimizer',
                 'Twig_LoaderInterface',
-                'Twig_Loader_Filesystem',
                 'Twig_Markup',
                 'Twig_TemplateInterface',
                 'Twig_Template',

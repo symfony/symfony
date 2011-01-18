@@ -33,6 +33,7 @@ class InitBundleCommand extends Command
         $this
             ->setDefinition(array(
                 new InputArgument('namespace', InputArgument::REQUIRED, 'The namespace of the bundle to create'),
+                new InputArgument('dir', InputArgument::REQUIRED, 'The directory where to create the bundle'),
             ))
             ->setName('init:bundle')
         ;
@@ -50,21 +51,8 @@ class InitBundleCommand extends Command
             throw new \InvalidArgumentException('The namespace must end with Bundle.');
         }
 
-        $dirs = $this->container->get('kernel')->getBundleDirs();
-
-        $tmp = str_replace('\\', '/', $namespace);
-        $namespace = str_replace('/', '\\', dirname($tmp));
-        $bundle = basename($tmp);
-
-        if (!isset($dirs[$namespace])) {
-            throw new \InvalidArgumentException(sprintf(
-                "Unable to initialize the bundle (%s is not a defined namespace).\n" .
-                "Defined namespaces are: %s",
-                $namespace, implode(', ', array_keys($dirs))));
-        }
-
-        $dir = $dirs[$namespace];
-        $output->writeln(sprintf('Initializing bundle "<info>%s</info>" in "<info>%s</info>"', $bundle, realpath($dir)));
+        $dir = $input->getArgument('dir');
+        $output->writeln(sprintf('Initializing bundle "<info>%s</info>" in "<info>%s</info>"', $bundle, $dir));
 
         if (file_exists($targetDir = $dir.'/'.$bundle)) {
             throw new \RuntimeException(sprintf('Bundle "%s" already exists.', $bundle));

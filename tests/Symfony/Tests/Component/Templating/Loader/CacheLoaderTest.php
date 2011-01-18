@@ -16,7 +16,7 @@ require_once __DIR__.'/../Fixtures/ProjectTemplateDebugger.php';
 use Symfony\Component\Templating\Loader\Loader;
 use Symfony\Component\Templating\Loader\CacheLoader;
 use Symfony\Component\Templating\Storage\StringStorage;
-use Symfony\Component\Templating\TemplateNameParser;
+use Symfony\Component\Templating\Loader\TemplateNameParser;
 
 class CacheLoaderTest extends \PHPUnit_Framework_TestCase
 {

@@ -9,14 +9,14 @@
  * file that was distributed with this source code.
  */
 
-namespace Symfony\Component\Templating;
+namespace Symfony\Component\Templating\Loader;
 
 /**
- * TemplateNameParser is the default implementation of TemplateNameParserInterface.
+ * TemplateNameParserInterface parses template name to a template name and an array of options.
  *
  * @author Fabien Potencier <fabien.potencier@symfony-project.com>
  */
-class TemplateNameParser implements TemplateNameParserInterface
+interface TemplateNameParserInterface
 {
     /**
      * Parses a template to an array of parameters.
@@ -27,8 +27,5 @@ class TemplateNameParser implements TemplateNameParserInterface
      *
      * @return array An array of parameters
      */
-    public function parse($name)
-    {
-        return array('name' => $name);
-    }
+    function parse($name);
 }

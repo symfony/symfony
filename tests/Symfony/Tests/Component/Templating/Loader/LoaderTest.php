@@ -14,7 +14,7 @@ namespace Symfony\Tests\Component\Templating\Loader;
 require_once __DIR__.'/../Fixtures/ProjectTemplateDebugger.php';
 
 use Symfony\Component\Templating\Loader\Loader;
-use Symfony\Component\Templating\TemplateNameParser;
+use Symfony\Component\Templating\Loader\TemplateNameParser;
 
 class LoaderTest extends \PHPUnit_Framework_TestCase
 {

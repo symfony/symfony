@@ -9,10 +9,10 @@
  * file that was distributed with this source code.
  */
 
-namespace Symfony\Bundle\FrameworkBundle\Tests\Templating;
+namespace Symfony\Bundle\FrameworkBundle\Tests\Templating\Loader;
 
 use Symfony\Bundle\FrameworkBundle\Tests\TestCase;
-use Symfony\Bundle\FrameworkBundle\Templating\TemplateNameParser;
+use Symfony\Bundle\FrameworkBundle\Templating\Loader\TemplateNameParser;
 use Symfony\Bundle\FrameworkBundle\Tests\Kernel;
 
 class TemplateNameParserTest extends TestCase
@@ -24,9 +24,9 @@ class TemplateNameParserTest extends TestCase
     {
         $kernel = new Kernel();
         $kernel->boot();
-        $converter = new TemplateNameParser($kernel);
+        $parser = new TemplateNameParser($kernel);
 
-        $this->assertEquals($parameters, $converter->parse($name));
+        $this->assertEquals($parameters, $parser->parse($name));
     }
 
     public function getParseTests()
@@ -35,8 +35,8 @@ class TemplateNameParserTest extends TestCase
             array('FooBundle:Post:index.php.html', array('name' => 'index', 'bundle' => 'FooBundle', 'controller' => 'Post', 'renderer' => 'php', 'format' => 'html')),
             array('FooBundle:Post:index.twig.html', array('name' => 'index', 'bundle' => 'FooBundle', 'controller' => 'Post', 'renderer' => 'twig', 'format' => 'html')),
             array('FooBundle:Post:index.php.xml', array('name' => 'index', 'bundle' => 'FooBundle', 'controller' => 'Post', 'renderer' => 'php', 'format' => 'xml')),
-            array('SensioFooBundle:Post:index.php.html', array('name' => 'index', 'bundle' => 'Sensio/FooBundle', 'controller' => 'Post', 'renderer' => 'php', 'format' => 'html')),
-            array('SensioCmsFooBundle:Post:index.php.html', array('name' => 'index', 'bundle' => 'Sensio/Cms/FooBundle', 'controller' => 'Post', 'renderer' => 'php', 'format' => 'html')),
+            array('SensioFooBundle:Post:index.php.html', array('name' => 'index', 'bundle' => 'SensioFooBundle', 'controller' => 'Post', 'renderer' => 'php', 'format' => 'html')),
+            array('SensioCmsFooBundle:Post:index.php.html', array('name' => 'index', 'bundle' => 'SensioCmsFooBundle', 'controller' => 'Post', 'renderer' => 'php', 'format' => 'html')),
             array(':Post:index.php.html',array('name' => 'index', 'bundle' => '', 'controller' => 'Post', 'renderer' => 'php', 'format' => 'html')),
             array('::index.php.html', array('name' => 'index', 'bundle' => '', 'controller' => '', 'renderer' => 'php', 'format' => 'html')),
         );
@@ -50,9 +50,9 @@ class TemplateNameParserTest extends TestCase
     {
         $kernel = new Kernel();
         $kernel->boot();
-        $converter = new TemplateNameParser($kernel);
+        $parser = new TemplateNameParser($kernel);
 
-        $converter->parse($name);
+        $parser->parse($name);
     }
 
     public function getParseInvalidTests()

@@ -26,17 +26,13 @@ abstract class DoctrineCommand extends BaseCommand
     public static function configureMigrationsForBundle(Application $application, $bundle, Configuration $configuration)
     {
         $configuration->setMigrationsNamespace($bundle.'\DoctrineMigrations');
-        
-        $dirs = $application->getKernel()->getBundleDirs();
-        
-        $tmp = str_replace('\\', '/', $bundle);
-        $namespace = str_replace('/', '\\', dirname($tmp));
-        $bundle = basename($tmp);
-        
-        $dir = $dirs[$namespace].'/'.$bundle.'/DoctrineMigrations';
+
+        $bundle = $this->application->getKernel()->getBundle($input->getArgument('bundle'));
+        $dir = $bundle->getPath().'/DoctrineMigrations';
+
         $configuration->setMigrationsDirectory($dir);
         $configuration->registerMigrationsFromDirectory($dir);
         $configuration->setName($bundle.' Migrations');
-        $configuration->setMigrationsTableName(Inflector::tableize($bundle).'_migration_versions');
+        $configuration->setMigrationsTableName(Inflector::tableize($bundle->getName()).'_migration_versions');
     }
 }

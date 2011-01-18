@@ -11,7 +11,7 @@
 
 namespace Symfony\Bundle\FrameworkBundle\Routing;
 
-use Symfony\Bundle\FrameworkBundle\Controller\ControllerNameConverter;
+use Symfony\Bundle\FrameworkBundle\Controller\ControllerNameParser;
 use Symfony\Component\Routing\Loader\DelegatingLoader as BaseDelegatingLoader;
 use Symfony\Component\Routing\Loader\LoaderResolverInterface;
 use Symfony\Component\HttpKernel\Log\LoggerInterface;
@@ -26,19 +26,19 @@ use Symfony\Component\HttpKernel\Log\LoggerInterface;
  */
 class DelegatingLoader extends BaseDelegatingLoader
 {
-    protected $converter;
+    protected $parser;
     protected $logger;
 
     /**
      * Constructor.
      *
-     * @param ControllerNameConverter $converter A ControllerNameConverter instance
-     * @param LoggerInterface         $logger    A LoggerInterface instance
-     * @param LoaderResolverInterface $resolver  A LoaderResolverInterface instance
+     * @param ControllerNameParser    $parser   A ControllerNameParser instance
+     * @param LoggerInterface         $logger   A LoggerInterface instance
+     * @param LoaderResolverInterface $resolver A LoaderResolverInterface instance
      */
-    public function __construct(ControllerNameConverter $converter, LoggerInterface $logger = null, LoaderResolverInterface $resolver)
+    public function __construct(ControllerNameParser $parser, LoggerInterface $logger = null, LoaderResolverInterface $resolver)
     {
-        $this->converter = $converter;
+        $this->parser = $parser;
         $this->logger = $logger;
 
         parent::__construct($resolver);
@@ -59,7 +59,7 @@ class DelegatingLoader extends BaseDelegatingLoader
         foreach ($collection->all() as $name => $route) {
             if ($controller = $route->getDefault('_controller')) {
                 try {
-                    $controller = $this->converter->fromShortNotation($controller);
+                    $controller = $this->parser->parse($controller);
                 } catch (\Exception $e) {
                     // unable to optimize unknown notation
                 }

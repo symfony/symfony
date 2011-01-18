@@ -16,7 +16,7 @@ require_once __DIR__.'/../Fixtures/ProjectTemplateDebugger.php';
 use Symfony\Component\Templating\Loader\ChainLoader;
 use Symfony\Component\Templating\Loader\FilesystemLoader;
 use Symfony\Component\Templating\Storage\FileStorage;
-use Symfony\Component\Templating\TemplateNameParser;
+use Symfony\Component\Templating\Loader\TemplateNameParser;
 
 class ChainLoaderTest extends \PHPUnit_Framework_TestCase
 {

@@ -67,15 +67,8 @@ EOT
             $paths = is_array($dirOrFile) ? $dirOrFile : array($dirOrFile);
         } else {
             $paths = array();
-            $bundleDirs = $this->container->get('kernel')->getBundleDirs();
             foreach ($this->container->get('kernel')->getBundles() as $bundle) {
-                $tmp = dirname(str_replace('\\', '/', get_class($bundle)));
-                $namespace = str_replace('/', '\\', dirname($tmp));
-                $class = basename($tmp);
-
-                if (isset($bundleDirs[$namespace]) && is_dir($dir = $bundleDirs[$namespace].'/'.$class.'/DataFixtures/MongoDB')) {
-                    $paths[] = $dir;
-                }
+                $paths[] = $bundle->getPath().'/DataFixtures/MongoDB';
             }
         }
 

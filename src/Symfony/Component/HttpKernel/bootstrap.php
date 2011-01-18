@@ -8,43 +8,15 @@ use Symfony\Component\Console\Application;
 use Symfony\Component\Finder\Finder;
 abstract class Bundle extends ContainerAware implements BundleInterface
 {
-    protected $name;
-    protected $namespace;
-    protected $path;
-    protected $reflection;
     public function boot()
     {
     }
     public function shutdown()
     {
     }
-    public function getName()
+    public function getParent()
     {
-        if (null === $this->name) {
-            $this->initReflection();
-        }
-        return $this->name;
-    }
-    public function getNamespace()
-    {
-        if (null === $this->name) {
-            $this->initReflection();
-        }
-        return $this->namespace;
-    }
-    public function getPath()
-    {
-        if (null === $this->name) {
-            $this->initReflection();
-        }
-        return $this->path;
-    }
-    public function getReflection()
-    {
-        if (null === $this->name) {
-            $this->initReflection();
-        }
-        return $this->reflection;
+        return null;
     }
     public function registerExtensions(ContainerBuilder $container)
     {
@@ -53,7 +25,7 @@ abstract class Bundle extends ContainerAware implements BundleInterface
         }
         $finder = new Finder();
         $finder->files()->name('*Extension.php')->in($dir);
-        $prefix = $this->namespace.'\\DependencyInjection';
+        $prefix = $this->getNamespace().'\\DependencyInjection';
         foreach ($finder as $file) {
             $class = $prefix.strtr($file->getPath(), array($dir => '', '/' => '\\')).'\\'.$file->getBasename('.php');
             $container->registerExtension(new $class());
@@ -66,20 +38,13 @@ abstract class Bundle extends ContainerAware implements BundleInterface
         }
         $finder = new Finder();
         $finder->files()->name('*Command.php')->in($dir);
-        $prefix = $this->namespace.'\\Command';
+        $prefix = $this->getNamespace().'\\Command';
         foreach ($finder as $file) {
             $r = new \ReflectionClass($prefix.strtr($file->getPath(), array($dir => '', '/' => '\\')).'\\'.$file->getBasename('.php'));
             if ($r->isSubclassOf('Symfony\\Component\\Console\\Command\\Command') && !$r->isAbstract()) {
                 $application->add($r->newInstance());
             }
         }
-    }
-    protected function initReflection()
-    {
-        $this->reflection = new \ReflectionObject($this);
-        $this->namespace = $this->reflection->getNamespaceName();
-        $this->name = $this->reflection->getShortName();
-        $this->path = str_replace('\\', '/', dirname($this->reflection->getFilename()));
     }
 }
 }
@@ -89,6 +54,9 @@ interface BundleInterface
 {
     function boot();
     function shutdown();
+    function getParent();
+    function getNamespace();
+    function getPath();
 }
 }
 namespace Symfony\Component\HttpKernel\Debug

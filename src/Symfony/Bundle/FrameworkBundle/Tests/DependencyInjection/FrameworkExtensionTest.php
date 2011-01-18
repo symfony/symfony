@@ -49,12 +49,7 @@ class FrameworkExtensionTest extends TestCase
     protected function getContainer()
     {
         return new ContainerBuilder(new ParameterBag(array(
-            'kernel.bundle_dirs'      => array(
-                'Symfony\\Framework' => __DIR__ . '/../../../Framework',
-            ),
-            'kernel.bundles'          => array(
-                'Symfony\\Bundle\\FrameworkBundle\\FrameworkBundle',
-            ),
+            'kernel.bundles'          => array('FrameworkBundle' => 'Symfony\\Bundle\\FrameworkBundle\\FrameworkBundle'),
             'kernel.root_dir'         => __DIR__,
             'kernel.debug'            => false,
             'kernel.compiled_classes' => array(),

@@ -153,7 +153,7 @@ class FrameworkExtension extends Extension
             'Symfony\\Component\\HttpKernel\\Controller\\ControllerResolverInterface',
 
             'Symfony\\Bundle\\FrameworkBundle\\RequestListener',
-            'Symfony\\Bundle\\FrameworkBundle\\Controller\\ControllerNameConverter',
+            'Symfony\\Bundle\\FrameworkBundle\\Controller\\ControllerNameParser',
             'Symfony\\Bundle\\FrameworkBundle\\Controller\\ControllerResolver',
             'Symfony\\Bundle\\FrameworkBundle\\Controller\\Controller',
 
@@ -212,13 +212,6 @@ class FrameworkExtension extends Extension
         if (array_key_exists('assets_base_urls', $config)) {
             $container->setParameter('templating.assets.base_urls', $config['assets_base_urls']);
         }
-
-        // template paths
-        $dirs = array('%kernel.root_dir%/views/%%bundle%%/%%controller%%/%%name%%.%%renderer%%.%%format%%');
-        foreach ($container->getParameter('kernel.bundle_dirs') as $dir) {
-            $dirs[] = $dir.'/%%bundle%%/Resources/views/%%controller%%/%%name%%.%%renderer%%.%%format%%';
-        }
-        $container->setParameter('templating.loader.filesystem.path', $dirs);
 
         // path for the filesystem loader
         if (isset($config['path'])) {
@@ -313,7 +306,7 @@ class FrameworkExtension extends Extension
             if ($first) {
                 // translation directories
                 $dirs = array();
-                foreach (array_reverse($container->getParameter('kernel.bundles')) as $bundle) {
+                foreach ($container->getParameter('kernel.bundles') as $bundle) {
                     $reflection = new \ReflectionClass($bundle);
                     if (is_dir($dir = dirname($reflection->getFilename()).'/Resources/translations')) {
                         $dirs[] = $dir;

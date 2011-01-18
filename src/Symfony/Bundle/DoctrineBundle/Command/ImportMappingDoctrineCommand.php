@@ -42,33 +42,20 @@ class ImportMappingDoctrineCommand extends DoctrineCommand
             ->setHelp(<<<EOT
 The <info>doctrine:mapping:import</info> command imports mapping information from an existing database:
 
-  <info>./app/console doctrine:mapping:import "Bundle\MyCustomBundle" xml</info>
+  <info>./app/console doctrine:mapping:import "MyCustomBundle" xml</info>
 
 You can also optionally specify which entity manager to import from with the <info>--em</info> option:
 
-  <info>./app/console doctrine:mapping:import "Bundle\MyCustomBundle" xml --em=default</info>
+  <info>./app/console doctrine:mapping:import "MyCustomBundle" xml --em=default</info>
 EOT
         );
     }
 
     protected function execute(InputInterface $input, OutputInterface $output)
     {
-        $bundleClass = null;
-        $bundleDirs = $this->container->get('kernel')->getBundleDirs();
-        foreach ($this->container->get('kernel')->getBundles() as $bundle) {
-            if (strpos(get_class($bundle), $input->getArgument('bundle')) !== false) {
-                $tmp = dirname(str_replace('\\', '/', get_class($bundle)));
-                $namespace = str_replace('/', '\\', dirname($tmp));
-                $class = basename($tmp);
+        $bundle = $this->application->getKernel()->getBundle($input->getArgument('bundle'));
 
-                if (isset($bundleDirs[$namespace])) {
-                    $destPath = realpath($bundleDirs[$namespace]).'/'.$class;
-                    $bundleClass = $class;
-                    break;
-                }
-            }
-        }
-
+        $destPath = $bundle->getPath();
         $type = $input->getArgument('mapping-type') ? $input->getArgument('mapping-type') : 'xml';
         if ('annotation' === $type) {
             $destPath .= '/Entity';
@@ -100,7 +87,7 @@ EOT
             $output->writeln(sprintf('Importing mapping information from "<info>%s</info>" entity manager', $emName));
             foreach ($metadata as $class) {
                 $className = $class->name;
-                $class->name = $namespace.'\\'.$bundleClass.'\\Entity\\'.$className;
+                $class->name = $bundle->getNamespace().'\\Entity\\'.$className;
                 if ('annotation' === $type) {
                     $path = $destPath.'/'.$className.'.php';
                 } else {

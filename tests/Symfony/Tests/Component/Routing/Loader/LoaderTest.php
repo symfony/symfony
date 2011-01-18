@@ -35,7 +35,7 @@ class LoaderTest extends \PHPUnit_Framework_TestCase
     public function testResolve()
     {
         $resolver = new LoaderResolver(array(
-            $ini = new XmlFileLoader(array()),
+            $ini = new XmlFileLoader($this->getMock('Symfony\Component\Routing\Loader\FileLocator')),
         ));
         $loader = new ProjectLoader1();
         $loader->setResolver($resolver);

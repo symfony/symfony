@@ -9,9 +9,9 @@
  * file that was distributed with this source code.
  */
 
-namespace Symfony\Bundle\FrameworkBundle\Templating;
+namespace Symfony\Bundle\FrameworkBundle\Templating\Loader;
 
-use Symfony\Component\Templating\TemplateNameParser as BaseTemplateNameParser;
+use Symfony\Component\Templating\Loader\TemplateNameParser as BaseTemplateNameParser;
 use Symfony\Component\HttpKernel\Kernel;
 
 /**
@@ -45,41 +45,26 @@ class TemplateNameParser extends BaseTemplateNameParser
             throw new \InvalidArgumentException(sprintf('Template name "%s" is not valid (format is "bundle:section:template.renderer.format").', $name));
         }
 
-        $bundle = null;
-        if ($parts[0]) {
-            foreach ($this->kernel->getBundles() as $b) {
-                if ($parts[0] !== $b->getName()) {
-                    continue;
-                }
-
-                foreach (array_keys($this->kernel->getBundleDirs()) as $prefix) {
-                    if (0 === $pos = strpos($b->getNamespace(), $prefix)) {
-                        $bundle = str_replace($prefix.'\\', '', $b->getNamespace());
-
-                        break 2;
-                    }
-                }
-            }
-
-            if (null === $bundle) {
-                throw new \InvalidArgumentException(sprintf('Unable to find a valid bundle name for template "%s".', $name));
-            }
-        }
-
         $elements = explode('.', $parts[2]);
         if (3 !== count($elements)) {
             throw new \InvalidArgumentException(sprintf('Template name "%s" is not valid (format is "bundle:section:template.renderer.format").', $name));
         }
 
         $parameters = array(
-            // bundle is used as part of the template path, so we need /
-            'bundle'     => str_replace('\\', '/', $bundle),
+            'bundle'     => $parts[0],
             'controller' => $parts[1],
             'name'       => $elements[0],
             'renderer'   => $elements[1],
             'format'     => $elements[2],
         );
 
+        if ($parameters['bundle']) {
+            try {
+                $this->kernel->getBundle($parameters['bundle']);
+            } catch (\Exception $e) {
+                throw new \InvalidArgumentException(sprintf('Template name "%s" is not valid.', $name), 0, $e);
+            }
+        }
 
         return $parameters;
     }

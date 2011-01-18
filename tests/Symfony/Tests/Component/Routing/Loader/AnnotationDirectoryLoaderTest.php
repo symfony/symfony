@@ -15,6 +15,7 @@ use Symfony\Component\Routing\Loader\LoaderResolver;
 use Symfony\Component\Routing\Loader\AnnotationDirectoryLoader;
 use Symfony\Component\Routing\Route;
 use Symfony\Component\Routing\RouteCollection;
+use Symfony\Component\Routing\Loader\FileLocator;
 
 class AnnotationDirectoryLoaderTest extends \PHPUnit_Framework_TestCase
 {
@@ -27,7 +28,7 @@ class AnnotationDirectoryLoaderTest extends \PHPUnit_Framework_TestCase
            ->disableOriginalConstructor()
            ->getMockForAbstractClass();
 
-        $loader = new AnnotationDirectoryLoader($annotationClassLoader);
+        $loader = new AnnotationDirectoryLoader(new FileLocator(), $annotationClassLoader);
 
         $fixturesDir = __DIR__.'/../Fixtures';
 

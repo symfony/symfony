@@ -13,7 +13,6 @@ namespace Symfony\Component\Templating\Loader;
 
 use Symfony\Component\Templating\Storage\Storage;
 use Symfony\Component\Templating\Storage\FileStorage;
-use Symfony\Component\Templating\TemplateNameParserInterface;
 
 /**
  * FilesystemLoader is a loader that read templates from the filesystem.

@@ -105,7 +105,7 @@ class Profiler
     public function export()
     {
         $data = base64_encode(serialize(array($this->token, $this->collectors, $this->ip, $this->url, $this->time)));
-        
+
         return $data;
     }
 
@@ -243,10 +243,10 @@ class Profiler
         $this->time = time();
 
         $data = base64_encode(serialize($this->collectors));
-        try {
-            $this->storage->write($this->token, $data, $this->ip, $this->url, $this->time);
-            $this->empty = false;
-        } catch (\Exception $e) {
+
+        if (true === $this->storage->write($this->token, $data, $this->ip, $this->url, $this->time)) {
+            $this->empty =false;
+        } else {
             if (null !== $this->logger) {
                 $this->logger->err(sprintf('Unable to store the profiler information (%s).', $e->getMessage()));
             }

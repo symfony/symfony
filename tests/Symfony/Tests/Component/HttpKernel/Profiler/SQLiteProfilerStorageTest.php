@@ -32,7 +32,6 @@ class SQLiteProfilerStorageTest extends \PHPUnit_Framework_TestCase
         @unlink(self::$dbFile);
     }
 
-
     protected function setUp()
     {
         self::$storage->purge();
@@ -57,6 +56,12 @@ class SQLiteProfilerStorageTest extends \PHPUnit_Framework_TestCase
         $this->assertTrue(false !== self::$storage->read('simple_quote'), '->write() accepts single quotes in URL');
         $this->assertTrue(false !== self::$storage->read('double_quote'), '->write() accepts double quotes in URL');
         $this->assertTrue(false !== self::$storage->read('backslash'), '->write() accpets backslash in URL');
+    }
+
+    public function testStoreDuplicateToken()
+    {
+        $this->assertTrue(true === self::$storage->write('token', 'data', '127.0.0.1', 'http://foo.bar', time()), '->write() returns true when the token is unique');
+        $this->assertTrue(false === self::$storage->write('token', 'data', '127.0.0.1', 'http://foo.bar', time()), '->write() return false when the token is already present in the DB');
     }
 
     public function testRetrieveByIp()

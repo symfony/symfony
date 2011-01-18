@@ -41,13 +41,15 @@ interface ProfilerStorageInterface
     function read($token);
 
     /**
-     * Reads data associated with the given token.
+     * Write data associated with the given token.
      *
      * @param string  $token A token
      * @param string  $data  The data associated with token
      * @param string  $ip    An IP
      * @param string  $url   An URL
      * @param integer $time  The time of the data
+     *
+     * @return Boolean Write operation successful
      */
     function write($token, $data, $ip, $url, $time);
 

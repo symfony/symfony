@@ -320,11 +320,9 @@ class AclProvider implements AclProviderInterface
             // has the ACL been hydrated during this hydration cycle?
             if (isset($acls[$aclId])) {
                 $acl = $acls[$aclId];
-            }
-
             // has the ACL been hydrated during any previous cycle, or was possibly loaded
             // from cache?
-            else if (isset($loadedAcls[$classType][$objectIdentifier])) {
+            } else if (isset($loadedAcls[$classType][$objectIdentifier])) {
                 $acl = $loadedAcls[$classType][$objectIdentifier];
 
                 // keep reference in local array (saves us some hash calculations)
@@ -337,10 +335,8 @@ class AclProvider implements AclProviderInterface
                     $oidCache[$objectIdentifier.$classType] = $acl->getObjectIdentity();
                 }
                 $result->attach($oidCache[$objectIdentifier.$classType], $acl);
-            }
-
             // so, this hasn't been hydrated yet
-            else {
+            } else {
                 // create object identity if we haven't done so yet
                 $oidLookupKey = $objectIdentifier.$classType;
                 if (!isset($oidCache[$oidLookupKey])) {

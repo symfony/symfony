@@ -54,8 +54,7 @@ class ObjectIdentityTest extends \PHPUnit_Framework_TestCase
     {
         if ($equal) {
             $this->assertTrue($oid1->equals($oid2));
-        }
-        else {
+        } else {
             $this->assertFalse($oid1->equals($oid2));
         }
     }

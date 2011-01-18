@@ -32,8 +32,7 @@ class AuditLoggerTest extends \PHPUnit_Framework_TestCase
                ->expects($this->never())
                ->method('isAuditFailure')
            ;
-        }
-        else {
+        } else {
             $ace
                 ->expects($this->never())
                 ->method('isAuditSuccess')
@@ -52,8 +51,7 @@ class AuditLoggerTest extends \PHPUnit_Framework_TestCase
                ->method('doLog')
                ->with($this->equalTo($granting), $this->equalTo($ace))
             ;
-        }
-        else {
+        } else {
             $logger
                 ->expects($this->never())
                 ->method('doLog')

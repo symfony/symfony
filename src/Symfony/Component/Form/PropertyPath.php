@@ -232,10 +232,9 @@ class PropertyPath implements \IteratorAggregate
 
         if (is_object($objectOrArray)) {
             $value = $this->readProperty($objectOrArray, $currentIndex);
-        }
         // arrays need to be treated separately (due to PHP bug?)
         // http://bugs.php.net/bug.php?id=52133
-        else {
+        } else {
             if (!array_key_exists($property, $objectOrArray)) {
                 $objectOrArray[$property] = $currentIndex + 1 < $this->length ? array() : null;
             }
@@ -267,10 +266,9 @@ class PropertyPath implements \IteratorAggregate
         if ($currentIndex + 1 < $this->length) {
             if (is_object($objectOrArray)) {
                 $nestedObject = $this->readProperty($objectOrArray, $currentIndex);
-            }
             // arrays need to be treated separately (due to PHP bug?)
             // http://bugs.php.net/bug.php?id=52133
-            else {
+            } else {
                 if (!array_key_exists($property, $objectOrArray)) {
                     $objectOrArray[$property] = array();
                 }

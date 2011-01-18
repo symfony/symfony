@@ -38,8 +38,7 @@ class RoleSecurityIdentityTest extends \PHPUnit_Framework_TestCase
     {
         if ($equal) {
             $this->assertTrue($id1->equals($id2));
-        }
-        else {
+        } else {
             $this->assertFalse($id1->equals($id2));
         }
     }

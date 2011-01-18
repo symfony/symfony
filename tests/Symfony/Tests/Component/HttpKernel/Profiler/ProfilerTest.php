@@ -31,7 +31,7 @@ class ProfilerTest extends \PHPUnit_Framework_TestCase
             @unlink($tmp);
         }
         $storage = new SQLiteProfilerStorage($tmp);
-        $storage->purge(true);
+        $storage->purge();
 
         $profiler = new Profiler($storage);
         $profiler->add($collector);

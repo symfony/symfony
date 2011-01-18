@@ -146,6 +146,25 @@ class Definition
     }
 
     /**
+     * Sets a specific argument
+     *
+     * @param integer $index
+     * @param mixed $argument
+     *
+     * @return Definition The current instance
+     */
+    public function setArgument($index, $argument)
+    {
+        if ($index < 0 || $index > count($this->arguments) - 1) {
+            throw new \OutOfBoundsException(sprintf('The index "%d" is not in the range [0, %d].', $index, count($this->arguments) - 1));
+        }
+
+        $this->arguments[$index] = $argument;
+
+        return $this;
+    }
+
+    /**
      * Gets the arguments to pass to the service constructor/factory method.
      *
      * @return array The array of arguments

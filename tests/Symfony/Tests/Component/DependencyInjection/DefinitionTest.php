@@ -167,4 +167,25 @@ class DefinitionTest extends \PHPUnit_Framework_TestCase
             'bar' => array(array('bar' => 'bar')),
         ), '->getTags() returns all tags');
     }
+
+    /**
+     * @covers Symfony\Component\DependencyInjection\Definition::setArgument
+     */
+    public function testSetArgument()
+    {
+        $def = new Definition('stdClass');
+
+        $def->addArgument('foo');
+        $this->assertSame(array('foo'), $def->getArguments());
+
+        $this->assertSame($def, $def->setArgument(0, 'moo'));
+        $this->assertSame(array('moo'), $def->getArguments());
+
+        $def->addArgument('moo');
+        $def
+            ->setArgument(0, 'foo')
+            ->setArgument(1, 'bar')
+        ;
+        $this->assertSame(array('foo', 'bar'), $def->getArguments());
+    }
 }

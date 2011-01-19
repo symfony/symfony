@@ -177,12 +177,14 @@ class AclProviderTest extends \PHPUnit_Framework_TestCase
         $this->entryCollection = $this->con->selectCollection($options['entry_table_name']);
         foreach ($this->getEntryData() as $data) {
             $query = array_combine($fields, $data);
-            $classId = $query['class'];
-            $query['class'] = $classes[$classId];
+            unset($query['id']);
+            unset($query['class']);
             $oid = $query['object_identity'];
             $query['object_identity'] = $oids[$oid];
             $sid = $query['security_identity'];
-            $query['security_identity'] = $sids[$sid];
+            if($sid) {
+                $query['security_identity'] = $sids[$sid];
+            }
             $this->entryCollection->insert($query);
         }
     }
@@ -210,6 +212,7 @@ class AclProviderTest extends \PHPUnit_Framework_TestCase
             array(3, 3, 4, null, 0, 1, 2, 1, 'all', 1, 1),
             array(4, 3, 4, null, 2, 2, 1, 1, 'all', 1, 1),
             array(5, 3, 4, null, 1, 3, 1, 1, 'all', 1, 1),
+            array(6, 2, 2, null, null, null, null, null, null, null, null),  // TODO: WHEN PARENT NOT IN TABLE, CREATE BLANK
         );
     }
 

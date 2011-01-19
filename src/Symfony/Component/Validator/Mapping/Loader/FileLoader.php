@@ -19,6 +19,12 @@ abstract class FileLoader implements LoaderInterface
 {
     protected $file;
 
+    /**
+     * Contains all known namespaces indexed by their prefix
+     * @var array
+     */
+    protected $namespaces;
+
     public function __construct($file)
     {
         if (!file_exists($file)) {
@@ -46,6 +52,14 @@ abstract class FileLoader implements LoaderInterface
     {
         if (strpos($name, '\\') !== false && class_exists($name)) {
             $className = (string)$name;
+        } else if (strpos($name, ':') !== false) {
+            list($prefix, $className) = explode(':', $name);
+
+            if (!isset($this->namespaces[$prefix])) {
+                throw new MappingException(sprintf('Undefined namespace prefix "%s"', $prefix));
+            }
+
+            $className = $this->namespaces[$prefix].$className;
         } else {
             $className = 'Symfony\\Component\\Validator\\Constraints\\'.$name;
         }

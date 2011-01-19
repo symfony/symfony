@@ -3,6 +3,8 @@
 <constraint-mapping xmlns="http://www.symfony-project.org/schema/dic/constraint-mapping"
     xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
     xsi:schemaLocation="http://www.symfony-project.org/schema/dic/constraint-mapping http://www.symfony-project.org/schema/dic/services/constraint-mapping-1.0.xsd">
+    
+  <namespace prefix="custom">Symfony\Tests\Component\Validator\Fixtures\</namespace>
 
   <class name="Symfony\Tests\Component\Validator\Fixtures\Entity">
 
@@ -10,6 +12,9 @@
 
     <!-- Custom constraint -->
     <constraint name="Symfony\Tests\Component\Validator\Fixtures\ConstraintA" />
+
+    <!-- Custom constraint with namespace abbreviation-->
+    <constraint name="custom:ConstraintB" />
 
     <!-- PROPERTY CONSTRAINTS -->
 

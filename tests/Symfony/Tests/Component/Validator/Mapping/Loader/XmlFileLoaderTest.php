@@ -13,6 +13,7 @@ namespace Symfony\Tests\Component\Validator\Mapping\Loader;
 
 require_once __DIR__.'/../../Fixtures/Entity.php';
 require_once __DIR__.'/../../Fixtures/ConstraintA.php';
+require_once __DIR__.'/../../Fixtures/ConstraintB.php';
 
 use Symfony\Component\Validator\Constraints\All;
 use Symfony\Component\Validator\Constraints\Collection;
@@ -22,6 +23,7 @@ use Symfony\Component\Validator\Constraints\Choice;
 use Symfony\Component\Validator\Mapping\ClassMetadata;
 use Symfony\Component\Validator\Mapping\Loader\XmlFileLoader;
 use Symfony\Tests\Component\Validator\Fixtures\ConstraintA;
+use Symfony\Tests\Component\Validator\Fixtures\ConstraintB;
 
 class XmlFileLoaderTest extends \PHPUnit_Framework_TestCase
 {
@@ -50,6 +52,7 @@ class XmlFileLoaderTest extends \PHPUnit_Framework_TestCase
 
         $expected = new ClassMetadata('Symfony\Tests\Component\Validator\Fixtures\Entity');
         $expected->addConstraint(new ConstraintA());
+        $expected->addConstraint(new ConstraintB());
         $expected->addPropertyConstraint('firstName', new NotNull());
         $expected->addPropertyConstraint('firstName', new Min(3));
         $expected->addPropertyConstraint('firstName', new Choice(array('A', 'B')));

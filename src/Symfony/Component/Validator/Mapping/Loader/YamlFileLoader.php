@@ -30,16 +30,24 @@ class YamlFileLoader extends FileLoader
     {
         if (null === $this->classes) {
             $this->classes = Yaml::load($this->file);
-        }
 
-        // empty file
-        if (null === $this->classes) {
-            return false;
-        }
+            // empty file
+            if (null === $this->classes) {
+                return false;
+            }
 
-        // not an array
-        if (!is_array($this->classes)) {
-            throw new \InvalidArgumentException(sprintf('The file "%s" must contain a YAML array.', $this->file));
+            // not an array
+            if (!is_array($this->classes)) {
+                throw new \InvalidArgumentException(sprintf('The file "%s" must contain a YAML array.', $this->file));
+            }
+
+            if (isset($this->classes['namespaces'])) {
+                foreach ($this->classes['namespaces'] as $prefix => $namespace) {
+                    $this->namespaces[$prefix] = $namespace;
+                }
+
+                unset($this->classes['namespaces']);
+            }
         }
 
         // TODO validation

@@ -12,13 +12,13 @@
 namespace Symfony\Tests\Component\Form;
 
 use Symfony\Component\Form\LocaleField;
-use Symfony\Component\Form\FormConfiguration;
+use Symfony\Component\Form\FormContext;
 
 class LocaleFieldTest extends \PHPUnit_Framework_TestCase
 {
     public function testLocalesAreSelectable()
     {
-        FormConfiguration::setDefaultLocale('de_AT');
+        FormContext::setLocale('de_AT');
 
         $field = new LocaleField('language');
         $choices = $field->getOtherChoices();

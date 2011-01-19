@@ -1,0 +1,62 @@
+<?xml version="1.0" ?>
+
+<container xmlns="http://www.symfony-project.org/schema/dic/services"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xsi:schemaLocation="http://www.symfony-project.org/schema/dic/services http://www.symfony-project.org/schema/dic/services/services-1.0.xsd">
+
+    <parameters>
+        <parameter key="form.factory.class">Symfony\Component\Form\FormFactory</parameter>
+        <parameter key="form.field_factory.class">Symfony\Component\Form\FieldFactory\FieldFactory</parameter>
+        <parameter key="form.field_factory.validator_guesser.class">Symfony\Component\Form\FieldFactory\ValidatorFieldFactoryGuesser</parameter>
+        <parameter key="form.default_context.class">Symfony\Component\Form\FormContext</parameter>
+        <parameter key="form.csrf_protection.enabled">true</parameter>
+        <parameter key="form.csrf_protection.field_name">_token</parameter>
+        <parameter key="form.csrf_protection.secret">secret</parameter>
+        <parameter key="form.validation_groups">Default</parameter>
+    </parameters>
+
+    <services>
+    
+    	<!-- FormFactory -->
+        <service id="form.factory" class="%form.factory.class%">
+            <argument type="service" id="form.default_context" />
+        </service>
+
+    	<!-- FieldFactory -->
+        <service id="form.field_factory" class="%form.field_factory.class%" public="false">
+        	<!-- All services with tag "form.field_factory.guesser" are inserted here by AddFieldFactoryGuessersPass -->
+        </service>
+
+    	<!-- ValidatorFieldFactoryGuesser -->
+        <service id="form.field_factory.validator_guesser" class="%form.field_factory.validator_guesser.class%" public="false">
+        	<tag name="form.field_factory.guesser" />
+        	<argument type="service" id="validator.mapping.class_metadata_factory" />
+        </service>
+
+    	<!-- FormContext -->
+        <service id="form.default_context" class="%form.default_context.class%">
+            <argument type="service" id="service_container" />
+            <call method="validator">
+                <argument type="service" id="validator" />
+            </call>
+            <call method="validationGroups">
+                <argument>%form.validation_groups%</argument>
+            </call>
+            <call method="fieldFactory">
+                <argument type="service" id="form.field_factory" />
+            </call>
+            <call method="csrfProtection">
+                <argument>%form.csrf_protection.enabled%</argument>
+            </call>
+            <call method="csrfFieldName">
+                <argument>%form.csrf_protection.field_name%</argument>
+            </call>
+            <call method="csrfSecrets">
+            	<argument type="collection">
+                	<argument>%form.csrf_protection.secret%</argument>
+                </argument>
+            </call>
+        </service>
+        
+    </services>
+</container>

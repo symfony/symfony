@@ -14,13 +14,13 @@ namespace Symfony\Tests\Component\Form;
 require_once __DIR__ . '/DateTimeTestCase.php';
 
 use Symfony\Component\Form\DateField;
-use Symfony\Component\Form\FormConfiguration;
+use Symfony\Component\Form\FormContext;
 
 class DateFieldTest extends DateTimeTestCase
 {
     protected function setUp()
     {
-        FormConfiguration::setDefaultLocale('de_AT');
+        FormContext::setLocale('de_AT');
     }
 
     public function testBind_fromInput_dateTime()

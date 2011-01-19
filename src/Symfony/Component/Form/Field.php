@@ -1,5 +1,7 @@
 <?php
 
+namespace Symfony\Component\Form;
+
 /*
  * This file is part of the Symfony package.
  *
@@ -8,8 +10,6 @@
  * For the full copyright and license information, please view the LICENSE
  * file that was distributed with this source code.
  */
-
-namespace Symfony\Component\Form;
 
 use Symfony\Component\Form\ValueTransformer\ValueTransformerInterface;
 use Symfony\Component\Form\ValueTransformer\TransformationFailedException;
@@ -74,7 +74,7 @@ class Field extends Configurable implements FieldInterface
         $this->addOption('normalization_transformer');
 
         $this->key = (string)$key;
-        $this->locale = FormConfiguration::getDefaultLocale();
+        $this->locale = FormContext::getLocale();
 
         parent::__construct($options);
 

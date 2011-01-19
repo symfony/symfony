@@ -19,7 +19,7 @@ require_once __DIR__ . '/Fixtures/RequiredOptionsField.php';
 use Symfony\Component\Form\ValueTransformer\ValueTransformerInterface;
 use Symfony\Component\Form\PropertyPath;
 use Symfony\Component\Form\FieldError;
-use Symfony\Component\Form\FormConfiguration;
+use Symfony\Component\Form\FormContext;
 use Symfony\Component\Form\ValueTransformer\TransformationFailedException;
 use Symfony\Tests\Component\Form\Fixtures\Author;
 use Symfony\Tests\Component\Form\Fixtures\TestField;
@@ -147,7 +147,7 @@ class FieldTest extends \PHPUnit_Framework_TestCase
 
     public function testLocaleIsPassedToValueTransformer()
     {
-        FormConfiguration::setDefaultLocale('de_DE');
+        FormContext::setLocale('de_DE');
 
         $transformer = $this->getMock('Symfony\Component\Form\ValueTransformer\ValueTransformerInterface');
         $transformer->expects($this->exactly(1))

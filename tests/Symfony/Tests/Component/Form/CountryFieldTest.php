@@ -12,13 +12,13 @@
 namespace Symfony\Tests\Component\Form;
 
 use Symfony\Component\Form\CountryField;
-use Symfony\Component\Form\FormConfiguration;
+use Symfony\Component\Form\FormContext;
 
 class CountryFieldTest extends \PHPUnit_Framework_TestCase
 {
     public function testCountriesAreSelectable()
     {
-        FormConfiguration::setDefaultLocale('de_AT');
+        FormContext::setLocale('de_AT');
 
         $field = new CountryField('country');
         $choices = $field->getOtherChoices();

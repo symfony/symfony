@@ -15,7 +15,7 @@ require_once __DIR__ . '/Fixtures/Author.php';
 require_once __DIR__ . '/Fixtures/TestField.php';
 
 use Symfony\Component\Form\Form;
-use Symfony\Component\Form\FormConfiguration;
+use Symfony\Component\Form\FormContext;
 use Symfony\Component\Form\Field;
 use Symfony\Component\Form\HiddenField;
 use Symfony\Component\Form\FieldGroup;
@@ -68,10 +68,11 @@ class FormTest extends \PHPUnit_Framework_TestCase
 
     protected function setUp()
     {
-        FormConfiguration::disableDefaultCsrfProtection();
-        FormConfiguration::setDefaultCsrfSecrets(array());
         $this->validator = $this->createMockValidator();
-        $this->form = new Form('author', new Author(), $this->validator);
+        $this->form = new Form('author', new Author(), $this->validator, array(
+            'csrf_protection' => false,
+            'csrf_secrets' => array(),
+        ));
     }
 
     public function testConstructInitializesObject()
@@ -84,19 +85,6 @@ class FormTest extends \PHPUnit_Framework_TestCase
         new TestSetDataBeforeConfigureForm($this, 'author', new Author(), $this->validator);
     }
 
-    public function testIsCsrfProtected()
-    {
-        $this->assertFalse($this->form->isCsrfProtected());
-
-        $this->form->enableCsrfProtection();
-
-        $this->assertTrue($this->form->isCsrfProtected());
-
-        $this->form->disableCsrfProtection();
-
-        $this->assertFalse($this->form->isCsrfProtected());
-    }
-
     public function testNoCsrfProtectionByDefault()
     {
         $form = new Form('author', new Author(), $this->validator);
@@ -104,60 +92,72 @@ class FormTest extends \PHPUnit_Framework_TestCase
         $this->assertFalse($form->isCsrfProtected());
     }
 
-    public function testDefaultCsrfProtectionCanBeEnabled()
+    public function testCsrfProtectionCanBeEnabled()
     {
-        FormConfiguration::enableDefaultCsrfProtection();
-        $form = new Form('author', new Author(), $this->validator);
+        $form = new Form('author', new Author(), $this->validator, array(
+            'csrf_protection' => true,
+        ));
 
         $this->assertTrue($form->isCsrfProtected());
     }
 
     public function testGeneratedCsrfSecretByDefault()
     {
-        $form = new Form('author', new Author(), $this->validator);
-        $form->enableCsrfProtection();
+        $form = new Form('author', new Author(), $this->validator, array(
+            'csrf_protection' => true,
+        ));
 
-        $this->assertTrue(strlen($form->getCsrfSecret()) >= 32);
+        $secrets = $form->getCsrfSecrets();
+
+        $this->assertEquals(1, count($secrets));
+        $this->assertTrue(strlen($secrets[0]) >= 32);
     }
 
-    public function testDefaultCsrfSecretsCanBeAdded()
+    public function testCsrfSecretsCanBeSet()
     {
-        FormConfiguration::addDefaultCsrfSecret('foobar');
+        $form = new Form('author', new Author(), $this->validator, array(
+            'csrf_protection' => true,
+            'csrf_field_name' => '_token',
+            'csrf_secrets' => array('foobar', 'secret'),
+        ));
 
-        $form = new Form('author', new Author(), $this->validator);
-        $form->enableCsrfProtection('_token', 'secret');
-
-        $this->assertEquals(md5('secret'.get_class($form).'foobar'), $form['_token']->getData());
+        $this->assertEquals(md5(get_class($form).'foobarsecret'), $form['_token']->getData());
     }
 
-    public function testDefaultCsrfSecretsCanBeAddedAsClosures()
+    public function testCsrfSecretsCanBeSetAsClosures()
     {
-        FormConfiguration::addDefaultCsrfSecret(function () {
+        $closure = function () {
             return 'foobar';
-        });
+        };
 
-        $form = new Form('author', new Author(), $this->validator);
-        $form->enableCsrfProtection('_token', 'secret');
+        $form = new Form('author', new Author(), $this->validator, array(
+            'csrf_protection' => true,
+            'csrf_field_name' => '_token',
+            'csrf_secrets' => array($closure, 'secret'),
+        ));
 
-        $this->assertEquals(md5('secret'.get_class($form).'foobar'), $form['_token']->getData());
+        $this->assertEquals(md5(get_class($form).'foobarsecret'), $form['_token']->getData());
     }
 
-    public function testDefaultCsrfFieldNameCanBeSet()
+    public function testCsrfFieldNameCanBeSet()
     {
-        FormConfiguration::setDefaultCsrfFieldName('foobar');
-        $form = new Form('author', new Author(), $this->validator);
-        $form->enableCsrfProtection();
+        $form = new Form('author', new Author(), $this->validator, array(
+            'csrf_protection' => true,
+            'csrf_field_name' => 'foobar',
+        ));
 
         $this->assertEquals('foobar', $form->getCsrfFieldName());
     }
 
     public function testCsrfProtectedFormsHaveExtraField()
     {
-        $this->form->enableCsrfProtection();
+        $form = new Form('author', new Author(), $this->validator, array(
+            'csrf_protection' => true,
+        ));
 
-        $this->assertTrue($this->form->has($this->form->getCsrfFieldName()));
+        $this->assertTrue($form->has($this->form->getCsrfFieldName()));
 
-        $field = $this->form->get($this->form->getCsrfFieldName());
+        $field = $form->get($form->getCsrfFieldName());
 
         $this->assertTrue($field instanceof HiddenField);
         $this->assertGreaterThanOrEqual(32, strlen($field->getDisplayedData()));
@@ -172,46 +172,61 @@ class FormTest extends \PHPUnit_Framework_TestCase
 
     public function testIsCsrfTokenValidPasses()
     {
-        $this->form->enableCsrfProtection();
+        $form = new Form('author', new Author(), $this->validator, array(
+            'csrf_protection' => true,
+        ));
 
-        $field = $this->form->getCsrfFieldName();
-        $token = $this->form->get($field)->getDisplayedData();
+        $field = $form->getCsrfFieldName();
+        $token = $form->get($field)->getDisplayedData();
 
-        $this->form->bind(array($field => $token));
+        $form->bind(array($field => $token));
 
-        $this->assertTrue($this->form->isCsrfTokenValid());
+        $this->assertTrue($form->isCsrfTokenValid());
     }
 
     public function testIsCsrfTokenValidFails()
     {
-        $this->form->enableCsrfProtection();
+        $form = new Form('author', new Author(), $this->validator, array(
+            'csrf_protection' => true,
+        ));
 
-        $field = $this->form->getCsrfFieldName();
+        $field = $form->getCsrfFieldName();
 
-        $this->form->bind(array($field => 'foobar'));
+        $form->bind(array($field => 'foobar'));
 
-        $this->assertFalse($this->form->isCsrfTokenValid());
+        $this->assertFalse($form->isCsrfTokenValid());
     }
 
-    public function testValidationGroupsCanBeSet()
+    public function testValidationGroupNullByDefault()
     {
-        $form = new Form('author', new Author(), $this->validator);
+        $this->assertNull($this->form->getValidationGroups());
+    }
 
-        $this->assertNull($form->getValidationGroups());
-        $form->setValidationGroups('group');
+    public function testValidationGroupsCanBeSetToString()
+    {
+        $form = new Form('author', new Author(), $this->validator, array(
+            'validation_groups' => 'group',
+        ));
+
         $this->assertEquals(array('group'), $form->getValidationGroups());
-        $form->setValidationGroups(array('group1', 'group2'));
+    }
+
+    public function testValidationGroupsCanBeSetToArray()
+    {
+        $form = new Form('author', new Author(), $this->validator, array(
+            'validation_groups' => array('group1', 'group2'),
+        ));
+
         $this->assertEquals(array('group1', 'group2'), $form->getValidationGroups());
-        $form->setValidationGroups(null);
-        $this->assertNull($form->getValidationGroups());
     }
 
     public function testBindUsesValidationGroups()
     {
         $field = $this->createMockField('firstName');
-        $form = new Form('author', new Author(), $this->validator);
+        $form = new Form('author', new Author(), $this->validator, array(
+            'validation_groups' => 'group',
+        ));
         $form->add($field);
-        $form->setValidationGroups('group');
 
         $this->validator->expects($this->once())
                                         ->method('validate')
@@ -225,7 +240,6 @@ class FormTest extends \PHPUnit_Framework_TestCase
         $field = $this->createMockField('firstName');
         $form = new Form('author', new Author());
         $form->add($field);
-        $form->setValidationGroups('group');
 
         $this->setExpectedException('Symfony\Component\Form\Exception\FormException');
 

@@ -20,6 +20,7 @@ use Symfony\Component\DependencyInjection\Parameter;
 use Symfony\Component\Finder\Finder;
 use Symfony\Component\HttpFoundation\RequestMatcher;
 use Symfony\Component\HttpKernel\DependencyInjection\Extension;
+use Symfony\Component\Form\FormContext;
 
 /**
  * FrameworkExtension.
@@ -42,6 +43,23 @@ class FrameworkExtension extends Extension
             $loader->load('web.xml');
         }
 
+        if (!$container->hasDefinition('form.factory')) {
+            $loader->load('form.xml');
+        }
+
+        if (isset($config['csrf_protection'])) {
+            foreach (array('enabled', 'field_name', 'field-name', 'secret') as $key) {
+                if (isset($config['csrf_protection'][$key])) {
+                    $container->setParameter('form.csrf_protection.'.strtr($key, '-', '_'),
+                            $config['csrf_protection'][$key]);
+                }
+            }
+        }
+
+        if (isset($config['i18n']) && $config['i18n']) {
+            FormContext::setLocale(\Locale::get());
+        }
+
         if (isset($config['ide'])) {
             switch ($config['ide']) {
                 case 'textmate':
@@ -58,12 +76,6 @@ class FrameworkExtension extends Extension
             }
 
             $container->setParameter('debug.file_link_format', $pattern);
-        }
-
-        foreach (array('csrf_secret', 'csrf-secret') as $key) {
-            if (isset($config[$key])) {
-                $container->setParameter('csrf_secret', $config[$key]);
-            }
         }
 
         if (!$container->hasDefinition('event_dispatcher')) {
@@ -149,7 +161,8 @@ class FrameworkExtension extends Extension
             'Symfony\\Component\\EventDispatcher\\EventDispatcher',
             'Symfony\\Bundle\\FrameworkBundle\\EventDispatcher',
 
-            'Symfony\\Component\\Form\\FormConfiguration',
+            'Symfony\\Component\\Form\\FormContext',
+            'Symfony\\Component\\Form\\FormContextInterface',
         ));
     }
 

@@ -12,6 +12,7 @@
 namespace Symfony\Bundle\FrameworkBundle;
 
 use Symfony\Bundle\FrameworkBundle\DependencyInjection\Compiler\AddConstraintValidatorsPass;
+use Symfony\Bundle\FrameworkBundle\DependencyInjection\Compiler\AddFieldFactoryGuessersPass;
 use Symfony\Bundle\FrameworkBundle\DependencyInjection\Compiler\TemplatingPass;
 use Symfony\Bundle\FrameworkBundle\DependencyInjection\Compiler\RegisterKernelListenersPass;
 use Symfony\Bundle\FrameworkBundle\DependencyInjection\Compiler\AddSecurityVotersPass;
@@ -23,7 +24,6 @@ use Symfony\Bundle\FrameworkBundle\DependencyInjection\Compiler\TranslatorPass;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\DependencyInjection\Compiler\PassConfig;
 use Symfony\Component\HttpKernel\Bundle\Bundle;
-use Symfony\Component\Form\FormConfiguration;
 
 /**
  * Bundle.
@@ -37,28 +37,27 @@ class FrameworkBundle extends Bundle
      */
     public function boot()
     {
-        if ($this->container->has('error_handler')) {
-            $this->container->get('error_handler');
-        }
+        $container = $this->container;
 
-        FormConfiguration::clearDefaultCsrfSecrets();
-
-        if ($this->container->hasParameter('csrf_secret')) {
-            FormConfiguration::addDefaultCsrfSecret($this->container->getParameter('csrf_secret'));
-            FormConfiguration::enableDefaultCsrfProtection();
+        if ($container->has('error_handler')) {
+            $container->get('error_handler');
         }
 
         // the session ID should always be included in the CSRF token, even
         // if default CSRF protection is not enabled
-        if ($this->container->has('session')) {
-            $container = $this->container;
-            FormConfiguration::addDefaultCsrfSecret(function () use ($container) {
+        if ($container->has('form.default_context') && $container->has('session')) {
+            $addSessionId = function () use ($container) {
                 // automatically starts the session when the CSRF token is
                 // generated
                 $container->get('session')->start();
 
                 return $container->get('session')->getId();
-            });
+            };
+
+//            $container->getDefinition('form.default_context')
+//                    ->addMethodCall('addCsrfSecret', array($addSessionId));
+//
+//                    var_dump($container->getDefinition('form.default_context'));
         }
     }
 
@@ -73,6 +72,7 @@ class FrameworkBundle extends Bundle
         $container->addCompilerPass(new RegisterKernelListenersPass());
         $container->addCompilerPass(new TemplatingPass());
         $container->addCompilerPass(new AddConstraintValidatorsPass());
+        $container->addCompilerPass(new AddFieldFactoryGuessersPass());
         $container->addCompilerPass(new AddClassesToCachePass());
         $container->addCompilerPass(new TranslatorPass());
     }

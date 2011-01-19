@@ -40,6 +40,7 @@ class FieldFactory implements FieldFactoryInterface
                 throw new UnexpectedTypeException($guesser, 'FieldFactoryGuesserInterface');
             }
         }
+
         $this->guessers = $guessers;
     }
 

@@ -4,11 +4,10 @@ namespace Symfony\Tests\Component\Validator\Fixtures;
 
 use Symfony\Component\Validator\Constraint;
 
-class ConstraintB extends Constraint {
-
+class ClassConstraint extends Constraint
+{
     public function targets()
     {
-        return array(self::PROPERTY_CONSTRAINT, self::CLASS_CONSTRAINT);
+        return self::CLASS_CONSTRAINT;
     }
-
 }

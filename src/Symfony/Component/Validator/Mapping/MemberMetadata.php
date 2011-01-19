@@ -14,6 +14,7 @@ namespace Symfony\Component\Validator\Mapping;
 use Symfony\Component\Validator\Constraint;
 use Symfony\Component\Validator\Constraints\Valid;
 use Symfony\Component\Validator\Exception\ValidatorException;
+use Symfony\Component\Validator\Exception\ConstraintDefinitionException;
 
 abstract class MemberMetadata extends ElementMetadata
 {
@@ -42,6 +43,12 @@ abstract class MemberMetadata extends ElementMetadata
      */
     public function addConstraint(Constraint $constraint)
     {
+        if (!in_array(Constraint::PROPERTY_CONSTRAINT, (array)$constraint->targets())) {
+            throw new ConstraintDefinitionException(sprintf(
+            		'The constraint %s cannot be put on properties or getters',
+                    get_class($constraint)));
+        }
+
         if ($constraint instanceof Valid) {
             $this->cascaded = true;
         } else {

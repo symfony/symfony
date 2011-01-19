@@ -18,10 +18,12 @@ use Symfony\Component\Validator\Mapping\PropertyMetadata;
 use Symfony\Tests\Component\Validator\Fixtures\Entity;
 use Symfony\Tests\Component\Validator\Fixtures\ConstraintA;
 use Symfony\Tests\Component\Validator\Fixtures\ConstraintB;
+use Symfony\Tests\Component\Validator\Fixtures\PropertyConstraint;
 
 require_once __DIR__.'/../Fixtures/Entity.php';
 require_once __DIR__.'/../Fixtures/ConstraintA.php';
 require_once __DIR__.'/../Fixtures/ConstraintB.php';
+require_once __DIR__.'/../Fixtures/PropertyConstraint.php';
 
 class ClassMetadataTest extends \PHPUnit_Framework_TestCase
 {
@@ -40,6 +42,13 @@ class ClassMetadataTest extends \PHPUnit_Framework_TestCase
         $this->setExpectedException('Symfony\Component\Validator\Exception\ConstraintDefinitionException');
 
         $this->metadata->addConstraint(new Valid());
+    }
+
+    public function testAddConstraintRequiresClassConstraints()
+    {
+        $this->setExpectedException('Symfony\Component\Validator\Exception\ConstraintDefinitionException');
+
+        $this->metadata->addConstraint(new PropertyConstraint());
     }
 
     public function testAddPropertyConstraints()

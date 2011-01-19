@@ -12,4 +12,9 @@ class ConstraintC extends Constraint
     {
         return array('option1');
     }
+
+    public function targets()
+    {
+        return array(self::PROPERTY_CONSTRAINT, self::CLASS_CONSTRAINT);
+    }
 }

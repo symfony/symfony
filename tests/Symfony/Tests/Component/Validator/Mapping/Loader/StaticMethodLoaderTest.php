@@ -11,9 +11,11 @@
 
 namespace Symfony\Tests\Component\Validator\Mapping\Loader;
 
+require_once __DIR__.'/../../Fixtures/ConstraintA.php';
+
 use Symfony\Component\Validator\Mapping\ClassMetadata;
 use Symfony\Component\Validator\Mapping\Loader\StaticMethodLoader;
-use Symfony\Component\Validator\Constraints\NotNull;
+use Symfony\Tests\Component\Validator\Fixtures\ConstraintA;
 
 class StaticMethodLoaderTest extends \PHPUnit_Framework_TestCase
 {
@@ -75,6 +77,6 @@ class BaseStaticLoaderDocument
 {
     static public function loadMetadata(ClassMetadata $metadata)
     {
-        $metadata->addConstraint(new NotNull());
+        $metadata->addConstraint(new ConstraintA());
     }
 }

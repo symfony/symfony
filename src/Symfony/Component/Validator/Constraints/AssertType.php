@@ -31,4 +31,12 @@ class AssertType extends \Symfony\Component\Validator\Constraint
     {
         return array('type');
     }
+
+    /**
+     * {@inheritDoc}
+     */
+    public function targets()
+    {
+        return self::PROPERTY_CONSTRAINT;
+    }
 }

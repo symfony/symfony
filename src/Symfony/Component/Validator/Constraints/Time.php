@@ -14,4 +14,12 @@ namespace Symfony\Component\Validator\Constraints;
 class Time extends \Symfony\Component\Validator\Constraint
 {
     public $message = 'This value is not a valid time';
+
+    /**
+     * {@inheritDoc}
+     */
+    public function targets()
+    {
+        return self::PROPERTY_CONSTRAINT;
+    }
 }

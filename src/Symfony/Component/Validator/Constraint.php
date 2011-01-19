@@ -28,7 +28,23 @@ use Symfony\Component\Validator\Exception\ConstraintDefinitionException;
  */
 abstract class Constraint
 {
+    /**
+     * The name of the group given to all constraints with no explicit group
+     * @var string
+     */
     const DEFAULT_GROUP = 'Default';
+
+    /**
+     * Marks a constraint that can be put onto classes
+     * @var string
+     */
+    const CLASS_CONSTRAINT = 'class';
+
+    /**
+     * Marks a constraint that can be put onto properties
+     * @var string
+     */
+    const PROPERTY_CONSTRAINT = 'property';
 
     /**
      * @var array
@@ -173,4 +189,15 @@ abstract class Constraint
     {
         return get_class($this) . 'Validator';
     }
+
+    /**
+     * Returns whether the constraint can be put onto classes, properties or
+     * both
+     *
+     * This method should return one or more of the constants
+     * Constraint::CLASS_CONSTRAINT and Constraint::PROPERTY_CONSTRAINT.
+     *
+     * @return string|array  One or more constant values
+     */
+    abstract public function targets();
 }

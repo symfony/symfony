@@ -8,51 +8,52 @@
 
     <!-- CLASS CONSTRAINTS -->
 
-    <!-- Constraint without value -->
-    <constraint name="NotNull" />
-
     <!-- Custom constraint -->
     <constraint name="Symfony\Tests\Component\Validator\Fixtures\ConstraintA" />
-    
-    <!-- Constraint with single value -->
-    <constraint name="Min">3</constraint>
-    
-    <!-- Constraint with multiple values -->
-    <constraint name="Choice">
-      <value>A</value>
-      <value>B</value>
-    </constraint>
-    
-    <!-- Constraint with child constraints -->
-    <constraint name="All">
-      <constraint name="NotNull" />
-      <constraint name="Min">3</constraint>
-    </constraint>
-    
-    <!-- Option with child constraints -->
-    <constraint name="All">
-      <option name="constraints">
-        <constraint name="NotNull" />
-        <constraint name="Min">3</constraint>
-      </option>
-    </constraint>
-    
-    <!-- Value with child constraints -->
-    <constraint name="Collection">
-      <option name="fields">
-        <value key="foo">
-          <constraint name="NotNull" />
-          <constraint name="Min">3</constraint>
-        </value>
-        <value key="bar">
-          <constraint name="Min">5</constraint>
-        </value>
-      </option>
-    </constraint>
 
     <!-- PROPERTY CONSTRAINTS -->
 
     <property name="firstName">
+  
+      <!-- Constraint without value -->
+      <constraint name="NotNull" />
+      
+      <!-- Constraint with single value -->
+      <constraint name="Min">3</constraint>
+      
+      <!-- Constraint with multiple values -->
+      <constraint name="Choice">
+        <value>A</value>
+        <value>B</value>
+      </constraint>
+      
+      <!-- Constraint with child constraints -->
+      <constraint name="All">
+        <constraint name="NotNull" />
+        <constraint name="Min">3</constraint>
+      </constraint>
+      
+      <!-- Option with child constraints -->
+      <constraint name="All">
+        <option name="constraints">
+          <constraint name="NotNull" />
+          <constraint name="Min">3</constraint>
+        </option>
+      </constraint>
+      
+      <!-- Value with child constraints -->
+      <constraint name="Collection">
+        <option name="fields">
+          <value key="foo">
+            <constraint name="NotNull" />
+            <constraint name="Min">3</constraint>
+          </value>
+          <value key="bar">
+            <constraint name="Min">5</constraint>
+          </value>
+        </option>
+      </constraint>
+      
       <!-- Constraint with options -->
       <constraint name="Choice">
         <!-- Option with single value -->

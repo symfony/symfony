@@ -24,4 +24,12 @@ class All extends \Symfony\Component\Validator\Constraint
     {
         return array('constraints');
     }
+
+    /**
+     * {@inheritDoc}
+     */
+    public function targets()
+    {
+        return self::PROPERTY_CONSTRAINT;
+    }
 }

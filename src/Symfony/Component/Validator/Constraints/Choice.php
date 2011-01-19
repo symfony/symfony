@@ -29,4 +29,12 @@ class Choice extends \Symfony\Component\Validator\Constraint
     {
         return 'choices';
     }
+
+    /**
+     * {@inheritDoc}
+     */
+    public function targets()
+    {
+        return self::PROPERTY_CONSTRAINT;
+    }
 }

@@ -57,13 +57,12 @@ class AnnotationLoaderTest extends \PHPUnit_Framework_TestCase
 
         $expected = new ClassMetadata('Symfony\Tests\Component\Validator\Fixtures\Entity');
         $expected->setGroupSequence(array('Foo', 'Entity'));
-        $expected->addConstraint(new NotNull());
         $expected->addConstraint(new ConstraintA());
-        $expected->addConstraint(new Min(3));
-        $expected->addConstraint(new Choice(array('A', 'B')));
-        $expected->addConstraint(new All(array(new NotNull(), new Min(3))));
-        $expected->addConstraint(new All(array('constraints' => array(new NotNull(), new Min(3)))));
-        $expected->addConstraint(new Collection(array('fields' => array(
+        $expected->addPropertyConstraint('firstName', new NotNull());
+        $expected->addPropertyConstraint('firstName', new Min(3));
+        $expected->addPropertyConstraint('firstName', new All(array(new NotNull(), new Min(3))));
+        $expected->addPropertyConstraint('firstName', new All(array('constraints' => array(new NotNull(), new Min(3)))));
+        $expected->addPropertyConstraint('firstName', new Collection(array('fields' => array(
             'foo' => array(new NotNull(), new Min(3)),
             'bar' => new Min(5),
         ))));
@@ -122,13 +121,12 @@ class AnnotationLoaderTest extends \PHPUnit_Framework_TestCase
         $expected->mergeConstraints($expected_parent);
 
         $expected->setGroupSequence(array('Foo', 'Entity'));
-        $expected->addConstraint(new NotNull());
         $expected->addConstraint(new ConstraintA());
-        $expected->addConstraint(new Min(3));
-        $expected->addConstraint(new Choice(array('A', 'B')));
-        $expected->addConstraint(new All(array(new NotNull(), new Min(3))));
-        $expected->addConstraint(new All(array('constraints' => array(new NotNull(), new Min(3)))));
-        $expected->addConstraint(new Collection(array('fields' => array(
+        $expected->addPropertyConstraint('firstName', new NotNull());
+        $expected->addPropertyConstraint('firstName', new Min(3));
+        $expected->addPropertyConstraint('firstName', new All(array(new NotNull(), new Min(3))));
+        $expected->addPropertyConstraint('firstName', new All(array('constraints' => array(new NotNull(), new Min(3)))));
+        $expected->addPropertyConstraint('firstName', new Collection(array('fields' => array(
             'foo' => array(new NotNull(), new Min(3)),
             'bar' => new Min(5),
         ))));

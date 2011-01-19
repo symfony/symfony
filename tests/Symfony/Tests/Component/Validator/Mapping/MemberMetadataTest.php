@@ -13,9 +13,11 @@ namespace Symfony\Tests\Component\Validator\Mapping;
 
 require_once __DIR__.'/../Fixtures/ConstraintA.php';
 require_once __DIR__.'/../Fixtures/ConstraintB.php';
+require_once __DIR__.'/../Fixtures/ClassConstraint.php';
 
 use Symfony\Tests\Component\Validator\Fixtures\ConstraintA;
 use Symfony\Tests\Component\Validator\Fixtures\ConstraintB;
+use Symfony\Tests\Component\Validator\Fixtures\ClassConstraint;
 use Symfony\Component\Validator\Constraints\Valid;
 use Symfony\Component\Validator\Mapping\MemberMetadata;
 
@@ -48,6 +50,13 @@ class MemberMetadataTest extends \PHPUnit_Framework_TestCase
         $this->assertEquals(array($constraint), $this->metadata->getConstraints());
         $this->assertEquals($result, $this->metadata);
         $this->assertFalse($this->metadata->isCascaded());
+    }
+
+    public function testAddConstraintRequiresClassConstraints()
+    {
+        $this->setExpectedException('Symfony\Component\Validator\Exception\ConstraintDefinitionException');
+
+        $this->metadata->addConstraint(new ClassConstraint());
     }
 
     public function testSerialize()

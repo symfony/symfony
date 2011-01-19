@@ -15,4 +15,12 @@ class Url extends \Symfony\Component\Validator\Constraint
 {
     public $message = 'This value is not a valid URL';
     public $protocols = array('http', 'https');
+
+    /**
+     * {@inheritDoc}
+     */
+    public function targets()
+    {
+        return self::PROPERTY_CONSTRAINT;
+    }
 }

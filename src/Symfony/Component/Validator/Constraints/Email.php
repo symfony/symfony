@@ -15,4 +15,12 @@ class Email extends \Symfony\Component\Validator\Constraint
 {
     public $message = 'This value is not a valid email address';
     public $checkMX = false;
+
+    /**
+     * {@inheritDoc}
+     */
+    public function targets()
+    {
+        return self::PROPERTY_CONSTRAINT;
+    }
 }

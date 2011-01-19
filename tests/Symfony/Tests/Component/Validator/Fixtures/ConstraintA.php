@@ -13,4 +13,9 @@ class ConstraintA extends Constraint
     {
         return 'property2';
     }
+
+    public function targets()
+    {
+        return array(self::PROPERTY_CONSTRAINT, self::CLASS_CONSTRAINT);
+    }
 }

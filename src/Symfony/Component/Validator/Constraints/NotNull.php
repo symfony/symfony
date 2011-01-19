@@ -14,4 +14,12 @@ namespace Symfony\Component\Validator\Constraints;
 class NotNull extends \Symfony\Component\Validator\Constraint
 {
     public $message = 'This value should not be null';
+
+    /**
+     * {@inheritDoc}
+     */
+    public function targets()
+    {
+        return self::PROPERTY_CONSTRAINT;
+    }
 }

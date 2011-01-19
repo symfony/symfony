@@ -96,8 +96,10 @@ class ClassMetadata extends ElementMetadata
      */
     public function addConstraint(Constraint $constraint)
     {
-        if ($constraint instanceof Valid) {
-            throw new ConstraintDefinitionException('The constraint Valid can only be put on properties or getters');
+        if (!in_array(Constraint::CLASS_CONSTRAINT, (array)$constraint->targets())) {
+            throw new ConstraintDefinitionException(sprintf(
+            		'The constraint %s cannot be put on classes',
+                    get_class($constraint)));
         }
 
         $constraint->addImplicitGroupName($this->getDefaultGroup());

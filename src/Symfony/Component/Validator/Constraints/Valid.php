@@ -28,4 +28,12 @@ class Valid extends \Symfony\Component\Validator\Constraint
             throw new ConstraintDefinitionException('The constraint Valid does not accept any options');
         }
     }
+
+    /**
+     * {@inheritDoc}
+     */
+    public function targets()
+    {
+        return self::PROPERTY_CONSTRAINT;
+    }
 }

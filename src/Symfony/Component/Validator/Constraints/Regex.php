@@ -32,4 +32,12 @@ class Regex extends \Symfony\Component\Validator\Constraint
     {
         return array('pattern');
     }
+
+    /**
+     * {@inheritDoc}
+     */
+    public function targets()
+    {
+        return self::PROPERTY_CONSTRAINT;
+    }
 }

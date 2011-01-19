@@ -35,7 +35,7 @@ class GraphWalker
 
     public function __construct($root, ClassMetadataFactoryInterface $metadataFactory, ConstraintValidatorFactoryInterface $factory)
     {
-        $this->context = new ValidationContext($root, $this, $metadataFactory);
+        $this->context = new ExecutionContext($root, $this, $metadataFactory);
         $this->validatorFactory = $factory;
         $this->metadataFactory = $metadataFactory;
     }

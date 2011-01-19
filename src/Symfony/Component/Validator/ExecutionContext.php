@@ -22,7 +22,7 @@ use Symfony\Component\Validator\Mapping\ClassMetadataFactoryInterface;
  * @author Fabien Potencier <fabien.potencier@symfony-project.com>
  * @author Bernhard Schussek <bernhard.schussek@symfony-project.com>
  */
-class ValidationContext
+class ExecutionContext
 {
     protected $root;
     protected $propertyPath;

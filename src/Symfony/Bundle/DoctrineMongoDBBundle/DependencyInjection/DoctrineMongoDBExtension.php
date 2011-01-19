@@ -44,6 +44,7 @@ class DoctrineMongoDBExtension extends AbstractDoctrineExtension
         $this->loadDefaults($config, $container);
         $this->loadConnections($config, $container);
         $this->loadDocumentManagers($config, $container);
+        $this->loadConstraints($config, $container);
     }
 
     /**
@@ -337,6 +338,16 @@ class DoctrineMongoDBExtension extends AbstractDoctrineExtension
             $method = $odmConfigDef->removeMethodCall('setDocumentNamespaces');
         }
         $odmConfigDef->addMethodCall('setDocumentNamespaces', array($this->aliasMap));
+    }
+
+    protected function loadConstraints($config, ContainerBuilder $container)
+    {
+        if ($container->hasParameter('validator.annotations.namespaces')) {
+            $container->setParameter('validator.annotations.namespaces', array_merge(
+                $container->getParamter('validator.annotations.namespaces'),
+                array('Symfony\Bundle\DoctrineMongoDBBundle\Validator\Constraints\\')
+            ));
+        }
     }
 
     protected function getObjectManagerElementName($name)

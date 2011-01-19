@@ -122,7 +122,7 @@ class SwitchUserListener implements ListenerInterface
             throw new \LogicException(sprintf('You are already switched to "%s" user.', (string) $token));
         }
 
-        $this->accessDecisionManager->decide($token, null, array($this->role));
+        $this->accessDecisionManager->decide($token, array($this->role));
 
         $username = $request->get($this->usernameParameter);
 

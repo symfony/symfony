@@ -274,11 +274,14 @@ $size = $cursor->count();
             throw new AclNotFoundException('There is no ACL for the given object identity.');
         }
         $ancestorIds = array();
+        $stringIds = array();
         foreach($cursor as $result) {
             $ancestorIds[] = $result['_id'];
             $ancestorIds = array_merge($ancestorIds, $result['ancestors']);
         }
-
+foreach($ancestorIds as $id) {
+    $stringIds[] = (string)$id;
+}
         return array("object_identity._id" => array('$in'=>$ancestorIds));
     }
 
@@ -324,24 +327,22 @@ $size = $cursor->count();
         // but it is faster
         $size = $cursor->count();
         if(1<$size) {
-            $cursor->batchNum($size);
+//            $cursor->batchSize($size);
         }
-        foreach ($cursor->current() as $data) {
-            list($aclId,
-                 $objectIdentity,
-                 $parentObjectIdentityId,
-                 $entriesInheriting,
-                 $aceId,
-                 $objectIdentityId,
-                 $fieldName,
-                 $aceOrder,
-                 $mask,
-                 $granting,
-                 $grantingStrategy,
-                 $auditSuccess,
-                 $auditFailure,
-                 $securityIdentity) = $data;
-
+        foreach($cursor as $data) {
+            list($aceMongoId,
+                $objectIdentity,
+                $fieldName,
+                $aceOrder,
+                $securityIdentity,
+                $mask,
+                $granting,
+                $grantingStrategy,
+                $auditSuccess,
+                $auditFailure) = array_values($data);
+$aclId = (string)$objectIdentity['_id'];
+$classType = $objectIdentity['object_identity']['type'];
+$objectIdentifier = $objectIdentity['object_identity']['identifier'];
             // has the ACL been hydrated during this hydration cycle?
             if (isset($acls[$aclId])) {
                 $acl = $acls[$aclId];
@@ -368,19 +369,21 @@ $size = $cursor->count();
             // so, this hasn't been hydrated yet
             else {
                 // create object identity if we haven't done so yet
-                $oidLookupKey = $objectIdentity['_id'];
+                $oidLookupKey = (string)$objectIdentity['_id'];
+                $oidLookupKey = $objectIdentifier.$classType;
                 if (!isset($oidCache[$oidLookupKey])) {
                     $oidCache[$oidLookupKey] = new ObjectIdentity($objectIdentifier, $classType);
                 }
 
-                $acl = new Acl((integer) $aclId, $oidCache[$oidLookupKey], $permissionGrantingStrategy, $emptyArray, !!$entriesInheriting);
+                $acl = new Acl($aclId, $oidCache[$oidLookupKey], $permissionGrantingStrategy, $emptyArray, !!$objectIdentity['entries_inheriting']);
 
                 // keep a local, and global reference to this ACL
                 $loadedAcls[$classType][$objectIdentifier] = $acl;
                 $acls[$aclId] = $acl;
 
                 // try to fill in parent ACL, or defer until all ACLs have been hydrated
-                if (null !== $parentObjectIdentityId) {
+                if (isset($objectIdentity['parent'])) {
+                    $parentObjectIdentityId = (string)$objectIdentity['parent']['_id'];
                     if (isset($acls[$parentObjectIdentityId])) {
                         $aclParentAclProperty->setValue($acl, $acls[$parentObjectIdentityId]);
                     } else {
@@ -392,6 +395,7 @@ $size = $cursor->count();
             }
 
             // check if this row contains an ACE record
+            $aceId = (string)$aceMongoId;
             if (null !== $aceId) {
                 // have we already hydrated ACEs for this ACL?
                 if (!isset($aces[$aclId])) {
@@ -403,27 +407,30 @@ $size = $cursor->count();
                 // It is important to only ever have one ACE instance per actual row since
                 // some ACEs are shared between ACL instances
                 if (!isset($loadedAces[$aceId])) {
-                    if (!isset($sids[$key = ($username?'1':'0').$securityIdentifier])) {
+                    $username = $securityIdentity['username'];
+                    $securityIdentifier = $securityIdentity['identifier'];
+                    $securityId = (string)$securityIdentity['_id'];
+                    if (!isset($sids[$securityId])) {
                         if ($username) {
-                            $sids[$key] = new UserSecurityIdentity(
+                            $sids[$securityId] = new UserSecurityIdentity(
                                 substr($securityIdentifier, 1 + $pos = strpos($securityIdentifier, '-')),
                                 substr($securityIdentifier, 0, $pos)
                             );
                         } else {
-                            $sids[$key] = new RoleSecurityIdentity($securityIdentifier);
+                            $sids[$securityId] = new RoleSecurityIdentity($securityIdentifier);
                         }
                     }
 
                     if (null === $fieldName) {
-                        $loadedAces[$aceId] = new Entry((integer) $aceId, $acl, $sids[$key], $grantingStrategy, (integer) $mask, !!$granting, !!$auditFailure, !!$auditSuccess);
+                        $loadedAces[$aceId] = new Entry($aceId, $acl, $sids[$securityId], $grantingStrategy, (integer) $mask, !!$granting, !!$auditFailure, !!$auditSuccess);
                     } else {
-                        $loadedAces[$aceId] = new FieldEntry((integer) $aceId, $acl, $fieldName, $sids[$key], $grantingStrategy, (integer) $mask, !!$granting, !!$auditFailure, !!$auditSuccess);
+                        $loadedAces[$aceId] = new FieldEntry($aceId, $acl, $fieldName, $sids[$securityId], $grantingStrategy, (integer) $mask, !!$granting, !!$auditFailure, !!$auditSuccess);
                     }
                 }
                 $ace = $loadedAces[$aceId];
 
                 // assign ACE to the correct property
-                if (null === $objectIdentityId) {
+                if (null === $objectIdentity) {
                     if (null === $fieldName) {
                         $aces[$aclId][0][$aceOrder] = $ace;
                     } else {

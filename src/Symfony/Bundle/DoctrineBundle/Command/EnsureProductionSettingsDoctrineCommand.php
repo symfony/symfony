@@ -36,11 +36,11 @@ class EnsureProductionSettingsDoctrineCommand extends EnsureProductionSettingsCo
             ->setHelp(<<<EOT
 The <info>doctrine:cache:clear-metadata</info> command clears all metadata cache for the default entity manager:
 
-  <info>./symfony doctrine:cache:clear-metadata</info>
+  <info>./app/console doctrine:cache:clear-metadata</info>
 
 You can also optionally specify the <comment>--em</comment> option to specify which entity manager to clear the cache for:
 
-  <info>./symfony doctrine:cache:clear-metadata --em=default</info>
+  <info>./app/console doctrine:cache:clear-metadata --em=default</info>
 EOT
         );
     }

@@ -36,11 +36,11 @@ class CreateSchemaDoctrineCommand extends CreateCommand
             ->setHelp(<<<EOT
 The <info>doctrine:schema:create</info> command creates the default entity managers schema:
 
-  <info>./symfony doctrine:schema:create</info>
+  <info>./app/console doctrine:schema:create</info>
 
 You can also optionally specify the name of a entity manager to create the schema for:
 
-  <info>./symfony doctrine:schema:create --em=default</info>
+  <info>./app/console doctrine:schema:create --em=default</info>
 EOT
         );
     }

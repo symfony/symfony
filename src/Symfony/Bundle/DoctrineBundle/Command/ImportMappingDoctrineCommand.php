@@ -42,11 +42,11 @@ class ImportMappingDoctrineCommand extends DoctrineCommand
             ->setHelp(<<<EOT
 The <info>doctrine:mapping:import</info> command imports mapping information from an existing database:
 
-  <info>./symfony doctrine:mapping:import "Bundle\MyCustomBundle" xml</info>
+  <info>./app/console doctrine:mapping:import "Bundle\MyCustomBundle" xml</info>
 
 You can also optionally specify which entity manager to import from with the <info>--em</info> option:
 
-  <info>./symfony doctrine:mapping:import "Bundle\MyCustomBundle" xml --em=default</info>
+  <info>./app/console doctrine:mapping:import "Bundle\MyCustomBundle" xml --em=default</info>
 EOT
         );
     }

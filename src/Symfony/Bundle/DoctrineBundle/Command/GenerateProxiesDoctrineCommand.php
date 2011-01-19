@@ -36,7 +36,7 @@ class GenerateProxiesDoctrineCommand extends GenerateProxiesCommand
             ->setHelp(<<<EOT
 The <info>doctrine:generate:proxies</info> command generates proxy classes for your entities:
 
-  <info>./symfony doctrine:generate:proxies</info>
+  <info>./app/console doctrine:generate:proxies</info>
 EOT
         );
     }

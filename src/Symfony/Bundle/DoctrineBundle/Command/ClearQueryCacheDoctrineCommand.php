@@ -35,11 +35,11 @@ class ClearQueryCacheDoctrineCommand extends QueryCommand
             ->setHelp(<<<EOT
 The <info>doctrine:cache:clear-query</info> command clears all query cache for the default entity manager:
 
-  <info>./symfony doctrine:cache:clear-query</info>
+  <info>./app/console doctrine:cache:clear-query</info>
 
 You can also optionally specify the <comment>--em</comment> option to specify which entity manager to clear the cache for:
 
-  <info>./symfony doctrine:cache:clear-query --em=default</info>
+  <info>./app/console doctrine:cache:clear-query --em=default</info>
 EOT
         );
     }

@@ -36,11 +36,11 @@ class UpdateSchemaDoctrineCommand extends UpdateCommand
             ->setHelp(<<<EOT
 The <info>doctrine:schema:update</info> command updates the default entity managers schema:
 
-  <info>./symfony doctrine:schema:update</info>
+  <info>./app/console doctrine:schema:update</info>
 
 You can also optionally specify the name of a entity manager to update the schema for:
 
-  <info>./symfony doctrine:schema:update --em=default</info>
+  <info>./app/console doctrine:schema:update --em=default</info>
 EOT
         );
     }

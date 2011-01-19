@@ -36,11 +36,11 @@ class DropSchemaDoctrineCommand extends DropCommand
             ->setHelp(<<<EOT
 The <info>doctrine:schema:drop</info> command drops the default entity managers schema:
 
-  <info>./symfony doctrine:schema:drop</info>
+  <info>./app/console doctrine:schema:drop</info>
 
 You can also optionally specify the name of a entity manager to drop the schema for:
 
-  <info>./symfony doctrine:schema:drop --em=default</info>
+  <info>./app/console doctrine:schema:drop --em=default</info>
 EOT
         );
     }

@@ -36,7 +36,7 @@ class ConvertMappingDoctrineCommand extends ConvertMappingCommand
             ->setHelp(<<<EOT
 The <info>doctrine:mapping:convert</info> command converts mapping information between supported formats:
 
-  <info>./symfony doctrine:mapping:convert xml /path/to/output</info>
+  <info>./app/console doctrine:mapping:convert xml /path/to/output</info>
 EOT
         );
     }

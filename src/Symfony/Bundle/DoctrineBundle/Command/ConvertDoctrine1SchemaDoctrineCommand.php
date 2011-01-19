@@ -43,7 +43,7 @@ class ConvertDoctrine1SchemaDoctrineCommand extends DoctrineCommand
             ->setHelp(<<<EOT
 The <info>doctrine:mapping:convert-d1-schema</info> command converts a Doctrine 1 schema to Doctrine 2 mapping files:
 
-  <info>./symfony doctrine:mapping:convert-d1-schema /path/to/doctrine1schema "Bundle\MyBundle" xml</info>
+  <info>./app/console doctrine:mapping:convert-d1-schema /path/to/doctrine1schema "Bundle\MyBundle" xml</info>
 
 Each Doctrine 1 model will have its own XML mapping file located in <info>Bundle/MyBundle/config/doctrine/metadata</info>.
 EOT

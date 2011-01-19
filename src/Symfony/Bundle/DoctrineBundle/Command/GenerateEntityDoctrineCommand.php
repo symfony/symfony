@@ -40,13 +40,13 @@ class GenerateEntityDoctrineCommand extends DoctrineCommand
             ->setHelp(<<<EOT
 The <info>doctrine:generate:entity</info> task initializes a new Doctrine entity inside a bundle:
 
-  <info>./symfony doctrine:generate:entity "Bundle\MyCustomBundle" "User\Group"</info>
+  <info>./app/console doctrine:generate:entity "Bundle\MyCustomBundle" "User\Group"</info>
 
 The above would initialize a new entity in the following entity namespace <info>Bundle\MyCustomBundle\Entity\User\Group</info>.
 
 You can also optionally specify the fields you want to generate in the new entity:
 
-  <info>./symfony doctrine:generate:entity "Bundle\MyCustomBundle" "User\Group" --fields="name:string(255) description:text"</info>
+  <info>./app/console doctrine:generate:entity "Bundle\MyCustomBundle" "User\Group" --fields="name:string(255) description:text"</info>
 EOT
         );
     }

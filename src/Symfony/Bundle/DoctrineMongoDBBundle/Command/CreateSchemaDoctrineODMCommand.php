@@ -35,11 +35,11 @@ class CreateSchemaDoctrineODMCommand extends CreateCommand
             ->setHelp(<<<EOT
 The <info>doctrine:mongodb:schema:create</info> command creates the default document manager's schema:
 
-  <info>./symfony doctrine:mongodb:schema:create</info>
+  <info>./app/console doctrine:mongodb:schema:create</info>
 
 You can also optionally specify the name of a document manager to create the schema for:
 
-  <info>./symfony doctrine:mongodb:schema:create --dm=default</info>
+  <info>./app/console doctrine:mongodb:schema:create --dm=default</info>
 EOT
         );
     }

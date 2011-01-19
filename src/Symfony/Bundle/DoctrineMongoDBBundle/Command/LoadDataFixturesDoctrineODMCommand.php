@@ -43,15 +43,15 @@ class LoadDataFixturesDoctrineODMCommand extends DoctrineODMCommand
             ->setHelp(<<<EOT
 The <info>doctrine:mongodb:data:load</info> command loads data fixtures from your bundles:
 
-  <info>./symfony doctrine:mongodb:data:load</info>
+  <info>./app/console doctrine:mongodb:data:load</info>
 
 You can also optionally specify the path to fixtures with the <info>--fixtures</info> option:
 
-  <info>./symfony doctrine:mongodb:data:load --fixtures=/path/to/fixtures1 --fixtures=/path/to/fixtures2</info>
+  <info>./app/console doctrine:mongodb:data:load --fixtures=/path/to/fixtures1 --fixtures=/path/to/fixtures2</info>
 
 If you want to append the fixtures instead of flushing the database first you can use the <info>--append</info> option:
 
-  <info>./symfony doctrine:mongodb:data:load --append</info>
+  <info>./app/console doctrine:mongodb:data:load --append</info>
 EOT
         );
     }

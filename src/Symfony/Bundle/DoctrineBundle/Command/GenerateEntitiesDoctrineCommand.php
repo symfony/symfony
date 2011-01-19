@@ -37,17 +37,17 @@ class GenerateEntitiesDoctrineCommand extends DoctrineCommand
             ->setHelp(<<<EOT
 The <info>doctrine:generate:entities</info> command generates entity classes and method stubs from your mapping information:
 
-  <info>./symfony doctrine:generate:entities</info>
+  <info>./app/console doctrine:generate:entities</info>
 
 The above would generate entity classes for all bundles.
 
 You can also optionally limit generation to entities within an individual bundle:
 
-  <info>./symfony doctrine:generate:entities --bundle="Bundle/MyCustomBundle"</info>
+  <info>./app/console doctrine:generate:entities --bundle="Bundle/MyCustomBundle"</info>
 
 Alternatively, you can limit generation to a single entity within a bundle:
 
-  <info>./symfony doctrine:generate:entities --bundle="Bundle/MyCustomBundle" --entity="User"</info>
+  <info>./app/console doctrine:generate:entities --bundle="Bundle/MyCustomBundle" --entity="User"</info>
 EOT
         );
     }

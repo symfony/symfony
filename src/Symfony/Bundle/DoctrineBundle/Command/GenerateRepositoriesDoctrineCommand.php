@@ -32,7 +32,7 @@ class GenerateRepositoriesDoctrineCommand extends DoctrineCommand
             ->setHelp(<<<EOT
 The <info>doctrine:generate:repositories</info> command generates the configured entity repository classes from your mapping information:
 
-  <info>./symfony doctrine:generate:repositories</info>
+  <info>./app/console doctrine:generate:repositories</info>
 EOT
         );
     }

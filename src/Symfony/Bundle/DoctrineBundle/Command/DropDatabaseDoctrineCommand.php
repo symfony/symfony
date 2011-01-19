@@ -38,11 +38,11 @@ class DropDatabaseDoctrineCommand extends DoctrineCommand
             ->setHelp(<<<EOT
 The <info>doctrine:database:drop</info> command drops the default connections database:
 
-  <info>./symfony doctrine:database:drop</info>
+  <info>./app/console doctrine:database:drop</info>
 
 You can also optionally specify the name of a connection to drop the database for:
 
-  <info>./symfony doctrine:database:drop --connection=default</info>
+  <info>./app/console doctrine:database:drop --connection=default</info>
 EOT
         );
     }

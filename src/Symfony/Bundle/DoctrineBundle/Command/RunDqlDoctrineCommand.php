@@ -36,15 +36,15 @@ class RunDqlDoctrineCommand extends RunDqlCommand
             ->setHelp(<<<EOT
 The <info>doctrine:query:dql</info> command executes the given DQL query and outputs the results:
 
-  <info>./symfony doctrine:query:dql "SELECT u FROM UserBundle:User u"</info>
+  <info>./app/console doctrine:query:dql "SELECT u FROM UserBundle:User u"</info>
 
 You can also optional specify some additional options like what type of hydration to use when executing the query:
 
-  <info>./symfony doctrine:query:dql "SELECT u FROM UserBundle:User u" --hydrate=array</info>
+  <info>./app/console doctrine:query:dql "SELECT u FROM UserBundle:User u" --hydrate=array</info>
 
 Additionaly you can specify the first result and maximum amount of results to show:
 
-  <info>./symfony doctrine:query:dql "SELECT u FROM UserBundle:User u" --first-result=0 --max-result=30</info>
+  <info>./app/console doctrine:query:dql "SELECT u FROM UserBundle:User u" --first-result=0 --max-result=30</info>
 EOT
         );
     }

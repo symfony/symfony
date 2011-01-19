@@ -32,6 +32,7 @@ class GraphWalker
     protected $context;
     protected $validatorFactory;
     protected $metadataFactory;
+    protected $validatedObjects = array();
 
     public function __construct($root, ClassMetadataFactoryInterface $metadataFactory, ConstraintValidatorFactoryInterface $factory)
     {
@@ -57,26 +58,41 @@ class GraphWalker
      * @param  string $group The validator group to use for validation
      * @param  string $propertyPath
      */
-    public function walkClass(ClassMetadata $metadata, $object, $group, $propertyPath)
+    public function walkObject(ClassMetadata $metadata, $object, $group, $propertyPath)
     {
         $this->context->setCurrentClass($metadata->getClassName());
 
         if ($group === Constraint::DEFAULT_GROUP && $metadata->hasGroupSequence()) {
             $groups = $metadata->getGroupSequence();
             foreach ($groups as $group) {
-                $this->walkClassForGroup($metadata, $object, $group, $propertyPath, Constraint::DEFAULT_GROUP);
+                $this->walkObjectForGroup($metadata, $object, $group, $propertyPath, Constraint::DEFAULT_GROUP);
 
                 if (count($this->getViolations()) > 0) {
                     break;
                 }
             }
         } else {
-            $this->walkClassForGroup($metadata, $object, $group, $propertyPath);
+            $this->walkObjectForGroup($metadata, $object, $group, $propertyPath);
         }
     }
 
-    protected function walkClassForGroup(ClassMetadata $metadata, $object, $group, $propertyPath, $propagatedGroup = null)
+    protected function walkObjectForGroup(ClassMetadata $metadata, $object, $group, $propertyPath, $propagatedGroup = null)
     {
+        $hash = spl_object_hash($object);
+
+        // Exit, if the object is already validated for the current group
+        if (isset($this->validatedObjects[$hash])) {
+            if (isset($this->validatedObjects[$hash][$group])) {
+                return;
+            }
+        } else {
+            $this->validatedObjects[$hash] = array();
+        }
+
+        // Remember validating this object before starting and possibly
+        // traversing the object graph
+        $this->validatedObjects[$hash][$group] = true;
+
         foreach ($metadata->findConstraints($group) as $constraint) {
             $this->walkConstraint($constraint, $object, $group, $propertyPath);
         }
@@ -128,7 +144,7 @@ class GraphWalker
                 throw new UnexpectedTypeException($value, 'object or array');
             } else {
                 $metadata = $this->metadataFactory->getClassMetadata(get_class($value));
-                $this->walkClass($metadata, $value, $group, $propertyPath);
+                $this->walkObject($metadata, $value, $group, $propertyPath);
             }
         }
     }

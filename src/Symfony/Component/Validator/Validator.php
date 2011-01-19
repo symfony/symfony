@@ -46,7 +46,7 @@ class Validator implements ValidatorInterface
         $metadata = $this->metadataFactory->getClassMetadata(get_class($object));
 
         $walk = function(GraphWalker $walker, $group) use ($metadata, $object) {
-            return $walker->walkClass($metadata, $object, $group, '');
+            return $walker->walkObject($metadata, $object, $group, '');
         };
 
         return $this->validateGraph($object, $walk, $groups);

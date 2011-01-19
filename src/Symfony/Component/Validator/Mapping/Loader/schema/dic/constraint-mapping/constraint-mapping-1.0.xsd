@@ -24,7 +24,7 @@
       ]]></xsd:documentation>
     </xsd:annotation>
     <xsd:sequence>
-      <xsd:element name="namespace" type="namespace" maxOccurs="unbounded" />
+      <xsd:element name="namespace" type="namespace" minOccurs="0" maxOccurs="unbounded" />
       <xsd:element name="class" type="class" maxOccurs="unbounded" />
     </xsd:sequence>
   </xsd:complexType>

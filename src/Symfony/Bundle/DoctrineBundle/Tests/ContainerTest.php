@@ -11,7 +11,6 @@
 
 namespace Symfony\Bundle\DoctrineBundle\Tests;
 
-use Symfony\Component\DependencyInjection\Dumper\PhpDumper;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\DependencyInjection\ParameterBag\ParameterBag;
 use Symfony\Bundle\DoctrineBundle\DependencyInjection\DoctrineExtension;
@@ -46,10 +45,7 @@ class ContainerTest extends TestCase
 
         $container->setDefinition('my.platform', new \Symfony\Component\DependencyInjection\Definition('Doctrine\DBAL\Platforms\MySqlPlatform'));
 
-        $dumper = new PhpDumper($container);
-        $code = $dumper->dump(array('class' => 'DoctrineBundleTestsProjectServiceContainer'));
-        eval(str_replace('<?php', null, $code));
-        return new \DoctrineBundleTestsProjectServiceContainer;
+        return $container;
     }
 
     public function testContainer()

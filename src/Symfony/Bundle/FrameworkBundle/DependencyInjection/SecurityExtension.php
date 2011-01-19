@@ -585,7 +585,7 @@ class SecurityExtension extends Extension
         }
 
         if (isset($config['connection'])) {
-            $container->setAlias(sprintf('doctrine.dbal.%s_connection', $config['connection']), 'security.acl.dbal.connection');
+            $container->setAlias('security.acl.dbal.connection', sprintf('doctrine.dbal.%s_connection', $config['connection']));
         }
 
         if (isset($config['cache'])) {

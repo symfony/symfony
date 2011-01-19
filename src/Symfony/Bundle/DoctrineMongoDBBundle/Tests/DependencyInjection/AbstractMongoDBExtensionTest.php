@@ -49,6 +49,8 @@ abstract class AbstractMongoDBExtensionTest extends TestCase
         $this->assertEquals('Doctrine\ODM\MongoDB\Mapping\Driver\XmlDriver', $container->getParameter('doctrine.odm.mongodb.metadata.xml_class'));
         $this->assertEquals('Doctrine\ODM\MongoDB\Mapping\Driver\YamlDriver', $container->getParameter('doctrine.odm.mongodb.metadata.yml_class'));
 
+        $this->assertEquals('Symfony\Bundle\DoctrineMongoDBBundle\Validator\Constraints\DoctrineMongoDBUniqueValidator', $container->getParameter('doctrine_odm.mongodb.validator.unique.class'));
+
         $config = array(
             'proxy_namespace' => 'MyProxies',
             'auto_generate_proxy_classes' => true,
@@ -318,6 +320,23 @@ abstract class AbstractMongoDBExtensionTest extends TestCase
 
         $this->assertEquals('apc', $container->getParameter('doctrine.odm.mongodb.metadata_cache_driver'));
         $this->assertTrue($container->getParameter('doctrine.odm.mongodb.auto_generate_proxy_classes'));
+    }
+
+    public function testRegistersValidatorNamespace()
+    {
+        $container = $this->getContainer();
+
+        $container->setParameter('validator.annotations.namespaces', array('Namespace1\\', 'Namespace2\\'));
+
+        $loader = new DoctrineMongoDBExtension();
+
+        $loader->mongodbLoad(array(), $container);
+
+        $this->assertEquals(array(
+            'Namespace1\\',
+            'Namespace2\\',
+            'Symfony\Bundle\DoctrineMongoDBBundle\Validator\Constraints\\'
+        ), $container->getParameter('validator.annotations.namespaces'));
     }
 
     protected function getContainer($bundle = 'YamlBundle')

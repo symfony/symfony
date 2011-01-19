@@ -344,7 +344,7 @@ class DoctrineMongoDBExtension extends AbstractDoctrineExtension
     {
         if ($container->hasParameter('validator.annotations.namespaces')) {
             $container->setParameter('validator.annotations.namespaces', array_merge(
-                $container->getParamter('validator.annotations.namespaces'),
+                $container->getParameter('validator.annotations.namespaces'),
                 array('Symfony\Bundle\DoctrineMongoDBBundle\Validator\Constraints\\')
             ));
         }

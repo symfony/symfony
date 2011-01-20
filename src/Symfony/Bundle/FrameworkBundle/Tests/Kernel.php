@@ -87,7 +87,8 @@ class Kernel extends BaseKernel
 
         $this->bundles = $this->registerBundles();
         $this->bundleDirs = $this->registerBundleDirs();
-        $this->container = $this->initializeContainer();
+
+        $this->initializeContainer();
 
         foreach ($this->bundles as $bundle) {
             $bundle->setContainer($this->container);

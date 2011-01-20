@@ -142,7 +142,8 @@ abstract class Kernel implements HttpKernelInterface, \Serializable
 
         $this->bundles = $this->registerBundles();
         $this->bundleDirs = $this->registerBundleDirs();
-        $this->container = $this->initializeContainer();
+
+        $this->initializeContainer();
 
         // load core classes
         ClassCollectionLoader::load(
@@ -343,10 +344,8 @@ abstract class Kernel implements HttpKernelInterface, \Serializable
 
         require_once $location.'.php';
 
-        $container = new $class();
-        $container->set('kernel', $this);
-
-        return $container;
+        $this->container = new $class();
+        $this->container->set('kernel', $this);
     }
 
     public function getKernelParameters()

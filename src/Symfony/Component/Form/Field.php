@@ -303,17 +303,22 @@ class Field extends Configurable implements FieldInterface
     }
 
     /**
-     * Returns the normalized data of the field.
+     * Returns the data in the format needed for the underlying object.
      *
-     * @return mixed  When the field is not bound, the default data is returned.
-     *                When the field is bound, the normalized bound data is
-     *                returned if the field is valid, null otherwise.
+     * @return mixed
      */
     public function getData()
     {
         return $this->data;
     }
 
+    /**
+     * Returns the normalized data of the field.
+     *
+     * @return mixed  When the field is not bound, the default data is returned.
+     *                When the field is bound, the normalized bound data is
+     *                returned if the field is valid, null otherwise.
+     */
     protected function getNormalizedData()
     {
         return $this->normalizedData;

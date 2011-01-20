@@ -92,6 +92,7 @@ class FieldGroup extends Field implements \IteratorAggregate, FieldGroupInterfac
      * </code>
      *
      * @param FieldInterface|string $field
+     * @return FieldInterface
      */
     public function add($field)
     {
@@ -113,7 +114,7 @@ class FieldGroup extends Field implements \IteratorAggregate, FieldGroupInterfac
             $factory = $this->getRoot()->getFieldFactory();
 
             if (!$factory) {
-                throw new \LogicException('A field factory must be available for automatically creating fields');
+                throw new \LogicException('A field factory must be available to automatically create fields');
             }
 
             $options = func_num_args() > 1 ? func_get_arg(1) : array();
@@ -337,7 +338,7 @@ class FieldGroup extends Field implements \IteratorAggregate, FieldGroupInterfac
     }
 
     /**
-     * Updates the chield fields from the properties of the given data
+     * Updates the child fields from the properties of the given data
      *
      * This method calls updateFromProperty() on all child fields that have a
      * property path set. If a child field has no property path set but

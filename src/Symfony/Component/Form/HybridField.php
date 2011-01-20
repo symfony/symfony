@@ -19,7 +19,8 @@ use Symfony\Component\Form\Exception\FormException;
  * You can use the method setFieldMode() to switch between the modes
  * HybridField::FIELD and HybridField::GROUP. This is useful when you want
  * to create a field that, depending on its configuration, can either be
- * a single field or a combination of different fields.
+ * a single field or a combination of different fields (e.g. a date field
+ * that might be a textbox or several select boxes).
  *
  * @author Bernhard Schussek <bernhard.schussek@symfony-project.com>
  */
@@ -48,16 +49,25 @@ class HybridField extends FieldGroup
         $this->mode = $mode;
     }
 
+    /**
+     * @return boolean
+     */
     public function isField()
     {
         return self::FIELD === $this->mode;
     }
 
+    /**
+     * @return boolean
+     */
     public function isGroup()
     {
         return self::GROUP === $this->mode;
     }
 
+    /**
+     * @return integer
+     */
     public function getFieldMode()
     {
         return $this->mode;

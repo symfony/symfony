@@ -360,7 +360,7 @@ class Field extends Configurable implements FieldInterface
     }
 
     /**
-     * Returns weather there are errors.
+     * Returns whether or not there are errors.
      *
      * @return boolean  true if form is bound and not valid
      */
@@ -376,7 +376,7 @@ class Field extends Configurable implements FieldInterface
     /**
      * Returns all errors
      *
-     * @return array  An array of errors that occured during binding
+     * @return array  An array of FieldError instances that occurred during binding
      */
     public function getErrors()
     {

@@ -27,12 +27,7 @@ abstract class BaseValueTransformer extends Configurable implements ValueTransfo
     protected $locale;
 
     /**
-     * Constructor.
-     *
-     * @param array $options     An array of options
-     *
-     * @throws \InvalidArgumentException when a option is not supported
-     * @throws \RuntimeException         when a required option is not given
+     * {@inheritDoc}
      */
     public function __construct(array $options = array())
     {

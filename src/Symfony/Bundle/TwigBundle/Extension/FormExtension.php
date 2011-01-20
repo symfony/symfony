@@ -115,9 +115,13 @@ class FormExtension extends \Twig_Extension
      *
      *     {{ form_field(field) }}
      *
-     * You can pass additional variables during the call:
+     * You can pass attributes element during the call:
      *
-     *     {{ form_field(field, {'param': 'value'}) }}
+     *     {{ form_field(field, {'class': 'foo'}) }}
+     *
+     * Some fields also accept additional variables as parameters:
+     *
+     *     {{ form_field(field, {}, {'separator': '+++++'}) }}
      *
      * @param FieldInterface $field  The field to render
      * @param array $params          Additional variables passed to the template
@@ -218,6 +222,11 @@ class FormExtension extends \Twig_Extension
         return $field->getData();
     }
 
+    /**
+     * @param FieldInterface $field The field to get the widget for
+     * @param array $resources An array of template resources
+     * @return array
+     */
     protected function getWidget(FieldInterface $field, array $resources = array())
     {
         $cacheable = true;
@@ -241,6 +250,7 @@ class FormExtension extends \Twig_Extension
             $parts = explode('\\', $class);
             $c = array_pop($parts);
 
+            // convert the base class name (e.g. TextareaField) to underscores (e.g. textarea_field)
             $underscore = strtolower(preg_replace(array('/([A-Z]+)([A-Z][a-z])/', '/([a-z\d])([A-Z])/'), array('\\1_\\2', '\\1_\\2'), strtr($c, '_', '.')));
 
             if (isset($templates[$underscore])) {

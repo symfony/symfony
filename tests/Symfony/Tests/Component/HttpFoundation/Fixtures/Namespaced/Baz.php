@@ -1,6 +1,8 @@
 <?php
 
-class Pearlike_Bar
+namespace Namespaced;
+
+class Baz
 {
     public static $loaded = true;
 }

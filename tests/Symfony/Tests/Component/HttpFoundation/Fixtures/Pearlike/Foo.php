@@ -1,5 +1,6 @@
 <?php
 
-class Pearlike_Foo {
+class Pearlike_Foo
+{
     public static $loaded = true;
 }

@@ -2,6 +2,7 @@
 
 namespace Namespaced;
 
-class Bar {
+class Bar
+{
     public static $loaded = true;
 }

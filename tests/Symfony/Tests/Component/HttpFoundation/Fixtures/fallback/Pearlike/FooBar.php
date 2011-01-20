@@ -1,6 +1,6 @@
 <?php
 
-class Pearlike_Bar
+class Pearlike_FooBar
 {
     public static $loaded = true;
 }

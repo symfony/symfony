@@ -16,19 +16,18 @@ use Symfony\Component\HttpFoundation\UniversalClassLoader;
 class UniversalClassLoaderTest extends \PHPUnit_Framework_TestCase
 {
     /**
-     * @covers Symfony\Component\HttpFoundation\UniversalClassLoader::loadClass
-     * @dataProvider testClassProvider
+     * @dataProvider getLoadClassTests
      */
     public function testLoadClass($className, $testClassName, $message)
     {
         $loader = new UniversalClassLoader();
-        $loader->registerNamespace('Namespaced', __DIR__ . DIRECTORY_SEPARATOR . 'Fixtures');
-        $loader->registerPrefix('Pearlike_', __DIR__ . DIRECTORY_SEPARATOR . 'Fixtures');
+        $loader->registerNamespace('Namespaced', __DIR__.DIRECTORY_SEPARATOR.'Fixtures');
+        $loader->registerPrefix('Pearlike_', __DIR__.DIRECTORY_SEPARATOR.'Fixtures');
         $loader->loadClass($testClassName);
         $this->assertTrue(class_exists($className), $message);
     }
 
-    public static function testClassProvider()
+    public function getLoadClassTests()
     {
         return array(
             array('\\Namespaced\\Foo', 'Namespaced\\Foo',   '->loadClass() loads Namespaced\Foo class'),
@@ -39,7 +38,31 @@ class UniversalClassLoaderTest extends \PHPUnit_Framework_TestCase
     }
 
     /**
-     * @dataProvider namespaceCollisionClassProvider
+     * @dataProvider getLoadClassFromFallbackTests
+     */
+    public function testLoadClassFromFallback($className, $testClassName, $message)
+    {
+        $loader = new UniversalClassLoader();
+        $loader->registerNamespace('Namespaced', __DIR__.DIRECTORY_SEPARATOR.'Fixtures');
+        $loader->registerPrefix('Pearlike_', __DIR__.DIRECTORY_SEPARATOR.'Fixtures');
+        $loader->registerNamespaceFallback(__DIR__.DIRECTORY_SEPARATOR.'Fixtures/fallback');
+        $loader->registerPrefixFallback(__DIR__.DIRECTORY_SEPARATOR.'Fixtures/fallback');
+        $loader->loadClass($testClassName);
+        $this->assertTrue(class_exists($className), $message);
+    }
+
+    public function getLoadClassFromFallbackTests()
+    {
+        return array(
+            array('\\Namespaced\\Baz',    'Namespaced\\Baz',    '->loadClass() loads Namespaced\Baz class'),
+            array('\\Pearlike_Baz',       'Pearlike_Baz',       '->loadClass() loads Pearlike_Baz class'),
+            array('\\Namespaced\\FooBar', 'Namespaced\\FooBar', '->loadClass() loads Namespaced\Baz class from fallback dir'),
+            array('\\Pearlike_FooBar',    'Pearlike_FooBar',    '->loadClass() loads Pearlike_Baz class from fallback dir'),
+        );
+    }
+
+    /**
+     * @dataProvider getLoadClassNamespaceCollisionTests
      */
     public function testLoadClassNamespaceCollision($namespaces, $className, $message)
     {
@@ -50,37 +73,37 @@ class UniversalClassLoaderTest extends \PHPUnit_Framework_TestCase
         $this->assertTrue(class_exists($className), $message);
     }
 
-    public static function namespaceCollisionClassProvider()
+    public function getLoadClassNamespaceCollisionTests()
     {
         return array(
             array(
                 array(
-                    'NamespaceCollision\\A' => __DIR__ . DIRECTORY_SEPARATOR . 'Fixtures/alpha',
-                    'NamespaceCollision\\A\\B' => __DIR__ . DIRECTORY_SEPARATOR . 'Fixtures/beta',
+                    'NamespaceCollision\\A' => __DIR__.DIRECTORY_SEPARATOR.'Fixtures/alpha',
+                    'NamespaceCollision\\A\\B' => __DIR__.DIRECTORY_SEPARATOR.'Fixtures/beta',
                 ),
                 'NamespaceCollision\A\Foo',
                 '->loadClass() loads NamespaceCollision\A\Foo from alpha.',
             ),
             array(
                 array(
-                    'NamespaceCollision\\A\\B' => __DIR__ . DIRECTORY_SEPARATOR . 'Fixtures/beta',
-                    'NamespaceCollision\\A' => __DIR__ . DIRECTORY_SEPARATOR . 'Fixtures/alpha',
+                    'NamespaceCollision\\A\\B' => __DIR__.DIRECTORY_SEPARATOR.'Fixtures/beta',
+                    'NamespaceCollision\\A' => __DIR__.DIRECTORY_SEPARATOR.'Fixtures/alpha',
                 ),
                 'NamespaceCollision\A\Bar',
                 '->loadClass() loads NamespaceCollision\A\Bar from alpha.',
             ),
             array(
                 array(
-                    'NamespaceCollision\\A' => __DIR__ . DIRECTORY_SEPARATOR . 'Fixtures/alpha',
-                    'NamespaceCollision\\A\\B' => __DIR__ . DIRECTORY_SEPARATOR . 'Fixtures/beta',
+                    'NamespaceCollision\\A' => __DIR__.DIRECTORY_SEPARATOR.'Fixtures/alpha',
+                    'NamespaceCollision\\A\\B' => __DIR__.DIRECTORY_SEPARATOR.'Fixtures/beta',
                 ),
                 'NamespaceCollision\A\B\Foo',
                 '->loadClass() loads NamespaceCollision\A\B\Foo from beta.',
             ),
             array(
                 array(
-                    'NamespaceCollision\\A\\B' => __DIR__ . DIRECTORY_SEPARATOR . 'Fixtures/beta',
-                    'NamespaceCollision\\A' => __DIR__ . DIRECTORY_SEPARATOR . 'Fixtures/alpha',
+                    'NamespaceCollision\\A\\B' => __DIR__.DIRECTORY_SEPARATOR.'Fixtures/beta',
+                    'NamespaceCollision\\A' => __DIR__.DIRECTORY_SEPARATOR.'Fixtures/alpha',
                 ),
                 'NamespaceCollision\A\B\Bar',
                 '->loadClass() loads NamespaceCollision\A\B\Bar from beta.',
@@ -89,7 +112,7 @@ class UniversalClassLoaderTest extends \PHPUnit_Framework_TestCase
     }
 
     /**
-     * @dataProvider prefixCollisionClassProvider
+     * @dataProvider getLoadClassPrefixCollisionTests
      */
     public function testLoadClassPrefixCollision($prefixes, $className, $message)
     {
@@ -100,37 +123,37 @@ class UniversalClassLoaderTest extends \PHPUnit_Framework_TestCase
         $this->assertTrue(class_exists($className), $message);
     }
 
-    public static function prefixCollisionClassProvider()
+    public function getLoadClassPrefixCollisionTests()
     {
         return array(
             array(
                 array(
-                    'PrefixCollision_A_' => __DIR__ . DIRECTORY_SEPARATOR . 'Fixtures/alpha',
-                    'PrefixCollision_A_B_' => __DIR__ . DIRECTORY_SEPARATOR . 'Fixtures/beta',
+                    'PrefixCollision_A_' => __DIR__.DIRECTORY_SEPARATOR.'Fixtures/alpha',
+                    'PrefixCollision_A_B_' => __DIR__.DIRECTORY_SEPARATOR.'Fixtures/beta',
                 ),
                 'PrefixCollision_A_Foo',
                 '->loadClass() loads PrefixCollision_A_Foo from alpha.',
             ),
             array(
                 array(
-                    'PrefixCollision_A_B_' => __DIR__ . DIRECTORY_SEPARATOR . 'Fixtures/beta',
-                    'PrefixCollision_A_' => __DIR__ . DIRECTORY_SEPARATOR . 'Fixtures/alpha',
+                    'PrefixCollision_A_B_' => __DIR__.DIRECTORY_SEPARATOR.'Fixtures/beta',
+                    'PrefixCollision_A_' => __DIR__.DIRECTORY_SEPARATOR.'Fixtures/alpha',
                 ),
                 'PrefixCollision_A_Bar',
                 '->loadClass() loads PrefixCollision_A_Bar from alpha.',
             ),
             array(
                 array(
-                    'PrefixCollision_A_' => __DIR__ . DIRECTORY_SEPARATOR . 'Fixtures/alpha',
-                    'PrefixCollision_A_B_' => __DIR__ . DIRECTORY_SEPARATOR . 'Fixtures/beta',
+                    'PrefixCollision_A_' => __DIR__.DIRECTORY_SEPARATOR.'Fixtures/alpha',
+                    'PrefixCollision_A_B_' => __DIR__.DIRECTORY_SEPARATOR.'Fixtures/beta',
                 ),
                 'PrefixCollision_A_B_Foo',
                 '->loadClass() loads PrefixCollision_A_B_Foo from beta.',
             ),
             array(
                 array(
-                    'PrefixCollision_A_B_' => __DIR__ . DIRECTORY_SEPARATOR . 'Fixtures/beta',
-                    'PrefixCollision_A_' => __DIR__ . DIRECTORY_SEPARATOR . 'Fixtures/alpha',
+                    'PrefixCollision_A_B_' => __DIR__.DIRECTORY_SEPARATOR.'Fixtures/beta',
+                    'PrefixCollision_A_' => __DIR__.DIRECTORY_SEPARATOR.'Fixtures/alpha',
                 ),
                 'PrefixCollision_A_B_Bar',
                 '->loadClass() loads PrefixCollision_A_B_Bar from beta.',

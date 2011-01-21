@@ -22,9 +22,9 @@ use Symfony\Component\Form\Exception\UnexpectedTypeException;
 class BooleanToStringTransformer extends BaseValueTransformer
 {
     /**
-     * Transforms a boolean into a string.
+     * Transforms a Boolean into a string.
      *
-     * @param  boolean $value   Boolean value.
+     * @param  Boolean $value   Boolean value.
      * @return string           String value.
      */
     public function transform($value)
@@ -34,17 +34,17 @@ class BooleanToStringTransformer extends BaseValueTransformer
         }
 
         if (!is_bool($value)) {
-            throw new UnexpectedTypeException($value, 'boolean');
+            throw new UnexpectedTypeException($value, 'Boolean');
         }
 
         return true === $value ? '1' : '';
     }
 
     /**
-     * Transforms a string into a boolean.
+     * Transforms a string into a Boolean.
      *
      * @param  string $value  String value.
-     * @return boolean        Boolean value.
+     * @return Boolean        Boolean value.
      */
     public function reverseTransform($value, $originalValue)
     {

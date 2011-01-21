@@ -131,7 +131,7 @@ abstract class Configurable
      *
      * @param  string $name  The option name
      *
-     * @return bool true if the option is set, false otherwise
+     * @return Boolean true if the option is set, false otherwise
      */
     public function hasOption($name)
     {

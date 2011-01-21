@@ -20,7 +20,7 @@ interface LoaderInterface
      *
      * @param ClassMetadata $metadata A metadata
      *
-     * @return boolean
+     * @return Boolean
      */
     function loadClassMetadata(ClassMetadata $metadata);
 }

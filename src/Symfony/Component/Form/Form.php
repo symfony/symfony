@@ -140,7 +140,7 @@ class Form extends FieldGroup
      *
      * @param  array $taintedValues  The form data of the $_POST array
      * @param  array $taintedFiles   An array of uploaded files
-     * @return boolean               Whether the form is valid
+     * @return Boolean               Whether the form is valid
      */
     final public function bind($taintedValues, array $taintedFiles = null)
     {
@@ -186,7 +186,7 @@ class Form extends FieldGroup
      * Binds the form with the given data.
      *
      * @param  array $taintedData  The data to bind to the form
-     * @return boolean             Whether the form is valid
+     * @return Boolean             Whether the form is valid
      */
     protected function doBind(array $taintedData)
     {
@@ -229,7 +229,7 @@ class Form extends FieldGroup
     /**
      * Returns whether the CSRF token is valid
      *
-     * @return boolean
+     * @return Boolean
      */
     public function isCsrfTokenValid()
     {
@@ -246,7 +246,7 @@ class Form extends FieldGroup
     /**
      * Returns whether the maximum POST size was reached in this request.
      *
-     * @return boolean
+     * @return Boolean
      */
     public function isPostMaxSizeReached()
     {

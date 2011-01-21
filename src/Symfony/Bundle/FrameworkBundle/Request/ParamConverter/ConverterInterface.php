@@ -28,7 +28,7 @@ interface ConverterInterface
      *
      * @param  \ReflectionParameter $parameter
      *
-     * @return boolean
+     * @return Boolean
      */
     function supports(\ReflectionClass $class);
 }

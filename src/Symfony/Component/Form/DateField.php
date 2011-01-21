@@ -237,7 +237,7 @@ class DateField extends HybridField
      * The year is valid if it is contained in the list passed to the field's
      * option "years".
      *
-     * @return boolean
+     * @return Boolean
      */
     public function isYearWithinRange()
     {
@@ -252,7 +252,7 @@ class DateField extends HybridField
      * The month is valid if it is contained in the list passed to the field's
      * option "months".
      *
-     * @return boolean
+     * @return Boolean
      */
     public function isMonthWithinRange()
     {
@@ -267,7 +267,7 @@ class DateField extends HybridField
      * The day is valid if it is contained in the list passed to the field's
      * option "days".
      *
-     * @return boolean
+     * @return Boolean
      */
     public function isDayWithinRange()
     {

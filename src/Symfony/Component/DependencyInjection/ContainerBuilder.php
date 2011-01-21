@@ -514,7 +514,7 @@ class ContainerBuilder extends Container implements TaggedContainerInterface
      *
      * @param string $class The class
      *
-     * @return boolean true if at least one InterfaceInjector is defined, false otherwise
+     * @return Boolean true if at least one InterfaceInjector is defined, false otherwise
      */
     public function hasInterfaceInjectorForClass($class)
     {

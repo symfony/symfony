@@ -31,7 +31,7 @@ use Symfony\Component\Form\ValueTransformer\TransformationFailedException;
  * localized string (3) is presented to and modified by the user.
  *
  * In most cases, format (1) and format (2) will be the same. For example,
- * a checkbox field uses a boolean value both for internal processing as for
+ * a checkbox field uses a Boolean value both for internal processing as for
  * storage in the object. In these cases you simply need to set a value
  * transformer to convert between formats (2) and (3). You can do this by
  * calling setValueTransformer() in the configure() method.
@@ -263,7 +263,7 @@ class Field extends Configurable implements FieldInterface
      * Binds POST data to the field, transforms and validates it.
      *
      * @param  string|array $taintedData  The POST data
-     * @return boolean                    Whether the form is valid
+     * @return Boolean                    Whether the form is valid
      * @throws AlreadyBoundException      when the field is already bound
      */
     public function bind($taintedData)
@@ -337,7 +337,7 @@ class Field extends Configurable implements FieldInterface
     /**
      * Returns whether the field is bound.
      *
-     * @return boolean  true if the form is bound to input values, false otherwise
+     * @return Boolean  true if the form is bound to input values, false otherwise
      */
     public function isBound()
     {
@@ -347,7 +347,7 @@ class Field extends Configurable implements FieldInterface
     /**
      * Returns whether the bound value could be reverse transformed correctly
      *
-     * @return boolean
+     * @return Boolean
      */
     public function isTransformationSuccessful()
     {
@@ -357,7 +357,7 @@ class Field extends Configurable implements FieldInterface
     /**
      * Returns whether the field is valid.
      *
-     * @return boolean
+     * @return Boolean
      */
     public function isValid()
     {
@@ -367,7 +367,7 @@ class Field extends Configurable implements FieldInterface
     /**
      * Returns whether or not there are errors.
      *
-     * @return boolean  true if form is bound and not valid
+     * @return Boolean  true if form is bound and not valid
      */
     public function hasErrors()
     {

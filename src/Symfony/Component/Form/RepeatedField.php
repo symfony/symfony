@@ -60,7 +60,7 @@ class RepeatedField extends FieldGroup
     /**
      * Returns whether both entered values are equal
      *
-     * @return bool
+     * @return Boolean
      */
     public function isFirstEqualToSecond()
     {

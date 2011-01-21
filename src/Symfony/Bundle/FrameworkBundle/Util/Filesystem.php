@@ -57,7 +57,7 @@ class Filesystem
      * @param  string $path  The directory path
      * @param  int    $mode  The directory mode
      *
-     * @return bool true if the directory has been created, false otherwise
+     * @return Boolean true if the directory has been created, false otherwise
      */
     public function mkdirs($path, $mode = 0777)
     {
@@ -161,9 +161,9 @@ class Filesystem
     /**
      * Creates a symbolic link or copy a directory.
      *
-     * @param string $originDir      The origin directory path
-     * @param string $targetDir      The symbolic link name
-     * @param bool   $copyOnWindows  Whether to copy files if on windows
+     * @param string  $originDir      The origin directory path
+     * @param string  $targetDir      The symbolic link name
+     * @param Boolean $copyOnWindows  Whether to copy files if on windows
      */
     public function symlink($originDir, $targetDir, $copyOnWindows = false)
     {

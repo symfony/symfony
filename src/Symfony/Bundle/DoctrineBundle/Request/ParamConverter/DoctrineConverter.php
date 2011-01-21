@@ -88,7 +88,7 @@ class DoctrineConverter implements ConverterInterface
      *
      * @param  \ReflectionParameter $parameter
      *
-     * @return boolean
+     * @return Boolean
      */
     public function supports(\ReflectionClass $class)
     {

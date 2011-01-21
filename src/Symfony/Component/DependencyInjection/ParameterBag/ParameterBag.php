@@ -136,7 +136,7 @@ class ParameterBag implements ParameterBagInterface
         }
 
         if (preg_match('/^%([^%]+)%$/', $value, $match)) {
-            // we do this to deal with non string values (boolean, integer, ...)
+            // we do this to deal with non string values (Boolean, integer, ...)
             // the preg_replace_callback converts them to strings
             return $this->get(strtolower($match[1]));
         }

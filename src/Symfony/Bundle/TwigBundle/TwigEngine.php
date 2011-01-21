@@ -93,7 +93,7 @@ class TwigEngine implements EngineInterface
      *
      * @param string $name A template name
      *
-     * @return boolean True if this class supports the given resource, false otherwise
+     * @return Boolean True if this class supports the given resource, false otherwise
      */
     public function supports($name)
     {

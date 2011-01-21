@@ -50,7 +50,7 @@ class HybridField extends FieldGroup
     }
 
     /**
-     * @return boolean
+     * @return Boolean
      */
     public function isField()
     {
@@ -58,7 +58,7 @@ class HybridField extends FieldGroup
     }
 
     /**
-     * @return boolean
+     * @return Boolean
      */
     public function isGroup()
     {

@@ -67,7 +67,7 @@ class PdoSessionStorage extends NativeSessionStorage
      * @param  string $path  (ignored)
      * @param  string $name  (ignored)
      *
-     * @return boolean true, if the session was opened, otherwise an exception is thrown
+     * @return Boolean true, if the session was opened, otherwise an exception is thrown
      */
     public function sessionOpen($path = null, $name = null)
     {
@@ -77,7 +77,7 @@ class PdoSessionStorage extends NativeSessionStorage
     /**
      * Closes a session.
      *
-     * @return boolean true, if the session was closed, otherwise false
+     * @return Boolean true, if the session was closed, otherwise false
      */
     public function sessionClose()
     {
@@ -90,7 +90,7 @@ class PdoSessionStorage extends NativeSessionStorage
      *
      * @param  string $id  A session ID
      *
-     * @return bool   true, if the session was destroyed, otherwise an exception is thrown
+     * @return Boolean   true, if the session was destroyed, otherwise an exception is thrown
      *
      * @throws \RuntimeException If the session cannot be destroyed
      */
@@ -119,7 +119,7 @@ class PdoSessionStorage extends NativeSessionStorage
      *
      * @param  int $lifetime  The lifetime of a session
      *
-     * @return bool true, if old sessions have been cleaned, otherwise an exception is thrown
+     * @return Boolean true, if old sessions have been cleaned, otherwise an exception is thrown
      *
      * @throws \RuntimeException If any old sessions cannot be cleaned
      */
@@ -194,7 +194,7 @@ class PdoSessionStorage extends NativeSessionStorage
      * @param  string $id    A session ID
      * @param  string $data  A serialized chunk of session data
      *
-     * @return bool true, if the session was written, otherwise an exception is thrown
+     * @return Boolean true, if the session was written, otherwise an exception is thrown
      *
      * @throws \RuntimeException If the session data cannot be written
      */

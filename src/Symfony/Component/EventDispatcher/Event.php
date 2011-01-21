@@ -85,7 +85,7 @@ class Event
      */
     public function setProcessed($processed)
     {
-        $this->processed = (boolean) $processed;
+        $this->processed = (Boolean) $processed;
     }
 
     /**

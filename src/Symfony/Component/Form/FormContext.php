@@ -54,7 +54,7 @@ class FormContext implements FormContextInterface
 
     /**
      * Whether the new form should be CSRF protected
-     * @var boolean
+     * @var Boolean
      */
     protected $csrfProtection = false;
 
@@ -206,7 +206,7 @@ class FormContext implements FormContextInterface
     /**
      * Returns whether the new form will be CSRF protected
      *
-     * @return boolean  Whether the form will be CSRF protected
+     * @return Boolean  Whether the form will be CSRF protected
      */
     public function isCsrfProtectionEnabled()
     {

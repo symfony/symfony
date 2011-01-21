@@ -85,7 +85,7 @@ class InterfaceInjector
      * Inspects if current interface injector is to be used with a given class
      *
      * @param string $object
-     * @return boolean
+     * @return Boolean
      */
     public function supports($object)
     {
@@ -146,7 +146,7 @@ class InterfaceInjector
      *
      * @param  string $method    The method name to search for
      *
-     * @return boolean
+     * @return Boolean
      */
     public function hasMethodCall($method)
     {

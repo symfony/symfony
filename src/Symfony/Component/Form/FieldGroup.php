@@ -152,7 +152,7 @@ class FieldGroup extends Field implements \IteratorAggregate, FieldGroupInterfac
      * Returns whether a field with the given key exists.
      *
      * @param  string $key
-     * @return boolean
+     * @return Boolean
      */
     public function has($key)
     {
@@ -233,15 +233,15 @@ class FieldGroup extends Field implements \IteratorAggregate, FieldGroupInterfac
     /**
      * Returns a filtered array of fields from the current schema.
      *
-     * @param boolean $hidden Whether to return hidden fields only or visible fields only
-     * @param boolean $recursive Whether to recur through embedded schemas
+     * @param Boolean $hidden Whether to return hidden fields only or visible fields only
+     * @param Boolean $recursive Whether to recur through embedded schemas
      *
      * @return array
      */
     protected function getFieldsByVisibility($hidden, $recursive)
     {
         $fields = array();
-        $hidden = (bool)$hidden;
+        $hidden = (Boolean)$hidden;
 
         foreach ($this->fields as $field) {
             if ($field instanceof FieldGroup && $recursive) {
@@ -400,7 +400,7 @@ class FieldGroup extends Field implements \IteratorAggregate, FieldGroupInterfac
     /**
      * Returns whether this form was bound with extra fields
      *
-     * @return boolean
+     * @return Boolean
      */
     public function isBoundWithExtraFields()
     {
@@ -411,7 +411,7 @@ class FieldGroup extends Field implements \IteratorAggregate, FieldGroupInterfac
     /**
      * Returns whether the field is valid.
      *
-     * @return boolean
+     * @return Boolean
      */
     public function isValid()
     {
@@ -472,7 +472,7 @@ class FieldGroup extends Field implements \IteratorAggregate, FieldGroupInterfac
     /**
      * Returns whether the field requires a multipart form.
      *
-     * @return boolean
+     * @return Boolean
      */
     public function isMultipart()
     {

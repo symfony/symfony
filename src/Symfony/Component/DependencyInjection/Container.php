@@ -124,7 +124,7 @@ class Container implements ContainerInterface
      *
      * @param  string $name The parameter name
      *
-     * @return boolean The presence of parameter in container
+     * @return Boolean The presence of parameter in container
      */
     public function hasParameter($name)
     {

@@ -38,7 +38,7 @@ interface FieldGroupInterface extends FieldInterface, \ArrayAccess, \Traversable
      * "address.postal_code". If $group is virtual though, the fields are
      * mapped directly to "street" and "postal_code".
      *
-     * @return boolean  Whether the group is virtual
+     * @return Boolean  Whether the group is virtual
      */
     public function isVirtual();
 }

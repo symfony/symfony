@@ -250,7 +250,7 @@ class ClassMetadata extends ElementMetadata
     /**
      * Returns whether this class has an overridden default group sequence.
      *
-     * @return boolean
+     * @return Boolean
      */
     public function hasGroupSequence()
     {

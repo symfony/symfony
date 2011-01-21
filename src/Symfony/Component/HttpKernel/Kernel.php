@@ -108,7 +108,7 @@ abstract class Kernel implements HttpKernelInterface, \Serializable
     /**
      * Checks whether the current kernel has been booted or not.
      *
-     * @return boolean $booted
+     * @return Boolean $booted
      */
     public function isBooted()
     {

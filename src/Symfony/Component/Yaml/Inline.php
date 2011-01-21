@@ -145,7 +145,7 @@ class Inline
      * @param string  $delimiters
      * @param array   $stringDelimiter
      * @param integer $i
-     * @param boolean $evaluate
+     * @param Boolean $evaluate
      *
      * @return string A YAML string
      *

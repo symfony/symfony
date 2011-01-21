@@ -36,7 +36,7 @@ interface LoaderInterface
      * @param mixed  $resource A resource
      * @param string $type     The resource type
      *
-     * @return boolean True if this class supports the given resource, false otherwise
+     * @return Boolean True if this class supports the given resource, false otherwise
      */
     function supports($resource, $type = null);
 

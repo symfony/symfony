@@ -230,7 +230,7 @@ class Definition
      *
      * @param  string $method    The method name to search for
      *
-     * @return boolean
+     * @return Boolean
      */
     public function hasMethodCall($method)
     {

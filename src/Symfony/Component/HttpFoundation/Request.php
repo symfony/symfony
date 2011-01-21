@@ -619,7 +619,7 @@ class Request
     /**
      * Returns the request body content.
      *
-     * @param  bool $asResource If true, a resource will be returned
+     * @param  Boolean $asResource If true, a resource will be returned
      *
      * @return string|resource The request body content or a resource to read the body stream.
      */
@@ -749,7 +749,7 @@ class Request
      * It works if your JavaScript library set an X-Requested-With HTTP header.
      * It is known to work with Prototype, Mootools, jQuery.
      *
-     * @return bool true if the request is an XMLHttpRequest, false otherwise
+     * @return Boolean true if the request is an XMLHttpRequest, false otherwise
      */
     public function isXmlHttpRequest()
     {

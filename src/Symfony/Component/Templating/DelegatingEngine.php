@@ -90,7 +90,7 @@ class DelegatingEngine implements EngineInterface
      *
      * @param string $name A template name
      *
-     * @return boolean True if this class supports the given template, false otherwise
+     * @return Boolean True if this class supports the given template, false otherwise
      */
     public function supports($name)
     {

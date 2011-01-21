@@ -82,7 +82,7 @@ class FileLocator
      *
      * @param string $file A file path
      *
-     * @return boolean
+     * @return Boolean
      */
     public function isAbsolutePath($file)
     {

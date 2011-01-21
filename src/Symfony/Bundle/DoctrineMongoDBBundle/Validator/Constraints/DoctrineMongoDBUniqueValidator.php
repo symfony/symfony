@@ -35,7 +35,7 @@ class DoctrineMongoDBUniqueValidator extends ConstraintValidator
     /**
      * @param Doctrine\ODM\MongoDB\Document $value
      * @param Constraint $constraint
-     * @return bool
+     * @return Boolean
      */
     public function isValid($document, Constraint $constraint)
     {

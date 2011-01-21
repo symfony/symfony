@@ -59,7 +59,7 @@ interface FormContextInterface
     /**
      * Enables or disables CSRF protection for the  form
      *
-     * @param boolean $enabled       Whether the form should be CSRF protected
+     * @param Boolean $enabled       Whether the form should be CSRF protected
      * @return FormContextInterface  This object
      */
     function csrfProtection($enabled);

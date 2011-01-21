@@ -154,7 +154,7 @@ class TimeField extends FieldGroup
      * The hour is valid if it is contained in the list passed to the field's
      * option "hours".
      *
-     * @return boolean
+     * @return Boolean
      */
     public function isHourWithinRange()
     {
@@ -169,7 +169,7 @@ class TimeField extends FieldGroup
      * The minute is valid if it is contained in the list passed to the field's
      * option "minutes".
      *
-     * @return boolean
+     * @return Boolean
      */
     public function isMinuteWithinRange()
     {
@@ -184,7 +184,7 @@ class TimeField extends FieldGroup
      * The second is valid if it is contained in the list passed to the field's
      * option "seconds".
      *
-     * @return boolean
+     * @return Boolean
      */
     public function isSecondWithinRange()
     {

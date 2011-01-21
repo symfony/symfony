@@ -106,7 +106,7 @@ abstract class MemberMetadata extends ElementMetadata
     /**
      * Returns whether this member is public
      *
-     * @return boolean
+     * @return Boolean
      */
     public function isPublic()
     {
@@ -116,7 +116,7 @@ abstract class MemberMetadata extends ElementMetadata
     /**
      * Returns whether this member is protected
      *
-     * @return boolean
+     * @return Boolean
      */
     public function isProtected()
     {
@@ -126,7 +126,7 @@ abstract class MemberMetadata extends ElementMetadata
     /**
      * Returns whether this member is private
      *
-     * @return boolean
+     * @return Boolean
      */
     public function isPrivate()
     {
@@ -136,7 +136,7 @@ abstract class MemberMetadata extends ElementMetadata
     /**
      * Returns whether objects stored in this member should be validated
      *
-     * @return boolean
+     * @return Boolean
      */
     public function isCascaded()
     {

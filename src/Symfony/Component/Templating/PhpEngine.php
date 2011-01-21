@@ -147,7 +147,7 @@ class PhpEngine implements EngineInterface, \ArrayAccess
      *
      * @param string $name A template name
      *
-     * @return boolean True if this class supports the given resource, false otherwise
+     * @return Boolean True if this class supports the given resource, false otherwise
      */
     public function supports($name)
     {
@@ -413,7 +413,7 @@ class PhpEngine implements EngineInterface, \ArrayAccess
                  */
                 function ($value) use ($that)
                 {
-                    // Numbers and boolean values get turned into strings which can cause problems
+                    // Numbers and Boolean values get turned into strings which can cause problems
                     // with type comparisons (e.g. === or is_int() etc).
                     return is_string($value) ? htmlspecialchars($value, ENT_QUOTES, $that->getCharset(), false) : $value;
                 },

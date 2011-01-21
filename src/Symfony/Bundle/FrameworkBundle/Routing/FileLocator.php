@@ -39,12 +39,12 @@ class FileLocator extends BaseFileLocator
     /**
      * {@inheritdoc}
      */
-    public function locate($file)
+    public function locate($file, $currentPath = null)
     {
         if ('@' === $file[0]) {
             return $this->kernel->locateResource($file);
         }
 
-        return parent::locate($file);
+        return parent::locate($file, $currentPath);
     }
 }

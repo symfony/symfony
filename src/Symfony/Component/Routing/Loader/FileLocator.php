@@ -36,15 +36,16 @@ class FileLocator
     /**
      * Returns a full path for a given file.
      *
-     * @param string $file A file path
+     * @param string $file        A file path
+     * @param string $currentPath The current path
      *
      * @return string The full path for the file
      *
      * @throws \InvalidArgumentException When file is not found
      */
-    public function locate($file)
+    public function locate($file, $currentPath = null)
     {
-        $path = $this->getAbsolutePath($file);
+        $path = $this->getAbsolutePath($file, $currentPath);
         if (!file_exists($path)) {
             throw new \InvalidArgumentException(sprintf('The file "%s" does not exist (in: %s).', $file, implode(', ', $this->paths)));
         }

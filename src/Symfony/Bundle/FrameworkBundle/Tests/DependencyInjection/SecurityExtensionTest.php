@@ -50,11 +50,12 @@ abstract class SecurityExtensionTest extends TestCase
     {
         $container = $this->getContainer('firewall');
 
+        $arguments = $container->getDefinition('security.firewall.map')->getArguments();
         $listeners = array();
-        foreach ($container->getDefinition('security.firewall.map')->getMethodCalls() as $call) {
-            if ($call[0] == 'add') {
-                $listeners[] = array_map(function ($ref) { return preg_replace('/\.[a-f0-9]+$/', '', (string) $ref); }, $call[1][1]);
-            }
+        foreach (array_keys($arguments[1]) as $contextId) {
+            $contextDef = $container->getDefinition($contextId);
+            $arguments = $contextDef->getArguments();
+            $listeners[] = array_map(function ($ref) { return preg_replace('/\.[a-f0-9]+$/', '', (string) $ref); }, $arguments[0]);
         }
 
         $this->assertEquals(array(
@@ -84,10 +85,22 @@ abstract class SecurityExtensionTest extends TestCase
             }
         }
 
-        $this->assertEquals(array(
-          array('security.matcher.url.0', array('ROLE_USER'), 'https'),
-          array('security.matcher.url.1', array('IS_AUTHENTICATED_ANONYMOUSLY'), null),
-        ), $rules);
+        $matcherIds = array();
+        foreach ($rules as $rule) {
+            list($matcherId, $roles, $channel) = $rule;
+
+            $this->assertFalse(isset($matcherIds[$matcherId]));
+            $matcherIds[$matcherId] = true;
+
+            $i = count($matcherIds);
+            if (1 === $i) {
+                $this->assertEquals(array('ROLE_USER'), $roles);
+                $this->assertEquals('https', $channel);
+            } else if (2 === $i) {
+                $this->assertEquals(array('IS_AUTHENTICATED_ANONYMOUSLY'), $roles);
+                $this->assertNull($channel);
+            }
+        }
     }
 
     protected function getContainer($file)

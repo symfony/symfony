@@ -85,5 +85,10 @@
             <argument type="service" id="security.authentication.manager" />
             <argument type="service" id="logger" on-invalid="null" />
         </service>
+        
+        <service id="security.firewall.context" class="%security.firewall.context.class%" public="false">
+            <argument type="collection" />
+            <argument type="service" id="security.exception_listener" />
+        </service>
     </services>
 </container>

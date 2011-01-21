@@ -76,7 +76,8 @@
         <parameter key="security.exception_listener.class">Symfony\Component\HttpKernel\Security\Firewall\ExceptionListener</parameter>
         <parameter key="security.context_listener.class">Symfony\Component\HttpKernel\Security\Firewall\ContextListener</parameter>
         <parameter key="security.firewall.class">Symfony\Component\HttpKernel\Security\Firewall</parameter>
-        <parameter key="security.firewall.map.class">Symfony\Component\HttpKernel\Security\FirewallMap</parameter>
+        <parameter key="security.firewall.map.class">Symfony\Bundle\FrameworkBundle\Security\FirewallMap</parameter>
+        <parameter key="security.firewall.context.class">Symfony\Bundle\FrameworkBundle\Security\FirewallContext</parameter>
         <parameter key="security.matcher.class">Symfony\Component\HttpFoundation\RequestMatcher</parameter>
 
         <parameter key="security.role_hierarchy.class">Symfony\Component\Security\Role\RoleHierarchy</parameter>
@@ -157,8 +158,11 @@
             <tag name="kernel.listener" priority="-128" />
             <argument type="service" id="security.firewall.map" />
         </service>
-        <service id="security.firewall.map" class="%security.firewall.map.class%" public="false" />
-
+        <service id="security.firewall.map" class="%security.firewall.map.class%" public="false">
+            <argument type="service" id="service_container" />
+            <argument type="collection" />
+        </service>
+        
         <service id="security.context_listener" class="%security.context_listener.class%" public="false">
             <argument type="service" id="security.context" />
             <argument type="collection"></argument>

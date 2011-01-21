@@ -21,7 +21,7 @@ use Symfony\Component\HttpKernel\Security\Firewall\ExceptionListener;
  *
  * @author Fabien Potencier <fabien.potencier@symfony-project.com>
  */
-class FirewallMap
+class FirewallMap implements FirewallMapInterface
 {
     protected $map = array();
 

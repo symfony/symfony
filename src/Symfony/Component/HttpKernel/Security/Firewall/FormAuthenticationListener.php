@@ -60,7 +60,7 @@ abstract class FormAuthenticationListener
     }
 
     /**
-     * 
+     *
      *
      * @param EventDispatcher $dispatcher An EventDispatcher instance
      * @param integer         $priority   The priority
@@ -69,7 +69,7 @@ abstract class FormAuthenticationListener
     {
         $dispatcher->connect('core.security', array($this, 'handle'), 0);
     }
-    
+
     /**
      * {@inheritDoc}
      */

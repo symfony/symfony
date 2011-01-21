@@ -37,7 +37,7 @@ class Firewall
      *
      * @param FirewallMap $map A FirewallMap instance
      */
-    public function __construct(FirewallMap $map)
+    public function __construct(FirewallMapInterface $map)
     {
         $this->map = $map;
         $this->currentListeners = array();
@@ -71,12 +71,12 @@ class Firewall
         // disconnect all listeners from core.security to avoid the overhead
         // of most listeners having to do this manually
         $this->dispatcher->disconnect('core.security');
-        
+
         // ensure that listeners disconnect from wherever they have connected to
         foreach ($this->currentListeners as $listener) {
             $listener->unregister($this->dispatcher);
         }
-        
+
         // register listeners for this firewall
         list($listeners, $exception) = $this->map->getListeners($request);
         if (null !== $exception) {
@@ -85,7 +85,7 @@ class Firewall
         foreach ($listeners as $listener) {
             $listener->register($this->dispatcher);
         }
-        
+
         // save current listener instances
         $this->currentListeners = $listeners;
         if (null !== $exception) {

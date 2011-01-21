@@ -29,6 +29,8 @@ use Symfony\Component\HttpFoundation\RequestMatcher;
  */
 class SecurityExtension extends Extension
 {
+    protected $requestMatchers = array();
+
     /**
      * Loads the web configuration.
      *
@@ -108,22 +110,31 @@ class SecurityExtension extends Extension
             }
 
             // matcher
-            $id = 'security.matcher.url.'.$i;
-            $definition = $container->register($id, '%security.matcher.class%');
-            $definition->setPublic(false);
+            $path = $host = $methods = $ip = null;
             if (isset($access['path'])) {
-                $definition->addMethodCall('matchPath', array(is_array($access['path']) ? $access['path']['pattern'] : $access['path']));
+                $path = $access['path'];
+            }
+            if (isset($access['host'])) {
+                $host = $access['host'];
+            }
+            if (count($tMethods = $this->fixConfig($access, 'method')) > 0) {
+                $methods = $tMethods;
+            }
+            if (isset($access['ip'])) {
+                $ip = $access['ip'];
             }
 
+            $matchAttributes = array();
             $attributes = $this->fixConfig($access, 'attribute');
             foreach ($attributes as $key => $attribute) {
                 if (isset($attribute['key'])) {
                     $key = $attribute['key'];
                 }
-                $definition->addMethodCall('matchAttribute', array($key, $attribute['pattern']));
+                $matchAttributes[$key] = $attribute['pattern'];
             }
+            $matcher = $this->createRequestMatcher($container, $path, $host, $methods, $ip, $matchAttributes);
 
-            $container->getDefinition('security.access_map')->addMethodCall('add', array(new Reference($id), $roles, $channel));
+            $container->getDefinition('security.access_map')->addMethodCall('add', array($matcher, $roles, $channel));
         }
     }
 
@@ -158,12 +169,21 @@ class SecurityExtension extends Extension
         $container->merge($c);
 
         // load firewall map
-        $map = $container->getDefinition('security.firewall.map');
+        $mapDef = $container->getDefinition('security.firewall.map');
+        $map = array();
         foreach ($firewalls as $firewall) {
             list($matcher, $listeners, $exceptionListener) = $this->createFirewall($container, $firewall, $providerIds);
 
-            $map->addMethodCall('add', array($matcher, $listeners, $exceptionListener));
+            $contextId = 'security.firewall.map.context.'.count($map);
+            $context = $container->setDefinition($contextId, clone $container->getDefinition('security.firewall.context'));
+            $context
+                ->setPublic(true)
+                ->setArgument(0, $listeners)
+                ->setArgument(1, $exceptionListener)
+            ;
+            $map[$contextId] = $matcher;
         }
+        $mapDef->setArgument(1, $map);
     }
 
     protected function createFirewall(ContainerBuilder $container, $firewall, $providerIds)
@@ -175,13 +195,7 @@ class SecurityExtension extends Extension
         $i = 0;
         $matcher = null;
         if (isset($firewall['pattern'])) {
-            $id = 'security.matcher.map'.$id.'.'.++$i;
-            $container
-                ->register($id, '%security.matcher.class%')
-                ->setPublic(false)
-                ->addMethodCall('matchPath', array($firewall['pattern']))
-            ;
-            $matcher = new Reference($id);
+            $matcher = $this->createRequestMatcher($container, $firewall['pattern']);
         }
 
         // Security disabled?
@@ -575,6 +589,30 @@ class SecurityExtension extends Extension
         }
 
         return $switchUserListenerId;
+    }
+
+    protected function createRequestMatcher($container, $path = null, $host = null, $methods = null, $ip = null, array $attributes = array())
+    {
+        $serialized = serialize(array($path, $host, $methods, $ip, $attributes));
+        $id = 'security.request_matcher.'.md5($serialized).sha1($serialized);
+
+        if (isset($this->requestMatchers[$id])) {
+            return $this->requestMatchers[$id];
+        }
+
+        // only add arguments that are necessary
+        $arguments = array($path, $host, $methods, $ip, $attributes);
+        while (count($arguments) > 0 && !end($arguments)) {
+            array_pop($arguments);
+        }
+
+        $container
+            ->register($id, '%security.matcher.class%')
+            ->setPublic(false)
+            ->setArguments($arguments)
+        ;
+
+        return $this->requestMatchers[$id] = new Reference($id);
     }
 
     public function aclLoad(array $config, ContainerBuilder $container)

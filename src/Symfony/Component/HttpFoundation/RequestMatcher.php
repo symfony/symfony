@@ -22,7 +22,16 @@ class RequestMatcher implements RequestMatcherInterface
     protected $host;
     protected $methods;
     protected $ip;
-    protected $attributes = array();
+    protected $attributes;
+
+    public function __construct($path = null, $host = null, $methods = null, $ip = null, array $attributes = array())
+    {
+        $this->path = $path;
+        $this->host = $host;
+        $this->methods = $methods;
+        $this->ip = $ip;
+        $this->attributes = $attributes;
+    }
 
     /**
      * Adds a check for the URL host name.

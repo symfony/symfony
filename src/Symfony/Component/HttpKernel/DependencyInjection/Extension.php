@@ -37,4 +37,41 @@ abstract class Extension extends BaseExtension
     {
         $this->classes = array_merge($this->classes, $classes);
     }
+
+    /**
+     * Normalizes a configuration entry.
+     *
+     * This method returns a normalize configuration array for a given key
+     * to remove the differences due to the original format (YAML and XML mainly).
+     *
+     * Here is an example.
+     *
+     * The configuration is XML:
+     *
+     * <twig:extension id="twig.extension.foo" />
+     * <twig:extension id="twig.extension.bar" />
+     *
+     * And the same configuration in YAML:
+     *
+     * twig.extensions: ['twig.extension.foo', 'twig.extension.bar']
+     *
+     * @param array A config array
+     * @param key   The key to normalize
+     */
+    protected function normalizeConfig($config, $key)
+    {
+        $values = array();
+        if (isset($config[$key.'s'])) {
+            $values = $config[$key.'s'];
+        } elseif (isset($config[$key])) {
+            if (is_string($config[$key]) || !is_int(key($config[$key]))) {
+                // only one
+                $values = array($config[$key]);
+            } else {
+                $values = $config[$key];
+            }
+        }
+
+        return $values;
+    }
 }

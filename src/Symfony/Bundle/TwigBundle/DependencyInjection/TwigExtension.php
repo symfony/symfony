@@ -67,7 +67,7 @@ class TwigExtension extends Extension
 
         // globals
         $def = $container->getDefinition('twig');
-        $globals = $this->fixConfig($config, 'global');
+        $globals = $this->normalizeConfig($config, 'global');
         if (isset($globals[0])) {
             foreach ($globals as $global) {
                 if (isset($global['type']) && 'service' === $global['type']) {
@@ -90,7 +90,7 @@ class TwigExtension extends Extension
         unset($config['globals'], $config['global']);
 
         // extensions
-        $extensions = $this->fixConfig($config, 'extension');
+        $extensions = $this->normalizeConfig($config, 'extension');
         if (isset($extensions[0]) && is_array($extensions[0])) {
             foreach ($extensions as $extension) {
                 $container->getDefinition($extension['id'])->addTag('twig.extension');
@@ -131,22 +131,5 @@ class TwigExtension extends Extension
     public function getAlias()
     {
         return 'twig';
-    }
-
-    protected function fixConfig($config, $key)
-    {
-        $values = array();
-        if (isset($config[$key.'s'])) {
-            $values = $config[$key.'s'];
-        } elseif (isset($config[$key])) {
-            if (is_string($config[$key]) || !is_int(key($config[$key]))) {
-                // only one
-                $values = array($config[$key]);
-            } else {
-                $values = $config[$key];
-            }
-        }
-
-        return $values;
     }
 }

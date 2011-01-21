@@ -54,10 +54,10 @@ class TemplateLocator
         }
 
         $parameters = $this->parser->parse($name);
-        $resource = $parameters['bundle'].'/Resources/views/'.$parameters['controller'].'/'.$parameters['name'].'.'.$parameters['renderer'].'.'.$parameters['format'];
+        $resource = $parameters['bundle'].'/Resources/views/'.$parameters['controller'].'/'.$parameters['name'].'.'.$parameters['format'].'.'.$parameters['renderer'];
 
         if (!$parameters['bundle']) {
-            if (is_file($file = $this->path.'/views/'.$parameters['controller'].'/'.$parameters['name'].'.'.$parameters['renderer'].'.'.$parameters['format'])) {
+            if (is_file($file = $this->path.'/views/'.$parameters['controller'].'/'.$parameters['name'].'.'.$parameters['format'].'.'.$parameters['renderer'])) {
                 return $this->cache[$name] = $file;
             }
 

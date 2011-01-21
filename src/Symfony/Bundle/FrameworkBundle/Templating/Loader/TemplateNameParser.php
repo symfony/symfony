@@ -54,8 +54,8 @@ class TemplateNameParser extends BaseTemplateNameParser
             'bundle'     => $parts[0],
             'controller' => $parts[1],
             'name'       => $elements[0],
-            'renderer'   => $elements[1],
-            'format'     => $elements[2],
+            'format'     => $elements[1],
+            'renderer'   => $elements[2],
         );
 
         if ($parameters['bundle']) {

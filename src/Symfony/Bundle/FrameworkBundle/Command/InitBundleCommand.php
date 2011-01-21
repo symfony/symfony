@@ -51,13 +51,13 @@ class InitBundleCommand extends Command
             throw new \InvalidArgumentException('The namespace must end with Bundle.');
         }
 
-        $pos = strrpos($namespace, '\\');
-        $bundle = substr($namespace, $pos ? $pos + 1 : 0);
+        $bundle = strtr($namespace, array('\\' => ''));
 
         $dir = $input->getArgument('dir');
+        $targetDir = $dir . strtr($namespace, '\\', '/');
         $output->writeln(sprintf('Initializing bundle "<info>%s</info>" in "<info>%s</info>"', $bundle, $dir));
 
-        if (file_exists($targetDir = $dir.'/'.$bundle)) {
+        if (file_exists($targetDir)) {
             throw new \RuntimeException(sprintf('Bundle "%s" already exists.', $bundle));
         }
 

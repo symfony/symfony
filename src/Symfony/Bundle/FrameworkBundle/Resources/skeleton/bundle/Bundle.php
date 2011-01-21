@@ -1,11 +1,24 @@
 <?php
 
-namespace {{ namespace }}\{{ bundle }};
+namespace {{ namespace }};
 
 use Symfony\Component\HttpKernel\Bundle\Bundle;
-use Symfony\Component\DependencyInjection\ContainerInterface;
-use Symfony\Component\DependencyInjection\ParameterBag\ParameterBagInterface;
 
 class {{ bundle }} extends Bundle
 {
+    /**
+     * {@inheritdoc}
+     */
+    public function getNamespace()
+    {
+        return __NAMESPACE__;
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function getPath()
+    {
+        return strtr(__DIR__, '\\', '/');
+    }
 }

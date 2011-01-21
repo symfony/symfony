@@ -3,11 +3,11 @@ namespace Symfony\Component\HttpKernel\Bundle
 {
 use Symfony\Component\DependencyInjection\ContainerAware;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
-use Symfony\Component\DependencyInjection\ParameterBag\ParameterBagInterface;
 use Symfony\Component\Console\Application;
 use Symfony\Component\Finder\Finder;
 abstract class Bundle extends ContainerAware implements BundleInterface
 {
+    protected $name;
     public function boot()
     {
     }
@@ -17,6 +17,14 @@ abstract class Bundle extends ContainerAware implements BundleInterface
     public function getParent()
     {
         return null;
+    }
+    final public function getName()
+    {
+        if (null !== $this->name) {
+            return $this->name;
+        }
+        $pos = strrpos(get_class($this), '\\');
+        return $this->name = substr(get_class($this), $pos ? $pos + 1 : 0);
     }
     public function registerExtensions(ContainerBuilder $container)
     {
@@ -55,6 +63,7 @@ interface BundleInterface
     function boot();
     function shutdown();
     function getParent();
+    function getName();
     function getNamespace();
     function getPath();
 }

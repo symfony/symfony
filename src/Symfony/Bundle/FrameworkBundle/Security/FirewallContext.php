@@ -15,7 +15,7 @@ class FirewallContext
     protected $listeners;
     protected $exceptionListener;
 
-    public function __construct(array $listeners, ExceptionListener $exceptionListener)
+    public function __construct(array $listeners, ExceptionListener $exceptionListener = null)
     {
         $this->listeners = $listeners;
         $this->exceptionListener = $exceptionListener;

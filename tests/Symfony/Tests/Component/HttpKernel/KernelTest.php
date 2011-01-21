@@ -53,10 +53,26 @@ class KernelTest extends \PHPUnit_Framework_TestCase
         $kernel
             ->expects($this->once())
             ->method('getBundle')
-            ->will($this->returnValue($this->getBundle(__DIR__.'/Fixtures/Bundle1')))
+            ->will($this->returnValue(array($this->getBundle(__DIR__.'/Fixtures/Bundle1'))))
         ;
 
         $this->assertEquals(__DIR__.'/Fixtures/Bundle1/foo.txt', $kernel->locateResource('@foo/foo.txt'));
+    }
+
+    public function testLocateResourceReturnsTheFirstThatMatchesWithParent()
+    {
+        $parent = $this->getBundle(__DIR__.'/Fixtures/Bundle1', '', 'ParentAABundle');
+        $child = $this->getBundle(__DIR__.'/Fixtures/Bundle2', 'ParentAABundle', 'ChildAABundle');
+
+        $kernel = $this->getKernel();
+        $kernel
+            ->expects($this->any())
+            ->method('getBundle')
+            ->will($this->returnValue(array($child, $parent)))
+        ;
+
+        $this->assertEquals(__DIR__.'/Fixtures/Bundle2/foo.txt', $kernel->locateResource('@foo/foo.txt'));
+        $this->assertEquals(__DIR__.'/Fixtures/Bundle1/bar.txt', $kernel->locateResource('@foo/bar.txt'));
     }
 
     public function testLocateResourceReturnsTheAllMatches()
@@ -65,7 +81,6 @@ class KernelTest extends \PHPUnit_Framework_TestCase
         $kernel
             ->expects($this->once())
             ->method('getBundle')
-            ->with($this->anything(), $this->equalTo(false))
             ->will($this->returnValue(array($this->getBundle(__DIR__.'/Fixtures/Bundle1'), $this->getBundle(__DIR__.'/Fixtures/Bundle2'))))
         ;
 
@@ -78,7 +93,6 @@ class KernelTest extends \PHPUnit_Framework_TestCase
         $kernel
             ->expects($this->once())
             ->method('getBundle')
-            ->with($this->anything(), $this->equalTo(false))
             ->will($this->returnValue(array($this->getBundle(__DIR__.'/Fixtures/Bundle1'), $this->getBundle(__DIR__.'/foobar'))))
         ;
 
@@ -91,7 +105,7 @@ class KernelTest extends \PHPUnit_Framework_TestCase
         $kernel
             ->expects($this->once())
             ->method('getBundle')
-            ->will($this->returnValue($this->getBundle(__DIR__.'/Fixtures/Bundle1')))
+            ->will($this->returnValue(array($this->getBundle(__DIR__.'/Fixtures/Bundle1'))))
         ;
 
         $this->assertEquals(__DIR__.'/Fixtures/Bundle1/foo.txt', $kernel->locateResource('@foo/foo.txt', __DIR__.'/Fixtures'));

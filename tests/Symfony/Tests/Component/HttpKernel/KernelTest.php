@@ -145,6 +145,7 @@ class KernelTest extends \PHPUnit_Framework_TestCase
             ->method('registerBundles')
             ->will($this->returnValue(array($parent, $grandparent, $child)))
         ;
+
         $kernel->initializeBundles();
 
         $map = $kernel->getBundleMap();
@@ -189,13 +190,23 @@ class KernelTest extends \PHPUnit_Framework_TestCase
 
     protected function getBundle($dir = null, $parent = null, $className = null)
     {
-        $bundle = $this->getMockBuilder('Symfony\Component\HttpKernel\Bundle\BundleInterface');
+        $bundle = $this
+            ->getMockBuilder('Symfony\Tests\Component\HttpKernel\KernelForTest')
+            ->setMethods(array('getPath', 'getParent', 'getName'))
+            ->disableOriginalConstructor()
+        ;
 
         if ($className) {
             $bundle->setMockClassName($className);
         }
 
         $bundle = $bundle->getMock();
+
+        $bundle
+            ->expects($this->any())
+            ->method('getName')
+            ->will($this->returnValue(get_class($bundle)))
+        ;
 
         if (null !== $dir) {
             $bundle

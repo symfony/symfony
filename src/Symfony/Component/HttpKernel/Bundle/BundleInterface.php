@@ -36,6 +36,13 @@ interface BundleInterface
     function getParent();
 
     /**
+     * Returns the bundle name (the class short name).
+     *
+     * @return string The Bundle name
+     */
+    function getName();
+
+    /**
      * Gets the Bundle namespace.
      *
      * @return string The Bundle namespace

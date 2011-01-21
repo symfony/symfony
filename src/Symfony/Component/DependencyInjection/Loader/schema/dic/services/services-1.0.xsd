@@ -39,9 +39,9 @@
         Enclosing element for the definition of all interface injectors
       ]]></xsd:documentation>
     </xsd:annotation>
-    <xsd:sequence>
-      <xsd:element name="interface" type="interface" minOccurs="0" maxOccurs="unbounded" />
-    </xsd:sequence>
+    <xsd:choice minOccurs="0" maxOccurs="unbounded">
+      <xsd:element name="interface" type="interface" />
+    </xsd:choice>
   </xsd:complexType>
 
   <xsd:complexType name="services">
@@ -50,9 +50,9 @@
         Enclosing element for the definition of all services
       ]]></xsd:documentation>
     </xsd:annotation>
-    <xsd:sequence>
-      <xsd:element name="service" type="service" minOccurs="1" maxOccurs="unbounded" />
-    </xsd:sequence>
+    <xsd:choice minOccurs="1" maxOccurs="unbounded">
+      <xsd:element name="service" type="service" />
+    </xsd:choice>
   </xsd:complexType>
 
   <xsd:complexType name="imports">
@@ -61,9 +61,9 @@
         Enclosing element for the import elements
       ]]></xsd:documentation>
     </xsd:annotation>
-    <xsd:sequence>
-      <xsd:element name="import" type="import" minOccurs="1" maxOccurs="unbounded" />
-    </xsd:sequence>
+    <xsd:choice minOccurs="1" maxOccurs="unbounded">
+      <xsd:element name="import" type="import" />
+    </xsd:choice>
   </xsd:complexType>
 
   <xsd:complexType name="import">
@@ -85,9 +85,9 @@
   </xsd:complexType>
 
   <xsd:complexType name="interface">
-    <xsd:sequence maxOccurs="unbounded">
-      <xsd:element name="call" type="call" minOccurs="1" maxOccurs="unbounded" />
-    </xsd:sequence>
+    <xsd:choice  minOccurs="1" maxOccurs="unbounded">
+      <xsd:element name="call" type="call" />
+    </xsd:choice>
     <xsd:attribute name="class" type="xsd:string" use="required" />
   </xsd:complexType>
 
@@ -114,17 +114,17 @@
   </xsd:complexType>
 
   <xsd:complexType name="parameters">
-    <xsd:sequence>
-      <xsd:element name="parameter" type="parameter" minOccurs="1" maxOccurs="unbounded" />
-    </xsd:sequence>
+    <xsd:choice minOccurs="1" maxOccurs="unbounded">
+      <xsd:element name="parameter" type="parameter" />
+    </xsd:choice>
     <xsd:attribute name="type" type="parameter_type" />
     <xsd:attribute name="key" type="xsd:string" />
   </xsd:complexType>
 
   <xsd:complexType name="parameter" mixed="true">
-    <xsd:sequence>
-      <xsd:element name="parameter" type="parameter" minOccurs="0" maxOccurs="unbounded" />
-    </xsd:sequence>
+    <xsd:choice minOccurs="0" maxOccurs="unbounded">
+      <xsd:element name="parameter" type="parameter" />
+    </xsd:choice>
     <xsd:attribute name="type" type="parameter_type" />
     <xsd:attribute name="id" type="xsd:string" />
     <xsd:attribute name="key" type="xsd:string" />

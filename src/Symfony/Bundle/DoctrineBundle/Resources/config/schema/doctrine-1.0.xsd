@@ -8,9 +8,9 @@
     <xsd:element name="dbal" type="dbal" />
 
     <xsd:complexType name="dbal">
-        <xsd:sequence>
+        <xsd:all>
             <xsd:element name="connections" type="connections" minOccurs="0" maxOccurs="1" />
-        </xsd:sequence>
+        </xsd:all>
 
         <xsd:attribute name="default-connection" type="xsd:string" />
         <xsd:attribute name="dbname" type="xsd:string" />
@@ -29,9 +29,9 @@
     </xsd:complexType>
 
     <xsd:complexType name="connections">
-        <xsd:sequence>
-            <xsd:element name="connection" type="connection" minOccurs="1" maxOccurs="unbounded" />
-        </xsd:sequence>
+        <xsd:choice minOccurs="1" maxOccurs="unbounded">
+            <xsd:element name="connection" type="connection" />
+        </xsd:choice>
     </xsd:complexType>
 
     <xsd:complexType name="connection">
@@ -66,17 +66,17 @@
     </xsd:complexType>
 
     <xsd:complexType name="mappings">
-        <xsd:sequence>
-            <xsd:element name="mapping" type="mapping" minOccurs="1" maxOccurs="unbounded" />
-        </xsd:sequence>
+        <xsd:choice minOccurs="1" maxOccurs="unbounded">
+            <xsd:element name="mapping" type="mapping" />
+        </xsd:choice>
     </xsd:complexType>
 
     <xsd:complexType name="orm">
-        <xsd:sequence>
+        <xsd:all>
             <xsd:element name="entity-managers" type="entity_managers" minOccurs="0" maxOccurs="1" />
             <xsd:element name="mappings" type="mappings" minOccurs="0" maxOccurs="1" />
             <xsd:element name="auto-generate-proxy-classes" type="xsd:string" minOccurs="0" maxOccurs="1" />
-        </xsd:sequence>
+        </xsd:all>
 
         <xsd:attribute name="default-entity-manager" type="xsd:string" />
         <xsd:attribute name="metadata-driver" type="xsd:string" />
@@ -84,15 +84,15 @@
     </xsd:complexType>
 
     <xsd:complexType name="entity_managers">
-        <xsd:sequence>
-            <xsd:element name="entity-manager" type="entity_manager" minOccurs="1" maxOccurs="unbounded" />
-        </xsd:sequence>
+        <xsd:choice minOccurs="1" maxOccurs="unbounded">
+            <xsd:element name="entity-manager" type="entity_manager" />
+        </xsd:choice>
     </xsd:complexType>
 
     <xsd:complexType name="entity_manager">
-        <xsd:sequence>
+        <xsd:all>
             <xsd:element name="mappings" type="mappings" minOccurs="0" maxOccurs="1" />
-        </xsd:sequence>
+        </xsd:all>
 
         <xsd:attribute name="connection" type="xsd:string" />
     </xsd:complexType>

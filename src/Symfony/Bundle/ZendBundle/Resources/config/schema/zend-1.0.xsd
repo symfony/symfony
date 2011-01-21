@@ -8,9 +8,9 @@
     <xsd:element name="config" type="config" />
 
     <xsd:complexType name="config">
-        <xsd:sequence>
+        <xsd:all>
             <xsd:element name="logger" type="logger" minOccurs="0" maxOccurs="1" />
-        </xsd:sequence>
+        </xsd:all>
     </xsd:complexType>
 
     <xsd:complexType name="logger">

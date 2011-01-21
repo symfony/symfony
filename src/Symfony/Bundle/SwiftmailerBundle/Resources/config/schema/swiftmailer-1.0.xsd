@@ -8,9 +8,9 @@
   <xsd:element name="config" type="config" />
 
   <xsd:complexType name="config">
-    <xsd:sequence>
+    <xsd:all>
       <xsd:element name="spool" type="spool" minOccurs="0" maxOccurs="1" />
-    </xsd:sequence>
+    </xsd:all>
 
     <xsd:attribute name="username" type="xsd:string" />
     <xsd:attribute name="password" type="xsd:string" />

@@ -8,7 +8,7 @@
     <xsd:element name="config" type="config" />
 
     <xsd:complexType name="config">
-        <xsd:sequence>
+        <xsd:all>
             <xsd:element name="router" type="router" minOccurs="0" maxOccurs="1" />
             <xsd:element name="validation" type="validation" minOccurs="0" maxOccurs="1" />
             <xsd:element name="profiler" type="profiler" minOccurs="0" maxOccurs="1" />
@@ -16,7 +16,7 @@
             <xsd:element name="templating" type="templating" minOccurs="0" maxOccurs="1" />
             <xsd:element name="translator" type="translator" minOccurs="0" maxOccurs="1" />
             <xsd:element name="param-converter" type="param-converter" minOccurs="0" maxOccurs="1" />
-        </xsd:sequence>
+        </xsd:all>
 
         <xsd:attribute name="ide" type="xsd:string" />
         <xsd:attribute name="csrf-secret" type="xsd:string" />
@@ -25,9 +25,9 @@
     </xsd:complexType>
 
     <xsd:complexType name="profiler">
-        <xsd:sequence>
+        <xsd:all>
             <xsd:element name="matcher" type="profiler_matcher" minOccurs="0" maxOccurs="1" />
-        </xsd:sequence>
+        </xsd:all>
     </xsd:complexType>
 
     <xsd:complexType name="profiler_matcher">
@@ -62,9 +62,9 @@
     </xsd:complexType>
 
     <xsd:complexType name="templating">
-        <xsd:sequence>
-            <xsd:element name="loader" type="xsd:string" minOccurs="0" maxOccurs="unbounded" />
-        </xsd:sequence>
+        <xsd:choice minOccurs="0" maxOccurs="unbounded">
+            <xsd:element name="loader" type="xsd:string" />
+        </xsd:choice>
 
         <xsd:attribute name="assets-version" type="xsd:string" />
         <xsd:attribute name="assets-base-urls" type="xsd:string" />

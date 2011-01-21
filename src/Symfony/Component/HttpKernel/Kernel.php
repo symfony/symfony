@@ -295,25 +295,20 @@ abstract class Kernel implements HttpKernelInterface, \Serializable
 
         $isResource = 0 === strpos($path, 'Resources');
 
-        // return the first matching one
-        if (true === $first) {
-            if (true === $isResource && null !== $dir && is_file($file = $dir.'/'.$bundle.'/'.substr($path, 10))) {
-                return $file;
-            } elseif (is_file($file = $this->getBundle($bundle)->getPath().'/'.$path)) {
+        $files = array();
+        if (true === $isResource && null !== $dir && is_file($file = $dir.'/'.$bundle.'/'.substr($path, 10))) {
+            if ($first) {
                 return $file;
             }
 
-            throw new \InvalidArgumentException(sprintf('Unable to find file "@%s".', $name));
-        }
-
-        // return them all
-        $files = array();
-        if (true === $isResource && null !== $dir && is_file($file = $dir.'/'.$bundle.'/'.substr($path, 10))) {
             $files[] = $file;
         }
 
         foreach ($this->getBundle($bundle, false) as $bundle) {
             if (is_file($file = $bundle->getPath().'/'.$path)) {
+                if ($first) {
+                    return $file;
+                }
                 $files[] = $file;
             }
         }

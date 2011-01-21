@@ -259,6 +259,8 @@ abstract class Kernel implements HttpKernelInterface, \Serializable
     /**
      * Returns the file path for a given resource.
      *
+     * A Resource can be a file or a directory.
+     *
      * The resource name must follow the following pattern:
      *
      *     @BundleName/path/to/a/file.something
@@ -296,7 +298,7 @@ abstract class Kernel implements HttpKernelInterface, \Serializable
         $isResource = 0 === strpos($path, 'Resources');
 
         $files = array();
-        if (true === $isResource && null !== $dir && is_file($file = $dir.'/'.$bundle.'/'.substr($path, 10))) {
+        if (true === $isResource && null !== $dir && file_exists($file = $dir.'/'.$bundle.'/'.substr($path, 10))) {
             if ($first) {
                 return $file;
             }
@@ -305,7 +307,7 @@ abstract class Kernel implements HttpKernelInterface, \Serializable
         }
 
         foreach ($this->getBundle($bundle, false) as $bundle) {
-            if (is_file($file = $bundle->getPath().'/'.$path)) {
+            if (file_exists($file = $bundle->getPath().'/'.$path)) {
                 if ($first) {
                     return $file;
                 }

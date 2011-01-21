@@ -130,6 +130,23 @@ class KernelTest extends \PHPUnit_Framework_TestCase
         $this->assertEquals(array(__DIR__.'/Fixtures/foo/foo.txt', __DIR__.'/Fixtures/Bundle1/Resources/foo.txt'), $kernel->locateResource('@foo/Resources/foo.txt', __DIR__.'/Fixtures', false));
     }
 
+    public function testLocateResourceOnDirectories()
+    {
+        $kernel = $this->getKernel();
+
+        $this->assertEquals(__DIR__.'/Fixtures/foo/', $kernel->locateResource('@foo/Resources/', __DIR__.'/Fixtures'));
+        $this->assertEquals(__DIR__.'/Fixtures/foo/', $kernel->locateResource('@foo/Resources', __DIR__.'/Fixtures'));
+
+        $kernel
+            ->expects($this->any())
+            ->method('getBundle')
+            ->will($this->returnValue(array($this->getBundle(__DIR__.'/Fixtures/Bundle1'))))
+        ;
+
+        $this->assertEquals(__DIR__.'/Fixtures/Bundle1/Resources/', $kernel->locateResource('@foo/Resources/'));
+        $this->assertEquals(__DIR__.'/Fixtures/Bundle1/Resources/', $kernel->locateResource('@foo/Resources/'));
+    }
+
     public function testInitializeBundles()
     {
         $parent = $this->getBundle(null, '', 'ParentABundle');

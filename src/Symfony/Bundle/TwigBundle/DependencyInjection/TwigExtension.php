@@ -25,6 +25,22 @@ class TwigExtension extends Extension
 {
     public function configLoad(array $configs, ContainerBuilder $container)
     {
+        $loader = new XmlFileLoader($container, __DIR__.'/../Resources/config');
+        $loader->load('twig.xml');
+
+        $this->addClassesToCompile(array(
+            'Twig_Environment',
+            'Twig_ExtensionInterface',
+            'Twig_Extension',
+            'Twig_Extension_Core',
+            'Twig_Extension_Escaper',
+            'Twig_Extension_Optimizer',
+            'Twig_LoaderInterface',
+            'Twig_Markup',
+            'Twig_TemplateInterface',
+            'Twig_Template',
+        ));
+
         foreach ($configs as $config) {
             $this->doConfigLoad($config, $container);
         }
@@ -38,24 +54,6 @@ class TwigExtension extends Extension
      */
     protected function doConfigLoad(array $config, ContainerBuilder $container)
     {
-        if (!$container->hasDefinition('twig')) {
-            $loader = new XmlFileLoader($container, __DIR__.'/../Resources/config');
-            $loader->load('twig.xml');
-
-            $this->addClassesToCompile(array(
-                'Twig_Environment',
-                'Twig_ExtensionInterface',
-                'Twig_Extension',
-                'Twig_Extension_Core',
-                'Twig_Extension_Escaper',
-                'Twig_Extension_Optimizer',
-                'Twig_LoaderInterface',
-                'Twig_Markup',
-                'Twig_TemplateInterface',
-                'Twig_Template',
-            ));
-        }
-
         // form resources
         foreach (array('resources', 'resource') as $key) {
             if (isset($config['form'][$key])) {

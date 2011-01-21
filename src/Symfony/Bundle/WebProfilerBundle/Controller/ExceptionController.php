@@ -33,7 +33,7 @@ class ExceptionController extends BaseExceptionController
         $code = $this->getStatusCode($exception);
 
         return $this->container->get('templating')->renderResponse(
-            'FrameworkBundle:Exception:'.$template.'.twig.html',
+            'FrameworkBundle:Exception:'.$template.'.html.twig',
             array(
                 'status_code'    => $code,
                 'status_text'    => Response::$statusTexts[$code],

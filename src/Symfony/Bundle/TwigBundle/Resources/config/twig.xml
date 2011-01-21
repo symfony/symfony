@@ -14,7 +14,7 @@
         <parameter key="twig.loader.class">Symfony\Bundle\TwigBundle\Loader\FilesystemLoader</parameter>
         <parameter key="twig.globals.class">Symfony\Bundle\TwigBundle\GlobalVariables</parameter>
         <parameter key="twig.form.resources" type="collection">
-            <parameter>TwigBundle::form.twig.html</parameter>
+            <parameter>TwigBundle::form.html.twig</parameter>
         </parameter>
         <parameter key="templating.engine.twig.class">Symfony\Bundle\TwigBundle\TwigEngine</parameter>
     </parameters>

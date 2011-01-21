@@ -51,6 +51,9 @@ class InitBundleCommand extends Command
             throw new \InvalidArgumentException('The namespace must end with Bundle.');
         }
 
+        $pos = strrpos($namespace, '\\');
+        $bundle = substr($namespace, $pos ? $pos + 1 : 0);
+
         $dir = $input->getArgument('dir');
         $output->writeln(sprintf('Initializing bundle "<info>%s</info>" in "<info>%s</info>"', $bundle, $dir));
 

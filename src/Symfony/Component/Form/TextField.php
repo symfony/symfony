@@ -14,6 +14,10 @@ namespace Symfony\Component\Form;
 /**
  * A text input field.
  *
+ * Available options:
+ *
+ *  * max_length:       The max_length to give the field.
+ *
  * @author Bernhard Schussek <bernhard.schussek@symfony-project.com>
  */
 class TextField extends Field

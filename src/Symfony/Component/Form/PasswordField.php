@@ -14,6 +14,11 @@ namespace Symfony\Component\Form;
 /**
  * A field for entering a password.
  *
+ * Available options:
+ *
+ *  * always_empty      If true, the field will always render empty. Default: true.
+ *
+ * @see Symfony\Component\Form\TextField
  * @author Bernhard Schussek <bernhard.schussek@symfony-project.com>
  */
 class PasswordField extends TextField

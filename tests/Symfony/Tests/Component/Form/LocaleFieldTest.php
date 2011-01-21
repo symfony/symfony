@@ -30,4 +30,24 @@ class LocaleFieldTest extends \PHPUnit_Framework_TestCase
         $this->assertArrayHasKey('zh_Hans_MO', $choices);
         $this->assertEquals('Chinesisch (vereinfacht, Sonderverwaltungszone Macao)', $choices['zh_Hans_MO']);
     }
+
+    public function testEmptyValueOption()
+    {
+        // empty_value false
+        $field = new LocaleField('language', array('empty_value' => false));
+        $choices = $field->getOtherChoices();
+        $this->assertArrayNotHasKey('', $choices);
+
+        // empty_value as a blank string
+        $field = new LocaleField('language', array('empty_value' => ''));
+        $choices = $field->getOtherChoices();
+        $this->assertArrayHasKey('', $choices);
+        $this->assertEquals('', $choices['']);
+
+        // empty_value as a normal string
+        $field = new LocaleField('language', array('empty_value' => 'Choose a locale'));
+        $choices = $field->getOtherChoices();
+        $this->assertArrayHasKey('', $choices);
+        $this->assertEquals('Choose a locale', $choices['']);
+    }
 }

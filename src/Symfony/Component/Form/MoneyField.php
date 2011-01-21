@@ -13,8 +13,19 @@ namespace Symfony\Component\Form;
 use Symfony\Component\Form\ValueTransformer\MoneyToLocalizedStringTransformer;
 
 /**
- * A localized field for entering money values
+ * A localized field for entering money values.
  *
+ * This field will output the money with the correct comma, period or spacing
+ * (e.g. 10,000) as well as the correct currency symbol in the correct location
+ * (i.e. before or after the field).
+ *
+ * Available options:
+ *
+ *  * currency:     The currency to display the money with. This is the 3-letter
+ *                  ISO 4217 currency code.
+ *  * divisor:      A number to divide the money by before displaying. Default 1.
+ * 
+ * @see Symfony\Component\Form\NumberField
  * @author Bernhard Schussek <bernhard.schussek@symfony-project.com>
  */
 class MoneyField extends NumberField
@@ -34,9 +45,9 @@ class MoneyField extends NumberField
      */
     protected function configure()
     {
+        $this->addRequiredOption('currency');
         $this->addOption('precision', 2);
         $this->addOption('divisor', 1);
-        $this->addOption('currency');
 
         parent::configure();
 

@@ -18,6 +18,30 @@ use Symfony\Component\Form\ValueTransformer\ValueTransformerChain;
 use Symfony\Component\Form\ValueTransformer\DateTimeToLocalizedStringTransformer;
 use Symfony\Component\Form\ValueTransformer\DateTimeToArrayTransformer;
 
+/**
+ * Represents a date field.
+ *
+ * Available options:
+ *
+ *  * widget:         How to render the field ("input" or "choice"). Default: "choice".
+ *  * type:           The type of the date stored on the object. Default: "datetime":
+ *                    * datetime:   A DateTime object;
+ *                    * string:     A raw string (e.g. 2011-05-01, Y-m-d);
+ *                    * timestamp:  A unix timestamp (e.g. 1304208000);
+ *                    * raw:        A year, month, day array.
+ *  * pattern:        The pattern for the select boxes when "widget" is "choice".
+ *                    You can use the placeholders "{{ year }}", "{{ month }}" and "{{ day }}".
+ *                    Default: locale dependent.
+ *
+ *  * years:          An array of years for the year select tag.
+ *  * months:         An array of months for the month select tag.
+ *  * days:           An array of days for the day select tag.
+ *
+ *  * format:         The date format type to use for displaying the data. Default: medium.
+ *  * data_timezone:  The timezone of the data. Default: UTC.
+ *  * user_timezone:  The timezone of the user entering a new value. Default: UTC.
+ *
+ */
 class DateField extends HybridField
 {
     const FULL = 'full';
@@ -65,37 +89,19 @@ class DateField extends HybridField
      */
     protected $formatter;
 
-    /**
-     * Configures the text field.
-     *
-     * Available options:
-     *
-     *  * widget:         How to render the field ("input" or "select"). Default: "input"
-     *  * years:          An array of years for the year select tag (optional)
-     *  * months:         An array of months for the month select tag (optional)
-     *  * days:           An array of days for the day select tag (optional)
-     *  * format:         See DateValueTransformer. Default: medium
-     *  * type:           The type of the date ("date", "datetime" or "timestamp"). Default: "date"
-     *  * data_timezone:  The timezone of the data
-     *  * user_timezone:  The timezone of the user entering a new value
-     *  * pattern:        The pattern for the select boxes when "widget" is "select".
-     *                    You can use the placeholders "{{ year }}", "{{ month }}" and "{{ day }}".
-     *                    Default: locale dependent
-     *
-     * @param array $options Options for this field
-     * @throws \InvalidArgumentException  Thrown if you want to show a timestamp with the select widget.
-     */
     protected function configure()
     {
+        $this->addOption('widget', self::CHOICE, self::$widgets);
+        $this->addOption('type', self::DATETIME, self::$types);
+        $this->addOption('pattern');
+
         $this->addOption('years', range(date('Y') - 5, date('Y') + 5));
         $this->addOption('months', range(1, 12));
         $this->addOption('days', range(1, 31));
+
         $this->addOption('format', self::MEDIUM, self::$formats);
-        $this->addOption('type', self::DATETIME, self::$types);
         $this->addOption('data_timezone', 'UTC');
         $this->addOption('user_timezone', 'UTC');
-        $this->addOption('widget', self::CHOICE, self::$widgets);
-        $this->addOption('pattern');
 
         $this->formatter = new \IntlDateFormatter(
             $this->locale,

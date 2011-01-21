@@ -18,17 +18,17 @@ use Symfony\Component\Form\Exception\InvalidOptionsException;
  *
  * Available options:
  *
- *  * choices:              An array of key-value pairs that will represent the choices.
+ *  * choices:              An array of key-value pairs that will represent the choices
  *  * preferred_choices:    An array of choices (by key) that should be displayed
- *                          above all other options in the field.
+ *                          above all other options in the field
  *
  * The multiple and expanded options control exactly which HTML element
  * that should be used to render this field:
  *
- *  * expanded = false, multiple = false    a drop-down select element;
- *  * expanded = false, multiple = true     a multiple select element;
- *  * expanded = true, multiple = false     a series of input radio elements;
- *  * expanded = true, multiple = true      a series of input checkboxes.
+ *  * expanded = false, multiple = false    A drop-down select element
+ *  * expanded = false, multiple = true     A multiple select element
+ *  * expanded = true, multiple = false     A series of input radio elements
+ *  * expanded = true, multiple = true      A series of input checkboxes
  *
  * @author Bernhard Schussek <bernhard.schussek@symfony-project.com>
  */

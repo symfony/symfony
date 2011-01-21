@@ -12,7 +12,13 @@
 namespace Symfony\Component\Form;
 
 /**
- * Field for entering URLs
+ * Field for entering URLs.
+ *
+ * Available options:
+ *
+ *  * default_protocol:     If specified, {default_protocol}:// (e.g. http://)
+ *                          will be prepended onto any input string that
+ *                          doesn't begin with the protocol.
  *
  * @author Bernhard Schussek <bernhard.schussek@symfony-project.com>
  */

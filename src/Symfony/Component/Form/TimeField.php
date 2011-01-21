@@ -17,6 +17,26 @@ use Symfony\Component\Form\ValueTransformer\DateTimeToStringTransformer;
 use Symfony\Component\Form\ValueTransformer\DateTimeToTimestampTransformer;
 use Symfony\Component\Form\ValueTransformer\ValueTransformerChain;
 
+/**
+ * Represents a time field.
+ *
+ * Available options:
+ *
+ *  * widget:         How to render the time field ("input" or "choice"). Default: "choice".
+ *  * type:           The type of the date stored on the object. Default: "datetime":
+ *                    * datetime:   A DateTime object;
+ *                    * string:     A raw string (e.g. 2011-05-01 12:30:00, Y-m-d H:i:s);
+ *                    * timestamp:  A unix timestamp (e.g. 1304208000).
+ *                    * raw:        An hour, minute, second array
+ *  * with_seconds    Whether or not to create a field for seconds. Default: false.
+ *
+ *  * hours:          An array of hours for the hour select tag.
+ *  * minutes:        An array of minutes for the minute select tag.
+ *  * seconds:        An array of seconds for the second select tag.
+ *
+ *  * data_timezone:  The timezone of the data. Default: UTC.
+ *  * user_timezone:  The timezone of the user entering a new value. Default: UTC.
+ */
 class TimeField extends FieldGroup
 {
     const INPUT = 'input';
@@ -44,14 +64,16 @@ class TimeField extends FieldGroup
      */
     protected function configure()
     {
+        $this->addOption('widget', self::CHOICE, self::$widgets);
+        $this->addOption('type', self::DATETIME, self::$types);
+        $this->addOption('with_seconds', false);
+
         $this->addOption('hours', range(0, 23));
         $this->addOption('minutes', range(0, 59));
         $this->addOption('seconds', range(0, 59));
-        $this->addOption('widget', self::CHOICE, self::$widgets);
-        $this->addOption('type', self::DATETIME, self::$types);
+
         $this->addOption('data_timezone', 'UTC');
         $this->addOption('user_timezone', 'UTC');
-        $this->addOption('with_seconds', false);
 
         if ($this->getOption('widget') == self::INPUT) {
             $this->add(new TextField('hour', array('max_length' => 2)));

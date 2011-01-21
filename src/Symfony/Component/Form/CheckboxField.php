@@ -19,7 +19,10 @@ namespace Symfony\Component\Form;
 class CheckboxField extends ToggleField
 {
     /**
-     * {@inheritDoc}
+     * Available options:
+     *
+     *  * value:    The value of the input checkbox. If the checkbox is checked,
+     *              this value will be posted as the value of the field.
      */
     protected function configure()
     {

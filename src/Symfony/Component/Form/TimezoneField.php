@@ -11,6 +11,15 @@
 
 namespace Symfony\Component\Form;
 
+/**
+ * Represents a field where each timezone is broken down by continent.
+ *
+ * Available options:
+ *
+ *  * empty_value:   If set to a non-false value, an "empty" option will
+ *                  be added to the top of the timezone choices. A
+ *                  common value might be "Choose a timezone". Default: false.
+ */
 class TimezoneField extends ChoiceField
 {
     /**
@@ -24,7 +33,15 @@ class TimezoneField extends ChoiceField
      */
     public function configure()
     {
-        $this->addOption('choices', self::getTimezoneChoices());
+        $this->addOption('empty_value', false);
+
+        $choices = self::getTimezoneChoices();
+
+        if (false !== $this->getOption('empty_value')) {
+            $choices = array('' => $this->getOption('empty_value')) + $choices;
+        }
+
+        $this->addOption('choices', $choices);
 
         parent::configure();
     }

@@ -15,6 +15,13 @@ use Symfony\Component\Form\FieldInterface;
 use Symfony\Component\Form\Exception\UnexpectedTypeException;
 
 /**
+ * A field group that repeats the given field multiple times over a collection
+ * specified by the property path if the field.
+ *
+ * Example usage:
+ *
+ *     $form->add(new CollectionField(new TextField('emails')));
+ *
  * @author     Bernhard Schussek <bernhard.schussek@symfony-project.com>
  */
 class CollectionField extends FieldGroup
@@ -32,7 +39,7 @@ class CollectionField extends FieldGroup
     protected $removedFields = array();
 
     /**
-     * Repeats the given field twice to verify the user's input
+     * Repeats the given field multiple times based in the internal collection.
      *
      * @param FieldInterface $innerField
      */
@@ -43,6 +50,15 @@ class CollectionField extends FieldGroup
         parent::__construct($innerField->getKey(), $options);
     }
 
+    /**
+     * Available options:
+     *
+     *  * modifiable:   If true, elements in the collection can be added
+     *                  and removed by the presence of absence of the
+     *                  corresponding field groups. Field groups could be
+     *                  added or removed via Javascript and reflected in
+     *                  the underlying collection. Default: false.
+     */
     protected function configure()
     {
         $this->addOption('modifiable', false);

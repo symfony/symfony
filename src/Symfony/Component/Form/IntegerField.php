@@ -24,6 +24,13 @@ use Symfony\Component\Form\ValueTransformer\NumberToLocalizedStringTransformer;
 /**
  * A localized field for entering integers.
  *
+ * The rounding-mode option defaults to rounding down. The available values are:
+ *  * NumberToLocalizedStringTransformer::ROUND_DOWN
+ *  * NumberToLocalizedStringTransformer::ROUND_UP
+ *  * NumberToLocalizedStringTransformer::ROUND_FLOOR
+ *  * NumberToLocalizedStringTransformer::ROUND_CEILING
+ *
+ * @see Symfony\Component\Form\NumberField
  * @author Bernhard Schussek <bernhard.schussek@symfony-project.com>
  */
 class IntegerField extends NumberField

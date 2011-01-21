@@ -17,8 +17,7 @@ use Symfony\Component\DependencyInjection\ContainerAware;
 /**
  * Controller is a simple implementation of a Controller.
  *
- * It provides methods to common features needed in controllers
- * and an array access to the container services.
+ * It provides methods to common features needed in controllers.
  *
  * @author Fabien Potencier <fabien.potencier@symfony-project.com>
  */

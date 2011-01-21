@@ -14,7 +14,21 @@ namespace Symfony\Component\Form;
 use Symfony\Component\Form\Exception\InvalidOptionsException;
 
 /**
- * Lets the user select between different choices
+ * Lets the user select between different choices.
+ *
+ * Available options:
+ *
+ *  * choices:              An array of key-value pairs that will represent the choices.
+ *  * preferred_choices:    An array of choices (by key) that should be displayed
+ *                          above all other options in the field.
+ *
+ * The multiple and expanded options control exactly which HTML element
+ * that should be used to render this field:
+ *
+ *  * expanded = false, multiple = false    a drop-down select element;
+ *  * expanded = false, multiple = true     a multiple select element;
+ *  * expanded = true, multiple = false     a series of input radio elements;
+ *  * expanded = true, multiple = true      a series of input checkboxes.
  *
  * @author Bernhard Schussek <bernhard.schussek@symfony-project.com>
  */
@@ -26,17 +40,12 @@ class ChoiceField extends HybridField
      */
     protected $preferredChoices = array();
 
-    /**
-     * {@inheritDoc}
-     */
     protected function configure()
     {
         $this->addRequiredOption('choices');
         $this->addOption('preferred_choices', array());
-        $this->addOption('separator', '----------');
         $this->addOption('multiple', false);
         $this->addOption('expanded', false);
-        $this->addOption('empty_value', '');
 
         if (!is_array($this->getOption('choices'))) {
             throw new InvalidOptionsException('The choices option must be an array', array('choices'));
@@ -94,11 +103,6 @@ class ChoiceField extends HybridField
     public function getOtherChoices()
     {
         return array_diff_key($this->getOption('choices'), $this->preferredChoices);
-    }
-
-    public function getEmptyValue()
-    {
-        return $this->isRequired() ? false : $this->getOption('empty_value');
     }
 
     public function getLabel($choice)

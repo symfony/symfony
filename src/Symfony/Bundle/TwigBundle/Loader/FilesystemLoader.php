@@ -24,10 +24,7 @@ class FilesystemLoader implements \Twig_LoaderInterface
     /**
      * Constructor.
      *
-     * @param Kernel                      $kernel     A Kernel instance
-     * @param TemplateNameParserInterface $nameParser A TemplateNameParserInterface instance
-     * @param string                      $path       A global fallback path
-     * @param LoggerInterface             $logger     A LoggerInterface instance
+     * @param TemplateLocator $locator A TemplateLocator instance
      */
     public function __construct(TemplateLocator $locator)
     {

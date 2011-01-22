@@ -74,7 +74,9 @@ EOT
 
         $loader = new \Doctrine\Common\DataFixtures\Loader();
         foreach ($paths as $path) {
-            $loader->loadFromDirectory($path);
+            if (is_dir($path)) {
+                $loader->loadFromDirectory($path);
+            }
         }
         $fixtures = $loader->getFixtures();
         $purger = new \Doctrine\Common\DataFixtures\Purger\ORMPurger($em);

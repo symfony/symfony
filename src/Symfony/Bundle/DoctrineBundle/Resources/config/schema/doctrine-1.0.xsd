@@ -25,10 +25,9 @@
         <xsd:attribute name="unix-socket" type="xsd:string" />
         <xsd:attribute name="memory" type="xsd:boolean" />
         <xsd:attribute name="charset" type="xsd:string" />
-        <xsd:attribute name="configuration-class" type="xsd:string" />
-        <xsd:attribute name="event-manager-class" type="xsd:string" />
         <xsd:attribute name="wrapper-class" type="xsd:string" />
         <xsd:attribute name="platform-service" type="xsd:string" />
+        <xsd:attribute name="logging" type="xsd:boolean" default="false" />
     </xsd:complexType>
 
     <xsd:complexType name="connections">
@@ -51,10 +50,9 @@
         <xsd:attribute name="unix-socket" type="xsd:string" />
         <xsd:attribute name="memory" type="xsd:boolean" />
         <xsd:attribute name="charset" type="xsd:string" />
-        <xsd:attribute name="configuration-class" type="xsd:string" />
-        <xsd:attribute name="event-manager-class" type="xsd:string" />
         <xsd:attribute name="wrapper-class" type="xsd:string" />
         <xsd:attribute name="platform-service" type="xsd:string" />
+        <xsd:attribute name="logging" type="xsd:boolean" default="false" />
     </xsd:complexType>
 
     <xsd:element name="orm" type="orm" />

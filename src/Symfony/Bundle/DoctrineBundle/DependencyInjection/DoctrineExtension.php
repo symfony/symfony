@@ -41,10 +41,10 @@ class DoctrineExtension extends AbstractDoctrineExtension
      */
     public function dbalLoad(array $configs, ContainerBuilder $container)
     {
-        $config = $this->mergeDbalConfig($configs);
-        
         $loader = new XmlFileLoader($container, __DIR__.'/../Resources/config');
         $loader->load('dbal.xml');
+
+        $config = $this->mergeDbalConfig($configs);
 
         $container->setAlias('database_connection', sprintf('doctrine.dbal.%s_connection', $config['default_connection']));
         $container->setParameter('doctrine.dbal.default_connection', $config['default_connection']);
@@ -84,11 +84,10 @@ class DoctrineExtension extends AbstractDoctrineExtension
             'wrapper-class'         => 'wrapperClass', // doctrine conv.
             'charset'               => 'charset',
         );
-        $supportedConfigParams = array(
-            'configuration-class'   => 'configuration_class',
+        $supportedContrainerParams = array(
             'platform-service'      => 'platform_service',
-            'configuration_class'   => 'configuration_class',
-            'platform_service'      => 'platform_service'
+            'platform_service'      => 'platform_service',
+            'logging'               => 'logging',
         );
         $mergedConfig = array(
             'default_connection'  => 'default',
@@ -102,10 +101,7 @@ class DoctrineExtension extends AbstractDoctrineExtension
                 'password'            => null,
                 'port'                => null,
             ),
-            'container' => array(
-                'configuration_class' => 'Doctrine\DBAL\Configuration',
-                'wrapper_class'       => null,
-            ),
+            'container' => array(),
         );
 
         foreach ($configs AS $config) {
@@ -136,8 +132,8 @@ class DoctrineExtension extends AbstractDoctrineExtension
                 foreach ($connection AS $k => $v) {
                     if (isset($supportedConnectionParams[$k])) {
                         $mergedConfig['connections'][$connectionName]['driver'][$supportedConnectionParams[$k]] = $v;
-                    } else if (isset($supportedConfigParams[$k])) {
-                        $mergedConfig['connections'][$connectionName]['container'][$supportedConfigParams[$k]] = $v;
+                    } else if (isset($supportedContrainerParams[$k])) {
+                        $mergedConfig['connections'][$connectionName]['container'][$supportedContrainerParams[$k]] = $v;
                     }
                 }
             }
@@ -154,9 +150,11 @@ class DoctrineExtension extends AbstractDoctrineExtension
      */
     protected function loadDbalConnection(array $connection, ContainerBuilder $container)
     {
-        $containerDef = new Definition($connection['container']['configuration_class']);
+        $containerDef = new Definition($container->getParameter('doctrine.dbal.configuration_class'));
         $containerDef->setPublic(false);
-        $containerDef->addMethodCall('setSQLLogger', array(new Reference('doctrine.dbal.logger')));
+        if (isset($connection['logging']) && $connection['logging']) {
+            $containerDef->addMethodCall('setSQLLogger', array(new Reference('doctrine.dbal.logger')));
+        }
         $container->setDefinition(sprintf('doctrine.dbal.%s_connection.configuration', $connection['name']), $containerDef);
 
         $driverOptions = $connection['driver'];

@@ -18,7 +18,7 @@ use Symfony\Component\HttpKernel\Kernel;
  *
  * @author Fabien Potencier <fabien.potencier@symfony-project.com>
  */
-class TemplateLocator
+class TemplateLocator implements TemplateLocatorInterface
 {
     protected $kernel;
     protected $parser;

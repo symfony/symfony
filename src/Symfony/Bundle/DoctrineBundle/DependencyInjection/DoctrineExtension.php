@@ -106,7 +106,7 @@ class DoctrineExtension extends AbstractDoctrineExtension
             ),
         );
 
-        foreach ($configs AS $config) {
+        foreach ($configs as $config) {
             if (isset($config['default-connection'])) {
                 $mergedConfig['default_connection'] = $config['default-connection'];
             } else if (isset($config['default_connection'])) {
@@ -114,7 +114,7 @@ class DoctrineExtension extends AbstractDoctrineExtension
             }
         }
 
-        foreach ($configs AS $config) {
+        foreach ($configs as $config) {
             if (isset($config['connections'])) {
                 $configConnections = $config['connections'];
                 if (isset($config['connections']['connection']) && isset($config['connections']['connection'][0])) {
@@ -131,7 +131,7 @@ class DoctrineExtension extends AbstractDoctrineExtension
                 }
                 $mergedConfig['connections'][$connectionName]['name'] = $connectionName;
 
-                foreach ($connection AS $k => $v) {
+                foreach ($connection as $k => $v) {
                     if (isset($supportedConnectionParams[$k])) {
                         $mergedConfig['connections'][$connectionName]['driver'][$supportedConnectionParams[$k]] = $v;
                     } else if (isset($supportedContrainerParams[$k])) {
@@ -268,7 +268,7 @@ class DoctrineExtension extends AbstractDoctrineExtension
             'class_metadata_factory_name'   => $container->getParameter('doctrine.orm.class_metadata_factory_name'),
         );
         
-        foreach ($configs AS $config) {
+        foreach ($configs as $config) {
             if (isset($config['default-entity-manager'])) {
                 $mergedConfig['default_entity_manager'] = $config['default-entity-manager'];
             } else if (isset($config['default_entity_manager'])) {
@@ -282,7 +282,7 @@ class DoctrineExtension extends AbstractDoctrineExtension
         }
         $defaultManagerOptions['connection'] = $mergedConfig['default_connection'];
 
-        foreach ($configs AS $config) {
+        foreach ($configs as $config) {
             if (isset($config['entity-managers'])) {
                 $config['entity_managers'] = $config['entity-managers'];
             }
@@ -305,12 +305,12 @@ class DoctrineExtension extends AbstractDoctrineExtension
                 $entityManagers = array($mergedConfig['default_entity_manager'] => $config);
             }
 
-            foreach ($entityManagers AS $name => $managerConfig) {
+            foreach ($entityManagers as $name => $managerConfig) {
                 if (!isset($mergedConfig['entity_managers'][$name])) {
                     $mergedConfig['entity_managers'][$name] = $defaultManagerOptions;
                 }
 
-                foreach ($managerConfig AS $k => $v) {
+                foreach ($managerConfig as $k => $v) {
                     if (isset($supportedEntityManagerOptions[$k])) {
                         $k = $supportedEntityManagerOptions[$k];
                         $mergedConfig['entity_managers'][$name][$k] = $v;
@@ -319,13 +319,13 @@ class DoctrineExtension extends AbstractDoctrineExtension
                 $mergedConfig['entity_managers'][$name]['name'] = $name;
 
                 if (isset($managerConfig['mappings'])) {
-                    foreach ($managerConfig['mappings'] AS $mappingName => $mappingConfig) {
+                    foreach ($managerConfig['mappings'] as $mappingName => $mappingConfig) {
                         if (!isset($mergedConfig['entity_managers'][$name]['mappings'][$mappingName])) {
                             $mergedConfig['entity_managers'][$name]['mappings'][$mappingName] = array();
                         }
 
                         if (is_array($mappingConfig)) {
-                            foreach ($mappingConfig AS $k => $v) {
+                            foreach ($mappingConfig as $k => $v) {
                                 $mergedConfig['entity_managers'][$name]['mappings'][$mappingName][$k] = $v;
                             }
                         }

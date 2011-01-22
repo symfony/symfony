@@ -249,6 +249,10 @@ abstract class AbstractDoctrineExtension extends Extension
                 "require at least the 'type', 'dir' and 'prefix' options.");
         }
 
+        if (!file_exists($mappingConfig['dir'])) {
+            throw new \InvalidArgumentException("Specified non-existing directory '" . $mappingConfig['dir'] . "' as mapping source.");
+        }
+
         if (!in_array($mappingConfig['type'], array('xml', 'yml', 'annotation', 'php', 'staticphp'))) {
             throw new \InvalidArgumentException("Can only configure 'xml', 'yml', 'annotation', 'php' or ".
                 "'static-php' through the DoctrineBundle. Use your own bundle to configure other metadata drivers. " .

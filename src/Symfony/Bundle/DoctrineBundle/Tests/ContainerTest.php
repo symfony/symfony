@@ -11,40 +11,11 @@
 
 namespace Symfony\Bundle\DoctrineBundle\Tests;
 
-use Symfony\Component\DependencyInjection\ContainerBuilder;
-use Symfony\Component\DependencyInjection\ParameterBag\ParameterBag;
-use Symfony\Bundle\DoctrineBundle\DependencyInjection\DoctrineExtension;
-use Symfony\Component\DependencyInjection\Loader\YamlFileLoader;
-
 class ContainerTest extends TestCase
 {
-    public function getContainer()
-    {
-        $container = new ContainerBuilder(new ParameterBag(array(
-            'kernel.bundles'     => array('YamlBundle' => 'DoctrineBundle\Tests\DependencyInjection\Fixtures\Bundles\YamlBundle\YamlBundle'),
-            'kernel.cache_dir'   => sys_get_temp_dir(),
-        )));
-        $loader = new DoctrineExtension();
-        $container->registerExtension($loader);
-        $loader->dbalLoad(array(array(
-            'connections' => array(
-                'default' => array(
-                    'driver' => 'pdo_mysql',
-                    'charset' => 'UTF-8',
-                    'platform-service' => 'my.platform',
-                )
-            )
-        )), $container);
-        $loader->ormLoad(array('bundles' => array('YamlBundle' => array())), $container);
-
-        $container->setDefinition('my.platform', new \Symfony\Component\DependencyInjection\Definition('Doctrine\DBAL\Platforms\MySqlPlatform'));
-
-        return $container;
-    }
-
     public function testContainer()
     {
-        $container = $this->getContainer();
+        $container = $this->createYamlBundleTestContainer();
         $this->assertInstanceOf('Doctrine\DBAL\Logging\DebugStack', $container->get('doctrine.dbal.logger.debug'));
         $this->assertInstanceOf('Doctrine\DBAL\Logging\DebugStack', $container->get('doctrine.dbal.logger'));
         $this->assertInstanceOf('Symfony\Bundle\DoctrineBundle\DataCollector\DoctrineDataCollector', $container->get('doctrine.data_collector'));

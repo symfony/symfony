@@ -12,6 +12,10 @@
 namespace Symfony\Bundle\DoctrineBundle\Tests;
 
 use Doctrine\ORM\EntityManager;
+use Symfony\Component\DependencyInjection\ContainerBuilder;
+use Symfony\Component\DependencyInjection\ParameterBag\ParameterBag;
+use Symfony\Bundle\DoctrineBundle\DependencyInjection\DoctrineExtension;
+use Symfony\Component\DependencyInjection\Loader\YamlFileLoader;
 
 class TestCase extends \PHPUnit_Framework_TestCase
 {
@@ -41,5 +45,36 @@ class TestCase extends \PHPUnit_Framework_TestCase
         );
 
         return EntityManager::create($params, $config);
+    }
+
+    public function createYamlBundleTestContainer()
+    {
+        $container = new ContainerBuilder(new ParameterBag(array(
+            'kernel.bundles'     => array('YamlBundle' => 'DoctrineBundle\Tests\DependencyInjection\Fixtures\Bundles\YamlBundle\YamlBundle'),
+            'kernel.cache_dir'   => sys_get_temp_dir(),
+            'kernel.root_dir'    => __DIR__ . "/../../../../" // src dir
+        )));
+        $loader = new DoctrineExtension();
+        $container->registerExtension($loader);
+        $loader->dbalLoad(array(array(
+            'connections' => array(
+                'default' => array(
+                    'driver' => 'pdo_mysql',
+                    'charset' => 'UTF-8',
+                    'platform-service' => 'my.platform',
+                )
+            )
+        )), $container);
+        $loader->ormLoad(array(
+            array(
+                'mappings' => array('YamlBundle' => array(
+                    'type' => 'yml',
+                    'dir' => __DIR__ . "/DependencyInjection/Fixtures/Bundles/YamlBundle/Resources/config/doctrine/metadata/orm",
+                    'prefix' => 'DoctrineBundle\Tests\DependencyInjection\Fixtures\Bundles\YamlBundle',
+            )))), $container);
+
+        $container->setDefinition('my.platform', new \Symfony\Component\DependencyInjection\Definition('Doctrine\DBAL\Platforms\MySqlPlatform'));
+
+        return $container;
     }
 }

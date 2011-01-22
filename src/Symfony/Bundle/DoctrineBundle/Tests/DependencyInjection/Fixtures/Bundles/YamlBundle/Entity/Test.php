@@ -4,4 +4,5 @@ namespace DoctrineBundle\Tests\DependencyInjection\Fixtures\Bundles\YamlBundle\E
 
 class Test
 {
+    private $id;
 }

@@ -103,9 +103,9 @@ class Request
         $this->query = new ParameterBag(null !== $query ? $query : $_GET);
         $this->attributes = new ParameterBag(null !== $attributes ? $attributes : array());
         $this->cookies = new ParameterBag(null !== $cookies ? $cookies : $_COOKIE);
-        $this->files = new ParameterBag($this->convertFileInformation(null !== $files ? $files : $_FILES));
-        $this->server = new ParameterBag(null !== $server ? $server : $_SERVER);
-        $this->headers = new HeaderBag($this->initializeHeaders());
+        $this->files = new FileBag(null !== $files ? $files : $_FILES);
+        $this->server = new ServerBag(null !== $server ? $server : $_SERVER);
+        $this->headers = new HeaderBag($this->server->getHeaders());
 
         $this->content = null;
         $this->languages = null;
@@ -928,102 +928,6 @@ class Request
         }
 
         return (string) $pathInfo;
-    }
-
-    /**
-     * Converts uploaded files to UploadedFile instances.
-     *
-     * @param  array $files A (multi-dimensional) array of uploaded file information
-     *
-     * @return array A (multi-dimensional) array of UploadedFile instances
-     */
-    protected function convertFileInformation(array $files)
-    {
-        $fixedFiles = array();
-
-        foreach ($files as $key => $data) {
-            $fixedFiles[$key] = $this->fixPhpFilesArray($data);
-        }
-
-        $fileKeys = array('error', 'name', 'size', 'tmp_name', 'type');
-        foreach ($fixedFiles as $key => $data) {
-            if (is_array($data)) {
-                $keys = array_keys($data);
-                sort($keys);
-
-                if ($keys == $fileKeys) {
-                    $data['error'] = (int) $data['error'];
-                }
-
-                if ($keys != $fileKeys) {
-                    $fixedFiles[$key] = $this->convertFileInformation($data);
-                } else if ($data['error'] === UPLOAD_ERR_NO_FILE) {
-                    $fixedFiles[$key] = null;
-                } else {
-                    $fixedFiles[$key] = new UploadedFile($data['tmp_name'], $data['name'], $data['type'], $data['size'], $data['error']);
-                }
-            }
-        }
-
-        return $fixedFiles;
-    }
-
-    /**
-     * Fixes a malformed PHP $_FILES array.
-     *
-     * PHP has a bug that the format of the $_FILES array differs, depending on
-     * whether the uploaded file fields had normal field names or array-like
-     * field names ("normal" vs. "parent[child]").
-     *
-     * This method fixes the array to look like the "normal" $_FILES array.
-     *
-     * It's safe to pass an already converted array, in which case this method
-     * just returns the original array unmodified.
-     *
-     * @param  array $data
-     * @return array
-     */
-    protected function fixPhpFilesArray($data)
-    {
-        if (!is_array($data)) {
-            return $data;
-        }
-
-        $fileKeys = array('error', 'name', 'size', 'tmp_name', 'type');
-        $keys = array_keys($data);
-        sort($keys);
-
-        if ($fileKeys != $keys || !isset($data['name']) || !is_array($data['name'])) {
-            return $data;
-        }
-
-        $files = $data;
-        foreach ($fileKeys as $k) {
-            unset($files[$k]);
-        }
-        foreach (array_keys($data['name']) as $key) {
-            $files[$key] = $this->fixPhpFilesArray(array(
-                'error'    => $data['error'][$key],
-                'name'     => $data['name'][$key],
-                'type'     => $data['type'][$key],
-                'tmp_name' => $data['tmp_name'][$key],
-                'size'     => $data['size'][$key],
-            ));
-        }
-
-        return $files;
-    }
-
-    protected function initializeHeaders()
-    {
-        $headers = array();
-        foreach ($this->server->all() as $key => $value) {
-            if ('http_' === strtolower(substr($key, 0, 5))) {
-                $headers[substr($key, 5)] = $value;
-            }
-        }
-
-        return $headers;
     }
 
     static protected function initializeFormats()

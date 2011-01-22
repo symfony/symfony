@@ -16,7 +16,7 @@
             <xsd:element name="templating" type="templating" minOccurs="0" maxOccurs="1" />
             <xsd:element name="translator" type="translator" minOccurs="0" maxOccurs="1" />
             <xsd:element name="param-converter" type="param-converter" minOccurs="0" maxOccurs="1" />
-            <xsd:element name="csrf_protection" type="csrf_protection" minOccurs="0" maxOccurs="1" />
+            <xsd:element name="csrf-protection" type="csrf_protection" minOccurs="0" maxOccurs="1" />
         </xsd:all>
 
         <xsd:attribute name="ide" type="xsd:string" />

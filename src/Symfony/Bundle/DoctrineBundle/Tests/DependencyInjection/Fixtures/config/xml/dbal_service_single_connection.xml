@@ -9,7 +9,7 @@
     <doctrine:dbal>
       <doctrine:connections>
         <doctrine:connection
-            id="mysql"
+            name="mysql"
             dbname="mysql_db"
             user="mysql_user"
             password="mysql_s3cr3t"

@@ -38,7 +38,7 @@
     </xsd:complexType>
 
     <xsd:complexType name="connection">
-        <xsd:attribute name="id" type="xsd:string" use="required" />
+        <xsd:attribute name="name" type="xsd:string" use="required" />
         <xsd:attribute name="dbname" type="xsd:string" use="required" />
         <xsd:attribute name="host" type="xsd:string" />
         <xsd:attribute name="port" type="xsd:integer" />
@@ -78,12 +78,15 @@
         <xsd:all>
             <xsd:element name="entity-managers" type="entity_managers" minOccurs="0" maxOccurs="1" />
             <xsd:element name="mappings" type="mappings" minOccurs="0" maxOccurs="1" />
-            <xsd:element name="auto-generate-proxy-classes" type="xsd:string" minOccurs="0" maxOccurs="1" />
         </xsd:all>
 
         <xsd:attribute name="default-entity-manager" type="xsd:string" />
-        <xsd:attribute name="metadata-driver" type="xsd:string" />
-        <xsd:attribute name="cache-driver" type="xsd:string" />
+        <xsd:attribute name="default-connection" type="xsd:string" />
+
+        <xsd:attribute name="auto-generate-proxy-classes" type="xsd:boolean" default="false" />
+        <xsd:attribute name="result-cache-driver" type="xsd:string" />
+        <xsd:attribute name="metadata-cache-driver" type="xsd:string" />
+        <xsd:attribute name="query-cache-driver" type="xsd:string" />
     </xsd:complexType>
 
     <xsd:complexType name="entity_managers">
@@ -98,5 +101,9 @@
         </xsd:all>
 
         <xsd:attribute name="connection" type="xsd:string" />
+        <xsd:attribute name="name" type="xsd:string" />
+        <xsd:attribute name="result-cache-driver" type="xsd:string" />
+        <xsd:attribute name="metadata-cache-driver" type="xsd:string" />
+        <xsd:attribute name="query-cache-driver" type="xsd:string" />
     </xsd:complexType>
 </xsd:schema>

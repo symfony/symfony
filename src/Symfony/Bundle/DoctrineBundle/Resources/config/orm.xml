@@ -15,7 +15,6 @@
         <!-- proxies -->
         <parameter key="doctrine.orm.proxy_namespace">Proxies</parameter>
         <parameter key="doctrine.orm.proxy_dir">%kernel.cache_dir%/doctrine/orm/Proxies</parameter>
-        <parameter key="doctrine.orm.auto_generate_proxy_classes">false</parameter>
 
         <!-- cache -->
         <parameter key="doctrine.orm.cache.array_class">Doctrine\Common\Cache\ArrayCache</parameter>

@@ -123,7 +123,6 @@ abstract class AbstractDoctrineExtensionTest extends TestCase
         $this->assertEquals('Doctrine\ORM\Configuration', $container->getParameter('doctrine.orm.configuration_class'));
         $this->assertEquals('Doctrine\ORM\EntityManager', $container->getParameter('doctrine.orm.entity_manager_class'));
         $this->assertEquals('Proxies', $container->getParameter('doctrine.orm.proxy_namespace'));
-        $this->assertEquals(false, $container->getParameter('doctrine.orm.auto_generate_proxy_classes'));
         $this->assertEquals('Doctrine\Common\Cache\ArrayCache', $container->getParameter('doctrine.orm.cache.array_class'));
         $this->assertEquals('Doctrine\Common\Cache\ApcCache', $container->getParameter('doctrine.orm.cache.apc_class'));
         $this->assertEquals('Doctrine\Common\Cache\MemcacheCache', $container->getParameter('doctrine.orm.cache.memcache_class'));
@@ -146,9 +145,6 @@ abstract class AbstractDoctrineExtensionTest extends TestCase
 
         $loader->dbalLoad(array(array()), $container);
         $loader->ormLoad(array($config), $container);
-
-        $this->assertEquals('MyProxies', $container->getParameter('doctrine.orm.proxy_namespace'));
-        $this->assertEquals(true, $container->getParameter('doctrine.orm.auto_generate_proxy_classes'));
 
         $definition = $container->getDefinition('doctrine.dbal.default_connection');
         $this->assertEquals('Doctrine\DBAL\DriverManager', $definition->getClass());
@@ -490,14 +486,16 @@ abstract class AbstractDoctrineExtensionTest extends TestCase
         $container->compile();
 
         $definition = $container->getDefinition('doctrine.orm.default_metadata_cache');
-        $this->assertDICDefinitionClass($definition, 'Doctrine\Common\Cache\MemcacheCache');
+        $this->assertDICDefinitionClass($definition, '%doctrine.orm.cache.memcache_class%');
         $this->assertDICDefinitionMethodCallOnce($definition, 'setMemcache',
             array(new Reference('doctrine.orm.default_memcache_instance'))
         );
 
         $definition = $container->getDefinition('doctrine.orm.default_memcache_instance');
-        $this->assertDICDefinitionClass($definition, 'Memcache');
-        $this->assertDICDefinitionMethodCallOnce($definition, 'connect', array('localhost', 11211));
+        $this->assertDICDefinitionClass($definition, '%doctrine.orm.cache.memcache_instance_class%');
+        $this->assertDICDefinitionMethodCallOnce($definition, 'connect', array(
+            '%doctrine.orm.cache.memcache_host%', '%doctrine.orm.cache.memcache_port%'
+        ));
     }
 
     public function testDependencyInjectionImportsOverrideDefaults()
@@ -512,8 +510,11 @@ abstract class AbstractDoctrineExtensionTest extends TestCase
         $container->getCompilerPassConfig()->setRemovingPasses(array());
         $container->compile();
 
-        $this->assertEquals('apc', $container->getParameter('doctrine.orm.metadata_cache_driver'));
-        $this->assertTrue($container->getParameter('doctrine.orm.auto_generate_proxy_classes'));
+        $cacheDefinition = $container->getDefinition('doctrine.orm.default_metadata_cache');
+        $this->assertEquals('%doctrine.orm.cache.apc_class%', $cacheDefinition->getClass());
+
+        $configDefinition = $container->getDefinition('doctrine.orm.default_configuration');
+        $this->assertDICDefinitionMethodCallOnce($configDefinition, 'setAutoGenerateProxyClasses', array(false));
     }
 
     public function testSingleEntityManagerMultipleMappingBundleDefinitions()

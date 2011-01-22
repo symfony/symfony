@@ -9,20 +9,20 @@
     <doctrine:dbal>
       <doctrine:connections>
         <doctrine:connection
-            id="mysql"
+            name="mysql"
             dbname="mysql_db"
             user="mysql_user"
             password="mysql_s3cr3t"
             unix-socket="/path/to/mysqld.sock" /><!--  -->
         <doctrine:connection
-            id="sqlite"
+            name="sqlite"
             driver="pdo_sqlite"
             dbname="sqlite_db"
             user="sqlite_user"
             password="sqlite_s3cr3t"
             memory="true" />
         <doctrine:connection
-            id="oci"
+            name="oci"
             driver="oci8"
             dbname="oracle_db"
             user="oracle_user"

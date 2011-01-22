@@ -9,12 +9,12 @@
 
     <doctrine:orm>
         <doctrine:entity-managers>
-            <doctrine:entity-manager id="em1">
+            <doctrine:entity-manager name="em1">
                 <mappings>
                     <mapping name="AnnotationsBundle" />
                 </mappings>
             </doctrine:entity-manager>
-            <doctrine:entity-manager id="em2">
+            <doctrine:entity-manager name="em2">
                 <mappings>
                     <mapping name="YamlBundle" dir="Resources/config/doctrine/metadata" alias="yml" />
                     <mapping name="manual" type="xml" prefix="DoctrineBundle\Tests\DependencyInjection\Fixtures\Bundles\XmlBundle"

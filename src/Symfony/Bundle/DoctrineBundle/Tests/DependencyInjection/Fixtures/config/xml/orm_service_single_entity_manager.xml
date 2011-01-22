@@ -7,10 +7,14 @@
                         http://www.symfony-project.org/schema/dic/doctrine/orm http://www.symfony-project.org/schema/dic/doctrine/orm/doctrine-1.0.xsd
                         http://www.symfony-project.org/schema/dic/doctrine/dbal http://www.symfony-project.org/schema/dic/doctrine/dbal/doctrine-1.0.xsd">
 
+    <parameters>
+        <parameter key="doctrine.orm.proxy_namespace">Proxies</parameter>
+    </parameters>
+
     <doctrine:dbal>
         <doctrine:connections>
             <doctrine:connection
-                id="default"
+                name="default"
                 driver="pdo_sqlite"
                 dbname="sqlite_db"
                 user="sqlite_user"
@@ -23,11 +27,10 @@
             metadata-cache-driver="apc"
             default-entity-manager="dm2"
             default-connection="conn1"
-            proxy-namespace="Proxies"
             auto-generate-proxy-classes="true"
         >
         <doctrine:entity-managers>
-            <doctrine:entity-manager id="default" connection="default">
+            <doctrine:entity-manager name="default" connection="default">
                 <metadata-cache-driver type="memcache">
                     <class>Doctrine\Common\Cache\MemcacheCache</class>
                     <host>localhost</host>

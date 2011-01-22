@@ -16,10 +16,10 @@
             <xsd:element name="templating" type="templating" minOccurs="0" maxOccurs="1" />
             <xsd:element name="translator" type="translator" minOccurs="0" maxOccurs="1" />
             <xsd:element name="param-converter" type="param-converter" minOccurs="0" maxOccurs="1" />
+            <xsd:element name="csrf_protection" type="csrf_protection" minOccurs="0" maxOccurs="1" />
         </xsd:all>
 
         <xsd:attribute name="ide" type="xsd:string" />
-        <xsd:attribute name="csrf-secret" type="xsd:string" />
         <xsd:attribute name="charset" type="xsd:string" />
         <xsd:attribute name="error-handler" type="xsd:string" />
     </xsd:complexType>
@@ -77,5 +77,11 @@
     </xsd:complexType>
 
     <xsd:complexType name="param-converter">
+    </xsd:complexType>
+
+    <xsd:complexType name="csrf_protection">
+        <xsd:attribute name="enabled" type="xsd:boolean" />
+        <xsd:attribute name="field-name" type="xsd:string" />
+        <xsd:attribute name="secret" type="xsd:string" />
     </xsd:complexType>
 </xsd:schema>

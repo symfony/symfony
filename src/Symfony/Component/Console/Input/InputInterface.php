@@ -44,13 +44,40 @@ interface InputInterface
      */
     function bind(InputDefinition $definition);
 
+    /**
+     * Validate if arguments given are correct.
+     *
+     * Throws an exception when not enough arguments are given.
+     *
+     * @throws \RuntimeException
+     */
     function validate();
 
+    /**
+     * Returns all the given arguments merged with the default values.
+     *
+     * @return array
+     */
     function getArguments();
 
+    /**
+     * Get argument by name.
+     *
+     * @return mixed
+     */
     function getArgument($name);
 
+    /**
+     * @return array
+     */
     function getOptions();
 
     function getOption($name);
+
+    /**
+     * Is this input means interactive?
+     *
+     * @return bool
+     */
+    function isInteractive();
 }

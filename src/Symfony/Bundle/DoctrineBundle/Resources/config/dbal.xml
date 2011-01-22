@@ -13,7 +13,7 @@
         <parameter key="doctrine.dbal.event_manager_class">Doctrine\Common\EventManager</parameter>
         <parameter key="doctrine.dbal.events.mysql_session_init.class">Doctrine\DBAL\Event\Listeners\MysqlSessionInit</parameter>
         <parameter key="doctrine.dbal.events.oracle_session_init.class">Doctrine\DBAL\Event\Listeners\OracleSessionInit</parameter>
-        <parameter key="doctrine.dbal.logging">false</parameter>
+        <parameter key="doctrine.dbal.logging">0</parameter>
     </parameters>
 
     <services>

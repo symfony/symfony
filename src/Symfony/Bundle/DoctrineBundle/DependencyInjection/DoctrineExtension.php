@@ -44,7 +44,7 @@ class DoctrineExtension extends AbstractDoctrineExtension
         $loader = new XmlFileLoader($container, __DIR__.'/../Resources/config');
         $loader->load('dbal.xml');
 
-        $config = $this->mergeDbalConfig($configs);
+        $config = $this->mergeDbalConfig($configs, $container);
 
         $container->setAlias('database_connection', sprintf('doctrine.dbal.%s_connection', $config['default_connection']));
         $container->setParameter('doctrine.dbal.default_connection', $config['default_connection']);
@@ -64,7 +64,7 @@ class DoctrineExtension extends AbstractDoctrineExtension
      * @param array $configs
      * @return array
      */
-    protected function mergeDbalConfig(array $configs)
+    protected function mergeDbalConfig(array $configs, $container)
     {
         $supportedConnectionParams = array(
             'dbname'                => 'dbname',
@@ -101,7 +101,9 @@ class DoctrineExtension extends AbstractDoctrineExtension
                 'password'            => null,
                 'port'                => null,
             ),
-            'container' => array(),
+            'container' => array(
+                'logging'             => (bool)$container->getParameter('doctrine.dbal.logging')
+            ),
         );
 
         foreach ($configs AS $config) {

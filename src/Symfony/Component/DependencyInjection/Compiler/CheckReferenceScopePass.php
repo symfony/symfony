@@ -69,7 +69,7 @@ class CheckReferenceScopePass implements CompilerPassInterface
         foreach ($arguments as $argument) {
             if (is_array($argument)) {
                 $this->validateReferences($argument);
-            } else if ($argument instanceof Reference) {
+            } elseif ($argument instanceof Reference) {
                 if (!$argument->isStrict()) {
                     continue;
                 }
@@ -86,7 +86,7 @@ class CheckReferenceScopePass implements CompilerPassInterface
                     throw new \RuntimeException(sprintf(
                         'Scope Widening Injection detected: The definition "%s" references the service "%s" which belongs to a narrower scope. '
                        .'Generally, it is safer to either move "%s" to scope "%s" or alternatively rely on the provider pattern by injecting the container itself, and requesting the service "%s" each time it is needed. '
-                       .'In rare, special cases however that might not be necessary, then you can set the reference to strict=false to get rid of this warning.',
+                       .'In rare, special cases however that might not be necessary, then you can set the reference to strict=false to get rid of this error.',
                        $this->currentId,
                        $id,
                        $this->currentId,
@@ -99,7 +99,7 @@ class CheckReferenceScopePass implements CompilerPassInterface
                     throw new \RuntimeException(sprintf(
                         'Cross-Scope Injection detected: The definition "%s" references the service "%s" which belongs to another scope hierarchy. '
                        .'This service might not be available consistently. Generally, it is safer to either move the definition "%s" to scope "%s", or '
-                       .'declare "%s" as a child scope of "%s". If you can be sure that the other scope is always active, you can set the reference to strict=false to get rid of this warning.',
+                       .'declare "%s" as a child scope of "%s". If you can be sure that the other scope is always active, you can set the reference to strict=false to get rid of this error.',
                        $this->currentId,
                        $id,
                        $this->currentId,

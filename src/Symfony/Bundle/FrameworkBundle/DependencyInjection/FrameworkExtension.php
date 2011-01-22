@@ -54,6 +54,10 @@ class FrameworkExtension extends Extension
             $loader->load('form.xml');
         }
 
+        if (isset($config['csrf-protection'])) {
+            $config['csrf_protection'] = $config['csrf-protection'];
+        }
+
         if (isset($config['csrf_protection'])) {
             foreach (array('enabled', 'field_name', 'field-name', 'secret') as $key) {
                 if (isset($config['csrf_protection'][$key])) {

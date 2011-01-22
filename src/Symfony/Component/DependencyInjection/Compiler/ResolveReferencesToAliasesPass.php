@@ -51,7 +51,7 @@ class ResolveReferencesToAliasesPass implements CompilerPassInterface
                 $defId = $this->getDefinitionId($id = (string) $argument);
 
                 if ($defId !== $id) {
-                    $arguments[$k] = new Reference($defId, $argument->getInvalidBehavior());
+                    $arguments[$k] = new Reference($defId, $argument->getInvalidBehavior(), $argument->isStrict());
                 }
             }
         }

@@ -219,7 +219,7 @@ class DoctrineExtension extends AbstractDoctrineExtension
 
         $config = $this->mergeOrmConfig($configs, $container);
         
-        $options = array('default_entity_manager', 'default_connection');
+        $options = array('default_entity_manager', 'default_connection', 'auto_generate_proxy_classes');
         foreach ($options as $key) {
             $container->setParameter('doctrine.orm.'.$key, $config[$key]);
         }
@@ -253,6 +253,7 @@ class DoctrineExtension extends AbstractDoctrineExtension
         $mergedConfig = array(
             'default_entity_manager' => 'default',
             'default_connection' => 'default',
+            'auto_generate_proxy_classes' => false,
             'entity_managers' => array(),
         );
 
@@ -278,6 +279,12 @@ class DoctrineExtension extends AbstractDoctrineExtension
                 $mergedConfig['default_connection'] = $config['default-connection'];
             } else if (isset($config['default_connection'])) {
                 $mergedConfig['default_connection'] = $config['default_connection'];
+            }
+            if (isset($config['auto_generate_proxy_classes'])) {
+                $mergedConfig['auto_generate_proxy_classes'] = $config['auto_generate_proxy_classes'];
+            }
+            if (isset($config['auto-generate-proxy-classes'])) {
+                $mergedConfig['auto_generate_proxy_classes'] = $config['auto-generate-proxy-classes'];
             }
         }
         $defaultManagerOptions['connection'] = $mergedConfig['default_connection'];

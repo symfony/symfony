@@ -119,6 +119,7 @@ abstract class AbstractDoctrineExtensionTest extends TestCase
         $loader->dbalLoad(array(array()), $container);
         $loader->ormLoad(array(array('mappings' => array('YamlBundle' => array()))), $container);
 
+        $this->assertFalse($container->getParameter('doctrine.orm.auto_generate_proxy_classes'));
         $this->assertEquals('Doctrine\ORM\Configuration', $container->getParameter('doctrine.orm.configuration_class'));
         $this->assertEquals('Doctrine\ORM\EntityManager', $container->getParameter('doctrine.orm.entity_manager_class'));
         $this->assertEquals('Proxies', $container->getParameter('doctrine.orm.proxy_namespace'));

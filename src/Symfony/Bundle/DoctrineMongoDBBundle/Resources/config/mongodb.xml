@@ -22,7 +22,7 @@
     <parameter key="doctrine.odm.mongodb.auto_generate_proxy_classes">false</parameter>
 
     <!-- hydrators -->
-    <parameter key="doctrine.odm.mongodb.hydrator_namespace">Proxies</parameter>
+    <parameter key="doctrine.odm.mongodb.hydrator_namespace">Hydrators</parameter>
     <parameter key="doctrine.odm.mongodb.hydrator_dir">%kernel.cache_dir%/doctrine/odm/mongodb/Hydrators</parameter>
     <parameter key="doctrine.odm.mongodb.auto_generate_hydrator_classes">false</parameter>
 

@@ -29,20 +29,6 @@ use Symfony\Bundle\DoctrineAbstractBundle\DependencyInjection\AbstractDoctrineEx
  */
 class DoctrineExtension extends AbstractDoctrineExtension
 {
-    public function dbalLoad(array $configs, ContainerBuilder $container)
-    {
-        foreach ($configs as $config) {
-            $this->doDbalLoad($config, $container);
-        }
-    }
-
-    public function ormLoad(array $configs, ContainerBuilder $container)
-    {
-        foreach ($configs as $config) {
-            $this->doOrmLoad($config, $container);
-        }
-    }
-
     /**
      * Loads the DBAL configuration.
      *
@@ -53,10 +39,174 @@ class DoctrineExtension extends AbstractDoctrineExtension
      * @param array $config An array of configuration settings
      * @param ContainerBuilder $container A ContainerBuilder instance
      */
-    protected function doDbalLoad($config, ContainerBuilder $container)
+    public function dbalLoad(array $configs, ContainerBuilder $container)
     {
-        $this->loadDbalDefaults($config, $container);
-        $this->loadDbalConnections($config, $container);
+        $config = $this->mergeDbalConfig($configs);
+        
+        $loader = new XmlFileLoader($container, __DIR__.'/../Resources/config');
+        $loader->load('dbal.xml');
+
+        $container->setAlias('database_connection', sprintf('doctrine.dbal.%s_connection', $config['default_connection']));
+        $container->setParameter('doctrine.dbal.default_connection', $config['default_connection']);
+
+        foreach ($config['connections'] as $name => $connection) {
+            $this->loadDbalConnection($connection, $container);
+        }
+    }
+
+    /**
+     * Merges a set of exclusive independent DBAL configurations into another.
+     *
+     * Beginning from the default settings this method acts as incremental merge
+     * of all the configurations that are passed through multiple environment
+     * and fallbacks for example config.yml + config_dev.yml
+     *
+     * @param array $configs
+     * @return array
+     */
+    protected function mergeDbalConfig(array $configs)
+    {
+        $supportedConnectionParams = array(
+            'dbname'                => 'dbname',
+            'host'                  => 'host',
+            'port'                  => 'port',
+            'user'                  => 'user',
+            'password'              => 'password',
+            'driver'                => 'driver',
+            'driver-class'          => 'driverClass', // doctrine conv.
+            'options'               => 'driverOptions', // doctrine conv.
+            'path'                  => 'path',
+            'unix-socket'           => 'unix_socket',
+            'memory'                => 'memory',
+            'driver_class'          => 'driverClass', // doctrine conv.
+            'unix_socket'           => 'unix_socket',
+            'wrapper_class'         => 'wrapperClass', // doctrine conv.
+            'wrapper-class'         => 'wrapperClass', // doctrine conv.
+            'charset'               => 'charset',
+        );
+        $supportedConfigParams = array(
+            'configuration-class'   => 'configuration_class',
+            'platform-service'      => 'platform_service',
+            'configuration_class'   => 'configuration_class',
+            'platform_service'      => 'platform_service'
+        );
+        $mergedConfig = array(
+            'default_connection'  => 'default',
+        );
+        $connectionDefaults = array(
+            'driver' => array(
+                'host'                => 'localhost',
+                'driver'              => 'pdo_mysql',
+                'driverOptions'       => array(),
+                'user'                => 'root',
+                'password'            => null,
+                'port'                => null,
+            ),
+            'container' => array(
+                'configuration_class' => 'Doctrine\DBAL\Configuration',
+                'wrapper_class'       => null,
+            ),
+        );
+
+        foreach ($configs AS $config) {
+            if (isset($config['default-connection'])) {
+                $mergedConfig['default_connection'] = $config['default-connection'];
+            } else if (isset($config['default_connection'])) {
+                $mergedConfig['default_connection'] = $config['default_connection'];
+            }
+        }
+
+        foreach ($configs AS $config) {
+            if (isset($config['connections'])) {
+                $configConnections = $config['connections'];
+                if (isset($config['connections']['connection']) && isset($config['connections']['connection'][0])) {
+                    $configConnections = $config['connections']['connection'];
+                }
+            } else {
+                $configConnections[$mergedConfig['default_connection']] = $config;
+            }
+            
+            foreach ($configConnections as $name => $connection) {
+                $connectionName = isset($connection['id']) ? $connection['id'] : $name;
+                if (!isset($mergedConfig['connections'][$connectionName])) {
+                    $mergedConfig['connections'][$connectionName] = $connectionDefaults;
+                }
+                $mergedConfig['connections'][$connectionName]['name'] = $connectionName;
+
+                foreach ($connection AS $k => $v) {
+                    if (isset($supportedConnectionParams[$k])) {
+                        $mergedConfig['connections'][$connectionName]['driver'][$supportedConnectionParams[$k]] = $v;
+                    } else if (isset($supportedConfigParams[$k])) {
+                        $mergedConfig['connections'][$connectionName]['container'][$supportedConfigParams[$k]] = $v;
+                    }
+                }
+            }
+        }
+
+        return $mergedConfig;
+    }
+
+    /**
+     * Loads a configured DBAL connection.
+     *
+     * @param array $connection A dbal connection configuration.
+     * @param ContainerBuilder $container A ContainerBuilder instance
+     */
+    protected function loadDbalConnection(array $connection, ContainerBuilder $container)
+    {
+        $containerDef = new Definition($connection['container']['configuration_class']);
+        $containerDef->setPublic(false);
+        $containerDef->addMethodCall('setSQLLogger', array(new Reference('doctrine.dbal.logger')));
+        $container->setDefinition(sprintf('doctrine.dbal.%s_connection.configuration', $connection['name']), $containerDef);
+
+        $driverOptions = $connection['driver'];
+
+        $driverDef = new Definition('Doctrine\DBAL\DriverManager');
+        $driverDef->setFactoryMethod('getConnection');
+        $container->setDefinition(sprintf('doctrine.dbal.%s_connection', $connection['name']), $driverDef);
+
+        // event manager
+        $eventManagerId = sprintf('doctrine.dbal.%s_connection.event_manager', $connection['name']);
+        $eventManagerDef = new Definition('%doctrine.dbal.event_manager_class%');
+        $eventManagerDef->setPublic(false);
+        $container->setDefinition($eventManagerId, $eventManagerDef);
+
+        if ($container->getParameter('doctrine.dbal.default_connection') == $connection['name']) {
+            $container->setAlias('doctrine.dbal.event_manager', new Alias(sprintf('doctrine.dbal.%s_connection.event_manager', $connection['name']), false));
+        }
+
+        if (isset($driverOptions['charset'])) {
+            if ( (isset($driverOptions['driver']) && stripos($driverOptions['driver'], 'mysql') !== false) ||
+                 (isset($driverOptions['driverClass']) && stripos($driverOptions['driverClass'], 'mysql') !== false)) {
+                $mysqlSessionInit = new Definition('%doctrine.dbal.events.mysql_session_init.class%');
+                $mysqlSessionInit->setArguments(array($driverOptions['charset']));
+                $mysqlSessionInit->setPublic(false);
+                $mysqlSessionInit->addTag(sprintf('doctrine.dbal.%s_event_subscriber', $connection['name']));
+
+                $container->setDefinition(
+                    sprintf('doctrine.dbal.%s_connection.events.mysqlsessioninit', $connection['name']),
+                    $mysqlSessionInit
+                );
+                unset($driverOptions['charset']);
+            }
+        }
+
+        if (isset($connection['container']['platform_service'])) {
+            $driverOptions['platform'] = new Reference($connection['container']['platform_service']);
+        }
+
+        $driverDef->setArguments(array(
+            $driverOptions,
+            new Reference(sprintf('doctrine.dbal.%s_connection.configuration', $connection['name'])),
+            new Reference(sprintf('doctrine.dbal.%s_connection.event_manager', $connection['name']))
+        ));
+    }
+
+    public function ormLoad(array $configs, ContainerBuilder $container)
+    {
+        foreach ($configs as $config) {
+            $this->doOrmLoad($config, $container);
+        }
     }
 
     /**
@@ -73,175 +223,6 @@ class DoctrineExtension extends AbstractDoctrineExtension
     {
         $this->loadOrmDefaults($config, $container);
         $this->loadOrmEntityManagers($config, $container);
-    }
-
-    /**
-     * Loads the DBAL configuration defaults.
-     *
-     * @param array $config An array of configuration settings
-     * @param ContainerBuilder $container A ContainerBuilder instance
-     */
-    protected function loadDbalDefaults(array $config, ContainerBuilder $container)
-    {
-        // arbitrary service that is always part of the "dbal" services. Its used to check if the
-        // defaults have to applied (first time run) or ignored (second or n-th run due to imports)
-        if (!$container->hasDefinition('doctrine.dbal.logger')) {
-            $loader = new XmlFileLoader($container, __DIR__.'/../Resources/config');
-            $loader->load('dbal.xml');
-        }
-
-        $defaultConnectionName = isset($config['default-connection']) ? $config['default-connection'] : (isset($config['default_connection']) ? $config['default_connection'] : $container->getParameter('doctrine.dbal.default_connection'));
-        $container->setAlias('database_connection', sprintf('doctrine.dbal.%s_connection', $defaultConnectionName));
-        $container->setParameter('doctrine.dbal.default_connection', $defaultConnectionName);
-    }
-
-    /**
-     * Loads the configured DBAL connections.
-     *
-     * @param array $config An array of configuration settings
-     * @param ContainerBuilder $container A ContainerBuilder instance
-     */
-    protected function loadDbalConnections(array $config, ContainerBuilder $container)
-    {
-        $connections = $this->getDbalConnections($config, $container);
-        foreach ($connections as $name => $connection) {
-            $connection['name'] = $name;
-            $this->loadDbalConnection($connection, $container);
-        }
-    }
-
-    /**
-     * Loads a configured DBAL connection.
-     *
-     * @param array $connection A dbal connection configuration.
-     * @param ContainerBuilder $container A ContainerBuilder instance
-     */
-    protected function loadDbalConnection(array $connection, ContainerBuilder $container)
-    {
-        // previously registered?
-        if ($container->hasDefinition(sprintf('doctrine.dbal.%s_connection', $connection['name']))) {
-            $driverDef = $container->getDefinition(sprintf('doctrine.dbal.%s_connection', $connection['name']));
-            $arguments = $driverDef->getArguments();
-            $driverOptions = $arguments[0];
-        } else {
-            $containerClass = isset($connection['configuration-class']) ? $connection['configuration-class'] : (isset($connection['configuration_class']) ? $connection['configuration_class'] : 'Doctrine\DBAL\Configuration');
-            $containerDef = new Definition($containerClass);
-            $containerDef->setPublic(false);
-            $containerDef->addMethodCall('setSqlLogger', array(new Reference('doctrine.dbal.logger')));
-            $container->setDefinition(sprintf('doctrine.dbal.%s_connection.configuration', $connection['name']), $containerDef);
-
-            $driverOptions = array();
-            $driverDef = new Definition('Doctrine\DBAL\DriverManager');
-            $driverDef->setFactoryMethod('getConnection');
-            $container->setDefinition(sprintf('doctrine.dbal.%s_connection', $connection['name']), $driverDef);
-        }
-
-        if (isset($connection['driver'])) {
-            $driverOptions['driver'] = $connection['driver'];
-        }
-        if (isset($connection['driver-class'])) {
-            $driverOptions['driverClass'] = $connection['driver-class'];
-        }
-        if (isset($connection['driver_class'])) {
-            $driverOptions['driverClass'] = $connection['driver_class'];
-        }
-        if (isset($connection['wrapper-class'])) {
-            $driverOptions['wrapperClass'] = $connection['wrapper-class'];
-        }
-        if (isset($connection['wrapper_class'])) {
-            $driverOptions['wrapperClass'] = $connection['wrapper_class'];
-        }
-        if (isset($connection['options'])) {
-            $driverOptions['driverOptions'] = $connection['options'];
-        }
-        foreach (array('dbname', 'host', 'user', 'password', 'path', 'memory', 'port', 'unix_socket', 'charset') as $key) {
-            if (isset($connection[$key])) {
-                $driverOptions[$key] = $connection[$key];
-            }
-
-            $nKey = str_replace('_', '-', $key);
-            if (isset($connection[$nKey])) {
-                $driverOptions[$key] = $connection[$nKey];
-            }
-        }
-
-        // event manager
-        $eventManagerName = isset($connection['event_manager']) ? $connection['event_manager'] : $connection['name'];
-        $eventManagerId = sprintf('doctrine.dbal.%s_connection.event_manager', $eventManagerName);
-        if (!$container->hasDefinition($eventManagerId)) {
-            $eventManagerDef = new Definition('%doctrine.dbal.event_manager_class%');
-            $eventManagerDef->setPublic(false);
-            $container->setDefinition($eventManagerId, $eventManagerDef);
-        }
-
-        if ($container->getParameter('doctrine.dbal.default_connection') == $connection['name']) {
-            $container->setAlias('doctrine.dbal.event_manager', new Alias(sprintf('doctrine.dbal.%s_connection.event_manager', $connection['name']), false));
-        }
-
-        if (isset($driverOptions['charset'])) {
-            if ( (isset($driverOptions['driver']) && stripos($driverOptions['driver'], 'mysql') !== false) ||
-                 (isset($driverOptions['driverClass']) && stripos($driverOptions['driverClass'], 'mysql') !== false)) {
-                $mysqlSessionInit = new Definition('%doctrine.dbal.events.mysql_session_init.class%');
-                $mysqlSessionInit->setArguments(array($driverOptions['charset']));
-                $mysqlSessionInit->setPublic(false);
-                $mysqlSessionInit->addTag(sprintf('doctrine.dbal.%s_event_subscriber', $eventManagerName));
-
-                $container->setDefinition(
-                    sprintf('doctrine.dbal.%s_connection.events.mysqlsessioninit', $connection['name']),
-                    $mysqlSessionInit
-                );
-                unset($driverOptions['charset']);
-            }
-        }
-
-        if (isset($connection['platform-service'])) {
-            $driverOptions['platform'] = new Reference($connection['platform-service']);
-        }
-        if (isset($connection['platform_service'])) {
-            $driverOptions['platform'] = new Reference($connection['platform_service']);
-        }
-
-        $driverDef->setArguments(array(
-            $driverOptions,
-            new Reference(sprintf('doctrine.dbal.%s_connection.configuration', $connection['name'])),
-            new Reference(sprintf('doctrine.dbal.%s_connection.event_manager', $connection['name']))
-        ));
-    }
-
-    /**
-     * Gets the configured DBAL connections.
-     *
-     * @param array $config An array of configuration settings
-     * @param ContainerBuilder $container A ContainerBuilder instance
-     */
-    protected function getDbalConnections(array $config, ContainerBuilder $container)
-    {
-        $defaultConnectionName = $container->getParameter('doctrine.dbal.default_connection');
-        $defaultConnection = array(
-            'driver'              => 'pdo_mysql',
-            'user'                => 'root',
-            'password'            => null,
-            'host'                => 'localhost',
-            'port'                => null,
-            'event_manager_class' => 'Doctrine\Common\EventManager',
-            'configuration_class' => 'Doctrine\DBAL\Configuration',
-            'wrapper_class'       => null,
-            'options'             => array()
-        );
-        $connections = array();
-        if (isset($config['connections'])) {
-            $configConnections = $config['connections'];
-            if (isset($config['connections']['connection']) && isset($config['connections']['connection'][0])) {
-                // Multiple connections
-                $configConnections = $config['connections']['connection'];
-            }
-            foreach ($configConnections as $name => $connection) {
-                $connections[isset($connection['id']) ? $connection['id'] : $name] = array_merge($defaultConnection, $connection);
-            }
-        } else {
-            $connections = array($defaultConnectionName => array_merge($defaultConnection, $config));
-        }
-        return $connections;
     }
 
     /**

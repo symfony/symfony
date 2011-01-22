@@ -72,7 +72,6 @@ class DoctrineMongoDBExtension extends AbstractDoctrineExtension
         $options = array(
             'default_document_manager',
             'default_connection',
-            'cache_driver',
             'metadata_cache_driver',
             'proxy_namespace',
             'auto_generate_proxy_classes',

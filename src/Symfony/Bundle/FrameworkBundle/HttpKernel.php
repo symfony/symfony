@@ -32,18 +32,14 @@ class HttpKernel extends BaseHttpKernel
 
         try {
             $response = parent::handle($request, $type, $catch);
-
-            if (HttpKernelInterface::MASTER_REQUEST !== $type) {
-                $this->container->leaveScope('request');
-            }
-
-            return $response;
         } catch (\Exception $e) {
-            if (HttpKernelInterface::MASTER_REQUEST !== $type) {
-                $this->container->leaveScope('request');
-            }
+            $this->container->leaveScope('request');
 
             throw $e;
         }
+
+        $this->container->leaveScope('request');
+
+        return $response;
     }
 }

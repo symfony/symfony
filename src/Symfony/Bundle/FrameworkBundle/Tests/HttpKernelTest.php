@@ -25,18 +25,11 @@ class HttpKernelTest extends \PHPUnit_Framework_TestCase
             ->method('enterScope')
             ->with($this->equalTo('request'))
         ;
-        if ($type !== HttpKernelInterface::MASTER_REQUEST) {
-            $container
-                ->expects($this->once())
-                ->method('leaveScope')
-                ->with($this->equalTo('request'))
-            ;
-        } else {
-            $container
-                ->expects($this->never())
-                ->method('leaveScope')
-            ;
-        }
+        $container
+            ->expects($this->once())
+            ->method('leaveScope')
+            ->with($this->equalTo('request'))
+        ;
         $container
             ->expects($this->once())
             ->method('set')
@@ -80,18 +73,11 @@ class HttpKernelTest extends \PHPUnit_Framework_TestCase
             ->method('enterScope')
             ->with($this->equalTo('request'))
         ;
-        if ($type !== HttpKernelInterface::MASTER_REQUEST) {
-            $container
-                ->expects($this->once())
-                ->method('leaveScope')
-                ->with($this->equalTo('request'))
-            ;
-        } else {
-            $container
-                ->expects($this->never())
-                ->method('leaveScope')
-            ;
-        }
+        $container
+            ->expects($this->once())
+            ->method('leaveScope')
+            ->with($this->equalTo('request'))
+        ;
         $container
             ->expects($this->once())
             ->method('set')

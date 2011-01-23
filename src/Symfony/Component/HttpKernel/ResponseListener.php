@@ -18,21 +18,12 @@ use Symfony\Component\HttpFoundation\Response;
 /**
  * ResponseListener fixes the Response Content-Type.
  *
+ * The filter method must be connected to the core.response event.
+ *
  * @author Fabien Potencier <fabien.potencier@symfony-project.com>
  */
 class ResponseListener
 {
-    /**
-     * Registers a core.response listener to change the Content-Type header based on the Request format.
-     *
-     * @param EventDispatcher $dispatcher An EventDispatcher instance
-     * @param integer         $priority   The priority
-     */
-    public function register(EventDispatcher $dispatcher, $priority = 0)
-    {
-        $dispatcher->connect('core.response', array($this, 'filter'), $priority);
-    }
-
     /**
      * Filters the Response.
      *

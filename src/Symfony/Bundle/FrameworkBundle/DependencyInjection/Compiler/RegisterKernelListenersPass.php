@@ -24,14 +24,25 @@ class RegisterKernelListenersPass implements CompilerPassInterface
         }
 
         $listeners = array();
-        foreach ($container->findTaggedServiceIds('kernel.listener') as $id => $attributes) {
-            $priority = isset($attributes[0]['priority']) ? $attributes[0]['priority'] : 0;
+        foreach ($container->findTaggedServiceIds('kernel.listener') as $id => $events) {
+            foreach ($events as $event) {
+                $priority = isset($event['priority']) ? $event['priority'] : 0;
+                if (!isset($event['event'])) {
+                    throw new \InvalidArgumentException(sprintf('Service "%s" must define the "event" attribute on "kernel.listener" tags.', $id));
+                }
+                if (!isset($event['method'])) {
+                    throw new \InvalidArgumentException(sprintf('Service "%s" must define the "method" attribute on "kernel.listener" tags.', $id));
+                }
 
-            if (!isset($listeners[$priority])) {
-                $listeners[$priority] = array();
+                if (!isset($listeners[$event['event']][$priority])) {
+                    if (!isset($listeners[$event['event']])) {
+                        $listeners[$event['event']] = array();
+                    }
+                    $listeners[$event['event']][$priority] = array();
+                }
+
+                $listeners[$event['event']][$priority][$id] = $event['method'];
             }
-
-            $listeners[$priority][] = new Reference($id);
         }
 
         $container

@@ -154,15 +154,17 @@
             <argument type="service" id="security.role_hierarchy" />
         </service>
 
-        <service id="security.firewall" class="%security.firewall.class%" public="false">
-            <tag name="kernel.listener" priority="-128" />
+        <service id="security.firewall" class="%security.firewall.class%">
+            <tag name="kernel.listener" event="core.request" method="handle" priority="-128" />
             <argument type="service" id="security.firewall.map" />
+            <argument type="service" id="event_dispatcher" />
         </service>
+
         <service id="security.firewall.map" class="%security.firewall.map.class%" public="false">
             <argument type="service" id="service_container" />
             <argument type="collection" />
         </service>
-        
+
         <service id="security.context_listener" class="%security.context_listener.class%" public="false">
             <argument type="service" id="security.context" />
             <argument type="collection"></argument>

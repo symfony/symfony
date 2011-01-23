@@ -60,7 +60,7 @@ class ResponseListenerTest extends \PHPUnit_Framework_TestCase
     {
         $dispatcher = new EventDispatcher();
         $listener = new ResponseListener();
-        $listener->register($dispatcher);
+        $dispatcher->connect('core.response', array($listener, 'filter'));
 
         return $dispatcher;
     }

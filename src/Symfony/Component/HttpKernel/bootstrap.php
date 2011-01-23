@@ -232,10 +232,6 @@ class ExceptionListener
         $this->controller = $controller;
         $this->logger = $logger;
     }
-    public function register(EventDispatcher $dispatcher, $priority = 0)
-    {
-        $dispatcher->connect('core.exception', array($this, 'handle'), $priority);
-    }
     public function handle(Event $event)
     {
         static $handling;

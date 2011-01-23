@@ -22,6 +22,8 @@ use Symfony\Component\HttpFoundation\Request;
 /**
  * ExceptionListener.
  *
+ * The handle method must be connected to the core.exception event.
+ *
  * @author Fabien Potencier <fabien.potencier@symfony-project.com>
  */
 class ExceptionListener
@@ -33,17 +35,6 @@ class ExceptionListener
     {
         $this->controller = $controller;
         $this->logger = $logger;
-    }
-
-    /**
-     * Registers a core.exception listener.
-     *
-     * @param EventDispatcher $dispatcher An EventDispatcher instance
-     * @param integer         $priority   The priority
-     */
-    public function register(EventDispatcher $dispatcher, $priority = 0)
-    {
-        $dispatcher->connect('core.exception', array($this, 'handle'), $priority);
     }
 
     public function handle(Event $event)

@@ -21,6 +21,8 @@ use Symfony\Component\DependencyInjection\ContainerInterface;
 /**
  * RequestListener.
  *
+ * The handle method must be connected to the core.request event.
+ *
  * @author Fabien Potencier <fabien.potencier@symfony-project.com>
  */
 class RequestListener
@@ -34,17 +36,6 @@ class RequestListener
         $this->container = $container;
         $this->router = $router;
         $this->logger = $logger;
-    }
-
-    /**
-     * Registers a core.request listener.
-     *
-     * @param EventDispatcher $dispatcher An EventDispatcher instance
-     * @param integer         $priority   The priority
-     */
-    public function register(EventDispatcher $dispatcher, $priority = 0)
-    {
-        $dispatcher->connect('core.request', array($this, 'handle'), $priority);
     }
 
     public function handle(Event $event)

@@ -24,6 +24,8 @@ use Symfony\Component\HttpFoundation\Request;
  * (a Basic authentication for the /api, and a web based authentication for
  * everything else for instance).
  *
+ * The handle method must be connected to the core.request event.
+ *
  * @author Fabien Potencier <fabien.potencier@symfony-project.com>
  */
 class Firewall
@@ -37,22 +39,11 @@ class Firewall
      *
      * @param FirewallMap $map A FirewallMap instance
      */
-    public function __construct(FirewallMapInterface $map)
+    public function __construct(FirewallMapInterface $map, EventDispatcher $dispatcher)
     {
         $this->map = $map;
-        $this->currentListeners = array();
-    }
-
-    /**
-     * Registers a core.request listener to enforce security.
-     *
-     * @param EventDispatcher $dispatcher An EventDispatcher instance
-     * @param integer         $priority   The priority
-     */
-    public function register(EventDispatcher $dispatcher, $priority = 0)
-    {
-        $dispatcher->connect('core.request', array($this, 'handle'), $priority);
         $this->dispatcher = $dispatcher;
+        $this->currentListeners = array();
     }
 
     /**

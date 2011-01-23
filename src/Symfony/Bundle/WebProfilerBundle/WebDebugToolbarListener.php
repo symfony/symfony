@@ -21,6 +21,8 @@ use Symfony\Component\HttpKernel\HttpKernelInterface;
 /**
  * WebDebugToolbarListener injects the Web Debug Toolbar.
  *
+ * The handle method must be connected to the core.response event.
+ *
  * @author Fabien Potencier <fabien.potencier@symfony-project.com>
  */
 class WebDebugToolbarListener
@@ -32,17 +34,6 @@ class WebDebugToolbarListener
     {
         $this->kernel = $kernel;
         $this->interceptRedirects = $interceptRedirects;
-    }
-
-    /**
-     * Registers a core.response listener.
-     *
-     * @param EventDispatcher $dispatcher An EventDispatcher instance
-     * @param integer         $priority   The priority
-     */
-    public function register(EventDispatcher $dispatcher, $priority = 0)
-    {
-        $dispatcher->connect('core.response', array($this, 'handle'), $priority);
     }
 
     public function handle(Event $event, Response $response)

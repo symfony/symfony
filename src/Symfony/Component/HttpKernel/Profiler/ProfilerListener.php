@@ -20,6 +20,9 @@ use Symfony\Component\HttpFoundation\RequestMatcherInterface;
 /**
  * ProfilerListener collects data for the current request by listening to the core.response event.
  *
+ * The handleException method must be connected to the core.exception event.
+ * The handleResponse method must be connected to the core.response event.
+ *
  * @author Fabien Potencier <fabien.potencier@symfony-project.com>
  */
 class ProfilerListener
@@ -41,18 +44,6 @@ class ProfilerListener
         $this->profiler = $profiler;
         $this->matcher = $matcher;
         $this->onlyException = $onlyException;
-    }
-
-    /**
-     * Registers a core.response and core.exception listeners.
-     *
-     * @param EventDispatcher $dispatcher An EventDispatcher instance
-     * @param integer         $priority   The priority
-     */
-    public function register(EventDispatcher $dispatcher, $priority = 0)
-    {
-        $dispatcher->connect('core.exception', array($this, 'handleException'), $priority);
-        $dispatcher->connect('core.response', array($this, 'handleResponse'), $priority);
     }
 
     /**

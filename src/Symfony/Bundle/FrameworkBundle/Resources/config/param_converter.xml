@@ -14,8 +14,8 @@
         <service id="request.param_converter.manager" class="%request.param_converter.manager.class%" public="false" />
 
         <!-- ParamConverterListener -->
-        <service id="request.param_converter.listener" class="%request.param_converter.listener.class%" public="false">
-            <tag name="kernel.listener" />
+        <service id="request.param_converter.listener" class="%request.param_converter.listener.class%">
+            <tag name="kernel.listener" event="core.controller" method="filterController" />
             <argument type="service" id="request.param_converter.manager" />
         </service>
     </services>

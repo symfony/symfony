@@ -23,6 +23,8 @@ use Symfony\Component\EventDispatcher\Event;
  * Converts \ReflectionParameters for Controller actions into Objects if the \ReflectionParameter have a class
  * (Typehinted).
  *
+ * The filterController method must be connected to the core.controller event.
+ *
  * @author Fabien Potencier <fabien.potencier@symfony-project.org>
  * @author Henrik Bjornskov <hb@peytz.dk>
  */
@@ -39,15 +41,6 @@ class ParamConverterListener
     public function __construct(ConverterManager $manager)
     {
         $this->manager = $manager;
-    }
-
-    /**
-     * @param EventDispatcher $dispatcher
-     * @param integer         $priority = 0
-     */
-    public function register(EventDispatcher $dispatcher, $priority = 0)
-    {
-        $dispatcher->connect('core.controller', array($this, 'filterController'), $priority);
     }
 
     /**

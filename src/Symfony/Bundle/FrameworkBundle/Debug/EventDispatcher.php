@@ -16,6 +16,7 @@ use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 use Symfony\Component\EventDispatcher\Event;
 use Symfony\Component\HttpKernel\Log\LoggerInterface;
 use Symfony\Component\HttpKernel\Debug\EventDispatcherTraceableInterface;
+use Symfony\Component\DependencyInjection\ContainerInterface;
 
 /**
  * EventDispatcher extends the original EventDispatcher class to add some debugging tools.
@@ -30,10 +31,13 @@ class EventDispatcher extends BaseEventDispatcher implements EventDispatcherTrac
     /**
      * Constructor.
      *
-     * @param LoggerInterface $logger A LoggerInterface instance
+     * @param ContainerInterface $container A ContainerInterface instance
+     * @param LoggerInterface    $logger    A LoggerInterface instance
      */
-    public function __construct(LoggerInterface $logger = null)
+    public function __construct(ContainerInterface $container, LoggerInterface $logger = null)
     {
+        parent::__construct($container);
+
         $this->logger = $logger;
         $this->called = array();
     }

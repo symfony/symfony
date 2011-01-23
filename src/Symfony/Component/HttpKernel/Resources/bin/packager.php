@@ -27,7 +27,6 @@ ClassCollectionLoader::load(array(
     'Symfony\\Component\\HttpKernel\\Bundle\\BundleInterface',
     'Symfony\\Component\\HttpKernel\\Debug\\ErrorHandler',
     'Symfony\\Component\\HttpKernel\\ClassCollectionLoader',
-    'Symfony\\Component\\HttpKernel\\Debug\\ExceptionListener',
 
     'Symfony\\Component\\DependencyInjection\\Container',
     'Symfony\\Component\\DependencyInjection\\ContainerAwareInterface',

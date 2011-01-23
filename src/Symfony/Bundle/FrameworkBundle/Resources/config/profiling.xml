@@ -24,8 +24,9 @@
             <argument>%profiler.storage.lifetime%</argument>
         </service>
 
-        <service id="profiler_listener" class="%profiler_listener.class%" public="false">
-            <tag name="kernel.listener" />
+        <service id="profiler_listener" class="%profiler_listener.class%">
+            <tag name="kernel.listener" event="core.response" method="handleResponse" />
+            <tag name="kernel.listener" event="core.exception" method="handleException" />
             <argument type="service" id="profiler" />
             <argument type="service" id="profiler.request_matcher" on-invalid="null" />
             <argument>%profiler_listener.only_exceptions%</argument>

@@ -24,7 +24,7 @@ class EsiListenerTest extends \PHPUnit_Framework_TestCase
     {
         $dispatcher = new EventDispatcher();
         $listener = new EsiListener(new Esi());
-        $listener->register($dispatcher);
+        $dispatcher->connect('core.response', array($listener, 'filter'));
 
         $event = new Event(null, 'core.response', array('request_type' => HttpKernelInterface::SUB_REQUEST));
         $dispatcher->filter($event, $response = new Response('foo <esi:include src="" />'));
@@ -32,20 +32,11 @@ class EsiListenerTest extends \PHPUnit_Framework_TestCase
         $this->assertEquals('', $response->headers->get('Surrogate-Control'));
     }
 
-    public function testNothingIsRegisteredIfEsiIsNull()
-    {
-        $dispatcher = new EventDispatcher();
-        $listener = new EsiListener();
-        $listener->register($dispatcher);
-
-        $this->assertEquals(array(), $dispatcher->getListeners('core.response'));
-    }
-
     public function testFilterWhenThereIsSomeEsiIncludes()
     {
         $dispatcher = new EventDispatcher();
         $listener = new EsiListener(new Esi());
-        $listener->register($dispatcher);
+        $dispatcher->connect('core.response', array($listener, 'filter'));
 
         $event = new Event(null, 'core.response', array('request_type' => HttpKernelInterface::MASTER_REQUEST));
         $dispatcher->filter($event, $response = new Response('foo <esi:include src="" />'));
@@ -57,7 +48,7 @@ class EsiListenerTest extends \PHPUnit_Framework_TestCase
     {
         $dispatcher = new EventDispatcher();
         $listener = new EsiListener(new Esi());
-        $listener->register($dispatcher);
+        $dispatcher->connect('core.response', array($listener, 'filter'));
 
         $event = new Event(null, 'core.response', array('request_type' => HttpKernelInterface::MASTER_REQUEST));
         $dispatcher->filter($event, $response = new Response('foo'));

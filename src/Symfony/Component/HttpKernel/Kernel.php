@@ -197,14 +197,6 @@ abstract class Kernel implements HttpKernelInterface, \Serializable
     }
 
     /**
-     * {@inheritdoc}
-     */
-    public function getRequest()
-    {
-        return $this->container->get('http_kernel')->getRequest();
-    }
-
-    /**
      * Gets the registered bundle instances.
      *
      * @return array An array of registered bundle instances

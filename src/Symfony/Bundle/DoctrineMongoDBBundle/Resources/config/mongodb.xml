@@ -39,7 +39,6 @@
     <parameter key="doctrine.odm.mongodb.metadata.driver_chain_class">Doctrine\ODM\MongoDB\Mapping\Driver\DriverChain</parameter>
     <parameter key="doctrine.odm.mongodb.metadata.annotation_class">Doctrine\ODM\MongoDB\Mapping\Driver\AnnotationDriver</parameter>
     <parameter key="doctrine.odm.mongodb.metadata.annotation_reader_class">Doctrine\Common\Annotations\AnnotationReader</parameter>
-    <parameter key="doctrine.odm.mongodb.metadata.annotation_default_namespace">Doctrine\ODM\MongoDB\Mapping\</parameter>
     <parameter key="doctrine.odm.mongodb.metadata.xml_class">Doctrine\ODM\MongoDB\Mapping\Driver\XmlDriver</parameter>
     <parameter key="doctrine.odm.mongodb.metadata.yml_class">Doctrine\ODM\MongoDB\Mapping\Driver\YamlDriver</parameter>
 

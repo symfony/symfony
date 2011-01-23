@@ -169,6 +169,15 @@ class Session implements \Serializable
     }
 
     /**
+     * Migrates the current session to a new session id while maintaining all
+     * session attributes.
+     */
+    public function migrate()
+    {
+        $this->storage->regenerate();
+    }
+
+    /**
      * Returns the session ID
      *
      * @return mixed  The session ID

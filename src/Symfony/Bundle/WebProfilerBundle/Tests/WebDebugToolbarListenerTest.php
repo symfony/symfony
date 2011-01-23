@@ -21,7 +21,7 @@ class WebDebugToolbarListenerTest extends \PHPUnit_Framework_TestCase
      */
     public function testInjectToolbar($content, $expected)
     {
-        $resolver = $this->getMock('Symfony\Bundle\FrameworkBundle\Controller\ControllerResolver', array(), array(), '', false);
+        $resolver = $this->getMock('Symfony\Bundle\FrameworkBundle\HttpKernel', array(), array(), '', false);
         $resolver->expects($this->any())
                  ->method('render')
                  ->will($this->returnValue('WDT'));

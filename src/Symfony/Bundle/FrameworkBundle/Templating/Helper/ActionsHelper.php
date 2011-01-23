@@ -12,7 +12,7 @@
 namespace Symfony\Bundle\FrameworkBundle\Templating\Helper;
 
 use Symfony\Component\Templating\Helper\Helper;
-use Symfony\Bundle\FrameworkBundle\Controller\ControllerResolver;
+use Symfony\Bundle\FrameworkBundle\HttpKernel;
 
 /**
  * ActionsHelper manages action inclusions.
@@ -21,16 +21,16 @@ use Symfony\Bundle\FrameworkBundle\Controller\ControllerResolver;
  */
 class ActionsHelper extends Helper
 {
-    protected $resolver;
+    protected $kernel;
 
     /**
      * Constructor.
      *
-     * @param Constructor $resolver A ControllerResolver instance
+     * @param HttpKernel $kernel A HttpKernel instance
      */
-    public function __construct(ControllerResolver $resolver)
+    public function __construct(HttpKernel $kernel)
     {
-        $this->resolver = $resolver;
+        $this->kernel = $kernel;
     }
 
     /**
@@ -53,7 +53,7 @@ class ActionsHelper extends Helper
      * @param array  $attributes An array of request attributes
      * @param array  $options    An array of options
      *
-     * @see Symfony\Bundle\FrameworkBundle\Controller\ControllerResolver::render()
+     * @see Symfony\Bundle\FrameworkBundle\HttpKernel::render()
      */
     public function render($controller, array $attributes = array(), array $options = array())
     {
@@ -64,7 +64,7 @@ class ActionsHelper extends Helper
             $options['query'] = $options['query'];
         }
 
-        return $this->resolver->render($controller, $options);
+        return $this->kernel->render($controller, $options);
     }
 
     /**

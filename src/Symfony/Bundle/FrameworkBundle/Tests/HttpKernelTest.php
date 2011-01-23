@@ -38,7 +38,8 @@ class HttpKernelTest extends \PHPUnit_Framework_TestCase
 
         $dispatcher = new EventDispatcher();
         $resolver = $this->getMock('Symfony\\Component\\HttpKernel\\Controller\\ControllerResolverInterface');
-        $kernel = new HttpKernel($container, $dispatcher, $resolver);
+        $kernel = new HttpKernel($container, $resolver);
+        $kernel->setEventDispatcher($dispatcher);
 
         $controller = function() use($expected)
         {
@@ -86,7 +87,8 @@ class HttpKernelTest extends \PHPUnit_Framework_TestCase
 
         $dispatcher = new EventDispatcher();
         $resolver = $this->getMock('Symfony\\Component\\HttpKernel\\Controller\\ControllerResolverInterface');
-        $kernel = new HttpKernel($container, $dispatcher, $resolver);
+        $kernel = new HttpKernel($container, $resolver);
+        $kernel->setEventDispatcher($dispatcher);
 
         $controller = function() use ($expected)
         {

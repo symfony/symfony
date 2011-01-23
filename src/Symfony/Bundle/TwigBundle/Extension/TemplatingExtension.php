@@ -106,7 +106,7 @@ class TemplatingExtension extends \Twig_Extension
             $options['query'] = $options['query'];
         }
 
-        return $this->container->get('controller_resolver')->render($controller, $options);
+        return $this->container->get('http_kernel')->render($controller, $options);
     }
 
     /**

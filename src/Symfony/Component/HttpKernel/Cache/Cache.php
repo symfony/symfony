@@ -154,11 +154,7 @@ class Cache implements HttpKernelInterface
 
         $response->isNotModified($request);
 
-        if ('head' === strtolower($request->getMethod())) {
-            $response->setContent('');
-        } else {
-            $this->restoreResponseBody($response);
-        }
+        $this->restoreResponseBody($request, $response);
 
         if (HttpKernelInterface::MASTER_REQUEST === $type && $this->options['debug']) {
             $response->headers->set('X-Symfony-Cache', $this->getLog());
@@ -513,8 +509,16 @@ class Cache implements HttpKernelInterface
      *
      * @return Response A Response instance
      */
-    protected function restoreResponseBody(Response $response)
+    protected function restoreResponseBody(Request $request, Response $response)
     {
+        if ('head' === strtolower($request->getMethod())) {
+            $response->setContent('');
+            $response->headers->remove('X-Body-Eval');
+            $response->headers->remove('X-Body-File');
+
+            return;
+        }
+
         if ($response->headers->has('X-Body-Eval')) {
             ob_start();
 

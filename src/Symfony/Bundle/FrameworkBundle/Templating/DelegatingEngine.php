@@ -30,15 +30,10 @@ class DelegatingEngine extends BaseDelegatingEngine implements EngineInterface
      *
      * @param ContainerInterface $container The DI container
      */
-    public function __construct(ContainerInterface $container)
+    public function __construct(ContainerInterface $container, array $engineIds)
     {
         $this->container = $container;
-        $this->engines = array();
-    }
-
-    public function setEngineIds($ids)
-    {
-        $this->engines = $ids;
+        $this->engines = $engineIds;
     }
 
     /**

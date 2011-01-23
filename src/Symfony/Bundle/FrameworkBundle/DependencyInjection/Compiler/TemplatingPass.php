@@ -36,20 +36,5 @@ class TemplatingPass implements CompilerPassInterface
                 $definition->addMethodCall('setHelpers', array($helpers));
             }
         }
-
-        if ($container->hasDefinition('templating.engine.delegating')) {
-            $queue = new \SplPriorityQueue();
-            $order = PHP_INT_MAX;
-            foreach ($container->findTaggedServiceIds('templating.engine') as $id => $attributes) {
-                $queue->insert($id, array(isset($attributes[0]['priority']) ? $attributes[0]['priority'] : 0, --$order));
-            }
-
-            $engines = array();
-            foreach ($queue as $engine) {
-                $engines[] = $engine;
-            }
-
-            $container->getDefinition('templating.engine.delegating')->addMethodCall('setEngineIds', array($engines));
-        }
     }
 }

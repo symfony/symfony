@@ -6,22 +6,11 @@
 
     <parameters>
         <parameter key="templating.engine.delegating.class">Symfony\Bundle\FrameworkBundle\Templating\DelegatingEngine</parameter>
-        <parameter key="templating.engine.php.class">Symfony\Bundle\FrameworkBundle\Templating\PhpEngine</parameter>
         <parameter key="templating.name_parser.class">Symfony\Bundle\FrameworkBundle\Templating\Loader\TemplateNameParser</parameter>
         <parameter key="templating.locator.class">Symfony\Bundle\FrameworkBundle\Templating\Loader\TemplateLocator</parameter>
         <parameter key="templating.loader.filesystem.class">Symfony\Bundle\FrameworkBundle\Templating\Loader\FilesystemLoader</parameter>
         <parameter key="templating.loader.cache.class">Symfony\Component\Templating\Loader\CacheLoader</parameter>
         <parameter key="templating.loader.chain.class">Symfony\Component\Templating\Loader\ChainLoader</parameter>
-        <parameter key="templating.helper.slots.class">Symfony\Component\Templating\Helper\SlotsHelper</parameter>
-        <parameter key="templating.helper.assets.class">Symfony\Bundle\FrameworkBundle\Templating\Helper\AssetsHelper</parameter>
-        <parameter key="templating.helper.actions.class">Symfony\Bundle\FrameworkBundle\Templating\Helper\ActionsHelper</parameter>
-        <parameter key="templating.helper.router.class">Symfony\Bundle\FrameworkBundle\Templating\Helper\RouterHelper</parameter>
-        <parameter key="templating.helper.request.class">Symfony\Bundle\FrameworkBundle\Templating\Helper\RequestHelper</parameter>
-        <parameter key="templating.helper.session.class">Symfony\Bundle\FrameworkBundle\Templating\Helper\SessionHelper</parameter>
-        <parameter key="templating.helper.code.class">Symfony\Bundle\FrameworkBundle\Templating\Helper\CodeHelper</parameter>
-        <parameter key="templating.helper.translator.class">Symfony\Bundle\FrameworkBundle\Templating\Helper\TranslatorHelper</parameter>
-        <parameter key="templating.helper.security.class">Symfony\Bundle\FrameworkBundle\Templating\Helper\SecurityHelper</parameter>
-        <parameter key="templating.helper.form.class">Symfony\Bundle\FrameworkBundle\Templating\Helper\FormHelper</parameter>
         <parameter key="templating.assets.version">null</parameter>
         <parameter key="templating.assets.base_urls" type="collection"></parameter>
         <parameter key="debug.file_link_format">null</parameter>
@@ -30,13 +19,7 @@
     <services>
         <service id="templating.engine.delegating" class="%templating.engine.delegating.class%" public="false">
             <argument type="service" id="service_container" />
-        </service>
-
-        <service id="templating.engine.php" class="%templating.engine.php.class%">
-            <tag name="templating.engine" priority="128" />
-            <argument type="service" id="service_container" />
-            <argument type="service" id="templating.loader" />
-            <call method="setCharset"><argument>%kernel.charset%</argument></call>
+            <argument type="collection" />
         </service>
 
         <service id="templating.name_parser" class="%templating.name_parser.class%">
@@ -63,60 +46,6 @@
             <call method="setDebugger"><argument type="service" id="templating.debugger" on-invalid="ignore" /></call>
         </service>
 
-        <service id="templating.helper.slots" class="%templating.helper.slots.class%">
-            <tag name="templating.helper" alias="slots" />
-        </service>
-
-        <service id="templating.helper.assets" class="%templating.helper.assets.class%">
-            <tag name="templating.helper" alias="assets" />
-            <argument type="service" id="request" strict="false" />
-            <argument>%templating.assets.base_urls%</argument>
-            <argument>%templating.assets.version%</argument>
-        </service>
-
-        <service id="templating.helper.request" class="%templating.helper.request.class%">
-            <tag name="templating.helper" alias="request" />
-            <argument type="service" id="request" strict="false" />
-        </service>
-
-        <service id="templating.helper.session" class="%templating.helper.session.class%">
-            <tag name="templating.helper" alias="session" />
-            <argument type="service" id="request" strict="false" />
-        </service>
-
-        <service id="templating.helper.router" class="%templating.helper.router.class%">
-            <tag name="templating.helper" alias="router" />
-            <argument type="service" id="router" />
-        </service>
-
-        <service id="templating.helper.actions" class="%templating.helper.actions.class%">
-            <tag name="templating.helper" alias="actions" />
-            <argument type="service" id="http_kernel" />
-        </service>
-
-        <service id="templating.helper.code" class="%templating.helper.code.class%">
-            <tag name="templating.helper" alias="code" />
-            <argument>%debug.file_link_format%</argument>
-            <argument>%kernel.root_dir%</argument>
-        </service>
-
-        <service id="templating.helper.translator" class="%templating.helper.translator.class%">
-            <tag name="templating.helper" alias="translator" />
-            <argument type="service" id="translator" />
-        </service>
-
-        <service id="templating.helper.security" class="%templating.helper.security.class%">
-            <tag name="templating.helper" alias="security" />
-            <argument type="service" id="security.context" on-invalid="ignore" />
-        </service>
-
-        <service id="templating.helper.form" class="%templating.helper.form.class%">
-            <tag name="templating.helper" alias="form" />
-            <argument type="service" id="templating" />
-        </service>
-
         <service id="templating.loader" alias="templating.loader.filesystem" />
-
-        <service id="templating" alias="templating.engine.delegating" />
     </services>
 </container>

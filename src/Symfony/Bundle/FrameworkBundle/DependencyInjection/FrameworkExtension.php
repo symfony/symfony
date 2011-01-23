@@ -205,9 +205,10 @@ class FrameworkExtension extends Extension
     {
         $config = isset($config['templating']) ? $config['templating'] : array();
 
-        if (!$container->hasDefinition('templating')) {
+        if (!$container->hasDefinition('templating.locator')) {
             $loader = new XmlFileLoader($container, __DIR__.'/../Resources/config');
             $loader->load('templating.xml');
+            $loader->load('templating_php.xml');
 
             if ($container->getParameter('kernel.debug')) {
                 $loader->load('templating_debug.xml');
@@ -253,6 +254,24 @@ class FrameworkExtension extends Extension
             $container->setDefinition('templating.loader.wrapped', $container->findDefinition('templating.loader'));
             $container->setDefinition('templating.loader', $container->getDefinition('templating.loader.cache'));
             $container->setParameter('templating.loader.cache.path', $config['cache']);
+        }
+
+        // engines
+        if (!$engines = $this->normalizeConfig($config, 'engine')) {
+            throw new \LogicException('You must register at least one templating engine.');
+        }
+
+        foreach ($engines as $i => $engine) {
+            $engines[$i] = new Reference('templating.engine.'.(is_array($engine) ? $engine['id'] : $engine));
+        }
+
+        if (1 === count($engines)) {
+            $container->setAlias('templating', (string) $engines[0]);
+        } else {
+            $def = $container->getDefinition('templating.engine.delegating');
+            $def->setArgument(1, $engines);
+
+            $container->setAlias('templating', 'templating.engine.delegating');
         }
 
         // compilation

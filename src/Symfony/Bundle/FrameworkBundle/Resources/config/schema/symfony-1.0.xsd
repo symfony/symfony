@@ -63,9 +63,10 @@
     </xsd:complexType>
 
     <xsd:complexType name="templating">
-        <xsd:choice minOccurs="0" maxOccurs="unbounded">
-            <xsd:element name="loader" type="xsd:string" />
-        </xsd:choice>
+        <xsd:sequence>
+            <xsd:element name="loader" type="xsd:string" minOccurs="0" maxOccurs="unbounded" />
+            <xsd:element name="engine" type="templating_engine" minOccurs="1" maxOccurs="unbounded" />
+        </xsd:sequence>
 
         <xsd:attribute name="assets-version" type="xsd:string" />
         <xsd:attribute name="assets-base-urls" type="xsd:string" />
@@ -87,5 +88,9 @@
 
     <xsd:complexType name="esi">
         <xsd:attribute name="enabled" type="xsd:boolean" />
+    </xsd:complexType>
+
+    <xsd:complexType name="templating_engine">
+        <xsd:attribute name="id" type="xsd:string" />
     </xsd:complexType>
 </xsd:schema>

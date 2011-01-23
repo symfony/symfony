@@ -34,7 +34,7 @@ class FrameworkExtensionTest extends TestCase
         $this->assertEquals('Symfony\Component\HttpKernel\Profiler\Profiler', $container->getParameter('profiler.class'), '->configLoad() loads the collectors.xml file if not already loaded');
 
         // templating
-        $loader->configLoad(array(array('templating' => array())), $container);
+        $loader->configLoad(array(array('templating' => array('engines' => array('php')))), $container);
         $this->assertEquals('Symfony\\Bundle\\FrameworkBundle\\Templating\\PhpEngine', $container->getParameter('templating.engine.php.class'), '->templatingLoad() loads the templating.xml file if not already loaded');
 
         // validation

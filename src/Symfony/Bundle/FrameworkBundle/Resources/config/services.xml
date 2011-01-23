@@ -27,6 +27,15 @@
             <call method="setEventDispatcher"><argument type="service" id="event_dispatcher" /></call>
         </service>
 
+        <!--
+            If you want to change the Request class, modify the code in
+            your front controller (app.php) so that it passes an instance of
+            YourRequestClass to the Kernel.
+            This service definition only defines the scope of the request.
+            It is used to check references scope.
+        -->
+        <service id="request" scope="request" />
+
         <service id="response" class="%response.class%" scope="prototype">
             <call method="setCharset">
                 <argument>%kernel.charset%</argument>

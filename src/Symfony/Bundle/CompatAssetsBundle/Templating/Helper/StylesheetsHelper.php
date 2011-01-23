@@ -83,15 +83,6 @@ class StylesheetsHelper extends Helper
     }
 
     /**
-     * Outputs HTML representation of the links to stylesheets.
-     *
-     */
-    public function output()
-    {
-        echo $this->render();
-    }
-
-    /**
      * Returns a string representation of this helper as HTML.
      *
      * @return string The HTML representation of the stylesheets

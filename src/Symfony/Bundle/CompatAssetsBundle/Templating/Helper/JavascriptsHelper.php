@@ -83,15 +83,6 @@ class JavascriptsHelper extends Helper
     }
 
     /**
-     * Outputs HTML representation of the links to JavaScripts.
-     *
-     */
-    public function output()
-    {
-        echo $this->render();
-    }
-
-    /**
      * Returns a string representation of this helper as HTML.
      *
      * @return string The HTML representation of the JavaScripts

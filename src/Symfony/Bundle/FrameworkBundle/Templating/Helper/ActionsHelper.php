@@ -34,19 +34,6 @@ class ActionsHelper extends Helper
     }
 
     /**
-     * Outputs the Response content for a given controller.
-     *
-     * @param string $controller A controller name to execute (a string like BlogBundle:Post:index), or a relative URI
-     * @param array  $options    An array of options
-     *
-     * @see render()
-     */
-    public function output($controller, array $attributes = array(), array $options = array())
-    {
-        echo $this->render($controller, $attributes, $options);
-    }
-
-    /**
      * Returns the Response content for a given controller or URI.
      *
      * @param string $controller A controller name to execute (a string like BlogBundle:Post:index), or a relative URI

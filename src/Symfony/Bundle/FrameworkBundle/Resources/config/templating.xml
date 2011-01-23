@@ -24,7 +24,6 @@
         <parameter key="templating.helper.form.class">Symfony\Bundle\FrameworkBundle\Templating\Helper\FormHelper</parameter>
         <parameter key="templating.assets.version">null</parameter>
         <parameter key="templating.assets.base_urls" type="collection"></parameter>
-        <parameter key="templating.renderer.php.class">Symfony\Component\Templating\Renderer\PhpRenderer</parameter>
         <parameter key="debug.file_link_format">null</parameter>
     </parameters>
 

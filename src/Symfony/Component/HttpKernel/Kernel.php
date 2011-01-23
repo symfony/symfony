@@ -29,8 +29,9 @@ use Symfony\Component\HttpKernel\ClassCollectionLoader;
 use Symfony\Component\HttpKernel\Bundle\BundleInterface;
 
 /**
- * The Kernel is the heart of the Symfony system. It manages an environment
- * that can host bundles.
+ * The Kernel is the heart of the Symfony system.
+ *
+ * It manages an environment made of bundles.
  *
  * @author Fabien Potencier <fabien.potencier@symfony-project.org>
  */
@@ -106,16 +107,6 @@ abstract class Kernel implements HttpKernelInterface, \Serializable
     abstract public function registerContainerConfiguration(LoaderInterface $loader);
 
     /**
-     * Checks whether the current kernel has been booted or not.
-     *
-     * @return Boolean $booted
-     */
-    public function isBooted()
-    {
-        return $this->booted;
-    }
-
-    /**
      * Boots the current kernel.
      *
      * This method boots the bundles, which MUST set
@@ -126,7 +117,7 @@ abstract class Kernel implements HttpKernelInterface, \Serializable
     public function boot()
     {
         if (true === $this->booted) {
-            throw new \LogicException('The kernel is already booted.');
+            return;
         }
 
         require_once __DIR__.'/bootstrap.php';

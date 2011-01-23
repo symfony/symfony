@@ -37,9 +37,7 @@ class Application extends BaseApplication
 
         $this->definition->addOption(new InputOption('--shell', '-s', InputOption::VALUE_NONE, 'Launch the shell.'));
 
-        if (!$this->kernel->isBooted()) {
-            $this->kernel->boot();
-        }
+        $this->kernel->boot();
 
         $this->registerCommands();
     }

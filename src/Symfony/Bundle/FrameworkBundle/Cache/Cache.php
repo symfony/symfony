@@ -48,9 +48,7 @@ abstract class Cache extends BaseCache
      */
     protected function forward(Request $request, $raw = false, Response $entry = null)
     {
-        if (!$this->kernel->isBooted()) {
-            $this->kernel->boot();
-        }
+        $this->kernel->boot();
         $this->kernel->getContainer()->set('cache', $this);
         $this->kernel->getContainer()->set('esi', $this->esi);
 

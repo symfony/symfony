@@ -30,7 +30,6 @@
         <parameter key="doctrine.orm.metadata.driver_chain_class">Doctrine\ORM\Mapping\Driver\DriverChain</parameter>
         <parameter key="doctrine.orm.metadata.annotation_class">Doctrine\ORM\Mapping\Driver\AnnotationDriver</parameter>
         <parameter key="doctrine.orm.metadata.annotation_reader_class">Doctrine\Common\Annotations\AnnotationReader</parameter>
-        <parameter key="doctrine.orm.metadata.annotation_default_namespace">Doctrine\ORM\Mapping\</parameter>
         <parameter key="doctrine.orm.metadata.xml_class">Doctrine\ORM\Mapping\Driver\XmlDriver</parameter>
         <parameter key="doctrine.orm.metadata.yml_class">Doctrine\ORM\Mapping\Driver\YamlDriver</parameter>
         <parameter key="doctrine.orm.metadata.php_class">Doctrine\ORM\Mapping\Driver\PHPDriver</parameter>

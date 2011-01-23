@@ -290,9 +290,11 @@ class FrameworkExtension extends Extension
      */
     protected function registerEsiConfiguration(array $config, ContainerBuilder $container)
     {
-        if (!$container->hasDefinition('esi')) {
-            $loader = new XmlFileLoader($container, array(__DIR__.'/../Resources/config', __DIR__.'/Resources/config'));
-            $loader->load('esi.xml');
+        if (isset($config['esi']['enabled']) && $config['esi']['enabled']) {
+            if (!$container->hasDefinition('esi')) {
+                $loader = new XmlFileLoader($container, array(__DIR__.'/../Resources/config', __DIR__.'/Resources/config'));
+                $loader->load('esi.xml');
+            }
         }
     }
 

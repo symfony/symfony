@@ -41,7 +41,7 @@ class ControllerResolver implements ControllerResolverInterface
      * Returns the Controller instance associated with a Request.
      *
      * This method looks for a '_controller' request attribute that represents
-     * the controller name (a string like ClassName:::MethodName).
+     * the controller name (a string like ClassName::MethodName).
      *
      * @param Request $request A Request instance
      *

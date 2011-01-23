@@ -126,6 +126,18 @@ class DefinitionTest extends \PHPUnit_Framework_TestCase
     }
 
     /**
+     * @covers Symfony\Component\DependencyInjection\Definition::setSynthetic
+     * @covers Symfony\Component\DependencyInjection\Definition::isSynthetic
+     */
+    public function testSetIsSynthetic()
+    {
+        $def = new Definition('stdClass');
+        $this->assertFalse($def->isSynthetic(), '->isSynthetic() returns false by default');
+        $this->assertSame($def, $def->setSynthetic(true), '->setSynthetic() implements a fluent interface');
+        $this->assertTrue($def->isSynthetic(), '->isSynthetic() returns true if the instance must not be public.');
+    }
+
+    /**
      * @covers Symfony\Component\DependencyInjection\Definition::setConfigurator
      * @covers Symfony\Component\DependencyInjection\Definition::getConfigurator
      */

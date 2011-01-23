@@ -12,9 +12,7 @@
 namespace Symfony\Component\DependencyInjection\Loader;
 
 use Symfony\Component\DependencyInjection\ContainerInterface;
-
 use Symfony\Component\DependencyInjection\Alias;
-
 use Symfony\Component\DependencyInjection\InterfaceInjector;
 use Symfony\Component\DependencyInjection\Definition;
 use Symfony\Component\DependencyInjection\Reference;
@@ -139,7 +137,7 @@ class XmlFileLoader extends FileLoader
 
         $definition = new Definition();
 
-        foreach (array('class', 'scope', 'public', 'factory-method', 'factory-service') as $key) {
+        foreach (array('class', 'scope', 'public', 'factory-method', 'factory-service', 'synthetic') as $key) {
             if (isset($service[$key])) {
                 $method = 'set'.str_replace('-', '', $key);
                 $definition->$method((string) $service->getAttributeAsPhp($key));

@@ -394,7 +394,9 @@ EOF;
         $this->variableCount = 0;
 
         $return = '';
-        if ($class = $definition->getClass()) {
+        if ($definition->isSynthetic()) {
+            $return = sprintf('@throws \RuntimeException always since this service is expected to be injected dynamically');
+        } else if ($class = $definition->getClass()) {
             $return = sprintf("@return %s A %s instance.", 0 === strpos($class, '%') ? 'Object' : $class, $class);
         } elseif ($definition->getFactoryService()) {
             $return = sprintf('@return Object An instance returned by %s::%s().', $definition->getFactoryService(), $definition->getFactoryMethod());
@@ -443,16 +445,20 @@ EOF;
 EOF;
         }
 
-        $code .=
-            $this->addServiceInclude($id, $definition).
-            $this->addServiceLocalTempVariables($id, $definition).
-            $this->addServiceInlinedDefinitions($id, $definition).
-            $this->addServiceInstance($id, $definition).
-            $this->addServiceInlinedDefinitionsSetup($id, $definition).
-            $this->addServiceMethodCalls($id, $definition).
-            $this->addServiceConfigurator($id, $definition).
-            $this->addServiceReturn($id, $definition)
-        ;
+        if ($definition->isSynthetic()) {
+            $code .= sprintf("        throw new \RuntimeException('You have requested a synthetic service (\"%s\"). The DIC does not know how to construct this service.');\n    }\n", $id);
+        } else {
+            $code .=
+                $this->addServiceInclude($id, $definition).
+                $this->addServiceLocalTempVariables($id, $definition).
+                $this->addServiceInlinedDefinitions($id, $definition).
+                $this->addServiceInstance($id, $definition).
+                $this->addServiceInlinedDefinitionsSetup($id, $definition).
+                $this->addServiceMethodCalls($id, $definition).
+                $this->addServiceConfigurator($id, $definition).
+                $this->addServiceReturn($id, $definition)
+            ;
+        }
 
         $this->definitionVariables = null;
         $this->referenceVariables = null;

@@ -12,7 +12,6 @@
 namespace Symfony\Component\DependencyInjection\Loader;
 
 use Symfony\Component\DependencyInjection\Alias;
-
 use Symfony\Component\DependencyInjection\ContainerInterface;
 use Symfony\Component\DependencyInjection\InterfaceInjector;
 use Symfony\Component\DependencyInjection\Definition;
@@ -146,6 +145,10 @@ class YamlFileLoader extends FileLoader
 
         if (isset($service['scope'])) {
             $definition->setScope($service['scope']);
+        }
+
+        if (isset($service['synthetic'])) {
+            $definition->setSynthetic($service['synthetic']);
         }
 
         if (isset($service['public'])) {

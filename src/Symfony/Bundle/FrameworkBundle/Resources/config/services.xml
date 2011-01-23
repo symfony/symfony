@@ -35,7 +35,7 @@
             This service definition only defines the scope of the request.
             It is used to check references scope.
         -->
-        <service id="request" scope="request" />
+        <service id="request" scope="request" synthetic="true" />
 
         <service id="response" class="%response.class%" scope="prototype">
             <call method="setCharset">

@@ -31,11 +31,8 @@ class TemplatingPass implements CompilerPassInterface
                 }
             }
 
-            $definition = $container->getDefinition('templating.engine.php');
-            $arguments = $definition->getArguments();
-            $definition->setArguments($arguments);
-
             if (count($helpers) > 0) {
+                $definition = $container->getDefinition('templating.engine.php');
                 $definition->addMethodCall('setHelpers', array($helpers));
             }
         }

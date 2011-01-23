@@ -15,6 +15,7 @@ class AclProviderTest extends \PHPUnit_Framework_TestCase
     protected $oidCollection;
     protected $oidAncestorCollection;
     protected $sidCollection;
+    protected $oids = array();
 
     public function testFindAclThrowsExceptionWhenNoAclExists()
     {
@@ -88,7 +89,7 @@ class AclProviderTest extends \PHPUnit_Framework_TestCase
 
         $this->assertInstanceOf('Symfony\Component\Security\Acl\Domain\Acl', $acl);
         $this->assertTrue($oid->equals($acl->getObjectIdentity()));
-        $this->assertEquals(4, $acl->getId());
+        $this->assertEquals((string)$this->oids[4]['_id'], $acl->getId());
         $this->assertEquals(0, count($acl->getClassAces()));
         $this->assertEquals(0, count($this->getField($acl, 'classFieldAces')));
         $this->assertEquals(3, count($acl->getObjectAces()));
@@ -148,7 +149,7 @@ class AclProviderTest extends \PHPUnit_Framework_TestCase
         }
 
         $this->oidCollection = $this->con->selectCollection($options['oid_table_name']);
-        $oids = array();
+        $this->oids = array();
         foreach ($this->getOidData() as $data) {
             $query = array();
             $id = $data[0];
@@ -160,7 +161,7 @@ class AclProviderTest extends \PHPUnit_Framework_TestCase
             $query['object_identity'] = $objectIdentity;
             $parentId = $data[3];
             if($parentId) {
-                $parent = $oids[$parentId];
+                $parent = $this->oids[$parentId];
                 if( isset($parent['ancestors'])) {
                   $ancestors = $parent['ancestors'];
                 }
@@ -170,7 +171,7 @@ class AclProviderTest extends \PHPUnit_Framework_TestCase
             }
             $query['entries_inheriting'] = $data[4];
             $this->oidCollection->insert($query);
-            $oids[$id] = $query;
+            $this->oids[$id] = $query;
         }
         
         $fields = array('id', 'class', 'object_identity', 'field_name', 'ace_order', 'security_identity', 'mask', 'granting', 'granting_strategy', 'audit_success', 'audit_failure');
@@ -180,7 +181,7 @@ class AclProviderTest extends \PHPUnit_Framework_TestCase
             unset($query['id']);
             unset($query['class']);
             $oid = $query['object_identity'];
-            $query['object_identity'] = $oids[$oid];
+            $query['object_identity'] = $this->oids[$oid];
             $sid = $query['security_identity'];
             if($sid) {
                 $query['security_identity'] = $sids[$sid];
@@ -191,6 +192,7 @@ class AclProviderTest extends \PHPUnit_Framework_TestCase
 
     protected function tearDown()
     {
+        $this->oid = array();
         $this->con->drop();
         $this->con = null;
     }
@@ -212,7 +214,6 @@ class AclProviderTest extends \PHPUnit_Framework_TestCase
             array(3, 3, 4, null, 0, 1, 2, 1, 'all', 1, 1),
             array(4, 3, 4, null, 2, 2, 1, 1, 'all', 1, 1),
             array(5, 3, 4, null, 1, 3, 1, 1, 'all', 1, 1),
-            array(6, 2, 2, null, null, null, null, null, null, null, null),  // TODO: WHEN PARENT NOT IN TABLE, CREATE BLANK
         );
     }
 

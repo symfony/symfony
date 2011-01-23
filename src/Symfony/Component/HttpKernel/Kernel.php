@@ -389,6 +389,7 @@ abstract class Kernel implements HttpKernelInterface, \Serializable
     {
         // init bundles
         $this->bundles = array();
+        $this->bundleMap = array();
         foreach ($this->registerBundles() as $bundle) {
             $name = $bundle->getName();
             $this->bundles[$name] = $bundle;

@@ -27,13 +27,6 @@
             <argument type="service" id="controller_resolver" />
         </service>
 
-        <!--
-            If you want to change the Request class, modify the code in
-            your front controller (app.php) so that it passes an instance of
-            YourRequestClass to the Kernel.
-        -->
-        <service id="request" scope="request" />
-
         <service id="response" class="%response.class%" scope="prototype">
             <call method="setCharset">
                 <argument>%kernel.charset%</argument>

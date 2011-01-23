@@ -89,7 +89,7 @@ class HttpKernel implements HttpKernelInterface
 
         // load controller
         if (false === $controller = $this->resolver->getController($request)) {
-            throw new NotFoundHttpException('Unable to find the controller for '.$request->getPathInfo().', check your route configuration.');
+            throw new NotFoundHttpException(sprintf('Unable to find the controller for "%s", check your route configuration.', $request->getPathInfo()));
         }
 
         $event = new Event($this, 'core.controller', array('request_type' => $type, 'request' => $request));

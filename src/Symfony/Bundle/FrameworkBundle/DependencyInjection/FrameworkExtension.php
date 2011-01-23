@@ -230,11 +230,6 @@ class FrameworkExtension extends Extension
             $container->setParameter('templating.assets.base_urls', $config['assets_base_urls']);
         }
 
-        // path for the filesystem loader
-        if (isset($config['path'])) {
-            $container->setParameter('templating.loader.filesystem.path', $config['path']);
-        }
-
         // loaders
         if (isset($config['loader'])) {
             $loaders = array();

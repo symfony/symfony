@@ -69,7 +69,6 @@
 
         <xsd:attribute name="assets-version" type="xsd:string" />
         <xsd:attribute name="assets-base-urls" type="xsd:string" />
-        <xsd:attribute name="path" type="xsd:string" />
         <xsd:attribute name="cache" type="xsd:string" />
     </xsd:complexType>
 

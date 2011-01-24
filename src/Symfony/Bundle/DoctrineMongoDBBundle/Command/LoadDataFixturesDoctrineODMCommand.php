@@ -72,6 +72,8 @@ EOT
             }
         }
 
+        $paths = array_filter($paths, 'is_dir');
+
         $loader = new \Doctrine\Common\DataFixtures\Loader();
         foreach ($paths as $path) {
             $loader->loadFromDirectory($path);

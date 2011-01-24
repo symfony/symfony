@@ -38,7 +38,7 @@ class ResolveInterfaceInjectorsPass implements CompilerPassInterface
                     require_once $definition->getFile();
                 }
 
-                if ($injector->supports($definition->getClass())) {
+                if (null !== $definition->getClass() && $injector->supports($definition->getClass())) {
                     $injector->processDefinition($definition);
                 }
             }

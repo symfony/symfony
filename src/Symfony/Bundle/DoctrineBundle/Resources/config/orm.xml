@@ -12,6 +12,7 @@
         <parameter key="doctrine.orm.configuration_class">Doctrine\ORM\Configuration</parameter>
         <parameter key="doctrine.orm.entity_manager_class">Doctrine\ORM\EntityManager</parameter>
         <parameter key="doctrine.orm.auto_generate_proxy_classes">false</parameter>
+        <parameter key="doctrine.orm.entity_managers" type="collection"></parameter>
 
         <!-- proxies -->
         <parameter key="doctrine.orm.proxy_namespace">Proxies</parameter>
@@ -41,6 +42,9 @@
         
         <!--  security/acl -->
         <parameter key="security.acl.collection_cache.class">Symfony\Bundle\DoctrineBundle\Security\AclCollectionCache</parameter>
+
+        <!-- cache warmer -->
+        <parameter key="doctrine.orm.proxy_cache_warmer.class">Symfony\Bundle\DoctrineBundle\CacheWarmer\ProxyCacheWarmer</parameter>
     </parameters>
 
     <services>
@@ -57,6 +61,11 @@
         <service id="request.param_converter.doctrine" class="Symfony\Bundle\DoctrineBundle\Request\ParamConverter\DoctrineConverter" public="false">
             <tag name="request.param_converter" />
             <argument type="service" id="doctrine.orm.default_entity_manager" />
+        </service>
+
+        <service id="doctrine.orm.proxy_cache_warmer" class="%doctrine.orm.proxy_cache_warmer.class%" public="false">
+            <tag name="kernel.cache_warmer" />
+            <argument type="service" id="service_container" />
         </service>
     </services>
 </container>

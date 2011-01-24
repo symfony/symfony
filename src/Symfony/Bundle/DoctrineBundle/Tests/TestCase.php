@@ -29,13 +29,13 @@ class TestCase extends \PHPUnit_Framework_TestCase
     /**
      * @return EntityManager
      */
-    protected function createTestEntityManager()
+    protected function createTestEntityManager($paths = array())
     {
         $config = new \Doctrine\ORM\Configuration();
         $config->setAutoGenerateProxyClasses(true);
         $config->setProxyDir(\sys_get_temp_dir());
         $config->setProxyNamespace('SymfonyTests\Doctrine');
-        $config->setMetadataDriverImpl($config->newDefaultAnnotationDriver());
+        $config->setMetadataDriverImpl($config->newDefaultAnnotationDriver($paths));
         $config->setQueryCacheImpl(new \Doctrine\Common\Cache\ArrayCache());
         $config->setMetadataCacheImpl(new \Doctrine\Common\Cache\ArrayCache());
 

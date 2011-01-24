@@ -234,6 +234,8 @@ class DoctrineExtension extends AbstractDoctrineExtension
                 );
             }
         }
+
+        $container->setParameter('doctrine.orm.entity_managers', array_keys($config['entity_managers']));
     }
 
     protected function mergeOrmConfig(array $configs, $container)

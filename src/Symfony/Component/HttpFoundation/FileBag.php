@@ -39,7 +39,7 @@ class FileBag extends ParameterBag
      */
     public function set($key, $value)
     {
-        if (is_array($value)) {
+        if (is_array($value) || $value instanceof UploadedFile) {
             parent::set($key, $this->convertFileInformation($value));
         }
     }
@@ -58,12 +58,15 @@ class FileBag extends ParameterBag
     /**
      * Converts uploaded files to UploadedFile instances.
      *
-     * @param  array $file A (multi-dimensional) array of uploaded file information
+     * @param  array|UploadedFile $file A (multi-dimensional) array of uploaded file information
      *
      * @return array A (multi-dimensional) array of UploadedFile instances
      */
-    protected function convertFileInformation(array $file)
+    protected function convertFileInformation($file)
     {
+        if ($file instanceof UploadedFile) {
+            return $file;
+        }
         $file = $this->fixPhpFilesArray($file);
         if (is_array($file)) {
             $keys = array_keys($file);

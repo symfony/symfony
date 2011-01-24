@@ -58,7 +58,7 @@ abstract class Extension extends BaseExtension
      * @param array A config array
      * @param key   The key to normalize
      */
-    protected function normalizeConfig($config, $key)
+    public static function normalizeConfig($config, $key)
     {
         $values = array();
         if (isset($config[$key.'s'])) {

@@ -241,6 +241,9 @@ class MutableAclProviderTest extends \PHPUnit_Framework_TestCase
 
     public function testUpdateDoesNothingWhenThereAreNoChanges()
     {
+        $this->markTestIncomplete(
+          'This test needs to be rewritten.'
+        );
         $con = $this->getMock('Doctrine\DBAL\Connection', array(), array(), '', false);
         $con
             ->expects($this->never())
@@ -314,6 +317,9 @@ class MutableAclProviderTest extends \PHPUnit_Framework_TestCase
 
     public function testUpdateAclWorksForChangingTheParentAcl()
     {
+        $this->markTestIncomplete(
+          'This test needs to be rewritten.'
+        );
         $provider = $this->getProvider();
         $acl = $provider->createAcl(new ObjectIdentity(1, 'Foo'));
         $parentAcl = $provider->createAcl(new ObjectIdentity(1, 'AnotherFoo'));
@@ -343,6 +349,9 @@ class MutableAclProviderTest extends \PHPUnit_Framework_TestCase
      */
     protected function importAcls(AclProvider $provider, array $data)
     {
+        $this->markTestIncomplete(
+          'This test needs to be rewritten.'
+        );
         $aclIds = $parentAcls = array();
         $con = $this->getField($provider, 'connection');
         $con->beginTransaction();
@@ -406,6 +415,7 @@ class MutableAclProviderTest extends \PHPUnit_Framework_TestCase
 
     protected function tearDown()
     {
+        $this->oid = array();
         $this->con->drop();
         $this->con = null;
     }

@@ -63,9 +63,9 @@ abstract class WebTestCase extends BaseWebTestCase
         // find the --configuration flag from PHPUnit
         $cli = implode(' ', $_SERVER['argv']);
         if (preg_match('/\-\-configuration[= ]+([^ ]+)/', $cli, $matches)) {
-            $dir = $dir.'/'.$matches[1];
+            $dir = realpath($matches[1]);
         } elseif (preg_match('/\-c +([^ ]+)/', $cli, $matches)) {
-            $dir = $dir.'/'.$matches[1];
+            $dir = realpath($matches[1]);
         } elseif (file_exists(getcwd().'/phpunit.xml') || file_exists(getcwd().'/phpunit.xml.dist')) {
             $dir = getcwd();
         } else {

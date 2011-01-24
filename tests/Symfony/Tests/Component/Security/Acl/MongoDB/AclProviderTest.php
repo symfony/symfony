@@ -10,7 +10,6 @@ use Doctrine\MongoDB\Connection;
 class AclProviderTest extends \PHPUnit_Framework_TestCase
 {
     protected $con;
-    protected $classCollection;
     protected $entryCollection;
     protected $oidCollection;
     protected $oidAncestorCollection;
@@ -128,13 +127,11 @@ class AclProviderTest extends \PHPUnit_Framework_TestCase
         $options = $this->getOptions();
 
         // populate the db with some test data
-        $this->classCollection = $this->con->selectCollection($options['class_table_name']);
-        $fields = array('class_type');
+        $fields = array('classType');
         $classes = array();
         foreach ($this->getClassData() as $data) {
             $id = array_shift($data);
             $query = array_combine($fields, $data);
-            $this->classCollection->insert($query);
             $classes[$id] = $query;
         }
 
@@ -154,11 +151,8 @@ class AclProviderTest extends \PHPUnit_Framework_TestCase
             $query = array();
             $id = $data[0];
             $classId = $data[1];
-            $objectIdentity = array(
-              "identifier" => $data[2],
-              "type" => $classes[$classId]['class_type']
-            );
-            $query['object_identity'] = $objectIdentity;
+            $query['identifier'] = $data[2];
+            $query['type'] = $classes[$classId]['classType'];
             $parentId = $data[3];
             if($parentId) {
                 $parent = $this->oids[$parentId];
@@ -169,22 +163,22 @@ class AclProviderTest extends \PHPUnit_Framework_TestCase
                 $query['ancestors'] = $ancestors;
                 $query['parent'] = $parent;
             }
-            $query['entries_inheriting'] = $data[4];
+            $query['entriesInheriting'] = $data[4];
             $this->oidCollection->insert($query);
             $this->oids[$id] = $query;
         }
         
-        $fields = array('id', 'class', 'object_identity', 'field_name', 'ace_order', 'security_identity', 'mask', 'granting', 'granting_strategy', 'audit_success', 'audit_failure');
+        $fields = array('id', 'class', 'objectIdentity', 'fieldName', 'aceOrder', 'securityIdentity', 'mask', 'granting', 'grantingStrategy', 'auditSuccess', 'auditFailure');
         $this->entryCollection = $this->con->selectCollection($options['entry_table_name']);
         foreach ($this->getEntryData() as $data) {
             $query = array_combine($fields, $data);
             unset($query['id']);
             unset($query['class']);
-            $oid = $query['object_identity'];
-            $query['object_identity'] = $this->oids[$oid];
-            $sid = $query['security_identity'];
+            $oid = $query['objectIdentity'];
+            $query['objectIdentity'] = $this->oids[$oid];
+            $sid = $query['securityIdentity'];
             if($sid) {
-                $query['security_identity'] = $sids[$sid];
+                $query['securityIdentity'] = $sids[$sid];
             }
             $this->entryCollection->insert($query);
         }
@@ -253,10 +247,9 @@ class AclProviderTest extends \PHPUnit_Framework_TestCase
     protected function getOptions()
     {
         return array(
-            'oid_table_name' => 'acl_object_identities',
-            'class_table_name' => 'acl_classes',
-            'sid_table_name' => 'acl_security_identities',
-            'entry_table_name' => 'acl_entries',
+            'oid_table_name' => 'aclObjectIdentities',
+            'sid_table_name' => 'aclSecurityIdentities',
+            'entry_table_name' => 'aclEntries',
         );
     }
 

@@ -227,8 +227,8 @@ class AclProvider implements AclProviderInterface
         $batchSet = array();
         for ($i=0,$c=count($batch); $i<$c; $i++) {
             $batchSet[] = array(
-                "object_identity.identifier" => $batch[$i]->getIdentifier(),
-                "object_identity.type" => $batch[$i]->getType(),
+                "identifier" => $batch[$i]->getIdentifier(),
+                "type" => $batch[$i]->getType(),
             );
         }
         $query = array('$or'=> $batchSet);
@@ -257,7 +257,7 @@ class AclProvider implements AclProviderInterface
         foreach ($ancestorIds as $id) {
             $stringIds[] = (string) $id;
         }
-        return array("object_identity._id" => array('$in' => $ancestorIds));
+        return array("objectIdentity._id" => array('$in' => $ancestorIds));
     }
 
     /**
@@ -303,8 +303,8 @@ class AclProvider implements AclProviderInterface
         // but it is faster
         $entries = array();
         foreach($cursor as $data) {
-            $objectId       = (string)$data['object_identity']['_id'];
-            $identifier = $data['object_identity']['object_identity']['identifier'];
+            $objectId       = (string)$data['objectIdentity']['_id'];
+            $identifier = $data['objectIdentity']['identifier'];
             $eid        = (string)$data['_id'];
             $entries[$objectId][$eid] = $data;
         }
@@ -321,27 +321,27 @@ class AclProvider implements AclProviderInterface
                         $parent = $parent['parent'];
                     }
                     $entries[$aclId][0] = array (
-                        'object_identity' => $parent,
-                        'field_name' => null,
-                        'ace_order' => null,
-                        'granting_strategy' => null,
+                        'objectIdentity' => $parent,
+                        'fieldName' => null,
+                        'aceOrder' => null,
+                        'grantingStrategy' => null,
                         'mask' => null,
                         'granting' => null,
-                        'audit_failure' => null,
-                        'audit_success' => null,
+                        'auditFailure' => null,
+                        'auditSuccess' => null,
                     );
                 }
                 foreach($entries[$aclId] as $aceId=>$entry) {
-                    $objectIdentity = $entry['object_identity'];
-                    $classType        = $objectIdentity['object_identity']['type'];
-                    $objectIdentifier = $objectIdentity['object_identity']['identifier'];
-                    $fieldName        = $entry['field_name'];
-                    $aceOrder         = $entry['ace_order'];
-                    $grantingStrategy = $entry['granting_strategy'];
+                    $objectIdentity   = $entry['objectIdentity'];
+                    $classType        = $objectIdentity['type'];
+                    $objectIdentifier = $objectIdentity['identifier'];
+                    $fieldName        = $entry['fieldName'];
+                    $aceOrder         = $entry['aceOrder'];
+                    $grantingStrategy = $entry['grantingStrategy'];
                     $mask             = (integer)$entry['mask'];
                     $granting         = $entry['granting'];
-                    $auditFailure     = $entry['audit_failure'];
-                    $auditSuccess     = $entry['audit_success'];
+                    $auditFailure     = $entry['auditFailure'];
+                    $auditSuccess     = $entry['auditSuccess'];
 
                     // has the ACL been hydrated during this hydration cycle?
                     if (isset($acls[$aclId])) {
@@ -373,7 +373,7 @@ class AclProvider implements AclProviderInterface
                             $oidCache[$oidLookupKey] = new ObjectIdentity($objectIdentifier, $classType);
                         }
 
-                        $acl = new Acl($aclId, $oidCache[$oidLookupKey], $permissionGrantingStrategy, $emptyArray, !!$objectIdentity['entries_inheriting']);
+                        $acl = new Acl($aclId, $oidCache[$oidLookupKey], $permissionGrantingStrategy, $emptyArray, !!$objectIdentity['entriesInheriting']);
 
                         // keep a local, and global reference to this ACL
                         $loadedAcls[$classType][$objectIdentifier] = $acl;
@@ -404,9 +404,9 @@ class AclProvider implements AclProviderInterface
                         // It is important to only ever have one ACE instance per actual row since
                         // some ACEs are shared between ACL instances
                         if (!isset($loadedAces[$aceId])) {
-                            $username = $entry['security_identity']['username'];
-                            $securityIdentifier = $entry['security_identity']['identifier'];
-                            $securityId = (string)$entry['security_identity']['_id'];
+                            $username = $entry['securityIdentity']['username'];
+                            $securityIdentifier = $entry['securityIdentity']['identifier'];
+                            $securityId = (string)$entry['securityIdentity']['_id'];
                             if (!isset($sids[$securityId])) {
                                 if ($username) {
                                     $sids[$securityId] = new UserSecurityIdentity(
@@ -498,5 +498,21 @@ class AclProvider implements AclProviderInterface
         }
 
         return $result;
+    }
+
+    /**
+     * Returns the primary key of the passed object identity.
+     *
+     * @param ObjectIdentityInterface $oid
+     * @return integer
+     */
+    protected function retrieveObjectIdentityPrimaryKey(ObjectIdentityInterface $oid)
+    {
+        $query = array(
+            "identifier" => $oid->getIdentifier(),
+            "type" => $$oid->getType(),
+        );
+
+        return $this->connection->selectCollection($this->options['oid_table_name'])->find($query);
     }
 }

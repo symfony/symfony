@@ -110,6 +110,16 @@ class FileBagTest extends \PHPUnit_Framework_TestCase
         $this->assertEquals($file, $files['child']['sub']['file']);
     }
 
+    public function testShouldNotConvertNestedUploadedFiles()
+    {
+        $tmpFile = $this->createTempFile();
+        $file = new UploadedFile($tmpFile, basename($tmpFile), 'text/plain', 100, 0);
+        $bag = new FileBag(array('image' => array('file' => $file)));
+
+        $files = $bag->all();
+        $this->assertEquals($file, $files['image']['file']);
+    }
+
     protected function createTempFile()
     {
         return tempnam(sys_get_temp_dir(), 'FormTest');

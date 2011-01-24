@@ -41,7 +41,7 @@ class RegisterKernelListenersPass implements CompilerPassInterface
                     $listeners[$event['event']][$priority] = array();
                 }
 
-                $listeners[$event['event']][$priority][$id] = $event['method'];
+                $listeners[$event['event']][$priority][] = array($id, $event['method']);
             }
         }
 

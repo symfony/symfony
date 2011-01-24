@@ -48,6 +48,10 @@ class EventDispatcher extends BaseEventDispatcher implements EventDispatcherTrac
     public function notify(Event $event)
     {
         foreach ($this->getListeners($event->getName()) as $listener) {
+            if (is_array($listener) && is_string($listener[0])) {
+                $listener[0] = $this->container->get($listener[0]);
+            }
+
             $this->addCall($event, $listener, 'notify');
 
             call_user_func($listener, $event);
@@ -62,6 +66,10 @@ class EventDispatcher extends BaseEventDispatcher implements EventDispatcherTrac
     public function notifyUntil(Event $event)
     {
         foreach ($this->getListeners($event->getName()) as $i => $listener) {
+            if (is_array($listener) && is_string($listener[0])) {
+                $listener[0] = $this->container->get($listener[0]);
+            }
+
             $this->addCall($event, $listener, 'notifyUntil');
 
             if (call_user_func($listener, $event)) {
@@ -88,6 +96,10 @@ class EventDispatcher extends BaseEventDispatcher implements EventDispatcherTrac
     public function filter(Event $event, $value)
     {
         foreach ($this->getListeners($event->getName()) as $listener) {
+            if (is_array($listener) && is_string($listener[0])) {
+                $listener[0] = $this->container->get($listener[0]);
+            }
+
             $this->addCall($event, $listener, 'filter');
 
             $value = call_user_func($listener, $event, $value);
@@ -115,6 +127,10 @@ class EventDispatcher extends BaseEventDispatcher implements EventDispatcherTrac
 
         foreach (array_keys($this->listeners) as $name) {
             foreach ($this->getListeners($name) as $listener) {
+                if (is_array($listener) && is_string($listener[0])) {
+                    $listener[0] = $this->container->get($listener[0]);
+                }
+
                 $listener = $this->listenerToString($listener);
 
                 if (!isset($this->called[$name.'.'.$listener])) {

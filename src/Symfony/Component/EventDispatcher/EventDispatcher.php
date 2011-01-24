@@ -48,12 +48,13 @@ class EventDispatcher
      *
      * @param string $name An event name
      * @param mixed|null $listener the listener to remove, or null to remove all
+     *
      * @return void
      */
     public function disconnect($name, $listener = null)
     {
         if (!isset($this->listeners[$name])) {
-            return false;
+            return;
         }
 
         if (null === $listener) {

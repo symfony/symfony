@@ -13,6 +13,7 @@ namespace Symfony\Bundle\FrameworkBundle;
 
 use Symfony\Component\EventDispatcher\EventDispatcher as BaseEventDispatcher;
 use Symfony\Component\DependencyInjection\ContainerInterface;
+use Symfony\Component\EventDispatcher\Event;
 
 /**
  * This EventDispatcher automatically gets the kernel listeners injected
@@ -22,7 +23,6 @@ use Symfony\Component\DependencyInjection\ContainerInterface;
 class EventDispatcher extends BaseEventDispatcher
 {
     protected $container;
-    protected $ids;
 
     /**
      * Constructor.
@@ -34,29 +34,58 @@ class EventDispatcher extends BaseEventDispatcher
         $this->container = $container;
     }
 
-    public function registerKernelListeners(array $ids)
+    public function registerKernelListeners(array $listeners)
     {
-        $this->ids = $ids;
+        $this->listeners = $listeners;
     }
 
     /**
      * {@inheritdoc}
      */
-    public function getListeners($name)
+    public function notify(Event $event)
     {
-        if (!isset($this->ids[$name])) {
-            return array();
+        foreach ($this->getListeners($event->getName()) as $listener) {
+            if (is_array($listener) && is_string($listener[0])) {
+                $listener[0] = $this->container->get($listener[0]);
+            }
+            call_user_func($listener, $event);
         }
 
-        $listeners = array();
-        $all = $this->ids[$name];
-        krsort($all);
-        foreach ($all as $l) {
-            foreach ($l as $id => $method) {
-                $listeners[] = array($this->container->get($id), $method);
+        return $event;
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function notifyUntil(Event $event)
+    {
+        foreach ($this->getListeners($event->getName()) as $listener) {
+            if (is_array($listener) && is_string($listener[0])) {
+                $listener[0] = $this->container->get($listener[0]);
+            }
+            if (call_user_func($listener, $event)) {
+                $event->setProcessed(true);
+                break;
             }
         }
 
-        return $listeners;
+        return $event;
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function filter(Event $event, $value)
+    {
+        foreach ($this->getListeners($event->getName()) as $listener) {
+            if (is_array($listener) && is_string($listener[0])) {
+                $listener[0] = $this->container->get($listener[0]);
+            }
+            $value = call_user_func($listener, $event, $value);
+        }
+
+        $event->setReturnValue($value);
+
+        return $event;
     }
 }

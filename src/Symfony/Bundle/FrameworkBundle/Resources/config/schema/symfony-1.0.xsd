@@ -23,7 +23,16 @@
         <xsd:attribute name="ide" type="xsd:string" />
         <xsd:attribute name="charset" type="xsd:string" />
         <xsd:attribute name="error-handler" type="xsd:string" />
+        <xsd:attribute name="cache-warmer" type="cache_warmer" />
     </xsd:complexType>
+
+    <xsd:simpleType name="cache_warmer">
+        <xsd:restriction base="xsd:string">
+            <xsd:enumeration value="false" />
+            <xsd:enumeration value="true" />
+            <xsd:enumeration value="full" />
+        </xsd:restriction>
+    </xsd:simpleType>
 
     <xsd:complexType name="profiler">
         <xsd:all>

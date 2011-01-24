@@ -21,6 +21,7 @@ use Symfony\Bundle\FrameworkBundle\DependencyInjection\Compiler\RoutingResolverP
 use Symfony\Bundle\FrameworkBundle\DependencyInjection\Compiler\ProfilerPass;
 use Symfony\Bundle\FrameworkBundle\DependencyInjection\Compiler\AddClassesToCachePass;
 use Symfony\Bundle\FrameworkBundle\DependencyInjection\Compiler\TranslatorPass;
+use Symfony\Bundle\FrameworkBundle\DependencyInjection\Compiler\AddCacheWarmerPass;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\DependencyInjection\Compiler\PassConfig;
 use Symfony\Component\HttpFoundation\File\File;
@@ -82,6 +83,7 @@ class FrameworkBundle extends Bundle
         $container->addCompilerPass(new AddFieldFactoryGuessersPass());
         $container->addCompilerPass(new AddClassesToCachePass());
         $container->addCompilerPass(new TranslatorPass());
+        $container->addCompilerPass(new AddCacheWarmerPass());
     }
 
     /**

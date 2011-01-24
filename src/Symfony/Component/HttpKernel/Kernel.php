@@ -427,15 +427,22 @@ abstract class Kernel implements HttpKernelInterface, \Serializable
         $location = $this->getCacheDir().'/'.$class;
         $reload = $this->debug ? $this->needsReload($class, $location) : false;
 
+        $fresh = false;
         if ($reload || !file_exists($location.'.php')) {
             $container = $this->buildContainer();
             $this->dumpContainer($container, $class, $location.'.php');
+
+            $fresh = true;
         }
 
         require_once $location.'.php';
 
         $this->container = new $class();
         $this->container->set('kernel', $this);
+
+        if ($fresh && 'cli' !== php_sapi_name()) {
+            $this->container->get('cache_warmer')->warmUp($this->container->getParameter('kernel.cache_dir'));
+        }
     }
 
     public function getKernelParameters()

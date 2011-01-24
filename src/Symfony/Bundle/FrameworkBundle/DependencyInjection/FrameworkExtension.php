@@ -157,6 +157,13 @@ class FrameworkExtension extends Extension
             $this->registerEsiConfiguration($config, $container);
         }
 
+        if (isset($config['cache-warmer'])) {
+            $config['cache_warmer'] = $config['cache-warmer'];
+        }
+
+        $warmer = isset($config['cache_warmer']) ? $config['cache_warmer'] : !$container->getParameter('kernel.debug');
+        $container->setParameter('kernel.cache_warmup', $warmer);
+
         $this->addClassesToCompile(array(
             'Symfony\\Component\\HttpFoundation\\ParameterBag',
             'Symfony\\Component\\HttpFoundation\\HeaderBag',
@@ -276,7 +283,6 @@ class FrameworkExtension extends Extension
 
         // compilation
         $this->addClassesToCompile(array(
-            'Symfony\\Component\\Templating\\DelegatingEngine',
             'Symfony\\Bundle\\FrameworkBundle\\Templating\\EngineInterface',
             'Symfony\\Component\\Templating\\EngineInterface',
         ));

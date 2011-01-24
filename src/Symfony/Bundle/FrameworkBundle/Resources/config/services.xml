@@ -11,6 +11,7 @@
         <parameter key="error_handler.class">Symfony\Component\HttpKernel\Debug\ErrorHandler</parameter>
         <parameter key="error_handler.level">null</parameter>
         <parameter key="filesystem.class">Symfony\Bundle\FrameworkBundle\Util\Filesystem</parameter>
+        <parameter key="cache_warmer.class">Symfony\Component\HttpKernel\CacheWarmer\CacheWarmerAggregate</parameter>
     </parameters>
 
     <services>
@@ -26,6 +27,10 @@
             <argument type="service" id="service_container" />
             <argument type="service" id="controller_resolver" />
             <call method="setEventDispatcher"><argument type="service" id="event_dispatcher" /></call>
+        </service>
+
+        <service id="cache_warmer" class="%cache_warmer.class%">
+            <argument type="collection" />
         </service>
 
         <!--

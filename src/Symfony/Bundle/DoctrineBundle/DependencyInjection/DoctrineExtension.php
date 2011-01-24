@@ -66,8 +66,6 @@ class DoctrineExtension extends AbstractDoctrineExtension
      */
     protected function mergeDbalConfig(array $configs, $container)
     {
-        $configs = array_reverse($configs);
-
         $supportedConnectionParams = array(
             'dbname'                => 'dbname',
             'host'                  => 'host',
@@ -216,8 +214,6 @@ class DoctrineExtension extends AbstractDoctrineExtension
      */
     public function ormLoad(array $configs, ContainerBuilder $container)
     {
-        $configs = array_reverse($configs);
-
         $loader = new XmlFileLoader($container, __DIR__.'/../Resources/config');
         $loader->load('orm.xml');
 
@@ -285,10 +281,10 @@ class DoctrineExtension extends AbstractDoctrineExtension
                 $mergedConfig['default_connection'] = $config['default_connection'];
             }
             if (isset($config['auto_generate_proxy_classes'])) {
-                $defaultManagerOptions['auto_generate_proxy_classes'] = $config['auto_generate_proxy_classes'];
+                $mergedConfig['auto_generate_proxy_classes'] = $config['auto_generate_proxy_classes'];
             }
             if (isset($config['auto-generate-proxy-classes'])) {
-                $defaultManagerOptions['auto_generate_proxy_classes'] = $config['auto-generate-proxy-classes'];
+                $mergedConfig['auto_generate_proxy_classes'] = $config['auto-generate-proxy-classes'];
             }
         }
         $defaultManagerOptions['connection'] = $mergedConfig['default_connection'];

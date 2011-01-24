@@ -17,12 +17,17 @@
             <parameter>TwigBundle::form.html.twig</parameter>
         </parameter>
         <parameter key="templating.engine.twig.class">Symfony\Bundle\TwigBundle\TwigEngine</parameter>
+        <parameter key="templating.cache_warmer.templates_cache.class">Symfony\Bundle\TwigBundle\CacheWarmer\TemplateCacheCacheWarmer</parameter>
     </parameters>
 
     <services>
         <service id="twig" class="%twig.class%">
             <argument type="service" id="twig.loader" />
             <argument>%twig.options%</argument>
+        </service>
+
+        <service id="templating.cache_warmer.templates_cache" class="%templating.cache_warmer.templates_cache.class%" public="false">
+            <argument type="service" id="service_container" />
         </service>
 
         <service id="twig.loader" class="%twig.loader.class%">

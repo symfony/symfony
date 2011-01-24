@@ -108,6 +108,14 @@ class TwigExtension extends Extension
             }
         }
 
+        if (isset($config['cache-warmer'])) {
+            $config['cache_warmer'] = $config['cache-warmer'];
+        }
+
+        if (isset($config['cache_warmer']) && $config['cache_warmer']) {
+            $container->getDefinition('templating.cache_warmer.templates_cache')->addTag('kernel.cache_warmer');
+        }
+
         $container->setParameter('twig.options', array_replace($container->getParameter('twig.options'), $config));
     }
 

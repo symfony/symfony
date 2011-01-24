@@ -69,7 +69,7 @@ class Controller extends ContainerAware
      */
     public function forward($controller, array $path = array(), array $query = array())
     {
-        return $this->container->get('controller_resolver')->forward($controller, $path, $query);
+        return $this->container->get('http_kernel')->forward($controller, $path, $query);
     }
 
     /**

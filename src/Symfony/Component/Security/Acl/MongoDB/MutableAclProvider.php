@@ -3,7 +3,7 @@
 namespace Symfony\Component\Security\Acl\MongoDB;
 
 use Doctrine\Common\PropertyChangedListener;
-use Doctrine\MongoDB\Connection;
+use Doctrine\MongoDB\Database;
 
 use Symfony\Component\Security\Acl\Domain\RoleSecurityIdentity;
 use Symfony\Component\Security\Acl\Domain\UserSecurityIdentity;
@@ -41,9 +41,9 @@ class MutableAclProvider extends AclProvider implements MutableAclProviderInterf
     /**
      * {@inheritDoc}
      */
-    public function __construct(Connection $connection, PermissionGrantingStrategyInterface $permissionGrantingStrategy, array $options, AclCacheInterface $aclCache = null)
+    public function __construct(Database $database, PermissionGrantingStrategyInterface $permissionGrantingStrategy, array $options, AclCacheInterface $aclCache = null)
     {
-        parent::__construct($connection, $permissionGrantingStrategy, $options, $aclCache);
+        parent::__construct($database, $permissionGrantingStrategy, $options, $aclCache);
 
         $this->propertyChanges = new \SplObjectStorage();
     }
@@ -53,7 +53,15 @@ class MutableAclProvider extends AclProvider implements MutableAclProviderInterf
      */
     function createAcl(ObjectIdentityInterface $oid)
     {
+        $key = $this->retrieveObjectIdentityPrimaryKey($oid);
+        if ($this->retrieveObjectIdentityPrimaryKey($oid)) {
+            throw new AclAlreadyExistsException(sprintf('%s is already associated with an ACL.', $oid));
+        }
 
+        $this->createObjectIdentity($oid, true);
+
+        // re-read the ACL from the database to ensure proper caching, etc.
+        return $this->findAcl($oid);
     }
 
     /**
@@ -72,8 +80,66 @@ class MutableAclProvider extends AclProvider implements MutableAclProviderInterf
 
     }
 
+    /**
+     * {@inheritDoc}
+     */
+    public function findAcls(array $oids, array $sids = array())
+    {
+        $result = parent::findAcls($oids, $sids);
+
+        foreach ($result as $oid) {
+            $acl = $result->offsetGet($oid);
+
+            if (false === $this->propertyChanges->contains($acl) && $acl instanceof MutableAclInterface) {
+                $acl->addPropertyChangedListener($this);
+                $this->propertyChanges->attach($acl, array());
+            }
+
+            $parentAcl = $acl->getParentAcl();
+            while (null !== $parentAcl) {
+                if (false === $this->propertyChanges->contains($parentAcl) && $acl instanceof MutableAclInterface) {
+                    $parentAcl->addPropertyChangedListener($this);
+                    $this->propertyChanges->attach($parentAcl, array());
+                }
+
+                $parentAcl = $parentAcl->getParentAcl();
+            }
+        }
+
+        return $result;
+    }
+
     function propertyChanged($sender, $propertyName, $oldValue, $newValue)
     {
 
+    }
+
+
+    /**
+     * Creates the ACL for the passed object identity
+     *
+     * @param ObjectIdentityInterface $oid
+     * @param boolean $entriesInheriting
+     * @param ObjectIdentityInterface $parent
+     * @return void
+     */
+    protected function createObjectIdentity(ObjectIdentityInterface $oid, $entriesInheriting, ObjectIdentityInterface $parent=null)
+    {
+        $data['identifier']        = $oid->getIdentifier();
+        $data['type']              = $oid->getType();
+        $data['entriesInheriting'] = $entriesInheriting;
+
+        if($parent) {
+            $ancestors = array();
+            $parentDocument = $this->getObjectIdentity($parent);
+            if( isset($parent['ancestors'])) {
+                $ancestors = $parentDocument['ancestors'];
+            }
+            $ancestors[] = $parentDocument['_id'];
+            $data['parent'] = $parentDocument;
+            $data['ancestors'] = $ancestors;
+        }
+
+        return $this->connection->selectCollection($this->options['oid_table_name'])->insert($data);
     }
 }

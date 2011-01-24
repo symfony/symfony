@@ -71,6 +71,10 @@ class CollectionToChoiceTransformer extends BaseValueTransformer
      */
     public function transform($value)
     {
+        if (null === $value) {
+            return array();
+        }
+
         $metadata = $this->getOption('em')->getClassMetadata($this->getOption('className'));
         $reflField = $metadata->getReflectionProperty($metadata->identifier[0]);
 
@@ -78,6 +82,7 @@ class CollectionToChoiceTransformer extends BaseValueTransformer
         foreach ($value AS $object) {
             $ids[] = $reflField->getValue($object);
         }
+
         return $ids;
     }
 }

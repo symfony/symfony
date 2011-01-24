@@ -68,6 +68,13 @@ class CollectionToChoiceTransformerTest extends \Symfony\Bundle\DoctrineBundle\T
         $this->assertEquals(array(), $ids);
     }
 
+    public function testTransformNull()
+    {
+        $transformer = $this->createTransformer();
+
+        $this->assertEquals(array(), $transformer->transform(null));
+    }
+
     public function createTagCollection()
     {
         $tags = new ArrayCollection();

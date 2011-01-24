@@ -9,34 +9,50 @@
 
     <xsd:complexType name="config">
         <xsd:all>
-            <xsd:element name="router" type="router" minOccurs="0" maxOccurs="1" />
-            <xsd:element name="validation" type="validation" minOccurs="0" maxOccurs="1" />
+            <xsd:element name="csrf-protection" type="csrf_protection" minOccurs="0" maxOccurs="1" />
+            <xsd:element name="esi" type="esi" minOccurs="0" maxOccurs="1" />
             <xsd:element name="profiler" type="profiler" minOccurs="0" maxOccurs="1" />
+            <xsd:element name="router" type="router" minOccurs="0" maxOccurs="1" />
             <xsd:element name="session" type="session" minOccurs="0" maxOccurs="1" />
             <xsd:element name="templating" type="templating" minOccurs="0" maxOccurs="1" />
             <xsd:element name="translator" type="translator" minOccurs="0" maxOccurs="1" />
-            <xsd:element name="csrf-protection" type="csrf_protection" minOccurs="0" maxOccurs="1" />
-            <xsd:element name="esi" type="esi" minOccurs="0" maxOccurs="1" />
+            <xsd:element name="validation" type="validation" minOccurs="0" maxOccurs="1" />
         </xsd:all>
 
-        <xsd:attribute name="ide" type="xsd:string" />
+        <xsd:attribute name="cache-warmer" type="cache_warmer" />
         <xsd:attribute name="charset" type="xsd:string" />
         <xsd:attribute name="error-handler" type="xsd:string" />
-        <xsd:attribute name="cache-warmer" type="cache_warmer" />
+        <xsd:attribute name="ide" type="xsd:string" />
     </xsd:complexType>
 
     <xsd:simpleType name="cache_warmer">
         <xsd:restriction base="xsd:string">
             <xsd:enumeration value="false" />
-            <xsd:enumeration value="true" />
             <xsd:enumeration value="full" />
+            <xsd:enumeration value="true" />
         </xsd:restriction>
     </xsd:simpleType>
+
+    <xsd:complexType name="csrf_protection">
+        <xsd:attribute name="enabled" type="xsd:boolean" />
+        <xsd:attribute name="field-name" type="xsd:string" />
+        <xsd:attribute name="secret" type="xsd:string" />
+    </xsd:complexType>
+
+    <xsd:complexType name="esi">
+        <xsd:attribute name="enabled" type="xsd:boolean" />
+    </xsd:complexType>
+
+    <xsd:complexType name="param_converter">
+        <xsd:attribute name="enabled" type="xsd:boolean" />
+    </xsd:complexType>
 
     <xsd:complexType name="profiler">
         <xsd:all>
             <xsd:element name="matcher" type="profiler_matcher" minOccurs="0" maxOccurs="1" />
         </xsd:all>
+
+        <xsd:attribute name="only-exceptions" type="xsd:boolean" />
     </xsd:complexType>
 
     <xsd:complexType name="profiler_matcher">
@@ -51,11 +67,6 @@
         <xsd:attribute name="cache-warmer" type="cache_warmer" />
     </xsd:complexType>
 
-    <xsd:complexType name="validation">
-        <xsd:attribute name="enabled" type="xsd:boolean" />
-        <xsd:attribute name="annotations" type="xsd:boolean" />
-    </xsd:complexType>
-
     <xsd:complexType name="session">
         <xsd:attribute name="class" type="xsd:string" />
         <xsd:attribute name="storage-id" type="xsd:string" />
@@ -64,11 +75,14 @@
         <xsd:attribute name="lifetime" type="xsd:integer" />
         <xsd:attribute name="path" type="xsd:string" />
         <xsd:attribute name="domain" type="xsd:string" />
-        <xsd:attribute name="secure" type="xsd:string" />
-        <xsd:attribute name="httponly" type="xsd:string" />
+        <xsd:attribute name="secure" type="xsd:boolean" />
+        <xsd:attribute name="httponly" type="xsd:boolean" />
         <xsd:attribute name="cache-limiter" type="xsd:string" />
         <xsd:attribute name="auto-start" type="xsd:boolean" />
         <xsd:attribute name="pdo.db-table" type="xsd:string" />
+        <xsd:attribute name="pdo.db-id-col" type="xsd:string" />
+        <xsd:attribute name="pdo.db-data-col" type="xsd:string" />
+        <xsd:attribute name="pdo.db-time-col" type="xsd:string" />
     </xsd:complexType>
 
     <xsd:complexType name="templating">
@@ -83,21 +97,26 @@
         <xsd:attribute name="cache-warmer" type="cache_warmer" />
     </xsd:complexType>
 
+    <xsd:complexType name="templating_engine">
+        <xsd:attribute name="id" type="xsd:string" />
+    </xsd:complexType>
+
     <xsd:complexType name="translator">
+        <xsd:attribute name="enabled" type="xsd:boolean" />
         <xsd:attribute name="fallback" type="xsd:string" />
     </xsd:complexType>
 
-    <xsd:complexType name="csrf_protection">
+    <xsd:complexType name="validation">
+        <xsd:sequence>
+            <xsd:element name="namespace" type="validation_namespace" minOccurs="0" maxOccurs="1" />
+        </xsd:sequence>
+
         <xsd:attribute name="enabled" type="xsd:boolean" />
-        <xsd:attribute name="field-name" type="xsd:string" />
-        <xsd:attribute name="secret" type="xsd:string" />
+        <xsd:attribute name="annotations" type="xsd:boolean" />
     </xsd:complexType>
 
-    <xsd:complexType name="esi">
-        <xsd:attribute name="enabled" type="xsd:boolean" />
-    </xsd:complexType>
-
-    <xsd:complexType name="templating_engine">
-        <xsd:attribute name="id" type="xsd:string" />
+    <xsd:complexType name="validation_namespace">
+        <xsd:attribute name="prefix" type="xsd:string" />
+        <xsd:attribute name="namespace" type="xsd:string" />
     </xsd:complexType>
 </xsd:schema>

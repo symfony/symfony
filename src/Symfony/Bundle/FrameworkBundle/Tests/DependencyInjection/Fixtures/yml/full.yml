@@ -1,0 +1,34 @@
+app.config:
+    csrf_protection:
+        enabled:    true
+        field_name: _csrf
+        secret:     s3cr3t
+    esi:
+        enabled: true
+    profiler:
+        only_exceptions: true
+    router:
+        resource:     %kernel.root_dir%/config/routing.xml
+        cache_warmer: true
+    session:
+        auto_start:     true
+        class:          Session
+        default_locale: fr
+        storage_id:     native
+        name:           _SYMFONY
+        lifetime:       86400
+        path:           /
+        domain:         example.com
+        secure:         true
+        httponly:       true
+    templating:
+        assets_version:   SomeVersionScheme
+        assets_base_urls: http://cdn.example.com
+        cache_warmer:     true
+        engines:          [php, twig]
+        loader:           [loader.foo, loader.bar]
+    translator:
+        enabled:  true,
+        fallback: fr
+    validation:
+        enabled: true

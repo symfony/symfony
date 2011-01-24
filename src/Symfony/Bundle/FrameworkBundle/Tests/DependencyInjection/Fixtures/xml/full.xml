@@ -1,0 +1,24 @@
+<?xml version="1.0" ?>
+
+<container xmlns="http://www.symfony-project.org/schema/dic/services"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xmlns:app="http://www.symfony-project.org/schema/dic/symfony"
+    xsi:schemaLocation="http://www.symfony-project.org/schema/dic/services http://www.symfony-project.org/schema/dic/services/services-1.0.xsd
+                        http://www.symfony-project.org/schema/dic/symfony http://www.symfony-project.org/schema/dic/symfony/symfony-1.0.xsd">
+
+    <app:config>
+        <app:csrf-protection enabled="true" field-name="_csrf" secret="s3cr3t" />
+        <app:esi enabled="true" />
+        <app:profiler only-exceptions="true" />
+        <app:router resource="%kernel.root_dir%/config/routing.xml" cache-warmer="true" />
+        <app:session auto-start="true" class="Session" default-locale="fr" storage-id="native" name="_SYMFONY" lifetime="86400" path="/" domain="example.com" secure="true" httponly="true" />
+        <app:templating assets-version="SomeVersionScheme" assets-base-urls="http://cdn.example.com" cache-warmer="true">
+            <app:loader>loader.foo</app:loader>
+            <app:loader>loader.bar</app:loader>
+            <app:engine id="php" />
+            <app:engine id="twig" />
+        </app:templating>
+        <app:translator enabled="true" fallback="fr" />
+        <app:validation enabled="true" />
+    </app:config>
+</container>

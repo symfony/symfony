@@ -1,0 +1,18 @@
+<?xml version="1.0" ?>
+
+<container xmlns="http://www.symfony-project.org/schema/dic/services"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xmlns:app="http://www.symfony-project.org/schema/dic/symfony"
+    xsi:schemaLocation="http://www.symfony-project.org/schema/dic/services http://www.symfony-project.org/schema/dic/services/services-1.0.xsd
+                        http://www.symfony-project.org/schema/dic/symfony http://www.symfony-project.org/schema/dic/symfony/symfony-1.0.xsd">
+
+    <app:config>
+        <app:router resource="%kernel.root_dir%/config/routing.xml" />
+        <app:validation enabled="true" annotations="true">
+            <app:namespace prefix="app" namespace="Application\Validator\Constraints\" />
+        </app:validation>
+        <app:templating>
+            <app:engine id="php" />
+        </app:templating>
+    </app:config>
+</container>

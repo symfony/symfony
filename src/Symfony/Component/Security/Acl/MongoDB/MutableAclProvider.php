@@ -69,7 +69,29 @@ class MutableAclProvider extends AclProvider implements MutableAclProviderInterf
      */
     function deleteAcl(ObjectIdentityInterface $oid)
     {
+        // TODO: safe options
+        $oidPK = $this->retrieveObjectIdentityPrimaryKey($oid);
 
+        $removableIds = $this->findChildrenIds($oidPK);
+        $removableIds[] = $oidPK;
+
+        $query = array(
+            '_id' => array('$in'=>$removableIds),
+        );
+        $this->connection->selectCollection($this->options['oid_table_name'])->remove($query);
+        $this->deleteAccessControlEntries($removableIds);
+
+
+        // evict the ACL from the in-memory identity map
+        if (isset($this->loadedAcls[$oid->getType()][$oid->getIdentifier()])) {
+            $this->propertyChanges->offsetUnset($this->loadedAcls[$oid->getType()][$oid->getIdentifier()]);
+            unset($this->loadedAcls[$oid->getType()][$oid->getIdentifier()]);
+        }
+
+        // evict the ACL from any caches
+        if (null !== $this->aclCache) {
+            $this->aclCache->evictFromCacheByIdentity($oid);
+        }
     }
 
     /**
@@ -140,6 +162,22 @@ class MutableAclProvider extends AclProvider implements MutableAclProviderInterf
             $data['ancestors'] = $ancestors;
         }
 
+        // TODO: safe options
         return $this->connection->selectCollection($this->options['oid_table_name'])->insert($data);
+    }
+
+    /**
+     * Deletes all ACEs for the given object identity primary key.
+     *
+     * @param array $removableIds MongoId
+     * @return void
+     */
+    protected function deleteAccessControlEntries($removableIds)
+    {
+        // TODO: safe options
+        $query = array(
+            'objectIdentity' => array('$in' => $removableIds),
+        );
+        $this->connection->selectCollection($this->options['entry_table_name'])->remove($query);
     }
 }

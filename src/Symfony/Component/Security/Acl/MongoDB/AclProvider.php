@@ -67,9 +67,32 @@ class AclProvider implements AclProviderInterface
     /**
      * {@inheritDoc}
      */
-    function findChildren(ObjectIdentityInterface $parentOid, $directChildrenOnly = false)
+    public function findChildren(ObjectIdentityInterface $parentOid, $directChildrenOnly = false)
     {
 
+    }
+
+    protected function findChildrenIds($parentId, $directChildrenOnly = false)
+    {
+        if($directChildrenOnly) {
+            $query = array(
+                "parent" => $parentId,
+            );
+        } else {
+            $query = array(
+                "ancestors" => $parentId,
+            );
+        }
+
+        $fields = array(
+            "_id" => true,
+        );
+        $childrenIds = array();
+        foreach ($this->connection->selectCollection($this->options['oid_table_name'])->find($query, $fields) as $data) {
+            $childrenIds[] = $data['_id'];
+        }
+
+        return $childrenIds;
     }
 
     /**
@@ -270,9 +293,6 @@ class AclProvider implements AclProviderInterface
             if(isset($result['ancestors'])) {
                 $ancestorIds = array_merge($ancestorIds, $result['ancestors']);
             }
-        }
-        foreach ($ancestorIds as $id) {
-            $stringIds[] = (string) $id;
         }
         return array("objectIdentity._id" => array('$in' => $ancestorIds));
     }
@@ -533,6 +553,10 @@ class AclProvider implements AclProviderInterface
             "type" => $oid->getType(),
         );
 
-        return $this->connection->selectCollection($this->options['oid_table_name'])->findOne($query);
+        $fields = array(
+          "_id" => true,
+        );
+        $id = $this->connection->selectCollection($this->options['oid_table_name'])->findOne($query, $fields);
+        return $id ? array_pop($id) : null;
     }
 }

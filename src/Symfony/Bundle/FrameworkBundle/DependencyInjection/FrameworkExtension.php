@@ -263,6 +263,15 @@ class FrameworkExtension extends Extension
             $container->setParameter('templating.loader.cache.path', $config['cache']);
         }
 
+        if (isset($config['cache-warmer'])) {
+            $config['cache_warmer'] = $config['cache-warmer'];
+        }
+
+        if (isset($config['cache_warmer']) && $config['cache_warmer']) {
+            $container->getDefinition('templating.cache_warmer.template_paths')->addTag('kernel.cache_warmer');
+            $container->setAlias('templating.locator', 'templating.locator.cached');
+        }
+
         // engines
         if (!$engines = $this->normalizeConfig($config, 'engine')) {
             throw new \LogicException('You must register at least one templating engine.');
@@ -281,10 +290,11 @@ class FrameworkExtension extends Extension
             $container->setAlias('templating', 'templating.engine.delegating');
         }
 
-        // compilation
         $this->addClassesToCompile(array(
             'Symfony\\Bundle\\FrameworkBundle\\Templating\\EngineInterface',
             'Symfony\\Component\\Templating\\EngineInterface',
+            'Symfony\\Bundle\\FrameworkBundle\\Templating\\Loader\\TemplateLocatorInterface',
+            $container->findDefinition('templating.locator')->getClass(),
         ));
     }
 

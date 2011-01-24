@@ -80,6 +80,7 @@
         <xsd:attribute name="assets-version" type="xsd:string" />
         <xsd:attribute name="assets-base-urls" type="xsd:string" />
         <xsd:attribute name="cache" type="xsd:string" />
+        <xsd:attribute name="cache-warmer" type="cache_warmer" />
     </xsd:complexType>
 
     <xsd:complexType name="translator">

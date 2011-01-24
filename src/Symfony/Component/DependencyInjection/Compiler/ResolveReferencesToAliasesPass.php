@@ -61,8 +61,8 @@ class ResolveReferencesToAliasesPass implements CompilerPassInterface
 
     protected function getDefinitionId($id)
     {
-        if ($this->container->hasAlias($id)) {
-            return $this->getDefinitionId((string) $this->container->getAlias($id));
+        while ($this->container->hasAlias($id)) {
+            $id = (string) $this->container->getAlias($id);
         }
 
         return $id;

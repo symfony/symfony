@@ -44,6 +44,10 @@ class CheckReferenceScopePass implements CompilerPassInterface
         }
 
         foreach ($container->getDefinitions() as $id => $definition) {
+            if ($definition->isSynthetic()) {
+                continue;
+            }
+
             $this->currentId = $id;
             $this->currentScope = $scope = $definition->getScope();
 

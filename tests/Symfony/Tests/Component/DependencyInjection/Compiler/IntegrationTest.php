@@ -32,18 +32,18 @@ class IntegrationTest extends \PHPUnit_Framework_TestCase
         $container = new ContainerBuilder();
 
         $a = $container
-            ->register('a')
+            ->register('a', '\stdClass')
             ->addArgument(new Reference('c'))
         ;
 
         $b = $container
-            ->register('b')
+            ->register('b', '\stdClass')
             ->addArgument(new Reference('c'))
             ->setPublic(false)
         ;
 
         $c = $container
-            ->register('c')
+            ->register('c', '\stdClass')
             ->setPublic(false)
         ;
 
@@ -61,14 +61,14 @@ class IntegrationTest extends \PHPUnit_Framework_TestCase
         $container = new ContainerBuilder();
 
         $a = $container
-            ->register('a')
+            ->register('a', '\stdClass')
             ->addArgument(new Reference('b'))
         ;
 
         $container->setAlias('b', new Alias('c', false));
 
         $c = $container
-            ->register('c')
+            ->register('c', '\stdClass')
             ->setPublic(false)
         ;
 
@@ -86,19 +86,19 @@ class IntegrationTest extends \PHPUnit_Framework_TestCase
         $container = new ContainerBuilder();
 
         $container
-            ->register('a')
+            ->register('a', '\stdClass')
             ->addArgument(new Reference('b'))
             ->addMethodCall('setC', array(new Reference('c')))
         ;
 
         $container
-            ->register('b')
+            ->register('b', '\stdClass')
             ->addArgument(new Reference('c'))
             ->setPublic(false)
         ;
 
         $container
-            ->register('c')
+            ->register('c', '\stdClass')
             ->setPublic(false)
         ;
 

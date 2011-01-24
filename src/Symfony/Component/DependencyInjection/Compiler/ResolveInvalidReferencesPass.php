@@ -40,6 +40,10 @@ class ResolveInvalidReferencesPass implements CompilerPassInterface
     {
         $this->container = $container;
         foreach ($container->getDefinitions() as $definition) {
+            if ($definition->isSynthetic()) {
+                continue;
+            }
+
             $definition->setArguments(
                 $this->processArguments($definition->getArguments())
             );

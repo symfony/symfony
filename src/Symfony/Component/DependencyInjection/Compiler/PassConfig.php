@@ -43,6 +43,7 @@ class PassConfig
 
         $this->optimizationPasses = array(
             new ResolveParameterPlaceHoldersPass(),
+            new CheckDefinitionValidityPass(),
             new ResolveReferencesToAliasesPass(),
             new ResolveInterfaceInjectorsPass(),
             new ResolveInvalidReferencesPass(),

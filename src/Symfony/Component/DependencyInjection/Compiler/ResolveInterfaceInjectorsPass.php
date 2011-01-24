@@ -26,6 +26,10 @@ class ResolveInterfaceInjectorsPass implements CompilerPassInterface
     public function process(ContainerBuilder $container)
     {
         foreach ($container->getDefinitions() as $definition) {
+            if ($definition->isSynthetic()) {
+                continue;
+            }
+
             $loaded = false;
             foreach ($container->getInterfaceInjectors() as $injector) {
                 if (null !== $definition->getFactoryService()) {
@@ -38,7 +42,7 @@ class ResolveInterfaceInjectorsPass implements CompilerPassInterface
                     require_once $definition->getFile();
                 }
 
-                if (null !== $definition->getClass() && $injector->supports($definition->getClass())) {
+                if ($injector->supports($definition->getClass())) {
                     $injector->processDefinition($definition);
                 }
             }

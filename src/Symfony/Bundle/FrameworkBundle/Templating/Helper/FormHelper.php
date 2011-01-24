@@ -14,7 +14,7 @@ namespace Symfony\Bundle\FrameworkBundle\Templating\Helper;
 use Symfony\Component\Templating\Helper\Helper;
 use Symfony\Component\Form\FieldInterface;
 use Symfony\Component\Form\FieldGroupInterface;
-use Symfony\Bundle\FrameworkBundle\Templating\DelegatingEngine;
+use Symfony\Bundle\FrameworkBundle\Templating\EngineInterface;
 
 /**
  * Form is a factory that wraps Form instances.
@@ -28,7 +28,7 @@ class FormHelper extends Helper
 
     protected $engine;
 
-    public function __construct(DelegatingEngine $engine)
+    public function __construct(EngineInterface $engine)
     {
         $this->engine = $engine;
     }

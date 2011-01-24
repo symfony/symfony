@@ -297,6 +297,18 @@ class Definition
     }
 
     /**
+     * Whether this definition has a tag with the given name
+     *
+     * @param string $name
+     *
+     * @return Boolean
+     */
+    public function hasTag($name)
+    {
+        return isset($this->tags[$name]);
+    }
+
+    /**
      * Clears the tags for this definition.
      *
      * @return Definition The current instance

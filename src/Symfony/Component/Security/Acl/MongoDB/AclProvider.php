@@ -49,15 +49,15 @@ class AclProvider implements AclProviderInterface
     /**
      * Constructor
      *
-     * @param Connection $connection
+     * @param Database $database
      * @param PermissionGrantingStrategyInterface $permissionGrantingStrategy
      * @param array $options
      * @param AclCacheInterface $aclCache
      */
-    public function __construct(Database $connection, PermissionGrantingStrategyInterface $permissionGrantingStrategy, array $options, AclCacheInterface $aclCache = null)
+    public function __construct(Database $database, PermissionGrantingStrategyInterface $permissionGrantingStrategy, array $options, AclCacheInterface $aclCache = null)
     {
         $this->aclCache = $aclCache;
-        $this->connection = $connection;
+        $this->connection = $database;
         $this->loadedAces = array();
         $this->loadedAcls = array();
         $this->options = $options;
@@ -216,10 +216,9 @@ class AclProvider implements AclProviderInterface
     }
 
     /**
-     * Retrieves all the ids which need to be queried from the database
-     * including the ids of parent ACLs.
+     * Retrieves the documents associated with the values in the batch
      *
-     * @param array $batch
+     * @param array $batch ObjectIdentity
      * @return Doctrine\MongoDB\Cursor
      */
     protected function getObjectIdentities(array &$batch)
@@ -234,6 +233,22 @@ class AclProvider implements AclProviderInterface
         $query = array('$or'=> $batchSet);
 
         return $this->connection->selectCollection($this->options['oid_table_name'])->find($query);
+    }
+
+    /**
+     * Retrieve the document associated with the values in the ObjectIdentity
+     *
+     * @param ObjectIdentity $oid
+     * @return Doctrine\MongoDB\Cursor
+     */
+    protected function getObjectIdentity(ObjectIdentity $oid)
+    {
+        $query = array(
+            "identifier" => $oid->getIdentifier(),
+            "type" => $oid->getType(),
+        );
+
+        return $this->connection->selectCollection($this->options['oid_table_name'])->findOne($query);
     }
 
     /**
@@ -252,7 +267,9 @@ class AclProvider implements AclProviderInterface
         $stringIds = array();
         foreach ($objectIdentities as $result) {
             $ancestorIds[] = $result['_id'];
-            $ancestorIds = array_merge($ancestorIds, $result['ancestors']);
+            if(isset($result['ancestors'])) {
+                $ancestorIds = array_merge($ancestorIds, $result['ancestors']);
+            }
         }
         foreach ($ancestorIds as $id) {
             $stringIds[] = (string) $id;
@@ -310,7 +327,10 @@ class AclProvider implements AclProviderInterface
         }
 
         foreach($objectIdentities as $curObject) {
-            $ancestors = $curObject['ancestors'];
+            $ancestors = array();
+            if(isset($curObject['ancestors'])) {
+               $ancestors = $curObject['ancestors'];
+            }
             $ancestors[] = $curObject['_id'];
 
             foreach($ancestors as $objectId) {
@@ -510,9 +530,9 @@ class AclProvider implements AclProviderInterface
     {
         $query = array(
             "identifier" => $oid->getIdentifier(),
-            "type" => $$oid->getType(),
+            "type" => $oid->getType(),
         );
 
-        return $this->connection->selectCollection($this->options['oid_table_name'])->find($query);
+        return $this->connection->selectCollection($this->options['oid_table_name'])->findOne($query);
     }
 }

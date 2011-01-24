@@ -465,15 +465,22 @@ class FrameworkExtension extends Extension
 
         $container->setParameter('routing.resource', $config['router']['resource']);
 
+        if (isset($config['router']['cache-warmer'])) {
+            $config['router']['cache_warmer'] = $config['router']['cache-warmer'];
+        }
+
+        if (isset($config['router']['cache_warmer']) && $config['router']['cache_warmer']) {
+            $container->getDefinition('router.cache_warmer')->addTag('kernel.cache_warmer');
+            $container->setAlias('router', 'router.cached');
+        }
+
         $this->addClassesToCompile(array(
             'Symfony\\Component\\Routing\\RouterInterface',
-            'Symfony\\Component\\Routing\\Router',
             'Symfony\\Component\\Routing\\Matcher\\UrlMatcherInterface',
             'Symfony\\Component\\Routing\\Matcher\\UrlMatcher',
             'Symfony\\Component\\Routing\\Generator\\UrlGeneratorInterface',
             'Symfony\\Component\\Routing\\Generator\\UrlGenerator',
-            'Symfony\\Component\\Routing\\Loader\\LoaderInterface',
-            'Symfony\\Bundle\\FrameworkBundle\\Routing\\LazyLoader',
+            $container->findDefinition('router')->getClass()
         ));
     }
 

@@ -6,6 +6,7 @@
 
     <parameters>
         <parameter key="router.class">Symfony\Component\Routing\Router</parameter>
+        <parameter key="router.cached.class">Symfony\Bundle\FrameworkBundle\Routing\CachedRouter</parameter>
         <parameter key="routing.loader.class">Symfony\Bundle\FrameworkBundle\Routing\DelegatingLoader</parameter>
         <parameter key="routing.file_locator.class">Symfony\Bundle\FrameworkBundle\Routing\FileLocator</parameter>
         <parameter key="routing.resolver.class">Symfony\Component\Routing\Loader\LoaderResolver</parameter>
@@ -18,6 +19,7 @@
         <parameter key="router.options.matcher_class">Symfony\Component\Routing\Matcher\UrlMatcher</parameter>
         <parameter key="router.options.matcher_base_class">Symfony\Component\Routing\Matcher\UrlMatcher</parameter>
         <parameter key="router.options.matcher_dumper_class">Symfony\Component\Routing\Matcher\Dumper\PhpMatcherDumper</parameter>
+        <parameter key="router.cache_warmer.class">Symfony\Bundle\FrameworkBundle\Routing\CacheWarmer\RouterCacheWarmer</parameter>
     </parameters>
 
     <services>
@@ -53,7 +55,7 @@
             <argument>routing.loader.real</argument>
         </service>
 
-        <service id="router" class="%router.class%">
+        <service id="router.real" class="%router.class%">
             <argument type="service" id="routing.loader" />
             <argument>%routing.resource%</argument>
             <argument type="collection">
@@ -68,6 +70,19 @@
                 <argument key="matcher_dumper_class">%router.options.matcher_dumper_class%</argument>
                 <argument key="matcher_cache_class">%kernel.name%_%kernel.environment%UrlMatcher</argument>
             </argument>
+        </service>
+
+        <service id="router" alias="router.real" />
+
+        <service id="router.cached" class="%router.cached.class%">
+            <argument>%kernel.cache_dir%</argument>
+            <argument key="matcher_cache_class">%kernel.name%_%kernel.environment%UrlMatcher</argument>
+            <argument key="generator_cache_class">%kernel.name%_%kernel.environment%UrlGenerator</argument>
+        </service>
+
+        <service id="router.cache_warmer" class="%router.cache_warmer.class%" public="false">
+            <tag name="kernel.cache_warmer" />
+            <argument type="service" id="router.real" />
         </service>
     </services>
 </container>

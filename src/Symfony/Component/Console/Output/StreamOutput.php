@@ -79,7 +79,7 @@ class StreamOutput extends Output
             // @codeCoverageIgnoreEnd
         }
 
-        flush();
+        fflush($this->stream);
     }
 
     /**

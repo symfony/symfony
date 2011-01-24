@@ -429,11 +429,9 @@ class MutableAclProviderTest extends \PHPUnit_Framework_TestCase
     protected function getOptions()
     {
         return array(
-            'oid_table_name' => 'acl_object_identities',
-            'oid_ancestors_table_name' => 'acl_object_identity_ancestors',
-            'class_table_name' => 'acl_classes',
-            'sid_table_name' => 'acl_security_identities',
-            'entry_table_name' => 'acl_entries',
+            'oid_table_name' => 'aclObjectIdentities',
+            'sid_table_name' => 'aclSecurityIdentities',
+            'entry_table_name' => 'aclEntries',
         );
     }
 

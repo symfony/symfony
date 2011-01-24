@@ -94,17 +94,8 @@ class Router implements RouterInterface
      */
     public function setContext(array $context = array())
     {
-        $this->context = $context;
-    }
-
-    /**
-     * Sets the defaults.
-     *
-     * @param array $defaults The defaults
-     */
-    public function setDefaults(array $defaults = array())
-    {
-        $this->defaults = $defaults;
+        $this->getMatcher()->setContext($context);
+        $this->getGenerator()->setContext($context);
     }
 
     /**

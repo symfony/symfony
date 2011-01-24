@@ -37,6 +37,16 @@ class ApacheUrlMatcher extends UrlMatcher
     }
 
     /**
+     * Sets the request context.
+     *
+     * @param array $context  The context
+     */
+    public function setContext(array $context = array())
+    {
+        $this->context = $context;
+    }
+
+    /**
      * Tries to match a URL based on Apache mod_rewrite matching.
      *
      * Returns false if no route matches the URL.

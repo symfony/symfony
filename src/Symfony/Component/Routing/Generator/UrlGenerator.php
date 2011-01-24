@@ -42,6 +42,16 @@ class UrlGenerator implements UrlGeneratorInterface
     }
 
     /**
+     * Sets the request context.
+     *
+     * @param array $context  The context
+     */
+    public function setContext(array $context = array())
+    {
+        $this->context = $context;
+    }
+
+    /**
      * Generates a URL from the given parameters.
      *
      * @param  string  $name       The name of the route

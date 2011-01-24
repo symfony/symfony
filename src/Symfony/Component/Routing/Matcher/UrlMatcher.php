@@ -40,6 +40,16 @@ class UrlMatcher implements UrlMatcherInterface
     }
 
     /**
+     * Sets the request context.
+     *
+     * @param array $context  The context
+     */
+    public function setContext(array $context = array())
+    {
+        $this->context = $context;
+    }
+
+    /**
      * Tries to match a URL with a set of routes.
      *
      * Returns false if no route matches the URL.

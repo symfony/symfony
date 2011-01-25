@@ -68,7 +68,7 @@ class FrameworkExtension extends Extension
         }
 
         if (isset($config['i18n']) && $config['i18n']) {
-            FormContext::setLocale(\Locale::get());
+            FormContext::setLocale(\Locale::getDefault());
         }
 
         if (isset($config['ide'])) {

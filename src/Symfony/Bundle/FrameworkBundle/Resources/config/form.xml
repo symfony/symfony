@@ -24,7 +24,7 @@
         </service>
 
     	<!-- FieldFactory -->
-        <service id="form.field_factory" class="%form.field_factory.class%" public="false">
+        <service id="form.field_factory" class="%form.field_factory.class%">
         	<!-- All services with tag "form.field_factory.guesser" are inserted here by AddFieldFactoryGuessersPass -->
         </service>
 

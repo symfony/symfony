@@ -35,7 +35,7 @@
         </service>
         
         <!-- CsrfProvider -->
-        <service id="form.csrf_provider" class="%form.csrf_provider.class%" public="false">
+        <service id="form.csrf_provider" class="%form.csrf_provider.class%">
         	<argument type="service" id="session" />
         	<argument>%form.csrf_protection.secret%</argument>
         </service>

@@ -13,6 +13,21 @@ namespace Symfony\Component\Locale;
 
 class Locale
 {
+    const DEFAULT_LOCALE = null;
+
+    /** Locale method constants */
+    const ACTUAL_LOCALE = 0;
+    const VALID_LOCALE  = 1;
+
+    /** Language tags constants */
+    const LANG_TAG               = 'language';
+    const EXTLANG_TAG            = 'extlang';
+    const SCRIPT_TAG             = 'script';
+    const REGION_TAG             = 'region';
+    const VARIANT_TAG            = 'variant';
+    const GRANDFATHERED_LANG_TAG = 'grandfathered';
+    const PRIVATE_TAG            = 'private';
+
     /**
      * Caches the countries in different locales
      * @var array

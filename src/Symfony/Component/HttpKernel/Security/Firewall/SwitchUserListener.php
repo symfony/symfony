@@ -37,6 +37,7 @@ class SwitchUserListener implements ListenerInterface
     protected $securityContext;
     protected $provider;
     protected $accountChecker;
+    protected $providerKey;
     protected $accessDecisionManager;
     protected $usernameParameter;
     protected $role;
@@ -45,11 +46,16 @@ class SwitchUserListener implements ListenerInterface
     /**
      * Constructor.
      */
-    public function __construct(SecurityContext $securityContext, UserProviderInterface $provider, AccountCheckerInterface $accountChecker, AccessDecisionManagerInterface $accessDecisionManager, LoggerInterface $logger = null, $usernameParameter = '_switch_user', $role = 'ROLE_ALLOWED_TO_SWITCH')
+    public function __construct(SecurityContext $securityContext, UserProviderInterface $provider, AccountCheckerInterface $accountChecker, $providerKey, AccessDecisionManagerInterface $accessDecisionManager, LoggerInterface $logger = null, $usernameParameter = '_switch_user', $role = 'ROLE_ALLOWED_TO_SWITCH')
     {
+        if (empty($providerKey)) {
+            throw new \InvalidArgumentException('$providerKey must not be empty.');
+        }
+
         $this->securityContext = $securityContext;
         $this->provider = $provider;
         $this->accountChecker = $accountChecker;
+        $this->providerKey = $providerKey;
         $this->accessDecisionManager = $accessDecisionManager;
         $this->usernameParameter = $usernameParameter;
         $this->role = $role;
@@ -57,7 +63,7 @@ class SwitchUserListener implements ListenerInterface
     }
 
     /**
-     * 
+     *
      *
      * @param EventDispatcherInterface $dispatcher An EventDispatcherInterface instance
      * @param integer                  $priority   The priority
@@ -66,14 +72,14 @@ class SwitchUserListener implements ListenerInterface
     {
         $dispatcher->connect('core.security', array($this, 'handle'), 0);
     }
-    
+
     /**
      * {@inheritDoc}
      */
     public function unregister(EventDispatcherInterface $dispatcher)
     {
     }
-    
+
     /**
      * Handles digest authentication.
      *
@@ -136,7 +142,7 @@ class SwitchUserListener implements ListenerInterface
         $roles = $user->getRoles();
         $roles[] = new SwitchUserRole('ROLE_PREVIOUS_ADMIN', $this->securityContext->getToken());
 
-        $token = new UsernamePasswordToken($user, $user->getPassword(), $roles);
+        $token = new UsernamePasswordToken($user, $user->getPassword(), $this->providerKey, $roles);
         $token->setImmutable(true);
 
         return $token;

@@ -31,17 +31,19 @@ abstract class PreAuthenticatedListener implements ListenerInterface
 {
     protected $securityContext;
     protected $authenticationManager;
+    protected $providerKey;
     protected $logger;
 
-    public function __construct(SecurityContext $securityContext, AuthenticationManagerInterface $authenticationManager, LoggerInterface $logger = null)
+    public function __construct(SecurityContext $securityContext, AuthenticationManagerInterface $authenticationManager, $providerKey, LoggerInterface $logger = null)
     {
         $this->securityContext = $securityContext;
         $this->authenticationManager = $authenticationManager;
+        $this->providerKey = $providerKey;
         $this->logger = $logger;
     }
 
     /**
-     * 
+     *
      *
      * @param EventDispatcherInterface $dispatcher An EventDispatcherInterface instance
      * @param integer                  $priority   The priority
@@ -50,14 +52,14 @@ abstract class PreAuthenticatedListener implements ListenerInterface
     {
         $dispatcher->connect('core.security', array($this, 'handle'), 0);
     }
-    
+
     /**
      * {@inheritDoc}
      */
     public function unregister(EventDispatcherInterface $dispatcher)
     {
     }
-    
+
     /**
      * Handles X509 authentication.
      *
@@ -88,7 +90,7 @@ abstract class PreAuthenticatedListener implements ListenerInterface
         }
 
         try {
-            $token = $this->authenticationManager->authenticate(new PreAuthenticatedToken($user, $credentials));
+            $token = $this->authenticationManager->authenticate(new PreAuthenticatedToken($user, $credentials, $this->providerKey));
 
             if (null !== $this->logger) {
                 $this->logger->debug(sprintf('Authentication success: %s', $token));

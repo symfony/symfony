@@ -18,17 +18,28 @@ namespace Symfony\Component\Security\Authentication\Token;
  */
 class UsernamePasswordToken extends Token
 {
+    protected $providerKey;
+
     /**
      * Constructor.
+     * 
+     * @param string $user The username (like a nickname, email address, etc.)
+     * @param string $credentials This usually is the password of the user
      */
-    public function __construct($user, $credentials, array $roles = array())
+    public function __construct($user, $credentials, $providerKey, array $roles = array())
     {
         parent::__construct($roles);
 
         $this->setUser($user);
         $this->credentials = $credentials;
+        $this->providerKey = $providerKey;
 
         parent::setAuthenticated((Boolean) count($roles));
+    }
+
+    public function getProviderKey()
+    {
+        return $this->providerKey;
     }
 
     /**

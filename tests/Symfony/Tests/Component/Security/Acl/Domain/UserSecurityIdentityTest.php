@@ -29,20 +29,25 @@ class UserSecurityIdentityTest extends \PHPUnit_Framework_TestCase
      */
     public function testEquals($id1, $id2, $equal)
     {
-        if ($equal) {
-            $this->assertTrue($id1->equals($id2));
-        } else {
-            $this->assertFalse($id1->equals($id2));
-        }
+        $this->assertSame($equal, $id1->equals($id2));
     }
 
     public function getCompareData()
     {
-        $account = $this->getMock('Symfony\Component\Security\User\AccountInterface');
+        $account = $this->getMockBuilder('Symfony\Component\Security\User\AccountInterface')
+                            ->setMockClassName('USI_AccountImpl')
+                            ->getMock();
         $account
-            ->expects($this->once())
-            ->method('__toString')
+            ->expects($this->any())
+            ->method('getUsername')
             ->will($this->returnValue('foo'))
+        ;
+
+        $token = $this->getMock('Symfony\Component\Security\Authentication\Token\TokenInterface');
+        $token
+            ->expects($this->any())
+            ->method('getUser')
+            ->will($this->returnValue($account))
         ;
 
         return array(
@@ -52,6 +57,8 @@ class UserSecurityIdentityTest extends \PHPUnit_Framework_TestCase
             array(new UserSecurityIdentity('foo', 'Foo'), UserSecurityIdentity::fromAccount($account), false),
             array(new UserSecurityIdentity('bla', 'Foo'), new UserSecurityIdentity('blub', 'Foo'), false),
             array(new UserSecurityIdentity('foo', 'Foo'), new RoleSecurityIdentity('foo'), false),
+            array(new UserSecurityIdentity('foo', 'Foo'), UserSecurityIdentity::fromToken($token), false),
+            array(new UserSecurityIdentity('foo', 'USI_AccountImpl'), UserSecurityIdentity::fromToken($token), true),
         );
     }
 }

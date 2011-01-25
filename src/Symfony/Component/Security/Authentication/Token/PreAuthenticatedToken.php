@@ -18,10 +18,12 @@ namespace Symfony\Component\Security\Authentication\Token;
  */
 class PreAuthenticatedToken extends Token
 {
+    protected $providerKey;
+
     /**
      * Constructor.
      */
-    public function __construct($user, $credentials, array $roles = null)
+    public function __construct($user, $credentials, $providerKey, array $roles = null)
     {
         parent::__construct(null === $roles ? array() : $roles);
         if (null !== $roles) {
@@ -30,6 +32,12 @@ class PreAuthenticatedToken extends Token
 
         $this->user = $user;
         $this->credentials = $credentials;
+        $this->providerKey = $providerKey;
+    }
+
+    public function getProviderKey()
+    {
+        return $this->providerKey;
     }
 
     /**

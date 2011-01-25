@@ -35,7 +35,7 @@ abstract class SecurityExtensionTest extends TestCase
 
         $providers = array_values(array_filter($container->getServiceIds(), function ($key) { return 0 === strpos($key, 'security.authentication.provider.'); }));
 
-        $this->assertEquals(array(
+        $expectedProviders = array(
             'security.authentication.provider.digest',
             'security.authentication.provider.digest_0ff1b54f2a4b7f71b2b9d6604fcca4b8',
             'security.authentication.provider.basic',
@@ -43,7 +43,11 @@ abstract class SecurityExtensionTest extends TestCase
             'security.authentication.provider.basic_98e44377704554700e68c22094b51ca4',
             'security.authentication.provider.doctrine',
             'security.authentication.provider.service',
-        ), $providers);
+            'security.authentication.provider.anonymous',
+        );
+
+        $this->assertEquals(array(), array_diff($expectedProviders, $providers));
+        $this->assertEquals(array(), array_diff($providers, $expectedProviders));
     }
 
     public function testFirewalls()

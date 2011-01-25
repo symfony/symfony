@@ -89,6 +89,7 @@ class LogoutListener implements ListenerInterface
         $response = new Response();
         $response->setRedirect(0 !== strpos($this->targetUrl, 'http') ? $request->getUriForPath($this->targetUrl) : $this->targetUrl, 302);
 
+        // handle multiple logout attempts gracefully
         if ($token = $this->securityContext->getToken()) {
             foreach ($this->handlers as $handler) {
                 $handler->logout($request, $response, $token);

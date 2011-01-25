@@ -17,14 +17,14 @@ use Symfony\Component\HttpFoundation\Request;
 
 /**
  * Handler for clearing invalidating the current session.
- * 
+ *
  * @author Johannes M. Schmitt <schmittjoh@gmail.com>
  */
 class SessionLogoutHandler implements LogoutHandlerInterface
 {
     /**
      * Invalidate the current session
-     * 
+     *
      * @param Request $request
      * @param Response $response
      * @param TokenInterface $token
@@ -33,5 +33,5 @@ class SessionLogoutHandler implements LogoutHandlerInterface
     public function logout(Request $request, Response $response, TokenInterface $token)
     {
         $request->getSession()->invalidate();
-    }    
+    }
 }

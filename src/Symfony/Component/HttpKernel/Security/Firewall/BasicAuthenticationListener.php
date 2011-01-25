@@ -29,21 +29,27 @@ class BasicAuthenticationListener implements ListenerInterface
 {
     protected $securityContext;
     protected $authenticationManager;
+    protected $providerKey;
     protected $authenticationEntryPoint;
     protected $logger;
     protected $ignoreFailure;
 
-    public function __construct(SecurityContext $securityContext, AuthenticationManagerInterface $authenticationManager, AuthenticationEntryPointInterface $authenticationEntryPoint, LoggerInterface $logger = null)
+    public function __construct(SecurityContext $securityContext, AuthenticationManagerInterface $authenticationManager, $providerKey, AuthenticationEntryPointInterface $authenticationEntryPoint, LoggerInterface $logger = null)
     {
+        if (empty($providerKey)) {
+            throw new \InvalidArgumentException('$providerKey must not be empty.');
+        }
+
         $this->securityContext = $securityContext;
         $this->authenticationManager = $authenticationManager;
+        $this->providerKey = $providerKey;
         $this->authenticationEntryPoint = $authenticationEntryPoint;
         $this->logger = $logger;
         $this->ignoreFailure = false;
     }
 
     /**
-     * 
+     *
      *
      * @param EventDispatcherInterface $dispatcher An EventDispatcherInterface instance
      * @param integer                  $priority   The priority
@@ -52,7 +58,7 @@ class BasicAuthenticationListener implements ListenerInterface
     {
         $dispatcher->connect('core.security', array($this, 'handle'), 0);
     }
-    
+
     /**
      * {@inheritDoc}
      */
@@ -88,7 +94,7 @@ class BasicAuthenticationListener implements ListenerInterface
         }
 
         try {
-            $token = $this->authenticationManager->authenticate(new UsernamePasswordToken($username, $request->server->get('PHP_AUTH_PW')));
+            $token = $this->authenticationManager->authenticate(new UsernamePasswordToken($username, $request->server->get('PHP_AUTH_PW'), $this->providerKey));
             $this->securityContext->setToken($token);
         } catch (AuthenticationException $failed) {
             $this->securityContext->setToken(null);

@@ -121,7 +121,7 @@ class UserTest extends \PHPUnit_Framework_TestCase
     {
         $user = new User('fabien', 'superpass');
         $user->eraseCredentials();
-        $this->assertNull($user->getPassword());
+        $this->assertEquals('superpass', $user->getPassword());
     }
 
     /**

@@ -29,6 +29,7 @@ abstract class UserAuthenticationProvider implements AuthenticationProviderInter
 {
     protected $hideUserNotFoundExceptions;
     protected $accountChecker;
+    protected $providerKey;
 
     /**
      * Constructor.
@@ -36,9 +37,14 @@ abstract class UserAuthenticationProvider implements AuthenticationProviderInter
      * @param AccountCheckerInterface $accountChecker             An AccountCheckerInterface interface
      * @param Boolean                 $hideUserNotFoundExceptions Whether to hide user not found exception or not
      */
-    public function __construct(AccountCheckerInterface $accountChecker, $hideUserNotFoundExceptions = true)
+    public function __construct(AccountCheckerInterface $accountChecker, $providerKey, $hideUserNotFoundExceptions = true)
     {
+        if (empty($providerKey)) {
+            throw new \InvalidArgumentException('$providerKey must not be empty.');
+        }
+
         $this->accountChecker = $accountChecker;
+        $this->providerKey = $providerKey;
         $this->hideUserNotFoundExceptions = $hideUserNotFoundExceptions;
     }
 
@@ -64,7 +70,7 @@ abstract class UserAuthenticationProvider implements AuthenticationProviderInter
             $this->checkAuthentication($user, $token);
             $this->accountChecker->checkPostAuth($user);
 
-            return new UsernamePasswordToken($user, $token->getCredentials(), $user->getRoles());
+            return new UsernamePasswordToken($user, $token->getCredentials(), $this->providerKey, $user->getRoles());
         } catch (UsernameNotFoundException $notFound) {
             if ($this->hideUserNotFoundExceptions) {
                 throw new BadCredentialsException('Bad credentials', 0, $notFound);
@@ -79,7 +85,7 @@ abstract class UserAuthenticationProvider implements AuthenticationProviderInter
      */
     public function supports(TokenInterface $token)
     {
-        return $token instanceof UsernamePasswordToken;
+        return $token instanceof UsernamePasswordToken && $this->providerKey === $token->getProviderKey();
     }
 
     /**

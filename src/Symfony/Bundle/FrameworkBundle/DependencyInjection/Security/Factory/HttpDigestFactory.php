@@ -26,16 +26,15 @@ class HttpDigestFactory implements SecurityFactoryInterface
         $provider = 'security.authentication.provider.dao.'.$id;
         $container
             ->register($provider, '%security.authentication.provider.dao.class%')
-            ->setArguments(array(new Reference($userProvider), new Reference('security.account_checker'), new Reference('security.encoder_factory')))
+            ->setArguments(array(new Reference($userProvider), new Reference('security.account_checker'), $id, new Reference('security.encoder_factory')))
             ->setPublic(false)
+            ->addTag('security.authentication_provider')
         ;
 
         // listener
         $listenerId = 'security.authentication.listener.digest.'.$id;
         $listener = $container->setDefinition($listenerId, clone $container->getDefinition('security.authentication.listener.digest'));
-        $arguments = $listener->getArguments();
-        $arguments[1] = new Reference($userProvider);
-        $listener->setArguments($arguments);
+        $listener->setArgument(2, $id);
 
         if (null === $defaultEntryPoint) {
             $defaultEntryPoint = 'security.authentication.digest_entry_point';

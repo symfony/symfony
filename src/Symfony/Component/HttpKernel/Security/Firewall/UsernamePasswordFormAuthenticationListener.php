@@ -11,6 +11,12 @@
 
 namespace Symfony\Component\HttpKernel\Security\Firewall;
 
+use Symfony\Component\HttpKernel\Security\Authentication\AuthenticationFailureHandlerInterface;
+
+use Symfony\Component\HttpKernel\Security\Authentication\AuthenticationSuccessHandlerInterface;
+
+use Symfony\Component\HttpKernel\Security\Session\SessionAuthenticationStrategyInterface;
+
 use Symfony\Component\Security\SecurityContext;
 use Symfony\Component\Security\Authentication\AuthenticationManagerInterface;
 use Symfony\Component\HttpKernel\Log\LoggerInterface;
@@ -23,18 +29,18 @@ use Symfony\Component\Security\Authentication\Token\UsernamePasswordToken;
  *
  * @author Fabien Potencier <fabien.potencier@symfony-project.com>
  */
-class UsernamePasswordFormAuthenticationListener extends FormAuthenticationListener
+class UsernamePasswordFormAuthenticationListener extends AbstractAuthenticationListener
 {
     /**
      * {@inheritdoc}
      */
-    public function __construct(SecurityContext $securityContext, AuthenticationManagerInterface $authenticationManager, array $options = array(), LoggerInterface $logger = null)
+    public function __construct(SecurityContext $securityContext, AuthenticationManagerInterface $authenticationManager, SessionAuthenticationStrategyInterface $sessionStrategy, $providerKey, array $options = array(), AuthenticationSuccessHandlerInterface $successHandler = null, AuthenticationFailureHandlerInterface $failureHandler = null, LoggerInterface $logger = null)
     {
-        parent::__construct($securityContext, $authenticationManager, array_merge(array(
+        parent::__construct($securityContext, $authenticationManager, $sessionStrategy, $providerKey, array_merge(array(
             'username_parameter' => '_username',
             'password_parameter' => '_password',
             'post_only'          => true,
-        ), $options), $logger);
+        ), $options), $successHandler, $failureHandler, $logger);
     }
 
     /**
@@ -55,6 +61,6 @@ class UsernamePasswordFormAuthenticationListener extends FormAuthenticationListe
 
         $request->getSession()->set(SecurityContext::LAST_USERNAME, $username);
 
-        return $this->authenticationManager->authenticate(new UsernamePasswordToken($username, $password));
+        return $this->authenticationManager->authenticate(new UsernamePasswordToken($username, $password, $this->providerKey));
     }
 }

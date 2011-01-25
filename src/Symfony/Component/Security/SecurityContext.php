@@ -11,8 +11,9 @@
 
 namespace Symfony\Component\Security;
 
+use Symfony\Component\Security\Authorization\AccessDecisionManagerInterface;
+use Symfony\Component\Security\Authentication\AuthenticationManagerInterface;
 use Symfony\Component\Security\Authentication\Token\TokenInterface;
-use Symfony\Component\Security\Authorization\AccessDecisionManager;
 use Symfony\Component\Security\Acl\Voter\FieldVote;
 
 /**
@@ -30,15 +31,19 @@ class SecurityContext
 
     protected $token;
     protected $accessDecisionManager;
+    protected $authenticationManager;
+    protected $alwaysAuthenticate;
 
     /**
      * Constructor.
      *
-     * @param AccessDecisionManager|null $accessDecisionManager An AccessDecisionManager instance
+     * @param AccessDecisionManagerInterface|null $accessDecisionManager An AccessDecisionManager instance
      */
-    public function __construct(AccessDecisionManager $accessDecisionManager = null)
+    public function __construct(AuthenticationManagerInterface $authenticationManager, AccessDecisionManagerInterface $accessDecisionManager = null, $alwaysAuthenticate = false)
     {
+        $this->authenticationManager = $authenticationManager;
         $this->accessDecisionManager = $accessDecisionManager;
+        $this->alwaysAuthenticate = $alwaysAuthenticate;
     }
 
     public function getUser()
@@ -58,6 +63,10 @@ class SecurityContext
             }
 
             $object = new FieldVote($object, $field);
+        }
+
+        if ($this->alwaysAuthenticate || !$this->token->isAuthenticated()) {
+            $this->token = $this->authenticationManager->authenticate($this->token);
         }
 
         return $this->accessDecisionManager->decide($this->token, (array) $attributes, $object);

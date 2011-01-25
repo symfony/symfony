@@ -32,13 +32,19 @@ use Symfony\Component\Security\User\AccountInterface;
 class ContextListener implements ListenerInterface
 {
     protected $context;
+    protected $contextKey;
     protected $logger;
     protected $userProviders;
 
-    public function __construct(SecurityContext $context, array $userProviders, LoggerInterface $logger = null)
+    public function __construct(SecurityContext $context, array $userProviders, $contextKey, LoggerInterface $logger = null)
     {
+        if (empty($contextKey)) {
+            throw new \InvalidArgumentException('$contextKey must not be empty.');
+        }
+
         $this->context = $context;
         $this->userProviders = $userProviders;
+        $this->contextKey = $contextKey;
         $this->logger = $logger;
     }
 
@@ -74,7 +80,7 @@ class ContextListener implements ListenerInterface
 
         $session = $request->hasSession() ? $request->getSession() : null;
 
-        if (null === $session || null === $token = $session->get('_security')) {
+        if (null === $session || null === $token = $session->get('_security_'.$this->contextKey)) {
             $this->context->setToken(null);
         } else {
             if (null !== $this->logger) {
@@ -114,7 +120,7 @@ class ContextListener implements ListenerInterface
             $this->logger->debug('Write SecurityContext in the session');
         }
 
-        $event->get('request')->getSession()->set('_security', serialize($token));
+        $event->get('request')->getSession()->set('_security_'.$this->contextKey, serialize($token));
 
         return $response;
     }
@@ -148,10 +154,18 @@ class ContextListener implements ListenerInterface
                     $token->setAuthenticated(false);
                 }
 
+                if (null !== $this->logger) {
+                    $this->logger->debug(sprintf('Username "%s" was reloaded from user provider.', $user));
+                }
+
                 return $token;
             } catch (UnsupportedAccountException $unsupported) {
                 // let's try the next user provider
             } catch (UsernameNotFoundException $notFound) {
+                if (null !== $this->logger) {
+                    $this->logger->debug(sprintf('Username "%s" could not be found.', $user));
+                }
+
                 return null;
             }
         }

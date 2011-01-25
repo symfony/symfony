@@ -11,6 +11,8 @@
 
 namespace Symfony\Component\Security\Acl\Domain;
 
+use Symfony\Component\Security\Authentication\Token\AnonymousToken;
+
 use Symfony\Component\Security\User\AccountInterface;
 use Symfony\Component\Security\Authentication\Token\TokenInterface;
 use Symfony\Component\Security\Acl\Model\SecurityIdentityRetrievalStrategyInterface;
@@ -49,9 +51,12 @@ class SecurityIdentityRetrievalStrategy implements SecurityIdentityRetrievalStra
         $sids = array();
 
         // add user security identity
-        $user = $token->getUser();
-        if ($user instanceof AccountInterface) {
-            $sids[] = UserSecurityIdentity::fromAccount($user);
+        if (!$token instanceof AnonymousToken) {
+            try {
+                $sids[] = UserSecurityIdentity::fromToken($token);
+            } catch (\InvalidArgumentException $invalid) {
+                // ignore, user has no user security identity
+            }
         }
 
         // add all reachable roles

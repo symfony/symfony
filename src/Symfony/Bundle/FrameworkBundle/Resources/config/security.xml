@@ -6,6 +6,7 @@
 
     <parameters>
         <parameter key="security.context.class">Symfony\Component\Security\SecurityContext</parameter>
+        <parameter key="security.context.always_authenticate">false</parameter>
 
         <parameter key="security.account_checker.class">Symfony\Component\Security\User\AccountChecker</parameter>
 
@@ -23,14 +24,16 @@
 
         <parameter key="security.authentication.provider.dao.class">Symfony\Component\Security\Authentication\Provider\DaoAuthenticationProvider</parameter>
         <parameter key="security.authentication.provider.pre_authenticated.class">Symfony\Component\Security\Authentication\Provider\PreAuthenticatedAuthenticationProvider</parameter>
+        <parameter key="security.authentication.provider.rememberme.class">Symfony\Component\Security\Authentication\Provider\RememberMeAuthenticationProvider</parameter>
 
         <parameter key="security.authentication.manager.class">Symfony\Component\Security\Authentication\AuthenticationProviderManager</parameter>
-
+        
         <parameter key="security.authentication.retry_entry_point.class">Symfony\Component\HttpKernel\Security\EntryPoint\RetryAuthenticationEntryPoint</parameter>
 
+        <parameter key="security.authentication.session_strategy.class">Symfony\Component\HttpKernel\Security\Session\SessionAuthenticationStrategy</parameter>
+        <parameter key="security.authentication.session_strategy.strategy">migrate</parameter>
+
         <parameter key="security.authentication.form_entry_point.class">Symfony\Component\HttpKernel\Security\EntryPoint\FormAuthenticationEntryPoint</parameter>
-        <parameter key="security.authentication.form.login_path">/login</parameter>
-        <parameter key="security.authentication.form.use_forward">false</parameter>
         <parameter key="security.authentication.listener.form.class">Symfony\Component\HttpKernel\Security\Firewall\UsernamePasswordFormAuthenticationListener</parameter>
         <parameter key="security.authentication.form.options" type="collection" />
 
@@ -48,8 +51,24 @@
         <parameter key="security.authentication.listener.basic.class">Symfony\Component\HttpKernel\Security\Firewall\BasicAuthenticationListener</parameter>
         <parameter key="security.authentication.listener.digest.class">Symfony\Component\HttpKernel\Security\Firewall\DigestAuthenticationListener</parameter>
         <parameter key="security.authentication.listener.anonymous.class">Symfony\Component\HttpKernel\Security\Firewall\AnonymousAuthenticationListener</parameter>
+        
+        <parameter key="security.authentication.provider.anonymous">Symfony\Component\Security\Authentication\Provider\AnonymousAuthenticationProvider</parameter>
         <parameter key="security.anonymous.key">SomeRandomValue</parameter>
 
+        <parameter key="security.authentication.listener.rememberme.class">Symfony\Component\HttpKernel\Security\Firewall\RememberMeListener</parameter>
+        <parameter key="security.rembemerme.token.provider.in_memory.class">Symfony\Component\Security\Authentication\RememberMe\InMemoryTokenProvider</parameter>
+        
+        <parameter key="security.authentication.rememberme.services.persistent.class">Symfony\Component\HttpKernel\Security\RememberMe\PersistentTokenBasedRememberMeServices</parameter>
+        <parameter key="security.authentication.rememberme.services.simplehash.class">Symfony\Component\HttpKernel\Security\RememberMe\TokenBasedRememberMeServices</parameter>
+        <parameter key="security.authentication.rememberme.services.options.name">SYMFONY_REMEMBERME</parameter>
+        <parameter key="security.authentication.rememberme.services.options.lifetime">31536000</parameter>
+        <parameter key="security.authentication.rememberme.services.options.path">/</parameter>
+        <parameter key="security.authentication.rememberme.services.options.domain" />
+        <parameter key="security.authentication.rememberme.services.options.secure">false</parameter>
+        <parameter key="security.authentication.rememberme.services.options.httponly">true</parameter>
+        <parameter key="security.authentication.rememberme.services.options.always_remember_me">false</parameter>
+        <parameter key="security.authentication.rememberme.services.options.remember_me_parameter">_remember_me</parameter>
+        
         <parameter key="security.channel_listener.class">Symfony\Component\HttpKernel\Security\Firewall\ChannelListener</parameter>
 
         <parameter key="security.logout_listener.class">Symfony\Component\HttpKernel\Security\Firewall\LogoutListener</parameter>
@@ -66,6 +85,8 @@
         <parameter key="security.access.decision_manager.strategy">affirmative</parameter>
         <parameter key="security.access.decision_manager.allow_if_all_abstain">false</parameter>
         <parameter key="security.access.decision_manager.allow_if_equal_granted_denied">true</parameter>
+        
+        <parameter key="security.access.denied_url">/access_denied</parameter>
         
         <parameter key="security.access.simple_role_voter.class">Symfony\Component\Security\Authorization\Voter\RoleVoter</parameter>
         <parameter key="security.access.authenticated_voter.class">Symfony\Component\Security\Authorization\Voter\AuthenticatedVoter</parameter>
@@ -85,7 +106,9 @@
 
     <services>
         <service id="security.context" class="%security.context.class%">
+            <argument type="service" id="security.authentication.manager" />
             <argument type="service" id="security.access.decision_manager" />
+            <argument>%security.context.always_authenticate%</argument>
         </service>
 
         <service id="security.role_hierarchy" class="%security.role_hierarchy.class%" public="false">
@@ -108,17 +131,27 @@
             <argument type="service" id="logger" on-invalid="null" />
         </service>
 
+        <service id="security.authentication.manager" class="%security.authentication.manager.class%" public="false">
+            <argument type="collection" />
+        </service>
+        
+        <service id="security.authentication.provider.anonymous" class="%security.authentication.provider.anonymous%" public="false">
+            <argument>%security.anonymous.key%</argument>
+            <tag name="security.authentication_provider" />
+        </service>
+
         <service id="security.authentication.trust_resolver" class="%security.authentication.trust_resolver.class%" public="false">
             <argument>%security.authentication.trust_resolver.anonymous_class%</argument>
             <argument>%security.authentication.trust_resolver.rememberme_class%</argument>
         </service>
-
-        <service id="security.authentication.retry_entry_point" class="%security.authentication.retry_entry_point.class%" public="false" />
-
-        <service id="security.authentication.form_entry_point" class="%security.authentication.form_entry_point.class%" public="false">
-            <argument>%security.authentication.form.login_path%</argument>
-            <argument>%security.authentication.form.use_forward%</argument>
+        
+        <service id="security.authentication.session_strategy" class="%security.authentication.session_strategy.class%" public="false">
+            <argument>%security.authentication.session_strategy.strategy%</argument>
         </service>
+
+        <service id="security.rememberme.token.provider.in_memory" class="%security.rembemerme.token.provider.in_memory.class%" public="false"></service>
+        
+        <service id="security.authentication.retry_entry_point" class="%security.authentication.retry_entry_point.class%" public="false" />
 
         <service id="security.authentication.basic_entry_point" class="%security.authentication.basic_entry_point.class%" public="false">
             <argument>%security.authentication.basic_entry_point.realm%</argument>
@@ -168,6 +201,7 @@
         <service id="security.context_listener" class="%security.context_listener.class%" public="false">
             <argument type="service" id="security.context" />
             <argument type="collection"></argument>
+            <argument />
             <argument type="service" id="logger" on-invalid="null" />
         </service>
     </services>

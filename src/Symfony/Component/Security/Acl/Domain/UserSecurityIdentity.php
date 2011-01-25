@@ -11,6 +11,7 @@
 
 namespace Symfony\Component\Security\Acl\Domain;
 
+use Symfony\Component\Security\Authentication\Token\TokenInterface;
 use Symfony\Component\Security\User\AccountInterface;
 use Symfony\Component\Security\Acl\Model\SecurityIdentityInterface;
 
@@ -51,7 +52,24 @@ class UserSecurityIdentity implements SecurityIdentityInterface
      */
     public static function fromAccount(AccountInterface $user)
     {
-        return new self((string) $user, get_class($user));
+        return new self($user->getUsername(), get_class($user));
+    }
+
+    /**
+     * Creates a user security identity from a TokenInterface
+     *
+     * @param TokenInterface $token
+     * @return UserSecurityIdentity
+     */
+    public static function fromToken(TokenInterface $token)
+    {
+        $user = $token->getUser();
+
+        if ($user instanceof AccountInterface) {
+            return self::fromAccount($user);
+        }
+
+        return new self((string) $user, is_object($user)? get_class($user) : get_class($token));
     }
 
     /**

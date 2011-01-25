@@ -26,16 +26,15 @@ class HttpBasicFactory implements SecurityFactoryInterface
         $provider = 'security.authentication.provider.dao.'.$id;
         $container
             ->register($provider, '%security.authentication.provider.dao.class%')
-            ->setArguments(array(new Reference($userProvider), new Reference('security.account_checker'), new Reference('security.encoder_factory')))
+            ->setArguments(array(new Reference($userProvider), new Reference('security.account_checker'), $id, new Reference('security.encoder_factory')))
             ->setPublic(false)
+            ->addTag('security.authentication_provider')
         ;
 
         // listener
         $listenerId = 'security.authentication.listener.basic.'.$id;
         $listener = $container->setDefinition($listenerId, clone $container->getDefinition('security.authentication.listener.basic'));
-        $arguments = $listener->getArguments();
-        $arguments[1] = new Reference($provider);
-        $listener->setArguments($arguments);
+        $listener->setArgument(2, $id);
 
         if (isset($config['path'])) {
             $container->setParameter('security.authentication.form.path', $config['path']);

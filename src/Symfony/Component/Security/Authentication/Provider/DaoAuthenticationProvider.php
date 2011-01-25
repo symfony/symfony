@@ -11,6 +11,7 @@
 
 namespace Symfony\Component\Security\Authentication\Provider;
 
+use Symfony\Component\Security\Authentication\Token\TokenInterface;
 use Symfony\Component\Security\Encoder\EncoderFactoryInterface;
 use Symfony\Component\Security\User\UserProviderInterface;
 use Symfony\Component\Security\User\AccountCheckerInterface;
@@ -38,9 +39,9 @@ class DaoAuthenticationProvider extends UserAuthenticationProvider
      * @param AccountCheckerInterface  $accountChecker  An AccountCheckerInterface instance
      * @param EncoderFactoryInterface  $encoderFactory  A EncoderFactoryInterface instance
      */
-    public function __construct(UserProviderInterface $userProvider, AccountCheckerInterface $accountChecker, EncoderFactoryInterface $encoderFactory, $hideUserNotFoundExceptions = true)
+    public function __construct(UserProviderInterface $userProvider, AccountCheckerInterface $accountChecker, $providerKey, EncoderFactoryInterface $encoderFactory, $hideUserNotFoundExceptions = true)
     {
-        parent::__construct($accountChecker, $hideUserNotFoundExceptions);
+        parent::__construct($accountChecker, $providerKey, $hideUserNotFoundExceptions);
 
         $this->encoderFactory = $encoderFactory;
         $this->userProvider = $userProvider;

@@ -11,6 +11,7 @@
 
 namespace Symfony\Component\Security\Authentication\Provider;
 
+use Symfony\Component\Security\User\AccountInterface;
 use Symfony\Component\Security\User\UserProviderInterface;
 use Symfony\Component\Security\User\AccountCheckerInterface;
 use Symfony\Component\Security\Exception\BadCredentialsException;
@@ -31,6 +32,7 @@ class PreAuthenticatedAuthenticationProvider implements AuthenticationProviderIn
 {
     protected $userProvider;
     protected $accountChecker;
+    protected $providerKey;
 
     /**
      * Constructor.
@@ -38,10 +40,11 @@ class PreAuthenticatedAuthenticationProvider implements AuthenticationProviderIn
      * @param UserProviderInterface   $userProvider   A UserProviderInterface instance
      * @param AccountCheckerInterface $accountChecker An AccountCheckerInterface instance
      */
-    public function __construct(UserProviderInterface $userProvider, AccountCheckerInterface $accountChecker)
+    public function __construct(UserProviderInterface $userProvider, AccountCheckerInterface $accountChecker, $providerKey)
     {
         $this->userProvider = $userProvider;
         $this->accountChecker = $accountChecker;
+        $this->providerKey = $providerKey;
     }
 
      /**
@@ -73,6 +76,6 @@ class PreAuthenticatedAuthenticationProvider implements AuthenticationProviderIn
      */
     public function supports(TokenInterface $token)
     {
-        return $token instanceof PreAuthenticatedToken;
+        return $token instanceof PreAuthenticatedToken && $this->providerKey === $token->getProviderKey();
     }
 }

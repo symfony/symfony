@@ -12,12 +12,12 @@
 namespace Symfony\Bundle\FrameworkBundle\DependencyInjection;
 
 use Symfony\Component\DependencyInjection\Alias;
-use Symfony\Component\DependencyInjection\Parameter;
 use Symfony\Component\HttpKernel\DependencyInjection\Extension;
 use Symfony\Component\DependencyInjection\Loader\XmlFileLoader;
 use Symfony\Component\DependencyInjection\Resource\FileResource;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\DependencyInjection\Reference;
+use Symfony\Component\DependencyInjection\Parameter;
 use Symfony\Component\DependencyInjection\Definition;
 use Symfony\Component\DependencyInjection\ParameterBag\ParameterBag;
 use Symfony\Component\HttpFoundation\RequestMatcher;
@@ -26,10 +26,12 @@ use Symfony\Component\HttpFoundation\RequestMatcher;
  * SecurityExtension.
  *
  * @author Fabien Potencier <fabien.potencier@symfony-project.com>
+ * @author Johannes M. Schmitt <schmittjoh@gmail.com>
  */
 class SecurityExtension extends Extension
 {
     protected $requestMatchers = array();
+    protected $contextListeners = array();
 
     public function configLoad(array $configs, ContainerBuilder $container)
     {
@@ -59,7 +61,15 @@ class SecurityExtension extends Extension
         }
 
         if (isset($config['access-denied-url'])) {
-            $container->setParameter('security.access_denied.url', $config['access-denied-url']);
+            $container->setParameter('security.access.denied_url', $config['access-denied-url']);
+        }
+
+        // session fixation protection
+        if (isset($config['session_fixation_protection'])) {
+            $config['session-fixation-protection'] = $config['session_fixation_protection'];
+        }
+        if (isset($config['session-fixation-protection'])) {
+            $container->setParameter('security.authentication.session_strategy.strategy', $config['session-fixation-protection']);
         }
 
         $this->createFirewalls($config, $container);
@@ -208,7 +218,13 @@ class SecurityExtension extends Extension
         // Matcher
         $i = 0;
         $matcher = null;
-        if (isset($firewall['pattern'])) {
+        if (isset($firewall['request_matcher'])) {
+            $firewall['request-matcher'] = $firewall['request_matcher'];
+        }
+
+        if (isset($firewall['request-matcher'])) {
+            $matcher = new Reference($firewall['request-matcher']);
+        } else if (isset($firewall['pattern'])) {
             $matcher = $this->createRequestMatcher($container, $firewall['pattern']);
         }
 
@@ -236,7 +252,12 @@ class SecurityExtension extends Extension
 
         // Context serializer listener
         if (!isset($firewall['stateless']) || !$firewall['stateless']) {
-            $listeners[] = new Reference('security.context_listener');
+            $contextKey = $id;
+            if (isset($firewall['context'])) {
+                $contextKey = $firewall['context'];
+            }
+
+            $listeners[] = new Reference($this->createContextListener($container, $contextKey));
         }
 
         // Logout listener
@@ -245,6 +266,10 @@ class SecurityExtension extends Extension
             $listener = $container->setDefinition($listenerId, clone $container->getDefinition('security.logout_listener'));
 
             $listeners[] = new Reference($listenerId);
+
+            if (!is_array($firewall['logout'])) {
+                $firewall['logout'] = array();
+            }
 
             $arguments = $listener->getArguments();
             if (isset($firewall['logout']['path'])) {
@@ -256,10 +281,19 @@ class SecurityExtension extends Extension
             }
             $listener->setArguments($arguments);
 
-            if (!isset($firewall['stateless']) || !$firewall['stateless']) {
+            // add session logout handler
+            $invalidateSession = true;
+            if (array_key_exists('invalidate_session', $firewall['logout'])) {
+                $firewall['logout']['invalidate-session'] = $firewall['logout']['invalidate_session'];
+            }
+            if (array_key_exists('invalidate-session', $firewall['logout'])) {
+                $invalidateSession = (Boolean) $invalidateSession;
+            }
+            if (true === $invalidateSession && (!isset($firewall['stateless']) || !$firewall['stateless'])) {
                 $listener->addMethodCall('addHandler', array(new Reference('security.logout.handler.session')));
             }
 
+            // add cookie logout handler
             if (count($cookies = $this->normalizeConfig($firewall['logout'], 'cookie')) > 0) {
                 $cookieHandlerId = 'security.logout.handler.cookie_clearing.'.$id;
                 $cookieHandler = $container->setDefinition($cookieHandlerId, clone $container->getDefinition('security.logout.handler.cookie_clearing'));
@@ -275,7 +309,7 @@ class SecurityExtension extends Extension
         $listeners = array_merge($listeners, $authListeners);
 
         // Access listener
-        $listeners[] = new Reference($this->createAccessListener($container, $id, $providers));
+        $listeners[] = new Reference('security.access_listener');
 
         // Switch user listener
         if (array_key_exists('switch_user', $firewall)) {
@@ -285,10 +319,33 @@ class SecurityExtension extends Extension
             $listeners[] = new Reference($this->createSwitchUserListener($container, $id, $firewall['switch-user'], $defaultProvider));
         }
 
+        // Determine default entry point
+        if (isset($firewall['entry_point'])) {
+            $firewall['entry-point'] = $firewall['entry_point'];
+        }
+        if (isset($firewall['entry-point'])) {
+            $defaultEntryPoint = $firewall['entry-point'];
+        }
+
         // Exception listener
-        $exceptionListener = new Reference($this->createExceptionListener($container, $id, $defaultEntryPoint));
+        $exceptionListener = new Reference($this->createExceptionListener($container, $firewall, $id, $defaultEntryPoint));
 
         return array($matcher, $listeners, $exceptionListener);
+    }
+
+    protected function createContextListener($container, $contextKey)
+    {
+        if (isset($this->contextListeners[$contextKey])) {
+            return $this->contextListeners[$contextKey];
+        }
+
+        $listenerId = 'security.context_listener.'.count($this->contextListeners);
+        $listener = $container->setDefinition($listenerId, clone $container->getDefinition('security.context_listener'));
+        $arguments = $listener->getArguments();
+        $arguments[2] = $contextKey;
+        $listener->setArguments($arguments);
+
+        return $this->contextListeners[$contextKey] = $listenerId;
     }
 
     protected function createAuthenticationListeners($container, $id, $firewall, $defaultProvider)
@@ -298,7 +355,7 @@ class SecurityExtension extends Extension
         $hasListeners = false;
         $defaultEntryPoint = null;
 
-        $positions = array('pre_auth', 'form', 'http');
+        $positions = array('pre_auth', 'form', 'http', 'remember_me');
 
         $tags = $container->findTaggedServiceIds('security.listener.factory');
         $factories = array();
@@ -323,9 +380,9 @@ class SecurityExtension extends Extension
                 if (array_key_exists($key, $firewall) && $firewall[$key] !== false) {
                     $userProvider = isset($firewall[$key]['provider']) ? $this->getUserProviderId($firewall[$key]['provider']) : $defaultProvider;
 
-                    list($provider, $listener, $defaultEntryPoint) = $factory->create($container, $id, $firewall[$key], $userProvider, $defaultEntryPoint);
+                    list($provider, $listenerId, $defaultEntryPoint) = $factory->create($container, $id, $firewall[$key], $userProvider, $defaultEntryPoint);
 
-                    $listeners[] = new Reference($listener);
+                    $listeners[] = new Reference($listenerId);
                     $providers[] = new Reference($provider);
                     $hasListeners = true;
                 }
@@ -553,32 +610,27 @@ class SecurityExtension extends Extension
         return 'security.authentication.provider.'.$name;
     }
 
-    protected function createAccessListener($container, $id, $providers)
+    protected function createExceptionListener($container, $config, $id, $defaultEntryPoint)
     {
-        // Authentication manager
-        $authManager = 'security.authentication.manager.'.$id;
-        $container
-            ->register($authManager, '%security.authentication.manager.class%')
-            ->addArgument($providers)
-            ->setPublic(false)
-        ;
+        if (isset($config['access_denied_handler'])) {
+            $config['access-denied-handler'] = $config['access_denied_handler'];
+        }
+        if (isset($config['access_denied_url'])) {
+            $config['access-denied-url'] = $config['access_denied_url'];
+        }
 
-        // Access listener
-        $listenerId = 'security.access_listener.'.$id;
-        $listener = $container->setDefinition($listenerId, clone $container->getDefinition('security.access_listener'));
-        $arguments = $listener->getArguments();
-        $arguments[3] = new Reference($authManager);
-        $listener->setArguments($arguments);
-
-        return $listenerId;
-    }
-
-    protected function createExceptionListener($container, $id, $defaultEntryPoint)
-    {
         $exceptionListenerId = 'security.exception_listener.'.$id;
         $listener = $container->setDefinition($exceptionListenerId, clone $container->getDefinition('security.exception_listener'));
         $arguments = $listener->getArguments();
         $arguments[2] = null === $defaultEntryPoint ? null : new Reference($defaultEntryPoint);
+
+        // access denied handler setup
+        if (isset($config['access-denied-handler'])) {
+            $arguments[4] = new Reference($config['access-denied-handler']);
+        } else if (isset($config['access-denied-url'])) {
+            $arguments[3] = $config['access-denied-url'];
+        }
+
         $listener->setArguments($arguments);
 
         return $exceptionListenerId;

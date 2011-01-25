@@ -65,6 +65,14 @@ class DocumentUserProvider implements UserProviderInterface
             throw new UnsupportedAccountException(sprintf('Instances of "%s" are not supported.', get_class($account)));
         }
 
-        return $this->loadUserByUsername((string) $account);
+        return $this->loadUserByUsername($account->getUsername());
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    public function supportsClass($class)
+    {
+        return $class === $this->class;
     }
 }

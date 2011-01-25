@@ -161,7 +161,14 @@ class UserAuthenticationProviderTest extends \PHPUnit_Framework_TestCase
 
     protected function getSupportedToken()
     {
-        return $this->getMock('Symfony\Component\Security\Authentication\Token\UsernamePasswordToken', array('getCredentials'), array(), '', false);
+        $mock = $this->getMock('Symfony\Component\Security\Authentication\Token\UsernamePasswordToken', array('getCredentials', 'getProviderKey'), array(), '', false);
+        $mock
+            ->expects($this->any())
+            ->method('getProviderKey')
+            ->will($this->returnValue('key'))
+        ;
+
+        return $mock;
     }
 
     protected function getProvider($userChecker = false, $hide = true)
@@ -170,6 +177,6 @@ class UserAuthenticationProviderTest extends \PHPUnit_Framework_TestCase
             $userChecker = $this->getMock('Symfony\Component\Security\User\AccountCheckerInterface');
         }
 
-        return $this->getMockForAbstractClass('Symfony\Component\Security\Authentication\Provider\UserAuthenticationProvider', array($userChecker, $hide));
+        return $this->getMockForAbstractClass('Symfony\Component\Security\Authentication\Provider\UserAuthenticationProvider', array($userChecker, 'key', $hide));
     }
 }

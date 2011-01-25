@@ -34,19 +34,25 @@ class DigestAuthenticationListener implements ListenerInterface
 {
     protected $securityContext;
     protected $provider;
+    protected $providerKey;
     protected $authenticationEntryPoint;
     protected $logger;
 
-    public function __construct(SecurityContext $securityContext, UserProviderInterface $provider, DigestAuthenticationEntryPoint $authenticationEntryPoint, LoggerInterface $logger = null)
+    public function __construct(SecurityContext $securityContext, UserProviderInterface $provider, $providerKey, DigestAuthenticationEntryPoint $authenticationEntryPoint, LoggerInterface $logger = null)
     {
+        if (empty($providerKey)) {
+            throw new \InvalidArgumentException('$providerKey must not be empty.');
+        }
+
         $this->securityContext = $securityContext;
         $this->provider = $provider;
+        $this->providerKey = $providerKey;
         $this->authenticationEntryPoint = $authenticationEntryPoint;
         $this->logger = $logger;
     }
 
     /**
-     * 
+     *
      *
      * @param EventDispatcherInterface $dispatcher An EventDispatcherInterface instance
      * @param integer                  $priority   The priority
@@ -55,7 +61,7 @@ class DigestAuthenticationListener implements ListenerInterface
     {
         $dispatcher->connect('core.security', array($this, 'handle'), 0);
     }
-    
+
     /**
      * {@inheritDoc}
      */
@@ -134,7 +140,7 @@ class DigestAuthenticationListener implements ListenerInterface
             $this->logger->debug(sprintf('Authentication success for user "%s" with response "%s"', $digestAuth->getUsername(), $digestAuth->getResponse()));
         }
 
-        $this->securityContext->setToken(new UsernamePasswordToken($user, $user->getPassword()));
+        $this->securityContext->setToken(new UsernamePasswordToken($user, $user->getPassword(), $this->providerKey));
     }
 
     protected function fail(Request $request, AuthenticationException $failed)

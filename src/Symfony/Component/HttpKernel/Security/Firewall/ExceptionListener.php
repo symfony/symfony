@@ -11,6 +11,9 @@
 
 namespace Symfony\Component\HttpKernel\Security\Firewall;
 
+use Symfony\Component\HttpFoundation\Response;
+use Symfony\Component\HttpKernel\Security\AccessDeniedHandler;
+use Symfony\Component\HttpKernel\Security\ExceptionTranslation\AccessDeniedHandlerInterface;
 use Symfony\Component\Security\SecurityContext;
 use Symfony\Component\Security\Authentication\AuthenticationTrustResolverInterface;
 use Symfony\Component\Security\Authentication\EntryPoint\AuthenticationEntryPointInterface;
@@ -33,14 +36,16 @@ use Symfony\Component\HttpKernel\HttpKernelInterface;
 class ExceptionListener implements ListenerInterface
 {
     protected $context;
+    protected $accessDeniedHandler;
     protected $authenticationEntryPoint;
     protected $authenticationTrustResolver;
     protected $errorPage;
     protected $logger;
 
-    public function __construct(SecurityContext $context, AuthenticationTrustResolverInterface $trustResolver, AuthenticationEntryPointInterface $authenticationEntryPoint = null, $errorPage = null, LoggerInterface $logger = null)
+    public function __construct(SecurityContext $context, AuthenticationTrustResolverInterface $trustResolver, AuthenticationEntryPointInterface $authenticationEntryPoint = null, $errorPage = null, AccessDeniedHandlerInterface $accessDeniedHandler = null, LoggerInterface $logger = null)
     {
         $this->context = $context;
+        $this->accessDeniedHandler = $accessDeniedHandler;
         $this->authenticationEntryPoint = $authenticationEntryPoint;
         $this->authenticationTrustResolver = $trustResolver;
         $this->errorPage = $errorPage;
@@ -57,7 +62,7 @@ class ExceptionListener implements ListenerInterface
     {
         $dispatcher->connect('core.exception', array($this, 'handleException'), 0);
     }
-    
+
     /**
      * {@inheritDoc}
      */
@@ -107,15 +112,26 @@ class ExceptionListener implements ListenerInterface
                     $this->logger->info('Access is denied (and user is neither anonymous, nor remember-me)');
                 }
 
-                if (null === $this->errorPage) {
-                    return;
-                }
-
-                $subRequest = Request::create($this->errorPage);
-                $subRequest->attributes->set(SecurityContext::ACCESS_DENIED_ERROR, $exception->getMessage());
-
                 try {
-                    $response = $event->getSubject()->handle($subRequest, HttpKernelInterface::SUB_REQUEST, true);
+                    if (null !== $this->accessDeniedHandler) {
+                        $response = $this->accessDeniedHandler->handle($event, $request, $exception);
+
+                        if (!$response instanceof Response) {
+                            return;
+                        }
+                    } else {
+                        if (null === $this->errorPage) {
+                            return;
+                        }
+
+                        $subRequest = Request::create($this->errorPage);
+                        $subRequest->attributes->set(SecurityContext::ACCESS_DENIED_ERROR, $exception->getMessage());
+
+                        $response = $event->getSubject()->handle($subRequest, HttpKernelInterface::SUB_REQUEST, true);
+                        $response->setStatusCode(403);
+
+                        return $response;
+                    }
                 } catch (\Exception $e) {
                     if (null !== $this->logger) {
                         $this->logger->err(sprintf('Exception thrown when handling an exception (%s: %s)', get_class($e), $e->getMessage()));
@@ -125,7 +141,6 @@ class ExceptionListener implements ListenerInterface
 
                     return;
                 }
-                $response->setStatusCode(403);
             }
         } else {
             return;

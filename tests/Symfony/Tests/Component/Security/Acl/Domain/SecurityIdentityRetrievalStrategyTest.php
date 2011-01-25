@@ -24,17 +24,37 @@ class SecurityIdentityRetrievalStrategyTest extends \PHPUnit_Framework_TestCase
     {
         $strategy = $this->getStrategy($roles, $authenticationStatus);
 
-        $token = $this->getMock('Symfony\Component\Security\Authentication\Token\TokenInterface');
+        if ('anonymous' === $authenticationStatus) {
+            $token = $this->getMockBuilder('Symfony\Component\Security\Authentication\Token\AnonymousToken')
+                                ->disableOriginalConstructor()
+                                ->getMock();
+        } else {
+            $class = '';
+            if (is_string($user)) {
+                $class = 'MyCustomTokenImpl';
+            }
+
+            $token = $this->getMockBuilder('Symfony\Component\Security\Authentication\Token\TokenInterface')
+                        ->setMockClassName($class)
+                        ->getMock();
+        }
         $token
             ->expects($this->once())
             ->method('getRoles')
             ->will($this->returnValue(array('foo')))
         ;
-        $token
-            ->expects($this->once())
-            ->method('getUser')
-            ->will($this->returnValue($user))
-        ;
+        if ('anonymous' === $authenticationStatus) {
+            $token
+                ->expects($this->never())
+                ->method('getUser')
+            ;
+        } else {
+            $token
+                ->expects($this->once())
+                ->method('getUser')
+                ->will($this->returnValue($user))
+            ;
+        }
 
         $extractedSids = $strategy->getSecurityIdentities($token);
 
@@ -60,6 +80,20 @@ class SecurityIdentityRetrievalStrategyTest extends \PHPUnit_Framework_TestCase
                 new RoleSecurityIdentity('IS_AUTHENTICATED_REMEMBERED'),
                 new RoleSecurityIdentity('IS_AUTHENTICATED_ANONYMOUSLY'),
             )),
+            array('johannes', array('ROLE_FOO'), 'fullFledged', array(
+                new UserSecurityIdentity('johannes', 'MyCustomTokenImpl'),
+                new RoleSecurityIdentity('ROLE_FOO'),
+                new RoleSecurityIdentity('IS_AUTHENTICATED_FULLY'),
+                new RoleSecurityIdentity('IS_AUTHENTICATED_REMEMBERED'),
+                new RoleSecurityIdentity('IS_AUTHENTICATED_ANONYMOUSLY'),
+            )),
+            array(new CustomUserImpl('johannes'), array('ROLE_FOO'), 'fullFledged', array(
+                new UserSecurityIdentity('johannes', 'Symfony\Tests\Component\Security\Acl\Domain\CustomUserImpl'),
+                new RoleSecurityIdentity('ROLE_FOO'),
+                new RoleSecurityIdentity('IS_AUTHENTICATED_FULLY'),
+                new RoleSecurityIdentity('IS_AUTHENTICATED_REMEMBERED'),
+                new RoleSecurityIdentity('IS_AUTHENTICATED_ANONYMOUSLY'),
+            )),
             array($this->getAccount('foo', 'FooBarUser'), array('ROLE_FOO'), 'rememberMe', array(
                 new UserSecurityIdentity('foo', 'FooBarUser'),
                 new RoleSecurityIdentity('ROLE_FOO'),
@@ -77,10 +111,11 @@ class SecurityIdentityRetrievalStrategyTest extends \PHPUnit_Framework_TestCase
     {
         $account = $this->getMock('Symfony\Component\Security\User\AccountInterface', array(), array(), $class);
         $account
-            ->expects($this->once())
-            ->method('__toString')
+            ->expects($this->any())
+            ->method('getUsername')
             ->will($this->returnValue($username))
         ;
+
 
         return $account;
     }
@@ -144,5 +179,20 @@ class SecurityIdentityRetrievalStrategyTest extends \PHPUnit_Framework_TestCase
 
 
         return new SecurityIdentityRetrievalStrategy($roleHierarchy, $trustResolver);
+    }
+}
+
+class CustomUserImpl
+{
+    protected $name;
+
+    public function __construct($name)
+    {
+        $this->name = $name;
+    }
+
+    public function __toString()
+    {
+        return $this->name;
     }
 }

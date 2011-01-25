@@ -119,7 +119,6 @@ class User implements AdvancedAccountInterface
      */
     public function eraseCredentials()
     {
-        $this->password = null;
     }
 
     /**

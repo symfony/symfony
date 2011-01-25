@@ -11,6 +11,7 @@
 
 namespace Symfony\Bundle\FrameworkBundle;
 
+use Symfony\Bundle\FrameworkBundle\DependencyInjection\Compiler\AddAuthenticationProvidersPass;
 use Symfony\Bundle\FrameworkBundle\DependencyInjection\Compiler\AddConstraintValidatorsPass;
 use Symfony\Bundle\FrameworkBundle\DependencyInjection\Compiler\AddFieldFactoryGuessersPass;
 use Symfony\Bundle\FrameworkBundle\DependencyInjection\Compiler\TemplatingPass;
@@ -67,6 +68,7 @@ class FrameworkBundle extends Bundle
         $container->addCompilerPass(new AddClassesToCachePass());
         $container->addCompilerPass(new TranslatorPass());
         $container->addCompilerPass(new AddCacheWarmerPass());
+        $container->addCompilerPass(new AddAuthenticationProvidersPass());
     }
 
     /**

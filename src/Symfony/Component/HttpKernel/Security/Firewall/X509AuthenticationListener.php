@@ -27,9 +27,9 @@ class X509AuthenticationListener extends PreAuthenticatedListener
     protected $userKey;
     protected $credentialKey;
 
-    public function __construct(SecurityContext $securityContext, AuthenticationManagerInterface $authenticationManager, $userKey = 'SSL_CLIENT_S_DN_Email', $credentialKey = 'SSL_CLIENT_S_DN', LoggerInterface $logger = null)
+    public function __construct(SecurityContext $securityContext, AuthenticationManagerInterface $authenticationManager, $providerKey, $userKey = 'SSL_CLIENT_S_DN_Email', $credentialKey = 'SSL_CLIENT_S_DN', LoggerInterface $logger = null)
     {
-        parent::__construct($securityContext, $authenticationManager, $logger);
+        parent::__construct($securityContext, $authenticationManager, $providerKey, $logger);
 
         $this->userKey = $userKey;
         $this->credentialKey = $credentialKey;

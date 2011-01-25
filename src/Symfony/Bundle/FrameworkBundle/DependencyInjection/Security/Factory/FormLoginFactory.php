@@ -26,17 +26,28 @@ class FormLoginFactory implements SecurityFactoryInterface
         $provider = 'security.authentication.provider.dao.'.$id;
         $container
             ->register($provider, '%security.authentication.provider.dao.class%')
-            ->setArguments(array(new Reference($userProvider), new Reference('security.account_checker'), new Reference('security.encoder_factory')))
+            ->setArguments(array(new Reference($userProvider), new Reference('security.account_checker'), $id, new Reference('security.encoder_factory')))
             ->setPublic(false)
+            ->addTag('security.authentication_provider')
         ;
 
         // listener
         $listenerId = 'security.authentication.listener.form.'.$id;
         $listener = $container->setDefinition($listenerId, clone $container->getDefinition('security.authentication.listener.form'));
-        $arguments = $listener->getArguments();
-        $arguments[1] = new Reference($provider);
-        $listener->setArguments($arguments);
+        $listener->setArgument(3, $id);
 
+        // add remember-me tag
+        $rememberMe = true;
+        if (isset($config['remember-me']) && false === $config['remember-me']) {
+            $rememberMe = false;
+        } else if (isset($config['remember_me']) && false === $config['remember_me']) {
+            $rememberMe = false;
+        }
+        if ($rememberMe) {
+            $listener->addTag('security.remember_me_aware', array('id' => $id, 'provider' => $userProvider));
+        }
+
+        // generate options
         $options = array(
             'check_path'                     => '/login_check',
             'login_path'                     => '/login',
@@ -53,11 +64,29 @@ class FormLoginFactory implements SecurityFactoryInterface
                 $options[$key] = $config[$key];
             }
         }
-        $container->setParameter('security.authentication.form.options', $options);
-        $container->setParameter('security.authentication.form.login_path', $options['login_path']);
-        $container->setParameter('security.authentication.form.use_forward', $options['use_forward']);
+        $listener->setArgument(4, $options);
 
-        return array($provider, $listenerId, 'security.authentication.form_entry_point');
+        // success handler
+        if (isset($config['success_handler'])) {
+            $config['success-handler'] = $config['success_handler'];
+        }
+        if (isset($config['success-handler'])) {
+            $listener->setArgument(5, new Reference($config['success-handler']));
+        }
+
+        // failure handler
+        if (isset($config['failure_handler'])) {
+            $config['failure-handler'] = $config['failure_handler'];
+        }
+        if (isset($config['failure-handler'])) {
+            $listener->setArgument(6, new Reference($config['failure-handler']));
+        }
+
+        // form entry point
+        $entryPoint = $container->setDefinition($entryPointId = 'security.authentication.form_entry_point.'.$id, clone $container->getDefinition('security.authentication.form_entry_point'));
+        $entryPoint->setArguments(array($options['login_path'], $options['use_forward']));
+
+        return array($provider, $listenerId, $entryPointId);
     }
 
     public function getPosition()

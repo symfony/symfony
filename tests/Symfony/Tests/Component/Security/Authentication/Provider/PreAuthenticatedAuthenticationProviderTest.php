@@ -21,6 +21,17 @@ class PreAuthenticatedAuthenticationProviderTest extends \PHPUnit_Framework_Test
 
         $this->assertTrue($provider->supports($this->getSupportedToken()));
         $this->assertFalse($provider->supports($this->getMock('Symfony\Component\Security\Authentication\Token\TokenInterface')));
+
+        $token = $this->getMockBuilder('Symfony\Component\Security\Authentication\Token\PreAuthenticatedToken')
+                    ->disableOriginalConstructor()
+                    ->getMock()
+        ;
+        $token
+            ->expects($this->once())
+            ->method('getProviderKey')
+            ->will($this->returnValue('foo'))
+        ;
+        $this->assertFalse($provider->supports($token));
     }
 
     public function testAuthenticateWhenTokenIsNotSupported()
@@ -71,7 +82,7 @@ class PreAuthenticatedAuthenticationProviderTest extends \PHPUnit_Framework_Test
 
     protected function getSupportedToken($user = false, $credentials = false)
     {
-        $token = $this->getMock('Symfony\Component\Security\Authentication\Token\PreAuthenticatedToken', array('getUser', 'getCredentials'), array(), '', false);
+        $token = $this->getMock('Symfony\Component\Security\Authentication\Token\PreAuthenticatedToken', array('getUser', 'getCredentials', 'getProviderKey'), array(), '', false);
         if (false !== $user) {
             $token->expects($this->once())
                   ->method('getUser')
@@ -84,6 +95,12 @@ class PreAuthenticatedAuthenticationProviderTest extends \PHPUnit_Framework_Test
                   ->will($this->returnValue($credentials))
             ;
         }
+
+        $token
+            ->expects($this->any())
+            ->method('getProviderKey')
+            ->will($this->returnValue('key'))
+        ;
 
         return $token;
     }
@@ -102,6 +119,6 @@ class PreAuthenticatedAuthenticationProviderTest extends \PHPUnit_Framework_Test
             $userChecker = $this->getMock('Symfony\Component\Security\User\AccountCheckerInterface');
         }
 
-        return new PreAuthenticatedAuthenticationProvider($userProvider, $userChecker);
+        return new PreAuthenticatedAuthenticationProvider($userProvider, $userChecker, 'key');
     }
 }

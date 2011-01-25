@@ -105,14 +105,14 @@ class AuthenticationProviderManagerTest extends \PHPUnit_Framework_TestCase
     public function testEraseCredentialFlag()
     {
         $manager = new AuthenticationProviderManager(array(
-            $this->getAuthenticationProvider(true, $token = new UsernamePasswordToken('foo', 'bar')),
+            $this->getAuthenticationProvider(true, $token = new UsernamePasswordToken('foo', 'bar', 'key')),
         ));
 
         $token = $manager->authenticate($this->getMock('Symfony\Component\Security\Authentication\Token\TokenInterface'));
         $this->assertEquals('', $token->getCredentials());
 
         $manager = new AuthenticationProviderManager(array(
-            $this->getAuthenticationProvider(true, $token = new UsernamePasswordToken('foo', 'bar')),
+            $this->getAuthenticationProvider(true, $token = new UsernamePasswordToken('foo', 'bar', 'key')),
         ), false);
 
         $token = $manager->authenticate($this->getMock('Symfony\Component\Security\Authentication\Token\TokenInterface'));

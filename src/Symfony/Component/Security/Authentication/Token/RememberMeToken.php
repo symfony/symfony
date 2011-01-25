@@ -22,6 +22,7 @@ use Symfony\Component\Security\User\AccountInterface;
 class RememberMeToken extends Token
 {
     protected $key;
+    protected $providerKey;
 
     /**
      * The persistent token which resulted in this authentication token.
@@ -36,16 +37,25 @@ class RememberMeToken extends Token
      * @param string $username
      * @param string $key
      */
-    public function __construct(AccountInterface $user, $key) {
+    public function __construct(AccountInterface $user, $providerKey, $key) {
         parent::__construct($user->getRoles());
 
-        if (0 === strlen($key)) {
-            throw new \InvalidArgumentException('$key cannot be empty.');
+        if (empty($key)) {
+            throw new \InvalidArgumentException('$key must not be empty.');
+        }
+        if (empty($providerKey)) {
+            throw new \InvalidArgumentException('$providerKey must not be empty.');
         }
 
-        $this->user = $user;
+        $this->setUser($user);
+        $this->providerKey = $providerKey;
         $this->key = $key;
         $this->setAuthenticated(true);
+    }
+
+    public function getProviderKey()
+    {
+        return $this->providerKey;
     }
 
     public function getKey()
@@ -53,13 +63,13 @@ class RememberMeToken extends Token
         return $this->key;
     }
 
-    public function setPersistentToken(PersistentTokenInterface $persistentToken)
-    {
-        $this->persistentToken = $persistentToken;
-    }
-
     public function getPersistentToken()
     {
         return $this->persistentToken;
+    }
+
+    public function setPersistentToken(PersistentTokenInterface $persistentToken)
+    {
+        $this->persistentToken = $persistentToken;
     }
 }

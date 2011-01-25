@@ -106,7 +106,6 @@ class UrlMatcher implements UrlMatcherInterface
             $url = substr($url, 0, $pos);
         }
 
-        // remove multiple /
-        return preg_replace('#/+#', '/', $url);
+        return $url;
     }
 }

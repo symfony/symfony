@@ -25,7 +25,6 @@ class UrlMatcherTest extends \PHPUnit_Framework_TestCase
         $matcher = new UrlMatcherForTests($collection, array(), array());
 
         $this->assertEquals('/foo', $matcher->normalizeUrl('/foo?foo=bar'), '->normalizeUrl() removes the query string');
-        $this->assertEquals('/foo/bar', $matcher->normalizeUrl('/foo//bar'), '->normalizeUrl() removes duplicated /');
     }
 
     public function testMatch()

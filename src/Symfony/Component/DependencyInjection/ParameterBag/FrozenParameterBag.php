@@ -20,24 +20,28 @@ class FrozenParameterBag extends ParameterBag
     /**
      * Constructor.
      *
+     * For performance reasons, the constructor assumes that
+     * all keys are already lowercased.
+     *
+     * This is always the case when used internally.
+     *
      * @param array $parameters An array of parameters
      */
     public function __construct(array $parameters = array())
     {
-        foreach ($parameters as $key => $value) {
-            $this->parameters[strtolower($key)] = $value;
-        }
+        $this->parameters = $parameters;
     }
 
+    /**
+     * {@inheritdoc}
+     */
     public function clear()
     {
         throw new \LogicException('Impossible to call clear() on a frozen ParameterBag.');
     }
 
     /**
-     * Adds parameters to the service container parameters.
-     *
-     * @param array $parameters An array of parameters
+     * {@inheritdoc}
      */
     public function add(array $parameters)
     {
@@ -45,10 +49,7 @@ class FrozenParameterBag extends ParameterBag
     }
 
     /**
-     * Sets a service container parameter.
-     *
-     * @param string $name       The parameter name
-     * @param mixed  $parameters The parameter value
+     * {@inheritdoc}
      */
     public function set($name, $value)
     {

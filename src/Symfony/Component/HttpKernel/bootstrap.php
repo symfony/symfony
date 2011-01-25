@@ -426,9 +426,7 @@ class FrozenParameterBag extends ParameterBag
 {
     public function __construct(array $parameters = array())
     {
-        foreach ($parameters as $key => $value) {
-            $this->parameters[strtolower($key)] = $value;
-        }
+        $this->parameters = $parameters;
     }
     public function clear()
     {

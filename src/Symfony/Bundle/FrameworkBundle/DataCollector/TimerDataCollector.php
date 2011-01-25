@@ -12,7 +12,7 @@
 namespace Symfony\Bundle\FrameworkBundle\DataCollector;
 
 use Symfony\Component\HttpKernel\DataCollector\DataCollector;
-use Symfony\Component\HttpKernel\Kernel;
+use Symfony\Component\HttpKernel\KernelInterface;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 
@@ -25,7 +25,7 @@ class TimerDataCollector extends DataCollector
 {
     protected $kernel;
 
-    public function __construct(Kernel $kernel)
+    public function __construct(KernelInterface $kernel)
     {
         $this->kernel = $kernel;
     }

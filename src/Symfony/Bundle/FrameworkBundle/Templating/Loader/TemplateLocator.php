@@ -12,7 +12,7 @@
 namespace Symfony\Bundle\FrameworkBundle\Templating\Loader;
 
 use Symfony\Component\Templating\Loader\TemplateNameParserInterface;
-use Symfony\Component\HttpKernel\Kernel;
+use Symfony\Component\HttpKernel\KernelInterface;
 
 /**
  *
@@ -28,11 +28,11 @@ class TemplateLocator implements TemplateLocatorInterface
     /**
      * Constructor.
      *
-     * @param Kernel                      $kernel A Kernel instance
+     * @param KernelInterface             $kernel A KernelInterface instance
      * @param TemplateNameParserInterface $parser A TemplateNameParserInterface instance
      * @param string                      $path   A global fallback path
      */
-    public function __construct(Kernel $kernel, TemplateNameParserInterface $parser, $path)
+    public function __construct(KernelInterface $kernel, TemplateNameParserInterface $parser, $path)
     {
         $this->kernel = $kernel;
         $this->path = $path;

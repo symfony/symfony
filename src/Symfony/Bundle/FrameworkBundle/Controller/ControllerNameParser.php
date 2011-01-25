@@ -11,7 +11,7 @@
 
 namespace Symfony\Bundle\FrameworkBundle\Controller;
 
-use Symfony\Component\HttpKernel\Kernel;
+use Symfony\Component\HttpKernel\KernelInterface;
 use Symfony\Component\HttpKernel\Log\LoggerInterface;
 
 /**
@@ -29,10 +29,10 @@ class ControllerNameParser
     /**
      * Constructor.
      *
-     * @param Kernel          $kernel A Kernel instance
+     * @param KernelInterface $kernel A KernelInterface instance
      * @param LoggerInterface $logger A LoggerInterface instance
      */
-    public function __construct(Kernel $kernel, LoggerInterface $logger = null)
+    public function __construct(KernelInterface $kernel, LoggerInterface $logger = null)
     {
         $this->kernel = $kernel;
         $this->logger = $logger;

@@ -32,7 +32,7 @@ class Client extends BaseClient
     /**
      * Constructor.
      *
-     * @param HttpKernelInterface $kernel    A Kernel instance
+     * @param HttpKernelInterface $kernel    An HttpKernelInterface instance
      * @param array               $server    The server parameters (equivalent of $_SERVER)
      * @param History             $history   A History instance to store the browser history
      * @param CookieJar           $cookieJar A CookieJar instance to store the cookies
@@ -57,7 +57,7 @@ class Client extends BaseClient
     /**
      * Returns the kernel.
      *
-     * @return Kernel
+     * @return HttpKernelInterface
      */
     public function getKernel()
     {

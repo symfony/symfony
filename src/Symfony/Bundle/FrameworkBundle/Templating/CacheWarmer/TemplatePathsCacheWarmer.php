@@ -12,7 +12,7 @@
 namespace Symfony\Bundle\FrameworkBundle\Templating\CacheWarmer;
 
 use Symfony\Component\HttpKernel\CacheWarmer\CacheWarmer;
-use Symfony\Component\HttpKernel\Kernel;
+use Symfony\Component\HttpKernel\KernelInterface;
 use Symfony\Component\Finder\Finder;
 
 /**
@@ -28,10 +28,10 @@ class TemplatePathsCacheWarmer extends CacheWarmer
     /**
      * Constructor.
      *
-     * @param Kernel $kernel  A Kernel instance
-     * @param string $rootDir The directory where global templates can be stored
+     * @param KernelInterface $kernel  A KernelInterface instance
+     * @param string          $rootDir The directory where global templates can be stored
      */
-    public function __construct(Kernel $kernel, $rootDir)
+    public function __construct(KernelInterface $kernel, $rootDir)
     {
         $this->kernel = $kernel;
         $this->rootDir = $rootDir;

@@ -12,7 +12,7 @@
 namespace Symfony\Bundle\FrameworkBundle\Templating\Loader;
 
 use Symfony\Component\Templating\Loader\TemplateNameParser as BaseTemplateNameParser;
-use Symfony\Component\HttpKernel\Kernel;
+use Symfony\Component\HttpKernel\KernelInterface;
 
 /**
  * TemplateNameParser parsers template name from the short notation
@@ -28,9 +28,9 @@ class TemplateNameParser extends BaseTemplateNameParser
     /**
      * Constructor.
      *
-     * @param Kernel $kernel A Kernel instance
+     * @param KernelInterface $kernel A KernelInterface instance
      */
-    public function __construct(Kernel $kernel)
+    public function __construct(KernelInterface $kernel)
     {
         $this->kernel = $kernel;
     }

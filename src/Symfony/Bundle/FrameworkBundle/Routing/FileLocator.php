@@ -12,10 +12,10 @@
 namespace Symfony\Bundle\FrameworkBundle\Routing;
 
 use Symfony\Component\Routing\Loader\FileLocator as BaseFileLocator;
-use Symfony\Component\HttpKernel\Kernel;
+use Symfony\Component\HttpKernel\KernelInterface;
 
 /**
- * FileLocator uses the Kernel to locate resources in bundles.
+ * FileLocator uses the KernelInterface to locate resources in bundles.
  *
  * @author Fabien Potencier <fabien.potencier@symfony-project.com>
  */
@@ -26,10 +26,10 @@ class FileLocator extends BaseFileLocator
     /**
      * Constructor.
      *
-     * @param Kernel       $kernel A Kernel instance
-     * @param string|array $paths  A path or an array of paths where to look for resources
+     * @param KernelInterface $kernel A KernelInterface instance
+     * @param string|array    $paths  A path or an array of paths where to look for resources
      */
-    public function __construct(Kernel $kernel, array $paths = array())
+    public function __construct(KernelInterface $kernel, array $paths = array())
     {
         $this->kernel = $kernel;
 

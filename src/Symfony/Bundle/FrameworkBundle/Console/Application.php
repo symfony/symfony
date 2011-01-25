@@ -15,6 +15,7 @@ use Symfony\Component\Console\Application as BaseApplication;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Output\OutputInterface;
+use Symfony\Component\HttpKernel\KernelInterface;
 use Symfony\Component\HttpKernel\Kernel;
 
 /**
@@ -29,7 +30,7 @@ class Application extends BaseApplication
     /**
      * Constructor.
      */
-    public function __construct(Kernel $kernel)
+    public function __construct(KernelInterface $kernel)
     {
         $this->kernel = $kernel;
 
@@ -45,7 +46,7 @@ class Application extends BaseApplication
     /**
      * Gets the Kernel associated with this Console.
      *
-     * @return Kernel A Kernel instance
+     * @return KernelInterface A KernelInterface instance
      */
     public function getKernel()
     {

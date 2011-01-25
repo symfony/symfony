@@ -11,6 +11,7 @@
 
 namespace Symfony\Bundle\FrameworkBundle\DataCollector;
 
+use Symfony\Component\HttpKernel\KernelInterface;
 use Symfony\Component\HttpKernel\Kernel;
 use Symfony\Component\HttpKernel\DataCollector\DataCollector;
 use Symfony\Component\HttpFoundation\Request;
@@ -30,10 +31,10 @@ class ConfigDataCollector extends DataCollector
     /**
      * Constructor.
      *
-     * @param Kernel          $kernel A Kernel instance
-     * @param RouterInterface $router A Router instance
+     * @param KernelInterface $kernel A KernelInterface instance
+     * @param RouterInterface $router A RouterInterface instance
      */
-    public function __construct(Kernel $kernel, RouterInterface $router = null)
+    public function __construct(KernelInterface $kernel, RouterInterface $router = null)
     {
         $this->kernel = $kernel;
         $this->router = $router;

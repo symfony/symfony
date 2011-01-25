@@ -78,11 +78,13 @@ class TemplatePathsCacheWarmer extends CacheWarmer
             }
         }
 
-        $finder = new Finder();
-        foreach ($finder->files()->followLinks()->name('*.twig')->in($this->rootDir) as $file) {
-            list($category, $template) = $this->parseTemplateName($file, strtr($this->rootDir, '\\', '/').'/');
+        if (is_dir($this->rootDir)) {
+            $finder = new Finder();
+            foreach ($finder->files()->followLinks()->name('*.twig')->in($this->rootDir) as $file) {
+                list($category, $template) = $this->parseTemplateName($file, strtr($this->rootDir, '\\', '/').'/');
 
-            $templates[sprintf(':%s:%s', $category, $template)] = (string) $file;
+                $templates[sprintf(':%s:%s', $category, $template)] = (string) $file;
+            }
         }
 
         return  $templates;

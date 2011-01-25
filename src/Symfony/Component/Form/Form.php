@@ -204,31 +204,6 @@ class Form extends FieldGroup
     }
 
     /**
-     * Returns a CSRF token for the given CSRF secret
-     *
-     * If you want to change the algorithm used to compute the token, you
-     * can override this method.
-     *
-     * @param  string $secret The secret string to use
-     *
-     * @return string A token string
-     */
-    protected function generateCsrfToken(array $secrets)
-    {
-        $implodedSecrets = get_class($this);
-
-        foreach ($secrets as $secret) {
-            if ($secret instanceof \Closure) {
-                $secret = $secret();
-            }
-
-            $implodedSecrets .= $secret;
-        }
-
-        return md5($implodedSecrets);
-    }
-
-    /**
      * @return true if this form is CSRF protected
      */
     public function isCsrfProtected()

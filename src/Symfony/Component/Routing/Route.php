@@ -101,7 +101,7 @@ class Route
     public function setOptions(array $options)
     {
         $this->options = array_merge(array(
-            'segment_separators' => array('/', '.'),
+            'segment_separators' => array('/', '.', '-'),
             'text_regex'         => '.+?',
             'compiler_class'     => 'Symfony\\Component\\Routing\\RouteCompiler',
         ), $options);

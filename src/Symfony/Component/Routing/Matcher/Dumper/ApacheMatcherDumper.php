@@ -70,6 +70,6 @@ class ApacheMatcherDumper extends MatcherDumper
             $regexes[] = sprintf("%sRewriteCond %%{PATH_INFO} %s\nRewriteRule .* %s [QSA,L,%s]", $conditions, $regex, $options['script_name'], $variables);
         }
 
-        return implode("\n\n", $regexes);
+        return implode("\n\n", $regexes)."\n";
     }
 }

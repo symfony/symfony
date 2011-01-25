@@ -25,7 +25,7 @@ class ProjectUrlMatcher extends Symfony\Component\Routing\Matcher\UrlMatcher
             return array_merge($this->mergeDefaults($matches, array (  'def' => 'test',)), array('_route' => 'foo'));
         }
 
-        if (isset($this->context['method']) && preg_match('#^(GET|head)$#xi', $this->context['method']) && 0 === strpos($url, '/bar') && preg_match('#^/bar/(?P<foo>[^/\.]+?)$#x', $url, $matches)) {
+        if (isset($this->context['method']) && preg_match('#^(GET|head)$#xi', $this->context['method']) && 0 === strpos($url, '/bar') && preg_match('#^/bar/(?P<foo>[^/\.\-]+?)$#x', $url, $matches)) {
             return array_merge($this->mergeDefaults($matches, array ()), array('_route' => 'bar'));
         }
 

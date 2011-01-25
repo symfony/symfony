@@ -33,6 +33,7 @@
 
         <service id="validator.validator_factory" class="%validator.validator_factory.class%" public="false">
             <argument type="service" id="service_container" />
+            <argument type="collection" />
         </service>
 
         <service id="validator.mapping.loader.loader_chain" class="%validator.mapping.loader.loader_chain.class%" public="false">

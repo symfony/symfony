@@ -17,30 +17,31 @@
     </parameters>
 
     <services>
-    
-    	<!-- FormFactory -->
+
+        <!-- FormFactory -->
         <service id="form.factory" class="%form.factory.class%">
             <argument type="service" id="form.default_context" />
         </service>
 
-    	<!-- FieldFactory -->
+        <!-- FieldFactory -->
         <service id="form.field_factory" class="%form.field_factory.class%">
-        	<!-- All services with tag "form.field_factory.guesser" are inserted here by AddFieldFactoryGuessersPass -->
+            <!-- All services with tag "form.field_factory.guesser" are inserted here by AddFieldFactoryGuessersPass -->
+            <argument type="collection" />
         </service>
 
-    	<!-- ValidatorFieldFactoryGuesser -->
+        <!-- ValidatorFieldFactoryGuesser -->
         <service id="form.field_factory.validator_guesser" class="%form.field_factory.validator_guesser.class%" public="false">
-        	<tag name="form.field_factory.guesser" />
-        	<argument type="service" id="validator.mapping.class_metadata_factory" />
+            <tag name="form.field_factory.guesser" />
+            <argument type="service" id="validator.mapping.class_metadata_factory" />
         </service>
         
         <!-- CsrfProvider -->
         <service id="form.csrf_provider" class="%form.csrf_provider.class%">
-        	<argument type="service" id="session" />
-        	<argument>%form.csrf_protection.secret%</argument>
+            <argument type="service" id="session" />
+            <argument>%form.csrf_protection.secret%</argument>
         </service>
 
-    	<!-- FormContext -->
+        <!-- FormContext -->
         <service id="form.default_context" class="%form.default_context.class%">
             <argument type="service" id="service_container" />
             <call method="validator">

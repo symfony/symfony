@@ -36,6 +36,6 @@ class JsonEncoder extends AbstractEncoder implements EncoderInterface
      */
     public function decode($data, $format)
     {
-        return json_decode($data);
+        return json_decode($data, true);
     }
 }

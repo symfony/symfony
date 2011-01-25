@@ -27,7 +27,7 @@
         <xsd:attribute name="charset" type="xsd:string" />
         <xsd:attribute name="wrapper-class" type="xsd:string" />
         <xsd:attribute name="platform-service" type="xsd:string" />
-        <xsd:attribute name="logging" type="xsd:boolean" default="false" />
+        <xsd:attribute name="logging" type="xsd:string" default="false" />
     </xsd:complexType>
 
     <xsd:complexType name="connections">
@@ -52,7 +52,7 @@
         <xsd:attribute name="charset" type="xsd:string" />
         <xsd:attribute name="wrapper-class" type="xsd:string" />
         <xsd:attribute name="platform-service" type="xsd:string" />
-        <xsd:attribute name="logging" type="xsd:boolean" default="false" />
+        <xsd:attribute name="logging" type="xsd:string" default="false" />
     </xsd:complexType>
 
     <xsd:element name="orm" type="orm" />
@@ -81,7 +81,7 @@
         <xsd:attribute name="default-entity-manager" type="xsd:string" />
         <xsd:attribute name="default-connection" type="xsd:string" />
 
-        <xsd:attribute name="auto-generate-proxy-classes" type="xsd:boolean" default="false" />
+        <xsd:attribute name="auto-generate-proxy-classes" type="xsd:string" default="false" />
         <xsd:attribute name="result-cache-driver" type="xsd:string" />
         <xsd:attribute name="metadata-cache-driver" type="xsd:string" />
         <xsd:attribute name="query-cache-driver" type="xsd:string" />

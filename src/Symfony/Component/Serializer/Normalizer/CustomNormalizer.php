@@ -16,7 +16,7 @@ use Symfony\Component\Serializer\SerializerInterface;
 /**
  * @author Jordi Boggiano <j.boggiano@seld.be>
  */
-class CustomNormalizer extends AbstractNormalizer implements NormalizerInterface
+class CustomNormalizer extends AbstractNormalizer
 {
     /**
      * {@inheritdoc}

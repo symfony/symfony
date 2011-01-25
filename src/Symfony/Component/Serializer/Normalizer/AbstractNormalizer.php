@@ -18,7 +18,7 @@ use Symfony\Component\Serializer\SerializerInterface;
  *
  * @author Jordi Boggiano <j.boggiano@seld.be>
  */
-abstract class AbstractNormalizer
+abstract class AbstractNormalizer implements NormalizerInterface
 {
     protected $serializer;
 

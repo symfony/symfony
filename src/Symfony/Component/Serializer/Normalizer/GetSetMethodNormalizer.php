@@ -33,7 +33,7 @@ use Symfony\Component\Serializer\SerializerInterface;
  *
  * @author Nils Adermann <naderman@naderman.de>
  */
-class GetSetMethodNormalizer extends AbstractNormalizer implements NormalizerInterface
+class GetSetMethodNormalizer extends AbstractNormalizer
 {
     /**
      * {@inheritdoc}

@@ -18,7 +18,7 @@ use Symfony\Component\Serializer\SerializerInterface;
  *
  * @author Jordi Boggiano <j.boggiano@seld.be>
  */
-class JsonEncoder extends AbstractEncoder implements EncoderInterface
+class JsonEncoder extends AbstractEncoder
 {
     /**
      * {@inheritdoc}

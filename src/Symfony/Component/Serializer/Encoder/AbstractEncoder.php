@@ -18,7 +18,7 @@ use Symfony\Component\Serializer\SerializerInterface;
  *
  * @author Jordi Boggiano <j.boggiano@seld.be>
  */
-abstract class AbstractEncoder
+abstract class AbstractEncoder implements EncoderInterface
 {
     protected $serializer;
 

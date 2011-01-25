@@ -29,9 +29,6 @@ class AddConstraintValidatorsPass implements CompilerPassInterface
             }
         }
 
-        $definition = $container->getDefinition('validator.validator_factory');
-        $arguments = $definition->getArguments();
-        $arguments[1] = $validators;
-        $definition->setArguments($arguments);
+        $container->getDefinition('validator.validator_factory')->setArgument(1, $validators);
     }
 }

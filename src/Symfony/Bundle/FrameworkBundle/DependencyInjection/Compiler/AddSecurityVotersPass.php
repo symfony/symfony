@@ -35,9 +35,6 @@ class AddSecurityVotersPass implements CompilerPassInterface
             return new Reference($id);
         }, array_keys($container->findTaggedServiceIds('security.voter')));
 
-        $definition = $container->getDefinition('security.access.decision_manager');
-        $arguments = $definition->getArguments();
-        $arguments[0] = $voters;
-        $definition->setArguments($arguments);
+        $container->getDefinition('security.access.decision_manager')->setArgument(0, $voters);
     }
 }

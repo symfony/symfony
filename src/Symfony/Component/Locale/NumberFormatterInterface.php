@@ -130,7 +130,7 @@ interface NumberFormatterInterface
      * @param  int         $type   Type of the formatting, one of the format type constants
      * @return bool|string         The formatted value or false on error
      */
-    function format($value, $type);
+    function format($value, $type = null);
 
     /**
      * Returns an attribute value
@@ -221,7 +221,7 @@ interface NumberFormatterInterface
      * @return bool               true on success or false on failure
      * @see    http://www.icu-project.org/apiref/icu4c/classDecimalFormat.html#_details
      */
-    function setPattern($attr, $value);
+    function setPattern($pattern);
 
     /**
      * Set the formatter's symbol

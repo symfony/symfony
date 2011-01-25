@@ -11,6 +11,7 @@
 
 namespace Symfony\Tests\Component\Locale;
 
+use Symfony\Component\Locale\Locale;
 use Symfony\Component\Locale\NumberFormatter;
 
 class NumberFormatterTest extends \PHPUnit_Framework_TestCase
@@ -71,8 +72,8 @@ class NumberFormatterTest extends \PHPUnit_Framework_TestCase
     public function testGetLocale()
     {
         $formatter = $this->createFormatter();
-        $this->assertEquals('pt', $formatter->getLocale(\Locale::ACTUAL_LOCALE));
-        $this->assertEquals('pt_BR', $formatter->getLocale(\Locale::VALID_LOCALE));
+        $this->assertEquals('pt', $formatter->getLocale());
+        $this->assertEquals('pt_BR', $formatter->getLocale(Locale::VALID_LOCALE));
     }
 
     public function testGetPattern()

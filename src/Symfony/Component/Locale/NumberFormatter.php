@@ -11,6 +11,7 @@
 
 namespace Symfony\Component\Locale;
 
+use Symfony\Component\Locale\Locale;
 use Symfony\Component\Locale\NumberFormatterInterface;
 
 /**
@@ -71,7 +72,7 @@ class NumberFormatter implements NumberFormatterInterface
     /**
      * @{inheritDoc}
      */
-    public function getLocale($type)
+    public function getLocale($type = Locale::ACTUAL_LOCALE)
     {
         return $this->formatter->getLocale($type);
     }

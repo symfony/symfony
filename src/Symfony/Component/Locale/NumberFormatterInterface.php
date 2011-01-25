@@ -11,6 +11,8 @@
 
 namespace Symfony\Component\Locale;
 
+use Symfony\Component\Locale\Locale;
+
 interface NumberFormatterInterface
 {
     /** Format style constants */
@@ -160,7 +162,7 @@ interface NumberFormatterInterface
      * @param  int      $type  The locale name type to return between valid or actual (Locale::VALID_LOCALE or Locale::ACTUAL_LOCALE, respectively)
      * @return string          The locale name used to create the formatter
      */
-    function getLocale($type);
+    function getLocale($type = Locale::ACTUAL_LOCALE);
 
     /**
      * Returns the formatter's pattern

@@ -79,11 +79,13 @@ class ResponseHeaderBag extends HeaderBag
      * Clears a cookie in the browser
      *
      * @param string $name
+     * @param string $path
+     * @param string $domain
      * @return void
      */
-    public function clearCookie($name)
+    public function clearCookie($name, $path = null, $domain = null)
     {
-        $this->setCookie(new Cookie($name, null, time() - 86400));
+        $this->setCookie(new Cookie($name, null, time() - 86400, $path, $domain));
     }
 
     /**

@@ -151,7 +151,7 @@ class Store
             $digest = 'en'.sha1($response->getContent());
 
             if (false === $this->save($digest, $response->getContent())) {
-                throw new \RuntimeException(sprintf('Unable to store the entity (%s).', $e->getMessage()));
+                throw new \RuntimeException(sprintf('Unable to store the entity.'));
             }
 
             $response->headers->set('X-Content-Digest', $digest);
@@ -180,7 +180,7 @@ class Store
         array_unshift($entries, array($storedEnv, $headers));
 
         if (false === $this->save($key, serialize($entries))) {
-            throw new \RuntimeException(sprintf('Unable to store the metadata (%s).', $e->getMessage()));
+            throw new \RuntimeException(sprintf('Unable to store the metadata.'));
         }
 
         return $key;
@@ -315,8 +315,8 @@ class Store
     public function save($key, $data)
     {
         $path = $this->getPath($key);
-        if (!is_dir(dirname($path))) {
-            mkdir(dirname($path), 0777, true);
+        if (!is_dir(dirname($path)) && false === @mkdir(dirname($path), 0777, true)) {
+            return false;
         }
 
         $tmpFile = tempnam(dirname($path), basename($path));

@@ -241,6 +241,9 @@ class DoctrineExtension extends AbstractDoctrineExtension
     protected function mergeOrmConfig(array $configs, $container)
     {
         $supportedEntityManagerOptions = array(
+            'proxy_dir'                         => 'proxy_dir',
+            'proxy_namespace'                   => 'proxy_namespace',
+            'auto_generate_proxy_classes'       => 'auto_generate_proxy_classes',
             'metadata_cache_driver'             => 'metadata_cache_driver',
             'query_cache_driver'                => 'query_cache_driver',
             'result_cache_driver'               => 'result_cache_driver',

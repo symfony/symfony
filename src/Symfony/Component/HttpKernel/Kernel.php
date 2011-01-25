@@ -120,8 +120,6 @@ abstract class Kernel implements HttpKernelInterface, \Serializable
             return;
         }
 
-        require_once __DIR__.'/bootstrap.php';
-
         // init bundles
         $this->initializeBundles();
 

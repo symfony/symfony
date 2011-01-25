@@ -72,11 +72,6 @@ class SecurityContext
         return $this->accessDecisionManager->decide($this->token, (array) $attributes, $object);
     }
 
-    public function isAuthenticated()
-    {
-        return null === $this->token ? false : $this->token->isAuthenticated();
-    }
-
     /**
      * Gets the currently authenticated token.
      *

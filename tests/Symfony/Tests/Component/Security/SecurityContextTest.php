@@ -16,23 +16,6 @@ use Symfony\Component\Security\SecurityContext;
 
 class SecurityContextTest extends \PHPUnit_Framework_TestCase
 {
-    public function testIsAuthenticated()
-    {
-        $context = new SecurityContext($this->getMock('Symfony\Component\Security\Authentication\AuthenticationManagerInterface'));
-
-        $this->assertFalse($context->isAuthenticated());
-
-        $token = $this->getMock('Symfony\Component\Security\Authentication\Token\TokenInterface');
-        $token->expects($this->once())->method('isAuthenticated')->will($this->returnValue(false));
-        $context->setToken($token);
-        $this->assertFalse($context->isAuthenticated());
-
-        $token = $this->getMock('Symfony\Component\Security\Authentication\Token\TokenInterface');
-        $token->expects($this->once())->method('isAuthenticated')->will($this->returnValue(true));
-        $context->setToken($token);
-        $this->assertTrue($context->isAuthenticated());
-    }
-
     public function testGetUser()
     {
         $context = new SecurityContext($this->getMock('Symfony\Component\Security\Authentication\AuthenticationManagerInterface'));

@@ -14,11 +14,9 @@ namespace Symfony\Component\EventDispatcher;
 /**
  * EventDispatcher implements a dispatcher object.
  *
- * @see http://developer.apple.com/documentation/Cocoa/Conceptual/Notifications/index.html Apple's Cocoa framework
- *
  * @author Fabien Potencier <fabien.potencier@symfony-project.com>
  */
-class EventDispatcher
+class EventDispatcher implements EventDispatcherInterface
 {
     protected $listeners = array();
 
@@ -46,8 +44,8 @@ class EventDispatcher
     /**
      * Disconnects one, or all listeners for the given event name.
      *
-     * @param string $name An event name
-     * @param mixed|null $listener the listener to remove, or null to remove all
+     * @param string     $name     An event name
+     * @param mixed|null $listener The listener to remove, or null to remove all
      *
      * @return void
      */
@@ -74,11 +72,11 @@ class EventDispatcher
     /**
      * Notifies all listeners of a given event.
      *
-     * @param Event $event An Event instance
+     * @param EventInterface $event An EventInterface instance
      *
-     * @return Event The Event instance
+     * @return EventInterface The EventInterface instance
      */
-    public function notify(Event $event)
+    public function notify(EventInterface $event)
     {
         foreach ($this->getListeners($event->getName()) as $listener) {
             call_user_func($listener, $event);
@@ -90,11 +88,11 @@ class EventDispatcher
     /**
      * Notifies all listeners of a given event until one returns a non null value.
      *
-     * @param  Event $event An Event instance
+     * @param  EventInterface $event An EventInterface instance
      *
-     * @return Event The Event instance
+     * @return EventInterface The EventInterface instance
      */
-    public function notifyUntil(Event $event)
+    public function notifyUntil(EventInterface $event)
     {
         foreach ($this->getListeners($event->getName()) as $listener) {
             if (call_user_func($listener, $event)) {
@@ -109,12 +107,12 @@ class EventDispatcher
     /**
      * Filters a value by calling all listeners of a given event.
      *
-     * @param  Event $event An Event instance
-     * @param  mixed $value The value to be filtered
+     * @param  EventInterface $event An EventInterface instance
+     * @param  mixed          $value The value to be filtered
      *
-     * @return Event The Event instance
+     * @return EventInterface The EventInterface instance
      */
-    public function filter(Event $event, $value)
+    public function filter(EventInterface $event, $value)
     {
         foreach ($this->getListeners($event->getName()) as $listener) {
             $value = call_user_func($listener, $event, $value);

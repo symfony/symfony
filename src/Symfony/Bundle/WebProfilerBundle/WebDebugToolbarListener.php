@@ -11,8 +11,7 @@
 
 namespace Symfony\Bundle\WebProfilerBundle;
 
-use Symfony\Component\EventDispatcher\EventDispatcher;
-use Symfony\Component\EventDispatcher\Event;
+use Symfony\Component\EventDispatcher\EventInterface;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Bundle\FrameworkBundle\HttpKernel;
@@ -36,7 +35,7 @@ class WebDebugToolbarListener
         $this->interceptRedirects = $interceptRedirects;
     }
 
-    public function handle(Event $event, Response $response)
+    public function handle(EventInterface $event, Response $response)
     {
         if (HttpKernelInterface::MASTER_REQUEST !== $event->get('request_type')) {
             return $response;

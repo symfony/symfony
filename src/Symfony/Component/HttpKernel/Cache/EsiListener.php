@@ -13,7 +13,8 @@ namespace Symfony\Component\HttpKernel\Cache;
 
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpKernel\HttpKernelInterface;
-use Symfony\Component\EventDispatcher\EventDispatcher;
+use Symfony\Component\EventDispatcher\EventDispatcherInterface;
+use Symfony\Component\EventDispatcher\EventInterface;
 
 /**
  * EsiListener adds a Surrogate-Control HTTP header when the Response needs to be parsed for ESI.
@@ -40,10 +41,10 @@ class EsiListener
     /**
      * Filters the Response.
      *
-     * @param Event    $event    An Event instance
-     * @param Response $response A Response instance
+     * @param EventInterface $event    An EventInterface instance
+     * @param Response       $response A Response instance
      */
-    public function filter($event, Response $response)
+    public function filter(EventInterface $event, Response $response)
     {
         if (HttpKernelInterface::MASTER_REQUEST !== $event->get('request_type') || null === $this->esi) {
             return $response;

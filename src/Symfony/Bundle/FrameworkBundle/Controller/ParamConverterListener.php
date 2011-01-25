@@ -16,8 +16,7 @@ use Symfony\Bundle\FrameworkBundle\Request\ParamConverter\ConverterManager;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
 use Symfony\Component\DependencyInjection\ContainerInterface;
-use Symfony\Component\EventDispatcher\EventDispatcher;
-use Symfony\Component\EventDispatcher\Event;
+use Symfony\Component\EventDispatcher\EventInterface;
 
 /**
  * Converts \ReflectionParameters for Controller actions into Objects if the \ReflectionParameter have a class
@@ -44,14 +43,14 @@ class ParamConverterListener
     }
 
     /**
-     * @param  Event $event
-     * @param  mixed $controller
+     * @param  EventInterface $event
+     * @param  mixed          $controller
      *
      * @return mixed
      *
      * @throws NotFoundHttpException
      */
-    public function filterController(Event $event, $controller)
+    public function filterController(EventInterface $event, $controller)
     {
         if (!is_array($controller)) {
             return $controller;

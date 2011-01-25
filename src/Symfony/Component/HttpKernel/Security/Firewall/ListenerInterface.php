@@ -11,7 +11,7 @@
 
 namespace Symfony\Component\HttpKernel\Security\Firewall;
 
-use Symfony\Component\EventDispatcher\EventDispatcher;
+use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 
 /**
  * Interface that must be implemented by firewall listeners
@@ -22,23 +22,21 @@ interface ListenerInterface
 {
     /**
      * The implementation must connect this listener to all necessary events.
-     * 
+     *
      * Typical events are: "core.security", and "core.response"
-     * 
-     * @param EventDispatcher $dispatcher
-     * @return void
+     *
+     * @param EventDispatcherInterface $dispatcher
      */
-    function register(EventDispatcher $dispatcher);
-    
+    function register(EventDispatcherInterface $dispatcher);
+
     /**
      * The implementation must remove this listener from any events that it had
      * connected to in register().
-     * 
+     *
      * It may remove this listener from "core.security", but this is ensured by
      * the firewall anyway.
-     * 
-     * @param EventDispatcher $dispatcher
-     * @return void
+     *
+     * @param EventDispatcherInterface $dispatcher
      */
-    function unregister(EventDispatcher $dispatcher);
+    function unregister(EventDispatcherInterface $dispatcher);
 }

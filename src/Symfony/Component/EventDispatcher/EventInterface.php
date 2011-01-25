@@ -12,101 +12,60 @@
 namespace Symfony\Component\EventDispatcher;
 
 /**
- * Event.
+ * EventInterface.
  *
  * @author Fabien Potencier <fabien.potencier@symfony-project.com>
  */
-class Event implements EventInterface
+interface EventInterface
 {
-    protected $value = null;
-    protected $processed = false;
-    protected $subject;
-    protected $name;
-    protected $parameters;
-
-    /**
-     * Constructs a new Event.
-     *
-     * @param mixed   $subject      The subject
-     * @param string  $name         The event name
-     * @param array   $parameters   An array of parameters
-     */
-    public function __construct($subject, $name, $parameters = array())
-    {
-        $this->subject = $subject;
-        $this->name = $name;
-        $this->parameters = $parameters;
-    }
-
     /**
      * Returns the subject.
      *
      * @return mixed The subject
      */
-    public function getSubject()
-    {
-        return $this->subject;
-    }
+    function getSubject();
 
     /**
      * Returns the event name.
      *
      * @return string The event name
      */
-    public function getName()
-    {
-        return $this->name;
-    }
+    function getName();
 
     /**
      * Sets the return value for this event.
      *
      * @param mixed $value The return value
      */
-    public function setReturnValue($value)
-    {
-        $this->value = $value;
-    }
+    function setReturnValue($value);
 
     /**
      * Returns the return value.
      *
      * @return mixed The return value
      */
-    public function getReturnValue()
-    {
-        return $this->value;
-    }
+    function getReturnValue();
 
     /**
      * Sets the processed flag.
      *
      * @param Boolean $processed The processed flag value
      */
-    public function setProcessed($processed)
-    {
-        $this->processed = (Boolean) $processed;
-    }
+    function setProcessed($processed);
 
     /**
      * Returns whether the event has been processed by a listener or not.
      *
      * @return Boolean true if the event has been processed, false otherwise
      */
-    public function isProcessed()
-    {
-        return $this->processed;
-    }
+    function isProcessed();
 
     /**
      * Returns the event parameters.
      *
      * @return array The event parameters
      */
-    public function all()
-    {
-        return $this->parameters;
-    }
+    function all();
 
     /**
      * Returns true if the parameter exists.
@@ -115,10 +74,7 @@ class Event implements EventInterface
      *
      * @return Boolean true if the parameter exists, false otherwise
      */
-    public function has($name)
-    {
-        return array_key_exists($name, $this->parameters);
-    }
+    function has($name);
 
     /**
      * Returns a parameter value.
@@ -129,14 +85,7 @@ class Event implements EventInterface
      *
      * @throws \InvalidArgumentException When parameter doesn't exists for this event
      */
-    public function get($name)
-    {
-        if (!array_key_exists($name, $this->parameters)) {
-            throw new \InvalidArgumentException(sprintf('The event "%s" has no "%s" parameter.', $this->name, $name));
-        }
-
-        return $this->parameters[$name];
-    }
+    function get($name);
 
     /**
      * Sets a parameter.
@@ -144,8 +93,5 @@ class Event implements EventInterface
      * @param string  $name   The parameter name
      * @param mixed   $value  The parameter value
      */
-    public function set($name, $value)
-    {
-        $this->parameters[$name] = $value;
-    }
+    function set($name, $value);
 }

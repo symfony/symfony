@@ -13,7 +13,7 @@ namespace Symfony\Bundle\FrameworkBundle;
 
 use Symfony\Component\EventDispatcher\EventDispatcher as BaseEventDispatcher;
 use Symfony\Component\DependencyInjection\ContainerInterface;
-use Symfony\Component\EventDispatcher\Event;
+use Symfony\Component\EventDispatcher\EventInterface;
 
 /**
  * This EventDispatcher automatically gets the kernel listeners injected
@@ -42,7 +42,7 @@ class EventDispatcher extends BaseEventDispatcher
     /**
      * {@inheritdoc}
      */
-    public function notify(Event $event)
+    public function notify(EventInterface $event)
     {
         foreach ($this->getListeners($event->getName()) as $listener) {
             if (is_array($listener) && is_string($listener[0])) {
@@ -57,7 +57,7 @@ class EventDispatcher extends BaseEventDispatcher
     /**
      * {@inheritdoc}
      */
-    public function notifyUntil(Event $event)
+    public function notifyUntil(EventInterface $event)
     {
         foreach ($this->getListeners($event->getName()) as $listener) {
             if (is_array($listener) && is_string($listener[0])) {
@@ -75,7 +75,7 @@ class EventDispatcher extends BaseEventDispatcher
     /**
      * {@inheritdoc}
      */
-    public function filter(Event $event, $value)
+    public function filter(EventInterface $event, $value)
     {
         foreach ($this->getListeners($event->getName()) as $listener) {
             if (is_array($listener) && is_string($listener[0])) {

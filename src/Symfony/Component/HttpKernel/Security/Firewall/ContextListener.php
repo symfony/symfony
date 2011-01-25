@@ -11,8 +11,8 @@
 
 namespace Symfony\Component\HttpKernel\Security\Firewall;
 
-use Symfony\Component\EventDispatcher\Event;
-use Symfony\Component\EventDispatcher\EventDispatcher;
+use Symfony\Component\EventDispatcher\EventInterface;
+use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpKernel\HttpKernelInterface;
 use Symfony\Component\HttpKernel\Log\LoggerInterface;
@@ -46,10 +46,10 @@ class ContextListener implements ListenerInterface
      * Registers a core.security listener to load the SecurityContext from the
      * session.
      *
-     * @param EventDispatcher $dispatcher An EventDispatcher instance
-     * @param integer         $priority   The priority
+     * @param EventDispatcherInterface $dispatcher An EventDispatcherInterface instance
+     * @param integer                  $priority   The priority
      */
-    public function register(EventDispatcher $dispatcher)
+    public function register(EventDispatcherInterface $dispatcher)
     {
         $dispatcher->connect('core.security', array($this, 'read'), 0);
         $dispatcher->connect('core.response', array($this, 'write'), 0);
@@ -58,7 +58,7 @@ class ContextListener implements ListenerInterface
     /**
      * {@inheritDoc}
      */
-    public function unregister(EventDispatcher $dispatcher)
+    public function unregister(EventDispatcherInterface $dispatcher)
     {
         $dispatcher->disconnect('core.response', array($this, 'write'));
     }
@@ -66,9 +66,9 @@ class ContextListener implements ListenerInterface
     /**
      * Reads the SecurityContext from the session.
      *
-     * @param Event $event An Event instance
+     * @param EventInterface $event An EventInterface instance
      */
-    public function read(Event $event)
+    public function read(EventInterface $event)
     {
         $request = $event->get('request');
 
@@ -94,9 +94,9 @@ class ContextListener implements ListenerInterface
     /**
      * Writes the SecurityContext to the session.
      *
-     * @param Event $event An Event instance
+     * @param EventInterface $event An EventInterface instance
      */
-    public function write(Event $event, Response $response)
+    public function write(EventInterface $event, Response $response)
     {
         if (HttpKernelInterface::MASTER_REQUEST !== $event->get('request_type')) {
             return $response;

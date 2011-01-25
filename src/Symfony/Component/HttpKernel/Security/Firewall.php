@@ -11,7 +11,8 @@
 
 namespace Symfony\Component\HttpKernel\Security;
 
-use Symfony\Component\EventDispatcher\EventDispatcher;
+use Symfony\Component\EventDispatcher\EventDispatcherInterface;
+use Symfony\Component\EventDispatcher\EventInterface;
 use Symfony\Component\EventDispatcher\Event;
 use Symfony\Component\HttpKernel\HttpKernelInterface;
 use Symfony\Component\HttpFoundation\Request;
@@ -39,7 +40,7 @@ class Firewall
      *
      * @param FirewallMap $map A FirewallMap instance
      */
-    public function __construct(FirewallMapInterface $map, EventDispatcher $dispatcher)
+    public function __construct(FirewallMapInterface $map, EventDispatcherInterface $dispatcher)
     {
         $this->map = $map;
         $this->dispatcher = $dispatcher;
@@ -49,9 +50,9 @@ class Firewall
     /**
      * Handles security.
      *
-     * @param Event $event An Event instance
+     * @param EventInterface $event An EventInterface instance
      */
-    public function handle(Event $event)
+    public function handle(EventInterface $event)
     {
         if (HttpKernelInterface::MASTER_REQUEST !== $event->get('request_type')) {
             return;

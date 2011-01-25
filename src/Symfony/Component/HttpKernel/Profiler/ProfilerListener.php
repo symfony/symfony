@@ -11,8 +11,7 @@
 
 namespace Symfony\Component\HttpKernel\Profiler;
 
-use Symfony\Component\EventDispatcher\EventDispatcher;
-use Symfony\Component\EventDispatcher\Event;
+use Symfony\Component\EventDispatcher\EventInterface;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpKernel\HttpKernelInterface;
 use Symfony\Component\HttpFoundation\RequestMatcherInterface;
@@ -49,9 +48,9 @@ class ProfilerListener
     /**
      * Handles the core.exception event.
      *
-     * @param Event $event An Event instance
+     * @param EventInterface $event An EventInterface instance
      */
-    public function handleException(Event $event)
+    public function handleException(EventInterface $event)
     {
         if (HttpKernelInterface::MASTER_REQUEST !== $event->get('request_type')) {
             return false;
@@ -65,11 +64,11 @@ class ProfilerListener
     /**
      * Handles the core.response event.
      *
-     * @param Event $event An Event instance
+     * @param EventInterface $event An EventInterface instance
      *
      * @return Response $response A Response instance
      */
-    public function handleResponse(Event $event, Response $response)
+    public function handleResponse(EventInterface $event, Response $response)
     {
         if (HttpKernelInterface::MASTER_REQUEST !== $event->get('request_type')) {
             return $response;

@@ -12,7 +12,7 @@
 namespace Symfony\Component\HttpKernel;
 
 use Symfony\Component\EventDispatcher\Event;
-use Symfony\Component\EventDispatcher\EventDispatcher;
+use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 use Symfony\Component\HttpKernel\Controller\ControllerResolverInterface;
 use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
 use Symfony\Component\HttpFoundation\Request;
@@ -31,10 +31,10 @@ class HttpKernel implements HttpKernelInterface
     /**
      * Constructor
      *
-     * @param EventDispatcher             $dispatcher An event dispatcher instance
+     * @param EventDispatcherInterface    $dispatcher An EventDispatcherInterface instance
      * @param ControllerResolverInterface $resolver A ControllerResolverInterface instance
      */
-    public function __construct(EventDispatcher $dispatcher, ControllerResolverInterface $resolver)
+    public function __construct(EventDispatcherInterface $dispatcher, ControllerResolverInterface $resolver)
     {
         $this->dispatcher = $dispatcher;
         $this->resolver = $resolver;

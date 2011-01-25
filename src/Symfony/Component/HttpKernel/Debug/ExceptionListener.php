@@ -11,8 +11,7 @@
 
 namespace Symfony\Component\HttpKernel\Debug;
 
-use Symfony\Component\EventDispatcher\EventDispatcher;
-use Symfony\Component\EventDispatcher\Event;
+use Symfony\Component\EventDispatcher\EventInterface;
 use Symfony\Component\HttpKernel\Log\LoggerInterface;
 use Symfony\Component\HttpKernel\Log\DebugLoggerInterface;
 use Symfony\Component\HttpKernel\HttpKernelInterface;
@@ -37,7 +36,7 @@ class ExceptionListener
         $this->logger = $logger;
     }
 
-    public function handle(Event $event)
+    public function handle(EventInterface $event)
     {
         static $handling;
 

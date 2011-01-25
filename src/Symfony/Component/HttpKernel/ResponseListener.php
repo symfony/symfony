@@ -11,8 +11,7 @@
 
 namespace Symfony\Component\HttpKernel;
 
-use Symfony\Component\EventDispatcher\EventDispatcher;
-use Symfony\Component\EventDispatcher\Event;
+use Symfony\Component\EventDispatcher\EventInterface;
 use Symfony\Component\HttpFoundation\Response;
 
 /**
@@ -27,10 +26,10 @@ class ResponseListener
     /**
      * Filters the Response.
      *
-     * @param Event    $event    An Event instance
-     * @param Response $response A Response instance
+     * @param EventInterface $event    An EventInterface instance
+     * @param Response       $response A Response instance
      */
-    public function filter(Event $event, Response $response)
+    public function filter(EventInterface $event, Response $response)
     {
         if (HttpKernelInterface::MASTER_REQUEST !== $event->get('request_type') || $response->headers->has('Content-Type')) {
             return $response;

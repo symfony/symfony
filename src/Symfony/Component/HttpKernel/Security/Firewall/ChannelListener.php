@@ -14,8 +14,8 @@ namespace Symfony\Component\HttpKernel\Security\Firewall;
 use Symfony\Component\HttpKernel\Security\AccessMap;
 use Symfony\Component\Security\Authentication\EntryPoint\AuthenticationEntryPointInterface;
 use Symfony\Component\HttpKernel\Log\LoggerInterface;
-use Symfony\Component\EventDispatcher\EventDispatcher;
-use Symfony\Component\EventDispatcher\Event;
+use Symfony\Component\EventDispatcher\EventDispatcherInterface;
+use Symfony\Component\EventDispatcher\EventInterface;
 
 /**
  * ChannelListener switches the HTTP protocol based on the access control
@@ -39,10 +39,10 @@ class ChannelListener implements ListenerInterface
     /**
      * 
      *
-     * @param EventDispatcher $dispatcher An EventDispatcher instance
-     * @param integer         $priority   The priority
+     * @param EventDispatcherInterface $dispatcher An EventDispatcherInterface instance
+     * @param integer                  $priority   The priority
      */
-    public function register(EventDispatcher $dispatcher)
+    public function register(EventDispatcherInterface $dispatcher)
     {
         $dispatcher->connect('core.security', array($this, 'handle'), 0);
     }
@@ -50,16 +50,16 @@ class ChannelListener implements ListenerInterface
     /**
      * {@inheritDoc}
      */
-    public function unregister(EventDispatcher $dispatcher)
+    public function unregister(EventDispatcherInterface $dispatcher)
     {
     }
     
     /**
      * Handles channel management.
      *
-     * @param Event $event An Event instance
+     * @param EventInterface $event An EventInterface instance
      */
-    public function handle(Event $event)
+    public function handle(EventInterface $event)
     {
         $request = $event->get('request');
 

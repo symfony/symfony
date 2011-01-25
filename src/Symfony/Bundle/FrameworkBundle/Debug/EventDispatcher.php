@@ -12,8 +12,7 @@
 namespace Symfony\Bundle\FrameworkBundle\Debug;
 
 use Symfony\Bundle\FrameworkBundle\EventDispatcher as BaseEventDispatcher;
-use Symfony\Component\EventDispatcher\EventDispatcherInterface;
-use Symfony\Component\EventDispatcher\Event;
+use Symfony\Component\EventDispatcher\EventInterface;
 use Symfony\Component\HttpKernel\Log\LoggerInterface;
 use Symfony\Component\HttpKernel\Debug\EventDispatcherTraceableInterface;
 use Symfony\Component\DependencyInjection\ContainerInterface;
@@ -45,7 +44,7 @@ class EventDispatcher extends BaseEventDispatcher implements EventDispatcherTrac
     /**
      * {@inheritDoc}
      */
-    public function notify(Event $event)
+    public function notify(EventInterface $event)
     {
         foreach ($this->getListeners($event->getName()) as $listener) {
             if (is_array($listener) && is_string($listener[0])) {
@@ -63,7 +62,7 @@ class EventDispatcher extends BaseEventDispatcher implements EventDispatcherTrac
     /**
      * {@inheritDoc}
      */
-    public function notifyUntil(Event $event)
+    public function notifyUntil(EventInterface $event)
     {
         foreach ($this->getListeners($event->getName()) as $i => $listener) {
             if (is_array($listener) && is_string($listener[0])) {
@@ -93,7 +92,7 @@ class EventDispatcher extends BaseEventDispatcher implements EventDispatcherTrac
     /**
      * {@inheritDoc}
      */
-    public function filter(Event $event, $value)
+    public function filter(EventInterface $event, $value)
     {
         foreach ($this->getListeners($event->getName()) as $listener) {
             if (is_array($listener) && is_string($listener[0])) {
@@ -160,7 +159,7 @@ class EventDispatcher extends BaseEventDispatcher implements EventDispatcherTrac
         }
     }
 
-    protected function addCall(Event $event, $listener, $type)
+    protected function addCall(EventInterface $event, $listener, $type)
     {
         $listener = $this->listenerToString($listener);
 

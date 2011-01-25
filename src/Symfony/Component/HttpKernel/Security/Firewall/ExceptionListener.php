@@ -15,8 +15,8 @@ use Symfony\Component\Security\SecurityContext;
 use Symfony\Component\Security\Authentication\AuthenticationTrustResolverInterface;
 use Symfony\Component\Security\Authentication\EntryPoint\AuthenticationEntryPointInterface;
 use Symfony\Component\HttpKernel\Log\LoggerInterface;
-use Symfony\Component\EventDispatcher\EventDispatcher;
-use Symfony\Component\EventDispatcher\Event;
+use Symfony\Component\EventDispatcher\EventDispatcherInterface;
+use Symfony\Component\EventDispatcher\EventInterface;
 use Symfony\Component\Security\Exception\AuthenticationException;
 use Symfony\Component\Security\Exception\AccessDeniedException;
 use Symfony\Component\Security\Authentication\Token\AnonymousToken;
@@ -50,10 +50,10 @@ class ExceptionListener implements ListenerInterface
     /**
      * Registers a core.exception listener to take care of security exceptions.
      *
-     * @param EventDispatcher $dispatcher An EventDispatcher instance
-     * @param integer         $priority   The priority
+     * @param EventDispatcherInterface $dispatcher An EventDispatcherInterface instance
+     * @param integer                  $priority   The priority
      */
-    public function register(EventDispatcher $dispatcher)
+    public function register(EventDispatcherInterface $dispatcher)
     {
         $dispatcher->connect('core.exception', array($this, 'handleException'), 0);
     }
@@ -61,7 +61,7 @@ class ExceptionListener implements ListenerInterface
     /**
      * {@inheritDoc}
      */
-    public function unregister(EventDispatcher $dispatcher)
+    public function unregister(EventDispatcherInterface $dispatcher)
     {
         $dispatcher->disconnect('core.exception', array($this, 'handleException'));
     }
@@ -69,9 +69,9 @@ class ExceptionListener implements ListenerInterface
     /**
      * Handles security related exceptions.
      *
-     * @param Event $event An Event instance
+     * @param EventInterface $event An EventInterface instance
      */
-    public function handleException(Event $event)
+    public function handleException(EventInterface $event)
     {
         $exception = $event->get('exception');
         $request = $event->get('request');

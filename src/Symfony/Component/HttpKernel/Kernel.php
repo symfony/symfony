@@ -35,7 +35,7 @@ use Symfony\Component\HttpKernel\Bundle\BundleInterface;
  *
  * @author Fabien Potencier <fabien.potencier@symfony-project.org>
  */
-abstract class Kernel implements HttpKernelInterface, \Serializable
+abstract class Kernel implements KernelInterface
 {
     protected $bundles;
     protected $bundleMap;
@@ -61,7 +61,7 @@ abstract class Kernel implements HttpKernelInterface, \Serializable
         $this->debug = (Boolean) $debug;
         $this->booted = false;
         $this->rootDir = realpath($this->registerRootDir());
-        $this->name = basename($this->rootDir);
+        $this->name = preg_replace('/[^a-zA-Z0-9_]+/', '', basename($this->rootDir));
 
         if ($this->debug) {
             ini_set('display_errors', 1);
@@ -82,29 +82,6 @@ abstract class Kernel implements HttpKernelInterface, \Serializable
         $this->booted = false;
         $this->container = null;
     }
-
-    /**
-     * Returns the root directory of this application.
-     *
-     * Most of the time, this is just __DIR__.
-     *
-     * @return string A directory path
-     */
-    abstract public function registerRootDir();
-
-    /**
-     * Returns an array of bundles to registers.
-     *
-     * @return array An array of bundle instances.
-     */
-    abstract public function registerBundles();
-
-    /**
-     * Loads the container configuration
-     *
-     * @param LoaderInterface $loader A LoaderInterface instance
-     */
-    abstract public function registerContainerConfiguration(LoaderInterface $loader);
 
     /**
      * Boots the current kernel.
@@ -308,11 +285,6 @@ abstract class Kernel implements HttpKernelInterface, \Serializable
         return $this->name;
     }
 
-    public function getSafeName()
-    {
-        return preg_replace('/[^a-zA-Z0-9_]+/', '', $this->name);
-    }
-
     /**
      * Gets the environment.
      *
@@ -421,7 +393,7 @@ abstract class Kernel implements HttpKernelInterface, \Serializable
 
     protected function initializeContainer()
     {
-        $class = $this->getSafeName().ucfirst($this->environment).($this->debug ? 'Debug' : '').'ProjectContainer';
+        $class = $this->name.ucfirst($this->environment).($this->debug ? 'Debug' : '').'ProjectContainer';
         $location = $this->getCacheDir().'/'.$class;
         $reload = $this->debug ? $this->needsReload($class, $location) : false;
 
@@ -443,7 +415,7 @@ abstract class Kernel implements HttpKernelInterface, \Serializable
         }
     }
 
-    public function getKernelParameters()
+    protected function getKernelParameters()
     {
         $bundles = array();
         foreach ($this->bundles as $name => $bundle) {

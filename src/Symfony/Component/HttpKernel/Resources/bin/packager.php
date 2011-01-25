@@ -36,6 +36,8 @@ ClassCollectionLoader::load(array(
     'Symfony\\Component\\HttpKernel\\Debug\\ErrorHandler',
     'Symfony\\Component\\HttpKernel\\ClassCollectionLoader',
     'Symfony\\Component\\HttpKernel\\HttpKernelInterface',
+    'Symfony\\Component\\HttpKernel\\HttpKernel',
+    'Symfony\\Component\\HttpKernel\\KernelInterface',
     'Symfony\\Component\\HttpKernel\\Kernel',
 
     'Symfony\\Component\\HttpFoundation\\ParameterBag',

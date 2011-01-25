@@ -16,13 +16,6 @@ use Symfony\Component\DependencyInjection\Loader\LoaderInterface;
 
 class KernelTest extends \PHPUnit_Framework_TestCase
 {
-    public function testGetSafeName()
-    {
-        $kernel = new KernelForTest('dev', true, '-foo-');
-
-        $this->assertEquals('foo', $kernel->getSafeName());
-    }
-
     /**
      * @expectedException \InvalidArgumentException
      */
@@ -280,13 +273,6 @@ class KernelTest extends \PHPUnit_Framework_TestCase
 
 class KernelForTest extends Kernel
 {
-    public function __construct($environment, $debug, $name)
-    {
-        parent::__construct($environment, $debug);
-
-        $this->name = $name;
-    }
-
     public function getBundleMap()
     {
         return $this->bundleMap;

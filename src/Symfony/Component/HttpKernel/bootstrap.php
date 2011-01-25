@@ -548,6 +548,104 @@ interface HttpKernelInterface
 }
 namespace Symfony\Component\HttpKernel
 {
+use Symfony\Component\EventDispatcher\Event;
+use Symfony\Component\EventDispatcher\EventDispatcherInterface;
+use Symfony\Component\HttpKernel\Controller\ControllerResolverInterface;
+use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
+use Symfony\Component\HttpFoundation\Request;
+use Symfony\Component\HttpFoundation\Response;
+class HttpKernel implements HttpKernelInterface
+{
+    protected $dispatcher;
+    protected $resolver;
+    public function __construct(EventDispatcherInterface $dispatcher, ControllerResolverInterface $resolver)
+    {
+        $this->dispatcher = $dispatcher;
+        $this->resolver = $resolver;
+    }
+    public function handle(Request $request, $type = HttpKernelInterface::MASTER_REQUEST, $catch = true)
+    {
+        try {
+            $response = $this->handleRaw($request, $type);
+        } catch (\Exception $e) {
+            if (false === $catch) {
+                throw $e;
+            }
+                        $event = new Event($this, 'core.exception', array('request_type' => $type, 'request' => $request, 'exception' => $e));
+            $this->dispatcher->notifyUntil($event);
+            if (!$event->isProcessed()) {
+                throw $e;
+            }
+            $response = $this->filterResponse($event->getReturnValue(), $request, 'A "core.exception" listener returned a non response object.', $type);
+        }
+        return $response;
+    }
+    protected function handleRaw(Request $request, $type = self::MASTER_REQUEST)
+    {
+                $event = new Event($this, 'core.request', array('request_type' => $type, 'request' => $request));
+        $this->dispatcher->notifyUntil($event);
+        if ($event->isProcessed()) {
+            return $this->filterResponse($event->getReturnValue(), $request, 'A "core.request" listener returned a non response object.', $type);
+        }
+                if (false === $controller = $this->resolver->getController($request)) {
+            throw new NotFoundHttpException(sprintf('Unable to find the controller for "%s", check your route configuration.', $request->getPathInfo()));
+        }
+        $event = new Event($this, 'core.controller', array('request_type' => $type, 'request' => $request));
+        $this->dispatcher->filter($event, $controller);
+        $controller = $event->getReturnValue();
+                if (!is_callable($controller)) {
+            throw new \LogicException(sprintf('The controller must be a callable (%s).', var_export($controller, true)));
+        }
+                $arguments = $this->resolver->getArguments($request, $controller);
+                $retval = call_user_func_array($controller, $arguments);
+                $event = new Event($this, 'core.view', array('request_type' => $type, 'request' => $request));
+        $this->dispatcher->filter($event, $retval);
+        return $this->filterResponse($event->getReturnValue(), $request, sprintf('The controller must return a response (instead of %s).', is_object($event->getReturnValue()) ? 'an object of class '.get_class($event->getReturnValue()) : is_array($event->getReturnValue()) ? 'an array' : str_replace("\n", '', var_export($event->getReturnValue(), true))), $type);
+    }
+    protected function filterResponse($response, $request, $message, $type)
+    {
+        if (!$response instanceof Response) {
+            throw new \RuntimeException($message);
+        }
+        $event = $this->dispatcher->filter(new Event($this, 'core.response', array('request_type' => $type, 'request' => $request)), $response);
+        $response = $event->getReturnValue();
+        if (!$response instanceof Response) {
+            throw new \RuntimeException('A "core.response" listener returned a non response object.');
+        }
+        return $response;
+    }
+}
+}
+namespace Symfony\Component\HttpKernel
+{
+use Symfony\Component\DependencyInjection\ContainerInterface;
+use Symfony\Component\DependencyInjection\Loader\LoaderInterface;
+use Symfony\Component\HttpKernel\HttpKernelInterface;
+use Symfony\Component\HttpKernel\Bundle\BundleInterface;
+interface KernelInterface extends HttpKernelInterface, \Serializable
+{
+    function registerRootDir();
+    function registerBundles();
+    function registerContainerConfiguration(LoaderInterface $loader);
+    function boot();
+    function shutdown();
+    function reboot();
+    function getBundles();
+    function isClassInActiveBundle($class);
+    function getBundle($name, $first = true);
+    function locateResource($name, $dir = null, $first = true);
+    function getName();
+    function getEnvironment();
+    function isDebug();
+    function getRootDir();
+    function getContainer();
+    function getStartTime();
+    function getCacheDir();
+    function getLogDir();
+}
+}
+namespace Symfony\Component\HttpKernel
+{
 use Symfony\Component\DependencyInjection\ContainerInterface;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\DependencyInjection\Dumper\PhpDumper;
@@ -564,7 +662,7 @@ use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpKernel\HttpKernelInterface;
 use Symfony\Component\HttpKernel\ClassCollectionLoader;
 use Symfony\Component\HttpKernel\Bundle\BundleInterface;
-abstract class Kernel implements HttpKernelInterface, \Serializable
+abstract class Kernel implements KernelInterface
 {
     protected $bundles;
     protected $bundleMap;
@@ -582,7 +680,7 @@ abstract class Kernel implements HttpKernelInterface, \Serializable
         $this->debug = (Boolean) $debug;
         $this->booted = false;
         $this->rootDir = realpath($this->registerRootDir());
-        $this->name = basename($this->rootDir);
+        $this->name = preg_replace('/[^a-zA-Z0-9_]+/', '', basename($this->rootDir));
         if ($this->debug) {
             ini_set('display_errors', 1);
             error_reporting(-1);
@@ -599,9 +697,6 @@ abstract class Kernel implements HttpKernelInterface, \Serializable
         $this->booted = false;
         $this->container = null;
     }
-    abstract public function registerRootDir();
-    abstract public function registerBundles();
-    abstract public function registerContainerConfiguration(LoaderInterface $loader);
     public function boot()
     {
         if (true === $this->booted) {
@@ -703,10 +798,6 @@ abstract class Kernel implements HttpKernelInterface, \Serializable
     {
         return $this->name;
     }
-    public function getSafeName()
-    {
-        return preg_replace('/[^a-zA-Z0-9_]+/', '', $this->name);
-    }
     public function getEnvironment()
     {
         return $this->environment;
@@ -767,7 +858,7 @@ abstract class Kernel implements HttpKernelInterface, \Serializable
     }
     protected function initializeContainer()
     {
-        $class = $this->getSafeName().ucfirst($this->environment).($this->debug ? 'Debug' : '').'ProjectContainer';
+        $class = $this->name.ucfirst($this->environment).($this->debug ? 'Debug' : '').'ProjectContainer';
         $location = $this->getCacheDir().'/'.$class;
         $reload = $this->debug ? $this->needsReload($class, $location) : false;
         $fresh = false;
@@ -783,7 +874,7 @@ abstract class Kernel implements HttpKernelInterface, \Serializable
             $this->container->get('cache_warmer')->warmUp($this->container->getParameter('kernel.cache_dir'));
         }
     }
-    public function getKernelParameters()
+    protected function getKernelParameters()
     {
         $bundles = array();
         foreach ($this->bundles as $name => $bundle) {

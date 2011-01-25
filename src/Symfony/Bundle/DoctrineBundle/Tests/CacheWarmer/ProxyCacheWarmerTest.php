@@ -20,6 +20,8 @@ class ProxyCacheWarmerTest extends \Symfony\Bundle\DoctrineBundle\Tests\TestCase
      * because there are none in the AnnotationsBundle. However that is
      * rather a task of doctrine to test. We touch the lines here and
      * verify that the container is called correctly for the relevant information.
+     *
+     * @group DoctrineORMProxy
      */
     public function testWarmCache()
     {
@@ -29,13 +31,17 @@ class ProxyCacheWarmerTest extends \Symfony\Bundle\DoctrineBundle\Tests\TestCase
         $container = $this->getMock('Symfony\Component\DependencyInjection\Container');
         $container->expects($this->at(0))
                   ->method('getParameter')
+                  ->with($this->equalTo('doctrine.orm.proxy_dir'))
+                  ->will($this->returnValue(sys_get_temp_dir()));
+        $container->expects($this->at(1))
+                  ->method('getParameter')
                   ->with($this->equalTo('doctrine.orm.entity_managers'))
                   ->will($this->returnValue(array('default', 'foo')));
-        $container->expects($this->at(1))
+        $container->expects($this->at(2))
                   ->method('get')
                   ->with($this->equalTo('doctrine.orm.default_entity_manager'))
                   ->will($this->returnValue($testManager));
-        $container->expects($this->at(2))
+        $container->expects($this->at(3))
                   ->method('get')
                   ->with($this->equalTo('doctrine.orm.foo_entity_manager'))
                   ->will($this->returnValue($testManager));

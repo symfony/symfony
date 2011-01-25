@@ -49,6 +49,15 @@ class ProxyCacheWarmer implements CacheWarmerInterface
 
     public function warmUp($cacheDir)
     {
+        $proxyCacheDir = $this->container->getParameter('doctrine.orm.proxy_dir');
+        if (!file_exists($proxyCacheDir)) {
+            if (false === @mkdir($proxyCacheDir, 0777, true)) {
+                throw new \RuntimeException(sprintf('Unable to create the Doctrine Proxy directory (%s)', dirname($proxyCacheDir)));
+            }
+        } else if (!is_writable($proxyCacheDir)) {
+            throw new \RuntimeException(sprintf('Doctrine Proxy directory (%s) is not writeable for the current system user.', $proxyCacheDir));
+        }
+
         $entityManagers = $this->container->getParameter('doctrine.orm.entity_managers');
         foreach ($entityManagers AS $entityManagerName) {
             $em = $this->container->get(sprintf('doctrine.orm.%s_entity_manager', $entityManagerName));

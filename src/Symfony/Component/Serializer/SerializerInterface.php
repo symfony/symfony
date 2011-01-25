@@ -2,6 +2,8 @@
 
 namespace Symfony\Component\Serializer;
 
+use Symfony\Component\Serializer\Encoder\EncoderInterface;
+
 /*
  * This file is part of the Symfony framework.
  *
@@ -73,4 +75,34 @@ interface SerializerInterface
      * @return mixed
      */
     function decode($data, $format);
+
+    /**
+     * @param string $format format name
+     * @param EncoderInterface $encoder
+     */
+    function addEncoder($format, EncoderInterface $encoder);
+
+    /**
+     * @param string $format format name
+     * @return EncoderInterface
+     */
+    function getEncoders();
+
+    /**
+     * @return array[]EncoderInterface
+     */
+    function getEncoder($format);
+
+    /**
+     * Checks whether the serializer has an encoder registered for the given format
+     *
+     * @param string $format format name
+     * @return Boolean
+     */
+    function hasEncoder($format);
+
+    /**
+     * @param string $format format name
+     */
+    function removeEncoder($format);
 }

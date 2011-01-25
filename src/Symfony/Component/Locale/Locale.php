@@ -175,7 +175,7 @@ class Locale
      */
     public static function acceptFromHttp($header)
     {
-        self::isIntlExtensionAvailable();
+        self::assertIntlExtensionAvailability();
         return \Locale::acceptFromHttp($header);
     }
 
@@ -189,7 +189,7 @@ class Locale
      */
     public static function composeLocale(array $subtags)
     {
-        self::isIntlExtensionAvailable();
+        self::assertIntlExtensionAvailability();
         return \Locale::composeLocale($subtags);
     }
 
@@ -204,7 +204,7 @@ class Locale
      */
     public static function filterMatches($langtag, $locale, $canonicalize = false)
     {
-        self::isIntlExtensionAvailable();
+        self::assertIntlExtensionAvailability();
         return \Locale::filterMatches($langtag, $locale, $canonicalize);
     }
 
@@ -218,7 +218,7 @@ class Locale
      */
     public static function getAllVariants($locale)
     {
-        self::isIntlExtensionAvailable();
+        self::assertIntlExtensionAvailability();
         return \Locale::getAllVariants($locale);
     }
 
@@ -231,7 +231,7 @@ class Locale
      */
     public static function getDefault()
     {
-        self::isIntlExtensionAvailable();
+        self::assertIntlExtensionAvailability();
         return \Locale::getDefault();
     }
 
@@ -246,7 +246,7 @@ class Locale
      */
     public static function getDisplayLanguage($locale, $inLocale = null)
     {
-        self::isIntlExtensionAvailable();
+        self::assertIntlExtensionAvailability();
         return \Locale::getDisplayLanguage($locale, $inLocale);
     }
 
@@ -261,7 +261,7 @@ class Locale
      */
     public static function getDisplayName($locale, $inLocale = null)
     {
-        self::isIntlExtensionAvailable();
+        self::assertIntlExtensionAvailability();
         return \Locale::getDisplayName($locale, $inLocale);
     }
 
@@ -276,7 +276,7 @@ class Locale
      */
     public static function getDisplayRegion($locale, $inLocale = null)
     {
-        self::isIntlExtensionAvailable();
+        self::assertIntlExtensionAvailability();
         return \Locale::getDisplayRegion($locale, $inLocale);
     }
 
@@ -291,7 +291,7 @@ class Locale
      */
     public static function getDisplayScript($locale, $inLocale = null)
     {
-        self::isIntlExtensionAvailable();
+        self::assertIntlExtensionAvailability();
         return \Locale::getDisplayScript($locale, $inLocale);
     }
 
@@ -306,7 +306,7 @@ class Locale
      */
     public static function getDisplayVariant($locale, $inLocale = null)
     {
-        self::isIntlExtensionAvailable();
+        self::assertIntlExtensionAvailability();
         return \Locale::getDisplayVariant($locale, $inLocale);
     }
 
@@ -320,7 +320,7 @@ class Locale
      */
     public static function getKeywords($locale)
     {
-        self::isIntlExtensionAvailable();
+        self::assertIntlExtensionAvailability();
         return \Locale::getKeywords($locale);
     }
 
@@ -334,7 +334,7 @@ class Locale
      */
     public static function getPrimaryLanguage($locale)
     {
-        self::isIntlExtensionAvailable();
+        self::assertIntlExtensionAvailability();
         return \Locale::getPrimaryLanguage($locale);
     }
 
@@ -348,7 +348,7 @@ class Locale
      */
     public static function getRegion($locale)
     {
-        self::isIntlExtensionAvailable();
+        self::assertIntlExtensionAvailability();
         return \Locale::getRegion($locale);
     }
 
@@ -362,7 +362,7 @@ class Locale
      */
     public static function getScript($locale)
     {
-        self::isIntlExtensionAvailable();
+        self::assertIntlExtensionAvailability();
         return \Locale::getScript($locale);
     }
 
@@ -378,7 +378,7 @@ class Locale
      */
     public static function lookup(array $langtag, $locale, $canonicalize = false, $default = null)
     {
-        self::isIntlExtensionAvailable();
+        self::assertIntlExtensionAvailability();
         return \Locale::lookup($langtag, $locale, $canonicalize, $default);
     }
 
@@ -392,7 +392,7 @@ class Locale
      */
     public static function parseLocale($locale)
     {
-        self::isIntlExtensionAvailable();
+        self::assertIntlExtensionAvailability();
         return \Locale::parseLocale($locale);
     }
 
@@ -400,26 +400,25 @@ class Locale
      * Sets the default runtime locale
      *
      * @param  string  $locale    The locale code
+     * @return bool               true on success or false on failure
      * @see    http://www.php.net/manual/en/locale.parselocale.php
      * @throws RuntimeException   When the intl extension is not loaded
      */
     public static function setDefault($locale)
     {
-        self::isIntlExtensionAvailable();
+        self::assertIntlExtensionAvailability();
         return \Locale::setDefault($locale);
     }
 
     /**
      * Check if the intl extension is loaded.
      *
-     * @throws RuntimeException  If the intl extension is not loaded
+     * @throws RuntimeException  When the intl extension is not loaded
      */
-    private static function isIntlExtensionAvailable()
+    private static function assertIntlExtensionAvailability()
     {
         if (!extension_loaded('intl')) {
             throw new \RuntimeException('The intl extension is not available.');
         }
-
-        return true;
     }
 }

@@ -137,6 +137,12 @@ class ValidatorFieldFactoryGuesser implements FieldFactoryGuesserInterface
                             array(),
                             FieldFactoryGuess::LOW_CONFIDENCE
                         );
+                    case '\DateTime':
+                        return new FieldFactoryClassGuess(
+                        	'Symfony\Component\Form\DateField',
+                            array(),
+                            FieldFactoryGuess::MEDIUM_CONFIDENCE
+                        );
                 }
                 break;
             case 'Symfony\Component\Validator\Constraints\Choice':

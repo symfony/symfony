@@ -12,6 +12,7 @@ namespace Symfony\Component\Form;
  */
 
 use Symfony\Component\Form\FieldFactory\FieldFactoryInterface;
+use Symfony\Component\Form\CsrfProvider\CsrfProviderInterface;
 use Symfony\Component\Validator\ValidatorInterface;
 
 /**
@@ -73,21 +74,12 @@ interface FormContextInterface
     function csrfFieldName($name);
 
     /**
-     * Sets the CSRF secrets to be used in the form
+     * Sets the CSRF provider used to generate and validate CSRF tokens
      *
-     * @param  array $secrets        A list of secret values
-     * @return FormContextInterface  This object
+     * @param  CsrfProviderInterface $provider  The provider instance
+     * @return FormContextInterface             This object
      */
-    function csrfSecrets(array $secrets);
-
-    /**
-     * Adds another CSRF secrets without removing the existing CSRF secrets
-     *
-     * @param  string $secret        A secret value
-     * @return FormContextInterface  This object
-     * @see csrfSecrets()
-     */
-    function addCsrfSecret($secret);
+    function csrfProvider(CsrfProviderInterface $csrfProvider);
 
     /**
      * Creates a new form with the settings stored in this context

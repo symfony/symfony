@@ -13,6 +13,7 @@ namespace Symfony\Component\Form;
 
 use Symfony\Component\Validator\ValidatorInterface;
 use Symfony\Component\Form\Exception\FormException;
+use Symfony\Component\Form\CsrfProvider\CsrfProviderInterface;
 
 /**
  * Form represents a form.
@@ -31,6 +32,10 @@ use Symfony\Component\Form\Exception\FormException;
  */
 class Form extends FieldGroup
 {
+    /**
+     * The validator to validate form values
+     * @var ValidatorInterface
+     */
     protected $validator = null;
 
     /**
@@ -50,9 +55,8 @@ class Form extends FieldGroup
             $this->setData($data);
         }
 
-        $this->addOption('csrf_protection');
         $this->addOption('csrf_field_name', '_token');
-        $this->addOption('csrf_secrets', array(__FILE__.php_uname()));
+        $this->addOption('csrf_provider');
         $this->addOption('field_factory');
         $this->addOption('validation_groups');
 
@@ -69,11 +73,17 @@ class Form extends FieldGroup
         }
 
         // Enable CSRF protection, if necessary
-        if ($this->getOption('csrf_protection')) {
+        if ($this->getOption('csrf_provider')) {
+            if (!$this->getOption('csrf_provider') instanceof CsrfProviderInterface) {
+                throw new FormException('The object passed to the "csrf_provider" option must implement CsrfProviderInterface');
+            }
+
+            $token = $this->getOption('csrf_provider')->generateCsrfToken(get_class($this));
+
             $field = new HiddenField($this->getOption('csrf_field_name'), array(
                 'property_path' => null,
             ));
-            $field->setData($this->generateCsrfToken($this->getOption('csrf_secrets')));
+            $field->setData($token);
 
             $this->add($field);
         }
@@ -121,13 +131,13 @@ class Form extends FieldGroup
     }
 
     /**
-     * Returns the secret values used for the CSRF protection
+     * Returns the provider used for generating and validating CSRF tokens
      *
-     * @return array  A list of string valuesf
+     * @return CsrfProviderInterface  The provider instance
      */
-    public function getCsrfSecrets()
+    public function getCsrfProvider()
     {
-        return $this->getOption('csrf_secrets');
+        return $this->getOption('csrf_provider');
     }
 
     /**
@@ -236,10 +246,9 @@ class Form extends FieldGroup
         if (!$this->isCsrfProtected()) {
             return true;
         } else {
-            $actual = $this->get($this->getOption('csrf_field_name'))->getDisplayedData();
-            $expected = $this->generateCsrfToken($this->getOption('csrf_secrets'));
+            $token = $this->get($this->getOption('csrf_field_name'))->getDisplayedData();
 
-            return $actual === $expected;
+            return $this->getOption('csrf_provider')->isCsrfTokenValid(get_class($this), $token);
         }
     }
 

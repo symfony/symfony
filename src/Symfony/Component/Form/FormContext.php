@@ -12,6 +12,7 @@ namespace Symfony\Component\Form;
  */
 
 use Symfony\Component\Form\FieldFactory\FieldFactoryInterface;
+use Symfony\Component\Form\CsrfProvider\CsrfProviderInterface;
 use Symfony\Component\Validator\ValidatorInterface;
 
 /**
@@ -47,10 +48,10 @@ class FormContext implements FormContextInterface
     protected $fieldFactory = null;
 
     /**
-     * The secret strings used for CSRF protection
+     * The provider used to generate and validate CSRF tokens
      * @var array
      */
-    protected $csrfSecrets = null;
+    protected $csrfProvider = null;
 
     /**
      * Whether the new form should be CSRF protected
@@ -137,9 +138,9 @@ class FormContext implements FormContextInterface
     /**
      * @inheritDoc
      */
-    public function csrfSecrets(array $secrets)
+    public function csrfProvider(CsrfProviderInterface $csrfProvider)
     {
-        $this->csrfSecrets = $secrets;
+        $this->csrfProvider = $csrfProvider;
 
         return $this;
     }
@@ -154,23 +155,12 @@ class FormContext implements FormContextInterface
             $data,
             $this->validator,
             array(
-                'csrf_protection' => $this->csrfProtection,
                 'csrf_field_name' => $this->csrfFieldName,
-                'csrf_secrets' => $this->csrfSecrets,
+                'csrf_provider' => $this->csrfProtection ? $this->csrfProvider : null,
                 'validation_groups' => $this->validationGroups,
                 'field_factory' => $this->fieldFactory,
             )
         );
-    }
-
-    /**
-     * @inheritDoc
-     */
-    public function addCsrfSecret($secret)
-    {
-        $this->csrfSecrets[] = $secret;
-
-        return $this;
     }
 
     /**
@@ -224,12 +214,12 @@ class FormContext implements FormContextInterface
     }
 
     /**
-     * Returns the secret values used for CSRF protection in the new form
+     * Returns the CSRF provider used to generate and validate CSRF tokens
      *
-     * @return array  A list of secret string values
+     * @return CsrfProviderInterface  The provider instance
      */
-    public function getCsrfSecrets()
+    public function getCsrfProvider()
     {
-        return $this->csrfSecrets;
+        return $this->csrfProvider;
     }
 }

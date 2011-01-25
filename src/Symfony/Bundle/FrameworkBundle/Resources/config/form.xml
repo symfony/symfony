@@ -8,6 +8,7 @@
         <parameter key="form.factory.class">Symfony\Component\Form\FormFactory</parameter>
         <parameter key="form.field_factory.class">Symfony\Component\Form\FieldFactory\FieldFactory</parameter>
         <parameter key="form.field_factory.validator_guesser.class">Symfony\Component\Form\FieldFactory\ValidatorFieldFactoryGuesser</parameter>
+        <parameter key="form.csrf_provider.class">Symfony\Component\Form\CsrfProvider\SessionCsrfProvider</parameter>
         <parameter key="form.default_context.class">Symfony\Component\Form\FormContext</parameter>
         <parameter key="form.csrf_protection.enabled">true</parameter>
         <parameter key="form.csrf_protection.field_name">_token</parameter>
@@ -32,6 +33,12 @@
         	<tag name="form.field_factory.guesser" />
         	<argument type="service" id="validator.mapping.class_metadata_factory" />
         </service>
+        
+        <!-- CsrfProvider -->
+        <service id="form.csrf_provider" class="%form.csrf_provider.class%" public="false">
+        	<argument type="service" id="session" />
+        	<argument>%form.csrf_protection.secret%</argument>
+        </service>
 
     	<!-- FormContext -->
         <service id="form.default_context" class="%form.default_context.class%">
@@ -51,10 +58,8 @@
             <call method="csrfFieldName">
                 <argument>%form.csrf_protection.field_name%</argument>
             </call>
-            <call method="csrfSecrets">
-            	<argument type="collection">
-                	<argument>%form.csrf_protection.secret%</argument>
-                </argument>
+            <call method="csrfProvider">
+                <argument type="service" id="form.csrf_provider" />
             </call>
         </service>
         

@@ -12,6 +12,7 @@ namespace Symfony\Component\Form;
  */
 
 use Symfony\Component\Form\FieldFactory\FieldFactoryInterface;
+use Symfony\Component\Form\CsrfProvider\CsrfProviderInterface;
 use Symfony\Component\Validator\ValidatorInterface;
 
 /**
@@ -133,32 +134,17 @@ class FormFactory implements FormContextInterface
     }
 
     /**
-     * Overrides the CSRF secrets setting of the default context and returns
+     * Overrides the CSRF provider setting of the default context and returns
      * the new context
      *
-     * @param  array $secrets        The secrets to use for CSRF protection
-     * @return FormContextInterface  The preconfigured form context
+     * @param  CsrfProviderInterface $provider  The provider instance
+     * @return FormContextInterface             The preconfigured form context
      */
-    public function csrfSecrets(array $secrets)
+    public function csrfProvider(CsrfProviderInterface $csrfProvider)
     {
         $context = clone $this->defaultContext;
 
-        return $context->csrfSecrets($secrets);
-    }
-
-    /**
-     * Adds a new CSRF secret to the ones in the default context and returns
-     * the new context
-     *
-     * @param  string $secret        The secret to add to the secrets used for
-     *                               CSRF protection
-     * @return FormContextInterface  The preconfigured form context
-     */
-    public function addCsrfSecret($secret)
-    {
-        $context = clone $this->defaultContext;
-
-        return $context->addCsrfSecret($secret);
+        return $context->csrfProvider($csrfProvider);
     }
 
     /**

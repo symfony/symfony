@@ -69,10 +69,7 @@ class FormTest extends \PHPUnit_Framework_TestCase
     protected function setUp()
     {
         $this->validator = $this->createMockValidator();
-        $this->form = new Form('author', new Author(), $this->validator, array(
-            'csrf_protection' => false,
-            'csrf_secrets' => array(),
-        ));
+        $this->form = new Form('author', new Author(), $this->validator);
     }
 
     public function testConstructInitializesObject()
@@ -95,54 +92,16 @@ class FormTest extends \PHPUnit_Framework_TestCase
     public function testCsrfProtectionCanBeEnabled()
     {
         $form = new Form('author', new Author(), $this->validator, array(
-            'csrf_protection' => true,
+            'csrf_provider' => $this->createMockCsrfProvider(),
         ));
 
         $this->assertTrue($form->isCsrfProtected());
     }
 
-    public function testGeneratedCsrfSecretByDefault()
-    {
-        $form = new Form('author', new Author(), $this->validator, array(
-            'csrf_protection' => true,
-        ));
-
-        $secrets = $form->getCsrfSecrets();
-
-        $this->assertEquals(1, count($secrets));
-        $this->assertTrue(strlen($secrets[0]) >= 32);
-    }
-
-    public function testCsrfSecretsCanBeSet()
-    {
-        $form = new Form('author', new Author(), $this->validator, array(
-            'csrf_protection' => true,
-            'csrf_field_name' => '_token',
-            'csrf_secrets' => array('foobar', 'secret'),
-        ));
-
-        $this->assertEquals(md5(get_class($form).'foobarsecret'), $form['_token']->getData());
-    }
-
-    public function testCsrfSecretsCanBeSetAsClosures()
-    {
-        $closure = function () {
-            return 'foobar';
-        };
-
-        $form = new Form('author', new Author(), $this->validator, array(
-            'csrf_protection' => true,
-            'csrf_field_name' => '_token',
-            'csrf_secrets' => array($closure, 'secret'),
-        ));
-
-        $this->assertEquals(md5(get_class($form).'foobarsecret'), $form['_token']->getData());
-    }
-
     public function testCsrfFieldNameCanBeSet()
     {
         $form = new Form('author', new Author(), $this->validator, array(
-            'csrf_protection' => true,
+            'csrf_provider' => $this->createMockCsrfProvider(),
             'csrf_field_name' => 'foobar',
         ));
 
@@ -151,8 +110,14 @@ class FormTest extends \PHPUnit_Framework_TestCase
 
     public function testCsrfProtectedFormsHaveExtraField()
     {
+        $provider = $this->createMockCsrfProvider();
+        $provider->expects($this->once())
+                ->method('generateCsrfToken')
+                ->with($this->equalTo('Symfony\Component\Form\Form'))
+                ->will($this->returnValue('ABCDEF'));
+
         $form = new Form('author', new Author(), $this->validator, array(
-            'csrf_protection' => true,
+            'csrf_provider' => $provider,
         ));
 
         $this->assertTrue($form->has($this->form->getCsrfFieldName()));
@@ -160,7 +125,7 @@ class FormTest extends \PHPUnit_Framework_TestCase
         $field = $form->get($form->getCsrfFieldName());
 
         $this->assertTrue($field instanceof HiddenField);
-        $this->assertGreaterThanOrEqual(32, strlen($field->getDisplayedData()));
+        $this->assertEquals('ABCDEF', $field->getDisplayedData());
     }
 
     public function testIsCsrfTokenValidPassesIfCsrfProtectionIsDisabled()
@@ -172,27 +137,38 @@ class FormTest extends \PHPUnit_Framework_TestCase
 
     public function testIsCsrfTokenValidPasses()
     {
+        $provider = $this->createMockCsrfProvider();
+        $provider->expects($this->once())
+                ->method('isCsrfTokenValid')
+                ->with($this->equalTo('Symfony\Component\Form\Form'), $this->equalTo('ABCDEF'))
+                ->will($this->returnValue(true));
+
         $form = new Form('author', new Author(), $this->validator, array(
-            'csrf_protection' => true,
+            'csrf_provider' => $provider,
         ));
 
         $field = $form->getCsrfFieldName();
-        $token = $form->get($field)->getDisplayedData();
 
-        $form->bind(array($field => $token));
+        $form->bind(array($field => 'ABCDEF'));
 
         $this->assertTrue($form->isCsrfTokenValid());
     }
 
     public function testIsCsrfTokenValidFails()
     {
+        $provider = $this->createMockCsrfProvider();
+        $provider->expects($this->once())
+                ->method('isCsrfTokenValid')
+                ->with($this->equalTo('Symfony\Component\Form\Form'), $this->equalTo('ABCDEF'))
+                ->will($this->returnValue(false));
+
         $form = new Form('author', new Author(), $this->validator, array(
-            'csrf_protection' => true,
+            'csrf_provider' => $provider,
         ));
 
         $field = $form->getCsrfFieldName();
 
-        $form->bind(array($field => 'foobar'));
+        $form->bind(array($field => 'ABCDEF'));
 
         $this->assertFalse($form->isCsrfTokenValid());
     }
@@ -368,5 +344,10 @@ class FormTest extends \PHPUnit_Framework_TestCase
     protected function createMockValidator()
     {
         return $this->getMock('Symfony\Component\Validator\ValidatorInterface');
+    }
+
+    protected function createMockCsrfProvider()
+    {
+        return $this->getMock('Symfony\Component\Form\CsrfProvider\CsrfProviderInterface');
     }
 }

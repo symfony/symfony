@@ -48,23 +48,6 @@ class FrameworkBundle extends Bundle
         if ($this->container->hasParameter('document_root')) {
             File::setDocumentRoot($this->container->getParameter('document_root'));
         }
-
-        // the session ID should always be included in the CSRF token, even
-        // if default CSRF protection is not enabled
-        if ($container->has('form.default_context') && $container->has('session')) {
-            $addSessionId = function () use ($container) {
-                // automatically starts the session when the CSRF token is
-                // generated
-                $container->get('session')->start();
-
-                return $container->get('session')->getId();
-            };
-
-//            $container->getDefinition('form.default_context')
-//                    ->addMethodCall('addCsrfSecret', array($addSessionId));
-//
-//                    var_dump($container->getDefinition('form.default_context'));
-        }
     }
 
     public function registerExtensions(ContainerBuilder $container)

@@ -434,13 +434,12 @@ class ClassCollectionLoader
         }
         self::$loaded[$name] = true;
         $classes = array_unique($classes);
-        if ($adaptive) {
-                        $classes = array_diff($classes, get_declared_classes(), get_declared_interfaces());
-                        $name = $name.'-'.substr(md5(implode('|', $classes)), 0, 5);
-        }
         $cache = $cacheDir.'/'.$name.'.php';
                 $reload = false;
         if ($autoReload) {
+            if ($adaptive) {
+                                $classes = array_diff($classes, get_declared_classes(), get_declared_interfaces());
+            }
             $metadata = $cacheDir.'/'.$name.'.meta';
             if (!file_exists($metadata) || !file_exists($cache)) {
                 $reload = true;
@@ -462,6 +461,9 @@ class ClassCollectionLoader
         if (!$reload && file_exists($cache)) {
             require_once $cache;
             return;
+        }
+        if ($adaptive) {
+                        $classes = array_diff($classes, get_declared_classes(), get_declared_interfaces());
         }
         $files = array();
         $content = '';

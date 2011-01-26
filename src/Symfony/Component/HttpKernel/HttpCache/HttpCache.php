@@ -29,7 +29,6 @@ class HttpCache implements HttpKernelInterface
     protected $kernel;
     protected $traces;
     protected $store;
-    protected $request;
     protected $esi;
 
     /**
@@ -125,7 +124,6 @@ class HttpCache implements HttpKernelInterface
         // FIXME: catch exceptions and implement a 500 error page here? -> in Varnish, there is a built-in error page mechanism
         if (HttpKernelInterface::MASTER_REQUEST === $type) {
             $this->traces = array();
-            $this->request = $request;
         }
 
         $path = $request->getPathInfo();

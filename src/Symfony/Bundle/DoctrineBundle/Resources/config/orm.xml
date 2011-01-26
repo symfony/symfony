@@ -39,7 +39,8 @@
 
         <!-- security/user -->
         <parameter key="security.user.provider.entity.class">Symfony\Bundle\DoctrineBundle\Security\EntityUserProvider</parameter>
-        
+        <parameter key="security.user.entity_manager.alias">doctrine.orm.entity_manager</parameter>
+
         <!--  security/acl -->
         <parameter key="security.acl.collection_cache.class">Symfony\Bundle\DoctrineBundle\Security\AclCollectionCache</parameter>
 
@@ -56,7 +57,7 @@
             </call>
         </service>
 
-        <service id="security.user.entity_manager" alias="doctrine.orm.default_entity_manager" public="false" />
+        <service id="security.user.entity_manager" alias="%security.user.entity_manager.alias%" public="false" />
 
         <service id="request.param_converter.doctrine" class="Symfony\Bundle\DoctrineBundle\Request\ParamConverter\DoctrineConverter" public="false">
             <tag name="request.param_converter" />

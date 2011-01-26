@@ -49,26 +49,8 @@ EOT
 
     protected function execute(InputInterface $input, OutputInterface $output)
     {
-        $found = false;
-        $connections = $this->getDoctrineConnections();
-        foreach ($connections as $name => $connection) {
-            if ($input->getOption('connection') && $name != $input->getOption('connection')) {
-                continue;
-            }
-            $this->createDatabaseForConnection($connection, $output);
-            $found = true;
-        }
-        if (false === $found) {
-            if ($input->getOption('connection')) {
-                throw new \InvalidArgumentException(sprintf('<error>Could not find a connection named <comment>%s</comment></error>', $input->getOption('connection')));
-            } else {
-                throw new \InvalidArgumentException(sprintf('<error>Could not find any configured connections</error>', $input->getOption('connection')));
-            }
-        }
-    }
-
-    protected function createDatabaseForConnection(Connection $connection, OutputInterface $output)
-    {
+        $connection = $this->getDoctrineConnection($intput->getOption('connection'));
+        
         $params = $connection->getParams();
         $name = isset($params['path']) ? $params['path']:$params['dbname'];
 

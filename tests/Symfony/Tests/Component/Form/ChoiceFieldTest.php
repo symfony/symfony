@@ -67,12 +67,35 @@ class ChoiceFieldTest extends \PHPUnit_Framework_TestCase
         ));
     }
 
-    public function testBindSingleNonExpanded()
+    public function getChoicesVariants()
+    {
+        $choices = $this->choices;
+
+        return array(
+            array($choices),
+            array(function () use ($choices) { return $choices; }),
+        );
+    }
+
+    public function getNumericChoicesVariants()
+    {
+        $choices = $this->numericChoices;
+
+        return array(
+            array($choices),
+            array(function () use ($choices) { return $choices; }),
+        );
+    }
+
+    /**
+     * @dataProvider getChoicesVariants
+     */
+    public function testBindSingleNonExpanded($choices)
     {
         $field = new ChoiceField('name', array(
             'multiple' => false,
             'expanded' => false,
-            'choices' => $this->choices,
+            'choices' => $choices,
         ));
 
         $field->bind('b');
@@ -81,12 +104,15 @@ class ChoiceFieldTest extends \PHPUnit_Framework_TestCase
         $this->assertEquals('b', $field->getDisplayedData());
     }
 
-    public function testBindMultipleNonExpanded()
+    /**
+     * @dataProvider getChoicesVariants
+     */
+    public function testBindMultipleNonExpanded($choices)
     {
         $field = new ChoiceField('name', array(
             'multiple' => true,
             'expanded' => false,
-            'choices' => $this->choices,
+            'choices' => $choices,
         ));
 
         $field->bind(array('a', 'b'));
@@ -95,12 +121,15 @@ class ChoiceFieldTest extends \PHPUnit_Framework_TestCase
         $this->assertEquals(array('a', 'b'), $field->getDisplayedData());
     }
 
-    public function testBindSingleExpanded()
+    /**
+     * @dataProvider getChoicesVariants
+     */
+    public function testBindSingleExpanded($choices)
     {
         $field = new ChoiceField('name', array(
             'multiple' => false,
             'expanded' => true,
-            'choices' => $this->choices,
+            'choices' => $choices,
         ));
 
         $field->bind('b');
@@ -119,12 +148,15 @@ class ChoiceFieldTest extends \PHPUnit_Framework_TestCase
         $this->assertSame(array('a' => '', 'b' => '1', 'c' => '', 'd' => '', 'e' => ''), $field->getDisplayedData());
     }
 
-    public function testBindSingleExpandedNumericChoices()
+    /**
+     * @dataProvider getNumericChoicesVariants
+     */
+    public function testBindSingleExpandedNumericChoices($choices)
     {
         $field = new ChoiceField('name', array(
             'multiple' => false,
             'expanded' => true,
-            'choices' => $this->numericChoices,
+            'choices' => $choices,
         ));
 
         $field->bind('1');
@@ -143,12 +175,15 @@ class ChoiceFieldTest extends \PHPUnit_Framework_TestCase
         $this->assertSame(array(0 => '', 1 => '1', 2 => '', 3 => '', 4 => ''), $field->getDisplayedData());
     }
 
-    public function testBindMultipleExpanded()
+    /**
+     * @dataProvider getChoicesVariants
+     */
+    public function testBindMultipleExpanded($choices)
     {
         $field = new ChoiceField('name', array(
             'multiple' => true,
             'expanded' => true,
-            'choices' => $this->choices,
+            'choices' => $choices,
         ));
 
         $field->bind(array('a' => 'a', 'b' => 'b'));
@@ -167,12 +202,15 @@ class ChoiceFieldTest extends \PHPUnit_Framework_TestCase
         $this->assertSame(array('a' => '1', 'b' => '1', 'c' => '', 'd' => '', 'e' => ''), $field->getDisplayedData());
     }
 
-    public function testBindMultipleExpandedNumericChoices()
+    /**
+     * @dataProvider getNumericChoicesVariants
+     */
+    public function testBindMultipleExpandedNumericChoices($choices)
     {
         $field = new ChoiceField('name', array(
             'multiple' => true,
             'expanded' => true,
-            'choices' => $this->numericChoices,
+            'choices' => $choices,
         ));
 
         $field->bind(array(1 => 1, 2 => 2));

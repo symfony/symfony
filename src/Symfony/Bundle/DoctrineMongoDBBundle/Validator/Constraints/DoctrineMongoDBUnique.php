@@ -22,6 +22,7 @@ class DoctrineMongoDBUnique extends Constraint
 {
     public $message = 'The value for {{ property }} already exists.';
     public $path;
+    public $documentManager;
 
     public function defaultOption()
     {
@@ -41,5 +42,15 @@ class DoctrineMongoDBUnique extends Constraint
     public function targets()
     {
         return Constraint::CLASS_CONSTRAINT;
+    }
+
+    public function getDocumentManagerId()
+    {
+        $id = 'doctrine.odm.mongodb.document_manager';
+        if (null !== $this->documentManager) {
+            $id = sprintf('doctrine.odm.mongodb.%s_document_manager', $this->documentManager);
+        }
+
+        return $id;
     }
 }

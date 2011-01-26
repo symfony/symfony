@@ -22,7 +22,8 @@ class DoctrineMongoDBUniqueValidatorTest extends \PHPUnit_Framework_TestCase
         $this->classMetadata = $this->getClassMetadata();
         $this->repository = $this->getDocumentRepository();
         $this->dm = $this->getDocumentManager($this->classMetadata, $this->repository);
-        $this->validator = new DoctrineMongoDBUniqueValidator($this->dm);
+        $container = $this->getContainer();
+        $this->validator = new DoctrineMongoDBUniqueValidator($container);
     }
 
     public function tearDown()
@@ -87,7 +88,18 @@ class DoctrineMongoDBUniqueValidatorTest extends \PHPUnit_Framework_TestCase
         );
     }
 
-    protected function getDocumentManager(ClassMetadata $classMetadata, DocumentRepository $repository)
+    private function getContainer()
+    {
+        $container = $this->getMock('Symfony\Component\DependencyInjection\ContainerInterface');
+
+        $container->expects($this->once())
+            ->method('get')
+            ->will($this->returnValue($this->dm));
+
+        return $container;
+    }
+
+    private function getDocumentManager(ClassMetadata $classMetadata, DocumentRepository $repository)
     {
         $dm = $this->getMockBuilder('Doctrine\ODM\MongoDB\DocumentManager')
             ->disableOriginalConstructor()

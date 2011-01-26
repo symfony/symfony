@@ -91,7 +91,7 @@
     
     <!--  validator -->
     <service id="doctrine_odm.mongodb.validator.unique" class="%doctrine_odm.mongodb.validator.unique.class%">
-        <argument type="service" id="doctrine.odm.mongodb.document_manager" />
+        <argument type="service" id="service_container" />
     </service>
 
   </services>

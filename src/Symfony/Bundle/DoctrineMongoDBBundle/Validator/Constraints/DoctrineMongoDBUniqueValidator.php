@@ -14,6 +14,7 @@ namespace Symfony\Bundle\DoctrineMongoDBBundle\Validator\Constraints;
 use Doctrine\ODM\MongoDB\DocumentManager;
 use Doctrine\ODM\MongoDB\Proxy\Proxy;
 use Doctrine\ODM\MongoDB\Mapping\ClassMetadata;
+use Symfony\Component\DependencyInjection\ContainerInterface;
 use Symfony\Component\Validator\Constraint;
 use Symfony\Component\Validator\ConstraintValidator;
 
@@ -25,11 +26,11 @@ use Symfony\Component\Validator\ConstraintValidator;
 class DoctrineMongoDBUniqueValidator extends ConstraintValidator
 {
 
-    protected $dm;
+    private $container;
 
-    public function __construct(DocumentManager $dm)
+    public function __construct(ContainerInterface $container)
     {
-        $this->dm = $dm;
+        $this->container = $container;
     }
 
     /**
@@ -40,16 +41,17 @@ class DoctrineMongoDBUniqueValidator extends ConstraintValidator
     public function isValid($document, Constraint $constraint)
     {
         $class    = get_class($document);
-        $metadata = $this->dm->getClassMetadata($class);
+        $dm       = $this->getDocumentManager($constraint);
+        $metadata = $dm->getClassMetadata($class);
 
         if ($metadata->isEmbeddedDocument) {
             throw new \InvalidArgumentException(sprintf("Document '%s' is an embedded document, and cannot be validated", $class));
         }
 
-        $query    = $this->getQueryArray($metadata, $document, $constraint->path);
+        $query = $this->getQueryArray($metadata, $document, $constraint->path);
 
         // check if document exists in mongodb
-        if (null === ($doc = $this->dm->getRepository($class)->findOneBy($query))) {
+        if (null === ($doc = $dm->getRepository($class)->findOneBy($query))) {
             return true;
         }
 
@@ -112,13 +114,13 @@ class DoctrineMongoDBUniqueValidator extends ConstraintValidator
      * @param string $field
      * @return string
      */
-    protected function getFieldNameFromPropertyPath($field)
+    private function getFieldNameFromPropertyPath($field)
     {
         $pieces = explode('.', $field);
         return $pieces[0];
     }
 
-    protected function getFieldValueRecursively($fieldName, $value)
+    private function getFieldValueRecursively($fieldName, $value)
     {
         $pieces = explode('.', $fieldName);
         unset($pieces[0]);
@@ -126,6 +128,11 @@ class DoctrineMongoDBUniqueValidator extends ConstraintValidator
             $value = $value[$piece];
         }
         return $value;
+    }
+
+    private function getDocumentManager(DoctrineMongoDBUnique $constraint)
+    {
+        return $this->container->get($constraint->getDocumentManagerId());
     }
 
 }

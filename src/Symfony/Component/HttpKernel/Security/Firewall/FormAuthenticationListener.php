@@ -100,9 +100,9 @@ abstract class FormAuthenticationListener
             $response = $this->onFailure($event->getSubject(), $request, $failed);
         }
 
-        $event->setReturnValue($response);
+        $event->setProcessed();
 
-        return true;
+        return $response;
     }
 
     protected function onFailure($kernel, Request $request, \Exception $failed)

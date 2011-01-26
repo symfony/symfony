@@ -55,8 +55,6 @@ class EventDispatcher extends BaseEventDispatcher implements EventDispatcherTrac
 
             call_user_func($listener, $event);
         }
-
-        return $event;
     }
 
     /**
@@ -71,7 +69,8 @@ class EventDispatcher extends BaseEventDispatcher implements EventDispatcherTrac
 
             $this->addCall($event, $listener, 'notifyUntil');
 
-            if (call_user_func($listener, $event)) {
+            $ret = call_user_func($listener, $event);
+            if ($event->isProcessed()) {
                 if (null !== $this->logger) {
                     $this->logger->debug(sprintf('Listener "%s" processed the event "%s"', $this->listenerToString($listener), $event->getName()));
 
@@ -81,12 +80,9 @@ class EventDispatcher extends BaseEventDispatcher implements EventDispatcherTrac
                     }
                 }
 
-                $event->setProcessed(true);
-                break;
+                return $ret;
             }
         }
-
-        return $event;
     }
 
     /**
@@ -104,9 +100,7 @@ class EventDispatcher extends BaseEventDispatcher implements EventDispatcherTrac
             $value = call_user_func($listener, $event, $value);
         }
 
-        $event->setReturnValue($value);
-
-        return $event;
+        return $value;
     }
 
     /**

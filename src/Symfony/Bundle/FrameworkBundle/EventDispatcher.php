@@ -50,8 +50,6 @@ class EventDispatcher extends BaseEventDispatcher
             }
             call_user_func($listener, $event);
         }
-
-        return $event;
     }
 
     /**
@@ -63,13 +61,12 @@ class EventDispatcher extends BaseEventDispatcher
             if (is_array($listener) && is_string($listener[0])) {
                 $listener[0] = $this->container->get($listener[0]);
             }
-            if (call_user_func($listener, $event)) {
-                $event->setProcessed(true);
-                break;
+
+            $ret = call_user_func($listener, $event);
+            if ($event->isProcessed()) {
+                return $ret;
             }
         }
-
-        return $event;
     }
 
     /**
@@ -84,8 +81,6 @@ class EventDispatcher extends BaseEventDispatcher
             $value = call_user_func($listener, $event, $value);
         }
 
-        $event->setReturnValue($value);
-
-        return $event;
+        return $value;
     }
 }

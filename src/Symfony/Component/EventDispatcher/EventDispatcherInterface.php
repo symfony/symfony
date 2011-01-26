@@ -45,17 +45,20 @@ interface EventDispatcherInterface
      * Notifies all listeners of a given event.
      *
      * @param EventInterface $event An EventInterface instance
-     *
-     * @return EventInterface The EventInterface instance
      */
     function notify(EventInterface $event);
 
     /**
-     * Notifies all listeners of a given event until one returns a non null value.
+     * Notifies all listeners of a given event until one processes the event.
+     *
+     * A listener tells the dispatcher that it has processed the event
+     * by calling the setProcessed() method on it.
+     *
+     * It can then return a value that will be fowarded to the caller.
      *
      * @param  EventInterface $event An EventInterface instance
      *
-     * @return EventInterface The EventInterface instance
+     * @return mixed The returned value of the listener that processed the event
      */
     function notifyUntil(EventInterface $event);
 
@@ -65,7 +68,7 @@ interface EventDispatcherInterface
      * @param  EventInterface $event An EventInterface instance
      * @param  mixed          $value The value to be filtered
      *
-     * @return EventInterface The EventInterface instance
+     * @return mixed The filtered value
      */
     function filter(EventInterface $event, $value);
 

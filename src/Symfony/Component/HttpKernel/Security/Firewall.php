@@ -85,13 +85,11 @@ class Firewall
         }
 
         // initiate the listener chain
-        $e = $this->dispatcher->notifyUntil(new Event($request, 'core.security', array('request' => $request)));
-        if ($e->isProcessed()) {
-            $event->setReturnValue($e->getReturnValue());
+        $ret = $this->dispatcher->notifyUntil($event = new Event($request, 'core.security', array('request' => $request)));
+        if ($event->isProcessed()) {
+            $event->setProcessed();
 
-            return true;
+            return $ret;
         }
-
-        return;
     }
 }

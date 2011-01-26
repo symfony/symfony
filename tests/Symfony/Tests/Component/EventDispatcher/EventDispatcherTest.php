@@ -55,7 +55,6 @@ class EventDispatcherTest extends \PHPUnit_Framework_TestCase
         $dispatcher->connect('foo', array($listener, 'listenToFooBis'));
         $e = $dispatcher->notify($event = new Event(new \stdClass(), 'foo'));
         $this->assertEquals('listenToFoolistenToFooBis', $listener->getValue(), '->notify() notifies all registered listeners in order');
-        $this->assertEquals($event, $e, '->notify() returns the event object');
 
         $listener->reset();
         $dispatcher = new EventDispatcher();
@@ -71,16 +70,15 @@ class EventDispatcherTest extends \PHPUnit_Framework_TestCase
         $dispatcher = new EventDispatcher();
         $dispatcher->connect('foo', array($listener, 'listenToFoo'));
         $dispatcher->connect('foo', array($listener, 'listenToFooBis'));
-        $e = $dispatcher->notifyUntil($event = new Event(new \stdClass(), 'foo'));
-        $this->assertEquals('listenToFoolistenToFooBis', $listener->getValue(), '->notifyUntil() notifies all registered listeners in order and stops if it returns true');
-        $this->assertEquals($event, $e, '->notifyUntil() returns the event object');
+        $dispatcher->notifyUntil($event = new Event(new \stdClass(), 'foo'));
+        $this->assertEquals('listenToFoolistenToFooBis', $listener->getValue(), '->notifyUntil() notifies all registered listeners in order and stops when the event is processed');
 
         $listener->reset();
         $dispatcher = new EventDispatcher();
         $dispatcher->connect('foo', array($listener, 'listenToFooBis'));
         $dispatcher->connect('foo', array($listener, 'listenToFoo'));
-        $e = $dispatcher->notifyUntil($event = new Event(new \stdClass(), 'foo'));
-        $this->assertEquals('listenToFooBis', $listener->getValue(), '->notifyUntil() notifies all registered listeners in order and stops if it returns true');
+        $dispatcher->notifyUntil($event = new Event(new \stdClass(), 'foo'));
+        $this->assertEquals('listenToFooBis', $listener->getValue(), '->notifyUntil() notifies all registered listeners in order and stops when the event is processed');
     }
 
     public function testFilter()
@@ -89,16 +87,15 @@ class EventDispatcherTest extends \PHPUnit_Framework_TestCase
         $dispatcher = new EventDispatcher();
         $dispatcher->connect('foo', array($listener, 'filterFoo'));
         $dispatcher->connect('foo', array($listener, 'filterFooBis'));
-        $e = $dispatcher->filter($event = new Event(new \stdClass(), 'foo'), 'foo');
-        $this->assertEquals('-*foo*-', $e->getReturnValue(), '->filter() filters a value');
-        $this->assertEquals($event, $e, '->filter() returns the event object');
+        $ret = $dispatcher->filter($event = new Event(new \stdClass(), 'foo'), 'foo');
+        $this->assertEquals('-*foo*-', $ret, '->filter() returns the filtered value');
 
         $listener->reset();
         $dispatcher = new EventDispatcher();
         $dispatcher->connect('foo', array($listener, 'filterFooBis'));
         $dispatcher->connect('foo', array($listener, 'filterFoo'));
-        $e = $dispatcher->filter($event = new Event(new \stdClass(), 'foo'), 'foo');
-        $this->assertEquals('*-foo-*', $e->getReturnValue(), '->filter() filters a value');
+        $ret = $dispatcher->filter($event = new Event(new \stdClass(), 'foo'), 'foo');
+        $this->assertEquals('*-foo-*', $ret, '->filter() returns the filtered value');
     }
 }
 
@@ -126,7 +123,7 @@ class Listener
     {
         $this->value .= 'listenToFooBis';
 
-        return true;
+        $event->setProcessed();
     }
 
     function getValue()

@@ -131,9 +131,9 @@ class ExceptionListener implements ListenerInterface
             return;
         }
 
-        $event->setReturnValue($response);
+        $event->setProcessed();
 
-        return true;
+        return $response;
     }
 
     protected function startAuthentication(Request $request, AuthenticationException $reason)

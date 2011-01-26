@@ -96,8 +96,9 @@ class LogoutListener implements ListenerInterface
         }
 
         $this->securityContext->setToken(null);
-        $event->setReturnValue($response);
 
-        return true;
+        $event->setProcessed();
+
+        return $response;
     }
 }

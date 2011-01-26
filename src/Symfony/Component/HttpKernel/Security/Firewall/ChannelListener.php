@@ -70,9 +70,9 @@ class ChannelListener implements ListenerInterface
                 $this->logger->debug('Redirecting to HTTPS');
             }
 
-            $event->setReturnValue($this->authenticationEntryPoint->start($request));
+            $event->setProcessed();
 
-            return true;
+            return $this->authenticationEntryPoint->start($request);
         }
 
         if ('http' === $channel && $request->isSecure()) {
@@ -80,9 +80,9 @@ class ChannelListener implements ListenerInterface
                 $this->logger->debug('Redirecting to HTTP');
             }
 
-            $event->setReturnValue($this->authenticationEntryPoint->start($request));
+            $event->setProcessed();
 
-            return true;
+            return $this->authenticationEntryPoint->start($request);
         }
     }
 }

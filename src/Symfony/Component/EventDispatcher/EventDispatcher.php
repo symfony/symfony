@@ -73,35 +73,29 @@ class EventDispatcher implements EventDispatcherInterface
      * Notifies all listeners of a given event.
      *
      * @param EventInterface $event An EventInterface instance
-     *
-     * @return EventInterface The EventInterface instance
      */
     public function notify(EventInterface $event)
     {
         foreach ($this->getListeners($event->getName()) as $listener) {
             call_user_func($listener, $event);
         }
-
-        return $event;
     }
 
     /**
-     * Notifies all listeners of a given event until one returns a non null value.
+     * Notifies all listeners of a given event until one processes the event.
      *
      * @param  EventInterface $event An EventInterface instance
      *
-     * @return EventInterface The EventInterface instance
+     * @return mixed The returned value of the listener that processed the event
      */
     public function notifyUntil(EventInterface $event)
     {
         foreach ($this->getListeners($event->getName()) as $listener) {
-            if (call_user_func($listener, $event)) {
-                $event->setProcessed(true);
-                break;
+            $ret = call_user_func($listener, $event);
+            if ($event->isProcessed()) {
+                return $ret;
             }
         }
-
-        return $event;
     }
 
     /**
@@ -110,7 +104,7 @@ class EventDispatcher implements EventDispatcherInterface
      * @param  EventInterface $event An EventInterface instance
      * @param  mixed          $value The value to be filtered
      *
-     * @return EventInterface The EventInterface instance
+     * @return mixed The filtered value
      */
     public function filter(EventInterface $event, $value)
     {
@@ -118,9 +112,7 @@ class EventDispatcher implements EventDispatcherInterface
             $value = call_user_func($listener, $event, $value);
         }
 
-        $event->setReturnValue($value);
-
-        return $event;
+        return $value;
     }
 
     /**

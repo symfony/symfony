@@ -44,9 +44,9 @@ class HttpKernelTest extends \PHPUnit_Framework_TestCase
         $dispatcher = new EventDispatcher();
         $dispatcher->connect('core.exception', function ($event)
         {
-            $event->setReturnValue(new Response($event->get('exception')->getMessage()));
+            $event->setProcessed();
 
-            return true;
+            return new Response($event->get('exception')->getMessage());
         });
 
         $kernel = new HttpKernel($dispatcher, $this->getResolver(function () { throw new \RuntimeException('foo'); }));
@@ -59,9 +59,9 @@ class HttpKernelTest extends \PHPUnit_Framework_TestCase
         $dispatcher = new EventDispatcher();
         $dispatcher->connect('core.request', function ($event)
         {
-            $event->setReturnValue(new Response('hello'));
+            $event->setProcessed();
 
-            return true;
+            return new Response('hello');
         });
 
         $kernel = new HttpKernel($dispatcher, $this->getResolver());

@@ -81,10 +81,10 @@ class ExceptionListener
             throw $exception;
         }
 
-        $event->setReturnValue($response);
+        $event->setProcessed();
 
         $handling = false;
 
-        return true;
+        return $response;
     }
 }

@@ -33,28 +33,20 @@ interface EventInterface
     function getName();
 
     /**
-     * Sets the return value for this event.
+     * Sets the processed flag to true.
      *
-     * @param mixed $value The return value
+     * This method must be called by listeners when
+     * it has processed the event (it is only meaninful
+     * when the event has been notified with the notifyUntil()
+     * dispatcher method.
      */
-    function setReturnValue($value);
-
-    /**
-     * Returns the return value.
-     *
-     * @return mixed The return value
-     */
-    function getReturnValue();
-
-    /**
-     * Sets the processed flag.
-     *
-     * @param Boolean $processed The processed flag value
-     */
-    function setProcessed($processed);
+    function setProcessed();
 
     /**
      * Returns whether the event has been processed by a listener or not.
+     *
+     * This method is only meaningful for events notified
+     * with notifyUntil().
      *
      * @return Boolean true if the event has been processed, false otherwise
      */

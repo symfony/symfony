@@ -118,16 +118,6 @@ class HttpCache implements HttpKernelInterface
     }
 
     /**
-     * Gets the Request instance associated with the master request.
-     *
-     * @return Symfony\Component\HttpFoundation\Request A Request instance
-     */
-    public function getRequest()
-    {
-        return $this->request;
-    }
-
-    /**
      * {@inheritdoc}
      */
     public function handle(Request $request, $type = HttpKernelInterface::MASTER_REQUEST, $catch = true)

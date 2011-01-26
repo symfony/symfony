@@ -44,7 +44,7 @@ class CachedTemplateLocator implements TemplateLocatorInterface
         $key = md5(serialize($template));
 
         if (!isset($this->templates[$key])) {
-            throw new \InvalidArgumentException(sprintf('Unable to find template "%s".', var_export($template, true)));
+            throw new \InvalidArgumentException(sprintf('Unable to find template "%s".', json_encode($template, true)));
         }
 
         return $this->templates[$key];

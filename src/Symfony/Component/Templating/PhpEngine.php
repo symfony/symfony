@@ -85,7 +85,7 @@ class PhpEngine implements EngineInterface, \ArrayAccess
 
         // render
         if (false === $content = $this->evaluate($template, $parameters)) {
-            throw new \RuntimeException(sprintf('The template "%s" cannot be rendered.', var_export($template, true)));
+            throw new \RuntimeException(sprintf('The template "%s" cannot be rendered.', json_encode($template)));
         }
 
         // decorator

@@ -146,7 +146,7 @@ abstract class AbstractDoctrineExtensionTest extends TestCase
         $loader->ormLoad(array($config), $container);
 
         $definition = $container->getDefinition('doctrine.dbal.default_connection');
-        $this->assertEquals('Doctrine\DBAL\DriverManager', $definition->getClass());
+        $this->assertEquals('Doctrine\DBAL\Connection', $definition->getClass());
 
         $args = $definition->getArguments();
         $this->assertEquals('pdo_mysql', $args[0]['driver']);
@@ -194,7 +194,7 @@ abstract class AbstractDoctrineExtensionTest extends TestCase
         $loader->ormLoad(array(array()), $container);
 
         $definition = $container->getDefinition('doctrine.dbal.default_connection');
-        $this->assertEquals('Doctrine\DBAL\DriverManager', $definition->getClass());
+        $this->assertEquals('Doctrine\DBAL\Connection', $definition->getClass());
 
         $definition = $container->getDefinition('doctrine.orm.default_entity_manager');
         $this->assertEquals('%doctrine.orm.entity_manager_class%', $definition->getClass());
@@ -222,7 +222,7 @@ abstract class AbstractDoctrineExtensionTest extends TestCase
         $container->compile();
 
         $definition = $container->getDefinition('doctrine.dbal.default_connection');
-        $this->assertEquals('Doctrine\DBAL\DriverManager', $definition->getClass());
+        $this->assertEquals('Doctrine\DBAL\Connection', $definition->getClass());
 
         $this->assertDICConstructorArguments($definition, array(
             array(
@@ -260,7 +260,7 @@ abstract class AbstractDoctrineExtensionTest extends TestCase
         $container->compile();
 
         $definition = $container->getDefinition('doctrine.dbal.default_connection');
-        $this->assertEquals('Doctrine\DBAL\DriverManager', $definition->getClass());
+        $this->assertEquals('Doctrine\DBAL\Connection', $definition->getClass());
 
         $this->assertDICConstructorArguments($definition, array(
             array(
@@ -300,7 +300,7 @@ abstract class AbstractDoctrineExtensionTest extends TestCase
         $container->compile();
 
         $definition = $container->getDefinition('doctrine.dbal.conn1_connection');
-        $this->assertEquals('Doctrine\DBAL\DriverManager', $definition->getClass());
+        $this->assertEquals('Doctrine\DBAL\Connection', $definition->getClass());
 
         $args = $definition->getArguments();
         $this->assertEquals('pdo_sqlite', $args[0]['driver']);
@@ -323,7 +323,7 @@ abstract class AbstractDoctrineExtensionTest extends TestCase
         $this->assertEquals('doctrine.orm.dm1_configuration', (string) $arguments[1]);
 
         $definition = $container->getDefinition('doctrine.dbal.conn2_connection');
-        $this->assertEquals('Doctrine\DBAL\DriverManager', $definition->getClass());
+        $this->assertEquals('Doctrine\DBAL\Connection', $definition->getClass());
 
         $args = $definition->getArguments();
         $this->assertEquals('pdo_sqlite', $args[0]['driver']);
@@ -624,6 +624,23 @@ abstract class AbstractDoctrineExtensionTest extends TestCase
         $calls = $container->getDefinition('doctrine.orm.default_metadata_driver')->getMethodCalls();
         $this->assertEquals('doctrine.orm.default_annotation_metadata_driver', (string) $calls[0][1][0]);
         $this->assertEquals('DoctrineBundle\Tests\DependencyInjection\Fixtures\Bundles\Vendor\AnnotationsBundle\Entity', $calls[0][1][1]);
+    }
+
+    public function testSetTypes()
+    {
+        $container = $this->getContainer(array('YamlBundle'));
+
+        $loader = new DoctrineExtension();
+        $container->registerExtension($loader);
+        $this->loadFromFile($container, 'dbal_types');
+        $container->getCompilerPassConfig()->setOptimizationPasses(array());
+        $container->getCompilerPassConfig()->setRemovingPasses(array());
+        $container->compile();
+
+        $this->assertEquals(
+            array('test' => 'Symfony\Bundle\DoctrineBundle\Tests\DependencyInjection\TestType'),
+            $container->getParameter('doctrine.dbal.types')
+        );
     }
 
     protected function getContainer($bundles = 'YamlBundle', $vendor = null)

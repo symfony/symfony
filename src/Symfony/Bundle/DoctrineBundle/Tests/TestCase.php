@@ -63,7 +63,10 @@ class TestCase extends \PHPUnit_Framework_TestCase
                     'charset' => 'UTF-8',
                     'platform-service' => 'my.platform',
                 )
-            )
+            ),
+            'types' => array(
+                'test' => 'Symfony\Bundle\DoctrineBundle\Tests\DependencyInjection\TestType',
+            ),
         )), $container);
         $loader->ormLoad(array(
             array(

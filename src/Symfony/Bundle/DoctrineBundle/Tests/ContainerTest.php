@@ -11,6 +11,8 @@
 
 namespace Symfony\Bundle\DoctrineBundle\Tests;
 
+use Doctrine\DBAL\Types\Type;
+
 class ContainerTest extends TestCase
 {
     public function testContainer()
@@ -37,5 +39,7 @@ class ContainerTest extends TestCase
         $this->assertInstanceOf('Symfony\Bundle\DoctrineBundle\CacheWarmer\ProxyCacheWarmer', $container->get('doctrine.orm.proxy_cache_warmer'));
 
         $this->assertSame($container->get('my.platform'), $container->get('doctrine.dbal.default_connection')->getDatabasePlatform());
+
+        $this->assertTrue(Type::hasType('test'));
     }
 }

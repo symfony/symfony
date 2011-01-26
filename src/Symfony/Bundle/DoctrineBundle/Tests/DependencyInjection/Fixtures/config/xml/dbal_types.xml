@@ -1,0 +1,14 @@
+<?xml version="1.0" ?>
+
+<container xmlns="http://www.symfony-project.org/schema/dic/services"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xmlns:doctrine="http://www.symfony-project.org/schema/dic/doctrine"
+    xsi:schemaLocation="http://www.symfony-project.org/schema/dic/services http://www.symfony-project.org/schema/dic/services/services-1.0.xsd
+                        http://www.symfony-project.org/schema/dic/doctrine http://www.symfony-project.org/schema/dic/doctrine/doctrine-1.0.xsd">
+
+    <doctrine:dbal>
+        <doctrine:types>
+            <doctrine:type name="test" class="Symfony\Bundle\DoctrineBundle\Tests\DependencyInjection\TestType" />
+        </doctrine:types>
+    </doctrine:dbal>
+</container>

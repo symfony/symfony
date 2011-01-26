@@ -10,6 +10,7 @@
     <xsd:complexType name="dbal">
         <xsd:all>
             <xsd:element name="connections" type="connections" minOccurs="0" maxOccurs="1" />
+            <xsd:element name="types" type="types" minOccurs="0" maxOccurs="1" />
         </xsd:all>
 
         <xsd:attribute name="default-connection" type="xsd:string" />
@@ -34,6 +35,17 @@
         <xsd:choice minOccurs="1" maxOccurs="unbounded">
             <xsd:element name="connection" type="connection" />
         </xsd:choice>
+    </xsd:complexType>
+
+    <xsd:complexType name="types">
+        <xsd:choice minOccurs="1" maxOccurs="unbounded">
+            <xsd:element name="type" type="type" />
+        </xsd:choice>
+    </xsd:complexType>
+
+    <xsd:complexType name="type">
+        <xsd:attribute name="name" type="xsd:string" use="required" />
+        <xsd:attribute name="class" type="xsd:string" use="required" />
     </xsd:complexType>
 
     <xsd:complexType name="connection">

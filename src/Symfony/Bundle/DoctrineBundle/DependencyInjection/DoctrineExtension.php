@@ -48,6 +48,7 @@ class DoctrineExtension extends AbstractDoctrineExtension
 
         $container->setAlias('database_connection', sprintf('doctrine.dbal.%s_connection', $config['default_connection']));
         $container->setParameter('doctrine.dbal.default_connection', $config['default_connection']);
+        $container->setParameter('doctrine.dbal.types', $config['types']);
 
         foreach ($config['connections'] as $name => $connection) {
             $this->loadDbalConnection($connection, $container);
@@ -91,6 +92,7 @@ class DoctrineExtension extends AbstractDoctrineExtension
         );
         $mergedConfig = array(
             'default_connection'  => 'default',
+            'types' => array(),
         );
         $connectionDefaults = array(
             'driver' => array(
@@ -111,6 +113,20 @@ class DoctrineExtension extends AbstractDoctrineExtension
                 $mergedConfig['default_connection'] = $config['default-connection'];
             } else if (isset($config['default_connection'])) {
                 $mergedConfig['default_connection'] = $config['default_connection'];
+            }
+
+            // Handle DBAL Types
+            if (isset($config['types'])) {
+                if (isset($config['types']['type'][0])) {
+                    $config['types'] = $config['types']['type'];
+                }
+                foreach ($config['types'] AS $name => $type) {
+                    if (is_array($type) && isset($type['name']) && isset($type['class'])) { // xml case
+                        $mergedConfig['types'][$type['name']] = $type['class'];
+                    } else { // yml case
+                        $mergedConfig['types'][$name] = $type;
+                    }
+                }
             }
         }
 
@@ -161,8 +177,9 @@ class DoctrineExtension extends AbstractDoctrineExtension
 
         $driverOptions = $connection['driver'];
 
-        $driverDef = new Definition('Doctrine\DBAL\DriverManager');
-        $driverDef->setFactoryMethod('getConnection');
+        $driverDef = new Definition('Doctrine\DBAL\Connection');
+        $driverDef->setFactoryService('doctrine.dbal.connection_factory');
+        $driverDef->setFactoryMethod('createConnection');
         $container->setDefinition(sprintf('doctrine.dbal.%s_connection', $connection['name']), $driverDef);
 
         // event manager

@@ -2,7 +2,7 @@
 
 namespace Symfony\Bundle\SecurityBundle\Security;
 
-use Symfony\Bundle\SecurityBundle\Security\FirewallMapInterface;
+use Symfony\Component\Security\Http\FirewallMapInterface;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\DependencyInjection\ContainerInterface;
 

@@ -12,7 +12,7 @@
 namespace Symfony\Tests\Component\Security\Acl\Domain;
 
 use Symfony\Component\Security\Acl\Domain\UserSecurityIdentity;
-use Symfony\Component\Security\Role\Role;
+use Symfony\Component\Security\Core\Role\Role;
 use Symfony\Component\Security\Acl\Domain\RoleSecurityIdentity;
 
 class RoleSecurityIdentityTest extends \PHPUnit_Framework_TestCase

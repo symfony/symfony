@@ -17,7 +17,7 @@ use Symfony\Component\Security\Acl\Exception\AclNotFoundException;
 use Symfony\Component\Security\Acl\Domain\RoleSecurityIdentity;
 use Symfony\Component\Security\Acl\Domain\UserSecurityIdentity;
 use Symfony\Component\Security\Acl\Domain\ObjectIdentity;
-use Symfony\Component\Security\Authorization\Voter\VoterInterface;
+use Symfony\Component\Security\Core\Authorization\Voter\VoterInterface;
 use Symfony\Component\Security\Acl\Voter\AclVoter;
 
 class AclVoterTest extends \PHPUnit_Framework_TestCase
@@ -363,7 +363,7 @@ class AclVoterTest extends \PHPUnit_Framework_TestCase
 
     protected function getToken()
     {
-        return $this->getMock('Symfony\Component\Security\Authentication\Token\TokenInterface');
+        return $this->getMock('Symfony\Component\Security\Core\Authentication\Token\TokenInterface');
     }
 
     protected function getVoter($allowIfObjectIdentityUnavailable = true)

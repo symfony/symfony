@@ -12,7 +12,7 @@
 namespace Symfony\Bundle\SecurityBundle\Templating\Helper;
 
 use Symfony\Component\Templating\Helper\Helper;
-use Symfony\Component\Security\SecurityContext;
+use Symfony\Component\Security\Core\SecurityContext;
 
 /**
  * SecurityHelper provides read-only access to the security context.

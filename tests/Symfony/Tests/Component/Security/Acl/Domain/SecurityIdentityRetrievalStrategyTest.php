@@ -25,7 +25,7 @@ class SecurityIdentityRetrievalStrategyTest extends \PHPUnit_Framework_TestCase
         $strategy = $this->getStrategy($roles, $authenticationStatus);
 
         if ('anonymous' === $authenticationStatus) {
-            $token = $this->getMockBuilder('Symfony\Component\Security\Authentication\Token\AnonymousToken')
+            $token = $this->getMockBuilder('Symfony\Component\Security\Core\Authentication\Token\AnonymousToken')
                                 ->disableOriginalConstructor()
                                 ->getMock();
         } else {
@@ -34,7 +34,7 @@ class SecurityIdentityRetrievalStrategyTest extends \PHPUnit_Framework_TestCase
                 $class = 'MyCustomTokenImpl';
             }
 
-            $token = $this->getMockBuilder('Symfony\Component\Security\Authentication\Token\TokenInterface')
+            $token = $this->getMockBuilder('Symfony\Component\Security\Core\Authentication\Token\TokenInterface')
                         ->setMockClassName($class)
                         ->getMock();
         }
@@ -109,7 +109,7 @@ class SecurityIdentityRetrievalStrategyTest extends \PHPUnit_Framework_TestCase
 
     protected function getAccount($username, $class)
     {
-        $account = $this->getMock('Symfony\Component\Security\User\AccountInterface', array(), array(), $class);
+        $account = $this->getMock('Symfony\Component\Security\Core\User\AccountInterface', array(), array(), $class);
         $account
             ->expects($this->any())
             ->method('getUsername')
@@ -122,7 +122,7 @@ class SecurityIdentityRetrievalStrategyTest extends \PHPUnit_Framework_TestCase
 
     protected function getStrategy(array $roles = array(), $authenticationStatus = 'fullFledged')
     {
-        $roleHierarchy = $this->getMock('Symfony\Component\Security\Role\RoleHierarchyInterface');
+        $roleHierarchy = $this->getMock('Symfony\Component\Security\Core\Role\RoleHierarchyInterface');
         $roleHierarchy
             ->expects($this->once())
             ->method('getReachableRoles')
@@ -130,7 +130,7 @@ class SecurityIdentityRetrievalStrategyTest extends \PHPUnit_Framework_TestCase
             ->will($this->returnValue($roles))
         ;
 
-        $trustResolver = $this->getMock('Symfony\Component\Security\Authentication\AuthenticationTrustResolver', array(), array('', ''));
+        $trustResolver = $this->getMock('Symfony\Component\Security\Core\Authentication\AuthenticationTrustResolver', array(), array('', ''));
 
         $trustResolver
             ->expects($this->at(0))

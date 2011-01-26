@@ -11,14 +11,14 @@
 
 namespace Symfony\Component\Security\Acl\Domain;
 
-use Symfony\Component\Security\Authentication\Token\AnonymousToken;
+use Symfony\Component\Security\Core\Authentication\Token\AnonymousToken;
 
-use Symfony\Component\Security\User\AccountInterface;
-use Symfony\Component\Security\Authentication\Token\TokenInterface;
+use Symfony\Component\Security\Core\User\AccountInterface;
+use Symfony\Component\Security\Core\Authentication\Token\TokenInterface;
 use Symfony\Component\Security\Acl\Model\SecurityIdentityRetrievalStrategyInterface;
-use Symfony\Component\Security\Authentication\AuthenticationTrustResolver;
-use Symfony\Component\Security\Role\RoleHierarchyInterface;
-use Symfony\Component\Security\Authorization\Voter\AuthenticatedVoter;
+use Symfony\Component\Security\Core\Authentication\AuthenticationTrustResolver;
+use Symfony\Component\Security\Core\Role\RoleHierarchyInterface;
+use Symfony\Component\Security\Core\Authorization\Voter\AuthenticatedVoter;
 
 /**
  * Strategy for retrieving security identities

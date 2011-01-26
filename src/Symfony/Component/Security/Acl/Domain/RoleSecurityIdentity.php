@@ -12,7 +12,7 @@
 namespace Symfony\Component\Security\Acl\Domain;
 
 use Symfony\Component\Security\Acl\Model\SecurityIdentityInterface;
-use Symfony\Component\Security\Role\Role;
+use Symfony\Component\Security\Core\Role\Role;
 
 /**
  * A SecurityIdentity implementation for roles

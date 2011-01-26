@@ -11,10 +11,10 @@
 
 namespace Symfony\Bundle\DoctrineMongoDBBundle\Security;
 
-use Symfony\Component\Security\User\AccountInterface;
-use Symfony\Component\Security\User\UserProviderInterface;
-use Symfony\Component\Security\Exception\UnsupportedAccountException;
-use Symfony\Component\Security\Exception\UsernameNotFoundException;
+use Symfony\Component\Security\Core\User\AccountInterface;
+use Symfony\Component\Security\Core\User\UserProviderInterface;
+use Symfony\Component\Security\Core\Exception\UnsupportedAccountException;
+use Symfony\Component\Security\Core\Exception\UsernameNotFoundException;
 
 class DocumentUserProvider implements UserProviderInterface
 {

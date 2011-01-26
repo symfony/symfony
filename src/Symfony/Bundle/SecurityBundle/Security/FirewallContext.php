@@ -2,7 +2,7 @@
 
 namespace Symfony\Bundle\SecurityBundle\Security;
 
-use Symfony\Bundle\SecurityBundle\Security\Firewall\ExceptionListener;
+use Symfony\Component\Security\Http\Firewall\ExceptionListener;
 
 /**
  * This is a wrapper around the actual firewall configuration which allows us

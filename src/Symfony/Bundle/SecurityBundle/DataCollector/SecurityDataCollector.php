@@ -11,7 +11,7 @@
 
 namespace Symfony\Bundle\SecurityBundle\DataCollector;
 
-use Symfony\Component\Security\SecurityContext;
+use Symfony\Component\Security\Core\SecurityContext;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 

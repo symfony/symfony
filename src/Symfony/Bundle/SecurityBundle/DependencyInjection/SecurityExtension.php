@@ -596,7 +596,7 @@ class SecurityExtension extends Extension
             $userId = $name.'_'.md5(serialize(array($username, $user['password'], $user['roles'])));
 
             $container
-                ->register($userId, 'Symfony\Component\Security\User\User')
+                ->register($userId, 'Symfony\Component\Security\Core\User\User')
                 ->setArguments(array($username, $user['password'], $user['roles']))
                 ->setPublic(false)
             ;

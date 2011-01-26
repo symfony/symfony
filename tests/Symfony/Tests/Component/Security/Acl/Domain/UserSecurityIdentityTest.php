@@ -34,7 +34,7 @@ class UserSecurityIdentityTest extends \PHPUnit_Framework_TestCase
 
     public function getCompareData()
     {
-        $account = $this->getMockBuilder('Symfony\Component\Security\User\AccountInterface')
+        $account = $this->getMockBuilder('Symfony\Component\Security\Core\User\AccountInterface')
                             ->setMockClassName('USI_AccountImpl')
                             ->getMock();
         $account
@@ -43,7 +43,7 @@ class UserSecurityIdentityTest extends \PHPUnit_Framework_TestCase
             ->will($this->returnValue('foo'))
         ;
 
-        $token = $this->getMock('Symfony\Component\Security\Authentication\Token\TokenInterface');
+        $token = $this->getMock('Symfony\Component\Security\Core\Authentication\Token\TokenInterface');
         $token
             ->expects($this->any())
             ->method('getUser')

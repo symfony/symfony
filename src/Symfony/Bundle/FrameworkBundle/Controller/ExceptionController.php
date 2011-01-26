@@ -74,7 +74,7 @@ class ExceptionController extends ContainerAware
     protected function getStatusCode(FlattenException $exception)
     {
         switch ($exception->getClass()) {
-            case 'Symfony\Component\Security\Exception\AccessDeniedException':
+            case 'Symfony\Component\Security\Core\Exception\AccessDeniedException':
                 return 403;
             case 'Symfony\Component\HttpKernel\Exception\NotFoundHttpException':
                 return 404;

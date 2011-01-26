@@ -11,7 +11,7 @@
 
 namespace Symfony\Bundle\SecurityBundle\Twig\Extension;
 
-use Symfony\Component\Security\SecurityContext;
+use Symfony\Component\Security\Core\SecurityContext;
 
 /**
  * SecurityExtension exposes security context features.

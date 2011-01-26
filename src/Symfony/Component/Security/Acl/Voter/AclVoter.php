@@ -21,9 +21,9 @@ use Symfony\Component\Security\Acl\Model\AclProviderInterface;
 use Symfony\Component\Security\Acl\Permission\PermissionMapInterface;
 use Symfony\Component\Security\Acl\Model\SecurityIdentityRetrievalStrategyInterface;
 use Symfony\Component\Security\Acl\Model\ObjectIdentityRetrievalStrategyInterface;
-use Symfony\Component\Security\Authentication\Token\TokenInterface;
-use Symfony\Component\Security\Authorization\Voter\VoterInterface;
-use Symfony\Component\Security\Role\RoleHierarchyInterface;
+use Symfony\Component\Security\Core\Authentication\Token\TokenInterface;
+use Symfony\Component\Security\Core\Authorization\Voter\VoterInterface;
+use Symfony\Component\Security\Core\Role\RoleHierarchyInterface;
 
 /**
  * This voter can be used as a base class for implementing your own permissions.

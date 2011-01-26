@@ -135,7 +135,7 @@ class ChoiceField extends HybridField
     /**
      * Returns a new field of type radio button or checkbox.
      *
-     * @param string $key      The key for the option
+     * @param string $choice   The key for the option
      * @param string $label    The label for the option
      */
     protected function newChoiceField($choice, $label)

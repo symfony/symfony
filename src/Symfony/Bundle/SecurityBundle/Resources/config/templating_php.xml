@@ -5,7 +5,7 @@
     xsi:schemaLocation="http://www.symfony-project.org/schema/dic/services http://www.symfony-project.org/schema/dic/services/services-1.0.xsd">
 
     <parameters>
-        <parameter key="templating.helper.security.class">Symfony\Bundle\FrameworkBundle\Templating\Helper\SecurityHelper</parameter>
+        <parameter key="templating.helper.security.class">Symfony\Bundle\SecurityBundle\Templating\Helper\SecurityHelper</parameter>
     </parameters>
 
     <services>

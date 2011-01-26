@@ -58,6 +58,8 @@ class SecurityExtension extends Extension
         if (!$container->hasDefinition('security.context')) {
             $loader = new XmlFileLoader($container, array(__DIR__.'/../Resources/config', __DIR__.'/Resources/config'));
             $loader->load('security.xml');
+            $loader->load('templating_php.xml');
+            $loader->load('templating_twig.xml');
         }
 
         if (isset($config['access-denied-url'])) {

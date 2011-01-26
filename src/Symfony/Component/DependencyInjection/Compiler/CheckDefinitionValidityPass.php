@@ -12,7 +12,7 @@ use Symfony\Component\DependencyInjection\ContainerBuilder;
  * Later passes can rely on the following, and specifically do not need to
  * perform these checks themself:
  *
- * - non synthetic services always have a class set
+ * - non synthetic, non abstract services always have a class set
  * - synthetic services are always public
  * - synthetic services are always of non-prototype scope
  *
@@ -39,8 +39,8 @@ class CheckDefinitionValidityPass implements CompilerPassInterface
                 ));
             }
 
-            // non-synthetic service has class
-            if (!$definition->isSynthetic() && !$definition->getClass()) {
+            // non-synthetic, non-abstract service has class
+            if (!$definition->isAbstract() && !$definition->isSynthetic() && !$definition->getClass()) {
                 if ($definition->getFactoryService()) {
                     throw new \RuntimeException(sprintf(
                         'Please add the class to service "%s" even if it is constructed '
@@ -52,8 +52,9 @@ class CheckDefinitionValidityPass implements CompilerPassInterface
 
                 throw new \RuntimeException(sprintf(
                     'The definition for "%s" has no class. If you intend to inject '
-                   .'this service dynamically at runtime, please mark it as synthetic=true, '
-                   .'otherwise specify a class to get rid of this error.',
+                   .'this service dynamically at runtime, please mark it as synthetic=true. '
+                   .'If this is an abstract definition solely used by child definitions, '
+                   .'please add abstract=true, otherwise specify a class to get rid of this error.',
                    $id
                 ));
             }

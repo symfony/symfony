@@ -57,4 +57,9 @@ class RepeatedPass implements CompilerPassInterface
     {
         $this->repeat = true;
     }
+
+    public function getPasses()
+    {
+        return $this->passes;
+    }
 }

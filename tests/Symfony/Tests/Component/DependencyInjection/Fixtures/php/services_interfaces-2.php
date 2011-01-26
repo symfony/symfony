@@ -23,21 +23,6 @@ class ProjectServiceContainer extends Container
     }
 
     /**
-     * Gets the 'barfactory' service.
-     *
-     * This service is shared.
-     * This method always returns the same instance of the service.
-     *
-     * @return BarClassFactory A BarClassFactory instance.
-     */
-    protected function getBarfactoryService()
-    {
-        return $this->services['barfactory'] = new \BarClassFactory();
-
-        $this->applyInterfaceInjectors($instance);
-    }
-
-    /**
      * Gets the 'bar' service.
      *
      * This service is shared.
@@ -48,6 +33,21 @@ class ProjectServiceContainer extends Container
     protected function getBarService()
     {
         return $this->services['bar'] = $this->get('barFactory')->createBarClass();
+
+        $this->applyInterfaceInjectors($instance);
+    }
+
+    /**
+     * Gets the 'barfactory' service.
+     *
+     * This service is shared.
+     * This method always returns the same instance of the service.
+     *
+     * @return BarClassFactory A BarClassFactory instance.
+     */
+    protected function getBarfactoryService()
+    {
+        return $this->services['barfactory'] = new \BarClassFactory();
 
         $this->applyInterfaceInjectors($instance);
     }

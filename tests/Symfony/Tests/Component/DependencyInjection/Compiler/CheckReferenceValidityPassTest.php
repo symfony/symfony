@@ -2,12 +2,12 @@
 
 namespace Symfony\Tests\Component\DependencyInjection\Compiler;
 
-use Symfony\Component\DependencyInjection\Compiler\CheckReferenceScopePass;
+use Symfony\Component\DependencyInjection\Compiler\CheckReferenceValidityPass;
 use Symfony\Component\DependencyInjection\ContainerInterface;
 use Symfony\Component\DependencyInjection\Reference;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 
-class CheckReferenceScopePassTest extends \PHPUnit_Framework_TestCase
+class CheckReferenceValidityPassTest extends \PHPUnit_Framework_TestCase
 {
     public function testProcessIgnoresScopeWideningIfNonStrictReference()
     {
@@ -57,6 +57,19 @@ class CheckReferenceScopePassTest extends \PHPUnit_Framework_TestCase
         $this->process($container);
     }
 
+    /**
+     * @expectedException \RuntimeException
+     */
+    public function testProcessDetectsReferenceToAbstractDefinition()
+    {
+        $container = new ContainerBuilder();
+
+        $container->register('a')->setAbstract(true);
+        $container->register('b')->addArgument(new Reference('a'));
+
+        $this->process($container);
+    }
+
     public function testProcess()
     {
         $container = new ContainerBuilder();
@@ -68,7 +81,7 @@ class CheckReferenceScopePassTest extends \PHPUnit_Framework_TestCase
 
     protected function process(ContainerBuilder $container)
     {
-        $pass = new CheckReferenceScopePass();
+        $pass = new CheckReferenceValidityPass();
         $pass->process($container);
     }
 }

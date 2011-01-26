@@ -26,7 +26,7 @@ class ResolveInterfaceInjectorsPass implements CompilerPassInterface
     public function process(ContainerBuilder $container)
     {
         foreach ($container->getDefinitions() as $definition) {
-            if ($definition->isSynthetic()) {
+            if (!$definition->getClass()) {
                 continue;
             }
 

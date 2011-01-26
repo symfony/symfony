@@ -50,6 +50,10 @@ class AnalyzeServiceReferencesPass implements RepeatablePassInterface
         $this->graph->clear();
 
         foreach ($container->getDefinitions() as $id => $definition) {
+            if ($definition->isSynthetic() || $definition->isAbstract()) {
+                continue;
+            }
+
             $this->currentId = $id;
             $this->currentDefinition = $definition;
             $this->processArguments($definition->getArguments());

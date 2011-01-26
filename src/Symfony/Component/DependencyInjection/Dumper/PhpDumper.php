@@ -494,7 +494,9 @@ EOF;
     protected function addServices()
     {
         $publicServices = $privateServices = $aliasServices = '';
-        foreach ($this->container->getDefinitions() as $id => $definition) {
+        $definitions = $this->container->getDefinitions();
+        ksort($definitions);
+        foreach ($definitions as $id => $definition) {
             if ($definition->isPublic()) {
                 $publicServices .= $this->addService($id, $definition);
             } else {
@@ -502,7 +504,9 @@ EOF;
             }
         }
 
-        foreach ($this->container->getAliases() as $alias => $id) {
+        $aliases = $this->container->getAliases();
+        ksort($aliases);
+        foreach ($aliases as $alias => $id) {
             $aliasServices .= $this->addServiceAlias($alias, $id);
         }
 

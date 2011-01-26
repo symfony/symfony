@@ -42,6 +42,7 @@ class PassConfig
         $this->beforeRemovingPasses = array();
 
         $this->optimizationPasses = array(
+            new ResolveDefinitionTemplatesPass(),
             new ResolveParameterPlaceHoldersPass(),
             new CheckDefinitionValidityPass(),
             new ResolveReferencesToAliasesPass(),
@@ -49,11 +50,12 @@ class PassConfig
             new ResolveInvalidReferencesPass(),
             new AnalyzeServiceReferencesPass(true),
             new CheckCircularReferencesPass(),
-            new CheckReferenceScopePass(),
+            new CheckReferenceValidityPass(),
         );
 
         $this->removingPasses = array(
             new RemovePrivateAliasesPass(),
+            new RemoveAbstractDefinitionsPass(),
             new ReplaceAliasByActualDefinitionPass(),
             new RepeatedPass(array(
                 new AnalyzeServiceReferencesPass(),
@@ -87,6 +89,11 @@ class PassConfig
         $passes[] = $pass;
     }
 
+    public function getAfterRemovingPasses()
+    {
+        return $this->afterRemovingPasses;
+    }
+
     public function getBeforeOptimizationPasses()
     {
         return $this->beforeOptimizationPasses;
@@ -115,6 +122,11 @@ class PassConfig
     public function setMergePass(CompilerPassInterface $pass)
     {
         $this->mergePass = $pass;
+    }
+
+    public function setAfterRemovingPasses(array $passes)
+    {
+        $this->afterRemovingPasses = $passes;
     }
 
     public function setBeforeOptimizationPasses(array $passes)

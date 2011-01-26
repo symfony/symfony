@@ -23,22 +23,6 @@ class ProjectServiceContainer extends Container
     }
 
     /**
-     * Gets the 'foo' service.
-     *
-     * @return FooClass A FooClass instance.
-     */
-    protected function getFooService()
-    {
-        $instance = call_user_func(array('FooClass', 'getInstance'), 'foo', $this->get('foo.baz'), array($this->getParameter('foo') => 'foo is '.$this->getParameter('foo'), 'bar' => $this->getParameter('foo')), true, $this);
-
-        $instance->setBar($this->get('bar'));
-        $instance->initialize();
-        sc_configure($instance);
-
-        return $instance;
-    }
-
-    /**
      * Gets the 'bar' service.
      *
      * This service is shared.
@@ -51,6 +35,35 @@ class ProjectServiceContainer extends Container
         $this->services['bar'] = $instance = new \FooClass('foo', $this->get('foo.baz'), $this->getParameter('foo_bar'));
 
         $this->get('foo.baz')->configure($instance);
+
+        return $instance;
+    }
+
+    /**
+     * Gets the 'factory_service' service.
+     *
+     * This service is shared.
+     * This method always returns the same instance of the service.
+     *
+     * @return Object An instance returned by foo.baz::getInstance().
+     */
+    protected function getFactoryServiceService()
+    {
+        return $this->services['factory_service'] = $this->get('foo.baz')->getInstance();
+    }
+
+    /**
+     * Gets the 'foo' service.
+     *
+     * @return FooClass A FooClass instance.
+     */
+    protected function getFooService()
+    {
+        $instance = call_user_func(array('FooClass', 'getInstance'), 'foo', $this->get('foo.baz'), array($this->getParameter('foo') => 'foo is '.$this->getParameter('foo'), 'bar' => $this->getParameter('foo')), true, $this);
+
+        $instance->setBar($this->get('bar'));
+        $instance->initialize();
+        sc_configure($instance);
 
         return $instance;
     }
@@ -110,19 +123,6 @@ class ProjectServiceContainer extends Container
         }
 
         return $instance;
-    }
-
-    /**
-     * Gets the 'factory_service' service.
-     *
-     * This service is shared.
-     * This method always returns the same instance of the service.
-     *
-     * @return Object An instance returned by foo.baz::getInstance().
-     */
-    protected function getFactoryServiceService()
-    {
-        return $this->services['factory_service'] = $this->get('foo.baz')->getInstance();
     }
 
     /**

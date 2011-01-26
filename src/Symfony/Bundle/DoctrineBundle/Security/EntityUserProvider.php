@@ -65,6 +65,6 @@ class EntityUserProvider implements UserProviderInterface
             throw new UnsupportedAccountException(sprintf('Instances of "%s" are not supported.', get_class($account)));
         }
 
-        return $this->loadUserByUsername((string) $account);
+        return $this->loadUserByUsername($account->getUsername());
     }
 }

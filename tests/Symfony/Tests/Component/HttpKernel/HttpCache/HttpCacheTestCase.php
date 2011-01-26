@@ -9,16 +9,16 @@
  * file that was distributed with this source code.
  */
 
-namespace Symfony\Tests\Component\HttpKernel\Cache;
+namespace Symfony\Tests\Component\HttpKernel\HttpCache;
 
 require_once __DIR__.'/TestHttpKernel.php';
 
 use Symfony\Component\HttpFoundation\Request;
-use Symfony\Component\HttpKernel\Cache\Cache;
-use Symfony\Component\HttpKernel\Cache\Store;
+use Symfony\Component\HttpKernel\HttpCache\HttpCache;
+use Symfony\Component\HttpKernel\HttpCache\Store;
 use Symfony\Component\HttpKernel\HttpKernelInterface;
 
-class CacheTestCase extends \PHPUnit_Framework_TestCase
+class HttpCacheTestCase extends \PHPUnit_Framework_TestCase
 {
     protected $kernel;
     protected $cache;
@@ -112,7 +112,7 @@ class CacheTestCase extends \PHPUnit_Framework_TestCase
         $this->store = new Store(sys_get_temp_dir().'/http_cache');
 
         $this->cacheConfig['debug'] = true;
-        $this->cache = new Cache($this->kernel, $this->store, null, $this->cacheConfig);
+        $this->cache = new HttpCache($this->kernel, $this->store, null, $this->cacheConfig);
         $this->request = Request::create($uri, $method, array(), $cookies, array(), $server);
 
         $this->response = $this->cache->handle($this->request, HttpKernelInterface::MASTER_REQUEST, $this->catch);

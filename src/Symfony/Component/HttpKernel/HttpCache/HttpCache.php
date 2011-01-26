@@ -13,7 +13,7 @@
  * file that was distributed with this source code.
  */
 
-namespace Symfony\Component\HttpKernel\Cache;
+namespace Symfony\Component\HttpKernel\HttpCache;
 
 use Symfony\Component\HttpKernel\HttpKernelInterface;
 use Symfony\Component\HttpFoundation\Request;
@@ -24,7 +24,7 @@ use Symfony\Component\HttpFoundation\Response;
  *
  * @author Fabien Potencier <fabien.potencier@symfony-project.com>
  */
-class Cache implements HttpKernelInterface
+class HttpCache implements HttpKernelInterface
 {
     protected $kernel;
     protected $traces;

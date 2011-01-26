@@ -9,9 +9,9 @@
  * file that was distributed with this source code.
  */
 
-namespace Symfony\Tests\Component\HttpKernel\Cache;
+namespace Symfony\Tests\Component\HttpKernel\HttpCache;
 
-use Symfony\Component\HttpKernel\Cache\Esi;
+use Symfony\Component\HttpKernel\HttpCache\Esi;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 
@@ -182,7 +182,7 @@ class EsiTest extends \PHPUnit_Framework_TestCase
 
     protected function getCache($request, $response)
     {
-        $cache = $this->getMock('Symfony\Component\HttpKernel\Cache\Cache', array('getRequest', 'handle'), array(), '', false);
+        $cache = $this->getMock('Symfony\Component\HttpKernel\HttpCache\HttpCache', array('getRequest', 'handle'), array(), '', false);
         $cache->expects($this->any())
               ->method('getRequest')
               ->will($this->returnValue($request))

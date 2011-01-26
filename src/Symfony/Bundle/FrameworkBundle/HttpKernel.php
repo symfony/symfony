@@ -69,7 +69,7 @@ class HttpKernel extends BaseHttpKernel
      * Renders a Controller and returns the Response content.
      *
      * Note that this method generates an esi:include tag only when both the standalone
-     * option is set to true and the request has ESI capability (@see Symfony\Component\HttpKernel\Cache\ESI).
+     * option is set to true and the request has ESI capability (@see Symfony\Component\HttpKernel\HttpCache\ESI).
      *
      * Available options:
      *

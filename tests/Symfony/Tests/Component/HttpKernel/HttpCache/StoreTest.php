@@ -9,15 +9,15 @@
  * file that was distributed with this source code.
  */
 
-namespace Symfony\Tests\Component\HttpKernel\Cache;
+namespace Symfony\Tests\Component\HttpKernel\HttpCache;
 
-require_once __DIR__.'/CacheTestCase.php';
+require_once __DIR__.'/HttpCacheTestCase.php';
 
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
-use Symfony\Component\HttpKernel\Cache\Store;
+use Symfony\Component\HttpKernel\HttpCache\Store;
 
-class CacheStoreTest extends \PHPUnit_Framework_TestCase
+class StoreTest extends \PHPUnit_Framework_TestCase
 {
     protected $request;
     protected $response;
@@ -28,7 +28,7 @@ class CacheStoreTest extends \PHPUnit_Framework_TestCase
         $this->request = Request::create('/');
         $this->response = new Response('hello world', 200, array());
 
-        CacheTestCase::clearDirectory(sys_get_temp_dir().'/http_cache');
+        HttpCacheTestCase::clearDirectory(sys_get_temp_dir().'/http_cache');
 
         $this->store = new Store(sys_get_temp_dir().'/http_cache');
     }
@@ -37,7 +37,7 @@ class CacheStoreTest extends \PHPUnit_Framework_TestCase
     {
         $this->store = null;
 
-        CacheTestCase::clearDirectory(sys_get_temp_dir().'/http_cache');
+        HttpCacheTestCase::clearDirectory(sys_get_temp_dir().'/http_cache');
     }
 
     public function testReadsAnEmptyArrayWithReadWhenNothingCachedAtKey()

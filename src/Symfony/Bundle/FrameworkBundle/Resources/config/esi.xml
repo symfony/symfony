@@ -5,8 +5,8 @@
     xsi:schemaLocation="http://www.symfony-project.org/schema/dic/services http://www.symfony-project.org/schema/dic/services/services-1.0.xsd">
 
     <parameters>
-        <parameter key="esi.class">Symfony\Component\HttpKernel\Cache\Esi</parameter>
-        <parameter key="esi_listener.class">Symfony\Component\HttpKernel\Cache\EsiListener</parameter>
+        <parameter key="esi.class">Symfony\Component\HttpKernel\HttpCache\Esi</parameter>
+        <parameter key="esi_listener.class">Symfony\Component\HttpKernel\HttpCache\EsiListener</parameter>
     </parameters>
 
     <services>

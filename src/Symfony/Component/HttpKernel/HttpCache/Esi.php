@@ -9,7 +9,7 @@
  * file that was distributed with this source code.
  */
 
-namespace Symfony\Component\HttpKernel\Cache;
+namespace Symfony\Component\HttpKernel\HttpCache;
 
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
@@ -167,12 +167,12 @@ class Esi
     /**
      * Handles an ESI from the cache.
      *
-     * @param Cache   $cache        A Cache instance
-     * @param string  $uri          The main URI
-     * @param string  $alt          An alternative URI
-     * @param Boolean $ignoreErrors Whether to ignore errors or not
+     * @param HttpCache $cache        An HttpCache instance
+     * @param string    $uri          The main URI
+     * @param string    $alt          An alternative URI
+     * @param Boolean   $ignoreErrors Whether to ignore errors or not
      */
-    public function handle(Cache $cache, $uri, $alt, $ignoreErrors)
+    public function handle(HttpCache $cache, $uri, $alt, $ignoreErrors)
     {
         $subRequest = Request::create($uri, 'get', array(), $cache->getRequest()->cookies->all(), array(), $cache->getRequest()->server->all());
 

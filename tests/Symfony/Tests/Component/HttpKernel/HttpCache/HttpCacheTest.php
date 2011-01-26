@@ -9,11 +9,11 @@
  * file that was distributed with this source code.
  */
 
-namespace Symfony\Tests\Component\HttpKernel\Cache;
+namespace Symfony\Tests\Component\HttpKernel\HttpCache;
 
-require_once __DIR__.'/CacheTestCase.php';
+require_once __DIR__.'/HttpCacheTestCase.php';
 
-class CacheTest extends CacheTestCase
+class HttpCacheTest extends HttpCacheTestCase
 {
     public function testPassesOnNonGetHeadRequests()
     {

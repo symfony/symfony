@@ -42,6 +42,7 @@ class SwitchUserListener implements ListenerInterface
     protected $usernameParameter;
     protected $role;
     protected $logger;
+    protected $eventDispatcher;
 
     /**
      * Constructor.
@@ -71,6 +72,8 @@ class SwitchUserListener implements ListenerInterface
     public function register(EventDispatcherInterface $dispatcher)
     {
         $dispatcher->connect('core.security', array($this, 'handle'), 0);
+
+        $this->eventDispatcher = $dispatcher;
     }
 
     /**
@@ -145,6 +148,10 @@ class SwitchUserListener implements ListenerInterface
         $token = new UsernamePasswordToken($user, $user->getPassword(), $this->providerKey, $roles);
         $token->setImmutable(true);
 
+        if (null !== $this->eventDispatcher) {
+            $this->eventDispatcher->notify(new Event($this, 'security.switch_user', array('request' => $request, 'target_user' => $token->getUser())));
+        }
+
         return $token;
     }
 
@@ -159,6 +166,10 @@ class SwitchUserListener implements ListenerInterface
     {
         if (false === $original = $this->getOriginalToken($this->securityContext->getToken())) {
             throw new AuthenticationCredentialsNotFoundException(sprintf('Could not find original Token object.'));
+        }
+
+        if (null !== $this->eventDispatcher) {
+            $this->eventDispatcher->notify(new Event($this, 'security.switch_user', array('request' => $request, 'target_user' => $original->getUser())));
         }
 
         return $original;

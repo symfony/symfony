@@ -224,7 +224,9 @@ abstract class AbstractAuthenticationListener implements ListenerInterface
         $session->remove(SecurityContext::AUTHENTICATION_ERROR);
         $session->remove(SecurityContext::LAST_USERNAME);
 
-        $this->eventDispatcher->notify(new Event($this, 'security.login_success', array('request' => $request, 'token' => $token)));
+        if (null !== $this->eventDispatcher) {
+            $this->eventDispatcher->notify(new Event($this, 'security.interactive_login', array('request' => $request, 'token' => $token)));
+        }
 
         if (null !== $this->successHandler) {
             $response = $this->successHandler->onAuthenticationSuccess($request, $token);

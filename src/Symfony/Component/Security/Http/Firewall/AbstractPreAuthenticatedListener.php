@@ -33,6 +33,7 @@ abstract class AbstractPreAuthenticatedListener implements ListenerInterface
     protected $authenticationManager;
     protected $providerKey;
     protected $logger;
+    protected $eventDispatcher;
 
     public function __construct(SecurityContext $securityContext, AuthenticationManagerInterface $authenticationManager, $providerKey, LoggerInterface $logger = null)
     {
@@ -51,6 +52,8 @@ abstract class AbstractPreAuthenticatedListener implements ListenerInterface
     public function register(EventDispatcherInterface $dispatcher)
     {
         $dispatcher->connect('core.security', array($this, 'handle'), 0);
+
+        $this->eventDispatcher = $dispatcher;
     }
 
     /**
@@ -96,6 +99,10 @@ abstract class AbstractPreAuthenticatedListener implements ListenerInterface
                 $this->logger->debug(sprintf('Authentication success: %s', $token));
             }
             $this->securityContext->setToken($token);
+
+            if (null !== $this->eventDispatcher) {
+                $this->eventDispatcher->notify(new Event($this, 'security.interactive_login', array('request' => $request, 'token' => $token)));
+            }
         } catch (AuthenticationException $failed) {
             $this->securityContext->setToken(null);
 

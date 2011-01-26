@@ -35,6 +35,7 @@ class RememberMeListener implements ListenerInterface
     protected $authenticationManager;
     protected $logger;
     protected $lastState;
+    protected $eventDispatcher;
 
     /**
      * Constructor
@@ -62,6 +63,8 @@ class RememberMeListener implements ListenerInterface
     {
         $dispatcher->connect('core.security', array($this, 'checkCookies'), 0);
         $dispatcher->connect('core.response', array($this, 'updateCookies'), 0);
+
+        $this->eventDispatcher = $dispatcher;
     }
 
     /**
@@ -96,6 +99,10 @@ class RememberMeListener implements ListenerInterface
                 }
 
                 $this->securityContext->setToken($token);
+
+                if (null !== $this->eventDispatcher) {
+                    $this->eventDispatcher->notify(new Event($this, 'security.interactive_login', array('request' => $request, 'token' => $token)));
+                }
 
                 if (null !== $this->logger) {
                     $this->logger->debug('SecurityContext populated with remember-me token.');

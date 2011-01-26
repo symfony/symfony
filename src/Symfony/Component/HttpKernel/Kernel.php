@@ -138,19 +138,6 @@ abstract class Kernel implements KernelInterface
     }
 
     /**
-     * Reboots the kernel.
-     *
-     * This method is mainly useful when doing functional testing.
-     *
-     * It is a shortcut for the call to shutdown() and boot().
-     */
-    public function reboot()
-    {
-        $this->shutdown();
-        $this->boot();
-    }
-
-    /**
      * {@inheritdoc}
      */
     public function handle(Request $request, $type = HttpKernelInterface::MASTER_REQUEST, $catch = true)

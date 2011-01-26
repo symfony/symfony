@@ -629,7 +629,6 @@ interface KernelInterface extends HttpKernelInterface, \Serializable
     function registerContainerConfiguration(LoaderInterface $loader);
     function boot();
     function shutdown();
-    function reboot();
     function getBundles();
     function isClassInActiveBundle($class);
     function getBundle($name, $first = true);
@@ -725,11 +724,6 @@ abstract class Kernel implements KernelInterface
             $bundle->setContainer(null);
         }
         $this->container = null;
-    }
-    public function reboot()
-    {
-        $this->shutdown();
-        $this->boot();
     }
     public function handle(Request $request, $type = HttpKernelInterface::MASTER_REQUEST, $catch = true)
     {

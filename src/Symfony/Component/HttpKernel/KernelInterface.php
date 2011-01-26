@@ -66,15 +66,6 @@ interface KernelInterface extends HttpKernelInterface, \Serializable
     function shutdown();
 
     /**
-     * Reboots the kernel.
-     *
-     * This method is mainly useful when doing functional testing.
-     *
-     * It is a shortcut for the call to shutdown() and boot().
-     */
-    function reboot();
-
-    /**
      * Gets the registered bundle instances.
      *
      * @return array An array of registered bundle instances

@@ -131,12 +131,20 @@ abstract class DoctrineCommand extends Command
         return $entityManagers;
     }
 
+    protected function getDoctrineEntityManagers()
+    {
+        $entityManagerNames = $this->container->getParameter('doctrine.orm.entity_managers');
+        $entityManagers = array();
+        foreach ($entityManagerNames AS $entityManagerName) {
+            $em = $this->container->get(sprintf('doctrine.orm.%s_entity_manager', $entityManagerName));
+            $entityManagers[] = $em;
+        }
+        return $entityManagers;
+    }
+
     protected function getBundleMetadatas(Bundle $bundle)
     {
-        $tmp = dirname(str_replace('\\', '/', get_class($bundle)));
         $namespace = $bundle->getNamespace();
-        $class = basename($tmp);
-
         $bundleMetadatas = array();
         $entityManagers = $this->getDoctrineEntityManagers();
         foreach ($entityManagers as $key => $em) {
@@ -144,7 +152,6 @@ abstract class DoctrineCommand extends Command
             $cmf->setEntityManager($em);
             $metadatas = $cmf->getAllMetadata();
             foreach ($metadatas as $metadata) {
-
                 if (strpos($metadata->name, $namespace) === 0) {
                     $bundleMetadatas[$metadata->name] = $metadata;
                 }

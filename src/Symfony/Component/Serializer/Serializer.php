@@ -141,7 +141,7 @@ class Serializer implements SerializerInterface
     /**
      * {@inheritdoc}
      */
-    public function addEncoder($format, EncoderInterface $encoder)
+    public function setEncoder($format, EncoderInterface $encoder)
     {
         $this->encoders[$format] = $encoder;
         $encoder->setSerializer($this);

@@ -80,7 +80,7 @@ interface SerializerInterface
      * @param string $format format name
      * @param EncoderInterface $encoder
      */
-    function addEncoder($format, EncoderInterface $encoder);
+    function setEncoder($format, EncoderInterface $encoder);
 
     /**
      * @param string $format format name

@@ -42,14 +42,14 @@ class SerializerTest extends \PHPUnit_Framework_TestCase
 
     public function testSerializeScalar()
     {
-        $this->serializer->addEncoder('json', new JsonEncoder());
+        $this->serializer->setEncoder('json', new JsonEncoder());
         $result = $this->serializer->serialize('foo', 'json');
         $this->assertEquals('"foo"', $result);
     }
 
     public function testSerializeArrayOfScalars()
     {
-        $this->serializer->addEncoder('json', new JsonEncoder());
+        $this->serializer->setEncoder('json', new JsonEncoder());
         $data = array('foo', array(5, 3));
         $result = $this->serializer->serialize($data, 'json');
         $this->assertEquals(json_encode($data), $result);
@@ -57,7 +57,7 @@ class SerializerTest extends \PHPUnit_Framework_TestCase
 
     public function testEncode()
     {
-        $this->serializer->addEncoder('json', new JsonEncoder());
+        $this->serializer->setEncoder('json', new JsonEncoder());
         $data = array('foo', array(5, 3));
         $result = $this->serializer->encode($data, 'json');
         $this->assertEquals(json_encode($data), $result);
@@ -65,7 +65,7 @@ class SerializerTest extends \PHPUnit_Framework_TestCase
 
     public function testDecode()
     {
-        $this->serializer->addEncoder('json', new JsonEncoder());
+        $this->serializer->setEncoder('json', new JsonEncoder());
         $data = array('foo', array(5, 3));
         $result = $this->serializer->decode(json_encode($data), 'json');
         $this->assertEquals($data, $result);

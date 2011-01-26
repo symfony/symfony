@@ -9,14 +9,14 @@
  * file that was distributed with this source code.
  */
 
-namespace Symfony\Bundle\FrameworkBundle\Templating\Loader;
+namespace Symfony\Bundle\FrameworkBundle\Templating;
 
-use Symfony\Component\Templating\Loader\TemplateNameParser as BaseTemplateNameParser;
+use Symfony\Component\Templating\TemplateNameParser as BaseTemplateNameParser;
 use Symfony\Component\HttpKernel\KernelInterface;
 
 /**
  * TemplateNameParser parsers template name from the short notation
- * "bundle:section:template.renderer.format" to an array of
+ * "bundle:section:template.engine.format" to an array of
  * template parameters.
  *
  * @author Fabien Potencier <fabien.potencier@symfony-project.com>
@@ -40,14 +40,25 @@ class TemplateNameParser extends BaseTemplateNameParser
      */
     public function parse($name)
     {
+        if (is_array($name)) {
+            return $name;
+        }
+
+        // normalize name
+        $name = str_replace(':/' , ':', preg_replace('#/{2,}#', '/', strtr($name, '\\', '/')));
+
+        if (false !== strpos($name, '..')) {
+            throw new \RuntimeException(sprintf('Template name "%s" contains invalid characters.', $name));
+        }
+
         $parts = explode(':', $name);
         if (3 !== count($parts)) {
-            throw new \InvalidArgumentException(sprintf('Template name "%s" is not valid (format is "bundle:section:template.renderer.format").', $name));
+            throw new \InvalidArgumentException(sprintf('Template name "%s" is not valid (format is "bundle:section:template.engine.format").', $name));
         }
 
         $elements = explode('.', $parts[2]);
         if (3 !== count($elements)) {
-            throw new \InvalidArgumentException(sprintf('Template name "%s" is not valid (format is "bundle:section:template.renderer.format").', $name));
+            throw new \InvalidArgumentException(sprintf('Template name "%s" is not valid (format is "bundle:section:template.engine.format").', $name));
         }
 
         $parameters = array(
@@ -55,7 +66,7 @@ class TemplateNameParser extends BaseTemplateNameParser
             'controller' => $parts[1],
             'name'       => $elements[0],
             'format'     => $elements[1],
-            'renderer'   => $elements[2],
+            'engine'     => $elements[2],
         );
 
         if ($parameters['bundle']) {

@@ -12,6 +12,7 @@
 namespace Symfony\Bundle\TwigBundle\Loader;
 
 use Symfony\Bundle\FrameworkBundle\Templating\Loader\TemplateLocatorInterface;
+use Symfony\Component\Templating\TemplateNameParserInterface;
 
 /**
  * FilesystemLoader extends the default Twig filesystem loader
@@ -21,14 +22,20 @@ use Symfony\Bundle\FrameworkBundle\Templating\Loader\TemplateLocatorInterface;
  */
 class FilesystemLoader implements \Twig_LoaderInterface
 {
+    protected $locator;
+    protected $parser;
+    protected $cache;
+
     /**
      * Constructor.
      *
      * @param TemplateLocator $locator A TemplateLocator instance
      */
-    public function __construct(TemplateLocatorInterface $locator)
+    public function __construct(TemplateLocatorInterface $locator, TemplateNameParserInterface $parser)
     {
         $this->locator = $locator;
+        $this->parser = $parser;
+        $this->cache = array();
     }
 
     /**
@@ -68,10 +75,19 @@ class FilesystemLoader implements \Twig_LoaderInterface
 
     protected function findTemplate($name)
     {
+        if (!is_array($name)) {
+            $name = $this->parser->parse($name);
+        }
+
+        $key = md5(serialize($name));
+        if (isset($this->cache[$key])) {
+            return $this->cache[$key];
+        }
+
         if (false === $file = $this->locator->locate($name)) {
             throw new \Twig_Error_Loader(sprintf('Unable to find template "%s".', $name));
         }
 
-        return $file;
+        return $this->cache[$key] = $file;
     }
 }

@@ -18,7 +18,7 @@ use Symfony\Component\Templating\Loader\Loader;
 use Symfony\Component\Templating\Storage\Storage;
 use Symfony\Component\Templating\Storage\StringStorage;
 use Symfony\Component\Templating\Helper\SlotsHelper;
-use Symfony\Component\Templating\Loader\TemplateNameParser;
+use Symfony\Component\Templating\TemplateNameParser;
 
 class PhpEngineTest extends \PHPUnit_Framework_TestCase
 {
@@ -26,18 +26,18 @@ class PhpEngineTest extends \PHPUnit_Framework_TestCase
 
     public function setUp()
     {
-        $this->loader = new ProjectTemplateLoader(new TemplateNameParser());
+        $this->loader = new ProjectTemplateLoader();
     }
 
     public function testConstructor()
     {
-        $engine = new ProjectTemplateEngine($this->loader);
+        $engine = new ProjectTemplateEngine(new TemplateNameParser(), $this->loader);
         $this->assertEquals($this->loader, $engine->getLoader(), '__construct() takes a loader instance as its second first argument');
     }
 
     public function testOffsetGet()
     {
-        $engine = new ProjectTemplateEngine($this->loader);
+        $engine = new ProjectTemplateEngine(new TemplateNameParser(), $this->loader);
         $engine->set($helper = new \SimpleHelper('bar'), 'foo');
         $this->assertEquals($helper, $engine['foo'], '->offsetGet() returns the value of a helper');
 
@@ -52,7 +52,7 @@ class PhpEngineTest extends \PHPUnit_Framework_TestCase
 
     public function testGetSetHas()
     {
-        $engine = new ProjectTemplateEngine($this->loader);
+        $engine = new ProjectTemplateEngine(new TemplateNameParser(), $this->loader);
         $foo = new \SimpleHelper('foo');
         $engine->set($foo);
         $this->assertEquals($foo, $engine->get('foo'), '->set() sets a helper');
@@ -74,7 +74,7 @@ class PhpEngineTest extends \PHPUnit_Framework_TestCase
 
     public function testExtendRender()
     {
-        $engine = new ProjectTemplateEngine($this->loader, array(), array(new SlotsHelper()));
+        $engine = new ProjectTemplateEngine(new TemplateNameParser(), $this->loader, array(), array(new SlotsHelper()));
         try {
             $engine->render('name');
             $this->fail('->render() throws an InvalidArgumentException if the template does not exist');
@@ -83,13 +83,13 @@ class PhpEngineTest extends \PHPUnit_Framework_TestCase
             $this->assertEquals('The template "name" does not exist.', $e->getMessage(), '->render() throws an InvalidArgumentException if the template does not exist');
         }
 
-        $engine = new ProjectTemplateEngine($this->loader, array(new SlotsHelper()));
+        $engine = new ProjectTemplateEngine(new TemplateNameParser(), $this->loader, array(new SlotsHelper()));
         $engine->set(new \SimpleHelper('bar'));
         $this->loader->setTemplate('foo.php', '<?php $view->extend("layout.php"); echo $view[\'foo\'].$foo ?>');
         $this->loader->setTemplate('layout.php', '-<?php echo $view[\'slots\']->get("_content") ?>-');
         $this->assertEquals('-barfoo-', $engine->render('foo.php', array('foo' => 'foo')), '->render() uses the decorator to decorate the template');
 
-        $engine = new ProjectTemplateEngine($this->loader, array(new SlotsHelper()));
+        $engine = new ProjectTemplateEngine(new TemplateNameParser(), $this->loader, array(new SlotsHelper()));
         $engine->set(new \SimpleHelper('bar'));
         $this->loader->setTemplate('bar.php', 'bar');
         $this->loader->setTemplate('foo.php', '<?php $view->extend("layout.php"); echo $foo ?>');
@@ -99,7 +99,7 @@ class PhpEngineTest extends \PHPUnit_Framework_TestCase
 
     public function testEscape()
     {
-        $engine = new ProjectTemplateEngine($this->loader);
+        $engine = new ProjectTemplateEngine(new TemplateNameParser(), $this->loader);
         $this->assertEquals('&lt;br /&gt;', $engine->escape('<br />'), '->escape() escapes strings');
         $foo = new \stdClass();
         $this->assertEquals($foo, $engine->escape($foo), '->escape() does nothing on non strings');
@@ -107,7 +107,7 @@ class PhpEngineTest extends \PHPUnit_Framework_TestCase
 
     public function testGetSetCharset()
     {
-        $engine = new ProjectTemplateEngine($this->loader);
+        $engine = new ProjectTemplateEngine(new TemplateNameParser(), $this->loader);
         $this->assertEquals('UTF-8', $engine->getCharset(), '->getCharset() returns UTF-8 by default');
         $engine->setCharset('ISO-8859-1');
         $this->assertEquals('ISO-8859-1', $engine->getCharset(), '->setCharset() changes the default charset to use');
@@ -115,7 +115,7 @@ class PhpEngineTest extends \PHPUnit_Framework_TestCase
 
     public function testGlobalVariables()
     {
-        $engine = new ProjectTemplateEngine($this->loader);
+        $engine = new ProjectTemplateEngine(new TemplateNameParser(), $this->loader);
         $engine->addGlobal('global_variable', 'lorem ipsum');
 
         $this->assertEquals(array(
@@ -125,7 +125,7 @@ class PhpEngineTest extends \PHPUnit_Framework_TestCase
 
     public function testGlobalsGetPassedToTemplate()
     {
-        $engine = new ProjectTemplateEngine($this->loader);
+        $engine = new ProjectTemplateEngine(new TemplateNameParser(), $this->loader);
         $engine->addGlobal('global', 'global variable');
 
         $this->loader->setTemplate('global.php', '<?php echo $global; ?>');
@@ -150,13 +150,13 @@ class ProjectTemplateLoader extends Loader
 
     public function setTemplate($name, $template)
     {
-        $this->templates[$name] = $template;
+        $this->templates[$this->getKey(array('name' => $name, 'engine' => 'php'))] = $template;
     }
 
-    public function load($template)
+    public function load($name)
     {
-        if (isset($this->templates[$template])) {
-            return new StringStorage($this->templates[$template]);
+        if (isset($this->templates[$this->getKey($name)])) {
+            return new StringStorage($this->templates[$this->getKey($name)]);
         }
 
         return false;
@@ -165,5 +165,10 @@ class ProjectTemplateLoader extends Loader
     public function isFresh($template, $time)
     {
         return false;
+    }
+
+    protected function getKey($template)
+    {
+        return md5(serialize($template));
     }
 }

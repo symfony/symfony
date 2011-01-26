@@ -6,7 +6,7 @@
 
     <parameters>
         <parameter key="templating.engine.delegating.class">Symfony\Bundle\FrameworkBundle\Templating\DelegatingEngine</parameter>
-        <parameter key="templating.name_parser.class">Symfony\Bundle\FrameworkBundle\Templating\Loader\TemplateNameParser</parameter>
+        <parameter key="templating.name_parser.class">Symfony\Bundle\FrameworkBundle\Templating\TemplateNameParser</parameter>
         <parameter key="templating.cache_warmer.template_paths.class">Symfony\Bundle\FrameworkBundle\Templating\CacheWarmer\TemplatePathsCacheWarmer</parameter>
         <parameter key="templating.locator.class">Symfony\Bundle\FrameworkBundle\Templating\Loader\TemplateLocator</parameter>
         <parameter key="templating.locator.cached.class">Symfony\Bundle\FrameworkBundle\Templating\Loader\CachedTemplateLocator</parameter>
@@ -30,7 +30,6 @@
 
         <service id="templating.locator" class="%templating.locator.class%" public="false">
             <argument type="service" id="kernel" />
-            <argument type="service" id="templating.name_parser" />
             <argument>%kernel.root_dir%</argument>
         </service>
 

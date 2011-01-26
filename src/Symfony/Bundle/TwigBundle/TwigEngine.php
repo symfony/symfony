@@ -12,6 +12,7 @@
 namespace Symfony\Bundle\TwigBundle;
 
 use Symfony\Bundle\FrameworkBundle\Templating\EngineInterface;
+use Symfony\Component\Templating\TemplateNameParserInterface;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\DependencyInjection\ContainerInterface;
 
@@ -24,18 +25,21 @@ class TwigEngine implements EngineInterface
 {
     protected $environment;
     protected $container;
+    protected $parser;
 
     /**
      * Constructor.
      *
-     * @param ContainerInterface $container   The DI container
-     * @param \Twig_Environment  $environment A \Twig_Environment instance
-     * @param GlobalVariables    $globals     A GlobalVariables instance
+     * @param \Twig_Environment           $environment A \Twig_Environment instance
+     * @param ContainerInterface          $container   The DI container
+     * @param TemplateNameParserInterface $parser      A TemplateNameParserInterface instance
+     * @param GlobalVariables             $globals     A GlobalVariables instance
      */
-    public function __construct(ContainerInterface $container, \Twig_Environment $environment, GlobalVariables $globals)
+    public function __construct(\Twig_Environment $environment, ContainerInterface $container, TemplateNameParserInterface $parser, GlobalVariables $globals)
     {
-        $this->container = $container;
         $this->environment = $environment;
+        $this->container = $container;
+        $this->parser = $parser;
 
         $environment->addGlobal('app', $globals);
     }
@@ -43,8 +47,8 @@ class TwigEngine implements EngineInterface
     /**
      * Renders a template.
      *
-     * @param string $name       A template name
-     * @param array  $parameters An array of parameters to pass to the template
+     * @param mixed $name       A template name
+     * @param array $parameters An array of parameters to pass to the template
      *
      * @return string The evaluated template as a string
      *
@@ -59,7 +63,7 @@ class TwigEngine implements EngineInterface
     /**
      * Returns true if the template exists.
      *
-     * @param string $name A template name
+     * @param mixed $name A template name
      *
      * @return Boolean true if the template exists, false otherwise
      */
@@ -77,7 +81,7 @@ class TwigEngine implements EngineInterface
     /**
      * Loads the given template.
      *
-     * @param string $name A template name
+     * @param mixed $name A template name
      *
      * @return \Twig_TemplateInterface A \Twig_TemplateInterface instance
      *
@@ -85,7 +89,7 @@ class TwigEngine implements EngineInterface
      */
     public function load($name)
     {
-        return $this->environment->loadTemplate($name);
+        return $this->environment->loadTemplate($this->parser->parse($name));
     }
 
     /**
@@ -97,7 +101,9 @@ class TwigEngine implements EngineInterface
      */
     public function supports($name)
     {
-        return false !== strpos($name, '.twig');
+        $template = $this->parser->parse($name);
+
+        return 'twig' === $template['engine'];
     }
 
     /**

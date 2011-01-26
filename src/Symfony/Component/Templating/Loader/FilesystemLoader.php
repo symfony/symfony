@@ -26,13 +26,10 @@ class FilesystemLoader extends Loader
     /**
      * Constructor.
      *
-     * @param TemplateNameParserInterface $nameParser           A TemplateNameParserInterface instance
-     * @param array                       $templatePathPatterns An array of path patterns to look for templates
+     * @param array $templatePathPatterns An array of path patterns to look for templates
      */
-    public function __construct(TemplateNameParserInterface $nameParser, $templatePathPatterns)
+    public function __construct($templatePathPatterns)
     {
-        parent::__construct($nameParser);
-
         if (!is_array($templatePathPatterns)) {
             $templatePathPatterns = array($templatePathPatterns);
         }
@@ -43,20 +40,18 @@ class FilesystemLoader extends Loader
     /**
      * Loads a template.
      *
-     * @param string $template The logical template name
+     * @param array $template The template name as an array
      *
      * @return Storage|Boolean false if the template cannot be loaded, a Storage instance otherwise
      */
     public function load($template)
     {
-        $parameters = $this->nameParser->parse($template);
-
-        if (self::isAbsolutePath($parameters['name']) && file_exists($parameters['name'])) {
-            return new FileStorage($parameters['name']);
+        if (self::isAbsolutePath($template['name']) && file_exists($template['name'])) {
+            return new FileStorage($template['name']);
         }
 
         $replacements = array();
-        foreach ($parameters as $key => $value) {
+        foreach ($template as $key => $value) {
             $replacements['%'.$key.'%'] = $value;
         }
 
@@ -87,7 +82,7 @@ class FilesystemLoader extends Loader
     /**
      * Returns true if the template is still fresh.
      *
-     * @param string    $template The template name
+     * @param array     $template The template name as an array
      * @param timestamp $time     The last modification time of the cached template
      */
     public function isFresh($template, $time)

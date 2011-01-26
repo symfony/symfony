@@ -9,10 +9,14 @@
  * file that was distributed with this source code.
  */
 
-namespace Symfony\Component\Templating\Loader;
+namespace Symfony\Component\Templating;
 
 /**
- * TemplateNameParserInterface parses template name to a template name and an array of options.
+ * TemplateNameParserInterface parses template names to a
+ * "normalized" array of template parameters.
+ *
+ * The template name array must always have at least a "name"
+ * and an "engine" key.
  *
  * @author Fabien Potencier <fabien.potencier@symfony-project.com>
  */
@@ -21,11 +25,9 @@ interface TemplateNameParserInterface
     /**
      * Parses a template to an array of parameters.
      *
-     * The only mandatory parameter is the template name (name).
-     *
      * @param string $name A template name
      *
-     * @return array An array of parameters
+     * @return array An array of template parameters
      */
     function parse($name);
 }

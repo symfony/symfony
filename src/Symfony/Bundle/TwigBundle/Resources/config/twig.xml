@@ -32,11 +32,13 @@
 
         <service id="twig.loader" class="%twig.loader.class%">
             <argument type="service" id="templating.locator" />
+            <argument type="service" id="templating.name_parser" />
         </service>
 
         <service id="templating.engine.twig" class="%templating.engine.twig.class%" public="false">
-            <argument type="service" id="service_container" />
             <argument type="service" id="twig" />
+            <argument type="service" id="service_container" />
+            <argument type="service" id="templating.name_parser" />
             <argument type="service" id="twig.globals" />
         </service>
 

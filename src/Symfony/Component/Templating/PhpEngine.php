@@ -33,15 +33,18 @@ class PhpEngine implements EngineInterface, \ArrayAccess
     protected $cache;
     protected $escapers;
     protected $globals;
+    protected $parser;
 
     /**
      * Constructor.
      *
-     * @param LoaderInterface $loader  A loader instance
-     * @param array           $helpers An array of helper instances
+     * @param TemplateNameParserInterface $parser  A TemplateNameParserInterface instance
+     * @param LoaderInterface             $loader  A loader instance
+     * @param array                       $helpers An array of helper instances
      */
-    public function __construct(LoaderInterface $loader, array $helpers = array())
+    public function __construct(TemplateNameParserInterface $parser, LoaderInterface $loader, array $helpers = array())
     {
+        $this->parser  = $parser;
         $this->loader  = $loader;
         $this->parents = array();
         $this->stack   = array();
@@ -60,8 +63,8 @@ class PhpEngine implements EngineInterface, \ArrayAccess
     /**
      * Renders a template.
      *
-     * @param string $name       A template name
-     * @param array  $parameters An array of parameters to pass to the template
+     * @param mixed $name       A template name
+     * @param array $parameters An array of parameters to pass to the template
      *
      * @return string The evaluated template as a string
      *
@@ -100,7 +103,7 @@ class PhpEngine implements EngineInterface, \ArrayAccess
     /**
      * Returns true if the template exists.
      *
-     * @param string $name A template name
+     * @param mixed $name A template name
      *
      * @return Boolean true if the template exists, false otherwise
      */
@@ -118,7 +121,7 @@ class PhpEngine implements EngineInterface, \ArrayAccess
     /**
      * Loads the given template.
      *
-     * @param string $name A template name
+     * @param mixed $name A template name
      *
      * @return Storage A Storage instance
      *
@@ -126,32 +129,35 @@ class PhpEngine implements EngineInterface, \ArrayAccess
      */
     public function load($name)
     {
-        if (isset($this->cache[$name])) {
-            return $this->cache[$name];
+        $template = $this->parser->parse($name);
+
+        $key = md5(serialize($template));
+        if (isset($this->cache[$key])) {
+            return $this->cache[$key];
         }
 
         // load
-        $template = $this->loader->load($name);
+        $template = $this->loader->load($template);
 
         if (false === $template) {
             throw new \InvalidArgumentException(sprintf('The template "%s" does not exist.', $name));
         }
 
-        $this->cache[$name] = $template;
-
-        return $template;
+        return $this->cache[$key] = $template;
     }
 
     /**
      * Returns true if this class is able to render the given template.
      *
-     * @param string $name A template name
+     * @param mixed $name A template name
      *
      * @return Boolean True if this class supports the given resource, false otherwise
      */
     public function supports($name)
     {
-        return false !== strpos($name, '.php');
+        $template = $this->parser->parse($name);
+
+        return 'php' === $template['engine'];
     }
 
     /**

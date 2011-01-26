@@ -14,6 +14,17 @@ namespace Symfony\Component\Templating;
 /**
  * EngineInterface is the interface each engine must implement.
  *
+ * All methods relies on a template name. A template name is a
+ * "logical" name for the template (an array), and as such it does not
+ * refers to a path on the filesystem (in fact, the template can be
+ * stored anywhere, like in a database).
+ *
+ * The methods should accept any name and if it is not an array, it should
+ * then use a TemplateNameParserInterface to convert the name to an array.
+ *
+ * Each template loader use the logical template name to look for
+ * the template.
+ *
  * @author Fabien Potencier <fabien.potencier@symfony-project.com>
  */
 interface EngineInterface
@@ -21,8 +32,8 @@ interface EngineInterface
     /**
      * Renders a template.
      *
-     * @param string $name       A template name
-     * @param array  $parameters An array of parameters to pass to the template
+     * @param mixed $name       A template name
+     * @param array $parameters An array of parameters to pass to the template
      *
      * @return string The evaluated template as a string
      *

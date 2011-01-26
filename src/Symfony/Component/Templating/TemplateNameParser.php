@@ -9,10 +9,13 @@
  * file that was distributed with this source code.
  */
 
-namespace Symfony\Component\Templating\Loader;
+namespace Symfony\Component\Templating;
 
 /**
  * TemplateNameParser is the default implementation of TemplateNameParserInterface.
+ *
+ * This implementation takes everything as the template name
+ * and the extension for the engine.
  *
  * @author Fabien Potencier <fabien.potencier@symfony-project.com>
  */
@@ -21,14 +24,21 @@ class TemplateNameParser implements TemplateNameParserInterface
     /**
      * Parses a template to an array of parameters.
      *
-     * The only mandatory parameter is the template name (name).
-     *
      * @param string $name A template name
      *
      * @return array An array of parameters
      */
     public function parse($name)
     {
-        return array('name' => $name);
+        if (is_array($name)) {
+            return $name;
+        }
+
+        $engine = null;
+        if (false !== $pos = strrpos($name, '.')) {
+            $engine = substr($name, $pos + 1);
+        }
+
+        return array('name' => $name, 'engine' => $engine);
     }
 }

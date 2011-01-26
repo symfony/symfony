@@ -21,27 +21,6 @@ use Symfony\Component\Templating\DebuggerInterface;
 abstract class Loader implements LoaderInterface
 {
     protected $debugger;
-    protected $nameParser;
-
-    /**
-     * Constructor.
-     *
-     * @param TemplateNameParserInterface $nameParser A TemplateNameParserInterface instance
-     */
-    public function __construct(TemplateNameParserInterface $nameParser)
-    {
-        $this->nameParser = $nameParser;
-    }
-
-    /**
-     * Gets the template name parser.
-     *
-     * @return TemplateNameParserInterface A TemplateNameParserInterface instance
-     */
-    public function getTemplateNameParser()
-    {
-        return $this->nameParser;
-    }
 
     /**
      * Sets the debugger to use for this loader.

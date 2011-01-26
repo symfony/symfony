@@ -11,63 +11,61 @@
 
 namespace Symfony\Bundle\FrameworkBundle\Templating\Loader;
 
-use Symfony\Component\Templating\Loader\TemplateNameParserInterface;
 use Symfony\Component\HttpKernel\KernelInterface;
 
 /**
+ * TemplateLocator locates templates in bundles.
  *
  * @author Fabien Potencier <fabien.potencier@symfony-project.com>
  */
 class TemplateLocator implements TemplateLocatorInterface
 {
     protected $kernel;
-    protected $parser;
     protected $path;
     protected $cache;
 
     /**
      * Constructor.
      *
-     * @param KernelInterface             $kernel A KernelInterface instance
-     * @param TemplateNameParserInterface $parser A TemplateNameParserInterface instance
-     * @param string                      $path   A global fallback path
+     * @param KernelInterface $kernel A KernelInterface instance
+     * @param string          $path   A global fallback path
      */
-    public function __construct(KernelInterface $kernel, TemplateNameParserInterface $parser, $path)
+    public function __construct(KernelInterface $kernel, $path)
     {
         $this->kernel = $kernel;
         $this->path = $path;
-        $this->parser = $parser;
         $this->cache = array();
     }
 
-    public function locate($name)
+    /**
+     * Locates a template on the filesystem.
+     *
+     * @param array $template The template name as an array
+     *
+     * @return string An absolute file name
+     */
+    public function locate($template)
     {
-        // normalize name
-        $name = str_replace(':/' , ':', preg_replace('#/{2,}#', '/', strtr($name, '\\', '/')));
+        $key = md5(serialize($template));
 
-        if (isset($this->cache[$name])) {
-            return $this->cache[$name];
+        if (isset($this->cache[$key])) {
+            return $this->cache[$key];
         }
 
-        if (false !== strpos($name, '..')) {
-            throw new \RuntimeException(sprintf('Template name "%s" contains invalid characters.', $name));
-        }
-
-        $parameters = $this->parser->parse($name);
-        $resource = $parameters['bundle'].'/Resources/views/'.$parameters['controller'].'/'.$parameters['name'].'.'.$parameters['format'].'.'.$parameters['renderer'];
-
-        if (!$parameters['bundle']) {
-            if (is_file($file = $this->path.'/views/'.$parameters['controller'].'/'.$parameters['name'].'.'.$parameters['format'].'.'.$parameters['renderer'])) {
-                return $this->cache[$name] = $file;
+        if (!$template['bundle']) {
+            if (is_file($file = $this->path.'/views/'.$template['controller'].'/'.$template['name'].'.'.$template['format'].'.'.$template['engine'])) {
+                return $this->cache[$key] = $file;
             }
 
-            throw new \InvalidArgumentException(sprintf('Unable to find template "%s" in "%s".', $name, $this->path));
+            throw new \InvalidArgumentException(sprintf('Unable to find template "%s" in "%s".', var_export($template, true), $this->path));
         }
+
+        $resource = $template['bundle'].'/Resources/views/'.$template['controller'].'/'.$template['name'].'.'.$template['format'].'.'.$template['engine'];
 
         try {
             return $this->kernel->locateResource('@'.$resource, $this->path);
         } catch (\Exception $e) {
-            throw new \InvalidArgumentException(sprintf('Unable to find template "%s".', $name, $this->path), 0, $e);
+            throw new \InvalidArgumentException(sprintf('Unable to find template "%s".', var_export($template, true), $this->path), 0, $e);
         }
     }
 }

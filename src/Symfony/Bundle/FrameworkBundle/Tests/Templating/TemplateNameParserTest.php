@@ -9,10 +9,10 @@
  * file that was distributed with this source code.
  */
 
-namespace Symfony\Bundle\FrameworkBundle\Tests\Templating\Loader;
+namespace Symfony\Bundle\FrameworkBundle\Tests\Templating;
 
 use Symfony\Bundle\FrameworkBundle\Tests\TestCase;
-use Symfony\Bundle\FrameworkBundle\Templating\Loader\TemplateNameParser;
+use Symfony\Bundle\FrameworkBundle\Templating\TemplateNameParser;
 use Symfony\Bundle\FrameworkBundle\Tests\Kernel;
 
 class TemplateNameParserTest extends TestCase
@@ -32,13 +32,13 @@ class TemplateNameParserTest extends TestCase
     public function getParseTests()
     {
         return array(
-            array('FooBundle:Post:index.html.php', array('name' => 'index', 'bundle' => 'FooBundle', 'controller' => 'Post', 'renderer' => 'php', 'format' => 'html')),
-            array('FooBundle:Post:index.html.twig', array('name' => 'index', 'bundle' => 'FooBundle', 'controller' => 'Post', 'renderer' => 'twig', 'format' => 'html')),
-            array('FooBundle:Post:index.xml.php', array('name' => 'index', 'bundle' => 'FooBundle', 'controller' => 'Post', 'renderer' => 'php', 'format' => 'xml')),
-            array('SensioFooBundle:Post:index.html.php', array('name' => 'index', 'bundle' => 'SensioFooBundle', 'controller' => 'Post', 'renderer' => 'php', 'format' => 'html')),
-            array('SensioCmsFooBundle:Post:index.html.php', array('name' => 'index', 'bundle' => 'SensioCmsFooBundle', 'controller' => 'Post', 'renderer' => 'php', 'format' => 'html')),
-            array(':Post:index.html.php',array('name' => 'index', 'bundle' => '', 'controller' => 'Post', 'renderer' => 'php', 'format' => 'html')),
-            array('::index.html.php', array('name' => 'index', 'bundle' => '', 'controller' => '', 'renderer' => 'php', 'format' => 'html')),
+            array('FooBundle:Post:index.html.php', array('name' => 'index', 'bundle' => 'FooBundle', 'controller' => 'Post', 'engine' => 'php', 'format' => 'html')),
+            array('FooBundle:Post:index.html.twig', array('name' => 'index', 'bundle' => 'FooBundle', 'controller' => 'Post', 'engine' => 'twig', 'format' => 'html')),
+            array('FooBundle:Post:index.xml.php', array('name' => 'index', 'bundle' => 'FooBundle', 'controller' => 'Post', 'engine' => 'php', 'format' => 'xml')),
+            array('SensioFooBundle:Post:index.html.php', array('name' => 'index', 'bundle' => 'SensioFooBundle', 'controller' => 'Post', 'engine' => 'php', 'format' => 'html')),
+            array('SensioCmsFooBundle:Post:index.html.php', array('name' => 'index', 'bundle' => 'SensioCmsFooBundle', 'controller' => 'Post', 'engine' => 'php', 'format' => 'html')),
+            array(':Post:index.html.php',array('name' => 'index', 'bundle' => '', 'controller' => 'Post', 'engine' => 'php', 'format' => 'html')),
+            array('::index.html.php', array('name' => 'index', 'bundle' => '', 'controller' => '', 'engine' => 'php', 'format' => 'html')),
         );
     }
 

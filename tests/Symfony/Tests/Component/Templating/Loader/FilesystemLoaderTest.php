@@ -15,7 +15,6 @@ require_once __DIR__.'/../Fixtures/ProjectTemplateDebugger.php';
 
 use Symfony\Component\Templating\Loader\FilesystemLoader;
 use Symfony\Component\Templating\Storage\FileStorage;
-use Symfony\Component\Templating\Loader\TemplateNameParser;
 
 class FilesystemLoaderTest extends \PHPUnit_Framework_TestCase
 {
@@ -28,11 +27,11 @@ class FilesystemLoaderTest extends \PHPUnit_Framework_TestCase
 
     public function testConstructor()
     {
-        $pathPattern = self::$fixturesPath.'/templates/%name%.%renderer%';
+        $pathPattern = self::$fixturesPath.'/templates/%name%.%engine%';
         $path = self::$fixturesPath.'/templates';
-        $loader = new ProjectTemplateLoader2(new TemplateNameParser(), $pathPattern);
+        $loader = new ProjectTemplateLoader2($pathPattern);
         $this->assertEquals(array($pathPattern), $loader->getTemplatePathPatterns(), '__construct() takes a path as its second argument');
-        $loader = new ProjectTemplateLoader2(new TemplateNameParser(), array($pathPattern));
+        $loader = new ProjectTemplateLoader2(array($pathPattern));
         $this->assertEquals(array($pathPattern), $loader->getTemplatePathPatterns(), '__construct() takes an array of paths as its second argument');
     }
 
@@ -48,25 +47,25 @@ class FilesystemLoaderTest extends \PHPUnit_Framework_TestCase
     {
         $pathPattern = self::$fixturesPath.'/templates/%name%';
         $path = self::$fixturesPath.'/templates';
-        $loader = new ProjectTemplateLoader2(new TemplateNameParser(), $pathPattern);
-        $storage = $loader->load($path.'/foo.php');
+        $loader = new ProjectTemplateLoader2($pathPattern);
+        $storage = $loader->load(array('name' => $path.'/foo.php', 'engine' => 'php'));
         $this->assertInstanceOf('Symfony\Component\Templating\Storage\FileStorage', $storage, '->load() returns a FileStorage if you pass an absolute path');
         $this->assertEquals($path.'/foo.php', (string) $storage, '->load() returns a FileStorage pointing to the passed absolute path');
 
-        $this->assertFalse($loader->load('bar'), '->load() returns false if the template is not found');
+        $this->assertFalse($loader->load(array('name' => 'bar', 'engine' => 'php')), '->load() returns false if the template is not found');
 
-        $storage = $loader->load('foo.php');
+        $storage = $loader->load(array('name' => 'foo.php', 'engine' => 'php'));
         $this->assertInstanceOf('Symfony\Component\Templating\Storage\FileStorage', $storage, '->load() returns a FileStorage if you pass a relative template that exists');
         $this->assertEquals($path.'/foo.php', (string) $storage, '->load() returns a FileStorage pointing to the absolute path of the template');
 
-        $loader = new ProjectTemplateLoader2(new TemplateNameParser(), $pathPattern);
+        $loader = new ProjectTemplateLoader2($pathPattern);
         $loader->setDebugger($debugger = new \ProjectTemplateDebugger());
-        $this->assertFalse($loader->load('foo.xml'), '->load() returns false if the template does not exists for the given renderer');
+        $this->assertFalse($loader->load(array('name' => 'foo.xml', 'engine' => 'php')), '->load() returns false if the template does not exists for the given engine');
         $this->assertTrue($debugger->hasMessage('Failed loading template'), '->load() logs a "Failed loading template" message if the template is not found');
 
-        $loader = new ProjectTemplateLoader2(new TemplateNameParser(), array(self::$fixturesPath.'/null/%name%', $pathPattern));
+        $loader = new ProjectTemplateLoader2(array(self::$fixturesPath.'/null/%name%', $pathPattern));
         $loader->setDebugger($debugger = new \ProjectTemplateDebugger());
-        $loader->load('foo.php');
+        $loader->load(array('name' => 'foo.php', 'engine' => 'php'));
         $this->assertTrue($debugger->hasMessage('Loaded template file'), '->load() logs a "Loaded template file" message if the template is found');
     }
 }

@@ -12,10 +12,18 @@
 namespace Symfony\Bundle\FrameworkBundle\Templating\Loader;
 
 /**
+ * Interfaces for classes that locates templates on disk
  *
  * @author Fabien Potencier <fabien.potencier@symfony-project.com>
  */
 interface TemplateLocatorInterface
 {
-    function locate($name);
+    /**
+     * Locates a template on the filesystem.
+     *
+     * @param array $template The template name as an array
+     *
+     * @return string An absolute file name
+     */
+    function locate($template);
 }

@@ -70,34 +70,44 @@ class TemplatePathsCacheWarmer extends CacheWarmer
 
             $finder = new Finder();
             foreach ($finder->files()->followLinks()->in($dir) as $file) {
-                list($category, $template) = $this->parseTemplateName($file, $prefix.'/');
-                $name = sprintf('%s:%s:%s', $bundle->getName(), $category, $template);
-                $resource = '@'.$bundle->getName().$prefix.'/'.$category.'/'.$template;
+                if (false !== $template = $this->parseTemplateName($file, $prefix.'/', $bundle->getName())) {
+                    $resource = '@'.$template['bundle'].'/Resources/views/'.$template['controller'].'/'.$template['name'].'.'.$template['format'].'.'.$template['engine'];
 
-                $templates[$name] = $this->kernel->locateResource($resource, $this->rootDir);
+                    $templates[md5(serialize($template))] = $this->kernel->locateResource($resource, $this->rootDir);
+                }
             }
         }
 
         if (is_dir($this->rootDir)) {
             $finder = new Finder();
             foreach ($finder->files()->followLinks()->in($this->rootDir) as $file) {
-                list($category, $template) = $this->parseTemplateName($file, strtr($this->rootDir, '\\', '/').'/');
-
-                $templates[sprintf(':%s:%s', $category, $template)] = (string) $file;
+                if (false !== $template = $this->parseTemplateName($file, strtr($this->rootDir, '\\', '/').'/')) {
+                    $templates[md5(serialize($template))] = (string) $file;
+                }
             }
         }
 
         return  $templates;
     }
 
-    protected function parseTemplateName($file, $prefix)
+    protected function parseTemplateName($file, $prefix, $bundle = '')
     {
         $path = strtr($file->getPathname(), '\\', '/');
 
         list(, $tmp) = explode($prefix, $path, 2);
         $parts = explode('/', strtr($tmp, '\\', '/'));
-        $template = array_pop($parts);
 
-        return array(implode('/', $parts), $template);
+        $elements = explode('.', array_pop($parts));
+        if (3 !== count($elements)) {
+            return false;
+        }
+
+        return array(
+            'bundle'     => $bundle,
+            'controller' => implode('/', $parts),
+            'name'       => $elements[0],
+            'format'     => $elements[1],
+            'engine'     => $elements[2],
+        );
     }
 }

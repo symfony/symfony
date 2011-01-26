@@ -227,12 +227,12 @@ abstract class AbstractAuthenticationListener implements ListenerInterface
         $this->eventDispatcher->notify(new Event($this, 'security.login_success', array('request' => $request, 'token' => $token)));
 
         if (null !== $this->successHandler) {
-            return $this->successHandler->onAuthenticationSuccess($request, $token);
+            $response = $this->successHandler->onAuthenticationSuccess($request, $token);
+        } else {
+            $response = new Response();
+            $path = $this->determineTargetUrl($request);
+            $response->setRedirect(0 !== strpos($path, 'http') ? $request->getUriForPath($path) : $path, 302);
         }
-
-        $response = new Response();
-        $path = $this->determineTargetUrl($request);
-        $response->setRedirect(0 !== strpos($path, 'http') ? $request->getUriForPath($path) : $path, 302);
 
         if (null !== $this->rememberMeServices) {
             $this->rememberMeServices->loginSuccess($request, $response, $token);

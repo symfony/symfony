@@ -35,7 +35,7 @@ class FieldFactoryTest extends \PHPUnit_Framework_TestCase
                 ->method('guessClass')
                 ->with($this->equalTo($object), $this->equalTo('firstName'))
                 ->will($this->returnValue(new FieldFactoryClassGuess(
-                	'Symfony\Component\Form\TextField',
+                    'Symfony\Component\Form\TextField',
                     array('max_length' => 10),
                     FieldFactoryGuess::MEDIUM_CONFIDENCE
                 )));
@@ -45,7 +45,7 @@ class FieldFactoryTest extends \PHPUnit_Framework_TestCase
                 ->method('guessClass')
                 ->with($this->equalTo($object), $this->equalTo('firstName'))
                 ->will($this->returnValue(new FieldFactoryClassGuess(
-                	'Symfony\Component\Form\PasswordField',
+                    'Symfony\Component\Form\PasswordField',
                     array('max_length' => 7),
                     FieldFactoryGuess::HIGH_CONFIDENCE
                 )));
@@ -85,7 +85,7 @@ class FieldFactoryTest extends \PHPUnit_Framework_TestCase
                 ->method('guessClass')
                 ->with($this->equalTo($object), $this->equalTo('firstName'))
                 ->will($this->returnValue(new FieldFactoryClassGuess(
-                	'Symfony\Component\Form\TextField',
+                    'Symfony\Component\Form\TextField',
                     array('max_length' => 10),
                     FieldFactoryGuess::MEDIUM_CONFIDENCE
                 )));
@@ -107,7 +107,7 @@ class FieldFactoryTest extends \PHPUnit_Framework_TestCase
                 ->method('guessClass')
                 ->with($this->equalTo($object), $this->equalTo('firstName'))
                 ->will($this->returnValue(new FieldFactoryClassGuess(
-                	'Symfony\Component\Form\TextField',
+                    'Symfony\Component\Form\TextField',
                     array('max_length' => 10),
                     FieldFactoryGuess::MEDIUM_CONFIDENCE
                 )));
@@ -115,7 +115,7 @@ class FieldFactoryTest extends \PHPUnit_Framework_TestCase
                 ->method('guessMaxLength')
                 ->with($this->equalTo($object), $this->equalTo('firstName'))
                 ->will($this->returnValue(new FieldFactoryGuess(
-                	15,
+                    15,
                     FieldFactoryGuess::MEDIUM_CONFIDENCE
                 )));
 
@@ -124,7 +124,7 @@ class FieldFactoryTest extends \PHPUnit_Framework_TestCase
                 ->method('guessMaxLength')
                 ->with($this->equalTo($object), $this->equalTo('firstName'))
                 ->will($this->returnValue(new FieldFactoryGuess(
-                	20,
+                    20,
                     FieldFactoryGuess::HIGH_CONFIDENCE
                 )));
 
@@ -145,7 +145,7 @@ class FieldFactoryTest extends \PHPUnit_Framework_TestCase
                 ->method('guessClass')
                 ->with($this->equalTo($object), $this->equalTo('firstName'))
                 ->will($this->returnValue(new FieldFactoryClassGuess(
-                	'Symfony\Component\Form\PasswordField',
+                    'Symfony\Component\Form\PasswordField',
                     array('max_length' => 10),
                     FieldFactoryGuess::MEDIUM_CONFIDENCE
                 )));
@@ -153,7 +153,7 @@ class FieldFactoryTest extends \PHPUnit_Framework_TestCase
                 ->method('guessMaxLength')
                 ->with($this->equalTo($object), $this->equalTo('firstName'))
                 ->will($this->returnValue(new FieldFactoryGuess(
-                	15,
+                    15,
                     FieldFactoryGuess::MEDIUM_CONFIDENCE
                 )));
 
@@ -174,7 +174,7 @@ class FieldFactoryTest extends \PHPUnit_Framework_TestCase
                 ->method('guessClass')
                 ->with($this->equalTo($object), $this->equalTo('firstName'))
                 ->will($this->returnValue(new FieldFactoryClassGuess(
-                	'Symfony\Component\Form\TextField',
+                    'Symfony\Component\Form\TextField',
                     array(),
                     FieldFactoryGuess::MEDIUM_CONFIDENCE
                 )));
@@ -182,7 +182,7 @@ class FieldFactoryTest extends \PHPUnit_Framework_TestCase
                 ->method('guessRequired')
                 ->with($this->equalTo($object), $this->equalTo('firstName'))
                 ->will($this->returnValue(new FieldFactoryGuess(
-                	true,
+                    true,
                     FieldFactoryGuess::MEDIUM_CONFIDENCE
                 )));
 
@@ -191,7 +191,7 @@ class FieldFactoryTest extends \PHPUnit_Framework_TestCase
                 ->method('guessRequired')
                 ->with($this->equalTo($object), $this->equalTo('firstName'))
                 ->will($this->returnValue(new FieldFactoryGuess(
-                	false,
+                    false,
                     FieldFactoryGuess::HIGH_CONFIDENCE
                 )));
 

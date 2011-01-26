@@ -98,8 +98,9 @@ class ClassMetadata extends ElementMetadata
     {
         if (!in_array(Constraint::CLASS_CONSTRAINT, (array)$constraint->targets())) {
             throw new ConstraintDefinitionException(sprintf(
-            		'The constraint %s cannot be put on classes',
-                    get_class($constraint)));
+                'The constraint %s cannot be put on classes',
+                get_class($constraint)
+            ));
         }
 
         $constraint->addImplicitGroupName($this->getDefaultGroup());

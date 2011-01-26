@@ -22,7 +22,7 @@ use Symfony\Component\Form\Exception\UnexpectedTypeException;
  *
  *     $form->add(new CollectionField(new TextField('emails')));
  *
- * @author     Bernhard Schussek <bernhard.schussek@symfony-project.com>
+ * @author Bernhard Schussek <bernhard.schussek@symfony-project.com>
  */
 class CollectionField extends FieldGroup
 {

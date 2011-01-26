@@ -762,7 +762,7 @@ class FieldGroupTest extends \PHPUnit_Framework_TestCase
     protected function createMockForm()
     {
         $form = $this->getMock(
-        	'Symfony\Component\Form\Form',
+            'Symfony\Component\Form\Form',
             array(),
             array(),
             '',

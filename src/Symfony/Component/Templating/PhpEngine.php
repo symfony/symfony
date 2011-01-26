@@ -75,24 +75,26 @@ class PhpEngine implements EngineInterface, \ArrayAccess
     {
         $template = $this->load($name);
 
-        $this->current = $name;
-        $this->parents[$name] = null;
+        $key = md5(serialize($template));
+
+        $this->current = $key;
+        $this->parents[$key] = null;
 
         // attach the global variables
         $parameters = array_replace($this->getGlobals(), $parameters);
 
         // render
         if (false === $content = $this->evaluate($template, $parameters)) {
-            throw new \RuntimeException(sprintf('The template "%s" cannot be rendered.', $name));
+            throw new \RuntimeException(sprintf('The template "%s" cannot be rendered.', var_export($template, true)));
         }
 
         // decorator
-        if ($this->parents[$name]) {
+        if ($this->parents[$key]) {
             $slots = $this->get('slots');
             $this->stack[] = $slots->get('_content');
             $slots->set('_content', $content);
 
-            $content = $this->render($this->parents[$name], $parameters);
+            $content = $this->render($this->parents[$key], $parameters);
 
             $slots->set('_content', array_pop($this->stack));
         }

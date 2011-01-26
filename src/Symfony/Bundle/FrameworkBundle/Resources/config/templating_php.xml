@@ -14,7 +14,6 @@
         <parameter key="templating.helper.session.class">Symfony\Bundle\FrameworkBundle\Templating\Helper\SessionHelper</parameter>
         <parameter key="templating.helper.code.class">Symfony\Bundle\FrameworkBundle\Templating\Helper\CodeHelper</parameter>
         <parameter key="templating.helper.translator.class">Symfony\Bundle\FrameworkBundle\Templating\Helper\TranslatorHelper</parameter>
-        <parameter key="templating.helper.security.class">Symfony\Bundle\FrameworkBundle\Templating\Helper\SecurityHelper</parameter>
         <parameter key="templating.helper.form.class">Symfony\Bundle\FrameworkBundle\Templating\Helper\FormHelper</parameter>
     </parameters>
 
@@ -66,11 +65,6 @@
         <service id="templating.helper.translator" class="%templating.helper.translator.class%">
             <tag name="templating.helper" alias="translator" />
             <argument type="service" id="translator" />
-        </service>
-
-        <service id="templating.helper.security" class="%templating.helper.security.class%">
-            <tag name="templating.helper" alias="security" />
-            <argument type="service" id="security.context" on-invalid="ignore" />
         </service>
 
         <service id="templating.helper.form" class="%templating.helper.form.class%">

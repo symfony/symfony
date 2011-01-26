@@ -11,12 +11,10 @@
 
 namespace Symfony\Bundle\FrameworkBundle;
 
-use Symfony\Bundle\FrameworkBundle\DependencyInjection\Compiler\AddAuthenticationProvidersPass;
 use Symfony\Bundle\FrameworkBundle\DependencyInjection\Compiler\AddConstraintValidatorsPass;
 use Symfony\Bundle\FrameworkBundle\DependencyInjection\Compiler\AddFieldFactoryGuessersPass;
 use Symfony\Bundle\FrameworkBundle\DependencyInjection\Compiler\TemplatingPass;
 use Symfony\Bundle\FrameworkBundle\DependencyInjection\Compiler\RegisterKernelListenersPass;
-use Symfony\Bundle\FrameworkBundle\DependencyInjection\Compiler\AddSecurityVotersPass;
 use Symfony\Bundle\FrameworkBundle\DependencyInjection\Compiler\ConverterManagerPass;
 use Symfony\Bundle\FrameworkBundle\DependencyInjection\Compiler\RoutingResolverPass;
 use Symfony\Bundle\FrameworkBundle\DependencyInjection\Compiler\ProfilerPass;
@@ -57,7 +55,6 @@ class FrameworkBundle extends Bundle
 
         $container->addScope('request');
 
-        $container->addCompilerPass(new AddSecurityVotersPass());
         $container->addCompilerPass(new ConverterManagerPass());
         $container->addCompilerPass(new RoutingResolverPass());
         $container->addCompilerPass(new ProfilerPass());
@@ -68,7 +65,6 @@ class FrameworkBundle extends Bundle
         $container->addCompilerPass(new AddClassesToCachePass());
         $container->addCompilerPass(new TranslatorPass());
         $container->addCompilerPass(new AddCacheWarmerPass());
-        $container->addCompilerPass(new AddAuthenticationProvidersPass());
     }
 
     /**

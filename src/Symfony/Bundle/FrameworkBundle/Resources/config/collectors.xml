@@ -7,7 +7,6 @@
     <parameters>
         <parameter key="data_collector.config.class">Symfony\Bundle\FrameworkBundle\DataCollector\ConfigDataCollector</parameter>
         <parameter key="data_collector.request.class">Symfony\Bundle\FrameworkBundle\DataCollector\RequestDataCollector</parameter>
-        <parameter key="data_collector.security.class">Symfony\Component\HttpKernel\DataCollector\SecurityDataCollector</parameter>
         <parameter key="data_collector.exception.class">Symfony\Component\HttpKernel\DataCollector\ExceptionDataCollector</parameter>
         <parameter key="data_collector.events.class">Symfony\Component\HttpKernel\DataCollector\EventDataCollector</parameter>
         <parameter key="data_collector.logger.class">Symfony\Component\HttpKernel\DataCollector\LoggerDataCollector</parameter>
@@ -24,11 +23,6 @@
 
         <service id="data_collector.request" class="%data_collector.request.class%" public="false">
             <tag name="data_collector" template="WebProfilerBundle:Collector:request" id="request" priority="255" />
-        </service>
-
-        <service id="data_collector.security" class="%data_collector.security.class%" public="false">
-            <tag name="data_collector" template="WebProfilerBundle:Collector:security" id="security" priority="255" />
-            <argument type="service" id="security.context" on-invalid="ignore" />
         </service>
 
         <service id="data_collector.exception" class="%data_collector.exception.class%" public="false">

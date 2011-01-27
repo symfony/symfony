@@ -50,11 +50,6 @@ interface KernelInterface extends HttpKernelInterface, \Serializable
 
     /**
      * Boots the current kernel.
-     *
-     * This method boots the bundles, which MUST set
-     * the DI container.
-     *
-     * @throws \LogicException When the Kernel is already booted
      */
     function boot();
 

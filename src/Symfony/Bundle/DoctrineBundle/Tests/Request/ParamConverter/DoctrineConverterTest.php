@@ -156,7 +156,7 @@ class DoctrineConverterTest extends TestCase
 
     protected function buildRequestWithAttributes(array $attributes)
     {
-        return new Request(null, null, $attributes);
+        return new Request(array(), array(), $attributes);
     }
 }
 

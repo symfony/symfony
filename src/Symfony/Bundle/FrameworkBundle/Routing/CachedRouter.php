@@ -39,7 +39,7 @@ class CachedRouter implements RouterInterface
             throw new \RuntimeException(sprintf('The routing cache is not warmed up (%s).', $cache));
         }
 
-        if (!class_exists($matcher)) {
+        if (!class_exists($matcher, false)) {
             require_once $cache;
             require_once $cacheDir.'/'.$generator.'.php';
         }

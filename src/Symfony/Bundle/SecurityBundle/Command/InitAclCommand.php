@@ -11,6 +11,7 @@
 
 namespace Symfony\Bundle\SecurityBundle\Command;
 
+use Symfony\Bundle\FrameworkBundle\Command\Command;
 use Symfony\Component\Security\Acl\Dbal\Schema;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Output\OutputInterface;

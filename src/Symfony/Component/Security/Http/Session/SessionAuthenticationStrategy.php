@@ -5,6 +5,16 @@ namespace Symfony\Component\Security\Http\Session;
 use Symfony\Component\Security\Core\Authentication\Token\TokenInterface;
 use Symfony\Component\HttpFoundation\Request;
 
+/**
+ * The default session strategy implementation.
+ *
+ * Supports the following strategies:
+ * NONE: the session is not changed
+ * MIGRATE: the session id is updated, attributes are kept
+ * INVALIDATE: the session id is updated, attributes are lost
+ *
+ * @author Johannes M. Schmitt <schmittjoh@gmail.com>
+ */
 class SessionAuthenticationStrategy implements SessionAuthenticationStrategyInterface
 {
     const NONE         = 'none';
@@ -18,6 +28,9 @@ class SessionAuthenticationStrategy implements SessionAuthenticationStrategyInte
         $this->strategy = $strategy;
     }
 
+    /**
+     * {@inheritDoc}
+     */
     public function onAuthentication(Request $request, TokenInterface $token)
     {
         switch ($this->strategy) {

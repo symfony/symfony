@@ -1,6 +1,6 @@
 <?php
 
-namespace Symfony\Component\Security\Http\ExceptionTranslation;
+namespace Symfony\Component\Security\Http\Authorization;
 
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\EventDispatcher\EventInterface;
@@ -17,8 +17,8 @@ interface AccessDeniedHandlerInterface
     /**
      * Handles an access denied failure.
      *
-     * @param EventInterface $event
-     * @param Request $request
+     * @param EventInterface        $event
+     * @param Request               $request
      * @param AccessDeniedException $accessDeniedException
      *
      * @return Response may return null

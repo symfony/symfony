@@ -12,7 +12,7 @@ require_once __DIR__.'/../../../ClassLoader/UniversalClassLoader.php';
  */
 
 use Symfony\Component\ClassLoader\UniversalClassLoader;
-use Symfony\Component\HttpKernel\ClassCollectionLoader;
+use Symfony\Component\ClassLoader\ClassCollectionLoader;
 
 $loader = new UniversalClassLoader();
 $loader->registerNamespaces(array('Symfony' => __DIR__.'/../../../../..'));
@@ -34,7 +34,6 @@ ClassCollectionLoader::load(array(
     'Symfony\\Component\\HttpKernel\\Bundle\\BundleInterface',
     'Symfony\\Component\\HttpKernel\\Bundle\\Bundle',
     'Symfony\\Component\\HttpKernel\\Debug\\ErrorHandler',
-    'Symfony\\Component\\HttpKernel\\ClassCollectionLoader',
     'Symfony\\Component\\HttpKernel\\HttpKernelInterface',
     'Symfony\\Component\\HttpKernel\\HttpKernel',
     'Symfony\\Component\\HttpKernel\\KernelInterface',
@@ -46,6 +45,7 @@ ClassCollectionLoader::load(array(
     'Symfony\\Component\\HttpFoundation\\HeaderBag',
     'Symfony\\Component\\HttpFoundation\\Request',
 
+    'Symfony\\Component\\ClassLoader\\ClassCollectionLoader',
     'Symfony\\Component\\ClassLoader\\UniversalClassLoader',
 
 ), __DIR__.'/../..', 'bootstrap', false);

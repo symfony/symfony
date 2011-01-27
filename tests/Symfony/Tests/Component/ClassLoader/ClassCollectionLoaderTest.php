@@ -9,9 +9,9 @@
  * file that was distributed with this source code.
  */
 
-namespace Symfony\Tests\Component\HttpKernel;
+namespace Symfony\Tests\Component\ClassLoader;
 
-use Symfony\Component\HttpKernel\ClassCollectionLoader;
+use Symfony\Component\ClassLoader\ClassCollectionLoader;
 
 class ClassCollectionLoaderTest extends \PHPUnit_Framework_TestCase
 {

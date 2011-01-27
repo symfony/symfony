@@ -21,6 +21,9 @@ use Symfony\Component\Form\Exception\InvalidOptionsException;
  *  * choices:              An array of key-value pairs that will represent the choices
  *  * preferred_choices:    An array of choices (by key) that should be displayed
  *                          above all other options in the field
+ *  * empty_value:          If set to a non-false value, an "empty" option will
+ *                          be added to the top of the countries choices. A
+ *                          common value might be "Choose a country". Default: false.
  *
  * The multiple and expanded options control exactly which HTML element
  * that should be used to render this field:
@@ -42,10 +45,10 @@ class ChoiceField extends HybridField
 
     /**
      * Stores the choices
-     * You should only access this property through getInitializedChoices()
+     * You should only access this property through getChoices()
      * @var array
      */
-    protected $initializedChoices = array();
+    private $choices = array();
 
     protected function configure()
     {
@@ -53,6 +56,7 @@ class ChoiceField extends HybridField
         $this->addOption('preferred_choices', array());
         $this->addOption('multiple', false);
         $this->addOption('expanded', false);
+        $this->addOption('empty_value', '');
 
         parent::configure();
 
@@ -73,7 +77,7 @@ class ChoiceField extends HybridField
         if ($this->isExpanded()) {
             $this->setFieldMode(self::GROUP);
 
-            $choices = $this->getInitializedChoices();
+            $choices = $this->getChoices();
 
             foreach ($this->preferredChoices as $choice => $_) {
                 $this->add($this->newChoiceField($choice, $choices[$choice]));
@@ -113,11 +117,29 @@ class ChoiceField extends HybridField
      */
     protected function initializeChoices()
     {
-        $this->initializedChoices = $this->getOption('choices');
-
-        if ($this->initializedChoices instanceof \Closure) {
-            $this->initializedChoices = $this->initializedChoices->__invoke();
+        if (!$this->choices) {
+            $this->choices = $this->getInitializedChoices();
         }
+    }
+
+    protected function getInitializedChoices()
+    {
+        $choices = $this->getOption('choices');
+
+        if ($choices instanceof \Closure) {
+            $choices = $choices->__invoke();
+        }
+
+        // TESTME
+        if (!is_array($choices)) {
+            throw new InvalidOptionsException('The "choices" option must be an array or a closure returning an array', array('choices'));
+        }
+
+        if (!$this->isRequired()) {
+            $choices = array_merge(array('' => $this->getOption('empty_value')), $choices);
+        }
+
+        return $choices;
     }
 
     /**
@@ -128,28 +150,26 @@ class ChoiceField extends HybridField
      *
      * @return array
      */
-    protected function getInitializedChoices()
+    protected function getChoices()
     {
-        if (!$this->initializedChoices) {
-            $this->initializeChoices();
-        }
+        $this->initializeChoices();
 
-        return $this->initializedChoices;
+        return $this->choices;
     }
 
     public function getPreferredChoices()
     {
-        return array_intersect_key($this->getInitializedChoices(), $this->preferredChoices);
+        return array_intersect_key($this->getChoices(), $this->preferredChoices);
     }
 
     public function getOtherChoices()
     {
-        return array_diff_key($this->getInitializedChoices(), $this->preferredChoices);
+        return array_diff_key($this->getChoices(), $this->preferredChoices);
     }
 
     public function getLabel($choice)
     {
-        $choices = $this->getInitializedChoices();
+        $choices = $this->getChoices();
 
         return isset($choices[$choice]) ? $choices[$choice] : null;
     }
@@ -225,7 +245,7 @@ class ChoiceField extends HybridField
     {
         if ($this->isExpanded()) {
             $value = parent::transform($value);
-            $choices = $this->getInitializedChoices();
+            $choices = $this->getChoices();
 
             foreach ($choices as $choice => $_) {
                 $choices[$choice] = $this->isMultipleChoice()
@@ -235,6 +255,7 @@ class ChoiceField extends HybridField
 
             return $choices;
         }
+
         return parent::transform($value);
     }
 
@@ -265,9 +286,10 @@ class ChoiceField extends HybridField
             if ($this->isMultipleChoice()) {
                 $value = $choices;
             } else {
-                $value =  count($choices) > 0 ? current($choices) : null;
+                $value = count($choices) > 0 ? current($choices) : null;
             }
         }
+
         return parent::reverseTransform($value);
     }
 }

@@ -88,7 +88,6 @@ class Field extends Configurable implements FieldInterface
 
         $this->normalizedData = $this->normalize($this->data);
         $this->transformedData = $this->transform($this->normalizedData);
-        $this->required = $this->getOption('required');
 
         $this->setPropertyPath($this->getOption('property_path'));
     }
@@ -184,9 +183,14 @@ class Field extends Configurable implements FieldInterface
      */
     public function isRequired()
     {
+        if (null === $this->required) {
+            $this->required = $this->getOption('required');
+        }
+
         if (null === $this->parent || $this->parent->isRequired()) {
             return $this->required;
         }
+
         return false;
     }
 

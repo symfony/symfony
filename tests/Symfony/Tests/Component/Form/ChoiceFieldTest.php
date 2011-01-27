@@ -88,6 +88,56 @@ class ChoiceFieldTest extends \PHPUnit_Framework_TestCase
     }
 
     /**
+     * @expectedException Symfony\Component\Form\Exception\InvalidOptionsException
+     */
+    public function testClosureShouldReturnArray()
+    {
+        $field = new ChoiceField('name', array(
+            'choices' => function () { return 'foobar'; },
+        ));
+
+        // trigger closure
+        $field->getOtherChoices();
+    }
+
+    public function testNonRequiredContainsEmptyField()
+    {
+        $field = new ChoiceField('name', array(
+            'multiple' => false,
+            'expanded' => false,
+            'choices' => $this->choices,
+            'required' => false,
+        ));
+
+        $this->assertEquals(array('' => '') + $this->choices, $field->getOtherChoices());
+    }
+
+    public function testRequiredContainsNoEmptyField()
+    {
+        $field = new ChoiceField('name', array(
+            'multiple' => false,
+            'expanded' => false,
+            'choices' => $this->choices,
+            'required' => true,
+        ));
+
+        $this->assertEquals($this->choices, $field->getOtherChoices());
+    }
+
+    public function testEmptyValueConfiguresLabelOfEmptyField()
+    {
+        $field = new ChoiceField('name', array(
+            'multiple' => false,
+            'expanded' => false,
+            'choices' => $this->choices,
+            'required' => false,
+            'empty_value' => 'Foobar',
+        ));
+
+        $this->assertEquals(array('' => 'Foobar') + $this->choices, $field->getOtherChoices());
+    }
+
+    /**
      * @dataProvider getChoicesVariants
      */
     public function testBindSingleNonExpanded($choices)

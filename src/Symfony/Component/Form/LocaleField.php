@@ -16,13 +16,6 @@ use Symfony\Component\Locale\Locale;
 /**
  * A field for selecting from a list of locales.
  *
- * In addition to the ChoiceField options, this field has the following
- * options:
- *
- *  * empty_value:  If set to a non-false value, an "empty" option will
- *                  be added to the top of the locale choices. A
- *                  common value might be "Choose a locale". Default: false.
- *
  * @see Symfony\Component\Form\ChoiceField
  * @author Bernhard Schussek <bernhard.schussek@symfony-project.com>
  */
@@ -33,15 +26,7 @@ class LocaleField extends ChoiceField
      */
     protected function configure()
     {
-        $this->addOption('empty_value', false);
-
-        $choices = Locale::getDisplayLocales($this->locale);
-
-        if (false !== $this->getOption('empty_value')) {
-            $choices = array('' => $this->getOption('empty_value')) + $choices;
-        }
-
-        $this->addOption('choices', $choices);
+        $this->addOption('choices', Locale::getDisplayLocales($this->locale));
 
         parent::configure();
     }

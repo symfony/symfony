@@ -42,24 +42,4 @@ class CountryFieldTest extends \PHPUnit_Framework_TestCase
 
         $this->assertArrayNotHasKey('ZZ', $choices);
     }
-
-    public function testEmptyValueOption()
-    {
-        // empty_value false
-        $field = new CountryField('country', array('empty_value' => false));
-        $choices = $field->getOtherChoices();
-        $this->assertArrayNotHasKey('', $choices);
-
-        // empty_value as a blank string
-        $field = new CountryField('country', array('empty_value' => ''));
-        $choices = $field->getOtherChoices();
-        $this->assertArrayHasKey('', $choices);
-        $this->assertEquals('', $choices['']);
-
-        // empty_value as a normal string
-        $field = new CountryField('country', array('empty_value' => 'Choose a country'));
-        $choices = $field->getOtherChoices();
-        $this->assertArrayHasKey('', $choices);
-        $this->assertEquals('Choose a country', $choices['']);
-    }
 }

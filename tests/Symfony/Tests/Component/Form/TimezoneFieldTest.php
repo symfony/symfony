@@ -28,24 +28,4 @@ class TimezoneFieldTest extends \PHPUnit_Framework_TestCase
         $this->assertArrayHasKey('America/New_York', $choices['America']);
         $this->assertEquals('New York', $choices['America']['America/New_York']);
     }
-
-    public function testEmptyValueOption()
-    {
-        // empty_value false
-        $field = new TimezoneField('timezone', array('empty_value' => false));
-        $choices = $field->getOtherChoices();
-        $this->assertArrayNotHasKey('', $choices);
-
-        // empty_value as a blank string
-        $field = new TimezoneField('timezone', array('empty_value' => ''));
-        $choices = $field->getOtherChoices();
-        $this->assertArrayHasKey('', $choices);
-        $this->assertEquals('', $choices['']);
-
-        // empty_value as a normal string
-        $field = new TimezoneField('timezone', array('empty_value' => 'Choose your timezone'));
-        $choices = $field->getOtherChoices();
-        $this->assertArrayHasKey('', $choices);
-        $this->assertEquals('Choose your timezone', $choices['']);
-    }
 }

@@ -4,6 +4,7 @@ namespace Symfony\Bundle\FrameworkBundle\DependencyInjection\Compiler;
 
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\DependencyInjection\Compiler\CompilerPassInterface;
+use Symfony\Component\HttpKernel\DependencyInjection\Extension;
 
 /*
  * This file is part of the Symfony framework.
@@ -31,8 +32,7 @@ class AddClassesToCachePass implements CompilerPassInterface
             list($namespace, $tag) = explode(':', $name);
 
             $extension = $container->getExtension($namespace);
-
-            if (method_exists($extension, 'getClassesToCompile')) {
+            if ($extension instanceof Extension) {
                 $classes = array_merge($classes, $extension->getClassesToCompile());
             }
         }

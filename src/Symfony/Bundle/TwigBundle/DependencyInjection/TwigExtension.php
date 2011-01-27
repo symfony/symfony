@@ -78,7 +78,7 @@ class TwigExtension extends Extension
             }
         } else {
             foreach ($globals as $key => $value) {
-                if ('@' === substr($value, 0, 1)) {
+                if (is_string($value) && '@' === substr($value, 0, 1)) {
                     $def->addMethodCall('addGlobal', array($key, new Reference(substr($value, 1))));
                 } else {
                     $def->addMethodCall('addGlobal', array($key, $value));

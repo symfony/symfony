@@ -71,16 +71,6 @@ class Request
     static protected $formats;
 
     /**
-     * Creates a new request with values from PHP's super globals.
-     *
-     * @return Request A new request
-     */
-    static public function fromGlobals()
-    {
-        return new static($_GET, $_POST, array(), $_COOKIE, $_FILES, $_SERVER);
-    }
-
-    /**
      * Constructor.
      *
      * @param array $query      The GET parameters
@@ -127,6 +117,16 @@ class Request
         $this->basePath = null;
         $this->method = null;
         $this->format = null;
+    }
+
+    /**
+     * Creates a new request with values from PHP's super globals.
+     *
+     * @return Request A new request
+     */
+    static public function createfromGlobals()
+    {
+        return new static($_GET, $_POST, array(), $_COOKIE, $_FILES, $_SERVER);
     }
 
     /**

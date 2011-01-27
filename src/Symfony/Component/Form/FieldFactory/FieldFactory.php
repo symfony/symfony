@@ -49,39 +49,41 @@ class FieldFactory implements FieldFactoryInterface
      */
     public function getInstance($object, $property, array $options = array())
     {
-        $guess = $this->guess(function ($guesser) use ($object, $property) {
-            return $guesser->guessMaxLength($object, $property);
-        });
-
-        $maxLength = $guess ? $guess->getValue() : null;
-
-        $guess = $this->guess(function ($guesser) use ($object, $property) {
+        // guess field class and options
+        $classGuess = $this->guess(function ($guesser) use ($object, $property) {
             return $guesser->guessClass($object, $property);
         });
 
-        if (!$guess) {
+        if (!$classGuess) {
             throw new \RuntimeException(sprintf('No field could be guessed for property "%s" of class %s', $property, get_class($object)));
         }
 
-        $class = $guess->getClass();
-        $textField = 'Symfony\Component\Form\TextField';
+        // guess maximum length
+        $maxLengthGuess = $this->guess(function ($guesser) use ($object, $property) {
+            return $guesser->guessMaxLength($object, $property);
+        });
 
-        if (null !== $maxLength && ($class == $textField || is_subclass_of($class, $textField))) {
-            $options = array_merge(array('max_length' => $maxLength), $options);
-        }
-
-        $options = array_merge($guess->getOptions(), $options);
-        $field = new $class($property, $options);
-
-        $guess = $this->guess(function ($guesser) use ($object, $property) {
+        // guess whether field is required
+        $requiredGuess = $this->guess(function ($guesser) use ($object, $property) {
             return $guesser->guessRequired($object, $property);
         });
 
-        if ($guess) {
-            $field->setRequired($guess->getValue());
+        // construct field
+        $class = $classGuess->getClass();
+        $textField = 'Symfony\Component\Form\TextField';
+
+        if ($maxLengthGuess && ($class == $textField || is_subclass_of($class, $textField))) {
+            $options = array_merge(array('max_length' => $maxLengthGuess->getValue()), $options);
         }
 
-        return $field;
+        if ($requiredGuess) {
+            $options = array_merge(array('required' => $requiredGuess->getValue()), $options);
+        }
+
+        // user options may override guessed options
+        $options = array_merge($classGuess->getOptions(), $options);
+
+        return new $class($property, $options);
     }
 
     /**

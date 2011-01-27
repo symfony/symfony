@@ -19,7 +19,7 @@
         <parameter key="router.options.matcher_class">Symfony\Component\Routing\Matcher\UrlMatcher</parameter>
         <parameter key="router.options.matcher_base_class">Symfony\Component\Routing\Matcher\UrlMatcher</parameter>
         <parameter key="router.options.matcher_dumper_class">Symfony\Component\Routing\Matcher\Dumper\PhpMatcherDumper</parameter>
-        <parameter key="router.cache_warmer.class">Symfony\Bundle\FrameworkBundle\Routing\CacheWarmer\RouterCacheWarmer</parameter>
+        <parameter key="router.cache_warmer.class">Symfony\Bundle\FrameworkBundle\CacheWarmer\RouterCacheWarmer</parameter>
         <parameter key="router.options.matcher.cache_class">%kernel.name%%kernel.environment%UrlMatcher</parameter>
         <parameter key="router.options.generator.cache_class">%kernel.name%%kernel.environment%UrlGenerator</parameter>
     </parameters>

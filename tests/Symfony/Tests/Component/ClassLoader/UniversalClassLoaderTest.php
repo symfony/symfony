@@ -9,9 +9,9 @@
  * file that was distributed with this source code.
  */
 
-namespace Symfony\Tests\Component\HttpFoundation;
+namespace Symfony\Tests\Component\ClassLoader;
 
-use Symfony\Component\HttpFoundation\UniversalClassLoader;
+use Symfony\Component\ClassLoader\UniversalClassLoader;
 
 class UniversalClassLoaderTest extends \PHPUnit_Framework_TestCase
 {

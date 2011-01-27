@@ -36,10 +36,6 @@ class HttpBasicFactory implements SecurityFactoryInterface
         $listener = $container->setDefinition($listenerId, clone $container->getDefinition('security.authentication.listener.basic'));
         $listener->setArgument(2, $id);
 
-        if (isset($config['path'])) {
-            $container->setParameter('security.authentication.form.path', $config['path']);
-        }
-
         if (null === $defaultEntryPoint) {
             $defaultEntryPoint = 'security.authentication.basic_entry_point';
         }

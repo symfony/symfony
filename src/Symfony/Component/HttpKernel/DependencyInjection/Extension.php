@@ -22,19 +22,45 @@ use Symfony\Component\DependencyInjection\ContainerBuilder;
 abstract class Extension extends BaseExtension
 {
     protected $classes = array();
+    protected $classMap = array();
 
+    /**
+     * Gets the classes to cache.
+     *
+     * @return array An array of classes
+     */
     public function getClassesToCompile()
     {
         return $this->classes;
     }
 
     /**
-     * Adds classes to be compiled when debug mode is not enabled.
+     * Adds classes to the class cache.
      *
-     * @param array $classes Classes to be compiled
+     * @param array $classes An array of classes
      */
     protected function addClassesToCompile(array $classes)
     {
         $this->classes = array_merge($this->classes, $classes);
+    }
+
+    /**
+     * Gets the autoload class map.
+     *
+     * @return array An array of classes
+     */
+    public function getAutoloadClassMap()
+    {
+        return $this->classMap;
+    }
+
+    /**
+     * Adds classes to the autoload class map.
+     *
+     * @param array $classes An array of classes
+     */
+    public function addClassesToAutoloadMap(array $classes)
+    {
+        $this->classMap = array_merge($this->classMap, $classes);
     }
 }

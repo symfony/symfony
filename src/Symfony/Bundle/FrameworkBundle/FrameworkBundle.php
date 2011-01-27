@@ -19,13 +19,15 @@ use Symfony\Bundle\FrameworkBundle\DependencyInjection\Compiler\ConverterManager
 use Symfony\Bundle\FrameworkBundle\DependencyInjection\Compiler\RoutingResolverPass;
 use Symfony\Bundle\FrameworkBundle\DependencyInjection\Compiler\ProfilerPass;
 use Symfony\Bundle\FrameworkBundle\DependencyInjection\Compiler\AddClassesToCachePass;
+use Symfony\Bundle\FrameworkBundle\DependencyInjection\Compiler\AddClassesToAutoloadMapPass;
 use Symfony\Bundle\FrameworkBundle\DependencyInjection\Compiler\TranslatorPass;
 use Symfony\Bundle\FrameworkBundle\DependencyInjection\Compiler\AddCacheWarmerPass;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\DependencyInjection\Compiler\PassConfig;
 use Symfony\Component\HttpFoundation\File\File;
 use Symfony\Component\HttpKernel\Bundle\Bundle;
-use Symfony\Component\HttpKernel\ClassCollectionLoader;
+use Symfony\Component\ClassLoader\ClassCollectionLoader;
+use Symfony\Component\ClassLoader\MapFileClassLoader;
 
 /**
  * Bundle.
@@ -57,6 +59,11 @@ class FrameworkBundle extends Bundle
             $this->container->getParameter('kernel.debug'),
             true
         );
+
+        if (file_exists($this->container->getParameter('kernel.cache_dir').'/autoload.php')) {
+            $classloader = new MapFileClassLoader($this->container->getParameter('kernel.cache_dir').'/autoload.php');
+            $classloader->register(true);
+        }
     }
 
     public function registerExtensions(ContainerBuilder $container)
@@ -73,6 +80,7 @@ class FrameworkBundle extends Bundle
         $container->addCompilerPass(new AddConstraintValidatorsPass());
         $container->addCompilerPass(new AddFieldFactoryGuessersPass());
         $container->addCompilerPass(new AddClassesToCachePass());
+        $container->addCompilerPass(new AddClassesToAutoloadMapPass());
         $container->addCompilerPass(new TranslatorPass());
         $container->addCompilerPass(new AddCacheWarmerPass());
     }

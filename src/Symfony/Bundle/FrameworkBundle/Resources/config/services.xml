@@ -12,6 +12,7 @@
         <parameter key="error_handler.level">null</parameter>
         <parameter key="filesystem.class">Symfony\Bundle\FrameworkBundle\Util\Filesystem</parameter>
         <parameter key="cache_warmer.class">Symfony\Component\HttpKernel\CacheWarmer\CacheWarmerAggregate</parameter>
+        <parameter key="cache_warmer.autoloader_map.class">Symfony\Bundle\FrameworkBundle\CacheWarmer\ClassMapCacheWarmer</parameter>
     </parameters>
 
     <services>
@@ -31,6 +32,11 @@
 
         <service id="cache_warmer" class="%cache_warmer.class%">
             <argument type="collection" />
+        </service>
+
+        <service id="cache_warmer.autoload_map" class="%cache_warmer.autoloader_map.class%" public="false">
+            <tag name="kernel.cache_warmer" />
+            <argument type="service" id="service_container" />
         </service>
 
         <!--

@@ -1948,3 +1948,27 @@ class UniversalClassLoader
     }
 }
 }
+namespace Symfony\Component\ClassLoader
+{
+class MapFileClassLoader
+{
+    protected $map = array();
+    public function __construct($file)
+    {
+        $this->map = require $file;
+    }
+    public function register($prepend = false)
+    {
+        spl_autoload_register(array($this, 'loadClass'), true, $prepend);
+    }
+    public function loadClass($class)
+    {
+        if ('\\' === $class[0]) {
+            $class = substr($class, 1);
+        }
+        if (isset($this->map[$class])) {
+            require $this->map[$class];
+        }
+    }
+}
+}

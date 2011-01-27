@@ -47,5 +47,6 @@ ClassCollectionLoader::load(array(
 
     'Symfony\\Component\\ClassLoader\\ClassCollectionLoader',
     'Symfony\\Component\\ClassLoader\\UniversalClassLoader',
+    'Symfony\\Component\\ClassLoader\\MapFileClassLoader',
 
 ), __DIR__.'/../..', 'bootstrap', false);

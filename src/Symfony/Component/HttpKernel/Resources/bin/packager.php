@@ -1,6 +1,6 @@
 <?php
 
-require_once __DIR__.'/../../../HttpFoundation/UniversalClassLoader.php';
+require_once __DIR__.'/../../../ClassLoader/UniversalClassLoader.php';
 
 /*
  * This file is part of the Symfony package.
@@ -11,7 +11,7 @@ require_once __DIR__.'/../../../HttpFoundation/UniversalClassLoader.php';
  * file that was distributed with this source code.
  */
 
-use Symfony\Component\HttpFoundation\UniversalClassLoader;
+use Symfony\Component\ClassLoader\UniversalClassLoader;
 use Symfony\Component\HttpKernel\ClassCollectionLoader;
 
 $loader = new UniversalClassLoader();
@@ -45,6 +45,7 @@ ClassCollectionLoader::load(array(
     'Symfony\\Component\\HttpFoundation\\ServerBag',
     'Symfony\\Component\\HttpFoundation\\HeaderBag',
     'Symfony\\Component\\HttpFoundation\\Request',
-    'Symfony\\Component\\HttpFoundation\\UniversalClassLoader',
+
+    'Symfony\\Component\\ClassLoader\\UniversalClassLoader',
 
 ), __DIR__.'/../..', 'bootstrap', false);

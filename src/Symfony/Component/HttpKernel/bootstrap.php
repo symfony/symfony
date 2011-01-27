@@ -11,6 +11,9 @@ interface ContainerInterface
     function set($id, $service, $scope = self::SCOPE_CONTAINER);
     function get($id, $invalidBehavior = self::EXCEPTION_ON_INVALID_REFERENCE);
     function has($id);
+    function getParameter($name);
+    function hasParameter($name);
+    function setParameter($name, $value);
     function enterScope($name);
     function leaveScope($name);
     function addScope($name, $parentScope = self::SCOPE_CONTAINER);
@@ -1842,7 +1845,7 @@ class Request
     }
 }
 }
-namespace Symfony\Component\HttpFoundation
+namespace Symfony\Component\ClassLoader
 {
 class UniversalClassLoader
 {
@@ -1890,9 +1893,9 @@ class UniversalClassLoader
     {
         $this->prefixes[$prefix] = $path;
     }
-    public function register()
+    public function register($prepend = false)
     {
-        spl_autoload_register(array($this, 'loadClass'));
+        spl_autoload_register(array($this, 'loadClass'), true, $prepend);
     }
     public function loadClass($class)
     {

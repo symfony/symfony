@@ -9,7 +9,7 @@
  * file that was distributed with this source code.
  */
 
-namespace Symfony\Component\HttpFoundation;
+namespace Symfony\Component\ClassLoader;
 
 /**
  * UniversalClassLoader implements a "universal" autoloader for PHP 5.3.
@@ -162,10 +162,12 @@ class UniversalClassLoader
 
     /**
      * Registers this instance as an autoloader.
+     *
+     * @param Boolean $prepend Whether to prepend the autoloader or not
      */
-    public function register()
+    public function register($prepend = false)
     {
-        spl_autoload_register(array($this, 'loadClass'));
+        spl_autoload_register(array($this, 'loadClass'), true, $prepend);
     }
 
     /**

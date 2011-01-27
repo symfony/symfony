@@ -58,6 +58,34 @@ interface ContainerInterface
     function has($id);
 
     /**
+     * Gets a parameter.
+     *
+     * @param  string $name The parameter name
+     *
+     * @return mixed  The parameter value
+     *
+     * @throws  \InvalidArgumentException if the parameter is not defined
+     */
+    function getParameter($name);
+
+    /**
+     * Checks if a parameter exists.
+     *
+     * @param  string $name The parameter name
+     *
+     * @return Boolean The presence of parameter in container
+     */
+    function hasParameter($name);
+
+    /**
+     * Sets a parameter.
+     *
+     * @param string $name       The parameter name
+     * @param mixed  $parameters The parameter value
+     */
+    function setParameter($name, $value);
+
+    /**
      * Enters the given scope
      *
      * @param string $name

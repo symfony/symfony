@@ -129,20 +129,24 @@ class GraphWalker
         }
 
         if ($metadata->isCascaded()) {
-            $this->walkReference($value, $propagatedGroup ?: $group, $propertyPath);
+            $this->walkReference($value, $propagatedGroup ?: $group, $propertyPath, $metadata->isCollectionCascaded());
         }
     }
 
-    protected function walkReference($value, $group, $propertyPath)
+    protected function walkReference($value, $group, $propertyPath, $traverse)
     {
         if (null !== $value) {
-            if (is_array($value)) {
-                foreach ($value as $key => $element) {
-                    $this->walkReference($element, $group, $propertyPath.'['.$key.']');
-                }
-            } else if (!is_object($value)) {
+            if (!is_object($value) && !is_array($value)) {
                 throw new UnexpectedTypeException($value, 'object or array');
-            } else {
+            }
+
+            if ($traverse && (is_array($value) || $value instanceof \Traversable)) {
+                foreach ($value as $key => $element) {
+                    $this->walkReference($element, $group, $propertyPath.'['.$key.']', $traverse);
+                }
+            }
+
+            if (is_object($value)) {
                 $metadata = $this->metadataFactory->getClassMetadata(get_class($value));
                 $this->walkObject($metadata, $value, $group, $propertyPath);
             }

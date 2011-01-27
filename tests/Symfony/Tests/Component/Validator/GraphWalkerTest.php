@@ -237,7 +237,7 @@ class GraphWalkerTest extends \PHPUnit_Framework_TestCase
         $this->assertEquals($violations, $this->walker->getViolations());
     }
 
-    public function testWalkCascadedPropertyValidatesArrays()
+    public function testWalkCascadedPropertyValidatesArraysByDefault()
     {
         $entity = new Entity();
         $entityMetadata = new ClassMetadata(get_class($entity));
@@ -265,6 +265,67 @@ class GraphWalkerTest extends \PHPUnit_Framework_TestCase
             'path[key]',
             $entity
         ));
+
+        $this->assertEquals($violations, $this->walker->getViolations());
+    }
+
+    public function testWalkCascadedPropertyValidatesTraversableByDefault()
+    {
+        $entity = new Entity();
+        $entityMetadata = new ClassMetadata(get_class($entity));
+        $this->factory->addClassMetadata($entityMetadata);
+        $this->factory->addClassMetadata(new ClassMetadata('ArrayIterator'));
+
+        // add a constraint for the entity that always fails
+        $entityMetadata->addConstraint(new FailingConstraint());
+
+        // validate array when validating the property "reference"
+        $this->metadata->addPropertyConstraint('reference', new Valid());
+
+        $this->walker->walkPropertyValue(
+            $this->metadata,
+            'reference',
+            new \ArrayIterator(array('key' => $entity)),
+            'Default',
+            'path'
+        );
+
+        $violations = new ConstraintViolationList();
+        $violations->add(new ConstraintViolation(
+            '',
+            array(),
+            'Root',
+            'path[key]',
+            $entity
+        ));
+
+        $this->assertEquals($violations, $this->walker->getViolations());
+    }
+
+    public function testWalkCascadedPropertyDoesNotValidateTraversableIfDisabled()
+    {
+        $entity = new Entity();
+        $entityMetadata = new ClassMetadata(get_class($entity));
+        $this->factory->addClassMetadata($entityMetadata);
+        $this->factory->addClassMetadata(new ClassMetadata('ArrayIterator'));
+
+        // add a constraint for the entity that always fails
+        $entityMetadata->addConstraint(new FailingConstraint());
+
+        // validate array when validating the property "reference"
+        $this->metadata->addPropertyConstraint('reference', new Valid(array(
+            'traverse' => false,
+        )));
+
+        $this->walker->walkPropertyValue(
+            $this->metadata,
+            'reference',
+            new \ArrayIterator(array('key' => $entity)),
+            'Default',
+            'path'
+        );
+
+        $violations = new ConstraintViolationList();
 
         $this->assertEquals($violations, $this->walker->getViolations());
     }

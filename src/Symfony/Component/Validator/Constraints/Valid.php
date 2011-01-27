@@ -15,19 +15,7 @@ use Symfony\Component\Validator\Exception\ConstraintDefinitionException;
 
 class Valid extends \Symfony\Component\Validator\Constraint
 {
-    /**
-     * This constraint does not accept any options
-     *
-     * @param  mixed $options           Unsupported argument!
-     *
-     * @throws InvalidOptionsException  When the parameter $options is not NULL
-     */
-    public function __construct($options = null)
-    {
-        if (null !== $options && count($options) > 0) {
-            throw new ConstraintDefinitionException('The constraint Valid does not accept any options');
-        }
-    }
+    public $traverse = true;
 
     /**
      * {@inheritDoc}

@@ -22,6 +22,7 @@ abstract class MemberMetadata extends ElementMetadata
     public $name;
     public $property;
     public $cascaded = false;
+    public $collectionCascaded = false;
     private $reflMember;
 
     /**
@@ -52,6 +53,7 @@ abstract class MemberMetadata extends ElementMetadata
 
         if ($constraint instanceof Valid) {
             $this->cascaded = true;
+            $this->collectionCascaded = $constraint->traverse;
         } else {
             parent::addConstraint($constraint);
         }
@@ -142,6 +144,17 @@ abstract class MemberMetadata extends ElementMetadata
     public function isCascaded()
     {
         return $this->cascaded;
+    }
+
+    /**
+     * Returns whether arrays or traversable objects stored in this member
+     * should be traversed and validated in each entry
+     *
+     * @return Boolean
+     */
+    public function isCollectionCascaded()
+    {
+        return $this->collectionCascaded;
     }
 
     /**

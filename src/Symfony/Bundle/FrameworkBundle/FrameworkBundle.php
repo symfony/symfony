@@ -41,16 +41,6 @@ class FrameworkBundle extends Bundle
      */
     public function boot()
     {
-        $container = $this->container;
-
-        if ($container->has('error_handler')) {
-            $container->get('error_handler');
-        }
-
-        if ($this->container->hasParameter('document_root')) {
-            File::setDocumentRoot($this->container->getParameter('document_root'));
-        }
-
         // load core classes
         ClassCollectionLoader::load(
             $this->container->getParameter('kernel.compiled_classes'),
@@ -59,6 +49,14 @@ class FrameworkBundle extends Bundle
             $this->container->getParameter('kernel.debug'),
             true
         );
+
+        if ($this->container->has('error_handler')) {
+            $this->container->get('error_handler');
+        }
+
+        if ($this->container->hasParameter('document_root')) {
+            File::setDocumentRoot($this->container->getParameter('document_root'));
+        }
 
         if (file_exists($this->container->getParameter('kernel.cache_dir').'/autoload.php')) {
             $classloader = new MapFileClassLoader($this->container->getParameter('kernel.cache_dir').'/autoload.php');

@@ -9,13 +9,15 @@
  * file that was distributed with this source code.
  */
 
-namespace Symfony\Bundle\DoctrineBundle\Tests\Form\ValueTransformer;
+namespace Symfony\Tests\Component\Form\Extension\Doctrine;
 
-use Symfony\Bundle\DoctrineBundle\Form\ValueTransformer\CollectionToStringTransformer;
+require_once __DIR__.'/TestCase.php';
+
+use Symfony\Component\Form\Extension\Doctrine\CollectionToStringTransformer;
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\ORM\Tools\SchemaTool;
 
-class CollectionToStringTransformerTest extends \Symfony\Bundle\DoctrineBundle\Tests\TestCase
+class CollectionToStringTransformerTest extends TestCase
 {
     /**
      * @var EntityManager
@@ -28,7 +30,7 @@ class CollectionToStringTransformerTest extends \Symfony\Bundle\DoctrineBundle\T
         $this->em = $this->createTestEntityManager();
 
         $schemaTool = new SchemaTool($this->em);
-        $classes = array($this->em->getClassMetadata('Symfony\Bundle\DoctrineBundle\Tests\Form\ValueTransformer\Tag'));
+        $classes = array($this->em->getClassMetadata(__NAMESPACE__.'\Tag'));
         try {
             $schemaTool->dropSchema($classes);
         } catch(\Exception $e) {
@@ -45,7 +47,7 @@ class CollectionToStringTransformerTest extends \Symfony\Bundle\DoctrineBundle\T
     {
         $this->setExpectedException('Symfony\Component\Form\Exception\MissingOptionsException');
         $transformer = new CollectionToStringTransformer(array(
-            'class_name' => 'Symfony\Bundle\DoctrineBundle\Tests\Form\ValueTransformer\Tag',
+            'class_name' => __NAMESPACE__.'\Tag',
             'field_name' => 'name',
         ));
     }
@@ -63,7 +65,7 @@ class CollectionToStringTransformerTest extends \Symfony\Bundle\DoctrineBundle\T
     {
         $this->setExpectedException('Symfony\Component\Form\Exception\MissingOptionsException');
         $transformer = new CollectionToStringTransformer(array(
-            'class_name' => 'Symfony\Bundle\DoctrineBundle\Tests\Form\ValueTransformer\Tag',
+            'class_name' => __NAMESPACE__.'\Tag',
             'em' => $this->em,
         ));
     }
@@ -71,7 +73,7 @@ class CollectionToStringTransformerTest extends \Symfony\Bundle\DoctrineBundle\T
     public function createTransformer()
     {
         $transformer = new CollectionToStringTransformer(array(
-            'class_name' => 'Symfony\Bundle\DoctrineBundle\Tests\Form\ValueTransformer\Tag',
+            'class_name' => __NAMESPACE__.'\Tag',
             'field_name' => 'name',
             'em' => $this->em,
             'create_instance_callback' => function($tagName) {
@@ -99,7 +101,7 @@ class CollectionToStringTransformerTest extends \Symfony\Bundle\DoctrineBundle\T
         $tags = new ArrayCollection();
         $tags->add(new Tag("foo"));
         $tags->add(new Tag("bar"));
-        
+
         $this->assertEquals("foo,bar", $transformer->transform($tags));
     }
 
@@ -187,7 +189,7 @@ class CollectionToStringTransformerTest extends \Symfony\Bundle\DoctrineBundle\T
 
         $this->assertSame($this->em, $transformer->getOption('em'));
 
-        $this->assertEquals(1, count($this->em->getRepository('Symfony\Bundle\DoctrineBundle\Tests\Form\ValueTransformer\Tag')->findAll()));
+        $this->assertEquals(1, count($this->em->getRepository(__NAMESPACE__.'\Tag')->findAll()));
     }
 
     /**

@@ -9,7 +9,7 @@
  * file that was distributed with this source code.
  */
 
-namespace Symfony\Bundle\DoctrineBundle\Form\ValueTransformer;
+namespace Symfony\Component\Form\Extension\Doctrine;
 
 use Symfony\Component\Form\ValueTransformer\BaseValueTransformer;
 use Symfony\Component\Form\ValueTransformer\TransformationFailedException;
@@ -33,6 +33,7 @@ use Doctrine\Common\Collections\Collection;
  * @todo Refactor to make 'fieldName' optional (identifier).
  *
  * @author Benjamin Eberlei <kontakt@beberlei.de>
+ * @author Bernhard Schussek <bernhard.schussek@symfony-project.com>
  */
 class CollectionToStringTransformer extends BaseValueTransformer
 {

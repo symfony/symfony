@@ -119,6 +119,10 @@ class ChoiceField extends HybridField
     {
         if (!$this->choices) {
             $this->choices = $this->getInitializedChoices();
+
+            if (!$this->isRequired()) {
+                $this->choices = array('' => $this->getOption('empty_value')) + $this->choices;
+            }
         }
     }
 
@@ -130,13 +134,8 @@ class ChoiceField extends HybridField
             $choices = $choices->__invoke();
         }
 
-        // TESTME
         if (!is_array($choices)) {
             throw new InvalidOptionsException('The "choices" option must be an array or a closure returning an array', array('choices'));
-        }
-
-        if (!$this->isRequired()) {
-            $choices = array_merge(array('' => $this->getOption('empty_value')), $choices);
         }
 
         return $choices;

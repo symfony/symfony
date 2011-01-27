@@ -25,6 +25,7 @@ use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\DependencyInjection\Compiler\PassConfig;
 use Symfony\Component\HttpFoundation\File\File;
 use Symfony\Component\HttpKernel\Bundle\Bundle;
+use Symfony\Component\HttpKernel\ClassCollectionLoader;
 
 /**
  * Bundle.
@@ -47,6 +48,15 @@ class FrameworkBundle extends Bundle
         if ($this->container->hasParameter('document_root')) {
             File::setDocumentRoot($this->container->getParameter('document_root'));
         }
+
+        // load core classes
+        ClassCollectionLoader::load(
+            $this->container->getParameter('kernel.compiled_classes'),
+            $this->container->getParameter('kernel.cache_dir'),
+            'classes',
+            $this->container->getParameter('kernel.debug'),
+            true
+        );
     }
 
     public function registerExtensions(ContainerBuilder $container)

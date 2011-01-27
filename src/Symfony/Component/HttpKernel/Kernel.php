@@ -25,7 +25,6 @@ use Symfony\Component\DependencyInjection\Loader\PhpFileLoader;
 use Symfony\Component\DependencyInjection\Loader\ClosureLoader;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpKernel\HttpKernelInterface;
-use Symfony\Component\HttpKernel\ClassCollectionLoader;
 use Symfony\Component\HttpKernel\Bundle\BundleInterface;
 
 /**
@@ -102,15 +101,6 @@ abstract class Kernel implements KernelInterface
 
         // init container
         $this->initializeContainer();
-
-        // load core classes
-        ClassCollectionLoader::load(
-            $this->container->getParameter('kernel.compiled_classes'),
-            $this->container->getParameter('kernel.cache_dir'),
-            'classes',
-            $this->container->getParameter('kernel.debug'),
-            true
-        );
 
         foreach ($this->bundles as $bundle) {
             $bundle->setContainer($this->container);

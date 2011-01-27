@@ -22,7 +22,7 @@ use Symfony\Component\Security\Core\Exception\BadCredentialsException;
  *
  * @author Fabien Potencier <fabien.potencier@symfony-project.com>
  */
-class X509AuthenticationListener extends PreAuthenticatedListener
+class X509AuthenticationListener extends AbstractPreAuthenticatedListener
 {
     protected $userKey;
     protected $credentialKey;

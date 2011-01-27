@@ -21,13 +21,13 @@ use Symfony\Component\Security\Core\Exception\AuthenticationException;
 use Symfony\Component\HttpFoundation\Request;
 
 /**
- * PreAuthenticatedListener is the base class for all listener that
+ * AbstractPreAuthenticatedListener is the base class for all listener that
  * authenticates users based on a pre-authenticated request (like a certificate
  * for instance).
  *
  * @author Fabien Potencier <fabien.potencier@symfony-project.com>
  */
-abstract class PreAuthenticatedListener implements ListenerInterface
+abstract class AbstractPreAuthenticatedListener implements ListenerInterface
 {
     protected $securityContext;
     protected $authenticationManager;

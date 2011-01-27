@@ -44,11 +44,6 @@ class ContainerBuilder extends Container implements TaggedContainerInterface
     public function __construct(ParameterBagInterface $parameterBag = null)
     {
         parent::__construct($parameterBag);
-
-        $this->compiler = new Compiler();
-        foreach ($this->compiler->getPassConfig()->getPasses() as $pass) {
-            $this->addObjectResource($pass);
-        }
     }
 
     /**
@@ -153,6 +148,10 @@ class ContainerBuilder extends Container implements TaggedContainerInterface
      */
     public function addCompilerPass(CompilerPassInterface $pass, $type = PassConfig::TYPE_BEFORE_OPTIMIZATION)
     {
+        if (null === $this->compiler) {
+            $this->initializeCompiler();
+        }
+
         $this->compiler->addPass($pass, $type);
 
         $this->addObjectResource($pass);
@@ -165,6 +164,10 @@ class ContainerBuilder extends Container implements TaggedContainerInterface
      */
     public function getCompilerPassConfig()
     {
+        if (null === $this->compiler) {
+            $this->initializeCompiler();
+        }
+
         return $this->compiler->getPassConfig();
     }
 
@@ -175,6 +178,10 @@ class ContainerBuilder extends Container implements TaggedContainerInterface
      */
     public function getCompiler()
     {
+        if (null === $this->compiler) {
+            $this->initializeCompiler();
+        }
+
         return $this->compiler;
     }
 
@@ -360,6 +367,10 @@ class ContainerBuilder extends Container implements TaggedContainerInterface
      */
     public function compile()
     {
+        if (null === $this->compiler) {
+            $this->initializeCompiler();
+        }
+
         $this->compiler->compile($this);
 
         $this->setExtensionConfigs(array());
@@ -783,6 +794,14 @@ class ContainerBuilder extends Container implements TaggedContainerInterface
         }
 
         return $tags;
+    }
+
+    protected function initializeCompiler()
+    {
+        $this->compiler = new Compiler();
+        foreach ($this->compiler->getPassConfig()->getPasses() as $pass) {
+            $this->addObjectResource($pass);
+        }
     }
 
     static public function getServiceConditionals($value)

@@ -231,7 +231,6 @@ class Profiler
             return;
         }
 
-        $response = $response;
         $response->headers->set('X-Debug-Token', $this->getToken());
 
         foreach ($this->collectors as $collector) {

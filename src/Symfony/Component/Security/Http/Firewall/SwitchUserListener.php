@@ -114,7 +114,7 @@ class SwitchUserListener implements ListenerInterface
 
         $event->setProcessed();
 
-        return $return;
+        return $response;
     }
 
     /**

@@ -60,6 +60,7 @@ class SecurityExtension extends Extension
             $loader->load('security.xml');
             $loader->load('templating_php.xml');
             $loader->load('templating_twig.xml');
+            $loader->load('collectors.xml');
         }
 
         if (isset($config['access-denied-url'])) {

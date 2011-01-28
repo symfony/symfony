@@ -43,6 +43,9 @@ abstract class SecurityExtensionTest extends \PHPUnit_Framework_TestCase
             'security.authentication.provider.doctrine',
             'security.authentication.provider.service',
             'security.authentication.provider.anonymous',
+            'security.authentication.provider.dao',
+            'security.authentication.provider.pre_authenticated',
+            'security.authentication.provider.rememberme',
         );
 
         $this->assertEquals(array(), array_diff($expectedProviders, $providers));
@@ -58,7 +61,7 @@ abstract class SecurityExtensionTest extends \PHPUnit_Framework_TestCase
         foreach (array_keys($arguments[1]) as $contextId) {
             $contextDef = $container->getDefinition($contextId);
             $arguments = $contextDef->getArguments();
-            $listeners[] = array_map(function ($ref) { return preg_replace('/\.[a-f0-9]+$/', '', (string) $ref); }, $arguments[0]);
+            $listeners[] = array_map(function ($ref) { return preg_replace('/\.[a-f0-9]+$/', '', (string) $ref); }, $arguments['index_0']);
         }
 
         $this->assertEquals(array(

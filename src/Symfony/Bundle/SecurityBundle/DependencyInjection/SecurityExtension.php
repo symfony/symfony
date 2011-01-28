@@ -185,11 +185,19 @@ class SecurityExtension extends Extension
 
         // load firewall map
         $mapDef = $container->getDefinition('security.firewall.map');
-        $map = array();
-        foreach ($firewalls as $firewall) {
-            list($matcher, $listeners, $exceptionListener) = $this->createFirewall($container, $firewall, $providerIds, $factories);
+        $names = $map = array();
+        foreach ($firewalls as $name => $firewall) {
+            if (isset($firewall['name'])) {
+                $name = $firewall['name'];
+            }
+            if (in_array($name, $names)) {
+                throw new \RuntimeException(sprintf('The firewall name must be unique. Duplicate found: "%s"', $name));
+            }
+            $names[] = $name;
 
-            $contextId = 'security.firewall.map.context.'.count($map);
+            list($matcher, $listeners, $exceptionListener) = $this->createFirewall($container, $name, $firewall, $providerIds, $factories);
+
+            $contextId = 'security.firewall.map.context.'.$name;
             $context = $container->setDefinition($contextId, new DefinitionDecorator('security.firewall.context'));
             $context
                 ->setArgument(0, $listeners)
@@ -200,11 +208,8 @@ class SecurityExtension extends Extension
         $mapDef->setArgument(1, $map);
     }
 
-    protected function createFirewall(ContainerBuilder $container, $firewall, $providerIds, array $factories)
+    protected function createFirewall(ContainerBuilder $container, $id, $firewall, $providerIds, array $factories)
     {
-        // unique id for this firewall
-        $id = md5(serialize($firewall));
-
         // Matcher
         $i = 0;
         $matcher = null;

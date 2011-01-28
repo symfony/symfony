@@ -84,14 +84,21 @@ abstract class Extension implements ExtensionInterface
      *
      * twig.extensions: ['twig.extension.foo', 'twig.extension.bar']
      *
-     * @param array A config array
-     * @param key   The key to normalize
+     * @param array  $config A config array
+     * @param string $key    The key to normalize
+     * @param string $plural The plural form of the key if it is irregular
+     *
+     * @return array
      */
-    public static function normalizeConfig($config, $key)
+    public static function normalizeConfig($config, $key, $plural = null)
     {
+        if (null === $plural) {
+            $plural = $key.'s';
+        }
+
         $values = array();
-        if (isset($config[$key.'s'])) {
-            $values = $config[$key.'s'];
+        if (isset($config[$plural])) {
+            $values = $config[$plural];
         } elseif (isset($config[$key])) {
             if (is_string($config[$key]) || !is_int(key($config[$key]))) {
                 // only one

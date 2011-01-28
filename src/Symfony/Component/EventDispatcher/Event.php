@@ -18,7 +18,6 @@ namespace Symfony\Component\EventDispatcher;
  */
 class Event implements EventInterface
 {
-    protected $value = null;
     protected $processed = false;
     protected $subject;
     protected $name;

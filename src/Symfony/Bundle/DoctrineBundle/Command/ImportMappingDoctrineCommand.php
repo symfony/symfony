@@ -74,9 +74,7 @@ EOT
             $exporter->setEntityGenerator($entityGenerator);
         }
 
-        $emName = $input->getOption('em') ? $input->getOption('em') : 'default';
-        $emServiceName = sprintf('doctrine.orm.%s_entity_manager', $emName);
-        $em = $this->container->get($emServiceName);
+        $em = $this->getEntityManager($this->container, $input->getOption('em'));
         $databaseDriver = new DatabaseDriver($em->getConnection()->getSchemaManager());
         $em->getConfiguration()->setMetadataDriverImpl($databaseDriver);
 

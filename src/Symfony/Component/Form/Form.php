@@ -46,7 +46,7 @@ class Form extends FieldGroup
      * @param ValidatorInterface $validator
      * @param array $options
      */
-    public function __construct($name, $data = null, ValidatorInterface $validator = null, array $options = array())
+    public function __construct($name = null, $data = null, ValidatorInterface $validator = null, array $options = array())
     {
         $this->validator = $validator;
 

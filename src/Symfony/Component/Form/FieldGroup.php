@@ -14,6 +14,7 @@ namespace Symfony\Component\Form;
 use Symfony\Component\Form\Exception\AlreadyBoundException;
 use Symfony\Component\Form\Exception\UnexpectedTypeException;
 use Symfony\Component\Form\Exception\DanglingFieldException;
+use Symfony\Component\Form\Exception\FieldDefinitionException;
 
 /**
  * FieldGroup represents an array of widgets bind to names and values.
@@ -37,7 +38,7 @@ class FieldGroup extends Field implements \IteratorAggregate, FieldGroupInterfac
     /**
      * @inheritDoc
      */
-    public function __construct($key, array $options = array())
+    public function __construct($key = null, array $options = array())
     {
         $this->addOption('virtual', false);
 
@@ -119,6 +120,10 @@ class FieldGroup extends Field implements \IteratorAggregate, FieldGroupInterfac
 
             $options = func_num_args() > 1 ? func_get_arg(1) : array();
             $field = $factory->getInstance($this->getData(), $field, $options);
+        }
+
+        if ('' === $field->getKey() || null === $field->getKey()) {
+            throw new FieldDefinitionException('You cannot add anonymous fields');
         }
 
         $this->fields[$field->getKey()] = $field;

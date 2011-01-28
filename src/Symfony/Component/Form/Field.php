@@ -64,7 +64,7 @@ class Field extends Configurable implements FieldInterface
     private $propertyPath = null;
     private $transformationSuccessful = true;
 
-    public function __construct($key, array $options = array())
+    public function __construct($key = null, array $options = array())
     {
         $this->addOption('trim', true);
         $this->addOption('required', true);

@@ -454,6 +454,18 @@ class FieldGroupTest extends \PHPUnit_Framework_TestCase
     }
 
     /**
+     * @expectedException Symfony\Component\Form\Exception\FormException
+     */
+    public function testAddThrowsExceptionIfAnonymousField()
+    {
+        $group = new TestFieldGroup('author');
+
+        $field = $this->createMockField('');
+
+        $group->add($field);
+    }
+
+    /**
      * @expectedException Symfony\Component\Form\Exception\DanglingFieldException
      */
     public function testAddThrowsExceptionIfStringButNoRootForm()

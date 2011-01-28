@@ -73,15 +73,17 @@ EOT
             foreach ($e as $value) {
                 $e = explode(':', $value);
                 $name = $e[0];
-                $type = isset($e[1]) ? $e[1] : 'string';
-                preg_match_all('/(.*)\((.*)\)/', $type, $matches);
-                $type = isset($matches[1][0]) ? $matches[1][0] : $type;
-                $length = isset($matches[2][0]) ? $matches[2][0] : null;
-                $class->mapField(array(
-                    'fieldName' => $name,
-                    'type' => $type,
-                    'length' => $length
-                ));
+                if (strlen($name)) {
+                    $type = isset($e[1]) ? $e[1] : 'string';
+                    preg_match_all('/(.*)\((.*)\)/', $type, $matches);
+                    $type = isset($matches[1][0]) ? $matches[1][0] : $type;
+                    $length = isset($matches[2][0]) ? $matches[2][0] : null;
+                    $class->mapField(array(
+                        'fieldName' => $name,
+                        'type' => $type,
+                        'length' => $length
+                    ));
+                }
             }
         }
 
@@ -89,22 +91,44 @@ EOT
         $cme = new ClassMetadataExporter();
         $exporter = $cme->getExporter($mappingType);
 
+        $entityPath = $bundle->getPath().'/Entity/'.$entity.'.php';
+        if (file_exists($entityPath)) {
+            throw new \RuntimeException(sprintf("Entity %s already exists.", $class->name));
+        }
+
         if ('annotation' === $mappingType) {
-            $path = $bundle->getPath().'/Entity/'.$entity.'.php';
             $exporter->setEntityGenerator($this->getEntityGenerator());
+            $entityCode = $exporter->exportClassMetadata($class);
+            $mappingPath = $mappingCode = false;
         } else {
             $mappingType = 'yaml' == $mappingType ? 'yml' : $mappingType;
-            $path = $bundle->getPath().'/Resources/config/doctrine/metadata/orm/'.str_replace('\\', '.', $fullEntityClassName).'.dcm.'.$mappingType;
-        }
+            $mappingPath = $bundle->getPath().'/Resources/config/doctrine/metadata/orm/'.str_replace('\\', '.', $fullEntityClassName).'.dcm.'.$mappingType;
+            $mappingCode = $exporter->exportClassMetadata($class);
 
-        $code = $exporter->exportClassMetadata($class);
+            $entityGenerator = $this->getEntityGenerator();
+            $entityCode = $entityGenerator->generateEntityClass($class);
+
+            if (file_exists($mappingPath)) {
+                throw new \RuntimeException(sprintf("Cannot generate entity when mapping <info>%s</info> already exists", $mappingPath));
+            }
+        }
 
         $output->writeln(sprintf('Generating entity for "<info>%s</info>"', $bundle->getName()));
-        $output->writeln(sprintf('  > generating <comment>%s</comment>', $fullEntityClassName));
+        $output->writeln(sprintf('  > entity <comment>%s</comment> into <info>%s</info>', $fullEntityClassName, $entityPath));
 
-        if (!is_dir($dir = dirname($path))) {
+        if (!is_dir($dir = dirname($entityPath))) {
             mkdir($dir, 0777, true);
         }
-        file_put_contents($path, $code);
+        file_put_contents($entityPath, $entityCode);
+
+        if ($mappingPath) {
+            $output->writeln(sprintf('  > mapping into <info>%s</info>', $mappingPath));
+
+            if (!is_dir($dir = dirname($mappingPath))) {
+                mkdir($dir, 0777, true);
+            }
+            file_put_contents($mappingPath, $mappingCode);
+        }
+
     }
 }

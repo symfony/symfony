@@ -134,4 +134,40 @@ abstract class DoctrineCommand extends Command
 
         return $bundleMetadatas;
     }
+
+    protected function findBundle($bundleName)
+    {
+        $foundBundle = false;
+        foreach ($this->application->getKernel()->getBundles() as $bundle) {
+            /* @var $bundle Bundle */
+            if (strtolower($bundleName) == strtolower($bundle->getName())) {
+                $foundBundle = $bundle;
+                break;
+            }
+        }
+
+        if (!$foundBundle) {
+            throw new \InvalidArgumentException("No bundle " . $bundleName . " was found.");
+        }
+
+        return $foundBundle;
+    }
+
+    /**
+     * Transform classname to a path $foundBundle substract it to get the destination
+     *
+     * @param Bundle $bundle
+     * @return string
+     */
+    protected function findBasePathForBundle($bundle)
+    {
+        $path = str_replace('\\', '/', $bundle->getNamespace());
+        $destination = str_replace('/'.$path, "", $bundle->getPath(), $c);
+
+        if ($c != 1) {
+            throw new \RuntimeException("Something went terribly wrong.");
+        }
+
+        return $destination;
+    }
 }

@@ -16,8 +16,6 @@ use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Output\OutputInterface;
 use Symfony\Component\Console\Output\Output;
-use Symfony\Component\HttpKernel\Bundle\Bundle;
-use Doctrine\ORM\Tools\EntityGenerator;
 
 /**
  * Generate entity classes from mapping information
@@ -32,7 +30,7 @@ class GenerateEntitiesDoctrineCommand extends DoctrineCommand
         $this
             ->setName('doctrine:generate:entities')
             ->setDescription('Generate entity classes and method stubs from your mapping information.')
-            ->addOption('bundle', null, InputOption::VALUE_REQUIRED, 'The bundle to initialize the entity or entities in.')
+            ->addArgument('bundle', InputArgument::REQUIRED, 'The bundle to initialize the entity or entities in.')
             ->addOption('entity', null, InputOption::VALUE_OPTIONAL, 'The entity class to initialize (shortname without namespace).')
             ->setHelp(<<<EOT
 The <info>doctrine:generate:entities</info> command generates entity classes and method stubs from your mapping information:
@@ -52,30 +50,31 @@ EOT
 
     protected function execute(InputInterface $input, OutputInterface $output)
     {
+        $bundleName = $input->getArgument('bundle');
         $filterEntity = $input->getOption('entity');
 
-        $entityGenerator = $this->getEntityGenerator();
-        foreach ($this->application->getKernel()->getBundles() as $bundle) {
-            /* @var $bundle Bundle */
-            if ($input->getOption('bundle') != $bundle->getName()) {
-                continue;
-            }
+        $foundBundle = $this->findBundle($bundleName);
 
-            // transform classname to a path and substract it to get the destination
-            $path = dirname(str_replace('\\', '/', $bundle->getNamespace()));
-            $destination = str_replace('/'.$path, "", $bundle->getPath());
+        if ($metadatas = $this->getBundleMetadatas($foundBundle)) {
+            $output->writeln(sprintf('Generating entities for "<info>%s</info>"', $foundBundle->getName()));
+            $entityGenerator = $this->getEntityGenerator();
 
-            if ($metadatas = $this->getBundleMetadatas($bundle)) {
-                $output->writeln(sprintf('Generating entities for "<info>%s</info>"', $class));
-
-                foreach ($metadatas as $metadata) {
-                    if ($filterEntity && $metadata->reflClass->getShortName() == $filterEntity) {
-                        continue;
-                    }
-                    $output->writeln(sprintf('  > generating <comment>%s</comment>', $metadata->name));
-                    $entityGenerator->generate(array($metadata), $destination);
+            foreach ($metadatas as $metadata) {
+                if ($filterEntity && $metadata->reflClass->getShortName() == $filterEntity) {
+                    continue;
                 }
+
+                if (strpos($metadata->name, $foundBundle->getNamespace()) === false) {
+                    throw new \RuntimeException(
+                        "Entity " . $metadata->name . " and bundle don't have a commont namespace, ".
+                        "generation failed because the target directory cannot be detected.");
+                }
+
+                $output->writeln(sprintf('  > generating <comment>%s</comment>', $metadata->name));
+                $entityGenerator->generate(array($metadata), $this->findBasePathForBundle($foundBundle));
             }
+        } else {
+            throw new \RuntimeException("Bundle " . $bundleName . " does not contain any mapped entities.");
         }
     }
 }

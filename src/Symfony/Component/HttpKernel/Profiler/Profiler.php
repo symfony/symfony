@@ -245,10 +245,12 @@ class Profiler
         $data = base64_encode(serialize($this->collectors));
 
         if (true === $this->storage->write($this->token, $data, $this->ip, $this->url, $this->time)) {
-            $this->empty =false;
-        } else {
-            if (null !== $this->logger) {
-                $this->logger->err(sprintf('Unable to store the profiler information (%s).', $e->getMessage()));
+            $this->empty = false;
+        } elseif (null !== $this->logger) {
+            if (null !== $exception) {
+                $this->logger->err(sprintf('Unable to store the profiler information (%s).', $exception->getMessage()));
+            } else {
+                $this->logger->err('Unable to store the profiler information (%s).');
             }
         }
     }

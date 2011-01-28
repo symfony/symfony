@@ -38,14 +38,14 @@ class SecurityExtension extends Extension
     public function configLoad(array $configs, ContainerBuilder $container)
     {
         foreach ($configs as $config) {
-            $this->doConfigLoad($config, $container);
+            $this->doConfigLoad($this->normalizeKeys($config), $container);
         }
     }
 
     public function aclLoad(array $configs, ContainerBuilder $container)
     {
         foreach ($configs as $config) {
-            $this->doAclLoad($config, $container);
+            $this->doAclLoad($this->normalizeKeys($config), $container);
         }
     }
 
@@ -67,16 +67,13 @@ class SecurityExtension extends Extension
             $loader->load('collectors.xml');
         }
 
-        if (isset($config['access-denied-url'])) {
-            $container->setParameter('security.access.denied_url', $config['access-denied-url']);
+        if (isset($config['access_denied_url'])) {
+            $container->setParameter('security.access.denied_url', $config['access_denied_url']);
         }
 
         // session fixation protection
         if (isset($config['session_fixation_protection'])) {
-            $config['session-fixation-protection'] = $config['session_fixation_protection'];
-        }
-        if (isset($config['session-fixation-protection'])) {
-            $container->setParameter('security.authentication.session_strategy.strategy', $config['session-fixation-protection']);
+            $container->setParameter('security.authentication.session_strategy.strategy', $config['session_fixation_protection']);
         }
 
         $this->createFirewalls($config, $container);
@@ -91,8 +88,6 @@ class SecurityExtension extends Extension
         $roles = array();
         if (isset($config['role_hierarchy'])) {
             $roles = $config['role_hierarchy'];
-        } elseif (isset($config['role-hierarchy'])) {
-            $roles = $config['role-hierarchy'];
         }
 
         if (isset($roles['role']) && is_int(key($roles['role']))) {
@@ -123,8 +118,6 @@ class SecurityExtension extends Extension
         $rules = array();
         if (isset($config['access_control'])) {
             $rules = $config['access_control'];
-        } elseif (isset($config['access-control'])) {
-            $rules = $config['access-control'];
         }
 
         if (isset($rules['rule']) && is_array($rules['rule'])) {
@@ -134,9 +127,7 @@ class SecurityExtension extends Extension
         foreach ($rules as $i => $access) {
             $roles = isset($access['role']) ? (is_array($access['role']) ? $access['role'] : preg_split('/\s*,\s*/', $access['role'])) : array();
             $channel = null;
-            if (isset($access['requires-channel'])) {
-                $channel = $access['requires-channel'];
-            } elseif (isset($access['requires_channel'])) {
+            if (isset($access['requires_channel'])) {
                 $channel = $access['requires_channel'];
             }
 
@@ -218,11 +209,7 @@ class SecurityExtension extends Extension
         $i = 0;
         $matcher = null;
         if (isset($firewall['request_matcher'])) {
-            $firewall['request-matcher'] = $firewall['request_matcher'];
-        }
-
-        if (isset($firewall['request-matcher'])) {
-            $matcher = new Reference($firewall['request-matcher']);
+            $matcher = new Reference($firewall['request_matcher']);
         } else if (isset($firewall['pattern'])) {
             $matcher = $this->createRequestMatcher($container, $firewall['pattern']);
         }
@@ -280,11 +267,8 @@ class SecurityExtension extends Extension
 
             // add session logout handler
             $invalidateSession = true;
-            if (array_key_exists('invalidate_session', $firewall['logout'])) {
-                $firewall['logout']['invalidate-session'] = $firewall['logout']['invalidate_session'];
-            }
-            if (array_key_exists('invalidate-session', $firewall['logout'])) {
-                $invalidateSession = (Boolean) $invalidateSession;
+            if (isset($firewall['logout']['invalidate_session'])) {
+                $invalidateSession = (Boolean) $firewall['logout']['invalidate_session'];
             }
             if (true === $invalidateSession && (!isset($firewall['stateless']) || !$firewall['stateless'])) {
                 $listener->addMethodCall('addHandler', array(new Reference('security.logout.handler.session')));
@@ -315,18 +299,12 @@ class SecurityExtension extends Extension
 
         // Switch user listener
         if (array_key_exists('switch_user', $firewall)) {
-            $firewall['switch-user'] = $firewall['switch_user'];
-        }
-        if (array_key_exists('switch-user', $firewall)) {
-            $listeners[] = new Reference($this->createSwitchUserListener($container, $id, $firewall['switch-user'], $defaultProvider));
+            $listeners[] = new Reference($this->createSwitchUserListener($container, $id, $firewall['switch_user'], $defaultProvider));
         }
 
         // Determine default entry point
         if (isset($firewall['entry_point'])) {
-            $firewall['entry-point'] = $firewall['entry_point'];
-        }
-        if (isset($firewall['entry-point'])) {
-            $defaultEntryPoint = $firewall['entry-point'];
+            $defaultEntryPoint = $firewall['entry_point'];
         }
 
         // Exception listener
@@ -493,8 +471,8 @@ class SecurityExtension extends Extension
         if ('plaintext' === $config['algorithm']) {
             $arguments = array();
 
-            if (array_key_exists('ignore-case', $config)) {
-                $arguments[0] = (Boolean) $config['ignore-case'];
+            if (isset($config['ignore_case'])) {
+                $arguments[0] = (Boolean) $config['ignore_case'];
             }
 
             $encoderMap[$accountClass] = array(
@@ -509,8 +487,8 @@ class SecurityExtension extends Extension
         $arguments = array($config['algorithm']);
 
         // add optional arguments
-        if (isset($config['encode-as-base64'])) {
-            $arguments[1] = (Boolean) $config['encode-as-base64'];
+        if (isset($config['encode_as_base64'])) {
+            $arguments[1] = (Boolean) $config['encode_as_base64'];
         } else {
             $arguments[1] = false;
         }
@@ -627,22 +605,15 @@ class SecurityExtension extends Extension
 
     protected function createExceptionListener($container, $config, $id, $defaultEntryPoint)
     {
-        if (isset($config['access_denied_handler'])) {
-            $config['access-denied-handler'] = $config['access_denied_handler'];
-        }
-        if (isset($config['access_denied_url'])) {
-            $config['access-denied-url'] = $config['access_denied_url'];
-        }
-
         $exceptionListenerId = 'security.exception_listener.'.$id;
         $listener = $container->setDefinition($exceptionListenerId, new DefinitionDecorator('security.exception_listener'));
         $listener->setArgument(2, null === $defaultEntryPoint ? null : new Reference($defaultEntryPoint));
 
         // access denied handler setup
-        if (isset($config['access-denied-handler'])) {
-            $listener->setArgument(4, new Reference($config['access-denied-handler']));
-        } else if (isset($config['access-denied-url'])) {
-            $listener->setArgument(3, $config['access-denied-url']);
+        if (isset($config['access_denied_handler'])) {
+            $listener->setArgument(4, new Reference($config['access_denied_handler']));
+        } else if (isset($config['access_denied_url'])) {
+            $listener->setArgument(3, $config['access_denied_url']);
         }
 
         return $exceptionListenerId;

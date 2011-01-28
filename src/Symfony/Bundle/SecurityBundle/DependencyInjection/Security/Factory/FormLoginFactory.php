@@ -39,9 +39,7 @@ class FormLoginFactory implements SecurityFactoryInterface
 
         // add remember-me tag
         $rememberMe = true;
-        if (isset($config['remember-me']) && false === $config['remember-me']) {
-            $rememberMe = false;
-        } else if (isset($config['remember_me']) && false === $config['remember_me']) {
+        if (isset($config['remember_me']) && false === $config['remember_me']) {
             $rememberMe = false;
         }
         if ($rememberMe) {
@@ -69,18 +67,12 @@ class FormLoginFactory implements SecurityFactoryInterface
 
         // success handler
         if (isset($config['success_handler'])) {
-            $config['success-handler'] = $config['success_handler'];
-        }
-        if (isset($config['success-handler'])) {
-            $listener->setArgument(5, new Reference($config['success-handler']));
+            $listener->setArgument(5, new Reference($config['success_handler']));
         }
 
         // failure handler
         if (isset($config['failure_handler'])) {
-            $config['failure-handler'] = $config['failure_handler'];
-        }
-        if (isset($config['failure-handler'])) {
-            $listener->setArgument(6, new Reference($config['failure-handler']));
+            $listener->setArgument(6, new Reference($config['failure_handler']));
         }
 
         // form entry point

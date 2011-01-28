@@ -298,6 +298,11 @@ class SecurityExtension extends Extension
 
                 $listener->addMethodCall('addHandler', array(new Reference($cookieHandlerId)));
             }
+
+            // add custom handlers
+            foreach ($this->normalizeConfig($firewall['logout'], 'handler') as $handlerId) {
+                $listener->addMethodCall('addHandler', array(new Reference($handlerId)));
+            }
         }
 
         // Authentication listeners

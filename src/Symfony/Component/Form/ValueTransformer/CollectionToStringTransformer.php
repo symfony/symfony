@@ -9,10 +9,8 @@
  * file that was distributed with this source code.
  */
 
-namespace Symfony\Component\Form\Extension\Doctrine;
+namespace Symfony\Component\Form\ValueTransformer;
 
-use Symfony\Component\Form\ValueTransformer\BaseValueTransformer;
-use Symfony\Component\Form\ValueTransformer\TransformationFailedException;
 use Doctrine\Common\Collections\Collection;
 
 /**

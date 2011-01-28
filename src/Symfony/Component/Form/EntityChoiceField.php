@@ -9,10 +9,8 @@
  * file that was distributed with this source code.
  */
 
-namespace Symfony\Component\Form\Extension\Doctrine;
+namespace Symfony\Component\Form;
 
-use Symfony\Component\Form\ChoiceField;
-use Symfony\Component\Form\PropertyPath;
 use Symfony\Component\Form\ValueTransformer\TransformationFailedException;
 use Symfony\Component\Form\Exception\FormException;
 use Symfony\Component\Form\Exception\InvalidOptionsException;

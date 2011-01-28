@@ -9,15 +9,16 @@
  * file that was distributed with this source code.
  */
 
-namespace Symfony\Tests\Component\Form\Extension\Doctrine;
+namespace Symfony\Tests\Component\Form\ValueTransformer;
 
-require_once __DIR__.'/TestCase.php';
+require_once __DIR__.'/../DoctrineOrmTestCase.php';
 
-use Symfony\Component\Form\Extension\Doctrine\CollectionToStringTransformer;
+use Symfony\Tests\Component\Form\DoctrineOrmTestCase;
+use Symfony\Component\Form\ValueTransformer\CollectionToStringTransformer;
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\ORM\Tools\SchemaTool;
 
-class CollectionToStringTransformerTest extends TestCase
+class CollectionToStringTransformerTest extends DoctrineOrmTestCase
 {
     /**
      * @var EntityManager

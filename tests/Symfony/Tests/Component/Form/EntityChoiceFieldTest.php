@@ -9,24 +9,24 @@
  * file that was distributed with this source code.
  */
 
-namespace Symfony\Tests\Component\Form\Extension\Doctrine;
+namespace Symfony\Tests\Component\Form;
 
-require_once __DIR__.'/TestCase.php';
+require_once __DIR__.'/DoctrineOrmTestCase.php';
 require_once __DIR__.'/Fixtures/SingleIdentEntity.php';
 require_once __DIR__.'/Fixtures/CompositeIdentEntity.php';
 
-use Symfony\Component\Form\Extension\Doctrine\EntityChoiceField;
+use Symfony\Component\Form\EntityChoiceField;
 use Symfony\Component\Form\Exception\UnexpectedTypeException;
-use Symfony\Tests\Component\Form\Extension\Doctrine\Fixtures\SingleIdentEntity;
-use Symfony\Tests\Component\Form\Extension\Doctrine\Fixtures\CompositeIdentEntity;
+use Symfony\Tests\Component\Form\Fixtures\SingleIdentEntity;
+use Symfony\Tests\Component\Form\Fixtures\CompositeIdentEntity;
 use Doctrine\ORM\Tools\SchemaTool;
 use Doctrine\Common\Collections\ArrayCollection;
 
-class EntityChoiceFieldTest extends TestCase
+class EntityChoiceFieldTest extends DoctrineOrmTestCase
 {
-    const SINGLE_IDENT_CLASS = 'Symfony\Tests\Component\Form\Extension\Doctrine\Fixtures\SingleIdentEntity';
+    const SINGLE_IDENT_CLASS = 'Symfony\Tests\Component\Form\Fixtures\SingleIdentEntity';
 
-    const COMPOSITE_IDENT_CLASS = 'Symfony\Tests\Component\Form\Extension\Doctrine\Fixtures\CompositeIdentEntity';
+    const COMPOSITE_IDENT_CLASS = 'Symfony\Tests\Component\Form\Fixtures\CompositeIdentEntity';
 
     /**
      * @var EntityManager

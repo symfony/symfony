@@ -1,6 +1,6 @@
 <?php
 
-namespace Symfony\Tests\Component\Form\Extension\Doctrine\Fixtures;
+namespace Symfony\Tests\Component\Form\Fixtures;
 
 /** @Entity */
 class CompositeIdentEntity

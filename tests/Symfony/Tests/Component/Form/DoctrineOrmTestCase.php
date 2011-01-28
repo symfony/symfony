@@ -9,7 +9,7 @@
  * file that was distributed with this source code.
  */
 
-namespace Symfony\Tests\Component\Form\Extension\Doctrine;
+namespace Symfony\Tests\Component\Form;
 
 use Doctrine\ORM\EntityManager;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
@@ -17,7 +17,7 @@ use Symfony\Component\DependencyInjection\ParameterBag\ParameterBag;
 use Symfony\Bundle\DoctrineBundle\DependencyInjection\DoctrineExtension;
 use Symfony\Component\DependencyInjection\Loader\YamlFileLoader;
 
-class TestCase extends \PHPUnit_Framework_TestCase
+class DoctrineOrmTestCase extends \PHPUnit_Framework_TestCase
 {
     protected function setUp()
     {

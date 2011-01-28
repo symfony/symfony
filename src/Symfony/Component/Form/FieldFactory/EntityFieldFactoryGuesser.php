@@ -9,11 +9,8 @@
  * file that was distributed with this source code.
  */
 
-namespace Symfony\Component\Form\Extension\Doctrine;
+namespace Symfony\Component\Form\FieldFactory;
 
-use Symfony\Component\Form\FieldFactory\FieldFactoryGuesserInterface;
-use Symfony\Component\Form\FieldFactory\FieldFactoryGuess;
-use Symfony\Component\Form\FieldFactory\FieldFactoryClassGuess;
 use Doctrine\ORM\EntityManager;
 
 /**

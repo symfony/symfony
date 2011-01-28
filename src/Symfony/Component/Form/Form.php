@@ -11,6 +11,8 @@
 
 namespace Symfony\Component\Form;
 
+use Symfony\Component\HttpFoundation\Request;
+use Symfony\Component\HttpFoundation\FileBag;
 use Symfony\Component\Validator\ValidatorInterface;
 use Symfony\Component\Form\Exception\FormException;
 use Symfony\Component\Form\CsrfProvider\CsrfProviderInterface;
@@ -20,11 +22,11 @@ use Symfony\Component\Form\CsrfProvider\CsrfProviderInterface;
  *
  * A form is composed of a validator schema and a widget form schema.
  *
- * Form also takes care of Csrf protection by default.
+ * Form also takes care of CSRF protection by default.
  *
- * A Csrf secret can be any random string. If set to false, it disables the
- * Csrf protection, and if set to null, it forces the form to use the global
- * Csrf secret. If the global Csrf secret is also null, then a random one
+ * A CSRF secret can be any random string. If set to false, it disables the
+ * CSRF protection, and if set to null, it forces the form to use the global
+ * CSRF secret. If the global CSRF secret is also null, then a random one
  * is generated on the fly.
  *
  * @author Fabien Potencier <fabien.potencier@symfony-project.com>
@@ -141,32 +143,42 @@ class Form extends FieldGroup
     }
 
     /**
-     * Binds the form with values and files.
+     * Binds the form with submitted data from a Request object
      *
-     * This method is final because it is very easy to break a form when
-     * overriding this method and adding logic that depends on $taintedFiles.
-     * You should override doBind() instead where the uploaded files are
-     * already merged into the data array.
-     *
-     * @param  array $taintedValues  The form data of the $_POST array
-     * @param  array $taintedFiles   An array of uploaded files
-     * @return Boolean               Whether the form is valid
+     * @param Request $request  The request object
+     * @see bind()
      */
-    final public function bind($taintedValues, array $taintedFiles = null)
+    public function bindRequest(Request $request)
     {
-        if (null === $taintedFiles) {
-            if ($this->isMultipart() && $this->getParent() === null) {
-                throw new \InvalidArgumentException('You must provide a files array for multipart forms');
-            }
+        $values = $request->request->get($this->getName());
+        $files = $request->files->get($this->getName());
 
-            $taintedFiles = array();
-        }
+        $this->bind(self::deepArrayUnion($values, $files));
+    }
 
-        if (null === $taintedValues) {
-            $taintedValues = array();
-        }
+    /**
+     * Binds the form with submitted data from the PHP globals $_POST and
+     * $_FILES
+     *
+     * @see bind()
+     */
+    public function bindGlobals()
+    {
+        $values = $_POST[$this->getName()];
 
-        $this->doBind(self::deepArrayUnion($taintedValues, $taintedFiles));
+        // fix files array and convert to UploadedFile instances
+        $fileBag = new FileBag($_FILES);
+        $files = $fileBag->get($this->getName());
+
+        $this->bind(self::deepArrayUnion($values, $files));
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    public function bind($values)
+    {
+        parent::bind($values);
 
         if ($this->getParent() === null) {
             if ($this->validator === null) {
@@ -190,17 +202,6 @@ class Form extends FieldGroup
                 }
             }
         }
-    }
-
-    /**
-     * Binds the form with the given data.
-     *
-     * @param  array $taintedData  The data to bind to the form
-     * @return Boolean             Whether the form is valid
-     */
-    protected function doBind(array $taintedData)
-    {
-        parent::bind($taintedData);
     }
 
     /**

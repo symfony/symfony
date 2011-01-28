@@ -20,6 +20,8 @@ use Symfony\Component\Form\Field;
 use Symfony\Component\Form\HiddenField;
 use Symfony\Component\Form\FieldGroup;
 use Symfony\Component\Form\PropertyPath;
+use Symfony\Component\HttpFoundation\Request;
+use Symfony\Component\HttpFoundation\File\UploadedFile;
 use Symfony\Component\Validator\ConstraintViolation;
 use Symfony\Component\Validator\ConstraintViolationList;
 use Symfony\Tests\Component\Form\Fixtures\Author;
@@ -222,26 +224,75 @@ class FormTest extends \PHPUnit_Framework_TestCase
         $form->bind(array()); // irrelevant
     }
 
-    public function testMultipartFormsWithoutParentsRequireFiles()
+    public function testBindRequest()
     {
-        $form = new Form('author', new Author(), $this->validator);
-        $form->add($this->createMultipartMockField('file'));
+        $values = array(
+            'author' => array(
+                'name' => 'Bernhard',
+                'image' => array('filename' => 'foobar.png'),
+            ),
+        );
+        $files = array(
+            'author' => array(
+                'error' => array('image' => array('file' => UPLOAD_ERR_OK)),
+                'name' => array('image' => array('file' => 'upload.png')),
+                'size' => array('image' => array('file' => 123)),
+                'tmp_name' => array('image' => array('file' => 'abcdef.png')),
+                'type' => array('image' => array('file' => 'image/png')),
+            ),
+        );
 
-        $this->setExpectedException('InvalidArgumentException');
+        $request = new Request(array(), $values, array(), array(), $files);
 
-        // should be given in second argument
-        $form->bind(array('file' => 'test.txt'));
+        $form = new Form('author', null, $this->createMockValidator());
+        $form->add(new TestField('name'));
+        $imageForm = new FieldGroup('image');
+        $imageForm->add(new TestField('file'));
+        $imageForm->add(new TestField('filename'));
+        $form->add($imageForm);
+
+        $form->bindRequest($request);
+
+        $file = new UploadedFile('abcdef.png', 'upload.png', 'image/png', 123, UPLOAD_ERR_OK);
+
+        $this->assertEquals('Bernhard', $form['name']->getData());
+        $this->assertEquals('foobar.png', $form['image']['filename']->getData());
+        $this->assertEquals($file, $form['image']['file']->getData());
     }
 
-    public function testMultipartFormsWithParentsRequireNoFiles()
+    public function testBindGlobals()
     {
-        $form = new Form('author', new Author(), $this->validator);
-        $form->add($this->createMultipartMockField('file'));
+        $_POST = array(
+            'author' => array(
+                'name' => 'Bernhard',
+                'image' => array('filename' => 'foobar.png'),
+            ),
+        );
+        $_FILES = array(
+            'author' => array(
+                'error' => array('image' => array('file' => UPLOAD_ERR_OK)),
+                'name' => array('image' => array('file' => 'upload.png')),
+                'size' => array('image' => array('file' => 123)),
+                'tmp_name' => array('image' => array('file' => 'abcdef.png')),
+                'type' => array('image' => array('file' => 'image/png')),
+            ),
+        );
 
-        $form->setParent($this->createMockField('group'));
 
-        // files are expected to be converted by the parent
-        $form->bind(array('file' => 'test.txt'));
+        $form = new Form('author', null, $this->createMockValidator());
+        $form->add(new TestField('name'));
+        $imageForm = new FieldGroup('image');
+        $imageForm->add(new TestField('file'));
+        $imageForm->add(new TestField('filename'));
+        $form->add($imageForm);
+
+        $form->bindGlobals();
+
+        $file = new UploadedFile('abcdef.png', 'upload.png', 'image/png', 123, UPLOAD_ERR_OK);
+
+        $this->assertEquals('Bernhard', $form['name']->getData());
+        $this->assertEquals('foobar.png', $form['image']['filename']->getData());
+        $this->assertEquals($file, $form['image']['file']->getData());
     }
 
     public function testUpdateFromPropertyIsIgnoredIfFormHasObject()

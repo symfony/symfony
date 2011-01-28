@@ -164,12 +164,12 @@ abstract class Kernel implements KernelInterface
     }
 
     /**
-     * Returns a bundle by its name.
+     * Returns a bundle and optionally its descendants by its name.
      *
      * @param string  $name  Bundle name
-     * @param Boolean $first Whether to return the first bundle or all bundles matching this name
+     * @param Boolean $first Whether to return the first bundle only or together with its descendants
      *
-     * @return BundleInterface A BundleInterface instance
+     * @return BundleInterface|Array A BundleInterface instance or an array of BundleInterface instances if $first is false
      *
      * @throws \InvalidArgumentException when the bundle is not enabled
      */
@@ -327,6 +327,16 @@ abstract class Kernel implements KernelInterface
         return $this->rootDir.'/logs';
     }
 
+    /**
+     * Initialize the data structures related to the bundle management:
+     *  - the bundle property maps a bundle name to a bundle instance,
+     *  - the bundleMap property maps a bundle name to the bundle inheritance hierarchy.
+     *
+     * @throws \LogicException if two bundles share a common name
+     * @throws \LogicException if a bundle tries to extend a non-existing bundle
+     * @throws \LogicException if two bundles extend the same ancestor
+     *
+     */
     protected function initializeBundles()
     {
         // init bundles
@@ -334,11 +344,11 @@ abstract class Kernel implements KernelInterface
         $this->bundleMap = array();
         foreach ($this->registerBundles() as $bundle) {
             $name = $bundle->getName();
+            if (isset($this->bundles[$name])) {
+                throw new \LogicException(sprintf('Trying to register two bundles with the same name "%s"', $name));
+            } 
             $this->bundles[$name] = $bundle;
-            if (!isset($this->bundleMap[$name])) {
-                $this->bundleMap[$name] = array();
-            }
-            $this->bundleMap[$name][] = $bundle;
+            $this->bundleMap[$name] = array($bundle);
         }
 
         // inheritance

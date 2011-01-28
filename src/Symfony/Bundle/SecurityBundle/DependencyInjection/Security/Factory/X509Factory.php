@@ -11,6 +11,8 @@
 
 namespace Symfony\Bundle\SecurityBundle\DependencyInjection\Security\Factory;
 
+use Symfony\Component\DependencyInjection\DefinitionDecorator;
+
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\DependencyInjection\Reference;
 
@@ -25,18 +27,16 @@ class X509Factory implements SecurityFactoryInterface
     {
         $provider = 'security.authentication.provider.pre_authenticated.'.$id;
         $container
-            ->register($provider, '%security.authentication.provider.pre_authenticated.class%')
-            ->setArguments(array(new Reference($userProvider), new Reference('security.account_checker'), $id))
-            ->setPublic(false)
+            ->setDefinition($provider, new DefinitionDecorator('security.authentication.provider.pre_authenticated'))
+            ->setArgument(0, new Reference($userProvider))
+            ->addArgument($id)
             ->addTag('security.authentication_provider')
         ;
 
         // listener
         $listenerId = 'security.authentication.listener.x509.'.$id;
-        $listener = $container->setDefinition($listenerId, clone $container->getDefinition('security.authentication.listener.x509'));
-        $arguments = $listener->getArguments();
-        $arguments[2] = $id;
-        $listener->setArguments($arguments);
+        $listener = $container->setDefinition($listenerId, new DefinitionDecorator('security.authentication.listener.x509'));
+        $listener->setArgument(2, $id);
 
         return array($provider, $listenerId, $defaultEntryPoint);
     }

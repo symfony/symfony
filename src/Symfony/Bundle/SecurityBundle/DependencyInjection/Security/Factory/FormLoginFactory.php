@@ -11,6 +11,7 @@
 
 namespace Symfony\Bundle\SecurityBundle\DependencyInjection\Security\Factory;
 
+use Symfony\Component\DependencyInjection\DefinitionDecorator;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\DependencyInjection\Reference;
 
@@ -25,15 +26,15 @@ class FormLoginFactory implements SecurityFactoryInterface
     {
         $provider = 'security.authentication.provider.dao.'.$id;
         $container
-            ->register($provider, '%security.authentication.provider.dao.class%')
-            ->setArguments(array(new Reference($userProvider), new Reference('security.account_checker'), $id, new Reference('security.encoder_factory')))
-            ->setPublic(false)
+            ->setDefinition($provider, new DefinitionDecorator('security.authentication.provider.dao'))
+            ->setArgument(0, new Reference($userProvider))
+            ->setArgument(2, $id)
             ->addTag('security.authentication_provider')
         ;
 
         // listener
         $listenerId = 'security.authentication.listener.form.'.$id;
-        $listener = $container->setDefinition($listenerId, clone $container->getDefinition('security.authentication.listener.form'));
+        $listener = $container->setDefinition($listenerId, new DefinitionDecorator('security.authentication.listener.form'));
         $listener->setArgument(3, $id);
 
         // add remember-me tag
@@ -60,7 +61,7 @@ class FormLoginFactory implements SecurityFactoryInterface
             'failure_forward'                => false,
         );
         foreach (array_keys($options) as $key) {
-            if (isset($config[$key])) {
+            if (array_key_exists($key, $config)) {
                 $options[$key] = $config[$key];
             }
         }
@@ -83,8 +84,12 @@ class FormLoginFactory implements SecurityFactoryInterface
         }
 
         // form entry point
-        $entryPoint = $container->setDefinition($entryPointId = 'security.authentication.form_entry_point.'.$id, clone $container->getDefinition('security.authentication.form_entry_point'));
-        $entryPoint->setArguments(array($options['login_path'], $options['use_forward']));
+        $entryPointId = 'security.authentication.form_entry_point.'.$id;
+        $container
+            ->setDefinition($entryPointId, new DefinitionDecorator('security.authentication.form_entry_point'))
+            ->addArgument($options['login_path'])
+            ->addArgument($options['use_forward'])
+        ;
 
         return array($provider, $listenerId, $entryPointId);
     }

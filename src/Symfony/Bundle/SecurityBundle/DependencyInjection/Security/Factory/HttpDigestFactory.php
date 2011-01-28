@@ -11,6 +11,7 @@
 
 namespace Symfony\Bundle\SecurityBundle\DependencyInjection\Security\Factory;
 
+use Symfony\Component\DependencyInjection\DefinitionDecorator;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\DependencyInjection\Reference;
 
@@ -25,15 +26,15 @@ class HttpDigestFactory implements SecurityFactoryInterface
     {
         $provider = 'security.authentication.provider.dao.'.$id;
         $container
-            ->register($provider, '%security.authentication.provider.dao.class%')
-            ->setArguments(array(new Reference($userProvider), new Reference('security.account_checker'), $id, new Reference('security.encoder_factory')))
-            ->setPublic(false)
+            ->setDefinition($provider, new DefinitionDecorator('security.authentication.provider.dao'))
+            ->setArgument(0, new Reference($userProvider))
+            ->setArgument(2, $id)
             ->addTag('security.authentication_provider')
         ;
 
         // listener
         $listenerId = 'security.authentication.listener.digest.'.$id;
-        $listener = $container->setDefinition($listenerId, clone $container->getDefinition('security.authentication.listener.digest'));
+        $listener = $container->setDefinition($listenerId, new DefinitionDecorator('security.authentication.listener.digest'));
         $listener->setArgument(2, $id);
 
         if (null === $defaultEntryPoint) {

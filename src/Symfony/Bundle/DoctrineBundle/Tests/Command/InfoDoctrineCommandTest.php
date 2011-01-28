@@ -18,7 +18,7 @@ class InfoDoctrineCommandTest extends TestCase
                ->with($this->equalTo("Found 1 entities mapped in entity manager 'default':"), $this->equalTo(true));
         $output->expects($this->at(1))
                ->method('write')
-               ->with($this->equalTo("<info>[OK]</info>   DoctrineBundle\Tests\DependencyInjection\Fixtures\Bundles\YamlBundle\Entity\Test"), $this->equalTo(true));
+               ->with($this->equalTo("<info>[OK]</info>   Fixtures\Bundles\YamlBundle\Entity\Test"), $this->equalTo(true));
 
         $testContainer = $this->createYamlBundleTestContainer();
         $kernel = $this->getMock('Symfony\Component\HttpKernel\Kernel', array(), array(), '', false);

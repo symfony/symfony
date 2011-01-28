@@ -1,6 +1,6 @@
 <?php
 
-namespace DoctrineBundle\Tests\DependencyInjection\Fixtures\Bundles\Vendor\AnnotationsBundle;
+namespace Fixtures\Bundles\Vendor\AnnotationsBundle;
 
 use Symfony\Component\HttpKernel\Bundle\Bundle;
 

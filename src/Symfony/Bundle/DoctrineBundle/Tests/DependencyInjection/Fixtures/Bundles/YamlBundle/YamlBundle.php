@@ -1,6 +1,6 @@
 <?php
 
-namespace DoctrineBundle\Tests\DependencyInjection\Fixtures\Bundles\YamlBundle;
+namespace Fixtures\Bundles\YamlBundle;
 
 use Symfony\Component\HttpKernel\Bundle\Bundle;
 

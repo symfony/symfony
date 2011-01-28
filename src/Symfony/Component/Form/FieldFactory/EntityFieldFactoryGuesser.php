@@ -61,7 +61,7 @@ class EntityFieldFactoryGuesser implements FieldFactoryGuesserInterface
                 $mapping = $metadata->getAssociationMapping($property);
 
                 return new FieldFactoryClassGuess(
-                	'Symfony\Component\Form\Extension\Doctrine\EntityChoiceField',
+                	'Symfony\Component\Form\EntityChoiceField',
                     array(
                         'em' => $this->em,
                         'class' => $mapping['targetEntity'],

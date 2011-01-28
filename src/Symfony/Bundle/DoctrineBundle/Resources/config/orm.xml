@@ -47,7 +47,7 @@
         <parameter key="doctrine.orm.proxy_cache_warmer.class">Symfony\Bundle\DoctrineBundle\CacheWarmer\ProxyCacheWarmer</parameter>
         
         <!-- form field factory guesser -->
-        <parameter key="form.field_factory.doctrine_guesser.class">Symfony\Component\Form\Extension\Doctrine\EntityFieldFactoryGuesser</parameter>
+        <parameter key="form.field_factory.doctrine_guesser.class">Symfony\Component\Form\FieldFactory\EntityFieldFactoryGuesser</parameter>
     </parameters>
 
     <services>

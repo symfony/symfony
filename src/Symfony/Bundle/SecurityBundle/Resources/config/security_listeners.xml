@@ -164,6 +164,7 @@
             <argument type="service" id="security.context" />
             <argument type="service" id="security.user.provider.in_memory" />
             <argument type="service" id="security.account_checker" />
+            <argument /> <!--  Provider Key -->
             <argument type="service" id="security.access.decision_manager" />
             <argument type="service" id="logger" on-invalid="null" />
             <argument>%security.authentication.switchuser.parameter%</argument>

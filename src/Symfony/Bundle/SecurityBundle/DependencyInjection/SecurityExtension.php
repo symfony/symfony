@@ -626,6 +626,7 @@ class SecurityExtension extends Extension
         $switchUserListenerId = 'security.authentication.switchuser_listener.'.$id;
         $listener = $container->setDefinition($switchUserListenerId, new DefinitionDecorator('security.authentication.switchuser_listener'));
         $listener->setArgument(1, new Reference($userProvider));
+        $listener->setArgument(3, $id);
 
         if (isset($config['parameter'])) {
             $listener->setArgument(5, $config['parameter']);

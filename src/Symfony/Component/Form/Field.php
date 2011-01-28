@@ -242,6 +242,16 @@ class Field extends Configurable implements FieldInterface
     }
 
     /**
+     * Returns whether the field has a parent.
+     *
+     * @return Boolean
+     */
+    public function hasParent()
+    {
+        return null !== $this->parent;
+    }
+
+    /**
      * Returns the root of the form tree
      *
      * @return FieldInterface  The root of the tree
@@ -249,6 +259,16 @@ class Field extends Configurable implements FieldInterface
     public function getRoot()
     {
         return $this->parent ? $this->parent->getRoot() : $this;
+    }
+
+    /**
+     * Returns whether the field is the root of the form tree
+     *
+     * @return Boolean
+     */
+    public function isRoot()
+    {
+        return !$this->hasParent();
     }
 
     /**

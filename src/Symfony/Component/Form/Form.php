@@ -235,7 +235,7 @@ class Form extends FieldGroup
      */
     public function isPostMaxSizeReached()
     {
-        if (isset($_SERVER['CONTENT_LENGTH'])) {
+        if ($this->isRoot() && isset($_SERVER['CONTENT_LENGTH'])) {
             $length = (int) $_SERVER['CONTENT_LENGTH'];
             $max = trim(ini_get('post_max_size'));
 

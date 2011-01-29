@@ -151,7 +151,7 @@ class Store
             $digest = 'en'.sha1($response->getContent());
 
             if (false === $this->save($digest, $response->getContent())) {
-                throw new \RuntimeException(sprintf('Unable to store the entity.'));
+                throw new \RuntimeException('Unable to store the entity.');
             }
 
             $response->headers->set('X-Content-Digest', $digest);
@@ -180,7 +180,7 @@ class Store
         array_unshift($entries, array($storedEnv, $headers));
 
         if (false === $this->save($key, serialize($entries))) {
-            throw new \RuntimeException(sprintf('Unable to store the metadata.'));
+            throw new \RuntimeException('Unable to store the metadata.');
         }
 
         return $key;

@@ -61,9 +61,10 @@ abstract class Bundle extends ContainerAware implements BundleInterface
             return $this->name;
         }
 
-        $pos = strrpos(get_class($this), '\\');
+        $name = get_class($this);
+        $pos = strrpos($name, '\\');
 
-        return $this->name = substr(get_class($this), $pos ? $pos + 1 : 0);
+        return $this->name = false === $pos ? $name :  substr($name, $pos + 1);
     }
 
     /**

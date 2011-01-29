@@ -75,6 +75,9 @@ class ValidatorFactoryTest extends \PHPUnit_Framework_TestCase
 
     public function testBuildDefaultFromAnnotations()
     {
+        if (!class_exists('Doctrine\Common\Annotations\AnnotationReader')) {
+            $this->markTestSkipped('Doctrine is required for this test');
+        }
         $factory = ValidatorFactory::buildDefault();
 
         $context = new ValidatorContext();
@@ -87,6 +90,9 @@ class ValidatorFactoryTest extends \PHPUnit_Framework_TestCase
 
     public function testBuildDefaultFromAnnotationsWithCustomNamespaces()
     {
+        if (!class_exists('Doctrine\Common\Annotations\AnnotationReader')) {
+            $this->markTestSkipped('Doctrine is required for this test');
+        }
         $factory = ValidatorFactory::buildDefault(array(), true, array(
             'myns' => 'My\\Namespace\\',
         ));
@@ -142,6 +148,9 @@ class ValidatorFactoryTest extends \PHPUnit_Framework_TestCase
 
     public function testBuildDefaultFromMultipleLoaders()
     {
+        if (!class_exists('Doctrine\Common\Annotations\AnnotationReader')) {
+            $this->markTestSkipped('Doctrine is required for this test');
+        }
         $xmlPath = __DIR__.'/Mapping/Loader/constraint-mapping.xml';
         $yamlPath = __DIR__.'/Mapping/Loader/constraint-mapping.yml';
         $factory = ValidatorFactory::buildDefault(array($xmlPath, $yamlPath), true, null, 'loadMetadata');

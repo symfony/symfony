@@ -15,7 +15,6 @@
             <xsd:element name="session" type="session" minOccurs="0" maxOccurs="1" />
             <xsd:element name="templating" type="templating" minOccurs="0" maxOccurs="1" />
             <xsd:element name="translator" type="translator" minOccurs="0" maxOccurs="1" />
-            <xsd:element name="param-converter" type="param-converter" minOccurs="0" maxOccurs="1" />
             <xsd:element name="csrf-protection" type="csrf_protection" minOccurs="0" maxOccurs="1" />
             <xsd:element name="esi" type="esi" minOccurs="0" maxOccurs="1" />
         </xsd:all>
@@ -86,9 +85,6 @@
 
     <xsd:complexType name="translator">
         <xsd:attribute name="fallback" type="xsd:string" />
-    </xsd:complexType>
-
-    <xsd:complexType name="param-converter">
     </xsd:complexType>
 
     <xsd:complexType name="csrf_protection">

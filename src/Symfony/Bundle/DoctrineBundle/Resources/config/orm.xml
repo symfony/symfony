@@ -58,11 +58,6 @@
 
         <service id="security.user.entity_manager" alias="doctrine.orm.default_entity_manager" public="false" />
 
-        <service id="request.param_converter.doctrine" class="Symfony\Bundle\DoctrineBundle\Request\ParamConverter\DoctrineConverter" public="false">
-            <tag name="request.param_converter" />
-            <argument type="service" id="doctrine.orm.default_entity_manager" />
-        </service>
-
         <service id="doctrine.orm.proxy_cache_warmer" class="%doctrine.orm.proxy_cache_warmer.class%" public="false">
             <tag name="kernel.cache_warmer" />
             <argument type="service" id="service_container" />

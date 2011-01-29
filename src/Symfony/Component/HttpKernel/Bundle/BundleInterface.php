@@ -29,9 +29,9 @@ interface BundleInterface
     function shutdown();
 
     /**
-     * Returns the bundle parent class.
+     * Returns the bundle parent name.
      *
-     * @return string The Bundle parent class name it overrides or null if no parent
+     * @return string The Bundle parent name it overrides or null if no parent
      */
     function getParent();
 
@@ -56,5 +56,5 @@ interface BundleInterface
      *
      * @return string The Bundle absolute path
      */
-    function getPath();
+    function getNormalizedPath();
 }

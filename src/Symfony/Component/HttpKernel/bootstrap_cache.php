@@ -151,7 +151,7 @@ abstract class Kernel implements KernelInterface
             $files[] = $file;
         }
         foreach ($this->getBundle($bundle, false) as $bundle) {
-            if (file_exists($file = $bundle->getPath().'/'.$path)) {
+            if (file_exists($file = $bundle->getNormalizedPath().'/'.$path)) {
                 if ($first) {
                     return $file;
                 }
@@ -401,6 +401,7 @@ class HttpCache implements HttpKernelInterface
     protected $kernel;
     protected $traces;
     protected $store;
+    protected $request;
     protected $esi;
     public function __construct(HttpKernelInterface $kernel, StoreInterface $store, Esi $esi = null, array $options = array())
     {
@@ -430,10 +431,15 @@ class HttpCache implements HttpKernelInterface
         }
         return implode('; ', $log);
     }
+    public function getRequest()
+    {
+        return $this->request;
+    }
     public function handle(Request $request, $type = HttpKernelInterface::MASTER_REQUEST, $catch = true)
     {
                 if (HttpKernelInterface::MASTER_REQUEST === $type) {
             $this->traces = array();
+            $this->request = $request;
         }
         $path = $request->getPathInfo();
         if ($qs = $request->getQueryString()) {
@@ -2432,7 +2438,7 @@ class UniversalClassLoader
     public function loadClass($class)
     {
         $class = ltrim($class, '\\');
-        if (false !== ($pos = strripos($class, '\\'))) {
+        if (false !== ($pos = strrpos($class, '\\'))) {
                         $namespace = substr($class, 0, $pos);
             foreach ($this->namespaces as $ns => $dirs) {
                 foreach ($dirs as $dir) {

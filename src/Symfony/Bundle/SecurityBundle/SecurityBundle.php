@@ -42,8 +42,8 @@ class SecurityBundle extends Bundle
     /**
      * {@inheritdoc}
      */
-    public function getPath()
+    protected function getPath()
     {
-        return strtr(__DIR__, '\\', '/');
+        return __DIR__;
     }
 }

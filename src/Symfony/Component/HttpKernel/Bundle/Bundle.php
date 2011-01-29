@@ -27,23 +27,21 @@ abstract class Bundle extends ContainerAware implements BundleInterface
     protected $name;
 
     /**
-     * Boots the Bundle.
+     * {@inheritDoc}
      */
     public function boot()
     {
     }
 
     /**
-     * Shutdowns the Bundle.
+     * {@inheritDoc}
      */
     public function shutdown()
     {
     }
 
     /**
-     * Returns the bundle parent name.
-     *
-     * @return string The Bundle parent name it overrides or null if no parent
+     * {@inheritDoc}
      */
     public function getParent()
     {
@@ -51,9 +49,7 @@ abstract class Bundle extends ContainerAware implements BundleInterface
     }
 
     /**
-     * Returns the bundle name (the class short name).
-     *
-     * @return string The Bundle name
+     * {@inheritDoc}
      */
     final public function getName()
     {
@@ -68,6 +64,14 @@ abstract class Bundle extends ContainerAware implements BundleInterface
     }
 
     /**
+     * {@inheritDoc}
+     */
+    final public function getNormalizedPath()
+    {
+        return strtr($this->getPath(), '\\', '/');
+    }
+
+    /**
      * Finds and registers Dependency Injection Container extensions.
      *
      * Override this method if your DIC extensions do not follow the conventions:
@@ -79,7 +83,7 @@ abstract class Bundle extends ContainerAware implements BundleInterface
      */
     public function registerExtensions(ContainerBuilder $container)
     {
-        if (!$dir = realpath($this->getPath().'/DependencyInjection')) {
+        if (!$dir = realpath($this->getNormalizedPath().'/DependencyInjection')) {
             return;
         }
 
@@ -106,7 +110,7 @@ abstract class Bundle extends ContainerAware implements BundleInterface
      */
     public function registerCommands(Application $application)
     {
-        if (!$dir = realpath($this->getPath().'/Command')) {
+        if (!$dir = realpath($this->getNormalizedPath().'/Command')) {
             return;
         }
 
@@ -121,4 +125,11 @@ abstract class Bundle extends ContainerAware implements BundleInterface
             }
         }
     }
+
+    /**
+     * Gets the Bundle directory path.
+     *
+     * @return string The Bundle absolute path
+     */
+    abstract protected function getPath();
 }

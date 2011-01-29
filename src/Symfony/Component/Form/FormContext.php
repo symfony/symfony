@@ -150,17 +150,19 @@ class FormContext implements FormContextInterface
      */
     public function getForm($name, $data = null)
     {
-        return new Form(
+        $form = new Form(
             $name,
-            $data,
-            $this->validator,
             array(
+                'validator' => $this->validator,
                 'csrf_field_name' => $this->csrfFieldName,
                 'csrf_provider' => $this->csrfProtection ? $this->csrfProvider : null,
                 'validation_groups' => $this->validationGroups,
                 'field_factory' => $this->fieldFactory,
             )
         );
+        $form->setData($data);
+
+        return $form;
     }
 
     /**

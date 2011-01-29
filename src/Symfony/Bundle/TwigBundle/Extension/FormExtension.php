@@ -12,7 +12,7 @@
 namespace Symfony\Bundle\TwigBundle\Extension;
 
 use Symfony\Component\Form\Form;
-use Symfony\Component\Form\FieldGroupInterface;
+use Symfony\Component\Form\FormInterface;
 use Symfony\Component\Form\FieldInterface;
 use Symfony\Component\Form\CollectionField;
 use Symfony\Component\Form\HybridField;
@@ -47,7 +47,7 @@ class FormExtension extends \Twig_Extension
         $this->environment = $environment;
     }
 
-    public function setTheme(FieldGroupInterface $group, array $resources)
+    public function setTheme(FormInterface $group, array $resources)
     {
         $this->themes->attach($group, $resources);
     }
@@ -159,11 +159,11 @@ class FormExtension extends \Twig_Extension
     /**
      * Renders all hidden fields of the given field group
      *
-     * @param FieldGroupInterface $group   The field group
+     * @param FormInterface $group   The field group
      * @param array $params                Additional variables passed to the
      *                                     template
      */
-    public function renderHidden(FieldGroupInterface $group, array $parameters = array())
+    public function renderHidden(FormInterface $group, array $parameters = array())
     {
         if (null === $this->templates) {
             $this->templates = $this->resolveResources($this->resources);

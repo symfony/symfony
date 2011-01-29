@@ -2,10 +2,10 @@
 
 namespace Symfony\Tests\Component\Form\Fixtures;
 
-use Symfony\Component\Form\FieldGroup;
+use Symfony\Component\Form\Form;
 use Symfony\Component\Form\ValueTransformer\ValueTransformerInterface;
 
-class TestFieldGroup extends FieldGroup
+class TestForm extends Form
 {
     /**
      * Expose method for testing purposes

@@ -46,7 +46,7 @@ use Symfony\Component\Form\ValueTransformer\ValueTransformerChain;
  *
  * @author Bernhard Schussek <bernhard.schussek@symfony-project.com>
  */
-class DateTimeField extends FieldGroup
+class DateTimeField extends Form
 {
     const DATETIME = 'datetime';
     const STRING = 'string';

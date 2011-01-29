@@ -24,7 +24,7 @@ use Symfony\Component\Form\Exception\UnexpectedTypeException;
  *
  * @author Bernhard Schussek <bernhard.schussek@symfony-project.com>
  */
-class CollectionField extends FieldGroup
+class CollectionField extends Form
 {
     /**
      * The prototype for the inner fields

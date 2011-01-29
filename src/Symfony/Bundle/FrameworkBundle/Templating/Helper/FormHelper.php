@@ -13,7 +13,7 @@ namespace Symfony\Bundle\FrameworkBundle\Templating\Helper;
 
 use Symfony\Component\Templating\Helper\Helper;
 use Symfony\Component\Form\FieldInterface;
-use Symfony\Component\Form\FieldGroupInterface;
+use Symfony\Component\Form\FormInterface;
 use Symfony\Bundle\FrameworkBundle\Templating\EngineInterface;
 
 /**
@@ -148,14 +148,14 @@ class FormHelper extends Helper
         ));
     }
 
-    public function hidden(/*FieldGroupInterface */$group, array $parameters = array(), $template = null)
+    public function hidden(/*FormInterface */$form, array $parameters = array(), $template = null)
     {
         if (null === $template) {
             $template = 'FrameworkBundle:Form:hidden.html.php';
         }
 
         return $this->engine->render($template, array(
-            'field'  => $group,
+            'field'  => $form,
             'params' => $parameters,
         ));
     }
@@ -185,8 +185,8 @@ class FormHelper extends Helper
             $currentFqClassName = get_parent_class($currentFqClassName);
         } while (null === $template && false !== $currentFqClassName);
 
-        if (null === $template && $field instanceof FieldGroupInterface) {
-            $template = 'FrameworkBundle:Form:field_group.html.php';
+        if (null === $template && $field instanceof FormInterface) {
+            $template = 'FrameworkBundle:Form:form.html.php';
         }
 
         self::$cache[$fqClassName] = $template;

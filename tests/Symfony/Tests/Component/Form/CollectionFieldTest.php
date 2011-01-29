@@ -14,7 +14,7 @@ namespace Symfony\Tests\Component\Form;
 require_once __DIR__ . '/Fixtures/TestField.php';
 
 use Symfony\Component\Form\CollectionField;
-use Symfony\Component\Form\FieldGroup;
+use Symfony\Component\Form\Form;
 use Symfony\Tests\Component\Form\Fixtures\TestField;
 
 class CollectionFieldTest extends \PHPUnit_Framework_TestCase

@@ -526,7 +526,7 @@ class FieldTest extends \PHPUnit_Framework_TestCase
     protected function createMockGroup()
     {
         return $this->getMock(
-            'Symfony\Component\Form\FieldGroup',
+            'Symfony\Component\Form\Form',
             array(),
             array(),
             '',

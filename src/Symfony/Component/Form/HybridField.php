@@ -24,7 +24,7 @@ use Symfony\Component\Form\Exception\FormException;
  *
  * @author Bernhard Schussek <bernhard.schussek@symfony-project.com>
  */
-class HybridField extends FieldGroup
+class HybridField extends Form
 {
     const FIELD = 0;
     const GROUP = 1;

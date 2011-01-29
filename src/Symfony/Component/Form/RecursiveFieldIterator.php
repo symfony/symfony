@@ -21,7 +21,7 @@ namespace Symfony\Component\Form;
  */
 class RecursiveFieldIterator extends \IteratorIterator implements \RecursiveIterator
 {
-    public function __construct(FieldGroupInterface $group)
+    public function __construct(FormInterface $group)
     {
         parent::__construct($group);
     }
@@ -33,7 +33,7 @@ class RecursiveFieldIterator extends \IteratorIterator implements \RecursiveIter
 
     public function hasChildren()
     {
-        return $this->current() instanceof FieldGroupInterface
+        return $this->current() instanceof FormInterface
                 && $this->current()->isVirtual();
     }
 }

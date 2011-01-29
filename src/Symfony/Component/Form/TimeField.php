@@ -37,7 +37,7 @@ use Symfony\Component\Form\ValueTransformer\ValueTransformerChain;
  *  * data_timezone:  The timezone of the data. Default: UTC.
  *  * user_timezone:  The timezone of the user entering a new value. Default: UTC.
  */
-class TimeField extends FieldGroup
+class TimeField extends Form
 {
     const INPUT = 'input';
     const CHOICE = 'choice';

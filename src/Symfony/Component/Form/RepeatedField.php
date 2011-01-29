@@ -21,7 +21,7 @@ namespace Symfony\Component\Form;
  *
  * @author Bernhard Schussek <bernhard.schussek@symfony-project.com>
  */
-class RepeatedField extends FieldGroup
+class RepeatedField extends Form
 {
     /**
      * The prototype for the inner fields

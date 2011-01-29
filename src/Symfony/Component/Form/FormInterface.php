@@ -16,7 +16,7 @@ namespace Symfony\Component\Form;
  *
  * @author     Bernhard Schussek <bernhard.schussek@symfony-project.com>
  */
-interface FieldGroupInterface extends FieldInterface, \ArrayAccess, \Traversable, \Countable
+interface FormInterface extends FieldInterface, \ArrayAccess, \Traversable, \Countable
 {
     /**
      * Returns whether this field group is virtual
@@ -27,7 +27,7 @@ interface FieldGroupInterface extends FieldInterface, \ArrayAccess, \Traversable
      * Example:
      *
      * <code>
-     * $group = new FieldGroup('address');
+     * $group = new Form('address');
      * $group->add(new TextField('street'));
      * $group->add(new TextField('postal_code'));
      * $form->add($group);

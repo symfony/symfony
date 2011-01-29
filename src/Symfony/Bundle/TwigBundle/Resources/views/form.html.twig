@@ -9,7 +9,7 @@
 {% endspaceless %}
 {% endblock field_row %}
 
-{% block field_group %}
+{% block form %}
 {% spaceless %}
     {{ form_errors(field) }}
     {% for child in field.visibleFields %}
@@ -17,7 +17,7 @@
     {% endfor %}
     {{ form_hidden(field) }}
 {% endspaceless %}
-{% endblock field_group %}
+{% endblock form %}
 
 {% block errors %}
 {% spaceless %}

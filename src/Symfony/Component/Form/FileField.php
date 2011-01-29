@@ -17,7 +17,7 @@ use Symfony\Component\Form\Exception\FormException;
 /**
  * A file field to upload files.
  */
-class FileField extends FieldGroup
+class FileField extends Form
 {
     /**
      * Whether the size of the uploaded file exceeds the upload_max_filesize
@@ -61,7 +61,7 @@ class FileField extends FieldGroup
      * This way the file can survive if the form does not validate and is
      * resubmitted.
      *
-     * @see Symfony\Component\Form\FieldGroup::preprocessData()
+     * @see Symfony\Component\Form\Form::preprocessData()
      */
     protected function preprocessData(array $data)
     {

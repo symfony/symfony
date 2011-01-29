@@ -719,30 +719,38 @@ abstract class Kernel implements KernelInterface
     protected function initializeBundles()
     {
                 $this->bundles = array();
-        $this->bundleMap = array();
+        $topMostBundles = array();
+        $directChildren = array();
         foreach ($this->registerBundles() as $bundle) {
             $name = $bundle->getName();
             if (isset($this->bundles[$name])) {
                 throw new \LogicException(sprintf('Trying to register two bundles with the same name "%s"', $name));
             }
             $this->bundles[$name] = $bundle;
-            $this->bundleMap[$name] = array($bundle);
+            if ($parentName = $bundle->getParent()) {
+                if (isset($directChildren[$parentName])) {
+                    throw new \LogicException(sprintf('Bundle "%s" is directly extended by two bundles "%s" and "%s".', $parentName, $name, $directChildren[$parentName]));
+                }
+                $directChildren[$parentName] = $name;
+            } else {
+                $topMostBundles[$name] = $bundle;
+            }
         }
-                $extended = array();
-        foreach ($this->bundles as $name => $bundle) {
-            $parent = $bundle;
-            $first = true;
-            while ($parentName = $parent->getParent()) {
-                if (!isset($this->bundles[$parentName])) {
-                    throw new \LogicException(sprintf('Bundle "%s" extends bundle "%s", which is not registered.', $name, $parentName));
-                }
-                if ($first && isset($extended[$parentName])) {
-                    throw new \LogicException(sprintf('Bundle "%s" is directly extended by two bundles "%s" and "%s".', $parentName, $name, $extended[$parentName]));
-                }
-                $first = false;
-                $parent = $this->bundles[$parentName];
-                $extended[$parentName] = $name;
-                array_unshift($this->bundleMap[$parentName], $bundle);
+                if (count($diff = array_diff(array_keys($directChildren), array_keys($this->bundles)))) {
+            throw new \LogicException(sprintf('Bundle "%s" extends bundle "%s", which is not registered.', $directChildren[$diff[0]], $diff[0]));
+        }
+                $this->bundleMap = array();
+        foreach ($topMostBundles as $name => $bundle) {
+            $bundleMap = array($bundle);
+            $hierarchy = array($name);
+            while (isset($directChildren[$name])) {
+                $name = $directChildren[$name];
+                array_unshift($bundleMap, $this->bundles[$name]);
+                $hierarchy[] = $name;
+            }
+            foreach ($hierarchy as $bundle) {
+                $this->bundleMap[$bundle] = $bundleMap;
+                array_pop($bundleMap);
             }
         }
     }
@@ -1756,12 +1764,13 @@ class ClassCollectionLoader
         }
         self::$loaded[$name] = true;
         $classes = array_unique($classes);
+        if ($adaptive) {
+                        $classes = array_diff($classes, get_declared_classes(), get_declared_interfaces());
+                        $name = $name.'-'.substr(md5(implode('|', $classes)), 0, 5);
+        }
         $cache = $cacheDir.'/'.$name.'.php';
                 $reload = false;
         if ($autoReload) {
-            if ($adaptive) {
-                                $classes = array_diff($classes, get_declared_classes(), get_declared_interfaces());
-            }
             $metadata = $cacheDir.'/'.$name.'.meta';
             if (!file_exists($metadata) || !file_exists($cache)) {
                 $reload = true;
@@ -1783,9 +1792,6 @@ class ClassCollectionLoader
         if (!$reload && file_exists($cache)) {
             require_once $cache;
             return;
-        }
-        if ($adaptive) {
-                        $classes = array_diff($classes, get_declared_classes(), get_declared_interfaces());
         }
         $files = array();
         $content = '';

@@ -42,16 +42,19 @@ class ClassCollectionLoader
 
         $classes = array_unique($classes);
 
+        if ($adaptive) {
+            // don't include already declared classes
+            $classes = array_diff($classes, get_declared_classes(), get_declared_interfaces());
+
+            // the cache is different depending on which classes are already declared
+            $name = $name.'-'.substr(md5(implode('|', $classes)), 0, 5);
+        }
+
         $cache = $cacheDir.'/'.$name.'.php';
 
         // auto-reload
         $reload = false;
         if ($autoReload) {
-            if ($adaptive) {
-                // don't include already declared classes
-                $classes = array_diff($classes, get_declared_classes(), get_declared_interfaces());
-            }
-
             $metadata = $cacheDir.'/'.$name.'.meta';
             if (!file_exists($metadata) || !file_exists($cache)) {
                 $reload = true;
@@ -77,11 +80,6 @@ class ClassCollectionLoader
             require_once $cache;
 
             return;
-        }
-
-        if ($adaptive) {
-            // don't include already declared classes
-            $classes = array_diff($classes, get_declared_classes(), get_declared_interfaces());
         }
 
         $files = array();

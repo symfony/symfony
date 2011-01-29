@@ -705,11 +705,11 @@ abstract class Kernel implements KernelInterface
         $this->bundleMap = array();
         foreach ($this->registerBundles() as $bundle) {
             $name = $bundle->getName();
-            $this->bundles[$name] = $bundle;
-            if (!isset($this->bundleMap[$name])) {
-                $this->bundleMap[$name] = array();
+            if (isset($this->bundles[$name])) {
+                throw new \LogicException(sprintf('Trying to register two bundles with the same name "%s"', $name));
             }
-            $this->bundleMap[$name][] = $bundle;
+            $this->bundles[$name] = $bundle;
+            $this->bundleMap[$name] = array($bundle);
         }
                 $extended = array();
         foreach ($this->bundles as $name => $bundle) {

@@ -39,12 +39,13 @@ class InitBundleCommand extends Command
             ->setHelp(<<<EOT
 The <info>init:bundle</info> command generates a new bundle with a basic skeleton.
 
-<info>./app/console init:bundle "Application\HelloBundle" src [bundleName]</info>
+<info>./app/console init:bundle "Vendor\HelloBundle" src [bundleName]</info>
 
-The bundle namespace must end with "Bundle" (e.g. <comment>Application\HelloBundle</comment>)
+The bundle namespace must end with "Bundle" (e.g. <comment>Vendor\HelloBundle</comment>)
 and can be placed in any directory (e.g. <comment>src</comment>).
-If you don't specify a bundle name (e.g. <comment>HelloBundle</comment> the bundle name will
-be a concatenation of namespace (e.g. <comment>ApplicationHelloBundle</comment>).
+
+If you don't specify a bundle name (e.g. <comment>HelloBundle</comment>), the bundle name will
+be the concatenation of the namespace segments (e.g. <comment>VendorHelloBundle</comment>).
 EOT
             )
             ->setName('init:bundle')
@@ -62,28 +63,27 @@ EOT
         if (!preg_match('/Bundle$/', $namespace = $input->getArgument('namespace'))) {
             throw new \InvalidArgumentException('The namespace must end with Bundle.');
         }
-        
-        //validate namespace
-        if (preg_match('/[^A-Za-z0-9_\-\\\]/', $namespace)) {
+
+        // validate namespace
+        if (preg_match('/[^A-Za-z0-9_\\\-]/', $namespace)) {
             throw new \InvalidArgumentException('The namespace contains invalid characters.');
         }
-        
-        //user specified bundle name?
-        if ('' == ($bundle = $input->getArgument('bundleName'))) {
+
+        // user specified bundle name?
+        $bundle = $input->getArgument('bundleName');
+        if ('' === $bundle) {
             $bundle = strtr($namespace, array('\\' => ''));
-        } else {
-            if (!preg_match('/Bundle$/', $bundle)) {
-                throw new \InvalidArgumentException('The bundleName must end with Bundle.');
-            }
+        } elseif (!preg_match('/Bundle$/', $bundle)) {
+            throw new \InvalidArgumentException('The bundle name must end with Bundle.');
         }
 
         $dir = $input->getArgument('dir');
 
-        //add trailing / if necessary
-        $dir = ('/' == substr($dir, -1, 1)) ? $dir : $dir . '/';
-        
-        $targetDir = $dir . strtr($namespace, '\\', '/');
-        
+        // add trailing / if necessary
+        $dir = '/' === substr($dir, -1, 1) ? $dir : $dir . '/';
+
+        $targetDir = $dir.strtr($namespace, '\\', '/');
+
         $output->writeln(sprintf('Initializing bundle "<info>%s</info>" in "<info>%s</info>"', $bundle, $dir));
 
         if (file_exists($targetDir)) {

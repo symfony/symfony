@@ -90,18 +90,15 @@ class ControllerResolver implements ControllerResolverInterface
         $attributes = $request->attributes->all();
 
         if (is_array($controller)) {
-            list($controller, $method) = $controller;
-            $m = new \ReflectionMethod($controller, $method);
-            $parameters = $m->getParameters();
-            $repr = sprintf('%s::%s()', get_class($controller), $method);
+            $r = new \ReflectionMethod($controller[0], $controller[1]);
+            $repr = sprintf('%s::%s()', get_class($controller[0]), $controller[1]);
         } else {
-            $f = new \ReflectionFunction($controller);
-            $parameters = $f->getParameters();
+            $r = new \ReflectionFunction($controller);
             $repr = 'Closure';
         }
 
         $arguments = array();
-        foreach ($parameters as $param) {
+        foreach ($r->getParameters() as $param) {
             if (array_key_exists($param->getName(), $attributes)) {
                 $arguments[] = $attributes[$param->getName()];
             } elseif ($param->isDefaultValueAvailable()) {

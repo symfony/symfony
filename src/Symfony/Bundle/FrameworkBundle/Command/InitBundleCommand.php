@@ -34,7 +34,19 @@ class InitBundleCommand extends Command
             ->setDefinition(array(
                 new InputArgument('namespace', InputArgument::REQUIRED, 'The namespace of the bundle to create'),
                 new InputArgument('dir', InputArgument::REQUIRED, 'The directory where to create the bundle'),
+                new InputArgument('bundleName', InputArgument::OPTIONAL, 'The optional bundle name'),
             ))
+            ->setHelp(<<<EOT
+The <info>init:bundle</info> command generates a new bundle with a basic skeleton.
+
+<info>./app/console init:bundle "Application\HelloBundle" src [bundleName]</info>
+
+The bundle namespace must end with "Bundle" (e.g. <comment>Application\HelloBundle</comment>)
+and can be placed in any directory (e.g. <comment>src</comment>).
+If you don't specify a bundle name (e.g. <comment>HelloBundle</comment> the bundle name will
+be a concatenation of namespace (e.g. <comment>ApplicationHelloBundle</comment>).
+EOT
+            )
             ->setName('init:bundle')
         ;
     }
@@ -50,11 +62,28 @@ class InitBundleCommand extends Command
         if (!preg_match('/Bundle$/', $namespace = $input->getArgument('namespace'))) {
             throw new \InvalidArgumentException('The namespace must end with Bundle.');
         }
-
-        $bundle = strtr($namespace, array('\\' => ''));
+        
+        //validate namespace
+        if (preg_match('/[^A-Za-z0-9_\-\\\]/', $namespace)) {
+            throw new \InvalidArgumentException('The namespace contains invalid characters.');
+        }
+        
+        //user specified bundle name?
+        if ('' == ($bundle = $input->getArgument('bundleName'))) {
+            $bundle = strtr($namespace, array('\\' => ''));
+        } else {
+            if (!preg_match('/Bundle$/', $bundle)) {
+                throw new \InvalidArgumentException('The bundleName must end with Bundle.');
+            }
+        }
 
         $dir = $input->getArgument('dir');
+
+        //add trailing / if necessary
+        $dir = ('/' == substr($dir, -1, 1)) ? $dir : $dir . '/';
+        
         $targetDir = $dir . strtr($namespace, '\\', '/');
+        
         $output->writeln(sprintf('Initializing bundle "<info>%s</info>" in "<info>%s</info>"', $bundle, $dir));
 
         if (file_exists($targetDir)) {

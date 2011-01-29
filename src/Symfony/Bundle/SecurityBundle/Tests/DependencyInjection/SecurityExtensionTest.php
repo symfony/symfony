@@ -61,21 +61,21 @@ abstract class SecurityExtensionTest extends \PHPUnit_Framework_TestCase
         foreach (array_keys($arguments[1]) as $contextId) {
             $contextDef = $container->getDefinition($contextId);
             $arguments = $contextDef->getArguments();
-            $listeners[] = array_map(function ($ref) { return preg_replace('/\.[a-f0-9]+$/', '', (string) $ref); }, $arguments['index_0']);
+            $listeners[] = array_map(function ($ref) { return (string) $ref; }, $arguments['index_0']);
         }
 
         $this->assertEquals(array(
             array(),
             array(
                 'security.channel_listener',
-                'security.logout_listener',
-                'security.authentication.listener.x509',
-                'security.authentication.listener.form',
-                'security.authentication.listener.basic',
-                'security.authentication.listener.digest',
+                'security.logout_listener.secure',
+                'security.authentication.listener.x509.secure',
+                'security.authentication.listener.form.secure',
+                'security.authentication.listener.basic.secure',
+                'security.authentication.listener.digest.secure',
                 'security.authentication.listener.anonymous',
                 'security.access_listener',
-                'security.authentication.switchuser_listener',
+                'security.authentication.switchuser_listener.secure',
             ),
         ), $listeners);
     }

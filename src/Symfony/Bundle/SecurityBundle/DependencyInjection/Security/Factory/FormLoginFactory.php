@@ -45,7 +45,7 @@ class FormLoginFactory extends AbstractFactory
         return 'security.authentication.listener.form';
     }
 
-    protected function createAuthProvider(ContainerBuilder $container, $id, $options, $userProviderId)
+    protected function createAuthProvider(ContainerBuilder $container, $id, $config, $userProviderId)
     {
         $provider = 'security.authentication.provider.dao.'.$id;
         $container
@@ -57,8 +57,11 @@ class FormLoginFactory extends AbstractFactory
         return $provider;
     }
 
-    protected function createEntryPoint($container, $id, $options, $defaultEntryPoint)
+    protected function createEntryPoint($container, $id, $config, $defaultEntryPoint)
     {
+        // merge set options with default options
+        $options = $this->getOptionsFromConfig($config);
+
         $entryPointId = 'security.authentication.form_entry_point.'.$id;
         $container
             ->setDefinition($entryPointId, new DefinitionDecorator('security.authentication.form_entry_point'))

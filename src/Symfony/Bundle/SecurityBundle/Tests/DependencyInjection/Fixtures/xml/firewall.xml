@@ -10,9 +10,9 @@
             <user name="foo" password="foo" roles="ROLE_USER" />
         </provider>
 
-        <firewall pattern="/login" security="false" />
+        <firewall name="simple" pattern="/login" security="false" />
 
-        <firewall stateless="true">
+        <firewall name="secure" stateless="true">
             <http-basic />
             <http-digest />
             <form-login />

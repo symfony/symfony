@@ -42,18 +42,15 @@ abstract class AbstractFactory implements SecurityFactoryInterface
             $config = array();
         }
 
-        // merge set options with default options
-        $options = $this->getOptionsFromConfig($config);
-
         // authentication provider
-        $authProviderId = $this->createAuthProvider($container, $id, $options, $userProviderId);
+        $authProviderId = $this->createAuthProvider($container, $id, $config, $userProviderId);
         $container
             ->getDefinition($authProviderId)
             ->addTag('security.authentication_provider')
         ;
 
         // authentication listener
-        $listenerId = $this->createListener($container, $id, $options, $userProviderId);
+        $listenerId = $this->createListener($container, $id, $config, $userProviderId);
 
         // add remember-me aware tag if requested
         if ($this->isRememberMeAware($config)) {
@@ -64,7 +61,7 @@ abstract class AbstractFactory implements SecurityFactoryInterface
         }
 
         // create entry point if applicable (optional)
-        $entryPointId = $this->createEntryPoint($container, $id, $options, $defaultEntryPointId);
+        $entryPointId = $this->createEntryPoint($container, $id, $config, $defaultEntryPointId);
 
         return array($authProviderId, $listenerId, $entryPointId);
     }
@@ -85,7 +82,7 @@ abstract class AbstractFactory implements SecurityFactoryInterface
      *
      * @return string never null, the id of the authentication provider
      */
-    abstract protected function createAuthProvider(ContainerBuilder $container, $id, $options, $userProviderId);
+    abstract protected function createAuthProvider(ContainerBuilder $container, $id, $config, $userProviderId);
 
     /**
      * Subclasses must return the id of the abstract listener template.
@@ -110,12 +107,12 @@ abstract class AbstractFactory implements SecurityFactoryInterface
      *
      * @param ContainerBuilder $container
      * @param string $id
-     * @param array $options
+     * @param array $config
      * @param string $defaultEntryPointId
      *
      * @return string the entry point id
      */
-    protected function createEntryPoint($container, $id, $options, $defaultEntryPointId)
+    protected function createEntryPoint($container, $id, $config, $defaultEntryPointId)
     {
         return $defaultEntryPointId;
     }
@@ -133,8 +130,11 @@ abstract class AbstractFactory implements SecurityFactoryInterface
         return !isset($config['remember_me']) || (Boolean) $config['remember_me'];
     }
 
-    protected function createListener($container, $id, $options, $userProvider)
+    protected function createListener($container, $id, $config, $userProvider)
     {
+        // merge set options with default options
+        $options = $this->getOptionsFromConfig($config);
+
         $listenerId = $this->getListenerId();
         $listener = new DefinitionDecorator($listenerId);
         $listener->setArgument(3, $id);

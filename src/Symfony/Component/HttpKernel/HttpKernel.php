@@ -97,7 +97,7 @@ class HttpKernel implements HttpKernelInterface
 
         // controller must be a callable
         if (!is_callable($controller)) {
-            throw new \LogicException(sprintf('The controller must be a callable (%s).', var_export($controller, true)));
+            throw new \LogicException(sprintf('The controller must be a callable (%s given).', $this->varToString($controller)));
         }
 
         // controller arguments
@@ -110,7 +110,7 @@ class HttpKernel implements HttpKernelInterface
         $event = new Event($this, 'core.view', array('request_type' => $type, 'request' => $request));
         $response = $this->dispatcher->filter($event, $retval);
 
-        return $this->filterResponse($response, $request, sprintf('The controller must return a response (instead of %s).', is_object($response) ? 'an object of class '.get_class($response) : is_array($response) ? 'an array' : str_replace("\n", '', var_export($response, true))), $type);
+        return $this->filterResponse($response, $request, sprintf('The controller must return a response (%s given).', $this->varToString($response)), $type);
     }
 
     /**
@@ -137,5 +137,27 @@ class HttpKernel implements HttpKernelInterface
         }
 
         return $response;
+    }
+
+    protected function varToString($var)
+    {
+        if (is_object($var)) {
+            return sprintf('[object](%s)', get_class($var));
+        }
+
+        if (is_array($var)) {
+            $a = array();
+            foreach ($var as $k => $v) {
+                $a[] = sprintf('%s => %s', $k, $this->varToString($v));
+            }
+
+            return sprintf("[array](%s)", implode(', ', $a));
+        }
+
+        if (is_resource($var)) {
+            return '[resource]';
+        }
+
+        return str_replace("\n", '', var_export((string) $var, true));
     }
 }

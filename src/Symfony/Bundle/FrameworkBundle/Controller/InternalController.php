@@ -42,6 +42,6 @@ class InternalController extends ContainerAware
             $attributes->add($tmp);
         }
 
-        return $this->container->get('controller_resolver')->forward($controller, $attributes->all(), $request->query->all());
+        return $this->container->get('http_kernel')->forward($controller, $attributes->all(), $request->query->all());
     }
 }

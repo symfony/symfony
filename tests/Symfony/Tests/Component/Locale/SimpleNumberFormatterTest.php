@@ -71,27 +71,6 @@ class SimpleNumberFormatterTest extends \PHPUnit_Framework_TestCase
         $this->assertEquals(SimpleNumberFormatter::GROUPING_USED, $groupingUsed);
     }
 
-    public function testFormat()
-    {
-        $formatter = new SimpleNumberFormatter('en', SimpleNumberFormatter::DECIMAL);
-
-        // Rounds to the next highest integer
-        $formatter->setAttribute(SimpleNumberFormatter::ROUNDING_MODE, SimpleNumberFormatter::ROUND_CEILING);
-        $this->assertSame('10', $formatter->format(9.5));
-
-        // Use the defined fraction digits
-        $formatter->setAttribute(SimpleNumberFormatter::FRACTION_DIGITS, 2);
-        $this->assertSame('10.00', $formatter->format(9.5));
-        $formatter->setAttribute(SimpleNumberFormatter::FRACTION_DIGITS, -1);
-        $this->assertSame('10', $formatter->format(9.5));
-
-        // Set the grouping size
-        $formatter->setAttribute(SimpleNumberFormatter::ROUNDING_MODE, SimpleNumberFormatter::ROUND_HALFEVEN);
-        $formatter->setAttribute(SimpleNumberFormatter::FRACTION_DIGITS, 2);
-        $this->assertSame('9.56', $formatter->format(9.555));
-        $this->assertSame('1,000,000.12', $formatter->format(1000000.123));
-    }
-
     /**
      * @dataProvider formatCurrencyProvider
      * @see  SimpleNumberFormatter::formatCurrency()
@@ -129,5 +108,111 @@ class SimpleNumberFormatterTest extends \PHPUnit_Framework_TestCase
             // array(1000.127, 'BRL', 'R$1,000.12'),
             // array(1000.127, 'CRC', '₡1,000'),
         );
+    }
+
+    public function testFormat()
+    {
+        $formatter = new SimpleNumberFormatter('en', SimpleNumberFormatter::DECIMAL);
+
+        // Rounds to the next highest integer
+        $formatter->setAttribute(SimpleNumberFormatter::ROUNDING_MODE, SimpleNumberFormatter::ROUND_CEILING);
+        $this->assertSame('10', $formatter->format(9.5));
+
+        // Use the defined fraction digits
+        $formatter->setAttribute(SimpleNumberFormatter::FRACTION_DIGITS, 2);
+        $this->assertSame('10.00', $formatter->format(9.5));
+        $formatter->setAttribute(SimpleNumberFormatter::FRACTION_DIGITS, -1);
+        $this->assertSame('10', $formatter->format(9.5));
+
+        // Rounds to the nearest even number
+        $formatter->setAttribute(SimpleNumberFormatter::ROUNDING_MODE, SimpleNumberFormatter::ROUND_HALFEVEN);
+        $formatter->setAttribute(SimpleNumberFormatter::FRACTION_DIGITS, 2);
+        $this->assertSame('9.56', $formatter->format(9.555));
+        $this->assertSame('1,000,000.12', $formatter->format(1000000.123));
+
+        // Don't use number grouping
+        $formatter->setAttribute(SimpleNumberFormatter::GROUPING_USED, 0);
+        $this->assertSame('1000000.12', $formatter->format(1000000.123));
+    }
+
+    public function testParseValueWithStringInTheBeginning()
+    {
+        $formatter = new SimpleNumberFormatter('en', SimpleNumberFormatter::DECIMAL);
+        $value = $formatter->parse('R$1,234,567.89', SimpleNumberFormatter::TYPE_DOUBLE);
+        $this->assertFalse($value);
+
+        $formatter = new \NumberFormatter('en', \NumberFormatter::DECIMAL);
+        $value = $formatter->parse('R$1,234,567.89', \NumberFormatter::TYPE_DOUBLE);
+        $this->assertFalse($value);
+    }
+
+    public function testParseValueWithStringAtTheEnd()
+    {
+        $formatter = new SimpleNumberFormatter('en', SimpleNumberFormatter::DECIMAL);
+        $value = $formatter->parse('1,234,567.89', SimpleNumberFormatter::TYPE_DOUBLE);
+        $this->assertEquals(1234567.89, $value);
+
+        $formatter = new \NumberFormatter('en', \NumberFormatter::DECIMAL);
+        $value = $formatter->parse('1,234,567.89R$', \NumberFormatter::TYPE_DOUBLE);
+        $this->assertEquals(1234567.89, $value);
+    }
+
+    public function testParse()
+    {
+        $formatter = new SimpleNumberFormatter('en', SimpleNumberFormatter::DECIMAL);
+
+        $value = $formatter->parse('9,223,372,036,854,775,808', SimpleNumberFormatter::TYPE_DOUBLE);
+        $this->assertSame(9223372036854775808, $value);
+
+        $value = $formatter->parse('2,147,483,648', SimpleNumberFormatter::TYPE_INT32);
+        $this->assertSame(2147483647, $value);
+
+        $value = $formatter->parse('-2,147,483,649', SimpleNumberFormatter::TYPE_INT32);
+        $this->assertSame(-2147483648, $value);
+
+        $value = $formatter->parse('9,223,372,036,854,775,808', SimpleNumberFormatter::TYPE_INT64);
+        $this->assertSame(9223372036854775807, $value);
+
+        $value = $formatter->parse('-9,223,372,036,854,775,809', SimpleNumberFormatter::TYPE_INT64);
+        // Strangely, using -9223372036854775808 directly in code make PHP type juggle the value to float
+        $this->assertSame(-9223372036854775807 - 1, $value);
+    }
+
+    public function testParseDetectType()
+    {
+        $formatter = new SimpleNumberFormatter('en', SimpleNumberFormatter::DECIMAL);
+        $value = $formatter->parse('1', SimpleNumberFormatter::TYPE_DEFAULT);
+        $this->assertInternalType('integer', $value);
+
+        $value = $formatter->parse('1.1', SimpleNumberFormatter::TYPE_DEFAULT);
+        $this->assertInternalType('float', $value);
+
+        // int 64 overflow
+        $value = $formatter->parse('9,223,372,036,854,775,808', SimpleNumberFormatter::TYPE_DEFAULT);
+        $this->assertInternalType('float', $value);
+        $this->assertEquals(9223372036854775808, $value);
+
+        $value = $formatter->parse('-9,223,372,036,854,775,809', SimpleNumberFormatter::TYPE_DEFAULT);
+        $this->assertInternalType('float', $value);
+        $this->assertEquals(-9223372036854775809, $value);
+
+        // int 32
+        $value = $formatter->parse('2,147,483,647', SimpleNumberFormatter::TYPE_DEFAULT);
+        $this->assertInternalType('integer', $value);
+        $this->assertSame(2147483647, $value);
+
+        $value = $formatter->parse('-2,147,483,648', SimpleNumberFormatter::TYPE_DEFAULT);
+        $this->assertInternalType('integer', $value);
+        $this->assertSame(-2147483648, $value);
+
+        // int 64
+        $value = $formatter->parse('9,223,372,036,854,775,807', SimpleNumberFormatter::TYPE_DEFAULT);
+        $this->assertInternalType('integer', $value);
+        $this->assertSame(9223372036854775807, $value);
+
+        $value = $formatter->parse('-9,223,372,036,854,775,808', SimpleNumberFormatter::TYPE_DEFAULT);
+        $this->assertInternalType('integer', $value);
+        // Strangely, using -9223372036854775808 directly in code make PHP type juggle the value to float
+        $this->assertSame(-9223372036854775807 - 1, $value);
     }
 }

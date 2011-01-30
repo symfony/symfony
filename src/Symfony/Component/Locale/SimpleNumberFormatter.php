@@ -220,7 +220,64 @@ class SimpleNumberFormatter implements NumberFormatterInterface
      */
     public function parse($value, $type = self::TYPE_DOUBLE, &$position = null)
     {
+        preg_match('/^([^0-9\-]{0,})(.*)/', $value, $matches);
 
+        // Any string before the numeric value causes error in the parsing
+        if (isset($matches[1]) && !empty($matches[1])) {
+            return false;
+        }
+
+        // Remove everything that is not number or dot (.)
+        $value = preg_replace('/[^0-9\.\-]/', '', $value);
+
+        // int 32
+        $int32UpperBound = 2147483647;
+        $int32LowerBound = ($int32UpperBound * -1) - 1;
+
+        // int 64
+        $int64UpperBound = 9223372036854775807;
+        $int64LowerBound = ($int64UpperBound * -1) - 1;
+
+        if ($type == self::TYPE_DEFAULT) {
+            if (strstr($value, '.') || is_float($value + 0) || is_float($value - 0)) {
+                $type = self::TYPE_DOUBLE;
+            }
+            elseif ($value <= $int32UpperBound && $value >= $int32LowerBound) {
+                $type = self::TYPE_INT32;
+            }
+            elseif ($value <= $int64UpperBound && $value >= $int64LowerBound) {
+                $type = self::TYPE_INT64;
+            }
+            else {
+                $type = self::TYPE_DOUBLE;
+            }
+        }
+
+        if ($type == self::TYPE_DOUBLE) {
+            $value = (float) $value;
+        }
+        elseif ($type == self::TYPE_INT32) {
+            if ($value > $int32UpperBound) {
+                $value = $int32UpperBound;
+            }
+            elseif ($value < $int32LowerBound) {
+                $value = $int32LowerBound;
+            }
+
+            $value = (int) $value;
+        }
+        elseif ($type == self::TYPE_INT64) {
+            if ($value > $int64UpperBound) {
+                $value = $int64UpperBound;
+            }
+            elseif ($value < $int64LowerBound) {
+                $value = $int64LowerBound;
+            }
+
+            $value = (int) $value;
+        }
+
+        return $value;
     }
 
     /**

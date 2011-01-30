@@ -4,7 +4,7 @@ use Symfony\Component\DependencyInjection\ContainerInterface;
 use Symfony\Component\DependencyInjection\Container;
 use Symfony\Component\DependencyInjection\Reference;
 use Symfony\Component\DependencyInjection\Parameter;
-use Symfony\Component\DependencyInjection\ParameterBag\FrozenParameterBag;
+
 
 /**
  * ProjectServiceContainer
@@ -19,7 +19,16 @@ class ProjectServiceContainer extends Container
      */
     public function __construct()
     {
-        parent::__construct(new FrozenParameterBag($this->getDefaultParameters()));
+        $this->parameters = $this->getDefaultParameters();
+
+        $this->services =
+        $this->scopedServices =
+        $this->scopeStacks = array();
+
+        $this->set('service_container', $this);
+
+        $this->scopes = array();
+        $this->scopeChildren = array();
     }
 
     /**
@@ -39,6 +48,35 @@ class ProjectServiceContainer extends Container
         return $instance;
     }
 
+    /**
+     * {@inheritdoc}
+     */
+    public function getParameter($name)
+    {
+        $name = strtolower($name);
+
+        if (!array_key_exists($name, $this->parameters)) {
+            throw new \InvalidArgumentException(sprintf('The parameter "%s" must be defined.', $name));
+        }
+
+        return $this->parameters[$name];
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function hasParameter($name)
+    {
+        return array_key_exists(strtolower($name), $this->parameters);
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function setParameter($name, $value)
+    {
+        throw new \LogicException('Impossible to call set() on a frozen ParameterBag.');
+    }
     /**
      * Gets the default parameters.
      *

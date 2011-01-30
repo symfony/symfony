@@ -71,14 +71,22 @@ class PhpDumper extends Dumper
             'base_class' => 'Container',
         ), $options);
 
-        return
-            $this->startClass($options['class'], $options['base_class']).
-            $this->addConstructor().
+        $code = $this->startClass($options['class'], $options['base_class']);
+
+        if ($this->container->isFrozen()) {
+            $code .= $this->addFrozenConstructor();
+        } else {
+            $code .= $this->addConstructor();
+        }
+
+        $code .=
             $this->addServices().
             $this->addDefaultParametersMethod().
             $this->addInterfaceInjectors().
             $this->endClass()
         ;
+
+        return $code;
     }
 
     protected function addInterfaceInjectors()
@@ -515,7 +523,7 @@ EOF;
 
     protected function startClass($class, $baseClass)
     {
-        $bagClass = $this->container->isFrozen() ? 'FrozenParameterBag' : 'ParameterBag';
+        $bagClass = $this->container->isFrozen() ? '' : 'use Symfony\Component\DependencyInjection\ParameterBag\\ParameterBag;';
 
         return <<<EOF
 <?php
@@ -524,7 +532,7 @@ use Symfony\Component\DependencyInjection\ContainerInterface;
 use Symfony\Component\DependencyInjection\Container;
 use Symfony\Component\DependencyInjection\Reference;
 use Symfony\Component\DependencyInjection\Parameter;
-use Symfony\Component\DependencyInjection\ParameterBag\\$bagClass;
+$bagClass
 
 /**
  * $class
@@ -539,8 +547,6 @@ EOF;
 
     protected function addConstructor()
     {
-        $bagClass = $this->container->isFrozen() ? 'FrozenParameterBag' : 'ParameterBag';
-
         $code = <<<EOF
 
     /**
@@ -548,7 +554,7 @@ EOF;
      */
     public function __construct()
     {
-        parent::__construct(new $bagClass(\$this->getDefaultParameters()));
+        parent::__construct(new ParameterBag(\$this->getDefaultParameters()));
 
 EOF;
 
@@ -556,6 +562,42 @@ EOF;
             $code .= "\n";
             $code .= "        \$this->scopes = ".$this->dumpValue($scopes).";\n";
             $code .= "        \$this->scopeChildren = ".$this->dumpValue($this->container->getScopeChildren()).";\n";
+        }
+
+        $code .= <<<EOF
+    }
+
+EOF;
+
+        return $code;
+    }
+
+    protected function addFrozenConstructor()
+    {
+        $code = <<<EOF
+
+    /**
+     * Constructor.
+     */
+    public function __construct()
+    {
+        \$this->parameters = \$this->getDefaultParameters();
+
+        \$this->services =
+        \$this->scopedServices =
+        \$this->scopeStacks = array();
+
+        \$this->set('service_container', \$this);
+
+EOF;
+
+        $code .= "\n";
+        if (count($scopes = $this->container->getScopes()) > 0) {
+            $code .= "        \$this->scopes = ".$this->dumpValue($scopes).";\n";
+            $code .= "        \$this->scopeChildren = ".$this->dumpValue($this->container->getScopeChildren()).";\n";
+        } else {
+            $code .= "        \$this->scopes = array();\n";
+            $code .= "        \$this->scopeChildren = array();\n";
         }
 
         $code .= <<<EOF
@@ -574,7 +616,43 @@ EOF;
 
         $parameters = $this->exportParameters($this->container->getParameterBag()->all());
 
-        return <<<EOF
+        $code = '';
+        if ($this->container->isFrozen()) {
+            $code .= <<<EOF
+
+    /**
+     * {@inheritdoc}
+     */
+    public function getParameter(\$name)
+    {
+        \$name = strtolower(\$name);
+
+        if (!array_key_exists(\$name, \$this->parameters)) {
+            throw new \InvalidArgumentException(sprintf('The parameter "%s" must be defined.', \$name));
+        }
+
+        return \$this->parameters[\$name];
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function hasParameter(\$name)
+    {
+        return array_key_exists(strtolower(\$name), \$this->parameters);
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function setParameter(\$name, \$value)
+    {
+        throw new \LogicException('Impossible to call set() on a frozen ParameterBag.');
+    }
+EOF;
+        }
+
+        $code .= <<<EOF
 
     /**
      * Gets the default parameters.
@@ -587,6 +665,8 @@ EOF;
     }
 
 EOF;
+
+        return $code;
     }
 
     protected function exportParameters($parameters, $indent = 12)

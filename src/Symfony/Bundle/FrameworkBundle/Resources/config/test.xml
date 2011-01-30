@@ -9,6 +9,7 @@
         <parameter key="test.client.parameters" type="collection"></parameter>
         <parameter key="test.client.history.class">Symfony\Component\BrowserKit\History</parameter>
         <parameter key="test.client.cookiejar.class">Symfony\Component\BrowserKit\CookieJar</parameter>
+        <parameter key="test.session.listener.class">Symfony\Bundle\FrameworkBundle\HttpFoundation\SessionListener</parameter>
     </parameters>
 
     <services>
@@ -22,5 +23,10 @@
         <service id="test.client.history" class="%test.client.history.class%" scope="prototype" />
 
         <service id="test.client.cookiejar" class="%test.client.cookiejar.class%" scope="prototype" />
+        
+        <service id="test.session.listener" class="%test.session.listener.class%">
+            <tag name="kernel.listener" event="core.request" method="handle" />
+            <tag name="kernel.listener" event="core.response" method="filter" />
+        </service>
     </services>
 </container>

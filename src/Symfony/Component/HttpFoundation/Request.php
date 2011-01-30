@@ -943,13 +943,13 @@ class Request
     static protected function initializeFormats()
     {
         static::$formats = array(
-            'txt'  => 'text/plain',
+            'txt'  => array('text/plain'),
             'js'   => array('application/javascript', 'application/x-javascript', 'text/javascript'),
-            'css'  => 'text/css',
+            'css'  => array('text/css'),
             'json' => array('application/json', 'application/x-json'),
             'xml'  => array('text/xml', 'application/xml', 'application/x-xml'),
-            'rdf'  => 'application/rdf+xml',
-            'atom' => 'application/atom+xml',
+            'rdf'  => array('application/rdf+xml'),
+            'atom' => array('application/atom+xml'),
         );
     }
 }

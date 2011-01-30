@@ -97,17 +97,41 @@ class RequestTest extends \PHPUnit_Framework_TestCase
 
     /**
      * @covers Symfony\Component\HttpFoundation\Request::getFormat
+     * @dataProvider getFormatToMimeTypeMapProvider
      */
-    public function testGetFormat()
+    public function testGetFormatFromMimeType($format, $mimeTypes)
     {
         $request = new Request();
+        foreach ($mimeTypes as $mime) {            
+            $this->assertEquals($format, $request->getFormat($mime));
+        }
 
-        $this->assertNull($request->getFormat(null), '->getFormat() returns null when mime-type is null');
-        $this->assertNull($request->getFormat('unexistant-mime-type'), '->getFormat() returns null when mime-type is unknown');
-        $this->assertEquals('txt', $request->getFormat('text/plain'), '->getFormat() returns correct format when mime-type have one format only');
-        $this->assertEquals('js', $request->getFormat('application/javascript'), '->getFormat() returns correct format when format have multiple mime-type (first)');
-        $this->assertEquals('js', $request->getFormat('application/x-javascript'), '->getFormat() returns correct format when format have multiple mime-type');
-        $this->assertEquals('js', $request->getFormat('text/javascript'), '->getFormat() returns correct format when format have multiple mime-type (last)');
+    }
+
+    /**
+     * @covers Symfony\Component\HttpFoundation\Request::getMimeType
+     * @dataProvider getFormatToMimeTypeMapProvider
+     */
+    public function testGetMimeTypeFromFormat($format, $mimeTypes)
+    {
+        if (!is_null($format)) {
+            $request = new Request();
+            $this->assertEquals($mimeTypes[0], $request->getMimeType($format));
+        }
+    }
+
+    public function getFormatToMimeTypeMapProvider()
+    {
+        return array(
+            array(null, array(null, 'unexistant-mime-type')),
+            array('txt', array('text/plain')),
+            array('js', array('application/javascript', 'application/x-javascript', 'text/javascript')),
+            array('css', array('text/css')),
+            array('json', array('application/json', 'application/x-json')),
+            array('xml', array('text/xml', 'application/xml', 'application/x-xml')),
+            array('rdf', array('application/rdf+xml')),
+            array('atom',array('application/atom+xml')),
+        );
     }
 
     /**

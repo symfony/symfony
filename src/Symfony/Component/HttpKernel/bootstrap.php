@@ -1315,7 +1315,7 @@ class Request
             'REQUEST_URI'          => $uri,
             'QUERY_STRING'         => $queryString,
         ));
-        return new self($query, $request, array(), $cookies, $files, $server);
+        return new static($query, $request, array(), $cookies, $files, $server);
     }
     public function duplicate(array $query = null, array $request = null, array $attributes = null, array $cookies = null, array $files = null, array $server = null)
     {
@@ -1934,9 +1934,7 @@ class UniversalClassLoader
     }
     public function loadClass($class)
     {
-        if ('\\' === $class[0]) {
-            $class = substr($class, 1);
-        }
+        $class = ltrim($class, '\\');
         if (false !== ($pos = strripos($class, '\\'))) {
                         $namespace = substr($class, 0, $pos);
             foreach ($this->namespaces as $ns => $dir) {

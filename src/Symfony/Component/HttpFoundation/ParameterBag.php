@@ -27,7 +27,7 @@ class ParameterBag
      */
     public function __construct(array $parameters = array())
     {
-        $this->replace($parameters);
+        $this->parameters = $parameters;
     }
 
     /**

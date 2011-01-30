@@ -511,7 +511,11 @@ class Request
 
             $host = trim($elements[count($elements) - 1]);
         } else {
-            $host = $this->headers->get('HOST', $this->server->get('SERVER_NAME', $this->server->get('SERVER_ADDR', '')));
+            if (!$host = $this->headers->get('HOST')) {
+                if (!$host = $this->server->get('SERVER_NAME')) {
+                    $host = $this->server->get('SERVER_ADDR', '');
+                }
+            }
         }
 
         // Remove port number from host

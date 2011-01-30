@@ -31,7 +31,10 @@ class HeaderBag
     {
         $this->cacheControl = array();
         $this->cookies = array();
-        $this->replace($headers);
+        $this->headers = array();
+        foreach ($headers as $key => $values) {
+            $this->set($key, $values);
+        }
     }
 
     /**

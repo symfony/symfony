@@ -52,7 +52,7 @@ EOF
      */
     protected function execute(InputInterface $input, OutputInterface $output)
     {
-        $router = $this->container->get('router');
+        $router = $this->container->get('router.real');
 
         $dumpOptions = array();
         if ($input->getArgument('script_name')) {

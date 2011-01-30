@@ -570,7 +570,7 @@ class Response
      */
     public function setCache(array $options)
     {
-        if ($diff = array_diff_key($options, array('etag', 'last_modified', 'max_age', 's_maxage', 'private', 'public'))) {
+        if ($diff = array_diff(array_keys($options), array('etag', 'last_modified', 'max_age', 's_maxage', 'private', 'public'))) {
             throw new \InvalidArgumentException(sprintf('Response does not support the following options: "%s".', implode('", "', array_keys($diff))));
         }
 

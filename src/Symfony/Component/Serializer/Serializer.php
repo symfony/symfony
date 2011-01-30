@@ -32,6 +32,11 @@ class Serializer implements SerializerInterface
     protected $encoders = array();
     protected $normalizerCache = array();
 
+    public function isStructuredType($val)
+    {
+        return null !== $val && !is_scalar($val);
+    }
+
     /**
      * {@inheritdoc}
      */
@@ -90,7 +95,7 @@ class Serializer implements SerializerInterface
     {
         if (is_array($data)) {
             foreach ($data as $key => $val) {
-                $data[$key] = is_scalar($val) ? $val : $this->normalize($val, $format);
+                $data[$key] = $this->isStructuredType($val) ? $this->normalize($val, $format) : $val;
             }
             return $data;
         }

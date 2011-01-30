@@ -25,7 +25,7 @@ class JsonEncoder extends AbstractEncoder
      */
     public function encode($data, $format)
     {
-        if (!is_scalar($data)) {
+        if ($this->serializer->isStructuredType($data)) {
             $data = $this->serializer->normalize($data, $format);
         }
         return json_encode($data);

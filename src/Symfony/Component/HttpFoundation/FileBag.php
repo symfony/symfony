@@ -24,6 +24,20 @@ class FileBag extends ParameterBag
     private $fileKeys = array('error', 'name', 'size', 'tmp_name', 'type');
 
     /**
+     * Constructor.
+     *
+     * @param array $headers An array of HTTP files
+     */
+    public function __construct(array $parameters = array())
+    {
+        // this line is not necessary, but including it avoids any stupid
+        // errors if we add code to the parent's constructor
+        parent::__construct();
+
+        $this->replace($parameters);
+    }
+
+    /**
      * (non-PHPdoc)
      * @see Symfony\Component\HttpFoundation\ParameterBag::replace()
      */

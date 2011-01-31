@@ -57,6 +57,10 @@ class Container implements ContainerInterface
 {
     protected $parameterBag;
     protected $services;
+    protected $scopes;
+    protected $scopeChildren;
+    protected $scopedServices;
+    protected $scopeStacks;
     protected $loading = array();
 
     /**
@@ -350,14 +354,9 @@ class Container implements ContainerInterface
         $this->scopeChildren[$name] = array();
 
         // normalize the child relations
-        if ($parentScope !== self::SCOPE_CONTAINER) {
+        while ($parentScope !== self::SCOPE_CONTAINER) {
             $this->scopeChildren[$parentScope][] = $name;
-
-            foreach ($this->scopeChildren as $pName => $childScopes) {
-                if (in_array($parentScope, $childScopes, true)) {
-                    $this->scopeChildren[$pName][] = $name;
-                }
-            }
+            $parentScope = $this->scopes[$parentScope];
         }
     }
 

@@ -50,20 +50,4 @@ class ValueTransformerChainTest extends \PHPUnit_Framework_TestCase
 
         $this->assertEquals('baz', $chain->reverseTransform('foo', null));
     }
-
-    public function testSetLocale()
-    {
-        $transformer1 = $this->getMock('Symfony\Component\Form\ValueTransformer\ValueTransformerInterface');
-        $transformer1->expects($this->once())
-                                 ->method('setLocale')
-                                 ->with($this->identicalTo('de_DE'));
-        $transformer2 = $this->getMock('Symfony\Component\Form\ValueTransformer\ValueTransformerInterface');
-        $transformer2->expects($this->once())
-                                 ->method('setLocale')
-                                 ->with($this->identicalTo('de_DE'));
-
-        $chain = new ValueTransformerChain(array($transformer1, $transformer2));
-
-        $chain->setLocale('de_DE');
-    }
 }

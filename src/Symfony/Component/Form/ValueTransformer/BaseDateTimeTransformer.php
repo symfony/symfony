@@ -11,7 +11,9 @@
 
 namespace Symfony\Component\Form\ValueTransformer;
 
-abstract class BaseDateTimeTransformer extends BaseValueTransformer
+use Symfony\Component\Form\Configurable;
+
+abstract class BaseDateTimeTransformer extends Configurable implements ValueTransformerInterface
 {
     const NONE   = 'none';
     const FULL   = 'full';

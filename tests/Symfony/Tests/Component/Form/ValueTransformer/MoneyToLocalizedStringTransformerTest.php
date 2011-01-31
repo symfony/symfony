@@ -19,12 +19,18 @@ use Symfony\Tests\Component\Form\LocalizedTestCase;
 
 class MoneyToLocalizedStringTransformerTest extends LocalizedTestCase
 {
+    protected function setUp()
+    {
+        parent::setUp();
+
+        \Locale::setDefault('de_AT');
+    }
+
     public function testTransform()
     {
         $transformer = new MoneyToLocalizedStringTransformer(array(
             'divisor' => 100,
         ));
-        $transformer->setLocale('de_AT');
 
         $this->assertEquals('1,23', $transformer->transform(123));
     }
@@ -52,7 +58,6 @@ class MoneyToLocalizedStringTransformerTest extends LocalizedTestCase
         $transformer = new MoneyToLocalizedStringTransformer(array(
             'divisor' => 100,
         ));
-        $transformer->setLocale('de_AT');
 
         $this->assertEquals(123, $transformer->reverseTransform('1,23', null));
     }

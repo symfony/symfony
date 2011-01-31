@@ -11,6 +11,7 @@
 
 namespace Symfony\Component\Form\ValueTransformer;
 
+use Symfony\Component\Form\Configurable;
 use Symfony\Component\Form\Exception\UnexpectedTypeException;
 
 /**
@@ -19,7 +20,7 @@ use Symfony\Component\Form\Exception\UnexpectedTypeException;
  * @author Bernhard Schussek <bernhard.schussek@symfony-project.com>
  * @author Florian Eckerstorfer <florian@eckerstorfer.org>
  */
-class DateTimeToStringTransformer extends BaseValueTransformer
+class DateTimeToStringTransformer extends Configurable implements ValueTransformerInterface
 {
     /**
      * {@inheritDoc}

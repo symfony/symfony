@@ -24,7 +24,6 @@ use Symfony\Component\Validator\ValidatorInterface;
  *
  * <code>
  * $form = $context
- *     ->locale('en_US')
  *     ->validationGroups('Address')
  *     ->getForm('author');
  * </code>

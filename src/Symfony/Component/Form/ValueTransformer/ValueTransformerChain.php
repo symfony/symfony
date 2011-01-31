@@ -74,14 +74,4 @@ class ValueTransformerChain implements ValueTransformerInterface
 
         return $value;
     }
-
-    /**
-     * {@inheritDoc}
-     */
-    public function setLocale($locale)
-    {
-        foreach ($this->transformers as $transformer) {
-            $transformer->setLocale($locale);
-        }
-    }
 }

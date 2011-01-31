@@ -18,7 +18,7 @@ class LanguageFieldTest extends \PHPUnit_Framework_TestCase
 {
     public function testCountriesAreSelectable()
     {
-        FormContext::setLocale('de_AT');
+        \Locale::setDefault('de_AT');
 
         $field = new LanguageField('language');
         $choices = $field->getOtherChoices();

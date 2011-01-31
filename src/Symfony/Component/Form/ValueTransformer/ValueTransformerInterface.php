@@ -11,14 +11,12 @@
 
 namespace Symfony\Component\Form\ValueTransformer;
 
-use Symfony\Component\Form\Localizable;
-
 /**
  * Transforms a value between different representations.
  *
  * @author     Bernhard Schussek <bernhard.schussek@symfony-project.com>
  */
-interface ValueTransformerInterface extends Localizable
+interface ValueTransformerInterface
 {
     /**
      * Transforms a value from the original representation to a transformed representation.

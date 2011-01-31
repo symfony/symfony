@@ -23,7 +23,7 @@ class CountryField extends ChoiceField
 {
     protected function configure()
     {
-        $this->addOption('choices', Locale::getDisplayCountries($this->locale));
+        $this->addOption('choices', Locale::getDisplayCountries(\Locale::getDefault()));
 
         parent::configure();
     }

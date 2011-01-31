@@ -104,7 +104,7 @@ class DateField extends HybridField
         $this->addOption('user_timezone', 'UTC');
 
         $this->formatter = new \IntlDateFormatter(
-            $this->locale,
+            \Locale::getDefault(),
             self::$intlFormats[$this->getOption('format')],
             \IntlDateFormatter::NONE
         );

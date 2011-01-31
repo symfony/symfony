@@ -11,6 +11,7 @@
 
 namespace Symfony\Component\Form\ValueTransformer;
 
+use Symfony\Component\Form\Configurable;
 use Doctrine\Common\Collections\Collection;
 
 /**
@@ -33,7 +34,7 @@ use Doctrine\Common\Collections\Collection;
  * @author Benjamin Eberlei <kontakt@beberlei.de>
  * @author Bernhard Schussek <bernhard.schussek@symfony-project.com>
  */
-class CollectionToStringTransformer extends BaseValueTransformer
+class CollectionToStringTransformer extends Configurable implements ValueTransformerInterface
 {
     protected function configure()
     {

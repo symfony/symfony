@@ -66,26 +66,6 @@ class FormContext implements FormContextInterface
     protected $csrfFieldName = '_token';
 
     /**
-     * Globally sets the locale for new forms and fields
-     *
-     * @param string $locale  A valid locale, such as "en", "de_DE" etc.
-     */
-    public static function setLocale($locale)
-    {
-        self::$locale = $locale;
-    }
-
-    /**
-     * Returns the locale used for new forms and fields
-     *
-     * @return string  A valid locale, such as "en", "de_DE" etc.
-     */
-    public static function getLocale()
-    {
-        return self::$locale;
-    }
-
-    /**
      * @inheritDoc
      */
     public function validator(ValidatorInterface $validator)

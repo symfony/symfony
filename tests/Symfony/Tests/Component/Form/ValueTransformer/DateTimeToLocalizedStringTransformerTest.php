@@ -25,6 +25,8 @@ class DateTimeToLocalizedStringTransformerTest extends DateTimeTestCase
     {
         parent::setUp();
 
+        \Locale::setDefault('de_AT');
+
         $this->dateTime = new \DateTime('2010-02-03 04:05:06 UTC');
         $this->dateTimeWithoutSeconds = new \DateTime('2010-02-03 04:05:00 UTC');
     }
@@ -46,7 +48,6 @@ class DateTimeToLocalizedStringTransformerTest extends DateTimeTestCase
             'output_timezone' => 'UTC',
             'date_format' => 'short',
         ));
-        $transformer->setLocale('de_AT');
         $this->assertEquals('03.02.10 04:05', $transformer->transform($this->dateTime));
     }
 
@@ -57,7 +58,7 @@ class DateTimeToLocalizedStringTransformerTest extends DateTimeTestCase
             'output_timezone' => 'UTC',
             'date_format' => 'medium',
         ));
-        $transformer->setLocale('de_AT');
+
         $this->assertEquals('03.02.2010 04:05', $transformer->transform($this->dateTime));
     }
 
@@ -68,7 +69,7 @@ class DateTimeToLocalizedStringTransformerTest extends DateTimeTestCase
             'output_timezone' => 'UTC',
             'date_format' => 'long',
         ));
-        $transformer->setLocale('de_AT');
+
         $this->assertEquals('03. Februar 2010 04:05', $transformer->transform($this->dateTime));
     }
 
@@ -79,7 +80,7 @@ class DateTimeToLocalizedStringTransformerTest extends DateTimeTestCase
             'output_timezone' => 'UTC',
             'date_format' => 'full',
         ));
-        $transformer->setLocale('de_AT');
+
         $this->assertEquals('Mittwoch, 03. Februar 2010 04:05', $transformer->transform($this->dateTime));
     }
 
@@ -90,7 +91,7 @@ class DateTimeToLocalizedStringTransformerTest extends DateTimeTestCase
             'output_timezone' => 'UTC',
             'time_format' => 'short',
         ));
-        $transformer->setLocale('de_AT');
+
         $this->assertEquals('03.02.2010 04:05', $transformer->transform($this->dateTime));
     }
 
@@ -101,7 +102,7 @@ class DateTimeToLocalizedStringTransformerTest extends DateTimeTestCase
             'output_timezone' => 'UTC',
             'time_format' => 'medium',
         ));
-        $transformer->setLocale('de_AT');
+
         $this->assertEquals('03.02.2010 04:05:06', $transformer->transform($this->dateTime));
     }
 
@@ -112,7 +113,7 @@ class DateTimeToLocalizedStringTransformerTest extends DateTimeTestCase
             'output_timezone' => 'UTC',
             'time_format' => 'long',
         ));
-        $transformer->setLocale('de_AT');
+
         $this->assertEquals('03.02.2010 04:05:06 GMT+00:00', $transformer->transform($this->dateTime));
     }
 
@@ -123,17 +124,19 @@ class DateTimeToLocalizedStringTransformerTest extends DateTimeTestCase
             'output_timezone' => 'UTC',
             'time_format' => 'full',
         ));
-        $transformer->setLocale('de_AT');
+
         $this->assertEquals('03.02.2010 04:05:06 GMT+00:00', $transformer->transform($this->dateTime));
     }
 
     public function testTransformToDifferentLocale()
     {
+        \Locale::setDefault('en_US');
+
         $transformer = new DateTimeToLocalizedStringTransformer(array(
             'input_timezone' => 'UTC',
             'output_timezone' => 'UTC',
         ));
-        $transformer->setLocale('en_US');
+
         $this->assertEquals('Feb 3, 2010 4:05 AM', $transformer->transform($this->dateTime));
     }
 
@@ -150,7 +153,7 @@ class DateTimeToLocalizedStringTransformerTest extends DateTimeTestCase
             'input_timezone' => 'America/New_York',
             'output_timezone' => 'Asia/Hong_Kong',
         ));
-        $transformer->setLocale('de_AT');
+
 
         $input = new \DateTime('2010-02-03 04:05:06 America/New_York');
 
@@ -187,7 +190,7 @@ class DateTimeToLocalizedStringTransformerTest extends DateTimeTestCase
             'output_timezone' => 'UTC',
             'date_format' => 'short',
         ));
-        $transformer->setLocale('de_AT');
+
         $this->assertDateTimeEquals($this->dateTimeWithoutSeconds, $transformer->reverseTransform('03.02.10 04:05', null));
     }
 
@@ -198,7 +201,7 @@ class DateTimeToLocalizedStringTransformerTest extends DateTimeTestCase
             'output_timezone' => 'UTC',
             'date_format' => 'medium',
         ));
-        $transformer->setLocale('de_AT');
+
         $this->assertDateTimeEquals($this->dateTimeWithoutSeconds, $transformer->reverseTransform('03.02.2010 04:05', null));
     }
 
@@ -209,7 +212,7 @@ class DateTimeToLocalizedStringTransformerTest extends DateTimeTestCase
             'output_timezone' => 'UTC',
             'date_format' => 'long',
         ));
-        $transformer->setLocale('de_AT');
+
         $this->assertDateTimeEquals($this->dateTimeWithoutSeconds, $transformer->reverseTransform('03. Februar 2010 04:05', null));
     }
 
@@ -220,7 +223,7 @@ class DateTimeToLocalizedStringTransformerTest extends DateTimeTestCase
             'output_timezone' => 'UTC',
             'date_format' => 'full',
         ));
-        $transformer->setLocale('de_AT');
+
         $this->assertDateTimeEquals($this->dateTimeWithoutSeconds, $transformer->reverseTransform('Mittwoch, 03. Februar 2010 04:05', null));
     }
 
@@ -231,7 +234,7 @@ class DateTimeToLocalizedStringTransformerTest extends DateTimeTestCase
             'output_timezone' => 'UTC',
             'time_format' => 'short',
         ));
-        $transformer->setLocale('de_AT');
+
         $this->assertDateTimeEquals($this->dateTimeWithoutSeconds, $transformer->reverseTransform('03.02.2010 04:05', null));
     }
 
@@ -242,7 +245,7 @@ class DateTimeToLocalizedStringTransformerTest extends DateTimeTestCase
             'output_timezone' => 'UTC',
             'time_format' => 'medium',
         ));
-        $transformer->setLocale('de_AT');
+
         $this->assertDateTimeEquals($this->dateTime, $transformer->reverseTransform('03.02.2010 04:05:06', null));
     }
 
@@ -253,7 +256,7 @@ class DateTimeToLocalizedStringTransformerTest extends DateTimeTestCase
             'output_timezone' => 'UTC',
             'time_format' => 'long',
         ));
-        $transformer->setLocale('de_AT');
+
         $this->assertDateTimeEquals($this->dateTime, $transformer->reverseTransform('03.02.2010 04:05:06 GMT+00:00', null));
     }
 
@@ -264,17 +267,19 @@ class DateTimeToLocalizedStringTransformerTest extends DateTimeTestCase
             'output_timezone' => 'UTC',
             'time_format' => 'full',
         ));
-        $transformer->setLocale('de_AT');
+
         $this->assertDateTimeEquals($this->dateTime, $transformer->reverseTransform('03.02.2010 04:05:06 GMT+00:00', null));
     }
 
     public function testReverseTransformFromDifferentLocale()
     {
+        \Locale::setDefault('en_US');
+
         $transformer = new DateTimeToLocalizedStringTransformer(array(
             'input_timezone' => 'UTC',
             'output_timezone' => 'UTC',
         ));
-        $transformer->setLocale('en_US');
+
         $this->assertDateTimeEquals($this->dateTimeWithoutSeconds, $transformer->reverseTransform('Feb 3, 2010 04:05 AM', null));
     }
 
@@ -284,7 +289,7 @@ class DateTimeToLocalizedStringTransformerTest extends DateTimeTestCase
             'input_timezone' => 'America/New_York',
             'output_timezone' => 'Asia/Hong_Kong',
         ));
-        $transformer->setLocale('de_AT');
+
 
         $dateTime = new \DateTime('2010-02-03 04:05:00 Asia/Hong_Kong');
         $dateTime->setTimezone(new \DateTimeZone('America/New_York'));

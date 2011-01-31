@@ -21,7 +21,6 @@ use Symfony\Component\Form\Exception\UnexpectedTypeException;
  *  * "input": The type of the normalized format ("time" or "timestamp"). Default: "datetime"
  *  * "output": The type of the transformed format ("string" or "array"). Default: "string"
  *  * "format": The format of the time string ("short", "medium", "long" or "full"). Default: "short"
- *  * "locale": The locale of the localized string. Default: Result of Locale::getDefault()
  *
  * @author Bernhard Schussek <bernhard.schussek@symfony-project.com>
  * @author Florian Eckerstorfer <florian@eckerstorfer.org>

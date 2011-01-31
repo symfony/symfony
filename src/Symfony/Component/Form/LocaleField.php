@@ -26,7 +26,7 @@ class LocaleField extends ChoiceField
      */
     protected function configure()
     {
-        $this->addOption('choices', Locale::getDisplayLocales($this->locale));
+        $this->addOption('choices', Locale::getDisplayLocales(\Locale::getDefault()));
 
         parent::configure();
     }

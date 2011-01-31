@@ -49,7 +49,6 @@ use Symfony\Component\Form\ValueTransformer\TransformationFailedException;
 class Field extends Configurable implements FieldInterface
 {
     protected $taintedData = null;
-    protected $locale = null;
 
     private $errors = array();
     private $key = '';
@@ -74,7 +73,6 @@ class Field extends Configurable implements FieldInterface
         $this->addOption('normalization_transformer');
 
         $this->key = (string)$key;
-        $this->locale = FormContext::getLocale();
 
         parent::__construct($options);
 
@@ -413,28 +411,12 @@ class Field extends Configurable implements FieldInterface
     }
 
     /**
-     * Injects the locale into the given object, if set.
-     *
-     * The locale is injected only if the object implements Localizable.
-     *
-     * @param object $object
-     */
-    protected function injectLocale($object)
-    {
-        if ($object instanceof Localizable) {
-            $object->setLocale($this->locale);
-        }
-    }
-
-    /**
      * Sets the ValueTransformer.
      *
      * @param ValueTransformerInterface $valueTransformer
      */
     protected function setNormalizationTransformer(ValueTransformerInterface $normalizationTransformer)
     {
-        $this->injectLocale($normalizationTransformer);
-
         $this->normalizationTransformer = $normalizationTransformer;
     }
 
@@ -455,8 +437,6 @@ class Field extends Configurable implements FieldInterface
      */
     protected function setValueTransformer(ValueTransformerInterface $valueTransformer)
     {
-        $this->injectLocale($valueTransformer);
-
         $this->valueTransformer = $valueTransformer;
     }
 

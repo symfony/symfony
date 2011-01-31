@@ -18,10 +18,16 @@ use Symfony\Tests\Component\Form\LocalizedTestCase;
 
 class PercentToLocalizedStringTransformerTest extends LocalizedTestCase
 {
+    protected function setUp()
+    {
+        parent::setUp();
+
+        \Locale::setDefault('de_AT');
+    }
+
     public function testTransform()
     {
         $transformer = new PercentToLocalizedStringTransformer();
-        $transformer->setLocale('de_AT');
 
         $this->assertEquals('10', $transformer->transform(0.1));
         $this->assertEquals('15', $transformer->transform(0.15));
@@ -41,7 +47,6 @@ class PercentToLocalizedStringTransformerTest extends LocalizedTestCase
         $transformer = new PercentToLocalizedStringTransformer(array(
             'type' => 'integer',
         ));
-        $transformer->setLocale('de_AT');
 
         $this->assertEquals('0', $transformer->transform(0.1));
         $this->assertEquals('1', $transformer->transform(1));
@@ -54,7 +59,6 @@ class PercentToLocalizedStringTransformerTest extends LocalizedTestCase
         $transformer = new PercentToLocalizedStringTransformer(array(
             'precision' => 2,
         ));
-        $transformer->setLocale('de_AT');
 
         $this->assertEquals('12,34', $transformer->transform(0.1234));
     }
@@ -62,7 +66,6 @@ class PercentToLocalizedStringTransformerTest extends LocalizedTestCase
     public function testReverseTransform()
     {
         $transformer = new PercentToLocalizedStringTransformer();
-        $transformer->setLocale('de_AT');
 
         $this->assertEquals(0.1, $transformer->reverseTransform('10', null));
         $this->assertEquals(0.15, $transformer->reverseTransform('15', null));
@@ -82,7 +85,6 @@ class PercentToLocalizedStringTransformerTest extends LocalizedTestCase
         $transformer = new PercentToLocalizedStringTransformer(array(
             'type' => 'integer',
         ));
-        $transformer->setLocale('de_AT');
 
         $this->assertEquals(10, $transformer->reverseTransform('10', null));
         $this->assertEquals(15, $transformer->reverseTransform('15', null));
@@ -95,7 +97,6 @@ class PercentToLocalizedStringTransformerTest extends LocalizedTestCase
         $transformer = new PercentToLocalizedStringTransformer(array(
             'precision' => 2,
         ));
-        $transformer->setLocale('de_AT');
 
         $this->assertEquals(0.1234, $transformer->reverseTransform('12,34', null));
     }

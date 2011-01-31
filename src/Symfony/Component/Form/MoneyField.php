@@ -70,12 +70,12 @@ class MoneyField extends NumberField
             return '{{ widget }}';
         }
 
-        if (!isset(self::$patterns[$this->locale])) {
-            self::$patterns[$this->locale] = array();
+        if (!isset(self::$patterns[\Locale::getDefault()])) {
+            self::$patterns[\Locale::getDefault()] = array();
         }
 
-        if (!isset(self::$patterns[$this->locale][$this->getOption('currency')])) {
-            $format = new \NumberFormatter($this->locale, \NumberFormatter::CURRENCY);
+        if (!isset(self::$patterns[\Locale::getDefault()][$this->getOption('currency')])) {
+            $format = new \NumberFormatter(\Locale::getDefault(), \NumberFormatter::CURRENCY);
             $pattern = $format->formatCurrency('123', $this->getOption('currency'));
 
             // the spacings between currency symbol and number are ignored, because
@@ -87,14 +87,14 @@ class MoneyField extends NumberField
             preg_match('/^([^\s\xc2\xa0]*)[\s\xc2\xa0]*123[,.]00[\s\xc2\xa0]*([^\s\xc2\xa0]*)$/', $pattern, $matches);
 
             if (!empty($matches[1])) {
-                self::$patterns[$this->locale] = $matches[1].' {{ widget }}';
+                self::$patterns[\Locale::getDefault()] = $matches[1].' {{ widget }}';
             } else if (!empty($matches[2])) {
-                self::$patterns[$this->locale] = '{{ widget }} '.$matches[2];
+                self::$patterns[\Locale::getDefault()] = '{{ widget }} '.$matches[2];
             } else {
-                self::$patterns[$this->locale] = '{{ widget }}';
+                self::$patterns[\Locale::getDefault()] = '{{ widget }}';
             }
         }
 
-        return self::$patterns[$this->locale];
+        return self::$patterns[\Locale::getDefault()];
     }
 }

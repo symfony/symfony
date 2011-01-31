@@ -145,20 +145,6 @@ class FieldTest extends \PHPUnit_Framework_TestCase
         $this->assertEquals('news_article_title', $this->field->getId());
     }
 
-    public function testLocaleIsPassedToValueTransformer()
-    {
-        FormContext::setLocale('de_DE');
-
-        $transformer = $this->getMock('Symfony\Component\Form\ValueTransformer\ValueTransformerInterface');
-        $transformer->expects($this->exactly(1))
-                         ->method('setLocale')
-                         ->with($this->equalTo('de_DE'));
-
-        $field = new TestField('title', array(
-            'value_transformer' => $transformer,
-        ));
-    }
-
     public function testIsRequiredReturnsOwnValueIfNoParent()
     {
         $this->field->setRequired(true);

@@ -11,6 +11,7 @@
 
 namespace Symfony\Component\Form\ValueTransformer;
 
+use Symfony\Component\Form\Configurable;
 use Symfony\Component\Form\Exception\UnexpectedTypeException;
 
 /**
@@ -19,7 +20,7 @@ use Symfony\Component\Form\Exception\UnexpectedTypeException;
  * @author Bernhard Schussek <bernhard.schussek@symfony-project.com>
  * @author Florian Eckerstorfer <florian@eckerstorfer.org>
  */
-class PercentToLocalizedStringTransformer extends BaseValueTransformer
+class PercentToLocalizedStringTransformer extends Configurable implements ValueTransformerInterface
 {
     const FRACTIONAL = 'fractional';
     const INTEGER = 'integer';
@@ -113,7 +114,7 @@ class PercentToLocalizedStringTransformer extends BaseValueTransformer
      */
     protected function getNumberFormatter()
     {
-        $formatter = new \NumberFormatter($this->locale, \NumberFormatter::DECIMAL);
+        $formatter = new \NumberFormatter(\Locale::getDefault(), \NumberFormatter::DECIMAL);
 
         $formatter->setAttribute(\NumberFormatter::FRACTION_DIGITS, $this->getOption('precision'));
 

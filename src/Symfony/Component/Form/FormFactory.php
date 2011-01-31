@@ -25,7 +25,6 @@ use Symfony\Component\Validator\ValidatorInterface;
  *
  * <code>
  * $defaultContext = new FormContext();
- * $defaultContext->locale('en_US');
  * $defaultContext->csrfProtection(true);
  * $factory = new FormFactory($defaultContext);
  *
@@ -39,7 +38,6 @@ use Symfony\Component\Validator\ValidatorInterface;
  *
  * <code>
  * $form = $factory
- *     ->locale('de_DE')
  *     ->csrfProtection(false)
  *     ->getForm('author');
  * </code>

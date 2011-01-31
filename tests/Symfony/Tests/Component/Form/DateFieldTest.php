@@ -20,7 +20,7 @@ class DateFieldTest extends DateTimeTestCase
 {
     protected function setUp()
     {
-        FormContext::setLocale('de_AT');
+        \Locale::setDefault('de_AT');
     }
 
     public function testBind_fromInput_dateTime()

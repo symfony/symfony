@@ -60,6 +60,7 @@ ClassCollectionLoader::load(array(
     'Symfony\\Component\\HttpKernel\\Kernel',
     'Symfony\\Component\\HttpKernel\\HttpKernelInterface',
     'Symfony\\Component\\HttpKernel\\HttpCache\\HttpCache',
+    'Symfony\\Component\\HttpKernel\\HttpCache\\StoreInterface',
     'Symfony\\Component\\HttpKernel\\HttpCache\\Store',
     'Symfony\\Component\\HttpKernel\\HttpCache\\Esi',
 

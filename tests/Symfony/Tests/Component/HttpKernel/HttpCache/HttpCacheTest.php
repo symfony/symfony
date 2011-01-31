@@ -593,7 +593,10 @@ class HttpCacheTest extends HttpCacheTestCase
         $tmp = unserialize($values[0]);
         $time = \DateTime::createFromFormat('U', time());
         $tmp[0][1]['expires'] = $time->format(DATE_RFC2822);
-        $this->store->save('md'.sha1('http://localhost/'), serialize($tmp));
+        $r = new \ReflectionObject($this->store);
+        $m = $r->getMethod('save');
+        $m->setAccessible(true);
+        $m->invoke($this->store, 'md'.sha1('http://localhost/'), serialize($tmp));
 
         // build subsequent request; should be found but miss due to freshness
         $this->request('GET', '/');

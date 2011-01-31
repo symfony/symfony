@@ -67,17 +67,17 @@ class HttpCache implements HttpKernelInterface
      *                            (see RFC 5861).
      *
      * @param HttpKernelInterface $kernel An HttpKernelInterface instance
-     * @param Store               $store  A Store instance
+     * @param StoreInterface      $store  A Store instance
      * @param Esi                 $esi    An Esi instance
      * @param array                                             $options        An array of options
      */
-    public function __construct(HttpKernelInterface $kernel, Store $store, Esi $esi = null, array $options = array())
+    public function __construct(HttpKernelInterface $kernel, StoreInterface $store, Esi $esi = null, array $options = array())
     {
         $this->store = $store;
         $this->kernel = $kernel;
 
         // needed in case there is a fatal error because the backend is too slow to respond
-        register_shutdown_function(array($this->store, '__destruct'));
+        register_shutdown_function(array($this->store, 'cleanup'));
 
         $this->options = array_merge(array(
             'debug'                  => false,

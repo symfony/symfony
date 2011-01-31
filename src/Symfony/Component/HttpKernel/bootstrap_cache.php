@@ -402,11 +402,11 @@ class HttpCache implements HttpKernelInterface
     protected $traces;
     protected $store;
     protected $esi;
-    public function __construct(HttpKernelInterface $kernel, Store $store, Esi $esi = null, array $options = array())
+    public function __construct(HttpKernelInterface $kernel, StoreInterface $store, Esi $esi = null, array $options = array())
     {
         $this->store = $store;
         $this->kernel = $kernel;
-                register_shutdown_function(array($this->store, '__destruct'));
+                register_shutdown_function(array($this->store, 'cleanup'));
         $this->options = array_merge(array(
             'debug'                  => false,
             'default_ttl'            => 0,
@@ -688,7 +688,23 @@ namespace Symfony\Component\HttpKernel\HttpCache
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpFoundation\HeaderBag;
-class Store
+interface StoreInterface
+{
+    function lookup(Request $request);
+    function write(Request $request, Response $response);
+    function invalidate(Request $request);
+    function lock(Request $request);
+    function unlock(Request $request);
+    function purge($url);
+    function cleanup();
+}
+}
+namespace Symfony\Component\HttpKernel\HttpCache
+{
+use Symfony\Component\HttpFoundation\Request;
+use Symfony\Component\HttpFoundation\Response;
+use Symfony\Component\HttpFoundation\HeaderBag;
+class Store implements StoreInterface
 {
     protected $root;
     protected $keyCache;
@@ -702,7 +718,7 @@ class Store
         $this->keyCache = new \SplObjectStorage();
         $this->locks = array();
     }
-    public function __destruct()
+    public function cleanup()
     {
                 foreach ($this->locks as $lock) {
             @unlink($lock);
@@ -810,7 +826,7 @@ class Store
             }
         }
     }
-    public function requestsMatch($vary, $env1, $env2)
+    protected function requestsMatch($vary, $env1, $env2)
     {
         if (empty($vary)) {
             return true;
@@ -825,7 +841,7 @@ class Store
         }
         return true;
     }
-    public function getMetadata($key)
+    protected function getMetadata($key)
     {
         if (false === $entries = $this->load($key)) {
             return array();
@@ -840,12 +856,12 @@ class Store
         }
         return false;
     }
-    public function load($key)
+    protected function load($key)
     {
         $path = $this->getPath($key);
         return file_exists($path) ? file_get_contents($path) : false;
     }
-    public function save($key, $data)
+    protected function save($key, $data)
     {
         $path = $this->getPath($key);
         if (!is_dir(dirname($path)) && false === @mkdir(dirname($path), 0777, true)) {
@@ -865,11 +881,11 @@ class Store
         }
         chmod($path, 0644);
     }
-    public function getPath($key)
+    protected function getPath($key)
     {
         return $this->root.DIRECTORY_SEPARATOR.substr($key, 0, 2).DIRECTORY_SEPARATOR.substr($key, 2, 2).DIRECTORY_SEPARATOR.substr($key, 4, 2).DIRECTORY_SEPARATOR.substr($key, 6);
     }
-    public function getCacheKey(Request $request)
+    protected function getCacheKey(Request $request)
     {
         if (isset($this->keyCache[$request])) {
             return $this->keyCache[$request];

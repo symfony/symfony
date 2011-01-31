@@ -23,7 +23,7 @@ use Symfony\Component\HttpFoundation\HeaderBag;
  *
  * @author Fabien Potencier <fabien.potencier@symfony-project.com>
  */
-class Store
+class Store implements StoreInterface
 {
     protected $root;
     protected $keyCache;
@@ -44,7 +44,10 @@ class Store
         $this->locks = array();
     }
 
-    public function __destruct()
+    /**
+     * Cleanups storage.
+     */
+    public function cleanup()
     {
         // unlock everything
         foreach ($this->locks as $lock) {
@@ -234,7 +237,7 @@ class Store
      *
      * @return Boolean true if the the two environments match, false otherwise
      */
-    public function requestsMatch($vary, $env1, $env2)
+    protected function requestsMatch($vary, $env1, $env2)
     {
         if (empty($vary)) {
             return true;
@@ -261,7 +264,7 @@ class Store
      *
      * @return array An array of data associated with the key
      */
-    public function getMetadata($key)
+    protected function getMetadata($key)
     {
         if (false === $entries = $this->load($key)) {
             return array();
@@ -291,13 +294,11 @@ class Store
     /**
      * Loads data for the given key.
      *
-     * Don't use this method directly, use lookup() instead
-     *
      * @param string $key  The store key
      *
      * @return string The data associated with the key
      */
-    public function load($key)
+    protected function load($key)
     {
         $path = $this->getPath($key);
 
@@ -307,12 +308,10 @@ class Store
     /**
      * Save data for the given key.
      *
-     * Don't use this method directly, use write() instead
-     *
      * @param string $key  The store key
      * @param string $data The data to store
      */
-    public function save($key, $data)
+    protected function save($key, $data)
     {
         $path = $this->getPath($key);
         if (!is_dir(dirname($path)) && false === @mkdir(dirname($path), 0777, true)) {
@@ -337,7 +336,7 @@ class Store
         chmod($path, 0644);
     }
 
-    public function getPath($key)
+    protected function getPath($key)
     {
         return $this->root.DIRECTORY_SEPARATOR.substr($key, 0, 2).DIRECTORY_SEPARATOR.substr($key, 2, 2).DIRECTORY_SEPARATOR.substr($key, 4, 2).DIRECTORY_SEPARATOR.substr($key, 6);
     }
@@ -349,7 +348,7 @@ class Store
      *
      * @return string A key for the given Request
      */
-    public function getCacheKey(Request $request)
+    protected function getCacheKey(Request $request)
     {
         if (isset($this->keyCache[$request])) {
             return $this->keyCache[$request];

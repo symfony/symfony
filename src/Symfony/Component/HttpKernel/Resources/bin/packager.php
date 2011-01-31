@@ -44,9 +44,33 @@ ClassCollectionLoader::load(array(
     'Symfony\\Component\\HttpFoundation\\ServerBag',
     'Symfony\\Component\\HttpFoundation\\HeaderBag',
     'Symfony\\Component\\HttpFoundation\\Request',
+    'Symfony\\Component\\HttpFoundation\\ApacheRequest',
 
     'Symfony\\Component\\ClassLoader\\ClassCollectionLoader',
     'Symfony\\Component\\ClassLoader\\UniversalClassLoader',
     'Symfony\\Component\\ClassLoader\\MapFileClassLoader',
-
 ), __DIR__.'/../..', 'bootstrap', false);
+
+if (file_exists(__DIR__.'/../../bootstrap_cache.php')) {
+    unlink(__DIR__.'/../../bootstrap_cache.php');
+}
+
+ClassCollectionLoader::load(array(
+    'Symfony\\Component\\HttpKernel\\KernelInterface',
+    'Symfony\\Component\\HttpKernel\\Kernel',
+    'Symfony\\Component\\HttpKernel\\HttpKernelInterface',
+    'Symfony\\Component\\HttpKernel\\HttpCache\\HttpCache',
+    'Symfony\\Component\\HttpKernel\\HttpCache\\Store',
+    'Symfony\\Component\\HttpKernel\\HttpCache\\Esi',
+
+    'Symfony\\Component\\HttpFoundation\\ParameterBag',
+    'Symfony\\Component\\HttpFoundation\\FileBag',
+    'Symfony\\Component\\HttpFoundation\\ServerBag',
+    'Symfony\\Component\\HttpFoundation\\HeaderBag',
+    'Symfony\\Component\\HttpFoundation\\Request',
+    'Symfony\\Component\\HttpFoundation\\ApacheRequest',
+    'Symfony\\Component\\HttpFoundation\\ResponseHeaderBag',
+    'Symfony\\Component\\HttpFoundation\\Response',
+
+    'Symfony\\Component\\ClassLoader\\UniversalClassLoader',
+), __DIR__.'/../..', 'bootstrap_cache', false);

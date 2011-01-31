@@ -80,7 +80,7 @@
 
 {% block hidden_field %}
 {% spaceless %}
-    <input type="hidden" {{ block('field_attributes') }} value="{{ field.displayedData }}" />
+    <input type="hidden" id="{{ field.id }}" name="{{ field.name }}"{% if field.disabled %} disabled="disabled"{% endif %} value="{{ field.displayedData }}" />
 {% endspaceless %}
 {% endblock hidden_field %}
 

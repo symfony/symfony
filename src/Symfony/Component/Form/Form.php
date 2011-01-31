@@ -73,12 +73,6 @@ class Form extends Field implements \IteratorAggregate, FormInterface
 
         parent::__construct($name, $options);
 
-        // If data is passed to this constructor, objects from parent forms
-        // should be ignored
-//        if (null !== $data) {
-//            $this->setPropertyPath(null);
-//        }
-
         // Enable CSRF protection, if necessary
         // TODO only in root form
         if ($this->getOption('csrf_provider')) {
@@ -86,14 +80,12 @@ class Form extends Field implements \IteratorAggregate, FormInterface
                 throw new FormException('The object passed to the "csrf_provider" option must implement CsrfProviderInterface');
             }
 
+            $fieldName = $this->getOption('csrf_field_name');
             $token = $this->getOption('csrf_provider')->generateCsrfToken(get_class($this));
 
-            $field = new HiddenField($this->getOption('csrf_field_name'), array(
-                'property_path' => null,
-            ));
-            $field->setData($token);
-
-            $this->add($field);
+            $this->add(new HiddenField($fieldName, array(
+                'data' => $token,
+            )));
         }
     }
 

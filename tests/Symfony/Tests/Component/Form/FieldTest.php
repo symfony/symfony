@@ -19,7 +19,7 @@ require_once __DIR__ . '/Fixtures/RequiredOptionsField.php';
 use Symfony\Component\Form\ValueTransformer\ValueTransformerInterface;
 use Symfony\Component\Form\PropertyPath;
 use Symfony\Component\Form\FieldError;
-use Symfony\Component\Form\FormContext;
+use Symfony\Component\Form\Form;
 use Symfony\Component\Form\ValueTransformer\TransformationFailedException;
 use Symfony\Tests\Component\Form\Fixtures\Author;
 use Symfony\Tests\Component\Form\Fixtures\TestField;
@@ -487,6 +487,23 @@ class FieldTest extends \PHPUnit_Framework_TestCase
         $this->field->setParent($parent);
 
         $this->assertEquals('ROOT', $this->field->getRoot());
+    }
+
+    public function testFieldsInitializedWithDataAreNotUpdatedWhenAddedToForms()
+    {
+        $author = new Author();
+        $author->firstName = 'Bernhard';
+
+        $field = new TestField('firstName', array(
+            'data' => 'foobar',
+        ));
+
+        $form = new Form('author', array(
+            'data' => $author,
+        ));
+        $form->add($field);
+
+        $this->assertEquals('foobar', $field->getData());
     }
 
     public function testGetRootReturnsFieldIfNoParent()

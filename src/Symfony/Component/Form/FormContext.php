@@ -130,9 +130,10 @@ class FormContext implements FormContextInterface
      */
     public function getForm($name, $data = null)
     {
-        $form = new Form(
+        return new Form(
             $name,
             array(
+                'data' => $data,
                 'validator' => $this->validator,
                 'csrf_field_name' => $this->csrfFieldName,
                 'csrf_provider' => $this->csrfProtection ? $this->csrfProvider : null,
@@ -140,9 +141,6 @@ class FormContext implements FormContextInterface
                 'field_factory' => $this->fieldFactory,
             )
         );
-        $form->setData($data);
-
-        return $form;
     }
 
     /**

@@ -65,6 +65,7 @@ class Field extends Configurable implements FieldInterface
 
     public function __construct($key = null, array $options = array())
     {
+        $this->addOption('data');
         $this->addOption('trim', true);
         $this->addOption('required', true);
         $this->addOption('disabled', false);
@@ -73,6 +74,14 @@ class Field extends Configurable implements FieldInterface
         $this->addOption('normalization_transformer');
 
         $this->key = (string)$key;
+
+        if (isset($options['data'])) {
+            // Populate the field with fixed data
+            // Set the property path to NULL so that the data is not
+            // overwritten by the form's data
+            $this->setData($options['data']);
+            $this->setPropertyPath(null);
+        }
 
         parent::__construct($options);
 
@@ -87,7 +96,9 @@ class Field extends Configurable implements FieldInterface
         $this->normalizedData = $this->normalize($this->data);
         $this->transformedData = $this->transform($this->normalizedData);
 
-        $this->setPropertyPath($this->getOption('property_path'));
+        if (!$this->getOption('data')) {
+            $this->setPropertyPath($this->getOption('property_path'));
+        }
     }
 
     /**

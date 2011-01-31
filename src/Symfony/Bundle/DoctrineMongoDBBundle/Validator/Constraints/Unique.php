@@ -18,7 +18,7 @@ use Symfony\Component\Validator\Constraint;
  *
  * @author Bulat Shakirzyanov <bulat@theopenskyproject.com>
  */
-class DoctrineMongoDBUnique extends Constraint
+class Unique extends Constraint
 {
     public $message = 'The value for {{ property }} already exists.';
     public $path;
@@ -36,7 +36,7 @@ class DoctrineMongoDBUnique extends Constraint
 
     public function validatedBy()
     {
-        return 'doctrine_odm.mongodb.validator.unique';
+        return 'doctrine_odm.mongodb.unique';
     }
 
     public function targets()

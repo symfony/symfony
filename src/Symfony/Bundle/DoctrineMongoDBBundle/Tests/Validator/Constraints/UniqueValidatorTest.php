@@ -2,14 +2,13 @@
 
 namespace Symfony\Bundle\DoctrineMongoDBBundle\Tests\Validator\Constraints;
 
-use Symfony\Bundle\DoctrineMongoDBBundle\Tests\Fixtures\Validator\Document;
-
 use Doctrine\ODM\MongoDB\Mapping\ClassMetadata;
 use Doctrine\ODM\MongoDB\DocumentRepository;
-use Symfony\Bundle\DoctrineMongoDBBundle\Validator\Constraints\DoctrineMongoDBUnique;
-use Symfony\Bundle\DoctrineMongoDBBundle\Validator\Constraints\DoctrineMongoDBUniqueValidator;
+use Symfony\Bundle\DoctrineMongoDBBundle\Tests\Fixtures\Validator\Document;
+use Symfony\Bundle\DoctrineMongoDBBundle\Validator\Constraints\Unique;
+use Symfony\Bundle\DoctrineMongoDBBundle\Validator\Constraints\UniqueValidator;
 
-class DoctrineMongoDBUniqueValidatorTest extends \PHPUnit_Framework_TestCase
+class UniqueValidatorTest extends \PHPUnit_Framework_TestCase
 {
     private $dm;
     private $repository;
@@ -23,7 +22,7 @@ class DoctrineMongoDBUniqueValidatorTest extends \PHPUnit_Framework_TestCase
         $this->repository = $this->getDocumentRepository();
         $this->dm = $this->getDocumentManager($this->classMetadata, $this->repository);
         $container = $this->getContainer();
-        $this->validator = new DoctrineMongoDBUniqueValidator($container);
+        $this->validator = new UniqueValidator($container);
     }
 
     public function tearDown()
@@ -43,7 +42,7 @@ class DoctrineMongoDBUniqueValidatorTest extends \PHPUnit_Framework_TestCase
             ->with(array($path => $value))
             ->will($this->returnValue($return));
 
-        $this->assertTrue($this->validator->isValid($document, new DoctrineMongoDBUnique($path)));
+        $this->assertTrue($this->validator->isValid($document, new Unique($path)));
     }
 
     public function getFieldsPathsValuesDocumentsAndReturns()
@@ -72,7 +71,7 @@ class DoctrineMongoDBUniqueValidatorTest extends \PHPUnit_Framework_TestCase
             ->method('findOneBy')
             ->with($query);
 
-        $this->validator->isValid($document, new DoctrineMongoDBUnique($path));
+        $this->validator->isValid($document, new Unique($path));
     }
 
     public function getFieldTypesFieldsPathsValuesAndQueries()

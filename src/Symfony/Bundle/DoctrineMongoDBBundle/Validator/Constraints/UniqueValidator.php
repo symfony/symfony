@@ -23,7 +23,7 @@ use Symfony\Component\Validator\ConstraintValidator;
  *
  * @author Bulat Shakirzyanov <bulat@theopenskyproject.com>
  */
-class DoctrineMongoDBUniqueValidator extends ConstraintValidator
+class UniqueValidator extends ConstraintValidator
 {
 
     private $container;
@@ -130,7 +130,7 @@ class DoctrineMongoDBUniqueValidator extends ConstraintValidator
         return $value;
     }
 
-    private function getDocumentManager(DoctrineMongoDBUnique $constraint)
+    private function getDocumentManager(Unique $constraint)
     {
         return $this->container->get($constraint->getDocumentManagerId());
     }

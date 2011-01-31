@@ -36,8 +36,12 @@ class ExceptionController extends ContainerAware
     {
         $this->container->get('request')->setRequestFormat($format);
 
+        // the count variable avoids an infinite loop on
+        // some Windows configurations where ob_get_level()
+        // never reaches 0
+        $count = 100;
         $currentContent = '';
-        while (ob_get_level()) {
+        while (ob_get_level() && --$count) {
             $currentContent .= ob_get_clean();
         }
 

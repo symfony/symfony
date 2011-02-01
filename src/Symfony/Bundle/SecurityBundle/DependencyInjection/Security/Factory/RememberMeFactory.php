@@ -24,8 +24,8 @@ class RememberMeFactory implements SecurityFactoryInterface
         $authProviderId = 'security.authentication.provider.rememberme.'.$id;
         $container
             ->setDefinition($authProviderId, new DefinitionDecorator('security.authentication.provider.rememberme'))
-            ->addArgument(1, $config['key'])
-            ->addArgument(2, $id)
+            ->addArgument($config['key'])
+            ->addArgument($id)
             ->addTag('security.authentication_provider')
         ;
 

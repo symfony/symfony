@@ -11,6 +11,7 @@
 
 namespace Symfony\Component\Security\Http\Firewall;
 
+use Symfony\Component\EventDispatcher\Event;
 use Symfony\Component\Security\Core\SecurityContext;
 use Symfony\Component\Security\Core\User\UserProviderInterface;
 use Symfony\Component\Security\Core\User\AccountCheckerInterface;

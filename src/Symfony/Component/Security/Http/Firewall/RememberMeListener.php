@@ -2,6 +2,7 @@
 
 namespace Symfony\Component\Security\Http\Firewall;
 
+use Symfony\Component\EventDispatcher\Event;
 use Symfony\Component\Security\Core\Authentication\Token\TokenInterface;
 use Symfony\Component\Security\Core\Exception\AuthenticationException;
 use Symfony\Component\Security\Core\Exception\CookieTheftException;
@@ -101,7 +102,7 @@ class RememberMeListener implements ListenerInterface
                 $this->securityContext->setToken($token);
 
                 if (null !== $this->eventDispatcher) {
-                    $this->eventDispatcher->notify(new Event($this, 'security.interactive_login', array('request' => $request, 'token' => $token)));
+                    $this->eventDispatcher->notify(new Event($this, 'security.interactive_login', array('request' => $event->get('request'), 'token' => $token)));
                 }
 
                 if (null !== $this->logger) {

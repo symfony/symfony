@@ -169,6 +169,11 @@ class FormTest extends \PHPUnit_Framework_TestCase
         $this->assertFalse($form->isCsrfTokenValid());
     }
 
+    public function testGetValidator()
+    {
+        $this->assertSame($this->validator, $this->form->getValidator());
+    }
+
     public function testValidationGroupNullByDefault()
     {
         $this->assertNull($this->form->getValidationGroups());

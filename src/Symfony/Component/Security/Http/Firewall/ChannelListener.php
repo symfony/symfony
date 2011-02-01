@@ -12,7 +12,7 @@
 namespace Symfony\Component\Security\Http\Firewall;
 
 use Symfony\Component\Security\Http\AccessMap;
-use Symfony\Component\Security\Core\Authentication\EntryPoint\AuthenticationEntryPointInterface;
+use Symfony\Component\Security\Http\EntryPoint\AuthenticationEntryPointInterface;
 use Symfony\Component\HttpKernel\Log\LoggerInterface;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 use Symfony\Component\EventDispatcher\EventInterface;
@@ -37,7 +37,7 @@ class ChannelListener implements ListenerInterface
     }
 
     /**
-     * 
+     *
      *
      * @param EventDispatcherInterface $dispatcher An EventDispatcherInterface instance
      * @param integer                  $priority   The priority
@@ -53,7 +53,7 @@ class ChannelListener implements ListenerInterface
     public function unregister(EventDispatcherInterface $dispatcher)
     {
     }
-    
+
     /**
      * Handles channel management.
      *
@@ -72,7 +72,7 @@ class ChannelListener implements ListenerInterface
 
             $event->setProcessed();
 
-            return $this->authenticationEntryPoint->start($request);
+            return $this->authenticationEntryPoint->start($event, $request);
         }
 
         if ('http' === $channel && $request->isSecure()) {
@@ -82,7 +82,7 @@ class ChannelListener implements ListenerInterface
 
             $event->setProcessed();
 
-            return $this->authenticationEntryPoint->start($request);
+            return $this->authenticationEntryPoint->start($event, $request);
         }
     }
 }

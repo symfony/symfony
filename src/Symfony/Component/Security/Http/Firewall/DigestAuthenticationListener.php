@@ -101,7 +101,7 @@ class DigestAuthenticationListener implements ListenerInterface
         try {
             $digestAuth->validateAndDecode($this->authenticationEntryPoint->getKey(), $this->authenticationEntryPoint->getRealmName());
         } catch (BadCredentialsException $e) {
-            $this->fail($request, $e);
+            $this->fail($event, $request, $e);
 
             return;
         }
@@ -115,7 +115,7 @@ class DigestAuthenticationListener implements ListenerInterface
 
             $serverDigestMd5 = $digestAuth->calculateServerDigest($user->getPassword(), $request->getMethod());
         } catch (UsernameNotFoundException $notFound) {
-            $this->fail($request, new BadCredentialsException(sprintf('Username %s not found.', $digestAuth->getUsername())));
+            $this->fail($event, $request, new BadCredentialsException(sprintf('Username %s not found.', $digestAuth->getUsername())));
 
             return;
         }
@@ -125,13 +125,13 @@ class DigestAuthenticationListener implements ListenerInterface
                 $this->logger->debug(sprintf("Expected response: '%s' but received: '%s'; is AuthenticationDao returning clear text passwords?", $serverDigestMd5, $digestAuth->getResponse()));
             }
 
-            $this->fail($request, new BadCredentialsException('Incorrect response'));
+            $this->fail($event, $request, new BadCredentialsException('Incorrect response'));
 
             return;
         }
 
         if ($digestAuth->isNonceExpired()) {
-            $this->fail($request, new NonceExpiredException('Nonce has expired/timed out.'));
+            $this->fail($event, $request, new NonceExpiredException('Nonce has expired/timed out.'));
 
             return;
         }
@@ -143,7 +143,7 @@ class DigestAuthenticationListener implements ListenerInterface
         $this->securityContext->setToken(new UsernamePasswordToken($user, $user->getPassword(), $this->providerKey));
     }
 
-    protected function fail(Request $request, AuthenticationException $failed)
+    protected function fail(EventInterface $event, Request $request, AuthenticationException $failed)
     {
         $this->securityContext->setToken(null);
 
@@ -151,7 +151,7 @@ class DigestAuthenticationListener implements ListenerInterface
             $this->logger->debug($failed);
         }
 
-        $this->authenticationEntryPoint->start($request, $failed);
+        $this->authenticationEntryPoint->start($event, $request, $failed);
     }
 }
 

@@ -16,7 +16,7 @@ use Symfony\Bundle\SecurityBundle\Security\AccessDeniedHandler;
 use Symfony\Component\Security\Http\Authorization\AccessDeniedHandlerInterface;
 use Symfony\Component\Security\Core\SecurityContext;
 use Symfony\Component\Security\Core\Authentication\AuthenticationTrustResolverInterface;
-use Symfony\Component\Security\Core\Authentication\EntryPoint\AuthenticationEntryPointInterface;
+use Symfony\Component\Security\Http\EntryPoint\AuthenticationEntryPointInterface;
 use Symfony\Component\HttpKernel\Log\LoggerInterface;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 use Symfony\Component\EventDispatcher\EventInterface;
@@ -87,7 +87,7 @@ class ExceptionListener implements ListenerInterface
             }
 
             try {
-                $response = $this->startAuthentication($request, $exception);
+                $response = $this->startAuthentication($event, $request, $exception);
             } catch (\Exception $e) {
                 $event->set('exception', $e);
 
@@ -101,7 +101,7 @@ class ExceptionListener implements ListenerInterface
                 }
 
                 try {
-                    $response = $this->startAuthentication($request, new InsufficientAuthenticationException('Full authentication is required to access this resource.', $token, 0, $exception));
+                    $response = $this->startAuthentication($event, $request, new InsufficientAuthenticationException('Full authentication is required to access this resource.', $token, 0, $exception));
                 } catch (\Exception $e) {
                     $event->set('exception', $e);
 
@@ -151,7 +151,7 @@ class ExceptionListener implements ListenerInterface
         return $response;
     }
 
-    protected function startAuthentication(Request $request, AuthenticationException $reason)
+    protected function startAuthentication(EventInterface $event, Request $request, AuthenticationException $reason)
     {
         $this->context->setToken(null);
 
@@ -165,6 +165,6 @@ class ExceptionListener implements ListenerInterface
 
         $request->getSession()->set('_security.target_path', $request->getUri());
 
-        return $this->authenticationEntryPoint->start($request, $reason);
+        return $this->authenticationEntryPoint->start($event, $request, $reason);
     }
 }

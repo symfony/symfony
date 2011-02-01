@@ -12,20 +12,17 @@
     </getter>
   </class>
 
-  <class name="Symfony\Component\Form\FieldGroup">
+  <class name="Symfony\Component\Form\Form">
     <property name="fields">
       <constraint name="Valid" />
     </property>
-    <getter property="boundWithExtraFields">
-      <constraint name="AssertFalse">
-        <option name="message">This field group should not contain extra fields</option>
-      </constraint>
-    </getter>
-  </class>
-
-  <class name="Symfony\Component\Form\Form">
     <getter property="data">
       <constraint name="Valid" />
+    </getter>
+    <getter property="submittedWithExtraFields">
+      <constraint name="AssertFalse">
+        <option name="message">This form should not contain extra fields</option>
+      </constraint>
     </getter>
     <getter property="postMaxSizeReached">
       <constraint name="AssertFalse">

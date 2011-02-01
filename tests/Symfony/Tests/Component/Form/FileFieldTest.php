@@ -52,7 +52,7 @@ class FileFieldTest extends \PHPUnit_Framework_TestCase
         file_put_contents($path, 'foobar');
     }
 
-    public function testBindUploadsNewFiles()
+    public function testSubmitUploadsNewFiles()
     {
         $tmpDir = realpath(self::$tmpDir);
         $tmpName = md5(session_id() . '$secret$' . '12345');
@@ -73,7 +73,7 @@ class FileFieldTest extends \PHPUnit_Framework_TestCase
              ->method('getOriginalName')
              ->will($this->returnValue('original_name.jpg'));
 
-        $this->field->bind(array(
+        $this->field->submit(array(
             'file' => $file,
             'token' => '12345',
             'original_name' => '',
@@ -91,12 +91,12 @@ class FileFieldTest extends \PHPUnit_Framework_TestCase
         $this->assertTrue($this->field->isUploadComplete());
     }
 
-    public function testBindKeepsUploadedFilesOnErrors()
+    public function testSubmitKeepsUploadedFilesOnErrors()
     {
         $tmpPath = self::$tmpDir . '/' . md5(session_id() . '$secret$' . '12345');
         $this->createTmpFile($tmpPath);
 
-        $this->field->bind(array(
+        $this->field->submit(array(
             'file' => '',
             'token' => '12345',
             'original_name' => 'original_name.jpg',
@@ -111,7 +111,7 @@ class FileFieldTest extends \PHPUnit_Framework_TestCase
         $this->assertEquals(realpath($tmpPath), realpath($this->field->getData()));
     }
 
-    public function testBindKeepsOldFileIfNotOverwritten()
+    public function testSubmitKeepsOldFileIfNotOverwritten()
     {
         $oldPath = tempnam(sys_get_temp_dir(), 'FileFieldTest');
         $this->createTmpFile($oldPath);
@@ -120,7 +120,7 @@ class FileFieldTest extends \PHPUnit_Framework_TestCase
 
         $this->assertEquals($oldPath, $this->field->getData());
 
-        $this->field->bind(array(
+        $this->field->submit(array(
             'file' => '',
             'token' => '12345',
             'original_name' => '',
@@ -135,14 +135,14 @@ class FileFieldTest extends \PHPUnit_Framework_TestCase
         $this->assertEquals($oldPath, $this->field->getData());
     }
 
-    public function testBindHandlesUploadErrIniSize()
+    public function testSubmitHandlesUploadErrIniSize()
     {
         $file = $this->getMock('Symfony\Component\HttpFoundation\File\UploadedFile', array(), array(), '', false);
         $file->expects($this->any())
              ->method('getError')
              ->will($this->returnValue(UPLOAD_ERR_INI_SIZE));
 
-        $this->field->bind(array(
+        $this->field->submit(array(
             'file' => $file,
             'token' => '12345',
             'original_name' => ''
@@ -151,14 +151,14 @@ class FileFieldTest extends \PHPUnit_Framework_TestCase
         $this->assertTrue($this->field->isIniSizeExceeded());
     }
 
-    public function testBindHandlesUploadErrFormSize()
+    public function testSubmitHandlesUploadErrFormSize()
     {
         $file = $this->getMock('Symfony\Component\HttpFoundation\File\UploadedFile', array(), array(), '', false);
         $file->expects($this->any())
              ->method('getError')
              ->will($this->returnValue(UPLOAD_ERR_FORM_SIZE));
 
-        $this->field->bind(array(
+        $this->field->submit(array(
             'file' => $file,
             'token' => '12345',
             'original_name' => ''
@@ -167,14 +167,14 @@ class FileFieldTest extends \PHPUnit_Framework_TestCase
         $this->assertTrue($this->field->isFormSizeExceeded());
     }
 
-    public function testBindHandlesUploadErrPartial()
+    public function testSubmitHandlesUploadErrPartial()
     {
         $file = $this->getMock('Symfony\Component\HttpFoundation\File\UploadedFile', array(), array(), '', false);
         $file->expects($this->any())
              ->method('getError')
              ->will($this->returnValue(UPLOAD_ERR_PARTIAL));
 
-        $this->field->bind(array(
+        $this->field->submit(array(
             'file' => $file,
             'token' => '12345',
             'original_name' => ''
@@ -183,7 +183,7 @@ class FileFieldTest extends \PHPUnit_Framework_TestCase
         $this->assertFalse($this->field->isUploadComplete());
     }
 
-    public function testBindThrowsExceptionOnUploadErrNoTmpDir()
+    public function testSubmitThrowsExceptionOnUploadErrNoTmpDir()
     {
         $file = $this->getMock('Symfony\Component\HttpFoundation\File\UploadedFile', array(), array(), '', false);
         $file->expects($this->any())
@@ -192,14 +192,14 @@ class FileFieldTest extends \PHPUnit_Framework_TestCase
 
         $this->setExpectedException('Symfony\Component\Form\Exception\FormException');
 
-        $this->field->bind(array(
+        $this->field->submit(array(
             'file' => $file,
             'token' => '12345',
             'original_name' => ''
         ));
     }
 
-    public function testBindThrowsExceptionOnUploadErrCantWrite()
+    public function testSubmitThrowsExceptionOnUploadErrCantWrite()
     {
         $file = $this->getMock('Symfony\Component\HttpFoundation\File\UploadedFile', array(), array(), '', false);
         $file->expects($this->any())
@@ -208,14 +208,14 @@ class FileFieldTest extends \PHPUnit_Framework_TestCase
 
         $this->setExpectedException('Symfony\Component\Form\Exception\FormException');
 
-        $this->field->bind(array(
+        $this->field->submit(array(
             'file' => $file,
             'token' => '12345',
             'original_name' => ''
         ));
     }
 
-    public function testBindThrowsExceptionOnUploadErrExtension()
+    public function testSubmitThrowsExceptionOnUploadErrExtension()
     {
         $file = $this->getMock('Symfony\Component\HttpFoundation\File\UploadedFile', array(), array(), '', false);
         $file->expects($this->any())
@@ -224,7 +224,7 @@ class FileFieldTest extends \PHPUnit_Framework_TestCase
 
         $this->setExpectedException('Symfony\Component\Form\Exception\FormException');
 
-        $this->field->bind(array(
+        $this->field->submit(array(
             'file' => $file,
             'token' => '12345',
             'original_name' => ''

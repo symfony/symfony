@@ -47,32 +47,32 @@ class FieldFactory implements FieldFactoryInterface
     /**
      * @inheritDoc
      */
-    public function getInstance($object, $property, array $options = array())
+    public function getInstance($class, $property, array $options = array())
     {
         // guess field class and options
-        $classGuess = $this->guess(function ($guesser) use ($object, $property) {
-            return $guesser->guessClass($object, $property);
+        $classGuess = $this->guess(function ($guesser) use ($class, $property) {
+            return $guesser->guessClass($class, $property);
         });
 
         if (!$classGuess) {
-            throw new \RuntimeException(sprintf('No field could be guessed for property "%s" of class %s', $property, get_class($object)));
+            throw new \RuntimeException(sprintf('No field could be guessed for property "%s" of class %s', $property, $class));
         }
 
         // guess maximum length
-        $maxLengthGuess = $this->guess(function ($guesser) use ($object, $property) {
-            return $guesser->guessMaxLength($object, $property);
+        $maxLengthGuess = $this->guess(function ($guesser) use ($class, $property) {
+            return $guesser->guessMaxLength($class, $property);
         });
 
         // guess whether field is required
-        $requiredGuess = $this->guess(function ($guesser) use ($object, $property) {
-            return $guesser->guessRequired($object, $property);
+        $requiredGuess = $this->guess(function ($guesser) use ($class, $property) {
+            return $guesser->guessRequired($class, $property);
         });
 
         // construct field
-        $class = $classGuess->getClass();
+        $fieldClass = $classGuess->getClass();
         $textField = 'Symfony\Component\Form\TextField';
 
-        if ($maxLengthGuess && ($class == $textField || is_subclass_of($class, $textField))) {
+        if ($maxLengthGuess && ($fieldClass == $textField || is_subclass_of($fieldClass, $textField))) {
             $options = array_merge(array('max_length' => $maxLengthGuess->getValue()), $options);
         }
 
@@ -83,7 +83,7 @@ class FieldFactory implements FieldFactoryInterface
         // user options may override guessed options
         $options = array_merge($classGuess->getOptions(), $options);
 
-        return new $class($property, $options);
+        return new $fieldClass($property, $options);
     }
 
     /**

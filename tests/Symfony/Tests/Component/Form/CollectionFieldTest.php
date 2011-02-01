@@ -81,11 +81,11 @@ class CollectionFieldTest extends \PHPUnit_Framework_TestCase
         $this->assertEquals(2, count($field));
     }
 
-    public function testNotResizedIfBoundWithMissingData()
+    public function testNotResizedIfSubmittedWithMissingData()
     {
         $field = new CollectionField(new TestField('emails'));
         $field->setData(array('foo@foo.com', 'bar@bar.com'));
-        $field->bind(array('foo@bar.com'));
+        $field->submit(array('foo@bar.com'));
 
         $this->assertTrue($field->has('0'));
         $this->assertTrue($field->has('1'));
@@ -93,37 +93,37 @@ class CollectionFieldTest extends \PHPUnit_Framework_TestCase
         $this->assertEquals(null, $field[1]->getData());
     }
 
-    public function testResizedIfBoundWithMissingDataAndModifiable()
+    public function testResizedIfSubmittedWithMissingDataAndModifiable()
     {
         $field = new CollectionField(new TestField('emails'), array(
             'modifiable' => true,
         ));
         $field->setData(array('foo@foo.com', 'bar@bar.com'));
-        $field->bind(array('foo@bar.com'));
+        $field->submit(array('foo@bar.com'));
 
         $this->assertTrue($field->has('0'));
         $this->assertFalse($field->has('1'));
         $this->assertEquals('foo@bar.com', $field[0]->getData());
     }
 
-    public function testNotResizedIfBoundWithExtraData()
+    public function testNotResizedIfSubmittedWithExtraData()
     {
         $field = new CollectionField(new TestField('emails'));
         $field->setData(array('foo@bar.com'));
-        $field->bind(array('foo@foo.com', 'bar@bar.com'));
+        $field->submit(array('foo@foo.com', 'bar@bar.com'));
 
         $this->assertTrue($field->has('0'));
         $this->assertFalse($field->has('1'));
         $this->assertEquals('foo@foo.com', $field[0]->getData());
     }
 
-    public function testResizedUpIfBoundWithExtraDataAndModifiable()
+    public function testResizedUpIfSubmittedWithExtraDataAndModifiable()
     {
         $field = new CollectionField(new TestField('emails'), array(
             'modifiable' => true,
         ));
         $field->setData(array('foo@bar.com'));
-        $field->bind(array('foo@foo.com', 'bar@bar.com'));
+        $field->submit(array('foo@foo.com', 'bar@bar.com'));
 
         $this->assertTrue($field->has('0'));
         $this->assertTrue($field->has('1'));
@@ -132,13 +132,13 @@ class CollectionFieldTest extends \PHPUnit_Framework_TestCase
         $this->assertEquals(array('foo@foo.com', 'bar@bar.com'), $field->getData());
     }
 
-    public function testResizedDownIfBoundWithLessDataAndModifiable()
+    public function testResizedDownIfSubmittedWithLessDataAndModifiable()
     {
         $field = new CollectionField(new TestField('emails'), array(
             'modifiable' => true,
         ));
         $field->setData(array('foo@bar.com', 'bar@bar.com'));
-        $field->bind(array('foo@foo.com'));
+        $field->submit(array('foo@foo.com'));
 
         $this->assertTrue($field->has('0'));
         $this->assertFalse($field->has('1'));

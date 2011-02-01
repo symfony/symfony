@@ -23,31 +23,31 @@ class DateFieldTest extends DateTimeTestCase
         \Locale::setDefault('de_AT');
     }
 
-    public function testBind_fromInput_dateTime()
+    public function testSubmit_fromInput_dateTime()
     {
         $field = new DateField('name', array('widget' => 'input', 'type' => DateField::DATETIME));
 
-        $field->bind('2.6.2010');
+        $field->submit('2.6.2010');
 
         $this->assertDateTimeEquals(new \DateTime('2010-06-02 UTC'), $field->getData());
         $this->assertEquals('02.06.2010', $field->getDisplayedData());
     }
 
-    public function testBind_fromInput_string()
+    public function testSubmit_fromInput_string()
     {
         $field = new DateField('name', array('widget' => 'input', 'type' => DateField::STRING));
 
-        $field->bind('2.6.2010');
+        $field->submit('2.6.2010');
 
         $this->assertEquals('2010-06-02', $field->getData());
         $this->assertEquals('02.06.2010', $field->getDisplayedData());
     }
 
-    public function testBind_fromInput_timestamp()
+    public function testSubmit_fromInput_timestamp()
     {
         $field = new DateField('name', array('widget' => 'input', 'type' => DateField::TIMESTAMP));
 
-        $field->bind('2.6.2010');
+        $field->submit('2.6.2010');
 
         $dateTime = new \DateTime('2010-06-02 UTC');
 
@@ -55,7 +55,7 @@ class DateFieldTest extends DateTimeTestCase
         $this->assertEquals('02.06.2010', $field->getDisplayedData());
     }
 
-    public function testBind_fromInput_raw()
+    public function testSubmit_fromInput_raw()
     {
         $field = new DateField('name', array(
             'data_timezone' => 'UTC',
@@ -64,7 +64,7 @@ class DateFieldTest extends DateTimeTestCase
             'type' => DateField::RAW,
         ));
 
-        $field->bind('2.6.2010');
+        $field->submit('2.6.2010');
 
         $output = array(
             'day' => '2',
@@ -76,7 +76,7 @@ class DateFieldTest extends DateTimeTestCase
         $this->assertEquals('02.06.2010', $field->getDisplayedData());
     }
 
-    public function testBind_fromChoice()
+    public function testSubmit_fromChoice()
     {
         $field = new DateField('name', array('widget' => DateField::CHOICE));
 
@@ -86,7 +86,7 @@ class DateFieldTest extends DateTimeTestCase
             'year' => '2010',
         );
 
-        $field->bind($input);
+        $field->submit($input);
 
         $dateTime = new \DateTime('2010-06-02 UTC');
 
@@ -94,7 +94,7 @@ class DateFieldTest extends DateTimeTestCase
         $this->assertEquals($input, $field->getDisplayedData());
     }
 
-    public function testBind_fromChoice_empty()
+    public function testSubmit_fromChoice_empty()
     {
         $field = new DateField('name', array('widget' => DateField::CHOICE, 'required' => false));
 
@@ -104,7 +104,7 @@ class DateFieldTest extends DateTimeTestCase
             'year' => '',
         );
 
-        $field->bind($input);
+        $field->submit($input);
 
         $this->assertSame(null, $field->getData());
         $this->assertEquals($input, $field->getDisplayedData());
@@ -132,7 +132,7 @@ class DateFieldTest extends DateTimeTestCase
             'years' => array(2010, 2011),
         ));
 
-        $field->bind('2.6.2010');
+        $field->submit('2.6.2010');
 
         $this->assertTrue($field->isYearWithinRange());
     }
@@ -144,7 +144,7 @@ class DateFieldTest extends DateTimeTestCase
             'years' => array(2010, 2011),
         ));
 
-        $field->bind('');
+        $field->submit('');
 
         $this->assertTrue($field->isYearWithinRange());
     }
@@ -156,7 +156,7 @@ class DateFieldTest extends DateTimeTestCase
             'years' => array(2010, 2012),
         ));
 
-        $field->bind('2.6.2011');
+        $field->submit('2.6.2011');
 
         $this->assertFalse($field->isYearWithinRange());
     }
@@ -168,7 +168,7 @@ class DateFieldTest extends DateTimeTestCase
             'months' => array(6, 7),
         ));
 
-        $field->bind('2.6.2010');
+        $field->submit('2.6.2010');
 
         $this->assertTrue($field->isMonthWithinRange());
     }
@@ -180,7 +180,7 @@ class DateFieldTest extends DateTimeTestCase
             'months' => array(6, 7),
         ));
 
-        $field->bind('');
+        $field->submit('');
 
         $this->assertTrue($field->isMonthWithinRange());
     }
@@ -192,7 +192,7 @@ class DateFieldTest extends DateTimeTestCase
             'months' => array(6, 8),
         ));
 
-        $field->bind('2.7.2010');
+        $field->submit('2.7.2010');
 
         $this->assertFalse($field->isMonthWithinRange());
     }
@@ -204,7 +204,7 @@ class DateFieldTest extends DateTimeTestCase
             'days' => array(6, 7),
         ));
 
-        $field->bind('6.6.2010');
+        $field->submit('6.6.2010');
 
         $this->assertTrue($field->isDayWithinRange());
     }
@@ -216,7 +216,7 @@ class DateFieldTest extends DateTimeTestCase
             'days' => array(6, 7),
         ));
 
-        $field->bind('');
+        $field->submit('');
 
         $this->assertTrue($field->isDayWithinRange());
     }
@@ -228,7 +228,7 @@ class DateFieldTest extends DateTimeTestCase
             'days' => array(6, 8),
         ));
 
-        $field->bind('7.6.2010');
+        $field->submit('7.6.2010');
 
         $this->assertFalse($field->isDayWithinRange());
     }

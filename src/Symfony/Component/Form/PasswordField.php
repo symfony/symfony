@@ -38,7 +38,7 @@ class PasswordField extends TextField
      */
     public function getDisplayedData()
     {
-        return $this->getOption('always_empty') || !$this->isBound()
+        return $this->getOption('always_empty') || !$this->isSubmitted()
                 ? ''
                 : parent::getDisplayedData();
     }

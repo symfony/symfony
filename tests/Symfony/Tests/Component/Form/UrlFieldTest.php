@@ -17,47 +17,47 @@ use Symfony\Component\Form\UrlField;
 
 class UrlFieldTest extends LocalizedTestCase
 {
-    public function testBindAddsDefaultProtocolIfNoneIsIncluded()
+    public function testSubmitAddsDefaultProtocolIfNoneIsIncluded()
     {
         $field = new UrlField('name');
 
-        $field->bind('www.domain.com');
+        $field->submit('www.domain.com');
 
         $this->assertSame('http://www.domain.com', $field->getData());
         $this->assertSame('http://www.domain.com', $field->getDisplayedData());
     }
 
-    public function testBindAddsNoDefaultProtocolIfAlreadyIncluded()
+    public function testSubmitAddsNoDefaultProtocolIfAlreadyIncluded()
     {
         $field = new UrlField('name', array(
             'default_protocol' => 'http',
         ));
 
-        $field->bind('ftp://www.domain.com');
+        $field->submit('ftp://www.domain.com');
 
         $this->assertSame('ftp://www.domain.com', $field->getData());
         $this->assertSame('ftp://www.domain.com', $field->getDisplayedData());
     }
 
-    public function testBindAddsNoDefaultProtocolIfEmpty()
+    public function testSubmitAddsNoDefaultProtocolIfEmpty()
     {
         $field = new UrlField('name', array(
             'default_protocol' => 'http',
         ));
 
-        $field->bind('');
+        $field->submit('');
 
         $this->assertSame(null, $field->getData());
         $this->assertSame('', $field->getDisplayedData());
     }
 
-    public function testBindAddsNoDefaultProtocolIfSetToNull()
+    public function testSubmitAddsNoDefaultProtocolIfSetToNull()
     {
         $field = new UrlField('name', array(
             'default_protocol' => null,
         ));
 
-        $field->bind('www.domain.com');
+        $field->submit('www.domain.com');
 
         $this->assertSame('www.domain.com', $field->getData());
         $this->assertSame('www.domain.com', $field->getDisplayedData());

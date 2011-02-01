@@ -140,7 +140,7 @@ class ChoiceFieldTest extends \PHPUnit_Framework_TestCase
     /**
      * @dataProvider getChoicesVariants
      */
-    public function testBindSingleNonExpanded($choices)
+    public function testSubmitSingleNonExpanded($choices)
     {
         $field = new ChoiceField('name', array(
             'multiple' => false,
@@ -148,7 +148,7 @@ class ChoiceFieldTest extends \PHPUnit_Framework_TestCase
             'choices' => $choices,
         ));
 
-        $field->bind('b');
+        $field->submit('b');
 
         $this->assertEquals('b', $field->getData());
         $this->assertEquals('b', $field->getDisplayedData());
@@ -157,7 +157,7 @@ class ChoiceFieldTest extends \PHPUnit_Framework_TestCase
     /**
      * @dataProvider getChoicesVariants
      */
-    public function testBindMultipleNonExpanded($choices)
+    public function testSubmitMultipleNonExpanded($choices)
     {
         $field = new ChoiceField('name', array(
             'multiple' => true,
@@ -165,7 +165,7 @@ class ChoiceFieldTest extends \PHPUnit_Framework_TestCase
             'choices' => $choices,
         ));
 
-        $field->bind(array('a', 'b'));
+        $field->submit(array('a', 'b'));
 
         $this->assertEquals(array('a', 'b'), $field->getData());
         $this->assertEquals(array('a', 'b'), $field->getDisplayedData());
@@ -174,7 +174,7 @@ class ChoiceFieldTest extends \PHPUnit_Framework_TestCase
     /**
      * @dataProvider getChoicesVariants
      */
-    public function testBindSingleExpanded($choices)
+    public function testSubmitSingleExpanded($choices)
     {
         $field = new ChoiceField('name', array(
             'multiple' => false,
@@ -182,7 +182,7 @@ class ChoiceFieldTest extends \PHPUnit_Framework_TestCase
             'choices' => $choices,
         ));
 
-        $field->bind('b');
+        $field->submit('b');
 
         $this->assertSame('b', $field->getData());
         $this->assertSame(false, $field['a']->getData());
@@ -201,7 +201,7 @@ class ChoiceFieldTest extends \PHPUnit_Framework_TestCase
     /**
      * @dataProvider getNumericChoicesVariants
      */
-    public function testBindSingleExpandedNumericChoices($choices)
+    public function testSubmitSingleExpandedNumericChoices($choices)
     {
         $field = new ChoiceField('name', array(
             'multiple' => false,
@@ -209,7 +209,7 @@ class ChoiceFieldTest extends \PHPUnit_Framework_TestCase
             'choices' => $choices,
         ));
 
-        $field->bind('1');
+        $field->submit('1');
 
         $this->assertSame(1, $field->getData());
         $this->assertSame(false, $field[0]->getData());
@@ -228,7 +228,7 @@ class ChoiceFieldTest extends \PHPUnit_Framework_TestCase
     /**
      * @dataProvider getChoicesVariants
      */
-    public function testBindMultipleExpanded($choices)
+    public function testSubmitMultipleExpanded($choices)
     {
         $field = new ChoiceField('name', array(
             'multiple' => true,
@@ -236,7 +236,7 @@ class ChoiceFieldTest extends \PHPUnit_Framework_TestCase
             'choices' => $choices,
         ));
 
-        $field->bind(array('a' => 'a', 'b' => 'b'));
+        $field->submit(array('a' => 'a', 'b' => 'b'));
 
         $this->assertSame(array('a', 'b'), $field->getData());
         $this->assertSame(true, $field['a']->getData());
@@ -255,7 +255,7 @@ class ChoiceFieldTest extends \PHPUnit_Framework_TestCase
     /**
      * @dataProvider getNumericChoicesVariants
      */
-    public function testBindMultipleExpandedNumericChoices($choices)
+    public function testSubmitMultipleExpandedNumericChoices($choices)
     {
         $field = new ChoiceField('name', array(
             'multiple' => true,
@@ -263,7 +263,7 @@ class ChoiceFieldTest extends \PHPUnit_Framework_TestCase
             'choices' => $choices,
         ));
 
-        $field->bind(array(1 => 1, 2 => 2));
+        $field->submit(array(1 => 1, 2 => 2));
 
         $this->assertSame(array(1, 2), $field->getData());
         $this->assertSame(false, $field[0]->getData());

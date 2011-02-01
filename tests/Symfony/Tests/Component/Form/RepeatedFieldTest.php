@@ -33,11 +33,11 @@ class RepeatedFieldTest extends \PHPUnit_Framework_TestCase
         $this->assertEquals('foobar', $this->field['second']->getData());
     }
 
-    public function testBindUnequal()
+    public function testSubmitUnequal()
     {
         $input = array('first' => 'foo', 'second' => 'bar');
 
-        $this->field->bind($input);
+        $this->field->submit($input);
 
         $this->assertEquals('foo', $this->field['first']->getDisplayedData());
         $this->assertEquals('bar', $this->field['second']->getDisplayedData());
@@ -46,11 +46,11 @@ class RepeatedFieldTest extends \PHPUnit_Framework_TestCase
         $this->assertEquals(null, $this->field->getData());
     }
 
-    public function testBindEqual()
+    public function testSubmitEqual()
     {
         $input = array('first' => 'foo', 'second' => 'foo');
 
-        $this->field->bind($input);
+        $this->field->submit($input);
 
         $this->assertEquals('foo', $this->field['first']->getDisplayedData());
         $this->assertEquals('foo', $this->field['second']->getDisplayedData());

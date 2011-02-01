@@ -149,7 +149,7 @@ class DateField extends HybridField
                 'output_timezone' => $this->getOption('user_timezone'),
             )));
 
-            $this->setFieldMode(self::GROUP);
+            $this->setFieldMode(self::FORM);
 
             $this->addChoiceFields();
         }

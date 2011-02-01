@@ -216,7 +216,7 @@ class PropertyPath implements \IteratorAggregate
      */
     public function setValue(&$objectOrArray, $value)
     {
-        $this->updatePropertyPath($objectOrArray, 0, $value);
+        $this->writePropertyPath($objectOrArray, 0, $value);
     }
 
     /**
@@ -259,7 +259,7 @@ class PropertyPath implements \IteratorAggregate
      * @param mixed $value                 The value to set at the end of the
      *                                     property path
      */
-    protected function updatePropertyPath(&$objectOrArray, $currentIndex, $value)
+    protected function writePropertyPath(&$objectOrArray, $currentIndex, $value)
     {
         $property = $this->elements[$currentIndex];
 
@@ -276,9 +276,9 @@ class PropertyPath implements \IteratorAggregate
                 $nestedObject =& $objectOrArray[$property];
             }
 
-            $this->updatePropertyPath($nestedObject, $currentIndex + 1, $value);
+            $this->writePropertyPath($nestedObject, $currentIndex + 1, $value);
         } else {
-            $this->updateProperty($objectOrArray, $currentIndex, $value);
+            $this->writeProperty($objectOrArray, $currentIndex, $value);
         }
     }
 
@@ -342,7 +342,7 @@ class PropertyPath implements \IteratorAggregate
      *                               path
      * @param mixed $value           The value to set
      */
-    protected function updateProperty(&$objectOrArray, $currentIndex, $value)
+    protected function writeProperty(&$objectOrArray, $currentIndex, $value)
     {
         $property = $this->elements[$currentIndex];
 

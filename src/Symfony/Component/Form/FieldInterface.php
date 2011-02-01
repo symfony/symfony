@@ -114,7 +114,7 @@ interface FieldInterface
      *
      * @param array|object $objectOrArray
      */
-    function updateFromProperty(&$objectOrArray);
+    function readProperty(&$objectOrArray);
 
     /**
      * Writes a the field value into a property of the object
@@ -123,16 +123,7 @@ interface FieldInterface
      *
      * @param array|object $objectOrArray
      */
-    function updateProperty(&$objectOrArray);
-
-    /**
-     * Returns the normalized data of the field.
-     *
-     * @return mixed  When the field is not bound, the default data is returned.
-     *                When the field is bound, the normalized bound data is
-     *                returned if the field is valid, null otherwise.
-     */
-    function getData();
+    function writeProperty(&$objectOrArray);
 
     /**
      * Returns the data of the field as it is displayed to the user.
@@ -142,24 +133,6 @@ interface FieldInterface
      *                       the bound data is returned.
      */
     function getDisplayedData();
-
-    /**
-     * Sets the default data
-     *
-     * @param mixed $default            The default data
-     * @throws UnexpectedTypeException  If the default data is invalid
-     */
-    function setData($default);
-
-    /**
-     * Binds POST data to the field, transforms and validates it.
-     *
-     * @param  string|array $taintedData  The POST data
-     * @return Boolean                    Whether the form is valid
-     * @throws InvalidConfigurationException when the field is not configured
-     *                                       correctly
-     */
-    function bind($taintedData);
 
     /**
      * Recursively adds constraint violations to the fields
@@ -186,13 +159,6 @@ interface FieldInterface
      * @param ConstraintViolation$violation
      */
     function addError(FieldError $error, PropertyPathIterator $pathIterator = null, $type = null);
-
-    /**
-     * Returns whether the field is bound.
-     *
-     * @return Boolean
-     */
-    function isBound();
 
     /**
      * Returns whether the field is valid.
@@ -245,4 +211,11 @@ interface FieldInterface
      * @param Boolean $required
      */
     function setRequired($required);
+
+    /**
+     * Writes posted data into the field
+     *
+     * @param mixed $data  The data from the POST request
+     */
+    function submit($data);
 }

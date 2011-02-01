@@ -12,19 +12,19 @@
 namespace Symfony\Component\Form\FieldFactory;
 
 /**
- * Automatically creates form fields for properties of an object
+ * Automatically creates form fields for properties of a class
  *
  * @author Bernhard Schussek <bernhard.schussek@symfony-project.com>
  */
 interface FieldFactoryInterface
 {
     /**
-     * Returns a field for a given property name
+     * Returns a field for a given property name of a class
      *
-     * @param  object $object     The object to create a field for
+     * @param  string $class      The fully qualified class name
      * @param  string $property   The name of the property
      * @param  array $options     Custom options for creating the field
      * @return FieldInterface     A field instance
      */
-    function getInstance($object, $property, array $options = array());
+    function getInstance($class, $property, array $options = array());
 }

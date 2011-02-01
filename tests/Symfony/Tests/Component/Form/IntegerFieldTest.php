@@ -17,11 +17,11 @@ use Symfony\Component\Form\IntegerField;
 
 class IntegerFieldTest extends LocalizedTestCase
 {
-    public function testBindCastsToInteger()
+    public function testSubmitCastsToInteger()
     {
         $field = new IntegerField('name');
 
-        $field->bind('1.678');
+        $field->submit('1.678');
 
         $this->assertSame(1, $field->getData());
         $this->assertSame('1', $field->getDisplayedData());

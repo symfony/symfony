@@ -87,5 +87,5 @@ interface FormContextInterface
      * @param  array|object $data  The data displayed and modified by the form
      * @return Form                The new form
      */
-    function getForm($name, $data = null);
+    function getForm($name, $data = null, array $options = array());
 }

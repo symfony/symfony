@@ -49,12 +49,10 @@ class EntityFieldFactoryGuesser implements FieldFactoryGuesserInterface
     /**
      * @inheritDoc
      */
-    public function guessClass($object, $property)
+    public function guessClass($class, $property)
     {
-        $className = get_class($object);
-
-        if ($this->isMappedClass($className)) {
-            $metadata = $this->em->getClassMetadata($className);
+        if ($this->isMappedClass($class)) {
+            $metadata = $this->em->getClassMetadata($class);
 
             if ($metadata->hasAssociation($property)) {
                 $multiple = $metadata->isCollectionValuedAssociation($property);
@@ -146,10 +144,10 @@ class EntityFieldFactoryGuesser implements FieldFactoryGuesserInterface
     /**
      * @inheritDoc
      */
-    public function guessRequired($object, $property)
+    public function guessRequired($class, $property)
     {
-        if ($this->isMappedClass(get_class($object))) {
-            $metadata = $this->em->getClassMetadata(get_class($object));
+        if ($this->isMappedClass($class)) {
+            $metadata = $this->em->getClassMetadata($class);
 
             if ($metadata->hasField($property)) {
                 if (!$metadata->isNullable($property)) {
@@ -170,10 +168,10 @@ class EntityFieldFactoryGuesser implements FieldFactoryGuesserInterface
     /**
      * @inheritDoc
      */
-    public function guessMaxLength($object, $property)
+    public function guessMaxLength($class, $property)
     {
-        if ($this->isMappedClass(get_class($object))) {
-            $metadata = $this->em->getClassMetadata(get_class($object));
+        if ($this->isMappedClass($class)) {
+            $metadata = $this->em->getClassMetadata($class);
 
             if (!$metadata->hasAssociation($property)) {
                 $mapping = $metadata->getFieldMapping($property);

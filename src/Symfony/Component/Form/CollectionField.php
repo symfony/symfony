@@ -33,7 +33,7 @@ class CollectionField extends Form
     protected $prototype;
 
     /**
-     * Remembers which fields were removed upon binding
+     * Remembers which fields were removed upon submitting
      * @var array
      */
     protected $removedFields = array();
@@ -92,7 +92,7 @@ class CollectionField extends Form
         parent::setData($collection);
     }
 
-    public function bind($taintedData)
+    public function submit($taintedData)
     {
         $this->removedFields = array();
 
@@ -113,12 +113,12 @@ class CollectionField extends Form
             }
         }
 
-        parent::bind($taintedData);
+        parent::submit($taintedData);
     }
 
-    protected function updateObject(&$objectOrArray)
+    protected function writeObject(&$objectOrArray)
     {
-        parent::updateObject($objectOrArray);
+        parent::writeObject($objectOrArray);
 
         foreach ($this->removedFields as $name) {
             unset($objectOrArray[$name]);

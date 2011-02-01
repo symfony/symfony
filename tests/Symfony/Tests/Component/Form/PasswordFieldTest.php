@@ -22,7 +22,7 @@ class PasswordFieldTest extends \PHPUnit_Framework_TestCase
 
         $this->assertSame('', $field->getDisplayedData());
 
-        $field->bind('after');
+        $field->submit('after');
 
         $this->assertSame('', $field->getDisplayedData());
     }
@@ -34,7 +34,7 @@ class PasswordFieldTest extends \PHPUnit_Framework_TestCase
 
         $this->assertSame('', $field->getDisplayedData());
 
-        $field->bind('after');
+        $field->submit('after');
 
         $this->assertSame('after', $field->getDisplayedData());
     }

@@ -191,8 +191,8 @@ class FormFactory implements FormContextInterface
      * @param  array|object $data  The data displayed and modified by the form
      * @return Form                The new form
      */
-    public function getForm($name, $data = null)
+    public function getForm($name, $data = null, array $options = array())
     {
-        return $this->defaultContext->getForm($name, $data);
+        return $this->defaultContext->getForm($name, $data, $options);
     }
 }

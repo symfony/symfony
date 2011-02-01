@@ -75,7 +75,7 @@ class ChoiceField extends HybridField
         }
 
         if ($this->isExpanded()) {
-            $this->setFieldMode(self::GROUP);
+            $this->setFieldMode(self::FORM);
 
             $choices = $this->getChoices();
 
@@ -218,13 +218,13 @@ class ChoiceField extends HybridField
      * Takes care of converting the input from a single radio button
      * to an array.
      */
-    public function bind($value)
+    public function submit($value)
     {
         if (!$this->isMultipleChoice() && $this->isExpanded()) {
             $value = null === $value ? array() : array($value => true);
         }
 
-        parent::bind($value);
+        parent::submit($value);
     }
 
     /**

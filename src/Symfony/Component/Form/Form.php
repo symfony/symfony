@@ -45,10 +45,22 @@ class Form extends Field implements \IteratorAggregate, FormInterface
     protected $fields = array();
 
     /**
-     * Contains the names of bound values who don't belong to any fields
+     * Contains the names of submitted values who don't belong to any fields
      * @var array
      */
     protected $extraFields = array();
+
+    /**
+     * Whether a request was bound to the form
+     * @var Boolean
+     */
+    protected $bound = false;
+
+    /**
+     * Stores the class that the data of this form must be instances of
+     * @var string
+     */
+    protected $dataClass;
 
     /**
      * Constructor.
@@ -60,6 +72,7 @@ class Form extends Field implements \IteratorAggregate, FormInterface
      */
     public function __construct($name = null, array $options = array())
     {
+        $this->addOption('data_class');
         $this->addOption('csrf_field_name', '_token');
         $this->addOption('csrf_provider');
         $this->addOption('field_factory');
@@ -71,10 +84,13 @@ class Form extends Field implements \IteratorAggregate, FormInterface
             $options['validation_groups'] = (array)$options['validation_groups'];
         }
 
+        if (isset($options['data_class'])) {
+            $this->dataClass = $options['data_class'];
+        }
+
         parent::__construct($name, $options);
 
-        // Enable CSRF protection, if necessary
-        // TODO only in root form
+        // Enable CSRF protection
         if ($this->getOption('csrf_provider')) {
             if (!$this->getOption('csrf_provider') instanceof CsrfProviderInterface) {
                 throw new FormException('The object passed to the "csrf_provider" option must implement CsrfProviderInterface');
@@ -83,9 +99,7 @@ class Form extends Field implements \IteratorAggregate, FormInterface
             $fieldName = $this->getOption('csrf_field_name');
             $token = $this->getOption('csrf_provider')->generateCsrfToken(get_class($this));
 
-            $this->add(new HiddenField($fieldName, array(
-                'data' => $token,
-            )));
+            $this->add(new HiddenField($fieldName, array('data' => $token)));
         }
     }
 
@@ -152,14 +166,20 @@ class Form extends Field implements \IteratorAggregate, FormInterface
                 throw new UnexpectedTypeException($field, 'FieldInterface or string');
             }
 
-            $factory = $this->getRoot()->getFieldFactory();
+            $factory = $this->getFieldFactory();
 
             if (!$factory) {
-                throw new \LogicException('A field factory must be available to automatically create fields');
+                throw new FormException('A field factory must be set to automatically create fields');
+            }
+
+            $class = $this->getDataClass();
+
+            if (!$class) {
+                throw new FormException('The data class must be set to automatically create fields');
             }
 
             $options = func_num_args() > 1 ? func_get_arg(1) : array();
-            $field = $factory->getInstance($this->getData(), $field, $options);
+            $field = $factory->getInstance($class, $field, $options);
         }
 
         if ('' === $field->getKey() || null === $field->getKey()) {
@@ -175,7 +195,7 @@ class Form extends Field implements \IteratorAggregate, FormInterface
         // if the property "data" is NULL, getTransformedData() returns an empty
         // string
         if (!empty($data)) {
-            $field->updateFromProperty($data);
+            $field->readProperty($data);
         }
 
         return $field;
@@ -316,7 +336,11 @@ class Form extends Field implements \IteratorAggregate, FormInterface
         }
 
         if (!empty($data)) {
-            $this->updateFromObject($data);
+            if ($this->dataClass && !$data instanceof $this->dataClass) {
+                throw new FormException(sprintf('Form data should be instance of %s', $this->dataClass));
+            }
+
+            $this->readObject($data);
         }
     }
 
@@ -340,67 +364,47 @@ class Form extends Field implements \IteratorAggregate, FormInterface
     /**
      * Binds POST data to the field, transforms and validates it.
      *
-     * @param  string|array $taintedData  The POST data
+     * @param  string|array $data  The POST data
      */
-    public function bind($taintedData)
+    public function submit($data)
     {
-        if (null === $taintedData) {
-            $taintedData = array();
+        if (null === $data) {
+            $data = array();
         }
 
-        if (!is_array($taintedData)) {
-            throw new UnexpectedTypeException($taintedData, 'array');
+        if (!is_array($data)) {
+            throw new UnexpectedTypeException($data, 'array');
         }
+
+        // remember for later
+        $submittedData = $data;
 
         foreach ($this->fields as $key => $field) {
-            if (!isset($taintedData[$key])) {
-                $taintedData[$key] = null;
+            if (!isset($data[$key])) {
+                $data[$key] = null;
             }
         }
 
-        $taintedData = $this->preprocessData($taintedData);
+        $data = $this->preprocessData($data);
 
-        foreach ($taintedData as $key => $value) {
+        foreach ($data as $key => $value) {
             if ($this->has($key)) {
-                $this->fields[$key]->bind($value);
+                $this->fields[$key]->submit($value);
             }
         }
 
         $data = $this->getTransformedData();
 
-        $this->updateObject($data);
+        $this->writeObject($data);
 
-        // bind and reverse transform the data
-        parent::bind($data);
+        // set and reverse transform the data
+        parent::submit($data);
 
         $this->extraFields = array();
 
-        foreach ($taintedData as $key => $value) {
+        foreach ($submittedData as $key => $value) {
             if (!$this->has($key)) {
                 $this->extraFields[] = $key;
-            }
-        }
-
-        if ($this->isRoot() && null !== $this->getOption('validator')) {
-//            if () {
-//                throw new FormException('A validator is required for binding. Forgot to pass it to the constructor of the form?');
-//            }
-
-            if ($violations = $this->getOption('validator')->validate($this, $this->getOption('validation_groups'))) {
-                // TODO: test me
-                foreach ($violations as $violation) {
-                    $propertyPath = new PropertyPath($violation->getPropertyPath());
-                    $iterator = $propertyPath->getIterator();
-
-                    if ($iterator->current() == 'data') {
-                        $type = self::DATA_ERROR;
-                        $iterator->next(); // point at the first data element
-                    } else {
-                        $type = self::FIELD_ERROR;
-                    }
-
-                    $this->addError(new FieldError($violation->getMessageTemplate(), $violation->getMessageParameters()), $iterator, $type);
-                }
             }
         }
     }
@@ -408,44 +412,44 @@ class Form extends Field implements \IteratorAggregate, FormInterface
     /**
      * Updates the child fields from the properties of the given data
      *
-     * This method calls updateFromProperty() on all child fields that have a
+     * This method calls readProperty() on all child fields that have a
      * property path set. If a child field has no property path set but
-     * implements FormInterface, updateProperty() is called on its
+     * implements FormInterface, writeProperty() is called on its
      * children instead.
      *
      * @param array|object $objectOrArray
      */
-    protected function updateFromObject(&$objectOrArray)
+    protected function readObject(&$objectOrArray)
     {
         $iterator = new RecursiveFieldIterator($this);
         $iterator = new \RecursiveIteratorIterator($iterator);
 
         foreach ($iterator as $field) {
-            $field->updateFromProperty($objectOrArray);
+            $field->readProperty($objectOrArray);
         }
     }
 
     /**
      * Updates all properties of the given data from the child fields
      *
-     * This method calls updateProperty() on all child fields that have a property
+     * This method calls writeProperty() on all child fields that have a property
      * path set. If a child field has no property path set but implements
-     * FormInterface, updateProperty() is called on its children instead.
+     * FormInterface, writeProperty() is called on its children instead.
      *
      * @param array|object $objectOrArray
      */
-    protected function updateObject(&$objectOrArray)
+    protected function writeObject(&$objectOrArray)
     {
         $iterator = new RecursiveFieldIterator($this);
         $iterator = new \RecursiveIteratorIterator($iterator);
 
         foreach ($iterator as $field) {
-            $field->updateProperty($objectOrArray);
+            $field->writeProperty($objectOrArray);
         }
     }
 
     /**
-     * Processes the bound data before it is passed to the individual fields
+     * Processes the submitted data before it is passed to the individual fields
      *
      * The data is in the user format.
      *
@@ -466,11 +470,11 @@ class Form extends Field implements \IteratorAggregate, FormInterface
     }
 
     /**
-     * Returns whether this form was bound with extra fields
+     * Returns whether this form was submitted with extra fields
      *
      * @return Boolean
      */
-    public function isBoundWithExtraFields()
+    public function isSubmittedWithExtraFields()
     {
         // TODO: integrate the field names in the error message
         return count($this->extraFields) > 0;
@@ -554,9 +558,9 @@ class Form extends Field implements \IteratorAggregate, FormInterface
     }
 
     /**
-     * Returns true if the bound field exists (implements the \ArrayAccess interface).
+     * Returns true if the field exists (implements the \ArrayAccess interface).
      *
-     * @param string $key The key of the bound field
+     * @param string $key The key of the field
      *
      * @return Boolean true if the widget exists, false otherwise
      */
@@ -674,17 +678,57 @@ class Form extends Field implements \IteratorAggregate, FormInterface
     }
 
     /**
-     * Binds the form with submitted data from a Request object
+     * Binds a request to the form
      *
-     * @param Request $request  The request object
-     * @see bind()
+     * If the request was a POST request, the data is submitted to the form,
+     * transformed and written into the form data (an object or an array).
+     * You can set the form data by passing it in the second parameter
+     * of this method or by passing it in the "data" option of the form's
+     * constructor.
+     *
+     * @param Request $request    The request to bind to the form
+     * @param array|object $data  The data from which to read default values
+     *                            and where to write submitted values
      */
-    public function bindRequest(Request $request)
+    public function bind(Request $request, $data = null)
     {
-        $values = $request->request->get($this->getName());
-        $files = $request->files->get($this->getName());
+        $this->bound = true;
 
-        $this->bind(self::deepArrayUnion($values, $files));
+        // Store object from which to read the default values and where to
+        // write the submitted values
+        if (null !== $data) {
+            $this->setData($data);
+        }
+
+        // Store the submitted data in case of a post request
+        if ('POST' == $request->getMethod()) {
+            $values = $request->request->get($this->getName(), array());
+            $files = $request->files->get($this->getName(), array());
+
+            $this->submit(self::deepArrayUnion($values, $files));
+
+            if (null === $this->getOption('validator')) {
+                throw new FormException('A validator is required for binding. Forgot to pass it to the constructor of the form?');
+            }
+
+            // Validate the submitted data
+            if ($violations = $this->getOption('validator')->validate($this, $this->getOption('validation_groups'))) {
+                // TODO: test me
+                foreach ($violations as $violation) {
+                    $propertyPath = new PropertyPath($violation->getPropertyPath());
+                    $iterator = $propertyPath->getIterator();
+
+                    if ($iterator->current() == 'data') {
+                        $type = self::DATA_ERROR;
+                        $iterator->next(); // point at the first data element
+                    } else {
+                        $type = self::FIELD_ERROR;
+                    }
+
+                    $this->addError(new FieldError($violation->getMessageTemplate(), $violation->getMessageParameters()), $iterator, $type);
+                }
+            }
+        }
     }
 
     /**
@@ -693,15 +737,17 @@ class Form extends Field implements \IteratorAggregate, FormInterface
      *
      * @see bind()
      */
-    public function bindGlobals()
+    public function bindGlobals($data = null)
     {
-        $values = $_POST[$this->getName()];
+        $this->bind(Request::createFromGlobals(), $data);
+    }
 
-        // fix files array and convert to UploadedFile instances
-        $fileBag = new FileBag($_FILES);
-        $files = $fileBag->get($this->getName());
-
-        $this->bind(self::deepArrayUnion($values, $files));
+    /**
+     * @var Boolean  whether a request and an object were bound to the form
+     */
+    public function isBound()
+    {
+        return $this->bound;
     }
 
     /**
@@ -753,6 +799,26 @@ class Form extends Field implements \IteratorAggregate, FormInterface
         } else {
             return false;
         }
+    }
+
+    /**
+     * Sets the class that object bound to this form must be instances of
+     *
+     * @param string  A fully qualified class name
+     */
+    protected function setDataClass($class)
+    {
+        $this->dataClass = $class;
+    }
+
+    /**
+     * Returns the class that object must have that are bound to this form
+     *
+     * @return string  A fully qualified class name
+     */
+    public function getDataClass()
+    {
+        return $this->dataClass;
     }
 
     /**

@@ -17,7 +17,7 @@ use Symfony\Component\Form\Exception\FormException;
  * A field that can dynamically act like a field or like a field group
  *
  * You can use the method setFieldMode() to switch between the modes
- * HybridField::FIELD and HybridField::GROUP. This is useful when you want
+ * HybridField::FIELD and HybridField::FORM. This is useful when you want
  * to create a field that, depending on its configuration, can either be
  * a single field or a combination of different fields (e.g. a date field
  * that might be a textbox or several select boxes).
@@ -27,7 +27,7 @@ use Symfony\Component\Form\Exception\FormException;
 class HybridField extends Form
 {
     const FIELD = 0;
-    const GROUP = 1;
+    const FORM = 1;
 
     protected $mode = self::FIELD;
 
@@ -38,7 +38,7 @@ class HybridField extends Form
      * this field.
      *
      * @param integer $mode  One of the constants HybridField::FIELD and
-     *                       HybridField::GROUP.
+     *                       HybridField::FORM.
      */
     public function setFieldMode($mode)
     {
@@ -62,7 +62,7 @@ class HybridField extends Form
      */
     public function isGroup()
     {
-        return self::GROUP === $this->mode;
+        return self::FORM === $this->mode;
     }
 
     /**
@@ -93,7 +93,7 @@ class HybridField extends Form
      */
     public function getDisplayedData()
     {
-        if ($this->mode === self::GROUP) {
+        if ($this->mode === self::FORM) {
             return parent::getDisplayedData();
         } else {
             return Field::getDisplayedData();
@@ -105,7 +105,7 @@ class HybridField extends Form
      */
     public function setData($data)
     {
-        if ($this->mode === self::GROUP) {
+        if ($this->mode === self::FORM) {
             parent::setData($data);
         } else {
             Field::setData($data);
@@ -115,12 +115,12 @@ class HybridField extends Form
     /**
      * {@inheritDoc}
      */
-    public function bind($data)
+    public function submit($data)
     {
-        if ($this->mode === self::GROUP) {
-            parent::bind($data);
+        if ($this->mode === self::FORM) {
+            parent::submit($data);
         } else {
-            Field::bind($data);
+            Field::submit($data);
         }
     }
 }

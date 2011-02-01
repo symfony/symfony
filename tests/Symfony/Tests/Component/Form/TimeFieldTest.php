@@ -17,7 +17,7 @@ use Symfony\Component\Form\TimeField;
 
 class TimeFieldTest extends DateTimeTestCase
 {
-    public function testBind_dateTime()
+    public function testSubmit_dateTime()
     {
         $field = new TimeField('name', array(
             'data_timezone' => 'UTC',
@@ -30,7 +30,7 @@ class TimeFieldTest extends DateTimeTestCase
             'minute' => '4',
         );
 
-        $field->bind($input);
+        $field->submit($input);
 
         $dateTime = new \DateTime('1970-01-01 03:04:00 UTC');
 
@@ -38,7 +38,7 @@ class TimeFieldTest extends DateTimeTestCase
         $this->assertEquals($input, $field->getDisplayedData());
     }
 
-    public function testBind_string()
+    public function testSubmit_string()
     {
         $field = new TimeField('name', array(
             'data_timezone' => 'UTC',
@@ -51,13 +51,13 @@ class TimeFieldTest extends DateTimeTestCase
             'minute' => '4',
         );
 
-        $field->bind($input);
+        $field->submit($input);
 
         $this->assertEquals('03:04:00', $field->getData());
         $this->assertEquals($input, $field->getDisplayedData());
     }
 
-    public function testBind_timestamp()
+    public function testSubmit_timestamp()
     {
         $field = new TimeField('name', array(
             'data_timezone' => 'UTC',
@@ -70,7 +70,7 @@ class TimeFieldTest extends DateTimeTestCase
             'minute' => '4',
         );
 
-        $field->bind($input);
+        $field->submit($input);
 
         $dateTime = new \DateTime('1970-01-01 03:04:00 UTC');
 
@@ -78,7 +78,7 @@ class TimeFieldTest extends DateTimeTestCase
         $this->assertEquals($input, $field->getDisplayedData());
     }
 
-    public function testBind_raw()
+    public function testSubmit_raw()
     {
         $field = new TimeField('name', array(
             'data_timezone' => 'UTC',
@@ -96,7 +96,7 @@ class TimeFieldTest extends DateTimeTestCase
             'minute' => '4',
         );
 
-        $field->bind($input);
+        $field->submit($input);
 
         $this->assertEquals($data, $field->getData());
         $this->assertEquals($input, $field->getDisplayedData());
@@ -148,7 +148,7 @@ class TimeFieldTest extends DateTimeTestCase
             'hours' => array(6, 7),
         ));
 
-        $field->bind(array('hour' => '06', 'minute' => '12'));
+        $field->submit(array('hour' => '06', 'minute' => '12'));
 
         $this->assertTrue($field->isHourWithinRange());
     }
@@ -159,7 +159,7 @@ class TimeFieldTest extends DateTimeTestCase
             'hours' => array(6, 7),
         ));
 
-        $field->bind(array('hour' => '', 'minute' => ''));
+        $field->submit(array('hour' => '', 'minute' => ''));
 
         $this->assertTrue($field->isHourWithinRange());
     }
@@ -170,7 +170,7 @@ class TimeFieldTest extends DateTimeTestCase
             'hours' => array(6, 7),
         ));
 
-        $field->bind(array('hour' => '08', 'minute' => '12'));
+        $field->submit(array('hour' => '08', 'minute' => '12'));
 
         $this->assertFalse($field->isHourWithinRange());
     }
@@ -181,7 +181,7 @@ class TimeFieldTest extends DateTimeTestCase
             'minutes' => array(6, 7),
         ));
 
-        $field->bind(array('hour' => '06', 'minute' => '06'));
+        $field->submit(array('hour' => '06', 'minute' => '06'));
 
         $this->assertTrue($field->isMinuteWithinRange());
     }
@@ -192,7 +192,7 @@ class TimeFieldTest extends DateTimeTestCase
             'minutes' => array(6, 7),
         ));
 
-        $field->bind(array('hour' => '', 'minute' => ''));
+        $field->submit(array('hour' => '', 'minute' => ''));
 
         $this->assertTrue($field->isMinuteWithinRange());
     }
@@ -203,7 +203,7 @@ class TimeFieldTest extends DateTimeTestCase
             'minutes' => array(6, 7),
         ));
 
-        $field->bind(array('hour' => '06', 'minute' => '08'));
+        $field->submit(array('hour' => '06', 'minute' => '08'));
 
         $this->assertFalse($field->isMinuteWithinRange());
     }
@@ -215,7 +215,7 @@ class TimeFieldTest extends DateTimeTestCase
             'with_seconds' => true,
         ));
 
-        $field->bind(array('hour' => '04', 'minute' => '05', 'second' => '06'));
+        $field->submit(array('hour' => '04', 'minute' => '05', 'second' => '06'));
 
         $this->assertTrue($field->isSecondWithinRange());
     }
@@ -227,7 +227,7 @@ class TimeFieldTest extends DateTimeTestCase
             'with_seconds' => true,
         ));
 
-        $field->bind(array('hour' => '', 'minute' => ''));
+        $field->submit(array('hour' => '', 'minute' => ''));
 
         $this->assertTrue($field->isSecondWithinRange());
     }
@@ -239,7 +239,7 @@ class TimeFieldTest extends DateTimeTestCase
             'with_seconds' => true,
         ));
 
-        $field->bind(array('hour' => '04', 'minute' => '05', 'second' => '08'));
+        $field->submit(array('hour' => '04', 'minute' => '05', 'second' => '08'));
 
         $this->assertFalse($field->isSecondWithinRange());
     }

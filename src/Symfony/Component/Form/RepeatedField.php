@@ -92,7 +92,7 @@ class RepeatedField extends Form
      */
     public function getData()
     {
-        if ($this->isBound() && $this->isFirstEqualToSecond()) {
+        if ($this->isSubmitted() && $this->isFirstEqualToSecond()) {
             return $this->get($this->getOption('first_key'))->getData();
         }
 

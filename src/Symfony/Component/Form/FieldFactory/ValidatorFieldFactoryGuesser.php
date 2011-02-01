@@ -34,11 +34,11 @@ class ValidatorFieldFactoryGuesser implements FieldFactoryGuesserInterface
     /**
      * @inheritDoc
      */
-    public function guessClass($object, $property)
+    public function guessClass($class, $property)
     {
         $guesser = $this;
 
-        return $this->guess($object, $property, function (Constraint $constraint) use ($guesser) {
+        return $this->guess($class, $property, function (Constraint $constraint) use ($guesser) {
             return $guesser->guessClassForConstraint($constraint);
         });
     }
@@ -46,11 +46,11 @@ class ValidatorFieldFactoryGuesser implements FieldFactoryGuesserInterface
     /**
      * @inheritDoc
      */
-    public function guessRequired($object, $property)
+    public function guessRequired($class, $property)
     {
         $guesser = $this;
 
-        return $this->guess($object, $property, function (Constraint $constraint) use ($guesser) {
+        return $this->guess($class, $property, function (Constraint $constraint) use ($guesser) {
             return $guesser->guessRequiredForConstraint($constraint);
         });
     }
@@ -58,11 +58,11 @@ class ValidatorFieldFactoryGuesser implements FieldFactoryGuesserInterface
     /**
      * @inheritDoc
      */
-    public function guessMaxLength($object, $property)
+    public function guessMaxLength($class, $property)
     {
         $guesser = $this;
 
-        return $this->guess($object, $property, function (Constraint $constraint) use ($guesser) {
+        return $this->guess($class, $property, function (Constraint $constraint) use ($guesser) {
             return $guesser->guessMaxLengthForConstraint($constraint);
         });
     }
@@ -71,16 +71,16 @@ class ValidatorFieldFactoryGuesser implements FieldFactoryGuesserInterface
      * Iterates over the constraints of a property, executes a constraints on
      * them and returns the best guess
      *
-     * @param object $object      The object to read the constraints from
+     * @param string $class       The class to read the constraints from
      * @param string $property    The property for which to find constraints
      * @param \Closure $guessForConstraint   The closure that returns a guess
      *                            for a given constraint
      * @return FieldFactoryGuess  The guessed value with the highest confidence
      */
-    protected function guess($object, $property, \Closure $guessForConstraint)
+    protected function guess($class, $property, \Closure $guessForConstraint)
     {
         $guesses = array();
-        $classMetadata = $this->metadataFactory->getClassMetadata(get_class($object));
+        $classMetadata = $this->metadataFactory->getClassMetadata($class);
         $memberMetadatas = $classMetadata->getMemberMetadatas($property);
 
         foreach ($memberMetadatas as $memberMetadata) {

@@ -63,6 +63,25 @@ class Form extends Field implements \IteratorAggregate, FormInterface
     protected $dataClass;
 
     /**
+     * The context used when creating the form
+     * @var FormContext
+     */
+    protected $context = null;
+
+    /**
+     * Creates a new form with the options stored in the given context
+     *
+     * @param  FormContextInterface $context
+     * @param  string $name
+     * @param  array $options
+     * @return Form
+     */
+    public static function create(FormContextInterface $context, $name = null, array $options = array())
+    {
+        return new static($name, array_merge($context->getOptions(), $options));
+    }
+
+    /**
      * Constructor.
      *
      * @param string $name
@@ -79,6 +98,7 @@ class Form extends Field implements \IteratorAggregate, FormInterface
         $this->addOption('validation_groups');
         $this->addOption('virtual', false);
         $this->addOption('validator');
+        $this->addOption('context');
 
         if (isset($options['validation_groups'])) {
             $options['validation_groups'] = (array)$options['validation_groups'];
@@ -819,6 +839,16 @@ class Form extends Field implements \IteratorAggregate, FormInterface
     public function getDataClass()
     {
         return $this->dataClass;
+    }
+
+    /**
+     * Returns the context used when creating this form
+     *
+     * @return FormContext  The context instance
+     */
+    public function getContext()
+    {
+        return $this->getOption('context');
     }
 
     /**

@@ -14,11 +14,10 @@ namespace Symfony\Tests\Component\Form;
 require_once __DIR__ . '/Fixtures/Author.php';
 require_once __DIR__ . '/Fixtures/TestField.php';
 
-use Symfony\Component\Form\FormFactory;
 use Symfony\Component\Form\FormContext;
 use Symfony\Component\Form\CsrfProvider\DefaultCsrfProvider;
 
-class FormFactoryTest extends \PHPUnit_Framework_TestCase
+class FormContextTest extends \PHPUnit_Framework_TestCase
 {
     protected $validator;
 
@@ -29,25 +28,27 @@ class FormFactoryTest extends \PHPUnit_Framework_TestCase
 
     public function testBuildDefaultWithCsrfProtection()
     {
-        $factory = FormFactory::buildDefault($this->validator, 'secret');
+        $context = FormContext::buildDefault($this->validator, 'secret');
 
-        $context = new FormContext();
-        $context->validator($this->validator);
-        $context->csrfProtection(true);
-        $context->csrfProvider(new DefaultCsrfProvider('secret'));
+        $expected = array(
+            'validator' => $this->validator,
+            'csrf_provider' => new DefaultCsrfProvider('secret'),
+            'context' => $context,
+        );
 
-        $this->assertEquals(new FormFactory($context), $factory);
+        $this->assertEquals($expected, $context->getOptions());
     }
 
     public function testBuildDefaultWithoutCsrfProtection()
     {
-        $factory = FormFactory::buildDefault($this->validator, null, false);
+        $context = FormContext::buildDefault($this->validator, null, false);
 
-        $context = new FormContext();
-        $context->validator($this->validator);
-        $context->csrfProtection(false);
+        $expected = array(
+            'validator' => $this->validator,
+            'context' => $context,
+        );
 
-        $this->assertEquals(new FormFactory($context), $factory);
+        $this->assertEquals($expected, $context->getOptions());
     }
 
     /**
@@ -55,6 +56,6 @@ class FormFactoryTest extends \PHPUnit_Framework_TestCase
      */
     public function testBuildDefaultWithoutCsrfSecretThrowsException()
     {
-        FormFactory::buildDefault($this->validator, null, true);
+        FormContext::buildDefault($this->validator, null, true);
     }
 }

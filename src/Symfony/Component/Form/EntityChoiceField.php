@@ -325,7 +325,7 @@ class EntityChoiceField extends ChoiceField
     protected function getReflProperty($property)
     {
         if (!isset($this->reflProperties[$property])) {
-            $this->reflProperties[$property] = new \ReflectionProperty($this->getOption('class'), $field);
+            $this->reflProperties[$property] = new \ReflectionProperty($this->getOption('class'), $property);
             $this->reflProperties[$property]->setAccessible(true);
         }
 

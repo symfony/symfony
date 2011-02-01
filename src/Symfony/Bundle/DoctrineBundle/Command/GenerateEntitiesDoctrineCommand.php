@@ -37,11 +37,11 @@ The <info>doctrine:generate:entities</info> command generates entity classes and
 
 You have to limit generation of entities to an individual bundle:
 
-  <info>./app/console doctrine:generate:entities --bundle="MyCustomBundle"</info>
+  <info>./app/console doctrine:generate:entities MyCustomBundle</info>
 
 Alternatively, you can limit generation to a single entity within a bundle:
 
-  <info>./app/console doctrine:generate:entities --bundle="MyCustomBundle" --entity="User"</info>
+  <info>./app/console doctrine:generate:entities "MyCustomBundle" --entity="User"</info>
 
 You have to specifiy the shortname (without namespace) of the entity you want to filter for.
 EOT

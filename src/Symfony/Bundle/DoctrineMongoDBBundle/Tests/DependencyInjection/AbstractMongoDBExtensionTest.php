@@ -48,7 +48,7 @@ abstract class AbstractMongoDBExtensionTest extends TestCase
         $this->assertEquals('Doctrine\ODM\MongoDB\Mapping\Driver\XmlDriver', $container->getParameter('doctrine.odm.mongodb.metadata.xml_class'));
         $this->assertEquals('Doctrine\ODM\MongoDB\Mapping\Driver\YamlDriver', $container->getParameter('doctrine.odm.mongodb.metadata.yml_class'));
 
-        $this->assertEquals('Symfony\Bundle\DoctrineMongoDBBundle\Validator\Constraints\DoctrineMongoDBUniqueValidator', $container->getParameter('doctrine_odm.mongodb.validator.unique.class'));
+        $this->assertEquals('Symfony\Bundle\DoctrineMongoDBBundle\Validator\Constraints\UniqueValidator', $container->getParameter('doctrine_odm.mongodb.validator.unique.class'));
 
         $config = array(
             'proxy_namespace' => 'MyProxies',
@@ -334,7 +334,7 @@ abstract class AbstractMongoDBExtensionTest extends TestCase
         $this->assertEquals(array(
             'Namespace1\\',
             'Namespace2\\',
-            'Symfony\Bundle\DoctrineMongoDBBundle\Validator\Constraints\\'
+            'mongodb' => 'Symfony\Bundle\DoctrineMongoDBBundle\Validator\Constraints\\',
         ), $container->getParameter('validator.annotations.namespaces'));
     }
 

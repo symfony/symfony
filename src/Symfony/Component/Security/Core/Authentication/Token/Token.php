@@ -28,6 +28,7 @@ abstract class Token implements TokenInterface
     protected $user;
     protected $credentials;
     protected $immutable;
+    protected $providerKey;
 
     /**
      * Constructor.
@@ -184,9 +185,17 @@ abstract class Token implements TokenInterface
     /**
      * {@inheritdoc}
      */
+    public function getProviderKey()
+    {
+        return $this->providerKey;
+    }
+
+    /**
+     * {@inheritdoc}
+     */
     public function serialize()
     {
-        return serialize(array($this->user, $this->credentials, $this->authenticated, $this->roles, $this->immutable));
+        return serialize(array($this->user, $this->credentials, $this->authenticated, $this->roles, $this->immutable, $this->providerKey));
     }
 
     /**
@@ -194,6 +203,6 @@ abstract class Token implements TokenInterface
      */
     public function unserialize($serialized)
     {
-        list($this->user, $this->credentials, $this->authenticated, $this->roles, $this->immutable) = unserialize($serialized);
+        list($this->user, $this->credentials, $this->authenticated, $this->roles, $this->immutable, $this->providerKey) = unserialize($serialized);
     }
 }

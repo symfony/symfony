@@ -22,7 +22,6 @@ use Symfony\Component\Security\Core\User\AccountInterface;
 class RememberMeToken extends Token
 {
     protected $key;
-    protected $providerKey;
 
     /**
      * The persistent token which resulted in this authentication token.
@@ -51,11 +50,6 @@ class RememberMeToken extends Token
         $this->providerKey = $providerKey;
         $this->key = $key;
         $this->setAuthenticated(true);
-    }
-
-    public function getProviderKey()
-    {
-        return $this->providerKey;
     }
 
     public function getKey()

@@ -18,8 +18,6 @@ namespace Symfony\Component\Security\Core\Authentication\Token;
  */
 class PreAuthenticatedToken extends Token
 {
-    protected $providerKey;
-
     /**
      * Constructor.
      */
@@ -33,11 +31,6 @@ class PreAuthenticatedToken extends Token
         $this->user = $user;
         $this->credentials = $credentials;
         $this->providerKey = $providerKey;
-    }
-
-    public function getProviderKey()
-    {
-        return $this->providerKey;
     }
 
     /**

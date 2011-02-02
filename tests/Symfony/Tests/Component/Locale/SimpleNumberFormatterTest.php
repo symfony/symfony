@@ -215,4 +215,14 @@ class SimpleNumberFormatterTest extends \PHPUnit_Framework_TestCase
         // Strangely, using -9223372036854775808 directly in code make PHP type juggle the value to float
         $this->assertSame(-9223372036854775807 - 1, $value);
     }
+
+    /**
+     * @expectedException RuntimeException
+     */
+    public function testParseWithPositionValue()
+    {
+        $position = 1;
+        $formatter = new SimpleNumberFormatter('en', SimpleNumberFormatter::DECIMAL);
+        $formatter->parse('123', SimpleNumberFormatter::TYPE_DEFAULT, $position);
+    }
 }

@@ -234,6 +234,10 @@ class SimpleNumberFormatter implements NumberFormatterInterface
      */
     public function parse($value, $type = self::TYPE_DOUBLE, &$position = null)
     {
+        if (!is_null($position)) {
+            throw new \RuntimeException('$position should be null. Processing based on the $position value is not supported. Install the intl extension for full localization capabilities.');
+        }
+
         preg_match('/^([^0-9\-]{0,})(.*)/', $value, $matches);
 
         // Any string before the numeric value causes error in the parsing

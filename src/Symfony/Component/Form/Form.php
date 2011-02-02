@@ -516,10 +516,10 @@ class Form extends Field implements \IteratorAggregate, FormInterface
     /**
      * {@inheritDoc}
      */
-    public function addError(FieldError $error, PropertyPathIterator $pathIterator = null, $type = null)
+    public function addError(Error $error, PropertyPathIterator $pathIterator = null)
     {
         if (null !== $pathIterator) {
-            if ($type === self::FIELD_ERROR && $pathIterator->hasNext()) {
+            if ($error instanceof FieldError && $pathIterator->hasNext()) {
                 $pathIterator->next();
 
                 if ($pathIterator->isProperty() && $pathIterator->current() === 'fields') {
@@ -527,11 +527,11 @@ class Form extends Field implements \IteratorAggregate, FormInterface
                 }
 
                 if ($this->has($pathIterator->current()) && !$this->get($pathIterator->current())->isHidden()) {
-                    $this->get($pathIterator->current())->addError($error, $pathIterator, $type);
+                    $this->get($pathIterator->current())->addError($error, $pathIterator);
 
                     return;
                 }
-            } else if ($type === self::DATA_ERROR) {
+            } else if ($error instanceof DataError) {
                 $iterator = new RecursiveFieldIterator($this);
                 $iterator = new \RecursiveIteratorIterator($iterator);
 
@@ -542,7 +542,7 @@ class Form extends Field implements \IteratorAggregate, FormInterface
                                 $pathIterator->next();
                             }
 
-                            $field->addError($error, $pathIterator, $type);
+                            $field->addError($error, $pathIterator);
 
                             return;
                         }
@@ -729,25 +729,34 @@ class Form extends Field implements \IteratorAggregate, FormInterface
      */
     public function validate()
     {
-        if (null === $this->getOption('validator')) {
+        $validator = $this->getOption('validator');
+        $groups = $this->getOption('validation_groups');
+
+        if (null === $validator) {
             throw new MissingOptionsException('The option "validator" is required for validating', array('validator'));
         }
 
-        // Validate the submitted data
-        if ($violations = $this->getOption('validator')->validate($this, $this->getOption('validation_groups'))) {
-            // TODO: test me
+        // Validate the submitted data in the domain object in the sets
+        // validation group(s)
+        if ($violations = $validator->validate($this->getData(), $groups)) {
             foreach ($violations as $violation) {
                 $propertyPath = new PropertyPath($violation->getPropertyPath());
                 $iterator = $propertyPath->getIterator();
+                $iterator->next(); // point at the first data element
+                $error = new DataError($violation->getMessageTemplate(), $violation->getMessageParameters());
 
-                if ($iterator->current() == 'data') {
-                    $type = self::DATA_ERROR;
-                    $iterator->next(); // point at the first data element
-                } else {
-                    $type = self::FIELD_ERROR;
-                }
+                $this->addError($error, $iterator);
+            }
+        }
 
-                $this->addError(new FieldError($violation->getMessageTemplate(), $violation->getMessageParameters()), $iterator, $type);
+        // Validate the submitted data in the fields in group "Default"
+        if ($violations = $validator->validate($this)) {
+            foreach ($violations as $violation) {
+                $propertyPath = new PropertyPath($violation->getPropertyPath());
+                $iterator = $propertyPath->getIterator();
+                $error = new FieldError($violation->getMessageTemplate(), $violation->getMessageParameters());
+
+                $this->addError($error, $iterator);
             }
         }
     }

@@ -358,7 +358,7 @@ class Field extends Configurable implements FieldInterface
      *
      * @see FieldInterface
      */
-    public function addError(FieldError $error, PropertyPathIterator $pathIterator = null, $type = null)
+    public function addError(Error $error, PropertyPathIterator $pathIterator = null)
     {
         $this->errors[] = $error;
     }

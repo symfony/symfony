@@ -12,10 +12,10 @@
 namespace Symfony\Component\Form;
 
 /**
- * Wraps errors in form fields
+ * Wraps errors in the form data
  *
  * @author Bernhard Schussek <bernhard.schussek@symfony-project.com>
  */
-class FieldError extends Error
+class DataError extends Error
 {
 }

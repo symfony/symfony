@@ -154,11 +154,10 @@ interface FieldInterface
      * ...
      * </code>
      *
-     * @param FieldError $error
+     * @param Error $error
      * @param PropertyPathIterator $pathIterator
-     * @param ConstraintViolation$violation
      */
-    function addError(FieldError $error, PropertyPathIterator $pathIterator = null, $type = null);
+    function addError(Error $error, PropertyPathIterator $pathIterator = null);
 
     /**
      * Returns whether the field is valid.

@@ -19,6 +19,7 @@ use Symfony\Component\Form\Form;
 use Symfony\Component\Form\FormContext;
 use Symfony\Component\Form\Field;
 use Symfony\Component\Form\FieldError;
+use Symfony\Component\Form\DataError;
 use Symfony\Component\Form\HiddenField;
 use Symfony\Component\Form\PropertyPath;
 use Symfony\Component\HttpFoundation\Request;
@@ -206,9 +207,19 @@ class FormTest extends \PHPUnit_Framework_TestCase
         ));
         $form->add($field);
 
-        $this->validator->expects($this->once())
-                                        ->method('validate')
-                                        ->with($this->equalTo($form), $this->equalTo(array('group')));
+        $this->validator->expects($this->exactly(2))
+            ->method('validate');
+
+// PHPUnit limitation here
+//        // form data is validated in custom group
+//        $this->validator->expects($this->once())
+//            ->method('validate')
+//            ->with($this->equalTo($form->getData()), $this->equalTo(array('group')));
+//
+//        // form itself is validated in group "Default"
+//        $this->validator->expects($this->once())
+//            ->method('validate')
+//            ->with($this->equalTo($form));
 
         // data is irrelevant
         $form->bind($this->createPostRequest());
@@ -453,7 +464,7 @@ class FormTest extends \PHPUnit_Framework_TestCase
 
         $path = new PropertyPath('fields[firstName].data');
 
-        $form->addError($error, $path->getIterator(), Form::FIELD_ERROR);
+        $form->addError(new FieldError('Message'), $path->getIterator());
     }
 
     public function testAddErrorMapsFieldValidationErrorsOntoFieldsWithinNestedForms()
@@ -472,13 +483,11 @@ class FormTest extends \PHPUnit_Framework_TestCase
 
         $path = new PropertyPath('fields[names].fields[firstName].data');
 
-        $form->addError($error, $path->getIterator(), Form::FIELD_ERROR);
+        $form->addError(new FieldError('Message'), $path->getIterator());
     }
 
     public function testAddErrorKeepsFieldValidationErrorsIfFieldNotFound()
     {
-        $error = new FieldError('Message');
-
         $field = $this->createMockField('foo');
         $field->expects($this->never())
                     ->method('addError');
@@ -488,15 +497,13 @@ class FormTest extends \PHPUnit_Framework_TestCase
 
         $path = new PropertyPath('fields[bar].data');
 
-        $form->addError($error, $path->getIterator(), Form::FIELD_ERROR);
+        $form->addError(new FieldError('Message'), $path->getIterator());
 
-        $this->assertEquals(array($error), $form->getErrors());
+        $this->assertEquals(array(new FieldError('Message')), $form->getErrors());
     }
 
     public function testAddErrorKeepsFieldValidationErrorsIfFieldIsHidden()
     {
-        $error = new FieldError('Message');
-
         $field = $this->createMockField('firstName');
         $field->expects($this->any())
                     ->method('isHidden')
@@ -509,14 +516,14 @@ class FormTest extends \PHPUnit_Framework_TestCase
 
         $path = new PropertyPath('fields[firstName].data');
 
-        $form->addError($error, $path->getIterator(), Form::FIELD_ERROR);
+        $form->addError(new FieldError('Message'), $path->getIterator());
 
-        $this->assertEquals(array($error), $form->getErrors());
+        $this->assertEquals(array(new FieldError('Message')), $form->getErrors());
     }
 
     public function testAddErrorMapsDataValidationErrorsOntoFields()
     {
-        $error = new FieldError('Message');
+        $error = new DataError('Message');
 
         // path is expected to point at "firstName"
         $expectedPath = new PropertyPath('firstName');
@@ -528,20 +535,18 @@ class FormTest extends \PHPUnit_Framework_TestCase
                     ->will($this->returnValue(new PropertyPath('firstName')));
         $field->expects($this->once())
                     ->method('addError')
-                    ->with($this->equalTo($error), $this->equalTo($expectedPathIterator), $this->equalTo(Form::DATA_ERROR));
+                    ->with($this->equalTo($error), $this->equalTo($expectedPathIterator));
 
         $form = new Form('author');
         $form->add($field);
 
         $path = new PropertyPath('firstName');
 
-        $form->addError($error, $path->getIterator(), Form::DATA_ERROR);
+        $form->addError($error, $path->getIterator());
     }
 
     public function testAddErrorKeepsDataValidationErrorsIfFieldNotFound()
     {
-        $error = new FieldError('Message');
-
         $field = $this->createMockField('foo');
         $field->expects($this->any())
                     ->method('getPropertyPath')
@@ -554,13 +559,11 @@ class FormTest extends \PHPUnit_Framework_TestCase
 
         $path = new PropertyPath('bar');
 
-        $form->addError($error, $path->getIterator(), Form::DATA_ERROR);
+        $form->addError(new DataError('Message'), $path->getIterator());
     }
 
     public function testAddErrorKeepsDataValidationErrorsIfFieldIsHidden()
     {
-        $error = new FieldError('Message');
-
         $field = $this->createMockField('firstName');
         $field->expects($this->any())
                     ->method('isHidden')
@@ -576,12 +579,12 @@ class FormTest extends \PHPUnit_Framework_TestCase
 
         $path = new PropertyPath('firstName');
 
-        $form->addError($error, $path->getIterator(), Form::DATA_ERROR);
+        $form->addError(new DataError('Message'), $path->getIterator());
     }
 
     public function testAddErrorMapsDataValidationErrorsOntoNestedFields()
     {
-        $error = new FieldError('Message');
+        $error = new DataError('Message');
 
         // path is expected to point at "street"
         $expectedPath = new PropertyPath('address.street');
@@ -594,19 +597,19 @@ class FormTest extends \PHPUnit_Framework_TestCase
                     ->will($this->returnValue(new PropertyPath('address')));
         $field->expects($this->once())
                     ->method('addError')
-                    ->with($this->equalTo($error), $this->equalTo($expectedPathIterator), $this->equalTo(Form::DATA_ERROR));
+                    ->with($this->equalTo($error), $this->equalTo($expectedPathIterator));
 
         $form = new Form('author');
         $form->add($field);
 
         $path = new PropertyPath('address.street');
 
-        $form->addError($error, $path->getIterator(), Form::DATA_ERROR);
+        $form->addError($error, $path->getIterator());
     }
 
     public function testAddErrorMapsErrorsOntoFieldsInVirtualGroups()
     {
-        $error = new FieldError('Message');
+        $error = new DataError('Message');
 
         // path is expected to point at "address"
         $expectedPath = new PropertyPath('address');
@@ -618,7 +621,7 @@ class FormTest extends \PHPUnit_Framework_TestCase
                     ->will($this->returnValue(new PropertyPath('address')));
         $field->expects($this->once())
                     ->method('addError')
-                    ->with($this->equalTo($error), $this->equalTo($expectedPathIterator), $this->equalTo(Form::DATA_ERROR));
+                    ->with($this->equalTo($error), $this->equalTo($expectedPathIterator));
 
         $form = new Form('author');
         $nestedForm = new Form('nested', array('virtual' => true));
@@ -627,7 +630,7 @@ class FormTest extends \PHPUnit_Framework_TestCase
 
         $path = new PropertyPath('address');
 
-        $form->addError($error, $path->getIterator(), Form::DATA_ERROR);
+        $form->addError($error, $path->getIterator());
     }
 
     public function testAddThrowsExceptionIfAlreadySubmitted()

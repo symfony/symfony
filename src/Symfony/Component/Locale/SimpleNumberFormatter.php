@@ -91,6 +91,20 @@ class SimpleNumberFormatter implements NumberFormatterInterface
     );
 
     /**
+     * The maximum values of the integer type in 32 and 64 bit platforms.
+     */
+    private static $intValues = array(
+        self::TYPE_INT32 => array(
+            'positive' => 2147483647,
+            'negative' => -2147483648
+        ),
+        self::TYPE_INT64 => array(
+            'positive' => 9223372036854775807,
+            'negative' => -9223372036854775808
+        )
+    );
+
+    /**
      * @{inheritDoc}
      */
     public function __construct($locale = 'en', $style = null, $pattern = null)
@@ -374,53 +388,69 @@ class SimpleNumberFormatter implements NumberFormatterInterface
 
     private function getNumericValue($value, $type)
     {
-        // int 32
-        $int32UpperBound = 2147483647;
-        $int32LowerBound = ($int32UpperBound * -1) - 1;
-
-        // int 64
-        $int64UpperBound = 9223372036854775807;
-        $int64LowerBound = ($int64UpperBound * -1) - 1;
-
-        if ($type == self::TYPE_DEFAULT) {
-            if (strstr($value, '.') || is_float($value + 0) || is_float($value - 0)) {
-                $type = self::TYPE_DOUBLE;
-            }
-            elseif ($value <= $int32UpperBound && $value >= $int32LowerBound) {
-                $type = self::TYPE_INT32;
-            }
-            elseif ($value <= $int64UpperBound && $value >= $int64LowerBound) {
-                $type = self::TYPE_INT64;
-            }
-            else {
-                $type = self::TYPE_DOUBLE;
-            }
-        }
+        $type = $this->detectNumberType($value, $type);
 
         if ($type == self::TYPE_DOUBLE) {
             $value = (float) $value;
         }
         elseif ($type == self::TYPE_INT32) {
-            if ($value > $int32UpperBound) {
-                $value = $int32UpperBound;
-            }
-            elseif ($value < $int32LowerBound) {
-                $value = $int32LowerBound;
-            }
-
-            $value = (int) $value;
+            $value = $this->getIntValue($type, $value);
         }
         elseif ($type == self::TYPE_INT64) {
-            if ($value > $int64UpperBound) {
-                $value = $int64UpperBound;
-            }
-            elseif ($value < $int64LowerBound) {
-                $value = $int64LowerBound;
-            }
-
-            $value = (int) $value;
+            $value = $this->getIntValue($type, $value);
         }
 
         return $value;
+    }
+
+    private function detectNumberType($value, $type)
+    {
+        if ($type != self::TYPE_DEFAULT) {
+            return $type;
+        }
+
+        if ($this->isFloat($value)) {
+            $type = self::TYPE_DOUBLE;
+        }
+        elseif ($this->isInt32($value)) {
+            $type = self::TYPE_INT32;
+        }
+        elseif ($this->isInt64($value)) {
+            $type = self::TYPE_INT64;
+        }
+
+        return $type;
+    }
+
+    private function isFloat($value)
+    {
+        return strstr($value, '.') || is_float($value + 0) || is_float($value - 0);
+    }
+
+    private function isInt32($value)
+    {
+        return $this->isIntType(self::TYPE_INT32, $value);
+    }
+
+    private function isInt64($value)
+    {
+        return $this->isIntType(self::TYPE_INT64, $value);
+    }
+
+    private function isIntType($type, $value)
+    {
+        return $value <= self::$intValues[$type]['positive'] && $value >= self::$intValues[$type]['negative'];
+    }
+
+    private function getIntValue($int, $value)
+    {
+        if ($value > self::$intValues[$int]['positive']) {
+            $value = self::$intValues[$int]['positive'];
+        }
+        elseif ($value < self::$intValues[$int]['negative']) {
+            $value = self::$intValues[$int]['negative'];
+        }
+
+        return (int) $value;
     }
 }

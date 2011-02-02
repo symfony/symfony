@@ -151,12 +151,12 @@ class ExceptionListener implements ListenerInterface
         return $response;
     }
 
-    protected function startAuthentication(EventInterface $event, Request $request, AuthenticationException $reason)
+    protected function startAuthentication(EventInterface $event, Request $request, AuthenticationException $authException)
     {
         $this->context->setToken(null);
 
         if (null === $this->authenticationEntryPoint) {
-            throw $reason;
+            throw $authException;
         }
 
         if (null !== $this->logger) {
@@ -165,6 +165,6 @@ class ExceptionListener implements ListenerInterface
 
         $request->getSession()->set('_security.target_path', $request->getUri());
 
-        return $this->authenticationEntryPoint->start($event, $request, $reason);
+        return $this->authenticationEntryPoint->start($event, $request, $authException);
     }
 }

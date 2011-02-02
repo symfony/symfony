@@ -143,15 +143,15 @@ class DigestAuthenticationListener implements ListenerInterface
         $this->securityContext->setToken(new UsernamePasswordToken($user, $user->getPassword(), $this->providerKey));
     }
 
-    protected function fail(EventInterface $event, Request $request, AuthenticationException $failed)
+    protected function fail(EventInterface $event, Request $request, AuthenticationException $authException)
     {
         $this->securityContext->setToken(null);
 
         if (null !== $this->logger) {
-            $this->logger->debug($failed);
+            $this->logger->debug($authException);
         }
 
-        $this->authenticationEntryPoint->start($event, $request, $failed);
+        $this->authenticationEntryPoint->start($event, $request, $authException);
     }
 }
 

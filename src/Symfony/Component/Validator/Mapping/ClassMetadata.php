@@ -208,6 +208,18 @@ class ClassMetadata extends ElementMetadata
     }
 
     /**
+     * Returns true if metadatas of members is present for the given property.
+     *
+     * @param string $property The name of the property
+     *
+     * @return Boolean
+     */
+    public function hasMemberMetadatas($property)
+    {
+        return array_key_exists($property, $this->members);
+    }
+
+    /**
      * Returns all metadatas of members describing the given property
      *
      * @param string $property The name of the property

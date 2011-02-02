@@ -81,14 +81,17 @@ class ValidatorFieldFactoryGuesser implements FieldFactoryGuesserInterface
     {
         $guesses = array();
         $classMetadata = $this->metadataFactory->getClassMetadata($class);
-        $memberMetadatas = $classMetadata->getMemberMetadatas($property);
 
-        foreach ($memberMetadatas as $memberMetadata) {
-            $constraints = $memberMetadata->getConstraints();
+        if ($classMetadata->hasMemberMetadatas($property)) {
+            $memberMetadatas = $classMetadata->getMemberMetadatas($property);
 
-            foreach ($constraints as $constraint) {
-                if ($guess = $guessForConstraint($constraint)) {
-                    $guesses[] = $guess;
+            foreach ($memberMetadatas as $memberMetadata) {
+                $constraints = $memberMetadata->getConstraints();
+
+                foreach ($constraints as $constraint) {
+                    if ($guess = $guessForConstraint($constraint)) {
+                        $guesses[] = $guess;
+                    }
                 }
             }
         }

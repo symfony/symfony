@@ -48,8 +48,6 @@ use Symfony\Component\Form\ValueTransformer\TransformationFailedException;
  */
 class Field extends Configurable implements FieldInterface
 {
-    protected $taintedData = null;
-
     private $errors = array();
     private $key = '';
     private $parent = null;
@@ -295,7 +293,7 @@ class Field extends Configurable implements FieldInterface
     /**
      * Binds POST data to the field, transforms and validates it.
      *
-     * @param  string|array $taintedData  The POST data
+     * @param  string|array $data  The POST data
      */
     public function submit($data)
     {

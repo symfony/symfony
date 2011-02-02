@@ -79,6 +79,8 @@ class SimpleNumberFormatter implements NumberFormatterInterface
      * hexadecimal and the decimal digits.
      *
      * @see  http://source.icu-project.org/repos/icu/icu/trunk/source/data/curr/en.txt
+     * @see  SimpleNumberFormatter::getCurrencySymbol()
+     * @see  SimpleNumberFormatter::formatCurrency()
      * @todo Move this to Resources/data and use \ResourceBundle to load the data.
      * @todo Search in the icu data where the currency subunits (usage of cents) are defined
      */

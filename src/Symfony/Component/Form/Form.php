@@ -85,8 +85,6 @@ class Form extends Field implements \IteratorAggregate, FormInterface
      * Constructor.
      *
      * @param string $name
-     * @param array|object $data
-     * @param ValidatorInterface $validator
      * @param array $options
      */
     public function __construct($name = null, array $options = array())

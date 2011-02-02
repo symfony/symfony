@@ -16,7 +16,7 @@ use Symfony\Component\HttpFoundation\FileBag;
 use Symfony\Component\Validator\ValidatorInterface;
 use Symfony\Component\Form\Exception\FormException;
 use Symfony\Component\Form\Exception\MissingOptionsException;
-use Symfony\Component\Form\Exception\AlreadyBoundException;
+use Symfony\Component\Form\Exception\AlreadySubmittedException;
 use Symfony\Component\Form\Exception\UnexpectedTypeException;
 use Symfony\Component\Form\Exception\DanglingFieldException;
 use Symfony\Component\Form\Exception\FieldDefinitionException;
@@ -50,12 +50,6 @@ class Form extends Field implements \IteratorAggregate, FormInterface
      * @var array
      */
     protected $extraFields = array();
-
-    /**
-     * Whether a request was bound to the form
-     * @var Boolean
-     */
-    protected $bound = false;
 
     /**
      * Stores the class that the data of this form must be instances of
@@ -174,8 +168,8 @@ class Form extends Field implements \IteratorAggregate, FormInterface
      */
     public function add($field)
     {
-        if ($this->isBound()) {
-            throw new AlreadyBoundException('You cannot add fields after binding a form');
+        if ($this->isSubmitted()) {
+            throw new AlreadySubmittedException('You cannot add fields after submitting a form');
         }
 
         // if the field is given as string, ask the field factory of the form
@@ -711,8 +705,6 @@ class Form extends Field implements \IteratorAggregate, FormInterface
      */
     public function bind(Request $request, $data = null)
     {
-        $this->bound = true;
-
         // Store object from which to read the default values and where to
         // write the submitted values
         if (null !== $data) {
@@ -728,14 +720,6 @@ class Form extends Field implements \IteratorAggregate, FormInterface
 
             $this->validate();
         }
-    }
-
-    /**
-     * @var Boolean  whether a request and an object were bound to the form
-     */
-    public function isBound()
-    {
-        return $this->bound;
     }
 
     /**

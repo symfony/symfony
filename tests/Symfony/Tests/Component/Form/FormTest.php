@@ -630,13 +630,13 @@ class FormTest extends \PHPUnit_Framework_TestCase
         $form->addError($error, $path->getIterator(), Form::DATA_ERROR);
     }
 
-    public function testAddThrowsExceptionIfAlreadyBound()
+    public function testAddThrowsExceptionIfAlreadySubmitted()
     {
         $form = new Form('author', array('validator' => $this->validator));
         $form->add($this->createMockField('firstName'));
-        $form->bind(new Request());
+        $form->submit(array());
 
-        $this->setExpectedException('Symfony\Component\Form\Exception\AlreadyBoundException');
+        $this->setExpectedException('Symfony\Component\Form\Exception\AlreadySubmittedException');
         $form->add($this->createMockField('lastName'));
     }
 

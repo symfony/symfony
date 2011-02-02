@@ -16,6 +16,15 @@ use Symfony\Component\Locale\SimpleNumberFormatter;
 
 class SimpleNumberFormatterTest extends \PHPUnit_Framework_TestCase
 {
+    private static $int64Upper = 9223372036854775807;
+
+    /**
+     * Strangely, using -9223372036854775808 directly in code make PHP type
+     * juggle the value to float. Then, use this value with an explicit typecast
+     * to int, e.g.: (int) self::$int64Lower.
+     */
+    private static $int64Lower = -9223372036854775808;
+
     /**
      * @expectedException InvalidArgumentException
      */
@@ -164,56 +173,50 @@ class SimpleNumberFormatterTest extends \PHPUnit_Framework_TestCase
         $value = $formatter->parse('9,223,372,036,854,775,808', SimpleNumberFormatter::TYPE_DOUBLE);
         $this->assertSame(9223372036854775808, $value);
 
+        // int 32
         $value = $formatter->parse('2,147,483,648', SimpleNumberFormatter::TYPE_INT32);
         $this->assertSame(2147483647, $value);
 
         $value = $formatter->parse('-2,147,483,649', SimpleNumberFormatter::TYPE_INT32);
         $this->assertSame(-2147483648, $value);
 
+        // int 64
         $value = $formatter->parse('9,223,372,036,854,775,808', SimpleNumberFormatter::TYPE_INT64);
         $this->assertSame(9223372036854775807, $value);
 
         $value = $formatter->parse('-9,223,372,036,854,775,809', SimpleNumberFormatter::TYPE_INT64);
-        // Strangely, using -9223372036854775808 directly in code make PHP type juggle the value to float
-        $this->assertSame(-9223372036854775807 - 1, $value);
+        $this->assertSame((int) self::$int64Lower, $value);
     }
 
-    public function testParseDetectType()
+    /**
+     * @dataProvider parseDetectTypeProvider
+     */
+    public function testParseDetectType($parseValue, $expectedType, $expectedValue)
     {
         $formatter = new SimpleNumberFormatter('en', SimpleNumberFormatter::DECIMAL);
-        $value = $formatter->parse('1', SimpleNumberFormatter::TYPE_DEFAULT);
-        $this->assertInternalType('integer', $value);
+        $value = $formatter->parse($parseValue, SimpleNumberFormatter::TYPE_DEFAULT);
+        $this->assertInternalType($expectedType, $value);
+        $this->assertSame($expectedValue, $value);
+    }
 
-        $value = $formatter->parse('1.1', SimpleNumberFormatter::TYPE_DEFAULT);
-        $this->assertInternalType('float', $value);
+    public function parseDetectTypeProvider()
+    {
+        return array(
+            array('1', 'integer', 1),
+            array('1.1', 'float', 1.1),
 
-        // int 64 overflow
-        $value = $formatter->parse('9,223,372,036,854,775,808', SimpleNumberFormatter::TYPE_DEFAULT);
-        $this->assertInternalType('float', $value);
-        $this->assertEquals(9223372036854775808, $value);
+            // int 32
+            array('2,147,483,647', 'integer', 2147483647),
+            array('-2,147,483,648', 'integer', -2147483648),
 
-        $value = $formatter->parse('-9,223,372,036,854,775,809', SimpleNumberFormatter::TYPE_DEFAULT);
-        $this->assertInternalType('float', $value);
-        $this->assertEquals(-9223372036854775809, $value);
+            // int 64
+            array('9,223,372,036,854,775,807', 'integer', self::$int64Upper),
+            array('-9,223,372,036,854,775,808', 'integer', (int) self::$int64Lower),
 
-        // int 32
-        $value = $formatter->parse('2,147,483,647', SimpleNumberFormatter::TYPE_DEFAULT);
-        $this->assertInternalType('integer', $value);
-        $this->assertSame(2147483647, $value);
-
-        $value = $formatter->parse('-2,147,483,648', SimpleNumberFormatter::TYPE_DEFAULT);
-        $this->assertInternalType('integer', $value);
-        $this->assertSame(-2147483648, $value);
-
-        // int 64
-        $value = $formatter->parse('9,223,372,036,854,775,807', SimpleNumberFormatter::TYPE_DEFAULT);
-        $this->assertInternalType('integer', $value);
-        $this->assertSame(9223372036854775807, $value);
-
-        $value = $formatter->parse('-9,223,372,036,854,775,808', SimpleNumberFormatter::TYPE_DEFAULT);
-        $this->assertInternalType('integer', $value);
-        // Strangely, using -9223372036854775808 directly in code make PHP type juggle the value to float
-        $this->assertSame(-9223372036854775807 - 1, $value);
+            // int 64 overflow
+            array('9,223,372,036,854,775,808', 'float', 9223372036854775808),
+            array('-9,223,372,036,854,775,809', 'float', -9223372036854775809)
+        );
     }
 
     /**

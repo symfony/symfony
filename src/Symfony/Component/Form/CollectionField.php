@@ -33,6 +33,26 @@ class CollectionField extends Form
     protected $removedFields = array();
 
     /**
+     * The prototype field for the collection rows
+     * @var FieldInterface
+     */
+    protected $prototype;
+
+    public function __construct($key, array $options = array())
+    {
+        // This doesn't work with addOption(), because the value of this option
+        // needs to be accessed before Configurable::__construct() is reached
+        // Setting all options in the constructor of the root field
+        // is conceptually flawed
+        if (isset($options['prototype'])) {
+            $this->prototype = $options['prototype'];
+            unset($options['prototype']);
+        }
+
+        parent::__construct($key, $options);
+    }
+
+    /**
      * Available options:
      *
      *  * modifiable:   If true, elements in the collection can be added
@@ -43,7 +63,6 @@ class CollectionField extends Form
      */
     protected function configure()
     {
-        $this->addOption('prototype');
         $this->addOption('modifiable', false);
 
         if ($this->getOption('modifiable')) {
@@ -114,8 +133,8 @@ class CollectionField extends Form
             $propertyPath = '['.$propertyPath.']';
         }
 
-        if ($this->getOption('prototype')) {
-            $field = clone $this->getOption('prototype');
+        if ($this->prototype) {
+            $field = clone $this->prototype;
             $field->setKey($key);
             $field->setPropertyPath($propertyPath);
         } else {

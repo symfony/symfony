@@ -192,7 +192,7 @@ class SimpleNumberFormatter implements NumberFormatterInterface
      */
     public function getLocale($type = Locale::ACTUAL_LOCALE)
     {
-
+        $this->throwMethodNotImplementException(__METHOD__);
     }
 
     /**
@@ -200,7 +200,7 @@ class SimpleNumberFormatter implements NumberFormatterInterface
      */
     public function getPattern()
     {
-
+        $this->throwMethodNotImplementException(__METHOD__);
     }
 
     /**
@@ -208,7 +208,7 @@ class SimpleNumberFormatter implements NumberFormatterInterface
      */
     public function getSymbol($attr)
     {
-
+        $this->throwMethodNotImplementException(__METHOD__);
     }
 
     /**
@@ -216,7 +216,7 @@ class SimpleNumberFormatter implements NumberFormatterInterface
      */
     public function getTextAttribute($attr)
     {
-
+        $this->throwMethodNotImplementException(__METHOD__);
     }
 
     /**
@@ -224,7 +224,7 @@ class SimpleNumberFormatter implements NumberFormatterInterface
      */
     public function parseCurrency($value, &$currency, &$position = null)
     {
-
+        $this->throwMethodNotImplementException(__METHOD__);
     }
 
     /**
@@ -282,7 +282,7 @@ class SimpleNumberFormatter implements NumberFormatterInterface
      */
     public function setPattern($pattern)
     {
-
+        $this->throwMethodNotImplementException(__METHOD__);
     }
 
     /**
@@ -290,7 +290,7 @@ class SimpleNumberFormatter implements NumberFormatterInterface
      */
     public function setSymbol($attr, $value)
     {
-
+        $this->throwMethodNotImplementException(__METHOD__);
     }
 
     /**
@@ -298,7 +298,7 @@ class SimpleNumberFormatter implements NumberFormatterInterface
      */
     public function setTextAttribute($attr, $value)
     {
-
+        $this->throwMethodNotImplementException(__METHOD__);
     }
 
     /**
@@ -444,5 +444,11 @@ class SimpleNumberFormatter implements NumberFormatterInterface
         }
 
         return (int) $value;
+    }
+
+    private function throwMethodNotImplementException($methodName)
+    {
+        $message = sprintf('The %s::%s() is not implemented. Install the intl extension for full localization capabilities.', __CLASS__, $methodName);
+        throw new \RuntimeException($message);
     }
 }

@@ -58,6 +58,9 @@ class SimpleNumberFormatterTest extends \PHPUnit_Framework_TestCase
         $formatter->setAttribute(SimpleNumberFormatter::LENIENT_PARSE, null);
     }
 
+    /**
+     * @covers Symfony\Component\Locale\SimpleNumberFormatter::getAttribute
+     */
     public function testSetAttributeInvalidRoundingMode()
     {
         $formatter = new SimpleNumberFormatter('en', SimpleNumberFormatter::DECIMAL);
@@ -149,6 +152,51 @@ class SimpleNumberFormatterTest extends \PHPUnit_Framework_TestCase
         $this->assertEquals(SimpleNumberFormatter::U_ZERO_ERROR_MESSAGE, $formatter->getErrorMessage());
     }
 
+    /**
+     * @expectedException RuntimeException
+     */
+    public function testGetLocale()
+    {
+        $formatter = new SimpleNumberFormatter('en', SimpleNumberFormatter::DECIMAL);
+        $formatter->getLocale();
+    }
+
+    /**
+     * @expectedException RuntimeException
+     */
+    public function testGetPattern()
+    {
+        $formatter = new SimpleNumberFormatter('en', SimpleNumberFormatter::DECIMAL);
+        $formatter->getPattern();
+    }
+
+    /**
+     * @expectedException RuntimeException
+     */
+    public function testGetSymbol()
+    {
+        $formatter = new SimpleNumberFormatter('en', SimpleNumberFormatter::DECIMAL);
+        $formatter->getSymbol(null);
+    }
+
+    /**
+     * @expectedException RuntimeException
+     */
+    public function testGetTextAttribute()
+    {
+        $formatter = new SimpleNumberFormatter('en', SimpleNumberFormatter::DECIMAL);
+        $formatter->getTextAttribute(null);
+    }
+
+    /**
+     * @expectedException RuntimeException
+     */
+    public function testParseCurrency()
+    {
+        $formatter = new SimpleNumberFormatter('en', SimpleNumberFormatter::DECIMAL);
+        $formatter->parseCurrency(null, $currency);
+    }
+
     public function testParseValueWithStringInTheBeginning()
     {
         $formatter = new SimpleNumberFormatter('en', SimpleNumberFormatter::DECIMAL);
@@ -232,5 +280,32 @@ class SimpleNumberFormatterTest extends \PHPUnit_Framework_TestCase
         $position = 1;
         $formatter = new SimpleNumberFormatter('en', SimpleNumberFormatter::DECIMAL);
         $formatter->parse('123', SimpleNumberFormatter::TYPE_DEFAULT, $position);
+    }
+
+    /**
+     * @expectedException RuntimeException
+     */
+    public function testSetPattern()
+    {
+        $formatter = new SimpleNumberFormatter('en', SimpleNumberFormatter::DECIMAL);
+        $formatter->setPattern(null);
+    }
+
+    /**
+     * @expectedException RuntimeException
+     */
+    public function testSetSymbol()
+    {
+        $formatter = new SimpleNumberFormatter('en', SimpleNumberFormatter::DECIMAL);
+        $formatter->setSymbol(null, null);
+    }
+
+    /**
+     * @expectedException RuntimeException
+     */
+    public function testSetTextAttribute()
+    {
+        $formatter = new SimpleNumberFormatter('en', SimpleNumberFormatter::DECIMAL);
+        $formatter->setTextAttribute(null, null);
     }
 }

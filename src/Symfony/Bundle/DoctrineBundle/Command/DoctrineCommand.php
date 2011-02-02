@@ -70,6 +70,9 @@ abstract class DoctrineCommand extends Command
     {
         $entityGenerator = new EntityGenerator();
 
+        if (version_compare(\Doctrine\ORM\Version::VERSION, "2.0.2-DEV") >= 0) {
+            $entityGenerator->setAnnotationPrefix("orm:");
+        }
         $entityGenerator->setGenerateAnnotations(false);
         $entityGenerator->setGenerateStubMethods(true);
         $entityGenerator->setRegenerateEntityIfExists(false);

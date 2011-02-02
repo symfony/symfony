@@ -137,6 +137,18 @@ class SimpleNumberFormatterTest extends \PHPUnit_Framework_TestCase
         $this->assertSame('1000000.12', $formatter->format(1000000.123));
     }
 
+    public function testGetErrorCode()
+    {
+        $formatter = new SimpleNumberFormatter('en', SimpleNumberFormatter::DECIMAL);
+        $this->assertEquals(SimpleNumberFormatter::U_ZERO_ERROR, $formatter->getErrorCode());
+    }
+
+    public function testGetErrorMessage()
+    {
+        $formatter = new SimpleNumberFormatter('en', SimpleNumberFormatter::DECIMAL);
+        $this->assertEquals(SimpleNumberFormatter::U_ZERO_ERROR_MESSAGE, $formatter->getErrorMessage());
+    }
+
     public function testParseValueWithStringInTheBeginning()
     {
         $formatter = new SimpleNumberFormatter('en', SimpleNumberFormatter::DECIMAL);

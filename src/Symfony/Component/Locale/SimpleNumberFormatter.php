@@ -19,6 +19,9 @@ use Symfony\Component\Locale\NumberFormatterInterface;
  */
 class SimpleNumberFormatter implements NumberFormatterInterface
 {
+    const U_ZERO_ERROR = 0;
+    const U_ZERO_ERROR_MESSAGE = 'U_ZERO_ERROR';
+
     /**
      * Default values for the en locale.
      */
@@ -173,7 +176,7 @@ class SimpleNumberFormatter implements NumberFormatterInterface
      */
     public function getErrorCode()
     {
-
+        return self::U_ZERO_ERROR;
     }
 
     /**
@@ -181,7 +184,7 @@ class SimpleNumberFormatter implements NumberFormatterInterface
      */
     public function getErrorMessage()
     {
-
+        return self::U_ZERO_ERROR_MESSAGE;
     }
 
     /**

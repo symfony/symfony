@@ -20,6 +20,7 @@ class Definition
 {
     protected $class;
     protected $file;
+    protected $factoryClass;
     protected $factoryMethod;
     protected $factoryService;
     protected $scope;
@@ -50,15 +51,40 @@ class Definition
     }
 
     /**
-     * Sets the factory method able to create an instance of this class.
+     * Sets the name of the class that acts as a factory using the factory method,
+     * which will be invoked statically.
      *
-     * @param  string $method The method name
+     * @param  string $factoryClass The factory class name
      *
      * @return Definition The current instance
      */
-    public function setFactoryMethod($method)
+    public function setFactoryClass($factoryClass)
     {
-        $this->factoryMethod = $method;
+        $this->factoryClass = $factoryClass;
+
+        return $this;
+    }
+
+    /**
+     * Gets the factory class.
+     *
+     * @return string The factory class name
+     */
+    public function getFactoryClass()
+    {
+        return $this->factoryClass;
+    }
+
+    /**
+     * Sets the factory method able to create an instance of this class.
+     *
+     * @param  string $factoryMethod The factory method name
+     *
+     * @return Definition The current instance
+     */
+    public function setFactoryMethod($factoryMethod)
+    {
+        $this->factoryMethod = $factoryMethod;
 
         return $this;
     }
@@ -74,7 +100,7 @@ class Definition
     }
 
     /**
-     * Sets the name of the service that acts as a factory using the constructor method.
+     * Sets the name of the service that acts as a factory using the factory method.
      *
      * @param string $factoryService The factory service id
      *

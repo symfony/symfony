@@ -165,6 +165,10 @@ class YamlFileLoader extends FileLoader
             $definition->setAbstract($service['abstract']);
         }
 
+        if (isset($service['factory_class'])) {
+            $definition->setFactoryClass($service['factory_class']);
+        }
+
         if (isset($service['factory_method'])) {
             $definition->setFactoryMethod($service['factory_method']);
         }

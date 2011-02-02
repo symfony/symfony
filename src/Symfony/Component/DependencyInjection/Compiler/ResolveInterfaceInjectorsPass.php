@@ -32,7 +32,7 @@ class ResolveInterfaceInjectorsPass implements CompilerPassInterface
 
             $loaded = false;
             foreach ($container->getInterfaceInjectors() as $injector) {
-                if (null !== $definition->getFactoryService()) {
+                if (null !== $definition->getFactoryClass() || null !== $definition->getFactoryService()) {
                     continue;
                 }
 

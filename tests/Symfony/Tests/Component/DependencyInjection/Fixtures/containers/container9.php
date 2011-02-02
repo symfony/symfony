@@ -12,6 +12,7 @@ $container->
     register('foo', 'FooClass')->
     addTag('foo', array('foo' => 'foo'))->
     addTag('foo', array('bar' => 'bar'))->
+    setFactoryClass('FooClass')->
     setFactoryMethod('getInstance')->
     setArguments(array('foo', new Reference('foo.baz'), array('%foo%' => 'foo is %foo%', 'bar' => '%foo%'), true, new Reference('service_container')))->
     setScope('prototype')->
@@ -27,6 +28,7 @@ $container->
 ;
 $container->
     register('foo.baz', '%baz_class%')->
+    setFactoryClass('%baz_class%')->
     setFactoryMethod('getInstance')->
     setConfigurator(array('%baz_class%', 'configureStatic1'))
 ;

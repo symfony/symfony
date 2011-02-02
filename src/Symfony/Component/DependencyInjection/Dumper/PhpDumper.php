@@ -230,10 +230,12 @@ EOF;
                 }
 
                 if (null !== $sDefinition->getFactoryMethod()) {
-                    if (null !== $sDefinition->getFactoryService()) {
+                    if (null !== $sDefinition->getFactoryClass()) {
+                        $code .= sprintf("        \$%s = call_user_func(array(%s, '%s')%s);\n", $name, $this->dumpValue($sDefinition->getFactoryClass()), $sDefinition->getFactoryMethod(), count($arguments) > 0 ? ', '.implode(', ', $arguments) : '');
+                    } elseif (null !== $sDefinition->getFactoryService()) {
                         $code .= sprintf("        \$%s = %s->%s(%s);\n", $name, $this->getServiceCall($sDefinition->getFactoryService()), $sDefinition->getFactoryMethod(), implode(', ', $arguments));
                     } else {
-                        $code .= sprintf("        \$%s = call_user_func(array(%s, '%s')%s);\n", $name, $class, $sDefinition->getFactoryMethod(), count($arguments) > 0 ? ', '.implode(', ', $arguments) : '');
+                        throw new \RuntimeException('Factory service or factory class must be defined in service definition for '.$id);
                     }
                 } elseif (false !== strpos($class, '$')) {
                     $code .= sprintf("        \$class = %s;\n        \$%s = new \$class(%s);\n", $class, $name, implode(', ', $arguments));
@@ -294,10 +296,12 @@ EOF;
         }
 
         if (null !== $definition->getFactoryMethod()) {
-            if (null !== $definition->getFactoryService()) {
+            if (null !== $definition->getFactoryClass()) {
+                $code = sprintf("        $return{$instantiation}call_user_func(array(%s, '%s')%s);\n", $this->dumpValue($definition->getFactoryClass()), $definition->getFactoryMethod(), $arguments ? ', '.implode(', ', $arguments) : '');
+            } elseif (null !== $definition->getFactoryService()) {
                 $code = sprintf("        $return{$instantiation}%s->%s(%s);\n", $this->getServiceCall($definition->getFactoryService()), $definition->getFactoryMethod(), implode(', ', $arguments));
             } else {
-                $code = sprintf("        $return{$instantiation}call_user_func(array(%s, '%s')%s);\n", $class, $definition->getFactoryMethod(), $arguments ? ', '.implode(', ', $arguments) : '');
+                throw new \RuntimeException('Factory method requires a factory service or factory class in service definition for '.$id);
             }
         } elseif (false !== strpos($class, '$')) {
             $code = sprintf("        \$class = %s;\n        $return{$instantiation}new \$class(%s);\n", $class, implode(', ', $arguments));
@@ -404,8 +408,10 @@ EOF;
         $return = '';
         if ($definition->isSynthetic()) {
             $return = sprintf('@throws \RuntimeException always since this service is expected to be injected dynamically');
-        } else if ($class = $definition->getClass()) {
+        } elseif ($class = $definition->getClass()) {
             $return = sprintf("@return %s A %s instance.", 0 === strpos($class, '%') ? 'Object' : $class, $class);
+        } elseif ($definition->getFactoryClass()) {
+            $return = sprintf('@return Object An instance returned by %s::%s().', $definition->getFactoryClass(), $definition->getFactoryMethod());
         } elseif ($definition->getFactoryService()) {
             $return = sprintf('@return Object An instance returned by %s::%s().', $definition->getFactoryService(), $definition->getFactoryMethod());
         }
@@ -821,10 +827,12 @@ EOF;
             }
 
             if (null !== $value->getFactoryMethod()) {
-                if (null !== $value->getFactoryService()) {
+                if (null !== $value->getFactoryClass()) {
+                    return sprintf("call_user_func(array(%s, '%s')%s)", $this->dumpValue($value->getFactoryClass()), $value->getFactoryMethod(), count($arguments) > 0 ? ', '.implode(', ', $arguments) : '');
+                } elseif (null !== $value->getFactoryService()) {
                     return sprintf("%s->%s(%s)", $this->getServiceCall($value->getFactoryService()), $value->getFactoryMethod(), implode(', ', $arguments));
                 } else {
-                    return sprintf("call_user_func(array(%s, '%s')%s)", $class, $value->getFactoryMethod(), count($arguments) > 0 ? ', '.implode(', ', $arguments) : '');
+                    throw new \RuntimeException('Cannot dump definitions which have factory method without factory service or factory class.');
                 }
             }
 

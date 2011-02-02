@@ -37,11 +37,11 @@ class DefinitionDecorator extends Definition
         return parent::setClass($class);
     }
 
-    public function setFactoryService($service)
+    public function setFactoryClass($class)
     {
-        $this->changes['factory_service'] = true;
+        $this->changes['factory_class'] = true;
 
-        return parent::setFactoryService($service);
+        return parent::setFactoryClass($class);
     }
 
     public function setFactoryMethod($method)
@@ -49,6 +49,13 @@ class DefinitionDecorator extends Definition
         $this->changes['factory_method'] = true;
 
         return parent::setFactoryMethod($method);
+    }
+
+    public function setFactoryService($service)
+    {
+        $this->changes['factory_service'] = true;
+
+        return parent::setFactoryService($service);
     }
 
     public function setConfigurator($callable)

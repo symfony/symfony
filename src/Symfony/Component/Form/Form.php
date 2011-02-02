@@ -736,16 +736,19 @@ class Form extends Field implements \IteratorAggregate, FormInterface
             throw new MissingOptionsException('The option "validator" is required for validating', array('validator'));
         }
 
-        // Validate the submitted data in the domain object in the sets
-        // validation group(s)
-        if ($violations = $validator->validate($this->getData(), $groups)) {
-            foreach ($violations as $violation) {
-                $propertyPath = new PropertyPath($violation->getPropertyPath());
-                $iterator = $propertyPath->getIterator();
-                $iterator->next(); // point at the first data element
-                $error = new DataError($violation->getMessageTemplate(), $violation->getMessageParameters());
+        // Only validate data if it is a domain object
+        if (is_object($this->getData())) {
+            // Validate the submitted data in the domain object in the sets
+            // validation group(s)
+            if ($violations = $validator->validate($this->getData(), $groups)) {
+                foreach ($violations as $violation) {
+                    $propertyPath = new PropertyPath($violation->getPropertyPath());
+                    $iterator = $propertyPath->getIterator();
+                    $iterator->next(); // point at the first data element
+                    $error = new DataError($violation->getMessageTemplate(), $violation->getMessageParameters());
 
-                $this->addError($error, $iterator);
+                    $this->addError($error, $iterator);
+                }
             }
         }
 

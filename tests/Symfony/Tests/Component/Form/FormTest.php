@@ -200,13 +200,13 @@ class FormTest extends \PHPUnit_Framework_TestCase
 
     public function testBindUsesValidationGroups()
     {
-        $field = $this->createMockField('firstName');
         $form = new Form('author', array(
             'validation_groups' => 'group',
             'validator' => $this->validator,
         ));
-        $form->add($field);
+        $form->add(new TestField('firstName'));
 
+        // both the form and the object are validated
         $this->validator->expects($this->exactly(2))
             ->method('validate');
 
@@ -221,8 +221,26 @@ class FormTest extends \PHPUnit_Framework_TestCase
 //            ->method('validate')
 //            ->with($this->equalTo($form));
 
-        // data is irrelevant
-        $form->bind($this->createPostRequest());
+        // concrete request is irrelevant
+        // data is an object
+        $form->bind($this->createPostRequest(), new Author());
+    }
+
+    public function testBindDoesNotValidateArrays()
+    {
+        $form = new Form('author', array(
+            'validator' => $this->validator,
+        ));
+        $form->add(new TestField('firstName'));
+
+        // only the form is validated
+        $this->validator->expects($this->once())
+            ->method('validate')
+            ->with($this->equalTo($form));
+
+        // concrete request is irrelevant
+        // data is an array
+        $form->bind($this->createPostRequest(), array());
     }
 
     public function testBindThrowsExceptionIfNoValidatorIsSet()

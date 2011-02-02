@@ -21,13 +21,17 @@ class CollectionFieldTest extends \PHPUnit_Framework_TestCase
 {
     public function testContainsNoFieldsByDefault()
     {
-        $field = new CollectionField(new TestField('emails'));
+        $field = new CollectionField('emails', array(
+            'prototype' => new TestField(),
+        ));
         $this->assertEquals(0, count($field));
     }
 
     public function testSetDataAdjustsSize()
     {
-        $field = new CollectionField(new TestField('emails'));
+        $field = new CollectionField('emails', array(
+            'prototype' => new TestField(),
+        ));
         $field->setData(array('foo@foo.com', 'foo@bar.com'));
 
         $this->assertTrue($field[0] instanceof TestField);
@@ -45,7 +49,8 @@ class CollectionFieldTest extends \PHPUnit_Framework_TestCase
 
     public function testSetDataAdjustsSizeIfModifiable()
     {
-        $field = new CollectionField(new TestField('emails'), array(
+        $field = new CollectionField('emails', array(
+            'prototype' => new TestField(),
             'modifiable' => true,
         ));
         $field->setData(array('foo@foo.com', 'foo@bar.com'));
@@ -64,14 +69,17 @@ class CollectionFieldTest extends \PHPUnit_Framework_TestCase
 
     public function testThrowsExceptionIfObjectIsNotTraversable()
     {
-        $field = new CollectionField(new TestField('emails'));
+        $field = new CollectionField('emails', array(
+            'prototype' => new TestField(),
+        ));
         $this->setExpectedException('Symfony\Component\Form\Exception\UnexpectedTypeException');
         $field->setData(new \stdClass());
     }
 
     public function testModifiableCollectionsContainExtraField()
     {
-        $field = new CollectionField(new TestField('emails'), array(
+        $field = new CollectionField('emails', array(
+            'prototype' => new TestField(),
             'modifiable' => true,
         ));
         $field->setData(array('foo@bar.com'));
@@ -83,7 +91,9 @@ class CollectionFieldTest extends \PHPUnit_Framework_TestCase
 
     public function testNotResizedIfSubmittedWithMissingData()
     {
-        $field = new CollectionField(new TestField('emails'));
+        $field = new CollectionField('emails', array(
+            'prototype' => new TestField(),
+        ));
         $field->setData(array('foo@foo.com', 'bar@bar.com'));
         $field->submit(array('foo@bar.com'));
 
@@ -95,7 +105,8 @@ class CollectionFieldTest extends \PHPUnit_Framework_TestCase
 
     public function testResizedIfSubmittedWithMissingDataAndModifiable()
     {
-        $field = new CollectionField(new TestField('emails'), array(
+        $field = new CollectionField('emails', array(
+            'prototype' => new TestField(),
             'modifiable' => true,
         ));
         $field->setData(array('foo@foo.com', 'bar@bar.com'));
@@ -108,7 +119,9 @@ class CollectionFieldTest extends \PHPUnit_Framework_TestCase
 
     public function testNotResizedIfSubmittedWithExtraData()
     {
-        $field = new CollectionField(new TestField('emails'));
+        $field = new CollectionField('emails', array(
+            'prototype' => new TestField(),
+        ));
         $field->setData(array('foo@bar.com'));
         $field->submit(array('foo@foo.com', 'bar@bar.com'));
 
@@ -119,7 +132,8 @@ class CollectionFieldTest extends \PHPUnit_Framework_TestCase
 
     public function testResizedUpIfSubmittedWithExtraDataAndModifiable()
     {
-        $field = new CollectionField(new TestField('emails'), array(
+        $field = new CollectionField('emails', array(
+            'prototype' => new TestField(),
             'modifiable' => true,
         ));
         $field->setData(array('foo@bar.com'));
@@ -134,7 +148,8 @@ class CollectionFieldTest extends \PHPUnit_Framework_TestCase
 
     public function testResizedDownIfSubmittedWithLessDataAndModifiable()
     {
-        $field = new CollectionField(new TestField('emails'), array(
+        $field = new CollectionField('emails', array(
+            'prototype' => new TestField(),
             'modifiable' => true,
         ));
         $field->setData(array('foo@bar.com', 'bar@bar.com'));

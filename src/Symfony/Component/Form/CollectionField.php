@@ -27,28 +27,10 @@ use Symfony\Component\Form\Exception\UnexpectedTypeException;
 class CollectionField extends Form
 {
     /**
-     * The prototype for the inner fields
-     * @var FieldInterface
-     */
-    protected $prototype;
-
-    /**
      * Remembers which fields were removed upon submitting
      * @var array
      */
     protected $removedFields = array();
-
-    /**
-     * Repeats the given field multiple times based in the internal collection.
-     *
-     * @param FieldInterface $innerField
-     */
-    public function __construct(FieldInterface $innerField, array $options = array())
-    {
-        $this->prototype = $innerField;
-
-        parent::__construct($innerField->getKey(), $options);
-    }
 
     /**
      * Available options:
@@ -61,6 +43,7 @@ class CollectionField extends Form
      */
     protected function configure()
     {
+        $this->addOption('prototype');
         $this->addOption('modifiable', false);
 
         if ($this->getOption('modifiable')) {
@@ -92,28 +75,28 @@ class CollectionField extends Form
         parent::setData($collection);
     }
 
-    public function submit($taintedData)
+    public function submit($data)
     {
         $this->removedFields = array();
 
-        if (null === $taintedData) {
-            $taintedData = array();
+        if (null === $data) {
+            $data = array();
         }
 
         foreach ($this as $name => $field) {
-            if (!isset($taintedData[$name]) && $this->getOption('modifiable') && '$$key$$' != $name) {
+            if (!isset($data[$name]) && $this->getOption('modifiable') && '$$key$$' != $name) {
                 $this->remove($name);
                 $this->removedFields[] = $name;
             }
         }
 
-        foreach ($taintedData as $name => $value) {
+        foreach ($data as $name => $value) {
             if (!isset($this[$name]) && $this->getOption('modifiable')) {
                 $this->add($this->newField($name, $name));
             }
         }
 
-        parent::submit($taintedData);
+        parent::submit($data);
     }
 
     protected function writeObject(&$objectOrArray)
@@ -127,9 +110,20 @@ class CollectionField extends Form
 
     protected function newField($key, $propertyPath)
     {
-        $field = clone $this->prototype;
-        $field->setKey($key);
-        $field->setPropertyPath(null === $propertyPath ? null : '['.$propertyPath.']');
+        if (null !== $propertyPath) {
+            $propertyPath = '['.$propertyPath.']';
+        }
+
+        if ($this->getOption('prototype')) {
+            $field = clone $this->getOption('prototype');
+            $field->setKey($key);
+            $field->setPropertyPath($propertyPath);
+        } else {
+            $field = new TextField($key, array(
+                'property_path' => $propertyPath,
+            ));
+        }
+
         return $field;
     }
 }

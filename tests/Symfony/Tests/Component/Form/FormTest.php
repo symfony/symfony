@@ -220,7 +220,7 @@ class FormTest extends \PHPUnit_Framework_TestCase
         $form = new Form('author');
         $form->add($field);
 
-        $this->setExpectedException('Symfony\Component\Form\Exception\FormException');
+        $this->setExpectedException('Symfony\Component\Form\Exception\MissingOptionsException');
 
         // data is irrelevant
         $form->bind($this->createPostRequest());
@@ -268,43 +268,6 @@ class FormTest extends \PHPUnit_Framework_TestCase
         $form->bind(new Request(), $object);
 
         $this->assertSame($object, $form->getData());
-    }
-
-    public function testBindGlobals()
-    {
-        $_POST = array(
-            'author' => array(
-                'name' => 'Bernhard',
-                'image' => array('filename' => 'foobar.png'),
-            ),
-        );
-        $_FILES = array(
-            'author' => array(
-                'error' => array('image' => array('file' => UPLOAD_ERR_OK)),
-                'name' => array('image' => array('file' => 'upload.png')),
-                'size' => array('image' => array('file' => 123)),
-                'tmp_name' => array('image' => array('file' => 'abcdef.png')),
-                'type' => array('image' => array('file' => 'image/png')),
-            ),
-        );
-        // don't erase other variables
-        $_SERVER['REQUEST_METHOD'] = 'POST';
-
-
-        $form = new Form('author', array('validator' => $this->validator));
-        $form->add(new TestField('name'));
-        $imageForm = new Form('image');
-        $imageForm->add(new TestField('file'));
-        $imageForm->add(new TestField('filename'));
-        $form->add($imageForm);
-
-        $form->bindGlobals();
-
-        $file = new UploadedFile('abcdef.png', 'upload.png', 'image/png', 123, UPLOAD_ERR_OK);
-
-        $this->assertEquals('Bernhard', $form['name']->getData());
-        $this->assertEquals('foobar.png', $form['image']['filename']->getData());
-        $this->assertEquals($file, $form['image']['file']->getData());
     }
 
     public function testReadPropertyIsIgnoredIfPropertyPathIsNull()

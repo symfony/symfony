@@ -15,6 +15,7 @@ use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\FileBag;
 use Symfony\Component\Validator\ValidatorInterface;
 use Symfony\Component\Form\Exception\FormException;
+use Symfony\Component\Form\Exception\MissingOptionsException;
 use Symfony\Component\Form\Exception\AlreadyBoundException;
 use Symfony\Component\Form\Exception\UnexpectedTypeException;
 use Symfony\Component\Form\Exception\DanglingFieldException;
@@ -725,39 +726,8 @@ class Form extends Field implements \IteratorAggregate, FormInterface
 
             $this->submit(self::deepArrayUnion($values, $files));
 
-            if (null === $this->getOption('validator')) {
-                throw new FormException('A validator is required for binding. Forgot to pass it to the constructor of the form?');
-            }
-
-            // Validate the submitted data
-            if ($violations = $this->getOption('validator')->validate($this, $this->getOption('validation_groups'))) {
-                // TODO: test me
-                foreach ($violations as $violation) {
-                    $propertyPath = new PropertyPath($violation->getPropertyPath());
-                    $iterator = $propertyPath->getIterator();
-
-                    if ($iterator->current() == 'data') {
-                        $type = self::DATA_ERROR;
-                        $iterator->next(); // point at the first data element
-                    } else {
-                        $type = self::FIELD_ERROR;
-                    }
-
-                    $this->addError(new FieldError($violation->getMessageTemplate(), $violation->getMessageParameters()), $iterator, $type);
-                }
-            }
+            $this->validate();
         }
-    }
-
-    /**
-     * Binds the form with submitted data from the PHP globals $_POST and
-     * $_FILES
-     *
-     * @see bind()
-     */
-    public function bindGlobals($data = null)
-    {
-        $this->bind(Request::createFromGlobals(), $data);
     }
 
     /**
@@ -766,6 +736,36 @@ class Form extends Field implements \IteratorAggregate, FormInterface
     public function isBound()
     {
         return $this->bound;
+    }
+
+    /**
+     * Validates the form and its domain object
+     *
+     * @throws FormException  If the option "validator" was not set
+     */
+    public function validate()
+    {
+        if (null === $this->getOption('validator')) {
+            throw new MissingOptionsException('The option "validator" is required for validating', array('validator'));
+        }
+
+        // Validate the submitted data
+        if ($violations = $this->getOption('validator')->validate($this, $this->getOption('validation_groups'))) {
+            // TODO: test me
+            foreach ($violations as $violation) {
+                $propertyPath = new PropertyPath($violation->getPropertyPath());
+                $iterator = $propertyPath->getIterator();
+
+                if ($iterator->current() == 'data') {
+                    $type = self::DATA_ERROR;
+                    $iterator->next(); // point at the first data element
+                } else {
+                    $type = self::FIELD_ERROR;
+                }
+
+                $this->addError(new FieldError($violation->getMessageTemplate(), $violation->getMessageParameters()), $iterator, $type);
+            }
+        }
     }
 
     /**

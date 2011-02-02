@@ -51,8 +51,6 @@ class SimpleNumberFormatter implements NumberFormatterInterface
      * and SimpleNumberFormatter::ROUND_UP does not have a PHP only equivalent.
      */
     private static $roundingModes = array(
-        'ROUND_CEILING'  => self::ROUND_CEILING,
-        'ROUND_FLOOR'    => self::ROUND_FLOOR,
         'ROUND_HALFEVEN' => self::ROUND_HALFEVEN,
         'ROUND_HALFDOWN' => self::ROUND_HALFDOWN,
         'ROUND_HALFUP'   => self::ROUND_HALFUP
@@ -127,10 +125,6 @@ class SimpleNumberFormatter implements NumberFormatterInterface
 
     /**
      * @{inheritDoc}
-     * @todo With the default rounding mode (ROUND_HALFEVEN), the currency value
-     *       seems to be correctly rounded. However, since ROUND_CEILING is
-     *       mapping to the ceil() function, the value is being returned. This
-     *       is wrong.
      */
     public function formatCurrency($value, $currency)
     {
@@ -158,7 +152,6 @@ class SimpleNumberFormatter implements NumberFormatterInterface
             $fractionDigits = 0;
         }
 
-        // Rounding
         $value = $this->round($value, $fractionDigits);
         return $this->formatNumber($value, $fractionDigits);
     }
@@ -332,18 +325,8 @@ class SimpleNumberFormatter implements NumberFormatterInterface
      */
     private function round($value, $precision)
     {
-        switch ($this->getAttribute(self::ROUNDING_MODE)):
-            case self::ROUND_CEILING:
-                $value = ceil($value);
-                break;
-            case self::ROUND_FLOOR:
-                $value = floor($value);
-                break;
-            default:
-                $roundingMode = self::$phpRoundingMap[$this->getAttribute(self::ROUNDING_MODE)];
-                $value = round($value, $precision, $roundingMode);
-                break;
-            endswitch;
+        $roundingMode = self::$phpRoundingMap[$this->getAttribute(self::ROUNDING_MODE)];
+        $value = round($value, $precision, $roundingMode);
 
         return $value;
     }

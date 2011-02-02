@@ -123,23 +123,16 @@ class SimpleNumberFormatterTest extends \PHPUnit_Framework_TestCase
     {
         $formatter = new SimpleNumberFormatter('en', SimpleNumberFormatter::DECIMAL);
 
-        // Rounds to the next highest integer
-        $formatter->setAttribute(SimpleNumberFormatter::ROUNDING_MODE, SimpleNumberFormatter::ROUND_CEILING);
-        $this->assertSame('10', $formatter->format(9.5));
-
         // Use the defined fraction digits
-        $formatter->setAttribute(SimpleNumberFormatter::FRACTION_DIGITS, 2);
-        $this->assertSame('10.00', $formatter->format(9.5));
-        $formatter->setAttribute(SimpleNumberFormatter::FRACTION_DIGITS, -1);
-        $this->assertSame('10', $formatter->format(9.5));
-
-        // Rounds to the nearest even number
-        $formatter->setAttribute(SimpleNumberFormatter::ROUNDING_MODE, SimpleNumberFormatter::ROUND_HALFEVEN);
         $formatter->setAttribute(SimpleNumberFormatter::FRACTION_DIGITS, 2);
         $this->assertSame('9.56', $formatter->format(9.555));
         $this->assertSame('1,000,000.12', $formatter->format(1000000.123));
 
+        $formatter->setAttribute(SimpleNumberFormatter::FRACTION_DIGITS, -1);
+        $this->assertSame('10', $formatter->format(9.5));
+
         // Don't use number grouping
+        $formatter->setAttribute(SimpleNumberFormatter::FRACTION_DIGITS, 2);
         $formatter->setAttribute(SimpleNumberFormatter::GROUPING_USED, 0);
         $this->assertSame('1000000.12', $formatter->format(1000000.123));
     }

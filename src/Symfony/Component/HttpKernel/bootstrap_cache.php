@@ -2379,8 +2379,8 @@ class UniversalClassLoader
 {
     protected $namespaces = array();
     protected $prefixes = array();
-    protected $namespaceFallback;
-    protected $prefixFallback;
+    protected $namespaceFallback = array();
+    protected $prefixFallback = array();
     public function getNamespaces()
     {
         return $this->namespaces;
@@ -2397,29 +2397,33 @@ class UniversalClassLoader
     {
         return $this->prefixFallback;
     }
-    public function registerNamespaceFallback($dir)
+    public function registerNamespaceFallback($dirs)
     {
-        $this->namespaceFallback = $dir;
+        $this->namespaceFallback = (array) $dirs;
     }
-    public function registerPrefixFallback($dir)
+    public function registerPrefixFallback($dirs)
     {
-        $this->prefixFallback = $dir;
+        $this->prefixFallback = (array) $dirs;
     }
     public function registerNamespaces(array $namespaces)
     {
-        $this->namespaces = array_merge($this->namespaces, $namespaces);
+        foreach ($namespaces as $namespace => $locations) {
+            $this->namespaces[$namespace] = (array) $locations;
+        }
     }
-    public function registerNamespace($namespace, $path)
+    public function registerNamespace($namespace, $paths)
     {
-        $this->namespaces[$namespace] = $path;
+        $this->namespaces[$namespace] = (array) $paths;
     }
     public function registerPrefixes(array $classes)
     {
-        $this->prefixes = array_merge($this->prefixes, $classes);
+        foreach ($classes as $prefix => $locations) {
+            $this->prefixes[$prefix] = (array) $locations;
+        }
     }
-    public function registerPrefix($prefix, $path)
+    public function registerPrefix($prefix, $paths)
     {
-        $this->prefixes[$prefix] = $path;
+        $this->prefixes[$prefix] = (array) $paths;
     }
     public function register($prepend = false)
     {
@@ -2430,36 +2434,42 @@ class UniversalClassLoader
         $class = ltrim($class, '\\');
         if (false !== ($pos = strripos($class, '\\'))) {
                         $namespace = substr($class, 0, $pos);
-            foreach ($this->namespaces as $ns => $dir) {
-                if (0 === strpos($namespace, $ns)) {
-                    $className = substr($class, $pos + 1);
-                    $file = $dir.DIRECTORY_SEPARATOR.str_replace('\\', DIRECTORY_SEPARATOR, $namespace).DIRECTORY_SEPARATOR.str_replace('_', DIRECTORY_SEPARATOR, $className).'.php';
-                    if (file_exists($file)) {
-                        require $file;
-                        return;
+            foreach ($this->namespaces as $ns => $dirs) {
+                foreach ($dirs as $dir) {
+                    if (0 === strpos($namespace, $ns)) {
+                        $className = substr($class, $pos + 1);
+                        $file = $dir.DIRECTORY_SEPARATOR.str_replace('\\', DIRECTORY_SEPARATOR, $namespace).DIRECTORY_SEPARATOR.str_replace('_', DIRECTORY_SEPARATOR, $className).'.php';
+                        if (file_exists($file)) {
+                            require $file;
+                            return;
+                        }
                     }
                 }
             }
-            if (null !== $this->namespaceFallback) {
-                $file = $this->namespaceFallback.DIRECTORY_SEPARATOR.str_replace('\\', DIRECTORY_SEPARATOR, $class).'.php';
+            foreach ($this->namespaceFallback as $dir) {
+                $file = $dir.DIRECTORY_SEPARATOR.str_replace('\\', DIRECTORY_SEPARATOR, $class).'.php';
                 if (file_exists($file)) {
                     require $file;
+                    return;
                 }
             }
         } else {
-                        foreach ($this->prefixes as $prefix => $dir) {
-                if (0 === strpos($class, $prefix)) {
-                    $file = $dir.DIRECTORY_SEPARATOR.str_replace('_', DIRECTORY_SEPARATOR, $class).'.php';
-                    if (file_exists($file)) {
-                        require $file;
-                        return;
+                        foreach ($this->prefixes as $prefix => $dirs) {
+                foreach ($dirs as $dir) {
+                    if (0 === strpos($class, $prefix)) {
+                        $file = $dir.DIRECTORY_SEPARATOR.str_replace('_', DIRECTORY_SEPARATOR, $class).'.php';
+                        if (file_exists($file)) {
+                            require $file;
+                            return;
+                        }
                     }
                 }
             }
-            if (null !== $this->prefixFallback) {
-                $file = $this->prefixFallback.DIRECTORY_SEPARATOR.str_replace('_', DIRECTORY_SEPARATOR, $class).'.php';
+            foreach ($this->prefixFallback as $dir) {
+                $file = $dir.DIRECTORY_SEPARATOR.str_replace('_', DIRECTORY_SEPARATOR, $class).'.php';
                 if (file_exists($file)) {
                     require $file;
+                    return;
                 }
             }
         }

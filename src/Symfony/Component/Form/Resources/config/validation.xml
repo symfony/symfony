@@ -13,6 +13,7 @@
   </class>
 
   <class name="Symfony\Component\Form\Form">
+    <constraint name="Execute">validateData</constraint>
     <property name="fields">
       <constraint name="Valid" />
     </property>

@@ -14,6 +14,7 @@ namespace Symfony\Component\Form;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\FileBag;
 use Symfony\Component\Validator\ValidatorInterface;
+use Symfony\Component\Validator\ExecutionContext;
 use Symfony\Component\Form\Exception\FormException;
 use Symfony\Component\Form\Exception\MissingOptionsException;
 use Symfony\Component\Form\Exception\AlreadySubmittedException;
@@ -667,7 +668,13 @@ class Form extends Field implements \IteratorAggregate, FormInterface
      */
     public function getValidationGroups()
     {
-        return $this->getOption('validation_groups');
+        $groups = $this->getOption('validation_groups');
+
+        if (!$groups && $this->hasParent()) {
+            $groups = $this->getParent()->getValidationGroups();
+        }
+
+        return $groups;
     }
 
     /**
@@ -736,28 +743,22 @@ class Form extends Field implements \IteratorAggregate, FormInterface
             throw new MissingOptionsException('The option "validator" is required for validating', array('validator'));
         }
 
-        // Only validate data if it is a domain object
-        if (is_object($this->getData())) {
-            // Validate the submitted data in the domain object in the sets
-            // validation group(s)
-            if ($violations = $validator->validate($this->getData(), $groups)) {
-                foreach ($violations as $violation) {
-                    $propertyPath = new PropertyPath($violation->getPropertyPath());
-                    $iterator = $propertyPath->getIterator();
-                    $iterator->next(); // point at the first data element
-                    $error = new DataError($violation->getMessageTemplate(), $violation->getMessageParameters());
-
-                    $this->addError($error, $iterator);
-                }
-            }
-        }
-
-        // Validate the submitted data in the fields in group "Default"
+        // Validate the form in group "Default"
+        // Validation of the data in the custom group is done by validateData(),
+        // which is constrained by the Execute constraint
         if ($violations = $validator->validate($this)) {
             foreach ($violations as $violation) {
                 $propertyPath = new PropertyPath($violation->getPropertyPath());
                 $iterator = $propertyPath->getIterator();
-                $error = new FieldError($violation->getMessageTemplate(), $violation->getMessageParameters());
+                $template = $violation->getMessageTemplate();
+                $parameters = $violation->getMessageParameters();
+
+                if ($iterator->current() == 'data') {
+                    $iterator->next(); // point at the first data element
+                    $error = new DataError($template, $parameters);
+                } else {
+                    $error = new FieldError($template, $parameters);
+                }
 
                 $this->addError($error, $iterator);
             }
@@ -843,6 +844,40 @@ class Form extends Field implements \IteratorAggregate, FormInterface
     public function getContext()
     {
         return $this->getOption('context');
+    }
+
+    /**
+     * Validates the data of this form
+     *
+     * This method is called automatically during the validation process.
+     *
+     * @param ExecutionContext $context  The current validation context
+     */
+    public function validateData(ExecutionContext $context)
+    {
+        $groups = $this->getValidationGroups();
+        $propertyPath = $context->getPropertyPath();
+        $graphWalker = $context->getGraphWalker();
+
+        if (null === $groups) {
+            $groups = array(null);
+        }
+
+        // The Execute constraint is called on class level, so we need to
+        // set the property manually
+        $context->setCurrentProperty('data');
+
+        // Adjust the property path accordingly
+        if (!empty($propertyPath)) {
+            $propertyPath .= '.';
+        }
+
+        $propertyPath .= 'data';
+
+        foreach ($groups as $group) {
+            // Don't use potential overridden versions of getData()!
+            $graphWalker->walkReference(Form::getData(), $group, $propertyPath, true);
+        }
     }
 
     /**

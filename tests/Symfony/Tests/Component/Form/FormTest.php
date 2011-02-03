@@ -26,6 +26,7 @@ use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\File\UploadedFile;
 use Symfony\Component\Validator\ConstraintViolation;
 use Symfony\Component\Validator\ConstraintViolationList;
+use Symfony\Component\Validator\ExecutionContext;
 use Symfony\Tests\Component\Form\Fixtures\Author;
 use Symfony\Tests\Component\Form\Fixtures\TestField;
 use Symfony\Tests\Component\Form\Fixtures\TestForm;
@@ -198,7 +199,31 @@ class FormTest extends \PHPUnit_Framework_TestCase
         $this->assertEquals(array('group1', 'group2'), $form->getValidationGroups());
     }
 
-    public function testBindUsesValidationGroups()
+    public function testValidationGroupsAreInheritedFromParentIfEmpty()
+    {
+        $parentForm = new Form('parent', array(
+            'validation_groups' => 'group',
+        ));
+        $childForm = new Form('child');
+        $parentForm->add($childForm);
+
+        $this->assertEquals(array('group'), $childForm->getValidationGroups());
+    }
+
+    public function testValidationGroupsAreNotInheritedFromParentIfSet()
+    {
+        $parentForm = new Form('parent', array(
+            'validation_groups' => 'group1',
+        ));
+        $childForm = new Form('child', array(
+            'validation_groups' => 'group2',
+        ));
+        $parentForm->add($childForm);
+
+        $this->assertEquals(array('group2'), $childForm->getValidationGroups());
+    }
+
+    public function testBindValidatesData()
     {
         $form = new Form('author', array(
             'validation_groups' => 'group',
@@ -206,24 +231,12 @@ class FormTest extends \PHPUnit_Framework_TestCase
         ));
         $form->add(new TestField('firstName'));
 
-        // both the form and the object are validated
-        $this->validator->expects($this->exactly(2))
-            ->method('validate');
-
-// PHPUnit limitation here
-//        // form data is validated in custom group
-//        $this->validator->expects($this->once())
-//            ->method('validate')
-//            ->with($this->equalTo($form->getData()), $this->equalTo(array('group')));
-//
-//        // form itself is validated in group "Default"
-//        $this->validator->expects($this->once())
-//            ->method('validate')
-//            ->with($this->equalTo($form));
+        $this->validator->expects($this->once())
+            ->method('validate')
+            ->with($this->equalTo($form));
 
         // concrete request is irrelevant
-        // data is an object
-        $form->bind($this->createPostRequest(), new Author());
+        $form->bind($this->createPostRequest());
     }
 
     public function testBindDoesNotValidateArrays()
@@ -1036,6 +1049,68 @@ class FormTest extends \PHPUnit_Framework_TestCase
         $this->assertSame(array($form['visibleField']), $visibleFields);
     }
 
+    public function testValidateData()
+    {
+        $graphWalker = $this->createMockGraphWalker();
+        $metadataFactory = $this->createMockMetadataFactory();
+        $context = new ExecutionContext('Root', $graphWalker, $metadataFactory);
+        $object = $this->getMock('\stdClass');
+        $form = new Form('author', array('validation_groups' => array(
+            'group1',
+            'group2',
+        )));
+
+        $graphWalker->expects($this->exactly(2))
+                ->method('walkReference')
+                ->with($object,
+                    // should test for groups - PHPUnit limitation
+                    $this->anything(),
+                    'data',
+                    true);
+
+        $form->setData($object);
+        $form->validateData($context);
+    }
+
+    public function testValidateDataAppendsPropertyPath()
+    {
+        $graphWalker = $this->createMockGraphWalker();
+        $metadataFactory = $this->createMockMetadataFactory();
+        $context = new ExecutionContext('Root', $graphWalker, $metadataFactory);
+        $context->setPropertyPath('path');
+        $object = $this->getMock('\stdClass');
+        $form = new Form('author');
+
+        $graphWalker->expects($this->once())
+                ->method('walkReference')
+                ->with($object,
+                    null,
+                    'path.data',
+                    true);
+
+        $form->setData($object);
+        $form->validateData($context);
+    }
+
+    public function testValidateDataSetsCurrentPropertyToData()
+    {
+        $graphWalker = $this->createMockGraphWalker();
+        $metadataFactory = $this->createMockMetadataFactory();
+        $context = new ExecutionContext('Root', $graphWalker, $metadataFactory);
+        $object = $this->getMock('\stdClass');
+        $form = new Form('author');
+        $test = $this;
+
+        $graphWalker->expects($this->once())
+                ->method('walkReference')
+                ->will($this->returnCallback(function () use ($context, $test) {
+                    $test->assertEquals('data', $context->getCurrentProperty());
+                }));
+
+        $form->setData($object);
+        $form->validateData($context);
+    }
+
     /**
      * Create a group containing two fields, "visibleField" and "hiddenField"
      *
@@ -1151,6 +1226,18 @@ class FormTest extends \PHPUnit_Framework_TestCase
     protected function createMockCsrfProvider()
     {
         return $this->getMock('Symfony\Component\Form\CsrfProvider\CsrfProviderInterface');
+    }
+
+    protected function createMockGraphWalker()
+    {
+        return $this->getMockBuilder('Symfony\Component\Validator\GraphWalker')
+                ->disableOriginalConstructor()
+                ->getMock();
+    }
+
+    protected function createMockMetadataFactory()
+    {
+        return $this->getMock('Symfony\Component\Validator\Mapping\ClassMetadataFactoryInterface');
     }
 
     protected function createPostRequest(array $values = array(), array $files = array())

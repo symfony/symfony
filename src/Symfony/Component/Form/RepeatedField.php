@@ -86,16 +86,23 @@ class RepeatedField extends Form
     }
 
     /**
-     * Return only value of first password field.
+     * Return the value of a child field
      *
-     * @return string The password.
+     * If the value of the first field is set, this value is returned.
+     * Otherwise the value of the second field is returned. This way,
+     * this field will never trigger a NotNull/NotBlank error if any of the
+     * child fields was filled in.
+     *
+     * @return string The field value
      */
     public function getData()
     {
-        if ($this->isSubmitted() && $this->isFirstEqualToSecond()) {
-            return $this->get($this->getOption('first_key'))->getData();
-        }
+        // Return whichever data is set. This should not return NULL if any of
+        // the fields is set, otherwise this might trigger a NotNull/NotBlank
+        // error even though some value was set
+        $data1 = $this->get($this->getOption('first_key'))->getData();
+        $data2 = $this->get($this->getOption('second_key'))->getData();
 
-        return null;
+        return $data1 ?: $data2;
     }
 }

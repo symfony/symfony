@@ -43,7 +43,7 @@ class RepeatedFieldTest extends \PHPUnit_Framework_TestCase
         $this->assertEquals('bar', $this->field['second']->getDisplayedData());
         $this->assertFalse($this->field->isFirstEqualToSecond());
         $this->assertEquals($input, $this->field->getDisplayedData());
-        $this->assertEquals(null, $this->field->getData());
+        $this->assertEquals('foo', $this->field->getData());
     }
 
     public function testSubmitEqual()
@@ -57,5 +57,14 @@ class RepeatedFieldTest extends \PHPUnit_Framework_TestCase
         $this->assertTrue($this->field->isFirstEqualToSecond());
         $this->assertEquals($input, $this->field->getDisplayedData());
         $this->assertEquals('foo', $this->field->getData());
+    }
+
+    public function testGetDataReturnsSecondValueIfFirstIsEmpty()
+    {
+        $input = array('first' => '', 'second' => 'bar');
+
+        $this->field->submit($input);
+
+        $this->assertEquals('bar', $this->field->getData());
     }
 }

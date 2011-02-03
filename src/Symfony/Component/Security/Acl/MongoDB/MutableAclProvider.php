@@ -99,7 +99,106 @@ class MutableAclProvider extends AclProvider implements MutableAclProviderInterf
      */
     function updateAcl(MutableAclInterface $acl)
     {
+        if (!$this->propertyChanges->contains($acl)) {
+            throw new \InvalidArgumentException('$acl is not tracked by this provider.');
+        }
 
+        $propertyChanges = $this->propertyChanges->offsetGet($acl);
+        // check if any changes were made to this ACL
+        if (0 === count($propertyChanges)) {
+            return;
+        }
+
+        $sets = $sharedPropertyChanges = array();
+
+            if (isset($propertyChanges['entriesInheriting'])) {
+                $sets[] = 'entriesInheriting = '. $propertyChanges['entriesInheriting'][1];
+            }
+
+            if (isset($propertyChanges['parentAcl'])) {
+                if (null === $propertyChanges['parentAcl'][1]) {
+                    $sets[] = 'parent_object_identity_id = NULL';
+                } else {
+                    $sets[] = 'parent_object_identity_id = '.intval($propertyChanges['parentAcl'][1]->getId()); // TODO: wrong!
+                }
+
+                $this->generateAncestorRelations($acl);
+            }
+
+            // this includes only updates of existing ACEs, but neither the creation, nor
+            // the deletion of ACEs; these are tracked by changes to the ACL's respective
+            // properties (classAces, classFieldAces, objectAces, objectFieldAces)
+            if (isset($propertyChanges['aces'])) {
+                $this->updateAces($propertyChanges['aces']);
+            }
+
+            // check properties for deleted, and created ACEs
+            if (isset($propertyChanges['classAces'])) {
+                $this->updateAceProperty('classAces', $propertyChanges['classAces']);
+                $sharedPropertyChanges['classAces'] = $propertyChanges['classAces'];
+            }
+            if (isset($propertyChanges['classFieldAces'])) {
+                $this->updateFieldAceProperty('classFieldAces', $propertyChanges['classFieldAces']);
+                $sharedPropertyChanges['classFieldAces'] = $propertyChanges['classFieldAces'];
+            }
+            if (isset($propertyChanges['objectAces'])) {
+                $this->updateAceProperty('objectAces', $propertyChanges['objectAces']);
+            }
+            if (isset($propertyChanges['objectFieldAces'])) {
+                $this->updateFieldAceProperty('objectFieldAces', $propertyChanges['objectFieldAces']);
+            }
+
+            // if there have been changes to shared properties, we need to synchronize other
+            // ACL instances for object identities of the same type that are already in-memory
+            if (count($sharedPropertyChanges) > 0) {
+                $classAcesProperty = new \ReflectionProperty('Symfony\Component\Security\Acl\Domain\Acl', 'classAces');
+                $classAcesProperty->setAccessible(true);
+                $classFieldAcesProperty = new \ReflectionProperty('Symfony\Component\Security\Acl\Domain\Acl', 'classFieldAces');
+                $classFieldAcesProperty->setAccessible(true);
+
+                foreach ($this->loadedAcls[$acl->getObjectIdentity()->getType()] as $sameTypeAcl) {
+                    if (isset($sharedPropertyChanges['classAces'])) {
+                        if ($acl !== $sameTypeAcl && $classAcesProperty->getValue($sameTypeAcl) !== $sharedPropertyChanges['classAces'][0]) {
+                            throw new ConcurrentModificationException('The "classAces" property has been modified concurrently.');
+                        }
+
+                        $classAcesProperty->setValue($sameTypeAcl, $sharedPropertyChanges['classAces'][1]);
+                    }
+
+                    if (isset($sharedPropertyChanges['classFieldAces'])) {
+                        if ($acl !== $sameTypeAcl && $classFieldAcesProperty->getValue($sameTypeAcl) !== $sharedPropertyChanges['classFieldAces'][0]) {
+                            throw new ConcurrentModificationException('The "classFieldAces" property has been modified concurrently.');
+                        }
+
+                        $classFieldAcesProperty->setValue($sameTypeAcl, $sharedPropertyChanges['classFieldAces'][1]);
+                    }
+                }
+            }
+
+            // persist any changes to the acl_object_identities table
+            if (count($sets) > 0) {
+                $this->connection->executeQuery($this->getUpdateObjectIdentitySql($acl->getId(), $sets));
+            }
+
+        $this->propertyChanges->offsetSet($acl, array());
+
+        if (null !== $this->aclCache) {
+            if (count($sharedPropertyChanges) > 0) {
+                // FIXME: Currently, there is no easy way to clear the cache for ACLs
+                //        of a certain type. The problem here is that we need to make
+                //        sure to clear the cache of all child ACLs as well, and these
+                //        child ACLs might be of a different class type.
+                $this->aclCache->clearCache();
+            } else {
+                // if there are no shared property changes, it's sufficient to just delete
+                // the cache for this ACL
+                $this->aclCache->evictFromCacheByIdentity($acl->getObjectIdentity());
+
+                foreach ($this->findChildren($acl->getObjectIdentity()) as $childOid) {
+                    $this->aclCache->evictFromCacheByIdentity($childOid);
+                }
+            }
+        }
     }
 
     /**
@@ -131,10 +230,83 @@ class MutableAclProvider extends AclProvider implements MutableAclProviderInterf
         return $result;
     }
 
-    function propertyChanged($sender, $propertyName, $oldValue, $newValue)
+    /**
+     * Implementation of PropertyChangedListener
+     *
+     * This allows us to keep track of which values have been changed, so we don't
+     * have to do a full introspection when ->updateAcl() is called.
+     *
+     * @param mixed $sender
+     * @param string $propertyName
+     * @param mixed $oldValue
+     * @param mixed $newValue
+     * @return void
+     */
+    public function propertyChanged($sender, $propertyName, $oldValue, $newValue)
     {
+        if (!$sender instanceof MutableAclInterface && !$sender instanceof EntryInterface) {
+            throw new \InvalidArgumentException('$sender must be an instance of MutableAclInterface, or EntryInterface.');
+        }
 
+        if ($sender instanceof EntryInterface) {
+            if (null === $sender->getId()) {
+                return;
+            }
+
+            $ace = $sender;
+            $sender = $ace->getAcl();
+        } else {
+            $ace = null;
+        }
+
+        if (false === $this->propertyChanges->contains($sender)) {
+            throw new \InvalidArgumentException('$sender is not being tracked by this provider.');
+        }
+
+        $propertyChanges = $this->propertyChanges->offsetGet($sender);
+        if (null === $ace) {
+            if (isset($propertyChanges[$propertyName])) {
+                $oldValue = $propertyChanges[$propertyName][0];
+                if ($oldValue === $newValue) {
+                    unset($propertyChanges[$propertyName]);
+                } else {
+                    $propertyChanges[$propertyName] = array($oldValue, $newValue);
+                }
+            } else {
+                $propertyChanges[$propertyName] = array($oldValue, $newValue);
+            }
+        } else {
+            if (!isset($propertyChanges['aces'])) {
+                $propertyChanges['aces'] = new \SplObjectStorage();
+            }
+
+            $acePropertyChanges = $propertyChanges['aces']->contains($ace)? $propertyChanges['aces']->offsetGet($ace) : array();
+
+            if (isset($acePropertyChanges[$propertyName])) {
+                $oldValue = $acePropertyChanges[$propertyName][0];
+                if ($oldValue === $newValue) {
+                    unset($acePropertyChanges[$propertyName]);
+                } else {
+                    $acePropertyChanges[$propertyName] = array($oldValue, $newValue);
+                }
+            } else {
+                $acePropertyChanges[$propertyName] = array($oldValue, $newValue);
+            }
+
+            if (count($acePropertyChanges) > 0) {
+                $propertyChanges['aces']->offsetSet($ace, $acePropertyChanges);
+            } else {
+                $propertyChanges['aces']->offsetUnset($ace);
+
+                if (0 === count($propertyChanges['aces'])) {
+                    unset($propertyChanges['aces']);
+                }
+            }
+        }
+
+        $this->propertyChanges->offsetSet($sender, $propertyChanges);
     }
+
 
 
     /**
@@ -179,5 +351,30 @@ class MutableAclProvider extends AclProvider implements MutableAclProviderInterf
             'objectIdentity' => array('$in' => $removableIds),
         );
         $this->connection->selectCollection($this->options['entry_table_name'])->remove($query);
+    }
+
+    /**
+     * This regenerates the ancestor table which is used for fast read access.
+     *
+     * @param AclInterface $acl
+     * @return void
+     */
+    protected function generateAncestorRelations(AclInterface $acl)
+    {
+        $parentId = $acl->getParentAcl()->getId();
+        $query = array(
+            '_id' => $parentId,
+        );
+        $parent load from db
+        $pk = $acl->getId();
+
+        //update
+
+        $parentAcl = $acl->getParentAcl();
+        while (null !== $parentAcl) {
+            $this->connection->executeQuery($this->getInsertObjectIdentityRelationSql($pk, $parentAcl->getId()));
+
+            $parentAcl = $parentAcl->getParentAcl();
+        }
     }
 }

@@ -140,13 +140,8 @@ class EventDispatcher implements EventDispatcherInterface
             return array();
         }
 
-        $listeners = array();
-        $all = $this->listeners[$name];
-        krsort($all);
-        foreach ($all as $l) {
-            $listeners = array_merge($listeners, $l);
-        }
+        krsort($this->listeners[$name]);
 
-        return $listeners;
+        return call_user_func_array('array_merge', $this->listeners[$name]);
     }
 }

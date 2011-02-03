@@ -133,7 +133,7 @@ class GraphWalker
         }
     }
 
-    protected function walkReference($value, $group, $propertyPath, $traverse)
+    public function walkReference($value, $group, $propertyPath, $traverse)
     {
         if (null !== $value) {
             if (!is_object($value) && !is_array($value)) {

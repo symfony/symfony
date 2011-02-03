@@ -330,6 +330,24 @@ class GraphWalkerTest extends \PHPUnit_Framework_TestCase
         $this->assertEquals($violations, $this->walker->getViolations());
     }
 
+    public function testWalkCascadedPropertyDoesNotValidateNestedScalarValues()
+    {
+        // validate array when validating the property "reference"
+        $this->metadata->addPropertyConstraint('reference', new Valid());
+
+        $this->walker->walkPropertyValue(
+            $this->metadata,
+            'reference',
+            array('scalar', 'values'),
+            'Default',
+            'path'
+        );
+
+        $violations = new ConstraintViolationList();
+
+        $this->assertEquals($violations, $this->walker->getViolations());
+    }
+
     public function testWalkCascadedPropertyDoesNotValidateNullValues()
     {
         $this->metadata->addPropertyConstraint('reference', new Valid());

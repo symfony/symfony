@@ -125,7 +125,13 @@ class UrlGenerator implements UrlGeneratorInterface
         $url = (isset($this->context['base_url']) ? $this->context['base_url'] : '').$url;
 
         if ($absolute && isset($this->context['host'])) {
-            $url = 'http'.(isset($this->context['is_secure']) && $this->context['is_secure'] ? 's' : '').'://'.$this->context['host'].$url;
+            $isSecure = (isset($this->context['is_secure']) && $this->context['is_secure']);
+            $port = isset($this->context['port']) ? $this->context['port'] : 80;
+            $urlBeginning = 'http'.($isSecure ? 's' : '').'://'.$this->context['host'];
+            if (($isSecure && $port != 443) || (!$isSecure && $port != 80)) {
+                $urlBeginning .= ':'.$port;
+            }
+            $url = $urlBeginning.$url;
         }
 
         return $url;

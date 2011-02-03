@@ -74,6 +74,7 @@ class RequestListener
                 'base_url'  => $request->getBaseUrl(),
                 'method'    => $request->getMethod(),
                 'host'      => $request->getHost(),
+                'port'      => $request->getPort(),
                 'is_secure' => $request->isSecure(),
             ));
         }

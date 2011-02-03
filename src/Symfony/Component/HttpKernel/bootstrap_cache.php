@@ -1092,6 +1092,11 @@ use Symfony\Component\HttpFoundation\File\UploadedFile;
 class FileBag extends ParameterBag
 {
     private $fileKeys = array('error', 'name', 'size', 'tmp_name', 'type');
+    public function __construct(array $parameters = array())
+    {
+                        parent::__construct();
+        $this->replace($parameters);
+    }
     public function replace(array $files = array())
     {
         $this->parameters = array();
@@ -1907,6 +1912,11 @@ namespace Symfony\Component\HttpFoundation
 class ResponseHeaderBag extends HeaderBag
 {
     protected $computedCacheControl = array();
+    public function __construct(array $parameters = array())
+    {
+                        parent::__construct();
+        $this->replace($parameters);
+    }
     public function replace(array $headers = array())
     {
         parent::replace($headers);

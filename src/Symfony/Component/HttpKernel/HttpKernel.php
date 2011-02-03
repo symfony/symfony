@@ -104,11 +104,13 @@ class HttpKernel implements HttpKernelInterface
         $arguments = $this->resolver->getArguments($request, $controller);
 
         // call controller
-        $retval = call_user_func_array($controller, $arguments);
+        $response = call_user_func_array($controller, $arguments);
 
         // view
-        $event = new Event($this, 'core.view', array('request_type' => $type, 'request' => $request));
-        $response = $this->dispatcher->filter($event, $retval);
+        if (!$response instanceof Response) {
+            $event = new Event($this, 'core.view', array('request_type' => $type, 'request' => $request));
+            $response = $this->dispatcher->filter($event, $response);
+        }
 
         return $this->filterResponse($response, $request, sprintf('The controller must return a response (%s given).', $this->varToString($response)), $type);
     }

@@ -63,7 +63,7 @@ class PropertyPath implements \IteratorAggregate
         $remaining = $propertyPath;
 
         // first element is evaluated differently - no leading dot for properties
-        $pattern = '/^((\w+)|\[(\w+)\])(.*)/';
+        $pattern = '/^((\w+)|\[([^\]]+)\])(.*)/';
 
         while (preg_match($pattern, $remaining, $matches)) {
             if ($matches[2] !== '') {
@@ -76,7 +76,7 @@ class PropertyPath implements \IteratorAggregate
 
             $position += strlen($matches[1]);
             $remaining = $matches[4];
-            $pattern = '/^(\.(\w+)|\[(\w+)\])(.*)/';
+            $pattern = '/^(\.(\w+)|\[([^\]]+)\])(.*)/';
         }
 
         if (!empty($remaining)) {

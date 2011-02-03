@@ -354,27 +354,31 @@ class MutableAclProvider extends AclProvider implements MutableAclProviderInterf
     }
 
     /**
-     * This regenerates the ancestor table which is used for fast read access.
+     * This updates the parent and ancestors in the identity
      *
      * @param AclInterface $acl
      * @return void
      */
     protected function generateAncestorRelations(AclInterface $acl)
     {
-        $parentId = $acl->getParentAcl()->getId();
         $query = array(
-            '_id' => $parentId,
+            '_id' => $acl->getId(),
         );
-        $parent load from db
-        $pk = $acl->getId();
+        $identity = $this->connection->selectCollection($this->options['oid_table_name'])->find($query);
+        $query = array(
+            '_id' => $acl->getParentAcl()->getId(),
+        );
+        $parent = $this->connection->selectCollection($this->options['oid_table_name'])->find($query);
+
+        $identity['parent'] = $parent;
+
+        if( isset($parent['ancestors'])) {
+          $ancestors = $parent['ancestors'];
+        }
+        $ancestors[] = $parent['_id'];
+        $identity['ancestors'] = $ancestors;
 
         //update
 
-        $parentAcl = $acl->getParentAcl();
-        while (null !== $parentAcl) {
-            $this->connection->executeQuery($this->getInsertObjectIdentityRelationSql($pk, $parentAcl->getId()));
-
-            $parentAcl = $parentAcl->getParentAcl();
-        }
     }
 }

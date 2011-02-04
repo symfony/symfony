@@ -246,11 +246,11 @@ class FormExtension extends \Twig_Extension
 
         // themes
         $parent = $field;
-        while ($parent = $parent->getParent()) {
+        do {
             if (isset($this->themes[$parent])) {
                 $all = array_merge($all, $this->themes[$parent]);
             }
-        }
+        } while ($parent = $parent->getParent());
 
         // local
         $all = array_merge($all, null !== $resources ? (array) $resources : array());

@@ -89,7 +89,7 @@ class TwigEngine implements EngineInterface
      */
     public function load($name)
     {
-        return $this->environment->loadTemplate($this->parser->parse($name));
+        return $this->environment->loadTemplate($this->parser->parse($name), is_array($name) ? json_encode($name) : $name);
     }
 
     /**

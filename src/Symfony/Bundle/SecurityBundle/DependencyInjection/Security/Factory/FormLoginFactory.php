@@ -59,14 +59,11 @@ class FormLoginFactory extends AbstractFactory
 
     protected function createEntryPoint($container, $id, $config, $defaultEntryPoint)
     {
-        // merge set options with default options
-        $options = $this->getOptionsFromConfig($config);
-
         $entryPointId = 'security.authentication.form_entry_point.'.$id;
         $container
             ->setDefinition($entryPointId, new DefinitionDecorator('security.authentication.form_entry_point'))
-            ->addArgument($options['login_path'])
-            ->addArgument($options['use_forward'])
+            ->addArgument($config['login_path'])
+            ->addArgument($config['use_forward'])
         ;
 
         return $entryPointId;

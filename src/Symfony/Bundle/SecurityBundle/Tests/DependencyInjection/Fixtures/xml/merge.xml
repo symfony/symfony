@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<container xmlns="http://www.symfony-project.org/schema/dic/services"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xmlns:sec="http://www.symfony-project.org/schema/dic/security"
+    xsi:schemaLocation="http://www.symfony-project.org/schema/dic/services http://www.symfony-project.org/schema/dic/services/services-1.0.xsd">
+    
+    <imports>
+        <import resource="merge_import.xml"/>
+    </imports>
+    
+    <sec:config>
+        <sec:firewall name="main" form-login="false">
+            <sec:http-basic />
+        </sec:firewall>
+        
+        <sec:role id="FOO" value="MOO" />
+    </sec:config>
+
+</container>

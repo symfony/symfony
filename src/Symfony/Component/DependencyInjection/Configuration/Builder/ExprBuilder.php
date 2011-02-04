@@ -2,6 +2,11 @@
 
 namespace Symfony\Component\DependencyInjection\Configuration\Builder;
 
+/**
+ * This class builds an if expression.
+ *
+ * @author Johannes M. Schmitt <schmittjoh@gmail.com>
+ */
 class ExprBuilder
 {
     public $parent;
@@ -13,8 +18,12 @@ class ExprBuilder
         $this->parent = $parent;
     }
 
-    public function ifTrue(\Closure $closure)
+    public function ifTrue(\Closure $closure = null)
     {
+        if (null === $closure) {
+            $closure = function($v) { return true === $v; };
+        }
+
         $this->ifPart = $closure;
 
         return $this;
@@ -44,6 +53,31 @@ class ExprBuilder
     public function then(\Closure $closure)
     {
         $this->thenPart = $closure;
+
+        return $this;
+    }
+
+    public function thenReplaceKeyWithAttribute($attribute)
+    {
+        $this->thenPart = function($v) {
+            $newValue = array();
+            foreach ($v as $k => $oldValue) {
+                if (is_array($oldValue) && isset($oldValue['id'])) {
+                    $k = $oldValue['id'];
+                }
+
+                $newValue[$k] = $oldValue;
+            }
+
+            return $newValue;
+        };
+
+        return $this;
+    }
+
+    public function thenEmptyArray()
+    {
+        $this->thenPart = function($v) { return array(); };
 
         return $this;
     }

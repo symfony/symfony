@@ -28,12 +28,8 @@
         <parameter key="security.authentication.listener.anonymous.class">Symfony\Component\Security\Http\Firewall\AnonymousAuthenticationListener</parameter>
         
         <parameter key="security.authentication.switchuser_listener.class">Symfony\Component\Security\Http\Firewall\SwitchUserListener</parameter>
-        <parameter key="security.authentication.switchuser.role">ROLE_ALLOWED_TO_SWITCH</parameter>
-        <parameter key="security.authentication.switchuser.parameter">_switch_user</parameter>
 
         <parameter key="security.logout_listener.class">Symfony\Component\Security\Http\Firewall\LogoutListener</parameter>
-        <parameter key="security.logout.path">/logout</parameter>
-        <parameter key="security.logout.target_path">/</parameter>
         <parameter key="security.logout.handler.session.class">Symfony\Component\Security\Http\Logout\SessionLogoutHandler</parameter>
         <parameter key="security.logout.handler.cookie_clearing.class">Symfony\Component\Security\Http\Logout\CookieClearingLogoutHandler</parameter>
 
@@ -83,14 +79,12 @@
         <service id="security.context_listener" class="%security.context_listener.class%" public="false">
             <argument type="service" id="security.context" />
             <argument type="collection"></argument>
-            <argument />
+            <argument /> <!-- Provider Key -->
             <argument type="service" id="logger" on-invalid="null" />
         </service>
 
         <service id="security.logout_listener" class="%security.logout_listener.class%" public="false" abstract="true">
             <argument type="service" id="security.context" />
-            <argument>%security.logout.path%</argument>
-            <argument>%security.logout.target_path%</argument>
         </service>
         <service id="security.logout.handler.session" class="%security.logout.handler.session.class%" public="false" />
         <service id="security.logout.handler.cookie_clearing" class="%security.logout.handler.cookie_clearing.class%" public="false" abstract="true" />
@@ -162,13 +156,11 @@
 
         <service id="security.authentication.switchuser_listener" class="%security.authentication.switchuser_listener.class%" public="false" abstract="true">
             <argument type="service" id="security.context" />
-            <argument type="service" id="security.user.provider.in_memory" />
+            <argument /> <!-- User Provider -->
             <argument type="service" id="security.account_checker" />
             <argument /> <!--  Provider Key -->
             <argument type="service" id="security.access.decision_manager" />
             <argument type="service" id="logger" on-invalid="null" />
-            <argument>%security.authentication.switchuser.parameter%</argument>
-            <argument>%security.authentication.switchuser.role%</argument>
         </service>
 
         <service id="security.access_listener" class="%security.access_listener.class%" public="false">

@@ -15,11 +15,11 @@ class NormalizerTest extends \PHPUnit_Framework_TestCase
         $tb = new TreeBuilder();
         $tree = $tb
             ->root('root_name', 'array')
-                ->normalize('encoder')
+                ->fixXmlConfig('encoder')
                 ->node('encoders', 'array')
-                    ->key('class')
+                    ->useAttributeAsKey('class')
                     ->prototype('array')
-                        ->before()->ifString()->then(function($v) { return array('algorithm' => $v); })->end()
+                        ->beforeNormalization()->ifString()->then(function($v) { return array('algorithm' => $v); })->end()
                         ->node('algorithm', 'scalar')->end()
                     ->end()
                 ->end()
@@ -87,7 +87,7 @@ class NormalizerTest extends \PHPUnit_Framework_TestCase
         $tree = $tb
             ->root('root', 'array')
                 ->node('logout', 'array')
-                    ->normalize('handler')
+                    ->fixXmlConfig('handler')
                     ->node('handlers', 'array')
                         ->prototype('scalar')->end()
                     ->end()

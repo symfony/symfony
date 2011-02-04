@@ -11,6 +11,8 @@
 
 namespace Symfony\Bundle\SecurityBundle\DependencyInjection\Security\Factory;
 
+use Symfony\Component\DependencyInjection\Configuration\Builder\NodeBuilder;
+
 use Symfony\Component\DependencyInjection\DefinitionDecorator;
 
 use Symfony\Component\DependencyInjection\ContainerBuilder;
@@ -49,5 +51,12 @@ class X509Factory implements SecurityFactoryInterface
     public function getKey()
     {
         return 'x509';
+    }
+
+    public function addConfiguration(NodeBuilder $builder)
+    {
+        $builder
+            ->scalarNode('provider')->end()
+        ;
     }
 }

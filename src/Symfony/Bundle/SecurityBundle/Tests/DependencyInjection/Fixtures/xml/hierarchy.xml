@@ -6,10 +6,8 @@
     xsi:schemaLocation="http://www.symfony-project.org/schema/dic/services http://www.symfony-project.org/schema/dic/services/services-1.0.xsd">
 
     <config>
-        <role-hierarchy>
-            <role id="ROLE_ADMIN">ROLE_USER</role>
-            <role id="ROLE_SUPER_ADMIN">ROLE_USER,ROLE_ADMIN,ROLE_ALLOWED_TO_SWITCH</role>
-            <role id="ROLE_REMOTE">ROLE_USER,ROLE_ADMIN</role>
-        </role-hierarchy>
+        <role id="ROLE_ADMIN">ROLE_USER</role>
+        <role id="ROLE_SUPER_ADMIN">ROLE_USER,ROLE_ADMIN,ROLE_ALLOWED_TO_SWITCH</role>
+        <role id="ROLE_REMOTE">ROLE_USER,ROLE_ADMIN</role>
     </config>
 </srv:container>

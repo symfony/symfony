@@ -28,7 +28,7 @@ class AbstractFactoryTest extends \PHPUnit_Framework_TestCase
         list($authProviderId,
              $listenerId,
              $entryPointId
-        ) = $factory->create($container, 'foo', array('use_forward' => true, 'failure_path' => '/foo', 'success_handler' => 'foo'), 'user_provider', 'entry_point');
+        ) = $factory->create($container, 'foo', array('use_forward' => true, 'failure_path' => '/foo', 'success_handler' => 'foo', 'remember_me' => true), 'user_provider', 'entry_point');
 
         // auth provider
         $this->assertEquals('auth_provider', $authProviderId);
@@ -41,15 +41,8 @@ class AbstractFactoryTest extends \PHPUnit_Framework_TestCase
         $this->assertEquals(array(
             'index_3' => 'foo',
             'index_4' => array(
-                'check_path'                     => '/login_check',
-                'login_path'                     => '/login',
                 'use_forward'                    => true,
-                'always_use_default_target_path' => false,
-                'default_target_path'            => '/',
-                'target_path_parameter'          => '_target_path',
-                'use_referer'                    => false,
                 'failure_path'                   => '/foo',
-                'failure_forward'                => false,
             ),
             'index_5' => new Reference('foo'),
         ), $definition->getArguments());

@@ -36,10 +36,10 @@ abstract class SecurityExtensionTest extends \PHPUnit_Framework_TestCase
 
         $expectedProviders = array(
             'security.authentication.provider.digest',
-            'security.authentication.provider.digest_0ff1b54f2a4b7f71b2b9d6604fcca4b8',
+            'security.authentication.provider.digest_23374fce51fe846516ff85bfa9add8fe',
             'security.authentication.provider.basic',
-            'security.authentication.provider.basic_b7f0cf21802ffc8b22cadbb255f07213',
-            'security.authentication.provider.basic_98e44377704554700e68c22094b51ca4',
+            'security.authentication.provider.basic_745e8583f784c83c4b4208fd281001f3',
+            'security.authentication.provider.basic_af4bcce7246fb064b8e219034043d88a',
             'security.authentication.provider.doctrine',
             'security.authentication.provider.service',
             'security.authentication.provider.anonymous',
@@ -107,6 +107,16 @@ abstract class SecurityExtensionTest extends \PHPUnit_Framework_TestCase
                 $this->assertNull($channel);
             }
         }
+    }
+
+    public function testMerge()
+    {
+        $container = $this->getContainer('merge');
+
+        $this->assertEquals(array(
+            'FOO' => array('MOO'),
+            'ADMIN' => array('USER'),
+        ), $container->getParameter('security.role_hierarchy.roles'));
     }
 
     protected function getContainer($file)

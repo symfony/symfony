@@ -1,0 +1,11 @@
+imports:
+    - { resource: merge_import.yml }
+            
+security.config:
+    firewalls:
+        main:
+            form_login: false
+            http_basic: ~
+            
+    role_hierarchy:
+        FOO: [MOO]

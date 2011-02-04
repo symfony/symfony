@@ -2,9 +2,18 @@
 
 namespace Symfony\Component\DependencyInjection\Configuration\Builder;
 
+use Symfony\Component\DependencyInjection\Configuration\BaseNode;
+
+use Symfony\Component\DependencyInjection\Configuration\BooleanNode;
+
 use Symfony\Component\DependencyInjection\Configuration\ArrayNode;
 use Symfony\Component\DependencyInjection\Configuration\ScalarNode;
 
+/**
+ * This is the entry class for building your own config tree.
+ *
+ * @author Johannes M. Schmitt <schmittjoh@gmail.com>
+ */
 class TreeBuilder
 {
     protected $root;
@@ -32,9 +41,6 @@ class TreeBuilder
 
     protected function createConfigNode(NodeBuilder $node)
     {
-        $node->beforeTransformations = $this->buildExpressions($node->beforeTransformations);
-        $node->afterTransformations = $this->buildExpressions($node->afterTransformations);
-
         $method = 'create'.$node->type.'ConfigNode';
         if (!method_exists($this, $method)) {
             throw new \RuntimeException(sprintf('Unknown node type: "%s"', $node->type));
@@ -43,14 +49,77 @@ class TreeBuilder
         return $this->$method($node);
     }
 
+    protected function createBooleanConfigNode(NodeBuilder $node)
+    {
+        $configNode = new BooleanNode($node->name, $node->parent);
+        $this->configureScalarNode($configNode, $node);
+
+        return $configNode;
+    }
+
     protected function createScalarConfigNode(NodeBuilder $node)
     {
-        return new ScalarNode($node->name, $node->parent, $node->beforeTransformations, $node->afterTransformations);
+        $configNode = new ScalarNode($node->name, $node->parent);
+        $this->configureScalarNode($configNode, $node);
+
+        return $configNode;
+    }
+
+    protected function configureScalarNode(ScalarNode $configNode, NodeBuilder $node)
+    {
+        if (null !== $node->normalization) {
+            $configNode->setNormalizationClosures(
+                $this->buildExpressions($node->normalization->before)
+            );
+        }
+
+        if (null !== $node->merge) {
+            $configNode->setAllowOverwrite($node->merge->allowOverwrite);
+        }
+
+        if (true === $node->default) {
+            $configNode->setDefaultValue($node->defaultValue);
+        }
+
+        if (false === $node->allowEmptyValue) {
+            $configNode->setAllowEmptyValue($node->allowEmptyValue);
+        }
+
+        $configNode->addEquivalentValue(null, $node->nullEquivalent);
+        $configNode->addEquivalentValue(true, $node->trueEquivalent);
+        $configNode->addEquivalentValue(false, $node->falseEquivalent);
     }
 
     protected function createArrayConfigNode(NodeBuilder $node)
     {
-        $configNode = new ArrayNode($node->name, $node->parent, $node->beforeTransformations, $node->afterTransformations, $node->normalizeTransformations, $node->key);
+        $configNode = new ArrayNode($node->name, $node->parent);
+        $configNode->setAddIfNotSet($node->addDefaults);
+        $configNode->setAllowNewKeys($node->allowNewKeys);
+        $configNode->addEquivalentValue(null, $node->nullEquivalent);
+        $configNode->addEquivalentValue(true, $node->trueEquivalent);
+        $configNode->addEquivalentValue(false, $node->falseEquivalent);
+        $configNode->setPerformDeepMerging($node->performDeepMerging);
+
+        if (null !== $node->key) {
+            $configNode->setKeyAttribute($node->key);
+        }
+
+        if (true === $node->atLeastOne) {
+            $configNode->setMinNumberOfElements(1);
+        }
+
+        if (null !== $node->normalization) {
+            $configNode->setNormalizationClosures(
+                $this->buildExpressions($node->normalization->before)
+            );
+
+            $configNode->setXmlRemappings($node->normalization->remappings);
+        }
+
+        if (null !== $node->merge) {
+            $configNode->setAllowOverwrite($node->merge->allowOverwrite);
+            $configNode->setAllowFalse($node->merge->allowFalse);
+        }
 
         foreach ($node->children as $child) {
             $child->parent = $configNode;

@@ -26,7 +26,7 @@ class ResolveParameterPlaceHoldersPass implements CompilerPassInterface
     {
         $this->parameterBag = $container->getParameterBag();
 
-        foreach ($container->getDefinitions() as $id => $definition) {
+        foreach ($container->getDefinitions() as $definition) {
             $definition->setClass($this->resolveValue($definition->getClass()));
             $definition->setFile($this->resolveValue($definition->getFile()));
             $definition->setArguments($this->resolveValue($definition->getArguments()));

@@ -70,7 +70,7 @@ class AnalyzeServiceReferencesPass implements RepeatablePassInterface
 
     protected function processArguments(array $arguments)
     {
-        foreach ($arguments as $k => $argument) {
+        foreach ($arguments as $argument) {
             if (is_array($argument)) {
                 $this->processArguments($argument);
             } else if ($argument instanceof Reference) {

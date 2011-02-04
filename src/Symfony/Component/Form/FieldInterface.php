@@ -11,7 +11,7 @@
 
 namespace Symfony\Component\Form;
 
-use Symfony\Component\I18N\TranslatorInterface;
+use Symfony\Component\Translation\TranslatorInterface;
 
 /**
  * A form field that can be embedded in a form.

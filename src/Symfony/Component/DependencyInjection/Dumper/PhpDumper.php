@@ -676,7 +676,7 @@ EOF;
             if (is_array($value)) {
                 $value = $this->exportParameters($value, $indent + 4);
             } elseif ($value instanceof Variable) {
-                throw new \InvalidArgumentException(sprintf('you cannot dump a container with parameters that contain variable references. Variable "%s" found.', $variable));
+                throw new \InvalidArgumentException(sprintf('you cannot dump a container with parameters that contain variable references. Variable "%s" found.', $value));
             } elseif ($value instanceof Definition) {
                 throw new \InvalidArgumentException(sprintf('You cannot dump a container with parameters that contain service definitions. Definition for "%s" found.', $value->getClass()));
             } elseif ($value instanceof Reference) {

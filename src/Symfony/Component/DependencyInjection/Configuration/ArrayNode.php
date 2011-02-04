@@ -3,6 +3,7 @@
 namespace Symfony\Component\DependencyInjection\Configuration;
 
 use Symfony\Component\DependencyInjection\Extension\Extension;
+use Symfony\Component\DependencyInjection\Configuration\Exception\InvalidTypeException;
 
 class ArrayNode extends BaseNode implements PrototypeNodeInterface
 {

@@ -785,7 +785,7 @@ QUERY;
             }
         }
 
-        foreach ($changes[0] as $field => $old) {
+        foreach ($changes[0] as $old) {
             for ($i=0,$c=count($old); $i<$c; $i++) {
                 $ace = $old[$i];
 

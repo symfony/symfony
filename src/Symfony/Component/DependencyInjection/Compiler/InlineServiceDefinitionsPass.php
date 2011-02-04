@@ -35,7 +35,7 @@ class InlineServiceDefinitionsPass implements RepeatablePassInterface
     {
         $this->graph = $container->getCompiler()->getServiceReferenceGraph();
 
-        foreach ($container->getDefinitions() as $id => $definition) {
+        foreach ($container->getDefinitions() as $definition) {
             $definition->setArguments(
                 $this->inlineArguments($container, $definition->getArguments())
             );

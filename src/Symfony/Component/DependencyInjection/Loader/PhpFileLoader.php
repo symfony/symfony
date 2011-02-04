@@ -30,9 +30,6 @@ class PhpFileLoader extends FileLoader
      */
     public function load($file)
     {
-        $container = $this->container;
-        $loader = $this;
-
         $path = $this->findFile($file);
         $this->currentDir = dirname($path);
         $this->container->addResource(new FileResource($path));

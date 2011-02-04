@@ -62,7 +62,7 @@ class CommandTester
             $this->output->setVerbosity($options['verbosity']);
         }
 
-        $ret = $this->command->run($this->input, $this->output);
+        $this->command->run($this->input, $this->output);
 
         rewind($this->output->getStream());
 

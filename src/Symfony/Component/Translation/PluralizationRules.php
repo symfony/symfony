@@ -207,7 +207,7 @@ class PluralizationRules
         }
 
         if (!is_callable($rule)) {
-            throw new Exception('The given rule can not be called');
+            throw new \LogicException('The given rule can not be called');
         }
 
         self::$rules[$locale] = $rule;

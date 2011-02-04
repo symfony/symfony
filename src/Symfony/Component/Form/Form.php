@@ -737,7 +737,6 @@ class Form extends Field implements \IteratorAggregate, FormInterface
     public function validate()
     {
         $validator = $this->getOption('validator');
-        $groups = $this->getOption('validation_groups');
 
         if (null === $validator) {
             throw new MissingOptionsException('The option "validator" is required for validating', array('validator'));

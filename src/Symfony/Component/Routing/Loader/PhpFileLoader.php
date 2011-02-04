@@ -30,8 +30,6 @@ class PhpFileLoader extends FileLoader
      */
     public function load($file, $type = null)
     {
-        $loader = $this;
-
         $path = $this->locator->locate($file);
 
         $collection = include $path;

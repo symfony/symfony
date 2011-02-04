@@ -27,7 +27,7 @@ class ReplaceAliasByActualDefinitionPass implements CompilerPassInterface
         foreach ($container->getAliases() as $id => $alias) {
             $aliasId = (string) $alias;
 
-            $definition = $container->getDefinition($aliasId = (string) $alias);
+            $definition = $container->getDefinition($aliasId);
 
             if ($definition->isPublic()) {
                 continue;

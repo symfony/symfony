@@ -4,7 +4,7 @@ namespace Symfony\Component\Security\Http;
 
 use Symfony\Component\HttpFoundation\RequestMatcherInterface;
 use Symfony\Component\HttpFoundation\Request;
-use Symfony\Component\HttpKernel\Security\Firewall\ExceptionListener;
+use Symfony\Component\Security\Http\Firewall\ExceptionListener;
 
 /*
  * This file is part of the Symfony framework.

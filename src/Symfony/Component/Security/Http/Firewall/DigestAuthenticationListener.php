@@ -21,7 +21,7 @@ use Symfony\Component\Security\Core\Authentication\Token\UsernamePasswordToken;
 use Symfony\Component\Security\Core\Exception\BadCredentialsException;
 use Symfony\Component\Security\Core\Exception\AuthenticationServiceException;
 use Symfony\Component\Security\Core\Exception\UsernameNotFoundException;
-use Symfony\Component\Security\Http\EntryPoint\NonceExpiredException;
+use Symfony\Component\HttpKernel\Security\EntryPoint\NonceExpiredException;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\Security\Core\Exception\AuthenticationException;
 
@@ -87,6 +87,7 @@ class DigestAuthenticationListener implements ListenerInterface
                 return;
             }
 
+            // FIXME
             if ($token instanceof UsernamePasswordToken && $token->isAuthenticated() && (string) $token === $username) {
                 return;
             }

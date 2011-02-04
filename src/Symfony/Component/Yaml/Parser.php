@@ -130,7 +130,7 @@ class Parser
                             }
                         } else {
                             // Associative array, merge
-                            $merged = array_merge($merge, $parsed);
+                            $merged = array_merge($merged, $parsed);
                         }
 
                         $isProcessed = $merged;

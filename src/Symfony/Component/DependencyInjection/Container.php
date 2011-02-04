@@ -245,7 +245,7 @@ class Container implements ContainerInterface
         $ids = array();
         $r = new \ReflectionClass($this);
         foreach ($r->getMethods() as $method) {
-            if (preg_match('/^get(.+)Service$/', $name = $method->getName(), $match)) {
+            if (preg_match('/^get(.+)Service$/', $method->getName(), $match)) {
                 $ids[] = self::underscore($match[1]);
             }
         }

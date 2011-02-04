@@ -1,8 +1,8 @@
 <?php
 
-namespace Symfony\Components\Validator\Mapping\Cache;
+namespace Symfony\Component\Validator\Mapping\Cache;
 
-use Symfony\Components\Validator\Mapping\ClassMetadata;
+use Symfony\Component\Validator\Mapping\ClassMetadata;
 
 class ApcCache implements CacheInterface
 {

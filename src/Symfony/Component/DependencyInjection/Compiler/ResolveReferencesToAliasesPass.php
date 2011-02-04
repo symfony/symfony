@@ -28,7 +28,7 @@ class ResolveReferencesToAliasesPass implements CompilerPassInterface
     {
         $this->container = $container;
 
-        foreach ($container->getDefinitions() as $id => $definition)
+        foreach ($container->getDefinitions() as $definition)
         {
             if ($definition->isSynthetic() || $definition->isAbstract()) {
                 continue;

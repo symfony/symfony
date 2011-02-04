@@ -75,7 +75,6 @@ class GetSetMethodNormalizer extends AbstractNormalizer
         if ($constructor) {
             $constructorParameters = $constructor->getParameters();
 
-            $attributeNames = array_keys($data);
             $params = array();
             foreach ($constructorParameters as $constructorParameter) {
                 $paramName = strtolower($constructorParameter->getName());

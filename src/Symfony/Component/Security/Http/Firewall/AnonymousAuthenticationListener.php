@@ -62,8 +62,6 @@ class AnonymousAuthenticationListener implements ListenerInterface
      */
     public function handle(EventInterface $event)
     {
-        $request = $event->get('request');
-
         if (null !== $this->context->getToken()) {
             return;
         }

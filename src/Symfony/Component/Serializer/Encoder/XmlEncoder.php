@@ -233,7 +233,7 @@ class XmlEncoder extends AbstractEncoder
      */
     protected function appendDocumentFragment($node, $fragment)
     {
-        if ($fragment instanceof DOMDocumentFragment) {
+        if ($fragment instanceof \DOMDocumentFragment) {
             $node->appendChild($fragment);
             return true;
         }

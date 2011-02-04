@@ -409,7 +409,7 @@ class PhpEngine implements EngineInterface, \ArrayAccess
                 function ($value) use ($that)
                 {
                     if ('UTF-8' != $that->getCharset()) {
-                        $string = $that->convertEncoding($string, 'UTF-8', $that->getCharset());
+                        $string = $that->convertEncoding($value, 'UTF-8', $that->getCharset());
                     }
 
                     $callback = function ($matches) use ($that)

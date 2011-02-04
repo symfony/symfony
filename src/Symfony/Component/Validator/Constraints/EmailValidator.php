@@ -63,6 +63,6 @@ class EmailValidator extends ConstraintValidator
             return checkdnsrr($host, 'MX');
         }
 
-        throw new ValidatorError('Could not retrieve DNS record information. Remove check_mx = true to prevent this warning');
+        throw new \LogicException('Could not retrieve DNS record information. Remove check_mx = true to prevent this warning');
     }
 }

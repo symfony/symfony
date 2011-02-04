@@ -618,19 +618,22 @@ class Application
         if ($namespace) {
             $commandsXML->setAttribute('namespace', $namespace);
         } else {
-            $xml->appendChild($namespacesXML = $dom->createElement('namespaces'));
+            $namespacesXML = $dom->createElement('namespaces');
+            $xml->appendChild($namespacesXML);
         }
 
         // add commands by namespace
         foreach ($this->sortCommands($commands) as $space => $commands) {
             if (!$namespace) {
-                $namespacesXML->appendChild($namespaceArrayXML = $dom->createElement('namespace'));
+                $namespaceArrayXML = $dom->createElement('namespace');
+                $namespacesXML->appendChild($namespaceArrayXML);
                 $namespaceArrayXML->setAttribute('id', $space);
             }
 
             foreach ($commands as $command) {
                 if (!$namespace) {
-                    $namespaceArrayXML->appendChild($commandXML = $dom->createElement('command'));
+                    $commandXML = $dom->createElement('command');
+                    $namespaceArrayXML->appendChild($commandXML);
                     $commandXML->appendChild($dom->createTextNode($command->getName()));
                 }
 
@@ -731,7 +734,7 @@ class Application
         }
         ksort($namespacedCommands);
 
-        foreach ($namespacedCommands as $name => &$commands) {
+        foreach ($namespacedCommands as &$commands) {
             ksort($commands);
         }
 

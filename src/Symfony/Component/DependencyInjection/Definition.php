@@ -238,7 +238,7 @@ class Definition
      */
     public function hasMethodCall($method)
     {
-        foreach ($this->calls as $i => $call) {
+        foreach ($this->calls as $call) {
             if ($call[0] === $method) {
                 return true;
             }

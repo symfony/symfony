@@ -158,8 +158,6 @@ class GraphvizDumper extends Dumper
 
     protected function startDot()
     {
-        $parameters = var_export($this->container->getParameterBag()->all(), true);
-
         return sprintf("digraph sc {\n  %s\n  node [%s];\n  edge [%s];\n\n",
             $this->addOptions($this->options['graph']),
             $this->addOptions($this->options['node']),

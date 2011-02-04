@@ -11,7 +11,7 @@
 
 namespace Symfony\Component\DomCrawler;
 
-use Symfony\Component\DomCrawler\FormField;
+use Symfony\Component\DomCrawler\Field\FormField;
 
 /**
  * Form represents an HTML form.

@@ -176,7 +176,7 @@ class DoctrineAclCache implements AclCacheInterface
 
         $aceClassFieldProperty = new \ReflectionProperty($acl, 'classFieldAces');
         $aceClassFieldProperty->setAccessible(true);
-        foreach ($aceClassFieldProperty->getValue($acl) as $field => $aces) {
+        foreach ($aceClassFieldProperty->getValue($acl) as $aces) {
             foreach ($aces as $ace) {
                 $aceAclProperty->setValue($ace, $acl);
             }
@@ -185,7 +185,7 @@ class DoctrineAclCache implements AclCacheInterface
 
         $aceObjectFieldProperty = new \ReflectionProperty($acl, 'objectFieldAces');
         $aceObjectFieldProperty->setAccessible(true);
-        foreach ($aceObjectFieldProperty->getValue($acl) as $field => $aces) {
+        foreach ($aceObjectFieldProperty->getValue($acl) as $aces) {
             foreach ($aces as $ace) {
                 $aceAclProperty->setValue($ace, $acl);
             }

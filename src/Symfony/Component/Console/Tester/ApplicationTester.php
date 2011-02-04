@@ -62,7 +62,7 @@ class ApplicationTester
             $this->output->setVerbosity($options['verbosity']);
         }
 
-        $ret = $this->application->run($this->input, $this->output);
+        $this->application->run($this->input, $this->output);
 
         rewind($this->output->getStream());
 

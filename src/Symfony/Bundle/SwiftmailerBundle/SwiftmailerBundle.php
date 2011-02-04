@@ -31,7 +31,7 @@ class SwiftmailerBundle extends Bundle
     /**
      * {@inheritdoc}
      */
-    protected function getPath()
+    public function getPath()
     {
         return __DIR__;
     }

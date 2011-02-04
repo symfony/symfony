@@ -27,21 +27,23 @@ abstract class Bundle extends ContainerAware implements BundleInterface
     protected $name;
 
     /**
-     * {@inheritDoc}
+     * Boots the Bundle.
      */
     public function boot()
     {
     }
 
     /**
-     * {@inheritDoc}
+     * Shutdowns the Bundle.
      */
     public function shutdown()
     {
     }
 
     /**
-     * {@inheritDoc}
+     * Returns the bundle parent name.
+     *
+     * @return string The Bundle parent name it overrides or null if no parent
      */
     public function getParent()
     {
@@ -49,7 +51,9 @@ abstract class Bundle extends ContainerAware implements BundleInterface
     }
 
     /**
-     * {@inheritDoc}
+     * Returns the bundle name (the class short name).
+     *
+     * @return string The Bundle name
      */
     final public function getName()
     {
@@ -64,7 +68,11 @@ abstract class Bundle extends ContainerAware implements BundleInterface
     }
 
     /**
-     * {@inheritDoc}
+     * Gets the Bundle directory path.
+     *
+     * The path should always be returned as a Unix path (with /).
+     *
+     * @return string The Bundle absolute path
      */
     final public function getNormalizedPath()
     {
@@ -125,11 +133,4 @@ abstract class Bundle extends ContainerAware implements BundleInterface
             }
         }
     }
-
-    /**
-     * Gets the Bundle directory path.
-     *
-     * @return string The Bundle absolute path
-     */
-    abstract protected function getPath();
 }

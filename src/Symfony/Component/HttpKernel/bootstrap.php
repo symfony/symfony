@@ -228,6 +228,7 @@ interface BundleInterface
     function getParent();
     function getName();
     function getNamespace();
+    function getPath();
     function getNormalizedPath();
 }
 }
@@ -291,7 +292,6 @@ abstract class Bundle extends ContainerAware implements BundleInterface
             }
         }
     }
-    abstract protected function getPath();
 }
 }
 namespace Symfony\Component\HttpKernel\Debug

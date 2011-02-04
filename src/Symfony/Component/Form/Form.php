@@ -855,28 +855,29 @@ class Form extends Field implements \IteratorAggregate, FormInterface
      */
     public function validateData(ExecutionContext $context)
     {
-        $groups = $this->getValidationGroups();
-        $propertyPath = $context->getPropertyPath();
-        $graphWalker = $context->getGraphWalker();
+        if (is_object($this->getData()) || is_array($this->getData())) {
+            $groups = $this->getValidationGroups();
+            $propertyPath = $context->getPropertyPath();
+            $graphWalker = $context->getGraphWalker();
 
-        if (null === $groups) {
-            $groups = array(null);
-        }
+            if (null === $groups) {
+                $groups = array(null);
+            }
 
-        // The Execute constraint is called on class level, so we need to
-        // set the property manually
-        $context->setCurrentProperty('data');
+            // The Execute constraint is called on class level, so we need to
+            // set the property manually
+            $context->setCurrentProperty('data');
 
-        // Adjust the property path accordingly
-        if (!empty($propertyPath)) {
-            $propertyPath .= '.';
-        }
+            // Adjust the property path accordingly
+            if (!empty($propertyPath)) {
+                $propertyPath .= '.';
+            }
 
-        $propertyPath .= 'data';
+            $propertyPath .= 'data';
 
-        foreach ($groups as $group) {
-            // Don't use potential overridden versions of getData()!
-            $graphWalker->walkReference(Form::getData(), $group, $propertyPath, true);
+            foreach ($groups as $group) {
+                $graphWalker->walkReference($this->getData(), $group, $propertyPath, true);
+            }
         }
     }
 

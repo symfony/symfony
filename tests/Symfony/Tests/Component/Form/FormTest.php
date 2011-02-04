@@ -1111,6 +1111,25 @@ class FormTest extends \PHPUnit_Framework_TestCase
         $form->validateData($context);
     }
 
+    public function testValidateDataDoesNotWalkScalars()
+    {
+        $graphWalker = $this->createMockGraphWalker();
+        $metadataFactory = $this->createMockMetadataFactory();
+        $context = new ExecutionContext('Root', $graphWalker, $metadataFactory);
+        $valueTransformer = $this->createMockTransformer();
+        $form = new Form('author', array('value_transformer' => $valueTransformer));
+
+        $graphWalker->expects($this->never())
+                ->method('walkReference');
+
+        $valueTransformer->expects($this->atLeastOnce())
+                ->method('reverseTransform')
+                ->will($this->returnValue('foobar'));
+
+        $form->submit(array('foo' => 'bar')); // reverse transformed to "foobar"
+        $form->validateData($context);
+    }
+
     /**
      * Create a group containing two fields, "visibleField" and "hiddenField"
      *

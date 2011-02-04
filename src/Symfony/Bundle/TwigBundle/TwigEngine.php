@@ -89,6 +89,10 @@ class TwigEngine implements EngineInterface
      */
     public function load($name)
     {
+        if ($name instanceof \Twig_Template) {
+            return $name;
+        }
+
         return $this->environment->loadTemplate($this->parser->parse($name), is_array($name) ? json_encode($name) : $name);
     }
 
@@ -101,6 +105,10 @@ class TwigEngine implements EngineInterface
      */
     public function supports($name)
     {
+        if ($name instanceof \Twig_Template) {
+            return true;
+        }
+
         $template = $this->parser->parse($name);
 
         return 'twig' === $template['engine'];

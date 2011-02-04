@@ -270,7 +270,11 @@ class FormExtension extends \Twig_Extension
         $templates = array();
         foreach ($resources as $resource)
         {
-            $blocks = $this->resolveTemplate($this->environment->loadTemplate($resource));
+            if (!$resource instanceof \Twig_Template) {
+                $resource = $this->environment->loadTemplate($resource);
+            }
+
+            $blocks = $this->resolveTemplate($resource);
 
             $templates = array_replace($templates, $blocks);
         }

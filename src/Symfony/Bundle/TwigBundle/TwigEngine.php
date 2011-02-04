@@ -79,24 +79,6 @@ class TwigEngine implements EngineInterface
     }
 
     /**
-     * Loads the given template.
-     *
-     * @param mixed $name A template name
-     *
-     * @return \Twig_TemplateInterface A \Twig_TemplateInterface instance
-     *
-     * @throws \Twig_Error_Loader if the template cannot be found
-     */
-    public function load($name)
-    {
-        if ($name instanceof \Twig_Template) {
-            return $name;
-        }
-
-        return $this->environment->loadTemplate($this->parser->parse($name), is_array($name) ? json_encode($name) : $name);
-    }
-
-    /**
      * Returns true if this class is able to render the given template.
      *
      * @param string $name A template name
@@ -132,5 +114,23 @@ class TwigEngine implements EngineInterface
         $response->setContent($this->render($view, $parameters));
 
         return $response;
+    }
+
+    /**
+     * Loads the given template.
+     *
+     * @param mixed $name A template name
+     *
+     * @return \Twig_TemplateInterface A \Twig_TemplateInterface instance
+     *
+     * @throws \Twig_Error_Loader if the template cannot be found
+     */
+    protected function load($name)
+    {
+        if ($name instanceof \Twig_Template) {
+            return $name;
+        }
+
+        return $this->environment->loadTemplate($this->parser->parse($name), is_array($name) ? json_encode($name) : $name);
     }
 }

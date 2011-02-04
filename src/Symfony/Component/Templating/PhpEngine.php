@@ -121,34 +121,6 @@ class PhpEngine implements EngineInterface, \ArrayAccess
     }
 
     /**
-     * Loads the given template.
-     *
-     * @param mixed $name A template name
-     *
-     * @return Storage A Storage instance
-     *
-     * @throws \InvalidArgumentException if the template cannot be found
-     */
-    public function load($name)
-    {
-        $template = $this->parser->parse($name);
-
-        $key = md5(serialize($template));
-        if (isset($this->cache[$key])) {
-            return $this->cache[$key];
-        }
-
-        // load
-        $template = $this->loader->load($template);
-
-        if (false === $template) {
-            throw new \InvalidArgumentException(sprintf('The template "%s" does not exist.', $name));
-        }
-
-        return $this->cache[$key] = $template;
-    }
-
-    /**
      * Returns true if this class is able to render the given template.
      *
      * @param mixed $name A template name
@@ -487,5 +459,33 @@ class PhpEngine implements EngineInterface, \ArrayAccess
     public function getLoader()
     {
         return $this->loader;
+    }
+
+    /**
+     * Loads the given template.
+     *
+     * @param mixed $name A template name
+     *
+     * @return Storage A Storage instance
+     *
+     * @throws \InvalidArgumentException if the template cannot be found
+     */
+    protected function load($name)
+    {
+        $template = $this->parser->parse($name);
+
+        $key = md5(serialize($template));
+        if (isset($this->cache[$key])) {
+            return $this->cache[$key];
+        }
+
+        // load
+        $template = $this->loader->load($template);
+
+        if (false === $template) {
+            throw new \InvalidArgumentException(sprintf('The template "%s" does not exist.', $name));
+        }
+
+        return $this->cache[$key] = $template;
     }
 }

@@ -51,17 +51,6 @@ interface EngineInterface
     function exists($name);
 
     /**
-     * Loads the given template.
-     *
-     * @param string $name A template name
-     *
-     * @return mixed A renderable template
-     *
-     * @throws \Exception if the template cannot be found
-     */
-    function load($name);
-
-    /**
      * Returns true if this class is able to render the given template.
      *
      * @param string $name A template name

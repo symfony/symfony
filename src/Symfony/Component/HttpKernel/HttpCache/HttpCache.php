@@ -29,6 +29,7 @@ class HttpCache implements HttpKernelInterface
     protected $kernel;
     protected $traces;
     protected $store;
+    protected $request;
     protected $esi;
 
     /**
@@ -117,6 +118,16 @@ class HttpCache implements HttpKernelInterface
     }
 
     /**
+     * Gets the Request instance associated with the master request.
+     *
+     * @return Symfony\Component\HttpFoundation\Request A Request instance
+     */
+    public function getRequest()
+    {
+        return $this->request;
+    }
+
+    /**
      * {@inheritdoc}
      */
     public function handle(Request $request, $type = HttpKernelInterface::MASTER_REQUEST, $catch = true)
@@ -124,6 +135,7 @@ class HttpCache implements HttpKernelInterface
         // FIXME: catch exceptions and implement a 500 error page here? -> in Varnish, there is a built-in error page mechanism
         if (HttpKernelInterface::MASTER_REQUEST === $type) {
             $this->traces = array();
+            $this->request = $request;
         }
 
         $path = $request->getPathInfo();

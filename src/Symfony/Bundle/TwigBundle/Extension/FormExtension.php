@@ -261,9 +261,8 @@ class FormExtension extends \Twig_Extension
                 $resource = $this->environment->loadTemplate($resource);
             }
 
-            // an array of blockName => template
             $blocks = array();
-            foreach ($resource->getBlockNames() as $name) {
+            foreach ($this->getBlockNames($resource) as $name) {
                 $blocks[$name] = $resource;
             }
 
@@ -271,6 +270,17 @@ class FormExtension extends \Twig_Extension
         }
 
         return $templates;
+    }
+
+    protected function getBlockNames($resource)
+    {
+        $names = $resource->getBlockNames();
+        $parent = $resource;
+        while (false !== $parent = $parent->getParent(array())) {
+            $names = array_merge($names, $parent->getBlockNames());
+        }
+
+        return array_unique($names);
     }
 
     /**

@@ -179,11 +179,12 @@ abstract class Client
      * @param array   $parameters    The Request parameters
      * @param array   $files         The files
      * @param array   $server        The server parameters (HTTP headers are referenced with a HTTP_ prefix as PHP does)
+     * @param string  $content       The raw body data
      * @param Boolean $changeHistory Whether to update the history or not (only used internally for back(), forward(), and reload())
      *
      * @return Crawler
      */
-    public function request($method, $uri, array $parameters = array(), array $files = array(), array $server = array(), $changeHistory = true)
+    public function request($method, $uri, array $parameters = array(), array $files = array(), array $server = array(), $content = null, $changeHistory = true)
     {
         $uri = $this->getAbsoluteUri($uri);
 
@@ -194,7 +195,7 @@ abstract class Client
         $server['HTTP_HOST'] = parse_url($uri, PHP_URL_HOST);
         $server['HTTPS'] = 'https' == parse_url($uri, PHP_URL_SCHEME);
 
-        $request = new Request($uri, $method, $parameters, $files, $this->cookieJar->getValues($uri), $server);
+        $request = new Request($uri, $method, $parameters, $files, $this->cookieJar->getValues($uri), $server, $content);
 
         $this->request = $this->filterRequest($request);
 
@@ -378,6 +379,6 @@ abstract class Client
      */
     protected function requestFromRequest(Request $request, $changeHistory = true)
     {
-        return $this->request($request->getMethod(), $request->getUri(), $request->getParameters(), array(), $request->getFiles(), $request->getServer(), $changeHistory);
+        return $this->request($request->getMethod(), $request->getUri(), $request->getParameters(), array(), $request->getFiles(), $request->getServer(), $request->getContent(), $changeHistory);
     }
 }

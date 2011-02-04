@@ -73,16 +73,17 @@ class Request
     /**
      * Constructor.
      *
-     * @param array $query      The GET parameters
-     * @param array $request    The POST parameters
-     * @param array $attributes The request attributes (parameters parsed from the PATH_INFO, ...)
-     * @param array $cookies    The COOKIE parameters
-     * @param array $files      The FILES parameters
-     * @param array $server     The SERVER parameters
+     * @param array  $query      The GET parameters
+     * @param array  $request    The POST parameters
+     * @param array  $attributes The request attributes (parameters parsed from the PATH_INFO, ...)
+     * @param array  $cookies    The COOKIE parameters
+     * @param array  $files      The FILES parameters
+     * @param array  $server     The SERVER parameters
+     * @param string $content    The raw body data
      */
-    public function __construct(array $query = array(), array $request = array(), array $attributes = array(), array $cookies = array(), array $files = array(), array $server = array())
+    public function __construct(array $query = array(), array $request = array(), array $attributes = array(), array $cookies = array(), array $files = array(), array $server = array(), $content = null)
     {
-        $this->initialize($query, $request, $attributes, $cookies, $files, $server);
+        $this->initialize($query, $request, $attributes, $cookies, $files, $server, $content);
     }
 
     /**
@@ -90,14 +91,15 @@ class Request
      *
      * This method also re-initializes all properties.
      *
-     * @param array $query      The GET parameters
-     * @param array $request    The POST parameters
-     * @param array $attributes The request attributes (parameters parsed from the PATH_INFO, ...)
-     * @param array $cookies    The COOKIE parameters
-     * @param array $files      The FILES parameters
-     * @param array $server     The SERVER parameters
+     * @param array  $query      The GET parameters
+     * @param array  $request    The POST parameters
+     * @param array  $attributes The request attributes (parameters parsed from the PATH_INFO, ...)
+     * @param array  $cookies    The COOKIE parameters
+     * @param array  $files      The FILES parameters
+     * @param array  $server     The SERVER parameters
+     * @param string $content    The raw body data
      */
-    public function initialize(array $query = array(), array $request = array(), array $attributes = array(), array $cookies = array(), array $files = array(), array $server = array())
+    public function initialize(array $query = array(), array $request = array(), array $attributes = array(), array $cookies = array(), array $files = array(), array $server = array(), $content = null)
     {
         $this->request = new ParameterBag($request);
         $this->query = new ParameterBag($query);
@@ -107,7 +109,7 @@ class Request
         $this->server = new ServerBag($server);
         $this->headers = new HeaderBag($this->server->getHeaders());
 
-        $this->content = null;
+        $this->content = $content;
         $this->languages = null;
         $this->charsets = null;
         $this->acceptableContentTypes = null;
@@ -138,10 +140,11 @@ class Request
      * @param array  $cookies    The request cookies ($_COOKIE)
      * @param array  $files      The request files ($_FILES)
      * @param array  $server     The server parameters ($_SERVER)
+     * @param string $content    The raw body data
      *
      * @return Request A Request instance
      */
-    static public function create($uri, $method = 'GET', $parameters = array(), $cookies = array(), $files = array(), $server = array())
+    static public function create($uri, $method = 'GET', $parameters = array(), $cookies = array(), $files = array(), $server = array(), $content = null)
     {
         $defaults = array(
             'SERVER_NAME'          => 'localhost',
@@ -204,7 +207,7 @@ class Request
             'QUERY_STRING'         => $queryString,
         ));
 
-        return new static($query, $request, array(), $cookies, $files, $server);
+        return new static($query, $request, array(), $cookies, $files, $server, $content);
     }
 
     /**

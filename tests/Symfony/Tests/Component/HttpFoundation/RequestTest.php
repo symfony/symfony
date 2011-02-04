@@ -72,6 +72,10 @@ class RequestTest extends \PHPUnit_Framework_TestCase
         $this->assertEquals('/foo', $request->getPathInfo());
         $this->assertEquals('test.com', $request->getHost());
         $this->assertEquals(90, $request->getPort());
+
+        $json = '{"jsonrpc":"2.0","method":"echo","id":7,"params":["Hello World"]}';
+        $request = Request::create('http://example.com/jsonrpc', 'POST', array(), array(), array(), array(), $json);
+        $this->assertEquals($json, $request->getContent());
     }
 
     /**

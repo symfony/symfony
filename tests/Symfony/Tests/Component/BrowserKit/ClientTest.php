@@ -103,6 +103,18 @@ class ClientTest extends \PHPUnit_Framework_TestCase
     }
 
     /**
+     * @covers Symfony\Component\BrowserKit\Client::getContent
+     */
+    public function testGetContent()
+    {
+        $json = '{"jsonrpc":"2.0","method":"echo","id":7,"params":["Hello World"]}';
+
+        $client = new TestClient();
+        $client->request('POST', 'http://example.com/jsonrpc', array(), array(), array(), $json);
+        $this->assertEquals($json, $client->getRequest()->getContent());
+    }
+
+    /**
      * @covers Symfony\Component\BrowserKit\Client::getCrawler
      */
     public function testGetCrawler()

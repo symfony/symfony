@@ -1372,11 +1372,11 @@ class Request
     protected $format;
     protected $session;
     static protected $formats;
-    public function __construct(array $query = array(), array $request = array(), array $attributes = array(), array $cookies = array(), array $files = array(), array $server = array())
+    public function __construct(array $query = array(), array $request = array(), array $attributes = array(), array $cookies = array(), array $files = array(), array $server = array(), $content = null)
     {
-        $this->initialize($query, $request, $attributes, $cookies, $files, $server);
+        $this->initialize($query, $request, $attributes, $cookies, $files, $server, $content);
     }
-    public function initialize(array $query = array(), array $request = array(), array $attributes = array(), array $cookies = array(), array $files = array(), array $server = array())
+    public function initialize(array $query = array(), array $request = array(), array $attributes = array(), array $cookies = array(), array $files = array(), array $server = array(), $content = null)
     {
         $this->request = new ParameterBag($request);
         $this->query = new ParameterBag($query);
@@ -1385,7 +1385,7 @@ class Request
         $this->files = new FileBag($files);
         $this->server = new ServerBag($server);
         $this->headers = new HeaderBag($this->server->getHeaders());
-        $this->content = null;
+        $this->content = $content;
         $this->languages = null;
         $this->charsets = null;
         $this->acceptableContentTypes = null;
@@ -1400,7 +1400,7 @@ class Request
     {
         return new static($_GET, $_POST, array(), $_COOKIE, $_FILES, $_SERVER);
     }
-    static public function create($uri, $method = 'GET', $parameters = array(), $cookies = array(), $files = array(), $server = array())
+    static public function create($uri, $method = 'GET', $parameters = array(), $cookies = array(), $files = array(), $server = array(), $content = null)
     {
         $defaults = array(
             'SERVER_NAME'          => 'localhost',
@@ -1454,7 +1454,7 @@ class Request
             'REQUEST_URI'          => $uri,
             'QUERY_STRING'         => $queryString,
         ));
-        return new static($query, $request, array(), $cookies, $files, $server);
+        return new static($query, $request, array(), $cookies, $files, $server, $content);
     }
     public function duplicate(array $query = null, array $request = null, array $attributes = null, array $cookies = null, array $files = null, array $server = null)
     {

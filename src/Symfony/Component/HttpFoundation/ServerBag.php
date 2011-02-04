@@ -24,7 +24,7 @@ class ServerBag extends ParameterBag
         $headers = array();
         foreach ($this->parameters as $key => $value) {
             if ('HTTP_' === substr($key, 0, 5)) {
-                $headers[strtolower(substr($key, 5))] = $value;
+                $headers[substr($key, 5)] = $value;
             }
         }
 

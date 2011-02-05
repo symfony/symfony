@@ -148,7 +148,7 @@ class FrameworkExtension extends Extension
             ),
             'ide' => null,
             'profiler' => array(
-                'enabled'         => true,
+                'enabled'         => false,
                 'only_exceptions' => null,
                 'matcher' => array(
                     'ip'      => null,
@@ -202,6 +202,10 @@ class FrameworkExtension extends Extension
 
         foreach ($configs as $config) {
             $config = $this->normalizeKeys($config);
+
+            if (isset($config['profiler'])) {
+                $config['profiler']['enabled'] = true;
+            }
 
             if (isset($config['templating']) && is_array($config['templating'])) {
                 $config['templating']['engines'] = $this->normalizeConfig($config['templating'], 'engine');
@@ -334,28 +338,30 @@ class FrameworkExtension extends Extension
      */
     protected function registerProfilerConfiguration(array $config, ContainerBuilder $container, XmlFileLoader $loader)
     {
-        if ($config['enabled']) {
-            $loader->load('profiling.xml');
-            $loader->load('collectors.xml');
+        if (!$config['enabled']) {
+            return;
+        }
 
-            if (isset($config['only_exceptions'])) {
-                $container->setParameter('profiler_listener.only_exceptions', $config['only_exceptions']);
-            }
+        $loader->load('profiling.xml');
+        $loader->load('collectors.xml');
 
-            if ($config['matcher']) {
-                if (isset($config['matcher']['service'])) {
-                    $container->setAlias('profiler.request_matcher', $config['matcher']['service']);
-                } elseif (isset($config['matcher']['ip']) || isset($config['matcher']['path'])) {
-                    $definition = $container->register('profiler.request_matcher', 'Symfony\\Component\\HttpFoundation\\RequestMatcher');
-                    $definition->setPublic(false);
+        if (isset($config['only_exceptions'])) {
+            $container->setParameter('profiler_listener.only_exceptions', $config['only_exceptions']);
+        }
 
-                    if (isset($config['matcher']['ip'])) {
-                        $definition->addMethodCall('matchIp', array($config['matcher']['ip']));
-                    }
+        if ($config['matcher']) {
+            if (isset($config['matcher']['service'])) {
+                $container->setAlias('profiler.request_matcher', $config['matcher']['service']);
+            } elseif (isset($config['matcher']['ip']) || isset($config['matcher']['path'])) {
+                $definition = $container->register('profiler.request_matcher', 'Symfony\\Component\\HttpFoundation\\RequestMatcher');
+                $definition->setPublic(false);
 
-                    if (isset($config['matcher']['path'])) {
-                        $definition->addMethodCall('matchPath', array($config['matcher']['path']));
-                    }
+                if (isset($config['matcher']['ip'])) {
+                    $definition->addMethodCall('matchIp', array($config['matcher']['ip']));
+                }
+
+                if (isset($config['matcher']['path'])) {
+                    $definition->addMethodCall('matchPath', array($config['matcher']['path']));
                 }
             }
         }

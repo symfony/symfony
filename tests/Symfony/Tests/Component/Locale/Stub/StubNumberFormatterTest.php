@@ -9,12 +9,12 @@
  * file that was distributed with this source code.
  */
 
-namespace Symfony\Tests\Component\Locale;
+namespace Symfony\Tests\Component\Locale\Stub;
 
 use Symfony\Component\Locale\Locale;
-use Symfony\Component\Locale\SimpleNumberFormatter;
+use Symfony\Component\Locale\Stub\StubNumberFormatter;
 
-class SimpleNumberFormatterTest extends \PHPUnit_Framework_TestCase
+class StubNumberFormatterTest extends \PHPUnit_Framework_TestCase
 {
     private static $int64Upper = 9223372036854775807;
 
@@ -30,7 +30,7 @@ class SimpleNumberFormatterTest extends \PHPUnit_Framework_TestCase
      */
     public function testConstructorWithUnsupportedLocale()
     {
-        $formatter = new SimpleNumberFormatter('pt_BR');
+        $formatter = new StubNumberFormatter('pt_BR');
     }
 
     /**
@@ -38,7 +38,7 @@ class SimpleNumberFormatterTest extends \PHPUnit_Framework_TestCase
      */
     public function testConstructorWithUnsupportedStyle()
     {
-        $formatter = new SimpleNumberFormatter('en', SimpleNumberFormatter::PATTERN_DECIMAL);
+        $formatter = new StubNumberFormatter('en', StubNumberFormatter::PATTERN_DECIMAL);
     }
 
     /**
@@ -46,7 +46,7 @@ class SimpleNumberFormatterTest extends \PHPUnit_Framework_TestCase
      */
     public function testConstructorWithPatternDifferentThanNull()
     {
-        $formatter = new SimpleNumberFormatter('en', SimpleNumberFormatter::DECIMAL, '');
+        $formatter = new StubNumberFormatter('en', StubNumberFormatter::DECIMAL, '');
     }
 
     /**
@@ -54,43 +54,43 @@ class SimpleNumberFormatterTest extends \PHPUnit_Framework_TestCase
      */
     public function testSetAttributeWithUnsupportedAttribute()
     {
-        $formatter = new SimpleNumberFormatter('en', SimpleNumberFormatter::DECIMAL);
-        $formatter->setAttribute(SimpleNumberFormatter::LENIENT_PARSE, null);
+        $formatter = new StubNumberFormatter('en', StubNumberFormatter::DECIMAL);
+        $formatter->setAttribute(StubNumberFormatter::LENIENT_PARSE, null);
     }
 
     /**
-     * @covers Symfony\Component\Locale\SimpleNumberFormatter::getAttribute
+     * @covers Symfony\Component\Locale\StubNumberFormatter::getAttribute
      */
     public function testSetAttributeInvalidRoundingMode()
     {
-        $formatter = new SimpleNumberFormatter('en', SimpleNumberFormatter::DECIMAL);
+        $formatter = new StubNumberFormatter('en', StubNumberFormatter::DECIMAL);
 
-        $ret = $formatter->setAttribute(SimpleNumberFormatter::ROUNDING_MODE, null);
-        $roundingMode = $formatter->getAttribute(SimpleNumberFormatter::ROUNDING_MODE);
+        $ret = $formatter->setAttribute(StubNumberFormatter::ROUNDING_MODE, null);
+        $roundingMode = $formatter->getAttribute(StubNumberFormatter::ROUNDING_MODE);
 
         $this->assertFalse($ret);
-        $this->assertEquals(SimpleNumberFormatter::ROUND_HALFEVEN, $roundingMode);
+        $this->assertEquals(StubNumberFormatter::ROUND_HALFEVEN, $roundingMode);
     }
 
     public function testSetAttributeInvalidGroupingUsedValue()
     {
-        $formatter = new SimpleNumberFormatter('en', SimpleNumberFormatter::DECIMAL);
+        $formatter = new StubNumberFormatter('en', StubNumberFormatter::DECIMAL);
 
-        $ret = $formatter->setAttribute(SimpleNumberFormatter::GROUPING_USED, null);
-        $groupingUsed = $formatter->getAttribute(SimpleNumberFormatter::GROUPING_USED);
+        $ret = $formatter->setAttribute(StubNumberFormatter::GROUPING_USED, null);
+        $groupingUsed = $formatter->getAttribute(StubNumberFormatter::GROUPING_USED);
 
         $this->assertFalse($ret);
-        $this->assertEquals(SimpleNumberFormatter::GROUPING_USED, $groupingUsed);
+        $this->assertEquals(StubNumberFormatter::GROUPING_USED, $groupingUsed);
     }
 
     /**
      * @dataProvider formatCurrencyProvider
-     * @see  SimpleNumberFormatter::formatCurrency()
+     * @see  StubNumberFormatter::formatCurrency()
      * @todo Test with ROUND_CEILING and ROUND_FLOOR modes
      */
     public function testFormatCurrency($value, $currency, $expected)
     {
-        $formatter = new SimpleNumberFormatter('en', SimpleNumberFormatter::DECIMAL);
+        $formatter = new StubNumberFormatter('en', StubNumberFormatter::DECIMAL);
         $this->assertEquals($expected, $formatter->formatCurrency($value, $currency));
 
         if (extension_loaded('intl')) {
@@ -124,32 +124,32 @@ class SimpleNumberFormatterTest extends \PHPUnit_Framework_TestCase
 
     public function testFormat()
     {
-        $formatter = new SimpleNumberFormatter('en', SimpleNumberFormatter::DECIMAL);
+        $formatter = new StubNumberFormatter('en', StubNumberFormatter::DECIMAL);
 
         // Use the defined fraction digits
-        $formatter->setAttribute(SimpleNumberFormatter::FRACTION_DIGITS, 2);
+        $formatter->setAttribute(StubNumberFormatter::FRACTION_DIGITS, 2);
         $this->assertSame('9.56', $formatter->format(9.555));
         $this->assertSame('1,000,000.12', $formatter->format(1000000.123));
 
-        $formatter->setAttribute(SimpleNumberFormatter::FRACTION_DIGITS, -1);
+        $formatter->setAttribute(StubNumberFormatter::FRACTION_DIGITS, -1);
         $this->assertSame('10', $formatter->format(9.5));
 
         // Don't use number grouping
-        $formatter->setAttribute(SimpleNumberFormatter::FRACTION_DIGITS, 2);
-        $formatter->setAttribute(SimpleNumberFormatter::GROUPING_USED, 0);
+        $formatter->setAttribute(StubNumberFormatter::FRACTION_DIGITS, 2);
+        $formatter->setAttribute(StubNumberFormatter::GROUPING_USED, 0);
         $this->assertSame('1000000.12', $formatter->format(1000000.123));
     }
 
     public function testGetErrorCode()
     {
-        $formatter = new SimpleNumberFormatter('en', SimpleNumberFormatter::DECIMAL);
-        $this->assertEquals(SimpleNumberFormatter::U_ZERO_ERROR, $formatter->getErrorCode());
+        $formatter = new StubNumberFormatter('en', StubNumberFormatter::DECIMAL);
+        $this->assertEquals(StubNumberFormatter::U_ZERO_ERROR, $formatter->getErrorCode());
     }
 
     public function testGetErrorMessage()
     {
-        $formatter = new SimpleNumberFormatter('en', SimpleNumberFormatter::DECIMAL);
-        $this->assertEquals(SimpleNumberFormatter::U_ZERO_ERROR_MESSAGE, $formatter->getErrorMessage());
+        $formatter = new StubNumberFormatter('en', StubNumberFormatter::DECIMAL);
+        $this->assertEquals(StubNumberFormatter::U_ZERO_ERROR_MESSAGE, $formatter->getErrorMessage());
     }
 
     /**
@@ -157,7 +157,7 @@ class SimpleNumberFormatterTest extends \PHPUnit_Framework_TestCase
      */
     public function testGetLocale()
     {
-        $formatter = new SimpleNumberFormatter('en', SimpleNumberFormatter::DECIMAL);
+        $formatter = new StubNumberFormatter('en', StubNumberFormatter::DECIMAL);
         $formatter->getLocale();
     }
 
@@ -166,7 +166,7 @@ class SimpleNumberFormatterTest extends \PHPUnit_Framework_TestCase
      */
     public function testGetPattern()
     {
-        $formatter = new SimpleNumberFormatter('en', SimpleNumberFormatter::DECIMAL);
+        $formatter = new StubNumberFormatter('en', StubNumberFormatter::DECIMAL);
         $formatter->getPattern();
     }
 
@@ -175,7 +175,7 @@ class SimpleNumberFormatterTest extends \PHPUnit_Framework_TestCase
      */
     public function testGetSymbol()
     {
-        $formatter = new SimpleNumberFormatter('en', SimpleNumberFormatter::DECIMAL);
+        $formatter = new StubNumberFormatter('en', StubNumberFormatter::DECIMAL);
         $formatter->getSymbol(null);
     }
 
@@ -184,7 +184,7 @@ class SimpleNumberFormatterTest extends \PHPUnit_Framework_TestCase
      */
     public function testGetTextAttribute()
     {
-        $formatter = new SimpleNumberFormatter('en', SimpleNumberFormatter::DECIMAL);
+        $formatter = new StubNumberFormatter('en', StubNumberFormatter::DECIMAL);
         $formatter->getTextAttribute(null);
     }
 
@@ -193,14 +193,14 @@ class SimpleNumberFormatterTest extends \PHPUnit_Framework_TestCase
      */
     public function testParseCurrency()
     {
-        $formatter = new SimpleNumberFormatter('en', SimpleNumberFormatter::DECIMAL);
+        $formatter = new StubNumberFormatter('en', StubNumberFormatter::DECIMAL);
         $formatter->parseCurrency(null, $currency);
     }
 
     public function testParseValueWithStringInTheBeginning()
     {
-        $formatter = new SimpleNumberFormatter('en', SimpleNumberFormatter::DECIMAL);
-        $value = $formatter->parse('R$1,234,567.89', SimpleNumberFormatter::TYPE_DOUBLE);
+        $formatter = new StubNumberFormatter('en', StubNumberFormatter::DECIMAL);
+        $value = $formatter->parse('R$1,234,567.89', StubNumberFormatter::TYPE_DOUBLE);
         $this->assertFalse($value);
 
         $formatter = new \NumberFormatter('en', \NumberFormatter::DECIMAL);
@@ -210,8 +210,8 @@ class SimpleNumberFormatterTest extends \PHPUnit_Framework_TestCase
 
     public function testParseValueWithStringAtTheEnd()
     {
-        $formatter = new SimpleNumberFormatter('en', SimpleNumberFormatter::DECIMAL);
-        $value = $formatter->parse('1,234,567.89', SimpleNumberFormatter::TYPE_DOUBLE);
+        $formatter = new StubNumberFormatter('en', StubNumberFormatter::DECIMAL);
+        $value = $formatter->parse('1,234,567.89', StubNumberFormatter::TYPE_DOUBLE);
         $this->assertEquals(1234567.89, $value);
 
         $formatter = new \NumberFormatter('en', \NumberFormatter::DECIMAL);
@@ -221,23 +221,23 @@ class SimpleNumberFormatterTest extends \PHPUnit_Framework_TestCase
 
     public function testParse()
     {
-        $formatter = new SimpleNumberFormatter('en', SimpleNumberFormatter::DECIMAL);
+        $formatter = new StubNumberFormatter('en', StubNumberFormatter::DECIMAL);
 
-        $value = $formatter->parse('9,223,372,036,854,775,808', SimpleNumberFormatter::TYPE_DOUBLE);
+        $value = $formatter->parse('9,223,372,036,854,775,808', StubNumberFormatter::TYPE_DOUBLE);
         $this->assertSame(9223372036854775808, $value);
 
         // int 32
-        $value = $formatter->parse('2,147,483,648', SimpleNumberFormatter::TYPE_INT32);
+        $value = $formatter->parse('2,147,483,648', StubNumberFormatter::TYPE_INT32);
         $this->assertSame(2147483647, $value);
 
-        $value = $formatter->parse('-2,147,483,649', SimpleNumberFormatter::TYPE_INT32);
+        $value = $formatter->parse('-2,147,483,649', StubNumberFormatter::TYPE_INT32);
         $this->assertSame(-2147483648, $value);
 
         // int 64
-        $value = $formatter->parse('9,223,372,036,854,775,808', SimpleNumberFormatter::TYPE_INT64);
+        $value = $formatter->parse('9,223,372,036,854,775,808', StubNumberFormatter::TYPE_INT64);
         $this->assertSame(9223372036854775807, $value);
 
-        $value = $formatter->parse('-9,223,372,036,854,775,809', SimpleNumberFormatter::TYPE_INT64);
+        $value = $formatter->parse('-9,223,372,036,854,775,809', StubNumberFormatter::TYPE_INT64);
         $this->assertSame((int) self::$int64Lower, $value);
     }
 
@@ -246,8 +246,8 @@ class SimpleNumberFormatterTest extends \PHPUnit_Framework_TestCase
      */
     public function testParseDetectType($parseValue, $expectedType, $expectedValue)
     {
-        $formatter = new SimpleNumberFormatter('en', SimpleNumberFormatter::DECIMAL);
-        $value = $formatter->parse($parseValue, SimpleNumberFormatter::TYPE_DEFAULT);
+        $formatter = new StubNumberFormatter('en', StubNumberFormatter::DECIMAL);
+        $value = $formatter->parse($parseValue, StubNumberFormatter::TYPE_DEFAULT);
         $this->assertInternalType($expectedType, $value);
         $this->assertSame($expectedValue, $value);
     }
@@ -278,8 +278,8 @@ class SimpleNumberFormatterTest extends \PHPUnit_Framework_TestCase
     public function testParseWithPositionValue()
     {
         $position = 1;
-        $formatter = new SimpleNumberFormatter('en', SimpleNumberFormatter::DECIMAL);
-        $formatter->parse('123', SimpleNumberFormatter::TYPE_DEFAULT, $position);
+        $formatter = new StubNumberFormatter('en', StubNumberFormatter::DECIMAL);
+        $formatter->parse('123', StubNumberFormatter::TYPE_DEFAULT, $position);
     }
 
     /**
@@ -287,7 +287,7 @@ class SimpleNumberFormatterTest extends \PHPUnit_Framework_TestCase
      */
     public function testSetPattern()
     {
-        $formatter = new SimpleNumberFormatter('en', SimpleNumberFormatter::DECIMAL);
+        $formatter = new StubNumberFormatter('en', StubNumberFormatter::DECIMAL);
         $formatter->setPattern(null);
     }
 
@@ -296,7 +296,7 @@ class SimpleNumberFormatterTest extends \PHPUnit_Framework_TestCase
      */
     public function testSetSymbol()
     {
-        $formatter = new SimpleNumberFormatter('en', SimpleNumberFormatter::DECIMAL);
+        $formatter = new StubNumberFormatter('en', StubNumberFormatter::DECIMAL);
         $formatter->setSymbol(null, null);
     }
 
@@ -305,7 +305,7 @@ class SimpleNumberFormatterTest extends \PHPUnit_Framework_TestCase
      */
     public function testSetTextAttribute()
     {
-        $formatter = new SimpleNumberFormatter('en', SimpleNumberFormatter::DECIMAL);
+        $formatter = new StubNumberFormatter('en', StubNumberFormatter::DECIMAL);
         $formatter->setTextAttribute(null, null);
     }
 }

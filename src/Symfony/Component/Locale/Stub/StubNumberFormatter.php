@@ -9,14 +9,14 @@
  * file that was distributed with this source code.
  */
 
-namespace Symfony\Component\Locale;
+namespace Symfony\Component\Locale\Stub;
 
 use Symfony\Component\Locale\Locale;
 
 /**
- * Provides a simple NumberFormatter for the 'en' locale.
+ * Provides a stub NumberFormatter for the 'en' locale.
  */
-class SimpleNumberFormatter
+class StubNumberFormatter
 {
     const U_ZERO_ERROR = 0;
     const U_ZERO_ERROR_MESSAGE = 'U_ZERO_ERROR';

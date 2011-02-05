@@ -25,7 +25,16 @@ namespace Symfony\Component\CssSelector;
 class Parser
 {
     /**
+     * Translate a CSS expression to its XPath equivalent.
+     * Optionally, a prefix can be added to the resulting XPath
+     * expression with the $prefix parameter.
+     *
      * @throws SyntaxError When got None for xpath expression
+     *
+     * @param  mixed  $cssExpr The CSS expression.
+     * @param  string $prefix  An optional prefix for the XPath expression.
+     *
+     * @return string
      */
     static public function cssToXpath($cssExpr, $prefix = 'descendant-or-self::')
     {
@@ -62,7 +71,14 @@ class Parser
     }
 
     /**
+     * Parse an expression and return the Node object that represents
+     * the parsed expression.
+     *
      * @throws \Exception When tokenizer throws it while parsing
+     *
+     * @param  string $string The expression to parse
+     *
+     * @return Node\NodeInterface
      */
     public function parse($string)
     {
@@ -79,6 +95,14 @@ class Parser
         }
     }
 
+    /**
+     * Parse a selector group contained in $stream and return
+     * the Node object that represents the expression.
+     *
+     * @param  TokenStream $stream The stream to parse.
+     *
+     * @return Node\NodeInterface
+     */
     protected function parseSelectorGroup($stream)
     {
         $result = array();
@@ -99,7 +123,14 @@ class Parser
     }
 
     /**
+     * Parse a selector contained in $stream and return the Node
+     * object that represents it.
+     *
      * @throws SyntaxError When expected selector but got something else
+     *
+     * @param  TokenStrem $stream The stream containing the selector.
+     *
+     * @return Node\NodeInterface
      */
     protected function parseSelector($stream)
     {
@@ -128,7 +159,14 @@ class Parser
     }
 
     /**
+     * Parse a simple selector (the current token) from $stream and return
+     * the resulting Node object.
+     *
      * @throws SyntaxError When expected symbol but got something else
+     *
+     * @param  TokenStream The stream containing the selector.
+     *
+     * @return Node\NodeInterface
      */
     protected function parseSimpleSelector($stream)
     {
@@ -228,7 +266,16 @@ class Parser
     }
 
     /**
+     * Parse an attribute from a selector contained in $stream and return
+     * the resulting AttribNode object.
+     *
      * @throws SyntaxError When encountered unexpected selector
+     *
+     * @param  Node\NodeInterface $selector The selector object whose attribute
+     *                                      is to be parsed.
+     * @param  TokenStream        $strem    The container token stream.
+     *
+     * @return Node\AttribNode
      */
     protected function parseAttrib($selector, $stream)
     {

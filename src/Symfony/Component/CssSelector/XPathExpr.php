@@ -27,6 +27,15 @@ class XPathExpr
     protected $condition;
     protected $starPrefix;
 
+    /**
+     * Constructor.
+     *
+     * @param string $prefix     Prefix for the XPath expression.
+     * @param string $path       Actual path of the expression.
+     * @param string $element    The element in the expression.
+     * @param string $condition  A condition for the expression.
+     * @param bool   $starPrefix Indicates whether to use a star prefix.
+     */
     public function __construct($prefix = null, $path = null, $element = '*', $condition = null, $starPrefix = false)
     {
         $this->prefix = $prefix;
@@ -36,31 +45,61 @@ class XPathExpr
         $this->starPrefix = $starPrefix;
     }
 
+    /**
+     * Get the prefix of this XPath expression.
+     *
+     * @return string
+     */
     public function getPrefix()
     {
         return $this->prefix;
     }
 
+    /**
+     * Get the path of this XPath expression.
+     *
+     * @return string
+     */
     public function getPath()
     {
         return $this->path;
     }
 
+    /**
+     * Answer whether this XPath expression has a star prefix.
+     *
+     * @return bool
+     */
     public function hasStarPrefix()
     {
         return $this->starPrefix;
     }
 
+    /**
+     * Get the element of this XPath expression.
+     *
+     * @return string
+     */
     public function getElement()
     {
         return $this->element;
     }
 
+    /**
+     * Get the condition of this XPath expression.
+     *
+     * @return string
+     */
     public function getCondition()
     {
         return $this->condition;
     }
 
+    /**
+     * Get a string representation for this XPath expression.
+     *
+     * @return string
+     */
     public function __toString()
     {
         $path = '';
@@ -81,6 +120,12 @@ class XPathExpr
         return $path;
     }
 
+    /**
+     * Add a condition to this XPath expression.
+     * Any pre-existant condition will be ANDed to it.
+     *
+     * @param string $condition The condition to add.
+     */
     public function addCondition($condition)
     {
         if ($this->condition) {
@@ -90,6 +135,12 @@ class XPathExpr
         }
     }
 
+    /**
+     * Add a prefix to this XPath expression.
+     * It will be prepended to any pre-existant prefixes.
+     *
+     * @param string $prefix  The prefix to add.
+     */
     public function addPrefix($prefix)
     {
         if ($this->prefix) {
@@ -99,6 +150,11 @@ class XPathExpr
         }
     }
 
+    /**
+     * Add a condition to this XPath expression using the name of the element
+     * as the desired value.
+     * This method resets the element to '*'.
+     */
     public function addNameTest()
     {
         if ($this->element == '*') {
@@ -110,6 +166,11 @@ class XPathExpr
         $this->element = '*';
     }
 
+    /**
+     * Add a star prefix to this XPath expression.
+     * This method will prepend a '*' to the path and set the star prefix flag
+     * to true.
+     */
     public function addStarPrefix()
     {
         /*
@@ -125,6 +186,14 @@ class XPathExpr
         $this->starPrefix = true;
     }
 
+    /**
+     * Join this XPath expression with $other (another XPath expression) using
+     * $combiner to join them.
+     *
+     * @param string    $combiner The combiner string.
+     * @param XPathExpr $other    The other XPath expression to combine with
+     *                            this one.
+     */
     public function join($combiner, $other)
     {
         $prefix = (string) $this;
@@ -143,6 +212,13 @@ class XPathExpr
         $this->condition = $other->GetCondition();
     }
 
+    /**
+     * Get an XPath literal for $s.
+     *
+     * @param  mixed $s Can either be a Node\ElementNode or a string.
+     *
+     * @return string
+     */
     static public function xpathLiteral($s)
     {
         if ($s instanceof Node\ElementNode) {

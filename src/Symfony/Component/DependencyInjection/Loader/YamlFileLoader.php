@@ -280,22 +280,14 @@ class YamlFileLoader extends FileLoader
             throw new \InvalidArgumentException(sprintf('The service file "%s" is not valid.', $file));
         }
 
-        foreach (array_keys($content) as $key) {
-            if (in_array($key, array('imports', 'parameters', 'services', 'interfaces'))) {
+        foreach (array_keys($content) as $namespace) {
+            if (in_array($namespace, array('imports', 'parameters', 'services', 'interfaces'))) {
                 continue;
             }
 
-            // can it be handled by an extension?
-            if (false !== strpos($key, '.')) {
-                list($namespace, $tag) = explode('.', $key);
-                if (!$this->container->hasExtension($namespace)) {
-                    throw new \InvalidArgumentException(sprintf('There is no extension able to load the configuration for "%s" (in %s).', $key, $file));
-                }
-
-                continue;
+            if (!$this->container->hasExtension($namespace)) {
+                throw new \InvalidArgumentException(sprintf('There is no extension able to load the configuration for "%s" (in %s).', $key, $file));
             }
-
-            throw new \InvalidArgumentException(sprintf('The "%s" tag is not valid (in %s).', $key, $file));
         }
 
         return $content;
@@ -341,18 +333,16 @@ class YamlFileLoader extends FileLoader
      */
     protected function loadFromExtensions($content)
     {
-        foreach ($content as $key => $values) {
-            if (in_array($key, array('imports', 'parameters', 'services', 'interfaces'))) {
+        foreach ($content as $namespace => $values) {
+            if (in_array($namespace, array('imports', 'parameters', 'services', 'interfaces'))) {
                 continue;
             }
-
-            list($namespace, $tag) = explode('.', $key);
 
             if (!is_array($values)) {
                 $values = array();
             }
 
-            $this->container->loadFromExtension($namespace, $tag, $values);
+            $this->container->loadFromExtension($namespace, $values);
         }
     }
 }

@@ -33,7 +33,7 @@ use Symfony\Component\Config\FileLocator;
  */
 class WebProfilerExtension extends Extension
 {
-    public function configLoad(array $configs, ContainerBuilder $container)
+    public function load(array $configs, ContainerBuilder $container)
     {
         foreach ($configs as $config) {
             $this->doConfigLoad($config, $container);

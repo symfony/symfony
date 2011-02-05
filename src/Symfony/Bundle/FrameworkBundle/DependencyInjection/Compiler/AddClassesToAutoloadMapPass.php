@@ -28,10 +28,7 @@ class AddClassesToAutoloadMapPass implements CompilerPassInterface
     public function process(ContainerBuilder $container)
     {
         $classes = array();
-        foreach ($container->getExtensionConfigs() as $name => $configs) {
-            list($namespace, $tag) = explode(':', $name);
-
-            $extension = $container->getExtension($namespace);
+        foreach ($container->getExtensions() as $extension) {
             if ($extension instanceof Extension) {
                 $classes = array_merge($classes, $extension->getAutoloadClassMap());
             }

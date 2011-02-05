@@ -21,24 +21,6 @@ use Symfony\Component\DependencyInjection\ContainerBuilder;
 abstract class Extension implements ExtensionInterface
 {
     /**
-     * Loads a specific configuration.
-     *
-     * @param string  $tag           The tag name
-     * @param array   $config        An array of configuration values
-     * @param ContainerBuilder $configuration A ContainerBuilder instance
-     *
-     * @throws \InvalidArgumentException When provided tag is not defined in this extension
-     */
-    public function load($tag, array $config, ContainerBuilder $configuration)
-    {
-        if (!method_exists($this, $method = $tag.'Load')) {
-            throw new \InvalidArgumentException(sprintf('The tag "%s:%s" is not defined in the "%s" extension.', $this->getAlias(), $tag, $this->getAlias()));
-        }
-
-        $this->$method($config, $configuration);
-    }
-
-    /**
      * This method normalizes keys between the different configuration formats
      *
      * Namely, you mostly have foo_bar in YAML while you have foo-bar in XML.

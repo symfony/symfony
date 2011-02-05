@@ -28,6 +28,7 @@ use Symfony\Component\Config\Resource\ResourceInterface;
 class ContainerBuilder extends Container implements TaggedContainerInterface
 {
     static protected $extensions = array();
+    static protected $extensionsByNs = array();
 
     protected $definitions      = array();
     protected $aliases          = array();
@@ -57,7 +58,7 @@ class ContainerBuilder extends Container implements TaggedContainerInterface
         static::$extensions[$extension->getAlias()] = $extension;
 
         if (false !== $extension->getNamespace()) {
-            static::$extensions[$extension->getNamespace()] = $extension;
+            static::$extensionsByNs[$extension->getNamespace()] = $extension;
         }
     }
 
@@ -70,11 +71,25 @@ class ContainerBuilder extends Container implements TaggedContainerInterface
      */
     static public function getExtension($name)
     {
-        if (!isset(static::$extensions[$name])) {
-            throw new \LogicException(sprintf('Container extension "%s" is not registered', $name));
+        if (empty(static::$extensions[$name])) {
+            if (empty(static::$extensionsByNs[$name])) {
+                throw new \LogicException(sprintf('Container extension "%s" is not registered', $name));
+            }
+
+            return static::$extensionsByNs[$name];
         }
 
         return static::$extensions[$name];
+    }
+
+    /**
+     * Returns extensions keyed by alias
+     *
+     * @return array ExtensionInterfaces
+     */
+    static public function getExtensions()
+    {
+        return static::$extensions;
     }
 
     /**
@@ -85,7 +100,7 @@ class ContainerBuilder extends Container implements TaggedContainerInterface
      */
     static public function hasExtension($name)
     {
-        return isset(static::$extensions[$name]);
+        return isset(static::$extensions[$name]) || isset(static::$extensionsByNs[$name]);
     }
 
     /**
@@ -129,12 +144,11 @@ class ContainerBuilder extends Container implements TaggedContainerInterface
      * Loads the configuration for an extension.
      *
      * @param string $extension The extension alias or namespace
-     * @param string $tag       The extension tag to load (without the namespace - namespace.tag)
      * @param array  $values    An array of values that customizes the extension
      *
      * @return ContainerBuilder The current instance
      */
-    public function loadFromExtension($extension, $tag, array $values = array())
+    public function loadFromExtension($extension, array $values = array())
     {
         if (true === $this->isFrozen()) {
             throw new \LogicException('Cannot load from an extension on a frozen container.');
@@ -142,11 +156,11 @@ class ContainerBuilder extends Container implements TaggedContainerInterface
 
         $namespace = $this->getExtension($extension)->getAlias();
 
-        if (!isset($this->extensionConfigs[$namespace.':'.$tag])) {
-            $this->extensionConfigs[$namespace.':'.$tag] = array();
+        if (!isset($this->extensionConfigs[$namespace])) {
+            $this->extensionConfigs[$namespace] = array();
         }
 
-        $this->extensionConfigs[$namespace.':'.$tag][] = $this->getParameterBag()->resolveValue($values);
+        $this->extensionConfigs[$namespace][] = $this->getParameterBag()->resolveValue($values);
 
         return $this;
     }
@@ -363,6 +377,20 @@ class ContainerBuilder extends Container implements TaggedContainerInterface
     public function getExtensionConfigs()
     {
         return $this->extensionConfigs;
+    }
+
+    /**
+     * Returns the containers for the registered extensions by alias.
+     *
+     * @return ExtensionInterface extension container
+     */
+    public function getExtensionConfig($name)
+    {
+        if (empty($this->extensionConfigs[$name])) {
+            return array(array());
+        }
+
+        return $this->extensionConfigs[$name];
     }
 
     /**

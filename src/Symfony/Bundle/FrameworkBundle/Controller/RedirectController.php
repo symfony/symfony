@@ -54,4 +54,35 @@ class RedirectController extends ContainerAware
 
         return $response;
     }
+
+    /**
+     * Redirects to a URL.
+     *
+     * It expects a url path parameter.
+     * By default, the response status code is 301.
+     *
+     * If the url is empty, the status code will be 410.
+     * If the permanent path parameter is set, the status code will be 302.
+     *
+     * @param string  $url       The url to redirect to
+     * @param Boolean $permanent Whether the redirect is permanent or not
+     *
+     * @return Response A Response instance
+     */
+    public function urlRedirectAction($url, $permanent = false)
+    {
+        if (!$url) {
+            $response = $this->container->get('response');
+            $response->setStatusCode(410);
+
+            return $response;
+        }
+
+        $code = $permanent ? 301 : 302;
+
+        $response = $this->container->get('response');
+        $response->setRedirect($url, $code);
+
+        return $response;
+    }
 }

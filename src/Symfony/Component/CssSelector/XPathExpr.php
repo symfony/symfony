@@ -66,7 +66,7 @@ class XPathExpr
     }
 
     /**
-     * Answer whether this XPath expression has a star prefix.
+     * Answers whether this XPath expression has a star prefix.
      *
      * @return bool
      */
@@ -121,7 +121,7 @@ class XPathExpr
     }
 
     /**
-     * Add a condition to this XPath expression.
+     * Adds a condition to this XPath expression.
      * Any pre-existant condition will be ANDed to it.
      *
      * @param string $condition The condition to add.
@@ -136,7 +136,7 @@ class XPathExpr
     }
 
     /**
-     * Add a prefix to this XPath expression.
+     * Adds a prefix to this XPath expression.
      * It will be prepended to any pre-existant prefixes.
      *
      * @param string $prefix  The prefix to add.
@@ -151,7 +151,7 @@ class XPathExpr
     }
 
     /**
-     * Add a condition to this XPath expression using the name of the element
+     * Adds a condition to this XPath expression using the name of the element
      * as the desired value.
      * This method resets the element to '*'.
      */
@@ -167,7 +167,7 @@ class XPathExpr
     }
 
     /**
-     * Add a star prefix to this XPath expression.
+     * Adds a star prefix to this XPath expression.
      * This method will prepend a '*' to the path and set the star prefix flag
      * to true.
      */
@@ -187,7 +187,7 @@ class XPathExpr
     }
 
     /**
-     * Join this XPath expression with $other (another XPath expression) using
+     * Joins this XPath expression with $other (another XPath expression) using
      * $combiner to join them.
      *
      * @param string    $combiner The combiner string.

@@ -25,7 +25,7 @@ namespace Symfony\Component\CssSelector;
 class Parser
 {
     /**
-     * Translate a CSS expression to its XPath equivalent.
+     * Translates a CSS expression to its XPath equivalent.
      * Optionally, a prefix can be added to the resulting XPath
      * expression with the $prefix parameter.
      *
@@ -71,7 +71,7 @@ class Parser
     }
 
     /**
-     * Parse an expression and return the Node object that represents
+     * Parses an expression and returns the Node object that represents
      * the parsed expression.
      *
      * @throws \Exception When tokenizer throws it while parsing
@@ -96,7 +96,7 @@ class Parser
     }
 
     /**
-     * Parse a selector group contained in $stream and return
+     * Parses a selector group contained in $stream and returns
      * the Node object that represents the expression.
      *
      * @param  TokenStream $stream The stream to parse.
@@ -123,7 +123,7 @@ class Parser
     }
 
     /**
-     * Parse a selector contained in $stream and return the Node
+     * Parses a selector contained in $stream and returns the Node
      * object that represents it.
      *
      * @throws SyntaxError When expected selector but got something else
@@ -159,7 +159,7 @@ class Parser
     }
 
     /**
-     * Parse a simple selector (the current token) from $stream and return
+     * Parses a simple selector (the current token) from $stream and returns
      * the resulting Node object.
      *
      * @throws SyntaxError When expected symbol but got something else
@@ -266,7 +266,7 @@ class Parser
     }
 
     /**
-     * Parse an attribute from a selector contained in $stream and return
+     * Parses an attribute from a selector contained in $stream and returns
      * the resulting AttribNode object.
      *
      * @throws SyntaxError When encountered unexpected selector

@@ -50,7 +50,7 @@ class Token
     }
 
     /**
-     * Answer whether this token's type equals to $type.
+     * Answers whether this token's type equals to $type.
      *
      * @param  string $type The type to test against this token's one.
      *

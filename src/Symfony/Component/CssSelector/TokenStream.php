@@ -79,7 +79,7 @@ class TokenStream
     }
 
     /**
-     * Peek for the next token in this stream. This means that the next token
+     * Peeks for the next token in this stream. This means that the next token
      * will be returned but it won't be considered as used (visited) until the
      * next() method is invoked.
      * If there are no remaining tokens null will be returned.

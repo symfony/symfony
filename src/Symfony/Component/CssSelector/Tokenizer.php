@@ -22,7 +22,7 @@ namespace Symfony\Component\CssSelector;
 class Tokenizer
 {
     /**
-     * Take a CSS selector and return an array holding the Tokens
+     * Takes a CSS selector and returns an array holding the Tokens
      * it contains.
      *
      * @param  string $s The selector to lex.
@@ -103,8 +103,8 @@ class Tokenizer
     }
 
     /**
-     * Tokenize a quoted string (i.e. 'A string quoted with \' characters'),
-     * and return an array holding the unquoted string contained by $s and
+     * Tokenizes a quoted string (i.e. 'A string quoted with \' characters'),
+     * and returns an array holding the unquoted string contained by $s and
      * the new position from which tokenizing should take over.
      *
      * @throws SyntaxError When expected closing is not found
@@ -142,7 +142,7 @@ class Tokenizer
     }
 
     /**
-     * Unescape a string literal and return the unescaped string.
+     * Unescapes a string literal and returns the unescaped string.
      *
      * @throws SyntaxError When invalid escape sequence is found
      *
@@ -166,7 +166,7 @@ class Tokenizer
     }
 
     /**
-     * Lex selector $s and return the an array holding the name of the symbol
+     * Lexes selector $s and returns an array holding the name of the symbol
      * contained in it and the new position from which tokenizing should take
      * over.
      *

@@ -64,7 +64,7 @@ class TemplatePathsCacheWarmer extends CacheWarmer
         $prefix = '/Resources/views';
         $templates = array();
         foreach ($this->kernel->getBundles() as $name => $bundle) {
-            if (!is_dir($dir = $bundle->getNormalizedPath().$prefix)) {
+            if (!is_dir($dir = $bundle->getPath().$prefix)) {
                 continue;
             }
 

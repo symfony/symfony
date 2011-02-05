@@ -28,20 +28,4 @@ class ZendBundle extends Bundle
 
         $container->addCompilerPass(new ZendLoggerWriterPass());
     }
-
-    /**
-     * {@inheritdoc}
-     */
-    public function getNamespace()
-    {
-        return __NAMESPACE__;
-    }
-
-    /**
-     * {@inheritdoc}
-     */
-    public function getPath()
-    {
-        return __DIR__;
-    }
 }

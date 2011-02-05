@@ -49,14 +49,6 @@ interface BundleInterface
      */
     function getNamespace();
 
-
-    /**
-     * Gets the Bundle directory path.
-     *
-     * @return string The Bundle absolute path
-     */
-    function getPath();
-
     /**
      * Gets the Bundle directory path.
      *
@@ -64,5 +56,5 @@ interface BundleInterface
      *
      * @return string The Bundle absolute path
      */
-    function getNormalizedPath();
+    function getPath();
 }

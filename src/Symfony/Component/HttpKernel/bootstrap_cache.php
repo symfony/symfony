@@ -151,7 +151,7 @@ abstract class Kernel implements KernelInterface
             $files[] = $file;
         }
         foreach ($this->getBundle($bundle, false) as $bundle) {
-            if (file_exists($file = $bundle->getNormalizedPath().'/'.$path)) {
+            if (file_exists($file = $bundle->getPath().'/'.$path)) {
                 if ($first) {
                     return $file;
                 }

@@ -255,7 +255,7 @@ class KernelTest extends \PHPUnit_Framework_TestCase
     {
         $bundle = $this
             ->getMockBuilder('Symfony\Tests\Component\HttpKernel\BundleForTest')
-            ->setMethods(array('getNormalizedPath', 'getParent', 'getName'))
+            ->setMethods(array('getPath', 'getParent', 'getName'))
             ->disableOriginalConstructor()
         ;
 
@@ -273,7 +273,7 @@ class KernelTest extends \PHPUnit_Framework_TestCase
 
         $bundle
             ->expects($this->any())
-            ->method('getNormalizedPath')
+            ->method('getPath')
             ->will($this->returnValue(strtr($dir, '\\', '/')))
         ;
         

@@ -28,20 +28,4 @@ class TwigBundle extends Bundle
 
         $container->addCompilerPass(new TwigEnvironmentPass());
     }
-
-    /**
-     * {@inheritdoc}
-     */
-    public function getNamespace()
-    {
-        return __NAMESPACE__;
-    }
-
-    /**
-     * {@inheritdoc}
-     */
-    public function getPath()
-    {
-        return __DIR__;
-    }
 }

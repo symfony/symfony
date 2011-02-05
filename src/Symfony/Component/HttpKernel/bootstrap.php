@@ -113,7 +113,7 @@ class Container implements ContainerInterface
         $ids = array();
         $r = new \ReflectionClass($this);
         foreach ($r->getMethods() as $method) {
-            if (preg_match('/^get(.+)Service$/', $name = $method->getName(), $match)) {
+            if (preg_match('/^get(.+)Service$/', $method->getName(), $match)) {
                 $ids[] = self::underscore($match[1]);
             }
         }
@@ -229,7 +229,6 @@ interface BundleInterface
     function getName();
     function getNamespace();
     function getPath();
-    function getNormalizedPath();
 }
 }
 namespace Symfony\Component\HttpKernel\Bundle
@@ -241,11 +240,26 @@ use Symfony\Component\Finder\Finder;
 abstract class Bundle extends ContainerAware implements BundleInterface
 {
     protected $name;
+    protected $reflected;
     public function boot()
     {
     }
     public function shutdown()
     {
+    }
+    public function getNamespace()
+    {
+        if (null === $this->reflected) {
+            $this->reflected = new \ReflectionObject($this);
+        }
+        return $this->reflected->getNamespaceName();
+    }
+    public function getPath()
+    {
+        if (null === $this->reflected) {
+            $this->reflected = new \ReflectionObject($this);
+        }
+        return strtr(dirname($this->reflected->getFileName()), '\\', '/');
     }
     public function getParent()
     {
@@ -260,13 +274,9 @@ abstract class Bundle extends ContainerAware implements BundleInterface
         $pos = strrpos($name, '\\');
         return $this->name = false === $pos ? $name :  substr($name, $pos + 1);
     }
-    final public function getNormalizedPath()
-    {
-        return strtr($this->getPath(), '\\', '/');
-    }
     public function registerExtensions(ContainerBuilder $container)
     {
-        if (!$dir = realpath($this->getNormalizedPath().'/DependencyInjection')) {
+        if (!$dir = realpath($this->getPath().'/DependencyInjection')) {
             return;
         }
         $finder = new Finder();
@@ -279,7 +289,7 @@ abstract class Bundle extends ContainerAware implements BundleInterface
     }
     public function registerCommands(Application $application)
     {
-        if (!$dir = realpath($this->getNormalizedPath().'/Command')) {
+        if (!$dir = realpath($this->getPath().'/Command')) {
             return;
         }
         $finder = new Finder();
@@ -577,7 +587,7 @@ abstract class Kernel implements KernelInterface
             $files[] = $file;
         }
         foreach ($this->getBundle($bundle, false) as $bundle) {
-            if (file_exists($file = $bundle->getNormalizedPath().'/'.$path)) {
+            if (file_exists($file = $bundle->getPath().'/'.$path)) {
                 if ($first) {
                     return $file;
                 }

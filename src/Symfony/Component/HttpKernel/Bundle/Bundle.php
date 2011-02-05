@@ -25,6 +25,7 @@ use Symfony\Component\Finder\Finder;
 abstract class Bundle extends ContainerAware implements BundleInterface
 {
     protected $name;
+    protected $reflected;
 
     /**
      * Boots the Bundle.
@@ -38,6 +39,34 @@ abstract class Bundle extends ContainerAware implements BundleInterface
      */
     public function shutdown()
     {
+    }
+
+    /**
+     * Gets the Bundle namespace.
+     *
+     * @return string The Bundle namespace
+     */
+    public function getNamespace()
+    {
+        if (null === $this->reflected) {
+            $this->reflected = new \ReflectionObject($this);
+        }
+
+        return $this->reflected->getNamespaceName();
+    }
+
+    /**
+     * Gets the Bundle directory path.
+     *
+     * @return string The Bundle absolute path
+     */
+    public function getPath()
+    {
+        if (null === $this->reflected) {
+            $this->reflected = new \ReflectionObject($this);
+        }
+
+        return strtr(dirname($this->reflected->getFileName()), '\\', '/');
     }
 
     /**
@@ -68,18 +97,6 @@ abstract class Bundle extends ContainerAware implements BundleInterface
     }
 
     /**
-     * Gets the Bundle directory path.
-     *
-     * The path should always be returned as a Unix path (with /).
-     *
-     * @return string The Bundle absolute path
-     */
-    final public function getNormalizedPath()
-    {
-        return strtr($this->getPath(), '\\', '/');
-    }
-
-    /**
      * Finds and registers Dependency Injection Container extensions.
      *
      * Override this method if your DIC extensions do not follow the conventions:
@@ -91,7 +108,7 @@ abstract class Bundle extends ContainerAware implements BundleInterface
      */
     public function registerExtensions(ContainerBuilder $container)
     {
-        if (!$dir = realpath($this->getNormalizedPath().'/DependencyInjection')) {
+        if (!$dir = realpath($this->getPath().'/DependencyInjection')) {
             return;
         }
 
@@ -118,7 +135,7 @@ abstract class Bundle extends ContainerAware implements BundleInterface
      */
     public function registerCommands(Application $application)
     {
-        if (!$dir = realpath($this->getNormalizedPath().'/Command')) {
+        if (!$dir = realpath($this->getPath().'/Command')) {
             return;
         }
 

@@ -157,7 +157,10 @@ class SQLiteProfilerStorage implements ProfilerStorageInterface
             foreach ($args as $arg => $val) {
                 $stmt->bindValue($arg, $val, is_int($val) ? \PDO::PARAM_INT : \PDO::PARAM_STR);
             }
-            $stmt->execute();
+            $success = $stmt->execute();
+            if (!$success) {
+                throw new \RuntimeException(sprintf('Error executing SQLite query "%s"', $query));
+            }
         }
     }
 

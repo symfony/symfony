@@ -102,9 +102,6 @@ class ClientTest extends \PHPUnit_Framework_TestCase
         $this->assertEquals('foo', $client->getResponse()->getContent(), '->getCrawler() returns the Response of the last request');
     }
 
-    /**
-     * @covers Symfony\Component\BrowserKit\Client::getContent
-     */
     public function testGetContent()
     {
         $json = '{"jsonrpc":"2.0","method":"echo","id":7,"params":["Hello World"]}';

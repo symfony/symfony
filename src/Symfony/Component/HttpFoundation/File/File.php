@@ -605,7 +605,7 @@ class File
      */
     public function size()
     {
-        if (false === ($size = filesize($this->getPath()))) {
+        if (false === ($size = @filesize($this->getPath()))) {
             throw new FileException(sprintf('Could not read file size of %s', $this->getPath()));
         }
 
@@ -623,7 +623,7 @@ class File
     {
         $newPath = $directory . DIRECTORY_SEPARATOR . $filename;
 
-        if (!rename($this->getPath(), $newPath)) {
+        if (!@rename($this->getPath(), $newPath)) {
             throw new FileException(sprintf('Could not move file %s to %s', $this->getPath(), $newPath));
         }
 

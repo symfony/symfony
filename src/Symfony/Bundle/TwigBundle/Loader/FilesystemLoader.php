@@ -75,11 +75,9 @@ class FilesystemLoader implements \Twig_LoaderInterface
 
     protected function findTemplate($name)
     {
-        if (!is_array($name)) {
-            $name = $this->parser->parse($name);
-        }
+        $tpl = is_array($name) ? $name : $this->parser->parse($name);
 
-        $key = md5(serialize($name));
+        $key = md5(serialize($tpl));
         if (isset($this->cache[$key])) {
             return $this->cache[$key];
         }
@@ -87,13 +85,13 @@ class FilesystemLoader implements \Twig_LoaderInterface
         $file = null;
         $previous = null;
         try {
-            $file = $this->locator->locate($name);
+            $file = $this->locator->locate($tpl);
         } catch (\InvalidArgumentException $e) {
             $previous = $e;
         }
 
         if (false === $file || null === $file) {
-            throw new \Twig_Error_Loader(sprintf('Unable to find template "%s".', $name), 0, null, $previous);
+            throw new \Twig_Error_Loader(sprintf('Unable to find template "%s".', json_encode($name)), 0, null, $previous);
         }
 
         return $this->cache[$key] = $file;

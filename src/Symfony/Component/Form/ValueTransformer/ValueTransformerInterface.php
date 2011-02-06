@@ -65,11 +65,9 @@ interface ValueTransformerInterface
      * is passed.
      *
      * @param  mixed $value               The value in the transformed representation
-     * @param  mixed $originalValue       The original value from the datasource that is about to be overwritten by the new value.
-     * @return mixed                      The value in the original representation
      * @throws UnexpectedTypeException    when the argument is not of the
      *                                    expected type
      * @throws ValueTransformerException  when the transformation fails
      */
-    function reverseTransform($value, $originalValue);
+    function reverseTransform($value);
 }

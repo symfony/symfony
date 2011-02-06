@@ -58,9 +58,9 @@ class MoneyToLocalizedStringTransformer extends NumberToLocalizedStringTransform
      * @param string $value Localized money string
      * @return number Normalized number
      */
-    public function reverseTransform($value, $originalValue)
+    public function reverseTransform($value)
     {
-        $value = parent::reverseTransform($value, $originalValue);
+        $value = parent::reverseTransform($value);
 
         if (null !== $value) {
             $value *= $this->getOption('divisor');

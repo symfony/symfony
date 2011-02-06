@@ -95,7 +95,7 @@ class DateTimeToArrayTransformer extends BaseDateTimeTransformer
      * @param  array $value  Localized date string/array
      * @return DateTime      Normalized date
      */
-    public function reverseTransform($value, $originalValue)
+    public function reverseTransform($value)
     {
         if (null === $value) {
             return null;

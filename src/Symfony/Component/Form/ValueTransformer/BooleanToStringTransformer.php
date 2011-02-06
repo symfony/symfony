@@ -47,7 +47,7 @@ class BooleanToStringTransformer extends Configurable implements ValueTransforme
      * @param  string $value  String value.
      * @return Boolean        Boolean value.
      */
-    public function reverseTransform($value, $originalValue)
+    public function reverseTransform($value)
     {
         if (!is_string($value)) {
             throw new UnexpectedTypeException($value, 'string');

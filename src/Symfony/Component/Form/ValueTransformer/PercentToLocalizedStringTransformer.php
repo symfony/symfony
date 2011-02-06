@@ -82,7 +82,7 @@ class PercentToLocalizedStringTransformer extends Configurable implements ValueT
      * @param  number $value  Percentage value.
      * @return number         Normalized value.
      */
-    public function reverseTransform($value, $originalValue)
+    public function reverseTransform($value)
     {
         if (!is_string($value)) {
             throw new UnexpectedTypeException($value, 'string');

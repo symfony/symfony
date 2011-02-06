@@ -60,7 +60,7 @@ class DateTimeToTimestampTransformer extends Configurable implements ValueTransf
      * @param  string $value  A value as produced by PHP's date() function
      * @return DateTime       A DateTime object
      */
-    public function reverseTransform($value, $originalValue)
+    public function reverseTransform($value)
     {
         if (null === $value) {
             return null;

@@ -74,7 +74,7 @@ class NumberToLocalizedStringTransformer extends Configurable implements ValueTr
      *
      * @param string $value
      */
-    public function reverseTransform($value, $originalValue)
+    public function reverseTransform($value)
     {
         if (!is_string($value)) {
             throw new UnexpectedTypeException($value, 'string');

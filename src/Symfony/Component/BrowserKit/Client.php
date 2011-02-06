@@ -266,16 +266,39 @@ abstract class Client
         // @codeCoverageIgnoreEnd
     }
 
+    /**
+     * Filters the request
+     *
+     * @param Request The request to filter
+     *
+     * @return Request
+     */
     protected function filterRequest(Request $request)
     {
         return $request;
     }
 
+    /**
+     * Filters the Response
+     *
+     * @param Response The Response to filter
+     *
+     * @return Response
+     */
     protected function filterResponse($response)
     {
         return $response;
     }
 
+    /**
+     * Creates a crawler
+     *
+     * @param string A uri
+     * @param string Content for the crawler to use
+     * @param string Content type
+     *
+     * @return Crawler
+     */
     protected function createCrawlerFromContent($uri, $content, $type)
     {
         $crawler = new Crawler(null, $uri);
@@ -286,6 +309,8 @@ abstract class Client
 
     /**
      * Goes back in the browser history.
+     *
+     * @return Crawler
      */
     public function back()
     {
@@ -294,6 +319,8 @@ abstract class Client
 
     /**
      * Goes forward in the browser history.
+     *
+     * @return Crawler
      */
     public function forward()
     {
@@ -302,6 +329,8 @@ abstract class Client
 
     /**
      * Reloads the current browser.
+     *
+     * @return Crawler
      */
     public function reload()
     {
@@ -335,6 +364,12 @@ abstract class Client
         $this->history->clear();
     }
 
+    /**
+     * Takes a URI and converts it to absolute if it is not already absolute.
+     *
+     * @param string A uri
+     * @return string An absolute uri
+     */
     protected function getAbsoluteUri($uri)
     {
         // already absolute?

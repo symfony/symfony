@@ -73,13 +73,16 @@ class StubIntlDateFormatterTest extends \PHPUnit_Framework_TestCase
             array('qqqq', 0, '1st quarter'),
             array('qqqqq', 0, '1st quarter'),
 
+            // 4 months
             array('Q', 7776000, '2'),
             array('QQ', 7776000, '02'),
             array('QQQ', 7776000, 'Q2'),
             array('QQQQ', 7776000, '2nd quarter'),
 
+            // 7 months
             array('QQQQ', 15638400, '3rd quarter'),
 
+            // 10 months
             array('QQQQ', 23587200, '4th quarter'),
 
             /* hour */
@@ -89,6 +92,12 @@ class StubIntlDateFormatterTest extends \PHPUnit_Framework_TestCase
 
             array('h', 1, '12'),
             array('h', 3600, '1'),
+
+            /* day of year */
+            array('D', 0, '1'),
+            array('D', 86400, '2'), // 1 day
+            array('D', 31536000, '1'), // 1 year
+            array('D', 31622400, '2'), // 1 year + 1 day
         );
     }
 

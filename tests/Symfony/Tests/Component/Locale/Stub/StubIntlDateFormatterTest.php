@@ -34,7 +34,6 @@ class StubIntlDateFormatterTest extends \PHPUnit_Framework_TestCase
             array('MMM', 0, 'Jan'),
             array('MMMM', 0, 'January'),
             array('MMMMM', 0, 'J'),
-            /* this is stupid */
             array('MMMMMM', 0, '00001'),
 
             /* years */
@@ -49,6 +48,32 @@ class StubIntlDateFormatterTest extends \PHPUnit_Framework_TestCase
             array('d', 0, '1'),
             array('dd', 0, '01'),
             array('ddd', 0, '001'),
+
+            /* era */
+            array('G', 0, 'AD'),
+            array('G', -62167222800, 'BC'),
+
+            /* quarter */
+            array('Q', 0, '1'),
+            array('QQ', 0, '01'),
+            array('QQQ', 0, 'Q1'),
+            array('QQQQ', 0, '1st quarter'),
+            array('QQQQQ', 0, '1st quarter'),
+
+            array('q', 0, '1'),
+            array('qq', 0, '01'),
+            array('qqq', 0, 'Q1'),
+            array('qqqq', 0, '1st quarter'),
+            array('qqqqq', 0, '1st quarter'),
+
+            array('Q', 7776000, '2'),
+            array('QQ', 7776000, '02'),
+            array('QQQ', 7776000, 'Q2'),
+            array('QQQQ', 7776000, '2nd quarter'),
+
+            array('QQQQ', 15638400, '3rd quarter'),
+
+            array('QQQQ', 23587200, '4th quarter'),
         );
     }
 

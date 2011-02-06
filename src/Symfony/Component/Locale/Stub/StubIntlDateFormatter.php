@@ -40,7 +40,7 @@ class StubIntlDateFormatter
 
     public function format($timestamp)
     {
-        $regExp = "/('(M+|y+|d+|[^Myd])|M+|y+|d+)/";
+        $regExp = "/('(M+|y+|d+|G+|Q+|q+|[^MydGQq])|M+|y+|d+|G+|Q+|q+)/";
 
         $callback = function($matches) use ($timestamp) {
             $pattern = $matches[0];
@@ -85,6 +85,30 @@ class StubIntlDateFormatter
 
                 case 'd':
                     return str_pad(gmdate('j', $timestamp), $length, '0', STR_PAD_LEFT);
+                    break;
+
+                case 'G':
+                    $year = (int) gmdate('Y', $timestamp);
+                    return $year >= 0 ? 'AD' : 'BC';
+                    break;
+
+                case 'q':
+                case 'Q':
+                    $month = (int) gmdate('n', $timestamp);
+                    $quarter = (int) floor(($month - 1) / 3) + 1;
+                    switch ($length) {
+                        case 1:
+                        case 2:
+                            return str_pad($quarter, $length, '0', STR_PAD_LEFT);
+                            break;
+                        case 3:
+                            return 'Q' . $quarter;
+                            break;
+                        default:
+                            $map = array(1 => '1st quarter', 2 => '2nd quarter', 3 => '3rd quarter', 4 => '4th quarter');
+                            return $map[$quarter];
+                            break;
+                    }
                     break;
             }  
         };

@@ -40,7 +40,7 @@ class StubIntlDateFormatter
 
     public function format($timestamp)
     {
-        $regExp = "/('(M+|L+|y+|d+|G+|Q+|q+|[^MLydGQq])|M+|L+|y+|d+|G+|Q+|q+)/";
+        $regExp = "/('(M+|L+|y+|d+|G+|Q+|q+|h+|[^MLydGQqh])|M+|L+|y+|d+|G+|Q+|q+|h+)/";
 
         $callback = function($matches) use ($timestamp) {
             $pattern = $matches[0];
@@ -110,6 +110,11 @@ class StubIntlDateFormatter
                             return $map[$quarter];
                             break;
                     }
+                    break;
+
+                case 'h':
+                    $hours = gmdate('g', $timestamp);
+                    return str_pad($hours, $length, '0', STR_PAD_LEFT);
                     break;
             }  
         };

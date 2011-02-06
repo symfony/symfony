@@ -69,6 +69,7 @@ class Configuration
             ->arrayNode('role_hierarchy')
                 ->containsNameValuePairsWithKeyAttribute('id')
                 ->prototype('array')
+                    ->performNoDeepMerging()
                     ->beforeNormalization()->ifString()->then(function($v) { return array('value' => $v); })->end()
                     ->beforeNormalization()
                         ->ifTrue(function($v) { return is_array($v) && isset($v['value']); })

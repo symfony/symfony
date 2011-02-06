@@ -318,6 +318,12 @@ class ArrayNode extends BaseNode implements PrototypeNodeInterface
         }
 
         foreach ($rightSide as $k => $v) {
+            // prototype, and key is irrelevant, so simply append the element
+            if (null !== $this->prototype && null === $this->keyAttribute) {
+                $leftSide[] = $v;
+                continue;
+            }
+
             // no conflict
             if (!array_key_exists($k, $leftSide)) {
                 if (!$this->allowNewKeys) {

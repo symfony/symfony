@@ -15,9 +15,7 @@ class MergeTest extends \PHPUnit_Framework_TestCase
         $tree = $tb
             ->root('root', 'array')
                 ->node('foo', 'scalar')
-                    ->merge()
-                        ->denyOverwrite()
-                    ->end()
+                    ->cannotBeOverwritten()
                 ->end()
             ->end()
             ->buildTree()
@@ -42,12 +40,12 @@ class MergeTest extends \PHPUnit_Framework_TestCase
                 ->node('foo', 'scalar')->end()
                 ->node('bar', 'scalar')->end()
                 ->node('unsettable', 'array')
-                    ->merge()->allowUnset()->end()
+                    ->canBeUnset()
                     ->node('foo', 'scalar')->end()
                     ->node('bar', 'scalar')->end()
                 ->end()
                 ->node('unsetted', 'array')
-                    ->merge()->allowUnset()->end()
+                    ->canBeUnset()
                     ->prototype('scalar')->end()
                 ->end()
             ->end()
@@ -144,5 +142,29 @@ class MergeTest extends \PHPUnit_Framework_TestCase
                 'c' => 'd',
             )
         ), $tree->merge($a, $b));
+    }
+
+    public function testPrototypeWithoutAKeyAttribute()
+    {
+        $tb = new TreeBuilder();
+
+        $tree = $tb
+            ->root('config', 'array')
+                ->node('append_elements', 'array')
+                    ->prototype('scalar')->end()
+                ->end()
+            ->end()
+            ->buildTree()
+        ;
+
+        $a = array(
+            'append_elements' => array('a', 'b'),
+        );
+
+        $b = array(
+            'append_elements' => array('c', 'd'),
+        );
+
+        $this->assertEquals(array('append_elements' => array('a', 'b', 'c', 'd')), $tree->merge($a, $b));
     }
 }

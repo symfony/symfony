@@ -28,6 +28,7 @@ class Configuration
             ->scalarNode('charset')->end()
             ->scalarNode('document_root')->end()
             ->scalarNode('error_handler')->end()
+            ->scalarNode('exception_controller')->end()
             ->scalarNode('ide')->end()
             ->booleanNode('test')->end()
         ;

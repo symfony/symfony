@@ -78,6 +78,10 @@ class FrameworkExtension extends Extension
             }
         }
 
+        if (isset($config['exception_controller'])) {
+            $container->setParameter('exception_listener.controller', $config['exception_controller']);
+        }
+
         if (isset($config['ide'])) {
             $patterns = array(
                 'textmate' => 'txmt://open?url=file://%%f&line=%%l',

@@ -21,6 +21,14 @@ class StubIntlDateFormatterTest extends \PHPUnit_Framework_TestCase
         return array(
             array('y-M-d', 0, '1970-1-1'),
 
+            /* escaping */
+            array("'M", 0, 'M'),
+            array("'y-'M-'d", 0, 'y-M-d'),
+            array("'yy", 0, 'yy'),
+            array("'''yy", 0, "'yy"),
+            array("''y", 0, "'1970"),
+            array("''yy", 0, "'70"),
+
             /* months */
             array('M', 0, '1'),
             array('MM', 0, '01'),
@@ -65,11 +73,11 @@ class StubIntlDateFormatterTest extends \PHPUnit_Framework_TestCase
     public function testFormat($pattern, $timestamp, $expected)
     {
         $formatter = new StubIntlDateFormatter('en', StubIntlDateFormatter::MEDIUM, StubIntlDateFormatter::SHORT, 'UTC', StubIntlDateFormatter::GREGORIAN, $pattern);
-        $this->assertEquals($expected, $formatter->format($timestamp));
+        $this->assertEquals($expected, $formatter->format($timestamp), 'Check date format with stub implementation.');
 
         if (extension_loaded('intl')) {
             $formatter = new \IntlDateFormatter('en', \IntlDateFormatter::MEDIUM, \IntlDateFormatter::SHORT, 'UTC', \IntlDateFormatter::GREGORIAN, $pattern);
-            $this->assertEquals($expected, $formatter->format($timestamp));
+            $this->assertEquals($expected, $formatter->format($timestamp), 'Check date format with intl extension.');
         }
     }
 

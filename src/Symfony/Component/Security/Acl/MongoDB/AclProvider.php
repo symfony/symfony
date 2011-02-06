@@ -69,11 +69,8 @@ class AclProvider implements AclProviderInterface
      */
     public function findChildren(ObjectIdentityInterface $parentOid, $directChildrenOnly = false)
     {
+        $parentId = $this->retrieveObjectIdentityPrimaryKey($parentOid);
 
-    }
-
-    protected function findChildrenIds($parentId, $directChildrenOnly = false)
-    {
         if($directChildrenOnly) {
             $query = array(
                 "parent" => $parentId,
@@ -83,16 +80,11 @@ class AclProvider implements AclProviderInterface
                 "ancestors" => $parentId,
             );
         }
-
-        $fields = array(
-            "_id" => true,
-        );
-        $childrenIds = array();
-        foreach ($this->connection->selectCollection($this->options['oid_table_name'])->find($query, $fields) as $data) {
-            $childrenIds[] = $data['_id'];
+        $children = array();
+        foreach ($this->connection->selectCollection($this->options['oid_table_name'])->find($query) as $data) {
+            $children[] = $data;
         }
-
-        return $childrenIds;
+        return $children;
     }
 
     /**

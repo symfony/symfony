@@ -120,7 +120,7 @@ class ClassCollectionLoader
     /**
      * Adds brackets around each namespace if it's not already the case.
      *
-     * @param string Namespace string
+     * @param string $source Namespace string
      *
      * @return string Namespaces with brackets
      */
@@ -169,8 +169,8 @@ class ClassCollectionLoader
     /**
      * Writes a cache file
      *
-     * @param string Filename
-     * @param string Temporary file content
+     * @param string $file Filename
+     * @param string $content Temporary file content
      *
      * @throws \RuntimeException when a cache file cannot be written
      */

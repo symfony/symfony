@@ -269,7 +269,7 @@ abstract class Client
     /**
      * Filters the request
      *
-     * @param Request The request to filter
+     * @param Request $request The request to filter
      *
      * @return Request
      */
@@ -281,7 +281,7 @@ abstract class Client
     /**
      * Filters the Response
      *
-     * @param Response The Response to filter
+     * @param Response $response The Response to filter
      *
      * @return Response
      */
@@ -293,9 +293,9 @@ abstract class Client
     /**
      * Creates a crawler
      *
-     * @param string A uri
-     * @param string Content for the crawler to use
-     * @param string Content type
+     * @param string $uri A uri
+     * @param string $content Content for the crawler to use
+     * @param string $type Content type
      *
      * @return Crawler
      */
@@ -367,7 +367,7 @@ abstract class Client
     /**
      * Takes a URI and converts it to absolute if it is not already absolute.
      *
-     * @param string A uri
+     * @param string $uri A uri
      * @return string An absolute uri
      */
     protected function getAbsoluteUri($uri)

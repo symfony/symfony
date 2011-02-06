@@ -23,7 +23,7 @@ class MapFileClassLoader
     /**
      * Constructor
      *
-     * @param string Path to class mapping file
+     * @param string $file Path to class mapping file
      */
     public function __construct($file)
     {

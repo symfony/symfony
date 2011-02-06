@@ -40,7 +40,12 @@ class StubIntlDateFormatter
 
     public function format($timestamp)
     {
-        $regExp = "/('(M+|L+|y+|d+|G+|Q+|q+|h+|D+|E+|a+|H+|[^MLydGQqhDEaH])|M+|L+|y+|d+|G+|Q+|q+|h+|D+|E+|a+|H+)/";
+        $specialChars = 'MLydGQqhDEaH';
+        $specialCharsArray = str_split($specialChars);
+        $specialCharsMatch = implode('|', array_map(function($char) {
+            return $char . '+';
+        }, $specialCharsArray));
+        $regExp = "/('($specialCharsMatch|[^$specialChars])|$specialCharsMatch)/";
 
         $callback = function($matches) use ($timestamp) {
             $pattern = $matches[0];

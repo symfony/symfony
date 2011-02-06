@@ -40,7 +40,7 @@ class StubIntlDateFormatter
 
     public function format($timestamp)
     {
-        $regExp = "/('(M+|L+|y+|d+|G+|Q+|q+|h+|D+|E+|a+|[^MLydGQqhDEa])|M+|L+|y+|d+|G+|Q+|q+|h+|D+|E+|a+)/";
+        $regExp = "/('(M+|L+|y+|d+|G+|Q+|q+|h+|D+|E+|a+|H+|[^MLydGQqhDEaH])|M+|L+|y+|d+|G+|Q+|q+|h+|D+|E+|a+|H+)/";
 
         $callback = function($matches) use ($timestamp) {
             $pattern = $matches[0];
@@ -137,6 +137,10 @@ class StubIntlDateFormatter
 
                 case 'a':
                     return gmdate('A', $timestamp);
+                    break;
+
+                case 'H':
+                    return str_pad(gmdate('G', $timestamp), $length, '0', STR_PAD_LEFT);
                     break;
             }
         };

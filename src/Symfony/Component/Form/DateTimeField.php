@@ -75,6 +75,19 @@ class DateTimeField extends Form
         TimeField::INPUT,
     );
 
+    /**
+     * {@inheritDoc}
+     */
+    public function __construct($key, array $options = array())
+    {
+        // Override parent option
+        // \DateTime objects are never edited by reference, because
+        // we treat them like value objects
+        $this->addOption('by_reference', false);
+
+        parent::__construct($key, $options);
+    }
+
     protected function configure()
     {
         $this->addOption('date_widget', DateField::CHOICE, self::$dateWidgets);

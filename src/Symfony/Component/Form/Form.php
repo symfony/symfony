@@ -93,6 +93,7 @@ class Form extends Field implements \IteratorAggregate, FormInterface
         $this->addOption('virtual', false);
         $this->addOption('validator');
         $this->addOption('context');
+        $this->addOption('by_reference', true);
 
         if (isset($options['validation_groups'])) {
             $options['validation_groups'] = (array)$options['validation_groups'];
@@ -877,6 +878,21 @@ class Form extends Field implements \IteratorAggregate, FormInterface
             foreach ($groups as $group) {
                 $graphWalker->walkReference($this->getData(), $group, $propertyPath, true);
             }
+        }
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    public function writeProperty(&$objectOrArray)
+    {
+        $data = $this->getData();
+
+        // Don't update parent if data is a composite type (object or array)
+        // and "by_reference" option is true, because then we expect that
+        // we are working with a reference to the parent's data
+        if (!(is_object($data) || is_array($data)) || !$this->getOption('by_reference')) {
+            parent::writeProperty($objectOrArray);
         }
     }
 

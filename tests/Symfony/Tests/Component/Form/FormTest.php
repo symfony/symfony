@@ -41,6 +41,59 @@ class FormTest_PreconfiguredForm extends Form
     }
 }
 
+// behaves like a form with a value transformer that transforms into
+// a specific format
+class FormTest_FormThatReturns extends Form
+{
+    protected $returnValue;
+
+    public function setReturnValue($returnValue)
+    {
+        $this->returnValue = $returnValue;
+    }
+
+    public function setData($data)
+    {
+    }
+
+    public function getData()
+    {
+        return $this->returnValue;
+    }
+}
+
+class FormTest_AuthorWithoutRefSetter
+{
+    protected $reference;
+
+    protected $referenceCopy;
+
+    public function __construct($reference)
+    {
+        $this->reference = $reference;
+        $this->referenceCopy = $reference;
+    }
+
+    // The returned object should be modified by reference without having
+    // to provide a setReference() method
+    public function getReference()
+    {
+        return $this->reference;
+    }
+
+    // The returned object is a copy, so setReferenceCopy() must be used
+    // to update it
+    public function getReferenceCopy()
+    {
+        return is_object($this->referenceCopy) ? clone $this->referenceCopy : $this->referenceCopy;
+    }
+
+    public function setReferenceCopy($reference)
+    {
+        $this->referenceCopy = $reference;
+    }
+}
+
 class TestSetDataBeforeConfigureForm extends Form
 {
     protected $testCase;
@@ -1128,6 +1181,71 @@ class FormTest extends \PHPUnit_Framework_TestCase
 
         $form->submit(array('foo' => 'bar')); // reverse transformed to "foobar"
         $form->validateData($context);
+    }
+
+    public function testSubformDoesntCallSetters()
+    {
+        $author = new FormTest_AuthorWithoutRefSetter(new Author());
+
+        $form = new Form('author', array('validator' => $this->createMockValidator()));
+        $form->setData($author);
+        $refForm = new Form('reference');
+        $refForm->add(new TestField('firstName'));
+        $form->add($refForm);
+
+        $form->bind($this->createPostRequest(array(
+            'author' => array(
+                // reference has a getter, but not setter
+                'reference' => array(
+                    'firstName' => 'Foo',
+                )
+            )
+        )));
+
+        $this->assertEquals('Foo', $author->getReference()->firstName);
+    }
+
+    public function testSubformCallsSettersIfByReferenceIsFalse()
+    {
+        $author = new FormTest_AuthorWithoutRefSetter(new Author());
+
+        $form = new Form('author', array('validator' => $this->createMockValidator()));
+        $form->setData($author);
+        $refForm = new Form('referenceCopy', array('by_reference' => false));
+        $refForm->add(new TestField('firstName'));
+        $form->add($refForm);
+
+        $form->bind($this->createPostRequest(array(
+            'author' => array(
+                // referenceCopy has a getter that returns a copy
+                'referenceCopy' => array(
+                    'firstName' => 'Foo',
+                )
+            )
+        )));
+
+        // firstName can only be updated if setReferenceCopy() was called
+        $this->assertEquals('Foo', $author->getReferenceCopy()->firstName);
+    }
+
+    public function testSubformCallsSettersIfReferenceIsScalar()
+    {
+        $author = new FormTest_AuthorWithoutRefSetter('scalar');
+
+        $form = new Form('author', array('validator' => $this->createMockValidator()));
+        $form->setData($author);
+        $refForm = new FormTest_FormThatReturns('referenceCopy');
+        $refForm->setReturnValue('foobar');
+        $form->add($refForm);
+
+        $form->bind($this->createPostRequest(array(
+            'author' => array(
+                'referenceCopy' => array(), // doesn't matter actually
+            )
+        )));
+
+        // firstName can only be updated if setReferenceCopy() was called
+        $this->assertEquals('foobar', $author->getReferenceCopy());
     }
 
     /**

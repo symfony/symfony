@@ -62,6 +62,19 @@ class TimeField extends Form
     /**
      * {@inheritDoc}
      */
+    public function __construct($key, array $options = array())
+    {
+        // Override parent option
+        // \DateTime objects are never edited by reference, because
+        // we treat them like value objects
+        $this->addOption('by_reference', false);
+
+        parent::__construct($key, $options);
+    }
+
+    /**
+     * {@inheritDoc}
+     */
     protected function configure()
     {
         $this->addOption('widget', self::CHOICE, self::$widgets);

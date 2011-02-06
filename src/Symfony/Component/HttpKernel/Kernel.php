@@ -97,7 +97,7 @@ abstract class Kernel implements KernelInterface
         // init container
         $this->initializeContainer();
 
-        foreach ($this->bundles as $bundle) {
+        foreach ($this->getBundles() as $bundle) {
             $bundle->setContainer($this->container);
             $bundle->boot();
         }
@@ -114,7 +114,7 @@ abstract class Kernel implements KernelInterface
     {
         $this->booted = false;
 
-        foreach ($this->bundles as $bundle) {
+        foreach ($this->getBundles() as $bundle) {
             $bundle->shutdown();
             $bundle->setContainer(null);
         }
@@ -131,7 +131,17 @@ abstract class Kernel implements KernelInterface
             $this->boot();
         }
 
-        return $this->container->get('http_kernel')->handle($request, $type, $catch);
+        return $this->getHttpKernel()->handle($request, $type, $catch);
+    }
+
+    /**
+     * Gets a http kernel from the container
+     *
+     * @return HttpKernel
+     */
+    protected function getHttpKernel()
+    {
+        return $this->container->get('http_kernel');
     }
 
     /**
@@ -343,7 +353,7 @@ abstract class Kernel implements KernelInterface
         $this->bundles = array();
         $topMostBundles = array();
         $directChildren = array();
-        
+
         foreach ($this->registerBundles() as $bundle) {
             $name = $bundle->getName();
             if (isset($this->bundles[$name])) {
@@ -358,7 +368,7 @@ abstract class Kernel implements KernelInterface
                 $directChildren[$parentName] = $name;
             } else {
                 $topMostBundles[$name] = $bundle;
-            }            
+            }
         }
 
         // look for orphans
@@ -377,7 +387,7 @@ abstract class Kernel implements KernelInterface
                 array_unshift($bundleMap, $this->bundles[$name]);
                 $hierarchy[] = $name;
             }
-            
+
             foreach ($hierarchy as $bundle) {
                 $this->bundleMap[$bundle] = $bundleMap;
                 array_pop($bundleMap);

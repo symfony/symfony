@@ -14,9 +14,191 @@ namespace Symfony\Tests\Component\HttpKernel;
 use Symfony\Component\HttpKernel\Kernel;
 use Symfony\Component\HttpKernel\Bundle\BundleInterface;
 use Symfony\Component\DependencyInjection\Loader\LoaderInterface;
+use Symfony\Component\HttpKernel\HttpKernelInterface;
+use Symfony\Component\HttpFoundation\Request;
 
 class KernelTest extends \PHPUnit_Framework_TestCase
 {
+    public function testConstructor()
+    {
+        $env = 'test_env';
+        $debug = true;
+        $kernel = new KernelForTest($env, $debug);
+
+        $this->assertEquals($env, $kernel->getEnvironment());
+        $this->assertEquals($debug, $kernel->isDebug());
+        $this->assertFalse($kernel->isBooted());
+        $this->assertLessThanOrEqual(microtime(true), $kernel->getStartTime());
+        $this->assertNull($kernel->getContainer());
+    }
+
+    public function testClone()
+    {
+        $env = 'test_env';
+        $debug = true;
+        $kernel = new KernelForTest($env, $debug);
+
+        $clone = clone $kernel;
+
+        $this->assertEquals($env, $clone->getEnvironment());
+        $this->assertEquals($debug, $clone->isDebug());
+        $this->assertFalse($clone->isBooted());
+        $this->assertLessThanOrEqual(microtime(true), $clone->getStartTime());
+        $this->assertNull($clone->getContainer());
+    }
+
+    public function testBootInitializesBundlesAndContainer()
+    {
+        $kernel = $this->getMockBuilder('Symfony\Tests\Component\HttpKernel\KernelForTest')
+            ->disableOriginalConstructor()
+            ->setMethods(array('initializeBundles', 'initializeContainer', 'getBundles'))
+            ->getMock();
+        $kernel->expects($this->once())
+            ->method('initializeBundles');
+        $kernel->expects($this->once())
+            ->method('initializeContainer');
+        $kernel->expects($this->once())
+            ->method('getBundles')
+            ->will($this->returnValue(array()));
+
+        $kernel->boot();
+    }
+
+    public function testBootSetsTheContainerToTheBundles()
+    {
+        $bundle = $this->getMockBuilder('Symfony\Component\HttpKernel\Bundle\Bundle')
+            ->disableOriginalConstructor()
+            ->getMock();
+        $bundle->expects($this->once())
+            ->method('setContainer');
+
+        $kernel = $this->getMockBuilder('Symfony\Tests\Component\HttpKernel\KernelForTest')
+            ->disableOriginalConstructor()
+            ->setMethods(array('initializeBundles', 'initializeContainer', 'getBundles'))
+            ->getMock();
+        $kernel->expects($this->once())
+            ->method('getBundles')
+            ->will($this->returnValue(array($bundle)));
+
+        $kernel->boot();
+    }
+
+    public function testBootSetsTheBootedFlagToTrue()
+    {
+        $kernel = $this->getMockBuilder('Symfony\Tests\Component\HttpKernel\KernelForTest')
+            ->disableOriginalConstructor()
+            ->setMethods(array('initializeBundles', 'initializeContainer', 'getBundles'))
+            ->getMock();
+        $kernel->expects($this->once())
+            ->method('getBundles')
+            ->will($this->returnValue(array()));
+
+        $kernel->boot();
+
+        $this->assertTrue($kernel->isBooted());
+    }
+
+    public function testShutdownCallsShutdownOnAllBundles()
+    {
+        $bundle = $this->getMockBuilder('Symfony\Component\HttpKernel\Bundle\Bundle')
+            ->disableOriginalConstructor()
+            ->getMock();
+        $bundle->expects($this->once())
+            ->method('shutdown');
+
+        $kernel = $this->getMockBuilder('Symfony\Tests\Component\HttpKernel\KernelForTest')
+            ->disableOriginalConstructor()
+            ->setMethods(array('getBundles'))
+            ->getMock();
+        $kernel->expects($this->once())
+            ->method('getBundles')
+            ->will($this->returnValue(array($bundle)));
+
+        $kernel->shutdown();
+    }
+
+    public function testShutdownGivesNullContainerToAllBundles()
+    {
+        $bundle = $this->getMockBuilder('Symfony\Component\HttpKernel\Bundle\Bundle')
+            ->disableOriginalConstructor()
+            ->getMock();
+        $bundle->expects($this->once())
+            ->method('setContainer')
+            ->with(null);
+
+        $kernel = $this->getMockBuilder('Symfony\Tests\Component\HttpKernel\KernelForTest')
+            ->disableOriginalConstructor()
+            ->setMethods(array('getBundles'))
+            ->getMock();
+        $kernel->expects($this->once())
+            ->method('getBundles')
+            ->will($this->returnValue(array($bundle)));
+
+        $kernel->shutdown();
+    }
+
+    public function testHandleCallsHandleOnHttpKernel()
+    {
+        $type = HttpKernelInterface::MASTER_REQUEST;
+        $catch = true;
+        $request = new Request();
+
+        $httpKernelMock = $this->getMockBuilder('Symfony\Component\HttpKernel\HttpKernel')
+            ->disableOriginalConstructor()
+            ->getMock();
+        $httpKernelMock
+            ->expects($this->once())
+            ->method('handle')
+            ->with($request, $type, $catch);
+
+        $kernel = $this->getMockBuilder('Symfony\Tests\Component\HttpKernel\KernelForTest')
+            ->disableOriginalConstructor()
+            ->setMethods(array('getHttpKernel'))
+            ->getMock();
+
+        $kernel->expects($this->once())
+            ->method('getHttpKernel')
+            ->will($this->returnValue($httpKernelMock));
+
+        $kernel->handle($request, $type, $catch);
+    }
+
+    public function testStripComments()
+    {
+        if (!function_exists('token_get_all')) {
+            $this->markTestSkipped();
+            return;
+        }
+        $source = <<<EOF
+<?php
+
+/**
+ * some class comments to strip
+ */
+class TestClass
+{
+    /**
+     * some method comments to strip
+     */
+    public function doStuff()
+    {
+        // inline comment
+    }
+}
+EOF;
+        $expected = <<<EOF
+<?php
+class TestClass
+{
+    public function doStuff()
+    {
+            }
+}
+EOF;
+
+        $this->assertEquals($expected, Kernel::stripComments($source));
+    }
+
     /**
      * @expectedException \InvalidArgumentException
      */
@@ -241,14 +423,14 @@ class KernelTest extends \PHPUnit_Framework_TestCase
     {
         $fooBundle = $this->getBundle(null, null, 'FooBundle', 'DuplicateName');
         $barBundle = $this->getBundle(null, null, 'BarBundle', 'DuplicateName');
-       
+
         $kernel = $this->getKernel();
         $kernel
             ->expects($this->once())
             ->method('registerBundles')
             ->will($this->returnValue(array($fooBundle, $barBundle)))
         ;
-        $kernel->initializeBundles();      
+        $kernel->initializeBundles();
     }
 
     protected function getBundle($dir = null, $parent = null, $className = null, $bundleName = null)
@@ -276,13 +458,13 @@ class KernelTest extends \PHPUnit_Framework_TestCase
             ->method('getPath')
             ->will($this->returnValue(strtr($dir, '\\', '/')))
         ;
-        
+
         $bundle
             ->expects($this->any())
             ->method('getParent')
             ->will($this->returnValue($parent))
         ;
-        
+
         return $bundle;
     }
 
@@ -332,6 +514,11 @@ class KernelForTest extends Kernel
     public function initializeBundles()
     {
         parent::initializeBundles();
+    }
+
+    public function isBooted()
+    {
+        return $this->booted;
     }
 }
 

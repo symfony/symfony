@@ -163,7 +163,7 @@ abstract class Kernel implements KernelInterface
      */
     public function isClassInActiveBundle($class)
     {
-        foreach ($this->bundles as $bundle) {
+        foreach ($this->getBundles() as $bundle) {
             $bundleClass = get_class($bundle);
             if (0 === strpos($class, substr($bundleClass, 0, strrpos($bundleClass, '\\')))) {
                 return true;

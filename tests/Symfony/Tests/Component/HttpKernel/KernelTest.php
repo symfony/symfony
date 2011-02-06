@@ -13,6 +13,7 @@ namespace Symfony\Tests\Component\HttpKernel;
 
 use Symfony\Component\HttpKernel\Kernel;
 use Symfony\Component\HttpKernel\Bundle\BundleInterface;
+use Symfony\Component\HttpKernel\Bundle\Bundle;
 use Symfony\Component\DependencyInjection\Loader\LoaderInterface;
 use Symfony\Component\HttpKernel\HttpKernelInterface;
 use Symfony\Component\HttpFoundation\Request;
@@ -98,6 +99,20 @@ class KernelTest extends \PHPUnit_Framework_TestCase
         $this->assertTrue($kernel->isBooted());
     }
 
+    public function testBootKernelSeveralTimesOnlyInitializesBundlesOnce()
+    {
+        $kernel = $this->getMockBuilder('Symfony\Tests\Component\HttpKernel\KernelForTest')
+            ->disableOriginalConstructor()
+            ->setMethods(array('initializeBundles', 'initializeContainer', 'getBundles'))
+            ->getMock();
+        $kernel->expects($this->once())
+            ->method('getBundles')
+            ->will($this->returnValue(array()));
+
+        $kernel->boot();
+        $kernel->boot();
+    }
+
     public function testShutdownCallsShutdownOnAllBundles()
     {
         $bundle = $this->getMockBuilder('Symfony\Component\HttpKernel\Bundle\Bundle')
@@ -163,6 +178,35 @@ class KernelTest extends \PHPUnit_Framework_TestCase
         $kernel->handle($request, $type, $catch);
     }
 
+    public function testHandleBootsTheKernel()
+    {
+        $type = HttpKernelInterface::MASTER_REQUEST;
+        $catch = true;
+        $request = new Request();
+
+        $httpKernelMock = $this->getMockBuilder('Symfony\Component\HttpKernel\HttpKernel')
+            ->disableOriginalConstructor()
+            ->getMock();
+
+        $kernel = $this->getMockBuilder('Symfony\Tests\Component\HttpKernel\KernelForTest')
+            ->disableOriginalConstructor()
+            ->setMethods(array('getHttpKernel', 'boot'))
+            ->getMock();
+
+        $kernel->expects($this->once())
+            ->method('getHttpKernel')
+            ->will($this->returnValue($httpKernelMock));
+
+        $kernel->expects($this->once())
+            ->method('boot');
+
+        // required as this value is initialized
+        // in the kernel constructor, which we don't call
+        $kernel->setIsBooted(false);
+
+        $kernel->handle($request, $type, $catch);
+    }
+
     public function testStripComments()
     {
         if (!function_exists('token_get_all')) {
@@ -197,6 +241,66 @@ class TestClass
 EOF;
 
         $this->assertEquals($expected, Kernel::stripComments($source));
+    }
+
+    public function testIsClassInActiveBundleFalse()
+    {
+        $kernel = $this->getKernelMockForIsClassInActiveBundleTest();
+
+        $this->assertFalse($kernel->isClassInActiveBundle('Not\In\Active\Bundle'));
+    }
+
+    public function testIsClassInActiveBundleFalseNoNamespace()
+    {
+        $kernel = $this->getKernelMockForIsClassInActiveBundleTest();
+
+        $this->assertFalse($kernel->isClassInActiveBundle('NotNamespacedClass'));
+    }
+
+    public function testIsClassInActiveBundleTrue()
+    {
+        $kernel = $this->getKernelMockForIsClassInActiveBundleTest();
+
+        $this->assertTrue($kernel->isClassInActiveBundle(__NAMESPACE__.'\FooBarBundle\SomeClass'));
+    }
+
+    protected function getKernelMockForIsClassInActiveBundleTest()
+    {
+        $bundle = new FooBarBundle();
+
+        $kernel = $this->getMockBuilder('Symfony\Tests\Component\HttpKernel\KernelForTest')
+            ->disableOriginalConstructor()
+            ->setMethods(array('getBundles'))
+            ->getMock();
+        $kernel->expects($this->once())
+            ->method('getBundles')
+            ->will($this->returnValue(array($bundle)));
+
+        return $kernel;
+    }
+
+    public function testGetRootDir()
+    {
+        $kernel = new KernelForTest('test', true);
+
+        $this->assertEquals(__DIR__, $kernel->getRootDir());
+    }
+
+    public function testGetName()
+    {
+        $kernel = new KernelForTest('test', true);
+
+        $this->assertEquals('HttpKernel', $kernel->getName());
+    }
+
+    public function testSerialize()
+    {
+        $env = 'test_env';
+        $debug = true;
+        $kernel = new KernelForTest($env, $debug);
+
+        $expected = serialize(array($env, $debug));
+        $this->assertEquals($expected, $kernel->serialize());
     }
 
     /**
@@ -497,6 +601,7 @@ class KernelForTest extends Kernel
 
     public function registerRootDir()
     {
+        return __DIR__;
     }
 
     public function registerBundles()
@@ -520,9 +625,19 @@ class KernelForTest extends Kernel
     {
         return $this->booted;
     }
+
+    public function setIsBooted($value)
+    {
+        $this->booted = (bool) $value;
+    }
 }
 
 abstract class BundleForTest implements BundleInterface
 {
     // We can not extend Symfony\Component\HttpKernel\Bundle\Bundle as we want to mock getName() which is final
+}
+
+class FooBarBundle extends Bundle
+{
+    // We need a full namespaced bundle instance to test isClassInActiveBundle
 }

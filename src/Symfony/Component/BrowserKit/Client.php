@@ -267,7 +267,7 @@ abstract class Client
     }
 
     /**
-     * Filters the request
+     * Filters the request.
      *
      * @param Request $request The request to filter
      *
@@ -279,7 +279,7 @@ abstract class Client
     }
 
     /**
-     * Filters the Response
+     * Filters the Response.
      *
      * @param Response $response The Response to filter
      *
@@ -291,7 +291,7 @@ abstract class Client
     }
 
     /**
-     * Creates a crawler
+     * Creates a crawler.
      *
      * @param string $uri A uri
      * @param string $content Content for the crawler to use

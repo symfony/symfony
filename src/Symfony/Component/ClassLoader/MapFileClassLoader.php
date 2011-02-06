@@ -21,7 +21,7 @@ class MapFileClassLoader
     protected $map = array();
 
     /**
-     * Constructor
+     * Constructor.
      *
      * @param string $file Path to class mapping file
      */

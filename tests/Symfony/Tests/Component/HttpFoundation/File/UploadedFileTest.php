@@ -15,6 +15,7 @@ use Symfony\Component\HttpFoundation\File\UploadedFile;
 
 class UploadedFileTest extends \PHPUnit_Framework_TestCase
 {
+
     public function testFileUploadsMustBeEnabled()
     {
         // we can't change this setting without modifying php.ini :(
@@ -31,6 +32,42 @@ class UploadedFileTest extends \PHPUnit_Framework_TestCase
         }
     }
 
+    public function testFileUploadsWithNoMimeType()
+    {
+        // we can't change this setting without modifying php.ini :(
+        if (ini_get('file_uploads')) {
+
+            $file = new UploadedFile(
+                __DIR__.'/Fixtures/test.gif',
+                'original.gif',
+                null,
+                filesize(__DIR__.'/Fixtures/test.gif'),
+                UPLOAD_ERR_OK
+            );
+
+            $this->assertAttributeEquals('application/octet-stream', 'mimeType', $file);
+            $this->assertEquals('image/gif', $file->getMimeType());
+        }
+    }
+
+    public function testFileUploadsWithUnknownMimeType()
+    {
+        // we can't change this setting without modifying php.ini :(
+        if (ini_get('file_uploads')) {
+
+            $file = new UploadedFile(
+                __DIR__.'/Fixtures/.unknownextension',
+                'original.gif',
+                null,
+                filesize(__DIR__.'/Fixtures/.unknownextension'),
+                UPLOAD_ERR_OK
+            );
+
+            $this->assertAttributeEquals('application/octet-stream', 'mimeType', $file);
+            $this->assertEquals('application/octet-stream', $file->getMimeType());
+        }
+    }
+
     public function testErrorIsOkByDefault()
     {
         // we can't change this setting without modifying php.ini :(
@@ -44,6 +81,21 @@ class UploadedFileTest extends \PHPUnit_Framework_TestCase
             );
 
             $this->assertEquals(UPLOAD_ERR_OK, $file->getError());
+        }
+    }
+    public function testGetOriginalName()
+    {
+        // we can't change this setting without modifying php.ini :(
+        if (ini_get('file_uploads')) {
+            $file = new UploadedFile(
+                __DIR__.'/Fixtures/test.gif',
+                'original.gif',
+                'image/gif',
+                filesize(__DIR__.'/Fixtures/test.gif'),
+                null
+            );
+
+            $this->assertEquals('original.gif', $file->getOriginalName());
         }
     }
 }

@@ -50,17 +50,10 @@ class FileinfoMimeTypeGuesser implements MimeTypeGuesserInterface
             return null;
         }
 
-        if (!$finfo = new \finfo(FILEINFO_MIME)) {
+        if (!$finfo = new \finfo(FILEINFO_MIME_TYPE)) {
             return null;
         }
 
-        $type = $finfo->file($path);
-
-        // remove charset (added as of PHP 5.3)
-        if (false !== $pos = strpos($type, ';')) {
-            $type = substr($type, 0, $pos);
-        }
-
-        return $type;
+        return $finfo->file($path);
     }
 }

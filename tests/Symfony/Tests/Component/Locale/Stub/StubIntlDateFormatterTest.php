@@ -23,7 +23,6 @@ class StubIntlDateFormatterTest extends \PHPUnit_Framework_TestCase
 
             /* escaping */
             array("'M", 0, 'M'),
-            array("'y-'M-'d", 0, 'y-M-d'),
             array("'yy", 0, 'yy'),
             array("'''yy", 0, "'yy"),
             array("''y", 0, "'1970"),
@@ -54,6 +53,19 @@ class StubIntlDateFormatterTest extends \PHPUnit_Framework_TestCase
     }
 
     /**
+    * provides data for cases that are broken in icu/intl
+    */
+    public function brokenFormatProvider()
+    {
+        return array(
+            /* escaping */
+            array("'y-'M-'d", 0, 'y-M-d'),
+            array("WTF 'y-'M", 0, '0T1 y-M'),
+            array("n-'M", 0, 'n-M'),
+        );
+    }
+
+    /**
      * @expectedException InvalidArgumentException
      */
     public function testConstructorWithUnsupportedLocale()
@@ -72,6 +84,22 @@ class StubIntlDateFormatterTest extends \PHPUnit_Framework_TestCase
     */
     public function testFormat($pattern, $timestamp, $expected)
     {
+        $formatter = new StubIntlDateFormatter('en', StubIntlDateFormatter::MEDIUM, StubIntlDateFormatter::SHORT, 'UTC', StubIntlDateFormatter::GREGORIAN, $pattern);
+        $this->assertEquals($expected, $formatter->format($timestamp), 'Check date format with stub implementation.');
+
+        if (extension_loaded('intl')) {
+            $formatter = new \IntlDateFormatter('en', \IntlDateFormatter::MEDIUM, \IntlDateFormatter::SHORT, 'UTC', \IntlDateFormatter::GREGORIAN, $pattern);
+            $this->assertEquals($expected, $formatter->format($timestamp), 'Check date format with intl extension.');
+        }
+    }
+
+    /**
+    * @dataProvider brokenFormatProvider
+    */
+    public function testBrokenFormat($pattern, $timestamp, $expected)
+    {
+        $this->markTestSkipped('icu/intl has some bugs, thus skipping.');
+
         $formatter = new StubIntlDateFormatter('en', StubIntlDateFormatter::MEDIUM, StubIntlDateFormatter::SHORT, 'UTC', StubIntlDateFormatter::GREGORIAN, $pattern);
         $this->assertEquals($expected, $formatter->format($timestamp), 'Check date format with stub implementation.');
 

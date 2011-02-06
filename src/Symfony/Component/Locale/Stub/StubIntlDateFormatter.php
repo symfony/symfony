@@ -40,9 +40,15 @@ class StubIntlDateFormatter
 
     public function format($timestamp)
     {
+        $regExp = "/('(M+|y+|d+|[^Myd])|M+|y+|d+)/";
+
         $callback = function($matches) use ($timestamp) {
             $pattern = $matches[0];
             $length = strlen($pattern);
+
+            if ("'" === $pattern[0]) {
+                return substr($pattern, 1);
+            }
 
             switch ($pattern[0]) {
                 case 'M':
@@ -83,7 +89,7 @@ class StubIntlDateFormatter
             }  
         };
 
-        $formatted = preg_replace_callback('/(M+|y+|d+)/', $callback, $this->getPattern());
+        $formatted = preg_replace_callback($regExp, $callback, $this->getPattern());
 
         return $formatted;
     }

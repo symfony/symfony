@@ -131,6 +131,6 @@ class TwigEngine implements EngineInterface
             return $name;
         }
 
-        return $this->environment->loadTemplate($this->parser->parse($name), is_array($name) ? json_encode($name) : $name);
+        return $this->environment->loadTemplate($this->parser->parse($name));
     }
 }

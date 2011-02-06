@@ -372,7 +372,7 @@ abstract class Kernel implements KernelInterface
         }
 
         // look for orphans
-        if (count($diff = array_diff(array_keys($directChildren), array_keys($this->bundles)))) {
+        if (count($diff = array_values(array_diff(array_keys($directChildren), array_keys($this->bundles))))) {
             throw new \LogicException(sprintf('Bundle "%s" extends bundle "%s", which is not registered.', $directChildren[$diff[0]], $diff[0]));
         }
 

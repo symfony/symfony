@@ -713,6 +713,10 @@ class Form extends Field implements \IteratorAggregate, FormInterface
      */
     public function bind(Request $request, $data = null)
     {
+        if (!$this->getName()) {
+            throw new FormException('You cannot bind anonymous forms. Please give this form a name');
+        }
+
         // Store object from which to read the default values and where to
         // write the submitted values
         if (null !== $data) {

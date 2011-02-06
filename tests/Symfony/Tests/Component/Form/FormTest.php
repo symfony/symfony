@@ -276,6 +276,16 @@ class FormTest extends \PHPUnit_Framework_TestCase
         $this->assertEquals(array('group2'), $childForm->getValidationGroups());
     }
 
+    /**
+     * @expectedException Symfony\Component\Form\Exception\FormException
+     */
+    public function testBindThrowsExceptionIfAnonymous()
+    {
+        $form = new Form(null, array('validator' => $this->createMockValidator()));
+
+        $form->bind($this->createPostRequest());
+    }
+
     public function testBindValidatesData()
     {
         $form = new Form('author', array(

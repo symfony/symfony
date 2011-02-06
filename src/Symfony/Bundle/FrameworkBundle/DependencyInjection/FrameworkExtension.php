@@ -309,10 +309,10 @@ class FrameworkExtension extends Extension
             $container->setParameter('templating.assets.base_urls', $config['assets_base_urls']);
         }
 
-        if (isset($config['loaders'])) {
+        if (isset($config['loaders']) && $config['loaders']) {
             $loaders = array_map(function($loader) { return new Reference($loader); }, $config['loaders']);
 
-            // Use a deligation unless only a single loader was registered
+            // Use a delegation unless only a single loader was registered
             if (1 === count($loaders)) {
                 $container->setAlias('templating.loader', (string) reset($loaders));
             } else {

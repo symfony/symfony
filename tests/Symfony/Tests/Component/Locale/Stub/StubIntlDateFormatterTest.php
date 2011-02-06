@@ -28,22 +28,22 @@ class StubIntlDateFormatterTest extends \PHPUnit_Framework_TestCase
             array("''y", 0, "'1970"),
             array("''yy", 0, "'70"),
 
-            /* months */
+            /* month */
             array('M', 0, '1'),
             array('MM', 0, '01'),
             array('MMM', 0, 'Jan'),
             array('MMMM', 0, 'January'),
             array('MMMMM', 0, 'J'),
-            array('MMMMMM', 0, '00001'),
+            array('MMMMMM', 0, '000001'),
 
             array('L', 0, '1'),
             array('LL', 0, '01'),
             array('LLL', 0, 'Jan'),
             array('LLLL', 0, 'January'),
             array('LLLLL', 0, 'J'),
-            array('LLLLLL', 0, '00001'),
+            array('LLLLLL', 0, '000001'),
 
-            /* years */
+            /* year */
             array('y', 0, '1970'),
             array('yy', 0, '70'),
             array('yyy', 0, '1970'),
@@ -81,6 +81,14 @@ class StubIntlDateFormatterTest extends \PHPUnit_Framework_TestCase
             array('QQQQ', 15638400, '3rd quarter'),
 
             array('QQQQ', 23587200, '4th quarter'),
+
+            /* hour */
+            array('h', 0, '12'),
+            array('hh', 0, '12'),
+            array('hhh', 0, '012'),
+
+            array('h', 1, '12'),
+            array('h', 3600, '1'),
         );
     }
 
@@ -92,6 +100,8 @@ class StubIntlDateFormatterTest extends \PHPUnit_Framework_TestCase
         return array(
             /* escaping */
             array("'y-'M-'d", 0, 'y-M-d'),
+
+            /* weird bugs */
             array("WTF 'y-'M", 0, '0T1 y-M'),
             array("n-'M", 0, 'n-M'),
         );

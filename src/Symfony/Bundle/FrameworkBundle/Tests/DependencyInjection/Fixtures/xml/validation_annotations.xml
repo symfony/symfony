@@ -7,12 +7,8 @@
                         http://www.symfony-project.org/schema/dic/symfony http://www.symfony-project.org/schema/dic/symfony/symfony-1.0.xsd">
 
     <app:config>
-        <app:router resource="%kernel.root_dir%/config/routing.xml" />
         <app:validation enabled="true" annotations="true">
             <app:namespace prefix="app" namespace="Application\Validator\Constraints\" />
         </app:validation>
-        <app:templating>
-            <app:engine id="php" />
-        </app:templating>
     </app:config>
 </container>

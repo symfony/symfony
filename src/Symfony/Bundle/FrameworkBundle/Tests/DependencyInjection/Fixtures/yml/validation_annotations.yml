@@ -1,10 +1,6 @@
 app.config:
-    router:
-        resource: %kernel.root_dir%/config/routing.xml
     validation:
         enabled:     true
-        annotations: true
-        namespaces:
-            app: Application\Validator\Constraints\
-    templating:
-        engine: php
+        annotations:
+            namespaces:
+                app: Application\Validator\Constraints\

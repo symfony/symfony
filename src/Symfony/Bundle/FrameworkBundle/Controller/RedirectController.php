@@ -47,7 +47,7 @@ class RedirectController extends ContainerAware
         $code = $permanent ? 301 : 302;
 
         $attributes = $this->container->get('request')->attributes->all();
-        unset($attributes['_route'], $attributes['route']);
+        unset($attributes['_route'], $attributes['route'], $attributes['permanent'] );
 
         $response = $this->container->get('response');
         $response->setRedirect($this->container->get('router')->generate($route, $attributes), $code);

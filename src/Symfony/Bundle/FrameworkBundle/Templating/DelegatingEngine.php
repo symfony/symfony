@@ -69,7 +69,7 @@ class DelegatingEngine extends BaseDelegatingEngine implements EngineInterface
             }
         }
 
-        throw new \RuntimeException(sprintf('No engine is able to work with the "%s" template.', $name));
+        throw new \RuntimeException(sprintf('No engine is able to work with the %s template.', json_encode($name)));
     }
 
     /**

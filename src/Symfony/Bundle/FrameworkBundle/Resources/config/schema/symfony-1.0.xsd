@@ -22,6 +22,7 @@
         <xsd:attribute name="cache-warmer" type="cache_warmer" />
         <xsd:attribute name="charset" type="xsd:string" />
         <xsd:attribute name="error-handler" type="xsd:string" />
+        <xsd:attribute name="exception-controller" type="xsd:string" />
         <xsd:attribute name="ide" type="xsd:string" />
     </xsd:complexType>
 

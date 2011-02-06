@@ -40,7 +40,7 @@ class StubIntlDateFormatter
 
     public function format($timestamp)
     {
-        $regExp = "/('(M+|L+|y+|d+|G+|Q+|q+|h+|D+|E+|[^MLydGQqhDE])|M+|L+|y+|d+|G+|Q+|q+|h+|D+|E+)/";
+        $regExp = "/('(M+|L+|y+|d+|G+|Q+|q+|h+|D+|E+|a+|[^MLydGQqhDEa])|M+|L+|y+|d+|G+|Q+|q+|h+|D+|E+|a+)/";
 
         $callback = function($matches) use ($timestamp) {
             $pattern = $matches[0];
@@ -134,7 +134,11 @@ class StubIntlDateFormatter
                             return substr($dayOfWeek, 0, 3);
                     }
                     break;
-            }  
+
+                case 'a':
+                    return gmdate('A', $timestamp);
+                    break;
+            }
         };
 
         $formatted = preg_replace_callback($regExp, $callback, $this->getPattern());

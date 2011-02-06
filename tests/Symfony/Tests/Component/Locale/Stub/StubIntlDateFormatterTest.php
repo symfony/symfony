@@ -107,7 +107,20 @@ class StubIntlDateFormatterTest extends \PHPUnit_Framework_TestCase
             array('EEEEE', 0, 'T'),
             array('EEEEEE', 0, 'Thu'),
 
-            array('E', 1296950400, 'Sun'),
+            array('E', 1296540000, 'Tue'), // 2011-02-01
+            array('E', 1296950400, 'Sun'), // 2011-02-06
+
+            /* am/pm marker */
+            array('a', 0, 'AM'),
+            array('aa', 0, 'AM'),
+            array('aaa', 0, 'AM'),
+            array('aaaa', 0, 'AM'),
+
+            // 12 hours
+            array('a', 43200, 'PM'),
+            array('aa', 43200, 'PM'),
+            array('aaa', 43200, 'PM'),
+            array('aaaa', 43200, 'PM'),
         );
     }
 

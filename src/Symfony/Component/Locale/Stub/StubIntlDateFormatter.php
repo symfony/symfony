@@ -40,7 +40,7 @@ class StubIntlDateFormatter
 
     public function format($timestamp)
     {
-        $regExp = "/('(M+|L+|y+|d+|G+|Q+|q+|h+|[^MLydGQqh])|M+|L+|y+|d+|G+|Q+|q+|h+)/";
+        $regExp = "/('(M+|L+|y+|d+|G+|Q+|q+|h+|D+|[^MLydGQqhD])|M+|L+|y+|d+|G+|Q+|q+|h+|D+)/";
 
         $callback = function($matches) use ($timestamp) {
             $pattern = $matches[0];
@@ -113,8 +113,12 @@ class StubIntlDateFormatter
                     break;
 
                 case 'h':
-                    $hours = gmdate('g', $timestamp);
-                    return str_pad($hours, $length, '0', STR_PAD_LEFT);
+                    return str_pad(gmdate('g', $timestamp), $length, '0', STR_PAD_LEFT);
+                    break;
+
+                case 'D':
+                    $dayOfYear = gmdate('z', $timestamp) + 1;
+                    return str_pad($dayOfYear, $length, '0', STR_PAD_LEFT);
                     break;
             }  
         };

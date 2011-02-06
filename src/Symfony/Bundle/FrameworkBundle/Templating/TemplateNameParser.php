@@ -53,12 +53,12 @@ class TemplateNameParser extends BaseTemplateNameParser
 
         $parts = explode(':', $name);
         if (3 !== count($parts)) {
-            throw new \InvalidArgumentException(sprintf('Template name "%s" is not valid (format is "bundle:section:template.engine.format").', $name));
+            throw new \InvalidArgumentException(sprintf('Template name "%s" is not valid (format is "bundle:section:template.format.engine").', $name));
         }
 
         $elements = explode('.', $parts[2]);
         if (3 !== count($elements)) {
-            throw new \InvalidArgumentException(sprintf('Template name "%s" is not valid (format is "bundle:section:template.engine.format").', $name));
+            throw new \InvalidArgumentException(sprintf('Template name "%s" is not valid (format is "bundle:section:template.format.engine").', $name));
         }
 
         $parameters = array(

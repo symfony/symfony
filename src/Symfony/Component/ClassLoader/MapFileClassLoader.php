@@ -12,6 +12,7 @@
 namespace Symfony\Component\ClassLoader;
 
 /**
+ * A class loader that uses a mapping file to look up paths.
  *
  * @author Fabien Potencier <fabien.potencier@symfony-project.org>
  */
@@ -19,6 +20,11 @@ class MapFileClassLoader
 {
     protected $map = array();
 
+    /**
+     * Constructor
+     *
+     * @param string Path to class mapping file
+     */
     public function __construct($file)
     {
         $this->map = require $file;

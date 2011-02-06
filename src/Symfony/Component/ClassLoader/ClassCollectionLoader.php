@@ -119,6 +119,10 @@ class ClassCollectionLoader
 
     /**
      * Adds brackets around each namespace if it's not already the case.
+     *
+     * @param string Namespace string
+     *
+     * @return string Namespaces with brackets
      */
     static public function fixNamespaceDeclarations($source)
     {
@@ -162,6 +166,15 @@ class ClassCollectionLoader
         return $output;
     }
 
+    /**
+     * Writes a cache file
+     *
+     * @param string Filename
+     * @param string Temporary file content
+     *
+     * @throws \RuntimeException when a cache file cannot be written
+     */
+     
     static protected function writeCacheFile($file, $content)
     {
         $tmpFile = tempnam(dirname($file), basename($file));

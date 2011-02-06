@@ -102,7 +102,7 @@ class UniversalClassLoader
     /**
      * Registers the directory to use as a fallback for namespaces.
      *
-     * @return string|array $dirs A directory path or an array of directories
+     * @param string|array $dirs A directory path or an array of directories
      */
     public function registerNamespaceFallback($dirs)
     {
@@ -112,7 +112,7 @@ class UniversalClassLoader
     /**
      * Registers the directory to use as a fallback for class prefixes.
      *
-     * @return string|array $dirs A directory path or an array of directories
+     * @param string|array $dirs A directory path or an array of directories
      */
     public function registerPrefixFallback($dirs)
     {

@@ -8,6 +8,13 @@ use Symfony\Component\DependencyInjection\Configuration\Exception\InvalidTypeExc
 /**
  * This node represents a scalar value in the config tree.
  *
+ * The following values are considered scalars:
+ *   * booleans
+ *   * strings
+ *   * null
+ *   * integers
+ *   * floats
+ *
  * @author Johannes M. Schmitt <schmittjoh@gmail.com>
  */
 class ScalarNode extends BaseNode implements PrototypeNodeInterface
@@ -44,7 +51,7 @@ class ScalarNode extends BaseNode implements PrototypeNodeInterface
 
     protected function validateType($value)
     {
-        if (!is_scalar($value)) {
+        if (!is_scalar($value) && null !== $value) {
             throw new InvalidTypeException(sprintf(
                 'Invalid type for path "%s". Expected scalar, but got %s.',
                 $this->getPath(),

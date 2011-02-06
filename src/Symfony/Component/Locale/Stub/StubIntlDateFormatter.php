@@ -40,7 +40,7 @@ class StubIntlDateFormatter
 
     public function format($timestamp)
     {
-        $regExp = "/('(M+|y+|d+|G+|Q+|q+|[^MydGQq])|M+|y+|d+|G+|Q+|q+)/";
+        $regExp = "/('(M+|L+|y+|d+|G+|Q+|q+|[^MLydGQq])|M+|L+|y+|d+|G+|Q+|q+)/";
 
         $callback = function($matches) use ($timestamp) {
             $pattern = $matches[0];
@@ -52,6 +52,7 @@ class StubIntlDateFormatter
 
             switch ($pattern[0]) {
                 case 'M':
+                case 'L':
                     $matchLengthMap = array(
                         1   => 'n',
                         2   => 'm',

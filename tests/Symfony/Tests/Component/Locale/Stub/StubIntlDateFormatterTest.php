@@ -36,6 +36,13 @@ class StubIntlDateFormatterTest extends \PHPUnit_Framework_TestCase
             array('MMMMM', 0, 'J'),
             array('MMMMMM', 0, '00001'),
 
+            array('L', 0, '1'),
+            array('LL', 0, '01'),
+            array('LLL', 0, 'Jan'),
+            array('LLLL', 0, 'January'),
+            array('LLLLL', 0, 'J'),
+            array('LLLLLL', 0, '00001'),
+
             /* years */
             array('y', 0, '1970'),
             array('yy', 0, '70'),

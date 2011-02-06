@@ -7,10 +7,6 @@
                         http://www.symfony-project.org/schema/dic/symfony http://www.symfony-project.org/schema/dic/symfony/symfony-1.0.xsd">
 
     <app:config>
-        <app:router resource="%kernel.root_dir%/config/routing.xml" />
         <app:session storage-id="pdo" pdo.db-table="table" pdo.db-id-col="id" pdo.db-data-col="data" pdo.db-time-col="time" />
-        <app:templating>
-            <app:engine id="php" />
-        </app:templating>
     </app:config>
 </container>

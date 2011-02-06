@@ -28,7 +28,7 @@ app.config:
         engines:          [php, twig]
         loader:           [loader.foo, loader.bar]
     translator:
-        enabled:  true,
+        enabled:  true
         fallback: fr
     validation:
         enabled: true

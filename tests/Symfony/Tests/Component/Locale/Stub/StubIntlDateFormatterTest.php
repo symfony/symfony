@@ -98,6 +98,16 @@ class StubIntlDateFormatterTest extends \PHPUnit_Framework_TestCase
             array('D', 86400, '2'), // 1 day
             array('D', 31536000, '1'), // 1 year
             array('D', 31622400, '2'), // 1 year + 1 day
+
+            /* day of week */
+            array('E', 0, 'Thu'),
+            array('EE', 0, 'Thu'),
+            array('EEE', 0, 'Thu'),
+            array('EEEE', 0, 'Thursday'),
+            array('EEEEE', 0, 'T'),
+            array('EEEEEE', 0, 'Thu'),
+
+            array('E', 1296950400, 'Sun'),
         );
     }
 

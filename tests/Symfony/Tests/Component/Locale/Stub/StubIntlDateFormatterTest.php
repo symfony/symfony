@@ -117,11 +117,11 @@ class StubIntlDateFormatterTest extends \PHPUnit_Framework_TestCase
     public function testFormat($pattern, $timestamp, $expected)
     {
         $formatter = new StubIntlDateFormatter('en', StubIntlDateFormatter::MEDIUM, StubIntlDateFormatter::SHORT, 'UTC', StubIntlDateFormatter::GREGORIAN, $pattern);
-        $this->assertEquals($expected, $formatter->format($timestamp), 'Check date format with stub implementation.');
+        $this->assertSame($expected, $formatter->format($timestamp), 'Check date format with stub implementation.');
 
         if (extension_loaded('intl')) {
             $formatter = new \IntlDateFormatter('en', \IntlDateFormatter::MEDIUM, \IntlDateFormatter::SHORT, 'UTC', \IntlDateFormatter::GREGORIAN, $pattern);
-            $this->assertEquals($expected, $formatter->format($timestamp), 'Check date format with intl extension.');
+            $this->assertSame($expected, $formatter->format($timestamp), 'Check date format with intl extension.');
         }
     }
 
@@ -133,11 +133,11 @@ class StubIntlDateFormatterTest extends \PHPUnit_Framework_TestCase
         $this->markTestSkipped('icu/intl has some bugs, thus skipping.');
 
         $formatter = new StubIntlDateFormatter('en', StubIntlDateFormatter::MEDIUM, StubIntlDateFormatter::SHORT, 'UTC', StubIntlDateFormatter::GREGORIAN, $pattern);
-        $this->assertEquals($expected, $formatter->format($timestamp), 'Check date format with stub implementation.');
+        $this->assertSame($expected, $formatter->format($timestamp), 'Check date format with stub implementation.');
 
         if (extension_loaded('intl')) {
             $formatter = new \IntlDateFormatter('en', \IntlDateFormatter::MEDIUM, \IntlDateFormatter::SHORT, 'UTC', \IntlDateFormatter::GREGORIAN, $pattern);
-            $this->assertEquals($expected, $formatter->format($timestamp), 'Check date format with intl extension.');
+            $this->assertSame($expected, $formatter->format($timestamp), 'Check date format with intl extension.');
         }
     }
 

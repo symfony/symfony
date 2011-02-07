@@ -65,13 +65,14 @@ class MimeTypeTest extends \PHPUnit_Framework_TestCase
 
         $this->setExpectedException('Symfony\Component\HttpFoundation\File\Exception\AccessDeniedException');
         MimeTypeGuesser::getInstance()->guess($path);
-
-
     }
+
     public static function tearDownAfterClass()
     {
         $path = __DIR__.'/../Fixtures/to_delete';
-        chmod($path, 0666);
-        @unlink($path);
+        if (file_exists($path)) {
+            chmod($path, 0666);
+            @unlink($path);
+        }
     }
 }

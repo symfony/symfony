@@ -1011,13 +1011,9 @@ class FormTest extends \PHPUnit_Framework_TestCase
 
     public function testSetDataToNullUsesDataConstructorOption()
     {
-        $test = $this;
         $author = new Author();
         $form = new Form('author', array(
-            'data_class' => 'Symfony\Tests\Component\Form\Fixtures\Author',
-            'data_constructor' => function ($class) use ($test, $author) {
-                $test->assertEquals('Symfony\Tests\Component\Form\Fixtures\Author', $class);
-
+            'data_constructor' => function () use ($author) {
                 return $author;
             }
         ));

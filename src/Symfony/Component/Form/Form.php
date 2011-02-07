@@ -112,10 +112,6 @@ class Form extends Field implements \IteratorAggregate, FormInterface
 
         if (isset($options['data_constructor'])) {
             $this->dataConstructor = $options['data_constructor'];
-        } else {
-            $this->dataConstructor = function ($class) {
-                return new $class();
-            };
         }
 
         parent::__construct($name, $options);
@@ -356,9 +352,14 @@ class Form extends Field implements \IteratorAggregate, FormInterface
      */
     public function setData($data)
     {
-        if (empty($data) && $this->dataClass) {
-            $constructor = $this->dataConstructor;
-            $data = $constructor($this->dataClass);
+        if (empty($data)) {
+            if ($this->dataConstructor) {
+                $constructor = $this->dataConstructor;
+                $data = $constructor();
+            } else if ($this->dataClass) {
+                $class = $this->dataClass;
+                $data = new $class();
+            }
         }
 
         parent::setData($data);

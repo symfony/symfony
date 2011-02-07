@@ -221,6 +221,11 @@ class PhpEngine implements EngineInterface, \ArrayAccess
         }
     }
 
+    /**
+     * Sets the helpers.
+     *
+     * @params Helper[] $helpers An array of helper
+     */
     public function setHelpers(array $helpers)
     {
         $this->helpers = array();
@@ -286,7 +291,8 @@ class PhpEngine implements EngineInterface, \ArrayAccess
     /**
      * Escapes a string by using the current charset.
      *
-     * @param mixed $value A variable to escape
+     * @param mixed  $value   A variable to escape
+     * @param string $context The context name
      *
      * @return string The escaped value
      */
@@ -440,6 +446,17 @@ class PhpEngine implements EngineInterface, \ArrayAccess
         );
     }
 
+    /**
+     * Convert a string from one encoding to another.
+     *
+     * @param string $string The string to convert
+     * @param string $to     The input encoding
+     * @param string $from   The output encoding
+     *
+     * @return string The string with the new encoding
+     *
+     * @throws \RuntimeException if no suitable encoding function is found (iconv or mbstring)
+     */
     public function convertEncoding($string, $to, $from)
     {
         if (function_exists('iconv')) {

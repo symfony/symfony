@@ -103,6 +103,15 @@ class DelegatingEngine implements EngineInterface
         return false;
     }
 
+    /**
+     * Get an engine able to render the given template.
+     *
+     * @param string $name A template name
+     *
+     * @return EngineInterface The engine
+     *
+     * @throws \RuntimeException if no engine able to work with the template is found
+     */
     protected function getEngine($name)
     {
         foreach ($this->engines as $engine) {

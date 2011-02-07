@@ -379,6 +379,11 @@ class Inline
         }
     }
 
+    /**
+     * Get a regex that match a unix timestamp
+     *
+     * @return string The regular expression
+     */
     static protected function getTimestampRegex()
     {
         return <<<EOF

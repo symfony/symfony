@@ -29,6 +29,9 @@ class StubIntlDateFormatter
     const TRADITIONAL = 0;
     const GREGORIAN = 1;
 
+    private $pattern;
+    private $dateTimeZone;
+
     public function __construct($locale, $datetype, $timetype, $timezone = null, $calendar = null, $pattern = null)
     {
         if ('en' != $locale) {
@@ -36,10 +39,16 @@ class StubIntlDateFormatter
         }
 
         $this->setPattern($pattern);
+
+        $this->dateTimeZone = new \DateTimeZone($timezone);
     }
 
     public function format($timestamp)
     {
+        $dateTime = new \DateTime();
+        $dateTime->setTimestamp($timestamp);
+        $dateTime->setTimezone($this->dateTimeZone);
+
         $specialChars = 'MLydGQqhDEaHkKms';
         $specialCharsArray = str_split($specialChars);
         $specialCharsMatch = implode('|', array_map(function($char) {
@@ -47,7 +56,7 @@ class StubIntlDateFormatter
         }, $specialCharsArray));
         $regExp = "/('($specialCharsMatch|[^$specialChars])|$specialCharsMatch)/";
 
-        $callback = function($matches) use ($timestamp) {
+        $callback = function($matches) use ($dateTime) {
             $pattern = $matches[0];
             $length = strlen($pattern);
 
@@ -66,11 +75,11 @@ class StubIntlDateFormatter
                     );
 
                     if (isset($matchLengthMap[$length])) {
-                       return gmdate($matchLengthMap[$length], $timestamp);
+                       return $dateTime->format($matchLengthMap[$length]);
                     } else if (5 == $length) {
-                        return substr(gmdate('M', $timestamp), 0, 1);
+                        return substr($dateTime->format('M'), 0, 1);
                     } else {
-                        return str_pad(gmdate('m', $timestamp), $length, '0', STR_PAD_LEFT);
+                        return str_pad($dateTime->format('m'), $length, '0', STR_PAD_LEFT);
                     }
                     break;
 
@@ -83,24 +92,24 @@ class StubIntlDateFormatter
                     );
 
                     if (isset($matchLengthMap[$length])) {
-                       return gmdate($matchLengthMap[$length], $timestamp);
+                       return $dateTime->format($matchLengthMap[$length]);
                     } else {
-                        return str_pad(gmdate('Y', $timestamp), $length, '0', STR_PAD_LEFT);
+                        return str_pad($dateTime->format('Y'), $length, '0', STR_PAD_LEFT);
                     }
                     break;
 
                 case 'd':
-                    return str_pad(gmdate('j', $timestamp), $length, '0', STR_PAD_LEFT);
+                    return str_pad($dateTime->format('j'), $length, '0', STR_PAD_LEFT);
                     break;
 
                 case 'G':
-                    $year = (int) gmdate('Y', $timestamp);
+                    $year = (int) $dateTime->format('Y');
                     return $year >= 0 ? 'AD' : 'BC';
                     break;
 
                 case 'q':
                 case 'Q':
-                    $month = (int) gmdate('n', $timestamp);
+                    $month = (int) $dateTime->format('n');
                     $quarter = (int) floor(($month - 1) / 3) + 1;
                     switch ($length) {
                         case 1:
@@ -118,16 +127,16 @@ class StubIntlDateFormatter
                     break;
 
                 case 'h':
-                    return str_pad(gmdate('g', $timestamp), $length, '0', STR_PAD_LEFT);
+                    return str_pad($dateTime->format('g'), $length, '0', STR_PAD_LEFT);
                     break;
 
                 case 'D':
-                    $dayOfYear = gmdate('z', $timestamp) + 1;
+                    $dayOfYear = $dateTime->format('z') + 1;
                     return str_pad($dayOfYear, $length, '0', STR_PAD_LEFT);
                     break;
 
                 case 'E':
-                    $dayOfWeek = gmdate('l', $timestamp);
+                    $dayOfWeek = $dateTime->format('l');
                     switch ($length) {
                         case 4:
                             return $dayOfWeek;
@@ -141,32 +150,32 @@ class StubIntlDateFormatter
                     break;
 
                 case 'a':
-                    return gmdate('A', $timestamp);
+                    return $dateTime->format('A');
                     break;
 
                 case 'H':
-                    return str_pad(gmdate('G', $timestamp), $length, '0', STR_PAD_LEFT);
+                    return str_pad($dateTime->format('G'), $length, '0', STR_PAD_LEFT);
                     break;
 
                 case 'k':
-                    $hourOfDay = gmdate('G', $timestamp);
+                    $hourOfDay = $dateTime->format('G');
                     $hourOfDay = ('0' == $hourOfDay) ? '24' : $hourOfDay;
                     return str_pad($hourOfDay, $length, '0', STR_PAD_LEFT);
                     break;
 
                 case 'K':
-                    $hourOfDay = gmdate('g', $timestamp);
+                    $hourOfDay = $dateTime->format('g');
                     $hourOfDay = ('12' == $hourOfDay) ? '0' : $hourOfDay;
                     return str_pad($hourOfDay, $length, '0', STR_PAD_LEFT);
                     break;
 
                 case 'm':
-                    $minuteOfHour = (int) gmdate('i', $timestamp);
+                    $minuteOfHour = (int) $dateTime->format('i');
                     return str_pad($minuteOfHour, $length, '0', STR_PAD_LEFT);
                     break;
 
                 case 's':
-                    $secondOfMinute = (int) gmdate('s', $timestamp);
+                    $secondOfMinute = (int) $dateTime->format('s');
                     return str_pad($secondOfMinute, $length, '0', STR_PAD_LEFT);
                     break;
             }

@@ -185,6 +185,31 @@ class StubIntlDateFormatterTest extends \PHPUnit_Framework_TestCase
         );
     }
 
+    public function formatWithTimezoneProvider()
+    {
+        return array(
+            array(0, 'UTC', '1970-01-01 00:00:00'),
+            array(0, 'Europe/Zurich', '1970-01-01 01:00:00'),
+            array(0, 'Europe/Paris', '1970-01-01 01:00:00'),
+            array(0, 'Africa/Cairo', '1970-01-01 02:00:00'),
+            array(0, 'Africa/Casablanca', '1970-01-01 00:00:00'),
+            array(0, 'Africa/Djibouti', '1970-01-01 03:00:00'),
+            array(0, 'Africa/Johannesburg', '1970-01-01 02:00:00'),
+            array(0, 'America/Antigua', '1969-12-31 20:00:00'),
+            array(0, 'America/Toronto', '1969-12-31 19:00:00'),
+            array(0, 'America/Vancouver', '1969-12-31 16:00:00'),
+            array(0, 'Asia/Aqtau', '1970-01-01 05:00:00'),
+            array(0, 'Asia/Bangkok', '1970-01-01 07:00:00'),
+            array(0, 'Asia/Dubai', '1970-01-01 04:00:00'),
+            array(0, 'Australia/Brisbane', '1970-01-01 10:00:00'),
+            array(0, 'Australia/Melbourne', '1970-01-01 10:00:00'),
+            array(0, 'Europe/Berlin', '1970-01-01 01:00:00'),
+            array(0, 'Europe/Dublin', '1970-01-01 01:00:00'),
+            array(0, 'Europe/Warsaw', '1970-01-01 01:00:00'),
+            array(0, 'Pacific/Fiji', '1970-01-01 12:00:00'),
+        );
+    }
+
     /**
     * provides data for cases that are broken in icu/intl
     */
@@ -229,6 +254,22 @@ class StubIntlDateFormatterTest extends \PHPUnit_Framework_TestCase
     }
 
     /**
+    * @dataProvider formatWithTimezoneProvider
+    */
+    public function testFormatWithTimezone($timestamp, $timezone, $expected)
+    {
+        $pattern = 'yyyy-MM-dd HH:mm:ss';
+
+        $formatter = new StubIntlDateFormatter('en', StubIntlDateFormatter::MEDIUM, StubIntlDateFormatter::SHORT, $timezone, StubIntlDateFormatter::GREGORIAN, $pattern);
+        $this->assertSame($expected, $formatter->format($timestamp), 'Check date format with stub implementation.');
+
+        if (extension_loaded('intl')) {
+            $formatter = new \IntlDateFormatter('en', \IntlDateFormatter::MEDIUM, \IntlDateFormatter::SHORT, $timezone, \IntlDateFormatter::GREGORIAN, $pattern);
+            $this->assertSame($expected, $formatter->format($timestamp), 'Check date format with intl extension.');
+        }
+    }
+
+    /**
     * @dataProvider brokenFormatProvider
     */
     public function testBrokenFormat($pattern, $timestamp, $expected)
@@ -249,7 +290,7 @@ class StubIntlDateFormatterTest extends \PHPUnit_Framework_TestCase
      */
     public function testGetCalendar()
     {
-        $formatter = new StubIntlDateFormatter('en', StubIntlDateFormatter::MEDIUM, StubIntlDateFormatter::SHORT);
+        $formatter = new StubIntlDateFormatter('en', StubIntlDateFormatter::MEDIUM, StubIntlDateFormatter::SHORT, 'UTC');
         $formatter->getCalendar();
     }
 }

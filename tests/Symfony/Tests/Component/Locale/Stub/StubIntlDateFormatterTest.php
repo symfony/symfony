@@ -85,7 +85,7 @@ class StubIntlDateFormatterTest extends \PHPUnit_Framework_TestCase
             // 10 months
             array('QQQQ', 23587200, '4th quarter'),
 
-            /* 12-hour */
+            /* 12-hour (1-12) */
             array('h', 0, '12'),
             array('hh', 0, '12'),
             array('hhh', 0, '012'),
@@ -142,6 +142,15 @@ class StubIntlDateFormatterTest extends \PHPUnit_Framework_TestCase
             array('k', 3600, '1'),
             array('k', 43200, '12'),
             array('k', 46800, '13'),
+
+            /* 12-hour (0-11) */
+            array('K', 0, '0'),
+            array('KK', 0, '00'),
+            array('KKK', 0, '000'),
+
+            array('K', 1, '0'),
+            array('K', 3600, '1'),
+            array('K', 43200, '0'), // 12 hours
         );
     }
 

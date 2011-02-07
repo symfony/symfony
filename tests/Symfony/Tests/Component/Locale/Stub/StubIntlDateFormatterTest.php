@@ -164,6 +164,24 @@ class StubIntlDateFormatterTest extends \PHPUnit_Framework_TestCase
             array('m', 3600, '0'),
             array('m', 3660, '1'),
             array('m', 43200, '0'), // 12 hours
+
+            /* second */
+            array('s', 0, '0'),
+            array('ss', 0, '00'),
+            array('sss', 0, '000'),
+
+            array('s', 1, '1'),
+            array('s', 2, '2'),
+            array('s', 5, '5'),
+            array('s', 30, '30'),
+            array('s', 59, '59'),
+            array('s', 60, '0'),
+            array('s', 120, '0'),
+            array('s', 180, '0'),
+            array('s', 3600, '0'),
+            array('s', 3601, '1'),
+            array('s', 3630, '30'),
+            array('s', 43200, '0'), // 12 hours
         );
     }
 

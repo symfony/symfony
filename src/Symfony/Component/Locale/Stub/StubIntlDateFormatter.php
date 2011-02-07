@@ -40,7 +40,7 @@ class StubIntlDateFormatter
 
     public function format($timestamp)
     {
-        $specialChars = 'MLydGQqhDEaHkKm';
+        $specialChars = 'MLydGQqhDEaHkKms';
         $specialCharsArray = str_split($specialChars);
         $specialCharsMatch = implode('|', array_map(function($char) {
             return $char . '+';
@@ -163,6 +163,11 @@ class StubIntlDateFormatter
                 case 'm':
                     $minuteOfHour = (int) gmdate('i', $timestamp);
                     return str_pad($minuteOfHour, $length, '0', STR_PAD_LEFT);
+                    break;
+
+                case 's':
+                    $secondOfMinute = (int) gmdate('s', $timestamp);
+                    return str_pad($secondOfMinute, $length, '0', STR_PAD_LEFT);
                     break;
             }
         };

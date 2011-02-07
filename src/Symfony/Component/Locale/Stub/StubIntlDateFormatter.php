@@ -40,7 +40,7 @@ class StubIntlDateFormatter
 
     public function format($timestamp)
     {
-        $specialChars = 'MLydGQqhDEaH';
+        $specialChars = 'MLydGQqhDEaHk';
         $specialCharsArray = str_split($specialChars);
         $specialCharsMatch = implode('|', array_map(function($char) {
             return $char . '+';
@@ -146,6 +146,12 @@ class StubIntlDateFormatter
 
                 case 'H':
                     return str_pad(gmdate('G', $timestamp), $length, '0', STR_PAD_LEFT);
+                    break;
+
+                case 'k':
+                    $hourOfDay = gmdate('G', $timestamp);
+                    $hourOfDay = ('0' == $hourOfDay) ? '24' : $hourOfDay;
+                    return str_pad($hourOfDay, $length, '0', STR_PAD_LEFT);
                     break;
             }
         };

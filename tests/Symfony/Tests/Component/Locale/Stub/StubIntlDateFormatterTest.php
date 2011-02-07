@@ -123,7 +123,7 @@ class StubIntlDateFormatterTest extends \PHPUnit_Framework_TestCase
             array('aaa', 43200, 'PM'),
             array('aaaa', 43200, 'PM'),
 
-            /* 24-hour */
+            /* 24-hour (0-23) */
             array('H', 0, '0'),
             array('HH', 0, '00'),
             array('HHH', 0, '000'),
@@ -132,6 +132,16 @@ class StubIntlDateFormatterTest extends \PHPUnit_Framework_TestCase
             array('H', 3600, '1'),
             array('H', 43200, '12'),
             array('H', 46800, '13'),
+
+            /* 24-hour (1-24) */
+            array('k', 0, '24'),
+            array('kk', 0, '24'),
+            array('kkk', 0, '024'),
+
+            array('k', 1, '24'),
+            array('k', 3600, '1'),
+            array('k', 43200, '12'),
+            array('k', 46800, '13'),
         );
     }
 

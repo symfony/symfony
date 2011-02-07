@@ -49,7 +49,7 @@ class StubIntlDateFormatter
         $dateTime->setTimestamp($timestamp);
         $dateTime->setTimezone($this->dateTimeZone);
 
-        $specialChars = 'MLydGQqhDEaHkKms';
+        $specialChars = 'MLydGQqhDEaHkKmsz';
         $specialCharsArray = str_split($specialChars);
         $specialCharsMatch = implode('|', array_map(function($char) {
             return $char . '+';
@@ -177,6 +177,10 @@ class StubIntlDateFormatter
                 case 's':
                     $secondOfMinute = (int) $dateTime->format('s');
                     return str_pad($secondOfMinute, $length, '0', STR_PAD_LEFT);
+                    break;
+
+                case 'z':
+                    return $dateTime->format('\G\M\TP');
                     break;
             }
         };

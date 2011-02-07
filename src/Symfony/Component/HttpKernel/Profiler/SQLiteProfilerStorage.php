@@ -94,11 +94,11 @@ class SQLiteProfilerStorage implements ProfilerStorageInterface
         );
         try {
             $this->exec($db, 'INSERT INTO data (token, data, ip, url, time, created_at) VALUES (:token, :data, :ip, :url, :time, :created_at)', $args);
+            $this->cleanup();
             $status = true;
         } catch (\Exception $e) {
             $status = false;
         }
-        $this->cleanup();
         $this->close($db);
 
         return $status;

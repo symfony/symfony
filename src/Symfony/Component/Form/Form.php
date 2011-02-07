@@ -59,6 +59,12 @@ class Form extends Field implements \IteratorAggregate, FormInterface
     protected $dataClass;
 
     /**
+     * Stores the constructor closure for creating new domain object instances
+     * @var \Closure
+     */
+    protected $dataConstructor;
+
+    /**
      * The context used when creating the form
      * @var FormContext
      */
@@ -86,6 +92,7 @@ class Form extends Field implements \IteratorAggregate, FormInterface
     public function __construct($name = null, array $options = array())
     {
         $this->addOption('data_class');
+        $this->addOption('data_constructor');
         $this->addOption('csrf_field_name', '_token');
         $this->addOption('csrf_provider');
         $this->addOption('field_factory');
@@ -101,6 +108,14 @@ class Form extends Field implements \IteratorAggregate, FormInterface
 
         if (isset($options['data_class'])) {
             $this->dataClass = $options['data_class'];
+        }
+
+        if (isset($options['data_constructor'])) {
+            $this->dataConstructor = $options['data_constructor'];
+        } else {
+            $this->dataConstructor = function ($class) {
+                return new $class();
+            };
         }
 
         parent::__construct($name, $options);
@@ -341,6 +356,11 @@ class Form extends Field implements \IteratorAggregate, FormInterface
      */
     public function setData($data)
     {
+        if (empty($data) && $this->dataClass) {
+            $constructor = $this->dataConstructor;
+            $data = $constructor($this->dataClass);
+        }
+
         parent::setData($data);
 
         // get transformed data and pass its values to child fields

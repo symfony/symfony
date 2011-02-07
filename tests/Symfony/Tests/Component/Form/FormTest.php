@@ -991,6 +991,41 @@ class FormTest extends \PHPUnit_Framework_TestCase
         $form->setData(new Author());
     }
 
+    public function testSetDataToNull()
+    {
+        $form = new Form('author');
+        $form->setData(null);
+
+        $this->assertNull($form->getData());
+    }
+
+    public function testSetDataToNullCreatesObjectIfClassAvailable()
+    {
+        $form = new Form('author', array(
+            'data_class' => 'Symfony\Tests\Component\Form\Fixtures\Author',
+        ));
+        $form->setData(null);
+
+        $this->assertEquals(new Author(), $form->getData());
+    }
+
+    public function testSetDataToNullUsesDataConstructorOption()
+    {
+        $test = $this;
+        $author = new Author();
+        $form = new Form('author', array(
+            'data_class' => 'Symfony\Tests\Component\Form\Fixtures\Author',
+            'data_constructor' => function ($class) use ($test, $author) {
+                $test->assertEquals('Symfony\Tests\Component\Form\Fixtures\Author', $class);
+
+                return $author;
+            }
+        ));
+        $form->setData(null);
+
+        $this->assertSame($author, $form->getData());
+    }
+
     public function testSubmitUpdatesTransformedDataFromAllFields()
     {
         $originalAuthor = new Author();

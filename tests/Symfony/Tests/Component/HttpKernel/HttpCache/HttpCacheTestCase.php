@@ -12,8 +12,10 @@
 namespace Symfony\Tests\Component\HttpKernel\HttpCache;
 
 require_once __DIR__.'/TestHttpKernel.php';
+require_once __DIR__.'/TestMultipleHttpKernel.php';
 
 use Symfony\Component\HttpFoundation\Request;
+use Symfony\Component\HttpKernel\HttpCache\Esi;
 use Symfony\Component\HttpKernel\HttpCache\HttpCache;
 use Symfony\Component\HttpKernel\HttpCache\Store;
 use Symfony\Component\HttpKernel\HttpKernelInterface;
@@ -28,18 +30,21 @@ class HttpCacheTestCase extends \PHPUnit_Framework_TestCase
     protected $response;
     protected $responses;
     protected $catch;
+    protected $esi;
 
     protected function setUp()
     {
         $this->kernel = null;
 
         $this->cache = null;
+        $this->esi = null;
         $this->caches = array();
         $this->cacheConfig = array();
 
         $this->request = null;
         $this->response = null;
         $this->responses = array();
+
 
         $this->catch = false;
 
@@ -101,7 +106,7 @@ class HttpCacheTestCase extends \PHPUnit_Framework_TestCase
         $this->assertFalse($this->kernel->isCatchingExceptions());
     }
 
-    public function request($method, $uri = '/', $server = array(), $cookies = array())
+    public function request($method, $uri = '/', $server = array(), $cookies = array(), $esi = false)
     {
         if (null === $this->kernel) {
             throw new \LogicException('You must call setNextResponse() before calling request().');
@@ -112,7 +117,9 @@ class HttpCacheTestCase extends \PHPUnit_Framework_TestCase
         $this->store = new Store(sys_get_temp_dir().'/http_cache');
 
         $this->cacheConfig['debug'] = true;
-        $this->cache = new HttpCache($this->kernel, $this->store, null, $this->cacheConfig);
+
+        $this->esi = $esi ? new Esi() : null;
+        $this->cache = new HttpCache($this->kernel, $this->store, $this->esi, $this->cacheConfig);
         $this->request = Request::create($uri, $method, array(), $cookies, array(), $server);
 
         $this->response = $this->cache->handle($this->request, HttpKernelInterface::MASTER_REQUEST, $this->catch);
@@ -133,9 +140,12 @@ class HttpCacheTestCase extends \PHPUnit_Framework_TestCase
     // A basic response with 200 status code and a tiny body.
     public function setNextResponse($statusCode = 200, array $headers = array(), $body = 'Hello World', \Closure $customizer = null)
     {
-        $called = false;
-
         $this->kernel = new TestHttpKernel($body, $statusCode, $headers, $customizer);
+    }
+
+    public function setNextResponses($responses)
+    {
+        $this->kernel = new TestMultipleHttpKernel($responses);
     }
 
     public function catchExceptions($catch = true)

@@ -893,4 +893,67 @@ class HttpCacheTest extends HttpCacheTestCase
 
         $this->assertExceptionsAreNotCaught();
     }
+
+    public function testEsiCacheSendsTheLowestTtl()
+    {
+        $responses = array(
+            array(
+                'status'  => 200,
+                'body'    => '<esi:include src="/foo" /> <esi:include src="/bar" />',
+                'headers' => array(
+                    'Cache-Control'     => 's-maxage=300',
+                    'Surrogate-Control' => 'content="ESI/1.0"',
+                ),
+            ),
+            array(
+                'status'  => 200,
+                'body'    => 'Hello World!',
+                'headers' => array('Cache-Control' => 's-maxage=300'),
+            ),
+            array(
+                'status'  => 200,
+                'body'    => 'My name is Bobby.',
+                'headers' => array('Cache-Control' => 's-maxage=100'),
+            ),
+        );
+
+        $this->setNextResponses($responses);
+
+        $this->request('GET', '/', array(), array(), true);
+        $this->assertEquals("Hello World! My name is Bobby.", $this->response->getContent());
+        $this->assertEquals(100, $this->response->getTtl());
+    }
+
+    public function testEsiCacheForceValidation()
+    {
+        $responses = array(
+            array(
+                'status'  => 200,
+                'body'    => '<esi:include src="/foo" /> <esi:include src="/bar" />',
+                'headers' => array(
+                    'Cache-Control'     => 's-maxage=300',
+                    'Surrogate-Control' => 'content="ESI/1.0"',
+                ),
+            ),
+            array(
+                'status'  => 200,
+                'body'    => 'Hello World!',
+                'headers' => array('ETag' => 'foobar'),
+            ),
+            array(
+                'status'  => 200,
+                'body'    => 'My name is Bobby.',
+                'headers' => array('Cache-Control' => 's-maxage=100'),
+            ),
+        );
+
+        $this->setNextResponses($responses);
+
+        $this->request('GET', '/', array(), array(), true);
+        $this->assertEquals('Hello World! My name is Bobby.', $this->response->getContent());
+        $this->assertEquals(null, $this->response->getTtl());
+        $this->assertTrue($this->response->mustRevalidate());
+        $this->assertTrue($this->response->headers->hasCacheControlDirective('private'));
+        $this->assertTrue($this->response->headers->hasCacheControlDirective('no-cache'));
+    }
 }

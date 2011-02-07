@@ -31,6 +31,7 @@ class HttpCache implements HttpKernelInterface
     protected $store;
     protected $request;
     protected $esi;
+    protected $esiTtls;
 
     /**
      * Constructor.
@@ -136,6 +137,7 @@ class HttpCache implements HttpKernelInterface
         if (HttpKernelInterface::MASTER_REQUEST === $type) {
             $this->traces = array();
             $this->request = $request;
+            $this->esiTtls = array();
         }
 
         $path = $request->getPathInfo();
@@ -160,7 +162,41 @@ class HttpCache implements HttpKernelInterface
             $response->headers->set('X-Symfony-Cache', $this->getLog());
         }
 
+        if (null !== $this->esi) {
+            $this->addEsiTtl($response);
+
+            if ($request === $this->request) {
+                $this->updateResponseCacheControl($response);
+            }
+        }
+
         return $response;
+    }
+
+    /**
+     * Stores the response's TTL locally.
+     *
+     * @param Response $response
+     */
+    protected function addEsiTtl(Response $response)
+    {
+        $this->esiTtls[] = $response->isValidateable() ? 0 : $response->getTtl();
+    }
+
+    /**
+     * Changes the master response TTL to the smallest TTL received or force validation if
+     * one of the ESI has validation cache strategy.
+     *
+     * @param Response $response
+     */
+    protected function updateResponseCacheControl(Response $response)
+    {
+        $ttl = min($this->esiTtls);
+        if (0 === $ttl) {
+            $response->headers->set('Cache-Control', 'no-cache, must-revalidate');
+        } else {
+            $response->setSharedMaxAge($ttl);
+        }
     }
 
     /**

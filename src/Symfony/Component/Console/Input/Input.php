@@ -64,6 +64,8 @@ abstract class Input implements InputInterface
     abstract protected function parse();
 
     /**
+     * Validates the input.
+     *
      * @throws \RuntimeException When not enough arguments are given
      */
     public function validate()
@@ -73,11 +75,21 @@ abstract class Input implements InputInterface
         }
     }
 
+    /**
+     * Checks if the input is interactive.
+     *
+     * @return Boolean Returns true if the input is interactive
+     */
     public function isInteractive()
     {
         return $this->interactive;
     }
 
+    /**
+     * Sets the input interactivity.
+     *
+     * @param Boolean $interactive If the input should be interactive
+     */
     public function setInteractive($interactive)
     {
         $this->interactive = (Boolean) $interactive;

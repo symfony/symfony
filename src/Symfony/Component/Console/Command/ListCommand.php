@@ -26,7 +26,7 @@ use Symfony\Component\Console\Command\Command;
 class ListCommand extends Command
 {
     /**
-     * @see Command
+     * {@inheritdoc}
      */
     protected function configure()
     {
@@ -54,7 +54,7 @@ EOF
     }
 
     /**
-     * @see Command
+     * {@inheritdoc}
      */
     protected function execute(InputInterface $input, OutputInterface $output)
     {

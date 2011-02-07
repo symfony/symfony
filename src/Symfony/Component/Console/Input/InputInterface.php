@@ -63,6 +63,7 @@ interface InputInterface
     /**
      * Get argument by name.
      *
+     * @param string $name The name of the argument
      * @return mixed
      */
     function getArgument($name);
@@ -72,6 +73,12 @@ interface InputInterface
      */
     function getOptions();
 
+    /**
+     * Get an option by name.
+     *
+     * @param string $name The name of the option
+     * @return mixed
+     */
     function getOption($name);
 
     /**

@@ -179,6 +179,12 @@ abstract class Output implements OutputInterface
     }
 
     /**
+     * Replaces the starting style of the output.
+     *
+     * @param array $match
+     *
+     * @return string The replaced style
+     *
      * @throws \InvalidArgumentException When style is unknown
      */
     protected function replaceStartStyle($match)
@@ -220,6 +226,13 @@ abstract class Output implements OutputInterface
         return "\033[".implode(';', $codes).'m';
     }
 
+    /**
+     * Replaces the end style.
+     *
+     * @param string $match The text to match
+     *
+     * @return string The end style
+     */
     protected function replaceEndStyle($match)
     {
         if (!$this->decorated) {

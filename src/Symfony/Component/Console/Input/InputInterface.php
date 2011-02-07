@@ -38,6 +38,18 @@ interface InputInterface
     function hasParameterOption($value);
 
     /**
+     * Returns the value of a raw option (not parsed).
+     *
+     * This method is to be used to introspect the input parameters
+     * before it has been validated. It must be used carefully.
+     *
+     * @param string|array $values The value(s) to look for in the raw parameters (can be an array)
+     *
+     * @return mixed The option value
+     */
+    function getParameterOption(array $values, $default = false);
+
+    /**
      * Binds the current Input instance with the given arguments and options.
      *
      * @param InputDefinition $definition A InputDefinition instance

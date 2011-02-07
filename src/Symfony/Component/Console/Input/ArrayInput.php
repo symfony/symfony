@@ -83,6 +83,33 @@ class ArrayInput extends Input
     }
 
     /**
+     * Returns the value of a raw option (not parsed).
+     *
+     * This method is to be used to introspect the input parameters
+     * before it has been validated. It must be used carefully.
+     *
+     * @param string|array $values The value(s) to look for in the raw parameters (can be an array)
+     *
+     * @return mixed The option value
+     */
+    public function getParameterOption(array $values, $default = false)
+    {
+        if (!is_array($values)) {
+            $values = array($values);
+        }
+
+        foreach ($this->parameters as $k => $v) {
+            if (is_int($k) && in_array($v, $values)) {
+                return true;
+            } elseif (in_array($k, $values)) {
+                return $v;
+            }
+        }
+
+        return $default;
+    }
+
+    /**
      * Processes command line arguments.
      */
     protected function parse()

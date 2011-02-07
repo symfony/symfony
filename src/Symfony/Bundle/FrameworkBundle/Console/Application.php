@@ -34,9 +34,11 @@ class Application extends BaseApplication
     {
         $this->kernel = $kernel;
 
-        parent::__construct('Symfony', Kernel::VERSION.' - '.$kernel->getName());
+        parent::__construct('Symfony', Kernel::VERSION.' - '.$kernel->getName().'/'.$kernel->getEnvironment().($kernel->isDebug() ? '/debug' : ''));
 
         $this->definition->addOption(new InputOption('--shell', '-s', InputOption::VALUE_NONE, 'Launch the shell.'));
+        $this->definition->addOption(new InputOption('--env', '-e', InputOption::VALUE_REQUIRED, 'The Environment name.', 'dev'));
+        $this->definition->addOption(new InputOption('--debug', '-d', InputOption::VALUE_NONE, 'Whether to run in debug mode.'));
 
         $this->kernel->boot();
 

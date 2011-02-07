@@ -54,28 +54,37 @@ class RequestTest extends \PHPUnit_Framework_TestCase
         $this->assertEquals('/foo', $request->getPathInfo());
         $this->assertEquals('bar=baz', $request->getQueryString());
         $this->assertEquals(80, $request->getPort());
+        $this->assertEquals('test.com', $request->getHttpHost());
+        $this->assertFalse($request->isSecure());
 
         $request = Request::create('https://test.com/foo?bar=baz');
         $this->assertEquals('https://test.com/foo?bar=baz', $request->getUri());
         $this->assertEquals('/foo', $request->getPathInfo());
         $this->assertEquals('bar=baz', $request->getQueryString());
         $this->assertEquals(443, $request->getPort());
+        $this->assertEquals('test.com', $request->getHttpHost());
+        $this->assertTrue($request->isSecure());
 
         $request = Request::create('test.com:90/foo');
         $this->assertEquals('http://test.com:90/foo', $request->getUri());
         $this->assertEquals('/foo', $request->getPathInfo());
         $this->assertEquals('test.com', $request->getHost());
+        $this->assertEquals('test.com:90', $request->getHttpHost());
         $this->assertEquals(90, $request->getPort());
+        $this->assertFalse($request->isSecure());
 
         $request = Request::create('https://test.com:90/foo');
         $this->assertEquals('https://test.com:90/foo', $request->getUri());
         $this->assertEquals('/foo', $request->getPathInfo());
         $this->assertEquals('test.com', $request->getHost());
+        $this->assertEquals('test.com:90', $request->getHttpHost());
         $this->assertEquals(90, $request->getPort());
+        $this->assertTrue($request->isSecure());
 
         $json = '{"jsonrpc":"2.0","method":"echo","id":7,"params":["Hello World"]}';
         $request = Request::create('http://example.com/jsonrpc', 'POST', array(), array(), array(), array(), $json);
         $this->assertEquals($json, $request->getContent());
+        $this->assertFalse($request->isSecure());
     }
 
     /**
@@ -101,6 +110,7 @@ class RequestTest extends \PHPUnit_Framework_TestCase
 
     /**
      * @covers Symfony\Component\HttpFoundation\Request::getFormat
+     * @covers Symfony\Component\HttpFoundation\Request::setFormat
      * @dataProvider getFormatToMimeTypeMapProvider
      */
     public function testGetFormatFromMimeType($format, $mimeTypes)
@@ -109,7 +119,10 @@ class RequestTest extends \PHPUnit_Framework_TestCase
         foreach ($mimeTypes as $mime) {            
             $this->assertEquals($format, $request->getFormat($mime));
         }
-
+        $request->setFormat($format, $mimeTypes);
+        foreach ($mimeTypes as $mime) {
+            $this->assertEquals($format, $request->getFormat($mime));
+        }
     }
 
     /**
@@ -322,6 +335,7 @@ class RequestTest extends \PHPUnit_Framework_TestCase
         $request->initialize(array(), array(), array(), array(), array(), $server);
 
         $this->assertEquals('http://hostname/some/path', $request->getUriForPath('/some/path'), '->getUriForPath() with rewrite, default port without HOST_HEADER');
+        $this->assertEquals('hostname', $request->getHttpHost());
     }
 
     /**
@@ -420,6 +434,23 @@ class RequestTest extends \PHPUnit_Framework_TestCase
         $this->assertEquals('PURGE', $request->getMethod(), '->getMethod() returns the method from _method if defined and POST');
     }
 
+    public function testGetClientIp()
+    {
+        $request = new Request;
+        $this->assertEquals('', $request->getClientIp());
+        $this->assertEquals('', $request->getClientIp(true));
+        $request->initialize(array(), array(), array(), array(), array(), array('REMOTE_ADDR' => '88.88.88.88'));
+        $this->assertEquals('88.88.88.88', $request->getClientIp());
+        $request->initialize(array(), array(), array(), array(), array(), array('REMOTE_ADDR' => '127.0.0.1', 'HTTP_CLIENT_IP' => '88.88.88.88'));
+        $this->assertEquals('127.0.0.1', $request->getClientIp());
+        $request->initialize(array(), array(), array(), array(), array(), array('REMOTE_ADDR' => '127.0.0.1', 'HTTP_CLIENT_IP' => '88.88.88.88'));
+        $this->assertEquals('88.88.88.88', $request->getClientIp(true));
+        $request->initialize(array(), array(), array(), array(), array(), array('REMOTE_ADDR' => '127.0.0.1', 'HTTP_X_FORWARDED_FOR' => '88.88.88.88'));
+        $this->assertEquals('127.0.0.1', $request->getClientIp());
+        $request->initialize(array(), array(), array(), array(), array(), array('REMOTE_ADDR' => '127.0.0.1', 'HTTP_X_FORWARDED_FOR' => '88.88.88.88'));
+        $this->assertEquals('88.88.88.88', $request->getClientIp(true));
+    }
+
     public function testGetContentWorksTwiceInDefaultMode()
     {
         $req = new Request;
@@ -472,5 +503,164 @@ class RequestTest extends \PHPUnit_Framework_TestCase
         $this->assertEquals('bar5', $request->server->get('foo5'), '::fromGlobals() uses values from $_SERVER');
 
         unset($_GET['foo1'], $_POST['foo2'], $_COOKIE['foo3'], $_FILES['foo4'], $_SERVER['foo5']);
+    }
+
+    public function testOverrideGlobals()
+    {
+        $time = $_SERVER['REQUEST_TIME']; // fix for phpunit timer
+
+        $request = new Request();
+        $request->initialize(array('foo' => 'bar'));
+        $request->overrideGlobals();
+
+        $this->assertEquals(array('foo' => 'bar'), $_GET);
+
+        $request->initialize(array(), array('foo' => 'bar'));
+        $request->overrideGlobals();
+
+        $this->assertEquals(array('foo' => 'bar'), $_POST);
+
+        $this->assertArrayNotHasKey('HTTP_X_FORWARDED_PROTO', $_SERVER);
+
+        $request->headers->set('X_FORWARDED_PROTO', 'https');
+
+        $this->assertTrue($request->isSecure());
+
+        $request->overrideGlobals();
+
+        $this->assertArrayHasKey('HTTP_X_FORWARDED_PROTO', $_SERVER);
+
+        $_SERVER['REQUEST_TIME'] = $time; // fix for phpunit timer
+    }
+
+    public function testGetScriptName()
+    {
+        $request = new Request();
+        $this->assertEquals('', $request->getScriptName());
+
+        $server = array();
+        $server['SCRIPT_NAME'] = '/index.php';
+
+        $request->initialize(array(), array(), array(), array(), array(), $server);
+
+        $this->assertEquals('/index.php', $request->getScriptName());
+
+        $server = array();
+        $server['ORIG_SCRIPT_NAME'] = '/frontend.php';
+        $request->initialize(array(), array(), array(), array(), array(), $server);
+
+        $this->assertEquals('/frontend.php', $request->getScriptName());
+
+        $server = array();
+        $server['SCRIPT_NAME'] = '/index.php';
+        $server['ORIG_SCRIPT_NAME'] = '/frontend.php';
+        $request->initialize(array(), array(), array(), array(), array(), $server);
+
+        $this->assertEquals('/index.php', $request->getScriptName());
+    }
+
+    public function testGetBasePath()
+    {
+        $request = new Request();
+        $this->assertEquals('', $request->getBasePath());
+
+        $server = array();
+        $server['SCRIPT_FILENAME'] = '/some/where/index.php';
+        $request->initialize(array(), array(), array(), array(), array(), $server);
+        $this->assertEquals('', $request->getBasePath());
+
+        $server = array();
+        $server['SCRIPT_FILENAME'] = '/some/where/index.php';
+        $server['SCRIPT_NAME'] = '/index.php';
+        $request->initialize(array(), array(), array(), array(), array(), $server);
+
+        $this->assertEquals('', $request->getBasePath());
+
+        $server = array();
+        $server['SCRIPT_FILENAME'] = '/some/where/index.php';
+        $server['PHP_SELF'] = '/index.php';
+        $request->initialize(array(), array(), array(), array(), array(), $server);
+
+        $this->assertEquals('', $request->getBasePath());
+
+        $server = array();
+        $server['SCRIPT_FILENAME'] = '/some/where/index.php';
+        $server['ORIG_SCRIPT_NAME'] = '/index.php';
+        $request->initialize(array(), array(), array(), array(), array(), $server);
+
+        $this->assertEquals('', $request->getBasePath());
+    }
+
+    public function testGetPreferredLanguage()
+    {
+        $request = new Request();
+        $this->assertEquals('', $request->getPreferredLanguage());
+        $this->assertEquals('fr', $request->getPreferredLanguage(array('fr')));
+        $this->assertEquals('fr', $request->getPreferredLanguage(array('fr', 'en')));
+        $this->assertEquals('en', $request->getPreferredLanguage(array('en', 'fr')));
+        $this->assertEquals('fr-ch', $request->getPreferredLanguage(array('fr-ch', 'fr-fr')));
+
+        $request = new Request();
+        $request->headers->set('Accept-language', 'zh, en-us; q=0.8, en; q=0.6');
+        $this->assertEquals('en', $request->getPreferredLanguage(array('en', 'en-us')));
+
+        $request = new Request();
+        $request->headers->set('Accept-language', 'zh, en-us; q=0.8, en; q=0.6');
+        $this->assertEquals('en', $request->getPreferredLanguage(array('fr', 'en')));
+    }
+
+    public function testIsXmlHttpRequest()
+    {
+        $request = new Request();
+        $this->assertFalse($request->isXmlHttpRequest());
+
+        $request->headers->set('X-Requested-With', 'XMLHttpRequest');
+        $this->assertTrue($request->isXmlHttpRequest());
+
+        $request->headers->remove('X-Requested-With');
+        $this->assertFalse($request->isXmlHttpRequest());
+    }
+
+    public function testGetCharsets()
+    {
+        $request = new Request();
+        $this->assertEquals(array(), $request->getCharsets());
+        $request->headers->set('Accept-Charset', 'ISO-8859-1, US-ASCII, UTF-8; q=0.8, ISO-10646-UCS-2; q=0.6');
+        $this->assertEquals(array(), $request->getCharsets()); // testing caching
+
+        $request = new Request();
+        $request->headers->set('Accept-Charset', 'ISO-8859-1, US-ASCII, UTF-8; q=0.8, ISO-10646-UCS-2; q=0.6');
+        $this->assertEquals(array('ISO-8859-1', 'US-ASCII', 'UTF-8', 'ISO-10646-UCS-2'), $request->getCharsets());
+        
+        $request = new Request();
+        $request->headers->set('Accept-Charset', 'ISO-8859-1,utf-8;q=0.7,*;q=0.7');
+        $this->assertEquals(array('ISO-8859-1', '*', 'utf-8'), $request->getCharsets());
+    }
+
+    public function testGetAcceptableContentTypes()
+    {
+        $request = new Request();
+        $this->assertEquals(array(), $request->getAcceptableContentTypes());
+        $request->headers->set('Accept', 'application/vnd.wap.wmlscriptc, text/vnd.wap.wml, application/vnd.wap.xhtml+xml, application/xhtml+xml, text/html, multipart/mixed, */*');
+        $this->assertEquals(array(), $request->getAcceptableContentTypes()); // testing caching
+
+        $request = new Request();
+        $request->headers->set('Accept', 'application/vnd.wap.wmlscriptc, text/vnd.wap.wml, application/vnd.wap.xhtml+xml, application/xhtml+xml, text/html, multipart/mixed, */*');
+        $this->assertEquals(array('multipart/mixed', '*/*', 'text/html', 'application/xhtml+xml', 'text/vnd.wap.wml', 'application/vnd.wap.xhtml+xml', 'application/vnd.wap.wmlscriptc'), $request->getAcceptableContentTypes());
+    }
+
+    public function testGetLanguages()
+    {
+        $request = new Request();
+        $this->assertNull($request->getLanguages());
+
+        $request = new Request();
+        $request->headers->set('Accept-language', 'zh, en-us; q=0.8, en; q=0.6');
+        $this->assertEquals(array('zh', 'en_US', 'en'), $request->getLanguages());
+        $this->assertEquals(array('zh', 'en_US', 'en'), $request->getLanguages());
+
+        $request = new Request();
+        $request->headers->set('Accept-language', 'zh, i-cherokee; q=0.6');
+        $this->assertEquals(array('zh', 'cherokee'), $request->getLanguages());
     }
 }

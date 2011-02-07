@@ -1258,6 +1258,29 @@ class FormTest extends \PHPUnit_Framework_TestCase
         $this->assertEquals('foobar', $author->getReferenceCopy());
     }
 
+    public function testSubformAlwaysInsertsIntoArrays()
+    {
+        $ref1 = new Author();
+        $ref2 = new Author();
+        $author = array('referenceCopy' => $ref1);
+
+        $form = new Form('author', array('validator' => $this->createMockValidator()));
+        $form->setData($author);
+        $refForm = new FormTest_FormThatReturns('referenceCopy');
+        $refForm->setReturnValue($ref2);
+        $form->add($refForm);
+
+        $form->bind($this->createPostRequest(array(
+            'author' => array(
+                'referenceCopy' => array(), // doesn't matter actually
+            )
+        )));
+
+        // the new reference was inserted into the array
+        $author = $form->getData();
+        $this->assertSame($ref2, $author['referenceCopy']);
+    }
+
     /**
      * Create a group containing two fields, "visibleField" and "hiddenField"
      *

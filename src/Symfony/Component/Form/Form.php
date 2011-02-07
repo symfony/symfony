@@ -895,7 +895,7 @@ class Form extends Field implements \IteratorAggregate, FormInterface
         // Don't update parent if data is a composite type (object or array)
         // and "by_reference" option is true, because then we expect that
         // we are working with a reference to the parent's data
-        if (!is_object($data) || !$this->getOption('by_reference')) {
+        if (!is_object($data) || !is_object($objectOrArray) || !$this->getOption('by_reference')) {
             parent::writeProperty($objectOrArray);
         }
     }

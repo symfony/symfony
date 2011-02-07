@@ -146,6 +146,11 @@ class SQLiteProfilerStorage implements ProfilerStorageInterface
     protected function exec($db, $query, array $args = array())
     {
         $stmt = $db->prepare($query);
+
+        if (false === $stmt) {
+            throw new \RuntimeException('The database cannot successfully prepare the statement');
+        }
+
         if ($db instanceof \SQLite3) {
             foreach ($args as $arg => $val) {
                 $stmt->bindValue($arg, $val, is_int($val) ? \SQLITE3_INTEGER : \SQLITE3_TEXT);

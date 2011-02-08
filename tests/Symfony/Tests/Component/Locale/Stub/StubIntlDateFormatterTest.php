@@ -19,12 +19,14 @@ class StubIntlDateFormatterTest extends \PHPUnit_Framework_TestCase
     public function formatProvider()
     {
         return array(
+            /* general */
             array('y-M-d', 0, '1970-1-1'),
+            array("yyyy.MM.dd G 'at' HH:mm:ss zzz", 0, '1970.01.01 AD at 00:00:00 GMT+00:00'),
 
             /* escaping */
-            array("'M", 0, 'M'),
-            array("'yy", 0, 'yy'),
-            array("'''yy", 0, "'yy"),
+            array("'M'", 0, 'M'),
+            array("'yy'", 0, 'yy'),
+            array("'''yy'", 0, "'yy"),
             array("''y", 0, "'1970"),
             array("''yy", 0, "'70"),
 
@@ -218,21 +220,6 @@ class StubIntlDateFormatterTest extends \PHPUnit_Framework_TestCase
     }
 
     /**
-    * provides data for cases that are broken in icu/intl
-    */
-    public function brokenFormatProvider()
-    {
-        return array(
-            /* escaping */
-            array("'y-'M-'d", 0, 'y-M-d'),
-
-            /* weird bugs */
-            array("WTF 'y-'M", 0, '0T1 y-M'),
-            array("n-'M", 0, 'n-M'),
-        );
-    }
-
-    /**
      * @expectedException InvalidArgumentException
      */
     public function testConstructorWithUnsupportedLocale()
@@ -272,22 +259,6 @@ class StubIntlDateFormatterTest extends \PHPUnit_Framework_TestCase
 
         if (extension_loaded('intl')) {
             $formatter = new \IntlDateFormatter('en', \IntlDateFormatter::MEDIUM, \IntlDateFormatter::SHORT, $timezone, \IntlDateFormatter::GREGORIAN, $pattern);
-            $this->assertSame($expected, $formatter->format($timestamp), 'Check date format with intl extension.');
-        }
-    }
-
-    /**
-    * @dataProvider brokenFormatProvider
-    */
-    public function testBrokenFormat($pattern, $timestamp, $expected)
-    {
-        $this->markTestSkipped('icu/intl has some bugs, thus skipping.');
-
-        $formatter = new StubIntlDateFormatter('en', StubIntlDateFormatter::MEDIUM, StubIntlDateFormatter::SHORT, 'UTC', StubIntlDateFormatter::GREGORIAN, $pattern);
-        $this->assertSame($expected, $formatter->format($timestamp), 'Check date format with stub implementation.');
-
-        if (extension_loaded('intl')) {
-            $formatter = new \IntlDateFormatter('en', \IntlDateFormatter::MEDIUM, \IntlDateFormatter::SHORT, 'UTC', \IntlDateFormatter::GREGORIAN, $pattern);
             $this->assertSame($expected, $formatter->format($timestamp), 'Check date format with intl extension.');
         }
     }

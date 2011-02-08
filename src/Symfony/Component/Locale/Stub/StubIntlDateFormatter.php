@@ -55,14 +55,15 @@ class StubIntlDateFormatter
         $specialCharsMatch = implode('|', array_map(function($char) {
             return $char . '+';
         }, $specialCharsArray));
-        $regExp = "/('($specialCharsMatch|[^$specialChars])|$specialCharsMatch)/";
+        $quoteMatch = "'(?>(?>[^']+|'{2}+|)?)'";
+        $regExp = "/($quoteMatch|$specialCharsMatch)/";
 
         $callback = function($matches) use ($dateTime) {
             $pattern = $matches[0];
             $length = strlen($pattern);
 
             if ("'" === $pattern[0]) {
-                return substr($pattern, 1);
+                return preg_replace("/'{2}/", "'", substr($pattern, 1, -1));
             }
 
             switch ($pattern[0]) {

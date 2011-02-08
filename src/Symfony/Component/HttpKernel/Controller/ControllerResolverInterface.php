@@ -49,6 +49,8 @@ interface ControllerResolverInterface
      * @param Request $request    A Request instance
      * @param mixed   $controller A PHP callable
      *
+     * @return array An array of arguments to pass to the controller
+     *
      * @throws \RuntimeException When value for argument given is not provided
      */
     function getArguments(Request $request, $controller);

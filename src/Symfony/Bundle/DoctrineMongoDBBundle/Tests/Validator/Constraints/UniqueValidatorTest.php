@@ -5,10 +5,11 @@ namespace Symfony\Bundle\DoctrineMongoDBBundle\Tests\Validator\Constraints;
 use Doctrine\ODM\MongoDB\Mapping\ClassMetadata;
 use Doctrine\ODM\MongoDB\DocumentRepository;
 use Symfony\Bundle\DoctrineMongoDBBundle\Tests\Fixtures\Validator\Document;
+use Symfony\Bundle\DoctrineMongoDBBundle\Tests\TestCase;
 use Symfony\Bundle\DoctrineMongoDBBundle\Validator\Constraints\Unique;
 use Symfony\Bundle\DoctrineMongoDBBundle\Validator\Constraints\UniqueValidator;
 
-class UniqueValidatorTest extends \PHPUnit_Framework_TestCase
+class UniqueValidatorTest extends TestCase
 {
     private $dm;
     private $repository;
@@ -18,6 +19,7 @@ class UniqueValidatorTest extends \PHPUnit_Framework_TestCase
 
     public function setUp()
     {
+        parent::setUp();
         $this->classMetadata = $this->getClassMetadata();
         $this->repository = $this->getDocumentRepository();
         $this->dm = $this->getDocumentManager($this->classMetadata, $this->repository);

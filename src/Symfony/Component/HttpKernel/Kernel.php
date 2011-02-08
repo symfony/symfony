@@ -164,8 +164,7 @@ abstract class Kernel implements KernelInterface
     public function isClassInActiveBundle($class)
     {
         foreach ($this->getBundles() as $bundle) {
-            $bundleClass = get_class($bundle);
-            if (0 === strpos($class, substr($bundleClass, 0, strrpos($bundleClass, '\\')))) {
+            if (0 === strpos($class, $bundle->getNamespace())) {
                 return true;
             }
         }
@@ -339,7 +338,7 @@ abstract class Kernel implements KernelInterface
 
     /**
      * Initialize the data structures related to the bundle management:
-     *  - the bundle property maps a bundle name to the bundle instance,
+     *  - the bundles property maps a bundle name to the bundle instance,
      *  - the bundleMap property maps a bundle name to the bundle inheritance hierarchy (most derived bundle first).
      *
      * @throws \LogicException if two bundles share a common name

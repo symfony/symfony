@@ -71,16 +71,18 @@ EOT
 
         // user specified bundle name?
         $bundle = $input->getArgument('bundleName');
-        if ('' === $bundle) {
+        if (!$bundle) {
             $bundle = strtr($namespace, array('\\' => ''));
-        } elseif (!preg_match('/Bundle$/', $bundle)) {
+        }
+
+        if (!preg_match('/Bundle$/', $bundle)) {
             throw new \InvalidArgumentException('The bundle name must end with Bundle.');
         }
 
         $dir = $input->getArgument('dir');
 
         // add trailing / if necessary
-        $dir = '/' === substr($dir, -1, 1) ? $dir : $dir . '/';
+        $dir = '/' === substr($dir, -1, 1) ? $dir : $dir.'/';
 
         $targetDir = $dir.strtr($namespace, '\\', '/');
 

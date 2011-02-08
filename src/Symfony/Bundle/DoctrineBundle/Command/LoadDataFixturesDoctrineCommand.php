@@ -72,7 +72,7 @@ EOT
             }
         }
 
-        $loader = new \Doctrine\Common\DataFixtures\Loader();
+        $loader = $loader = new \Symfony\Bundle\DoctrineAbstractBundle\Common\DataFixtures\Loader($this->container);
         foreach ($paths as $path) {
             if (is_dir($path)) {
                 $loader->loadFromDirectory($path);

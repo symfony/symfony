@@ -72,11 +72,11 @@ EOT
             }
         }
 
-        $paths = array_filter($paths, 'is_dir');
-
-        $loader = new \Doctrine\Common\DataFixtures\Loader();
+        $loader = new \Symfony\Bundle\DoctrineAbstractBundle\Common\DataFixtures\Loader($this->container);
         foreach ($paths as $path) {
-            $loader->loadFromDirectory($path);
+            if (is_dir($path)) {
+                $loader->loadFromDirectory($path);
+            }
         }
         $fixtures = $loader->getFixtures();
         $purger = new \Doctrine\Common\DataFixtures\Purger\MongoDBPurger($dm);

@@ -92,7 +92,7 @@ class ArrayInput extends Input
      *
      * @return mixed The option value
      */
-    public function getParameterOption(array $values, $default = false)
+    public function getParameterOption($values, $default = false)
     {
         if (!is_array($values)) {
             $values = array($values);

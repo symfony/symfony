@@ -18,8 +18,11 @@ use Symfony\Component\Console\Output\OutputInterface;
 use Symfony\Component\Console\Output\Output;
 use Symfony\Component\Finder\Finder;
 use Symfony\Bundle\FrameworkBundle\Util\Filesystem;
+use Symfony\Bundle\DoctrineAbstractBundle\Common\DataFixtures\Loader as DataFixturesLoader;
 use Doctrine\Common\Cli\Configuration;
 use Doctrine\Common\Cli\CliController as DoctrineCliController;
+use Doctrine\Common\DataFixtures\Executor\MongoDBExecutor;
+use Doctrine\Common\DataFixtures\Purger\MongoDBPurger;
 use Doctrine\ODM\MongoDB\DocumentManager;
 use Doctrine\ODM\MongoDB\Internal\CommitOrderCalculator;
 use Doctrine\ODM\MongoDB\Mapping\ClassMetadata;
@@ -72,15 +75,15 @@ EOT
             }
         }
 
-        $loader = new \Symfony\Bundle\DoctrineAbstractBundle\Common\DataFixtures\Loader($this->container);
+        $loader = new DataFixturesLoader($this->container);
         foreach ($paths as $path) {
             if (is_dir($path)) {
                 $loader->loadFromDirectory($path);
             }
         }
         $fixtures = $loader->getFixtures();
-        $purger = new \Doctrine\Common\DataFixtures\Purger\MongoDBPurger($dm);
-        $executor = new \Doctrine\Common\DataFixtures\Executor\MongoDBExecutor($dm, $purger);
+        $purger = new MongoDBPurger($dm);
+        $executor = new MongoDBExecutor($dm, $purger);
         $executor->setLogger(function($message) use ($output) {
             $output->writeln(sprintf('  <comment>></comment> <info>%s</info>', $message));
         });

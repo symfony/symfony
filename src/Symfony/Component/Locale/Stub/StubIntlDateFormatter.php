@@ -49,6 +49,7 @@ class StubIntlDateFormatter
         $dateTime->setTimestamp($timestamp);
         $dateTime->setTimezone($this->dateTimeZone);
 
+        // not implemented: YuwWFgecSAZvVW
         $specialChars = 'MLydGQqhDEaHkKmsz';
         $specialCharsArray = str_split($specialChars);
         $specialCharsMatch = implode('|', array_map(function($char) {

@@ -71,7 +71,8 @@ class TemplatePathsCacheWarmer extends CacheWarmer
             $finder = new Finder();
             foreach ($finder->files()->followLinks()->in($dir) as $file) {
                 if (false !== $template = $this->parseTemplateName($file, $prefix.'/', $bundle->getName())) {
-                    $resource = '@'.$template['bundle'].'/Resources/views/'.$template['controller'].'/'.$template['name'].'.'.$template['format'].'.'.$template['engine'];
+                    $controllerSegment = empty($template['controller']) ? '' :  $template['controller'].'/';
+                    $resource = '@'.$template['bundle'].'/Resources/views/'.$controllerSegment.$template['name'].'.'.$template['format'].'.'.$template['engine'];
 
                     $templates[md5(serialize($template))] = $this->kernel->locateResource($resource, $this->rootDir);
                 }
@@ -92,10 +93,11 @@ class TemplatePathsCacheWarmer extends CacheWarmer
 
     protected function parseTemplateName($file, $prefix, $bundle = '')
     {
+        $prefix = strtr($prefix, '\\', '/');
         $path = strtr($file->getPathname(), '\\', '/');
 
         list(, $tmp) = explode($prefix, $path, 2);
-        $parts = explode('/', strtr($tmp, '\\', '/'));
+        $parts = explode('/', $tmp);
 
         $elements = explode('.', array_pop($parts));
         if (3 !== count($elements)) {

@@ -59,7 +59,7 @@ class StubIntlDateFormatter
         $specialCharsMatch = implode('|', array_map(function($char) {
             return $char . '+';
         }, $specialCharsArray));
-        $quoteMatch = "'(?>(?>[^']+|'{2}+|)?)'";
+        $quoteMatch = "'(?>(?>[^']+|'{2}+)?)'|'{2}";
         $regExp = "/($quoteMatch|$specialCharsMatch)/";
 
         $callback = function($matches) use ($dateTime) {

@@ -911,12 +911,18 @@ class Form extends Field implements \IteratorAggregate, FormInterface
      */
     public function writeProperty(&$objectOrArray)
     {
-        $data = $this->getData();
+        $isReference = false;
 
-        // Don't update parent if data is a composite type (object or array)
-        // and "by_reference" option is true, because then we expect that
-        // we are working with a reference to the parent's data
-        if (!is_object($data) || !is_object($objectOrArray) || !$this->getOption('by_reference')) {
+        // If the data is identical to the value in $objectOrArray, we are
+        // dealing with a reference
+        if ($this->getPropertyPath() !== null) {
+            $isReference = $this->getData() === $this->getPropertyPath()->getValue($objectOrArray);
+        }
+
+        // Don't write into $objectOrArray if $objectOrArray is an object,
+        // $isReference is true (see above) and the option "by_reference" is
+        // true as well
+        if (!is_object($objectOrArray) || !$isReference || !$this->getOption('by_reference')) {
             parent::writeProperty($objectOrArray);
         }
     }

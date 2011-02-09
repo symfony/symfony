@@ -1246,6 +1246,32 @@ class FormTest extends \PHPUnit_Framework_TestCase
         $this->assertEquals('Foo', $author->getReference()->firstName);
     }
 
+    public function testSubformCallsSettersIfTheObjectChanged()
+    {
+        // no reference
+        $author = new FormTest_AuthorWithoutRefSetter(null);
+        $newReference = new Author();
+
+        $form = new Form('author', array('validator' => $this->createMockValidator()));
+        $form->setData($author);
+        $refForm = new Form('referenceCopy');
+        $refForm->add(new TestField('firstName'));
+        $form->add($refForm);
+
+        $refForm->setData($newReference); // new author object
+
+        $form->bind($this->createPostRequest(array(
+            'author' => array(
+                // referenceCopy has a getter that returns a copy
+                'referenceCopy' => array(
+                    'firstName' => 'Foo',
+                )
+            )
+        )));
+
+        $this->assertEquals('Foo', $author->getReferenceCopy()->firstName);
+    }
+
     public function testSubformCallsSettersIfByReferenceIsFalse()
     {
         $author = new FormTest_AuthorWithoutRefSetter(new Author());

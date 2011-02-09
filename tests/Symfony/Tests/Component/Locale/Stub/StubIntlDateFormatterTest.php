@@ -22,6 +22,10 @@ class StubIntlDateFormatterTest extends \PHPUnit_Framework_TestCase
             /* general */
             array('y-M-d', 0, '1970-1-1'),
             array("yyyy.MM.dd G 'at' HH:mm:ss zzz", 0, '1970.01.01 AD at 00:00:00 GMT+00:00'),
+            array("EEE, MMM d, ''yy", 0, "Thu, Jan 1, '00"),
+            array('h:mm a', 0, '12:00 AM'),
+            array('K:mm a, z', 0, '0:00 AM, GMT+00:00'),
+            array('yyyyy.MMMM.dd GGG hh:mm aaa', 0, '01970.January.01 AD 12:00 AM'),
 
             /* escaping */
             array("'M'", 0, 'M'),

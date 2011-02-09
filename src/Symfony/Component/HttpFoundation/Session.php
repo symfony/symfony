@@ -122,7 +122,7 @@ class Session implements \Serializable
      *
      * @param array $attributes Attributes
      */
-    public function setAttributes($attributes)
+    public function setAttributes(array $attributes)
     {
         if (false === $this->started) {
             $this->start();

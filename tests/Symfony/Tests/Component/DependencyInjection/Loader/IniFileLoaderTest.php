@@ -13,6 +13,7 @@ namespace Symfony\Tests\Component\DependencyInjection\Loader;
 
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\DependencyInjection\Loader\IniFileLoader;
+use Symfony\Component\DependencyInjection\Loader\FileLocator;
 
 class IniFileLoaderTest extends \PHPUnit_Framework_TestCase
 {
@@ -30,7 +31,7 @@ class IniFileLoaderTest extends \PHPUnit_Framework_TestCase
     public function testLoader()
     {
         $container = new ContainerBuilder();
-        $loader = new IniFileLoader($container, self::$fixturesPath.'/ini');
+        $loader = new IniFileLoader($container, new FileLocator(self::$fixturesPath.'/ini'));
         $loader->load('parameters.ini');
         $this->assertEquals(array('foo' => 'bar', 'bar' => '%foo%'), $container->getParameterBag()->all(), '->load() takes a single file name as its first argument');
 
@@ -56,7 +57,7 @@ class IniFileLoaderTest extends \PHPUnit_Framework_TestCase
      */
     public function testSupports()
     {
-        $loader = new IniFileLoader(new ContainerBuilder());
+        $loader = new IniFileLoader(new ContainerBuilder(), new FileLocator());
 
         $this->assertTrue($loader->supports('foo.ini'), '->supports() returns true if the resource is loadable');
         $this->assertFalse($loader->supports('foo.foo'), '->supports() returns true if the resource is loadable');

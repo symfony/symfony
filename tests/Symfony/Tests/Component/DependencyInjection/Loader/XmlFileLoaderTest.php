@@ -21,6 +21,7 @@ use Symfony\Component\DependencyInjection\Loader\XmlFileLoader;
 use Symfony\Component\DependencyInjection\Loader\YamlFileLoader;
 use Symfony\Component\DependencyInjection\Loader\IniFileLoader;
 use Symfony\Component\DependencyInjection\Loader\LoaderResolver;
+use Symfony\Component\DependencyInjection\Loader\FileLocator;
 
 class XmlFileLoaderTest extends \PHPUnit_Framework_TestCase
 {
@@ -37,7 +38,7 @@ class XmlFileLoaderTest extends \PHPUnit_Framework_TestCase
 
     public function testLoad()
     {
-        $loader = new ProjectLoader2(new ContainerBuilder(), self::$fixturesPath.'/ini');
+        $loader = new ProjectLoader2(new ContainerBuilder(), new FileLocator(self::$fixturesPath.'/ini'));
 
         try {
             $loader->load('foo.xml');
@@ -50,7 +51,7 @@ class XmlFileLoaderTest extends \PHPUnit_Framework_TestCase
 
     public function testParseFile()
     {
-        $loader = new ProjectLoader2(new ContainerBuilder(), self::$fixturesPath.'/ini');
+        $loader = new ProjectLoader2(new ContainerBuilder(), new FileLocator(self::$fixturesPath.'/ini'));
 
         try {
             $loader->parseFile(self::$fixturesPath.'/ini/parameters.ini');
@@ -60,7 +61,7 @@ class XmlFileLoaderTest extends \PHPUnit_Framework_TestCase
             $this->assertStringStartsWith('[ERROR 4] Start tag expected, \'<\' not found (in', $e->getMessage(), '->parseFile() throws an InvalidArgumentException if the loaded file is not a valid XML file');
         }
 
-        $loader = new ProjectLoader2(new ContainerBuilder(), self::$fixturesPath.'/xml');
+        $loader = new ProjectLoader2(new ContainerBuilder(), new FileLocator(self::$fixturesPath.'/xml'));
 
         try {
             $loader->parseFile(self::$fixturesPath.'/xml/nonvalid.xml');
@@ -77,7 +78,7 @@ class XmlFileLoaderTest extends \PHPUnit_Framework_TestCase
     public function testLoadParameters()
     {
         $container = new ContainerBuilder();
-        $loader = new ProjectLoader2($container, self::$fixturesPath.'/xml');
+        $loader = new ProjectLoader2($container, new FileLocator(self::$fixturesPath.'/xml'));
         $loader->load('services2.xml');
 
         $actual = $container->getParameterBag()->all();
@@ -90,9 +91,9 @@ class XmlFileLoaderTest extends \PHPUnit_Framework_TestCase
     {
         $container = new ContainerBuilder();
         $resolver = new LoaderResolver(array(
-            new IniFileLoader($container, self::$fixturesPath.'/xml'),
-            new YamlFileLoader($container, self::$fixturesPath.'/xml'),
-            $loader = new ProjectLoader2($container, self::$fixturesPath.'/xml'),
+            new IniFileLoader($container, new FileLocator(self::$fixturesPath.'/xml')),
+            new YamlFileLoader($container, new FileLocator(self::$fixturesPath.'/xml')),
+            $loader = new ProjectLoader2($container, new FileLocator(self::$fixturesPath.'/xml')),
         ));
         $loader->setResolver($resolver);
         $loader->load('services4.xml');
@@ -106,7 +107,7 @@ class XmlFileLoaderTest extends \PHPUnit_Framework_TestCase
     public function testLoadAnonymousServices()
     {
         $container = new ContainerBuilder();
-        $loader = new ProjectLoader2($container, self::$fixturesPath.'/xml');
+        $loader = new ProjectLoader2($container, new FileLocator(self::$fixturesPath.'/xml'));
         $loader->load('services5.xml');
         $services = $container->getDefinitions();
         $this->assertEquals(3, count($services), '->load() attributes unique ids to anonymous services');
@@ -128,7 +129,7 @@ class XmlFileLoaderTest extends \PHPUnit_Framework_TestCase
     public function testLoadServices()
     {
         $container = new ContainerBuilder();
-        $loader = new ProjectLoader2($container, self::$fixturesPath.'/xml');
+        $loader = new ProjectLoader2($container, new FileLocator(self::$fixturesPath.'/xml'));
         $loader->load('services6.xml');
         $services = $container->getDefinitions();
         $this->assertTrue(isset($services['foo']), '->load() parses <service> elements');
@@ -194,7 +195,7 @@ class XmlFileLoaderTest extends \PHPUnit_Framework_TestCase
         $container = new ContainerBuilder();
         $container->registerExtension(new \ProjectExtension());
         $container->registerExtension(new \ProjectWithXsdExtension());
-        $loader = new ProjectLoader2($container, self::$fixturesPath.'/xml');
+        $loader = new ProjectLoader2($container, new FileLocator(self::$fixturesPath.'/xml'));
 
         // extension without an XSD
         $loader->load('extensions/services1.xml');
@@ -212,7 +213,7 @@ class XmlFileLoaderTest extends \PHPUnit_Framework_TestCase
         $container = new ContainerBuilder();
         $container->registerExtension(new \ProjectExtension());
         $container->registerExtension(new \ProjectWithXsdExtension());
-        $loader = new ProjectLoader2($container, self::$fixturesPath.'/xml');
+        $loader = new ProjectLoader2($container, new FileLocator(self::$fixturesPath.'/xml'));
         $loader->load('extensions/services2.xml');
         $container->compile();
         $services = $container->getDefinitions();
@@ -224,7 +225,7 @@ class XmlFileLoaderTest extends \PHPUnit_Framework_TestCase
         $this->assertEquals('BAR', $services['project.service.foo']->getClass(), '->load() parses extension elements');
         $this->assertEquals('BAR', $parameters['project.parameter.foo'], '->load() parses extension elements');
 
-        $loader = new ProjectLoader2(new ContainerBuilder(), self::$fixturesPath.'/xml');
+        $loader = new ProjectLoader2(new ContainerBuilder(), new FileLocator(self::$fixturesPath.'/xml'));
 
         // extension with an XSD (does not validate)
         try {
@@ -250,7 +251,7 @@ class XmlFileLoaderTest extends \PHPUnit_Framework_TestCase
         // extension with an XSD in PHAR archive
         $container = new ContainerBuilder();
         $container->registerExtension(new \ProjectWithXsdExtensionInPhar());
-        $loader = new ProjectLoader2($container, self::$fixturesPath.'/xml');
+        $loader = new ProjectLoader2($container, new FileLocator(self::$fixturesPath.'/xml'));
         $loader->load('extensions/services6.xml');
 
         // extension with an XSD in PHAR archive (does not validate)
@@ -268,7 +269,7 @@ class XmlFileLoaderTest extends \PHPUnit_Framework_TestCase
      */
     public function testSupports()
     {
-        $loader = new XmlFileLoader(new ContainerBuilder());
+        $loader = new XmlFileLoader(new ContainerBuilder(), new FileLocator());
 
         $this->assertTrue($loader->supports('foo.xml'), '->supports() returns true if the resource is loadable');
         $this->assertFalse($loader->supports('foo.foo'), '->supports() returns true if the resource is loadable');
@@ -277,7 +278,7 @@ class XmlFileLoaderTest extends \PHPUnit_Framework_TestCase
     public function testLoadInterfaceInjectors()
     {
         $container = new ContainerBuilder();
-        $loader = new ProjectLoader2($container, self::$fixturesPath.'/xml');
+        $loader = new ProjectLoader2($container, new FileLocator(self::$fixturesPath.'/xml'));
         $loader->load('interfaces1.xml');
         $interfaces = $container->getInterfaceInjectors('FooClass');
         $this->assertEquals(1, count($interfaces), '->load() parses <interface> elements');

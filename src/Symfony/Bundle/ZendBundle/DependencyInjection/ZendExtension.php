@@ -13,6 +13,7 @@ namespace Symfony\Bundle\ZendBundle\DependencyInjection;
 
 use Symfony\Component\HttpKernel\DependencyInjection\Extension;
 use Symfony\Component\DependencyInjection\Loader\XmlFileLoader;
+use Symfony\Component\DependencyInjection\Loader\FileLocator;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 
 /**
@@ -36,7 +37,7 @@ class ZendExtension extends Extension
      */
     public function configLoad(array $configs, ContainerBuilder $container)
     {
-        $loader = new XmlFileLoader($container, __DIR__.'/../Resources/config');
+        $loader = new XmlFileLoader($container, new FileLocator(__DIR__.'/../Resources/config'));
         $loader->load('logger.xml');
         $container->setAlias('logger', 'zend.logger');
 

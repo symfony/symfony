@@ -17,6 +17,7 @@ use Symfony\Component\DependencyInjection\Definition;
 use Symfony\Component\DependencyInjection\Loader\Loader;
 use Symfony\Component\DependencyInjection\Loader\PhpFileLoader;
 use Symfony\Component\DependencyInjection\Loader\LoaderResolver;
+use Symfony\Component\DependencyInjection\Loader\FileLocator;
 
 class PhpFileLoaderTest extends \PHPUnit_Framework_TestCase
 {
@@ -25,7 +26,7 @@ class PhpFileLoaderTest extends \PHPUnit_Framework_TestCase
      */
     public function testSupports()
     {
-        $loader = new PhpFileLoader(new ContainerBuilder());
+        $loader = new PhpFileLoader(new ContainerBuilder(), new FileLocator());
 
         $this->assertTrue($loader->supports('foo.php'), '->supports() returns true if the resource is loadable');
         $this->assertFalse($loader->supports('foo.foo'), '->supports() returns true if the resource is loadable');
@@ -36,7 +37,7 @@ class PhpFileLoaderTest extends \PHPUnit_Framework_TestCase
      */
     public function testLoad()
     {
-        $loader = new PhpFileLoader($container = new ContainerBuilder());
+        $loader = new PhpFileLoader($container = new ContainerBuilder(), new FileLocator());
 
         $loader->load(__DIR__.'/../Fixtures/php/simple.php');
 

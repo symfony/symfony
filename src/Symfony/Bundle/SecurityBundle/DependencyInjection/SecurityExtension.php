@@ -17,6 +17,7 @@ use Symfony\Component\DependencyInjection\DefinitionDecorator;
 use Symfony\Component\DependencyInjection\Alias;
 use Symfony\Component\HttpKernel\DependencyInjection\Extension;
 use Symfony\Component\DependencyInjection\Loader\XmlFileLoader;
+use Symfony\Component\DependencyInjection\Loader\FileLocator;
 use Symfony\Component\DependencyInjection\Resource\FileResource;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\DependencyInjection\Reference;
@@ -56,7 +57,7 @@ class SecurityExtension extends Extension
         $config = $processor->process($tree, $configs);
 
         // load services
-        $loader = new XmlFileLoader($container, array(__DIR__.'/../Resources/config', __DIR__.'/Resources/config'));
+        $loader = new XmlFileLoader($container, new FileLocator(array(__DIR__.'/../Resources/config', __DIR__.'/Resources/config')));
         $loader->load('security.xml');
         $loader->load('security_listeners.xml');
         $loader->load('security_rememberme.xml');
@@ -82,7 +83,7 @@ class SecurityExtension extends Extension
         $processor = new Processor();
         $config = $processor->process($this->configuration->getAclConfigTree(), $configs);
 
-        $loader = new XmlFileLoader($container, array(__DIR__.'/../Resources/config', __DIR__.'/Resources/config'));
+        $loader = new XmlFileLoader($container, new FileLocator(array(__DIR__.'/../Resources/config', __DIR__.'/Resources/config')));
         $loader->load('security_acl.xml');
 
         if (isset($config['connection'])) {
@@ -551,7 +552,7 @@ class SecurityExtension extends Extension
         // load service templates
         $c = new ContainerBuilder();
         $parameterBag = $container->getParameterBag();
-        $loader = new XmlFileLoader($c, array(__DIR__.'/../Resources/config', __DIR__.'/Resources/config'));
+        $loader = new XmlFileLoader($c, new FileLocator(array(__DIR__.'/../Resources/config', __DIR__.'/Resources/config')));
         $loader->load('security_factories.xml');
 
         // load user-created listener factories

@@ -14,8 +14,6 @@ namespace Symfony\Bundle\DoctrineMongoDBBundle\Tests\DependencyInjection;
 use Symfony\Bundle\DoctrineMongoDBBundle\Tests\TestCase;
 use Symfony\Bundle\DoctrineMongoDBBundle\DependencyInjection\DoctrineMongoDBExtension;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
-use Symfony\Component\DependencyInjection\Loader\XmlFileLoader;
-use Symfony\Component\DependencyInjection\Loader\YamlFileLoader;
 use Symfony\Component\DependencyInjection\ParameterBag\ParameterBag;
 use Symfony\Component\DependencyInjection\Reference;
 

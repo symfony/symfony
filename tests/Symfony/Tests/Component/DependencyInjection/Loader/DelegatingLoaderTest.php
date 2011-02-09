@@ -16,6 +16,7 @@ use Symfony\Component\DependencyInjection\Loader\LoaderResolver;
 use Symfony\Component\DependencyInjection\Loader\DelegatingLoader;
 use Symfony\Component\DependencyInjection\Loader\IniFileLoader;
 use Symfony\Component\DependencyInjection\Loader\ClosureLoader;
+use Symfony\Component\DependencyInjection\Loader\FileLocator;
 
 class DelegatingLoaderTest extends \PHPUnit_Framework_TestCase
 {
@@ -49,7 +50,7 @@ class DelegatingLoaderTest extends \PHPUnit_Framework_TestCase
     {
         $container = new ContainerBuilder();
         $resolver = new LoaderResolver(array(
-            $ini = new IniFileLoader($container, array()),
+            $ini = new IniFileLoader($container, new FileLocator(array())),
         ));
         $loader = new DelegatingLoader($resolver);
 

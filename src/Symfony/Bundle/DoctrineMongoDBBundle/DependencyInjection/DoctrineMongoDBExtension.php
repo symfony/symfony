@@ -13,6 +13,7 @@ namespace Symfony\Bundle\DoctrineMongoDBBundle\DependencyInjection;
 
 use Symfony\Component\HttpKernel\DependencyInjection\Extension;
 use Symfony\Component\DependencyInjection\Loader\XmlFileLoader;
+use Symfony\Component\DependencyInjection\Loader\FileLocator;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\DependencyInjection\Alias;
 use Symfony\Component\DependencyInjection\Reference;
@@ -64,7 +65,7 @@ class DoctrineMongoDBExtension extends AbstractDoctrineExtension
     {
         if (!$container->hasDefinition('doctrine.odm.mongodb.metadata.annotation')) {
             // Load DoctrineMongoDBBundle/Resources/config/mongodb.xml
-            $loader = new XmlFileLoader($container, __DIR__.'/../Resources/config');
+            $loader = new XmlFileLoader($container, new FileLocator(__DIR__.'/../Resources/config'));
             $loader->load('mongodb.xml');
         }
 

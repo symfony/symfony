@@ -16,8 +16,8 @@ use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\DependencyInjection\Dumper\PhpDumper;
 use Symfony\Component\DependencyInjection\ParameterBag\ParameterBag;
 use Symfony\Component\DependencyInjection\Loader\DelegatingLoader;
-use Symfony\Component\DependencyInjection\Loader\LoaderResolver;
 use Symfony\Component\DependencyInjection\Loader\LoaderInterface;
+use Symfony\Component\DependencyInjection\Loader\LoaderResolver;
 use Symfony\Component\DependencyInjection\Loader\XmlFileLoader;
 use Symfony\Component\DependencyInjection\Loader\YamlFileLoader;
 use Symfony\Component\DependencyInjection\Loader\IniFileLoader;
@@ -26,6 +26,7 @@ use Symfony\Component\DependencyInjection\Loader\ClosureLoader;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpKernel\HttpKernelInterface;
 use Symfony\Component\HttpKernel\Bundle\BundleInterface;
+use Symfony\Component\HttpKernel\DependencyInjection\Loader\FileLocator;
 
 /**
  * The Kernel is the heart of the Symfony system.
@@ -523,11 +524,11 @@ abstract class Kernel implements KernelInterface
     protected function getContainerLoader(ContainerInterface $container)
     {
         $resolver = new LoaderResolver(array(
-            new XmlFileLoader($container),
-            new YamlFileLoader($container),
-            new IniFileLoader($container),
-            new PhpFileLoader($container),
-            new ClosureLoader($container),
+            new XmlFileLoader($container, new FileLocator($this)),
+            new YamlFileLoader($container, new FileLocator($this)),
+            new IniFileLoader($container, new FileLocator($this)),
+            new PhpFileLoader($container, new FileLocator($this)),
+            new ClosureLoader($container, new FileLocator($this)),
         ));
 
         return new DelegatingLoader($resolver);

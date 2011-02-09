@@ -15,6 +15,7 @@ use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\DependencyInjection\Loader\LoaderResolver;
 use Symfony\Component\DependencyInjection\Loader\Loader;
 use Symfony\Component\DependencyInjection\Loader\IniFileLoader;
+use Symfony\Component\DependencyInjection\Loader\FileLocator;
 
 class LoaderTest extends \PHPUnit_Framework_TestCase
 {
@@ -47,7 +48,7 @@ class LoaderTest extends \PHPUnit_Framework_TestCase
         $container = new ContainerBuilder();
 
         $resolver = new LoaderResolver(array(
-            $ini = new IniFileLoader($container, array()),
+            $ini = new IniFileLoader($container, new FileLocator(array())),
         ));
         $loader = new ProjectLoader1($container);
         $loader->setResolver($resolver);

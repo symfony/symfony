@@ -13,12 +13,13 @@ namespace Symfony\Bundle\DoctrineMongoDBBundle\Tests\DependencyInjection;
 
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\DependencyInjection\Loader\XmlFileLoader;
+use Symfony\Component\DependencyInjection\Loader\FileLocator;
 
 class XmlMongoDBExtensionTest extends AbstractMongoDBExtensionTest
 {
     protected function loadFromFile(ContainerBuilder $container, $file)
     {
-        $loadXml = new XmlFileLoader($container, __DIR__.'/Fixtures/config/xml');
+        $loadXml = new XmlFileLoader($container, new FileLocator(__DIR__.'/Fixtures/config/xml'));
         $loadXml->load($file.'.xml');
     }
 }

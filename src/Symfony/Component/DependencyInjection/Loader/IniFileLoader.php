@@ -30,7 +30,7 @@ class IniFileLoader extends FileLoader
      */
     public function load($file)
     {
-        $path = $this->findFile($file);
+        $path = $this->locator->locate($file);
 
         $this->container->addResource(new FileResource($path));
 

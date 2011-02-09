@@ -13,12 +13,13 @@ namespace Symfony\Bundle\DoctrineMongoDBBundle\Tests\DependencyInjection;
 
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\DependencyInjection\Loader\YamlFileLoader;
+use Symfony\Component\DependencyInjection\Loader\FileLocator;
 
 class YamlMongoDBExtensionTest extends AbstractMongoDBExtensionTest
 {
     protected function loadFromFile(ContainerBuilder $container, $file)
     {
-        $loadYaml = new YamlFileLoader($container, __DIR__.'/Fixtures/config/yml');
+        $loadYaml = new YamlFileLoader($container, new FileLocator(__DIR__.'/Fixtures/config/yml'));
         $loadYaml->load($file.'.yml');
     }
 }

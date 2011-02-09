@@ -13,12 +13,13 @@ namespace Symfony\Bundle\FrameworkBundle\Tests\DependencyInjection;
 
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\DependencyInjection\Loader\XmlFileLoader;
+use Symfony\Component\DependencyInjection\Loader\FileLocator;
 
 class XmlFrameworkExtensionTest extends FrameworkExtensionTest
 {
     protected function loadFromFile(ContainerBuilder $container, $file)
     {
-        $loader = new XmlFileLoader($container, __DIR__.'/Fixtures/xml');
+        $loader = new XmlFileLoader($container, new FileLocator(__DIR__.'/Fixtures/xml'));
         $loader->load($file.'.xml');
     }
 }

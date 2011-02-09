@@ -13,6 +13,7 @@ namespace Symfony\Bundle\SwiftmailerBundle\DependencyInjection;
 
 use Symfony\Component\HttpKernel\DependencyInjection\Extension;
 use Symfony\Component\DependencyInjection\Loader\XmlFileLoader;
+use Symfony\Component\DependencyInjection\Loader\FileLocator;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\DependencyInjection\Reference;
 
@@ -47,7 +48,7 @@ class SwiftMailerExtension extends Extension
     protected function doConfigLoad(array $config, ContainerBuilder $container)
     {
         if (!$container->hasDefinition('swiftmailer.mailer')) {
-            $loader = new XmlFileLoader($container, __DIR__.'/../Resources/config');
+            $loader = new XmlFileLoader($container, new FileLocator(__DIR__.'/../Resources/config'));
             $loader->load('swiftmailer.xml');
             $container->setAlias('mailer', 'swiftmailer.mailer');
         }

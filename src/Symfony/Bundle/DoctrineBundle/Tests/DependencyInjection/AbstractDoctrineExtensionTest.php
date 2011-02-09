@@ -18,6 +18,7 @@ use Symfony\Component\DependencyInjection\ParameterBag\ParameterBag;
 use Symfony\Component\DependencyInjection\Loader\XmlFileLoader;
 use Symfony\Component\DependencyInjection\Loader\YamlFileLoader;
 use Symfony\Component\DependencyInjection\Reference;
+use Symfony\Component\DependencyInjection\Loader\FileLocator;
 
 abstract class AbstractDoctrineExtensionTest extends TestCase
 {
@@ -59,7 +60,7 @@ abstract class AbstractDoctrineExtensionTest extends TestCase
         $loader = new DoctrineExtension();
         $container->registerExtension($loader);
 
-        $loadXml = new XmlFileLoader($container, __DIR__.'/Fixtures/config/xml');
+        $loadXml = new XmlFileLoader($container, new FileLocator(__DIR__.'/Fixtures/config/xml'));
         $loadXml->load('dbal_service_multiple_connections.xml');
         $loader->dbalLoad(array(array()), $container);
 
@@ -93,7 +94,7 @@ abstract class AbstractDoctrineExtensionTest extends TestCase
         $loader = new DoctrineExtension();
         $container->registerExtension($loader);
 
-        $loadXml = new XmlFileLoader($container, __DIR__.'/Fixtures/config/xml');
+        $loadXml = new XmlFileLoader($container, new FileLocator(__DIR__.'/Fixtures/config/xml'));
         $loadXml->load('dbal_service_single_connection.xml');
         $loader->dbalLoad(array(array()), $container);
 

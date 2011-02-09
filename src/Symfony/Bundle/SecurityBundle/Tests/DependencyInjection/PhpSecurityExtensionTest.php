@@ -13,12 +13,13 @@ namespace Symfony\Bundle\SecurityBundle\Tests\DependencyInjection;
 
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\DependencyInjection\Loader\PhpFileLoader;
+use Symfony\Component\DependencyInjection\Loader\FileLocator;
 
 class PhpSecurityExtensionTest extends SecurityExtensionTest
 {
     protected function loadFromFile(ContainerBuilder $container, $file)
     {
-        $loadXml = new PhpFileLoader($container, __DIR__.'/Fixtures/php');
+        $loadXml = new PhpFileLoader($container, new FileLocator(__DIR__.'/Fixtures/php'));
         $loadXml->load($file.'.php');
     }
 }

@@ -13,12 +13,13 @@ namespace Symfony\Bundle\SecurityBundle\Tests\DependencyInjection;
 
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\DependencyInjection\Loader\YamlFileLoader;
+use Symfony\Component\DependencyInjection\Loader\FileLocator;
 
 class YamlSecurityExtensionTest extends SecurityExtensionTest
 {
     protected function loadFromFile(ContainerBuilder $container, $file)
     {
-        $loadXml = new YamlFileLoader($container, __DIR__.'/Fixtures/yml');
+        $loadXml = new YamlFileLoader($container, new FileLocator(__DIR__.'/Fixtures/yml'));
         $loadXml->load($file.'.yml');
     }
 }

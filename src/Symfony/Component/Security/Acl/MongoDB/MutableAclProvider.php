@@ -315,8 +315,9 @@ class MutableAclProvider extends AclProvider implements MutableAclProviderInterf
      * @param ObjectIdentityInterface $parent
      * @return void
      */
-    protected function createObjectIdentity(ObjectIdentityInterface $oid, $entriesInheriting, ObjectIdentityInterface $parent=null)
+    protected function createObjectIdentity(ObjectIdentityInterface $oid, $entriesInheriting=false, ObjectIdentityInterface $parent=null)
     {
+        // TODO are entriesInheriting and parent necessary?
         $data['identifier']        = $oid->getIdentifier();
         $data['type']              = $oid->getType();
         $data['entriesInheriting'] = $entriesInheriting;

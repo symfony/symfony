@@ -102,8 +102,6 @@ class FileField extends Form
      */
     protected function normalize($path)
     {
-        srand(microtime(true));
-
         return array(
             'file' => '',
             'token' => rand(100000, 999999),

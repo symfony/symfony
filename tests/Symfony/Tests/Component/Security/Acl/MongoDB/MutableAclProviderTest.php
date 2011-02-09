@@ -347,52 +347,66 @@ class MutableAclProviderTest extends \PHPUnit_Framework_TestCase
      * @throws \InvalidArgumentException
      * @throws Exception
      */
-    protected function importAcls(AclProvider $provider, array $data)
-    {
-        $this->markTestIncomplete(
-          'This test needs to be rewritten.'
-        );
+    protected function importAcls(AclProvider $provider, array $data) {
         $aclIds = $parentAcls = array();
-        $con = $this->getField($provider, 'connection');
-        $con->beginTransaction();
-        try {
-            foreach ($data as $name => $aclData) {
-                if (!isset($aclData['object_identifier'], $aclData['class_type'])) {
-                    throw new \InvalidArgumentException('"object_identifier", and "class_type" must be present.');
-                }
 
-                $this->callMethod($provider, 'createObjectIdentity', array(new ObjectIdentity($aclData['object_identifier'], $aclData['class_type'])));
-                $aclId = $con->lastInsertId();
-                $aclIds[$name] = $aclId;
 
-                $sql = $this->callMethod($provider, 'getInsertObjectIdentityRelationSql', array($aclId, $aclId));
-                $con->executeQuery($sql);
-
-                if (isset($aclData['parent_acl'])) {
-                    if (isset($aclIds[$aclData['parent_acl']])) {
-                        $con->executeQuery("UPDATE acl_object_identities SET parent_object_identity_id = ".$aclIds[$aclData['parent_acl']]." WHERE id = ".$aclId);
-                        $con->executeQuery($this->callMethod($provider, 'getInsertObjectIdentityRelationSql', array($aclId, $aclIds[$aclData['parent_acl']])));
-                    } else {
-                        $parentAcls[$aclId] = $aclData['parent_acl'];
-                    }
-                }
+        foreach ($data as $name => $aclData) {
+            if (!isset($aclData['object_identifier'], $aclData['class_type'])) {
+                throw new \InvalidArgumentException('"object_identifier", and "class_type" must be present.');
             }
 
-            foreach ($parentAcls as $aclId => $name) {
-                if (!isset($aclIds[$name])) {
-                    throw new \InvalidArgumentException(sprintf('"%s" does not exist.', $name));
+            $objIdentity = new ObjectIdentity($aclData['object_identifier'], $aclData['class_type']);
+            $this->callMethod($provider, 'createObjectIdentity', array($objIdentity));
+
+            $acl = $this->callMethod($provider, 'getObjectIdentity', array($objIdentity));
+            $aclIds[$name] = $aclId = (string)$acl['_id'];
+
+            if (isset($aclData['parent_acl'])) {
+                if (isset($aclIds[$aclData['parent_acl']])) {
+                    $this->addParentToIdentity($provider, $aclId, $aclIds[$aclData['parent_acl']]);
+                } else {
+                    $parentAcls[$aclId] = $aclData['parent_acl'];
                 }
-
-                $con->executeQuery(sprintf("UPDATE acl_object_identities SET parent_object_identity_id = %d WHERE id = %d", $aclIds[$name], $aclId));
-                $con->executeQuery($this->callMethod($provider, 'getInsertObjectIdentityRelationSql', array($aclId, $aclIds[$name])));
             }
-
-            $con->commit();
-        } catch (\Exception $e) {
-            $con->rollBack();
-
-            throw $e;
         }
+
+        foreach ($parentAcls as $aclId => $name) {
+            if (!isset($aclIds[$name])) {
+                throw new \InvalidArgumentException(sprintf('"%s" does not exist.', $name));
+            }
+            $this->addParentToIdentity($provider, $aclId, $aclIds[$name]);
+        }
+    }
+
+    protected function addParentToIdentity(AclProvider $provider, $identity, $parent)
+    {
+        $query = array(
+            '_id' => new \MongoId($parent),
+        );
+
+        $connection = $this->getField($provider, 'connection');
+        $options = $this->getOptions();
+
+        $parent = $connection->selectCollection($options['oid_table_name'])->findOne($query);
+
+        // update parent relationship
+        $updates['parent'] = $parent;
+
+        if (isset($parent['ancestors'])) {
+            $ancestors = $parent['ancestors'];
+        }
+        $ancestors[] = $parent['_id'];
+        $updates['ancestors'] = $ancestors;
+
+        $entry = array(
+            '_id' => new \MongoId($identity),
+        );
+        $newData = array(
+            '$set' => $updates,
+        );
+
+        $connection->selectCollection($options['oid_table_name'])->update($entry, $newData);
     }
 
     protected function callMethod($object, $method, array $args)

@@ -13,6 +13,7 @@ namespace Symfony\Component\Form;
 
 use Symfony\Component\HttpFoundation\File\File;
 use Symfony\Component\Form\Exception\FormException;
+use Symfony\Component\HttpFoundation\File\UploadedFile;
 
 /**
  * A file field to upload files.
@@ -66,6 +67,9 @@ class FileField extends Form
     protected function preprocessData(array $data)
     {
         if ($data['file']) {
+            if (!$data['file'] instanceof UploadedFile) {
+                throw new \UnexpectedValueException('Uploaded file is not of type UploadedFile, your form tag is probably missing the enctype="multipart/form-data" attribute.');
+            }
             switch ($data['file']->getError()) {
                 case UPLOAD_ERR_INI_SIZE:
                     $this->iniSizeExceeded = true;

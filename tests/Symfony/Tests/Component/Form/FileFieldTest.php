@@ -111,6 +111,18 @@ class FileFieldTest extends \PHPUnit_Framework_TestCase
         $this->assertEquals(realpath($tmpPath), realpath($this->field->getData()));
     }
 
+    /**
+     * @expectedException UnexpectedValueException
+     */
+    public function testSubmitFailsOnMissingMultipart()
+    {
+        $this->field->submit(array(
+            'file' => 'foo.jpg',
+            'token' => '12345',
+            'original_name' => 'original_name.jpg',
+        ));
+    }
+
     public function testSubmitKeepsOldFileIfNotOverwritten()
     {
         $oldPath = tempnam(sys_get_temp_dir(), 'FileFieldTest');

@@ -26,17 +26,29 @@ class HashNode implements NodeInterface
     protected $selector;
     protected $id;
 
+    /**
+     * Constructor.
+     *
+     * @param NodeInterface $selector The NodeInterface object
+     * @param string $id The ID
+     */
     public function __construct($selector, $id)
     {
         $this->selector = $selector;
         $this->id = $id;
     }
 
+    /** 
+     * {@inheritDoc}
+     */
     public function __toString()
     {
         return sprintf('%s[%s#%s]', __CLASS__, $this->selector, $this->id);
     }
 
+    /**
+     * {@inheritDoc}
+     */
     public function toXpath()
     {
         $path = $this->selector->toXpath();

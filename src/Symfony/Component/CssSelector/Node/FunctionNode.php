@@ -31,6 +31,14 @@ class FunctionNode implements NodeInterface
     protected $name;
     protected $expr;
 
+    /**
+     * Constructor.
+     *
+     * @param NodeInterface $selector The XPath expression
+     * @param string $type
+     * @param string $name
+     * @param XPathExpr $expr 
+     */
     public function __construct($selector, $type, $name, $expr)
     {
         $this->selector = $selector;
@@ -39,12 +47,16 @@ class FunctionNode implements NodeInterface
         $this->expr = $expr;
     }
 
+    /**
+     * {@inheritDoc}
+     */
     public function __toString()
     {
         return sprintf('%s[%s%s%s(%s)]', __CLASS__, $this->selector, $this->type, $this->name, $this->expr);
     }
 
     /**
+     * {@inheritDoc}
      * @throws SyntaxError When unsupported or unknown pseudo-class is found
      */
     public function toXpath()
@@ -61,6 +73,15 @@ class FunctionNode implements NodeInterface
         return $this->$method($sel_path, $this->expr);
     }
 
+    /**
+     * undocumented function
+     *
+     * @param XPathExpr $xpath 
+     * @param mixed $expr 
+     * @param string $last 
+     * @param string $addNameTest 
+     * @return XPathExpr
+     */
     protected function _xpath_nth_child($xpath, $expr, $last = false, $addNameTest = true)
     {
         list($a, $b) = $this->parseSeries($expr);
@@ -124,11 +145,25 @@ class FunctionNode implements NodeInterface
              -1n+6 means elements 6 and previous */
     }
 
+    /**
+     * undocumented function
+     *
+     * @param XPathExpr $xpath 
+     * @param XPathExpr $expr 
+     * @return XPathExpr
+     */
     protected function _xpath_nth_last_child($xpath, $expr)
     {
         return $this->_xpath_nth_child($xpath, $expr, true);
     }
 
+    /**
+     * undocumented function
+     *
+     * @param XPathExpr $xpath 
+     * @param XPathExpr $expr 
+     * @return XPathExpr
+     */
     protected function _xpath_nth_of_type($xpath, $expr)
     {
         if ($xpath->getElement() == '*') {
@@ -138,11 +173,25 @@ class FunctionNode implements NodeInterface
         return $this->_xpath_nth_child($xpath, $expr, false, false);
     }
 
+    /**
+     * undocumented function
+     *
+     * @param XPathExpr $xpath 
+     * @param XPathExpr $expr 
+     * @return XPathExpr
+     */
     protected function _xpath_nth_last_of_type($xpath, $expr)
     {
         return $this->_xpath_nth_child($xpath, $expr, true, false);
     }
 
+    /**
+     * undocumented function
+     *
+     * @param XPathExpr $xpath 
+     * @param XPathExpr $expr 
+     * @return XPathExpr
+     */
     protected function _xpath_contains($xpath, $expr)
     {
         // text content, minus tags, must contain expr
@@ -159,6 +208,13 @@ class FunctionNode implements NodeInterface
         return $xpath;
     }
 
+    /**
+     * undocumented function
+     *
+     * @param XPathExpr $xpath 
+     * @param XPathExpr $expr 
+     * @return XPathExpr
+     */
     protected function _xpath_not($xpath, $expr)
     {
         // everything for which not expr applies
@@ -170,7 +226,12 @@ class FunctionNode implements NodeInterface
         return $xpath;
     }
 
-    // Parses things like '1n+2', or 'an+b' generally, returning (a, b)
+    /**
+     * Parses things like '1n+2', or 'an+b' generally, returning (a, b)
+     *
+     * @param mixed $s 
+     * @return array
+     */
     protected function parseSeries($s)
     {
         if ($s instanceof ElementNode) {

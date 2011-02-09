@@ -25,16 +25,27 @@ class OrNode implements NodeInterface
 {
     protected $items;
 
+    /**
+     * Constructor.
+     *
+     * @param array $items An array of NodeInterface objects
+     */
     public function __construct($items)
     {
         $this->items = $items;
     }
 
+    /**
+     * {@inheritDoc}
+     */
     public function __toString()
     {
         return sprintf('%s(%s)', __CLASS__, $this->items);
     }
 
+    /**
+     * {@inheritDoc}
+     */
     public function toXpath()
     {
         $paths = array();

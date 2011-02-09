@@ -34,6 +34,11 @@ class PseudoNode implements NodeInterface
     protected $ident;
 
     /**
+     * Constructor.
+     *
+     * @param NodeInterface $element The NodeInterface element
+     * @param string $type Node type
+     * @param string $ident The ident
      * @throws SyntaxError When incorrect PseudoNode type is given
      */
     public function __construct($element, $type, $ident)
@@ -48,12 +53,16 @@ class PseudoNode implements NodeInterface
         $this->ident = $ident;
     }
 
+    /**
+     * {@inheritDoc}
+     */
     public function __toString()
     {
         return sprintf('%s[%s%s%s]', __CLASS__, $this->element, $this->type, $this->ident);
     }
 
     /**
+     * {@inheritDoc}
      * @throws SyntaxError When unsupported or unknown pseudo-class is found
      */
     public function toXpath()
@@ -71,6 +80,11 @@ class PseudoNode implements NodeInterface
         return $this->$method($el_xpath);
     }
 
+    /**
+     *
+     * @param XPathExpr $xpath The XPath expression
+     * @return XPathExpr The modified XPath expression
+     */
     protected function xpath_checked($xpath)
     {
         // FIXME: is this really all the elements?
@@ -80,6 +94,8 @@ class PseudoNode implements NodeInterface
     }
 
     /**
+     * @param XPathExpr $xpath The XPath expression
+     * @return XPathExpr The modified XPath expression
      * @throws SyntaxError If this element is the root element
      */
     protected function xpath_root($xpath)
@@ -88,6 +104,12 @@ class PseudoNode implements NodeInterface
         throw new SyntaxError();
     }
 
+    /**
+     * Marks this XPath expression as the first child.
+     *
+     * @param XPathExpr $xpath The XPath expression
+     * @return XPathExpr The modified expression
+     */
     protected function xpath_first_child($xpath)
     {
         $xpath->addStarPrefix();
@@ -97,6 +119,12 @@ class PseudoNode implements NodeInterface
         return $xpath;
     }
 
+    /** 
+     * Sets the XPath  to be the last child.
+     *
+     * @param XPathExpr $xpath The XPath expression
+     * @return XPathExpr The modified expression
+     */
     protected function xpath_last_child($xpath)
     {
         $xpath->addStarPrefix();
@@ -106,6 +134,12 @@ class PseudoNode implements NodeInterface
         return $xpath;
     }
 
+    /**
+     * Sets the XPath expression to be the first of type.
+     *
+     * @param XPathExpr $xpath The XPath expression
+     * @return XPathExpr The modified expression
+     */
     protected function xpath_first_of_type($xpath)
     {
         if ($xpath->getElement() == '*') {
@@ -118,6 +152,10 @@ class PseudoNode implements NodeInterface
     }
 
     /**
+     * Sets the XPath expression to be the last of type.
+     *
+     * @param XPathExpr $xpath The XPath expression
+     * @return XPathExpr The modified expression
      * @throws SyntaxError Because *:last-of-type is not implemented
      */
     protected function xpath_last_of_type($xpath)
@@ -131,6 +169,12 @@ class PseudoNode implements NodeInterface
         return $xpath;
     }
 
+    /**
+     * Sets the XPath expression to be the only child.
+     *
+     * @param XPathExpr $xpath The XPath expression
+     * @return XPathExpr The modified expression
+     */
     protected function xpath_only_child($xpath)
     {
         $xpath->addNameTest();
@@ -141,6 +185,10 @@ class PseudoNode implements NodeInterface
     }
 
     /**
+     * Sets the XPath expression to be only of type.
+     *
+     * @param XPathExpr $xpath The XPath expression
+     * @return XPathExpr The modified expression
      * @throws SyntaxError Because *:only-of-type is not implemented
      */
     protected function xpath_only_of_type($xpath)
@@ -153,6 +201,12 @@ class PseudoNode implements NodeInterface
         return $xpath;
     }
 
+    /**
+     * undocumented function
+     *
+     * @param XPathExpr $xpath The XPath expression
+     * @return XPathExpr The modified expression
+     */
     protected function xpath_empty($xpath)
     {
         $xpath->addCondition('not(*) and not(normalize-space())');

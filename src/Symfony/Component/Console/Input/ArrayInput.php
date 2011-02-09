@@ -89,6 +89,7 @@ class ArrayInput extends Input
      * before it has been validated. It must be used carefully.
      *
      * @param string|array $values The value(s) to look for in the raw parameters (can be an array)
+     * @param mixed $default The default value to return if no result is found
      *
      * @return mixed The option value
      */

@@ -40,7 +40,11 @@ class StubIntlDateFormatter
 
         $this->setPattern($pattern);
 
-        $this->dateTimeZone = new \DateTimeZone($timezone);
+        try {
+            $this->dateTimeZone = new \DateTimeZone($timezone);
+        } catch (\Exception $e) {
+            $this->dateTimeZone = new \DateTimeZone('UTC');
+        }
     }
 
     public function format($timestamp)

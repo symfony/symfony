@@ -90,7 +90,7 @@ class FileField extends Form
                 default:
                     $data['file']->move($this->getTmpDir());
                     $data['file']->rename($this->getTmpName($data['token']));
-                    $data['original_name'] = $data['file']->getOriginalName();
+                    $data['original_name'] = $data['file']->getName();
                     $data['file'] = '';
                     break;
             }

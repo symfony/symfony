@@ -70,7 +70,7 @@ class FileFieldTest extends \PHPUnit_Framework_TestCase
                 $that->createTmpFile($tmpPath);
              }));
         $file->expects($this->any())
-             ->method('getOriginalName')
+             ->method('getName')
              ->will($this->returnValue('original_name.jpg'));
 
         $this->field->submit(array(

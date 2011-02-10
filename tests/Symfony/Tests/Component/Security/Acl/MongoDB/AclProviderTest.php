@@ -175,10 +175,16 @@ class AclProviderTest extends \PHPUnit_Framework_TestCase
             unset($query['id']);
             unset($query['class']);
             $oid = $query['objectIdentity'];
-            $query['objectIdentity'] = $this->oids[$oid];
+            $query['objectIdentity'] = array(
+                '$ref' => $options['oid_table_name'],
+                '$id' => $this->oids[$oid]['_id'],
+            );
             $sid = $query['securityIdentity'];
             if($sid) {
-                $query['securityIdentity'] = $sids[$sid];
+                $query['securityIdentity'] = array(
+                    '$ref' => $options['sid_table_name'],
+                    '$id' => $sids[$sid]['_id'],
+                );
             }
             $this->entryCollection->insert($query);
         }

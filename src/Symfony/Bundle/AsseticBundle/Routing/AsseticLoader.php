@@ -12,7 +12,7 @@
 namespace Symfony\Bundle\AsseticBundle\Routing;
 
 use Assetic\AssetManager;
-use Symfony\Component\Routing\Loader\Loader;
+use Symfony\Component\Config\Loader\Loader;
 use Symfony\Component\Routing\Route;
 use Symfony\Component\Routing\RouteCollection;
 

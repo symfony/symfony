@@ -11,7 +11,7 @@
 
 namespace Symfony\Component\Routing;
 
-use Symfony\Component\Routing\Resource\ResourceInterface;
+use Symfony\Component\Config\Resource\ResourceInterface;
 
 /**
  * A RouteCollection represents a set of Route instances.

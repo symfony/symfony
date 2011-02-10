@@ -2,9 +2,9 @@
 namespace Symfony\Component\HttpKernel
 {
 use Symfony\Component\DependencyInjection\ContainerInterface;
-use Symfony\Component\DependencyInjection\Loader\LoaderInterface;
 use Symfony\Component\HttpKernel\HttpKernelInterface;
 use Symfony\Component\HttpKernel\Bundle\BundleInterface;
+use Symfony\Component\Config\Loader\LoaderInterface;
 interface KernelInterface extends HttpKernelInterface, \Serializable
 {
     function registerRootDir();
@@ -32,9 +32,6 @@ use Symfony\Component\DependencyInjection\ContainerInterface;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\DependencyInjection\Dumper\PhpDumper;
 use Symfony\Component\DependencyInjection\ParameterBag\ParameterBag;
-use Symfony\Component\DependencyInjection\Loader\DelegatingLoader;
-use Symfony\Component\DependencyInjection\Loader\LoaderInterface;
-use Symfony\Component\DependencyInjection\Loader\LoaderResolver;
 use Symfony\Component\DependencyInjection\Loader\XmlFileLoader;
 use Symfony\Component\DependencyInjection\Loader\YamlFileLoader;
 use Symfony\Component\DependencyInjection\Loader\IniFileLoader;
@@ -43,7 +40,10 @@ use Symfony\Component\DependencyInjection\Loader\ClosureLoader;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpKernel\HttpKernelInterface;
 use Symfony\Component\HttpKernel\Bundle\BundleInterface;
-use Symfony\Component\HttpKernel\DependencyInjection\Loader\FileLocator;
+use Symfony\Component\HttpKernel\Config\FileLocator;
+use Symfony\Component\Config\Loader\LoaderResolver;
+use Symfony\Component\Config\Loader\DelegatingLoader;
+use Symfony\Component\Config\ConfigCache;
 abstract class Kernel implements KernelInterface
 {
     protected $bundles;
@@ -240,15 +240,14 @@ abstract class Kernel implements KernelInterface
     protected function initializeContainer()
     {
         $class = $this->name.ucfirst($this->environment).($this->debug ? 'Debug' : '').'ProjectContainer';
-        $location = $this->getCacheDir().'/'.$class;
-        $reload = $this->debug ? $this->needsReload($class, $location) : false;
+        $cache = new ConfigCache($this->getCacheDir(), $class, $this->debug);
         $fresh = false;
-        if ($reload || !file_exists($location.'.php')) {
+        if (!$cache->isFresh()) {
             $container = $this->buildContainer();
-            $this->dumpContainer($container, $class, $location.'.php');
+            $this->dumpContainer($cache, $container, $class);
             $fresh = true;
         }
-        require_once $location.'.php';
+        require_once $cache;
         $this->container = new $class();
         $this->container->set('kernel', $this);
         if ($fresh && 'cli' !== php_sapi_name()) {
@@ -285,20 +284,6 @@ abstract class Kernel implements KernelInterface
         }
         return $parameters;
     }
-    protected function needsReload($class, $location)
-    {
-        if (!file_exists($location.'.meta') || !file_exists($location.'.php')) {
-            return true;
-        }
-        $meta = unserialize(file_get_contents($location.'.meta'));
-        $time = filemtime($location.'.php');
-        foreach ($meta as $resource) {
-            if (!$resource->isUptodate($time)) {
-                return true;
-            }
-        }
-        return false;
-    }
     protected function buildContainer()
     {
         $parameterBag = new ParameterBag($this->getKernelParameters());
@@ -309,13 +294,14 @@ abstract class Kernel implements KernelInterface
                 $container->addObjectResource($bundle);
             }
         }
+        $container->addObjectResource($this);
         if (null !== $cont = $this->registerContainerConfiguration($this->getContainerLoader($container))) {
             $container->merge($cont);
         }
         $container->compile();
         return $container;
     }
-    protected function dumpContainer(ContainerBuilder $container, $class, $file)
+    protected function dumpContainer(ConfigCache $cache, ContainerBuilder $container, $class)
     {
         foreach (array('cache', 'logs') as $name) {
             $dir = $container->getParameter(sprintf('kernel.%s_dir', $name));
@@ -332,11 +318,7 @@ abstract class Kernel implements KernelInterface
         if (!$this->debug) {
             $content = self::stripComments($content);
         }
-        $this->writeCacheFile($file, $content);
-        if ($this->debug) {
-            $container->addObjectResource($this);
-                        $this->writeCacheFile($this->getCacheDir().'/'.$class.'.meta', serialize($container->getResources()));
-        }
+        $cache->write($content, $container->getResources());
     }
     protected function getContainerLoader(ContainerInterface $container)
     {
@@ -364,15 +346,6 @@ abstract class Kernel implements KernelInterface
         }
                 $output = preg_replace(array('/\s+$/Sm', '/\n+/S'), "\n", $output);
         return $output;
-    }
-    protected function writeCacheFile($file, $content)
-    {
-        $tmpFile = tempnam(dirname($file), basename($file));
-        if (false !== @file_put_contents($tmpFile, $content) && @rename($tmpFile, $file)) {
-            chmod($file, 0644);
-            return;
-        }
-        throw new \RuntimeException(sprintf('Failed to write cache file "%s".', $file));
     }
     public function serialize()
     {

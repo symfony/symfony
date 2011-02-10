@@ -16,6 +16,7 @@ use Symfony\Component\Translation\Loader\LoaderInterface;
 use Symfony\Component\Translation\MessageSelector;
 use Symfony\Component\DependencyInjection\ContainerInterface;
 use Symfony\Component\HttpFoundation\Session;
+use Symfony\Component\Config\ConfigCache;
 
 /**
  * Translator.
@@ -88,17 +89,24 @@ class Translator extends BaseTranslator
             return parent::loadCatalogue($locale);
         }
 
-        if ($this->needsReload($locale)) {
+        $cache = new ConfigCache($this->options['cache_dir'], 'catalogue.'.$locale, $this->options['debug']);
+        if (!$cache->isFresh()) {
             $this->initialize();
 
             parent::loadCatalogue($locale);
 
-            $this->updateCache($locale);
+            $content = sprintf(
+                "<?php use Symfony\Component\Translation\MessageCatalogue; return new MessageCatalogue('%s', %s);",
+                $locale,
+                var_export($this->catalogues[$locale]->all(), true)
+            ));
+
+            $cache->write($content, $this->catalogues[$locale]->getResources());
 
             return;
         }
 
-        $this->catalogues[$locale] = include $this->getCacheFile($locale);
+        $this->catalogues[$locale] = include $cache;
     }
 
     protected function initialize()
@@ -110,69 +118,5 @@ class Translator extends BaseTranslator
         foreach ($this->container->getParameter('translation.resources') as $resource) {
             $this->addResource($resource[0], $resource[1], $resource[2], $resource[3]);
         }
-    }
-
-    protected function updateCache($locale)
-    {
-        $this->writeCacheFile($this->getCacheFile($locale), sprintf(
-            "<?php use Symfony\Component\Translation\MessageCatalogue; return new MessageCatalogue('%s', %s);",
-            $locale,
-            var_export($this->catalogues[$locale]->all(), true)
-        ));
-
-        if ($this->options['debug']) {
-            $this->writeCacheFile($this->getCacheFile($locale, 'meta'), serialize($this->catalogues[$locale]->getResources()));
-        }
-    }
-
-    protected function needsReload($locale)
-    {
-        $file = $this->getCacheFile($locale);
-        if (!file_exists($file)) {
-            return true;
-        }
-
-        if (!$this->options['debug']) {
-            return false;
-        }
-
-        $metadata = $this->getCacheFile($locale, 'meta');
-        if (!file_exists($metadata)) {
-            return true;
-        }
-
-        $time = filemtime($file);
-        $meta = unserialize(file_get_contents($metadata));
-        foreach ($meta as $resource) {
-            if (!$resource->isUptodate($time)) {
-                return true;
-            }
-        }
-
-        return false;
-    }
-
-    protected function getCacheFile($locale, $extension = 'php')
-    {
-        return $this->options['cache_dir'].'/catalogue.'.$locale.'.'.$extension;
-    }
-
-    /**
-     * @throws \RuntimeException When cache file can't be wrote
-     */
-    protected function writeCacheFile($file, $content)
-    {
-        if (!is_dir(dirname($file))) {
-            @mkdir(dirname($file), 0777, true);
-        }
-
-        $tmpFile = tempnam(dirname($file), basename($file));
-        if (false !== @file_put_contents($tmpFile, $content) && @rename($tmpFile, $file)) {
-            chmod($file, 0644);
-
-            return;
-        }
-
-        throw new \RuntimeException(sprintf('Failed to write cache file "%s".', $file));
     }
 }

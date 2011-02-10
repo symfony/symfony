@@ -11,7 +11,7 @@
 
 namespace Symfony\Bundle\AsseticBundle\Tests\Kernel;
 
-use Symfony\Component\DependencyInjection\Loader\LoaderInterface;
+use Symfony\Component\Config\Loader\LoaderInterface;
 use Symfony\Component\HttpKernel\Kernel;
 
 class TestKernel extends Kernel

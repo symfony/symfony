@@ -11,7 +11,7 @@
 
 namespace Symfony\Component\DependencyInjection\Loader;
 
-use Symfony\Component\DependencyInjection\Resource\FileResource;
+use Symfony\Component\Config\Resource\FileResource;
 
 /**
  * PhpFileLoader loads service definitions from a PHP file.
@@ -26,9 +26,10 @@ class PhpFileLoader extends FileLoader
     /**
      * Loads a PHP file.
      *
-     * @param mixed $resource The resource
+     * @param mixed  $resource The resource
+     * @param string $type The resource type
      */
-    public function load($file)
+    public function load($file, $type = null)
     {
         // the container and loader variables are exposed to the included file below
         $container = $this->container;
@@ -44,11 +45,12 @@ class PhpFileLoader extends FileLoader
     /**
      * Returns true if this class supports the given resource.
      *
-     * @param  mixed $resource A resource
+     * @param mixed  $resource A resource
+     * @param string $type     The resource type
      *
      * @return Boolean true if this class supports the given resource, false otherwise
      */
-    public function supports($resource)
+    public function supports($resource, $type = null)
     {
         return is_string($resource) && 'php' === pathinfo($resource, PATHINFO_EXTENSION);
     }

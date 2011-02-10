@@ -11,40 +11,43 @@
 
 namespace Symfony\Bundle\FrameworkBundle\Templating\Loader;
 
-use Symfony\Component\HttpKernel\KernelInterface;
+use Symfony\Component\Config\FileLocatorInterface;
 
 /**
  * TemplateLocator locates templates in bundles.
  *
  * @author Fabien Potencier <fabien.potencier@symfony-project.com>
  */
-class TemplateLocator implements TemplateLocatorInterface
+class TemplateLocator implements FileLocatorInterface
 {
-    protected $kernel;
+    protected $locator;
     protected $path;
     protected $cache;
 
     /**
      * Constructor.
      *
-     * @param KernelInterface $kernel A KernelInterface instance
-     * @param string          $path   A global fallback path
+     * @param FileLocatorInterface $locator A FileLocatorInterface instance
+     * @param string               $path    A global fallback path
      */
-    public function __construct(KernelInterface $kernel, $path)
+    public function __construct(FileLocatorInterface $locator, $path)
     {
-        $this->kernel = $kernel;
+        $this->locator = $locator;
         $this->path = $path;
         $this->cache = array();
     }
 
     /**
-     * Locates a template on the filesystem.
+     * Returns a full path for a given file.
      *
-     * @param array $template The template name as an array
+     * @param array  $template The template name as an array
+     * @param string $currentPath The current path
      *
-     * @return string An absolute file name
+     * @return string The full path for the file
+     *
+     * @throws \InvalidArgumentException When file is not found
      */
-    public function locate($template)
+    public function locate($template, $currentPath = null, $first = true)
     {
         $key = md5(serialize($template));
 
@@ -63,7 +66,7 @@ class TemplateLocator implements TemplateLocatorInterface
         $resource = $template['bundle'].'/Resources/views/'.$template['controller'].'/'.$template['name'].'.'.$template['format'].'.'.$template['engine'];
 
         try {
-            return $this->kernel->locateResource('@'.$resource, $this->path);
+            return $this->locator->locate('@'.$resource, $this->path);
         } catch (\Exception $e) {
             throw new \InvalidArgumentException(sprintf('Unable to find template "%s".', json_encode($template), $this->path), 0, $e);
         }

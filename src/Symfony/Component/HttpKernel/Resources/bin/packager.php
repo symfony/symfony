@@ -46,6 +46,8 @@ ClassCollectionLoader::load(array(
     'Symfony\\Component\\ClassLoader\\ClassCollectionLoader',
     'Symfony\\Component\\ClassLoader\\UniversalClassLoader',
     'Symfony\\Component\\ClassLoader\\MapFileClassLoader',
+
+    'Symfony\\Component\\Config\\ConfigCache',
 ), __DIR__.'/../..', 'bootstrap', false);
 
 if (file_exists(__DIR__.'/../../bootstrap_cache.php')) {

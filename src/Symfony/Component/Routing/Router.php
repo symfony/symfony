@@ -11,7 +11,8 @@
 
 namespace Symfony\Component\Routing;
 
-use Symfony\Component\Routing\Loader\LoaderInterface;
+use Symfony\Component\Config\Loader\LoaderInterface;
+use Symfony\Component\Config\ConfigCache;
 
 /**
  * The Router class is an example of the integration of all pieces of the
@@ -144,7 +145,8 @@ class Router implements RouterInterface
         }
 
         $class = $this->options['matcher_cache_class'];
-        if ($this->needsReload($class)) {
+        $cache = new ConfigCache($this->options['cache_dir'], $class, $this->options['debug']);
+        if (!$cache->isFresh($class)) {
             $dumper = new $this->options['matcher_dumper_class']($this->getRouteCollection());
 
             $options = array(
@@ -152,10 +154,10 @@ class Router implements RouterInterface
                 'base_class' => $this->options['matcher_base_class'],
             );
 
-            $this->updateCache($class, $dumper->dump($options));
+            $cache->write($dumper->dump($options), $this->getRouteCollection()->getResources());
         }
 
-        require_once $this->getCacheFile($class);
+        require_once $cache;
 
         return $this->matcher = new $class($this->context, $this->defaults);
     }
@@ -176,7 +178,8 @@ class Router implements RouterInterface
         }
 
         $class = $this->options['generator_cache_class'];
-        if ($this->needsReload($class)) {
+        $cache = new ConfigCache($this->options['cache_dir'], $class, $this->options['debug']);
+        if (!$cache->isFresh($class)) {
             $dumper = new $this->options['generator_dumper_class']($this->getRouteCollection());
 
             $options = array(
@@ -184,67 +187,11 @@ class Router implements RouterInterface
                 'base_class' => $this->options['generator_base_class'],
             );
 
-            $this->updateCache($class, $dumper->dump($options));
+            $cache->write($dumper->dump($options), $this->getRouteCollection()->getResources());
         }
 
-        require_once $this->getCacheFile($class);
+        require_once $cache;
 
         return $this->generator = new $class($this->context, $this->defaults);
-    }
-
-    protected function updateCache($class, $dump)
-    {
-        $this->writeCacheFile($this->getCacheFile($class), $dump);
-
-        if ($this->options['debug']) {
-            $this->writeCacheFile($this->getCacheFile($class, 'meta'), serialize($this->getRouteCollection()->getResources()));
-        }
-    }
-
-    protected function needsReload($class)
-    {
-        $file = $this->getCacheFile($class);
-        if (!file_exists($file)) {
-            return true;
-        }
-
-        if (!$this->options['debug']) {
-            return false;
-        }
-
-        $metadata = $this->getCacheFile($class, 'meta');
-        if (!file_exists($metadata)) {
-            return true;
-        }
-
-        $time = filemtime($file);
-        $meta = unserialize(file_get_contents($metadata));
-        foreach ($meta as $resource) {
-            if (!$resource->isUptodate($time)) {
-                return true;
-            }
-        }
-
-        return false;
-    }
-
-    protected function getCacheFile($class, $extension = 'php')
-    {
-        return $this->options['cache_dir'].'/'.$class.'.'.$extension;
-    }
-
-    /**
-     * @throws \RuntimeException When cache file can't be wrote
-     */
-    protected function writeCacheFile($file, $content)
-    {
-        $tmpFile = tempnam(dirname($file), basename($file));
-        if (false !== @file_put_contents($tmpFile, $content) && @rename($tmpFile, $file)) {
-            chmod($file, 0644);
-
-            return;
-        }
-
-        throw new \RuntimeException(sprintf('Failed to write cache file "%s".', $file));
     }
 }

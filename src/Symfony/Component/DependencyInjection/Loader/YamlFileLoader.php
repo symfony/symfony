@@ -19,7 +19,7 @@ use Symfony\Component\DependencyInjection\InterfaceInjector;
 use Symfony\Component\DependencyInjection\Definition;
 use Symfony\Component\DependencyInjection\Reference;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
-use Symfony\Component\DependencyInjection\Resource\FileResource;
+use Symfony\Component\Config\Resource\FileResource;
 use Symfony\Component\Yaml\Yaml;
 
 /**
@@ -35,8 +35,9 @@ class YamlFileLoader extends FileLoader
      * Loads a Yaml file.
      *
      * @param mixed $resource The resource
+     * @param string $type    The resource type
      */
-    public function load($file)
+    public function load($file, $type = null)
     {
         $path = $this->locator->locate($file);
 
@@ -72,11 +73,12 @@ class YamlFileLoader extends FileLoader
     /**
      * Returns true if this class supports the given resource.
      *
-     * @param  mixed $resource A resource
+     * @param mixed  $resource A resource
+     * @param string $type     The resource type
      *
      * @return Boolean true if this class supports the given resource, false otherwise
      */
-    public function supports($resource)
+    public function supports($resource, $type = null)
     {
         return is_string($resource) && 'yml' === pathinfo($resource, PATHINFO_EXTENSION);
     }

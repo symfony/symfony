@@ -13,6 +13,7 @@
         <parameter key="filesystem.class">Symfony\Bundle\FrameworkBundle\Util\Filesystem</parameter>
         <parameter key="cache_warmer.class">Symfony\Component\HttpKernel\CacheWarmer\CacheWarmerAggregate</parameter>
         <parameter key="cache_warmer.autoloader_map.class">Symfony\Bundle\FrameworkBundle\CacheWarmer\ClassMapCacheWarmer</parameter>
+        <parameter key="file_locator.class">Symfony\Component\HttpKernel\Config\FileLocator</parameter>
     </parameters>
 
     <services>
@@ -55,5 +56,9 @@
         </service>
 
         <service id="filesystem" class="%filesystem.class%"></service>
+
+        <service id="file_locator" class="%file_locator.class%">
+            <argument type="service" id="kernel" />
+        </service>
     </services>
 </container>

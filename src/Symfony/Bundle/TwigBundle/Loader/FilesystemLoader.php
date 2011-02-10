@@ -11,8 +11,8 @@
 
 namespace Symfony\Bundle\TwigBundle\Loader;
 
-use Symfony\Bundle\FrameworkBundle\Templating\Loader\TemplateLocatorInterface;
 use Symfony\Component\Templating\TemplateNameParserInterface;
+use Symfony\Component\Config\FileLocatorInterface;
 
 /**
  * FilesystemLoader extends the default Twig filesystem loader
@@ -29,9 +29,9 @@ class FilesystemLoader implements \Twig_LoaderInterface
     /**
      * Constructor.
      *
-     * @param TemplateLocator $locator A TemplateLocator instance
+     * @param FileLocatorInterface $locator A FileLocatorInterface instance
      */
-    public function __construct(TemplateLocatorInterface $locator, TemplateNameParserInterface $parser)
+    public function __construct(FileLocatorInterface $locator, TemplateNameParserInterface $parser)
     {
         $this->locator = $locator;
         $this->parser = $parser;

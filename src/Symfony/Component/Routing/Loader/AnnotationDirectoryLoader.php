@@ -33,10 +33,7 @@ class AnnotationDirectoryLoader extends AnnotationFileLoader
      */
     public function load($path, $type = null)
     {
-        $dir = $this->locator->getAbsolutePath($path);
-        if (!file_exists($dir)) {
-            throw new \InvalidArgumentException(sprintf('The directory "%s" does not exist (in: %s).', $dir, implode(', ', $this->paths)));
-        }
+        $dir = $this->locator->locate($path);
 
         $collection = new RouteCollection();
         foreach (new \RecursiveIteratorIterator(new \RecursiveDirectoryIterator($dir), \RecursiveIteratorIterator::LEAVES_ONLY) as $file) {
@@ -62,6 +59,12 @@ class AnnotationDirectoryLoader extends AnnotationFileLoader
      */
     public function supports($resource, $type = null)
     {
-        return is_string($resource) && is_dir($this->locator->getAbsolutePath($resource)) && (!$type || 'annotation' === $type);
+        try {
+            $path = $this->locator->locate($resource);
+        } catch (\Exception $e) {
+            return false;
+        }
+
+        return is_string($resource) && is_dir($path) && (!$type || 'annotation' === $type);
     }
 }

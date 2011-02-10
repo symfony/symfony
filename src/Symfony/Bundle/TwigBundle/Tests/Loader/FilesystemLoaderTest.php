@@ -13,13 +13,13 @@ namespace Symfony\Bundle\TwigBundle\Tests\Loader;
 
 use Symfony\Bundle\TwigBundle\Tests\TestCase;
 use Symfony\Bundle\TwigBundle\Loader\FilesystemLoader;
-use Symfony\Bundle\FrameworkBundle\Templating\Loader\TemplateLocatorInterface;
+use Symfony\Component\Config\FileLocatorInterface;
 use Symfony\Component\Templating\TemplateNameParserInterface;
 use InvalidArgumentException;
 
 class FilesystemLoaderTest extends TestCase
 {
-    /** @var TemplateLocatorInterface */
+    /** @var FileLocatorInterface */
     private $locator;
     /** @var TemplateNameParserInterface */
     private $parser;
@@ -30,7 +30,7 @@ class FilesystemLoaderTest extends TestCase
     {
         parent::setUp();
 
-        $this->locator = $this->getMock('Symfony\Bundle\FrameworkBundle\Templating\Loader\TemplateLocatorInterface');
+        $this->locator = $this->getMock('Symfony\Component\Config\FileLocatorInterface');
         $this->parser = $this->getMock('Symfony\Component\Templating\TemplateNameParserInterface');
         $this->loader = new FilesystemLoader($this->locator, $this->parser);
     }

@@ -12,7 +12,9 @@
 namespace Symfony\Component\Routing\Loader;
 
 use Symfony\Component\Routing\RouteCollection;
-use Symfony\Component\Routing\Resource\FileResource;
+use Symfony\Component\Config\Resource\FileResource;
+use Symfony\Component\Config\Loader\FileLoader;
+use Symfony\Component\Config\FileLocator;
 
 /**
  * AnnotationFileLoader loads routing information from annotations set
@@ -53,10 +55,7 @@ class AnnotationFileLoader extends FileLoader
      */
     public function load($file, $type = null)
     {
-        $path = $this->locator->getAbsolutePath($file);
-        if (!file_exists($path)) {
-            throw new \InvalidArgumentException(sprintf('The file "%s" cannot be found (in: %s).', $file, implode(', ', $this->paths)));
-        }
+        $path = $this->locator->locate($file);
 
         $collection = new RouteCollection();
         if ($class = $this->findClass($path)) {

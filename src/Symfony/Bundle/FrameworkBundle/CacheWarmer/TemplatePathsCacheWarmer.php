@@ -14,6 +14,7 @@ namespace Symfony\Bundle\FrameworkBundle\CacheWarmer;
 use Symfony\Component\HttpKernel\CacheWarmer\CacheWarmer;
 use Symfony\Component\HttpKernel\KernelInterface;
 use Symfony\Component\Finder\Finder;
+use Symfony\Component\Config\FileLocatorInterface;
 
 /**
  * Computes the association between template names and their paths on the disk.
@@ -22,18 +23,21 @@ use Symfony\Component\Finder\Finder;
  */
 class TemplatePathsCacheWarmer extends CacheWarmer
 {
+    protected $locator;
     protected $kernel;
     protected $rootDir;
 
     /**
      * Constructor.
      *
-     * @param KernelInterface $kernel  A KernelInterface instance
-     * @param string          $rootDir The directory where global templates can be stored
+     * @param KernelInterface      $kernel  A KernelInterface instance
+     * @param FileLocatorInterface $locator A FileLocatorInterface instance
+     * @param string               $rootDir The directory where global templates can be stored
      */
-    public function __construct(KernelInterface $kernel, $rootDir)
+    public function __construct(KernelInterface $kernel, FileLocatorInterface $locator, $rootDir)
     {
         $this->kernel = $kernel;
+        $this->locator = $locator;
         $this->rootDir = $rootDir;
     }
 
@@ -74,7 +78,7 @@ class TemplatePathsCacheWarmer extends CacheWarmer
                     $controllerSegment = empty($template['controller']) ? '' :  $template['controller'].'/';
                     $resource = '@'.$template['bundle'].'/Resources/views/'.$controllerSegment.$template['name'].'.'.$template['format'].'.'.$template['engine'];
 
-                    $templates[md5(serialize($template))] = $this->kernel->locateResource($resource, $this->rootDir);
+                    $templates[md5(serialize($template))] = $this->locator->locate($resource, $this->rootDir);
                 }
             }
         }

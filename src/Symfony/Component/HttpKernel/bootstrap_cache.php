@@ -1028,7 +1028,7 @@ class Esi
         $subRequest = Request::create($uri, 'get', array(), $cache->getRequest()->cookies->all(), array(), $cache->getRequest()->server->all());
         try {
             $response = $cache->handle($subRequest, HttpKernelInterface::SUB_REQUEST, true);
-            if (200 != $response->getStatusCode()) {
+            if (!$response->isSuccessful()) {
                 throw new \RuntimeException(sprintf('Error when rendering "%s" (Status code is %s).', $subRequest->getUri(), $response->getStatusCode()));
             }
             return $response->getContent();

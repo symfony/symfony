@@ -128,8 +128,6 @@ class ExceptionListener implements ListenerInterface
 
                         $response = $event->getSubject()->handle($subRequest, HttpKernelInterface::SUB_REQUEST, true);
                         $response->setStatusCode(403);
-
-                        return $response;
                     }
                 } catch (\Exception $e) {
                     if (null !== $this->logger) {

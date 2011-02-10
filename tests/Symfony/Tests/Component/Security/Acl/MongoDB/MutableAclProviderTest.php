@@ -241,23 +241,20 @@ class MutableAclProviderTest extends \PHPUnit_Framework_TestCase
 
     public function testUpdateDoesNothingWhenThereAreNoChanges()
     {
-        $this->markTestIncomplete(
-          'This test needs to be rewritten.'
+        $this->markTestSkipped('need to work on mocking');
+        $provider = $this->getMock('Symfony\Component\Security\Acl\MongoDB\MutableAclProvider',
+            array(),
+            array($this->con, new PermissionGrantingStrategy()),
+            '',
+            false
         );
-        $con = $this->getMock('Doctrine\DBAL\Connection', array(), array(), '', false);
-        $con
-            ->expects($this->never())
-            ->method('beginTransaction')
-        ;
-        $con
-            ->expects($this->never())
-            ->method('executeQuery')
-        ;
-
-        $provider = new MutableAclProvider($con, new PermissionGrantingStrategy(), array());
         $acl = new Acl(1, new ObjectIdentity(1, 'Foo'), new PermissionGrantingStrategy(), array(), true);
         $propertyChanges = $this->getField($provider, 'propertyChanges');
         $propertyChanges->offsetSet($acl, array());
+        $provider
+            ->expects($this->never())
+            ->method('updateObjectIdentity')
+        ;
         $provider->updateAcl($acl);
     }
 
@@ -317,9 +314,6 @@ class MutableAclProviderTest extends \PHPUnit_Framework_TestCase
 
     public function testUpdateAclWorksForChangingTheParentAcl()
     {
-        $this->markTestIncomplete(
-          'This test needs to be rewritten.'
-        );
         $provider = $this->getProvider();
         $acl = $provider->createAcl(new ObjectIdentity(1, 'Foo'));
         $parentAcl = $provider->createAcl(new ObjectIdentity(1, 'AnotherFoo'));
@@ -330,6 +324,16 @@ class MutableAclProviderTest extends \PHPUnit_Framework_TestCase
         $reloadedAcl = $reloadProvider->findAcl(new ObjectIdentity(1, 'Foo'));
         $this->assertNotSame($acl, $reloadedAcl);
         $this->assertSame($parentAcl->getId(), $reloadedAcl->getParentAcl()->getId());
+    }
+
+    public function testSecurityIdentityDoesNotCreateDuplicates()
+    {
+        $provider = $this->getProvider();
+        $securityIdentity1 = new RoleSecurityIdentity('ROLE_FOO');
+        $sid1 = (string)$this->callMethod($provider, 'insertSecurityIdentity', $securityIdentity1);
+        $securityIdentity2 = new RoleSecurityIdentity('ROLE_FOO');
+        $sid2 = (string)$this->callMethod($provider, 'insertSecurityIdentity', $securityIdentity2);
+        $this->assertEquals($sid1, $sid2, 'insertSecurityIdentity should not create a second document');
     }
 
     /**
@@ -422,7 +426,7 @@ class MutableAclProviderTest extends \PHPUnit_Framework_TestCase
         if (!class_exists('Doctrine\MongoDB\Connection')) {
             $this->markTestSkipped('Doctrine2 MongoDB is required for this test');
         }
-        $database = 'aclTest';
+        $database='aclTest';
         $mongo = new \Doctrine\MongoDB\Connection();
         $this->con = $mongo->selectDatabase($database);
     }

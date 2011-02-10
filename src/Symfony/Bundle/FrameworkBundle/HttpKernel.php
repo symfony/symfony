@@ -128,7 +128,7 @@ class HttpKernel extends BaseHttpKernel
         }
 
         try {
-            $response = $this->handle($subRequest, HttpKernelInterface::SUB_REQUEST, true);
+            $response = $this->handle($subRequest, HttpKernelInterface::SUB_REQUEST, false);
 
             if (!$response->isSuccessful()) {
                 throw new \RuntimeException(sprintf('Error when rendering "%s" (Status code is %s).', $request->getUri(), $response->getStatusCode()));

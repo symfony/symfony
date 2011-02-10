@@ -76,11 +76,10 @@ class Configuration
         $rootNode
             ->arrayNode('profiler')
                 ->canBeUnset()
-                ->treatNullLike(array())
-                ->treatTrueLike(array())
                 ->booleanNode('only_exceptions')->end()
                 ->arrayNode('matcher')
                     ->canBeUnset()
+                    ->performNoDeepMerging()
                     ->scalarNode('ip')->end()
                     ->scalarNode('path')->end()
                     ->scalarNode('service')->end()
@@ -106,8 +105,6 @@ class Configuration
         $rootNode
             ->arrayNode('session')
                 ->canBeUnset()
-                ->treatNullLike(array())
-                ->treatTrueLike(array())
                 // Strip "pdo." prefix from option keys, since dots cannot appear in node names
                 ->beforeNormalization()
                     ->ifArray()
@@ -152,6 +149,7 @@ class Configuration
                 ->scalarNode('cache_warmer')->end()
                 ->fixXmlConfig('engine')
                 ->arrayNode('engines')
+                    ->isRequired()
                     ->requiresAtLeastOneElement()
                     ->beforeNormalization()
                         ->ifTrue(function($v){ return !is_array($v); })

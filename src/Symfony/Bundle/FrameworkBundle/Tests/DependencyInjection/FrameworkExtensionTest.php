@@ -57,7 +57,7 @@ abstract class FrameworkExtensionTest extends TestCase
     }
 
     /**
-     * @expectedException InvalidArgumentException
+     * @expectedException Symfony\Component\DependencyInjection\Configuration\Exception\InvalidConfigurationException
      */
     public function testRouterRequiresResourceOption()
     {
@@ -130,7 +130,7 @@ abstract class FrameworkExtensionTest extends TestCase
     }
 
     /**
-     * @expectedException LogicException
+     * @expectedException Symfony\Component\DependencyInjection\Configuration\Exception\InvalidConfigurationException
      */
     public function testTemplatingRequiresAtLeastOneEngine()
     {

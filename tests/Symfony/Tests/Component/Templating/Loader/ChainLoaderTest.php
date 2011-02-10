@@ -16,6 +16,7 @@ require_once __DIR__.'/../Fixtures/ProjectTemplateDebugger.php';
 use Symfony\Component\Templating\Loader\ChainLoader;
 use Symfony\Component\Templating\Loader\FilesystemLoader;
 use Symfony\Component\Templating\Storage\FileStorage;
+use Symfony\Component\Templating\TemplateReference;
 
 class ChainLoaderTest extends \PHPUnit_Framework_TestCase
 {
@@ -45,9 +46,13 @@ class ChainLoaderTest extends \PHPUnit_Framework_TestCase
     public function testLoad()
     {
         $loader = new ProjectTemplateLoader1(array($this->loader1, $this->loader2));
-        $this->assertFalse($loader->load(array('name' => 'bar', 'engine' => 'php')), '->load() returns false if the template is not found');
-        $this->assertFalse($loader->load(array('name' => 'foo', 'engine' => 'php')), '->load() returns false if the template does not exists for the given renderer');
-        $this->assertInstanceOf('Symfony\Component\Templating\Storage\FileStorage', $loader->load(array('name' => 'foo.php', 'engine' => 'php')), '->load() returns a FileStorage if the template exists');
+        $this->assertFalse($loader->load(new TemplateReference('bar', 'php')), '->load() returns false if the template is not found');
+        $this->assertFalse($loader->load(new TemplateReference('foo', 'php')), '->load() returns false if the template does not exists for the given renderer');
+        $this->assertInstanceOf(
+            'Symfony\Component\Templating\Storage\FileStorage',
+            $loader->load(new TemplateReference('foo.php', 'php')),
+            '->load() returns a FileStorage if the template exists'
+        );
     }
 }
 

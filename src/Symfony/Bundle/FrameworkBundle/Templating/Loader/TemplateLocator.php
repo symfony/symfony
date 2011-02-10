@@ -12,6 +12,7 @@
 namespace Symfony\Bundle\FrameworkBundle\Templating\Loader;
 
 use Symfony\Component\Config\FileLocatorInterface;
+use Symfony\Component\Templating\TemplateReferenceInterface;
 
 /**
  * TemplateLocator locates templates in bundles.
@@ -40,8 +41,9 @@ class TemplateLocator implements FileLocatorInterface
     /**
      * Returns a full path for a given file.
      *
-     * @param array  $template The template name as an array
-     * @param string $currentPath The current path
+     * @param TemplateReferenceInterface    $template     A template
+     * @param string                        $currentPath  Unused
+     * @param Boolean                       $first        Unused
      *
      * @return string The full path for the file
      *
@@ -49,26 +51,16 @@ class TemplateLocator implements FileLocatorInterface
      */
     public function locate($template, $currentPath = null, $first = true)
     {
-        $key = md5(serialize($template));
+        $key = $template->getSignature();
 
         if (isset($this->cache[$key])) {
             return $this->cache[$key];
         }
 
-        if (!$template['bundle']) {
-            if (is_file($file = $this->path.'/views/'.$template['controller'].'/'.$template['name'].'.'.$template['format'].'.'.$template['engine'])) {
-                return $this->cache[$key] = $file;
-            }
-
-            throw new \InvalidArgumentException(sprintf('Unable to find template "%s" in "%s".', json_encode($template), $this->path));
-        }
-
-        $resource = $template['bundle'].'/Resources/views/'.$template['controller'].'/'.$template['name'].'.'.$template['format'].'.'.$template['engine'];
-
         try {
-            return $this->locator->locate('@'.$resource, $this->path);
-        } catch (\Exception $e) {
-            throw new \InvalidArgumentException(sprintf('Unable to find template "%s".', json_encode($template), $this->path), 0, $e);
+            return $this->cache[$key] = $this->locator->locate($template->getPath(), $this->path);
+        } catch (\InvalidArgumentException $e) {
+            throw new \InvalidArgumentException(sprintf('Unable to find template "%s" in "%s".', json_encode($template), $this->path), 0, $e);
         }
     }
 }

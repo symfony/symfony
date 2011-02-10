@@ -340,21 +340,24 @@ class FrameworkExtension extends Extension
 
         $this->addClassesToCompile(array(
             'Symfony\\Bundle\\FrameworkBundle\\Templating\\EngineInterface',
+            'Symfony\\Component\\Templating\\TemplateNameParserInterface',
+            'Symfony\\Component\\Templating\\TemplateNameParser',
             'Symfony\\Component\\Templating\\EngineInterface',
             'Symfony\\Component\\Config\\FileLocatorInterface',
+            'Symfony\\Component\\Templating\\TemplateReferenceInterface',
+            'Symfony\\Component\\Templating\\TemplateReference',
+            'Symfony\\Bundle\\FrameworkBundle\\Templating\\TemplateReference',
+            'Symfony\\Bundle\\FrameworkBundle\\Templating\\TemplateNameParser',
             $container->findDefinition('templating.locator')->getClass(),
         ));
 
         if (in_array('php', $config['engines'], true)) {
             $this->addClassesToCompile(array(
                 'Symfony\\Component\\Templating\\PhpEngine',
-                'Symfony\\Component\\Templating\\TemplateNameParserInterface',
-                'Symfony\\Component\\Templating\\TemplateNameParser',
                 'Symfony\\Component\\Templating\\Loader\\LoaderInterface',
                 'Symfony\\Component\\Templating\\Storage\\Storage',
                 'Symfony\\Component\\Templating\\Storage\\FileStorage',
                 'Symfony\\Bundle\\FrameworkBundle\\Templating\\PhpEngine',
-                'Symfony\\Bundle\\FrameworkBundle\\Templating\\TemplateNameParser',
                 'Symfony\\Bundle\\FrameworkBundle\\Templating\\Loader\\FilesystemLoader',
             ));
         }

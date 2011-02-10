@@ -12,18 +12,20 @@
 namespace Symfony\Bundle\FrameworkBundle\Templating;
 
 use Symfony\Component\Templating\TemplateNameParser as BaseTemplateNameParser;
+use Symfony\Component\Templating\TemplateReferenceInterface;
 use Symfony\Component\HttpKernel\KernelInterface;
 
 /**
- * TemplateNameParser parsers template name from the short notation
- * "bundle:section:template.engine.format" to an array of
- * template parameters.
+ * TemplateNameParser converts template names from the short notation
+ * "bundle:section:template.format.engine" to TemplateReferenceInterface
+ * instances.
  *
  * @author Fabien Potencier <fabien.potencier@symfony-project.com>
  */
 class TemplateNameParser extends BaseTemplateNameParser
 {
     protected $kernel;
+    protected $cache;
 
     /**
      * Constructor.
@@ -33,6 +35,7 @@ class TemplateNameParser extends BaseTemplateNameParser
     public function __construct(KernelInterface $kernel)
     {
         $this->kernel = $kernel;
+        $this->cache = array();
     }
 
     /**
@@ -40,8 +43,10 @@ class TemplateNameParser extends BaseTemplateNameParser
      */
     public function parse($name)
     {
-        if (is_array($name)) {
+        if ($name instanceof TemplateReferenceInterface) {
             return $name;
+        } else if (isset($this->cache[$name])) {
+            return $this->cache[$name];
         }
 
         // normalize name
@@ -61,22 +66,36 @@ class TemplateNameParser extends BaseTemplateNameParser
             throw new \InvalidArgumentException(sprintf('Template name "%s" is not valid (format is "bundle:section:template.format.engine").', $name));
         }
 
-        $parameters = array(
-            'bundle'     => $parts[0],
-            'controller' => $parts[1],
-            'name'       => $elements[0],
-            'format'     => $elements[1],
-            'engine'     => $elements[2],
-        );
+        $template = new TemplateReference($parts[0], $parts[1], $elements[0], $elements[1], $elements[2]);
 
-        if ($parameters['bundle']) {
+        if ($template->get('bundle')) {
             try {
-                $this->kernel->getBundle($parameters['bundle']);
+                $this->kernel->getBundle($template->get('bundle'));
             } catch (\Exception $e) {
                 throw new \InvalidArgumentException(sprintf('Template name "%s" is not valid.', $name), 0, $e);
             }
         }
 
-        return $parameters;
+        return $this->cache[$name] = $template;
     }
+
+    /**
+     * Convert a filename to a template.
+     *
+     * @param string $file The filename
+     * 
+     * @return TemplateReferenceInterface A template
+     */
+    public function parseFromFilename($file)
+    {
+        $parts = explode('/', strtr($file, '\\', '/'));
+
+        $elements = explode('.', array_pop($parts));
+        if (3 !== count($elements)) {
+            return false;
+        }
+
+        return new TemplateReference('', implode('/', $parts), $elements[0], $elements[1], $elements[2]);
+    }
+
 }

@@ -12,22 +12,19 @@
 namespace Symfony\Component\Templating;
 
 /**
- * TemplateNameParserInterface parses template names to a
- * "normalized" array of template parameters.
- *
- * The template name array must always have at least a "name"
- * and an "engine" key.
+ * TemplateNameParserInterface converts template names to TemplateReferenceInterface
+ * instances.
  *
  * @author Fabien Potencier <fabien.potencier@symfony-project.com>
  */
 interface TemplateNameParserInterface
 {
     /**
-     * Parses a template to an array of parameters.
+     * Convert a template name to a TemplateReferenceInterface instance.
      *
      * @param string $name A template name
      *
-     * @return array An array of template parameters
+     * @return TemplateReferenceInterface A template
      */
     function parse($name);
 }

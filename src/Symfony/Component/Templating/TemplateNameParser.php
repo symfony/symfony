@@ -11,6 +11,9 @@
 
 namespace Symfony\Component\Templating;
 
+use Symfony\Component\Templating\TemplateReferenceInterface;
+use Symfony\Component\Templating\TemplateReference;
+
 /**
  * TemplateNameParser is the default implementation of TemplateNameParserInterface.
  *
@@ -26,11 +29,11 @@ class TemplateNameParser implements TemplateNameParserInterface
      *
      * @param string $name A template name
      *
-     * @return array An array of parameters
+     * @return TemplateReferenceInterface A template
      */
     public function parse($name)
     {
-        if (is_array($name)) {
+        if ($name instanceof TemplateReferenceInterface) {
             return $name;
         }
 
@@ -39,6 +42,6 @@ class TemplateNameParser implements TemplateNameParserInterface
             $engine = substr($name, $pos + 1);
         }
 
-        return array('name' => $name, 'engine' => $engine);
+        return new TemplateReference($name, $engine);
     }
 }

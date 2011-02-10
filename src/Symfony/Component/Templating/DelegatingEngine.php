@@ -36,8 +36,8 @@ class DelegatingEngine implements EngineInterface
     /**
      * Renders a template.
      *
-     * @param string $name       A template name
-     * @param array  $parameters An array of parameters to pass to the template
+     * @param mixed $name       A template name or a TemplateReferenceInterface instance
+     * @param array $parameters An array of parameters to pass to the template
      *
      * @return string The evaluated template as a string
      *
@@ -52,27 +52,13 @@ class DelegatingEngine implements EngineInterface
     /**
      * Returns true if the template exists.
      *
-     * @param string $name A template name
+     * @param mixed $name A template name or a TemplateReferenceInterface instance
      *
      * @return Boolean true if the template exists, false otherwise
      */
     public function exists($name)
     {
         return $this->getEngine($name)->exists($name);
-    }
-
-    /**
-     * Loads the given template.
-     *
-     * @param string $name A template name
-     *
-     * @return \Twig_TemplateInterface A \Twig_TemplateInterface instance
-     *
-     * @throws \Twig_Error_Loader if the template cannot be found
-     */
-    public function load($name)
-    {
-        return $this->getEngine($name)->load($name);
     }
 
     /**
@@ -88,25 +74,25 @@ class DelegatingEngine implements EngineInterface
     /**
      * Returns true if this class is able to render the given template.
      *
-     * @param string $name A template name
+     * @param mixed $name A template name or a TemplateReferenceInterface instance
      *
-     * @return Boolean True if this class supports the given template, false otherwise
+     * @return Boolean true if this class supports the given template, false otherwise
      */
     public function supports($name)
     {
-        foreach ($this->engines as $engine) {
-            if ($engine->supports($name)) {
-                return true;
-            }
+        try {
+            $this->getEngine($name);
+        } catch (\RuntimeException $e) {
+            return false;
         }
 
-        return false;
+        return true;
     }
 
     /**
      * Get an engine able to render the given template.
      *
-     * @param string $name A template name
+     * @param mixed $name A template name or a TemplateReferenceInterface instance
      *
      * @return EngineInterface The engine
      *

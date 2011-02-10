@@ -29,7 +29,25 @@ class StubIntlDateFormatter
     const TRADITIONAL = 0;
     const GREGORIAN = 1;
 
+    private $defaultDateFormats = array(
+        self::NONE      => '',
+        self::FULL      => 'EEEE, LLLL d, y',
+        self::LONG      => 'LLLL d, y',
+        self::MEDIUM    => 'LLL d, y',
+        self::SHORT     => 'M/d/yy',
+    );
+
+    private $defaultTimeFormats = array(
+        self::FULL      => 'h:mm:ss a zzzz',
+        self::LONG      => 'h:mm:ss a z',
+        self::MEDIUM    => 'h:mm:ss a',
+        self::SHORT     => 'h:mm a',
+    );
+
+    private $datetype;
+    private $timetype;
     private $pattern;
+
     private $dateTimeZone;
 
     public function __construct($locale, $datetype, $timetype, $timezone = null, $calendar = null, $pattern = null)
@@ -37,6 +55,9 @@ class StubIntlDateFormatter
         if ('en' != $locale) {
             throw new \InvalidArgumentException('Unsupported $locale value. Only the \'en\' locale is supported. Install the intl extension for full localization capabilities.');
         }
+
+        $this->datetype = $datetype;
+        $this->timetype = $timetype;
 
         $this->setPattern($pattern);
 
@@ -196,6 +217,11 @@ class StubIntlDateFormatter
         return $formatted;
     }
 
+    public function getLocale()
+    {
+        return 'en';
+    }
+
     public function getPattern()
     {
         return $this->pattern;
@@ -203,12 +229,33 @@ class StubIntlDateFormatter
 
     public function getCalendar()
     {
+        return self::GREGORIAN;
+    }
+
+    public function setLocale($locale)
+    {
         $this->throwMethodNotImplementException(__METHOD__);
     }
 
     public function setPattern($pattern)
     {
+        if (null === $pattern) {
+            $patternParts = array();
+            if (self::NONE !== $this->datetype) {
+                $patternParts[] = $this->defaultDateFormats[$this->datetype];
+            }
+            if (self::NONE !== $this->timetype) {
+                $patternParts[] = $this->defaultTimeFormats[$this->timetype];
+            }
+            $pattern = implode(' ', $patternParts);
+        }
+
         $this->pattern = $pattern;
+    }
+
+    public function setCalendar()
+    {
+        $this->throwMethodNotImplementException(__METHOD__);
     }
 
     private function throwMethodNotImplementException($methodName)

@@ -13,9 +13,9 @@ namespace Symfony\Bundle\SwiftmailerBundle\DependencyInjection;
 
 use Symfony\Component\HttpKernel\DependencyInjection\Extension;
 use Symfony\Component\DependencyInjection\Loader\XmlFileLoader;
-use Symfony\Component\DependencyInjection\Loader\FileLocator;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\DependencyInjection\Reference;
+use Symfony\Component\Config\Loader\FileLocator;
 
 /**
  * SwiftMailerExtension is an extension for the SwiftMailer library.

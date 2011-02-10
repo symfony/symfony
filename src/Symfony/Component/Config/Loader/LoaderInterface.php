@@ -9,12 +9,10 @@
  * file that was distributed with this source code.
  */
 
-namespace Symfony\Component\Routing\Loader;
-
-use Symfony\Component\Routing\Loader\LoaderResolver;
+namespace Symfony\Component\Config\Loader;
 
 /**
- * LoaderInterface is the interface that all loader classes must implement.
+ * LoaderInterface is the interface implemented by all loader classes.
  *
  * @author Fabien Potencier <fabien.potencier@symfony-project.com>
  */
@@ -23,22 +21,18 @@ interface LoaderInterface
     /**
      * Loads a resource.
      *
-     * @param mixed  $resource A resource
-     * @param string $type     The resource type
-     *
-     * @return RouteCollection A RouteCollection instance
+     * @param mixed $resource The resource
      */
-    function load($resource, $type = null);
+    function load($resource);
 
     /**
      * Returns true if this class supports the given resource.
      *
-     * @param mixed  $resource A resource
-     * @param string $type     The resource type
+     * @param  mixed $resource A resource
      *
-     * @return Boolean True if this class supports the given resource, false otherwise
+     * @return Boolean true if this class supports the given resource, false otherwise
      */
-    function supports($resource, $type = null);
+    function supports($resource);
 
     /**
      * Gets the loader resolver.

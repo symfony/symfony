@@ -9,12 +9,10 @@
  * file that was distributed with this source code.
  */
 
-namespace Symfony\Component\Routing\Loader;
-
-use Symfony\Component\Routing\RouteCollection;
+namespace Symfony\Component\Config\Loader;
 
 /**
- * DelegatingLoader delegates route loading to other loaders using a loader resolver.
+ * DelegatingLoader delegates loading to other loaders using a loader resolver.
  *
  * This loader acts as an array of LoaderInterface objects - each having
  * a chance to load a given resource (handled by the resolver)
@@ -41,36 +39,30 @@ class DelegatingLoader extends Loader
     /**
      * Loads a resource.
      *
-     * @param mixed  $resource A resource
-     * @param string $type     The resource type
-     *
-     * @return RouteCollection A RouteCollection instance
-     *
-     * @throws \InvalidArgumentException When the resource cannot be loaded
+     * @param mixed $resource A resource
      */
-    public function load($resource, $type = null)
+    public function load($resource)
     {
-        $loader = $this->resolver->resolve($resource, $type);
+        $loader = $this->resolver->resolve($resource);
 
         if (false === $loader) {
-            throw new \InvalidArgumentException(sprintf('Unable to load the "%s" routing resource.', is_string($resource) ? $resource : (is_object($resource) ? get_class($resource) : 'RESOURCE')));
+            throw new \InvalidArgumentException(sprintf('Unable to load the "%s" container resource.', is_string($resource) ? $resource : (is_object($resource) ? get_class($resource) : 'RESOURCE')));
         }
 
-        return $loader->load($resource, $type);
+        return $loader->load($resource);
     }
 
     /**
      * Returns true if this class supports the given resource.
      *
-     * @param mixed  $resource A resource
-     * @param string $type     The resource type
+     * @param  mixed $resource A resource
      *
-     * @return Boolean True if this class supports the given resource, false otherwise
+     * @return Boolean true if this class supports the given resource, false otherwise
      */
-    public function supports($resource, $type = null)
+    public function supports($resource)
     {
         foreach ($this->resolver->getLoaders() as $loader) {
-            if ($loader->supports($resource, $type)) {
+            if ($loader->supports($resource)) {
                 return true;
             }
         }

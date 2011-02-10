@@ -438,9 +438,9 @@ class HttpKernel implements HttpKernelInterface
 namespace Symfony\Component\HttpKernel
 {
 use Symfony\Component\DependencyInjection\ContainerInterface;
-use Symfony\Component\DependencyInjection\Loader\LoaderInterface;
 use Symfony\Component\HttpKernel\HttpKernelInterface;
 use Symfony\Component\HttpKernel\Bundle\BundleInterface;
+use Symfony\Component\Config\Loader\LoaderInterface;
 interface KernelInterface extends HttpKernelInterface, \Serializable
 {
     function registerRootDir();
@@ -469,7 +469,6 @@ use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\DependencyInjection\Dumper\PhpDumper;
 use Symfony\Component\DependencyInjection\ParameterBag\ParameterBag;
 use Symfony\Component\DependencyInjection\Loader\DelegatingLoader;
-use Symfony\Component\DependencyInjection\Loader\LoaderInterface;
 use Symfony\Component\DependencyInjection\Loader\LoaderResolver;
 use Symfony\Component\DependencyInjection\Loader\XmlFileLoader;
 use Symfony\Component\DependencyInjection\Loader\YamlFileLoader;

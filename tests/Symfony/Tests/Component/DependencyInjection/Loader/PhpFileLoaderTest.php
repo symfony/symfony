@@ -16,8 +16,8 @@ use Symfony\Component\DependencyInjection\Reference;
 use Symfony\Component\DependencyInjection\Definition;
 use Symfony\Component\DependencyInjection\Loader\Loader;
 use Symfony\Component\DependencyInjection\Loader\PhpFileLoader;
-use Symfony\Component\DependencyInjection\Loader\LoaderResolver;
-use Symfony\Component\DependencyInjection\Loader\FileLocator;
+use Symfony\Component\Config\Loader\LoaderResolver;
+use Symfony\Component\Config\Loader\FileLocator;
 
 class PhpFileLoaderTest extends \PHPUnit_Framework_TestCase
 {

@@ -11,11 +11,11 @@
 
 namespace Symfony\Tests\Component\Routing\Loader;
 
-use Symfony\Component\Routing\Loader\LoaderResolver;
 use Symfony\Component\Routing\Loader\AnnotationDirectoryLoader;
 use Symfony\Component\Routing\Route;
 use Symfony\Component\Routing\RouteCollection;
-use Symfony\Component\Routing\Loader\FileLocator;
+use Symfony\Component\Config\Loader\LoaderResolver;
+use Symfony\Component\Config\Loader\FileLocator;
 
 class AnnotationDirectoryLoaderTest extends \PHPUnit_Framework_TestCase
 {

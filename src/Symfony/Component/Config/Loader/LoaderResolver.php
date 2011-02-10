@@ -9,21 +9,27 @@
  * file that was distributed with this source code.
  */
 
-namespace Symfony\Component\Routing\Loader;
+namespace Symfony\Component\Config\Loader;
 
 /**
  * LoaderResolver selects a loader for a given resource.
+ *
+ * A resource can be anything (e.g. a full path to a config file or a Closure).
+ * Each loader determines whether it can load a resource and how.
  *
  * @author Fabien Potencier <fabien.potencier@symfony-project.com>
  */
 class LoaderResolver implements LoaderResolverInterface
 {
+    /**
+     * @var LoaderInterface[] An array of LoaderInterface objects
+     */
     protected $loaders;
 
     /**
      * Constructor.
      *
-     * @param array $loaders An array of LoaderInterface instances to add
+     * @param LoaderInterface[] $loaders An array of loaders
      */
     public function __construct(array $loaders = array())
     {
@@ -37,14 +43,13 @@ class LoaderResolver implements LoaderResolverInterface
      * Returns a loader able to load the resource.
      *
      * @param mixed  $resource A resource
-     * @param string $type     The resource type
      *
-     * @return LoaderInterface|false A LoaderInterface instance supporting the resource if one exists, false otherwise
+     * @return LoaderInterface|false A LoaderInterface instance
      */
-    public function resolve($resource, $type = null)
+    public function resolve($resource)
     {
         foreach ($this->loaders as $loader) {
-            if ($loader->supports($resource, $type)) {
+            if ($loader->supports($resource)) {
                 return $loader;
             }
         }
@@ -66,7 +71,7 @@ class LoaderResolver implements LoaderResolverInterface
     /**
      * Returns the registered loaders.
      *
-     * @return array An array of LoaderInterface instances
+     * @return LoaderInterface[] An array of LoaderInterface instances
      */
     public function getLoaders()
     {

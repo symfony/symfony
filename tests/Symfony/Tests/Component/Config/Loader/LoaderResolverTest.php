@@ -9,47 +9,47 @@
  * file that was distributed with this source code.
  */
 
-namespace Symfony\Tests\Component\DependencyInjection\Loader;
+namespace Symfony\Tests\Component\Config\Loader;
 
-use Symfony\Component\DependencyInjection\ContainerBuilder;
-use Symfony\Component\DependencyInjection\Loader\LoaderResolver;
-use Symfony\Component\DependencyInjection\Loader\ClosureLoader;
+use Symfony\Component\Config\Loader\LoaderResolver;
 
 class LoaderResolverTest extends \PHPUnit_Framework_TestCase
 {
     /**
-     * @covers Symfony\Component\DependencyInjection\Loader\LoaderResolver::__construct
+     * @covers Symfony\Component\Config\Loader\LoaderResolver::__construct
      */
     public function testConstructor()
     {
         $resolver = new LoaderResolver(array(
-            $loader = new ClosureLoader(new ContainerBuilder()),
+            $loader = $this->getMock('Symfony\Component\Config\Loader\LoaderInterface'),
         ));
 
         $this->assertEquals(array($loader), $resolver->getLoaders(), '__construct() takes an array of loaders as its first argument');
     }
 
     /**
-     * @covers Symfony\Component\DependencyInjection\Loader\LoaderResolver::resolve
+     * @covers Symfony\Component\Config\Loader\LoaderResolver::resolve
      */
     public function testResolve()
     {
-        $resolver = new LoaderResolver(array(
-            $loader = new ClosureLoader(new ContainerBuilder()),
-        ));
-
+        $loader = $this->getMock('Symfony\Component\Config\Loader\LoaderInterface');
+        $resolver = new LoaderResolver(array($loader));
         $this->assertFalse($resolver->resolve('foo.foo'), '->resolve() returns false if no loader is able to load the resource');
+
+        $loader = $this->getMock('Symfony\Component\Config\Loader\LoaderInterface');
+        $loader->expects($this->once())->method('supports')->will($this->returnValue(true));
+        $resolver = new LoaderResolver(array($loader));
         $this->assertEquals($loader, $resolver->resolve(function () {}), '->resolve() returns the loader for the given resource');
     }
 
     /**
-     * @covers Symfony\Component\DependencyInjection\Loader\LoaderResolver::getLoaders
-     * @covers Symfony\Component\DependencyInjection\Loader\LoaderResolver::addLoader
+     * @covers Symfony\Component\Config\Loader\LoaderResolver::getLoaders
+     * @covers Symfony\Component\Config\Loader\LoaderResolver::addLoader
      */
     public function testLoaders()
     {
         $resolver = new LoaderResolver();
-        $resolver->addLoader($loader = new ClosureLoader(new ContainerBuilder()));
+        $resolver->addLoader($loader = $this->getMock('Symfony\Component\Config\Loader\LoaderInterface'));
 
         $this->assertEquals(array($loader), $resolver->getLoaders(), 'addLoader() adds a loader');
     }

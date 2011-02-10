@@ -13,7 +13,7 @@ namespace Symfony\Tests\Component\DependencyInjection\Loader;
 
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\DependencyInjection\Loader\IniFileLoader;
-use Symfony\Component\DependencyInjection\Loader\FileLocator;
+use Symfony\Component\Config\Loader\FileLocator;
 
 class IniFileLoaderTest extends \PHPUnit_Framework_TestCase
 {

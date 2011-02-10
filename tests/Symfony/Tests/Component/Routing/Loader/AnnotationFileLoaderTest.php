@@ -11,7 +11,7 @@
 
 namespace Symfony\Tests\Component\Routing\Loader;
 
-use Symfony\Component\Routing\Loader\LoaderResolver;
+use Symfony\Component\Config\Loader\LoaderResolver;
 use Symfony\Component\Routing\Loader\AnnotationFileLoader;
 use Symfony\Component\Routing\Route;
 use Symfony\Component\Routing\RouteCollection;
@@ -27,7 +27,7 @@ class AnnotationFileLoaderTest extends \PHPUnit_Framework_TestCase
            ->disableOriginalConstructor()
            ->getMockForAbstractClass();
 
-        $loader = new AnnotationFileLoader($this->getMock('Symfony\Component\Routing\Loader\FileLocator'), $annotationClassLoader);
+        $loader = new AnnotationFileLoader($this->getMock('Symfony\Component\Config\Loader\FileLocator'), $annotationClassLoader);
 
         $fixture = __DIR__.'/../Fixtures/annotated.php';
 

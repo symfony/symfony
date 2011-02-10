@@ -14,9 +14,9 @@ namespace Symfony\Tests\Component\HttpKernel;
 use Symfony\Component\HttpKernel\Kernel;
 use Symfony\Component\HttpKernel\Bundle\BundleInterface;
 use Symfony\Component\HttpKernel\Bundle\Bundle;
-use Symfony\Component\DependencyInjection\Loader\LoaderInterface;
 use Symfony\Component\HttpKernel\HttpKernelInterface;
 use Symfony\Component\HttpFoundation\Request;
+use Symfony\Component\Config\Loader\LoaderInterface;
 
 class KernelTest extends \PHPUnit_Framework_TestCase
 {

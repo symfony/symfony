@@ -9,9 +9,7 @@
  * file that was distributed with this source code.
  */
 
-namespace Symfony\Component\Routing\Loader;
-
-use Symfony\Component\Routing\RouteCollection;
+namespace Symfony\Component\Config\Loader;
 
 /**
  * FileLoader is the abstract class used by all built-in loaders that are file based.
@@ -23,6 +21,9 @@ abstract class FileLoader extends Loader
     protected $locator;
     protected $currentDir;
 
+    /**
+     * Constructor.
+     */
     public function __construct(FileLocator $locator)
     {
         $this->locator = $locator;
@@ -34,21 +35,24 @@ abstract class FileLoader extends Loader
     }
 
     /**
-     * Adds routes from a resource.
+     * Adds definitions and parameters from a resource.
      *
-     * @param mixed  $resource A Resource
-     * @param string $type     The resource type
-     *
-     * @return RouteCollection A RouteCollection instance
+     * @param mixed $resource A Resource
      */
-    public function import($resource, $type = null)
+    public function import($resource, $ignoreErrors = false)
     {
-        $loader = $this->resolve($resource, $type);
+        try {
+            $loader = $this->resolve($resource);
 
-        if ($loader instanceof FileLoader && null !== $this->currentDir) {
-            $resource = $this->locator->getAbsolutePath($resource, $this->currentDir);
+            if ($loader instanceof FileLoader && null !== $this->currentDir) {
+                $resource = $this->locator->getAbsolutePath($resource, $this->currentDir);
+            }
+
+            $loader->load($resource);
+        } catch (\Exception $e) {
+            if (!$ignoreErrors) {
+                throw $e;
+            }
         }
-
-        return $loader->load($resource, $type);
     }
 }

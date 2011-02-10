@@ -18,8 +18,8 @@ use Symfony\Component\DependencyInjection\Loader\Loader;
 use Symfony\Component\DependencyInjection\Loader\XmlFileLoader;
 use Symfony\Component\DependencyInjection\Loader\YamlFileLoader;
 use Symfony\Component\DependencyInjection\Loader\IniFileLoader;
-use Symfony\Component\DependencyInjection\Loader\LoaderResolver;
-use Symfony\Component\DependencyInjection\Loader\FileLocator;
+use Symfony\Component\Config\Loader\LoaderResolver;
+use Symfony\Component\Config\Loader\FileLocator;
 
 class YamlFileLoaderTest extends \PHPUnit_Framework_TestCase
 {

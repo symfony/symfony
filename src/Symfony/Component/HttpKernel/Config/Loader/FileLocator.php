@@ -9,9 +9,9 @@
  * file that was distributed with this source code.
  */
 
-namespace Symfony\Bundle\FrameworkBundle\Routing;
+namespace Symfony\Component\HttpKernel\Config\Loader;
 
-use Symfony\Component\Routing\Loader\FileLocator as BaseFileLocator;
+use Symfony\Component\Config\Loader\FileLocator as BaseFileLocator;
 use Symfony\Component\HttpKernel\KernelInterface;
 
 /**

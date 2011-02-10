@@ -14,12 +14,12 @@ namespace Symfony\Bundle\DoctrineBundle\DependencyInjection;
 use Symfony\Component\DependencyInjection\Alias;
 use Symfony\Component\HttpKernel\DependencyInjection\Extension;
 use Symfony\Component\DependencyInjection\Loader\XmlFileLoader;
-use Symfony\Component\DependencyInjection\Loader\FileLocator;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\DependencyInjection\Definition;
 use Symfony\Component\DependencyInjection\Reference;
 use Symfony\Component\DependencyInjection\Resource\FileResource;
 use Symfony\Bundle\DoctrineAbstractBundle\DependencyInjection\AbstractDoctrineExtension;
+use Symfony\Component\Config\Loader\FileLocator;
 
 /**
  * DoctrineExtension is an extension for the Doctrine DBAL and ORM library.

@@ -11,7 +11,7 @@
 
 namespace Symfony\Component\DependencyInjection\Loader;
 
-use Symfony\Component\DependencyInjection\Resource\FileResource;
+use Symfony\Component\Config\Resource\FileResource;
 
 /**
  * PhpFileLoader loads service definitions from a PHP file.

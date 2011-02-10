@@ -13,7 +13,7 @@ namespace Symfony\Tests\Component\Routing;
 
 use Symfony\Component\Routing\RouteCollection;
 use Symfony\Component\Routing\Route;
-use Symfony\Component\Routing\Resource\FileResource;
+use Symfony\Component\Config\Resource\FileResource;
 
 class RouteCollectionTest extends \PHPUnit_Framework_TestCase
 {

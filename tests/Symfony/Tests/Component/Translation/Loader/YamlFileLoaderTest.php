@@ -12,7 +12,7 @@
 namespace Symfony\Tests\Component\Translation\Loader;
 
 use Symfony\Component\Translation\Loader\YamlFileLoader;
-use Symfony\Component\Translation\Resource\FileResource;
+use Symfony\Component\Config\Resource\FileResource;
 
 class YamlFileLoaderTest extends \PHPUnit_Framework_TestCase
 {

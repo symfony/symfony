@@ -9,9 +9,9 @@
  * file that was distributed with this source code.
  */
 
-namespace Symfony\Tests\Component\DependencyInjection\Resource;
+namespace Symfony\Tests\Component\Config\Resource;
 
-use Symfony\Component\DependencyInjection\Resource\FileResource;
+use Symfony\Component\Config\Resource\FileResource;
 
 class FileResourceTest extends \PHPUnit_Framework_TestCase
 {
@@ -31,7 +31,7 @@ class FileResourceTest extends \PHPUnit_Framework_TestCase
     }
 
     /**
-     * @covers Symfony\Component\DependencyInjection\Resource\FileResource::getResource
+     * @covers Symfony\Component\Config\Resource\FileResource::getResource
      */
     public function testGetResource()
     {
@@ -39,7 +39,7 @@ class FileResourceTest extends \PHPUnit_Framework_TestCase
     }
 
     /**
-     * @covers Symfony\Component\DependencyInjection\Resource\FileResource::isUptodate
+     * @covers Symfony\Component\Config\Resource\FileResource::isUptodate
      */
     public function testIsUptodate()
     {

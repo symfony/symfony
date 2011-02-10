@@ -12,7 +12,7 @@
 namespace Symfony\Component\Translation\Loader;
 
 use Symfony\Component\Translation\MessageCatalogue;
-use Symfony\Component\Translation\Resource\FileResource;
+use Symfony\Component\Config\Resource\FileResource;
 
 /**
  * XliffFileLoader loads translations from XLIFF files.

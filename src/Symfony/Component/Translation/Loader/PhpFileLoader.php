@@ -11,7 +11,7 @@
 
 namespace Symfony\Component\Translation\Loader;
 
-use Symfony\Component\Translation\Resource\FileResource;
+use Symfony\Component\Config\Resource\FileResource;
 
 /**
  * PhpFileLoader loads translations from PHP files returning an array of translations.

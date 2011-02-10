@@ -18,7 +18,7 @@ Events
             <tr>
                 <td><code>{{ elements.event }}</code></td>
                 <td><code>{{ elements.caller|abbr_class }}</code></td>
-                <td><code>{{ elements.listener|abbr_method }}()</code></td>
+                <td><code>{{ elements.listener|abbr_method }}</code></td>
             </tr>
         {% endfor %}
     </table>
@@ -34,7 +34,7 @@ Events
             {% for elements in collector.notcalledlisteners %}
                 <tr>
                     <td><code>{{ elements.event }}</code></td>
-                    <td><code>{{ elements.listener|abbr_method }}()</code></td>
+                    <td><code>{{ elements.listener|abbr_method }}</code></td>
                 </tr>
             {% endfor %}
         </table>

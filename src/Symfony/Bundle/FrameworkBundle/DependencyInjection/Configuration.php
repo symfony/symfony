@@ -96,6 +96,7 @@ class Configuration
                 ->canBeUnset()
                 ->scalarNode('cache_warmer')->end()
                 ->scalarNode('resource')->isRequired()->end()
+                ->scalarNode('type')->end()
                 ->end()
         ;
     }

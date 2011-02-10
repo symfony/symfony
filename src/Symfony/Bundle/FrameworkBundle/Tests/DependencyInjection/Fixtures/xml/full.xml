@@ -10,7 +10,7 @@
         <app:csrf-protection enabled="true" field-name="_csrf" secret="s3cr3t" />
         <app:esi enabled="true" />
         <app:profiler only-exceptions="true" />
-        <app:router resource="%kernel.root_dir%/config/routing.xml" cache-warmer="true" />
+        <app:router cache-warmer="true" resource="%kernel.root_dir%/config/routing.xml" type="xml" />
         <app:session auto-start="true" class="Session" default-locale="fr" storage-id="native" name="_SYMFONY" lifetime="86400" path="/" domain="example.com" secure="true" httponly="true" />
         <app:templating assets-version="SomeVersionScheme" assets-base-urls="http://cdn.example.com" cache-warmer="true">
             <app:loader>loader.foo</app:loader>

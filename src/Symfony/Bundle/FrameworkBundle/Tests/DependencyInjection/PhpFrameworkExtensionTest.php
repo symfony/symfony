@@ -13,7 +13,7 @@ namespace Symfony\Bundle\FrameworkBundle\Tests\DependencyInjection;
 
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\DependencyInjection\Loader\PhpFileLoader;
-use Symfony\Component\Config\Loader\FileLocator;
+use Symfony\Component\DependencyInjection\Loader\FileLocator;
 
 class PhpFrameworkExtensionTest extends FrameworkExtensionTest
 {

@@ -11,7 +11,7 @@
 
 namespace Symfony\Tests\Component\Routing\Loader;
 
-use Symfony\Component\Config\Loader\LoaderResolver;
+use Symfony\Component\Routing\Loader\LoaderResolver;
 use Symfony\Component\Routing\Loader\XmlFileLoader;
 use Symfony\Component\Routing\Route;
 use Symfony\Component\Routing\RouteCollection;
@@ -23,7 +23,7 @@ class XmlFileLoaderTest extends \PHPUnit_Framework_TestCase
      */
     public function testSupports()
     {
-        $loader = new XmlFileLoader($this->getMock('Symfony\Component\Config\Loader\FileLocator'));
+        $loader = new XmlFileLoader($this->getMock('Symfony\Component\Routing\Loader\FileLocator'));
 
         $this->assertTrue($loader->supports('foo.xml'), '->supports() returns true if the resource is loadable');
         $this->assertFalse($loader->supports('foo.foo'), '->supports() returns true if the resource is loadable');

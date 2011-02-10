@@ -11,8 +11,6 @@
 
 namespace Symfony\Component\Routing\Loader;
 
-use Symfony\Component\Config\Loader\Loader;
-
 /**
  * ClosureLoader loads routes from a PHP closure.
  *

@@ -13,7 +13,7 @@ namespace Symfony\Bundle\DoctrineMongoDBBundle\Tests\DependencyInjection;
 
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\DependencyInjection\Loader\YamlFileLoader;
-use Symfony\Component\Config\Loader\FileLocator;
+use Symfony\Component\DependencyInjection\Loader\FileLocator;
 
 class YamlMongoDBExtensionTest extends AbstractMongoDBExtensionTest
 {

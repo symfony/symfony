@@ -17,8 +17,8 @@ use Symfony\Component\DependencyInjection\Compiler\PassConfig;
 use Symfony\Component\DependencyInjection\Extension\ExtensionInterface;
 use Symfony\Component\DependencyInjection\InterfaceInjector;
 use Symfony\Component\DependencyInjection\ParameterBag\ParameterBagInterface;
-use Symfony\Component\Config\Resource\FileResource;
-use Symfony\Component\Config\Resource\ResourceInterface;
+use Symfony\Component\DependencyInjection\Resource\FileResource;
+use Symfony\Component\DependencyInjection\Resource\ResourceInterface;
 
 /**
  * ContainerBuilder is a DI container that provides an API to easily describe services.

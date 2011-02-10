@@ -9,16 +9,17 @@
  * file that was distributed with this source code.
  */
 
-namespace Symfony\Tests\Component\Config\Loader;
+namespace Symfony\Tests\Component\Routing\Loader;
 
-use Symfony\Component\Config\Loader\LoaderResolver;
-use Symfony\Component\Config\Loader\Loader;
+use Symfony\Component\Routing\Loader\LoaderResolver;
+use Symfony\Component\Routing\Loader\Loader;
+use Symfony\Component\Routing\Loader\XmlFileLoader;
 
 class LoaderTest extends \PHPUnit_Framework_TestCase
 {
     /**
-     * @covers Symfony\Component\Config\Loader\Loader::getResolver
-     * @covers Symfony\Component\Config\Loader\Loader::setResolver
+     * @covers Symfony\Component\Routing\Loader\Loader::getResolver
+     * @covers Symfony\Component\Routing\Loader\Loader::setResolver
      */
     public function testGetSetResolver()
     {
@@ -29,24 +30,19 @@ class LoaderTest extends \PHPUnit_Framework_TestCase
     }
 
     /**
-     * @covers Symfony\Component\Config\Loader\Loader::resolve
+     * @covers Symfony\Component\Routing\Loader\Loader::resolve
      */
     public function testResolve()
     {
-        $loader1 = $this->getMock('Symfony\Component\Config\Loader\LoaderInterface');
-        $loader1->expects($this->once())->method('supports')->will($this->returnValue(true));
-        $resolver = new LoaderResolver(array($loader1));
+        $resolver = new LoaderResolver(array(
+            $ini = new XmlFileLoader($this->getMock('Symfony\Component\Routing\Loader\FileLocator')),
+        ));
         $loader = new ProjectLoader1();
         $loader->setResolver($resolver);
 
+        $this->assertSame($ini, $loader->resolve('foo.xml'), '->resolve() finds a loader');
         $this->assertSame($loader, $loader->resolve('foo.foo'), '->resolve() finds a loader');
-        $this->assertSame($loader1, $loader->resolve('foo.xml'), '->resolve() finds a loader');
 
-        $loader1 = $this->getMock('Symfony\Component\Config\Loader\LoaderInterface');
-        $loader1->expects($this->once())->method('supports')->will($this->returnValue(false));
-        $resolver = new LoaderResolver(array($loader1));
-        $loader = new ProjectLoader1();
-        $loader->setResolver($resolver);
         try {
             $loader->resolve(new \stdClass());
             $this->fail('->resolve() throws an \InvalidArgumentException if the resource cannot be loaded');

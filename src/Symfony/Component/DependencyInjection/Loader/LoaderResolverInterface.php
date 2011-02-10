@@ -9,7 +9,7 @@
  * file that was distributed with this source code.
  */
 
-namespace Symfony\Component\Config\Loader;
+namespace Symfony\Component\DependencyInjection\Loader;
 
 /**
  * LoaderResolverInterface selects a loader for a given resource.

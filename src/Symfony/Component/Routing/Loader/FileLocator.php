@@ -9,7 +9,7 @@
  * file that was distributed with this source code.
  */
 
-namespace Symfony\Component\Config\Loader;
+namespace Symfony\Component\Routing\Loader;
 
 /**
  * FileLocator uses an array of pre-defined paths to find files.

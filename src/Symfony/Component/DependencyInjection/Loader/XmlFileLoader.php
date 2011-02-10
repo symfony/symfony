@@ -20,7 +20,7 @@ use Symfony\Component\DependencyInjection\Definition;
 use Symfony\Component\DependencyInjection\Reference;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\DependencyInjection\SimpleXMLElement;
-use Symfony\Component\Config\Resource\FileResource;
+use Symfony\Component\DependencyInjection\Resource\FileResource;
 
 /**
  * XmlFileLoader loads XML files service definitions.

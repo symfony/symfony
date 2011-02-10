@@ -9,7 +9,9 @@
  * file that was distributed with this source code.
  */
 
-namespace Symfony\Component\Config\Loader;
+namespace Symfony\Component\DependencyInjection\Loader;
+
+use Symfony\Component\DependencyInjection\ContainerBuilder;
 
 /**
  * Loader is the abstract class used by all built-in loaders.
@@ -18,7 +20,18 @@ namespace Symfony\Component\Config\Loader;
  */
 abstract class Loader implements LoaderInterface
 {
+    protected $container;
     protected $resolver;
+
+    /**
+     * Constructor.
+     *
+     * @param ContainerBuilder $container A ContainerBuilder instance
+     */
+    public function __construct(ContainerBuilder $container)
+    {
+        $this->container = $container;
+    }
 
     /**
      * Gets the loader resolver.

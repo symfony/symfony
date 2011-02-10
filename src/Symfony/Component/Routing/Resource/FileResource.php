@@ -9,7 +9,7 @@
  * file that was distributed with this source code.
  */
 
-namespace Symfony\Component\Config\Resource;
+namespace Symfony\Component\Routing\Resource;
 
 /**
  * FileResource represents a resource stored on the filesystem.

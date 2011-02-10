@@ -82,10 +82,10 @@ class MessageCatalogueTest extends \PHPUnit_Framework_TestCase
 
     public function testAddCatalogue()
     {
-        $r = $this->getMock('Symfony\Component\Config\Resource\ResourceInterface');
+        $r = $this->getMock('Symfony\Component\Translation\Resource\ResourceInterface');
         $r->expects($this->any())->method('__toString')->will($this->returnValue('r'));
 
-        $r1 = $this->getMock('Symfony\Component\Config\Resource\ResourceInterface');
+        $r1 = $this->getMock('Symfony\Component\Translation\Resource\ResourceInterface');
         $r1->expects($this->any())->method('__toString')->will($this->returnValue('r1'));
 
         $catalogue = new MessageCatalogue('en', array('domain1' => array('foo' => 'foo'), 'domain2' => array('bar' => 'bar')));
@@ -104,10 +104,10 @@ class MessageCatalogueTest extends \PHPUnit_Framework_TestCase
 
     public function testAddFallbackCatalogue()
     {
-        $r = $this->getMock('Symfony\Component\Config\Resource\ResourceInterface');
+        $r = $this->getMock('Symfony\Component\Translation\Resource\ResourceInterface');
         $r->expects($this->any())->method('__toString')->will($this->returnValue('r'));
 
-        $r1 = $this->getMock('Symfony\Component\Config\Resource\ResourceInterface');
+        $r1 = $this->getMock('Symfony\Component\Translation\Resource\ResourceInterface');
         $r1->expects($this->any())->method('__toString')->will($this->returnValue('r1'));
 
         $catalogue = new MessageCatalogue('en_US', array('domain1' => array('foo' => 'foo'), 'domain2' => array('bar' => 'bar')));
@@ -136,11 +136,11 @@ class MessageCatalogueTest extends \PHPUnit_Framework_TestCase
     public function testGetAddResource()
     {
         $catalogue = new MessageCatalogue('en');
-        $r = $this->getMock('Symfony\Component\Config\Resource\ResourceInterface');
+        $r = $this->getMock('Symfony\Component\Translation\Resource\ResourceInterface');
         $r->expects($this->any())->method('__toString')->will($this->returnValue('r'));
         $catalogue->addResource($r);
         $catalogue->addResource($r);
-        $r1 = $this->getMock('Symfony\Component\Config\Resource\ResourceInterface');
+        $r1 = $this->getMock('Symfony\Component\Translation\Resource\ResourceInterface');
         $r1->expects($this->any())->method('__toString')->will($this->returnValue('r1'));
         $catalogue->addResource($r1);
 

@@ -11,7 +11,7 @@
 
 namespace Symfony\Component\Translation;
 
-use Symfony\Component\Config\Resource\ResourceInterface;
+use Symfony\Component\Translation\Resource\ResourceInterface;
 
 /**
  * MessageCatalogue.

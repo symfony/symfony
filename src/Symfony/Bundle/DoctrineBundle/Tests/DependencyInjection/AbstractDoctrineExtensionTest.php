@@ -18,7 +18,7 @@ use Symfony\Component\DependencyInjection\ParameterBag\ParameterBag;
 use Symfony\Component\DependencyInjection\Loader\XmlFileLoader;
 use Symfony\Component\DependencyInjection\Loader\YamlFileLoader;
 use Symfony\Component\DependencyInjection\Reference;
-use Symfony\Component\Config\Loader\FileLocator;
+use Symfony\Component\DependencyInjection\Loader\FileLocator;
 
 abstract class AbstractDoctrineExtensionTest extends TestCase
 {

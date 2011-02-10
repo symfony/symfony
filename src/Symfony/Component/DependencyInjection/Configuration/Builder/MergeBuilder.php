@@ -13,6 +13,11 @@ class MergeBuilder
     public $allowFalse;
     public $allowOverwrite;
 
+    /**
+     * Constructor
+     *
+     * @param Symfony\Component\DependencyInjection\Configuration\Builder\NodeBuilder $parent The parent node
+     */
     public function __construct($parent)
     {
         $this->parent = $parent;
@@ -20,6 +25,12 @@ class MergeBuilder
         $this->allowOverwrite = true;
     }
 
+    /**
+     * Sets whether the node can be unset.
+     *
+     * @param boolean $allow
+     * @return Symfony\Component\DependencyInjection\Configuration\Builder\MergeBuilder
+     */
     public function allowUnset($allow = true)
     {
         $this->allowFalse = $allow;
@@ -27,6 +38,13 @@ class MergeBuilder
         return $this;
     }
 
+    /**
+     * Sets whether the node can be overwritten.
+     *
+     * @param boolean $deny Whether the overwritting is forbidden or not
+     *
+     * @return Symfony\Component\DependencyInjection\Configuration\Builder\MergeBuilder
+     */
     public function denyOverwrite($deny = true)
     {
         $this->allowOverwrite = !$deny;
@@ -34,6 +52,11 @@ class MergeBuilder
         return $this;
     }
 
+    /**
+     * Returns the parent node.
+     *
+     * @return Symfony\Component\DependencyInjection\Configuration\Builder\NodeBuilder
+     */
     public function end()
     {
         return $this->parent;

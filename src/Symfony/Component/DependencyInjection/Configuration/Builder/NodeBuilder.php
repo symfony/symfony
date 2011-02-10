@@ -33,6 +33,13 @@ class NodeBuilder
     public $falseEquivalent;
     public $performDeepMerging;
 
+    /**
+     * Constructor
+     *
+     * @param string      $name   the name of the node
+     * @param string      $type   The type of the node
+     * @param NodeBuilder $parent
+     */
     public function __construct($name, $type, $parent = null)
     {
         $this->name = $name;
@@ -67,6 +74,14 @@ class NodeBuilder
      * FLUID INTERFACE
      ****************************/
 
+    /**
+     * Creates a child node.
+     *
+     * @param string $name The name of the node
+     * @param string $type The type of the node
+     *
+     * @return Symfony\Component\DependencyInjection\Configuration\Builder\NodeBuilder The builder of the child node
+     */
     public function node($name, $type)
     {
         $node = new static($name, $type, $this);
@@ -74,21 +89,49 @@ class NodeBuilder
         return $this->children[$name] = $node;
     }
 
+    /**
+     * Creates a child array node
+     *
+     * @param string $name The name of the node
+     *
+     * @return Symfony\Component\DependencyInjection\Configuration\Builder\NodeBuilder The builder of the child node
+     */
     public function arrayNode($name)
     {
         return $this->node($name, 'array');
     }
 
+    /**
+     * Creates a child scalar node.
+     *
+     * @param string $name the name of the node
+     *
+     * @return Symfony\Component\DependencyInjection\Configuration\Builder\NodeBuilder The builder of the child node
+     */
     public function scalarNode($name)
     {
         return $this->node($name, 'scalar');
     }
 
+    /**
+     * Creates a child boolean node.
+     *
+     * @param string $name The name of the node
+     *
+     * @return Symfony\Component\DependencyInjection\Configuration\Builder\NodeBuilder The builder of the child node
+     */
     public function booleanNode($name)
     {
         return $this->node($name, 'boolean');
     }
 
+    /**
+     * Sets the default value.
+     *
+     * @param mixed $value The default value
+     *
+     * @return Symfony\Component\DependencyInjection\Configuration\Builder\NodeBuilder
+     */
     public function defaultValue($value)
     {
         $this->default = true;
@@ -97,6 +140,11 @@ class NodeBuilder
         return $this;
     }
 
+    /**
+     * Sets the node as required.
+     *
+     * @return Symfony\Component\DependencyInjection\Configuration\Builder\NodeBuilder
+     */
     public function isRequired()
     {
         $this->required = true;
@@ -104,6 +152,13 @@ class NodeBuilder
         return $this;
     }
 
+    /**
+     * Sets the attribute to use as key of the array.
+     *
+     * @param string $attribute The name of the attribute
+     *
+     * @return Symfony\Component\DependencyInjection\Configuration\Builder\NodeBuilder
+     */
     public function containsNameValuePairsWithKeyAttribute($attribute)
     {
         $this->beforeNormalization()
@@ -116,6 +171,11 @@ class NodeBuilder
         return $this;
     }
 
+    /**
+     * Requires the node to have at least one element.
+     *
+     * @return Symfony\Component\DependencyInjection\Configuration\Builder\NodeBuilder
+     */
     public function requiresAtLeastOneElement()
     {
         $this->atLeastOne = true;
@@ -123,6 +183,13 @@ class NodeBuilder
         return $this;
     }
 
+    /**
+     * Sets the equivalent value used when the node contains null.
+     *
+     * @param mixed $value
+     *
+     * @return Symfony\Component\DependencyInjection\Configuration\Builder\NodeBuilder
+     */
     public function treatNullLike($value)
     {
         $this->nullEquivalent = $value;
@@ -130,6 +197,13 @@ class NodeBuilder
         return $this;
     }
 
+    /**
+     * Sets the equivalent value used when the node contains true.
+     *
+     * @param mixed $value
+     *
+     * @return Symfony\Component\DependencyInjection\Configuration\Builder\NodeBuilder
+     */
     public function treatTrueLike($value)
     {
         $this->trueEquivalent = $value;
@@ -137,6 +211,13 @@ class NodeBuilder
         return $this;
     }
 
+    /**
+     * Sets the equivalent value used when the node contains false.
+     *
+     * @param mixed $value
+     *
+     * @return Symfony\Component\DependencyInjection\Configuration\Builder\NodeBuilder
+     */
     public function treatFalseLike($value)
     {
         $this->falseEquivalent = $value;
@@ -144,21 +225,41 @@ class NodeBuilder
         return $this;
     }
 
+    /**
+     * Sets null as the default value.
+     *
+     * @return Symfony\Component\DependencyInjection\Configuration\Builder\NodeBuilder
+     */
     public function defaultNull()
     {
         return $this->defaultValue(null);
     }
 
+    /**
+     * Sets true as the default value.
+     *
+     * @return Symfony\Component\DependencyInjection\Configuration\Builder\NodeBuilder
+     */
     public function defaultTrue()
     {
         return $this->defaultValue(true);
     }
 
+    /**
+     * Sets false as the default value.
+     *
+     * @return Symfony\Component\DependencyInjection\Configuration\Builder\NodeBuilder
+     */
     public function defaultFalse()
     {
         return $this->defaultValue(false);
     }
 
+    /**
+     * Adds the default value if the node is not set in the configuration.
+     *
+     * @return Symfony\Component\DependencyInjection\Configuration\Builder\NodeBuilder
+     */
     public function addDefaultsIfNotSet()
     {
         $this->addDefaults = true;
@@ -166,6 +267,13 @@ class NodeBuilder
         return $this;
     }
 
+    /**
+     * Disallows adding news keys in a subsequent configuration.
+     *
+     * If used all keys have to be defined in the same configuration file.
+     *
+     * @return Symfony\Component\DependencyInjection\Configuration\Builder\NodeBuilder
+     */
     public function disallowNewKeysInSubsequentConfigs()
     {
         $this->allowNewKeys = false;
@@ -173,6 +281,11 @@ class NodeBuilder
         return $this;
     }
 
+    /**
+     * Gets the builder for normalization rules.
+     *
+     * @return Symfony\Component\DependencyInjection\Configuration\Builder\NormalizationBuilder
+     */
     protected function normalization()
     {
         if (null === $this->normalization) {
@@ -182,11 +295,24 @@ class NodeBuilder
         return $this->normalization;
     }
 
+    /**
+     * Sets an expression to run before the normalization.
+     *
+     * @return Symfony\Component\DependencyInjection\Configuration\Builder\ExprBuilder
+     */
     public function beforeNormalization()
     {
         return $this->normalization()->before();
     }
 
+    /**
+     * Sets a normalization rule for XML configurations.
+     *
+     * @param string $singular The key to remap
+     * @param string $plural   The plural of the key for irregular plurals
+     *
+     * @return Symfony\Component\DependencyInjection\Configuration\Builder\NodeBuilder
+     */
     public function fixXmlConfig($singular, $plural = null)
     {
         $this->normalization()->remap($singular, $plural);
@@ -194,6 +320,13 @@ class NodeBuilder
         return $this;
     }
 
+    /**
+     * Sets an attribute to use as key.
+     *
+     * @param string $name
+     *
+     * @return Symfony\Component\DependencyInjection\Configuration\Builder\NodeBuilder
+     */
     public function useAttributeAsKey($name)
     {
         $this->key = $name;
@@ -201,6 +334,11 @@ class NodeBuilder
         return $this;
     }
 
+    /**
+     * Gets the builder for merging rules.
+     *
+     * @return Symfony\Component\DependencyInjection\Configuration\Builder\MergeBuilder
+     */
     protected function merge()
     {
         if (null === $this->merge) {
@@ -210,6 +348,13 @@ class NodeBuilder
         return $this->merge;
     }
 
+    /**
+     * Sets whether the node can be overwritten.
+     *
+     * @param boolean $deny Whether the overwritting is forbidden or not
+     *
+     * @return Symfony\Component\DependencyInjection\Configuration\Builder\NodeBuilder
+     */
     public function cannotBeOverwritten($deny = true)
     {
         $this->merge()->denyOverwrite($deny);
@@ -217,6 +362,11 @@ class NodeBuilder
         return $this;
     }
 
+    /**
+     * Denies the node value being empty.
+     *
+     * @return Symfony\Component\DependencyInjection\Configuration\Builder\NodeBuilder
+     */
     public function cannotBeEmpty()
     {
         $this->allowEmptyValue = false;
@@ -224,6 +374,13 @@ class NodeBuilder
         return $this;
     }
 
+    /**
+     * Sets whether the node can be unset.
+     *
+     * @param boolean $allow
+     *
+     * @return Symfony\Component\DependencyInjection\Configuration\Builder\NodeBuilder
+     */
     public function canBeUnset($allow = true)
     {
         $this->merge()->allowUnset($allow);
@@ -231,11 +388,23 @@ class NodeBuilder
         return $this;
     }
 
+    /**
+     * Sets a prototype for child nodes.
+     *
+     * @param string $type the type of node
+     *
+     * @return Symfony\Component\DependencyInjection\Configuration\Builder\NodeBuilder
+     */
     public function prototype($type)
     {
         return $this->prototype = new static(null, $type, $this);
     }
 
+    /**
+     * Disables the deep merging of the node.
+     *
+     * @return Symfony\Component\DependencyInjection\Configuration\Builder\NodeBuilder
+     */
     public function performNoDeepMerging()
     {
         $this->performDeepMerging = false;
@@ -243,6 +412,11 @@ class NodeBuilder
         return $this;
     }
 
+    /**
+     * Returns the parent node.
+     *
+     * @return Symfony\Component\DependencyInjection\Configuration\Builder\NodeBuilder
+     */
     public function end()
     {
         return $this->parent;

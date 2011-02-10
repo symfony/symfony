@@ -13,6 +13,11 @@ class NormalizationBuilder
     public $before;
     public $remappings;
 
+    /**
+     * Constructor
+     *
+     * @param Symfony\Component\DependencyInjection\Configuration\Builder\NodeBuilder $parent
+     */
     public function __construct($parent)
     {
         $this->parent = $parent;
@@ -24,6 +29,14 @@ class NormalizationBuilder
         $this->after = array();
     }
 
+    /**
+     * Registers a key to remap to its plural form.
+     *
+     * @param string $key    The key to remap
+     * @param string $plural The plural of the key in case of irregular plural
+     *
+     * @return Symfony\Component\DependencyInjection\Configuration\Builder\NormalizationBuilder
+     */
     public function remap($key, $plural = null)
     {
         if (null === $plural) {
@@ -35,6 +48,13 @@ class NormalizationBuilder
         return $this;
     }
 
+    /**
+     * Registers a closure to run before the normalization or an expression builder to build it if null is provided.
+     *
+     * @param \Closure $closure
+     *
+     * @return Symfony\Component\DependencyInjection\Configuration\Builder\ExprBuilder|Symfony\Component\DependencyInjection\Configuration\Builder\NormalizationBuilder
+     */
     public function before(\Closure $closure = null)
     {
         if (null !== $closure) {

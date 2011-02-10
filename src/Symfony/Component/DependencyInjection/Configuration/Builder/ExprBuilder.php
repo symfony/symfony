@@ -101,11 +101,11 @@ class ExprBuilder
      */
     public function thenReplaceKeyWithAttribute($attribute)
     {
-        $this->thenPart = function($v) {
+        $this->thenPart = function($v) use ($attribute) {
             $newValue = array();
             foreach ($v as $k => $oldValue) {
-                if (is_array($oldValue) && isset($oldValue['id'])) {
-                    $k = $oldValue['id'];
+                if (is_array($oldValue) && isset($oldValue[$attribute])) {
+                    $k = $oldValue[$attribute];
                 }
 
                 $newValue[$k] = $oldValue;

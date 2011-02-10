@@ -10,6 +10,8 @@
     </imports>
     
     <sec:config>
+        <sec:provider name="default" id="foo" />
+    
         <sec:firewall name="main" form-login="false">
             <sec:http-basic />
         </sec:firewall>

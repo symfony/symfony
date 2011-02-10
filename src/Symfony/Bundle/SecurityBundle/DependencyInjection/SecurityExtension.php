@@ -470,7 +470,7 @@ class SecurityExtension extends Extension
         $definition = $container->register($name, '%security.user.provider.in_memory.class%');
         $definition->setPublic(false);
         foreach ($provider['users'] as $username => $user) {
-            $userId = $name.'_'.md5(json_encode(array($username, $user['password'], $user['roles'])));
+            $userId = $name.'_'.$username;
 
             $container
                 ->register($userId, 'Symfony\Component\Security\Core\User\User')
@@ -486,7 +486,7 @@ class SecurityExtension extends Extension
 
     protected function getUserProviderId($name)
     {
-        return 'security.authentication.provider.'.$name;
+        return 'security.user.provider.'.$name;
     }
 
     protected function createExceptionListener($container, $config, $id, $defaultEntryPoint)

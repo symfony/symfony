@@ -1,4 +1,4 @@
-<?xml version="1.0" ?>
+<?xml version="1.0" encoding="UTF-8"?>
 
 <srv:container xmlns="http://www.symfony-project.org/schema/dic/security"
     xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
@@ -6,12 +6,15 @@
     xsi:schemaLocation="http://www.symfony-project.org/schema/dic/services http://www.symfony-project.org/schema/dic/services/services-1.0.xsd">
 
     <config>
+        <provider name="default">
+            <user name="foo" password="foo" roles="ROLE_USER" />
+        </provider>
+        
         <provider name="digest">
             <user name="foo" password="foo" roles="ROLE_USER, ROLE_ADMIN" />
         </provider>
 
         <provider name="basic">
-            <password-encoder hash="sha1" />
             <user name="foo" password="0beec7b5ea3f0fdbc95d0dd47f3c5bc275da8a33" roles="ROLE_SUPER_ADMIN" />
             <user name="bar" password="0beec7b5ea3f0fdbc95d0dd47f3c5bc275da8a33" roles="ROLE_USER, ROLE_ADMIN" />
         </provider>
@@ -21,5 +24,26 @@
         </provider>
 
         <provider name="service" id="user.manager" />
+
+        <firewall name="simple" pattern="/login" security="false" />
+
+        <firewall name="secure" stateless="true">
+            <http-basic />
+            <http-digest />
+            <form-login />
+            <anonymous />
+            <switch-user />
+            <x509 />
+            <logout />
+        </firewall>
+
+        <role id="ROLE_ADMIN">ROLE_USER</role>
+        <role id="ROLE_SUPER_ADMIN">ROLE_USER,ROLE_ADMIN,ROLE_ALLOWED_TO_SWITCH</role>
+        <role id="ROLE_REMOTE">ROLE_USER,ROLE_ADMIN</role>
+
+        <rule path="/blog/524" role="ROLE_USER" requires-channel="https" />
+        <rule role='IS_AUTHENTICATED_ANONYMOUSLY' path="/blog/.*">
+            <attribute key="_controller" pattern=".*\\BlogBundle\\.*" />
+        </rule>
     </config>
 </srv:container>

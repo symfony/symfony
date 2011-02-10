@@ -153,25 +153,6 @@ class NodeBuilder
     }
 
     /**
-     * Sets the attribute to use as key of the array.
-     *
-     * @param string $attribute The name of the attribute
-     *
-     * @return Symfony\Component\DependencyInjection\Configuration\Builder\NodeBuilder
-     */
-    public function containsNameValuePairsWithKeyAttribute($attribute)
-    {
-        $this->beforeNormalization()
-                ->ifArray()
-                ->thenReplaceKeyWithAttribute($attribute)
-        ;
-
-        $this->useAttributeAsKey($attribute);
-
-        return $this;
-    }
-
-    /**
      * Requires the node to have at least one element.
      *
      * @return Symfony\Component\DependencyInjection\Configuration\Builder\NodeBuilder

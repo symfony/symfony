@@ -93,31 +93,6 @@ class ExprBuilder
     }
 
     /**
-     * Sets a closure replacing the key with an attribute of the value when it is an array.
-     *
-     * @param string $attribute
-     *
-     * @return Symfony\Component\DependencyInjection\Configuration\Builder\ExprBuilder
-     */
-    public function thenReplaceKeyWithAttribute($attribute)
-    {
-        $this->thenPart = function($v) use ($attribute) {
-            $newValue = array();
-            foreach ($v as $k => $oldValue) {
-                if (is_array($oldValue) && isset($oldValue[$attribute])) {
-                    $k = $oldValue[$attribute];
-                }
-
-                $newValue[$k] = $oldValue;
-            }
-
-            return $newValue;
-        };
-
-        return $this;
-    }
-
-    /**
      * Sets a closure returning an empty array.
      *
      * @return Symfony\Component\DependencyInjection\Configuration\Builder\ExprBuilder

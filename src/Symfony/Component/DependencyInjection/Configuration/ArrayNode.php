@@ -225,7 +225,7 @@ class ArrayNode extends BaseNode implements PrototypeNodeInterface
                 if ($child->isRequired()) {
                     throw new InvalidConfigurationException(sprintf(
                         'The node at path "%s" must be configured.',
-                        $this->getPath()
+                        $this->getPath().'.'.$name
                     ));
                 }
 
@@ -352,19 +352,15 @@ class ArrayNode extends BaseNode implements PrototypeNodeInterface
                 continue;
             }
 
-            try {
-                if (null !== $this->prototype) {
-                    $this->prototype->setName($k);
-                    $leftSide[$k] = $this->prototype->merge($leftSide[$k], $v);
-                } else {
-                    if (!isset($this->children[$k])) {
-                        throw new \RuntimeException('merge() expects a normalized config array.');
-                    }
-
-                    $leftSide[$k] = $this->children[$k]->merge($leftSide[$k], $v);
+            if (null !== $this->prototype) {
+                $this->prototype->setName($k);
+                $leftSide[$k] = $this->prototype->merge($leftSide[$k], $v);
+            } else {
+                if (!isset($this->children[$k])) {
+                    throw new \RuntimeException('merge() expects a normalized config array.');
                 }
-            } catch (UnsetKeyException $unset) {
-                unset($leftSide[$k]);
+
+                $leftSide[$k] = $this->children[$k]->merge($leftSide[$k], $v);
             }
         }
 

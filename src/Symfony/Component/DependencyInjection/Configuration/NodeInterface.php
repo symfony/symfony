@@ -19,4 +19,5 @@ interface NodeInterface
     function getDefaultValue();
     function normalize($value);
     function merge($leftSide, $rightSide);
+    function finalize($value);
 }

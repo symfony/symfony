@@ -128,6 +128,7 @@ class TreeBuilder
         $configNode->addEquivalentValue(null, $node->nullEquivalent);
         $configNode->addEquivalentValue(true, $node->trueEquivalent);
         $configNode->addEquivalentValue(false, $node->falseEquivalent);
+        $configNode->setRequired($node->required);
     }
 
     /**
@@ -146,6 +147,7 @@ class TreeBuilder
         $configNode->addEquivalentValue(true, $node->trueEquivalent);
         $configNode->addEquivalentValue(false, $node->falseEquivalent);
         $configNode->setPerformDeepMerging($node->performDeepMerging);
+        $configNode->setRequired($node->required);
 
         if (null !== $node->key) {
             $configNode->setKeyAttribute($node->key);

@@ -1,0 +1,82 @@
+<?xml version="1.0" ?>
+
+<container xmlns="http://www.symfony-project.org/schema/dic/services"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xsi:schemaLocation="http://www.symfony-project.org/schema/dic/services http://www.symfony-project.org/schema/dic/services/services-1.0.xsd">
+
+    <parameters>
+        <parameter key="assetic.asset_factory.class">Symfony\Bundle\AsseticBundle\Factory\AssetFactory</parameter>
+        <parameter key="assetic.asset_manager.class">Symfony\Bundle\AsseticBundle\Factory\CachedAssetManager</parameter>
+        <parameter key="assetic.filter_manager.class">Assetic\FilterManager</parameter>
+
+        <parameter key="assetic.filter.coffee.class">Assetic\Filter\CoffeeScriptFilter</parameter>
+        <parameter key="assetic.filter.cssrewrite.class">Assetic\Filter\CssRewriteFilter</parameter>
+        <parameter key="assetic.filter.google_closure_compiler_api.class">Assetic\Filter\GoogleClosure\CompilerApiFilter</parameter>
+        <parameter key="assetic.filter.google_closure_compiler_jar.class">Assetic\Filter\GoogleClosure\CompilerJarFilter</parameter>
+        <parameter key="assetic.filter.less.class">Assetic\Filter\LessFilter</parameter>
+        <parameter key="assetic.filter.sass.class">Assetic\Filter\Sass\SassFilter</parameter>
+        <parameter key="assetic.filter.scss.class">Assetic\Filter\Sass\ScssFilter</parameter>
+        <parameter key="assetic.filter.sprockets.class">Assetic\Filter\SprocketsFilter</parameter>
+
+        <parameter key="assetic.debug">%kernel.debug%</parameter>
+        <parameter key="assetic.use_controller">%kernel.debug%</parameter>
+        <parameter key="assetic.document_root">%kernel.root_dir%/../web</parameter>
+        <parameter key="assetic.default_javascripts_output">js/*.js</parameter>
+        <parameter key="assetic.default_stylesheets_output">css/*.css</parameter>
+
+        <parameter key="assetic.java_bin">/usr/bin/java</parameter>
+        <parameter key="assetic.sass_bin">/usr/bin/sass</parameter>
+        <parameter key="assetic.lessc_bin">/usr/bin/lessc</parameter>
+        <parameter key="assetic.sprocketize_bin">/usr/bin/sprocketize</parameter>
+        <parameter key="assetic.coffee_bin">/usr/bin/coffee</parameter>
+    </parameters>
+
+    <services>
+        <!-- managers -->
+        <service id="assetic.filter_manager" class="%assetic.filter_manager.class%" />
+        <service id="assetic.asset_manager" class="%assetic.asset_manager.class%">
+            <argument type="service" id="assetic.asset_factory" />
+        </service>
+        <service id="assetic.asset_factory" class="%assetic.asset_factory.class%" public="false">
+            <argument type="service" id="kernel" />
+            <argument>%assetic.document_root%</argument>
+            <argument>%assetic.debug%</argument>
+            <call method="setFilterManager"><argument type="service" id="assetic.filter_manager" /></call>
+        </service>
+
+        <!-- filters -->
+        <service id="assetic.filter.cssrewrite" class="%assetic.filter.cssrewrite.class%" public="false">
+            <tag name="assetic.filter" alias="cssrewrite" />
+            <argument type="service" id="assetic.css_tokenizer" />
+        </service>
+        <service id="assetic.filter.less" class="%assetic.filter.less.class%" public="false">
+            <tag name="assetic.filter" alias="less" />
+            <argument>%assetic.lessc_bin%</argument>
+        </service>
+        <service id="assetic.filter.sass" class="%assetic.filter.sass.class%" public="false">
+            <tag name="assetic.filter" alias="sass" />
+            <argument>%assetic.sass_bin%</argument>
+        </service>
+        <service id="assetic.filter.scss" class="%assetic.filter.scss.class%" public="false">
+            <tag name="assetic.filter" alias="scss" />
+            <argument>%assetic.sass_bin%</argument>
+        </service>
+        <service id="assetic.filter.google_closure_compiler" class="%assetic.filter.google_closure_compiler_api.class%" public="false">
+            <tag name="assetic.filter" alias="closure" />
+        </service>
+        <service id="assetic.filter.sprockets" class="%assetic.filter.sprockets.class%" public="false">
+            <tag name="assetic.filter" alias="sprockets" />
+            <argument>%assetic.document_root%</argument>
+            <argument>%assetic.sprocketize_bin%</argument>
+        </service>
+        <service id="assetic.filter.coffee" class="%assetic.filter.coffee.class%" public="false">
+            <tag name="assetic.filter" alias="coffee" />
+            <argument>%assetic.coffee_bin%</argument>
+        </service>
+
+        <!-- other -->
+        <service id="assetic.css_tokenizer" class="PHP_CodeSniffer_Tokenizers_CSS" public="false">
+            <file>PHP/CodeSniffer.php</file>
+        </service>
+    </services>
+</container>

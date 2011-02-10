@@ -1,0 +1,3 @@
+_assetic:
+    resource: .
+    type:     assetic

@@ -26,6 +26,9 @@ install_git()
     fi
 }
 
+# Assetic
+install_git assetic git://github.com/kriswallsmith/assetic.git
+
 # Doctrine ORM
 install_git doctrine git://github.com/doctrine/doctrine2.git
 

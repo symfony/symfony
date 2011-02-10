@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+
+<xsd:schema xmlns="http://www.symfony-project.org/schema/dic/assetic"
+    xmlns:xsd="http://www.w3.org/2001/XMLSchema"
+    targetNamespace="http://www.symfony-project.org/schema/dic/assetic"
+    elementFormDefault="qualified">
+
+    <xsd:element name="config">
+        <xsd:complexType name="config">
+            <xsd:attribute name="debug" type="xsd:string" />
+            <xsd:attribute name="use-controller" type="xsd:string" />
+            <xsd:attribute name="document-root" type="xsd:string" />
+            <xsd:attribute name="closure" type="xsd:string" />
+            <xsd:attribute name="yui" type="xsd:string" />
+            <xsd:attribute name="default-javascripts-output" type="xsd:string" />
+            <xsd:attribute name="default-stylesheets-output" type="xsd:string" />
+        </xsd:complexType>
+    </xsd:element>
+</xsd:schema>

@@ -15,6 +15,7 @@ $loader->registerNamespaces(array(
     'Doctrine\\DBAL'                 => __DIR__.'/vendor/doctrine-dbal/lib',
     'Doctrine'                       => __DIR__.'/vendor/doctrine/lib',
     'Zend'                           => __DIR__.'/vendor/zend/library',
+    'Assetic'                        => __DIR__.'/vendor/assetic/src',
 ));
 $loader->registerPrefixes(array(
     'Swift_' => __DIR__.'/vendor/swiftmailer/lib/classes',

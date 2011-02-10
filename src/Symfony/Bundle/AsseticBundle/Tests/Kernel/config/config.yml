@@ -1,0 +1,21 @@
+app.config:
+    charset:       UTF-8
+    error_handler: null
+    csrf_protection:
+        enabled: true
+        secret: xxxxxxxxxx
+    router:        { resource: "%kernel.root_dir%/config/routing.yml" }
+    validation:    { enabled: true, annotations: true }
+    templating:    { engines: ['twig', 'php'] }
+    session:
+        default_locale: en
+        lifetime:       3600
+        auto_start:     false
+
+twig.config:
+    debug:            %kernel.debug%
+    strict_variables: %kernel.debug%
+
+assetic.config:
+    use_controller: true
+    document_root:  "%kernel.root_dir%/web"

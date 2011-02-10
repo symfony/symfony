@@ -359,6 +359,7 @@ class FrameworkExtension extends Extension
             ));
         }
 
+        $container->setParameter('templating.engines', $config['engines']);
         $engines = array_map(function($engine) { return new Reference('templating.engine.'.$engine); }, $config['engines']);
 
         // Use a deligation unless only a single engine was registered

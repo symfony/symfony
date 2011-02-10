@@ -44,6 +44,12 @@ class PhpMatcherDumperTest extends \PHPUnit_Framework_TestCase
         $collection->add('baz2', new Route(
             '/test/baz.html'
         ));
+        $collection->add('baz3', new Route(
+            '/test/baz3/'
+        ));
+        $collection->add('baz4', new Route(
+            '/test/{foo}/'
+        ));
 
         $dumper = new PhpMatcherDumper($collection);
         $this->assertStringEqualsFile(self::$fixturesPath.'/dumper/url_matcher1.php', $dumper->dump(), '->dump() dumps basic routes to the correct PHP file.');

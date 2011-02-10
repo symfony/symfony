@@ -37,6 +37,20 @@ class ProjectUrlMatcher extends Symfony\Component\Routing\Matcher\UrlMatcher
             return array_merge($this->mergeDefaults(array(), array ()), array('_route' => 'baz2'));
         }
 
+        if (rtrim($url, '/') === '/test/baz3') {
+            if (substr($url, -1) !== '/') {
+                return array('_controller' => 'Symfony\Bundle\FrameworkBundle\Controller\RedirectController::urlRedirectAction', 'url' => $this->context['base_url'].$url.'/', 'permanent' => true, '_route' => 'baz3');
+            }
+            return array_merge($this->mergeDefaults(array(), array ()), array('_route' => 'baz3'));
+        }
+
+        if (0 === strpos($url, '/test') && preg_match('#^/test/(?P<foo>[^/\.]+?)/?$#x', $url, $matches)) {
+            if (substr($url, -1) !== '/') {
+                return array('_controller' => 'Symfony\Bundle\FrameworkBundle\Controller\RedirectController::urlRedirectAction', 'url' => $this->context['base_url'].$url.'/', 'permanent' => true, '_route' => 'baz4');
+            }
+            return array_merge($this->mergeDefaults($matches, array ()), array('_route' => 'baz4'));
+        }
+
         return false;
     }
 }

@@ -35,8 +35,9 @@ class Router implements RouterInterface
      *
      * Available options:
      *
-     *   * cache_dir: The cache directory (or null to disable caching)
-     *   * debug:     Whether to enable debugging or not (false by default)
+     *   * cache_dir:     The cache directory (or null to disable caching)
+     *   * debug:         Whether to enable debugging or not (false by default)
+     *   * resource_type: Type hint for the main resource (optional)
      *
      * @param LoaderInterface $loader A LoaderInterface instance
      * @param mixed           $resource The main resource to load
@@ -63,6 +64,7 @@ class Router implements RouterInterface
             'matcher_base_class'     => 'Symfony\\Component\\Routing\\Matcher\\UrlMatcher',
             'matcher_dumper_class'   => 'Symfony\\Component\\Routing\\Matcher\\Dumper\\PhpMatcherDumper',
             'matcher_cache_class'    => 'ProjectUrlMatcher',
+            'resource_type'          => null,
         );
 
         // check option names
@@ -81,7 +83,7 @@ class Router implements RouterInterface
     public function getRouteCollection()
     {
         if (null === $this->collection) {
-            $this->collection = $this->loader->load($this->resource);
+            $this->collection = $this->loader->load($this->resource, $this->options['resource_type']);
         }
 
         return $this->collection;

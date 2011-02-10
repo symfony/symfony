@@ -234,6 +234,10 @@ class FrameworkExtension extends Extension
 
         $container->setParameter('routing.resource', $config['resource']);
 
+        if (isset($config['type'])) {
+            $container->setParameter('router.options.resource_type', $config['type']);
+        }
+
         if (isset($config['cache_warmer']) && $config['cache_warmer']) {
             $container->getDefinition('router.cache_warmer')->addTag('kernel.cache_warmer');
             $container->setAlias('router', 'router.cached');

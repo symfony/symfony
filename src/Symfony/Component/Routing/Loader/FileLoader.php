@@ -40,13 +40,15 @@ abstract class FileLoader extends Loader
      * @param string $type     The resource type
      *
      * @return RouteCollection A RouteCollection instance
+     *
+     * @throws \InvalidArgumentException When resource is expected to be a file and cannot be found
      */
     public function import($resource, $type = null)
     {
         $loader = $this->resolve($resource, $type);
 
         if ($loader instanceof FileLoader && null !== $this->currentDir) {
-            $resource = $this->locator->getAbsolutePath($resource, $this->currentDir);
+            $resource = $this->locator->locate($resource, $this->currentDir);
         }
 
         return $loader->load($resource, $type);

@@ -56,7 +56,6 @@ class XmlFileLoader extends FileLoader
                     $type = (string) $node->getAttribute('type');
                     $prefix = (string) $node->getAttribute('prefix');
                     $this->currentDir = dirname($path);
-                    $file = $this->locator->locate($resource, $this->currentDir);
                     $collection->addCollection($this->import($file, $type), $prefix);
                     break;
                 default:

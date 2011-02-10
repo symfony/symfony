@@ -85,13 +85,13 @@ abstract class Token implements TokenInterface
      */
     public function __toString()
     {
-        if (!is_object($this->user)) {
-            return (string) $this->user;
-        } elseif ($this->user instanceof AccountInterface) {
+        if (is_string($this->user)) {
+            return $this->user;
+        } else if ($this->user instanceof AccountInterface) {
             return $this->user->getUsername();
-        } else {
-            return 'n/a';
         }
+
+        return (string) $this->user;
     }
 
     /**
@@ -141,7 +141,7 @@ abstract class Token implements TokenInterface
 
         if (!is_string($user) && !is_object($user)) {
             throw new \InvalidArgumentException('$user must be an object, or a primitive string.');
-        } else if (is_object($user) && !method_exists($user, '__toString')) {
+        } else if (is_object($user) && !$user instanceof AccountInterface && !method_exists($user, '__toString')) {
             throw new \InvalidArgumentException('If $user is an object, it must implement __toString().');
         }
 

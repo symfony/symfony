@@ -46,7 +46,7 @@ class TokenTest extends \PHPUnit_Framework_TestCase
         $this->assertEquals('fabien', (string) $token);
 
         $token->setUser(new TestUser('fabien'));
-        $this->assertEquals('n/a', (string) $token);
+        $this->assertEquals('fabien', (string) $token);
 
         $user = $this->getMock('Symfony\Component\Security\Core\User\AccountInterface');
         $user->expects($this->once())->method('getUsername')->will($this->returnValue('fabien'));

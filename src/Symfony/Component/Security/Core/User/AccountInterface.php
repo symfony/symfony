@@ -19,13 +19,6 @@ namespace Symfony\Component\Security\Core\User;
 interface AccountInterface
 {
     /**
-     * Returns a string representation of the User.
-     *
-     * @return string A string return of the User
-     */
-    function __toString();
-
-    /**
      * Returns the roles granted to the user.
      *
      * @return Role[] The user roles

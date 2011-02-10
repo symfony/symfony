@@ -11,9 +11,9 @@
 
 namespace Symfony\Bundle\FrameworkBundle\Routing;
 
-use Symfony\Component\Routing\Loader\LoaderInterface;
+use Symfony\Component\Config\Loader\LoaderInterface;
 use Symfony\Component\DependencyInjection\ContainerInterface;
-use Symfony\Component\Routing\Loader\LoaderResolver as BaseLoaderResolver;
+use Symfony\Component\Config\Loader\LoaderResolver;
 
 /**
  * LazyLoader facilitate lazy loading of loader services.
@@ -78,7 +78,7 @@ class LazyLoader implements LoaderInterface
      *
      * @param LoaderResolver $resolver A LoaderResolver instance
      */
-    public function setResolver(BaseLoaderResolver $resolver)
+    public function setResolver(LoaderResolver $resolver)
     {
         $this->container->get($this->service)->setResolver($resolver);
     }

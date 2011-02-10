@@ -11,7 +11,7 @@
 
 namespace Symfony\Component\Routing;
 
-use Symfony\Component\Routing\Loader\LoaderInterface;
+use Symfony\Component\Config\Loader\LoaderInterface;
 
 /**
  * The Router class is an example of the integration of all pieces of the

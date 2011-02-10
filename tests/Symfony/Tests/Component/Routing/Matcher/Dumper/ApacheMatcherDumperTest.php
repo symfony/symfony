@@ -38,7 +38,13 @@ class ApacheMatcherDumperTest extends \PHPUnit_Framework_TestCase
             array(),
             array('_method' => 'GET|head')
         ));
-        
+        $collection->add('baz', new Route(
+            '/test/baz/'
+        ));
+        $collection->add('baz2', new Route(
+            '/test/{foo}/'
+        ));
+
         $dumper = new ApacheMatcherDumper($collection);
 
         $this->assertStringEqualsFile(self::$fixturesPath.'/dumper/url_matcher1.apache', $dumper->dump(), '->dump() dumps basic routes to the correct apache format.');

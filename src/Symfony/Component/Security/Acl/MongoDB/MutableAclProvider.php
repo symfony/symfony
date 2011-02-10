@@ -392,4 +392,145 @@ class MutableAclProvider extends AclProvider implements MutableAclProviderInterf
 
         $this->connection->selectCollection($this->options['oid_table_name'])->update($entry, $newData);
     }
+
+    /**
+     * This processes changes on an ACE related property (classAces, or objectAces).
+     *
+     * @param string $name
+     * @param array $changes
+     * @return void
+     */
+    protected function updateAceProperty($name, array $changes)
+    {
+        list($old, $new) = $changes;
+
+        $sids = new \SplObjectStorage();
+        $currentIds = array();
+        for ($i=0,$c=count($new); $i<$c; $i++) {
+            $ace = $new[$i];
+
+            if (null === $ace->getId()) {
+                if ($sids->contains($ace->getSecurityIdentity())) {
+                    $sid = $sids->offsetGet($ace->getSecurityIdentity());
+                } else {
+                    $sid = (string)$this->insertSecurityIdentity($ace->getSecurityIdentity());
+                }
+
+                $objectIdentityId = $name === 'classAces' ? null : $ace->getAcl()->getId();
+
+                $aceId = (string)$this->insertAccessControlEntry($objectIdentityId, null, $i, $sid, $ace->getStrategy(), $ace->getMask(), $ace->isGranting(), $ace->isAuditSuccess(), $ace->isAuditFailure());
+                $this->loadedAces[$aceId] = $ace;
+
+                $aceIdProperty = new \ReflectionProperty($ace, 'id');
+                $aceIdProperty->setAccessible(true);
+                $aceIdProperty->setValue($ace, intval($aceId));
+            } else {
+                $currentIds[$ace->getId()] = true;
+            }
+        }
+
+        for ($i=0,$c=count($old); $i<$c; $i++) {
+            $ace = $old[$i];
+
+            if (!isset($currentIds[$ace->getId()])) {
+                $this->deleteAccessControlEntry($ace->getId());
+                unset($this->loadedAces[$ace->getId()]);
+            }
+        }
+    }
+
+    /**
+     * Insert a security identity into the db, if it is already there, just return the id.
+     *
+     * @param SecurityIdentityInterface $sid
+     * @throws \InvalidArgumentException
+     * @return MongoId
+     */
+    protected function insertSecurityIdentity(SecurityIdentityInterface $sid)
+    {
+        if ($sid instanceof UserSecurityIdentity) {
+            $identifier = $sid->getClass().'-'.$sid->getUsername();
+            $username = true;
+        } else if ($sid instanceof RoleSecurityIdentity) {
+            $identifier = $sid->getRole();
+            $username = false;
+        } else {
+            throw new \InvalidArgumentException('$sid must either be an instance of UserSecurityIdentity, or RoleSecurityIdentity.');
+        }
+
+        $criteria = array(
+            'identitifer' => $identifier,
+            'username'    => $username,
+        );
+        $result = $this->connection->selectCollection($this->options['sid_table_name'])->findOne($criteria);
+        if (isset($result)) {
+            return $result['_id'];
+        }
+        $this->connection->selectCollection($this->options['sid_table_name'])->insert($criteria);
+        return $criteria['_id'];
+    }
+
+    /**
+     * Constructs the SQL for inserting an ACE.
+     *
+     * @param integer|null $objectIdentityId
+     * @param string|null $field
+     * @param integer $aceOrder
+     * @param integer $securityIdentityId
+     * @param string $strategy
+     * @param integer $mask
+     * @param Boolean $granting
+     * @param Boolean $auditSuccess
+     * @param Boolean $auditFailure
+     * @return MongoId
+     */
+    protected function insertAccessControlEntry($objectIdentityId, $field, $aceOrder, $securityIdentityId, $strategy, $mask, $granting, $auditSuccess, $auditFailure)
+    {
+        $criteria = array(
+            'aceOrder' => $aceOrder,
+            'securityIdentity' => array(
+                '$ref' => $this->options['sid_table_name'],
+                '$id' => new \MongoId($securityIdentityId),
+            ),
+            'mask' => $mask,
+            'granting' => $granting,
+            'grantingStrategy' => $strategy,
+            'auditSuccess' => $auditSuccess,
+            'auditFailure' => $auditFailure,
+        );
+
+        if (isset($objectIdentityId)) {
+            $criteria['objectIdentity'] = array(
+                '$ref' => $this->options['oid_table_name'],
+                '$id' => new \MongoId($objectIdentityId),
+            );
+        }
+        if (isset($field)) {
+            $criteria['fieldName'] = $field;
+        }
+        $this->connection->selectCollection($this->options['entry_table_name'])->insert($criteria);
+        return $criteria['_id'];
+    }
+
+    /**
+     * Persists the changes which were made to ACEs to the database.
+     *
+     * @param \SplObjectStorage $aces
+     * @return void
+     */
+    protected function updateAces(\SplObjectStorage $aces)
+    {
+        foreach ($aces as $ace)
+        {
+            $update = $aces->offsetGet($ace);
+            if (isset($update['strategy'])) {
+                $update['grantingStrategy'] = $update['strategy'];
+                unset($update['strategy']);
+            }
+            $criteria = array(
+                '_id' => $ace->getid(),
+            );
+            $this->connection->selectCollection($this->options['entry_table_name'])->update($criteria, $update);
+        }
+    }
 }

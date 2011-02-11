@@ -56,4 +56,21 @@ class ResponseTest extends \PHPUnit_Framework_TestCase
 
         $this->assertEquals("foo: bar\n\nfoo", $response->__toString(), '->__toString() returns the headers and the content as a string');
     }
+
+    public function testMagicToStringWithMultipleSetCookieHeader()
+    {
+        $headers = array(
+            'content-type' => 'text/html; charset=utf-8',
+            'set-cookie'   => array('foo=bar', 'bar=foo')  
+        );
+        
+        $expected = 'content-type: text/html; charset=utf-8'."\n";
+        $expected.= 'set-cookie: foo=bar'."\n";
+        $expected.= 'set-cookie: bar=foo'."\n\n";
+        $expected.= 'foo';
+        
+        $response = new Response('foo', 304, $headers);
+
+        $this->assertEquals($expected, $response->__toString(), '->__toString() returns the headers and the content as a string');
+    }
 }

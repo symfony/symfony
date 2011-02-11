@@ -48,10 +48,30 @@ class Response
     {
         $headers = '';
         foreach ($this->headers as $name => $value) {
-            $headers .= sprintf("%s: %s\n", $name, $value);
+            
+            if (is_string($value)) {
+                $headers .= $this->buildHeader($name, $value);
+            } else {
+                foreach ($value as $headerValue) {
+                    $headers .= $this->buildHeader($name, $headerValue);
+                }
+            }
         }
 
         return $headers."\n".$this->content;
+    }
+
+    /**
+     * Returns the build header line.
+     *
+     * @param string $name  The header name
+     * @param string $value The header value
+     *
+     * @return string The buil header line
+     */
+    protected function buildHeader($name, $value)
+    {
+        return sprintf("%s: %s\n", $name, $value);
     }
 
     /**

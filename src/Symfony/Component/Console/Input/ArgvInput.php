@@ -276,7 +276,7 @@ class ArgvInput extends Input
                     if (false !== $pos = strpos($token, '=')) {
                         return substr($token, $pos + 1);
                     } else {
-                        return array_shift($this->tokens);
+                        return array_shift($tokens);
                     }
                 }
             }

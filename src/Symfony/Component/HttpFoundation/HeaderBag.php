@@ -179,9 +179,6 @@ class HeaderBag
      * Sets a cookie.
      *
      * @param Cookie $cookie
-     *
-     * @throws \InvalidArgumentException When the cookie expire parameter is not valid
-     *
      * @return void
      */
     public function setCookie(Cookie $cookie)
@@ -215,6 +212,9 @@ class HeaderBag
      * Returns a cookie
      *
      * @param string $name
+     *
+     * @throws \InvalidArgumentException When the cookie does not exist
+     *
      * @return Cookie
      */
     public function getCookie($name)

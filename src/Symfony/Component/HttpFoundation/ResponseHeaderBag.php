@@ -25,13 +25,13 @@ class ResponseHeaderBag extends HeaderBag
      *
      * @param array $headers An array of HTTP headers
      */
-    public function __construct(array $parameters = array())
+    public function __construct(array $headers = array())
     {
         // this line is not necessary, but including it avoids any stupid
         // errors if we add code to the parent's constructor
         parent::__construct();
 
-        $this->replace($parameters);
+        $this->replace($headers);
     }
 
     /**

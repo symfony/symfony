@@ -11,7 +11,7 @@
 
 namespace Symfony\Bundle\SecurityBundle\DataCollector;
 
-use Symfony\Component\Security\Core\SecurityContext;
+use Symfony\Component\Security\Core\SecurityContextInterface;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpKernel\DataCollector\DataCollector;
@@ -25,7 +25,7 @@ class SecurityDataCollector extends DataCollector
 {
     protected $context;
 
-    public function __construct(SecurityContext $context = null)
+    public function __construct(SecurityContextInterface $context = null)
     {
         $this->context = $context;
     }
@@ -53,7 +53,7 @@ class SecurityDataCollector extends DataCollector
             $this->data = array(
                 'enabled'       => true,
                 'authenticated' => $token->isAuthenticated(),
-                'user'          => (string) $token->getUser(),
+                'user'          => (string) $token,
                 'roles'         => array_map(function ($role){ return $role->getRole();}, $token->getRoles()),
             );
         }

@@ -36,10 +36,20 @@ class GlobalVariables
 
     public function getUser()
     {
-        $security = $this->getSecurity();
-        if ($security && $user = $security->getUser()) {
-            return $user;
+        if (!$security = $this->getSecurity()) {
+            return;
         }
+
+        if (!$token = $security->getToken()) {
+            return;
+        }
+
+        $user = $token->getUser();
+        if (!is_object($user)) {
+            return;
+        }
+
+        return $user;
     }
 
     public function getRequest()

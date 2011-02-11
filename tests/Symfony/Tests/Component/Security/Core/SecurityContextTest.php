@@ -16,18 +16,6 @@ use Symfony\Component\Security\Core\SecurityContext;
 
 class SecurityContextTest extends \PHPUnit_Framework_TestCase
 {
-    public function testGetUser()
-    {
-        $context = new SecurityContext($this->getMock('Symfony\Component\Security\Core\Authentication\AuthenticationManagerInterface'));
-
-        $this->assertNull($context->getUser());
-
-        $token = $this->getMock('Symfony\Component\Security\Core\Authentication\Token\TokenInterface');
-        $token->expects($this->once())->method('getUser')->will($this->returnValue('foo'));
-        $context->setToken($token);
-        $this->assertEquals('foo', $context->getUser());
-    }
-
     public function testVoteAuthenticatesTokenIfNecessary()
     {
         $authManager = $this->getMock('Symfony\Component\Security\Core\Authentication\AuthenticationManagerInterface');
@@ -53,13 +41,21 @@ class SecurityContextTest extends \PHPUnit_Framework_TestCase
         $this->assertSame($newToken, $context->getToken());
     }
 
+    /**
+     * @expectedException Symfony\Component\Security\Core\Exception\AuthenticationCredentialsNotFoundException
+     */
+    public function testVoteWithoutAuthenticationToken()
+    {
+        $context = new SecurityContext(
+            $this->getMock('Symfony\Component\Security\Core\Authentication\AuthenticationManagerInterface'),
+            $this->getMock('Symfony\Component\Security\Core\Authorization\AccessDecisionManagerInterface')
+        );
+
+        $context->vote('ROLE_FOO');
+    }
+
     public function testVote()
     {
-        $context = new SecurityContext($this->getMock('Symfony\Component\Security\Core\Authentication\AuthenticationManagerInterface'));
-        $this->assertFalse($context->vote('ROLE_FOO'));
-        $context->setToken($token = $this->getMock('Symfony\Component\Security\Core\Authentication\Token\TokenInterface'));
-        $this->assertFalse($context->vote('ROLE_FOO'));
-
         $manager = $this->getMock('Symfony\Component\Security\Core\Authorization\AccessDecisionManagerInterface');
         $manager->expects($this->once())->method('decide')->will($this->returnValue(false));
         $context = new SecurityContext($this->getMock('Symfony\Component\Security\Core\Authentication\AuthenticationManagerInterface'), $manager);
@@ -85,7 +81,10 @@ class SecurityContextTest extends \PHPUnit_Framework_TestCase
 
     public function testGetSetToken()
     {
-        $context = new SecurityContext($this->getMock('Symfony\Component\Security\Core\Authentication\AuthenticationManagerInterface'));
+        $context = new SecurityContext(
+            $this->getMock('Symfony\Component\Security\Core\Authentication\AuthenticationManagerInterface'),
+            $this->getMock('Symfony\Component\Security\Core\Authorization\AccessDecisionManagerInterface')
+        );
         $this->assertNull($context->getToken());
 
         $context->setToken($token = $this->getMock('Symfony\Component\Security\Core\Authentication\Token\TokenInterface'));

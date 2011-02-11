@@ -11,8 +11,9 @@
 
 namespace Symfony\Bundle\SecurityBundle\Templating\Helper;
 
+use Symfony\Component\Security\Acl\Voter\FieldVote;
 use Symfony\Component\Templating\Helper\Helper;
-use Symfony\Component\Security\Core\SecurityContext;
+use Symfony\Component\Security\Core\SecurityContextInterface;
 
 /**
  * SecurityHelper provides read-only access to the security context.
@@ -28,7 +29,7 @@ class SecurityHelper extends Helper
      *
      * @param SecurityContext $context A SecurityContext instance
      */
-    public function __construct(SecurityContext $context = null)
+    public function __construct(SecurityContextInterface $context = null)
     {
         $this->context = $context;
     }
@@ -39,7 +40,11 @@ class SecurityHelper extends Helper
             return false;
         }
 
-        return $this->context->vote($role, $object, $field);
+        if (null !== $field) {
+            $object = new FieldVote($object, $field);
+        }
+
+        return $this->context->vote($role, $object);
     }
 
     /**

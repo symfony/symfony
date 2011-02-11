@@ -12,7 +12,7 @@
 namespace Symfony\Component\Security\Http\Firewall;
 
 use Symfony\Component\Security\Http\Logout\LogoutHandlerInterface;
-use Symfony\Component\Security\Core\SecurityContext;
+use Symfony\Component\Security\Core\SecurityContextInterface;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 use Symfony\Component\EventDispatcher\EventInterface;
 use Symfony\Component\HttpFoundation\Response;
@@ -32,11 +32,11 @@ class LogoutListener implements ListenerInterface
     /**
      * Constructor
      *
-     * @param SecurityContext $securityContext
+     * @param SecurityContextInterface $securityContext
      * @param string $logoutPath The path that starts the logout process
      * @param string $targetUrl  The URL to redirect to after logout
      */
-    public function __construct(SecurityContext $securityContext, $logoutPath, $targetUrl = '/')
+    public function __construct(SecurityContextInterface $securityContext, $logoutPath, $targetUrl = '/')
     {
         $this->securityContext = $securityContext;
         $this->logoutPath = $logoutPath;

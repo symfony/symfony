@@ -11,7 +11,7 @@
 
 namespace Symfony\Component\Security\Http\Firewall;
 
-use Symfony\Component\Security\Core\SecurityContext;
+use Symfony\Component\Security\Core\SecurityContextInterface;
 use Symfony\Component\HttpKernel\Log\LoggerInterface;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 use Symfony\Component\EventDispatcher\EventInterface;
@@ -29,7 +29,7 @@ class AnonymousAuthenticationListener implements ListenerInterface
     protected $key;
     protected $logger;
 
-    public function __construct(SecurityContext $context, $key, LoggerInterface $logger = null)
+    public function __construct(SecurityContextInterface $context, $key, LoggerInterface $logger = null)
     {
         $this->context = $context;
         $this->key     = $key;
@@ -47,7 +47,7 @@ class AnonymousAuthenticationListener implements ListenerInterface
     {
         $dispatcher->connect('core.security', array($this, 'handle'), 0);
     }
-    
+
     /**
      * {@inheritDoc}
      */

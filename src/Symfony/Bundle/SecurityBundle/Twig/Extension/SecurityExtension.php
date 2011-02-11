@@ -11,7 +11,8 @@
 
 namespace Symfony\Bundle\SecurityBundle\Twig\Extension;
 
-use Symfony\Component\Security\Core\SecurityContext;
+use Symfony\Component\Security\Acl\Voter\FieldVote;
+use Symfony\Component\Security\Core\SecurityContextInterface;
 
 /**
  * SecurityExtension exposes security context features.
@@ -22,7 +23,7 @@ class SecurityExtension extends \Twig_Extension
 {
     protected $context;
 
-    public function __construct(SecurityContext $context = null)
+    public function __construct(SecurityContextInterface $context = null)
     {
         $this->context = $context;
     }
@@ -33,7 +34,11 @@ class SecurityExtension extends \Twig_Extension
             return false;
         }
 
-        return $this->context->vote($role, $object, $field);
+        if (null !== $field) {
+            $object = new FieldVote($object, $field);
+        }
+
+        return $this->context->vote($role, $object);
     }
 
     /**

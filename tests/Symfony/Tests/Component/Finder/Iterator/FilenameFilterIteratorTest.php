@@ -22,7 +22,7 @@ class FilenameFilterIteratorTest extends IteratorTestCase
      */
     public function testAccept($matchPatterns, $noMatchPatterns, $expected)
     {
-        $inner = new Iterator(array('test.php', 'test.py', 'foo.php'));
+        $inner = new InnerNameIterator(array('test.php', 'test.py', 'foo.php'));
 
         $iterator = new FilenameFilterIterator($inner, $matchPatterns, $noMatchPatterns);
 
@@ -39,5 +39,19 @@ class FilenameFilterIteratorTest extends IteratorTestCase
             array(array('/\.php$/'), array(), array('test.php', 'foo.php')),
             array(array(), array('/\.php$/'), array('test.py')),
         );
+    }
+
+}
+
+class InnerNameIterator extends \ArrayIterator
+{
+    public function current()
+    {
+        return new \SplFileInfo(parent::current());
+    }
+
+    public function getFilename()
+    {
+        return parent::current();
     }
 }

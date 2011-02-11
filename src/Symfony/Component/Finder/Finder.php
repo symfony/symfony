@@ -338,10 +338,10 @@ class Finder implements \IteratorAggregate
 
     protected function searchInDirectory($dir)
     {
-        $flags = \FilesystemIterator::SKIP_DOTS;
+        $flags = \RecursiveDirectoryIterator::SKIP_DOTS;
 
         if ($this->followLinks) {
-            $flags |= \FilesystemIterator::FOLLOW_SYMLINKS;
+            $flags |= \RecursiveDirectoryIterator::FOLLOW_SYMLINKS;
         }
 
         $iterator = new \RecursiveIteratorIterator(new \RecursiveDirectoryIterator($dir, $flags), \RecursiveIteratorIterator::SELF_FIRST);

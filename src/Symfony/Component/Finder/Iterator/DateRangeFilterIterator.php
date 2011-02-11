@@ -40,7 +40,7 @@ class DateRangeFilterIterator extends \FilterIterator
      */
     public function accept()
     {
-        $fileinfo = $this->getInnerIterator()->current();
+        $fileinfo = $this->current();
 
         if (!$fileinfo->isFile()) {
             return true;

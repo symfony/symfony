@@ -43,14 +43,10 @@ class ExcludeDirectoryFilterIterator extends \FilterIterator
      */
     public function accept()
     {
-        $inner = $this;
-        while ($inner && !$inner->getInnerIterator() instanceof \RecursiveIteratorIterator) {
-            $inner = $inner->getInnerIterator();
-        }
-
-        $method = $inner->current()->isDir() ? 'getSubPathname' : 'getSubPath';
+        $path = $this->isDir() ? $this->getSubPathname() : $this->getSubPath();
+        $path = strtr($path, '\\', '/');
         foreach ($this->patterns as $pattern) {
-            if (preg_match($pattern, strtr($this->getInnerIterator()->$method(), '\\', '/'))) {
+            if (preg_match($pattern, $path)) {
                 return false;
             }
         }

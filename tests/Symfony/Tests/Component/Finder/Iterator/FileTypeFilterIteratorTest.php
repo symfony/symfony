@@ -22,7 +22,7 @@ class FileTypeFilterIteratorTest extends RealIteratorTestCase
      */
     public function testAccept($mode, $expected)
     {
-        $inner = new Iterator(self::$files);
+        $inner = new InnerTypeIterator(self::$files);
 
         $iterator = new FileTypeFilterIterator($inner, $mode);
 
@@ -35,5 +35,23 @@ class FileTypeFilterIteratorTest extends RealIteratorTestCase
             array(FileTypeFilterIterator::ONLY_FILES, array(sys_get_temp_dir().'/symfony2_finder/test.py', sys_get_temp_dir().'/symfony2_finder/foo/bar.tmp', sys_get_temp_dir().'/symfony2_finder/test.php')),
             array(FileTypeFilterIterator::ONLY_DIRECTORIES, array(sys_get_temp_dir().'/symfony2_finder/.git', sys_get_temp_dir().'/symfony2_finder/foo', sys_get_temp_dir().'/symfony2_finder/toto')),
         );
+    }
+}
+
+class InnerTypeIterator extends \ArrayIterator
+{
+   public function current()
+    {
+        return new \SplFileInfo(parent::current());
+    }
+
+    public function isFile()
+    {
+        return $this->current()->isFile();
+    }
+
+    public function isDir()
+    {
+        return $this->current()->isDir();
     }
 }

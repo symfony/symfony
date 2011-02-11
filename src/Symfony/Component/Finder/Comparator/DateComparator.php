@@ -39,13 +39,11 @@ class DateComparator extends Comparator
         }
 
         $operator = isset($matches[1]) ? $matches[1] : '==';
-        if ('since' === $operator || 'after' === $operator)
-        {
+        if ('since' === $operator || 'after' === $operator) {
             $operator = '>';
         }
 
-        if ('until' === $operator || 'before' === $operator)
-        {
+        if ('until' === $operator || 'before' === $operator) {
             $operator = '<';
         }
 

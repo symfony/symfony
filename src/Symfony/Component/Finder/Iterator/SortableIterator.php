@@ -29,12 +29,12 @@ class SortableIterator extends \ArrayIterator
      */
     public function __construct(\Iterator $iterator, $sort)
     {
-        if (!$sort instanceof \Closure && self::SORT_BY_NAME == $sort) {
+        if (self::SORT_BY_NAME === $sort) {
             $sort = function ($a, $b)
             {
                 return strcmp($a->getRealpath(), $b->getRealpath());
             };
-        } elseif (!$sort instanceof \Closure && self::SORT_BY_TYPE == $sort) {
+        } elseif (self::SORT_BY_TYPE === $sort) {
             $sort = function ($a, $b)
             {
                 if ($a->isDir() && $b->isFile()) {

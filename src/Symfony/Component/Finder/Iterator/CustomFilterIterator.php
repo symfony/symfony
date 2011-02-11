@@ -43,7 +43,7 @@ class CustomFilterIterator extends \FilterIterator
      */
     public function accept()
     {
-        $fileinfo = $this->getInnerIterator()->current();
+        $fileinfo = $this->current();
 
         foreach ($this->filters as $filter) {
             if (false === $filter($fileinfo)) {

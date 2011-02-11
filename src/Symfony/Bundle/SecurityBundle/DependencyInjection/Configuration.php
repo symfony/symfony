@@ -49,7 +49,7 @@ class Configuration
         $rootNode = $tb->root('security:config', 'array');
 
         $rootNode
-            ->scalarNode('access_denied_url')->end()
+            ->scalarNode('access_denied_url')->defaultNull()->end()
             ->scalarNode('session_fixation_strategy')->cannotBeEmpty()->defaultValue('migrate')->end()
         ;
 

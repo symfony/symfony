@@ -10,8 +10,6 @@
 
         <parameter key="security.account_checker.class">Symfony\Component\Security\Core\User\AccountChecker</parameter>
 
-        <parameter key="security.access_denied.url">null</parameter>
-
         <parameter key="security.encoder_factory.generic.class">Symfony\Component\Security\Core\Encoder\EncoderFactory</parameter>
         <parameter key="security.encoder.digest.class">Symfony\Component\Security\Core\Encoder\MessageDigestPasswordEncoder</parameter>
         <parameter key="security.encoder.plain.class">Symfony\Component\Security\Core\Encoder\PlaintextPasswordEncoder</parameter>
@@ -23,7 +21,7 @@
         <parameter key="security.authentication.trust_resolver.rememberme_class">Symfony\Component\Security\Core\Authentication\Token\RememberMeToken</parameter>
 
         <parameter key="security.authentication.manager.class">Symfony\Component\Security\Core\Authentication\AuthenticationProviderManager</parameter>
-        
+
         <parameter key="security.authentication.session_strategy.class">Symfony\Component\Security\Http\Session\SessionAuthenticationStrategy</parameter>
         <parameter key="security.authentication.session_strategy.strategy">migrate</parameter>
 
@@ -31,9 +29,7 @@
         <parameter key="security.access.decision_manager.strategy">affirmative</parameter>
         <parameter key="security.access.decision_manager.allow_if_all_abstain">false</parameter>
         <parameter key="security.access.decision_manager.allow_if_equal_granted_denied">true</parameter>
-        
-        <parameter key="security.access.denied_url">/access_denied</parameter>
-        
+
         <parameter key="security.access.simple_role_voter.class">Symfony\Component\Security\Core\Authorization\Voter\RoleVoter</parameter>
         <parameter key="security.access.authenticated_voter.class">Symfony\Component\Security\Core\Authorization\Voter\AuthenticatedVoter</parameter>
         <parameter key="security.access.role_hierarchy_voter.class">Symfony\Component\Security\Core\Authorization\Voter\RoleHierarchyVoter</parameter>
@@ -57,20 +53,20 @@
         <service id="security.authentication.manager" class="%security.authentication.manager.class%" public="false">
             <argument type="collection" />
         </service>
-        
+
         <service id="security.authentication.trust_resolver" class="%security.authentication.trust_resolver.class%" public="false">
             <argument>%security.authentication.trust_resolver.anonymous_class%</argument>
             <argument>%security.authentication.trust_resolver.rememberme_class%</argument>
         </service>
-        
+
         <service id="security.authentication.session_strategy" class="%security.authentication.session_strategy.class%" public="false">
             <argument>%security.authentication.session_strategy.strategy%</argument>
         </service>
-        
+
         <service id="security.encoder_factory.generic" class="%security.encoder_factory.generic.class%" public="false">
             <argument type="collection"></argument>
         </service>
-        
+
         <service id="security.encoder_factory" alias="security.encoder_factory.generic"></service>
         
         <service id="security.account_checker" class="%security.account_checker.class%" public="false" />
@@ -93,17 +89,17 @@
         <service id="security.access.simple_role_voter" class="%security.access.simple_role_voter.class%" public="false">
             <tag name="security.voter" />
         </service>
-        
+
         <service id="security.access.authenticated_voter" class="%security.access.authenticated_voter.class%" public="false">
             <argument type="service" id="security.authentication.trust_resolver" />
             <tag name="security.voter" />
         </service>
-        
+
         <service id="security.access.role_hierarchy_voter" class="%security.access.role_hierarchy_voter.class%" public="false">
             <argument type="service" id="security.role_hierarchy" />
         </service>
 
-        
+
         <!-- Firewall related services -->
         <service id="security.firewall" class="%security.firewall.class%">
             <tag name="kernel.listener" event="core.request" method="handle" priority="-128" />

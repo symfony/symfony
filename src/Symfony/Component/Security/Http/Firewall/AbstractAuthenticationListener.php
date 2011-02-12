@@ -195,7 +195,7 @@ abstract class AbstractAuthenticationListener implements ListenerInterface
             }
 
             $subRequest = Request::create($this->options['failure_path']);
-            $subRequest->attributes->set(SecurityContext::AUTHENTICATION_ERROR, $failed->getMessage());
+            $subRequest->attributes->set(SecurityContextInterface::AUTHENTICATION_ERROR, $failed->getMessage());
 
             return $event->getSubject()->handle($subRequest, HttpKernelInterface::SUB_REQUEST);
         } else {
@@ -203,7 +203,7 @@ abstract class AbstractAuthenticationListener implements ListenerInterface
                 $this->logger->debug(sprintf('Redirecting to %s', $this->options['failure_path']));
             }
 
-            $request->getSession()->set(SecurityContext::AUTHENTICATION_ERROR, $failed->getMessage());
+            $request->getSession()->set(SecurityContextInterface::AUTHENTICATION_ERROR, $failed->getMessage());
 
             $response = new Response();
             $response->setRedirect(0 !== strpos($this->options['failure_path'], 'http') ? $request->getUriForPath($this->options['failure_path']) : $this->options['failure_path'], 302);
@@ -221,8 +221,8 @@ abstract class AbstractAuthenticationListener implements ListenerInterface
         $this->securityContext->setToken($token);
 
         $session = $request->getSession();
-        $session->remove(SecurityContext::AUTHENTICATION_ERROR);
-        $session->remove(SecurityContext::LAST_USERNAME);
+        $session->remove(SecurityContextInterface::AUTHENTICATION_ERROR);
+        $session->remove(SecurityContextInterface::LAST_USERNAME);
 
         if (null !== $this->eventDispatcher) {
             $this->eventDispatcher->notify(new Event($this, 'security.interactive_login', array('request' => $request, 'token' => $token)));

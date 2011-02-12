@@ -26,27 +26,6 @@ use Symfony\Component\HttpKernel\HttpKernelInterface;
 class SessionListener
 {
     /**
-     * @var Request
-     */
-    private $request;
-
-    /**
-     * @var Boolean
-     */
-    private $master = false;
-
-    /**
-     * Assigns request and its type on 'core.request' event
-     *
-     * @param EventInterface $event
-     */
-    public function handle(EventInterface $event)
-    {
-        $this->request = $event->get('request');
-        $this->master = HttpKernelInterface::MASTER_REQUEST === $event->get('request_type');
-    }
-
-    /**
      * Checks if session was initialized and saves if current request is master
      * Runs on 'core.response' in test environment
      *
@@ -57,20 +36,14 @@ class SessionListener
      */
     public function filter(EventInterface $event, Response $response)
     {
-        if (isset($this->request) && $this->master && null !== $this->request->getSession()) {
-            $this->request->getSession()->save();
+        if ($request = $event->get('request')) {
+            if (HttpKernelInterface::MASTER_REQUEST === $event->get('request_type')) {
+                if ($session = $request->getSession()) {
+                    $session->save();
+                }
+            }
         }
 
         return $response;
-    }
-
-    /**
-     * Returns true is current request is master request
-     *
-     * @return Boolean
-     */
-    public function isMaster()
-    {
-        return $this->master;
     }
 }

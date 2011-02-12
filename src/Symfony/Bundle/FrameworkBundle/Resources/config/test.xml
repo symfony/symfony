@@ -23,9 +23,8 @@
         <service id="test.client.history" class="%test.client.history.class%" scope="prototype" />
 
         <service id="test.client.cookiejar" class="%test.client.cookiejar.class%" scope="prototype" />
-        
+
         <service id="test.session.listener" class="%test.session.listener.class%">
-            <tag name="kernel.listener" event="core.request" method="handle" />
             <tag name="kernel.listener" event="core.response" method="filter" />
         </service>
     </services>

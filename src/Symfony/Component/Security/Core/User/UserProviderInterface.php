@@ -30,28 +30,28 @@ interface UserProviderInterface
      *
      * @return AccountInterface
      */
-     function loadUserByUsername($username);
+    function loadUserByUsername($username);
 
-     /**
-      * Loads the user for the account interface.
-      *
-      * It is up to the implementation if it decides to reload the user data
-      * from the database, or if it simply merges the passed User into the
-      * identity map of an entity manager.
-      *
-      * @throws UnsupportedAccountException if the account is not supported
-      * @param AccountInterface $account
-      *
-      * @return AccountInterface
-      */
-     function loadUserByAccount(AccountInterface $account);
+    /**
+     * Loads the user for the account interface.
+     *
+     * It is up to the implementation if it decides to reload the user data
+     * from the database, or if it simply merges the passed User into the
+     * identity map of an entity manager.
+     *
+     * @throws UnsupportedAccountException if the account is not supported
+     * @param AccountInterface $account
+     *
+     * @return AccountInterface
+     */
+    function loadUserByAccount(AccountInterface $account);
 
-     /**
-      * Whether this provider supports the given user class
-      *
-      * @param string $class
-      *
-      * @return Boolean
-      */
-     function supportsClass($class);
+    /**
+     * Whether this provider supports the given user class
+     *
+     * @param string $class
+     *
+     * @return Boolean
+     */
+    function supportsClass($class);
 }

@@ -24,6 +24,7 @@ class ArrayNode extends BaseNode implements PrototypeNodeInterface
     protected $addIfNotSet;
     protected $minNumberOfElements;
     protected $performDeepMerging;
+    protected $defaultValue;
 
     public function __construct($name, NodeInterface $parent = null)
     {
@@ -120,6 +121,14 @@ class ArrayNode extends BaseNode implements PrototypeNodeInterface
         $this->name = $name;
     }
 
+    public function setDefaultValue($value)
+    {
+        if (!is_array($value)) {
+            throw new \InvalidArgumentException($this->getPath().': the default value of an array node has to be an array.');
+        }
+        $this->defaultValue = $value;
+    }
+
     public function hasDefaultValue()
     {
         if (null !== $this->prototype) {
@@ -136,7 +145,11 @@ class ArrayNode extends BaseNode implements PrototypeNodeInterface
         }
 
         if (null !== $this->prototype) {
-            return array();
+            return $this->defaultValue ?: array();
+        }
+
+        if (null !== $this->defaultValue) {
+            throw new \RuntimeException($this->getPath().': An ARRAY node can have a specified default value only when using a prototype');
         }
 
         $defaults = array();

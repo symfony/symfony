@@ -126,6 +126,11 @@ class ArrayNode extends BaseNode implements PrototypeNodeInterface
         if (!is_array($value)) {
             throw new \InvalidArgumentException($this->getPath().': the default value of an array node has to be an array.');
         }
+
+        if (null === $this->prototype) {
+            throw new \RuntimeException($this->getPath().': An ARRAY node can have a specified default value only when using a prototype');
+        }
+
         $this->defaultValue = $value;
     }
 
@@ -146,10 +151,6 @@ class ArrayNode extends BaseNode implements PrototypeNodeInterface
 
         if (null !== $this->prototype) {
             return $this->defaultValue ?: array();
-        }
-
-        if (null !== $this->defaultValue) {
-            throw new \RuntimeException($this->getPath().': An ARRAY node can have a specified default value only when using a prototype');
         }
 
         $defaults = array();

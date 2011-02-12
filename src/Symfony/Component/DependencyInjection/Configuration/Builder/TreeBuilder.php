@@ -147,10 +147,6 @@ class TreeBuilder
         $configNode->addEquivalentValue(false, $node->falseEquivalent);
         $configNode->setPerformDeepMerging($node->performDeepMerging);
 
-        if (null !== $node->defaultValue) {
-            $configNode->setDefaultValue($node->defaultValue);
-        }
-
         if (null !== $node->key) {
             $configNode->setKeyAttribute($node->key);
         }
@@ -181,6 +177,10 @@ class TreeBuilder
         if (null !== $node->prototype) {
             $node->prototype->parent = $configNode;
             $configNode->setPrototype($this->createConfigNode($node->prototype));
+        }
+
+        if (null !== $node->defaultValue) {
+            $configNode->setDefaultValue($node->defaultValue);
         }
 
         return $configNode;

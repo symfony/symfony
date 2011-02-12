@@ -1,5 +1,7 @@
 #!/bin/sh
 
+cd $(dirname $0)
+
 # initialization
 if [ -d "vendor" ]; then
   rm -rf vendor/*

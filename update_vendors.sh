@@ -1,6 +1,8 @@
 #!/bin/sh
 
-CURRENT=`pwd`/vendor
+cd $(dirname $0)
+
+CURRENT=${PWD}/vendor
 
 # Doctrine ORM
 cd $CURRENT/doctrine && git pull

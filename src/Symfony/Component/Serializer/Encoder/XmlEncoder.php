@@ -162,13 +162,13 @@ class XmlEncoder extends AbstractEncoder
     {
         if (is_array($val)) {
             return $this->buildXml($node, $val);
-        } elseif (is_object($val)) {
-            return $this->buildXml($node, $this->serializer->normalizeObject($val, $this->format));
         } elseif ($val instanceof \SimpleXMLElement) {
             $child = $this->dom->importNode(dom_import_simplexml($val), true);
             $node->appendChild($child);
         } elseif ($val instanceof \Traversable) {
             $this->buildXml($node, $val);
+        } elseif (is_object($val)) {
+            return $this->buildXml($node, $this->serializer->normalizeObject($val, $this->format));
         } elseif (is_numeric($val)) {
             return $this->appendText($node, (string) $val);
         } elseif (is_string($val)) {

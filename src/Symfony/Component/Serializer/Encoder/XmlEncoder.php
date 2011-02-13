@@ -267,6 +267,8 @@ class XmlEncoder extends AbstractEncoder
      */
     protected function isElementNameValid($name)
     {
-        return $name && strpos($name, ' ') === false && preg_match('|^\w+$|', $name);
+        return $name &&
+            false === strpos($name, ' ') &&
+            preg_match('#^[\pL_][\pL0-9._-]+$#ui', $name);
     }
 }

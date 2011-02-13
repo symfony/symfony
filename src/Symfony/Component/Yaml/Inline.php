@@ -20,7 +20,7 @@ class Inline
     const REGEX_QUOTED_STRING = '(?:"([^"\\\\]*(?:\\\\.[^"\\\\]*)*)"|\'([^\']*(?:\'\'[^\']*)*)\')';
 
     /**
-     * Convert a YAML string to a PHP array.
+     * Converts a YAML string to a PHP array.
      *
      * @param string $value A YAML string
      *
@@ -380,7 +380,7 @@ class Inline
     }
 
     /**
-     * Get a regex that match a unix timestamp
+     * Gets a regex that matches an unix timestamp
      *
      * @return string The regular expression
      */

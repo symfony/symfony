@@ -293,6 +293,8 @@ class Parser
 
     /**
      * Moves the parser to the next line.
+     *
+     * @return Boolean
      */
     protected function moveToNextLine()
     {
@@ -320,7 +322,7 @@ class Parser
      *
      * @return mixed  A PHP value
      *
-     * @throws ParserException When reference doesn't not exist
+     * @throws ParserException When reference does not exist
      */
     protected function parseValue($value)
     {

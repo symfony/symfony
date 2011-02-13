@@ -87,16 +87,17 @@
 
         <!-- Security Voters -->
         <service id="security.access.simple_role_voter" class="%security.access.simple_role_voter.class%" public="false">
-            <tag name="security.voter" />
+            <tag name="security.voter" priority="245" />
         </service>
 
         <service id="security.access.authenticated_voter" class="%security.access.authenticated_voter.class%" public="false">
             <argument type="service" id="security.authentication.trust_resolver" />
-            <tag name="security.voter" />
+            <tag name="security.voter" priority="250" />
         </service>
 
         <service id="security.access.role_hierarchy_voter" class="%security.access.role_hierarchy_voter.class%" public="false">
             <argument type="service" id="security.role_hierarchy" />
+            <tag name="security.voter" priority="245" />
         </service>
 
 

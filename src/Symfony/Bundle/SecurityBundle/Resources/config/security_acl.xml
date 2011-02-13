@@ -73,7 +73,7 @@
             <argument type="service" id="security.acl.permission.map" />
             <argument type="service" id="logger" on-invalid="null" />
             <argument>%security.acl.voter.allow_if_object_identity_unavailable%</argument>
-            <tag name="security.voter" />
+            <tag name="security.voter" priority="255" />
         </service>
     </services>
 </container>

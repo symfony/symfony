@@ -16,7 +16,7 @@ interface ContainerInterface
     function setParameter($name, $value);
     function enterScope($name);
     function leaveScope($name);
-    function addScope($name, $parentScope = self::SCOPE_CONTAINER);
+    function addScope(ScopeInterface $scope);
     function hasScope($name);
     function isScopeActive($name);
 }
@@ -165,8 +165,10 @@ class Container implements ContainerInterface
             $this->services = call_user_func_array('array_merge', $services);
         }
     }
-    public function addScope($name, $parentScope = self::SCOPE_CONTAINER)
+    public function addScope(ScopeInterface $scope)
     {
+        $name = $scope->getName();
+        $parentScope = $scope->getParentName();
         if (self::SCOPE_CONTAINER === $name || self::SCOPE_PROTOTYPE === $name) {
             throw new \InvalidArgumentException(sprintf('The scope "%s" is reserved.', $name));
         }

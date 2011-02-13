@@ -1964,10 +1964,10 @@ namespace Symfony\Component\HttpFoundation
 class ResponseHeaderBag extends HeaderBag
 {
     protected $computedCacheControl = array();
-    public function __construct(array $parameters = array())
+    public function __construct(array $headers = array())
     {
                         parent::__construct();
-        $this->replace($parameters);
+        $this->replace($headers);
     }
     public function replace(array $headers = array())
     {

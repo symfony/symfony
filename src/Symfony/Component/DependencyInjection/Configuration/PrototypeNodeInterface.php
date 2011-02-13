@@ -9,5 +9,11 @@ namespace Symfony\Component\DependencyInjection\Configuration;
  */
 interface PrototypeNodeInterface extends NodeInterface
 {
+    /**
+     * Sets the name of the node.
+     *
+     * @param string $name The name of the node
+     * @return void
+     */
     function setName($name);
 }

@@ -22,6 +22,11 @@ class ResolveParameterPlaceHoldersPass implements CompilerPassInterface
 {
     protected $parameterBag;
 
+    /**
+     * Processes the ContainerBuilder to resolve parameter placeholders.
+     *
+     * @param ContainerBuilder $container 
+     */
     public function process(ContainerBuilder $container)
     {
         $this->parameterBag = $container->getParameterBag();
@@ -57,6 +62,12 @@ class ResolveParameterPlaceHoldersPass implements CompilerPassInterface
         }
     }
 
+    /**
+     * Expands parameters into their full values
+     *
+     * @param mixed $value The value to resolve
+     * @return mixed The resolved value
+     */
     protected function resolveValue($value)
     {
         if (is_array($value)) {
@@ -73,6 +84,13 @@ class ResolveParameterPlaceHoldersPass implements CompilerPassInterface
         }
     }
 
+    /**
+     * Resolves parameters inside a string
+     *
+     * @param string $value The string to resolve
+     * @return string The resolved string
+     * @throws \RuntimeException when a given parameter has a type problem.
+     */
     public function resolveString($value)
     {
         if (preg_match('/^%[^%]+%$/', $value)) {

@@ -38,7 +38,8 @@ class ContainerBuilder extends Container implements TaggedContainerInterface
     protected $compiler;
 
     /**
-     * Constructor
+     * Constructor.
+     *
      * @param ParameterBagInterface $parameterBag
      */
     public function __construct(ParameterBagInterface $parameterBag = null)
@@ -72,6 +73,12 @@ class ContainerBuilder extends Container implements TaggedContainerInterface
         return static::$extensions[$name];
     }
 
+    /**
+     * Checks if we have an extension.
+     *
+     * @param string $name The name of the extension
+     * @return boolean If the extension exists
+     */
     static public function hasExtension($name)
     {
         return isset(static::$extensions[$name]);
@@ -185,11 +192,21 @@ class ContainerBuilder extends Container implements TaggedContainerInterface
         return $this->compiler;
     }
 
+    /**
+     * Returns all Scopes.
+     *
+     * @return array An array of scopes
+     */
     public function getScopes()
     {
         return $this->scopes;
     }
 
+    /**
+     * Returns all Scope chilren.
+     *
+     * @return array An array of scope children.
+     */
     public function getScopeChildren()
     {
         return $this->scopeChildren;
@@ -200,6 +217,7 @@ class ContainerBuilder extends Container implements TaggedContainerInterface
      *
      * @param string $id      The service identifier
      * @param object $service The service instance
+     * @param string $scope   The scope
      *
      * @throws BadMethodCallException
      */
@@ -305,6 +323,9 @@ class ContainerBuilder extends Container implements TaggedContainerInterface
      * In the above example, even if the loaded resource defines a foo
      * parameter, the value will still be 'bar' as defined in the ContainerBuilder
      * constructor.
+     *
+     * @param ContainerBuilder $container The ContainerBuilder instance to merge.
+     * @throws \LogicException when this ContainerBuilder is frozen
      */
     public function merge(ContainerBuilder $container)
     {
@@ -802,6 +823,11 @@ class ContainerBuilder extends Container implements TaggedContainerInterface
         return $tags;
     }
 
+    /**
+     * Initializes the compiler
+     *
+     * @return void
+     */
     protected function initializeCompiler()
     {
         $this->compiler = new Compiler();
@@ -810,6 +836,12 @@ class ContainerBuilder extends Container implements TaggedContainerInterface
         }
     }
 
+    /**
+     * Returns the Service Conditionals.
+     *
+     * @param mixed $value An array of conditionals to return.
+     * @return array An array of Service conditionals
+     */
     static public function getServiceConditionals($value)
     {
         $services = array();

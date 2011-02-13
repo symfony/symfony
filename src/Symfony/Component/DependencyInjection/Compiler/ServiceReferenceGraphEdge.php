@@ -24,6 +24,13 @@ class ServiceReferenceGraphEdge
     protected $destNode;
     protected $value;
 
+    /**
+     * Constructor.
+     *
+     * @param ServiceReferenceGraphNode $sourceNode 
+     * @param ServiceReferenceGraphNode $destNode 
+     * @param string $value 
+     */
     public function __construct(ServiceReferenceGraphNode $sourceNode, ServiceReferenceGraphNode $destNode, $value = null)
     {
         $this->sourceNode = $sourceNode;
@@ -31,16 +38,31 @@ class ServiceReferenceGraphEdge
         $this->value = $value;
     }
 
+    /**
+     * Returns the value of the edge
+     *
+     * @return ServiceReferenceGraphNode
+     */
     public function getValue()
     {
         return $this->value;
     }
 
+    /**
+     * Returns the source node
+     *
+     * @return ServiceReferenceGraphNode
+     */
     public function getSourceNode()
     {
         return $this->sourceNode;
     }
 
+    /**
+     * Returns the destination node
+     *
+     * @return ServiceReferenceGraphNode
+     */
     public function getDestNode()
     {
         return $this->destNode;

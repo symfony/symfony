@@ -18,11 +18,23 @@ namespace Symfony\Component\DependencyInjection;
  */
 class SimpleXMLElement extends \SimpleXMLElement
 {
+    /**
+     * Converts an attribute as a php type.
+     *
+     * @param string $name 
+     * @return mixed
+     */
     public function getAttributeAsPhp($name)
     {
         return self::phpize($this[$name]);
     }
 
+    /**
+     * Returns arguments as valid php types.
+     *
+     * @param string $name 
+     * @return mixed
+     */
     public function getArgumentsAsPhp($name)
     {
         $arguments = array();
@@ -74,6 +86,12 @@ class SimpleXMLElement extends \SimpleXMLElement
         return $arguments;
     }
 
+    /**
+     * Converts an xml value to a php type.
+     *
+     * @param mixed $value 
+     * @return mixed
+     */
     static public function phpize($value)
     {
         $value = (string) $value;

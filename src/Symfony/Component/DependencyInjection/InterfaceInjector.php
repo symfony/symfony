@@ -59,6 +59,7 @@ class InterfaceInjector
      * Adds method calls if Definition is of required interface
      *
      * @param Definition $definition
+     * @param string $class
      * @return void
      */
     public function processDefinition(Definition $definition, $class = null)

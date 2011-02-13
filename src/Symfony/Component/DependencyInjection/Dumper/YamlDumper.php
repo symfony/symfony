@@ -35,6 +35,11 @@ class YamlDumper extends Dumper
         return $this->addParameters().$this->addInterfaceInjectors()."\n".$this->addServices();
     }
 
+    /**
+     * Adds interface injectors
+     *
+     * @return string
+     */
     protected function addInterfaceInjectors()
     {
         if (!$this->container->getInterfaceInjectors()) {
@@ -52,6 +57,13 @@ class YamlDumper extends Dumper
         return $code;
     }
 
+    /**
+     * Adds a service
+     *
+     * @param string $id 
+     * @param Definition $definition 
+     * @return string
+     */
     protected function addService($id, $definition)
     {
         $code = "  $id:\n";
@@ -114,6 +126,13 @@ class YamlDumper extends Dumper
         return $code;
     }
 
+    /**
+     * Adds a service alias
+     *
+     * @param string $alias 
+     * @param string $id 
+     * @return void
+     */
     protected function addServiceAlias($alias, $id)
     {
         if ($id->isPublic()) {
@@ -123,6 +142,11 @@ class YamlDumper extends Dumper
         }
     }
 
+    /**
+     * Adds services
+     *
+     * @return string
+     */
     protected function addServices()
     {
         if (!$this->container->getDefinitions()) {
@@ -141,6 +165,11 @@ class YamlDumper extends Dumper
         return $code;
     }
 
+    /**
+     * Adds parameters
+     *
+     * @return string
+     */
     protected function addParameters()
     {
         if (!$this->container->getParameterBag()->all()) {
@@ -157,6 +186,9 @@ class YamlDumper extends Dumper
     }
 
     /**
+     * Dumps the value to YAML format
+     *
+     * @param mixed $value
      * @throws \RuntimeException When trying to dump object or resource
      */
     protected function dumpValue($value)
@@ -179,6 +211,13 @@ class YamlDumper extends Dumper
         }
     }
 
+    /**
+     * Gets the service call.
+     *
+     * @param string $id 
+     * @param Reference $reference 
+     * @return string
+     */
     protected function getServiceCall($id, Reference $reference = null)
     {
         if (null !== $reference && ContainerInterface::EXCEPTION_ON_INVALID_REFERENCE !== $reference->getInvalidBehavior()) {
@@ -188,11 +227,23 @@ class YamlDumper extends Dumper
         }
     }
 
+    /**
+     * Gets parameter call.
+     *
+     * @param string $id 
+     * @return string
+     */
     protected function getParameterCall($id)
     {
         return sprintf('%%%s%%', $id);
     }
 
+    /**
+     * Prepares parameters
+     *
+     * @param string $parameters 
+     * @return array 
+     */
     protected function prepareParameters($parameters)
     {
         $filtered = array();
@@ -209,6 +260,12 @@ class YamlDumper extends Dumper
         return $this->escape($filtered);
     }
 
+    /**
+     * Escapes arguments
+     *
+     * @param array $arguments 
+     * @return array
+     */
     protected function escape($arguments)
     {
         $args = array();

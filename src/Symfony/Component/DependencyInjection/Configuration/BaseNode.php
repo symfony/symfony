@@ -20,6 +20,13 @@ abstract class BaseNode implements NodeInterface
     protected $required;
     protected $equivalentValues;
 
+    /**
+     * Constructor.
+     *
+     * @param string $name The name of the node
+     * @param NodeInterface $parent The parent of this node
+     * @throws \InvalidArgumentException if the name contains a period.
+     */
     public function __construct($name, NodeInterface $parent = null)
     {
         if (false !== strpos($name, '.')) {
@@ -35,41 +42,87 @@ abstract class BaseNode implements NodeInterface
         $this->equivalentValues = array();
     }
 
+    /**
+     * Adds an equivilent value.
+     *
+     * @param mixed $originalValue 
+     * @param mixed $equivalentValue 
+     * @return void
+     */
     public function addEquivalentValue($originalValue, $equivalentValue)
     {
         $this->equivalentValues[] = array($originalValue, $equivalentValue);
     }
 
+    /**
+     * Set this node as required.
+     *
+     * @param boolean $boolean Required node
+     * @return void
+     */
     public function setRequired($boolean)
     {
         $this->required = (Boolean) $boolean;
     }
 
+    /**
+     * Sets if this node can be overridden.
+     *
+     * @param boolean $allow 
+     * @return void
+     */
     public function setAllowOverwrite($allow)
     {
         $this->allowOverwrite = (Boolean) $allow;
     }
 
+    /**
+     * Sets the closures used for normalization.
+     *
+     * @param array $closures An array of Closures used for normalization
+     * @return void
+     */
     public function setNormalizationClosures(array $closures)
     {
         $this->normalizationClosures = $closures;
     }
 
+    /**
+     * Sets the closures used for final validation.
+     *
+     * @param array $closures An array of Closures used for final validation
+     * @return void
+     */
     public function setFinalValidationClosures(array $closures)
     {
         $this->finalValidationClosures = $closures;
     }
 
+    /**
+     * Checks if this node is required.
+     *
+     * @return boolean 
+     */
     public function isRequired()
     {
         return $this->required;
     }
 
+    /**
+     * Returns the name of this node
+     *
+     * @return string The Node's name.
+     */
     public function getName()
     {
         return $this->name;
     }
 
+    /**
+     * Retrieves the path of this node.
+     *
+     * @return string The Node's path
+     */
     public function getPath()
     {
         $path = $this->name;
@@ -81,6 +134,14 @@ abstract class BaseNode implements NodeInterface
         return $path;
     }
 
+    /**
+     * Merges two values together.
+     *
+     * @param mixed $leftSide 
+     * @param mixed $rightSide 
+     * @return mixed The merged value
+     * @throws ForbiddenOverwriteException
+     */
     public final function merge($leftSide, $rightSide)
     {
         if (!$this->allowOverwrite) {
@@ -98,6 +159,12 @@ abstract class BaseNode implements NodeInterface
         return $this->mergeValues($leftSide, $rightSide);
     }
 
+    /**
+     * Normalizes a value, applying all normalization closures.
+     *
+     * @param mixed $value Value to normalize.
+     * @return mied The normalized value.
+     */
     public final function normalize($value)
     {
         // run custom normalization closures
@@ -119,6 +186,12 @@ abstract class BaseNode implements NodeInterface
         return $this->normalizeValue($value);
     }
 
+    /**
+     * Finalizes a value, applying all finalization closures.
+     *
+     * @param mixed $value The value to finalize 
+     * @return mixed The finalized value
+     */
     public final function finalize($value)
     {
         $this->validateType($value);
@@ -144,8 +217,37 @@ abstract class BaseNode implements NodeInterface
         return $value;
     }
 
+    /**
+     * Validates the type of a Node.
+     *
+     * @param mixed $value The value to validate
+     * @return void
+     * @throws \InvalidTypeException when the value is invalid
+     */
     abstract protected function validateType($value);
+    
+    /**
+     * Normalizes the value.
+     *
+     * @param mixed $value The value to normalize.
+     * @return mixed The normalized value
+     */
     abstract protected function normalizeValue($value);
+    
+    /**
+     * Merges two values together
+     *
+     * @param mixed $leftSide 
+     * @param mixed $rightSide 
+     * @return mixed The merged value
+     */
     abstract protected function mergeValues($leftSide, $rightSide);
+    
+    /**
+     * Finalizes a value
+     *
+     * @param mixed $value The value to finalize
+     * @return mixed The finalized value
+     */
     abstract protected function finalizeValue($value);
 }

@@ -48,11 +48,21 @@ class Reference
         return (string) $this->id;
     }
 
+    /**
+     * Returns the behavior to be used when the service does not exist.
+     *
+     * @return int
+     */
     public function getInvalidBehavior()
     {
         return $this->invalidBehavior;
     }
 
+    /**
+     * Returns true when this Reference is strict
+     *
+     * @return boolean
+     */
     public function isStrict()
     {
         return $this->strict;

@@ -26,16 +26,31 @@ class ResolveInvalidReferencesPass implements CompilerPassInterface
     protected $container;
     protected $exceptions;
 
+    /** 
+     * Constructor.
+     *
+     * @param array $exceptions An array of exceptions
+     */
     public function __construct(array $exceptions = array('kernel', 'service_container', 'templating.loader.wrapped', 'pdo_connection'))
     {
         $this->exceptions = $exceptions;
     }
 
+    /**
+     * Add an exception.
+     *
+     * @param string $id Exception identifier
+     */
     public function addException($id)
     {
         $this->exceptions[] = $id;
     }
 
+    /**
+     * Process the ContainerBuilder to resolve invalid references.
+     *
+     * @param ContainerBuilder $container 
+     */
     public function process(ContainerBuilder $container)
     {
         $this->container = $container;
@@ -60,6 +75,12 @@ class ResolveInvalidReferencesPass implements CompilerPassInterface
         }
     }
 
+    /**
+     * Processes arguments to determin invalid references.
+     *
+     * @param array $arguments An array of Reference objects
+     * @param boolean $inMethodCall 
+     */
     protected function processArguments(array $arguments, $inMethodCall = false)
     {
         foreach ($arguments as $k => $argument) {

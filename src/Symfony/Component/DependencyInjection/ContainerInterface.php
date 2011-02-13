@@ -122,6 +122,7 @@ interface ContainerInterface
      *
      * It does however not check if the scope actually exists.
      *
+     * @param string $name
      * @return Boolean
      */
     function isScopeActive($name);

@@ -144,6 +144,14 @@ class ParameterBag implements ParameterBagInterface
         return str_replace('%%', '%', preg_replace_callback(array('/(?<!%)%([^%]+)%/'), array($this, 'resolveValueCallback'), $value));
     }
 
+    /**
+     * Value callback
+     *
+     * @see resolveValue
+     *
+     * @param array $match 
+     * @return string
+     */
     protected function resolveValueCallback($match)
     {
         return $this->get(strtolower($match[1]));

@@ -16,6 +16,11 @@ class ResolveDefinitionTemplatesPass implements CompilerPassInterface
 {
     protected $container;
 
+    /**
+     * Process the ContainerBuilder to replace DefinitionDecorator instances with their real Definition instances.
+     *
+     * @param ContainerBuilder $container 
+     */
     public function process(ContainerBuilder $container)
     {
         $this->container = $container;
@@ -31,6 +36,13 @@ class ResolveDefinitionTemplatesPass implements CompilerPassInterface
         }
     }
 
+    /**
+     * Resolves the definition
+     *
+     * @param string $id The definition identifier
+     * @param DefinitionDecorator $definition 
+     * @return Definition
+     */
     protected function resolveDefinition($id, DefinitionDecorator $definition)
     {
         if (!$this->container->hasDefinition($parent = $definition->getParent())) {

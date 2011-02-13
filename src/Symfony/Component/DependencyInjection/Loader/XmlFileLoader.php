@@ -75,6 +75,13 @@ class XmlFileLoader extends FileLoader
         return is_string($resource) && 'xml' === pathinfo($resource, PATHINFO_EXTENSION);
     }
 
+    /**
+     * Parses parameters
+     *
+     * @param SimpleXMLElement $xml 
+     * @param string $file 
+     * @return void
+     */
     protected function parseParameters(SimpleXMLElement $xml, $file)
     {
         if (!$xml->parameters) {
@@ -84,6 +91,13 @@ class XmlFileLoader extends FileLoader
         $this->container->getParameterBag()->add($xml->parameters->getArgumentsAsPhp('parameter'));
     }
 
+    /**
+     * Parses imports
+     *
+     * @param SimpleXMLElement $xml 
+     * @param string $file 
+     * @return void
+     */
     protected function parseImports(SimpleXMLElement $xml, $file)
     {
         if (!$xml->imports) {
@@ -96,6 +110,13 @@ class XmlFileLoader extends FileLoader
         }
     }
 
+    /**
+     * Parses interface injectors
+     *
+     * @param SimpleXMLElement $xml 
+     * @param string $file 
+     * @return void
+     */
     protected function parseInterfaceInjectors(SimpleXMLElement $xml, $file)
     {
         if (!$xml->interfaces) {
@@ -107,6 +128,13 @@ class XmlFileLoader extends FileLoader
         }
     }
 
+    /**
+     * Parses an individual interface injector
+     *
+     * @param string $class
+     * @param SimpleXMLElement $interface
+     * @param string $file
+     */
     protected function parseInterfaceInjector($class, $interface, $file)
     {
         $injector = new InterfaceInjector($class);
@@ -116,6 +144,13 @@ class XmlFileLoader extends FileLoader
         $this->container->addInterfaceInjector($injector);
     }
 
+    /**
+     * Parses multiple definitions
+     *
+     * @param SimpleXMLElement $xml 
+     * @param string $file 
+     * @return void
+     */
     protected function parseDefinitions(SimpleXMLElement $xml, $file)
     {
         if (!$xml->services) {
@@ -127,6 +162,14 @@ class XmlFileLoader extends FileLoader
         }
     }
 
+    /**
+     * Parses an individual Definition
+     *
+     * @param string $id 
+     * @param SimpleXMLElement $service 
+     * @param string $file 
+     * @return void
+     */
     protected function parseDefinition($id, $service, $file)
     {
         if ((string) $service['alias']) {
@@ -193,6 +236,9 @@ class XmlFileLoader extends FileLoader
     }
 
     /**
+     * Parses a XML file.
+     *
+     * @param string $file Path to a file
      * @throws \InvalidArgumentException When loading of XML file returns error
      */
     protected function parseFile($file)
@@ -210,6 +256,13 @@ class XmlFileLoader extends FileLoader
         return simplexml_import_dom($dom, 'Symfony\\Component\\DependencyInjection\\SimpleXMLElement');
     }
 
+    /**
+     * Processes anonymous services
+     *
+     * @param SimpleXMLElement $xml 
+     * @param string $file 
+     * @return array An array of anonymous services
+     */
     protected function processAnonymousServices(SimpleXMLElement $xml, $file)
     {
         $definitions = array();
@@ -256,6 +309,12 @@ class XmlFileLoader extends FileLoader
         return $xml;
     }
 
+    /**
+     * Validates an XML document.
+     *
+     * @param DOMDocument $dom 
+     * @param string $file 
+     */
     protected function validate(\DOMDocument $dom, $file)
     {
         $this->validateSchema($dom, $file);
@@ -263,6 +322,12 @@ class XmlFileLoader extends FileLoader
     }
 
     /**
+     * Validates a documents XML schema.
+     *
+     * @param \DOMDocument $dom
+     * @param string $file
+     * @return void
+     *
      * @throws \RuntimeException         When extension references a non-existent XSD file
      * @throws \InvalidArgumentException When xml doesn't validate its xsd schema
      */
@@ -332,6 +397,12 @@ EOF
     }
 
     /**
+     * Validates an extension.
+     *
+     * @param \DOMDocument $dom
+     * @param string $file
+     * @return void
+     *
      * @throws  \InvalidArgumentException When non valid tag are found or no extension are found
      */
     protected function validateExtensions(\DOMDocument $dom, $file)
@@ -348,6 +419,11 @@ EOF
         }
     }
 
+    /**
+     * Returns an array of XML errors.
+     *
+     * @return array
+     */
     protected function getXmlErrors()
     {
         $errors = array();
@@ -367,6 +443,12 @@ EOF
         return $errors;
     }
 
+    /**
+     * Loads from an extension.
+     *
+     * @param SimpleXMLElement $xml 
+     * @return void
+     */
     protected function loadFromExtensions(SimpleXMLElement $xml)
     {
         foreach (dom_import_simplexml($xml)->childNodes as $node) {

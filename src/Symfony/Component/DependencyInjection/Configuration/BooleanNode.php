@@ -6,6 +6,9 @@ use Symfony\Component\DependencyInjection\Configuration\Exception\InvalidTypeExc
 
 class BooleanNode extends ScalarNode
 {
+    /**
+     * {@inheritDoc}
+     */
     protected function validateType($value)
     {
         parent::validateType($value);

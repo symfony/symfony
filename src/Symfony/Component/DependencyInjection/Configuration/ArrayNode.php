@@ -26,6 +26,12 @@ class ArrayNode extends BaseNode implements PrototypeNodeInterface
     protected $performDeepMerging;
     protected $defaultValue;
 
+    /**
+     * Constructor.
+     *
+     * @param string $name The Node's name
+     * @param NodeInterface $parent The node parent
+     */
     public function __construct($name, NodeInterface $parent = null)
     {
         parent::__construct($name, $parent);
@@ -111,16 +117,33 @@ class ArrayNode extends BaseNode implements PrototypeNodeInterface
         $this->allowNewKeys = (Boolean) $allow;
     }
 
+    /**
+     * Sets if deep merging should occur.
+     *
+     * @param boolean $boolean
+     */
     public function setPerformDeepMerging($boolean)
     {
         $this->performDeepMerging = (Boolean) $boolean;
     }
 
+    /**
+     * Sets the node Name.
+     *
+     * @param string $name The node's name
+     */
     public function setName($name)
     {
         $this->name = $name;
     }
 
+    /**
+     * Sets the default value of this node.
+     *
+     * @param string $value
+     * @throws \InvalidArgumentException if the default value is not an array
+     * @throws \RuntimeException if the node does not have a prototype
+     */
     public function setDefaultValue($value)
     {
         if (!is_array($value)) {
@@ -134,6 +157,11 @@ class ArrayNode extends BaseNode implements PrototypeNodeInterface
         $this->defaultValue = $value;
     }
 
+    /**
+     * Checks if the node has a default value.
+     *
+     * @return boolean
+     */
     public function hasDefaultValue()
     {
         if (null !== $this->prototype) {
@@ -143,6 +171,12 @@ class ArrayNode extends BaseNode implements PrototypeNodeInterface
         return $this->addIfNotSet;
     }
 
+    /**
+     * Retrieves the default value.
+     *
+     * @return array The default value
+     * @throws \RuntimeException if the node has no default value
+     */
     public function getDefaultValue()
     {
         if (!$this->hasDefaultValue()) {
@@ -165,6 +199,12 @@ class ArrayNode extends BaseNode implements PrototypeNodeInterface
         return $defaults;
     }
 
+    /**
+     * Sets the node prototype.
+     *
+     * @param PrototypeNodeInterface $node 
+     * @throws \RuntimeException if the node doesnt have concrete children
+     */
     public function setPrototype(PrototypeNodeInterface $node)
     {
         if (count($this->children) > 0) {
@@ -174,6 +214,14 @@ class ArrayNode extends BaseNode implements PrototypeNodeInterface
         $this->prototype = $node;
     }
 
+    /**
+     * Adds a child node.
+     *
+     * @param NodeInterface $node The child node to add
+     * @throws \InvalidArgumentException when the child node has no name
+     * @throws \InvalidArgumentException when the child node's name is not unique
+     * @throws \RuntimeException if this array node is not a prototype
+     */
     public function addChild(NodeInterface $node)
     {
         $name = $node->getName();
@@ -190,6 +238,14 @@ class ArrayNode extends BaseNode implements PrototypeNodeInterface
         $this->children[$name] = $node;
     }
 
+    /**
+     * Finalises the value of this node.
+     *
+     * @param mixed $value 
+     * @return mixed The finalised value
+     * @throws UnsetKeyException
+     * @throws InvalidConfigurationException if the node doesnt have enough children
+     */
     protected function finalizeValue($value)
     {
         if (false === $value) {
@@ -246,6 +302,12 @@ class ArrayNode extends BaseNode implements PrototypeNodeInterface
         return $value;
     }
 
+    /**
+     * Validates the type of the value.
+     *
+     * @param mixed $value
+     * @throws InvalidTypeException
+     */
     protected function validateType($value)
     {
         if (!is_array($value) && (!$this->allowFalse || false !== $value)) {
@@ -257,6 +319,12 @@ class ArrayNode extends BaseNode implements PrototypeNodeInterface
         }
     }
 
+    /**
+     * Normalises the value.
+     *
+     * @param mixed $value The value to normalise
+     * @return mixed The normalised value
+     */
     protected function normalizeValue($value)
     {
         if (false === $value) {
@@ -319,6 +387,15 @@ class ArrayNode extends BaseNode implements PrototypeNodeInterface
         return $normalized;
     }
 
+    /**
+     * Merges values together.
+     *
+     * @param mixed $leftSide The left side to merge.
+     * @param mixed $rightSide The right side to merge.
+     * @return mixed The merged values
+     * @throws InvalidConfigurationException
+     * @throws \RuntimeException
+     */
     protected function mergeValues($leftSide, $rightSide)
     {
         if (false === $rightSide) {

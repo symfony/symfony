@@ -23,32 +23,53 @@ class ScalarNode extends BaseNode implements PrototypeNodeInterface
     protected $defaultValue;
     protected $allowEmptyValue = true;
 
+    /**
+     * {@inheritDoc}
+     */
     public function setDefaultValue($value)
     {
         $this->defaultValueSet = true;
         $this->defaultValue = $value;
     }
 
+    /**
+     * {@inheritDoc}
+     */
     public function hasDefaultValue()
     {
         return $this->defaultValueSet;
     }
 
+    /**
+     * {@inheritDoc}
+     */
     public function getDefaultValue()
     {
         return $this->defaultValue;
     }
 
+    /**
+     * Sets if this node is allowed to have an empty value.
+     *
+     * @param boolean $boolean True if this entity will accept empty values.
+     * @return void
+     */
     public function setAllowEmptyValue($boolean)
     {
         $this->allowEmptyValue = (Boolean) $boolean;
     }
 
+    /**
+     * {@inheritDoc}
+     */
     public function setName($name)
     {
         $this->name = $name;
     }
 
+    /**
+     * {@inheritDoc}
+     */
     protected function validateType($value)
     {
         if (!is_scalar($value) && null !== $value) {
@@ -60,6 +81,9 @@ class ScalarNode extends BaseNode implements PrototypeNodeInterface
         }
     }
 
+    /**
+     * {@inheritDoc}
+     */
     protected function finalizeValue($value)
     {
         if (!$this->allowEmptyValue && empty($value)) {
@@ -73,11 +97,17 @@ class ScalarNode extends BaseNode implements PrototypeNodeInterface
         return $value;
     }
 
+    /**
+     * {@inheritDoc}
+     */
     protected function normalizeValue($value)
     {
         return $value;
     }
 
+    /**
+     * {@inheritDoc}
+     */
     protected function mergeValues($leftSide, $rightSide)
     {
         return $rightSide;

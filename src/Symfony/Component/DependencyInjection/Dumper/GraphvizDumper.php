@@ -81,6 +81,11 @@ class GraphvizDumper extends Dumper
         return $this->startDot().$this->addNodes().$this->addEdges().$this->endDot();
     }
 
+    /**
+     * Returns all nodes.
+     *
+     * @return string A string representation of all nodes
+     */
     protected function addNodes()
     {
         $code = '';
@@ -93,6 +98,11 @@ class GraphvizDumper extends Dumper
         return $code;
     }
 
+    /**
+     * Returns all edges.
+     *
+     * @return string A string representation of all edges
+     */
     protected function addEdges()
     {
         $code = '';
@@ -105,6 +115,15 @@ class GraphvizDumper extends Dumper
         return $code;
     }
 
+    /**
+     * Finds all edges belonging to a specific service id.
+     *
+     * @param string $id The service id used to find edges
+     * @param array $arguments An array of arguments
+     * @param boolean $required 
+     * @param string $name 
+     * @return array An array of edges
+     */
     protected function findEdges($id, $arguments, $required, $name)
     {
         $edges = array();
@@ -129,6 +148,11 @@ class GraphvizDumper extends Dumper
         return $edges;
     }
 
+    /**
+     * Finds all nodes.
+     *
+     * @return array An array of all nodes
+     */
     protected function findNodes()
     {
         $nodes = array();
@@ -156,6 +180,11 @@ class GraphvizDumper extends Dumper
         return $nodes;
     }
 
+    /**
+     * Returns the start dot.
+     *
+     * @return string The string representation of a start dot
+     */
     protected function startDot()
     {
         return sprintf("digraph sc {\n  %s\n  node [%s];\n  edge [%s];\n\n",
@@ -165,11 +194,22 @@ class GraphvizDumper extends Dumper
         );
     }
 
+    /**
+     * Returns the end dot.
+     *
+     * @return void
+     */
     protected function endDot()
     {
         return "}\n";
     }
 
+    /**
+     * Adds attributes
+     *
+     * @param array $attributes An array of attributes
+     * @return string A comma separated list of attributes
+     */
     protected function addAttributes($attributes)
     {
         $code = array();
@@ -180,6 +220,12 @@ class GraphvizDumper extends Dumper
         return $code ? ', '.implode(', ', $code) : '';
     }
 
+    /**
+     * Adds options
+     *
+     * @param array $options An array of options
+     * @return string A space seperated list of options
+     */
     protected function addOptions($options)
     {
         $code = array();
@@ -190,11 +236,23 @@ class GraphvizDumper extends Dumper
         return implode(' ', $code);
     }
 
+    /**
+     * Dotizes an identifier.
+     *
+     * @param string $id The identifier to dotize
+     * @return string A dotized string
+     */
     protected function dotize($id)
     {
         return strtolower(preg_replace('/[^\w]/i', '_', $id));
     }
 
+    /**
+     * Compiles an array of aliases for a specified service id.
+     *
+     * @param string $id A service id
+     * @return array An array of aliases
+     */
     protected function getAliases($id)
     {
         $aliases = array();

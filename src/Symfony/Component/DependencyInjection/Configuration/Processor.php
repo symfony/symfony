@@ -11,6 +11,13 @@ use Symfony\Component\DependencyInjection\Extension\Extension;
  */
 class Processor
 {
+    /**
+     * Processes a node tree.
+     *
+     * @param NodeInterface $configTree The node tree to process
+     * @param array $configs An array of configuration items
+     * @return boolean
+     */
     public function process(NodeInterface $configTree, array $configs)
     {
         $configs = Extension::normalizeKeys($configs);

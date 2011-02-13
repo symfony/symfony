@@ -26,11 +26,19 @@ class InlineServiceDefinitionsPass implements RepeatablePassInterface
     protected $repeatedPass;
     protected $graph;
 
+    /**
+     * {@inheritDoc}
+     */
     public function setRepeatedPass(RepeatedPass $repeatedPass)
     {
         $this->repeatedPass = $repeatedPass;
     }
 
+    /**
+     * Processes the ContainerBuilder for inline service definitions.
+     *
+     * @param ContainerBuilder $container 
+     */
     public function process(ContainerBuilder $container)
     {
         $this->graph = $container->getCompiler()->getServiceReferenceGraph();
@@ -46,6 +54,12 @@ class InlineServiceDefinitionsPass implements RepeatablePassInterface
         }
     }
 
+    /**
+     * Processes inline arguments.
+     *
+     * @param ContainerBuilder $container The ContainerBuilder
+     * @param array $arguments An array of arguments
+     */
     protected function inlineArguments(ContainerBuilder $container, array $arguments)
     {
         foreach ($arguments as $k => $argument) {
@@ -72,6 +86,14 @@ class InlineServiceDefinitionsPass implements RepeatablePassInterface
         return $arguments;
     }
 
+    /**
+     * Checks if the definition is inlineable.
+     *
+     * @param ContainerBuilder $container 
+     * @param string $id 
+     * @param Definition $definition 
+     * @return boolean If the definition is inlineable
+     */
     protected function isInlinableDefinition(ContainerBuilder $container, $id, Definition $definition)
     {
         if (ContainerInterface::SCOPE_PROTOTYPE === $definition->getScope()) {

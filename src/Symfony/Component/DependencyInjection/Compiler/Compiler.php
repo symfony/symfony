@@ -27,6 +27,9 @@ class Compiler
     protected $log;
     protected $serviceReferenceGraph;
 
+    /**
+     * Constructor.
+     */
     public function __construct()
     {
         $this->passConfig = new PassConfig();
@@ -34,31 +37,62 @@ class Compiler
         $this->log = array();
     }
 
+    /**
+     * Returns the PassConfig.
+     *
+     * @return PassConfig The PassConfig instance
+     */
     public function getPassConfig()
     {
         return $this->passConfig;
     }
 
+    /**
+     * Returns the ServiceReferenceGraph.
+     *
+     * @return ServiceReferenceGraph The ServiceReferenceGraph instance
+     */
     public function getServiceReferenceGraph()
     {
         return $this->serviceReferenceGraph;
     }
 
+    /**
+     * Adds a pass to the PassConfig.
+     *
+     * @param CompilerPassInterface $pass A compiler pass
+     * @param string $type The type of the pass
+     */
     public function addPass(CompilerPassInterface $pass, $type = PassConfig::TYPE_BEFORE_OPTIMIZATION)
     {
         $this->passConfig->addPass($pass, $type);
     }
 
+    /**
+     * Adds a log message.
+     *
+     * @param string $string The log message 
+     */
     public function addLogMessage($string)
     {
         $this->log[] = $string;
     }
 
+    /**
+     * Returns the log.
+     *
+     * @return array Log array
+     */
     public function getLog()
     {
         return $this->log;
     }
 
+    /**
+     * Run the Compiler and process all Passes.
+     *
+     * @param ContainerBuilder $container 
+     */
     public function compile(ContainerBuilder $container)
     {
         foreach ($this->passConfig->getPasses() as $pass) {
@@ -68,12 +102,22 @@ class Compiler
         }
     }
 
+    /**
+     * Starts an individual pass.
+     *
+     * @param CompilerPassInterface $pass The pass to start
+     */
     protected function startPass(CompilerPassInterface $pass)
     {
         $this->currentPass = $pass;
         $this->currentStartTime = microtime(true);
     }
 
+    /**
+     * Ends an individual pass.
+     *
+     * @param CompilerPassInterface $pass The compiler pass
+     */
     protected function endPass(CompilerPassInterface $pass)
     {
         $this->currentPass = null;

@@ -23,16 +23,31 @@ class ServiceReferenceGraph
 {
     protected $nodes;
 
+    /**
+     * Constructor.
+     */
     public function __construct()
     {
         $this->nodes = array();
     }
 
+    /**
+     * Checks if the graph has a specific node.
+     *
+     * @param string $id Id to check
+     */
     public function hasNode($id)
     {
         return isset($this->nodes[$id]);
     }
 
+    /**
+     * Gets a node by identifier.
+     *
+     * @param string $id The id to retrieve
+     * @return ServiceReferenceGraphNode The node matching the supplied identifier
+     * @throws \InvalidArgumentException 
+     */
     public function getNode($id)
     {
         if (!isset($this->nodes[$id])) {
@@ -42,16 +57,33 @@ class ServiceReferenceGraph
         return $this->nodes[$id];
     }
 
+    /**
+     * Returns all nodes.
+     *
+     * @return array An array of all ServiceReferenceGraphNode objects
+     */
     public function getNodes()
     {
         return $this->nodes;
     }
 
+    /**
+     * Clears all nodes.
+     */
     public function clear()
     {
         $this->nodes = array();
     }
 
+    /**
+     * Connects 2 nodes together in the Graph.
+     *
+     * @param string $sourceId 
+     * @param string $sourceValue 
+     * @param string $destId 
+     * @param string $destValue 
+     * @param string $reference 
+     */
     public function connect($sourceId, $sourceValue, $destId, $destValue = null, $reference = null)
     {
         $sourceNode = $this->createNode($sourceId, $sourceValue);
@@ -62,6 +94,13 @@ class ServiceReferenceGraph
         $destNode->addInEdge($edge);
     }
 
+    /**
+     * Creates a graph node.
+     *
+     * @param string $id 
+     * @param string $value 
+     * @return ServiceReferenceGraphNode
+     */
     protected function createNode($id, $value)
     {
         if (isset($this->nodes[$id]) && $this->nodes[$id]->getValue() === $value) {

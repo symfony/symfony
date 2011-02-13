@@ -22,6 +22,11 @@ use Symfony\Component\DependencyInjection\Reference;
  */
 class ReplaceAliasByActualDefinitionPass implements CompilerPassInterface
 {
+    /**
+     * Process the Container to replace aliases with service definitions.
+     *
+     * @param ContainerBuilder $container 
+     */
     public function process(ContainerBuilder $container)
     {
         foreach ($container->getAliases() as $id => $alias) {
@@ -47,6 +52,13 @@ class ReplaceAliasByActualDefinitionPass implements CompilerPassInterface
         }
     }
 
+    /**
+     * Updates references to remove aliasess.
+     *
+     * @param ContainerBuilder $container The container
+     * @param string $currentId The alias identifier being replaced
+     * @param string $newId The id of the service the alias points to
+     */
     protected function updateReferences($container, $currentId, $newId)
     {
         foreach ($container->getAliases() as $id => $alias) {
@@ -66,6 +78,13 @@ class ReplaceAliasByActualDefinitionPass implements CompilerPassInterface
         }
     }
 
+    /**
+     * Updates argument references.
+     *
+     * @param array $arguments An array of Arguments
+     * @param string $currentId The alias identifier
+     * @param string $newId The identifier the alias points to
+     */
     protected function updateArgumentReferences(array $arguments, $currentId, $newId)
     {
         foreach ($arguments as $k => $argument) {

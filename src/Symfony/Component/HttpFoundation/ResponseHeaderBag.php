@@ -99,7 +99,7 @@ class ResponseHeaderBag extends HeaderBag
      */
     public function clearCookie($name, $path = null, $domain = null)
     {
-        $this->setCookie(new Cookie($name, null, time() - 86400, $path, $domain));
+        $this->setCookie(new Cookie($name, null, 1, $path, $domain));
     }
 
     /**

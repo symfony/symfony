@@ -41,6 +41,18 @@ class XmlEncoderTest extends \PHPUnit_Framework_TestCase
         $this->assertEquals($expected, $this->encoder->encode($obj, 'xml'));
     }
 
+    public function testSetRootNodeName()
+    {
+        $obj = new ScalarDummy;
+        $obj->xmlFoo = "foo";
+
+        $this->encoder->setRootNodeName('test');
+        $expected = '<?xml version="1.0"?>'."\n".
+            '<test><![CDATA[foo]]></test>'."\n";
+
+        $this->assertEquals($expected, $this->encoder->encode($obj, 'xml'));
+    }
+
     public function testEncodeSimpleXML()
     {
         $xml = simplexml_load_string('<firstname>Peter</firstname>');

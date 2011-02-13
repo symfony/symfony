@@ -24,6 +24,7 @@ class XmlEncoder extends AbstractEncoder
 {
     protected $dom;
     protected $format;
+    protected $rootNodeName = 'response';
 
     /**
      * {@inheritdoc}
@@ -38,11 +39,11 @@ class XmlEncoder extends AbstractEncoder
         $this->format = $format;
 
         if ($this->serializer->isStructuredType($data)) {
-            $root = $this->dom->createElement('response');
+            $root = $this->dom->createElement($this->rootNodeName);
             $this->dom->appendChild($root);
             $this->buildXml($root, $data);
         } else {
-            $this->appendNode($this->dom, $data, 'response');
+            $this->appendNode($this->dom, $data, $this->rootNodeName);
         }
         return $this->dom->saveXML();
     }
@@ -57,6 +58,24 @@ class XmlEncoder extends AbstractEncoder
             return (string) $xml;
         }
         return $this->parseXml($xml);
+    }
+
+    /**
+     * Sets the root node name
+     * @param string $name root node name
+     */
+    public function setRootNodeName($name)
+    {
+        $this->rootNodeName = $name;
+    }
+
+    /**
+     * Returns the root node name
+     * @return string
+     */
+    public function getRootNodeName()
+    {
+        return $this->rootNodeName;
     }
 
     /**
@@ -120,7 +139,7 @@ class XmlEncoder extends AbstractEncoder
                 if (!$parentNode->parentNode->parentNode) {
                     $root = $parentNode->parentNode;
                     $root->removeChild($parentNode);
-                    return $this->appendNode($root, $data, 'response');
+                    return $this->appendNode($root, $data, $this->rootNodeName);
                 }
                 return $this->appendNode($parentNode, $data, 'data');
             }

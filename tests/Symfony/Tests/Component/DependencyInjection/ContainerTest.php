@@ -11,6 +11,7 @@
 
 namespace Symfony\Tests\Component\DependencyInjection;
 
+use Symfony\Component\DependencyInjection\Scope;
 use Symfony\Component\DependencyInjection\Container;
 use Symfony\Component\DependencyInjection\ContainerInterface;
 use Symfony\Component\DependencyInjection\ParameterBag\ParameterBag;
@@ -125,14 +126,14 @@ class ContainerTest extends \PHPUnit_Framework_TestCase
     public function testSetDoesNotAllowInactiveScope()
     {
         $c = new Container();
-        $c->addScope('foo');
+        $c->addScope(new Scope('foo'));
         $c->set('foo', new \stdClass(), 'foo');
     }
 
     public function testSetAlsoSetsScopedService()
     {
         $c = new Container();
-        $c->addScope('foo');
+        $c->addScope(new Scope('foo'));
         $c->enterScope('foo');
         $c->set('foo', $foo = new \stdClass(), 'foo');
 
@@ -183,7 +184,7 @@ class ContainerTest extends \PHPUnit_Framework_TestCase
     public function testEnterLeaveCurrentScope()
     {
         $container = new ProjectServiceContainer();
-        $container->addScope('foo');
+        $container->addScope(new Scope('foo'));
 
         $container->enterScope('foo');
         $scoped1 = $container->get('scoped');
@@ -208,8 +209,8 @@ class ContainerTest extends \PHPUnit_Framework_TestCase
     public function testEnterLeaveScopeWithChildScopes()
     {
         $container = new Container();
-        $container->addScope('foo');
-        $container->addScope('bar', 'foo');
+        $container->addScope(new Scope('foo'));
+        $container->addScope(new Scope('bar', 'foo'));
 
         $this->assertFalse($container->isScopeActive('foo'));
 
@@ -243,7 +244,7 @@ class ContainerTest extends \PHPUnit_Framework_TestCase
     public function testAddScopeDoesNotAllowBuiltInScopes($scope)
     {
         $container = new Container();
-        $container->addScope($scope);
+        $container->addScope(new Scope($scope));
     }
 
     /**
@@ -252,8 +253,8 @@ class ContainerTest extends \PHPUnit_Framework_TestCase
     public function testAddScopeDoesNotAllowExistingScope()
     {
         $container = new Container();
-        $container->addScope('foo');
-        $container->addScope('foo');
+        $container->addScope(new Scope('foo'));
+        $container->addScope(new Scope('foo'));
     }
 
     /**
@@ -263,14 +264,14 @@ class ContainerTest extends \PHPUnit_Framework_TestCase
     public function testAddScopeDoesNotAllowInvalidParentScope($scope)
     {
         $c = new Container();
-        $c->addScope('foo', $scope);
+        $c->addScope(new Scope('foo', $scope));
     }
 
     public function testAddScope()
     {
         $c = new Container();
-        $c->addScope('foo');
-        $c->addScope('bar', 'foo');
+        $c->addScope(new Scope('foo'));
+        $c->addScope(new Scope('bar', 'foo'));
 
         $this->assertSame(array('foo' => 'container', 'bar' => 'foo'), $this->getField($c, 'scopes'));
         $this->assertSame(array('foo' => array('bar'), 'bar' => array()), $this->getField($c, 'scopeChildren'));
@@ -281,7 +282,7 @@ class ContainerTest extends \PHPUnit_Framework_TestCase
         $c = new Container();
 
         $this->assertFalse($c->hasScope('foo'));
-        $c->addScope('foo');
+        $c->addScope(new Scope('foo'));
         $this->assertTrue($c->hasScope('foo'));
     }
 
@@ -290,7 +291,7 @@ class ContainerTest extends \PHPUnit_Framework_TestCase
         $c = new Container();
 
         $this->assertFalse($c->isScopeActive('foo'));
-        $c->addScope('foo');
+        $c->addScope(new Scope('foo'));
 
         $this->assertFalse($c->isScopeActive('foo'));
         $c->enterScope('foo');

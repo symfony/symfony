@@ -2,6 +2,8 @@
 
 namespace Symfony\Tests\Component\DependencyInjection\Compiler;
 
+use Symfony\Component\DependencyInjection\Scope;
+
 use Symfony\Component\DependencyInjection\Compiler\CheckReferenceValidityPass;
 use Symfony\Component\DependencyInjection\ContainerInterface;
 use Symfony\Component\DependencyInjection\Reference;
@@ -33,8 +35,8 @@ class CheckReferenceValidityPassTest extends \PHPUnit_Framework_TestCase
     public function testProcessIgnoresCrossScopeHierarchyReferenceIfNotStrict()
     {
         $container = new ContainerBuilder();
-        $container->addScope('a');
-        $container->addScope('b');
+        $container->addScope(new Scope('a'));
+        $container->addScope(new Scope('b'));
 
         $container->register('a')->setScope('a')->addArgument(new Reference('b', ContainerInterface::EXCEPTION_ON_INVALID_REFERENCE, false));
         $container->register('b')->setScope('b');
@@ -48,8 +50,8 @@ class CheckReferenceValidityPassTest extends \PHPUnit_Framework_TestCase
     public function testProcessDetectsCrossScopeHierarchyReference()
     {
         $container = new ContainerBuilder();
-        $container->addScope('a');
-        $container->addScope('b');
+        $container->addScope(new Scope('a'));
+        $container->addScope(new Scope('b'));
 
         $container->register('a')->setScope('a')->addArgument(new Reference('b'));
         $container->register('b')->setScope('b');

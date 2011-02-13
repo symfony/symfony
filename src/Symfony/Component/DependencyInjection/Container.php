@@ -334,12 +334,14 @@ class Container implements ContainerInterface
     /**
      * Adds a scope to the container
      *
-     * @param string $name
-     * @param string $parentScope
+     * @param ScopeInterface $scope
      * @return void
      */
-    public function addScope($name, $parentScope = self::SCOPE_CONTAINER)
+    public function addScope(ScopeInterface $scope)
     {
+        $name = $scope->getName();
+        $parentScope = $scope->getParentName();
+
         if (self::SCOPE_CONTAINER === $name || self::SCOPE_PROTOTYPE === $name) {
             throw new \InvalidArgumentException(sprintf('The scope "%s" is reserved.', $name));
         }

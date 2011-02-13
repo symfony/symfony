@@ -105,6 +105,7 @@ class DoctrineMongoDBExtension extends AbstractDoctrineExtension
             $documentManager['name'] = $name;
             $this->loadDocumentManager($documentManager, $container);
         }
+        $container->setParameter('doctrine.odm.mongodb.document_managers', array_keys($documentManagers));
     }
 
     /**

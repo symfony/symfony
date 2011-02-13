@@ -50,7 +50,13 @@
 
     <!-- security/user -->
     <parameter key="security.user.provider.document.class">Symfony\Bundle\DoctrineMongoDBBundle\Security\DocumentUserProvider</parameter>
-    
+
+    <!-- proxy cache warmer -->
+    <parameter key="doctrine.odm.mongodb.proxy_cache_warmer.class">Symfony\Bundle\DoctrineMongoDBBundle\CacheWarmer\ProxyCacheWarmer</parameter>
+
+    <!-- hydrator cache warmer -->
+    <parameter key="doctrine.odm.mongodb.hydrator_cache_warmer.class">Symfony\Bundle\DoctrineMongoDBBundle\CacheWarmer\HydratorCacheWarmer</parameter>
+
     <!-- validator -->
     <parameter key="doctrine_odm.mongodb.validator.unique.class">Symfony\Bundle\DoctrineMongoDBBundle\Validator\Constraints\UniqueValidator</parameter>
   </parameters>
@@ -88,7 +94,17 @@
     </service>
 
     <service id="security.user.document_manager" alias="doctrine.odm.mongodb.default_document_manager" />
-    
+
+    <service id="doctrine.odm.mongodb.proxy_cache_warmer" class="%doctrine.odm.mongodb.proxy_cache_warmer.class%" public="false">
+        <tag name="kernel.cache_warmer" />
+        <argument type="service" id="service_container" />
+    </service>
+
+    <service id="doctrine.odm.mongodb.hydrator_cache_warmer" class="%doctrine.odm.mongodb.hydrator_cache_warmer.class%" public="false">
+        <tag name="kernel.cache_warmer" />
+        <argument type="service" id="service_container" />
+    </service>
+
     <!--  validator -->
     <service id="doctrine_odm.mongodb.validator.unique" class="%doctrine_odm.mongodb.validator.unique.class%">
         <tag name="validator.constraint_validator" alias="doctrine_odm.mongodb.unique" />

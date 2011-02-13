@@ -15,7 +15,7 @@ use Symfony\Component\Security\Http\Authentication\AuthenticationFailureHandlerI
 use Symfony\Component\Security\Http\Authentication\AuthenticationSuccessHandlerInterface;
 use Symfony\Component\Security\Http\Session\SessionAuthenticationStrategyInterface;
 
-use Symfony\Component\Security\Core\SecurityContext;
+use Symfony\Component\Security\Core\SecurityContextInterface;
 use Symfony\Component\Security\Core\Authentication\AuthenticationManagerInterface;
 use Symfony\Component\HttpKernel\Log\LoggerInterface;
 use Symfony\Component\HttpFoundation\Request;
@@ -32,7 +32,7 @@ class UsernamePasswordFormAuthenticationListener extends AbstractAuthenticationL
     /**
      * {@inheritdoc}
      */
-    public function __construct(SecurityContext $securityContext, AuthenticationManagerInterface $authenticationManager, SessionAuthenticationStrategyInterface $sessionStrategy, $providerKey, array $options = array(), AuthenticationSuccessHandlerInterface $successHandler = null, AuthenticationFailureHandlerInterface $failureHandler = null, LoggerInterface $logger = null)
+    public function __construct(SecurityContextInterface $securityContext, AuthenticationManagerInterface $authenticationManager, SessionAuthenticationStrategyInterface $sessionStrategy, $providerKey, array $options = array(), AuthenticationSuccessHandlerInterface $successHandler = null, AuthenticationFailureHandlerInterface $failureHandler = null, LoggerInterface $logger = null)
     {
         parent::__construct($securityContext, $authenticationManager, $sessionStrategy, $providerKey, array_merge(array(
             'username_parameter' => '_username',
@@ -62,3 +62,4 @@ class UsernamePasswordFormAuthenticationListener extends AbstractAuthenticationL
         return $this->authenticationManager->authenticate(new UsernamePasswordToken($username, $password, $this->providerKey));
     }
 }
+

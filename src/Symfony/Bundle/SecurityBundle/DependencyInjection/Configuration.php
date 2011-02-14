@@ -159,7 +159,7 @@ class Configuration
                             ->prototype('scalar')->end()
                         ->end()
                     ->end()
-                    ->booleanNode('anonymous')->end()
+                    ->booleanNode('anonymous')->defaultFalse()->end()
                     ->arrayNode('switch_user')
                         ->scalarNode('provider')->end()
                         ->scalarNode('parameter')->defaultValue('_switch_user')->end()

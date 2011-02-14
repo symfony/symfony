@@ -175,9 +175,9 @@ class SecurityExtension extends Extension
 
         // load firewall map
         $mapDef = $container->getDefinition('security.firewall.map');
-        $map = array();
+        $map = $authenticationProviders = array();
         foreach ($firewalls as $name => $firewall) {
-            list($matcher, $listeners, $exceptionListener) = $this->createFirewall($container, $name, $firewall, $providerIds, $factories);
+            list($matcher, $listeners, $exceptionListener) = $this->createFirewall($container, $name, $firewall, $authenticationProviders, $providerIds, $factories);
 
             $contextId = 'security.firewall.map.context.'.$name;
             $context = $container->setDefinition($contextId, new DefinitionDecorator('security.firewall.context'));
@@ -188,9 +188,18 @@ class SecurityExtension extends Extension
             $map[$contextId] = $matcher;
         }
         $mapDef->setArgument(1, $map);
+
+        // add authentication providers to authentication manager
+        $authenticationProviders = array_map(function($id) {
+            return new Reference($id);
+        }, array_values(array_unique($authenticationProviders)));
+        $container
+            ->getDefinition('security.authentication.manager')
+            ->setArgument(0, $authenticationProviders)
+        ;
     }
 
-    protected function createFirewall(ContainerBuilder $container, $id, $firewall, $providerIds, array $factories)
+    protected function createFirewall(ContainerBuilder $container, $id, $firewall, &$authenticationProviders, $providerIds, array $factories)
     {
         // Matcher
         $i = 0;
@@ -259,7 +268,7 @@ class SecurityExtension extends Extension
         }
 
         // Authentication listeners
-        list($authListeners, $providers, $defaultEntryPoint) = $this->createAuthenticationListeners($container, $id, $firewall, $defaultProvider, $factories);
+        list($authListeners, $defaultEntryPoint) = $this->createAuthenticationListeners($container, $id, $firewall, $authenticationProviders, $defaultProvider, $factories);
 
         $listeners = array_merge($listeners, $authListeners);
 
@@ -295,10 +304,9 @@ class SecurityExtension extends Extension
         return $this->contextListeners[$contextKey] = $listenerId;
     }
 
-    protected function createAuthenticationListeners($container, $id, $firewall, $defaultProvider, array $factories)
+    protected function createAuthenticationListeners($container, $id, $firewall, &$authenticationProviders, $defaultProvider, array $factories)
     {
         $listeners = array();
-        $providers = array();
         $hasListeners = false;
         $defaultEntryPoint = null;
 
@@ -312,7 +320,7 @@ class SecurityExtension extends Extension
                     list($provider, $listenerId, $defaultEntryPoint) = $factory->create($container, $id, $firewall[$key], $userProvider, $defaultEntryPoint);
 
                     $listeners[] = new Reference($listenerId);
-                    $providers[] = new Reference($provider);
+                    $authenticationProviders[] = $provider;
                     $hasListeners = true;
                 }
             }
@@ -321,6 +329,7 @@ class SecurityExtension extends Extension
         // Anonymous
         if (isset($firewall['anonymous'])) {
             $listeners[] = new Reference('security.authentication.listener.anonymous');
+            $authenticationProviders[] = 'security.authentication.provider.anonymous';
             $hasListeners = true;
         }
 
@@ -328,7 +337,7 @@ class SecurityExtension extends Extension
             throw new \LogicException(sprintf('No authentication listener registered for pattern "%s".', isset($firewall['pattern']) ? $firewall['pattern'] : ''));
         }
 
-        return array($listeners, $providers, $defaultEntryPoint);
+        return array($listeners, $defaultEntryPoint);
     }
 
     protected function createEncoders($encoders, ContainerBuilder $container)

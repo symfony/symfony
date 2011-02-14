@@ -42,10 +42,6 @@ abstract class AbstractFactory implements SecurityFactoryInterface
     {
         // authentication provider
         $authProviderId = $this->createAuthProvider($container, $id, $config, $userProviderId);
-        $container
-            ->getDefinition($authProviderId)
-            ->addTag('security.authentication_provider')
-        ;
 
         // authentication listener
         $listenerId = $this->createListener($container, $id, $config, $userProviderId);

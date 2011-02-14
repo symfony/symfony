@@ -54,7 +54,6 @@
 
         <service id="security.authentication.provider.anonymous" class="%security.authentication.provider.anonymous%" public="false">
             <argument>%security.anonymous.key%</argument>
-            <tag name="security.authentication_provider" />
         </service>
 
         <service id="security.authentication.retry_entry_point" class="%security.authentication.retry_entry_point.class%" public="false" />

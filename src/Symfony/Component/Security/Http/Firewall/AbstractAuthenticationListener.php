@@ -12,7 +12,6 @@
 namespace Symfony\Component\Security\Http\Firewall;
 
 use Symfony\Component\EventDispatcher\Event;
-
 use Symfony\Component\Security\Http\Session\SessionAuthenticationStrategyInterface;
 use Symfony\Component\Security\Http\Authentication\AuthenticationFailureHandlerInterface;
 use Symfony\Component\Security\Http\Authentication\AuthenticationSuccessHandlerInterface;
@@ -173,7 +172,7 @@ abstract class AbstractAuthenticationListener implements ListenerInterface
         return $this->options['check_path'] === $request->getPathInfo();
     }
 
-    protected function onFailure($event, Request $request, \Exception $failed)
+    protected function onFailure($event, Request $request, AuthenticationException $failed)
     {
         if (null !== $this->logger) {
             $this->logger->debug(sprintf('Authentication request failed: %s', $failed->getMessage()));
@@ -195,7 +194,7 @@ abstract class AbstractAuthenticationListener implements ListenerInterface
             }
 
             $subRequest = Request::create($this->options['failure_path']);
-            $subRequest->attributes->set(SecurityContextInterface::AUTHENTICATION_ERROR, $failed->getMessage());
+            $subRequest->attributes->set(SecurityContextInterface::AUTHENTICATION_ERROR, $failed);
 
             return $event->getSubject()->handle($subRequest, HttpKernelInterface::SUB_REQUEST);
         } else {
@@ -203,7 +202,7 @@ abstract class AbstractAuthenticationListener implements ListenerInterface
                 $this->logger->debug(sprintf('Redirecting to %s', $this->options['failure_path']));
             }
 
-            $request->getSession()->set(SecurityContextInterface::AUTHENTICATION_ERROR, $failed->getMessage());
+            $request->getSession()->set(SecurityContextInterface::AUTHENTICATION_ERROR, $failed);
 
             $response = new Response();
             $response->setRedirect(0 !== strpos($this->options['failure_path'], 'http') ? $request->getUriForPath($this->options['failure_path']) : $this->options['failure_path'], 302);

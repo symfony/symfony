@@ -16,7 +16,7 @@ namespace Symfony\Component\Security\Core\Exception;
  *
  * @author Fabien Potencier <fabien.potencier@symfony-project.com>
  */
-class AuthenticationException extends \RuntimeException
+class AuthenticationException extends \RuntimeException implements \Serializable
 {
     protected $extraInformation;
 
@@ -35,5 +35,27 @@ class AuthenticationException extends \RuntimeException
     public function setExtraInformation($extraInformation)
     {
         $this->extraInformation = $extraInformation;
+    }
+
+    public function serialize()
+    {
+        return serialize(array(
+            $this->extraInformation,
+            $this->code,
+            $this->message,
+            $this->file,
+            $this->line,
+        ));
+    }
+
+    public function unserialize($str)
+    {
+        list(
+            $this->extraInformation,
+            $this->code,
+            $this->message,
+            $this->file,
+            $this->line
+        ) = unserialize($str);
     }
 }

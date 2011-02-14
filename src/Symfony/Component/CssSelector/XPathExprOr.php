@@ -36,7 +36,7 @@ class XPathExprOr extends XPathExpr
     }
 
     /**
-     * Get a string representation of this |'d expression.
+     * Gets a string representation of this |'d expression.
      *
      * @return string
      */

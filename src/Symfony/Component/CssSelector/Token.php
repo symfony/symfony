@@ -28,9 +28,9 @@ class Token
     /**
      * Constructor.
      *
-     * @param string $type     The type of this token.
-     * @param mixed  $value    The value of this token.
-     * @param int    $position The order of this token.
+     * @param string  $type     The type of this token.
+     * @param mixed   $value    The value of this token.
+     * @param integer $position The order of this token.
      */
     public function __construct($type, $value, $position)
     {
@@ -40,7 +40,7 @@ class Token
     }
 
     /**
-     * Get a string representation of this token.
+     * Gets a string representation of this token.
      *
      * @return string
      */
@@ -54,7 +54,7 @@ class Token
      *
      * @param  string $type The type to test against this token's one.
      *
-     * @return bool
+     * @return Boolean
      */
     public function isType($type)
     {
@@ -62,9 +62,9 @@ class Token
     }
 
     /**
-     * Get the position of this token.
+     * Gets the position of this token.
      *
-     * @return int
+     * @return integer
      */
     public function getPosition()
     {

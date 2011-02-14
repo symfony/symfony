@@ -30,11 +30,11 @@ class XPathExpr
     /**
      * Constructor.
      *
-     * @param string $prefix     Prefix for the XPath expression.
-     * @param string $path       Actual path of the expression.
-     * @param string $element    The element in the expression.
-     * @param string $condition  A condition for the expression.
-     * @param bool   $starPrefix Indicates whether to use a star prefix.
+     * @param string  $prefix     Prefix for the XPath expression.
+     * @param string  $path       Actual path of the expression.
+     * @param string  $element    The element in the expression.
+     * @param string  $condition  A condition for the expression.
+     * @param Boolean $starPrefix Indicates whether to use a star prefix.
      */
     public function __construct($prefix = null, $path = null, $element = '*', $condition = null, $starPrefix = false)
     {
@@ -46,7 +46,7 @@ class XPathExpr
     }
 
     /**
-     * Get the prefix of this XPath expression.
+     * Gets the prefix of this XPath expression.
      *
      * @return string
      */
@@ -56,7 +56,7 @@ class XPathExpr
     }
 
     /**
-     * Get the path of this XPath expression.
+     * Gets the path of this XPath expression.
      *
      * @return string
      */
@@ -68,7 +68,7 @@ class XPathExpr
     /**
      * Answers whether this XPath expression has a star prefix.
      *
-     * @return bool
+     * @return Boolean
      */
     public function hasStarPrefix()
     {
@@ -76,7 +76,7 @@ class XPathExpr
     }
 
     /**
-     * Get the element of this XPath expression.
+     * Gets the element of this XPath expression.
      *
      * @return string
      */
@@ -86,7 +86,7 @@ class XPathExpr
     }
 
     /**
-     * Get the condition of this XPath expression.
+     * Gets the condition of this XPath expression.
      *
      * @return string
      */
@@ -96,7 +96,7 @@ class XPathExpr
     }
 
     /**
-     * Get a string representation for this XPath expression.
+     * Gets a string representation for this XPath expression.
      *
      * @return string
      */
@@ -213,7 +213,7 @@ class XPathExpr
     }
 
     /**
-     * Get an XPath literal for $s.
+     * Gets an XPath literal for $s.
      *
      * @param  mixed $s Can either be a Node\ElementNode or a string.
      *

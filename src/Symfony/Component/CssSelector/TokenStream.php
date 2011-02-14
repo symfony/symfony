@@ -43,7 +43,7 @@ class TokenStream
     }
 
     /**
-     * Get the tokens that have already been visited in this stream.
+     * Gets the tokens that have already been visited in this stream.
      *
      * @return array
      */
@@ -53,7 +53,7 @@ class TokenStream
     }
 
     /**
-     * Get the next token in the stream or null if there is none.
+     * Gets the next token in the stream or null if there is none.
      * Note that if this stream was set to be peeking its behavior
      * will be restored to not peeking after this operation.
      *

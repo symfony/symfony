@@ -17,3 +17,4 @@ doctrine_odm.mongodb:
       metadata_cache_driver: xcache
     dm2:
       connection: conn2
+      database:   prod2

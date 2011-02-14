@@ -32,7 +32,6 @@ class AbstractFactoryTest extends \PHPUnit_Framework_TestCase
 
         // auth provider
         $this->assertEquals('auth_provider', $authProviderId);
-        $this->assertEquals(array('security.authentication_provider' => array(array())), $container->getDefinition('auth_provider')->getTags());
 
         // listener
         $this->assertEquals('abstract_listener.foo', $listenerId);

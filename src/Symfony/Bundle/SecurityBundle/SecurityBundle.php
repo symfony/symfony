@@ -13,7 +13,6 @@ namespace Symfony\Bundle\SecurityBundle;
 
 use Symfony\Component\HttpKernel\Bundle\Bundle;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
-use Symfony\Bundle\SecurityBundle\DependencyInjection\Compiler\AddAuthenticationProvidersPass;
 use Symfony\Bundle\SecurityBundle\DependencyInjection\Compiler\AddSecurityVotersPass;
 
 /**
@@ -28,6 +27,5 @@ class SecurityBundle extends Bundle
         parent::registerExtensions($container);
 
         $container->addCompilerPass(new AddSecurityVotersPass());
-        $container->addCompilerPass(new AddAuthenticationProvidersPass());
     }
 }

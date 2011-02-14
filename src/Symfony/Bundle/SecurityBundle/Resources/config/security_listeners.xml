@@ -84,6 +84,9 @@
 
         <service id="security.logout_listener" class="%security.logout_listener.class%" public="false" abstract="true">
             <argument type="service" id="security.context" />
+            <argument /> <!-- Logout Path -->
+            <argument /> <!-- Target-URL Path -->
+            <argument type="service" id="security.logout.success_handler" on-invalid="null" />
         </service>
         <service id="security.logout.handler.session" class="%security.logout.handler.session.class%" public="false" />
         <service id="security.logout.handler.cookie_clearing" class="%security.logout.handler.cookie_clearing.class%" public="false" abstract="true" />

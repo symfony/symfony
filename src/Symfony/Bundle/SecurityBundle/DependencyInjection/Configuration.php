@@ -141,6 +141,7 @@ class Configuration
                         ->canBeUnset()
                         ->scalarNode('path')->defaultValue('/logout')->end()
                         ->scalarNode('target')->defaultValue('/')->end()
+                        ->scalarNode('success_handler')->end()
                         ->booleanNode('invalidate_session')->defaultTrue()->end()
                         ->fixXmlConfig('delete_cookie')
                         ->arrayNode('delete_cookies')

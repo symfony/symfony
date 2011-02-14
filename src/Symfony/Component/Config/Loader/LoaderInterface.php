@@ -49,4 +49,5 @@ interface LoaderInterface
      * @param LoaderResolver $resolver A LoaderResolver instance
      */
     function setResolver(LoaderResolver $resolver);
+
 }

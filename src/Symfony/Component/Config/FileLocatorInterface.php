@@ -19,10 +19,11 @@ interface FileLocatorInterface
     /**
      * Returns a full path for a given file name.
      *
-     * @param mixed  $name        The file name to locate
-     * @param string $currentPath The current path
+     * @param mixed   $name        The file name to locate
+     * @param string  $currentPath The current path
+     * @param Boolean $first       Wether to return the first occurence or an array of filenames
      *
-     * @return string The full path for the file
+     * @return string|array The full path to the file|An array of file paths
      *
      * @throws \InvalidArgumentException When file is not found
      */

@@ -46,7 +46,7 @@ class ConfigCache
      */
     public function __toString()
     {
-        return $this->cacheDir.'/'.$this->file.'.php';
+        return $this->getCacheFile();
     }
 
     /**

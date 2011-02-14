@@ -22,11 +22,6 @@ namespace Symfony\Component\Config\Loader;
 class DelegatingLoader extends Loader
 {
     /**
-     * @var LoaderResolverInterface
-     */
-    protected $resolver;
-
-    /**
      * Constructor.
      *
      * @param LoaderResolverInterface $resolver A LoaderResolverInterface instance
@@ -41,6 +36,8 @@ class DelegatingLoader extends Loader
      *
      * @param mixed  $resource A resource
      * @param string $type     The resource type
+     *
+     * @throws \InvalidArgumentException if no loader is found.
      */
     public function load($resource, $type = null)
     {
@@ -63,12 +60,6 @@ class DelegatingLoader extends Loader
      */
     public function supports($resource, $type = null)
     {
-        foreach ($this->resolver->getLoaders() as $loader) {
-            if ($loader->supports($resource, $type)) {
-                return true;
-            }
-        }
-
-        return false;
+        return false === $this->resolver->resolve($resource, $type) ? false : true;
     }
 }

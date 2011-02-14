@@ -99,7 +99,7 @@ class Translator extends BaseTranslator
                 "<?php use Symfony\Component\Translation\MessageCatalogue; return new MessageCatalogue('%s', %s);",
                 $locale,
                 var_export($this->catalogues[$locale]->all(), true)
-            ));
+            );
 
             $cache->write($content, $this->catalogues[$locale]->getResources());
 

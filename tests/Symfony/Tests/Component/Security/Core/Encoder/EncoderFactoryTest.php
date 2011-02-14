@@ -31,8 +31,9 @@ class EncoderFactoryTest extends \PHPUnit_Framework_TestCase
 
     public function testGetEncoderWithService()
     {
-        $factory = new EncoderFactory(array());
-        $factory->addEncoder('Symfony\Component\Security\Core\User\AccountInterface', new MessageDigestPasswordEncoder('sha1'));
+        $factory = new EncoderFactory(array(
+            'Symfony\Component\Security\Core\User\AccountInterface' => new MessageDigestPasswordEncoder('sha1'),
+        ));
 
         $encoder = $factory->getEncoder($this->getMock('Symfony\Component\Security\Core\User\AccountInterface'));
         $expectedEncoder = new MessageDigestPasswordEncoder('sha1');

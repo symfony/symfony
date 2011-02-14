@@ -6,6 +6,14 @@
     xsi:schemaLocation="http://www.symfony-project.org/schema/dic/services http://www.symfony-project.org/schema/dic/services/services-1.0.xsd">
 
     <config>
+        <encoder class="JMS\FooBundle\Entity\User1" algorithm="plaintext" />
+
+        <encoder class="JMS\FooBundle\Entity\User2" algorithm="sha1" encode-as-base64="true" iterations="5" />
+
+        <encoder class="JMS\FooBundle\Entity\User3" algorithm="md5" />
+
+        <encoder class="JMS\FooBundle\Entity\User4" id="security.encoder.foo" />
+
         <provider name="default">
             <user name="foo" password="foo" roles="ROLE_USER" />
         </provider>

@@ -1,6 +1,20 @@
 <?php
 
 $container->loadFromExtension('security', 'config', array(
+    'encoders' => array(
+        'JMS\FooBundle\Entity\User1' => 'plaintext',
+        'JMS\FooBundle\Entity\User2' => array(
+            'algorithm' => 'sha1',
+            'encode_as_base64' => true,
+            'iterations' => 5,
+        ),
+        'JMS\FooBundle\Entity\User3' => array(
+            'algorithm' => 'md5',
+        ),
+        'JMS\FooBundle\Entity\User4' => array(
+            'id' => 'security.encoder.foo',
+        ),
+    ),
     'providers' => array(
         'default' => array(
             'users' => array(

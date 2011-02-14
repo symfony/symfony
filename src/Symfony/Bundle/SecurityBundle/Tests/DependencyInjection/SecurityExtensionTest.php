@@ -11,6 +11,10 @@
 
 namespace Symfony\Bundle\SecurityBundle\Tests\DependencyInjection;
 
+use Symfony\Component\DependencyInjection\Reference;
+
+use Symfony\Component\DependencyInjection\Parameter;
+
 use Symfony\Bundle\SecurityBundle\DependencyInjection\SecurityExtension;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 
@@ -115,6 +119,27 @@ abstract class SecurityExtensionTest extends \PHPUnit_Framework_TestCase
             'FOO' => array('MOO'),
             'ADMIN' => array('USER'),
         ), $container->getParameter('security.role_hierarchy.roles'));
+    }
+
+    public function testEncoders()
+    {
+        $container = $this->getContainer('container1');
+
+        $this->assertEquals(array(array(
+            'JMS\FooBundle\Entity\User1' => array(
+                'class' => new Parameter('security.encoder.plain.class'),
+                'arguments' => array(),
+            ),
+            'JMS\FooBundle\Entity\User2' => array(
+                'class' => new Parameter('security.encoder.digest.class'),
+                'arguments' => array('sha1', true, 5),
+            ),
+            'JMS\FooBundle\Entity\User3' => array(
+                'class' => new Parameter('security.encoder.digest.class'),
+                'arguments' => array('md5', false, 1),
+            ),
+            'JMS\FooBundle\Entity\User4' => new Reference('security.encoder.foo'),
+        )), $container->getDefinition('security.encoder_factory.generic')->getArguments());
     }
 
     protected function getContainer($file)

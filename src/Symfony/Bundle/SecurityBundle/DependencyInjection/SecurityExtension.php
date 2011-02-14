@@ -72,6 +72,10 @@ class SecurityExtension extends Extension
         $this->createFirewalls($config, $container);
         $this->createAuthorization($config, $container);
         $this->createRoleHierarchy($config, $container);
+
+        if ($config['encoders']) {
+            $this->createEncoders($config['encoders'], $container);
+        }
     }
 
     public function aclLoad(array $configs, ContainerBuilder $container)
@@ -155,8 +159,6 @@ class SecurityExtension extends Extension
 
         $firewalls = $config['firewalls'];
         $providerIds = $this->createUserProviders($config, $container);
-
-        $this->createEncoders($config, $container);
 
         // make the ContextListener aware of the configured user providers
         $definition = $container->getDefinition('security.context_listener');
@@ -329,15 +331,11 @@ class SecurityExtension extends Extension
         return array($listeners, $providers, $defaultEntryPoint);
     }
 
-    protected function createEncoders($config, ContainerBuilder $container)
+    protected function createEncoders($encoders, ContainerBuilder $container)
     {
-        if (!isset($config['encoders'])) {
-            return;
-        }
-
         $encoderMap = array();
-        foreach ($config['encoders'] as $class => $encoder) {
-            $encoderMap = $this->createEncoder($encoderMap, $class, $encoder, $container);
+        foreach ($encoders as $class => $encoder) {
+            $encoderMap[$class] = $this->createEncoder($class, $encoder, $container);
         }
 
         $container
@@ -346,16 +344,11 @@ class SecurityExtension extends Extension
         ;
     }
 
-    protected function createEncoder(array $encoderMap, $accountClass, $config, ContainerBuilder $container)
+    protected function createEncoder($accountClass, $config, ContainerBuilder $container)
     {
         // a custom encoder service
         if (isset($config['id'])) {
-            $container
-                ->getDefinition('security.encoder_factory.generic')
-                ->addMethodCall('addEncoder', array($accountClass, new Reference($config['id'])))
-            ;
-
-            return $encoderMap;
+            return new Reference($config['id']);
         }
 
         // plaintext encoder
@@ -366,12 +359,10 @@ class SecurityExtension extends Extension
                 $arguments[0] = $config['ignore_case'];
             }
 
-            $encoderMap[$accountClass] = array(
+            return array(
                 'class' => new Parameter('security.encoder.plain.class'),
                 'arguments' => $arguments,
             );
-
-            return $encoderMap;
         }
 
         // message digest encoder
@@ -390,12 +381,10 @@ class SecurityExtension extends Extension
             $arguments[2] = 1;
         }
 
-        $encoderMap[$accountClass] = array(
+        return array(
             'class' => new Parameter('security.encoder.digest.class'),
             'arguments' => $arguments,
         );
-
-        return $encoderMap;
     }
 
     // Parses user providers and returns an array of their ids

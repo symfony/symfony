@@ -1,4 +1,15 @@
 security.config:
+    encoders:
+        JMS\FooBundle\Entity\User1: plaintext
+        JMS\FooBundle\Entity\User2:
+            algorithm: sha1
+            encode_as_base64: true
+            iterations: 5
+        JMS\FooBundle\Entity\User3:
+            algorithm: md5
+        JMS\FooBundle\Entity\User4:
+            id: security.encoder.foo
+
     providers:
         default:
             users:

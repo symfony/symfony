@@ -28,7 +28,7 @@ class TemplatingPass implements CompilerPassInterface
         if (in_array('twig', $engines)) {
             $am->addMethodCall('addCacheFile', array('%kernel.cache_dir%/assetic_twig_assets.php'));
         } else {
-            foreach ($container->getTaggedServiceIds('assetic.templating.twig') as $id => $attr) {
+            foreach ($container->findTaggedServiceIds('assetic.templating.twig') as $id => $attr) {
                 $container->remove($id);
             }
         }
@@ -36,7 +36,7 @@ class TemplatingPass implements CompilerPassInterface
         if (in_array('php', $engines)) {
             // $am->addMethodCall('addCacheFile', array('%kernel.cache_dir%/assetic_php_assets.php'));
         } else {
-            foreach ($container->getTaggedServiceIds('assetic.templating.php') as $id => $attr) {
+            foreach ($container->findTaggedServiceIds('assetic.templating.php') as $id => $attr) {
                 $container->remove($id);
             }
         }

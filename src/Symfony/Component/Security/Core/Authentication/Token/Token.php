@@ -29,6 +29,7 @@ abstract class Token implements TokenInterface
     protected $credentials;
     protected $immutable;
     protected $providerKey;
+    protected $attributes;
 
     /**
      * Constructor.
@@ -40,6 +41,7 @@ abstract class Token implements TokenInterface
         $this->setRoles($roles);
         $this->authenticated = false;
         $this->immutable = false;
+        $this->attributes = array();
     }
 
     /**
@@ -193,7 +195,7 @@ abstract class Token implements TokenInterface
      */
     public function serialize()
     {
-        return serialize(array($this->user, $this->credentials, $this->authenticated, $this->roles, $this->immutable, $this->providerKey));
+        return serialize(array($this->user, $this->credentials, $this->authenticated, $this->roles, $this->immutable, $this->providerKey, $this->attributes));
     }
 
     /**
@@ -201,6 +203,67 @@ abstract class Token implements TokenInterface
      */
     public function unserialize($serialized)
     {
-        list($this->user, $this->credentials, $this->authenticated, $this->roles, $this->immutable, $this->providerKey) = unserialize($serialized);
+        list($this->user, $this->credentials, $this->authenticated, $this->roles, $this->immutable, $this->providerKey, $this->attributes) = unserialize($serialized);
+    }
+
+    /**
+     * Returns the token attributes.
+     *
+     * @return array The token attributes
+     */
+    public function getAttributes()
+    {
+        return $this->attributes;
+    }
+
+    /**
+     * Sets the token attributes.
+     *
+     * @param array $attributes The token attributes
+     */
+    public function setAttributes(array $attributes)
+    {
+        $this->attributes = $attributes;
+    }
+
+    /**
+     * Returns true if the attribute exists.
+     *
+     * @param  string  $name  The attribute name
+     *
+     * @return Boolean true if the attribute exists, false otherwise
+     */
+    public function hasAttribute($name)
+    {
+        return array_key_exists($name, $this->attributes);
+    }
+
+    /**
+     * Returns a attribute value.
+     *
+     * @param string $name The attribute name
+     *
+     * @return mixed The attribute value
+     *
+     * @throws \InvalidArgumentException When attribute doesn't exist for this token
+     */
+    public function getAttribute($name)
+    {
+        if (!array_key_exists($name, $this->attributes)) {
+            throw new \InvalidArgumentException(sprintf('This token has no "%s" attribute.', $name));
+        }
+
+        return $this->attributes[$name];
+    }
+
+    /**
+     * Sets a attribute.
+     *
+     * @param string $name  The attribute name
+     * @param mixed  $value The attribute value
+     */
+    public function setAttribute($name, $value)
+    {
+        $this->attributes[$name] = $value;
     }
 }

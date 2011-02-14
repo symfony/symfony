@@ -70,9 +70,14 @@ class TokenTest extends \PHPUnit_Framework_TestCase
         $token->eraseCredentials();
     }
 
+    /**
+     * @covers Symfony\Component\Security\Core\Authentication\Token\Token::serialize
+     * @covers Symfony\Component\Security\Core\Authentication\Token\Token::unserialize
+     */
     public function testSerialize()
     {
         $token = new Token(array('ROLE_FOO'));
+        $token->setAttributes(array('foo' => 'bar'));
 
         $this->assertEquals($token, unserialize(serialize($token)));
     }
@@ -156,5 +161,34 @@ class TokenTest extends \PHPUnit_Framework_TestCase
             array('addRole', new Role('foo')),
             array('setRoles', array('foo', 'asdf')),
         );
+    }
+
+    /**
+     * @covers Symfony\Component\Security\Core\Authentication\Token\Token::getAttributes
+     * @covers Symfony\Component\Security\Core\Authentication\Token\Token::setAttributes
+     * @covers Symfony\Component\Security\Core\Authentication\Token\Token::hasAttribute
+     * @covers Symfony\Component\Security\Core\Authentication\Token\Token::getAttribute
+     * @covers Symfony\Component\Security\Core\Authentication\Token\Token::setAttribute
+     */
+    public function testAttributes()
+    {
+        $attributes = array('foo' => 'bar');
+        $token = new Token();
+        $token->setAttributes($attributes);
+
+        $this->assertEquals($attributes, $token->getAttributes(), '->getAttributes() returns the token attributes');
+        $this->assertEquals('bar', $token->getAttribute('foo'), '->getAttribute() returns the value of a attribute');
+        $token->setAttribute('foo', 'foo');
+        $this->assertEquals('foo', $token->getAttribute('foo'), '->setAttribute() changes the value of a attribute');
+        $this->assertTrue($token->hasAttribute('foo'), '->hasAttribute() returns true if the attribute is defined');
+        $this->assertFalse($token->hasAttribute('oof'), '->hasAttribute() returns false if the attribute is not defined');
+
+        try {
+            $token->getAttribute('foobar');
+            $this->fail('->getAttribute() throws an \InvalidArgumentException exception when the attribute does not exist');
+        } catch (\Exception $e) {
+            $this->assertInstanceOf('\InvalidArgumentException', $e, '->getAttribute() throws an \InvalidArgumentException exception when the attribute does not exist');
+            $this->assertEquals('This token has no "foobar" attribute.', $e->getMessage(), '->getAttribute() throws an \InvalidArgumentException exception when the attribute does not exist');
+        }
     }
 }

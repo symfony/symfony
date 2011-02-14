@@ -99,4 +99,46 @@ interface TokenInterface extends \Serializable
      * Removes sensitive information from the token.
      */
     function eraseCredentials();
+
+    /**
+     * Returns the token attributes.
+     *
+     * @return array The token attributes
+     */
+    function getAttributes();
+
+    /**
+     * Sets the token attributes.
+     *
+     * @param array $attributes The token attributes
+     */
+    function setAttributes(array $attributes);
+
+    /**
+     * Returns true if the attribute exists.
+     *
+     * @param  string  $name  The attribute name
+     *
+     * @return Boolean true if the attribute exists, false otherwise
+     */
+    function hasAttribute($name);
+
+    /**
+     * Returns a attribute value.
+     *
+     * @param string $name The attribute name
+     *
+     * @return mixed The attribute value
+     *
+     * @throws \InvalidArgumentException When attribute doesn't exist for this token
+     */
+    function getAttribute($name);
+
+    /**
+     * Sets a attribute.
+     *
+     * @param string $name  The attribute name
+     * @param mixed  $value The attribute value
+     */
+    function setAttribute($name, $value);
 }

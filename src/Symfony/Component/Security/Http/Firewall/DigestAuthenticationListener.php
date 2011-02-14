@@ -82,13 +82,14 @@ class DigestAuthenticationListener implements ListenerInterface
             return;
         }
 
+        $digestAuth = new DigestData($header);
+
         if (null !== $token = $this->securityContext->getToken()) {
             if ($token->isImmutable()) {
                 return;
             }
 
-            // FIXME
-            if ($token instanceof UsernamePasswordToken && $token->isAuthenticated() && (string) $token === $username) {
+            if ($token instanceof UsernamePasswordToken && $token->isAuthenticated() && (string) $token === $digestAuth->getUsername()) {
                 return;
             }
         }
@@ -96,8 +97,6 @@ class DigestAuthenticationListener implements ListenerInterface
         if (null !== $this->logger) {
             $this->logger->debug(sprintf('Digest Authorization header received from user agent: %s', $header));
         }
-
-        $digestAuth = new DigestData($header);
 
         try {
             $digestAuth->validateAndDecode($this->authenticationEntryPoint->getKey(), $this->authenticationEntryPoint->getRealmName());

@@ -35,12 +35,14 @@ class TemplatePathsCacheWarmer extends CacheWarmer
      *
      * @param KernelInterface      $kernel  A KernelInterface instance
      * @param FileLocatorInterface $locator A FileLocatorInterface instance
+     * @param TemplateNameParser   $parser  A TemplateNameParser instance
      * @param string               $rootDir The directory where global templates can be stored
      */
-    public function __construct(KernelInterface $kernel, FileLocatorInterface $locator, $rootDir)
+    public function __construct(KernelInterface $kernel, FileLocatorInterface $locator, TemplateNameParser $parser, $rootDir)
     {
         $this->kernel = $kernel;
         $this->locator = $locator;
+        $this->parser = $parser;
         $this->rootDir = $rootDir;
     }
 
@@ -97,11 +99,7 @@ class TemplatePathsCacheWarmer extends CacheWarmer
     }
 
     protected function parseTemplateName($file, $prefix, $bundle = '')
-    {
-        if (null === $this->parser) {
-            $this->parser = $this->kernel->getContainer()->get('templating.name_parser');
-        }
-        
+    {      
         $prefix = strtr($prefix, '\\', '/');
         $path = strtr($file->getPathname(), '\\', '/');
 

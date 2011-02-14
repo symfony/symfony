@@ -53,6 +53,33 @@ class XmlEncoderTest extends \PHPUnit_Framework_TestCase
         $this->assertEquals($expected, $this->encoder->encode($obj, 'xml'));
     }
 
+    public function testAttributes()
+    {
+        $obj = new ScalarDummy;
+        $obj->xmlFoo = array(
+            'foo-bar' => array(
+                '@id' => 1,
+                '@name' => 'Bar'
+            ),
+            'Foo' => array(
+                'Bar' => "Test",
+                '@Type' => 'test'
+            ),
+            'föo_bär' => '',
+            "Bar" => array(1,2,3)
+        );
+        $expected = '<?xml version="1.0"?>'."\n".
+            '<response>'.
+            '<foo-bar id="1" name="Bar"/>'.
+            '<Foo Type="test"><Bar><![CDATA[Test]]></Bar></Foo>'.
+            '<föo_bär><![CDATA[]]></föo_bär>'.
+            '<Bar>1</Bar>'.
+            '<Bar>2</Bar>'.
+            '<Bar>3</Bar>'.
+            '</response>'."\n";
+        $this->assertEquals($expected, $this->encoder->encode($obj, 'xml'));
+    }
+
     public function testElementNameValid()
     {
         $obj = new ScalarDummy;
@@ -112,8 +139,9 @@ class XmlEncoderTest extends \PHPUnit_Framework_TestCase
         return '<?xml version="1.0"?>'."\n".
             '<response>'.
             '<foo><![CDATA[foo]]></foo>'.
-            '<bar><item key="0"><![CDATA[a]]></item><item key="1"><![CDATA[b]]></item></bar>'.
-            '<baz><key><![CDATA[val]]></key><key2><![CDATA[val]]></key2><item key="A B"><![CDATA[bar]]></item></baz>'.
+            '<bar><![CDATA[a]]></bar><bar><![CDATA[b]]></bar>'.
+            '<baz><key><![CDATA[val]]></key><key2><![CDATA[val]]></key2><item key="A B"><![CDATA[bar]]></item>'.
+            '<Barry><FooBar id="1"><Baz><![CDATA[Ed]]></Baz></FooBar></Barry></baz>'.
             '<qux>1</qux>'.
             '</response>'."\n";
     }
@@ -123,7 +151,7 @@ class XmlEncoderTest extends \PHPUnit_Framework_TestCase
         $obj = new Dummy;
         $obj->foo = 'foo';
         $obj->bar = array('a', 'b');
-        $obj->baz = array('key' => 'val', 'key2' => 'val', 'A B' => 'bar');
+        $obj->baz = array('key' => 'val', 'key2' => 'val', 'A B' => 'bar', "Barry" => array('FooBar' => array("@id"=>1,"Baz"=>"Ed")));
         $obj->qux = "1";
         return $obj;
     }

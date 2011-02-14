@@ -90,6 +90,11 @@ class XmlEncoder extends AbstractEncoder
         foreach ($node->children() as $key => $subnode) {
             if ($subnode->count()) {
                 $value = $this->parseXml($subnode);
+                if ($subnode->attributes()) {
+                    foreach ($subnode->attributes() as $attrkey => $attr) {
+                        $value['@'.$attrkey] = (string) $attr;
+                    }
+                }
             } else {
                 $value = (string) $subnode;
             }
@@ -102,6 +107,11 @@ class XmlEncoder extends AbstractEncoder
                     $data[] = $tmp;
                     $data[] = $value;
                 }
+            } elseif (key_exists($key, $data)) {
+                if (false === is_array($data[$key])) {
+                    $data[$key] = array($data[$key]);
+                }
+                $data[$key][] = $value;
             } else {
                 $data[$key] = $value;
             }
@@ -122,8 +132,25 @@ class XmlEncoder extends AbstractEncoder
 
         if (is_array($data) || $data instanceof \Traversable) {
             foreach ($data as $key => $data) {
-                if (is_array($data) && false === is_numeric($key)) {
-                    $append = $this->appendNode($parentNode, $data, $key);
+                //Ah this is the magic @ attribute types.
+                if (strpos($key,"@")===0 && is_scalar($data) && $this->isElementNameValid($attributeName = substr($key,1))) {
+                    $parentNode->setAttribute($attributeName, $data);
+                } elseif (is_array($data) && false === is_numeric($key)) {
+                    /**
+                    * Is this array fully numeric keys?
+                    */
+                    if (ctype_digit( implode('', array_keys($data) ) )) {
+                        /**
+                        * Create nodes to append to $parentNode based on the $key of this array
+                        * Produces <xml><item>0</item><item>1</item></xml>
+                        * From array("item" => array(0,1));
+                        */
+                        foreach ($data as $subData) {
+                            $append = $this->appendNode($parentNode, $subData, $key);
+                        }
+                    } else {
+                        $append = $this->appendNode($parentNode, $data, $key);
+                    }
                 } elseif (is_numeric($key) || !$this->isElementNameValid($key)) {
                     $append = $this->appendNode($parentNode, $data, "item", $key);
                 } else {
@@ -194,7 +221,7 @@ class XmlEncoder extends AbstractEncoder
             return $this->appendCData($node, $val);
         } elseif (is_bool($val)) {
             return $this->appendText($node, (int) $val);
-        } elseif ($val instanceof \DOMNode){
+        } elseif ($val instanceof \DOMNode) {
             $child = $this->dom->importNode($val, true);
             $node->appendChild($child);
         }

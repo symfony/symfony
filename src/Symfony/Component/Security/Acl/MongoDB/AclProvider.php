@@ -380,7 +380,7 @@ class AclProvider implements AclProviderInterface
                     $objectIdentity   = $oid[$aclId];
                     $classType        = $objectIdentity['type'];
                     $objectIdentifier = $objectIdentity['identifier'];
-                    $fieldName        = $entry['fieldName'];
+                    $fieldName        = isset($entry['fieldName']) ? $entry['fieldName'] : null;
                     $aceOrder         = $entry['aceOrder'];
                     $grantingStrategy = $entry['grantingStrategy'];
                     $mask             = (integer)$entry['mask'];

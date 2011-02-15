@@ -32,7 +32,7 @@ class Configuration
     public function getConfigTree()
     {
         $treeBuilder = new TreeBuilder();
-        $rootNode = $treeBuilder->root('swiftmailer:config', 'array');
+        $rootNode = $treeBuilder->root('swiftmailer', 'array');
 
         $rootNode
             ->scalarNode('transport')

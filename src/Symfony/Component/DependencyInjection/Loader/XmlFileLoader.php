@@ -101,7 +101,10 @@ class XmlFileLoader extends FileLoader
      */
     protected function parseImports(SimpleXMLElement $xml, $file)
     {
-        $imports = $xml->xpath('//container:imports/container:import');
+        if (false === $imports = $xml->xpath('//container:imports/container:import')) {
+            return;
+        }
+
         foreach ($imports as $import) {
             $this->currentDir = dirname($file);
             $this->import((string) $import['resource'], (Boolean) $import->getAttributeAsPhp('ignore-errors'));
@@ -151,7 +154,10 @@ class XmlFileLoader extends FileLoader
      */
     protected function parseDefinitions(SimpleXMLElement $xml, $file)
     {
-        $services = $xml->xpath('//container:services/container:service');
+        if (false === $services = $xml->xpath('//container:services/container:service')) {
+            return;
+        }
+
         foreach ($services as $service) {
             $this->parseDefinition((string) $service['id'], $service, $file);
         }
@@ -264,7 +270,9 @@ class XmlFileLoader extends FileLoader
         $count = 0;
 
         // anonymous services as arguments
-        $nodes = $xml->xpath('//container:argument[@type="service"][not(@id)]');
+        if (false === $nodes = $xml->xpath('//container:argument[@type="service"][not(@id)]')) {
+            return;
+        }
         foreach ($nodes as $node) {
             // give it a unique name
             $node['id'] = sprintf('%s_%d', md5($file), ++$count);
@@ -274,7 +282,9 @@ class XmlFileLoader extends FileLoader
         }
 
         // anonymous services "in the wild"
-        $nodes = $xml->xpath('//container:services/container:service[not(@id)]');
+        if (false === $nodes = $xml->xpath('//container:services/container:service[not(@id)]')) {
+            return;
+        }
         foreach ($nodes as $node) {
             // give it a unique name
             $node['id'] = sprintf('%s_%d', md5($file), ++$count);

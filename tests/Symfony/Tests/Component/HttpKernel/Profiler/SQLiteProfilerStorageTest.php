@@ -11,9 +11,9 @@
 
 namespace Symfony\Tests\Component\HttpKernel\Profiler;
 
-use Symfony\Component\HttpKernel\Profiler\SQLiteProfilerStorage;
+use Symfony\Component\HttpKernel\Profiler\SqliteProfilerStorage;
 
-class SQLiteProfilerStorageTest extends \PHPUnit_Framework_TestCase
+class SqliteProfilerStorageTest extends \PHPUnit_Framework_TestCase
 {
     protected static $dbFile;
     protected static $storage;
@@ -24,7 +24,7 @@ class SQLiteProfilerStorageTest extends \PHPUnit_Framework_TestCase
         if (file_exists(self::$dbFile)) {
             @unlink(self::$dbFile);
         }
-        self::$storage = new SQLiteProfilerStorage(self::$dbFile);
+        self::$storage = new SqliteProfilerStorage(self::$dbFile);
     }
 
     public static function tearDownAfterClass()

@@ -12,7 +12,7 @@
 namespace Symfony\Tests\Component\HttpKernel\Profiler;
 
 use Symfony\Component\HttpKernel\DataCollector\RequestDataCollector;
-use Symfony\Component\HttpKernel\Profiler\SQLiteProfilerStorage;
+use Symfony\Component\HttpKernel\Profiler\SqliteProfilerStorage;
 use Symfony\Component\HttpKernel\Profiler\Profiler;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
@@ -30,7 +30,7 @@ class ProfilerTest extends \PHPUnit_Framework_TestCase
         if (file_exists($tmp)) {
             @unlink($tmp);
         }
-        $storage = new SQLiteProfilerStorage($tmp);
+        $storage = new SqliteProfilerStorage($tmp);
         $storage->purge();
 
         $profiler = new Profiler($storage);

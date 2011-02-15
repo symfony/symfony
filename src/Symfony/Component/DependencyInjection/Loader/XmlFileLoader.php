@@ -271,7 +271,7 @@ class XmlFileLoader extends FileLoader
 
         // anonymous services as arguments
         if (false === $nodes = $xml->xpath('//container:argument[@type="service"][not(@id)]')) {
-            return;
+            return $xml;
         }
         foreach ($nodes as $node) {
             // give it a unique name
@@ -283,7 +283,7 @@ class XmlFileLoader extends FileLoader
 
         // anonymous services "in the wild"
         if (false === $nodes = $xml->xpath('//container:services/container:service[not(@id)]')) {
-            return;
+            return $xml;
         }
         foreach ($nodes as $node) {
             // give it a unique name

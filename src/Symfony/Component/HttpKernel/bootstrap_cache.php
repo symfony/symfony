@@ -128,7 +128,7 @@ abstract class Kernel implements KernelInterface
     public function getBundle($name, $first = true)
     {
         if (!isset($this->bundleMap[$name])) {
-            throw new \InvalidArgumentException(sprintf('Bundle "%s" does not exist or it is not enabled.', $name));
+            throw new \InvalidArgumentException(sprintf('Bundle "%s" does not exist or it is not enabled. Maybe you forgot to add it in the registerBundles() function of your %s.php file?', $name, get_class($this)));
         }
         if (true === $first) {
             return $this->bundleMap[$name][0];
@@ -1975,7 +1975,7 @@ class ResponseHeaderBag extends HeaderBag
     }
     public function clearCookie($name, $path = null, $domain = null)
     {
-        $this->setCookie(new Cookie($name, null, time() - 86400, $path, $domain));
+        $this->setCookie(new Cookie($name, null, 1, $path, $domain));
     }
     protected function computeCacheControlValue()
     {

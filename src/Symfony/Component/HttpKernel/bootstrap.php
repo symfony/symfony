@@ -392,7 +392,7 @@ class HttpKernel implements HttpKernelInterface
             return $this->filterResponse($response, $request, 'A "core.request" listener returned a non response object.', $type);
         }
                 if (false === $controller = $this->resolver->getController($request)) {
-            throw new NotFoundHttpException(sprintf('Unable to find the controller for "%s", check your route configuration.', $request->getPathInfo()));
+            throw new NotFoundHttpException(sprintf('Unable to find the controller for path "%s". Maybe you forgot to add the matching route in your routing configuration?', $request->getPathInfo()));
         }
         $event = new Event($this, 'core.controller', array('request_type' => $type, 'request' => $request));
         $controller = $this->dispatcher->filter($event, $controller);
@@ -566,7 +566,7 @@ abstract class Kernel implements KernelInterface
     public function getBundle($name, $first = true)
     {
         if (!isset($this->bundleMap[$name])) {
-            throw new \InvalidArgumentException(sprintf('Bundle "%s" does not exist or it is not enabled.', $name));
+            throw new \InvalidArgumentException(sprintf('Bundle "%s" does not exist or it is not enabled. Maybe you forgot to add it in the registerBundles() function of your %s.php file?', $name, get_class($this)));
         }
         if (true === $first) {
             return $this->bundleMap[$name][0];
@@ -1966,7 +1966,7 @@ class ConfigCache
     }
     public function __toString()
     {
-        return $this->cacheDir.'/'.$this->file.'.php';
+        return $this->getCacheFile();
     }
     public function isFresh()
     {

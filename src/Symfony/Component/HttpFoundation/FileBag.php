@@ -30,10 +30,6 @@ class FileBag extends ParameterBag
      */
     public function __construct(array $parameters = array())
     {
-        // this line is not necessary, but including it avoids any stupid
-        // errors if we add code to the parent's constructor
-        parent::__construct();
-
         $this->replace($parameters);
     }
 

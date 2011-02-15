@@ -27,11 +27,11 @@ class ResponseHeaderBag extends HeaderBag
      */
     public function __construct(array $headers = array())
     {
-        // this line is not necessary, but including it avoids any stupid
-        // errors if we add code to the parent's constructor
-        parent::__construct();
+        parent::__construct($headers);
 
-        $this->replace($headers);
+        if (!isset($this->headers['cache-control'])) {
+            $this->set('cache-control', '');
+        }
     }
 
     /**

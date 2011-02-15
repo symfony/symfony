@@ -330,9 +330,9 @@ class MutableAclProviderTest extends \PHPUnit_Framework_TestCase
     {
         $provider = $this->getProvider();
         $securityIdentity1 = new RoleSecurityIdentity('ROLE_FOO');
-        $sid1 = (string)$this->callMethod($provider, 'insertSecurityIdentity', $securityIdentity1);
+        $sid1 = (string)$this->callMethod($provider, 'insertSecurityIdentity', (array)$securityIdentity1);
         $securityIdentity2 = new RoleSecurityIdentity('ROLE_FOO');
-        $sid2 = (string)$this->callMethod($provider, 'insertSecurityIdentity', $securityIdentity2);
+        $sid2 = (string)$this->callMethod($provider, 'insertSecurityIdentity', (array)$securityIdentity2);
         $this->assertEquals($sid1, $sid2, 'insertSecurityIdentity should not create a second document');
     }
 

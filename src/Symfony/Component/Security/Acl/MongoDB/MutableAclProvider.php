@@ -459,8 +459,8 @@ class MutableAclProvider extends AclProvider implements MutableAclProviderInterf
         }
 
         $criteria = array(
-            'identitifer' => $identifier,
-            'username'    => $username,
+            'identifier' => $identifier,
+            'username'   => $username,
         );
         $result = $this->connection->selectCollection($this->options['sid_table_name'])->findOne($criteria);
         if (isset($result)) {

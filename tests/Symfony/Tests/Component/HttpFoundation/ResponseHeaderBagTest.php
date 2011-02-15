@@ -17,36 +17,36 @@ class ResponseHeaderBagTest extends \PHPUnit_Framework_TestCase
 {
     public function testCacheControlHeader()
     {
-        $bag = new ResponseHeaderBag(array(), 'response');
+        $bag = new ResponseHeaderBag(array());
         $this->assertEquals('no-cache', $bag->get('Cache-Control'));
         $this->assertTrue($bag->hasCacheControlDirective('no-cache'));
 
-        $bag = new ResponseHeaderBag(array('Cache-Control' => 'public'), 'response');
+        $bag = new ResponseHeaderBag(array('Cache-Control' => 'public'));
         $this->assertEquals('public', $bag->get('Cache-Control'));
         $this->assertTrue($bag->hasCacheControlDirective('public'));
 
-        $bag = new ResponseHeaderBag(array('ETag' => 'abcde'), 'response');
+        $bag = new ResponseHeaderBag(array('ETag' => 'abcde'));
         $this->assertEquals('private, max-age=0, must-revalidate', $bag->get('Cache-Control'));
         $this->assertTrue($bag->hasCacheControlDirective('private'));
         $this->assertTrue($bag->hasCacheControlDirective('must-revalidate'));
         $this->assertEquals(0, $bag->getCacheControlDirective('max-age'));
 
-        $bag = new ResponseHeaderBag(array('Last-Modified' => 'abcde'), 'response');
+        $bag = new ResponseHeaderBag(array('Last-Modified' => 'abcde'));
         $this->assertEquals('private, max-age=0, must-revalidate', $bag->get('Cache-Control'));
 
-        $bag = new ResponseHeaderBag(array('Etag' => 'abcde', 'Last-Modified' => 'abcde'), 'response');
+        $bag = new ResponseHeaderBag(array('Etag' => 'abcde', 'Last-Modified' => 'abcde'));
         $this->assertEquals('private, max-age=0, must-revalidate', $bag->get('Cache-Control'));
 
-        $bag = new ResponseHeaderBag(array('cache-control' => 'max-age=100'), 'response');
+        $bag = new ResponseHeaderBag(array('cache-control' => 'max-age=100'));
         $this->assertEquals('max-age=100, private', $bag->get('Cache-Control'));
 
-        $bag = new ResponseHeaderBag(array('cache-control' => 's-maxage=100'), 'response');
+        $bag = new ResponseHeaderBag(array('cache-control' => 's-maxage=100'));
         $this->assertEquals('s-maxage=100', $bag->get('Cache-Control'));
 
-        $bag = new ResponseHeaderBag(array('cache-control' => 'private, max-age=100'), 'response');
+        $bag = new ResponseHeaderBag(array('cache-control' => 'private, max-age=100'));
         $this->assertEquals('max-age=100, private', $bag->get('Cache-Control'));
 
-        $bag = new ResponseHeaderBag(array('cache-control' => 'public, max-age=100'), 'response');
+        $bag = new ResponseHeaderBag(array('cache-control' => 'public, max-age=100'));
         $this->assertEquals('max-age=100, public', $bag->get('Cache-Control'));
     }
 }

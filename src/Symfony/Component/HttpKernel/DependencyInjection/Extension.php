@@ -63,4 +63,19 @@ abstract class Extension extends BaseExtension
     {
         $this->classMap = array_merge($this->classMap, $classes);
     }
+
+    /**
+     * Returns the base path for the XSD files.
+     *
+     * @return string The XSD base path
+     */
+    public function getXsdValidationBasePath()
+    {
+        return false;
+    }
+
+    public function getNamespace()
+    {
+        return false;
+    }
 }

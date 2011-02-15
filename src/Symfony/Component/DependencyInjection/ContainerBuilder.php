@@ -54,7 +54,11 @@ class ContainerBuilder extends Container implements TaggedContainerInterface
      */
     static public function registerExtension(ExtensionInterface $extension)
     {
-        static::$extensions[$extension->getAlias()] = static::$extensions[$extension->getNamespace()] = $extension;
+        static::$extensions[$extension->getAlias()] = $extension;
+
+        if (false !== $extension->getNamespace()) {
+            static::$extensions[$extension->getNamespace()] = $extension;
+        }
     }
 
     /**

@@ -13,6 +13,7 @@ namespace Symfony\Component\HttpKernel\Bundle;
 
 use Symfony\Component\DependencyInjection\ContainerAware;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
+use Symfony\Component\DependencyInjection\Container;
 use Symfony\Component\Console\Application;
 use Symfony\Component\Finder\Finder;
 
@@ -39,6 +40,37 @@ abstract class Bundle extends ContainerAware implements BundleInterface
      */
     public function shutdown()
     {
+    }
+
+    /**
+     * Builds the bundle.
+     *
+     * It is only ever called once when the cache is empty.
+     *
+     * The default implementation automatically registers a DIC extension
+     * if its name is the same as the bundle name after replacing the
+     * Bundle suffix by Extension (DependencyInjection\SensioBlogExtension
+     * for a SensioBlogBundle for instance). In such a case, the alias
+     * is forced to be the underscore version of the bundle name
+     * (sensio_blog for a SensioBlogBundle for instance).
+     *
+     * This method can be overriden to register compilation passes,
+     * other extensions, ...
+     *
+     * @param ContainerBuilder $container A ContainerBuilder instance
+     */
+    public function build(ContainerBuilder $container)
+    {
+        $class = $this->getNamespace().'\\DependencyInjection\\'.str_replace('Bundle', 'Extension', $this->getName());
+        if (class_exists($class)) {
+            $extension = new $class();
+            $alias = Container::underscore(str_replace('Bundle', '', $this->getName()));
+            if ($alias !== $extension->getAlias()) {
+                throw new \LogicException(sprintf('The extension alias for the default extension of a bundle must be the underscored version of the bundle name ("%s" vs "%s")', $alias, $extension->getAlias()));
+            }
+
+            $container->registerExtension($extension);
+        }
     }
 
     /**
@@ -94,33 +126,6 @@ abstract class Bundle extends ContainerAware implements BundleInterface
         $pos = strrpos($name, '\\');
 
         return $this->name = false === $pos ? $name :  substr($name, $pos + 1);
-    }
-
-    /**
-     * Finds and registers Dependency Injection Container extensions.
-     *
-     * Override this method if your DIC extensions do not follow the conventions:
-     *
-     * * Extensions are in the 'DependencyInjection/' sub-directory
-     * * Extension class names ends with 'Extension'
-     *
-     * @param ContainerBuilder $container A ContainerBuilder instance
-     */
-    public function registerExtensions(ContainerBuilder $container)
-    {
-        if (!$dir = realpath($this->getPath().'/DependencyInjection')) {
-            return;
-        }
-
-        $finder = new Finder();
-        $finder->files()->name('*Extension.php')->in($dir);
-
-        $prefix = $this->getNamespace().'\\DependencyInjection';
-        foreach ($finder as $file) {
-            $class = $prefix.strtr($file->getPath(), array($dir => '', '/' => '\\')).'\\'.$file->getBasename('.php');
-
-            $container->registerExtension(new $class());
-        }
     }
 
     /**

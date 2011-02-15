@@ -64,9 +64,9 @@ class FrameworkBundle extends Bundle
         }
     }
 
-    public function registerExtensions(ContainerBuilder $container)
+    public function build(ContainerBuilder $container)
     {
-        parent::registerExtensions($container);
+        parent::build($container);
 
         $container->addScope(new Scope('request'));
 

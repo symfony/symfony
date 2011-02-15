@@ -22,9 +22,9 @@ use Symfony\Bundle\ZendBundle\DependencyInjection\Compiler\ZendLoggerWriterPass;
  */
 class ZendBundle extends Bundle
 {
-    public function registerExtensions(ContainerBuilder $container)
+    public function build(ContainerBuilder $container)
     {
-        parent::registerExtensions($container);
+        parent::build($container);
 
         $container->addCompilerPass(new ZendLoggerWriterPass());
     }

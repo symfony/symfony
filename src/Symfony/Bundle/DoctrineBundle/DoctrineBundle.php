@@ -25,9 +25,9 @@ use Symfony\Component\HttpKernel\Bundle\Bundle;
  */
 class DoctrineBundle extends Bundle
 {
-    public function registerExtensions(ContainerBuilder $container)
+    public function build(ContainerBuilder $container)
     {
-        parent::registerExtensions($container);
+        parent::build($container);
 
         $container->addCompilerPass(new RegisterEventListenersAndSubscribersPass(), PassConfig::TYPE_BEFORE_OPTIMIZATION);
     }

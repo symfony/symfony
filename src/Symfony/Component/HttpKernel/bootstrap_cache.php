@@ -289,7 +289,7 @@ abstract class Kernel implements KernelInterface
         $parameterBag = new ParameterBag($this->getKernelParameters());
         $container = new ContainerBuilder($parameterBag);
         foreach ($this->bundles as $bundle) {
-            $bundle->registerExtensions($container);
+            $bundle->build($container);
             if ($this->debug) {
                 $container->addObjectResource($bundle);
             }

@@ -24,9 +24,9 @@ use Symfony\Component\HttpKernel\Bundle\Bundle;
  */
 class AsseticBundle extends Bundle
 {
-    public function registerExtensions(ContainerBuilder $container)
+    public function build(ContainerBuilder $container)
     {
-        parent::registerExtensions($container);
+        parent::build($container);
 
         $container->addCompilerPass(new AssetManagerPass());
         $container->addCompilerPass(new FilterManagerPass());

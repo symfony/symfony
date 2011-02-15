@@ -11,6 +11,8 @@
 
 namespace Symfony\Component\HttpKernel\Bundle;
 
+use Symfony\Component\DependencyInjection\ContainerBuilder;
+
 /**
  * BundleInterface.
  *
@@ -27,6 +29,15 @@ interface BundleInterface
      * Shutdowns the Bundle.
      */
     function shutdown();
+
+    /**
+     * Builds the bundle.
+     *
+     * It is only ever called once when the cache is empty.
+     *
+     * @param ContainerBuilder $container A ContainerBuilder instance
+     */
+    public function build(ContainerBuilder $container);
 
     /**
      * Returns the bundle parent name.

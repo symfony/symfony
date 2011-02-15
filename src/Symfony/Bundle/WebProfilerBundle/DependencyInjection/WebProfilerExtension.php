@@ -85,6 +85,6 @@ class WebProfilerExtension extends Extension
 
     public function getAlias()
     {
-        return 'webprofiler';
+        return 'web_profiler';
     }
 }

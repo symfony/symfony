@@ -506,6 +506,6 @@ class FrameworkExtension extends Extension
 
     public function getAlias()
     {
-        return 'app';
+        return 'framework';
     }
 }

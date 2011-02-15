@@ -402,6 +402,6 @@ class DoctrineMongoDBExtension extends AbstractDoctrineExtension
      */
     public function getAlias()
     {
-        return 'doctrine_odm';
+        return 'doctrine_mongo_db';
     }
 }

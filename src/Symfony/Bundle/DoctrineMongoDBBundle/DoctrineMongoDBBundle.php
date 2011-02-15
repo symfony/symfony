@@ -27,9 +27,9 @@ use Symfony\Bundle\DoctrineMongoDBBundle\DependencyInjection\Compiler\RegisterEv
  */
 class DoctrineMongoDBBundle extends Bundle
 {
-    public function registerExtensions(ContainerBuilder $container)
+    public function build(ContainerBuilder $container)
     {
-        parent::registerExtensions($container);
+        parent::build($container);
 
         $container->addCompilerPass(new RegisterEventListenersAndSubscribersPass(), PassConfig::TYPE_BEFORE_OPTIMIZATION);
         $container->addCompilerPass(new CreateProxyDirectoryPass(), PassConfig::TYPE_BEFORE_REMOVING);

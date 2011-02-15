@@ -1,4 +1,4 @@
-app.config:
+framework:
     charset:       UTF-8
     error_handler: null
     csrf_protection:
@@ -12,10 +12,10 @@ app.config:
         lifetime:       3600
         auto_start:     false
 
-twig.config:
+twig:
     debug:            %kernel.debug%
     strict_variables: %kernel.debug%
 
-assetic.config:
+assetic:
     use_controller: true
     document_root:  "%kernel.root_dir%/web"

@@ -1,11 +1,12 @@
-doctrine.orm:
-  mappings:
-    AnnotationsBundle: ~
-    YamlBundle:
-      dir: Resources/config/doctrine/metadata
-      alias: yml
-    manual:
-      type: xml
-      prefix: Fixtures\Bundles\XmlBundle
-      dir: %kernel.root_dir%/../src/Symfony/Bundle/DoctrineBundle/Tests/DependencyInjection/Fixtures/Bundles/XmlBundle/Resources/config/doctrine/metadata
-      alias: TestAlias
+doctrine:
+    orm:
+        mappings:
+            AnnotationsBundle: ~
+            YamlBundle:
+                dir: Resources/config/doctrine/metadata
+                alias: yml
+            manual:
+                type: xml
+                prefix: Fixtures\Bundles\XmlBundle
+                dir: %kernel.root_dir%/../src/Symfony/Bundle/DoctrineBundle/Tests/DependencyInjection/Fixtures/Bundles/XmlBundle/Resources/config/doctrine/metadata
+                alias: TestAlias

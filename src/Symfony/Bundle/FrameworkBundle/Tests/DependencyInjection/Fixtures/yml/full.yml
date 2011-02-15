@@ -1,4 +1,4 @@
-app.config:
+framework:
     csrf_protection:
         enabled:    true
         field_name: _csrf

@@ -5,6 +5,15 @@
     targetNamespace="http://www.symfony-project.org/schema/dic/doctrine"
     elementFormDefault="qualified">
 
+    <xsd:element name="config">
+        <xsd:complexType>
+            <xsd:all>
+                <xsd:element name="dbal" type="dbal" minOccurs="0" maxOccurs="1" />
+                <xsd:element name="orm" type="orm" minOccurs="0" maxOccurs="1" />
+            </xsd:all>
+        </xsd:complexType>
+    </xsd:element>
+
     <xsd:attributeGroup name="connection-config">
         <xsd:attribute name="dbname" type="xsd:string" />
         <xsd:attribute name="host" type="xsd:string" />
@@ -22,8 +31,6 @@
         <xsd:attribute name="platform-service" type="xsd:string" />
         <xsd:attribute name="logging" type="xsd:string" default="false" />
     </xsd:attributeGroup>
-
-    <xsd:element name="dbal" type="dbal" />
 
     <xsd:complexType name="dbal">
         <xsd:all>
@@ -57,8 +64,6 @@
         <xsd:attributeGroup ref="connection-config" />
     </xsd:complexType>
 
-    <xsd:element name="orm" type="orm" />
-
     <xsd:complexType name="mapping">
         <xsd:attribute name="name" type="xsd:string" use="required" />
         <xsd:attribute name="type" type="xsd:string" />
@@ -78,6 +83,7 @@
         <xsd:all>
             <xsd:element name="entity-managers" type="entity_managers" minOccurs="0" maxOccurs="1" />
             <xsd:element name="mappings" type="mappings" minOccurs="0" maxOccurs="1" />
+            <xsd:element name="metadata-cache-driver" type="metadata_cache_driver" minOccurs="0" maxOccurs="1" />
         </xsd:all>
 
         <xsd:attribute name="default-entity-manager" type="xsd:string" />
@@ -89,6 +95,17 @@
         <xsd:attribute name="query-cache-driver" type="xsd:string" />
     </xsd:complexType>
 
+    <xsd:complexType name="metadata_cache_driver">
+        <xsd:all>
+            <xsd:element name="class" type="xsd:string" minOccurs="0" maxOccurs="1" />
+            <xsd:element name="host" type="xsd:string" minOccurs="0" maxOccurs="1" />
+            <xsd:element name="port" type="xsd:string" minOccurs="0" maxOccurs="1" />
+            <xsd:element name="instance-class" type="xsd:string" minOccurs="0" maxOccurs="1" />
+        </xsd:all>
+
+        <xsd:attribute name="type" type="xsd:string" />
+    </xsd:complexType>
+
     <xsd:complexType name="entity_managers">
         <xsd:choice minOccurs="1" maxOccurs="unbounded">
             <xsd:element name="entity-manager" type="entity_manager" />
@@ -98,6 +115,7 @@
     <xsd:complexType name="entity_manager">
         <xsd:all>
             <xsd:element name="mappings" type="mappings" minOccurs="0" maxOccurs="1" />
+            <xsd:element name="metadata-cache-driver" type="metadata_cache_driver" minOccurs="0" maxOccurs="1" />
         </xsd:all>
 
         <xsd:attribute name="connection" type="xsd:string" />

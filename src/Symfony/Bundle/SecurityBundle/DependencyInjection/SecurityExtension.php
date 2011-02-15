@@ -47,18 +47,13 @@ class SecurityExtension extends Extension
 
     public function load(array $configs, ContainerBuilder $container)
     {
-        foreach ($configs as $config) {
-            if (isset($config['acl'])) {
-                $this->doAclLoad($this->normalizeKeys($config['acl']), $container);
-                unset($config['acl']);
-            }
+        $this->aclLoad($configs, $container);
 
-            $this->doConfigLoad($this->normalizeKeys($config), $container);
+        $tmp = array_filter($configs);
+        if (empty($tmp)) {
+            return;
         }
-    }
 
-    public function doConfigLoad(array $configs, ContainerBuilder $container)
-    {
         $processor = new Processor();
 
         // first assemble the factories
@@ -90,7 +85,7 @@ class SecurityExtension extends Extension
         }
     }
 
-    public function doAclLoad(array $configs, ContainerBuilder $container)
+    protected function aclLoad(array $configs, ContainerBuilder $container)
     {
         $processor = new Processor();
         $config = $processor->process($this->configuration->getAclConfigTree(), $configs);

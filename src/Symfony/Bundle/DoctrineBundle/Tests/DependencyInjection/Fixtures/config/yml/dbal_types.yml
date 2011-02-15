@@ -1,3 +1,4 @@
-doctrine.dbal:
-  types:
-    test: Symfony\Bundle\DoctrineBundle\Tests\DependencyInjection\TestType
+doctrine:
+    dbal:
+        types:
+            test: Symfony\Bundle\DoctrineBundle\Tests\DependencyInjection\TestType

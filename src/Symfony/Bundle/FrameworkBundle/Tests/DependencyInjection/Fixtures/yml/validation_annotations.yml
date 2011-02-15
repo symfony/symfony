@@ -1,4 +1,4 @@
-app.config:
+framework:
     validation:
         enabled:     true
         annotations:

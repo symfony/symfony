@@ -1,6 +1,6 @@
 <?php
 
-$container->loadFromExtension('security', 'config', array(
+$container->loadFromExtension('security', array(
     'firewalls' => array(
         'main' => array(
             'form_login' => array(

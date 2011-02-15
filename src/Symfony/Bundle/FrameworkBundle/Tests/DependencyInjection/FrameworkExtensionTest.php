@@ -63,7 +63,7 @@ abstract class FrameworkExtensionTest extends TestCase
     {
         $container = $this->createContainer();
         $loader = new FrameworkExtension();
-        $loader->configLoad(array(array('router' => true)), $container);
+        $loader->load(array(array('router' => true)), $container);
     }
 
     public function testSession()
@@ -138,7 +138,7 @@ abstract class FrameworkExtensionTest extends TestCase
     {
         $container = $this->createContainer();
         $loader = new FrameworkExtension();
-        $loader->configLoad(array(array('templating' => null)), $container);
+        $loader->load(array(array('templating' => null)), $container);
     }
 
     public function testValidation()
@@ -187,6 +187,7 @@ abstract class FrameworkExtensionTest extends TestCase
 
     protected function createContainerFromFile($file)
     {
+        ContainerBuilder::clearExtensions();
         $container = $this->createContainer();
         $container->registerExtension(new FrameworkExtension());
         $this->loadFromFile($container, $file);

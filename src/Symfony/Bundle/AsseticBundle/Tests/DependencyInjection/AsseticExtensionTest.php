@@ -50,10 +50,10 @@ class AsseticExtensionTest extends \PHPUnit_Framework_TestCase
         $this->container->setParameter('kernel.debug', $debug);
 
         $extension = new AsseticExtension();
-        $extension->configLoad(array(), $this->container);
+        $extension->load(array(array()), $this->container);
 
-        $this->assertFalse($this->container->has('assetic.filter.yui_css'), '->configLoad() does not load the yui_css filter when a yui value is not provided');
-        $this->assertFalse($this->container->has('assetic.filter.yui_js'), '->configLoad() does not load the yui_js filter when a yui value is not provided');
+        $this->assertFalse($this->container->has('assetic.filter.yui_css'), '->load() does not load the yui_css filter when a yui value is not provided');
+        $this->assertFalse($this->container->has('assetic.filter.yui_js'), '->load() does not load the yui_js filter when a yui value is not provided');
 
         // sanity check
         $container = $this->getDumpedContainer();
@@ -73,10 +73,10 @@ class AsseticExtensionTest extends \PHPUnit_Framework_TestCase
     public function testYuiConfig()
     {
         $extension = new AsseticExtension();
-        $extension->configLoad(array(array('yui' => '/path/to/yuicompressor.jar')), $this->container);
+        $extension->load(array(array('yui' => '/path/to/yuicompressor.jar')), $this->container);
 
-        $this->assertTrue($this->container->has('assetic.filter.yui_css'), '->configLoad() loads the yui_css filter when a yui value is provided');
-        $this->assertTrue($this->container->has('assetic.filter.yui_js'), '->configLoad() loads the yui_js filter when a yui value is provided');
+        $this->assertTrue($this->container->has('assetic.filter.yui_css'), '->load() loads the yui_css filter when a yui value is provided');
+        $this->assertTrue($this->container->has('assetic.filter.yui_js'), '->load() loads the yui_js filter when a yui value is provided');
 
         // sanity check
         $container = $this->getDumpedContainer();
@@ -91,7 +91,7 @@ class AsseticExtensionTest extends \PHPUnit_Framework_TestCase
     public function testDocumentRoot($key)
     {
         $extension = new AsseticExtension();
-        $extension->configLoad(array(array($key => '/path/to/web')), $this->container);
+        $extension->load(array(array($key => '/path/to/web')), $this->container);
 
         $this->assertEquals('/path/to/web', $this->container->getParameter('assetic.document_root'), '"'.$key.'" sets document root');
     }
@@ -110,7 +110,7 @@ class AsseticExtensionTest extends \PHPUnit_Framework_TestCase
     public function testUseController($bool, $includes, $omits)
     {
         $extension = new AsseticExtension();
-        $extension->configLoad(array(array('use_controller' => $bool)), $this->container);
+        $extension->load(array(array('use_controller' => $bool)), $this->container);
 
         foreach ($includes as $id) {
             $this->assertTrue($this->container->has($id), '"'.$id.'" is registered when use_controller is '.$bool);

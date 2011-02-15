@@ -18,18 +18,18 @@ use Symfony\Component\DependencyInjection\Reference;
 
 class TwigExtensionTest extends TestCase
 {
-    public function testConfigLoad()
+    public function testLoad()
     {
         $container = new ContainerBuilder();
         $loader = new TwigExtension();
 
-        $loader->configLoad(array(array()), $container);
-        $this->assertEquals('Twig_Environment', $container->getParameter('twig.class'), '->configLoad() loads the twig.xml file if not already loaded');
+        $loader->load(array(array()), $container);
+        $this->assertEquals('Twig_Environment', $container->getParameter('twig.class'), '->load() loads the twig.xml file if not already loaded');
 
-        $loader->configLoad(array(array('charset' => 'ISO-8859-1')), $container);
+        $loader->load(array(array('charset' => 'ISO-8859-1')), $container);
         $options = $container->getParameter('twig.options');
-        $this->assertEquals('ISO-8859-1', $options['charset'], '->configLoad() overrides existing configuration options');
-        $this->assertEquals('%kernel.debug%', $options['debug'], '->configLoad() merges the new values with the old ones');
+        $this->assertEquals('ISO-8859-1', $options['charset'], '->load() overrides existing configuration options');
+        $this->assertEquals('%kernel.debug%', $options['debug'], '->load() merges the new values with the old ones');
     }
 
     public function testConfigGlobals()
@@ -37,7 +37,7 @@ class TwigExtensionTest extends TestCase
         // XML
         $container = new ContainerBuilder();
         $loader = new TwigExtension();
-        $loader->configLoad(array(array('global' => array(
+        $loader->load(array(array('global' => array(
             array('key' => 'foo', 'type' => 'service', 'id' => 'bar'),
             array('key' => 'pi', 'value' => 3.14),
         ))), $container);
@@ -50,7 +50,7 @@ class TwigExtensionTest extends TestCase
         // YAML, PHP
         $container = new ContainerBuilder();
         $loader = new TwigExtension();
-        $loader->configLoad(array(array('globals' => array(
+        $loader->load(array(array('globals' => array(
             'foo' => '@bar',
             'pi'  => 3.14,
         ))), $container);
@@ -67,7 +67,7 @@ class TwigExtensionTest extends TestCase
         $container = new ContainerBuilder();
         $container->register('foo', 'stdClass');
         $loader = new TwigExtension();
-        $loader->configLoad(array(array('extensions' => array(array('id' => 'foo')))), $container);
+        $loader->load(array(array('extensions' => array(array('id' => 'foo')))), $container);
         $config = $container->getDefinition('foo');
         $this->assertEquals(array('twig.extension'), array_keys($config->getTags()));
 
@@ -75,7 +75,7 @@ class TwigExtensionTest extends TestCase
         $container = new ContainerBuilder();
         $container->register('foo', 'stdClass');
         $loader = new TwigExtension();
-        $loader->configLoad(array(array('extensions' => array('foo'))), $container);
+        $loader->load(array(array('extensions' => array('foo'))), $container);
         $config = $container->getDefinition('foo');
         $this->assertEquals(array('twig.extension'), array_keys($config->getTags()));
     }

@@ -1,4 +1,4 @@
-security.config:
+security:
     firewalls:
         main:
             form_login:

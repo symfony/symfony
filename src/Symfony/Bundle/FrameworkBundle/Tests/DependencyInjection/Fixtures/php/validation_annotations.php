@@ -1,6 +1,6 @@
 <?php
 
-$container->loadFromExtension('app', 'config', array(
+$container->loadFromExtension('framework', array(
     'validation' => array(
         'enabled'     => true,
         'annotations' => array(

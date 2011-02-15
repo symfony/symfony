@@ -1,6 +1,6 @@
 <?php
 
-$container->loadFromExtension('app', 'config', array(
+$container->loadFromExtension('framework', array(
     'session' => array(
         'storage_id'      => 'pdo',
         'pdo.db_table'    => 'table',

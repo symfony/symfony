@@ -1,4 +1,4 @@
-doctrine_odm.mongodb:
+doctrine_mongo_db:
   default_document_manager: dm2
   default_connection: conn2
   metadata_cache_driver: apc

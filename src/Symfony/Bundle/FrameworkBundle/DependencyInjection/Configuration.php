@@ -21,7 +21,7 @@ class Configuration
     public function getConfigTree($kernelDebug)
     {
         $treeBuilder = new TreeBuilder();
-        $rootNode = $treeBuilder->root('app:config', 'array');
+        $rootNode = $treeBuilder->root('framework', 'array');
 
         $rootNode
             ->scalarNode('cache_warmer')->defaultValue(!$kernelDebug)->end()

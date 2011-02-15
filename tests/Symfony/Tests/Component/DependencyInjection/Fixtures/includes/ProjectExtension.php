@@ -6,8 +6,10 @@ use Symfony\Component\DependencyInjection\Extension\Extension;
 
 class ProjectExtension extends Extension
 {
-    public function barLoad(array $config, ContainerBuilder $configuration)
+    public function load(array $configs, ContainerBuilder $configuration)
     {
+        $config = call_user_func_array('array_merge', $configs);
+
         $configuration->setDefinition('project.service.bar', new Definition('FooClass'));
         $configuration->setParameter('project.parameter.bar', isset($config['foo']) ? $config['foo'] : 'foobar');
 

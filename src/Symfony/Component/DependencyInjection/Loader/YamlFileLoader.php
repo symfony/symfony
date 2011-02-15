@@ -286,7 +286,7 @@ class YamlFileLoader extends FileLoader
             }
 
             if (!$this->container->hasExtension($namespace)) {
-                throw new \InvalidArgumentException(sprintf('There is no extension able to load the configuration for "%s" (in %s).', $key, $file));
+                throw new \InvalidArgumentException(sprintf('There is no extension able to load the configuration for "%s" (in %s).', $namespace, $file));
             }
         }
 

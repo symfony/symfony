@@ -1,6 +1,6 @@
 <?php
 
-$container->loadFromExtension('security', 'config', array(
+$container->loadFromExtension('security', array(
     'encoders' => array(
         'JMS\FooBundle\Entity\User1' => 'plaintext',
         'JMS\FooBundle\Entity\User2' => array(

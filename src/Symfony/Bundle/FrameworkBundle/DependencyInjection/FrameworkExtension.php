@@ -30,20 +30,13 @@ use Symfony\Component\Config\FileLocator;
  */
 class FrameworkExtension extends Extension
 {
-    public function load(array $configs, ContainerBuilder $container)
-    {
-        foreach ($configs as $config) {
-            $this->doConfigLoad($config, $container);
-        }
-    }
-
     /**
      * Responds to the app.config configuration parameter.
      *
      * @param array            $configs
      * @param ContainerBuilder $container
      */
-    public function configLoad(array $configs, ContainerBuilder $container)
+    public function load(array $configs, ContainerBuilder $container)
     {
         $loader = new XmlFileLoader($container, new FileLocator(__DIR__.'/../Resources/config'));
 

@@ -30,7 +30,7 @@ use Symfony\Bundle\DoctrineAbstractBundle\DependencyInjection\AbstractDoctrineEx
  */
 class DoctrineMongoDBExtension extends AbstractDoctrineExtension
 {
-    public function mongodbLoad(array $configs, ContainerBuilder $container)
+    public function load(array $configs, ContainerBuilder $container)
     {
         foreach ($configs as $config) {
             $this->doMongodbLoad($config, $container);

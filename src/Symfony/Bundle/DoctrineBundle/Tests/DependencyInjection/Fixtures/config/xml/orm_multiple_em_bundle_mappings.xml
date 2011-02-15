@@ -1,28 +1,29 @@
 <?xml version="1.0" ?>
 
-<container xmlns="http://www.symfony-project.org/schema/dic/services"
+<srv:container xmlns="http://www.symfony-project.org/schema/dic/doctrine"
     xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-    xmlns:doctrine="http://www.symfony-project.org/schema/dic/doctrine"
+    xmlns:srv="http://www.symfony-project.org/schema/dic/services"
     xsi:schemaLocation="http://www.symfony-project.org/schema/dic/services http://www.symfony-project.org/schema/dic/services/services-1.0.xsd
-                        http://www.symfony-project.org/schema/dic/doctrine/orm http://www.symfony-project.org/schema/dic/doctrine/orm/doctrine-1.0.xsd
-                        http://www.symfony-project.org/schema/dic/doctrine/dbal http://www.symfony-project.org/schema/dic/doctrine/dbal/doctrine-1.0.xsd">
+                        http://www.symfony-project.org/schema/dic/doctrine http://www.symfony-project.org/schema/dic/doctrine/doctrine-1.0.xsd">
 
-    <doctrine:orm>
-        <doctrine:entity-managers>
-            <doctrine:entity-manager name="em1">
-                <mappings>
-                    <mapping name="AnnotationsBundle" />
-                </mappings>
-            </doctrine:entity-manager>
-            <doctrine:entity-manager name="em2">
-                <mappings>
-                    <mapping name="YamlBundle" dir="Resources/config/doctrine/metadata" alias="yml" />
-                    <mapping name="manual" type="xml" prefix="Fixtures\Bundles\XmlBundle"
-                        dir="%kernel.root_dir%/../src/Symfony/Bundle/DoctrineBundle/Tests/DependencyInjection/Fixtures/Bundles/XmlBundle/Resources/config/doctrine/metadata"
-                        alias="TestAlias"
-                    />
-                </mappings>
-            </doctrine:entity-manager>
-        </doctrine:entity-managers>
-    </doctrine:orm>
-</container>
+    <config>
+        <orm>
+            <entity-managers>
+                <entity-manager name="em1">
+                    <mappings>
+                        <mapping name="AnnotationsBundle" />
+                    </mappings>
+                </entity-manager>
+                <entity-manager name="em2">
+                    <mappings>
+                        <mapping name="YamlBundle" dir="Resources/config/doctrine/metadata" alias="yml" />
+                        <mapping name="manual" type="xml" prefix="Fixtures\Bundles\XmlBundle"
+                            dir="%kernel.root_dir%/../src/Symfony/Bundle/DoctrineBundle/Tests/DependencyInjection/Fixtures/Bundles/XmlBundle/Resources/config/doctrine/metadata"
+                            alias="TestAlias"
+                        />
+                    </mappings>
+                </entity-manager>
+            </entity-managers>
+        </orm>
+    </config>
+</srv:container>

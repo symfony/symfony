@@ -2,7 +2,7 @@
 
 $this->load('merge_import.php', $container);
 
-$container->loadFromExtension('security', 'config', array(
+$container->loadFromExtension('security', array(
     'providers' => array(
         'default' => array('id' => 'foo'),
     ),

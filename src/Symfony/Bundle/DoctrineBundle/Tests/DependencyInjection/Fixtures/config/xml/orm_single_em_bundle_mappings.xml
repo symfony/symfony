@@ -1,20 +1,21 @@
 <?xml version="1.0" ?>
 
-<container xmlns="http://www.symfony-project.org/schema/dic/services"
+<srv:container xmlns="http://www.symfony-project.org/schema/dic/doctrine"
     xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-    xmlns:doctrine="http://www.symfony-project.org/schema/dic/doctrine"
+    xmlns:srv="http://www.symfony-project.org/schema/dic/services"
     xsi:schemaLocation="http://www.symfony-project.org/schema/dic/services http://www.symfony-project.org/schema/dic/services/services-1.0.xsd
-                        http://www.symfony-project.org/schema/dic/doctrine/orm http://www.symfony-project.org/schema/dic/doctrine/orm/doctrine-1.0.xsd
-                        http://www.symfony-project.org/schema/dic/doctrine/dbal http://www.symfony-project.org/schema/dic/doctrine/dbal/doctrine-1.0.xsd">
+                        http://www.symfony-project.org/schema/dic/doctrine http://www.symfony-project.org/schema/dic/doctrine/doctrine-1.0.xsd">
 
-    <doctrine:orm>
-        <mappings>
-            <mapping name="AnnotationsBundle" />
-            <mapping name="YamlBundle" dir="Resources/config/doctrine/metadata" alias="yml" />
-            <mapping name="manual" type="xml" prefix="Fixtures\Bundles\XmlBundle"
-                dir="%kernel.root_dir%/../src/Symfony/Bundle/DoctrineBundle/Tests/DependencyInjection/Fixtures/Bundles/XmlBundle/Resources/config/doctrine/metadata"
-                alias="TestAlias"
-            />
-        </mappings>
-    </doctrine:orm>
-</container>
+    <config>
+        <orm>
+            <mappings>
+                <mapping name="AnnotationsBundle" />
+                <mapping name="YamlBundle" dir="Resources/config/doctrine/metadata" alias="yml" />
+                <mapping name="manual" type="xml" prefix="Fixtures\Bundles\XmlBundle"
+                    dir="%kernel.root_dir%/../src/Symfony/Bundle/DoctrineBundle/Tests/DependencyInjection/Fixtures/Bundles/XmlBundle/Resources/config/doctrine/metadata"
+                    alias="TestAlias"
+                />
+            </mappings>
+        </orm>
+    </config>
+</srv:container>

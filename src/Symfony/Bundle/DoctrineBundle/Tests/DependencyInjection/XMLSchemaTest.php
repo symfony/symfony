@@ -27,7 +27,7 @@ class XMLSchemaTest extends \PHPUnit_Framework_TestCase
         $dom->load($file);
 
 
-        $dbalElements = $dom->getElementsByTagNameNS("http://www.symfony-project.org/schema/dic/doctrine", "dbal");
+        $dbalElements = $dom->getElementsByTagNameNS("http://www.symfony-project.org/schema/dic/doctrine", "config");
         if ($dbalElements->length) {
             $dbalDom = new \DOMDocument('1.0', 'UTF-8');
             $dbalNode = $dbalDom->importNode($dbalElements->item(0));
@@ -38,7 +38,7 @@ class XMLSchemaTest extends \PHPUnit_Framework_TestCase
             $found = true;
         }
 
-        $ormElements = $dom->getElementsByTagNameNS("http://www.symfony-project.org/schema/dic/doctrine", "orm");
+        $ormElements = $dom->getElementsByTagNameNS("http://www.symfony-project.org/schema/dic/doctrine", "config");
         if ($ormElements->length) {
             $ormDom = new \DOMDocument('1.0', 'UTF-8');
             $ormNode = $ormDom->importNode($ormElements->item(0));

@@ -1,7 +1,7 @@
 imports:
     - { resource: merge_import.yml }
-            
-security.config:
+
+security:
     providers:
         default: { id: foo }
 

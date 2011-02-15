@@ -1,39 +1,40 @@
 <?xml version="1.0" ?>
 
-<container xmlns="http://www.symfony-project.org/schema/dic/services"
+<srv:container xmlns="http://www.symfony-project.org/schema/dic/doctrine"
     xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-    xmlns:doctrine="http://www.symfony-project.org/schema/dic/doctrine"
+    xmlns:srv="http://www.symfony-project.org/schema/dic/services"
     xsi:schemaLocation="http://www.symfony-project.org/schema/dic/services http://www.symfony-project.org/schema/dic/services/services-1.0.xsd
-                        http://www.symfony-project.org/schema/dic/doctrine/orm http://www.symfony-project.org/schema/dic/doctrine/orm/doctrine-1.0.xsd
-                        http://www.symfony-project.org/schema/dic/doctrine/dbal http://www.symfony-project.org/schema/dic/doctrine/dbal/doctrine-1.0.xsd">
+                        http://www.symfony-project.org/schema/dic/doctrine http://www.symfony-project.org/schema/dic/doctrine/doctrine-1.0.xsd">
 
-    <parameters>
-        <parameter key="doctrine.orm.proxy_namespace">Proxies</parameter>
-    </parameters>
+    <srv:parameters>
+        <srv:parameter key="doctrine.orm.proxy_namespace">Proxies</srv:parameter>
+    </srv:parameters>
 
-    <doctrine:dbal>
-        <doctrine:connections>
-            <doctrine:connection
-                name="conn1"
-                driver="pdo_sqlite"
-                dbname="sqlite_db"
-                user="sqlite_user"
-                password="sqlite_s3cr3t"
-                memory="true" />
-            <doctrine:connection
-                name="conn2"
-                driver="pdo_sqlite"
-                dbname="sqlite_db"
-                user="sqlite_user"
-                password="sqlite_s3cr3t"
-                memory="true" />
-        </doctrine:connections>
-    </doctrine:dbal>
+    <config>
+        <dbal>
+            <connections>
+                <connection
+                    name="conn1"
+                    driver="pdo_sqlite"
+                    dbname="sqlite_db"
+                    user="sqlite_user"
+                    password="sqlite_s3cr3t"
+                    memory="true" />
+                <connection
+                    name="conn2"
+                    driver="pdo_sqlite"
+                    dbname="sqlite_db"
+                    user="sqlite_user"
+                    password="sqlite_s3cr3t"
+                    memory="true" />
+            </connections>
+        </dbal>
 
-    <doctrine:orm default-entity-manager="dm2" default-connection="conn1" auto-generate-proxy-classes="true">
-        <doctrine:entity-managers>
-            <doctrine:entity-manager name="dm1" metadata-cache-driver="xcache" connection="conn1" />
-            <doctrine:entity-manager name="dm2" connection="conn2" metadata-cache-driver="apc" />
-        </doctrine:entity-managers>
-    </doctrine:orm>
-</container>
+        <orm default-entity-manager="dm2" default-connection="conn1" auto-generate-proxy-classes="true">
+            <entity-managers>
+                <entity-manager name="dm1" metadata-cache-driver="xcache" connection="conn1" />
+                <entity-manager name="dm2" connection="conn2" metadata-cache-driver="apc" />
+            </entity-managers>
+        </orm>
+    </config>
+</srv:container>

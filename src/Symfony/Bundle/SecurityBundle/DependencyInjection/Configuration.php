@@ -22,7 +22,7 @@ class Configuration
         $tb = new TreeBuilder();
 
         return $tb
-            ->root('security:acl', 'array')
+            ->root('security', 'array')
                 ->scalarNode('connection')->end()
                 ->scalarNode('cache')->end()
             ->end()
@@ -34,7 +34,7 @@ class Configuration
         $tb = new TreeBuilder();
 
         return $tb
-            ->root('security:config', 'array')
+            ->root('security', 'array')
                 ->fixXmlConfig('factory', 'factories')
                 ->arrayNode('factories')
                     ->prototype('scalar')->end()
@@ -46,7 +46,7 @@ class Configuration
     public function getMainConfigTree(array $factories)
     {
         $tb = new TreeBuilder();
-        $rootNode = $tb->root('security:config', 'array');
+        $rootNode = $tb->root('security', 'array');
 
         $rootNode
             ->scalarNode('access_denied_url')->defaultNull()->end()

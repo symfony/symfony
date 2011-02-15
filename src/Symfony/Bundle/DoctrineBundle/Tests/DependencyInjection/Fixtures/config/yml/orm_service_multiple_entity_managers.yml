@@ -1,29 +1,30 @@
 parameters:
   doctrine.orm.proxy_namespace: Proxies
 
-doctrine.dbal:
-  connections:
-    conn1:
-      driver: pdo_sqlite
-      dbname: sqlite_db
-      user: sqlite_user
-      password: sqlite_s3cr3t
-      memory: true
-    conn2:
-      driver: pdo_sqlite
-      dbname: sqlite_db
-      user: sqlite_user
-      password: sqlite_s3cr3t
-      memory: true
+doctrine:
+    dbal:
+        connections:
+            conn1:
+                driver: pdo_sqlite
+                dbname: sqlite_db
+                user: sqlite_user
+                password: sqlite_s3cr3t
+                memory: true
+            conn2:
+                driver: pdo_sqlite
+                dbname: sqlite_db
+                user: sqlite_user
+                password: sqlite_s3cr3t
+                memory: true
 
-doctrine.orm:
-  default_entity_manager: dm2
-  default_connection: conn1
-  auto_generate_proxy_classes: true
-  entity_managers:
-    dm1:
-      metadata_cache_driver: xcache
-      connection: conn1
-    dm2:
-      metadata_cache_driver: apc
-      connection: conn2
+    orm:
+        default_entity_manager: dm2
+        default_connection: conn1
+        auto_generate_proxy_classes: true
+        entity_managers:
+            dm1:
+                metadata_cache_driver: xcache
+                connection: conn1
+            dm2:
+                metadata_cache_driver: apc
+                connection: conn2

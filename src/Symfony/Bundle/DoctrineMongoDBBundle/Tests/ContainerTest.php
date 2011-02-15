@@ -28,7 +28,7 @@ class ContainerTest extends TestCase
         )));
         $loader = new DoctrineMongoDBExtension();
         $container->registerExtension($loader);
-        $loader->mongodbLoad(array('mappings' => array('YamlBundle' => array())), $container);
+        $loader->load(array('mappings' => array('YamlBundle' => array())), $container);
 
         return $container;
     }

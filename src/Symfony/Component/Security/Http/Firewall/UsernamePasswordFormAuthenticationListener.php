@@ -11,15 +11,16 @@
 
 namespace Symfony\Component\Security\Http\Firewall;
 
+use Symfony\Component\Form\CsrfProvider\CsrfProviderInterface;
+use Symfony\Component\HttpFoundation\Request;
+use Symfony\Component\HttpKernel\Log\LoggerInterface;
 use Symfony\Component\Security\Http\Authentication\AuthenticationFailureHandlerInterface;
 use Symfony\Component\Security\Http\Authentication\AuthenticationSuccessHandlerInterface;
 use Symfony\Component\Security\Http\Session\SessionAuthenticationStrategyInterface;
-
-use Symfony\Component\Security\Core\SecurityContextInterface;
 use Symfony\Component\Security\Core\Authentication\AuthenticationManagerInterface;
-use Symfony\Component\HttpKernel\Log\LoggerInterface;
-use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\Security\Core\Authentication\Token\UsernamePasswordToken;
+use Symfony\Component\Security\Core\Exception\InvalidCsrfTokenException;
+use Symfony\Component\Security\Core\SecurityContextInterface;
 
 /**
  * UsernamePasswordFormAuthenticationListener is the default implementation of
@@ -29,16 +30,22 @@ use Symfony\Component\Security\Core\Authentication\Token\UsernamePasswordToken;
  */
 class UsernamePasswordFormAuthenticationListener extends AbstractAuthenticationListener
 {
+    protected $csrfProvider;
+
     /**
      * {@inheritdoc}
      */
-    public function __construct(SecurityContextInterface $securityContext, AuthenticationManagerInterface $authenticationManager, SessionAuthenticationStrategyInterface $sessionStrategy, $providerKey, array $options = array(), AuthenticationSuccessHandlerInterface $successHandler = null, AuthenticationFailureHandlerInterface $failureHandler = null, LoggerInterface $logger = null)
+    public function __construct(SecurityContextInterface $securityContext, AuthenticationManagerInterface $authenticationManager, SessionAuthenticationStrategyInterface $sessionStrategy, $providerKey, array $options = array(), AuthenticationSuccessHandlerInterface $successHandler = null, AuthenticationFailureHandlerInterface $failureHandler = null, LoggerInterface $logger = null, CsrfProviderInterface $csrfProvider = null)
     {
         parent::__construct($securityContext, $authenticationManager, $sessionStrategy, $providerKey, array_merge(array(
             'username_parameter' => '_username',
             'password_parameter' => '_password',
+            'csrf_parameter'     => '_csrf_token',
+            'csrf_page_id'       => 'form_login',
             'post_only'          => true,
         ), $options), $successHandler, $failureHandler, $logger);
+
+        $this->csrfProvider = $csrfProvider;
     }
 
     /**
@@ -52,6 +59,14 @@ class UsernamePasswordFormAuthenticationListener extends AbstractAuthenticationL
             }
 
             return null;
+        }
+
+        if (null !== $this->csrfProvider) {
+            $csrfToken = $request->get($this->options['csrf_parameter']);
+
+            if (false === $this->csrfProvider->isTokenValid($this->options['csrf_page_id'], $csrfToken)) {
+                throw new InvalidCsrfTokenException('Invalid CSRF token.');
+            }
         }
 
         $username = trim($request->get($this->options['username_parameter']));

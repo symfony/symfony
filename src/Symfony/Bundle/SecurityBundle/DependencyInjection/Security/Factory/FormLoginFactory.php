@@ -11,6 +11,7 @@
 
 namespace Symfony\Bundle\SecurityBundle\DependencyInjection\Security\Factory;
 
+use Symfony\Component\DependencyInjection\Configuration\Builder\NodeBuilder;
 use Symfony\Component\DependencyInjection\DefinitionDecorator;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\DependencyInjection\Reference;
@@ -27,6 +28,8 @@ class FormLoginFactory extends AbstractFactory
     {
         $this->addOption('username_parameter', '_username');
         $this->addOption('password_parameter', '_password');
+        $this->addOption('csrf_parameter', '_csrf_token');
+        $this->addOption('csrf_page_id', 'form_login');
         $this->addOption('post_only', true);
     }
 
@@ -38,6 +41,15 @@ class FormLoginFactory extends AbstractFactory
     public function getKey()
     {
         return 'form-login';
+    }
+
+    public function addConfiguration(NodeBuilder $builder)
+    {
+        parent::addConfiguration($builder);
+
+        $builder
+            ->scalarNode('csrf_provider')->cannotBeEmpty()->end()
+        ;
     }
 
     protected function getListenerId()
@@ -55,6 +67,20 @@ class FormLoginFactory extends AbstractFactory
         ;
 
         return $provider;
+    }
+
+    protected function createListener($container, $id, $config, $userProvider)
+    {
+        $listenerId = parent::createListener($container, $id, $config, $userProvider);
+
+        if (isset($config['csrf_provider'])) {
+            $container
+                ->getDefinition($listenerId)
+                ->addArgument(new Reference($config['csrf_provider']))
+            ;
+        }
+
+        return $listenerId;
     }
 
     protected function createEntryPoint($container, $id, $config, $defaultEntryPoint)

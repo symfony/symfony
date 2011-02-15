@@ -116,6 +116,6 @@
         <service id="security.firewall.context" class="%security.firewall.context.class%" abstract="true">
             <argument type="collection" />
             <argument type="service" id="security.exception_listener" />
-        </service>        
+        </service>
     </services>
 </container>

@@ -57,5 +57,9 @@ class ResponseHeaderBagTest extends \PHPUnit_Framework_TestCase
 
         $bag = new ResponseHeaderBag(array('cache-control' => 'public, max-age=100'));
         $this->assertEquals('max-age=100, public', $bag->get('Cache-Control'));
+
+        $bag = new ResponseHeaderBag();
+        $bag->set('Last-Modified', 'abcde');
+        $this->assertEquals('private, must-revalidate', $bag->get('Cache-Control'));
     }
 }

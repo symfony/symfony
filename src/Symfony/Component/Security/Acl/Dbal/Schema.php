@@ -73,8 +73,8 @@ class Schema extends BaseSchema
         $table->addColumn('mask', 'integer');
         $table->addColumn('granting', 'boolean');
         $table->addColumn('granting_strategy', 'string', array('length' => 30));
-        $table->addColumn('audit_success', 'boolean', array('default' => 0));
-        $table->addColumn('audit_failure', 'boolean', array('default' => 0));
+        $table->addColumn('audit_success', 'boolean');
+        $table->addColumn('audit_failure', 'boolean');
 
         $table->setPrimaryKey(array('id'));
         $table->addUniqueIndex(array('class_id', 'object_identity_id', 'field_name', 'ace_order'));
@@ -98,7 +98,7 @@ class Schema extends BaseSchema
         $table->addColumn('class_id', 'integer', array('unsigned' => true));
         $table->addColumn('object_identifier', 'string', array('length' => 100));
         $table->addColumn('parent_object_identity_id', 'integer', array('unsigned' => true, 'notnull' => false));
-        $table->addColumn('entries_inheriting', 'boolean', array('default' => 0));
+        $table->addColumn('entries_inheriting', 'boolean');
 
         $table->setPrimaryKey(array('id'));
         $table->addUniqueIndex(array('object_identifier', 'class_id'));
@@ -137,7 +137,7 @@ class Schema extends BaseSchema
 
         $table->addColumn('id', 'integer', array('unsigned' => true, 'autoincrement' => 'auto'));
         $table->addColumn('identifier', 'string', array('length' => 200));
-        $table->addColumn('username', 'boolean', array('default' => 0));
+        $table->addColumn('username', 'boolean');
 
         $table->setPrimaryKey(array('id'));
         $table->addUniqueIndex(array('identifier', 'username'));

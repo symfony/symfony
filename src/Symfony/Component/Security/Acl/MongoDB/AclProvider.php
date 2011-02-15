@@ -225,9 +225,12 @@ class AclProvider implements AclProviderInterface
         if (0 === $objIdentities->count()) {
             throw new AclNotFoundException('There is no ACL for the given object identity.');
         }
-        $query = $this->getLookupQuery($objIdentities, $sids);
-        $entryCursor = $this->connection->selectCollection($this->options['entry_table_name'])->find($query);
-        return $this->hydrateObjectIdentities($entryCursor, $objIdentities, $oidLookup, $sids);
+        $oids = $this->getOIDSet($objIdentities, $sids);
+        $entryQuery = array('objectIdentity.$id' => array('$in' => $oids));
+        $entryCursor = $this->connection->selectCollection($this->options['entry_table_name'])->find($entryQuery);
+        $oidQuery = array('_id' => array('$in' => $oids));
+        $oidCursor = $this->connection->selectCollection($this->options['oid_table_name'])->find($oidQuery);
+        return $this->hydrateObjectIdentities($entryCursor, $oidCursor, $oidLookup, $sids);
     }
 
     /**
@@ -275,7 +278,7 @@ class AclProvider implements AclProviderInterface
      * @throws AclNotFoundException
      * @return array $query
      */
-    protected function getLookupQuery(Cursor $objectIdentities, array $sids)
+    protected function getOIDSet(Cursor $objectIdentities, array $sids)
     {
         // FIXME: add support for filtering by sids (right now we select all sids)
         $oids = array();
@@ -285,7 +288,7 @@ class AclProvider implements AclProviderInterface
                 $oids = array_merge($oids, $result['ancestors']);
             }
         }
-        return array('objectIdentity.$id' => array('$in' => array_unique($oids)));
+        return array_unique($oids);
     }
 
     /**
@@ -304,7 +307,7 @@ class AclProvider implements AclProviderInterface
      * @throws \RuntimeException
      * @return \SplObjectStorage
      */
-    protected function hydrateObjectIdentities(Cursor $entryCursor, Cursor $objectIdentities, array $oidLookup, array $sids)
+    protected function hydrateObjectIdentities(Cursor $entryCursor, Cursor $objectCursor, array $oidLookup, array $sids)
     {
         $parentIdToFill = new \SplObjectStorage();
         $acls = $aces = $emptyArray = array();
@@ -335,21 +338,23 @@ class AclProvider implements AclProviderInterface
         foreach($entryCursor as $entry) {
             $objectId       = (string)$entry['objectIdentity']['$id'];
             $eid        = (string)$entry['_id'];
-            $entries[$objectId][$eid] = $data;
+            $entries[$objectId][$eid] = $entry;
+            $securityIds[] = $entry['securityIdentity']['$id'];
         }
-foreach($objectIdentities as $curObject) {
-    $id = (string)$curObject['_id'];
-    $oid[$id] = $curObject;
-}
-        foreach($objectIdentities as $curObject) {
-            $ancestors = array();
-            if(isset($curObject['ancestors'])) {
-               $ancestors = $curObject['ancestors'];
-            }
-            $ancestors[] = $curObject['_id'];
 
-            foreach($ancestors as $objectId) {
-                $aclId = (string)$objectId;
+        $sidQuery = array('_id' => array('$in' => array_unique($securityIds)));
+        $sidCursor = $this->connection->selectCollection($this->options['sid_table_name'])->find($sidQuery);
+        foreach($sidCursor as $curSid) {
+            $sidId = (string)$curSid['_id'];
+            $securityIdentities[$sidId] = $curSid;
+        }
+        
+        foreach($objectCursor as $curObject) {
+            $id = (string)$curObject['_id'];
+            $oid[$id] = $curObject;
+        }
+
+            foreach($oid as $aclId => $objectId) {
                 if(!isset($entries[$aclId])) {
                     $parent = $curObject;
                     while($parent['_id']!=$aclId) {
@@ -366,15 +371,9 @@ foreach($objectIdentities as $curObject) {
                         'auditSuccess' => null,
                     );
                 }
-/*                                    $criteria = array(
-                        '_id' => $entry['objectIdentity']['$id'],
-                    );
-                    $objectIdentity   = $this->connection
-                        ->selectCollection($this->options['oid_table_name'])
-                        ->findOne($criteria)
-                    ;*/
-                foreach($entries[$aclId] as $aceId=>$entry) {
-
+                foreach($entries[$aclId] as $aceId => $entry) {
+//                    $oidId = $entry['objectIdentifier']['$id'];
+                    $objectIdentity   = $oid[$aclId];
                     $classType        = $objectIdentity['type'];
                     $objectIdentifier = $objectIdentity['identifier'];
                     $fieldName        = $entry['fieldName'];
@@ -446,9 +445,10 @@ foreach($objectIdentities as $curObject) {
                         // It is important to only ever have one ACE instance per actual row since
                         // some ACEs are shared between ACL instances
                         if (!isset($loadedAces[$aceId])) {
-                            $username = $entry['securityIdentity']['username'];
-                            $securityIdentifier = $entry['securityIdentity']['identifier'];
-                            $securityId = (string)$entry['securityIdentity']['_id'];
+                            $securityId = (string)$entry['securityIdentity']['$id'];
+                            $securityIdentity = $securityIdentities[$securityId];
+                            $username = $securityIdentity['username'];
+                            $securityIdentifier = $securityIdentity['identifier'];
                             if (!isset($sids[$securityId])) {
                                 if ($username) {
                                     $sids[$securityId] = new UserSecurityIdentity(
@@ -485,7 +485,6 @@ foreach($objectIdentities as $curObject) {
                     }
                 }
             }
-        }
 
         // We do not sort on database level since we only want certain subsets to be sorted,
         // and we are going to read the entire result set anyway.

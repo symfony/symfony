@@ -12,18 +12,26 @@ mkdir -p vendor && cd vendor
 ##
 # @param destination directory (e.g. "doctrine")
 # @param URL of the git remote (e.g. git://github.com/doctrine/doctrine2.git)
+# @param revision to point the head (e.g. origin/HEAD)
 #
 install_git()
 {
     INSTALL_DIR=$1
     SOURCE_URL=$2
-    if [ -d $INSTALL_DIR ]; then
-        cd $INSTALL_DIR
-        git pull
-        cd ..
-    else
+    REV=$3
+
+    if [ -z $REV ]; then
+        REV=origin/HEAD
+    fi
+
+    if [ ! -d $INSTALL_DIR ]; then
         git clone $SOURCE_URL $INSTALL_DIR
     fi
+
+    cd $INSTALL_DIR
+    git fetch origin
+    git reset --hard $REV
+    cd ..
 }
 
 # Assetic
@@ -51,7 +59,7 @@ install_git doctrine-mongodb git://github.com/doctrine/mongodb.git
 install_git doctrine-mongodb-odm git://github.com/doctrine/mongodb-odm.git
 
 # Swiftmailer
-install_git swiftmailer git://github.com/swiftmailer/swiftmailer.git
+install_git swiftmailer git://github.com/swiftmailer/swiftmailer.git origin/4.1
 
 # Twig
 install_git twig git://github.com/fabpot/Twig.git

@@ -342,11 +342,13 @@ class AclProvider implements AclProviderInterface
             $securityIds[] = $entry['securityIdentity']['$id'];
         }
 
-        $sidQuery = array('_id' => array('$in' => array_unique($securityIds)));
-        $sidCursor = $this->connection->selectCollection($this->options['sid_table_name'])->find($sidQuery);
-        foreach($sidCursor as $curSid) {
-            $sidId = (string)$curSid['_id'];
-            $securityIdentities[$sidId] = $curSid;
+        if (isset($securityIds)) {
+            $sidQuery = array('_id' => array('$in' => array_unique($securityIds)));
+            $sidCursor = $this->connection->selectCollection($this->options['sid_table_name'])->find($sidQuery);
+            foreach($sidCursor as $curSid) {
+                $sidId = (string)$curSid['_id'];
+                $securityIdentities[$sidId] = $curSid;
+            }
         }
         
         foreach($objectCursor as $curObject) {
@@ -357,8 +359,10 @@ class AclProvider implements AclProviderInterface
             foreach($oid as $aclId => $objectId) {
                 if(!isset($entries[$aclId])) {
                     $parent = $curObject;
-                    while($parent['_id']!=$aclId) {
-                        $parent = $parent['parent'];
+                    while((string)$parent['_id']!=$aclId && isset($parent['parent'])) {
+                        if (isset($parent['parent'])) {
+                            $parent = $parent['parent'];
+                        }
                     }
                     $entries[$aclId][0] = array (
                         'objectIdentity' => $parent,

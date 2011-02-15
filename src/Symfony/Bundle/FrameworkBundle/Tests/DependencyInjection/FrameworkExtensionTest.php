@@ -187,7 +187,6 @@ abstract class FrameworkExtensionTest extends TestCase
 
     protected function createContainerFromFile($file)
     {
-        ContainerBuilder::clearExtensions();
         $container = $this->createContainer();
         $container->registerExtension(new FrameworkExtension());
         $this->loadFromFile($container, $file);

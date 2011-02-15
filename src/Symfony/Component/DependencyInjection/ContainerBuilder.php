@@ -27,8 +27,8 @@ use Symfony\Component\Config\Resource\ResourceInterface;
  */
 class ContainerBuilder extends Container implements TaggedContainerInterface
 {
-    static protected $extensions     = array();
-    static protected $extensionsByNs = array();
+    protected $extensions     = array();
+    protected $extensionsByNs = array();
 
     protected $definitions      = array();
     protected $aliases          = array();
@@ -53,12 +53,12 @@ class ContainerBuilder extends Container implements TaggedContainerInterface
      *
      * @param ExtensionInterface $extension An extension instance
      */
-    static public function registerExtension(ExtensionInterface $extension)
+    public function registerExtension(ExtensionInterface $extension)
     {
-        static::$extensions[$extension->getAlias()] = $extension;
+        $this->extensions[$extension->getAlias()] = $extension;
 
         if (false !== $extension->getNamespace()) {
-            static::$extensionsByNs[$extension->getNamespace()] = $extension;
+            $this->extensionsByNs[$extension->getNamespace()] = $extension;
         }
     }
 
@@ -69,14 +69,14 @@ class ContainerBuilder extends Container implements TaggedContainerInterface
      *
      * @return ExtensionInterface An extension instance
      */
-    static public function getExtension($name)
+    public function getExtension($name)
     {
-        if (isset(static::$extensions[$name])) {
-            return static::$extensions[$name];
+        if (isset($this->extensions[$name])) {
+            return $this->extensions[$name];
         }
 
-        if (isset(static::$extensionsByNs[$name])) {
-            return static::$extensionsByNs[$name];
+        if (isset($this->extensionsByNs[$name])) {
+            return $this->extensionsByNs[$name];
         }
 
         throw new \LogicException(sprintf('Container extension "%s" is not registered', $name));
@@ -87,9 +87,9 @@ class ContainerBuilder extends Container implements TaggedContainerInterface
      *
      * @return array An array of ExtensionInterface
      */
-    static public function getExtensions()
+    public function getExtensions()
     {
-        return static::$extensions;
+        return $this->extensions;
     }
 
     /**
@@ -98,19 +98,9 @@ class ContainerBuilder extends Container implements TaggedContainerInterface
      * @param string $name The name of the extension
      * @return boolean If the extension exists
      */
-    static public function hasExtension($name)
+    public function hasExtension($name)
     {
-        return isset(static::$extensions[$name]) || isset(static::$extensionsByNs[$name]);
-    }
-
-    /**
-     * Unregisters all extensions.
-     *
-     * This method is only useful in unit tests.
-     */
-    static public function clearExtensions()
-    {
-        static::$extensions = array();
+        return isset($this->extensions[$name]) || isset($this->extensionsByNs[$name]);
     }
 
     /**
@@ -370,7 +360,7 @@ class ContainerBuilder extends Container implements TaggedContainerInterface
             $this->addResource($resource);
         }
 
-        foreach (static::$extensions as $name => $extension) {
+        foreach ($this->extensions as $name => $extension) {
             if (!isset($this->extensionConfigs[$name])) {
                 $this->extensionConfigs[$name] = array();
             }

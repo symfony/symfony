@@ -128,8 +128,6 @@ class PhpDumperTest extends \PHPUnit_Framework_TestCase
 
         $dumper = new PhpDumper($container);
 
-        file_put_contents(self::$fixturesPath.'/php/services_interfaces-1-1.php', $dumper->dump());
-
         $this->assertStringEqualsFile(self::$fixturesPath.'/php/services_interfaces-1-1.php', $dumper->dump(), '->dump() dumps interface injectors');
     }
 }

@@ -49,40 +49,6 @@ class ProjectServiceContainer extends Container
     }
 
     /**
-     * Gets the 'project.service.bar' service.
-     *
-     * This service is shared.
-     * This method always returns the same instance of the service.
-     *
-     * @return FooClass A FooClass instance.
-     */
-    protected function getProject_Service_BarService()
-    {
-        $this->services['project.service.bar'] = $instance = new \FooClass();
-
-        $instance->setBar('someValue');
-
-        return $instance;
-    }
-
-    /**
-     * Gets the 'project.service.foo' service.
-     *
-     * This service is shared.
-     * This method always returns the same instance of the service.
-     *
-     * @return FooClass A FooClass instance.
-     */
-    protected function getProject_Service_FooService()
-    {
-        $this->services['project.service.foo'] = $instance = new \FooClass();
-
-        $instance->setBar('someValue');
-
-        return $instance;
-    }
-
-    /**
      * {@inheritdoc}
      */
     public function getParameter($name)
@@ -121,8 +87,6 @@ class ProjectServiceContainer extends Container
         return array(
             'cla' => 'Fo',
             'ss' => 'Class',
-            'project.parameter.bar' => 'foobar',
-            'project.parameter.foo' => 'foobar',
         );
     }
 }

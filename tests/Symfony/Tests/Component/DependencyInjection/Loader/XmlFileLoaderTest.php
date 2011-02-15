@@ -225,7 +225,10 @@ class XmlFileLoaderTest extends \PHPUnit_Framework_TestCase
         $this->assertEquals('BAR', $services['project.service.foo']->getClass(), '->load() parses extension elements');
         $this->assertEquals('BAR', $parameters['project.parameter.foo'], '->load() parses extension elements');
 
-        $loader = new ProjectLoader2(new ContainerBuilder(), new FileLocator(self::$fixturesPath.'/xml'));
+        $container = new ContainerBuilder();
+        $container->registerExtension(new \ProjectExtension());
+        $container->registerExtension(new \ProjectWithXsdExtension());
+        $loader = new ProjectLoader2($container, new FileLocator(self::$fixturesPath.'/xml'));
 
         // extension with an XSD (does not validate)
         try {

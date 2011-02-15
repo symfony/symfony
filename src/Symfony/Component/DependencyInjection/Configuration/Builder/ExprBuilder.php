@@ -165,7 +165,7 @@ class ExprBuilder
      */
     public function thenInvalid($message)
     {
-        $this->thenPart = function ($v) use ($message) {throw new \InvalidArgumentException(sprintf($message, $v)); };
+        $this->thenPart = function ($v) use ($message) {throw new \InvalidArgumentException(sprintf($message, json_encode($v))); };
 
         return $this;
     }

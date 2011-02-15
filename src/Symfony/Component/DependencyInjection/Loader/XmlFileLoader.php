@@ -40,6 +40,7 @@ class XmlFileLoader extends FileLoader
         $path = $this->locator->locate($file);
 
         $xml = $this->parseFile($path);
+        $xml->registerXPathNamespace('container', 'http://www.symfony-project.org/schema/dic/services');
 
         $this->container->addResource(new FileResource($path));
 
@@ -100,11 +101,8 @@ class XmlFileLoader extends FileLoader
      */
     protected function parseImports(SimpleXMLElement $xml, $file)
     {
-        if (!$xml->imports) {
-            return;
-        }
-
-        foreach ($xml->imports->import as $import) {
+        $imports = $xml->xpath('//container:imports/container:import');
+        foreach ($imports as $import) {
             $this->currentDir = dirname($file);
             $this->import((string) $import['resource'], (Boolean) $import->getAttributeAsPhp('ignore-errors'));
         }
@@ -153,11 +151,8 @@ class XmlFileLoader extends FileLoader
      */
     protected function parseDefinitions(SimpleXMLElement $xml, $file)
     {
-        if (!$xml->services) {
-            return;
-        }
-
-        foreach ($xml->services->service as $service) {
+        $services = $xml->xpath('//container:services/container:service');
+        foreach ($services as $service) {
             $this->parseDefinition((string) $service['id'], $service, $file);
         }
     }
@@ -268,9 +263,6 @@ class XmlFileLoader extends FileLoader
         $definitions = array();
         $count = 0;
 
-        // find anonymous service definitions
-        $xml->registerXPathNamespace('container', 'http://www.symfony-project.org/schema/dic/services');
-
         // anonymous services as arguments
         $nodes = $xml->xpath('//container:argument[@type="service"][not(@id)]');
         foreach ($nodes as $node) {
@@ -282,7 +274,7 @@ class XmlFileLoader extends FileLoader
         }
 
         // anonymous services "in the wild"
-        $nodes = $xml->xpath('//container:service[not(@id)]');
+        $nodes = $xml->xpath('//container:services/container:service[not(@id)]');
         foreach ($nodes as $node) {
             // give it a unique name
             $node['id'] = sprintf('%s_%d', md5($file), ++$count);
@@ -408,7 +400,7 @@ EOF
     protected function validateExtensions(\DOMDocument $dom, $file)
     {
         foreach ($dom->documentElement->childNodes as $node) {
-            if (!$node instanceof \DOMElement || in_array($node->tagName, array('imports', 'parameters', 'services', 'interfaces'))) {
+            if (!$node instanceof \DOMElement || 'http://www.symfony-project.org/schema/dic/services' === $node->namespaceURI) {
                 continue;
             }
 

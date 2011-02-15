@@ -222,6 +222,46 @@ class FinderTest extends Iterator\RealIteratorTestCase
         $this->assertEquals($expected, $a, 'implements the \IteratorAggregate interface');
     }
 
+    public function testRelativePath()
+    {
+        $finder = new Finder();
+
+        $finder->in(self::$tmpDir);
+
+        $paths = array();
+
+        foreach($finder as $file) {
+            $paths[] = $file->getRelativePath();
+        }
+
+        $ref = array("", "", "", "", "foo");
+
+        sort($ref);
+        sort($paths);
+
+        $this->assertEquals($paths, $ref);
+    }
+
+    public function testRelativePathname()
+    {
+        $finder = new Finder();
+
+        $finder->in(self::$tmpDir)->sortByName();
+
+        $paths = array();
+
+        foreach($finder as $file) {
+            $paths[] = $file->getRelativePathname();
+        }
+
+        $ref = array("test.php", "toto", "test.py", "foo", "foo".DIRECTORY_SEPARATOR."bar.tmp");
+
+        sort($paths);
+        sort($ref);
+
+        $this->assertEquals($paths, $ref);
+    }
+
     protected function toAbsolute($files)
     {
         $f = array();

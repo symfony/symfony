@@ -344,7 +344,10 @@ class Finder implements \IteratorAggregate
             $flags |= \RecursiveDirectoryIterator::FOLLOW_SYMLINKS;
         }
 
-        $iterator = new \RecursiveIteratorIterator(new \RecursiveDirectoryIterator($dir, $flags), \RecursiveIteratorIterator::SELF_FIRST);
+        $iterator = new \RecursiveIteratorIterator(
+            new Iterator\RecursiveDirectoryIterator($dir, $flags),
+            \RecursiveIteratorIterator::SELF_FIRST
+        );
 
         if ($this->depths) {
             $iterator = new Iterator\DepthRangeFilterIterator($iterator, $this->depths);

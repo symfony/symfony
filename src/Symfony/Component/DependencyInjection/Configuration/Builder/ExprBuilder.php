@@ -115,6 +115,20 @@ class ExprBuilder
     }
 
     /**
+     * Tests if the value is not in an array.
+     *
+     * @param array $array
+     *
+     * @return Symfony\Component\DependencyInjection\Configuration\Builder\ExprBuilder
+     */
+    public function ifNotInArray(array $array)
+    {
+        $this->ifPart = function($v) use ($array) { return !in_array($v, $array, true); };
+
+        return $this;
+    }
+
+    /**
      * Sets the closure to run if the test pass.
      *
      * @param \Closure $closure

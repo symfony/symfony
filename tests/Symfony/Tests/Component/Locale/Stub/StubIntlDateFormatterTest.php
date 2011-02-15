@@ -61,6 +61,7 @@ class StubIntlDateFormatterTest extends \PHPUnit_Framework_TestCase
             array("'''yy'", 0, "'yy"),
             array("''y", 0, "'1970"),
             array("''yy", 0, "'70"),
+            array("H 'o'' clock'", 0, "0 o' clock"),
 
             /* month */
             array('M', 0, '1'),

@@ -68,7 +68,7 @@ class PreAuthenticatedAuthenticationProvider implements AuthenticationProviderIn
 
         $this->accountChecker->checkPostAuth($user);
 
-        return new PreAuthenticatedToken($user, $token->getCredentials(), $user->getRoles());
+        return new PreAuthenticatedToken($user, $token->getCredentials(), $this->providerKey, $user->getRoles());
     }
 
     /**

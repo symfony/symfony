@@ -58,6 +58,7 @@ class PreAuthenticatedAuthenticationProviderTest extends \PHPUnit_Framework_Test
         $token = $provider->authenticate($this->getSupportedToken('fabien', 'pass'));
         $this->assertInstanceOf('Symfony\Component\Security\Core\Authentication\Token\PreAuthenticatedToken', $token);
         $this->assertEquals('pass', $token->getCredentials());
+        $this->assertEquals('key', $token->getProviderKey());
         $this->assertEquals(array(), $token->getRoles());
         $this->assertSame($user, $token->getUser());
     }

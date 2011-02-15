@@ -226,8 +226,8 @@ class AclProvider implements AclProviderInterface
             throw new AclNotFoundException('There is no ACL for the given object identity.');
         }
         $query = $this->getLookupQuery($objIdentities, $sids);
-        $cursor = $this->connection->selectCollection($this->options['entry_table_name'])->find($query);
-        return $this->hydrateObjectIdentities($cursor, $objIdentities, $oidLookup, $sids);
+        $entryCursor = $this->connection->selectCollection($this->options['entry_table_name'])->find($query);
+        return $this->hydrateObjectIdentities($entryCursor, $objIdentities, $oidLookup, $sids);
     }
 
     /**
@@ -278,15 +278,14 @@ class AclProvider implements AclProviderInterface
     protected function getLookupQuery(Cursor $objectIdentities, array $sids)
     {
         // FIXME: add support for filtering by sids (right now we select all sids)
-        $ancestorIds = array();
-        $stringIds = array();
+        $oids = array();
         foreach ($objectIdentities as $result) {
-            $ancestorIds[] = $result['_id'];
+            $oids[] = $result['_id'];
             if(isset($result['ancestors'])) {
-                $ancestorIds = array_merge($ancestorIds, $result['ancestors']);
+                $oids = array_merge($oids, $result['ancestors']);
             }
         }
-        return array("objectIdentity._id" => array('$in' => $ancestorIds));
+        return array('objectIdentity.$id' => array('$in' => array_unique($oids)));
     }
 
     /**
@@ -305,7 +304,7 @@ class AclProvider implements AclProviderInterface
      * @throws \RuntimeException
      * @return \SplObjectStorage
      */
-    protected function hydrateObjectIdentities(Cursor $cursor, Cursor $objectIdentities, array $oidLookup, array $sids)
+    protected function hydrateObjectIdentities(Cursor $entryCursor, Cursor $objectIdentities, array $oidLookup, array $sids)
     {
         $parentIdToFill = new \SplObjectStorage();
         $acls = $aces = $emptyArray = array();
@@ -330,14 +329,18 @@ class AclProvider implements AclProviderInterface
 
         // TODO: fetchAll() consumes more memory than consecutive calls to fetch(),
         // but it is faster
+        // need to assemble full list of oids needed (include ancestors)
         $entries = array();
-        foreach($cursor as $data) {
-            $objectId       = (string)$data['objectIdentity']['_id'];
-            $identifier = $data['objectIdentity']['identifier'];
-            $eid        = (string)$data['_id'];
+
+        foreach($entryCursor as $entry) {
+            $objectId       = (string)$entry['objectIdentity']['$id'];
+            $eid        = (string)$entry['_id'];
             $entries[$objectId][$eid] = $data;
         }
-
+foreach($objectIdentities as $curObject) {
+    $id = (string)$curObject['_id'];
+    $oid[$id] = $curObject;
+}
         foreach($objectIdentities as $curObject) {
             $ancestors = array();
             if(isset($curObject['ancestors'])) {
@@ -363,8 +366,15 @@ class AclProvider implements AclProviderInterface
                         'auditSuccess' => null,
                     );
                 }
+/*                                    $criteria = array(
+                        '_id' => $entry['objectIdentity']['$id'],
+                    );
+                    $objectIdentity   = $this->connection
+                        ->selectCollection($this->options['oid_table_name'])
+                        ->findOne($criteria)
+                    ;*/
                 foreach($entries[$aclId] as $aceId=>$entry) {
-                    $objectIdentity   = $entry['objectIdentity'];
+
                     $classType        = $objectIdentity['type'];
                     $objectIdentifier = $objectIdentity['identifier'];
                     $fieldName        = $entry['fieldName'];

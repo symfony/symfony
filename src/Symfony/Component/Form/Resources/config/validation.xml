@@ -29,7 +29,7 @@
     </getter>
     <getter property="csrfTokenValid">
       <constraint name="AssertTrue">
-        <option name="message">The CSRF token is invalid</option>
+        <option name="message">The CSRF token is invalid. Please try to resubmit the form</option>
       </constraint>
     </getter>
   </class>

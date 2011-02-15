@@ -16,6 +16,7 @@ use Symfony\Component\DependencyInjection\Loader\XmlFileLoader;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\DependencyInjection\Reference;
 use Symfony\Component\Config\FileLocator;
+use Symfony\Component\DependencyInjection\Configuration\Processor;
 
 /**
  * SwiftMailerExtension is an extension for the SwiftMailer library.
@@ -24,13 +25,6 @@ use Symfony\Component\Config\FileLocator;
  */
 class SwiftMailerExtension extends Extension
 {
-    public function load(array $configs, ContainerBuilder $container)
-    {
-        foreach ($configs as $config) {
-            $this->doConfigLoad($config, $container);
-        }
-    }
-
     /**
      * Loads the Swift Mailer configuration.
      *
@@ -45,62 +39,53 @@ class SwiftMailerExtension extends Extension
      * @param array            $config    An array of configuration settings
      * @param ContainerBuilder $container A ContainerBuilder instance
      */
-    protected function doConfigLoad(array $config, ContainerBuilder $container)
+    public function load(array $configs, ContainerBuilder $container)
     {
-        if (!$container->hasDefinition('swiftmailer.mailer')) {
-            $loader = new XmlFileLoader($container, new FileLocator(__DIR__.'/../Resources/config'));
-            $loader->load('swiftmailer.xml');
-            $container->setAlias('mailer', 'swiftmailer.mailer');
-        }
+        $loader = new XmlFileLoader($container, new FileLocator(__DIR__.'/../Resources/config'));
+        $loader->load('swiftmailer.xml');
+        $container->setAlias('mailer', 'swiftmailer.mailer');
 
         $r = new \ReflectionClass('Swift_Message');
         $container->setParameter('swiftmailer.base_dir', dirname(dirname(dirname($r->getFilename()))));
 
-        $transport = $container->getParameter('swiftmailer.transport.name');
-        if (array_key_exists('transport', $config)) {
-            if (null === $config['transport']) {
-                $transport = 'null';
-            } elseif ('gmail' === $config['transport']) {
-                $config['encryption'] = 'ssl';
-                $config['auth_mode'] = 'login';
-                $config['host'] = 'smtp.gmail.com';
-                $transport = 'smtp';
-            } else {
-                $transport = $config['transport'];
-            }
+        $configuration = new Configuration();
+        $processor = new Processor();
+        $config = $processor->process($configuration->getConfigTree(), $configs);
 
-            $container->setParameter('swiftmailer.transport.name', $transport);
+        if (null === $config['transport']) {
+            $transport = 'null';
+        } elseif ('gmail' === $config['transport']) {
+            $config['encryption'] = 'ssl';
+            $config['auth_mode'] = 'login';
+            $config['host'] = 'smtp.gmail.com';
+            $transport = 'smtp';
+        } else {
+            $transport = $config['transport'];
         }
+
+        $container->setParameter('swiftmailer.transport.name', $transport);
 
         $container->setAlias('swiftmailer.transport', 'swiftmailer.transport.'.$transport);
 
-        if (isset($config['encryption']) && 'ssl' === $config['encryption'] && !isset($config['port'])) {
+        if ('ssl' === $config['encryption'] && !isset($config['port'])) {
             $config['port'] = 465;
         }
 
         foreach (array('encryption', 'port', 'host', 'username', 'password', 'auth_mode') as $key) {
-            if (isset($config[$key])) {
-                $container->setParameter('swiftmailer.transport.'.$transport.'.'.$key, $config[$key]);
-            }
+            $container->setParameter('swiftmailer.transport.'.$transport.'.'.$key, $config[$key]);
         }
 
         // spool?
         if (isset($config['spool'])) {
-            $type = isset($config['spool']['type']) ? $config['spool']['type'] : 'file';
+            $type = $config['spool']['type'];
 
             $container->setAlias('swiftmailer.transport.real', 'swiftmailer.transport.'.$transport);
             $container->setAlias('swiftmailer.transport', 'swiftmailer.transport.spool');
             $container->setAlias('swiftmailer.spool', 'swiftmailer.spool.'.$type);
 
             foreach (array('path') as $key) {
-                if (isset($config['spool'][$key])) {
-                    $container->setParameter('swiftmailer.spool.'.$type.'.'.$key, $config['spool'][$key]);
-                }
+                $container->setParameter('swiftmailer.spool.'.$type.'.'.$key, $config['spool'][$key]);
             }
-        }
-
-        if (array_key_exists('delivery-address', $config)) {
-            $config['delivery_address'] = $config['delivery-address'];
         }
 
         if (isset($config['delivery_address']) && $config['delivery_address']) {
@@ -110,9 +95,6 @@ class SwiftMailerExtension extends Extension
             $container->setParameter('swiftmailer.single_address', null);
         }
 
-        if (array_key_exists('disable-delivery', $config)) {
-            $config['disable_delivery'] = $config['disable-delivery'];
-        }
 
         if (isset($config['disable_delivery']) && $config['disable_delivery']) {
             $container->findDefinition('swiftmailer.transport')->addMethodCall('registerPlugin', array(new Reference('swiftmailer.plugin.blackhole')));

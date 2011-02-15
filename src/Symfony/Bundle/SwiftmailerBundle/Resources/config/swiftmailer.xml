@@ -7,21 +7,12 @@
   <parameters>
     <parameter key="swiftmailer.class">Swift_Mailer</parameter>
 
-    <parameter key="swiftmailer.transport.name">smtp</parameter>
     <parameter key="swiftmailer.transport.smtp.class">Swift_Transport_EsmtpTransport</parameter>
     <parameter key="swiftmailer.transport.sendmail.class">Swift_Transport_SendmailTransport</parameter>
     <parameter key="swiftmailer.transport.mail.class">Swift_Transport_MailTransport</parameter>
 
-    <parameter key="swiftmailer.transport.smtp.host">localhost</parameter>
-    <parameter key="swiftmailer.transport.smtp.port">25</parameter>
-    <parameter key="swiftmailer.transport.smtp.encryption">null</parameter>
-    <parameter key="swiftmailer.transport.smtp.username">null</parameter>
-    <parameter key="swiftmailer.transport.smtp.password">null</parameter>
-    <parameter key="swiftmailer.transport.smtp.auth_mode">null</parameter>
-
     <parameter key="swiftmailer.transport.failover.class">Swift_Transport_FailoverTransport</parameter>
     <parameter key="swiftmailer.spool.file.class">Swift_FileSpool</parameter>
-    <parameter key="swiftmailer.spool.file.path">%kernel.cache_dir%/swiftmailer/pool</parameter>
 
     <parameter key="swiftmailer.init_file">%swiftmailer.base_dir%/swift_init.php</parameter>
 

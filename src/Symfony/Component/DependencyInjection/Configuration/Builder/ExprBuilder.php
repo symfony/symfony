@@ -157,13 +157,15 @@ class ExprBuilder
     /**
      * Sets a closure marking the value as invalid at validation time.
      *
+     * if you want to add the value of the node in your message just use a %s placeholder.
+     *
      * @param string $message
      *
      * @return Symfony\Component\DependencyInjection\Configuration\Builder\ExprBuilder
      */
     public function thenInvalid($message)
     {
-        $this->thenPart = function ($v) use ($message) {throw new \InvalidArgumentException($message); };
+        $this->thenPart = function ($v) use ($message) {throw new \InvalidArgumentException(sprintf($message, $v)); };
 
         return $this;
     }

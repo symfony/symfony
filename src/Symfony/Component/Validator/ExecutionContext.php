@@ -125,7 +125,7 @@ class ExecutionContext
     /**
      * @return ClassMetadataFactoryInterface
      */
-    public function getClassMetadataFactory()
+    public function getMetadataFactory()
     {
         return $this->metadataFactory;
     }

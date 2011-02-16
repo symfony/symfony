@@ -103,23 +103,12 @@ class ChoiceFieldTest extends \PHPUnit_Framework_TestCase
     }
 
     /**
-     * @expectedException Symfony\Component\Form\Exception\InvalidOptionsException
+     * @expectedException Symfony\Component\Form\Exception\UnexpectedTypeException
      */
     public function testConfigureChoicesWithNonArray()
     {
         $field = new ChoiceField('name', array(
             'choices' => new \ArrayObject(),
-        ));
-    }
-
-    /**
-     * @expectedException Symfony\Component\Form\Exception\InvalidOptionsException
-     */
-    public function testConfigurePreferredChoicesWithNonArray()
-    {
-        $field = new ChoiceField('name', array(
-            'choices' => $this->choices,
-            'preferred_choices' => new \ArrayObject(),
         ));
     }
 
@@ -144,7 +133,7 @@ class ChoiceFieldTest extends \PHPUnit_Framework_TestCase
     }
 
     /**
-     * @expectedException Symfony\Component\Form\Exception\InvalidOptionsException
+     * @expectedException Symfony\Component\Form\Exception\UnexpectedTypeException
      */
     public function testClosureShouldReturnArray()
     {

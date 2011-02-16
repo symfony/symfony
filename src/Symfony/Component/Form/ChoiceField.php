@@ -11,7 +11,7 @@
 
 namespace Symfony\Component\Form;
 
-use Symfony\Component\Form\Exception\InvalidOptionsException;
+use Symfony\Component\Form\ChoiceList\DefaultChoiceList;
 
 /**
  * Lets the user select between different choices.
@@ -37,18 +37,27 @@ use Symfony\Component\Form\Exception\InvalidOptionsException;
  */
 class ChoiceField extends HybridField
 {
-    /**
-     * Stores the preferred choices with the choices as keys
-     * @var array
-     */
-    protected $preferredChoices = array();
+    protected $choiceList;
 
-    /**
-     * Stores the choices
-     * You should only access this property through getChoices()
-     * @var array
-     */
-    private $choices = array();
+    public function __construct($name = null, array $options = array())
+    {
+        parent::__construct($name, $options);
+
+        // until we have DI, this MUST happen after configure()
+        if ($this->isExpanded()) {
+            $this->setFieldMode(self::FORM);
+
+            foreach ($this->choiceList->getPreferredChoices() as $choice => $value) {
+                $this->add($this->newChoiceField($choice, $value));
+            }
+
+            foreach ($this->choiceList->getOtherChoices() as $choice => $value) {
+                $this->add($this->newChoiceField($choice, $value));
+            }
+        } else {
+            $this->setFieldMode(self::FIELD);
+        }
+    }
 
     protected function configure()
     {
@@ -60,37 +69,12 @@ class ChoiceField extends HybridField
 
         parent::configure();
 
-        $choices = $this->getOption('choices');
-
-        if (!is_array($choices) && !$choices instanceof \Closure) {
-            throw new InvalidOptionsException('The choices option must be an array or a closure', array('choices'));
-        }
-
-        if (!is_array($this->getOption('preferred_choices'))) {
-            throw new InvalidOptionsException('The preferred_choices option must be an array', array('preferred_choices'));
-        }
-
-        if (count($this->getOption('preferred_choices')) > 0) {
-            $this->preferredChoices = array_flip($this->getOption('preferred_choices'));
-        }
-
-        if ($this->isExpanded()) {
-            $this->setFieldMode(self::FORM);
-
-            $choices = $this->getChoices();
-
-            foreach ($this->preferredChoices as $choice => $_) {
-                $this->add($this->newChoiceField($choice, $choices[$choice]));
-            }
-
-            foreach ($choices as $choice => $value) {
-                if (!isset($this->preferredChoices[$choice])) {
-                    $this->add($this->newChoiceField($choice, $value));
-                }
-            }
-        } else {
-            $this->setFieldMode(self::FIELD);
-        }
+        $this->choiceList = new DefaultChoiceList(
+            $this->getOption('choices'),
+            $this->getOption('preferred_choices'),
+            $this->getOption('empty_value'),
+            $this->isRequired()
+        );
     }
 
     public function getName()
@@ -108,79 +92,29 @@ class ChoiceField extends HybridField
         return $name;
     }
 
-    /**
-     * Initializes the choices
-     *
-     * If the choices were given as a closure, the closure is executed now.
-     *
-     * @return array
-     */
-    protected function initializeChoices()
-    {
-        if (!$this->choices) {
-            $this->choices = $this->getInitializedChoices();
-
-            if (!$this->isRequired()) {
-                $this->choices = array('' => $this->getOption('empty_value')) + $this->choices;
-            }
-        }
-    }
-
-    protected function getInitializedChoices()
-    {
-        $choices = $this->getOption('choices');
-
-        if ($choices instanceof \Closure) {
-            $choices = $choices->__invoke();
-        }
-
-        if (!is_array($choices)) {
-            throw new InvalidOptionsException('The "choices" option must be an array or a closure returning an array', array('choices'));
-        }
-
-        return $choices;
-    }
-
-    /**
-     * Returns the choices
-     *
-     * If the choices were given as a closure, the closure is executed on
-     * the first call of this method.
-     *
-     * @return array
-     */
-    protected function getChoices()
-    {
-        $this->initializeChoices();
-
-        return $this->choices;
-    }
-
     public function getPreferredChoices()
     {
-        return array_intersect_key($this->getChoices(), $this->preferredChoices);
+        return $this->choiceList->getPreferredChoices();
     }
 
     public function getOtherChoices()
     {
-        return array_diff_key($this->getChoices(), $this->preferredChoices);
+        return $this->choiceList->getOtherChoices();
     }
 
     public function getLabel($choice)
     {
-        $choices = $this->getChoices();
-
-        return isset($choices[$choice]) ? $choices[$choice] : null;
+        return $this->choiceList->getLabel($choice);
     }
 
     public function isChoiceGroup($choice)
     {
-        return is_array($choice) || $choice instanceof \Traversable;
+        return $this->choiceList->isChoiceGroup($choice);
     }
 
     public function isChoiceSelected($choice)
     {
-        return in_array((string) $choice, (array) $this->getDisplayedData(), true);
+        return $this->choiceList->isChoiceSelected($choice, $this->getDisplayedData());
     }
 
     public function isMultipleChoice()
@@ -244,7 +178,7 @@ class ChoiceField extends HybridField
     {
         if ($this->isExpanded()) {
             $value = parent::transform($value);
-            $choices = $this->getChoices();
+            $choices = $this->choiceList->getChoices();
 
             foreach ($choices as $choice => $_) {
                 $choices[$choice] = $this->isMultipleChoice()

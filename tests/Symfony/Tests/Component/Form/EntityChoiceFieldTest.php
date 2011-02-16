@@ -103,7 +103,7 @@ class EntityChoiceFieldTest extends DoctrineOrmTestCase
 //    }
 
     /**
-     * @expectedException Symfony\Component\Form\Exception\InvalidOptionsException
+     * @expectedException Symfony\Component\Form\Exception\UnexpectedTypeException
      */
     public function testConfigureQueryBuilderWithNonQueryBuilderAndNonClosure()
     {
@@ -115,7 +115,7 @@ class EntityChoiceFieldTest extends DoctrineOrmTestCase
     }
 
     /**
-     * @expectedException Symfony\Component\Form\Exception\InvalidOptionsException
+     * @expectedException Symfony\Component\Form\Exception\UnexpectedTypeException
      */
     public function testConfigureQueryBuilderWithClosureReturningNonQueryBuilder()
     {

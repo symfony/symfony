@@ -75,6 +75,7 @@
         <service id="assetic.filter.coffee" class="%assetic.filter.coffee.class%" public="false">
             <tag name="assetic.filter" alias="coffee" />
             <argument>%assetic.coffee_bin%</argument>
+            <argument>%assetic.node_bin%</argument>
         </service>
 
         <!-- other -->

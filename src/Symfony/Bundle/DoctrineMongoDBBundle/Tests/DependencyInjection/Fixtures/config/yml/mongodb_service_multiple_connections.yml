@@ -17,4 +17,3 @@ doctrine_mongo_db:
       metadata_cache_driver: xcache
     dm2:
       connection: conn2
-      database:   prod2

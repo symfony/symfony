@@ -37,6 +37,6 @@ class TestCase extends \PHPUnit_Framework_TestCase
         $config->setMetadataDriverImpl($config->newDefaultAnnotationDriver($paths));
         $config->setMetadataCacheImpl(new \Doctrine\Common\Cache\ArrayCache());
 
-        return DocumentManager::create(new Connection(), 'test', $config);
+        return DocumentManager::create(new Connection(), $config);
     }
 }

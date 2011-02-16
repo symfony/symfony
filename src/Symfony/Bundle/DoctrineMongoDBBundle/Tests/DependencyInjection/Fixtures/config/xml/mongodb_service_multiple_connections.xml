@@ -27,9 +27,7 @@
         </doctrine:connections>
         <doctrine:document-managers>
             <doctrine:document-manager id="dm1" metadata-cache-driver="xcache" connection="conn1" />
-            <doctrine:document-manager id="dm2" connection="conn2">
-                <database>prod2</database>
-            </doctrine:document-manager>
+            <doctrine:document-manager id="dm2" connection="conn2" />
         </doctrine:document-managers>
     </doctrine:mongodb>
 </container>

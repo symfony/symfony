@@ -21,7 +21,7 @@ use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
  *
  * @author Kris Wallsmith <kris.wallsmith@symfony-project.com>
  */
-class Controller
+class AsseticController
 {
     protected $request;
     protected $response;

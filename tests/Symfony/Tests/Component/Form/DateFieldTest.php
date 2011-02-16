@@ -149,6 +149,22 @@ class DateFieldTest extends DateTimeTestCase
         $this->assertTrue($field->isYearWithinRange());
     }
 
+    public function testIsYearWithinRange_returnsTrueIfEmpty_choice()
+    {
+        $field = new DateField('name', array(
+            'widget' => 'choice',
+            'years' => array(2010, 2011),
+        ));
+
+        $field->submit(array(
+            'day' => '1',
+            'month' => '2',
+            'year' => '',
+        ));
+
+        $this->assertTrue($field->isYearWithinRange());
+    }
+
     public function testIsYearWithinRange_returnsFalseIfNotContained()
     {
         $field = new DateField('name', array(
@@ -185,6 +201,22 @@ class DateFieldTest extends DateTimeTestCase
         $this->assertTrue($field->isMonthWithinRange());
     }
 
+    public function testIsMonthWithinRange_returnsTrueIfEmpty_choice()
+    {
+        $field = new DateField('name', array(
+            'widget' => 'choice',
+            'months' => array(6, 7),
+        ));
+
+        $field->submit(array(
+            'day' => '1',
+            'month' => '',
+            'year' => '2011',
+        ));
+
+        $this->assertTrue($field->isMonthWithinRange());
+    }
+
     public function testIsMonthWithinRange_returnsFalseIfNotContained()
     {
         $field = new DateField('name', array(
@@ -217,6 +249,22 @@ class DateFieldTest extends DateTimeTestCase
         ));
 
         $field->submit('');
+
+        $this->assertTrue($field->isDayWithinRange());
+    }
+
+    public function testIsDayWithinRange_returnsTrueIfEmpty_choice()
+    {
+        $field = new DateField('name', array(
+            'widget' => 'choice',
+            'days' => array(6, 7),
+        ));
+
+        $field->submit(array(
+            'day' => '',
+            'month' => '1',
+            'year' => '2011',
+        ));
 
         $this->assertTrue($field->isDayWithinRange());
     }

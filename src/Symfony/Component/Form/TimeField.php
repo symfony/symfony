@@ -195,7 +195,8 @@ class TimeField extends Form
     {
         $date = $this->getNormalizedData();
 
-        return null === $date || in_array($date->format('H'), $this->getOption('hours'));
+        return $this->isEmpty() || $this->get('hour')->isEmpty()
+                || in_array($date->format('H'), $this->getOption('hours'));
     }
 
     /**
@@ -210,7 +211,8 @@ class TimeField extends Form
     {
         $date = $this->getNormalizedData();
 
-        return null === $date || in_array($date->format('i'), $this->getOption('minutes'));
+        return $this->isEmpty() || $this->get('minute')->isEmpty()
+                || in_array($date->format('i'), $this->getOption('minutes'));
     }
 
     /**
@@ -225,7 +227,8 @@ class TimeField extends Form
     {
         $date = $this->getNormalizedData();
 
-        return null === $date || in_array($date->format('s'), $this->getOption('seconds'));
+        return $this->isEmpty() || !$this->has('second') || $this->get('second')->isEmpty()
+                || in_array($date->format('s'), $this->getOption('seconds'));
     }
 
     /**

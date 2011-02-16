@@ -159,7 +159,7 @@ class TimeFieldTest extends DateTimeTestCase
             'hours' => array(6, 7),
         ));
 
-        $field->submit(array('hour' => '', 'minute' => ''));
+        $field->submit(array('hour' => '', 'minute' => '06'));
 
         $this->assertTrue($field->isHourWithinRange());
     }
@@ -192,7 +192,7 @@ class TimeFieldTest extends DateTimeTestCase
             'minutes' => array(6, 7),
         ));
 
-        $field->submit(array('hour' => '', 'minute' => ''));
+        $field->submit(array('hour' => '06', 'minute' => ''));
 
         $this->assertTrue($field->isMinuteWithinRange());
     }
@@ -227,7 +227,18 @@ class TimeFieldTest extends DateTimeTestCase
             'with_seconds' => true,
         ));
 
-        $field->submit(array('hour' => '', 'minute' => ''));
+        $field->submit(array('hour' => '06', 'minute' => '06', 'second' => ''));
+
+        $this->assertTrue($field->isSecondWithinRange());
+    }
+
+    public function testIsSecondWithinRange_returnsTrueIfNotWithSeconds()
+    {
+        $field = new TimeField('name', array(
+            'seconds' => array(6, 7),
+        ));
+
+        $field->submit(array('hour' => '06', 'minute' => '06'));
 
         $this->assertTrue($field->isSecondWithinRange());
     }

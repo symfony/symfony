@@ -1338,6 +1338,32 @@ class FormTest extends \PHPUnit_Framework_TestCase
         $this->assertSame($ref2, $author['referenceCopy']);
     }
 
+    public function testIsEmptyReturnsTrueIfAllFieldsAreEmpty()
+    {
+        $form = new Form();
+        $field1 = new TestField('foo');
+        $field1->setData('');
+        $field2 = new TestField('bar');
+        $field2->setData(null);
+        $form->add($field1);
+        $form->add($field2);
+
+        $this->assertTrue($form->isEmpty());
+    }
+
+    public function testIsEmptyReturnsFalseIfAnyFieldIsFilled()
+    {
+        $form = new Form();
+        $field1 = new TestField('foo');
+        $field1->setData('baz');
+        $field2 = new TestField('bar');
+        $field2->setData(null);
+        $form->add($field1);
+        $form->add($field2);
+
+        $this->assertFalse($form->isEmpty());
+    }
+
     /**
      * Create a group containing two fields, "visibleField" and "hiddenField"
      *

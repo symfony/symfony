@@ -928,6 +928,20 @@ class Form extends Field implements \IteratorAggregate, FormInterface
     }
 
     /**
+     * {@inheritDoc}
+     */
+    public function isEmpty()
+    {
+        foreach ($this->fields as $field) {
+            if (!$field->isEmpty()) {
+                return false;
+            }
+        }
+
+        return true;
+    }
+
+    /**
      * Merges two arrays without reindexing numeric keys.
      *
      * @param array $array1 An array to merge

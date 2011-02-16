@@ -205,6 +205,13 @@ interface FieldInterface
     function isHidden();
 
     /**
+     * Returns whether the field is empty
+     *
+     * @return boolean
+     */
+    function isEmpty();
+
+    /**
      * Sets whether this field is required to be filled out when submitted.
      *
      * @param Boolean $required

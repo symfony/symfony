@@ -536,4 +536,12 @@ class Field extends Configurable implements FieldInterface
             $this->propertyPath->setValue($objectOrArray, $this->getData());
         }
     }
+
+    /**
+     * {@inheritDoc}
+     */
+    public function isEmpty()
+    {
+        return null === $this->data || '' === $this->data;
+    }
 }

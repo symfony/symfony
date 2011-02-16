@@ -123,4 +123,16 @@ class HybridField extends Form
             Field::submit($data);
         }
     }
+
+    /**
+     * {@inheritDoc}
+     */
+    public function isEmpty()
+    {
+        if ($this->mode === self::FORM) {
+            return parent::isEmpty();
+        } else {
+            return Field::isEmpty();
+        }
+    }
 }

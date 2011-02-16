@@ -511,6 +511,27 @@ class FieldTest extends \PHPUnit_Framework_TestCase
         $this->assertEquals($this->field, $this->field->getRoot());
     }
 
+    public function testIsEmptyReturnsTrueIfNull()
+    {
+        $this->field->setData(null);
+
+        $this->assertTrue($this->field->isEmpty());
+    }
+
+    public function testIsEmptyReturnsTrueIfEmptyString()
+    {
+        $this->field->setData('');
+
+        $this->assertTrue($this->field->isEmpty());
+    }
+
+    public function testIsEmptyReturnsFalseIfZero()
+    {
+        $this->field->setData(0);
+
+        $this->assertFalse($this->field->isEmpty());
+    }
+
     protected function createMockTransformer()
     {
         return $this->getMock('Symfony\Component\Form\ValueTransformer\ValueTransformerInterface', array(), array(), '', false, false);

@@ -213,10 +213,6 @@ class Configuration
                         ->scalarNode('class')->isRequired()->cannotBeEmpty()->end()
                         ->scalarNode('property')->defaultNull()->end()
                     ->end()
-                    ->arrayNode('document')
-                        ->scalarNode('class')->isRequired()->cannotBeEmpty()->end()
-                        ->scalarNode('property')->defaultNull()->end()
-                    ->end()
                 ->end()
             ->end()
         ;

@@ -28,7 +28,7 @@
     </parameters>
 
     <services>
-        <service id="security.acl.dbal.connection" alias="doctrine.dbal.default_connection" />
+        <service id="security.acl.dbal.connection" alias="database_connection" />
 
         <service id="security.acl.object_identity_retrieval_strategy" class="%security.acl.object_identity_retrieval_strategy.class%" public="false"></service>
 

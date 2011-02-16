@@ -4,9 +4,11 @@
     xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
     xsi:schemaLocation="http://www.symfony-project.org/schema/dic/services http://www.symfony-project.org/schema/dic/services/services-1.0.xsd">
 
-    <service id="assetic.filter.google_closure_compiler" class="%assetic.filter.google_closure_compiler_jar.class%">
-        <tag name="assetic.filter" alias="closure" />
-        <argument>%assetic.google_closure_compiler_jar%</argument>
-        <argument>%assetic.java_bin%</argument>
-    </service>
+    <services>
+        <service id="assetic.filter.google_closure_compiler" class="%assetic.filter.google_closure_compiler_jar.class%">
+            <tag name="assetic.filter" alias="closure" />
+            <argument>%assetic.google_closure_compiler_jar%</argument>
+            <argument>%assetic.java_bin%</argument>
+        </service>
+    </services>
 </container>

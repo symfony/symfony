@@ -12,6 +12,7 @@
 namespace Symfony\Bundle\AsseticBundle\Tests\DependencyInjection;
 
 use Symfony\Bundle\AsseticBundle\DependencyInjection\AsseticExtension;
+use Symfony\Component\DependencyInjection\Container;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\DependencyInjection\Dumper\PhpDumper;
 use Symfony\Component\DependencyInjection\Scope;
@@ -21,6 +22,20 @@ class AsseticExtensionTest extends \PHPUnit_Framework_TestCase
 {
     private $kernel;
     private $container;
+
+    static public function assertSaneContainer(Container $container, $message = '')
+    {
+        $errors = array();
+        foreach ($container->getServiceIds() as $id) {
+            try {
+                $container->get($id);
+            } catch (\Exception $e) {
+                $errors[$id] = $e->getMessage();
+            }
+        }
+
+        self::assertEquals(array(), $errors, $message);
+    }
 
     protected function setUp()
     {
@@ -56,11 +71,7 @@ class AsseticExtensionTest extends \PHPUnit_Framework_TestCase
         $this->assertFalse($this->container->has('assetic.filter.yui_css'), '->load() does not load the yui_css filter when a yui value is not provided');
         $this->assertFalse($this->container->has('assetic.filter.yui_js'), '->load() does not load the yui_js filter when a yui value is not provided');
 
-        // sanity check
-        $container = $this->getDumpedContainer();
-        foreach ($container->getServiceIds() as $id) {
-            $container->get($id);
-        }
+        $this->assertSaneContainer($this->getDumpedContainer());
     }
 
     public function getDebugModes()
@@ -79,11 +90,7 @@ class AsseticExtensionTest extends \PHPUnit_Framework_TestCase
         $this->assertTrue($this->container->has('assetic.filter.yui_css'), '->load() loads the yui_css filter when a yui value is provided');
         $this->assertTrue($this->container->has('assetic.filter.yui_js'), '->load() loads the yui_js filter when a yui value is provided');
 
-        // sanity check
-        $container = $this->getDumpedContainer();
-        foreach ($container->getServiceIds() as $id) {
-            $container->get($id);
-        }
+        $this->assertSaneContainer($this->getDumpedContainer());
     }
 
     /**
@@ -121,11 +128,7 @@ class AsseticExtensionTest extends \PHPUnit_Framework_TestCase
             $this->assertFalse($this->container->has($id), '"'.$id.'" is not registered when use_controller is '.$bool);
         }
 
-        // sanity check
-        $container = $this->getDumpedContainer();
-        foreach ($container->getServiceIds() as $id) {
-            $container->get($id);
-        }
+        $this->assertSaneContainer($this->getDumpedContainer());
     }
 
     public function getUseControllerKeys()
@@ -134,6 +137,14 @@ class AsseticExtensionTest extends \PHPUnit_Framework_TestCase
             array(true, array('assetic.routing_loader', 'assetic.controller'), array('assetic.asset_writer_cache_warmer', 'assetic.asset_writer')),
             array(false, array('assetic.asset_writer_cache_warmer', 'assetic.asset_writer'), array('assetic.routing_loader', 'assetic.controller')),
         );
+    }
+
+    public function testClosure()
+    {
+        $extension = new AsseticExtension();
+        $extension->load(array(array('closure' => '/path/to/closure.jar')), $this->container);
+
+        $this->assertSaneContainer($this->getDumpedContainer());
     }
 
     private function getDumpedContainer()

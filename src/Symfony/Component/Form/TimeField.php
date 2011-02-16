@@ -16,6 +16,9 @@ use Symfony\Component\Form\ValueTransformer\DateTimeToArrayTransformer;
 use Symfony\Component\Form\ValueTransformer\DateTimeToStringTransformer;
 use Symfony\Component\Form\ValueTransformer\DateTimeToTimestampTransformer;
 use Symfony\Component\Form\ValueTransformer\ValueTransformerChain;
+use Symfony\Component\Form\ChoiceList\HourChoiceList;
+use Symfony\Component\Form\ChoiceList\MinuteChoiceList;
+use Symfony\Component\Form\ChoiceList\SecondChoiceList;
 
 /**
  * Represents a time field.
@@ -81,9 +84,9 @@ class TimeField extends Form
         $this->addOption('type', self::DATETIME, self::$types);
         $this->addOption('with_seconds', false);
 
-        $this->addOption('hours', range(0, 23));
-        $this->addOption('minutes', range(0, 59));
-        $this->addOption('seconds', range(0, 59));
+        $this->addOption('hours', array());
+        $this->addOption('minutes', array());
+        $this->addOption('seconds', array());
 
         $this->addOption('data_timezone', date_default_timezone_get());
         $this->addOption('user_timezone', date_default_timezone_get());
@@ -97,15 +100,15 @@ class TimeField extends Form
             }
         } else {
             $this->add(new ChoiceField('hour', array(
-                'choices' => $this->generatePaddedChoices($this->getOption('hours'), 2),
+                'choice_list' => new HourChoiceList($this->getOption('hours')),
             )));
             $this->add(new ChoiceField('minute', array(
-                'choices' => $this->generatePaddedChoices($this->getOption('minutes'), 2),
+                'choice_list' => new MinuteChoiceList($this->getOption('minutes')),
             )));
 
             if ($this->getOption('with_seconds')) {
                 $this->add(new ChoiceField('second', array(
-                    'choices' => $this->generatePaddedChoices($this->getOption('seconds'), 2),
+                    'choice_list' => new SecondChoiceList($this->getOption('seconds')),
                 )));
             }
         }

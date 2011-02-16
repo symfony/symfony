@@ -17,6 +17,9 @@ use Symfony\Component\Form\ValueTransformer\DateTimeToTimestampTransformer;
 use Symfony\Component\Form\ValueTransformer\ValueTransformerChain;
 use Symfony\Component\Form\ValueTransformer\DateTimeToLocalizedStringTransformer;
 use Symfony\Component\Form\ValueTransformer\DateTimeToArrayTransformer;
+use Symfony\Component\Form\ChoiceList\YearChoiceList;
+use Symfony\Component\Form\ChoiceList\MonthChoiceList;
+use Symfony\Component\Form\ChoiceList\DayChoiceList;
 
 /**
  * Represents a date field.
@@ -108,9 +111,9 @@ class DateField extends HybridField
         $this->addOption('type', self::DATETIME, self::$types);
         $this->addOption('pattern');
 
-        $this->addOption('years', range(date('Y') - 5, date('Y') + 5));
-        $this->addOption('months', range(1, 12));
-        $this->addOption('days', range(1, 31));
+        $this->addOption('years', array());
+        $this->addOption('months', array());
+        $this->addOption('days', array());
 
         $this->addOption('format', self::MEDIUM, self::$formats);
         $this->addOption('data_timezone', date_default_timezone_get());
@@ -164,57 +167,16 @@ class DateField extends HybridField
 
             $this->setFieldMode(self::FORM);
 
-            $this->addChoiceFields();
+            $this->add(new ChoiceField('year', array(
+                'choice_list' => new YearChoiceList($this->getOption('years')),
+            )));
+            $this->add(new ChoiceField('month', array(
+                'choice_list' => new MonthChoiceList($this->formatter, $this->getOption('months')),
+            )));
+            $this->add(new ChoiceField('day', array(
+                'choice_list' => new DayChoiceList($this->getOption('days')),
+            )));
         }
-    }
-
-    /**
-     * Generates an array of choices for the given values
-     *
-     * If the values are shorter than $padLength characters, they are padded with
-     * zeros on the left side.
-     *
-     * @param  array   $values     The available choices
-     * @param  integer $padLength  The length to pad the choices
-     * @return array               An array with the input values as keys and the
-     *                             padded values as values
-     */
-    protected function generatePaddedChoices(array $values, $padLength)
-    {
-        $choices = array();
-
-        foreach ($values as $value) {
-            $choices[$value] = str_pad($value, $padLength, '0', STR_PAD_LEFT);
-        }
-
-        return $choices;
-    }
-
-    /**
-     * Generates an array of localized month choices
-     *
-     * @param  array $months  The month numbers to generate
-     * @return array          The localized months respecting the configured
-     *                        locale and date format
-     */
-    protected function generateMonthChoices(array $months)
-    {
-        $pattern = $this->formatter->getPattern();
-
-        if (preg_match('/M+/', $pattern, $matches)) {
-            $this->formatter->setPattern($matches[0]);
-            $choices = array();
-
-            foreach ($months as $month) {
-                $choices[$month] = $this->formatter->format(gmmktime(0, 0, 0, $month));
-            }
-
-            $this->formatter->setPattern($pattern);
-        } else {
-            $choices = $this->generatePaddedChoices($months, 2);
-        }
-
-        return $choices;
     }
 
     public function getPattern()
@@ -232,22 +194,6 @@ class DateField extends HybridField
 
         // default fallback
         return '{{ year }}-{{ month }}-{{ day }}';
-    }
-
-    /**
-     * Adds (or replaces if already added) the fields used when widget=CHOICE
-     */
-    protected function addChoiceFields()
-    {
-        $this->add(new ChoiceField('year', array(
-            'choices' => $this->generatePaddedChoices($this->getOption('years'), 4),
-        )));
-        $this->add(new ChoiceField('month', array(
-            'choices' => $this->generateMonthChoices($this->getOption('months')),
-        )));
-        $this->add(new ChoiceField('day', array(
-            'choices' => $this->generatePaddedChoices($this->getOption('days'), 2),
-        )));
     }
 
     /**

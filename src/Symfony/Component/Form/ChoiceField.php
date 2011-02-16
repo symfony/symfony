@@ -63,20 +63,25 @@ class ChoiceField extends HybridField
 
     protected function configure()
     {
-        $this->addRequiredOption('choices');
+        $this->addOption('choices', array());
         $this->addOption('preferred_choices', array());
         $this->addOption('multiple', false);
         $this->addOption('expanded', false);
         $this->addOption('empty_value', '');
+        $this->addOption('choice_list');
 
         parent::configure();
 
-        $this->choiceList = new DefaultChoiceList(
-            $this->getOption('choices'),
-            $this->getOption('preferred_choices'),
-            $this->getOption('empty_value'),
-            $this->isRequired()
-        );
+        if ($this->getOption('choice_list')) {
+            $this->choiceList = $this->getOption('choice_list');
+        } else {
+            $this->choiceList = new DefaultChoiceList(
+                $this->getOption('choices'),
+                $this->getOption('preferred_choices'),
+                $this->getOption('empty_value'),
+                $this->isRequired()
+            );
+        }
 
         if ($this->getOption('expanded')) {
             if ($this->getOption('multiple')) {

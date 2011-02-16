@@ -96,12 +96,12 @@ class DateTimeField extends Form
         $this->addOption('date_pattern');
         $this->addOption('with_seconds', false);
 
-        $this->addOption('years', range(date('Y') - 5, date('Y') + 5));
-        $this->addOption('months', range(1, 12));
-        $this->addOption('days', range(1, 31));
-        $this->addOption('hours', range(0, 23));
-        $this->addOption('minutes', range(0, 59));
-        $this->addOption('seconds', range(0, 59));
+        $this->addOption('years', array());
+        $this->addOption('months', array());
+        $this->addOption('days', array());
+        $this->addOption('hours', array());
+        $this->addOption('minutes', array());
+        $this->addOption('seconds', array());
 
         $this->addOption('data_timezone', date_default_timezone_get());
         $this->addOption('user_timezone', date_default_timezone_get());

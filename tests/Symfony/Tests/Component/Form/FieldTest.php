@@ -220,6 +220,14 @@ class FieldTest extends \PHPUnit_Framework_TestCase
         $this->assertSame('', $this->field->getDisplayedData());
     }
 
+    public function testValuesAreTransformedCorrectlyIfNotNull_noValueTransformer()
+    {
+        $this->field->setData(123);
+
+        $this->assertSame(123, $this->field->getData());
+        $this->assertSame('123', $this->field->getDisplayedData());
+    }
+
     public function testSubmittedValuesAreTransformedCorrectly()
     {
         $valueTransformer = $this->createMockTransformer();

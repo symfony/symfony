@@ -180,7 +180,7 @@ class ChoiceField extends HybridField
 
     public function isChoiceSelected($choice)
     {
-        return in_array($choice, (array) $this->getDisplayedData());
+        return in_array((string) $choice, (array) $this->getDisplayedData(), true);
     }
 
     public function isMultipleChoice()

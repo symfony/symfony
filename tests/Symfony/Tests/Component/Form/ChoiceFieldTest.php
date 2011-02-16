@@ -46,6 +46,62 @@ class ChoiceFieldTest extends \PHPUnit_Framework_TestCase
         4 => 'Roman',
     );
 
+    public function testIsChoiceSelectedDifferentiatesBetweenZeroAndEmpty_integerZero()
+    {
+        $field = new ChoiceField('name', array(
+            'choices' => array(
+                0 => 'Foo',
+                '' => 'Bar',
+            )
+        ));
+
+        $field->submit(0);
+
+        $this->assertTrue($field->isChoiceSelected(0));
+        $this->assertTrue($field->isChoiceSelected('0'));
+        $this->assertFalse($field->isChoiceSelected(''));
+
+        $field->submit('0');
+
+        $this->assertTrue($field->isChoiceSelected(0));
+        $this->assertTrue($field->isChoiceSelected('0'));
+        $this->assertFalse($field->isChoiceSelected(''));
+
+        $field->submit('');
+
+        $this->assertFalse($field->isChoiceSelected(0));
+        $this->assertFalse($field->isChoiceSelected('0'));
+        $this->assertTrue($field->isChoiceSelected(''));
+    }
+
+    public function testIsChoiceSelectedDifferentiatesBetweenZeroAndEmpty_stringZero()
+    {
+        $field = new ChoiceField('name', array(
+            'choices' => array(
+                '0' => 'Foo',
+                '' => 'Bar',
+            )
+        ));
+
+        $field->submit(0);
+
+        $this->assertTrue($field->isChoiceSelected(0));
+        $this->assertTrue($field->isChoiceSelected('0'));
+        $this->assertFalse($field->isChoiceSelected(''));
+
+        $field->submit('0');
+
+        $this->assertTrue($field->isChoiceSelected(0));
+        $this->assertTrue($field->isChoiceSelected('0'));
+        $this->assertFalse($field->isChoiceSelected(''));
+
+        $field->submit('');
+
+        $this->assertFalse($field->isChoiceSelected(0));
+        $this->assertFalse($field->isChoiceSelected('0'));
+        $this->assertTrue($field->isChoiceSelected(''));
+    }
+
     /**
      * @expectedException Symfony\Component\Form\Exception\InvalidOptionsException
      */

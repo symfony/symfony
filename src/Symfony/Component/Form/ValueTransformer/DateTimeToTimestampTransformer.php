@@ -27,8 +27,8 @@ class DateTimeToTimestampTransformer extends Configurable implements ValueTransf
      */
     protected function configure()
     {
-        $this->addOption('input_timezone', 'UTC');
-        $this->addOption('output_timezone', 'UTC');
+        $this->addOption('input_timezone', date_default_timezone_get());
+        $this->addOption('output_timezone', date_default_timezone_get());
 
         parent::configure();
     }

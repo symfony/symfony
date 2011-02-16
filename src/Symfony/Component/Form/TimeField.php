@@ -85,8 +85,8 @@ class TimeField extends Form
         $this->addOption('minutes', range(0, 59));
         $this->addOption('seconds', range(0, 59));
 
-        $this->addOption('data_timezone', 'UTC');
-        $this->addOption('user_timezone', 'UTC');
+        $this->addOption('data_timezone', date_default_timezone_get());
+        $this->addOption('user_timezone', date_default_timezone_get());
 
         if ($this->getOption('widget') == self::INPUT) {
             $this->add(new TextField('hour', array('max_length' => 2)));

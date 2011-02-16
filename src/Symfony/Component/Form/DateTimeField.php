@@ -103,8 +103,8 @@ class DateTimeField extends Form
         $this->addOption('minutes', range(0, 59));
         $this->addOption('seconds', range(0, 59));
 
-        $this->addOption('data_timezone', 'UTC');
-        $this->addOption('user_timezone', 'UTC');
+        $this->addOption('data_timezone', date_default_timezone_get());
+        $this->addOption('user_timezone', date_default_timezone_get());
         $this->addOption('date_format', DateField::MEDIUM, self::$dateFormats);
 
         $this->add(new DateField('date', array(

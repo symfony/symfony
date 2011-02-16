@@ -25,7 +25,12 @@ class DateFieldTest extends DateTimeTestCase
 
     public function testSubmit_fromInput_dateTime()
     {
-        $field = new DateField('name', array('widget' => 'input', 'type' => DateField::DATETIME));
+        $field = new DateField('name', array(
+            'data_timezone' => 'UTC',
+            'user_timezone' => 'UTC',
+            'widget' => 'input',
+            'type' => DateField::DATETIME,
+        ));
 
         $field->submit('2.6.2010');
 
@@ -35,7 +40,12 @@ class DateFieldTest extends DateTimeTestCase
 
     public function testSubmit_fromInput_string()
     {
-        $field = new DateField('name', array('widget' => 'input', 'type' => DateField::STRING));
+        $field = new DateField('name', array(
+            'data_timezone' => 'UTC',
+            'user_timezone' => 'UTC',
+            'widget' => 'input',
+            'type' => DateField::STRING,
+        ));
 
         $field->submit('2.6.2010');
 
@@ -45,7 +55,12 @@ class DateFieldTest extends DateTimeTestCase
 
     public function testSubmit_fromInput_timestamp()
     {
-        $field = new DateField('name', array('widget' => 'input', 'type' => DateField::TIMESTAMP));
+        $field = new DateField('name', array(
+            'data_timezone' => 'UTC',
+            'user_timezone' => 'UTC',
+            'widget' => 'input',
+            'type' => DateField::TIMESTAMP,
+        ));
 
         $field->submit('2.6.2010');
 
@@ -78,7 +93,11 @@ class DateFieldTest extends DateTimeTestCase
 
     public function testSubmit_fromChoice()
     {
-        $field = new DateField('name', array('widget' => DateField::CHOICE));
+        $field = new DateField('name', array(
+            'data_timezone' => 'UTC',
+            'user_timezone' => 'UTC',
+            'widget' => DateField::CHOICE,
+        ));
 
         $input = array(
             'day' => '2',
@@ -96,7 +115,12 @@ class DateFieldTest extends DateTimeTestCase
 
     public function testSubmit_fromChoice_empty()
     {
-        $field = new DateField('name', array('widget' => DateField::CHOICE, 'required' => false));
+        $field = new DateField('name', array(
+            'data_timezone' => 'UTC',
+            'user_timezone' => 'UTC',
+            'widget' => DateField::CHOICE,
+            'required' => false,
+        ));
 
         $input = array(
             'day' => '',
@@ -128,6 +152,8 @@ class DateFieldTest extends DateTimeTestCase
     public function testIsYearWithinRange_returnsTrueIfWithin()
     {
         $field = new DateField('name', array(
+            'data_timezone' => 'UTC',
+            'user_timezone' => 'UTC',
             'widget' => 'input',
             'years' => array(2010, 2011),
         ));
@@ -140,6 +166,8 @@ class DateFieldTest extends DateTimeTestCase
     public function testIsYearWithinRange_returnsTrueIfEmpty()
     {
         $field = new DateField('name', array(
+            'data_timezone' => 'UTC',
+            'user_timezone' => 'UTC',
             'widget' => 'input',
             'years' => array(2010, 2011),
         ));
@@ -152,6 +180,8 @@ class DateFieldTest extends DateTimeTestCase
     public function testIsYearWithinRange_returnsTrueIfEmpty_choice()
     {
         $field = new DateField('name', array(
+            'data_timezone' => 'UTC',
+            'user_timezone' => 'UTC',
             'widget' => 'choice',
             'years' => array(2010, 2011),
         ));
@@ -168,6 +198,8 @@ class DateFieldTest extends DateTimeTestCase
     public function testIsYearWithinRange_returnsFalseIfNotContained()
     {
         $field = new DateField('name', array(
+            'data_timezone' => 'UTC',
+            'user_timezone' => 'UTC',
             'widget' => 'input',
             'years' => array(2010, 2012),
         ));
@@ -180,6 +212,8 @@ class DateFieldTest extends DateTimeTestCase
     public function testIsMonthWithinRange_returnsTrueIfWithin()
     {
         $field = new DateField('name', array(
+            'data_timezone' => 'UTC',
+            'user_timezone' => 'UTC',
             'widget' => 'input',
             'months' => array(6, 7),
         ));
@@ -192,6 +226,8 @@ class DateFieldTest extends DateTimeTestCase
     public function testIsMonthWithinRange_returnsTrueIfEmpty()
     {
         $field = new DateField('name', array(
+            'data_timezone' => 'UTC',
+            'user_timezone' => 'UTC',
             'widget' => 'input',
             'months' => array(6, 7),
         ));
@@ -204,6 +240,8 @@ class DateFieldTest extends DateTimeTestCase
     public function testIsMonthWithinRange_returnsTrueIfEmpty_choice()
     {
         $field = new DateField('name', array(
+            'data_timezone' => 'UTC',
+            'user_timezone' => 'UTC',
             'widget' => 'choice',
             'months' => array(6, 7),
         ));
@@ -220,6 +258,8 @@ class DateFieldTest extends DateTimeTestCase
     public function testIsMonthWithinRange_returnsFalseIfNotContained()
     {
         $field = new DateField('name', array(
+            'data_timezone' => 'UTC',
+            'user_timezone' => 'UTC',
             'widget' => 'input',
             'months' => array(6, 8),
         ));
@@ -232,6 +272,8 @@ class DateFieldTest extends DateTimeTestCase
     public function testIsDayWithinRange_returnsTrueIfWithin()
     {
         $field = new DateField('name', array(
+            'data_timezone' => 'UTC',
+            'user_timezone' => 'UTC',
             'widget' => 'input',
             'days' => array(6, 7),
         ));
@@ -244,6 +286,8 @@ class DateFieldTest extends DateTimeTestCase
     public function testIsDayWithinRange_returnsTrueIfEmpty()
     {
         $field = new DateField('name', array(
+            'data_timezone' => 'UTC',
+            'user_timezone' => 'UTC',
             'widget' => 'input',
             'days' => array(6, 7),
         ));
@@ -256,6 +300,8 @@ class DateFieldTest extends DateTimeTestCase
     public function testIsDayWithinRange_returnsTrueIfEmpty_choice()
     {
         $field = new DateField('name', array(
+            'data_timezone' => 'UTC',
+            'user_timezone' => 'UTC',
             'widget' => 'choice',
             'days' => array(6, 7),
         ));
@@ -272,6 +318,8 @@ class DateFieldTest extends DateTimeTestCase
     public function testIsDayWithinRange_returnsFalseIfNotContained()
     {
         $field = new DateField('name', array(
+            'data_timezone' => 'UTC',
+            'user_timezone' => 'UTC',
             'widget' => 'input',
             'days' => array(6, 8),
         ));
@@ -284,6 +332,8 @@ class DateFieldTest extends DateTimeTestCase
     public function testIsPartiallyFilled_returnsFalseIfInput()
     {
         $field = new DateField('name', array(
+            'data_timezone' => 'UTC',
+            'user_timezone' => 'UTC',
             'widget' => 'input',
         ));
 
@@ -295,6 +345,8 @@ class DateFieldTest extends DateTimeTestCase
     public function testIsPartiallyFilled_returnsFalseIfChoiceAndCompletelyEmpty()
     {
         $field = new DateField('name', array(
+            'data_timezone' => 'UTC',
+            'user_timezone' => 'UTC',
             'widget' => 'choice',
         ));
 
@@ -310,6 +362,8 @@ class DateFieldTest extends DateTimeTestCase
     public function testIsPartiallyFilled_returnsFalseIfChoiceAndCompletelyFilled()
     {
         $field = new DateField('name', array(
+            'data_timezone' => 'UTC',
+            'user_timezone' => 'UTC',
             'widget' => 'choice',
         ));
 
@@ -325,6 +379,8 @@ class DateFieldTest extends DateTimeTestCase
     public function testIsPartiallyFilled_returnsTrueIfChoiceAndDayEmpty()
     {
         $field = new DateField('name', array(
+            'data_timezone' => 'UTC',
+            'user_timezone' => 'UTC',
             'widget' => 'choice',
         ));
 

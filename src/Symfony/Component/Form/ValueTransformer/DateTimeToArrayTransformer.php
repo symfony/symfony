@@ -112,16 +112,20 @@ class DateTimeToArrayTransformer extends BaseDateTimeTransformer
             return null;
         }
 
-        $dateTime = new \DateTime(sprintf(
-            '%s-%s-%s %s:%s:%s %s',
-            empty($value['year']) ? '1970' : $value['year'],
-            empty($value['month']) ? '1' : $value['month'],
-            empty($value['day']) ? '1' : $value['day'],
-            empty($value['hour']) ? '0' : $value['hour'],
-            empty($value['minute']) ? '0' : $value['minute'],
-            empty($value['second']) ? '0' : $value['second'],
-            $outputTimezone
-        ));
+        try {
+            $dateTime = new \DateTime(sprintf(
+                '%s-%s-%s %s:%s:%s %s',
+                empty($value['year']) ? '1970' : $value['year'],
+                empty($value['month']) ? '1' : $value['month'],
+                empty($value['day']) ? '1' : $value['day'],
+                empty($value['hour']) ? '0' : $value['hour'],
+                empty($value['minute']) ? '0' : $value['minute'],
+                empty($value['second']) ? '0' : $value['second'],
+                $outputTimezone
+            ));
+        } catch (\Exception $e) {
+            throw new TransformationFailedException($e->getMessage(), null, $e);
+        }
 
         if ($inputTimezone != $outputTimezone) {
             $dateTime->setTimezone(new \DateTimeZone($inputTimezone));

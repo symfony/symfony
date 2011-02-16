@@ -120,12 +120,12 @@ class DateTimeToArrayTransformerTest extends DateTimeTestCase
         $this->assertSame($output, $transformer->transform($input));
     }
 
+    /**
+     * @expectedException Symfony\Component\Form\Exception\UnexpectedTypeException
+     */
     public function testTransformRequiresDateTime()
     {
         $transformer = new DateTimeToArrayTransformer();
-
-        $this->setExpectedException('Symfony\Component\Form\Exception\UnexpectedTypeException');
-
         $transformer->reverseTransform('12345', null);
     }
 
@@ -217,12 +217,108 @@ class DateTimeToArrayTransformerTest extends DateTimeTestCase
         $this->assertDateTimeEquals($output, $transformer->reverseTransform($input, null));
     }
 
+    /**
+     * @expectedException Symfony\Component\Form\Exception\UnexpectedTypeException
+     */
     public function testReverseTransformRequiresArray()
     {
         $transformer = new DateTimeToArrayTransformer();
-
-        $this->setExpectedException('Symfony\Component\Form\Exception\UnexpectedTypeException');
-
         $transformer->reverseTransform('12345', null);
+    }
+
+    /**
+     * @expectedException Symfony\Component\Form\ValueTransformer\TransformationFailedException
+     */
+    public function testReverseTransformWithNegativeYear()
+    {
+        $transformer = new DateTimeToArrayTransformer();
+        $transformer->reverseTransform(array(
+            'year' => '-1',
+            'month' => '2',
+            'day' => '3',
+            'hour' => '4',
+            'minute' => '5',
+            'second' => '6',
+        ));
+    }
+
+    /**
+     * @expectedException Symfony\Component\Form\ValueTransformer\TransformationFailedException
+     */
+    public function testReverseTransformWithNegativeMonth()
+    {
+        $transformer = new DateTimeToArrayTransformer();
+        $transformer->reverseTransform(array(
+            'year' => '2010',
+            'month' => '-1',
+            'day' => '3',
+            'hour' => '4',
+            'minute' => '5',
+            'second' => '6',
+        ));
+    }
+
+    /**
+     * @expectedException Symfony\Component\Form\ValueTransformer\TransformationFailedException
+     */
+    public function testReverseTransformWithNegativeDay()
+    {
+        $transformer = new DateTimeToArrayTransformer();
+        $transformer->reverseTransform(array(
+            'year' => '2010',
+            'month' => '2',
+            'day' => '-1',
+            'hour' => '4',
+            'minute' => '5',
+            'second' => '6',
+        ));
+    }
+
+    /**
+     * @expectedException Symfony\Component\Form\ValueTransformer\TransformationFailedException
+     */
+    public function testReverseTransformWithNegativeHour()
+    {
+        $transformer = new DateTimeToArrayTransformer();
+        $transformer->reverseTransform(array(
+            'year' => '2010',
+            'month' => '2',
+            'day' => '3',
+            'hour' => '-1',
+            'minute' => '5',
+            'second' => '6',
+        ));
+    }
+
+    /**
+     * @expectedException Symfony\Component\Form\ValueTransformer\TransformationFailedException
+     */
+    public function testReverseTransformWithNegativeMinute()
+    {
+        $transformer = new DateTimeToArrayTransformer();
+        $transformer->reverseTransform(array(
+            'year' => '2010',
+            'month' => '2',
+            'day' => '3',
+            'hour' => '4',
+            'minute' => '-1',
+            'second' => '6',
+        ));
+    }
+
+    /**
+     * @expectedException Symfony\Component\Form\ValueTransformer\TransformationFailedException
+     */
+    public function testReverseTransformWithNegativeSecond()
+    {
+        $transformer = new DateTimeToArrayTransformer();
+        $transformer->reverseTransform(array(
+            'year' => '2010',
+            'month' => '2',
+            'day' => '3',
+            'hour' => '4',
+            'minute' => '5',
+            'second' => '-1',
+        ));
     }
 }

@@ -37,12 +37,6 @@
         <parameter key="doctrine.orm.metadata.staticphp_class">Doctrine\ORM\Mapping\Driver\StaticPHPDriver</parameter>
         <parameter key="doctrine.orm.class_metadata_factory_name">Doctrine\ORM\Mapping\ClassMetadataFactory</parameter>
 
-        <!-- security/user -->
-        <parameter key="security.user.provider.entity.class">Symfony\Bundle\DoctrineBundle\Security\EntityUserProvider</parameter>
-        
-        <!--  security/acl -->
-        <parameter key="security.acl.collection_cache.class">Symfony\Bundle\DoctrineBundle\Security\AclCollectionCache</parameter>
-
         <!-- cache warmer -->
         <parameter key="doctrine.orm.proxy_cache_warmer.class">Symfony\Bundle\DoctrineBundle\CacheWarmer\ProxyCacheWarmer</parameter>
         
@@ -58,8 +52,6 @@
               <argument>orm</argument>
             </call>
         </service>
-
-        <service id="security.user.entity_manager" alias="doctrine.orm.default_entity_manager" public="false" />
 
         <service id="doctrine.orm.proxy_cache_warmer" class="%doctrine.orm.proxy_cache_warmer.class%" public="false">
             <tag name="kernel.cache_warmer" />

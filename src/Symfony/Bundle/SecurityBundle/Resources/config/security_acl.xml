@@ -11,30 +11,32 @@
         <parameter key="security.acl.dbal.oid_ancestors_table_name">acl_object_identity_ancestors</parameter>
         <parameter key="security.acl.dbal.sid_table_name">acl_security_identities</parameter>
         <parameter key="security.acl.dbal.provider.class">Symfony\Component\Security\Acl\Dbal\MutableAclProvider</parameter>
-        
+
         <parameter key="security.acl.permission_granting_strategy.class">Symfony\Component\Security\Acl\Domain\PermissionGrantingStrategy</parameter>
-        
+
         <parameter key="security.acl.voter.class">Symfony\Component\Security\Acl\Voter\AclVoter</parameter>
         <parameter key="security.acl.voter.allow_if_object_identity_unavailable">true</parameter>
         <parameter key="security.acl.permission.map.class">Symfony\Component\Security\Acl\Permission\BasicPermissionMap</parameter>
-        
+
         <parameter key="security.acl.object_identity_retrieval_strategy.class">Symfony\Component\Security\Acl\Domain\ObjectIdentityRetrievalStrategy</parameter>
         <parameter key="security.acl.security_identity_retrieval_strategy.class">Symfony\Component\Security\Acl\Domain\SecurityIdentityRetrievalStrategy</parameter>
-        
+
         <parameter key="security.acl.cache.doctrine.class">Symfony\Component\Security\Acl\Domain\DoctrineAclCache</parameter>
         <parameter key="security.acl.cache.doctrine.prefix">sf2_acl_</parameter>
+
+        <parameter key="security.acl.collection_cache.class">Symfony\Component\Security\Acl\Domain\AclCollectionCache</parameter>
     </parameters>
 
     <services>
         <service id="security.acl.dbal.connection" alias="doctrine.dbal.default_connection" />
-    
+
         <service id="security.acl.object_identity_retrieval_strategy" class="%security.acl.object_identity_retrieval_strategy.class%" public="false"></service>
-        
+
         <service id="security.acl.security_identity_retrieval_strategy" class="%security.acl.security_identity_retrieval_strategy.class%" public="false">
             <argument type="service" id="security.role_hierarchy" />
             <argument type="service" id="security.authentication.trust_resolver" />
         </service>
-    
+
         <service id="security.acl.dbal.provider" class="%security.acl.dbal.provider.class%" public="false">
             <argument type="service" id="security.acl.dbal.connection" />
             <argument type="service" id="security.acl.permission_granting_strategy" />
@@ -49,23 +51,23 @@
         </service>
 
         <service id="security.acl.provider" alias="security.acl.dbal.provider" />
-        
+
         <service id="security.acl.permission_granting_strategy" class="%security.acl.permission_granting_strategy.class%" public="false">
             <call method="setAuditLogger">
                 <argument type="service" id="security.acl.audit_logger" on-invalid="ignore" />
             </call>
         </service>
-        
+
         <service id="security.acl.cache.doctrine" class="%security.acl.cache.doctrine.class%" public="false">
             <argument type="service" id="security.acl.cache.doctrine_cache_impl" />
             <argument type="service" id="security.acl.permission_granting_strategy" />        
             <argument>%security.acl.cache.doctrine.prefix%</argument>
         </service>
-        
+
         <service id="security.acl.cache.doctrine.cache_impl" alias="doctrine.orm.default_result_cache" public="false" />
-        
+
         <service id="security.acl.permission.map" class="%security.acl.permission.map.class%" public="false"></service>
-        
+
         <service id="security.acl.voter.basic_permissions" class="%security.acl.voter.class%" public="false">
             <argument type="service" id="security.acl.provider" />
             <argument type="service" id="security.acl.object_identity_retrieval_strategy" />

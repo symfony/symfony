@@ -64,7 +64,7 @@ class UsernamePasswordFormAuthenticationListener extends AbstractAuthenticationL
         if (null !== $this->csrfProvider) {
             $csrfToken = $request->get($this->options['csrf_parameter']);
 
-            if (false === $this->csrfProvider->isTokenValid($this->options['csrf_page_id'], $csrfToken)) {
+            if (false === $this->csrfProvider->isCsrfTokenValid($this->options['csrf_page_id'], $csrfToken)) {
                 throw new InvalidCsrfTokenException('Invalid CSRF token.');
             }
         }

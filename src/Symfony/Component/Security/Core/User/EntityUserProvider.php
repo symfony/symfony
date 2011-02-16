@@ -9,20 +9,27 @@
  * file that was distributed with this source code.
  */
 
-namespace Symfony\Bundle\DoctrineBundle\Security;
+namespace Symfony\Component\Security\Core\User;
 
-use Symfony\Component\Security\Core\User\AccountInterface;
-use Symfony\Component\Security\Core\User\UserProviderInterface;
+use Doctrine\ORM\EntityManager;
 use Symfony\Component\Security\Core\Exception\UnsupportedAccountException;
 use Symfony\Component\Security\Core\Exception\UsernameNotFoundException;
 
+/**
+ * Wrapper around a Doctrine EntityManager.
+ *
+ * Provides easy to use provisioning for Doctrine entity users.
+ *
+ * @author Fabien Potencier <fabien.potencier@symfony-project.com>
+ * @author Johannes M. Schmitt <schmittjoh@gmail.com>
+ */
 class EntityUserProvider implements UserProviderInterface
 {
     protected $class;
     protected $repository;
     protected $property;
 
-    public function __construct($em, $class, $property = null)
+    public function __construct(EntityManager $em, $class, $property = null)
     {
         $this->class = $class;
 

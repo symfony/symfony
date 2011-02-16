@@ -47,8 +47,6 @@ class SecurityExtension extends Extension
 
     public function load(array $configs, ContainerBuilder $container)
     {
-        $this->aclLoad($configs, $container);
-
         $tmp = array_filter($configs);
         if (empty($tmp)) {
             return;
@@ -83,22 +81,10 @@ class SecurityExtension extends Extension
         if ($config['encoders']) {
             $this->createEncoders($config['encoders'], $container);
         }
-    }
 
-    protected function aclLoad(array $configs, ContainerBuilder $container)
-    {
-        $processor = new Processor();
-        $config = $processor->process($this->configuration->getAclConfigTree(), $configs);
-
-        $loader = new XmlFileLoader($container, new FileLocator(array(__DIR__.'/../Resources/config', __DIR__.'/Resources/config')));
-        $loader->load('security_acl.xml');
-
-        if (isset($config['connection'])) {
-            $container->setAlias('security.acl.dbal.connection', sprintf('doctrine.dbal.%s_connection', $config['connection']));
-        }
-
-        if (isset($config['cache'])) {
-            $container->setAlias('security.acl.cache', sprintf('security.acl.cache.%s', $config['cache']));
+        // load ACL
+        if (isset($config['acl'])) {
+            $this->aclLoad($config['acl'], $container);
         }
     }
 
@@ -120,6 +106,20 @@ class SecurityExtension extends Extension
     public function getAlias()
     {
         return 'security';
+    }
+
+    protected function aclLoad($config, ContainerBuilder $container)
+    {
+        $loader = new XmlFileLoader($container, new FileLocator(array(__DIR__.'/../Resources/config', __DIR__.'/Resources/config')));
+        $loader->load('security_acl.xml');
+
+        if (isset($config['connection'])) {
+            $container->setAlias('security.acl.dbal.connection', sprintf('doctrine.dbal.%s_connection', $config['connection']));
+        }
+
+        if (isset($config['cache'])) {
+            $container->setAlias('security.acl.cache', sprintf('security.acl.cache.%s', $config['cache']));
+        }
     }
 
     /**
@@ -421,8 +421,6 @@ class SecurityExtension extends Extension
     }
 
     // Parses a <provider> tag and returns the id for the related user provider service
-    // FIXME: Replace register() calls in this method with DefinitionDecorator
-    //        and move the actual definition to an xml file
     protected function createUserDaoProvider($name, $provider, ContainerBuilder $container, $master = true)
     {
         $name = $this->getUserProviderId(strtolower($name));
@@ -443,42 +441,22 @@ class SecurityExtension extends Extension
         // Doctrine Entity DAO provider
         if (isset($provider['entity'])) {
             $container
-                ->register($name, '%security.user.provider.entity.class%')
-                ->setPublic(false)
-                ->setArguments(array(
-                    new Reference('security.user.entity_manager'),
-                    $provider['entity']['class'],
-                    $provider['entity']['property'],
-                ))
+                ->setDefinition($name, new DefinitionDecorator('security.user.provider.entity'))
+                ->addArgument($provider['entity']['class'])
+                ->addArgument($provider['entity']['property'])
             ;
 
             return $name;
         }
 
-        // Doctrine Document DAO provider
-        if (isset($provider['document'])) {
-            $container
-                ->register($name, '%security.user.provider.document.class%')
-                ->setPublic(false)
-                ->setArguments(array(
-                    new Reference('security.user.document_manager'),
-                    $provider['document']['class'],
-                    $provider['document']['property'],
-            ));
-
-            return $name;
-        }
-
         // In-memory DAO provider
-        $definition = $container->register($name, '%security.user.provider.in_memory.class%');
-        $definition->setPublic(false);
+        $definition = $container->setDefinition($name, new DefinitionDecorator('security.user.provider.in_memory'));
         foreach ($provider['users'] as $username => $user) {
             $userId = $name.'_'.$username;
 
             $container
-                ->register($userId, 'Symfony\Component\Security\Core\User\User')
+                ->setDefinition($userId, new DefinitionDecorator('security.user.provider.in_memory.user'))
                 ->setArguments(array($username, $user['password'], $user['roles']))
-                ->setPublic(false)
             ;
 
             $definition->addMethodCall('createUser', array(new Reference($userId)));
@@ -489,7 +467,7 @@ class SecurityExtension extends Extension
 
     protected function getUserProviderId($name)
     {
-        return 'security.user.provider.'.$name;
+        return 'security.user.provider.concrete.'.$name;
     }
 
     protected function createExceptionListener($container, $config, $id, $defaultEntryPoint)

@@ -14,7 +14,9 @@
         <parameter key="security.encoder.digest.class">Symfony\Component\Security\Core\Encoder\MessageDigestPasswordEncoder</parameter>
         <parameter key="security.encoder.plain.class">Symfony\Component\Security\Core\Encoder\PlaintextPasswordEncoder</parameter>
 
+        <parameter key="security.user.provider.entity.class">Symfony\Component\Security\Core\User\EntityUserProvider</parameter>
         <parameter key="security.user.provider.in_memory.class">Symfony\Component\Security\Core\User\InMemoryUserProvider</parameter>
+        <parameter key="security.user.provider.in_memory.user.class">Symfony\Component\Security\Core\User\User</parameter>
 
         <parameter key="security.authentication.trust_resolver.class">Symfony\Component\Security\Core\Authentication\AuthenticationTrustResolver</parameter>
         <parameter key="security.authentication.trust_resolver.anonymous_class">Symfony\Component\Security\Core\Authentication\Token\AnonymousToken</parameter>
@@ -117,5 +119,15 @@
             <argument type="collection" />
             <argument type="service" id="security.exception_listener" />
         </service>
+
+
+        <!-- Provisioning -->
+        <service id="security.user.provider.entity" class="%security.user.provider.entity.class%" abstract="true" public="false">
+            <argument type="service" id="security.user.entity_manager" />
+        </service>
+        <service id="security.user.entity_manager" alias="doctrine.orm.default_entity_manager" public="false" />
+
+        <service id="security.user.provider.in_memory" class="%security.user.provider.in_memory.class%" abstract="true" public="false" />
+        <service id="security.user.provider.in_memory.user" class="%security.user.provider.in_memory.user.class%" abstract="true" public="false" />
     </services>
 </container>

@@ -36,18 +36,18 @@ abstract class SecurityExtensionTest extends \PHPUnit_Framework_TestCase
     {
         $container = $this->getContainer('container1');
 
-        $providers = array_values(array_filter($container->getServiceIds(), function ($key) { return 0 === strpos($key, 'security.user.provider.'); }));
+        $providers = array_values(array_filter($container->getServiceIds(), function ($key) { return 0 === strpos($key, 'security.user.provider.concrete'); }));
 
         $expectedProviders = array(
-            'security.user.provider.default',
-            'security.user.provider.default_foo',
-            'security.user.provider.digest',
-            'security.user.provider.digest_foo',
-            'security.user.provider.basic',
-            'security.user.provider.basic_foo',
-            'security.user.provider.basic_bar',
-            'security.user.provider.doctrine',
-            'security.user.provider.service',
+            'security.user.provider.concrete.default',
+            'security.user.provider.concrete.default_foo',
+            'security.user.provider.concrete.digest',
+            'security.user.provider.concrete.digest_foo',
+            'security.user.provider.concrete.basic',
+            'security.user.provider.concrete.basic_foo',
+            'security.user.provider.concrete.basic_bar',
+            'security.user.provider.concrete.doctrine',
+            'security.user.provider.concrete.service',
         );
 
         $this->assertEquals(array(), array_diff($expectedProviders, $providers));

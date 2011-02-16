@@ -17,18 +17,6 @@ use Symfony\Component\DependencyInjection\Configuration\Builder\TreeBuilder;
  */
 class Configuration
 {
-    public function getAclConfigTree()
-    {
-        $tb = new TreeBuilder();
-
-        return $tb
-            ->root('security', 'array')
-                ->scalarNode('connection')->end()
-                ->scalarNode('cache')->end()
-            ->end()
-            ->buildTree();
-    }
-
     public function getFactoryConfigTree()
     {
         $tb = new TreeBuilder();
@@ -53,6 +41,7 @@ class Configuration
             ->scalarNode('session_fixation_strategy')->cannotBeEmpty()->defaultValue('migrate')->end()
         ;
 
+        $this->addAclSection($rootNode);
         $this->addEncodersSection($rootNode);
         $this->addProvidersSection($rootNode);
         $this->addFirewallsSection($rootNode, $factories);
@@ -60,6 +49,16 @@ class Configuration
         $this->addRoleHierarchySection($rootNode);
 
         return $tb->buildTree();
+    }
+
+    protected function addAclSection($rootNode)
+    {
+        $rootNode
+            ->arrayNode('acl')
+                ->scalarNode('connection')->end()
+                ->scalarNode('cache')->end()
+            ->end()
+        ;
     }
 
     protected function addRoleHierarchySection($rootNode)

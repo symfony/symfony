@@ -241,20 +241,20 @@ class MutableAclProviderTest extends \PHPUnit_Framework_TestCase
 
     public function testUpdateDoesNothingWhenThereAreNoChanges()
     {
-        $this->markTestSkipped('need to work on mocking');
-        $provider = $this->getMock('Symfony\Component\Security\Acl\MongoDB\MutableAclProvider',
-            array(),
-            array($this->con, new PermissionGrantingStrategy()),
-            '',
-            false
+        $args = array(
+            $this->con, new PermissionGrantingStrategy(), array(),
         );
-        $acl = new Acl(1, new ObjectIdentity(1, 'Foo'), new PermissionGrantingStrategy(), array(), true);
-        $propertyChanges = $this->getField($provider, 'propertyChanges');
-        $propertyChanges->offsetSet($acl, array());
+        $provider = $this->getMockBuilder('Symfony\Component\Security\Acl\MongoDB\MutableAclProvider')
+            ->setConstructorArgs($args)
+            ->getMock();
         $provider
             ->expects($this->never())
             ->method('updateObjectIdentity')
         ;
+        $acl = new Acl(1, new ObjectIdentity(1, 'Foo'), new PermissionGrantingStrategy(), array(), true);
+        $propertyChanges = $this->getField($provider, 'propertyChanges');
+        $propertyChanges->offsetSet($acl, array());
+
         $provider->updateAcl($acl);
     }
 

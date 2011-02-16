@@ -80,7 +80,7 @@ class StubIntlDateFormatter
         $specialCharsMatch = implode('|', array_map(function($char) {
             return $char . '+';
         }, $specialCharsArray));
-        $quoteMatch = "'(?>(?>[^']+|'{2}+)?)'|'{2}";
+        $quoteMatch = "'(?:[^']+|'')*'";
         $regExp = "/($quoteMatch|$specialCharsMatch)/";
 
         $callback = function($matches) use ($dateTime) {
@@ -88,7 +88,10 @@ class StubIntlDateFormatter
             $length = strlen($pattern);
 
             if ("'" === $pattern[0]) {
-                return preg_replace("/'{2}/", "'", substr($pattern, 1, -1));
+                if (preg_match("/^'+$/", $matches[0])) {
+                    return str_replace("''", "'", $matches[0]);
+                }
+                return str_replace("''", "'", substr($matches[0], 1, -1));
             }
 
             switch ($pattern[0]) {

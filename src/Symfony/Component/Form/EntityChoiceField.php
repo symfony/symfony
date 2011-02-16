@@ -13,6 +13,11 @@ namespace Symfony\Component\Form;
 
 use Symfony\Component\Form\ChoiceList\EntityChoiceList;
 use Symfony\Component\Form\ValueTransformer\TransformationFailedException;
+use Symfony\Component\Form\ValueTransformer\ValueTransformerChain;
+use Symfony\Component\Form\ValueTransformer\EntitiesToArrayTransformer;
+use Symfony\Component\Form\ValueTransformer\EntityToIdTransformer;
+use Symfony\Component\Form\ValueTransformer\ArrayToChoicesTransformer;
+use Symfony\Component\Form\ValueTransformer\ScalarToChoicesTransformer;
 use Symfony\Component\Form\Exception\FormException;
 use Symfony\Component\Form\Exception\InvalidOptionsException;
 use Doctrine\Common\Collections\Collection;
@@ -87,6 +92,28 @@ class EntityChoiceField extends ChoiceField
             $this->getOption('empty_value'),
             $this->isRequired()
         );
+
+        $transformers = array();
+
+        if ($this->getOption('multiple')) {
+            $transformers[] = new EntitiesToArrayTransformer($this->choiceList);
+
+            if ($this->getOption('expanded')) {
+                $transformers[] = new ArrayToChoicesTransformer($this->choiceList);
+            }
+        } else {
+            $transformers[] = new EntityToIdTransformer($this->choiceList);
+
+            if ($this->getOption('expanded')) {
+                $transformers[] = new ScalarToChoicesTransformer($this->choiceList);
+            }
+        }
+
+        if (count($transformers) > 1) {
+            $this->setValueTransformer(new ValueTransformerChain($transformers));
+        } else {
+            $this->setValueTransformer(current($transformers));
+        }
     }
 
     /**
@@ -124,100 +151,5 @@ class EntityChoiceField extends ChoiceField
         }
 
         return $data;
-    }
-
-    /**
-     * Transforms choice keys into entities
-     *
-     * @param  mixed $keyOrKeys   An array of keys, a single key or NULL
-     * @return Collection|object  A collection of entities, a single entity
-     *                            or NULL
-     */
-    protected function reverseTransform($keyOrKeys)
-    {
-        $keyOrKeys = parent::reverseTransform($keyOrKeys);
-
-        if (null === $keyOrKeys) {
-            return $this->getOption('multiple') ? new ArrayCollection() : null;
-        }
-
-        $notFound = array();
-
-        if (count($this->choiceList->getIdentifier()) > 1) {
-            $notFound = array_diff((array)$keyOrKeys, array_keys($this->choiceList->getEntities()));
-        } else if ($this->choiceList->getEntities()) {
-            $notFound = array_diff((array)$keyOrKeys, array_keys($this->choiceList->getEntities()));
-        }
-
-        if (0 === count($notFound)) {
-            if (is_array($keyOrKeys)) {
-                $result = new ArrayCollection();
-
-                // optimize this into a SELECT WHERE IN query
-                foreach ($keyOrKeys as $key) {
-                    try {
-                        $result->add($this->choiceList->getEntity($key));
-                    } catch (NoResultException $e) {
-                        $notFound[] = $key;
-                    }
-                }
-            } else {
-                try {
-                    $result = $this->choiceList->getEntity($keyOrKeys);
-                } catch (NoResultException $e) {
-                    $notFound[] = $keyOrKeys;
-                }
-            }
-        }
-
-        if (count($notFound) > 0) {
-            throw new TransformationFailedException('The entities with keys "%s" could not be found', implode('", "', $notFound));
-        }
-
-        return $result;
-    }
-
-    /**
-     * Transforms entities into choice keys
-     *
-     * @param  Collection|object  A collection of entities, a single entity or
-     *                            NULL
-     * @return mixed              An array of choice keys, a single key or
-     *                            NULL
-     */
-    protected function transform($collectionOrEntity)
-    {
-        if (null === $collectionOrEntity) {
-            return $this->getOption('multiple') ? array() : '';
-        }
-
-        if (count($this->choiceList->getIdentifier()) > 1) {
-            // load all choices
-            $availableEntities = $this->choiceList->getEntities();
-
-            if ($collectionOrEntity instanceof Collection) {
-                $result = array();
-
-                foreach ($collectionOrEntity as $entity) {
-                    // identify choices by their collection key
-                    $key = array_search($entity, $availableEntities);
-                    $result[] = $key;
-                }
-            } else {
-                $result = array_search($collectionOrEntity, $availableEntities);
-            }
-        } else {
-            if ($collectionOrEntity instanceof Collection) {
-                $result = array();
-
-                foreach ($collectionOrEntity as $entity) {
-                    $result[] = current($this->choiceList->getIdentifierValues($entity));
-                }
-            } else {
-                $result = current($this->choiceList->getIdentifierValues($collectionOrEntity));
-            }
-        }
-
-        return parent::transform($result);
     }
 }

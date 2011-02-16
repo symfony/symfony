@@ -12,6 +12,8 @@
 namespace Symfony\Component\Form;
 
 use Symfony\Component\Form\ChoiceList\DefaultChoiceList;
+use Symfony\Component\Form\ValueTransformer\ArrayToChoicesTransformer;
+use Symfony\Component\Form\ValueTransformer\ScalarToChoicesTransformer;
 
 /**
  * Lets the user select between different choices.
@@ -75,6 +77,14 @@ class ChoiceField extends HybridField
             $this->getOption('empty_value'),
             $this->isRequired()
         );
+
+        if ($this->getOption('expanded')) {
+            if ($this->getOption('multiple')) {
+                $this->setValueTransformer(new ArrayToChoicesTransformer($this->choiceList));
+            } else {
+                $this->setValueTransformer(new ScalarToChoicesTransformer($this->choiceList));
+            }
+        }
     }
 
     public function getName()
@@ -159,70 +169,5 @@ class ChoiceField extends HybridField
         }
 
         parent::submit($value);
-    }
-
-    /**
-     * Transforms a single choice or an array of choices to a format appropriate
-     * for the nested checkboxes/radio buttons.
-     *
-     * The result is an array with the options as keys and true/false as values,
-     * depending on whether a given option is selected. If this field is rendered
-     * as select tag, the value is not modified.
-     *
-     * @param  mixed $value  An array if "multiple" is set to true, a scalar
-     *                       value otherwise.
-     * @return mixed         An array if "expanded" or "multiple" is set to true,
-     *                       a scalar value otherwise.
-     */
-    protected function transform($value)
-    {
-        if ($this->isExpanded()) {
-            $value = parent::transform($value);
-            $choices = $this->choiceList->getChoices();
-
-            foreach ($choices as $choice => $_) {
-                $choices[$choice] = $this->isMultipleChoice()
-                    ? in_array($choice, (array)$value, true)
-                    : ($choice === $value);
-            }
-
-            return $choices;
-        }
-
-        return parent::transform($value);
-    }
-
-    /**
-     * Transforms a checkbox/radio button array to a single choice or an array
-     * of choices.
-     *
-     * The input value is an array with the choices as keys and true/false as
-     * values, depending on whether a given choice is selected. The output
-     * is an array with the selected choices or a single selected choice.
-     *
-     * @param  mixed $value  An array if "expanded" or "multiple" is set to true,
-     *                       a scalar value otherwise.
-     * @return mixed $value  An array if "multiple" is set to true, a scalar
-     *                       value otherwise.
-     */
-    protected function reverseTransform($value)
-    {
-        if ($this->isExpanded()) {
-            $choices = array();
-
-            foreach ($value as $choice => $selected) {
-                if ($selected) {
-                    $choices[] = $choice;
-                }
-            }
-
-            if ($this->isMultipleChoice()) {
-                $value = $choices;
-            } else {
-                $value = count($choices) > 0 ? current($choices) : null;
-            }
-        }
-
-        return parent::reverseTransform($value);
     }
 }

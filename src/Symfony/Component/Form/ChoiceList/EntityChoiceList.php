@@ -212,21 +212,25 @@ class EntityChoiceList extends DefaultChoiceList
      */
     public function getEntity($key)
     {
-        if (count($this->identifier) > 1) {
-            // $key is a collection index
-            $entities = $this->getEntities();
-            return $entities[$key];
-        } else if ($this->entities) {
-            return $this->entities[$key];
-        } else if ($qb = $this->queryBuilder) {
-            // should we clone the builder?
-            $alias = $qb->getRootAlias();
-            $where = $qb->expr()->eq($alias.'.'.current($this->identifier), $key);
+        try {
+            if (count($this->identifier) > 1) {
+                // $key is a collection index
+                $entities = $this->getEntities();
+                return isset($entities[$key]) ? $entities[$key] : null;
+            } else if ($this->entities) {
+                return isset($this->entities[$key]) ? $this->entities[$key] : null;
+            } else if ($qb = $this->queryBuilder) {
+                // should we clone the builder?
+                $alias = $qb->getRootAlias();
+                $where = $qb->expr()->eq($alias.'.'.current($this->identifier), $key);
 
-            return $qb->andWhere($where)->getQuery()->getSingleResult();
+                return $qb->andWhere($where)->getQuery()->getSingleResult();
+            }
+
+            return $this->em->find($this->class, $key);
+        } catch (NoResultException $e) {
+            return null;
         }
-
-        return $this->em->find($this->class, $key);
     }
 
     /**

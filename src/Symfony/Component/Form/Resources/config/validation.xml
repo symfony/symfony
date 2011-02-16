@@ -43,6 +43,11 @@
   </class>
 
   <class name="Symfony\Component\Form\DateField">
+    <getter property="partiallyFilled">
+      <constraint name="AssertFalse">
+        <option name="message">The date is not fully selected</option>
+      </constraint>
+    </getter>
     <getter property="yearWithinRange">
       <constraint name="AssertTrue">
         <option name="message">The year is invalid</option>
@@ -61,6 +66,11 @@
   </class>
 
   <class name="Symfony\Component\Form\TimeField">
+    <getter property="partiallyFilled">
+      <constraint name="AssertFalse">
+        <option name="message">The time is not fully selected</option>
+      </constraint>
+    </getter>
     <getter property="hourWithinRange">
       <constraint name="AssertTrue">
         <option name="message">The hour is invalid</option>

@@ -243,4 +243,112 @@ class TimeFieldTest extends DateTimeTestCase
 
         $this->assertFalse($field->isSecondWithinRange());
     }
+
+    public function testIsPartiallyFilled_returnsFalseIfCompletelyEmpty()
+    {
+        $field = new TimeField('name', array(
+            'widget' => 'choice',
+        ));
+
+        $field->submit(array(
+            'hour' => '',
+            'minute' => '',
+        ));
+
+        $this->assertFalse($field->isPartiallyFilled());
+    }
+
+    public function testIsPartiallyFilled_returnsFalseIfCompletelyEmpty_withSeconds()
+    {
+        $field = new TimeField('name', array(
+            'widget' => 'choice',
+            'with_seconds' => true,
+        ));
+
+        $field->submit(array(
+            'hour' => '',
+            'minute' => '',
+            'second' => '',
+        ));
+
+        $this->assertFalse($field->isPartiallyFilled());
+    }
+
+    public function testIsPartiallyFilled_returnsFalseIfCompletelyFilled()
+    {
+        $field = new TimeField('name', array(
+            'widget' => 'choice',
+        ));
+
+        $field->submit(array(
+            'hour' => '0',
+            'minute' => '0',
+        ));
+
+        $this->assertFalse($field->isPartiallyFilled());
+    }
+
+    public function testIsPartiallyFilled_returnsFalseIfCompletelyFilled_withSeconds()
+    {
+        $field = new TimeField('name', array(
+            'widget' => 'choice',
+            'with_seconds' => true,
+        ));
+
+        $field->submit(array(
+            'hour' => '0',
+            'minute' => '0',
+            'second' => '0',
+        ));
+
+        $this->assertFalse($field->isPartiallyFilled());
+    }
+
+    public function testIsPartiallyFilled_returnsTrueIfChoiceAndHourEmpty()
+    {
+        $field = new TimeField('name', array(
+            'widget' => 'choice',
+            'with_seconds' => true,
+        ));
+
+        $field->submit(array(
+            'hour' => '',
+            'minute' => '0',
+            'second' => '0',
+        ));
+
+        $this->assertTrue($field->isPartiallyFilled());
+    }
+
+    public function testIsPartiallyFilled_returnsTrueIfChoiceAndMinuteEmpty()
+    {
+        $field = new TimeField('name', array(
+            'widget' => 'choice',
+            'with_seconds' => true,
+        ));
+
+        $field->submit(array(
+            'hour' => '0',
+            'minute' => '',
+            'second' => '0',
+        ));
+
+        $this->assertTrue($field->isPartiallyFilled());
+    }
+
+    public function testIsPartiallyFilled_returnsTrueIfChoiceAndSecondsEmpty()
+    {
+        $field = new TimeField('name', array(
+            'widget' => 'choice',
+            'with_seconds' => true,
+        ));
+
+        $field->submit(array(
+            'hour' => '0',
+            'minute' => '0',
+            'second' => '',
+        ));
+
+        $this->assertTrue($field->isPartiallyFilled());
+    }
 }

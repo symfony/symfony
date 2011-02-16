@@ -141,6 +141,8 @@
 
 {% block date_time_field %}
 {% spaceless %}
+    {{ form_errors(field.date) }}
+    {{ form_errors(field.time) }}
     {{ form_field(field.date) }}
     {{ form_field(field.time) }}
 {% endspaceless %}

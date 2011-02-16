@@ -294,4 +294,28 @@ class DateField extends HybridField
 
         return null === $date || in_array($date->format('d'), $this->getOption('days'));
     }
+
+    /**
+     * Returns whether the field is neither completely filled (a selected
+     * value in each dropdown) nor completely empty
+     *
+     * @return Boolean
+     */
+    public function isPartiallyFilled()
+    {
+        if ($this->isField()) {
+            return false;
+        }
+
+        if ($this->isEmpty()) {
+            return false;
+        }
+
+        if ($this->get('year')->isEmpty() || $this->get('month')->isEmpty()
+                || $this->get('day')->isEmpty()) {
+            return true;
+        }
+
+        return false;
+    }
 }

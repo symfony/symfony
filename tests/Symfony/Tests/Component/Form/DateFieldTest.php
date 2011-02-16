@@ -232,4 +232,60 @@ class DateFieldTest extends DateTimeTestCase
 
         $this->assertFalse($field->isDayWithinRange());
     }
+
+    public function testIsPartiallyFilled_returnsFalseIfInput()
+    {
+        $field = new DateField('name', array(
+            'widget' => 'input',
+        ));
+
+        $field->submit('7.6.2010');
+
+        $this->assertFalse($field->isPartiallyFilled());
+    }
+
+    public function testIsPartiallyFilled_returnsFalseIfChoiceAndCompletelyEmpty()
+    {
+        $field = new DateField('name', array(
+            'widget' => 'choice',
+        ));
+
+        $field->submit(array(
+            'day' => '',
+            'month' => '',
+            'year' => '',
+        ));
+
+        $this->assertFalse($field->isPartiallyFilled());
+    }
+
+    public function testIsPartiallyFilled_returnsFalseIfChoiceAndCompletelyFilled()
+    {
+        $field = new DateField('name', array(
+            'widget' => 'choice',
+        ));
+
+        $field->submit(array(
+            'day' => '2',
+            'month' => '6',
+            'year' => '2010',
+        ));
+
+        $this->assertFalse($field->isPartiallyFilled());
+    }
+
+    public function testIsPartiallyFilled_returnsTrueIfChoiceAndDayEmpty()
+    {
+        $field = new DateField('name', array(
+            'widget' => 'choice',
+        ));
+
+        $field->submit(array(
+            'day' => '',
+            'month' => '6',
+            'year' => '2010',
+        ));
+
+        $this->assertTrue($field->isPartiallyFilled());
+    }
 }

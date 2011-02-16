@@ -433,9 +433,18 @@ class SecurityExtension extends Extension
         }
 
         // Chain provider
-        if (count($provider['providers']) > 0) {
-            // FIXME
-            throw new \RuntimeException('Not implemented yet.');
+        if ($provider['providers']) {
+            $providers = array();
+            foreach ($provider['providers'] as $providerName) {
+                $providers[] = new Reference($this->getUserProviderId(strtolower($providerName)));
+            }
+
+            $container
+                ->setDefinition($name, new DefinitionDecorator('security.user.provider.chain'))
+                ->addArgument($providers)
+            ;
+
+            return $name;
         }
 
         // Doctrine Entity DAO provider

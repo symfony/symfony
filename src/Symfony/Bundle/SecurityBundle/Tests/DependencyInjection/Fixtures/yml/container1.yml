@@ -26,6 +26,9 @@ security:
             entity: { class: SecurityBundle:User, property: username }
         service:
             id: user.manager
+        chain:
+            providers: [service, doctrine, basic]
+            
 
     firewalls:
         simple: { pattern: /login, security: false }

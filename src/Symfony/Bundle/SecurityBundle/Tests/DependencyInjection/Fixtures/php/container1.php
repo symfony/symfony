@@ -38,6 +38,9 @@ $container->loadFromExtension('security', array(
         'service' => array(
             'id' => 'user.manager',
         ),
+        'chain' => array(
+            'providers' => array('service', 'doctrine', 'basic'),
+        ),
     ),
 
     'firewalls' => array(

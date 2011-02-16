@@ -17,6 +17,7 @@
         <parameter key="security.user.provider.entity.class">Symfony\Component\Security\Core\User\EntityUserProvider</parameter>
         <parameter key="security.user.provider.in_memory.class">Symfony\Component\Security\Core\User\InMemoryUserProvider</parameter>
         <parameter key="security.user.provider.in_memory.user.class">Symfony\Component\Security\Core\User\User</parameter>
+        <parameter key="security.user.provider.chain.class">Symfony\Component\Security\Core\User\ChainUserProvider</parameter>
 
         <parameter key="security.authentication.trust_resolver.class">Symfony\Component\Security\Core\Authentication\AuthenticationTrustResolver</parameter>
         <parameter key="security.authentication.trust_resolver.anonymous_class">Symfony\Component\Security\Core\Authentication\Token\AnonymousToken</parameter>
@@ -129,5 +130,7 @@
 
         <service id="security.user.provider.in_memory" class="%security.user.provider.in_memory.class%" abstract="true" public="false" />
         <service id="security.user.provider.in_memory.user" class="%security.user.provider.in_memory.user.class%" abstract="true" public="false" />
+
+        <service id="security.user.provider.chain" class="%security.user.provider.chain.class%" abstract="true" public="false" />
     </services>
 </container>

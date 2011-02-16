@@ -48,10 +48,18 @@ abstract class SecurityExtensionTest extends \PHPUnit_Framework_TestCase
             'security.user.provider.concrete.basic_bar',
             'security.user.provider.concrete.doctrine',
             'security.user.provider.concrete.service',
+            'security.user.provider.concrete.chain',
         );
 
         $this->assertEquals(array(), array_diff($expectedProviders, $providers));
         $this->assertEquals(array(), array_diff($providers, $expectedProviders));
+
+        // chain provider
+        $this->assertEquals(array(array(
+            new Reference('security.user.provider.concrete.service'),
+            new Reference('security.user.provider.concrete.doctrine'),
+            new Reference('security.user.provider.concrete.basic'),
+        )), $container->getDefinition('security.user.provider.concrete.chain')->getArguments());
     }
 
     public function testFirewalls()

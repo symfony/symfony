@@ -13,6 +13,7 @@ namespace Symfony\Component\Form;
 
 use Symfony\Component\Form\ValueTransformer\ValueTransformerInterface;
 use Symfony\Component\Form\ValueTransformer\TransformationFailedException;
+use Symfony\Component\Form\DataProcessor\DataProcessorInterface;
 
 /**
  * Base class for form fields
@@ -50,15 +51,16 @@ class Field extends Configurable implements FieldInterface
 {
     private $errors = array();
     private $key = '';
-    private $parent = null;
+    private $parent;
     private $submitted = false;
-    private $required = null;
-    private $data = null;
-    private $normalizedData = null;
-    private $transformedData = null;
-    private $normalizationTransformer = null;
-    private $valueTransformer = null;
-    private $propertyPath = null;
+    private $required;
+    private $data;
+    private $normalizedData;
+    private $transformedData;
+    private $normalizationTransformer;
+    private $valueTransformer;
+    private $dataProcessor;
+    private $propertyPath;
     private $transformationSuccessful = true;
 
     public function __construct($key = null, array $options = array())
@@ -328,6 +330,10 @@ class Field extends Configurable implements FieldInterface
      */
     protected function processData($data)
     {
+        if ($this->dataProcessor) {
+            return $this->dataProcessor->processData($data);
+        }
+
         return $data;
     }
 
@@ -455,6 +461,26 @@ class Field extends Configurable implements FieldInterface
     protected function getValueTransformer()
     {
         return $this->valueTransformer;
+    }
+
+    /**
+     * Sets the data processor
+     *
+     * @param DataProcessorInterface $dataProcessor
+     */
+    protected function setDataProcessor(DataProcessorInterface $dataProcessor)
+    {
+        $this->dataProcessor = $dataProcessor;
+    }
+
+    /**
+     * Returns the data processor
+     *
+     * @return DataProcessorInterface
+     */
+    protected function getDataProcessor()
+    {
+        return $this->dataProcessor;
     }
 
     /**

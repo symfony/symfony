@@ -12,6 +12,7 @@
 namespace Symfony\Component\Form;
 
 use Symfony\Component\Form\ChoiceList\EntityChoiceList;
+use Symfony\Component\Form\DataProcessor\CollectionMerger;
 use Symfony\Component\Form\ValueTransformer\TransformationFailedException;
 use Symfony\Component\Form\ValueTransformer\ValueTransformerChain;
 use Symfony\Component\Form\ValueTransformer\EntitiesToArrayTransformer;
@@ -96,6 +97,8 @@ class EntityChoiceField extends ChoiceField
         $transformers = array();
 
         if ($this->getOption('multiple')) {
+            $this->setDataProcessor(new CollectionMerger($this));
+
             $transformers[] = new EntitiesToArrayTransformer($this->choiceList);
 
             if ($this->getOption('expanded')) {
@@ -114,42 +117,5 @@ class EntityChoiceField extends ChoiceField
         } else {
             $this->setValueTransformer(current($transformers));
         }
-    }
-
-    /**
-     * Merges the selected and deselected entities into the collection passed
-     * when calling setData()
-     *
-     * @see parent::processData()
-     */
-    protected function processData($data)
-    {
-        // reuse the existing collection to optimize for Doctrine
-        if ($data instanceof Collection) {
-            $currentData = $this->getData();
-
-            if (!$currentData) {
-                $currentData = $data;
-            } else if (count($data) === 0) {
-                $currentData->clear();
-            } else {
-                // merge $data into $currentData
-                foreach ($currentData as $entity) {
-                    if (!$data->contains($entity)) {
-                        $currentData->removeElement($entity);
-                    } else {
-                        $data->removeElement($entity);
-                    }
-                }
-
-                foreach ($data as $entity) {
-                    $currentData->add($entity);
-                }
-            }
-
-            return $currentData;
-        }
-
-        return $data;
     }
 }

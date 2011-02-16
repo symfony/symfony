@@ -14,6 +14,7 @@ namespace Symfony\Component\Form;
 use Symfony\Component\Form\ValueTransformer\ValueTransformerInterface;
 use Symfony\Component\Form\ValueTransformer\TransformationFailedException;
 use Symfony\Component\Form\DataProcessor\DataProcessorInterface;
+use Symfony\Component\Form\Renderer\RendererInterface;
 
 /**
  * Base class for form fields
@@ -62,6 +63,7 @@ class Field extends Configurable implements FieldInterface
     private $dataProcessor;
     private $propertyPath;
     private $transformationSuccessful = true;
+    private $renderer;
 
     public function __construct($key = null, array $options = array())
     {
@@ -481,6 +483,26 @@ class Field extends Configurable implements FieldInterface
     protected function getDataProcessor()
     {
         return $this->dataProcessor;
+    }
+
+    /**
+     * Sets the renderer
+     *
+     * @param RendererInterface $renderer
+     */
+    public function setRenderer(RendererInterface $renderer)
+    {
+        $this->renderer = $renderer;
+    }
+
+    /**
+     * Returns the renderer
+     *
+     * @return RendererInterface
+     */
+    public function getRenderer()
+    {
+        return $this->renderer;
     }
 
     /**

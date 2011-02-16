@@ -47,8 +47,7 @@ class SecurityExtension extends Extension
 
     public function load(array $configs, ContainerBuilder $container)
     {
-        $tmp = array_filter($configs);
-        if (empty($tmp)) {
+        if (!array_filter($configs)) {
             return;
         }
 
@@ -86,6 +85,26 @@ class SecurityExtension extends Extension
         if (isset($config['acl'])) {
             $this->aclLoad($config['acl'], $container);
         }
+
+        // add some required classes for compilation
+        $this->addClassesToCompile(array(
+            'Symfony\\Component\\Security\\Http\\Firewall',
+            'Symfony\\Component\\Security\\Http\\FirewallMapInterface',
+            'Symfony\\Component\\Security\\Core\\SecurityContext',
+            'Symfony\\Component\\Security\\Core\\SecurityContextInterface',
+            'Symfony\\Component\\Security\\Core\\User\\UserProviderInterface',
+            'Symfony\\Component\\Security\\Core\\Authentication\\AuthenticationProviderManager',
+            'Symfony\\Component\\Security\\Core\\Authentication\\AuthenticationManagerInterface',
+            'Symfony\\Component\\Security\\Core\\Authorization\\AccessDecisionManager',
+            'Symfony\\Component\\Security\\Core\\Authorization\\AccessDecisionManagerInterface',
+            'Symfony\\Component\\Security\\Core\\Authorization\\Voter\\VoterInterface',
+
+            'Symfony\\Bundle\\SecurityBundle\\Security\\FirewallMap',
+            'Symfony\\Bundle\\SecurityBundle\\Security\\FirewallContext',
+
+            'Symfony\\Component\\HttpFoundation\\RequestMatcher',
+            'Symfony\\Component\\HttpFoundation\\RequestMatcherInterface',
+        ));
     }
 
     /**
@@ -143,6 +162,14 @@ class SecurityExtension extends Extension
 
     protected function createAuthorization($config, ContainerBuilder $container)
     {
+        if (!$config['access_control']) {
+            return;
+        }
+
+        $this->addClassesToCompile(array(
+            'Symfony\\Component\\Security\\Http\\AccessMap',
+        ));
+
         foreach ($config['access_control'] as $access) {
             $matcher = $this->createRequestMatcher(
                 $container,

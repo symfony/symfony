@@ -107,6 +107,10 @@ class AsseticExtension extends Extension
         if ($container->hasParameter('assetic.yui_jar')) {
             $loader->load('yui_compressor.xml');
         }
+
+        if ($container->hasParameter('assetic.less.compress')) {
+            $container->getDefinition('assetic.filter.less')->addMethodCall('setCompress', array('%assetic.less.compress%'));
+        }
     }
 
     /**

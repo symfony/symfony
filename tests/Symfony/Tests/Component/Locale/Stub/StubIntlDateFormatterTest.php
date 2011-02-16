@@ -304,13 +304,13 @@ class StubIntlDateFormatterTest extends \PHPUnit_Framework_TestCase
      */
     public function testGetCalendar()
     {
-        $formatter = new StubIntlDateFormatter('en');
+        $formatter = new StubIntlDateFormatter('en', StubIntlDateFormatter::FULL, StubIntlDateFormatter::NONE);
         $formatter->setCalendar(StubIntlDateFormatter::GREGORIAN);
     }
 
     public function testSetCalendar()
     {
-        $formatter = new StubIntlDateFormatter('en');
+        $formatter = new StubIntlDateFormatter('en', StubIntlDateFormatter::FULL, StubIntlDateFormatter::NONE);
         $this->assertEquals(StubIntlDateFormatter::GREGORIAN, $formatter->getCalendar());
     }
 }

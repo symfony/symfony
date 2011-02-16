@@ -11,7 +11,9 @@
 
 namespace Symfony\Bundle\AsseticBundle\Controller;
 
+use Assetic\Asset\AssetCache;
 use Assetic\AssetManager;
+use Assetic\Cache\CacheInterface;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
@@ -26,12 +28,14 @@ class AsseticController
     protected $request;
     protected $response;
     protected $am;
+    protected $cache;
 
-    public function __construct(Request $request, Response $response, AssetManager $am)
+    public function __construct(Request $request, Response $response, AssetManager $am, CacheInterface $cache)
     {
         $this->request = $request;
         $this->response = $response;
         $this->am = $am;
+        $this->cache = $cache;
     }
 
     public function render($name)
@@ -40,7 +44,7 @@ class AsseticController
             throw new NotFoundHttpException('Asset Not Found');
         }
 
-        $asset = $this->am->get($name);
+        $asset = $this->getAsset($name);
 
         // validate if-modified-since
         if (null !== $lastModified = $asset->getLastModified()) {
@@ -56,5 +60,10 @@ class AsseticController
         $this->response->setContent($asset->dump());
 
         return $this->response;
+    }
+
+    protected function getAsset($name)
+    {
+        return new AssetCache($this->am->get($name), $this->cache);
     }
 }

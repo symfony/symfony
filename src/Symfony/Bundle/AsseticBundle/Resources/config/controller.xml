@@ -7,6 +7,8 @@
     <parameters>
         <parameter key="assetic.controller.class">Symfony\Bundle\AsseticBundle\Controller\AsseticController</parameter>
         <parameter key="assetic.routing_loader.class">Symfony\Bundle\AsseticBundle\Routing\AsseticLoader</parameter>
+        <parameter key="assetic.cache.class">Assetic\Cache\FilesystemCache</parameter>
+        <parameter key="assetic.cache_dir">%kernel.cache_dir%/assetic</parameter>
     </parameters>
 
     <services>
@@ -18,6 +20,10 @@
             <argument type="service" id="request" />
             <argument type="service" id="response" />
             <argument type="service" id="assetic.asset_manager" />
+            <argument type="service" id="assetic.cache" />
+        </service>
+        <service id="assetic.cache" class="%assetic.cache.class%" public="false">
+            <argument>%assetic.cache_dir%</argument>
         </service>
     </services>
 </container>

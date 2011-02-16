@@ -39,6 +39,7 @@ class AsseticExtensionTest extends \PHPUnit_Framework_TestCase
         $this->container->register('twig', 'Twig_Environment');
         $this->container->setParameter('kernel.debug', false);
         $this->container->setParameter('kernel.root_dir', __DIR__);
+        $this->container->setParameter('kernel.cache_dir', __DIR__);
         $this->container->setParameter('kernel.bundles', array());
     }
 

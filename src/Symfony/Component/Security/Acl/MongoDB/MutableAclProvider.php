@@ -362,7 +362,7 @@ class MutableAclProvider extends AclProvider implements MutableAclProviderInterf
     protected function updateObjectIdentity(AclInterface $acl, array $changes)
     {
         if (isset($changes['entriesInheriting'])) {
-            $updates['entriesInheriting'] = true;
+            $updates['entriesInheriting'] = $changes['entriesInheriting'][1];
         }
 
         if (isset($changes['parentAcl'])) {
@@ -423,7 +423,7 @@ class MutableAclProvider extends AclProvider implements MutableAclProviderInterf
 
                 $aceIdProperty = new \ReflectionProperty($ace, 'id');
                 $aceIdProperty->setAccessible(true);
-                $aceIdProperty->setValue($ace, intval($aceId));
+                $aceIdProperty->setValue($ace, $aceId);
             } else {
                 $currentIds[$ace->getId()] = true;
             }
@@ -471,7 +471,7 @@ class MutableAclProvider extends AclProvider implements MutableAclProviderInterf
     }
 
     /**
-     * Constructs the SQL for inserting an ACE.
+     * Insert an ACE into the collection.
      *
      * @param integer|null $objectIdentityId
      * @param string|null $field
@@ -513,6 +513,19 @@ class MutableAclProvider extends AclProvider implements MutableAclProviderInterf
     }
 
     /**
+     * Remove an entry from the collection
+     *
+     * @param string $id
+     */
+    protected function deleteAccessControlEntry($id)
+    {
+        $criteria = array(
+            '_id' => new \MongoId($id),
+        );
+        $this->connection->selectCollection($this->options['entry_table_name'])->remove($criteria);
+    }
+
+    /**
      * Persists the changes which were made to ACEs to the database.
      *
      * @param \SplObjectStorage $aces
@@ -522,15 +535,27 @@ class MutableAclProvider extends AclProvider implements MutableAclProviderInterf
     {
         foreach ($aces as $ace)
         {
-            $update = $aces->offsetGet($ace);
-            if (isset($update['strategy'])) {
-                $update['grantingStrategy'] = $update['strategy'];
-                unset($update['strategy']);
+            $update = array();
+            $propertyChanges = $aces->offsetGet($ace);
+            if (isset($propertyChanges['mask'])) {
+                $update['mask'] = $propertyChanges['mask'][1];
+            }
+            if (isset($propertyChanges['strategy'])) {
+                $update['strategy'] = $propertyChanges['strategy'];
+            }
+            if (isset($propertyChanges['aceOrder'])) {
+                $update['aceOrder'] = $propertyChanges['aceOrder'][1];
+            }
+            if (isset($propertyChanges['auditSuccess'])) {
+                $update['auditSuccess'] = $propertyChanges['auditSuccess'][1];
+            }
+            if (isset($propertyChanges['auditFailure'])) {
+                $update['auditFailure'] = $propertyChanges['auditFailure'][1];
             }
             $criteria = array(
-                '_id' => $ace->getid(),
+                '_id' => new \MongoId($ace->getId()),
             );
-            $this->connection->selectCollection($this->options['entry_table_name'])->update($criteria, $update);
+            $this->connection->selectCollection($this->options['entry_table_name'])->update($criteria, array('$set'=>$update));
         }
     }
 }

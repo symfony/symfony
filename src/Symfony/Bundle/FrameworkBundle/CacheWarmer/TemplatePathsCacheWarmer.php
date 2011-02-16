@@ -79,8 +79,9 @@ class TemplatePathsCacheWarmer extends CacheWarmer
 
             $finder = new Finder();
             foreach ($finder->files()->followLinks()->in($dir) as $file) {
-                if (false !== $template = $this->parseTemplateName($file, $prefix.'/', $bundle->getName())) {
-
+                $template = $this->parser->parseFromFilename($file->getRelativePathname());
+                if (false !== $template) {
+                    $template->set('bundle', $name);
                     $templates[$template->getSignature()] = $this->locator->locate($template->getPath(), $this->rootDir);
                 }
             }
@@ -89,27 +90,13 @@ class TemplatePathsCacheWarmer extends CacheWarmer
         if (is_dir($this->rootDir)) {
             $finder = new Finder();
             foreach ($finder->files()->followLinks()->in($this->rootDir) as $file) {
-                if (false !== $template = $this->parseTemplateName($file, strtr($this->rootDir, '\\', '/').'/')) {
+                $template = $this->parser->parseFromFilename($file->getRelativePathname());
+                if (false !== $template) {
                     $templates[$template->getSignature()] = $file->getRealPath();
                 }
             }
         }
 
         return  $templates;
-    }
-
-    protected function parseTemplateName($file, $prefix, $bundle = '')
-    {      
-        $prefix = strtr($prefix, '\\', '/');
-        $path = strtr($file->getPathname(), '\\', '/');
-
-        list(, $file) = explode($prefix, $path, 2);
-
-        $template = $this->parser->parseFromFilename($file);
-        if (false !== $template) {
-            $template->set('bundle', $bundle);
-        }
-
-        return $template;
     }
 }

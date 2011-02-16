@@ -300,7 +300,7 @@ abstract class Bundle extends ContainerAware implements BundleInterface
         $finder->files()->name('*Command.php')->in($dir);
         $prefix = $this->getNamespace().'\\Command';
         foreach ($finder as $file) {
-            $r = new \ReflectionClass($prefix.strtr($file->getPath(), array($dir => '', '/' => '\\')).'\\'.$file->getBasename('.php'));
+            $r = new \ReflectionClass($prefix.strtr($file->getRelativePath(), '/', '\\').'\\'.$file->getBasename('.php'));
             if ($r->isSubclassOf('Symfony\\Component\\Console\\Command\\Command') && !$r->isAbstract()) {
                 $application->add($r->newInstance());
             }
@@ -865,7 +865,6 @@ class FileBag extends ParameterBag
     private $fileKeys = array('error', 'name', 'size', 'tmp_name', 'type');
     public function __construct(array $parameters = array())
     {
-                        parent::__construct();
         $this->replace($parameters);
     }
     public function replace(array $files = array())

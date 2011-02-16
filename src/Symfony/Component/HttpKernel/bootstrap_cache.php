@@ -1099,7 +1099,6 @@ class FileBag extends ParameterBag
     private $fileKeys = array('error', 'name', 'size', 'tmp_name', 'type');
     public function __construct(array $parameters = array())
     {
-                        parent::__construct();
         $this->replace($parameters);
     }
     public function replace(array $files = array())
@@ -1939,8 +1938,10 @@ class ResponseHeaderBag extends HeaderBag
     protected $computedCacheControl = array();
     public function __construct(array $headers = array())
     {
-                        parent::__construct();
-        $this->replace($headers);
+        parent::__construct($headers);
+        if (!isset($this->headers['cache-control'])) {
+            $this->set('cache-control', '');
+        }
     }
     public function replace(array $headers = array())
     {

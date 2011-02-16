@@ -258,7 +258,7 @@ class MutableAclProviderTest extends \PHPUnit_Framework_TestCase
         $provider->updateAcl($acl);
     }
 
-    public function testUpdateAclThrowsExceptionOnConcurrentModifcationOfSharedProperties()
+    public function testUpdateAclThrowsExceptionOnConcurrentModificationOfSharedProperties()
     {
         $provider = $this->getProvider();
         $acl1 = $provider->createAcl(new ObjectIdentity(1, 'Foo'));
@@ -329,10 +329,10 @@ class MutableAclProviderTest extends \PHPUnit_Framework_TestCase
     public function testSecurityIdentityDoesNotCreateDuplicates()
     {
         $provider = $this->getProvider();
-        $securityIdentity1 = new RoleSecurityIdentity('ROLE_FOO');
-        $sid1 = (string)$this->callMethod($provider, 'insertSecurityIdentity', (array)$securityIdentity1);
-        $securityIdentity2 = new RoleSecurityIdentity('ROLE_FOO');
-        $sid2 = (string)$this->callMethod($provider, 'insertSecurityIdentity', (array)$securityIdentity2);
+        $securityIdentity1 = array(new RoleSecurityIdentity('ROLE_FOO'));
+        $sid1 = $this->callMethod($provider, 'insertSecurityIdentity', $securityIdentity1);
+        $securityIdentity2 = array(new RoleSecurityIdentity('ROLE_FOO'));
+        $sid2 = $this->callMethod($provider, 'insertSecurityIdentity', $securityIdentity2);
         $this->assertEquals($sid1, $sid2, 'insertSecurityIdentity should not create a second document');
     }
 

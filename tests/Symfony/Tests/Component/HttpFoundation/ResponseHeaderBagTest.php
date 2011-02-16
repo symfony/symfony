@@ -26,16 +26,25 @@ class ResponseHeaderBagTest extends \PHPUnit_Framework_TestCase
         $this->assertTrue($bag->hasCacheControlDirective('public'));
 
         $bag = new ResponseHeaderBag(array('ETag' => 'abcde'));
-        $this->assertEquals('private, max-age=0, must-revalidate', $bag->get('Cache-Control'));
+        $this->assertEquals('private, must-revalidate', $bag->get('Cache-Control'));
         $this->assertTrue($bag->hasCacheControlDirective('private'));
         $this->assertTrue($bag->hasCacheControlDirective('must-revalidate'));
-        $this->assertEquals(0, $bag->getCacheControlDirective('max-age'));
+        $this->assertFalse($bag->hasCacheControlDirective('max-age'));
+
+        $bag = new ResponseHeaderBag(array('Expires' => 'Wed, 16 Feb 2011 14:17:43 GMT'));
+        $this->assertEquals('private, must-revalidate', $bag->get('Cache-Control'));
+
+        $bag = new ResponseHeaderBag(array(
+            'Expires' => 'Wed, 16 Feb 2011 14:17:43 GMT',
+            'Cache-Control' => 'max-age=3600'
+        ));
+        $this->assertEquals('max-age=3600, private', $bag->get('Cache-Control'));
 
         $bag = new ResponseHeaderBag(array('Last-Modified' => 'abcde'));
-        $this->assertEquals('private, max-age=0, must-revalidate', $bag->get('Cache-Control'));
+        $this->assertEquals('private, must-revalidate', $bag->get('Cache-Control'));
 
         $bag = new ResponseHeaderBag(array('Etag' => 'abcde', 'Last-Modified' => 'abcde'));
-        $this->assertEquals('private, max-age=0, must-revalidate', $bag->get('Cache-Control'));
+        $this->assertEquals('private, must-revalidate', $bag->get('Cache-Control'));
 
         $bag = new ResponseHeaderBag(array('cache-control' => 'max-age=100'));
         $this->assertEquals('max-age=100, private', $bag->get('Cache-Control'));

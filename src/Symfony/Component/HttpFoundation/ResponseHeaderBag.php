@@ -118,7 +118,7 @@ class ResponseHeaderBag extends HeaderBag
 
         if (!$this->cacheControl) {
             // conservative by default
-            return 'private, max-age=0, must-revalidate';
+            return 'private, must-revalidate';
         }
 
         $header = $this->getCacheControlHeader();

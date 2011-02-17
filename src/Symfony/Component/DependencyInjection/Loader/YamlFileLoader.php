@@ -239,7 +239,15 @@ class YamlFileLoader extends FileLoader
         }
 
         if (isset($service['tags'])) {
+            if (!is_array($service['tags'])) {
+                throw new \InvalidArgumentException(sprintf('Parameter "tags" must be an array for service "%s" in %s.', $id, $file));
+            }
+
             foreach ($service['tags'] as $tag) {
+                if (!isset($tag['name'])) {
+                    throw new \InvalidArgumentException(sprintf('A "tags" entry is missing a "name" key must be an array for service "%s" in %s.', $id, $file));
+                }
+
                 $name = $tag['name'];
                 unset($tag['name']);
 

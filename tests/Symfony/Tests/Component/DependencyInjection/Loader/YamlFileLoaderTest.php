@@ -166,6 +166,30 @@ class YamlFileLoaderTest extends \PHPUnit_Framework_TestCase
         $interface = $interfaces['FooClass'];
         $this->assertTrue($interface->hasMethodCall('setBar'), '->load() parses interfaces elements');
     }
+
+    public function testNonArrayTagThrowsException()
+    {
+        $loader = new YamlFileLoader(new ContainerBuilder(), new FileLocator(self::$fixturesPath.'/yaml'));
+        try {
+            $loader->load('badtag1.yml');
+            $this->fail('->load() should throw an exception when the tags key of a service is not an array');
+        } catch (\Exception $e) {
+            $this->assertInstanceOf('\InvalidArgumentException', $e, '->load() throws an InvalidArgumentException if the tags key is not an array');
+            $this->assertStringStartsWith('Parameter "tags" must be an array for service', $e->getMessage(), '->load() throws an InvalidArgumentException if the tags key is not an array');
+        }
+    }
+
+    public function testTagWithoutNameThrowsException()
+    {
+        $loader = new YamlFileLoader(new ContainerBuilder(), new FileLocator(self::$fixturesPath.'/yaml'));
+        try {
+            $loader->load('badtag2.yml');
+            $this->fail('->load() should throw an exception when a tag is missing the name key');
+        } catch (\Exception $e) {
+            $this->assertInstanceOf('\InvalidArgumentException', $e, '->load() throws an InvalidArgumentException if a tag is missing the name key');
+            $this->assertStringStartsWith('A "tags" entry is missing a "name" key must be an array for service ', $e->getMessage(), '->load() throws an InvalidArgumentException if a tag is missing the name key');
+        }
+    }
 }
 
 class ProjectLoader3 extends YamlFileLoader

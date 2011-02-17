@@ -700,8 +700,10 @@ class Form extends Field implements \IteratorAggregate, FormInterface
     /**
      * Binds a request to the form
      *
-     * If the request was a POST request, the data is submitted to the form,
-     * transformed and written into the form data (an object or an array).
+     * If the request was a POST, PUT or DELETE request, the data is submitted
+     * to the form, transformed and written into the form data (an object or an
+     * array).
+     * 
      * You can set the form data by passing it in the second parameter
      * of this method or by passing it in the "data" option of the form's
      * constructor.
@@ -718,8 +720,11 @@ class Form extends Field implements \IteratorAggregate, FormInterface
             $this->setData($data);
         }
 
-        // Store the submitted data in case of a post request
-        if ('POST' == $request->getMethod()) {
+        // Store the submitted data in case of a post, put or delete request
+        switch ($request->getMethod()) {
+          case 'POST':
+          case 'PUT':
+          case 'DELETE':
             $values = $request->request->get($this->getName(), array());
             $files = $request->files->get($this->getName(), array());
 

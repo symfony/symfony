@@ -42,6 +42,7 @@ class NodeBuilder
     public $trueEquivalent;
     public $falseEquivalent;
     public $performDeepMerging;
+    public $allowUnnamedChildren;
 
     /**
      * Constructor
@@ -64,6 +65,7 @@ class NodeBuilder
         $this->allowEmptyValue = true;
         $this->children = array();
         $this->performDeepMerging = true;
+        $this->allowUnnamedChildren = false;
 
         if ('boolean' === $type) {
             $this->nullEquivalent = true;
@@ -439,5 +441,21 @@ class NodeBuilder
     public function end()
     {
         return $this->parent;
+    }
+
+    /**
+     * Allows child values not represented by a node.
+     *
+     * An example would be an "options" array node, where its children
+     * could be any key of any form. In this case, no children are placed
+     * on the node, but child values must be allowed.
+     *
+     * @return Symfony\Component\DependencyInjection\Configuration\Builder\NodeBuilder
+     */
+    public function allowUnnamedChildren()
+    {
+        $this->allowUnnamedChildren = true;
+
+        return $this;
     }
 }

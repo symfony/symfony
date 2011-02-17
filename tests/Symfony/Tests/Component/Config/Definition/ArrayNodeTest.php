@@ -49,4 +49,33 @@ class ArrayNodeTest extends \PHPUnit_Framework_TestCase
         $node->setDefaultValue(array ('test'));
         $this->assertEquals(array ('test'), $node->getDefaultValue());
     }
+
+    // finalizeValue() should protect against child values with no corresponding node
+    public function testExceptionThrownOnUnrecognizedChild()
+    {
+        $this->setExpectedException('Symfony\Component\DependencyInjection\Configuration\Exception\InvalidConfigurationException');
+        $node = new ArrayNode('root');
+        $node->finalize(array('foo' => 'bar'));
+    }
+
+    // if unnamedChildren is true, finalize allows them
+    public function textNoExceptionForUnrecognizedChildWithUnnamedChildren()
+    {
+        $node = new ArrayNode('root');
+        $node->setAllowUnnamedChildren(true);
+        $finalized = $node->finalize(array('foo' => 'bar'));
+
+        $this->assertEquals(array('foo' => 'bar'), $finalized);
+    }
+
+    /**
+     * normalize() should not strip values that don't have children nodes.
+     * Validation will take place later in finalizeValue().
+     */
+    public function testNormalizeKeepsExtraArrayValues()
+    {
+        $node = new ArrayNode('root');
+        $normalized = $node->normalize(array('foo' => 'bar'));
+        $this->assertEquals(array('foo' => 'bar'), $normalized);
+    }
 }

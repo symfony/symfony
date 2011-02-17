@@ -34,6 +34,7 @@ class ArrayNode extends BaseNode implements PrototypeNodeInterface
     protected $minNumberOfElements;
     protected $performDeepMerging;
     protected $defaultValue;
+    protected $allowUnnamedChildren;
 
     /**
      * Constructor.
@@ -52,6 +53,7 @@ class ArrayNode extends BaseNode implements PrototypeNodeInterface
         $this->allowNewKeys = true;
         $this->performDeepMerging = true;
         $this->minNumberOfElements = 0;
+        $this->allowUnnamedChildren = false;
     }
 
     /**
@@ -308,6 +310,14 @@ class ArrayNode extends BaseNode implements PrototypeNodeInterface
             }
         }
 
+        // if extra fields are present and allowUnnamedChildren is false, throw exception
+        if (!$this->allowUnnamedChildren && $diff = array_diff(array_keys($value), array_keys($this->children))) {
+            $msg = sprintf('Unrecognized options "%s" under "%s"', implode(', ', $diff), $this->getPath());
+
+            throw new InvalidConfigurationException($msg);
+        }
+
+
         return $value;
     }
 
@@ -384,16 +394,17 @@ class ArrayNode extends BaseNode implements PrototypeNodeInterface
             return $normalized;
         }
 
-        $normalized = array();
+        // note that this purposefully does not exclude unrecognized child keys.
+        // unrecognized keys are just added in - validation takes place in finalize
         foreach ($this->children as $name => $child) {
             if (!array_key_exists($name, $value)) {
                 continue;
             }
 
-            $normalized[$name] = $child->normalize($value[$name]);
+            $value[$name] = $child->normalize($value[$name]);
         }
 
-        return $normalized;
+        return $value;
     }
 
     /**
@@ -451,5 +462,20 @@ class ArrayNode extends BaseNode implements PrototypeNodeInterface
         }
 
         return $leftSide;
+    }
+
+    /**
+     * Set whether or not to allow this array to have child values that
+     * are not represented as nodes.
+     *
+     * An example would be an "options" array node, where its children
+     * could be any key of any form. In this case, no children are placed
+     * on the node, but child values must be allowed.
+     *
+     * @param  Boolean $v Whether to allow unnamed children
+     */
+    public function setAllowUnnamedChildren($v)
+    {
+        $this->allowUnnamedChildren = $v;
     }
 }

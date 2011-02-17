@@ -358,6 +358,7 @@ class ArrayNode extends BaseNode implements PrototypeNodeInterface
             }
 
             $value[$plural] = Extension::normalizeConfig($value, $singular, $plural);
+            unset($value[$singular]);
         }
 
         if (null !== $this->prototype) {
@@ -372,6 +373,7 @@ class ArrayNode extends BaseNode implements PrototypeNodeInterface
                         ));
                     } else if (isset($v[$this->keyAttribute])) {
                         $k = $v[$this->keyAttribute];
+                        unset($v[$this->keyAttribute]);
                     }
 
                     if (array_key_exists($k, $normalized)) {

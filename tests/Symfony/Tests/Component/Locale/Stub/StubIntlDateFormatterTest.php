@@ -11,10 +11,13 @@
 
 namespace Symfony\Tests\Component\Locale\Stub;
 
+require_once __DIR__.'/../TestCase.php';
+
 use Symfony\Component\Locale\Locale;
 use Symfony\Component\Locale\Stub\StubIntlDateFormatter;
+use Symfony\Tests\Component\Locale\TestCase as LocaleTestCase;
 
-class StubIntlDateFormatterTest extends \PHPUnit_Framework_TestCase
+class StubIntlDateFormatterTest extends LocaleTestCase
 {
     /**
      * @expectedException InvalidArgumentException
@@ -38,7 +41,7 @@ class StubIntlDateFormatterTest extends \PHPUnit_Framework_TestCase
         $formatter = new StubIntlDateFormatter('en', StubIntlDateFormatter::MEDIUM, StubIntlDateFormatter::SHORT, 'UTC', StubIntlDateFormatter::GREGORIAN, $pattern);
         $this->assertSame($expected, $formatter->format($timestamp), 'Check date format with stub implementation.');
 
-        if (extension_loaded('intl')) {
+        if ($this->isIntlExtensionLoaded()) {
             $formatter = new \IntlDateFormatter('en', \IntlDateFormatter::MEDIUM, \IntlDateFormatter::SHORT, 'UTC', \IntlDateFormatter::GREGORIAN, $pattern);
             $this->assertSame($expected, $formatter->format($timestamp), 'Check date format with intl extension.');
         }
@@ -237,7 +240,7 @@ class StubIntlDateFormatterTest extends \PHPUnit_Framework_TestCase
         $formatter = new StubIntlDateFormatter('en', StubIntlDateFormatter::MEDIUM, StubIntlDateFormatter::SHORT, $timezone, StubIntlDateFormatter::GREGORIAN, $pattern);
         $this->assertSame($expected, $formatter->format($timestamp), 'Check date format with stub implementation.');
 
-        if (extension_loaded('intl')) {
+        if ($this->isIntlExtensionLoaded()) {
             $formatter = new \IntlDateFormatter('en', \IntlDateFormatter::MEDIUM, \IntlDateFormatter::SHORT, $timezone, \IntlDateFormatter::GREGORIAN, $pattern);
             $this->assertSame($expected, $formatter->format($timestamp), 'Check date format with intl extension.');
         }
@@ -278,7 +281,7 @@ class StubIntlDateFormatterTest extends \PHPUnit_Framework_TestCase
         $formatter = new StubIntlDateFormatter('en', $datetype, $timetype, 'UTC');
         $this->assertSame($expected, $formatter->format($timestamp), 'Check date format with stub implementation.');
 
-        if (extension_loaded('intl')) {
+        if ($this->isIntlExtensionLoaded()) {
             $formatter = new \IntlDateFormatter('en', $datetype, $timetype, 'UTC');
             $this->assertSame($expected, $formatter->format($timestamp), 'Check date format with intl extension.');
         }

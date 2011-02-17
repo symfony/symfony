@@ -102,6 +102,29 @@ class NodeBuilder
     }
 
     /**
+     * Add a NodeBuilder instance directly.
+     *
+     * This helps achieve a fluid interface when a method on your Configuration
+     * class returns a pre-build NodeBuilder instance on your behalf:
+     *
+     *     $root = new NodeBuilder();
+     *         ->node('foo', 'scalar')
+     *         ->addNodeBuilder($this->getBarNodeBuilder())
+     *         ->node('baz', 'scalar')
+     *     ;
+     *
+     * @return Symfony\Component\DependencyInjection\Configuration\Builder\NodeBuilder This builder node
+     */
+    public function addNodeBuilder(NodeBuilder $node)
+    {
+        $node->parent = $this;
+
+        $this->children[$node->name] = $node;
+
+        return $this;
+    }
+
+    /**
      * Creates a child array node
      *
      * @param string $name The name of the node

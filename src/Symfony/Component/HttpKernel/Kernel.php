@@ -480,10 +480,10 @@ abstract class Kernel implements KernelInterface
             $dir = $container->getParameter(sprintf('kernel.%s_dir', $name));
             if (!is_dir($dir)) {
                 if (false === @mkdir($dir, 0777, true)) {
-                    die(sprintf('Unable to create the %s directory (%s)', $name, dirname($dir)));
+                    die(sprintf("Unable to create the %s directory (%s)\n", $name, dirname($dir)));
                 }
             } elseif (!is_writable($dir)) {
-                die(sprintf('Unable to write in the %s directory (%s)', $name, $dir));
+                die(sprintf("Unable to write in the %s directory (%s)\n", $name, $dir));
             }
         }
 

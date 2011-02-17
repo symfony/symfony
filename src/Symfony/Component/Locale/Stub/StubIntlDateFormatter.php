@@ -84,17 +84,17 @@ class StubIntlDateFormatter
         $regExp = "/($quoteMatch|$specialCharsMatch)/";
 
         $callback = function($matches) use ($dateTime) {
-            $pattern = $matches[0];
-            $length = strlen($pattern);
+            $datePattern = $matches[0];
+            $length = strlen($datePattern);
 
-            if ("'" === $pattern[0]) {
-                if (preg_match("/^'+$/", $matches[0])) {
-                    return str_replace("''", "'", $matches[0]);
+            if ("'" === $datePattern[0]) {
+                if (preg_match("/^'+$/", $datePattern)) {
+                    return str_replace("''", "'", $datePattern);
                 }
-                return str_replace("''", "'", substr($matches[0], 1, -1));
+                return str_replace("''", "'", substr($datePattern, 1, -1));
             }
 
-            switch ($pattern[0]) {
+            switch ($datePattern[0]) {
                 case 'M':
                 case 'L':
                     $matchLengthMap = array(

@@ -65,7 +65,7 @@
     {% if attr.type is defined and attr.type != "text" %}
         <input {{ block('field_attributes') }} value="{{ field.displayedData }}" />
     {% else %}
-        {#{% set attr.maxlength = attr.maxlength|default(field.maxlength) %}#}
+        {% set attr = attr|merge({ 'maxlength': attr.maxlength|default(field.maxlength) }) %}
         <input type="text" {{ block('field_attributes') }} value="{{ field.displayedData }}" />
     {% endif %}
 {% endspaceless %}
@@ -73,7 +73,7 @@
 
 {% block password_field %}
 {% spaceless %}
-    {#{% set attr.maxlength = attr.maxlength|default(field.maxlength) %}#}
+    {% set attr = attr|merge({ 'maxlength': attr.maxlength|default(field.maxlength) }) %}
     <input type="password" {{ block('field_attributes') }} value="{{ field.displayedData }}" />
 {% endspaceless %}
 {% endblock password_field %}
@@ -160,16 +160,14 @@
 
 {% block time_field %}
 {% spaceless %}
-    {# TODO the next line should be set attr.size = 1, but that's not supported yet by Twig #}
-    {% if field.isField %}{% set attr = { 'size': 1 } %}{% endif %}
+    {% if field.isField %}{% set attr = attr|merge({ 'size': 1 }) %}{% endif %}
     {{ form_field(field.hour, attr) }}:{{ form_field(field.minute, attr) }}{% if field.isWithSeconds %}:{{ form_field(field.second, attr) }}{% endif %}
 {% endspaceless %}
 {% endblock time_field %}
 
 {% block number_field %}
 {% spaceless %}
-    {# TODO the next line should be set attr.type = 'number', but that's not supported yet by Twig #}
-    {% set attr = { 'type': 'number' } %}
+    {% set attr = attr|merge({ 'type': 'number' }) %}
     {{ block('text_field') }}
 {% endspaceless %}
 {% endblock number_field %}
@@ -182,8 +180,7 @@
 
 {% block url_field %}
 {% spaceless %}
-    {# TODO the next line should be set attr.type = 'url', but that's not supported yet by Twig #}
-    {% set attr = { 'type': 'url' } %}
+    {% set attr = attr|merge({ 'type': 'url' }) %}
     {{ block('text_field') }}
 {% endspaceless %}
 {% endblock url_field %}

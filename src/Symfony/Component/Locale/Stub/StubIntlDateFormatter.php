@@ -11,7 +11,7 @@
 
 namespace Symfony\Component\Locale\Stub;
 
-use Symfony\Component\Locale\Locale;
+use Symfony\Component\Locale\Exception\MethodNotImplementedException;
 
 /**
  * Provides a stub IntlDateFormatter for the 'en' locale.
@@ -225,19 +225,14 @@ class StubIntlDateFormatter
         return 'en';
     }
 
+    public function setLocale($locale)
+    {
+        throw new MethodNotImplementedException(__METHOD__);
+    }
+
     public function getPattern()
     {
         return $this->pattern;
-    }
-
-    public function getCalendar()
-    {
-        return self::GREGORIAN;
-    }
-
-    public function setLocale($locale)
-    {
-        $this->throwMethodNotImplementException(__METHOD__);
     }
 
     public function setPattern($pattern)
@@ -256,14 +251,13 @@ class StubIntlDateFormatter
         $this->pattern = $pattern;
     }
 
-    public function setCalendar()
+    public function getCalendar()
     {
-        $this->throwMethodNotImplementException(__METHOD__);
+        return self::GREGORIAN;
     }
 
-    private function throwMethodNotImplementException($methodName)
+    public function setCalendar()
     {
-        $message = sprintf('The %s::%s() is not implemented. Install the intl extension for full localization capabilities.', __CLASS__, $methodName);
-        throw new \RuntimeException($message);
+        throw new MethodNotImplementedException(__METHOD__);
     }
 }

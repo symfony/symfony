@@ -302,18 +302,46 @@ class StubIntlDateFormatterTest extends LocaleTestCase
         );
     }
 
+    public function testGetPattern()
+    {
+        $formatter = new StubIntlDateFormatter('en', StubIntlDateFormatter::FULL, StubIntlDateFormatter::NONE, StubIntlDateFormatter::GREGORIAN, 'UTC', 'yyyy-MM-dd');
+        $this->assertEquals('yyyy-MM-dd', $formatter->getPattern());
+    }
+
+    public function testSetPattern()
+    {
+        $formatter = new StubIntlDateFormatter('en', StubIntlDateFormatter::FULL, StubIntlDateFormatter::NONE);
+        $formatter->setPattern('yyyy-MM-dd');
+        $this->assertEquals('yyyy-MM-dd', $formatter->getPattern());
+    }
+
+    public function testGetLocale()
+    {
+        $formatter = new StubIntlDateFormatter('en', StubIntlDateFormatter::FULL, StubIntlDateFormatter::NONE);
+        $this->assertEquals('en', $formatter->getLocale());
+    }
+
     /**
-     * @expectedException RuntimeException
+     * @expectedException Symfony\Component\Locale\Exception\MethodNotImplementedException
      */
+    public function testSetLocale()
+    {
+        $formatter = new StubIntlDateFormatter('en', StubIntlDateFormatter::FULL, StubIntlDateFormatter::NONE);
+        $formatter->setLocale('pt_BR');
+    }
+
     public function testGetCalendar()
     {
         $formatter = new StubIntlDateFormatter('en', StubIntlDateFormatter::FULL, StubIntlDateFormatter::NONE);
-        $formatter->setCalendar(StubIntlDateFormatter::GREGORIAN);
+        $this->assertEquals(StubIntlDateFormatter::GREGORIAN, $formatter->getCalendar());
     }
 
+    /**
+     * @expectedException Symfony\Component\Locale\Exception\MethodNotImplementedException
+     */
     public function testSetCalendar()
     {
         $formatter = new StubIntlDateFormatter('en', StubIntlDateFormatter::FULL, StubIntlDateFormatter::NONE);
-        $this->assertEquals(StubIntlDateFormatter::GREGORIAN, $formatter->getCalendar());
+        $formatter->setCalendar(StubIntlDateFormatter::GREGORIAN);
     }
 }

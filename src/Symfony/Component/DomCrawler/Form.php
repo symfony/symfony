@@ -174,7 +174,7 @@ class Form implements \ArrayAccess
         $uri = $this->node->getAttribute('action');
         $urlHaveScheme = 'http' === substr($uri, 0, 4);
 
-        if (!$uri) {
+        if (!$uri || '#' === $uri) {
             $uri = $this->path;
         }
 

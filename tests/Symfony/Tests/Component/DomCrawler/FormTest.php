@@ -341,6 +341,12 @@ class FormTest extends \PHPUnit_Framework_TestCase
                 array(),
                 '/?foo=foo',
             ),
+            array(
+                'chooses the path if the action attribute value is a sharp (#)',
+                '<form action="#" method="post"><input type="text" name="foo" value="foo" /><input type="submit" /></form>',
+                array(),
+                '/',
+            ),
         );
     }
 

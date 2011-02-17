@@ -149,7 +149,11 @@ abstract class Bundle extends ContainerAware implements BundleInterface
 
         $prefix = $this->getNamespace().'\\Command';
         foreach ($finder as $file) {
-            $r = new \ReflectionClass($prefix.strtr($file->getRelativePath(), '/', '\\').'\\'.$file->getBasename('.php'));
+            $ns = $prefix;
+            if ($relativePath = $file->getRelativePath()) {
+                $ns .= '\\'.strtr($relativePath, '/', '\\');
+            }
+            $r = new \ReflectionClass($ns.'\\'.$file->getBasename('.php'));
             if ($r->isSubclassOf('Symfony\\Component\\Console\\Command\\Command') && !$r->isAbstract()) {
                 $application->add($r->newInstance());
             }

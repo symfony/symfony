@@ -49,7 +49,7 @@
     <parameter key="doctrine.odm.mongodb.document_dirs" type="collection"></parameter>
 
     <!-- security/user -->
-    <parameter key="security.user.provider.document.class">Symfony\Bundle\DoctrineMongoDBBundle\Security\DocumentUserProvider</parameter>
+    <parameter key="doctrine.odm.mongodb.security.user.provider.class">Symfony\Bundle\DoctrineMongoDBBundle\Security\DocumentUserProvider</parameter>
 
     <!-- proxy cache warmer -->
     <parameter key="doctrine.odm.mongodb.proxy_cache_warmer.class">Symfony\Bundle\DoctrineMongoDBBundle\CacheWarmer\ProxyCacheWarmer</parameter>
@@ -93,13 +93,11 @@
       <argument type="service" id="doctrine.odm.mongodb.logger" />
     </service>
 
-    <service id="security.user.document_manager" alias="doctrine.odm.mongodb.default_document_manager" />
-
+    <!-- Cache Warmers -->
     <service id="doctrine.odm.mongodb.proxy_cache_warmer" class="%doctrine.odm.mongodb.proxy_cache_warmer.class%" public="false">
         <tag name="kernel.cache_warmer" />
         <argument type="service" id="service_container" />
     </service>
-
     <service id="doctrine.odm.mongodb.hydrator_cache_warmer" class="%doctrine.odm.mongodb.hydrator_cache_warmer.class%" public="false">
         <tag name="kernel.cache_warmer" />
         <argument type="service" id="service_container" />
@@ -111,5 +109,11 @@
         <argument type="service" id="service_container" />
     </service>
 
+    <!-- Security -->
+    <service id="doctrine.odm.mongodb.security.user.provider" class="%doctrine.odm.mongodb.security.user.provider.class%" public="false" abstract="true">
+        <argument type="service" id="doctrine.odm.mongodb.security.user.document_manager" />
+    </service>
+    <service id="doctrine.odm.mongodb.security.user.document_manager" alias="doctrine.odm.mongodb.default_document_manager" public="false" />
+    
   </services>
 </container>

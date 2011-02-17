@@ -340,7 +340,7 @@ abstract class Client
     /**
      * Follow redirects?
      *
-     * @return Client
+     * @return Crawler
      *
      * @throws \LogicException If request was not a redirect
      */

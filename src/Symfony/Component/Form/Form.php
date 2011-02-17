@@ -523,6 +523,8 @@ class Form extends Field implements \IteratorAggregate, FormInterface
      */
     public function isValid()
     {
+        $this->validate();
+
         if (!parent::isValid()) {
             return false;
         }
@@ -750,8 +752,6 @@ class Form extends Field implements \IteratorAggregate, FormInterface
             $files = $request->files->get($this->getName(), array());
 
             $this->submit(array_replace_recursive($values, $files));
-
-            $this->validate();
         }
     }
 

@@ -344,4 +344,105 @@ class StubIntlDateFormatterTest extends LocaleTestCase
         $formatter = new StubIntlDateFormatter('en', StubIntlDateFormatter::FULL, StubIntlDateFormatter::NONE);
         $formatter->setCalendar(StubIntlDateFormatter::GREGORIAN);
     }
+
+    public function testGetDateType()
+    {
+        $formatter = new StubIntlDateFormatter('en', StubIntlDateFormatter::FULL, StubIntlDateFormatter::NONE);
+        $this->assertEquals(StubIntlDateFormatter::FULL, $formatter->getDateType());
+    }
+
+    public function testGetTimeType()
+    {
+        $formatter = new StubIntlDateFormatter('en', StubIntlDateFormatter::NONE, StubIntlDateFormatter::FULL);
+        $this->assertEquals(StubIntlDateFormatter::FULL, $formatter->getTimeType());
+    }
+
+    /**
+     * @expectedException Symfony\Component\Locale\Exception\MethodNotImplementedException
+     */
+    public function testGetErrorCode()
+    {
+        $formatter = new StubIntlDateFormatter('en', StubIntlDateFormatter::FULL, StubIntlDateFormatter::NONE);
+        $formatter->getErrorCode();
+    }
+
+    /**
+     * @expectedException Symfony\Component\Locale\Exception\MethodNotImplementedException
+     */
+    public function testGetErrorMessage()
+    {
+        $formatter = new StubIntlDateFormatter('en', StubIntlDateFormatter::FULL, StubIntlDateFormatter::NONE);
+        $formatter->getErrorMessage();
+    }
+
+    /**
+    * @dataProvider timezoneIdProvider
+    */
+    public function testGetTimezoneId($timezoneId)
+    {
+        $formatter = new StubIntlDateFormatter('en', StubIntlDateFormatter::FULL, StubIntlDateFormatter::NONE, $timezoneId);
+        $this->assertEquals($timezoneId, $formatter->getTimezoneId(), 'Check timezone id with stub implementation.');
+
+        if ($this->isIntlExtensionLoaded()) {
+            $formatter = new \IntlDateFormatter('en', \IntlDateFormatter::FULL, \IntlDateFormatter::NONE, $timezoneId);
+            $this->assertEquals($timezoneId, $formatter->getTimezoneId(), 'Check timezone id with intl extension.');
+        }
+    }
+
+    public function timezoneIdProvider()
+    {
+        return array(
+            array('Europe/Zurich'),
+            array('Asia/Dubai'),
+        );
+    }
+
+    public function testSetTimezoneId()
+    {
+        $formatter = new StubIntlDateFormatter('en', StubIntlDateFormatter::FULL, StubIntlDateFormatter::NONE, 'UTC');
+        $this->assertEquals('UTC', $formatter->getTimezoneId(), 'Check timezone id with stub implementation.');
+
+        $formatter->setTimezoneId('Europe/Zurich');
+        $this->assertEquals('Europe/Zurich', $formatter->getTimezoneId(), 'Check timezone id with intl extension.');
+
+        if ($this->isIntlExtensionLoaded()) {
+            $formatter = new \IntlDateFormatter('en', \IntlDateFormatter::FULL, \IntlDateFormatter::NONE, 'UTC');
+
+            $formatter->setTimezoneId('Europe/Zurich');
+            $this->assertEquals('Europe/Zurich', $formatter->getTimezoneId(), 'Check timezone id with intl extension.');
+        }
+    }
+
+    /**
+     * @expectedException Symfony\Component\Locale\Exception\MethodNotImplementedException
+     */
+    public function testLocaltime()
+    {
+        $formatter = new StubIntlDateFormatter('en', StubIntlDateFormatter::FULL, StubIntlDateFormatter::NONE);
+        $formatter->localtime('Wednesday, December 31, 1969 4:00:00 PM PT');
+    }
+
+    /**
+     * @expectedException Symfony\Component\Locale\Exception\MethodNotImplementedException
+     */
+    public function testParse()
+    {
+        $formatter = new StubIntlDateFormatter('en', StubIntlDateFormatter::FULL, StubIntlDateFormatter::NONE);
+        $formatter->parse('Wednesday, December 31, 1969 4:00:00 PM PT');
+    }
+
+    /**
+     * @expectedException Symfony\Component\Locale\Exception\MethodNotImplementedException
+     */
+    public function testIsLenient()
+    {
+        $formatter = new StubIntlDateFormatter('en', StubIntlDateFormatter::FULL, StubIntlDateFormatter::NONE);
+        $formatter->isLenient();
+    }
+
+    public function testStaticCreate()
+    {
+        $formatter = StubIntlDateFormatter::create('en', StubIntlDateFormatter::FULL, StubIntlDateFormatter::NONE);
+        $this->assertInstanceOf('Symfony\Component\Locale\Stub\StubIntlDateFormatter', $formatter);
+    }
 }

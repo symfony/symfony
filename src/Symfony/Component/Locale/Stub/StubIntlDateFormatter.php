@@ -60,12 +60,7 @@ class StubIntlDateFormatter
         $this->timetype = $timetype;
 
         $this->setPattern($pattern);
-
-        try {
-            $this->dateTimeZone = new \DateTimeZone($timezone);
-        } catch (\Exception $e) {
-            $this->dateTimeZone = new \DateTimeZone('UTC');
-        }
+        $this->setTimezoneId($timezone);
     }
 
     public function format($timestamp)
@@ -259,5 +254,59 @@ class StubIntlDateFormatter
     public function setCalendar()
     {
         throw new MethodNotImplementedException(__METHOD__);
+    }
+
+    public function getDateType()
+    {
+        return $this->datetype;
+    }
+
+    public function getTimeType()
+    {
+        return $this->timetype;
+    }
+
+    public function getErrorCode()
+    {
+        throw new MethodNotImplementedException(__METHOD__);
+    }
+
+    public function getErrorMessage()
+    {
+        throw new MethodNotImplementedException(__METHOD__);
+    }
+
+    public function getTimezoneId()
+    {
+        return $this->dateTimeZone->getName();
+    }
+
+    public function setTimezoneId($timezoneId)
+    {
+        try {
+            $this->dateTimeZone = new \DateTimeZone($timezoneId);
+        } catch (\Exception $e) {
+            $this->dateTimeZone = new \DateTimeZone('UTC');
+        }
+    }
+
+    public function isLenient()
+    {
+        throw new MethodNotImplementedException(__METHOD__);
+    }
+
+    public function localtime($value, &$position = 0)
+    {
+        throw new MethodNotImplementedException(__METHOD__);
+    }
+
+    public function parse($value, &$position = 0)
+    {
+        throw new MethodNotImplementedException(__METHOD__);
+    }
+
+    static public function create($locale, $datetype, $timetype, $timezone = null, $calendar = null, $pattern = null)
+    {
+        return new self($locale, $datetype, $timetype, $timezone, $calendar, $pattern);
     }
 }

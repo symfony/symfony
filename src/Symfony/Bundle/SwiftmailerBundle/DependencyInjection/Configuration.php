@@ -11,8 +11,8 @@
 
 namespace Symfony\Bundle\SwiftmailerBundle\DependencyInjection;
 
-use Symfony\Component\DependencyInjection\Configuration\Builder\NodeBuilder;
-use Symfony\Component\DependencyInjection\Configuration\Builder\TreeBuilder;
+use Symfony\Component\Config\Definition\Builder\NodeBuilder;
+use Symfony\Component\Config\Definition\Builder\TreeBuilder;
 
 /**
  * This class contains the configuration information for the bundle
@@ -27,7 +27,7 @@ class Configuration
     /**
      * Generates the configuration tree.
      *
-     * @return \Symfony\Component\DependencyInjection\Configuration\NodeInterface
+     * @return \Symfony\Component\Config\Definition\NodeInterface
      */
     public function getConfigTree()
     {

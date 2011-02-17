@@ -9,7 +9,7 @@
  * file that was distributed with this source code.
  */
 
-namespace Symfony\Component\DependencyInjection\Configuration\Builder;
+namespace Symfony\Component\Config\Definition\Builder;
 
 /**
  * This class builds merge conditions.
@@ -25,7 +25,7 @@ class MergeBuilder
     /**
      * Constructor
      *
-     * @param Symfony\Component\DependencyInjection\Configuration\Builder\NodeBuilder $parent The parent node
+     * @param Symfony\Component\Config\Definition\Builder\NodeBuilder $parent The parent node
      */
     public function __construct($parent)
     {
@@ -38,7 +38,7 @@ class MergeBuilder
      * Sets whether the node can be unset.
      *
      * @param boolean $allow
-     * @return Symfony\Component\DependencyInjection\Configuration\Builder\MergeBuilder
+     * @return Symfony\Component\Config\Definition\Builder\MergeBuilder
      */
     public function allowUnset($allow = true)
     {
@@ -52,7 +52,7 @@ class MergeBuilder
      *
      * @param boolean $deny Whether the overwritting is forbidden or not
      *
-     * @return Symfony\Component\DependencyInjection\Configuration\Builder\MergeBuilder
+     * @return Symfony\Component\Config\Definition\Builder\MergeBuilder
      */
     public function denyOverwrite($deny = true)
     {
@@ -64,7 +64,7 @@ class MergeBuilder
     /**
      * Returns the parent node.
      *
-     * @return Symfony\Component\DependencyInjection\Configuration\Builder\NodeBuilder
+     * @return Symfony\Component\Config\Definition\Builder\NodeBuilder
      */
     public function end()
     {

@@ -9,7 +9,7 @@
  * file that was distributed with this source code.
  */
 
-namespace Symfony\Component\DependencyInjection\Configuration;
+namespace Symfony\Component\Config\Definition;
 
 use Symfony\Component\DependencyInjection\Extension\Extension;
 

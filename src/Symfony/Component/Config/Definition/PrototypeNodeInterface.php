@@ -9,7 +9,7 @@
  * file that was distributed with this source code.
  */
 
-namespace Symfony\Component\DependencyInjection\Configuration;
+namespace Symfony\Component\Config\Definition;
 
 /**
  * This interface must be implemented by nodes which can be used as prototypes.

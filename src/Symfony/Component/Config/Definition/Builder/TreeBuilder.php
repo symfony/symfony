@@ -9,14 +9,14 @@
  * file that was distributed with this source code.
  */
 
-namespace Symfony\Component\DependencyInjection\Configuration\Builder;
+namespace Symfony\Component\Config\Definition\Builder;
 
-use Symfony\Component\DependencyInjection\Configuration\BaseNode;
+use Symfony\Component\Config\Definition\BaseNode;
 
-use Symfony\Component\DependencyInjection\Configuration\BooleanNode;
+use Symfony\Component\Config\Definition\BooleanNode;
 
-use Symfony\Component\DependencyInjection\Configuration\ArrayNode;
-use Symfony\Component\DependencyInjection\Configuration\ScalarNode;
+use Symfony\Component\Config\Definition\ArrayNode;
+use Symfony\Component\Config\Definition\ScalarNode;
 
 /**
  * This is the entry class for building your own config tree.
@@ -34,7 +34,7 @@ class TreeBuilder
      * @param string $name The name of the node
      * @param string $type The type of the node
      *
-     * @return Symfony\Component\DependencyInjection\Configuration\Builder\NodeBuilder
+     * @return Symfony\Component\Config\Definition\Builder\NodeBuilder
      */
     public function root($name, $type)
     {
@@ -46,7 +46,7 @@ class TreeBuilder
     /**
      * Builds the tree.
      *
-     * @return Symfony\Component\DependencyInjection\Configuration\NodeInterface
+     * @return Symfony\Component\Config\Definition\NodeInterface
      */
     public function buildTree()
     {
@@ -66,7 +66,7 @@ class TreeBuilder
      *
      * @param NodeBuilder $node The builder of the node
      *
-     * @return Symfony\Component\DependencyInjection\Configuration\NodeInterface
+     * @return Symfony\Component\Config\Definition\NodeInterface
      */
     protected function createConfigNode(NodeBuilder $node)
     {
@@ -83,7 +83,7 @@ class TreeBuilder
      *
      * @param NodeBuilder $node The builder of the node
      *
-     * @return Symfony\Component\DependencyInjection\Configuration\BooleanNode
+     * @return Symfony\Component\Config\Definition\BooleanNode
      */
     protected function createBooleanConfigNode(NodeBuilder $node)
     {
@@ -98,7 +98,7 @@ class TreeBuilder
      *
      * @param NodeBuilder $node the builder of the node
      *
-     * @return Symfony\Component\DependencyInjection\Configuration\ScalarNode
+     * @return Symfony\Component\Config\Definition\ScalarNode
      */
     protected function createScalarConfigNode(NodeBuilder $node)
     {
@@ -151,7 +151,7 @@ class TreeBuilder
      *
      * @param NodeBuilder $node The builder of the node
      *
-     * @return Symfony\Component\DependencyInjection\Configuration\ArrayNode
+     * @return Symfony\Component\Config\Definition\ArrayNode
      */
     protected function createArrayConfigNode(NodeBuilder $node)
     {

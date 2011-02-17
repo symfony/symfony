@@ -1,13 +1,13 @@
 <?php
 
-namespace Symfony\Tests\Component\DependencyInjection\Configuration;
+namespace Symfony\Tests\Component\Config\Definition;
 
-use Symfony\Component\DependencyInjection\Configuration\Builder\TreeBuilder;
+use Symfony\Component\Config\Definition\Builder\TreeBuilder;
 
 class MergeTest extends \PHPUnit_Framework_TestCase
 {
     /**
-     * @expectedException Symfony\Component\DependencyInjection\Configuration\Exception\ForbiddenOverwriteException
+     * @expectedException Symfony\Component\Config\Definition\Exception\ForbiddenOverwriteException
      */
     public function testForbiddenOverwrite()
     {
@@ -77,7 +77,7 @@ class MergeTest extends \PHPUnit_Framework_TestCase
     }
 
     /**
-     * @expectedException Symfony\Component\DependencyInjection\Configuration\Exception\InvalidConfigurationException
+     * @expectedException Symfony\Component\Config\Definition\Exception\InvalidConfigurationException
      */
     public function testDoesNotAllowNewKeysInSubsequentConfigs()
     {

@@ -9,12 +9,12 @@
  * file that was distributed with this source code.
  */
 
-namespace Symfony\Component\DependencyInjection\Configuration;
+namespace Symfony\Component\Config\Definition;
 
-use Symfony\Component\DependencyInjection\Configuration\Exception\InvalidConfigurationException;
-use Symfony\Component\DependencyInjection\Configuration\Exception\DuplicateKeyException;
-use Symfony\Component\DependencyInjection\Configuration\Exception\InvalidTypeException;
-use Symfony\Component\DependencyInjection\Configuration\Exception\UnsetKeyException;
+use Symfony\Component\Config\Definition\Exception\InvalidConfigurationException;
+use Symfony\Component\Config\Definition\Exception\DuplicateKeyException;
+use Symfony\Component\Config\Definition\Exception\InvalidTypeException;
+use Symfony\Component\Config\Definition\Exception\UnsetKeyException;
 use Symfony\Component\DependencyInjection\Extension\Extension;
 
 /**

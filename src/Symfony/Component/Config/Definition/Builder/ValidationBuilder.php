@@ -9,7 +9,7 @@
  * file that was distributed with this source code.
  */
 
-namespace Symfony\Component\DependencyInjection\Configuration\Builder;
+namespace Symfony\Component\Config\Definition\Builder;
 
 /**
  * This class builds validation conditions.
@@ -24,7 +24,7 @@ class ValidationBuilder
     /**
      * Constructor
      *
-     * @param Symfony\Component\DependencyInjection\Configuration\Builder\NodeBuilder $parent
+     * @param Symfony\Component\Config\Definition\Builder\NodeBuilder $parent
      */
     public function __construct($parent)
     {
@@ -38,7 +38,7 @@ class ValidationBuilder
      *
      * @param \Closure $closure
      *
-     * @return Symfony\Component\DependencyInjection\Configuration\Builder\ExprBuilder|Symfony\Component\DependencyInjection\Configuration\Builder\ValidationBuilder
+     * @return Symfony\Component\Config\Definition\Builder\ExprBuilder|Symfony\Component\Config\Definition\Builder\ValidationBuilder
      */
     public function rule(\Closure $closure = null)
     {

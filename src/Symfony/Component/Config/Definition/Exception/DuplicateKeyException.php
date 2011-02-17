@@ -9,14 +9,14 @@
  * file that was distributed with this source code.
  */
 
-namespace Symfony\Component\DependencyInjection\Configuration\Exception;
+namespace Symfony\Component\Config\Definition\Exception;
 
 /**
- * This exception is usually not encountered by the end-user, but only used
- * internally to signal the parent scope to unset a key.
+ * This exception is thrown whenever the key of an array is not unique. This can
+ * only be the case if the configuration is coming from an XML file.
  *
  * @author Johannes M. Schmitt <schmittjoh@gmail.com>
  */
-class UnsetKeyException extends Exception
+class DuplicateKeyException extends InvalidConfigurationException
 {
 }

@@ -1,9 +1,9 @@
 <?php
 
-namespace Symfony\Tests\Component\DependencyInjection\Configuration;
+namespace Symfony\Tests\Component\Config\Definition;
 
-use Symfony\Component\DependencyInjection\Configuration\NodeInterface;
-use Symfony\Component\DependencyInjection\Configuration\Builder\TreeBuilder;
+use Symfony\Component\Config\Definition\NodeInterface;
+use Symfony\Component\Config\Definition\Builder\TreeBuilder;
 
 class NormalizerTest extends \PHPUnit_Framework_TestCase
 {

@@ -9,9 +9,9 @@
  * file that was distributed with this source code.
  */
 
-namespace Symfony\Component\DependencyInjection\Configuration;
+namespace Symfony\Component\Config\Definition;
 
-use Symfony\Component\DependencyInjection\Configuration\Exception\InvalidTypeException;
+use Symfony\Component\Config\Definition\Exception\InvalidTypeException;
 
 class BooleanNode extends ScalarNode
 {

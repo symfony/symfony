@@ -9,10 +9,10 @@
  * file that was distributed with this source code.
  */
 
-namespace Symfony\Component\DependencyInjection\Configuration;
+namespace Symfony\Component\Config\Definition;
 
-use Symfony\Component\DependencyInjection\Configuration\Exception\Exception;
-use Symfony\Component\DependencyInjection\Configuration\Exception\ForbiddenOverwriteException;
+use Symfony\Component\Config\Definition\Exception\Exception;
+use Symfony\Component\Config\Definition\Exception\ForbiddenOverwriteException;
 
 /**
  * The base node class

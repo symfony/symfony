@@ -1,10 +1,10 @@
 <?php
 
-namespace Symfony\Tests\Component\DependencyInjection\Configuration;
+namespace Symfony\Tests\Component\Config\Definition;
 
-use Symfony\Component\DependencyInjection\Configuration\Builder\TreeBuilder;
-use Symfony\Component\DependencyInjection\Configuration\Processor;
-use Symfony\Component\DependencyInjection\Configuration\NodeInterface;
+use Symfony\Component\Config\Definition\Builder\TreeBuilder;
+use Symfony\Component\Config\Definition\Processor;
+use Symfony\Component\Config\Definition\NodeInterface;
 
 class FinalizationTest extends \PHPUnit_Framework_TestCase
 {

@@ -9,7 +9,7 @@
  * file that was distributed with this source code.
  */
 
-namespace Symfony\Component\DependencyInjection\Configuration\Builder;
+namespace Symfony\Component\Config\Definition\Builder;
 
 /**
  * This class builds normalization conditions.
@@ -25,7 +25,7 @@ class NormalizationBuilder
     /**
      * Constructor
      *
-     * @param Symfony\Component\DependencyInjection\Configuration\Builder\NodeBuilder $parent
+     * @param Symfony\Component\Config\Definition\Builder\NodeBuilder $parent
      */
     public function __construct($parent)
     {
@@ -44,7 +44,7 @@ class NormalizationBuilder
      * @param string $key    The key to remap
      * @param string $plural The plural of the key in case of irregular plural
      *
-     * @return Symfony\Component\DependencyInjection\Configuration\Builder\NormalizationBuilder
+     * @return Symfony\Component\Config\Definition\Builder\NormalizationBuilder
      */
     public function remap($key, $plural = null)
     {
@@ -62,7 +62,7 @@ class NormalizationBuilder
      *
      * @param \Closure $closure
      *
-     * @return Symfony\Component\DependencyInjection\Configuration\Builder\ExprBuilder|Symfony\Component\DependencyInjection\Configuration\Builder\NormalizationBuilder
+     * @return Symfony\Component\Config\Definition\Builder\ExprBuilder|Symfony\Component\Config\Definition\Builder\NormalizationBuilder
      */
     public function before(\Closure $closure = null)
     {

@@ -9,10 +9,10 @@
  * file that was distributed with this source code.
  */
 
-namespace Symfony\Component\DependencyInjection\Configuration;
+namespace Symfony\Component\Config\Definition;
 
-use Symfony\Component\DependencyInjection\Configuration\Exception\InvalidConfigurationException;
-use Symfony\Component\DependencyInjection\Configuration\Exception\InvalidTypeException;
+use Symfony\Component\Config\Definition\Exception\InvalidConfigurationException;
+use Symfony\Component\Config\Definition\Exception\InvalidTypeException;
 
 /**
  * This node represents a scalar value in the config tree.

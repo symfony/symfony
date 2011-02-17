@@ -9,14 +9,13 @@
  * file that was distributed with this source code.
  */
 
-namespace Symfony\Component\DependencyInjection\Configuration\Exception;
+namespace Symfony\Component\Config\Definition\Exception;
 
 /**
- * This exception is thrown when a configuration path is overwritten from a
- * subsequent configuration file, but the entry node specifically forbids this.
+ * This exception is thrown if an invalid type is encountered.
  *
  * @author Johannes M. Schmitt <schmittjoh@gmail.com>
  */
-class ForbiddenOverwriteException extends InvalidConfigurationException
+class InvalidTypeException extends InvalidConfigurationException
 {
 }

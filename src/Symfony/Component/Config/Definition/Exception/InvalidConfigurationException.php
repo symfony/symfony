@@ -9,14 +9,14 @@
  * file that was distributed with this source code.
  */
 
-namespace Symfony\Component\DependencyInjection\Configuration\Exception;
+namespace Symfony\Component\Config\Definition\Exception;
 
 /**
- * This exception is thrown whenever the key of an array is not unique. This can
- * only be the case if the configuration is coming from an XML file.
+ * A very general exception which can be thrown whenever non of the more specific
+ * exceptions is suitable.
  *
  * @author Johannes M. Schmitt <schmittjoh@gmail.com>
  */
-class DuplicateKeyException extends InvalidConfigurationException
+class InvalidConfigurationException extends Exception
 {
 }

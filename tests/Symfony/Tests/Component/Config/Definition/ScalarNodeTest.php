@@ -1,6 +1,6 @@
 <?php
 
-namespace Symfony\Component\DependencyInjection\Configuration;
+namespace Symfony\Component\Config\Definition;
 
 class ScalarNodeTest extends \PHPUnit_Framework_TestCase
 {
@@ -30,7 +30,7 @@ class ScalarNodeTest extends \PHPUnit_Framework_TestCase
 
     /**
      * @dataProvider getInvalidValues
-     * @expectedException Symfony\Component\DependencyInjection\Configuration\Exception\InvalidTypeException
+     * @expectedException Symfony\Component\Config\Definition\Exception\InvalidTypeException
      */
     public function testNormalizeThrowsExceptionOnInvalidValues($value)
     {

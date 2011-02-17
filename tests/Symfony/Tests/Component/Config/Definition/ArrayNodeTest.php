@@ -1,13 +1,13 @@
 <?php
 
-namespace Symfony\Tests\Component\DependencyInjection\Configuration;
+namespace Symfony\Tests\Component\Config\Definition;
 
-use Symfony\Component\DependencyInjection\Configuration\ArrayNode;
+use Symfony\Component\Config\Definition\ArrayNode;
 
 class ArrayNodeTest extends \PHPUnit_Framework_TestCase
 {
     /**
-     * @expectedException Symfony\Component\DependencyInjection\Configuration\Exception\InvalidTypeException
+     * @expectedException Symfony\Component\Config\Definition\Exception\InvalidTypeException
      */
     public function testNormalizeThrowsExceptionWhenFalseIsNotAllowed()
     {

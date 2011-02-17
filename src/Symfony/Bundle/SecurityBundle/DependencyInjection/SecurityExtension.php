@@ -11,8 +11,8 @@
 
 namespace Symfony\Bundle\SecurityBundle\DependencyInjection;
 
-use Symfony\Component\DependencyInjection\Configuration\Processor;
-use Symfony\Component\DependencyInjection\Configuration\Builder\TreeBuilder;
+use Symfony\Component\Config\Definition\Processor;
+use Symfony\Component\Config\Definition\Builder\TreeBuilder;
 use Symfony\Component\DependencyInjection\DefinitionDecorator;
 use Symfony\Component\DependencyInjection\Alias;
 use Symfony\Component\HttpKernel\DependencyInjection\Extension;

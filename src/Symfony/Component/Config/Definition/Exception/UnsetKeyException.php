@@ -9,13 +9,14 @@
  * file that was distributed with this source code.
  */
 
-namespace Symfony\Component\DependencyInjection\Configuration\Exception;
+namespace Symfony\Component\Config\Definition\Exception;
 
 /**
- * This exception is thrown if an invalid type is encountered.
+ * This exception is usually not encountered by the end-user, but only used
+ * internally to signal the parent scope to unset a key.
  *
  * @author Johannes M. Schmitt <schmittjoh@gmail.com>
  */
-class InvalidTypeException extends InvalidConfigurationException
+class UnsetKeyException extends Exception
 {
 }

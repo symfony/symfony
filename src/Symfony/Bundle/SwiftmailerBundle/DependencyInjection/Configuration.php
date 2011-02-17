@@ -63,7 +63,7 @@ class Configuration
             ->arrayNode('spool')
                 ->addDefaultsIfNotSet()
                 ->scalarNode('type')->defaultValue('file')->end()
-                ->scalarNode('path')->defaultValue('%kernel.cache_dir%/swiftmailer/pool')->end()
+                ->scalarNode('path')->defaultValue('%kernel.cache_dir%/swiftmailer/spool')->end()
             ->end()
             ->scalarNode('delivery_adress')->end()
             ->booleanNode('disable_delivery')->end();

@@ -35,7 +35,6 @@ class ArrayNode extends BaseNode implements PrototypeNodeInterface
     protected $minNumberOfElements;
     protected $performDeepMerging;
     protected $defaultValue;
-    protected $preventExtraKeys;
 
     /**
      * Constructor.
@@ -55,7 +54,6 @@ class ArrayNode extends BaseNode implements PrototypeNodeInterface
         $this->allowNewKeys = true;
         $this->performDeepMerging = true;
         $this->minNumberOfElements = 0;
-        $this->preventExtraKeys = true;
     }
 
     /**
@@ -417,8 +415,8 @@ class ArrayNode extends BaseNode implements PrototypeNodeInterface
             $value[$name] = $child->normalize($value[$name]);
         }
 
-        // if extra fields are present and preventExtraKeys is true, throw exception
-        if ($this->preventExtraKeys && $diff = array_diff(array_keys($value), array_keys($this->children))) {
+        // if extra fields are present, throw exception
+        if ($diff = array_diff(array_keys($value), array_keys($this->children))) {
             $msg = sprintf('Unrecognized options "%s" under "%s"', implode(', ', $diff), $this->getPath());
 
             throw new InvalidConfigurationException($msg);
@@ -482,24 +480,5 @@ class ArrayNode extends BaseNode implements PrototypeNodeInterface
         }
 
         return $leftSide;
-    }
-
-    /**
-     * Set whether or not this array should just prevent child values from
-     * keys that have no corresponding child nodes.
-     *
-     * If true (default), an exception will be thrown if unrecognized options
-     * are introduced. If false, extra keys are allowed in and included in
-     * the final array.
-     *
-     * An example would be an "options" array node, where its children
-     * could be any key of any form. In this case, no children are placed
-     * on the node, but child values must be allowed.
-     *
-     * @param  Boolean $v Whether to allow unnamed children
-     */
-    public function setPreventExtraKeys($v)
-    {
-        $this->preventExtraKeys = $v;
     }
 }

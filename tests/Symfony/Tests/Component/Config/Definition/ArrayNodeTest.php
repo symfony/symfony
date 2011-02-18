@@ -59,23 +59,16 @@ class ArrayNodeTest extends \PHPUnit_Framework_TestCase
         $node->normalize(array('foo' => 'bar'));
     }
 
-    // if prevent extra keys is false, normalize allows them
-    public function textNoExceptionForUnrecognizedChildWithUnnamedChildren()
-    {
-        $node = new ArrayNode('root');
-        $node->setPreventExtraKeys(false);
-        $normalized = $node->normalize(array('foo' => 'bar'));
-
-        $this->assertEquals(array('foo' => 'bar'), $normalized);
-    }
-
     // a remapped key (e.g. "mapping" -> "mappings") should be unset after being used
     public function testRemappedKeysAreUnset()
     {
         $node = new ArrayNode('root');
         $mappingsNode = new ArrayNode('mappings');
-        $mappingsNode->setPreventExtraKeys(false); // just so we can add anything to it
         $node->addChild($mappingsNode);
+
+        // each item under mappings is just a scalar
+        $prototype= new ScalarNode(null, $mappingsNode);
+        $mappingsNode->setPrototype($prototype);
 
         $remappings = array();
         $remappings[] = array('mapping', 'mappings');
@@ -108,8 +101,9 @@ class ArrayNodeTest extends \PHPUnit_Framework_TestCase
         $node = new ArrayNode('root');
         $node->setKeyAttribute('id', true);
 
-        $prototype = new ArrayNode(null);
-        $prototype->setPreventExtraKeys(false); // just so it allows anything
+        // each item under the root is an array, with one scalar item
+        $prototype= new ArrayNode(null, $node);
+        $prototype->addChild(new ScalarNode('foo'));
         $node->setPrototype($prototype);
 
         $children = array();
@@ -130,8 +124,10 @@ class ArrayNodeTest extends \PHPUnit_Framework_TestCase
         $node = new ArrayNode('root');
         $node->setKeyAttribute('id', false);
 
-        $prototype = new ArrayNode(null);
-        $prototype->setPreventExtraKeys(false); // just so it allows anything
+        // each item under the root is an array, with two scalar items
+        $prototype= new ArrayNode(null, $node);
+        $prototype->addChild(new ScalarNode('foo'));
+        $prototype->addChild(new ScalarNode('id')); // the key attribute will remain
         $node->setPrototype($prototype);
 
         $children = array();

@@ -50,7 +50,7 @@ EOF
         $mailer     = $this->container->get('mailer');
         $transport  = $mailer->getTransport();
 
-        if ("Swift_Transport_SpoolTransport" === get_class($transport)) {
+        if ($transport instanceof \Swift_Transport_SpoolTransport) {
             $spool = $transport->getSpool();
             $spool->setMessageLimit($input->getOption('message-limit'));
             $spool->setTimeLimit($input->getOption('time-limit'));

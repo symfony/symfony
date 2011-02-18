@@ -9,7 +9,7 @@
  * with this source code in the file LICENSE.
  */
 
-namespace Symfony\Bundle\AsseticBundle\Tests;
+namespace Symfony\Bundle\AsseticBundle\Tests\Factory;
 
 use Symfony\Bundle\AsseticBundle\Factory\CachedAssetManager;
 

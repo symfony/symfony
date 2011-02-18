@@ -1,17 +1,17 @@
 <?php
 
-namespace Symfony\Tests\Component\DependencyInjection\Configuration;
+namespace Symfony\Tests\Component\Config\Definition;
 
-use Symfony\Component\DependencyInjection\Configuration\Builder\NodeBuilder;
+use Symfony\Component\Config\Definition\Builder\NodeBuilder;
 
 class NodeBuilderTest extends \PHPUnit_Framework_TestCase
 {
-    public function testAddNodeBuilder()
+    public function testNodeBuilder()
     {
         $nodeBuilder = new NodeBuilder('root', array());
         $childNode = new NodeBuilder('child', array());
 
-        $ret = $nodeBuilder->addNodeBuilder($childNode);
+        $ret = $nodeBuilder->nodeBuilder($childNode);
         $this->assertEquals(array('child' => $childNode), $nodeBuilder->children);
         $this->assertEquals($nodeBuilder, $ret);
     }

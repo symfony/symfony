@@ -54,7 +54,7 @@ class ArrayNodeTest extends \PHPUnit_Framework_TestCase
     // finalizeValue() should protect against child values with no corresponding node
     public function testExceptionThrownOnUnrecognizedChild()
     {
-        $this->setExpectedException('Symfony\Component\DependencyInjection\Configuration\Exception\InvalidConfigurationException');
+        $this->setExpectedException('Symfony\Component\Config\Definition\Exception\InvalidConfigurationException');
         $node = new ArrayNode('root');
         $node->normalize(array('foo' => 'bar'));
     }

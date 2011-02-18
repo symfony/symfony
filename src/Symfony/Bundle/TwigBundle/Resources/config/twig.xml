@@ -6,16 +6,8 @@
 
     <parameters>
         <parameter key="twig.class">Twig_Environment</parameter>
-        <parameter key="twig.options" type="collection">
-            <parameter key="charset">%kernel.charset%</parameter>
-            <parameter key="debug">%kernel.debug%</parameter>
-            <parameter key="cache">%kernel.cache_dir%/twig</parameter>
-        </parameter>
         <parameter key="twig.loader.class">Symfony\Bundle\TwigBundle\Loader\FilesystemLoader</parameter>
         <parameter key="twig.globals.class">Symfony\Bundle\TwigBundle\GlobalVariables</parameter>
-        <parameter key="twig.form.resources" type="collection">
-            <parameter>TwigBundle::form.html.twig</parameter>
-        </parameter>
         <parameter key="templating.engine.twig.class">Symfony\Bundle\TwigBundle\TwigEngine</parameter>
         <parameter key="templating.cache_warmer.templates_cache.class">Symfony\Bundle\TwigBundle\CacheWarmer\TemplateCacheCacheWarmer</parameter>
     </parameters>

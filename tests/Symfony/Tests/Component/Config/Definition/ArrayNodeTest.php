@@ -129,7 +129,7 @@ class ArrayNodeTest extends \PHPUnit_Framework_TestCase
     {
         $node = new ArrayNode('root');
         $node->setKeyAttribute('id');
-        $node->setKeyAttributeIsRemoved(false);
+        $node->setRemoveKeyAttribute(false);
 
         $prototype = new ArrayNode(null);
         $prototype->setPreventExtraKeys(false); // just so it allows anything

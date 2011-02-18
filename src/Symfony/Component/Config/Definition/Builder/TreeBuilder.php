@@ -167,7 +167,7 @@ class TreeBuilder
 
         if (null !== $node->key) {
             $configNode->setKeyAttribute($node->key);
-            $configNode->setKeyAttributeIsRemoved($node->removeKeyItem);
+            $configNode->setRemoveKeyAttribute($node->removeKeyItem);
         }
 
         if (true === $node->atLeastOne) {

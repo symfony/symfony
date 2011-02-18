@@ -28,7 +28,7 @@ class ArrayNode extends BaseNode implements PrototypeNodeInterface
     protected $children;
     protected $prototype;
     protected $keyAttribute;
-    protected $keyAttributeIsRemoved;
+    protected $removeKeyAttribute;
     protected $allowFalse;
     protected $allowNewKeys;
     protected $addIfNotSet;
@@ -49,7 +49,7 @@ class ArrayNode extends BaseNode implements PrototypeNodeInterface
 
         $this->children = array();
         $this->xmlRemappings = array();
-        $this->keyAttributeIsRemoved = true;
+        $this->removeKeyAttribute = true;
         $this->allowFalse = false;
         $this->addIfNotSet = false;
         $this->allowNewKeys = true;
@@ -115,9 +115,9 @@ class ArrayNode extends BaseNode implements PrototypeNodeInterface
      *
      * @param Boolean $remove Whether or not the key attribute should be removed.
      */
-    public function setKeyAttributeIsRemoved($remove)
+    public function setRemoveKeyAttribute($remove)
     {
-        $this->keyAttributeIsRemoved = $remove;
+        $this->removeKeyAttribute = $remove;
     }
 
     /**
@@ -394,7 +394,7 @@ class ArrayNode extends BaseNode implements PrototypeNodeInterface
                         $k = $v[$this->keyAttribute];
 
                         // remove the key attribute if configured to
-                        if ($this->keyAttributeIsRemoved) {
+                        if ($this->removeKeyAttribute) {
                             unset($v[$this->keyAttribute]);
                         }
                     }
@@ -497,7 +497,7 @@ class ArrayNode extends BaseNode implements PrototypeNodeInterface
     }
 
     /**
-     * Set whether or not to this array should just prevent child values from
+     * Set whether or not this array should just prevent child values from
      * keys that have no corresponding child nodes.
      *
      * If true (default), an exception will be thrown if unrecognized options

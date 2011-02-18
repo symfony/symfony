@@ -61,7 +61,6 @@ class Configuration
                 ->end()
             ->end()
             ->arrayNode('spool')
-                ->addDefaultsIfNotSet()
                 ->scalarNode('type')->defaultValue('file')->end()
                 ->scalarNode('path')->defaultValue('%kernel.cache_dir%/swiftmailer/spool')->end()
             ->end()

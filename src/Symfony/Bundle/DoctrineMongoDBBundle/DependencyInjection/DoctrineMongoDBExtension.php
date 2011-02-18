@@ -118,8 +118,6 @@ class DoctrineMongoDBExtension extends AbstractDoctrineExtension
     {
         $defaultDocumentManager = $container->getParameter('doctrine.odm.mongodb.default_document_manager');
         $defaultDatabase = isset($documentManager['default_database']) ? $documentManager['default_database'] : $container->getParameter('doctrine.odm.mongodb.default_database');
-        $proxyCacheDir = $container->getParameter('kernel.cache_dir').'/doctrine/odm/mongodb/Proxies';
-        $hydratorCacheDir = $container->getParameter('kernel.cache_dir').'/doctrine/odm/mongodb/Hydrators';
         $configServiceName = sprintf('doctrine.odm.mongodb.%s_configuration', $documentManager['name']);
 
         if ($container->hasDefinition($configServiceName)) {
@@ -135,12 +133,12 @@ class DoctrineMongoDBExtension extends AbstractDoctrineExtension
         $methods = array(
             'setMetadataCacheImpl' => new Reference(sprintf('doctrine.odm.mongodb.%s_metadata_cache', $documentManager['name'])),
             'setMetadataDriverImpl' => new Reference(sprintf('doctrine.odm.mongodb.%s_metadata_driver', $documentManager['name'])),
-            'setProxyDir' => $proxyCacheDir,
-            'setProxyNamespace' => $container->getParameter('doctrine.odm.mongodb.proxy_namespace'),
-            'setAutoGenerateProxyClasses' => $container->getParameter('doctrine.odm.mongodb.auto_generate_proxy_classes'),
-            'setHydratorDir' => $hydratorCacheDir,
-            'setHydratorNamespace' => $container->getParameter('doctrine.odm.mongodb.hydrator_namespace'),
-            'setAutoGenerateHydratorClasses' => $container->getParameter('doctrine.odm.mongodb.auto_generate_hydrator_classes'),
+            'setProxyDir' => '%kernel.cache_dir%'.'/doctrine/odm/mongodb/Proxies',
+            'setProxyNamespace' => '%doctrine.odm.mongodb.proxy_namespace%',
+            'setAutoGenerateProxyClasses' => '%doctrine.odm.mongodb.auto_generate_proxy_classes%',
+            'setHydratorDir' => '%kernel.cache_dir%'.'/doctrine/odm/mongodb/Hydrators',
+            'setHydratorNamespace' => '%doctrine.odm.mongodb.hydrator_namespace%',
+            'setAutoGenerateHydratorClasses' => '%doctrine.odm.mongodb.auto_generate_hydrator_classes%',
             'setDefaultDB' => $defaultDatabase,
             'setLoggerCallable' => array(new Reference('doctrine.odm.mongodb.logger'), 'logQuery'),
         );

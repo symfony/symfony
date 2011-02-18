@@ -17,7 +17,7 @@ use Symfony\Component\Console\Output\OutputInterface;
 use Symfony\Component\Console\Input\InputOption;
 
 /**
- * Warmup the cache.
+ * Send Emails from the spool.
  *
  * @author Fabien Potencier <fabien.potencier@symfony-project.com>
  * @author Clément JOBEILI <clement.jobeili@gmail.com>
@@ -31,7 +31,7 @@ class SendEmailCommand extends Command
     {
         $this
             ->setName('swiftmailer:spool:send')
-            ->setDescription('Send all emails from the spool')
+            ->setDescription('Send emails from the spool')
             ->addOption('message-limit', 0, InputOption::VALUE_OPTIONAL, 'The maximum number of messages to send.')
             ->addOption('time-limit', 0, InputOption::VALUE_OPTIONAL, 'The time limit for sending messages (in seconds).')
             ->setHelp(<<<EOF

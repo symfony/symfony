@@ -42,7 +42,7 @@ class NodeBuilder
     public $trueEquivalent;
     public $falseEquivalent;
     public $performDeepMerging;
-    public $allowUnnamedChildren;
+    public $preventExtraKeys;
 
     /**
      * Constructor
@@ -65,7 +65,7 @@ class NodeBuilder
         $this->allowEmptyValue = true;
         $this->children = array();
         $this->performDeepMerging = true;
-        $this->allowUnnamedChildren = false;
+        $this->preventExtraKeys = true;
 
         if ('boolean' === $type) {
             $this->nullEquivalent = true;
@@ -467,7 +467,11 @@ class NodeBuilder
     }
 
     /**
-     * Allows child values not represented by a node.
+     * Allow un-named child values to be set into an array node.
+     *
+     * By default, any values under an array node must be represented by
+     * a child node. This allows an array node to accept any values set
+     * on it, regardless of whether or not a node is present to normalize it.
      *
      * An example would be an "options" array node, where its children
      * could be any key of any form. In this case, no children are placed
@@ -475,9 +479,9 @@ class NodeBuilder
      *
      * @return Symfony\Component\DependencyInjection\Configuration\Builder\NodeBuilder
      */
-    public function allowUnnamedChildren()
+    public function allowExtraKeys()
     {
-        $this->allowUnnamedChildren = true;
+        $this->preventExtraKeys = false;
 
         return $this;
     }

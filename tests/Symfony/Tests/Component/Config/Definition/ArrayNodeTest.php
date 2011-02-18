@@ -56,27 +56,16 @@ class ArrayNodeTest extends \PHPUnit_Framework_TestCase
     {
         $this->setExpectedException('Symfony\Component\DependencyInjection\Configuration\Exception\InvalidConfigurationException');
         $node = new ArrayNode('root');
-        $node->finalize(array('foo' => 'bar'));
+        $node->normalize(array('foo' => 'bar'));
     }
 
-    // if unnamedChildren is true, finalize allows them
+    // if prevent extra keys is false, normalize allows them
     public function textNoExceptionForUnrecognizedChildWithUnnamedChildren()
     {
         $node = new ArrayNode('root');
-        $node->setAllowUnnamedChildren(true);
-        $finalized = $node->finalize(array('foo' => 'bar'));
-
-        $this->assertEquals(array('foo' => 'bar'), $finalized);
-    }
-
-    /**
-     * normalize() should not strip values that don't have children nodes.
-     * Validation will take place later in finalizeValue().
-     */
-    public function testNormalizeKeepsExtraArrayValues()
-    {
-        $node = new ArrayNode('root');
+        $node->setPreventExtraKeys(false);
         $normalized = $node->normalize(array('foo' => 'bar'));
+
         $this->assertEquals(array('foo' => 'bar'), $normalized);
     }
 
@@ -84,6 +73,9 @@ class ArrayNodeTest extends \PHPUnit_Framework_TestCase
     public function testRemappedKeysAreUnset()
     {
         $node = new ArrayNode('root');
+        $mappingsNode = new ArrayNode('mappings');
+        $mappingsNode->setPreventExtraKeys(false); // just so we can add anything to it
+        $node->addChild($mappingsNode);
 
         $remappings = array();
         $remappings[] = array('mapping', 'mappings');
@@ -117,6 +109,7 @@ class ArrayNodeTest extends \PHPUnit_Framework_TestCase
         $node->setKeyAttribute('id');
 
         $prototype = new ArrayNode(null);
+        $prototype->setPreventExtraKeys(false); // just so it allows anything
         $node->setPrototype($prototype);
 
         $children = array();

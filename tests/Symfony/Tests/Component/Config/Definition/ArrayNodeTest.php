@@ -106,7 +106,7 @@ class ArrayNodeTest extends \PHPUnit_Framework_TestCase
     public function testMappedAttributeKeyIsRemoved()
     {
         $node = new ArrayNode('root');
-        $node->setKeyAttribute('id');
+        $node->setKeyAttribute('id', true);
 
         $prototype = new ArrayNode(null);
         $prototype->setPreventExtraKeys(false); // just so it allows anything
@@ -128,8 +128,7 @@ class ArrayNodeTest extends \PHPUnit_Framework_TestCase
     public function testMappedAttributeKeyNotRemoved()
     {
         $node = new ArrayNode('root');
-        $node->setKeyAttribute('id');
-        $node->setRemoveKeyAttribute(false);
+        $node->setKeyAttribute('id', false);
 
         $prototype = new ArrayNode(null);
         $prototype->setPreventExtraKeys(false); // just so it allows anything

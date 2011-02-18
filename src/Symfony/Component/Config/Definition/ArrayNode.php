@@ -87,22 +87,7 @@ class ArrayNode extends BaseNode implements PrototypeNodeInterface
      * This is only relevant for XML configurations, and only in combination
      * with a prototype based node.
      *
-     * @param string $attribute
-     * @return void
-     */
-    public function setKeyAttribute($attribute)
-    {
-        $this->keyAttribute = $attribute;
-    }
-
-    /**
-     * Sets whether or not the key attribute should be removed from child items.
-     *
-     * If true (the default) and keyAttribute is set, then when a child item
-     * is remapped based off of the key attribute, the key attribute is removed
-     * from the item's value.
-     *
-     * In other words, if "id" is the keyAttribute, then:
+     * For example, if "id" is the keyAttribute, then:
      *
      *     array('id' => 'my_name', 'foo' => 'bar')
      *
@@ -110,13 +95,16 @@ class ArrayNode extends BaseNode implements PrototypeNodeInterface
      *
      *     'id' => array('foo' => 'bar')
      *
-     * If false, the resulting array will still have the "'id' => 'my_name'"
-     * item in it.
+     * If $remove is false, the resulting array will still have the
+     * "'id' => 'my_name'" item in it.
      *
-     * @param Boolean $remove Whether or not the key attribute should be removed.
+     * @param string $attribute The name of the attribute to use as a key
+     * @param Boolean $remove Whether or not to remove the key
+     * @return void
      */
-    public function setRemoveKeyAttribute($remove)
+    public function setKeyAttribute($attribute, $remove = true)
     {
+        $this->keyAttribute = $attribute;
         $this->removeKeyAttribute = $remove;
     }
 

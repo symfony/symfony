@@ -166,8 +166,7 @@ class TreeBuilder
         $configNode->setPreventExtraKeys($node->preventExtraKeys);
 
         if (null !== $node->key) {
-            $configNode->setKeyAttribute($node->key);
-            $configNode->setRemoveKeyAttribute($node->removeKeyItem);
+            $configNode->setKeyAttribute($node->key, $node->removeKeyItem);
         }
 
         if (true === $node->atLeastOne) {

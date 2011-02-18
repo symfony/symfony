@@ -226,11 +226,6 @@ class StubIntlDateFormatter
         return $this->datetype;
     }
 
-    public function setLocale($locale)
-    {
-        throw new MethodNotImplementedException(__METHOD__);
-    }
-
     public function getErrorCode()
     {
         throw new MethodNotImplementedException(__METHOD__);

@@ -27,6 +27,7 @@ class TestKernel extends Kernel
             new \Symfony\Bundle\FrameworkBundle\FrameworkBundle(),
             new \Symfony\Bundle\TwigBundle\TwigBundle(),
             new \Symfony\Bundle\AsseticBundle\AsseticBundle(),
+            new TestBundle(),
         );
     }
 

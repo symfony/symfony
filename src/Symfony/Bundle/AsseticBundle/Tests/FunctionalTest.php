@@ -85,7 +85,7 @@ class FunctionalTest extends \PHPUnit_Framework_TestCase
         $content = $container->get('templating')->render('::layout.html.twig');
         $crawler = new Crawler($content);
 
-        $this->assertEquals(2, count($crawler->filter('link[href$=".css"]')));
+        $this->assertEquals(3, count($crawler->filter('link[href$=".css"]')));
         $this->assertEquals(2, count($crawler->filter('script[src$=".js"]')));
     }
 
@@ -103,14 +103,14 @@ class FunctionalTest extends \PHPUnit_Framework_TestCase
         $content = $container->get('templating')->render('::layout.html.php');
         $crawler = new Crawler($content);
 
-        $this->assertEquals(2, count($crawler->filter('link[href$=".css"]')));
+        $this->assertEquals(3, count($crawler->filter('link[href$=".css"]')));
         $this->assertEquals(2, count($crawler->filter('script[src$=".js"]')));
     }
 
     public function provideDebugAndAssetCount()
     {
         return array(
-            array(true, 4),
+            array(true, 5),
             array(false, 2),
         );
     }

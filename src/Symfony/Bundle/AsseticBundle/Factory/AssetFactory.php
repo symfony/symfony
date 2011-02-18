@@ -30,13 +30,13 @@ class AssetFactory extends BaseAssetFactory
         parent::__construct($baseDir, $debug);
     }
 
-    protected function parseAsset($sourceUrl)
+    protected function parseInput($input)
     {
         // expand bundle notation
-        if ('@' == $sourceUrl[0] && false !== strpos($sourceUrl, '/')) {
-            $sourceUrl = $this->kernel->locateResource($sourceUrl);
+        if ('@' == $input[0] && false !== strpos($input, '/')) {
+            $input = $this->kernel->locateResource($input);
         }
 
-        return parent::parseAsset($sourceUrl);
+        return parent::parseInput($input);
     }
 }

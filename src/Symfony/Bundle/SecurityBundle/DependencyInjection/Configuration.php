@@ -23,6 +23,7 @@ class Configuration
 
         return $tb
             ->root('security', 'array')
+                ->ignoreExtraKeys()
                 ->fixXmlConfig('factory', 'factories')
                 ->arrayNode('factories')
                     ->prototype('scalar')->end()

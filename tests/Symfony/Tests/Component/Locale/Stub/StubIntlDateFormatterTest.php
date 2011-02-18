@@ -20,7 +20,7 @@ use Symfony\Tests\Component\Locale\TestCase as LocaleTestCase;
 class StubIntlDateFormatterTest extends LocaleTestCase
 {
     /**
-     * @expectedException InvalidArgumentException
+     * @expectedException Symfony\Component\Locale\Exception\MethodArgumentValueNotImplementedException
      */
     public function testConstructorWithUnsupportedLocale()
     {
@@ -36,15 +36,20 @@ class StubIntlDateFormatterTest extends LocaleTestCase
     /**
     * @dataProvider formatProvider
     */
-    public function testFormat($pattern, $timestamp, $expected)
+    public function testFormatStub($pattern, $timestamp, $expected)
     {
         $formatter = new StubIntlDateFormatter('en', StubIntlDateFormatter::MEDIUM, StubIntlDateFormatter::SHORT, 'UTC', StubIntlDateFormatter::GREGORIAN, $pattern);
-        $this->assertSame($expected, $formatter->format($timestamp), 'Check date format with stub implementation.');
+        $this->assertSame($expected, $formatter->format($timestamp));
+    }
 
-        if ($this->isIntlExtensionLoaded()) {
-            $formatter = new \IntlDateFormatter('en', \IntlDateFormatter::MEDIUM, \IntlDateFormatter::SHORT, 'UTC', \IntlDateFormatter::GREGORIAN, $pattern);
-            $this->assertSame($expected, $formatter->format($timestamp), 'Check date format with intl extension.');
-        }
+    /**
+    * @dataProvider formatProvider
+    */
+    public function testFormatIntl($pattern, $timestamp, $expected)
+    {
+        $this->skipIfIntlExtensionIsNotLoaded();
+        $formatter = new \IntlDateFormatter('en', \IntlDateFormatter::MEDIUM, \IntlDateFormatter::SHORT, 'UTC', \IntlDateFormatter::GREGORIAN, $pattern);
+        $this->assertSame($expected, $formatter->format($timestamp));
     }
 
     public function formatProvider()
@@ -233,17 +238,22 @@ class StubIntlDateFormatterTest extends LocaleTestCase
     /**
     * @dataProvider formatWithTimezoneProvider
     */
-    public function testFormatWithTimezone($timestamp, $timezone, $expected)
+    public function testFormatWithTimezoneStub($timestamp, $timezone, $expected)
     {
         $pattern = 'yyyy-MM-dd HH:mm:ss';
-
         $formatter = new StubIntlDateFormatter('en', StubIntlDateFormatter::MEDIUM, StubIntlDateFormatter::SHORT, $timezone, StubIntlDateFormatter::GREGORIAN, $pattern);
-        $this->assertSame($expected, $formatter->format($timestamp), 'Check date format with stub implementation.');
+        $this->assertSame($expected, $formatter->format($timestamp));
+    }
 
-        if ($this->isIntlExtensionLoaded()) {
-            $formatter = new \IntlDateFormatter('en', \IntlDateFormatter::MEDIUM, \IntlDateFormatter::SHORT, $timezone, \IntlDateFormatter::GREGORIAN, $pattern);
-            $this->assertSame($expected, $formatter->format($timestamp), 'Check date format with intl extension.');
-        }
+    /**
+    * @dataProvider formatWithTimezoneProvider
+    */
+    public function testFormatWithTimezoneIntl($timestamp, $timezone, $expected)
+    {
+        $this->skipIfIntlExtensionIsNotLoaded();
+        $pattern = 'yyyy-MM-dd HH:mm:ss';
+        $formatter = new \IntlDateFormatter('en', \IntlDateFormatter::MEDIUM, \IntlDateFormatter::SHORT, $timezone, \IntlDateFormatter::GREGORIAN, $pattern);
+        $this->assertSame($expected, $formatter->format($timestamp), 'Check date format with intl extension.');
     }
 
     public function formatWithTimezoneProvider()
@@ -274,20 +284,25 @@ class StubIntlDateFormatterTest extends LocaleTestCase
     }
 
     /**
-    * @dataProvider defaultDateFormatsProvider
+    * @dataProvider dateAndTimeTypeProvider
     */
-    public function testDefaultDateFormats($timestamp, $datetype, $timetype, $expected)
+    public function testDateAndTimeTypeStub($timestamp, $datetype, $timetype, $expected)
     {
         $formatter = new StubIntlDateFormatter('en', $datetype, $timetype, 'UTC');
-        $this->assertSame($expected, $formatter->format($timestamp), 'Check date format with stub implementation.');
-
-        if ($this->isIntlExtensionLoaded()) {
-            $formatter = new \IntlDateFormatter('en', $datetype, $timetype, 'UTC');
-            $this->assertSame($expected, $formatter->format($timestamp), 'Check date format with intl extension.');
-        }
+        $this->assertSame($expected, $formatter->format($timestamp));
     }
 
-    public function defaultDateFormatsProvider()
+    /**
+    * @dataProvider dateAndTimeTypeProvider
+    */
+    public function testDateAndTimeTypeIntl($timestamp, $datetype, $timetype, $expected)
+    {
+        $this->skipIfIntlExtensionIsNotLoaded();
+        $formatter = new \IntlDateFormatter('en', $datetype, $timetype, 'UTC');
+        $this->assertSame($expected, $formatter->format($timestamp));
+    }
+
+    public function dateAndTimeTypeProvider()
     {
         return array(
             array(0, StubIntlDateFormatter::FULL, StubIntlDateFormatter::NONE, 'Thursday, January 1, 1970'),
@@ -302,59 +317,16 @@ class StubIntlDateFormatterTest extends LocaleTestCase
         );
     }
 
-    public function testGetPattern()
-    {
-        $formatter = new StubIntlDateFormatter('en', StubIntlDateFormatter::FULL, StubIntlDateFormatter::NONE, StubIntlDateFormatter::GREGORIAN, 'UTC', 'yyyy-MM-dd');
-        $this->assertEquals('yyyy-MM-dd', $formatter->getPattern());
-    }
-
-    public function testSetPattern()
-    {
-        $formatter = new StubIntlDateFormatter('en', StubIntlDateFormatter::FULL, StubIntlDateFormatter::NONE);
-        $formatter->setPattern('yyyy-MM-dd');
-        $this->assertEquals('yyyy-MM-dd', $formatter->getPattern());
-    }
-
-    public function testGetLocale()
-    {
-        $formatter = new StubIntlDateFormatter('en', StubIntlDateFormatter::FULL, StubIntlDateFormatter::NONE);
-        $this->assertEquals('en', $formatter->getLocale());
-    }
-
-    /**
-     * @expectedException Symfony\Component\Locale\Exception\MethodNotImplementedException
-     */
-    public function testSetLocale()
-    {
-        $formatter = new StubIntlDateFormatter('en', StubIntlDateFormatter::FULL, StubIntlDateFormatter::NONE);
-        $formatter->setLocale('pt_BR');
-    }
-
     public function testGetCalendar()
     {
         $formatter = new StubIntlDateFormatter('en', StubIntlDateFormatter::FULL, StubIntlDateFormatter::NONE);
         $this->assertEquals(StubIntlDateFormatter::GREGORIAN, $formatter->getCalendar());
     }
 
-    /**
-     * @expectedException Symfony\Component\Locale\Exception\MethodNotImplementedException
-     */
-    public function testSetCalendar()
-    {
-        $formatter = new StubIntlDateFormatter('en', StubIntlDateFormatter::FULL, StubIntlDateFormatter::NONE);
-        $formatter->setCalendar(StubIntlDateFormatter::GREGORIAN);
-    }
-
     public function testGetDateType()
     {
         $formatter = new StubIntlDateFormatter('en', StubIntlDateFormatter::FULL, StubIntlDateFormatter::NONE);
         $this->assertEquals(StubIntlDateFormatter::FULL, $formatter->getDateType());
-    }
-
-    public function testGetTimeType()
-    {
-        $formatter = new StubIntlDateFormatter('en', StubIntlDateFormatter::NONE, StubIntlDateFormatter::FULL);
-        $this->assertEquals(StubIntlDateFormatter::FULL, $formatter->getTimeType());
     }
 
     /**
@@ -375,18 +347,41 @@ class StubIntlDateFormatterTest extends LocaleTestCase
         $formatter->getErrorMessage();
     }
 
+    public function testGetLocale()
+    {
+        $formatter = new StubIntlDateFormatter('en', StubIntlDateFormatter::FULL, StubIntlDateFormatter::NONE);
+        $this->assertEquals('en', $formatter->getLocale());
+    }
+
+    public function testGetPattern()
+    {
+        $formatter = new StubIntlDateFormatter('en', StubIntlDateFormatter::FULL, StubIntlDateFormatter::NONE, StubIntlDateFormatter::GREGORIAN, 'UTC', 'yyyy-MM-dd');
+        $this->assertEquals('yyyy-MM-dd', $formatter->getPattern());
+    }
+
+    public function testGetTimeType()
+    {
+        $formatter = new StubIntlDateFormatter('en', StubIntlDateFormatter::NONE, StubIntlDateFormatter::FULL);
+        $this->assertEquals(StubIntlDateFormatter::FULL, $formatter->getTimeType());
+    }
+
     /**
     * @dataProvider timeZoneIdProvider
     */
-    public function testGetTimeZoneId($timeZoneId)
+    public function testGetTimeZoneIdStub($timeZoneId)
     {
         $formatter = new StubIntlDateFormatter('en', StubIntlDateFormatter::FULL, StubIntlDateFormatter::NONE, $timeZoneId);
-        $this->assertEquals($timeZoneId, $formatter->getTimeZoneId(), 'Check timezone id with stub implementation.');
+        $this->assertEquals($timeZoneId, $formatter->getTimeZoneId());
+    }
 
-        if ($this->isIntlExtensionLoaded()) {
-            $formatter = new \IntlDateFormatter('en', \IntlDateFormatter::FULL, \IntlDateFormatter::NONE, $timeZoneId);
-            $this->assertEquals($timeZoneId, $formatter->getTimeZoneId(), 'Check timezone id with intl extension.');
-        }
+    /**
+    * @dataProvider timeZoneIdProvider
+    */
+    public function testGetTimeZoneIdIntl($timeZoneId)
+    {
+        $this->skipIfIntlExtensionIsNotLoaded();
+        $formatter = new StubIntlDateFormatter('en', StubIntlDateFormatter::FULL, StubIntlDateFormatter::NONE, $timeZoneId);
+        $this->assertEquals($timeZoneId, $formatter->getTimeZoneId());
     }
 
     public function timeZoneIdProvider()
@@ -397,20 +392,13 @@ class StubIntlDateFormatterTest extends LocaleTestCase
         );
     }
 
-    public function testSetTimeZoneId()
+    /**
+     * @expectedException Symfony\Component\Locale\Exception\MethodNotImplementedException
+     */
+    public function testIsLenient()
     {
-        $formatter = new StubIntlDateFormatter('en', StubIntlDateFormatter::FULL, StubIntlDateFormatter::NONE, 'UTC');
-        $this->assertEquals('UTC', $formatter->getTimeZoneId(), 'Check timezone id with stub implementation.');
-
-        $formatter->setTimeZoneId('Europe/Zurich');
-        $this->assertEquals('Europe/Zurich', $formatter->getTimeZoneId(), 'Check timezone id with intl extension.');
-
-        if ($this->isIntlExtensionLoaded()) {
-            $formatter = new \IntlDateFormatter('en', \IntlDateFormatter::FULL, \IntlDateFormatter::NONE, 'UTC');
-
-            $formatter->setTimeZoneId('Europe/Zurich');
-            $this->assertEquals('Europe/Zurich', $formatter->getTimeZoneId(), 'Check timezone id with intl extension.');
-        }
+        $formatter = new StubIntlDateFormatter('en', StubIntlDateFormatter::FULL, StubIntlDateFormatter::NONE);
+        $formatter->isLenient();
     }
 
     /**
@@ -434,10 +422,10 @@ class StubIntlDateFormatterTest extends LocaleTestCase
     /**
      * @expectedException Symfony\Component\Locale\Exception\MethodNotImplementedException
      */
-    public function testIsLenient()
+    public function testSetCalendar()
     {
         $formatter = new StubIntlDateFormatter('en', StubIntlDateFormatter::FULL, StubIntlDateFormatter::NONE);
-        $formatter->isLenient();
+        $formatter->setCalendar(StubIntlDateFormatter::GREGORIAN);
     }
 
     /**
@@ -447,6 +435,29 @@ class StubIntlDateFormatterTest extends LocaleTestCase
     {
         $formatter = new StubIntlDateFormatter('en', StubIntlDateFormatter::FULL, StubIntlDateFormatter::NONE);
         $formatter->setLenient(true);
+    }
+
+    public function testSetPattern()
+    {
+        $formatter = new StubIntlDateFormatter('en', StubIntlDateFormatter::FULL, StubIntlDateFormatter::NONE);
+        $formatter->setPattern('yyyy-MM-dd');
+        $this->assertEquals('yyyy-MM-dd', $formatter->getPattern());
+    }
+
+    public function testSetTimeZoneId()
+    {
+        $formatter = new StubIntlDateFormatter('en', StubIntlDateFormatter::FULL, StubIntlDateFormatter::NONE, 'UTC');
+        $this->assertEquals('UTC', $formatter->getTimeZoneId(), 'Check timezone id with stub implementation.');
+
+        $formatter->setTimeZoneId('Europe/Zurich');
+        $this->assertEquals('Europe/Zurich', $formatter->getTimeZoneId(), 'Check timezone id with intl extension.');
+
+        if ($this->isIntlExtensionLoaded()) {
+            $formatter = new \IntlDateFormatter('en', \IntlDateFormatter::FULL, \IntlDateFormatter::NONE, 'UTC');
+
+            $formatter->setTimeZoneId('Europe/Zurich');
+            $this->assertEquals('Europe/Zurich', $formatter->getTimeZoneId(), 'Check timezone id with intl extension.');
+        }
     }
 
     public function testStaticCreate()

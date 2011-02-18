@@ -12,6 +12,7 @@
 namespace Symfony\Component\Locale\Stub;
 
 use Symfony\Component\Locale\Exception\MethodNotImplementedException;
+use Symfony\Component\Locale\Exception\MethodArgumentValueNotImplementedException;
 
 /**
  * Provides a stub IntlDateFormatter for the 'en' locale.
@@ -53,7 +54,7 @@ class StubIntlDateFormatter
     public function __construct($locale, $datetype, $timetype, $timezone = null, $calendar = null, $pattern = null)
     {
         if ('en' != $locale) {
-            throw new \InvalidArgumentException('Unsupported $locale value. Only the \'en\' locale is supported. Install the intl extension for full localization capabilities.');
+            throw new MethodArgumentValueNotImplementedException(__METHOD__, 'locale', $locale, 'Only the \'en\' locale is supported');
         }
 
         $this->datetype = $datetype;

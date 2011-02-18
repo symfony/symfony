@@ -40,6 +40,12 @@ class Configuration
         $rootNode
             ->scalarNode('access_denied_url')->defaultNull()->end()
             ->scalarNode('session_fixation_strategy')->cannotBeEmpty()->defaultValue('migrate')->end()
+
+            // add a faux-entry for factories, so that no validation error is thrown
+            ->fixXmlConfig('factory', 'factories')
+            ->arrayNode('factories')
+                ->ignoreExtraKeys()
+            ->end()
         ;
 
         $this->addAclSection($rootNode);

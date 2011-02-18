@@ -53,16 +53,16 @@ class TwigAssetsCacheWarmerTest extends \PHPUnit_Framework_TestCase
             ->will($this->returnValue(strtr(__DIR__.'/bundle', '\\', '/')));
         $this->loader->expects($this->at(0))
             ->method('load')
-            ->with('MyBundle::grandparent.html.twig')
-            ->will($this->returnValue(array('grandparent' => array())));
-        $this->loader->expects($this->at(1))
-            ->method('load')
             ->with('MyBundle:Parents/Children:child.html.twig')
             ->will($this->returnValue(array('child' => array())));
-        $this->loader->expects($this->at(2))
+        $this->loader->expects($this->at(1))
             ->method('load')
             ->with('MyBundle:Parents:parent.html.twig')
             ->will($this->returnValue(array('parent' => array())));
+        $this->loader->expects($this->at(2))
+            ->method('load')
+            ->with('MyBundle::grandparent.html.twig')
+            ->will($this->returnValue(array('grandparent' => array())));
 
         $this->cacheWarmer->warmUp($this->cacheDir);
     }

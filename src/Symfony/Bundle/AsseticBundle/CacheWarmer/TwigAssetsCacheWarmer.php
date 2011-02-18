@@ -33,7 +33,7 @@ class TwigAssetsCacheWarmer extends CacheWarmer
         foreach ($this->kernel->getBundles() as $name => $bundle) {
             if (is_dir($dir = $bundle->getPath().'/Resources/views/')) {
                 $finder = new Finder();
-                $finder->files()->name('*.twig')->in($dir);
+                $finder->files()->name('*.twig')->in($dir)->sortByName();
                 foreach ($finder as $file) {
                     $formulae += $this->loader->load($name.':'.substr($file->getPath(), strlen($dir)).':'.$file->getBasename());
                 }

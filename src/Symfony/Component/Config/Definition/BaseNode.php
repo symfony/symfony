@@ -13,6 +13,7 @@ namespace Symfony\Component\Config\Definition;
 
 use Symfony\Component\Config\Definition\Exception\Exception;
 use Symfony\Component\Config\Definition\Exception\ForbiddenOverwriteException;
+use Symfony\Component\Config\Definition\Exception\InvalidConfigurationException;
 
 /**
  * The base node class

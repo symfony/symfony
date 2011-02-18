@@ -82,6 +82,7 @@ class SwiftMailerExtension extends Extension
             $container->setAlias('swiftmailer.transport.real', 'swiftmailer.transport.'.$transport);
             $container->setAlias('swiftmailer.transport', 'swiftmailer.transport.spool');
             $container->setAlias('swiftmailer.spool', 'swiftmailer.spool.'.$type);
+            $container->getDefinition('swiftmailer.spool.file')->setArgument(0, '%swiftmailer.spool.file.path%');
 
             foreach (array('path') as $key) {
                 $container->setParameter('swiftmailer.spool.'.$type.'.'.$key, $config['spool'][$key]);

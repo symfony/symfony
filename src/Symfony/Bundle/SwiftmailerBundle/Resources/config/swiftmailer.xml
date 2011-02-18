@@ -81,7 +81,7 @@
     </service>
 
     <service id="swiftmailer.spool.file" class="%swiftmailer.spool.file.class%" public="false">
-      <argument>%swiftmailer.spool.file.path%</argument>
+      <argument />
     </service>
 
     <service id="swiftmailer.plugin.redirecting" class="%swiftmailer.plugin.redirecting.class%" public="false">

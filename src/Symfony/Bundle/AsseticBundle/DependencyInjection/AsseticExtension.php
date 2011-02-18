@@ -15,6 +15,7 @@ use Symfony\Component\DependencyInjection\Extension\Extension;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\DependencyInjection\Loader\XmlFileLoader;
 use Symfony\Component\Config\FileLocator;
+use Symfony\Component\Config\Definition\Processor;
 
 /**
  * Semantic asset configuration.
@@ -62,34 +63,24 @@ class AsseticExtension extends Extension
         $loader->load('templating_twig.xml');
         // $loader->load('templating_php.xml'); // not ready yet
 
-        foreach (self::normalizeKeys($configs) as $config) {
-            if (isset($config['debug'])) {
-                $container->setParameter('assetic.debug', $config['debug']);
-            }
+        $configuration = new Configuration();
+        $processor = new Processor();
+        $config = $processor->process($configuration->getConfigTree($container->getParameter('kernel.debug')), $configs);
 
-            if (isset($config['use_controller'])) {
-                $container->setParameter('assetic.use_controller', $config['use_controller']);
-            }
+        $container->setParameter('assetic.debug', $config['debug']);
+        $container->setParameter('assetic.use_controller', $config['use_controller']);
+        $container->setParameter('assetic.document_root', $config['document_root']);
+        $container->setParameter('assetic.default_javascripts_output', $config['default_javascripts_output']);
+        $container->setParameter('assetic.default_stylesheets_output', $config['default_stylesheets_output']);
 
-            if (isset($config['document_root'])) {
-                $container->setParameter('assetic.document_root', $config['document_root']);
-            }
+        if (isset($config['closure'])) {
+            $container->setParameter('assetic.google_closure_compiler_jar', $config['closure']);
+            $loader->load('google_closure_compiler.xml');
+        }
 
-            if (isset($config['closure'])) {
-                $container->setParameter('assetic.google_closure_compiler_jar', $config['closure']);
-            }
-
-            if (isset($config['yui'])) {
-                $container->setParameter('assetic.yui_jar', $config['yui']);
-            }
-
-            if (isset($config['default_javascripts_output'])) {
-                $container->setParameter('assetic.default_javascripts_output', $config['default_javascripts_output']);
-            }
-
-            if (isset($config['default_stylesheets_output'])) {
-                $container->setParameter('assetic.default_stylesheets_output', $config['default_stylesheets_output']);
-            }
+        if (isset($config['yui'])) {
+            $container->setParameter('assetic.yui_jar', $config['yui']);
+            $loader->load('yui_compressor.xml');
         }
 
         if ($container->getParameterBag()->resolveValue($container->getParameterBag()->get('assetic.use_controller'))) {
@@ -98,14 +89,6 @@ class AsseticExtension extends Extension
         } else {
             $loader->load('asset_writer.xml');
             $container->setParameter('assetic.twig_extension.class', '%assetic.twig_extension.static.class%');
-        }
-
-        if ($container->hasParameter('assetic.google_closure_compiler_jar')) {
-            $loader->load('google_closure_compiler.xml');
-        }
-
-        if ($container->hasParameter('assetic.yui_jar')) {
-            $loader->load('yui_compressor.xml');
         }
 
         if ($container->hasParameter('assetic.less.compress')) {

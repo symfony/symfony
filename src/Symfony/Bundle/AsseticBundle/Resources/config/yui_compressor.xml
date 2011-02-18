@@ -7,7 +7,6 @@
     <parameters>
         <parameter key="assetic.filter.yui_css.class">Assetic\Filter\Yui\CssCompressorFilter</parameter>
         <parameter key="assetic.filter.yui_js.class">Assetic\Filter\Yui\JsCompressorFilter</parameter>
-        <parameter key="assetic.yui_java_bin">%assetic.java_bin%</parameter>
     </parameters>
 
     <services>
@@ -19,7 +18,7 @@
         <service id="assetic.filter.yui_js" class="%assetic.filter.yui_js.class%" public="false">
             <tag name="assetic.filter" alias="yui_js" />
             <argument>%assetic.yui_jar%</argument>
-            <argument>%assetic.yui_java_bin%</argument>
+            <argument>%assetic.java_bin%</argument>
         </service>
     </services>
 </container>

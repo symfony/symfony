@@ -51,12 +51,21 @@ class ArrayNodeTest extends \PHPUnit_Framework_TestCase
         $this->assertEquals(array ('test'), $node->getDefaultValue());
     }
 
-    // finalizeValue() should protect against child values with no corresponding node
+    /**
+     * normalize() should protect against child values with no corresponding node
+     */
     public function testExceptionThrownOnUnrecognizedChild()
     {
-        $this->setExpectedException('Symfony\Component\Config\Definition\Exception\InvalidConfigurationException');
         $node = new ArrayNode('root');
-        $node->normalize(array('foo' => 'bar'));
+
+        try
+        {
+            $node->normalize(array('foo' => 'bar'));
+            $this->fail('An exception should have been throw for a bad child node');
+        } catch (\Exception $e) {
+            $this->assertInstanceOf('Symfony\Component\Config\Definition\Exception\InvalidConfigurationException', $e);
+            $this->assertEquals('Unrecognized options "foo" under "root"', $e->getMessage());
+        }
     }
 
     // a remapped key (e.g. "mapping" -> "mappings") should be unset after being used

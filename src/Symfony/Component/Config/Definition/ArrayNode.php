@@ -405,24 +405,24 @@ class ArrayNode extends BaseNode implements PrototypeNodeInterface
             return $normalized;
         }
 
-        // note that this purposefully does not exclude unrecognized child keys.
-        // unrecognized keys are just added in - validation takes place in finalize
+        $normalized = array();
         foreach ($this->children as $name => $child) {
             if (!array_key_exists($name, $value)) {
                 continue;
             }
 
-            $value[$name] = $child->normalize($value[$name]);
+            $normalized[$name] = $child->normalize($value[$name]);
+            unset($value[$name]);
         }
 
         // if extra fields are present, throw exception
-        if ($diff = array_diff(array_keys($value), array_keys($this->children))) {
-            $msg = sprintf('Unrecognized options "%s" under "%s"', implode(', ', $diff), $this->getPath());
+        if (count($value)) {
+            $msg = sprintf('Unrecognized options "%s" under "%s"', implode(', ', array_keys($value)), $this->getPath());
 
             throw new InvalidConfigurationException($msg);
         }
 
-        return $value;
+        return $normalized;
     }
 
     /**

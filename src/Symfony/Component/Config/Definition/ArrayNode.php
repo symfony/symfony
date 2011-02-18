@@ -28,6 +28,7 @@ class ArrayNode extends BaseNode implements PrototypeNodeInterface
     protected $children;
     protected $prototype;
     protected $keyAttribute;
+    protected $keyAttributeIsRemoved;
     protected $allowFalse;
     protected $allowNewKeys;
     protected $addIfNotSet;
@@ -48,6 +49,7 @@ class ArrayNode extends BaseNode implements PrototypeNodeInterface
 
         $this->children = array();
         $this->xmlRemappings = array();
+        $this->keyAttributeIsRemoved = true;
         $this->allowFalse = false;
         $this->addIfNotSet = false;
         $this->allowNewKeys = true;
@@ -91,6 +93,31 @@ class ArrayNode extends BaseNode implements PrototypeNodeInterface
     public function setKeyAttribute($attribute)
     {
         $this->keyAttribute = $attribute;
+    }
+
+    /**
+     * Sets whether or not the key attribute should be removed from child items.
+     *
+     * If true (the default) and keyAttribute is set, then when a child item
+     * is remapped based off of the key attribute, the key attribute is removed
+     * from the item's value.
+     *
+     * In other words, if "id" is the keyAttribute, then:
+     *
+     *     array('id' => 'my_name', 'foo' => 'bar')
+     *
+     * becomes
+     *
+     *     'id' => array('foo' => 'bar')
+     *
+     * If false, the resulting array will still have the "'id' => 'my_name'"
+     * item in it.
+     *
+     * @param Boolean $remove Whether or not the key attribute should be removed.
+     */
+    public function setKeyAttributeIsRemoved($remove)
+    {
+        $this->keyAttributeIsRemoved = $remove;
     }
 
     /**
@@ -365,7 +392,11 @@ class ArrayNode extends BaseNode implements PrototypeNodeInterface
                         ));
                     } else if (isset($v[$this->keyAttribute])) {
                         $k = $v[$this->keyAttribute];
-                        unset($v[$this->keyAttribute]);
+
+                        // remove the key attribute if configured to
+                        if ($this->keyAttributeIsRemoved) {
+                            unset($v[$this->keyAttribute]);
+                        }
                     }
 
                     if (array_key_exists($k, $normalized)) {

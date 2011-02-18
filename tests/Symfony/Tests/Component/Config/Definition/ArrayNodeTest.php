@@ -120,4 +120,27 @@ class ArrayNodeTest extends \PHPUnit_Framework_TestCase
         $expected['item_name'] = array('foo' => 'bar');
         $this->assertEquals($expected, $normalized);
     }
+
+    /**
+     * Tests the opposite of the testMappedAttributeKeyIsRemoved because
+     * the removal can be toggled with an option.
+     */
+    public function testMappedAttributeKeyNotRemoved()
+    {
+        $node = new ArrayNode('root');
+        $node->setKeyAttribute('id');
+        $node->setKeyAttributeIsRemoved(false);
+
+        $prototype = new ArrayNode(null);
+        $prototype->setPreventExtraKeys(false); // just so it allows anything
+        $node->setPrototype($prototype);
+
+        $children = array();
+        $children[] = array('id' => 'item_name', 'foo' => 'bar');
+        $normalized = $node->normalize($children);
+
+        $expected = array();
+        $expected['item_name'] = array('id' => 'item_name', 'foo' => 'bar');
+        $this->assertEquals($expected, $normalized);
+    }
 }

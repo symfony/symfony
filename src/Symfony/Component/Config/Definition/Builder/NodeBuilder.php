@@ -24,6 +24,7 @@ class NodeBuilder
     public $name;
     public $type;
     public $key;
+    public $removeKeyItem;
     public $parent;
     public $children;
     public $prototype;
@@ -339,13 +340,33 @@ class NodeBuilder
     /**
      * Sets an attribute to use as key.
      *
-     * @param string $name
+     * This is useful when you have an indexed array that should be an
+     * associative array. You can select an item from within the array
+     * to be the key of the particular item. For example, if "id" is the
+     * "key", then:
+     *
+     *     array(
+     *         array('id' => 'my_name', 'foo' => 'bar'),
+     *     )
+     *
+     * becomes
+     *
+     *     array(
+     *         'id' => array('foo' => 'bar'),
+     *     )
+     *
+     * If you'd like "'id' => 'my_name'" to still be present in the resulting
+     * array, then you can set the second argument of this method to false.
+     *
+     * @param string $name The name of the key
+     * @param Boolean $removeKeyItem Whether or not the key item should be removed.
      *
      * @return Symfony\Component\Config\Definition\Builder\NodeBuilder
      */
-    public function useAttributeAsKey($name)
+    public function useAttributeAsKey($name, $removeKeyItem = true)
     {
         $this->key = $name;
+        $this->removeKeyItem = $removeKeyItem;
 
         return $this;
     }

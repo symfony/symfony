@@ -115,7 +115,7 @@ class NodeBuilder
      *
      * @return Symfony\Component\DependencyInjection\Configuration\Builder\NodeBuilder This builder node
      */
-    public function addNodeBuilder(NodeBuilder $node)
+    public function nodeBuilder(NodeBuilder $node)
     {
         $node->parent = $this;
 

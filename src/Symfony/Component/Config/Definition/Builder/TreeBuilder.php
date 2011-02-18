@@ -163,6 +163,7 @@ class TreeBuilder
         $configNode->addEquivalentValue(false, $node->falseEquivalent);
         $configNode->setPerformDeepMerging($node->performDeepMerging);
         $configNode->setRequired($node->required);
+        $configNode->setIgnoreExtraKeys($node->ignoreExtraKeys);
 
         if (null !== $node->key) {
             $configNode->setKeyAttribute($node->key, $node->removeKeyItem);

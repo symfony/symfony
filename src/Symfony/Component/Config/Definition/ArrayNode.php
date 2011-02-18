@@ -35,6 +35,7 @@ class ArrayNode extends BaseNode implements PrototypeNodeInterface
     protected $minNumberOfElements;
     protected $performDeepMerging;
     protected $defaultValue;
+    protected $ignoreExtraKeys;
 
     /**
      * Constructor.
@@ -144,11 +145,21 @@ class ArrayNode extends BaseNode implements PrototypeNodeInterface
     /**
      * Sets if deep merging should occur.
      *
-     * @param boolean $boolean
+     * @param Boolean $boolean
      */
     public function setPerformDeepMerging($boolean)
     {
         $this->performDeepMerging = (Boolean) $boolean;
+    }
+
+    /**
+     * Whether extra keys should just be ignore without an exception.
+     *
+     * @param Boolean $boolean To allow extra keys
+     */
+    public function setIgnoreExtraKeys($boolean)
+    {
+        $this->ignoreExtraKeys = (Boolean) $boolean;
     }
 
     /**
@@ -416,7 +427,7 @@ class ArrayNode extends BaseNode implements PrototypeNodeInterface
         }
 
         // if extra fields are present, throw exception
-        if (count($value)) {
+        if (count($value) && !$this->ignoreExtraKeys) {
             $msg = sprintf('Unrecognized options "%s" under "%s"', implode(', ', array_keys($value)), $this->getPath());
 
             throw new InvalidConfigurationException($msg);

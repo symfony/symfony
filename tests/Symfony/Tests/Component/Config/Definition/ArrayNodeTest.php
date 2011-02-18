@@ -68,6 +68,21 @@ class ArrayNodeTest extends \PHPUnit_Framework_TestCase
         }
     }
 
+    /**
+     * Tests that no exception is thrown for an unrecognized child if the
+     * ignoreExtraKeys option is set to true.
+     *
+     * Related to testExceptionThrownOnUnrecognizedChild
+     */
+    public function testIgnoreExtraKeysNoException()
+    {
+        $node = new ArrayNode('roo');
+        $node->setIgnoreExtraKeys(true);
+
+        $node->normalize(array('foo' => 'bar'));
+        $this->assertTrue(true, 'No exception was thrown when setIgnoreExtraKeys is true');
+    }
+
     // a remapped key (e.g. "mapping" -> "mappings") should be unset after being used
     public function testRemappedKeysAreUnset()
     {

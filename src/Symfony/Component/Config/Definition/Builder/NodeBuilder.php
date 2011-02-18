@@ -43,6 +43,7 @@ class NodeBuilder
     public $trueEquivalent;
     public $falseEquivalent;
     public $performDeepMerging;
+    public $ignoreExtraKeys;
 
     /**
      * Constructor
@@ -483,5 +484,22 @@ class NodeBuilder
     public function end()
     {
         return $this->parent;
+    }
+
+    /**
+     * Allows extra config keys to be specified under an array without
+     * throwing an exception.
+     *
+     * Those config values are simply ignored. This should be used only
+     * in special cases where you want to send an entire configuration
+     * array through a special tree that processes only part of the array.
+     *
+     * @return Symfony\Component\Config\Definition\Builder\NodeBuilder
+     */
+    public function ignoreExtraKeys()
+    {
+        $this->ignoreExtraKeys = true;
+
+        return $this;
     }
 }

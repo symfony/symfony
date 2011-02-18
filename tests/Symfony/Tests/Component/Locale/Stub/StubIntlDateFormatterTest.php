@@ -262,7 +262,7 @@ class StubIntlDateFormatterTest extends LocaleTestCase
         $this->skipIfIntlExtensionIsNotLoaded();
         $pattern = 'yyyy-MM-dd HH:mm:ss';
         $formatter = new \IntlDateFormatter('en', \IntlDateFormatter::MEDIUM, \IntlDateFormatter::SHORT, $timezone, \IntlDateFormatter::GREGORIAN, $pattern);
-        $this->assertSame($expected, $formatter->format($timestamp), 'Check date format with intl extension.');
+        $this->assertSame($expected, $formatter->format($timestamp));
     }
 
     public function formatWithTimezoneProvider()
@@ -290,6 +290,16 @@ class StubIntlDateFormatterTest extends LocaleTestCase
 
             array(0, 'Foo/Bar', '1970-01-01 00:00:00'),
         );
+    }
+
+    /**
+     * @expectedException Symfony\Component\Locale\Exception\NotImplementedException
+     */
+    public function testFormatWithUnimplementedCharsStub()
+    {
+        $pattern = 'Y';
+        $formatter = new StubIntlDateFormatter('en', StubIntlDateFormatter::MEDIUM, StubIntlDateFormatter::SHORT, 'UTC', StubIntlDateFormatter::GREGORIAN, $pattern);
+        $formatter->format(0);
     }
 
     /**

@@ -11,6 +11,7 @@
 
 namespace Symfony\Component\Locale\Stub;
 
+use Symfony\Component\Locale\Exception\NotImplementedException;
 use Symfony\Component\Locale\Exception\MethodNotImplementedException;
 use Symfony\Component\Locale\Exception\MethodArgumentValueNotImplementedException;
 
@@ -70,27 +71,28 @@ class StubIntlDateFormatter
         $dateTime->setTimestamp($timestamp);
         $dateTime->setTimezone($this->dateTimeZone);
 
-        // not implemented: YuwWFgecSAZvVW
-        $specialChars = 'MLydGQqhDEaHkKmsz';
-        $specialCharsArray = str_split($specialChars);
-        $specialCharsMatch = implode('|', array_map(function($char) {
-            return $char . '+';
-        }, $specialCharsArray));
         $quoteMatch = "'(?:[^']+|'')*'";
-        $regExp = "/($quoteMatch|$specialCharsMatch)/";
+        $implementedCharsMatch = $this->buildCharsMatch('MLydGQqhDEaHkKmsz');
 
-        $callback = function($matches) use ($dateTime) {
-            $datePattern = $matches[0];
-            $length = strlen($datePattern);
+        $notImplementedChars = 'YuwWFgecSAZvVW';
+        $notImplementedCharsMatch = $this->buildCharsMatch($notImplementedChars);
 
-            if ("'" === $datePattern[0]) {
-                if (preg_match("/^'+$/", $datePattern)) {
-                    return str_replace("''", "'", $datePattern);
+        $regExp = "/($quoteMatch|$implementedCharsMatch|$notImplementedCharsMatch)/";
+
+        $pattern = $this->getPattern();
+
+        $callback = function($matches) use ($dateTime, $notImplementedChars, $pattern) {
+            $dateChars = $matches[0];
+            $length = strlen($dateChars);
+
+            if ("'" === $dateChars[0]) {
+                if (preg_match("/^'+$/", $dateChars)) {
+                    return str_replace("''", "'", $dateChars);
                 }
-                return str_replace("''", "'", substr($datePattern, 1, -1));
+                return str_replace("''", "'", substr($dateChars, 1, -1));
             }
 
-            switch ($datePattern[0]) {
+            switch ($dateChars[0]) {
                 case 'M':
                 case 'L':
                     $matchLengthMap = array(
@@ -208,10 +210,17 @@ class StubIntlDateFormatter
                 case 'z':
                     return $dateTime->format('\G\M\TP');
                     break;
+
+                default:
+                    // handle unimplemented characters
+                    if (false !== strpos($notImplementedChars, $dateChars[0])) {
+                        throw new NotImplementedException(sprintf("Unimplemented date character '%s' in format '%s'", $dateChars[0], $pattern));
+                    }
+                    break;
             }
         };
 
-        $formatted = preg_replace_callback($regExp, $callback, $this->getPattern());
+        $formatted = preg_replace_callback($regExp, $callback, $pattern);
 
         return $formatted;
     }
@@ -304,6 +313,16 @@ class StubIntlDateFormatter
         } catch (\Exception $e) {
             $this->dateTimeZone = new \DateTimeZone('UTC');
         }
+    }
+
+    protected function buildCharsMatch($specialChars) {
+        $specialCharsArray = str_split($specialChars);
+
+        $specialCharsMatch = implode('|', array_map(function($char) {
+            return $char . '+';
+        }, $specialCharsArray));
+
+        return $specialCharsMatch;
     }
 
     static public function create($locale, $datetype, $timetype, $timezone = null, $calendar = null, $pattern = null)

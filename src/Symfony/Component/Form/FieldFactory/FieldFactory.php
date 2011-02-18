@@ -73,7 +73,8 @@ class FieldFactory implements FieldFactoryInterface
         $textField = 'Symfony\Component\Form\TextField';
 
         if ($maxLengthGuess && ($fieldClass == $textField || is_subclass_of($fieldClass, $textField))) {
-            $options = array_merge(array('max_length' => $maxLengthGuess->getValue()), $options);
+// TODO enable me again later
+//            $options = array_merge(array('max_length' => $maxLengthGuess->getValue()), $options);
         }
 
         if ($requiredGuess) {

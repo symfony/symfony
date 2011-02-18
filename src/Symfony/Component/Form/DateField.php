@@ -179,21 +179,10 @@ class DateField extends HybridField
         }
     }
 
-    public function getPattern()
+    // temporary
+    public function getFormatter()
     {
-        // set order as specified in the pattern
-        if ($this->getOption('pattern')) {
-            return $this->getOption('pattern');
-        }
-
-        // set right order with respect to locale (e.g.: de_DE=dd.MM.yy; en_US=M/d/yy)
-        // lookup various formats at http://userguide.icu-project.org/formatparse/datetime
-        if (preg_match('/^([yMd]+).+([yMd]+).+([yMd]+)$/', $this->formatter->getPattern())) {
-            return preg_replace(array('/y+/', '/M+/', '/d+/'), array('{{ year }}', '{{ month }}', '{{ day }}'), $this->formatter->getPattern());
-        }
-
-        // default fallback
-        return '{{ year }}-{{ month }}-{{ day }}';
+        return $this->formatter;
     }
 
     /**

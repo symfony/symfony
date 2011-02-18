@@ -68,7 +68,9 @@
     {% if attr.type is defined and attr.type != "text" %}
         <input {{ block('field_attributes') }} value="{{ field.displayedData }}" />
     {% else %}
-        {% set attr = attr|merge({ 'maxlength': attr.maxlength|default(max_length) }) %}
+        {% if attr.maxlength is not defined and max_length is defined %}
+            {% set attr = attr|merge({ 'maxlength': max_length }) %}
+        {% endif %}
         <input type="text" {{ block('field_attributes') }} value="{{ field.displayedData }}" />
     {% endif %}
 {% endspaceless %}
@@ -156,7 +158,11 @@
     {% if field.isField %}
         {{ block('text__widget') }}
     {% else %}
-        {{ field.pattern|replace({ '{{ year }}': field.year.renderer.widget, '{{ month }}': field.month.renderer.widget, '{{ day }}': field.day.renderer.widget })|raw }}
+        {{ date_pattern|replace({ 
+            '{{ year }}': field.year.renderer.widget, 
+            '{{ month }}': field.month.renderer.widget, 
+            '{{ day }}': field.day.renderer.widget 
+        })|raw }}
     {% endif %}
 {% endspaceless %}
 {% endblock date__widget %}

@@ -30,6 +30,34 @@ use Symfony\Bundle\DoctrineAbstractBundle\DependencyInjection\AbstractDoctrineEx
  */
 class DoctrineMongoDBExtension extends AbstractDoctrineExtension
 {
+    /**
+     * Responds to the doctrine_mongo_db configuration parameter.
+     *
+     * Available options:
+     *
+     *  * mappings                  An array of bundle names (as the key)
+     *                              and mapping configuration (as the value).
+     *  * default_document_manager  The name of the document manager that should be
+     *                              marked as the default. Default: default.
+     *  * default_connection        If using a single connection, the name to give
+     *                              to that connection. Default: default.
+     *  * metadata_cache_driver     Options: array (default), apc, memcache, xcache
+     *  * server                    The server if only specifying one connection
+     *                              (e.g. mongodb://localhost:27017)
+     *  * options                   The connections options if only specifying
+     *                              one connection.
+     *  * connections               An array of each connection and its configuration
+     *  * document_managers         An array of document manager names and
+     *                              configuration.
+     *  * default_database          The database for a document manager that didn't
+     *                              explicitly set a database. Default: default;
+     *  * proxy_namespace           Namespace of the generated proxies. Default: Proxies
+     *  * auto_generate_proxy_classes Whether to always regenerate the proxt classes.
+     *                              Default: false.
+     *  * hydrator_namespace        Namespace of the generated proxies. Default: Hydrators
+     *  * auto_generate_hydrator_classes Whether to always regenerate the proxt classes.
+     *                              Default: false.
+     */
     public function load(array $configs, ContainerBuilder $container)
     {
         foreach ($configs as $config) {

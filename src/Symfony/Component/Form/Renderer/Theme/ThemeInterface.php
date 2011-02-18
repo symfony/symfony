@@ -9,17 +9,9 @@
  * file that was distributed with this source code.
  */
 
-namespace Symfony\Component\Form;
+namespace Symfony\Component\Form\Renderer\Theme;
 
-/**
- * A text input field.
- *
- * Available options:
- *
- *  * max_length:       The max_length to give the field.
- *
- * @author Bernhard Schussek <bernhard.schussek@symfony-project.com>
- */
-class TextField extends Field
+interface ThemeInterface
 {
+    function render($template, $block, array $parameters);
 }

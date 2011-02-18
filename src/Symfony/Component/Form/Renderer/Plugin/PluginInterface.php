@@ -9,8 +9,11 @@
  * file that was distributed with this source code.
  */
 
-namespace Symfony\Component\Form\Renderer\Engine;
+namespace Symfony\Component\Form\Renderer\Plugin;
 
-interface EngineInterface
+use Symfony\Component\Form\Renderer\RendererInterface;
+
+interface PluginInterface
 {
+    function setUp(RendererInterface $renderer);
 }

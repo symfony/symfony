@@ -28,13 +28,17 @@ class FilterManagerPass implements CompilerPassInterface
             return;
         }
 
-        $fm = $container->getDefinition('assetic.filter_manager');
+        $mapping = array();
         foreach ($container->findTaggedServiceIds('assetic.filter') as $id => $attributes) {
             foreach ($attributes as $attr) {
                 if (isset($attr['alias'])) {
-                    $fm->addMethodCall('set', array($attr['alias'], new Reference($id)));
+                    $mapping[$attr['alias']] = $id;
                 }
             }
         }
+
+        $container
+            ->getDefinition('assetic.filter_manager')
+            ->setArgument(1, $mapping);
     }
 }

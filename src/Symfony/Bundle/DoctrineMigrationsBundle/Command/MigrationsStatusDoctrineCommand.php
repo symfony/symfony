@@ -39,7 +39,7 @@ class MigrationsStatusDoctrineCommand extends StatusCommand
     {
         DoctrineCommand::setApplicationEntityManager($this->application, $input->getOption('em'));
 
-        $configuration = $this->_getMigrationConfiguration($input, $output);
+        $configuration = $this->getMigrationConfiguration($input, $output);
         DoctrineCommand::configureMigrationsForBundle($this->application, $input->getOption('bundle'), $configuration);
 
         parent::execute($input, $output);

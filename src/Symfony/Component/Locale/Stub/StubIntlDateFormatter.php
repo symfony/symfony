@@ -60,7 +60,7 @@ class StubIntlDateFormatter
         $this->timetype = $timetype;
 
         $this->setPattern($pattern);
-        $this->setTimezoneId($timezone);
+        $this->setTimeZoneId($timezone);
     }
 
     public function format($timestamp)
@@ -215,9 +215,14 @@ class StubIntlDateFormatter
         return $formatted;
     }
 
-    public function getLocale()
+    public function getCalendar()
     {
-        return 'en';
+        return self::GREGORIAN;
+    }
+
+    public function getDateType()
+    {
+        return $this->datetype;
     }
 
     public function setLocale($locale)
@@ -225,9 +230,59 @@ class StubIntlDateFormatter
         throw new MethodNotImplementedException(__METHOD__);
     }
 
+    public function getErrorCode()
+    {
+        throw new MethodNotImplementedException(__METHOD__);
+    }
+
+    public function getErrorMessage()
+    {
+        throw new MethodNotImplementedException(__METHOD__);
+    }
+
+    public function getLocale()
+    {
+        return 'en';
+    }
+
     public function getPattern()
     {
         return $this->pattern;
+    }
+
+    public function getTimeType()
+    {
+        return $this->timetype;
+    }
+
+    public function getTimeZoneId()
+    {
+        return $this->dateTimeZone->getName();
+    }
+
+    public function isLenient()
+    {
+        throw new MethodNotImplementedException(__METHOD__);
+    }
+
+    public function localtime($value, &$position = 0)
+    {
+        throw new MethodNotImplementedException(__METHOD__);
+    }
+
+    public function parse($value, &$position = 0)
+    {
+        throw new MethodNotImplementedException(__METHOD__);
+    }
+
+    public function setCalendar()
+    {
+        throw new MethodNotImplementedException(__METHOD__);
+    }
+
+    public function setLenient($lenient)
+    {
+        throw new MethodNotImplementedException(__METHOD__);
     }
 
     public function setPattern($pattern)
@@ -246,63 +301,13 @@ class StubIntlDateFormatter
         $this->pattern = $pattern;
     }
 
-    public function getCalendar()
-    {
-        return self::GREGORIAN;
-    }
-
-    public function setCalendar()
-    {
-        throw new MethodNotImplementedException(__METHOD__);
-    }
-
-    public function getDateType()
-    {
-        return $this->datetype;
-    }
-
-    public function getTimeType()
-    {
-        return $this->timetype;
-    }
-
-    public function getErrorCode()
-    {
-        throw new MethodNotImplementedException(__METHOD__);
-    }
-
-    public function getErrorMessage()
-    {
-        throw new MethodNotImplementedException(__METHOD__);
-    }
-
-    public function getTimezoneId()
-    {
-        return $this->dateTimeZone->getName();
-    }
-
-    public function setTimezoneId($timezoneId)
+    public function setTimeZoneId($timeZoneId)
     {
         try {
-            $this->dateTimeZone = new \DateTimeZone($timezoneId);
+            $this->dateTimeZone = new \DateTimeZone($timeZoneId);
         } catch (\Exception $e) {
             $this->dateTimeZone = new \DateTimeZone('UTC');
         }
-    }
-
-    public function isLenient()
-    {
-        throw new MethodNotImplementedException(__METHOD__);
-    }
-
-    public function localtime($value, &$position = 0)
-    {
-        throw new MethodNotImplementedException(__METHOD__);
-    }
-
-    public function parse($value, &$position = 0)
-    {
-        throw new MethodNotImplementedException(__METHOD__);
     }
 
     static public function create($locale, $datetype, $timetype, $timezone = null, $calendar = null, $pattern = null)

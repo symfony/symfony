@@ -376,20 +376,20 @@ class StubIntlDateFormatterTest extends LocaleTestCase
     }
 
     /**
-    * @dataProvider timezoneIdProvider
+    * @dataProvider timeZoneIdProvider
     */
-    public function testGetTimezoneId($timezoneId)
+    public function testGetTimeZoneId($timeZoneId)
     {
-        $formatter = new StubIntlDateFormatter('en', StubIntlDateFormatter::FULL, StubIntlDateFormatter::NONE, $timezoneId);
-        $this->assertEquals($timezoneId, $formatter->getTimezoneId(), 'Check timezone id with stub implementation.');
+        $formatter = new StubIntlDateFormatter('en', StubIntlDateFormatter::FULL, StubIntlDateFormatter::NONE, $timeZoneId);
+        $this->assertEquals($timeZoneId, $formatter->getTimeZoneId(), 'Check timezone id with stub implementation.');
 
         if ($this->isIntlExtensionLoaded()) {
-            $formatter = new \IntlDateFormatter('en', \IntlDateFormatter::FULL, \IntlDateFormatter::NONE, $timezoneId);
-            $this->assertEquals($timezoneId, $formatter->getTimezoneId(), 'Check timezone id with intl extension.');
+            $formatter = new \IntlDateFormatter('en', \IntlDateFormatter::FULL, \IntlDateFormatter::NONE, $timeZoneId);
+            $this->assertEquals($timeZoneId, $formatter->getTimeZoneId(), 'Check timezone id with intl extension.');
         }
     }
 
-    public function timezoneIdProvider()
+    public function timeZoneIdProvider()
     {
         return array(
             array('Europe/Zurich'),
@@ -397,19 +397,19 @@ class StubIntlDateFormatterTest extends LocaleTestCase
         );
     }
 
-    public function testSetTimezoneId()
+    public function testSetTimeZoneId()
     {
         $formatter = new StubIntlDateFormatter('en', StubIntlDateFormatter::FULL, StubIntlDateFormatter::NONE, 'UTC');
-        $this->assertEquals('UTC', $formatter->getTimezoneId(), 'Check timezone id with stub implementation.');
+        $this->assertEquals('UTC', $formatter->getTimeZoneId(), 'Check timezone id with stub implementation.');
 
-        $formatter->setTimezoneId('Europe/Zurich');
-        $this->assertEquals('Europe/Zurich', $formatter->getTimezoneId(), 'Check timezone id with intl extension.');
+        $formatter->setTimeZoneId('Europe/Zurich');
+        $this->assertEquals('Europe/Zurich', $formatter->getTimeZoneId(), 'Check timezone id with intl extension.');
 
         if ($this->isIntlExtensionLoaded()) {
             $formatter = new \IntlDateFormatter('en', \IntlDateFormatter::FULL, \IntlDateFormatter::NONE, 'UTC');
 
-            $formatter->setTimezoneId('Europe/Zurich');
-            $this->assertEquals('Europe/Zurich', $formatter->getTimezoneId(), 'Check timezone id with intl extension.');
+            $formatter->setTimeZoneId('Europe/Zurich');
+            $this->assertEquals('Europe/Zurich', $formatter->getTimeZoneId(), 'Check timezone id with intl extension.');
         }
     }
 
@@ -438,6 +438,15 @@ class StubIntlDateFormatterTest extends LocaleTestCase
     {
         $formatter = new StubIntlDateFormatter('en', StubIntlDateFormatter::FULL, StubIntlDateFormatter::NONE);
         $formatter->isLenient();
+    }
+
+    /**
+     * @expectedException Symfony\Component\Locale\Exception\MethodNotImplementedException
+     */
+    public function testSetLenient()
+    {
+        $formatter = new StubIntlDateFormatter('en', StubIntlDateFormatter::FULL, StubIntlDateFormatter::NONE);
+        $formatter->setLenient(true);
     }
 
     public function testStaticCreate()

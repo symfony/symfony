@@ -11,7 +11,7 @@
 
 namespace Symfony\Component\Form;
 
-use Symfony\Component\Form\ValueTransformer\NumberToLocalizedStringTransformer;
+use Symfony\Component\Form\ValueTransformer\IntegerToLocalizedStringTransformer;
 
 /*
  * This file is part of the Symfony package.
@@ -43,16 +43,14 @@ class IntegerField extends NumberField
         $this->addOption('precision', 0);
 
         // Integer cast rounds towards 0, so do the same when displaying fractions
-        $this->addOption('rounding-mode', NumberToLocalizedStringTransformer::ROUND_DOWN);
+        $this->addOption('rounding-mode', IntegerToLocalizedStringTransformer::ROUND_DOWN);
 
         parent::configure();
-    }
 
-    /**
-     * {@inheritDoc}
-     */
-    public function getData()
-    {
-        return (int)parent::getData();
+        $this->setValueTransformer(new IntegerToLocalizedStringTransformer(array(
+            'precision' => $this->getOption('precision'),
+            'grouping' => $this->getOption('grouping'),
+            'rounding-mode' => $this->getOption('rounding-mode'),
+        )));
     }
 }

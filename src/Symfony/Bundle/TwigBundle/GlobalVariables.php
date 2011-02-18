@@ -27,6 +27,11 @@ class GlobalVariables
         $this->container = $container;
     }
 
+    /**
+     * Returns security context service
+     * 
+     * @return Symfony\Component\Security\Core\SecurityContext|void The security context
+     */
     public function getSecurity()
     {
         if ($this->container->has('security.context')) {
@@ -34,6 +39,12 @@ class GlobalVariables
         }
     }
 
+    /**
+     * Returns current user
+     * 
+     * @return mixed|void
+     * @see Symfony\Component\Security\Core\Authentication\Token\TokenInterface::getUser()
+     */
     public function getUser()
     {
         if (!$security = $this->getSecurity()) {
@@ -52,6 +63,11 @@ class GlobalVariables
         return $user;
     }
 
+    /**
+     * Returns security context service
+     * 
+     * @return Symfony\Component\HttpFoundation\Request|void The http request object
+     */
     public function getRequest()
     {
         if ($this->container->has('request') && $request = $this->container->get('request')) {
@@ -59,10 +75,39 @@ class GlobalVariables
         }
     }
 
+    /**
+     * Returns security context service
+     * 
+     * @return Symfony\Component\HttpFoundation\Session|void The session
+     */
     public function getSession()
     {
         if ($request = $this->getRequest()) {
             return $request->getSession();
+        }
+    }
+    
+    /**
+     * Returns current app environment
+     * 
+     * @return string|void The current environment string (e.g 'dev')
+     */
+    public function getEnvironment()
+    {
+        if ($this->container->hasParameter('kernel.environment')) {
+            return $this->container->getParameter('kernel.environment');
+        }
+    }
+    
+    /**
+     * Returns current app debug mode
+     * 
+     * @return boolean|void The current debug mode
+     */
+    public function getDebug()
+    {
+        if ($this->container->hasParameter('kernel.debug')) {
+            return (bool)$this->container->getParameter('kernel.debug');
         }
     }
 }

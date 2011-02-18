@@ -444,20 +444,23 @@ class StubIntlDateFormatterTest extends LocaleTestCase
         $this->assertEquals('yyyy-MM-dd', $formatter->getPattern());
     }
 
-    public function testSetTimeZoneId()
+    public function testSetTimeZoneIdStub()
     {
         $formatter = new StubIntlDateFormatter('en', StubIntlDateFormatter::FULL, StubIntlDateFormatter::NONE, 'UTC');
-        $this->assertEquals('UTC', $formatter->getTimeZoneId(), 'Check timezone id with stub implementation.');
+        $this->assertEquals('UTC', $formatter->getTimeZoneId());
 
         $formatter->setTimeZoneId('Europe/Zurich');
-        $this->assertEquals('Europe/Zurich', $formatter->getTimeZoneId(), 'Check timezone id with intl extension.');
+        $this->assertEquals('Europe/Zurich', $formatter->getTimeZoneId());
+    }
 
-        if ($this->isIntlExtensionLoaded()) {
-            $formatter = new \IntlDateFormatter('en', \IntlDateFormatter::FULL, \IntlDateFormatter::NONE, 'UTC');
+    public function testSetTimeZoneIdIntl()
+    {
+        $this->skipIfIntlExtensionIsNotLoaded();
+        $formatter = new \IntlDateFormatter('en', \IntlDateFormatter::FULL, \IntlDateFormatter::NONE, 'UTC');
+        $this->assertEquals('UTC', $formatter->getTimeZoneId());
 
-            $formatter->setTimeZoneId('Europe/Zurich');
-            $this->assertEquals('Europe/Zurich', $formatter->getTimeZoneId(), 'Check timezone id with intl extension.');
-        }
+        $formatter->setTimeZoneId('Europe/Zurich');
+        $this->assertEquals('Europe/Zurich', $formatter->getTimeZoneId());
     }
 
     public function testStaticCreate()

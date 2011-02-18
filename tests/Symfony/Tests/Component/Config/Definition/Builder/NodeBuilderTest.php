@@ -11,7 +11,7 @@ class NodeBuilderTest extends \PHPUnit_Framework_TestCase
         $nodeBuilder = new NodeBuilder('root', array());
         $childNode = new NodeBuilder('child', array());
 
-        $ret = $nodeBuilder->nodeBuilder($childNode);
+        $ret = $nodeBuilder->builder($childNode);
         $this->assertEquals(array('child' => $childNode), $nodeBuilder->children);
         $this->assertEquals($nodeBuilder, $ret);
     }

@@ -54,7 +54,7 @@ class StubIntlDateFormatterTest extends LocaleTestCase
 
     public function formatProvider()
     {
-        return array(
+        $formatData = array(
             /* general */
             array('y-M-d', 0, '1970-1-1'),
             array("yyyy.MM.dd G 'at' HH:mm:ss zzz", 0, '1970.01.01 AD at 00:00:00 GMT+00:00'),
@@ -101,7 +101,6 @@ class StubIntlDateFormatterTest extends LocaleTestCase
 
             /* era */
             array('G', 0, 'AD'),
-            array('G', -62167222800, 'BC'),
 
             /* quarter */
             array('Q', 0, '1'),
@@ -233,6 +232,16 @@ class StubIntlDateFormatterTest extends LocaleTestCase
             array('zzzz', 0, 'GMT+00:00'),
             array('zzzzz', 0, 'GMT+00:00'),
         );
+
+        // BC era has huge negative unix timestamp
+        // so testing it requires 64bit
+        if (2147483647 > PHP_INT_MAX) {
+            $formatData = array_merge($formatData, array(
+                array('G', -62167222800, 'BC'),
+            ));
+        }
+
+        return $formatData;
     }
 
     /**

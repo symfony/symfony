@@ -81,11 +81,12 @@ class SqliteProfilerStorage implements ProfilerStorageInterface
     /**
      * {@inheritdoc}
      */
-    public function write($token, $data, $ip, $url, $time)
+    public function write($token, $parent, $data, $ip, $url, $time)
     {
         $db = $this->initDb();
         $args = array(
             ':token'        => $token,
+            ':parent'       => $parent,
             ':data'         => $data,
             ':ip'           => $ip,
             ':url'          => $url,
@@ -93,7 +94,7 @@ class SqliteProfilerStorage implements ProfilerStorageInterface
             ':created_at'   => time(),
         );
         try {
-            $this->exec($db, 'INSERT INTO data (token, data, ip, url, time, created_at) VALUES (:token, :data, :ip, :url, :time, :created_at)', $args);
+            $this->exec($db, 'INSERT INTO data (token, parent, data, ip, url, time, created_at) VALUES (:token, :parent, :data, :ip, :url, :time, :created_at)', $args);
             $this->cleanup();
             $status = true;
         } catch (\Exception $e) {
@@ -134,10 +135,11 @@ class SqliteProfilerStorage implements ProfilerStorageInterface
             throw new \RuntimeException('You need to enable either the SQLite or PDO_SQLite extension for the profiler to run properly.');
         }
 
-        $db->exec('CREATE TABLE IF NOT EXISTS data (token STRING, data STRING, ip STRING, url STRING, time INTEGER, created_at INTEGER)');
+        $db->exec('CREATE TABLE IF NOT EXISTS data (token STRING, data STRING, ip STRING, url STRING, time INTEGER, parent STRING, created_at INTEGER)');
         $db->exec('CREATE INDEX IF NOT EXISTS data_created_at ON data (created_at)');
         $db->exec('CREATE INDEX IF NOT EXISTS data_ip ON data (ip)');
         $db->exec('CREATE INDEX IF NOT EXISTS data_url ON data (url)');
+        $db->exec('CREATE INDEX IF NOT EXISTS data_parent ON data (parent)');
         $db->exec('CREATE UNIQUE INDEX IF NOT EXISTS data_token ON data (token)');
 
         return $db;

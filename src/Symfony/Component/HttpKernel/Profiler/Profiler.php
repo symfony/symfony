@@ -29,6 +29,7 @@ class Profiler
     protected $logger;
     protected $enabled;
     protected $token;
+    protected $parent;
     protected $data;
     protected $ip;
     protected $url;
@@ -104,7 +105,7 @@ class Profiler
      */
     public function export()
     {
-        $data = base64_encode(serialize(array($this->token, $this->collectors, $this->ip, $this->url, $this->time)));
+        $data = base64_encode(serialize(array($this->token, $this->parent, $this->collectors, $this->ip, $this->url, $this->time)));
 
         return $data;
     }
@@ -118,7 +119,7 @@ class Profiler
      */
     public function import($data)
     {
-        list($token, $collectors, $ip, $url, $time) = unserialize(base64_decode($data));
+        list($token, $parent, $collectors, $ip, $url, $time) = unserialize(base64_decode($data));
 
         if (false !== $this->storage->read($token)) {
             return false;
@@ -126,7 +127,7 @@ class Profiler
 
         $data = base64_encode(serialize($collectors));
 
-        $this->storage->write($token, $data, $ip, $url, $time);
+        $this->storage->write($token, $parent, $data, $ip, $url, $time);
 
         return $token;
     }
@@ -172,6 +173,16 @@ class Profiler
     public function isEmpty()
     {
         return $this->empty;
+    }
+
+    /**
+     * Returns the parent token.
+     *
+     * @return string The parent token
+     */
+    public function getParent()
+    {
+        return $this->parent;
     }
 
     /**
@@ -237,13 +248,14 @@ class Profiler
             $collector->collect($request, $response, $exception);
         }
 
-        $this->ip   = $request->server->get('REMOTE_ADDR');
-        $this->url  = $request->getUri();
-        $this->time = time();
+        $this->parent = '';
+        $this->ip     = $request->server->get('REMOTE_ADDR');
+        $this->url    = $request->getUri();
+        $this->time   = time();
 
         $data = base64_encode(serialize($this->collectors));
 
-        if (true === $this->storage->write($this->token, $data, $this->ip, $this->url, $this->time)) {
+        if (true === $this->storage->write($this->token, $this->parent, $data, $this->ip, $this->url, $this->time)) {
             $this->empty = false;
         } elseif (null !== $this->logger) {
             if (null !== $exception) {

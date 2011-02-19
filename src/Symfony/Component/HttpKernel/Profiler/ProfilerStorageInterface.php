@@ -43,15 +43,16 @@ interface ProfilerStorageInterface
     /**
      * Write data associated with the given token.
      *
-     * @param string  $token A token
-     * @param string  $data  The data associated with token
-     * @param string  $ip    An IP
-     * @param string  $url   An URL
-     * @param integer $time  The time of the data
+     * @param string  $token  A token
+     * @param string  $parent The parent token
+     * @param string  $data   The data associated with token
+     * @param string  $ip     An IP
+     * @param string  $url    An URL
+     * @param integer $time   The time of the data
      *
      * @return Boolean Write operation successful
      */
-    function write($token, $data, $ip, $url, $time);
+    function write($token, $parent, $data, $ip, $url, $time);
 
     /**
      * Purges all data from the database.

@@ -415,7 +415,7 @@ class Field extends Configurable implements FieldInterface
      *
      * @param ValueTransformerInterface $valueTransformer
      */
-    protected function setNormalizationTransformer(ValueTransformerInterface $normalizationTransformer)
+    public function setNormalizationTransformer(ValueTransformerInterface $normalizationTransformer)
     {
         $this->normalizationTransformer = $normalizationTransformer;
 
@@ -427,7 +427,7 @@ class Field extends Configurable implements FieldInterface
      *
      * @return ValueTransformerInterface
      */
-    protected function getNormalizationTransformer()
+    public function getNormalizationTransformer()
     {
         return $this->normalizationTransformer;
     }
@@ -437,7 +437,7 @@ class Field extends Configurable implements FieldInterface
      *
      * @param ValueTransformerInterface $valueTransformer
      */
-    protected function setValueTransformer(ValueTransformerInterface $valueTransformer)
+    public function setValueTransformer(ValueTransformerInterface $valueTransformer)
     {
         $this->valueTransformer = $valueTransformer;
 
@@ -449,7 +449,7 @@ class Field extends Configurable implements FieldInterface
      *
      * @return ValueTransformerInterface
      */
-    protected function getValueTransformer()
+    public function getValueTransformer()
     {
         return $this->valueTransformer;
     }
@@ -459,7 +459,7 @@ class Field extends Configurable implements FieldInterface
      *
      * @param DataProcessorInterface $dataProcessor
      */
-    protected function setDataProcessor(DataProcessorInterface $dataProcessor)
+    public function setDataProcessor(DataProcessorInterface $dataProcessor)
     {
         $this->dataProcessor = $dataProcessor;
 
@@ -471,7 +471,7 @@ class Field extends Configurable implements FieldInterface
      *
      * @return DataProcessorInterface
      */
-    protected function getDataProcessor()
+    public function getDataProcessor()
     {
         return $this->dataProcessor;
     }

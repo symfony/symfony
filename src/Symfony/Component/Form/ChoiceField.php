@@ -14,6 +14,7 @@ namespace Symfony\Component\Form;
 use Symfony\Component\Form\ChoiceList\DefaultChoiceList;
 use Symfony\Component\Form\ValueTransformer\ArrayToChoicesTransformer;
 use Symfony\Component\Form\ValueTransformer\ScalarToChoicesTransformer;
+use Symfony\Component\Form\DataProcessor\RadioToArrayConverter;
 
 /**
  * Lets the user select between different choices.
@@ -85,6 +86,7 @@ class ChoiceField extends HybridField
                 $this->setValueTransformer(new ArrayToChoicesTransformer($this->choiceList));
             } else {
                 $this->setValueTransformer(new ScalarToChoicesTransformer($this->choiceList));
+                $this->setDataPreprocessor(new RadioToArrayConverter());
             }
         }
     }
@@ -122,20 +124,5 @@ class ChoiceField extends HybridField
                 'value' => $choice,
             ));
         }
-    }
-
-    /**
-     * {@inheritDoc}
-     *
-     * Takes care of converting the input from a single radio button
-     * to an array.
-     */
-    public function submit($value)
-    {
-        if (!$this->isMultipleChoice() && $this->isExpanded()) {
-            $value = null === $value ? array() : array($value => true);
-        }
-
-        parent::submit($value);
     }
 }

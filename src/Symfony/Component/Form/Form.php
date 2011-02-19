@@ -22,6 +22,7 @@ use Symfony\Component\Form\Exception\UnexpectedTypeException;
 use Symfony\Component\Form\Exception\DanglingFieldException;
 use Symfony\Component\Form\Exception\FieldDefinitionException;
 use Symfony\Component\Form\CsrfProvider\CsrfProviderInterface;
+use Symfony\Component\Form\DataProcessor\DataProcessorInterface;
 
 /**
  * Form represents a form.
@@ -69,6 +70,8 @@ class Form extends Field implements \IteratorAggregate, FormInterface
      * @var FormContext
      */
     protected $context = null;
+
+    private $dataPreprocessor;
 
     /**
      * Creates a new form with the options stored in the given context
@@ -408,11 +411,11 @@ class Form extends Field implements \IteratorAggregate, FormInterface
             $data = array();
         }
 
-        // remember for later
-        $submittedData = $data;
-
         // might return an array, if $data isn't one already
         $data = $this->preprocessData($data);
+
+        // remember for later
+        $submittedData = $data;
 
         if (!is_array($data)) {
             throw new UnexpectedTypeException($data, 'array');
@@ -495,6 +498,10 @@ class Form extends Field implements \IteratorAggregate, FormInterface
      */
     protected function preprocessData($data)
     {
+        if ($this->dataPreprocessor) {
+            return $this->dataPreprocessor->processData($data);
+        }
+
         return $data;
     }
 
@@ -956,6 +963,28 @@ class Form extends Field implements \IteratorAggregate, FormInterface
         }
 
         return true;
+    }
+
+    /**
+     * Sets the data preprocessor
+     *
+     * @param DataProcessorInterface $dataPreprocessor
+     */
+    public function setDataPreprocessor(DataProcessorInterface $dataPreprocessor)
+    {
+        $this->dataPreprocessor = $dataPreprocessor;
+
+        return $this;
+    }
+
+    /**
+     * Returns the data preprocessor
+     *
+     * @return DataPreprocessorInterface
+     */
+    public function getDataPreprocessor()
+    {
+        return $this->dataPreprocessor;
     }
 
     /**

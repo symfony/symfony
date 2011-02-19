@@ -13,6 +13,7 @@ namespace Symfony\Bundle\DoctrineMongoDBBundle\Tests\DependencyInjection;
 
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Bundle\DoctrineMongoDBBundle\DependencyInjection\Configuration;
+use Symfony\Component\Yaml\Yaml;
 
 use Symfony\Component\Config\Definition\Processor;
 
@@ -49,6 +50,94 @@ class ConfigurationTest extends \PHPUnit_Framework_TestCase
         if (count($options)) {
             $this->fail('Extra defaults were returned: '. print_r($options, true));
         }
+    }
+
+    /**
+     * Tests a full configuration.
+     *
+     * @dataProvider fullConfigurationProvider
+     */
+    public function testFullConfiguration($config)
+    {
+        $processor = new Processor();
+        $configuration = new Configuration();
+        $options = $processor->process($configuration->getConfigTree(), array($config));
+
+        $expected = array(
+            'proxy_namespace'                   => 'Test_Proxies',
+            'auto_generate_proxy_classes'       => true,
+            'hydrator_namespace'                => 'Test_Hydrators',
+            'auto_generate_hydrator_classes'    => true,
+            'default_document_manager'          => 'default_dm_name',
+            'default_database'                  => 'default_db_name',
+            'metadata_cache_driver' => array(
+                'type'      => 'memcache',
+                'class'     => 'fooClass',
+                'host'      => 'host_val',
+                'port'      => 1234,
+                'instance_class' => 'instance_val',
+            ),
+            'default_connection'                => 'conn1',
+            'server'                            => 'http://server',
+            'options'       => array(
+                'connect'   => true,
+                'persist'   => 'persist_val',
+                'timeout'   => 500,
+                'replicaSet' => true,
+                'username'  => 'username_val',
+                'password'  => 'password_val',
+            ),
+            'connections'   => array(
+                'conn1'         => array(
+                    'server'    => null,
+                    'options'   => array(),
+                ),
+                'conn2'         => array(
+                    'server'    => 'http://server2',
+                    'options'   => array(),
+                ),
+            ),
+            'mappings'      => array(
+                'FooBundle'     => array(
+                    'type' => 'annotations',
+                ),
+            ),
+            'document_managers' => array(
+                'dm1' => array(
+                    'mappings' => array(),
+                ),
+                'dm2' => array(
+                    'default_database' => 'dm2_default_db',
+                    'connection' => 'dm2_connection',
+                    'database' => 'db1',
+                    'mappings' => array(
+                        'BarBundle' => array(
+                            'type'      => 'yml',
+                            'dir'       => '%kernel.cache_dir%',
+                            'prefix'    => 'prefix_val',
+                            'alias'     => 'alias_val',
+                        )
+                    ),
+                    'metadata_cache_driver' => array(
+                        'type' => 'apc',
+                    )
+                )
+            )
+        );
+
+        //var_dump($options);
+
+        $this->assertEquals($expected, $options);
+    }
+
+    public function fullConfigurationProvider()
+    {
+      $yaml = Yaml::load(__DIR__.'/Fixtures/config/yml/full.yml');
+      $yaml = $yaml['doctrine_mongo_db'];
+
+       return array(
+           array($yaml),
+       );
     }
 
     /**

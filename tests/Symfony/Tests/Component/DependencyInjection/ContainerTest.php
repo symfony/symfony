@@ -33,7 +33,7 @@ class ContainerTest extends \PHPUnit_Framework_TestCase
     /**
      * @covers Symfony\Component\DependencyInjection\Container::compile
      */
-    public function testcompile()
+    public function testCompile()
     {
         $sc = new Container(new ParameterBag(array('foo' => 'bar')));
         $sc->compile();
@@ -98,7 +98,7 @@ class ContainerTest extends \PHPUnit_Framework_TestCase
         $this->assertEquals(array('service_container', 'foo', 'bar'), $sc->getServiceIds(), '->getServiceIds() returns all defined service ids');
 
         $sc = new ProjectServiceContainer();
-        $this->assertEquals(array('scoped', 'scoped_foo', 'bar', 'foo_bar', 'foo.baz', 'service_container'), $sc->getServiceIds(), '->getServiceIds() returns defined service ids by getXXXService() methods');
+        $this->assertEquals(array('scoped', 'scoped_foo', 'bar', 'foo_bar', 'foo.baz', 'circular', 'service_container'), $sc->getServiceIds(), '->getServiceIds() returns defined service ids by getXXXService() methods');
     }
 
     /**
@@ -155,7 +155,7 @@ class ContainerTest extends \PHPUnit_Framework_TestCase
         $this->assertEquals($sc->__foo_baz, $sc->get('foo.baz'), '->get() returns the service if a get*Method() is defined');
 
         $sc->set('bar', $bar = new \stdClass());
-        $this->assertSame($sc->get('bar'), $bar, '->getServiceIds() prefers to return a service defined with a getXXXService() method than one defined with set()');
+        $this->assertEquals($bar, $sc->get('bar'), '->get() prefers to return a service defined with set() than one defined with a getXXXMethod()');
 
         try {
             $sc->get('');
@@ -165,6 +165,19 @@ class ContainerTest extends \PHPUnit_Framework_TestCase
             $this->assertEquals('The service "" does not exist.', $e->getMessage(), '->get() throws a \InvalidArgumentException exception if the service is empty');
         }
         $this->assertNull($sc->get('', ContainerInterface::NULL_ON_INVALID_REFERENCE));
+    }
+
+    public function testGetCircularReference()
+    {
+
+        $sc = new ProjectServiceContainer();
+        try {
+            $sc->get('circular');
+            $this->fail('->get() throws a \LogicException if it contains circular reference');
+        } catch (\Exception $e) {
+            $this->assertInstanceOf('\LogicException', $e, '->get() throws a \LogicException if it contains circular reference');
+            $this->assertStringStartsWith('Circular reference detected for service "circular"', $e->getMessage(), '->get() throws a \LogicException if it contains circular reference');
+        }
     }
 
     /**
@@ -235,6 +248,28 @@ class ContainerTest extends \PHPUnit_Framework_TestCase
 
         $this->assertFalse($container->isScopeActive('foo'));
         $this->assertFalse($container->has('a'));
+    }
+
+    public function testLeaveScopeNotActive()
+    {
+        $container = new Container();
+        $container->addScope(new Scope('foo'));
+
+        try {
+            $container->leaveScope('foo');
+            $this->fail('->leaveScope() throws a \LogicException if the scope is not active yet');
+        } catch (\Exception $e) {
+            $this->assertInstanceOf('\LogicException', $e, '->leaveScope() throws a \LogicException if the scope is not active yet');
+            $this->assertEquals('The scope "foo" is not active.', $e->getMessage(), '->leaveScope() throws a \LogicException if the scope is not active yet');
+        }
+
+        try {
+            $container->leaveScope('bar');
+            $this->fail('->leaveScope() throws a \LogicException if the scope does not exist');
+        } catch (\Exception $e) {
+            $this->assertInstanceOf('\LogicException', $e, '->leaveScope() throws a \LogicException if the scope does not exist');
+            $this->assertEquals('The scope "bar" is not active.', $e->getMessage(), '->leaveScope() throws a \LogicException if the scope does not exist');
+        }
     }
 
     /**
@@ -371,5 +406,9 @@ class ProjectServiceContainer extends Container
     protected function getFoo_BazService()
     {
         return $this->__foo_baz;
+    }
+
+    protected function getCircularService(){
+        return $this->get('circular');
     }
 }

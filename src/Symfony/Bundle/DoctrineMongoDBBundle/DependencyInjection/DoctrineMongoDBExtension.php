@@ -88,7 +88,24 @@ class DoctrineMongoDBExtension extends AbstractDoctrineExtension
         // load the connections
         $this->loadConnections($config['connections'], $container);
 
-        $this->loadDocumentManagers($config, $container);
+        // if no "document_managers" were given, setup the default manager
+        if (!isset($config['document_managers']) || !$config['document_managers']) {
+            $defaultName = $config['default_document_manager'];
+            $config['document_managers'] = array($defaultName => array(
+                'mappings'          => $config['mappings'],
+                'default_database'  => $config['default_database'],
+                'metadata_cache_driver' => $config['metadata_cache_driver'],
+            ));
+        }
+        // load the document managers
+        $this->loadDocumentManagers(
+            $config['document_managers'],
+            $config['default_document_manager'],
+            $config['default_database'],
+            $config['metadata_cache_driver'],
+            $container
+        );
+
         $this->loadConstraints($config, $container);
     }
 
@@ -101,12 +118,10 @@ class DoctrineMongoDBExtension extends AbstractDoctrineExtension
     protected function overrideParameters($options, ContainerBuilder $container)
     {
         $overrides = array(
-            'default_document_manager',
             'proxy_namespace',
             'auto_generate_proxy_classes',
             'hydrator_namespace',
             'auto_generate_hydrator_classes',
-            'default_database',
         );
 
         foreach ($overrides as $key) {
@@ -124,30 +139,39 @@ class DoctrineMongoDBExtension extends AbstractDoctrineExtension
     /**
      * Loads the document managers configuration.
      *
-     * @param array $config An array of configuration settings
+     * @param array $dmConfigs An array of document manager configs
+     * @param string $defaultDM The default document manager name
+     * @param string $defaultDB The default db name
+     * @param string $defaultMetadataCache The default metadata cache configuration
      * @param ContainerBuilder $container A ContainerBuilder instance
      */
-    protected function loadDocumentManagers(array $config, ContainerBuilder $container)
+    protected function loadDocumentManagers(array $dmConfigs, $defaultDM, $defaultDB, $defaultMetadataCache, ContainerBuilder $container)
     {
-        $documentManagers = $this->getDocumentManagers($config, $container);
-        foreach ($documentManagers as $name => $documentManager) {
+        foreach ($dmConfigs as $name => $documentManager) {
             $documentManager['name'] = $name;
-            $this->loadDocumentManager($documentManager, $container, $config['metadata_cache_driver']);
+            $this->loadDocumentManager(
+                $documentManager,
+                $defaultDM,
+                $defaultDB,
+                $defaultMetadataCache,
+                $container
+            );
         }
-        $container->setParameter('doctrine.odm.mongodb.document_managers', array_keys($documentManagers));
+        $container->setParameter('doctrine.odm.mongodb.document_managers', array_keys($dmConfigs));
     }
 
     /**
      * Loads a document manager configuration.
      *
      * @param array $documentManager        A document manager configuration array
-     * @param ContainerBuilder $container   A ContainerBuilder instance
-     * @param array $defaultMetadataCache   The default metadata cache configuration array
+     * @param string $defaultDM The default document manager name
+     * @param string $defaultDB The default db name
+     * @param string $defaultMetadataCache The default metadata cache configuration
+     * @param ContainerBuilder $container A ContainerBuilder instance
      */
-    protected function loadDocumentManager(array $documentManager, ContainerBuilder $container, $defaultMetadataCache)
+    protected function loadDocumentManager(array $documentManager, $defaultDM, $defaultDB, $defaultMetadataCache, ContainerBuilder $container)
     {
-        $defaultDocumentManager = $container->getParameter('doctrine.odm.mongodb.default_document_manager');
-        $defaultDatabase = isset($documentManager['default_database']) ? $documentManager['default_database'] : $container->getParameter('doctrine.odm.mongodb.default_database');
+        $defaultDatabase = isset($documentManager['default_database']) ? $documentManager['default_database'] : $defaultDB;
         $configServiceName = sprintf('doctrine.odm.mongodb.%s_configuration', $documentManager['name']);
 
         if ($container->hasDefinition($configServiceName)) {
@@ -200,7 +224,7 @@ class DoctrineMongoDBExtension extends AbstractDoctrineExtension
         $odmDmDef->addTag('doctrine.odm.mongodb.document_manager');
         $container->setDefinition(sprintf('doctrine.odm.mongodb.%s_document_manager', $documentManager['name']), $odmDmDef);
 
-        if ($documentManager['name'] == $defaultDocumentManager) {
+        if ($documentManager['name'] == $defaultDM) {
             $container->setAlias(
                 'doctrine.odm.mongodb.document_manager',
                 new Alias(sprintf('doctrine.odm.mongodb.%s_document_manager', $documentManager['name']))
@@ -210,30 +234,6 @@ class DoctrineMongoDBExtension extends AbstractDoctrineExtension
                 new Alias(sprintf('doctrine.odm.mongodb.%s_event_manager', $documentManager['name']))
             );
         }
-    }
-
-    /**
-     * Gets the configured document managers.
-     *
-     * @param array $config An array of configuration settings
-     * @param ContainerBuilder $container A ContainerBuilder instance
-     */
-    protected function getDocumentManagers(array $config, ContainerBuilder $container)
-    {
-        $defaultDocumentManager = $container->getParameter('doctrine.odm.mongodb.default_document_manager');
-
-        $documentManagers = array();
-
-        if (count($config['document_managers'])) {
-            $configDocumentManagers = $config['document_managers'];
-
-            foreach ($configDocumentManagers as $name => $documentManager) {
-                $documentManagers[isset($documentManager['id']) ? $documentManager['id'] : $name] = $documentManager;
-            }
-        } else {
-            $documentManagers = array($defaultDocumentManager => $config);
-        }
-        return $documentManagers;
     }
 
     /**

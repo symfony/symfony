@@ -37,14 +37,21 @@ class ZendExtension extends Extension
      */
     public function load(array $configs, ContainerBuilder $container)
     {
-        $loader = new XmlFileLoader($container, new FileLocator(__DIR__.'/../Resources/config'));
-        $loader->load('logger.xml');
-        $container->setAlias('logger', 'zend.logger');
-
+        $first = true;
         foreach ($configs as $config) {
-            if (isset($config['logger'])) {
-                $this->registerLoggerConfiguration($config, $container);
+            if (!isset($config['logger'])) {
+                continue;
             }
+
+            if ($first) {
+                $first = false;
+
+                $loader = new XmlFileLoader($container, new FileLocator(__DIR__.'/../Resources/config'));
+                $loader->load('logger.xml');
+                $container->setAlias('logger', 'zend.logger');
+            }
+
+            $this->registerLoggerConfiguration($config, $container);
         }
     }
 

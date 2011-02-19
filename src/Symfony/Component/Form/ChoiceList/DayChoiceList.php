@@ -13,12 +13,12 @@ namespace Symfony\Component\Form\ChoiceList;
 
 class DayChoiceList extends PaddedChoiceList
 {
-    public function __construct(array $days = array(), array $preferredChoices = array(), $emptyValue = '', $required = false)
+    public function __construct(array $days = array(), array $preferredChoices = array())
     {
         if (count($days) === 0) {
             $days = range(1, 31);
         }
 
-        parent::__construct($days, 2, '0', STR_PAD_LEFT, $preferredChoices, $emptyValue, $required);
+        parent::__construct($days, 2, '0', STR_PAD_LEFT, $preferredChoices);
     }
 }

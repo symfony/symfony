@@ -89,9 +89,7 @@ class EntityChoiceField extends ChoiceField
             $this->getOption('property'),
             $this->getOption('query_builder'),
             $this->getOption('choices'),
-            $this->getOption('preferred_choices'),
-            $this->getOption('empty_value'),
-            $this->isRequired()
+            $this->getOption('preferred_choices')
         );
 
         $transformers = array();

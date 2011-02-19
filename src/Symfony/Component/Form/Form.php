@@ -408,20 +408,21 @@ class Form extends Field implements \IteratorAggregate, FormInterface
             $data = array();
         }
 
+        // remember for later
+        $submittedData = $data;
+
+        // might return an array, if $data isn't one already
+        $data = $this->preprocessData($data);
+
         if (!is_array($data)) {
             throw new UnexpectedTypeException($data, 'array');
         }
-
-        // remember for later
-        $submittedData = $data;
 
         foreach ($this->fields as $key => $field) {
             if (!isset($data[$key])) {
                 $data[$key] = null;
             }
         }
-
-        $data = $this->preprocessData($data);
 
         foreach ($data as $key => $value) {
             if ($this->has($key)) {
@@ -492,7 +493,7 @@ class Form extends Field implements \IteratorAggregate, FormInterface
      * @param  array $data
      * @return array
      */
-    protected function preprocessData(array $data)
+    protected function preprocessData($data)
     {
         return $data;
     }

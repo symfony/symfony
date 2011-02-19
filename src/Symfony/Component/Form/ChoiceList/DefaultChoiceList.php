@@ -15,6 +15,8 @@ use Symfony\Component\Form\Exception\UnexpectedTypeException;
 
 class DefaultChoiceList implements ChoiceListInterface
 {
+    private $field;
+
     /**
      * Stores the preferred choices with the choices as keys
      * @var array
@@ -30,11 +32,7 @@ class DefaultChoiceList implements ChoiceListInterface
 
     private $initialized = false;
 
-    private $emptyValue;
-
-    private $required;
-
-    public function __construct($choices, array $preferredChoices = array(), $emptyValue = '', $required = false)
+    public function __construct($choices, array $preferredChoices = array())
     {
         if (!is_array($choices) && !$choices instanceof \Closure) {
             throw new UnexpectedTypeException($choices, 'array or \Closure');
@@ -42,8 +40,6 @@ class DefaultChoiceList implements ChoiceListInterface
 
         $this->choices = $choices;
         $this->preferredChoices = array_flip($preferredChoices);
-        $this->emptyValue = $emptyValue;
-        $this->required = $required;
     }
 
     /**
@@ -114,11 +110,6 @@ class DefaultChoiceList implements ChoiceListInterface
     {
         if (!$this->initialized) {
             $this->choices = $this->getInitializedChoices($this->choices);
-
-            if (!$this->required) {
-                $this->choices = array('' => $this->emptyValue) + $this->choices;
-            }
-
             $this->initialized = true;
         }
     }

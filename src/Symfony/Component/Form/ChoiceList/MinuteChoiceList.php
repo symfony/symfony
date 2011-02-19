@@ -13,12 +13,12 @@ namespace Symfony\Component\Form\ChoiceList;
 
 class MinuteChoiceList extends PaddedChoiceList
 {
-    public function __construct(array $minutes = array(), array $preferredChoices = array(), $emptyValue = '', $required = false)
+    public function __construct(array $minutes = array(), array $preferredChoices = array())
     {
         if (count($minutes) === 0) {
             $minutes = range(0, 59);
         }
 
-        parent::__construct($minutes, 2, '0', STR_PAD_LEFT, $preferredChoices, $emptyValue, $required);
+        parent::__construct($minutes, 2, '0', STR_PAD_LEFT, $preferredChoices);
     }
 }

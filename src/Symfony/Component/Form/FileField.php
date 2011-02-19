@@ -63,7 +63,7 @@ class FileField extends Form
      *
      * @see Symfony\Component\Form\Form::preprocessData()
      */
-    protected function preprocessData(array $data)
+    protected function preprocessData($data)
     {
         if ($data['file']) {
             switch ($data['file']->getError()) {

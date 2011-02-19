@@ -98,14 +98,14 @@
 {% block options %}
 {% spaceless %}
     {% for choice, label in options %}
-        {% if field.isChoiceGroup(label) %}
+        {% if choice_list.isChoiceGroup(label) %}
             <optgroup label="{{ choice }}">
                 {% for nestedChoice, nestedLabel in label %}
-                    <option value="{{ nestedChoice }}"{% if field.isChoiceSelected(nestedChoice) %} selected="selected"{% endif %}>{{ nestedLabel }}</option>
+                    <option value="{{ nestedChoice }}"{% if choice_list.isChoiceSelected(nestedChoice, field.displayedData) %} selected="selected"{% endif %}>{{ nestedLabel }}</option>
                 {% endfor %}
             </optgroup>
         {% else %}
-            <option value="{{ choice }}"{% if field.isChoiceSelected(choice) %} selected="selected"{% endif %}>{{ label }}</option>
+            <option value="{{ choice }}"{% if choice_list.isChoiceSelected(choice, field.displayedData) %} selected="selected"{% endif %}>{{ label }}</option>
         {% endif %}
     {% endfor %}
 {% endspaceless %}
@@ -116,16 +116,19 @@
     {% if field.isExpanded %}
         {% for choice, child in field %}
             {{ child.renderer.widget }}
-            <label for="{{ id }}">{{ field.label(choice) }}</label>
+            <label for="{{ id }}">{{ choice_list.label(choice) }}</label>
         {% endfor %}
     {% else %}
         <select {{ block('field_attributes') }}{% if field.isMultipleChoice %} multiple="multiple"{% endif %}>
-            {% if field.preferredChoices|length > 0 %}
-                {% set options = field.preferredChoices %}
-                {{ block('options') }}
-                <option disabled="disabled">{{ params.separator|default('-------------------') }}</option>
+            {% if not field.required %}
+                <option value="">{{ empty_value }}</option>
             {% endif %}
-            {% set options = field.otherChoices %}
+            {% if preferred_choices|length > 0 %}
+                {% set options = preferred_choices %}
+                {{ block('options') }}
+                <option disabled="disabled">{{ separator }}</option>
+            {% endif %}
+            {% set options = choices %}
             {{ block('options') }}
         </select>
     {% endif %}

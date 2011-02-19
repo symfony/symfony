@@ -21,7 +21,7 @@ class LanguageFieldTest extends \PHPUnit_Framework_TestCase
         \Locale::setDefault('de_AT');
 
         $field = new LanguageField('language');
-        $choices = $field->getOtherChoices();
+        $choices = $field->getChoiceList()->getOtherChoices();
 
         $this->assertArrayHasKey('en', $choices);
         $this->assertEquals('Englisch', $choices['en']);
@@ -38,7 +38,7 @@ class LanguageFieldTest extends \PHPUnit_Framework_TestCase
     public function testMultipleLanguagesIsNotIncluded()
     {
         $field = new LanguageField('language');
-        $choices = $field->getOtherChoices();
+        $choices = $field->getChoiceList()->getOtherChoices();
 
         $this->assertArrayNotHasKey('mul', $choices);
     }

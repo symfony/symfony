@@ -13,12 +13,12 @@ namespace Symfony\Component\Form\ChoiceList;
 
 class HourChoiceList extends PaddedChoiceList
 {
-    public function __construct(array $hours = array(), array $preferredChoices = array(), $emptyValue = '', $required = false)
+    public function __construct(array $hours = array(), array $preferredChoices = array())
     {
         if (count($hours) === 0) {
             $hours = range(0, 23);
         }
 
-        parent::__construct($hours, 2, '0', STR_PAD_LEFT, $preferredChoices, $emptyValue, $required);
+        parent::__construct($hours, 2, '0', STR_PAD_LEFT, $preferredChoices);
     }
 }

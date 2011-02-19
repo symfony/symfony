@@ -21,7 +21,7 @@ class LocaleFieldTest extends \PHPUnit_Framework_TestCase
         \Locale::setDefault('de_AT');
 
         $field = new LocaleField('language');
-        $choices = $field->getOtherChoices();
+        $choices = $field->getChoiceList()->getOtherChoices();
 
         $this->assertArrayHasKey('en', $choices);
         $this->assertEquals('Englisch', $choices['en']);

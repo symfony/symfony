@@ -74,7 +74,7 @@ class EntityChoiceList extends DefaultChoiceList
 
     private $propertyPath;
 
-    public function __construct(EntityManager $em, $class, $property = null, $queryBuilder = null, $choices = null, array $preferredChoices = array(), $emptyValue = '', $required = false)
+    public function __construct(EntityManager $em, $class, $property = null, $queryBuilder = null, $choices = null, array $preferredChoices = array())
     {
         // If a query builder was passed, it must be a closure or QueryBuilder
         // instance
@@ -102,7 +102,7 @@ class EntityChoiceList extends DefaultChoiceList
             $this->propertyPath = new PropertyPath($property);
         }
 
-        parent::__construct($choices, $preferredChoices, $emptyValue, $required);
+        parent::__construct($choices, $preferredChoices);
 
         // The entities can be passed directly in the "choices" option.
         // In this case, initializing the entity cache is a cheap operation

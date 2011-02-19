@@ -21,7 +21,7 @@ class CountryFieldTest extends \PHPUnit_Framework_TestCase
         \Locale::setDefault('de_AT');
 
         $field = new CountryField('country');
-        $choices = $field->getOtherChoices();
+        $choices = $field->getChoiceList()->getOtherChoices();
 
         $this->assertArrayHasKey('DE', $choices);
         $this->assertEquals('Deutschland', $choices['DE']);
@@ -38,7 +38,7 @@ class CountryFieldTest extends \PHPUnit_Framework_TestCase
     public function testUnknownCountryIsNotIncluded()
     {
         $field = new CountryField('country');
-        $choices = $field->getOtherChoices();
+        $choices = $field->getChoiceList()->getOtherChoices();
 
         $this->assertArrayNotHasKey('ZZ', $choices);
     }

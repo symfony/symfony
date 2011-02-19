@@ -67,7 +67,6 @@ class ChoiceField extends HybridField
         $this->addOption('preferred_choices', array());
         $this->addOption('multiple', false);
         $this->addOption('expanded', false);
-        $this->addOption('empty_value', '');
         $this->addOption('choice_list');
 
         parent::configure();
@@ -77,9 +76,7 @@ class ChoiceField extends HybridField
         } else {
             $this->choiceList = new DefaultChoiceList(
                 $this->getOption('choices'),
-                $this->getOption('preferred_choices'),
-                $this->getOption('empty_value'),
-                $this->isRequired()
+                $this->getOption('preferred_choices')
             );
         }
 
@@ -92,44 +89,10 @@ class ChoiceField extends HybridField
         }
     }
 
-    public function getName()
+    // TODO remove me again
+    public function getChoiceList()
     {
-        // TESTME
-        $name = parent::getName();
-
-        // Add "[]" to the name in case a select tag with multiple options is
-        // displayed. Otherwise only one of the selected options is sent in the
-        // POST request.
-        if ($this->isMultipleChoice() && !$this->isExpanded()) {
-            $name .= '[]';
-        }
-
-        return $name;
-    }
-
-    public function getPreferredChoices()
-    {
-        return $this->choiceList->getPreferredChoices();
-    }
-
-    public function getOtherChoices()
-    {
-        return $this->choiceList->getOtherChoices();
-    }
-
-    public function getLabel($choice)
-    {
-        return $this->choiceList->getLabel($choice);
-    }
-
-    public function isChoiceGroup($choice)
-    {
-        return $this->choiceList->isChoiceGroup($choice);
-    }
-
-    public function isChoiceSelected($choice)
-    {
-        return $this->choiceList->isChoiceSelected($choice, $this->getDisplayedData());
+        return $this->choiceList;
     }
 
     public function isMultipleChoice()

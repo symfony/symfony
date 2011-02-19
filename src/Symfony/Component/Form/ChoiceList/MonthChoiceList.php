@@ -20,7 +20,7 @@ class MonthChoiceList extends PaddedChoiceList
      * @return array          The localized months respecting the configured
      *                        locale and date format
      */
-    public function __construct(\IntlDateFormatter $formatter, array $months = array(), array $preferredChoices = array(), $emptyValue = '', $required = false)
+    public function __construct(\IntlDateFormatter $formatter, array $months = array(), array $preferredChoices = array())
     {
         if (count($months) === 0) {
             $months = range(1, 12);
@@ -40,9 +40,9 @@ class MonthChoiceList extends PaddedChoiceList
             // segmentation fault, so let's restore the old state instead
             $formatter->setPattern($pattern);
 
-            DefaultChoiceList::__construct($choices, $preferredChoices, $emptyValue, $required);
+            DefaultChoiceList::__construct($choices, $preferredChoices);
         } else {
-            parent::__construct($months, 2, '0', STR_PAD_LEFT, $preferredChoices, $emptyValue, $required);
+            parent::__construct($months, 2, '0', STR_PAD_LEFT, $preferredChoices);
         }
 
     }

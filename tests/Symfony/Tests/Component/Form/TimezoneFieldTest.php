@@ -18,7 +18,7 @@ class TimezoneFieldTest extends \PHPUnit_Framework_TestCase
     public function testTimezonesAreSelectable()
     {
         $field = new TimeZoneField('timezone');
-        $choices = $field->getOtherChoices();
+        $choices = $field->getChoiceList()->getOtherChoices();
 
         $this->assertArrayHasKey('Africa', $choices);
         $this->assertArrayHasKey('Africa/Kinshasa', $choices['Africa']);

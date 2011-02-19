@@ -22,7 +22,7 @@
     {% endif %}
 >
 {% for name, template in templates %}
-    {{ template.renderblock('toolbar', { 'collector': profiler.get(name) }) }}
+    {{ template.renderblock('toolbar', { 'collector': profiler.get(name), 'profiler_url': profiler_url }) }}
 {% endfor %}
 {% if 'normal' != position %}
     <img style="float: right; cursor: pointer; margin: 0 10px; vertical-align: middle" width="24" height="24" alt="Hide Toolbar" src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABgAAAAYCAYAAADgdz34AAAAGXRFWHRTb2Z0d2FyZQBBZG9iZSBJbWFnZVJlYWR5ccllPAAAAwBJREFUeNrUVltrGkEUPlOvuah58R6Ehr4KAd8Cgb60CaTEP1Eo9AcFCv0TCZYQ+u5bfkFaEy9LYoRCqrvRmdXtd9bZdHW1pg996MDnzM7Mnm/ON+ecVTiOQ/+yvaB/3MLe4OLiwj//Erj+S1sloOU9HBwcLPSgCJwDDd0Xn2m4BjR1X1rowXg85u4EOAyHw2Tb9iHGdWAPMFYYL0ciEVJKHWH8GXgbuAMQFIFjHqfTaYrHYzxXAup6jebAazWgHI1GaWdnh0KhMM+/AV4FCHBiAzgbjUZkGAYlEkmKxWI8XwLqQBEgDZ6rAWX2Np/PU6PRIMsyee0r8C0gEdzj7iPrjnGFSbLZLCkYNAeDkk+ukCdLPB6nTCZDzWaTBoMB6cB4v/AONAFrXQVOmaQDEjagpCTTND2SBza+vr5OuVyOOp2O3/hrfyQtIgiSjCRlsmmSILEsy42QjY0N2t7eplarRf1+f6nxGQIJAqHHDpM4VBWCTiWTtEdTuZR0F9n4d2jef4AzQiw1PusBTjjXfnsiZYWlYJK1tTW6urpaefKgB0ECr0Vdr1CzhsMhwnBCErLp/Xzh42eVigUEXlaXI4hz1v3u7o4mkwkVCgVIKtmL0qpk9N3BVF+IyndRxM85Ht0kSmxuUq/XoxFOLoRDNzdNKhby7qEGmsQhsUfCMTwbC+5A+U/uxnksFqVUMukaZ3m05j+kVJUbxH4up0lm88RYcskgEE4RUtdwzN1YNEKp1BZ1u10aPj5OjQux755QR1e7rUmUJnFEHWsgcYxAqeBNUtontlK7LFIymXI17/d/cjZfIyf2scdwIWUVB7o0Bya1kQsp7I1HUVaUKtlKfvKpMVOLUGvU8RiXmEgm6P7+3g1FpabGFdcq9VSLULdUFXOXpmW5CZfa2nKlx/4jrlUBifgldGfAcff2luxp+WbN95dEyFOe4N0KFzuOMLQv/ryY/x5wsQthfKQ3fvjDt8BPcqJL/Zm2sfSDwy+8m//8rWgeSRrozS+K//5fxS8BBgCXGQk7P2P29gAAAABJRU5ErkJggg==" onclick="this.parentNode.previousSibling.style.display = this.parentNode.style.display = 'none';" />

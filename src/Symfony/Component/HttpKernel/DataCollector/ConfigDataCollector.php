@@ -9,14 +9,13 @@
  * file that was distributed with this source code.
  */
 
-namespace Symfony\Bundle\FrameworkBundle\DataCollector;
+namespace Symfony\Component\HttpKernel\DataCollector;
 
 use Symfony\Component\HttpKernel\KernelInterface;
 use Symfony\Component\HttpKernel\Kernel;
 use Symfony\Component\HttpKernel\DataCollector\DataCollector;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
-use Symfony\Component\Routing\RouterInterface;
 
 /**
  * ConfigDataCollector.
@@ -26,18 +25,15 @@ use Symfony\Component\Routing\RouterInterface;
 class ConfigDataCollector extends DataCollector
 {
     protected $kernel;
-    protected $router;
 
     /**
      * Constructor.
      *
      * @param KernelInterface $kernel A KernelInterface instance
-     * @param RouterInterface $router A RouterInterface instance
      */
-    public function __construct(KernelInterface $kernel, RouterInterface $router = null)
+    public function __construct(KernelInterface $kernel)
     {
         $this->kernel = $kernel;
-        $this->router = $router;
     }
 
     /**
@@ -61,24 +57,6 @@ class ConfigDataCollector extends DataCollector
                 (extension_loaded('xcache') && ini_get('xcache.cacher'))
             ),
         );
-    }
-
-    /**
-     * Gets the URL.
-     *
-     * @return string The URL
-     */
-    public function getUrl()
-    {
-        if (null !== $this->router) {
-            try {
-                return $this->router->generate('_profiler', array('token' => $this->data['token']));
-            } catch (\Exception $e) {
-                // the route is not registered
-            }
-        }
-
-        return false;
     }
 
     /**

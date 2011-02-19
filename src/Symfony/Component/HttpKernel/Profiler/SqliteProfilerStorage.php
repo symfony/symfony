@@ -157,6 +157,9 @@ class SqliteProfilerStorage implements ProfilerStorageInterface
             }
 
             $res = $stmt->execute();
+            if (false === $res) {
+                throw new \RuntimeException(sprintf('Error executing SQLite query "%s"', $query));
+            }
             $res->finalize();
         } else {
             foreach ($args as $arg => $val) {

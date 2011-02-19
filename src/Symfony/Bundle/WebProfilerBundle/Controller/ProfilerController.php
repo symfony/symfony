@@ -149,10 +149,18 @@ class ProfilerController extends ContainerAware
             $position = false === strpos($this->container->get('request')->headers->get('user-agent'), 'Mobile') ? 'fixed' : 'absolute';
         }
 
+        $url = null;
+        try {
+            $url = $this->container->get('router')->generate('_profiler', array('token' => $token));
+        } catch (\Exception $e) {
+            // the profiler is not enabled
+        }
+
         return $this->container->get('templating')->renderResponse('WebProfilerBundle:Profiler:toolbar.html.twig', array(
-            'position'  => $position,
-            'profiler'  => $profiler,
-            'templates' => $this->getTemplates($profiler),
+            'position'     => $position,
+            'profiler'     => $profiler,
+            'templates'    => $this->getTemplates($profiler),
+            'profiler_url' => $url,
         ));
     }
 

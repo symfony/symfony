@@ -28,8 +28,8 @@ class GlobalVariables
     }
 
     /**
-     * Returns security context service
-     * 
+     * Returns the security context service.
+     *
      * @return Symfony\Component\Security\Core\SecurityContext|void The security context
      */
     public function getSecurity()
@@ -40,9 +40,10 @@ class GlobalVariables
     }
 
     /**
-     * Returns current user
-     * 
+     * Returns the current user.
+     *
      * @return mixed|void
+     *
      * @see Symfony\Component\Security\Core\Authentication\Token\TokenInterface::getUser()
      */
     public function getUser()
@@ -64,8 +65,8 @@ class GlobalVariables
     }
 
     /**
-     * Returns security context service
-     * 
+     * Returns the security context service.
+     *
      * @return Symfony\Component\HttpFoundation\Request|void The http request object
      */
     public function getRequest()
@@ -76,8 +77,8 @@ class GlobalVariables
     }
 
     /**
-     * Returns security context service
-     * 
+     * Returns the security context service.
+     *
      * @return Symfony\Component\HttpFoundation\Session|void The session
      */
     public function getSession()
@@ -86,28 +87,24 @@ class GlobalVariables
             return $request->getSession();
         }
     }
-    
+
     /**
-     * Returns current app environment
-     * 
-     * @return string|void The current environment string (e.g 'dev')
+     * Returns the current app environment.
+     *
+     * @return string The current environment string (e.g 'dev')
      */
     public function getEnvironment()
     {
-        if ($this->container->hasParameter('kernel.environment')) {
-            return $this->container->getParameter('kernel.environment');
-        }
+        return $this->container->getParameter('kernel.environment');
     }
-    
+
     /**
-     * Returns current app debug mode
-     * 
-     * @return boolean|void The current debug mode
+     * Returns the current app debug mode.
+     *
+     * @return Boolean The current debug mode
      */
     public function getDebug()
     {
-        if ($this->container->hasParameter('kernel.debug')) {
-            return (bool)$this->container->getParameter('kernel.debug');
-        }
+        return (bool) $this->container->getParameter('kernel.debug');
     }
 }

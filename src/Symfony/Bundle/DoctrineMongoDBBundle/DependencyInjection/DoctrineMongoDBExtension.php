@@ -74,22 +74,24 @@ class DoctrineMongoDBExtension extends AbstractDoctrineExtension
             $config['metadata_cache_driver'] = array('type' => 'array');
         }
 
-        $this->loadDefaults($config, $container);
+        // set some options as parameters and unset them
+        $config = $this->overrideParameters($config, $container);
+
+       
         $this->loadConnections($config, $container);
         $this->loadDocumentManagers($config, $container);
         $this->loadConstraints($config, $container);
     }
 
     /**
-     * Loads the default configuration.
+     * Uses some of the extension options to override DI extension parameters.
      *
-     * @param array $config An array of configuration settings
+     * @param array $options The available configuration options
      * @param ContainerBuilder $container A ContainerBuilder instance
      */
-    protected function loadDefaults(array $config, ContainerBuilder $container)
+    protected function overrideParameters($options, ContainerBuilder $container)
     {
-        // Allow these application configuration options to override the defaults
-        $options = array(
+        $overrides = array(
             'default_document_manager',
             'default_connection',
             'proxy_namespace',
@@ -98,11 +100,17 @@ class DoctrineMongoDBExtension extends AbstractDoctrineExtension
             'auto_generate_hydrator_classes',
             'default_database',
         );
-        foreach ($options as $key) {
-            if (isset($config[$key])) {
-                $container->setParameter('doctrine.odm.mongodb.'.$key, $config[$key]);
+
+        foreach ($overrides as $key) {
+            if (isset($options[$key])) {
+                $container->setParameter('doctrine.odm.mongodb.'.$key, $options[$key]);
+
+                // the option should not be used, the parameter should be referenced
+                unset($options[$key]);
             }
         }
+
+        return $options;
     }
 
     /**

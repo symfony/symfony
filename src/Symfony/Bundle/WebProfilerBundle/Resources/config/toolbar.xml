@@ -13,6 +13,7 @@
         <service id="debug.toolbar" class="%debug.toolbar.class%">
             <tag name="kernel.listener" event="core.response" method="handle" priority="-128" />
             <argument type="service" id="http_kernel" />
+            <argument type="service" id="templating.engine.twig" />
             <argument>%debug.toolbar.intercept_redirects%</argument>
         </service>
     </services>

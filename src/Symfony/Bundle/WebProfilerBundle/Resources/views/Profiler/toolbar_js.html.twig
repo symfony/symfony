@@ -1,0 +1,13 @@
+<div id="sfwdt{{ token }}" style="display: none"></div>
+<script type="text/javascript">
+    wdt = document.getElementById('sfwdt{{ token }}');
+    if (window.XMLHttpRequest) {
+        xhr = new XMLHttpRequest();
+    } else {
+        xhr = new ActiveXObject('Microsoft.XMLHTTP');
+    }
+    xhr.open('GET', '{{ url("_wdt", { "token": token }) }}', false);
+    xhr.send('');
+    wdt.innerHTML = xhr.responseText;
+    wdt.style.display = 'block';
+</script>

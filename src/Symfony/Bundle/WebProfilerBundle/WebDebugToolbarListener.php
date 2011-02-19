@@ -16,6 +16,7 @@ use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Bundle\FrameworkBundle\HttpKernel;
 use Symfony\Component\HttpKernel\HttpKernelInterface;
+use Symfony\Bundle\TwigBundle\TwigEngine;
 
 /**
  * WebDebugToolbarListener injects the Web Debug Toolbar.
@@ -30,11 +31,13 @@ use Symfony\Component\HttpKernel\HttpKernelInterface;
 class WebDebugToolbarListener
 {
     protected $kernel;
+    protected $templating;
     protected $interceptRedirects;
 
-    public function __construct(HttpKernel $kernel, $interceptRedirects = false)
+    public function __construct(HttpKernel $kernel, TwigEngine $templating, $interceptRedirects = false)
     {
         $this->kernel = $kernel;
+        $this->templating = $templating;
         $this->interceptRedirects = $interceptRedirects;
     }
 
@@ -83,7 +86,7 @@ class WebDebugToolbarListener
             $substrFunction = 'substr';
         }
 
-        $toolbar = "\n".str_replace("\n", '', $this->kernel->render('WebProfilerBundle:Profiler:toolbar', array('attributes' => array('token' => $response->headers->get('X-Debug-Token')))))."\n";
+        $toolbar = "\n".str_replace("\n", '', $this->templating->render('WebProfilerBundle:Profiler:toolbar_js.html.twig', array('token' => $response->headers->get('X-Debug-Token'))))."\n";
         $content = $response->getContent();
 
         if (false !== $pos = $posrFunction($content, '</body>')) {

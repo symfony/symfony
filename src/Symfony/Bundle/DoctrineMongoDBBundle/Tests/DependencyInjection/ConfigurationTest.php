@@ -18,6 +18,39 @@ use Symfony\Component\Config\Definition\Processor;
 
 class ConfigurationTest extends \PHPUnit_Framework_TestCase
 {
+    public function testDefaults()
+    {
+        $processor = new Processor();
+        $configuration = new Configuration();
+        $options = $processor->process($configuration->getConfigTree(), array());
+
+        $defaults = array(
+            'auto_generate_hydrator_classes'    => false,
+            'auto_generate_proxy_classes'       => false,
+            'default_document_manager'          => 'default',
+            'default_database'                  => 'default',
+            'mappings'                          => array(),
+            'document_managers'                 => array(),
+            'default_connection'                => 'default',
+            'server'                            => null,
+            'options'                           => array(),
+            'connections'                       => array(),
+            'proxy_namespace'                   => 'Proxies',
+            'hydrator_namespace'                => 'Hydrators',
+        );
+
+        foreach ($defaults as $key => $default) {
+            $this->assertTrue(array_key_exists($key, $options), sprintf('The default "%s" exists', $key));
+            $this->assertEquals($default, $options[$key]);
+
+            unset($options[$key]);
+        }
+
+        if (count($options)) {
+            $this->fail('Extra defaults were returned: '. print_r($options, true));
+        }
+    }
+
     /**
      * @dataProvider optionProvider
      * @param array $configs The source array of configuration arrays

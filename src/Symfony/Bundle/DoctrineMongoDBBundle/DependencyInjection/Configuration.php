@@ -29,10 +29,10 @@ class Configuration
         $this->addConnectionsSection($rootNode);
 
         $rootNode
-            ->scalarNode('proxy_namespace')->defaultValue(null)->end()
-            ->scalarNode('auto_generate_proxy_classes')->defaultValue(null)->end()
-            ->scalarNode('hydrator_namespace')->defaultValue(null)->end()
-            ->scalarNode('auto_generate_hydrator_classes')->defaultValue(null)->end()
+            ->scalarNode('proxy_namespace')->defaultValue('Proxies')->end()
+            ->scalarNode('auto_generate_proxy_classes')->defaultValue(false)->end()
+            ->scalarNode('hydrator_namespace')->defaultValue('Hydrators')->end()
+            ->scalarNode('auto_generate_hydrator_classes')->defaultValue(false)->end()
         ;
 
         return $treeBuilder->buildTree();

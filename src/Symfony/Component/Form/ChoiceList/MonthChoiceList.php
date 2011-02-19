@@ -20,12 +20,8 @@ class MonthChoiceList extends PaddedChoiceList
      * @return array          The localized months respecting the configured
      *                        locale and date format
      */
-    public function __construct(\IntlDateFormatter $formatter, array $months = array(), array $preferredChoices = array())
+    public function __construct(\IntlDateFormatter $formatter, array $months, array $preferredChoices = array())
     {
-        if (count($months) === 0) {
-            $months = range(1, 12);
-        }
-
         $pattern = $formatter->getPattern();
 
         if (preg_match('/M+/', $pattern, $matches)) {

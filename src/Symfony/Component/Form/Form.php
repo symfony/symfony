@@ -73,6 +73,8 @@ class Form extends Field implements \IteratorAggregate, FormInterface
 
     private $dataPreprocessor;
 
+    private $modifyByReference;
+
     /**
      * Creates a new form with the options stored in the given context
      *
@@ -130,6 +132,8 @@ class Form extends Field implements \IteratorAggregate, FormInterface
 
             $this->add(new HiddenField($fieldName, array('data' => $token)));
         }
+
+        $this->modifyByReference = $this->getOption('by_reference');
     }
 
     /**
@@ -227,7 +231,7 @@ class Form extends Field implements \IteratorAggregate, FormInterface
             $field->readProperty($data);
         }
 
-        return $field;
+        return $this;
     }
 
     /**
@@ -946,7 +950,7 @@ class Form extends Field implements \IteratorAggregate, FormInterface
         // Don't write into $objectOrArray if $objectOrArray is an object,
         // $isReference is true (see above) and the option "by_reference" is
         // true as well
-        if (!is_object($objectOrArray) || !$isReference || !$this->getOption('by_reference')) {
+        if (!is_object($objectOrArray) || !$isReference || !$this->modifyByReference) {
             parent::writeProperty($objectOrArray);
         }
     }
@@ -985,6 +989,18 @@ class Form extends Field implements \IteratorAggregate, FormInterface
     public function getDataPreprocessor()
     {
         return $this->dataPreprocessor;
+    }
+
+    public function setModifyByReference($modifyByReference)
+    {
+        $this->modifyByReference = $modifyByReference;
+
+        return $this;
+    }
+
+    public function isModifiedByReference()
+    {
+        return $this->modifyByReference;
     }
 
     /**

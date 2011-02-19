@@ -113,7 +113,13 @@
 
 {% block choice__widget %}
 {% spaceless %}
-    <select {{ block('field_attributes') }}{% if field.isMultipleChoice %} multiple="multiple"{% endif %}>
+    {% if expanded %}
+        {% for choice, child in field %}
+            {{ child.renderer.widget }}
+            {{ child.renderer.label(choice_list.label(choice)) }}
+        {% endfor %}
+    {% else %}
+    <select {{ block('field_attributes') }}{% if multiple %} multiple="multiple"{% endif %}>
         {% if not field.required %}
             <option value="">{{ empty_value }}</option>
         {% endif %}
@@ -125,17 +131,9 @@
         {% set options = choices %}
         {{ block('options') }}
     </select>
+    {% endif %}
 {% endspaceless %}
 {% endblock choice__widget %}
-
-{% block choice_expanded__widget %}
-{% spaceless %}
-    {% for choice, child in field %}
-        {{ child.renderer.widget }}
-        {{ child.renderer.label(choice_list.label(choice)) }}
-    {% endfor %}
-{% endspaceless %}
-{% endblock choice_expanded__widget %}
 
 {% block checkbox__widget %}
 {% spaceless %}
@@ -160,7 +158,7 @@
 
 {% block date__widget %}
 {% spaceless %}
-    {% if field.isField %}
+    {% if widget == 'text' %}
         {{ block('text__widget') }}
     {% else %}
         {{ date_pattern|replace({ 

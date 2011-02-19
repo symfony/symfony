@@ -13,19 +13,20 @@ namespace Symfony\Component\Form\Renderer\Plugin;
 
 use Symfony\Component\Form\Renderer\RendererInterface;
 
-class ValuePlugin implements PluginInterface
+class ParameterPlugin implements PluginInterface
 {
+    private $name;
+
     private $value;
 
-    public function __construct($value = null)
+    public function __construct($name, $value)
     {
+        $this->name = $name;
         $this->value = $value;
     }
 
     public function setUp(RendererInterface $renderer)
     {
-        if (null !== $this->value) {
-            $renderer->setParameter('value', $this->value);
-        }
+        $renderer->setParameter($this->name, $this->value);
     }
 }

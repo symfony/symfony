@@ -17,9 +17,8 @@ use Symfony\Component\Form\ValueTransformer\DateTimeToTimestampTransformer;
 use Symfony\Component\Form\ValueTransformer\ValueTransformerChain;
 use Symfony\Component\Form\ValueTransformer\DateTimeToLocalizedStringTransformer;
 use Symfony\Component\Form\ValueTransformer\DateTimeToArrayTransformer;
-use Symfony\Component\Form\ChoiceList\YearChoiceList;
+use Symfony\Component\Form\ChoiceList\PaddedChoiceList;
 use Symfony\Component\Form\ChoiceList\MonthChoiceList;
-use Symfony\Component\Form\ChoiceList\DayChoiceList;
 
 /**
  * Represents a date field.
@@ -111,9 +110,9 @@ class DateField extends HybridField
         $this->addOption('type', self::DATETIME, self::$types);
         $this->addOption('pattern');
 
-        $this->addOption('years', array());
-        $this->addOption('months', array());
-        $this->addOption('days', array());
+        $this->addOption('years', range(date('Y') - 5, date('Y') + 5));
+        $this->addOption('months', range(1, 12));
+        $this->addOption('days', range(1, 31));
 
         $this->addOption('format', self::MEDIUM, self::$formats);
         $this->addOption('data_timezone', date_default_timezone_get());
@@ -168,13 +167,13 @@ class DateField extends HybridField
             $this->setFieldMode(self::FORM);
 
             $this->add(new ChoiceField('year', array(
-                'choice_list' => new YearChoiceList($this->getOption('years')),
+                'choice_list' => new PaddedChoiceList($this->getOption('years'), 2, '0', STR_PAD_LEFT),
             )));
             $this->add(new ChoiceField('month', array(
                 'choice_list' => new MonthChoiceList($this->formatter, $this->getOption('months')),
             )));
             $this->add(new ChoiceField('day', array(
-                'choice_list' => new DayChoiceList($this->getOption('days')),
+                'choice_list' => new PaddedChoiceList($this->getOption('days'), 2, '0', STR_PAD_LEFT),
             )));
         }
     }

@@ -21,7 +21,7 @@ class Configuration
     public function getConfigTree()
     {
         $treeBuilder = new TreeBuilder();
-        $rootNode = $treeBuilder->root('doctrinemongodb', 'array');
+        $rootNode = $treeBuilder->root('doctrine_mongo_db', 'array');
 
         $this->addSingleDocumentManagerSection($rootNode);
         $this->addDocumentManagersSection($rootNode);

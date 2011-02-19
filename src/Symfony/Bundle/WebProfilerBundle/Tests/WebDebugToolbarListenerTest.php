@@ -33,7 +33,7 @@ class WebDebugToolbarListenerTest extends \PHPUnit_Framework_TestCase
 
         $response = new Response($content);
 
-        $m->invoke($listener, $request, $response);
+        $m->invoke($listener, $response);
         $this->assertEquals($expected, $response->getContent());
     }
 

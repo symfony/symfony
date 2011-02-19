@@ -130,16 +130,19 @@ class ProfilerController extends ContainerAware
      *
      * @return Response A Response instance
      */
-    public function toolbarAction($token = null, $position = null)
+    public function toolbarAction($token, $position = null)
     {
+        if (null === $token) {
+            return $this->container->get('response');
+        }
+
         $profiler = $this->container->get('profiler');
+        $profiler->disable();
 
-        if (null !== $token) {
-            $profiler = $profiler->loadFromToken($token);
+        $profiler = $profiler->loadFromToken($token);
 
-            if ($profiler->isEmpty()) {
-                return $this->container->get('response');
-            }
+        if ($profiler->isEmpty()) {
+            return $this->container->get('response');
         }
 
         if (null === $position) {

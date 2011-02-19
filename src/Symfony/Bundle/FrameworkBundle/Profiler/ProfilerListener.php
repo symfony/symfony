@@ -9,12 +9,13 @@
  * file that was distributed with this source code.
  */
 
-namespace Symfony\Component\HttpKernel\Profiler;
+namespace Symfony\Bundle\FrameworkBundle\Profiler;
 
 use Symfony\Component\EventDispatcher\EventInterface;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpKernel\HttpKernelInterface;
 use Symfony\Component\HttpFoundation\RequestMatcherInterface;
+use Symfony\Component\DependencyInjection\ContainerInterface;
 
 /**
  * ProfilerListener collects data for the current request by listening to the core.response event.
@@ -26,7 +27,7 @@ use Symfony\Component\HttpFoundation\RequestMatcherInterface;
  */
 class ProfilerListener
 {
-    protected $profiler;
+    protected $container;
     protected $exception;
     protected $onlyException;
     protected $matcher;
@@ -34,13 +35,13 @@ class ProfilerListener
     /**
      * Constructor.
      *
-     * @param Profiler                $profiler      A Profiler instance
+     * @param ContainerInterface      $container     A ContainerInterface instance
      * @param RequestMatcherInterface $matcher       A RequestMatcher instance
      * @param Boolean                 $onlyException true if the profiler only collects data when an exception occurs, false otherwise
      */
-    public function __construct(Profiler $profiler, RequestMatcherInterface $matcher = null, $onlyException = false)
+    public function __construct(ContainerInterface $container, RequestMatcherInterface $matcher = null, $onlyException = false)
     {
-        $this->profiler = $profiler;
+        $this->container = $container;
         $this->matcher = $matcher;
         $this->onlyException = $onlyException;
     }
@@ -82,7 +83,7 @@ class ProfilerListener
             return $response;
         }
 
-        $this->profiler->collect($event->get('request'), $response, $this->exception);
+        $this->container->get('profiler')->collect($event->get('request'), $response, $this->exception);
         $this->exception = null;
 
         return $response;

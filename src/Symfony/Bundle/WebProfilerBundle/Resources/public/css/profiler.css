@@ -81,6 +81,10 @@ img {
     margin-left: 45px;
 }
 
+.header a {
+    color: #fff;
+}
+
 .menu, td.menu {
     width: 240px;
 }

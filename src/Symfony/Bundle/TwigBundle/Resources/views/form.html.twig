@@ -113,37 +113,39 @@
 
 {% block choice__widget %}
 {% spaceless %}
-    {% if field.isExpanded %}
-        {% for choice, child in field %}
-            {{ child.renderer.widget }}
-            <label for="{{ id }}">{{ choice_list.label(choice) }}</label>
-        {% endfor %}
-    {% else %}
-        <select {{ block('field_attributes') }}{% if field.isMultipleChoice %} multiple="multiple"{% endif %}>
-            {% if not field.required %}
-                <option value="">{{ empty_value }}</option>
-            {% endif %}
-            {% if preferred_choices|length > 0 %}
-                {% set options = preferred_choices %}
-                {{ block('options') }}
-                <option disabled="disabled">{{ separator }}</option>
-            {% endif %}
-            {% set options = choices %}
+    <select {{ block('field_attributes') }}{% if field.isMultipleChoice %} multiple="multiple"{% endif %}>
+        {% if not field.required %}
+            <option value="">{{ empty_value }}</option>
+        {% endif %}
+        {% if preferred_choices|length > 0 %}
+            {% set options = preferred_choices %}
             {{ block('options') }}
-        </select>
-    {% endif %}
+            <option disabled="disabled">{{ separator }}</option>
+        {% endif %}
+        {% set options = choices %}
+        {{ block('options') }}
+    </select>
 {% endspaceless %}
 {% endblock choice__widget %}
 
+{% block choice_expanded__widget %}
+{% spaceless %}
+    {% for choice, child in field %}
+        {{ child.renderer.widget }}
+        {{ child.renderer.label(choice_list.label(choice)) }}
+    {% endfor %}
+{% endspaceless %}
+{% endblock choice_expanded__widget %}
+
 {% block checkbox__widget %}
 {% spaceless %}
-    <input type="checkbox" {{ block('field_attributes') }}{% if field.hasValue %} value="{{ field.value }}"{% endif %}{% if field.ischecked %} checked="checked"{% endif %} />
+    <input type="checkbox" {{ block('field_attributes') }}{% if value is defined %} value="{{ value }}"{% endif %}{% if field.data %} checked="checked"{% endif %} />
 {% endspaceless %}
 {% endblock checkbox__widget %}
 
 {% block radio__widget %}
 {% spaceless %}
-    <input type="radio" {{ block('field_attributes') }}{% if field.hasValue %} value="{{ field.value }}"{% endif %}{% if field.ischecked %} checked="checked"{% endif %} />
+    <input type="radio" {{ block('field_attributes') }}{% if value is defined %} value="{{ value }}"{% endif %}{% if field.data %} checked="checked"{% endif %} />
 {% endspaceless %}
 {% endblock radio__widget %}
 

@@ -106,7 +106,7 @@ class DoctrineMongoDBExtension extends AbstractDoctrineExtension
             $container
         );
 
-        $this->loadConstraints($config, $container);
+        $this->loadConstraints($container);
     }
 
     /**
@@ -339,7 +339,7 @@ class DoctrineMongoDBExtension extends AbstractDoctrineExtension
         $odmConfigDef->addMethodCall('setDocumentNamespaces', array($this->aliasMap));
     }
 
-    protected function loadConstraints($config, ContainerBuilder $container)
+    protected function loadConstraints(ContainerBuilder $container)
     {
         if ($container->hasParameter('validator.annotations.namespaces')) {
             $container->setParameter('validator.annotations.namespaces', array_merge(

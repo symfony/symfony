@@ -172,8 +172,8 @@
 
 {% block time__widget %}
 {% spaceless %}
-    {% if field.isField %}{% set attr = attr|merge({ 'size': 1 }) %}{% endif %}
-    {{ field.hour.renderer.widget(attr) }}:{{ field.minute.renderer.widget(attr) }}{% if field.isWithSeconds %}:{{ field.second.renderer.widget(attr) }}{% endif %}
+    {% if widget == 'text' %}{% set attr = attr|merge({ 'size': 1 }) %}{% endif %}
+    {{ field.hour.renderer.widget(attr) }}:{{ field.minute.renderer.widget(attr) }}{% if with_seconds %}:{{ field.second.renderer.widget(attr) }}{% endif %}
 {% endspaceless %}
 {% endblock time__widget %}
 

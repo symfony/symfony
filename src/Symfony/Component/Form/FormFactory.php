@@ -67,6 +67,16 @@ class FormFactory
             ->addRendererPlugin(new NamePlugin($field));
     }
 
+    public function getTextField($key, array $options = array())
+    {
+        $options = array_merge(array(
+            'max_length' => null,
+        ), $options);
+
+        return $this->getField($key, 'text')
+            ->addRendererPlugin(new ParameterPlugin('max_length', $options['max_length']));
+    }
+
     public function getCheckboxField($key, array $options = array())
     {
         $options = array_merge(array(
@@ -195,6 +205,63 @@ class FormFactory
         return $this->getChoiceFieldForList($key, $choiceList, $options);
     }
 
+    protected function getHourField($key, array $options = array())
+    {
+        $options = array_merge(array(
+            'widget' => 'choice',
+            'hours' => range(0, 23),
+            'preferred_choices' => array(),
+        ), $options);
+
+        if ($options['widget'] == 'text') {
+            return $this->getTextField($key, array('max_length' => 2));
+        } else {
+            $choiceList = new PaddedChoiceList(
+                $options['hours'], 2, '0', STR_PAD_LEFT, $options['preferred_choices']
+            );
+
+            return $this->getChoiceFieldForList($key, $choiceList, $options);
+        }
+    }
+
+    protected function getMinuteField($key, array $options = array())
+    {
+        $options = array_merge(array(
+            'widget' => 'choice',
+            'minutes' => range(0, 59),
+            'preferred_choices' => array(),
+        ), $options);
+
+        if ($options['widget'] == 'text') {
+            return $this->getTextField($key, array('max_length' => 2));
+        } else {
+            $choiceList = new PaddedChoiceList(
+                $options['minutes'], 2, '0', STR_PAD_LEFT, $options['preferred_choices']
+            );
+
+            return $this->getChoiceFieldForList($key, $choiceList, $options);
+        }
+    }
+
+    protected function getSecondField($key, array $options = array())
+    {
+        $options = array_merge(array(
+            'widget' => 'choice',
+            'seconds' => range(0, 59),
+            'preferred_choices' => array(),
+        ), $options);
+
+        if ($options['widget'] == 'text') {
+            return $this->getTextField($key, array('max_length' => 2));
+        } else {
+            $choiceList = new PaddedChoiceList(
+                $options['seconds'], 2, '0', STR_PAD_LEFT, $options['preferred_choices']
+            );
+
+            return $this->getChoiceFieldForList($key, $choiceList, $options);
+        }
+    }
+
     public function getDateField($key, array $options = array())
     {
         $options = array_merge(array(
@@ -219,8 +286,7 @@ class FormFactory
                     'time_format' => DateTimeToLocalizedStringTransformer::NONE,
                     'input_timezone' => $options['data_timezone'],
                     'output_timezone' => $options['user_timezone'],
-                )))
-                ->addRendererPlugin(new ParameterPlugin('widget', 'text'));
+                )));
         } else {
             $field = $this->getForm($key, 'date')
                 ->add($this->getYearField('year', $options))
@@ -230,7 +296,6 @@ class FormFactory
                     'input_timezone' => $options['data_timezone'],
                     'output_timezone' => $options['user_timezone'],
                 )))
-                ->addRendererPlugin(new ParameterPlugin('widget', 'choice'))
                 ->addRendererPlugin(new DatePatternPlugin($formatter))
                 // Don't modify \DateTime classes by reference, we treat
                 // them like immutable value objects
@@ -261,6 +326,72 @@ class FormFactory
                 ))
             ));
         }
+
+        $field->addRendererPlugin(new ParameterPlugin('widget', $options['widget']));
+
+        return $field;
+    }
+
+    public function getTimeField($key, array $options = array())
+    {
+        $options = array_merge(array(
+            'widget' => 'choice',
+            'type' => 'datetime',
+            'with_seconds' => false,
+            'pattern' => null,
+            'data_timezone' => date_default_timezone_get(),
+            'user_timezone' => date_default_timezone_get(),
+        ), $options);
+
+        $children = array('hour', 'minute');
+        $field = $this->getForm($key, 'time')
+            ->add($this->getHourField('hour', $options))
+            ->add($this->getMinuteField('minute', $options))
+            // Don't modify \DateTime classes by reference, we treat
+            // them like immutable value objects
+            ->setModifyByReference(false);
+
+        if ($options['with_seconds']) {
+            $children[] = 'second';
+            $field->add($this->getSecondField('second', $options));
+        }
+
+        if ($options['type'] == 'string') {
+            $field->setNormalizationTransformer(new ReversedTransformer(
+                new DateTimeToStringTransformer(array(
+                    'format' => 'H:i:s',
+                    'input_timezone' => $options['data_timezone'],
+                    'output_timezone' => $options['data_timezone'],
+                ))
+            ));
+        } else if ($options['type'] == 'timestamp') {
+            $field->setNormalizationTransformer(new ReversedTransformer(
+                new DateTimeToTimestampTransformer(array(
+                    'input_timezone' => $options['data_timezone'],
+                    'output_timezone' => $options['data_timezone'],
+                ))
+            ));
+        } else if ($options['type'] === 'raw') {
+            $field->setNormalizationTransformer(new ReversedTransformer(
+                new DateTimeToArrayTransformer(array(
+                    'input_timezone' => $options['data_timezone'],
+                    'output_timezone' => $options['data_timezone'],
+                    'fields' => $children,
+                ))
+            ));
+        }
+
+        $field
+            ->setValueTransformer(new DateTimeToArrayTransformer(array(
+                'input_timezone' => $options['data_timezone'],
+                'output_timezone' => $options['user_timezone'],
+                // if the field is rendered as choice field, the values should be trimmed
+                // of trailing zeros to render the selected choices correctly
+                'pad' => $options['widget'] === 'text',
+                'fields' => $children,
+            )))
+            ->addRendererPlugin(new ParameterPlugin('widget', $options['widget']))
+            ->addRendererPlugin(new ParameterPlugin('with_seconds', $options['with_seconds']));
 
         return $field;
     }

@@ -293,6 +293,7 @@ class ArrayNode extends BaseNode implements PrototypeNodeInterface
 
         if (null !== $this->prototype) {
             foreach ($value as $k => $v) {
+                $this->prototype->setName($k);
                 try {
                     $value[$k] = $this->prototype->finalize($v);
                 } catch (UnsetKeyException $unset) {

@@ -30,7 +30,7 @@
 
 {% block label %}
 {% spaceless %}
-    <label for="{{ field.id }}">{% trans label %}</label>
+    <label for="{{ id }}">{% trans label %}</label>
 {% endspaceless %}
 {% endblock label %}
 
@@ -44,7 +44,7 @@
 
 {% block field_attributes %}
 {% spaceless %}
-    id="{{ field.id }}" name="{{ field.name }}"{% if field.disabled %} disabled="disabled"{% endif %}{% if field.required %} required="required"{% endif %}
+    id="{{ id }}" name="{{ name }}"{% if field.disabled %} disabled="disabled"{% endif %}{% if field.required %} required="required"{% endif %}
     {{ block('attributes') }}
 {% endspaceless %}
 {% endblock field_attributes %}
@@ -85,7 +85,7 @@
 
 {% block hidden__widget %}
 {% spaceless %}
-    <input type="hidden" id="{{ field.id }}" name="{{ field.name }}"{% if field.disabled %} disabled="disabled"{% endif %} value="{{ field.displayedData }}" />
+    <input type="hidden" id="{{ id }}" name="{{ name }}"{% if field.disabled %} disabled="disabled"{% endif %} value="{{ field.displayedData }}" />
 {% endspaceless %}
 {% endblock hidden__widget %}
 
@@ -116,7 +116,7 @@
     {% if field.isExpanded %}
         {% for choice, child in field %}
             {{ child.renderer.widget }}
-            <label for="{{ child.id }}">{{ field.label(choice) }}</label>
+            <label for="{{ id }}">{{ field.label(choice) }}</label>
         {% endfor %}
     {% else %}
         <select {{ block('field_attributes') }}{% if field.isMultipleChoice %} multiple="multiple"{% endif %}>

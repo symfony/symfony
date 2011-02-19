@@ -734,7 +734,7 @@ class Form extends Field implements \IteratorAggregate, FormInterface
      */
     public function bind(Request $request, $data = null)
     {
-        if (!$this->getName()) {
+        if (!$this->getKey()) {
             throw new FormException('You cannot bind anonymous forms. Please give this form a name');
         }
 
@@ -753,6 +753,22 @@ class Form extends Field implements \IteratorAggregate, FormInterface
 
             $this->validate();
         }
+    }
+
+    /**
+     * @deprecated
+     */
+    private function getName()
+    {
+        return null === $this->getParent() ? $this->getKey() : $this->getParent()->getName().'['.$this->key.']';
+    }
+
+    /**
+     * @deprecated
+     */
+    private function getId()
+    {
+        return null === $this->getParent() ? $this->getKey() : $this->getParent()->getId().'_'.$this->key;
     }
 
     /**

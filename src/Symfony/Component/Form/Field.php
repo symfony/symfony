@@ -168,22 +168,6 @@ class Field extends Configurable implements FieldInterface
     /**
      * {@inheritDoc}
      */
-    public function getName()
-    {
-        return null === $this->parent ? $this->key : $this->parent->getName().'['.$this->key.']';
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    public function getId()
-    {
-        return null === $this->parent ? $this->key : $this->parent->getId().'_'.$this->key;
-    }
-
-    /**
-     * {@inheritDoc}
-     */
     public function setRequired($required)
     {
         $this->required = $required;

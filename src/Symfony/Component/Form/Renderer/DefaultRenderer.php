@@ -67,6 +67,14 @@ class DefaultRenderer implements RendererInterface
         $this->parameters[$name] = $value;
     }
 
+    public function getParameter($name)
+    {
+        $this->setUpPlugins();
+
+        // TODO exception handling
+        return $this->parameters[$name];
+    }
+
     public function getWidget(array $attributes = array(), array $parameters = array())
     {
         return $this->render('widget', $attributes, $parameters);

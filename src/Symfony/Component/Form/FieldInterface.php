@@ -70,27 +70,6 @@ interface FieldInterface
     function getKey();
 
     /**
-     * Returns the name of the field.
-     *
-     * @return string  When the field has no parent, the name is equal to its
-     *                 key. If the field has a parent, the name is composed of
-     *                 the parent's name and the field's key, where the field's
-     *                 key is wrapped in squared brackets
-     *                 (e.g. "parent_name[field_key]")
-     */
-    function getName();
-
-    /**
-     * Returns the ID of the field.
-     *
-     * @return string  The ID of a field is equal to its name, where all
-     *                 sequences of squared brackets are replaced by a single
-     *                 underscore (e.g. if the name is "parent_name[field_key]",
-     *                 the ID is "parent_name_field_key").
-     */
-    function getId();
-
-    /**
      * Sets the property path
      *
      * The property path determines the property or a sequence of properties

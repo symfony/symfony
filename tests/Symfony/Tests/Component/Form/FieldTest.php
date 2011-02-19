@@ -121,30 +121,6 @@ class FieldTest extends \PHPUnit_Framework_TestCase
         $this->assertFalse($this->field->isValid());
     }
 
-    public function testGetNameReturnsKey()
-    {
-        $this->assertEquals('title', $this->field->getName());
-    }
-
-    public function testGetNameIncludesParent()
-    {
-        $this->field->setParent($this->createMockGroupWithName('news[article]'));
-
-        $this->assertEquals('news[article][title]', $this->field->getName());
-    }
-
-    public function testGetIdReturnsKey()
-    {
-        $this->assertEquals('title', $this->field->getId());
-    }
-
-    public function testGetIdIncludesParent()
-    {
-        $this->field->setParent($this->createMockGroupWithId('news_article'));
-
-        $this->assertEquals('news_article_title', $this->field->getId());
-    }
-
     public function testIsRequiredReturnsOwnValueIfNoParent()
     {
         $this->field->setRequired(true);

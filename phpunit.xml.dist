@@ -24,8 +24,6 @@
             <exclude>
                 <directory>./src/Symfony/Bundle/*/Resources</directory>
                 <directory>./src/Symfony/Component/*/Resources</directory>
-                <file>./src/Symfony/Component/HttpKernel/bootstrap.php</file>
-                <file>./src/Symfony/Component/HttpKernel/bootstrap_cache.php</file>
             </exclude>
         </whitelist>
     </filter>

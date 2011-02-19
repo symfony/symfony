@@ -15,6 +15,7 @@ use Symfony\Component\Form\ValueTransformer\ValueTransformerInterface;
 use Symfony\Component\Form\ValueTransformer\TransformationFailedException;
 use Symfony\Component\Form\DataProcessor\DataProcessorInterface;
 use Symfony\Component\Form\Renderer\RendererInterface;
+use Symfony\Component\Form\Renderer\Plugin\PluginInterface;
 
 /**
  * Base class for form fields
@@ -417,6 +418,8 @@ class Field extends Configurable implements FieldInterface
     protected function setNormalizationTransformer(ValueTransformerInterface $normalizationTransformer)
     {
         $this->normalizationTransformer = $normalizationTransformer;
+
+        return $this;
     }
 
     /**
@@ -437,6 +440,8 @@ class Field extends Configurable implements FieldInterface
     protected function setValueTransformer(ValueTransformerInterface $valueTransformer)
     {
         $this->valueTransformer = $valueTransformer;
+
+        return $this;
     }
 
     /**
@@ -457,6 +462,8 @@ class Field extends Configurable implements FieldInterface
     protected function setDataProcessor(DataProcessorInterface $dataProcessor)
     {
         $this->dataProcessor = $dataProcessor;
+
+        return $this;
     }
 
     /**
@@ -477,6 +484,8 @@ class Field extends Configurable implements FieldInterface
     public function setRenderer(RendererInterface $renderer)
     {
         $this->renderer = $renderer;
+
+        return $this;
     }
 
     /**
@@ -487,6 +496,13 @@ class Field extends Configurable implements FieldInterface
     public function getRenderer()
     {
         return $this->renderer;
+    }
+
+    public function addRendererPlugin(PluginInterface $plugin)
+    {
+        $this->renderer->addPlugin($plugin);
+
+        return $this;
     }
 
     /**

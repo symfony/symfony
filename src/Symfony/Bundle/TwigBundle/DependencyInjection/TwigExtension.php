@@ -11,23 +11,68 @@
 
 namespace Symfony\Bundle\TwigBundle\DependencyInjection;
 
-use Symfony\Component\HttpKernel\DependencyInjection\Extension;
-use Symfony\Component\DependencyInjection\Loader\XmlFileLoader;
+use Symfony\Component\Config\FileLocator;
+use Symfony\Component\Config\Definition\Processor;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\DependencyInjection\Reference;
-use Symfony\Component\Config\FileLocator;
+use Symfony\Component\DependencyInjection\Loader\XmlFileLoader;
+use Symfony\Component\HttpKernel\DependencyInjection\Extension;
 
 /**
  * TwigExtension.
  *
  * @author Fabien Potencier <fabien.potencier@symfony-project.com>
+ * @author Jeremy Mikola <jmikola@gmail.com>
  */
 class TwigExtension extends Extension
 {
+    /**
+     * Responds to the twig configuration parameter.
+     *
+     * @param array            $configs
+     * @param ContainerBuilder $container
+     */
     public function load(array $configs, ContainerBuilder $container)
     {
         $loader = new XmlFileLoader($container, new FileLocator(__DIR__.'/../Resources/config'));
         $loader->load('twig.xml');
+
+        $processor = new Processor();
+        $configuration = new Configuration();
+
+        $config = $processor->process($configuration->getConfigTree(), $configs);
+
+        $container->setParameter('twig.form.resources', $config['form']['resources']);
+
+        if (!empty($config['globals'])) {
+            $def = $container->getDefinition('twig');
+            foreach ($config['globals'] as $key => $global) {
+                if (isset($global['type']) && 'service' === $global['type']) {
+                    $def->addMethodCall('addGlobal', array($key, new Reference($global['id'])));
+                } else {
+                    $def->addMethodCall('addGlobal', array($key, $global['value']));
+                }
+            }
+        }
+
+        if (!empty($config['extensions'])) {
+            foreach ($config['extensions'] as $id) {
+                $container->getDefinition($id)->addTag('twig.extension');
+            }
+        }
+
+        if (!empty($config['cache_warmer'])) {
+            $container->getDefinition('templating.cache_warmer.templates_cache')->addTag('kernel.cache_warmer');
+        }
+
+        unset(
+            $config['form'],
+            $config['globals'],
+            $config['extensions'],
+            $config['cache_warmer']
+        );
+
+        $container->setParameter('twig.options', $config);
 
         $this->addClassesToCompile(array(
             'Twig_Environment',
@@ -41,83 +86,6 @@ class TwigExtension extends Extension
             'Twig_TemplateInterface',
             'Twig_Template',
         ));
-
-        foreach ($configs as $config) {
-            $this->doConfigLoad($config, $container);
-        }
-    }
-
-    /**
-     * Loads the Twig configuration.
-     *
-     * @param array            $config    An array of configuration settings
-     * @param ContainerBuilder $container A ContainerBuilder instance
-     */
-    protected function doConfigLoad(array $config, ContainerBuilder $container)
-    {
-        // form resources
-        foreach (array('resources', 'resource') as $key) {
-            if (isset($config['form'][$key])) {
-                $resources = (array) $config['form'][$key];
-                $container->setParameter('twig.form.resources', array_merge($container->getParameter('twig.form.resources'), $resources));
-                unset($config['form'][$key]);
-            }
-        }
-
-        // globals
-        $def = $container->getDefinition('twig');
-        $globals = $this->normalizeConfig($config, 'global');
-        if (isset($globals[0])) {
-            foreach ($globals as $global) {
-                if (isset($global['type']) && 'service' === $global['type']) {
-                    $def->addMethodCall('addGlobal', array($global['key'], new Reference($global['id'])));
-                } elseif (isset($global['value'])) {
-                    $def->addMethodCall('addGlobal', array($global['key'], $global['value']));
-                } else {
-                    throw new \InvalidArgumentException(sprintf('Unable to understand global configuration (%s).', var_export($global, true)));
-                }
-            }
-        } else {
-            foreach ($globals as $key => $value) {
-                if (is_string($value) && '@' === substr($value, 0, 1)) {
-                    $def->addMethodCall('addGlobal', array($key, new Reference(substr($value, 1))));
-                } else {
-                    $def->addMethodCall('addGlobal', array($key, $value));
-                }
-            }
-        }
-        unset($config['globals'], $config['global']);
-
-        // extensions
-        $extensions = $this->normalizeConfig($config, 'extension');
-        if (isset($extensions[0]) && is_array($extensions[0])) {
-            foreach ($extensions as $extension) {
-                $container->getDefinition($extension['id'])->addTag('twig.extension');
-            }
-        } else {
-            foreach ($extensions as $id) {
-                $container->getDefinition($id)->addTag('twig.extension');
-            }
-        }
-        unset($config['extensions'], $config['extension']);
-
-        // convert - to _
-        foreach ($config as $key => $value) {
-            if (false !== strpos($key, '-')) {
-                unset($config[$key]);
-                $config[str_replace('-', '_', $key)] = $value;
-            }
-        }
-
-        if (isset($config['cache-warmer'])) {
-            $config['cache_warmer'] = $config['cache-warmer'];
-        }
-
-        if (isset($config['cache_warmer']) && $config['cache_warmer']) {
-            $container->getDefinition('templating.cache_warmer.templates_cache')->addTag('kernel.cache_warmer');
-        }
-
-        $container->setParameter('twig.options', array_replace($container->getParameter('twig.options'), $config));
     }
 
     /**

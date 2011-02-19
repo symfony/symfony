@@ -77,8 +77,17 @@ class DoctrineMongoDBExtension extends AbstractDoctrineExtension
         // set some options as parameters and unset them
         $config = $this->overrideParameters($config, $container);
 
-       
-        $this->loadConnections($config, $container);
+        // if no "connections" were given, setup the default connection
+        if (!isset($config['connections']) || !$config['connections']) {
+            $defaultName = $config['default_connection'];
+            $config['connections'] = array($defaultName => array(
+                'server'    => $config['server'],
+                'options'   => $config['options'],
+            ));
+        }
+        // load the connections
+        $this->loadConnections($config['connections'], $container);
+
         $this->loadDocumentManagers($config, $container);
         $this->loadConstraints($config, $container);
     }
@@ -93,7 +102,6 @@ class DoctrineMongoDBExtension extends AbstractDoctrineExtension
     {
         $overrides = array(
             'default_document_manager',
-            'default_connection',
             'proxy_namespace',
             'auto_generate_proxy_classes',
             'hydrator_namespace',
@@ -260,12 +268,11 @@ class DoctrineMongoDBExtension extends AbstractDoctrineExtension
     /**
      * Loads the configured connections.
      *
-     * @param array $config An array of configuration settings
+     * @param array $config An array of connections configurations
      * @param ContainerBuilder $container A ContainerBuilder instance
      */
-    protected function loadConnections(array $config, ContainerBuilder $container)
+    protected function loadConnections(array $connections, ContainerBuilder $container)
     {
-        $connections = $this->getConnections($config, $container);
         foreach ($connections as $name => $connection) {
             $odmConnArgs = array(
                 isset($connection['server']) ? $connection['server'] : null,
@@ -275,28 +282,6 @@ class DoctrineMongoDBExtension extends AbstractDoctrineExtension
             $odmConnDef = new Definition('%doctrine.odm.mongodb.connection_class%', $odmConnArgs);
             $container->setDefinition(sprintf('doctrine.odm.mongodb.%s_connection', $name), $odmConnDef);
         }
-    }
-
-    /**
-     * Gets the configured connections.
-     *
-     * @param array $config An array of configuration settings
-     * @param ContainerBuilder $container A ContainerBuilder instance
-     */
-    protected function getConnections(array $config, ContainerBuilder $container)
-    {
-        $defaultConnection = $container->getParameter('doctrine.odm.mongodb.default_connection');
-
-        $connections = array();
-        if (count($config['connections'])) {
-            $configConnections = $config['connections'];
-            foreach ($configConnections as $name => $connection) {
-                $connections[isset($connection['id']) ? $connection['id'] : $name] = $connection;
-            }
-        } else {
-            $connections = array($defaultConnection => $config);
-        }
-        return $connections;
     }
 
     /**

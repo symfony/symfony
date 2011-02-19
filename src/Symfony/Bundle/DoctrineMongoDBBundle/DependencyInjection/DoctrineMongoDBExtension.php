@@ -208,14 +208,6 @@ class DoctrineMongoDBExtension extends AbstractDoctrineExtension
         if (count($config['document_managers'])) {
             $configDocumentManagers = $config['document_managers'];
 
-            if (isset($config['document_managers']['document-manager'])) {
-                $config['document_managers']['document_manager'] = $config['document_managers']['document-manager'];
-            }
-
-            if (isset($config['document_managers']['document_manager']) && isset($config['document_managers']['document_manager'][0])) {
-                // Multiple document managers
-                $configDocumentManagers = $config['document_managers']['document_manager'];
-            }
             foreach ($configDocumentManagers as $name => $documentManager) {
                 $documentManagers[isset($documentManager['id']) ? $documentManager['id'] : $name] = $documentManager;
             }
@@ -287,10 +279,6 @@ class DoctrineMongoDBExtension extends AbstractDoctrineExtension
         $connections = array();
         if (count($config['connections'])) {
             $configConnections = $config['connections'];
-            if (isset($config['connections']['connection']) && isset($config['connections']['connection'][0])) {
-                // Multiple connections
-                $configConnections = $config['connections']['connection'];
-            }
             foreach ($configConnections as $name => $connection) {
                 $connections[isset($connection['id']) ? $connection['id'] : $name] = $connection;
             }

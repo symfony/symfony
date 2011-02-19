@@ -24,6 +24,7 @@ class NodeBuilder
     public $name;
     public $type;
     public $key;
+    public $removeKeyItem;
     public $parent;
     public $children;
     public $prototype;
@@ -42,6 +43,7 @@ class NodeBuilder
     public $trueEquivalent;
     public $falseEquivalent;
     public $performDeepMerging;
+    public $ignoreExtraKeys;
 
     /**
      * Constructor
@@ -97,6 +99,29 @@ class NodeBuilder
         $node = new static($name, $type, $this);
 
         return $this->children[$name] = $node;
+    }
+
+    /**
+     * Add a NodeBuilder instance directly.
+     *
+     * This helps achieve a fluid interface when a method on your Configuration
+     * class returns a pre-build NodeBuilder instance on your behalf:
+     *
+     *     $root = new NodeBuilder();
+     *         ->node('foo', 'scalar')
+     *         ->addNodeBuilder($this->getBarNodeBuilder())
+     *         ->node('baz', 'scalar')
+     *     ;
+     *
+     * @return Symfony\Component\DependencyInjection\Configuration\Builder\NodeBuilder This builder node
+     */
+    public function builder(NodeBuilder $node)
+    {
+        $node->parent = $this;
+
+        $this->children[$node->name] = $node;
+
+        return $this;
     }
 
     /**
@@ -314,13 +339,33 @@ class NodeBuilder
     /**
      * Sets an attribute to use as key.
      *
-     * @param string $name
+     * This is useful when you have an indexed array that should be an
+     * associative array. You can select an item from within the array
+     * to be the key of the particular item. For example, if "id" is the
+     * "key", then:
+     *
+     *     array(
+     *         array('id' => 'my_name', 'foo' => 'bar'),
+     *     )
+     *
+     * becomes
+     *
+     *     array(
+     *         'id' => array('foo' => 'bar'),
+     *     )
+     *
+     * If you'd like "'id' => 'my_name'" to still be present in the resulting
+     * array, then you can set the second argument of this method to false.
+     *
+     * @param string $name The name of the key
+     * @param Boolean $removeKeyItem Whether or not the key item should be removed.
      *
      * @return Symfony\Component\Config\Definition\Builder\NodeBuilder
      */
-    public function useAttributeAsKey($name)
+    public function useAttributeAsKey($name, $removeKeyItem = true)
     {
         $this->key = $name;
+        $this->removeKeyItem = $removeKeyItem;
 
         return $this;
     }
@@ -439,5 +484,22 @@ class NodeBuilder
     public function end()
     {
         return $this->parent;
+    }
+
+    /**
+     * Allows extra config keys to be specified under an array without
+     * throwing an exception.
+     *
+     * Those config values are simply ignored. This should be used only
+     * in special cases where you want to send an entire configuration
+     * array through a special tree that processes only part of the array.
+     *
+     * @return Symfony\Component\Config\Definition\Builder\NodeBuilder
+     */
+    public function ignoreExtraKeys()
+    {
+        $this->ignoreExtraKeys = true;
+
+        return $this;
     }
 }

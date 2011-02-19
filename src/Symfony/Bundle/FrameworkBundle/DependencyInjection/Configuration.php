@@ -195,6 +195,7 @@ class Configuration
                     ->ifTrue(function($v) { return is_array($v) && !empty($v['annotations']) && !empty($v['namespace']); })
                     ->then(function($v){
                         $v['annotations'] = array('namespace' => $v['namespace']);
+                        unset($v['namespace']);
                         return $v;
                     })
                     ->end()

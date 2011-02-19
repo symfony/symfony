@@ -39,7 +39,7 @@ class SwiftmailerExtensionTest extends TestCase
         $container = new ContainerBuilder();
         $loader = new SwiftmailerExtension();
 
-        $loader->load(array(array('spool' => array ('enabled' => true))), $container);
+        $loader->load(array(array('spool' => array())), $container);
         $this->assertEquals('swiftmailer.transport.spool', (string) $container->getAlias('swiftmailer.transport'));
         $this->assertEquals('swiftmailer.transport.smtp', (string) $container->getAlias('swiftmailer.transport.real'));
     }

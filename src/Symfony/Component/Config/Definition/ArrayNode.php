@@ -28,12 +28,14 @@ class ArrayNode extends BaseNode implements PrototypeNodeInterface
     protected $children;
     protected $prototype;
     protected $keyAttribute;
+    protected $removeKeyAttribute;
     protected $allowFalse;
     protected $allowNewKeys;
     protected $addIfNotSet;
     protected $minNumberOfElements;
     protected $performDeepMerging;
     protected $defaultValue;
+    protected $ignoreExtraKeys;
 
     /**
      * Constructor.
@@ -47,6 +49,7 @@ class ArrayNode extends BaseNode implements PrototypeNodeInterface
 
         $this->children = array();
         $this->xmlRemappings = array();
+        $this->removeKeyAttribute = true;
         $this->allowFalse = false;
         $this->addIfNotSet = false;
         $this->allowNewKeys = true;
@@ -83,12 +86,25 @@ class ArrayNode extends BaseNode implements PrototypeNodeInterface
      * This is only relevant for XML configurations, and only in combination
      * with a prototype based node.
      *
-     * @param string $attribute
+     * For example, if "id" is the keyAttribute, then:
+     *
+     *     array('id' => 'my_name', 'foo' => 'bar')
+     *
+     * becomes
+     *
+     *     'id' => array('foo' => 'bar')
+     *
+     * If $remove is false, the resulting array will still have the
+     * "'id' => 'my_name'" item in it.
+     *
+     * @param string $attribute The name of the attribute to use as a key
+     * @param Boolean $remove Whether or not to remove the key
      * @return void
      */
-    public function setKeyAttribute($attribute)
+    public function setKeyAttribute($attribute, $remove = true)
     {
         $this->keyAttribute = $attribute;
+        $this->removeKeyAttribute = $remove;
     }
 
     /**
@@ -129,11 +145,21 @@ class ArrayNode extends BaseNode implements PrototypeNodeInterface
     /**
      * Sets if deep merging should occur.
      *
-     * @param boolean $boolean
+     * @param Boolean $boolean
      */
     public function setPerformDeepMerging($boolean)
     {
         $this->performDeepMerging = (Boolean) $boolean;
+    }
+
+    /**
+     * Whether extra keys should just be ignore without an exception.
+     *
+     * @param Boolean $boolean To allow extra keys
+     */
+    public function setIgnoreExtraKeys($boolean)
+    {
+        $this->ignoreExtraKeys = (Boolean) $boolean;
     }
 
     /**
@@ -348,6 +374,7 @@ class ArrayNode extends BaseNode implements PrototypeNodeInterface
             }
 
             $value[$plural] = Extension::normalizeConfig($value, $singular, $plural);
+            unset($value[$singular]);
         }
 
         if (null !== $this->prototype) {
@@ -362,6 +389,11 @@ class ArrayNode extends BaseNode implements PrototypeNodeInterface
                         ));
                     } else if (isset($v[$this->keyAttribute])) {
                         $k = $v[$this->keyAttribute];
+
+                        // remove the key attribute if configured to
+                        if ($this->removeKeyAttribute) {
+                            unset($v[$this->keyAttribute]);
+                        }
                     }
 
                     if (array_key_exists($k, $normalized)) {
@@ -391,6 +423,14 @@ class ArrayNode extends BaseNode implements PrototypeNodeInterface
             }
 
             $normalized[$name] = $child->normalize($value[$name]);
+            unset($value[$name]);
+        }
+
+        // if extra fields are present, throw exception
+        if (count($value) && !$this->ignoreExtraKeys) {
+            $msg = sprintf('Unrecognized options "%s" under "%s"', implode(', ', array_keys($value)), $this->getPath());
+
+            throw new InvalidConfigurationException($msg);
         }
 
         return $normalized;

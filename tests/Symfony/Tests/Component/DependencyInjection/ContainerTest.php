@@ -408,7 +408,8 @@ class ProjectServiceContainer extends Container
         return $this->__foo_baz;
     }
 
-    protected function getCircularService(){
+    protected function getCircularService()
+    {
         return $this->get('circular');
     }
 }

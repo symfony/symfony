@@ -163,6 +163,33 @@ class FormFactory
         return $this->getChoiceFieldForList($key, $choiceList, $options);
     }
 
+    public function getCountryField($key, array $options = array())
+    {
+        $options = array_merge(array(
+            'choices' => Locale::getDisplayCountries(\Locale::getDefault()),
+        ), $options);
+
+        return $this->getChoiceField($key, $options);
+    }
+
+    public function getLanguageField($key, array $options = array())
+    {
+        $options = array_merge(array(
+            'choices' => Locale::getDisplayLanguages(\Locale::getDefault()),
+        ), $options);
+
+        return $this->getChoiceField($key, $options);
+    }
+
+    public function getLocaleField($key, array $options = array())
+    {
+        $options = array_merge(array(
+            'choices' => Locale::getDisplayLocales(\Locale::getDefault()),
+        ), $options);
+
+        return $this->getChoiceField($key, $options);
+    }
+
     protected function getDayField($key, array $options = array())
     {
         $options = array_merge(array(
@@ -330,6 +357,15 @@ class FormFactory
         $field->addRendererPlugin(new ParameterPlugin('widget', $options['widget']));
 
         return $field;
+    }
+
+    public function getBirthdayField($key, array $options = array())
+    {
+        $options = array_merge(array(
+            'years' => range($currentYear-120, $currentYear),
+        ), $options);
+
+        return $this->getDateField($key, $options);
     }
 
     public function getTimeField($key, array $options = array())

@@ -64,9 +64,15 @@ class DoctrineMongoDBExtension extends AbstractDoctrineExtension
         // Load DoctrineMongoDBBundle/Resources/config/mongodb.xml
         $loader = new XmlFileLoader($container, new FileLocator(__DIR__.'/../Resources/config'));
         $loader->load('mongodb.xml');
+
         $processor = new Processor();
         $configuration = new Configuration();
         $config = $processor->process($configuration->getConfigTree(), $configs);
+
+        // can't currently default this correctly in Configuration
+        if (!isset($config['metadata_cache_driver'])) {
+            $config['metadata_cache_driver'] = array('type' => 'array');
+        }
 
         $this->loadDefaults($config, $container);
         $this->loadConnections($config, $container);
@@ -97,10 +103,6 @@ class DoctrineMongoDBExtension extends AbstractDoctrineExtension
                 $container->setParameter('doctrine.odm.mongodb.'.$key, $config[$key]);
             }
         }
-
-        if (isset($config['metadata_cache_driver'])) {
-            $container->setParameter('doctrine.odm.mongodb.metadata_cache_driver', $config['metadata_cache_driver']['type']);
-        }
     }
 
     /**
@@ -114,7 +116,7 @@ class DoctrineMongoDBExtension extends AbstractDoctrineExtension
         $documentManagers = $this->getDocumentManagers($config, $container);
         foreach ($documentManagers as $name => $documentManager) {
             $documentManager['name'] = $name;
-            $this->loadDocumentManager($documentManager, $container);
+            $this->loadDocumentManager($documentManager, $container, $config['metadata_cache_driver']);
         }
         $container->setParameter('doctrine.odm.mongodb.document_managers', array_keys($documentManagers));
     }
@@ -123,9 +125,10 @@ class DoctrineMongoDBExtension extends AbstractDoctrineExtension
      * Loads a document manager configuration.
      *
      * @param array $documentManager        A document manager configuration array
-     * @param ContainerBuilder $container A ContainerBuilder instance
+     * @param ContainerBuilder $container   A ContainerBuilder instance
+     * @param array $defaultMetadataCache   The default metadata cache configuration array
      */
-    protected function loadDocumentManager(array $documentManager, ContainerBuilder $container)
+    protected function loadDocumentManager(array $documentManager, ContainerBuilder $container, $defaultMetadataCache)
     {
         $defaultDocumentManager = $container->getParameter('doctrine.odm.mongodb.default_document_manager');
         $defaultDatabase = isset($documentManager['default_database']) ? $documentManager['default_database'] : $container->getParameter('doctrine.odm.mongodb.default_database');
@@ -139,7 +142,7 @@ class DoctrineMongoDBExtension extends AbstractDoctrineExtension
         }
 
         $this->loadDocumentManagerBundlesMappingInformation($documentManager, $odmConfigDef, $container);
-        $this->loadDocumentManagerMetadataCacheDriver($documentManager, $container);
+        $this->loadDocumentManagerMetadataCacheDriver($documentManager, $container, $defaultMetadataCache);
 
         $methods = array(
             'setMetadataCacheImpl' => new Reference(sprintf('doctrine.odm.mongodb.%s_metadata_cache', $documentManager['name'])),
@@ -220,14 +223,14 @@ class DoctrineMongoDBExtension extends AbstractDoctrineExtension
     /**
      * Loads the configured document manager metadata cache driver.
      *
-     * @param array $config        A configured document manager array
-     * @param ContainerBuilder $container A ContainerBuilder instance
+     * @param array $config                 A configured document manager array
+     * @param ContainerBuilder $container   A ContainerBuilder instance
+     * @param array $defaultMetadataCache   The default metadata cache configuration array
      */
-    protected function loadDocumentManagerMetadataCacheDriver(array $documentManager, ContainerBuilder $container)
+    protected function loadDocumentManagerMetadataCacheDriver(array $documentManager, ContainerBuilder $container, $defaultMetadataCache)
     {
-        $metadataCacheDriver = $container->getParameter('doctrine.odm.mongodb.metadata_cache_driver');
-        $dmMetadataCacheDriver = isset($documentManager['metadata_cache_driver']) ? $documentManager['metadata_cache_driver'] : $metadataCacheDriver;
-        $type = is_array($dmMetadataCacheDriver) ? $dmMetadataCacheDriver['type'] : $dmMetadataCacheDriver;
+        $dmMetadataCacheDriver = isset($documentManager['metadata_cache_driver']) ? $documentManager['metadata_cache_driver'] : $defaultMetadataCache;
+        $type = $dmMetadataCacheDriver['type'];
 
         if ('memcache' === $type) {
             $memcacheClass = isset($dmMetadataCacheDriver['class']) ? $dmMetadataCacheDriver['class'] : sprintf('%%doctrine.odm.mongodb.cache.%s_class%%', $type);

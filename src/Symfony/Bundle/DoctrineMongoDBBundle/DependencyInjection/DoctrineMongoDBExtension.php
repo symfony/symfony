@@ -20,6 +20,7 @@ use Symfony\Component\DependencyInjection\Definition;
 use Symfony\Component\Config\Resource\FileResource;
 use Symfony\Component\Config\FileLocator;
 use Symfony\Bundle\DoctrineAbstractBundle\DependencyInjection\AbstractDoctrineExtension;
+use Symfony\Component\Config\Definition\Processor;
 
 /**
  * Doctrine MongoDB ODM extension.
@@ -60,23 +61,13 @@ class DoctrineMongoDBExtension extends AbstractDoctrineExtension
      */
     public function load(array $configs, ContainerBuilder $container)
     {
-        foreach ($configs as $config) {
-            $this->doMongodbLoad($config, $container);
-        }
-    }
+        // Load DoctrineMongoDBBundle/Resources/config/mongodb.xml
+        $loader = new XmlFileLoader($container, new FileLocator(__DIR__.'/../Resources/config'));
+        $loader->load('mongodb.xml');
+        $processor = new Processor();
+        $configuration = new Configuration();
+        $config = $processor->process($configuration->getConfigTree(), $configs);
 
-    /**
-     * Loads the MongoDB ODM configuration.
-     *
-     * Usage example:
-     *
-     *     <doctrine:mongodb server="mongodb://localhost:27017" />
-     *
-     * @param array $config An array of configuration settings
-     * @param ContainerBuilder $container A ContainerBuilder instance
-     */
-    protected function doMongodbLoad($config, ContainerBuilder $container)
-    {
         $this->loadDefaults($config, $container);
         $this->loadConnections($config, $container);
         $this->loadDocumentManagers($config, $container);
@@ -91,17 +82,10 @@ class DoctrineMongoDBExtension extends AbstractDoctrineExtension
      */
     protected function loadDefaults(array $config, ContainerBuilder $container)
     {
-        if (!$container->hasDefinition('doctrine.odm.mongodb.metadata.annotation')) {
-            // Load DoctrineMongoDBBundle/Resources/config/mongodb.xml
-            $loader = new XmlFileLoader($container, new FileLocator(__DIR__.'/../Resources/config'));
-            $loader->load('mongodb.xml');
-        }
-
         // Allow these application configuration options to override the defaults
         $options = array(
             'default_document_manager',
             'default_connection',
-            'metadata_cache_driver',
             'proxy_namespace',
             'auto_generate_proxy_classes',
             'hydrator_namespace',
@@ -112,11 +96,10 @@ class DoctrineMongoDBExtension extends AbstractDoctrineExtension
             if (isset($config[$key])) {
                 $container->setParameter('doctrine.odm.mongodb.'.$key, $config[$key]);
             }
+        }
 
-            $nKey = str_replace('_', '-', $key);
-            if (isset($config[$nKey])) {
-                $container->setParameter('doctrine.odm.mongodb.'.$key, $config[$nKey]);
-            }
+        if (isset($config['metadata_cache_driver'])) {
+            $container->setParameter('doctrine.odm.mongodb.metadata_cache_driver', $config['metadata_cache_driver']['type']);
         }
     }
 
@@ -222,11 +205,7 @@ class DoctrineMongoDBExtension extends AbstractDoctrineExtension
 
         $documentManagers = array();
 
-        if (isset($config['document-managers'])) {
-            $config['document_managers'] = $config['document-managers'];
-        }
-
-        if (isset($config['document_managers'])) {
+        if (count($config['document_managers'])) {
             $configDocumentManagers = $config['document_managers'];
 
             if (isset($config['document_managers']['document-manager'])) {
@@ -255,8 +234,8 @@ class DoctrineMongoDBExtension extends AbstractDoctrineExtension
     protected function loadDocumentManagerMetadataCacheDriver(array $documentManager, ContainerBuilder $container)
     {
         $metadataCacheDriver = $container->getParameter('doctrine.odm.mongodb.metadata_cache_driver');
-        $dmMetadataCacheDriver = isset($documentManager['metadata-cache-driver']) ? $documentManager['metadata-cache-driver'] : (isset($documentManager['metadata_cache_driver']) ? $documentManager['metadata_cache_driver'] : $metadataCacheDriver);
-        $type = is_array($dmMetadataCacheDriver) && isset($dmMetadataCacheDriver['type']) ? $dmMetadataCacheDriver['type'] : $dmMetadataCacheDriver;
+        $dmMetadataCacheDriver = isset($documentManager['metadata_cache_driver']) ? $documentManager['metadata_cache_driver'] : $metadataCacheDriver;
+        $type = is_array($dmMetadataCacheDriver) ? $dmMetadataCacheDriver['type'] : $dmMetadataCacheDriver;
 
         if ('memcache' === $type) {
             $memcacheClass = isset($dmMetadataCacheDriver['class']) ? $dmMetadataCacheDriver['class'] : sprintf('%%doctrine.odm.mongodb.cache.%s_class%%', $type);
@@ -271,6 +250,7 @@ class DoctrineMongoDBExtension extends AbstractDoctrineExtension
         } else {
              $cacheDef = new Definition(sprintf('%%doctrine.odm.mongodb.cache.%s_class%%', $type));
         }
+
         $container->setDefinition(sprintf('doctrine.odm.mongodb.%s_metadata_cache', $documentManager['name']), $cacheDef);
     }
 
@@ -305,7 +285,7 @@ class DoctrineMongoDBExtension extends AbstractDoctrineExtension
         $defaultConnection = $container->getParameter('doctrine.odm.mongodb.default_connection');
 
         $connections = array();
-        if (isset($config['connections'])) {
+        if (count($config['connections'])) {
             $configConnections = $config['connections'];
             if (isset($config['connections']['connection']) && isset($config['connections']['connection'][0])) {
                 // Multiple connections

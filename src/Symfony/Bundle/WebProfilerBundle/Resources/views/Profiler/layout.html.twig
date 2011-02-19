@@ -7,7 +7,7 @@
             Symfony Profiler
         </h1>
         <div>
-            <em>{{ profiler.url }}</em> by <em>{{ profiler.ip }}</em> at <em>{{ profiler.time|date('r') }}</em>
+            <em><a href="{{ profiler.url }}">{{ profiler.url }}</a></em> by <em>{{ profiler.ip }}</em> at <em>{{ profiler.time|date('r') }}</em>
         </div>
     </div>
 

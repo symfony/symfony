@@ -161,6 +161,18 @@ class NodeBuilder
     }
 
     /**
+     * Creates a child variable node.
+     *
+     * @param string $name The name of the node
+     *
+     * @return Symfony\Component\Config\Definition\Builder\NodeBuilder The builder of the child node
+     */
+    public function variableNode($name)
+    {
+        return $this->node($name, 'variable');
+    }
+
+    /**
      * Sets the default value.
      *
      * @param mixed $value The default value

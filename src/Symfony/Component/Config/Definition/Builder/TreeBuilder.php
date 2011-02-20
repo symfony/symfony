@@ -17,6 +17,7 @@ use Symfony\Component\Config\Definition\BooleanNode;
 
 use Symfony\Component\Config\Definition\ArrayNode;
 use Symfony\Component\Config\Definition\ScalarNode;
+use Symfony\Component\Config\Definition\VariableNode;
 
 /**
  * This is the entry class for building your own config tree.
@@ -144,6 +145,49 @@ class TreeBuilder
                 $this->buildExpressions($node->validation->rules)
             );
         }
+    }
+
+    /**
+     * Creates a variable node.
+     *
+     * @param NodeBuilder $node the builder of the node
+     *
+     * @return Symfony\Component\Config\Definition\VariableNode
+     */
+    protected function createVariableConfigNode(NodeBuilder $node)
+    {
+        $configNode = new VariableNode($node->name, $node->parent);
+
+        if (null !== $node->normalization) {
+            $configNode->setNormalizationClosures(
+                $this->buildExpressions($node->normalization->before)
+            );
+        }
+
+        if (null !== $node->merge) {
+            $configNode->setAllowOverwrite($node->merge->allowOverwrite);
+        }
+
+        if (true === $node->default) {
+            $configNode->setDefaultValue($node->defaultValue);
+        }
+
+        if (false === $node->allowEmptyValue) {
+            $configNode->setAllowEmptyValue($node->allowEmptyValue);
+        }
+
+        $configNode->addEquivalentValue(null, $node->nullEquivalent);
+        $configNode->addEquivalentValue(true, $node->trueEquivalent);
+        $configNode->addEquivalentValue(false, $node->falseEquivalent);
+        $configNode->setRequired($node->required);
+
+        if (null !== $node->validation) {
+            $configNode->setFinalValidationClosures(
+                $this->buildExpressions($node->validation->rules)
+            );
+        }
+
+        return $configNode;
     }
 
     /**

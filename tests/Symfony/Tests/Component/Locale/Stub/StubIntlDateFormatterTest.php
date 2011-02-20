@@ -348,22 +348,16 @@ class StubIntlDateFormatterTest extends LocaleTestCase
         $this->assertEquals(StubIntlDateFormatter::FULL, $formatter->getDateType());
     }
 
-    /**
-     * @expectedException Symfony\Component\Locale\Exception\MethodNotImplementedException
-     */
     public function testGetErrorCode()
     {
         $formatter = new StubIntlDateFormatter('en', StubIntlDateFormatter::FULL, StubIntlDateFormatter::NONE);
-        $formatter->getErrorCode();
+        $this->assertEquals(StubIntlDateFormatter::U_ZERO_ERROR, $formatter->getErrorCode());
     }
 
-    /**
-     * @expectedException Symfony\Component\Locale\Exception\MethodNotImplementedException
-     */
     public function testGetErrorMessage()
     {
         $formatter = new StubIntlDateFormatter('en', StubIntlDateFormatter::FULL, StubIntlDateFormatter::NONE);
-        $formatter->getErrorMessage();
+        $this->assertEquals(StubIntlDateFormatter::U_ZERO_ERROR_MESSAGE, $formatter->getErrorMessage());
     }
 
     public function testGetLocale()

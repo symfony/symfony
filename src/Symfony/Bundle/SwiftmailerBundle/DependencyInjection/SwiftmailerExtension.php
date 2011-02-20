@@ -19,11 +19,11 @@ use Symfony\Component\Config\FileLocator;
 use Symfony\Component\Config\Definition\Processor;
 
 /**
- * SwiftMailerExtension is an extension for the SwiftMailer library.
+ * SwiftmailerExtension is an extension for the SwiftMailer library.
  *
  * @author Fabien Potencier <fabien.potencier@symfony-project.com>
  */
-class SwiftMailerExtension extends Extension
+class SwiftmailerExtension extends Extension
 {
     /**
      * Loads the Swift Mailer configuration.

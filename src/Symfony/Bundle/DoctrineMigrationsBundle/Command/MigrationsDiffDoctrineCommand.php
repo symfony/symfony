@@ -31,7 +31,6 @@ class MigrationsDiffDoctrineCommand extends DiffCommand
 
         $this
             ->setName('doctrine:migrations:diff')
-            ->addOption('bundle', null, InputOption::VALUE_REQUIRED, 'The bundle to load migrations configuration from.')
             ->addOption('em', null, InputOption::VALUE_OPTIONAL, 'The entity manager to use for this command.')
         ;
     }
@@ -41,7 +40,7 @@ class MigrationsDiffDoctrineCommand extends DiffCommand
         DoctrineCommand::setApplicationEntityManager($this->application, $input->getOption('em'));
 
         $configuration = $this->getMigrationConfiguration($input, $output);
-        DoctrineCommand::configureMigrationsForBundle($this->application, $input->getOption('bundle'), $configuration);
+        DoctrineCommand::configureMigrations($this->application->getKernel()->getContainer(), $configuration);
 
         parent::execute($input, $output);
     }

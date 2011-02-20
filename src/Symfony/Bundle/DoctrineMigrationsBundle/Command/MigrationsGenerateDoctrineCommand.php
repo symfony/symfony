@@ -30,7 +30,6 @@ class MigrationsGenerateDoctrineCommand extends GenerateCommand
 
         $this
             ->setName('doctrine:migrations:generate')
-            ->addOption('bundle', null, InputOption::VALUE_REQUIRED, 'The bundle to load migrations configuration from.')
             ->addOption('em', null, InputOption::VALUE_OPTIONAL, 'The entity manager to use for this command.')
         ;
     }
@@ -40,7 +39,7 @@ class MigrationsGenerateDoctrineCommand extends GenerateCommand
         DoctrineCommand::setApplicationEntityManager($this->application, $input->getOption('em'));
 
         $configuration = $this->getMigrationConfiguration($input, $output);
-        DoctrineCommand::configureMigrationsForBundle($this->application, $input->getOption('bundle'), $configuration);
+        DoctrineCommand::configureMigrations($this->application->getKernel()->getContainer(), $configuration);
 
         parent::execute($input, $output);
     }

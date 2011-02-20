@@ -11,10 +11,10 @@
 
 namespace Symfony\Bundle\DoctrineMigrationsBundle\Command;
 
+use Symfony\Component\DependencyInjection\ContainerInterface;
 use Symfony\Bundle\FrameworkBundle\Console\Application;
 use Symfony\Bundle\DoctrineBundle\Command\DoctrineCommand as BaseCommand;
 use Doctrine\DBAL\Migrations\Configuration\Configuration;
-use Doctrine\Common\Util\Inflector;
 
 /**
  * Base class for Doctrine console commands to extend from.
@@ -23,15 +23,17 @@ use Doctrine\Common\Util\Inflector;
  */
 abstract class DoctrineCommand extends BaseCommand
 {
-    public static function configureMigrationsForBundle(Application $application, $bundle, Configuration $configuration)
+    public static function configureMigrations(ContainerInterface $container, Configuration $configuration)
     {
-        $bundle = $application->getKernel()->getBundle($bundle);
-        $dir = $bundle->getPath().'/DoctrineMigrations';
+        $dir = $container->getParameter('doctrine_migrations.dir_name');
+        if (!file_exists($dir)) {
+            mkdir($dir, 0777, true);
+        }
 
-        $configuration->setMigrationsNamespace($bundle->getNamespace().'\DoctrineMigrations');
+        $configuration->setMigrationsNamespace($container->getParameter('doctrine_migrations.namespace'));
         $configuration->setMigrationsDirectory($dir);
         $configuration->registerMigrationsFromDirectory($dir);
-        $configuration->setName($bundle->getName().' Migrations');
-        $configuration->setMigrationsTableName(Inflector::tableize($bundle->getName()).'_migration_versions');
+        $configuration->setName($container->getParameter('doctrine_migrations.name'));
+        $configuration->setMigrationsTableName($container->getParameter('doctrine_migrations.table_name'));
     }
 }

@@ -125,8 +125,6 @@ class ConfigurationTest extends \PHPUnit_Framework_TestCase
             )
         );
 
-        //var_dump($options);
-
         $this->assertEquals($expected, $options);
     }
 

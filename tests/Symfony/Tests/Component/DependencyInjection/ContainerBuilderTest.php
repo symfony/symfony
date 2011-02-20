@@ -12,7 +12,7 @@
 namespace Symfony\Tests\Component\DependencyInjection;
 
 use Symfony\Component\DependencyInjection\Alias;
-
+use Symfony\Component\DependencyInjection\Compiler\CompilerPassInterface;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\DependencyInjection\ContainerInterface;
 use Symfony\Component\DependencyInjection\Definition;
@@ -202,6 +202,18 @@ class ContainerBuilderTest extends \PHPUnit_Framework_TestCase
         $aliases = $builder->getAliases();
         $this->assertTrue(isset($aliases['bar']));
         $this->assertTrue(isset($aliases['foobar']));
+    }
+
+    /**
+     * @covers Symfony\Component\DependencyInjection\ContainerBuilder::addCompilerPass
+     * @covers Symfony\Component\DependencyInjection\ContainerBuilder::getCompilerPassConfig
+     */
+    public function testAddGetCompilerPass()
+    {
+        $builder = new ContainerBuilder();
+        $builderCompilerPasses = $builder->getCompiler()->getPassConfig()->getPasses();
+        $builder->addCompilerPass($this->getMock('Symfony\Component\DependencyInjection\Compiler\CompilerPassInterface'));
+        $this->assertEquals(sizeof($builderCompilerPasses) + 1, sizeof($builder->getCompiler()->getPassConfig()->getPasses()));
     }
 
     /**

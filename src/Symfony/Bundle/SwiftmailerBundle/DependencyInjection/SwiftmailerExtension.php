@@ -121,16 +121,4 @@ class SwiftMailerExtension extends Extension
     {
         return 'http://www.symfony-project.org/schema/dic/swiftmailer';
     }
-
-    /**
-     * Returns the recommended alias to use in XML.
-     *
-     * This alias is also the mandatory prefix to use when using YAML.
-     *
-     * @return string The alias
-     */
-    public function getAlias()
-    {
-        return 'swiftmailer';
-    }
 }

@@ -82,9 +82,4 @@ class WebProfilerExtension extends Extension
     {
         return 'http://www.symfony-project.org/schema/dic/webprofiler';
     }
-
-    public function getAlias()
-    {
-        return 'web_profiler';
-    }
 }

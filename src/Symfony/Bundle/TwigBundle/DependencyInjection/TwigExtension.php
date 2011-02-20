@@ -102,9 +102,4 @@ class TwigExtension extends Extension
     {
         return 'http://www.symfony-project.org/schema/dic/twig';
     }
-
-    public function getAlias()
-    {
-        return 'twig';
-    }
 }

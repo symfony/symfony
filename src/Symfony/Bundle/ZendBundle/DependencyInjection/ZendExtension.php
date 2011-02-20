@@ -101,9 +101,4 @@ class ZendExtension extends Extension
     {
         return 'http://www.symfony-project.org/schema/dic/zend';
     }
-
-    public function getAlias()
-    {
-        return 'zend';
-    }
 }

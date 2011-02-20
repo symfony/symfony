@@ -503,9 +503,4 @@ class FrameworkExtension extends Extension
     {
         return 'http://www.symfony-project.org/schema/dic/symfony';
     }
-
-    public function getAlias()
-    {
-        return 'framework';
-    }
 }

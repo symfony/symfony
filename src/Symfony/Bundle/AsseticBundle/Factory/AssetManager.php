@@ -18,7 +18,7 @@ use Assetic\Factory\LazyAssetManager;
  *
  * @author Kris Wallsmith <kris.wallsmith@symfony-project.com>
  */
-class CachedAssetManager extends LazyAssetManager
+class AssetManager extends LazyAssetManager
 {
     protected $cacheFiles = array();
     protected $fresh = true;

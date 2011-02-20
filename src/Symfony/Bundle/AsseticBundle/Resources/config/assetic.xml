@@ -6,8 +6,8 @@
 
     <parameters>
         <parameter key="assetic.asset_factory.class">Symfony\Bundle\AsseticBundle\Factory\AssetFactory</parameter>
-        <parameter key="assetic.asset_manager.class">Symfony\Bundle\AsseticBundle\Factory\CachedAssetManager</parameter>
-        <parameter key="assetic.filter_manager.class">Symfony\Bundle\AsseticBundle\LazyFilterManager</parameter>
+        <parameter key="assetic.asset_manager.class">Symfony\Bundle\AsseticBundle\Factory\AssetManager</parameter>
+        <parameter key="assetic.filter_manager.class">Symfony\Bundle\AsseticBundle\FilterManager</parameter>
 
         <parameter key="assetic.filter.coffee.class">Assetic\Filter\CoffeeScriptFilter</parameter>
         <parameter key="assetic.filter.cssrewrite.class">Assetic\Filter\CssRewriteFilter</parameter>

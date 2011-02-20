@@ -235,7 +235,7 @@ class StubIntlDateFormatterTest extends LocaleTestCase
 
         // BC era has huge negative unix timestamp
         // so testing it requires 64bit
-        if (2147483647 > PHP_INT_MAX) {
+        if ($this->is64Bit()) {
             $formatData = array_merge($formatData, array(
                 array('G', -62167222800, 'BC'),
             ));

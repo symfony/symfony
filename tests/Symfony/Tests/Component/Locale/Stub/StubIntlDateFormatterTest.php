@@ -338,7 +338,7 @@ class StubIntlDateFormatterTest extends LocaleTestCase
 
     public function testGetCalendar()
     {
-        $formatter = new StubIntlDateFormatter('en', StubIntlDateFormatter::FULL, StubIntlDateFormatter::NONE);
+        $formatter = $this->createStubFormatter();
         $this->assertEquals(StubIntlDateFormatter::GREGORIAN, $formatter->getCalendar());
     }
 
@@ -350,19 +350,19 @@ class StubIntlDateFormatterTest extends LocaleTestCase
 
     public function testGetErrorCode()
     {
-        $formatter = new StubIntlDateFormatter('en', StubIntlDateFormatter::FULL, StubIntlDateFormatter::NONE);
+        $formatter = $this->createStubFormatter();
         $this->assertEquals(StubIntlDateFormatter::U_ZERO_ERROR, $formatter->getErrorCode());
     }
 
     public function testGetErrorMessage()
     {
-        $formatter = new StubIntlDateFormatter('en', StubIntlDateFormatter::FULL, StubIntlDateFormatter::NONE);
+        $formatter = $this->createStubFormatter();
         $this->assertEquals(StubIntlDateFormatter::U_ZERO_ERROR_MESSAGE, $formatter->getErrorMessage());
     }
 
     public function testGetLocale()
     {
-        $formatter = new StubIntlDateFormatter('en', StubIntlDateFormatter::FULL, StubIntlDateFormatter::NONE);
+        $formatter = $this->createStubFormatter();
         $this->assertEquals('en', $formatter->getLocale());
     }
 
@@ -393,7 +393,7 @@ class StubIntlDateFormatterTest extends LocaleTestCase
     public function testGetTimeZoneIdIntl($timeZoneId)
     {
         $this->skipIfIntlExtensionIsNotLoaded();
-        $formatter = new StubIntlDateFormatter('en', StubIntlDateFormatter::FULL, StubIntlDateFormatter::NONE, $timeZoneId);
+        $formatter = new StubIntlDateFormatter('en', StubIntlDateFormatter::MEDIUM, StubIntlDateFormatter::SHORT, $timeZoneId);
         $this->assertEquals($timeZoneId, $formatter->getTimeZoneId());
     }
 
@@ -410,7 +410,7 @@ class StubIntlDateFormatterTest extends LocaleTestCase
      */
     public function testIsLenient()
     {
-        $formatter = new StubIntlDateFormatter('en', StubIntlDateFormatter::FULL, StubIntlDateFormatter::NONE);
+        $formatter = $this->createStubFormatter();
         $formatter->isLenient();
     }
 
@@ -419,7 +419,7 @@ class StubIntlDateFormatterTest extends LocaleTestCase
      */
     public function testLocaltime()
     {
-        $formatter = new StubIntlDateFormatter('en', StubIntlDateFormatter::FULL, StubIntlDateFormatter::NONE);
+        $formatter = $this->createStubFormatter();
         $formatter->localtime('Wednesday, December 31, 1969 4:00:00 PM PT');
     }
 
@@ -428,7 +428,7 @@ class StubIntlDateFormatterTest extends LocaleTestCase
      */
     public function testParse()
     {
-        $formatter = new StubIntlDateFormatter('en', StubIntlDateFormatter::FULL, StubIntlDateFormatter::NONE);
+        $formatter = $this->createStubFormatter();
         $formatter->parse('Wednesday, December 31, 1969 4:00:00 PM PT');
     }
 
@@ -437,7 +437,7 @@ class StubIntlDateFormatterTest extends LocaleTestCase
      */
     public function testSetCalendar()
     {
-        $formatter = new StubIntlDateFormatter('en', StubIntlDateFormatter::FULL, StubIntlDateFormatter::NONE);
+        $formatter = $this->createStubFormatter();
         $formatter->setCalendar(StubIntlDateFormatter::GREGORIAN);
     }
 
@@ -446,20 +446,20 @@ class StubIntlDateFormatterTest extends LocaleTestCase
      */
     public function testSetLenient()
     {
-        $formatter = new StubIntlDateFormatter('en', StubIntlDateFormatter::FULL, StubIntlDateFormatter::NONE);
+        $formatter = $this->createStubFormatter();
         $formatter->setLenient(true);
     }
 
     public function testSetPattern()
     {
-        $formatter = new StubIntlDateFormatter('en', StubIntlDateFormatter::FULL, StubIntlDateFormatter::NONE);
+        $formatter = $this->createStubFormatter();
         $formatter->setPattern('yyyy-MM-dd');
         $this->assertEquals('yyyy-MM-dd', $formatter->getPattern());
     }
 
     public function testSetTimeZoneIdStub()
     {
-        $formatter = new StubIntlDateFormatter('en', StubIntlDateFormatter::FULL, StubIntlDateFormatter::NONE, 'UTC');
+        $formatter = new StubIntlDateFormatter('en', StubIntlDateFormatter::MEDIUM, StubIntlDateFormatter::SHORT, 'UTC');
         $this->assertEquals('UTC', $formatter->getTimeZoneId());
 
         $formatter->setTimeZoneId('Europe/Zurich');
@@ -469,7 +469,7 @@ class StubIntlDateFormatterTest extends LocaleTestCase
     public function testSetTimeZoneIdIntl()
     {
         $this->skipIfIntlExtensionIsNotLoaded();
-        $formatter = new \IntlDateFormatter('en', \IntlDateFormatter::FULL, \IntlDateFormatter::NONE, 'UTC');
+        $formatter = new \IntlDateFormatter('en', \IntlDateFormatter::MEDIUM, \IntlDateFormatter::SHORT, 'UTC');
         $this->assertEquals('UTC', $formatter->getTimeZoneId());
 
         $formatter->setTimeZoneId('Europe/Zurich');
@@ -478,7 +478,12 @@ class StubIntlDateFormatterTest extends LocaleTestCase
 
     public function testStaticCreate()
     {
-        $formatter = StubIntlDateFormatter::create('en', StubIntlDateFormatter::FULL, StubIntlDateFormatter::NONE);
+        $formatter = StubIntlDateFormatter::create('en', StubIntlDateFormatter::MEDIUM, StubIntlDateFormatter::SHORT);
         $this->assertInstanceOf('Symfony\Component\Locale\Stub\StubIntlDateFormatter', $formatter);
+    }
+
+    protected function createStubFormatter()
+    {
+        return new StubIntlDateFormatter('en', StubIntlDateFormatter::MEDIUM, StubIntlDateFormatter::SHORT);
     }
 }

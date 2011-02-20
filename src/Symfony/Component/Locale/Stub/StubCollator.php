@@ -17,6 +17,8 @@ use Symfony\Component\Locale\Exception\MethodArgumentValueNotImplementedExceptio
 
 /**
  * Provides a stub Collator for the 'en' locale.
+ *
+ * @author Igor Wiedler <igor@wiedler.ch>
  */
 class StubCollator
 {

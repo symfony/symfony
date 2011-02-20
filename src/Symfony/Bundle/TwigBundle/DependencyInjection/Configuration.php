@@ -78,12 +78,21 @@ class Configuration
                 ->useAttributeAsKey('key')
                 ->prototype('array')
                     ->beforeNormalization()
-                        ->ifTrue(function($v){ return is_scalar($v); })
-                        ->then(function($v){
-                            return ('@' === substr($v, 0, 1))
-                                   ? array('id' => substr($v, 1), 'type' => 'service')
-                                   : array('value' => $v);
+                        ->ifTrue(function($v){ return is_string($v) && '@' === substr($v, 0, 1); })
+                        ->then(function($v){ return array('id' => substr($v, 1), 'type' => 'service'); })
+                    ->end()
+                    ->beforeNormalization()
+                        ->ifTrue(function($v){
+                            if (is_array($v)) {
+                                $keys = array_keys($v);
+                                sort($keys);
+
+                                return $keys !== array('id', 'type') && $keys !== array('value');
+                            }
+
+                            return true;
                         })
+                        ->then(function($v){ return array('value' => $v); })
                     ->end()
                     ->scalarNode('id')->end()
                     ->scalarNode('type')
@@ -92,7 +101,7 @@ class Configuration
                             ->thenInvalid('The %s type is not supported')
                         ->end()
                     ->end()
-                    ->scalarNode('value')->end()
+                    ->variableNode('value')->end()
                 ->end()
             ->end()
         ;

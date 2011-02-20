@@ -86,6 +86,33 @@ class TwigExtensionTest extends TestCase
         $this->assertTrue($options['strict_variables'], '->load() sets the strict_variables option');
     }
 
+    public function testGlobalsWithDifferentTypesAndValues()
+    {
+        $globals = array(
+            'array'   => array(),
+            'false'   => false,
+            'float'   => 2.0,
+            'integer' => 3,
+            'null'    => null,
+            'object'  => new \stdClass(),
+            'string'  => 'foo',
+            'true'    => true,
+        );
+
+        $container = $this->createContainer();
+        $container->registerExtension(new TwigExtension());
+        $container->loadFromExtension('twig', array('globals' => $globals));
+        $this->compileContainer($container);
+
+        $calls = $container->getDefinition('twig')->getMethodCalls();
+
+        foreach ($calls as $call) {
+            list($name, $value) = each($globals);
+            $this->assertEquals($name, $call[1][0]);
+            $this->assertSame($value, $call[1][1]);
+        }
+    }
+
     public function getFormats()
     {
         return array(

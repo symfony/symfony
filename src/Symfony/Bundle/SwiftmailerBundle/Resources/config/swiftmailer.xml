@@ -7,12 +7,10 @@
   <parameters>
     <parameter key="swiftmailer.class">Swift_Mailer</parameter>
 
-    <parameter key="swiftmailer.transport.smtp.class">Swift_Transport_EsmtpTransport</parameter>
     <parameter key="swiftmailer.transport.sendmail.class">Swift_Transport_SendmailTransport</parameter>
     <parameter key="swiftmailer.transport.mail.class">Swift_Transport_MailTransport</parameter>
 
     <parameter key="swiftmailer.transport.failover.class">Swift_Transport_FailoverTransport</parameter>
-    <parameter key="swiftmailer.spool.file.class">Swift_FileSpool</parameter>
 
     <parameter key="swiftmailer.init_file">%swiftmailer.base_dir%/swift_init.php</parameter>
 
@@ -24,21 +22,6 @@
     <service id="swiftmailer.mailer" class="%swiftmailer.class%" public="false">
       <argument type="service" id="swiftmailer.transport" />
       <file>%swiftmailer.init_file%</file>
-    </service>
-
-    <service id="swiftmailer.transport.smtp" class="%swiftmailer.transport.smtp.class%" public="false">
-      <argument type="service" id="swiftmailer.transport.buffer" />
-      <argument type="collection">
-        <argument type="service" id="swiftmailer.transport.authhandler" />
-      </argument>
-      <argument type="service" id="swiftmailer.transport.eventdispatcher" />
-
-      <call method="setHost"><argument>%swiftmailer.transport.smtp.host%</argument></call>
-      <call method="setPort"><argument>%swiftmailer.transport.smtp.port%</argument></call>
-      <call method="setEncryption"><argument>%swiftmailer.transport.smtp.encryption%</argument></call>
-      <call method="setUsername"><argument>%swiftmailer.transport.smtp.username%</argument></call>
-      <call method="setPassword"><argument>%swiftmailer.transport.smtp.password%</argument></call>
-      <call method="setAuthMode"><argument>%swiftmailer.transport.smtp.auth_mode%</argument></call>
     </service>
 
     <service id="swiftmailer.transport.sendmail" class="%swiftmailer.transport.sendmail.class%" public="false">
@@ -71,17 +54,8 @@
 
     <service id="swiftmailer.transport.replacementfactory" class="Swift_StreamFilters_StringReplacementFilterFactory" public="false" />
 
-    <service id="swiftmailer.transport.spool" class="Swift_Transport_SpoolTransport" public="false">
-      <argument type="service" id="swiftmailer.transport.eventdispatcher" />
-      <argument type="service" id="swiftmailer.spool" />
-    </service>
-
     <service id="swiftmailer.transport.null" class="Swift_Transport_NullTransport" public="false">
       <argument type="service" id="swiftmailer.transport.eventdispatcher" />
-    </service>
-
-    <service id="swiftmailer.spool.file" class="%swiftmailer.spool.file.class%" public="false">
-      <argument />
     </service>
 
     <service id="swiftmailer.plugin.redirecting" class="%swiftmailer.plugin.redirecting.class%" public="false">
@@ -91,7 +65,5 @@
     <service id="swiftmailer.plugin.blackhole" class="%swiftmailer.plugin.blackhole.class%" public="false" />
 
     <service id="swiftmailer.transport" alias="swiftmailer.transport.smtp" public="false" />
-
-    <service id="swiftmailer.spool" alias="swiftmailer.spool.file" public="false" />
   </services>
 </container>

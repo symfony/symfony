@@ -63,6 +63,10 @@ class SwiftmailerExtension extends Extension
             $transport = $config['transport'];
         }
 
+        if ('smtp' === $transport) {
+            $loader->load('smtp.xml');
+        }
+
         $container->setParameter('swiftmailer.transport.name', $transport);
 
         $container->setAlias('swiftmailer.transport', 'swiftmailer.transport.'.$transport);
@@ -79,10 +83,10 @@ class SwiftmailerExtension extends Extension
         if (isset($config['spool'])) {
             $type = $config['spool']['type'];
 
+            $loader->load('spool.xml');
             $container->setAlias('swiftmailer.transport.real', 'swiftmailer.transport.'.$transport);
             $container->setAlias('swiftmailer.transport', 'swiftmailer.transport.spool');
             $container->setAlias('swiftmailer.spool', 'swiftmailer.spool.'.$type);
-            $container->getDefinition('swiftmailer.spool.file')->setArgument(0, '%swiftmailer.spool.file.path%');
 
             foreach (array('path') as $key) {
                 $container->setParameter('swiftmailer.spool.'.$type.'.'.$key, $config['spool'][$key]);

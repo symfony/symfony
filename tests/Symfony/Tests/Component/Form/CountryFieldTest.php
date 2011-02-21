@@ -14,14 +14,16 @@ namespace Symfony\Tests\Component\Form;
 use Symfony\Component\Form\CountryField;
 use Symfony\Component\Form\FormContext;
 
-class CountryFieldTest extends \PHPUnit_Framework_TestCase
+require_once __DIR__.'/TestCase.php';
+
+class CountryFieldTest extends TestCase
 {
     public function testCountriesAreSelectable()
     {
         \Locale::setDefault('de_AT');
 
-        $field = new CountryField('country');
-        $choices = $field->getChoiceList()->getOtherChoices();
+        $field = $this->factory->getCountryField('country');
+        $choices = $field->getRenderer()->getVar('choices');
 
         $this->assertArrayHasKey('DE', $choices);
         $this->assertEquals('Deutschland', $choices['DE']);
@@ -37,8 +39,8 @@ class CountryFieldTest extends \PHPUnit_Framework_TestCase
 
     public function testUnknownCountryIsNotIncluded()
     {
-        $field = new CountryField('country');
-        $choices = $field->getChoiceList()->getOtherChoices();
+        $field = $this->factory->getCountryField('country');
+        $choices = $field->getRenderer()->getVar('choices');
 
         $this->assertArrayNotHasKey('ZZ', $choices);
     }

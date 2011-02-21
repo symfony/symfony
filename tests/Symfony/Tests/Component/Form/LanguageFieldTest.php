@@ -11,17 +11,19 @@
 
 namespace Symfony\Tests\Component\Form;
 
+require_once __DIR__.'/TestCase.php';
+
 use Symfony\Component\Form\LanguageField;
 use Symfony\Component\Form\FormContext;
 
-class LanguageFieldTest extends \PHPUnit_Framework_TestCase
+class LanguageFieldTest extends TestCase
 {
     public function testCountriesAreSelectable()
     {
         \Locale::setDefault('de_AT');
 
-        $field = new LanguageField('language');
-        $choices = $field->getChoiceList()->getOtherChoices();
+        $field = $this->factory->getLanguageField('language');
+        $choices = $field->getRenderer()->getVar('choices');
 
         $this->assertArrayHasKey('en', $choices);
         $this->assertEquals('Englisch', $choices['en']);
@@ -37,8 +39,8 @@ class LanguageFieldTest extends \PHPUnit_Framework_TestCase
 
     public function testMultipleLanguagesIsNotIncluded()
     {
-        $field = new LanguageField('language');
-        $choices = $field->getChoiceList()->getOtherChoices();
+        $field = $this->factory->getLanguageField('language');
+        $choices = $field->getRenderer()->getVar('choices');
 
         $this->assertArrayNotHasKey('mul', $choices);
     }

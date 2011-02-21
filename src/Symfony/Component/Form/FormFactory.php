@@ -27,13 +27,20 @@ use Symfony\Component\Form\Renderer\Plugin\ChoicePlugin;
 use Symfony\Component\Form\Renderer\Plugin\ParentNamePlugin;
 use Symfony\Component\Form\Renderer\Plugin\DatePatternPlugin;
 use Symfony\Component\Form\Renderer\Plugin\MoneyPatternPlugin;
+use Symfony\Component\Form\Renderer\Plugin\ValuePlugin;
+use Symfony\Component\Form\Renderer\Plugin\PasswordValuePlugin;
 use Symfony\Component\Form\ValueTransformer\BooleanToStringTransformer;
 use Symfony\Component\Form\ValueTransformer\NumberToLocalizedStringTransformer;
 use Symfony\Component\Form\ValueTransformer\IntegerToLocalizedStringTransformer;
 use Symfony\Component\Form\ValueTransformer\MoneyToLocalizedStringTransformer;
 use Symfony\Component\Form\ValueTransformer\ScalarToChoicesTransformer;
 use Symfony\Component\Form\ValueTransformer\DateTimeToArrayTransformer;
+use Symfony\Component\Form\ValueTransformer\DateTimeToStringTransformer;
+use Symfony\Component\Form\ValueTransformer\DateTimeToLocalizedStringTransformer;
+use Symfony\Component\Form\ValueTransformer\DateTimeToTimestampTransformer;
+use Symfony\Component\Form\ValueTransformer\ReversedTransformer;
 use Symfony\Component\Validator\ValidatorInterface;
+use Symfony\Component\Locale\Locale;
 
 class FormFactory
 {
@@ -101,7 +108,7 @@ class FormFactory
             ->setRendererVar('class', null)
             ->setRendererVar('max_length', null)
             ->setRendererVar('size', null)
-            ->setRendererVar('label', ucfirst(strtolower(str_replace('_', ' ', $key))));
+            ->setRendererVar('label', ucfirst(strtolower(str_replace('_', ' ', $field->getKey()))));
     }
 
     protected function initForm(FormInterface $form, array $options = array())
@@ -163,13 +170,26 @@ class FormFactory
             ->setRendererVar('max_length', $options['max_length']);
     }
 
+    public function getPasswordField($key, array $options = array())
+    {
+        $options = array_merge(array(
+            'template' => 'password',
+            'always_empty' => true,
+        ), $options);
+
+        $field = $this->getTextField($key, $options);
+
+        return $field
+            ->addRendererPlugin(new PasswordValuePlugin($field, $options['always_empty']));
+    }
+
     public function getHiddenField($key, array $options = array())
     {
         $options = array_merge(array(
             'template' => 'hidden',
         ), $options);
 
-        return $this->getField($key, 'hidden', $options)
+        return $this->getField($key, $options)
             ->setHidden(true);
     }
 

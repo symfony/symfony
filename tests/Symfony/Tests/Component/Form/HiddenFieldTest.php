@@ -11,15 +11,18 @@
 
 namespace Symfony\Tests\Component\Form;
 
+require_once __DIR__.'/TestCase.php';
+
 use Symfony\Component\Form\HiddenField;
 
-class HiddenFieldTest extends \PHPUnit_Framework_TestCase
+class HiddenFieldTest extends TestCase
 {
     protected $field;
 
     protected function setUp()
     {
-        $this->field = new HiddenField('name');
+        parent::setUp();
+        $this->field = $this->factory->getHiddenField('name');
     }
 
     public function testIsHidden()

@@ -11,17 +11,19 @@
 
 namespace Symfony\Tests\Component\Form;
 
+require_once __DIR__.'/TestCase.php';
+
 use Symfony\Component\Form\LocaleField;
 use Symfony\Component\Form\FormContext;
 
-class LocaleFieldTest extends \PHPUnit_Framework_TestCase
+class LocaleFieldTest extends TestCase
 {
     public function testLocalesAreSelectable()
     {
         \Locale::setDefault('de_AT');
 
-        $field = new LocaleField('language');
-        $choices = $field->getChoiceList()->getOtherChoices();
+        $field = $this->factory->getLocaleField('language');
+        $choices = $field->getRenderer()->getVar('choices');
 
         $this->assertArrayHasKey('en', $choices);
         $this->assertEquals('Englisch', $choices['en']);

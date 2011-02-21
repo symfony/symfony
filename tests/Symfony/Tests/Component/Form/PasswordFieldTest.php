@@ -11,31 +11,41 @@
 
 namespace Symfony\Tests\Component\Form;
 
+require_once __DIR__.'/TestCase.php';
+
 use Symfony\Component\Form\PasswordField;
 
-class PasswordFieldTest extends \PHPUnit_Framework_TestCase
+class PasswordFieldTest extends TestCase
 {
-    public function testGetDisplayedData()
+    public function testGetDisplayedData_beforeSubmit()
     {
-        $field = new PasswordField('name');
+        $field = $this->factory->getPasswordField('name');
         $field->setData('before');
 
-        $this->assertSame('', $field->getDisplayedData());
-
-        $field->submit('after');
-
-        $this->assertSame('', $field->getDisplayedData());
+        $this->assertSame('', $field->getRenderer()->getVar('value'));
     }
 
-    public function testGetDisplayedDataWithAlwaysEmptyDisabled()
+    public function testGetDisplayedData_afterSubmit()
     {
-        $field = new PasswordField('name', array('always_empty' => false));
-        $field->setData('before');
-
-        $this->assertSame('', $field->getDisplayedData());
-
+        $field = $this->factory->getPasswordField('name');
         $field->submit('after');
 
-        $this->assertSame('after', $field->getDisplayedData());
+        $this->assertSame('', $field->getRenderer()->getVar('value'));
+    }
+
+    public function testGetDisplayedDataWithAlwaysEmptyDisabled_beforeSubmit()
+    {
+        $field = $this->factory->getPasswordField('name', array('always_empty' => false));
+        $field->setData('before');
+
+        $this->assertSame('', $field->getRenderer()->getVar('value'));
+    }
+
+    public function testGetDisplayedDataWithAlwaysEmptyDisabled_afterSubmit()
+    {
+        $field = $this->factory->getPasswordField('name', array('always_empty' => false));
+        $field->submit('after');
+
+        $this->assertSame('after', $field->getRenderer()->getVar('value'));
     }
 }

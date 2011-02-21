@@ -11,10 +11,14 @@
 
 namespace Symfony\Tests\Component\Form;
 
-class LocalizedTestCase extends \PHPUnit_Framework_TestCase
+require_once __DIR__ . '/TestCase.php';
+
+class LocalizedTestCase extends TestCase
 {
     protected function setUp()
     {
+        parent::setUp();
+
         if (!extension_loaded('intl')) {
             $this->markTestSkipped('The "intl" extension is not available');
         }

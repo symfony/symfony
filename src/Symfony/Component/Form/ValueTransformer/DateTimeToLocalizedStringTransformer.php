@@ -32,8 +32,8 @@ class DateTimeToLocalizedStringTransformer extends BaseDateTimeTransformer
      */
     protected function configure()
     {
-        $this->addOption('date_format', self::MEDIUM);
-        $this->addOption('time_format', self::SHORT);
+        $this->addOption('date_format', \IntlDateFormatter::MEDIUM);
+        $this->addOption('time_format', \IntlDateFormatter::SHORT);
         $this->addOption('input_timezone', 'UTC');
         $this->addOption('output_timezone', 'UTC');
 
@@ -121,8 +121,8 @@ class DateTimeToLocalizedStringTransformer extends BaseDateTimeTransformer
      */
     protected function getIntlDateFormatter()
     {
-        $dateFormat = $this->getIntlFormatConstant($this->getOption('date_format'));
-        $timeFormat = $this->getIntlFormatConstant($this->getOption('time_format'));
+        $dateFormat = $this->getOption('date_format');
+        $timeFormat = $this->getOption('time_format');
         $timezone = $this->getOption('output_timezone');
 
         return new \IntlDateFormatter(\Locale::getDefault(), $dateFormat, $timeFormat, $timezone);

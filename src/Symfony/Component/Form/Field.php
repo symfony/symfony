@@ -65,6 +65,7 @@ class Field extends Configurable implements FieldInterface
     private $propertyPath;
     private $transformationSuccessful = true;
     private $renderer;
+    private $hidden = false;
 
     public function __construct($key = null, array $options = array())
     {
@@ -209,6 +210,13 @@ class Field extends Configurable implements FieldInterface
         return false;
     }
 
+    public function setHidden($hidden)
+    {
+        $this->hidden = $hidden;
+
+        return true;
+    }
+
     /**
      * Returns true if the widget is hidden.
      *
@@ -216,7 +224,7 @@ class Field extends Configurable implements FieldInterface
      */
     public function isHidden()
     {
-        return false;
+        return $this->hidden;
     }
 
     /**

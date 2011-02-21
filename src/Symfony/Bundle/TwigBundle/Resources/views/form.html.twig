@@ -184,6 +184,13 @@
 {% endspaceless %}
 {% endblock number__widget %}
 
+{% block integer__widget %}
+{% spaceless %}
+    {% set attr = attr|merge({ 'type': 'number' }) %}
+    {{ block('text__widget') }}
+{% endspaceless %}
+{% endblock integer__widget %}
+
 {% block money__widget %}
 {% spaceless %}
     {{ money_pattern|replace({ '{{ widget }}': block('text__widget') })|raw }}

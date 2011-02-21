@@ -11,7 +11,6 @@
 
 namespace Symfony\Component\Form;
 
-use Symfony\Component\Form\ValueTransformer\BooleanToStringTransformer;
 use Symfony\Component\Form\ChoiceList\ChoiceListInterface;
 use Symfony\Component\Form\ChoiceList\DefaultChoiceList;
 use Symfony\Component\Form\ChoiceList\PaddedChoiceList;
@@ -25,6 +24,11 @@ use Symfony\Component\Form\Renderer\Plugin\ParameterPlugin;
 use Symfony\Component\Form\Renderer\Plugin\ChoicePlugin;
 use Symfony\Component\Form\Renderer\Plugin\ParentNamePlugin;
 use Symfony\Component\Form\Renderer\Plugin\DatePatternPlugin;
+use Symfony\Component\Form\Renderer\Plugin\MoneyPatternPlugin;
+use Symfony\Component\Form\ValueTransformer\BooleanToStringTransformer;
+use Symfony\Component\Form\ValueTransformer\NumberToLocalizedStringTransformer;
+use Symfony\Component\Form\ValueTransformer\IntegerToLocalizedStringTransformer;
+use Symfony\Component\Form\ValueTransformer\MoneyToLocalizedStringTransformer;
 use Symfony\Component\Form\ValueTransformer\ScalarToChoicesTransformer;
 use Symfony\Component\Form\ValueTransformer\DateTimeToArrayTransformer;
 
@@ -75,6 +79,65 @@ class FormFactory
 
         return $this->getField($key, 'text')
             ->addRendererPlugin(new ParameterPlugin('max_length', $options['max_length']));
+    }
+
+    public function getHiddenField($key, array $options = array())
+    {
+        return $this->getField($key, 'hidden')
+            ->setHidden(true);
+    }
+
+    public function getNumberField($key, array $options = array())
+    {
+        $options = array_merge(array(
+            // default precision is locale specific (usually around 3)
+            'precision' => null,
+            'grouping' => false,
+            'rounding_mode' => NumberToLocalizedStringTransformer::ROUND_HALFUP,
+        ), $options);
+
+        return $this->getField($key, 'number')
+            ->setValueTransformer(new NumberToLocalizedStringTransformer(array(
+                'precision' => $options['precision'],
+                'grouping' => $options['grouping'],
+                'rounding-mode' => $options['rounding_mode'],
+            )));
+    }
+
+    public function getIntegerField($key, array $options = array())
+    {
+        $options = array_merge(array(
+            // default precision is locale specific (usually around 3)
+            'precision' => null,
+            'grouping' => false,
+            // Integer cast rounds towards 0, so do the same when displaying fractions
+            'rounding_mode' => IntegerToLocalizedStringTransformer::ROUND_DOWN,
+        ), $options);
+
+        return $this->getField($key, 'integer')
+            ->setValueTransformer(new IntegerToLocalizedStringTransformer(array(
+                'precision' => $options['precision'],
+                'grouping' => $options['grouping'],
+                'rounding-mode' => $options['rounding_mode'],
+            )));
+    }
+
+    public function getMoneyField($key, array $options = array())
+    {
+        $options = array_merge(array(
+            'precision' => 2,
+            'grouping' => false,
+            'divisor' => 1,
+            'currency' => 'EUR',
+        ), $options);
+
+        return $this->getField($key, 'money')
+            ->setValueTransformer(new MoneyToLocalizedStringTransformer(array(
+                'precision' => $options['precision'],
+                'grouping' => $options['grouping'],
+                'divisor' => $options['divisor'],
+            )))
+            ->addRendererPlugin(new MoneyPatternPlugin($options['currency']));
     }
 
     public function getCheckboxField($key, array $options = array())

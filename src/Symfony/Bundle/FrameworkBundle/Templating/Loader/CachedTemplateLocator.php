@@ -19,20 +19,25 @@ use Symfony\Component\Templating\TemplateReferenceInterface;
  *
  * @author Fabien Potencier <fabien.potencier@symfony-project.com>
  */
-class CachedTemplateLocator implements FileLocatorInterface
+class CachedTemplateLocator extends TemplateLocator
 {
     protected $templates;
 
     /**
      * Constructor.
+     *
+     * @param string               $cacheDir The cache path
+     * @param FileLocatorInterface $locator  A FileLocatorInterface instance
+     * @param string               $path     A global fallback path
      */
-    public function __construct($cacheDir)
+    public function __construct($cacheDir, FileLocatorInterface $locator, $path)
     {
         if (!file_exists($cache = $cacheDir.'/templates.php')) {
             throw new \RuntimeException(sprintf('The template locator cache is not warmed up (%s).', $cache));
         }
 
         $this->templates = require $cache;
+        parent::__construct($locator, $path);
     }
 
     /**
@@ -51,7 +56,7 @@ class CachedTemplateLocator implements FileLocatorInterface
         $key = $template->getSignature();
 
         if (!isset($this->templates[$key])) {
-            throw new \InvalidArgumentException(sprintf('Unable to find template "%s".', json_encode($template)));
+            return parent::locate($template, $currentPath, $first);
         }
 
         return $this->templates[$key];

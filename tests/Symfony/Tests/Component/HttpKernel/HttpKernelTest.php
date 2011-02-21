@@ -105,9 +105,11 @@ class HttpKernelTest extends \PHPUnit_Framework_TestCase
     public function testHandleWhenControllerDoesNotReturnAResponseButAViewIsRegistered()
     {
         $dispatcher = new EventDispatcher();
-        $dispatcher->connect('core.view', function ($event, $retval)
+        $dispatcher->connect('core.view', function ($event)
         {
-            return new Response($retval);
+            $event->setProcessed();
+
+            return new Response($event->get('controller_value'));
         });
         $kernel = new HttpKernel($dispatcher, $this->getResolver(function () { return 'foo'; }));
 
@@ -120,9 +122,11 @@ class HttpKernelTest extends \PHPUnit_Framework_TestCase
     public function testHandleWhenAViewDoesNotReturnAResponse()
     {
         $dispatcher = new EventDispatcher();
-        $dispatcher->connect('core.view', function ($event, $retval)
+        $dispatcher->connect('core.view', function ($event)
         {
-            return $retval;
+            $event->setProcessed();
+
+            return $event->get('controller_value');
         });
         $kernel = new HttpKernel($dispatcher, $this->getResolver(function () { return 'foo'; }));
 

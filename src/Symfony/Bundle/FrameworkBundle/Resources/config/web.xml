@@ -34,6 +34,7 @@
 
         <service id="response_listener" class="%response_listener.class%">
             <tag name="kernel.listener" event="core.response" method="filter" />
+            <argument>%kernel.charset%</argument>
         </service>
 
         <service id="exception_listener" class="%exception_listener.class%">

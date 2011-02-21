@@ -23,6 +23,13 @@ use Symfony\Component\HttpFoundation\Response;
  */
 class ResponseListener
 {
+    protected $charset;
+
+    public function __construct($charset)
+    {
+        $this->charset = $charset;
+    }
+
     /**
      * Filters the Response.
      *
@@ -31,7 +38,15 @@ class ResponseListener
      */
     public function filter(EventInterface $event, Response $response)
     {
-        if (HttpKernelInterface::MASTER_REQUEST !== $event->get('request_type') || $response->headers->has('Content-Type')) {
+        if (HttpKernelInterface::MASTER_REQUEST !== $event->get('request_type')) {
+            return $response;
+        }
+
+        if (null === $response->getCharset()) {
+            $response->setCharset($this->charset);
+        }
+
+        if ($response->headers->has('Content-Type')) {
             return $response;
         }
 

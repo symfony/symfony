@@ -59,7 +59,7 @@ class ResponseListenerTest extends \PHPUnit_Framework_TestCase
     protected function getDispatcher()
     {
         $dispatcher = new EventDispatcher();
-        $listener = new ResponseListener();
+        $listener = new ResponseListener('UTF-8');
         $dispatcher->connect('core.response', array($listener, 'filter'));
 
         return $dispatcher;

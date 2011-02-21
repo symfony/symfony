@@ -181,7 +181,7 @@ class FormExtension extends \Twig_Extension
         return $this->render($field, 'label', array(
             'field'  => $field,
             'params' => $parameters,
-            'label'  => null !== $label ? $label : ucfirst(strtolower(str_replace('_', ' ', $field->getKey()))),
+            'label'  => null !== $label ? $label : $field->getLabel(),
         ));
     }
 

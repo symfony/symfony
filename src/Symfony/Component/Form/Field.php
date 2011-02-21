@@ -175,7 +175,7 @@ class Field extends Configurable implements FieldInterface
      */
     public function getLabel()
     {
-        return $this->getOption('label') ?: $this->key;
+        return $this->getOption('label') ?: ucfirst(strtolower(str_replace('_', ' ', $this->key)));
     }
 
     /**

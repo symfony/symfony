@@ -24,10 +24,17 @@ class UrlMatcherTest extends \PHPUnit_Framework_TestCase
 
         $matcher = new UrlMatcherForTests($collection, array(), array());
 
-        $this->assertEquals('/', $matcher->normalizeUrl(''), '->normalizeUrl() adds a / at the beginning of the URL if needed');
-        $this->assertEquals('/foo', $matcher->normalizeUrl('foo'), '->normalizeUrl() adds a / at the beginning of the URL if needed');
         $this->assertEquals('/foo', $matcher->normalizeUrl('/foo?foo=bar'), '->normalizeUrl() removes the query string');
         $this->assertEquals('/foo/bar', $matcher->normalizeUrl('/foo//bar'), '->normalizeUrl() removes duplicated /');
+    }
+
+    /**
+     * @expectedException \InvalidArgumentException
+     */
+    public function testNormalizeUrlThrowsAnExceptionIfTheUrlIsInvalid()
+    {
+        $matcher = new UrlMatcherForTests(new RouteCollection(), array(), array());
+        $matcher->normalizeUrl('');
     }
 
     public function testMatch()

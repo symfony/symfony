@@ -102,7 +102,7 @@ class UrlMatcher implements UrlMatcherInterface
     {
         // ensure that the URL starts with a /
         if ('/' !== substr($url, 0, 1)) {
-            $url = '/'.$url;
+            throw new \InvalidArgumentException(sprintf('URL "%s" is not valid (it does not start with a /).', $url));
         }
 
         // remove the query string

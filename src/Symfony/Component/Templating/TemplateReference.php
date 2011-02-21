@@ -75,4 +75,11 @@ class TemplateReference implements TemplateReferenceInterface
         return $this->parameters;
     }
 
+    /**
+     * {@inheritDoc}
+     */
+    public function getPath()
+    {
+        return $this->parameters['name'];
+    }
 }

@@ -55,4 +55,12 @@ interface TemplateReferenceInterface
      */
     function getSignature();
 
+    /**
+     * Returns the path to the template.
+     *
+     * By default, it just returns the template name.
+     *
+     * @return string A path to the template or a resource
+     */
+    function getPath();
 }

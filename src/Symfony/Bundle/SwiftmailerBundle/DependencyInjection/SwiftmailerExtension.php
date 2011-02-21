@@ -71,8 +71,8 @@ class SwiftmailerExtension extends Extension
 
         $container->setAlias('swiftmailer.transport', 'swiftmailer.transport.'.$transport);
 
-        if ('ssl' === $config['encryption'] && !isset($config['port'])) {
-            $config['port'] = 465;
+        if (false === $config['port']) {
+            $config['port'] = 'ssl' === $config['encryption'] ? 465 : 25;
         }
 
         foreach (array('encryption', 'port', 'host', 'username', 'password', 'auth_mode') as $key) {

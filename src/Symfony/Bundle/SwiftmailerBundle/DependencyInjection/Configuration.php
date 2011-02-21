@@ -45,7 +45,7 @@ class Configuration
             ->scalarNode('username')->defaultNull()->end()
             ->scalarNode('password')->defaultNull()->end()
             ->scalarNode('host')->defaultValue('localhost')->end()
-            ->scalarNode('port')->defaultValue(25)->end()
+            ->scalarNode('port')->defaultValue(false)->end()
             ->scalarNode('encryption')
                 ->defaultNull()
                 ->validate()

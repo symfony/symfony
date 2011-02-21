@@ -627,30 +627,6 @@ class Response
     }
 
     /**
-     * Creates a redirect response so that it conforms to the rules defined for a redirect status code.
-     *
-     * @see http://tools.ietf.org/html/rfc2616#section-10.3.5
-     */
-    static public function createRedirect($url, $status = 302)
-    {
-        if (empty($url)) {
-            throw new \InvalidArgumentException('Cannot redirect to an empty URL.');
-        }
-
-        $response = new static(
-            sprintf('<html><head><meta http-equiv="refresh" content="1;url=%s"/></head></html>', htmlspecialchars($url, ENT_QUOTES)),
-            $status,
-            array('Location' => $url)
-        );
-
-        if (!$response->isRedirect()) {
-            throw new \InvalidArgumentException(sprintf('The HTTP status code is not a redirect ("%s" given).', $status));
-        }
-
-        return $response;
-    }
-
-    /**
      * Returns true if the response includes a Vary header.
      *
      * @return true if the response includes a Vary header, false otherwise

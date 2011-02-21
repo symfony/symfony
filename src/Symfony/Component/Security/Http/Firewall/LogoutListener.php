@@ -18,6 +18,7 @@ use Symfony\Component\Security\Core\SecurityContextInterface;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 use Symfony\Component\EventDispatcher\EventInterface;
 use Symfony\Component\HttpFoundation\Response;
+use Symfony\Component\HttpFoundation\RedirectResponse;
 
 /**
  * LogoutListener logout users.
@@ -97,7 +98,7 @@ class LogoutListener implements ListenerInterface
                 throw new \RuntimeException('Logout Success Handler did not return a Response.');
             }
         } else {
-            $response = Response::createRedirect(0 !== strpos($this->targetUrl, 'http') ? $request->getUriForPath($this->targetUrl) : $this->targetUrl, 302);
+            $response = new RedirectResponse(0 !== strpos($this->targetUrl, 'http') ? $request->getUriForPath($this->targetUrl) : $this->targetUrl, 302);
         }
 
         // handle multiple logout attempts gracefully

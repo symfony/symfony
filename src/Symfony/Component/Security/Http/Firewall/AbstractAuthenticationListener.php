@@ -25,6 +25,7 @@ use Symfony\Component\Security\Core\Exception\AuthenticationException;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpKernel\HttpKernelInterface;
 use Symfony\Component\HttpFoundation\Response;
+use Symfony\Component\HttpFoundation\RedirectResponse;
 use Symfony\Component\Security\Core\Authentication\Token\TokenInterface;
 
 /**
@@ -204,7 +205,7 @@ abstract class AbstractAuthenticationListener implements ListenerInterface
 
             $request->getSession()->set(SecurityContextInterface::AUTHENTICATION_ERROR, $failed);
 
-            return Response::createRedirect(0 !== strpos($this->options['failure_path'], 'http') ? $request->getUriForPath($this->options['failure_path']) : $this->options['failure_path'], 302);
+            return new RedirectResponse(0 !== strpos($this->options['failure_path'], 'http') ? $request->getUriForPath($this->options['failure_path']) : $this->options['failure_path'], 302);
         }
     }
 
@@ -228,7 +229,7 @@ abstract class AbstractAuthenticationListener implements ListenerInterface
             $response = $this->successHandler->onAuthenticationSuccess($event, $request, $token);
         } else {
             $path = $this->determineTargetUrl($request);
-            $response = Response::createRedirect(0 !== strpos($path, 'http') ? $request->getUriForPath($path) : $path, 302);
+            $response = new RedirectResponse(0 !== strpos($path, 'http') ? $request->getUriForPath($path) : $path, 302);
         }
 
         if (null !== $this->rememberMeServices) {

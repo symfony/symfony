@@ -15,6 +15,7 @@ use Symfony\Component\EventDispatcher\EventInterface;
 use Symfony\Component\Security\Core\Exception\AuthenticationException;
 use Symfony\Component\Security\Http\EntryPoint\AuthenticationEntryPointInterface;
 use Symfony\Component\HttpFoundation\Response;
+use Symfony\Component\HttpFoundation\RedirectResponse;
 use Symfony\Component\HttpFoundation\Request;
 
 /**
@@ -53,6 +54,6 @@ class RetryAuthenticationEntryPoint implements AuthenticationEntryPointInterface
 
         $url = $scheme.'://'.$request->getHost().$port.$request->getScriptName().$request->getPathInfo().$qs;
 
-        return Response::createRedirect($url, 301);
+        return new RedirectResponse($url, 301);
     }
 }

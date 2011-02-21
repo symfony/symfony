@@ -13,6 +13,7 @@ namespace Symfony\Bundle\WebProfilerBundle\Controller;
 
 use Symfony\Component\DependencyInjection\ContainerAware;
 use Symfony\Component\HttpFoundation\Response;
+use Symfony\Component\HttpFoundation\RedirectResponse;
 use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
 
 /**
@@ -87,7 +88,7 @@ class ProfilerController extends ContainerAware
         $profiler->disable();
         $profiler->purge();
 
-        return Response::createRedirect($this->container->get('router')->generate('_profiler', array('token' => '-')));
+        return new RedirectResponse($this->container->get('router')->generate('_profiler', array('token' => '-')));
     }
 
     /**
@@ -111,7 +112,7 @@ class ProfilerController extends ContainerAware
             throw new \RuntimeException('Problem uploading the data (token already exists).');
         }
 
-        return Response::createRedirect($this->container->get('router')->generate('_profiler', array('token' => $token)));
+        return new RedirectResponse($this->container->get('router')->generate('_profiler', array('token' => $token)));
     }
 
     /**
@@ -220,7 +221,7 @@ class ProfilerController extends ContainerAware
         $request = $this->container->get('request');
 
         if ($token = $request->query->get('token')) {
-            return Response::createRedirect($this->container->get('router')->generate('_profiler', array('token' => $token)));
+            return new RedirectResponse($this->container->get('router')->generate('_profiler', array('token' => $token)));
         }
 
         $session = $request->getSession();
@@ -232,7 +233,7 @@ class ProfilerController extends ContainerAware
         $profiler->disable();
         $tokens = $profiler->find($ip, $url, $limit);
 
-        return Response::createRedirect($this->container->get('router')->generate('_profiler_search_results', array('token' => $tokens ? $tokens[0]['token'] : '')));
+        return new RedirectResponse($this->container->get('router')->generate('_profiler_search_results', array('token' => $tokens ? $tokens[0]['token'] : '')));
     }
 
     protected function getTemplateNames($profiler)

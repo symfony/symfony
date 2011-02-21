@@ -22,7 +22,7 @@ class ResponseListenerTest extends \PHPUnit_Framework_TestCase
 {
     public function testFilterDoesNothingForSubRequests()
     {
-        $event = new Event(null, 'core.response', array('request_type' => HttpKernelInterface::SUB_REQUEST));
+        $event = new Event(null, 'core.response', array('request_type' => HttpKernelInterface::SUB_REQUEST, 'request' => new Request()));
         $this->getDispatcher()->filter($event, $response = new Response('foo'));
 
         $this->assertEquals('', $response->headers->get('content-type'));
@@ -30,7 +30,7 @@ class ResponseListenerTest extends \PHPUnit_Framework_TestCase
 
     public function testFilterDoesNothingIfContentTypeIsSet()
     {
-        $event = new Event(null, 'core.response', array('request_type' => HttpKernelInterface::MASTER_REQUEST));
+        $event = new Event(null, 'core.response', array('request_type' => HttpKernelInterface::MASTER_REQUEST, 'request' => new Request()));
         $response = new Response('foo');
         $response->headers->set('Content-Type', 'text/plain');
         $this->getDispatcher()->filter($event, $response);

@@ -56,6 +56,11 @@ class Request
      */
     public $headers;
 
+    /**
+     * @var \Symfony\Component\HttpFoundation\ResponseHeaderBag
+     */
+    public $responseHeaders;
+
     protected $content;
     protected $languages;
     protected $charsets;
@@ -108,6 +113,7 @@ class Request
         $this->files = new FileBag($files);
         $this->server = new ServerBag($server);
         $this->headers = new HeaderBag($this->server->getHeaders());
+        $this->responseHeaders = new ResponseHeaderBag();
 
         $this->content = $content;
         $this->languages = null;

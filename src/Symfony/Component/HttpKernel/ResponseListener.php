@@ -12,6 +12,7 @@
 namespace Symfony\Component\HttpKernel;
 
 use Symfony\Component\EventDispatcher\EventInterface;
+use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 
 /**
@@ -38,6 +39,8 @@ class ResponseListener
      */
     public function filter(EventInterface $event, Response $response)
     {
+        $this->mergeHeadersFromRequest($event->get('request'), $response);
+
         if (HttpKernelInterface::MASTER_REQUEST !== $event->get('request_type')) {
             return $response;
         }
@@ -57,5 +60,16 @@ class ResponseListener
         }
 
         return $response;
+    }
+
+    protected function mergeHeadersFromRequest(Request $request, Response $response)
+    {
+        foreach ($request->responseHeaders->all() as $key => $value) {
+            $response->headers->set($key, $value, true);
+        }
+
+        foreach ($request->responseHeaders->getCookies() as $cookie) {
+            $response->setCookie($cookie);
+        }
     }
 }

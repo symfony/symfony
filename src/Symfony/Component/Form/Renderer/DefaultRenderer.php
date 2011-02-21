@@ -23,7 +23,7 @@ class DefaultRenderer implements RendererInterface
 
     private $theme;
 
-    private $parameters = array();
+    private $vars = array();
 
     private $plugins = array();
 
@@ -62,37 +62,37 @@ class DefaultRenderer implements RendererInterface
         $this->plugins[] = $plugin;
     }
 
-    public function setParameter($name, $value)
+    public function setVar($name, $value)
     {
-        $this->parameters[$name] = $value;
+        $this->vars[$name] = $value;
     }
 
-    public function getParameter($name)
+    public function getVar($name)
     {
         $this->setUpPlugins();
 
         // TODO exception handling
-        return $this->parameters[$name];
+        return $this->vars[$name];
     }
 
-    public function getWidget(array $attributes = array(), array $parameters = array())
+    public function getWidget(array $vars = array())
     {
-        return $this->render('widget', $attributes, $parameters);
+        return $this->render('widget', $vars);
     }
 
-    public function getErrors(array $attributes = array(), array $parameters = array())
+    public function getErrors(array $vars = array())
     {
-        return $this->render('errors', $attributes, $parameters);
+        return $this->render('errors', $vars);
     }
 
-    public function getRow(array $attributes = array(), array $parameters = array())
+    public function getRow(array $vars = array())
     {
-        return $this->render('row', $attributes, $parameters);
+        return $this->render('row', $vars);
     }
 
-    public function getHidden(array $attributes = array(), array $parameters = array())
+    public function getHidden(array $vars = array())
     {
-        return $this->render('hidden', $attributes, $parameters);
+        return $this->render('hidden', $vars);
     }
 
     /**
@@ -101,23 +101,22 @@ class DefaultRenderer implements RendererInterface
      * @param FieldInterface $field  The field to render the label for
      * @param array $params          Additional variables passed to the template
      */
-    public function getLabel($label = null, array $attributes = array(), array $parameters = array())
+    public function getLabel($label = null, array $vars = array())
     {
         if (null !== $label) {
-            $parameters['label'] = $label;
+            $vars['label'] = $label;
         }
 
-        return $this->render('label', $attributes, $parameters);
+        return $this->render('label', $vars);
     }
 
-    protected function render($block, array $attributes = array(), array $parameters = array())
+    protected function render($block, array $vars = array())
     {
         $this->setUpPlugins();
 
         return $this->theme->render($this->template, $block, array_replace(
-            array('attr' => $attributes),
-            $this->parameters,
-            $parameters
+            $this->vars,
+            $vars
         ));
     }
 }

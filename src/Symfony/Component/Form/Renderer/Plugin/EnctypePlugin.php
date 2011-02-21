@@ -34,6 +34,6 @@ class EnctypePlugin implements PluginInterface
      */
     public function setUp(RendererInterface $renderer)
     {
-        $renderer->setParameter('enctype', $this->field->isMultipart() ? 'enctype="multipart/form-data"' : '');
+        $renderer->setVar('enctype', $this->field->isMultipart() ? 'enctype="multipart/form-data"' : '');
     }
 }

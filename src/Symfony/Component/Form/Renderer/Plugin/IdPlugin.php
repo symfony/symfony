@@ -38,12 +38,12 @@ class IdPlugin implements PluginInterface
 
         if ($this->field->hasParent()) {
             $parentRenderer = $this->field->getParent()->getRenderer();
-            $parentId = $parentRenderer->getParameter('id');
+            $parentId = $parentRenderer->getVar('id');
             $id = sprintf('%s_%s', $parentId, $fieldKey);
         } else {
             $id = $fieldKey;
         }
 
-        $renderer->setParameter('id', $id);
+        $renderer->setVar('id', $id);
     }
 }

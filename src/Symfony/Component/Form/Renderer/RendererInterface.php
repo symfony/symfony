@@ -13,15 +13,17 @@ namespace Symfony\Component\Form\Renderer;
 
 interface RendererInterface
 {
-    function setParameter($name, $value);
+    function setVar($name, $value);
 
-    function getWidget(array $attributes = array(), array $parameters = array());
+    function getVar($name);
 
-    function getErrors(array $attributes = array(), array $parameters = array());
+    function getWidget(array $vars = array());
 
-    function getRow(array $attributes = array(), array $parameters = array());
+    function getErrors(array $vars = array());
 
-    function getHidden(array $attributes = array(), array $parameters = array());
+    function getRow(array $vars = array());
+
+    function getHidden(array $vars = array());
 
     /**
      * Renders the label of the given field
@@ -29,5 +31,5 @@ interface RendererInterface
      * @param FieldInterface $field  The field to render the label for
      * @param array $params          Additional variables passed to the template
      */
-    function getLabel($label = null, array $attributes = array(), array $parameters = array());
+    function getLabel($label = null, array $vars = array());
 }

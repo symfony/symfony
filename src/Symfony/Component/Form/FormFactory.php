@@ -58,17 +58,25 @@ class FormFactory
         return $field
             ->setRenderer(new DefaultRenderer($this->theme, $template))
             ->addRendererPlugin(new IdPlugin($field))
-            ->addRendererPlugin(new NamePlugin($field));
+            ->addRendererPlugin(new NamePlugin($field))
+            ->setRendererVar('field', $field)
+            ->setRendererVar('class', null)
+            ->setRendererVar('max_length', null)
+            ->setRendererVar('size', null)
+            ->setRendererVar('label', ucfirst(strtolower(str_replace('_', ' ', $key))));
     }
 
     protected function getForm($key, $template)
     {
-        $field = new Form($key);
+        $form = new Form($key);
 
-        return $field
+        return $form
             ->setRenderer(new DefaultRenderer($this->theme, $template))
-            ->addRendererPlugin(new IdPlugin($field))
-            ->addRendererPlugin(new NamePlugin($field));
+            ->addRendererPlugin(new IdPlugin($form))
+            ->addRendererPlugin(new NamePlugin($form))
+            ->setRendererVar('field', $form)
+            ->setRendererVar('class', null)
+            ->setRendererVar('label', ucfirst(strtolower(str_replace('_', ' ', $key))));
     }
 
     public function getTextField($key, array $options = array())
@@ -78,7 +86,7 @@ class FormFactory
         ), $options);
 
         return $this->getField($key, 'text')
-            ->addRendererPlugin(new ParameterPlugin('max_length', $options['max_length']));
+            ->setRendererVar('max_length', $options['max_length']);
     }
 
     public function getHiddenField($key, array $options = array())
@@ -148,7 +156,7 @@ class FormFactory
 
         return $this->getField($key, 'checkbox')
             ->setValueTransformer(new BooleanToStringTransformer())
-            ->addRendererPlugin(new ParameterPlugin('value', $options['value']));
+            ->setRendererVar('value', $options['value']);
     }
 
     public function getRadioField($key, array $options = array())
@@ -162,7 +170,7 @@ class FormFactory
         return $field
             ->setValueTransformer(new BooleanToStringTransformer())
             ->addRendererPlugin(new ParentNamePlugin($field))
-            ->addRendererPlugin(new ParameterPlugin('value', $options['value']));
+            ->setRendererVar('value', $options['value']);
     }
 
     protected function getChoiceFieldForList($key, ChoiceListInterface $choiceList, array $options = array())
@@ -192,8 +200,8 @@ class FormFactory
         }
 
         $field->addRendererPlugin(new ChoicePlugin($choiceList))
-            ->addRendererPlugin(new ParameterPlugin('multiple', $options['multiple']))
-            ->addRendererPlugin(new ParameterPlugin('expanded', $options['expanded']));
+            ->setRendererVar('multiple', $options['multiple'])
+            ->setRendererVar('expanded', $options['expanded']);
 
         if ($options['multiple'] && $options['expanded']) {
             $field->setValueTransformer(new ArrayToChoicesTransformer($choiceList));
@@ -417,7 +425,7 @@ class FormFactory
             ));
         }
 
-        $field->addRendererPlugin(new ParameterPlugin('widget', $options['widget']));
+        $field->setRendererVar('widget', $options['widget']);
 
         return $field;
     }
@@ -489,8 +497,8 @@ class FormFactory
                 'pad' => $options['widget'] === 'text',
                 'fields' => $children,
             )))
-            ->addRendererPlugin(new ParameterPlugin('widget', $options['widget']))
-            ->addRendererPlugin(new ParameterPlugin('with_seconds', $options['with_seconds']));
+            ->setRendererVar('widget', $options['widget'])
+            ->setRendererVar('with_seconds', $options['with_seconds']);
 
         return $field;
     }

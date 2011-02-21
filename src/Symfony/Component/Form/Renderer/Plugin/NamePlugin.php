@@ -38,12 +38,12 @@ class NamePlugin implements PluginInterface
 
         if ($this->field->hasParent()) {
             $parentRenderer = $this->field->getParent()->getRenderer();
-            $parentName = $parentRenderer->getParameter('name');
+            $parentName = $parentRenderer->getVar('name');
             $name = sprintf('%s[%s]', $parentName, $fieldKey);
         } else {
             $name = $fieldKey;
         }
 
-        $renderer->setParameter('name', $name);
+        $renderer->setVar('name', $name);
     }
 }

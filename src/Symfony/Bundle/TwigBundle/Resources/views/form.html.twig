@@ -36,18 +36,16 @@
 
 {% block attributes %}
 {% spaceless %}
-    {% for key, value in attr %}
-        {{ key }}="{{ value }}"
-    {% endfor %}
+    id="{{ id }}" name="{{ name }}"{% if class %} class="{{ class }}"{% endif %}{% if field.disabled %} disabled="disabled"{% endif %}{% if field.required %} required="required"{% endif %}{% if max_length %} maxlength="{{ max_length }}"{% endif %}{% if size %} size="{{ size }}"{% endif %}
 {% endspaceless %}
 {% endblock attributes %}
 
-{% block field_attributes %}
+{% block widget %}
 {% spaceless %}
-    id="{{ id }}" name="{{ name }}"{% if field.disabled %} disabled="disabled"{% endif %}{% if field.required %} required="required"{% endif %}
-    {{ block('attributes') }}
+    {% set type = type|default('text') %}
+    <input type="{{ type }}" {{ block('attributes') }} value="{{ field.displayedData }}" />
 {% endspaceless %}
-{% endblock field_attributes %}
+{% endblock widget %}
 
 {% block form__widget %}
 {% spaceless %}
@@ -65,33 +63,28 @@
 
 {% block text__widget %}
 {% spaceless %}
-    {% if attr.type is defined and attr.type != "text" %}
-        <input {{ block('field_attributes') }} value="{{ field.displayedData }}" />
-    {% else %}
-        {% if attr.maxlength is not defined and max_length is defined %}
-            {% set attr = attr|merge({ 'maxlength': max_length }) %}
-        {% endif %}
-        <input type="text" {{ block('field_attributes') }} value="{{ field.displayedData }}" />
-    {% endif %}
+    {% set type = type|default('text') %}
+    {{ block('widget') }}
 {% endspaceless %}
 {% endblock text__widget %}
 
 {% block password__widget %}
 {% spaceless %}
-    {% set attr = attr|merge({ 'maxlength': attr.maxlength|default(field.maxlength) }) %}
-    <input type="password" {{ block('field_attributes') }} value="{{ field.displayedData }}" />
+    {% set type = type|default('password') %}
+    {{ block('widget') }}
 {% endspaceless %}
 {% endblock password__widget %}
 
 {% block hidden__widget %}
 {% spaceless %}
-    <input type="hidden" id="{{ id }}" name="{{ name }}"{% if field.disabled %} disabled="disabled"{% endif %} value="{{ field.displayedData }}" />
+    {% set type = type|default('hidden') %}
+    {{ block('widget') }}
 {% endspaceless %}
 {% endblock hidden__widget %}
 
 {% block textarea__widget %}
 {% spaceless %}
-    <textarea {{ block('field_attributes') }}>{{ field.displayedData }}</textarea>
+    <textarea {{ block('attributes') }}>{{ field.displayedData }}</textarea>
 {% endspaceless %}
 {% endblock textarea__widget %}
 
@@ -119,7 +112,7 @@
             {{ child.renderer.label(choice_list.label(choice)) }}
         {% endfor %}
     {% else %}
-    <select {{ block('field_attributes') }}{% if multiple %} multiple="multiple"{% endif %}>
+    <select {{ block('attributes') }}{% if multiple %} multiple="multiple"{% endif %}>
         {% if not field.required %}
             <option value="">{{ empty_value }}</option>
         {% endif %}
@@ -137,13 +130,13 @@
 
 {% block checkbox__widget %}
 {% spaceless %}
-    <input type="checkbox" {{ block('field_attributes') }}{% if value is defined %} value="{{ value }}"{% endif %}{% if field.data %} checked="checked"{% endif %} />
+    <input type="checkbox" {{ block('attributes') }}{% if value is defined %} value="{{ value }}"{% endif %}{% if field.data %} checked="checked"{% endif %} />
 {% endspaceless %}
 {% endblock checkbox__widget %}
 
 {% block radio__widget %}
 {% spaceless %}
-    <input type="radio" {{ block('field_attributes') }}{% if value is defined %} value="{{ value }}"{% endif %}{% if field.data %} checked="checked"{% endif %} />
+    <input type="radio" {{ block('attributes') }}{% if value is defined %} value="{{ value }}"{% endif %}{% if field.data %} checked="checked"{% endif %} />
 {% endspaceless %}
 {% endblock radio__widget %}
 
@@ -172,41 +165,40 @@
 
 {% block time__widget %}
 {% spaceless %}
-    {% if widget == 'text' %}{% set attr = attr|merge({ 'size': 1 }) %}{% endif %}
-    {{ field.hour.renderer.widget(attr) }}:{{ field.minute.renderer.widget(attr) }}{% if with_seconds %}:{{ field.second.renderer.widget(attr) }}{% endif %}
+    {{ field.hour.renderer.widget({ 'size': '1' }) }}:{{ field.minute.renderer.widget({ 'size': '1' }) }}{% if with_seconds %}:{{ field.second.renderer.widget({ 'size': '1' }) }}{% endif %}
 {% endspaceless %}
 {% endblock time__widget %}
 
 {% block number__widget %}
 {% spaceless %}
-    {% set attr = attr|merge({ 'type': 'number' }) %}
-    {{ block('text__widget') }}
+    {% set type = type|default('number') %}
+    {{ block('widget') }}
 {% endspaceless %}
 {% endblock number__widget %}
 
 {% block integer__widget %}
 {% spaceless %}
-    {% set attr = attr|merge({ 'type': 'number' }) %}
-    {{ block('text__widget') }}
+    {% set type = type|default('number') %}
+    {{ block('widget') }}
 {% endspaceless %}
 {% endblock integer__widget %}
 
 {% block money__widget %}
 {% spaceless %}
-    {{ money_pattern|replace({ '{{ widget }}': block('text__widget') })|raw }}
+    {{ money_pattern|replace({ '{{ widget }}': block('widget') })|raw }}
 {% endspaceless %}
 {% endblock money__widget %}
 
 {% block url__widget %}
 {% spaceless %}
-    {% set attr = attr|merge({ 'type': 'url' }) %}
-    {{ block('text__widget') }}
+    {% set type = type|default('url') %}
+    {{ block('widget') }}
 {% endspaceless %}
 {% endblock url__widget %}
 
 {% block percent__widget %}
 {% spaceless %}
-    {{ block('text__widget') }} %
+    {{ block('widget') }} %
 {% endspaceless %}
 {% endblock percent__widget %}
 
@@ -214,7 +206,7 @@
 {% spaceless %}
     {% set group = field %}
     {% set field = group.file %}
-    <input type="file" {{ block('field_attributes') }} />
+    <input type="file" {{ block('attributes') }} />
     {{ group.token.renderer.widget }}
     {{ group.original_name.renderer.widget }}
 {% endspaceless %}

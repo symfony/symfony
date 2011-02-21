@@ -491,9 +491,6 @@ class Field extends Configurable implements FieldInterface
      */
     public function setRenderer(RendererInterface $renderer)
     {
-        $renderer->setParameter('field', $this);
-        $renderer->setParameter('label', ucfirst(strtolower(str_replace('_', ' ', $this->getKey()))));
-
         $this->renderer = $renderer;
 
         return $this;
@@ -512,6 +509,13 @@ class Field extends Configurable implements FieldInterface
     public function addRendererPlugin(PluginInterface $plugin)
     {
         $this->renderer->addPlugin($plugin);
+
+        return $this;
+    }
+
+    public function setRendererVar($name, $value)
+    {
+        $this->renderer->setVar($name, $value);
 
         return $this;
     }

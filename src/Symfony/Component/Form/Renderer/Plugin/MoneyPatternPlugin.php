@@ -26,7 +26,7 @@ class MoneyPatternPlugin implements PluginInterface
 
     public function setUp(RendererInterface $renderer)
     {
-        $renderer->setParameter('money_pattern', self::getPattern($this->currency));
+        $renderer->setVar('money_pattern', self::getPattern($this->currency));
     }
 
     /**

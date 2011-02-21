@@ -24,7 +24,7 @@ class DatePatternPlugin implements PluginInterface
 
     public function setUp(RendererInterface $renderer)
     {
-        $renderer->setParameter('date_pattern', $this->getPattern());
+        $renderer->setVar('date_pattern', $this->getPattern());
     }
 
     public function getPattern()

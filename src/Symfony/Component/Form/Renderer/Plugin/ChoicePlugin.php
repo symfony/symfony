@@ -27,10 +27,10 @@ class ChoicePlugin implements PluginInterface
     {
         $choiceList = $this->choiceList;
 
-        $renderer->setParameter('choices', $this->choiceList->getOtherChoices());
-        $renderer->setParameter('preferred_choices', $this->choiceList->getPreferredChoices());
-        $renderer->setParameter('separator', '-------------------');
-        $renderer->setParameter('choice_list', $this->choiceList);
-        $renderer->setParameter('empty_value', '');
+        $renderer->setVar('choices', $this->choiceList->getOtherChoices());
+        $renderer->setVar('preferred_choices', $this->choiceList->getPreferredChoices());
+        $renderer->setVar('separator', '-------------------');
+        $renderer->setVar('choice_list', $this->choiceList);
+        $renderer->setVar('empty_value', '');
     }
 }

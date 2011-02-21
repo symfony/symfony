@@ -34,6 +34,6 @@ class MaxLengthPlugin implements PluginInterface
      */
     public function setUp(RendererInterface $renderer)
     {
-        $renderer->setParameter('max_length', $this->maxLength);
+        $renderer->setVar('max_length', $this->maxLength);
     }
 }

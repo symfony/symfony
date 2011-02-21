@@ -36,7 +36,7 @@ class ParentNamePlugin implements PluginInterface
     {
         if ($this->field->hasParent()) {
             $parentRenderer = $this->field->getParent()->getRenderer();
-            $renderer->setParameter('name', $parentRenderer->getParameter('name'));
+            $renderer->setVar('name', $parentRenderer->getVar('name'));
         }
     }
 }

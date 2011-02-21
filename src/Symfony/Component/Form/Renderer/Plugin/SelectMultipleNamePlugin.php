@@ -23,6 +23,6 @@ class SelectMultipleNamePlugin extends NamePlugin
         // Add "[]" to the name in case a select tag with multiple options is
         // displayed. Otherwise only one of the selected options is sent in the
         // POST request.
-        $renderer->setParameter('name', $renderer->getParameter('name').'[]');
+        $renderer->setVar('name', $renderer->getVar('name').'[]');
     }
 }

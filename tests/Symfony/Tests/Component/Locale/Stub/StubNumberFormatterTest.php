@@ -602,13 +602,10 @@ class StubNumberFormatterTest extends LocaleTestCase
         $this->assertEquals(StubNumberFormatter::U_ZERO_ERROR_MESSAGE, $formatter->getErrorMessage());
     }
 
-    /**
-     * @expectedException Symfony\Component\Locale\Exception\MethodNotImplementedException
-     */
     public function testGetLocale()
     {
         $formatter = $this->getStubFormatterWithDecimalStyle();
-        $formatter->getLocale();
+        $this->assertEquals('en', $formatter->getLocale());
     }
 
     /**

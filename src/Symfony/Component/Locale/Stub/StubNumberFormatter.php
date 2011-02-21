@@ -355,11 +355,10 @@ class StubNumberFormatter
      *
      * @param  int      $type     The locale name type to return between valid or actual (StubLocale::VALID_LOCALE or StubLocale::ACTUAL_LOCALE, respectively)
      * @return string             The locale name used to create the formatter
-     * @throws MethodNotImplementedException
      */
     public function getLocale($type = StubLocale::ACTUAL_LOCALE)
     {
-        throw new MethodNotImplementedException(__METHOD__);
+        return $this->locale;
     }
 
     /**

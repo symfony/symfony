@@ -97,8 +97,7 @@ class LogoutListener implements ListenerInterface
                 throw new \RuntimeException('Logout Success Handler did not return a Response.');
             }
         } else {
-            $response = new Response();
-            $response->setRedirect(0 !== strpos($this->targetUrl, 'http') ? $request->getUriForPath($this->targetUrl) : $this->targetUrl, 302);
+            $response = Response::createRedirect(0 !== strpos($this->targetUrl, 'http') ? $request->getUriForPath($this->targetUrl) : $this->targetUrl, 302);
         }
 
         // handle multiple logout attempts gracefully

@@ -53,9 +53,6 @@ class RetryAuthenticationEntryPoint implements AuthenticationEntryPointInterface
 
         $url = $scheme.'://'.$request->getHost().$port.$request->getScriptName().$request->getPathInfo().$qs;
 
-        $response = new Response();
-        $response->setRedirect($url, 301);
-
-        return $response;
+        return Response::createRedirect($url, 301);
     }
 }

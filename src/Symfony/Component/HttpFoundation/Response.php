@@ -627,23 +627,27 @@ class Response
     }
 
     /**
-     * Modifies the response so that it conforms to the rules defined for a redirect status code.
+     * Creates a redirect response so that it conforms to the rules defined for a redirect status code.
      *
      * @see http://tools.ietf.org/html/rfc2616#section-10.3.5
      */
-    public function setRedirect($url, $status = 302)
+    static public function createRedirect($url, $status = 302)
     {
         if (empty($url)) {
             throw new \InvalidArgumentException('Cannot redirect to an empty URL.');
         }
 
-        $this->setStatusCode($status);
-        if (!$this->isRedirect()) {
+        $response = new static(
+            sprintf('<html><head><meta http-equiv="refresh" content="1;url=%s"/></head></html>', htmlspecialchars($url, ENT_QUOTES)),
+            $status,
+            array('Location' => $url)
+        );
+
+        if (!$response->isRedirect()) {
             throw new \InvalidArgumentException(sprintf('The HTTP status code is not a redirect ("%s" given).', $status));
         }
 
-        $this->headers->set('Location', $url);
-        $this->setContent(sprintf('<html><head><meta http-equiv="refresh" content="1;url=%s"/></head></html>', htmlspecialchars($url, ENT_QUOTES)));
+        return $response;
     }
 
     /**

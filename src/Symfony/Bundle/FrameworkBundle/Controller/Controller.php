@@ -24,27 +24,6 @@ use Symfony\Component\DependencyInjection\ContainerAware;
 class Controller extends ContainerAware
 {
     /**
-     * Creates a Response instance.
-     *
-     * @param string  $content The Response body
-     * @param integer $status  The status code
-     * @param array   $headers An array of HTTP headers
-     *
-     * @return Response A Response instance
-     */
-    public function createResponse($content = '', $status = 200, array $headers = array())
-    {
-        $response = $this->container->get('response');
-        $response->setContent($content);
-        $response->setStatusCode($status);
-        foreach ($headers as $name => $value) {
-            $response->headers->set($name, $value);
-        }
-
-        return $response;
-    }
-
-    /**
      * Generates a URL from the given parameters.
      *
      * @param  string  $name       The name of the route
@@ -70,18 +49,6 @@ class Controller extends ContainerAware
     public function forward($controller, array $path = array(), array $query = array())
     {
         return $this->container->get('http_kernel')->forward($controller, $path, $query);
-    }
-
-    /**
-     * Returns an HTTP redirect Response.
-     *
-     * @return Response A Response instance
-     */
-    public function redirect($url, $status = 302)
-    {
-        $response = $this->container->get('response');
-        $response->setRedirect($url, $status);
-        return $response;
     }
 
     /**

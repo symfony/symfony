@@ -7,7 +7,6 @@
     <parameters>
         <parameter key="event_dispatcher.class">Symfony\Bundle\FrameworkBundle\EventDispatcher</parameter>
         <parameter key="http_kernel.class">Symfony\Bundle\FrameworkBundle\HttpKernel</parameter>
-        <parameter key="response.class">Symfony\Component\HttpFoundation\Response</parameter>
         <parameter key="error_handler.class">Symfony\Component\HttpKernel\Debug\ErrorHandler</parameter>
         <parameter key="error_handler.level">null</parameter>
         <parameter key="filesystem.class">Symfony\Bundle\FrameworkBundle\Util\Filesystem</parameter>
@@ -48,12 +47,6 @@
             It is used to check references scope.
         -->
         <service id="request" scope="request" synthetic="true" />
-
-        <service id="response" class="%response.class%" scope="prototype">
-            <call method="setCharset">
-                <argument>%kernel.charset%</argument>
-            </call>
-        </service>
 
         <service id="filesystem" class="%filesystem.class%"></service>
 

@@ -24,21 +24,18 @@ use Symfony\Component\DependencyInjection\ContainerInterface;
 class TwigEngine implements EngineInterface
 {
     protected $environment;
-    protected $container;
     protected $parser;
 
     /**
      * Constructor.
      *
      * @param \Twig_Environment           $environment A \Twig_Environment instance
-     * @param ContainerInterface          $container   The DI container
      * @param TemplateNameParserInterface $parser      A TemplateNameParserInterface instance
      * @param GlobalVariables             $globals     A GlobalVariables instance
      */
-    public function __construct(\Twig_Environment $environment, ContainerInterface $container, TemplateNameParserInterface $parser, GlobalVariables $globals)
+    public function __construct(\Twig_Environment $environment, TemplateNameParserInterface $parser, GlobalVariables $globals)
     {
         $this->environment = $environment;
-        $this->container = $container;
         $this->parser = $parser;
 
         $environment->addGlobal('app', $globals);
@@ -108,7 +105,7 @@ class TwigEngine implements EngineInterface
     public function renderResponse($view, array $parameters = array(), Response $response = null)
     {
         if (null === $response) {
-            $response = $this->container->get('response');
+            $response = new Response();
         }
 
         $response->setContent($this->render($view, $parameters));

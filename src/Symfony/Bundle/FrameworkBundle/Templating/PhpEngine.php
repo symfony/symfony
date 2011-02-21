@@ -77,7 +77,7 @@ class PhpEngine extends BasePhpEngine implements EngineInterface
     public function renderResponse($view, array $parameters = array(), Response $response = null)
     {
         if (null === $response) {
-            $response = $this->container->get('response');
+            $response = new Response();
         }
 
         $response->setContent($this->render($view, $parameters));

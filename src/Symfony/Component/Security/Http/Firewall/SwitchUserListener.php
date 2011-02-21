@@ -109,9 +109,8 @@ class SwitchUserListener implements ListenerInterface
             }
         }
 
-        $response = new Response();
         $request->server->set('QUERY_STRING', '');
-        $response->setRedirect($request->getUri(), 302);
+        $response = Response::createRedirect($request->getUri(), 302);
 
         $event->setProcessed();
 

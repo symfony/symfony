@@ -20,25 +20,14 @@ use Symfony\Bundle\FrameworkBundle\Controller\ControllerNameParser;
 use Symfony\Bundle\FrameworkBundle\Tests\Logger;
 use Symfony\Bundle\FrameworkBundle\Tests\Kernel;
 
-
-
 /**
- * 
  * @author Marcin Sikon<marcin.sikon@gmail.com>
  */
 class RedirectControllerTest extends TestCase
 {
     public function testEmptyRoute()
     {
-        $response = new Response();
-
         $container = $this->getMock('Symfony\Component\DependencyInjection\ContainerInterface');
-        $container
-            ->expects($this->once())
-            ->method('get')
-            ->with($this->equalTo('response'))
-            ->will($this->returnValue($response))
-        ;
 
         $controller = new RedirectController();
         $controller->setContainer($container);
@@ -50,20 +39,16 @@ class RedirectControllerTest extends TestCase
         $this->assertEquals(410, $returnResponse->getStatusCode());
     }
 
-
-
     /**
      * @dataProvider provider
      */
     public function testRoute($permanent, $expectedCode)
     {
-        $response = new Response();
         $request = new Request();
 
         $route = 'new-route';
         $url = '/redirect-url';
         $params = array('additional-parameter' => 'value');
-
 
         $request->attributes = new ParameterBag(array('route' => $route, '_route' => 'current-route', 'permanent' => $permanent) + $params);
 
@@ -86,21 +71,13 @@ class RedirectControllerTest extends TestCase
         $container
             ->expects($this->at(1))
             ->method('get')
-            ->with($this->equalTo('response'))
-            ->will($this->returnValue($response));
-
-        $container
-            ->expects($this->at(2))
-            ->method('get')
             ->with($this->equalTo('router'))
             ->will($this->returnValue($router));
-
 
         $controller = new RedirectController();
         $controller->setContainer($container);
 
         $returnResponse = $controller->redirectAction($route, $permanent);
-
 
         $this->assertInstanceOf('\Symfony\Component\HttpFoundation\Response', $returnResponse);
 
@@ -109,8 +86,6 @@ class RedirectControllerTest extends TestCase
         $this->assertEquals($expectedCode, $returnResponse->getStatusCode());
     }
 
-
-
     public function provider()
     {
         return array(
@@ -118,5 +93,4 @@ class RedirectControllerTest extends TestCase
             array(false, 302),
         );
     }
-
 }

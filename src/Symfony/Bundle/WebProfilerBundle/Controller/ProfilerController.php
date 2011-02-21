@@ -70,12 +70,10 @@ class ProfilerController extends ContainerAware
             throw new NotFoundHttpException(sprintf('Token "%s" does not exist.', $token));
         }
 
-        $response = $this->container->get('response');
-        $response->setContent($profiler->export());
-        $response->headers->set('Content-Type', 'text/plain');
-        $response->headers->set('Content-Disposition', 'attachment; filename= '.$token.'.txt');
-
-        return $response;
+        return new Response($profiler->export(), 200, array(
+            'Content-Type'        => 'text/plain',
+            'Content-Disposition' => 'attachment; filename= '.$token.'.txt',
+        ));
     }
 
     /**
@@ -89,10 +87,7 @@ class ProfilerController extends ContainerAware
         $profiler->disable();
         $profiler->purge();
 
-        $response = $this->container->get('response');
-        $response->setRedirect($this->container->get('router')->generate('_profiler', array('token' => '-')));
-
-        return $response;
+        return Response::createRedirect($this->container->get('router')->generate('_profiler', array('token' => '-')));
     }
 
     /**
@@ -116,10 +111,7 @@ class ProfilerController extends ContainerAware
             throw new \RuntimeException('Problem uploading the data (token already exists).');
         }
 
-        $response = $this->container->get('response');
-        $response->setRedirect($this->container->get('router')->generate('_profiler', array('token' => $token)));
-
-        return $response;
+        return Response::createRedirect($this->container->get('router')->generate('_profiler', array('token' => $token)));
     }
 
     /**
@@ -133,7 +125,7 @@ class ProfilerController extends ContainerAware
     public function toolbarAction($token, $position = null)
     {
         if (null === $token) {
-            return $this->container->get('response');
+            return new Response();
         }
 
         $profiler = $this->container->get('profiler');
@@ -142,7 +134,7 @@ class ProfilerController extends ContainerAware
         $profiler = $profiler->loadFromToken($token);
 
         if ($profiler->isEmpty()) {
-            return $this->container->get('response');
+            return new Response();
         }
 
         if (null === $position) {
@@ -228,10 +220,7 @@ class ProfilerController extends ContainerAware
         $request = $this->container->get('request');
 
         if ($token = $request->query->get('token')) {
-            $response = $this->container->get('response');
-            $response->setRedirect($this->container->get('router')->generate('_profiler', array('token' => $token)));
-
-            return $response;
+            return Response::createRedirect($this->container->get('router')->generate('_profiler', array('token' => $token)));
         }
 
         $session = $request->getSession();
@@ -243,10 +232,7 @@ class ProfilerController extends ContainerAware
         $profiler->disable();
         $tokens = $profiler->find($ip, $url, $limit);
 
-        $response = $this->container->get('response');
-        $response->setRedirect($this->container->get('router')->generate('_profiler_search_results', array('token' => $tokens ? $tokens[0]['token'] : '')));
-
-        return $response;
+        return Response::createRedirect($this->container->get('router')->generate('_profiler_search_results', array('token' => $tokens ? $tokens[0]['token'] : '')));
     }
 
     protected function getTemplateNames($profiler)

@@ -6,7 +6,9 @@ use Symfony\Component\Routing\Route;
 $collection = new RouteCollection();
 /*
 $collection->add('homepage', new Route('/', array(
-    '_controller' => 'NewBundle:Default:index',
+    '_controller' => '{{ bundle }}:Default:index',
 )));
+
+$collection->import("{{ bundle }}/Controller", '/prefix');
 */
 return $collection;

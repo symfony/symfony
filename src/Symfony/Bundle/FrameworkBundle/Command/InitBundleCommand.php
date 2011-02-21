@@ -35,7 +35,7 @@ class InitBundleCommand extends Command
                 new InputArgument('namespace', InputArgument::REQUIRED, 'The namespace of the bundle to create'),
                 new InputArgument('dir', InputArgument::REQUIRED, 'The directory where to create the bundle'),
                 new InputArgument('bundleName', InputArgument::OPTIONAL, 'The optional bundle name'),
-                new InputOption('format', '', InputOption::VALUE_REQUIRED, 'Use the format for configuration files (php, xml, or yml)', 'xml')
+                new InputOption('format', '', InputOption::VALUE_REQUIRED, 'Use the format for configuration files (php, xml, or yml)', 'yml')
             ))
             ->setHelp(<<<EOT
 The <info>init:bundle</info> command generates a new bundle with a basic skeleton.

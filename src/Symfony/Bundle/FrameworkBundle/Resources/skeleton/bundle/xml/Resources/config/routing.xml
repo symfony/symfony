@@ -4,4 +4,11 @@
     xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
     xsi:schemaLocation="http://www.symfony-project.org/schema/routing http://www.symfony-project.org/schema/routing/routing-1.0.xsd">
 
+    <!--
+    <route id="homepage" pattern="/">
+        <default key="_controller">{{ bundle }}:Default:denied</default>
+    </route>
+
+    <import resource="@{{ bundle }}/Resources/config/routing.xml" prefix="/prefix" />
+    //-->
 </routes>

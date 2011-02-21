@@ -65,6 +65,20 @@ class StubNumberFormatterTest extends LocaleTestCase
         $ret = $formatter->setAttribute(StubNumberFormatter::ROUNDING_MODE, null);
     }
 
+    public function testCreateStub()
+    {
+        $this->assertInstanceOf(
+            'Symfony\Component\Locale\Stub\StubNumberFormatter',
+            StubNumberFormatter::create('en', StubNumberFormatter::DECIMAL)
+        );
+    }
+
+    public function testCreateIntl()
+    {
+        $this->skipIfIntlExtensionIsNotLoaded();
+        $this->assertInstanceOf('\NumberFormatter', \NumberFormatter::create('en', \NumberFormatter::DECIMAL));
+    }
+
     /**
      * @dataProvider formatCurrencyWithDecimalStyleProvider
      */

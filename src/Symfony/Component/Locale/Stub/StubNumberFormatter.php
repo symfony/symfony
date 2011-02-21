@@ -235,6 +235,25 @@ class StubNumberFormatter
     }
 
     /**
+     * Static constructor
+     *
+     * @param  string  $locale   The locale code
+     * @param  int     $style    Style of the formatting, one of the format style constants
+     * @param  string  $pattern  A pattern string in case $style is NumberFormat::PATTERN_DECIMAL or
+     *                           NumberFormat::PATTERN_RULEBASED. It must conform to  the syntax
+     *                           described in the ICU DecimalFormat or ICU RuleBasedNumberFormat documentation
+     * @see    http://www.icu-project.org/apiref/icu4c/classDecimalFormat.html#_details
+     * @see    http://www.icu-project.org/apiref/icu4c/classRuleBasedNumberFormat.html#_details
+     * @throws MethodArgumentValueNotImplementedException  When $locale different than 'en' is passed
+     * @throws MethodArgumentValueNotImplementedException  When the $style is not supported
+     * @throws MethodArgumentNotImplementedException       When the pattern value is different than null
+     */
+    public static function create($locale = 'en', $style = null, $pattern = null)
+    {
+        return new self($locale, $style, $pattern);
+    }
+
+    /**
      * Format a currency value
      *
      * @param  float   $value     The numeric currency value

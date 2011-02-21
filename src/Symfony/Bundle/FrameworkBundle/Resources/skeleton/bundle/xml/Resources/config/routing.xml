@@ -8,7 +8,5 @@
     <route id="homepage" pattern="/">
         <default key="_controller">{{ bundle }}:Default:denied</default>
     </route>
-
-    <import resource="@{{ bundle }}/Resources/config/routing.xml" prefix="/prefix" />
     //-->
 </routes>

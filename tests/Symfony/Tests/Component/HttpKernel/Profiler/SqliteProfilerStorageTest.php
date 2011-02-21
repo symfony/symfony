@@ -40,7 +40,7 @@ class SqliteProfilerStorageTest extends \PHPUnit_Framework_TestCase
     public function testStore()
     {
         for ($i = 0; $i < 10; $i ++) {
-            self::$storage->write('token_'.$i, 'data', '127.0.0.1', 'http://foo.bar', time());
+            self::$storage->write('token_'.$i, '', 'data', '127.0.0.1', 'http://foo.bar', time());
         }
         $this->assertEquals(count(self::$storage->find('127.0.0.1', 'http://foo.bar', 20)), 10, '->write() stores data in the database');
     }
@@ -49,9 +49,9 @@ class SqliteProfilerStorageTest extends \PHPUnit_Framework_TestCase
     {
         // The SQLite storage accepts special characters in URLs (Even though URLs are not
         // supposed to contain them)
-        self::$storage->write('simple_quote', 'data', '127.0.0.1', 'http://foo.bar/\'', time());
-        self::$storage->write('double_quote', 'data', '127.0.0.1', 'http://foo.bar/"', time());
-        self::$storage->write('backslash', 'data', '127.0.0.1', 'http://foo.bar/\\', time());
+        self::$storage->write('simple_quote', '', 'data', '127.0.0.1', 'http://foo.bar/\'', time());
+        self::$storage->write('double_quote', '', 'data', '127.0.0.1', 'http://foo.bar/"', time());
+        self::$storage->write('backslash', '', 'data', '127.0.0.1', 'http://foo.bar/\\', time());
         
         $this->assertTrue(false !== self::$storage->read('simple_quote'), '->write() accepts single quotes in URL');
         $this->assertTrue(false !== self::$storage->read('double_quote'), '->write() accepts double quotes in URL');
@@ -60,13 +60,13 @@ class SqliteProfilerStorageTest extends \PHPUnit_Framework_TestCase
 
     public function testStoreDuplicateToken()
     {
-        $this->assertTrue(true === self::$storage->write('token', 'data', '127.0.0.1', 'http://foo.bar', time()), '->write() returns true when the token is unique');
-        $this->assertTrue(false === self::$storage->write('token', 'data', '127.0.0.1', 'http://foo.bar', time()), '->write() return false when the token is already present in the DB');
+        $this->assertTrue(true === self::$storage->write('token', '', 'data', '127.0.0.1', 'http://foo.bar', time()), '->write() returns true when the token is unique');
+        $this->assertTrue(false === self::$storage->write('token', '', 'data', '127.0.0.1', 'http://foo.bar', time()), '->write() return false when the token is already present in the DB');
     }
 
     public function testRetrieveByIp()
     {
-        self::$storage->write('token', 'data', '127.0.0.1', 'http://foo.bar', time());
+        self::$storage->write('token', '', 'data', '127.0.0.1', 'http://foo.bar', time());
 
         $this->assertEquals(count(self::$storage->find('127.0.0.1', '', 10)), 1, '->find() retrieve a record by IP');
         $this->assertEquals(count(self::$storage->find('127.0.%.1', '', 10)), 0, '->find() does not interpret a "%" as a wildcard in the IP');
@@ -75,11 +75,11 @@ class SqliteProfilerStorageTest extends \PHPUnit_Framework_TestCase
 
     public function testRetrieveByUrl()
     {
-        self::$storage->write('simple_quote', 'data', '127.0.0.1', 'http://foo.bar/\'', time());
-        self::$storage->write('double_quote', 'data', '127.0.0.1', 'http://foo.bar/"', time());
-        self::$storage->write('backslash', 'data', '127.0.0.1', 'http://foo\\bar/', time());
-        self::$storage->write('percent', 'data', '127.0.0.1', 'http://foo.bar/%', time());
-        self::$storage->write('underscore', 'data', '127.0.0.1', 'http://foo.bar/_', time());
+        self::$storage->write('simple_quote', '', 'data', '127.0.0.1', 'http://foo.bar/\'', time());
+        self::$storage->write('double_quote', '', 'data', '127.0.0.1', 'http://foo.bar/"', time());
+        self::$storage->write('backslash', '', 'data', '127.0.0.1', 'http://foo\\bar/', time());
+        self::$storage->write('percent', '', 'data', '127.0.0.1', 'http://foo.bar/%', time());
+        self::$storage->write('underscore', '', 'data', '127.0.0.1', 'http://foo.bar/_', time());
 
         $this->assertEquals(count(self::$storage->find('127.0.0.1', 'http://foo.bar/\'', 10)), 1, '->find() accepts single quotes in URLs');
         $this->assertEquals(count(self::$storage->find('127.0.0.1', 'http://foo.bar/"', 10)), 1, '->find() accepts double quotes in URLs');

@@ -15,7 +15,9 @@ use Symfony\Component\Form\ChoiceList\ChoiceListInterface;
 use Symfony\Component\Form\ChoiceList\DefaultChoiceList;
 use Symfony\Component\Form\ChoiceList\PaddedChoiceList;
 use Symfony\Component\Form\ChoiceList\MonthChoiceList;
+use Symfony\Component\Form\CsrfProvider\CsrfProviderInterface;
 use Symfony\Component\Form\DataProcessor\RadioToArrayConverter;
+use Symfony\Component\Form\FieldFactory\FieldFactoryInterface;
 use Symfony\Component\Form\Renderer\DefaultRenderer;
 use Symfony\Component\Form\Renderer\Theme\ThemeInterface;
 use Symfony\Component\Form\Renderer\Plugin\IdPlugin;
@@ -31,32 +33,68 @@ use Symfony\Component\Form\ValueTransformer\IntegerToLocalizedStringTransformer;
 use Symfony\Component\Form\ValueTransformer\MoneyToLocalizedStringTransformer;
 use Symfony\Component\Form\ValueTransformer\ScalarToChoicesTransformer;
 use Symfony\Component\Form\ValueTransformer\DateTimeToArrayTransformer;
+use Symfony\Component\Validator\ValidatorInterface;
 
 class FormFactory
 {
     private $theme;
 
-    public function __construct(ThemeInterface $theme)
-    {
-        $this->setTheme($theme);
-    }
+    private $csrfProvider;
 
-    public function setTheme(ThemeInterface $theme)
+    private $validator;
+
+    private $fieldFactory;
+
+    public function __construct(ThemeInterface $theme, CsrfProviderInterface $csrfProvider, ValidatorInterface $validator, FieldFactoryInterface $fieldFactory)
     {
         $this->theme = $theme;
+        $this->csrfProvider = $csrfProvider;
+        $this->validator = $validator;
+        $this->fieldFactory = $fieldFactory;
     }
 
-    public function getTheme()
+    protected function getTheme()
     {
         return $this->theme;
     }
 
-    protected function getField($key, $template)
+    protected function getCsrfProvider()
     {
-        $field = new Field($key);
+        return $this->csrfProvider;
+    }
+
+    protected function getValidator()
+    {
+        return $this->validator;
+    }
+
+    protected function getFieldFactory()
+    {
+        return $this->fieldFactory;
+    }
+
+    protected function initField(FieldInterface $field, array $options = array())
+    {
+        $options = array_merge(array(
+            'template' => 'text',
+            'data' => null,
+            'property_path' => (string)$field->getKey(),
+            'trim' => true,
+            'required' => true,
+            'disabled' => false,
+            'value_transformer' => null,
+            'normalization_transformer' => null,
+        ), $options);
 
         return $field
-            ->setRenderer(new DefaultRenderer($this->theme, $template))
+            ->setData($options['data'])
+            ->setPropertyPath($options['property_path'])
+            ->setTrim($options['trim'])
+            ->setRequired($options['required'])
+            ->setDisabled($options['disabled'])
+            ->setValueTransformer($options['value_transformer'])
+            ->setNormalizationTransformer($options['normalization_transformer'])
+            ->setRenderer(new DefaultRenderer($this->theme, $options['template']))
             ->addRendererPlugin(new IdPlugin($field))
             ->addRendererPlugin(new NamePlugin($field))
             ->setRendererVar('field', $field)
@@ -66,45 +104,86 @@ class FormFactory
             ->setRendererVar('label', ucfirst(strtolower(str_replace('_', ' ', $key))));
     }
 
-    protected function getForm($key, $template)
+    protected function initForm(FormInterface $form, array $options = array())
+    {
+        $options = array_merge(array(
+            'template' => 'form',
+            'data_class' => null,
+            'data_constructor' => null,
+            'csrf_protection' => true,
+            'csrf_field_name' => '_token',
+            'csrf_provider' => $this->csrfProvider,
+            'field_factory' => $this->fieldFactory,
+            'validation_groups' => null,
+            'virtual' => false,
+            'validator' => $this->validator,
+        ), $options);
+
+        $this->initField($form, $options);
+
+        if ($options['csrf_protection']) {
+            $form->enableCsrfProtection($options['csrf_provider'], $options['csrf_field_name']);
+        }
+
+        return $form
+            ->setDataClass($options['data_class'])
+            ->setDataConstructor($options['data_constructor'])
+            ->setFieldFactory($options['field_factory'])
+            ->setValidationGroups($options['validation_groups'])
+            ->setVirtual($options['virtual'])
+            ->setValidator($options['validator']);
+    }
+
+    public function getField($key, array $options = array())
+    {
+        $field = new Field($key);
+
+        $this->initField($field);
+
+        return $field;
+    }
+
+    public function getForm($key, array $options = array())
     {
         $form = new Form($key);
 
-        return $form
-            ->setRenderer(new DefaultRenderer($this->theme, $template))
-            ->addRendererPlugin(new IdPlugin($form))
-            ->addRendererPlugin(new NamePlugin($form))
-            ->setRendererVar('field', $form)
-            ->setRendererVar('class', null)
-            ->setRendererVar('label', ucfirst(strtolower(str_replace('_', ' ', $key))));
+        $this->initForm($form);
+
+        return $form;
     }
 
     public function getTextField($key, array $options = array())
     {
         $options = array_merge(array(
+            'template' => 'text',
             'max_length' => null,
         ), $options);
 
-        return $this->getField($key, 'text')
+        return $this->getField($key, $options)
             ->setRendererVar('max_length', $options['max_length']);
     }
 
     public function getHiddenField($key, array $options = array())
     {
-        return $this->getField($key, 'hidden')
+        $options = array_merge(array(
+            'template' => 'hidden',
+        ), $options);
+
+        return $this->getField($key, 'hidden', $options)
             ->setHidden(true);
     }
 
     public function getNumberField($key, array $options = array())
     {
         $options = array_merge(array(
+            'template' => 'number',
             // default precision is locale specific (usually around 3)
             'precision' => null,
             'grouping' => false,
             'rounding_mode' => NumberToLocalizedStringTransformer::ROUND_HALFUP,
         ), $options);
 
-        return $this->getField($key, 'number')
+        return $this->getField($key, $options)
             ->setValueTransformer(new NumberToLocalizedStringTransformer(array(
                 'precision' => $options['precision'],
                 'grouping' => $options['grouping'],
@@ -115,6 +194,7 @@ class FormFactory
     public function getIntegerField($key, array $options = array())
     {
         $options = array_merge(array(
+            'template' => 'integer',
             // default precision is locale specific (usually around 3)
             'precision' => null,
             'grouping' => false,
@@ -122,7 +202,7 @@ class FormFactory
             'rounding_mode' => IntegerToLocalizedStringTransformer::ROUND_DOWN,
         ), $options);
 
-        return $this->getField($key, 'integer')
+        return $this->getField($key, $options)
             ->setValueTransformer(new IntegerToLocalizedStringTransformer(array(
                 'precision' => $options['precision'],
                 'grouping' => $options['grouping'],
@@ -133,13 +213,14 @@ class FormFactory
     public function getMoneyField($key, array $options = array())
     {
         $options = array_merge(array(
+            'template' => 'money',
             'precision' => 2,
             'grouping' => false,
             'divisor' => 1,
             'currency' => 'EUR',
         ), $options);
 
-        return $this->getField($key, 'money')
+        return $this->getField($key, $options)
             ->setValueTransformer(new MoneyToLocalizedStringTransformer(array(
                 'precision' => $options['precision'],
                 'grouping' => $options['grouping'],
@@ -151,10 +232,11 @@ class FormFactory
     public function getCheckboxField($key, array $options = array())
     {
         $options = array_merge(array(
+            'template' => 'checkbox',
             'value' => '1',
         ), $options);
 
-        return $this->getField($key, 'checkbox')
+        return $this->getField($key, $options)
             ->setValueTransformer(new BooleanToStringTransformer())
             ->setRendererVar('value', $options['value']);
     }
@@ -162,10 +244,11 @@ class FormFactory
     public function getRadioField($key, array $options = array())
     {
         $options = array_merge(array(
+            'template' => 'radio',
             'value' => null,
         ), $options);
 
-        $field = $this->getField($key, 'radio');
+        $field = $this->getField($key, $options);
 
         return $field
             ->setValueTransformer(new BooleanToStringTransformer())
@@ -176,14 +259,15 @@ class FormFactory
     protected function getChoiceFieldForList($key, ChoiceListInterface $choiceList, array $options = array())
     {
         $options = array_merge(array(
+            'template' => 'choice',
             'multiple' => false,
             'expanded' => false,
         ), $options);
 
         if (!$options['expanded']) {
-            $field = $this->getField($key, 'choice');
+            $field = $this->getField($key, $options);
         } else {
-            $field = $this->getForm($key, 'choice');
+            $field = $this->getForm($key, $options);
             $choices = array_merge($choiceList->getPreferredChoices(), $choiceList->getOtherChoices());
 
             foreach ($choices as $choice => $value) {
@@ -363,6 +447,7 @@ class FormFactory
     public function getDateField($key, array $options = array())
     {
         $options = array_merge(array(
+            'template' => 'date',
             'widget' => 'choice',
             'type' => 'datetime',
             'pattern' => null,
@@ -378,18 +463,25 @@ class FormFactory
         );
 
         if ($options['widget'] === 'text') {
-            $field = $this->getField($key, 'date')
+            $field = $this->getField($key, $options)
                 ->setValueTransformer(new DateTimeToLocalizedStringTransformer(array(
                     'date_format' => $options['format'],
-                    'time_format' => DateTimeToLocalizedStringTransformer::NONE,
+                    'time_format' => \IntlDateFormatter::NONE,
                     'input_timezone' => $options['data_timezone'],
                     'output_timezone' => $options['user_timezone'],
                 )));
         } else {
-            $field = $this->getForm($key, 'date')
-                ->add($this->getYearField('year', $options))
-                ->add($this->getMonthField('month', $formatter, $options))
-                ->add($this->getDayField('day', $options))
+            // Only pass a subset of the options to children
+            $childOptions = array_intersect_key($options, array_flip(array(
+                'years',
+                'months',
+                'days',
+            )));
+
+            $field = $this->getForm($key, $options)
+                ->add($this->getYearField('year', $childOptions))
+                ->add($this->getMonthField('month', $formatter, $childOptions))
+                ->add($this->getDayField('day', $childOptions))
                 ->setValueTransformer(new DateTimeToArrayTransformer(array(
                     'input_timezone' => $options['data_timezone'],
                     'output_timezone' => $options['user_timezone'],
@@ -442,6 +534,7 @@ class FormFactory
     public function getTimeField($key, array $options = array())
     {
         $options = array_merge(array(
+            'template' => 'time',
             'widget' => 'choice',
             'type' => 'datetime',
             'with_seconds' => false,
@@ -450,17 +543,25 @@ class FormFactory
             'user_timezone' => date_default_timezone_get(),
         ), $options);
 
+        // Only pass a subset of the options to children
+        $childOptions = array_intersect_key($options, array_flip(array(
+            'hours',
+            'minutes',
+            'seconds',
+            'widget',
+        )));
+
         $children = array('hour', 'minute');
-        $field = $this->getForm($key, 'time')
-            ->add($this->getHourField('hour', $options))
-            ->add($this->getMinuteField('minute', $options))
+        $field = $this->getForm($key, $options)
+            ->add($this->getHourField('hour', $childOptions))
+            ->add($this->getMinuteField('minute', $childOptions))
             // Don't modify \DateTime classes by reference, we treat
             // them like immutable value objects
             ->setModifyByReference(false);
 
         if ($options['with_seconds']) {
             $children[] = 'second';
-            $field->add($this->getSecondField('second', $options));
+            $field->add($this->getSecondField('second', $childOptions));
         }
 
         if ($options['type'] == 'string') {

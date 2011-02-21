@@ -23,6 +23,7 @@ use Symfony\Component\Form\Exception\DanglingFieldException;
 use Symfony\Component\Form\Exception\FieldDefinitionException;
 use Symfony\Component\Form\CsrfProvider\CsrfProviderInterface;
 use Symfony\Component\Form\DataProcessor\DataProcessorInterface;
+use Symfony\Component\Form\FieldFactory\FieldFactoryInterface;
 
 /**
  * Form represents a form.
@@ -45,96 +46,39 @@ class Form extends Field implements \IteratorAggregate, FormInterface
      * Contains all the fields of this group
      * @var array
      */
-    protected $fields = array();
+    private $fields = array();
 
     /**
      * Contains the names of submitted values who don't belong to any fields
      * @var array
      */
-    protected $extraFields = array();
+    private $extraFields = array();
 
     /**
      * Stores the class that the data of this form must be instances of
      * @var string
      */
-    protected $dataClass;
+    private $dataClass;
 
     /**
      * Stores the constructor closure for creating new domain object instances
      * @var \Closure
      */
-    protected $dataConstructor;
-
-    /**
-     * The context used when creating the form
-     * @var FormContext
-     */
-    protected $context = null;
+    private $dataConstructor;
 
     private $dataPreprocessor;
 
     private $modifyByReference;
 
-    /**
-     * Creates a new form with the options stored in the given context
-     *
-     * @param  FormContextInterface $context
-     * @param  string $name
-     * @param  array $options
-     * @return Form
-     */
-    public static function create(FormContextInterface $context, $name = null, array $options = array())
-    {
-        return new static($name, array_merge($context->getOptions(), $options));
-    }
+    private $validator;
 
-    /**
-     * Constructor.
-     *
-     * @param string $name
-     * @param array $options
-     */
-    public function __construct($name = null, array $options = array())
-    {
-        $this->addOption('data_class');
-        $this->addOption('data_constructor');
-        $this->addOption('csrf_field_name', '_token');
-        $this->addOption('csrf_provider');
-        $this->addOption('field_factory');
-        $this->addOption('validation_groups');
-        $this->addOption('virtual', false);
-        $this->addOption('validator');
-        $this->addOption('context');
-        $this->addOption('by_reference', true);
+    private $validationGroups;
 
-        if (isset($options['validation_groups'])) {
-            $options['validation_groups'] = (array)$options['validation_groups'];
-        }
+    private $virtual;
 
-        if (isset($options['data_class'])) {
-            $this->dataClass = $options['data_class'];
-        }
+    private $csrfFieldName;
 
-        if (isset($options['data_constructor'])) {
-            $this->dataConstructor = $options['data_constructor'];
-        }
-
-        parent::__construct($name, $options);
-
-        // Enable CSRF protection
-        if ($this->getOption('csrf_provider')) {
-            if (!$this->getOption('csrf_provider') instanceof CsrfProviderInterface) {
-                throw new FormException('The object passed to the "csrf_provider" option must implement CsrfProviderInterface');
-            }
-
-            $fieldName = $this->getOption('csrf_field_name');
-            $token = $this->getOption('csrf_provider')->generateCsrfToken(get_class($this));
-
-            $this->add(new HiddenField($fieldName, array('data' => $token)));
-        }
-
-        $this->modifyByReference = $this->getOption('by_reference');
-    }
+    private $csrfProvider;
 
     /**
      * Clones this group
@@ -385,6 +329,8 @@ class Form extends Field implements \IteratorAggregate, FormInterface
 
             $this->readObject($data);
         }
+
+        return $this;
     }
 
     /**
@@ -509,12 +455,19 @@ class Form extends Field implements \IteratorAggregate, FormInterface
         return $data;
     }
 
+    public function setVirtual($virtual)
+    {
+        $this->virtual = $virtual;
+
+        return $this;
+    }
+
     /**
      * @inheritDoc
      */
     public function isVirtual()
     {
-        return $this->getOption('virtual');
+        return $this->virtual;
     }
 
     /**
@@ -674,15 +627,11 @@ class Form extends Field implements \IteratorAggregate, FormInterface
         return count($this->fields);
     }
 
-    /**
-     * Returns a factory for automatically creating fields based on metadata
-     * available for a form's object
-     *
-     * @return FieldFactoryInterface  The factory
-     */
-    public function getFieldFactory()
+    public function setValidator(ValidatorInterface $validator)
     {
-        return $this->getOption('field_factory');
+        $this->validator = $validator;
+
+        return $this;
     }
 
     /**
@@ -692,7 +641,14 @@ class Form extends Field implements \IteratorAggregate, FormInterface
      */
     public function getValidator()
     {
-        return $this->getOption('validator');
+        return $this->validator;
+    }
+
+    public function setValidationGroups($validationGroups)
+    {
+        $this->validationGroups = (array)$validationGroups;
+
+        return $this;
     }
 
     /**
@@ -702,13 +658,33 @@ class Form extends Field implements \IteratorAggregate, FormInterface
      */
     public function getValidationGroups()
     {
-        $groups = $this->getOption('validation_groups');
+        $groups = $this->validationGroups;
 
         if (!$groups && $this->hasParent()) {
             $groups = $this->getParent()->getValidationGroups();
         }
 
         return $groups;
+    }
+
+    public function enableCsrfProtection(CsrfProviderInterface $provider, $fieldName = '_token')
+    {
+        $this->csrfProvider = $provider;
+        $this->csrfFieldName = $fieldName;
+
+        $token = $provider->generateCsrfToken(get_class($this));
+
+        // FIXME
+//        $this->add(new HiddenField($fieldName, array('data' => $token)));
+    }
+
+    public function disableCsrfProtection()
+    {
+        if ($this->isCsrfProtected()) {
+            $this->remove($this->csrfFieldName);
+            $this->csrfProvider = null;
+            $this->csrfFieldName = null;
+        }
     }
 
     /**
@@ -718,7 +694,7 @@ class Form extends Field implements \IteratorAggregate, FormInterface
      */
     public function getCsrfFieldName()
     {
-        return $this->getOption('csrf_field_name');
+        return $this->csrfFieldName;
     }
 
     /**
@@ -728,7 +704,31 @@ class Form extends Field implements \IteratorAggregate, FormInterface
      */
     public function getCsrfProvider()
     {
-        return $this->getOption('csrf_provider');
+        return $this->csrfProvider;
+    }
+
+    /**
+     * @return true if this form is CSRF protected
+     */
+    public function isCsrfProtected()
+    {
+        return $this->csrfFieldName && $this->has($this->csrfFieldName);
+    }
+
+    /**
+     * Returns whether the CSRF token is valid
+     *
+     * @return Boolean
+     */
+    public function isCsrfTokenValid()
+    {
+        if (!$this->isCsrfProtected()) {
+            return true;
+        } else {
+            $token = $this->get($this->csrfFieldName)->getDisplayedData();
+
+            return $this->csrfProvider->isCsrfTokenValid(get_class($this), $token);
+        }
     }
 
     /**
@@ -819,30 +819,6 @@ class Form extends Field implements \IteratorAggregate, FormInterface
     }
 
     /**
-     * @return true if this form is CSRF protected
-     */
-    public function isCsrfProtected()
-    {
-        return $this->has($this->getOption('csrf_field_name'));
-    }
-
-    /**
-     * Returns whether the CSRF token is valid
-     *
-     * @return Boolean
-     */
-    public function isCsrfTokenValid()
-    {
-        if (!$this->isCsrfProtected()) {
-            return true;
-        } else {
-            $token = $this->get($this->getOption('csrf_field_name'))->getDisplayedData();
-
-            return $this->getOption('csrf_provider')->isCsrfTokenValid(get_class($this), $token);
-        }
-    }
-
-    /**
      * Returns whether the maximum POST size was reached in this request.
      *
      * @return Boolean
@@ -874,9 +850,11 @@ class Form extends Field implements \IteratorAggregate, FormInterface
      *
      * @param string  A fully qualified class name
      */
-    protected function setDataClass($class)
+    public function setDataClass($class)
     {
         $this->dataClass = $class;
+
+        return $this;
     }
 
     /**
@@ -889,14 +867,34 @@ class Form extends Field implements \IteratorAggregate, FormInterface
         return $this->dataClass;
     }
 
-    /**
-     * Returns the context used when creating this form
-     *
-     * @return FormContext  The context instance
-     */
-    public function getContext()
+    public function setDataConstructor($dataConstructor)
     {
-        return $this->getOption('context');
+        $this->dataConstructor = $dataConstructor;
+
+        return $this;
+    }
+
+    public function getDataConstructor()
+    {
+        return $this->dataConstructor;
+    }
+
+    public function setFieldFactory(FieldFactoryInterface $fieldFactory = null)
+    {
+        $this->fieldFactory = $fieldFactory;
+
+        return $this;
+    }
+
+    /**
+     * Returns a factory for automatically creating fields based on metadata
+     * available for a form's object
+     *
+     * @return FieldFactoryInterface  The factory
+     */
+    public function getFieldFactory()
+    {
+        return $this->fieldFactory;
     }
 
     /**

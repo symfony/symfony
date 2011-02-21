@@ -70,6 +70,14 @@ class ContextListener implements ListenerInterface
     }
 
     /**
+     * {@inheritDoc}
+     */
+    public function reconnect(EventDispatcherInterface $dispatcher)
+    {
+        $dispatcher->connect('core.response', array($this, 'write'), 0);
+    }
+
+    /**
      * Reads the SecurityContext from the session.
      *
      * @param EventInterface $event An EventInterface instance

@@ -56,6 +56,13 @@ class AnonymousAuthenticationListener implements ListenerInterface
     }
 
     /**
+     * {@inheritDoc}
+     */
+    public function reconnect(EventDispatcherInterface $dispatcher)
+    {
+    }
+
+    /**
      * Handles anonymous authentication.
      *
      * @param EventInterface $event An EventInterface instance

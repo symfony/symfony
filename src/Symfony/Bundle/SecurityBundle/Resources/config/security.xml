@@ -71,7 +71,7 @@
         </service>
 
         <service id="security.encoder_factory" alias="security.encoder_factory.generic"></service>
-        
+
         <service id="security.account_checker" class="%security.account_checker.class%" public="false" />
 
 
@@ -107,6 +107,7 @@
         <!-- Firewall related services -->
         <service id="security.firewall" class="%security.firewall.class%">
             <tag name="kernel.listener" event="core.request" method="handle" priority="-128" />
+            <tag name="kernel.listener" event="core.response" method="handleResponse" priority="128" />
             <argument type="service" id="security.firewall.map" />
             <argument type="service" id="event_dispatcher" />
         </service>

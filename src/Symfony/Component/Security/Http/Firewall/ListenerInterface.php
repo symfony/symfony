@@ -15,7 +15,7 @@ use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 
 /**
  * Interface that must be implemented by firewall listeners
- * 
+ *
  * @author Johannes M. Schmitt <schmittjoh@gmail.com>
  */
 interface ListenerInterface
@@ -39,4 +39,15 @@ interface ListenerInterface
      * @param EventDispatcherInterface $dispatcher
      */
     function unregister(EventDispatcherInterface $dispatcher);
+
+    /**
+     * The implementation must reconnect this listener to all events it needs to
+     * handle after the core.security event.
+     *
+     * This method is called only if a sub request required the listeners to be
+     * unregistered.
+     *
+     * @param EventDispatcherInterface $dispatcher
+     */
+    function reconnect(EventDispatcherInterface $dispatcher);
 }

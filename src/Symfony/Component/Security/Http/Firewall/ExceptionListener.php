@@ -71,6 +71,14 @@ class ExceptionListener implements ListenerInterface
     }
 
     /**
+     * {@inheritDoc}
+     */
+    public function reconnect(EventDispatcherInterface $dispatcher)
+    {
+        $dispatcher->connect('core.exception', array($this, 'handleException'), 0);
+    }
+
+    /**
      * Handles security related exceptions.
      *
      * @param EventInterface $event An EventInterface instance

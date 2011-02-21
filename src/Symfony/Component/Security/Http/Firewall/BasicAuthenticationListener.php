@@ -67,6 +67,13 @@ class BasicAuthenticationListener implements ListenerInterface
     }
 
     /**
+     * {@inheritDoc}
+     */
+    public function reconnect(EventDispatcherInterface $dispatcher)
+    {
+    }
+
+    /**
      * Handles basic authentication.
      *
      * @param EventInterface $event An EventInterface instance

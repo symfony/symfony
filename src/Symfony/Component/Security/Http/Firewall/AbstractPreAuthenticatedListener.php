@@ -65,6 +65,13 @@ abstract class AbstractPreAuthenticatedListener implements ListenerInterface
     }
 
     /**
+     * {@inheritDoc}
+     */
+    public function reconnect(EventDispatcherInterface $dispatcher)
+    {
+    }
+
+    /**
      * Handles X509 authentication.
      *
      * @param EventInterface $event An EventInterface instance

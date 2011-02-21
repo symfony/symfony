@@ -79,6 +79,13 @@ class LogoutListener implements ListenerInterface
     }
 
     /**
+     * {@inheritDoc}
+     */
+    public function reconnect(EventDispatcherInterface $dispatcher)
+    {
+    }
+
+    /**
      * Performs the logout if requested
      *
      * @param EventInterface $event An EventInterface instance

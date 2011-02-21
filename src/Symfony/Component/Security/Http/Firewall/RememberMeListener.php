@@ -77,6 +77,14 @@ class RememberMeListener implements ListenerInterface
     }
 
     /**
+     * {@inheritDoc}
+     */
+    public function reconnect(EventDispatcherInterface $dispatcher)
+    {
+        $dispatcher->connect('core.response', array($this, 'updateCookies'), 0);
+    }
+
+    /**
      * Handles remember-me cookie based authentication.
      *
      * @param Event $event An Event instance

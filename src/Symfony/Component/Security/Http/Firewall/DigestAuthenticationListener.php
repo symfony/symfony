@@ -70,6 +70,13 @@ class DigestAuthenticationListener implements ListenerInterface
     }
 
     /**
+     * {@inheritDoc}
+     */
+    public function reconnect(EventDispatcherInterface $dispatcher)
+    {
+    }
+
+    /**
      * Handles digest authentication.
      *
      * @param EventInterface $event An EventInterface instance

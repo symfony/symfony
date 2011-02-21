@@ -34,6 +34,7 @@ class Firewall
     protected $map;
     protected $dispatcher;
     protected $currentListeners;
+    protected $listenersStack;
 
     /**
      * Constructor.
@@ -54,15 +55,13 @@ class Firewall
      */
     public function handle(EventInterface $event)
     {
-        if (HttpKernelInterface::MASTER_REQUEST !== $event->get('request_type')) {
-            return;
-        }
-
         $request = $event->get('request');
 
         // disconnect all listeners from core.security to avoid the overhead
         // of most listeners having to do this manually
         $this->dispatcher->disconnect('core.security');
+
+        array_push($this->listenersStack, $this->currentListeners);
 
         // ensure that listeners disconnect from wherever they have connected to
         foreach ($this->currentListeners as $listener) {
@@ -90,6 +89,31 @@ class Firewall
             $event->setProcessed();
 
             return $ret;
+        }
+    }
+
+    /**
+     * Reconnects super request firewall listeners after finishing a sub request.
+     *
+     * All firewall listeners of the sub request are disconnected from all their
+     * events.
+     *
+     * @param EventInterface $event An EventInterface instance
+     */
+    public function handleResponse(EventInterface $event)
+    {
+        $this->dispatcher->disconnect('core.security');
+
+        foreach ($this->currentListeners as $listener) {
+            $listener->unregister($this->dispatcher);
+        }
+
+        $listeners = array_pop($this->listenersStack);
+
+        if (null !== $listeners) {
+            foreach ($listeners as $listener) {
+                $listener->reconnect($this->dispatcher);
+            }
         }
     }
 }

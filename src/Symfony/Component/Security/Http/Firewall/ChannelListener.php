@@ -55,6 +55,13 @@ class ChannelListener implements ListenerInterface
     }
 
     /**
+     * {@inheritDoc}
+     */
+    public function reconnect(EventDispatcherInterface $dispatcher)
+    {
+    }
+
+    /**
      * Handles channel management.
      *
      * @param EventInterface $event An EventInterface instance

@@ -122,6 +122,13 @@ abstract class AbstractAuthenticationListener implements ListenerInterface
     }
 
     /**
+     * {@inheritDoc}
+     */
+    public function reconnect(EventDispatcherInterface $dispatcher)
+    {
+    }
+
+    /**
      * Handles form based authentication.
      *
      * @param Event $event An Event instance

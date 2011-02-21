@@ -81,6 +81,13 @@ interface FieldInterface
     function getName();
 
     /**
+     * Returns the label of the field.
+     *
+     * @return string  If no label is specified, the label is equal to its key.
+     */
+    function getLabel();
+
+    /**
      * Returns the ID of the field.
      *
      * @return string  The ID of a field is equal to its name, where all

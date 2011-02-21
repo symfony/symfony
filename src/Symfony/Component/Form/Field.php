@@ -63,6 +63,7 @@ class Field extends Configurable implements FieldInterface
 
     public function __construct($key = null, array $options = array())
     {
+        $this->addOption('label');
         $this->addOption('data');
         $this->addOption('trim', true);
         $this->addOption('required', true);
@@ -71,7 +72,7 @@ class Field extends Configurable implements FieldInterface
         $this->addOption('value_transformer');
         $this->addOption('normalization_transformer');
 
-        $this->key = (string)$key;
+        $this->key = $key;
 
         if (isset($options['data'])) {
             // Populate the field with fixed data
@@ -167,6 +168,14 @@ class Field extends Configurable implements FieldInterface
     public function getName()
     {
         return null === $this->parent ? $this->key : $this->parent->getName().'['.$this->key.']';
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    public function getLabel()
+    {
+        return $this->getOption('label') ?: $this->key;
     }
 
     /**

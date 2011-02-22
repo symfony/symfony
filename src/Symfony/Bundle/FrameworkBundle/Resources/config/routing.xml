@@ -86,7 +86,7 @@
 
         <service id="router.cache_warmer" class="%router.cache_warmer.class%" public="false">
             <tag name="kernel.cache_warmer" />
-            <argument type="service" id="router.real" />
+            <argument type="service" id="router" />
         </service>
     </services>
 </container>

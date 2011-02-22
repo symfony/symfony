@@ -11,9 +11,9 @@
 
 namespace Symfony\Bundle\AsseticBundle\Tests\Factory;
 
-use Symfony\Bundle\AsseticBundle\Factory\CachedAssetManager;
+use Symfony\Bundle\AsseticBundle\Factory\AssetManager;
 
-class CachedAssetManagerTest extends \PHPUnit_Framework_TestCase
+class AssetManagerTest extends \PHPUnit_Framework_TestCase
 {
     protected function setUp()
     {
@@ -31,7 +31,7 @@ class CachedAssetManagerTest extends \PHPUnit_Framework_TestCase
             ->disableOriginalConstructor()
             ->getMock();
 
-        $am = new CachedAssetManager($factory);
+        $am = new AssetManager($factory);
         $am->addCacheFile($file);
 
         $this->assertTrue($am->has('foo'), '->loadFormulae() loads formulae');

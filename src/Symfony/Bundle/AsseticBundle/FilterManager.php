@@ -11,7 +11,7 @@
 
 namespace Symfony\Bundle\AsseticBundle;
 
-use Assetic\FilterManager;
+use Assetic\FilterManager as BaseFilterManager;
 use Symfony\Component\DependencyInjection\ContainerInterface;
 
 /**
@@ -19,7 +19,7 @@ use Symfony\Component\DependencyInjection\ContainerInterface;
  *
  * @author Kris Wallsmith <kris.wallsmith@symfony-project.com>
  */
-class LazyFilterManager extends FilterManager
+class FilterManager extends BaseFilterManager
 {
     protected $container;
     protected $mappings;

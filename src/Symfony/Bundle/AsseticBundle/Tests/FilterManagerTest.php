@@ -11,9 +11,9 @@
 
 namespace Symfony\Bundle\AsseticBundle\Tests;
 
-use Symfony\Bundle\AsseticBundle\LazyFilterManager;
+use Symfony\Bundle\AsseticBundle\FilterManager;
 
-class LazyFilterManagerTest extends \PHPUnit_Framework_TestCase
+class FilterManagerTest extends \PHPUnit_Framework_TestCase
 {
     protected function setUp()
     {
@@ -32,7 +32,7 @@ class LazyFilterManagerTest extends \PHPUnit_Framework_TestCase
             ->with('assetic.filter.bar')
             ->will($this->returnValue($filter));
 
-        $fm = new LazyFilterManager($container, array('foo' => 'assetic.filter.bar'));
+        $fm = new FilterManager($container, array('foo' => 'assetic.filter.bar'));
 
         $this->assertSame($filter, $fm->get('foo'), '->get() loads the filter from the container');
         $this->assertSame($filter, $fm->get('foo'), '->get() loads the filter from the container');
@@ -42,7 +42,7 @@ class LazyFilterManagerTest extends \PHPUnit_Framework_TestCase
     {
         $container = $this->getMock('Symfony\\Component\\DependencyInjection\\ContainerInterface');
 
-        $fm = new LazyFilterManager($container, array('foo' => 'assetic.filter.bar'));
+        $fm = new FilterManager($container, array('foo' => 'assetic.filter.bar'));
         $this->assertTrue($fm->has('foo'), '->has() returns true for lazily mapped filters');
     }
 
@@ -56,7 +56,7 @@ class LazyFilterManagerTest extends \PHPUnit_Framework_TestCase
             ->with('assetic.filter.bar')
             ->will($this->returnValue($filter));
 
-        $fm = new LazyFilterManager($container, array('foo' => 'assetic.filter.bar'));
+        $fm = new FilterManager($container, array('foo' => 'assetic.filter.bar'));
         $fm->set('bar', $filter);
         $all = $fm->all();
         $this->assertEquals(2, count($all), '->all() returns all lazy and normal filters');

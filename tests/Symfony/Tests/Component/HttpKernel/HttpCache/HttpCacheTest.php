@@ -693,6 +693,7 @@ class HttpCacheTest extends HttpCacheTestCase
         $this->setNextResponse(200, array(), 'Hello World', function ($request, $response) use ($time, &$count)
         {
             $response->headers->set('Last-Modified', $time->format(DATE_RFC2822));
+            $response->headers->set('Cache-Control', 'public');
             switch (++$count) {
                 case 1:
                     $response->setContent('first response');

@@ -113,6 +113,7 @@ class FormFactory
             ->setRenderer(new DefaultRenderer($this->theme, $options['template']))
             ->addRendererPlugin(new IdPlugin($field))
             ->addRendererPlugin(new NamePlugin($field))
+            ->addRendererPlugin(new ValuePlugin($field))
             ->setRendererVar('field', $field)
             ->setRendererVar('class', null)
             ->setRendererVar('max_length', null)

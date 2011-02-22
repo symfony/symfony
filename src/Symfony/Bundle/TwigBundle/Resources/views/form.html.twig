@@ -43,7 +43,7 @@
 {% block widget %}
 {% spaceless %}
     {% set type = type|default('text') %}
-    <input type="{{ type }}" {{ block('attributes') }} value="{{ field.displayedData }}" />
+    <input type="{{ type }}" {{ block('attributes') }} value="{{ value }}" />
 {% endspaceless %}
 {% endblock widget %}
 
@@ -84,7 +84,7 @@
 
 {% block textarea__widget %}
 {% spaceless %}
-    <textarea {{ block('attributes') }}>{{ field.displayedData }}</textarea>
+    <textarea {{ block('attributes') }}>{{ value }}</textarea>
 {% endspaceless %}
 {% endblock textarea__widget %}
 
@@ -94,11 +94,11 @@
         {% if choice_list.isChoiceGroup(label) %}
             <optgroup label="{{ choice }}">
                 {% for nestedChoice, nestedLabel in label %}
-                    <option value="{{ nestedChoice }}"{% if choice_list.isChoiceSelected(nestedChoice, field.displayedData) %} selected="selected"{% endif %}>{{ nestedLabel }}</option>
+                    <option value="{{ nestedChoice }}"{% if choice_list.isChoiceSelected(nestedChoice, value) %} selected="selected"{% endif %}>{{ nestedLabel }}</option>
                 {% endfor %}
             </optgroup>
         {% else %}
-            <option value="{{ choice }}"{% if choice_list.isChoiceSelected(choice, field.displayedData) %} selected="selected"{% endif %}>{{ label }}</option>
+            <option value="{{ choice }}"{% if choice_list.isChoiceSelected(choice, value) %} selected="selected"{% endif %}>{{ label }}</option>
         {% endif %}
     {% endfor %}
 {% endspaceless %}

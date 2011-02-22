@@ -25,7 +25,7 @@ class DefaultRenderer implements RendererInterface
 
     private $vars = array();
 
-    private $plugins = array();
+    private $changes = array();
 
     private $initialized = false;
 
@@ -35,13 +35,19 @@ class DefaultRenderer implements RendererInterface
         $this->template = $template;
     }
 
-    private function setUpPlugins()
+    private function initialize()
     {
         if (!$this->initialized) {
             $this->initialized = true;
 
-            foreach ($this->plugins as $plugin) {
-                $plugin->setUp($this);
+            // Make sure that plugins and set variables are applied in the
+            // order they were added
+            foreach ($this->changes as $key => $value) {
+                if ($value instanceof PluginInterface) {
+                    $value->setUp($this);
+                } else {
+                    $this->vars[$key] = $value;
+                }
             }
         }
     }
@@ -59,17 +65,21 @@ class DefaultRenderer implements RendererInterface
     public function addPlugin(PluginInterface $plugin)
     {
         $this->initialized = false;
-        $this->plugins[] = $plugin;
+        $this->changes[] = $plugin;
     }
 
     public function setVar($name, $value)
     {
-        $this->vars[$name] = $value;
+        if ($this->initialized) {
+            $this->vars[$name] = $value;
+        } else {
+            $this->changes[$name] = $value;
+        }
     }
 
     public function getVar($name)
     {
-        $this->setUpPlugins();
+        $this->initialize();
 
         // TODO exception handling
         return $this->vars[$name];
@@ -112,7 +122,7 @@ class DefaultRenderer implements RendererInterface
 
     protected function render($block, array $vars = array())
     {
-        $this->setUpPlugins();
+        $this->initialize();
 
         return $this->theme->render($this->template, $block, array_replace(
             $this->vars,

@@ -31,7 +31,7 @@ class HttpCache implements HttpKernelInterface
     protected $store;
     protected $request;
     protected $esi;
-    protected $esiTtls;
+    protected $esiCacheStrategy;
 
     /**
      * Constructor.
@@ -137,7 +137,9 @@ class HttpCache implements HttpKernelInterface
         if (HttpKernelInterface::MASTER_REQUEST === $type) {
             $this->traces = array();
             $this->request = $request;
-            $this->esiTtls = array();
+            if (null !== $this->esi) {
+                $this->esiCacheStrategy = $this->esi->createCacheStrategy();
+            }
         }
 
         $path = $request->getPathInfo();
@@ -163,41 +165,14 @@ class HttpCache implements HttpKernelInterface
         }
 
         if (null !== $this->esi) {
-            $this->addEsiTtl($response);
+            $this->esiCacheStrategy->add($response);
 
-            if ($request === $this->request) {
-                $this->updateResponseCacheControl($response);
+            if (HttpKernelInterface::MASTER_REQUEST === $type) {
+                $this->esiCacheStrategy->update($response);
             }
         }
 
         return $response;
-    }
-
-    /**
-     * Stores the response's TTL locally.
-     *
-     * @param Response $response
-     */
-    protected function addEsiTtl(Response $response)
-    {
-        $this->esiTtls[] = $response->isValidateable() ? -1 : $response->getTtl();
-    }
-
-    /**
-     * Changes the master response TTL to the smallest TTL received or force validation if
-     * one of the ESI has validation cache strategy.
-     *
-     * @param Response $response
-     */
-    protected function updateResponseCacheControl(Response $response)
-    {
-        $ttl = min($this->esiTtls);
-        if (-1 === $ttl) {
-            $response->headers->set('Cache-Control', 'no-cache, must-revalidate');
-        } else {
-            $response->setSharedMaxAge($ttl);
-            $response->setMaxAge(0);
-        }
     }
 
     /**

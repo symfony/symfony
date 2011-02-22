@@ -42,6 +42,16 @@ class Esi
     }
 
     /**
+     * Returns a new cache strategy instance.
+     *
+     * @return EsiResponseCacheStrategyInterface A EsiResponseCacheStrategyInterface instance
+     */
+    public function createCacheStrategy()
+    {
+        return new EsiResponseCacheStrategy();
+    }
+
+    /**
      * Checks that at least one surrogate has ESI/1.0 capability.
      *
      * @param Request $request A Request instance

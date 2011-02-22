@@ -20,6 +20,8 @@ use Symfony\Component\EventDispatcher\EventInterface;
 use Symfony\Component\Security\Core\Authentication\Token\PreAuthenticatedToken;
 use Symfony\Component\Security\Core\Exception\AuthenticationException;
 use Symfony\Component\HttpFoundation\Request;
+use Symfony\Component\Security\Http\Session\SessionAuthenticationStrategyInterface;
+
 
 /**
  * AbstractPreAuthenticatedListener is the base class for all listener that
@@ -36,7 +38,7 @@ abstract class AbstractPreAuthenticatedListener implements ListenerInterface
     protected $logger;
     protected $eventDispatcher;
 
-    public function __construct(SecurityContextInterface $securityContext, AuthenticationManagerInterface $authenticationManager, $providerKey, LoggerInterface $logger = null)
+    public function __construct(SecurityContextInterface $securityContext, AuthenticationManagerInterface $authenticationManager, SessionAuthenticationStrategyInterface $sessionStrategy, $providerKey, array $options = array(), AuthenticationSuccessHandlerInterface $successHandler = null, AuthenticationFailureHandlerInterface $failureHandler = null, LoggerInterface $logger = null)
     {
         $this->securityContext = $securityContext;
         $this->authenticationManager = $authenticationManager;

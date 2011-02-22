@@ -50,7 +50,6 @@ class AsseticExtensionTest extends \PHPUnit_Framework_TestCase
         $this->container = new ContainerBuilder();
         $this->container->addScope(new Scope('request'));
         $this->container->register('request', 'Symfony\\Component\\HttpFoundation\\Request')->setScope('request');
-        $this->container->register('response', 'Symfony\\Component\\HttpFoundation\\Response')->setScope('prototype');
         $this->container->register('twig', 'Twig_Environment');
         $this->container->setParameter('kernel.debug', false);
         $this->container->setParameter('kernel.root_dir', __DIR__);

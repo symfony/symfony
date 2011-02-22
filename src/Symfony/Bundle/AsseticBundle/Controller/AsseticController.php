@@ -26,14 +26,12 @@ use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
 class AsseticController
 {
     protected $request;
-    protected $response;
     protected $am;
     protected $cache;
 
-    public function __construct(Request $request, Response $response, AssetManager $am, CacheInterface $cache)
+    public function __construct(Request $request, AssetManager $am, CacheInterface $cache)
     {
         $this->request = $request;
-        $this->response = $response;
         $this->am = $am;
         $this->cache = $cache;
     }
@@ -46,20 +44,22 @@ class AsseticController
 
         $asset = $this->getAsset($name);
 
+        $response = new Response();
+
         // validate if-modified-since
         if (null !== $lastModified = $asset->getLastModified()) {
             $date = new \DateTime();
             $date->setTimestamp($lastModified);
-            $this->response->setLastModified($date);
+            $response->setLastModified($date);
 
-            if ($this->response->isNotModified($this->request)) {
-                return $this->response;
+            if ($response->isNotModified($this->request)) {
+                return $response;
             }
         }
 
-        $this->response->setContent($asset->dump());
+        $response->setContent($asset->dump());
 
-        return $this->response;
+        return $response;
     }
 
     protected function getAsset($name)

@@ -54,6 +54,7 @@ class DateValidatorTest extends \PHPUnit_Framework_TestCase
             array('2010-01-01'),
             array('1955-12-12'),
             array('2030-05-31'),
+            array(new \DateTime('2010-01-01')),
         );
     }
 

@@ -25,6 +25,10 @@ class DateValidator extends ConstraintValidator
             return true;
         }
 
+        if ($value instanceof \DateTime) {
+            return true;
+        }
+
         if (!is_scalar($value) && !(is_object($value) && method_exists($value, '__toString()'))) {
             throw new UnexpectedTypeException($value, 'string');
         }

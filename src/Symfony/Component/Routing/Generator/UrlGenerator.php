@@ -98,7 +98,7 @@ class UrlGenerator implements UrlGeneratorInterface
                         throw new \InvalidArgumentException(sprintf('Parameter "%s" for route "%s" must match "%s" ("%s" given).', $token[3], $name, $requirements[$token[3]], $tparams[$token[3]]));
                     }
 
-                    $url = $token[1].urlencode($tparams[$token[3]]).$url;
+                    $url = $token[1].$tparams[$token[3]].$url;
                     $optional = false;
                 }
             } elseif ('text' === $token[0]) {

@@ -168,6 +168,7 @@ class HttpCacheTest extends HttpCacheTestCase
                     $response->setContent('private data');
                 }
             } else {
+                $response->headers->set('Cache-Control', 'public');
                 $response->setETag('"public tag"');
                 if (in_array('"public tag"', $etags)) {
                     $response->setStatusCode(304);

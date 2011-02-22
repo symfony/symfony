@@ -148,7 +148,7 @@ class HttpCache implements HttpKernelInterface
         }
         $this->traces[$request->getMethod().' '.$path] = array();
 
-        if (!$request->isMethodSafe($request)) {
+        if (!$request->isMethodSafe()) {
             $response = $this->invalidate($request, $catch);
         } elseif ($request->headers->has('expect')) {
             $response = $this->pass($request, $catch);

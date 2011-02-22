@@ -11,8 +11,8 @@
 
 namespace Symfony\Tests\Component\Form;
 
+require_once __DIR__ . '/TestCase.php';
 require_once __DIR__ . '/Fixtures/Author.php';
-require_once __DIR__ . '/Fixtures/TestField.php';
 require_once __DIR__ . '/Fixtures/TestForm.php';
 
 use Symfony\Component\Form\Form;
@@ -28,7 +28,6 @@ use Symfony\Component\Validator\ConstraintViolation;
 use Symfony\Component\Validator\ConstraintViolationList;
 use Symfony\Component\Validator\ExecutionContext;
 use Symfony\Tests\Component\Form\Fixtures\Author;
-use Symfony\Tests\Component\Form\Fixtures\TestField;
 use Symfony\Tests\Component\Form\Fixtures\TestForm;
 
 class FormTest_PreconfiguredForm extends Form
@@ -115,7 +114,7 @@ class TestSetDataBeforeConfigureForm extends Form
     }
 }
 
-class FormTest extends \PHPUnit_Framework_TestCase
+class FormTest extends TestCase
 {
     protected $validator;
     protected $form;
@@ -127,20 +126,23 @@ class FormTest extends \PHPUnit_Framework_TestCase
 
     protected function setUp()
     {
+        parent::setUp();
+
         $this->validator = $this->createMockValidator();
-        $this->form = new Form('author', array('validator' => $this->validator));
+        $this->form = $this->factory->getForm('author', array('validator' => $this->validator));
     }
 
     public function testNoCsrfProtectionByDefault()
     {
-        $form = new Form('author');
+        $form = $this->factory->getForm('author');
 
         $this->assertFalse($form->isCsrfProtected());
     }
 
     public function testCsrfProtectionCanBeEnabled()
     {
-        $form = new Form('author', array(
+        $form = $this->factory->getForm('author', array(
+            'csrf_protection' => true,
             'csrf_provider' => $this->createMockCsrfProvider(),
         ));
 
@@ -149,7 +151,7 @@ class FormTest extends \PHPUnit_Framework_TestCase
 
     public function testCsrfFieldNameCanBeSet()
     {
-        $form = new Form('author', array(
+        $form = $this->factory->getForm('author', array(
             'csrf_provider' => $this->createMockCsrfProvider(),
             'csrf_field_name' => 'foobar',
         ));
@@ -165,7 +167,7 @@ class FormTest extends \PHPUnit_Framework_TestCase
                 ->with($this->equalTo('Symfony\Component\Form\Form'))
                 ->will($this->returnValue('ABCDEF'));
 
-        $form = new Form('author', array(
+        $form = $this->factory->getForm('author', array(
             'csrf_provider' => $provider,
         ));
 
@@ -192,7 +194,7 @@ class FormTest extends \PHPUnit_Framework_TestCase
                 ->with($this->equalTo('Symfony\Component\Form\Form'), $this->equalTo('ABCDEF'))
                 ->will($this->returnValue(true));
 
-        $form = new Form('author', array(
+        $form = $this->factory->getForm('author', array(
             'csrf_provider' => $provider,
             'validator' => $this->validator,
         ));
@@ -212,7 +214,7 @@ class FormTest extends \PHPUnit_Framework_TestCase
                 ->with($this->equalTo('Symfony\Component\Form\Form'), $this->equalTo('ABCDEF'))
                 ->will($this->returnValue(false));
 
-        $form = new Form('author', array(
+        $form = $this->factory->getForm('author', array(
             'csrf_provider' => $provider,
             'validator' => $this->validator,
         ));
@@ -236,7 +238,7 @@ class FormTest extends \PHPUnit_Framework_TestCase
 
     public function testValidationGroupsCanBeSetToString()
     {
-        $form = new Form('author', array(
+        $form = $this->factory->getForm('author', array(
             'validation_groups' => 'group',
         ));
 
@@ -245,7 +247,7 @@ class FormTest extends \PHPUnit_Framework_TestCase
 
     public function testValidationGroupsCanBeSetToArray()
     {
-        $form = new Form('author', array(
+        $form = $this->factory->getForm('author', array(
             'validation_groups' => array('group1', 'group2'),
         ));
 
@@ -254,10 +256,10 @@ class FormTest extends \PHPUnit_Framework_TestCase
 
     public function testValidationGroupsAreInheritedFromParentIfEmpty()
     {
-        $parentForm = new Form('parent', array(
+        $parentForm = $this->factory->getForm('parent', array(
             'validation_groups' => 'group',
         ));
-        $childForm = new Form('child');
+        $childForm = $this->factory->getForm('child');
         $parentForm->add($childForm);
 
         $this->assertEquals(array('group'), $childForm->getValidationGroups());
@@ -265,10 +267,10 @@ class FormTest extends \PHPUnit_Framework_TestCase
 
     public function testValidationGroupsAreNotInheritedFromParentIfSet()
     {
-        $parentForm = new Form('parent', array(
+        $parentForm = $this->factory->getForm('parent', array(
             'validation_groups' => 'group1',
         ));
-        $childForm = new Form('child', array(
+        $childForm = $this->factory->getForm('child', array(
             'validation_groups' => 'group2',
         ));
         $parentForm->add($childForm);
@@ -281,18 +283,18 @@ class FormTest extends \PHPUnit_Framework_TestCase
      */
     public function testBindThrowsExceptionIfAnonymous()
     {
-        $form = new Form(null, array('validator' => $this->createMockValidator()));
+        $form = $this->factory->getForm(null, array('validator' => $this->createMockValidator()));
 
         $form->bind($this->createPostRequest());
     }
 
     public function testBindValidatesData()
     {
-        $form = new Form('author', array(
+        $form = $this->factory->getForm('author', array(
             'validation_groups' => 'group',
             'validator' => $this->validator,
         ));
-        $form->add(new TestField('firstName'));
+        $form->add(new Field('firstName'));
 
         $this->validator->expects($this->once())
             ->method('validate')
@@ -304,10 +306,10 @@ class FormTest extends \PHPUnit_Framework_TestCase
 
     public function testBindDoesNotValidateArrays()
     {
-        $form = new Form('author', array(
+        $form = $this->factory->getForm('author', array(
             'validator' => $this->validator,
         ));
-        $form->add(new TestField('firstName'));
+        $form->add(new Field('firstName'));
 
         // only the form is validated
         $this->validator->expects($this->once())
@@ -322,7 +324,7 @@ class FormTest extends \PHPUnit_Framework_TestCase
     public function testBindThrowsExceptionIfNoValidatorIsSet()
     {
         $field = $this->createMockField('firstName');
-        $form = new Form('author');
+        $form = $this->factory->getForm('author');
         $form->add($field);
 
         $this->setExpectedException('Symfony\Component\Form\Exception\MissingOptionsException');
@@ -349,11 +351,11 @@ class FormTest extends \PHPUnit_Framework_TestCase
             ),
         );
 
-        $form = new Form('author', array('validator' => $this->validator));
-        $form->add(new TestField('name'));
-        $imageForm = new Form('image');
-        $imageForm->add(new TestField('file'));
-        $imageForm->add(new TestField('filename'));
+        $form = $this->factory->getForm('author', array('validator' => $this->validator));
+        $form->add(new Field('name'));
+        $imageForm = $this->factory->getForm('image');
+        $imageForm->add(new Field('file'));
+        $imageForm->add(new Field('filename'));
         $form->add($imageForm);
 
         $form->bind($this->createPostRequest($values, $files));
@@ -368,7 +370,7 @@ class FormTest extends \PHPUnit_Framework_TestCase
     public function testBindAcceptsObject()
     {
         $object = new \stdClass();
-        $form = new Form('author', array('validator' => $this->validator));
+        $form = $this->factory->getForm('author', array('validator' => $this->validator));
 
         $form->bind(new Request(), $object);
 
@@ -381,7 +383,7 @@ class FormTest extends \PHPUnit_Framework_TestCase
         $author->child = new Author();
         $standaloneChild = new Author();
 
-        $form = new Form('child');
+        $form = $this->factory->getForm('child');
         $form->setData($standaloneChild);
         $form->setPropertyPath(null);
         $form->readProperty($author);
@@ -396,7 +398,7 @@ class FormTest extends \PHPUnit_Framework_TestCase
         $author->child = $child = new Author();
         $standaloneChild = new Author();
 
-        $form = new Form('child');
+        $form = $this->factory->getForm('child');
         $form->setData($standaloneChild);
         $form->setPropertyPath(null);
         $form->writeProperty($author);
@@ -407,7 +409,7 @@ class FormTest extends \PHPUnit_Framework_TestCase
 
     public function testSupportsArrayAccess()
     {
-        $form = new Form('author');
+        $form = $this->factory->getForm('author');
         $form->add($this->createMockField('firstName'));
         $this->assertEquals($form->get('firstName'), $form['firstName']);
         $this->assertTrue(isset($form['firstName']));
@@ -415,7 +417,7 @@ class FormTest extends \PHPUnit_Framework_TestCase
 
     public function testSupportsUnset()
     {
-        $form = new Form('author');
+        $form = $this->factory->getForm('author');
         $form->add($this->createMockField('firstName'));
         unset($form['firstName']);
         $this->assertFalse(isset($form['firstName']));
@@ -423,14 +425,14 @@ class FormTest extends \PHPUnit_Framework_TestCase
 
     public function testDoesNotSupportAddingFields()
     {
-        $form = new Form('author');
+        $form = $this->factory->getForm('author');
         $this->setExpectedException('LogicException');
         $form[] = $this->createMockField('lastName');
     }
 
     public function testSupportsCountable()
     {
-        $form = new Form('group');
+        $form = $this->factory->getForm('group');
         $form->add($this->createMockField('firstName'));
         $form->add($this->createMockField('lastName'));
         $this->assertEquals(2, count($form));
@@ -441,7 +443,7 @@ class FormTest extends \PHPUnit_Framework_TestCase
 
     public function testSupportsIterable()
     {
-        $form = new Form('group');
+        $form = $this->factory->getForm('group');
         $form->add($field1 = $this->createMockField('field1'));
         $form->add($field2 = $this->createMockField('field2'));
         $form->add($field3 = $this->createMockField('field3'));
@@ -457,7 +459,7 @@ class FormTest extends \PHPUnit_Framework_TestCase
 
     public function testIsSubmitted()
     {
-        $form = new Form('author', array('validator' => $this->validator));
+        $form = $this->factory->getForm('author', array('validator' => $this->validator));
         $this->assertFalse($form->isSubmitted());
         $form->submit(array('firstName' => 'Bernhard'));
         $this->assertTrue($form->isSubmitted());
@@ -465,7 +467,7 @@ class FormTest extends \PHPUnit_Framework_TestCase
 
     public function testValidIfAllFieldsAreValid()
     {
-        $form = new Form('author', array('validator' => $this->validator));
+        $form = $this->factory->getForm('author', array('validator' => $this->validator));
         $form->add($this->createValidMockField('firstName'));
         $form->add($this->createValidMockField('lastName'));
 
@@ -476,7 +478,7 @@ class FormTest extends \PHPUnit_Framework_TestCase
 
     public function testInvalidIfFieldIsInvalid()
     {
-        $form = new Form('author', array('validator' => $this->validator));
+        $form = $this->factory->getForm('author', array('validator' => $this->validator));
         $form->add($this->createInvalidMockField('firstName'));
         $form->add($this->createValidMockField('lastName'));
 
@@ -487,7 +489,7 @@ class FormTest extends \PHPUnit_Framework_TestCase
 
     public function testInvalidIfSubmittedWithExtraFields()
     {
-        $form = new Form('author', array('validator' => $this->validator));
+        $form = $this->factory->getForm('author', array('validator' => $this->validator));
         $form->add($this->createValidMockField('firstName'));
         $form->add($this->createValidMockField('lastName'));
 
@@ -498,7 +500,7 @@ class FormTest extends \PHPUnit_Framework_TestCase
 
     public function testHasNoErrorsIfOnlyFieldHasErrors()
     {
-        $form = new Form('author', array('validator' => $this->validator));
+        $form = $this->factory->getForm('author', array('validator' => $this->validator));
         $form->add($this->createInvalidMockField('firstName'));
 
         $form->submit(array('firstName' => 'Bernhard'));
@@ -538,7 +540,7 @@ class FormTest extends \PHPUnit_Framework_TestCase
                     ->method('submit')
                     ->with($this->equalTo(null));
 
-        $form = new Form('author', array('validator' => $this->validator));
+        $form = $this->factory->getForm('author', array('validator' => $this->validator));
         $form->add($field);
 
         $form->submit(array());
@@ -553,7 +555,7 @@ class FormTest extends \PHPUnit_Framework_TestCase
                     ->method('addError')
                     ->with($this->equalTo($error));
 
-        $form = new Form('author');
+        $form = $this->factory->getForm('author');
         $form->add($field);
 
         $path = new PropertyPath('fields[firstName].data');
@@ -570,8 +572,8 @@ class FormTest extends \PHPUnit_Framework_TestCase
                     ->method('addError')
                     ->with($this->equalTo($error));
 
-        $form = new Form('author');
-        $innerGroup = new Form('names');
+        $form = $this->factory->getForm('author');
+        $innerGroup = $this->factory->getForm('names');
         $innerGroup->add($field);
         $form->add($innerGroup);
 
@@ -586,7 +588,7 @@ class FormTest extends \PHPUnit_Framework_TestCase
         $field->expects($this->never())
                     ->method('addError');
 
-        $form = new Form('author');
+        $form = $this->factory->getForm('author');
         $form->add($field);
 
         $path = new PropertyPath('fields[bar].data');
@@ -605,7 +607,7 @@ class FormTest extends \PHPUnit_Framework_TestCase
         $field->expects($this->never())
                     ->method('addError');
 
-        $form = new Form('author');
+        $form = $this->factory->getForm('author');
         $form->add($field);
 
         $path = new PropertyPath('fields[firstName].data');
@@ -631,7 +633,7 @@ class FormTest extends \PHPUnit_Framework_TestCase
                     ->method('addError')
                     ->with($this->equalTo($error), $this->equalTo($expectedPathIterator));
 
-        $form = new Form('author');
+        $form = $this->factory->getForm('author');
         $form->add($field);
 
         $path = new PropertyPath('firstName');
@@ -648,7 +650,7 @@ class FormTest extends \PHPUnit_Framework_TestCase
         $field->expects($this->never())
                     ->method('addError');
 
-        $form = new Form('author');
+        $form = $this->factory->getForm('author');
         $form->add($field);
 
         $path = new PropertyPath('bar');
@@ -668,7 +670,7 @@ class FormTest extends \PHPUnit_Framework_TestCase
         $field->expects($this->never())
                     ->method('addError');
 
-        $form = new Form('author');
+        $form = $this->factory->getForm('author');
         $form->add($field);
 
         $path = new PropertyPath('firstName');
@@ -693,7 +695,7 @@ class FormTest extends \PHPUnit_Framework_TestCase
                     ->method('addError')
                     ->with($this->equalTo($error), $this->equalTo($expectedPathIterator));
 
-        $form = new Form('author');
+        $form = $this->factory->getForm('author');
         $form->add($field);
 
         $path = new PropertyPath('address.street');
@@ -717,8 +719,8 @@ class FormTest extends \PHPUnit_Framework_TestCase
                     ->method('addError')
                     ->with($this->equalTo($error), $this->equalTo($expectedPathIterator));
 
-        $form = new Form('author');
-        $nestedForm = new Form('nested', array('virtual' => true));
+        $form = $this->factory->getForm('author');
+        $nestedForm = $this->factory->getForm('nested', array('virtual' => true));
         $nestedForm->add($field);
         $form->add($nestedForm);
 
@@ -729,7 +731,7 @@ class FormTest extends \PHPUnit_Framework_TestCase
 
     public function testAddThrowsExceptionIfAlreadySubmitted()
     {
-        $form = new Form('author', array('validator' => $this->validator));
+        $form = $this->factory->getForm('author', array('validator' => $this->validator));
         $form->add($this->createMockField('firstName'));
         $form->submit(array());
 
@@ -739,7 +741,7 @@ class FormTest extends \PHPUnit_Framework_TestCase
 
     public function testAddSetsFieldParent()
     {
-        $form = new Form('author');
+        $form = $this->factory->getForm('author');
 
         $field = $this->createMockField('firstName');
         $field->expects($this->once())
@@ -751,7 +753,7 @@ class FormTest extends \PHPUnit_Framework_TestCase
 
     public function testRemoveUnsetsFieldParent()
     {
-        $form = new Form('author');
+        $form = $this->factory->getForm('author');
 
         $field = $this->createMockField('firstName');
         $field->expects($this->exactly(2))
@@ -818,7 +820,7 @@ class FormTest extends \PHPUnit_Framework_TestCase
      */
     public function testAddThrowsExceptionIfNoFieldOrString()
     {
-        $form = new Form('author');
+        $form = $this->factory->getForm('author');
 
         $form->add(1234);
     }
@@ -828,7 +830,7 @@ class FormTest extends \PHPUnit_Framework_TestCase
      */
     public function testAddThrowsExceptionIfAnonymousField()
     {
-        $form = new Form('author');
+        $form = $this->factory->getForm('author');
 
         $field = $this->createMockField('');
 
@@ -840,7 +842,7 @@ class FormTest extends \PHPUnit_Framework_TestCase
      */
     public function testAddThrowsExceptionIfStringButNoFieldFactory()
     {
-        $form = new Form('author', array('data_class' => 'Application\Entity'));
+        $form = $this->factory->getForm('author', array('data_class' => 'Application\Entity'));
 
         $form->add('firstName');
     }
@@ -850,7 +852,7 @@ class FormTest extends \PHPUnit_Framework_TestCase
      */
     public function testAddThrowsExceptionIfStringButNoClass()
     {
-        $form = new Form('author', array('field_factory' => new \stdClass()));
+        $form = $this->factory->getForm('author', array('field_factory' => new \stdClass()));
 
         $form->add('firstName');
     }
@@ -866,7 +868,7 @@ class FormTest extends \PHPUnit_Framework_TestCase
                 ->with($this->equalTo('stdClass'), $this->equalTo('firstName'), $this->equalTo(array('foo' => 'bar')))
                 ->will($this->returnValue($field));
 
-        $form = new Form('author', array(
+        $form = $this->factory->getForm('author', array(
             'data' => $author,
             'data_class' => 'stdClass',
             'field_factory' => $factory,
@@ -918,7 +920,7 @@ class FormTest extends \PHPUnit_Framework_TestCase
      * Example:
      *
      * <code>
-     * $dateRangeField = new Form('dateRange');
+     * $dateRangeField = $this->factory->getForm('dateRange');
      * $dateRangeField->add(new DateField('startDate'));
      * $dateRangeField->add(new DateField('endDate'));
      * $form->add($dateRangeField);
@@ -936,8 +938,8 @@ class FormTest extends \PHPUnit_Framework_TestCase
         $author = new Author();
         $author->firstName = 'Foo';
 
-        $form = new Form('author');
-        $nestedForm = new Form('personal_data', array(
+        $form = $this->factory->getForm('author');
+        $nestedForm = $this->factory->getForm('personal_data', array(
             'virtual' => true,
         ));
 
@@ -963,7 +965,7 @@ class FormTest extends \PHPUnit_Framework_TestCase
 
     public function testSetDataThrowsAnExceptionIfArgumentIsNotObjectOrArray()
     {
-        $form = new Form('author');
+        $form = $this->factory->getForm('author');
 
         $this->setExpectedException('InvalidArgumentException');
 
@@ -975,7 +977,7 @@ class FormTest extends \PHPUnit_Framework_TestCase
      */
     public function testSetDataMatchesAgainstDataClass_fails()
     {
-        $form = new Form('author', array(
+        $form = $this->factory->getForm('author', array(
             'data_class' => 'Symfony\Tests\Component\Form\Fixtures\Author',
         ));
 
@@ -984,7 +986,7 @@ class FormTest extends \PHPUnit_Framework_TestCase
 
     public function testSetDataMatchesAgainstDataClass_succeeds()
     {
-        $form = new Form('author', array(
+        $form = $this->factory->getForm('author', array(
             'data_class' => 'Symfony\Tests\Component\Form\Fixtures\Author',
         ));
 
@@ -993,7 +995,7 @@ class FormTest extends \PHPUnit_Framework_TestCase
 
     public function testSetDataToNull()
     {
-        $form = new Form('author');
+        $form = $this->factory->getForm('author');
         $form->setData(null);
 
         $this->assertNull($form->getData());
@@ -1001,7 +1003,7 @@ class FormTest extends \PHPUnit_Framework_TestCase
 
     public function testSetDataToNullCreatesObjectIfClassAvailable()
     {
-        $form = new Form('author', array(
+        $form = $this->factory->getForm('author', array(
             'data_class' => 'Symfony\Tests\Component\Form\Fixtures\Author',
         ));
         $form->setData(null);
@@ -1012,7 +1014,7 @@ class FormTest extends \PHPUnit_Framework_TestCase
     public function testSetDataToNullUsesDataConstructorOption()
     {
         $author = new Author();
-        $form = new Form('author', array(
+        $form = $this->factory->getForm('author', array(
             'data_constructor' => function () use ($author) {
                 return $author;
             }
@@ -1062,7 +1064,7 @@ class FormTest extends \PHPUnit_Framework_TestCase
 
     public function testGetDataReturnsObject()
     {
-        $form = new Form('author');
+        $form = $this->factory->getForm('author');
         $object = new \stdClass();
         $form->setData($object);
         $this->assertEquals($object, $form->getData());
@@ -1075,7 +1077,7 @@ class FormTest extends \PHPUnit_Framework_TestCase
                     ->method('getDisplayedData')
                     ->will($this->returnValue('Bernhard'));
 
-        $form = new Form('author');
+        $form = $this->factory->getForm('author');
         $form->add($field);
 
         $this->assertEquals(array('firstName' => 'Bernhard'), $form->getDisplayedData());
@@ -1083,7 +1085,7 @@ class FormTest extends \PHPUnit_Framework_TestCase
 
     public function testIsMultipartIfAnyFieldIsMultipart()
     {
-        $form = new Form('author');
+        $form = $this->factory->getForm('author');
         $form->add($this->createMultipartMockField('firstName'));
         $form->add($this->createNonMultipartMockField('lastName'));
 
@@ -1092,7 +1094,7 @@ class FormTest extends \PHPUnit_Framework_TestCase
 
     public function testIsNotMultipartIfNoFieldIsMultipart()
     {
-        $form = new Form('author');
+        $form = $this->factory->getForm('author');
         $form->add($this->createNonMultipartMockField('firstName'));
         $form->add($this->createNonMultipartMockField('lastName'));
 
@@ -1101,7 +1103,7 @@ class FormTest extends \PHPUnit_Framework_TestCase
 
     public function testSupportsClone()
     {
-        $form = new Form('author');
+        $form = $this->factory->getForm('author');
         $form->add($this->createMockField('firstName'));
 
         $clone = clone $form;
@@ -1117,7 +1119,7 @@ class FormTest extends \PHPUnit_Framework_TestCase
                     ->method('getData')
                     ->will($this->returnValue('Bernhard'));
 
-        $form = new Form('author');
+        $form = $this->factory->getForm('author');
         $form->add($field);
 
         $form->submit(array('firstName' => 'Bernhard'));
@@ -1149,7 +1151,7 @@ class FormTest extends \PHPUnit_Framework_TestCase
         $metadataFactory = $this->createMockMetadataFactory();
         $context = new ExecutionContext('Root', $graphWalker, $metadataFactory);
         $object = $this->getMock('\stdClass');
-        $form = new Form('author', array('validation_groups' => array(
+        $form = $this->factory->getForm('author', array('validation_groups' => array(
             'group1',
             'group2',
         )));
@@ -1173,7 +1175,7 @@ class FormTest extends \PHPUnit_Framework_TestCase
         $context = new ExecutionContext('Root', $graphWalker, $metadataFactory);
         $context->setPropertyPath('path');
         $object = $this->getMock('\stdClass');
-        $form = new Form('author');
+        $form = $this->factory->getForm('author');
 
         $graphWalker->expects($this->once())
                 ->method('walkReference')
@@ -1192,7 +1194,7 @@ class FormTest extends \PHPUnit_Framework_TestCase
         $metadataFactory = $this->createMockMetadataFactory();
         $context = new ExecutionContext('Root', $graphWalker, $metadataFactory);
         $object = $this->getMock('\stdClass');
-        $form = new Form('author');
+        $form = $this->factory->getForm('author');
         $test = $this;
 
         $graphWalker->expects($this->once())
@@ -1211,7 +1213,7 @@ class FormTest extends \PHPUnit_Framework_TestCase
         $metadataFactory = $this->createMockMetadataFactory();
         $context = new ExecutionContext('Root', $graphWalker, $metadataFactory);
         $valueTransformer = $this->createMockTransformer();
-        $form = new Form('author', array('value_transformer' => $valueTransformer));
+        $form = $this->factory->getForm('author', array('value_transformer' => $valueTransformer));
 
         $graphWalker->expects($this->never())
                 ->method('walkReference');
@@ -1228,10 +1230,10 @@ class FormTest extends \PHPUnit_Framework_TestCase
     {
         $author = new FormTest_AuthorWithoutRefSetter(new Author());
 
-        $form = new Form('author', array('validator' => $this->createMockValidator()));
+        $form = $this->factory->getForm('author', array('validator' => $this->createMockValidator()));
         $form->setData($author);
-        $refForm = new Form('reference');
-        $refForm->add(new TestField('firstName'));
+        $refForm = $this->factory->getForm('reference');
+        $refForm->add(new Field('firstName'));
         $form->add($refForm);
 
         $form->bind($this->createPostRequest(array(
@@ -1252,10 +1254,10 @@ class FormTest extends \PHPUnit_Framework_TestCase
         $author = new FormTest_AuthorWithoutRefSetter(null);
         $newReference = new Author();
 
-        $form = new Form('author', array('validator' => $this->createMockValidator()));
+        $form = $this->factory->getForm('author', array('validator' => $this->createMockValidator()));
         $form->setData($author);
-        $refForm = new Form('referenceCopy');
-        $refForm->add(new TestField('firstName'));
+        $refForm = $this->factory->getForm('referenceCopy');
+        $refForm->add(new Field('firstName'));
         $form->add($refForm);
 
         $refForm->setData($newReference); // new author object
@@ -1276,10 +1278,10 @@ class FormTest extends \PHPUnit_Framework_TestCase
     {
         $author = new FormTest_AuthorWithoutRefSetter(new Author());
 
-        $form = new Form('author', array('validator' => $this->createMockValidator()));
+        $form = $this->factory->getForm('author', array('validator' => $this->createMockValidator()));
         $form->setData($author);
-        $refForm = new Form('referenceCopy', array('by_reference' => false));
-        $refForm->add(new TestField('firstName'));
+        $refForm = $this->factory->getForm('referenceCopy', array('by_reference' => false));
+        $refForm->add(new Field('firstName'));
         $form->add($refForm);
 
         $form->bind($this->createPostRequest(array(
@@ -1299,7 +1301,7 @@ class FormTest extends \PHPUnit_Framework_TestCase
     {
         $author = new FormTest_AuthorWithoutRefSetter('scalar');
 
-        $form = new Form('author', array('validator' => $this->createMockValidator()));
+        $form = $this->factory->getForm('author', array('validator' => $this->createMockValidator()));
         $form->setData($author);
         $refForm = new FormTest_FormThatReturns('referenceCopy');
         $refForm->setReturnValue('foobar');
@@ -1321,7 +1323,7 @@ class FormTest extends \PHPUnit_Framework_TestCase
         $ref2 = new Author();
         $author = array('referenceCopy' => $ref1);
 
-        $form = new Form('author', array('validator' => $this->createMockValidator()));
+        $form = $this->factory->getForm('author', array('validator' => $this->createMockValidator()));
         $form->setData($author);
         $refForm = new FormTest_FormThatReturns('referenceCopy');
         $refForm->setReturnValue($ref2);
@@ -1340,10 +1342,10 @@ class FormTest extends \PHPUnit_Framework_TestCase
 
     public function testIsEmptyReturnsTrueIfAllFieldsAreEmpty()
     {
-        $form = new Form();
-        $field1 = new TestField('foo');
+        $form = $this->factory->getForm();
+        $field1 = new Field('foo');
         $field1->setData('');
-        $field2 = new TestField('bar');
+        $field2 = new Field('bar');
         $field2->setData(null);
         $form->add($field1);
         $form->add($field2);
@@ -1353,10 +1355,10 @@ class FormTest extends \PHPUnit_Framework_TestCase
 
     public function testIsEmptyReturnsFalseIfAnyFieldIsFilled()
     {
-        $form = new Form();
-        $field1 = new TestField('foo');
+        $form = $this->factory->getForm();
+        $field1 = new Field('foo');
         $field1->setData('baz');
-        $field2 = new TestField('bar');
+        $field2 = new Field('bar');
         $field2->setData(null);
         $form->add($field1);
         $form->add($field2);
@@ -1371,7 +1373,7 @@ class FormTest extends \PHPUnit_Framework_TestCase
      */
     protected function getGroupWithBothVisibleAndHiddenField()
     {
-        $form = new Form('testGroup');
+        $form = $this->factory->getForm('testGroup');
 
         // add a visible field
         $visibleField = $this->createMockField('visibleField');

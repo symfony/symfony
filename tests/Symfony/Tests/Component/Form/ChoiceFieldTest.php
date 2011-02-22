@@ -11,10 +11,12 @@
 
 namespace Symfony\Tests\Component\Form;
 
+require_once __DIR__.'/TestCase.php';
+
 use Symfony\Component\Form\ChoiceField;
 use Symfony\Component\Form\Exception\UnexpectedTypeException;
 
-class ChoiceFieldTest extends \PHPUnit_Framework_TestCase
+class ChoiceFieldTest extends TestCase
 {
     protected $choices = array(
         'a' => 'Bernhard',
@@ -48,7 +50,7 @@ class ChoiceFieldTest extends \PHPUnit_Framework_TestCase
 
     public function testIsChoiceSelectedDifferentiatesBetweenZeroAndEmpty_integerZero()
     {
-        $field = new ChoiceField('name', array(
+        $field = $this->factory->getChoiceField('name', array(
             'choices' => array(
                 0 => 'Foo',
                 '' => 'Bar',
@@ -57,26 +59,26 @@ class ChoiceFieldTest extends \PHPUnit_Framework_TestCase
 
         $field->submit(0);
 
-        $this->assertTrue($field->getChoiceList()->isChoiceSelected(0, $field->getDisplayedData()));
-        $this->assertTrue($field->getChoiceList()->isChoiceSelected('0', $field->getDisplayedData()));
-        $this->assertFalse($field->getChoiceList()->isChoiceSelected('', $field->getDisplayedData()));
+        $this->assertTrue($field->getRenderer()->getVar('choice_list')->isChoiceSelected(0, $field->getDisplayedData()));
+        $this->assertTrue($field->getRenderer()->getVar('choice_list')->isChoiceSelected('0', $field->getDisplayedData()));
+        $this->assertFalse($field->getRenderer()->getVar('choice_list')->isChoiceSelected('', $field->getDisplayedData()));
 
         $field->submit('0');
 
-        $this->assertTrue($field->getChoiceList()->isChoiceSelected(0, $field->getDisplayedData()));
-        $this->assertTrue($field->getChoiceList()->isChoiceSelected('0', $field->getDisplayedData()));
-        $this->assertFalse($field->getChoiceList()->isChoiceSelected('', $field->getDisplayedData()));
+        $this->assertTrue($field->getRenderer()->getVar('choice_list')->isChoiceSelected(0, $field->getDisplayedData()));
+        $this->assertTrue($field->getRenderer()->getVar('choice_list')->isChoiceSelected('0', $field->getDisplayedData()));
+        $this->assertFalse($field->getRenderer()->getVar('choice_list')->isChoiceSelected('', $field->getDisplayedData()));
 
         $field->submit('');
 
-        $this->assertFalse($field->getChoiceList()->isChoiceSelected(0, $field->getDisplayedData()));
-        $this->assertFalse($field->getChoiceList()->isChoiceSelected('0', $field->getDisplayedData()));
-        $this->assertTrue($field->getChoiceList()->isChoiceSelected('', $field->getDisplayedData()));
+        $this->assertFalse($field->getRenderer()->getVar('choice_list')->isChoiceSelected(0, $field->getDisplayedData()));
+        $this->assertFalse($field->getRenderer()->getVar('choice_list')->isChoiceSelected('0', $field->getDisplayedData()));
+        $this->assertTrue($field->getRenderer()->getVar('choice_list')->isChoiceSelected('', $field->getDisplayedData()));
     }
 
     public function testIsChoiceSelectedDifferentiatesBetweenZeroAndEmpty_stringZero()
     {
-        $field = new ChoiceField('name', array(
+        $field = $this->factory->getChoiceField('name', array(
             'choices' => array(
                 '0' => 'Foo',
                 '' => 'Bar',
@@ -85,21 +87,21 @@ class ChoiceFieldTest extends \PHPUnit_Framework_TestCase
 
         $field->submit(0);
 
-        $this->assertTrue($field->getChoiceList()->isChoiceSelected(0, $field->getDisplayedData()));
-        $this->assertTrue($field->getChoiceList()->isChoiceSelected('0', $field->getDisplayedData()));
-        $this->assertFalse($field->getChoiceList()->isChoiceSelected('', $field->getDisplayedData()));
+        $this->assertTrue($field->getRenderer()->getVar('choice_list')->isChoiceSelected(0, $field->getDisplayedData()));
+        $this->assertTrue($field->getRenderer()->getVar('choice_list')->isChoiceSelected('0', $field->getDisplayedData()));
+        $this->assertFalse($field->getRenderer()->getVar('choice_list')->isChoiceSelected('', $field->getDisplayedData()));
 
         $field->submit('0');
 
-        $this->assertTrue($field->getChoiceList()->isChoiceSelected(0, $field->getDisplayedData()));
-        $this->assertTrue($field->getChoiceList()->isChoiceSelected('0', $field->getDisplayedData()));
-        $this->assertFalse($field->getChoiceList()->isChoiceSelected('', $field->getDisplayedData()));
+        $this->assertTrue($field->getRenderer()->getVar('choice_list')->isChoiceSelected(0, $field->getDisplayedData()));
+        $this->assertTrue($field->getRenderer()->getVar('choice_list')->isChoiceSelected('0', $field->getDisplayedData()));
+        $this->assertFalse($field->getRenderer()->getVar('choice_list')->isChoiceSelected('', $field->getDisplayedData()));
 
         $field->submit('');
 
-        $this->assertFalse($field->getChoiceList()->isChoiceSelected(0, $field->getDisplayedData()));
-        $this->assertFalse($field->getChoiceList()->isChoiceSelected('0', $field->getDisplayedData()));
-        $this->assertTrue($field->getChoiceList()->isChoiceSelected('', $field->getDisplayedData()));
+        $this->assertFalse($field->getRenderer()->getVar('choice_list')->isChoiceSelected(0, $field->getDisplayedData()));
+        $this->assertFalse($field->getRenderer()->getVar('choice_list')->isChoiceSelected('0', $field->getDisplayedData()));
+        $this->assertTrue($field->getRenderer()->getVar('choice_list')->isChoiceSelected('', $field->getDisplayedData()));
     }
 
     /**
@@ -107,7 +109,7 @@ class ChoiceFieldTest extends \PHPUnit_Framework_TestCase
      */
     public function testConfigureChoicesWithNonArray()
     {
-        $field = new ChoiceField('name', array(
+        $field = $this->factory->getChoiceField('name', array(
             'choices' => new \ArrayObject(),
         ));
     }
@@ -137,12 +139,12 @@ class ChoiceFieldTest extends \PHPUnit_Framework_TestCase
      */
     public function testClosureShouldReturnArray()
     {
-        $field = new ChoiceField('name', array(
+        $field = $this->factory->getChoiceField('name', array(
             'choices' => function () { return 'foobar'; },
         ));
 
         // trigger closure
-        $field->getChoiceList()->getOtherChoices();
+        $field->getRenderer()->getVar('choices');
     }
 
     /**
@@ -150,7 +152,7 @@ class ChoiceFieldTest extends \PHPUnit_Framework_TestCase
      */
     public function testSubmitSingleNonExpanded($choices)
     {
-        $field = new ChoiceField('name', array(
+        $field = $this->factory->getChoiceField('name', array(
             'multiple' => false,
             'expanded' => false,
             'choices' => $choices,
@@ -167,7 +169,7 @@ class ChoiceFieldTest extends \PHPUnit_Framework_TestCase
      */
     public function testSubmitMultipleNonExpanded($choices)
     {
-        $field = new ChoiceField('name', array(
+        $field = $this->factory->getChoiceField('name', array(
             'multiple' => true,
             'expanded' => false,
             'choices' => $choices,
@@ -184,7 +186,7 @@ class ChoiceFieldTest extends \PHPUnit_Framework_TestCase
      */
     public function testSubmitSingleExpanded($choices)
     {
-        $field = new ChoiceField('name', array(
+        $field = $this->factory->getChoiceField('name', array(
             'multiple' => false,
             'expanded' => true,
             'choices' => $choices,
@@ -211,7 +213,7 @@ class ChoiceFieldTest extends \PHPUnit_Framework_TestCase
      */
     public function testSubmitSingleExpandedNumericChoices($choices)
     {
-        $field = new ChoiceField('name', array(
+        $field = $this->factory->getChoiceField('name', array(
             'multiple' => false,
             'expanded' => true,
             'choices' => $choices,
@@ -238,7 +240,7 @@ class ChoiceFieldTest extends \PHPUnit_Framework_TestCase
      */
     public function testSubmitMultipleExpanded($choices)
     {
-        $field = new ChoiceField('name', array(
+        $field = $this->factory->getChoiceField('name', array(
             'multiple' => true,
             'expanded' => true,
             'choices' => $choices,
@@ -265,7 +267,7 @@ class ChoiceFieldTest extends \PHPUnit_Framework_TestCase
      */
     public function testSubmitMultipleExpandedNumericChoices($choices)
     {
-        $field = new ChoiceField('name', array(
+        $field = $this->factory->getChoiceField('name', array(
             'multiple' => true,
             'expanded' => true,
             'choices' => $choices,

@@ -11,14 +11,16 @@
 
 namespace Symfony\Tests\Component\Form;
 
+require_once __DIR__.'/TestCase.php';
+
 use Symfony\Component\Form\TimezoneField;
 
-class TimezoneFieldTest extends \PHPUnit_Framework_TestCase
+class TimezoneFieldTest extends TestCase
 {
     public function testTimezonesAreSelectable()
     {
-        $field = new TimeZoneField('timezone');
-        $choices = $field->getChoiceList()->getOtherChoices();
+        $field = $this->factory->getTimeZoneField('timezone');
+        $choices = $field->getRenderer()->getVar('choices');
 
         $this->assertArrayHasKey('Africa', $choices);
         $this->assertArrayHasKey('Africa/Kinshasa', $choices['Africa']);

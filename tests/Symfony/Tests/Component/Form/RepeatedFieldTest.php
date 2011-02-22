@@ -11,10 +11,8 @@
 
 namespace Symfony\Tests\Component\Form;
 
-require_once __DIR__ . '/Fixtures/TestField.php';
-
 use Symfony\Component\Form\RepeatedField;
-use Symfony\Tests\Component\Form\Fixtures\TestField;
+use Symfony\Component\Form\Field;
 
 class RepeatedFieldTest extends \PHPUnit_Framework_TestCase
 {
@@ -22,7 +20,7 @@ class RepeatedFieldTest extends \PHPUnit_Framework_TestCase
 
     protected function setUp()
     {
-        $this->field = new RepeatedField(new TestField('name'));
+        $this->field = new RepeatedField(new Field('name'));
     }
 
     public function testSetData()

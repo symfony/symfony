@@ -9,14 +9,9 @@
  * file that was distributed with this source code.
  */
 
-namespace Symfony\Component\Form;
+namespace Symfony\Component\Form\ChoiceList;
 
-/**
- * Represents a field where each timezone is broken down by continent.
- *
- * @author Bernhard Schussek <bernhard.schussek@symfony-project.com>
- */
-class TimezoneField extends ChoiceField
+class TimeZoneChoiceList extends DefaultChoiceList
 {
     /**
      * Stores the available timezone choices
@@ -24,31 +19,6 @@ class TimezoneField extends ChoiceField
      */
     protected static $timezones = array();
 
-    /**
-     * {@inheritDoc}
-     */
-    public function configure()
-    {
-        $this->addOption('choices', self::getTimezoneChoices());
-
-        parent::configure();
-    }
-
-    /**
-     * Preselects the server timezone if the field is empty and required
-     *
-     * {@inheritDoc}
-     */
-    public function getDisplayedData()
-    {
-        $data = parent::getDisplayedData();
-
-        if (null == $data && $this->isRequired()) {
-            $data = date_default_timezone_get();
-        }
-
-        return $data;
-    }
 
     /**
      * Returns the timezone choices
@@ -60,7 +30,7 @@ class TimezoneField extends ChoiceField
      *
      * @return array  The timezone choices
      */
-    protected static function getTimezoneChoices()
+    public function __construct(array $preferredChoices = array())
     {
         if (count(self::$timezones) == 0) {
             foreach (\DateTimeZone::listIdentifiers() as $timezone) {
@@ -85,6 +55,6 @@ class TimezoneField extends ChoiceField
             }
         }
 
-        return self::$timezones;
+        parent::__construct(self::$timezones, $preferredChoices);
     }
 }

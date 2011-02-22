@@ -12,7 +12,6 @@
 namespace Symfony\Tests\Component\Form;
 
 require_once __DIR__ . '/Fixtures/Author.php';
-require_once __DIR__ . '/Fixtures/TestField.php';
 
 use Symfony\Component\Form\FormContext;
 use Symfony\Component\Form\CsrfProvider\DefaultCsrfProvider;

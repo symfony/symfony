@@ -24,7 +24,7 @@ class PaddedChoiceList extends DefaultChoiceList
      * @return array               An array with the input values as keys and the
      *                             padded values as values
      */
-    public function __construct($values, $padLength, $padString, $padType = STR_PAD_LEFT, array $preferredChoices = array(), $emptyValue = '', $required = false)
+    public function __construct($values, $padLength, $padString, $padType = STR_PAD_LEFT, array $preferredChoices = array())
     {
         $choices = array();
 
@@ -32,6 +32,6 @@ class PaddedChoiceList extends DefaultChoiceList
             $choices[$value] = str_pad($value, $padLength, $padString, $padType);
         }
 
-        parent::__construct($choices, $preferredChoices, $emptyValue, $required);
+        parent::__construct($choices, $preferredChoices);
     }
 }

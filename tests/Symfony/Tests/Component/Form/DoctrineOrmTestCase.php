@@ -11,16 +11,20 @@
 
 namespace Symfony\Tests\Component\Form;
 
+require_once __DIR__.'/TestCase.php';
+
 use Doctrine\ORM\EntityManager;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\DependencyInjection\ParameterBag\ParameterBag;
 use Symfony\Bundle\DoctrineBundle\DependencyInjection\DoctrineExtension;
 use Symfony\Component\DependencyInjection\Loader\YamlFileLoader;
 
-class DoctrineOrmTestCase extends \PHPUnit_Framework_TestCase
+class DoctrineOrmTestCase extends TestCase
 {
     protected function setUp()
     {
+        parent::setUp();
+
         if (!class_exists('Doctrine\\Common\\Version')) {
             $this->markTestSkipped('Doctrine is not available.');
         }

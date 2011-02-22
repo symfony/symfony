@@ -330,7 +330,7 @@ class Field extends Configurable implements FieldInterface
      *                When the field is submitted, the normalized submitted data is
      *                returned if the field is valid, null otherwise.
      */
-    protected function getNormalizedData()
+    public function getNormalizedData()
     {
         return $this->normalizedData;
     }

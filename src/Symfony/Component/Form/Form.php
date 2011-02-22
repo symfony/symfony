@@ -157,6 +157,8 @@ class Form extends Field implements \IteratorAggregate, FormInterface
 
             $options = func_num_args() > 1 ? func_get_arg(1) : array();
             $field = $factory->getInstance($class, $field, $options);
+
+            // TODO throw exception if nothing was returned
         }
 
         if ('' === $field->getKey() || null === $field->getKey()) {
@@ -646,7 +648,7 @@ class Form extends Field implements \IteratorAggregate, FormInterface
 
     public function setValidationGroups($validationGroups)
     {
-        $this->validationGroups = (array)$validationGroups;
+        $this->validationGroups = empty($validationGroups) ? null : (array)$validationGroups;
 
         return $this;
     }
@@ -790,16 +792,14 @@ class Form extends Field implements \IteratorAggregate, FormInterface
      */
     public function validate()
     {
-        $validator = $this->getOption('validator');
-
-        if (null === $validator) {
-            throw new MissingOptionsException('The option "validator" is required for validating', array('validator'));
+        if (null === $this->validator) {
+            throw new MissingOptionsException('A validator is required for validating', array('validator'));
         }
 
         // Validate the form in group "Default"
         // Validation of the data in the custom group is done by validateData(),
         // which is constrained by the Execute constraint
-        if ($violations = $validator->validate($this)) {
+        if ($violations = $this->validator->validate($this)) {
             foreach ($violations as $violation) {
                 $propertyPath = new PropertyPath($violation->getPropertyPath());
                 $iterator = $propertyPath->getIterator();

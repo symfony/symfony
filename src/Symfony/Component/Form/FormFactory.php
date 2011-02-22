@@ -15,8 +15,12 @@ use Symfony\Component\Form\ChoiceList\ChoiceListInterface;
 use Symfony\Component\Form\ChoiceList\DefaultChoiceList;
 use Symfony\Component\Form\ChoiceList\PaddedChoiceList;
 use Symfony\Component\Form\ChoiceList\MonthChoiceList;
+use Symfony\Component\Form\ChoiceList\TimeZoneChoiceList;
+use Symfony\Component\Form\ChoiceList\EntityChoiceList;
 use Symfony\Component\Form\CsrfProvider\CsrfProviderInterface;
 use Symfony\Component\Form\DataProcessor\RadioToArrayConverter;
+use Symfony\Component\Form\DataProcessor\UrlProtocolFixer;
+use Symfony\Component\Form\DataProcessor\CollectionMerger;
 use Symfony\Component\Form\FieldFactory\FieldFactoryInterface;
 use Symfony\Component\Form\Renderer\DefaultRenderer;
 use Symfony\Component\Form\Renderer\Theme\ThemeInterface;
@@ -29,6 +33,7 @@ use Symfony\Component\Form\Renderer\Plugin\DatePatternPlugin;
 use Symfony\Component\Form\Renderer\Plugin\MoneyPatternPlugin;
 use Symfony\Component\Form\Renderer\Plugin\ValuePlugin;
 use Symfony\Component\Form\Renderer\Plugin\PasswordValuePlugin;
+use Symfony\Component\Form\Renderer\Plugin\SelectMultipleNamePlugin;
 use Symfony\Component\Form\ValueTransformer\BooleanToStringTransformer;
 use Symfony\Component\Form\ValueTransformer\NumberToLocalizedStringTransformer;
 use Symfony\Component\Form\ValueTransformer\IntegerToLocalizedStringTransformer;
@@ -39,6 +44,10 @@ use Symfony\Component\Form\ValueTransformer\DateTimeToStringTransformer;
 use Symfony\Component\Form\ValueTransformer\DateTimeToLocalizedStringTransformer;
 use Symfony\Component\Form\ValueTransformer\DateTimeToTimestampTransformer;
 use Symfony\Component\Form\ValueTransformer\ReversedTransformer;
+use Symfony\Component\Form\ValueTransformer\EntityToIdTransformer;
+use Symfony\Component\Form\ValueTransformer\EntitiesToArrayTransformer;
+use Symfony\Component\Form\ValueTransformer\ValueTransformerChain;
+use Symfony\Component\Form\ValueTransformer\ArrayToChoicesTransformer;
 use Symfony\Component\Validator\ValidatorInterface;
 use Symfony\Component\Locale\Locale;
 
@@ -145,7 +154,7 @@ class FormFactory
     {
         $field = new Field($key);
 
-        $this->initField($field);
+        $this->initField($field, $options);
 
         return $field;
     }
@@ -154,7 +163,7 @@ class FormFactory
     {
         $form = new Form($key);
 
-        $this->initForm($form);
+        $this->initForm($form, $options);
 
         return $form;
     }
@@ -168,6 +177,15 @@ class FormFactory
 
         return $this->getField($key, $options)
             ->setRendererVar('max_length', $options['max_length']);
+    }
+
+    public function getTextareaField($key, array $options = array())
+    {
+        $options = array_merge(array(
+            'template' => 'textarea',
+        ), $options);
+
+        return $this->getField($key, $options);
     }
 
     public function getPasswordField($key, array $options = array())
@@ -276,6 +294,16 @@ class FormFactory
             ->setRendererVar('value', $options['value']);
     }
 
+    public function getUrlField($key, array $options = array())
+    {
+        $options = array_merge(array(
+            'default_protocol' => 'http',
+        ), $options);
+
+        return $this->getTextField($key, $options)
+            ->setDataProcessor(new UrlProtocolFixer($options['default_protocol']));
+    }
+
     protected function getChoiceFieldForList($key, ChoiceListInterface $choiceList, array $options = array())
     {
         $options = array_merge(array(
@@ -288,7 +316,7 @@ class FormFactory
             $field = $this->getField($key, $options);
         } else {
             $field = $this->getForm($key, $options);
-            $choices = array_merge($choiceList->getPreferredChoices(), $choiceList->getOtherChoices());
+            $choices = array_replace($choiceList->getPreferredChoices(), $choiceList->getOtherChoices());
 
             foreach ($choices as $choice => $value) {
                 if ($options['multiple']) {
@@ -338,6 +366,57 @@ class FormFactory
         return $this->getChoiceFieldForList($key, $choiceList, $options);
     }
 
+    public function getEntityChoiceField($key, array $options = array())
+    {
+        $options = array_merge(array(
+            'em' => null,
+            'class' => null,
+            'property' => null,
+            'query_builder' => null,
+            'choices' => array(),
+            'preferred_choices' => array(),
+            'multiple' => false,
+            'expanded' => false,
+        ), $options);
+
+        $choiceList = new EntityChoiceList(
+            $options['em'],
+            $options['class'],
+            $options['property'],
+            $options['query_builder'],
+            $options['choices'],
+            $options['preferred_choices']
+        );
+
+        $field = $this->getChoiceFieldForList($key, $choiceList, $options);
+
+        $transformers = array();
+
+        if ($options['multiple']) {
+            $field->setDataProcessor(new CollectionMerger($field));
+
+            $transformers[] = new EntitiesToArrayTransformer($choiceList);
+
+            if ($options['expanded']) {
+                $transformers[] = new ArrayToChoicesTransformer($choiceList);
+            }
+        } else {
+            $transformers[] = new EntityToIdTransformer($choiceList);
+
+            if ($options['expanded']) {
+                $transformers[] = new ScalarToChoicesTransformer($choiceList);
+            }
+        }
+
+        if (count($transformers) > 1) {
+            $field->setValueTransformer(new ValueTransformerChain($transformers));
+        } else {
+            $field->setValueTransformer(current($transformers));
+        }
+
+        return $field;
+    }
+
     public function getCountryField($key, array $options = array())
     {
         $options = array_merge(array(
@@ -363,6 +442,17 @@ class FormFactory
         ), $options);
 
         return $this->getChoiceField($key, $options);
+    }
+
+    public function getTimeZoneField($key, array $options = array())
+    {
+        $options = array_merge(array(
+            'preferred_choices' => array(),
+        ), $options);
+
+        $choiceList = new TimeZoneChoiceList($options['preferred_choices']);
+
+        return $this->getChoiceFieldForList($key, $choiceList, $options);
     }
 
     protected function getDayField($key, array $options = array())

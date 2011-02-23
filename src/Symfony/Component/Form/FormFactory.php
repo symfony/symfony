@@ -634,7 +634,7 @@ class FormFactory
                     'input_timezone' => $options['data_timezone'],
                 ))
             ));
-        } else if ($options['type'] === 'raw') {
+        } else if ($options['type'] === 'array') {
             $field->setNormalizationTransformer(new ReversedTransformer(
                 new DateTimeToArrayTransformer(array(
                     'input_timezone' => $options['data_timezone'],
@@ -706,7 +706,7 @@ class FormFactory
                     'output_timezone' => $options['data_timezone'],
                 ))
             ));
-        } else if ($options['type'] === 'raw') {
+        } else if ($options['type'] === 'array') {
             $field->setNormalizationTransformer(new ReversedTransformer(
                 new DateTimeToArrayTransformer(array(
                     'input_timezone' => $options['data_timezone'],

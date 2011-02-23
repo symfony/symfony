@@ -43,6 +43,10 @@ class AsseticExtensionTest extends \PHPUnit_Framework_TestCase
             $this->markTestSkipped('Assetic is not available.');
         }
 
+        if (false === @include 'PHP/CodeSniffer.php') {
+            $this->markTestSkipped('PHP_CodeSniffer is not installed.');
+        }
+
         $this->kernel = $this->getMockBuilder('Symfony\\Component\\HttpKernel\\Kernel')
             ->disableOriginalConstructor()
             ->getMock();

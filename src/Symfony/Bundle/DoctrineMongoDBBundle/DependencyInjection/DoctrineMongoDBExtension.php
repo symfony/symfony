@@ -33,7 +33,9 @@ class DoctrineMongoDBExtension extends AbstractDoctrineExtension
     public function load(array $configs, ContainerBuilder $container)
     {
         foreach ($configs as $config) {
-            $this->doMongodbLoad($config, $container);
+            if ( ! empty($config)) {
+                $this->doMongodbLoad($config, $container);
+            }
         }
     }
 

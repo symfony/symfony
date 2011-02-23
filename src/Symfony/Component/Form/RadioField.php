@@ -24,6 +24,6 @@ class RadioField extends ToggleField
     public function getName()
     {
         // TESTME
-        return $this->getParent() ? $this->getParent()->getName() : $this->getName();
+        return $this->getParent() ? $this->getParent()->getName() : parent::getName();
     }
 }

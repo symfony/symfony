@@ -16,7 +16,7 @@ use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 
 /**
- * DoctrineDataCollector.
+ * SpoolDataCollector.
  *
  * @author Clément JOBEILI <clement.jobeili@gmail.com>
  */

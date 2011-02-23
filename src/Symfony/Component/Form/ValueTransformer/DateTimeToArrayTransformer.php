@@ -112,6 +112,19 @@ class DateTimeToArrayTransformer extends BaseDateTimeTransformer
             return null;
         }
 
+        $emptyFields = array();
+
+        foreach ($this->getOption('fields') as $field) {
+            if (empty($value[$field])) {
+                $emptyFields[] = $field;
+            }
+        }
+
+        if (count($emptyFields) > 0) {
+            throw new TransformationFailedException(sprintf(
+                    'The fields "%s" should not be empty', implode('", "', $emptyFields)));
+        }
+
         try {
             $dateTime = new \DateTime(sprintf(
                 '%s-%s-%s %s:%s:%s %s',

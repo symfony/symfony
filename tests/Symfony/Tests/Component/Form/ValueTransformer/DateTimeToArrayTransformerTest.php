@@ -150,7 +150,7 @@ class DateTimeToArrayTransformerTest extends DateTimeTestCase
         $this->assertDateTimeEquals($output, $transformer->reverseTransform($input, null));
     }
 
-    public function testReverseTransform_empty()
+    public function testReverseTransform_completelyEmpty()
     {
         $transformer = new DateTimeToArrayTransformer();
 
@@ -164,6 +164,111 @@ class DateTimeToArrayTransformerTest extends DateTimeTestCase
         );
 
         $this->assertSame(null, $transformer->reverseTransform($input, null));
+    }
+
+    public function testReverseTransform_completelyEmpty_subsetOfFields()
+    {
+        $transformer = new DateTimeToArrayTransformer(array(
+            'fields' => array('year', 'month', 'day')
+        ));
+
+        $input = array(
+            'year' => '',
+            'month' => '',
+            'day' => '',
+        );
+
+        $this->assertSame(null, $transformer->reverseTransform($input, null));
+    }
+
+    /**
+     * @expectedException Symfony\Component\Form\ValueTransformer\TransformationFailedException
+     */
+    public function testReverseTransform_partiallyEmpty_year()
+    {
+        $transformer = new DateTimeToArrayTransformer();
+        $transformer->reverseTransform(array(
+            'month' => '2',
+            'day' => '3',
+            'hour' => '4',
+            'minute' => '5',
+            'second' => '6',
+        ));
+    }
+
+    /**
+     * @expectedException Symfony\Component\Form\ValueTransformer\TransformationFailedException
+     */
+    public function testReverseTransform_partiallyEmpty_month()
+    {
+        $transformer = new DateTimeToArrayTransformer();
+        $transformer->reverseTransform(array(
+            'year' => '2010',
+            'day' => '3',
+            'hour' => '4',
+            'minute' => '5',
+            'second' => '6',
+        ));
+    }
+
+    /**
+     * @expectedException Symfony\Component\Form\ValueTransformer\TransformationFailedException
+     */
+    public function testReverseTransform_partiallyEmpty_day()
+    {
+        $transformer = new DateTimeToArrayTransformer();
+        $transformer->reverseTransform(array(
+            'year' => '2010',
+            'month' => '2',
+            'hour' => '4',
+            'minute' => '5',
+            'second' => '6',
+        ));
+    }
+
+    /**
+     * @expectedException Symfony\Component\Form\ValueTransformer\TransformationFailedException
+     */
+    public function testReverseTransform_partiallyEmpty_hour()
+    {
+        $transformer = new DateTimeToArrayTransformer();
+        $transformer->reverseTransform(array(
+            'year' => '2010',
+            'month' => '2',
+            'day' => '3',
+            'minute' => '5',
+            'second' => '6',
+        ));
+    }
+
+    /**
+     * @expectedException Symfony\Component\Form\ValueTransformer\TransformationFailedException
+     */
+    public function testReverseTransform_partiallyEmpty_minute()
+    {
+        $transformer = new DateTimeToArrayTransformer();
+        $transformer->reverseTransform(array(
+            'year' => '2010',
+            'month' => '2',
+            'day' => '3',
+            'hour' => '4',
+            'second' => '6',
+        ));
+    }
+
+    /**
+     * @expectedException Symfony\Component\Form\ValueTransformer\TransformationFailedException
+     */
+    public function testReverseTransform_partiallyEmpty_second()
+    {
+        $transformer = new DateTimeToArrayTransformer();
+        $transformer->reverseTransform(array(
+            'year' => '2010',
+            'month' => '2',
+            'day' => '3',
+            'hour' => '4',
+            'minute' => '5',
+        ));
     }
 
     public function testReverseTransform_null()

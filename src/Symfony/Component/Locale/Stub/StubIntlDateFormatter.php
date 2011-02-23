@@ -88,11 +88,16 @@ class StubIntlDateFormatter
      * @param  string  $pattern  Optional pattern to use when formatting.
      * @see    http://userguide.icu-project.org/formatparse/datetime
      * @throws MethodArgumentValueNotImplementedException  When $locale different than 'en' is passed
+     * @throws MethodArgumentValueNotImplementedException  When $calendar different than GREGORIAN is passed
      */
-    public function __construct($locale, $datetype, $timetype, $timezone = null, $calendar = null, $pattern = null)
+    public function __construct($locale, $datetype, $timetype, $timezone = null, $calendar = self::GREGORIAN, $pattern = null)
     {
         if ('en' != $locale) {
             throw new MethodArgumentValueNotImplementedException(__METHOD__, 'locale', $locale, 'Only the \'en\' locale is supported');
+        }
+
+        if (self::GREGORIAN != $calendar) {
+            throw new MethodArgumentValueNotImplementedException(__METHOD__, 'calendar', $calendar, 'Only the GREGORIAN calendar is supported');
         }
 
         $this->datetype = $datetype;
@@ -156,15 +161,8 @@ class StubIntlDateFormatter
                     break;
 
                 case 'y':
-                    $matchLengthMap = array(
-                        1   => 'Y',
-                        2   => 'y',
-                        3   => 'Y',
-                        4   => 'Y',
-                    );
-
-                    if (isset($matchLengthMap[$length])) {
-                       return $dateTime->format($matchLengthMap[$length]);
+                    if (2 == $length) {
+                       return $dateTime->format('y');
                     } else {
                         return str_pad($dateTime->format('Y'), $length, '0', STR_PAD_LEFT);
                     }
@@ -502,7 +500,7 @@ class StubIntlDateFormatter
      * @see    http://userguide.icu-project.org/formatparse/datetime
      * @throws MethodArgumentValueNotImplementedException  When $locale different than 'en' is passed
      */
-    static public function create($locale, $datetype, $timetype, $timezone = null, $calendar = null, $pattern = null)
+    static public function create($locale, $datetype, $timetype, $timezone = null, $calendar = self::GREGORIAN, $pattern = null)
     {
         return new self($locale, $datetype, $timetype, $timezone, $calendar, $pattern);
     }

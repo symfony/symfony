@@ -38,7 +38,7 @@ class StubIntlDateFormatterTest extends LocaleTestCase
     */
     public function testFormatStub($pattern, $timestamp, $expected)
     {
-        $formatter = new StubIntlDateFormatter('en', StubIntlDateFormatter::MEDIUM, StubIntlDateFormatter::SHORT, 'UTC', StubIntlDateFormatter::GREGORIAN, $pattern);
+        $formatter = $this->createStubFormatter($pattern);
         $this->assertSame($expected, $formatter->format($timestamp));
     }
 
@@ -48,7 +48,7 @@ class StubIntlDateFormatterTest extends LocaleTestCase
     public function testFormatIntl($pattern, $timestamp, $expected)
     {
         $this->skipIfIntlExtensionIsNotLoaded();
-        $formatter = new \IntlDateFormatter('en', \IntlDateFormatter::MEDIUM, \IntlDateFormatter::SHORT, 'UTC', \IntlDateFormatter::GREGORIAN, $pattern);
+        $formatter = $this->createIntlFormatter($pattern);
         $this->assertSame($expected, $formatter->format($timestamp));
     }
 
@@ -368,7 +368,7 @@ class StubIntlDateFormatterTest extends LocaleTestCase
 
     public function testGetPattern()
     {
-        $formatter = new StubIntlDateFormatter('en', StubIntlDateFormatter::FULL, StubIntlDateFormatter::NONE, StubIntlDateFormatter::GREGORIAN, 'UTC', 'yyyy-MM-dd');
+        $formatter = new StubIntlDateFormatter('en', StubIntlDateFormatter::FULL, StubIntlDateFormatter::NONE, 'UTC', StubIntlDateFormatter::GREGORIAN, 'yyyy-MM-dd');
         $this->assertEquals('yyyy-MM-dd', $formatter->getPattern());
     }
 
@@ -459,7 +459,7 @@ class StubIntlDateFormatterTest extends LocaleTestCase
 
     public function testSetTimeZoneIdStub()
     {
-        $formatter = new StubIntlDateFormatter('en', StubIntlDateFormatter::MEDIUM, StubIntlDateFormatter::SHORT, 'UTC');
+        $formatter = $this->createStubFormatter();
         $this->assertEquals('UTC', $formatter->getTimeZoneId());
 
         $formatter->setTimeZoneId('Europe/Zurich');
@@ -469,7 +469,7 @@ class StubIntlDateFormatterTest extends LocaleTestCase
     public function testSetTimeZoneIdIntl()
     {
         $this->skipIfIntlExtensionIsNotLoaded();
-        $formatter = new \IntlDateFormatter('en', \IntlDateFormatter::MEDIUM, \IntlDateFormatter::SHORT, 'UTC');
+        $formatter = $this->createIntlFormatter();
         $this->assertEquals('UTC', $formatter->getTimeZoneId());
 
         $formatter->setTimeZoneId('Europe/Zurich');
@@ -482,8 +482,13 @@ class StubIntlDateFormatterTest extends LocaleTestCase
         $this->assertInstanceOf('Symfony\Component\Locale\Stub\StubIntlDateFormatter', $formatter);
     }
 
-    protected function createStubFormatter()
+    protected function createStubFormatter($pattern = null)
     {
-        return new StubIntlDateFormatter('en', StubIntlDateFormatter::MEDIUM, StubIntlDateFormatter::SHORT);
+        return new StubIntlDateFormatter('en', StubIntlDateFormatter::MEDIUM, StubIntlDateFormatter::SHORT, 'UTC', StubIntlDateFormatter::GREGORIAN, $pattern);
+    }
+
+    protected function createIntlFormatter($pattern = null)
+    {
+        return new \IntlDateFormatter('en', \IntlDateFormatter::MEDIUM, \IntlDateFormatter::SHORT, 'UTC', \IntlDateFormatter::GREGORIAN, $pattern);
     }
 }

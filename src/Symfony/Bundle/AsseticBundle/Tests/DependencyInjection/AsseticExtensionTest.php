@@ -43,7 +43,7 @@ class AsseticExtensionTest extends \PHPUnit_Framework_TestCase
             $this->markTestSkipped('Assetic is not available.');
         }
 
-        if (false === @include 'PHP/CodeSniffer.php') {
+        if (false === @include_once 'PHP/CodeSniffer.php') {
             $this->markTestSkipped('PHP_CodeSniffer is not installed.');
         }
 

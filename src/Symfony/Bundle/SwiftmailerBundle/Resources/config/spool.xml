@@ -22,5 +22,11 @@
     </service>
 
     <service id="swiftmailer.spool" alias="swiftmailer.spool.file" public="false" />
+    
+    <service id="swiftmailer.data_collector" class="%swiftmailer.data_collector.class%" public="false">
+        <tag name="data_collector" template="SwiftmailerBundle:Collector:spool" id="spool" />
+        <argument>%swiftmailer.spool.file.path%</argument>
+    </service>
+    
   </services>
 </container>

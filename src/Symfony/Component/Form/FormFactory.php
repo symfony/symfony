@@ -49,6 +49,7 @@ use Symfony\Component\Form\ValueTransformer\EntityToIdTransformer;
 use Symfony\Component\Form\ValueTransformer\EntitiesToArrayTransformer;
 use Symfony\Component\Form\ValueTransformer\ValueTransformerChain;
 use Symfony\Component\Form\ValueTransformer\ArrayToChoicesTransformer;
+use Symfony\Component\Form\ValueTransformer\ArrayToPartsTransformer;
 use Symfony\Component\Validator\ValidatorInterface;
 use Symfony\Component\Locale\Locale;
 
@@ -678,7 +679,7 @@ class FormFactory
             'widget',
         )));
 
-        $children = array('hour', 'minute');
+        $parts = array('hour', 'minute');
         $field = $this->getForm($key, $options)
             ->add($this->getHourField('hour', $childOptions))
             ->add($this->getMinuteField('minute', $childOptions))
@@ -687,7 +688,7 @@ class FormFactory
             ->setModifyByReference(false);
 
         if ($options['with_seconds']) {
-            $children[] = 'second';
+            $parts[] = 'second';
             $field->add($this->getSecondField('second', $childOptions));
         }
 
@@ -711,7 +712,7 @@ class FormFactory
                 new DateTimeToArrayTransformer(array(
                     'input_timezone' => $options['data_timezone'],
                     'output_timezone' => $options['data_timezone'],
-                    'fields' => $children,
+                    'fields' => $parts,
                 ))
             ));
         }
@@ -723,10 +724,111 @@ class FormFactory
                 // if the field is rendered as choice field, the values should be trimmed
                 // of trailing zeros to render the selected choices correctly
                 'pad' => $options['widget'] === 'text',
-                'fields' => $children,
+                'fields' => $parts,
             )))
             ->setRendererVar('widget', $options['widget'])
             ->setRendererVar('with_seconds', $options['with_seconds']);
+
+        return $field;
+    }
+
+    public function getDateTimeField($key, array $options = array())
+    {
+        $options = array_merge(array(
+            'template' => 'datetime',
+            'type' => 'datetime',
+            'with_seconds' => false,
+            'data_timezone' => date_default_timezone_get(),
+            'user_timezone' => date_default_timezone_get(),
+        ), $options);
+
+        // Only pass a subset of the options to children
+        $dateFieldOptions = array_intersect_key($options, array_flip(array(
+            'years',
+            'months',
+            'days',
+        )));
+        $timeFieldOptions = array_intersect_key($options, array_flip(array(
+            'hours',
+            'minutes',
+            'seconds',
+            'with_seconds',
+        )));
+
+        if (isset($options['date_pattern'])) {
+            $dateFieldOptions['pattern'] = $options['date_pattern'];
+        }
+        if (isset($options['date_widget'])) {
+            $dateFieldOptions['widget'] = $options['date_widget'];
+        }
+        if (isset($options['date_format'])) {
+            $dateFieldOptions['format'] = $options['date_format'];
+        }
+
+        $dateFieldOptions['type'] = 'array';
+
+        if (isset($options['time_pattern'])) {
+            $timeFieldOptions['pattern'] = $options['time_pattern'];
+        }
+        if (isset($options['time_widget'])) {
+            $timeFieldOptions['widget'] = $options['time_widget'];
+        }
+        if (isset($options['time_format'])) {
+            $timeFieldOptions['format'] = $options['time_format'];
+        }
+
+        $timeFieldOptions['type'] = 'array';
+
+        $parts = array('year', 'month', 'day', 'hour', 'minute');
+        $timeParts = array('hour', 'minute');
+
+        if ($options['with_seconds']) {
+            $parts[] = 'second';
+            $timeParts[] = 'second';
+        }
+
+        $field = $this->getForm($key, $options)
+            ->setValueTransformer(new ValueTransformerChain(array(
+                new DateTimeToArrayTransformer(array(
+                    'input_timezone' => $options['data_timezone'],
+                    'output_timezone' => $options['user_timezone'],
+                )),
+                new ArrayToPartsTransformer(array(
+                    'date' => array('year', 'month', 'day'),
+                    'time' => $timeParts,
+                )),
+            )))
+            ->add($this->getDateField('date', $dateFieldOptions))
+            ->add($this->getTimeField('time', $timeFieldOptions))
+            // Don't modify \DateTime classes by reference, we treat
+            // them like immutable value objects
+            ->setModifyByReference(false)
+            ->setData(null); // hack: should be invoked automatically
+
+        if ($options['type'] == 'string') {
+            $field->setNormalizationTransformer(new ReversedTransformer(
+                new DateTimeToStringTransformer(array(
+                    'format' => 'Y-m-d H:i:s',
+                    'input_timezone' => $options['data_timezone'],
+                    'output_timezone' => $options['data_timezone'],
+                ))
+            ));
+        } else if ($options['type'] == 'timestamp') {
+            $field->setNormalizationTransformer(new ReversedTransformer(
+                new DateTimeToTimestampTransformer(array(
+                    'input_timezone' => $options['data_timezone'],
+                    'output_timezone' => $options['data_timezone'],
+                ))
+            ));
+        } else if ($options['type'] === 'array') {
+            $field->setNormalizationTransformer(new ReversedTransformer(
+                new DateTimeToArrayTransformer(array(
+                    'input_timezone' => $options['data_timezone'],
+                    'output_timezone' => $options['data_timezone'],
+                    'fields' => $parts,
+                ))
+            ));
+        }
 
         return $field;
     }

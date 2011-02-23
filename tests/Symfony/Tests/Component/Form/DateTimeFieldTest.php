@@ -21,12 +21,12 @@ class DateTimeFieldTest extends DateTimeTestCase
 {
     public function testSubmit_dateTime()
     {
-        $field = new DateTimeField('name', array(
+        $field = $this->factory->getDateTimeField('name', array(
             'data_timezone' => 'UTC',
             'user_timezone' => 'UTC',
-            'date_widget' => DateField::CHOICE,
-            'time_widget' => TimeField::CHOICE,
-            'type' => DateTimeField::DATETIME,
+            'date_widget' => 'choice',
+            'time_widget' => 'choice',
+            'type' => 'datetime',
         ));
 
         $field->submit(array(
@@ -48,12 +48,12 @@ class DateTimeFieldTest extends DateTimeTestCase
 
     public function testSubmit_string()
     {
-        $field = new DateTimeField('name', array(
+        $field = $this->factory->getDateTimeField('name', array(
             'data_timezone' => 'UTC',
             'user_timezone' => 'UTC',
-            'type' => DateTimeField::STRING,
-            'date_widget' => DateField::CHOICE,
-            'time_widget' => TimeField::CHOICE,
+            'type' => 'string',
+            'date_widget' => 'choice',
+            'time_widget' => 'choice',
         ));
 
         $field->submit(array(
@@ -73,12 +73,12 @@ class DateTimeFieldTest extends DateTimeTestCase
 
     public function testSubmit_timestamp()
     {
-        $field = new DateTimeField('name', array(
+        $field = $this->factory->getDateTimeField('name', array(
             'data_timezone' => 'UTC',
             'user_timezone' => 'UTC',
-            'type' => DateTimeField::TIMESTAMP,
-            'date_widget' => DateField::CHOICE,
-            'time_widget' => TimeField::CHOICE,
+            'type' => 'timestamp',
+            'date_widget' => 'choice',
+            'time_widget' => 'choice',
         ));
 
         $field->submit(array(
@@ -100,12 +100,12 @@ class DateTimeFieldTest extends DateTimeTestCase
 
     public function testSubmit_withSeconds()
     {
-        $field = new DateTimeField('name', array(
+        $field = $this->factory->getDateTimeField('name', array(
             'data_timezone' => 'UTC',
             'user_timezone' => 'UTC',
-            'date_widget' => DateField::CHOICE,
-            'time_widget' => TimeField::CHOICE,
-            'type' => DateTimeField::DATETIME,
+            'date_widget' => 'choice',
+            'time_widget' => 'choice',
+            'type' => 'datetime',
             'with_seconds' => true,
         ));
 
@@ -131,13 +131,13 @@ class DateTimeFieldTest extends DateTimeTestCase
 
     public function testSubmit_differentTimezones()
     {
-        $field = new DateTimeField('name', array(
+        $field = $this->factory->getDateTimeField('name', array(
             'data_timezone' => 'America/New_York',
             'user_timezone' => 'Pacific/Tahiti',
-            'date_widget' => DateField::CHOICE,
-            'time_widget' => TimeField::CHOICE,
+            'date_widget' => 'choice',
+            'time_widget' => 'choice',
             // don't do this test with DateTime, because it leads to wrong results!
-            'type' => DateTimeField::STRING,
+            'type' => 'string',
             'with_seconds' => true,
         ));
 

@@ -46,19 +46,14 @@ class FilterManagerTest extends \PHPUnit_Framework_TestCase
         $this->assertTrue($fm->has('foo'), '->has() returns true for lazily mapped filters');
     }
 
-    public function testAll()
+    public function testGetNames()
     {
         $container = $this->getMock('Symfony\\Component\\DependencyInjection\\ContainerInterface');
         $filter = $this->getMock('Assetic\\Filter\\FilterInterface');
 
-        $container->expects($this->once())
-            ->method('get')
-            ->with('assetic.filter.bar')
-            ->will($this->returnValue($filter));
-
         $fm = new FilterManager($container, array('foo' => 'assetic.filter.bar'));
         $fm->set('bar', $filter);
-        $all = $fm->all();
-        $this->assertEquals(2, count($all), '->all() returns all lazy and normal filters');
+
+        $this->assertEquals(array('foo', 'bar'), $fm->getNames(), '->getNames() returns all lazy and normal filter names');
     }
 }

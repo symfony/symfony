@@ -11,14 +11,14 @@
 
 namespace Symfony\Bundle\AsseticBundle\Twig;
 
-use Assetic\Extension\Twig\Node;
+use Assetic\Extension\Twig\AsseticNode;
 
 /**
  * The "static" node references a file in the web directory.
  *
  * @author Kris Wallsmith <kris.wallsmith@symfony-project.com>
  */
-class StaticNode extends Node
+class StaticNode extends AsseticNode
 {
     /**
      * Renders the asset URL using Symfony's asset() function.

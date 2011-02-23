@@ -45,7 +45,9 @@ class AsseticLoader extends Loader
     public function load($resource, $type = null)
     {
         $routes = new RouteCollection();
-        foreach ($this->am->all() as $name => $asset) {
+        foreach ($this->am->getNames() as $name) {
+            $asset = $this->am->get($name);
+
             $defaults = array(
                 '_controller' => 'assetic.controller:render',
                 'name'        => $name,

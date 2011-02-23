@@ -11,32 +11,19 @@
 
 namespace Symfony\Bundle\AsseticBundle\Templating;
 
-use Symfony\Component\Templating\Loader\LoaderInterface;
-use Symfony\Component\Templating\TemplateNameParser;
+use Assetic\Factory\Loader\FormulaLoaderInterface;
+use Assetic\Factory\Resource\ResourceInterface;
 
 /**
  * Loads formulae from PHP templates.
  *
  * @author Kris Wallsmith <kris.wallsmith@symfony-project.com>
  */
-class FormulaLoader
+class FormulaLoader implements FormulaLoaderInterface
 {
-    protected $parser;
-    protected $loader;
-
-    public function __construct(TemplateNameParser $parser, LoaderInterface $loader)
+    public function load(ResourceInterface $resource)
     {
-        $this->parser = $parser;
-        $this->loader = $loader;
-    }
-
-    public function load($templateName)
-    {
-        if (!$template = $this->loader->load($this->parser->parse($templateName))) {
-            return array();
-        }
-
-        $tokens = token_get_all($template->getContent());
+        $tokens = token_get_all($resource->getContent());
 
         /**
          * @todo Find and extract asset formulae from calls to the following:

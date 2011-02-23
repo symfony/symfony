@@ -28,8 +28,8 @@ class AsseticBundle extends Bundle
     {
         parent::build($container);
 
+        $container->addCompilerPass(new TemplatingPass());
         $container->addCompilerPass(new AssetManagerPass());
         $container->addCompilerPass(new FilterManagerPass());
-        $container->addCompilerPass(new TemplatingPass());
     }
 }

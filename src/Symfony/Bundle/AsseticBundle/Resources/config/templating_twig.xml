@@ -7,8 +7,8 @@
     <parameters>
         <parameter key="assetic.twig_extension.dynamic.class">Symfony\Bundle\AsseticBundle\Twig\DynamicExtension</parameter>
         <parameter key="assetic.twig_extension.static.class">Symfony\Bundle\AsseticBundle\Twig\StaticExtension</parameter>
-        <parameter key="assetic.twig_formula_loader.class">Assetic\Extension\Twig\FormulaLoader</parameter>
-        <parameter key="assetic.cache_warmer.twig.class">Symfony\Bundle\AsseticBundle\CacheWarmer\TwigAssetsCacheWarmer</parameter>
+        <parameter key="assetic.twig_formula_loader.class">Assetic\Extension\Twig\TwigFormulaLoader</parameter>
+        <parameter key="assetic.twig_directory_resource.class"></parameter>
     </parameters>
 
     <services>
@@ -20,13 +20,13 @@
             <argument>%assetic.default_javascripts_output%</argument>
             <argument>%assetic.default_stylesheets_output%</argument>
         </service>
-        <service id="assetic.cache_warmer.twig" class="%assetic.cache_warmer.twig.class%" public="false">
-            <tag name="kernel.cache_warmer" priority="10" />
+        <service id="assetic.twig_formula_loader" class="%assetic.cached_formula_loader.class%" public="false">
+            <tag name="assetic.formula_loader" alias="twig" />
             <tag name="assetic.templating.twig" />
-            <argument type="service" id="kernel" />
-            <argument type="service" id="assetic.twig_formula_loader" />
+            <argument type="service" id="assetic.twig_formula_loader.real" />
+            <argument type="service" id="assetic.config_cache" />
         </service>
-        <service id="assetic.twig_formula_loader" class="%assetic.twig_formula_loader.class%" public="false">
+        <service id="assetic.twig_formula_loader.real" class="%assetic.twig_formula_loader.class%" public="false">
             <tag name="assetic.templating.twig" />
             <argument type="service" id="twig" />
         </service>

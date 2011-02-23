@@ -45,16 +45,11 @@ class FilterManager extends BaseFilterManager
 
     public function has($name)
     {
-        return isset($this->mappings) || parent::has($name);
+        return isset($this->mappings[$name]) || parent::has($name);
     }
 
-    public function all()
+    public function getNames()
     {
-        $filters = array();
-        foreach ($this->mappings as $name => $id) {
-            $filters[$name] = $this->container->get($id);
-        }
-
-        return $filters + parent::all();
+        return array_unique(array_merge(array_keys($this->mappings), parent::getNames()));
     }
 }

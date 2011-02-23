@@ -11,11 +11,13 @@
 
 namespace Symfony\Bundle\AsseticBundle\DependencyInjection;
 
-use Symfony\Component\HttpKernel\DependencyInjection\Extension;
-use Symfony\Component\DependencyInjection\ContainerBuilder;
-use Symfony\Component\DependencyInjection\Loader\XmlFileLoader;
 use Symfony\Component\Config\FileLocator;
 use Symfony\Component\Config\Definition\Processor;
+use Symfony\Component\DependencyInjection\ContainerBuilder;
+use Symfony\Component\DependencyInjection\Definition;
+use Symfony\Component\DependencyInjection\Loader\XmlFileLoader;
+use Symfony\Component\DependencyInjection\Reference;
+use Symfony\Component\HttpKernel\DependencyInjection\Extension;
 
 /**
  * Semantic asset configuration.
@@ -94,6 +96,56 @@ class AsseticExtension extends Extension
         if ($container->hasParameter('assetic.less.compress')) {
             $container->getDefinition('assetic.filter.less')->addMethodCall('setCompress', array('%assetic.less.compress%'));
         }
+
+        $this->registerFormulaResources($container);
+    }
+
+    protected function registerFormulaResources(ContainerBuilder $container)
+    {
+        // bundle views/ directories
+        $am = $container->getDefinition('assetic.asset_manager');
+        foreach ($container->getParameter('kernel.bundles') as $name => $class) {
+            $rc = new \ReflectionClass($class);
+            if (is_dir($dir = dirname($rc->getFileName()).'/Resources/views')) {
+                foreach (array('twig', 'php') as $engine) {
+                    $container->setDefinition(
+                        'assetic.'.$engine.'_directory_resource.'.$name,
+                        $this->createDirectoryResourceDefinition($name, $dir, $engine)
+                    );
+                }
+            }
+        }
+
+        // kernel views/ directory
+        if (is_dir($dir = $container->getParameter('kernel.root_dir').'/views')) {
+            foreach (array('twig', 'php') as $engine) {
+                $container->setDefinition(
+                    'assetic.'.$engine.'_directory_resource.kernel',
+                    $this->createDirectoryResourceDefinition('', $dir, $engine)
+                );
+            }
+        }
+    }
+
+    /**
+     * @todo decorate an abstract xml definition
+     */
+    protected function createDirectoryResourceDefinition($bundle, $dir, $engine)
+    {
+        $definition = new Definition('%assetic.directory_resource.class%');
+
+        $definition
+            ->addArgument(new Reference('templating.name_parser'))
+            ->addArgument(new Reference('templating.loader'))
+            ->addArgument($bundle)
+            ->addArgument($dir)
+            ->addArgument('/\.'.$engine.'$/')
+            ->addTag('assetic.templating.'.$engine)
+            ->addTag('assetic.formula_resource', array('loader' => $engine))
+            ->setPublic(false)
+        ;
+
+        return $definition;
     }
 
     /**

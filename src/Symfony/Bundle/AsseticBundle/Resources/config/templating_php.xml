@@ -6,8 +6,8 @@
 
     <parameters>
         <parameter key="assetic.helper.class">Symfony\Bundle\AsseticBundle\Templating\AsseticHelper</parameter>
-        <parameter key="assetic.cache_warmer.php.class">Symfony\Bundle\AsseticBundle\CacheWarmer\PhpTemplatingAssetsCacheWarmer</parameter>
         <parameter key="assetic.php_formula_loader.class">Symfony\Bundle\AsseticBundle\Templating\FormulaLoader</parameter>
+        <parameter key="assetic.php_directory_resource.class"></parameter>
     </parameters>
 
     <services>
@@ -19,16 +19,14 @@
             <argument>%assetic.default_javascripts_output%</argument>
             <argument>%assetic.default_stylesheets_output%</argument>
         </service>
-        <service id="assetic.cache_warmer.php" class="%assetic.cache_warmer.php.class%" public="false">
-            <tag name="kernel.cache_warmer" priority="10" />
+        <service id="assetic.php_formula_loader" class="%assetic.cached_formula_loader.class%" public="false">
+            <tag name="assetic.formula_loader" alias="php" />
             <tag name="assetic.templating.php" />
-            <argument type="service" id="kernel" />
-            <argument type="service" id="assetic.php_formula_loader" />
+            <argument type="service" id="assetic.php_formula_loader.real" />
+            <argument type="service" id="assetic.config_cache" />
         </service>
-        <service id="assetic.php_formula_loader" class="%assetic.php_formula_loader.class%" public="false">
+        <service id="assetic.php_formula_loader.real" class="%assetic.php_formula_loader.class%" public="false">
             <tag name="assetic.templating.php" />
-            <argument type="service" id="templating.name_parser" />
-            <argument type="service" id="templating.loader" />
         </service>
     </services>
 </container>

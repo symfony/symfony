@@ -44,11 +44,10 @@ class FunctionalTest extends \PHPUnit_Framework_TestCase
         $kernel = new TestKernel('test', $debug);
         $kernel->boot();
         $container = $kernel->getContainer();
-        $container->get('cache_warmer')->warmUp($container->getParameter('kernel.cache_dir'));
 
-        $assets = $container->get('assetic.asset_manager')->all();
+        $names = $container->get('assetic.asset_manager')->getNames();
 
-        $this->assertEquals($count, count($assets));
+        $this->assertEquals($count, count($names));
     }
 
     /**
@@ -59,7 +58,6 @@ class FunctionalTest extends \PHPUnit_Framework_TestCase
         $kernel = new TestKernel('test', $debug);
         $kernel->boot();
         $container = $kernel->getContainer();
-        $container->get('cache_warmer')->warmUp($container->getParameter('kernel.cache_dir'));
 
         $routes = $container->get('router')->getRouteCollection()->all();
 
@@ -80,7 +78,6 @@ class FunctionalTest extends \PHPUnit_Framework_TestCase
         $container = $kernel->getContainer();
         $container->enterScope('request');
         $container->set('request', new Request());
-        $container->get('cache_warmer')->warmUp($container->getParameter('kernel.cache_dir'));
 
         $content = $container->get('templating')->render('::layout.html.twig');
         $crawler = new Crawler($content);
@@ -98,7 +95,6 @@ class FunctionalTest extends \PHPUnit_Framework_TestCase
         $container = $kernel->getContainer();
         $container->enterScope('request');
         $container->set('request', new Request());
-        $container->get('cache_warmer')->warmUp($container->getParameter('kernel.cache_dir'));
 
         $content = $container->get('templating')->render('::layout.html.php');
         $crawler = new Crawler($content);

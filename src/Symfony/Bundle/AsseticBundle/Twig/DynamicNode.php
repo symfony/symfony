@@ -11,14 +11,14 @@
 
 namespace Symfony\Bundle\AsseticBundle\Twig;
 
-use Assetic\Extension\Twig\Node;
+use Assetic\Extension\Twig\AsseticNode;
 
 /**
  * The "dynamic" node uses a controller to render assets.
  *
  * @author Kris Wallsmith <kris.wallsmith@symfony-project.com>
  */
-class DynamicNode extends Node
+class DynamicNode extends AsseticNode
 {
     /**
      * Renders the asset URL using Symfony's path() function.

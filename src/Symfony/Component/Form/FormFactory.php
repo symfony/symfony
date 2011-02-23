@@ -38,6 +38,7 @@ use Symfony\Component\Form\ValueTransformer\BooleanToStringTransformer;
 use Symfony\Component\Form\ValueTransformer\NumberToLocalizedStringTransformer;
 use Symfony\Component\Form\ValueTransformer\IntegerToLocalizedStringTransformer;
 use Symfony\Component\Form\ValueTransformer\MoneyToLocalizedStringTransformer;
+use Symfony\Component\Form\ValueTransformer\PercentToLocalizedStringTransformer;
 use Symfony\Component\Form\ValueTransformer\ScalarToChoicesTransformer;
 use Symfony\Component\Form\ValueTransformer\DateTimeToArrayTransformer;
 use Symfony\Component\Form\ValueTransformer\DateTimeToStringTransformer;
@@ -266,6 +267,21 @@ class FormFactory
                 'divisor' => $options['divisor'],
             )))
             ->addRendererPlugin(new MoneyPatternPlugin($options['currency']));
+    }
+
+    public function getPercentField($key, array $options = array())
+    {
+        $options = array_merge(array(
+            'template' => 'percent',
+            'precision' => 0,
+            'type' => 'fractional',
+        ), $options);
+
+        return $this->getField($key, $options)
+            ->setValueTransformer(new PercentToLocalizedStringTransformer(array(
+                'precision' => $options['precision'],
+                'type' => $options['type'],
+            )));
     }
 
     public function getCheckboxField($key, array $options = array())

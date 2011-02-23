@@ -198,6 +198,7 @@
 
 {% block percent__widget %}
 {% spaceless %}
+    {% set type = type|default('text') %}
     {{ block('widget') }} %
 {% endspaceless %}
 {% endblock percent__widget %}

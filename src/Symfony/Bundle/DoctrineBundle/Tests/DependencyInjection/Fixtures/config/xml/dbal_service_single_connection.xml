@@ -7,7 +7,7 @@
                         http://symfony.com/schema/dic/doctrine http://symfony.com/schema/dic/doctrine/doctrine-1.0.xsd">
 
     <config>
-        <dbal>
+        <dbal default-connection="mysql">
             <connection
                 name="mysql"
                 dbname="mysql_db"

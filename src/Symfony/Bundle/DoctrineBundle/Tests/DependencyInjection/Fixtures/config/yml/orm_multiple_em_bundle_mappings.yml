@@ -1,8 +1,7 @@
 doctrine:
     orm:
+        default_entity_manager: em2
         entity_managers:
-            default_entity_manager: dm2
-            default_connection: conn1
             em1:
                 mappings:
                     AnnotationsBundle: ~

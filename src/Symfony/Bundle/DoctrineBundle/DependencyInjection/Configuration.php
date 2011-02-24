@@ -45,6 +45,10 @@ class Configuration
         $node
             ->arrayNode('dbal')
                 ->beforeNormalization()
+                    ->ifNull()
+                    ->then(function($v) { return array (); }) // Let use the default values with the subsequent closure.
+                ->end()
+                ->beforeNormalization()
                     ->ifTrue(function($v){ return is_array($v) && !array_key_exists('connections', $v) && !array_key_exists('connection', $v); })
                     ->then(function($v) {
                         $connection = array ();
@@ -61,7 +65,7 @@ class Configuration
                         return $v;
                     })
                 ->end()
-                ->scalarNode('default_connection')->cannotBeEmpty()->defaultValue('default')->end()
+                ->scalarNode('default_connection')->isRequired()->cannotBeEmpty()->end()
                 ->fixXmlConfig('type')
                 ->arrayNode('types')
                     ->useAttributeAsKey('name')
@@ -82,6 +86,7 @@ class Configuration
     {
         $node = new NodeBuilder('connections', 'array');
         $node
+            ->requiresAtLeastOneElement()
             ->useAttributeAsKey('name')
             ->prototype('array')
                 ->scalarNode('dbname')->end()
@@ -132,8 +137,7 @@ class Configuration
                         return $v;
                     })
                 ->end()
-                ->scalarNode('default_entity_manager')->cannotBeEmpty()->defaultValue('default')->end()
-                ->scalarNode('default_connection')->cannotBeEmpty()->defaultValue('default')->end()
+                ->scalarNode('default_entity_manager')->isRequired()->cannotBeEmpty()->end()
                 ->booleanNode('auto_generate_proxy_classes')->defaultFalse()->end()
                 ->scalarNode('proxy_dir')->defaultValue('%kernel.cache_dir%/doctrine/orm/Proxies')->end()
                 ->scalarNode('proxy_namespace')->defaultValue('Proxies')->end()
@@ -147,6 +151,7 @@ class Configuration
     {
         $node = new NodeBuilder('entity_managers', 'array');
         $node
+            ->requiresAtLeastOneElement()
             ->useAttributeAsKey('name')
             ->prototype('array')
                 ->addDefaultsIfNotSet()
@@ -157,6 +162,8 @@ class Configuration
                 ->scalarNode('class_metadata_factory_name')->defaultValue('%doctrine.orm.class_metadata_factory_name%')->end()
                 ->fixXmlConfig('mapping')
                 ->arrayNode('mappings')
+                    ->isRequired()
+                    ->requiresAtLeastOneElement()
                     ->useAttributeAsKey('name')
                     ->prototype('array')
                         ->beforeNormalization()

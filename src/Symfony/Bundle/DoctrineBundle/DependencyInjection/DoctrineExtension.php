@@ -140,8 +140,7 @@ class DoctrineExtension extends AbstractDoctrineExtension
     {
         $loader = new XmlFileLoader($container, new FileLocator(__DIR__.'/../Resources/config'));
         $loader->load('orm.xml');
-
-        $options = array('default_entity_manager', 'default_connection', 'auto_generate_proxy_classes', 'proxy_dir', 'proxy_namespace');
+        $options = array('default_entity_manager', 'auto_generate_proxy_classes', 'proxy_dir', 'proxy_namespace');
         foreach ($options as $key) {
             $container->setParameter('doctrine.orm.'.$key, $config[$key]);
         }

@@ -10,6 +10,8 @@
         <orm
             auto-generate-proxy-classes="false"
             metadata-cache-driver="apc"
-        />
+        >
+            <mapping name="YamlBundle" />
+        </orm>
     </config>
 </srv:container>

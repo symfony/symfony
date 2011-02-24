@@ -11,7 +11,7 @@
     </srv:parameters>
 
     <config>
-        <dbal>
+        <dbal default-connection="default">
             <connection
                 name="default"
                 driver="pdo_sqlite"
@@ -22,9 +22,7 @@
         </dbal>
 
         <orm
-                metadata-cache-driver="apc"
-                default-entity-manager="dm2"
-                default-connection="conn1"
+                default-entity-manager="default"
                 auto-generate-proxy-classes="true"
             >
             <entity-manager name="default" connection="default">
@@ -34,6 +32,7 @@
                     <port>11211</port>
                     <instance-class>Memcache</instance-class>
                 </metadata-cache-driver>
+                <mapping name="YamlBundle" />
             </entity-manager>
         </orm>
     </config>

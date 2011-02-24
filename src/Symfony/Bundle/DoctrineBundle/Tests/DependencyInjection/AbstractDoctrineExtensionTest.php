@@ -186,7 +186,7 @@ abstract class AbstractDoctrineExtensionTest extends TestCase
         $container = $this->getContainer();
         $loader = new DoctrineExtension();
 
-        $loader->load(array(array('dbal' => array(), 'orm' => array())), $container);
+        $loader->load(array(array('dbal' => array(), 'orm' => array('mappings' => array('YamlBundle' => array())))), $container);
 
         $definition = $container->getDefinition('doctrine.dbal.default_connection');
         $this->assertEquals('Doctrine\DBAL\Connection', $definition->getClass());
@@ -207,8 +207,6 @@ abstract class AbstractDoctrineExtensionTest extends TestCase
         $container = $this->getContainer();
         $loader = new DoctrineExtension();
         $container->registerExtension($loader);
-
-        $loader->load(array(array('dbal' => array(), 'orm' => array())), $container);
 
         $this->loadFromFile($container, 'orm_service_simple_single_entity_manager');
 
@@ -269,6 +267,8 @@ abstract class AbstractDoctrineExtensionTest extends TestCase
                 'password' => 'sqlite_s3cr3t',
                 'dbname' => 'sqlite_db',
                 'memory' => true,
+                'logging' => false,
+                'charset' => 'UTF-8'
             ),
             new Reference('doctrine.dbal.default_connection.configuration'),
             new Reference('doctrine.dbal.default_connection.event_manager')
@@ -307,9 +307,9 @@ abstract class AbstractDoctrineExtensionTest extends TestCase
         $this->assertEquals('doctrine.dbal.conn1_connection.configuration', (string) $args[1]);
         $this->assertEquals('doctrine.dbal.conn1_connection.event_manager', (string) $args[2]);
 
-        $this->assertEquals('doctrine.orm.dm2_entity_manager', (string) $container->getAlias('doctrine.orm.entity_manager'));
+        $this->assertEquals('doctrine.orm.em2_entity_manager', (string) $container->getAlias('doctrine.orm.entity_manager'));
 
-        $definition = $container->getDefinition('doctrine.orm.dm1_entity_manager');
+        $definition = $container->getDefinition('doctrine.orm.em1_entity_manager');
         $this->assertEquals('%doctrine.orm.entity_manager_class%', $definition->getClass());
         $this->assertEquals('%doctrine.orm.entity_manager_class%', $definition->getFactoryClass());
         $this->assertEquals('create', $definition->getFactoryMethod());
@@ -319,7 +319,7 @@ abstract class AbstractDoctrineExtensionTest extends TestCase
         $this->assertInstanceOf('Symfony\Component\DependencyInjection\Reference', $arguments[0]);
         $this->assertEquals('doctrine.dbal.conn1_connection', (string) $arguments[0]);
         $this->assertInstanceOf('Symfony\Component\DependencyInjection\Reference', $arguments[1]);
-        $this->assertEquals('doctrine.orm.dm1_configuration', (string) $arguments[1]);
+        $this->assertEquals('doctrine.orm.em1_configuration', (string) $arguments[1]);
 
         $definition = $container->getDefinition('doctrine.dbal.conn2_connection');
         $this->assertEquals('Doctrine\DBAL\Connection', $definition->getClass());
@@ -331,7 +331,7 @@ abstract class AbstractDoctrineExtensionTest extends TestCase
         $this->assertEquals('doctrine.dbal.conn2_connection.configuration', (string) $args[1]);
         $this->assertEquals('doctrine.dbal.conn2_connection.event_manager', (string) $args[2]);
 
-        $definition = $container->getDefinition('doctrine.orm.dm2_entity_manager');
+        $definition = $container->getDefinition('doctrine.orm.em2_entity_manager');
         $this->assertEquals('%doctrine.orm.entity_manager_class%', $definition->getClass());
         $this->assertEquals('%doctrine.orm.entity_manager_class%', $definition->getFactoryClass());
         $this->assertEquals('create', $definition->getFactoryMethod());
@@ -341,15 +341,15 @@ abstract class AbstractDoctrineExtensionTest extends TestCase
         $this->assertInstanceOf('Symfony\Component\DependencyInjection\Reference', $arguments[0]);
         $this->assertEquals('doctrine.dbal.conn2_connection', (string) $arguments[0]);
         $this->assertInstanceOf('Symfony\Component\DependencyInjection\Reference', $arguments[1]);
-        $this->assertEquals('doctrine.orm.dm2_configuration', (string) $arguments[1]);
+        $this->assertEquals('doctrine.orm.em2_configuration', (string) $arguments[1]);
 
-        $definition = $container->getDefinition('doctrine.orm.dm1_metadata_cache');
+        $definition = $container->getDefinition('doctrine.orm.em1_metadata_cache');
         $this->assertEquals('%doctrine.orm.cache.xcache_class%', $definition->getClass());
 
-        $definition = $container->getDefinition('doctrine.orm.dm1_query_cache');
+        $definition = $container->getDefinition('doctrine.orm.em1_query_cache');
         $this->assertEquals('%doctrine.orm.cache.array_class%', $definition->getClass());
 
-        $definition = $container->getDefinition('doctrine.orm.dm1_result_cache');
+        $definition = $container->getDefinition('doctrine.orm.em1_result_cache');
         $this->assertEquals('%doctrine.orm.cache.array_class%', $definition->getClass());
     }
 
@@ -469,10 +469,10 @@ abstract class AbstractDoctrineExtensionTest extends TestCase
         $container->getCompilerPassConfig()->setRemovingPasses(array());
         $container->compile();
 
-        $definition = $container->getDefinition('doctrine.orm.dm1_metadata_cache');
+        $definition = $container->getDefinition('doctrine.orm.em1_metadata_cache');
         $this->assertDICDefinitionClass($definition, '%doctrine.orm.cache.xcache_class%');
 
-        $definition = $container->getDefinition('doctrine.orm.dm2_metadata_cache');
+        $definition = $container->getDefinition('doctrine.orm.em2_metadata_cache');
         $this->assertDICDefinitionClass($definition, '%doctrine.orm.cache.apc_class%');
     }
 

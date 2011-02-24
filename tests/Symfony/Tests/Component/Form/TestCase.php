@@ -25,6 +25,8 @@ class TestCase extends \PHPUnit_Framework_TestCase
 
     protected $storage;
 
+    private $em;
+
     protected $factory;
 
     protected function setUp()
@@ -36,7 +38,10 @@ class TestCase extends \PHPUnit_Framework_TestCase
         $this->storage = $this->getMockBuilder('Symfony\Component\HttpFoundation\File\TemporaryStorage')
             ->disableOriginalConstructor()
             ->getMock();
+        $this->em = $this->getMockBuilder('Doctrine\ORM\EntityManager')
+            ->disableOriginalConstructor()
+            ->getMock();
         $this->factory = new FormFactory($this->theme, $this->csrfProvider,
-                $this->validator, $this->fieldFactory, $this->storage);
+                $this->validator, $this->fieldFactory, $this->storage, $this->em);
     }
 }

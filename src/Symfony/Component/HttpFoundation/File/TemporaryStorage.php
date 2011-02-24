@@ -25,8 +25,12 @@ class TemporaryStorage
 
     private $nestingLevels;
 
-    public function __construct($directory, $secret, $nestingLevels = 3)
+    public function __construct($secret, $nestingLevels = 3, $directory = null)
     {
+        if (empty($directory)) {
+            $directory = sys_get_temp_dir();
+        }
+
         $this->directory = realpath($directory);
         $this->secret = $secret;
         $this->nestingLevels = $nestingLevels;

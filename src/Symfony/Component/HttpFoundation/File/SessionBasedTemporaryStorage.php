@@ -20,7 +20,7 @@ use Symfony\Component\HttpFoundation\File\Exception\UnexpectedTypeException;
  */
 class SessionBasedTemporaryStorage extends TemporaryStorage
 {
-    public function __construct(Session $session, $directory, $secret, $nestingLevels = 3)
+    public function __construct(Session $session, $secret, $nestingLevels = 3, $directory = null)
     {
         parent::__construct($directory, $secret, $nestingLevels);
 

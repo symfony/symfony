@@ -57,6 +57,7 @@ use Symfony\Component\Form\ValueTransformer\FileToStringTransformer;
 use Symfony\Component\Validator\ValidatorInterface;
 use Symfony\Component\Locale\Locale;
 use Symfony\Component\HttpFoundation\File\TemporaryStorage;
+use Doctrine\ORM\EntityManager;
 
 class FormFactory
 {
@@ -70,17 +71,21 @@ class FormFactory
 
     private $storage;
 
+    private $entityManager;
+
     public function __construct(ThemeInterface $theme,
             CsrfProviderInterface $csrfProvider,
             ValidatorInterface $validator,
             FieldFactoryInterface $fieldFactory,
-            TemporaryStorage $storage)
+            TemporaryStorage $storage,
+            EntityManager $entityManager)
     {
         $this->theme = $theme;
         $this->csrfProvider = $csrfProvider;
         $this->validator = $validator;
         $this->fieldFactory = $fieldFactory;
         $this->storage = $storage;
+        $this->entityManager = $entityManager;
     }
 
     protected function getTheme()
@@ -399,7 +404,7 @@ class FormFactory
     public function getEntityChoiceField($key, array $options = array())
     {
         $options = array_merge(array(
-            'em' => null,
+            'em' => $this->entityManager,
             'class' => null,
             'property' => null,
             'query_builder' => null,

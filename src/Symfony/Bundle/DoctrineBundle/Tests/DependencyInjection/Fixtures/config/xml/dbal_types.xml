@@ -8,9 +8,7 @@
 
     <config>
         <dbal>
-            <types>
-                <type name="test" class="Symfony\Bundle\DoctrineBundle\Tests\DependencyInjection\TestType" />
-            </types>
+            <type name="test" class="Symfony\Bundle\DoctrineBundle\Tests\DependencyInjection\TestType" />
         </dbal>
     </config>
 </srv:container>

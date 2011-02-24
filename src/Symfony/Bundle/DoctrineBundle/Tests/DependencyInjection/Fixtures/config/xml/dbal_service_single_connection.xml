@@ -8,14 +8,12 @@
 
     <config>
         <dbal>
-            <connections>
-                <connection
-                    name="mysql"
-                    dbname="mysql_db"
-                    user="mysql_user"
-                    password="mysql_s3cr3t"
-                    unix-socket="/path/to/mysqld.sock" /><!--  -->
-            </connections>
+            <connection
+                name="mysql"
+                dbname="mysql_db"
+                user="mysql_user"
+                password="mysql_s3cr3t"
+                unix-socket="/path/to/mysqld.sock" /><!--  -->
         </dbal>
     </config>
 </srv:container>

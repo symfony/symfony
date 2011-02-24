@@ -39,17 +39,12 @@ abstract class AbstractDoctrineExtensionTest extends TestCase
     {
         $container = $this->getContainer();
         $loader = new DoctrineExtension();
-        $loader->load(array(array('dbal' => array('password' => 'foo'))), $container);
 
-        $loader->load(array(array(), array('dbal' => array('default_connection' => 'foo')), array()), $container);
+        $loader->load(array(array('dbal' => array('password' => 'foo')), array(), array('dbal' => array('default_connection' => 'foo')), array()), $container);
 
         $arguments = $container->getDefinition('doctrine.dbal.default_connection')->getArguments();
         $config = $arguments[0];
 
-        $this->assertEquals('foo', $config['password']);
-        $this->assertEquals('root', $config['user']);
-
-        $loader->load(array(array('dbal' => array('user' => 'foo'))), $container);
         $this->assertEquals('foo', $config['password']);
         $this->assertEquals('root', $config['user']);
     }
@@ -117,8 +112,7 @@ abstract class AbstractDoctrineExtensionTest extends TestCase
         $container = $this->getContainer();
         $loader = new DoctrineExtension();
 
-        $loader->load(array(array('dbal' => array())), $container);
-        $loader->load(array(array('orm' => array('mappings' => array('YamlBundle' => array())))), $container);
+        $loader->load(array(array('dbal' => array(), 'orm' => array('mappings' => array('YamlBundle' => array())))), $container);
 
         $this->assertFalse($container->getParameter('doctrine.orm.auto_generate_proxy_classes'));
         $this->assertEquals('Doctrine\ORM\Configuration', $container->getParameter('doctrine.orm.configuration_class'));
@@ -143,8 +137,8 @@ abstract class AbstractDoctrineExtensionTest extends TestCase
             'mappings' => array('YamlBundle' => array()),
         );
 
-        $loader->load(array(array('dbal' => array())), $container);
-        $loader->load(array('orm' => $config), $container);
+        $container = $this->getContainer();
+        $loader->load(array(array('dbal' => array(), 'orm' => $config)), $container);
 
         $definition = $container->getDefinition('doctrine.dbal.default_connection');
         $this->assertEquals('Doctrine\DBAL\Connection', $definition->getClass());
@@ -192,8 +186,7 @@ abstract class AbstractDoctrineExtensionTest extends TestCase
         $container = $this->getContainer();
         $loader = new DoctrineExtension();
 
-        $loader->load(array(array('dbal' => array())), $container);
-        $loader->load(array(array('orm' => array())), $container);
+        $loader->load(array(array('dbal' => array(), 'orm' => array())), $container);
 
         $definition = $container->getDefinition('doctrine.dbal.default_connection');
         $this->assertEquals('Doctrine\DBAL\Connection', $definition->getClass());
@@ -215,8 +208,7 @@ abstract class AbstractDoctrineExtensionTest extends TestCase
         $loader = new DoctrineExtension();
         $container->registerExtension($loader);
 
-        $loader->load(array(array('dbal' => array())), $container);
-        $loader->load(array(array('orm' => array())), $container);
+        $loader->load(array(array('dbal' => array(), 'orm' => array())), $container);
 
         $this->loadFromFile($container, 'orm_service_simple_single_entity_manager');
 
@@ -235,6 +227,7 @@ abstract class AbstractDoctrineExtensionTest extends TestCase
                 'user' => 'root',
                 'password' => null,
                 'port' => null,
+                'logging' => false,
             ),
             new Reference('doctrine.dbal.default_connection.configuration'),
             new Reference('doctrine.dbal.default_connection.event_manager')
@@ -365,7 +358,6 @@ abstract class AbstractDoctrineExtensionTest extends TestCase
         $container = $this->getContainer();
         $loader = new DoctrineExtension();
 
-        $loader->load(array(array()), $container);
         $loader->load(array(array('orm' => array('mappings' => array('YamlBundle' => array())))), $container);
 
         $definition = $container->getDefinition('doctrine.orm.default_configuration');
@@ -379,7 +371,6 @@ abstract class AbstractDoctrineExtensionTest extends TestCase
         $container = $this->getContainer();
         $loader = new DoctrineExtension();
 
-        $loader->load(array(array()), $container);
         $loader->load(array(array('orm' => array('mappings' => array('YamlBundle' => array('alias' => 'yml'))))), $container);
 
         $definition = $container->getDefinition('doctrine.orm.default_configuration');
@@ -393,7 +384,6 @@ abstract class AbstractDoctrineExtensionTest extends TestCase
         $container = $this->getContainer('YamlBundle');
         $loader = new DoctrineExtension();
 
-        $loader->load(array(array()), $container);
         $loader->load(array(array('orm' => array('mappings' => array('YamlBundle' => array())))), $container);
 
         $definition = $container->getDefinition('doctrine.orm.default_metadata_driver');
@@ -408,7 +398,6 @@ abstract class AbstractDoctrineExtensionTest extends TestCase
         $container = $this->getContainer('XmlBundle');
         $loader = new DoctrineExtension();
 
-        $loader->load(array(array()), $container);
         $loader->load(array(array('orm' => array('mappings' => array('XmlBundle' => array())))), $container);
 
         $definition = $container->getDefinition('doctrine.orm.default_metadata_driver');
@@ -423,7 +412,6 @@ abstract class AbstractDoctrineExtensionTest extends TestCase
         $container = $this->getContainer('AnnotationsBundle');
         $loader = new DoctrineExtension();
 
-        $loader->load(array(array()), $container);
         $loader->load(array(array('orm' => array('mappings' => array('AnnotationsBundle' => array())))), $container);
 
         $definition = $container->getDefinition('doctrine.orm.default_metadata_driver');
@@ -438,7 +426,6 @@ abstract class AbstractDoctrineExtensionTest extends TestCase
         $container = $this->getContainer(array('XmlBundle', 'AnnotationsBundle'));
         $loader = new DoctrineExtension();
 
-        $loader->load(array(array()), $container);
         $loader->load(array(array('orm' => array(
                 'auto_generate_proxy_classes' => true,
                 'mappings' => array('AnnotationsBundle' => array())
@@ -459,7 +446,15 @@ abstract class AbstractDoctrineExtensionTest extends TestCase
         ));
 
         $configDef = $container->getDefinition('doctrine.orm.default_configuration');
-        $this->assertDICDefinitionMethodCallOnce($configDef, 'setAutoGenerateProxyClasses', array( false ));
+        $this->assertDICDefinitionMethodCallOnce($configDef, 'setAutoGenerateProxyClasses');
+
+        $calls = $configDef->getMethodCalls();
+        foreach ($calls as $call) {
+            if ($call[0] == 'setAutoGenerateProxyClasses') {
+                $this->assertFalse($container->getParameterBag()->resolveValue($call[1][0]));
+                break;
+            }
+        }
     }
 
     public function testEntityManagerMetadataCacheDriverConfiguration()
@@ -557,17 +552,17 @@ abstract class AbstractDoctrineExtensionTest extends TestCase
         $annDef = $container->getDefinition('doctrine.orm.default_annotation_metadata_driver');
         $this->assertDICConstructorArguments($annDef, array(
             new Reference('doctrine.orm.metadata.annotation_reader'),
-            array(__DIR__ . '/Fixtures/Bundles/AnnotationsBundle/Entity')
+            array(__DIR__ .DIRECTORY_SEPARATOR.'Fixtures'.DIRECTORY_SEPARATOR.'Bundles'.DIRECTORY_SEPARATOR.'AnnotationsBundle'.DIRECTORY_SEPARATOR.'Entity')
         ));
 
         $ymlDef = $container->getDefinition('doctrine.orm.default_yml_metadata_driver');
         $this->assertDICConstructorArguments($ymlDef, array(
-            array(__DIR__ . '/Fixtures/Bundles/YamlBundle/Resources/config/doctrine/metadata')
+            array(__DIR__ .DIRECTORY_SEPARATOR.'Fixtures'.DIRECTORY_SEPARATOR.'Bundles'.DIRECTORY_SEPARATOR.'YamlBundle'.DIRECTORY_SEPARATOR.'Resources'.DIRECTORY_SEPARATOR.'config'.DIRECTORY_SEPARATOR.'doctrine'.DIRECTORY_SEPARATOR.'metadata')
         ));
 
         $xmlDef = $container->getDefinition('doctrine.orm.default_xml_metadata_driver');
         $this->assertDICConstructorArguments($xmlDef, array(
-            array(__DIR__ . '/Fixtures/Bundles/XmlBundle/Resources/config/doctrine/metadata')
+            array(__DIR__ .DIRECTORY_SEPARATOR.'Fixtures'.DIRECTORY_SEPARATOR.'Bundles'.DIRECTORY_SEPARATOR.'XmlBundle'.DIRECTORY_SEPARATOR.'Resources'.DIRECTORY_SEPARATOR.'config'.DIRECTORY_SEPARATOR.'doctrine'.DIRECTORY_SEPARATOR.'metadata')
         ));
     }
 
@@ -606,17 +601,17 @@ abstract class AbstractDoctrineExtensionTest extends TestCase
         $annDef = $container->getDefinition('doctrine.orm.em1_annotation_metadata_driver');
         $this->assertDICConstructorArguments($annDef, array(
             new Reference('doctrine.orm.metadata.annotation_reader'),
-            array(__DIR__ . '/Fixtures/Bundles/AnnotationsBundle/Entity')
+            array(__DIR__ .DIRECTORY_SEPARATOR.'Fixtures'.DIRECTORY_SEPARATOR.'Bundles'.DIRECTORY_SEPARATOR.'AnnotationsBundle'.DIRECTORY_SEPARATOR.'Entity')
         ));
 
         $ymlDef = $container->getDefinition('doctrine.orm.em2_yml_metadata_driver');
         $this->assertDICConstructorArguments($ymlDef, array(
-            array(__DIR__ . '/Fixtures/Bundles/YamlBundle/Resources/config/doctrine/metadata')
+            array(__DIR__ .DIRECTORY_SEPARATOR.'Fixtures'.DIRECTORY_SEPARATOR.'Bundles'.DIRECTORY_SEPARATOR.'YamlBundle'.DIRECTORY_SEPARATOR.'Resources'.DIRECTORY_SEPARATOR.'config'.DIRECTORY_SEPARATOR.'doctrine'.DIRECTORY_SEPARATOR.'metadata')
         ));
 
         $xmlDef = $container->getDefinition('doctrine.orm.em2_xml_metadata_driver');
         $this->assertDICConstructorArguments($xmlDef, array(
-            array(__DIR__ . '/Fixtures/Bundles/XmlBundle/Resources/config/doctrine/metadata')
+            array(__DIR__ .DIRECTORY_SEPARATOR.'Fixtures'.DIRECTORY_SEPARATOR.'Bundles'.DIRECTORY_SEPARATOR.'XmlBundle'.DIRECTORY_SEPARATOR.'Resources'.DIRECTORY_SEPARATOR.'config'.DIRECTORY_SEPARATOR.'doctrine'.DIRECTORY_SEPARATOR.'metadata')
         ));
     }
 
@@ -625,7 +620,6 @@ abstract class AbstractDoctrineExtensionTest extends TestCase
         $container = $this->getContainer('AnnotationsBundle', 'Vendor');
         $loader = new DoctrineExtension();
 
-        $loader->load(array(array()), $container);
         $loader->load(array(array('orm' => array('mappings' => array('AnnotationsBundle' => array())))), $container);
 
         $calls = $container->getDefinition('doctrine.orm.default_metadata_driver')->getMethodCalls();

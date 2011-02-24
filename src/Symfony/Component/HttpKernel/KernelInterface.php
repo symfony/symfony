@@ -26,15 +26,6 @@ use Symfony\Component\Config\Loader\LoaderInterface;
 interface KernelInterface extends HttpKernelInterface, \Serializable
 {
     /**
-     * Returns the root directory of this application.
-     *
-     * Most of the time, this is just __DIR__.
-     *
-     * @return string A directory path
-     */
-    function registerRootDir();
-
-    /**
      * Returns an array of bundles to registers.
      *
      * @return array An array of bundle instances.
@@ -77,12 +68,12 @@ interface KernelInterface extends HttpKernelInterface, \Serializable
     function isClassInActiveBundle($class);
 
     /**
-     * Returns a bundle by its name.
+     * Returns a bundle and optionally its descendants by its name.
      *
      * @param string  $name  Bundle name
-     * @param Boolean $first Whether to return the first bundle or all bundles matching this name
+     * @param Boolean $first Whether to return the first bundle only or together with its descendants
      *
-     * @return BundleInterface A BundleInterface instance
+     * @return BundleInterface|Array A BundleInterface instance or an array of BundleInterface instances if $first is false
      *
      * @throws \InvalidArgumentException when the bundle is not enabled
      */
@@ -116,6 +107,11 @@ interface KernelInterface extends HttpKernelInterface, \Serializable
      */
     function locateResource($name, $dir = null, $first = true);
 
+    /**
+     * Gets the name of the kernel
+     *
+     * @return string The kernel name
+     */
     function getName();
 
     /**

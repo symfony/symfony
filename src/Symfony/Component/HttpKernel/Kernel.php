@@ -60,8 +60,7 @@ abstract class Kernel implements KernelInterface
         $this->environment = $environment;
         $this->debug = (Boolean) $debug;
         $this->booted = false;
-        $this->rootDir = realpath($this->registerRootDir());
-        $this->name = preg_replace('/[^a-zA-Z0-9_]+/', '', basename($this->rootDir));
+        $this->name = preg_replace('/[^a-zA-Z0-9_]+/', '', basename($this->getRootDir()));
 
         if ($this->debug) {
             ini_set('display_errors', 1);
@@ -262,6 +261,11 @@ abstract class Kernel implements KernelInterface
         throw new \InvalidArgumentException(sprintf('Unable to find file "@%s".', $name));
     }
 
+    /**
+     * Gets the name of the kernel
+     *
+     * @return string The kernel name
+     */
     public function getName()
     {
         return $this->name;
@@ -294,6 +298,11 @@ abstract class Kernel implements KernelInterface
      */
     public function getRootDir()
     {
+        if (null === $this->rootDir) {
+            $r = new \ReflectionObject($this);
+            $this->rootDir = dirname($r->getFileName());
+        }
+        
         return $this->rootDir;
     }
 
@@ -324,7 +333,7 @@ abstract class Kernel implements KernelInterface
      */
     public function getCacheDir()
     {
-        return $this->rootDir.'/cache/'.$this->environment;
+        return $this->getRootDir().'/cache/'.$this->environment;
     }
 
     /**
@@ -334,7 +343,7 @@ abstract class Kernel implements KernelInterface
      */
     public function getLogDir()
     {
-        return $this->rootDir.'/logs';
+        return $this->getRootDir().'/logs';
     }
 
     /**
@@ -345,7 +354,6 @@ abstract class Kernel implements KernelInterface
      * @throws \LogicException if two bundles share a common name
      * @throws \LogicException if a bundle tries to extend a non-registered bundle
      * @throws \LogicException if two bundles extend the same ancestor
-     *
      */
     protected function initializeBundles()
     {
@@ -396,6 +404,12 @@ abstract class Kernel implements KernelInterface
 
     }
 
+    /**
+     * Initializes the DI container
+     *
+     * The cached version of the DI container is used when fresh, otherwise the
+     * container is built.
+     */
     protected function initializeContainer()
     {
         $class = $this->name.ucfirst($this->environment).($this->debug ? 'Debug' : '').'ProjectContainer';
@@ -418,6 +432,11 @@ abstract class Kernel implements KernelInterface
         }
     }
 
+    /**
+     * Returns the kernel parameters
+     *
+     * @return array An array of kernel parameters
+     */
     protected function getKernelParameters()
     {
         $bundles = array();
@@ -427,7 +446,7 @@ abstract class Kernel implements KernelInterface
 
         return array_merge(
             array(
-                'kernel.root_dir'    => $this->rootDir,
+                'kernel.root_dir'    => $this->getRootDir(),
                 'kernel.environment' => $this->environment,
                 'kernel.debug'       => $this->debug,
                 'kernel.name'        => $this->name,
@@ -440,6 +459,13 @@ abstract class Kernel implements KernelInterface
         );
     }
 
+    /**
+     * Gets the environment parameters
+     *
+     * Only the parameters starting with "SYMFONY__" are considered
+     *
+     * @return array An array of parameters
+     */
     protected function getEnvParameters()
     {
         $parameters = array();
@@ -452,6 +478,11 @@ abstract class Kernel implements KernelInterface
         return $parameters;
     }
 
+    /**
+     * Builds the DI container
+     *
+     * @return ContainerBuilder The compiled DI container
+     */
     protected function buildContainer()
     {
         $parameterBag = new ParameterBag($this->getKernelParameters());
@@ -474,6 +505,13 @@ abstract class Kernel implements KernelInterface
         return $container;
     }
 
+    /**
+     * Dumps the DI container to PHP code in the cache
+     * 
+     * @param ConfigCache       $cache      The config cache
+     * @param ContainerBuilder  $container  The DI container
+     * @param string            $class      The name of the class to generate
+     */
     protected function dumpContainer(ConfigCache $cache, ContainerBuilder $container, $class)
     {
         foreach (array('cache', 'logs') as $name) {
@@ -497,6 +535,12 @@ abstract class Kernel implements KernelInterface
         $cache->write($content, $container->getResources());
     }
 
+    /**
+     * Returns a loader for the container
+     * 
+     * @param ContainerInterface $container The DI container
+     * @return DelegatingLoader The loader
+     */
     protected function getContainerLoader(ContainerInterface $container)
     {
         $resolver = new LoaderResolver(array(

@@ -160,7 +160,7 @@ abstract class AbstractDoctrineExtensionTest extends TestCase
 
         $arguments = $definition->getArguments();
         $this->assertInstanceOf('Symfony\Component\DependencyInjection\Reference', $arguments[0]);
-        $this->assertEquals('doctrine.dbal.default_connection', (string) $arguments[0]);
+        $this->assertEquals('database_connection', (string) $arguments[0]);
         $this->assertInstanceOf('Symfony\Component\DependencyInjection\Reference', $arguments[1]);
         $this->assertEquals('doctrine.orm.default_configuration', (string) $arguments[1]);
 
@@ -198,7 +198,7 @@ abstract class AbstractDoctrineExtensionTest extends TestCase
         $this->assertArrayHasKey('doctrine.orm.entity_manager', $definition->getTags());
 
         $this->assertDICConstructorArguments($definition, array(
-            new Reference('doctrine.dbal.default_connection'), new Reference('doctrine.orm.default_configuration')
+            new Reference('database_connection'), new Reference('doctrine.orm.default_configuration')
         ));
     }
 
@@ -238,7 +238,7 @@ abstract class AbstractDoctrineExtensionTest extends TestCase
         $this->assertArrayHasKey('doctrine.orm.entity_manager', $definition->getTags());
 
         $this->assertDICConstructorArguments($definition, array(
-            new Reference('doctrine.dbal.default_connection'), new Reference('doctrine.orm.default_configuration')
+            new Reference('database_connection'), new Reference('doctrine.orm.default_configuration')
         ));
     }
 
@@ -489,15 +489,15 @@ abstract class AbstractDoctrineExtensionTest extends TestCase
         $container->compile();
 
         $definition = $container->getDefinition('doctrine.orm.default_metadata_cache');
-        $this->assertDICDefinitionClass($definition, '%doctrine.orm.cache.memcache_class%');
+        $this->assertDICDefinitionClass($definition, 'Doctrine\Common\Cache\MemcacheCache');
         $this->assertDICDefinitionMethodCallOnce($definition, 'setMemcache',
             array(new Reference('doctrine.orm.default_memcache_instance'))
         );
 
         $definition = $container->getDefinition('doctrine.orm.default_memcache_instance');
-        $this->assertDICDefinitionClass($definition, '%doctrine.orm.cache.memcache_instance_class%');
+        $this->assertDICDefinitionClass($definition, 'Memcache');
         $this->assertDICDefinitionMethodCallOnce($definition, 'connect', array(
-            '%doctrine.orm.cache.memcache_host%', '%doctrine.orm.cache.memcache_port%'
+            'localhost', '11211'
         ));
     }
 

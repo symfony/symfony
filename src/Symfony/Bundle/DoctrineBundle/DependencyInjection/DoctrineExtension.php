@@ -165,7 +165,7 @@ class DoctrineExtension extends AbstractDoctrineExtension
     {
         $configServiceName = sprintf('doctrine.orm.%s_configuration', $entityManager['name']);
 
-        $ormConfigDef = new Definition('Doctrine\ORM\Configuration');
+        $ormConfigDef = new Definition('%doctrine.orm.configuration_class%');
         $ormConfigDef->setPublic(false);
         $container->setDefinition($configServiceName, $ormConfigDef);
 
@@ -187,10 +187,11 @@ class DoctrineExtension extends AbstractDoctrineExtension
         }
 
         $entityManagerService = sprintf('doctrine.orm.%s_entity_manager', $entityManager['name']);
-        $connectionName = isset($entityManager['connection']) ? $entityManager['connection'] : $entityManager['name'];
+        $connectionId = isset($entityManager['connection']) ? sprintf('doctrine.dbal.%s_connection', $entityManager['connection']) : 'database_connection';
+        $eventManagerID = isset($entityManager['connection']) ? sprintf('doctrine.dbal.%s_connection.event_manager', $entityManager['connection']) : 'doctrine.dbal.event_manager';
 
         $ormEmArgs = array(
-            new Reference(sprintf('doctrine.dbal.%s_connection', $connectionName)),
+            new Reference($connectionId),
             new Reference(sprintf('doctrine.orm.%s_configuration', $entityManager['name']))
         );
         $ormEmDef = new Definition('%doctrine.orm.entity_manager_class%', $ormEmArgs);
@@ -201,7 +202,7 @@ class DoctrineExtension extends AbstractDoctrineExtension
 
         $container->setAlias(
             sprintf('doctrine.orm.%s_entity_manager.event_manager', $entityManager['name']),
-            new Alias(sprintf('doctrine.dbal.%s_connection.event_manager', $connectionName), false)
+            new Alias($eventManagerID, false)
         );
     }
 
@@ -304,10 +305,14 @@ class DoctrineExtension extends AbstractDoctrineExtension
     protected function getEntityManagerCacheDefinition(array $entityManager, $cacheDriver, ContainerBuilder $container)
     {
         if ('memcache' === $cacheDriver['type']) {
-            $cacheDef = new Definition('%doctrine.orm.cache.memcache_class%');
-            $memcacheInstance = new Definition('%doctrine.orm.cache.memcache_instance_class%');
+            $memcacheClass = !empty ($cacheDriver['class']) ? $cacheDriver['class'] : '%doctrine.orm.cache.memcache_class%';
+            $memcacheInstanceClass = !empty ($cacheDriver['instance_class']) ? $cacheDriver['instance_class'] : '%doctrine.orm.cache.memcache_instance_class%';
+            $memcacheHost = !empty ($cacheDriver['host']) ? $cacheDriver['host'] : '%doctrine.orm.cache.memcache_host%';
+            $memcachePort = !empty ($cacheDriver['port']) ? $cacheDriver['port'] : '%doctrine.orm.cache.memcache_port%';
+            $cacheDef = new Definition($memcacheClass);
+            $memcacheInstance = new Definition($memcacheInstanceClass);
             $memcacheInstance->addMethodCall('connect', array(
-                '%doctrine.orm.cache.memcache_host%', '%doctrine.orm.cache.memcache_port%'
+                $memcacheHost, $memcachePort
             ));
             $container->setDefinition(sprintf('doctrine.orm.%s_memcache_instance', $entityManager['name']), $memcacheInstance);
             $cacheDef->addMethodCall('setMemcache', array(new Reference(sprintf('doctrine.orm.%s_memcache_instance', $entityManager['name']))));

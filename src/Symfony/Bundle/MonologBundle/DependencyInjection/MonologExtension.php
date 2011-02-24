@@ -82,15 +82,11 @@ class MonologExtension extends Extension
             $definition->setArguments(array(
                 $handler['path'],
                 $handler['level'],
-                isset($handler['bubble']) ? $handler['bubble'] : false,
+                $handler['bubble'],
             ));
             break;
 
         case 'fingerscrossed':
-            if (!isset($handler['handler'])) {
-                // TODO validate that in Config class?
-                throw new \InvalidArgumentException('Handler sub-node is missing.');
-            }
             if (!isset($handler['action_level'])) {
                 $handler['action_level'] = 'WARNING';
             }
@@ -100,7 +96,7 @@ class MonologExtension extends Extension
                 $this->buildHandler($container, $handler['handler']),
                 $handler['action_level'],
                 isset($handler['buffer_size']) ? $handler['buffer_size'] : 0,
-                isset($handler['bubble']) ? $handler['bubble'] : false,
+                $handler['bubble'],
             ));
             break;
         }

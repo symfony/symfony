@@ -8,14 +8,24 @@
     <xsd:element name="config" type="config" />
 
     <xsd:complexType name="config">
-        <xsd:all>
-            <xsd:element name="handler" type="handler" minOccurs="0" maxOccurs="unbounded" />
-        </xsd:all>
+        <xsd:choice minOccurs="0" maxOccurs="unbounded">
+            <xsd:element name="handler" type="handler" />
+        </xsd:choice>
     </xsd:complexType>
 
     <xsd:complexType name="handler">
-        <xsd:attribute name="level" type="level" />
-        <xsd:attribute name="path" type="xsd:string" />
+        <xsd:all>
+            <xsd:element name="handler" maxOccurs="1">
+                <xsd:complexType>
+                    <xsd:attributeGroup ref="handler_attribute" />
+                </xsd:complexType>
+            </xsd:element>
+        </xsd:all>
+        <xsd:attributeGroup ref="handler_attributes" />
+        <xsd:attribute name="name" type="xsd:string" use="required">
+        <xsd:attribute name="bubble" type="xsd:boolean" />
+        <xsd:attribute name="action-level" type="level" />
+        <xsd:attribute name="buffer-size" type="xsd:integer" />
     </xsd:complexType>
 
     <xsd:simpleType name="level">
@@ -31,4 +41,10 @@
             <xsd:enumeration value="400" />
         </xsd:restriction>
     </xsd:simpleType>
+
+    <xsd:attributeGroup name="handler_attributes">
+        <xsd:attribute name="type" type="xsd:string" use="required" />
+        <xsd:attribute name="level" type="level" />
+        <xsd:attribute name="path" type="xsd:string" />
+    </xsd:attributeGroup>
 </xsd:schema>

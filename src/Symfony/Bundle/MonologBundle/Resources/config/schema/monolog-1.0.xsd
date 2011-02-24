@@ -1,0 +1,34 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+
+<xsd:schema xmlns="http://www.symfony-project.org/schema/dic/monolog"
+    xmlns:xsd="http://www.w3.org/2001/XMLSchema"
+    targetNamespace="http://www.symfony-project.org/schema/dic/monolog"
+    elementFormDefault="qualified">
+
+    <xsd:element name="config" type="config" />
+
+    <xsd:complexType name="config">
+        <xsd:all>
+            <xsd:element name="handler" type="handler" minOccurs="0" maxOccurs="unbounded" />
+        </xsd:all>
+    </xsd:complexType>
+
+    <xsd:complexType name="handler">
+        <xsd:attribute name="level" type="level" />
+        <xsd:attribute name="path" type="xsd:string" />
+    </xsd:complexType>
+
+    <xsd:simpleType name="level">
+        <xsd:restriction base="xsd:string">
+            <xsd:enumeration value="error" />
+            <xsd:enumeration value="warning" />
+            <xsd:enumeration value="info" />
+            <xsd:enumeration value="debug" />
+
+            <xsd:enumeration value="100" />
+            <xsd:enumeration value="200" />
+            <xsd:enumeration value="300" />
+            <xsd:enumeration value="400" />
+        </xsd:restriction>
+    </xsd:simpleType>
+</xsd:schema>

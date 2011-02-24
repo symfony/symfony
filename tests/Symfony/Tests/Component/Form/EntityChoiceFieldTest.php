@@ -170,7 +170,7 @@ class EntityChoiceFieldTest extends DoctrineOrmTestCase
         $field->setData(null);
 
         $this->assertEquals(new ArrayCollection(), $field->getData());
-        $this->assertEquals('', $field->getDisplayedData());
+        $this->assertEquals(array(), $field->getDisplayedData());
     }
 
     public function testSubmitSingleExpanded_null()

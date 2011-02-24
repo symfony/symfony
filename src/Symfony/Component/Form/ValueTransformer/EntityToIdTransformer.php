@@ -33,7 +33,7 @@ class EntityToIdTransformer implements ValueTransformerInterface
      */
     public function transform($entity)
     {
-        if (null === $entity) {
+        if (null === $entity || '' === $entity) {
             return '';
         }
 
@@ -60,7 +60,7 @@ class EntityToIdTransformer implements ValueTransformerInterface
      */
     public function reverseTransform($key)
     {
-        if ('' === $key) {
+        if ('' === $key || null === $key) {
             return null;
         }
 

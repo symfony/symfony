@@ -356,10 +356,10 @@ class ArrayNode extends BaseNode implements PrototypeNodeInterface
     }
 
     /**
-     * Normalises the value.
+     * Normalizes the value.
      *
-     * @param mixed $value The value to normalise
-     * @return mixed The normalised value
+     * @param mixed $value The value to normalize
+     * @return mixed The normalized value
      */
     protected function normalizeValue($value)
     {
@@ -378,16 +378,13 @@ class ArrayNode extends BaseNode implements PrototypeNodeInterface
             unset($value[$singular]);
         }
 
-        if (null !== $this->prototype) {
-            $normalized = array();
+        $normalized = array();
+        if (null !== $this->prototype) {            
             foreach ($value as $k => $v) {
                 if (null !== $this->keyAttribute && is_array($v)) {
                     if (!isset($v[$this->keyAttribute]) && is_int($k)) {
-                        throw new InvalidConfigurationException(sprintf(
-                            'You must set a "%s" attribute for path "%s".',
-                            $this->keyAttribute,
-                            $this->getPath()
-                        ));
+                        $msg = sprintf('The attribute "%s" must be set for path "%s".', $this->keyAttribute, $this->getPath());
+                        throw new InvalidConfigurationException($msg);
                     } else if (isset($v[$this->keyAttribute])) {
                         $k = $v[$this->keyAttribute];
 
@@ -398,11 +395,8 @@ class ArrayNode extends BaseNode implements PrototypeNodeInterface
                     }
 
                     if (array_key_exists($k, $normalized)) {
-                        throw new DuplicateKeyException(sprintf(
-                            'Duplicate key "%s" for path "%s".',
-                            $k,
-                            $this->getPath()
-                        ));
+                        $msg = sprintf('Duplicate key "%s" for path "%s".', $k, $this->getPath());
+                        throw new DuplicateKeyException($msg);
                     }
                 }
 
@@ -413,25 +407,19 @@ class ArrayNode extends BaseNode implements PrototypeNodeInterface
                     $normalized[] = $this->prototype->normalize($v);
                 }
             }
-
-            return $normalized;
-        }
-
-        $normalized = array();
-        foreach ($this->children as $name => $child) {
-            if (!array_key_exists($name, $value)) {
-                continue;
+        } else {
+            foreach ($this->children as $name => $child) {
+                if (array_key_exists($name, $value)) {
+                    $normalized[$name] = $child->normalize($value[$name]);
+                    unset($value[$name]);
+                }
             }
 
-            $normalized[$name] = $child->normalize($value[$name]);
-            unset($value[$name]);
-        }
-
-        // if extra fields are present, throw exception
-        if (count($value) && !$this->ignoreExtraKeys) {
-            $msg = sprintf('Unrecognized options "%s" under "%s"', implode(', ', array_keys($value)), $this->getPath());
-
-            throw new InvalidConfigurationException($msg);
+            // if extra fields are present, throw exception
+            if (count($value) && !$this->ignoreExtraKeys) {
+                $msg = sprintf('Unrecognized options "%s" under "%s"', implode(', ', array_keys($value)), $this->getPath());
+                throw new InvalidConfigurationException($msg);
+            }
         }
 
         return $normalized;

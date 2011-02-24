@@ -78,12 +78,12 @@ class TimeFieldTest extends DateTimeTestCase
         $this->assertEquals($input, $field->getDisplayedData());
     }
 
-    public function testSubmit_raw()
+    public function testSubmit_array()
     {
         $field = $this->factory->getTimeField('name', array(
             'data_timezone' => 'UTC',
             'user_timezone' => 'UTC',
-            'type' => 'raw',
+            'type' => 'array',
         ));
 
         $input = array(

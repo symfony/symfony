@@ -613,6 +613,7 @@ class FormFactory
                 ->setValueTransformer(new DateTimeToArrayTransformer(array(
                     'input_timezone' => $options['data_timezone'],
                     'output_timezone' => $options['user_timezone'],
+                    'fields' => array('year', 'month', 'day'),
                 )))
                 ->addRendererPlugin(new DatePatternPlugin($formatter))
                 // Don't modify \DateTime classes by reference, we treat

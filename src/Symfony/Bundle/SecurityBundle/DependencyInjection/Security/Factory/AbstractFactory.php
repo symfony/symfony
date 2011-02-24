@@ -26,16 +26,19 @@ use Symfony\Component\DependencyInjection\Reference;
  */
 abstract class AbstractFactory implements SecurityFactoryInterface
 {
-    protected $options = array(
+    protected $listenerOptions = array(
         'check_path'                     => '/login_check',
         'login_path'                     => '/login',
         'use_forward'                    => false,
+        'failure_path'                   => null,
+        'failure_forward'                => false,
+    );
+
+    protected $targetUrlGeneratorOptions = array(
         'always_use_default_target_path' => false,
         'default_target_path'            => '/',
         'target_path_parameter'          => '_target_path',
-        'use_referer'                    => false,
-        'failure_path'                   => null,
-        'failure_forward'                => false,
+        'use_referer'                    => false
     );
 
     public function create(ContainerBuilder $container, $id, $config, $userProviderId, $defaultEntryPointId)
@@ -43,8 +46,11 @@ abstract class AbstractFactory implements SecurityFactoryInterface
         // authentication provider
         $authProviderId = $this->createAuthProvider($container, $id, $config, $userProviderId);
 
+        // target url generator
+        $targetUrlGeneratorId = $this->createTargetUrlGenerator($container, $id, $config);
+
         // authentication listener
-        $listenerId = $this->createListener($container, $id, $config, $userProviderId);
+        $listenerId = $this->createListener($container, $id, $config, $userProviderId, $targetUrlGeneratorId);
 
         // add remember-me aware tag if requested
         if ($this->isRememberMeAware($config)) {
@@ -69,7 +75,7 @@ abstract class AbstractFactory implements SecurityFactoryInterface
             ->scalarNode('failure_handler')->end()
         ;
 
-        foreach ($this->options as $name => $default) {
+        foreach (array_merge($this->listenerOptions, $this->targetUrlGeneratorOptions) as $name => $default) {
             if (is_bool($default)) {
                 $node->booleanNode($name)->defaultValue($default);
             } else {
@@ -80,7 +86,7 @@ abstract class AbstractFactory implements SecurityFactoryInterface
 
     public final function addOption($name, $default = null)
     {
-        $this->options[$name] = $default;
+        $this->listenerOptions[$name] = $default;
     }
 
     /**
@@ -142,26 +148,38 @@ abstract class AbstractFactory implements SecurityFactoryInterface
         return $config['remember_me'];
     }
 
-    protected function createListener($container, $id, $config, $userProvider)
+    protected function createListener($container, $id, $config, $userProvider, $targetUrlGenerator)
     {
         $listenerId = $this->getListenerId();
         $listener = new DefinitionDecorator($listenerId);
-        $listener->setArgument(3, $id);
-        $listener->setArgument(4, array_intersect_key($config, $this->options));
+        $listener->setArgument(3, new Reference($targetUrlGenerator));
+        $listener->setArgument(4, $id);
+        $listener->setArgument(5, array_intersect_key($config, $this->listenerOptions));
 
         // success handler
         if (isset($config['success_handler'])) {
-            $listener->setArgument(5, new Reference($config['success_handler']));
+            $listener->setArgument(6, new Reference($config['success_handler']));
         }
 
         // failure handler
         if (isset($config['failure_handler'])) {
-            $listener->setArgument(6, new Reference($config['failure_handler']));
+            $listener->setArgument(7, new Reference($config['failure_handler']));
         }
 
         $listenerId .= '.'.$id;
         $container->setDefinition($listenerId, $listener);
 
         return $listenerId;
+    }
+
+    public function createTargetUrlGenerator(ContainerBuilder $container, $id, $config)
+    {
+        $targetUrlGeneratorId = 'security.authentication.target_url_generator.'.$id;
+        $container
+            ->setDefinition($targetUrlGeneratorId, new DefinitionDecorator('security.authentication.target_url_generator'))
+            ->addArgument(array_intersect_key($config, $this->targetUrlGeneratorOptions))
+            ;
+
+        return $targetUrlGeneratorId;
     }
 }

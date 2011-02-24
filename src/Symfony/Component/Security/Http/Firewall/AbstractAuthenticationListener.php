@@ -15,6 +15,7 @@ use Symfony\Component\EventDispatcher\Event;
 use Symfony\Component\Security\Http\Session\SessionAuthenticationStrategyInterface;
 use Symfony\Component\Security\Http\Authentication\AuthenticationFailureHandlerInterface;
 use Symfony\Component\Security\Http\Authentication\AuthenticationSuccessHandlerInterface;
+use Symfony\Component\Security\Http\Authentication\TargetUrlGenerator;
 use Symfony\Component\Security\Http\RememberMe\RememberMeServicesInterface;
 use Symfony\Component\Security\Core\SecurityContextInterface;
 use Symfony\Component\Security\Core\Authentication\AuthenticationManagerInterface;
@@ -50,6 +51,7 @@ abstract class AbstractAuthenticationListener implements ListenerInterface
     protected $securityContext;
     protected $authenticationManager;
     protected $sessionStrategy;
+    protected $targetUrlGenerator;
     protected $providerKey;
     protected $eventDispatcher;
     protected $options;
@@ -66,7 +68,7 @@ abstract class AbstractAuthenticationListener implements ListenerInterface
      * @param array                          $options               An array of options for the processing of a successful, or failed authentication attempt
      * @param LoggerInterface                $logger                A LoggerInterface instance
      */
-    public function __construct(SecurityContextInterface $securityContext, AuthenticationManagerInterface $authenticationManager, SessionAuthenticationStrategyInterface $sessionStrategy, $providerKey, array $options = array(), AuthenticationSuccessHandlerInterface $successHandler = null, AuthenticationFailureHandlerInterface $failureHandler = null, LoggerInterface $logger = null)
+    public function __construct(SecurityContextInterface $securityContext, AuthenticationManagerInterface $authenticationManager, SessionAuthenticationStrategyInterface $sessionStrategy, TargetUrlGenerator $targetUrlGenerator, $providerKey, array $options = array(), AuthenticationSuccessHandlerInterface $successHandler = null, AuthenticationFailureHandlerInterface $failureHandler = null, LoggerInterface $logger = null)
     {
         if (empty($providerKey)) {
             throw new \InvalidArgumentException('$providerKey must not be empty.');
@@ -75,6 +77,7 @@ abstract class AbstractAuthenticationListener implements ListenerInterface
         $this->securityContext = $securityContext;
         $this->authenticationManager = $authenticationManager;
         $this->sessionStrategy = $sessionStrategy;
+        $this->targetUrlGenerator = $targetUrlGenerator;
         $this->providerKey = $providerKey;
         $this->successHandler = $successHandler;
         $this->failureHandler = $failureHandler;
@@ -226,9 +229,9 @@ abstract class AbstractAuthenticationListener implements ListenerInterface
         }
 
         if (null !== $this->successHandler) {
-            $response = $this->successHandler->onAuthenticationSuccess($event, $request, $token);
+            $response = $this->successHandler->onAuthenticationSuccess($event, $request, $token, $this->targetUrlGenerator);
         } else {
-            $path = $this->determineTargetUrl($request);
+            $path = $this->targetUrlGenerator->determineTargetUrl($request);
             $response = new RedirectResponse(0 !== strpos($path, 'http') ? $request->getUriForPath($path) : $path, 302);
         }
 
@@ -237,37 +240,6 @@ abstract class AbstractAuthenticationListener implements ListenerInterface
         }
 
         return $response;
-    }
-
-    /**
-     * Builds the target URL according to the defined options.
-     *
-     * @param Request $request
-     *
-     * @return string
-     */
-    protected function determineTargetUrl(Request $request)
-    {
-        if ($this->options['always_use_default_target_path']) {
-            return $this->options['default_target_path'];
-        }
-
-        if ($targetUrl = $request->get($this->options['target_path_parameter'])) {
-            return $targetUrl;
-        }
-
-        $session = $request->getSession();
-        if ($targetUrl = $session->get('_security.target_path')) {
-            $session->remove('_security.target_path');
-
-            return $targetUrl;
-        }
-
-        if ($this->options['use_referer'] && $targetUrl = $request->headers->get('Referer')) {
-            return $targetUrl;
-        }
-
-        return $this->options['default_target_path'];
     }
 
     /**

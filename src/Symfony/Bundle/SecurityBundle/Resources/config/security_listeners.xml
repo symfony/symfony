@@ -10,6 +10,7 @@
         <parameter key="security.channel_listener.class">Symfony\Component\Security\Http\Firewall\ChannelListener</parameter>
 
         <parameter key="security.authentication.form_entry_point.class">Symfony\Component\Security\Http\EntryPoint\FormAuthenticationEntryPoint</parameter>
+        <parameter key="security.authentication.target_url_generator.class">Symfony\Component\Security\Http\Authentication\TargetUrlGenerator</parameter>
         <parameter key="security.authentication.listener.form.class">Symfony\Component\Security\Http\Firewall\UsernamePasswordFormAuthenticationListener</parameter>
 
         <parameter key="security.authentication.listener.basic.class">Symfony\Component\Security\Http\Firewall\BasicAuthenticationListener</parameter>
@@ -26,7 +27,7 @@
         <parameter key="security.authentication.x509.credentials">SSL_CLIENT_S_DN</parameter>
 
         <parameter key="security.authentication.listener.anonymous.class">Symfony\Component\Security\Http\Firewall\AnonymousAuthenticationListener</parameter>
-        
+
         <parameter key="security.authentication.switchuser_listener.class">Symfony\Component\Security\Http\Firewall\SwitchUserListener</parameter>
 
         <parameter key="security.logout_listener.class">Symfony\Component\Security\Http\Firewall\LogoutListener</parameter>
@@ -44,7 +45,7 @@
         <parameter key="security.authentication.provider.anonymous">Symfony\Component\Security\Core\Authentication\Provider\AnonymousAuthenticationProvider</parameter>
         <parameter key="security.anonymous.key">SomeRandomValue</parameter>
     </parameters>
-    
+
     <services>
         <service id="security.authentication.listener.anonymous" class="%security.authentication.listener.anonymous.class%" public="false">
             <argument type="service" id="security.context" />
@@ -93,10 +94,13 @@
 
         <service id="security.authentication.form_entry_point" class="%security.authentication.form_entry_point.class%" public="false" abstract="true" />
 
+        <service id="security.authentication.target_url_generator" class="%security.authentication.target_url_generator.class%" public="false" abstract="true" />
+
         <service id="security.authentication.listener.abstract" abstract="true" public="false">
             <argument type="service" id="security.context" />
             <argument type="service" id="security.authentication.manager" />
             <argument type="service" id="security.authentication.session_strategy" />
+            <argument type="service" id="security.authentication.target_url_generator" />
             <argument />
             <argument type="collection"></argument>
             <argument type="service" id="security.authentication.success_handler" on-invalid="null" />
@@ -104,8 +108,8 @@
             <argument type="service" id="logger" on-invalid="null" />
         </service>
 
-        <service id="security.authentication.listener.form" 
-                 class="%security.authentication.listener.form.class%" 
+        <service id="security.authentication.listener.form"
+                 class="%security.authentication.listener.form.class%"
                  parent="security.authentication.listener.abstract"
                  abstract="true">
         </service>
@@ -134,19 +138,19 @@
             <argument type="service" id="security.authentication.digest_entry_point" />
             <argument type="service" id="logger" on-invalid="null" />
         </service>
-        
+
         <service id="security.authentication.provider.dao" class="%security.authentication.provider.dao.class%" abstract="true" public="false">
             <argument /> <!-- User Provider -->
             <argument type="service" id="security.account_checker" />
             <argument /> <!-- Provider-shared Key -->
             <argument type="service" id="security.encoder_factory" />
         </service>
-        
+
         <service id="security.authentication.provider.pre_authenticated" class="%security.authentication.provider.pre_authenticated.class%" abstract="true" public="false">
             <argument /> <!-- User Provider -->
             <argument type="service" id="security.account_checker" />
         </service>
-        
+
         <service id="security.exception_listener" class="%security.exception_listener.class%" public="false" abstract="true">
             <argument type="service" id="security.context" />
             <argument type="service" id="security.authentication.trust_resolver" />

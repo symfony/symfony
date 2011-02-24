@@ -22,12 +22,13 @@ interface AuthenticationSuccessHandlerInterface
      * is called by authentication listeners inheriting from
      * AbstractAuthenticationListener.
      *
-     * @param EventInterface $event the "core.security" event, this event always
+     * @param EventInterface     $event the "core.security" event, this event always
      *                              has the kernel as target
-     * @param Request        $request
-     * @param TokenInterface $token
+     * @param Request            $request
+     * @param TokenInterface     $token
+     * @param TargetUrlGenerator $targetUrlGenerator - has a determineTargetUrl method
      *
      * @return Response the response to return
      */
-    function onAuthenticationSuccess(EventInterface $event, Request $request, TokenInterface $token);
+    function onAuthenticationSuccess(EventInterface $event, Request $request, TokenInterface $token, TargetUrlGenerator $targetUrlGenerator);
 }

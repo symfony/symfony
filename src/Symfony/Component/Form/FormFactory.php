@@ -50,6 +50,7 @@ use Symfony\Component\Form\ValueTransformer\EntitiesToArrayTransformer;
 use Symfony\Component\Form\ValueTransformer\ValueTransformerChain;
 use Symfony\Component\Form\ValueTransformer\ArrayToChoicesTransformer;
 use Symfony\Component\Form\ValueTransformer\ArrayToPartsTransformer;
+use Symfony\Component\Form\ValueTransformer\ValueToDuplicatesTransformer;
 use Symfony\Component\Validator\ValidatorInterface;
 use Symfony\Component\Locale\Locale;
 
@@ -833,5 +834,36 @@ class FormFactory
         }
 
         return $field;
+    }
+
+    public function getRepeatedField($key, array $options = array())
+    {
+        $options = array_merge(array(
+            'template' => 'repeated',
+            'first_key' => 'first',
+            'second_key' => 'second',
+            'prototype' => null,
+        ), $options);
+
+        // Lazy creation of the prototype
+        if (!isset($options['prototype'])) {
+            $options['prototype'] = $this->getTextField('key');
+        }
+
+        $firstChild = clone $options['prototype'];
+        $firstChild->setKey($options['first_key']);
+        $firstChild->setPropertyPath($options['first_key']);
+
+        $secondChild = clone $options['prototype'];
+        $secondChild->setKey($options['second_key']);
+        $secondChild->setPropertyPath($options['second_key']);
+
+        return $this->getForm($key, $options)
+            ->setValueTransformer(new ValueToDuplicatesTransformer(array(
+                $options['first_key'],
+                $options['second_key'],
+            )))
+            ->add($firstChild)
+            ->add($secondChild);
     }
 }

@@ -11,16 +11,23 @@
 
 namespace Symfony\Tests\Component\Form;
 
+require_once __DIR__.'/TestCase.php';
+
 use Symfony\Component\Form\RepeatedField;
 use Symfony\Component\Form\Field;
 
-class RepeatedFieldTest extends \PHPUnit_Framework_TestCase
+class RepeatedFieldTest extends TestCase
 {
     protected $field;
 
     protected function setUp()
     {
-        $this->field = new RepeatedField(new Field('name'));
+        parent::setUp();
+
+        $this->field = $this->factory->getRepeatedField('name', array(
+            'prototype' => $this->factory->getField('foo'),
+        ));
+        $this->field->setData(null);
     }
 
     public function testSetData()
@@ -39,9 +46,9 @@ class RepeatedFieldTest extends \PHPUnit_Framework_TestCase
 
         $this->assertEquals('foo', $this->field['first']->getDisplayedData());
         $this->assertEquals('bar', $this->field['second']->getDisplayedData());
-        $this->assertFalse($this->field->isFirstEqualToSecond());
+        $this->assertFalse($this->field->isTransformationSuccessful());
         $this->assertEquals($input, $this->field->getDisplayedData());
-        $this->assertEquals('foo', $this->field->getData());
+        $this->assertEquals(null, $this->field->getData());
     }
 
     public function testSubmitEqual()
@@ -52,17 +59,8 @@ class RepeatedFieldTest extends \PHPUnit_Framework_TestCase
 
         $this->assertEquals('foo', $this->field['first']->getDisplayedData());
         $this->assertEquals('foo', $this->field['second']->getDisplayedData());
-        $this->assertTrue($this->field->isFirstEqualToSecond());
+        $this->assertTrue($this->field->isTransformationSuccessful());
         $this->assertEquals($input, $this->field->getDisplayedData());
         $this->assertEquals('foo', $this->field->getData());
-    }
-
-    public function testGetDataReturnsSecondValueIfFirstIsEmpty()
-    {
-        $input = array('first' => '', 'second' => 'bar');
-
-        $this->field->submit($input);
-
-        $this->assertEquals('bar', $this->field->getData());
     }
 }

@@ -35,6 +35,13 @@ class FileUploader implements DataProcessorInterface
 
     public function processData($data)
     {
+        // TESTME
+        $data = array_merge(array(
+            'file' => '',
+            'token' => '',
+            'name' => '',
+        ), $data);
+
         // Newly uploaded file
         if ($data['file'] instanceof UploadedFile && $data['file']->isValid()) {
             $data['token'] = (string)rand(100000, 999999);

@@ -22,7 +22,7 @@ class SessionBasedTemporaryStorage extends TemporaryStorage
 {
     public function __construct(Session $session, $secret, $nestingLevels = 3, $directory = null)
     {
-        parent::__construct($directory, $secret, $nestingLevels);
+        parent::__construct($secret, $nestingLevels, $directory);
 
         $this->session = $session;
     }

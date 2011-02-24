@@ -904,7 +904,7 @@ class FormFactory
         return $field
             ->setDataPreprocessor(new FileUploader($field, $this->storage))
             ->setData(null) // FIXME
-            ->add($this->getField('file', array('type' => 'file')))
+            ->add($this->getField('file')->setRendererVar('type', 'file'))
             ->add($this->getHiddenField('token'))
             ->add($this->getHiddenField('name'));
     }

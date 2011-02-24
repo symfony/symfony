@@ -205,11 +205,9 @@
 
 {% block file__widget %}
 {% spaceless %}
-    {% set group = field %}
-    {% set field = group.file %}
-    <input type="file" {{ block('attributes') }} />
-    {{ group.token.renderer.widget }}
-    {{ group.original_name.renderer.widget }}
+    {{ field.file.renderer.widget }}
+    {{ field.token.renderer.widget }}
+    {{ field.name.renderer.widget }}
 {% endspaceless %}
 {% endblock file__widget %}
 

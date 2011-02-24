@@ -793,6 +793,7 @@ class FormFactory
                 new DateTimeToArrayTransformer(array(
                     'input_timezone' => $options['data_timezone'],
                     'output_timezone' => $options['user_timezone'],
+                    'fields' => $parts,
                 )),
                 new ArrayToPartsTransformer(array(
                     'date' => array('year', 'month', 'day'),

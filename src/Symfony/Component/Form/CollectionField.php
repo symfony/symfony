@@ -77,6 +77,10 @@ class CollectionField extends Form
 
     public function setData($collection)
     {
+        if (null === $collection) {
+            $collection = array();
+        }
+
         if (!is_array($collection) && !$collection instanceof \Traversable) {
             throw new UnexpectedTypeException($collection, 'array or \Traversable');
         }

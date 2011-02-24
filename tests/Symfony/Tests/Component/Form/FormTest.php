@@ -840,7 +840,7 @@ class FormTest extends \PHPUnit_Framework_TestCase
      */
     public function testAddThrowsExceptionIfStringButNoFieldFactory()
     {
-        $form = new Form('author', array('data_class' => 'Application\Entity'));
+        $form = new Form('author');
 
         $form->add('firstName');
     }
@@ -991,14 +991,6 @@ class FormTest extends \PHPUnit_Framework_TestCase
         $form->setData(new Author());
     }
 
-    public function testSetDataToNull()
-    {
-        $form = new Form('author');
-        $form->setData(null);
-
-        $this->assertNull($form->getData());
-    }
-
     public function testSetDataToNullCreatesObjectIfClassAvailable()
     {
         $form = new Form('author', array(
@@ -1020,6 +1012,18 @@ class FormTest extends \PHPUnit_Framework_TestCase
         $form->setData(null);
 
         $this->assertSame($author, $form->getData());
+    }
+
+    /*
+     * We need something to write the field values into
+     */
+    public function testSetDataToNullCreatesArrayIfNoDataClassOrConstructor()
+    {
+        $author = new Author();
+        $form = new Form('author');
+        $form->setData(null);
+
+        $this->assertSame(array(), $form->getData());
     }
 
     public function testSubmitUpdatesTransformedDataFromAllFields()

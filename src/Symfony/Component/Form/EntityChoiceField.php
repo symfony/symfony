@@ -449,7 +449,7 @@ class EntityChoiceField extends ChoiceField
         }
 
         if (count($notFound) > 0) {
-            throw new TransformationFailedException('The entities with keys "%s" could not be found', implode('", "', $notFound));
+            throw new TransformationFailedException(sprintf('The entities with keys "%s" could not be found', implode('", "', $notFound)));
         }
 
         return $result;
@@ -466,10 +466,10 @@ class EntityChoiceField extends ChoiceField
     protected function transform($collectionOrEntity)
     {
         if (null === $collectionOrEntity) {
-            return $this->getOption('multiple') ? array() : '';
+            return $this->isField() ? '' : array();
         }
 
-        if (count($this->identifier) > 1) {
+        if (count($this->getIdentifierFields()) > 1) {
             // load all choices
             $availableEntities = $this->getEntities();
 
@@ -495,7 +495,6 @@ class EntityChoiceField extends ChoiceField
                 $result = current($this->getIdentifierValues($collectionOrEntity));
             }
         }
-
 
         return parent::transform($result);
     }

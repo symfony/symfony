@@ -192,6 +192,33 @@ class PropertyPathTest extends \PHPUnit_Framework_TestCase
         $path->getValue(new Author());
     }
 
+    public function testGetValueThrowsExceptionIfNotObjectOrArray()
+    {
+        $path = new PropertyPath('foobar');
+
+        $this->setExpectedException('Symfony\Component\Form\Exception\UnexpectedTypeException');
+
+        $path->getValue('baz');
+    }
+
+    public function testGetValueThrowsExceptionIfNull()
+    {
+        $path = new PropertyPath('foobar');
+
+        $this->setExpectedException('Symfony\Component\Form\Exception\UnexpectedTypeException');
+
+        $path->getValue(null);
+    }
+
+    public function testGetValueThrowsExceptionIfEmpty()
+    {
+        $path = new PropertyPath('foobar');
+
+        $this->setExpectedException('Symfony\Component\Form\Exception\UnexpectedTypeException');
+
+        $path->getValue('');
+    }
+
     public function testSetValueUpdatesArrays()
     {
         $array = array();
@@ -290,6 +317,36 @@ class PropertyPathTest extends \PHPUnit_Framework_TestCase
         $this->setExpectedException('Symfony\Component\Form\Exception\PropertyAccessDeniedException');
 
         $path->setValue(new Author(), 'foobar');
+    }
+
+    public function testSetValueThrowsExceptionIfNotObjectOrArray()
+    {
+        $path = new PropertyPath('foobar');
+        $value = 'baz';
+
+        $this->setExpectedException('Symfony\Component\Form\Exception\UnexpectedTypeException');
+
+        $path->setValue($value, 'bam');
+    }
+
+    public function testSetValueThrowsExceptionIfNull()
+    {
+        $path = new PropertyPath('foobar');
+        $value = null;
+
+        $this->setExpectedException('Symfony\Component\Form\Exception\UnexpectedTypeException');
+
+        $path->setValue($value, 'bam');
+    }
+
+    public function testSetValueThrowsExceptionIfEmpty()
+    {
+        $path = new PropertyPath('foobar');
+        $value = '';
+
+        $this->setExpectedException('Symfony\Component\Form\Exception\UnexpectedTypeException');
+
+        $path->setValue($value, 'bam');
     }
 
     public function testToString()

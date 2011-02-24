@@ -135,4 +135,28 @@ class HybridField extends Form
             return Field::isEmpty();
         }
     }
+
+    /**
+     * {@inheritDoc}
+     */
+    protected function transform($value)
+    {
+        if ($this->mode === self::FORM) {
+            return parent::transform($value);
+        } else {
+            return Field::transform($value);
+        }
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    protected function reverseTransform($value)
+    {
+        if ($this->mode === self::FORM) {
+            return parent::reverseTransform($value);
+        } else {
+            return Field::reverseTransform($value);
+        }
+    }
 }

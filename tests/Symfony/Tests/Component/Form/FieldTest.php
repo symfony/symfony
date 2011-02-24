@@ -15,6 +15,7 @@ require_once __DIR__ . '/Fixtures/Author.php';
 require_once __DIR__ . '/Fixtures/TestField.php';
 require_once __DIR__ . '/Fixtures/InvalidField.php';
 require_once __DIR__ . '/Fixtures/RequiredOptionsField.php';
+require_once __DIR__ . '/Fixtures/FixedValueTransformer.php';
 
 use Symfony\Component\Form\ValueTransformer\ValueTransformerInterface;
 use Symfony\Component\Form\PropertyPath;
@@ -25,6 +26,7 @@ use Symfony\Tests\Component\Form\Fixtures\Author;
 use Symfony\Tests\Component\Form\Fixtures\TestField;
 use Symfony\Tests\Component\Form\Fixtures\InvalidField;
 use Symfony\Tests\Component\Form\Fixtures\RequiredOptionsField;
+use Symfony\Tests\Component\Form\Fixtures\FixedValueTransformer;
 
 class FieldTest extends \PHPUnit_Framework_TestCase
 {
@@ -224,7 +226,11 @@ class FieldTest extends \PHPUnit_Framework_TestCase
     {
         $this->field->setData(123);
 
-        $this->assertSame(123, $this->field->getData());
+        // The values are synchronized
+        // Without value transformer, the field can't know that the data
+        // should be casted to an integer when the field is bound
+        // Even without binding, the data will thus be a string
+        $this->assertSame('123', $this->field->getData());
         $this->assertSame('123', $this->field->getDisplayedData());
     }
 
@@ -349,21 +355,15 @@ class FieldTest extends \PHPUnit_Framework_TestCase
 
     public function testValuesAreTransformedCorrectly()
     {
-        // The value is first passed to the normalization transformer...
-        $normTransformer = $this->createMockTransformer();
-        $normTransformer->expects($this->exactly(2))
-                                ->method('transform')
-                                // Impossible to test with PHPUnit because called twice
-                                // ->with($this->identicalTo(0))
-                                ->will($this->returnValue('norm[0]'));
+        $normTransformer = new FixedValueTransformer(array(
+            null => '',
+            0 => 'norm[0]',
+        ));
 
-        // ...and then to the value transformer
-        $valueTransformer = $this->createMockTransformer();
-        $valueTransformer->expects($this->exactly(2))
-                                ->method('transform')
-                                // Impossible to test with PHPUnit because called twice
-                                // ->with($this->identicalTo('norm[0]'))
-                                ->will($this->returnValue('transform[norm[0]]'));
+        $valueTransformer = new FixedValueTransformer(array(
+            '' => '',
+            'norm[0]' => 'transform[norm[0]]',
+        ));
 
         $field = new TestField('title', array(
             'value_transformer' => $valueTransformer,
@@ -379,18 +379,10 @@ class FieldTest extends \PHPUnit_Framework_TestCase
 
     public function testSubmittedValuesAreTrimmedBeforeTransforming()
     {
-        // The value is passed to the value transformer
-        $transformer = $this->createMockTransformer();
-        $transformer->expects($this->once())
-                                ->method('reverseTransform')
-                                ->with($this->identicalTo('a'))
-                                ->will($this->returnValue('reverse[a]'));
-
-        $transformer->expects($this->exactly(2))
-                                ->method('transform')
-                                // Impossible to test with PHPUnit because called twice
-                                // ->with($this->identicalTo('reverse[a]'))
-                                ->will($this->returnValue('a'));
+        $transformer = new FixedValueTransformer(array(
+            null => '',
+            'reverse[a]' => 'a',
+        ));
 
         $field = new TestField('title', array(
             'value_transformer' => $transformer,
@@ -404,18 +396,10 @@ class FieldTest extends \PHPUnit_Framework_TestCase
 
     public function testSubmittedValuesAreNotTrimmedBeforeTransformingIfDisabled()
     {
-        // The value is passed to the value transformer
-        $transformer = $this->createMockTransformer();
-        $transformer->expects($this->once())
-                                ->method('reverseTransform')
-                                ->with($this->identicalTo(' a '))
-                                ->will($this->returnValue('reverse[ a ]'));
-
-        $transformer->expects($this->exactly(2))
-                                ->method('transform')
-                                // Impossible to test with PHPUnit because called twice
-                                // ->with($this->identicalTo('reverse[ a ]'))
-                                ->will($this->returnValue(' a '));
+        $transformer = new FixedValueTransformer(array(
+            null => '',
+            'reverse[ a ]' => ' a ',
+        ));
 
         $field = new TestField('title', array(
             'trim' => false,
@@ -426,21 +410,6 @@ class FieldTest extends \PHPUnit_Framework_TestCase
 
         $this->assertEquals(' a ', $field->getDisplayedData());
         $this->assertEquals('reverse[ a ]', $field->getData());
-    }
-
-    /*
-     * This is important so that submit() can work even if setData() was not called
-     * before
-     */
-    public function testWritePropertyTreatsEmptyValuesAsArrays()
-    {
-        $array = null;
-
-        $field = new TestField('firstName');
-        $field->submit('Bernhard');
-        $field->writeProperty($array);
-
-        $this->assertEquals(array('firstName' => 'Bernhard'), $array);
     }
 
     public function testWritePropertyDoesNotWritePropertyIfPropertyPathIsEmpty()
@@ -470,14 +439,15 @@ class FieldTest extends \PHPUnit_Framework_TestCase
     {
         // The value is passed to the value transformer
         $transformer = $this->createMockTransformer();
-        $transformer->expects($this->once())
-                ->method('reverseTransform')
-                ->will($this->throwException(new TransformationFailedException()));
 
         $field = new TestField('title', array(
             'trim' => false,
             'value_transformer' => $transformer,
         ));
+
+        $transformer->expects($this->once())
+                ->method('reverseTransform')
+                ->will($this->throwException(new TransformationFailedException()));
 
         $field->submit('a');
 

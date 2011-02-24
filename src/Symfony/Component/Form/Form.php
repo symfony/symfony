@@ -352,16 +352,6 @@ class Form extends Field implements \IteratorAggregate, FormInterface
      */
     public function setData($data)
     {
-        if (empty($data)) {
-            if ($this->dataConstructor) {
-                $constructor = $this->dataConstructor;
-                $data = $constructor();
-            } else if ($this->dataClass) {
-                $class = $this->dataClass;
-                $data = new $class();
-            }
-        }
-
         parent::setData($data);
 
         // get transformed data and pass its values to child fields
@@ -378,6 +368,30 @@ class Form extends Field implements \IteratorAggregate, FormInterface
 
             $this->readObject($data);
         }
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    protected function transform($value)
+    {
+        if (null === $this->getValueTransformer()) {
+            // Empty values must be converted to objects or arrays so that
+            // they can be read by PropertyPath in the child fields
+            if (empty($value)) {
+                if ($this->dataConstructor) {
+                    $constructor = $this->dataConstructor;
+                    return $constructor();
+                } else if ($this->dataClass) {
+                    $class = $this->dataClass;
+                    return new $class();
+                } else {
+                    return array();
+                }
+            }
+        }
+
+        return parent::transform($value);
     }
 
     /**

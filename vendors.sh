@@ -58,6 +58,9 @@ install_git doctrine-mongodb git://github.com/doctrine/mongodb.git
 # Doctrine MongoDB
 install_git doctrine-mongodb-odm git://github.com/doctrine/mongodb-odm.git
 
+# Monolog
+install_git monolog git://github.com/Seldaek/monolog.git
+
 # Swiftmailer
 install_git swiftmailer git://github.com/swiftmailer/swiftmailer.git origin/4.1
 

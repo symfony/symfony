@@ -68,7 +68,7 @@ class TwigEngine implements EngineInterface
     {
         try {
             $this->load($name);
-        } catch (\Twig_Error_Loader $e) {
+        } catch (\InvalidArgumentException $e) {
             return false;
         }
 
@@ -133,6 +133,5 @@ class TwigEngine implements EngineInterface
         } catch (\Twig_Error_Loader $e) {
             throw new \InvalidArgumentException($e->getMessage(), $e->getCode(), $e);
         }
-        
     }
 }

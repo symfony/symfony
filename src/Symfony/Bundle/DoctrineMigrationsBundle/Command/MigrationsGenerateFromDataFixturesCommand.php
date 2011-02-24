@@ -95,7 +95,7 @@ class MigrationsGenerateFromDataFixturesCommand extends GenerateCommand
                 if (is_object($param)) {
                     if ($param instanceOf \DateTime) {
                         $queries[$key][1][$key2] = $param->format('Y-m-d\TH:i:s\Z');
-                    } else if (in_array('__toString', get_class_methods($param))) {
+                    } else if (method_exists($param, '__toString')) {
                         $queries[$key][1][$key2] = (string)$param;
                     } else {
                         $output->writeln(sprintf('  <comment>></comment> <info>cannot convert object of type %s to a string</info>', get_class($param)));

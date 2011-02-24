@@ -21,6 +21,7 @@ use Symfony\Component\Form\CsrfProvider\CsrfProviderInterface;
 use Symfony\Component\Form\DataProcessor\RadioToArrayConverter;
 use Symfony\Component\Form\DataProcessor\UrlProtocolFixer;
 use Symfony\Component\Form\DataProcessor\CollectionMerger;
+use Symfony\Component\Form\DataProcessor\FileUploader;
 use Symfony\Component\Form\FieldFactory\FieldFactoryInterface;
 use Symfony\Component\Form\Renderer\DefaultRenderer;
 use Symfony\Component\Form\Renderer\Theme\ThemeInterface;
@@ -51,8 +52,11 @@ use Symfony\Component\Form\ValueTransformer\ValueTransformerChain;
 use Symfony\Component\Form\ValueTransformer\ArrayToChoicesTransformer;
 use Symfony\Component\Form\ValueTransformer\ArrayToPartsTransformer;
 use Symfony\Component\Form\ValueTransformer\ValueToDuplicatesTransformer;
+use Symfony\Component\Form\ValueTransformer\FileToArrayTransformer;
+use Symfony\Component\Form\ValueTransformer\FileToStringTransformer;
 use Symfony\Component\Validator\ValidatorInterface;
 use Symfony\Component\Locale\Locale;
+use Symfony\Component\HttpFoundation\File\TemporaryStorage;
 
 class FormFactory
 {
@@ -64,12 +68,19 @@ class FormFactory
 
     private $fieldFactory;
 
-    public function __construct(ThemeInterface $theme, CsrfProviderInterface $csrfProvider, ValidatorInterface $validator, FieldFactoryInterface $fieldFactory)
+    private $storage;
+
+    public function __construct(ThemeInterface $theme,
+            CsrfProviderInterface $csrfProvider,
+            ValidatorInterface $validator,
+            FieldFactoryInterface $fieldFactory,
+            TemporaryStorage $storage)
     {
         $this->theme = $theme;
         $this->csrfProvider = $csrfProvider;
         $this->validator = $validator;
         $this->fieldFactory = $fieldFactory;
+        $this->storage = $storage;
     }
 
     protected function getTheme()
@@ -865,5 +876,31 @@ class FormFactory
             )))
             ->add($firstChild)
             ->add($secondChild);
+    }
+
+    public function getFileField($key, array $options = array())
+    {
+        $options = array_merge(array(
+            'template' => 'file',
+            'type' => 'string',
+        ), $options);
+
+        $field = $this->getForm($key, $options);
+
+        if ($options['type'] === 'string') {
+            $field->setNormalizationTransformer(new ValueTransformerChain(array(
+                new ReversedTransformer(new FileToStringTransformer()),
+                new FileToArrayTransformer(),
+            )));
+        } else {
+            $field->setNormalizationTransformer(new FileToArrayTransformer());
+        }
+
+        return $field
+            ->setDataPreprocessor(new FileUploader($field, $this->storage))
+            ->setData(null) // FIXME
+            ->add($this->getField('file', array('type' => 'file')))
+            ->add($this->getHiddenField('token'))
+            ->add($this->getHiddenField('name'));
     }
 }

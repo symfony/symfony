@@ -23,6 +23,8 @@ class TestCase extends \PHPUnit_Framework_TestCase
 
     protected $fieldFactory;
 
+    protected $storage;
+
     protected $factory;
 
     protected function setUp()
@@ -31,6 +33,10 @@ class TestCase extends \PHPUnit_Framework_TestCase
         $this->csrfProvider = $this->getMock('Symfony\Component\Form\CsrfProvider\CsrfProviderInterface');
         $this->validator = $this->getMock('Symfony\Component\Validator\ValidatorInterface');
         $this->fieldFactory = $this->getMock('Symfony\Component\Form\FieldFactory\FieldFactoryInterface');
-        $this->factory = new FormFactory($this->theme, $this->csrfProvider, $this->validator, $this->fieldFactory);
+        $this->storage = $this->getMockBuilder('Symfony\Component\HttpFoundation\File\TemporaryStorage')
+            ->disableOriginalConstructor()
+            ->getMock();
+        $this->factory = new FormFactory($this->theme, $this->csrfProvider,
+                $this->validator, $this->fieldFactory, $this->storage);
     }
 }

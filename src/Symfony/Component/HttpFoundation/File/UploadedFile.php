@@ -2,7 +2,7 @@
 
 /*
  * This file is part of the Symfony package.
- * 
+ *
  * (c) Fabien Potencier <fabien.potencier@symfony-project.com>
  *
  * For the full copyright and license information, please view the LICENSE
@@ -12,6 +12,7 @@
 namespace Symfony\Component\HttpFoundation\File;
 
 use Symfony\Component\HttpFoundation\File\Exception\FileException;
+use Symfony\Component\HttpFoundation\File\Exception\UploadException;
 
 /**
  * A file uploaded through a form.
@@ -68,12 +69,22 @@ class UploadedFile extends File
             throw new FileException(sprintf('Unable to create UploadedFile because "file_uploads" is disabled in your php.ini file (%s)', get_cfg_var('cfg_file_path')));
         }
 
-        if (is_file($path)) {
-            $this->path = realpath($path);
-        }
-
         if (null === $error) {
             $error = UPLOAD_ERR_OK;
+        }
+
+        switch ($error) {
+            // TESTME
+            case UPLOAD_ERR_NO_TMP_DIR:
+                throw new UploadException('Could not upload a file because a temporary directory is missing (UPLOAD_ERR_NO_TMP_DIR)');
+            case UPLOAD_ERR_CANT_WRITE:
+                throw new UploadException('Could not write file to disk (UPLOAD_ERR_CANT_WRITE)');
+            case UPLOAD_ERR_EXTENSION:
+                throw new UploadException('A PHP extension stopped the file upload (UPLOAD_ERR_EXTENSION)');
+        }
+
+        if (is_file($path)) {
+            $this->path = realpath($path);
         }
 
         if (null === $mimeType) {
@@ -121,6 +132,48 @@ class UploadedFile extends File
     public function getError()
     {
         return $this->error;
+    }
+
+    /**
+     * Returns whether the file was uploaded succesfully.
+     *
+     * @return Boolean  True if no error occurred during uploading
+     */
+    public function isValid()
+    {
+        return $this->error === UPLOAD_ERR_OK;
+    }
+
+    /**
+     * Returns true if the size of the uploaded file exceeds the
+     * upload_max_filesize directive in php.ini
+     *
+     * @return Boolean
+     */
+    protected function isIniSizeExceeded()
+    {
+        return $this->error === UPLOAD_ERR_INI_SIZE;
+    }
+
+    /**
+     * Returns true if the size of the uploaded file exceeds the
+     * MAX_FILE_SIZE directive specified in the HTML form
+     *
+     * @return Boolean
+     */
+    protected function isFormSizeExceeded()
+    {
+        return $this->error === UPLOAD_ERR_FORM_SIZE;
+    }
+
+    /**
+     * Returns true if the file was completely uploaded
+     *
+     * @return Boolean
+     */
+    protected function isUploadComplete()
+    {
+        return $this->error !== UPLOAD_ERR_PARTIAL;
     }
 
     /**

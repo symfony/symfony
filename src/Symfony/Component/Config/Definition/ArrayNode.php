@@ -81,7 +81,7 @@ class ArrayNode extends BaseNode implements PrototypeNodeInterface
     }
 
     /**
-     * The name of the attribute that should be used as key.
+     * The name of the attribute which value should be used as key.
      *
      * This is only relevant for XML configurations, and only in combination
      * with a prototype based node.
@@ -92,12 +92,12 @@ class ArrayNode extends BaseNode implements PrototypeNodeInterface
      *
      * becomes
      *
-     *     'id' => array('foo' => 'bar')
+     *     'my_name' => array('foo' => 'bar')
      *
      * If $remove is false, the resulting array will still have the
      * "'id' => 'my_name'" item in it.
      *
-     * @param string $attribute The name of the attribute to use as a key
+     * @param string $attribute The name of the attribute which value is to be used as a key
      * @param Boolean $remove Whether or not to remove the key
      * @return void
      */
@@ -238,7 +238,7 @@ class ArrayNode extends BaseNode implements PrototypeNodeInterface
      * Sets the node prototype.
      *
      * @param PrototypeNodeInterface $node 
-     * @throws \RuntimeException if the node doesn't have concrete children
+     * @throws \RuntimeException if the node has concrete children
      */
     public function setPrototype(PrototypeNodeInterface $node)
     {

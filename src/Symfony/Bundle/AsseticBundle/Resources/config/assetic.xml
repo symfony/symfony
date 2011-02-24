@@ -21,6 +21,7 @@
         <parameter key="assetic.filter.sass.class">Assetic\Filter\Sass\SassFilter</parameter>
         <parameter key="assetic.filter.scss.class">Assetic\Filter\Sass\ScssFilter</parameter>
         <parameter key="assetic.filter.sprockets.class">Assetic\Filter\SprocketsFilter</parameter>
+        <parameter key="assetic.filter.stylus.class">Assetic\Filter\StylusFilter</parameter>
 
         <parameter key="assetic.java_bin">/usr/bin/java</parameter>
         <parameter key="assetic.sass_bin">/usr/bin/sass</parameter>
@@ -80,6 +81,12 @@
             <tag name="assetic.filter" alias="coffee" />
             <argument>%assetic.coffee_bin%</argument>
             <argument>%assetic.node_bin%</argument>
+        </service>
+        <service id="assetic.filter.stylus" class="%assetic.filter.stylus.class%">
+            <tag name="assetic.filter" alias="stylus" />
+            <argument>%assetic.document_root%</argument>
+            <argument>%assetic.node_bin%</argument>
+            <argument>%assetic.node_paths%</argument>
         </service>
 
         <!-- other -->

@@ -14,6 +14,7 @@ namespace Symfony\Component\Form;
 use Symfony\Component\Form\Exception\InvalidPropertyPathException;
 use Symfony\Component\Form\Exception\InvalidPropertyException;
 use Symfony\Component\Form\Exception\PropertyAccessDeniedException;
+use Symfony\Component\Form\Exception\UnexpectedTypeException;
 
 /**
  * Allows easy traversing of a property path
@@ -228,6 +229,10 @@ class PropertyPath implements \IteratorAggregate
      */
     protected function readPropertyPath(&$objectOrArray, $currentIndex)
     {
+        if (!is_object($objectOrArray) && !is_array($objectOrArray)) {
+            throw new UnexpectedTypeException($objectOrArray, 'object or array');
+        }
+
         $property = $this->elements[$currentIndex];
 
         if (is_object($objectOrArray)) {
@@ -261,6 +266,10 @@ class PropertyPath implements \IteratorAggregate
      */
     protected function writePropertyPath(&$objectOrArray, $currentIndex, $value)
     {
+        if (!is_object($objectOrArray) && !is_array($objectOrArray)) {
+            throw new UnexpectedTypeException($objectOrArray, 'object or array');
+        }
+
         $property = $this->elements[$currentIndex];
 
         if ($currentIndex + 1 < $this->length) {

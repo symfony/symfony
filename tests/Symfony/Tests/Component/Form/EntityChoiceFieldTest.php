@@ -145,23 +145,53 @@ class EntityChoiceFieldTest extends DoctrineOrmTestCase
         $this->assertEquals('', $field->getDisplayedData());
     }
 
-    public function testSetDataMultiple_null()
+    public function testSetDataMultipleExpanded_null()
     {
         $field = $this->factory->getEntityChoiceField('name', array(
             'multiple' => true,
+            'expanded' => true,
             'em' => $this->em,
             'class' => self::SINGLE_IDENT_CLASS,
         ));
         $field->setData(null);
 
+        $this->assertEquals(new ArrayCollection(), $field->getData());
+        $this->assertEquals(array(), $field->getDisplayedData());
+    }
+
+    public function testSetDataMultipleNonExpanded_null()
+    {
+        $field = $this->factory->getEntityChoiceField('name', array(
+            'multiple' => true,
+            'expanded' => false,
+            'em' => $this->em,
+            'class' => self::SINGLE_IDENT_CLASS,
+        ));
+        $field->setData(null);
+
+        $this->assertEquals(new ArrayCollection(), $field->getData());
+        $this->assertEquals('', $field->getDisplayedData());
+    }
+
+    public function testSubmitSingleExpanded_null()
+    {
+        $field = $this->factory->getEntityChoiceField('name', array(
+            'multiple' => false,
+            'expanded' => true,
+            'em' => $this->em,
+            'class' => self::SINGLE_IDENT_CLASS,
+        ));
+        $field->submit(null);
+
         $this->assertEquals(null, $field->getData());
         $this->assertEquals(array(), $field->getDisplayedData());
     }
 
-    public function testSubmitSingle_null()
+    public function testSubmitSingleNonExpanded_null()
     {
         $field = $this->factory->getEntityChoiceField('name', array(
             'multiple' => false,
+            'expanded' => false,
             'em' => $this->em,
             'class' => self::SINGLE_IDENT_CLASS,
         ));
@@ -327,7 +357,7 @@ class EntityChoiceFieldTest extends DoctrineOrmTestCase
             'property' => 'name',
         ));
 
-        $existing = new ArrayCollection(array($entity2));
+        $existing = new ArrayCollection(array(0 => $entity2));
 
         $field->setData($existing);
         $field->submit(array('0', '2'));

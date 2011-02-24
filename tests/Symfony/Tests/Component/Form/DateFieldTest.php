@@ -31,7 +31,7 @@ class DateFieldTest extends DateTimeTestCase
             'data_timezone' => 'UTC',
             'user_timezone' => 'UTC',
             'widget' => 'text',
-            'type' => DateField::DATETIME,
+            'type' => 'datetime',
         ));
 
         $field->submit('2.6.2010');
@@ -46,7 +46,7 @@ class DateFieldTest extends DateTimeTestCase
             'data_timezone' => 'UTC',
             'user_timezone' => 'UTC',
             'widget' => 'text',
-            'type' => DateField::STRING,
+            'type' => 'string',
         ));
 
         $field->submit('2.6.2010');
@@ -61,7 +61,7 @@ class DateFieldTest extends DateTimeTestCase
             'data_timezone' => 'UTC',
             'user_timezone' => 'UTC',
             'widget' => 'text',
-            'type' => DateField::TIMESTAMP,
+            'type' => 'timestamp',
         ));
 
         $field->submit('2.6.2010');
@@ -78,7 +78,7 @@ class DateFieldTest extends DateTimeTestCase
             'data_timezone' => 'UTC',
             'user_timezone' => 'UTC',
             'widget' => 'text',
-            'type' => DateField::RAW,
+            'type' => 'array',
         ));
 
         $field->submit('2.6.2010');
@@ -98,7 +98,7 @@ class DateFieldTest extends DateTimeTestCase
         $field = $this->factory->getDateField('name', array(
             'data_timezone' => 'UTC',
             'user_timezone' => 'UTC',
-            'widget' => DateField::CHOICE,
+            'widget' => 'choice',
         ));
 
         $text = array(
@@ -120,7 +120,7 @@ class DateFieldTest extends DateTimeTestCase
         $field = $this->factory->getDateField('name', array(
             'data_timezone' => 'UTC',
             'user_timezone' => 'UTC',
-            'widget' => DateField::CHOICE,
+            'widget' => 'choice',
             'required' => false,
         ));
 
@@ -142,7 +142,7 @@ class DateFieldTest extends DateTimeTestCase
             'data_timezone' => 'America/New_York',
             'user_timezone' => 'Pacific/Tahiti',
             // don't do this test with DateTime, because it leads to wrong results!
-            'type' => DateField::STRING,
+            'type' => 'string',
             'widget' => 'text',
         ));
 

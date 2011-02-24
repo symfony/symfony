@@ -99,7 +99,7 @@ class Field extends Configurable implements FieldInterface
      *
      * @return string
      */
-    protected function getTransformedData()
+    public function getTransformedData()
     {
         return $this->transformedData;
     }
@@ -261,9 +261,15 @@ class Field extends Configurable implements FieldInterface
      */
     public function setData($data)
     {
+        // All four transformation methods must be executed to make sure
+        // that all three data representations are synchronized
+        // Store data in between steps because processData() might use
+        // this data
         $this->data = $data;
         $this->normalizedData = $this->normalize($data);
-        $this->transformedData = $this->transform($this->normalizedData);
+        $this->transformedData = $this->transform($this->normalize($data));
+        $this->normalizedData = $this->processData($this->reverseTransform($this->transformedData));
+        $this->data = $this->denormalize($this->normalizedData);
 
         return $this;
     }

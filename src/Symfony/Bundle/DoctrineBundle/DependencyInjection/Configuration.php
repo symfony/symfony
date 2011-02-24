@@ -61,7 +61,7 @@ class Configuration
                         return $v;
                     })
                 ->end()
-                ->scalarNode('default_connection')->isRequired()->cannotBeEmpty()->end()
+                ->scalarNode('default_connection')->cannotBeEmpty()->defaultValue('default')->end()
                 ->fixXmlConfig('type')
                 ->arrayNode('types')
                     ->useAttributeAsKey('name')
@@ -90,14 +90,17 @@ class Configuration
                 ->scalarNode('user')->defaultValue('root')->end()
                 ->scalarNode('password')->defaultNull()->end()
                 ->scalarNode('driver')->defaultValue('pdo_mysql')->end()
+                ->fixXmlConfig('driver_class', 'driverClass')
                 ->scalarNode('driver_class')->end()
-                ->arrayNode('options')
+                ->fixXmlConfig('options', 'driverOptions')
+                ->arrayNode('driverOptions')
                     ->useAttributeAsKey('key')
                     ->prototype('scalar')->end()
                 ->end()
                 ->scalarNode('path')->end()
                 ->booleanNode('memory')->end()
                 ->scalarNode('unix_socket')->end()
+                ->fixXmlConfig('wrapper_class', 'wrapperClass')
                 ->scalarNode('wrapper_class')->end()
                 ->scalarNode('platform_service')->end()
                 ->scalarNode('charset')->defaultValue('UTF-8')->end()
@@ -116,23 +119,24 @@ class Configuration
                     ->ifTrue(function($v){ return is_array($v) && !array_key_exists('entity_managers', $v) && !array_key_exists('entity_manager', $v); })
                     ->then(function($v) {
                         $entityManager = array ();
-                        $keys = array ('result_cache_driver', 'metadata_cache_driver', 'query_cache_driver', 'mappings');
+                        $keys = array ('result_cache_driver', 'result-cache-driver', 'metadata_cache_driver', 'metadata-cache-driver', 'query_cache_driver', 'query-cache-driver', 'mappings', 'mapping', 'connection');
                         foreach ($keys as $key) {
                             if (array_key_exists($key, $v)) {
-                                $entityManagers[$key] = $v[$key];
+                                $entityManager[$key] = $v[$key];
                                 unset($v[$key]);
                             }
                         }
-                        if (!empty ($entityManager)) {
-                            $defaultEntityManager = isset($v['default_entity_manager']) ? (string) $v['default_entity_manager'] : 'default';
-                            $v['entity_managers'] = array ($defaultEntityManager => $entityManager);
-                            $v['default_entity_manager'] = $defaultEntityManager;
-                        }
+                        $defaultEntityManager = isset($v['default_entity_manager']) ? (string) $v['default_entity_manager'] : 'default';
+                        $v['entity_managers'] = array ($defaultEntityManager => $entityManager);
+                        $v['default_entity_manager'] = $defaultEntityManager;
                         return $v;
                     })
                 ->end()
-                ->scalarNode('default_entity_manager')->isRequired()->cannotBeEmpty()->end()
+                ->scalarNode('default_entity_manager')->cannotBeEmpty()->defaultValue('default')->end()
+                ->scalarNode('default_connection')->cannotBeEmpty()->defaultValue('default')->end()
                 ->booleanNode('auto_generate_proxy_classes')->defaultFalse()->end()
+                ->scalarNode('proxy_dir')->defaultValue('%kernel.cache_dir%/doctrine/orm/Proxies')->end()
+                ->scalarNode('proxy_namespace')->defaultValue('Proxies')->end()
                 ->fixXmlConfig('entity_manager')
                 ->builder($this->getOrmEntityManagersNode())
             ->end()
@@ -150,18 +154,16 @@ class Configuration
                 ->builder($this->getOrmCacheDriverNode('metadata_cache_driver'))
                 ->builder($this->getOrmCacheDriverNode('result_cache_driver'))
                 ->scalarNode('connection')->end()
-                ->scalarNode('proxy_dir')->defaultValue('%kernel.cache_dir%/doctrine/orm/Proxies')->end()
-                ->scalarNode('proxy_namespace')->defaultValue('Proxies')->end()
-                ->scalarNode('class_metadata_factory_name')->end()
+                ->scalarNode('class_metadata_factory_name')->defaultValue('%doctrine.orm.class_metadata_factory_name%')->end()
                 ->fixXmlConfig('mapping')
                 ->arrayNode('mappings')
                     ->useAttributeAsKey('name')
-                    ->treatNullLike(array ())
                     ->prototype('array')
                         ->beforeNormalization()
                             ->ifString()
                             ->then(function($v) { return array ('type' => $v); })
                         ->end()
+                        ->treatNullLike(array ())
                         ->scalarNode('type')->end()
                         ->scalarNode('dir')->end()
                         ->scalarNode('alias')->end()
@@ -180,14 +182,16 @@ class Configuration
     {
         $node = new NodeBuilder($name, 'array');
         $node
+            ->addDefaultsIfNotSet()
             ->beforeNormalization()
                 ->ifString()
                 ->then(function($v) { return array ('type' => $v); })
             ->end()
-            ->scalarNode('type')->defaultValue('array')->end()
+            ->scalarNode('type')->defaultValue('array')->isRequired()->end()
             ->scalarNode('host')->end()
             ->scalarNode('port')->end()
             ->scalarNode('instance_class')->end()
+            ->scalarNode('class')->end()
         ;
 
         return $node;

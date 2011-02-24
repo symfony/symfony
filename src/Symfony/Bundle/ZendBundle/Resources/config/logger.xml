@@ -6,7 +6,6 @@
 
     <parameters>
         <parameter key="zend.logger.class">Symfony\Bundle\ZendBundle\Logger\Logger</parameter>
-        <parameter key="zend.logger.priority" type="constant">Zend\Log\Logger::CRIT</parameter>
         <parameter key="zend.logger.log_errors">true</parameter>
         <parameter key="zend.logger.writer.debug.class">Symfony\Bundle\ZendBundle\Logger\DebugLogger</parameter>
         <parameter key="zend.logger.writer.filesystem.class">Zend\Log\Writer\Stream</parameter>

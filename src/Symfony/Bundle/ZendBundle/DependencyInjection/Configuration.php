@@ -37,7 +37,7 @@ class Configuration
         $rootNode
             ->arrayNode('logger')
                 ->canBeUnset()
-                ->scalarNode('priority')->defaultValue('CRIT')->end()
+                ->scalarNode('priority')->defaultValue('INFO')->end()
                 ->scalarNode('path')->defaultValue('%kernel.logs_dir%/%kernel.environment%.log')->end()
                 ->booleanNode('log_errors')->defaultFalse()->end()
             ->end()

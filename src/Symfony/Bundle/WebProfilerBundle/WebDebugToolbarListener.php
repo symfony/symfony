@@ -91,6 +91,8 @@ class WebDebugToolbarListener
 
         if (false !== $pos = $posrFunction($content, '</body>')) {
             $content = $substrFunction($content, 0, $pos).$toolbar.$substrFunction($content, $pos);
+        } else {
+            $content .= $toolbar;
         }
 
         $response->setContent($content);

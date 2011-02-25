@@ -24,13 +24,18 @@ use Symfony\Component\Config\Definition\Builder\TreeBuilder;
  */
 class Configuration
 {
+    private $kernelDebug;
+
     /**
      * Generates the configuration tree.
      *
+     * @param Boolean $kernelDebug
      * @return \Symfony\Component\Config\Definition\NodeInterface
      */
-    public function getConfigTree()
+    public function getConfigTree($kernelDebug)
     {
+        $this->kernelDebug = (bool) $kernelDebug;
+
         $treeBuilder = new TreeBuilder();
         $rootNode = $treeBuilder->root('doctrine', 'array');
 
@@ -109,7 +114,7 @@ class Configuration
                 ->scalarNode('wrapper_class')->end()
                 ->scalarNode('platform_service')->end()
                 ->scalarNode('charset')->defaultValue('UTF-8')->end()
-                ->booleanNode('logging')->defaultFalse()->end()
+                ->booleanNode('logging')->defaultValue($this->kernelDebug)->end()
             ->end()
         ;
 

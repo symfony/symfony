@@ -34,7 +34,7 @@ class DoctrineExtension extends AbstractDoctrineExtension
     {
         $configuration = new Configuration();
         $processor = new Processor();
-        $config = $processor->process($configuration->getConfigTree(), $configs);
+        $config = $processor->process($configuration->getConfigTree($container->getParameter('kernel.debug')), $configs);
 
         if (!empty($config['dbal'])) {
             $this->dbalLoad($config['dbal'], $container);

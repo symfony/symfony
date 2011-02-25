@@ -15,7 +15,7 @@ use Symfony\Component\Form\FieldInterface;
 use Symfony\Component\Form\Renderer\Theme\ThemeInterface;
 use Symfony\Component\Form\Renderer\Plugin\PluginInterface;
 
-class DefaultRenderer implements RendererInterface
+class DefaultRenderer implements RendererInterface, \ArrayAccess
 {
     private $field;
 
@@ -77,6 +77,11 @@ class DefaultRenderer implements RendererInterface
         }
     }
 
+    public function hasVar($name)
+    {
+        return array_key_exists($name, $this->vars);
+    }
+
     public function getVar($name)
     {
         $this->initialize();
@@ -128,5 +133,25 @@ class DefaultRenderer implements RendererInterface
             $this->vars,
             $vars
         ));
+    }
+
+    public function offsetGet($name)
+    {
+        return $this->getVar($name);
+    }
+
+    public function offsetExists($name)
+    {
+        return $this->hasVar($name);
+    }
+
+    public function offsetSet($name, $value)
+    {
+        throw new \BadMethodCallException('Not supported');
+    }
+
+    public function offsetUnset($name)
+    {
+        throw new \BadMethodCallException('Not supported');
     }
 }

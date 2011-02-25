@@ -10,6 +10,7 @@
         <parameter key="monolog.handler.fingerscrossed.class">Monolog\Handler\FingersCrossedHandler</parameter>
         <parameter key="monolog.handler.null.class">Monolog\Handler\NullHandler</parameter>
         <parameter key="monolog.handler.test.class">Monolog\Handler\TestHandler</parameter>
+        <parameter key="monolog.handler.debug.class">Symfony\Bundle\MonologBundle\Logger\DebugHandler</parameter>
     </parameters>
 
     <services>

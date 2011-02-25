@@ -66,7 +66,12 @@ class DumpCommand extends Command
      */
     protected function watch(LazyAssetManager $am, $baseDir, OutputInterface $output, $debug = false)
     {
-        $previously = array();
+        $cache = sys_get_temp_dir().'/assetic_watch_'.substr(sha1($baseDir), 0, 7);
+        if (file_exists($cache)) {
+            $previously = unserialize(file_get_contents($cache));
+        } else {
+            $previously = array();
+        }
 
         while (true) {
             // reload formulae when in debug
@@ -80,6 +85,7 @@ class DumpCommand extends Command
                 }
             }
 
+            file_put_contents($cache, serialize($previously));
             sleep(1);
         }
     }

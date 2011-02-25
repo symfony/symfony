@@ -38,6 +38,6 @@ class Logger extends BaseLogger implements LoggerInterface
 
     public function log($message, $level)
     {
-        return $this->addMessage($level, $message);
+        return $this->addRecord($level, $message);
     }
 }

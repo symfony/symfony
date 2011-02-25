@@ -12,6 +12,8 @@
 namespace Symfony\Bundle\MonologBundle;
 
 use Symfony\Component\HttpKernel\Bundle\Bundle;
+use Symfony\Component\DependencyInjection\ContainerBuilder;
+use Symfony\Bundle\MonologBundle\DependencyInjection\Compiler\LoggerChannelPass;
 
 /**
  * Bundle.
@@ -20,4 +22,10 @@ use Symfony\Component\HttpKernel\Bundle\Bundle;
  */
 class MonologBundle extends Bundle
 {
+    public function build(ContainerBuilder $container)
+    {
+        parent::build($container);
+
+        $container->addCompilerPass(new LoggerChannelPass());
+    }
 }

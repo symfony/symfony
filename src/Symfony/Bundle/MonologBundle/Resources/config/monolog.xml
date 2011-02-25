@@ -13,8 +13,11 @@
     </parameters>
 
     <services>
-        <service id="monolog.logger" class="%monolog.logger.class%" public="false">
-            <argument>framework</argument>
+        <service id="monolog.logger" parent="monolog.logger_prototype">
+            <argument index="0">app</argument>
+        </service>
+        <service id="monolog.logger_prototype" class="%monolog.logger.class%" abstract="true">
+            <argument /><!-- Channel -->
         </service>
     </services>
 </container>

@@ -52,25 +52,26 @@ class MonologExtension extends Extension
             $loader->load('monolog.xml');
             $container->setAlias('logger', 'monolog.logger');
 
-            $logger = $container->getDefinition('monolog.logger');
+            $logger = $container->getDefinition('monolog.logger.prototype');
 
             $handlers = array();
-            foreach ($config['handlers'] as $handler) {
-                $handlers[] = $this->buildHandler($container, $handler);
+            foreach ($config['handlers'] as $name => $handler) {
+                $handlers[] = $this->buildHandler($container, $name, $handler);
             }
 
             // TODO somehow the DebugLogger should be pushed on the stack as well, or that concept needs to be changed
             // didn't have to investigate yet what it is exactly
             $handlers = array_reverse($handlers);
             foreach ($handlers as $handler) {
-                $logger->addMethodCall('pushHandler', array($handler));
+                $logger->addMethodCall('pushHandler', array(new Reference($handler)));
             }
         }
     }
 
-    public function buildHandler(ContainerBuilder $container, array $handler)
+    public function buildHandler(ContainerBuilder $container, $name, array $handler)
     {
-        $definition = new Definition(new Parameter('monolog.handler.'.$handler['type'].'.class'));
+        $handlerId = sprintf('monolog.handler.%s', $name);
+        $definition = new Definition(sprintf('%monolog.handler.%s.class%', $handler['type']));
         $handler['level'] = is_int($handler['level']) ? $handler['level'] : constant('Monolog\Logger::'.strtoupper($handler['level']));
 
         switch ($handler['type']) {
@@ -107,8 +108,9 @@ class MonologExtension extends Extension
             ));
             break;
         }
+        $container->setDefinition($handlerId, $definition);
 
-        return $definition;
+        return $handlerId;
     }
 
     /**

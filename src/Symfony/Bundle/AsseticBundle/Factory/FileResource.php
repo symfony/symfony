@@ -11,7 +11,7 @@
 
 namespace Symfony\Bundle\AsseticBundle\Factory;
 
-use Assetic\Factory\Resource\ResourceInterface;
+use Assetic\Factory\Resource\FileResourceInterface;
 use Symfony\Bundle\FrameworkBundle\Templating\TemplateReference;
 use Symfony\Component\Templating\Loader\LoaderInterface;
 
@@ -20,7 +20,7 @@ use Symfony\Component\Templating\Loader\LoaderInterface;
  *
  * @author Kris Wallsmith <kris.wallsmith@symfony-project.com>
  */
-class FileResource implements ResourceInterface
+class FileResource implements FileResourceInterface
 {
     protected $loader;
     protected $parser;
@@ -54,6 +54,11 @@ class FileResource implements ResourceInterface
     public function getContent()
     {
         return $this->loader->load($this->getTemplate())->getContent();
+    }
+
+    public function getPath()
+    {
+        return $this->path;
     }
 
     protected function getTemplate()

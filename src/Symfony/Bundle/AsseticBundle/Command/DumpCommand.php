@@ -66,6 +66,10 @@ class DumpCommand extends Command
      */
     protected function watch(LazyAssetManager $am, $baseDir, OutputInterface $output, $debug = false)
     {
+        $refl = new \ReflectionClass('Assetic\\AssetManager');
+        $prop = $refl->getProperty('assets');
+        $prop->setAccessible(true);
+
         $cache = sys_get_temp_dir().'/assetic_watch_'.substr(sha1($baseDir), 0, 7);
         if (file_exists($cache)) {
             $previously = unserialize(file_get_contents($cache));
@@ -73,20 +77,31 @@ class DumpCommand extends Command
             $previously = array();
         }
 
+        $error = '';
         while (true) {
-            // reload formulae when in debug
-            if ($debug) {
-                $am->load();
-            }
+            try {
+                foreach ($am->getNames() as $name) {
+                    if ($asset = $this->checkAsset($am, $name, $previously)) {
+                        $this->dumpAsset($asset, $baseDir, $output);
+                    }
+                }
 
-            foreach ($am->getNames() as $name) {
-                if ($asset = $this->checkAsset($am, $name, $previously)) {
-                    $this->dumpAsset($asset, $baseDir, $output);
+                // reset the asset manager
+                $prop->setValue($am, array());
+                if ($debug) {
+                    $am->load();
+                }
+
+                file_put_contents($cache, serialize($previously));
+                $error = '';
+
+                sleep(1);
+            } catch (\Exception $e) {
+                if ($error != $msg = $e->getMessage()) {
+                    $output->writeln('<error>[error]</error> '.$msg);
+                    $error = $msg;
                 }
             }
-
-            file_put_contents($cache, serialize($previously));
-            sleep(1);
         }
     }
 
@@ -101,7 +116,7 @@ class DumpCommand extends Command
      */
     protected function checkAsset(LazyAssetManager $am, $name, array &$previously)
     {
-        $formula = serialize($am->getFormula($name));
+        $formula = $am->hasFormula($name) ? serialize($am->getFormula($name)) : null;
         $asset = $am->get($name);
         $mtime = $asset->getLastModified();
 

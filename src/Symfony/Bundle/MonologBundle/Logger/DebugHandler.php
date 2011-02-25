@@ -20,7 +20,7 @@ use Symfony\Component\HttpKernel\Log\DebugLoggerInterface;
  *
  * @author Jordi Boggiano <j.boggiano@seld.be>
  */
-class DebugLogger extends TestHandler implements DebugLoggerInterface
+class DebugHandler extends TestHandler implements DebugLoggerInterface
 {
     /**
      * {@inheritdoc}

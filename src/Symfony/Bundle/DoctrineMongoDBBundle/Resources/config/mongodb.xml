@@ -86,6 +86,7 @@
 
     <!-- logger -->
     <service id="doctrine.odm.mongodb.logger" class="%doctrine.odm.mongodb.logger_class%">
+      <tag name="monolog.logger" channel="doctrine" />
       <argument type="service" id="logger" on-invalid="null" />
      </service>
     <service id="doctrine.odm.mongodb.data_collector" class="%doctrine.odm.mongodb.data_collector_class%" public="false">
@@ -114,6 +115,6 @@
         <argument type="service" id="doctrine.odm.mongodb.security.user.document_manager" />
     </service>
     <service id="doctrine.odm.mongodb.security.user.document_manager" alias="doctrine.odm.mongodb.default_document_manager" public="false" />
-    
+
   </services>
 </container>

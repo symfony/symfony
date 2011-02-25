@@ -10,6 +10,7 @@
 
     <services>
         <service id="templating.debugger" class="%templating.debugger.class%" public="false">
+            <tag name="monolog.logger" channel="templating" />
             <argument type="service" id="logger" on-invalid="null" />
         </service>
     </services>

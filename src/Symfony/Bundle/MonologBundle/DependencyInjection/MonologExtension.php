@@ -99,6 +99,13 @@ class MonologExtension extends Extension
                 $handler['bubble'],
             ));
             break;
+        default:
+            // Handler using the constructor of AbstractHandler without adding their own arguments
+            $definition->setArguments(array(
+                $handler['level'],
+                $handler['bubble'],
+            ));
+            break;
         }
 
         return $definition;

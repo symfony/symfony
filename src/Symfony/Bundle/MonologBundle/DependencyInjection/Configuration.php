@@ -60,6 +60,7 @@ class Configuration
             ->performNoDeepMerging()
             ->scalarNode('type')
                 ->isRequired()
+                ->treatNullLike('null')
                 ->beforeNormalization()
                     ->always()
                     ->then(function($v) { return strtolower($v); })

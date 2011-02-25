@@ -69,10 +69,6 @@ class Configuration
             ->scalarNode('level')->defaultValue('DEBUG')->end()
             ->booleanNode('bubble')->defaultFalse()->end()
             ->scalarNode('path')->end() // stream specific
-            ->validate()
-                ->ifTrue(function($v) { return 'stream' === $v['type'] && !isset($v['path']); })
-                ->thenInvalid('The path has to be specified to use a StreamHandler')
-            ->end()
         ;
     }
 

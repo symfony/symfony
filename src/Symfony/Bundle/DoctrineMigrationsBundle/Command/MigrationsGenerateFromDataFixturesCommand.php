@@ -22,7 +22,6 @@ use Symfony\Bundle\DoctrineAbstractBundle\Common\DataFixtures\Loader as DataFixt
 use Doctrine\DBAL\Tools\Console\Helper\ConnectionHelper;
 use Doctrine\DBAL\Migrations\Configuration\Configuration;
 use Symfony\Bundle\DoctrineMigrationsBundle\SQLLogger\FixturesToMigrationSQLLogger;
-use Symfony\Bundle\DoctrineMigrationsBundle\Command\DoctrineCommand;
 
 /**
  * Command for generating a Doctrine database migration class from a set of fixtures.
@@ -57,13 +56,12 @@ class MigrationsGenerateFromDataFixturesCommand extends GenerateCommand
 
         DoctrineCommand::setApplicationEntityManager($this->application, $emName);
 
-        $configuration = $this->getMigrationConfiguration($input, $output);
-        DoctrineCommand::configureMigrations($this->application->getKernel()->getContainer(), $configuration);
-
         $emServiceName = sprintf('doctrine.orm.%s_entity_manager', $emName);
         $em = $container->get($emServiceName);
 
         $em->getConnection()->getConfiguration()->setSQLLogger($sqlLogger);
+
+        $configuration = $this->getMigrationConfiguration($input, $output);
 
         $dirOrFile = $input->getOption('fixtures');
         if ($dirOrFile) {
@@ -90,23 +88,10 @@ class MigrationsGenerateFromDataFixturesCommand extends GenerateCommand
         $executor->execute($fixtures);
 
         $queries = $sqlLogger->getQueries();
-        foreach ($queries as $key => $query) {
-            foreach ($query[1] as $key2 => $param) {
-                if (is_object($param)) {
-                    if ($param instanceOf \DateTime) {
-                        $queries[$key][1][$key2] = $param->format('Y-m-d\TH:i:s\Z');
-                    } else if (in_array('__toString', get_class_methods($param))) {
-                        $queries[$key][1][$key2] = (string)$param;
-                    } else {
-                        $output->writeln(sprintf('  <comment>></comment> <info>cannot convert object of type %s to a string</info>', get_class($param)));
-                    }
-                }
-            }
-        }
 
         $output->writeln(sprintf('  <comment>></comment> <info>%s queries logged</info>', count($queries)));
         foreach ($queries as $query) {
-            $output->writeln(sprintf('    <comment>-</comment> <info>%s (parameters? %s)</info>', $query[0], is_array($query[1]) ? 'yes' : 'no'));
+            $output->writeln(sprintf('    <comment>-</comment> <info>%s (%s)</info>', $query[0], implode(',', $query[1])));            
         }
 
         $version = date('YmdHis');
@@ -125,7 +110,7 @@ class MigrationsGenerateFromDataFixturesCommand extends GenerateCommand
             if (strpos($query[0], $configuration->getMigrationsTableName()) !== false) {
                 continue;
             }
-            $code[] = sprintf("\$this->addSql(\"%s\", %s);", $query[0], var_export($query[1], true));
+            $code[] = sprintf("\$this->_addSql(\"%s\", %s);", $query[0], var_export($query[1], true));
         }
         return implode("\n", $code);
     }

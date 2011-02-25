@@ -49,11 +49,11 @@ class Configuration
                             ->then(function($v) { return strtolower($v); })
                         ->end()
                     ->end()
-                    ->scalarNode('action_level')->end()
                     ->scalarNode('level')->defaultValue('INFO')->end()
-                    ->scalarNode('path')->end()
                     ->booleanNode('bubble')->defaultFalse()->end()
-                    ->scalarNode('buffer_size')->end()
+                    ->scalarNode('path')->end() // stream specific
+                    ->scalarNode('action_level')->end() // fingerscrossed specific
+                    ->scalarNode('buffer_size')->end() // fingerscrossed specific
                     ->arrayNode('handler')
                         ->performNoDeepMerging()
                         ->scalarNode('type')
@@ -64,7 +64,8 @@ class Configuration
                             ->end()
                         ->end()
                         ->scalarNode('level')->defaultValue('DEBUG')->end()
-                        ->scalarNode('path')->end()
+                        ->booleanNode('bubble')->defaultFalse()->end()
+                        ->scalarNode('path')->end() // stream specific
                     ->end()
                     ->validate()
                         ->ifTrue(function($v) { return 'fingerscrossed' === $v['type'] && !isset($v['handler']); })

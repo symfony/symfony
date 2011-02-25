@@ -23,7 +23,6 @@
         </xsd:all>
         <xsd:attributeGroup ref="handler_attributes" />
         <xsd:attribute name="name" type="xsd:string" use="required">
-        <xsd:attribute name="bubble" type="xsd:boolean" />
         <xsd:attribute name="action-level" type="level" />
         <xsd:attribute name="buffer-size" type="xsd:integer" />
     </xsd:complexType>
@@ -45,6 +44,7 @@
     <xsd:attributeGroup name="handler_attributes">
         <xsd:attribute name="type" type="xsd:string" use="required" />
         <xsd:attribute name="level" type="level" />
+        <xsd:attribute name="bubble" type="xsd:boolean" />
         <xsd:attribute name="path" type="xsd:string" />
     </xsd:attributeGroup>
 </xsd:schema>

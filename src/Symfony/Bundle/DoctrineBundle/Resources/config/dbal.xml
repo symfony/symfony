@@ -21,6 +21,7 @@
         <service id="doctrine.dbal.logger.debug" class="%doctrine.dbal.logger.debug_class%" public="false" />
 
         <service id="doctrine.dbal.logger" class="%doctrine.dbal.logger_class%" public="false">
+            <tag name="monolog.logger" channel="doctrine" />
             <argument type="service" id="logger" on-invalid="null" />
         </service>
 

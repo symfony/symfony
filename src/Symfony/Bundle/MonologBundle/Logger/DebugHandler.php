@@ -12,7 +12,6 @@
 namespace Symfony\Bundle\MonologBundle\Logger;
 
 use Monolog\Handler\TestHandler;
-use Monolog\Logger;
 use Symfony\Component\HttpKernel\Log\DebugLoggerInterface;
 
 /**
@@ -27,7 +26,16 @@ class DebugHandler extends TestHandler implements DebugLoggerInterface
      */
     public function getLogs()
     {
-        return $this->messages;
+        $records = array();
+        foreach ($this->records as $record) {
+            $records[] = array(
+                'timestamp' => $record['datetime']->getTimestamp(),
+                'message' => $record['message'],
+                'priority' => $record['level'],
+                'priorityName' => $record['level_name'],
+            );
+        }
+        return $records;
     }
 
     /**
@@ -35,6 +43,8 @@ class DebugHandler extends TestHandler implements DebugLoggerInterface
      */
     public function countErrors()
     {
-        return count($this->messagesByLevel[Logger::ERROR]);
+        return isset($this->recordsByLevel[\Monolog\Logger::ERROR])
+            ? count($this->recordsByLevel[\Monolog\Logger::ERROR])
+            : 0;
     }
 }

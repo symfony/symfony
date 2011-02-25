@@ -113,11 +113,12 @@ class DateField extends HybridField
         $this->addOption('days', range(1, 31));
 
         $this->addOption('format', self::MEDIUM, self::$formats);
+        $this->addOption('locale', \Locale::getDefault());
         $this->addOption('data_timezone', date_default_timezone_get());
         $this->addOption('user_timezone', date_default_timezone_get());
 
         $this->formatter = new \IntlDateFormatter(
-            \Locale::getDefault(),
+            $this->getOption('locale'),
             self::$intlFormats[$this->getOption('format')],
             \IntlDateFormatter::NONE
         );

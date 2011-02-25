@@ -29,15 +29,11 @@ class Logger extends BaseLogger implements LoggerInterface
      */
     public function getDebugLogger()
     {
-        $handler = $this->handler;
-        while ($handler) {
+        foreach ($this->handlers as $handler) {
             if ($handler instanceof DebugLoggerInterface) {
                 return $handler;
             }
-            $handler = $handler->getParent();
         }
-
-        return null;
     }
 
     public function log($message, $level)

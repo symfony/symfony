@@ -34,55 +34,52 @@ class Configuration
         $treeBuilder = new TreeBuilder();
         $rootNode = $treeBuilder->root('monolog', 'array');
 
-        $rootNode
+        $handlersPrototype = $rootNode
             ->fixXmlConfig('handler')
             ->arrayNode('handlers')
                 ->canBeUnset()
                 ->performNoDeepMerging()
                 ->useAttributeAsKey('name')
                 ->prototype('array')
-                    ->performNoDeepMerging()
-                    ->scalarNode('type')
-                        ->isRequired()
-                        ->beforeNormalization()
-                            ->always()
-                            ->then(function($v) { return strtolower($v); })
-                        ->end()
-                    ->end()
-                    ->scalarNode('level')->defaultValue('INFO')->end()
-                    ->booleanNode('bubble')->defaultFalse()->end()
-                    ->scalarNode('path')->end() // stream specific
                     ->scalarNode('action_level')->end() // fingerscrossed specific
                     ->scalarNode('buffer_size')->end() // fingerscrossed specific
-                    ->arrayNode('handler')
-                        ->performNoDeepMerging()
-                        ->scalarNode('type')
-                            ->isRequired()
-                            ->beforeNormalization()
-                                ->always()
-                                ->then(function($v) { return strtolower($v); })
-                            ->end()
-                        ->end()
-                        ->scalarNode('level')->defaultValue('DEBUG')->end()
-                        ->booleanNode('bubble')->defaultFalse()->end()
-                        ->scalarNode('path')->end() // stream specific
-                        ->validate()
-                            ->ifTrue(function($v) { return 'stream' === $v['type'] && !isset($v['path']); })
-                            ->thenInvalid('The path has to be specified to use a StreamHandler')
-                        ->end()
-                    ->end()
+                    ->builder($this->getHandlerSubnode())
                     ->validate()
                         ->ifTrue(function($v) { return 'fingerscrossed' === $v['type'] && !isset($v['handler']); })
                         ->thenInvalid('The handler has to be specified to use a FingersCrossedHandler')
                     ->end()
-                    ->validate()
-                        ->ifTrue(function($v) { return 'stream' === $v['type'] && !isset($v['path']); })
-                        ->thenInvalid('The path has to be specified to use a StreamHandler')
-                    ->end()
-                ->end()
-            ->end()
         ;
+        $this->addHandlerSection($handlersPrototype);
 
         return $treeBuilder->buildTree();
+    }
+
+    private function addHandlerSection(NodeBuilder $node)
+    {
+        $node
+            ->performNoDeepMerging()
+            ->scalarNode('type')
+                ->isRequired()
+                ->beforeNormalization()
+                    ->always()
+                    ->then(function($v) { return strtolower($v); })
+                ->end()
+            ->end()
+            ->scalarNode('level')->defaultValue('DEBUG')->end()
+            ->booleanNode('bubble')->defaultFalse()->end()
+            ->scalarNode('path')->end() // stream specific
+            ->validate()
+                ->ifTrue(function($v) { return 'stream' === $v['type'] && !isset($v['path']); })
+                ->thenInvalid('The path has to be specified to use a StreamHandler')
+            ->end()
+        ;
+    }
+
+    private function getHandlerSubnode()
+    {
+        $node = new NodeBuilder('handler', 'array');
+        $this->addHandlerSection($node);
+
+        return $node;
     }
 }

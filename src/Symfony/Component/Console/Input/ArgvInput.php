@@ -150,11 +150,22 @@ class ArgvInput extends Input
      */
     protected function parseArgument($token)
     {
-        if (!$this->definition->hasArgument(count($this->arguments))) {
-            throw new \RuntimeException('Too many arguments.');
-        }
+        $c = count($this->arguments);
 
-        $this->arguments[$this->definition->getArgument(count($this->arguments))->getName()] = $token;
+        // if input is expecting another argument, add it
+        if ($this->definition->hasArgument($c)) {
+            $arg = $this->definition->getArgument($c);
+            $this->arguments[$arg->getName()] = $arg->isArray()? array($token) : $token;
+
+        // if last argument isArray(), append token to last argument
+        } elseif ($this->definition->hasArgument($c - 1) && $this->definition->getArgument($c - 1)->isArray()) {
+            $arg = $this->definition->getArgument($c - 1);
+            $this->arguments[$arg->getName()][] = $token;
+
+        // unexpected argument
+        } else {
+            throw new RuntimeException('Too many arguments.');
+        }
     }
 
     /**

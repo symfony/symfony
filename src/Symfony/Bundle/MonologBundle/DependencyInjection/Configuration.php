@@ -70,6 +70,8 @@ class Configuration
                     ->validate()
                         ->ifTrue(function($v) { return 'fingerscrossed' === $v['type'] && !isset($v['handler']); })
                         ->thenInvalid('The handler has to be specified to use a FingersCrossedHandler')
+                        ->ifTrue(function($v) { return 'stream' === $v['type'] && !isset($v['path']); })
+                        ->thenInvalid('The path has to be specified to use a StreamHandler')
                     ->end()
                 ->end()
             ->end()

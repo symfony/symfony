@@ -52,7 +52,7 @@ class MonologExtension extends Extension
             $loader->load('monolog.xml');
             $container->setAlias('logger', 'monolog.logger');
 
-            $logger = $container->getDefinition('monolog.logger.prototype');
+            $logger = $container->getDefinition('monolog.logger_prototype');
 
             $handlers = array();
             foreach ($config['handlers'] as $name => $handler) {
@@ -71,7 +71,7 @@ class MonologExtension extends Extension
     public function buildHandler(ContainerBuilder $container, $name, array $handler)
     {
         $handlerId = sprintf('monolog.handler.%s', $name);
-        $definition = new Definition(sprintf('%monolog.handler.%s.class%', $handler['type']));
+        $definition = new Definition(sprintf('%%monolog.handler.%s.class%%', $handler['type']));
         $handler['level'] = is_int($handler['level']) ? $handler['level'] : constant('Monolog\Logger::'.strtoupper($handler['level']));
 
         switch ($handler['type']) {

@@ -127,7 +127,7 @@ abstract class AbstractDoctrineExtension extends Extension
     }
 
     /**
-     * Registter the mapping driver configuration for later use with the object managers metadata driver chain.
+     * Register the mapping driver configuration for later use with the object managers metadata driver chain.
      *
      * @param array $mappingConfig
      * @param string $mappingName
@@ -298,7 +298,7 @@ abstract class AbstractDoctrineExtension extends Extension
     }
 
     /**
-     * Prefixes the relative dependency injenction container path with the object manager prefix.
+     * Prefixes the relative dependency injection container path with the object manager prefix.
      *
      * @example $name is 'entity_manager' then the result would be 'doctrine.orm.entity_manager'
      *

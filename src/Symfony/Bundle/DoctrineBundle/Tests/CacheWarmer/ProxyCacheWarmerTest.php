@@ -16,7 +16,7 @@ use Symfony\Bundle\DoctrineBundle\CacheWarmer\ProxyCacheWarmer;
 class ProxyCacheWarmerTest extends \Symfony\Bundle\DoctrineBundle\Tests\TestCase
 {
     /**
-     * This is not necessarily a good test, it doesnt generate any proxies
+     * This is not necessarily a good test, it doesn't generate any proxies
      * because there are none in the AnnotationsBundle. However that is
      * rather a task of doctrine to test. We touch the lines here and
      * verify that the container is called correctly for the relevant information.

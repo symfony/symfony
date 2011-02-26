@@ -42,7 +42,7 @@ You can also optional specify some additional options like what type of hydratio
 
   <info>./app/console doctrine:query:dql "SELECT u FROM UserBundle:User u" --hydrate=array</info>
 
-Additionaly you can specify the first result and maximum amount of results to show:
+Additionally you can specify the first result and maximum amount of results to show:
 
   <info>./app/console doctrine:query:dql "SELECT u FROM UserBundle:User u" --first-result=0 --max-result=30</info>
 EOT

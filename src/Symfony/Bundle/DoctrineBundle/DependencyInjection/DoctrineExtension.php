@@ -108,7 +108,7 @@ class DoctrineExtension extends AbstractDoctrineExtension
             'wrapper-class'         => 'wrapperClass', // doctrine conv.
             'charset'               => 'charset',
         );
-        $supportedContrainerParams = array(
+        $supportedContainerParams = array(
             'platform-service'      => 'platform_service',
             'platform_service'      => 'platform_service',
             'logging'               => 'logging',
@@ -173,8 +173,8 @@ class DoctrineExtension extends AbstractDoctrineExtension
                 foreach ($connection as $k => $v) {
                     if (isset($supportedConnectionParams[$k])) {
                         $mergedConfig['connections'][$connectionName]['driver'][$supportedConnectionParams[$k]] = $v;
-                    } else if (isset($supportedContrainerParams[$k])) {
-                        $mergedConfig['connections'][$connectionName]['container'][$supportedContrainerParams[$k]] = $v;
+                    } else if (isset($supportedContainerParams[$k])) {
+                        $mergedConfig['connections'][$connectionName]['container'][$supportedContainerParams[$k]] = $v;
                     }
                 }
             }
@@ -447,8 +447,8 @@ class DoctrineExtension extends AbstractDoctrineExtension
      *
      * There are two distinct configuration possibilities for mapping information:
      *
-     * 1. Specifiy a bundle and optionally details where the entity and mapping information reside.
-     * 2. Specifiy an arbitrary mapping location.
+     * 1. Specify a bundle and optionally details where the entity and mapping information reside.
+     * 2. Specify an arbitrary mapping location.
      *
      * @example
      *

@@ -63,6 +63,17 @@ abstract class RememberMeServices implements RememberMeServicesInterface, Logout
     }
 
     /**
+     * Returns the parameter that is used for checking whether remember-me
+     * services have been requested.
+     *
+     * @return string
+     */
+    public function getRememberMeParameter()
+    {
+        return $this->options['remember_me_parameter'];
+    }
+
+    /**
      * Implementation of RememberMeServicesInterface. Detects whether a remember-me
      * cookie was set, decodes it, and hands it to subclasses for further processing.
      *

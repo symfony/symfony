@@ -101,11 +101,6 @@ class UrlMatcher implements UrlMatcherInterface
 
     protected function normalizeUrl($url)
     {
-        // ensure that the URL starts with a /
-        if ('/' !== substr($url, 0, 1)) {
-            throw new \InvalidArgumentException(sprintf('URL "%s" is not valid (it does not start with a /).', $url));
-        }
-
         // remove the query string
         if (false !== $pos = strpos($url, '?')) {
             $url = substr($url, 0, $pos);

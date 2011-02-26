@@ -85,7 +85,7 @@ class File
         'application/vnd.curl' => 'curl',
         'application/vnd.data-vision.rdz' => 'rdz',
         'application/vnd.dreamfactory' => 'dfac',
-        'application/vnd.fsc.weblauch' => 'fsc',
+        'application/vnd.fsc.weblaunch' => 'fsc',
         'application/vnd.genomatix.tuxedo' => 'txd',
         'application/vnd.hbci' => 'hbci',
         'application/vnd.hhe.lesson-player' => 'les',

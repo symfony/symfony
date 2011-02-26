@@ -40,7 +40,7 @@ class TwigEngineTest extends TestCase
         $this->assertSame($app, $globals['app']);
     }
 
-    public function testEvalutateWithoutAvailableRequest()
+    public function testEvaluateWithoutAvailableRequest()
     {
         $environment = $this->getTwigEnvironment();
         $container = new Container();

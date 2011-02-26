@@ -120,149 +120,9 @@ class StubIntlDateFormatter
         $dateTime->setTimestamp($timestamp);
         $dateTime->setTimezone($this->dateTimeZone);
 
-        $quoteMatch = "'(?:[^']+|'')*'";
-        $implementedCharsMatch = $this->buildCharsMatch('MLydGQqhDEaHkKmsz');
-
-        $notImplementedChars = 'YuwWFgecSAZvVW';
-        $notImplementedCharsMatch = $this->buildCharsMatch($notImplementedChars);
-
-        $regExp = "/($quoteMatch|$implementedCharsMatch|$notImplementedCharsMatch)/";
-
         $pattern = $this->getPattern();
-
-        $callback = function($matches) use ($dateTime, $notImplementedChars, $pattern) {
-            $dateChars = $matches[0];
-            $length = strlen($dateChars);
-
-            if ("'" === $dateChars[0]) {
-                if (preg_match("/^'+$/", $dateChars)) {
-                    return str_replace("''", "'", $dateChars);
-                }
-                return str_replace("''", "'", substr($dateChars, 1, -1));
-            }
-
-            switch ($dateChars[0]) {
-                case 'M':
-                case 'L':
-                    $matchLengthMap = array(
-                        1   => 'n',
-                        2   => 'm',
-                        3   => 'M',
-                        4   => 'F',
-                    );
-
-                    if (isset($matchLengthMap[$length])) {
-                       return $dateTime->format($matchLengthMap[$length]);
-                    } else if (5 == $length) {
-                        return substr($dateTime->format('M'), 0, 1);
-                    } else {
-                        return str_pad($dateTime->format('m'), $length, '0', STR_PAD_LEFT);
-                    }
-                    break;
-
-                case 'y':
-                    if (2 == $length) {
-                       return $dateTime->format('y');
-                    } else {
-                        return str_pad($dateTime->format('Y'), $length, '0', STR_PAD_LEFT);
-                    }
-                    break;
-
-                case 'd':
-                    return str_pad($dateTime->format('j'), $length, '0', STR_PAD_LEFT);
-                    break;
-
-                case 'G':
-                    $year = (int) $dateTime->format('Y');
-                    return $year >= 0 ? 'AD' : 'BC';
-                    break;
-
-                case 'q':
-                case 'Q':
-                    $month = (int) $dateTime->format('n');
-                    $quarter = (int) floor(($month - 1) / 3) + 1;
-                    switch ($length) {
-                        case 1:
-                        case 2:
-                            return str_pad($quarter, $length, '0', STR_PAD_LEFT);
-                            break;
-                        case 3:
-                            return 'Q' . $quarter;
-                            break;
-                        default:
-                            $map = array(1 => '1st quarter', 2 => '2nd quarter', 3 => '3rd quarter', 4 => '4th quarter');
-                            return $map[$quarter];
-                            break;
-                    }
-                    break;
-
-                case 'h':
-                    return str_pad($dateTime->format('g'), $length, '0', STR_PAD_LEFT);
-                    break;
-
-                case 'D':
-                    $dayOfYear = $dateTime->format('z') + 1;
-                    return str_pad($dayOfYear, $length, '0', STR_PAD_LEFT);
-                    break;
-
-                case 'E':
-                    $dayOfWeek = $dateTime->format('l');
-                    switch ($length) {
-                        case 4:
-                            return $dayOfWeek;
-                            break;
-                        case 5:
-                            return $dayOfWeek[0];
-                            break;
-                        default:
-                            return substr($dayOfWeek, 0, 3);
-                    }
-                    break;
-
-                case 'a':
-                    return $dateTime->format('A');
-                    break;
-
-                case 'H':
-                    return str_pad($dateTime->format('G'), $length, '0', STR_PAD_LEFT);
-                    break;
-
-                case 'k':
-                    $hourOfDay = $dateTime->format('G');
-                    $hourOfDay = ('0' == $hourOfDay) ? '24' : $hourOfDay;
-                    return str_pad($hourOfDay, $length, '0', STR_PAD_LEFT);
-                    break;
-
-                case 'K':
-                    $hourOfDay = $dateTime->format('g');
-                    $hourOfDay = ('12' == $hourOfDay) ? '0' : $hourOfDay;
-                    return str_pad($hourOfDay, $length, '0', STR_PAD_LEFT);
-                    break;
-
-                case 'm':
-                    $minuteOfHour = (int) $dateTime->format('i');
-                    return str_pad($minuteOfHour, $length, '0', STR_PAD_LEFT);
-                    break;
-
-                case 's':
-                    $secondOfMinute = (int) $dateTime->format('s');
-                    return str_pad($secondOfMinute, $length, '0', STR_PAD_LEFT);
-                    break;
-
-                case 'z':
-                    return $dateTime->format('\G\M\TP');
-                    break;
-
-                default:
-                    // handle unimplemented characters
-                    if (false !== strpos($notImplementedChars, $dateChars[0])) {
-                        throw new NotImplementedException(sprintf("Unimplemented date character '%s' in format '%s'", $dateChars[0], $pattern));
-                    }
-                    break;
-            }
-        };
-
-        $formatted = preg_replace_callback($regExp, $callback, $pattern);
+        $transformer = new DateFormat\FullTransformer($pattern);
+        $formatted = $transformer->format($dateTime);
 
         return $formatted;
     }
@@ -460,17 +320,6 @@ class StubIntlDateFormatter
         $dateTime->setTimezone($this->dateTimeZone);
 
         return $dateTime;
-    }
-
-    protected function buildCharsMatch($specialChars)
-    {
-        $specialCharsArray = str_split($specialChars);
-
-        $specialCharsMatch = implode('|', array_map(function($char) {
-            return $char . '+';
-        }, $specialCharsArray));
-
-        return $specialCharsMatch;
     }
 
     protected function getDefaultPattern()

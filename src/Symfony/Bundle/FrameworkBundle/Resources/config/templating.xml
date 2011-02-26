@@ -41,7 +41,6 @@
 
         <service id="templating.cache_warmer.template_paths" class="%templating.cache_warmer.template_paths.class%" public="false">
             <argument type="service" id="kernel" />
-            <argument type="service" id="file_locator" />
             <argument type="service" id="templating.name_parser" />
             <argument>%kernel.root_dir%/views</argument>
         </service>

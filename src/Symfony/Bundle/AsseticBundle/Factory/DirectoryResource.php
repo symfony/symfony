@@ -12,37 +12,38 @@
 namespace Symfony\Bundle\AsseticBundle\Factory;
 
 use Assetic\Factory\Resource\DirectoryResource as BaseDirectoryResource;
-use Symfony\Bundle\FrameworkBundle\Templating\TemplateNameParser;
 use Symfony\Component\Templating\Loader\LoaderInterface;
 
 /**
- * A directory resource that creates Symfony2 resources.
+ * A directory resource that creates Symfony2 templating resources.
  *
  * @author Kris Wallsmith <kris.wallsmith@symfony-project.com>
  */
 class DirectoryResource extends BaseDirectoryResource
 {
-    protected $parser;
     protected $loader;
     protected $bundle;
-    protected $baseDirLength;
+    protected $path;
 
-    public function __construct(TemplateNameParser $parser, LoaderInterface $loader, $bundle, $baseDir, $pattern = null)
+    /**
+     * Constructor.
+     *
+     * @param LoaderInterface $loader  The templating loader
+     * @param string          $bundle  The current bundle name
+     * @param string          $path    The directory path
+     * @param string          $pattern A regex pattern for file basenames
+     */
+    public function __construct(LoaderInterface $loader, $bundle, $path, $pattern = null)
     {
-        $this->parser = $parser;
         $this->loader = $loader;
         $this->bundle = $bundle;
+        $this->path = rtrim($path, '/').'/';
 
-        $this->baseDirLength = strlen(rtrim($baseDir, '/')) + 1;
-
-        parent::__construct($baseDir, $pattern);
+        parent::__construct($path, $pattern);
     }
 
-    protected function createResource($path)
+    public function getIterator()
     {
-        $template = $this->parser->parseFromFilename(substr($path, $this->baseDirLength));
-        $template->set('bundle', $this->bundle);
-
-        return new FileResource($this->loader, $template);
+        return new DirectoryResourceIterator($this->loader, $this->bundle, $this->path, $this->getInnerIterator());
     }
 }

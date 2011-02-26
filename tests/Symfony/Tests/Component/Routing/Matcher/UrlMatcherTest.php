@@ -28,15 +28,6 @@ class UrlMatcherTest extends \PHPUnit_Framework_TestCase
         $this->assertEquals('/foo/bar', $matcher->normalizeUrl('/foo//bar'), '->normalizeUrl() removes duplicated /');
     }
 
-    /**
-     * @expectedException \InvalidArgumentException
-     */
-    public function testNormalizeUrlThrowsAnExceptionIfTheUrlIsInvalid()
-    {
-        $matcher = new UrlMatcherForTests(new RouteCollection(), array(), array());
-        $matcher->normalizeUrl('');
-    }
-
     public function testMatch()
     {
       // test the patterns are matched are parameters are returned

@@ -135,11 +135,10 @@ class AsseticExtension extends Extension
         $definition = new Definition('%assetic.directory_resource.class%');
 
         $definition
-            ->addArgument(new Reference('templating.name_parser'))
             ->addArgument(new Reference('templating.loader'))
             ->addArgument($bundle)
             ->addArgument($dir)
-            ->addArgument('/\.'.$engine.'$/')
+            ->addArgument('/^[^.]+\.[^.]+\.'.$engine.'$/')
             ->addTag('assetic.templating.'.$engine)
             ->addTag('assetic.formula_resource', array('loader' => $engine))
             ->setPublic(false)

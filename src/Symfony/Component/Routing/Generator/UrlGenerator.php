@@ -98,7 +98,8 @@ class UrlGenerator implements UrlGeneratorInterface
                         throw new \InvalidArgumentException(sprintf('Parameter "%s" for route "%s" must match "%s" ("%s" given).', $token[3], $name, $requirements[$token[3]], $tparams[$token[3]]));
                     }
 
-                    $url = $token[1].urlencode($tparams[$token[3]]).$url;
+                    // %2F is not valid in a URL, so we double encode it
+                    $url = $token[1].str_replace('%2F', '%252F', urlencode($tparams[$token[3]])).$url;
                     $optional = false;
                 }
             } elseif ('text' === $token[0]) {

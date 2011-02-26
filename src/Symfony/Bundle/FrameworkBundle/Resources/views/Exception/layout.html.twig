@@ -3,12 +3,10 @@
     <head>
         <meta http-equiv="Content-Type" content="text/html; charset={{ _charset }}"/>
         <title>{{ exception.message }} ({{ status_code }} {{ status_text }})</title>
-        <style type="text/css">
-            html { background: #eee }
-            body { font: 11px Verdana, Arial, sans-serif; color: #333 }
-            .sf-exceptionreset, .sf-exceptionreset .block, .sf-exceptionreset #message { margin: auto }
-        </style>
-        <link href="{{ asset('bundles/framework/css/exception.css') }}" rel="stylesheet" type="text/css" media="screen" />
+
+        <link href="{{ asset('/bundles/framework/css/exception_layout.css') }}" rel="stylesheet" type="text/css" media="all" />
+        <link href="{{ asset('/bundles/framework/css/exception.css') }}" rel="stylesheet" type="text/css" media="all" />
+
         <script type="text/javascript">
             //<![CDATA[
             function toggle(id, clazz) {
@@ -26,10 +24,54 @@
 
                 el.style.display = current == 'none' ? 'block' : 'none';
             }
+
+            function switchIcons(id1, id2) {
+                icon1 = document.getElementById(id1);
+                icon2 = document.getElementById(id2);
+
+                visibility1 = icon1.style.visibility;
+                visibility2 = icon2.style.visibility;
+
+                icon1.style.visibility = visibility2;
+                icon2.style.visibility = visibility1;
+            }
+
             //]]>
         </script>
     </head>
     <body>
-        {% block body '' %}
+        <div id="content">
+            <div class="header clear_fix">
+                <div class="header_logo">
+                  <a href="http://symfony.com/">
+                    <img src="{{ asset('bundles/framework/images/logo_symfony.gif') }}" alt="Symfony" />
+                  </a>
+                </div>
+
+                <div class="search">
+                  <form method="post" action="http://symfony.com/search">
+                    <div class="form_row">
+
+                      <label for="search_id">
+                          <img src="{{ asset('bundles/framework/images/grey_magnifier.png') }}" alt="Search on Symfony website" />
+                      </label>
+
+                      <input name="search_name" id="search_id" type="text" placeholder="Search on Symfony website" />
+
+                      <button type="submit">
+                        <span class="border_l">
+                          <span class="border_r">
+                            <span class="btn_bg">OK</span>
+                          </span>
+                        </span>
+                      </button>
+                    </div>
+                   </form>
+                </div>
+            </div>
+
+            {% block body '' %}
+
+        </div>
     </body>
 </html>

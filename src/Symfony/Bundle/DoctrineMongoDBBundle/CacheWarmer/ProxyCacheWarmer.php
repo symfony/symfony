@@ -39,7 +39,7 @@ class ProxyCacheWarmer implements CacheWarmerInterface
     }
 
     /**
-     * This cache warmer is not optional, without proxies fatal error occour!
+     * This cache warmer is not optional, without proxies fatal error occurs!
      *
      * @return false
      */

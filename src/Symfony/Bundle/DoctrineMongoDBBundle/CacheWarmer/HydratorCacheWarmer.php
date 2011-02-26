@@ -39,7 +39,7 @@ class HydratorCacheWarmer implements CacheWarmerInterface
     }
 
     /**
-     * This cache warmer is not optional, without hydrators fatal error occour!
+     * This cache warmer is not optional, without hydrators fatal error occurs!
      *
      * @return false
      */

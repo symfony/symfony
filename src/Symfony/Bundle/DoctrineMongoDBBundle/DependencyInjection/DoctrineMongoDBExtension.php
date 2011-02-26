@@ -299,8 +299,8 @@ class DoctrineMongoDBExtension extends AbstractDoctrineExtension
      *
      * There are two distinct configuration possibilities for mapping information:
      *
-     * 1. Specifiy a bundle and optionally details where the entity and mapping information reside.
-     * 2. Specifiy an arbitrary mapping location.
+     * 1. Specify a bundle and optionally details where the entity and mapping information reside.
+     * 2. Specify an arbitrary mapping location.
      *
      * @example
      *

@@ -70,7 +70,7 @@ class RouteCompilerTest extends \PHPUnit_Framework_TestCase
             array(
                 'Route with several variables that have default values',
                 array('/foo/{bar}/{foobar}', array('bar' => 'bar', 'foobar' => 'foobar')),
-                '/foo', '#^/foo(?:/(?P<bar>[^/\.]+?) (?:/(?P<foobar>[^/\.]+?) )?)?$#x', array('bar' => '{bar}', 'foobar' => '{foobar}'), array(
+                '/foo', '#^/foo(?:/(?P<bar>[^/\.]+?))?(?:/(?P<foobar>[^/\.]+?))?$#x', array('bar' => '{bar}', 'foobar' => '{foobar}'), array(
                     array('variable', '/', '{foobar}', 'foobar'),
                     array('variable', '/', '{bar}', 'bar'),
                     array('text', '/', 'foo', null),
@@ -79,10 +79,29 @@ class RouteCompilerTest extends \PHPUnit_Framework_TestCase
             array(
                 'Route with several variables but some of them have no default values',
                 array('/foo/{bar}/{foobar}', array('bar' => 'bar')),
-                '/foo', '#^/foo/(?P<bar>[^/\.]+?)/(?P<foobar>[^/\.]+?)$#x', array('bar' => '{bar}', 'foobar' => '{foobar}'), array(
+                '/foo', '#^/foo(?:/(?P<bar>[^/\.]+?))?/(?P<foobar>[^/\.]+?)$#x', array('bar' => '{bar}', 'foobar' => '{foobar}'), array(
                     array('variable', '/', '{foobar}', 'foobar'),
                     array('variable', '/', '{bar}', 'bar'),
                     array('text', '/', 'foo', null),
+                )),
+
+            array(
+                'Route with several variables that some of them have no default values and some of them have empty defaults',
+                array('/foo/{bar}/{foobar}/{foofoobar}', array('bar' => 'bar', 'foobar' => '')),
+                '/foo', '#^/foo(?:/(?P<bar>[^/\.]+?))?(?:/(?P<foobar>[^/\.]+?))?/(?P<foofoobar>[^/\.]+?)$#x', array('bar' => '{bar}', 'foobar' => '{foobar}', 'foofoobar' => '{foofoobar}'), array(
+                    array('variable', '/', '{foofoobar}', 'foofoobar'),
+                    array('variable', '/', '{foobar}', 'foobar'),
+                    array('variable', '/', '{bar}', 'bar'),
+                    array('text', '/', 'foo', null),
+                )),
+
+            array(
+                'Route with several variables that some of them have no default values and one of them is first segment',
+                array('/{bar}/{foobar}/{foofoobar}', array('bar' => 'bar', 'foobar' => 'foobar')),
+                '', '#^/?(?:/(?P<bar>[^/\.]+?))?(?:/(?P<foobar>[^/\.]+?))?/(?P<foofoobar>[^/\.]+?)$#x', array('bar' => '{bar}', 'foobar' => '{foobar}', 'foofoobar' => '{foofoobar}'), array(
+                    array('variable', '/', '{foofoobar}', 'foofoobar'),
+                    array('variable', '/', '{foobar}', 'foobar'),
+                    array('variable', '/', '{bar}', 'bar')
                 )),
 
             array(

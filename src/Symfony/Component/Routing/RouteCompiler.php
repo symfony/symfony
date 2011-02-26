@@ -22,6 +22,7 @@ class RouteCompiler implements RouteCompilerInterface
     protected $route;
     protected $variables;
     protected $firstOptional;
+    protected $optionals;
     protected $segments;
     protected $tokens;
     protected $staticPrefix;
@@ -38,6 +39,7 @@ class RouteCompiler implements RouteCompilerInterface
     {
         $this->route = $route;
         $this->firstOptional = 0;
+        $this->optionals = array();
         $this->segments = array();
         $this->variables = array();
         $this->tokens = array();
@@ -91,11 +93,10 @@ class RouteCompiler implements RouteCompilerInterface
      */
     protected function postCompile()
     {
-        // all segments after the last static segment are optional
-        // be careful, the n-1 is optional only if n is empty
         for ($i = $this->firstOptional, $max = count($this->segments); $i < $max; $i++) {
-            $this->segments[$i] = (0 == $i ? '/?' : '').str_repeat(' ', $i - $this->firstOptional).'(?:'.$this->segments[$i];
-            $this->segments[] = str_repeat(' ', $max - $i - 1).')?';
+            if (in_array($i, $this->optionals)) {
+                $this->segments[$i] = (0 == $i ? '/?' : '').'(?:'.$this->segments[$i].')?';
+            }
         }
 
         $this->staticPrefix = '';
@@ -211,9 +212,10 @@ class RouteCompiler implements RouteCompilerInterface
 
         $this->segments[] = preg_quote($separator, '#').'(?P<'.$variable.'>'.$requirement.')';
         $this->variables[$variable] = $name;
-
-        if (!$this->route->getDefault($variable)) {
-            $this->firstOptional = count($this->segments);
+        
+        $this->firstOptional = 0;
+        if (null !== $this->route->getDefault($variable)) {
+            $this->optionals[] = count($this->segments)-1;
         }
     }
 

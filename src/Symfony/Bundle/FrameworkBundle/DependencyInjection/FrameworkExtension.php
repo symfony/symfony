@@ -365,7 +365,7 @@ class FrameworkExtension extends Extension
         $container->setParameter('templating.engines', $config['engines']);
         $engines = array_map(function($engine) { return new Reference('templating.engine.'.$engine); }, $config['engines']);
 
-        // Use a deligation unless only a single engine was registered
+        // Use a delegation unless only a single engine was registered
         if (1 === count($engines)) {
             $container->setAlias('templating', (string) reset($engines));
         } else {

@@ -43,7 +43,7 @@ class ControllerNameParser
      *
      * @param string $controller A short notation controller (a:b:c)
      *
-     * @param string A controler (class::method)
+     * @param string A controller (class::method)
      */
     public function parse($controller)
     {

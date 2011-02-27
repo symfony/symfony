@@ -43,10 +43,12 @@ class TranslatorTest extends \PHPUnit_Framework_TestCase
 
     public function testTransWithFallbackLocale()
     {
-        $translator = new Translator('en_US', new MessageSelector());
+        $translator = new Translator('fr_FR', new MessageSelector());
         $translator->addLoader('array', new ArrayLoader());
         $translator->addResource('array', array('foo' => 'foofoo'), 'en_US');
         $translator->addResource('array', array('bar' => 'foobar'), 'en');
+
+        $translator->setFallbackLocale('en');
 
         $this->assertEquals('foobar', $translator->trans('bar'));
     }

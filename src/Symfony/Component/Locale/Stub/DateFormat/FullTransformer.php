@@ -173,16 +173,43 @@ class FullTransformer
     {
         $datetime = $this->extractDateTime($options);
 
-        $year   = $datetime['year'];
-        $month  = $datetime['month'];
-        $day    = $datetime['day'];
-        $hour   = $datetime['hour'];
-        $minute = $datetime['minute'];
-        $second = $datetime['second'];
+        $year     = $datetime['year'];
+        $month    = $datetime['month'];
+        $day      = $datetime['day'];
+        $hour     = $datetime['hour'];
+        $minute   = $datetime['minute'];
+        $second   = $datetime['second'];
+        $marker   = $datetime['marker'];
+        $hourType = $datetime['hourType'];
 
         // If month is false, return immediately
         if (false === $month) {
             return false;
+        }
+
+        // If the AM/PM marker is AM or null, the hour is 12 (1-12) and the capture was 'h' or 'hh', the hour is 0
+        if ('1201' === $hourType && 'PM' !== $marker && 12 === $hour) {
+            $hour = 0;
+        }
+
+        // If PM and hour is not 12 (1-12), sum 12 hour
+        if ('1201' === $hourType && 'PM' === $marker && 12 !== $hour) {
+            $hour = $hour + 12;
+        }
+
+        // If PM, sum 12 hours when 12 hour (0-11)
+        if ('1200' === $hourType && 'PM' === $marker) {
+            $hour = $hour + 12;
+        }
+
+        // If 24 hours (0-23 or 1-24) and marker is set, hour is 0
+        if (('2400' === $hourType || '2401' === $hourType) && null !== $marker) {
+            $hour = 0;
+        }
+
+        // If 24 hours (1-24) and hour is 24, hour is 0
+        if ('2401' === $hourType && 24 === $hour) {
+            $hour = 0;
         }
 
         // Set the timezone
@@ -200,12 +227,14 @@ class FullTransformer
     private function extractDateTime(array $datetime)
     {
         return array(
-            'year'   => isset($datetime['year']) ? $datetime['year'] : 1970,
-            'month'  => isset($datetime['month']) ? $datetime['month'] : 1,
-            'day'    => isset($datetime['day']) ? $datetime['day'] : 1,
-            'hour'   => isset($datetime['hour']) ? $datetime['hour'] : 0,
-            'minute' => isset($datetime['minute']) ? $datetime['minute'] : 0,
-            'second' => isset($datetime['second']) ? $datetime['second'] : 0,
+            'year'     => isset($datetime['year']) ? $datetime['year'] : 1970,
+            'month'    => isset($datetime['month']) ? $datetime['month'] : 1,
+            'day'      => isset($datetime['day']) ? $datetime['day'] : 1,
+            'hour'     => isset($datetime['hour']) ? $datetime['hour'] : 0,
+            'minute'   => isset($datetime['minute']) ? $datetime['minute'] : 0,
+            'second'   => isset($datetime['second']) ? $datetime['second'] : 0,
+            'marker'   => isset($datetime['marker']) ? $datetime['marker'] : null,
+            'hourType' => isset($datetime['hourType']) ? $datetime['hourType'] : null,
         );
     }
 }

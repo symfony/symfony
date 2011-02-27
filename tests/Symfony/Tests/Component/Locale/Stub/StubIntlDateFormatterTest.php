@@ -470,6 +470,48 @@ class StubIntlDateFormatterTest extends LocaleTestCase
             array('y-M-d', '1970-1-1', 0),
             array('y-M-dd', '1970-1-01', 0),
             array('y-M-ddd', '1970-1-001', 0),
+
+            // 12 hours (1-12)
+            array('y-M-d h', '1970-1-1 1', 3600),
+            array('y-M-d h', '1970-1-1 10', 36000),
+            array('y-M-d hh', '1970-1-1 11', 39600),
+            array('y-M-d hh', '1970-1-1 12', 0),
+            array('y-M-d hh a', '1970-1-1 12 AM', 0),
+            array('y-M-d hh a', '1970-1-1 12 PM', 43200),
+            array('y-M-d hh a', '1970-1-1 11 AM', 39600),
+            array('y-M-d hh a', '1970-1-1 11 PM', 82800),
+
+            // 12 hours (0-11)
+            array('y-M-d K', '1970-1-1 1', 3600),
+            array('y-M-d K', '1970-1-1 10', 36000),
+            array('y-M-d KK', '1970-1-1 11', 39600),
+            array('y-M-d KK', '1970-1-1 12', 43200),
+            array('y-M-d KK a', '1970-1-1 12 AM', 43200),
+            array('y-M-d KK a', '1970-1-1 12 PM', 86400),
+            array('y-M-d KK a', '1970-1-1 10 AM', 36000),
+            array('y-M-d KK a', '1970-1-1 10 PM', 79200),
+
+            // 24 hours (0-23)
+            array('y-M-d H', '1970-1-1 0', 0),
+            array('y-M-d H', '1970-1-1 1', 3600),
+            array('y-M-d H', '1970-1-1 10', 36000),
+            array('y-M-d HH', '1970-1-1 11', 39600),
+            array('y-M-d HH', '1970-1-1 12', 43200),
+            array('y-M-d HH', '1970-1-1 23', 82800),
+            array('y-M-d HH a', '1970-1-1 11 AM', 0),
+            array('y-M-d HH a', '1970-1-1 12 AM', 0),
+            array('y-M-d HH a', '1970-1-1 23 AM', 0),
+
+            // 24 hours (1-24)
+            array('y-M-d k', '1970-1-1 1', 3600),
+            array('y-M-d k', '1970-1-1 10', 36000),
+            array('y-M-d kk', '1970-1-1 11', 39600),
+            array('y-M-d kk', '1970-1-1 12', 43200),
+            array('y-M-d kk', '1970-1-1 23', 82800),
+            array('y-M-d kk', '1970-1-1 24', 0),
+            array('y-M-d kk a', '1970-1-1 11 AM', 0),
+            array('y-M-d kk a', '1970-1-1 12 AM', 0),
+            array('y-M-d kk a', '1970-1-1 23 AM', 0),
         );
     }
 

@@ -27,13 +27,15 @@ class Hour2401Transformer extends Transformer
 
     public function getReverseMatchingRegExp($length)
     {
-        return "\d{1,$length}";
+        $capture = str_pad('', $length, 'k');
+        return '?P<'.$capture.'>\d{1,2}';
     }
 
     public function extractDateOptions($matched, $length)
     {
         return array(
             'hour' => (int) $matched,
+            'hourType' => '2401'
         );
     }
 }

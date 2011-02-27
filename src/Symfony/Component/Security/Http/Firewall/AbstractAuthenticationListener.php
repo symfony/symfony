@@ -198,15 +198,15 @@ abstract class AbstractAuthenticationListener implements ListenerInterface
             $subRequest->attributes->set(SecurityContextInterface::AUTHENTICATION_ERROR, $failed);
 
             return $event->getSubject()->handle($subRequest, HttpKernelInterface::SUB_REQUEST);
-        } else {
-            if (null !== $this->logger) {
-                $this->logger->debug(sprintf('Redirecting to %s', $this->options['failure_path']));
-            }
-
-            $request->getSession()->set(SecurityContextInterface::AUTHENTICATION_ERROR, $failed);
-
-            return new RedirectResponse(0 !== strpos($this->options['failure_path'], 'http') ? $request->getUriForPath($this->options['failure_path']) : $this->options['failure_path'], 302);
         }
+
+        if (null !== $this->logger) {
+            $this->logger->debug(sprintf('Redirecting to %s', $this->options['failure_path']));
+        }
+
+        $request->getSession()->set(SecurityContextInterface::AUTHENTICATION_ERROR, $failed);
+
+        return new RedirectResponse(0 !== strpos($this->options['failure_path'], 'http') ? $request->getUriForPath($this->options['failure_path']) : $this->options['failure_path'], 302);
     }
 
     protected function onSuccess(EventInterface $event, Request $request, TokenInterface $token)

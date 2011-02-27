@@ -66,7 +66,7 @@ class HydratorCacheWarmer implements CacheWarmerInterface
         }
 
         $documentManagers = $this->container->getParameter('doctrine.odm.mongodb.document_managers');
-        foreach ($documentManagers AS $documentManagerName) {
+        foreach ($documentManagers as $documentManagerName) {
             $dm = $this->container->get(sprintf('doctrine.odm.mongodb.%s_document_manager', $documentManagerName));
             /* @var $dm Doctrine\ODM\MongoDB\DocumentManager */
             $classes = $dm->getMetadataFactory()->getAllMetadata();

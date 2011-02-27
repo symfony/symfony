@@ -37,7 +37,7 @@ class HydratorCacheWarmerTest extends \Symfony\Bundle\DoctrineMongoDBBundle\Test
         $container->expects($this->at(1))
                   ->method('getParameter')
                   ->with($this->equalTo('doctrine.odm.mongodb.auto_generate_hydrator_classes'))
-                  ->will($this->returnValue( false ));
+                  ->will($this->returnValue(false));
         $container->expects($this->at(2))
                   ->method('getParameter')
                   ->with($this->equalTo('doctrine.odm.mongodb.document_managers'))
@@ -72,11 +72,11 @@ class HydratorCacheWarmerTest extends \Symfony\Bundle\DoctrineMongoDBBundle\Test
         $container->expects($this->at(1))
                   ->method('getParameter')
                   ->with($this->equalTo('doctrine.odm.mongodb.auto_generate_hydrator_classes'))
-                  ->will($this->returnValue( true ));
+                  ->will($this->returnValue(true));
         $container->expects($this->at(2))
                   ->method('getParameter')
                   ->with($this->equalTo('assertion'))
-                  ->will($this->returnValue( true ));
+                  ->will($this->returnValue(true));
 
         $cacheWarmer = new HydratorCacheWarmer($container);
         $cacheWarmer->warmUp(sys_get_temp_dir());

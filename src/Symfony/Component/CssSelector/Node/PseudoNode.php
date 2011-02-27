@@ -67,7 +67,7 @@ class PseudoNode implements NodeInterface
      */
     public function toXpath()
     {
-        $el_xpath = $this->element->toXpath();
+        $elXpath = $this->element->toXpath();
 
         if (in_array($this->ident, self::$unsupported)) {
             throw new SyntaxError(sprintf('The pseudo-class %s is unsupported', $this->ident));
@@ -77,7 +77,7 @@ class PseudoNode implements NodeInterface
             throw new SyntaxError(sprintf('The pseudo-class %s is unknown', $this->ident));
         }
 
-        return $this->$method($el_xpath);
+        return $this->$method($elXpath);
     }
 
     /**

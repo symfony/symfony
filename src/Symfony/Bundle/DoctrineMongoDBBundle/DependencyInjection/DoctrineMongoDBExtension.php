@@ -339,7 +339,7 @@ class DoctrineMongoDBExtension extends AbstractDoctrineExtension
         if ($odmConfigDef->hasMethodCall('setDocumentNamespaces')) {
             // TODO: Can we make a method out of it on Definition? replaceMethodArguments() or something.
             $calls = $odmConfigDef->getMethodCalls();
-            foreach ($calls AS $call) {
+            foreach ($calls as $call) {
                 if ($call[0] == 'setDocumentNamespaces') {
                     $this->aliasMap = array_merge($call[1][0], $this->aliasMap);
                 }

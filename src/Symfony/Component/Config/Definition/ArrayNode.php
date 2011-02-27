@@ -321,7 +321,7 @@ class ArrayNode extends BaseNode implements PrototypeNodeInterface
                     ));
                 }
 
-                if ($child->hasDefaultValue())  {
+                if ($child->hasDefaultValue()) {
                     $value[$name] = $child->getDefaultValue();
                 }
 

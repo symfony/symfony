@@ -65,7 +65,7 @@ class ProxyCacheWarmer implements CacheWarmerInterface
         }
 
         $entityManagers = $this->container->getParameter('doctrine.orm.entity_managers');
-        foreach ($entityManagers AS $entityManagerName) {
+        foreach ($entityManagers as $entityManagerName) {
             $em = $this->container->get(sprintf('doctrine.orm.%s_entity_manager', $entityManagerName));
             /* @var $em Doctrine\ORM\EntityManager */
             $classes = $em->getMetadataFactory()->getAllMetadata();

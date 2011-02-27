@@ -437,8 +437,7 @@ class AclProvider implements AclProviderInterface
         // fill-in parent ACLs where this hasn't been done yet cause the parent ACL was not
         // yet available
         $processed = 0;
-        foreach ($parentIdToFill as $acl)
-        {
+        foreach ($parentIdToFill as $acl) {
             $parentId = $parentIdToFill->offsetGet($acl);
 
             // let's see if we have already hydrated this

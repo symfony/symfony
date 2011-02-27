@@ -61,7 +61,7 @@ class FunctionNode implements NodeInterface
      */
     public function toXpath()
     {
-        $sel_path = $this->selector->toXpath();
+        $selPath = $this->selector->toXpath();
         if (in_array($this->name, self::$unsupported)) {
             throw new SyntaxError(sprintf('The pseudo-class %s is not supported', $this->name));
         }
@@ -70,7 +70,7 @@ class FunctionNode implements NodeInterface
             throw new SyntaxError(sprintf('The pseudo-class %s is unknown', $this->name));
         }
 
-        return $this->$method($sel_path, $this->expr);
+        return $this->$method($selPath, $this->expr);
     }
 
     /**
@@ -113,13 +113,13 @@ class FunctionNode implements NodeInterface
         }
 
         if ($b > 0) {
-            $b_neg = -$b;
+            $bNeg = -$b;
         } else {
-            $b_neg = sprintf('+%s', -$b);
+            $bNeg = sprintf('+%s', -$b);
         }
 
         if ($a != 1) {
-            $expr = array(sprintf('(position() %s) mod %s = 0', $b_neg, $a));
+            $expr = array(sprintf('(position() %s) mod %s = 0', $bNeg, $a));
         } else {
             $expr = array();
         }

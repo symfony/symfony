@@ -97,11 +97,11 @@ class PdoSessionStorage extends NativeSessionStorage
     public function sessionDestroy($id)
     {
         // get table/column
-        $db_table  = $this->options['db_table'];
-        $db_id_col = $this->options['db_id_col'];
+        $dbTable  = $this->options['db_table'];
+        $dbIdCol = $this->options['db_id_col'];
 
         // delete the record associated with this id
-        $sql = 'DELETE FROM '.$db_table.' WHERE '.$db_id_col.'= ?';
+        $sql = 'DELETE FROM '.$dbTable.' WHERE '.$dbIdCol.'= ?';
 
         try {
             $stmt = $this->db->prepare($sql);
@@ -126,11 +126,11 @@ class PdoSessionStorage extends NativeSessionStorage
     public function sessionGC($lifetime)
     {
         // get table/column
-        $db_table    = $this->options['db_table'];
-        $db_time_col = $this->options['db_time_col'];
+        $dbTable    = $this->options['db_table'];
+        $dbTimeCol = $this->options['db_time_col'];
 
         // delete the record associated with this id
-        $sql = 'DELETE FROM '.$db_table.' WHERE '.$db_time_col.' < '.(time() - $lifetime);
+        $sql = 'DELETE FROM '.$dbTable.' WHERE '.$dbTimeCol.' < '.(time() - $lifetime);
 
         try {
             $this->db->query($sql);
@@ -153,13 +153,13 @@ class PdoSessionStorage extends NativeSessionStorage
     public function sessionRead($id)
     {
         // get table/columns
-        $db_table    = $this->options['db_table'];
-        $db_data_col = $this->options['db_data_col'];
-        $db_id_col   = $this->options['db_id_col'];
-        $db_time_col = $this->options['db_time_col'];
+        $dbTable    = $this->options['db_table'];
+        $dbDataCol = $this->options['db_data_col'];
+        $dbIdCol   = $this->options['db_id_col'];
+        $dbTimeCol = $this->options['db_time_col'];
 
         try {
-            $sql = 'SELECT '.$db_data_col.' FROM '.$db_table.' WHERE '.$db_id_col.'=?';
+            $sql = 'SELECT '.$dbDataCol.' FROM '.$dbTable.' WHERE '.$dbIdCol.'=?';
 
             $stmt = $this->db->prepare($sql);
             $stmt->bindParam(1, $id, \PDO::PARAM_STR, 255);
@@ -173,7 +173,7 @@ class PdoSessionStorage extends NativeSessionStorage
                 return $sessionRows[0][0];
             } else {
                 // session does not exist, create it
-                $sql = 'INSERT INTO '.$db_table.'('.$db_id_col.', '.$db_data_col.', '.$db_time_col.') VALUES (?, ?, ?)';
+                $sql = 'INSERT INTO '.$dbTable.'('.$dbIdCol.', '.$dbDataCol.', '.$dbTimeCol.') VALUES (?, ?, ?)';
 
                 $stmt = $this->db->prepare($sql);
                 $stmt->bindParam(1, $id, \PDO::PARAM_STR);
@@ -201,12 +201,12 @@ class PdoSessionStorage extends NativeSessionStorage
     public function sessionWrite($id, $data)
     {
         // get table/column
-        $db_table    = $this->options['db_table'];
-        $db_data_col = $this->options['db_data_col'];
-        $db_id_col   = $this->options['db_id_col'];
-        $db_time_col = $this->options['db_time_col'];
+        $dbTable    = $this->options['db_table'];
+        $dbDataCol = $this->options['db_data_col'];
+        $dbIdCol   = $this->options['db_id_col'];
+        $dbTimeCol = $this->options['db_time_col'];
 
-        $sql = 'UPDATE '.$db_table.' SET '.$db_data_col.' = ?, '.$db_time_col.' = '.time().' WHERE '.$db_id_col.'= ?';
+        $sql = 'UPDATE '.$dbTable.' SET '.$dbDataCol.' = ?, '.$dbTimeCol.' = '.time().' WHERE '.$dbIdCol.'= ?';
 
         try {
             $stmt = $this->db->prepare($sql);

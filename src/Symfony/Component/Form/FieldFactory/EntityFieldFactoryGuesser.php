@@ -37,9 +37,9 @@ class EntityFieldFactoryGuesser implements FieldFactoryGuesserInterface
     }
 
     /**
-	 * Returns whether Doctrine 2 metadata exists for that class
-	 *
-	 * @return boolean
+     * Returns whether Doctrine 2 metadata exists for that class
+     *
+     * @return boolean
      */
     protected function isMappedClass($class)
     {
@@ -59,7 +59,7 @@ class EntityFieldFactoryGuesser implements FieldFactoryGuesserInterface
                 $mapping = $metadata->getAssociationMapping($property);
 
                 return new FieldFactoryClassGuess(
-                	'Symfony\Component\Form\EntityChoiceField',
+                    'Symfony\Component\Form\EntityChoiceField',
                     array(
                         'em' => $this->em,
                         'class' => $mapping['targetEntity'],
@@ -72,13 +72,13 @@ class EntityFieldFactoryGuesser implements FieldFactoryGuesserInterface
                 {
         //            case 'array':
         //                return new FieldFactoryClassGuess(
-        //                	'Symfony\Component\Form\CollectionField',
+        //                    'Symfony\Component\Form\CollectionField',
         //                    array(),
         //                    FieldFactoryGuess::HIGH_CONFIDENCE
         //                );
                     case 'boolean':
                         return new FieldFactoryClassGuess(
-                        	'Symfony\Component\Form\CheckboxField',
+                            'Symfony\Component\Form\CheckboxField',
                             array(),
                             FieldFactoryGuess::HIGH_CONFIDENCE
                         );
@@ -86,20 +86,20 @@ class EntityFieldFactoryGuesser implements FieldFactoryGuesserInterface
                     case 'vardatetime':
                     case 'datetimetz':
                         return new FieldFactoryClassGuess(
-                        	'Symfony\Component\Form\DateTimeField',
+                            'Symfony\Component\Form\DateTimeField',
                             array(),
                             FieldFactoryGuess::HIGH_CONFIDENCE
                         );
                     case 'date':
                         return new FieldFactoryClassGuess(
-                        	'Symfony\Component\Form\DateField',
+                            'Symfony\Component\Form\DateField',
                             array(),
                             FieldFactoryGuess::HIGH_CONFIDENCE
                         );
                     case 'decimal':
                     case 'float':
                         return new FieldFactoryClassGuess(
-                        	'Symfony\Component\Form\NumberField',
+                            'Symfony\Component\Form\NumberField',
                             array(),
                             FieldFactoryGuess::MEDIUM_CONFIDENCE
                         );
@@ -107,25 +107,25 @@ class EntityFieldFactoryGuesser implements FieldFactoryGuesserInterface
                     case 'bigint':
                     case 'smallint':
                         return new FieldFactoryClassGuess(
-                        	'Symfony\Component\Form\IntegerField',
+                            'Symfony\Component\Form\IntegerField',
                             array(),
                             FieldFactoryGuess::MEDIUM_CONFIDENCE
                         );
                     case 'string':
                         return new FieldFactoryClassGuess(
-                        	'Symfony\Component\Form\TextField',
+                            'Symfony\Component\Form\TextField',
                             array(),
                             FieldFactoryGuess::MEDIUM_CONFIDENCE
                         );
                     case 'text':
                         return new FieldFactoryClassGuess(
-                        	'Symfony\Component\Form\TextareaField',
+                            'Symfony\Component\Form\TextareaField',
                             array(),
                             FieldFactoryGuess::MEDIUM_CONFIDENCE
                         );
                     case 'time':
                         return new FieldFactoryClassGuess(
-                        	'Symfony\Component\Form\TimeField',
+                            'Symfony\Component\Form\TimeField',
                             array(),
                             FieldFactoryGuess::HIGH_CONFIDENCE
                         );
@@ -135,7 +135,7 @@ class EntityFieldFactoryGuesser implements FieldFactoryGuesserInterface
         }
 
         return new FieldFactoryClassGuess(
-        	'Symfony\Component\Form\TextField',
+            'Symfony\Component\Form\TextField',
             array(),
             FieldFactoryGuess::LOW_CONFIDENCE
         );

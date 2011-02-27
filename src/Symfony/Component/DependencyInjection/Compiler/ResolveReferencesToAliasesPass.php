@@ -33,8 +33,7 @@ class ResolveReferencesToAliasesPass implements CompilerPassInterface
     {
         $this->container = $container;
 
-        foreach ($container->getDefinitions() as $definition)
-        {
+        foreach ($container->getDefinitions() as $definition) {
             if ($definition->isSynthetic() || $definition->isAbstract()) {
                 continue;
             }
@@ -62,7 +61,7 @@ class ResolveReferencesToAliasesPass implements CompilerPassInterface
         foreach ($arguments as $k => $argument) {
             if (is_array($argument)) {
                 $arguments[$k] = $this->processArguments($argument);
-            } else if ($argument instanceof Reference) {
+            } elseif ($argument instanceof Reference) {
                 $defId = $this->getDefinitionId($id = (string) $argument);
 
                 if ($defId !== $id) {

@@ -206,9 +206,9 @@ class YamlDumper extends Dumper
             return $this->getParameterCall((string) $value);
         } elseif (is_object($value) || is_resource($value)) {
             throw new \RuntimeException('Unable to dump a service container if a parameter is an object or a resource.');
-        } else {
-            return $value;
         }
+
+        return $value;
     }
 
     /**
@@ -222,9 +222,9 @@ class YamlDumper extends Dumper
     {
         if (null !== $reference && ContainerInterface::EXCEPTION_ON_INVALID_REFERENCE !== $reference->getInvalidBehavior()) {
             return sprintf('@?%s', $id);
-        } else {
-            return sprintf('@%s', $id);
         }
+
+        return sprintf('@%s', $id);
     }
 
     /**

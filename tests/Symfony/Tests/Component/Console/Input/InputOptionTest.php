@@ -12,7 +12,6 @@
 namespace Symfony\Tests\Component\Console\Input;
 
 use Symfony\Component\Console\Input\InputOption;
-use Symfony\Component\Console\Exception;
 
 class InputOptionTest extends \PHPUnit_Framework_TestCase
 {

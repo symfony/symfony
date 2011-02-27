@@ -519,9 +519,9 @@ class File
     {
         if ($ext = pathinfo($this->getName(), \PATHINFO_EXTENSION)) {
             return '.' . $ext;
-        } else {
-            return '';
         }
+
+        return '';
     }
 
     /**
@@ -537,9 +537,9 @@ class File
 
         if (isset(self::$defaultExtensions[$type])) {
             return '.' . self::$defaultExtensions[$type];
-        } else {
-            return $this->getExtension();
         }
+
+        return $this->getExtension();
     }
 
     /**

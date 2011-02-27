@@ -171,18 +171,18 @@ class PdoSessionStorage extends NativeSessionStorage
 
             if (count($sessionRows) == 1) {
                 return $sessionRows[0][0];
-            } else {
-                // session does not exist, create it
-                $sql = 'INSERT INTO '.$db_table.'('.$db_id_col.', '.$db_data_col.', '.$db_time_col.') VALUES (?, ?, ?)';
-
-                $stmt = $this->db->prepare($sql);
-                $stmt->bindParam(1, $id, \PDO::PARAM_STR);
-                $stmt->bindValue(2, '', \PDO::PARAM_STR);
-                $stmt->bindValue(3, time(), \PDO::PARAM_INT);
-                $stmt->execute();
-
-                return '';
             }
+
+            // session does not exist, create it
+            $sql = 'INSERT INTO '.$db_table.'('.$db_id_col.', '.$db_data_col.', '.$db_time_col.') VALUES (?, ?, ?)';
+
+            $stmt = $this->db->prepare($sql);
+            $stmt->bindParam(1, $id, \PDO::PARAM_STR);
+            $stmt->bindValue(2, '', \PDO::PARAM_STR);
+            $stmt->bindValue(3, time(), \PDO::PARAM_INT);
+            $stmt->execute();
+
+            return '';
         } catch (\PDOException $e) {
             throw new \RuntimeException(sprintf('PDOException was thrown when trying to manipulate session data: %s', $e->getMessage()), 0, $e);
         }

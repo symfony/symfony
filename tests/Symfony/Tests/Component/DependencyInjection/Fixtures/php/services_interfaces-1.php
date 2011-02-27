@@ -34,8 +34,6 @@ class ProjectServiceContainer extends Container
     {
         $class = $this->getParameter('cla').'o'.$this->getParameter('ss');
         return $this->services['foo'] = new $class();
-
-        $this->applyInterfaceInjectors($instance);
     }
 
     /**

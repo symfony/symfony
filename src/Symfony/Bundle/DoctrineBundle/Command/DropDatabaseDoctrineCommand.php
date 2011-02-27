@@ -74,7 +74,7 @@ EOT
             }
         } else {
             $output->writeln(sprintf('<info>Would drop the database named <comment>%s</comment>.</info>', $name));
-            $output->writeln(sprintf('<error>All data will be lost!</error>', $name));
+            $output->writeln('<error>All data will be lost!</error>');
         }
     }
 }

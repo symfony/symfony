@@ -134,15 +134,15 @@ class Translator implements TranslatorInterface
     protected function loadCatalogue($locale)
     {
         $this->catalogues[$locale] = new MessageCatalogue($locale);
-        if (!isset($this->resources[$locale])) {
-            return;
-        }
 
-        foreach ($this->resources[$locale] as $resource) {
-            if (!isset($this->loaders[$resource[0]])) {
-                throw new \RuntimeException(sprintf('The "%s" translation loader is not registered.', $resource[0]));
+        if (isset($this->resources[$locale])) {
+
+            foreach ($this->resources[$locale] as $resource) {
+                if (!isset($this->loaders[$resource[0]])) {
+                    throw new \RuntimeException(sprintf('The "%s" translation loader is not registered.', $resource[0]));
+                }
+                $this->catalogues[$locale]->addCatalogue($this->loaders[$resource[0]]->load($resource[1], $locale, $resource[2]));
             }
-            $this->catalogues[$locale]->addCatalogue($this->loaders[$resource[0]]->load($resource[1], $locale, $resource[2]));
         }
 
         $this->optimizeCatalogue($locale);

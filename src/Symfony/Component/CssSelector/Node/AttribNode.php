@@ -55,9 +55,9 @@ class AttribNode implements NodeInterface
     {
         if ($this->operator == 'exists') {
             return sprintf('%s[%s[%s]]', __CLASS__, $this->selector, $this->formatAttrib());
-        } else {
-            return sprintf('%s[%s[%s %s %s]]', __CLASS__, $this->selector, $this->formatAttrib(), $this->operator, $this->value);
         }
+
+        return sprintf('%s[%s[%s %s %s]]', __CLASS__, $this->selector, $this->formatAttrib(), $this->operator, $this->value);
     }
 
     /**

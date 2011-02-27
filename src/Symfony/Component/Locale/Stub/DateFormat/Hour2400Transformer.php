@@ -16,11 +16,20 @@ namespace Symfony\Component\Locale\Stub\DateFormat;
  *
  * @author Igor Wiedler <igor@wiedler.ch>
  */
-class Hour2400Transformer extends Transformer
+class Hour2400Transformer extends HourTransformer
 {
     public function format(\DateTime $dateTime, $length)
     {
         return $this->padLeft($dateTime->format('G'), $length);
+    }
+
+    public function getMktimeHour($hour, $marker = null)
+    {
+        if (null !== $marker) {
+            $hour = 0;
+        }
+
+        return $hour;
     }
 
     public function getReverseMatchingRegExp($length)
@@ -32,7 +41,7 @@ class Hour2400Transformer extends Transformer
     {
         return array(
             'hour' => (int) $matched,
-            'hourType' => '2400'
+            'hourInstance' => $this
         );
     }
 }

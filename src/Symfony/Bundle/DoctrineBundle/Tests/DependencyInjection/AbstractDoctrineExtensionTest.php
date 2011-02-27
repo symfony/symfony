@@ -710,7 +710,7 @@ abstract class AbstractDoctrineExtensionTest extends TestCase
     {
         $calls = $definition->getMethodCalls();
         $called = false;
-        foreach ($calls AS $call) {
+        foreach ($calls as $call) {
             if ($call[0] == $methodName) {
                 if ($called) {
                     $this->fail("Method '".$methodName."' is expected to be called only once, a second call was registered though.");

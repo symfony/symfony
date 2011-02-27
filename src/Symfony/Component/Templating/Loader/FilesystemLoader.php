@@ -90,8 +90,7 @@ class FilesystemLoader extends Loader
      */
     public function isFresh(TemplateReferenceInterface $template, $time)
     {
-        if (false === $storage = $this->load($template))
-        {
+        if (false === $storage = $this->load($template)) {
             return false;
         }
 

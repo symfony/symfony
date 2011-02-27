@@ -36,8 +36,7 @@ class InternalController extends ContainerAware
 
         $attributes->remove('path');
         $attributes->remove('controller');
-        if ('none' !== $path)
-        {
+        if ('none' !== $path) {
             parse_str($path, $tmp);
             $attributes->add($tmp);
         }

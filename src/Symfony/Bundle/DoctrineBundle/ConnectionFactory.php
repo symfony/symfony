@@ -52,7 +52,7 @@ class ConnectionFactory
 
     private function initializeTypes()
     {
-        foreach ($this->typesConfig AS $type => $className) {
+        foreach ($this->typesConfig as $type => $className) {
             if (Type::hasType($type)) {
                 Type::overrideType($type, $className);
             } else {

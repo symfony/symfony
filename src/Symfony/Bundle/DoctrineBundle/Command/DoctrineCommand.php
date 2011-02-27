@@ -112,7 +112,7 @@ abstract class DoctrineCommand extends Command
     {
         $entityManagerNames = $this->container->getParameter('doctrine.orm.entity_managers');
         $entityManagers = array();
-        foreach ($entityManagerNames AS $entityManagerName) {
+        foreach ($entityManagerNames as $entityManagerName) {
             $em = $this->container->get(sprintf('doctrine.orm.%s_entity_manager', $entityManagerName));
             $entityManagers[] = $em;
         }

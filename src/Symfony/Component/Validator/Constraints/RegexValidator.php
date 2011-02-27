@@ -33,8 +33,7 @@ class RegexValidator extends ConstraintValidator
             ($constraint->match && !preg_match($constraint->pattern, $value))
             ||
             (!$constraint->match && preg_match($constraint->pattern, $value))
-        )
-        {
+        ) {
             $this->setMessage($constraint->message, array('{{ value }}' => $value));
 
             return false;

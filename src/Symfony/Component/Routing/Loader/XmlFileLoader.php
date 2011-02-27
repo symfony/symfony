@@ -103,7 +103,7 @@ class XmlFileLoader extends FileLoader
             switch ($node->tagName) {
                 case 'default':
                     $defaults[(string) $node->getAttribute('key')] = trim((string) $node->nodeValue);
-                 break;
+                    break;
                 case 'option':
                     $options[(string) $node->getAttribute('key')] = trim((string) $node->nodeValue);
                     break;

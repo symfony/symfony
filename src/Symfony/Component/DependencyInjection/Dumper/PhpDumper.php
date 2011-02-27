@@ -1094,19 +1094,16 @@ EOF;
         $nonFirstChars = self::NON_FIRST_CHARS;
         $nonFirstCharsLength = strlen($nonFirstChars);
 
-        while (true)
-        {
+        while (true) {
             $name = '';
             $i = $this->variableCount;
 
-            if ('' === $name)
-            {
+            if ('' === $name) {
                 $name .= $firstChars[$i%$firstCharsLength];
                 $i = intval($i/$firstCharsLength);
             }
 
-            while ($i > 0)
-            {
+            while ($i > 0) {
                 $i -= 1;
                 $name .= $nonFirstChars[$i%$nonFirstCharsLength];
                 $i = intval($i/$nonFirstCharsLength);

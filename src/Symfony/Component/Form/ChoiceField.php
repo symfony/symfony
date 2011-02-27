@@ -205,11 +205,11 @@ class ChoiceField extends HybridField
             return new CheckboxField($choice, array(
                 'value' => $choice,
             ));
-        } else {
-            return new RadioField($choice, array(
-                'value' => $choice,
-            ));
         }
+
+        return new RadioField($choice, array(
+            'value' => $choice,
+        ));
     }
 
     /**

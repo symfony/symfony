@@ -53,6 +53,15 @@ class TranslatorTest extends \PHPUnit_Framework_TestCase
         $this->assertEquals('foobar', $translator->trans('bar'));
     }
 
+    public function testTransWithFallbackLocaleBis()
+    {
+        $translator = new Translator('en_US', new MessageSelector());
+        $translator->addLoader('array', new ArrayLoader());
+        $translator->addResource('array', array('foo' => 'foofoo'), 'en_US');
+        $translator->addResource('array', array('bar' => 'foobar'), 'en');
+        $this->assertEquals('foobar', $translator->trans('bar'));
+    }
+
     /**
      * @expectedException RuntimeException
      */

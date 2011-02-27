@@ -33,6 +33,8 @@ class ProjectServiceContainer extends Container
     protected function getBarService()
     {
         return $this->services['bar'] = $this->get('barFactory')->createBarClass();
+
+        $this->applyInterfaceInjectors($instance);
     }
 
     /**
@@ -46,6 +48,8 @@ class ProjectServiceContainer extends Container
     protected function getBarfactoryService()
     {
         return $this->services['barfactory'] = new \BarClassFactory();
+
+        $this->applyInterfaceInjectors($instance);
     }
 
     /**

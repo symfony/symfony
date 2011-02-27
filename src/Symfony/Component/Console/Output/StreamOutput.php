@@ -97,9 +97,9 @@ class StreamOutput extends Output
         // @codeCoverageIgnoreStart
         if (DIRECTORY_SEPARATOR == '\\') {
             return false !== getenv('ANSICON');
-        } else {
-            return function_exists('posix_isatty') && @posix_isatty($this->stream);
         }
+
+        return function_exists('posix_isatty') && @posix_isatty($this->stream);
         // @codeCoverageIgnoreEnd
     }
 }

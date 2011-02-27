@@ -226,8 +226,8 @@ class StubIntlDateFormatter
      * @param  int      $position   Position at which to start the parsing in $value (zero-based).
      *                              If no error occurs before $value is consumed, $parse_pos will
      *                              contain -1 otherwise it will contain the position at which parsing
-     *                              ended. If $parse_pos > strlen($value), the parse fails immediately. 
-     * @return string               Localtime compatible array of integers: contains 24 hour clock value in tm_hour field 
+     *                              ended. If $parse_pos > strlen($value), the parse fails immediately.
+     * @return string               Localtime compatible array of integers: contains 24 hour clock value in tm_hour field
      * @throws MethodNotImplementedException
      */
     public function localtime($value, &$position = 0)
@@ -242,7 +242,7 @@ class StubIntlDateFormatter
      * @param  int      $position   Position at which to start the parsing in $value (zero-based).
      *                              If no error occurs before $value is consumed, $parse_pos will
      *                              contain -1 otherwise it will contain the position at which parsing
-     *                              ended. If $parse_pos > strlen($value), the parse fails immediately. 
+     *                              ended. If $parse_pos > strlen($value), the parse fails immediately.
      * @return string               Parsed value as a timestamp
      * @throws MethodNotImplementedException
      */

@@ -89,7 +89,7 @@ class TreeBuilder
     protected function createBooleanConfigNode(NodeBuilder $node)
     {
         $configNode = new BooleanNode($node->name, $node->parent);
-        $this->configureScalarNode($configNode, $node);
+        $this->configureVariableNode($configNode, $node);
 
         return $configNode;
     }
@@ -104,18 +104,18 @@ class TreeBuilder
     protected function createScalarConfigNode(NodeBuilder $node)
     {
         $configNode = new ScalarNode($node->name, $node->parent);
-        $this->configureScalarNode($configNode, $node);
+        $this->configureVariableNode($configNode, $node);
 
         return $configNode;
     }
 
     /**
-     * Configures a scalar node.
+     * Configures a variable node.
      *
-     * @param ScalarNode  $configNode The node to configure
-     * @param NodeBuilder $node       The builder of the node
+     * @param VariableNode $configNode The node to configure
+     * @param NodeBuilder  $node       The builder of the node
      */
-    protected function configureScalarNode(ScalarNode $configNode, NodeBuilder $node)
+    protected function configureVariableNode(VariableNode $configNode, NodeBuilder $node)
     {
         if (null !== $node->normalization) {
             $configNode->setNormalizationClosures(
@@ -157,7 +157,7 @@ class TreeBuilder
     protected function createVariableConfigNode(NodeBuilder $node)
     {
         $configNode = new VariableNode($node->name, $node->parent);
-        $this->configureScalarNode($configNode, $node);
+        $this->configureVariableNode($configNode, $node);
 
         return $configNode;
     }

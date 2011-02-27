@@ -28,10 +28,12 @@ class FullTransformer
 
     private $transformers;
     private $pattern;
+    private $timezone;
 
-    public function __construct($pattern)
+    public function __construct($pattern, $timezone)
     {
         $this->pattern = $pattern;
+        $this->timezone = $timezone;
 
         $implementedCharsMatch = $this->buildCharsMatch($this->implementedChars);
         $notImplementedCharsMatch = $this->buildCharsMatch($this->notImplementedChars);
@@ -56,6 +58,11 @@ class FullTransformer
             's' => new SecondTransformer(),
             'z' => new TimeZoneTransformer(),
         );
+    }
+
+    public function getTransformers()
+    {
+        return $this->transformers;
     }
 
     public function format(\DateTime $dateTime)
@@ -93,33 +100,44 @@ class FullTransformer
 
     public function getReverseMatchingRegExp($pattern)
     {
-        $reverseMatchingRegExp = preg_replace_callback($this->regExp, function($matches) {
-            if (isset($this->transformers[$dateChars[0]])) {
-                $transformer = $this->transformers[$dateChars[0]];
-                return $transformer->getReverseMatchingRegExp($length);
+        $that = $this;
+
+        $reverseMatchingRegExp = preg_replace_callback($this->regExp, function($matches) use ($that) {
+            $length = strlen($matches[0]);
+            $transformerIndex = $matches[0][0];
+
+            $transformers = $that->getTransformers();
+
+            if (isset($transformers[$transformerIndex])) {
+                $transformer = $transformers[$transformerIndex];
+                return '(' . $transformer->getReverseMatchingRegExp($length) . ')';
             }
-        }, $this->pattern);
+        }, $pattern);
 
         return $reverseMatchingRegExp;
     }
 
-    public function parse($pattern, $value)
+    public function parse($value)
     {
-        $reverseMatchingRegExp = $this->getReverseMatchingRegExp($pattern);
+        $reverseMatchingRegExp = $this->getReverseMatchingRegExp($this->pattern);
+        $reverseMatchingRegExp = '/'.$reverseMatchingRegExp.'/';
 
         $options = array();
 
         if (preg_match($reverseMatchingRegExp, $value, $matches)) {
+            $matches = $this->normalizeArray($matches);
+
             foreach ($this->transformers as $char => $transformer) {
                 if (isset($matches[$char])) {
-                    $options = array_merge($options, $transformer->extractDateOptions($char, strlen($matches[$char])));
+                    $length = strlen($matches[$char]['pattern']);
+                    $options = array_merge($options, $transformer->extractDateOptions($matches[$char]['value'], $length));
                 }
             }
 
             return $this->calculateUnixTimestamp($options);
-        } else {
-            throw new \InvalidArgumentException(sprintf("Failed to match value '%s' with pattern '%s'", $value, $pattern));
         }
+
+        throw new \InvalidArgumentException(sprintf("Failed to match value '%s' with pattern '%s'", $value, $this->pattern));
     }
 
     protected function buildCharsMatch($specialChars)
@@ -131,5 +149,63 @@ class FullTransformer
         }, $specialCharsArray));
 
         return $specialCharsMatch;
+    }
+
+    protected function normalizeArray(array $data)
+    {
+        $ret = array();
+
+        foreach ($data as $key => $value) {
+            if (!is_string($key)) {
+                continue;
+            }
+
+            $ret[$key[0]] = array(
+                'value' => $value,
+                'pattern' => $key
+            );
+        }
+
+        return $ret;
+    }
+
+    private function calculateUnixTimestamp(array $options)
+    {
+        $datetime = $this->extractDateTime($options);
+
+        $year   = $datetime['year'];
+        $month  = $datetime['month'];
+        $day    = $datetime['day'];
+        $hour   = $datetime['hour'];
+        $minute = $datetime['minute'];
+        $second = $datetime['second'];
+
+        // If month is false, return immediately
+        if (false === $month) {
+            return false;
+        }
+
+        // Set the timezone
+        $originalTimezone = date_default_timezone_get();
+        date_default_timezone_set($this->timezone);
+
+        $timestamp = mktime($hour, $minute, $second, $month, $day, $year);
+
+        // Restore timezone
+        date_default_timezone_set($originalTimezone);
+
+        return $timestamp;
+    }
+
+    private function extractDateTime(array $datetime)
+    {
+        return array(
+            'year'   => isset($datetime['year']) ? $datetime['year'] : 1970,
+            'month'  => isset($datetime['month']) ? $datetime['month'] : 1,
+            'day'    => isset($datetime['day']) ? $datetime['day'] : 1,
+            'hour'   => isset($datetime['hour']) ? $datetime['hour'] : 0,
+            'minute' => isset($datetime['minute']) ? $datetime['minute'] : 0,
+            'second' => isset($datetime['second']) ? $datetime['second'] : 0,
+        );
     }
 }

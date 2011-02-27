@@ -11,6 +11,8 @@
 
 namespace Symfony\Component\Locale\Stub\DateFormat;
 
+use Symfony\Component\Locale\Exception\MethodArgumentValueNotImplementedException;
+
 /**
  * Parser and formatter for date formats
  *
@@ -18,6 +20,39 @@ namespace Symfony\Component\Locale\Stub\DateFormat;
  */
 class MonthTransformer extends Transformer
 {
+    private static $months = array(
+        'January',
+        'February',
+        'March',
+        'April',
+        'May',
+        'June',
+        'July',
+        'August',
+        'September',
+        'October',
+        'November',
+        'December'
+    );
+
+    private static $shortMonths = array();
+
+    private static $flippedMonths = array();
+
+    private static $flippedShortMonths = array();
+
+    public function __construct()
+    {
+        if (0 == count(self::$shortMonths)) {
+            self::$shortMonths = array_map(function($month) {
+                return substr($month, 0, 3);
+            }, self::$months);
+
+            self::$flippedMonths = array_flip(self::$months);
+            self::$flippedShortMonths = array_flip(self::$shortMonths);
+        }
+    }
+
     public function format(\DateTime $dateTime, $length)
     {
         $matchLengthMap = array(
@@ -38,23 +73,18 @@ class MonthTransformer extends Transformer
 
     public function getReverseMatchingRegExp($length)
     {
-        $months = array('January', 'February', 'March', 'April', 'May', 'June', 'July', 'August', 'September', 'October', 'November', 'December');
-
         switch ($length) {
             case 1:
-                return '\d{1,2}';
+                return '?P<M>\d{1,2}';
                 break;
             case 3:
-                $shortMonths = array_map(function($month) {
-                    return substr($month, 0, 2);
-                }, $months);
-                return implode('|', $shortMonths);
+                return '?P<MMM>' . implode('|', self::$shortMonths);
                 break;
             case 4:
-                return implode('|', $months);
+                return '?P<MMMM>' . implode('|', self::$months);
                 break;
             case 5:
-                return '[JFMASOND]';
+                return '?P<MMMMM>' . '[JFMASOND]';
                 break;
             default:
                 return "\d{$length}";
@@ -64,8 +94,24 @@ class MonthTransformer extends Transformer
 
     public function extractDateOptions($matched, $length)
     {
+        if (!is_numeric($matched)) {
+            if (3 == $length) {
+                $matched = self::$flippedShortMonths[$matched] + 1;
+            }
+            elseif (4 == $length) {
+                $matched = self::$flippedMonths[$matched] + 1;
+            }
+            elseif (5 == $length) {
+                // IntlDateFormatter::parse() always returns false for MMMMM or LLLLL
+                $matched = false;
+            }
+        }
+        else {
+            $matched = (int) $matched;
+        }
+
         return array(
-            'month' => (int) $matched,
+            'month' => $matched,
         );
     }
 }

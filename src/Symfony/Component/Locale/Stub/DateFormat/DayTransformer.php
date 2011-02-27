@@ -26,9 +26,9 @@ class DayTransformer extends Transformer
     public function getReverseMatchingRegExp($length)
     {
         if (1 == $length) {
-            return '\d{1,2}';
+            return '?P<d>\d{1,2}';
         } else {
-            return "\d{$length}";
+            return '?P<d>\d{'.$length.'}';
         }
     }
 

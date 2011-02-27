@@ -424,12 +424,53 @@ class StubIntlDateFormatterTest extends LocaleTestCase
     }
 
     /**
-     * @expectedException Symfony\Component\Locale\Exception\MethodNotImplementedException
+     * @dataProvider parseProvider
      */
-    public function testParse()
+    public function testParseIntl($pattern, $value, $expected)
     {
-        $formatter = $this->createStubFormatter();
-        $formatter->parse('Wednesday, December 31, 1969 4:00:00 PM PT');
+        $formatter = $this->createIntlFormatter($pattern);
+        $this->assertEquals($expected, $formatter->parse($value));
+    }
+
+    /**
+     * @dataProvider parseProvider
+     */
+    public function testParseStub($pattern, $value, $expected)
+    {
+        $formatter = $this->createStubFormatter($pattern);
+        $this->assertEquals($expected, $formatter->parse($value));
+    }
+
+    public function parseProvider()
+    {
+        return array(
+            // years
+            array('y-M-d', '1970-1-1', 0),
+            array('yy-M-d', '70-1-1', 0),
+
+            // months
+            array('y-M-d', '1970-1-1', 0),
+            array('y-MMM-d', '1970-Jan-1', 0),
+            array('y-MMMM-d', '1970-January-1', 0),
+
+            // 1 char month
+            array('y-MMMMM-d', '1970-J-1', false),
+            array('y-MMMMM-d', '1970-S-1', false),
+
+            // standalone months
+            array('y-L-d', '1970-1-1', 0),
+            array('y-LLL-d', '1970-Jan-1', 0),
+            array('y-LLLL-d', '1970-January-1', 0),
+
+            // standalone 1 char month
+            array('y-LLLLL-d', '1970-J-1', false),
+            array('y-LLLLL-d', '1970-S-1', false),
+
+            // days
+            array('y-M-d', '1970-1-1', 0),
+            array('y-M-dd', '1970-1-01', 0),
+            array('y-M-ddd', '1970-1-001', 0),
+        );
     }
 
     /**

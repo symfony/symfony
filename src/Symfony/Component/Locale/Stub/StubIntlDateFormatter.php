@@ -120,8 +120,7 @@ class StubIntlDateFormatter
         $dateTime->setTimestamp($timestamp);
         $dateTime->setTimezone($this->dateTimeZone);
 
-        $pattern = $this->getPattern();
-        $transformer = new DateFormat\FullTransformer($pattern);
+        $transformer = new DateFormat\FullTransformer($this->getPattern(), $this->getTimeZoneId());
         $formatted = $transformer->format($dateTime);
 
         return $formatted;
@@ -244,11 +243,11 @@ class StubIntlDateFormatter
      *                              contain -1 otherwise it will contain the position at which parsing
      *                              ended. If $parse_pos > strlen($value), the parse fails immediately.
      * @return string               Parsed value as a timestamp
-     * @throws MethodNotImplementedException
      */
     public function parse($value, &$position = 0)
     {
-        throw new MethodNotImplementedException(__METHOD__);
+        $transformer = new DateFormat\FullTransformer($this->getPattern(), $this->getTimeZoneId());
+        return $transformer->parse($value);
     }
 
     /**

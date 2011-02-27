@@ -30,9 +30,10 @@ class YearTransformer extends Transformer
     public function getReverseMatchingRegExp($length)
     {
         if (2 == $length) {
-            return '\d{2}';
+            return '?P<yy>\d{2}';
         } else {
-            return "\d{1,$length}";
+            $length = $length < 4 ? 4 : $length;
+            return "?P<y>\d{1,$length}";
         }
     }
 

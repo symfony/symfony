@@ -42,6 +42,7 @@ class AnnotationDirectoryLoader extends AnnotationFileLoader
             }
 
             if ($class = $this->findClass($file)) {
+                $collection->addResource(new FileResource($file));
                 $collection->addCollection($this->loader->load($class, $type));
             }
         }

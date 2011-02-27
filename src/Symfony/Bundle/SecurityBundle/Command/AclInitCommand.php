@@ -22,7 +22,7 @@ use Doctrine\DBAL\DriverManager;
  *
  * @author Johannes M. Schmitt <schmittjoh@gmail.com>
  */
-class InitAclCommand extends Command
+class AclInitCommand extends Command
 {
     /**
      * @see Command
@@ -30,7 +30,7 @@ class InitAclCommand extends Command
     protected function configure()
     {
         $this
-            ->setName('init:acl')
+            ->setName('acl:init')
         ;
     }
 

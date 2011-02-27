@@ -60,21 +60,6 @@ class ZendExtension extends Extension
                     $container->findDefinition('zend.logger')->removeMethodCall('registerErrorHandler');
                 }
             }
-
-            $this->addClassesToCompile(array(
-                'Symfony\\Bundle\\ZendBundle\\Logger\\DebugLogger',
-                'Symfony\\Bundle\\ZendBundle\\Logger\\Logger',
-                'Zend\\Log\\Factory',
-                'Zend\\Log\\Filter',
-                'Zend\\Log\\Filter\\AbstractFilter',
-                'Zend\\Log\\Filter\\Priority',
-                'Zend\\Log\\Formatter',
-                'Zend\\Log\\Formatter\\Simple',
-                'Zend\\Log\\Logger',
-                'Zend\\Log\\Writer',
-                'Zend\\Log\\Writer\\AbstractWriter',
-                'Zend\\Log\\Writer\\Stream',
-            ));
         }
     }
 

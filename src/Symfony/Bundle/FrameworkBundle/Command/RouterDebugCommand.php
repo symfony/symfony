@@ -159,8 +159,8 @@ EOF
     {
         if (is_object($value)) {
             return sprintf('object(%s)', get_class($value));
-        } else {
-            return preg_replace("/\n\s*/s", '', var_export($value, true));
         }
+
+        return preg_replace("/\n\s*/s", '', var_export($value, true));
     }
 }

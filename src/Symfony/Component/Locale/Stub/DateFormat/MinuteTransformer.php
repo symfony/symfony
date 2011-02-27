@@ -27,10 +27,12 @@ class MinuteTransformer extends Transformer
     public function getReverseMatchingRegExp($length)
     {
         if (1 == $length) {
-            return '\d{1,2}';
+            $regExp = '\d{1,2}';
         } else {
-            return "\d{$length}";
+            $regExp = '\d{'.$length.'}';
         }
+
+        return $regExp;
     }
 
     public function extractDateOptions($matched, $length)

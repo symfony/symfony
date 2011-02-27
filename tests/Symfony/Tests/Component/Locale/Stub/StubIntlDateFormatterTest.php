@@ -512,6 +512,14 @@ class StubIntlDateFormatterTest extends LocaleTestCase
             array('y-M-d kk a', '1970-1-1 11 AM', 0),
             array('y-M-d kk a', '1970-1-1 12 AM', 0),
             array('y-M-d kk a', '1970-1-1 23 AM', 0),
+
+            // minutes
+            array('y-M-d HH:m', '1970-1-1 0:1', 60),
+            array('y-M-d HH:mm', '1970-1-1 0:10', 600),
+
+            // seconds
+            array('y-M-d HH:mm:s', '1970-1-1 00:01:1', 61),
+            array('y-M-d HH:mm:ss', '1970-1-1 00:01:10', 70),
         );
     }
 

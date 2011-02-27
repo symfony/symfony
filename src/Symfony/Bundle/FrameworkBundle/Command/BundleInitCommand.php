@@ -23,7 +23,7 @@ use Symfony\Bundle\FrameworkBundle\Util\Mustache;
  *
  * @author Fabien Potencier <fabien.potencier@symfony-project.com>
  */
-class InitBundleCommand extends Command
+class BundleInitCommand extends Command
 {
     /**
      * @see Command
@@ -38,9 +38,9 @@ class InitBundleCommand extends Command
                 new InputOption('format', '', InputOption::VALUE_REQUIRED, 'Use the format for configuration files (php, xml, or yml)', 'yml')
             ))
             ->setHelp(<<<EOT
-The <info>init:bundle</info> command generates a new bundle with a basic skeleton.
+The <info>bundle:init</info> command generates a new bundle with a basic skeleton.
 
-<info>./app/console init:bundle "Vendor\HelloBundle" src [bundleName]</info>
+<info>./app/console bundle:init "Vendor\HelloBundle" src [bundleName]</info>
 
 The bundle namespace must end with "Bundle" (e.g. <comment>Vendor\HelloBundle</comment>)
 and can be placed in any directory (e.g. <comment>src</comment>).
@@ -49,7 +49,7 @@ If you don't specify a bundle name (e.g. <comment>HelloBundle</comment>), the bu
 be the concatenation of the namespace segments (e.g. <comment>VendorHelloBundle</comment>).
 EOT
             )
-            ->setName('init:bundle')
+            ->setName('bundle:init')
         ;
     }
 

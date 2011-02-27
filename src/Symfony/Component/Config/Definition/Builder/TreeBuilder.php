@@ -157,35 +157,7 @@ class TreeBuilder
     protected function createVariableConfigNode(NodeBuilder $node)
     {
         $configNode = new VariableNode($node->name, $node->parent);
-
-        if (null !== $node->normalization) {
-            $configNode->setNormalizationClosures(
-                $this->buildExpressions($node->normalization->before)
-            );
-        }
-
-        if (null !== $node->merge) {
-            $configNode->setAllowOverwrite($node->merge->allowOverwrite);
-        }
-
-        if (true === $node->default) {
-            $configNode->setDefaultValue($node->defaultValue);
-        }
-
-        if (false === $node->allowEmptyValue) {
-            $configNode->setAllowEmptyValue($node->allowEmptyValue);
-        }
-
-        $configNode->addEquivalentValue(null, $node->nullEquivalent);
-        $configNode->addEquivalentValue(true, $node->trueEquivalent);
-        $configNode->addEquivalentValue(false, $node->falseEquivalent);
-        $configNode->setRequired($node->required);
-
-        if (null !== $node->validation) {
-            $configNode->setFinalValidationClosures(
-                $this->buildExpressions($node->validation->rules)
-            );
-        }
+        $this->configureScalarNode($configNode, $node);
 
         return $configNode;
     }

@@ -31,7 +31,7 @@ class DayTransformer extends Transformer
             $regExp = '\d{'.$length.'}';
         }
 
-        return $this->addNamedCapture($regExp, 1);
+        return $regExp;
     }
 
     public function extractDateOptions($matched, $length)

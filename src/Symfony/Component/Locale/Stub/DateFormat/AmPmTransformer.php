@@ -25,7 +25,7 @@ class AmPmTransformer extends Transformer
 
     public function getReverseMatchingRegExp($length)
     {
-        return $this->addNamedCapture("AM|PM", 1);
+        return 'AM|PM';
     }
 
     public function extractDateOptions($matched, $length)

@@ -41,7 +41,7 @@ class MonthTransformer extends Transformer
 
     private static $flippedShortMonths = array();
 
-    public function __construct($namedCapture)
+    public function __construct()
     {
         if (0 == count(self::$shortMonths)) {
             self::$shortMonths = array_map(function($month) {
@@ -51,8 +51,6 @@ class MonthTransformer extends Transformer
             self::$flippedMonths = array_flip(self::$months);
             self::$flippedShortMonths = array_flip(self::$shortMonths);
         }
-
-        parent::__construct($namedCapture);
     }
 
     public function format(\DateTime $dateTime, $length)
@@ -93,7 +91,7 @@ class MonthTransformer extends Transformer
                 break;
         }
 
-        return $this->addNamedCapture($regExp, $length);
+        return $regExp;
     }
 
     public function extractDateOptions($matched, $length)

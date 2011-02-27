@@ -35,10 +35,10 @@ class YearTransformer extends Transformer
             $regExp = '\d{4}';
 
             // The named capture in this case will be always y (that equals to yyyy)
-            $length = 1;
+            //$length = 1;
         }
 
-        return $this->addNamedCapture($regExp, $length);
+        return $regExp;
     }
 
     public function extractDateOptions($matched, $length)

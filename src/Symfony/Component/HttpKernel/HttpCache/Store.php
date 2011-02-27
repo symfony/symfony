@@ -78,9 +78,9 @@ class Store implements StoreInterface
             $this->locks[] = $path;
 
             return true;
-        } else {
-            return $path;
         }
+
+        return $path;
     }
 
     /**
@@ -125,12 +125,12 @@ class Store implements StoreInterface
         list($req, $headers) = $match;
         if (file_exists($body = $this->getPath($headers['x-content-digest'][0]))) {
             return $this->restoreResponse($headers, $body);
-        } else {
-            // TODO the metaStore referenced an entity that doesn't exist in
-            // the entityStore. We definitely want to return nil but we should
-            // also purge the entry from the meta-store when this is detected.
-            return null;
         }
+
+        // TODO the metaStore referenced an entity that doesn't exist in
+        // the entityStore. We definitely want to return nil but we should
+        // also purge the entry from the meta-store when this is detected.
+        return null;
     }
 
     /**

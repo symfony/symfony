@@ -26,10 +26,12 @@ class DayTransformer extends Transformer
     public function getReverseMatchingRegExp($length)
     {
         if (1 == $length) {
-            return '?P<d>\d{1,2}';
+            $regExp = '\d{1,2}';
         } else {
-            return '?P<d>\d{'.$length.'}';
+            $regExp = '\d{'.$length.'}';
         }
+
+        return $this->addNamedCapture($regExp, 1);
     }
 
     public function extractDateOptions($matched, $length)

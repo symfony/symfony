@@ -25,8 +25,7 @@ class Hour1201Transformer extends Transformer
 
     public function getReverseMatchingRegExp($length)
     {
-        $capture = str_pad('', $length, 'h');
-        return '?P<'.$capture.'>\d{1,2}';
+        return $this->addNamedCapture('\d{1,2}', $length);
     }
 
     public function extractDateOptions($matched, $length)

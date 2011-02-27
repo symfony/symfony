@@ -18,6 +18,25 @@ namespace Symfony\Component\Locale\Stub\DateFormat;
  */
 abstract class Transformer
 {
+    protected $namedCapture;
+
+    public function __construct($namedCapture)
+    {
+        $this->namedCapture = $namedCapture;
+    }
+
+    public function getNamedCapture()
+    {
+        return $this->namedCapture;
+    }
+
+    public function addNamedCapture($regExp, $lenght = 1)
+    {
+        $namedCapture = $this->getNamedCapture();
+        $namedCapture = str_repeat($namedCapture, $lenght);
+        return '?P<'.$namedCapture.'>' . $regExp;
+    }
+
     abstract public function format(\DateTime $dateTime, $length);
     abstract public function getReverseMatchingRegExp($length);
     abstract public function extractDateOptions($matched, $length);

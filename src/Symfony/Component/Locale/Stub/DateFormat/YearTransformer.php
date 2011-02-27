@@ -30,11 +30,15 @@ class YearTransformer extends Transformer
     public function getReverseMatchingRegExp($length)
     {
         if (2 == $length) {
-            return '?P<yy>\d{2}';
+            $regExp = '\d{2}';
         } else {
-            $length = $length < 4 ? 4 : $length;
-            return "?P<y>\d{1,$length}";
+            $regExp = '\d{4}';
+
+            // The named capture in this case will be always y (that equals to yyyy)
+            $length = 1;
         }
+
+        return $this->addNamedCapture($regExp, $length);
     }
 
     public function extractDateOptions($matched, $length)

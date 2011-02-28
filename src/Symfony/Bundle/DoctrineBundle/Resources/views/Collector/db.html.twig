@@ -8,17 +8,22 @@
 {% endblock %}
 
 {% block menu %}
-<div class="count">{{ '%0.0f'|format(collector.time * 1000) }} ms</div>
-<div class="count">{{ collector.querycount }}</div>
-<img style="margin: 0 5px 0 0; vertical-align: middle; width: 32px" width="32" height="32" alt="Database" src="{{ asset('bundles/webprofiler/images/db.png') }}" />
-Doctrine
+<span class="picto png_fix">
+    <strong>Doctrine</strong>
+    <span class="more_information">
+        <span class="count">{{ collector.querycount }}</span>
+        <span class="count">{{ '%0.0f'|format(collector.time * 1000) }} ms</span>
+    </span>
+</span>
 {% endblock %}
 
 {% block panel %}
     <h2>Queries</h2>
 
     {% if not collector.querycount %}
-        <em>No queries.</em>
+        <p>
+            <em>No queries.</em>
+        </p>
     {% else %}
         <ul class="alt">
             {% for i, query in collector.queries %}

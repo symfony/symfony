@@ -8,9 +8,12 @@
 {% endblock %}
 
 {% block menu %}
-<div class="count">{{ collector.querycount }}</div>
-<img style="margin: 0 5px 0 0; vertical-align: middle; width: 32px" width="32" height="32" alt="Mongo" src="{{ asset('bundles/webprofiler/images/db.png') }}" />
-Doctrine MongoDB
+<span class="picto png_fix">
+    <strong>Doctrine MongoDB</strong>
+    <span class="more_information">
+        <span class="count">{{ collector.querycount }}</span>
+    </span>
+</span>
 {% endblock %}
 
 {% block panel %}
@@ -19,7 +22,9 @@ Doctrine MongoDB
     {% if not collector.queries %}
         <em>Query logging is disabled.</em>
     {% elseif not collector.querycount %}
-        <em>No queries.</em>
+        <p>
+            <em>No queries.</em>
+        </p>
     {% else %}
         <ul class="alt">
             {% for i, query in collector.queries %}

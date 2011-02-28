@@ -15,7 +15,6 @@ use Symfony\Component\Config\Definition\Exception\InvalidConfigurationException;
 use Symfony\Component\Config\Definition\Exception\DuplicateKeyException;
 use Symfony\Component\Config\Definition\Exception\InvalidTypeException;
 use Symfony\Component\Config\Definition\Exception\UnsetKeyException;
-use Symfony\Component\DependencyInjection\Extension\Extension;
 
 /**
  * Represents an ARRAY node in the config tree.
@@ -237,7 +236,7 @@ class ArrayNode extends BaseNode implements PrototypeNodeInterface
     /**
      * Sets the node prototype.
      *
-     * @param PrototypeNodeInterface $node 
+     * @param PrototypeNodeInterface $node
      * @throws \RuntimeException if the node doesn't have concrete children
      */
     public function setPrototype(PrototypeNodeInterface $node)
@@ -276,7 +275,7 @@ class ArrayNode extends BaseNode implements PrototypeNodeInterface
     /**
      * Finalises the value of this node.
      *
-     * @param mixed $value 
+     * @param mixed $value
      * @return mixed The finalised value
      * @throws UnsetKeyException
      * @throws InvalidConfigurationException if the node doesn't have enough children
@@ -374,7 +373,7 @@ class ArrayNode extends BaseNode implements PrototypeNodeInterface
                 continue;
             }
 
-            $value[$plural] = Extension::normalizeConfig($value, $singular, $plural);
+            $value[$plural] = Processor::normalizeConfig($value, $singular, $plural);
             unset($value[$singular]);
         }
 

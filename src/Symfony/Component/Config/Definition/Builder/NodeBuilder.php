@@ -113,7 +113,7 @@ class NodeBuilder
      *         ->node('baz', 'scalar')
      *     ;
      *
-     * @return Symfony\Component\DependencyInjection\Configuration\Builder\NodeBuilder This builder node
+     * @return Symfony\Component\Config\Definition\Builder\NodeBuilder This builder node
      */
     public function builder(NodeBuilder $node)
     {

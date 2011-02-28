@@ -62,9 +62,9 @@
                         </ul>
                     {% endif %}
 
-                    {# render 'WebProfilerBundle:Profiler:searchBar' with { 'token': token } #}
+                    {% render 'WebProfilerBundle:Profiler:searchBar' with { 'token': token } %}
                     
-                    {# include 'WebProfilerBundle:Profiler:admin.html.twig' with { 'token': token } only #}
+                    {% include 'WebProfilerBundle:Profiler:admin.html.twig' with { 'token': token } only %}
 
                 </div>
 

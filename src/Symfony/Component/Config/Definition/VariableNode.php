@@ -75,7 +75,6 @@ class VariableNode extends BaseNode implements PrototypeNodeInterface
      */
     protected function validateType($value)
     {
-        return true;
     }
 
     /**

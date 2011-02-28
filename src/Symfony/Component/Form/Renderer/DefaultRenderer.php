@@ -29,6 +29,8 @@ class DefaultRenderer implements RendererInterface
 
     private $initialized = false;
 
+    private $rendered = false;
+
     public function __construct(ThemeInterface $theme, $template)
     {
         $this->theme = $theme;
@@ -95,8 +97,15 @@ class DefaultRenderer implements RendererInterface
         return $this->vars;
     }
 
+    public function isRendered()
+    {
+        return $this->rendered;
+    }
+
     public function getWidget(array $vars = array())
     {
+        $this->rendered = true;
+
         return $this->render('widget', $vars);
     }
 

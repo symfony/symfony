@@ -225,8 +225,7 @@ class FormFactory
             'template' => 'hidden',
         ), $options);
 
-        return $this->getField($key, $options)
-            ->setHidden(true);
+        return $this->getField($key, $options);
     }
 
     public function getNumberField($key, array $options = array())

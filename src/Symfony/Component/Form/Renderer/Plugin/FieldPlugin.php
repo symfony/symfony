@@ -52,7 +52,6 @@ class FieldPlugin implements PluginInterface
         $renderer->setVar('name', $name);
         $renderer->setVar('errors', $this->field->getErrors());
         $renderer->setVar('value', $this->field->getDisplayedData());
-        $renderer->setVar('hidden', $this->field->isHidden());
         $renderer->setVar('disabled', $this->field->isDisabled());
         $renderer->setVar('required', $this->field->isRequired());
         $renderer->setVar('class', null);

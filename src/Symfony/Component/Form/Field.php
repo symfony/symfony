@@ -187,23 +187,6 @@ class Field extends Configurable implements FieldInterface
         return false;
     }
 
-    public function setHidden($hidden)
-    {
-        $this->hidden = $hidden;
-
-        return $this;
-    }
-
-    /**
-     * Returns true if the widget is hidden.
-     *
-     * @return Boolean true if the widget is hidden, false otherwise
-     */
-    public function isHidden()
-    {
-        return $this->hidden;
-    }
-
     /**
      * {@inheritDoc}
      */

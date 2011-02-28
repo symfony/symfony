@@ -177,13 +177,6 @@ interface FieldInterface
     function isDisabled();
 
     /**
-     * Returns whether the field is hidden
-     *
-     * @return Boolean
-     */
-    function isHidden();
-
-    /**
      * Returns whether the field is empty
      *
      * @return boolean

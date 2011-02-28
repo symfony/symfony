@@ -23,8 +23,8 @@
 {% block rest %}
 {% spaceless %}
     {% for field in fields %}
-        {% if field.vars.hidden %}
-            {{ field.widget }}
+        {% if not field.rendered %}
+            {{ field.row }}
         {% endif %}
     {% endfor %}
 {% endspaceless %}
@@ -52,7 +52,7 @@
 {% block form__widget %}
 {% spaceless %}
     {{ this.errors }}
-    {% for field in visible_fields %}
+    {% for field in fields %}
         {{ field.row }}
     {% endfor %}
     {{ this.rest }}
@@ -83,6 +83,12 @@
     {{ block('widget') }}
 {% endspaceless %}
 {% endblock hidden__widget %}
+
+{% block hidden__row %}
+{% spaceless %}
+    {{ this.widget }}
+{% endspaceless %}
+{% endblock hidden__row %}
 
 {% block textarea__widget %}
 {% spaceless %}

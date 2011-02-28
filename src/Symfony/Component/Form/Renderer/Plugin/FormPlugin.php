@@ -26,17 +26,11 @@ class FormPlugin implements PluginInterface
     public function setUp(RendererInterface $renderer)
     {
         $fields = array();
-        $visibleFields = array();
 
         foreach ($this->form as $key => $field) {
             $fields[$key] = $field->getRenderer();
-
-            if (!$field->isHidden()) {
-                $visibleFields[$key] = $field->getRenderer();
-            }
         }
 
         $renderer->setVar('fields', $fields);
-        $renderer->setVar('visible_fields', $visibleFields);
     }
 }

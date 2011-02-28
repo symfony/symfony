@@ -460,7 +460,7 @@ class Form extends Field implements \IteratorAggregate, FormInterface
                     $pathIterator->next();
                 }
 
-                if ($this->has($pathIterator->current()) && !$this->get($pathIterator->current())->isHidden()) {
+                if ($this->has($pathIterator->current())) {
                     $this->get($pathIterator->current())->addError($error, $pathIterator);
 
                     return;
@@ -471,7 +471,7 @@ class Form extends Field implements \IteratorAggregate, FormInterface
 
                 foreach ($iterator as $field) {
                     if (null !== ($fieldPath = $field->getPropertyPath())) {
-                        if ($fieldPath->getElement(0) === $pathIterator->current() && !$field->isHidden()) {
+                        if ($fieldPath->getElement(0) === $pathIterator->current()) {
                             if ($pathIterator->hasNext()) {
                                 $pathIterator->next();
                             }

@@ -12,7 +12,6 @@
 namespace Symfony\Bundle\AsseticBundle\Routing;
 
 use Assetic\Factory\LazyAssetManager;
-use Assetic\Factory\Resource\FileResourceInterface;
 use Symfony\Component\Config\Loader\Loader;
 use Symfony\Component\Config\Resource\FileResource;
 use Symfony\Component\Routing\Route;
@@ -44,18 +43,18 @@ class AsseticLoader extends Loader
         $this->am = $am;
     }
 
-    public function load($resource, $type = null)
+    public function load($routingResource, $type = null)
     {
         $routes = new RouteCollection();
 
         // resources
-        foreach ($this->am->getResources() as $resource) {
-            if (!$resource instanceof \Traversable) {
-                $resource = array($resource);
+        foreach ($this->am->getResources() as $resources) {
+            if (!$resources instanceof \Traversable) {
+                $resources = array($resources);
             }
-            foreach ($resource as $r) {
-                if ($r instanceof FileResourceInterface) {
-                    $routes->addResource(new FileResource($r->getPath()));
+            foreach ($resources as $resource) {
+                if (file_exists($path = (string) $resource)) {
+                    $routes->addResource(new FileResource($path));
                 }
             }
         }

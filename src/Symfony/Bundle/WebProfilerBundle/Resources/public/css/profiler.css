@@ -14,12 +14,12 @@ body
     _height:100%;
     margin:0;
     padding:0;
+    background-color:#efefef;
 }
 body
 {
     font: 1em "Lucida Sans Unicode", "Lucida Grande", Verdana, Arial, Helvetica, sans-serif;;
     text-align:left;
-    background-color:#efefef;
 }
 
 p
@@ -461,4 +461,70 @@ td.main, td.menu {
     color: #6b6b6b;
     line-height: 28px;
     background: transparent url("/bundles/webprofiler/images/profiler/btn_bg.png") repeat-x top left;
+}
+
+.navigation .search
+{
+    padding-top: 15px;
+    float: none;
+    background: none repeat scroll 0 0 #f6f6f6;
+    color: #333333;
+    margin: 20px 0;
+    border: 1px solid #dfdfdf;
+    border-left: none;
+}
+
+.navigation .search h3
+{
+    font-family: Arial,Helvetica,sans-serif;
+    text-transform: uppercase;
+    margin-left: 10px;
+    font-size: 13px;
+}
+
+.navigation .search form
+{
+    padding: 15px 0;
+}
+
+.navigation .search button
+{
+    float: right;
+    margin-right: 20px;
+}
+
+.navigation .search label
+{
+    display: block;
+    float: left;
+    width: 50px;
+}
+
+.navigation .search input, 
+.navigation .search select, 
+.navigation .search label, 
+.navigation .search a
+{
+    font-size: 12px;
+}
+
+.navigation .search form
+{
+    padding-left: 10px;
+}
+
+.navigation .search input
+{
+    width: 160px;
+}
+
+.navigation .import label
+{
+    float: none;
+    display: inline;
+}
+
+.navigation .import input
+{
+    width: 100px;
 }

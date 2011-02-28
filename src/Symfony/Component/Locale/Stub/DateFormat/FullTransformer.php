@@ -79,11 +79,8 @@ class FullTransformer
     {
         $length = strlen($dateChars);
 
-        if ("'" === $dateChars[0]) {
-            if (preg_match("/^'+$/", $dateChars)) {
-                return str_replace("''", "'", $dateChars);
-            }
-            return str_replace("''", "'", substr($dateChars, 1, -1));
+        if ($this->isQuoteMatch($dateChars)) {
+            return $this->replaceQuoteMatch($dateChars);
         }
 
         if (isset($this->transformers[$dateChars[0]])) {
@@ -106,6 +103,11 @@ class FullTransformer
         $reverseMatchingRegExp = preg_replace_callback($this->regExp, function($matches) use ($that) {
             $length = strlen($matches[0]);
             $transformerIndex = $matches[0][0];
+
+            $dateChars = $matches[0];
+            if ($that->isQuoteMatch($dateChars)) {
+                return $that->replaceQuoteMatch($dateChars);
+            }
 
             $transformers = $that->getTransformers();
 
@@ -169,6 +171,19 @@ class FullTransformer
         }
 
         return $ret;
+    }
+
+    public function isQuoteMatch($quoteMatch)
+    {
+        return ("'" === $quoteMatch[0]);
+    }
+
+    public function replaceQuoteMatch($quoteMatch)
+    {
+        if (preg_match("/^'+$/", $quoteMatch)) {
+            return str_replace("''", "'", $quoteMatch);
+        }
+        return str_replace("''", "'", substr($quoteMatch, 1, -1));
     }
 
     private function calculateUnixTimestamp($dateTime, array $options)

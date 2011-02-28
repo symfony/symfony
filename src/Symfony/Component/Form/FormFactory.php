@@ -25,16 +25,16 @@ use Symfony\Component\Form\DataProcessor\FileUploader;
 use Symfony\Component\Form\FieldFactory\FieldFactoryInterface;
 use Symfony\Component\Form\Renderer\DefaultRenderer;
 use Symfony\Component\Form\Renderer\Theme\ThemeInterface;
-use Symfony\Component\Form\Renderer\Plugin\IdPlugin;
-use Symfony\Component\Form\Renderer\Plugin\NamePlugin;
+use Symfony\Component\Form\Renderer\Plugin\FieldPlugin;
+use Symfony\Component\Form\Renderer\Plugin\FormPlugin;
 use Symfony\Component\Form\Renderer\Plugin\ParameterPlugin;
 use Symfony\Component\Form\Renderer\Plugin\ChoicePlugin;
 use Symfony\Component\Form\Renderer\Plugin\ParentNamePlugin;
 use Symfony\Component\Form\Renderer\Plugin\DatePatternPlugin;
 use Symfony\Component\Form\Renderer\Plugin\MoneyPatternPlugin;
-use Symfony\Component\Form\Renderer\Plugin\ValuePlugin;
 use Symfony\Component\Form\Renderer\Plugin\PasswordValuePlugin;
 use Symfony\Component\Form\Renderer\Plugin\SelectMultipleNamePlugin;
+use Symfony\Component\Form\Renderer\Plugin\CheckedPlugin;
 use Symfony\Component\Form\ValueTransformer\BooleanToStringTransformer;
 use Symfony\Component\Form\ValueTransformer\NumberToLocalizedStringTransformer;
 use Symfony\Component\Form\ValueTransformer\IntegerToLocalizedStringTransformer;
@@ -130,10 +130,7 @@ class FormFactory
             ->setValueTransformer($options['value_transformer'])
             ->setNormalizationTransformer($options['normalization_transformer'])
             ->setRenderer(new DefaultRenderer($this->theme, $options['template']))
-            ->addRendererPlugin(new IdPlugin($field))
-            ->addRendererPlugin(new NamePlugin($field))
-            ->addRendererPlugin(new ValuePlugin($field))
-            ->setRendererVar('field', $field)
+            ->addRendererPlugin(new FieldPlugin($field))
             ->setRendererVar('class', null)
             ->setRendererVar('max_length', null)
             ->setRendererVar('size', null)
@@ -167,7 +164,8 @@ class FormFactory
             ->setFieldFactory($options['field_factory'])
             ->setValidationGroups($options['validation_groups'])
             ->setVirtual($options['virtual'])
-            ->setValidator($options['validator']);
+            ->setValidator($options['validator'])
+            ->addRendererPlugin(new FormPlugin($form));
     }
 
     public function getField($key, array $options = array())
@@ -309,8 +307,11 @@ class FormFactory
             'value' => '1',
         ), $options);
 
-        return $this->getField($key, $options)
+        $field = $this->getField($key, $options);
+
+        return $field
             ->setValueTransformer(new BooleanToStringTransformer())
+            ->addRendererPlugin(new CheckedPlugin($field))
             ->setRendererVar('value', $options['value']);
     }
 
@@ -325,6 +326,7 @@ class FormFactory
 
         return $field
             ->setValueTransformer(new BooleanToStringTransformer())
+            ->addRendererPlugin(new CheckedPlugin($field))
             ->addRendererPlugin(new ParentNamePlugin($field))
             ->setRendererVar('value', $options['value']);
     }

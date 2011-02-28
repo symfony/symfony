@@ -14,7 +14,7 @@ namespace Symfony\Component\Form\Renderer\Plugin;
 use Symfony\Component\Form\Renderer\RendererInterface;
 use Symfony\Component\Form\FieldInterface;
 
-class NamePlugin implements PluginInterface
+class FieldPlugin implements PluginInterface
 {
     private $field;
 
@@ -38,12 +38,26 @@ class NamePlugin implements PluginInterface
 
         if ($this->field->hasParent()) {
             $parentRenderer = $this->field->getParent()->getRenderer();
+            $parentId = $parentRenderer->getVar('id');
             $parentName = $parentRenderer->getVar('name');
+            $id = sprintf('%s_%s', $parentId, $fieldKey);
             $name = sprintf('%s[%s]', $parentName, $fieldKey);
         } else {
+            $id = $fieldKey;
             $name = $fieldKey;
         }
 
+        $renderer->setVar('this', $renderer);
+        $renderer->setVar('id', $id);
         $renderer->setVar('name', $name);
+        $renderer->setVar('errors', $this->field->getErrors());
+        $renderer->setVar('value', $this->field->getDisplayedData());
+        $renderer->setVar('hidden', $this->field->isHidden());
+        $renderer->setVar('disabled', $this->field->isDisabled());
+        $renderer->setVar('required', $this->field->isRequired());
+        $renderer->setVar('class', null);
+        $renderer->setVar('max_length', null);
+        $renderer->setVar('size', null);
+        $renderer->setVar('label', ucfirst(strtolower(str_replace('_', ' ', $this->field->getKey()))));
     }
 }

@@ -1103,24 +1103,6 @@ class FormTest extends TestCase
         $this->assertEquals(array('firstName' => 'Bernhard'), $form->getData());
     }
 
-    public function testGetHiddenFieldsReturnsOnlyHiddenFields()
-    {
-        $form = $this->getGroupWithBothVisibleAndHiddenField();
-
-        $hiddenFields = $form->getHiddenFields(true, false);
-
-        $this->assertSame(array($form['hiddenField']), $hiddenFields);
-    }
-
-    public function testGetVisibleFieldsReturnsOnlyVisibleFields()
-    {
-        $form = $this->getGroupWithBothVisibleAndHiddenField();
-
-        $visibleFields = $form->getVisibleFields(true, false);
-
-        $this->assertSame(array($form['visibleField']), $visibleFields);
-    }
-
     public function testValidateData()
     {
         $graphWalker = $this->createMockGraphWalker();

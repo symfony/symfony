@@ -23,7 +23,7 @@ interface RendererInterface
 
     function getRow(array $vars = array());
 
-    function getHidden(array $vars = array());
+    function getRest(array $vars = array());
 
     /**
      * Renders the label of the given field

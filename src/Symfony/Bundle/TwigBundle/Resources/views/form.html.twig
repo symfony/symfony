@@ -1,32 +1,34 @@
 {% block row %}
 {% spaceless %}
     <div>
-        {{ field.renderer.label }}
-        {{ field.renderer.errors }}
-        {{ field.renderer.widget }}
+        {{ this.label }}
+        {{ this.errors }}
+        {{ this.widget }}
     </div>
 {% endspaceless %}
 {% endblock row %}
 
 {% block errors %}
 {% spaceless %}
-    {% if field.hasErrors %}
+    {% if errors|length > 0 %}
     <ul>
-        {% for error in field.errors %}
+        {% for error in errors %}
             <li>{% trans error.messageTemplate with error.messageParameters from 'validators' %}</li>
         {% endfor %}
     </ul>
-    {% endif %}
+    {% endif %}  	
 {% endspaceless %}
 {% endblock errors %}
 
-{% block hidden %}
+{% block rest %}
 {% spaceless %}
-    {% for child in field.allHiddenFields %}
-        {{ child.renderer.widget }}
+    {% for field in fields %}
+        {% if field.vars.hidden %}
+            {{ field.widget }}
+        {% endif %}
     {% endfor %}
 {% endspaceless %}
-{% endblock hidden %}
+{% endblock rest %}
 
 {% block label %}
 {% spaceless %}
@@ -36,7 +38,7 @@
 
 {% block attributes %}
 {% spaceless %}
-    id="{{ id }}" name="{{ name }}"{% if class %} class="{{ class }}"{% endif %}{% if field.disabled %} disabled="disabled"{% endif %}{% if field.required %} required="required"{% endif %}{% if max_length %} maxlength="{{ max_length }}"{% endif %}{% if size %} size="{{ size }}"{% endif %}
+    id="{{ id }}" name="{{ name }}"{% if class %} class="{{ class }}"{% endif %}{% if disabled %} disabled="disabled"{% endif %}{% if required %} required="required"{% endif %}{% if max_length %} maxlength="{{ max_length }}"{% endif %}{% if size %} size="{{ size }}"{% endif %}
 {% endspaceless %}
 {% endblock attributes %}
 
@@ -49,11 +51,11 @@
 
 {% block form__widget %}
 {% spaceless %}
-    {{ field.renderer.errors }}
-    {% for child in field.visibleFields %}
-        {{ child.renderer.row }}
+    {{ this.errors }}
+    {% for field in visible_fields %}
+        {{ field.row }}
     {% endfor %}
-    {{ field.renderer.hidden }}
+    {{ this.rest }}
 {% endspaceless %}
 {% endblock form__widget %}
 
@@ -107,13 +109,13 @@
 {% block choice__widget %}
 {% spaceless %}
     {% if expanded %}
-        {% for choice, child in field %}
-            {{ child.renderer.widget }}
-            {{ child.renderer.label(choice_list.label(choice)) }}
+        {% for choice, field in fields %}
+            {{ field.widget }}
+            {{ field.label(choice_list.label(choice)) }}
         {% endfor %}
     {% else %}
     <select {{ block('attributes') }}{% if multiple %} multiple="multiple"{% endif %}>
-        {% if not field.required %}
+        {% if not required %}
             <option value="">{{ empty_value }}</option>
         {% endif %}
         {% if preferred_choices|length > 0 %}
@@ -130,22 +132,22 @@
 
 {% block checkbox__widget %}
 {% spaceless %}
-    <input type="checkbox" {{ block('attributes') }}{% if value is defined %} value="{{ value }}"{% endif %}{% if field.data %} checked="checked"{% endif %} />
+    <input type="checkbox" {{ block('attributes') }}{% if value is defined %} value="{{ value }}"{% endif %}{% if checked %} checked="checked"{% endif %} />
 {% endspaceless %}
 {% endblock checkbox__widget %}
 
 {% block radio__widget %}
 {% spaceless %}
-    <input type="radio" {{ block('attributes') }}{% if value is defined %} value="{{ value }}"{% endif %}{% if field.data %} checked="checked"{% endif %} />
+    <input type="radio" {{ block('attributes') }}{% if value is defined %} value="{{ value }}"{% endif %}{% if checked %} checked="checked"{% endif %} />
 {% endspaceless %}
 {% endblock radio__widget %}
 
 {% block date_time__widget %}
 {% spaceless %}
-    {{ field.date.renderer.errors }}
-    {{ field.time.renderer.errors }}
-    {{ field.date.renderer.widget }}
-    {{ field.time.renderer.widget }}
+    {{ fields.date.errors }}
+    {{ fields.time.errors }}
+    {{ fields.date.widget }}
+    {{ fields.time.widget }}
 {% endspaceless %}
 {% endblock date_time__widget %}
 
@@ -155,9 +157,9 @@
         {{ block('text__widget') }}
     {% else %}
         {{ date_pattern|replace({ 
-            '{{ year }}': field.year.renderer.widget, 
-            '{{ month }}': field.month.renderer.widget, 
-            '{{ day }}': field.day.renderer.widget 
+            '{{ year }}': fields.year.widget, 
+            '{{ month }}': fields.month.widget, 
+            '{{ day }}': fields.day.widget 
         })|raw }}
     {% endif %}
 {% endspaceless %}
@@ -165,7 +167,7 @@
 
 {% block time__widget %}
 {% spaceless %}
-    {{ field.hour.renderer.widget({ 'size': '1' }) }}:{{ field.minute.renderer.widget({ 'size': '1' }) }}{% if with_seconds %}:{{ field.second.renderer.widget({ 'size': '1' }) }}{% endif %}
+    {{ fields.hour.widget({ 'size': '1' }) }}:{{ fields.minute.widget({ 'size': '1' }) }}{% if with_seconds %}:{{ fields.second.widget({ 'size': '1' }) }}{% endif %}
 {% endspaceless %}
 {% endblock time__widget %}
 
@@ -205,9 +207,9 @@
 
 {% block file__widget %}
 {% spaceless %}
-    {{ field.file.renderer.widget }}
-    {{ field.token.renderer.widget }}
-    {{ field.name.renderer.widget }}
+    {{ fields.file.widget }}
+    {{ fields.token.widget }}
+    {{ fields.name.widget }}
 {% endspaceless %}
 {% endblock file__widget %}
 

@@ -18,6 +18,8 @@ namespace Symfony\Component\Locale\Stub\DateFormat;
  */
 class TimeZoneTransformer extends Transformer
 {
+    static protected $timezonesId = array();
+
     public function format(\DateTime $dateTime, $length)
     {
         return $dateTime->format('\G\M\TP');
@@ -31,7 +33,39 @@ class TimeZoneTransformer extends Transformer
     public function extractDateOptions($matched, $length)
     {
         return array(
-            'timezone' => (int) $matched,
+            'timezone' => $this->getTimezoneId($matched)
         );
+    }
+
+    protected function getTimezoneId($matched)
+    {
+        $offset = $this->getSecondsOffset($matched);
+
+        if (isset(self::$timezonesId[$offset])) {
+            return $timezonesId[$offset];
+        }
+
+        $abbreviations = \DateTimeZone::listAbbreviations();
+
+        $timezoneId = null;
+        foreach ($abbreviations as $zone => $timezones) {
+            foreach ($timezones as $timezone) {
+                if ($offset === $timezone['offset'] && 1 === preg_match('/^Etc\//', $timezone['timezone_id'])) {
+                    $timezoneId = $timezone['timezone_id'];
+                    break 2;
+                }
+            }
+        }
+
+        self::$timezonesId[$offset] = $timezoneId;
+        return self::$timezonesId[$offset];
+    }
+
+    protected function getSecondsOffset($timezone)
+    {
+        preg_match('/GMT(?P<signal>[+-])(?P<hours>\d{2}):(?P<minutes>\d{2})/', $timezone, $matches);
+        $seconds = ($matches['hours'] * 60 * 60) + ($matches['minutes'] * 60);
+        $seconds *= $matches['signal'] == '-' ? -1 : 1;
+        return $seconds;
     }
 }

@@ -246,8 +246,9 @@ class StubIntlDateFormatter
      */
     public function parse($value, &$position = 0)
     {
+        $dateTime = $this->createDateTime(0);
         $transformer = new DateFormat\FullTransformer($this->getPattern(), $this->getTimeZoneId());
-        return $transformer->parse($value);
+        return $transformer->parse($dateTime, $value);
     }
 
     /**

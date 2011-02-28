@@ -446,7 +446,8 @@ class StubIntlDateFormatterTest extends LocaleTestCase
         return array(
             // years
             array('y-M-d', '1970-1-1', 0),
-            array('yy-M-d', '70-1-1', 0),
+            // TODO: review to support or not this variant
+            // array('yy-M-d', '70-1-1', 0),
 
             // months
             array('y-M-d', '1970-1-1', 0),
@@ -520,6 +521,16 @@ class StubIntlDateFormatterTest extends LocaleTestCase
             // seconds
             array('y-M-d HH:mm:s', '1970-1-1 00:01:1', 61),
             array('y-M-d HH:mm:ss', '1970-1-1 00:01:10', 70),
+
+            // timezone
+            array('y-M-d HH:mm:ss zzzz', '1970-1-1 00:00:00 GMT-03:00', 10800),
+            array('y-M-d HH:mm:ss zzzz', '1970-1-1 00:00:00 GMT-04:00', 14400),
+            array('y-M-d HH:mm:ss zzzz', '1970-1-1 00:00:00 GMT-00:00', 0),
+            array('y-M-d HH:mm:ss zzzz', '1970-1-1 00:00:00 GMT+03:00', -10800),
+            array('y-M-d HH:mm:ss zzzz', '1970-1-1 00:00:00 GMT+04:00', -14400),
+
+            // a previous timezoned parsing should not change the timezone for the next parsing
+            array('y-M-d HH:mm:ss', '1970-1-1 00:00:00', 0)
         );
     }
 

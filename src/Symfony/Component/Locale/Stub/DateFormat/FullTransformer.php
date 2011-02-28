@@ -118,7 +118,7 @@ class FullTransformer
         return $reverseMatchingRegExp;
     }
 
-    public function parse($value)
+    public function parse(\DateTime $dateTime, $value)
     {
         $reverseMatchingRegExp = $this->getReverseMatchingRegExp($this->pattern);
         $reverseMatchingRegExp = '/'.$reverseMatchingRegExp.'/';
@@ -135,7 +135,7 @@ class FullTransformer
                 }
             }
 
-            return $this->calculateUnixTimestamp($options);
+            return $this->calculateUnixTimestamp($dateTime, $options);
         }
 
         throw new \InvalidArgumentException(sprintf("Failed to match value '%s' with pattern '%s'", $value, $this->pattern));
@@ -170,7 +170,7 @@ class FullTransformer
         return $ret;
     }
 
-    private function calculateUnixTimestamp(array $options)
+    private function calculateUnixTimestamp($dateTime, array $options)
     {
         $datetime = $this->extractDateTime($options);
 
@@ -182,26 +182,27 @@ class FullTransformer
         $second   = $datetime['second'];
         $marker   = $datetime['marker'];
         $hourInstance = $datetime['hourInstance'];
+        $timezone = $datetime['timezone'];
 
         // If month is false, return immediately
         if (false === $month) {
             return false;
         }
 
+        // Normalize hour for mktime
         if ($hourInstance instanceof HourTransformer) {
             $hour = $hourInstance->getMktimeHour($hour, $marker);
         }
 
-        // Set the timezone
-        $originalTimezone = date_default_timezone_get();
-        date_default_timezone_set($this->timezone);
+        // Set the timezone if different from the default one
+        if (null !== $timezone && $timezone !== $this->timezone) {
+            $dateTime->setTimezone(new \DateTimeZone($timezone));
+        }
 
-        $timestamp = mktime($hour, $minute, $second, $month, $day, $year);
+        $dateTime->setDate($year, $month, $day);
+        $dateTime->setTime($hour, $minute, $second);
 
-        // Restore timezone
-        date_default_timezone_set($originalTimezone);
-
-        return $timestamp;
+        return $dateTime->getTimestamp();
     }
 
     private function extractDateTime(array $datetime)
@@ -215,6 +216,7 @@ class FullTransformer
             'second'   => isset($datetime['second']) ? $datetime['second'] : 0,
             'marker'   => isset($datetime['marker']) ? $datetime['marker'] : null,
             'hourInstance' => isset($datetime['hourInstance']) ? $datetime['hourInstance'] : null,
+            'timezone' => isset($datetime['timezone']) ? $datetime['timezone'] : null,
         );
     }
 }

@@ -32,7 +32,7 @@ class TreeBuilder
      * @param string $name The name of the node
      * @param string $type The type of the node
      *
-     * @return Symfony\Component\Config\Definition\Builder\NodeBuilder
+     * @return NodeBuilder
      */
     public function root($name, $type)
     {

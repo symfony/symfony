@@ -429,7 +429,7 @@ class StubIntlDateFormatterTest extends LocaleTestCase
     public function testParseIntl($pattern, $value, $expected)
     {
         $formatter = $this->createIntlFormatter($pattern);
-        $this->assertEquals($expected, $formatter->parse($value));
+        $this->assertSame($expected, $formatter->parse($value));
     }
 
     /**
@@ -438,7 +438,7 @@ class StubIntlDateFormatterTest extends LocaleTestCase
     public function testParseStub($pattern, $value, $expected)
     {
         $formatter = $this->createStubFormatter($pattern);
-        $this->assertEquals($expected, $formatter->parse($value));
+        $this->assertSame($expected, $formatter->parse($value));
     }
 
     public function parseProvider()

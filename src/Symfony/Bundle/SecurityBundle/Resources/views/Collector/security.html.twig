@@ -16,18 +16,25 @@
 {% endblock %}
 
 {% block menu %}
-<img style="margin: 0 5px 0 0; vertical-align: middle; width: 32px" width="32" height="32" alt="Security" src="{{ asset('bundles/webprofiler/images/security.png') }}" />
-Security
+<span class="picto png_fix">
+    <strong>Security</strong>
+</span>
 {% endblock %}
 
 {% block panel %}
     <h2>Security</h2>
     {% if collector.authenticated %}
-        Username: <strong>{{ collector.user }}</strong><br />
-        Roles: {{ collector.roles|yaml_encode }}
+        <p>
+            Username: <strong>{{ collector.user }}</strong><br />
+            Roles: {{ collector.roles|yaml_encode }}
+        </p>
     {% elseif collector.enabled %}
-        <em>No token</em>
+        <p>
+            <em>No token</em>
+        </p>
     {% else %}
-        <em>The security component is disabled</em>
+        <p>
+            <em>The security component is disabled</em>
+        </p>
     {% endif %}
 {% endblock %}

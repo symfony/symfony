@@ -164,7 +164,7 @@ class ArgvInput extends Input
 
         // unexpected argument
         } else {
-            throw new RuntimeException('Too many arguments.');
+            throw new \RuntimeException('Too many arguments.');
         }
     }
 

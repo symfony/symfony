@@ -5,16 +5,23 @@
     targetNamespace="http://www.symfony-project.org/schema/dic/assetic"
     elementFormDefault="qualified">
 
-    <xsd:element name="config">
-        <xsd:complexType name="config">
-            <xsd:attribute name="debug" type="xsd:string" />
-            <xsd:attribute name="use-controller" type="xsd:string" />
-            <xsd:attribute name="read-from" type="xsd:string" />
-            <xsd:attribute name="write-to" type="xsd:string" />
-            <xsd:attribute name="closure" type="xsd:string" />
-            <xsd:attribute name="yui" type="xsd:string" />
-            <xsd:attribute name="default-javascripts-output" type="xsd:string" />
-            <xsd:attribute name="default-stylesheets-output" type="xsd:string" />
-        </xsd:complexType>
-    </xsd:element>
+    <xsd:element name="config" type="config" />
+
+    <xsd:complexType name="config">
+        <xsd:sequence>
+            <xsd:element name="bundle" type="bundle" minOccurs="0" maxOccurs="unbounded" />
+        </xsd:sequence>
+        <xsd:attribute name="debug" type="xsd:string" />
+        <xsd:attribute name="use-controller" type="xsd:string" />
+        <xsd:attribute name="read-from" type="xsd:string" />
+        <xsd:attribute name="write-to" type="xsd:string" />
+        <xsd:attribute name="closure" type="xsd:string" />
+        <xsd:attribute name="yui" type="xsd:string" />
+        <xsd:attribute name="default-javascripts-output" type="xsd:string" />
+        <xsd:attribute name="default-stylesheets-output" type="xsd:string" />
+    </xsd:complexType>
+
+    <xsd:complexType name="bundle">
+        <xsd:attribute name="name" type="xsd:string" />
+    </xsd:complexType>
 </xsd:schema>

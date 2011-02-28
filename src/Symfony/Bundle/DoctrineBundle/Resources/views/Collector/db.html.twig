@@ -10,9 +10,9 @@
 {% block menu %}
 <span class="picto png_fix">
     <strong>Doctrine</strong>
-    <span class="more_information">
-        <span class="count">{{ collector.querycount }}</span>
-        <span class="count">{{ '%0.0f'|format(collector.time * 1000) }} ms</span>
+    <span class="count">
+        <span>{{ collector.querycount }}</span>
+        <span>{{ '%0.0f'|format(collector.time * 1000) }} ms</span>
     </span>
 </span>
 {% endblock %}

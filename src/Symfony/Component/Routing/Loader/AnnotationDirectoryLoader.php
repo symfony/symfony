@@ -12,6 +12,7 @@
 namespace Symfony\Component\Routing\Loader;
 
 use Symfony\Component\Routing\RouteCollection;
+use Symfony\Component\Config\Resource\FileResource;
 
 /**
  * AnnotationDirectoryLoader loads routing information from annotations set

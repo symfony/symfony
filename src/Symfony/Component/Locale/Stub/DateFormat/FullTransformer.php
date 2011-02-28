@@ -124,7 +124,7 @@ class FullTransformer
     public function parse(\DateTime $dateTime, $value)
     {
         $reverseMatchingRegExp = $this->getReverseMatchingRegExp($this->pattern);
-        $reverseMatchingRegExp = '/'.$reverseMatchingRegExp.'/';
+        $reverseMatchingRegExp = '/^'.$reverseMatchingRegExp.'$/';
 
         $options = array();
 

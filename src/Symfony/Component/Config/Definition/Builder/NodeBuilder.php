@@ -16,7 +16,7 @@ namespace Symfony\Component\Config\Definition\Builder;
  *
  * @author Johannes M. Schmitt <schmittjoh@gmail.com>
  */
-class NodeBuilder
+class NodeBuilder implements BuilderInterface
 {
     /************
      * READ-ONLY
@@ -48,11 +48,11 @@ class NodeBuilder
     /**
      * Constructor
      *
-     * @param string      $name   the name of the node
-     * @param string      $type   The type of the node
-     * @param mixed       $parent Either a NodeBuilder or a TreeBuilder instance
+     * @param string            $name   The name of the node
+     * @param string            $type   The type of the node
+     * @param BuilderInterface  $parent A builder instance
      */
-    public function __construct($name, $type, $parent = null)
+    public function __construct($name, $type, BuilderInterface $parent = null)
     {
         $this->name = $name;
         $this->type = $type;

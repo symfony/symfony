@@ -21,7 +21,7 @@ use Symfony\Component\Config\Definition\VariableNode;
  *
  * @author Johannes M. Schmitt <schmittjoh@gmail.com>
  */
-class TreeBuilder
+class TreeBuilder implements BuilderInterface
 {
     protected $root;
     protected $tree;

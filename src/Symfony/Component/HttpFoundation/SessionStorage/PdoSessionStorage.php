@@ -23,7 +23,7 @@ class PdoSessionStorage extends NativeSessionStorage
     /**
      * @throws \InvalidArgumentException When "db_table" option is not provided
      */
-    public function __construct(\PDO $db, $options = null)
+    public function __construct(\PDO $db, array $options = array())
     {
         $this->db = $db;
         $options = array_merge(array(

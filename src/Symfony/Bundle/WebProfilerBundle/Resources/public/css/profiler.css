@@ -356,6 +356,14 @@ table th.value
     padding: 0;
 }
 
+.sf-exceptionreset .block_exception_detected .text_exception {
+    width: 520px;
+}
+
+.sf-exceptionreset .block_exception_detected .illustration_exception {
+    display: none;
+}
+
 ul.alt li {
     padding: 5px 7px;
     font-size: 13px;

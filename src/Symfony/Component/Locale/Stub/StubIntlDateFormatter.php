@@ -12,6 +12,7 @@
 namespace Symfony\Component\Locale\Stub;
 
 use Symfony\Component\Locale\Stub\StubLocale;
+use Symfony\Component\Locale\Stub\DateFormat\FullTransformer;
 use Symfony\Component\Locale\Exception\NotImplementedException;
 use Symfony\Component\Locale\Exception\MethodNotImplementedException;
 use Symfony\Component\Locale\Exception\MethodArgumentValueNotImplementedException;
@@ -124,7 +125,7 @@ class StubIntlDateFormatter
         $dateTime->setTimestamp($timestamp);
         $dateTime->setTimezone($this->dateTimeZone);
 
-        $transformer = new DateFormat\FullTransformer($this->getPattern(), $this->getTimeZoneId());
+        $transformer = new FullTransformer($this->getPattern(), $this->getTimeZoneId());
         $formatted = $transformer->format($dateTime);
 
         return $formatted;
@@ -251,7 +252,7 @@ class StubIntlDateFormatter
     public function parse($value, &$position = 0)
     {
         $dateTime = $this->createDateTime(0);
-        $transformer = new DateFormat\FullTransformer($this->getPattern(), $this->getTimeZoneId());
+        $transformer = new FullTransformer($this->getPattern(), $this->getTimeZoneId());
         return $transformer->parse($dateTime, $value);
     }
 

@@ -34,13 +34,13 @@ class EnsureProductionSettingsDoctrineCommand extends EnsureProductionSettingsCo
             ->setName('doctrine:ensure-production-settings')
             ->addOption('em', null, InputOption::VALUE_OPTIONAL, 'The entity manager to use for this command.')
             ->setHelp(<<<EOT
-The <info>doctrine:cache:clear-metadata</info> command clears all metadata cache for the default entity manager:
+The <info>doctrine:ensure-production-settings</info> command ensures that Doctrine is properly configured for a production environment.:
 
-  <info>./app/console doctrine:cache:clear-metadata</info>
+  <info>./app/console doctrine:ensure-production-settings</info>
 
-You can also optionally specify the <comment>--em</comment> option to specify which entity manager to clear the cache for:
+You can also optionally specify the <comment>--em</comment> option to specify which entity manager to use:
 
-  <info>./app/console doctrine:cache:clear-metadata --em=default</info>
+  <info>./app/console doctrine:ensure-production-settings --em=default</info>
 EOT
         );
     }

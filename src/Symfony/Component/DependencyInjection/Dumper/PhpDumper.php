@@ -235,7 +235,6 @@ EOF;
             if ($processed->contains($sDefinition)) {
                 continue;
             }
-            $processed->offsetSet($sDefinition);
 
             $class = $this->dumpValue($sDefinition->getClass());
             if ($nbOccurrences->offsetGet($sDefinition) > 1 || count($sDefinition->getMethodCalls()) > 0 || null !== $sDefinition->getConfigurator() || false !== strpos($class, '$')) {
@@ -428,7 +427,6 @@ EOF;
             if ($processed->contains($iDefinition)) {
                 continue;
             }
-            $processed->offsetSet($iDefinition);
 
             if (!$this->hasReference($id, $iDefinition->getMethodCalls())) {
                 continue;

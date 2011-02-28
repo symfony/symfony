@@ -5,11 +5,14 @@
 {% endblock %}
 
 {% block menu %}
-{% if collector.hasexception %}
-    <span class="count">1</span>
-{% endif %}
-<img style="margin: 0 5px 0 0; vertical-align: middle; width: 32px" width="32" height="32" alt="Exception" src="{{ asset('bundles/webprofiler/images/exception.png') }}" />
-Exception
+<span class="picto png_fix">
+    <strong>Exception</strong>
+    <span class="more_information">
+        {% if collector.hasexception %}
+            <span class="count">1</span>
+        {% endif %}
+    </span>
+</span>
 {% endblock %}
 
 {% block panel %}

@@ -8,9 +8,12 @@
 {% endblock %}
 
 {% block menu %}
-<span class="count">{{ collector.counterrors }}</span>
-<img style="margin: 0 5px 0 0; vertical-align: middle; width: 32px" width="32" height="32" alt="Logs" src="{{ asset('bundles/webprofiler/images/logger.png') }}" />
-Logs
+<span class="picto png_fix">
+    <strong>Logs</strong>
+    <span class="more_information">
+        <span class="count">{{ collector.counterrors }}</span>
+    </span>
+</span>
 {% endblock %}
 
 {% block panel %}

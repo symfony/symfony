@@ -14,8 +14,9 @@
 {% endblock %}
 
 {% block menu %}
-<img style="margin: 0 5px 0 0; vertical-align: middle; width: 32px" width="32" height="32" alt="Request" src="{{ asset('bundles/webprofiler/images/request.png') }}" />
-Request
+<span class="picto png_fix">
+    <strong>Request</strong>
+</span>
 {% endblock %}
 
 {% block panel %}
@@ -24,7 +25,9 @@ Request
     {% if collector.requestquery.all|length %}
         {% include 'WebProfilerBundle:Profiler:bag.html.twig' with { 'bag': collector.requestquery } only %}
     {% else %}
-        <em>No GET parameters</em>
+        <p>
+            <em>No GET parameters</em>
+        </p>
     {% endif %}
 
     <h2>Request POST Parameters</h2>
@@ -32,7 +35,9 @@ Request
     {% if collector.requestrequest.all|length %}
         {% include 'WebProfilerBundle:Profiler:bag.html.twig' with { 'bag': collector.requestrequest } only %}
     {% else %}
-        <em>No POST parameters</em>
+        <p>
+            <em>No POST parameters</em>
+        </p>
     {% endif %}
 
     <h2>Request Attributes</h2>
@@ -40,7 +45,9 @@ Request
     {% if collector.requestattributes.all|length %}
         {% include 'WebProfilerBundle:Profiler:bag.html.twig' with { 'bag': collector.requestattributes } only %}
     {% else %}
-        <em>No attributes</em>
+        <p>
+            <em>No attributes</em>
+        </p>
     {% endif %}
 
     <h2>Request Cookies</h2>
@@ -48,7 +55,9 @@ Request
     {% if collector.requestcookies.all|length %}
         {% include 'WebProfilerBundle:Profiler:bag.html.twig' with { 'bag': collector.requestcookies } only %}
     {% else %}
-        <em>No cookies</em>
+        <p>
+            <em>No cookies</em>
+        </p>
     {% endif %}
 
     <h2>Requests Headers</h2>

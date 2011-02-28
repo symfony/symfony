@@ -1,0 +1,128 @@
+/*
+  Corrige le bug d'affichage de bordure et de
+  décalage du contenu sous IE en mode XP
+*/
+button
+{
+  background-color: transparent;
+}
+
+/**
+* début des styles commun à tous les boutons
+*/
+.shadow_extensible_button,
+.extensible_button,
+.non_extensible_button
+{
+	-webkit-appearance: button-bevel;
+	float: left;
+	text-align: left;
+	display: block;
+	padding: 0;
+	margin: 0;
+	border: 0px solid #000000;
+	text-decoration: none;
+	cursor: pointer;
+	background-color: transparent;
+	white-space: nowrap;
+}
+.shadow_extensible_button:hover,
+.extensible_button:hover,
+.non_extensible_button:hover
+{
+	text-decoration: none;
+}
+
+button span
+{
+  position: relative;
+}
+
+button span span,
+button span span span
+{
+  position: static;
+}
+
+/**
+* fin des styles commun à tous les boutons
+*/
+
+/**
+* début des styles pour le bouton non extensible 01
+*/
+.non_extensible_button_01,
+.non_extensible_button_02
+{
+	display: inline-block;
+	text-align: center;
+	vertical-align: middle;
+	border: 0;
+	background: none;
+}
+
+.non_extensible_button_01 span
+{
+	text-decoration: none;
+	display: block;
+	height: 28px;
+	float: left;
+	padding: 0 0 0 8px;
+	background: transparent url("/bundles/webprofiler/images/profiler/border_l.png") no-repeat top left;
+}
+
+.non_extensible_button_01 span span
+{
+	padding: 0 8px 0 0;
+	background: transparent url("/bundles/webprofiler/images/profiler/border_r.png") right top no-repeat;
+}
+
+.non_extensible_button_01 span span span
+{
+	padding: 0px 7px;
+	font: bold 11px Arial, Helvetica, sans-serif;
+	color: #6b6b6b;
+	line-height: 28px;    /* Alignement vertical du texte */
+	background: transparent url("/bundles/webprofiler/images/profiler/btn_bg.png") repeat-x top left;
+}
+/*
+* fin des styles pour le bouton non extensible 01
+**/
+
+
+/**
+* début des styles pour le bouton non extensible 02
+*/
+
+.non_extensible_button_02
+{
+  float:none;
+}
+
+.non_extensible_button_02 span
+{
+	display: block;
+	height: 38px;
+	float: left;
+	padding: 0 0 0 8px;
+  background: transparent url("/bundles/webprofiler/images/profiler/border_l.png") left top no-repeat;
+}
+
+.non_extensible_button_02 span span
+{
+	padding: 0 8px 0 0;
+	background: transparent url("/bundles/webprofiler/images/profiler/border_r.png") right top no-repeat;
+}
+
+.non_extensible_button_02 span span span
+{
+	padding: 0px 16px;
+	font: bold 12px/38px Arial, Helvetica, sans-serif;
+  text-shadow:1px 1px 1px #415a08;
+  text-decoration:none;
+	color: #FFFFFF;
+	background: transparent url("/bundles/webprofiler/images/profiler/btn_bg.png") repeat-x top left;
+}
+/*
+* fin des styles pour le bouton non extensible 02
+**/

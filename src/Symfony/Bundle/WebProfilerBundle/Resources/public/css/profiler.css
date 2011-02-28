@@ -5,6 +5,7 @@ http://developer.yahoo.com/yui/license.html
 version: 3.1.2
 build: 56
 */
+/*
 html{color:#000;background:#FFF;}body,div,dl,dt,dd,ul,ol,li,h1,h2,h3,h4,h5,h6,pre,code,form,fieldset,legend,input,textarea,p,blockquote,th,td{margin:0;padding:0;}table{border-collapse:collapse;border-spacing:0;}fieldset,img{border:0;}address,caption,cite,code,dfn,em,strong,th,var{font-style:normal;font-weight:normal;}li{list-style:none;}caption,th{text-align:left;}h1,h2,h3,h4,h5,h6{font-size:100%;font-weight:normal;}q:before,q:after{content:'';}abbr,acronym{border:0;font-variant:normal;}sup{vertical-align:text-top;}sub{vertical-align:text-bottom;}input,textarea,select{font-family:inherit;font-size:inherit;font-weight:inherit;}input,textarea,select{*font-size:100%;}legend{color:#000;}
 
 .clearfix:after {
@@ -19,15 +20,115 @@ html{color:#000;background:#FFF;}body,div,dl,dt,dd,ul,ol,li,h1,h2,h3,h4,h5,h6,pr
 * html .clearfix {height: 1%;}
 .clearfix {display: block;}
 
+html, body {
+    margin: 0;
+    min-height: 100%;
+    padding: 0;
+    width: 100%;
+}
+*/
 html {
     background: #fff;
 }
 
 body {
-    font: 11px Verdana, Arial, sans-serif;
-    color: #222;
+    background-color: #efefef;
+    font: 1em "Lucida Sans Unicode","Lucida Grande",Verdana,Arial,Helvetica,sans-serif;
+    text-align: left;
+    color: #000;
 }
 
+h1 {
+    float: left;
+    color: #404040;
+    font-family: Georgia,"Times New Roman",Times,serif;
+    font-size: 100%;
+    font-weight: normal;
+}
+
+#content {
+    font-family: Arial,Helvetica,sans-serif;
+    margin: 0 auto;
+    width: 970px;
+}
+
+#content .clear_fix {
+    display: block;
+}
+
+.header {
+    padding: 30px 30px 20px;
+}
+
+.search {
+    padding-top: 20px;
+    float: right;
+}
+
+.search label {
+    line-height: 28px;
+    vertical-align: middle;
+}
+
+.search input {
+    font-size: 12px;
+    margin-right: 10px;
+    width: 188px;
+    background: url("/bundles/webprofiler/images/profiler/input_bg.gif") repeat-x scroll left top #fff;
+    border: 1px solid #dadada;
+    color: #565656;
+    padding: 5px 6px;
+}
+
+.search button {
+    overflow: visible;
+    width: auto;
+    float: none;
+    background: none repeat scroll 0 0 transparent;
+    border: 0 none;
+    display: inline-block;
+    text-align: center;
+    vertical-align: middle;
+    cursor: pointer;
+    margin: 0;
+    padding: 0;
+    text-decoration: none;
+    white-space: nowrap;
+}
+
+.search button span {
+    position: relative;
+    background: url("/bundles/webprofiler/images/profiler/border_l.png") no-repeat scroll left top transparent;
+    display: block;
+    float: left;
+    height: 28px;
+    padding: 0 0 0 8px;
+    text-decoration: none;
+}
+
+.search button span span {
+    background: url("/bundles/webprofiler/images/profiler/border_r.png") no-repeat scroll right top transparent;
+    padding: 0 8px 0 0;
+}
+
+.search button span span span {
+    background: url("/bundles/webprofiler/images/profiler/btn_bg.png") repeat-x scroll left top transparent;
+    color: #6B6B6B;
+    font: bold 11px/28px Arial,Helvetica,sans-serif;
+    padding: 0 7px;
+}
+
+.resume {
+    margin: 0;
+    background-color: #f6f6f6;
+    border: 1px solid #dfdfdf;
+    padding: 16px 28px;
+    -moz-border-radius: 16px 16px 16px 16px;
+    border-radius:16px;
+    margin-bottom: 20px;
+}
+
+/*
 strong {
     font-weight: bold;
 }
@@ -69,6 +170,12 @@ h3 {
 
 img {
     vertical-align: middle;
+}
+
+#content
+{
+    width:970px;
+    margin:0 auto;
 }
 
 .header {
@@ -203,3 +310,4 @@ td.main, td.menu {
     border: 0;
     vertical-align: top;
 }
+*/

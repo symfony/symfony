@@ -1,0 +1,17 @@
+.header
+{
+	padding:30px 30px 20px 30px;
+}
+
+/* -- Debut Profiler -- */
+.symfony_profiler .header h1,
+.header_logo
+{
+	float:left;
+}
+.box_search
+{
+	float:right;
+}
+
+/* -- FIN Profiler -- */

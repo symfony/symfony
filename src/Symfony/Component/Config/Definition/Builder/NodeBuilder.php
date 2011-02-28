@@ -149,7 +149,7 @@ class NodeBuilder
     }
 
     /**
-     * Creates a child boolean node.
+     * Creates a child Boolean node.
      *
      * @param string $name The name of the node
      *
@@ -349,7 +349,7 @@ class NodeBuilder
     }
 
     /**
-     * Sets an attribute to use as key.
+     * Set the attribute which value is to be used as key.
      *
      * This is useful when you have an indexed array that should be an
      * associative array. You can select an item from within the array
@@ -363,7 +363,7 @@ class NodeBuilder
      * becomes
      *
      *     array(
-     *         'id' => array('foo' => 'bar'),
+     *         'my_name' => array('foo' => 'bar'),
      *     )
      *
      * If you'd like "'id' => 'my_name'" to still be present in the resulting
@@ -399,7 +399,7 @@ class NodeBuilder
     /**
      * Sets whether the node can be overwritten.
      *
-     * @param boolean $deny Whether the overwriting is forbidden or not
+     * @param Boolean $deny Whether the overwriting is forbidden or not
      *
      * @return Symfony\Component\Config\Definition\Builder\NodeBuilder
      */
@@ -425,7 +425,7 @@ class NodeBuilder
     /**
      * Sets whether the node can be unset.
      *
-     * @param boolean $allow
+     * @param Boolean $allow
      *
      * @return Symfony\Component\Config\Definition\Builder\NodeBuilder
      */

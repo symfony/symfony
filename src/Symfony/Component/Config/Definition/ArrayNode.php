@@ -61,7 +61,6 @@ class ArrayNode extends BaseNode implements PrototypeNodeInterface
      * Sets the xml remappings that should be performed.
      *
      * @param array $remappings an array of the form array(array(string, string))
-     * @return void
      */
     public function setXmlRemappings(array $remappings)
     {
@@ -73,7 +72,6 @@ class ArrayNode extends BaseNode implements PrototypeNodeInterface
      * contain. By default this is zero, meaning no elements.
      *
      * @param integer $number
-     * @return void
      */
     public function setMinNumberOfElements($number)
     {
@@ -99,7 +97,6 @@ class ArrayNode extends BaseNode implements PrototypeNodeInterface
      *
      * @param string $attribute The name of the attribute which value is to be used as a key
      * @param Boolean $remove Whether or not to remove the key
-     * @return void
      */
     public function setKeyAttribute($attribute, $remove = true)
     {
@@ -112,7 +109,6 @@ class ArrayNode extends BaseNode implements PrototypeNodeInterface
      * defined in any of the configuration files.
      *
      * @param Boolean $boolean
-     * @return void
      */
     public function setAddIfNotSet($boolean)
     {
@@ -124,7 +120,6 @@ class ArrayNode extends BaseNode implements PrototypeNodeInterface
      * be unset.
      *
      * @param Boolean $allow
-     * @return void
      */
     public function setAllowFalse($allow)
     {
@@ -135,7 +130,6 @@ class ArrayNode extends BaseNode implements PrototypeNodeInterface
      * Sets whether new keys can be defined in subsequent configurations.
      *
      * @param Boolean $allow
-     * @return void
      */
     public function setAllowNewKeys($allow)
     {

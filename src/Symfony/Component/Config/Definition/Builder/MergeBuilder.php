@@ -37,7 +37,7 @@ class MergeBuilder
     /**
      * Sets whether the node can be unset.
      *
-     * @param boolean $allow
+     * @param Boolean $allow
      * @return Symfony\Component\Config\Definition\Builder\MergeBuilder
      */
     public function allowUnset($allow = true)
@@ -50,7 +50,7 @@ class MergeBuilder
     /**
      * Sets whether the node can be overwritten.
      *
-     * @param boolean $deny Whether the overwriting is forbidden or not
+     * @param Boolean $deny Whether the overwriting is forbidden or not
      *
      * @return Symfony\Component\Config\Definition\Builder\MergeBuilder
      */

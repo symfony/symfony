@@ -25,7 +25,7 @@ class Processor
      *
      * @param NodeInterface $configTree The node tree to process
      * @param array $configs An array of configuration items
-     * @return boolean
+     * @return Boolean
      */
     public function process(NodeInterface $configTree, array $configs)
     {

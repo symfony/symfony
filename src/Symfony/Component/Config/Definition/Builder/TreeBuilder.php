@@ -80,7 +80,7 @@ class TreeBuilder
     }
 
     /**
-     * Creates a boolean node.
+     * Creates a Boolean node.
      *
      * @param NodeBuilder $node The builder of the node
      *

@@ -530,7 +530,10 @@ class StubIntlDateFormatterTest extends LocaleTestCase
             array('y-M-d HH:mm:ss zzzz', '1970-1-1 00:00:00 GMT+04:00', -14400),
 
             // a previous timezoned parsing should not change the timezone for the next parsing
-            array('y-M-d HH:mm:ss', '1970-1-1 00:00:00', 0)
+            array('y-M-d HH:mm:ss', '1970-1-1 00:00:00', 0),
+
+            // regExp metachars in the pattern string
+            array('y[M-d', '1970[1-1', 0),
         );
     }
 

@@ -113,7 +113,7 @@ class FullTransformer
                 $captureName = str_repeat($transformerIndex, $length);
                 return "(?P<$captureName>" . $transformer->getReverseMatchingRegExp($length) . ')';
             }
-        }, $pattern);
+        }, preg_quote($pattern, '/'));
 
         return $reverseMatchingRegExp;
     }

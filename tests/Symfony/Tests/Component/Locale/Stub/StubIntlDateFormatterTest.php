@@ -57,11 +57,11 @@ class StubIntlDateFormatterTest extends LocaleTestCase
         $formatData = array(
             /* general */
             array('y-M-d', 0, '1970-1-1'),
-            array("yyyy.MM.dd G 'at' HH:mm:ss zzz", 0, '1970.01.01 AD at 00:00:00 GMT+00:00'),
+            array("yyyy.MM.dd 'at' HH:mm:ss zzz", 0, '1970.01.01 at 00:00:00 GMT+00:00'),
             array("EEE, MMM d, ''yy", 0, "Thu, Jan 1, '70"),
             array('h:mm a', 0, '12:00 AM'),
             array('K:mm a, z', 0, '0:00 AM, GMT+00:00'),
-            array('yyyyy.MMMM.dd GGG hh:mm aaa', 0, '01970.January.01 AD 12:00 AM'),
+            array('yyyyy.MMMM.dd hh:mm aaa', 0, '01970.January.01 12:00 AM'),
 
             /* escaping */
             array("'M'", 0, 'M'),
@@ -98,9 +98,6 @@ class StubIntlDateFormatterTest extends LocaleTestCase
             array('d', 0, '1'),
             array('dd', 0, '01'),
             array('ddd', 0, '001'),
-
-            /* era */
-            array('G', 0, 'AD'),
 
             /* quarter */
             array('Q', 0, '1'),
@@ -232,14 +229,6 @@ class StubIntlDateFormatterTest extends LocaleTestCase
             array('zzzz', 0, 'GMT+00:00'),
             array('zzzzz', 0, 'GMT+00:00'),
         );
-
-        // BC era has huge negative unix timestamp
-        // so testing it requires 64bit
-        if ($this->is64Bit()) {
-            $formatData = array_merge($formatData, array(
-                array('G', -62167222800, 'BC'),
-            ));
-        }
 
         return $formatData;
     }

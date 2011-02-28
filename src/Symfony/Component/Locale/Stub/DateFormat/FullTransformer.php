@@ -22,8 +22,8 @@ use Symfony\Component\Locale\Stub\DateFormat\MonthTransformer;
 class FullTransformer
 {
     private $quoteMatch = "'(?:[^']+|'')*'";
-    private $implementedChars = 'MLydGQqhDEaHkKmsz';
-    private $notImplementedChars = 'YuwWFgecSAZvVW';
+    private $implementedChars = 'MLydQqhDEaHkKmsz';
+    private $notImplementedChars = 'GYuwWFgecSAZvVW';
     private $regExp;
 
     private $transformers;
@@ -44,7 +44,6 @@ class FullTransformer
             'L' => new MonthTransformer(),
             'y' => new YearTransformer(),
             'd' => new DayTransformer(),
-            'G' => new EraTransformer(),
             'q' => new QuarterTransformer(),
             'Q' => new QuarterTransformer(),
             'h' => new Hour1201Transformer(),

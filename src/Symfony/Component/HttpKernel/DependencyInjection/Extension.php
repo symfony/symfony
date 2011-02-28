@@ -2,7 +2,7 @@
 
 namespace Symfony\Component\HttpKernel\DependencyInjection;
 
-use Symfony\Component\DependencyInjection\Extension\Extension as BaseExtension;
+use Symfony\Component\DependencyInjection\Extension\ExtensionInterface;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\DependencyInjection\Container;
 
@@ -20,7 +20,7 @@ use Symfony\Component\DependencyInjection\Container;
  *
  * @author Fabien Potencier <fabien.potencier@symfony-project.com>
  */
-abstract class Extension extends BaseExtension
+abstract class Extension implements ExtensionInterface
 {
     protected $classes = array();
     protected $classMap = array();

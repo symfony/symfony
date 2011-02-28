@@ -110,12 +110,16 @@ class StubIntlDateFormatter
     /**
      * Format the date/time value (timestamp) as a string
      *
-     * @param  int         $timestamp   Unix timestamp to format
+     * @param  mixed         $timestamp   Unix timestamp to format
      * @return string                   The formatted value
      * @throws NotImplementedException  If one of the formatting characters is not implemented
      */
     public function format($timestamp)
     {
+        if (!is_int($timestamp)) {
+            throw new MethodArgumentValueNotImplementedException(__METHOD__, 'timestamp', $timestamp, 'Only the integer unix timestamps are supported');
+        }
+
         $dateTime = $this->createDateTime($timestamp);
         $dateTime->setTimestamp($timestamp);
         $dateTime->setTimezone($this->dateTimeZone);

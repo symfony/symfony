@@ -303,6 +303,15 @@ class StubIntlDateFormatterTest extends LocaleTestCase
     }
 
     /**
+     * @expectedException Symfony\Component\Locale\Exception\NotImplementedException
+     */
+    public function testFormatWithNonIntegerTimestamp()
+    {
+        $formatter = $this->createStubFormatter();
+        $formatter->format(array());
+    }
+
+    /**
     * @dataProvider dateAndTimeTypeProvider
     */
     public function testDateAndTimeTypeStub($timestamp, $datetype, $timetype, $expected)

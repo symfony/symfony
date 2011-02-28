@@ -66,6 +66,10 @@
 {
   background:transparent url("/bundles/webprofiler/images/profiler/db.png") no-repeat 22px 14px;
 }
+.menu_profiler .security .picto
+{
+  background:transparent url("/bundles/webprofiler/images/profiler/security.png") no-repeat 22px 14px;
+}
 .more_information
 {
   float:right;

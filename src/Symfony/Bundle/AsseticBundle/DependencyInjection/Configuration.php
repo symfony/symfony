@@ -47,15 +47,14 @@ class Configuration
                 ->beforeNormalization()
                     ->ifTrue(function($v){ return !is_array($v); })
                     ->then(function($v){ return array($v); })
-                    ->end()
+                ->end()
                 ->prototype('scalar')
                     ->beforeNormalization()
                         ->ifTrue(function($v) { return is_array($v) && isset($v['name']); })
                         ->then(function($v){ return $v['name']; })
-                        ->end()
                     ->end()
                 ->end()
-        ;
+            ->end();
 
         return $tree->buildTree();
     }

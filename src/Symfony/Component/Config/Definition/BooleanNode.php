@@ -20,8 +20,6 @@ class BooleanNode extends ScalarNode
      */
     protected function validateType($value)
     {
-        parent::validateType($value);
-
         if (!is_bool($value)) {
             throw new InvalidTypeException(sprintf(
                 'Invalid type for path "%s". Expected boolean, but got %s.',

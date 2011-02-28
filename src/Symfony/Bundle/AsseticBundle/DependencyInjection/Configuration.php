@@ -37,7 +37,8 @@ class Configuration
         $rootNode
             ->booleanNode('debug')->defaultValue($kernelDebug)->end()
             ->booleanNode('use_controller')->defaultValue($kernelDebug)->end()
-            ->scalarNode('document_root')->defaultValue('%kernel.root_dir%/../web')->end()
+            ->scalarNode('read_from')->defaultValue('%kernel.root_dir%/../web')->end()
+            ->scalarNode('write_to')->defaultValue('%assetic.read_from%')->end()
             ->scalarNode('closure')->end()
             ->scalarNode('yui')->end()
             ->scalarNode('default_javascripts_output')->defaultValue('js/*.js')->end()

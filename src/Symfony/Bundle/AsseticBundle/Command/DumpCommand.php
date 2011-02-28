@@ -18,6 +18,7 @@ use Symfony\Component\Console\Input\InputArgument;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Output\OutputInterface;
+use Symfony\Component\EventDispatcher\Event;
 
 /**
  * Dumps assets to the filesystem.
@@ -31,25 +32,28 @@ class DumpCommand extends Command
         $this
             ->setName('assetic:dump')
             ->setDescription('Dumps all assets to the filesystem')
-            ->addArgument('base_dir', InputArgument::OPTIONAL, 'The base directory')
+            ->addArgument('write_to', InputArgument::OPTIONAL, 'Override the configured asset root')
             ->addOption('watch', null, InputOption::VALUE_NONE, 'Check for changes every second')
         ;
     }
 
     protected function execute(InputInterface $input, OutputInterface $output)
     {
-        if (!$baseDir = $input->getArgument('base_dir')) {
-            $baseDir = $this->container->getParameter('assetic.document_root');
+        if (!$basePath = $input->getArgument('write_to')) {
+            $basePath = $this->container->getParameter('assetic.write_to');
         }
 
         $am = $this->container->get('assetic.asset_manager');
 
+        // notify an event so custom stream wrappers can be registered lazily
+        $this->container->get('event_dispatcher')->notify(new Event(null, 'assetic.write', array('path' => $basePath)));
+
         if ($input->getOption('watch')) {
-            return $this->watch($am, $baseDir, $output, $this->container->getParameter('kernel.debug'));
+            return $this->watch($am, $basePath, $output, $this->container->getParameter('kernel.debug'));
         }
 
         foreach ($am->getNames() as $name) {
-            $this->dumpAsset($am->get($name), $baseDir, $output);
+            $this->dumpAsset($am->get($name), $basePath, $output);
         }
     }
 
@@ -60,17 +64,17 @@ class DumpCommand extends Command
      * manager for changes.
      *
      * @param LazyAssetManager $am      The asset manager
-     * @param string           $baseDir The base directory to write to
+     * @param string           $basePath The base directory to write to
      * @param OutputInterface  $output  The command output
      * @param Boolean          $debug   Debug mode
      */
-    protected function watch(LazyAssetManager $am, $baseDir, OutputInterface $output, $debug = false)
+    protected function watch(LazyAssetManager $am, $basePath, OutputInterface $output, $debug = false)
     {
         $refl = new \ReflectionClass('Assetic\\AssetManager');
         $prop = $refl->getProperty('assets');
         $prop->setAccessible(true);
 
-        $cache = sys_get_temp_dir().'/assetic_watch_'.substr(sha1($baseDir), 0, 7);
+        $cache = sys_get_temp_dir().'/assetic_watch_'.substr(sha1($basePath), 0, 7);
         if (file_exists($cache)) {
             $previously = unserialize(file_get_contents($cache));
         } else {
@@ -82,7 +86,7 @@ class DumpCommand extends Command
             try {
                 foreach ($am->getNames() as $name) {
                     if ($asset = $this->checkAsset($am, $name, $previously)) {
-                        $this->dumpAsset($asset, $baseDir, $output);
+                        $this->dumpAsset($asset, $basePath, $output);
                     }
                 }
 
@@ -135,14 +139,14 @@ class DumpCommand extends Command
      * Writes an asset.
      *
      * @param AssetInterface  $asset   An asset
-     * @param string          $baseDir The base directory to write to
+     * @param string          $basePath The base directory to write to
      * @param OutputInterface $output  The command output
      *
      * @throws RuntimeException If there is a problem writing the asset
      */
-    protected function dumpAsset(AssetInterface $asset, $baseDir, OutputInterface $output)
+    protected function dumpAsset(AssetInterface $asset, $basePath, OutputInterface $output)
     {
-        $target = rtrim($baseDir, '/') . '/' . $asset->getTargetUrl();
+        $target = rtrim($basePath, '/') . '/' . $asset->getTargetUrl();
         if (!is_dir($dir = dirname($target))) {
             $output->writeln('<info>[dir+]</info> '.$dir);
             if (false === @mkdir($dir)) {

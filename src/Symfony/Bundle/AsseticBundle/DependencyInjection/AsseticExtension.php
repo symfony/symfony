@@ -37,7 +37,8 @@ class AsseticExtension extends Extension
      *     <assetic:config
      *         debug="true"
      *         use-controller="true"
-     *         document-root="/path/to/document/root"
+     *         read-from="/path/to/web"
+     *         write-to="s3://mybucket"
      *         closure="/path/to/google_closure/compiler.jar"
      *         yui="/path/to/yuicompressor.jar"
      *         default-javascripts-output="js/build/*.js"
@@ -49,7 +50,8 @@ class AsseticExtension extends Extension
      *     assetic:
      *         debug: true
      *         use_controller: true
-     *         document_root: /path/to/document/root
+     *         read_from: /path/to/web
+     *         write_to: s3://mybucket
      *         closure: /path/to/google_closure/compiler.jar
      *         yui: /path/to/yuicompressor.jar
      *         default_javascripts_output: js/build/*.js
@@ -71,7 +73,8 @@ class AsseticExtension extends Extension
 
         $container->setParameter('assetic.debug', $config['debug']);
         $container->setParameter('assetic.use_controller', $config['use_controller']);
-        $container->setParameter('assetic.document_root', $config['document_root']);
+        $container->setParameter('assetic.read_from', $config['read_from']);
+        $container->setParameter('assetic.write_to', $config['write_to']);
         $container->setParameter('assetic.default_javascripts_output', $config['default_javascripts_output']);
         $container->setParameter('assetic.default_stylesheets_output', $config['default_stylesheets_output']);
 

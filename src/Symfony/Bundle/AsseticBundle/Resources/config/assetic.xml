@@ -45,7 +45,7 @@
         </service>
         <service id="assetic.asset_factory" class="%assetic.asset_factory.class%" public="false">
             <argument type="service" id="kernel" />
-            <argument>%assetic.document_root%</argument>
+            <argument>%assetic.read_from%</argument>
             <argument>%assetic.debug%</argument>
             <call method="setFilterManager"><argument type="service" id="assetic.filter_manager" /></call>
         </service>
@@ -56,7 +56,7 @@
         </service>
         <service id="assetic.filter.less" class="%assetic.filter.less.class%">
             <tag name="assetic.filter" alias="less" />
-            <argument>%assetic.document_root%</argument>
+            <argument>%assetic.read_from%</argument>
             <argument>%assetic.node_bin%</argument>
             <argument>%assetic.node_paths%</argument>
         </service>
@@ -73,7 +73,7 @@
         </service>
         <service id="assetic.filter.sprockets" class="%assetic.filter.sprockets.class%">
             <tag name="assetic.filter" alias="sprockets" />
-            <argument>%assetic.document_root%</argument>
+            <argument>%assetic.read_from%</argument>
             <argument>%assetic.sprocketize_bin%</argument>
         </service>
         <service id="assetic.filter.coffee" class="%assetic.filter.coffee.class%">
@@ -83,7 +83,7 @@
         </service>
         <service id="assetic.filter.stylus" class="%assetic.filter.stylus.class%">
             <tag name="assetic.filter" alias="stylus" />
-            <argument>%assetic.document_root%</argument>
+            <argument>%assetic.read_from%</argument>
             <argument>%assetic.node_bin%</argument>
             <argument>%assetic.node_paths%</argument>
         </service>

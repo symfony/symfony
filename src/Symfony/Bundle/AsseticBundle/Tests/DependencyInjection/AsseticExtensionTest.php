@@ -93,25 +93,6 @@ class AsseticExtensionTest extends \PHPUnit_Framework_TestCase
     }
 
     /**
-     * @dataProvider getDocumentRootKeys
-     */
-    public function testDocumentRoot($key)
-    {
-        $extension = new AsseticExtension();
-        $extension->load(array(array($key => '/path/to/web')), $this->container);
-
-        $this->assertEquals('/path/to/web', $this->container->getParameter('assetic.document_root'), '"'.$key.'" sets document root');
-    }
-
-    public function getDocumentRootKeys()
-    {
-        return array(
-            array('document_root'),
-            array('document-root'),
-        );
-    }
-
-    /**
      * @dataProvider getUseControllerKeys
      */
     public function testUseController($bool, $includes, $omits)

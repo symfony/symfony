@@ -9,7 +9,8 @@
         <xsd:complexType name="config">
             <xsd:attribute name="debug" type="xsd:string" />
             <xsd:attribute name="use-controller" type="xsd:string" />
-            <xsd:attribute name="document-root" type="xsd:string" />
+            <xsd:attribute name="read-from" type="xsd:string" />
+            <xsd:attribute name="write-to" type="xsd:string" />
             <xsd:attribute name="closure" type="xsd:string" />
             <xsd:attribute name="yui" type="xsd:string" />
             <xsd:attribute name="default-javascripts-output" type="xsd:string" />

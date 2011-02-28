@@ -29,8 +29,8 @@ class StubIntlDateFormatterTest extends LocaleTestCase
 
     public function testConstructor()
     {
-        $formatter = new StubIntlDateFormatter('en', StubIntlDateFormatter::MEDIUM, StubIntlDateFormatter::SHORT, 'UTC', StubIntlDateFormatter::GREGORIAN, 'Y-M-d');
-        $this->assertEquals('Y-M-d', $formatter->getPattern());
+        $formatter = new StubIntlDateFormatter('en', StubIntlDateFormatter::MEDIUM, StubIntlDateFormatter::SHORT, 'UTC', StubIntlDateFormatter::GREGORIAN, 'y-M-d');
+        $this->assertEquals('y-M-d', $formatter->getPattern());
     }
 
     /**

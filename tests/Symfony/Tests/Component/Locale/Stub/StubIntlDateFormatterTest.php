@@ -532,6 +532,7 @@ class StubIntlDateFormatterTest extends LocaleTestCase
 
             // regExp metachars in the pattern string
             array('y[M-d', '1970[1-1', 0),
+            array('y[M/d', '1970[1/1', 0),
         );
     }
 

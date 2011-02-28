@@ -101,6 +101,8 @@ class FullTransformer
     {
         $that = $this;
 
+        $escapedPattern = preg_quote($pattern, '/');
+
         $reverseMatchingRegExp = preg_replace_callback($this->regExp, function($matches) use ($that) {
             $length = strlen($matches[0]);
             $transformerIndex = $matches[0][0];
@@ -112,7 +114,7 @@ class FullTransformer
                 $captureName = str_repeat($transformerIndex, $length);
                 return "(?P<$captureName>" . $transformer->getReverseMatchingRegExp($length) . ')';
             }
-        }, preg_quote($pattern, '/'));
+        }, $escapedPattern);
 
         return $reverseMatchingRegExp;
     }

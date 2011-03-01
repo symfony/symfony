@@ -54,7 +54,7 @@ class AssetManagerPass implements CompilerPassInterface
         foreach ($container->findTaggedServiceIds('assetic.formula_resource') as $id => $attributes) {
             foreach ($attributes as $attr) {
                 if (isset($attr['loader'])) {
-                    $am->addMethodCall('addResource', array($attr['loader'], new Reference($id)));
+                    $am->addMethodCall('addResource', array(new Reference($id), $attr['loader']));
                 }
             }
         }

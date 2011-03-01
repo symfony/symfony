@@ -192,7 +192,7 @@ class StubNumberFormatterTest extends LocaleTestCase
         // the 4.2 release is from 2009-05-08 and the 4.4 from 2010-03-17. It's ugly we want to compare if the
         // stub implementation is behaving like the intl one
         // http://bugs.icu-project.org/trac/changeset/27776/icu/trunk/source/data/curr/en.txt
-        $chf = $this->isLowerThanIcuVersion('4.4') ? 'Fr.' : 'CHF';
+        $chf = $this->isIntlExtensionLoaded() && $this->isLowerThanIcuVersion('4.4') ? 'Fr.' : 'CHF';
 
         return array(
             array(100, 'CHF', $chf, '%s100.00'),

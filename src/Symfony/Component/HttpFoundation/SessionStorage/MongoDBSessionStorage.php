@@ -33,7 +33,7 @@ class MongoDBSessionStorage extends NativeSessionStorage
             'time_field' => 'sess_time',
         ), $options);
 
-        if (!array_key_exists('collection', $options)) {
+        if (!isset($options['collection'])) {
             throw new \InvalidArgumentException('You must provide the "collection" option for a MongoDBSessionStorage.');
         }
 

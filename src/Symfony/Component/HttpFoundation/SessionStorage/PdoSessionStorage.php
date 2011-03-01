@@ -32,7 +32,7 @@ class PdoSessionStorage extends NativeSessionStorage
             'db_time_col' => 'sess_time',
         ), $options);
 
-        if (!array_key_exists('db_table', $options)) {
+        if (!isset($options['db_table'])) {
             throw new \InvalidArgumentException('You must provide the "db_table" option for a PdoSessionStorage.');
         }
 

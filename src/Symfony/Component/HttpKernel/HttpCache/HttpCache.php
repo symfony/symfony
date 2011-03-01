@@ -340,7 +340,7 @@ class HttpCache implements HttpKernelInterface
     /**
      * Forwards the Request to the backend and determines whether the response should be stored.
      *
-     * This methods is trigered when the cache missed or a reload is required.
+     * This methods is triggered when the cache missed or a reload is required.
      *
      * @param Request  $request A Request instance
      * @param Boolean  $catch   whether to process exceptions

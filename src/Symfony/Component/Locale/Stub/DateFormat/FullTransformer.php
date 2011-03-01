@@ -120,6 +120,37 @@ class FullTransformer
     }
 
     /**
+     * Parse a pattern based string to a timestamp value
+     *
+     * @param  DateTime  $dateTime       A configured DateTime object to use to perform the date calculation
+     * @param  string    $value          String to convert to a time value
+     * @return int                       The corresponding Unix timestamp
+     * @throws InvalidArgumentException  When the value can not be matched with pattern
+     */
+    public function parse(\DateTime $dateTime, $value)
+    {
+        $reverseMatchingRegExp = $this->getReverseMatchingRegExp($this->pattern);
+        $reverseMatchingRegExp = '/^'.$reverseMatchingRegExp.'$/';
+
+        $options = array();
+
+        if (preg_match($reverseMatchingRegExp, $value, $matches)) {
+            $matches = $this->normalizeArray($matches);
+
+            foreach ($this->transformers as $char => $transformer) {
+                if (isset($matches[$char])) {
+                    $length = strlen($matches[$char]['pattern']);
+                    $options = array_merge($options, $transformer->extractDateOptions($matches[$char]['value'], $length));
+                }
+            }
+
+            return $this->calculateUnixTimestamp($dateTime, $options);
+        }
+
+        throw new \InvalidArgumentException(sprintf("Failed to match value '%s' with pattern '%s'", $value, $this->pattern));
+    }
+
+    /**
      * Retrieve a regular expression to match with a formatted value.
      *
      * @param  string  $pattern  The pattern to create the reverse matching regular expression
@@ -154,34 +185,28 @@ class FullTransformer
     }
 
     /**
-     * Parse a pattern based string to a timestamp value
+     * Check if the first char of a string is a single quote
      *
-     * @param  DateTime  $dateTime       A configured DateTime object to use to perform the date calculation
-     * @param  string    $value          String to convert to a time value
-     * @return int                       The corresponding Unix timestamp
-     * @throws InvalidArgumentException  When the value can not be matched with pattern
+     * @param  string  $quoteMatch  The string to check
+     * @return bool                 true if matches, false otherwise
      */
-    public function parse(\DateTime $dateTime, $value)
+    public function isQuoteMatch($quoteMatch)
     {
-        $reverseMatchingRegExp = $this->getReverseMatchingRegExp($this->pattern);
-        $reverseMatchingRegExp = '/^'.$reverseMatchingRegExp.'$/';
+        return ("'" === $quoteMatch[0]);
+    }
 
-        $options = array();
-
-        if (preg_match($reverseMatchingRegExp, $value, $matches)) {
-            $matches = $this->normalizeArray($matches);
-
-            foreach ($this->transformers as $char => $transformer) {
-                if (isset($matches[$char])) {
-                    $length = strlen($matches[$char]['pattern']);
-                    $options = array_merge($options, $transformer->extractDateOptions($matches[$char]['value'], $length));
-                }
-            }
-
-            return $this->calculateUnixTimestamp($dateTime, $options);
+    /**
+     * Replaces single quotes at the start or end of a string with two single quotes
+     *
+     * @param  string  $quoteMatch  The string to replace the quotes
+     * @return string               A string with the single quotes replaced
+     */
+    public function replaceQuoteMatch($quoteMatch)
+    {
+        if (preg_match("/^'+$/", $quoteMatch)) {
+            return str_replace("''", "'", $quoteMatch);
         }
-
-        throw new \InvalidArgumentException(sprintf("Failed to match value '%s' with pattern '%s'", $value, $this->pattern));
+        return str_replace("''", "'", substr($quoteMatch, 1, -1));
     }
 
     /**
@@ -227,31 +252,6 @@ class FullTransformer
     }
 
     /**
-     * Check if the first char of a string is a single quote
-     *
-     * @param  string  $quoteMatch  The string to check
-     * @return bool                 true if matches, false otherwise
-     */
-    public function isQuoteMatch($quoteMatch)
-    {
-        return ("'" === $quoteMatch[0]);
-    }
-
-    /**
-     * Replaces single quotes at the start or end of a string with two single quotes
-     *
-     * @param  string  $quoteMatch  The string to replace the quotes
-     * @return string               A string with the single quotes replaced
-     */
-    public function replaceQuoteMatch($quoteMatch)
-    {
-        if (preg_match("/^'+$/", $quoteMatch)) {
-            return str_replace("''", "'", $quoteMatch);
-        }
-        return str_replace("''", "'", substr($quoteMatch, 1, -1));
-    }
-
-    /**
      * Calculates the Unix timestamp based on the matched values by the reverse matching regular
      * expression of parse()
      *
@@ -259,19 +259,19 @@ class FullTransformer
      * @param  array     $options   An array with the matched values to be used to calculate the timestamp
      * @return bool|int             The calculated timestamp or false if matched date is invalid
      */
-    private function calculateUnixTimestamp(\DateTime $dateTime, array $options)
+    protected function calculateUnixTimestamp(\DateTime $dateTime, array $options)
     {
         $datetime = $this->extractDateTime($options);
 
-        $year     = $datetime['year'];
-        $month    = $datetime['month'];
-        $day      = $datetime['day'];
-        $hour     = $datetime['hour'];
-        $minute   = $datetime['minute'];
-        $second   = $datetime['second'];
-        $marker   = $datetime['marker'];
+        $year         = $datetime['year'];
+        $month        = $datetime['month'];
+        $day          = $datetime['day'];
+        $hour         = $datetime['hour'];
         $hourInstance = $datetime['hourInstance'];
-        $timezone = $datetime['timezone'];
+        $minute       = $datetime['minute'];
+        $second       = $datetime['second'];
+        $marker       = $datetime['marker'];
+        $timezone     = $datetime['timezone'];
 
         // If month is false, return immediately (intl behavior)
         if (false === $month) {
@@ -304,15 +304,15 @@ class FullTransformer
     private function extractDateTime(array $datetime)
     {
         return array(
-            'year'     => isset($datetime['year']) ? $datetime['year'] : 1970,
-            'month'    => isset($datetime['month']) ? $datetime['month'] : 1,
-            'day'      => isset($datetime['day']) ? $datetime['day'] : 1,
-            'hour'     => isset($datetime['hour']) ? $datetime['hour'] : 0,
-            'minute'   => isset($datetime['minute']) ? $datetime['minute'] : 0,
-            'second'   => isset($datetime['second']) ? $datetime['second'] : 0,
-            'marker'   => isset($datetime['marker']) ? $datetime['marker'] : null,
+            'year'         => isset($datetime['year']) ? $datetime['year'] : 1970,
+            'month'        => isset($datetime['month']) ? $datetime['month'] : 1,
+            'day'          => isset($datetime['day']) ? $datetime['day'] : 1,
+            'hour'         => isset($datetime['hour']) ? $datetime['hour'] : 0,
             'hourInstance' => isset($datetime['hourInstance']) ? $datetime['hourInstance'] : null,
-            'timezone' => isset($datetime['timezone']) ? $datetime['timezone'] : null,
+            'minute'       => isset($datetime['minute']) ? $datetime['minute'] : 0,
+            'second'       => isset($datetime['second']) ? $datetime['second'] : 0,
+            'marker'       => isset($datetime['marker']) ? $datetime['marker'] : null,
+            'timezone'     => isset($datetime['timezone']) ? $datetime['timezone'] : null,
         );
     }
 }

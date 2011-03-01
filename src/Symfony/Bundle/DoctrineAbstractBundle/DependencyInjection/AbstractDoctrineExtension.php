@@ -187,7 +187,7 @@ abstract class AbstractDoctrineExtension extends Extension
     }
 
     /**
-     * Register all the collected mapping information with the object manager by registering the appropiate mapping drivers.
+     * Register all the collected mapping information with the object manager by registering the appropriate mapping drivers.
      *
      * @param array $objectManager
      * @param Container $container

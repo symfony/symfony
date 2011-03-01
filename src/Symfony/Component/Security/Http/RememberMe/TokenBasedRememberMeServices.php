@@ -117,13 +117,15 @@ class TokenBasedRememberMeServices extends RememberMeServices
     }
 
     /**
-     * Generates the cookie value
+     * Generates the cookie value.
      *
-     * @param strign $class
-     * @param string $username The username
-     * @param integer $expires The unixtime when the cookie expires
-     * @param string $password The encoded password
+     * @param string  $class
+     * @param string  $username The username
+     * @param integer $expires  The unixtime when the cookie expires
+     * @param string  $password The encoded password
+     *
      * @throws \RuntimeException if username contains invalid chars
+     *
      * @return string
      */
     protected function generateCookieValue($class, $username, $expires, $password)

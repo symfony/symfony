@@ -274,7 +274,7 @@ class FrameworkExtension extends Extension
         $container->setAlias('session.storage', 'session.storage.'.$config['storage_id']);
 
         $options = $container->getParameter('session.storage.'.$config['storage_id'].'.options');
-        foreach (array('name', 'lifetime', 'path', 'domain', 'secure', 'httponly', 'db_table', 'db_id_col', 'db_data_col', 'db_time_col') as $key) {
+        foreach (array('name', 'lifetime', 'path', 'domain', 'secure', 'httponly', 'db_table', 'db_id_col', 'db_data_col', 'db_time_col', 'collection', 'id_field', 'data_field', 'time_field') as $key) {
             if (isset($config[$key])) {
                 $options[$key] = $config[$key];
             }

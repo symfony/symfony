@@ -105,13 +105,18 @@ class Configuration
         $rootNode
             ->arrayNode('session')
                 ->canBeUnset()
-                // Strip "pdo." prefix from option keys, since dots cannot appear in node names
+                // Strip "pdo." and "mongodb." prefix from option keys, since dots cannot appear in node names
                 ->beforeNormalization()
                     ->ifArray()
                     ->then(function($v){
                         foreach ($v as $key => $value) {
                             if (0 === strncmp('pdo.', $key, 4)) {
                                 $v[substr($key, 4)] = $value;
+                                unset($v[$key]);
+                            }
+
+                            if (0 === strncmp('mongodb.', $key, 8)) {
+                                $v[substr($key, 8)] = $value;
                                 unset($v[$key]);
                             }
                         }
@@ -134,6 +139,11 @@ class Configuration
                 ->scalarNode('db_id_col')->end()
                 ->scalarNode('db_data_col')->end()
                 ->scalarNode('db_time_col')->end()
+                // MongoDBSessionStorage options
+                ->scalarNode('collection')->end()
+                ->scalarNode('id_field')->end()
+                ->scalarNode('data_field')->end()
+                ->scalarNode('time_field')->end()
                 ->end()
         ;
     }

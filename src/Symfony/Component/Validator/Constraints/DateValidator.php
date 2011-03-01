@@ -35,7 +35,7 @@ class DateValidator extends ConstraintValidator
 
         $value = (string) $value;
 
-        if (!preg_match(self::PATTERN, $value, $matches)) {
+        if (!preg_match(static::PATTERN, $value, $matches)) {
             $this->setMessage($constraint->message, array('{{ value }}' => $value));
 
             return false;

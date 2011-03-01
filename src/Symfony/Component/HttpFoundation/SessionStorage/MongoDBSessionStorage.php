@@ -22,7 +22,7 @@ class MongoDBSessionStorage extends NativeSessionStorage
     protected $db;
 
     /**
-     * @throws \InvalidArgumentException When "db_table" option is not provided
+     * @throws \InvalidArgumentException When "collection" option is not provided
      */
     public function __construct(\MongoDB $db, array $options = array())
     {

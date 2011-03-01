@@ -1,0 +1,12 @@
+<?xml version="1.0" ?>
+
+<container xmlns="http://www.symfony-project.org/schema/dic/services"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xmlns:app="http://www.symfony-project.org/schema/dic/symfony"
+    xsi:schemaLocation="http://www.symfony-project.org/schema/dic/services http://www.symfony-project.org/schema/dic/services/services-1.0.xsd
+                        http://www.symfony-project.org/schema/dic/symfony http://www.symfony-project.org/schema/dic/symfony/symfony-1.0.xsd">
+
+    <app:config>
+        <app:session storage-id="mongodb" mongodb.collection="collection" mongodb.id-field="id" mongodb.data-field="data" mongodb.time-field="time" />
+    </app:config>
+</container>

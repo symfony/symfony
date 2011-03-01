@@ -84,6 +84,10 @@
         <xsd:attribute name="pdo.db-id-col" type="xsd:string" />
         <xsd:attribute name="pdo.db-data-col" type="xsd:string" />
         <xsd:attribute name="pdo.db-time-col" type="xsd:string" />
+        <xsd:attribute name="mongodb.collection" type="xsd:string" />
+        <xsd:attribute name="mongodb.id-field" type="xsd:string" />
+        <xsd:attribute name="mongodb.data-field" type="xsd:string" />
+        <xsd:attribute name="mongodb.time-field" type="xsd:string" />
     </xsd:complexType>
 
     <xsd:complexType name="templating">

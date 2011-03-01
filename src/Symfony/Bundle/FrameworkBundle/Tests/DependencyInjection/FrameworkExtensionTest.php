@@ -75,7 +75,7 @@ abstract class FrameworkExtensionTest extends TestCase
         $this->assertTrue($container->getDefinition('session')->hasMethodCall('start'));
         $this->assertEquals('Session', $container->getParameter('session.class'));
         $this->assertEquals('session.storage.native', (string) $container->getAlias('session.storage'));
-        
+
         $options = $container->getParameter('session.storage.native.options');
         $this->assertEquals('_SYMFONY', $options['name']);
         $this->assertEquals(86400, $options['lifetime']);
@@ -95,6 +95,18 @@ abstract class FrameworkExtensionTest extends TestCase
         $this->assertEquals('id', $options['db_id_col']);
         $this->assertEquals('data', $options['db_data_col']);
         $this->assertEquals('time', $options['db_time_col']);
+    }
+
+    public function testSessionMongoDB()
+    {
+        $container = $this->createContainerFromFile('session_mongodb');
+        $options = $container->getParameter('session.storage.mongodb.options');
+
+        $this->assertEquals('session.storage.mongodb', (string) $container->getAlias('session.storage'));
+        $this->assertEquals('collection', $options['collection']);
+        $this->assertEquals('id', $options['id_field']);
+        $this->assertEquals('data', $options['data_field']);
+        $this->assertEquals('time', $options['time_field']);
     }
 
     public function testTemplating()

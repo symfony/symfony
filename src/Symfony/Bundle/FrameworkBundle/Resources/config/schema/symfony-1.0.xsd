@@ -70,7 +70,7 @@
 
     <xsd:complexType name="session">
         <xsd:attribute name="class" type="xsd:string" />
-        <xsd:attribute name="storage-id" type="xsd:string" />
+        <xsd:attribute name="storage-id" type="storage_id" />
         <xsd:attribute name="default-locale" type="xsd:string" />
         <xsd:attribute name="name" type="xsd:string" />
         <xsd:attribute name="lifetime" type="xsd:integer" />
@@ -89,6 +89,14 @@
         <xsd:attribute name="mongodb.data-field" type="xsd:string" />
         <xsd:attribute name="mongodb.time-field" type="xsd:string" />
     </xsd:complexType>
+    
+    <xsd:simpleType name="storage_id">
+        <xsd:restriction base="xsd:string">
+            <xsd:enumeration value="pdo" />
+            <xsd:enumeration value="mongodb" />
+            <xsd:enumeration value="native" />
+        </xsd:restriction>
+    </xsd:simpleType>
 
     <xsd:complexType name="templating">
         <xsd:sequence>

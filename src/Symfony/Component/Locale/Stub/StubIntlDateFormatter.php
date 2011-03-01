@@ -318,6 +318,13 @@ class StubIntlDateFormatter
         }
     }
 
+    /**
+     * Create and returns a DateTime object with the specified timestamp and with the
+     * current time zone
+     *
+     * @param  int  $timestamp
+     * @return DateTime
+     */
     protected function createDateTime($timestamp)
     {
         $dateTime = new \DateTime();
@@ -327,6 +334,10 @@ class StubIntlDateFormatter
         return $dateTime;
     }
 
+    /**
+     * Returns a pattern string based in the datetype and timetype values
+     * @return string
+     */
     protected function getDefaultPattern()
     {
         $patternParts = array();

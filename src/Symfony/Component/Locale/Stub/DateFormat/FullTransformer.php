@@ -30,6 +30,12 @@ class FullTransformer
     private $pattern;
     private $timezone;
 
+    /**
+     * Constructor
+     *
+     * @param  string  $pattern   The pattern to be used to format and/or parse values
+     * @param  string  $timezone  The timezone to perform the date/time calculations
+     */
     public function __construct($pattern, $timezone)
     {
         $this->pattern = $pattern;
@@ -59,11 +65,22 @@ class FullTransformer
         );
     }
 
+    /**
+     * Return the array of Transformer objects
+     *
+     * @return  array  Associative array of Transformer objects (format char => Transformer)
+     */
     public function getTransformers()
     {
         return $this->transformers;
     }
 
+    /**
+     * Format a DateTime using ICU dateformat pattern
+     *
+     * @param  DateTime  $dateTime  A DateTime object to be used to generate the formatted value
+     * @return string               The formatted value
+     */
     public function format(\DateTime $dateTime)
     {
         $that = $this;
@@ -75,6 +92,14 @@ class FullTransformer
         return $formatted;
     }
 
+    /**
+     * Return the formatted ICU value for the matched date characters
+     *
+     * @param  string    $dateChars     The date characters to be replaced with a formatted ICU value
+     * @param  DateTime  $dateTime      A DateTime object to be used to generate the formatted value
+     * @return string                   The formatted value
+     * @throws NotImplementedException  When it encounters a not implemented date character
+     */
     public function formatReplace($dateChars, $dateTime)
     {
         $length = strlen($dateChars);
@@ -94,6 +119,13 @@ class FullTransformer
         }
     }
 
+    /**
+     * Retrieve a regular expression to match with a formatted value.
+     *
+     * @param  string  $pattern  The pattern to create the reverse matching regular expression
+     * @return string            The reverse matching regular expression with named captures being formed by the
+     *                           transformer index in the $transformer array
+     */
     public function getReverseMatchingRegExp($pattern)
     {
         $that = $this;
@@ -121,6 +153,14 @@ class FullTransformer
         return $reverseMatchingRegExp;
     }
 
+    /**
+     * Parse a pattern based string to a timestamp value
+     *
+     * @param  DateTime  $dateTime       A configured DateTime object to use to perform the date calculation
+     * @param  string    $value          String to convert to a time value
+     * @return int                       The corresponding Unix timestamp
+     * @throws InvalidArgumentException  When the value can not be matched with pattern
+     */
     public function parse(\DateTime $dateTime, $value)
     {
         $reverseMatchingRegExp = $this->getReverseMatchingRegExp($this->pattern);
@@ -144,6 +184,12 @@ class FullTransformer
         throw new \InvalidArgumentException(sprintf("Failed to match value '%s' with pattern '%s'", $value, $this->pattern));
     }
 
+    /**
+     * Builds a chars match regular expression
+     *
+     * @param  string  $specialChars  A string of chars to build the regular expression
+     * @return string                 The chars match regular expression
+     */
     protected function buildCharsMatch($specialChars)
     {
         $specialCharsArray = str_split($specialChars);
@@ -155,6 +201,13 @@ class FullTransformer
         return $specialCharsMatch;
     }
 
+    /**
+     * Normalize a preg_replace match array, removing the numeric keys and returning an associative array
+     * with the value and pattern values for the matched Transformer
+     *
+     * @param  array  $data
+     * @return array
+     */
     protected function normalizeArray(array $data)
     {
         $ret = array();
@@ -173,11 +226,23 @@ class FullTransformer
         return $ret;
     }
 
+    /**
+     * Check if the first char of a string is a single quote
+     *
+     * @param  string  $quoteMatch  The string to check
+     * @return bool                 true if matches, false otherwise
+     */
     public function isQuoteMatch($quoteMatch)
     {
         return ("'" === $quoteMatch[0]);
     }
 
+    /**
+     * Replaces single quotes at the start or end of a string with two single quotes
+     *
+     * @param  string  $quoteMatch  The string to replace the quotes
+     * @return string               A string with the single quotes replaced
+     */
     public function replaceQuoteMatch($quoteMatch)
     {
         if (preg_match("/^'+$/", $quoteMatch)) {
@@ -186,7 +251,15 @@ class FullTransformer
         return str_replace("''", "'", substr($quoteMatch, 1, -1));
     }
 
-    private function calculateUnixTimestamp($dateTime, array $options)
+    /**
+     * Calculates the Unix timestamp based on the matched values by the reverse matching regular
+     * expression of parse()
+     *
+     * @param  DateTime  $dateTime  The DateTime object to be used to calculate the timestamp
+     * @param  array     $options   An array with the matched values to be used to calculate the timestamp
+     * @return bool|int             The calculated timestamp or false if matched date is invalid
+     */
+    private function calculateUnixTimestamp(\DateTime $dateTime, array $options)
     {
         $datetime = $this->extractDateTime($options);
 
@@ -200,7 +273,7 @@ class FullTransformer
         $hourInstance = $datetime['hourInstance'];
         $timezone = $datetime['timezone'];
 
-        // If month is false, return immediately
+        // If month is false, return immediately (intl behavior)
         if (false === $month) {
             return false;
         }
@@ -221,6 +294,13 @@ class FullTransformer
         return $dateTime->getTimestamp();
     }
 
+    /**
+     * Extract date time data from an array and returns an associative array with sensible
+     * default values for the timestamp calculation of calculateUnixTimestamp()
+     *
+     * @param  array  $datetime
+     * @return array
+     */
     private function extractDateTime(array $datetime)
     {
         return array(

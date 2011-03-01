@@ -12,12 +12,15 @@
 namespace Symfony\Component\Locale\Stub\DateFormat;
 
 /**
- * Parser and formatter for date formats
+ * Parser and formatter for day of week format
  *
  * @author Igor Wiedler <igor@wiedler.ch>
  */
 class DayOfWeekTransformer extends Transformer
 {
+    /**
+     * {@inheritDoc}
+     */
     public function format(\DateTime $dateTime, $length)
     {
         $dayOfWeek = $dateTime->format('l');
@@ -31,6 +34,9 @@ class DayOfWeekTransformer extends Transformer
         }
     }
 
+    /**
+     * {@inheritDoc}
+     */
     public function getReverseMatchingRegExp($length)
     {
         $dayOfWeek = $dateTime->format('l');
@@ -44,6 +50,9 @@ class DayOfWeekTransformer extends Transformer
         }
     }
 
+    /**
+     * {@inheritDoc}
+     */
     public function extractDateOptions($matched, $length)
     {
         return array(

@@ -12,23 +12,32 @@
 namespace Symfony\Component\Locale\Stub\DateFormat;
 
 /**
- * Parser and formatter for date formats
+ * Parser and formatter for day of year format
  *
  * @author Igor Wiedler <igor@wiedler.ch>
  */
 class DayOfYearTransformer extends Transformer
 {
+    /**
+     * {@inheritDoc}
+     */
     public function format(\DateTime $dateTime, $length)
     {
         $dayOfYear = $dateTime->format('z') + 1;
         return $this->padLeft($dayOfYear, $length);
     }
 
+    /**
+     * {@inheritDoc}
+     */
     public function getReverseMatchingRegExp($length)
     {
         return "\d{$length}";
     }
 
+    /**
+     * {@inheritDoc}
+     */
     public function extractDateOptions($matched, $length)
     {
         return array(

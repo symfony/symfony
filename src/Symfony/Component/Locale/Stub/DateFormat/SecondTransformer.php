@@ -12,18 +12,24 @@
 namespace Symfony\Component\Locale\Stub\DateFormat;
 
 /**
- * Parser and formatter for date formats
+ * Parser and formatter for the second format
  *
  * @author Igor Wiedler <igor@wiedler.ch>
  */
 class SecondTransformer extends Transformer
 {
+    /**
+     * {@inheritDoc}
+     */
     public function format(\DateTime $dateTime, $length)
     {
         $secondOfMinute = (int) $dateTime->format('s');
         return $this->padLeft($secondOfMinute, $length);
     }
 
+    /**
+     * {@inheritDoc}
+     */
     public function getReverseMatchingRegExp($length)
     {
         if (1 == $length) {
@@ -35,6 +41,9 @@ class SecondTransformer extends Transformer
         return $regExp;
     }
 
+    /**
+     * {@inheritDoc}
+     */
     public function extractDateOptions($matched, $length)
     {
         return array(

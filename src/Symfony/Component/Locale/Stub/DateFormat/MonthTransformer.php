@@ -14,13 +14,16 @@ namespace Symfony\Component\Locale\Stub\DateFormat;
 use Symfony\Component\Locale\Exception\MethodArgumentValueNotImplementedException;
 
 /**
- * Parser and formatter for date formats
+ * Parser and formatter for month format
  *
  * @author Igor Wiedler <igor@wiedler.ch>
  */
 class MonthTransformer extends Transformer
 {
-    private static $months = array(
+    /**
+     * @var array
+     */
+    static protected $months = array(
         'January',
         'February',
         'March',
@@ -35,12 +38,27 @@ class MonthTransformer extends Transformer
         'December'
     );
 
-    private static $shortMonths = array();
+    /**
+     * Short months names (first 3 letters)
+     * @var array
+     */
+    static protected $shortMonths = array();
 
-    private static $flippedMonths = array();
+    /**
+     * Flipped $months array, $name => $index
+     * @var array
+     */
+    static protected $flippedMonths = array();
 
-    private static $flippedShortMonths = array();
+    /**
+     * Flipped $shortMonths array, $name => $index
+     * @var array
+     */
+    static protected $flippedShortMonths = array();
 
+    /**
+     * Constructor
+     */
     public function __construct()
     {
         if (0 == count(self::$shortMonths)) {
@@ -53,6 +71,9 @@ class MonthTransformer extends Transformer
         }
     }
 
+    /**
+     * {@inheritDoc}
+     */
     public function format(\DateTime $dateTime, $length)
     {
         $matchLengthMap = array(
@@ -71,6 +92,9 @@ class MonthTransformer extends Transformer
         }
     }
 
+    /**
+     * {@inheritDoc}
+     */
     public function getReverseMatchingRegExp($length)
     {
         switch ($length) {
@@ -94,6 +118,9 @@ class MonthTransformer extends Transformer
         return $regExp;
     }
 
+    /**
+     * {@inheritDoc}
+     */
     public function extractDateOptions($matched, $length)
     {
         if (!is_numeric($matched)) {

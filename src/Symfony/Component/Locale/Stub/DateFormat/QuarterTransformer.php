@@ -12,12 +12,15 @@
 namespace Symfony\Component\Locale\Stub\DateFormat;
 
 /**
- * Parser and formatter for date formats
+ * Parser and formatter for quarter format
  *
  * @author Igor Wiedler <igor@wiedler.ch>
  */
 class QuarterTransformer extends Transformer
 {
+    /**
+     * {@inheritDoc}
+     */
     public function format(\DateTime $dateTime, $length)
     {
         $month = (int) $dateTime->format('n');
@@ -34,6 +37,9 @@ class QuarterTransformer extends Transformer
         }
     }
 
+    /**
+     * {@inheritDoc}
+     */
     public function getReverseMatchingRegExp($length)
     {
         switch ($length) {
@@ -47,6 +53,9 @@ class QuarterTransformer extends Transformer
         }
     }
 
+    /**
+     * {@inheritDoc}
+     */
     public function extractDateOptions($matched, $length)
     {
         return array();

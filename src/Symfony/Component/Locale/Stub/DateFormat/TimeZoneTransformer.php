@@ -12,24 +12,37 @@
 namespace Symfony\Component\Locale\Stub\DateFormat;
 
 /**
- * Parser and formatter for date formats
+ * Parser and formatter for time zone format
  *
  * @author Igor Wiedler <igor@wiedler.ch>
  */
 class TimeZoneTransformer extends Transformer
 {
+    /**
+     * Caches the matched timezones
+     * @var array
+     */
     static protected $timezonesId = array();
 
+    /**
+     * {@inheritDoc}
+     */
     public function format(\DateTime $dateTime, $length)
     {
         return $dateTime->format('\G\M\TP');
     }
 
+    /**
+     * {@inheritDoc}
+     */
     public function getReverseMatchingRegExp($length)
     {
         return 'GMT[+-]\d{2}:\d{2}';
     }
 
+    /**
+     * {@inheritDoc}
+     */
     public function extractDateOptions($matched, $length)
     {
         return array(
@@ -37,6 +50,16 @@ class TimeZoneTransformer extends Transformer
         );
     }
 
+    /**
+     * Get a Etc/GMT timezone identifier for the specified timezone
+     *
+     * @param  string  $timezone  A GMT timezone string (GMT-03:00, e.g.)
+     * @return string             A timezone identifier
+     * @see    http://www.timezoneconverter.com/cgi-bin/zoneinfo.tzc?s=default&tz=GMT0
+     *
+     * TODO: refactor the timezone matching to match to non 0 minutes timezones (Pacific/Chatham, e.g.)
+     *       http://en.wikipedia.org/wiki/List_of_tz_database_time_zones
+     */
     protected function getTimezoneId($matched)
     {
         $offset = $this->getSecondsOffset($matched);
@@ -61,6 +84,12 @@ class TimeZoneTransformer extends Transformer
         return self::$timezonesId[$offset];
     }
 
+    /**
+     * Calculates the seconds offset of a timezone
+     *
+     * @param  string  $timezone  A GMT timezone string (GMT-03:00, e.g.)
+     * @return int                The offset in seconds of the timezone
+     */
     protected function getSecondsOffset($timezone)
     {
         preg_match('/GMT(?P<signal>[+-])(?P<hours>\d{2}):(?P<minutes>\d{2})/', $timezone, $matches);

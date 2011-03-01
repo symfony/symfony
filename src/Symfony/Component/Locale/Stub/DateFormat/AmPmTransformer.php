@@ -12,22 +12,31 @@
 namespace Symfony\Component\Locale\Stub\DateFormat;
 
 /**
- * Parser and formatter for date formats
+ * Parser and formatter for AM/PM markers format
  *
  * @author Igor Wiedler <igor@wiedler.ch>
  */
 class AmPmTransformer extends Transformer
 {
+    /**
+     * {@inheritDoc}
+     */
     public function format(\DateTime $dateTime, $length)
     {
         return $dateTime->format('A');
     }
 
+    /**
+     * {@inheritDoc}
+     */
     public function getReverseMatchingRegExp($length)
     {
         return 'AM|PM';
     }
 
+    /**
+     * {@inheritDoc}
+     */
     public function extractDateOptions($matched, $length)
     {
         return array(

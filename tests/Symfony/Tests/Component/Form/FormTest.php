@@ -490,31 +490,6 @@ class FormTest extends TestCase
         $this->assertFalse($form->hasErrors());
     }
 
-    public function testSubmitForwardsPreprocessedData()
-    {
-        $field = $this->createMockField('firstName');
-
-        $form = $this->getMock(
-            'Symfony\Component\Form\Form',
-            array('preprocessData'), // only mock preprocessData()
-            array('author', array('validator' => $this->validator))
-        );
-
-        // The data array is prepared directly after binding
-        $form->expects($this->once())
-              ->method('preprocessData')
-              ->with($this->equalTo(array('firstName' => 'Bernhard')))
-              ->will($this->returnValue(array('firstName' => 'preprocessed[Bernhard]')));
-        $form->add($field);
-
-        // The preprocessed data is then forwarded to the fields
-        $field->expects($this->once())
-                    ->method('submit')
-                    ->with($this->equalTo('preprocessed[Bernhard]'));
-
-        $form->submit(array('firstName' => 'Bernhard'));
-    }
-
     public function testSubmitForwardsNullIfValueIsMissing()
     {
         $field = $this->createMockField('firstName');

@@ -15,6 +15,7 @@ require_once __DIR__ . '/TestCase.php';
 require_once __DIR__ . '/Fixtures/Author.php';
 require_once __DIR__ . '/Fixtures/InvalidField.php';
 require_once __DIR__ . '/Fixtures/FixedValueTransformer.php';
+require_once __DIR__ . '/Fixtures/FixedFilter.php';
 
 use Symfony\Component\Form\ValueTransformer\ValueTransformerInterface;
 use Symfony\Component\Form\PropertyPath;
@@ -24,6 +25,7 @@ use Symfony\Component\Form\ValueTransformer\TransformationFailedException;
 use Symfony\Tests\Component\Form\Fixtures\Author;
 use Symfony\Tests\Component\Form\Fixtures\InvalidField;
 use Symfony\Tests\Component\Form\Fixtures\FixedValueTransformer;
+use Symfony\Tests\Component\Form\Fixtures\FixedFilter;
 
 class FieldTest extends TestCase
 {
@@ -167,7 +169,7 @@ class FieldTest extends TestCase
         $this->assertTrue($this->field->isSubmitted());
     }
 
-    public function testDefaultValuesAreTransformedCorrectly()
+    public function testDefaultDataIsTransformedCorrectly()
     {
         $field = $this->factory->getField('name');
 
@@ -175,7 +177,7 @@ class FieldTest extends TestCase
         $this->assertEquals('', $this->field->getDisplayedData());
     }
 
-    public function testValuesAreTransformedCorrectlyIfNull_noValueTransformer()
+    public function testDataIsTransformedCorrectlyIfNull_noValueTransformer()
     {
         $this->field->setData(null);
 
@@ -183,7 +185,7 @@ class FieldTest extends TestCase
         $this->assertSame('', $this->field->getDisplayedData());
     }
 
-    public function testValuesAreTransformedCorrectlyIfNotNull_noValueTransformer()
+    public function testDataIsTransformedCorrectlyIfNotNull_noValueTransformer()
     {
         $this->field->setData(123);
 
@@ -195,116 +197,43 @@ class FieldTest extends TestCase
         $this->assertSame('123', $this->field->getDisplayedData());
     }
 
-    public function testSubmittedValuesAreTransformedCorrectly()
+    public function testSubmittedDataIsTransformedCorrectly()
     {
-        $valueTransformer = $this->createMockTransformer();
-        $normTransformer = $this->createMockTransformer();
-
-        $field = $this->getMock(
-            'Symfony\Component\Form\Field',
-            array('processData'), // only mock processData()
-            array('title')
-        );
-        $field->setValueTransformer($valueTransformer);
-        $field->setNormalizationTransformer($normTransformer);
-
-        // 1a. The value is converted to a string and passed to the value transformer
-        $valueTransformer->expects($this->once())
-                                ->method('reverseTransform')
-                                ->with($this->identicalTo('0'))
-                                ->will($this->returnValue('reverse[0]'));
-
-        // 2. The output of the reverse transformation is passed to processData()
-        //    The processed data is accessible through getNormalizedData()
-        $field->expects($this->once())
-                    ->method('processData')
-                    ->with($this->equalTo('reverse[0]'))
-                    ->will($this->returnValue('processed[reverse[0]]'));
-
-        // 3. The processed data is denormalized and then accessible through
-        //    getData()
-        $normTransformer->expects($this->once())
-                                ->method('reverseTransform')
-                                ->with($this->identicalTo('processed[reverse[0]]'))
-                                ->will($this->returnValue('denorm[processed[reverse[0]]]'));
-
-        // 4. The processed data is transformed again and then accessible
-        //    through getDisplayedData()
-        $valueTransformer->expects($this->once())
-                                ->method('transform')
-                                ->with($this->equalTo('processed[reverse[0]]'))
-                                ->will($this->returnValue('transform[processed[reverse[0]]]'));
-
-        $field->submit(0);
-
-        $this->assertEquals('denorm[processed[reverse[0]]]', $field->getData());
-        $this->assertEquals('processed[reverse[0]]', $field->getNormalizedData());
-        $this->assertEquals('transform[processed[reverse[0]]]', $field->getDisplayedData());
-    }
-
-    public function testSubmittedValuesAreTransformedCorrectlyIfEmpty_processDataReturnsValue()
-    {
-        $transformer = $this->createMockTransformer();
-
-        $field = $this->getMock(
-            'Symfony\Component\Form\Field',
-            array('processData'), // only mock processData()
-            array('title')
-        );
-        $field->setValueTransformer($transformer);
-
-        // 1. Empty values are converted to NULL by convention
-        $transformer->expects($this->once())
-                                ->method('reverseTransform')
-                                ->with($this->identicalTo(''))
-                                ->will($this->returnValue(null));
-
-        // 2. NULL is passed to processData()
-        $field->expects($this->once())
-                    ->method('processData')
-                    ->with($this->identicalTo(null))
-                    ->will($this->returnValue('processed'));
-
-        // 3. The processed data is transformed (for displayed data)
-        $transformer->expects($this->once())
-                                ->method('transform')
-                                ->with($this->equalTo('processed'))
-                                ->will($this->returnValue('transform[processed]'));
-
-        $field->submit('');
-
-        $this->assertSame('processed', $field->getData());
-        $this->assertEquals('transform[processed]', $field->getDisplayedData());
-    }
-
-    public function testSubmittedValuesAreTransformedCorrectlyIfEmpty_processDataReturnsNull()
-    {
-        $transformer = $this->createMockTransformer();
-
-        $field = $this->factory->getField('title', array(
-            'value_transformer' => $transformer,
+        $filter = new FixedFilter(array(
+            'filterBoundDataFromClient' => array(
+                // 1. The value is converted to a string and passed to the
+                //    first filter
+                '0' => 'filter1[0]',
+            ),
+            'filterBoundData' => array(
+                // 3. The normalized value is passed to the second filter
+                'norm[filter1[0]]' => 'filter2[norm[filter1[0]]]',
+            ),
+        ));
+        $valueTransformer = new FixedValueTransformer(array(
+            // 2. The filtered value is normalized
+            'norm[filter1[0]]' => 'filter1[0]',
+            // 4a. The filtered normalized value is converted to client
+            //     representation
+            'filter2[norm[filter1[0]]]' => 'client[filter2[norm[filter1[0]]]]'
+        ));
+        $normTransformer = new FixedValueTransformer(array(
+            // 4b. The filtered normalized value is converted to app
+            //     representation
+            'app[filter2[norm[filter1[0]]]]' => 'filter2[norm[filter1[0]]]',
         ));
 
-        // 1. Empty values are converted to NULL by convention
-        $transformer->expects($this->once())
-                                ->method('reverseTransform')
-                                ->with($this->identicalTo(''))
-                                ->will($this->returnValue(null));
+        $this->field->appendFilter($filter);
+        $this->field->setValueTransformer($valueTransformer);
+        $this->field->setNormalizationTransformer($normTransformer);
+        $this->field->submit(0);
 
-        // 2. The processed data is NULL and therefore transformed to an empty
-        //    string by convention
-        $transformer->expects($this->once())
-                                ->method('transform')
-                                ->with($this->identicalTo(null))
-                                ->will($this->returnValue(''));
-
-        $field->submit('');
-
-        $this->assertSame(null, $field->getData());
-        $this->assertEquals('', $field->getDisplayedData());
+        $this->assertEquals('app[filter2[norm[filter1[0]]]]', $this->field->getData());
+        $this->assertEquals('filter2[norm[filter1[0]]]', $this->field->getNormalizedData());
+        $this->assertEquals('client[filter2[norm[filter1[0]]]]', $this->field->getDisplayedData());
     }
 
-    public function testSubmittedValuesAreTransformedCorrectlyIfEmpty_processDataReturnsNull_noValueTransformer()
+    public function testSubmittedDataIsTransformedCorrectlyIfEmpty_noValueTransformer()
     {
         $this->field->submit('');
 
@@ -312,7 +241,7 @@ class FieldTest extends TestCase
         $this->assertEquals('', $this->field->getDisplayedData());
     }
 
-    public function testValuesAreTransformedCorrectly()
+    public function testSetDataIsTransformedCorrectly()
     {
         $normTransformer = new FixedValueTransformer(array(
             null => '',
@@ -336,7 +265,7 @@ class FieldTest extends TestCase
         $this->assertEquals('transform[norm[0]]', $field->getDisplayedData());
     }
 
-    public function testSubmittedValuesAreTrimmedBeforeTransforming()
+    public function testSubmittedDataIsTrimmedBeforeTransforming()
     {
         $transformer = new FixedValueTransformer(array(
             null => '',
@@ -353,7 +282,7 @@ class FieldTest extends TestCase
         $this->assertEquals('reverse[a]', $field->getData());
     }
 
-    public function testSubmittedValuesAreNotTrimmedBeforeTransformingIfDisabled()
+    public function testSubmittedDataIsNotTrimmedBeforeTransformingIfDisabled()
     {
         $transformer = new FixedValueTransformer(array(
             null => '',

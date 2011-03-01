@@ -22,8 +22,8 @@ use Symfony\Component\Form\Exception\UnexpectedTypeException;
 use Symfony\Component\Form\Exception\DanglingFieldException;
 use Symfony\Component\Form\Exception\FieldDefinitionException;
 use Symfony\Component\Form\CsrfProvider\CsrfProviderInterface;
-use Symfony\Component\Form\DataProcessor\DataProcessorInterface;
 use Symfony\Component\Form\FieldFactory\FieldFactoryInterface;
+use Symfony\Component\Form\Filter\FilterInterface;
 
 /**
  * Form represents a form.
@@ -40,7 +40,7 @@ use Symfony\Component\Form\FieldFactory\FieldFactoryInterface;
  * @author Fabien Potencier <fabien.potencier@symfony-project.com>
  * @author Bernhard Schussek <bernhard.schussek@symfony-project.com>
  */
-class Form extends Field implements \IteratorAggregate, FormInterface
+class Form extends Field implements \IteratorAggregate, FormInterface, FilterInterface
 {
     /**
      * Contains all the fields of this group
@@ -66,8 +66,6 @@ class Form extends Field implements \IteratorAggregate, FormInterface
      */
     private $dataConstructor;
 
-    private $dataPreprocessor;
-
     private $modifyByReference = true;
 
     private $validator;
@@ -79,6 +77,13 @@ class Form extends Field implements \IteratorAggregate, FormInterface
     private $csrfFieldName;
 
     private $csrfProvider;
+
+    public function __construct($key = null)
+    {
+        parent::__construct($key);
+
+        $this->appendFilter($this);
+    }
 
     /**
      * Clones this group
@@ -255,28 +260,58 @@ class Form extends Field implements \IteratorAggregate, FormInterface
         return $this;
     }
 
-    /**
-     * {@inheritDoc}
-     */
-    protected function transform($value)
+    public function filterSetData($data)
     {
-        if (null === $this->getValueTransformer()) {
+        if (null === $this->getValueTransformer() && null === $this->getNormalizationTransformer()) {
             // Empty values must be converted to objects or arrays so that
             // they can be read by PropertyPath in the child fields
-            if (empty($value)) {
+            if (empty($data)) {
                 if ($this->dataConstructor) {
                     $constructor = $this->dataConstructor;
-                    return $constructor();
+                    $data = $constructor();
                 } else if ($this->dataClass) {
                     $class = $this->dataClass;
-                    return new $class();
+                    $data = new $class();
                 } else {
-                    return array();
+                    $data = array();
                 }
             }
         }
 
-        return parent::transform($value);
+        return $data;
+    }
+
+    public function filterBoundDataFromClient($data)
+    {
+        if (!is_array($data)) {
+            throw new UnexpectedTypeException($data, 'array');
+        }
+
+        foreach ($this->fields as $key => $field) {
+            if (!isset($data[$key])) {
+                $data[$key] = null;
+            }
+        }
+
+        foreach ($data as $key => $value) {
+            if ($this->has($key)) {
+                $this->fields[$key]->submit($value);
+            }
+        }
+
+        $data = $this->getTransformedData();
+
+        $this->writeObject($data);
+
+        return $data;
+    }
+
+    public function getSupportedFilters()
+    {
+        return array(
+            Filters::filterSetData,
+            Filters::filterBoundDataFromClient,
+        );
     }
 
     /**
@@ -303,42 +338,12 @@ class Form extends Field implements \IteratorAggregate, FormInterface
      */
     public function submit($data)
     {
-        if (null === $data) {
-            $data = array();
-        }
-
-        // might return an array, if $data isn't one already
-        $data = $this->preprocessData($data);
-
-        // remember for later
-        $submittedData = $data;
-
-        if (!is_array($data)) {
-            throw new UnexpectedTypeException($data, 'array');
-        }
-
-        foreach ($this->fields as $key => $field) {
-            if (!isset($data[$key])) {
-                $data[$key] = null;
-            }
-        }
-
-        foreach ($data as $key => $value) {
-            if ($this->has($key)) {
-                $this->fields[$key]->submit($value);
-            }
-        }
-
-        $data = $this->getTransformedData();
-
-        $this->writeObject($data);
-
         // set and reverse transform the data
         parent::submit($data);
 
         $this->extraFields = array();
 
-        foreach ($submittedData as $key => $value) {
+        foreach ((array)$data as $key => $value) {
             if (!$this->has($key)) {
                 $this->extraFields[] = $key;
             }
@@ -909,28 +914,6 @@ class Form extends Field implements \IteratorAggregate, FormInterface
         }
 
         return true;
-    }
-
-    /**
-     * Sets the data preprocessor
-     *
-     * @param DataProcessorInterface $dataPreprocessor
-     */
-    public function setDataPreprocessor(DataProcessorInterface $dataPreprocessor)
-    {
-        $this->dataPreprocessor = $dataPreprocessor;
-
-        return $this;
-    }
-
-    /**
-     * Returns the data preprocessor
-     *
-     * @return DataPreprocessorInterface
-     */
-    public function getDataPreprocessor()
-    {
-        return $this->dataPreprocessor;
     }
 
     public function setModifyByReference($modifyByReference)

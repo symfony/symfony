@@ -155,7 +155,7 @@ class EntityChoiceFieldTest extends DoctrineOrmTestCase
         ));
         $field->setData(null);
 
-        $this->assertEquals(new ArrayCollection(), $field->getData());
+        $this->assertEquals(null, $field->getData());
         $this->assertEquals(array(), $field->getDisplayedData());
     }
 
@@ -169,7 +169,7 @@ class EntityChoiceFieldTest extends DoctrineOrmTestCase
         ));
         $field->setData(null);
 
-        $this->assertEquals(new ArrayCollection(), $field->getData());
+        $this->assertEquals(null, $field->getData());
         $this->assertEquals(array(), $field->getDisplayedData());
     }
 

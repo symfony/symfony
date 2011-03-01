@@ -18,10 +18,9 @@ use Symfony\Component\Form\ChoiceList\MonthChoiceList;
 use Symfony\Component\Form\ChoiceList\TimeZoneChoiceList;
 use Symfony\Component\Form\ChoiceList\EntityChoiceList;
 use Symfony\Component\Form\CsrfProvider\CsrfProviderInterface;
-use Symfony\Component\Form\DataProcessor\RadioToArrayConverter;
-use Symfony\Component\Form\DataProcessor\UrlProtocolFixer;
-use Symfony\Component\Form\DataProcessor\CollectionMerger;
-use Symfony\Component\Form\DataProcessor\FileUploader;
+use Symfony\Component\Form\Filter\RadioInputFilter;
+use Symfony\Component\Form\Filter\FixUrlProtocolFilter;
+use Symfony\Component\Form\Filter\FileUploadFilter;
 use Symfony\Component\Form\FieldFactory\FieldFactoryInterface;
 use Symfony\Component\Form\Renderer\DefaultRenderer;
 use Symfony\Component\Form\Renderer\Theme\ThemeInterface;
@@ -54,6 +53,7 @@ use Symfony\Component\Form\ValueTransformer\ArrayToPartsTransformer;
 use Symfony\Component\Form\ValueTransformer\ValueToDuplicatesTransformer;
 use Symfony\Component\Form\ValueTransformer\FileToArrayTransformer;
 use Symfony\Component\Form\ValueTransformer\FileToStringTransformer;
+use Symfony\Component\Form\ValueTransformer\MergeCollectionTransformer;
 use Symfony\Component\Validator\ValidatorInterface;
 use Symfony\Component\Locale\Locale;
 use Symfony\Component\HttpFoundation\File\TemporaryStorage;
@@ -337,7 +337,7 @@ class FormFactory
         ), $options);
 
         return $this->getTextField($key, $options)
-            ->setDataProcessor(new UrlProtocolFixer($options['default_protocol']));
+            ->prependFilter(new FixUrlProtocolFilter($options['default_protocol']));
     }
 
     protected function getChoiceFieldForList($key, ChoiceListInterface $choiceList, array $options = array())
@@ -377,7 +377,7 @@ class FormFactory
 
         if (!$options['multiple'] && $options['expanded']) {
             $field->setValueTransformer(new ScalarToChoicesTransformer($choiceList));
-            $field->setDataPreprocessor(new RadioToArrayConverter());
+            $field->prependFilter(new RadioInputFilter());
         }
 
         if ($options['multiple'] && !$options['expanded']) {
@@ -429,8 +429,7 @@ class FormFactory
         $transformers = array();
 
         if ($options['multiple']) {
-            $field->setDataProcessor(new CollectionMerger($field));
-
+            $transformers[] = new MergeCollectionTransformer($field);
             $transformers[] = new EntitiesToArrayTransformer($choiceList);
 
             if ($options['expanded']) {
@@ -903,7 +902,7 @@ class FormFactory
         }
 
         return $field
-            ->setDataPreprocessor(new FileUploader($field, $this->storage))
+            ->prependFilter(new FileUploadFilter($field, $this->storage))
             ->setData(null) // FIXME
             ->add($this->getField('file')->setRendererVar('type', 'file'))
             ->add($this->getHiddenField('token'))

@@ -9,9 +9,9 @@
  * file that was distributed with this source code.
  */
 
-namespace Symfony\Component\Form\DataProcessor;
+namespace Symfony\Component\Form\Filter;
 
-interface DataProcessorInterface
+interface FilterChainInterface
 {
-    function processData($data);
+    function filter($type, $data);
 }

@@ -38,6 +38,8 @@ class CollectionField extends Form
      */
     protected $prototype;
 
+    private $modifiable = true;
+
     public function __construct($key, array $options = array())
     {
         // This doesn't work with addOption(), because the value of this option
@@ -63,9 +65,7 @@ class CollectionField extends Form
      */
     protected function configure()
     {
-        $this->addOption('modifiable', false);
-
-        if ($this->getOption('modifiable')) {
+        if ($this->modifiable) {
             $field = $this->newField('$$key$$', null);
             // TESTME
             $field->setRequired(false);
@@ -86,7 +86,7 @@ class CollectionField extends Form
         }
 
         foreach ($this as $name => $field) {
-            if (!$this->getOption('modifiable') || '$$key$$' != $name) {
+            if (!$this->modifiable || '$$key$$' != $name) {
                 $this->remove($name);
             }
         }
@@ -107,14 +107,14 @@ class CollectionField extends Form
         }
 
         foreach ($this as $name => $field) {
-            if (!isset($data[$name]) && $this->getOption('modifiable') && '$$key$$' != $name) {
+            if (!isset($data[$name]) && $this->modifiable && '$$key$$' != $name) {
                 $this->remove($name);
                 $this->removedFields[] = $name;
             }
         }
 
         foreach ($data as $name => $value) {
-            if (!isset($this[$name]) && $this->getOption('modifiable')) {
+            if (!isset($this[$name]) && $this->modifiable) {
                 $this->add($this->newField($name, $name));
             }
         }

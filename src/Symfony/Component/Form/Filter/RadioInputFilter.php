@@ -9,9 +9,10 @@
  * file that was distributed with this source code.
  */
 
-namespace Symfony\Component\Form\DataProcessor;
+namespace Symfony\Component\Form\Filter;
 
 use Symfony\Component\Form\FieldInterface;
+use Symfony\Component\Form\Filters;
 
 /**
  * Takes care of converting the input from a single radio button
@@ -19,10 +20,15 @@ use Symfony\Component\Form\FieldInterface;
  *
  * @author Bernhard Schussek <bernhard.schussek@symfony-project.com>
  */
-class RadioToArrayConverter implements DataProcessorInterface
+class RadioInputFilter implements FilterInterface
 {
-    public function processData($data)
+    public function filterBoundDataFromClient($data)
     {
         return count((array)$data) === 0 ? array() : array($data => true);
+    }
+
+    public function getSupportedFilters()
+    {
+        return Filters::filterBoundDataFromClient;
     }
 }

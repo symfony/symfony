@@ -9,9 +9,10 @@
  * file that was distributed with this source code.
  */
 
-namespace Symfony\Component\Form\DataProcessor;
+namespace Symfony\Component\Form\Filter;
 
 use Symfony\Component\Form\FieldInterface;
+use Symfony\Component\Form\Filters;
 use Symfony\Component\HttpFoundation\File\File;
 use Symfony\Component\HttpFoundation\File\UploadedFile;
 use Symfony\Component\HttpFoundation\File\TemporaryStorage;
@@ -21,7 +22,7 @@ use Symfony\Component\HttpFoundation\File\TemporaryStorage;
  *
  * @author Bernhard Schussek <bernhard.schussek@symfony-project.com>
  */
-class FileUploader implements DataProcessorInterface
+class FileUploadFilter implements FilterInterface
 {
     private $field;
 
@@ -33,7 +34,12 @@ class FileUploader implements DataProcessorInterface
         $this->storage = $storage;
     }
 
-    public function processData($data)
+    public function getSupportedFilters()
+    {
+        return Filters::filterBoundDataFromClient;
+    }
+
+    public function filterBoundDataFromClient($data)
     {
         // TESTME
         $data = array_merge(array(

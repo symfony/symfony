@@ -13,9 +13,11 @@ namespace Symfony\Component\Form;
 
 use Symfony\Component\Form\ValueTransformer\ValueTransformerInterface;
 use Symfony\Component\Form\ValueTransformer\TransformationFailedException;
-use Symfony\Component\Form\DataProcessor\DataProcessorInterface;
 use Symfony\Component\Form\Renderer\RendererInterface;
 use Symfony\Component\Form\Renderer\Plugin\PluginInterface;
+use Symfony\Component\Form\Filter\FilterChainInterface;
+use Symfony\Component\Form\Filter\FilterChain;
+use Symfony\Component\Form\Filter\FilterInterface;
 
 /**
  * Base class for form fields
@@ -49,7 +51,7 @@ use Symfony\Component\Form\Renderer\Plugin\PluginInterface;
  *
  * @author Bernhard Schussek <bernhard.schussek@symfony-project.com>
  */
-class Field extends Configurable implements FieldInterface
+class Field implements FieldInterface
 {
     private $errors = array();
     private $key = '';
@@ -61,17 +63,39 @@ class Field extends Configurable implements FieldInterface
     private $transformedData = '';
     private $normalizationTransformer;
     private $valueTransformer;
-    private $dataProcessor;
     private $propertyPath;
     private $transformationSuccessful = true;
     private $renderer;
     private $hidden = false;
     private $trim = true;
     private $disabled = false;
+    private $filterChain;
 
     public function __construct($key = null)
     {
         $this->key = (string)$key;
+        // TODO should be injected instead
+        $this->filterChain = new FilterChain(Filters::$all);
+    }
+
+    /**
+     * @deprecated
+     */
+    public function prependFilter(FilterInterface $filter)
+    {
+        $this->filterChain->prependFilter($filter);
+
+        return $this;
+    }
+
+    /**
+     * @deprecated
+     */
+    public function appendFilter(FilterInterface $filter)
+    {
+        $this->filterChain->appendFilter($filter);
+
+        return $this;
     }
 
     /**
@@ -242,17 +266,23 @@ class Field extends Configurable implements FieldInterface
      *
      * @see FieldInterface
      */
-    public function setData($data)
+    public function setData($appData)
     {
-        // All four transformation methods must be executed to make sure
-        // that all three data representations are synchronized
-        // Store data in between steps because processData() might use
-        // this data
-        $this->data = $data;
-        $this->normalizedData = $this->normalize($data);
-        $this->transformedData = $this->transform($this->normalize($data));
-        $this->normalizedData = $this->processData($this->reverseTransform($this->transformedData));
-        $this->data = $this->denormalize($this->normalizedData);
+        // Hook to change content of the data
+        $appData = $this->filterChain->filter(Filters::filterSetData, $appData);
+
+        // Treat data as strings unless a value transformer exists
+        if (null === $this->valueTransformer && is_scalar($appData)) {
+            $appData = (string)$appData;
+        }
+
+        // Synchronize representations - must not change the content!
+        $normData = $this->normalize($appData);
+        $clientData = $this->transform($normData);
+
+        $this->data = $appData;
+        $this->normalizedData = $normData;
+        $this->transformedData = $clientData;
 
         return $this;
     }
@@ -262,44 +292,46 @@ class Field extends Configurable implements FieldInterface
      *
      * @param  string|array $data  The POST data
      */
-    public function submit($data)
+    public function submit($clientData)
     {
-        $this->transformedData = (is_array($data) || is_object($data)) ? $data : (string)$data;
         $this->submitted = true;
         $this->errors = array();
 
-        if (is_string($this->transformedData) && $this->trim) {
-            $this->transformedData = trim($this->transformedData);
+        if (is_scalar($clientData) || null === $clientData) {
+            $clientData = (string)$clientData;
         }
 
+        if (is_string($clientData) && $this->trim) {
+            $clientData = trim($clientData);
+        }
+
+        $appData = null;
+        $normData = null;
+
+        // Hook to change content of the data submitted by the browser
+        $clientData = $this->filterChain->filter(Filters::filterBoundDataFromClient, $clientData);
+
         try {
-            $this->normalizedData = $this->processData($this->reverseTransform($this->transformedData));
-            $this->data = $this->denormalize($this->normalizedData);
-            $this->transformedData = $this->transform($this->normalizedData);
+            // Normalize data to unified representation
+            $normData = $this->reverseTransform($clientData);
             $this->transformationSuccessful = true;
         } catch (TransformationFailedException $e) {
             $this->transformationSuccessful = false;
         }
-    }
 
-    /**
-     * Processes the submitted reverse-transformed data.
-     *
-     * This method can be overridden if you want to modify the data entered
-     * by the user. Note that the data is already in reverse transformed format.
-     *
-     * This method will not be called if reverse transformation fails.
-     *
-     * @param  mixed $data
-     * @return mixed
-     */
-    protected function processData($data)
-    {
-        if ($this->dataProcessor) {
-            return $this->dataProcessor->processData($data);
+        if ($this->transformationSuccessful) {
+            // Hook to change content of the data in the normalized
+            // representation
+            $normData = $this->filterChain->filter(Filters::filterBoundData, $normData);
+
+            // Synchronize representations - must not change the content!
+            $appData = $this->denormalize($normData);
+            $clientData = $this->transform($normData);
         }
 
-        return $data;
+        $this->data = $appData;
+        $this->normalizedData = $normData;
+        $this->transformedData = $clientData;
     }
 
     /**
@@ -430,28 +462,6 @@ class Field extends Configurable implements FieldInterface
     public function getValueTransformer()
     {
         return $this->valueTransformer;
-    }
-
-    /**
-     * Sets the data processor
-     *
-     * @param DataProcessorInterface $dataProcessor
-     */
-    public function setDataProcessor(DataProcessorInterface $dataProcessor = null)
-    {
-        $this->dataProcessor = $dataProcessor;
-
-        return $this;
-    }
-
-    /**
-     * Returns the data processor
-     *
-     * @return DataProcessorInterface
-     */
-    public function getDataProcessor()
-    {
-        return $this->dataProcessor;
     }
 
     public function setTrim($trim)

@@ -9,19 +9,25 @@
  * file that was distributed with this source code.
  */
 
-namespace Symfony\Component\Form\DataProcessor;
+namespace Symfony\Component\Form\ValueTransformer;
 
 use Symfony\Component\Form\FieldInterface;
 
-class CollectionMerger implements DataProcessorInterface
+class MergeCollectionTransformer implements ValueTransformerInterface
 {
     private $field;
 
-    public function __construct(FieldInterface $field) {
+    public function __construct(FieldInterface $field)
+    {
         $this->field = $field;
     }
 
-    public function processData($data)
+    public function transform($data)
+    {
+        return $data;
+    }
+
+    public function reverseTransform($data)
     {
         $collection = $this->field->getData();
 

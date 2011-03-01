@@ -18,6 +18,7 @@ use Symfony\Component\Form\ChoiceList\MonthChoiceList;
 use Symfony\Component\Form\ChoiceList\TimeZoneChoiceList;
 use Symfony\Component\Form\ChoiceList\EntityChoiceList;
 use Symfony\Component\Form\CsrfProvider\CsrfProviderInterface;
+use Symfony\Component\Form\EventListener\ResizeFormListener;
 use Symfony\Component\Form\Filter\RadioInputFilter;
 use Symfony\Component\Form\Filter\FixUrlProtocolFilter;
 use Symfony\Component\Form\Filter\FileUploadFilter;
@@ -907,5 +908,34 @@ class FormFactory
             ->add($this->getField('file')->setRendererVar('type', 'file'))
             ->add($this->getHiddenField('token'))
             ->add($this->getHiddenField('name'));
+    }
+
+    public function getCollectionField($key, array $options = array())
+    {
+        $options = array_merge(array(
+            'template' => 'collection',
+            'prototype' => null,
+            'modifiable' => false,
+        ), $options);
+
+        $field = $this->getForm($key, $options);
+
+        if (!isset($options['prototype'])) {
+            $options['prototype'] = $this->getTextField('prototype');
+        }
+
+        if ($options['modifiable']) {
+            $child = clone $options['prototype'];
+            $child->setKey('$$key$$');
+            $child->setPropertyPath(null);
+            // TESTME
+            $child->setRequired(false);
+            $field->add($child);
+        }
+
+        $field->addEventListener(new ResizeFormListener($field,
+                $options['prototype'], $options['modifiable']));
+
+        return $field;
     }
 }

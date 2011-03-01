@@ -11,15 +11,17 @@
 
 namespace Symfony\Tests\Component\Form;
 
+require_once __DIR__.'/TestCase.php';
+
 use Symfony\Component\Form\CollectionField;
 use Symfony\Component\Form\Form;
 use Symfony\Component\Form\Field;
 
-class CollectionFieldTest extends \PHPUnit_Framework_TestCase
+class CollectionFieldTest extends TestCase
 {
     public function testContainsNoFieldsByDefault()
     {
-        $field = new CollectionField('emails', array(
+        $field = $this->factory->getCollectionField('emails', array(
             'prototype' => new Field(),
         ));
         $this->assertEquals(0, count($field));
@@ -27,7 +29,7 @@ class CollectionFieldTest extends \PHPUnit_Framework_TestCase
 
     public function testSetDataAdjustsSize()
     {
-        $field = new CollectionField('emails', array(
+        $field = $this->factory->getCollectionField('emails', array(
             'prototype' => new Field(),
         ));
         $field->setData(array('foo@foo.com', 'foo@bar.com'));
@@ -47,7 +49,7 @@ class CollectionFieldTest extends \PHPUnit_Framework_TestCase
 
     public function testSetDataAdjustsSizeIfModifiable()
     {
-        $field = new CollectionField('emails', array(
+        $field = $this->factory->getCollectionField('emails', array(
             'prototype' => new Field(),
             'modifiable' => true,
         ));
@@ -67,7 +69,7 @@ class CollectionFieldTest extends \PHPUnit_Framework_TestCase
 
     public function testThrowsExceptionIfObjectIsNotTraversable()
     {
-        $field = new CollectionField('emails', array(
+        $field = $this->factory->getCollectionField('emails', array(
             'prototype' => new Field(),
         ));
         $this->setExpectedException('Symfony\Component\Form\Exception\UnexpectedTypeException');
@@ -76,7 +78,7 @@ class CollectionFieldTest extends \PHPUnit_Framework_TestCase
 
     public function testModifiableCollectionsContainExtraField()
     {
-        $field = new CollectionField('emails', array(
+        $field = $this->factory->getCollectionField('emails', array(
             'prototype' => new Field(),
             'modifiable' => true,
         ));
@@ -89,7 +91,7 @@ class CollectionFieldTest extends \PHPUnit_Framework_TestCase
 
     public function testNotResizedIfSubmittedWithMissingData()
     {
-        $field = new CollectionField('emails', array(
+        $field = $this->factory->getCollectionField('emails', array(
             'prototype' => new Field(),
         ));
         $field->setData(array('foo@foo.com', 'bar@bar.com'));
@@ -103,7 +105,7 @@ class CollectionFieldTest extends \PHPUnit_Framework_TestCase
 
     public function testResizedIfSubmittedWithMissingDataAndModifiable()
     {
-        $field = new CollectionField('emails', array(
+        $field = $this->factory->getCollectionField('emails', array(
             'prototype' => new Field(),
             'modifiable' => true,
         ));
@@ -117,7 +119,7 @@ class CollectionFieldTest extends \PHPUnit_Framework_TestCase
 
     public function testNotResizedIfSubmittedWithExtraData()
     {
-        $field = new CollectionField('emails', array(
+        $field = $this->factory->getCollectionField('emails', array(
             'prototype' => new Field(),
         ));
         $field->setData(array('foo@bar.com'));
@@ -130,7 +132,7 @@ class CollectionFieldTest extends \PHPUnit_Framework_TestCase
 
     public function testResizedUpIfSubmittedWithExtraDataAndModifiable()
     {
-        $field = new CollectionField('emails', array(
+        $field = $this->factory->getCollectionField('emails', array(
             'prototype' => new Field(),
             'modifiable' => true,
         ));
@@ -146,7 +148,7 @@ class CollectionFieldTest extends \PHPUnit_Framework_TestCase
 
     public function testResizedDownIfSubmittedWithLessDataAndModifiable()
     {
-        $field = new CollectionField('emails', array(
+        $field = $this->factory->getCollectionField('emails', array(
             'prototype' => new Field(),
             'modifiable' => true,
         ));

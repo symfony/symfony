@@ -15,9 +15,10 @@ use Symfony\Component\Form\ValueTransformer\ValueTransformerInterface;
 use Symfony\Component\Form\ValueTransformer\TransformationFailedException;
 use Symfony\Component\Form\Renderer\RendererInterface;
 use Symfony\Component\Form\Renderer\Plugin\PluginInterface;
-use Symfony\Component\Form\Filter\FilterChainInterface;
 use Symfony\Component\Form\Filter\FilterChain;
 use Symfony\Component\Form\Filter\FilterInterface;
+use Symfony\Component\Form\EventListener\EventManager;
+use Symfony\Component\Form\EventListener\EventListenerInterface;
 
 /**
  * Base class for form fields
@@ -70,12 +71,14 @@ class Field implements FieldInterface
     private $trim = true;
     private $disabled = false;
     private $filterChain;
+    private $eventManager;
 
     public function __construct($key = null)
     {
         $this->key = (string)$key;
         // TODO should be injected instead
         $this->filterChain = new FilterChain(Filters::$all);
+        $this->eventManager = new EventManager(Events::$all);
     }
 
     /**
@@ -94,6 +97,16 @@ class Field implements FieldInterface
     public function appendFilter(FilterInterface $filter)
     {
         $this->filterChain->appendFilter($filter);
+
+        return $this;
+    }
+
+    /**
+     * @deprecated
+     */
+    public function addEventListener(EventListenerInterface $listener)
+    {
+        $this->eventManager->addEventListener($listener);
 
         return $this;
     }
@@ -268,6 +281,8 @@ class Field implements FieldInterface
      */
     public function setData($appData)
     {
+        $this->eventManager->triggerEvent(Events::preSetData, $appData);
+
         // Hook to change content of the data
         $appData = $this->filterChain->filter(Filters::filterSetData, $appData);
 
@@ -284,6 +299,8 @@ class Field implements FieldInterface
         $this->normalizedData = $normData;
         $this->transformedData = $clientData;
 
+        $this->eventManager->triggerEvent(Events::postSetData);
+
         return $this;
     }
 
@@ -294,12 +311,11 @@ class Field implements FieldInterface
      */
     public function submit($clientData)
     {
-        $this->submitted = true;
-        $this->errors = array();
-
         if (is_scalar($clientData) || null === $clientData) {
             $clientData = (string)$clientData;
         }
+
+        $this->eventManager->triggerEvent(Events::preBind, $clientData);
 
         if (is_string($clientData) && $this->trim) {
             $clientData = trim($clientData);
@@ -329,9 +345,13 @@ class Field implements FieldInterface
             $clientData = $this->transform($normData);
         }
 
+        $this->submitted = true;
+        $this->errors = array();
         $this->data = $appData;
         $this->normalizedData = $normData;
         $this->transformedData = $clientData;
+
+        $this->eventManager->triggerEvent(Events::postBind);
     }
 
     /**

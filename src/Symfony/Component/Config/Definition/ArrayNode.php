@@ -237,7 +237,7 @@ class ArrayNode extends BaseNode implements PrototypeNodeInterface
     /**
      * Sets the node prototype.
      *
-     * @param PrototypeNodeInterface $node 
+     * @param PrototypeNodeInterface $node
      * @throws \RuntimeException if the node doesn't have concrete children
      */
     public function setPrototype(PrototypeNodeInterface $node)
@@ -276,7 +276,7 @@ class ArrayNode extends BaseNode implements PrototypeNodeInterface
     /**
      * Finalises the value of this node.
      *
-     * @param mixed $value 
+     * @param mixed $value
      * @return mixed The finalised value
      * @throws UnsetKeyException
      * @throws InvalidConfigurationException if the node doesn't have enough children
@@ -470,7 +470,9 @@ class ArrayNode extends BaseNode implements PrototypeNodeInterface
                 if (!$this->allowNewKeys) {
                     throw new InvalidConfigurationException(sprintf(
                         'You are not allowed to define new elements for path "%s". '
-                       .'Please define all elements for this path in one config file.',
+                       .'Please define all elements for this path in one config file. '
+                       .'If you are trying to overwrite an element, make sure you redefine it '
+                       .'with the same name.',
                         $this->getPath()
                     ));
                 }

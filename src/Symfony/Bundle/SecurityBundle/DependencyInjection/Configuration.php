@@ -210,6 +210,7 @@ class Configuration
                         ->useAttributeAsKey('name')
                         ->prototype('array')
                             ->scalarNode('password')->defaultValue(uniqid())->end()
+                            ->scalarNode('class')->defaultValue(null)->end()
                             ->arrayNode('roles')
                                 ->beforeNormalization()->ifString()->then(function($v) { return preg_split('/\s*,\s*/', $v); })->end()
                                 ->prototype('scalar')->end()

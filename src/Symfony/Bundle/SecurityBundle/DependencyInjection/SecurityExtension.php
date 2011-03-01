@@ -470,10 +470,14 @@ class SecurityExtension extends Extension
         foreach ($provider['users'] as $username => $user) {
             $userId = $name.'_'.$username;
 
-            $container
+            $userDefinition = $container
                 ->setDefinition($userId, new DefinitionDecorator('security.user.provider.in_memory.user'))
                 ->setArguments(array($username, $user['password'], $user['roles']))
             ;
+
+            if ($user['class']) {
+                $userDefinition->setClass($user['class']);
+            }
 
             $definition->addMethodCall('createUser', array(new Reference($userId)));
         }

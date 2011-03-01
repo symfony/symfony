@@ -122,12 +122,8 @@ class StubIntlDateFormatter
             throw new MethodArgumentValueNotImplementedException(__METHOD__, 'timestamp', $timestamp, 'Only the integer unix timestamps are supported');
         }
 
-        $dateTime = $this->createDateTime($timestamp);
-        $dateTime->setTimestamp($timestamp);
-        $dateTime->setTimezone($this->dateTimeZone);
-
         $transformer = new FullTransformer($this->getPattern(), $this->getTimeZoneId());
-        $formatted = $transformer->format($dateTime);
+        $formatted = $transformer->format($this->createDateTime($timestamp));
 
         return $formatted;
     }

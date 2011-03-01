@@ -46,7 +46,7 @@ class ContentTypeMimeTypeGuesser implements MimeTypeGuesserInterface
             throw new AccessDeniedException($path);
         }
 
-        if (!self::isSupported() || !is_readable($path)) {
+        if (!self::isSupported()) {
             return null;
         }
 

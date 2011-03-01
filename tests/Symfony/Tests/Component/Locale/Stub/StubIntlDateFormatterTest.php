@@ -426,6 +426,7 @@ class StubIntlDateFormatterTest extends LocaleTestCase
      */
     public function testParseIntl($pattern, $value, $expected)
     {
+        $this->skipIfIntlExtensionIsNotLoaded();
         $formatter = $this->createIntlFormatter($pattern);
         $this->assertSame($expected, $formatter->parse($value));
     }
@@ -541,6 +542,24 @@ class StubIntlDateFormatterTest extends LocaleTestCase
             array("''y", "'1970", 0),
             array("H 'o'' clock'", "0 o' clock", 0),
         );
+    }
+
+    public function testParseWithNullPositionValueStub()
+    {
+        $position = null;
+        $formatter = $this->createStubFormatter('y');
+        $this->assertSame(0, $formatter->parse('1970', $position));
+        $this->assertNull($position);
+    }
+
+    /**
+     * @expectedException Symfony\Component\Locale\Exception\MethodArgumentNotImplementedException
+     */
+    public function testParseWithNotNullPositionValueStub()
+    {
+        $position = 0;
+        $formatter = $this->createStubFormatter('y');
+        $this->assertSame(0, $formatter->parse('1970', $position));
     }
 
     /**

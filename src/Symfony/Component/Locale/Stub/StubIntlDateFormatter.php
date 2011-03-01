@@ -15,6 +15,7 @@ use Symfony\Component\Locale\Stub\StubLocale;
 use Symfony\Component\Locale\Stub\DateFormat\FullTransformer;
 use Symfony\Component\Locale\Exception\NotImplementedException;
 use Symfony\Component\Locale\Exception\MethodNotImplementedException;
+use Symfony\Component\Locale\Exception\MethodArgumentNotImplementedException;
 use Symfony\Component\Locale\Exception\MethodArgumentValueNotImplementedException;
 
 /**
@@ -242,15 +243,21 @@ class StubIntlDateFormatter
     /**
      * Parse string to a timestamp value
      *
-     * @param  string   $value      String to convert to a time value
-     * @param  int      $position   Position at which to start the parsing in $value (zero-based).
-     *                              If no error occurs before $value is consumed, $parse_pos will
-     *                              contain -1 otherwise it will contain the position at which parsing
-     *                              ended. If $parse_pos > strlen($value), the parse fails immediately.
-     * @return string               Parsed value as a timestamp
+     * @param  string   $value                        String to convert to a time value
+     * @param  int      $position                     Position at which to start the parsing in $value (zero-based).
+     *                                                If no error occurs before $value is consumed, $parse_pos will
+     *                                                contain -1 otherwise it will contain the position at which parsing
+     *                                                ended. If $parse_pos > strlen($value), the parse fails immediately.
+     * @return string                                 Parsed value as a timestamp
+     * @throws MethodArgumentNotImplementedException  When $position different than null, behavior not implemented
      */
-    public function parse($value, &$position = 0)
+    public function parse($value, &$position = null)
     {
+        // We don't calculate the position when parsing the value
+        if (!is_null($position)) {
+            throw new MethodArgumentNotImplementedException(__METHOD__, 'position');
+        }
+
         $dateTime = $this->createDateTime(0);
         $transformer = new FullTransformer($this->getPattern(), $this->getTimeZoneId());
         return $transformer->parse($dateTime, $value);

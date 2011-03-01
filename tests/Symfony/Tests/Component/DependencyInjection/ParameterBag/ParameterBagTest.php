@@ -98,18 +98,18 @@ class ParameterBagTest extends \PHPUnit_Framework_TestCase
         $bag = new ParameterBag(array());
         try {
             $bag->resolveValue('%foobar%', array());
-            $this->fail('->resolveValue() throws an InvalidArgumentException if a placeholder references a non-existant parameter');
+            $this->fail('->resolveValue() throws an InvalidArgumentException if a placeholder references a non-existent parameter');
         } catch (\Exception $e) {
-            $this->assertInstanceOf('\InvalidArgumentException', $e, '->resolveValue() throws an InvalidArgumentException if a placeholder references a non-existant parameter');
-            $this->assertEquals('The parameter "foobar" must be defined.', $e->getMessage(), '->resolveValue() throws an InvalidArgumentException if a placeholder references a non-existant parameter');
+            $this->assertInstanceOf('\InvalidArgumentException', $e, '->resolveValue() throws an InvalidArgumentException if a placeholder references a non-existent parameter');
+            $this->assertEquals('The parameter "foobar" must be defined.', $e->getMessage(), '->resolveValue() throws an InvalidArgumentException if a placeholder references a non-existent parameter');
         }
 
         try {
             $bag->resolveValue('foo %foobar% bar', array());
-            $this->fail('->resolveValue() throws an InvalidArgumentException if a placeholder references a non-existant parameter');
+            $this->fail('->resolveValue() throws an InvalidArgumentException if a placeholder references a non-existent parameter');
         } catch (\Exception $e) {
-            $this->assertInstanceOf('\InvalidArgumentException', $e, '->resolveValue() throws an InvalidArgumentException if a placeholder references a non-existant parameter');
-            $this->assertEquals('The parameter "foobar" must be defined.', $e->getMessage(), '->resolveValue() throws an InvalidArgumentException if a placeholder references a non-existant parameter');
+            $this->assertInstanceOf('\InvalidArgumentException', $e, '->resolveValue() throws an InvalidArgumentException if a placeholder references a non-existent parameter');
+            $this->assertEquals('The parameter "foobar" must be defined.', $e->getMessage(), '->resolveValue() throws an InvalidArgumentException if a placeholder references a non-existent parameter');
         }
     }
 }

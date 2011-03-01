@@ -49,6 +49,6 @@ class XMLSchemaTest extends \PHPUnit_Framework_TestCase
             $found = true;
         }
 
-        $this->assertTrue($found, "Neither <doctrine:orm> nor <doctrine:dbal> elements found in given XML. Are namespace sconfigured correctly?");
+        $this->assertTrue($found, "Neither <doctrine:orm> nor <doctrine:dbal> elements found in given XML. Are namespaces configured correctly?");
     }
 }

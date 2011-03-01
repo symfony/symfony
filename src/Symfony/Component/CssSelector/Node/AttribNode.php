@@ -118,7 +118,7 @@ class AttribNode implements NodeInterface
     /**
      * Returns a formatted attribute
      *
-     * @return string The formatted attributep
+     * @return string The formatted attribute
      */
     protected function formatAttrib()
     {

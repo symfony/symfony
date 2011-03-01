@@ -393,7 +393,7 @@ class DoctrineExtension extends AbstractDoctrineExtension
      * There are two possible runtime scenarios:
      *
      * 1. If the EntityManager was defined before, override only the new calls to Doctrine\ORM\Configuration
-     * 2. If the EntityManager was not defined beforeefore, gather all the defaults for not specified options and set all the information.
+     * 2. If the EntityManager was not defined before, gather all the defaults for not specified options and set all the information.
      *
      * @param array $entityManager A configured ORM entity manager.
      * @param ContainerBuilder $container A ContainerBuilder instance

@@ -251,7 +251,8 @@ class AclProvider implements AclProviderInterface
      * @param array $batch
      * @param array $sids
      * @param array $oidLookup
-     * @return \SplObjectStorage mapping object identites to ACL instances
+     *
+     * @return \SplObjectStorage mapping object identities to ACL instances
      */
     protected function lookupObjectIdentities(array $batch, array $sids, array $oidLookup)
     {

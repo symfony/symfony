@@ -14,6 +14,9 @@ namespace Symfony\Bundle\AsseticBundle\Tests;
 use Symfony\Component\DomCrawler\Crawler;
 use Symfony\Component\HttpFoundation\Request;
 
+/**
+ * @group functional
+ */
 class FunctionalTest extends \PHPUnit_Framework_TestCase
 {
     protected function setUp()

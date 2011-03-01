@@ -273,7 +273,7 @@ class Parser
      *
      * @param  Node\NodeInterface $selector The selector object whose attribute
      *                                      is to be parsed.
-     * @param  TokenStream        $strem    The container token stream.
+     * @param  TokenStream        $stream    The container token stream.
      *
      * @return Node\AttribNode
      */

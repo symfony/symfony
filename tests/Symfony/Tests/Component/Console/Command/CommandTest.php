@@ -210,10 +210,10 @@ class CommandTest extends \PHPUnit_Framework_TestCase
         $command = new Command('foo');
         try {
             $command->run(new StringInput(''), new NullOutput());
-            $this->fail('->run() throws a \LogicException if the execute() method has not been overriden and no code has been provided');
+            $this->fail('->run() throws a \LogicException if the execute() method has not been overridden and no code has been provided');
         } catch (\Exception $e) {
-            $this->assertInstanceOf('\LogicException', $e, '->run() throws a \LogicException if the execute() method has not been overriden and no code has been provided');
-            $this->assertEquals('You must override the execute() method in the concrete command class.', $e->getMessage(), '->run() throws a \LogicException if the execute() method has not been overriden and no code has been provided');
+            $this->assertInstanceOf('\LogicException', $e, '->run() throws a \LogicException if the execute() method has not been overridden and no code has been provided');
+            $this->assertEquals('You must override the execute() method in the concrete command class.', $e->getMessage(), '->run() throws a \LogicException if the execute() method has not been overridden and no code has been provided');
         }
     }
 

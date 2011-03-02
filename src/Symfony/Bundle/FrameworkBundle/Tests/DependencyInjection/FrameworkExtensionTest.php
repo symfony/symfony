@@ -75,7 +75,7 @@ abstract class FrameworkExtensionTest extends TestCase
         $this->assertTrue($container->getDefinition('session')->hasMethodCall('start'));
         $this->assertEquals('Session', $container->getParameter('session.class'));
         $this->assertEquals('session.storage.native', (string) $container->getAlias('session.storage'));
-        
+
         $options = $container->getParameter('session.storage.native.options');
         $this->assertEquals('_SYMFONY', $options['name']);
         $this->assertEquals(86400, $options['lifetime']);
@@ -103,7 +103,7 @@ abstract class FrameworkExtensionTest extends TestCase
 
         $this->assertTrue($container->hasDefinition('templating.name_parser'), '->registerTemplatingConfiguration() loads templating.xml');
         $this->assertEquals('SomeVersionScheme', $container->getParameter('templating.assets.version'));
-        $this->assertEquals('http://cdn.example.com', $container->getParameter('templating.assets.base_urls'));
+        $this->assertEquals(array('http://cdn.example.com'), $container->getParameter('templating.assets.base_urls'));
 
         $this->assertTrue($container->getDefinition('templating.cache_warmer.template_paths')->hasTag('kernel.cache_warmer'), '->registerTemplatingConfiguration() tags templating cache warmer if cache warming is set');
         $this->assertEquals('templating.locator.cached', (string) $container->getAlias('templating.locator'), '->registerTemplatingConfiguration() changes templating.locator alias to cached if cache warming is set');

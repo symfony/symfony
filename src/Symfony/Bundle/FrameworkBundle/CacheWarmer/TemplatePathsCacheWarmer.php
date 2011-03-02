@@ -91,7 +91,8 @@ class TemplatePathsCacheWarmer extends CacheWarmer
                     if (null !== $bundle) {
                       $template->set('bundle', $bundle);
                     }
-                    $templates[$template->getSignature()] = $file->getRealPath();
+                    $templatePath = sprintf('%s:%s:%s.%s.%s', $template->get('bundle'), $template->get('controller'), $template->get('name'), $template->get('format'), $template->get('engine'));
+                    $templates[$templatePath] = $file->getRealPath();
                 }
             }
         }

@@ -65,7 +65,9 @@
     {% if attr.type is defined and attr.type != "text" %}
         <input {{ block('field_attributes') }} value="{{ field.displayedData }}" />
     {% else %}
-        {% set attr = attr|merge({ 'maxlength': attr.maxlength|default(field.maxlength) }) %}
+        {% if (field.maxlength is defined and field.maxlength > 0) or (attr.maxlength is defined and attr.maxlength > 0)  %}
+            {% set attr = attr|merge({ 'maxlength': attr.maxlength|default(field.maxlength) }) %}
+        {% endif %}
         <input type="text" {{ block('field_attributes') }} value="{{ field.displayedData }}" />
     {% endif %}
 {% endspaceless %}
@@ -73,7 +75,9 @@
 
 {% block password_field %}
 {% spaceless %}
-    {% set attr = attr|merge({ 'maxlength': attr.maxlength|default(field.maxlength) }) %}
+    {% if (field.maxlength is defined and field.maxlength > 0) or (attr.maxlength is defined and attr.maxlength > 0)  %}
+        {% set attr = attr|merge({ 'maxlength': attr.maxlength|default(field.maxlength) }) %}
+    {% endif %}
     <input type="password" {{ block('field_attributes') }} value="{{ field.displayedData }}" />
 {% endspaceless %}
 {% endblock password_field %}

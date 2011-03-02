@@ -82,6 +82,13 @@ class Field implements FieldInterface
     }
 
     /**
+     * Cloning is not supported
+     */
+    private function __clone()
+    {
+    }
+
+    /**
      * @deprecated
      */
     public function prependFilter(FilterInterface $filter)
@@ -109,14 +116,6 @@ class Field implements FieldInterface
         $this->eventManager->addEventListener($listener);
 
         return $this;
-    }
-
-    /**
-     * Clones this field.
-     */
-    public function __clone()
-    {
-        // TODO
     }
 
     /**

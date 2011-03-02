@@ -33,11 +33,6 @@ interface FieldInterface
     const DATA_ERROR = 1;
 
     /**
-     * Clones this field.
-     */
-    function __clone();
-
-    /**
      * Sets the parent field.
      *
      * @param FieldInterface $parent  The parent field

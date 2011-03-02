@@ -1,12 +1,11 @@
-{% block row %}
+{% block rows %}
 {% spaceless %}
-    <div>
-        {{ this.label }}
-        {{ this.errors }}
-        {{ this.widget }}
-    </div>
+    {{ this.errors }}
+    {% for field in fields %}
+        {{ field.row }}
+    {% endfor %}
 {% endspaceless %}
-{% endblock row %}
+{% endblock rows %}
 
 {% block errors %}
 {% spaceless %}
@@ -49,20 +48,6 @@
 {% endspaceless %}
 {% endblock widget %}
 
-{% block form__widget %}
-{% spaceless %}
-    {{ this.errors }}
-    {% for field in fields %}
-        {{ field.row }}
-    {% endfor %}
-    {{ this.rest }}
-{% endspaceless %}
-{% endblock form__widget %}
-
-{% block collection__widget %}
-    {{ block('form__widget') }}
-{% endblock collection__widget %}
-
 {% block text__widget %}
 {% spaceless %}
     {% set type = type|default('text') %}
@@ -84,10 +69,8 @@
 {% endspaceless %}
 {% endblock hidden__widget %}
 
+{# Don't render hidden fields - they will be rendered in the "rest" helper #}
 {% block hidden__row %}
-{% spaceless %}
-    {{ this.widget }}
-{% endspaceless %}
 {% endblock hidden__row %}
 
 {% block textarea__widget %}
@@ -219,3 +202,14 @@
 {% endspaceless %}
 {% endblock file__widget %}
 
+{% block collection__widget %}
+{% spaceless %}
+    {{ block('form__widget') }}
+{% endspaceless %}
+{% endblock collection__widget %}
+
+{% block repeated__row %}
+{% spaceless %}
+    {{ block('rows') }}
+{% endspaceless %}
+{% endblock repeated__row %}

@@ -37,6 +37,11 @@ class FormFactory implements FormFactoryInterface
         $instance = null;
         $hierarchy = array();
 
+        // TESTME
+        if (null === $key) {
+            $key = $identifier;
+        }
+
         while (null !== $identifier) {
             // TODO check if identifier exists
             $config = $this->configLoader->getConfig($identifier);

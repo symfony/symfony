@@ -18,36 +18,23 @@ class RepeatedFieldConfig extends AbstractFieldConfig
 {
     public function configure(FieldInterface $field, array $options)
     {
-        $firstChild = clone $options['prototype'];
-        $firstChild->setKey($options['first_key']);
-        $firstChild->setPropertyPath($options['first_key']);
-
-        $secondChild = clone $options['prototype'];
-        $secondChild->setKey($options['second_key']);
-        $secondChild->setPropertyPath($options['second_key']);
-
         $field->setValueTransformer(new ValueToDuplicatesTransformer(array(
                 $options['first_key'],
                 $options['second_key'],
             )))
-            ->add($firstChild)
-            ->add($secondChild);
+            ->add($this->getInstance($options['identifier'], $options['first_key'], $options['options']))
+            ->add($this->getInstance($options['identifier'], $options['second_key'], $options['options']));
     }
 
     public function getDefaultOptions(array $options)
     {
-        $defaultOptions = array(
+        return array(
             'template' => 'repeated',
+            'identifier' => 'text',
+            'options' => array(),
             'first_key' => 'first',
             'second_key' => 'second',
         );
-
-        // Lazy creation of the prototype
-        if (!isset($options['prototype'])) {
-            $defaultOptions['prototype'] = $this->getInstance('text');
-        }
-
-        return $defaultOptions;
     }
 
     public function getParent(array $options)

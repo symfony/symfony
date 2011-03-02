@@ -37,6 +37,15 @@ class DefaultRenderer implements RendererInterface
         $this->template = $template;
     }
 
+    public function __clone()
+    {
+        foreach ($this->changes as $key => $change) {
+            if (is_object($change)) {
+                $this->changes[$key] = clone $change;
+            }
+        }
+    }
+
     private function initialize()
     {
         if (!$this->initialized) {
@@ -51,6 +60,8 @@ class DefaultRenderer implements RendererInterface
                     $this->vars[$key] = $value;
                 }
             }
+
+            $this->changes = array();
         }
     }
 

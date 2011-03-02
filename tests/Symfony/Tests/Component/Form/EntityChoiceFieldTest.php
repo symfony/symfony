@@ -74,7 +74,7 @@ class EntityChoiceFieldTest extends DoctrineOrmTestCase
 //
 //        $this->persist(array($entity1, $entity2));
 //
-//        $field = $this->factory->getEntityChoiceField('name', array(
+//        $field = $this->factory->getInstance('entity', 'name', array(
 //            'em' => $this->em,
 //            'class' => self::SINGLE_IDENT_CLASS,
 //            'required' => false,
@@ -90,7 +90,7 @@ class EntityChoiceFieldTest extends DoctrineOrmTestCase
      */
     public function testConfigureQueryBuilderWithNonQueryBuilderAndNonClosure()
     {
-        $field = $this->factory->getEntityChoiceField('name', array(
+        $field = $this->factory->getInstance('entity', 'name', array(
             'em' => $this->em,
             'class' => self::SINGLE_IDENT_CLASS,
             'query_builder' => new \stdClass(),
@@ -102,7 +102,7 @@ class EntityChoiceFieldTest extends DoctrineOrmTestCase
      */
     public function testConfigureQueryBuilderWithClosureReturningNonQueryBuilder()
     {
-        $field = $this->factory->getEntityChoiceField('name', array(
+        $field = $this->factory->getInstance('entity', 'name', array(
             'em' => $this->em,
             'class' => self::SINGLE_IDENT_CLASS,
             'query_builder' => function () {
@@ -123,7 +123,7 @@ class EntityChoiceFieldTest extends DoctrineOrmTestCase
 
         // no persist here!
 
-        $field = $this->factory->getEntityChoiceField('name', array(
+        $field = $this->factory->getInstance('entity', 'name', array(
             'multiple' => false,
             'em' => $this->em,
             'class' => self::SINGLE_IDENT_CLASS,
@@ -134,7 +134,7 @@ class EntityChoiceFieldTest extends DoctrineOrmTestCase
 
     public function testSetDataSingle_null()
     {
-        $field = $this->factory->getEntityChoiceField('name', array(
+        $field = $this->factory->getInstance('entity', 'name', array(
             'multiple' => false,
             'em' => $this->em,
             'class' => self::SINGLE_IDENT_CLASS,
@@ -147,7 +147,7 @@ class EntityChoiceFieldTest extends DoctrineOrmTestCase
 
     public function testSetDataMultipleExpanded_null()
     {
-        $field = $this->factory->getEntityChoiceField('name', array(
+        $field = $this->factory->getInstance('entity', 'name', array(
             'multiple' => true,
             'expanded' => true,
             'em' => $this->em,
@@ -161,7 +161,7 @@ class EntityChoiceFieldTest extends DoctrineOrmTestCase
 
     public function testSetDataMultipleNonExpanded_null()
     {
-        $field = $this->factory->getEntityChoiceField('name', array(
+        $field = $this->factory->getInstance('entity', 'name', array(
             'multiple' => true,
             'expanded' => false,
             'em' => $this->em,
@@ -175,7 +175,7 @@ class EntityChoiceFieldTest extends DoctrineOrmTestCase
 
     public function testSubmitSingleExpanded_null()
     {
-        $field = $this->factory->getEntityChoiceField('name', array(
+        $field = $this->factory->getInstance('entity', 'name', array(
             'multiple' => false,
             'expanded' => true,
             'em' => $this->em,
@@ -189,7 +189,7 @@ class EntityChoiceFieldTest extends DoctrineOrmTestCase
 
     public function testSubmitSingleNonExpanded_null()
     {
-        $field = $this->factory->getEntityChoiceField('name', array(
+        $field = $this->factory->getInstance('entity', 'name', array(
             'multiple' => false,
             'expanded' => false,
             'em' => $this->em,
@@ -203,7 +203,7 @@ class EntityChoiceFieldTest extends DoctrineOrmTestCase
 
     public function testSubmitMultiple_null()
     {
-        $field = $this->factory->getEntityChoiceField('name', array(
+        $field = $this->factory->getInstance('entity', 'name', array(
             'multiple' => true,
             'em' => $this->em,
             'class' => self::SINGLE_IDENT_CLASS,
@@ -221,7 +221,7 @@ class EntityChoiceFieldTest extends DoctrineOrmTestCase
 
         $this->persist(array($entity1, $entity2));
 
-        $field = $this->factory->getEntityChoiceField('name', array(
+        $field = $this->factory->getInstance('entity', 'name', array(
             'multiple' => false,
             'expanded' => false,
             'em' => $this->em,
@@ -243,7 +243,7 @@ class EntityChoiceFieldTest extends DoctrineOrmTestCase
 
         $this->persist(array($entity1, $entity2));
 
-        $field = $this->factory->getEntityChoiceField('name', array(
+        $field = $this->factory->getInstance('entity', 'name', array(
             'multiple' => false,
             'expanded' => false,
             'em' => $this->em,
@@ -267,7 +267,7 @@ class EntityChoiceFieldTest extends DoctrineOrmTestCase
 
         $this->persist(array($entity1, $entity2, $entity3));
 
-        $field = $this->factory->getEntityChoiceField('name', array(
+        $field = $this->factory->getInstance('entity', 'name', array(
             'multiple' => true,
             'expanded' => false,
             'em' => $this->em,
@@ -292,7 +292,7 @@ class EntityChoiceFieldTest extends DoctrineOrmTestCase
 
         $this->persist(array($entity1, $entity2, $entity3));
 
-        $field = $this->factory->getEntityChoiceField('name', array(
+        $field = $this->factory->getInstance('entity', 'name', array(
             'multiple' => true,
             'expanded' => false,
             'em' => $this->em,
@@ -323,7 +323,7 @@ class EntityChoiceFieldTest extends DoctrineOrmTestCase
 
         $this->persist(array($entity1, $entity2, $entity3));
 
-        $field = $this->factory->getEntityChoiceField('name', array(
+        $field = $this->factory->getInstance('entity', 'name', array(
             'multiple' => true,
             'expanded' => false,
             'em' => $this->em,
@@ -349,7 +349,7 @@ class EntityChoiceFieldTest extends DoctrineOrmTestCase
 
         $this->persist(array($entity1, $entity2, $entity3));
 
-        $field = $this->factory->getEntityChoiceField('name', array(
+        $field = $this->factory->getInstance('entity', 'name', array(
             'multiple' => true,
             'expanded' => false,
             'em' => $this->em,
@@ -379,7 +379,7 @@ class EntityChoiceFieldTest extends DoctrineOrmTestCase
 
         $this->persist(array($entity1, $entity2));
 
-        $field = $this->factory->getEntityChoiceField('name', array(
+        $field = $this->factory->getInstance('entity', 'name', array(
             'multiple' => false,
             'expanded' => true,
             'em' => $this->em,
@@ -406,7 +406,7 @@ class EntityChoiceFieldTest extends DoctrineOrmTestCase
 
         $this->persist(array($entity1, $entity2, $entity3));
 
-        $field = $this->factory->getEntityChoiceField('name', array(
+        $field = $this->factory->getInstance('entity', 'name', array(
             'multiple' => true,
             'expanded' => true,
             'em' => $this->em,
@@ -437,7 +437,7 @@ class EntityChoiceFieldTest extends DoctrineOrmTestCase
 
         $this->persist(array($entity1, $entity2, $entity3));
 
-        $field = $this->factory->getEntityChoiceField('name', array(
+        $field = $this->factory->getInstance('entity', 'name', array(
             'em' => $this->em,
             'class' => self::SINGLE_IDENT_CLASS,
             // not all persisted entities should be displayed
@@ -461,7 +461,7 @@ class EntityChoiceFieldTest extends DoctrineOrmTestCase
 
         $this->persist(array($entity1, $entity2, $entity3));
 
-        $field = $this->factory->getEntityChoiceField('name', array(
+        $field = $this->factory->getInstance('entity', 'name', array(
             'em' => $this->em,
             'class' => self::SINGLE_IDENT_CLASS,
             'choices' => array($entity1, $entity2),
@@ -482,7 +482,7 @@ class EntityChoiceFieldTest extends DoctrineOrmTestCase
 
         $this->persist(array($entity1, $entity2, $entity3));
 
-        $field = $this->factory->getEntityChoiceField('name', array(
+        $field = $this->factory->getInstance('entity', 'name', array(
             'em' => $this->em,
             'class' => self::COMPOSITE_IDENT_CLASS,
             'choices' => array($entity1, $entity2),
@@ -505,7 +505,7 @@ class EntityChoiceFieldTest extends DoctrineOrmTestCase
 
         $repository = $this->em->getRepository(self::SINGLE_IDENT_CLASS);
 
-        $field = $this->factory->getEntityChoiceField('name', array(
+        $field = $this->factory->getInstance('entity', 'name', array(
             'em' => $this->em,
             'class' => self::SINGLE_IDENT_CLASS,
             'query_builder' => $repository->createQueryBuilder('e')
@@ -527,7 +527,7 @@ class EntityChoiceFieldTest extends DoctrineOrmTestCase
 
         $this->persist(array($entity1, $entity2, $entity3));
 
-        $field = $this->factory->getEntityChoiceField('name', array(
+        $field = $this->factory->getInstance('entity', 'name', array(
             'em' => $this->em,
             'class' => self::SINGLE_IDENT_CLASS,
             'query_builder' => function ($repository) {
@@ -551,7 +551,7 @@ class EntityChoiceFieldTest extends DoctrineOrmTestCase
 
         $this->persist(array($entity1, $entity2, $entity3));
 
-        $field = $this->factory->getEntityChoiceField('name', array(
+        $field = $this->factory->getInstance('entity', 'name', array(
             'em' => $this->em,
             'class' => self::COMPOSITE_IDENT_CLASS,
             'query_builder' => function ($repository) {

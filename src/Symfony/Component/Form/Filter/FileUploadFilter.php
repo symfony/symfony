@@ -74,10 +74,7 @@ class FileUploadFilter implements FilterInterface
         // Clear other fields if we still don't have a file, but keep
         // possible existing files of the field
         if (!$data['file']) {
-            $currentData = $this->field->getNormalizedData();
-            $data['file'] = $currentData['file'];
-            $data['token'] = '';
-            $data['name'] = '';
+            $data = $this->field->getNormalizedData();
         }
 
         return $data;

@@ -24,8 +24,8 @@ class RepeatedFieldTest extends TestCase
     {
         parent::setUp();
 
-        $this->field = $this->factory->getRepeatedField('name', array(
-            'prototype' => $this->factory->getField('foo'),
+        $this->field = $this->factory->getInstance('repeated', 'name', array(
+            'prototype' => $this->factory->getInstance('field', 'foo'),
         ));
         $this->field->setData(null);
     }

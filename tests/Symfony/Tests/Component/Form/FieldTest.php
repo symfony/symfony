@@ -35,63 +35,63 @@ class FieldTest extends TestCase
     {
         parent::setUp();
 
-        $this->field = $this->factory->getField('title');
+        $this->field = $this->factory->getInstance('field', 'title');
     }
 
     public function testGetPropertyPath_defaultPath()
     {
-        $field = $this->factory->getField('title');
+        $field = $this->factory->getInstance('field', 'title');
 
         $this->assertEquals(new PropertyPath('title'), $field->getPropertyPath());
     }
 
     public function testGetPropertyPath_pathIsZero()
     {
-        $field = $this->factory->getField('title', array('property_path' => '0'));
+        $field = $this->factory->getInstance('field', 'title', array('property_path' => '0'));
 
         $this->assertEquals(new PropertyPath('0'), $field->getPropertyPath());
     }
 
     public function testGetPropertyPath_pathIsEmpty()
     {
-        $field = $this->factory->getField('title', array('property_path' => ''));
+        $field = $this->factory->getInstance('field', 'title', array('property_path' => ''));
 
         $this->assertEquals(null, $field->getPropertyPath());
     }
 
     public function testGetPropertyPath_pathIsNull()
     {
-        $field = $this->factory->getField('title', array('property_path' => null));
+        $field = $this->factory->getInstance('field', 'title', array('property_path' => null));
 
         $this->assertEquals(null, $field->getPropertyPath());
     }
 
     public function testPassRequiredAsOption()
     {
-        $field = $this->factory->getField('title', array('required' => false));
+        $field = $this->factory->getInstance('field', 'title', array('required' => false));
 
         $this->assertFalse($field->isRequired());
 
-        $field = $this->factory->getField('title', array('required' => true));
+        $field = $this->factory->getInstance('field', 'title', array('required' => true));
 
         $this->assertTrue($field->isRequired());
     }
 
     public function testPassDisabledAsOption()
     {
-        $field = $this->factory->getField('title', array('disabled' => false));
+        $field = $this->factory->getInstance('field', 'title', array('disabled' => false));
 
         $this->assertFalse($field->isDisabled());
 
-        $field = $this->factory->getField('title', array('disabled' => true));
+        $field = $this->factory->getInstance('field', 'title', array('disabled' => true));
 
         $this->assertTrue($field->isDisabled());
     }
 
     public function testFieldIsDisabledIfParentIsDisabled()
     {
-        $field = $this->factory->getField('title', array('disabled' => false));
-        $field->setParent($this->factory->getField('title', array('disabled' => true)));
+        $field = $this->factory->getInstance('field', 'title', array('disabled' => false));
+        $field->setParent($this->factory->getInstance('field', 'title', array('disabled' => true)));
 
         $this->assertTrue($field->isDisabled());
     }
@@ -171,7 +171,7 @@ class FieldTest extends TestCase
 
     public function testDefaultDataIsTransformedCorrectly()
     {
-        $field = $this->factory->getField('name');
+        $field = $this->factory->getInstance('field', 'name');
 
         $this->assertEquals(null, $this->field->getData());
         $this->assertEquals('', $this->field->getDisplayedData());
@@ -253,7 +253,7 @@ class FieldTest extends TestCase
             'norm[0]' => 'transform[norm[0]]',
         ));
 
-        $field = $this->factory->getField('title', array(
+        $field = $this->factory->getInstance('field', 'title', array(
             'value_transformer' => $valueTransformer,
             'normalization_transformer' => $normTransformer,
         ));
@@ -272,7 +272,7 @@ class FieldTest extends TestCase
             'reverse[a]' => 'a',
         ));
 
-        $field = $this->factory->getField('title', array(
+        $field = $this->factory->getInstance('field', 'title', array(
             'value_transformer' => $transformer,
         ));
 
@@ -289,7 +289,7 @@ class FieldTest extends TestCase
             'reverse[ a ]' => ' a ',
         ));
 
-        $field = $this->factory->getField('title', array(
+        $field = $this->factory->getInstance('field', 'title', array(
             'trim' => false,
             'value_transformer' => $transformer,
         ));
@@ -304,7 +304,7 @@ class FieldTest extends TestCase
     {
         $object = new Author();
 
-        $field = $this->factory->getField('firstName', array('property_path' => null));
+        $field = $this->factory->getInstance('field', 'firstName', array('property_path' => null));
         $field->submit('Bernhard');
         $field->writeProperty($object);
 
@@ -313,7 +313,7 @@ class FieldTest extends TestCase
 
     public function testIsTransformationSuccessfulReturnsTrueIfReverseTransformSucceeded()
     {
-        $field = $this->factory->getField('title', array(
+        $field = $this->factory->getInstance('field', 'title', array(
             'trim' => false,
         ));
 
@@ -328,7 +328,7 @@ class FieldTest extends TestCase
         // The value is passed to the value transformer
         $transformer = $this->createMockTransformer();
 
-        $field = $this->factory->getField('title', array(
+        $field = $this->factory->getInstance('field', 'title', array(
             'trim' => false,
             'value_transformer' => $transformer,
         ));
@@ -360,7 +360,7 @@ class FieldTest extends TestCase
         $author = new Author();
         $author->firstName = 'Bernhard';
 
-        $field = $this->factory->getField('firstName', array(
+        $field = $this->factory->getInstance('field', 'firstName', array(
             'data' => 'foobar',
         ));
 

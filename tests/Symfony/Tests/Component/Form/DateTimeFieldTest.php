@@ -21,7 +21,7 @@ class DateTimeFieldTest extends DateTimeTestCase
 {
     public function testSubmit_dateTime()
     {
-        $field = $this->factory->getDateTimeField('name', array(
+        $field = $this->factory->getInstance('datetime', 'name', array(
             'data_timezone' => 'UTC',
             'user_timezone' => 'UTC',
             'date_widget' => 'choice',
@@ -48,7 +48,7 @@ class DateTimeFieldTest extends DateTimeTestCase
 
     public function testSubmit_string()
     {
-        $field = $this->factory->getDateTimeField('name', array(
+        $field = $this->factory->getInstance('datetime', 'name', array(
             'data_timezone' => 'UTC',
             'user_timezone' => 'UTC',
             'type' => 'string',
@@ -73,7 +73,7 @@ class DateTimeFieldTest extends DateTimeTestCase
 
     public function testSubmit_timestamp()
     {
-        $field = $this->factory->getDateTimeField('name', array(
+        $field = $this->factory->getInstance('datetime', 'name', array(
             'data_timezone' => 'UTC',
             'user_timezone' => 'UTC',
             'type' => 'timestamp',
@@ -100,7 +100,7 @@ class DateTimeFieldTest extends DateTimeTestCase
 
     public function testSubmit_withSeconds()
     {
-        $field = $this->factory->getDateTimeField('name', array(
+        $field = $this->factory->getInstance('datetime', 'name', array(
             'data_timezone' => 'UTC',
             'user_timezone' => 'UTC',
             'date_widget' => 'choice',
@@ -131,7 +131,7 @@ class DateTimeFieldTest extends DateTimeTestCase
 
     public function testSubmit_differentTimezones()
     {
-        $field = $this->factory->getDateTimeField('name', array(
+        $field = $this->factory->getInstance('datetime', 'name', array(
             'data_timezone' => 'America/New_York',
             'user_timezone' => 'Pacific/Tahiti',
             'date_widget' => 'choice',

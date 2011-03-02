@@ -19,7 +19,7 @@ class IntegerFieldTest extends LocalizedTestCase
 {
     public function testSubmitCastsToInteger()
     {
-        $field = $this->factory->getIntegerField('name');
+        $field = $this->factory->getInstance('integer', 'name');
 
         $field->submit('1.678');
 

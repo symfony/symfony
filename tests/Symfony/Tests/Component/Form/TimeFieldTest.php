@@ -19,7 +19,7 @@ class TimeFieldTest extends DateTimeTestCase
 {
     public function testSubmit_dateTime()
     {
-        $field = $this->factory->getTimeField('name', array(
+        $field = $this->factory->getInstance('time', 'name', array(
             'data_timezone' => 'UTC',
             'user_timezone' => 'UTC',
             'type' => 'datetime',
@@ -40,7 +40,7 @@ class TimeFieldTest extends DateTimeTestCase
 
     public function testSubmit_string()
     {
-        $field = $this->factory->getTimeField('name', array(
+        $field = $this->factory->getInstance('time', 'name', array(
             'data_timezone' => 'UTC',
             'user_timezone' => 'UTC',
             'type' => 'string',
@@ -59,7 +59,7 @@ class TimeFieldTest extends DateTimeTestCase
 
     public function testSubmit_timestamp()
     {
-        $field = $this->factory->getTimeField('name', array(
+        $field = $this->factory->getInstance('time', 'name', array(
             'data_timezone' => 'UTC',
             'user_timezone' => 'UTC',
             'type' => 'timestamp',
@@ -80,7 +80,7 @@ class TimeFieldTest extends DateTimeTestCase
 
     public function testSubmit_array()
     {
-        $field = $this->factory->getTimeField('name', array(
+        $field = $this->factory->getInstance('time', 'name', array(
             'data_timezone' => 'UTC',
             'user_timezone' => 'UTC',
             'type' => 'array',
@@ -104,7 +104,7 @@ class TimeFieldTest extends DateTimeTestCase
 
     public function testSetData_withSeconds()
     {
-        $field = $this->factory->getTimeField('name', array(
+        $field = $this->factory->getInstance('time', 'name', array(
             'data_timezone' => 'UTC',
             'user_timezone' => 'UTC',
             'type' => 'datetime',
@@ -118,7 +118,7 @@ class TimeFieldTest extends DateTimeTestCase
 
     public function testSetData_differentTimezones()
     {
-        $field = $this->factory->getTimeField('name', array(
+        $field = $this->factory->getInstance('time', 'name', array(
             'data_timezone' => 'America/New_York',
             'user_timezone' => 'Pacific/Tahiti',
             // don't do this test with DateTime, because it leads to wrong results!
@@ -146,7 +146,7 @@ class TimeFieldTest extends DateTimeTestCase
     {
         $this->markTestSkipped('Needs to be reimplemented using validators');
 
-        $field = $this->factory->getTimeField('name', array(
+        $field = $this->factory->getInstance('time', 'name', array(
             'hours' => array(6, 7),
         ));
 
@@ -159,7 +159,7 @@ class TimeFieldTest extends DateTimeTestCase
     {
         $this->markTestSkipped('Needs to be reimplemented using validators');
 
-        $field = $this->factory->getTimeField('name', array(
+        $field = $this->factory->getInstance('time', 'name', array(
             'hours' => array(6, 7),
         ));
 
@@ -172,7 +172,7 @@ class TimeFieldTest extends DateTimeTestCase
     {
         $this->markTestSkipped('Needs to be reimplemented using validators');
 
-        $field = $this->factory->getTimeField('name', array(
+        $field = $this->factory->getInstance('time', 'name', array(
             'hours' => array(6, 7),
         ));
 
@@ -185,7 +185,7 @@ class TimeFieldTest extends DateTimeTestCase
     {
         $this->markTestSkipped('Needs to be reimplemented using validators');
 
-        $field = $this->factory->getTimeField('name', array(
+        $field = $this->factory->getInstance('time', 'name', array(
             'minutes' => array(6, 7),
         ));
 
@@ -198,7 +198,7 @@ class TimeFieldTest extends DateTimeTestCase
     {
         $this->markTestSkipped('Needs to be reimplemented using validators');
 
-        $field = $this->factory->getTimeField('name', array(
+        $field = $this->factory->getInstance('time', 'name', array(
             'minutes' => array(6, 7),
         ));
 
@@ -211,7 +211,7 @@ class TimeFieldTest extends DateTimeTestCase
     {
         $this->markTestSkipped('Needs to be reimplemented using validators');
 
-        $field = $this->factory->getTimeField('name', array(
+        $field = $this->factory->getInstance('time', 'name', array(
             'minutes' => array(6, 7),
         ));
 
@@ -224,7 +224,7 @@ class TimeFieldTest extends DateTimeTestCase
     {
         $this->markTestSkipped('Needs to be reimplemented using validators');
 
-        $field = $this->factory->getTimeField('name', array(
+        $field = $this->factory->getInstance('time', 'name', array(
             'seconds' => array(6, 7),
             'with_seconds' => true,
         ));
@@ -238,7 +238,7 @@ class TimeFieldTest extends DateTimeTestCase
     {
         $this->markTestSkipped('Needs to be reimplemented using validators');
 
-        $field = $this->factory->getTimeField('name', array(
+        $field = $this->factory->getInstance('time', 'name', array(
             'seconds' => array(6, 7),
             'with_seconds' => true,
         ));
@@ -252,7 +252,7 @@ class TimeFieldTest extends DateTimeTestCase
     {
         $this->markTestSkipped('Needs to be reimplemented using validators');
 
-        $field = $this->factory->getTimeField('name', array(
+        $field = $this->factory->getInstance('time', 'name', array(
             'seconds' => array(6, 7),
         ));
 
@@ -265,7 +265,7 @@ class TimeFieldTest extends DateTimeTestCase
     {
         $this->markTestSkipped('Needs to be reimplemented using validators');
 
-        $field = $this->factory->getTimeField('name', array(
+        $field = $this->factory->getInstance('time', 'name', array(
             'seconds' => array(6, 7),
             'with_seconds' => true,
         ));
@@ -279,7 +279,7 @@ class TimeFieldTest extends DateTimeTestCase
     {
         $this->markTestSkipped('Needs to be reimplemented using validators');
 
-        $field = $this->factory->getTimeField('name', array(
+        $field = $this->factory->getInstance('time', 'name', array(
             'widget' => 'choice',
         ));
 
@@ -295,7 +295,7 @@ class TimeFieldTest extends DateTimeTestCase
     {
         $this->markTestSkipped('Needs to be reimplemented using validators');
 
-        $field = $this->factory->getTimeField('name', array(
+        $field = $this->factory->getInstance('time', 'name', array(
             'widget' => 'choice',
             'with_seconds' => true,
         ));
@@ -313,7 +313,7 @@ class TimeFieldTest extends DateTimeTestCase
     {
         $this->markTestSkipped('Needs to be reimplemented using validators');
 
-        $field = $this->factory->getTimeField('name', array(
+        $field = $this->factory->getInstance('time', 'name', array(
             'widget' => 'choice',
         ));
 
@@ -329,7 +329,7 @@ class TimeFieldTest extends DateTimeTestCase
     {
         $this->markTestSkipped('Needs to be reimplemented using validators');
 
-        $field = $this->factory->getTimeField('name', array(
+        $field = $this->factory->getInstance('time', 'name', array(
             'widget' => 'choice',
             'with_seconds' => true,
         ));
@@ -347,7 +347,7 @@ class TimeFieldTest extends DateTimeTestCase
     {
         $this->markTestSkipped('Needs to be reimplemented using validators');
 
-        $field = $this->factory->getTimeField('name', array(
+        $field = $this->factory->getInstance('time', 'name', array(
             'widget' => 'choice',
             'with_seconds' => true,
         ));
@@ -365,7 +365,7 @@ class TimeFieldTest extends DateTimeTestCase
     {
         $this->markTestSkipped('Needs to be reimplemented using validators');
 
-        $field = $this->factory->getTimeField('name', array(
+        $field = $this->factory->getInstance('time', 'name', array(
             'widget' => 'choice',
             'with_seconds' => true,
         ));
@@ -383,7 +383,7 @@ class TimeFieldTest extends DateTimeTestCase
     {
         $this->markTestSkipped('Needs to be reimplemented using validators');
 
-        $field = $this->factory->getTimeField('name', array(
+        $field = $this->factory->getInstance('time', 'name', array(
             'widget' => 'choice',
             'with_seconds' => true,
         ));

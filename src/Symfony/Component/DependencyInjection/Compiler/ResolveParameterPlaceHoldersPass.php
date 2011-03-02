@@ -79,9 +79,9 @@ class ResolveParameterPlaceHoldersPass implements CompilerPassInterface
             return $resolved;
         } else if (is_string($value)) {
             return $this->resolveString($value);
-        } else {
-            return $value;
         }
+
+        return $value;
     }
 
     /**

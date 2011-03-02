@@ -122,7 +122,7 @@ class XPathExpr
 
     /**
      * Adds a condition to this XPath expression.
-     * Any pre-existant condition will be ANDed to it.
+     * Any pre-existent condition will be ANDed to it.
      *
      * @param string $condition The condition to add.
      */
@@ -137,7 +137,7 @@ class XPathExpr
 
     /**
      * Adds a prefix to this XPath expression.
-     * It will be prepended to any pre-existant prefixes.
+     * It will be prepended to any pre-existent prefixes.
      *
      * @param string $prefix  The prefix to add.
      */

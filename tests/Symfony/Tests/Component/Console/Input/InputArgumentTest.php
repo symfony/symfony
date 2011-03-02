@@ -12,7 +12,6 @@
 namespace Symfony\Tests\Component\Console\Input;
 
 use Symfony\Component\Console\Input\InputArgument;
-use Symfony\Component\Console\Exception;
 
 class InputArgumentTest extends \PHPUnit_Framework_TestCase
 {

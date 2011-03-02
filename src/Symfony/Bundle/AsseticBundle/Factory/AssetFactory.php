@@ -12,7 +12,7 @@
 namespace Symfony\Bundle\AsseticBundle\Factory;
 
 use Assetic\Factory\AssetFactory as BaseAssetFactory;
-use Symfony\Component\HttpKernel\Kernel;
+use Symfony\Component\HttpKernel\KernelInterface;
 
 /**
  * Loads asset formulae from the filesystem.
@@ -23,7 +23,7 @@ class AssetFactory extends BaseAssetFactory
 {
     protected $kernel;
 
-    public function __construct(Kernel $kernel, $baseDir, $debug = false)
+    public function __construct(KernelInterface $kernel, $baseDir, $debug = false)
     {
         $this->kernel = $kernel;
 

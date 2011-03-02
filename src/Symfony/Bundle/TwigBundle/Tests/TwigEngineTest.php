@@ -21,7 +21,7 @@ use Symfony\Bundle\TwigBundle\GlobalVariables;
 
 class TwigEngineTest extends TestCase
 {
-    public function testEvalutateAddsAppGlobal()
+    public function testEvaluateAddsAppGlobal()
     {
         $environment = $this->getTwigEnvironment();
         $container = $this->getContainer();
@@ -40,7 +40,7 @@ class TwigEngineTest extends TestCase
         $this->assertSame($app, $globals['app']);
     }
 
-    public function testEvalutateWithoutAvailableRequest()
+    public function testEvaluateWithoutAvailableRequest()
     {
         $environment = $this->getTwigEnvironment();
         $container = new Container();

@@ -17,8 +17,6 @@ use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Output\OutputInterface;
 use Symfony\Component\Console\Output\Output;
 use Symfony\Bundle\FrameworkBundle\Util\Filesystem;
-use Doctrine\Common\Cli\Configuration;
-use Doctrine\Common\Cli\CliController as DoctrineCliController;
 use Doctrine\DBAL\Connection;
 
 /**
@@ -74,7 +72,7 @@ EOT
             }
         } else {
             $output->writeln(sprintf('<info>Would drop the database named <comment>%s</comment>.</info>', $name));
-            $output->writeln(sprintf('<error>All data will be lost!</error>', $name));
+            $output->writeln('<error>All data will be lost!</error>');
         }
     }
 }

@@ -357,7 +357,7 @@ EOF;
         $kernel->initializeBundles();
     }
 
-    public function testInitializeBundlesSupportsArbitaryBundleRegistrationOrder()
+    public function testInitializeBundlesSupportsArbitraryBundleRegistrationOrder()
     {
         $grandparent = $this->getBundle(null, null, 'GrandParentCCundle');
         $parent = $this->getBundle(null, 'GrandParentCCundle', 'ParentCCundle');

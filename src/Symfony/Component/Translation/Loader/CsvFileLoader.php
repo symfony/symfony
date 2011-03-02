@@ -31,7 +31,7 @@ class CsvFileLoader extends ArrayLoader implements LoaderInterface
             throw new \InvalidArgumentException(sprintf('Error opening file "%s".', $resource));
         }
 
-        while(($data = fgetcsv($file, 0, ';')) !== false) {
+        while (($data = fgetcsv($file, 0, ';')) !== false) {
             if (substr($data[0], 0, 1) === '#') {
                 continue;
             }

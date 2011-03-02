@@ -7,6 +7,13 @@ use Symfony\Component\HttpFoundation\Response;
 
 class RememberMeServicesTest extends \PHPUnit_Framework_TestCase
 {
+    public function testGetRememberMeParameter()
+    {
+        $service = $this->getService(null, array('remember_me_parameter' => 'foo'));
+
+        $this->assertEquals('foo', $service->getRememberMeParameter());
+    }
+
     public function testAutoLoginReturnsNullWhenNoCookie()
     {
         $service = $this->getService(null, array('name' => 'foo'));

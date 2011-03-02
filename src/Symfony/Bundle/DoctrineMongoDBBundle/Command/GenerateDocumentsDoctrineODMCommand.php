@@ -43,7 +43,7 @@ Alternatively, you can limit generation to a single document within a bundle:
 
   <info>./app/console doctrine:generate:documents "MyCustomBundle" --document="User"</info>
 
-You have to specifiy the shortname (without namespace) of the document you want to filter for.
+You have to specify the shortname (without namespace) of the document you want to filter for.
 EOT
         );
     }
@@ -66,7 +66,7 @@ EOT
 
                 if (strpos($metadata->name, $foundBundle->getNamespace()) === false) {
                     throw new \RuntimeException(
-                        "Document " . $metadata->name . " and bundle don't have a commont namespace, ".
+                        "Document " . $metadata->name . " and bundle don't have a common namespace, ".
                         "generation failed because the target directory cannot be detected.");
                 }
 

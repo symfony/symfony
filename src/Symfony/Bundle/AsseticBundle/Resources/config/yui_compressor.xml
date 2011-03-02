@@ -10,12 +10,12 @@
     </parameters>
 
     <services>
-        <service id="assetic.filter.yui_css" class="%assetic.filter.yui_css.class%" public="false">
+        <service id="assetic.filter.yui_css" class="%assetic.filter.yui_css.class%">
             <tag name="assetic.filter" alias="yui_css" />
             <argument>%assetic.yui_jar%</argument>
             <argument>%assetic.java_bin%</argument>
         </service>
-        <service id="assetic.filter.yui_js" class="%assetic.filter.yui_js.class%" public="false">
+        <service id="assetic.filter.yui_js" class="%assetic.filter.yui_js.class%">
             <tag name="assetic.filter" alias="yui_js" />
             <argument>%assetic.yui_jar%</argument>
             <argument>%assetic.java_bin%</argument>

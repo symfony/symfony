@@ -54,7 +54,7 @@ abstract class Bundle extends ContainerAware implements BundleInterface
      * is forced to be the underscore version of the bundle name
      * (sensio_blog for a SensioBlogBundle for instance).
      *
-     * This method can be overriden to register compilation passes,
+     * This method can be overridden to register compilation passes,
      * other extensions, ...
      *
      * @param ContainerBuilder $container A ContainerBuilder instance

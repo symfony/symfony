@@ -16,7 +16,7 @@ use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpFoundation\Request;
 
 /**
- * This handler cleares the passed cookies when a user logs out.
+ * This handler clears the passed cookies when a user logs out.
  *
  * @author Johannes M. Schmitt <schmittjoh@gmail.com>
  */

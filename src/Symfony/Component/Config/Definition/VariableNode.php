@@ -16,8 +16,8 @@ use Symfony\Component\Config\Definition\Exception\InvalidConfigurationException;
 /**
  * This node represents a variable value in the config tree.
  *
- * This node is intended for arbitrary variables. It behaves similar to scalar
- * nodes except that any PHP type is accepted as a value.
+ * This node is intended for arbitrary variables.
+ * Any PHP type is accepted as a value.
  *
  * @author Jeremy Mikola <jmikola@gmail.com>
  */

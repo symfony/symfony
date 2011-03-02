@@ -12,6 +12,7 @@
 namespace Symfony\Component\Routing\Loader;
 
 use Symfony\Component\Routing\RouteCollection;
+use Symfony\Component\Config\Resource\FileResource;
 
 /**
  * AnnotationDirectoryLoader loads routing information from annotations set
@@ -42,6 +43,7 @@ class AnnotationDirectoryLoader extends AnnotationFileLoader
             }
 
             if ($class = $this->findClass($file)) {
+                $collection->addResource(new FileResource($file));
                 $collection->addCollection($this->loader->load($class, $type));
             }
         }

@@ -36,12 +36,12 @@ class TestClient extends Client
     {
         if (null === $this->nextResponse) {
             return new Response();
-        } else {
-            $response = $this->nextResponse;
-            $this->nextResponse = null;
-
-            return $response;
         }
+
+        $response = $this->nextResponse;
+        $this->nextResponse = null;
+
+        return $response;
     }
 
     protected function getScript($request)

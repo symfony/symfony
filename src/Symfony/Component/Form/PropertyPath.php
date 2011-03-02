@@ -251,9 +251,9 @@ class PropertyPath implements \IteratorAggregate
 
         if ($currentIndex < $this->length) {
             return $this->readPropertyPath($value, $currentIndex);
-        } else {
-            return $value;
         }
+
+        return $value;
     }
 
     /**

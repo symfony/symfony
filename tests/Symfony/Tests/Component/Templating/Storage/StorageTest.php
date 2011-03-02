@@ -12,7 +12,6 @@
 namespace Symfony\Tests\Component\Templating\Storage;
 
 use Symfony\Component\Templating\Storage\Storage;
-use Symfony\Component\Templating\Renderer\PhpRenderer;
 
 class StorageTest extends \PHPUnit_Framework_TestCase
 {

@@ -9,14 +9,10 @@
  * with this source code in the file LICENSE.
  */
 
-namespace Symfony\Bundle\AsseticBundle\Tests\Kernel;
+namespace Symfony\Bundle\AsseticBundle\Tests\TestBundle;
 
 use Symfony\Component\HttpKernel\Bundle\Bundle;
 
 class TestBundle extends Bundle
 {
-    public function getPath()
-    {
-        return parent::getPath().'/bundle';
-    }
 }

@@ -14,7 +14,6 @@ namespace Symfony\Tests\Component\Console\Input;
 use Symfony\Component\Console\Input\InputDefinition;
 use Symfony\Component\Console\Input\InputArgument;
 use Symfony\Component\Console\Input\InputOption;
-use Symfony\Component\Console\Exception;
 
 class InputDefinitionTest extends \PHPUnit_Framework_TestCase
 {

@@ -25,6 +25,7 @@
             <tag name="assetic.templating.twig" />
             <argument type="service" id="assetic.twig_formula_loader.real" />
             <argument type="service" id="assetic.config_cache" />
+            <argument>%kernel.debug%</argument>
         </service>
         <service id="assetic.twig_formula_loader.real" class="%assetic.twig_formula_loader.class%" public="false">
             <tag name="assetic.templating.twig" />

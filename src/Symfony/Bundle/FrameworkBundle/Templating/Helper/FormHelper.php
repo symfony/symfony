@@ -66,9 +66,9 @@ class FormHelper extends Helper
     {
         if (false === $value || null === $value || ('' === $value && 'value' != $name)) {
             return '';
-        } else {
-            return ' '.$this->attribute($name, $value);
         }
+
+        return ' '.$this->attribute($name, $value);
     }
 
     /**

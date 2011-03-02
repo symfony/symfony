@@ -683,7 +683,7 @@ abstract class AbstractDoctrineExtensionTest extends TestCase
 
     protected function assertDICConstructorArguments($definition, $args)
     {
-        $this->assertEquals($args, $definition->getArguments(), "Expected and actual DIC Service constructor arguments of definition '" . $definition->getClass()."' dont match.");
+        $this->assertEquals($args, $definition->getArguments(), "Expected and actual DIC Service constructor arguments of definition '" . $definition->getClass()."' don't match.");
     }
 
     protected function assertDICDefinitionMethodCallAt($pos, $definition, $methodName, array $params = null)
@@ -710,7 +710,7 @@ abstract class AbstractDoctrineExtensionTest extends TestCase
     {
         $calls = $definition->getMethodCalls();
         $called = false;
-        foreach ($calls AS $call) {
+        foreach ($calls as $call) {
             if ($call[0] == $methodName) {
                 if ($called) {
                     $this->fail("Method '".$methodName."' is expected to be called only once, a second call was registered though.");

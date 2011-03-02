@@ -96,8 +96,8 @@ EOF;
             return log(0);
         } elseif ('+Inf' === $number || 'Inf' === $number) {
             return -log(0);
-        } else {
-            return (int) $number;
         }
+
+        return (int) $number;
     }
 }

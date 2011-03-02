@@ -159,9 +159,9 @@ class Command
 
         if ($this->code) {
             return call_user_func($this->code, $input, $output);
-        } else {
-            return $this->execute($input, $output);
         }
+
+        return $this->execute($input, $output);
     }
 
     /**

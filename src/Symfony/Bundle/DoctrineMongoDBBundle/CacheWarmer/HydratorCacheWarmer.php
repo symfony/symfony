@@ -39,7 +39,7 @@ class HydratorCacheWarmer implements CacheWarmerInterface
     }
 
     /**
-     * This cache warmer is not optional, without hydrators fatal error occour!
+     * This cache warmer is not optional, without hydrators fatal error occurs!
      *
      * @return false
      */
@@ -66,7 +66,7 @@ class HydratorCacheWarmer implements CacheWarmerInterface
         }
 
         $documentManagers = $this->container->getParameter('doctrine.odm.mongodb.document_managers');
-        foreach ($documentManagers AS $documentManagerName) {
+        foreach ($documentManagers as $documentManagerName) {
             $dm = $this->container->get(sprintf('doctrine.odm.mongodb.%s_document_manager', $documentManagerName));
             /* @var $dm Doctrine\ODM\MongoDB\DocumentManager */
             $classes = $dm->getMetadataFactory()->getAllMetadata();

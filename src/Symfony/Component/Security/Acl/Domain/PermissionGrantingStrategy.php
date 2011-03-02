@@ -220,8 +220,8 @@ class PermissionGrantingStrategy implements PermissionGrantingStrategyInterface
             return 0 !== ($ace->getMask() & $requiredMask);
         } else if (self::EQUAL === $strategy) {
             return $requiredMask === $ace->getMask();
-        } else {
-            throw new \RuntimeException(sprintf('The strategy "%s" is not supported.', $strategy));
         }
+
+        throw new \RuntimeException(sprintf('The strategy "%s" is not supported.', $strategy));
     }
 }

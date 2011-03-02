@@ -111,13 +111,13 @@ class AclVoter implements VoterInterface
                     }
 
                     return self::ACCESS_GRANTED;
-                } else {
-                    if (null !== $this->logger) {
-                        $this->logger->debug('ACL found, insufficient permissions. Voting to deny access.');
-                    }
-
-                    return self::ACCESS_DENIED;
                 }
+
+                if (null !== $this->logger) {
+                    $this->logger->debug('ACL found, insufficient permissions. Voting to deny access.');
+                }
+
+                return self::ACCESS_DENIED;
             } catch (NoAceFoundException $noAce) {
                 if (null !== $this->logger) {
                     $this->logger->debug('ACL found, no ACE applicable. Voting to deny access.');

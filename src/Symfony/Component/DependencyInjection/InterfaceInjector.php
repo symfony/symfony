@@ -25,7 +25,7 @@ class InterfaceInjector
     protected $processedDefinitions = array();
 
     /**
-     * Contructs interface injector by specifying the target class name
+     * Constructs interface injector by specifying the target class name
      *
      * @param string $class
      */

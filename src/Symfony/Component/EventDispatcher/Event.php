@@ -61,7 +61,7 @@ class Event implements EventInterface
      * Sets the processed flag to true.
      *
      * This method must be called by listeners when
-     * it has processed the event (it is only meaninful
+     * it has processed the event (it is only meaningful
      * when the event has been notified with the notifyUntil()
      * dispatcher method.
      */

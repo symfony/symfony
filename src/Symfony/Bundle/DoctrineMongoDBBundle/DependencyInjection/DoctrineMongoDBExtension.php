@@ -299,8 +299,8 @@ class DoctrineMongoDBExtension extends AbstractDoctrineExtension
      *
      * There are two distinct configuration possibilities for mapping information:
      *
-     * 1. Specifiy a bundle and optionally details where the entity and mapping information reside.
-     * 2. Specifiy an arbitrary mapping location.
+     * 1. Specify a bundle and optionally details where the entity and mapping information reside.
+     * 2. Specify an arbitrary mapping location.
      *
      * @example
      *
@@ -339,7 +339,7 @@ class DoctrineMongoDBExtension extends AbstractDoctrineExtension
         if ($odmConfigDef->hasMethodCall('setDocumentNamespaces')) {
             // TODO: Can we make a method out of it on Definition? replaceMethodArguments() or something.
             $calls = $odmConfigDef->getMethodCalls();
-            foreach ($calls AS $call) {
+            foreach ($calls as $call) {
                 if ($call[0] == 'setDocumentNamespaces') {
                     $this->aliasMap = array_merge($call[1][0], $this->aliasMap);
                 }

@@ -436,9 +436,9 @@ class Request
 
         if (('http' == $scheme && $port == 80) || ('https' == $scheme && $port == 443)) {
             return $name;
-        } else {
-            return $name.':'.$port;
         }
+
+        return $name.':'.$port;
     }
 
     public function getRequestUri()

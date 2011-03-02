@@ -53,7 +53,7 @@ class ParameterBagTest extends \PHPUnit_Framework_TestCase
 
         $this->assertEquals('bar', $bag->get('foo'), '->get() gets the value of a parameter');
         $this->assertEquals('default', $bag->get('unknown', 'default'), '->get() returns second argument as default if a parameter is not defined');
-        $this->assertNull($bag->get('null', 'default'), '->get() retuns null if null is set');
+        $this->assertNull($bag->get('null', 'default'), '->get() returns null if null is set');
     }
 
     /**

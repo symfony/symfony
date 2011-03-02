@@ -147,12 +147,12 @@ class Parser
                 $combinator = ' ';
             }
             $consumed = count($stream->getUsed());
-            $next_selector = $this->parseSimpleSelector($stream);
+            $nextSelector = $this->parseSimpleSelector($stream);
             if ($consumed == count($stream->getUsed())) {
                 throw new SyntaxError(sprintf("Expected selector, got '%s'", $stream->peek()));
             }
 
-            $result = new Node\CombinedSelectorNode($result, $combinator, $next_selector);
+            $result = new Node\CombinedSelectorNode($result, $combinator, $nextSelector);
         }
 
         return $result;
@@ -193,11 +193,11 @@ class Parser
         }
 
         $result = new Node\ElementNode($namespace, $element);
-        $has_hash = false;
+        $hasHash = false;
         while (true) {
             $peek = $stream->peek();
             if ('#' == $peek) {
-                if ($has_hash) {
+                if ($hasHash) {
                     /* You can't have two hashes
                         (FIXME: is there some more general rule I'm missing?) */
                     // @codeCoverageIgnoreStart
@@ -206,7 +206,7 @@ class Parser
                 }
                 $stream->next();
                 $result = new Node\HashNode($result, $stream->next());
-                $has_hash = true;
+                $hasHash = true;
 
                 continue;
             } elseif ('.' == $peek) {
@@ -273,7 +273,7 @@ class Parser
      *
      * @param  Node\NodeInterface $selector The selector object whose attribute
      *                                      is to be parsed.
-     * @param  TokenStream        $strem    The container token stream.
+     * @param  TokenStream        $stream    The container token stream.
      *
      * @return Node\AttribNode
      */

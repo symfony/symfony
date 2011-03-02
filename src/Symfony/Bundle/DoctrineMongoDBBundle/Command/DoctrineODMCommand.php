@@ -55,7 +55,7 @@ abstract class DoctrineODMCommand extends Command
     {
         $documentManagerNames = $this->container->getParameter('doctrine.odm.mongodb.document_managers');
         $documentManagers = array();
-        foreach ($documentManagerNames AS $documentManagerName) {
+        foreach ($documentManagerNames as $documentManagerName) {
             $dm = $this->container->get(sprintf('doctrine.odm.mongodb.%s_document_manager', $documentManagerName));
             $documentManagers[] = $dm;
         }

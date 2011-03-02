@@ -42,8 +42,8 @@ class Filesystem
         $mostRecent = false;
         if (file_exists($targetFile)) {
             $statTarget = stat($targetFile);
-            $stat_origin = stat($originFile);
-            $mostRecent = ($stat_origin['mtime'] > $statTarget['mtime']) ? true : false;
+            $statOrigin = stat($originFile);
+            $mostRecent = $statOrigin['mtime'] > $statTarget['mtime'];
         }
 
         if ($options['override'] || !file_exists($targetFile) || $mostRecent) {

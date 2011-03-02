@@ -460,9 +460,9 @@ class PhpEngine implements EngineInterface, \ArrayAccess
             return iconv($from, $to, $string);
         } elseif (function_exists('mb_convert_encoding')) {
             return mb_convert_encoding($string, $to, $from);
-        } else {
-            throw new \RuntimeException('No suitable convert encoding function (use UTF-8 as your encoding or install the iconv or mbstring extension).');
         }
+
+        throw new \RuntimeException('No suitable convert encoding function (use UTF-8 as your encoding or install the iconv or mbstring extension).');
     }
 
     /**

@@ -42,10 +42,10 @@ class Tokenizer
 
         while (true) {
             if (preg_match('#\s+#A', $s, $match, 0, $pos)) {
-                $preceding_whitespace_pos = $pos;
+                $precedingWhitespacePos = $pos;
                 $pos += strlen($match[0]);
             } else {
-                $preceding_whitespace_pos = 0;
+                $precedingWhitespacePos = 0;
             }
 
             if ($pos >= strlen($s)) {
@@ -74,8 +74,8 @@ class Tokenizer
             }
 
             if (in_array($c, array('>', '+', '~', ',', '.', '*', '=', '[', ']', '(', ')', '|', ':', '#'))) {
-                if (in_array($c, array('.', '#', '[')) && $preceding_whitespace_pos > 0) {
-                    $tokens[] = new Token('Token', ' ', $preceding_whitespace_pos);
+                if (in_array($c, array('.', '#', '[')) && $precedingWhitespacePos > 0) {
+                    $tokens[] = new Token('Token', ' ', $precedingWhitespacePos);
                 }
                 $tokens[] = new Token('Token', $c, $pos);
                 ++$pos;
@@ -85,18 +85,18 @@ class Tokenizer
 
             if ('"' === $c || "'" === $c) {
                 // Quoted string
-                $old_pos = $pos;
+                $oldPos = $pos;
                 list($sym, $pos) = $this->tokenizeEscapedString($s, $pos);
 
-                $tokens[] = new Token('String', $sym, $old_pos);
+                $tokens[] = new Token('String', $sym, $oldPos);
 
                 continue;
             }
 
-            $old_pos = $pos;
+            $oldPos = $pos;
             list($sym, $pos) = $this->tokenizeSymbol($s, $pos);
 
-            $tokens[] = new Token('Symbol', $sym, $old_pos);
+            $tokens[] = new Token('Symbol', $sym, $oldPos);
 
             continue;
         }

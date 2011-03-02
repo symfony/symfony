@@ -86,13 +86,14 @@ class FileBag extends ParameterBag
             }
             if ($keys != $this->fileKeys) {
                 $file = array_map(array($this, 'convertFileInformation'), $file);
-            } else
+            } else {
                 if ($file['error'] === UPLOAD_ERR_NO_FILE) {
                     $file = null;
                 } else {
                     $file = new UploadedFile($file['tmp_name'], $file['name'],
                     $file['type'], $file['size'], $file['error']);
                 }
+            }
         }
         return $file;
     }

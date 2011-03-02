@@ -224,7 +224,8 @@ class GraphvizDumper extends Dumper
      * Adds options
      *
      * @param array $options An array of options
-     * @return string A space seperated list of options
+     *
+     * @return string A space separated list of options
      */
     protected function addOptions($options)
     {

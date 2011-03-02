@@ -96,16 +96,16 @@ class HeaderBag
         if (!array_key_exists($key, $this->headers)) {
             if (null === $default) {
                 return $first ? null : array();
-            } else {
-                return $first ? $default : array($default);
             }
+
+            return $first ? $default : array($default);
         }
 
         if ($first) {
             return count($this->headers[$key]) ? $this->headers[$key][0] : $default;
-        } else {
-            return $this->headers[$key];
         }
+
+        return $this->headers[$key];
     }
 
     /**

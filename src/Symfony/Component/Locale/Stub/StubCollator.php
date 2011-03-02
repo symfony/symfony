@@ -84,7 +84,7 @@ class StubCollator
 
         $plainSortFlag = isset($intlToPlainFlagMap[$sortFlag]) ? $intlToPlainFlagMap[$sortFlag] : self::SORT_REGULAR;
 
-        return asort($array);
+        return asort($array, $plainSortFlag);
     }
 
     public function compare($a, $b)

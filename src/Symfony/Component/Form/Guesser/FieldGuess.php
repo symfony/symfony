@@ -9,10 +9,10 @@
  * file that was distributed with this source code.
  */
 
-namespace Symfony\Component\Form\FieldFactory;
+namespace Symfony\Component\Form\Guesser;
 
 /**
- * Contains a value guessed by a FieldFactoryGuesserInterface instance
+ * Contains a value guessed by a FieldGuesserInterface instance
  *
  * Each instance also contains a confidence value about the correctness of
  * the guessed value. Thus an instance with confidence HIGH_CONFIDENCE is
@@ -21,7 +21,7 @@ namespace Symfony\Component\Form\FieldFactory;
  *
  * @author Bernhard Schussek <bernhard.schussek@symfony-project.com>
  */
-class FieldFactoryGuess
+class FieldGuess
 {
     /**
      * Marks an instance with a value that is very likely to be correct
@@ -73,7 +73,7 @@ class FieldFactoryGuess
      * returned guess is any of them.
      *
      * @param  array $guesses     A list of guesses
-     * @return FieldFactoryGuess  The guess with the highest confidence
+     * @return FieldGuess  The guess with the highest confidence
      */
     static public function getBestGuess(array $guesses)
     {

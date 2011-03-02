@@ -11,9 +11,10 @@
 
 namespace Symfony\Component\Form\Config;
 
+use Symfony\Component\Form\Form;
 use Symfony\Component\Form\FieldInterface;
+use Symfony\Component\Form\FormFactoryInterface;
 use Symfony\Component\Form\CsrfProvider\CsrfProviderInterface;
-use Symfony\Component\Form\FieldFactory\FieldFactoryInterface;
 use Symfony\Component\Form\Renderer\Plugin\FormPlugin;
 use Symfony\Component\Validator\ValidatorInterface;
 
@@ -21,23 +22,22 @@ class FormConfig extends AbstractFieldConfig
 {
     private $csrfProvider;
 
-    private $fieldFactory;
-
     private $validator;
 
-    public function __construct(CsrfProviderInterface $csrfProvider,
-            FieldFactoryInterface $fieldFactory,
+    public function __construct(FormFactoryInterface $factory,
+            CsrfProviderInterface $csrfProvider,
             ValidatorInterface $validator)
     {
+        parent::__construct($factory);
+
         $this->csrfProvider = $csrfProvider;
-        $this->fieldFactory = $fieldFactory;
         $this->validator = $validator;
     }
+
     public function configure(FieldInterface $field, array $options)
     {
         $field->setDataClass($options['data_class'])
             ->setDataConstructor($options['data_constructor'])
-            ->setFieldFactory($options['field_factory'])
             ->setValidationGroups($options['validation_groups'])
             ->setVirtual($options['virtual'])
             ->setValidator($options['validator'])
@@ -57,16 +57,16 @@ class FormConfig extends AbstractFieldConfig
             'csrf_protection' => true,
             'csrf_field_name' => '_token',
             'csrf_provider' => $this->csrfProvider,
-            'field_factory' => $this->fieldFactory,
             'validation_groups' => null,
             'virtual' => false,
             'validator' => $this->validator,
         );
     }
 
-    public function getClassName()
+    public function createInstance($key)
     {
-        return 'Symfony\Component\Form\Form';
+        return new Form($key, $this->getFormFactory(), $this->csrfProvider,
+                $this->validator);
     }
 
     public function getParent(array $options)

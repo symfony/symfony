@@ -12,6 +12,7 @@
 namespace Symfony\Component\Form\Config;
 
 use Symfony\Component\Form\FieldInterface;
+use Symfony\Component\Form\FormFactoryInterface;
 use Symfony\Component\Form\Filter\FileUploadFilter;
 use Symfony\Component\Form\ValueTransformer\ValueTransformerChain;
 use Symfony\Component\Form\ValueTransformer\ReversedTransformer;
@@ -23,8 +24,11 @@ class FileFieldConfig extends AbstractFieldConfig
 {
     private $storage;
 
-    public function __construct(TemporaryStorage $storage)
+    public function __construct(FormFactoryInterface $factory,
+            TemporaryStorage $storage)
     {
+        parent::__construct($factory);
+
         $this->storage = $storage;
     }
 

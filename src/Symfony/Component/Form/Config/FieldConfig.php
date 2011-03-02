@@ -11,7 +11,9 @@
 
 namespace Symfony\Component\Form\Config;
 
+use Symfony\Component\Form\Field;
 use Symfony\Component\Form\FieldInterface;
+use Symfony\Component\Form\FormFactoryInterface;
 use Symfony\Component\Form\Renderer\DefaultRenderer;
 use Symfony\Component\Form\Renderer\Theme\ThemeInterface;
 use Symfony\Component\Form\Renderer\Plugin\FieldPlugin;
@@ -20,8 +22,10 @@ class FieldConfig extends AbstractFieldConfig
 {
     private $theme;
 
-    public function __construct(ThemeInterface $theme)
+    public function __construct(FormFactoryInterface $factory, ThemeInterface $theme)
     {
+        parent::__construct($factory);
+
         $this->theme = $theme;
     }
 
@@ -58,9 +62,9 @@ class FieldConfig extends AbstractFieldConfig
         );
     }
 
-    public function getClassName()
+    public function createInstance($key)
     {
-        return 'Symfony\Component\Form\Field';
+        return new Field($key);
     }
 
     public function getParent(array $options)

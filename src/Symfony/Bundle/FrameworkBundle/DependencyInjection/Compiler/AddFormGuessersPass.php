@@ -16,23 +16,28 @@ use Symfony\Component\DependencyInjection\Compiler\CompilerPassInterface;
 use Symfony\Component\DependencyInjection\Reference;
 
 /**
- * Adds all services with the tag "form.field_factory_guesser" as argument
- * to the "form.field_factory" service
+ * Adds all services with the tag "form.guesser" as calls to the "addGuesser"
+ * method of the "form.factory" service
  *
  * @author Bernhard Schussek <bernhard.schussek@symfony-project.com>
  */
-class AddFieldFactoryGuessersPass implements CompilerPassInterface
+class AddFormGuessersPass implements CompilerPassInterface
 {
     public function process(ContainerBuilder $container)
     {
-        if (!$container->hasDefinition('form.field_factory')) {
+        if (!$container->hasDefinition('form.factory')) {
             return;
         }
 
-        $guessers = array_map(function($id) {
+        // Builds an array with service IDs as keys and tag aliases as values
+        $guessers = array_map(function ($id) {
             return new Reference($id);
-        }, array_keys($container->findTaggedServiceIds('form.field_factory.guesser')));
+        }, array_keys($container->findTaggedServiceIds('form.guesser')));
 
-        $container->getDefinition('form.field_factory')->setArgument(0, $guessers);
+        $service = $container->getDefinition('form.factory');
+
+        foreach ($guessers as $guesser) {
+            $service->addMethodCall('addGuesser', array($guesser));
+        }
     }
 }

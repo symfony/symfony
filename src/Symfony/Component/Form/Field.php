@@ -73,7 +73,7 @@ class Field implements FieldInterface
     private $filterChain;
     private $eventManager;
 
-    public function __construct($key = null)
+    public function __construct($key)
     {
         $this->key = (string)$key;
         // TODO should be injected instead

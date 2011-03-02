@@ -9,7 +9,7 @@
  * file that was distributed with this source code.
  */
 
-namespace Symfony\Component\Form\FieldFactory;
+namespace Symfony\Component\Form\Guesser;
 
 /**
  * Contains a guessed class name and a list of options for creating an instance
@@ -17,7 +17,7 @@ namespace Symfony\Component\Form\FieldFactory;
  *
  * @author Bernhard Schussek <bernhard.schussek@symfony-project.com>
  */
-class FieldFactoryClassGuess extends FieldFactoryGuess
+class FieldIdentifierGuess extends FieldGuess
 {
     /**
      * The guessed options for creating an instance of the guessed class
@@ -28,15 +28,15 @@ class FieldFactoryClassGuess extends FieldFactoryGuess
     /**
      * Constructor
      *
-     * @param string $class         The guessed class name
+     * @param string $identifier    The guessed field identifier
      * @param array  $options       The options for creating instances of the
      *                              guessed class
      * @param integer $confidence   The confidence that the guessed class name
      *                              is correct
      */
-    public function __construct($class, array $options, $confidence)
+    public function __construct($identifier, array $options, $confidence)
     {
-        parent::__construct($class, $confidence);
+        parent::__construct($identifier, $confidence);
 
         $this->options = $options;
     }
@@ -46,7 +46,7 @@ class FieldFactoryClassGuess extends FieldFactoryGuess
      *
      * @return string
      */
-    public function getClass()
+    public function getIdentifier()
     {
         return $this->getValue();
     }

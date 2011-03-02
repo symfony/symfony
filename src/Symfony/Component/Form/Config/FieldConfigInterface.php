@@ -17,7 +17,7 @@ interface FieldConfigInterface
 {
     function configure(FieldInterface $field, array $options);
 
-    function getClassName();
+    function createInstance($key);
 
     function getDefaultOptions(array $options);
 

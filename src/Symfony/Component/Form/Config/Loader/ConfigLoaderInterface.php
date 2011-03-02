@@ -9,11 +9,11 @@
  * file that was distributed with this source code.
  */
 
-namespace Symfony\Component\Form;
+namespace Symfony\Component\Form\Config\Loader;
 
-interface FormFactoryInterface
+interface ConfigLoaderInterface
 {
-    function getInstance($identifier, $key = null, array $options = array());
+    function getConfig($identifier);
 
-    function getInstanceForProperty($class, $property, array $options = array());
+    function hasConfig($identifier);
 }

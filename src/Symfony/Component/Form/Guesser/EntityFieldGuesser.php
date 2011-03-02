@@ -9,7 +9,7 @@
  * file that was distributed with this source code.
  */
 
-namespace Symfony\Component\Form\FieldFactory;
+namespace Symfony\Component\Form\Guesser;
 
 use Doctrine\ORM\EntityManager;
 
@@ -18,7 +18,7 @@ use Doctrine\ORM\EntityManager;
  *
  * @author Bernhard Schussek <bernhard.schussek@symfony-project.com>
  */
-class EntityFieldFactoryGuesser implements FieldFactoryGuesserInterface
+class EntityFieldGuesser implements FieldGuesserInterface
 {
     /**
      * The Doctrine 2 entity manager
@@ -49,7 +49,7 @@ class EntityFieldFactoryGuesser implements FieldFactoryGuesserInterface
     /**
      * @inheritDoc
      */
-    public function guessClass($class, $property)
+    public function guessIdentifier($class, $property)
     {
         if ($this->isMappedClass($class)) {
             $metadata = $this->em->getClassMetadata($class);
@@ -58,86 +58,86 @@ class EntityFieldFactoryGuesser implements FieldFactoryGuesserInterface
                 $multiple = $metadata->isCollectionValuedAssociation($property);
                 $mapping = $metadata->getAssociationMapping($property);
 
-                return new FieldFactoryClassGuess(
-                    'Symfony\Component\Form\EntityChoiceField',
+                return new FieldIdentifierGuess(
+                    'entity',
                     array(
                         'em' => $this->em,
                         'class' => $mapping['targetEntity'],
                         'multiple' => $multiple,
                     ),
-                    FieldFactoryGuess::HIGH_CONFIDENCE
+                    FieldGuess::HIGH_CONFIDENCE
                 );
             } else {
                 switch ($metadata->getTypeOfField($property))
                 {
         //            case 'array':
-        //                return new FieldFactoryClassGuess(
-        //                    'Symfony\Component\Form\CollectionField',
+        //                return new FieldIdentifierGuess(
+        //                    'Collection',
         //                    array(),
-        //                    FieldFactoryGuess::HIGH_CONFIDENCE
+        //                    FieldGuess::HIGH_CONFIDENCE
         //                );
                     case 'boolean':
-                        return new FieldFactoryClassGuess(
-                            'Symfony\Component\Form\CheckboxField',
+                        return new FieldIdentifierGuess(
+                            'checkbox',
                             array(),
-                            FieldFactoryGuess::HIGH_CONFIDENCE
+                            FieldGuess::HIGH_CONFIDENCE
                         );
                     case 'datetime':
                     case 'vardatetime':
                     case 'datetimetz':
-                        return new FieldFactoryClassGuess(
-                            'Symfony\Component\Form\DateTimeField',
+                        return new FieldIdentifierGuess(
+                            'datetime',
                             array(),
-                            FieldFactoryGuess::HIGH_CONFIDENCE
+                            FieldGuess::HIGH_CONFIDENCE
                         );
                     case 'date':
-                        return new FieldFactoryClassGuess(
-                            'Symfony\Component\Form\DateField',
+                        return new FieldIdentifierGuess(
+                            'date',
                             array(),
-                            FieldFactoryGuess::HIGH_CONFIDENCE
+                            FieldGuess::HIGH_CONFIDENCE
                         );
                     case 'decimal':
                     case 'float':
-                        return new FieldFactoryClassGuess(
-                            'Symfony\Component\Form\NumberField',
+                        return new FieldIdentifierGuess(
+                            'number',
                             array(),
-                            FieldFactoryGuess::MEDIUM_CONFIDENCE
+                            FieldGuess::MEDIUM_CONFIDENCE
                         );
                     case 'integer':
                     case 'bigint':
                     case 'smallint':
-                        return new FieldFactoryClassGuess(
-                            'Symfony\Component\Form\IntegerField',
+                        return new FieldIdentifierGuess(
+                            'integer',
                             array(),
-                            FieldFactoryGuess::MEDIUM_CONFIDENCE
+                            FieldGuess::MEDIUM_CONFIDENCE
                         );
                     case 'string':
-                        return new FieldFactoryClassGuess(
-                            'Symfony\Component\Form\TextField',
+                        return new FieldIdentifierGuess(
+                            'text',
                             array(),
-                            FieldFactoryGuess::MEDIUM_CONFIDENCE
+                            FieldGuess::MEDIUM_CONFIDENCE
                         );
                     case 'text':
-                        return new FieldFactoryClassGuess(
-                            'Symfony\Component\Form\TextareaField',
+                        return new FieldIdentifierGuess(
+                            'textarea',
                             array(),
-                            FieldFactoryGuess::MEDIUM_CONFIDENCE
+                            FieldGuess::MEDIUM_CONFIDENCE
                         );
                     case 'time':
-                        return new FieldFactoryClassGuess(
-                            'Symfony\Component\Form\TimeField',
+                        return new FieldIdentifierGuess(
+                            'time',
                             array(),
-                            FieldFactoryGuess::HIGH_CONFIDENCE
+                            FieldGuess::HIGH_CONFIDENCE
                         );
     //                case 'object': ???
                 }
             }
         }
 
-        return new FieldFactoryClassGuess(
-            'Symfony\Component\Form\TextField',
+        return new FieldIdentifierGuess(
+            'text',
             array(),
-            FieldFactoryGuess::LOW_CONFIDENCE
+            FieldGuess::LOW_CONFIDENCE
         );
     }
 
@@ -151,15 +151,15 @@ class EntityFieldFactoryGuesser implements FieldFactoryGuesserInterface
 
             if ($metadata->hasField($property)) {
                 if (!$metadata->isNullable($property)) {
-                    return new FieldFactoryGuess(
+                    return new FieldGuess(
                         true,
-                        FieldFactoryGuess::HIGH_CONFIDENCE
+                        FieldGuess::HIGH_CONFIDENCE
                     );
                 }
 
-                return new FieldFactoryGuess(
+                return new FieldGuess(
                     false,
-                    FieldFactoryGuess::MEDIUM_CONFIDENCE
+                    FieldGuess::MEDIUM_CONFIDENCE
                 );
             }
         }
@@ -178,9 +178,9 @@ class EntityFieldFactoryGuesser implements FieldFactoryGuesserInterface
 
 
                 if (isset($mapping['length'])) {
-                    return new FieldFactoryGuess(
+                    return new FieldGuess(
                         $mapping['length'],
-                        FieldFactoryGuess::HIGH_CONFIDENCE
+                        FieldGuess::HIGH_CONFIDENCE
                     );
                 }
             }

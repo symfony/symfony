@@ -68,6 +68,8 @@ class Form extends Field implements \IteratorAggregate, FormInterface, FilterInt
 
     private $modifyByReference = true;
 
+    private $factory;
+
     private $validator;
 
     private $validationGroups;
@@ -78,9 +80,14 @@ class Form extends Field implements \IteratorAggregate, FormInterface, FilterInt
 
     private $csrfProvider;
 
-    public function __construct($key = null)
+    public function __construct($key, FormFactoryInterface $factory,
+            CsrfProviderInterface $csrfProvider, ValidatorInterface $validator)
     {
         parent::__construct($key);
+
+        $this->factory = $factory;
+        $this->csrfProvider = $csrfProvider;
+        $this->validator = $validator;
 
         $this->appendFilter($this);
     }
@@ -148,22 +155,24 @@ class Form extends Field implements \IteratorAggregate, FormInterface, FilterInt
                 throw new UnexpectedTypeException($field, 'FieldInterface or string');
             }
 
-            $factory = $this->getFieldFactory();
+            if (func_num_args() > 2 || (func_num_args() > 1 && !is_array(func_get_arg(1)))) {
+                $identifier = func_get_arg(0);
+                $key = func_get_arg(1);
+                $options = func_num_args() > 2 ? func_get_arg(2) : array();
 
-            if (!$factory) {
-                throw new FormException('A field factory must be set to automatically create fields');
+                $field = $this->factory->getInstance($identifier, $key, $options);
+            } else {
+                $class = $this->getDataClass();
+
+                if (!$class) {
+                    throw new FormException('The data class must be set to automatically create fields');
+                }
+
+                $property = func_get_arg(0);
+                $options = func_num_args() > 1 ? func_get_arg(1) : array();
+
+                $field = $this->factory->getInstanceForProperty($class, $property, $options);
             }
-
-            $class = $this->getDataClass();
-
-            if (!$class) {
-                throw new FormException('The data class must be set to automatically create fields');
-            }
-
-            $options = func_num_args() > 1 ? func_get_arg(1) : array();
-            $field = $factory->getInstance($class, $field, $options);
-
-            // TODO throw exception if nothing was returned
         }
 
         if ('' === $field->getKey() || null === $field->getKey()) {
@@ -826,24 +835,6 @@ class Form extends Field implements \IteratorAggregate, FormInterface, FilterInt
     public function getDataConstructor()
     {
         return $this->dataConstructor;
-    }
-
-    public function setFieldFactory(FieldFactoryInterface $fieldFactory = null)
-    {
-        $this->fieldFactory = $fieldFactory;
-
-        return $this;
-    }
-
-    /**
-     * Returns a factory for automatically creating fields based on metadata
-     * available for a form's object
-     *
-     * @return FieldFactoryInterface  The factory
-     */
-    public function getFieldFactory()
-    {
-        return $this->fieldFactory;
     }
 
     /**

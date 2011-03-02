@@ -18,7 +18,7 @@ class BirthdayFieldConfig extends AbstractFieldConfig
     public function getDefaultOptions(array $options)
     {
         return array(
-            'years' => range($currentYear-120, $currentYear),
+            'years' => range(date('Y') - 120, date('Y')),
         );
     }
 

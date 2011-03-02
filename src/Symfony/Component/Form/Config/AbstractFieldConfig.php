@@ -18,9 +18,14 @@ abstract class AbstractFieldConfig implements FieldConfigInterface
 {
     private $factory;
 
-    public function setFormFactory(FormFactoryInterface $factory)
+    public function __construct(FormFactoryInterface $factory)
     {
         $this->factory = $factory;
+    }
+
+    protected function getFormFactory()
+    {
+        return $this->factory;
     }
 
     protected function getInstance($identifier, $key = null, array $options = array())
@@ -32,7 +37,7 @@ abstract class AbstractFieldConfig implements FieldConfigInterface
     {
     }
 
-    public function getClassName()
+    public function createInstance($key)
     {
         return null;
     }

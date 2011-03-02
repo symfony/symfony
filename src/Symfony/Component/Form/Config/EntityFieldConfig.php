@@ -12,6 +12,7 @@
 namespace Symfony\Component\Form\Config;
 
 use Symfony\Component\Form\FieldInterface;
+use Symfony\Component\Form\FormFactoryInterface;
 use Symfony\Component\Form\ChoiceList\EntityChoiceList;
 use Symfony\Component\Form\ValueTransformer\MergeCollectionTransformer;
 use Symfony\Component\Form\ValueTransformer\EntitiesToArrayTransformer;
@@ -25,8 +26,10 @@ class EntityFieldConfig extends AbstractFieldConfig
 {
     private $em;
 
-    public function __construct(EntityManager $em)
+    public function __construct(FormFactoryInterface $factory, EntityManager $em)
     {
+        parent::__construct($factory);
+
         $this->em = $em;
     }
 

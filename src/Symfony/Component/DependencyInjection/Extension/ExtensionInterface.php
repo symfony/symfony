@@ -24,11 +24,11 @@ interface ExtensionInterface
      * Loads a specific configuration.
      *
      * @param array   $config        An array of configuration values
-     * @param ContainerBuilder $configuration A ContainerBuilder instance
+     * @param ContainerBuilder $container A ContainerBuilder instance
      *
      * @throws \InvalidArgumentException When provided tag is not defined in this extension
      */
-    function load(array $config, ContainerBuilder $configuration);
+    function load(array $config, ContainerBuilder $container);
 
     /**
      * Returns the namespace to be used for this extension (XML namespace).

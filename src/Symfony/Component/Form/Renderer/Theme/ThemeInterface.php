@@ -13,5 +13,5 @@ namespace Symfony\Component\Form\Renderer\Theme;
 
 interface ThemeInterface
 {
-    function render($template, $block, array $parameters);
+    function render($field, $section, array $parameters);
 }

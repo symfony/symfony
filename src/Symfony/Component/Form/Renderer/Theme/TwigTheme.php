@@ -18,26 +18,26 @@ use Symfony\Component\Form\Exception\FormException;
 class TwigTheme implements ThemeInterface
 {
     private $environment;
-    private $template;
-    private $blocks;
+    private $templates;
+    private $templatesByBlock;
 
-    public function __construct(\Twig_Environment $environment, $template)
+    public function __construct(\Twig_Environment $environment, $templates)
     {
         $this->environment = $environment;
-        $this->template = $template;
+        $this->templates = (array)$templates;
     }
 
     private function initialize()
     {
-        if (!$this->blocks) {
-            $this->blocks = array();
+        if (!$this->templatesByBlock) {
+            $this->templatesByBlock = array();
 
-            if (!$this->template instanceof \Twig_Template) {
-                $this->template = $this->environment->loadTemplate($this->template);
-            }
+            foreach ($this->templates as $template) {
+                $template = $this->environment->loadTemplate($template);
 
-            foreach ($this->getBlockNames($this->template) as $blockName) {
-                $this->blocks[$blockName] = true;
+                foreach ($this->getBlockNames($template) as $blockName) {
+                    $this->templatesByBlock[$blockName] = $template;
+                }
             }
         }
     }
@@ -54,18 +54,18 @@ class TwigTheme implements ThemeInterface
         return array_unique($names);
     }
 
-    public function render($template, $block, array $parameters)
+    public function render($field, $section, array $parameters)
     {
         $this->initialize();
 
-        if (isset($this->blocks[$template.'__'.$block])) {
-            $blockName = $template.'__'.$block;
-        } else if (isset($this->blocks[$block])) {
-            $blockName = $block;
+        if (isset($this->templatesByBlock[$field.'__'.$section])) {
+            $blockName = $field.'__'.$section;
+        } else if (isset($this->templatesByBlock[$section])) {
+            $blockName = $section;
         } else {
-            throw new FormException(sprintf('The form theme is missing the "%s" block', $block));
+            throw new FormException(sprintf('The form theme is missing the "%s" block', $section));
         }
 
-        return $this->template->renderBlock($blockName, $parameters);
+        return $this->templatesByBlock[$blockName]->renderBlock($blockName, $parameters);
     }
 }

@@ -634,8 +634,10 @@ class Form extends Field implements \IteratorAggregate, FormInterface, FilterInt
 
         $token = $provider->generateCsrfToken(get_class($this));
 
-        // FIXME
-//        $this->add(new HiddenField($fieldName, array('data' => $token)));
+        $this->add('hidden', $fieldName, array(
+            'data' => $token,
+            'property_path' => null,
+        ));
     }
 
     public function disableCsrfProtection()

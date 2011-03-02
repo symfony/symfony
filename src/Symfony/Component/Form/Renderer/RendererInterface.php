@@ -13,6 +13,8 @@ namespace Symfony\Component\Form\Renderer;
 
 interface RendererInterface
 {
+    function setChildren(array $renderers);
+
     function setVar($name, $value);
 
     function getVar($name);

@@ -15,7 +15,7 @@ use Symfony\Component\Form\FieldInterface;
 use Symfony\Component\Form\Renderer\Theme\ThemeInterface;
 use Symfony\Component\Form\Renderer\Plugin\PluginInterface;
 
-class DefaultRenderer implements RendererInterface
+class DefaultRenderer implements RendererInterface, \ArrayAccess
 {
     private $field;
 
@@ -30,6 +30,8 @@ class DefaultRenderer implements RendererInterface
     private $initialized = false;
 
     private $rendered = false;
+
+    private $children = array();
 
     public function __construct(ThemeInterface $theme, $template)
     {
@@ -63,6 +65,11 @@ class DefaultRenderer implements RendererInterface
 
             $this->changes = array();
         }
+    }
+
+    public function setChildren(array $renderers)
+    {
+        $this->children = $renderers;
     }
 
     public function setTheme(ThemeInterface $theme)
@@ -158,5 +165,25 @@ class DefaultRenderer implements RendererInterface
             $this->vars,
             $vars
         ));
+    }
+
+    public function offsetGet($name)
+    {
+        return $this->children[$name];
+    }
+
+    public function offsetExists($name)
+    {
+        return isset($this->children[$name]);
+    }
+
+    public function offsetSet($name, $value)
+    {
+        throw new \BadMethodCallException('Not supported');
+    }
+
+    public function offsetUnset($name)
+    {
+        throw new \BadMethodCallException('Not supported');
     }
 }

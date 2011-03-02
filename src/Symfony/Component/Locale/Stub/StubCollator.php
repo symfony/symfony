@@ -22,6 +22,16 @@ use Symfony\Component\Locale\Exception\MethodArgumentValueNotImplementedExceptio
  */
 class StubCollator
 {
+    /**
+     * Constants defined by the intl extension, not class constants in IntlDateFormatter
+     * TODO: remove if the Form component drop the call to the intl_is_failure() function
+     *
+     * @see StubIntlDateFormatter::getErrorCode()
+     * @see StubIntlDateFormatter::getErrorMessage()
+     */
+    const U_ZERO_ERROR = 0;
+    const U_ZERO_ERROR_MESSAGE = 'U_ZERO_ERROR';
+
     const ON = 17;
     const OFF = 16;
     const DEFAULT_VALUE = -1;
@@ -75,6 +85,77 @@ class StubCollator
         $plainSortFlag = isset($intlToPlainFlagMap[$sortFlag]) ? $intlToPlainFlagMap[$sortFlag] : self::SORT_REGULAR;
 
         return asort($array);
+    }
+
+    public function compare($a, $b)
+    {
+        throw new MethodNotImplementedException(__METHOD__);
+    }
+
+    public function getAttribute($attr)
+    {
+        throw new MethodNotImplementedException(__METHOD__);
+    }
+
+    /**
+     * Returns collator's last error code. Always returns the U_ZERO_ERROR class constant value
+     *
+     * @return int  The error code from last collator call
+     */
+    public function getErrorCode()
+    {
+        return self::U_ZERO_ERROR;
+    }
+
+    /**
+     * Returns collator's last error message. Always returns the U_ZERO_ERROR_MESSAGE class constant value
+     *
+     * @return string  The error message from last collator call
+     */
+    public function getErrorMessage()
+    {
+        return self::U_ZERO_ERROR_MESSAGE;
+    }
+
+    /**
+     * Returns the collator's locale
+     *
+     * @param  int      $type     The locale name type to return between valid or actual (StubLocale::VALID_LOCALE or StubLocale::ACTUAL_LOCALE, respectively)
+     * @return string             The locale name used to create the collator
+     */
+    public function getLocale($type = StubLocale::ACTUAL_LOCALE)
+    {
+        return 'en';
+    }
+
+    public function getSortKey($string)
+    {
+        throw new MethodNotImplementedException(__METHOD__);
+    }
+
+    public function getStrength()
+    {
+        throw new MethodNotImplementedException(__METHOD__);
+    }
+
+    public function setAttribute($attr, $val)
+    {
+        throw new MethodNotImplementedException(__METHOD__);
+    }
+
+    public function setStrength($strength)
+    {
+        throw new MethodNotImplementedException(__METHOD__);
+    }
+
+    public function sortWithSortKeys(&$arr)
+    {
+        throw new MethodNotImplementedException(__METHOD__);
+    }
+
+    public function sort(&$arr, $sort_flag = null)
+    {
+        throw new MethodNotImplementedException(__METHOD__);
     }
 
     static public function create($locale)

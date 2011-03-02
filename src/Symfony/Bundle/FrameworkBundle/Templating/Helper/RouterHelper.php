@@ -12,7 +12,7 @@
 namespace Symfony\Bundle\FrameworkBundle\Templating\Helper;
 
 use Symfony\Component\Templating\Helper\Helper;
-use Symfony\Component\Routing\Router;
+use Symfony\Component\Routing\RouterInstance;
 
 /**
  * RouterHelper manages links between pages in a template context.
@@ -26,9 +26,9 @@ class RouterHelper extends Helper
     /**
      * Constructor.
      *
-     * @param Router $router A Router instance
+     * @param RouterInstance $router A Router instance
      */
-    public function __construct(Router $router)
+    public function __construct(RouterInstance $router)
     {
         $this->generator = $router->getGenerator();
     }

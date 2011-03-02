@@ -86,4 +86,14 @@ class CachedRouter implements RouterInterface
     {
         return $this->matcher->match($url);
     }
+
+    /**
+     * Gets the UrlGenerator instance associated with this Router.
+     *
+     * @return UrlGeneratorInterface A UrlGeneratorInterface instance
+     */
+    public function getGenerator()
+    {
+        return $this->generator;
+    }
 }

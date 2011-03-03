@@ -155,12 +155,23 @@ class ArgvInput extends Input
         // if input is expecting another argument, add it
         if ($this->definition->hasArgument($c)) {
             $arg = $this->definition->getArgument($c);
-            $this->arguments[$arg->getName()] = $arg->isArray()? array($token) : $token;
+            if (false !== strpos($token, '=')) {
+                $parts = explode('=', $token);
+                $this->arguments[$arg->getName()][$parts[0]] = $parts[1];
+            } else {
+                $this->arguments[$arg->getName()] = $arg->isArray() ? array($token) : $token;
+            }
 
         // if last argument isArray(), append token to last argument
         } elseif ($this->definition->hasArgument($c - 1) && $this->definition->getArgument($c - 1)->isArray()) {
             $arg = $this->definition->getArgument($c - 1);
-            $this->arguments[$arg->getName()][] = $token;
+
+            if (false !== strpos($token, '=')) {
+                $parts = explode('=', $token);
+                $this->arguments[$arg->getName()][$parts[0]] = $parts[1];
+            } else {
+                $this->arguments[$arg->getName()][] = $token;
+            }
 
         // unexpected argument
         } else {

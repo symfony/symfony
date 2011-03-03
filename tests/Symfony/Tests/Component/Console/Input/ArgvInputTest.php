@@ -34,6 +34,14 @@ class ArgvInputTest extends \PHPUnit_Framework_TestCase
         $input->bind(new InputDefinition(array(new InputArgument('name'))));
         $this->assertEquals(array('name' => 'foo'), $input->getArguments(), '->parse() is stateless');
 
+        $input = new TestInput(array('cli.php', 'foo'));
+        $input->bind(new InputDefinition(array(new InputArgument('name', InputArgument::IS_ARRAY))));
+        $this->assertEquals(array('name' => array('foo')), $input->getArguments(), '->parse() parses array argument');
+
+        $input = new TestInput(array('cli.php', 'foo=bar'));
+        $input->bind(new InputDefinition(array(new InputArgument('name', InputArgument::IS_ARRAY))));
+        $this->assertEquals(array('name' => array('foo' => 'bar')), $input->getArguments(), '->parse() parses array argument with keys');
+
         $input = new TestInput(array('cli.php', '--foo'));
         $input->bind(new InputDefinition(array(new InputOption('foo'))));
         $this->assertEquals(array('foo' => true), $input->getOptions(), '->parse() parses long options without a value');

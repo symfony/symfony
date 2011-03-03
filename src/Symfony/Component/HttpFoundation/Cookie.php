@@ -24,9 +24,9 @@ class Cookie
     protected $expire;
     protected $path;
     protected $secure;
-    protected $httponly;
+    protected $httpOnly;
 
-    public function __construct($name, $value = null, $expire = 0, $path = null, $domain = null, $secure = false, $httponly = true)
+    public function __construct($name, $value = null, $expire = 0, $path = '/', $domain = null, $secure = false, $httpOnly = true)
     {
         // from PHP source code
         if (preg_match("/[=,; \t\r\n\013\014]/", $name)) {
@@ -47,7 +47,7 @@ class Cookie
         $this->expire = (integer) $expire;
         $this->path = $path;
         $this->secure = (Boolean) $secure;
-        $this->httponly = (Boolean) $httponly;
+        $this->httpOnly = (Boolean) $httpOnly;
     }
 
     public function getName()
@@ -80,9 +80,9 @@ class Cookie
         return $this->secure;
     }
 
-    public function isHttponly()
+    public function isHttpOnly()
     {
-        return $this->httponly;
+        return $this->httpOnly;
     }
 
     /**

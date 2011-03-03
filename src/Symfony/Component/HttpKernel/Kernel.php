@@ -24,6 +24,7 @@ use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpKernel\HttpKernelInterface;
 use Symfony\Component\HttpKernel\Bundle\BundleInterface;
 use Symfony\Component\HttpKernel\Config\FileLocator;
+use Symfony\Component\HttpKernel\DependencyInjection\MergeExtensionConfigurationPass;
 use Symfony\Component\Config\Loader\LoaderResolver;
 use Symfony\Component\Config\Loader\DelegatingLoader;
 use Symfony\Component\Config\ConfigCache;
@@ -457,6 +458,7 @@ abstract class Kernel implements KernelInterface
         $parameterBag = new ParameterBag($this->getKernelParameters());
 
         $container = new ContainerBuilder($parameterBag);
+        $container->getCompilerPassConfig()->setMergePass(new MergeExtensionConfigurationPass());
         foreach ($this->bundles as $bundle) {
             $bundle->build($container);
 

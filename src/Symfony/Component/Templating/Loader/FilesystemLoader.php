@@ -60,7 +60,7 @@ class FilesystemLoader extends Loader
 
         $logs = array();
         foreach ($this->templatePathPatterns as $templatePathPattern) {
-            if (is_file($file = strtr($templatePathPattern, $replacements))) {
+            if (is_readable($file = strtr($templatePathPattern, $replacements))) {
                 if (null !== $this->debugger) {
                     $this->debugger->log(sprintf('Loaded template file "%s"', $file));
                 }

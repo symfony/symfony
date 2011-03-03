@@ -447,6 +447,29 @@ class ContainerBuilderTest extends \PHPUnit_Framework_TestCase
         $container->getExtension('no_registered');
     }
 
+    public function testRegisteredButNotLoadedExtension()
+    {
+        $extension = $this->getMock('Symfony\\Component\\DependencyInjection\\Extension\\ExtensionInterface');
+        $extension->expects($this->once())->method('getAlias')->will($this->returnValue('project'));
+        $extension->expects($this->never())->method('load');
+
+        $container = new ContainerBuilder();
+        $container->registerExtension($extension);
+        $container->compile();
+    }
+
+    public function testRegisteredAndLoadedExtension()
+    {
+        $extension = $this->getMock('Symfony\\Component\\DependencyInjection\\Extension\\ExtensionInterface');
+        $extension->expects($this->exactly(2))->method('getAlias')->will($this->returnValue('project'));
+        $extension->expects($this->once())->method('load')->with(array(array('foo' => 'bar')));
+
+        $container = new ContainerBuilder();
+        $container->registerExtension($extension);
+        $container->loadFromExtension('project', array('foo' => 'bar'));
+        $container->compile();
+    }
+
     /**
      * @covers Symfony\Component\DependencyInjection\ContainerBuilder::addInterfaceInjector
      * @covers Symfony\Component\DependencyInjection\ContainerBuilder::addInterfaceInjectors

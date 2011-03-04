@@ -79,8 +79,8 @@ class XmlFileLoader extends FileLoader
     /**
      * Parses parameters
      *
-     * @param SimpleXMLElement $xml 
-     * @param string $file 
+     * @param SimpleXMLElement $xml
+     * @param string $file
      * @return void
      */
     protected function parseParameters(SimpleXMLElement $xml, $file)
@@ -95,8 +95,8 @@ class XmlFileLoader extends FileLoader
     /**
      * Parses imports
      *
-     * @param SimpleXMLElement $xml 
-     * @param string $file 
+     * @param SimpleXMLElement $xml
+     * @param string $file
      * @return void
      */
     protected function parseImports(SimpleXMLElement $xml, $file)
@@ -114,8 +114,8 @@ class XmlFileLoader extends FileLoader
     /**
      * Parses interface injectors
      *
-     * @param SimpleXMLElement $xml 
-     * @param string $file 
+     * @param SimpleXMLElement $xml
+     * @param string $file
      * @return void
      */
     protected function parseInterfaceInjectors(SimpleXMLElement $xml, $file)
@@ -148,8 +148,8 @@ class XmlFileLoader extends FileLoader
     /**
      * Parses multiple definitions
      *
-     * @param SimpleXMLElement $xml 
-     * @param string $file 
+     * @param SimpleXMLElement $xml
+     * @param string $file
      * @return void
      */
     protected function parseDefinitions(SimpleXMLElement $xml, $file)
@@ -166,9 +166,9 @@ class XmlFileLoader extends FileLoader
     /**
      * Parses an individual Definition
      *
-     * @param string $id 
-     * @param SimpleXMLElement $service 
-     * @param string $file 
+     * @param string $id
+     * @param SimpleXMLElement $service
+     * @param string $file
      * @return void
      */
     protected function parseDefinition($id, $service, $file)
@@ -201,6 +201,7 @@ class XmlFileLoader extends FileLoader
         }
 
         $definition->setArguments($service->getArgumentsAsPhp('argument'));
+        $definition->setProperties($service->getArgumentsAsPhp('property'));
 
         if (isset($service->configurator)) {
             if (isset($service->configurator['function'])) {
@@ -260,8 +261,8 @@ class XmlFileLoader extends FileLoader
     /**
      * Processes anonymous services
      *
-     * @param SimpleXMLElement $xml 
-     * @param string $file 
+     * @param SimpleXMLElement $xml
+     * @param string $file
      * @return array An array of anonymous services
      */
     protected function processAnonymousServices(SimpleXMLElement $xml, $file)
@@ -314,8 +315,8 @@ class XmlFileLoader extends FileLoader
     /**
      * Validates an XML document.
      *
-     * @param DOMDocument $dom 
-     * @param string $file 
+     * @param DOMDocument $dom
+     * @param string $file
      */
     protected function validate(\DOMDocument $dom, $file)
     {
@@ -448,7 +449,7 @@ EOF
     /**
      * Loads from an extension.
      *
-     * @param SimpleXMLElement $xml 
+     * @param SimpleXMLElement $xml
      * @return void
      */
     protected function loadFromExtensions(SimpleXMLElement $xml)

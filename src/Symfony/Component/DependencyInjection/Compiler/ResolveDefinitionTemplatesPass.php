@@ -19,7 +19,7 @@ class ResolveDefinitionTemplatesPass implements CompilerPassInterface
     /**
      * Process the ContainerBuilder to replace DefinitionDecorator instances with their real Definition instances.
      *
-     * @param ContainerBuilder $container 
+     * @param ContainerBuilder $container
      */
     public function process(ContainerBuilder $container)
     {
@@ -40,7 +40,7 @@ class ResolveDefinitionTemplatesPass implements CompilerPassInterface
      * Resolves the definition
      *
      * @param string $id The definition identifier
-     * @param DefinitionDecorator $definition 
+     * @param DefinitionDecorator $definition
      * @return Definition
      */
     protected function resolveDefinition($id, DefinitionDecorator $definition)
@@ -61,6 +61,7 @@ class ResolveDefinitionTemplatesPass implements CompilerPassInterface
         $def->setClass($parentDef->getClass());
         $def->setArguments($parentDef->getArguments());
         $def->setMethodCalls($parentDef->getMethodCalls());
+        $def->setProperties($parentDef->getProperties());
         $def->setFactoryClass($parentDef->getFactoryClass());
         $def->setFactoryMethod($parentDef->getFactoryMethod());
         $def->setFactoryService($parentDef->getFactoryService());
@@ -105,6 +106,11 @@ class ResolveDefinitionTemplatesPass implements CompilerPassInterface
 
             $index = (integer) substr($k, strlen('index_'));
             $def->setArgument($index, $v);
+        }
+
+        // merge properties
+        foreach ($definition->getProperties() as $k => $v) {
+            $def->setProperty($k, $v);
         }
 
         // append method calls

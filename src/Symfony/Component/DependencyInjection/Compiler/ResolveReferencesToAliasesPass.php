@@ -27,7 +27,7 @@ class ResolveReferencesToAliasesPass implements CompilerPassInterface
     /**
      * Processes the ContainerBuilder to replace references to aliases with actual service references.
      *
-     * @param ContainerBuilder $container 
+     * @param ContainerBuilder $container
      */
     public function process(ContainerBuilder $container)
     {
@@ -40,6 +40,7 @@ class ResolveReferencesToAliasesPass implements CompilerPassInterface
 
             $definition->setArguments($this->processArguments($definition->getArguments()));
             $definition->setMethodCalls($this->processArguments($definition->getMethodCalls()));
+            $definition->setProperties($this->processArguments($definition->getProperties()));
         }
 
         foreach ($container->getAliases() as $id => $alias) {

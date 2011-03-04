@@ -41,6 +41,8 @@ class FileUploadFilter implements FilterInterface
 
     public function filterBoundDataFromClient($data)
     {
+        // TODO should be disableable
+
         // TESTME
         $data = array_merge(array(
             'file' => '',

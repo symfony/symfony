@@ -155,6 +155,8 @@ class Form extends Field implements \IteratorAggregate, FormInterface, FilterInt
                 throw new UnexpectedTypeException($field, 'FieldInterface or string');
             }
 
+            // TODO turn order of $identifier and $key around
+
             if (func_num_args() > 2 || (func_num_args() > 1 && !is_array(func_get_arg(1)))) {
                 $identifier = func_get_arg(0);
                 $key = func_get_arg(1);

@@ -46,4 +46,9 @@ abstract class AbstractFieldConfig implements FieldConfigInterface
     {
         return array();
     }
+
+    public function getIdentifier()
+    {
+        return get_class($this);
+    }
 }

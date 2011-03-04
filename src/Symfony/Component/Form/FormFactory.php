@@ -34,6 +34,8 @@ class FormFactory implements FormFactoryInterface
 
     public function getInstance($identifier, $key = null, array $options = array())
     {
+        // TODO $identifier can be FQN of a config class
+
         $instance = null;
         $hierarchy = array();
 

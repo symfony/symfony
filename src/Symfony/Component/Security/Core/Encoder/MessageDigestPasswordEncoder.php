@@ -49,7 +49,7 @@ class MessageDigestPasswordEncoder extends BasePasswordEncoder
 
         // "stretch" hash
         for ($i = 1; $i < $this->iterations; $i++) {
-            $digest = hash($this->algorithm, $digest, true);
+            $digest = hash($this->algorithm, $digest.$salted, true);
         }
 
         return $this->encodeHashAsBase64 ? base64_encode($digest) : bin2hex($digest);

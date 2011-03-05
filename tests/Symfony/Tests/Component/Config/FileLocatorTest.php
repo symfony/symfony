@@ -54,11 +54,31 @@ class FileLocatorTest extends \PHPUnit_Framework_TestCase
             '->locate() returns the absolute filename if the file exists in one of the paths given in the constructor'
         );
 
+        $this->assertEquals(
+            __DIR__.'/Fixtures'.DIRECTORY_SEPARATOR.'foo.xml',
+            $loader->locate(__DIR__.'/Fixtures/foo.xml', __DIR__),
+            '->locate() returns the absolute filename if the file exists in one of the paths given in the constructor'
+        );
+
         $loader = new FileLocator(array(__DIR__.'/Fixtures', __DIR__.'/Fixtures/Again'));
 
         $this->assertEquals(
             array(__DIR__.'/Fixtures'.DIRECTORY_SEPARATOR.'foo.xml', __DIR__.'/Fixtures/Again'.DIRECTORY_SEPARATOR.'foo.xml'),
             $loader->locate('foo.xml', __DIR__, false),
+            '->locate() returns an array of absolute filenames'
+        );
+
+        $this->assertEquals(
+            array(__DIR__.'/Fixtures'.DIRECTORY_SEPARATOR.'foo.xml', __DIR__.'/Fixtures/Again'.DIRECTORY_SEPARATOR.'foo.xml'),
+            $loader->locate('foo.xml', __DIR__.'/Fixtures', false),
+            '->locate() returns an array of absolute filenames'
+        );
+
+        $loader = new FileLocator(__DIR__.'/Fixtures/Again');
+
+        $this->assertEquals(
+            array(__DIR__.'/Fixtures'.DIRECTORY_SEPARATOR.'foo.xml', __DIR__.'/Fixtures/Again'.DIRECTORY_SEPARATOR.'foo.xml'),
+            $loader->locate('foo.xml', __DIR__.'/Fixtures', false),
             '->locate() returns an array of absolute filenames'
         );
     }
@@ -71,5 +91,15 @@ class FileLocatorTest extends \PHPUnit_Framework_TestCase
         $loader = new FileLocator(array(__DIR__.'/Fixtures'));
 
         $loader->locate('foobar.xml', __DIR__);
+    }
+
+    /**
+     * @expectedException \InvalidArgumentException
+     */
+    public function testLocateThrowsAnExceptionIfTheFileDoesNotExistsInAbsolutePath()
+    {
+        $loader = new FileLocator(array(__DIR__.'/Fixtures'));
+
+        $loader->locate(__DIR__.'/Fixtures/foobar.xml', __DIR__);
     }
 }

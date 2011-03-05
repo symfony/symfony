@@ -62,7 +62,12 @@ class Session implements \Serializable
         }
 
         // flag current flash messages to be removed at shutdown
-        $this->oldFlashes = array_flip(array_keys($this->attributes['_flash']));
+        if (!isset($this->attributes['_persist_flashes'])) {
+            $this->oldFlashes = array_flip(array_keys($this->attributes['_flash']));
+        } else {
+            $this->oldFlashes = array();
+            unset($this->attributes['_persist_flashes']);
+        }
 
         $this->started = true;
     }
@@ -253,6 +258,11 @@ class Session implements \Serializable
     public function clearFlashes()
     {
         $this->attributes['_flash'] = array();
+    }
+
+    public function persistFlashes()
+    {
+        $this->attributes['_persist_flashes'] = true;
     }
 
     public function save()

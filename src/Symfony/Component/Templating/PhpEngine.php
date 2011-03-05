@@ -412,7 +412,7 @@ class PhpEngine implements EngineInterface, \ArrayAccess
                 function ($value) use ($that)
                 {
                     if ('UTF-8' != $that->getCharset()) {
-                        $string = $that->convertEncoding($value, 'UTF-8', $that->getCharset());
+                        $value = $that->convertEncoding($value, 'UTF-8', $that->getCharset());
                     }
 
                     $callback = function ($matches) use ($that)
@@ -430,15 +430,15 @@ class PhpEngine implements EngineInterface, \ArrayAccess
                         return '\\u'.substr('0000'.bin2hex($char), -4);
                     };
 
-                    if (null === $string = preg_replace_callback('#[^\p{L}\p{N} ]#u', $callback, $string)) {
+                    if (null === $value = preg_replace_callback('#[^\p{L}\p{N} ]#u', $callback, $value)) {
                         throw new \InvalidArgumentException('The string to escape is not a valid UTF-8 string.');
                     }
 
                     if ('UTF-8' != $that->getCharset()) {
-                        $string = $that->convertEncoding($string, $that->getCharset(), 'UTF-8');
+                        $value = $that->convertEncoding($value, $that->getCharset(), 'UTF-8');
                     }
 
-                    return $string;
+                    return $value;
                 },
         );
     }

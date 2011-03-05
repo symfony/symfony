@@ -160,7 +160,10 @@ class ExceptionListener implements ListenerInterface
             $this->logger->debug('Calling Authentication entry point');
         }
 
-        $request->getSession()->set('_security.target_path', $request->getUri());
+        // session isn't required when using http basic authentification mecanism for example
+        if ($request->hasSession()) {
+            $request->getSession()->set('_security.target_path', $request->getUri());
+        }
 
         return $this->authenticationEntryPoint->start($event, $request, $authException);
     }

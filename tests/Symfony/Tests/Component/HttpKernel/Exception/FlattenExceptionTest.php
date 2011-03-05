@@ -20,13 +20,51 @@ class FlattenExceptionTest extends \PHPUnit_Framework_TestCase
     public function testFlattenHttpException(\Exception $exception, $statusCode)
     {
         $flattened = FlattenException::create($exception);
+        $flattened2 = FlattenException::create($exception);
+        
+        $flattened->setPrevious($flattened2);
 
         $this->assertEquals($exception->getMessage(), $flattened->getMessage(), 'The message is copied from the original exception.');
         $this->assertEquals($exception->getCode(), $flattened->getCode(), 'The code is copied from the original exception.');
         $this->assertEquals(get_class($exception), $flattened->getClass(), 'The class is set to the class of the original exception');
 
     }
-
+    
+    /**
+     * @dataProvider flattenDataProvider
+     */
+    public function testPrevious(\Exception $exception, $statusCode)
+    {
+        $flattened = FlattenException::create($exception);
+        $flattened2 = FlattenException::create($exception);
+        
+        $flattened->setPrevious($flattened2);
+        
+        $this->assertSame($flattened2,$flattened->getPrevious());
+        
+        $this->assertSame(array($flattened2),$flattened->getPreviouses());
+    }
+    
+    /**
+     * @dataProvider flattenDataProvider
+     */
+    public function testToArray(\Exception $exception, $statusCode)
+    {
+        $flattened = FlattenException::create($exception);
+        $flattened->setTrace(array(),'foo.php',123);
+        
+        $this->assertEquals(array(
+            array(
+                'message'=> 'test',
+                'class'=>'Exception',
+                'trace'=>array(array(
+                    'namespace'   => '', 'short_class' => '', 'class' => '','type' => '','function' => '', 'file' => 'foo.php','line' => 123,
+                    'args'        => array()
+                )),
+            )
+        ),$flattened->toArray());
+    }
+    
     public function flattenDataProvider()
     {
         return array(

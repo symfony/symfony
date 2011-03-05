@@ -1,0 +1,38 @@
+<?php
+
+/*
+ * This file is part of the Symfony package.
+ *
+ * (c) Fabien Potencier <fabien.potencier@symfony-project.com>
+ *
+ * For the full copyright and license information, please view the LICENSE
+ * file that was distributed with this source code.
+ */
+
+namespace Symfony\Component\Security\Http\Event;
+
+use Symfony\Component\HttpFoundation\Request;
+use Doctrine\Common\EventArgs;
+
+class InteractiveLoginEventArgs extends EventArgs
+{
+    private $request;
+
+    private $authenticationToken;
+
+    public function __construct(Request $request, $authenticationToken)
+    {
+        $this->request = $request;
+        $this->authenticationToken = $authenticationToken;
+    }
+
+    public function getRequest()
+    {
+        return $this->request;
+    }
+
+    public function getAuthenticationToken()
+    {
+        return $this->authenticationToken;
+    }
+}

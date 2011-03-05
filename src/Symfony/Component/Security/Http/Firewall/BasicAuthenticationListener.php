@@ -15,10 +15,11 @@ use Symfony\Component\Security\Core\SecurityContextInterface;
 use Symfony\Component\Security\Core\Authentication\AuthenticationManagerInterface;
 use Symfony\Component\Security\Http\EntryPoint\AuthenticationEntryPointInterface;
 use Symfony\Component\HttpKernel\Log\LoggerInterface;
-use Symfony\Component\EventDispatcher\EventDispatcherInterface;
-use Symfony\Component\EventDispatcher\EventInterface;
+use Symfony\Component\HttpKernel\Event\RequestEventArgs;
+use Symfony\Component\HttpKernel\Events;
 use Symfony\Component\Security\Core\Authentication\Token\UsernamePasswordToken;
 use Symfony\Component\Security\Core\Exception\AuthenticationException;
+use Doctrine\Common\EventManager;
 
 /**
  * BasicAuthenticationListener implements Basic HTTP authentication.
@@ -51,27 +52,26 @@ class BasicAuthenticationListener implements ListenerInterface
     /**
      *
      *
-     * @param EventDispatcherInterface $dispatcher An EventDispatcherInterface instance
-     * @param integer                  $priority   The priority
+     * @param EventManager $evm An EventManager instance
      */
-    public function register(EventDispatcherInterface $dispatcher)
+    public function register(EventManager $evm)
     {
-        $dispatcher->connect('core.security', array($this, 'handle'), 0);
+        $evm->addEventListener(Events::onCoreSecurity, $this);
     }
 
     /**
      * {@inheritDoc}
      */
-    public function unregister(EventDispatcherInterface $dispatcher)
+    public function unregister(EventManager $evm)
     {
     }
 
     /**
      * Handles basic authentication.
      *
-     * @param EventInterface $event An EventInterface instance
+     * @param RequestEventArgs $eventArgs A RequestEventArgs instance
      */
-    public function handle(EventInterface $event)
+    public function onCoreSecurity(RequestEventArgs $eventArgs)
     {
         $request = $event->get('request');
 

@@ -5,11 +5,11 @@
     xsi:schemaLocation="http://www.symfony-project.org/schema/dic/services http://www.symfony-project.org/schema/dic/services/services-1.0.xsd">
 
     <parameters>
-        <parameter key="debug.event_dispatcher.class">Symfony\Bundle\FrameworkBundle\Debug\EventDispatcher</parameter>
+        <parameter key="debug.event_manager.class">Symfony\Bundle\FrameworkBundle\Debug\TraceableEventManager</parameter>
     </parameters>
 
     <services>
-        <service id="debug.event_dispatcher" class="%debug.event_dispatcher.class%">
+        <service id="debug.event_manager" class="%debug.event_manager.class%">
             <argument type="service" id="service_container" />
             <argument type="service" id="logger" on-invalid="null" />
         </service>

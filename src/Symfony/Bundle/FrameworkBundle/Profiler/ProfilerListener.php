@@ -11,17 +11,14 @@
 
 namespace Symfony\Bundle\FrameworkBundle\Profiler;
 
-use Symfony\Component\EventDispatcher\EventInterface;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpKernel\HttpKernelInterface;
+use Symfony\Component\HttpKernel\Event\RequestEventArgs;
 use Symfony\Component\HttpFoundation\RequestMatcherInterface;
 use Symfony\Component\DependencyInjection\ContainerInterface;
 
 /**
- * ProfilerListener collects data for the current request by listening to the core.response event.
- *
- * The handleException method must be connected to the core.exception event.
- * The handleResponse method must be connected to the core.response event.
+ * ProfilerListener collects data for the current request by listening to the filterCoreResponse event.
  *
  * @author Fabien Potencier <fabien.potencier@symfony-project.com>
  */
@@ -47,45 +44,39 @@ class ProfilerListener
     }
 
     /**
-     * Handles the core.exception event.
+     * Handles the onCoreException event.
      *
      * @param EventInterface $event An EventInterface instance
      */
-    public function handleException(EventInterface $event)
+    public function onCoreException(ExceptionEventArgs $eventArgs)
     {
-        if (HttpKernelInterface::MASTER_REQUEST !== $event->get('request_type')) {
-            return false;
+        if (HttpKernelInterface::MASTER_REQUEST !== $eventArgs->getRequestType()) {
+            return;
         }
 
-        $this->exception = $event->get('exception');
-
-        return false;
+        $this->exception = $eventArgs->getException();
     }
 
     /**
-     * Handles the core.response event.
+     * Handles the filterCoreResponse event.
      *
-     * @param EventInterface $event An EventInterface instance
-     *
-     * @return Response $response A Response instance
+     * @param EventInterface $eventArgs An EventInterface instance
      */
-    public function handleResponse(EventInterface $event, Response $response)
+    public function filterCoreResponse(RequestEventArgs $eventArgs)
     {
-        if (HttpKernelInterface::MASTER_REQUEST !== $event->get('request_type')) {
-            return $response;
+        if (HttpKernelInterface::MASTER_REQUEST !== $eventArgs->getRequestType()) {
+            return;
         }
 
-        if (null !== $this->matcher && !$this->matcher->matches($event->get('request'))) {
-            return $response;
+        if (null !== $this->matcher && !$this->matcher->matches($eventArgs->getRequest())) {
+            return;
         }
 
         if ($this->onlyException && null === $this->exception) {
-            return $response;
+            return;
         }
 
-        $this->container->get('profiler')->collect($event->get('request'), $response, $this->exception);
+        $this->container->get('profiler')->collect($eventArgs->getRequest(), $response, $this->exception);
         $this->exception = null;
-
-        return $response;
     }
 }

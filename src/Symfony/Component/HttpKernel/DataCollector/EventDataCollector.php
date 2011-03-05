@@ -11,10 +11,10 @@
 
 namespace Symfony\Component\HttpKernel\DataCollector;
 
-use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
-use Symfony\Component\HttpKernel\Debug\EventDispatcherTraceableInterface;
+use Symfony\Component\HttpKernel\Debug\TraceableEventManagerInterface;
+use Doctrine\Common\EventManager;
 
 /**
  * EventDataCollector.
@@ -23,12 +23,12 @@ use Symfony\Component\HttpKernel\Debug\EventDispatcherTraceableInterface;
  */
 class EventDataCollector extends DataCollector
 {
-    protected $dispatcher;
+    protected $evm;
 
-    public function setEventDispatcher(EventDispatcherInterface $dispatcher)
+    public function setEventManager(EventManager $evm)
     {
-        if ($dispatcher instanceof EventDispatcherTraceableInterface) {
-            $this->dispatcher = $dispatcher;
+        if ($evm instanceof TraceableEventManagerInterface) {
+            $this->evm = $evm;
         }
     }
 
@@ -38,8 +38,8 @@ class EventDataCollector extends DataCollector
     public function collect(Request $request, Response $response, \Exception $exception = null)
     {
         $this->data = array(
-            'called_listeners'     => null !== $this->dispatcher ? $this->dispatcher->getCalledListeners() : array(),
-            'not_called_listeners' => null !== $this->dispatcher ? $this->dispatcher->getNotCalledListeners() : array(),
+            'called_listeners'     => null !== $this->evm ? $this->evm->getCalledListeners() : array(),
+            'not_called_listeners' => null !== $this->evm ? $this->evm->getNotCalledListeners() : array(),
         );
     }
 
@@ -48,7 +48,7 @@ class EventDataCollector extends DataCollector
      *
      * @return array An array of called listeners
      *
-     * @see EventDispatcherTraceableInterface
+     * @see TraceableEventManagerInterface
      */
     public function getCalledListeners()
     {
@@ -60,7 +60,7 @@ class EventDataCollector extends DataCollector
      *
      * @return array An array of not called listeners
      *
-     * @see EventDispatcherTraceableInterface
+     * @see TraceableEventManagerInterface
      */
     public function getNotCalledListeners()
     {

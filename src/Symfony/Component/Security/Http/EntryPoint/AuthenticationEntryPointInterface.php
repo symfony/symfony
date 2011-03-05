@@ -11,7 +11,7 @@
 
 namespace Symfony\Component\Security\Http\EntryPoint;
 
-use Symfony\Component\EventDispatcher\EventInterface;
+use Symfony\Component\HttpKernel\Event\RequestEventArgs;
 use Symfony\Component\Security\Core\Exception\AuthenticationException;
 use Symfony\Component\HttpFoundation\Request;
 
@@ -26,9 +26,9 @@ interface AuthenticationEntryPointInterface
     /**
      * Starts the authentication scheme.
      *
-     * @param EventInterface          $event         The "core.security" event
+     * @param RequestEventArgs        $eventArgs     The "onCoreSecurity" event
      * @param object                  $request       The request that resulted in an AuthenticationException
      * @param AuthenticationException $authException The exception that started the authentication process
      */
-    function start(EventInterface $event, Request $request, AuthenticationException $authException = null);
+    function start(RequestEventArgs $eventArgs, Request $request, AuthenticationException $authException = null);
 }

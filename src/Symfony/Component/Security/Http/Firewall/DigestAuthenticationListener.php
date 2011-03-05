@@ -15,8 +15,8 @@ use Symfony\Component\Security\Core\SecurityContextInterface;
 use Symfony\Component\Security\Core\User\UserProviderInterface;
 use Symfony\Component\Security\Http\EntryPoint\DigestAuthenticationEntryPoint;
 use Symfony\Component\HttpKernel\Log\LoggerInterface;
-use Symfony\Component\EventDispatcher\EventDispatcherInterface;
-use Symfony\Component\EventDispatcher\EventInterface;
+use Symfony\Component\HttpKernel\Event\RequestEventArgs;
+use Symfony\Component\HttpKernel\Events;
 use Symfony\Component\Security\Core\Authentication\Token\UsernamePasswordToken;
 use Symfony\Component\Security\Core\Exception\BadCredentialsException;
 use Symfony\Component\Security\Core\Exception\AuthenticationServiceException;
@@ -24,6 +24,7 @@ use Symfony\Component\Security\Core\Exception\UsernameNotFoundException;
 use Symfony\Component\Security\Core\Exception\NonceExpiredException;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\Security\Core\Exception\AuthenticationException;
+use Doctrine\Common\EventManager;
 
 /**
  * DigestAuthenticationListener implements Digest HTTP authentication.
@@ -54,29 +55,28 @@ class DigestAuthenticationListener implements ListenerInterface
     /**
      *
      *
-     * @param EventDispatcherInterface $dispatcher An EventDispatcherInterface instance
-     * @param integer                  $priority   The priority
+     * @param EventManager $evm An EventManager instance
      */
-    public function register(EventDispatcherInterface $dispatcher)
+    public function register(EventManager $evm)
     {
-        $dispatcher->connect('core.security', array($this, 'handle'), 0);
+        $evm->addEventListener(Events::onCoreSecurity, $this);
     }
 
     /**
      * {@inheritDoc}
      */
-    public function unregister(EventDispatcherInterface $dispatcher)
+    public function unregister(EventManager $evm)
     {
     }
 
     /**
      * Handles digest authentication.
      *
-     * @param EventInterface $event An EventInterface instance
+     * @param RequestEventArgs $eventArgs A RequestEventArgs instance
      */
-    public function handle(EventInterface $event)
+    public function onCoreSecurity(RequestEventArgs $eventArgs)
     {
-        $request = $event->get('request');
+        $request = $eventArgs->getRequest();
 
         if (!$header = $request->server->get('PHP_AUTH_DIGEST')) {
             return;

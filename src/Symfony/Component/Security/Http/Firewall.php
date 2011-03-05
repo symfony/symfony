@@ -11,11 +11,11 @@
 
 namespace Symfony\Component\Security\Http;
 
-use Symfony\Component\EventDispatcher\EventDispatcherInterface;
-use Symfony\Component\EventDispatcher\EventInterface;
-use Symfony\Component\EventDispatcher\Event;
 use Symfony\Component\HttpKernel\HttpKernelInterface;
+use Symfony\Component\HttpKernel\Events;
+use Symfony\Component\HttpKernel\Event\RequestEventArgs;
 use Symfony\Component\HttpFoundation\Request;
+use Doctrine\Common\EventManager;
 
 /**
  * Firewall uses a FirewallMap to register security listeners for the given
@@ -25,14 +25,12 @@ use Symfony\Component\HttpFoundation\Request;
  * (a Basic authentication for the /api, and a web based authentication for
  * everything else for instance).
  *
- * The handle method must be connected to the core.request event.
- *
  * @author Fabien Potencier <fabien.potencier@symfony-project.com>
  */
 class Firewall
 {
     protected $map;
-    protected $dispatcher;
+    protected $evm;
     protected $currentListeners;
 
     /**
@@ -40,42 +38,42 @@ class Firewall
      *
      * @param FirewallMap $map A FirewallMap instance
      */
-    public function __construct(FirewallMapInterface $map, EventDispatcherInterface $dispatcher)
+    public function __construct(FirewallMapInterface $map, EventManager $evm)
     {
         $this->map = $map;
-        $this->dispatcher = $dispatcher;
+        $this->evm = $evm;
         $this->currentListeners = array();
     }
 
     /**
      * Handles security.
      *
-     * @param EventInterface $event An EventInterface instance
+     * @param RequestEventArgs $eventArgs An RequestEventArgs instance
      */
-    public function handle(EventInterface $event)
+    public function onCoreRequest(RequestEventArgs $eventArgs)
     {
-        if (HttpKernelInterface::MASTER_REQUEST !== $event->get('request_type')) {
+        if (HttpKernelInterface::MASTER_REQUEST !== $eventArgs->getRequestType()) {
             return;
         }
 
-        $request = $event->get('request');
+        $request = $eventArgs->getRequest();
 
-        // disconnect all listeners from core.security to avoid the overhead
+        // disconnect all listeners from onCoreSecurity to avoid the overhead
         // of most listeners having to do this manually
-        $this->dispatcher->disconnect('core.security');
+        $this->evm->removeEventListeners(Events::onCoreSecurity);
 
         // ensure that listeners disconnect from wherever they have connected to
         foreach ($this->currentListeners as $listener) {
-            $listener->unregister($this->dispatcher);
+            $listener->unregister($this->evm);
         }
 
         // register listeners for this firewall
         list($listeners, $exception) = $this->map->getListeners($request);
         if (null !== $exception) {
-            $exception->register($this->dispatcher);
+            $exception->register($this->evm);
         }
         foreach ($listeners as $listener) {
-            $listener->register($this->dispatcher);
+            $listener->register($this->evm);
         }
 
         // save current listener instances
@@ -85,11 +83,11 @@ class Firewall
         }
 
         // initiate the listener chain
-        $ret = $this->dispatcher->notifyUntil($securityEvent = new Event($request, 'core.security', array('request' => $request)));
-        if ($securityEvent->isProcessed()) {
-            $event->setProcessed();
+        $securityEventArgs = new RequestEventArgs($eventArgs->getKernel(), $request, $eventArgs->getRequestType());
+        $this->evm->dispatchEvent($securityEventArgs);
 
-            return $ret;
+        if ($securityEventArgs->hasResponse()) {
+            $eventArgs->setResponse($securityEventArgs->getResponse());
         }
     }
 }

@@ -11,15 +11,17 @@
 
 namespace Symfony\Component\Security\Http\Firewall;
 
-use Symfony\Component\EventDispatcher\Event;
 use Symfony\Component\Security\Core\SecurityContextInterface;
 use Symfony\Component\Security\Core\Authentication\AuthenticationManagerInterface;
-use Symfony\Component\HttpKernel\Log\LoggerInterface;
-use Symfony\Component\EventDispatcher\EventDispatcherInterface;
-use Symfony\Component\EventDispatcher\EventInterface;
 use Symfony\Component\Security\Core\Authentication\Token\PreAuthenticatedToken;
 use Symfony\Component\Security\Core\Exception\AuthenticationException;
+use Symfony\Component\Security\Http\Event\InteractiveLoginEventArgs;
+use Symfony\Component\Security\Http\Events;
+use Symfony\Component\HttpKernel\Event\RequestEventArgs;
+use Symfony\Component\HttpKernel\Events as KernelEvents;
+use Symfony\Component\HttpKernel\Log\LoggerInterface;
 use Symfony\Component\HttpFoundation\Request;
+use Doctrine\Common\EventManager;
 
 /**
  * AbstractPreAuthenticatedListener is the base class for all listener that
@@ -34,7 +36,7 @@ abstract class AbstractPreAuthenticatedListener implements ListenerInterface
     protected $authenticationManager;
     protected $providerKey;
     protected $logger;
-    protected $eventDispatcher;
+    protected $evm;
 
     public function __construct(SecurityContextInterface $securityContext, AuthenticationManagerInterface $authenticationManager, $providerKey, LoggerInterface $logger = null)
     {
@@ -47,20 +49,19 @@ abstract class AbstractPreAuthenticatedListener implements ListenerInterface
     /**
      *
      *
-     * @param EventDispatcherInterface $dispatcher An EventDispatcherInterface instance
-     * @param integer                  $priority   The priority
+     * @param EventManager $evm An EventManager instance
      */
-    public function register(EventDispatcherInterface $dispatcher)
+    public function register(EventManager $evm)
     {
-        $dispatcher->connect('core.security', array($this, 'handle'), 0);
+        $evm->addEventListener(KernelEvents::onCoreSecurity, $this);
 
-        $this->eventDispatcher = $dispatcher;
+        $this->evm = $evm;
     }
 
     /**
      * {@inheritDoc}
      */
-    public function unregister(EventDispatcherInterface $dispatcher)
+    public function unregister(EventManager $evm)
     {
     }
 
@@ -69,9 +70,9 @@ abstract class AbstractPreAuthenticatedListener implements ListenerInterface
      *
      * @param EventInterface $event An EventInterface instance
      */
-    public function handle(EventInterface $event)
+    public function onCoreSecurity(RequestEventArgs $eventArgs)
     {
-        $request = $event->get('request');
+        $request = $eventArgs->getRequest();
 
         if (null !== $this->logger) {
             $this->logger->debug(sprintf('Checking secure context token: %s', $this->securityContext->getToken()));
@@ -101,8 +102,9 @@ abstract class AbstractPreAuthenticatedListener implements ListenerInterface
             }
             $this->securityContext->setToken($token);
 
-            if (null !== $this->eventDispatcher) {
-                $this->eventDispatcher->notify(new Event($this, 'security.interactive_login', array('request' => $request, 'token' => $token)));
+            if (null !== $this->evm) {
+                $loginEventArgs = new InteractiveLoginEventArgs($request, $token);
+                $this->evm->notify(Events::onSecurityInteractiveLogin, $loginEventArgs);
             }
         } catch (AuthenticationException $failed) {
             $this->securityContext->setToken(null);

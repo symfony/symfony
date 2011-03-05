@@ -7,7 +7,7 @@ use Symfony\Component\HttpKernel\HttpKernelInterface;
 use Symfony\Component\HttpKernel\Controller\ControllerResolverInterface;
 use Symfony\Component\DependencyInjection\ContainerInterface;
 use Symfony\Component\HttpKernel\HttpKernel as BaseHttpKernel;
-use Symfony\Component\EventDispatcher\EventDispatcherInterface;
+use Doctrine\Common\EventManager;
 
 /**
  * This HttpKernel is used to manage scope changes of the DI container.
@@ -23,11 +23,6 @@ class HttpKernel extends BaseHttpKernel
     {
         $this->container = $container;
         $this->resolver = $controllerResolver;
-    }
-
-    public function setEventDispatcher(EventDispatcherInterface $dispatcher)
-    {
-        $this->dispatcher = $dispatcher;
     }
 
     public function handle(Request $request, $type = HttpKernelInterface::MASTER_REQUEST, $catch = true)

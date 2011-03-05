@@ -2,18 +2,20 @@
 
 namespace Symfony\Component\Security\Http\Firewall;
 
-use Symfony\Component\EventDispatcher\Event;
-use Symfony\Component\Security\Core\Authentication\Token\TokenInterface;
-use Symfony\Component\Security\Core\Exception\AuthenticationException;
-use Symfony\Component\Security\Core\Exception\CookieTheftException;
 use Symfony\Component\HttpKernel\HttpKernelInterface;
 use Symfony\Component\HttpKernel\Log\LoggerInterface;
-use Symfony\Component\Security\Core\Authentication\AuthenticationManagerInterface;
-use Symfony\Component\EventDispatcher\EventDispatcherInterface;
-use Symfony\Component\EventDispatcher\EventInterface;
+use Symfony\Component\HttpKernel\Event\RequestEventArgs;
+use Symfony\Component\HttpKernel\Events as KernelEvents;
 use Symfony\Component\HttpFoundation\Response;
+use Symfony\Component\Security\Core\Authentication\Token\TokenInterface;
+use Symfony\Component\Security\Core\Authentication\AuthenticationManagerInterface;
+use Symfony\Component\Security\Core\Exception\AuthenticationException;
+use Symfony\Component\Security\Core\Exception\CookieTheftException;
 use Symfony\Component\Security\Core\SecurityContext;
 use Symfony\Component\Security\Http\RememberMe\RememberMeServicesInterface;
+use Symfony\Component\Security\Http\Event\InteractiveLoginEventArgs;
+use Symfony\Component\Security\Http\Events;
+use Doctrine\Common\EventManager;
 
 /*
  * This file is part of the Symfony framework.
@@ -36,7 +38,7 @@ class RememberMeListener implements ListenerInterface
     protected $authenticationManager;
     protected $logger;
     protected $lastState;
-    protected $eventDispatcher;
+    protected $evm;
 
     /**
      * Constructor
@@ -55,33 +57,34 @@ class RememberMeListener implements ListenerInterface
     }
 
     /**
-     * Listen to core.security, and core.response event
+     * Listen to onCoreSecurity and filterCoreResponse event
      *
-     * @param EventDispatcherInterface $dispatcher An EventDispatcherInterface instance
-     * @param integer         $priority   The priority
+     * @param EventManager $evm An EventManager instance
      */
-    public function register(EventDispatcherInterface $dispatcher)
+    public function register(EventManager $evm)
     {
-        $dispatcher->connect('core.security', array($this, 'checkCookies'), 0);
-        $dispatcher->connect('core.response', array($this, 'updateCookies'), 0);
+        $evm->addEventListener(
+            array(KernelEvents::onCoreSecurity, KernelEvents::filterCoreResponse),
+            $this
+        );
 
-        $this->eventDispatcher = $dispatcher;
+        $this->evm = $evm;
     }
 
     /**
      * {@inheritDoc}
      */
-    public function unregister(EventDispatcherInterface $dispatcher)
+    public function unregister(EventManager $evm)
     {
-        $dispatcher->disconnect('core.response', array($this, 'updateCookies'));
+        $evm->removeEventListener(KernelEvents::onCoreSecurity, $this);
     }
 
     /**
      * Handles remember-me cookie based authentication.
      *
-     * @param Event $event An Event instance
+     * @param RequestEventArgs $eventArgs A RequestEventArgs instance
      */
-    public function checkCookies(EventInterface $event)
+    public function onCoreSecurity(RequestEventArgs $eventArgs)
     {
         $this->lastState = null;
 
@@ -90,7 +93,7 @@ class RememberMeListener implements ListenerInterface
         }
 
         try {
-            if (null === $token = $this->rememberMeServices->autoLogin($event->get('request'))) {
+            if (null === $token = $this->rememberMeServices->autoLogin($eventArgs->getRequest())) {
                 return;
             }
 
@@ -101,8 +104,9 @@ class RememberMeListener implements ListenerInterface
 
                 $this->securityContext->setToken($token);
 
-                if (null !== $this->eventDispatcher) {
-                    $this->eventDispatcher->notify(new Event($this, 'security.interactive_login', array('request' => $event->get('request'), 'token' => $token)));
+                if (null !== $this->evm) {
+                    $loginEventArgs = new InteractiveLoginEventArgs($eventArgs->getRequest(), $token);
+                    $this->evm->dispatchEvent(Events::onSecurityInteractiveLogin, $loginEventArgs);
                 }
 
                 if (null !== $this->logger) {
@@ -139,18 +143,16 @@ class RememberMeListener implements ListenerInterface
      * Update cookies
      * @param Event $event
      */
-    public function updateCookies(EventInterface $event, Response $response)
+    public function filterCoreResponse(RequestEventArgs $eventArgs)
     {
-        if (HttpKernelInterface::MASTER_REQUEST !== $event->get('request_type')) {
-            return $response;
+        if (HttpKernelInterface::MASTER_REQUEST !== $eventArgs->getRequestType()) {
+            return;
         }
 
         if ($this->lastState instanceof TokenInterface) {
-            $this->rememberMeServices->loginSuccess($event->get('request'), $response, $this->lastState);
+            $this->rememberMeServices->loginSuccess($eventArgs->getRequest(), $eventArgs->getResponse(), $this->lastState);
         } else if ($this->lastState instanceof AuthenticationException) {
-            $this->rememberMeServices->loginFail($event->get('request'), $response);
+            $this->rememberMeServices->loginFail($eventArgs->getRequest(), $eventArgs->getResponse());
         }
-
-        return $response;
     }
 }

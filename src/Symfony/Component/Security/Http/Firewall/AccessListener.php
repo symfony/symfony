@@ -16,10 +16,11 @@ use Symfony\Component\Security\Core\Authorization\AccessDecisionManagerInterface
 use Symfony\Component\Security\Http\AccessMap;
 use Symfony\Component\Security\Core\Authentication\AuthenticationManagerInterface;
 use Symfony\Component\HttpKernel\Log\LoggerInterface;
-use Symfony\Component\EventDispatcher\EventDispatcherInterface;
-use Symfony\Component\EventDispatcher\EventInterface;
+use Symfony\Component\HttpKernel\Event\RequestEventArgs;
+use Symfony\Component\HttpKernel\Events;
 use Symfony\Component\Security\Core\Exception\AuthenticationCredentialsNotFoundException;
 use Symfony\Component\Security\Core\Exception\AccessDeniedException;
+use Doctrine\Common\EventManager;
 
 /**
  * AccessListener enforces access control rules.
@@ -44,35 +45,34 @@ class AccessListener implements ListenerInterface
     }
 
     /**
-     * Registers a core.security listener to enforce authorization rules.
+     * Registers a onCoreSecurity listener to enforce authorization rules.
      *
-     * @param EventDispatcherInterface $dispatcher An EventDispatcherInterface instance
-     * @param integer                  $priority   The priority
+     * @param EventManager $evm An EventManager instance
      */
-    public function register(EventDispatcherInterface $dispatcher)
+    public function register(EventManager $evm)
     {
-        $dispatcher->connect('core.security', array($this, 'handle'), 0);
+        $evm->addEventListener(Events::onCoreSecurity, $this);
     }
-    
+
     /**
      * {@inheritDoc}
      */
-    public function unregister(EventDispatcherInterface $dispatcher)
+    public function unregister(EventManager $evm)
     {
     }
 
     /**
      * Handles access authorization.
      *
-     * @param EventInterface $event An EventInterface instance
+     * @param RequestEventArgs $eventArgs A RequestEventArgs instance
      */
-    public function handle(EventInterface $event)
+    public function onCoreSecurity(RequestEventArgs $eventArgs)
     {
         if (null === $token = $this->context->getToken()) {
             throw new AuthenticationCredentialsNotFoundException('A Token was not found in the SecurityContext.');
         }
 
-        $request = $event->get('request');
+        $request = $eventArgs->getRequest();
 
         list($attributes, $channel) = $this->map->getPatterns($request);
 

@@ -11,22 +11,22 @@
 
 namespace Symfony\Component\Security\Http\Firewall;
 
-use Symfony\Component\EventDispatcher\Event;
 use Symfony\Component\Security\Http\Session\SessionAuthenticationStrategyInterface;
 use Symfony\Component\Security\Http\Authentication\AuthenticationFailureHandlerInterface;
 use Symfony\Component\Security\Http\Authentication\AuthenticationSuccessHandlerInterface;
 use Symfony\Component\Security\Http\RememberMe\RememberMeServicesInterface;
 use Symfony\Component\Security\Core\SecurityContextInterface;
 use Symfony\Component\Security\Core\Authentication\AuthenticationManagerInterface;
-use Symfony\Component\HttpKernel\Log\LoggerInterface;
-use Symfony\Component\EventDispatcher\EventDispatcherInterface;
-use Symfony\Component\EventDispatcher\EventInterface;
 use Symfony\Component\Security\Core\Exception\AuthenticationException;
-use Symfony\Component\HttpFoundation\Request;
+use Symfony\Component\HttpKernel\Log\LoggerInterface;
 use Symfony\Component\HttpKernel\HttpKernelInterface;
+use Symfony\Component\HttpKernel\Events as KernelEvents;
+use Symfony\Component\HttpKernel\Event\RequestEventArgs;
+use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpFoundation\RedirectResponse;
 use Symfony\Component\Security\Core\Authentication\Token\TokenInterface;
+use Doctrine\Common\EventManager;
 
 /**
  * The AbstractAuthenticationListener is the preferred base class for all
@@ -51,7 +51,7 @@ abstract class AbstractAuthenticationListener implements ListenerInterface
     protected $authenticationManager;
     protected $sessionStrategy;
     protected $providerKey;
-    protected $eventDispatcher;
+    protected $evm;
     protected $options;
     protected $successHandler;
     protected $failureHandler;
@@ -102,22 +102,21 @@ abstract class AbstractAuthenticationListener implements ListenerInterface
     }
 
     /**
-     * Subscribe to the core.security event
+     * Subscribe to the onCoreSecurity event
      *
-     * @param EventDispatcher $dispatcher An EventDispatcher instance
-     * @param integer         $priority   The priority
+     * @param EventManager $evm An EventManager instance
      */
-    public function register(EventDispatcherInterface $dispatcher)
+    public function register(EventManager $evm)
     {
-        $dispatcher->connect('core.security', array($this, 'handle'), 0);
+        $evm->addEventListener(KernelEvents::onCoreSecurity, $this);
 
-        $this->eventDispatcher = $dispatcher;
+        $this->evm = $evm;
     }
 
     /**
      * {@inheritDoc}
      */
-    public function unregister(EventDispatcherInterface $dispatcher)
+    public function unregister(EventManager $evm)
     {
     }
 
@@ -126,9 +125,9 @@ abstract class AbstractAuthenticationListener implements ListenerInterface
      *
      * @param Event $event An Event instance
      */
-    public function handle(EventInterface $event)
+    public function onCoreSecurity(RequestEventArgs $eventArgs)
     {
-        $request = $event->get('request');
+        $request = $eventArgs->getRequest();
 
         if (!$this->requiresAuthentication($request)) {
             return;
@@ -142,19 +141,17 @@ abstract class AbstractAuthenticationListener implements ListenerInterface
             if ($returnValue instanceof TokenInterface) {
                 $this->sessionStrategy->onAuthentication($request, $returnValue);
 
-                $response = $this->onSuccess($event, $request, $returnValue);
+                $response = $this->onSuccess($eventArgs, $request, $returnValue);
             } else if ($returnValue instanceof Response) {
                 $response = $returnValue;
             } else {
                 throw new \RuntimeException('attemptAuthentication() must either return a Response, an implementation of TokenInterface, or null.');
             }
-        } catch (AuthenticationException $failed) {
-            $response = $this->onFailure($event, $request, $failed);
+        } catch (AuthenticationException $e) {
+            $response = $this->onFailure($eventArgs, $request, $e);
         }
 
-        $event->setProcessed();
-
-        return $response;
+        $eventArgs->setResponse($response);
     }
 
     /**
@@ -173,7 +170,7 @@ abstract class AbstractAuthenticationListener implements ListenerInterface
         return $this->options['check_path'] === $request->getPathInfo();
     }
 
-    protected function onFailure($event, Request $request, AuthenticationException $failed)
+    protected function onFailure(RequestEventArgs $eventArgs, Request $request, AuthenticationException $failed)
     {
         if (null !== $this->logger) {
             $this->logger->debug(sprintf('Authentication request failed: %s', $failed->getMessage()));
@@ -182,7 +179,7 @@ abstract class AbstractAuthenticationListener implements ListenerInterface
         $this->securityContext->setToken(null);
 
         if (null !== $this->failureHandler) {
-            return $this->failureHandler->onAuthenticationFailure($event, $request, $failed);
+            return $this->failureHandler->onAuthenticationFailure($eventArgs, $request, $failed);
         }
 
         if (null === $this->options['failure_path']) {
@@ -197,7 +194,7 @@ abstract class AbstractAuthenticationListener implements ListenerInterface
             $subRequest = Request::create($this->options['failure_path']);
             $subRequest->attributes->set(SecurityContextInterface::AUTHENTICATION_ERROR, $failed);
 
-            return $event->getSubject()->handle($subRequest, HttpKernelInterface::SUB_REQUEST);
+            return $eventArgs->getSubject()->handle($subRequest, HttpKernelInterface::SUB_REQUEST);
         }
 
         if (null !== $this->logger) {
@@ -209,7 +206,7 @@ abstract class AbstractAuthenticationListener implements ListenerInterface
         return new RedirectResponse(0 !== strpos($this->options['failure_path'], 'http') ? $request->getUriForPath($this->options['failure_path']) : $this->options['failure_path'], 302);
     }
 
-    protected function onSuccess(EventInterface $event, Request $request, TokenInterface $token)
+    protected function onSuccess(RequestEventArgs $eventArgs, Request $request, TokenInterface $token)
     {
         if (null !== $this->logger) {
             $this->logger->debug('User has been authenticated successfully');
@@ -221,12 +218,13 @@ abstract class AbstractAuthenticationListener implements ListenerInterface
         $session->remove(SecurityContextInterface::AUTHENTICATION_ERROR);
         $session->remove(SecurityContextInterface::LAST_USERNAME);
 
-        if (null !== $this->eventDispatcher) {
-            $this->eventDispatcher->notify(new Event($this, 'security.interactive_login', array('request' => $request, 'token' => $token)));
+        if (null !== $this->evm) {
+            $loginEventArgs = new InteractiveLoginEventArgs($request, $token);
+            $this->evm->dispatchEvent(Events::onSecurityInteractiveLogin, $loginEventArgs);
         }
 
         if (null !== $this->successHandler) {
-            $response = $this->successHandler->onAuthenticationSuccess($event, $request, $token);
+            $response = $this->successHandler->onAuthenticationSuccess($eventArgs, $request, $token);
         } else {
             $path = $this->determineTargetUrl($request);
             $response = new RedirectResponse(0 !== strpos($path, 'http') ? $request->getUriForPath($path) : $path, 302);

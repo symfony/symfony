@@ -11,10 +11,10 @@
 
 namespace Symfony\Bundle\FrameworkBundle\Debug;
 
-use Symfony\Bundle\FrameworkBundle\EventDispatcher as BaseEventDispatcher;
+use Doctrine\Common\EventManager;
 use Symfony\Component\EventDispatcher\EventInterface;
 use Symfony\Component\HttpKernel\Log\LoggerInterface;
-use Symfony\Component\HttpKernel\Debug\EventDispatcherTraceableInterface;
+use Symfony\Component\HttpKernel\Debug\TraceableEventManagerInterface;
 use Symfony\Component\DependencyInjection\ContainerInterface;
 
 /**
@@ -22,7 +22,7 @@ use Symfony\Component\DependencyInjection\ContainerInterface;
  *
  * @author Fabien Potencier <fabien.potencier@symfony-project.com>
  */
-class EventDispatcher extends BaseEventDispatcher implements EventDispatcherTraceableInterface
+class TraceableEventManager extends EventManager implements TraceableEventManagerInterface
 {
     protected $logger;
     protected $called;

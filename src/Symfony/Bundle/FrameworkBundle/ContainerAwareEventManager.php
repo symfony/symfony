@@ -11,16 +11,16 @@
 
 namespace Symfony\Bundle\FrameworkBundle;
 
-use Symfony\Component\EventDispatcher\EventDispatcher as BaseEventDispatcher;
 use Symfony\Component\DependencyInjection\ContainerInterface;
 use Symfony\Component\EventDispatcher\EventInterface;
+use Doctrine\Common\EventManager;
 
 /**
  * This EventDispatcher automatically gets the kernel listeners injected
  *
  * @author Fabien Potencier <fabien.potencier@symfony-project.com>
  */
-class EventDispatcher extends BaseEventDispatcher
+class ContainerAwareEventManager extends EventManager
 {
     protected $container;
 

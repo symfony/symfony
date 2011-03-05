@@ -11,11 +11,11 @@
 
 namespace Symfony\Component\Security\Http\EntryPoint;
 
-use Symfony\Component\EventDispatcher\EventInterface;
 use Symfony\Component\Security\Core\Exception\AuthenticationException;
 use Symfony\Component\Security\Http\EntryPoint\AuthenticationEntryPointInterface;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpFoundation\Request;
+use Symfony\Component\HttpKernel\Event\RequestEventArgs;
 
 /**
  * BasicAuthenticationEntryPoint starts an HTTP Basic authentication.
@@ -31,7 +31,7 @@ class BasicAuthenticationEntryPoint implements AuthenticationEntryPointInterface
         $this->realmName = $realmName;
     }
 
-    public function start(EventInterface $event, Request $request, AuthenticationException $authException = null)
+    public function start(RequestEventArgs $event, Request $request, AuthenticationException $authException = null)
     {
         $response = new Response();
         $response->headers->set('WWW-Authenticate', sprintf('Basic realm="%s"', $this->realmName));

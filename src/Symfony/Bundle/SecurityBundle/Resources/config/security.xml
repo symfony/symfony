@@ -106,9 +106,9 @@
 
         <!-- Firewall related services -->
         <service id="security.firewall" class="%security.firewall.class%">
-            <tag name="kernel.listener" event="core.request" method="handle" priority="-128" />
+            <tag name="kernel.listener" event="onCoreRequest" priority="-128" />
             <argument type="service" id="security.firewall.map" />
-            <argument type="service" id="event_dispatcher" />
+            <argument type="service" id="event_manager" />
         </service>
 
         <service id="security.firewall.map" class="%security.firewall.map.class%" public="false">

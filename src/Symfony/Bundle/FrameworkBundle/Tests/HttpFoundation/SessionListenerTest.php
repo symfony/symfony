@@ -55,7 +55,7 @@ class SessionListenerTest extends \PHPUnit_Framework_TestCase
         $response = new Response();
 
         $this->assertSame($response, $this->listener->filter(new Event(
-            $this, 'core.response', array('request' => $request, 'request_type' => $type)
+            $this, 'filterCoreResponse', array('request' => $request, 'request_type' => $type)
         ), $response));
     }
 

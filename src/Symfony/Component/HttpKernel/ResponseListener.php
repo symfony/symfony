@@ -11,13 +11,11 @@
 
 namespace Symfony\Component\HttpKernel;
 
-use Symfony\Component\EventDispatcher\EventInterface;
+use Symfony\Component\HttpKernel\Event\RequestEventArgs;
 use Symfony\Component\HttpFoundation\Response;
 
 /**
  * ResponseListener fixes the Response Content-Type.
- *
- * The filter method must be connected to the core.response event.
  *
  * @author Fabien Potencier <fabien.potencier@symfony-project.com>
  */
@@ -33,29 +31,28 @@ class ResponseListener
     /**
      * Filters the Response.
      *
-     * @param EventInterface $event    An EventInterface instance
-     * @param Response       $response A Response instance
+     * @param RequestEventArgs $eventArgs    A RequestEventArgs instance
      */
-    public function filter(EventInterface $event, Response $response)
+    public function filterCoreResponse(RequestEventArgs $eventArgs)
     {
-        if (HttpKernelInterface::MASTER_REQUEST !== $event->get('request_type')) {
-            return $response;
+        if (HttpKernelInterface::MASTER_REQUEST !== $event->getRequestType()) {
+            return;
         }
+
+        $response = $eventArgs->getResponse();
 
         if (null === $response->getCharset()) {
             $response->setCharset($this->charset);
         }
 
         if ($response->headers->has('Content-Type')) {
-            return $response;
+            return;
         }
 
-        $request = $event->get('request');
+        $request = $event->getRequest();
         $format = $request->getRequestFormat();
         if ((null !== $format) && $mimeType = $request->getMimeType($format)) {
             $response->headers->set('Content-Type', $mimeType);
         }
-
-        return $response;
     }
 }

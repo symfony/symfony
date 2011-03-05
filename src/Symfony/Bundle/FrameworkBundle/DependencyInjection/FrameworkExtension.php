@@ -140,17 +140,21 @@ class FrameworkExtension extends Extension
             'Symfony\\Component\\HttpKernel\\ResponseListener',
             'Symfony\\Component\\HttpKernel\\Controller\\ControllerResolver',
             'Symfony\\Component\\HttpKernel\\Controller\\ControllerResolverInterface',
+            'Symfony\\Component\\HttpKernel\\Event\\RequestEventArgs',
+            'Symfony\\Component\\HttpKernel\\Event\\ControllerEventArgs',
+            'Symfony\\Component\\HttpKernel\\Event\\ViewEventArgs',
+            'Symfony\\Component\\HttpKernel\\Event\\ExceptionEventArgs',
 
             'Symfony\\Bundle\\FrameworkBundle\\RequestListener',
             'Symfony\\Bundle\\FrameworkBundle\\Controller\\ControllerNameParser',
             'Symfony\\Bundle\\FrameworkBundle\\Controller\\ControllerResolver',
             'Symfony\\Bundle\\FrameworkBundle\\Controller\\Controller',
 
-            'Symfony\\Component\\EventDispatcher\\EventInterface',
-            'Symfony\\Component\\EventDispatcher\\Event',
-            'Symfony\\Component\\EventDispatcher\\EventDispatcherInterface',
-            'Symfony\\Component\\EventDispatcher\\EventDispatcher',
-            'Symfony\\Bundle\\FrameworkBundle\\EventDispatcher',
+            'Symfony\\Bundle\\FrameworkBundle\\ContainerAwareEventManager',
+
+            'Doctrine\\Common\\EventManager',
+            'Doctrine\\Common\\EventArgs',
+            'Doctrine\\Common\\EventSubscriber',
         ));
     }
 

@@ -11,12 +11,15 @@
 
 namespace Symfony\Component\HttpKernel;
 
-use Symfony\Component\EventDispatcher\Event;
-use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 use Symfony\Component\HttpKernel\Controller\ControllerResolverInterface;
 use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
+use Symfony\Component\HttpKernel\Event\ControllerEventArgs;
+use Symfony\Component\HttpKernel\Event\RequestEventArgs;
+use Symfony\Component\HttpKernel\Event\ExceptionEventArgs;
+use Symfony\Component\HttpKernel\Event\ViewEventArgs;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
+use Doctrine\Common\EventManager;
 
 /**
  * HttpKernel notifies events to convert a Request object to a Response one.
@@ -25,18 +28,18 @@ use Symfony\Component\HttpFoundation\Response;
  */
 class HttpKernel implements HttpKernelInterface
 {
-    protected $dispatcher;
+    protected $evm;
     protected $resolver;
 
     /**
      * Constructor
      *
-     * @param EventDispatcherInterface    $dispatcher An EventDispatcherInterface instance
+     * @param EventManager $evm An EventManager instance
      * @param ControllerResolverInterface $resolver A ControllerResolverInterface instance
      */
-    public function __construct(EventDispatcherInterface $dispatcher, ControllerResolverInterface $resolver)
+    public function __construct(EventManager $evm, ControllerResolverInterface $resolver)
     {
-        $this->dispatcher = $dispatcher;
+        $this->evm = $evm;
         $this->resolver = $resolver;
     }
 
@@ -53,13 +56,14 @@ class HttpKernel implements HttpKernelInterface
             }
 
             // exception
-            $event = new Event($this, 'core.exception', array('request_type' => $type, 'request' => $request, 'exception' => $e));
-            $response = $this->dispatcher->notifyUntil($event);
-            if (!$event->isProcessed()) {
+            $eventArgs = new ExceptionEventArgs($this, $e, $request, $type);
+            $this->evm->dispatchEvent(Events::onCoreException, $eventArgs);
+
+            if (!$eventArgs->isHandled()) {
                 throw $e;
             }
 
-            $response = $this->filterResponse($response, $request, 'A "core.exception" listener returned a non response object.', $type);
+            $response = $this->filterResponse($eventArgs->getResponse(), $request, $type);
         }
 
         return $response;
@@ -81,10 +85,11 @@ class HttpKernel implements HttpKernelInterface
     protected function handleRaw(Request $request, $type = self::MASTER_REQUEST)
     {
         // request
-        $event = new Event($this, 'core.request', array('request_type' => $type, 'request' => $request));
-        $response = $this->dispatcher->notifyUntil($event);
-        if ($event->isProcessed()) {
-            return $this->filterResponse($response, $request, 'A "core.request" listener returned a non response object.', $type);
+        $eventArgs = new RequestEventArgs($this, $request, $type);
+        $this->evm->dispatchEvent(Events::onCoreRequest, $eventArgs);
+
+        if ($eventArgs->hasResponse()) {
+            return $this->filterResponse($eventArgs->getResponse(), $request, $type);
         }
 
         // load controller
@@ -92,13 +97,9 @@ class HttpKernel implements HttpKernelInterface
             throw new NotFoundHttpException(sprintf('Unable to find the controller for path "%s". Maybe you forgot to add the matching route in your routing configuration?', $request->getPathInfo()));
         }
 
-        $event = new Event($this, 'core.controller', array('request_type' => $type, 'request' => $request));
-        $controller = $this->dispatcher->filter($event, $controller);
-
-        // controller must be a callable
-        if (!is_callable($controller)) {
-            throw new \LogicException(sprintf('The controller must be a callable (%s given).', $this->varToString($controller)));
-        }
+        $eventArgs = new ControllerEventArgs($this, $controller, $request, $type);
+        $this->evm->dispatchEvent(Events::filterCoreController, $eventArgs);
+        $controller = $eventArgs->getController();
 
         // controller arguments
         $arguments = $this->resolver->getArguments($request, $controller);
@@ -108,14 +109,19 @@ class HttpKernel implements HttpKernelInterface
 
         // view
         if (!$response instanceof Response) {
-            $event = new Event($this, 'core.view', array('request_type' => $type, 'request' => $request, 'controller_value' => $response));
-            $retval = $this->dispatcher->notifyUntil($event);
-            if ($event->isProcessed()) {
-                $response = $retval;
+            $eventArgs = new ViewEventArgs($this, $response, $request, $type);
+            $this->dispatchEvent(Events::onCoreView, $eventArgs);
+
+            if ($eventArgs->hasResponse()) {
+                $response = $eventArgs->getResponse();
+            }
+
+            if (!$response instanceof Response) {
+                throw new \LogicException(sprintf('The controller must return a response (%s given).', $this->varToString($response)));
             }
         }
 
-        return $this->filterResponse($response, $request, sprintf('The controller must return a response (%s given).', $this->varToString($response)), $type);
+        return $this->filterResponse($response, $request, $type);
     }
 
     /**
@@ -129,19 +135,13 @@ class HttpKernel implements HttpKernelInterface
      *
      * @throws \RuntimeException if the passed object is not a Response instance
      */
-    protected function filterResponse($response, $request, $message, $type)
+    protected function filterResponse(Response $response, Request $request, $type)
     {
-        if (!$response instanceof Response) {
-            throw new \RuntimeException($message);
-        }
+        $eventArgs = new RequestEventArgs($this, $request, $type, $response);
 
-        $response = $this->dispatcher->filter(new Event($this, 'core.response', array('request_type' => $type, 'request' => $request)), $response);
+        $this->evm->dispatchEvent(Events::filterCoreResponse, $eventArgs);
 
-        if (!$response instanceof Response) {
-            throw new \RuntimeException('A "core.response" listener returned a non response object.');
-        }
-
-        return $response;
+        return $event->getResponse();
     }
 
     protected function varToString($var)

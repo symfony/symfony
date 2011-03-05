@@ -11,17 +11,15 @@
 
 namespace Symfony\Component\HttpKernel\Debug;
 
-use Symfony\Component\EventDispatcher\EventInterface;
 use Symfony\Component\HttpKernel\Log\LoggerInterface;
 use Symfony\Component\HttpKernel\Log\DebugLoggerInterface;
+use Symfony\Component\HttpKernel\Event\ExceptionEventArgs;
 use Symfony\Component\HttpKernel\HttpKernelInterface;
 use Symfony\Component\HttpKernel\Exception\FlattenException;
 use Symfony\Component\HttpFoundation\Request;
 
 /**
  * ExceptionListener.
- *
- * The handle method must be connected to the core.exception event.
  *
  * @author Fabien Potencier <fabien.potencier@symfony-project.com>
  */
@@ -36,7 +34,7 @@ class ExceptionListener
         $this->logger = $logger;
     }
 
-    public function handle(EventInterface $event)
+    public function onCoreException(ExceptionEventArgs $eventArgs)
     {
         static $handling;
 
@@ -46,8 +44,8 @@ class ExceptionListener
 
         $handling = true;
 
-        $exception = $event->get('exception');
-        $request = $event->get('request');
+        $exception = $eventArgs->get('exception');
+        $request = $eventArgs->get('request');
 
         if (null !== $this->logger) {
             $this->logger->err(sprintf('%s: %s (uncaught exception)', get_class($exception), $exception->getMessage()));
@@ -68,7 +66,7 @@ class ExceptionListener
         $request = $request->duplicate(null, null, $attributes);
 
         try {
-            $response = $event->getSubject()->handle($request, HttpKernelInterface::SUB_REQUEST, true);
+            $response = $eventArgs->getSubject()->handle($request, HttpKernelInterface::SUB_REQUEST, true);
         } catch (\Exception $e) {
             $message = sprintf('Exception thrown when handling an exception (%s: %s)', get_class($e), $e->getMessage());
             if (null !== $this->logger) {
@@ -81,10 +79,9 @@ class ExceptionListener
             throw $exception;
         }
 
-        $event->setProcessed();
+        $eventArgs->setHandled(true);
+        $eventArgs->setResponse($response);
 
         $handling = false;
-
-        return $response;
     }
 }

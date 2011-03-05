@@ -5,7 +5,7 @@
     xsi:schemaLocation="http://www.symfony-project.org/schema/dic/services http://www.symfony-project.org/schema/dic/services/services-1.0.xsd">
 
     <parameters>
-        <parameter key="event_dispatcher.class">Symfony\Bundle\FrameworkBundle\EventDispatcher</parameter>
+        <parameter key="event_manager.class">Symfony\Bundle\FrameworkBundle\ContainerAwareEventManager</parameter>
         <parameter key="http_kernel.class">Symfony\Bundle\FrameworkBundle\HttpKernel</parameter>
         <parameter key="error_handler.class">Symfony\Component\HttpKernel\Debug\ErrorHandler</parameter>
         <parameter key="error_handler.level">null</parameter>
@@ -16,7 +16,7 @@
     </parameters>
 
     <services>
-        <service id="event_dispatcher" class="%event_dispatcher.class%">
+        <service id="event_manager" class="%event_manager.class%">
             <argument type="service" id="service_container" />
         </service>
 
@@ -27,7 +27,7 @@
         <service id="http_kernel" class="%http_kernel.class%">
             <argument type="service" id="service_container" />
             <argument type="service" id="controller_resolver" />
-            <call method="setEventDispatcher"><argument type="service" id="event_dispatcher" /></call>
+            <call method="setEventManager"><argument type="service" id="event_manager" /></call>
         </service>
 
         <service id="cache_warmer" class="%cache_warmer.class%">

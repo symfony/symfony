@@ -11,17 +11,17 @@
 
 namespace Symfony\Bundle\WebProfilerBundle;
 
-use Symfony\Component\EventDispatcher\EventInterface;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Bundle\FrameworkBundle\HttpKernel;
 use Symfony\Component\HttpKernel\HttpKernelInterface;
+use Symfony\Component\HttpKernel\Event\RequestEventArgs;
 use Symfony\Bundle\TwigBundle\TwigEngine;
 
 /**
  * WebDebugToolbarListener injects the Web Debug Toolbar.
  *
- * The handle method must be connected to the core.response event.
+ * The handle method must be connected to the filterCoreResponse event.
  *
  * The WDT is only injected on well-formed HTML (with a proper </body> tag).
  * This means that the WDT is never included in sub-requests or ESI requests.
@@ -41,12 +41,13 @@ class WebDebugToolbarListener
         $this->interceptRedirects = $interceptRedirects;
     }
 
-    public function handle(EventInterface $event, Response $response)
+    public function filterCoreResponse(RequestEventArgs $eventArgs)
     {
-        if (HttpKernelInterface::MASTER_REQUEST !== $event->get('request_type')) {
-            return $response;
+        if (HttpKernelInterface::MASTER_REQUEST !== $eventArgs->getRequestType()) {
+            return;
         }
 
+        $response = $eventArgs->getResponse();
         if ($response->headers->has('X-Debug-Token') && $response->isRedirect() && $this->interceptRedirects) {
             $response->setContent(
                 sprintf('<html><head></head><body><h1>This Request redirects to<br /><a href="%1$s">%1$s</a>.</h1><h4>The redirect was intercepted by the web debug toolbar to help debugging.<br/>For more information, see the "intercept-redirects" option of the Profiler.</h4></body></html>',
@@ -56,19 +57,17 @@ class WebDebugToolbarListener
             $response->headers->remove('Location');
         }
 
-        $request = $event->get('request');
+        $request = $eventArgs->getRequest();
         if (!$response->headers->has('X-Debug-Token')
             || '3' === substr($response->getStatusCode(), 0, 1)
             || ($response->headers->has('Content-Type') && false === strpos($response->headers->get('Content-Type'), 'html'))
             || 'html' !== $request->getRequestFormat()
             || $request->isXmlHttpRequest()
         ) {
-            return $response;
+            return;
         }
 
         $this->injectToolbar($response);
-
-        return $response;
     }
 
     /**

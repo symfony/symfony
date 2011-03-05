@@ -14,7 +14,7 @@ namespace Symfony\Component\HttpKernel\Debug;
 /**
  * @author Fabien Potencier <fabien.potencier@symfony-project.com>
  */
-interface EventDispatcherTraceableInterface
+interface TraceableEventManagerInterface
 {
     /**
      * Gets the called listeners.

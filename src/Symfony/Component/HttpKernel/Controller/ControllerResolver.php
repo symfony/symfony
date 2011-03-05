@@ -66,7 +66,7 @@ class ControllerResolver implements ControllerResolverInterface
 
         list($controller, $method) = $this->createController($controller);
 
-        if (!method_exists($controller, $method)) {
+        if (!is_callable(array($controller, $method))) {
             throw new \InvalidArgumentException(sprintf('Method "%s::%s" does not exist.', get_class($controller), $method));
         }
 

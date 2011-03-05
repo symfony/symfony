@@ -73,7 +73,7 @@ class PseudoNode implements NodeInterface
             throw new SyntaxError(sprintf('The pseudo-class %s is unsupported', $this->ident));
         }
         $method = 'xpath_'.str_replace('-', '_', $this->ident);
-        if (!method_exists($this, $method)) {
+        if (!is_callable(array($this, $method))) {
             throw new SyntaxError(sprintf('The pseudo-class %s is unknown', $this->ident));
         }
 
@@ -119,7 +119,7 @@ class PseudoNode implements NodeInterface
         return $xpath;
     }
 
-    /** 
+    /**
      * Sets the XPath  to be the last child.
      *
      * @param XPathExpr $xpath The XPath expression

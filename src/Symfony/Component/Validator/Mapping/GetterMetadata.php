@@ -26,9 +26,9 @@ class GetterMetadata extends MemberMetadata
         $getMethod = 'get'.ucfirst($property);
         $isMethod = 'is'.ucfirst($property);
 
-        if (method_exists($class, $getMethod)) {
+        if (is_callable(array($class, $getMethod))) {
             $method = $getMethod;
-        } else if (method_exists($class, $isMethod)) {
+        } else if (is_callable(array($class, $isMethod))) {
             $method = $isMethod;
         } else {
             throw new ValidatorException(sprintf('Neither method %s nor %s exists in class %s', $getMethod, $isMethod, $class));

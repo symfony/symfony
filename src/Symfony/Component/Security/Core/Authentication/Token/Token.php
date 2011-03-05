@@ -141,7 +141,7 @@ abstract class Token implements TokenInterface
 
         if (!is_string($user) && !is_object($user)) {
             throw new \InvalidArgumentException('$user must be an object, or a primitive string.');
-        } else if (is_object($user) && !$user instanceof AccountInterface && !method_exists($user, '__toString')) {
+        } else if (is_object($user) && !$user instanceof AccountInterface && !is_callable(array($user, '__toString'))) {
             throw new \InvalidArgumentException('If $user is an object, it must implement __toString().');
         }
 

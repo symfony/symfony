@@ -42,7 +42,7 @@ class Route
 
         foreach ($data as $key => $value) {
             $method = 'set'.$key;
-            if (!method_exists($this, $method)) {
+            if (!is_callable(array($this, $method))) {
                 throw new \BadMethodCallException(sprintf("Unknown property '%s' on annotation '%s'.", $key, get_class($this)));
             }
             $this->$method($value);

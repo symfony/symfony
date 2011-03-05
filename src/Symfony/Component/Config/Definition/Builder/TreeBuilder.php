@@ -72,7 +72,7 @@ class TreeBuilder
     protected function createConfigNode(NodeBuilder $node)
     {
         $method = 'create'.$node->type.'ConfigNode';
-        if (!method_exists($this, $method)) {
+        if (!is_callable(array($this, $method))) {
             throw new \RuntimeException(sprintf('Unknown node type: "%s"', $node->type));
         }
 

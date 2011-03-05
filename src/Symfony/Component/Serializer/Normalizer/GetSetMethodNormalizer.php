@@ -99,7 +99,7 @@ class GetSetMethodNormalizer extends AbstractNormalizer
 
         foreach ($data as $attribute => $value) {
             $setter = 'set' . $attribute;
-            if (method_exists($object, $setter)) {
+            if (is_callable(array($object, $setter))) {
                 $object->$setter($value);
             }
         }

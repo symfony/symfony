@@ -190,7 +190,7 @@ class Container implements ContainerInterface
     {
         $id = strtolower($id);
 
-        return isset($this->services[$id]) || method_exists($this, 'get'.strtr($id, array('_' => '', '.' => '_')).'Service');
+        return isset($this->services[$id]) || is_callable(array($this, 'get'.strtr($id, array('_' => '', '.' => '_')).'Service'));
     }
 
     /**
@@ -220,7 +220,7 @@ class Container implements ContainerInterface
             throw new \LogicException(sprintf('Circular reference detected for service "%s" (services currently loading: %s).', $id, implode(', ', array_keys($this->loading))));
         }
 
-        if (method_exists($this, $method = 'get'.strtr($id, array('_' => '', '.' => '_')).'Service')) {
+        if (is_callable(array($this, $method = 'get'.strtr($id, array('_' => '', '.' => '_')).'Service'))) {
             $this->loading[$id] = true;
 
             $service = $this->$method();

@@ -39,7 +39,7 @@ class ExecuteValidator extends ConstraintValidator
         $propertyPath = $context->getPropertyPath();
 
         foreach ($methods as $method) {
-            if (!method_exists($object, $method)) {
+            if (!is_callable(array($object, $method))) {
                 throw new ConstraintDefinitionException(sprintf('Method "%s" targeted by Execute constraint does not exist', $method));
             }
 

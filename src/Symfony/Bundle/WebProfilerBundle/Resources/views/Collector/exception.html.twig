@@ -6,7 +6,8 @@
 {% endblock %}
 
 {% block menu %}
-<span class="picto png_fix">
+<span class="label png_fix">
+    <span class="icon"><img src="{{ asset('bundles/webprofiler/images/profiler/exception.png') }}" alt="" /></span>
     <strong>Exception</strong>
     <span class="count">
         {% if collector.hasexception %}

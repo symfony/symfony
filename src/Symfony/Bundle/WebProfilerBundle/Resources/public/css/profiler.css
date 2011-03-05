@@ -155,34 +155,44 @@ fieldset
 
 .menu_profiler
 {
-    border-right:1px solid #dfdfdf;
+    border-right: 1px solid #dfdfdf;
 }
 
 .menu_profiler li
 {
-    border-bottom:1px solid #dfdfdf;
-    position:relative;
-    padding-bottom:0;
-    display:block;
+    border-bottom:    1px solid #dfdfdf;
+    position:         relative;
+    padding-bottom:   0;
+    display:          block;
+    background-color: #f6f6f6;
 }
 
-.menu_profiler li a,
-.menu_profiler li a .picto
+.menu_profiler li a
 {
-    display:block;
-    font-size:13px;
-    background-color:#f6f6f6;
-    text-transform:uppercase;
-    cursor:pointer;
+    color:           #404040;
+    display:         block;
+    font-size:       13px;
+    text-transform:  uppercase;
+    text-decoration: none;
+    cursor:          pointer;
 }
 
-.menu_profiler li a,
-.menu_profiler li a:hover
+.menu_profiler li a span.label
 {
-    color:#404040;
-    text-decoration:none;
-    display:block;
-    background-image:none;
+    display:    block;
+    padding:    20px 20px 16px 65px;
+    min-height: 24px;
+    _height:    24px;
+}
+
+.menu_profiler li a span.icon
+{
+    display: block;
+    position: absolute;
+    left: 0px;
+    top: 12px;
+    width: 60px;
+    text-align: center;
 }
 
 .menu_profiler li.selected a,
@@ -191,60 +201,21 @@ fieldset
     background:#d1d1d1 url(../images/profiler/bg_submenu.gif) repeat-x 0 0;
 }
 
-.menu_profiler a .picto
-{
-    display:block;
-    padding:20px 20px 16px 65px;
-    min-height:24px;
-    _height:24px;
-}
-
+.menu_profiler .request,
 .menu_profiler .request a,
-.menu_profiler .request .picto
+.menu_profiler .request a span.label
 {
     -moz-border-radius:16px 0 0 0;
     -webkit-border-radius:16px 0 0 0;
     border-radius:16px 0 0 0;
 }
 
-.menu_profiler .request .picto
+.menu_profiler li a span.count
 {
-    background:transparent url(../images/profiler/request.png) no-repeat 14px 14px;
-}
-
-.menu_profiler .exception .picto
-{
-    background:transparent url(../images/profiler/exception.png) no-repeat 14px 14px;
-}
-
-.menu_profiler .events .picto
-{
-    background:transparent url(../images/profiler/events.png) no-repeat 22px 14px;
-}
-
-.menu_profiler .logger .picto
-{
-    background:transparent url(../images/profiler/logger.png) no-repeat 22px 14px;
-}
-
-.menu_profiler .db .picto
-{
-    background:transparent url(../images/profiler/db.png) no-repeat 22px 14px;
-}
-
-.menu_profiler .security .picto
-{
-    background:transparent url(../images/profiler/security.png) no-repeat 22px 14px;
-}
-
-.menu_profiler .picto span.count
-{
-    float:right;
-    position:relative;
-    top:-4px;
-    display:block;
-    width:70px;
-    text-align:right;
+    padding: 0;
+    position:absolute;
+    right: 10px;
+    top: 20px;
 }
 
 .navigation, .collector_content
@@ -288,7 +259,7 @@ li
     margin-bottom:20px;
 }
 
-.menu_profiler .picto span.count span
+.menu_profiler span.count span
 {
     display:inline-block;
     background-color:#aacd4e;

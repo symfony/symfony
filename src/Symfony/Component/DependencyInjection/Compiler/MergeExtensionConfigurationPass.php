@@ -30,10 +30,15 @@ class MergeExtensionConfigurationPass implements CompilerPassInterface
         $aliases = $container->getAliases();
 
         foreach ($container->getExtensions() as $name => $extension) {
+            if (!$config = $container->getExtensionConfig($name)) {
+                // this extension was not called
+                continue;
+            }
+
             $tmpContainer = new ContainerBuilder($container->getParameterBag());
             $tmpContainer->addObjectResource($extension);
 
-            $extension->load($container->getExtensionConfig($name), $tmpContainer);
+            $extension->load($config, $tmpContainer);
 
             $container->merge($tmpContainer);
         }

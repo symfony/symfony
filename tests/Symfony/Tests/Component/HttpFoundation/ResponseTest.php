@@ -179,10 +179,57 @@ class ResponseTest extends \PHPUnit_Framework_TestCase
         $response->__toString();
     }
 
+    public function testSetCache()
+    {
+        $response = new Response();
+        //array('etag', 'last_modified', 'max_age', 's_maxage', 'private', 'public')
+        try {
+            $response->setCache(array("wrong option" => "value"));
+            $this->fail('->setCache() throws an InvalidArgumentException if an option is not supported');
+        } catch (\Exception $e) {
+            $this->assertInstanceOf('InvalidArgumentException', $e, '->setCache() throws an InvalidArgumentException if an option is not supported');
+        }
+
+        $options = array('etag' => '"whatever"');
+        $response->setCache($options);
+        $this->assertEquals($response->getEtag(), '"whatever"');
+
+        $now = new \DateTime();
+        $options = array('last_modified' => $now);
+        $response->setCache($options);
+        $this->assertEquals($response->getLastModified()->getTimestamp(), $now->getTimestamp());
+
+        $options = array('max_age' => 100);
+        $response->setCache($options);
+        $this->assertEquals($response->getMaxAge(), 100);
+
+        $options = array('s_maxage' => 200);
+        $response->setCache($options);
+        $this->assertEquals($response->getMaxAge(), 200);
+
+        $this->assertFalse($response->headers->hasCacheControlDirective('public'));
+        $this->assertFalse($response->headers->hasCacheControlDirective('private'));
+
+        $response->setCache(array('public' => true));
+        $this->assertTrue($response->headers->hasCacheControlDirective('public'));
+        $this->assertFalse($response->headers->hasCacheControlDirective('private'));
+
+        $response->setCache(array('public' => false));
+        $this->assertFalse($response->headers->hasCacheControlDirective('public'));
+        $this->assertTrue($response->headers->hasCacheControlDirective('private'));
+
+        $response->setCache(array('private' => true));
+        $this->assertFalse($response->headers->hasCacheControlDirective('public'));
+        $this->assertTrue($response->headers->hasCacheControlDirective('private'));
+
+        $response->setCache(array('private' => false));
+        $this->assertTrue($response->headers->hasCacheControlDirective('public'));
+        $this->assertFalse($response->headers->hasCacheControlDirective('private'));
+    }
+
     public function testSendContent()
     {
         $response = new Response('test response rendering', 200);
-        $response->sendHeaders();
 
         ob_start();
         $response->sendContent();
@@ -197,6 +244,29 @@ class ResponseTest extends \PHPUnit_Framework_TestCase
 
         $this->assertTrue($response->headers->hasCacheControlDirective('public'));
         $this->assertFalse($response->headers->hasCacheControlDirective('private'));
+    }
+
+    public function testSetExpires()
+    {
+        $response = new Response();
+        $response->setExpires(null);
+
+        $this->assertNull($response->getExpires(), '->setExpires() remove the header when passed null');
+
+        $now = new \DateTime();
+        $response->setExpires($now);
+
+        $this->assertEquals($response->getExpires()->getTimestamp(), $now->getTimestamp());
+    }
+
+    public function testSetLastModified()
+    {
+        $response = new Response();
+        $response->setLastModified(new \DateTime());
+        $this->assertNotNull($response->getLastModified());
+
+        $response->setLastModified(null);
+        $this->assertNull($response->getLastModified());
     }
 
     public function testIsInvalid()

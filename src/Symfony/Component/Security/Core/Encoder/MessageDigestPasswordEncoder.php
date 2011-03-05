@@ -28,7 +28,7 @@ class MessageDigestPasswordEncoder extends BasePasswordEncoder
      * @param Boolean $encodeHashAsBase64 Whether to base64 encode the password hash
      * @param integer $iterations         The number of iterations to use to stretch the password hash
      */
-    public function __construct($algorithm = 'sha256', $encodeHashAsBase64 = false, $iterations = 1)
+    public function __construct($algorithm = 'sha512', $encodeHashAsBase64 = true, $iterations = 5000)
     {
         $this->algorithm = $algorithm;
         $this->encodeHashAsBase64 = $encodeHashAsBase64;

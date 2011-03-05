@@ -381,11 +381,7 @@ class SecurityExtension extends Extension
 
         // plaintext encoder
         if ('plaintext' === $config['algorithm']) {
-            $arguments = array();
-
-            if (isset($config['ignore_case'])) {
-                $arguments[0] = $config['ignore_case'];
-            }
+            $arguments = array($config['ignore_case']);
 
             return array(
                 'class' => new Parameter('security.encoder.plain.class'),
@@ -394,20 +390,11 @@ class SecurityExtension extends Extension
         }
 
         // message digest encoder
-        $arguments = array($config['algorithm']);
-
-        // add optional arguments
-        if (isset($config['encode_as_base64'])) {
-            $arguments[1] = $config['encode_as_base64'];
-        } else {
-            $arguments[1] = false;
-        }
-
-        if (isset($config['iterations'])) {
-            $arguments[2] = $config['iterations'];
-        } else {
-            $arguments[2] = 1;
-        }
+        $arguments = array(
+            $config['algorithm'],
+            $config['encode_as_base64'],
+            $config['iterations'],
+        );
 
         return array(
             'class' => new Parameter('security.encoder.digest.class'),

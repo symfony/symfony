@@ -124,7 +124,7 @@ class ExceptionListener implements ListenerInterface
                         }
 
                         $subRequest = Request::create($this->errorPage);
-                        $subRequest->attributes->set(SecurityContextInterface::ACCESS_DENIED_ERROR, $exception->getMessage());
+                        $subRequest->attributes->set(SecurityContextInterface::ACCESS_DENIED_ERROR, $exception);
 
                         $response = $event->getSubject()->handle($subRequest, HttpKernelInterface::SUB_REQUEST, true);
                         $response->setStatusCode(403);

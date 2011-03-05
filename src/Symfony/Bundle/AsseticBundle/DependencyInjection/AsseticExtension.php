@@ -37,7 +37,7 @@ class AsseticExtension extends Extension
         $loader = new XmlFileLoader($container, new FileLocator(__DIR__ . '/../Resources/config'));
         $loader->load('assetic.xml');
         $loader->load('templating_twig.xml');
-        // $loader->load('templating_php.xml'); // not ready yet
+        $loader->load('templating_php.xml');
 
         $config = self::processConfigs($configs, $container->getParameter('kernel.debug'), array_keys($container->getParameter('kernel.bundles')));
 

@@ -9,7 +9,7 @@
  * with this source code in the file LICENSE.
  */
 
-namespace Symfony\Bundle\AsseticBundle\Factory;
+namespace Symfony\Bundle\AsseticBundle\Factory\Resource;
 
 use Symfony\Component\Templating\Loader\LoaderInterface;
 

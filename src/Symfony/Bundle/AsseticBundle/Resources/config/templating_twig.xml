@@ -8,7 +8,6 @@
         <parameter key="assetic.twig_extension.dynamic.class">Symfony\Bundle\AsseticBundle\Twig\DynamicExtension</parameter>
         <parameter key="assetic.twig_extension.static.class">Symfony\Bundle\AsseticBundle\Twig\StaticExtension</parameter>
         <parameter key="assetic.twig_formula_loader.class">Assetic\Extension\Twig\TwigFormulaLoader</parameter>
-        <parameter key="assetic.twig_directory_resource.class"></parameter>
     </parameters>
 
     <services>

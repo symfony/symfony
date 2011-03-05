@@ -90,8 +90,6 @@ class FunctionalTest extends \PHPUnit_Framework_TestCase
 
     public function testPhpRenderDebug()
     {
-        $this->markTestIncomplete('PHP templating is not ready yet.');
-
         $kernel = new TestKernel('test', true);
         $kernel->boot();
         $container = $kernel->getContainer();

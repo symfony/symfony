@@ -9,11 +9,6 @@ html{color:#000;background:#FFF;}body,div,dl,dt,dd,ul,ol,li,h1,h2,h3,h4,h5,h6,pr
 html,
 body
 {
-    width:100%;
-    min-height:100%;
-    _height:100%;
-    margin:0;
-    padding:0;
     background-color:#efefef;
 }
 body
@@ -134,8 +129,10 @@ fieldset
 
 #content
 {
-    width:970px;
-    margin:0 auto;
+    padding:     0 50px;
+    margin:      0 auto;
+    font-family: Arial, Helvetica, sans-serif;
+    min-width:   970px;
 }
 
 .header
@@ -234,6 +231,11 @@ fieldset
     padding:40px 0 40px 50px;
 }
 
+.collector_content table td
+{
+    background-color: white;
+}
+
 h1
 {
     font-family:Georgia, "Times New Roman", Times, serif;
@@ -269,11 +271,6 @@ li
     padding:4px;
     color:white;
     margin-right:2px;
-}
-
-#content
-{
-    font-family:Arial, Helvetica, sans-serif;
 }
 
 .resume

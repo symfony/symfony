@@ -11,7 +11,7 @@
         <parameter key="assetic.cached_formula_loader.class">Assetic\Factory\Loader\CachedFormulaLoader</parameter>
         <parameter key="assetic.config_cache.class">Assetic\Cache\ConfigCache</parameter>
         <parameter key="assetic.asset_manager_cache_warmer.class">Symfony\Bundle\AsseticBundle\CacheWarmer\AssetManagerCacheWarmer</parameter>
-        <parameter key="assetic.directory_resource.class">Symfony\Bundle\AsseticBundle\Factory\DirectoryResource</parameter>
+        <parameter key="assetic.directory_resource.class">Symfony\Bundle\AsseticBundle\Factory\Resource\DirectoryResource</parameter>
 
         <parameter key="assetic.filter.coffee.class">Assetic\Filter\CoffeeScriptFilter</parameter>
         <parameter key="assetic.filter.cssrewrite.class">Assetic\Filter\CssRewriteFilter</parameter>

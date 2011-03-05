@@ -88,7 +88,7 @@ img
     margin-right:10px; 
     font-size:12px; 
     border:1px solid #dadada; 
-    background:#FFFFFF url(/bundles/framework/images/input_bg.gif) repeat-x left top; 
+    background:#FFFFFF url(../images/input_bg.gif) repeat-x left top;
     padding:5px 6px;
     color:#565656;
 }
@@ -137,13 +137,13 @@ button span
     height: 28px;
     float: left;
     padding: 0 0 0 8px;
-    background: transparent url(/bundles/framework/images/border_l.png) no-repeat top left;
+    background: transparent url(../images/border_l.png) no-repeat top left;
 }
 
 button span span
 {
     padding: 0 8px 0 0;
-    background: transparent url(/bundles/framework/images/border_r.png) right top no-repeat;
+    background: transparent url(../images/border_r.png) right top no-repeat;
 }
 
 button span span span
@@ -152,7 +152,7 @@ button span span span
     font: bold 11px Arial, Helvetica, sans-serif;
     color: #6b6b6b;
     line-height: 28px;
-    background: transparent url(/bundles/framework/images/btn_bg.png) repeat-x top left;
+    background: transparent url(../images/btn_bg.png) repeat-x top left;
 }
 
 #content

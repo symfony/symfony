@@ -188,7 +188,7 @@ fieldset
 .menu_profiler li.selected a,
 .menu_profiler li a:hover
 {
-    background:#d1d1d1 url("/bundles/webprofiler/images/profiler/bg_submenu.gif") repeat-x 0 0;
+    background:#d1d1d1 url(../images/profiler/bg_submenu.gif) repeat-x 0 0;
 }
 
 .menu_profiler a .picto
@@ -209,32 +209,32 @@ fieldset
 
 .menu_profiler .request .picto
 {
-    background:transparent url("/bundles/webprofiler/images/profiler/request.png") no-repeat 14px 14px;
+    background:transparent url(../images/profiler/request.png) no-repeat 14px 14px;
 }
 
 .menu_profiler .exception .picto
 {
-    background:transparent url("/bundles/webprofiler/images/profiler/exception.png") no-repeat 14px 14px;
+    background:transparent url(../images/profiler/exception.png) no-repeat 14px 14px;
 }
 
 .menu_profiler .events .picto
 {
-    background:transparent url("/bundles/webprofiler/images/profiler/events.png") no-repeat 22px 14px;
+    background:transparent url(../images/profiler/events.png) no-repeat 22px 14px;
 }
 
 .menu_profiler .logger .picto
 {
-    background:transparent url("/bundles/webprofiler/images/profiler/logger.png") no-repeat 22px 14px;
+    background:transparent url(../images/profiler/logger.png) no-repeat 22px 14px;
 }
 
 .menu_profiler .db .picto
 {
-    background:transparent url("/bundles/webprofiler/images/profiler/db.png") no-repeat 22px 14px;
+    background:transparent url(../images/profiler/db.png) no-repeat 22px 14px;
 }
 
 .menu_profiler .security .picto
 {
-    background:transparent url("/bundles/webprofiler/images/profiler/security.png") no-repeat 22px 14px;
+    background:transparent url(../images/profiler/security.png) no-repeat 22px 14px;
 }
 
 .menu_profiler .picto span.count
@@ -402,7 +402,7 @@ td.main, td.menu {
     margin-right:10px;
     font-size:12px;
     border:1px solid #dadada;
-    background:#FFFFFF url("/bundles/webprofiler/images/profiler/input_bg.gif") repeat-x left top;
+    background:#FFFFFF url(../images/profiler/input_bg.gif) repeat-x left top;
     padding:5px 6px;
     color:#565656;
 }
@@ -445,13 +445,13 @@ td.main, td.menu {
     height: 28px;
     float: left;
     padding: 0 0 0 8px;
-    background: transparent url("/bundles/webprofiler/images/profiler/border_l.png") no-repeat top left;
+    background: transparent url(../images/profiler/border_l.png) no-repeat top left;
 }
 
 .search button span span
 {
     padding: 0 8px 0 0;
-    background: transparent url("/bundles/webprofiler/images/profiler/border_r.png") right top no-repeat;
+    background: transparent url(../images/profiler/border_r.png) right top no-repeat;
 }
 
 .search button span span span
@@ -460,7 +460,7 @@ td.main, td.menu {
     font: bold 11px Arial, Helvetica, sans-serif;
     color: #6b6b6b;
     line-height: 28px;
-    background: transparent url("/bundles/webprofiler/images/profiler/btn_bg.png") repeat-x top left;
+    background: transparent url(../images/profiler/btn_bg.png) repeat-x top left;
 }
 
 .navigation .search

@@ -207,7 +207,7 @@ build: 56
 {
     float:left;
     width:654px;
-    background: url(/bundles/framework/images/icon_log.png) no-repeat 0 -4px;
+    background: url(../images/icon_log.png) no-repeat 0 -4px;
     padding-left:24px;
 }
 

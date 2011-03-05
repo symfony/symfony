@@ -40,11 +40,16 @@ class Cookie
         if (empty($name)) {
             throw new \InvalidArgumentException('The cookie name cannot be empty');
         }
+        
+        //check if the expiration is valid
+        if(!$expire instanceof \DateTime && !is_numeric($expire) && (strtotime($expire) === false || strtotime($expire) === -1)){
+            throw new \InvalidArgumentException('The cookie expiration is not valid');
+        }
 
         $this->name = $name;
         $this->value = $value;
         $this->domain = $domain;
-        $this->expire = (integer) $expire;
+        $this->expire = $expire;
         $this->path = $path;
         $this->secure = (Boolean) $secure;
         $this->httponly = (Boolean) $httponly;

@@ -511,7 +511,7 @@ class Response
      */
     public function getLastModified()
     {
-        return $this->headers->getDate('LastModified');
+        return $this->headers->getDate('Last-Modified');
     }
 
     /**

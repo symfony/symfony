@@ -85,22 +85,9 @@ class AsseticHelper extends Helper
             return array($coll->getTargetUrl());
         }
 
-        // create a pattern for each leaf's target url
-        $pattern = $coll->getTargetUrl();
-        if (false !== $pos = strrpos($pattern, '.')) {
-            $pattern = substr($pattern, 0, $pos).'_*'.substr($pattern, $pos);
-        } else {
-            $pattern .= '_*';
-        }
-
         $urls = array();
         foreach ($coll as $leaf) {
-            $asset = $this->factory->createAsset($leaf->getSourceUrl(), $filters, array(
-                'output' => $pattern,
-                'name'   => 'part'.(count($urls) + 1),
-                'debug'  => $options['debug'],
-            ));
-            $urls[] = $asset->getTargetUrl();
+            $urls[] = $leaf->getTargetUrl();
         }
 
         return $urls;

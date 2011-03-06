@@ -376,6 +376,11 @@ td.main, td.menu {
     color:#565656;
 }
 
+.search input[type="search"]
+{
+    -webkit-appearance: textfield;
+}
+
 .search button
 {
     -webkit-appearance: button-bevel;

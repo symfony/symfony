@@ -217,7 +217,7 @@ class Response
     public function setStatusCode($code, $text = null)
     {
         $this->statusCode = (int) $code;
-        if ($this->statusCode < 100 || $this->statusCode > 599) {
+        if ($this->isInvalid()) {
             throw new \InvalidArgumentException(sprintf('The HTTP status code "%s" is not valid.', $code));
         }
 
@@ -511,7 +511,7 @@ class Response
      */
     public function getLastModified()
     {
-        return $this->headers->getDate('LastModified');
+        return $this->headers->getDate('Last-Modified');
     }
 
     /**

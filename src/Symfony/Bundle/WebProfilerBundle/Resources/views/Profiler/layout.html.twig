@@ -8,19 +8,17 @@
 
         <div class="header clear_fix">
             <h1>
-                <a href="{{ path('_profiler', {'token': token}) }}">
-                    <img src="{{ asset('bundles/webprofiler/images/profiler/logo_symfony_profiler.gif') }}" alt="Symfony profiler"/>
-                </a>
+                <img src="{{ asset('bundles/webprofiler/images/profiler/logo_symfony_profiler.gif') }}" alt="Symfony profiler"/>
             </h1>
-        
+
             <div class="search">
-                <form method="post" action="http://symfony.com/search">
+                <form method="get" action="http://symfony.com/search">
                     <div class="form_row">
                         <label for="search_id">
                             <img src="{{ asset('bundles/webprofiler/images/profiler/grey_magnifier.png') }}" alt="Search on Symfony website"/>
                         </label>
 
-                        <input name="search_name" id="search_id" type="text" placeholder="Search on Symfony website"/>
+                        <input name="q" id="search_id" type="text" placeholder="Search on Symfony website"/>
 
                         <button type="submit">
                             <span class="border_l">

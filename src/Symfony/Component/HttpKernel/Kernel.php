@@ -40,6 +40,7 @@ abstract class Kernel implements KernelInterface
 {
     protected $bundles;
     protected $bundleMap;
+    protected $bundleAliases;
     protected $container;
     protected $rootDir;
     protected $environment;
@@ -349,23 +350,44 @@ abstract class Kernel implements KernelInterface
     }
 
     /**
-     * Initializes the data structures related to the bundle management.
+     * Resolves a bundle alias.
      *
-     *  - the bundles property maps a bundle name to the bundle instance,
-     *  - the bundleMap property maps a bundle name to the bundle inheritance hierarchy (most derived bundle first).
+     * @param string $alias A bundle alias
      *
-     * @throws \LogicException if two bundles share a common name
-     * @throws \LogicException if a bundle tries to extend a non-registered bundle
-     * @throws \LogicException if two bundles extend the same ancestor
+     * @return string A bundle name
+     *
+     * @throws InvalidArgumentException If there is no alias
+     */
+    public function resolveBundleAlias($alias)
+    {
+        if (false === $name = array_search($alias, $this->bundleAliases)) {
+            throw new \InvalidArgumentException(sprintf('There is no "%s" bundle alias.', $alias));
+        }
+
+        return $name;
+    }
+
+    /**
+    * Initializes the data structures related to the bundle management.
+    *
+    *  - the bundles property maps a bundle name to the bundle instance,
+    *  - the bundleMap property maps a bundle name to the bundle inheritance hierarchy (most derived bundle first).
+    *
+    * @throws \LogicException if two bundles share a common name
+    * @throws \LogicException if a bundle tries to extend a non-registered bundle
+    * @throws \LogicException if two bundles extend the same ancestor
      */
     protected function initializeBundles()
     {
-        // init bundles
         $this->bundles = array();
+        $this->bundleMap = array();
+        $this->bundleAliases = array();
+
         $topMostBundles = array();
         $directChildren = array();
 
-        foreach ($this->registerBundles() as $bundle) {
+        // init bundles
+        foreach ($this->registerBundles() as $alias => $bundle) {
             $name = $bundle->getName();
             if (isset($this->bundles[$name])) {
                 throw new \LogicException(sprintf('Trying to register two bundles with the same name "%s"', $name));
@@ -380,6 +402,10 @@ abstract class Kernel implements KernelInterface
             } else {
                 $topMostBundles[$name] = $bundle;
             }
+
+            if (is_string($alias)) {
+                $this->bundleAliases[$name] = $alias;
+            }
         }
 
         // look for orphans
@@ -388,7 +414,6 @@ abstract class Kernel implements KernelInterface
         }
 
         // inheritance
-        $this->bundleMap = array();
         foreach ($topMostBundles as $name => $bundle) {
             $bundleMap = array($bundle);
             $hierarchy = array($name);
@@ -499,12 +524,19 @@ abstract class Kernel implements KernelInterface
      */
     protected function buildContainer()
     {
-        $parameterBag = new ParameterBag($this->getKernelParameters());
-
-        $container = new ContainerBuilder($parameterBag);
+        $container = new ContainerBuilder(new ParameterBag($this->getKernelParameters()));
         $container->getCompilerPassConfig()->setMergePass(new MergeExtensionConfigurationPass());
-        foreach ($this->bundles as $bundle) {
+
+        foreach ($this->bundles as $name => $bundle) {
             $bundle->build($container);
+
+            // register the bundle's extension and alias
+            if ($extension = $bundle->getExtension()) {
+                $container->registerExtension($extension);
+                if (isset($this->bundleAliases[$name])) {
+                    $container->registerExtensionAlias($extension->getName(), $this->bundleAliases[$name]);
+                }
+            }
 
             if ($this->debug) {
                 $container->addObjectResource($bundle);

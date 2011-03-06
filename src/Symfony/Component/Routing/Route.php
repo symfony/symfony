@@ -19,6 +19,7 @@ namespace Symfony\Component\Routing;
 class Route
 {
     protected $pattern;
+    protected $host;
     protected $defaults;
     protected $requirements;
     protected $options;
@@ -39,10 +40,12 @@ class Route
      * @param array  $defaults      An array of default parameter values
      * @param array  $requirements  An array of requirements for parameters (regexes)
      * @param array  $options       An array of options
+     * @param string $host          The host to match
      */
-    public function __construct($pattern, array $defaults = array(), array $requirements = array(), array $options = array())
+    public function __construct($pattern, array $defaults = array(), array $requirements = array(), array $options = array(), $host = null)
     {
         $this->setPattern($pattern);
+        $this->setHost($host);
         $this->setDefaults($defaults);
         $this->setRequirements($requirements);
         $this->setOptions($options);
@@ -75,6 +78,32 @@ class Route
         if (empty($this->pattern) || '/' !== $this->pattern[0]) {
             $this->pattern = '/'.$this->pattern;
         }
+
+        return $this;
+    }
+
+    /**
+     * Returns the host.
+     *
+     * @return string The host
+     */
+    public function getHost()
+    {
+        return $this->host;
+    }
+
+    /**
+     * Sets the host.
+     *
+     * This method implements a fluent interface.
+     *
+     * @param string $host The host
+     *
+     * @return Route The current Route instance
+     */
+    public function setHost($host)
+    {
+        $this->host = trim($host);
 
         return $this;
     }

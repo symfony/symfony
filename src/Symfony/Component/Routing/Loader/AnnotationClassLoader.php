@@ -98,6 +98,7 @@ abstract class AnnotationClassLoader implements LoaderInterface
 
         $globals = array(
             'pattern'      => '',
+            'host'         => '',
             'requirements' => array(),
             'options'      => array(),
             'defaults'     => array(),
@@ -107,6 +108,10 @@ abstract class AnnotationClassLoader implements LoaderInterface
         if ($annot = $this->reader->getClassAnnotation($class, $this->annotationClass)) {
             if (null !== $annot->getPattern()) {
                 $globals['pattern'] = $annot->getPattern();
+            }
+
+            if (null !== $annot->getHost()) {
+                $globals['host'] = $annot->getHost();
             }
 
             if (null !== $annot->getRequirements()) {
@@ -134,7 +139,7 @@ abstract class AnnotationClassLoader implements LoaderInterface
                 $requirements = array_merge($globals['requirements'], $annot->getRequirements());
                 $options = array_merge($globals['options'], $annot->getOptions());
 
-                $route = new Route($globals['pattern'].$annot->getPattern(), $defaults, $requirements, $options);
+                $route = new Route($globals['pattern'].$annot->getPattern(), $defaults, $requirements, $options, $globals['host'].$annot->getHost());
 
                 $this->configureRoute($route, $class, $method);
 

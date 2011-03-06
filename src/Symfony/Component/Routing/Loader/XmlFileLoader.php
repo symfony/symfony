@@ -115,7 +115,7 @@ class XmlFileLoader extends FileLoader
             }
         }
 
-        $route = new Route((string) $definition->getAttribute('pattern'), $defaults, $requirements, $options);
+        $route = new Route((string) $definition->getAttribute('pattern'), $defaults, $requirements, $options, (string) $definition->getAttribute('host'));
 
         $collection->add((string) $definition->getAttribute('id'), $route);
     }

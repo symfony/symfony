@@ -94,6 +94,7 @@ class YamlFileLoader extends FileLoader
      */
     protected function parseRoute(RouteCollection $collection, $name, $config, $file)
     {
+        $host = isset($config['host']) ? $config['host'] : null;
         $defaults = isset($config['defaults']) ? $config['defaults'] : array();
         $requirements = isset($config['requirements']) ? $config['requirements'] : array();
         $options = isset($config['options']) ? $config['options'] : array();
@@ -102,7 +103,7 @@ class YamlFileLoader extends FileLoader
             throw new \InvalidArgumentException(sprintf('You must define a "pattern" for the "%s" route.', $name));
         }
 
-        $route = new Route($config['pattern'], $defaults, $requirements, $options);
+        $route = new Route($config['pattern'], $defaults, $requirements, $options, $host);
 
         $collection->add($name, $route);
     }

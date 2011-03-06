@@ -72,13 +72,13 @@ class UrlGenerator implements UrlGeneratorInterface
             $this->cache[$name] = $route->compile();
         }
 
-        return $this->doGenerate($this->cache[$name]->getVariables(), $route->getDefaults(), $route->getRequirements(), $this->cache[$name]->getTokens(), $parameters, $name, $absolute);
+        return $this->doGenerate($route->getHost(), $this->cache[$name]->getVariables(), $route->getDefaults(), $route->getRequirements(), $this->cache[$name]->getTokens(), $parameters, $name, $absolute);
     }
 
     /**
      * @throws \InvalidArgumentException When route has some missing mandatory parameters
      */
-    protected function doGenerate($variables, $defaults, $requirements, $tokens, $parameters, $name, $absolute)
+    protected function doGenerate($host, $variables, $defaults, $requirements, $tokens, $parameters, $name, $absolute)
     {
         $defaults = array_merge($this->defaults, $defaults);
         $tparams = array_merge($defaults, $parameters);
@@ -125,7 +125,15 @@ class UrlGenerator implements UrlGeneratorInterface
 
         $url = (isset($this->context['base_url']) ? $this->context['base_url'] : '').$url;
 
-        if ($absolute && isset($this->context['host'])) {
+        if ($host) {
+            $isSecure = (isset($this->context['is_secure']) && $this->context['is_secure']);
+            $port = isset($this->context['port']) ? $this->context['port'] : 80;
+            $urlBeginning = 'http'.($isSecure ? 's' : '').'://'.$host;
+            if (($isSecure && $port != 443) || (!$isSecure && $port != 80)) {
+                $urlBeginning .= ':'.$port;
+            }
+            $url = $urlBeginning.$url;
+        } elseif ($absolute && isset($this->context['host'])) {
             $isSecure = (isset($this->context['is_secure']) && $this->context['is_secure']);
             $port = isset($this->context['port']) ? $this->context['port'] : 80;
             $urlBeginning = 'http'.($isSecure ? 's' : '').'://'.$this->context['host'];

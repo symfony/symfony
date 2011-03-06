@@ -53,6 +53,7 @@ class PhpGeneratorDumper extends GeneratorDumper
         foreach ($this->routes->all() as $name => $route) {
             $compiledRoute = $route->compile();
 
+            $host = str_replace("\n", '', var_export($compiledRoute->getHost(), true));
             $variables = str_replace("\n", '', var_export($compiledRoute->getVariables(), true));
             $defaults = str_replace("\n", '', var_export($route->getDefaults(), true));
             $requirements = str_replace("\n", '', var_export($compiledRoute->getRequirements(), true));
@@ -63,7 +64,7 @@ class PhpGeneratorDumper extends GeneratorDumper
             $methods[] = <<<EOF
     protected function get{$escapedName}RouteInfo()
     {
-        return array($variables, array_merge(\$this->defaults, $defaults), $requirements, $tokens);
+        return array($host, $variables, array_merge(\$this->defaults, $defaults), $requirements, $tokens);
     }
 
 EOF
@@ -82,9 +83,9 @@ EOF
 
         \$escapedName = str_replace('.', '__', \$name);
 
-        list(\$variables, \$defaults, \$requirements, \$tokens) = \$this->{'get'.\$escapedName.'RouteInfo'}();
+        list(\$host, \$variables, \$defaults, \$requirements, \$tokens) = \$this->{'get'.\$escapedName.'RouteInfo'}();
 
-        return \$this->doGenerate(\$variables, \$defaults, \$requirements, \$tokens, \$parameters, \$name, \$absolute);
+        return \$this->doGenerate(\$host, \$variables, \$defaults, \$requirements, \$tokens, \$parameters, \$name, \$absolute);
     }
 
 $methods

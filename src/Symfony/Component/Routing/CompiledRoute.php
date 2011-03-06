@@ -103,6 +103,16 @@ class CompiledRoute
     }
 
     /**
+     * Returns the host.
+     *
+     * @return string The host
+     */
+    public function getHost()
+    {
+        return $this->route->getHost();
+    }
+
+    /**
      * Returns the options.
      *
      * @return array The options

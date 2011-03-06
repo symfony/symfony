@@ -19,6 +19,7 @@ namespace Symfony\Component\Routing\Annotation;
 class Route
 {
     protected $pattern;
+    protected $host;
     protected $name;
     protected $requirements;
     protected $options;
@@ -67,6 +68,16 @@ class Route
     public function getName()
     {
         return $this->name;
+    }
+
+    public function setHost($host)
+    {
+        $this->host = $host;
+    }
+
+    public function getHost()
+    {
+        return $this->host;
     }
 
     public function setRequirements($requirements)

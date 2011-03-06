@@ -3,7 +3,7 @@
 /*
  * This file is part of the Symfony package.
  *
- * (c) Fabien Potencier <fabien.potencier@symfony-project.com>
+ * (c) Fabien Potencier <fabien@symfony.com>
  *
  * For the full copyright and license information, please view the LICENSE
  * file that was distributed with this source code.
@@ -25,7 +25,7 @@ use Symfony\Component\Config\FileLocator;
  * DoctrineExtension is an extension for the Doctrine DBAL and ORM library.
  *
  * @author Jonathan H. Wage <jonwage@gmail.com>
- * @author Fabien Potencier <fabien.potencier@symfony-project.com>
+ * @author Fabien Potencier <fabien@symfony.com>
  * @author Benjamin Eberlei <kontakt@beberlei.de>
  */
 class DoctrineExtension extends AbstractDoctrineExtension
@@ -574,6 +574,6 @@ class DoctrineExtension extends AbstractDoctrineExtension
      */
     public function getNamespace()
     {
-        return 'http://www.symfony-project.org/schema/dic/doctrine';
+        return 'http://symfony.com/schema/dic/doctrine';
     }
 }

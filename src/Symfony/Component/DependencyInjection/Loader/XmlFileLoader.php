@@ -3,7 +3,7 @@
 /*
  * This file is part of the Symfony package.
  *
- * (c) Fabien Potencier <fabien.potencier@symfony-project.com>
+ * (c) Fabien Potencier <fabien@symfony.com>
  *
  * For the full copyright and license information, please view the LICENSE
  * file that was distributed with this source code.
@@ -25,7 +25,7 @@ use Symfony\Component\Config\Resource\FileResource;
 /**
  * XmlFileLoader loads XML files service definitions.
  *
- * @author Fabien Potencier <fabien.potencier@symfony-project.com>
+ * @author Fabien Potencier <fabien@symfony.com>
  */
 class XmlFileLoader extends FileLoader
 {
@@ -40,7 +40,7 @@ class XmlFileLoader extends FileLoader
         $path = $this->locator->locate($file);
 
         $xml = $this->parseFile($path);
-        $xml->registerXPathNamespace('container', 'http://www.symfony-project.org/schema/dic/services');
+        $xml->registerXPathNamespace('container', 'http://symfony.com/schema/dic/services');
 
         $this->container->addResource(new FileResource($path));
 
@@ -335,7 +335,7 @@ class XmlFileLoader extends FileLoader
      */
     protected function validateSchema(\DOMDocument $dom, $file)
     {
-        $schemaLocations = array('http://www.symfony-project.org/schema/dic/services' => str_replace('\\', '/', __DIR__.'/schema/dic/services/services-1.0.xsd'));
+        $schemaLocations = array('http://symfony.com/schema/dic/services' => str_replace('\\', '/', __DIR__.'/schema/dic/services/services-1.0.xsd'));
 
         if ($element = $dom->documentElement->getAttributeNS('http://www.w3.org/2001/XMLSchema-instance', 'schemaLocation')) {
             $items = preg_split('/\s+/', $element);
@@ -376,9 +376,9 @@ class XmlFileLoader extends FileLoader
 
         $source = <<<EOF
 <?xml version="1.0" encoding="utf-8" ?>
-<xsd:schema xmlns="http://www.symfony-project.org/schema"
+<xsd:schema xmlns="http://symfony.com/schema"
     xmlns:xsd="http://www.w3.org/2001/XMLSchema"
-    targetNamespace="http://www.symfony-project.org/schema"
+    targetNamespace="http://symfony.com/schema"
     elementFormDefault="qualified">
 
     <xsd:import namespace="http://www.w3.org/XML/1998/namespace"/>
@@ -410,7 +410,7 @@ EOF
     protected function validateExtensions(\DOMDocument $dom, $file)
     {
         foreach ($dom->documentElement->childNodes as $node) {
-            if (!$node instanceof \DOMElement || 'http://www.symfony-project.org/schema/dic/services' === $node->namespaceURI) {
+            if (!$node instanceof \DOMElement || 'http://symfony.com/schema/dic/services' === $node->namespaceURI) {
                 continue;
             }
 
@@ -454,7 +454,7 @@ EOF
     protected function loadFromExtensions(SimpleXMLElement $xml)
     {
         foreach (dom_import_simplexml($xml)->childNodes as $node) {
-            if (!$node instanceof \DOMElement || $node->namespaceURI === 'http://www.symfony-project.org/schema/dic/services') {
+            if (!$node instanceof \DOMElement || $node->namespaceURI === 'http://symfony.com/schema/dic/services') {
                 continue;
             }
 

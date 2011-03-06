@@ -66,4 +66,21 @@ class RememberMeToken extends Token
     {
         $this->persistentToken = $persistentToken;
     }
+
+
+    /**
+     * {@inheritdoc}
+     */
+    public function serialize()
+    {
+        return serialize(array($this->user, $this->credentials, $this->authenticated, $this->roles, $this->immutable, $this->providerKey, $this->attributes, $this->key));
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function unserialize($serialized)
+    {
+        list($this->user, $this->credentials, $this->authenticated, $this->roles, $this->immutable, $this->providerKey, $this->attributes, $this->key) = unserialize($serialized);
+    }
 }

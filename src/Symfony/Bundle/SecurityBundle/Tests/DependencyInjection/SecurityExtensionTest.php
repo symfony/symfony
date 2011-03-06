@@ -136,15 +136,15 @@ abstract class SecurityExtensionTest extends \PHPUnit_Framework_TestCase
         $this->assertEquals(array(array(
             'JMS\FooBundle\Entity\User1' => array(
                 'class' => new Parameter('security.encoder.plain.class'),
-                'arguments' => array(),
+                'arguments' => array(false),
             ),
             'JMS\FooBundle\Entity\User2' => array(
                 'class' => new Parameter('security.encoder.digest.class'),
-                'arguments' => array('sha1', true, 5),
+                'arguments' => array('sha1', false, 5),
             ),
             'JMS\FooBundle\Entity\User3' => array(
                 'class' => new Parameter('security.encoder.digest.class'),
-                'arguments' => array('md5', false, 1),
+                'arguments' => array('md5', true, 5000),
             ),
             'JMS\FooBundle\Entity\User4' => new Reference('security.encoder.foo'),
         )), $container->getDefinition('security.encoder_factory.generic')->getArguments());

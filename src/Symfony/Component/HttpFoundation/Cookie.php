@@ -40,9 +40,9 @@ class Cookie
         if (empty($name)) {
             throw new \InvalidArgumentException('The cookie name cannot be empty');
         }
-        
-        //check if the expiration is valid
-        if(!$expire instanceof \DateTime && !is_numeric($expire) && (strtotime($expire) === false || strtotime($expire) === -1)){
+
+        // check if the expiration is valid
+        if (!$expire instanceof \DateTime && !is_numeric($expire) && (strtotime($expire) === false || strtotime($expire) === -1)) {
             throw new \InvalidArgumentException('The cookie expiration is not valid');
         }
 

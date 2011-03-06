@@ -36,7 +36,7 @@ class DoctrineMigrationsExtension extends Extension
         $config = $processor->process($configuration->getConfigTree(), $configs);
 
         foreach ($config as $key => $value) {
-            $container->setParameter($this->getAlias().'.'.$key, $value);
+            $container->setParameter($this->getName().'.'.$key, $value);
         }
     }
 

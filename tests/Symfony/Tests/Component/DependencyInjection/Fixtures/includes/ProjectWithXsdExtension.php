@@ -12,7 +12,7 @@ class ProjectWithXsdExtension extends ProjectExtension
         return 'http://www.example.com/schema/projectwithxsd';
     }
 
-    public function getAlias()
+    public function getName()
     {
         return 'projectwithxsd';
     }

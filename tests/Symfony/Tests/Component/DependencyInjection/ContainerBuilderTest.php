@@ -450,7 +450,7 @@ class ContainerBuilderTest extends \PHPUnit_Framework_TestCase
     public function testRegisteredButNotLoadedExtension()
     {
         $extension = $this->getMock('Symfony\\Component\\DependencyInjection\\Extension\\ExtensionInterface');
-        $extension->expects($this->once())->method('getAlias')->will($this->returnValue('project'));
+        $extension->expects($this->once())->method('getName')->will($this->returnValue('project'));
         $extension->expects($this->never())->method('load');
 
         $container = new ContainerBuilder();
@@ -461,13 +461,38 @@ class ContainerBuilderTest extends \PHPUnit_Framework_TestCase
     public function testRegisteredAndLoadedExtension()
     {
         $extension = $this->getMock('Symfony\\Component\\DependencyInjection\\Extension\\ExtensionInterface');
-        $extension->expects($this->exactly(2))->method('getAlias')->will($this->returnValue('project'));
+        $extension->expects($this->exactly(2))->method('getName')->will($this->returnValue('project'));
         $extension->expects($this->once())->method('load')->with(array(array('foo' => 'bar')));
 
         $container = new ContainerBuilder();
         $container->registerExtension($extension);
         $container->loadFromExtension('project', array('foo' => 'bar'));
         $container->compile();
+    }
+
+    public function testExtensionAlias()
+    {
+        $extension = $this->getMock('Symfony\\Component\\DependencyInjection\\Extension\\ExtensionInterface');
+        $extension->expects($this->any())->method('getName')->will($this->returnValue('original'));
+
+        $container = new ContainerBuilder();
+        $container->registerExtension($extension);
+        $container->registerExtensionAlias('original', 'alias');
+        $container->loadFromExtension('alias', array('foo' => 'bar'));
+
+        $this->assertEquals(array(array('foo' => 'bar')), $container->getExtensionConfig('original'), '->getExtensionConfig() and ->loadFromExtension() accept an alias');
+        $this->assertTrue($container->hasExtension('alias'), '->hasExtension() accepts an alias');
+        $this->assertSame($extension, $container->getExtension('alias'), '->getExtension() accepts an alias');
+    }
+
+    public function testCircularAlias()
+    {
+        $this->setExpectedException('LogicException');
+
+        $container = new ContainerBuilder();
+        $container->registerExtensionAlias('foo', 'bar');
+        $container->registerExtensionAlias('bar', 'foo');
+        $container->getExtensionConfig('foo');
     }
 
     /**

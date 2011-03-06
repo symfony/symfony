@@ -21,35 +21,31 @@ use Symfony\Component\DependencyInjection\ContainerBuilder;
 interface ExtensionInterface
 {
     /**
-     * Loads a specific configuration.
+     * Loads the current extension.
      *
-     * @param array   $config        An array of configuration values
+     * @param array            $configs   An array of value array for all calls to load the current extension
      * @param ContainerBuilder $container A ContainerBuilder instance
-     *
-     * @throws \InvalidArgumentException When provided tag is not defined in this extension
      */
-    function load(array $config, ContainerBuilder $container);
+    function load(array $configs, ContainerBuilder $container);
+
+    /**
+     * Returns the name used in YAML files.
+     *
+     * @return string The extension name
+     */
+    function getName();
 
     /**
      * Returns the namespace to be used for this extension (XML namespace).
      *
-     * @return string The XML namespace
+     * @return string|Boolean The XML namespace or false if XML is not supported
      */
     function getNamespace();
 
     /**
      * Returns the base path for the XSD files.
      *
-     * @return string The XSD base path
+     * @return string|Boolean The XSD base path or false if schema validation is not supported
      */
     function getXsdValidationBasePath();
-
-    /**
-     * Returns the recommended alias to use in XML.
-     *
-     * This alias is also the mandatory prefix to use when using YAML.
-     *
-     * @return string The alias
-     */
-    function getAlias();
 }

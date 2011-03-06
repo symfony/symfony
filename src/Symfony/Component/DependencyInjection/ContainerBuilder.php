@@ -29,10 +29,11 @@ class ContainerBuilder extends Container implements TaggedContainerInterface
 {
     private $extensions       = array();
     private $extensionsByNs   = array();
+    private $extensionAliases = array();
+    private $extensionConfigs = array();
     private $definitions      = array();
     private $aliases          = array();
     private $resources        = array();
-    private $extensionConfigs = array();
     private $injectors        = array();
     private $compiler;
 
@@ -43,11 +44,22 @@ class ContainerBuilder extends Container implements TaggedContainerInterface
      */
     public function registerExtension(ExtensionInterface $extension)
     {
-        $this->extensions[$extension->getAlias()] = $extension;
+        $this->extensions[$extension->getName()] = $extension;
 
         if (false !== $extension->getNamespace()) {
             $this->extensionsByNs[$extension->getNamespace()] = $extension;
         }
+    }
+
+    /**
+     * Assigns an alias to an extension.
+     *
+     * @param string $name  A current extension name
+     * @param string $alias An alias name to create
+     */
+    public function registerExtensionAlias($name, $alias)
+    {
+        $this->extensionAliases[$alias] = $name;
     }
 
     /**
@@ -59,6 +71,8 @@ class ContainerBuilder extends Container implements TaggedContainerInterface
      */
     public function getExtension($name)
     {
+        $name = $this->resolveExtensionAlias($name);
+
         if (isset($this->extensions[$name])) {
             return $this->extensions[$name];
         }
@@ -83,12 +97,29 @@ class ContainerBuilder extends Container implements TaggedContainerInterface
     /**
      * Checks if we have an extension.
      *
-     * @param string $name The name of the extension
+     * @param string $name The name, namespace or alias of the extension
+     *
      * @return boolean If the extension exists
      */
     public function hasExtension($name)
     {
+        $name = $this->resolveExtensionAlias($name);
+
         return isset($this->extensions[$name]) || isset($this->extensionsByNs[$name]);
+    }
+
+    /**
+     * Returns the configuration array for the given extension.
+     *
+     * @param string $name The name of the extension
+     *
+     * @return array An array of configuration
+     */
+    public function getExtensionConfig($name)
+    {
+        $name = $this->resolveExtensionAlias($name);
+
+        return isset($this->extensionConfigs[$name]) ? $this->extensionConfigs[$name] : array();
     }
 
     /**
@@ -142,13 +173,7 @@ class ContainerBuilder extends Container implements TaggedContainerInterface
             throw new \LogicException('Cannot load from an extension on a frozen container.');
         }
 
-        $namespace = $this->getExtension($extension)->getAlias();
-
-        if (!isset($this->extensionConfigs[$namespace])) {
-            $this->extensionConfigs[$namespace] = array();
-        }
-
-        $this->extensionConfigs[$namespace][] = $this->getParameterBag()->resolveValue($values);
+        $this->extensionConfigs[$this->getExtension($extension)->getName()][] = $values;
 
         return $this;
     }
@@ -355,22 +380,6 @@ class ContainerBuilder extends Container implements TaggedContainerInterface
 
             $this->extensionConfigs[$name] = array_merge($this->extensionConfigs[$name], $container->getExtensionConfig($name));
         }
-    }
-
-    /**
-     * Returns the configuration array for the given extension.
-     *
-     * @param string $name The name of the extension
-     *
-     * @return array An array of configuration
-     */
-    public function getExtensionConfig($name)
-    {
-        if (!isset($this->extensionConfigs[$name])) {
-            $this->extensionConfigs[$name] = array();
-        }
-
-        return $this->extensionConfigs[$name];
     }
 
     /**
@@ -847,5 +856,28 @@ class ContainerBuilder extends Container implements TaggedContainerInterface
         }
 
         return $services;
+    }
+
+    /**
+     * Resolves an extension alias to the extension name.
+     *
+     * @param string $alias An extension alias or name
+     *
+     * @return string The extension name
+     */
+    private function resolveExtensionAlias($alias)
+    {
+        $name = $alias;
+
+        $visited = array($alias);
+        while (isset($this->extensionAliases[$name])) {
+            if (in_array($this->extensionAliases[$name], $visited)) {
+                throw new \LogicException(sprintf('Circular reference detected while resolving the "%s" extension alias.', $alias));
+            }
+
+            $visited[] = $name = $this->extensionAliases[$name];
+        }
+
+        return $name;
     }
 }

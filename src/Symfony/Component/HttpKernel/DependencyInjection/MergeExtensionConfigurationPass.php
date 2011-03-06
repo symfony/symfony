@@ -29,11 +29,11 @@ class MergeExtensionConfigurationPass extends BaseMergeExtensionConfigurationPas
 
             if (class_exists($extClass)) {
                 $ext = new $extClass();
-                $alias = $ext->getAlias();
+                $name = $ext->getName();
 
                 // ensure all "main" extensions are loaded
-                if (!count($container->getExtensionConfig($alias))) {
-                    $container->loadFromExtension($alias, array());
+                if (!count($container->getExtensionConfig($name))) {
+                    $container->loadFromExtension($name, array());
                 }
             }
         }

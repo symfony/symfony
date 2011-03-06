@@ -66,13 +66,19 @@ abstract class Extension implements ExtensionInterface
     }
 
     /**
-     * Returns the base path for the XSD files.
+     * Returns the name used in YAML files.
      *
-     * @return string The XSD base path
+     * @return string The extension name
      */
-    public function getXsdValidationBasePath()
+    public function getName()
     {
-        return false;
+        $className = get_class($this);
+        if ('Extension' != substr($className, -9)) {
+            throw new \BadMethodCallException('This extension does not follow the naming convention; you must overwrite the getName() method.');
+        }
+        $classBaseName = substr(strrchr($className, '\\'), 1, -9);
+
+        return Container::underscore($classBaseName);
     }
 
     /**
@@ -86,20 +92,12 @@ abstract class Extension implements ExtensionInterface
     }
 
     /**
-     * Returns the recommended alias to use in XML.
+     * Returns the base path for the XSD files.
      *
-     * This alias is also the mandatory prefix to use when using YAML.
-     *
-     * @return string The alias
+     * @return string The XSD base path
      */
-    public function getAlias()
+    public function getXsdValidationBasePath()
     {
-        $className = get_class($this);
-        if (substr($className, -9) != 'Extension') {
-            throw new \BadMethodCallException('This extension does not follow the naming convention; you must overwrite the getAlias() method.');
-        }
-        $classBaseName = substr(strrchr($className, '\\'), 1, -9);
-
-        return Container::underscore($classBaseName);
+        return false;
     }
 }

@@ -157,6 +157,145 @@ class ResponseTest extends \PHPUnit_Framework_TestCase
         // verify second set()
         $response->__toString();
     }
+    
+    public function testSendContent()
+    {
+        $response = new Response();
+        $response->setContent('foo');
+        
+        ob_start();
+        $response->sendContent();
+        $output = ob_get_clean();
+        
+        $this->assertSame('foo',$output);
+    }
+    
+    public function testPublicPrivate()
+    {
+        $response = new Response();
+        
+        $response->setPrivate();
+        
+        $this->assertTrue($response->headers->getCacheControlDirective('private'));
+        
+        $response->setPublic();
+        
+        $this->assertTrue($response->headers->getCacheControlDirective('public'));
+    }
+    
+    public function testExpires()
+    {
+        $date = new \DateTime('@1111');
+        $response = new Response();
+        $response->setExpires($date);
+        
+        $this->assertInstanceOf('\DateTime',$response->getExpires());
+        
+        $response->setExpires();
+        
+        $this->assertFalse($response->headers->hasCacheControlDirective('Expires'));
+    }
+    
+    public function testClientTtl()
+    {
+        $response = new Response();
+        
+        $response->setClientTtl(1337);
+        
+        $this->assertEquals(1337,$response->getMaxAge());
+    }
+    
+    public function testSetCache()
+    {
+        $response = new Response();
+        
+        $options = array('etag'=>'foo', 'last_modified'=>new \DateTime('@1337'), 'max_age'=>1337, 's_maxage'=>null, 'private'=>false, 'public'=>true);
+        $response->setCache($options);
+        
+        $this->assertInstanceOf('\DateTime',$response->getLastModified());
+        $this->assertEquals(1337,$response->getMaxAge());
+        $this->assertTrue($response->headers->getCacheControlDirective('public'));
+        $this->assertNull($response->headers->getCacheControlDirective('private'));
+        $this->assertSame('"foo"',$response->getEtag());
+        
+        $options = array('etag'=>'foo', 'last_modified'=>new \DateTime('@1337'), 'max_age'=>null, 's_maxage'=>42, 'private'=>true, 'public'=>false);
+        $response->setCache($options);
+        
+        $this->assertEquals(42,$response->getMaxAge());
+        $this->assertNull($response->headers->getCacheControlDirective('public'));
+        $this->assertTrue($response->headers->getCacheControlDirective('private'));
+    }
+    
+    /**
+     * @expectedException InvalidArgumentException
+     */
+    public function testSetInvalidCache()
+    {
+        $response = new Response();
+        $response->setCache(array('foo'));
+    }
+    
+    /**
+     * @dataProvider statusCodeProvider
+     */
+    public function testStatusCodes($code)
+    {
+        $response = new Response();
+        $response->setStatusCode($code);
+        
+        switch($code){
+            case 100:
+                $this->assertTrue($response->isInformational());
+                break;
+            case 400:
+                $this->assertTrue($response->isClientError());
+                break;
+            case 500:
+                $this->assertTrue($response->isServerError());
+                break;
+            case 200:
+                $this->assertTrue($response->isOk());
+                $this->assertTrue($response->isSuccessful());
+                break;
+            case 403:
+                $this->assertTrue($response->isForbidden());
+                break;
+            case 404:
+                $this->assertTrue($response->isNotFound());
+                break;
+            case 301:
+            case 302:
+            case 303:
+            case 307:
+                $this->assertTrue($response->isRedirection());
+                $this->assertTrue($response->isRedirect());
+                break;
+            case 201:
+            case 204:
+            case 304:
+                $this->assertTrue($response->isEmpty());
+                break;
+        }
+    }
+    
+    public function statusCodeProvider()
+    {
+        return array(
+            array(500),
+            array(100),
+            array(400),
+            array(200),
+            array(403),
+            array(404),
+            array(301),
+            array(302),
+            array(303),
+            array(307),
+            array(201),
+            array(204),
+            array(304)
+        );
+    }
 
     protected function createDateTimeOneHourAgo()
     {

@@ -223,7 +223,7 @@ class Cookie
      *
      * @return Boolean The cookie httponly flag
      */
-    public function isHttponly()
+    public function isHttpOnly()
     {
         return $this->httponly;
     }

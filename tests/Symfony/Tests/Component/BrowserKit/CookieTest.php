@@ -99,10 +99,10 @@ class CookieTest extends \PHPUnit_Framework_TestCase
     public function testIsHttponly()
     {
         $cookie = new Cookie('foo', 'bar');
-        $this->assertFalse($cookie->isHttponly(), '->isHttponly() returns false if not defined');
+        $this->assertFalse($cookie->isHttpOnly(), '->isHttpOnly() returns false if not defined');
 
         $cookie = new Cookie('foo', 'bar', 0, '/', 'foo.com', false, true);
-        $this->assertTrue($cookie->isHttponly(), '->isHttponly() returns the cookie httponly flag');
+        $this->assertTrue($cookie->isHttpOnly(), '->isHttpOnly() returns the cookie httponly flag');
     }
 
     public function testGetExpiresTime()

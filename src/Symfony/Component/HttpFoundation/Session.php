@@ -213,7 +213,7 @@ class Session implements \Serializable
 
     public function getFlashes()
     {
-        return $this->attributes['_flash'];
+        return isset($this->attributes['_flash']) ? $this->attributes['_flash'] : array();
     }
 
     public function setFlashes($values)

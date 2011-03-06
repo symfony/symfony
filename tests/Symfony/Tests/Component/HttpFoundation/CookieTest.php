@@ -68,6 +68,14 @@ class CookieTest extends \PHPUnit_Framework_TestCase
     {
         new Cookie('MyCookie', $value);
     }
+    
+    /**
+     * @expectedException InvalidArgumentException
+     */
+    public function testInvalidExpiration()
+    {
+        $cookie = new Cookie('MyCookie', 'foo','bar');        
+    }
 
     /**
      * @covers Symfony\Component\HttpFoundation\Cookie::getValue

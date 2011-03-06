@@ -52,6 +52,10 @@ class ControllerNameParser
         }
 
         list($bundle, $controller, $action) = $parts;
+        if ($bundle && 'Bundle' != substr($bundle, -6)) {
+            $bundle = $this->kernel->resolveBundleAlias($bundle);
+        }
+
         $class = null;
         $logs = array();
         foreach ($this->kernel->getBundle($bundle, false) as $b) {

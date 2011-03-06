@@ -66,7 +66,14 @@ class TemplateNameParser extends BaseTemplateNameParser
             throw new \InvalidArgumentException(sprintf('Template name "%s" is not valid (format is "bundle:section:template.format.engine").', $name));
         }
 
-        $template = new TemplateReference($parts[0], $parts[1], $elements[0], $elements[1], $elements[2]);
+        // resolve bundle alias
+        if ($parts[0] && 'Bundle' != substr($parts[0], -6)) {
+            $bundle = $this->kernel->resolveBundleAlias($parts[0]);
+        } else {
+            $bundle = $parts[0];
+        }
+
+        $template = new TemplateReference($bundle, $parts[1], $elements[0], $elements[1], $elements[2]);
 
         if ($template->get('bundle')) {
             try {

@@ -50,7 +50,7 @@ class Kernel extends BaseKernel
         return array(
             new \Symfony\Bundle\FrameworkBundle\FrameworkBundle(),
             new \TestBundle\Sensio\FooBundle\SensioFooBundle(),
-            new \TestBundle\Sensio\Cms\FooBundle\SensioCmsFooBundle(),
+            'cms' => new \TestBundle\Sensio\Cms\FooBundle\SensioCmsFooBundle(),
             new \TestBundle\FooBundle\FooBundle(),
             new \TestBundle\Fabpot\FooBundle\FabpotFooBundle(),
         );

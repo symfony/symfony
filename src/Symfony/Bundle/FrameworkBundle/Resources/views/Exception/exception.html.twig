@@ -1,5 +1,5 @@
 <div class="sf-exceptionreset">
-    
+
     <div class="block_exception">
         <div class="block_exception_detected clear_fix">
             <div class="illustration_exception">
@@ -14,11 +14,11 @@
                 <h1>
                     {{ exception.message|replace({"\n": '<br />'})|format_file_from_text }}
                 </h1>
-            
+
                 <div>
                     <strong>{{ status_code }}</strong> {{ status_text }} - {{ exception.class|abbr_class }}
                 </div>
-            
+
                 {% set previous_count = exception.previouses|length %}
                 {% if previous_count %}
                     <div class="linked"><span><strong>{{ previous_count }}</strong> linked Exception{{ previous_count > 1 ? 's' : '' }}:</span>
@@ -45,10 +45,17 @@
     {% endfor %}
 
     {% if logger %}
-    
         <div class="block">
             <div class="logs clear_fix">
-                <h2>Logs <a href="#" onclick="toggle('logs'); return false;">&raquo;</a></h2>
+                {% spaceless %}
+                <h2>
+                    Logs&nbsp;
+                    <a href="#" onclick="toggle('logs'); switchIcons('icon_logs_open', 'icon_logs_close'); return false;">
+                        <img class="toggle" id="icon_logs_close" alt="-" src="{{ asset('bundles/framework/images/blue_picto_less.gif') }}" style="visibility: hidden" />
+                        <img class="toggle" id="icon_logs_open" alt="+" src="{{ asset('bundles/framework/images/blue_picto_more.gif') }}" style="visibility: display; margin-left: -18px" />
+                    </a>
+                </h2>
+                {% endspaceless %}
 
                 {% if logger.counterrors %}
                     <div class="error_count">
@@ -65,13 +72,19 @@
             </div>
 
         </div>
-
     {% endif %}
 
     {% if currentContent %}
         <div class="block">
-
-            <h2>Content of the Output <a href="#" onclick="toggle('output_content'); return false;">&raquo;</a></h2>
+            {% spaceless %}
+            <h2>
+                Content of the Output&nbsp;
+                <a href="#" onclick="toggle('output_content'); switchIcons('icon_content_open', 'icon_content_close'); return false;">
+                    <img class="toggle" id="icon_content_close" alt="-" src="{{ asset('bundles/framework/images/blue_picto_less.gif') }}" style="visibility: hidden" />
+                    <img class="toggle" id="icon_content_open" alt="+" src="{{ asset('bundles/framework/images/blue_picto_more.gif') }}" style="visibility: display; margin-left: -18px" />
+                </a>
+            </h2>
+            {% endspaceless %}
 
             <div id="output_content" style="display: none">
                 {{ currentContent }}

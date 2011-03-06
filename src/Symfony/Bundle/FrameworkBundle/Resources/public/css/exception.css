@@ -22,12 +22,6 @@ build: 56
     text-align:left;
     background-color:#efefef;
 }
-.sf-exceptionreset body
-{
-    /* Pour faire des hovers autre que sur des a */
-    /*behavior: url(/htc/csshover.htc);*/
-    /* Ca fonctionne avec ie6 et ce n'est pas accessible */
-}
 .sf-exceptionreset abbr
 {
     border-bottom: 1px dotted #000;
@@ -124,7 +118,7 @@ build: 56
 {
     background-color:#FFFFFF;
     border:1px solid #dfdfdf;
-    padding:50px;
+    padding:40px 50px;
 }
 
 .sf-exceptionreset .block_exception
@@ -198,17 +192,10 @@ build: 56
     text-decoration:underline;
 }
 
-.sf-exceptionreset .logs
-{
-    padding-bottom:20px;
-}
-
 .sf-exceptionreset .logs h2
 {
     float:left;
     width:654px;
-    background: url(../images/icon_log.png) no-repeat 0 -4px;
-    padding-left:24px;
 }
 
 .sf-exceptionreset .error_count

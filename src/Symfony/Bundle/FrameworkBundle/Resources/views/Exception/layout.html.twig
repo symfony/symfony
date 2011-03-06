@@ -4,27 +4,25 @@
         <meta http-equiv="Content-Type" content="text/html; charset={{ _charset }}"/>
         <title>{{ exception.message }} ({{ status_code }} {{ status_text }})</title>
 
-        <link href="{{ asset('/bundles/framework/css/exception_layout.css') }}" rel="stylesheet" type="text/css" media="all" />
-        <link href="{{ asset('/bundles/framework/css/exception.css') }}" rel="stylesheet" type="text/css" media="all" />
+        <link href="{{ asset('bundles/framework/css/exception_layout.css') }}" rel="stylesheet" type="text/css" media="all" />
+        <link href="{{ asset('bundles/framework/css/exception.css') }}" rel="stylesheet" type="text/css" media="all" />
     </head>
     <body>
         <div id="content">
             <div class="header clear_fix">
                 <div class="header_logo">
-                  <a href="http://symfony.com/">
                     <img src="{{ asset('bundles/framework/images/logo_symfony.gif') }}" alt="Symfony" />
-                  </a>
                 </div>
 
                 <div class="search">
-                  <form method="post" action="http://symfony.com/search">
+                  <form method="get" action="http://symfony.com/search">
                     <div class="form_row">
 
                       <label for="search_id">
                           <img src="{{ asset('bundles/framework/images/grey_magnifier.png') }}" alt="Search on Symfony website" />
                       </label>
 
-                      <input name="search_name" id="search_id" type="text" placeholder="Search on Symfony website" />
+                      <input name="q" id="search_id" type="text" placeholder="Search on Symfony website" />
 
                       <button type="submit">
                         <span class="border_l">

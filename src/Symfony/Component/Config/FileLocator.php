@@ -75,7 +75,7 @@ class FileLocator implements FileLocatorInterface
             throw new \InvalidArgumentException(sprintf('The file "%s" does not exist (in: %s%s).', $name, null !== $currentPath ? $currentPath.', ' : '', implode(', ', $this->paths)));
         }
 
-        return $filepaths;
+        return array_values(array_unique($filepaths));
     }
 
     /**

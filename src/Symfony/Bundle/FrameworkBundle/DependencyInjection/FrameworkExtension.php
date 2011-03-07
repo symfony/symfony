@@ -197,6 +197,8 @@ class FrameworkExtension extends Extension
         if (isset($config['only_exceptions'])) {
             $container->setParameter('profiler_listener.only_exceptions', $config['only_exceptions']);
         }
+        
+        $container->setParameter('profiler.storage.file', $config['storage_file']);
 
         if (isset($config['matcher'])) {
             if (isset($config['matcher']['service'])) {

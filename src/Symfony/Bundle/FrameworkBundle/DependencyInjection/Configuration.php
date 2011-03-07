@@ -77,6 +77,7 @@ class Configuration
             ->arrayNode('profiler')
                 ->canBeUnset()
                 ->booleanNode('only_exceptions')->end()
+                ->scalarNode('storage_file')->defaultValue('%kernel.cache_dir%/profiler.db')->end()
                 ->arrayNode('matcher')
                     ->canBeUnset()
                     ->performNoDeepMerging()

@@ -54,6 +54,7 @@
         </xsd:all>
 
         <xsd:attribute name="only-exceptions" type="xsd:boolean" />
+        <xsd:attribute name="storage-file" type="xsd:string" />
     </xsd:complexType>
 
     <xsd:complexType name="profiler_matcher">

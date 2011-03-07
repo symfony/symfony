@@ -87,6 +87,21 @@ class RequestTest extends \PHPUnit_Framework_TestCase
         $this->assertFalse($request->isSecure());
     }
 
+    public function testPUTDELETE()
+    {
+        $putrequest = "bar=baz&foo=test";
+        $request = Request::create('http://example.com/putrequest?foo=over', 'PUT', array(), array(), array(), array(), $putrequest);
+        $this->assertEquals($putrequest, $request->getContent());
+        $this->assertEquals('baz', $request->get('bar'));
+        $this->assertEquals('over', $request->get('foo'));
+
+        $putrequest = "foo=baz&foo2=testing";
+        $request = Request::create('http://example.com/putrequest?foo2=not', 'DELETE', array(), array(), array(), array(), $putrequest);
+        $this->assertEquals($putrequest, $request->getContent());
+        $this->assertEquals('baz', $request->get('foo'));
+        $this->assertEquals('not', $request->get('foo2'));
+    }
+
     /**
      * @covers Symfony\Component\HttpFoundation\Request::duplicate
      */

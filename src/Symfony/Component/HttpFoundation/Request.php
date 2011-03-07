@@ -92,7 +92,7 @@ class Request
      * This method also re-initializes all properties.
      *
      * @param array  $query      The GET parameters
-     * @param array  $request    The POST parameters
+     * @param array  $request    The POST/PUT/DELETE parameters
      * @param array  $attributes The request attributes (parameters parsed from the PATH_INFO, ...)
      * @param array  $cookies    The COOKIE parameters
      * @param array  $files      The FILES parameters
@@ -177,7 +177,12 @@ class Request
             $defaults['HTTP_HOST'] = $defaults['HTTP_HOST'].':'.$components['port'];
         }
 
-        if (in_array(strtoupper($method), array('POST', 'PUT', 'DELETE'))) {
+        if (in_array(strtoupper($method), array('PUT', 'DELETE'))) {
+            $request = array();
+            parse_str($content, $request);
+            $query = array();
+            $defaults['CONTENT_TYPE'] = 'application/x-www-form-urlencoded';
+        }  elseif ('POST' === strtoupper($method)) {
             $request = $parameters;
             $query = array();
             $defaults['CONTENT_TYPE'] = 'application/x-www-form-urlencoded';

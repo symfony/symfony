@@ -3,7 +3,7 @@
 /*
  * This file is part of the Symfony package.
  *
- * (c) Fabien Potencier <fabien.potencier@symfony-project.com>
+ * (c) Fabien Potencier <fabien@symfony.com>
  *
  * For the full copyright and license information, please view the LICENSE
  * file that was distributed with this source code.
@@ -29,7 +29,7 @@ use Symfony\Component\HttpFoundation\RequestMatcher;
 /**
  * SecurityExtension.
  *
- * @author Fabien Potencier <fabien.potencier@symfony-project.com>
+ * @author Fabien Potencier <fabien@symfony.com>
  * @author Johannes M. Schmitt <schmittjoh@gmail.com>
  */
 class SecurityExtension extends Extension
@@ -572,6 +572,6 @@ class SecurityExtension extends Extension
 
     public function getNamespace()
     {
-        return 'http://www.symfony-project.org/schema/dic/security';
+        return 'http://symfony.com/schema/dic/security';
     }
 }

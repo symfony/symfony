@@ -3,7 +3,7 @@
 /*
  * This file is part of the Symfony package.
  *
- * (c) Fabien Potencier <fabien.potencier@symfony-project.com>
+ * (c) Fabien Potencier <fabien@symfony.com>
  *
  * This code is partially based on the Rack-Cache library by Ryan Tomayko,
  * which is released under the MIT license.
@@ -22,7 +22,7 @@ use Symfony\Component\HttpFoundation\Response;
 /**
  * Cache provides HTTP caching.
  *
- * @author Fabien Potencier <fabien.potencier@symfony-project.com>
+ * @author Fabien Potencier <fabien@symfony.com>
  */
 class HttpCache implements HttpKernelInterface
 {

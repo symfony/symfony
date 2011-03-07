@@ -18,6 +18,12 @@
         </testsuite>
     </testsuites>
 
+    <groups>
+        <exclude>
+            <group>benchmark</group>
+        </exclude>
+    </groups>
+
     <filter>
         <whitelist>
             <directory>./src/Symfony/</directory>

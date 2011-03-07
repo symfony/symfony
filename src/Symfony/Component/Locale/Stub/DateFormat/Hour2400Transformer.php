@@ -29,7 +29,7 @@ class Hour2400Transformer extends HourTransformer
     /**
      * {@inheritDoc}
      */
-    public function getMktimeHour($hour, $marker = null)
+    public function getNormalizedHour($hour, $marker = null)
     {
         if ('AM' == $marker) {
             $hour = 0;

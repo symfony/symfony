@@ -19,11 +19,11 @@ namespace Symfony\Component\Locale\Stub\DateFormat;
 abstract class HourTransformer extends Transformer
 {
     /**
-     * Returns an hour value suitable for mktime() usage
+     * Returns a normalized hour value suitable for the hour transformer type
      *
      * @param  int     $hour    The hour value
      * @param  string  $marker  An optional AM/PM marker
-     * @return int              The hour value suitable for mktime() usage
+     * @return int              The normalized hour value
      */
-    abstract public function getMktimeHour($hour, $marker = null);
+    abstract public function getNormalizedHour($hour, $marker = null);
 }

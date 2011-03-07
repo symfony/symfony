@@ -280,7 +280,7 @@ class FullTransformer
 
         // Normalize hour for mktime
         if ($hourInstance instanceof HourTransformer) {
-            $hour = $hourInstance->getMktimeHour($hour, $marker);
+            $hour = $hourInstance->getNormalizedHour($hour, $marker);
         }
 
         // Set the timezone if different from the default one

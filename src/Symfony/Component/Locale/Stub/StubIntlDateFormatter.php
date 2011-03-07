@@ -120,6 +120,24 @@ class StubIntlDateFormatter
     }
 
     /**
+     * Static constructor
+     *
+     * @param  string  $locale   The locale code
+     * @param  int     $datetype Type of date formatting, one of the format type constants
+     * @param  int     $timetype Type of time formatting, one of the format type constants
+     * @param  string  $timezone Timezone identifier
+     * @param  int     $calendar Calendar to use for formatting or parsing; default is Gregorian.
+     *                           One of the calendar constants.
+     * @param  string  $pattern  Optional pattern to use when formatting.
+     * @see    http://userguide.icu-project.org/formatparse/datetime
+     * @throws MethodArgumentValueNotImplementedException  When $locale different than 'en' is passed
+     */
+    static public function create($locale, $datetype, $timetype, $timezone = null, $calendar = self::GREGORIAN, $pattern = null)
+    {
+        return new self($locale, $datetype, $timetype, $timezone, $calendar, $pattern);
+    }
+
+    /**
      * Format the date/time value (timestamp) as a string
      *
      * @param  mixed         $timestamp   Unix timestamp to format
@@ -387,23 +405,5 @@ class StubIntlDateFormatter
         $pattern = implode(' ', $patternParts);
 
         return $pattern;
-    }
-
-    /**
-     * Static constructor
-     *
-     * @param  string  $locale   The locale code
-     * @param  int     $datetype Type of date formatting, one of the format type constants
-     * @param  int     $timetype Type of time formatting, one of the format type constants
-     * @param  string  $timezone Timezone identifier
-     * @param  int     $calendar Calendar to use for formatting or parsing; default is Gregorian.
-     *                           One of the calendar constants.
-     * @param  string  $pattern  Optional pattern to use when formatting.
-     * @see    http://userguide.icu-project.org/formatparse/datetime
-     * @throws MethodArgumentValueNotImplementedException  When $locale different than 'en' is passed
-     */
-    static public function create($locale, $datetype, $timetype, $timezone = null, $calendar = self::GREGORIAN, $pattern = null)
-    {
-        return new self($locale, $datetype, $timetype, $timezone, $calendar, $pattern);
     }
 }

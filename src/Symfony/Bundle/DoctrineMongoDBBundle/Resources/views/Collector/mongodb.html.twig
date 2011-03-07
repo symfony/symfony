@@ -8,7 +8,8 @@
 {% endblock %}
 
 {% block menu %}
-<span class="picto">
+<span class="label">
+    <span class="icon"><img src="{{ asset('bundles/webprofiler/images/profiler/db.png') }}" alt="" /></span>
     <strong>Doctrine MongoDB</strong>
     <span class="count">
         <span>{{ collector.querycount }}</span>

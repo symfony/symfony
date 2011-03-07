@@ -39,7 +39,6 @@ class DayOfWeekTransformer extends Transformer
      */
     public function getReverseMatchingRegExp($length)
     {
-        $dayOfWeek = $dateTime->format('l');
         switch ($length) {
             case 4:
                 return 'Monday|Tuesday|Wednesday|Thursday|Friday|Saturday|Sunday';
@@ -55,8 +54,6 @@ class DayOfWeekTransformer extends Transformer
      */
     public function extractDateOptions($matched, $length)
     {
-        return array(
-            'hour' => (int) $matched,
-        );
+        return array();
     }
 }

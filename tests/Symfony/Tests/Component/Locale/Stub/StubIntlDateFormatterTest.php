@@ -630,6 +630,10 @@ class StubIntlDateFormatterTest extends LocaleTestCase
             // a previous timezoned parsing should not change the timezone for the next parsing
             array('y-M-d HH:mm:ss', '1970-1-1 00:00:00', 0),
 
+            // AM/PM (already covered by hours tests)
+            array('y-M-d HH:mm:ss a', '1970-1-1 00:00:00 AM', 0),
+            array('y-M-d HH:mm:ss a', '1970-1-1 00:00:00 PM', 43200),
+
             // regExp metachars in the pattern string
             array('y[M-d', '1970[1-1', 0),
             array('y[M/d', '1970[1/1', 0),
@@ -640,6 +644,72 @@ class StubIntlDateFormatterTest extends LocaleTestCase
             array("'''yy'", "'yy", 0),
             array("''y", "'1970", 0),
             array("H 'o'' clock'", "0 o' clock", 0),
+        );
+    }
+
+    /**
+     * Just to document the differencies between the stub and the intl implementations. The intl can parse
+     * any of the tested formats alone. The stub does not implement them as it would be needed to add more
+     * abstraction, passing more context to the transformers objects. Any of the formats are ignored alone
+     * or with date/time data (years, months, days, hours, minutes and seconds).
+     *
+     * Also in intl, format like 'ss E' for '10 2' (2nd day of year + 10 seconds) are added, then we have
+     * 86,400 seconds (24h * 60min * 60s) + 10 seconds
+     *
+     * @dataProvider parseDifferencies()
+     */
+    public function testParseDifferenciesStub($pattern, $value, $stubExpected, $intlExpected)
+    {
+        $formatter = $this->createStubFormatter($pattern);
+        $this->assertSame($stubExpected, $formatter->parse($value));
+    }
+
+    /**
+     * @dataProvider parseDifferencies()
+     */
+    public function testParseDifferenciesIntl($pattern, $value, $stubExpected, $intlExpected)
+    {
+        $formatter = $this->createIntlFormatter($pattern);
+        $this->assertSame($intlExpected, $formatter->parse($value));
+    }
+
+    public function parseDifferencies()
+    {
+        return array(
+            // AM/PM, ignored if alone
+            array('a', 'AM', 0, 0),
+            array('a', 'PM', 0, 43200),
+
+            // day of week
+            array('E', 'Thu', 0, 0),
+            array('EE', 'Thu', 0, 0),
+            array('EEE', 'Thu', 0, 0),
+            array('EEEE', 'Thursday', 0, 0),
+            array('EEEEE', 'T', 0, 432000),
+            array('EEEEEE', 'Thu', 0, 0),
+
+            // day of year
+            array('D', '1', 0, 0),
+            array('D', '2', 0, 86400),
+
+            // quarter
+            array('Q', '1', 0, 0),
+            array('QQ', '01', 0, 0),
+            array('QQQ', 'Q1', 0, 0),
+            array('QQQQ', '1st quarter', 0, 0),
+            array('QQQQQ', '1st quarter', 0, 0),
+
+            array('Q', '2', 0, 7776000),
+            array('QQ', '02', 0, 7776000),
+            array('QQQ', 'Q2', 0, 7776000),
+            array('QQQQ', '2nd quarter', 0, 7776000),
+            array('QQQQQ', '2nd quarter', 0, 7776000),
+
+            array('q', '1', 0, 0),
+            array('qq', '01', 0, 0),
+            array('qqq', 'Q1', 0, 0),
+            array('qqqq', '1st quarter', 0, 0),
+            array('qqqqq', '1st quarter', 0, 0),
         );
     }
 

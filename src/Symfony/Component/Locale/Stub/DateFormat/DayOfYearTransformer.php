@@ -32,7 +32,7 @@ class DayOfYearTransformer extends Transformer
      */
     public function getReverseMatchingRegExp($length)
     {
-        return "\d{$length}";
+        return '\d{'.$length.'}';
     }
 
     /**
@@ -40,8 +40,6 @@ class DayOfYearTransformer extends Transformer
      */
     public function extractDateOptions($matched, $length)
     {
-        return array(
-            'hour' => (int) $matched,
-        );
+        return array();
     }
 }

@@ -45,7 +45,7 @@ class QuarterTransformer extends Transformer
         switch ($length) {
             case 1:
             case 2:
-                return "\d{$length}";
+                return '\d{'.$length.'}';
             case 3:
                 return 'Q\d';
             default:

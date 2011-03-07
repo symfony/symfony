@@ -128,7 +128,14 @@ class Request
      */
     static public function createfromGlobals()
     {
-        return new static($_GET, $_POST, array(), $_COOKIE, $_FILES, $_SERVER);
+        //Implementing PUT and DELETE.
+        if (true === array_key_exists('REQUEST_METHOD',$_SERVER) && in_array($_SERVER['REQUEST_METHOD'],array('PUT','DELETE'))) {
+            $request = array();
+            parse_str(file_get_contents("php://input"), $request);
+        } else {
+            $request = $_POST;
+        }
+        return new static($_GET, $request, array(), $_COOKIE, $_FILES, $_SERVER);
     }
 
     /**

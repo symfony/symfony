@@ -79,6 +79,16 @@ class StubIntlDateFormatter
     private $dateTimeZone;
 
     /**
+     * @var bool
+     */
+    private $unitializedTimeZoneId = false;
+
+    /**
+     * @var string
+     */
+    private $timeZoneId;
+
+    /**
      * Constructor
      *
      * @param  string  $locale   The locale code
@@ -206,7 +216,11 @@ class StubIntlDateFormatter
      */
     public function getTimeZoneId()
     {
-        return $this->dateTimeZone->getName();
+        if (!$this->unitializedTimeZoneId) {
+            return $this->timeZoneId;
+        }
+
+        return null;
     }
 
     /**
@@ -307,18 +321,38 @@ class StubIntlDateFormatter
     /**
      * Set the formatter's timezone identifier
      *
-     * @param  string  $timeZoneId      The time zone ID string of the time zone to use.
-     *                                  If NULL or the empty string, the default time zone for the
-     *                                  runtime is used.
-     * @return bool                     true on success or false on failure
+     * @param  string  $timeZoneId   The time zone ID string of the time zone to use.
+     *                               If NULL or the empty string, the default time zone for the
+     *                               runtime is used.
+     * @return bool                  true on success or false on failure
      */
     public function setTimeZoneId($timeZoneId)
     {
+        if (is_null($timeZoneId)) {
+            $timeZoneId = date_default_timezone_get();
+            $this->unitializedTimeZoneId = true;
+        }
+
+        // Backup original passed time zone
+        $timeZone = $timeZoneId;
+
+        // Get an Etc/GMT time zone that is accepted for \DateTimeZone
+        if ('GMT' !== $timeZoneId && 'GMT' === substr($timeZoneId, 0, 3)) {
+            try {
+                $timeZoneId = DateFormat\TimeZoneTransformer::getEtcTimeZoneId($timeZoneId);
+            } catch (\InvalidArgumentException $e) {
+                // Does nothing, will fallback to UTC
+            }
+        }
+
         try {
             $this->dateTimeZone = new \DateTimeZone($timeZoneId);
         } catch (\Exception $e) {
             $this->dateTimeZone = new \DateTimeZone('UTC');
         }
+
+        $this->timeZoneId = $timeZone;
+        return true;
     }
 
     /**

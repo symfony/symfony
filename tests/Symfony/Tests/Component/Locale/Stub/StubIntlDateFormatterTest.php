@@ -34,8 +34,27 @@ class StubIntlDateFormatterTest extends LocaleTestCase
     }
 
     /**
-    * @dataProvider formatProvider
-    */
+     * When a time zone is not specified, it uses the system default however it returns null in the getter method
+     * @covers Symfony\Component\Locale\Stub\StubIntlDateFormatter::getTimeZoneId
+     * @covers Symfony\Component\Locale\Stub\StubIntlDateFormatter::setTimeZoneId
+     * @see StubIntlDateFormatterTest::testDefaultTimeZoneIntl()
+     */
+    public function testConstructorDefaultTimeZoneStub()
+    {
+        $formatter = new StubIntlDateFormatter('en', StubIntlDateFormatter::MEDIUM, StubIntlDateFormatter::SHORT);
+        $this->assertNull($formatter->getTimeZoneId());
+    }
+
+    public function testConstructorDefaultTimeZoneIntl()
+    {
+        $this->skipIfIntlExtensionIsNotLoaded();
+        $formatter = new \IntlDateFormatter('en', StubIntlDateFormatter::MEDIUM, StubIntlDateFormatter::SHORT);
+        $this->assertNull($formatter->getTimeZoneId());
+    }
+
+    /**
+     * @dataProvider formatProvider
+     */
     public function testFormatStub($pattern, $timestamp, $expected)
     {
         $formatter = $this->createStubFormatter($pattern);
@@ -234,8 +253,8 @@ class StubIntlDateFormatterTest extends LocaleTestCase
     }
 
     /**
-    * @dataProvider formatWithTimezoneProvider
-    */
+     * @dataProvider formatWithTimezoneProvider
+     */
     public function testFormatWithTimezoneStub($timestamp, $timezone, $expected)
     {
         $pattern = 'yyyy-MM-dd HH:mm:ss';
@@ -244,8 +263,8 @@ class StubIntlDateFormatterTest extends LocaleTestCase
     }
 
     /**
-    * @dataProvider formatWithTimezoneProvider
-    */
+     * @dataProvider formatWithTimezoneProvider
+     */
     public function testFormatWithTimezoneIntl($timestamp, $timezone, $expected)
     {
         $this->skipIfIntlExtensionIsNotLoaded();
@@ -258,6 +277,9 @@ class StubIntlDateFormatterTest extends LocaleTestCase
     {
         return array(
             array(0, 'UTC', '1970-01-01 00:00:00'),
+            array(0, 'GMT', '1970-01-01 00:00:00'),
+            array(0, 'GMT-03:00', '1969-12-31 21:00:00'),
+            array(0, 'GMT+03:00', '1970-01-01 03:00:00'),
             array(0, 'Europe/Zurich', '1970-01-01 01:00:00'),
             array(0, 'Europe/Paris', '1970-01-01 01:00:00'),
             array(0, 'Africa/Cairo', '1970-01-01 02:00:00'),
@@ -271,13 +293,73 @@ class StubIntlDateFormatterTest extends LocaleTestCase
             array(0, 'Asia/Bangkok', '1970-01-01 07:00:00'),
             array(0, 'Asia/Dubai', '1970-01-01 04:00:00'),
             array(0, 'Australia/Brisbane', '1970-01-01 10:00:00'),
+            array(0, 'Australia/Eucla', '1970-01-01 08:45:00'),
             array(0, 'Australia/Melbourne', '1970-01-01 10:00:00'),
             array(0, 'Europe/Berlin', '1970-01-01 01:00:00'),
             array(0, 'Europe/Dublin', '1970-01-01 01:00:00'),
             array(0, 'Europe/Warsaw', '1970-01-01 01:00:00'),
             array(0, 'Pacific/Fiji', '1970-01-01 12:00:00'),
 
+            // When time zone not exists, uses UTC by default
             array(0, 'Foo/Bar', '1970-01-01 00:00:00'),
+            array(0, 'UTC+04:30', '1970-01-01 00:00:00'),
+            array(0, 'UTC+04:AA', '1970-01-01 00:00:00'),
+        );
+    }
+
+    /**
+     * @expectedException Symfony\Component\Locale\Exception\NotImplementedException
+     */
+    public function testFormatWithTimezoneFormatOptionAndDifferentThanUtcStub()
+    {
+        $formatter = $this->createStubFormatter('zzzz');
+        $formatter->setTimeZoneId('Pacific/Fiji');
+        $formatter->format(0);
+    }
+
+    public function testFormatWithTimezoneFormatOptionAndDifferentThanUtcIntl()
+    {
+        $this->skipIfIntlExtensionIsNotLoaded();
+        $formatter = $this->createIntlFormatter('zzzz');
+        $formatter->setTimeZoneId('Pacific/Fiji');
+        $this->assertEquals('Fiji Time', $formatter->format(0));
+    }
+
+    public function testFormatWithGmtTimezoneStub()
+    {
+        $formatter = $this->createStubFormatter('zzzz');
+        $formatter->setTimeZoneId('GMT+03:00');
+        $this->assertEquals('GMT+03:00', $formatter->format(0));
+    }
+
+    public function testFormatWithGmtTimezoneIntl()
+    {
+        $this->skipIfIntlExtensionIsNotLoaded();
+        $formatter = $this->createIntlFormatter('zzzz');
+        $formatter->setTimeZoneId('GMT+03:00');
+        $this->assertEquals('GMT+03:00', $formatter->format(0));
+    }
+
+    public function testFormatWithDefaultTimezoneStub()
+    {
+        $formatter = new StubIntlDateFormatter('en', StubIntlDateFormatter::MEDIUM, StubIntlDateFormatter::SHORT);
+        $formatter->setPattern('yyyy-MM-dd HH:mm:ss');
+
+        $this->assertEquals(
+            $this->createDateTime(0)->format('Y-m-d H:i:s'),
+            $formatter->format(0)
+        );
+    }
+
+    public function testFormatWithDefaultTimezoneIntl()
+    {
+        $this->skipIfIntlExtensionIsNotLoaded();
+        $formatter = new \IntlDateFormatter('en', StubIntlDateFormatter::MEDIUM, StubIntlDateFormatter::SHORT);
+        $formatter->setPattern('yyyy-MM-dd HH:mm:ss');
+
+        $this->assertEquals(
+            $this->createDateTime(0)->format('Y-m-d H:i:s'),
+            $formatter->format(0)
         );
     }
 
@@ -374,33 +456,6 @@ class StubIntlDateFormatterTest extends LocaleTestCase
     {
         $formatter = new StubIntlDateFormatter('en', StubIntlDateFormatter::NONE, StubIntlDateFormatter::FULL);
         $this->assertEquals(StubIntlDateFormatter::FULL, $formatter->getTimeType());
-    }
-
-    /**
-    * @dataProvider timeZoneIdProvider
-    */
-    public function testGetTimeZoneIdStub($timeZoneId)
-    {
-        $formatter = new StubIntlDateFormatter('en', StubIntlDateFormatter::FULL, StubIntlDateFormatter::NONE, $timeZoneId);
-        $this->assertEquals($timeZoneId, $formatter->getTimeZoneId());
-    }
-
-    /**
-    * @dataProvider timeZoneIdProvider
-    */
-    public function testGetTimeZoneIdIntl($timeZoneId)
-    {
-        $this->skipIfIntlExtensionIsNotLoaded();
-        $formatter = new StubIntlDateFormatter('en', StubIntlDateFormatter::MEDIUM, StubIntlDateFormatter::SHORT, $timeZoneId);
-        $this->assertEquals($timeZoneId, $formatter->getTimeZoneId());
-    }
-
-    public function timeZoneIdProvider()
-    {
-        return array(
-            array('Europe/Zurich'),
-            array('Asia/Dubai'),
-        );
     }
 
     /**
@@ -527,6 +582,8 @@ class StubIntlDateFormatterTest extends LocaleTestCase
             array('y-M-d HH:mm:ss zzzz', '1970-1-1 00:00:00 GMT-00:00', 0),
             array('y-M-d HH:mm:ss zzzz', '1970-1-1 00:00:00 GMT+03:00', -10800),
             array('y-M-d HH:mm:ss zzzz', '1970-1-1 00:00:00 GMT+04:00', -14400),
+            array('y-M-d HH:mm:ss zzzz', '1970-1-1 00:00:00 GMT-0300', 10800),
+            array('y-M-d HH:mm:ss zzzz', '1970-1-1 00:00:00 GMT+0300', -10800),
 
             // a previous timezoned parsing should not change the timezone for the next parsing
             array('y-M-d HH:mm:ss', '1970-1-1 00:00:00', 0),
@@ -587,23 +644,59 @@ class StubIntlDateFormatterTest extends LocaleTestCase
         $this->assertEquals('yyyy-MM-dd', $formatter->getPattern());
     }
 
-    public function testSetTimeZoneIdStub()
+    /**
+     * @covers Symfony\Component\Locale\Stub\StubIntlDateFormatter::getTimeZoneId
+     * @dataProvider setTimeZoneIdProvider()
+     */
+    public function testSetTimeZoneIdStub($timeZoneId)
     {
         $formatter = $this->createStubFormatter();
-        $this->assertEquals('UTC', $formatter->getTimeZoneId());
-
-        $formatter->setTimeZoneId('Europe/Zurich');
-        $this->assertEquals('Europe/Zurich', $formatter->getTimeZoneId());
+        $formatter->setTimeZoneId($timeZoneId);
+        $this->assertEquals($timeZoneId, $formatter->getTimeZoneId());
     }
 
-    public function testSetTimeZoneIdIntl()
+    /**
+     * @dataProvider setTimeZoneIdProvider()
+     */
+    public function testSetTimeZoneIdIntl($timeZoneId)
     {
         $this->skipIfIntlExtensionIsNotLoaded();
         $formatter = $this->createIntlFormatter();
-        $this->assertEquals('UTC', $formatter->getTimeZoneId());
+        $formatter->setTimeZoneId($timeZoneId);
+        $this->assertEquals($timeZoneId, $formatter->getTimeZoneId());
+    }
 
-        $formatter->setTimeZoneId('Europe/Zurich');
-        $this->assertEquals('Europe/Zurich', $formatter->getTimeZoneId());
+    public function setTimeZoneIdProvider()
+    {
+        return array(
+            array('UTC'),
+            array('GMT'),
+            array('GMT-03:00'),
+            array('GMT-0300'),
+            array('Europe/Zurich'),
+
+            // When time zone not exists, uses UTC by default
+            array('Foo/Bar'),
+            array('GMT+00:AA'),
+            array('GMT+00AA'),
+        );
+    }
+
+    /**
+     * @expectedException Symfony\Component\Locale\Exception\NotImplementedException
+     */
+    public function testSetTimeZoneIdWithGmtTimeZoneWithMinutesOffsetStub()
+    {
+        $formatter = $this->createStubFormatter();
+        $formatter->setTimeZoneId('GMT+00:30');
+    }
+
+    public function testSetTimeZoneIdWithGmtTimeZoneWithMinutesOffsetIntl()
+    {
+        $this->skipIfIntlExtensionIsNotLoaded();
+        $formatter = $this->createIntlFormatter();
+        $formatter->setTimeZoneId('GMT+00:30');
+        $this->assertEquals('GMT+00:30', $formatter->getTimeZoneId());
     }
 
     public function testStaticCreate()
@@ -620,5 +713,17 @@ class StubIntlDateFormatterTest extends LocaleTestCase
     protected function createIntlFormatter($pattern = null)
     {
         return new \IntlDateFormatter('en', \IntlDateFormatter::MEDIUM, \IntlDateFormatter::SHORT, 'UTC', \IntlDateFormatter::GREGORIAN, $pattern);
+    }
+
+    protected function createDateTime($timestamp = null, $timeZone = null)
+    {
+        $timestamp = is_null($timestamp) ? time() : $timestamp;
+        $timeZone = is_null($timeZone) ? date_default_timezone_get() : $timeZone;
+
+        $dateTime = new \DateTime();
+        $dateTime->setTimestamp($timestamp);
+        $dateTime->setTimeZone(new \DateTimeZone($timeZone));
+
+        return $dateTime;
     }
 }

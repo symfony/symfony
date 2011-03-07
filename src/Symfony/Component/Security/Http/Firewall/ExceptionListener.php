@@ -34,12 +34,12 @@ use Symfony\Component\HttpKernel\HttpKernelInterface;
  */
 class ExceptionListener implements ListenerInterface
 {
-    protected $context;
-    protected $accessDeniedHandler;
-    protected $authenticationEntryPoint;
-    protected $authenticationTrustResolver;
-    protected $errorPage;
-    protected $logger;
+    private $context;
+    private $accessDeniedHandler;
+    private $authenticationEntryPoint;
+    private $authenticationTrustResolver;
+    private $errorPage;
+    private $logger;
 
     public function __construct(SecurityContextInterface $context, AuthenticationTrustResolverInterface $trustResolver, AuthenticationEntryPointInterface $authenticationEntryPoint = null, $errorPage = null, AccessDeniedHandlerInterface $accessDeniedHandler = null, LoggerInterface $logger = null)
     {
@@ -148,7 +148,7 @@ class ExceptionListener implements ListenerInterface
         return $response;
     }
 
-    protected function startAuthentication(EventInterface $event, Request $request, AuthenticationException $authException)
+    private function startAuthentication(EventInterface $event, Request $request, AuthenticationException $authException)
     {
         $this->context->setToken(null);
 
@@ -160,7 +160,7 @@ class ExceptionListener implements ListenerInterface
             $this->logger->debug('Calling Authentication entry point');
         }
 
-        // session isn't required when using http basic authentification mecanism for example
+        // session isn't required when using http basic authentification mechanism for example
         if ($request->hasSession()) {
             $request->getSession()->set('_security.target_path', $request->getUri());
         }

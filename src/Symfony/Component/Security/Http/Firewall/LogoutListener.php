@@ -27,11 +27,11 @@ use Symfony\Component\HttpFoundation\RedirectResponse;
  */
 class LogoutListener implements ListenerInterface
 {
-    protected $securityContext;
-    protected $logoutPath;
-    protected $targetUrl;
-    protected $handlers;
-    protected $successHandler;
+    private $securityContext;
+    private $logoutPath;
+    private $targetUrl;
+    private $handlers;
+    private $successHandler;
 
     /**
      * Constructor

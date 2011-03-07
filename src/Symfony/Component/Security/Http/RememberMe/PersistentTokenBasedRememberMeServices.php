@@ -30,7 +30,7 @@ use Symfony\Component\Security\Core\Authentication\Token\RememberMeToken;
  */
 class PersistentTokenBasedRememberMeServices extends RememberMeServices
 {
-    protected $tokenProvider;
+    private $tokenProvider;
 
     /**
      * Sets the token provider
@@ -41,6 +41,21 @@ class PersistentTokenBasedRememberMeServices extends RememberMeServices
     public function setTokenProvider(TokenProviderInterface $tokenProvider)
     {
         $this->tokenProvider = $tokenProvider;
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    public function logout(Request $request, Response $response, TokenInterface $token)
+    {
+        parent::logout($request, $response, $token);
+
+        if (null !== ($cookie = $request->cookies->get($this->options['name']))
+            && count($parts = $this->decodeCookie($cookie)) === 2
+        ) {
+            list($series, $tokenValue) = $parts;
+            $this->tokenProvider->deleteTokenBySeries($series);
+        }
     }
 
     /**
@@ -66,10 +81,8 @@ class PersistentTokenBasedRememberMeServices extends RememberMeServices
         }
 
         $user = $this->getUserProvider($persistentToken->getClass())->loadUserByUsername($persistentToken->getUsername());
-        $authenticationToken = new RememberMeToken($user, $this->providerKey, $this->key);
-        $authenticationToken->setPersistentToken($persistentToken);
 
-        return $authenticationToken;
+        return new RememberMeToken($user, $this->providerKey, $this->key, $persistentToken);
     }
 
     /**
@@ -112,21 +125,6 @@ class PersistentTokenBasedRememberMeServices extends RememberMeServices
                 $this->options['httponly']
             )
         );
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    public function logout(Request $request, Response $response, TokenInterface $token)
-    {
-        parent::logout($request, $response, $token);
-
-        if (null !== ($cookie = $request->cookies->get($this->options['name']))
-            && count($parts = $this->decodeCookie($cookie)) === 2
-        ) {
-            list($series, $tokenValue) = $parts;
-            $this->tokenProvider->deleteTokenBySeries($series);
-        }
     }
 
     /**

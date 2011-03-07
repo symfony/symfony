@@ -34,7 +34,7 @@ use Symfony\Component\Security\Acl\Model\SecurityIdentityInterface;
  */
 class MutableAclProvider extends AclProvider implements MutableAclProviderInterface, PropertyChangedListener
 {
-    protected $propertyChanges;
+    private $propertyChanges;
 
     /**
      * {@inheritDoc}
@@ -726,7 +726,7 @@ QUERY;
      * @param AclInterface $acl
      * @return void
      */
-    protected function regenerateAncestorRelations(AclInterface $acl)
+    private function regenerateAncestorRelations(AclInterface $acl)
     {
         $pk = $acl->getId();
         $this->connection->executeQuery($this->getDeleteObjectIdentityRelationsSql($pk));
@@ -747,7 +747,7 @@ QUERY;
      * @param array $changes
      * @return void
      */
-    protected function updateFieldAceProperty($name, array $changes)
+    private function updateFieldAceProperty($name, array $changes)
     {
         $sids = new \SplObjectStorage();
         $classIds = new \SplObjectStorage();
@@ -804,7 +804,7 @@ QUERY;
      * @param array $changes
      * @return void
      */
-    protected function updateAceProperty($name, array $changes)
+    private function updateAceProperty($name, array $changes)
     {
         list($old, $new) = $changes;
 
@@ -858,7 +858,7 @@ QUERY;
      * @param \SplObjectStorage $aces
      * @return void
      */
-    protected function updateAces(\SplObjectStorage $aces)
+    private function updateAces(\SplObjectStorage $aces)
     {
         foreach ($aces as $ace) {
             $propertyChanges = $aces->offsetGet($ace);

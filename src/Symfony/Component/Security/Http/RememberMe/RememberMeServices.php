@@ -2,7 +2,7 @@
 
 namespace Symfony\Component\Security\Http\RememberMe;
 
-use Symfony\Component\Security\Core\User\AccountInterface;
+use Symfony\Component\Security\Core\User\UserInterface;
 use Symfony\Component\Security\Core\Authentication\Token\RememberMeToken;
 use Symfony\Component\Security\Http\Logout\LogoutHandlerInterface;
 use Symfony\Component\Security\Core\Authentication\Token\TokenInterface;
@@ -30,11 +30,11 @@ abstract class RememberMeServices implements RememberMeServicesInterface, Logout
 {
     const COOKIE_DELIMITER = ':';
 
-    protected $userProviders;
     protected $options;
     protected $logger;
-    protected $key;
     protected $providerKey;
+    protected $key;
+    private $userProviders;
 
     /**
      * Constructor
@@ -80,7 +80,7 @@ abstract class RememberMeServices implements RememberMeServicesInterface, Logout
      * @param Request $request
      * @return TokenInterface
      */
-    public function autoLogin(Request $request)
+    public final function autoLogin(Request $request)
     {
         if (null === $cookie = $request->cookies->get($this->options['name'])) {
             return;
@@ -139,12 +139,12 @@ abstract class RememberMeServices implements RememberMeServicesInterface, Logout
      * @param TokenInterface $token The token that resulted in a successful authentication
      * @return void
      */
-    public function loginSuccess(Request $request, Response $response, TokenInterface $token)
+    public final function loginSuccess(Request $request, Response $response, TokenInterface $token)
     {
         if (!$token instanceof RememberMeToken) {
-            if (!$token->getUser() instanceof AccountInterface) {
+            if (!$token->getUser() instanceof UserInterface) {
                 if (null !== $this->logger) {
-                    $this->logger->debug('Remember-me ignores token since it does not contain an AccountInterface implementation.');
+                    $this->logger->debug('Remember-me ignores token since it does not contain an UserInterface implementation.');
                 }
 
                 return;

@@ -12,8 +12,8 @@ use Symfony\Component\Security\Http\Firewall\ExceptionListener;
  */
 class FirewallContext
 {
-    protected $listeners;
-    protected $exceptionListener;
+    private $listeners;
+    private $exceptionListener;
 
     public function __construct(array $listeners, ExceptionListener $exceptionListener = null)
     {

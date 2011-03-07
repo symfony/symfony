@@ -35,8 +35,8 @@ use Symfony\Component\Security\Core\Authentication\Token\TokenInterface;
  * Subclasses likely have to implement the following:
  * - an TokenInterface to hold authentication related data
  * - an AuthenticationProvider to perform the actual authentication of the
- *   token, retrieve the AccountInterface implementation from a database, and
- *   perform the specific account checks using the AccountChecker
+ *   token, retrieve the UserInterface implementation from a database, and
+ *   perform the specific account checks using the UserChecker
  *
  * By default, this listener only is active for a specific path, e.g.
  * /login_check. If you want to change this behavior, you can overwrite the
@@ -47,16 +47,16 @@ use Symfony\Component\Security\Core\Authentication\Token\TokenInterface;
  */
 abstract class AbstractAuthenticationListener implements ListenerInterface
 {
-    protected $securityContext;
-    protected $authenticationManager;
-    protected $sessionStrategy;
-    protected $providerKey;
-    protected $eventDispatcher;
     protected $options;
-    protected $successHandler;
-    protected $failureHandler;
     protected $logger;
-    protected $rememberMeServices;
+    private $securityContext;
+    private $authenticationManager;
+    private $sessionStrategy;
+    private $providerKey;
+    private $eventDispatcher;
+    private $successHandler;
+    private $failureHandler;
+    private $rememberMeServices;
 
     /**
      * Constructor.
@@ -173,7 +173,18 @@ abstract class AbstractAuthenticationListener implements ListenerInterface
         return $this->options['check_path'] === $request->getPathInfo();
     }
 
-    protected function onFailure($event, Request $request, AuthenticationException $failed)
+    /**
+     * Performs authentication.
+     *
+     * @param  Request $request A Request instance
+     *
+     * @return TokenInterface The authenticated token, or null if full authentication is not possible
+     *
+     * @throws AuthenticationException if the authentication fails
+     */
+    abstract protected function attemptAuthentication(Request $request);
+
+    private function onFailure($event, Request $request, AuthenticationException $failed)
     {
         if (null !== $this->logger) {
             $this->logger->debug(sprintf('Authentication request failed: %s', $failed->getMessage()));
@@ -209,7 +220,7 @@ abstract class AbstractAuthenticationListener implements ListenerInterface
         return new RedirectResponse(0 !== strpos($this->options['failure_path'], 'http') ? $request->getUriForPath($this->options['failure_path']) : $this->options['failure_path'], 302);
     }
 
-    protected function onSuccess(EventInterface $event, Request $request, TokenInterface $token)
+    private function onSuccess(EventInterface $event, Request $request, TokenInterface $token)
     {
         if (null !== $this->logger) {
             $this->logger->debug('User has been authenticated successfully');
@@ -246,7 +257,7 @@ abstract class AbstractAuthenticationListener implements ListenerInterface
      *
      * @return string
      */
-    protected function determineTargetUrl(Request $request)
+    private function determineTargetUrl(Request $request)
     {
         if ($this->options['always_use_default_target_path']) {
             return $this->options['default_target_path'];
@@ -269,15 +280,4 @@ abstract class AbstractAuthenticationListener implements ListenerInterface
 
         return $this->options['default_target_path'];
     }
-
-    /**
-     * Performs authentication.
-     *
-     * @param  Request $request A Request instance
-     *
-     * @return TokenInterface The authenticated token, or null if full authentication is not possible
-     *
-     * @throws AuthenticationException if the authentication fails
-     */
-    abstract protected function attemptAuthentication(Request $request);
 }

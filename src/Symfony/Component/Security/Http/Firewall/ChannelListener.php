@@ -25,9 +25,9 @@ use Symfony\Component\EventDispatcher\EventInterface;
  */
 class ChannelListener implements ListenerInterface
 {
-    protected $map;
-    protected $authenticationEntryPoint;
-    protected $logger;
+    private $map;
+    private $authenticationEntryPoint;
+    private $logger;
 
     public function __construct(AccessMap $map, AuthenticationEntryPointInterface $authenticationEntryPoint, LoggerInterface $logger = null)
     {

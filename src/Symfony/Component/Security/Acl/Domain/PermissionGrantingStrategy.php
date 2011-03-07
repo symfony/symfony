@@ -30,8 +30,8 @@ class PermissionGrantingStrategy implements PermissionGrantingStrategyInterface
     const ALL   = 'all';
     const ANY   = 'any';
 
-    protected static $noAceException;
-    protected $auditLogger;
+    private static $noAceException;
+    private $auditLogger;
 
     public function __construct()
     {
@@ -49,16 +49,6 @@ class PermissionGrantingStrategy implements PermissionGrantingStrategyInterface
     public function setAuditLogger(AuditLoggerInterface $auditLogger)
     {
         $this->auditLogger = $auditLogger;
-    }
-
-    /**
-     * Returns the audit logger
-     *
-     * @return AuditLoggerInterface
-     */
-    public function getAuditLogger()
-    {
-        return $this->auditLogger;
     }
 
     /**
@@ -153,7 +143,7 @@ class PermissionGrantingStrategy implements PermissionGrantingStrategyInterface
      * @param Boolean $administrativeMode true turns off audit logging
      * @return Boolean true, or false; either granting, or denying access respectively.
      */
-    protected function hasSufficientPermissions(AclInterface $acl, array $aces, array $masks, array $sids, $administrativeMode)
+    private function hasSufficientPermissions(AclInterface $acl, array $aces, array $masks, array $sids, $administrativeMode)
     {
         $firstRejectedAce  = null;
 
@@ -211,7 +201,7 @@ class PermissionGrantingStrategy implements PermissionGrantingStrategyInterface
      * @param EntryInterface $ace
      * @return Boolean
      */
-    protected function isAceApplicable($requiredMask, EntryInterface $ace)
+    private function isAceApplicable($requiredMask, EntryInterface $ace)
     {
         $strategy = $ace->getStrategy();
         if (self::ALL === $strategy) {

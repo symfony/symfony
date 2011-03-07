@@ -12,7 +12,7 @@
 namespace Symfony\Component\Security\Core\User;
 
 use Doctrine\ORM\EntityManager;
-use Symfony\Component\Security\Core\Exception\UnsupportedAccountException;
+use Symfony\Component\Security\Core\Exception\UnsupportedUserException;
 use Symfony\Component\Security\Core\Exception\UsernameNotFoundException;
 
 /**
@@ -25,9 +25,9 @@ use Symfony\Component\Security\Core\Exception\UsernameNotFoundException;
  */
 class EntityUserProvider implements UserProviderInterface
 {
-    protected $class;
-    protected $repository;
-    protected $property;
+    private $class;
+    private $repository;
+    private $property;
 
     public function __construct(EntityManager $em, $class, $property = null)
     {
@@ -66,13 +66,13 @@ class EntityUserProvider implements UserProviderInterface
     /**
      * {@inheritDoc}
      */
-    public function loadUserByAccount(AccountInterface $account)
+    public function loadUser(UserInterface $user)
     {
-        if (!$account instanceof $this->class) {
-            throw new UnsupportedAccountException(sprintf('Instances of "%s" are not supported.', get_class($account)));
+        if (!$user instanceof $this->class) {
+            throw new UnsupportedUserException(sprintf('Instances of "%s" are not supported.', get_class($user)));
         }
 
-        return $this->loadUserByUsername($account->getUsername());
+        return $this->loadUserByUsername($user->getUsername());
     }
 
     /**

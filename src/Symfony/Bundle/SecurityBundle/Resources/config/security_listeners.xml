@@ -137,14 +137,14 @@
         
         <service id="security.authentication.provider.dao" class="%security.authentication.provider.dao.class%" abstract="true" public="false">
             <argument /> <!-- User Provider -->
-            <argument type="service" id="security.account_checker" />
+            <argument type="service" id="security.user_checker" />
             <argument /> <!-- Provider-shared Key -->
             <argument type="service" id="security.encoder_factory" />
         </service>
         
         <service id="security.authentication.provider.pre_authenticated" class="%security.authentication.provider.pre_authenticated.class%" abstract="true" public="false">
             <argument /> <!-- User Provider -->
-            <argument type="service" id="security.account_checker" />
+            <argument type="service" id="security.user_checker" />
         </service>
         
         <service id="security.exception_listener" class="%security.exception_listener.class%" public="false" abstract="true">
@@ -159,7 +159,7 @@
         <service id="security.authentication.switchuser_listener" class="%security.authentication.switchuser_listener.class%" public="false" abstract="true">
             <argument type="service" id="security.context" />
             <argument /> <!-- User Provider -->
-            <argument type="service" id="security.account_checker" />
+            <argument type="service" id="security.user_checker" />
             <argument /> <!--  Provider Key -->
             <argument type="service" id="security.access.decision_manager" />
             <argument type="service" id="logger" on-invalid="null" />

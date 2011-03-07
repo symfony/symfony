@@ -11,7 +11,7 @@
 
 namespace Symfony\Component\Security\Core\Encoder;
 
-use Symfony\Component\Security\Core\User\AccountInterface;
+use Symfony\Component\Security\Core\User\UserInterface;
 
 /**
  * EncoderFactoryInterface to support different encoders for different accounts.
@@ -23,8 +23,8 @@ interface EncoderFactoryInterface
     /**
      * Returns the password encoder to use for the given account
      *
-     * @param AccountInterface $account
+     * @param UserInterface $user
      * @return PasswordEncoderInterface never null
      */
-    function getEncoder(AccountInterface $account);
+    function getEncoder(UserInterface $user);
 }

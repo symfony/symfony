@@ -30,7 +30,7 @@ use Symfony\Component\Security\Core\SecurityContextInterface;
  */
 class UsernamePasswordFormAuthenticationListener extends AbstractAuthenticationListener
 {
-    protected $csrfProvider;
+    private $csrfProvider;
 
     /**
      * {@inheritdoc}

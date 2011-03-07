@@ -12,44 +12,48 @@
 namespace Symfony\Component\Security\Core\Authentication\Token;
 
 use Symfony\Component\Security\Core\Authentication\RememberMe\PersistentTokenInterface;
-use Symfony\Component\Security\Core\User\AccountInterface;
+use Symfony\Component\Security\Core\User\UserInterface;
 
 /**
- * Base class for "Remember Me" tokens
+ * Authentication Token for "Remember-Me".
  *
  * @author Johannes M. Schmitt <schmittjoh@gmail.com>
  */
-class RememberMeToken extends Token
+class RememberMeToken extends AbstractToken
 {
-    protected $key;
-
-    /**
-     * The persistent token which resulted in this authentication token.
-     *
-     * @var PersistentTokenInterface
-     */
-    protected $persistentToken;
+    private $key;
+    private $providerKey;
+    private $persistentToken;
 
     /**
      * Constructor.
      *
-     * @param string $username
+     * @param UserInterface $user
+     * @param string $providerKey
      * @param string $key
      */
-    public function __construct(AccountInterface $user, $providerKey, $key) {
+    public function __construct(UserInterface $user, $providerKey, $key, PersistentTokenInterface $persistentToken = null) {
         parent::__construct($user->getRoles());
 
         if (empty($key)) {
             throw new \InvalidArgumentException('$key must not be empty.');
         }
+
         if (empty($providerKey)) {
             throw new \InvalidArgumentException('$providerKey must not be empty.');
         }
 
-        $this->setUser($user);
         $this->providerKey = $providerKey;
         $this->key = $key;
+        $this->persistentToken = $persistentToken;
+
+        $this->setUser($user);
         $this->setAuthenticated(true);
+    }
+
+    public function getProviderKey()
+    {
+        return $this->providerKey;
     }
 
     public function getKey()
@@ -62,18 +66,21 @@ class RememberMeToken extends Token
         return $this->persistentToken;
     }
 
-    public function setPersistentToken(PersistentTokenInterface $persistentToken)
+    public function getCredentials()
     {
-        $this->persistentToken = $persistentToken;
+        return '';
     }
-
 
     /**
      * {@inheritdoc}
      */
     public function serialize()
     {
-        return serialize(array($this->user, $this->credentials, $this->authenticated, $this->roles, $this->immutable, $this->providerKey, $this->attributes, $this->key));
+        return serialize(array(
+            $this->key,
+            $this->providerKey,
+            parent::serialize(),
+        ));
     }
 
     /**
@@ -81,6 +88,7 @@ class RememberMeToken extends Token
      */
     public function unserialize($serialized)
     {
-        list($this->user, $this->credentials, $this->authenticated, $this->roles, $this->immutable, $this->providerKey, $this->attributes, $this->key) = unserialize($serialized);
+        list($this->key, $this->providerKey, $parentStr) = unserialize($serialized);
+        parent::unserialize($parentStr);
     }
 }

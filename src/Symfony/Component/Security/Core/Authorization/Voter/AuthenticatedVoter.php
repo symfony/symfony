@@ -29,7 +29,7 @@ class AuthenticatedVoter implements VoterInterface
     const IS_AUTHENTICATED_REMEMBERED = 'IS_AUTHENTICATED_REMEMBERED';
     const IS_AUTHENTICATED_ANONYMOUSLY = 'IS_AUTHENTICATED_ANONYMOUSLY';
 
-    protected $authenticationTrustResolver;
+    private $authenticationTrustResolver;
 
     /**
      * Constructor.

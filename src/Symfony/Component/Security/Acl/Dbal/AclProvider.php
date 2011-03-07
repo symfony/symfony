@@ -43,7 +43,7 @@ class AclProvider implements AclProviderInterface
     protected $loadedAces;
     protected $loadedAcls;
     protected $options;
-    protected $permissionGrantingStrategy;
+    private $permissionGrantingStrategy;
 
     /**
      * Constructor
@@ -201,12 +201,163 @@ class AclProvider implements AclProviderInterface
     }
 
     /**
+     * Constructs the query used for looking up object identities and associated
+     * ACEs, and security identities.
+     *
+     * @param array $batch
+     * @param array $sids
+     * @throws AclNotFoundException
+     * @return string
+     */
+    protected function getLookupSql(array $batch, array $sids)
+    {
+        // FIXME: add support for filtering by sids (right now we select all sids)
+
+        $ancestorIds = $this->getAncestorIds($batch);
+        if (0 === count($ancestorIds)) {
+            throw new AclNotFoundException('There is no ACL for the given object identity.');
+        }
+
+        $sql = <<<SELECTCLAUSE
+            SELECT
+                o.id as acl_id,
+                o.object_identifier,
+                o.parent_object_identity_id,
+                o.entries_inheriting,
+                c.class_type,
+                e.id as ace_id,
+                e.object_identity_id,
+                e.field_name,
+                e.ace_order,
+                e.mask,
+                e.granting,
+                e.granting_strategy,
+                e.audit_success,
+                e.audit_failure,
+                s.username,
+                s.identifier as security_identifier
+            FROM
+                {$this->options['oid_table_name']} o
+            INNER JOIN {$this->options['class_table_name']} c ON c.id = o.class_id
+            LEFT JOIN {$this->options['entry_table_name']} e ON (
+                e.class_id = o.class_id AND (e.object_identity_id = o.id OR {$this->connection->getDatabasePlatform()->getIsNullExpression('e.object_identity_id')})
+            )
+            LEFT JOIN {$this->options['sid_table_name']} s ON (
+                s.id = e.security_identity_id
+            )
+
+            WHERE (o.id =
+SELECTCLAUSE;
+
+        $sql .= implode(' OR o.id = ', $ancestorIds).')';
+
+        return $sql;
+    }
+
+    protected function getAncestorLookupSql(array $batch)
+    {
+        $sql = <<<SELECTCLAUSE
+            SELECT a.ancestor_id
+            FROM acl_object_identities o
+            INNER JOIN acl_classes c ON c.id = o.class_id
+            INNER JOIN acl_object_identity_ancestors a ON a.object_identity_id = o.id
+               WHERE (
+SELECTCLAUSE;
+
+        $where = '(o.object_identifier = %s AND c.class_type = %s)';
+        for ($i=0,$c=count($batch); $i<$c; $i++) {
+            $sql .= sprintf(
+                $where,
+                $this->connection->quote($batch[$i]->getIdentifier()),
+                $this->connection->quote($batch[$i]->getType())
+            );
+
+            if ($i+1 < $c) {
+                $sql .= ' OR ';
+            }
+        }
+
+        $sql .= ')';
+
+        return $sql;
+    }
+
+    /**
+     * Constructs the SQL for retrieving child object identities for the given
+     * object identities.
+     *
+     * @param ObjectIdentityInterface $oid
+     * @param Boolean $directChildrenOnly
+     * @return string
+     */
+    protected function getFindChildrenSql(ObjectIdentityInterface $oid, $directChildrenOnly)
+    {
+        if (false === $directChildrenOnly) {
+            $query = <<<FINDCHILDREN
+                SELECT o.object_identifier, c.class_type
+                FROM
+                    {$this->options['oid_table_name']} as o
+                INNER JOIN {$this->options['class_table_name']} as c ON c.id = o.class_id
+                INNER JOIN {$this->options['oid_ancestors_table_name']} as a ON a.object_identity_id = o.id
+                WHERE
+                    a.ancestor_id = %d AND a.object_identity_id != a.ancestor_id
+FINDCHILDREN;
+        } else {
+            $query = <<<FINDCHILDREN
+                SELECT o.object_identifier, c.class_type
+                FROM {$this->options['oid_table_name']} as o
+                INNER JOIN {$this->options['class_table_name']} as c ON c.id = o.class_id
+                WHERE o.parent_object_identity_id = %d
+FINDCHILDREN;
+        }
+
+        return sprintf($query, $this->retrieveObjectIdentityPrimaryKey($oid));
+    }
+
+    /**
+     * Constructs the SQL for retrieving the primary key of the given object
+     * identity.
+     *
+     * @param ObjectIdentityInterface $oid
+     * @return string
+     */
+    protected function getSelectObjectIdentityIdSql(ObjectIdentityInterface $oid)
+    {
+        $query = <<<QUERY
+            SELECT o.id
+            FROM %s o
+            INNER JOIN %s c ON c.id = o.class_id
+            WHERE o.object_identifier = %s AND c.class_type = %s
+            LIMIT 1
+QUERY;
+
+        return sprintf(
+            $query,
+            $this->options['oid_table_name'],
+            $this->options['class_table_name'],
+            $this->connection->quote($oid->getIdentifier()),
+            $this->connection->quote($oid->getType())
+        );
+    }
+
+    /**
+     * Returns the primary key of the passed object identity.
+     *
+     * @param ObjectIdentityInterface $oid
+     * @return integer
+     */
+    protected function retrieveObjectIdentityPrimaryKey(ObjectIdentityInterface $oid)
+    {
+        return $this->connection->executeQuery($this->getSelectObjectIdentityIdSql($oid))->fetchColumn();
+    }
+
+    /**
      * This method is called when an ACL instance is retrieved from the cache.
      *
      * @param AclInterface $acl
      * @return void
      */
-    protected function updateAceIdentityMap(AclInterface $acl)
+    private function updateAceIdentityMap(AclInterface $acl)
     {
         foreach (array('classAces', 'classFieldAces', 'objectAces', 'objectFieldAces') as $property) {
             $reflection = new \ReflectionProperty($acl, $property);
@@ -227,13 +378,34 @@ class AclProvider implements AclProviderInterface
     }
 
     /**
+     * Retrieves all the ids which need to be queried from the database
+     * including the ids of parent ACLs.
+     *
+     * @param array $batch
+     * @return array
+     */
+    private function getAncestorIds(array $batch)
+    {
+        $sql = $this->getAncestorLookupSql($batch);
+
+        $ancestorIds = array();
+        foreach ($this->connection->executeQuery($sql)->fetchAll() as $data) {
+            // FIXME: skip ancestors which are cached
+
+            $ancestorIds[] = $data['ancestor_id'];
+        }
+
+        return $ancestorIds;
+    }
+
+    /**
      * Does either overwrite the passed ACE, or saves it in the global identity
      * map to ensure every ACE only gets instantiated once.
      *
      * @param array $aces
      * @return void
      */
-    protected function doUpdateAceIdentityMap(array &$aces)
+    private function doUpdateAceIdentityMap(array &$aces)
     {
         foreach ($aces as $index => $ace) {
             if (isset($this->loadedAces[$ace->getId()])) {
@@ -254,7 +426,7 @@ class AclProvider implements AclProviderInterface
      *
      * @return \SplObjectStorage mapping object identities to ACL instances
      */
-    protected function lookupObjectIdentities(array $batch, array $sids, array $oidLookup)
+    private function lookupObjectIdentities(array $batch, array $sids, array $oidLookup)
     {
         $sql = $this->getLookupSql($batch, $sids);
         $stmt = $this->connection->executeQuery($sql);
@@ -277,7 +449,7 @@ class AclProvider implements AclProviderInterface
      * @throws \RuntimeException
      * @return \SplObjectStorage
      */
-    protected function hydrateObjectIdentities(Statement $stmt, array $oidLookup, array $sids) {
+    private function hydrateObjectIdentities(Statement $stmt, array $oidLookup, array $sids) {
         $parentIdToFill = new \SplObjectStorage();
         $acls = $aces = $emptyArray = array();
         $oidCache = $oidLookup;
@@ -463,170 +635,5 @@ class AclProvider implements AclProviderInterface
         }
 
         return $result;
-    }
-
-    /**
-     * Constructs the query used for looking up object identities and associated
-     * ACEs, and security identities.
-     *
-     * @param array $batch
-     * @param array $sids
-     * @throws AclNotFoundException
-     * @return string
-     */
-    protected function getLookupSql(array $batch, array $sids)
-    {
-        // FIXME: add support for filtering by sids (right now we select all sids)
-
-        $ancestorIds = $this->getAncestorIds($batch);
-        if (0 === count($ancestorIds)) {
-            throw new AclNotFoundException('There is no ACL for the given object identity.');
-        }
-
-        $sql = <<<SELECTCLAUSE
-            SELECT
-                o.id as acl_id,
-                o.object_identifier,
-                o.parent_object_identity_id,
-                o.entries_inheriting,
-                c.class_type,
-                e.id as ace_id,
-                e.object_identity_id,
-                e.field_name,
-                e.ace_order,
-                e.mask,
-                e.granting,
-                e.granting_strategy,
-                e.audit_success,
-                e.audit_failure,
-                s.username,
-                s.identifier as security_identifier
-            FROM
-                {$this->options['oid_table_name']} o
-            INNER JOIN {$this->options['class_table_name']} c ON c.id = o.class_id
-            LEFT JOIN {$this->options['entry_table_name']} e ON (
-                e.class_id = o.class_id AND (e.object_identity_id = o.id OR {$this->connection->getDatabasePlatform()->getIsNullExpression('e.object_identity_id')})
-            )
-            LEFT JOIN {$this->options['sid_table_name']} s ON (
-                s.id = e.security_identity_id
-            )
-
-            WHERE (o.id =
-SELECTCLAUSE;
-
-        $sql .= implode(' OR o.id = ', $ancestorIds).')';
-
-        return $sql;
-    }
-
-    /**
-     * Retrieves all the ids which need to be queried from the database
-     * including the ids of parent ACLs.
-     *
-     * @param array $batch
-     * @return array
-     */
-    protected function getAncestorIds(array &$batch)
-    {
-        $sql = <<<SELECTCLAUSE
-            SELECT a.ancestor_id
-            FROM acl_object_identities o
-            INNER JOIN acl_classes c ON c.id = o.class_id
-            INNER JOIN acl_object_identity_ancestors a ON a.object_identity_id = o.id
-               WHERE (
-SELECTCLAUSE;
-
-        $where = '(o.object_identifier = %s AND c.class_type = %s)';
-        for ($i=0,$c=count($batch); $i<$c; $i++) {
-            $sql .= sprintf(
-                $where,
-                $this->connection->quote($batch[$i]->getIdentifier()),
-                $this->connection->quote($batch[$i]->getType())
-            );
-
-            if ($i+1 < $c) {
-                $sql .= ' OR ';
-            }
-        }
-
-        $sql .= ')';
-
-        $ancestorIds = array();
-        foreach ($this->connection->executeQuery($sql)->fetchAll() as $data) {
-            // FIXME: skip ancestors which are cached
-
-            $ancestorIds[] = $data['ancestor_id'];
-        }
-
-        return $ancestorIds;
-    }
-
-    /**
-     * Constructs the SQL for retrieving child object identities for the given
-     * object identities.
-     *
-     * @param ObjectIdentityInterface $oid
-     * @param Boolean $directChildrenOnly
-     * @return string
-     */
-    protected function getFindChildrenSql(ObjectIdentityInterface $oid, $directChildrenOnly)
-    {
-        if (false === $directChildrenOnly) {
-            $query = <<<FINDCHILDREN
-                SELECT o.object_identifier, c.class_type
-                FROM
-                    {$this->options['oid_table_name']} as o
-                INNER JOIN {$this->options['class_table_name']} as c ON c.id = o.class_id
-                INNER JOIN {$this->options['oid_ancestors_table_name']} as a ON a.object_identity_id = o.id
-                WHERE
-                    a.ancestor_id = %d AND a.object_identity_id != a.ancestor_id
-FINDCHILDREN;
-        } else {
-            $query = <<<FINDCHILDREN
-                SELECT o.object_identifier, c.class_type
-                FROM {$this->options['oid_table_name']} as o
-                INNER JOIN {$this->options['class_table_name']} as c ON c.id = o.class_id
-                WHERE o.parent_object_identity_id = %d
-FINDCHILDREN;
-        }
-
-        return sprintf($query, $this->retrieveObjectIdentityPrimaryKey($oid));
-    }
-
-    /**
-     * Constructs the SQL for retrieving the primary key of the given object
-     * identity.
-     *
-     * @param ObjectIdentityInterface $oid
-     * @return string
-     */
-    protected function getSelectObjectIdentityIdSql(ObjectIdentityInterface $oid)
-    {
-        $query = <<<QUERY
-            SELECT o.id
-            FROM %s o
-            INNER JOIN %s c ON c.id = o.class_id
-            WHERE o.object_identifier = %s AND c.class_type = %s
-            LIMIT 1
-QUERY;
-
-        return sprintf(
-            $query,
-            $this->options['oid_table_name'],
-            $this->options['class_table_name'],
-            $this->connection->quote($oid->getIdentifier()),
-            $this->connection->quote($oid->getType())
-        );
-    }
-
-    /**
-     * Returns the primary key of the passed object identity.
-     *
-     * @param ObjectIdentityInterface $oid
-     * @return integer
-     */
-    protected function retrieveObjectIdentityPrimaryKey(ObjectIdentityInterface $oid)
-    {
-        return $this->connection->executeQuery($this->getSelectObjectIdentityIdSql($oid))->fetchColumn();
     }
 }

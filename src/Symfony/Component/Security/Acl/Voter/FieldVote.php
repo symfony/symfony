@@ -19,8 +19,8 @@ namespace Symfony\Component\Security\Acl\Voter;
  */
 class FieldVote
 {
-    protected $domainObject;
-    protected $field;
+    private $domainObject;
+    private $field;
 
     public function __construct($domainObject, $field)
     {

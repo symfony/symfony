@@ -30,11 +30,11 @@ use Symfony\Component\HttpFoundation\Request;
  */
 abstract class AbstractPreAuthenticatedListener implements ListenerInterface
 {
-    protected $securityContext;
-    protected $authenticationManager;
-    protected $providerKey;
     protected $logger;
-    protected $eventDispatcher;
+    private $securityContext;
+    private $authenticationManager;
+    private $providerKey;
+    private $eventDispatcher;
 
     public function __construct(SecurityContextInterface $securityContext, AuthenticationManagerInterface $authenticationManager, $providerKey, LoggerInterface $logger = null)
     {
@@ -80,11 +80,7 @@ abstract class AbstractPreAuthenticatedListener implements ListenerInterface
         list($user, $credentials) = $this->getPreAuthenticatedData($request);
 
         if (null !== $token = $this->securityContext->getToken()) {
-            if ($token->isImmutable()) {
-                return;
-            }
-
-            if ($token instanceof PreAuthenticatedToken && $token->isAuthenticated() && (string) $token === $user) {
+            if ($token instanceof PreAuthenticatedToken && $token->isAuthenticated() && $token->getUsername() === $user) {
                 return;
             }
         }

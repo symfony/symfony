@@ -31,6 +31,7 @@ class Configuration
             ->scalarNode('exception_controller')->end()
             ->scalarNode('ide')->end()
             ->booleanNode('test')->end()
+            ->booleanNode('compile_classes')->defaultValue(!$kernelDebug)->end()
         ;
 
         $this->addCsrfProtectionSection($rootNode);

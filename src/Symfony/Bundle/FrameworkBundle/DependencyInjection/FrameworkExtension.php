@@ -97,6 +97,8 @@ class FrameworkExtension extends Extension
             $config['session']['storage_id'] = 'array';
         }
 
+        $container->setParameter('kernel.compile_classes', $config['compile_classes']);
+
         if (isset($config['csrf_protection'])) {
             $this->registerCsrfProtectionConfiguration($config['csrf_protection'], $container);
         }

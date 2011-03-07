@@ -42,13 +42,15 @@ class FrameworkBundle extends Bundle
     public function boot()
     {
         // load core classes
-        ClassCollectionLoader::load(
-            $this->container->getParameter('kernel.compiled_classes'),
-            $this->container->getParameter('kernel.cache_dir'),
-            'classes',
-            $this->container->getParameter('kernel.debug'),
-            true
-        );
+        if ($this->container->getParameter('kernel.compile_classes')) {
+            ClassCollectionLoader::load(
+                $this->container->getParameter('kernel.compiled_classes'),
+                $this->container->getParameter('kernel.cache_dir'),
+                'classes',
+                $this->container->getParameter('kernel.debug'),
+                true
+            );
+        }
 
         if ($this->container->has('error_handler')) {
             $this->container->get('error_handler');

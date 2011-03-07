@@ -669,6 +669,7 @@ class StubIntlDateFormatterTest extends LocaleTestCase
      */
     public function testParseDifferenciesIntl($pattern, $value, $stubExpected, $intlExpected)
     {
+        $this->skipIfIntlExtensionIsNotLoaded();
         $formatter = $this->createIntlFormatter($pattern);
         $this->assertSame($intlExpected, $formatter->parse($value));
     }

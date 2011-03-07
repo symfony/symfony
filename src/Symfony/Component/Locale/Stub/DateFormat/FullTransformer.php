@@ -261,17 +261,17 @@ class FullTransformer
      */
     protected function calculateUnixTimestamp(\DateTime $dateTime, array $options)
     {
-        $datetime = $this->extractDateTime($options);
+        $options = $this->getDefaultValueForOptions($options);
 
-        $year         = $datetime['year'];
-        $month        = $datetime['month'];
-        $day          = $datetime['day'];
-        $hour         = $datetime['hour'];
-        $hourInstance = $datetime['hourInstance'];
-        $minute       = $datetime['minute'];
-        $second       = $datetime['second'];
-        $marker       = $datetime['marker'];
-        $timezone     = $datetime['timezone'];
+        $year         = $options['year'];
+        $month        = $options['month'];
+        $day          = $options['day'];
+        $hour         = $options['hour'];
+        $hourInstance = $options['hourInstance'];
+        $minute       = $options['minute'];
+        $second       = $options['second'];
+        $marker       = $options['marker'];
+        $timezone     = $options['timezone'];
 
         // If month is false, return immediately (intl behavior)
         if (false === $month) {
@@ -295,24 +295,24 @@ class FullTransformer
     }
 
     /**
-     * Extract date time data from an array and returns an associative array with sensible
-     * default values for the timestamp calculation of calculateUnixTimestamp()
+     * Add sensible default values for missing items in the extracted date/time options array. The values
+     * are base in the beggining of the Unix era
      *
-     * @param  array  $datetime
+     * @param  array  $options
      * @return array
      */
-    private function extractDateTime(array $datetime)
+    private function getDefaultValueForOptions(array $options)
     {
         return array(
-            'year'         => isset($datetime['year']) ? $datetime['year'] : 1970,
-            'month'        => isset($datetime['month']) ? $datetime['month'] : 1,
-            'day'          => isset($datetime['day']) ? $datetime['day'] : 1,
-            'hour'         => isset($datetime['hour']) ? $datetime['hour'] : 0,
-            'hourInstance' => isset($datetime['hourInstance']) ? $datetime['hourInstance'] : null,
-            'minute'       => isset($datetime['minute']) ? $datetime['minute'] : 0,
-            'second'       => isset($datetime['second']) ? $datetime['second'] : 0,
-            'marker'       => isset($datetime['marker']) ? $datetime['marker'] : null,
-            'timezone'     => isset($datetime['timezone']) ? $datetime['timezone'] : null,
+            'year'         => isset($options['year']) ? $options['year'] : 1970,
+            'month'        => isset($options['month']) ? $options['month'] : 1,
+            'day'          => isset($options['day']) ? $options['day'] : 1,
+            'hour'         => isset($options['hour']) ? $options['hour'] : 0,
+            'hourInstance' => isset($options['hourInstance']) ? $options['hourInstance'] : null,
+            'minute'       => isset($options['minute']) ? $options['minute'] : 0,
+            'second'       => isset($options['second']) ? $options['second'] : 0,
+            'marker'       => isset($options['marker']) ? $options['marker'] : null,
+            'timezone'     => isset($options['timezone']) ? $options['timezone'] : null,
         );
     }
 }

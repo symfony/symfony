@@ -31,8 +31,10 @@ class Hour2400Transformer extends HourTransformer
      */
     public function getMktimeHour($hour, $marker = null)
     {
-        if (null !== $marker) {
+        if ('AM' == $marker) {
             $hour = 0;
+        } else if ('PM' == $marker) {
+            $hour = 12;
         }
 
         return $hour;

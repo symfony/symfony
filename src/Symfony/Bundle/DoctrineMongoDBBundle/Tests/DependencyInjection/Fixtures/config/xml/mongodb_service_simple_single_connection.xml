@@ -1,10 +1,10 @@
 <?xml version="1.0" ?>
 
-<container xmlns="http://www.symfony-project.org/schema/dic/services"
+<container xmlns="http://symfony.com/schema/dic/services"
     xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-    xmlns:doctrine="http://www.symfony-project.org/schema/dic/doctrine/odm/mongodb"
-    xsi:schemaLocation="http://www.symfony-project.org/schema/dic/services http://www.symfony-project.org/schema/dic/services/services-1.0.xsd
-                        http://www.symfony-project.org/schema/dic/doctrine/odm/mongodb http://www.symfony-project.org/schema/dic/doctrine/odm/mongodb/mongodb-1.0.xsd">
+    xmlns:doctrine="http://symfony.com/schema/dic/doctrine/odm/mongodb"
+    xsi:schemaLocation="http://symfony.com/schema/dic/services http://symfony.com/schema/dic/services/services-1.0.xsd
+                        http://symfony.com/schema/dic/doctrine/odm/mongodb http://symfony.com/schema/dic/doctrine/odm/mongodb/mongodb-1.0.xsd">
 
     <doctrine:mongodb server="mongodb://localhost:27017" default_database="mydb">
         <metadata-cache-driver type="memcache">

@@ -3,13 +3,13 @@
 /*
  * This file is part of the Symfony framework.
  *
- * (c) Fabien Potencier <fabien.potencier@symfony-project.com>
+ * (c) Fabien Potencier <fabien@symfony.com>
  *
  * This source file is subject to the MIT license that is bundled
  * with this source code in the file LICENSE.
  */
 
-namespace Symfony\Bundle\AsseticBundle\Factory;
+namespace Symfony\Bundle\AsseticBundle\Factory\Resource;
 
 use Assetic\Factory\Resource\DirectoryResource as BaseDirectoryResource;
 use Symfony\Component\Templating\Loader\LoaderInterface;
@@ -17,7 +17,7 @@ use Symfony\Component\Templating\Loader\LoaderInterface;
 /**
  * A directory resource that creates Symfony2 templating resources.
  *
- * @author Kris Wallsmith <kris.wallsmith@symfony-project.com>
+ * @author Kris Wallsmith <kris.wallsmith@symfony.com>
  */
 class DirectoryResource extends BaseDirectoryResource
 {

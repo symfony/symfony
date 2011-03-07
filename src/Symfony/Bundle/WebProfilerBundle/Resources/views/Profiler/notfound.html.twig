@@ -12,14 +12,17 @@
     </div>
 
     <table>
-        <tr><td class="menu">
-            {% render 'WebProfilerBundle:Profiler:searchBar' with { 'token': token } %}
+        <tr>
+            <td class="menu">
+                {% render 'WebProfilerBundle:Profiler:searchBar' with { 'token': token } %}
 
-            {% include 'WebProfilerBundle:Profiler:admin.html.twig' with { 'token': token } only %}
-        </td><td class="main">
-            <div class="content">
-                <h2>Token "{{ token }}" does not exist.</h2>
-            </div>
-        </td></tr>
+                {% include 'WebProfilerBundle:Profiler:admin.html.twig' with { 'token': token } only %}
+            </td>
+            <td class="main">
+                <div class="content">
+                    <h2>Token "{{ token }}" does not exist.</h2>
+                </div>
+            </td>
+        </tr>
     </table>
 {% endblock %}

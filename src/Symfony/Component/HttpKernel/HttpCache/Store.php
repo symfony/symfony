@@ -3,7 +3,7 @@
 /*
  * This file is part of the Symfony package.
  *
- * (c) Fabien Potencier <fabien.potencier@symfony-project.com>
+ * (c) Fabien Potencier <fabien@symfony.com>
  *
  * This code is partially based on the Rack-Cache library by Ryan Tomayko,
  * which is released under the MIT license.
@@ -21,7 +21,7 @@ use Symfony\Component\HttpFoundation\HeaderBag;
 /**
  * Store implements all the logic for storing cache metadata (Request and Response headers).
  *
- * @author Fabien Potencier <fabien.potencier@symfony-project.com>
+ * @author Fabien Potencier <fabien@symfony.com>
  */
 class Store implements StoreInterface
 {

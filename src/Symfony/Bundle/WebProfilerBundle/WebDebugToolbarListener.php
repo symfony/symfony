@@ -3,7 +3,7 @@
 /*
  * This file is part of the Symfony package.
  *
- * (c) Fabien Potencier <fabien.potencier@symfony-project.com>
+ * (c) Fabien Potencier <fabien@symfony.com>
  *
  * For the full copyright and license information, please view the LICENSE
  * file that was distributed with this source code.
@@ -26,7 +26,7 @@ use Symfony\Bundle\TwigBundle\TwigEngine;
  * The WDT is only injected on well-formed HTML (with a proper </body> tag).
  * This means that the WDT is never included in sub-requests or ESI requests.
  *
- * @author Fabien Potencier <fabien.potencier@symfony-project.com>
+ * @author Fabien Potencier <fabien@symfony.com>
  */
 class WebDebugToolbarListener
 {

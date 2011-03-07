@@ -73,7 +73,7 @@ class StubLocale
      * @return array                     The country names with their codes as keys
      * @throws InvalidArgumentException  When the locale is different than 'en'
      */
-    public static function getDisplayCountries($locale = 'en')
+    static public function getDisplayCountries($locale = 'en')
     {
         return self::getStubData($locale, 'countries', 'region');
     }
@@ -83,7 +83,7 @@ class StubLocale
      *
      * @return array  The country codes
      */
-    public static function getCountries()
+    static public function getCountries()
     {
         return array_keys(self::getDisplayCountries(self::getDefault()));
     }
@@ -95,7 +95,7 @@ class StubLocale
      * @return array                     The language names with their codes as keys
      * @throws InvalidArgumentException  When the locale is different than 'en'
      */
-    public static function getDisplayLanguages($locale)
+    static public function getDisplayLanguages($locale)
     {
         return self::getStubData($locale, 'languages', 'lang');
     }
@@ -105,7 +105,7 @@ class StubLocale
      *
      * @return array  The language codes
      */
-    public static function getLanguages()
+    static public function getLanguages()
     {
         return array_keys(self::getDisplayLanguages(self::getDefault()));
     }
@@ -117,7 +117,7 @@ class StubLocale
      * @return array                     The locale names with their codes as keys
      * @throws InvalidArgumentException  When the locale is different than 'en'
      */
-    public static function getDisplayLocales($locale)
+    static public function getDisplayLocales($locale)
     {
         return self::getStubData($locale, 'locales', 'names');
     }
@@ -127,7 +127,7 @@ class StubLocale
      *
      * @return array  The locale codes
      */
-    public static function getLocales()
+    static public function getLocales()
     {
         return array_keys(self::getDisplayLocales(self::getDefault()));
     }
@@ -137,7 +137,7 @@ class StubLocale
      *
      * @return array  The currencies data
      */
-    public static function getCurrenciesData($locale)
+    static public function getCurrenciesData($locale)
     {
         return self::getStubData($locale, 'currencies', 'curr');
     }
@@ -149,7 +149,7 @@ class StubLocale
      * @return array                     The currencies names with their codes as keys
      * @throws InvalidArgumentException  When the locale is different than 'en'
      */
-    public static function getDisplayCurrencies($locale)
+    static public function getDisplayCurrencies($locale)
     {
         $currencies = self::getCurrenciesData($locale);
 
@@ -169,7 +169,7 @@ class StubLocale
      *
      * @return array  The currencies codes
      */
-    public static function getCurrencies()
+    static public function getCurrencies()
     {
         return array_keys(self::getCurrenciesData(self::getDefault()));
     }
@@ -182,7 +182,7 @@ class StubLocale
      * @see    http://www.php.net/manual/en/locale.acceptfromhttp.php
      * @throws MethodNotImplementedException
      */
-    public static function acceptFromHttp($header)
+    static public function acceptFromHttp($header)
     {
         throw new MethodNotImplementedException(__METHOD__);
     }
@@ -195,7 +195,7 @@ class StubLocale
      * @see    http://www.php.net/manual/en/locale.composelocale.php
      * @throws MethodNotImplementedException
      */
-    public static function composeLocale(array $subtags)
+    static public function composeLocale(array $subtags)
     {
         throw new MethodNotImplementedException(__METHOD__);
     }
@@ -209,7 +209,7 @@ class StubLocale
      * @see    http://www.php.net/manual/en/locale.filtermatches.php
      * @throws MethodNotImplementedException
      */
-    public static function filterMatches($langtag, $locale, $canonicalize = false)
+    static public function filterMatches($langtag, $locale, $canonicalize = false)
     {
         throw new MethodNotImplementedException(__METHOD__);
     }
@@ -222,7 +222,7 @@ class StubLocale
      * @see    http://www.php.net/manual/en/locale.getallvariants.php
      * @throws MethodNotImplementedException
      */
-    public static function getAllVariants($locale)
+    static public function getAllVariants($locale)
     {
         throw new MethodNotImplementedException(__METHOD__);
     }
@@ -234,7 +234,7 @@ class StubLocale
      * @see    http://www.php.net/manual/en/locale.getdefault.php
      * @throws MethodNotImplementedException
      */
-    public static function getDefault()
+    static public function getDefault()
     {
         return 'en';
     }
@@ -248,7 +248,7 @@ class StubLocale
      * @see    http://www.php.net/manual/en/locale.getdisplaylanguage.php
      * @throws MethodNotImplementedException
      */
-    public static function getDisplayLanguage($locale, $inLocale = null)
+    static public function getDisplayLanguage($locale, $inLocale = null)
     {
         throw new MethodNotImplementedException(__METHOD__);
     }
@@ -262,7 +262,7 @@ class StubLocale
      * @see    http://www.php.net/manual/en/locale.getdisplayname.php
      * @throws MethodNotImplementedException
      */
-    public static function getDisplayName($locale, $inLocale = null)
+    static public function getDisplayName($locale, $inLocale = null)
     {
         throw new MethodNotImplementedException(__METHOD__);
     }
@@ -276,7 +276,7 @@ class StubLocale
      * @see    http://www.php.net/manual/en/locale.getdisplayregion.php
      * @throws MethodNotImplementedException
      */
-    public static function getDisplayRegion($locale, $inLocale = null)
+    static public function getDisplayRegion($locale, $inLocale = null)
     {
         throw new MethodNotImplementedException(__METHOD__);
     }
@@ -290,7 +290,7 @@ class StubLocale
      * @see    http://www.php.net/manual/en/locale.getdisplayscript.php
      * @throws MethodNotImplementedException
      */
-    public static function getDisplayScript($locale, $inLocale = null)
+    static public function getDisplayScript($locale, $inLocale = null)
     {
         throw new MethodNotImplementedException(__METHOD__);
     }
@@ -304,7 +304,7 @@ class StubLocale
      * @see    http://www.php.net/manual/en/locale.getdisplayvariant.php
      * @throws MethodNotImplementedException
      */
-    public static function getDisplayVariant($locale, $inLocale = null)
+    static public function getDisplayVariant($locale, $inLocale = null)
     {
         throw new MethodNotImplementedException(__METHOD__);
     }
@@ -317,7 +317,7 @@ class StubLocale
      * @see    http://www.php.net/manual/en/locale.getkeywords.php
      * @throws MethodNotImplementedException
      */
-    public static function getKeywords($locale)
+    static public function getKeywords($locale)
     {
         throw new MethodNotImplementedException(__METHOD__);
     }
@@ -330,7 +330,7 @@ class StubLocale
      * @see    http://www.php.net/manual/en/locale.getprimarylanguage.php
      * @throws MethodNotImplementedException
      */
-    public static function getPrimaryLanguage($locale)
+    static public function getPrimaryLanguage($locale)
     {
         throw new MethodNotImplementedException(__METHOD__);
     }
@@ -343,7 +343,7 @@ class StubLocale
      * @see    http://www.php.net/manual/en/locale.getregion.php
      * @throws MethodNotImplementedException
      */
-    public static function getRegion($locale)
+    static public function getRegion($locale)
     {
         throw new MethodNotImplementedException(__METHOD__);
     }
@@ -356,7 +356,7 @@ class StubLocale
      * @see    http://www.php.net/manual/en/locale.getscript.php
      * @throws MethodNotImplementedException
      */
-    public static function getScript($locale)
+    static public function getScript($locale)
     {
         throw new MethodNotImplementedException(__METHOD__);
     }
@@ -371,7 +371,7 @@ class StubLocale
      * @see    http://www.php.net/manual/en/locale.lookup.php
      * @throws RuntimeException       When the intl extension is not loaded
      */
-    public static function lookup(array $langtag, $locale, $canonicalize = false, $default = null)
+    static public function lookup(array $langtag, $locale, $canonicalize = false, $default = null)
     {
         throw new MethodNotImplementedException(__METHOD__);
     }
@@ -384,7 +384,7 @@ class StubLocale
      * @see    http://www.php.net/manual/en/locale.parselocale.php
      * @throws MethodNotImplementedException
      */
-    public static function parseLocale($locale)
+    static public function parseLocale($locale)
     {
         throw new MethodNotImplementedException(__METHOD__);
     }
@@ -397,7 +397,7 @@ class StubLocale
      * @see    http://www.php.net/manual/en/locale.parselocale.php
      * @throws MethodNotImplementedException
      */
-    public static function setDefault($locale)
+    static public function setDefault($locale)
     {
         throw new MethodNotImplementedException(__METHOD__);
     }
@@ -411,7 +411,7 @@ class StubLocale
      * @return array
      * @throws InvalidArgumentException  When the locale is different than 'en'
      */
-    private static function getStubData($locale, $cacheVariable, $stubDataDir)
+    static private function getStubData($locale, $cacheVariable, $stubDataDir)
     {
         if ('en' != $locale) {
             $message = 'Only the \'en\' locale is supported. '.NotImplementedException::INTL_INSTALL_MESSAGE;

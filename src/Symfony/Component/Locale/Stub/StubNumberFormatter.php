@@ -141,7 +141,7 @@ class StubNumberFormatter
      * The supported styles to the constructor $styles argument
      * @var array
      */
-    private static $supportedStyles = array(
+    static private $supportedStyles = array(
         'CURRENCY' => self::CURRENCY,
         'DECIMAL'  => self::DECIMAL
     );
@@ -150,7 +150,7 @@ class StubNumberFormatter
      * Supported attributes to the setAttribute() $attr argument
      * @var array
      */
-    private static $supportedAttributes = array(
+    static private $supportedAttributes = array(
         'FRACTION_DIGITS' => self::FRACTION_DIGITS,
         'GROUPING_USED'   => self::GROUPING_USED,
         'ROUNDING_MODE'   => self::ROUNDING_MODE
@@ -163,7 +163,7 @@ class StubNumberFormatter
      *
      * @var array
      */
-    private static $roundingModes = array(
+    static private $roundingModes = array(
         'ROUND_HALFEVEN' => self::ROUND_HALFEVEN,
         'ROUND_HALFDOWN' => self::ROUND_HALFDOWN,
         'ROUND_HALFUP'   => self::ROUND_HALFUP
@@ -176,7 +176,7 @@ class StubNumberFormatter
      * @see http://www.php.net/manual/en/function.round.php
      * @var array
      */
-    private static $phpRoundingMap = array(
+    static private $phpRoundingMap = array(
         self::ROUND_HALFDOWN => \PHP_ROUND_HALF_DOWN,
         self::ROUND_HALFEVEN => \PHP_ROUND_HALF_EVEN,
         self::ROUND_HALFUP   => \PHP_ROUND_HALF_UP
@@ -186,7 +186,7 @@ class StubNumberFormatter
      * The maximum values of the integer type in 32 bit platforms.
      * @var array
      */
-    private static $intRange = array(
+    static private $intRange = array(
         'positive' => 2147483647,
         'negative' => -2147483648
     );
@@ -248,7 +248,7 @@ class StubNumberFormatter
      * @throws MethodArgumentValueNotImplementedException  When the $style is not supported
      * @throws MethodArgumentNotImplementedException       When the pattern value is different than null
      */
-    public static function create($locale = 'en', $style = null, $pattern = null)
+    static public function create($locale = 'en', $style = null, $pattern = null)
     {
         return new self($locale, $style, $pattern);
     }

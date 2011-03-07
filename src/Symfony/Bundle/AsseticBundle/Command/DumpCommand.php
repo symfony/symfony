@@ -14,11 +14,13 @@ namespace Symfony\Bundle\AsseticBundle\Command;
 use Assetic\Asset\AssetInterface;
 use Assetic\Factory\LazyAssetManager;
 use Symfony\Bundle\FrameworkBundle\Command\Command;
+use Symfony\Bundle\AsseticBundle\Event\WriteEventArgs;
+use Symfony\Bundle\AsseticBundle\Events;
 use Symfony\Component\Console\Input\InputArgument;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Output\OutputInterface;
-use Symfony\Component\EventDispatcher\Event;
+use Doctrine\Common\EventManager;
 
 /**
  * Dumps assets to the filesystem.
@@ -46,7 +48,8 @@ class DumpCommand extends Command
         $am = $this->container->get('assetic.asset_manager');
 
         // notify an event so custom stream wrappers can be registered lazily
-        $this->container->get('event_dispatcher')->notify(new Event(null, 'assetic.write', array('path' => $basePath)));
+        $eventArgs = new WriteEventArgs($basePath);
+        $this->container->get('event_manager')->dispatchEvent(Events::onAsseticWrite, $writeEventArgs);
 
         if ($input->getOption('watch')) {
             return $this->watch($am, $basePath, $output, $this->container->getParameter('kernel.debug'));

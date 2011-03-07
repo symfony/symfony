@@ -21,7 +21,7 @@ use Symfony\Component\Security\Core\Exception\AuthenticationException;
 use Symfony\Component\HttpKernel\Log\LoggerInterface;
 use Symfony\Component\HttpKernel\HttpKernelInterface;
 use Symfony\Component\HttpKernel\Events as KernelEvents;
-use Symfony\Component\HttpKernel\Event\RequestEventArgs;
+use Symfony\Component\HttpKernel\Event\GetResponseEventArgs;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpFoundation\RedirectResponse;
@@ -125,7 +125,7 @@ abstract class AbstractAuthenticationListener implements ListenerInterface
      *
      * @param Event $event An Event instance
      */
-    public function onCoreSecurity(RequestEventArgs $eventArgs)
+    public function onCoreSecurity(GetResponseEventArgs $eventArgs)
     {
         $request = $eventArgs->getRequest();
 
@@ -170,7 +170,7 @@ abstract class AbstractAuthenticationListener implements ListenerInterface
         return $this->options['check_path'] === $request->getPathInfo();
     }
 
-    protected function onFailure(RequestEventArgs $eventArgs, Request $request, AuthenticationException $failed)
+    protected function onFailure(GetResponseEventArgs $eventArgs, Request $request, AuthenticationException $failed)
     {
         if (null !== $this->logger) {
             $this->logger->debug(sprintf('Authentication request failed: %s', $failed->getMessage()));
@@ -206,7 +206,7 @@ abstract class AbstractAuthenticationListener implements ListenerInterface
         return new RedirectResponse(0 !== strpos($this->options['failure_path'], 'http') ? $request->getUriForPath($this->options['failure_path']) : $this->options['failure_path'], 302);
     }
 
-    protected function onSuccess(RequestEventArgs $eventArgs, Request $request, TokenInterface $token)
+    protected function onSuccess(GetResponseEventArgs $eventArgs, Request $request, TokenInterface $token)
     {
         if (null !== $this->logger) {
             $this->logger->debug('User has been authenticated successfully');

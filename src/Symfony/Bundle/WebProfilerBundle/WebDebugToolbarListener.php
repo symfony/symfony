@@ -15,7 +15,7 @@ use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Bundle\FrameworkBundle\HttpKernel;
 use Symfony\Component\HttpKernel\HttpKernelInterface;
-use Symfony\Component\HttpKernel\Event\RequestEventArgs;
+use Symfony\Component\HttpKernel\Event\FilterResponseEventArgs;
 use Symfony\Bundle\TwigBundle\TwigEngine;
 
 /**
@@ -41,7 +41,7 @@ class WebDebugToolbarListener
         $this->interceptRedirects = $interceptRedirects;
     }
 
-    public function filterCoreResponse(RequestEventArgs $eventArgs)
+    public function filterCoreResponse(FilterResponseEventArgs $eventArgs)
     {
         if (HttpKernelInterface::MASTER_REQUEST !== $eventArgs->getRequestType()) {
             return;

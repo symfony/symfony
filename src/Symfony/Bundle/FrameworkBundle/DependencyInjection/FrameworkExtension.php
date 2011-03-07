@@ -51,8 +51,8 @@ class FrameworkExtension extends Extension
 
         if ($container->getParameter('kernel.debug')) {
             $loader->load('debug.xml');
-            $container->setDefinition('event_dispatcher', $container->findDefinition('debug.event_dispatcher'));
-            $container->setAlias('debug.event_dispatcher', 'event_dispatcher');
+            $container->setDefinition('event_manager', $container->findDefinition('debug.event_manager'));
+            $container->setAlias('debug.event_manager', 'event_manager');
         }
 
         $processor = new Processor();
@@ -140,10 +140,13 @@ class FrameworkExtension extends Extension
             'Symfony\\Component\\HttpKernel\\ResponseListener',
             'Symfony\\Component\\HttpKernel\\Controller\\ControllerResolver',
             'Symfony\\Component\\HttpKernel\\Controller\\ControllerResolverInterface',
-            'Symfony\\Component\\HttpKernel\\Event\\RequestEventArgs',
-            'Symfony\\Component\\HttpKernel\\Event\\ControllerEventArgs',
-            'Symfony\\Component\\HttpKernel\\Event\\ViewEventArgs',
-            'Symfony\\Component\\HttpKernel\\Event\\ExceptionEventArgs',
+            'Symfony\\Component\\HttpKernel\\Event\\KernelEventArgs',
+            'Symfony\\Component\\HttpKernel\\Event\\FilterControllerEventArgs',
+            'Symfony\\Component\\HttpKernel\\Event\\FilterResponseEventArgs',
+            'Symfony\\Component\\HttpKernel\\Event\\GetResponseEventArgs',
+            'Symfony\\Component\\HttpKernel\\Event\\GetResponseForControllerResultEventArgs',
+            'Symfony\\Component\\HttpKernel\\Event\\GetResponseForExceptionEventArgs',
+            'Symfony\\Component\\HttpKernel\\Events',
 
             'Symfony\\Bundle\\FrameworkBundle\\RequestListener',
             'Symfony\\Bundle\\FrameworkBundle\\Controller\\ControllerNameParser',

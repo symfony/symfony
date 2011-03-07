@@ -17,7 +17,7 @@ use Symfony\Component\Security\Core\Exception\NonceExpiredException;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpKernel\Log\LoggerInterface;
-use Symfony\Component\HttpKernel\Event\RequestEventArgs;
+use Symfony\Component\HttpKernel\Event\GetResponseEventArgs;
 
 /**
  * DigestAuthenticationEntryPoint starts an HTTP Digest authentication.
@@ -39,7 +39,7 @@ class DigestAuthenticationEntryPoint implements AuthenticationEntryPointInterfac
         $this->logger = $logger;
     }
 
-    public function start(RequestEventArgs $eventArgs, Request $request, AuthenticationException $authException = null)
+    public function start(GetResponseEventArgs $eventArgs, Request $request, AuthenticationException $authException = null)
     {
         $expiryTime = microtime(true) + $this->nonceValiditySeconds * 1000;
         $signatureValue = md5($expiryTime.':'.$this->key);

@@ -3,6 +3,7 @@
 namespace Symfony\Tests\Component\Security\Http\Firewall;
 
 use Symfony\Component\HttpKernel\HttpKernelInterface;
+use Symfony\Component\HttpKernel\Events;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Security\Core\Exception\CookieTheftException;
 use Symfony\Component\Security\Core\Exception\AuthenticationException;
@@ -15,22 +16,17 @@ class RememberMeListenerTest extends \PHPUnit_Framework_TestCase
     {
         list($listener,,,,) = $this->getListener();
 
-        $dispatcher = $this->getMock('Symfony\Component\EventDispatcher\EventDispatcher');
-        $dispatcher
-            ->expects($this->at(0))
-            ->method('connect')
-            ->with($this->equalTo('core.security'))
-        ;
-        $dispatcher
-            ->expects($this->at(1))
-            ->method('connect')
-            ->with($this->equalTo('core.response'))
+        $evm = $this->getMock('Doctrine\Common\EventManager');
+        $evm
+            ->expects($this->once())
+            ->method('addEventListener')
+            ->with($this->equalTo(array(Events::onCoreSecurity, Events::filterCoreResponse)))
         ;
 
-        $listener->register($dispatcher);
+        $listener->register($evm);
     }
 
-    public function testCheckCookiesDoesNotTryToPopulateNonEmptySecurityContext()
+    public function testOnCoreSecurityDoesNotTryToPopulateNonEmptySecurityContext()
     {
         list($listener, $context, $service,,) = $this->getListener();
 
@@ -46,11 +42,11 @@ class RememberMeListenerTest extends \PHPUnit_Framework_TestCase
         ;
 
         $this->assertNull($this->getLastState($listener));
-        $this->assertNull($listener->checkCookies($this->getEvent()));
+        $this->assertNull($listener->onCoreSecurity($this->getGetResponseEvent()));
         $this->assertNull($this->getLastState($listener));
     }
 
-    public function testCheckCookiesDoesNothingWhenNoCookieIsSet()
+    public function testOnCoreSecurityDoesNothingWhenNoCookieIsSet()
     {
         list($listener, $context, $service,,) = $this->getListener();
 
@@ -66,20 +62,19 @@ class RememberMeListenerTest extends \PHPUnit_Framework_TestCase
             ->will($this->returnValue(null))
         ;
 
-        $event = $this->getEvent();
+        $event = $this->getGetResponseEvent();
         $event
             ->expects($this->once())
-            ->method('get')
-            ->with('request')
+            ->method('getRequest')
             ->will($this->returnValue(new Request()))
         ;
 
         $this->assertNull($this->getLastState($listener));
-        $this->assertNull($listener->checkCookies($event));
+        $this->assertNull($listener->onCoreSecurity($event));
         $this->assertNull($this->getLastState($listener));
     }
 
-    public function testCheckCookiesIgnoresAuthenticationExceptionThrownByTheRememberMeServicesImplementation()
+    public function testOnCoreSecurityIgnoresAuthenticationExceptionThrownByTheRememberMeServicesImplementation()
     {
         list($listener, $context, $service,,) = $this->getListener();
 
@@ -96,20 +91,19 @@ class RememberMeListenerTest extends \PHPUnit_Framework_TestCase
             ->will($this->throwException($exception))
         ;
 
-        $event = $this->getEvent();
+        $event = $this->getGetResponseEvent();
         $event
             ->expects($this->once())
-            ->method('get')
-            ->with('request')
+            ->method('getRequest')
             ->will($this->returnValue(new Request()))
         ;
 
         $this->assertNull($this->getLastState($listener));
-        $this->assertNull($listener->checkCookies($event));
+        $this->assertNull($listener->onCoreSecurity($event));
         $this->assertSame($exception, $this->getLastState($listener));
     }
 
-    public function testCheckCookiesThrowsCookieTheftExceptionIfThrownByTheRememberMeServicesImplementation()
+    public function testOnCoreSecurityThrowsCookieTheftExceptionIfThrownByTheRememberMeServicesImplementation()
     {
         list($listener, $context, $service,,) = $this->getListener();
 
@@ -126,16 +120,15 @@ class RememberMeListenerTest extends \PHPUnit_Framework_TestCase
             ->will($this->throwException($exception))
         ;
 
-        $event = $this->getEvent();
+        $event = $this->getGetResponseEvent();
         $event
             ->expects($this->once())
-            ->method('get')
-            ->with('request')
+            ->method('getRequest')
             ->will($this->returnValue(new Request()))
         ;
 
         try {
-            $listener->checkCookies($event);
+            $listener->onCoreSecurity($event);
         }
         catch (CookieTheftException $theft) {
             $this->assertSame($theft, $this->getLastState($listener));
@@ -146,7 +139,7 @@ class RememberMeListenerTest extends \PHPUnit_Framework_TestCase
         $this->fail('Expected CookieTheftException was not thrown.');
     }
 
-    public function testCheckCookiesAuthenticationManagerDoesNotChangeListenerStateWhenTokenIsNotSupported()
+    public function testOnCoreSecurityAuthenticationManagerDoesNotChangeListenerStateWhenTokenIsNotSupported()
     {
         list($listener, $context, $service, $manager,) = $this->getListener();
 
@@ -162,20 +155,19 @@ class RememberMeListenerTest extends \PHPUnit_Framework_TestCase
             ->will($this->returnValue($this->getMock('Symfony\Component\Security\Core\Authentication\Token\TokenInterface')))
         ;
 
-        $event = $this->getEvent();
+        $event = $this->getGetResponseEvent();
         $event
             ->expects($this->once())
-            ->method('get')
-            ->with('request')
+            ->method('getRequest')
             ->will($this->returnValue(new Request()))
         ;
 
         $this->assertNull($this->getLastState($listener));
-        $this->assertNull($listener->checkCookies($event));
+        $this->assertNull($listener->onCoreSecurity($event));
         $this->assertNull($this->getLastState($listener));
     }
 
-    public function testCheckCookiesIgnoresAuthenticationExceptionThrownByAuthenticationManagerImplementation()
+    public function testOnCoreSecurityIgnoresAuthenticationExceptionThrownByAuthenticationManagerImplementation()
     {
         list($listener, $context, $service, $manager,) = $this->getListener();
 
@@ -198,20 +190,19 @@ class RememberMeListenerTest extends \PHPUnit_Framework_TestCase
             ->will($this->throwException($exception))
         ;
 
-        $event = $this->getEvent();
+        $event = $this->getGetResponseEvent();
         $event
             ->expects($this->once())
-            ->method('get')
-            ->with('request')
+            ->method('getRequest')
             ->will($this->returnValue(new Request()))
         ;
 
         $this->assertNull($this->getLastState($listener));
-        $this->assertNull($listener->checkCookies($event));
+        $this->assertNull($listener->onCoreSecurity($event));
         $this->assertSame($exception, $this->getLastState($listener));
     }
 
-    public function testCheckCookies()
+    public function testOnCoreSecurity()
     {
         list($listener, $context, $service, $manager,) = $this->getListener();
 
@@ -240,37 +231,41 @@ class RememberMeListenerTest extends \PHPUnit_Framework_TestCase
             ->will($this->returnValue($token))
         ;
 
-        $event = $this->getEvent();
+        $event = $this->getGetResponseEvent();
         $event
             ->expects($this->once())
-            ->method('get')
-            ->with('request')
+            ->method('getRequest')
             ->will($this->returnValue(new Request()))
         ;
 
         $this->assertNull($this->getLastState($listener));
-        $this->assertNull($listener->checkCookies($event));
+        $this->assertNull($listener->onCoreSecurity($event));
         $this->assertSame($token, $this->getLastState($listener));
     }
 
-    public function testUpdateCookiesIgnoresAnythingButMasterRequests()
+    public function testFilterCoreResponseIgnoresAnythingButMasterRequests()
     {
-        list($listener,,,,) = $this->getListener();
+        list($listener,, $service,,) = $this->getListener();
 
-        $event = $this->getEvent();
+        $token = $this->getMock('Symfony\Component\Security\Core\Authentication\Token\TokenInterface');
+        $this->setLastState($listener, $token);
+
+        $event = $this->getFilterResponseEvent();
         $event
             ->expects($this->once())
-            ->method('get')
-            ->with($this->equalTo('request_type'))
+            ->method('getRequestType')
             ->will($this->returnValue('foo'))
         ;
 
-        $response = $this->getMock('Symfony\Component\HttpFoundation\Response');
+        $service
+            ->expects($this->never())
+            ->method('loginSuccess')
+        ;
 
-        $this->assertSame($response, $listener->updateCookies($event, $response));
+        $listener->filterCoreResponse($event);
     }
 
-    public function testUpdateCookiesCallsLoginSuccessOnRememberMeServicesImplementationWhenAuthenticationWasSuccessful()
+    public function testFilterCoreResponseCallsLoginSuccessOnRememberMeServicesImplementationWhenAuthenticationWasSuccessful()
     {
         list($listener,, $service,,) = $this->getListener();
 
@@ -280,18 +275,21 @@ class RememberMeListenerTest extends \PHPUnit_Framework_TestCase
         $token = $this->getMock('Symfony\Component\Security\Core\Authentication\Token\TokenInterface');
         $this->setLastState($listener, $token);
 
-        $event = $this->getEvent();
+        $event = $this->getFilterResponseEvent();
         $event
-            ->expects($this->at(0))
-            ->method('get')
-            ->with('request_type')
+            ->expects($this->any())
+            ->method('getRequestType')
             ->will($this->returnValue(HttpKernelInterface::MASTER_REQUEST))
         ;
         $event
-            ->expects($this->at(1))
-            ->method('get')
-            ->with('request')
+            ->expects($this->any())
+            ->method('getRequest')
             ->will($this->returnValue($request))
+        ;
+        $event
+            ->expects($this->any())
+            ->method('getResponse')
+            ->will($this->returnValue($response))
         ;
 
         $service
@@ -301,10 +299,10 @@ class RememberMeListenerTest extends \PHPUnit_Framework_TestCase
             ->will($this->returnValue(null))
         ;
 
-        $this->assertSame($response, $listener->updateCookies($event, $response));
+        $listener->filterCoreResponse($event);
     }
 
-    public function testUpdateCookiesCallsLoginFailOnRememberMeServicesImplementationWhenAuthenticationWasNotSuccessful()
+    public function testFilterCoreResponseCallsLoginFailOnRememberMeServicesImplementationWhenAuthenticationWasNotSuccessful()
     {
         list($listener,, $service,,) = $this->getListener();
 
@@ -314,18 +312,21 @@ class RememberMeListenerTest extends \PHPUnit_Framework_TestCase
         $exception = new AuthenticationException('foo');
         $this->setLastState($listener, $exception);
 
-        $event = $this->getEvent();
+        $event = $this->getFilterResponseEvent();
         $event
-            ->expects($this->at(0))
-            ->method('get')
-            ->with('request_type')
+            ->expects($this->any())
+            ->method('getRequestType')
             ->will($this->returnValue(HttpKernelInterface::MASTER_REQUEST))
         ;
         $event
-            ->expects($this->at(1))
-            ->method('get')
-            ->with('request')
+            ->expects($this->any())
+            ->method('getRequest')
             ->will($this->returnValue($request))
+        ;
+        $event
+            ->expects($this->any())
+            ->method('getResponse')
+            ->will($this->returnValue($response))
         ;
 
         $service
@@ -335,7 +336,7 @@ class RememberMeListenerTest extends \PHPUnit_Framework_TestCase
             ->will($this->returnValue(null))
         ;
 
-        $this->assertSame($response, $listener->updateCookies($event, $response));
+        $listener->filterCoreResponse($event);
     }
 
     protected function setLastState($listener, $state)
@@ -355,9 +356,14 @@ class RememberMeListenerTest extends \PHPUnit_Framework_TestCase
         return $p->getValue($listener);
     }
 
-    protected function getEvent()
+    protected function getGetResponseEvent()
     {
-        return $this->getMock('Symfony\Component\EventDispatcher\Event', array(), array(), '', false);
+        return $this->getMock('Symfony\Component\HttpKernel\Event\GetResponseEventArgs', array(), array(), '', false);
+    }
+
+    protected function getFilterResponseEvent()
+    {
+        return $this->getMock('Symfony\Component\HttpKernel\Event\FilterResponseEventArgs', array(), array(), '', false);
     }
 
     protected function getListener()

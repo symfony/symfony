@@ -13,7 +13,7 @@ namespace Symfony\Component\Security\Http\Firewall;
 
 use Symfony\Component\Security\Core\SecurityContextInterface;
 use Symfony\Component\HttpKernel\Log\LoggerInterface;
-use Symfony\Component\HttpKernel\Event\RequestEventArgs;
+use Symfony\Component\HttpKernel\Event\GetResponseEventArgs;
 use Symfony\Component\HttpKernel\Events;
 use Symfony\Component\Security\Core\Authentication\Token\AnonymousToken;
 use Doctrine\Common\EventManager;
@@ -58,9 +58,9 @@ class AnonymousAuthenticationListener implements ListenerInterface
     /**
      * Handles anonymous authentication.
      *
-     * @param RequestEventArgs $eventArgs A RequestEventArgs instance
+     * @param GetResponseEventArgs $eventArgs A GetResponseEventArgs instance
      */
-    public function onCoreSecurity(RequestEventArgs $eventArgs)
+    public function onCoreSecurity(GetResponseEventArgs $eventArgs)
     {
         if (null !== $this->context->getToken()) {
             return;

@@ -12,56 +12,68 @@
 namespace Symfony\Tests\Component\HttpKernel;
 
 use Symfony\Component\HttpKernel\ResponseListener;
-use Symfony\Component\EventDispatcher\EventDispatcher;
-use Symfony\Component\EventDispatcher\Event;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpKernel\HttpKernelInterface;
+use Symfony\Component\HttpKernel\Event\FilterResponseEventArgs;
+use Symfony\Component\HttpKernel\Events;
+use Doctrine\Common\EventManager;
 
 class ResponseListenerTest extends \PHPUnit_Framework_TestCase
 {
+    private $evm;
+
+    private $kernel;
+
+    protected function setUp()
+    {
+        $this->evm = new EventManager();
+        $listener = new ResponseListener('UTF-8');
+        $this->evm->addEventListener(Events::filterCoreResponse, $listener);
+
+        $this->kernel = $this->getMock('Symfony\Component\HttpKernel\HttpKernelInterface');
+
+    }
     public function testFilterDoesNothingForSubRequests()
     {
-        $event = new Event(null, 'core.response', array('request_type' => HttpKernelInterface::SUB_REQUEST));
-        $this->getDispatcher()->filter($event, $response = new Response('foo'));
+        $response = new Response('foo');
 
-        $this->assertEquals('', $response->headers->get('content-type'));
+        $eventArgs = new FilterResponseEventArgs($this->kernel, new Request(), HttpKernelInterface::SUB_REQUEST, $response);
+        $this->evm->dispatchEvent(Events::filterCoreResponse, $eventArgs);
+
+        $this->assertEquals('', $eventArgs->getResponse()->headers->get('content-type'));
     }
 
     public function testFilterDoesNothingIfContentTypeIsSet()
     {
-        $event = new Event(null, 'core.response', array('request_type' => HttpKernelInterface::MASTER_REQUEST));
         $response = new Response('foo');
         $response->headers->set('Content-Type', 'text/plain');
-        $this->getDispatcher()->filter($event, $response);
 
-        $this->assertEquals('text/plain', $response->headers->get('content-type'));
+        $eventArgs = new FilterResponseEventArgs($this->kernel, new Request(), HttpKernelInterface::MASTER_REQUEST, $response);
+        $this->evm->dispatchEvent(Events::filterCoreResponse, $eventArgs);
+
+        $this->assertEquals('text/plain', $eventArgs->getResponse()->headers->get('content-type'));
     }
 
     public function testFilterDoesNothingIfRequestFormatIsNotDefined()
     {
-        $event = new Event(null, 'core.response', array('request_type' => HttpKernelInterface::MASTER_REQUEST, 'request' => Request::create('/')));
-        $this->getDispatcher()->filter($event, $response = new Response('foo'));
+        $response = new Response('foo');
 
-        $this->assertEquals('', $response->headers->get('content-type'));
+        $eventArgs = new FilterResponseEventArgs($this->kernel, Request::create('/'), HttpKernelInterface::MASTER_REQUEST, $response);
+        $this->evm->dispatchEvent(Events::filterCoreResponse, $eventArgs);
+
+        $this->assertEquals('', $eventArgs->getResponse()->headers->get('content-type'));
     }
 
     public function testFilterSetContentType()
     {
+        $response = new Response('foo');
         $request = Request::create('/');
         $request->setRequestFormat('json');
-        $event = new Event(null, 'core.response', array('request_type' => HttpKernelInterface::MASTER_REQUEST, 'request' => $request));
-        $this->getDispatcher()->filter($event, $response = new Response('foo'));
 
-        $this->assertEquals('application/json', $response->headers->get('content-type'));
-    }
+        $eventArgs = new FilterResponseEventArgs($this->kernel, $request, HttpKernelInterface::MASTER_REQUEST, $response);
+        $this->evm->dispatchEvent(Events::filterCoreResponse, $eventArgs);
 
-    protected function getDispatcher()
-    {
-        $dispatcher = new EventDispatcher();
-        $listener = new ResponseListener('UTF-8');
-        $dispatcher->connect('core.response', array($listener, 'filter'));
-
-        return $dispatcher;
+        $this->assertEquals('application/json', $eventArgs->getResponse()->headers->get('content-type'));
     }
 }

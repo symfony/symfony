@@ -14,14 +14,14 @@ namespace Symfony\Tests\Component\HttpKernel;
 use Symfony\Component\HttpKernel\HttpKernel;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
-use Symfony\Component\EventDispatcher\EventDispatcher;
 use Symfony\Component\HttpKernel\Controller\ControllerResolverInterface;
+use Doctrine\Common\EventManager;
 
 class TestHttpKernel extends HttpKernel implements ControllerResolverInterface
 {
     public function __construct()
     {
-        parent::__construct(new EventDispatcher(), $this);
+        parent::__construct(new EventManager(), $this);
     }
 
     public function getController(Request $request)

@@ -15,7 +15,7 @@ use Symfony\Component\Security\Core\SecurityContextInterface;
 use Symfony\Component\Security\Core\Authentication\AuthenticationManagerInterface;
 use Symfony\Component\Security\Http\EntryPoint\AuthenticationEntryPointInterface;
 use Symfony\Component\HttpKernel\Log\LoggerInterface;
-use Symfony\Component\HttpKernel\Event\RequestEventArgs;
+use Symfony\Component\HttpKernel\Event\GetResponseEventArgs;
 use Symfony\Component\HttpKernel\Events;
 use Symfony\Component\Security\Core\Authentication\Token\UsernamePasswordToken;
 use Symfony\Component\Security\Core\Exception\AuthenticationException;
@@ -69,11 +69,11 @@ class BasicAuthenticationListener implements ListenerInterface
     /**
      * Handles basic authentication.
      *
-     * @param RequestEventArgs $eventArgs A RequestEventArgs instance
+     * @param GetResponseEventArgs $eventArgs A GetResponseEventArgs instance
      */
-    public function onCoreSecurity(RequestEventArgs $eventArgs)
+    public function onCoreSecurity(GetResponseEventArgs $eventArgs)
     {
-        $request = $event->get('request');
+        $request = $eventArgs->getRequest();
 
         if (false === $username = $request->server->get('PHP_AUTH_USER', false)) {
             return;

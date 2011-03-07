@@ -17,7 +17,7 @@ use Symfony\Component\Security\Core\Authentication\Token\PreAuthenticatedToken;
 use Symfony\Component\Security\Core\Exception\AuthenticationException;
 use Symfony\Component\Security\Http\Event\InteractiveLoginEventArgs;
 use Symfony\Component\Security\Http\Events;
-use Symfony\Component\HttpKernel\Event\RequestEventArgs;
+use Symfony\Component\HttpKernel\Event\GetResponseEventArgs;
 use Symfony\Component\HttpKernel\Events as KernelEvents;
 use Symfony\Component\HttpKernel\Log\LoggerInterface;
 use Symfony\Component\HttpFoundation\Request;
@@ -70,7 +70,7 @@ abstract class AbstractPreAuthenticatedListener implements ListenerInterface
      *
      * @param EventInterface $event An EventInterface instance
      */
-    public function onCoreSecurity(RequestEventArgs $eventArgs)
+    public function onCoreSecurity(GetResponseEventArgs $eventArgs)
     {
         $request = $eventArgs->getRequest();
 

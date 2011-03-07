@@ -21,7 +21,7 @@ final class Events
 
     const onCoreView = 'onCoreView';
 
-    const filterCoreRespone = 'filterCoreResponse';
+    const filterCoreResponse = 'filterCoreResponse';
 
     const onCoreSecurity = 'onCoreSecurity';
 }

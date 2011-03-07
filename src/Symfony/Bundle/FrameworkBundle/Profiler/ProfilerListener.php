@@ -13,7 +13,7 @@ namespace Symfony\Bundle\FrameworkBundle\Profiler;
 
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpKernel\HttpKernelInterface;
-use Symfony\Component\HttpKernel\Event\RequestEventArgs;
+use Symfony\Component\HttpKernel\Event\FilterResponseEventArgs;
 use Symfony\Component\HttpFoundation\RequestMatcherInterface;
 use Symfony\Component\DependencyInjection\ContainerInterface;
 
@@ -62,7 +62,7 @@ class ProfilerListener
      *
      * @param EventInterface $eventArgs An EventInterface instance
      */
-    public function filterCoreResponse(RequestEventArgs $eventArgs)
+    public function filterCoreResponse(FilterResponseEventArgs $eventArgs)
     {
         if (HttpKernelInterface::MASTER_REQUEST !== $eventArgs->getRequestType()) {
             return;

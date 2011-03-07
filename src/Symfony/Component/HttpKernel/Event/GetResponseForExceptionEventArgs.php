@@ -11,20 +11,18 @@
 
 namespace Symfony\Component\HttpKernel\Event;
 
-use Symfony\Component\HttpKernel\KernelInterface;
+use Symfony\Component\HttpKernel\HttpKernelInterface;
 use Symfony\Component\HttpFoundation\Request;
 
-class ExceptionEventArgs extends RequestEventArgs
+class GetResponseForExceptionEventArgs extends GetResponseEventArgs
 {
     private $exception;
 
-    private $handled = false;
-
-    public function __construct(KernelInterface $kernel, \Exception $e, Request $request, $requestType)
+    public function __construct(HttpKernelInterface $kernel, Request $request, $requestType, \Exception $e)
     {
         parent::__construct($kernel, $request, $requestType);
 
-        $this->exception = $e;
+        $this->setException($e);
     }
 
     public function getException()
@@ -35,17 +33,5 @@ class ExceptionEventArgs extends RequestEventArgs
     public function setException(\Exception $exception)
     {
         $this->exception = $exception;
-    }
-
-    public function setHandled($handled)
-    {
-        $this->handled = $handled;
-
-        $this->stopPropagation();
-    }
-
-    public function isHandled()
-    {
-        return $this->handled;
     }
 }

@@ -16,13 +16,14 @@ use Doctrine\Common\EventManager;
  */
 class HttpKernel extends BaseHttpKernel
 {
-    protected $container;
-    protected $esiSupport;
+    private $container;
+    private $esiSupport;
 
-    public function __construct(ContainerInterface $container, ControllerResolverInterface $controllerResolver)
+    public function __construct(EventManager $evm, ContainerInterface $container, ControllerResolverInterface $controllerResolver)
     {
+        parent::__construct($evm, $controllerResolver);
+
         $this->container = $container;
-        $this->resolver = $controllerResolver;
     }
 
     public function handle(Request $request, $type = HttpKernelInterface::MASTER_REQUEST, $catch = true)

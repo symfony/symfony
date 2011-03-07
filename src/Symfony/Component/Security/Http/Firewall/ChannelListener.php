@@ -14,7 +14,7 @@ namespace Symfony\Component\Security\Http\Firewall;
 use Symfony\Component\Security\Http\AccessMap;
 use Symfony\Component\Security\Http\EntryPoint\AuthenticationEntryPointInterface;
 use Symfony\Component\HttpKernel\Log\LoggerInterface;
-use Symfony\Component\HttpKernel\Event\RequestEventArgs;
+use Symfony\Component\HttpKernel\Event\GetResponseEventArgs;
 use Symfony\Component\HttpKernel\Events;
 use Doctrine\Common\EventManager;
 
@@ -57,9 +57,9 @@ class ChannelListener implements ListenerInterface
     /**
      * Handles channel management.
      *
-     * @param RequestEventArgs $eventArgs A RequestEventArgs instance
+     * @param GetResponseEventArgs $eventArgs A GetResponseEventArgs instance
      */
-    public function onCoreSecurity(RequestEventArgs $eventArgs)
+    public function onCoreSecurity(GetResponseEventArgs $eventArgs)
     {
         $request = $eventArgs->getRequest();
 

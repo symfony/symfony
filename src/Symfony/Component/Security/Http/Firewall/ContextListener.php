@@ -14,7 +14,8 @@ namespace Symfony\Component\Security\Http\Firewall;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpKernel\HttpKernelInterface;
 use Symfony\Component\HttpKernel\Log\LoggerInterface;
-use Symfony\Component\HttpKernel\Event\RequestEventArgs;
+use Symfony\Component\HttpKernel\Event\GetResponseEventArgs;
+use Symfony\Component\HttpKernel\Event\FilterResponseEventArgs;
 use Symfony\Component\Security\Core\Authentication\Token\AnonymousToken;
 use Symfony\Component\Security\Core\Authentication\Token\TokenInterface;
 use Symfony\Component\Security\Core\Exception\UsernameNotFoundException;
@@ -73,9 +74,9 @@ class ContextListener implements ListenerInterface
     /**
      * Reads the SecurityContext from the session.
      *
-     * @param RequestEventArgs $eventArgs A RequestEventArgs instance
+     * @param GetResponseEventArgs $eventArgs A GetResponseEventArgs instance
      */
-    public function onCoreSecurity(RequestEventArgs $eventArgs)
+    public function onCoreSecurity(GetResponseEventArgs $eventArgs)
     {
         $request = $eventArgs->getRequest();
 
@@ -103,7 +104,7 @@ class ContextListener implements ListenerInterface
      *
      * @param EventInterface $event An EventInterface instance
      */
-    public function filterCoreResponse(RequestEventArgs $eventArgs)
+    public function filterCoreResponse(FilterResponseEventArgs $eventArgs)
     {
         if (HttpKernelInterface::MASTER_REQUEST !== $eventArgs->getRequestType()) {
             return;

@@ -11,23 +11,18 @@
 
 namespace Symfony\Component\HttpKernel\Event;
 
-use Symfony\Component\HttpKernel\KernelInterface;
+use Symfony\Component\HttpKernel\HttpKernelInterface;
 use Symfony\Component\HttpFoundation\Request;
 
-class ControllerEventArgs extends RequestEventArgs
+class FilterControllerEventArgs extends KernelEventArgs
 {
     private $controller;
 
-    public function __construct(KernelInterface $kernel, $controller, Request $request, $requestType)
+    public function __construct(HttpKernelInterface $kernel, $controller, Request $request, $requestType)
     {
-        // controller must be a callable
-        if (!is_callable($controller)) {
-            throw new \LogicException(sprintf('The controller must be a callable (%s given).', $this->varToString($controller)));
-        }
-
         parent::__construct($kernel, $request, $requestType);
 
-        $this->controller = $controller;
+        $this->setController($controller);
     }
 
     public function getController()

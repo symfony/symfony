@@ -12,17 +12,29 @@
 namespace Symfony\Bundle\FrameworkBundle;
 
 use Symfony\Component\DependencyInjection\ContainerInterface;
-use Symfony\Component\EventDispatcher\EventInterface;
 use Doctrine\Common\EventManager;
+use Doctrine\Common\EventArgs;
 
 /**
- * This EventDispatcher automatically gets the kernel listeners injected
+ * Lazily loads listeners and subscribers from the dependency injection
+ * container
  *
  * @author Fabien Potencier <fabien@symfony.com>
+ * @author Bernhard Schussek <bernhard.schussek@symfony.com>
  */
 class ContainerAwareEventManager extends EventManager
 {
-    protected $container;
+    /**
+     * The container from where services are loaded
+     * @var ContainerInterface
+     */
+    private $container;
+
+    /**
+     * The service IDs of the event listeners and subscribers
+     * @var array
+     */
+    private $listenerIds;
 
     /**
      * Constructor.
@@ -34,53 +46,60 @@ class ContainerAwareEventManager extends EventManager
         $this->container = $container;
     }
 
-    public function registerKernelListeners(array $listeners)
-    {
-        $this->listeners = $listeners;
-    }
-
     /**
-     * {@inheritdoc}
+     * Adds a service as event listener
+     *
+     * @param string|array $events  One or more events for which the listener
+     *                              is added
+     * @param string $serviceId     The ID of the listener service
+     * @param integer $priority     The higher this value, the earlier an event
+     *                              listener will be triggered in the chain.
+     *                              Defaults to 0.
      */
-    public function notify(EventInterface $event)
+    public function addEventListenerService($events, $serviceId, $priority = 0)
     {
-        foreach ($this->getListeners($event->getName()) as $listener) {
-            if (is_array($listener) && is_string($listener[0])) {
-                $listener[0] = $this->container->get($listener[0]);
-            }
-            call_user_func($listener, $event);
+        if (!is_string($serviceId)) {
+            throw new \InvalidArgumentException('Expected a string argument');
+        }
+
+        foreach ((array)$events as $event) {
+            // Prevent duplicate entries
+            $this->listenerIds[$event][$serviceId] = $priority;
         }
     }
 
     /**
-     * {@inheritdoc}
+     * Adds a service as event subscriber
+     *
+     * @param string $serviceId  The ID of the subscriber service
+     * @param integer $priority  The higher this value, the earlier an event
+     *                           listener will be triggered in the chain.
+     *                           Defaults to 0.
      */
-    public function notifyUntil(EventInterface $event)
+    public function addEventSuscriberService($serviceId, $priority = 0)
     {
-        foreach ($this->getListeners($event->getName()) as $listener) {
-            if (is_array($listener) && is_string($listener[0])) {
-                $listener[0] = $this->container->get($listener[0]);
-            }
-
-            $ret = call_user_func($listener, $event);
-            if ($event->isProcessed()) {
-                return $ret;
-            }
+        if (!is_string($serviceId)) {
+            throw new \InvalidArgumentException('Expected a string argument');
         }
+
+        // TODO get class name, call static method getSubscribedEvents()
+        // and pass to addEventListenerService
     }
 
     /**
-     * {@inheritdoc}
+     * {@inheritDoc}
+     *
+     * Lazily loads listeners for this event from the dependency injection
+     * container.
      */
-    public function filter(EventInterface $event, $value)
+    public function dispatchEvent($eventName, EventArgs $eventArgs = null)
     {
-        foreach ($this->getListeners($event->getName()) as $listener) {
-            if (is_array($listener) && is_string($listener[0])) {
-                $listener[0] = $this->container->get($listener[0]);
+        if (isset($this->listenerIds[$eventName])) {
+            foreach ($this->listenerIds[$eventName] as $serviceId => $priority) {
+                $this->addEventListener($eventName, $this->container->get($serviceId), $priority);
             }
-            $value = call_user_func($listener, $event, $value);
         }
 
-        return $value;
+        parent::dispatchEvent($eventName, $eventArgs);
     }
 }

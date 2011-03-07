@@ -4,7 +4,8 @@ namespace Symfony\Component\Security\Http\Firewall;
 
 use Symfony\Component\HttpKernel\HttpKernelInterface;
 use Symfony\Component\HttpKernel\Log\LoggerInterface;
-use Symfony\Component\HttpKernel\Event\RequestEventArgs;
+use Symfony\Component\HttpKernel\Event\GetResponseEventArgs;
+use Symfony\Component\HttpKernel\Event\FilterResponseEventArgs;
 use Symfony\Component\HttpKernel\Events as KernelEvents;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Security\Core\Authentication\Token\TokenInterface;
@@ -82,9 +83,9 @@ class RememberMeListener implements ListenerInterface
     /**
      * Handles remember-me cookie based authentication.
      *
-     * @param RequestEventArgs $eventArgs A RequestEventArgs instance
+     * @param GetResponseEventArgs $eventArgs A GetResponseEventArgs instance
      */
-    public function onCoreSecurity(RequestEventArgs $eventArgs)
+    public function onCoreSecurity(GetResponseEventArgs $eventArgs)
     {
         $this->lastState = null;
 
@@ -143,7 +144,7 @@ class RememberMeListener implements ListenerInterface
      * Update cookies
      * @param Event $event
      */
-    public function filterCoreResponse(RequestEventArgs $eventArgs)
+    public function filterCoreResponse(FilterResponseEventArgs $eventArgs)
     {
         if (HttpKernelInterface::MASTER_REQUEST !== $eventArgs->getRequestType()) {
             return;

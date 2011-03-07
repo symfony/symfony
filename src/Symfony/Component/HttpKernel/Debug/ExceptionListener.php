@@ -13,7 +13,7 @@ namespace Symfony\Component\HttpKernel\Debug;
 
 use Symfony\Component\HttpKernel\Log\LoggerInterface;
 use Symfony\Component\HttpKernel\Log\DebugLoggerInterface;
-use Symfony\Component\HttpKernel\Event\ExceptionEventArgs;
+use Symfony\Component\HttpKernel\Event\GetResponseForExceptionEventArgs;
 use Symfony\Component\HttpKernel\HttpKernelInterface;
 use Symfony\Component\HttpKernel\Exception\FlattenException;
 use Symfony\Component\HttpFoundation\Request;
@@ -34,7 +34,7 @@ class ExceptionListener
         $this->logger = $logger;
     }
 
-    public function onCoreException(ExceptionEventArgs $eventArgs)
+    public function onCoreException(GetResponseForExceptionEventArgs $eventArgs)
     {
         static $handling;
 
@@ -44,8 +44,8 @@ class ExceptionListener
 
         $handling = true;
 
-        $exception = $eventArgs->get('exception');
-        $request = $eventArgs->get('request');
+        $exception = $eventArgs->getException();
+        $request = $eventArgs->getRequest();
 
         if (null !== $this->logger) {
             $this->logger->err(sprintf('%s: %s (uncaught exception)', get_class($exception), $exception->getMessage()));
@@ -66,7 +66,7 @@ class ExceptionListener
         $request = $request->duplicate(null, null, $attributes);
 
         try {
-            $response = $eventArgs->getSubject()->handle($request, HttpKernelInterface::SUB_REQUEST, true);
+            $response = $eventArgs->getKernel()->handle($request, HttpKernelInterface::SUB_REQUEST, true);
         } catch (\Exception $e) {
             $message = sprintf('Exception thrown when handling an exception (%s: %s)', get_class($e), $e->getMessage());
             if (null !== $this->logger) {
@@ -77,12 +77,11 @@ class ExceptionListener
 
             // set handling to false otherwise it wont be able to handle further more
             $handling = false;
-            
+
             // re-throw the exception as this is a catch-all
             throw $exception;
         }
 
-        $eventArgs->setHandled(true);
         $eventArgs->setResponse($response);
 
         $handling = false;

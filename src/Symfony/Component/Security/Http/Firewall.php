@@ -13,7 +13,7 @@ namespace Symfony\Component\Security\Http;
 
 use Symfony\Component\HttpKernel\HttpKernelInterface;
 use Symfony\Component\HttpKernel\Events;
-use Symfony\Component\HttpKernel\Event\RequestEventArgs;
+use Symfony\Component\HttpKernel\Event\GetResponseEventArgs;
 use Symfony\Component\HttpFoundation\Request;
 use Doctrine\Common\EventManager;
 
@@ -48,9 +48,9 @@ class Firewall
     /**
      * Handles security.
      *
-     * @param RequestEventArgs $eventArgs An RequestEventArgs instance
+     * @param GetResponseEventArgs $eventArgs An GetResponseEventArgs instance
      */
-    public function onCoreRequest(RequestEventArgs $eventArgs)
+    public function onCoreRequest(GetResponseEventArgs $eventArgs)
     {
         if (HttpKernelInterface::MASTER_REQUEST !== $eventArgs->getRequestType()) {
             return;
@@ -83,7 +83,7 @@ class Firewall
         }
 
         // initiate the listener chain
-        $securityEventArgs = new RequestEventArgs($eventArgs->getKernel(), $request, $eventArgs->getRequestType());
+        $securityEventArgs = new GetResponseEventArgs($eventArgs->getKernel(), $request, $eventArgs->getRequestType());
         $this->evm->dispatchEvent($securityEventArgs);
 
         if ($securityEventArgs->hasResponse()) {

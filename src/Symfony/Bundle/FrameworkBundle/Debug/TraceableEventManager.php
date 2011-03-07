@@ -11,18 +11,18 @@
 
 namespace Symfony\Bundle\FrameworkBundle\Debug;
 
-use Doctrine\Common\EventManager;
-use Symfony\Component\EventDispatcher\EventInterface;
+use Symfony\Bundle\FrameworkBundle\ContainerAwareEventManager;
 use Symfony\Component\HttpKernel\Log\LoggerInterface;
 use Symfony\Component\HttpKernel\Debug\TraceableEventManagerInterface;
 use Symfony\Component\DependencyInjection\ContainerInterface;
+use Doctrine\Common\EventArgs;
 
 /**
- * EventDispatcher extends the original EventDispatcher class to add some debugging tools.
+ * Extends the ContainerAwareEventManager to add some debugging tools.
  *
  * @author Fabien Potencier <fabien@symfony.com>
  */
-class TraceableEventManager extends EventManager implements TraceableEventManagerInterface
+class TraceableEventManager extends ContainerAwareEventManager implements TraceableEventManagerInterface
 {
     protected $logger;
     protected $called;
@@ -44,6 +44,14 @@ class TraceableEventManager extends EventManager implements TraceableEventManage
     /**
      * {@inheritDoc}
      */
+    public function dispatchEvent($eventName, EventArgs $eventArgs = null)
+    {
+        parent::dispatchEvent($eventName, $eventArgs);
+    }
+
+    /**
+     * {@inheritDoc}
+     */
     public function notify(EventInterface $event)
     {
         foreach ($this->getListeners($event->getName()) as $listener) {
@@ -55,52 +63,6 @@ class TraceableEventManager extends EventManager implements TraceableEventManage
 
             call_user_func($listener, $event);
         }
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    public function notifyUntil(EventInterface $event)
-    {
-        foreach ($this->getListeners($event->getName()) as $i => $listener) {
-            if (is_array($listener) && is_string($listener[0])) {
-                $listener[0] = $this->container->get($listener[0]);
-            }
-
-            $this->addCall($event, $listener, 'notifyUntil');
-
-            $ret = call_user_func($listener, $event);
-            if ($event->isProcessed()) {
-                if (null !== $this->logger) {
-                    $this->logger->debug(sprintf('Listener "%s" processed the event "%s"', $this->listenerToString($listener), $event->getName()));
-
-                    $listeners = $this->getListeners($event->getName());
-                    while (++$i < count($listeners)) {
-                        $this->logger->debug(sprintf('Listener "%s" was not called for event "%s"', $this->listenerToString($listeners[$i]), $event->getName()));
-                    }
-                }
-
-                return $ret;
-            }
-        }
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    public function filter(EventInterface $event, $value)
-    {
-        foreach ($this->getListeners($event->getName()) as $listener) {
-            if (is_array($listener) && is_string($listener[0])) {
-                $listener[0] = $this->container->get($listener[0]);
-            }
-
-            $this->addCall($event, $listener, 'filter');
-
-            $value = call_user_func($listener, $event, $value);
-        }
-
-        return $value;
     }
 
     /**
@@ -163,7 +125,6 @@ class TraceableEventManager extends EventManager implements TraceableEventManage
 
         $this->called[$event->getName().'.'.$listener] = array(
             'event'    => $event->getName(),
-            'caller'   => null !== $event->getSubject() ? get_class($event->getSubject()) : null,
             'listener' => $listener,
         );
     }

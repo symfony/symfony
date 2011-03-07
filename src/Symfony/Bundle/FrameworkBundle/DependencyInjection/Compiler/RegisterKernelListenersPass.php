@@ -19,35 +19,25 @@ class RegisterKernelListenersPass implements CompilerPassInterface
 {
     public function process(ContainerBuilder $container)
     {
-        if (!$container->hasDefinition('event_dispatcher')) {
+        if (!$container->hasDefinition('event_manager')) {
             return;
         }
 
         $listeners = array();
+        $definition = $container->getDefinition('event_manager');
+
         foreach ($container->findTaggedServiceIds('kernel.listener') as $id => $events) {
             foreach ($events as $event) {
                 $priority = isset($event['priority']) ? $event['priority'] : 0;
+
+                var_dump($id);
+
                 if (!isset($event['event'])) {
-                    throw new \InvalidArgumentException(sprintf('Service "%s" must define the "event" attribute on "kernel.listener" tags.', $id));
+                    $definition->addMethodCall('addEventSubscriberService', array($id, $priority));
+                } else {
+                    $definition->addMethodCall('addEventListenerService', array($event['event'], $id, $priority));
                 }
-                if (!isset($event['method'])) {
-                    throw new \InvalidArgumentException(sprintf('Service "%s" must define the "method" attribute on "kernel.listener" tags.', $id));
-                }
-
-                if (!isset($listeners[$event['event']][$priority])) {
-                    if (!isset($listeners[$event['event']])) {
-                        $listeners[$event['event']] = array();
-                    }
-                    $listeners[$event['event']][$priority] = array();
-                }
-
-                $listeners[$event['event']][$priority][] = array($id, $event['method']);
             }
         }
-
-        $container
-            ->getDefinition('event_dispatcher')
-            ->addMethodCall('registerKernelListeners', array($listeners))
-        ;
     }
 }

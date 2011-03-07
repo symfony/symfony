@@ -13,7 +13,7 @@ namespace Symfony\Component\HttpKernel\HttpCache;
 
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpKernel\HttpKernelInterface;
-use Symfony\Component\HttpKernel\Event\RequestEventArgs;
+use Symfony\Component\HttpKernel\Event\FilterResponseEventArgs;
 
 /**
  * EsiListener adds a Surrogate-Control HTTP header when the Response needs to be parsed for ESI.
@@ -38,9 +38,9 @@ class EsiListener
     /**
      * Filters the Response.
      *
-     * @param RequestEventArgs $eventArgs  A RequestEventArgs instance
+     * @param FilterResponseEventArgs $eventArgs  A FilterResponseEventArgs instance
      */
-    public function filterCoreResponse(RequestEventArgs $eventArgs)
+    public function filterCoreResponse(FilterResponseEventArgs $eventArgs)
     {
         if (HttpKernelInterface::MASTER_REQUEST !== $eventArgs->getRequestType() || null === $this->esi) {
             return;

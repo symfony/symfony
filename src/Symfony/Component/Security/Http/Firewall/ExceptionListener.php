@@ -142,7 +142,6 @@ class ExceptionListener implements ListenerInterface
             return;
         }
 
-        $eventArgs->setHandled(true);
         $eventArgs->setResponse($response);
     }
 

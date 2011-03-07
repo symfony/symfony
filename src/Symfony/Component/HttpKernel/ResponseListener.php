@@ -11,7 +11,7 @@
 
 namespace Symfony\Component\HttpKernel;
 
-use Symfony\Component\HttpKernel\Event\RequestEventArgs;
+use Symfony\Component\HttpKernel\Event\FilterResponseEventArgs;
 use Symfony\Component\HttpFoundation\Response;
 
 /**
@@ -31,11 +31,11 @@ class ResponseListener
     /**
      * Filters the Response.
      *
-     * @param RequestEventArgs $eventArgs    A RequestEventArgs instance
+     * @param FilterResponseEventArgs $eventArgs    A FilterResponseEventArgs instance
      */
-    public function filterCoreResponse(RequestEventArgs $eventArgs)
+    public function filterCoreResponse(FilterResponseEventArgs $eventArgs)
     {
-        if (HttpKernelInterface::MASTER_REQUEST !== $event->getRequestType()) {
+        if (HttpKernelInterface::MASTER_REQUEST !== $eventArgs->getRequestType()) {
             return;
         }
 
@@ -49,7 +49,7 @@ class ResponseListener
             return;
         }
 
-        $request = $event->getRequest();
+        $request = $eventArgs->getRequest();
         $format = $request->getRequestFormat();
         if ((null !== $format) && $mimeType = $request->getMimeType($format)) {
             $response->headers->set('Content-Type', $mimeType);

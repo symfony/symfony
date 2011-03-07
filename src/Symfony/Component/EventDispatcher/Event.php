@@ -38,9 +38,7 @@ class Event implements EventInterface
     }
 
     /**
-     * Returns the subject.
-     *
-     * @return mixed The subject
+     * {@inheritDoc}
      */
     public function getSubject()
     {
@@ -48,9 +46,7 @@ class Event implements EventInterface
     }
 
     /**
-     * Returns the event name.
-     *
-     * @return string The event name
+     * {@inheritDoc}
      */
     public function getName()
     {
@@ -58,12 +54,7 @@ class Event implements EventInterface
     }
 
     /**
-     * Sets the processed flag to true.
-     *
-     * This method must be called by listeners when
-     * it has processed the event (it is only meaningful
-     * when the event has been notified with the notifyUntil()
-     * dispatcher method.
+     * {@inheritDoc}
      */
     public function setProcessed()
     {
@@ -71,12 +62,7 @@ class Event implements EventInterface
     }
 
     /**
-     * Returns whether the event has been processed by a listener or not.
-     *
-     * This method is only meaningful for events notified
-     * with notifyUntil().
-     *
-     * @return Boolean true if the event has been processed, false otherwise
+     * {@inheritDoc}
      */
     public function isProcessed()
     {
@@ -84,9 +70,7 @@ class Event implements EventInterface
     }
 
     /**
-     * Returns the event parameters.
-     *
-     * @return array The event parameters
+     * {@inheritDoc}
      */
     public function all()
     {
@@ -94,11 +78,7 @@ class Event implements EventInterface
     }
 
     /**
-     * Returns true if the parameter exists.
-     *
-     * @param  string  $name  The parameter name
-     *
-     * @return Boolean true if the parameter exists, false otherwise
+     * {@inheritDoc}
      */
     public function has($name)
     {
@@ -106,13 +86,7 @@ class Event implements EventInterface
     }
 
     /**
-     * Returns a parameter value.
-     *
-     * @param  string  $name  The parameter name
-     *
-     * @return mixed  The parameter value
-     *
-     * @throws \InvalidArgumentException When parameter doesn't exists for this event
+     * {@inheritDoc}
      */
     public function get($name)
     {
@@ -124,10 +98,7 @@ class Event implements EventInterface
     }
 
     /**
-     * Sets a parameter.
-     *
-     * @param string  $name   The parameter name
-     * @param mixed   $value  The parameter value
+     * {@inheritDoc}
      */
     public function set($name, $value)
     {

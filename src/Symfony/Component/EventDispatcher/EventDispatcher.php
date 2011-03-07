@@ -21,13 +21,7 @@ class EventDispatcher implements EventDispatcherInterface
     protected $listeners = array();
 
     /**
-     * Connects a listener to a given event name.
-     *
-     * Listeners with a higher priority are executed first.
-     *
-     * @param string  $name      An event name
-     * @param mixed   $listener  A PHP callable
-     * @param integer $priority  The priority (between -10 and 10 -- defaults to 0)
+     * {@inheritDoc}
      */
     public function connect($name, $listener, $priority = 0)
     {
@@ -42,12 +36,7 @@ class EventDispatcher implements EventDispatcherInterface
     }
 
     /**
-     * Disconnects one, or all listeners for the given event name.
-     *
-     * @param string     $name     An event name
-     * @param mixed|null $listener The listener to remove, or null to remove all
-     *
-     * @return void
+     * {@inheritDoc}
      */
     public function disconnect($name, $listener = null)
     {
@@ -70,9 +59,7 @@ class EventDispatcher implements EventDispatcherInterface
     }
 
     /**
-     * Notifies all listeners of a given event.
-     *
-     * @param EventInterface $event An EventInterface instance
+     * {@inheritDoc}
      */
     public function notify(EventInterface $event)
     {
@@ -99,12 +86,7 @@ class EventDispatcher implements EventDispatcherInterface
     }
 
     /**
-     * Filters a value by calling all listeners of a given event.
-     *
-     * @param  EventInterface $event An EventInterface instance
-     * @param  mixed          $value The value to be filtered
-     *
-     * @return mixed The filtered value
+     * {@inheritDoc}
      */
     public function filter(EventInterface $event, $value)
     {
@@ -116,11 +98,7 @@ class EventDispatcher implements EventDispatcherInterface
     }
 
     /**
-     * Returns true if the given event name has some listeners.
-     *
-     * @param  string $name The event name
-     *
-     * @return Boolean true if some listeners are connected, false otherwise
+     * {@inheritDoc}
      */
     public function hasListeners($name)
     {
@@ -128,11 +106,7 @@ class EventDispatcher implements EventDispatcherInterface
     }
 
     /**
-     * Returns all listeners associated with a given event name.
-     *
-     * @param  string $name The event name
-     *
-     * @return array  An array of listeners
+     * {@inheritDoc}
      */
     public function getListeners($name)
     {

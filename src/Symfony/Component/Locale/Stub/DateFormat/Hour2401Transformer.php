@@ -31,7 +31,7 @@ class Hour2401Transformer extends HourTransformer
     /**
      * {@inheritDoc}
      */
-    public function getNormalizedHour($hour, $marker = null)
+    public function normalizeHour($hour, $marker = null)
     {
         if (null === $marker && 24 === $hour) {
             $hour = 0;

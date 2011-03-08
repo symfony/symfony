@@ -25,5 +25,5 @@ abstract class HourTransformer extends Transformer
      * @param  string  $marker  An optional AM/PM marker
      * @return int              The normalized hour value
      */
-    abstract public function getNormalizedHour($hour, $marker = null);
+    abstract public function normalizeHour($hour, $marker = null);
 }

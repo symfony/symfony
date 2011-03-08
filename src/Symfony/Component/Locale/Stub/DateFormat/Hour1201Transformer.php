@@ -29,7 +29,7 @@ class Hour1201Transformer extends HourTransformer
     /**
      * {@inheritDoc}
      */
-    public function getNormalizedHour($hour, $marker = null)
+    public function normalizeHour($hour, $marker = null)
     {
         if ('PM' !== $marker && 12 === $hour) {
             $hour = 0;

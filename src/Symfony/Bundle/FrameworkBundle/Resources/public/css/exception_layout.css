@@ -93,6 +93,11 @@ img
     color:#565656;
 }
 
+.search input[type="search"]
+{
+    -webkit-appearance: textfield;
+}
+
 button
 {
     -webkit-appearance: button-bevel;

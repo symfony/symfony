@@ -44,7 +44,7 @@ class XliffFileLoader implements LoaderInterface
      * @param  string $file
      * @return SimpleXMLElement
      */
-    protected function parseFile($file)
+    private function parseFile($file)
     {
         $dom = new \DOMDocument();
         $current = libxml_use_internal_errors(true);
@@ -74,7 +74,7 @@ class XliffFileLoader implements LoaderInterface
      *
      * @return array  An array of errors
      */
-    protected function getXmlErrors()
+    private function getXmlErrors()
     {
         $errors = array();
         foreach (libxml_get_errors() as $error) {

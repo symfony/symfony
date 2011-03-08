@@ -90,7 +90,7 @@ class Interval
 EOF;
     }
 
-    static protected function convertNumber($number)
+    static private function convertNumber($number)
     {
         if ('-Inf' === $number) {
             return log(0);

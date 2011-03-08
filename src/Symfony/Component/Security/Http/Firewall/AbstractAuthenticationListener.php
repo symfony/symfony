@@ -49,10 +49,10 @@ abstract class AbstractAuthenticationListener implements ListenerInterface
 {
     protected $options;
     protected $logger;
+    protected $authenticationManager;
+    protected $providerKey;
     private $securityContext;
-    private $authenticationManager;
     private $sessionStrategy;
-    private $providerKey;
     private $eventDispatcher;
     private $successHandler;
     private $failureHandler;

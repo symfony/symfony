@@ -11,12 +11,11 @@
 <span class="label">
     <span class="icon"><img src="{{ asset('bundles/webprofiler/images/profiler/logger.png') }}" alt="" /></span>
     <strong>Logs</strong>
-    <span class="count">
-        <span>{{ collector.logs|length }}</span>
-        {% if collector.counterrors %}
+    {% if collector.counterrors %}
+        <span class="count">
             <span class="error">{{ collector.counterrors }}</span>
-        {% endif %}
-    </span>
+        </span>
+    {% endif %}
 </span>
 {% endblock %}
 

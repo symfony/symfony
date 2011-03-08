@@ -236,6 +236,9 @@ abstract class Kernel implements KernelInterface
 
         $name = substr($name, 1);
         list($bundle, $path) = explode('/', $name, 2);
+        if ('Bundle' != substr($bundle, -6)) {
+            $bundle = $this->resolveBundleAlias($bundle);
+        }
 
         $isResource = 0 === strpos($path, 'Resources');
 

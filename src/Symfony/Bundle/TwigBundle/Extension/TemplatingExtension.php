@@ -83,9 +83,9 @@ class TemplatingExtension extends \Twig_Extension
         return $this->container->get('router')->generate($name, $parameters, true);
     }
 
-    public function getAssetUrl($location)
+    public function getAssetUrl($location, $packageName = null)
     {
-        return $this->container->get('templating.helper.assets')->getUrl($location);
+        return $this->container->get('templating.helper.assets')->getUrl($location, $packageName);
     }
 
     /**

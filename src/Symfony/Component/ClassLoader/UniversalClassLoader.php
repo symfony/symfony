@@ -54,10 +54,10 @@ namespace Symfony\Component\ClassLoader;
  */
 class UniversalClassLoader
 {
-    protected $namespaces = array();
-    protected $prefixes = array();
-    protected $namespaceFallback = array();
-    protected $prefixFallback = array();
+    private $namespaces = array();
+    private $prefixes = array();
+    private $namespaceFallback = array();
+    private $prefixFallback = array();
 
     /**
      * Gets the configured namespaces.

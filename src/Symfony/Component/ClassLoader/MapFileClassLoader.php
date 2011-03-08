@@ -18,7 +18,7 @@ namespace Symfony\Component\ClassLoader;
  */
 class MapFileClassLoader
 {
-    protected $map = array();
+    private $map = array();
 
     /**
      * Constructor.

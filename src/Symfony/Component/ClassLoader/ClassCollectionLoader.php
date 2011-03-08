@@ -18,7 +18,7 @@ namespace Symfony\Component\ClassLoader;
  */
 class ClassCollectionLoader
 {
-    static protected $loaded;
+    static private $loaded;
 
     /**
      * Loads a list of classes and caches them in one big file.
@@ -174,8 +174,7 @@ class ClassCollectionLoader
      *
      * @throws \RuntimeException when a cache file cannot be written
      */
-     
-    static protected function writeCacheFile($file, $content)
+    static private function writeCacheFile($file, $content)
     {
         $tmpFile = tempnam(dirname($file), basename($file));
         if (false !== @file_put_contents($tmpFile, $content) && @rename($tmpFile, $file)) {
@@ -197,7 +196,7 @@ class ClassCollectionLoader
      *
      * @return string The PHP string with the comments removed
      */
-    static protected function stripComments($source)
+    static private function stripComments($source)
     {
         if (!function_exists('token_get_all')) {
             return $source;

@@ -15,26 +15,24 @@ use Symfony\Component\DependencyInjection\Compiler\MergeExtensionConfigurationPa
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 
 /**
- * Handles automatically loading each bundle's default extension.
+ * Ensures certain extensions are always loaded.
  *
  * @author Kris Wallsmith <kris.wallsmith@symfony.com>
  */
 class MergeExtensionConfigurationPass extends BaseMergeExtensionConfigurationPass
 {
+    private $extensions;
+
+    public function __construct(array $extensions = array())
+    {
+        $this->extensions = $extensions;
+    }
+
     public function process(ContainerBuilder $container)
     {
-        foreach ($container->getParameter('kernel.bundles') as $bundleName => $bundleClass) {
-            $bundleRefl = new \ReflectionClass($bundleClass);
-            $extClass = $bundleRefl->getNamespaceName().'\\DependencyInjection\\'.substr($bundleName, 0, -6).'Extension';
-
-            if (class_exists($extClass)) {
-                $ext = new $extClass();
-                $name = $ext->getName();
-
-                // ensure all "main" extensions are loaded
-                if (!count($container->getExtensionConfig($name))) {
-                    $container->loadFromExtension($name, array());
-                }
+        foreach ($this->extensions as $extension) {
+            if (!count($container->getExtensionConfig($extension))) {
+                $container->loadFromExtension($extension, array());
             }
         }
 

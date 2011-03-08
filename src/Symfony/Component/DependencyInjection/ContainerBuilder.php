@@ -39,18 +39,6 @@ class ContainerBuilder extends Container implements TaggedContainerInterface
     protected $compiler;
 
     /**
-     * Constructor.
-     *
-     * @param ParameterBagInterface $parameterBag
-     */
-    public function __construct(ParameterBagInterface $parameterBag = null)
-    {
-        parent::__construct($parameterBag);
-
-        $this->compiler = new Compiler();
-    }
-
-    /**
      * Registers an extension.
      *
      * @param ExtensionInterface $extension An extension instance
@@ -175,6 +163,10 @@ class ContainerBuilder extends Container implements TaggedContainerInterface
      */
     public function addCompilerPass(CompilerPassInterface $pass, $type = PassConfig::TYPE_BEFORE_OPTIMIZATION)
     {
+        if (null === $this->compiler) {
+            $this->compiler = new Compiler();
+        }
+
         $this->compiler->addPass($pass, $type);
 
         $this->addObjectResource($pass);
@@ -187,6 +179,10 @@ class ContainerBuilder extends Container implements TaggedContainerInterface
      */
     public function getCompilerPassConfig()
     {
+        if (null === $this->compiler) {
+            $this->compiler = new Compiler();
+        }
+
         return $this->compiler->getPassConfig();
     }
 
@@ -197,6 +193,10 @@ class ContainerBuilder extends Container implements TaggedContainerInterface
      */
     public function getCompiler()
     {
+        if (null === $this->compiler) {
+            $this->compiler = new Compiler();
+        }
+
         return $this->compiler;
     }
 
@@ -391,6 +391,10 @@ class ContainerBuilder extends Container implements TaggedContainerInterface
      */
     public function compile()
     {
+        if (null === $this->compiler) {
+            $this->compiler = new Compiler();
+        }
+
         foreach ($this->compiler->getPassConfig()->getPasses() as $pass) {
             $this->addObjectResource($pass);
         }

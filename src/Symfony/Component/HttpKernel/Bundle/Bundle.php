@@ -61,7 +61,7 @@ abstract class Bundle extends ContainerAware implements BundleInterface
      *
      * @return ExtensionInterface|null The bundle's container extension
      */
-    public function getExtension()
+    public function getContainerExtension()
     {
         if (null === $this->extension) {
             $class = $this->getNamespace().'\\DependencyInjection\\'.str_replace('Bundle', 'Extension', $this->getName());

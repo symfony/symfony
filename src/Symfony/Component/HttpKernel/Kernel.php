@@ -531,7 +531,7 @@ abstract class Kernel implements KernelInterface
             $bundle->build($container);
 
             // register the bundle's extension and alias
-            if ($extension = $bundle->getExtension()) {
+            if ($extension = $bundle->getContainerExtension()) {
                 $container->registerExtension($extension);
                 if (isset($this->bundleAliases[$name])) {
                     $container->registerExtensionAlias($extension->getName(), $this->bundleAliases[$name]);

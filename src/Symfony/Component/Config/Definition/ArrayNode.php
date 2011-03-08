@@ -15,7 +15,6 @@ use Symfony\Component\Config\Definition\Exception\InvalidConfigurationException;
 use Symfony\Component\Config\Definition\Exception\DuplicateKeyException;
 use Symfony\Component\Config\Definition\Exception\InvalidTypeException;
 use Symfony\Component\Config\Definition\Exception\UnsetKeyException;
-use Symfony\Component\DependencyInjection\Extension\Extension;
 
 /**
  * Represents an ARRAY node in the config tree.
@@ -374,7 +373,7 @@ class ArrayNode extends BaseNode implements PrototypeNodeInterface
                 continue;
             }
 
-            $value[$plural] = Extension::normalizeConfig($value, $singular, $plural);
+            $value[$plural] = Processor::normalizeConfig($value, $singular, $plural);
             unset($value[$singular]);
         }
 

@@ -20,8 +20,8 @@ use Symfony\Component\Finder\Glob;
  */
 class FilenameFilterIterator extends \FilterIterator
 {
-    protected $matchRegexps;
-    protected $noMatchRegexps;
+    private $matchRegexps;
+    private $noMatchRegexps;
 
     /**
      * Constructor.
@@ -81,7 +81,7 @@ class FilenameFilterIterator extends \FilterIterator
         return $match && !$exclude;
     }
 
-    protected function toRegex($str)
+    private function toRegex($str)
     {
         if (preg_match('/^([^a-zA-Z0-9\\\\]).+?\\1[ims]?$/', $str)) {
             return $str;

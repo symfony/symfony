@@ -27,7 +27,7 @@ class DirectoryResource implements ResourceInterface
      */
     public function __construct($resource)
     {
-        $this->resource = realpath($resource);
+        $this->resource = $resource;
     }
 
     /**
@@ -65,8 +65,9 @@ class DirectoryResource implements ResourceInterface
 
         $newestMTime = 0;
         foreach (new \RecursiveIteratorIterator(new \RecursiveDirectoryIterator($this->resource), \RecursiveIteratorIterator::LEAVES_ONLY) as $file) {
-          $newestMTime = max(filemtime($file), $newestMTime);
+            $newestMTime = max(filemtime($file), $newestMTime);
         }
+
         return $newestMTime < $timestamp;
     }
 }

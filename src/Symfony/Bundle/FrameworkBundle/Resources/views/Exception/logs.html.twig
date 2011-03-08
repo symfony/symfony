@@ -1,7 +1,12 @@
-<ol>
+<ol class="traces">
     {% for log in logs %}
-        <li{% if 'ERR' == log.priorityName %} class="error"{% endif %}>
-            {{ log.priorityName }}
+        <li>
+            {% if 'ERR' == log.priorityName %}
+                <em>{{ log.priorityName }}</em>
+            {% else %}
+                {{ log.priorityName }}
+            {% endif %}
+
             {{ log.message }}
         </li>
     {% endfor %}

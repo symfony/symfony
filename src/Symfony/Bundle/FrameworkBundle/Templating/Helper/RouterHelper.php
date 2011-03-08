@@ -3,7 +3,7 @@
 /*
  * This file is part of the Symfony package.
  *
- * (c) Fabien Potencier <fabien.potencier@symfony-project.com>
+ * (c) Fabien Potencier <fabien@symfony.com>
  *
  * For the full copyright and license information, please view the LICENSE
  * file that was distributed with this source code.
@@ -12,12 +12,12 @@
 namespace Symfony\Bundle\FrameworkBundle\Templating\Helper;
 
 use Symfony\Component\Templating\Helper\Helper;
-use Symfony\Component\Routing\Router;
+use Symfony\Component\Routing\RouterInterface;
 
 /**
  * RouterHelper manages links between pages in a template context.
  *
- * @author Fabien Potencier <fabien.potencier@symfony-project.com>
+ * @author Fabien Potencier <fabien@symfony.com>
  */
 class RouterHelper extends Helper
 {
@@ -26,9 +26,9 @@ class RouterHelper extends Helper
     /**
      * Constructor.
      *
-     * @param Router $router A Router instance
+     * @param RouterInterface $router A Router instance
      */
-    public function __construct(Router $router)
+    public function __construct(RouterInterface $router)
     {
         $this->generator = $router->getGenerator();
     }

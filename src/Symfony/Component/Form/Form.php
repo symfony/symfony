@@ -3,7 +3,7 @@
 /*
  * This file is part of the Symfony package.
  *
- * (c) Fabien Potencier <fabien.potencier@symfony-project.com>
+ * (c) Fabien Potencier <fabien@symfony.com>
  *
  * For the full copyright and license information, please view the LICENSE
  * file that was distributed with this source code.
@@ -35,8 +35,8 @@ use Symfony\Component\Form\CsrfProvider\CsrfProviderInterface;
  * CSRF secret. If the global CSRF secret is also null, then a random one
  * is generated on the fly.
  *
- * @author Fabien Potencier <fabien.potencier@symfony-project.com>
- * @author Bernhard Schussek <bernhard.schussek@symfony-project.com>
+ * @author Fabien Potencier <fabien@symfony.com>
+ * @author Bernhard Schussek <bernhard.schussek@symfony.com>
  */
 class Form extends Field implements \IteratorAggregate, FormInterface
 {

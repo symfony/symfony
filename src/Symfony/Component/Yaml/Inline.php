@@ -2,7 +2,7 @@
 
 /*
  * This file is part of the Symfony package.
- * (c) Fabien Potencier <fabien.potencier@symfony-project.com>
+ * (c) Fabien Potencier <fabien@symfony.com>
  *
  * For the full copyright and license information, please view the LICENSE
  * file that was distributed with this source code.
@@ -13,7 +13,7 @@ namespace Symfony\Component\Yaml;
 /**
  * Inline implements a YAML parser/dumper for the YAML inline syntax.
  *
- * @author Fabien Potencier <fabien.potencier@symfony-project.com>
+ * @author Fabien Potencier <fabien@symfony.com>
  */
 class Inline
 {
@@ -88,10 +88,10 @@ class Inline
                 return is_string($value) ? "'$value'" : (int) $value;
             case is_numeric($value):
                 return is_infinite($value) ? str_ireplace('INF', '.Inf', strval($value)) : (is_string($value) ? "'$value'" : $value);
-            case false !== strpos($value, "\n") || false !== strpos($value, "\r"):
-                return sprintf('"%s"', str_replace(array('"', "\n", "\r"), array('\\"', '\n', '\r'), $value));
-            case preg_match('/[ \s \' " \: \{ \} \[ \] , & \* \# \?] | \A[ - ? | < > = ! % @ ` ]/x', $value):
-                return sprintf("'%s'", str_replace('\'', '\'\'', $value));
+            case Escaper::requiresDoubleQuoting($value):
+                return Escaper::escapeWithDoubleQuotes($value);
+            case Escaper::requiresSingleQuoting($value):
+                return Escaper::escapeWithSingleQuotes($value);
             case '' == $value:
                 return "''";
             case preg_match(self::getTimestampRegex(), $value):
@@ -197,12 +197,11 @@ class Inline
 
         $output = substr($match[0], 1, strlen($match[0]) - 2);
 
+        $unescaper = new Unescaper();
         if ('"' == $scalar[$i]) {
-            // evaluate the string
-            $output = str_replace(array('\\"', '\\n', '\\r'), array('"', "\n", "\r"), $output);
+            $output = $unescaper->unescapeDoubleQuotedString($output);
         } else {
-            // unescape '
-            $output = str_replace('\'\'', '\'', $output);
+            $output = $unescaper->unescapeSingleQuotedString($output);
         }
 
         $i += strlen($match[0]);

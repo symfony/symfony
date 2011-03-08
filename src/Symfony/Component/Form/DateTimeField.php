@@ -3,7 +3,7 @@
 /*
  * This file is part of the Symfony package.
  *
- * (c) Fabien Potencier <fabien.potencier@symfony-project.com>
+ * (c) Fabien Potencier <fabien@symfony.com>
  *
  * For the full copyright and license information, please view the LICENSE
  * file that was distributed with this source code.
@@ -44,7 +44,7 @@ use Symfony\Component\Form\ValueTransformer\ValueTransformerChain;
  *  * data_timezone:  The timezone of the data. Default: UTC.
  *  * user_timezone:  The timezone of the user entering a new value. Default: UTC.
  *
- * @author Bernhard Schussek <bernhard.schussek@symfony-project.com>
+ * @author Bernhard Schussek <bernhard.schussek@symfony.com>
  */
 class DateTimeField extends Form
 {

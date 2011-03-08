@@ -3,7 +3,7 @@
 /*
  * This file is part of the Symfony package.
  *
- * (c) Fabien Potencier <fabien.potencier@symfony-project.com>
+ * (c) Fabien Potencier <fabien@symfony.com>
  *
  * For the full copyright and license information, please view the LICENSE
  * file that was distributed with this source code.
@@ -19,8 +19,8 @@ use Symfony\Component\Validator\Exception\GroupDefinitionException;
 /**
  * Represents all the configured constraints on a given class.
  *
- * @author Bernhard Schussek <bernhard.schussek@symfony-project.com>
- * @author Fabien Potencier <fabien.potencier@symfony-project.com>
+ * @author Bernhard Schussek <bernhard.schussek@symfony.com>
+ * @author Fabien Potencier <fabien@symfony.com>
  */
 class ClassMetadata extends ElementMetadata
 {

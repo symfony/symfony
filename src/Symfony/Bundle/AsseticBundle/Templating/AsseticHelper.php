@@ -3,7 +3,7 @@
 /*
  * This file is part of the Symfony framework.
  *
- * (c) Fabien Potencier <fabien.potencier@symfony-project.com>
+ * (c) Fabien Potencier <fabien@symfony.com>
  *
  * This source file is subject to the MIT license that is bundled
  * with this source code in the file LICENSE.
@@ -17,7 +17,7 @@ use Symfony\Component\Templating\Helper\Helper;
 /**
  * The "assetic" templating helper.
  *
- * @author Kris Wallsmith <kris.wallsmith@symfony-project.com>
+ * @author Kris Wallsmith <kris.wallsmith@symfony.com>
  */
 class AsseticHelper extends Helper
 {
@@ -85,22 +85,9 @@ class AsseticHelper extends Helper
             return array($coll->getTargetUrl());
         }
 
-        // create a pattern for each leaf's target url
-        $pattern = $coll->getTargetUrl();
-        if (false !== $pos = strrpos($pattern, '.')) {
-            $pattern = substr($pattern, 0, $pos).'_*'.substr($pattern, $pos);
-        } else {
-            $pattern .= '_*';
-        }
-
         $urls = array();
         foreach ($coll as $leaf) {
-            $asset = $this->factory->createAsset($leaf->getSourceUrl(), $filters, array(
-                'output' => $pattern,
-                'name'   => 'part'.(count($urls) + 1),
-                'debug'  => $options['debug'],
-            ));
-            $urls[] = $asset->getTargetUrl();
+            $urls[] = $leaf->getTargetUrl();
         }
 
         return $urls;

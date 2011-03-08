@@ -23,7 +23,7 @@ use Symfony\Component\CssSelector\SyntaxError;
  */
 class CombinedSelectorNode implements NodeInterface
 {
-    static protected $_method_mapping = array(
+    static protected $methodMapping = array(
         ' ' => 'descendant',
         '>' => 'child',
         '+' => 'direct_adjacent',
@@ -64,11 +64,11 @@ class CombinedSelectorNode implements NodeInterface
      */
     public function toXpath()
     {
-        if (!isset(self::$_method_mapping[$this->combinator])) {
+        if (!isset(self::$methodMapping[$this->combinator])) {
             throw new SyntaxError(sprintf('Unknown combinator: %s', $this->combinator));
         }
 
-        $method = '_xpath_'.self::$_method_mapping[$this->combinator];
+        $method = '_xpath_'.self::$methodMapping[$this->combinator];
         $path = $this->selector->toXpath();
 
         return $this->$method($path, $this->subselector);

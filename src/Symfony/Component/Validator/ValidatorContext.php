@@ -14,7 +14,7 @@ namespace Symfony\Component\Validator;
 use Symfony\Component\Validator\Mapping\ClassMetadataFactoryInterface;
 
 /**
- * Default implementaton of ValidatorContextInterface
+ * Default implementation of ValidatorContextInterface
  *
  * @author Bernhard Schussek <bernhard.schussek@symfony-project.com>
  */

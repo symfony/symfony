@@ -29,7 +29,7 @@ use Symfony\Component\Security\Core\Exception\AuthenticationCredentialsNotFoundE
 use Symfony\Component\Security\Core\Authentication\Token\TokenInterface;
 
 /**
- * SwitchUserListener allows a user to impersonate another one temporarly
+ * SwitchUserListener allows a user to impersonate another one temporarily
  * (like the Unix su command).
  *
  * @author Fabien Potencier <fabien.potencier@symfony-project.com>

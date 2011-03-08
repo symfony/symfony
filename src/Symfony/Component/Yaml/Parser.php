@@ -343,9 +343,9 @@ class Parser
             $modifiers = isset($matches['modifiers']) ? $matches['modifiers'] : '';
 
             return $this->parseFoldedScalar($matches['separator'], preg_replace('#\d+#', '', $modifiers), intval(abs($modifiers)));
-        } else {
-            return Inline::load($value);
         }
+
+        return Inline::load($value);
     }
 
     /**

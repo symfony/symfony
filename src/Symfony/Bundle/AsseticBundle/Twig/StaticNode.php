@@ -28,7 +28,7 @@ class StaticNode extends AsseticNode
         return new \Twig_Node_Expression_Function(
             new \Twig_Node_Expression_Name('asset', $body->getLine()),
             new \Twig_Node(array(
-                new \Twig_Node_Expression_Constant($this->getAttribute('target_url')),
+                new \Twig_Node_Expression_Constant($this->getAttribute('target_url'), $body->getLine()),
             )),
             $body->getLine()
         );

@@ -14,9 +14,10 @@
             <tag name="kernel.cache_warmer" />
             <argument type="service" id="assetic.asset_manager" />
             <argument type="service" id="assetic.asset_writer" />
+            <argument type="service" id="event_dispatcher" />
         </service>
         <service id="assetic.asset_writer" class="%assetic.asset_writer.class%" public="false">
-            <argument>%assetic.document_root%</argument>
+            <argument>%assetic.write_to%</argument>
         </service>
     </services>
 </container>

@@ -129,9 +129,9 @@ class Application
             // @codeCoverageIgnoreStart
             exit($statusCode);
             // @codeCoverageIgnoreEnd
-        } else {
-            return $statusCode;
         }
+
+        return $statusCode;
     }
 
     /**
@@ -315,9 +315,9 @@ class Application
     {
         if ('UNKNOWN' !== $this->getName() && 'UNKNOWN' !== $this->getVersion()) {
             return sprintf('<info>%s</info> version <comment>%s</comment>', $this->getName(), $this->getVersion());
-        } else {
-            return '<info>Console Tool</info>';
         }
+
+        return '<info>Console Tool</info>';
     }
 
     /**

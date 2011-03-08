@@ -53,7 +53,7 @@ abstract class BaseNode implements NodeInterface
     }
 
     /**
-     * Adds an equivilent value.
+     * Adds an equivalent value.
      *
      * @param mixed $originalValue 
      * @param mixed $equivalentValue 
@@ -173,7 +173,8 @@ abstract class BaseNode implements NodeInterface
      * Normalizes a value, applying all normalization closures.
      *
      * @param mixed $value Value to normalize.
-     * @return mied The normalized value.
+     *
+     * @return mixed The normalized value.
      */
     public final function normalize($value)
     {

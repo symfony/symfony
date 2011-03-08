@@ -62,7 +62,7 @@ class PhpMatcherDumper extends MatcherDumper
 
             $hasTrailingSlash = false;
             if (!count($compiledRoute->getVariables()) && false !== preg_match('#^(.)\^(?P<url>.*?)\$\1#', $compiledRoute->getRegex(), $m)) {
-                if (substr($m['url'], -1) === '/' && $m['url'] !== '/') {
+                if (substr($m['url'], -1) === '/') {
                     $conditions[] = sprintf("rtrim(\$url, '/') === '%s'", rtrim(str_replace('\\', '', $m['url']), '/'));
                     $hasTrailingSlash = true;
                 } else {

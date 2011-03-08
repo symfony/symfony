@@ -60,6 +60,7 @@ class PreAuthenticatedAuthenticationProviderTest extends \PHPUnit_Framework_Test
         $this->assertEquals('pass', $token->getCredentials());
         $this->assertEquals('key', $token->getProviderKey());
         $this->assertEquals(array(), $token->getRoles());
+        $this->assertEquals(array('foo' => 'bar'), $token->getAttributes(), '->authenticate() copies token attributes');
         $this->assertSame($user, $token->getUser());
     }
 
@@ -102,6 +103,8 @@ class PreAuthenticatedAuthenticationProviderTest extends \PHPUnit_Framework_Test
             ->method('getProviderKey')
             ->will($this->returnValue('key'))
         ;
+
+        $token->setAttributes(array('foo' => 'bar'));
 
         return $token;
     }

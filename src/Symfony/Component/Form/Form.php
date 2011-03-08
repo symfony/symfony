@@ -836,9 +836,9 @@ class Form extends Field implements \IteratorAggregate, FormInterface
             }
 
             return $length > $max;
-        } else {
-            return false;
         }
+
+        return false;
     }
 
     /**

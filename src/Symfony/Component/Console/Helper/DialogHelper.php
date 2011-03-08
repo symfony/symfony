@@ -61,9 +61,9 @@ class DialogHelper extends Helper
 
         if (false === $default) {
             return $answer && 'y' == strtolower($answer[0]);
-        } else {
-            return !$answer || 'y' == strtolower($answer[0]);
         }
+
+        return !$answer || 'y' == strtolower($answer[0]);
         // @codeCoverageIgnoreEnd
     }
 

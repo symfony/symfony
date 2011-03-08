@@ -73,9 +73,9 @@ class SqliteProfilerStorage implements ProfilerStorageInterface
         $this->close($db);
         if (isset($data[0]['data'])) {
             return array($data[0]['data'], $data[0]['ip'], $data[0]['url'], $data[0]['time']);
-        } else {
-            return false;
         }
+
+        return false;
     }
 
     /**

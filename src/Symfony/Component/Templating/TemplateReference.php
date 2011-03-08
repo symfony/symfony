@@ -62,9 +62,9 @@ class TemplateReference implements TemplateReferenceInterface
     {
         if (array_key_exists($name, $this->parameters)) {
             return $this->parameters[$name];
-        } else {
-            throw new \InvalidArgumentException(sprintf('The template does not support the "%s" parameter.', $name));
         }
+
+        throw new \InvalidArgumentException(sprintf('The template does not support the "%s" parameter.', $name));
     }
 
     /**

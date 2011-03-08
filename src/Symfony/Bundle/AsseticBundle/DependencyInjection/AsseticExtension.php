@@ -29,32 +29,6 @@ class AsseticExtension extends Extension
     /**
      * Loads the configuration.
      *
-     * When the debug flag is true, files in an asset collections will be
-     * rendered individually.
-     *
-     * In XML:
-     *
-     *     <assetic:config
-     *         debug="true"
-     *         use-controller="true"
-     *         document-root="/path/to/document/root"
-     *         closure="/path/to/google_closure/compiler.jar"
-     *         yui="/path/to/yuicompressor.jar"
-     *         default-javascripts-output="js/build/*.js"
-     *         default-stylesheets-output="css/build/*.css"
-     *     />
-     *
-     * In YAML:
-     *
-     *     assetic:
-     *         debug: true
-     *         use_controller: true
-     *         document_root: /path/to/document/root
-     *         closure: /path/to/google_closure/compiler.jar
-     *         yui: /path/to/yuicompressor.jar
-     *         default_javascripts_output: js/build/*.js
-     *         default_stylesheets_output: css/build/*.css
-     *
      * @param array            $configs   An array of configuration settings
      * @param ContainerBuilder $container A ContainerBuilder instance
      */
@@ -65,13 +39,12 @@ class AsseticExtension extends Extension
         $loader->load('templating_twig.xml');
         // $loader->load('templating_php.xml'); // not ready yet
 
-        $configuration = new Configuration();
-        $processor = new Processor();
-        $config = $processor->process($configuration->getConfigTree($container->getParameter('kernel.debug')), $configs);
+        $config = self::processConfigs($configs, $container->getParameter('kernel.debug'), array_keys($container->getParameter('kernel.bundles')));
 
         $container->setParameter('assetic.debug', $config['debug']);
         $container->setParameter('assetic.use_controller', $config['use_controller']);
-        $container->setParameter('assetic.document_root', $config['document_root']);
+        $container->setParameter('assetic.read_from', $config['read_from']);
+        $container->setParameter('assetic.write_to', $config['write_to']);
         $container->setParameter('assetic.default_javascripts_output', $config['default_javascripts_output']);
         $container->setParameter('assetic.default_stylesheets_output', $config['default_stylesheets_output']);
 
@@ -97,20 +70,36 @@ class AsseticExtension extends Extension
             $container->getDefinition('assetic.filter.less')->addMethodCall('setCompress', array('%assetic.less.compress%'));
         }
 
-        $this->registerFormulaResources($container);
+        $this->registerFormulaResources($container, $container->getParameterBag()->resolveValue($config['bundles']));
     }
 
-    protected function registerFormulaResources(ContainerBuilder $container)
+    static protected function processConfigs(array $configs, $debug, array $bundles)
     {
-        // bundle views/ directories
+        $configuration = new Configuration();
+        $tree = $configuration->getConfigTree($debug, $bundles);
+
+        $processor = new Processor();
+        return $processor->process($tree, $configs);
+    }
+
+    static protected function registerFormulaResources(ContainerBuilder $container, array $bundles)
+    {
+        $map = $container->getParameter('kernel.bundles');
+
+        if ($diff = array_diff($bundles, array_keys($map))) {
+            throw new \InvalidArgumentException(sprintf('The following bundles are not registered: "%s"', implode('", "', $diff)));
+        }
+
         $am = $container->getDefinition('assetic.asset_manager');
-        foreach ($container->getParameter('kernel.bundles') as $name => $class) {
-            $rc = new \ReflectionClass($class);
+
+        // bundle views/ directories
+        foreach ($bundles as $name) {
+            $rc = new \ReflectionClass($map[$name]);
             if (is_dir($dir = dirname($rc->getFileName()).'/Resources/views')) {
                 foreach (array('twig', 'php') as $engine) {
                     $container->setDefinition(
                         'assetic.'.$engine.'_directory_resource.'.$name,
-                        $this->createDirectoryResourceDefinition($name, $dir, $engine)
+                        self::createDirectoryResourceDefinition($name, $dir, $engine)
                     );
                 }
             }
@@ -121,7 +110,7 @@ class AsseticExtension extends Extension
             foreach (array('twig', 'php') as $engine) {
                 $container->setDefinition(
                     'assetic.'.$engine.'_directory_resource.kernel',
-                    $this->createDirectoryResourceDefinition('', $dir, $engine)
+                    self::createDirectoryResourceDefinition('', $dir, $engine)
                 );
             }
         }
@@ -130,16 +119,15 @@ class AsseticExtension extends Extension
     /**
      * @todo decorate an abstract xml definition
      */
-    protected function createDirectoryResourceDefinition($bundle, $dir, $engine)
+    static protected function createDirectoryResourceDefinition($bundle, $dir, $engine)
     {
         $definition = new Definition('%assetic.directory_resource.class%');
 
         $definition
-            ->addArgument(new Reference('templating.name_parser'))
             ->addArgument(new Reference('templating.loader'))
             ->addArgument($bundle)
             ->addArgument($dir)
-            ->addArgument('/\.'.$engine.'$/')
+            ->addArgument('/^[^.]+\.[^.]+\.'.$engine.'$/')
             ->addTag('assetic.templating.'.$engine)
             ->addTag('assetic.formula_resource', array('loader' => $engine))
             ->setPublic(false)

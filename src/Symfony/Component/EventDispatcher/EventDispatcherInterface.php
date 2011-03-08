@@ -54,7 +54,7 @@ interface EventDispatcherInterface
      * A listener tells the dispatcher that it has processed the event
      * by calling the setProcessed() method on it.
      *
-     * It can then return a value that will be fowarded to the caller.
+     * It can then return a value that will be forwarded to the caller.
      *
      * @param  EventInterface $event An EventInterface instance
      *

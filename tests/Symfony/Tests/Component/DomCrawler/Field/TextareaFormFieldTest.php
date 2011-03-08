@@ -22,7 +22,7 @@ class TextareaFormFieldTest extends FormFieldTestCase
         $node = $this->createNode('textarea', 'foo bar');
         $field = new TextareaFormField($node);
 
-        $this->assertEquals('foo bar', $field->getValue(), '->initialize() sets the value of the field to the textare node value');
+        $this->assertEquals('foo bar', $field->getValue(), '->initialize() sets the value of the field to the textarea node value');
 
         $node = $this->createNode('input', '');
         try {

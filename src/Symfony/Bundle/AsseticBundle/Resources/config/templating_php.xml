@@ -24,6 +24,7 @@
             <tag name="assetic.templating.php" />
             <argument type="service" id="assetic.php_formula_loader.real" />
             <argument type="service" id="assetic.config_cache" />
+            <argument>%kernel.debug%</argument>
         </service>
         <service id="assetic.php_formula_loader.real" class="%assetic.php_formula_loader.class%" public="false">
             <tag name="assetic.templating.php" />

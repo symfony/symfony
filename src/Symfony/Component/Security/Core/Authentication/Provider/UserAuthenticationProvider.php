@@ -70,7 +70,10 @@ abstract class UserAuthenticationProvider implements AuthenticationProviderInter
             $this->checkAuthentication($user, $token);
             $this->accountChecker->checkPostAuth($user);
 
-            return new UsernamePasswordToken($user, $token->getCredentials(), $this->providerKey, $user->getRoles());
+            $authenticatedToken = new UsernamePasswordToken($user, $token->getCredentials(), $this->providerKey, $user->getRoles());
+            $authenticatedToken->setAttributes($token->getAttributes());
+
+            return $authenticatedToken;
         } catch (UsernameNotFoundException $notFound) {
             if ($this->hideUserNotFoundExceptions) {
                 throw new BadCredentialsException('Bad credentials', 0, $notFound);

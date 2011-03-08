@@ -11,6 +11,8 @@
 
 namespace Symfony\Tests\Component\DependencyInjection\Compiler;
 
+use Symfony\Component\DependencyInjection\Scope;
+
 use Symfony\Component\DependencyInjection\Definition;
 use Symfony\Component\DependencyInjection\Compiler\AnalyzeServiceReferencesPass;
 use Symfony\Component\DependencyInjection\Compiler\Compiler;
@@ -108,6 +110,20 @@ class InlineServiceDefinitionsPassTest extends \PHPUnit_Framework_TestCase
 
         $inlinedArguments = $arguments[1]->getArguments();
         $this->assertSame($a, $inlinedArguments[0]);
+    }
+
+    public function testProcessInlinesOnlyIfSameScope()
+    {
+        $container = new ContainerBuilder();
+
+        $container->addScope(new Scope('foo'));
+        $a = $container->register('a')->setPublic(false)->setScope('foo');
+        $b = $container->register('b')->addArgument(new Reference('a'));
+
+        $this->process($container);
+        $arguments = $b->getArguments();
+        $this->assertEquals(new Reference('a'), $arguments[0]);
+        $this->assertTrue($container->hasDefinition('a'));
     }
 
     protected function process(ContainerBuilder $container)

@@ -43,7 +43,7 @@ Alternatively, you can limit generation to a single entity within a bundle:
 
   <info>./app/console doctrine:generate:entities "MyCustomBundle" --entity="User"</info>
 
-You have to specifiy the shortname (without namespace) of the entity you want to filter for.
+You have to specify the shortname (without namespace) of the entity you want to filter for.
 EOT
         );
     }
@@ -66,7 +66,7 @@ EOT
 
                 if (strpos($metadata->name, $foundBundle->getNamespace()) === false) {
                     throw new \RuntimeException(
-                        "Entity " . $metadata->name . " and bundle don't have a commont namespace, ".
+                        "Entity " . $metadata->name . " and bundle don't have a common namespace, ".
                         "generation failed because the target directory cannot be detected.");
                 }
 

@@ -50,7 +50,7 @@ class MergeBuilder
     /**
      * Sets whether the node can be overwritten.
      *
-     * @param boolean $deny Whether the overwritting is forbidden or not
+     * @param boolean $deny Whether the overwriting is forbidden or not
      *
      * @return Symfony\Component\Config\Definition\Builder\MergeBuilder
      */

@@ -117,7 +117,7 @@ class ClassMetadataTest extends \PHPUnit_Framework_TestCase
         $this->assertFalse($this->metadata->hasMemberMetadatas('non_existant_field'));
     }
 
-    public function testMergeConstraintsKeepsPrivateMembersSeperate()
+    public function testMergeConstraintsKeepsPrivateMembersSeparate()
     {
         $parent = new ClassMetadata(self::PARENTCLASS);
         $parent->addPropertyConstraint('internal', new ConstraintA());

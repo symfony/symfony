@@ -466,12 +466,12 @@ EOF;
         if (is_array($callable)) {
             if (is_object($callable[0]) && $callable[0] instanceof Reference) {
                 return sprintf("        %s->%s(\$%s);\n", $this->getServiceCall((string) $callable[0]), $callable[1], $variableName);
-            } else {
-                return sprintf("        call_user_func(array(%s, '%s'), \$%s);\n", $this->dumpValue($callable[0]), $callable[1], $variableName);
             }
-        } else {
-            return sprintf("        %s(\$%s);\n", $callable, $variableName);
+
+            return sprintf("        call_user_func(array(%s, '%s'), \$%s);\n", $this->dumpValue($callable[0]), $callable[1], $variableName);
         }
+
+        return sprintf("        %s(\$%s);\n", $callable, $variableName);
     }
 
     /**
@@ -1094,19 +1094,16 @@ EOF;
         $nonFirstChars = self::NON_FIRST_CHARS;
         $nonFirstCharsLength = strlen($nonFirstChars);
 
-        while (true)
-        {
+        while (true) {
             $name = '';
             $i = $this->variableCount;
 
-            if ('' === $name)
-            {
+            if ('' === $name) {
                 $name .= $firstChars[$i%$firstCharsLength];
                 $i = intval($i/$firstCharsLength);
             }
 
-            while ($i > 0)
-            {
+            while ($i > 0) {
                 $i -= 1;
                 $name .= $nonFirstChars[$i%$nonFirstCharsLength];
                 $i = intval($i/$nonFirstCharsLength);

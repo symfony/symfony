@@ -9,7 +9,7 @@
  * with this source code in the file LICENSE.
  */
 
-namespace Symfony\Bundle\AsseticBundle\Tests\Kernel;
+namespace Symfony\Bundle\AsseticBundle\Tests;
 
 use Symfony\Component\Config\Loader\LoaderInterface;
 use Symfony\Component\HttpKernel\Kernel;
@@ -18,7 +18,7 @@ class TestKernel extends Kernel
 {
     public function registerRootDir()
     {
-        return __DIR__;
+        return __DIR__.'/Resources';
     }
 
     public function registerBundles()
@@ -27,12 +27,12 @@ class TestKernel extends Kernel
             new \Symfony\Bundle\FrameworkBundle\FrameworkBundle(),
             new \Symfony\Bundle\TwigBundle\TwigBundle(),
             new \Symfony\Bundle\AsseticBundle\AsseticBundle(),
-            new TestBundle(),
+            new \Symfony\Bundle\AsseticBundle\Tests\TestBundle\TestBundle(),
         );
     }
 
     public function registerContainerConfiguration(LoaderInterface $loader)
     {
-        $loader->load(__DIR__.'/config/config.yml');
+        $loader->load(__DIR__.'/Resources/config/config.yml');
     }
 }

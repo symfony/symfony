@@ -48,6 +48,6 @@ class ConfigurationTest extends \PHPUnit_Framework_TestCase
         $config = $processor->process($tree, array($config));
 
         $this->assertFalse(array_key_exists('factory', $config), 'The factory key is silently removed without an exception');
-        $this->assertEquals(array(), $config['factories'], 'The factories key is jsut an empty array');
+        $this->assertEquals(array(), $config['factories'], 'The factories key is just an empty array');
     }
 }

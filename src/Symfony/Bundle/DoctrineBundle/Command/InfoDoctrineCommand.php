@@ -36,7 +36,7 @@ entities exist and possibly if their mapping information contains errors or not.
 
   <info>./app/console doctrine:mapping:info</info>
 
-If you are using multiple entitiy managers you can pick your choice with the <info>--em</info> option:
+If you are using multiple entity managers you can pick your choice with the <info>--em</info> option:
 
   <info>./app/console doctrine:mapping:info --em=default</info>
 EOT
@@ -48,7 +48,7 @@ EOT
         $entityManagerName = $input->getOption('em') ?
             $input->getOption('em') :
             $this->container->getParameter('doctrine.orm.default_entity_manager');
--
+
         $entityManagerService = sprintf('doctrine.orm.%s_entity_manager', $entityManagerName);
 
         /* @var $entityManager Doctrine\ORM\EntityManager */
@@ -61,11 +61,11 @@ EOT
         $output->write(sprintf("Found %d entities mapped in entity manager '%s':",
             count($entityClassNames), $entityManagerName), true);
         
-        foreach ($entityClassNames AS $entityClassName) {
+        foreach ($entityClassNames as $entityClassName) {
             try {
                 $cm = $entityManager->getClassMetadata($entityClassName);
                 $output->write("<info>[OK]</info>   " . $entityClassName, true);
-            } catch(MappingException $e) {
+            } catch (MappingException $e) {
                 $output->write("<error>[FAIL]</error> " . $entityClassName, true);
                 $output->write("<comment>" . $e->getMessage()."</comment>", true);
                 $output->write("", true);

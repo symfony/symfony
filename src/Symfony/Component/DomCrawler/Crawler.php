@@ -592,7 +592,7 @@ class Crawler extends \SplObjectStorage
             if ($node !== $this->getNode(0) && $node->nodeType === 1) {
                 $nodes[] = $node;
             }
-        } while($node = $node->$siblingDir);
+        } while ($node = $node->$siblingDir);
 
         return $nodes;
     }

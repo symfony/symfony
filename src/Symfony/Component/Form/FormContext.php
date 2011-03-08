@@ -16,7 +16,7 @@ use Symfony\Component\Form\Exception\FormException;
 use Symfony\Component\Validator\ValidatorInterface;
 
 /**
- * Default implementaton of FormContextInterface
+ * Default implementation of FormContextInterface
  *
  * This class is immutable by design.
  *

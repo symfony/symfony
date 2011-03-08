@@ -340,7 +340,7 @@ class HttpCache implements HttpKernelInterface
     /**
      * Forwards the Request to the backend and determines whether the response should be stored.
      *
-     * This methods is trigered when the cache missed or a reload is required.
+     * This methods is triggered when the cache missed or a reload is required.
      *
      * @param Request  $request A Request instance
      * @param Boolean  $catch   whether to process exceptions
@@ -456,32 +456,30 @@ class HttpCache implements HttpKernelInterface
 
                 // server the stale response while there is a revalidation
                 return true;
-            } else {
-                // wait for the lock to be released
-                $wait = 0;
-                while (file_exists($lock) && $wait < 5000000) {
-                    usleep($wait += 50000);
-                }
-
-                if ($wait < 2000000) {
-                    // replace the current entry with the fresh one
-                    $new = $this->lookup($request);
-                    $entry->headers = $new->headers;
-                    $entry->setContent($new->getContent());
-                    $entry->setStatusCode($new->getStatusCode());
-                    $entry->setProtocolVersion($new->getProtocolVersion());
-                    $entry->setCookies($new->getCookies());
-
-                    return true;
-                } else {
-                    // backend is slow as hell, send a 503 response (to avoid the dog pile effect)
-                    $entry->setStatusCode(503);
-                    $entry->setContent('503 Service Unavailable');
-                    $entry->headers->set('Retry-After', 10);
-
-                    return true;
-                }
             }
+
+            // wait for the lock to be released
+            $wait = 0;
+            while (file_exists($lock) && $wait < 5000000) {
+                usleep($wait += 50000);
+            }
+
+            if ($wait < 2000000) {
+                // replace the current entry with the fresh one
+                $new = $this->lookup($request);
+                $entry->headers = $new->headers;
+                $entry->setContent($new->getContent());
+                $entry->setStatusCode($new->getStatusCode());
+                $entry->setProtocolVersion($new->getProtocolVersion());
+                $entry->setCookies($new->getCookies());
+            } else {
+                // backend is slow as hell, send a 503 response (to avoid the dog pile effect)
+                $entry->setStatusCode(503);
+                $entry->setContent('503 Service Unavailable');
+                $entry->headers->set('Retry-After', 10);
+            }
+
+            return true;
         }
 
         // we have the lock, call the backend

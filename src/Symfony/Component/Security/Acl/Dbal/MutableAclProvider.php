@@ -860,8 +860,7 @@ QUERY;
      */
     protected function updateAces(\SplObjectStorage $aces)
     {
-        foreach ($aces as $ace)
-        {
+        foreach ($aces as $ace) {
             $propertyChanges = $aces->offsetGet($ace);
             $sets = array();
 

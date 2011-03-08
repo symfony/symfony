@@ -95,9 +95,9 @@ class HybridField extends Form
     {
         if ($this->mode === self::FORM) {
             return parent::getDisplayedData();
-        } else {
-            return Field::getDisplayedData();
         }
+
+        return Field::getDisplayedData();
     }
 
     /**
@@ -131,8 +131,8 @@ class HybridField extends Form
     {
         if ($this->mode === self::FORM) {
             return parent::isEmpty();
-        } else {
-            return Field::isEmpty();
         }
+
+        return Field::isEmpty();
     }
 }

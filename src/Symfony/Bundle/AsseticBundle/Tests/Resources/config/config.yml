@@ -18,4 +18,4 @@ twig:
 
 assetic:
     use_controller: true
-    document_root:  "%kernel.root_dir%/web"
+    read_from:      "%kernel.root_dir%/web"

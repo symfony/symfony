@@ -53,7 +53,7 @@ class ReplaceAliasByActualDefinitionPass implements CompilerPassInterface
     }
 
     /**
-     * Updates references to remove aliasess.
+     * Updates references to remove aliases.
      *
      * @param ContainerBuilder $container The container
      * @param string $currentId The alias identifier being replaced

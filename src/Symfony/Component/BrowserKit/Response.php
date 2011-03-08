@@ -118,9 +118,9 @@ class Response
             if (str_replace('-', '_', strtolower($key)) == str_replace('-', '_', strtolower($header))) {
                 if ($first) {
                     return is_array($value) ? (count($value) ? $value[0] : '') : $value;
-                } else {
-                    return is_array($value) ? $value : array($value);
                 }
+
+                return is_array($value) ? $value : array($value);
             }
         }
 

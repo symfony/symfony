@@ -56,7 +56,7 @@ class RedirectControllerTest extends TestCase
         $router
             ->expects($this->once())
             ->method('generate')
-            ->with($this->equalTo($route),$this->equalTo($params))
+            ->with($this->equalTo($route), $this->equalTo($params))
             ->will($this->returnValue($url));
 
         $container = $this->getMock('Symfony\Component\DependencyInjection\ContainerInterface');

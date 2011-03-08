@@ -150,13 +150,13 @@ class XmlDumper extends Dumper
             $service->setAttribute('class', $definition->getClass());
         }
         if ($definition->getFactoryMethod()) {
-            $service->setAttribute ('factory-method', $definition->getFactoryMethod());
+            $service->setAttribute('factory-method', $definition->getFactoryMethod());
         }
         if ($definition->getFactoryService()) {
-            $service->setAttribute ('factory-service', $definition->getFactoryService());
+            $service->setAttribute('factory-service', $definition->getFactoryService());
         }
         if (ContainerInterface::SCOPE_CONTAINER !== $scope = $definition->getScope()) {
-            $service->setAttribute ('scope', $scope);
+            $service->setAttribute('scope', $scope);
         }
 
         foreach ($definition->getTags() as $name => $tags) {

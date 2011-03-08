@@ -648,7 +648,7 @@ class StubIntlDateFormatterTest extends LocaleTestCase
     }
 
     /**
-     * Just to document the differencies between the stub and the intl implementations. The intl can parse
+     * Just to document the differences between the stub and the intl implementations. The intl can parse
      * any of the tested formats alone. The stub does not implement them as it would be needed to add more
      * abstraction, passing more context to the transformers objects. Any of the formats are ignored alone
      * or with date/time data (years, months, days, hours, minutes and seconds).
@@ -656,25 +656,25 @@ class StubIntlDateFormatterTest extends LocaleTestCase
      * Also in intl, format like 'ss E' for '10 2' (2nd day of year + 10 seconds) are added, then we have
      * 86,400 seconds (24h * 60min * 60s) + 10 seconds
      *
-     * @dataProvider parseDifferencies()
+     * @dataProvider parseDifferences()
      */
-    public function testParseDifferenciesStub($pattern, $value, $stubExpected, $intlExpected)
+    public function testParseDifferencesStub($pattern, $value, $stubExpected, $intlExpected)
     {
         $formatter = $this->createStubFormatter($pattern);
         $this->assertSame($stubExpected, $formatter->parse($value));
     }
 
     /**
-     * @dataProvider parseDifferencies()
+     * @dataProvider parseDifferences()
      */
-    public function testParseDifferenciesIntl($pattern, $value, $stubExpected, $intlExpected)
+    public function testParseDifferencesIntl($pattern, $value, $stubExpected, $intlExpected)
     {
         $this->skipIfIntlExtensionIsNotLoaded();
         $formatter = $this->createIntlFormatter($pattern);
         $this->assertSame($intlExpected, $formatter->parse($value));
     }
 
-    public function parseDifferencies()
+    public function parseDifferences()
     {
         return array(
             // AM/PM, ignored if alone

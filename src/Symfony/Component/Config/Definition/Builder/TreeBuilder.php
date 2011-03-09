@@ -86,7 +86,7 @@ class TreeBuilder implements BuilderInterface
     protected function createBooleanConfigNode(NodeBuilder $node)
     {
         $configNode = new BooleanNode($node->name, $node->parent);
-        $this->configureScalarNode($configNode, $node);
+        $this->configureVariableNode($configNode, $node);
 
         return $configNode;
     }
@@ -101,18 +101,18 @@ class TreeBuilder implements BuilderInterface
     protected function createScalarConfigNode(NodeBuilder $node)
     {
         $configNode = new ScalarNode($node->name, $node->parent);
-        $this->configureScalarNode($configNode, $node);
+        $this->configureVariableNode($configNode, $node);
 
         return $configNode;
     }
 
     /**
-     * Configures a scalar node.
+     * Configures a variable node.
      *
-     * @param ScalarNode  $configNode The node to configure
-     * @param NodeBuilder $node       The builder of the node
+     * @param VariableNode $configNode The node to configure
+     * @param NodeBuilder  $node       The builder of the node
      */
-    protected function configureScalarNode(ScalarNode $configNode, NodeBuilder $node)
+    protected function configureVariableNode(VariableNode $configNode, NodeBuilder $node)
     {
         if (null !== $node->normalization) {
             $configNode->setNormalizationClosures(
@@ -154,35 +154,7 @@ class TreeBuilder implements BuilderInterface
     protected function createVariableConfigNode(NodeBuilder $node)
     {
         $configNode = new VariableNode($node->name, $node->parent);
-
-        if (null !== $node->normalization) {
-            $configNode->setNormalizationClosures(
-                $this->buildExpressions($node->normalization->before)
-            );
-        }
-
-        if (null !== $node->merge) {
-            $configNode->setAllowOverwrite($node->merge->allowOverwrite);
-        }
-
-        if (true === $node->default) {
-            $configNode->setDefaultValue($node->defaultValue);
-        }
-
-        if (false === $node->allowEmptyValue) {
-            $configNode->setAllowEmptyValue($node->allowEmptyValue);
-        }
-
-        $configNode->addEquivalentValue(null, $node->nullEquivalent);
-        $configNode->addEquivalentValue(true, $node->trueEquivalent);
-        $configNode->addEquivalentValue(false, $node->falseEquivalent);
-        $configNode->setRequired($node->required);
-
-        if (null !== $node->validation) {
-            $configNode->setFinalValidationClosures(
-                $this->buildExpressions($node->validation->rules)
-            );
-        }
+        $this->configureVariableNode($configNode, $node);
 
         return $configNode;
     }

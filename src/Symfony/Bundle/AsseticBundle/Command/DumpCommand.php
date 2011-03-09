@@ -61,7 +61,7 @@ class DumpCommand extends Command
      * Watches a asset manager for changes.
      *
      * This method includes an infinite loop the continuously polls the asset
-     * manager for changes.
+     * manager for changes. If available, inotify is used to wait for changes.
      *
      * @param LazyAssetManager $am      The asset manager
      * @param string           $basePath The base directory to write to
@@ -85,23 +85,45 @@ class DumpCommand extends Command
             $previously = array();
         }
 
+        if (function_exists('inotify_init')) {
+            $inotify = inotify_init();
+        } else {
+            $inotify = false;
+        }
+
         $error = '';
         while (true) {
             try {
-                foreach ($am->getNames() as $name) {
+                file_put_contents($cache, serialize($previously));
+
+                if (false !== $inotify) {
+                    $reload = $this->inotifyWait($am, $basePath, $output, $inotify);
+                } else {
+                    sleep(1);
+                    $reload = true;
+                }
+
+                $checkAssets = array();
+                if (true === $reload) {
+                    // reset the asset manager
+                    $prop->setValue($am, array());
+                    $am->load();
+
+                    $checkAssets = $am->getNames();
+                } else if (is_array($reload)) {
+                    $checkAssets = $reload;
+                }
+
+                // need this here to make sure that filemtime is reported correctly
+                clearstatcache();
+
+                foreach ($checkAssets as $name) {
                     if ($asset = $this->checkAsset($am, $name, $previously)) {
                         $this->dumpAsset($asset, $basePath, $output);
                     }
                 }
 
-                // reset the asset manager
-                $prop->setValue($am, array());
-                $am->load();
-
-                file_put_contents($cache, serialize($previously));
                 $error = '';
-
-                sleep(1);
             } catch (\Exception $e) {
                 if ($error != $msg = $e->getMessage()) {
                     $output->writeln('<error>[error]</error> '.$msg);
@@ -109,6 +131,73 @@ class DumpCommand extends Command
                 }
             }
         }
+
+        if (false !== $inotify) {
+            fclose($inotify);
+        }
+    }
+
+    /**
+     * Sets up watches for inotify to monitor all assetic resources and assets.
+     *
+     * After waiting on inotify to find file modifications it either returns an
+     * array of modified assets or true to indicate that a resource was modifed.
+     *
+     * @param LazyAssetManager $am      The asset manager
+     * @param string           $basePath The base directory to write to
+     * @param OutputInterface  $output  The command output
+     * @param resource         $inotify File descriptor of the inotify handle
+     *
+     * @return Boolean|array True if a resource was modified or an array of
+     *                       modified assets.
+     */
+    protected function inotifyWait(LazyAssetManager $am, $basePath, OutputInterface $output, $inotify)
+    {
+        $flags = IN_MODIFY | IN_ATTRIB | IN_MOVE | IN_CREATE | IN_DELETE | IN_DELETE_SELF | IN_MOVE_SELF;
+
+        // add a watch for every resource (e.g. template file directory)
+        $resourceWatches = array();
+        foreach ($am->getResources() as $resource) {
+            $path = (string) $resource;
+            $watch = inotify_add_watch($inotify, $path, $flags);
+            $resourceWatches[$watch] = true;
+        }
+
+        // add watches for all files involved in any formulas
+        $assetsWatches = array();
+        foreach ($am->getNames() as $name) {
+            $assetCollection = $am->get($name);
+
+            foreach ($assetCollection as $leaf) {
+                $sourceUrl = $leaf->getSourceUrl();
+                if ($sourceUrl && false === strpos($sourceUrl, '://')) {
+                    $baseDir = self::isAbsolutePath($sourceUrl) ? '' : $basePath.'/';
+
+                    $watch = inotify_add_watch($inotify, $baseDir.$sourceUrl, $flags);
+                    $assetWatches[$watch] = $name;
+                }
+            }
+        }
+
+        // blocks until an event occurs
+        $events = inotify_read($inotify);
+
+        $reloadAssets = array();
+        $reload = false;
+        foreach ($events as $event) {
+            if (isset($resourceWatches[$event['wd']])) {
+                $reload = true;
+            } else if (isset($assetWatches[$event['wd']])) {
+                $reloadAssets[$assetWatches[$event['wd']]] = true;
+            }
+        }
+
+        if ($reload) {
+            $output->writeln('<info>[reload]</info> all asset manager resources');
+            return true;
+        }
+
+        return array_keys($reloadAssets);
     }
 
     /**
@@ -160,5 +249,10 @@ class DumpCommand extends Command
         if (false === @file_put_contents($target, $asset->dump())) {
             throw new \RuntimeException('Unable to write file '.$target);
         }
+    }
+
+    static private function isAbsolutePath($path)
+    {
+        return '/' == $path[0] || '\\' == $path[0] || (3 < strlen($path) && ctype_alpha($path[0]) && $path[1] == ':' && ('\\' == $path[2] || '/' == $path[2]));
     }
 }

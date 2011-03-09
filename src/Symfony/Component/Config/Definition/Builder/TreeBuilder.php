@@ -11,10 +11,7 @@
 
 namespace Symfony\Component\Config\Definition\Builder;
 
-use Symfony\Component\Config\Definition\BaseNode;
-
 use Symfony\Component\Config\Definition\BooleanNode;
-
 use Symfony\Component\Config\Definition\ArrayNode;
 use Symfony\Component\Config\Definition\ScalarNode;
 use Symfony\Component\Config\Definition\VariableNode;
@@ -24,7 +21,7 @@ use Symfony\Component\Config\Definition\VariableNode;
  *
  * @author Johannes M. Schmitt <schmittjoh@gmail.com>
  */
-class TreeBuilder
+class TreeBuilder implements BuilderInterface
 {
     protected $root;
     protected $tree;
@@ -35,7 +32,7 @@ class TreeBuilder
      * @param string $name The name of the node
      * @param string $type The type of the node
      *
-     * @return Symfony\Component\Config\Definition\Builder\NodeBuilder
+     * @return NodeBuilder
      */
     public function root($name, $type)
     {
@@ -80,7 +77,7 @@ class TreeBuilder
     }
 
     /**
-     * Creates a boolean node.
+     * Creates a Boolean node.
      *
      * @param NodeBuilder $node The builder of the node
      *

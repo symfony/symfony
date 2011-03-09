@@ -25,9 +25,9 @@ class NormalizationBuilder
     /**
      * Constructor
      *
-     * @param Symfony\Component\Config\Definition\Builder\NodeBuilder $parent
+     * @param NodeBuilder $parent
      */
-    public function __construct($parent)
+    public function __construct(NodeBuilder $parent)
     {
         $this->parent = $parent;
 
@@ -44,7 +44,7 @@ class NormalizationBuilder
      * @param string $key    The key to remap
      * @param string $plural The plural of the key in case of irregular plural
      *
-     * @return Symfony\Component\Config\Definition\Builder\NormalizationBuilder
+     * @return NormalizationBuilder
      */
     public function remap($key, $plural = null)
     {
@@ -62,7 +62,7 @@ class NormalizationBuilder
      *
      * @param \Closure $closure
      *
-     * @return Symfony\Component\Config\Definition\Builder\ExprBuilder|Symfony\Component\Config\Definition\Builder\NormalizationBuilder
+     * @return ExprBuilder|NormalizationBuilder
      */
     public function before(\Closure $closure = null)
     {

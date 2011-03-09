@@ -96,7 +96,7 @@ class RequestListener
                 $request->getSession()->setLocale($locale);
             }
         } elseif (null !== $this->logger) {
-            $this->logger->err(sprintf('No route found for %s', $request->getPathInfo()));
+            $this->logger->err(sprintf('No route found for %s %s', $request->getMethod(), $request->getPathInfo()));
         }
     }
 }

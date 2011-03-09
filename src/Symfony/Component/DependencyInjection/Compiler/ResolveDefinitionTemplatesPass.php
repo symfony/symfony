@@ -28,7 +28,7 @@ class ResolveDefinitionTemplatesPass implements CompilerPassInterface
             // yes, we are specifically fetching the definition from the
             // container to ensure we are not operating on stale data
             $definition = $container->getDefinition($id);
-            if (!$definition instanceof DefinitionDecorator) {
+            if (!$definition instanceof DefinitionDecorator || $definition->isAbstract()) {
                 continue;
             }
 

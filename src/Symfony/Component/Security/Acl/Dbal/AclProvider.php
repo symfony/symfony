@@ -38,7 +38,7 @@ class AclProvider implements AclProviderInterface
 {
     const MAX_BATCH_SIZE = 30;
 
-    protected $aclCache;
+    protected $cache;
     protected $connection;
     protected $loadedAces;
     protected $loadedAcls;
@@ -51,11 +51,11 @@ class AclProvider implements AclProviderInterface
      * @param Connection $connection
      * @param PermissionGrantingStrategyInterface $permissionGrantingStrategy
      * @param array $options
-     * @param AclCacheInterface $aclCache
+     * @param AclCacheInterface $cache
      */
-    public function __construct(Connection $connection, PermissionGrantingStrategyInterface $permissionGrantingStrategy, array $options, AclCacheInterface $aclCache = null)
+    public function __construct(Connection $connection, PermissionGrantingStrategyInterface $permissionGrantingStrategy, array $options, AclCacheInterface $cache = null)
     {
-        $this->aclCache = $aclCache;
+        $this->cache = $cache;
         $this->connection = $connection;
         $this->loadedAces = array();
         $this->loadedAcls = array();
@@ -122,8 +122,8 @@ class AclProvider implements AclProviderInterface
             }
 
             // check if we can locate the ACL in the cache
-            if (!$aclFound && null !== $this->aclCache) {
-                $acl = $this->aclCache->getFromCacheByIdentity($oid);
+            if (!$aclFound && null !== $this->cache) {
+                $acl = $this->cache->getFromCacheByIdentity($oid);
 
                 if (null !== $acl) {
                     if ($acl->isSidLoaded($sids)) {
@@ -149,10 +149,10 @@ class AclProvider implements AclProviderInterface
                         $result->attach($oid, $acl);
                         $aclFound = true;
                     } else {
-                        $this->aclCache->evictFromCacheByIdentity($oid);
+                        $this->cache->evictFromCacheByIdentity($oid);
 
                         foreach ($this->findChildren($oid) as $childOid) {
-                            $this->aclCache->evictFromCacheByIdentity($childOid);
+                            $this->cache->evictFromCacheByIdentity($childOid);
                         }
                     }
                 }
@@ -170,8 +170,8 @@ class AclProvider implements AclProviderInterface
                 foreach ($loadedBatch as $loadedOid) {
                     $loadedAcl = $loadedBatch->offsetGet($loadedOid);
 
-                    if (null !== $this->aclCache) {
-                        $this->aclCache->putInCache($loadedAcl);
+                    if (null !== $this->cache) {
+                        $this->cache->putInCache($loadedAcl);
                     }
 
                     if (isset($oidLookup[$loadedOid->getIdentifier().$loadedOid->getType()])) {
@@ -204,19 +204,12 @@ class AclProvider implements AclProviderInterface
      * Constructs the query used for looking up object identities and associated
      * ACEs, and security identities.
      *
-     * @param array $batch
-     * @param array $sids
-     * @throws AclNotFoundException
+     * @param array $ancestorIds
      * @return string
      */
-    protected function getLookupSql(array $batch, array $sids)
+    protected function getLookupSql(array $ancestorIds)
     {
         // FIXME: add support for filtering by sids (right now we select all sids)
-
-        $ancestorIds = $this->getAncestorIds($batch);
-        if (0 === count($ancestorIds)) {
-            throw new AclNotFoundException('There is no ACL for the given object identity.');
-        }
 
         $sql = <<<SELECTCLAUSE
             SELECT
@@ -346,7 +339,7 @@ QUERY;
      * @param ObjectIdentityInterface $oid
      * @return integer
      */
-    protected function retrieveObjectIdentityPrimaryKey(ObjectIdentityInterface $oid)
+    protected final function retrieveObjectIdentityPrimaryKey(ObjectIdentityInterface $oid)
     {
         return $this->connection->executeQuery($this->getSelectObjectIdentityIdSql($oid))->fetchColumn();
     }
@@ -428,7 +421,12 @@ QUERY;
      */
     private function lookupObjectIdentities(array $batch, array $sids, array $oidLookup)
     {
-        $sql = $this->getLookupSql($batch, $sids);
+        $ancestorIds = $this->getAncestorIds($batch);
+        if (!$ancestorIds) {
+            throw new AclNotFoundException('There is no ACL for the given object identity.');
+        }
+
+        $sql = $this->getLookupSql($ancestorIds);
         $stmt = $this->connection->executeQuery($sql);
 
         return $this->hydrateObjectIdentities($stmt, $oidLookup, $sids);

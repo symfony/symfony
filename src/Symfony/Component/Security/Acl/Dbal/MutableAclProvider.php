@@ -39,9 +39,9 @@ class MutableAclProvider extends AclProvider implements MutableAclProviderInterf
     /**
      * {@inheritDoc}
      */
-    public function __construct(Connection $connection, PermissionGrantingStrategyInterface $permissionGrantingStrategy, array $options, AclCacheInterface $aclCache = null)
+    public function __construct(Connection $connection, PermissionGrantingStrategyInterface $permissionGrantingStrategy, array $options, AclCacheInterface $cache = null)
     {
-        parent::__construct($connection, $permissionGrantingStrategy, $options, $aclCache);
+        parent::__construct($connection, $permissionGrantingStrategy, $options, $cache);
 
         $this->propertyChanges = new \SplObjectStorage();
     }
@@ -104,8 +104,8 @@ class MutableAclProvider extends AclProvider implements MutableAclProviderInterf
         }
 
         // evict the ACL from any caches
-        if (null !== $this->aclCache) {
-            $this->aclCache->evictFromCacheByIdentity($oid);
+        if (null !== $this->cache) {
+            $this->cache->evictFromCacheByIdentity($oid);
         }
     }
 
@@ -312,108 +312,23 @@ class MutableAclProvider extends AclProvider implements MutableAclProviderInterf
 
         $this->propertyChanges->offsetSet($acl, array());
 
-        if (null !== $this->aclCache) {
+        if (null !== $this->cache) {
             if (count($sharedPropertyChanges) > 0) {
                 // FIXME: Currently, there is no easy way to clear the cache for ACLs
                 //        of a certain type. The problem here is that we need to make
                 //        sure to clear the cache of all child ACLs as well, and these
                 //        child ACLs might be of a different class type.
-                $this->aclCache->clearCache();
+                $this->cache->clearCache();
             } else {
                 // if there are no shared property changes, it's sufficient to just delete
                 // the cache for this ACL
-                $this->aclCache->evictFromCacheByIdentity($acl->getObjectIdentity());
+                $this->cache->evictFromCacheByIdentity($acl->getObjectIdentity());
 
                 foreach ($this->findChildren($acl->getObjectIdentity()) as $childOid) {
-                    $this->aclCache->evictFromCacheByIdentity($childOid);
+                    $this->cache->evictFromCacheByIdentity($childOid);
                 }
             }
         }
-    }
-
-    /**
-     * Creates the ACL for the passed object identity
-     *
-     * @param ObjectIdentityInterface $oid
-     * @return void
-     */
-    protected function createObjectIdentity(ObjectIdentityInterface $oid)
-    {
-        $classId = $this->createOrRetrieveClassId($oid->getType());
-
-        $this->connection->executeQuery($this->getInsertObjectIdentitySql($oid->getIdentifier(), $classId, true));
-    }
-
-    /**
-     * Returns the primary key for the passed class type.
-     *
-     * If the type does not yet exist in the database, it will be created.
-     *
-     * @param string $classType
-     * @return integer
-     */
-    protected function createOrRetrieveClassId($classType)
-    {
-        if (false !== $id = $this->connection->executeQuery($this->getSelectClassIdSql($classType))->fetchColumn()) {
-            return $id;
-        }
-
-        $this->connection->executeQuery($this->getInsertClassSql($classType));
-
-        return $this->connection->executeQuery($this->getSelectClassIdSql($classType))->fetchColumn();
-    }
-
-    /**
-     * Returns the primary key for the passed security identity.
-     *
-     * If the security identity does not yet exist in the database, it will be
-     * created.
-     *
-     * @param SecurityIdentityInterface $sid
-     * @return integer
-     */
-    protected function createOrRetrieveSecurityIdentityId(SecurityIdentityInterface $sid)
-    {
-        if (false !== $id = $this->connection->executeQuery($this->getSelectSecurityIdentityIdSql($sid))->fetchColumn()) {
-            return $id;
-        }
-
-        $this->connection->executeQuery($this->getInsertSecurityIdentitySql($sid));
-
-        return $this->connection->executeQuery($this->getSelectSecurityIdentityIdSql($sid))->fetchColumn();
-    }
-
-    /**
-     * Deletes all ACEs for the given object identity primary key.
-     *
-     * @param integer $oidPK
-     * @return void
-     */
-    protected function deleteAccessControlEntries($oidPK)
-    {
-        $this->connection->executeQuery($this->getDeleteAccessControlEntriesSql($oidPK));
-    }
-
-    /**
-     * Deletes the object identity from the database.
-     *
-     * @param integer $pk
-     * @return void
-     */
-    protected function deleteObjectIdentity($pk)
-    {
-        $this->connection->executeQuery($this->getDeleteObjectIdentitySql($pk));
-    }
-
-    /**
-     * Deletes all entries from the relations table from the database.
-     *
-     * @param integer $pk
-     * @return void
-     */
-    protected function deleteObjectIdentityRelations($pk)
-    {
-        $this->connection->executeQuery($this->getDeleteObjectIdentityRelationsSql($pk));
     }
 
     /**
@@ -718,6 +633,91 @@ QUERY;
             implode(', ', $sets),
             $pk
         );
+    }
+
+    /**
+     * Creates the ACL for the passed object identity
+     *
+     * @param ObjectIdentityInterface $oid
+     * @return void
+     */
+    private function createObjectIdentity(ObjectIdentityInterface $oid)
+    {
+        $classId = $this->createOrRetrieveClassId($oid->getType());
+
+        $this->connection->executeQuery($this->getInsertObjectIdentitySql($oid->getIdentifier(), $classId, true));
+    }
+
+    /**
+     * Returns the primary key for the passed class type.
+     *
+     * If the type does not yet exist in the database, it will be created.
+     *
+     * @param string $classType
+     * @return integer
+     */
+    private function createOrRetrieveClassId($classType)
+    {
+        if (false !== $id = $this->connection->executeQuery($this->getSelectClassIdSql($classType))->fetchColumn()) {
+            return $id;
+        }
+
+        $this->connection->executeQuery($this->getInsertClassSql($classType));
+
+        return $this->connection->executeQuery($this->getSelectClassIdSql($classType))->fetchColumn();
+    }
+
+    /**
+     * Returns the primary key for the passed security identity.
+     *
+     * If the security identity does not yet exist in the database, it will be
+     * created.
+     *
+     * @param SecurityIdentityInterface $sid
+     * @return integer
+     */
+    private function createOrRetrieveSecurityIdentityId(SecurityIdentityInterface $sid)
+    {
+        if (false !== $id = $this->connection->executeQuery($this->getSelectSecurityIdentityIdSql($sid))->fetchColumn()) {
+            return $id;
+        }
+
+        $this->connection->executeQuery($this->getInsertSecurityIdentitySql($sid));
+
+        return $this->connection->executeQuery($this->getSelectSecurityIdentityIdSql($sid))->fetchColumn();
+    }
+
+    /**
+     * Deletes all ACEs for the given object identity primary key.
+     *
+     * @param integer $oidPK
+     * @return void
+     */
+    private function deleteAccessControlEntries($oidPK)
+    {
+        $this->connection->executeQuery($this->getDeleteAccessControlEntriesSql($oidPK));
+    }
+
+    /**
+     * Deletes the object identity from the database.
+     *
+     * @param integer $pk
+     * @return void
+     */
+    private function deleteObjectIdentity($pk)
+    {
+        $this->connection->executeQuery($this->getDeleteObjectIdentitySql($pk));
+    }
+
+    /**
+     * Deletes all entries from the relations table from the database.
+     *
+     * @param integer $pk
+     * @return void
+     */
+    private function deleteObjectIdentityRelations($pk)
+    {
+        $this->connection->executeQuery($this->getDeleteObjectIdentityRelationsSql($pk));
     }
 
     /**

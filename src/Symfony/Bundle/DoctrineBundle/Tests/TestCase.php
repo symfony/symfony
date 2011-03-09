@@ -62,7 +62,7 @@ class TestCase extends \PHPUnit_Framework_TestCase
                 'connections' => array(
                     'default' => array(
                         'driver' => 'pdo_mysql',
-                        'charset' => 'UTF-8',
+                        'charset' => 'UTF8',
                         'platform-service' => 'my.platform',
                     )
                 ),
@@ -71,10 +71,15 @@ class TestCase extends \PHPUnit_Framework_TestCase
                     'test' => 'Symfony\Bundle\DoctrineBundle\Tests\DependencyInjection\TestType',
                 ),
             ), 'orm' => array(
-                'mappings' => array('YamlBundle' => array(
-                    'type' => 'yml',
-                    'dir' => __DIR__ . "/DependencyInjection/Fixtures/Bundles/YamlBundle/Resources/config/doctrine/metadata/orm",
-                    'prefix' => 'Fixtures\Bundles\YamlBundle',
+                'default_entity_manager' => 'default',
+                'entity_managers' => array (
+                    'default' => array(
+                    'mappings' => array('YamlBundle' => array(
+                        'type' => 'yml',
+                        'dir' => __DIR__ . "/DependencyInjection/Fixtures/Bundles/YamlBundle/Resources/config/doctrine/metadata/orm",
+                        'prefix' => 'Fixtures\Bundles\YamlBundle',
+                    )
+                )
             )))
         )), $container);
 

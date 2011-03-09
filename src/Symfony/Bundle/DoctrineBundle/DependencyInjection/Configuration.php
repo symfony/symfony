@@ -51,24 +51,8 @@ class Configuration
             ->arrayNode('dbal')
                 ->beforeNormalization()
                     ->ifNull()
-                    ->then(function($v) { return array (); }) // Let use the default values with the subsequent closure.
-                ->end()
-                ->beforeNormalization()
-                    ->ifTrue(function($v){ return is_array($v) && !array_key_exists('connections', $v) && !array_key_exists('connection', $v); })
-                    ->then(function($v) {
-                        $connection = array ();
-                        $keys = array ('dbname', 'host', 'port', 'user', 'password', 'driver', 'driver_class', 'options', 'path', 'memory', 'unix_socket', 'wrapper_class', 'platform_service', 'charset', 'logging');
-                        foreach ($keys as $key) {
-                            if (array_key_exists($key, $v)) {
-                                $connection[$key] = $v[$key];
-                                unset($v[$key]);
-                            }
-                        }
-                        $defaultConnection = isset($v['default_connection']) ? (string) $v['default_connection'] : 'default';
-                        $v['connections'] = array ($defaultConnection => $connection);
-                        $v['default_connection'] = $defaultConnection;
-                        return $v;
-                    })
+                    // Define a default connection using the default values
+                    ->then(function($v) { return array ('default_connection' => 'default', 'connections' => array('default' => array())); })
                 ->end()
                 ->scalarNode('default_connection')->isRequired()->cannotBeEmpty()->end()
                 ->fixXmlConfig('type')
@@ -125,23 +109,6 @@ class Configuration
     {
         $node
             ->arrayNode('orm')
-                ->beforeNormalization()
-                    ->ifTrue(function($v){ return is_array($v) && !array_key_exists('entity_managers', $v) && !array_key_exists('entity_manager', $v); })
-                    ->then(function($v) {
-                        $entityManager = array ();
-                        $keys = array ('result_cache_driver', 'result-cache-driver', 'metadata_cache_driver', 'metadata-cache-driver', 'query_cache_driver', 'query-cache-driver', 'mappings', 'mapping', 'connection');
-                        foreach ($keys as $key) {
-                            if (array_key_exists($key, $v)) {
-                                $entityManager[$key] = $v[$key];
-                                unset($v[$key]);
-                            }
-                        }
-                        $defaultEntityManager = isset($v['default_entity_manager']) ? (string) $v['default_entity_manager'] : 'default';
-                        $v['entity_managers'] = array ($defaultEntityManager => $entityManager);
-                        $v['default_entity_manager'] = $defaultEntityManager;
-                        return $v;
-                    })
-                ->end()
                 ->scalarNode('default_entity_manager')->isRequired()->cannotBeEmpty()->end()
                 ->booleanNode('auto_generate_proxy_classes')->defaultFalse()->end()
                 ->scalarNode('proxy_dir')->defaultValue('%kernel.cache_dir%/doctrine/orm/Proxies')->end()

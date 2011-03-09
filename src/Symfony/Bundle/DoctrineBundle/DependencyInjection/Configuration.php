@@ -113,7 +113,7 @@ class Configuration
                 ->fixXmlConfig('wrapper_class', 'wrapperClass')
                 ->scalarNode('wrapper_class')->end()
                 ->scalarNode('platform_service')->end()
-                ->scalarNode('charset')->defaultValue('UTF-8')->end()
+                ->scalarNode('charset')->end()
                 ->booleanNode('logging')->defaultValue($this->kernelDebug)->end()
             ->end()
         ;

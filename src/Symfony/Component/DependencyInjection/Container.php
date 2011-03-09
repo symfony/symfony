@@ -223,7 +223,12 @@ class Container implements ContainerInterface
         if (method_exists($this, $method = 'get'.strtr($id, array('_' => '', '.' => '_')).'Service')) {
             $this->loading[$id] = true;
 
-            $service = $this->$method();
+            try {
+                $service = $this->$method();
+            } catch (\Exception $e) {
+                unset($this->loading[$id]);
+                throw $e;
+            }
 
             unset($this->loading[$id]);
 

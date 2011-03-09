@@ -21,11 +21,11 @@ use Symfony\Component\Translation\Loader\LoaderInterface;
 class Translator implements TranslatorInterface
 {
     private $catalogues;
-    private $locale;
     private $fallbackLocale;
     private $loaders;
     private $resources;
     private $selector;
+    protected $locale;
 
     /**
      * Constructor.

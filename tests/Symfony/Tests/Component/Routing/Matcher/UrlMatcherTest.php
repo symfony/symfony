@@ -17,16 +17,6 @@ use Symfony\Component\Routing\Route;
 
 class UrlMatcherTest extends \PHPUnit_Framework_TestCase
 {
-    public function testNormalizeUrl()
-    {
-        $collection = new RouteCollection();
-        $collection->add('foo', new Route('/{foo}'));
-
-        $matcher = new UrlMatcherForTests($collection, array(), array());
-
-        $this->assertEquals('/foo', $matcher->normalizeUrl('/foo?foo=bar'), '->normalizeUrl() removes the query string');
-    }
-
     public function testMatch()
     {
       // test the patterns are matched are parameters are returned
@@ -59,13 +49,5 @@ class UrlMatcherTest extends \PHPUnit_Framework_TestCase
       $this->assertNotEquals(false, $matcher->match('/foo'));
       $matcher = new UrlMatcher($collection, array('method' => 'HEAD'), array());
       $this->assertNotEquals(false, $matcher->match('/foo'));
-    }
-}
-
-class UrlMatcherForTests extends UrlMatcher
-{
-    public function normalizeUrl($url)
-    {
-        return parent::normalizeUrl($url);
     }
 }

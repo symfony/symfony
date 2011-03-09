@@ -32,11 +32,11 @@
             </trans-unit>
             <trans-unit id="8">
                 <source>The fields {{ fields }} were not expected</source>
-                <target>Поля {{ fields }} не ожидаемы</target>
+                <target>Поля {{ fields }} не ожидались</target>
             </trans-unit>
             <trans-unit id="9">
                 <source>The fields {{ fields }} are missing</source>
-                <target>Полей {{ fields }} не хватает</target>
+                <target>Поля {{ fields }} осутствуют</target>
             </trans-unit>
             <trans-unit id="10">
                 <source>This value is not a valid date</source>

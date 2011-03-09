@@ -175,8 +175,6 @@ class ProfilerController extends ContainerAware
 
         return $this->container->get('templating')->renderResponse('WebProfilerBundle:Profiler:search.html.twig', array(
             'token'    => $token,
-            'profiler' => $profiler,
-            'tokens'   => $profiler->find($ip, $url, $limit),
             'ip'       => $ip,
             'url'      => $url,
             'limit'    => $limit,

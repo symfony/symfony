@@ -268,7 +268,6 @@ abstract class AbstractDoctrineExtensionTest extends TestCase
                 'dbname' => 'sqlite_db',
                 'memory' => true,
                 'logging' => false,
-                'charset' => 'UTF-8'
             ),
             new Reference('doctrine.dbal.default_connection.configuration'),
             new Reference('doctrine.dbal.default_connection.event_manager')

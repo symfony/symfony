@@ -95,7 +95,7 @@ class UploadedFileTest extends \PHPUnit_Framework_TestCase
                 null
             );
 
-            $this->assertEquals('original.gif', $file->getOriginalName());
+            $this->assertEquals('original.gif', $file->getName());
         }
     }
 }

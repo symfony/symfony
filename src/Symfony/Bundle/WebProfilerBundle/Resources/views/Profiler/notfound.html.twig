@@ -6,7 +6,7 @@
        
         <div class="resume">
             <p>
-                <strong>Token "{{ token }}" does not exist.</strong>
+                <strong>No request matching the token "{{ token }}".</strong>
             </p>
         </div>
 
@@ -17,7 +17,12 @@
                     {% include 'WebProfilerBundle:Profiler:admin.html.twig' with { 'token': token } only %}
                 </div>
                 <div class="collector_content">
-                    {% block panel '' %}
+                    {% block panel%}
+                        <h2>Token not found</h2>
+                        <p>
+                            <em>No request matching the token "{{ token }}".</em>
+                        </p>
+                    {% endblock %}
                 </div>
             </div>
         </div>

@@ -11,7 +11,7 @@
     <strong>Exception</strong>
     <span class="count">
         {% if collector.hasexception %}
-            <span>1</span>
+            <span class="error">1</span>
         {% endif %}
     </span>
 </span>
@@ -21,7 +21,9 @@
     <h2>Exception</h2>
 
     {% if not collector.hasexception %}
-        <em>No exception was thrown and uncaught during the request.</em>
+        <p>
+            <em>No exception was thrown and uncaught during the request.</em>
+        </p>
     {% else %}
         {% render 'WebProfilerBundle:Exception:show' with { 'exception': collector.exception, 'format': 'html' } %}
     {% endif %}

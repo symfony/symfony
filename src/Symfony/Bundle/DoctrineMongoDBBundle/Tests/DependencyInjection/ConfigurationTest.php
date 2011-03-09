@@ -116,6 +116,7 @@ class ConfigurationTest extends \PHPUnit_Framework_TestCase
                             'dir'       => '%kernel.cache_dir%',
                             'prefix'    => 'prefix_val',
                             'alias'     => 'alias_val',
+                            'is_bundle' => false,
                         )
                     ),
                     'metadata_cache_driver' => array(

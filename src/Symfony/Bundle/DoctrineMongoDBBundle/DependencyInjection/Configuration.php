@@ -123,18 +123,19 @@ class Configuration
         $node
             ->useAttributeAsKey('name')
             ->prototype('array')
+                ->beforeNormalization()
+                    // if it's not an array, then the scalar is the type key
+                    ->ifString()
+                    ->then(function($v) { return array ('type' => $v); })
+                ->end()
                 // I believe that "null" should *not* set the type
                 // it's guessed in AbstractDoctrineExtension::detectMetadataDriver
                 ->treatNullLike(array())
-                ->beforeNormalization()
-                    // if it's not an array, then the scalar is the type key
-                    ->ifTrue(function($v) { return !is_array($v); })
-                    ->then(function($v){ return array('type' => $v); })
-                ->end()
                 ->scalarNode('type')->end()
                 ->scalarNode('dir')->end()
                 ->scalarNode('prefix')->end()
                 ->scalarNode('alias')->end()
+                ->booleanNode('is_bundle')->end()
                 ->performNoDeepMerging()
             ->end()
         ;

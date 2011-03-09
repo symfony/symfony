@@ -84,11 +84,15 @@ abstract class AbstractToken implements TokenInterface
         if (null === $this->user) {
             $changed = false;
         } else if ($this->user instanceof UserInterface) {
-            $changed = $this->user->equals($user);
+            if (!$user instanceof UserInterface) {
+                $changed = true;
+            } else {
+                $changed = !$this->user->equals($user);
+            }
         } else if ($user instanceof UserInterface) {
             $changed = true;
         } else {
-            $changed = (string) $this->user === (string) $user;
+            $changed = (string) $this->user !== (string) $user;
         }
 
         if ($changed) {

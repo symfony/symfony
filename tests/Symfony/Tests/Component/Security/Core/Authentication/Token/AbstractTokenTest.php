@@ -131,6 +131,104 @@ class AbstractTokenTest extends \PHPUnit_Framework_TestCase
         }
     }
 
+    /**
+     * @dataProvider getUsers
+     */
+    public function testSetUser($user)
+    {
+        $token = $this->getToken();
+        $token->setUser($user);
+        $this->assertSame($user, $token->getUser());
+    }
+
+    public function getUsers()
+    {
+        $user = $this->getMock('Symfony\Component\Security\Core\User\UserInterface');
+        $user
+            ->expects($this->any())
+            ->method('equals')
+            ->will($this->returnValue(true))
+        ;
+
+        return array(
+            array($user),
+            array(new TestUser('foo')),
+            array('foo'),
+        );
+    }
+
+    /**
+     * @dataProvider getUserChanges
+     */
+    public function testSetUserSetsAuthenticatedToFalseWhenUserChanges($firstUser, $secondUser)
+    {
+        $token = $this->getToken();
+        $token->setAuthenticated(true);
+        $this->assertTrue($token->isAuthenticated());
+
+        $token->setUser($firstUser);
+        $this->assertTrue($token->isAuthenticated());
+
+        $token->setUser($secondUser);
+        $this->assertFalse($token->isAuthenticated());
+    }
+
+    public function getUserChanges()
+    {
+        $user = $this->getMock('Symfony\Component\Security\Core\User\UserInterface');
+        $user
+            ->expects($this->any())
+            ->method('equals')
+            ->will($this->returnValue(false))
+        ;
+
+        return array(
+            array(
+                'foo', 'bar',
+            ),
+            array(
+                'foo', new TestUser('bar'),
+            ),
+            array(
+                'foo', $user,
+            ),
+            array(
+                $user, $user,
+            ),
+            array(
+                $user, 'foo'
+            ),
+            array(
+                $user, new TestUser('foo'),
+            ),
+            array(
+                new TestUser('foo'), new TestUser('bar'),
+            ),
+            array(
+                new TestUser('foo'), 'bar',
+            ),
+            array(
+                new TestUser('foo'), $user,
+            ),
+        );
+    }
+
+    /**
+     * @dataProvider getUsers
+     */
+    public function testSetUserDoesNotSetAuthenticatedToFalseWhenUserDoesNotChange($user)
+    {
+        $token = $this->getToken();
+        $token->setAuthenticated(true);
+        $this->assertTrue($token->isAuthenticated());
+
+        $token->setUser($user);
+        $this->assertTrue($token->isAuthenticated());
+
+        $token->setUser($user);
+        $this->assertTrue($token->isAuthenticated());
+    }
+
     protected function getToken(array $roles = array())
     {
         return $this->getMockForAbstractClass('Symfony\Component\Security\Core\Authentication\Token\AbstractToken', array($roles));

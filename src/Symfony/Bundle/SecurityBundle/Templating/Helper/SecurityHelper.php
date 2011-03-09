@@ -18,7 +18,7 @@ use Symfony\Component\Security\Core\SecurityContextInterface;
 /**
  * SecurityHelper provides read-only access to the security context.
  *
- * @author Fabien Potencier <fabien.potencier@symfony-project.com>
+ * @author Fabien Potencier <fabien@symfony.com>
  */
 class SecurityHelper extends Helper
 {

@@ -48,7 +48,16 @@ class RememberMeToken extends AbstractToken
         $this->persistentToken = $persistentToken;
 
         $this->setUser($user);
-        $this->setAuthenticated(true);
+        parent::setAuthenticated(true);
+    }
+
+    public function setAuthenticated($authenticated)
+    {
+        if ($authenticated) {
+            throw new \RuntimeException('You cannot set this token to authenticated after creation.');
+        }
+
+        parent::setAuthenticated(false);
     }
 
     public function getProviderKey()

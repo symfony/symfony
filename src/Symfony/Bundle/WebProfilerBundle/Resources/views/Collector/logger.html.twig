@@ -11,9 +11,11 @@
 <span class="label">
     <span class="icon"><img src="{{ asset('bundles/webprofiler/images/profiler/logger.png') }}" alt="" /></span>
     <strong>Logs</strong>
-    <span class="count">
-        <span>{{ collector.counterrors }}</span>
-    </span>
+    {% if collector.counterrors %}
+        <span class="count">
+            <span>{{ collector.counterrors }}</span>
+        </span>
+    {% endif %}
 </span>
 {% endblock %}
 
@@ -22,8 +24,8 @@
 
     {% if collector.logs %}
         <ul class="alt">
-            {% for i, log in collector.logs %}
-                <li class="{{ i is odd ? 'odd' : 'even' }}{% if 'ERR' == log.priorityName %} error{% endif %}">
+            {% for log in collector.logs %}
+                <li class="{{ cycle(['odd', 'even'], loop.index) }}{% if 'ERR' == log.priorityName %} error{% endif %}">
                     {{ log.priorityName }}
                     {{ log.message }}
                 </li>

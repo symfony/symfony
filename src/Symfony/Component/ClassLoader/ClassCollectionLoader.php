@@ -3,7 +3,7 @@
 /*
  * This file is part of the Symfony package.
  *
- * (c) Fabien Potencier <fabien.potencier@symfony-project.com>
+ * (c) Fabien Potencier <fabien@symfony.com>
  *
  * For the full copyright and license information, please view the LICENSE
  * file that was distributed with this source code.
@@ -14,11 +14,11 @@ namespace Symfony\Component\ClassLoader;
 /**
  * ClassCollectionLoader.
  *
- * @author Fabien Potencier <fabien.potencier@symfony-project.com>
+ * @author Fabien Potencier <fabien@symfony.com>
  */
 class ClassCollectionLoader
 {
-    static protected $loaded;
+    static private $loaded;
 
     /**
      * Loads a list of classes and caches them in one big file.
@@ -174,8 +174,7 @@ class ClassCollectionLoader
      *
      * @throws \RuntimeException when a cache file cannot be written
      */
-     
-    static protected function writeCacheFile($file, $content)
+    static private function writeCacheFile($file, $content)
     {
         $tmpFile = tempnam(dirname($file), basename($file));
         if (false !== @file_put_contents($tmpFile, $content) && @rename($tmpFile, $file)) {
@@ -197,7 +196,7 @@ class ClassCollectionLoader
      *
      * @return string The PHP string with the comments removed
      */
-    static protected function stripComments($source)
+    static private function stripComments($source)
     {
         if (!function_exists('token_get_all')) {
             return $source;

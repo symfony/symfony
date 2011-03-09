@@ -3,7 +3,7 @@
 /*
  * This file is part of the Symfony package.
  *
- * (c) Fabien Potencier <fabien.potencier@symfony-project.com>
+ * (c) Fabien Potencier <fabien@symfony.com>
  *
  * For the full copyright and license information, please view the LICENSE
  * file that was distributed with this source code.
@@ -53,7 +53,7 @@ abstract class BaseNode implements NodeInterface
     }
 
     /**
-     * Adds an equivilent value.
+     * Adds an equivalent value.
      *
      * @param mixed $originalValue 
      * @param mixed $equivalentValue 
@@ -173,7 +173,8 @@ abstract class BaseNode implements NodeInterface
      * Normalizes a value, applying all normalization closures.
      *
      * @param mixed $value Value to normalize.
-     * @return mied The normalized value.
+     *
+     * @return mixed The normalized value.
      */
     public final function normalize($value)
     {

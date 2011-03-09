@@ -3,7 +3,7 @@
 /*
  * This file is part of the Symfony package.
  *
- * (c) Fabien Potencier <fabien.potencier@symfony-project.com>
+ * (c) Fabien Potencier <fabien@symfony.com>
  *
  * For the full copyright and license information, please view the LICENSE
  * file that was distributed with this source code.
@@ -251,7 +251,8 @@ class AclProvider implements AclProviderInterface
      * @param array $batch
      * @param array $sids
      * @param array $oidLookup
-     * @return \SplObjectStorage mapping object identites to ACL instances
+     *
+     * @return \SplObjectStorage mapping object identities to ACL instances
      */
     protected function lookupObjectIdentities(array $batch, array $sids, array $oidLookup)
     {
@@ -437,8 +438,7 @@ class AclProvider implements AclProviderInterface
         // fill-in parent ACLs where this hasn't been done yet cause the parent ACL was not
         // yet available
         $processed = 0;
-        foreach ($parentIdToFill as $acl)
-        {
+        foreach ($parentIdToFill as $acl) {
             $parentId = $parentIdToFill->offsetGet($acl);
 
             // let's see if we have already hydrated this
@@ -466,7 +466,7 @@ class AclProvider implements AclProviderInterface
     }
 
     /**
-     * Constructs the query used for looking up object identites and associated
+     * Constructs the query used for looking up object identities and associated
      * ACEs, and security identities.
      *
      * @param array $batch

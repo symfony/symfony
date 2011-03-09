@@ -3,7 +3,7 @@
 /*
  * This file is part of the Symfony package.
  *
- * (c) Fabien Potencier <fabien.potencier@symfony-project.com>
+ * (c) Fabien Potencier <fabien@symfony.com>
  *
  * For the full copyright and license information, please view the LICENSE
  * file that was distributed with this source code.
@@ -24,9 +24,9 @@ class Cookie
     protected $expire;
     protected $path;
     protected $secure;
-    protected $httponly;
+    protected $httpOnly;
 
-    public function __construct($name, $value = null, $expire = 0, $path = null, $domain = null, $secure = false, $httponly = true)
+    public function __construct($name, $value = null, $expire = 0, $path = '/', $domain = null, $secure = false, $httpOnly = true)
     {
         // from PHP source code
         if (preg_match("/[=,; \t\r\n\013\014]/", $name)) {
@@ -41,13 +41,18 @@ class Cookie
             throw new \InvalidArgumentException('The cookie name cannot be empty');
         }
 
+        // check if the expiration is valid
+        if (!$expire instanceof \DateTime && !is_numeric($expire) && (strtotime($expire) === false || strtotime($expire) === -1)) {
+            throw new \InvalidArgumentException('The cookie expiration is not valid');
+        }
+
         $this->name = $name;
         $this->value = $value;
         $this->domain = $domain;
-        $this->expire = (integer) $expire;
+        $this->expire = $expire;
         $this->path = $path;
         $this->secure = (Boolean) $secure;
-        $this->httponly = (Boolean) $httponly;
+        $this->httpOnly = (Boolean) $httpOnly;
     }
 
     public function getName()
@@ -80,9 +85,9 @@ class Cookie
         return $this->secure;
     }
 
-    public function isHttponly()
+    public function isHttpOnly()
     {
-        return $this->httponly;
+        return $this->httpOnly;
     }
 
     /**

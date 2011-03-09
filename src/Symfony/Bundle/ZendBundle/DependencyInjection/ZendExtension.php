@@ -3,7 +3,7 @@
 /*
  * This file is part of the Symfony package.
  *
- * (c) Fabien Potencier <fabien.potencier@symfony-project.com>
+ * (c) Fabien Potencier <fabien@symfony.com>
  *
  * For the full copyright and license information, please view the LICENSE
  * file that was distributed with this source code.
@@ -15,11 +15,12 @@ use Symfony\Component\HttpKernel\DependencyInjection\Extension;
 use Symfony\Component\DependencyInjection\Loader\XmlFileLoader;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\Config\FileLocator;
+use Symfony\Component\Config\Definition\Processor;
 
 /**
  * ZendExtension is an extension for the Zend Framework libraries.
  *
- * @author Fabien Potencier <fabien.potencier@symfony-project.com>
+ * @author Fabien Potencier <fabien@symfony.com>
  */
 class ZendExtension extends Extension
 {
@@ -37,53 +38,43 @@ class ZendExtension extends Extension
      */
     public function load(array $configs, ContainerBuilder $container)
     {
-        $first = true;
-        foreach ($configs as $config) {
-            if (!isset($config['logger'])) {
-                continue;
-            }
+        $configuration = new Configuration();
+        $processor = new Processor();
+        $config = $processor->process($configuration->getConfigTree(), $configs);
 
-            if ($first) {
-                $first = false;
+        if (isset($config['logger'])) {
+            $loader = new XmlFileLoader($container, new FileLocator(__DIR__.'/../Resources/config'));
+            $loader->load('logger.xml');
+            $container->setAlias('logger', 'zend.logger');
 
-                $loader = new XmlFileLoader($container, new FileLocator(__DIR__.'/../Resources/config'));
-                $loader->load('logger.xml');
-                $container->setAlias('logger', 'zend.logger');
-            }
+            $config = $config['logger'];
 
-            $this->registerLoggerConfiguration($config, $container);
-        }
-    }
-
-    /**
-     * Loads the logger configuration.
-     *
-     * Usage example:
-     *
-     *      <zend:logger priority="info" path="/path/to/some.log" />
-     *
-     * @param array            $config    An array of configuration settings
-     * @param ContainerBuilder $container A ContainerBuilder instance
-     */
-    protected function registerLoggerConfiguration($config, ContainerBuilder $container)
-    {
-        $config = $config['logger'];
-
-        if (isset($config['priority'])) {
             $container->setParameter('zend.logger.priority', is_int($config['priority']) ? $config['priority'] : constant('\\Zend\\Log\\Logger::'.strtoupper($config['priority'])));
-        }
-
-        if (isset($config['path'])) {
             $container->setParameter('zend.logger.path', $config['path']);
-        }
 
-        if (isset($config['log_errors'])) {
             $definition = $container->findDefinition('zend.logger');
-            if (false === $config['log_errors'] && $definition->hasMethodCall('registerErrorHandler')) {
-                $container->findDefinition('zend.logger')->removeMethodCall('registerErrorHandler');
-            } else {
+            if ($config['log_errors']) {
                 $container->findDefinition('zend.logger')->addMethodCall('registerErrorHandler');
+            } else {
+                if ($definition->hasMethodCall('registerErrorHandler')) {
+                    $container->findDefinition('zend.logger')->removeMethodCall('registerErrorHandler');
+                }
             }
+
+            $this->addClassesToCompile(array(
+                'Zend\\Log\\Factory',
+                'Zend\\Log\\Filter',
+                'Zend\\Log\\Filter\\AbstractFilter',
+                'Zend\\Log\\Filter\\Priority',
+                'Zend\\Log\\Formatter',
+                'Zend\\Log\\Formatter\\Simple',
+                'Zend\\Log\\Logger',
+                'Zend\\Log\\Writer',
+                'Zend\\Log\\Writer\\AbstractWriter',
+                'Zend\\Log\\Writer\\Stream',
+                'Symfony\\Bundle\\ZendBundle\\Logger\\DebugLogger',
+                'Symfony\\Bundle\\ZendBundle\\Logger\\Logger',
+            ));
         }
     }
 
@@ -99,6 +90,6 @@ class ZendExtension extends Extension
 
     public function getNamespace()
     {
-        return 'http://www.symfony-project.org/schema/dic/zend';
+        return 'http://symfony.com/schema/dic/zend';
     }
 }

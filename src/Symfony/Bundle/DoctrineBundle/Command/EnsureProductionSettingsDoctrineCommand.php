@@ -3,7 +3,7 @@
 /*
  * This file is part of the Symfony package.
  *
- * (c) Fabien Potencier <fabien.potencier@symfony-project.com>
+ * (c) Fabien Potencier <fabien@symfony.com>
  *
  * For the full copyright and license information, please view the LICENSE
  * file that was distributed with this source code.
@@ -21,7 +21,7 @@ use Doctrine\ORM\Tools\Console\Command\EnsureProductionSettingsCommand;
 /**
  * Ensure the Doctrine ORM is configured properly for a production environment.
  *
- * @author Fabien Potencier <fabien.potencier@symfony-project.com>
+ * @author Fabien Potencier <fabien@symfony.com>
  * @author Jonathan H. Wage <jonwage@gmail.com>
  */
 class EnsureProductionSettingsDoctrineCommand extends EnsureProductionSettingsCommand
@@ -34,13 +34,13 @@ class EnsureProductionSettingsDoctrineCommand extends EnsureProductionSettingsCo
             ->setName('doctrine:ensure-production-settings')
             ->addOption('em', null, InputOption::VALUE_OPTIONAL, 'The entity manager to use for this command.')
             ->setHelp(<<<EOT
-The <info>doctrine:cache:clear-metadata</info> command clears all metadata cache for the default entity manager:
+The <info>doctrine:ensure-production-settings</info> command ensures that Doctrine is properly configured for a production environment.:
 
-  <info>./app/console doctrine:cache:clear-metadata</info>
+  <info>./app/console doctrine:ensure-production-settings</info>
 
-You can also optionally specify the <comment>--em</comment> option to specify which entity manager to clear the cache for:
+You can also optionally specify the <comment>--em</comment> option to specify which entity manager to use:
 
-  <info>./app/console doctrine:cache:clear-metadata --em=default</info>
+  <info>./app/console doctrine:ensure-production-settings --em=default</info>
 EOT
         );
     }

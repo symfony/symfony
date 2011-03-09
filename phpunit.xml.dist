@@ -18,6 +18,12 @@
         </testsuite>
     </testsuites>
 
+    <groups>
+        <exclude>
+            <group>benchmark</group>
+        </exclude>
+    </groups>
+
     <filter>
         <whitelist>
             <directory>./src/Symfony/</directory>
@@ -25,6 +31,7 @@
                 <directory>./src/Symfony/Bundle/*/Resources</directory>
                 <directory>./src/Symfony/Bundle/*/Tests</directory>
                 <directory>./src/Symfony/Component/*/Resources</directory>
+                <directory>./src/Symfony/Component/*/*/Resources</directory>
             </exclude>
         </whitelist>
     </filter>

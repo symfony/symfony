@@ -15,7 +15,7 @@ use Symfony\Component\HttpKernel\Log\LoggerInterface;
 /*
  * This file is part of the Symfony package.
  *
- * (c) Fabien Potencier <fabien.potencier@symfony-project.com>
+ * (c) Fabien Potencier <fabien@symfony.com>
  *
  * For the full copyright and license information, please view the LICENSE
  * file that was distributed with this source code.
@@ -60,6 +60,17 @@ abstract class RememberMeServices implements RememberMeServicesInterface, Logout
         $this->providerKey = $providerKey;
         $this->options = $options;
         $this->logger = $logger;
+    }
+
+    /**
+     * Returns the parameter that is used for checking whether remember-me
+     * services have been requested.
+     *
+     * @return string
+     */
+    public function getRememberMeParameter()
+    {
+        return $this->options['remember_me_parameter'];
     }
 
     /**

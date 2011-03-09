@@ -3,7 +3,7 @@
 /*
  * This file is part of the Symfony package.
  *
- * (c) Fabien Potencier <fabien.potencier@symfony-project.com>
+ * (c) Fabien Potencier <fabien@symfony.com>
  *
  * For the full copyright and license information, please view the LICENSE
  * file that was distributed with this source code.
@@ -22,7 +22,7 @@ use Symfony\Component\DependencyInjection\Parameter;
 /**
  * PhpDumper dumps a service container as a PHP class.
  *
- * @author Fabien Potencier <fabien.potencier@symfony-project.com>
+ * @author Fabien Potencier <fabien@symfony.com>
  * @author Johannes M. Schmitt <schmittjoh@gmail.com>
  */
 class PhpDumper extends Dumper
@@ -466,12 +466,12 @@ EOF;
         if (is_array($callable)) {
             if (is_object($callable[0]) && $callable[0] instanceof Reference) {
                 return sprintf("        %s->%s(\$%s);\n", $this->getServiceCall((string) $callable[0]), $callable[1], $variableName);
-            } else {
-                return sprintf("        call_user_func(array(%s, '%s'), \$%s);\n", $this->dumpValue($callable[0]), $callable[1], $variableName);
             }
-        } else {
-            return sprintf("        %s(\$%s);\n", $callable, $variableName);
+
+            return sprintf("        call_user_func(array(%s, '%s'), \$%s);\n", $this->dumpValue($callable[0]), $callable[1], $variableName);
         }
+
+        return sprintf("        %s(\$%s);\n", $callable, $variableName);
     }
 
     /**
@@ -1094,19 +1094,16 @@ EOF;
         $nonFirstChars = self::NON_FIRST_CHARS;
         $nonFirstCharsLength = strlen($nonFirstChars);
 
-        while (true)
-        {
+        while (true) {
             $name = '';
             $i = $this->variableCount;
 
-            if ('' === $name)
-            {
+            if ('' === $name) {
                 $name .= $firstChars[$i%$firstCharsLength];
                 $i = intval($i/$firstCharsLength);
             }
 
-            while ($i > 0)
-            {
+            while ($i > 0) {
                 $i -= 1;
                 $name .= $nonFirstChars[$i%$nonFirstCharsLength];
                 $i = intval($i/$nonFirstCharsLength);

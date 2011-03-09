@@ -3,7 +3,7 @@
 /*
  * This file is part of the Symfony package.
  *
- * (c) Fabien Potencier <fabien.potencier@symfony-project.com>
+ * (c) Fabien Potencier <fabien@symfony.com>
  *
  * For the full copyright and license information, please view the LICENSE
  * file that was distributed with this source code.
@@ -21,7 +21,7 @@ use Symfony\Component\Console\Application;
 /**
  * Base class for all commands.
  *
- * @author Fabien Potencier <fabien.potencier@symfony-project.com>
+ * @author Fabien Potencier <fabien@symfony.com>
  */
 class Command
 {
@@ -159,9 +159,9 @@ class Command
 
         if ($this->code) {
             return call_user_func($this->code, $input, $output);
-        } else {
-            return $this->execute($input, $output);
         }
+
+        return $this->execute($input, $output);
     }
 
     /**

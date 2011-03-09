@@ -3,7 +3,7 @@
 /*
  * This file is part of the Symfony package.
  *
- * (c) Fabien Potencier <fabien.potencier@symfony-project.com>
+ * (c) Fabien Potencier <fabien@symfony.com>
  *
  * For the full copyright and license information, please view the LICENSE
  * file that was distributed with this source code.
@@ -21,7 +21,7 @@ use Symfony\Component\Finder\Finder;
  * An implementation of BundleInterface that adds a few conventions
  * for DependencyInjection extensions and Console commands.
  *
- * @author Fabien Potencier <fabien.potencier@symfony-project.com>
+ * @author Fabien Potencier <fabien@symfony.com>
  */
 abstract class Bundle extends ContainerAware implements BundleInterface
 {
@@ -54,7 +54,7 @@ abstract class Bundle extends ContainerAware implements BundleInterface
      * is forced to be the underscore version of the bundle name
      * (sensio_blog for a SensioBlogBundle for instance).
      *
-     * This method can be overriden to register compilation passes,
+     * This method can be overridden to register compilation passes,
      * other extensions, ...
      *
      * @param ContainerBuilder $container A ContainerBuilder instance

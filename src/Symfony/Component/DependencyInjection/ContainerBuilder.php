@@ -3,7 +3,7 @@
 /*
  * This file is part of the Symfony package.
  *
- * (c) Fabien Potencier <fabien.potencier@symfony-project.com>
+ * (c) Fabien Potencier <fabien@symfony.com>
  *
  * For the full copyright and license information, please view the LICENSE
  * file that was distributed with this source code.
@@ -23,7 +23,7 @@ use Symfony\Component\Config\Resource\ResourceInterface;
 /**
  * ContainerBuilder is a DI container that provides an API to easily describe services.
  *
- * @author Fabien Potencier <fabien.potencier@symfony-project.com>
+ * @author Fabien Potencier <fabien@symfony.com>
  */
 class ContainerBuilder extends Container implements TaggedContainerInterface
 {
@@ -37,16 +37,6 @@ class ContainerBuilder extends Container implements TaggedContainerInterface
     protected $extensionConfigs = array();
     protected $injectors        = array();
     protected $compiler;
-
-    /**
-     * Constructor.
-     *
-     * @param ParameterBagInterface $parameterBag
-     */
-    public function __construct(ParameterBagInterface $parameterBag = null)
-    {
-        parent::__construct($parameterBag);
-    }
 
     /**
      * Registers an extension.
@@ -166,15 +156,15 @@ class ContainerBuilder extends Container implements TaggedContainerInterface
     }
 
     /**
-     * Adds a compiler pass at the end of the current passes
+     * Adds a compiler pass.
      *
-     * @param CompilerPassInterface $pass
-     * @param string                $type
+     * @param CompilerPassInterface $pass A compiler pass
+     * @param string                $type The type of compiler pass
      */
     public function addCompilerPass(CompilerPassInterface $pass, $type = PassConfig::TYPE_BEFORE_OPTIMIZATION)
     {
         if (null === $this->compiler) {
-            $this->initializeCompiler();
+            $this->compiler = new Compiler();
         }
 
         $this->compiler->addPass($pass, $type);
@@ -183,28 +173,28 @@ class ContainerBuilder extends Container implements TaggedContainerInterface
     }
 
     /**
-     * Returns the compiler pass config which can then be modified
+     * Returns the compiler pass config which can then be modified.
      *
-     * @return PassConfig
+     * @return PassConfig The compiler pass config
      */
     public function getCompilerPassConfig()
     {
         if (null === $this->compiler) {
-            $this->initializeCompiler();
+            $this->compiler = new Compiler();
         }
 
         return $this->compiler->getPassConfig();
     }
 
     /**
-     * Returns the compiler instance
+     * Returns the compiler.
      *
-     * @return Compiler
+     * @return Compiler The compiler
      */
     public function getCompiler()
     {
         if (null === $this->compiler) {
-            $this->initializeCompiler();
+            $this->compiler = new Compiler();
         }
 
         return $this->compiler;
@@ -379,7 +369,7 @@ class ContainerBuilder extends Container implements TaggedContainerInterface
     public function getExtensionConfig($name)
     {
         if (!isset($this->extensionConfigs[$name])) {
-            return array(array());
+            $this->extensionConfigs[$name] = array();
         }
 
         return $this->extensionConfigs[$name];
@@ -402,7 +392,11 @@ class ContainerBuilder extends Container implements TaggedContainerInterface
     public function compile()
     {
         if (null === $this->compiler) {
-            $this->initializeCompiler();
+            $this->compiler = new Compiler();
+        }
+
+        foreach ($this->compiler->getPassConfig()->getPasses() as $pass) {
+            $this->addObjectResource($pass);
         }
 
         $this->compiler->compile($this);
@@ -834,19 +828,6 @@ class ContainerBuilder extends Container implements TaggedContainerInterface
         }
 
         return $tags;
-    }
-
-    /**
-     * Initializes the compiler
-     *
-     * @return void
-     */
-    protected function initializeCompiler()
-    {
-        $this->compiler = new Compiler();
-        foreach ($this->compiler->getPassConfig()->getPasses() as $pass) {
-            $this->addObjectResource($pass);
-        }
     }
 
     /**

@@ -3,7 +3,7 @@
 /*
  * This file is part of the Symfony package.
  *
- * (c) Fabien Potencier <fabien.potencier@symfony-project.com>
+ * (c) Fabien Potencier <fabien@symfony.com>
  *
  * For the full copyright and license information, please view the LICENSE
  * file that was distributed with this source code.
@@ -25,7 +25,7 @@ use Symfony\Component\Config\FileLocator;
  * DoctrineExtension is an extension for the Doctrine DBAL and ORM library.
  *
  * @author Jonathan H. Wage <jonwage@gmail.com>
- * @author Fabien Potencier <fabien.potencier@symfony-project.com>
+ * @author Fabien Potencier <fabien@symfony.com>
  * @author Benjamin Eberlei <kontakt@beberlei.de>
  */
 class DoctrineExtension extends AbstractDoctrineExtension
@@ -108,7 +108,7 @@ class DoctrineExtension extends AbstractDoctrineExtension
             'wrapper-class'         => 'wrapperClass', // doctrine conv.
             'charset'               => 'charset',
         );
-        $supportedContrainerParams = array(
+        $supportedContainerParams = array(
             'platform-service'      => 'platform_service',
             'platform_service'      => 'platform_service',
             'logging'               => 'logging',
@@ -173,8 +173,8 @@ class DoctrineExtension extends AbstractDoctrineExtension
                 foreach ($connection as $k => $v) {
                     if (isset($supportedConnectionParams[$k])) {
                         $mergedConfig['connections'][$connectionName]['driver'][$supportedConnectionParams[$k]] = $v;
-                    } else if (isset($supportedContrainerParams[$k])) {
-                        $mergedConfig['connections'][$connectionName]['container'][$supportedContrainerParams[$k]] = $v;
+                    } else if (isset($supportedContainerParams[$k])) {
+                        $mergedConfig['connections'][$connectionName]['container'][$supportedContainerParams[$k]] = $v;
                     }
                 }
             }
@@ -393,7 +393,7 @@ class DoctrineExtension extends AbstractDoctrineExtension
      * There are two possible runtime scenarios:
      *
      * 1. If the EntityManager was defined before, override only the new calls to Doctrine\ORM\Configuration
-     * 2. If the EntityManager was not defined beforeefore, gather all the defaults for not specified options and set all the information.
+     * 2. If the EntityManager was not defined before, gather all the defaults for not specified options and set all the information.
      *
      * @param array $entityManager A configured ORM entity manager.
      * @param ContainerBuilder $container A ContainerBuilder instance
@@ -447,8 +447,8 @@ class DoctrineExtension extends AbstractDoctrineExtension
      *
      * There are two distinct configuration possibilities for mapping information:
      *
-     * 1. Specifiy a bundle and optionally details where the entity and mapping information reside.
-     * 2. Specifiy an arbitrary mapping location.
+     * 1. Specify a bundle and optionally details where the entity and mapping information reside.
+     * 2. Specify an arbitrary mapping location.
      *
      * @example
      *
@@ -574,6 +574,6 @@ class DoctrineExtension extends AbstractDoctrineExtension
      */
     public function getNamespace()
     {
-        return 'http://www.symfony-project.org/schema/dic/doctrine';
+        return 'http://symfony.com/schema/dic/doctrine';
     }
 }

@@ -3,7 +3,7 @@
 /*
  * This file is part of the Symfony package.
  *
- * (c) Fabien Potencier <fabien.potencier@symfony-project.com>
+ * (c) Fabien Potencier <fabien@symfony.com>
  *
  * For the full copyright and license information, please view the LICENSE
  * file that was distributed with this source code.
@@ -15,7 +15,6 @@ use Symfony\Component\Config\Definition\Exception\InvalidConfigurationException;
 use Symfony\Component\Config\Definition\Exception\DuplicateKeyException;
 use Symfony\Component\Config\Definition\Exception\InvalidTypeException;
 use Symfony\Component\Config\Definition\Exception\UnsetKeyException;
-use Symfony\Component\DependencyInjection\Extension\Extension;
 
 /**
  * Represents an ARRAY node in the config tree.
@@ -237,8 +236,8 @@ class ArrayNode extends BaseNode implements PrototypeNodeInterface
     /**
      * Sets the node prototype.
      *
-     * @param PrototypeNodeInterface $node 
-     * @throws \RuntimeException if the node doesnt have concrete children
+     * @param PrototypeNodeInterface $node
+     * @throws \RuntimeException if the node doesn't have concrete children
      */
     public function setPrototype(PrototypeNodeInterface $node)
     {
@@ -276,10 +275,10 @@ class ArrayNode extends BaseNode implements PrototypeNodeInterface
     /**
      * Finalises the value of this node.
      *
-     * @param mixed $value 
+     * @param mixed $value
      * @return mixed The finalised value
      * @throws UnsetKeyException
-     * @throws InvalidConfigurationException if the node doesnt have enough children
+     * @throws InvalidConfigurationException if the node doesn't have enough children
      */
     protected function finalizeValue($value)
     {
@@ -321,7 +320,7 @@ class ArrayNode extends BaseNode implements PrototypeNodeInterface
                     ));
                 }
 
-                if ($child->hasDefaultValue())  {
+                if ($child->hasDefaultValue()) {
                     $value[$name] = $child->getDefaultValue();
                 }
 
@@ -374,7 +373,7 @@ class ArrayNode extends BaseNode implements PrototypeNodeInterface
                 continue;
             }
 
-            $value[$plural] = Extension::normalizeConfig($value, $singular, $plural);
+            $value[$plural] = Processor::normalizeConfig($value, $singular, $plural);
             unset($value[$singular]);
         }
 
@@ -470,7 +469,9 @@ class ArrayNode extends BaseNode implements PrototypeNodeInterface
                 if (!$this->allowNewKeys) {
                     throw new InvalidConfigurationException(sprintf(
                         'You are not allowed to define new elements for path "%s". '
-                       .'Please define all elements for this path in one config file.',
+                       .'Please define all elements for this path in one config file. '
+                       .'If you are trying to overwrite an element, make sure you redefine it '
+                       .'with the same name.',
                         $this->getPath()
                     ));
                 }

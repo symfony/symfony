@@ -3,7 +3,7 @@
 /*
  * This file is part of the Symfony package.
  *
- * (c) Fabien Potencier <fabien.potencier@symfony-project.com>
+ * (c) Fabien Potencier <fabien@symfony.com>
  *
  * For the full copyright and license information, please view the LICENSE
  * file that was distributed with this source code.
@@ -22,7 +22,7 @@ use Symfony\Component\Form\Exception\FormException;
  * a single field or a combination of different fields (e.g. a date field
  * that might be a textbox or several select boxes).
  *
- * @author Bernhard Schussek <bernhard.schussek@symfony-project.com>
+ * @author Bernhard Schussek <bernhard.schussek@symfony.com>
  */
 class HybridField extends Form
 {
@@ -95,9 +95,9 @@ class HybridField extends Form
     {
         if ($this->mode === self::FORM) {
             return parent::getDisplayedData();
-        } else {
-            return Field::getDisplayedData();
         }
+
+        return Field::getDisplayedData();
     }
 
     /**
@@ -131,8 +131,8 @@ class HybridField extends Form
     {
         if ($this->mode === self::FORM) {
             return parent::isEmpty();
-        } else {
-            return Field::isEmpty();
         }
+
+        return Field::isEmpty();
     }
 }

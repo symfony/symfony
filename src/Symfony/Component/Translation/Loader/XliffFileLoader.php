@@ -3,7 +3,7 @@
 /*
  * This file is part of the Symfony package.
  *
- * (c) Fabien Potencier <fabien.potencier@symfony-project.com>
+ * (c) Fabien Potencier <fabien@symfony.com>
  *
  * For the full copyright and license information, please view the LICENSE
  * file that was distributed with this source code.
@@ -17,7 +17,7 @@ use Symfony\Component\Config\Resource\FileResource;
 /**
  * XliffFileLoader loads translations from XLIFF files.
  *
- * @author Fabien Potencier <fabien.potencier@symfony-project.com>
+ * @author Fabien Potencier <fabien@symfony.com>
  */
 class XliffFileLoader implements LoaderInterface
 {
@@ -44,7 +44,7 @@ class XliffFileLoader implements LoaderInterface
      * @param  string $file
      * @return SimpleXMLElement
      */
-    protected function parseFile($file)
+    private function parseFile($file)
     {
         $dom = new \DOMDocument();
         $current = libxml_use_internal_errors(true);
@@ -74,7 +74,7 @@ class XliffFileLoader implements LoaderInterface
      *
      * @return array  An array of errors
      */
-    protected function getXmlErrors()
+    private function getXmlErrors()
     {
         $errors = array();
         foreach (libxml_get_errors() as $error) {

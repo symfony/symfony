@@ -3,7 +3,7 @@
 /*
  * This file is part of the Symfony package.
  *
- * (c) Fabien Potencier <fabien.potencier@symfony-project.com>
+ * (c) Fabien Potencier <fabien@symfony.com>
  *
  * For the full copyright and license information, please view the LICENSE
  * file that was distributed with this source code.
@@ -40,7 +40,7 @@ use Symfony\Component\Console\Helper\DialogHelper;
  *     $app->add(new SimpleCommand());
  *     $app->run();
  *
- * @author Fabien Potencier <fabien.potencier@symfony-project.com>
+ * @author Fabien Potencier <fabien@symfony.com>
  */
 class Application
 {
@@ -129,9 +129,9 @@ class Application
             // @codeCoverageIgnoreStart
             exit($statusCode);
             // @codeCoverageIgnoreEnd
-        } else {
-            return $statusCode;
         }
+
+        return $statusCode;
     }
 
     /**
@@ -315,9 +315,9 @@ class Application
     {
         if ('UNKNOWN' !== $this->getName() && 'UNKNOWN' !== $this->getVersion()) {
             return sprintf('<info>%s</info> version <comment>%s</comment>', $this->getName(), $this->getVersion());
-        } else {
-            return '<info>Console Tool</info>';
         }
+
+        return '<info>Console Tool</info>';
     }
 
     /**

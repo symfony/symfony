@@ -3,7 +3,7 @@
 /*
  * This file is part of the Symfony package.
  *
- * (c) Fabien Potencier <fabien.potencier@symfony-project.com>
+ * (c) Fabien Potencier <fabien@symfony.com>
  *
  * For the full copyright and license information, please view the LICENSE
  * file that was distributed with this source code.
@@ -135,6 +135,14 @@ class ArgvInputTest extends \PHPUnit_Framework_TestCase
         $input = new TestInput(array('cli.php', '-fbbar'));
         $input->bind(new InputDefinition(array(new InputOption('foo', 'f', InputOption::VALUE_OPTIONAL), new InputOption('bar', 'b', InputOption::VALUE_OPTIONAL))));
         $this->assertEquals(array('foo' => 'bbar', 'bar' => null), $input->getOptions(), '->parse() parses short options when they are aggregated as a single one and one of them takes a value');
+
+        try {
+            $input = new TestInput(array('cli.php', 'foo', 'bar', 'baz', 'bat'));
+            $input->bind(new InputDefinition(array(new InputArgument('name', InputArgument::IS_ARRAY))));
+            $this->assertEquals(array('name' => array('foo', 'bar', 'baz', 'bat')), $input->getArguments(), '->parse() parses array arguments');
+        } catch (\RuntimeException $e) {
+            $this->assertNotEquals('Too many arguments.', $e->getMessage(), '->parse() parses array arguments');
+        }
     }
 
     public function testGetFirstArgument()

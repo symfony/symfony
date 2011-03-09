@@ -3,7 +3,7 @@
 /*
  * This file is part of the Symfony package.
  *
- * (c) Fabien Potencier <fabien.potencier@symfony-project.com>
+ * (c) Fabien Potencier <fabien@symfony.com>
  *
  * For the full copyright and license information, please view the LICENSE
  * file that was distributed with this source code.
@@ -20,7 +20,7 @@ use Symfony\Component\Templating\Loader\LoaderInterface;
 /**
  * PhpEngine is an engine able to render PHP templates.
  *
- * @author Fabien Potencier <fabien.potencier@symfony-project.com>
+ * @author Fabien Potencier <fabien@symfony.com>
  */
 class PhpEngine implements EngineInterface, \ArrayAccess
 {
@@ -412,7 +412,7 @@ class PhpEngine implements EngineInterface, \ArrayAccess
                 function ($value) use ($that)
                 {
                     if ('UTF-8' != $that->getCharset()) {
-                        $string = $that->convertEncoding($value, 'UTF-8', $that->getCharset());
+                        $value = $that->convertEncoding($value, 'UTF-8', $that->getCharset());
                     }
 
                     $callback = function ($matches) use ($that)
@@ -430,15 +430,15 @@ class PhpEngine implements EngineInterface, \ArrayAccess
                         return '\\u'.substr('0000'.bin2hex($char), -4);
                     };
 
-                    if (null === $string = preg_replace_callback('#[^\p{L}\p{N} ]#u', $callback, $string)) {
+                    if (null === $value = preg_replace_callback('#[^\p{L}\p{N} ]#u', $callback, $value)) {
                         throw new \InvalidArgumentException('The string to escape is not a valid UTF-8 string.');
                     }
 
                     if ('UTF-8' != $that->getCharset()) {
-                        $string = $that->convertEncoding($string, $that->getCharset(), 'UTF-8');
+                        $value = $that->convertEncoding($value, $that->getCharset(), 'UTF-8');
                     }
 
-                    return $string;
+                    return $value;
                 },
         );
     }
@@ -460,9 +460,9 @@ class PhpEngine implements EngineInterface, \ArrayAccess
             return iconv($from, $to, $string);
         } elseif (function_exists('mb_convert_encoding')) {
             return mb_convert_encoding($string, $to, $from);
-        } else {
-            throw new \RuntimeException('No suitable convert encoding function (use UTF-8 as your encoding or install the iconv or mbstring extension).');
         }
+
+        throw new \RuntimeException('No suitable convert encoding function (use UTF-8 as your encoding or install the iconv or mbstring extension).');
     }
 
     /**

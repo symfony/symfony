@@ -3,7 +3,7 @@
 /*
  * This file is part of the Symfony package.
  *
- * (c) Fabien Potencier <fabien.potencier@symfony-project.com>
+ * (c) Fabien Potencier <fabien@symfony.com>
  *
  * For the full copyright and license information, please view the LICENSE
  * file that was distributed with this source code.
@@ -17,7 +17,7 @@ use Symfony\Component\HttpFoundation\File\UploadedFile;
 /**
  * Request represents an HTTP request.
  *
- * @author Fabien Potencier <fabien.potencier@symfony-project.com>
+ * @author Fabien Potencier <fabien@symfony.com>
  */
 class Request
 {
@@ -436,9 +436,9 @@ class Request
 
         if (('http' == $scheme && $port == 80) || ('https' == $scheme && $port == 443)) {
             return $name;
-        } else {
-            return $name.':'.$port;
         }
+
+        return $name.':'.$port;
     }
 
     public function getRequestUri()

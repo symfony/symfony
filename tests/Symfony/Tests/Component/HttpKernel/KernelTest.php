@@ -3,7 +3,7 @@
 /*
  * This file is part of the Symfony package.
  *
- * (c) Fabien Potencier <fabien.potencier@symfony-project.com>
+ * (c) Fabien Potencier <fabien@symfony.com>
  *
  * For the full copyright and license information, please view the LICENSE
  * file that was distributed with this source code.
@@ -357,7 +357,7 @@ EOF;
         $kernel->initializeBundles();
     }
 
-    public function testInitializeBundlesSupportsArbitaryBundleRegistrationOrder()
+    public function testInitializeBundlesSupportsArbitraryBundleRegistrationOrder()
     {
         $grandparent = $this->getBundle(null, null, 'GrandParentCCundle');
         $parent = $this->getBundle(null, 'GrandParentCCundle', 'ParentCCundle');

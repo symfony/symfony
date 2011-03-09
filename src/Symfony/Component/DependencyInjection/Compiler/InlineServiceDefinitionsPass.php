@@ -3,7 +3,7 @@
 /*
  * This file is part of the Symfony package.
  *
- * (c) Fabien Potencier <fabien.potencier@symfony-project.com>
+ * (c) Fabien Potencier <fabien@symfony.com>
  *
  * For the full copyright and license information, please view the LICENSE
  * file that was distributed with this source code.
@@ -37,7 +37,7 @@ class InlineServiceDefinitionsPass implements RepeatablePassInterface
     /**
      * Processes the ContainerBuilder for inline service definitions.
      *
-     * @param ContainerBuilder $container 
+     * @param ContainerBuilder $container
      */
     public function process(ContainerBuilder $container)
     {
@@ -89,9 +89,9 @@ class InlineServiceDefinitionsPass implements RepeatablePassInterface
     /**
      * Checks if the definition is inlineable.
      *
-     * @param ContainerBuilder $container 
-     * @param string $id 
-     * @param Definition $definition 
+     * @param ContainerBuilder $container
+     * @param string $id
+     * @param Definition $definition
      * @return boolean If the definition is inlineable
      */
     protected function isInlinableDefinition(ContainerBuilder $container, $id, Definition $definition)
@@ -113,6 +113,10 @@ class InlineServiceDefinitionsPass implements RepeatablePassInterface
             $ids[] = $edge->getSourceNode()->getId();
         }
 
-        return count(array_unique($ids)) <= 1;
+        if (count(array_unique($ids)) > 1) {
+            return false;
+        }
+
+        return $container->getDefinition(reset($ids))->getScope() === $definition->getScope();
     }
 }

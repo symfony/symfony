@@ -3,7 +3,7 @@
 /*
  * This file is part of the Symfony package.
  *
- * (c) Fabien Potencier <fabien.potencier@symfony-project.com>
+ * (c) Fabien Potencier <fabien@symfony.com>
  *
  * For the full copyright and license information, please view the LICENSE
  * file that was distributed with this source code.
@@ -16,16 +16,16 @@ use Symfony\Component\Translation\Loader\LoaderInterface;
 /**
  * Translator.
  *
- * @author Fabien Potencier <fabien.potencier@symfony-project.com>
+ * @author Fabien Potencier <fabien@symfony.com>
  */
 class Translator implements TranslatorInterface
 {
-    protected $catalogues;
-    protected $locale;
-    protected $fallbackLocale;
-    protected $loaders;
-    protected $resources;
-    protected $selector;
+    private $catalogues;
+    private $locale;
+    private $fallbackLocale;
+    private $loaders;
+    private $resources;
+    private $selector;
 
     /**
      * Constructor.
@@ -131,24 +131,23 @@ class Translator implements TranslatorInterface
         return strtr($this->selector->choose($this->catalogues[$locale]->get($id, $domain), (int) $number, $locale), $parameters);
     }
 
-    protected function loadCatalogue($locale)
+    private function loadCatalogue($locale)
     {
         $this->catalogues[$locale] = new MessageCatalogue($locale);
-        if (!isset($this->resources[$locale])) {
-            return;
-        }
 
-        foreach ($this->resources[$locale] as $resource) {
-            if (!isset($this->loaders[$resource[0]])) {
-                throw new \RuntimeException(sprintf('The "%s" translation loader is not registered.', $resource[0]));
+        if (isset($this->resources[$locale])) {
+            foreach ($this->resources[$locale] as $resource) {
+                if (!isset($this->loaders[$resource[0]])) {
+                    throw new \RuntimeException(sprintf('The "%s" translation loader is not registered.', $resource[0]));
+                }
+                $this->catalogues[$locale]->addCatalogue($this->loaders[$resource[0]]->load($resource[1], $locale, $resource[2]));
             }
-            $this->catalogues[$locale]->addCatalogue($this->loaders[$resource[0]]->load($resource[1], $locale, $resource[2]));
         }
 
         $this->optimizeCatalogue($locale);
     }
 
-    protected function optimizeCatalogue($locale)
+    private function optimizeCatalogue($locale)
     {
         if (strlen($locale) > 3) {
             $fallback = substr($locale, 0, -strlen(strrchr($locale, '_')));

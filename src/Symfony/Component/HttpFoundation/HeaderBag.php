@@ -3,7 +3,7 @@
 /*
  * This file is part of the Symfony package.
  *
- * (c) Fabien Potencier <fabien.potencier@symfony-project.com>
+ * (c) Fabien Potencier <fabien@symfony.com>
  *
  * For the full copyright and license information, please view the LICENSE
  * file that was distributed with this source code.
@@ -14,7 +14,7 @@ namespace Symfony\Component\HttpFoundation;
 /**
  * HeaderBag is a container for HTTP headers.
  *
- * @author Fabien Potencier <fabien.potencier@symfony-project.com>
+ * @author Fabien Potencier <fabien@symfony.com>
  */
 class HeaderBag
 {
@@ -96,16 +96,16 @@ class HeaderBag
         if (!array_key_exists($key, $this->headers)) {
             if (null === $default) {
                 return $first ? null : array();
-            } else {
-                return $first ? $default : array($default);
             }
+
+            return $first ? $default : array($default);
         }
 
         if ($first) {
             return count($this->headers[$key]) ? $this->headers[$key][0] : $default;
-        } else {
-            return $this->headers[$key];
         }
+
+        return $this->headers[$key];
     }
 
     /**

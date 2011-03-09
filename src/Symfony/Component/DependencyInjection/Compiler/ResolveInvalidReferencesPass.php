@@ -3,7 +3,7 @@
 /*
  * This file is part of the Symfony package.
  *
- * (c) Fabien Potencier <fabien.potencier@symfony-project.com>
+ * (c) Fabien Potencier <fabien@symfony.com>
  *
  * For the full copyright and license information, please view the LICENSE
  * file that was distributed with this source code.
@@ -76,7 +76,7 @@ class ResolveInvalidReferencesPass implements CompilerPassInterface
     }
 
     /**
-     * Processes arguments to determin invalid references.
+     * Processes arguments to determine invalid references.
      *
      * @param array $arguments An array of Reference objects
      * @param boolean $inMethodCall 

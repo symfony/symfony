@@ -3,7 +3,7 @@
 /*
  * This file is part of the Symfony package.
  *
- * (c) Fabien Potencier <fabien.potencier@symfony-project.com>
+ * (c) Fabien Potencier <fabien@symfony.com>
  *
  * For the full copyright and license information, please view the LICENSE
  * file that was distributed with this source code.
@@ -25,7 +25,7 @@ use Symfony\Bundle\DoctrineAbstractBundle\DependencyInjection\AbstractDoctrineEx
  * Doctrine MongoDB ODM extension.
  *
  * @author Bulat Shakirzyanov <bulat@theopenskyproject.com>
- * @author Kris Wallsmith <kris.wallsmith@symfony-project.com>
+ * @author Kris Wallsmith <kris.wallsmith@symfony.com>
  * @author Jonathan H. Wage <jonwage@gmail.com>
  */
 class DoctrineMongoDBExtension extends AbstractDoctrineExtension
@@ -299,8 +299,8 @@ class DoctrineMongoDBExtension extends AbstractDoctrineExtension
      *
      * There are two distinct configuration possibilities for mapping information:
      *
-     * 1. Specifiy a bundle and optionally details where the entity and mapping information reside.
-     * 2. Specifiy an arbitrary mapping location.
+     * 1. Specify a bundle and optionally details where the entity and mapping information reside.
+     * 2. Specify an arbitrary mapping location.
      *
      * @example
      *
@@ -339,7 +339,7 @@ class DoctrineMongoDBExtension extends AbstractDoctrineExtension
         if ($odmConfigDef->hasMethodCall('setDocumentNamespaces')) {
             // TODO: Can we make a method out of it on Definition? replaceMethodArguments() or something.
             $calls = $odmConfigDef->getMethodCalls();
-            foreach ($calls AS $call) {
+            foreach ($calls as $call) {
                 if ($call[0] == 'setDocumentNamespaces') {
                     $this->aliasMap = array_merge($call[1][0], $this->aliasMap);
                 }
@@ -381,7 +381,7 @@ class DoctrineMongoDBExtension extends AbstractDoctrineExtension
      */
     public function getNamespace()
     {
-        return 'http://www.symfony-project.org/schema/dic/doctrine/odm/mongodb';
+        return 'http://symfony.com/schema/dic/doctrine/odm/mongodb';
     }
 
     /**

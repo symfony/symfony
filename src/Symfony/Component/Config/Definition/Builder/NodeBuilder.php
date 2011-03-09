@@ -3,7 +3,7 @@
 /*
  * This file is part of the Symfony package.
  *
- * (c) Fabien Potencier <fabien.potencier@symfony-project.com>
+ * (c) Fabien Potencier <fabien@symfony.com>
  *
  * For the full copyright and license information, please view the LICENSE
  * file that was distributed with this source code.
@@ -113,7 +113,7 @@ class NodeBuilder
      *         ->node('baz', 'scalar')
      *     ;
      *
-     * @return Symfony\Component\DependencyInjection\Configuration\Builder\NodeBuilder This builder node
+     * @return Symfony\Component\Config\Definition\Builder\NodeBuilder This builder node
      */
     public function builder(NodeBuilder $node)
     {
@@ -399,7 +399,7 @@ class NodeBuilder
     /**
      * Sets whether the node can be overwritten.
      *
-     * @param boolean $deny Whether the overwritting is forbidden or not
+     * @param boolean $deny Whether the overwriting is forbidden or not
      *
      * @return Symfony\Component\Config\Definition\Builder\NodeBuilder
      */

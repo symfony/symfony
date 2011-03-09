@@ -3,7 +3,7 @@
 /*
  * This file is part of the Symfony package.
  *
- * (c) Fabien Potencier <fabien.potencier@symfony-project.com>
+ * (c) Fabien Potencier <fabien@symfony.com>
  *
  * For the full copyright and license information, please view the LICENSE
  * file that was distributed with this source code.
@@ -16,7 +16,7 @@ use Symfony\Component\Console\Output\OutputInterface;
 /**
  * The Dialog class provides helpers to interact with the user.
  *
- * @author Fabien Potencier <fabien.potencier@symfony-project.com>
+ * @author Fabien Potencier <fabien@symfony.com>
  */
 class DialogHelper extends Helper
 {
@@ -61,9 +61,9 @@ class DialogHelper extends Helper
 
         if (false === $default) {
             return $answer && 'y' == strtolower($answer[0]);
-        } else {
-            return !$answer || 'y' == strtolower($answer[0]);
         }
+
+        return !$answer || 'y' == strtolower($answer[0]);
         // @codeCoverageIgnoreEnd
     }
 

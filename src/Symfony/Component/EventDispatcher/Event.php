@@ -3,7 +3,7 @@
 /*
  * This file is part of the Symfony package.
  *
- * (c) Fabien Potencier <fabien.potencier@symfony-project.com>
+ * (c) Fabien Potencier <fabien@symfony.com>
  *
  * For the full copyright and license information, please view the LICENSE
  * file that was distributed with this source code.
@@ -14,7 +14,7 @@ namespace Symfony\Component\EventDispatcher;
 /**
  * Event.
  *
- * @author Fabien Potencier <fabien.potencier@symfony-project.com>
+ * @author Fabien Potencier <fabien@symfony.com>
  */
 class Event implements EventInterface
 {
@@ -61,7 +61,7 @@ class Event implements EventInterface
      * Sets the processed flag to true.
      *
      * This method must be called by listeners when
-     * it has processed the event (it is only meaninful
+     * it has processed the event (it is only meaningful
      * when the event has been notified with the notifyUntil()
      * dispatcher method.
      */

@@ -3,7 +3,7 @@
 /*
  * This file is part of the Symfony package.
  *
- * (c) Fabien Potencier <fabien.potencier@symfony-project.com>
+ * (c) Fabien Potencier <fabien@symfony.com>
  *
  * This code is partially based on the Rack-Cache library by Ryan Tomayko,
  * which is released under the MIT license.
@@ -24,7 +24,7 @@ use Symfony\Component\HttpFoundation\Response;
  * This implementation changes the master response TTL to the smallest TTL received
  * or force validation if one of the ESI has validation cache strategy.
  *
- * @author Fabien Potencier <fabien.potencier@symfony-project.com>
+ * @author Fabien Potencier <fabien@symfony.com>
  */
 class EsiResponseCacheStrategy implements EsiResponseCacheStrategyInterface
 {

@@ -3,7 +3,7 @@
 /*
  * This file is part of the Symfony package.
  *
- * (c) Fabien Potencier <fabien.potencier@symfony-project.com>
+ * (c) Fabien Potencier <fabien@symfony.com>
  *
  * For the full copyright and license information, please view the LICENSE
  * file that was distributed with this source code.
@@ -17,7 +17,7 @@ use Symfony\Component\HttpFoundation\FileBag;
 /**
  * FileBagTest.
  *
- * @author Fabien Potencier <fabien.potencier@symfony-project.org>
+ * @author Fabien Potencier <fabien@symfony.com>
  * @author Bulat Shakirzyanov <mallluhuct@gmail.com>
  */
 class FileBagTest extends \PHPUnit_Framework_TestCase

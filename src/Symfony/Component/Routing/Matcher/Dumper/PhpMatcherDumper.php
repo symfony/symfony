@@ -3,7 +3,7 @@
 /*
  * This file is part of the Symfony package.
  *
- * (c) Fabien Potencier <fabien.potencier@symfony-project.com>
+ * (c) Fabien Potencier <fabien@symfony.com>
  *
  * For the full copyright and license information, please view the LICENSE
  * file that was distributed with this source code.
@@ -16,7 +16,7 @@ use Symfony\Component\Routing\Route;
 /**
  * PhpMatcherDumper creates a PHP class able to match URLs for a given set of routes.
  *
- * @author Fabien Potencier <fabien.potencier@symfony-project.com>
+ * @author Fabien Potencier <fabien@symfony.com>
  */
 class PhpMatcherDumper extends MatcherDumper
 {
@@ -62,7 +62,7 @@ class PhpMatcherDumper extends MatcherDumper
 
             $hasTrailingSlash = false;
             if (!count($compiledRoute->getVariables()) && false !== preg_match('#^(.)\^(?P<url>.*?)\$\1#', $compiledRoute->getRegex(), $m)) {
-                if (substr($m['url'], -1) === '/' && $m['url'] !== '/') {
+                if (substr($m['url'], -1) === '/') {
                     $conditions[] = sprintf("rtrim(\$url, '/') === '%s'", rtrim(str_replace('\\', '', $m['url']), '/'));
                     $hasTrailingSlash = true;
                 } else {

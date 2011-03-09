@@ -3,7 +3,7 @@
 /*
  * This file is part of the Symfony package.
  *
- * (c) Fabien Potencier <fabien.potencier@symfony-project.com>
+ * (c) Fabien Potencier <fabien@symfony.com>
  *
  * For the full copyright and license information, please view the LICENSE
  * file that was distributed with this source code.
@@ -26,7 +26,7 @@ use Symfony\Component\Security\Core\Authentication\Token\TokenInterface;
  * UserProviderInterface implementation may still throw a
  * UsernameNotFoundException, for example.
  *
- * @author Fabien Potencier <fabien.potencier@symfony-project.com>
+ * @author Fabien Potencier <fabien@symfony.com>
  */
 class PreAuthenticatedAuthenticationProvider implements AuthenticationProviderInterface
 {
@@ -68,7 +68,10 @@ class PreAuthenticatedAuthenticationProvider implements AuthenticationProviderIn
 
         $this->accountChecker->checkPostAuth($user);
 
-        return new PreAuthenticatedToken($user, $token->getCredentials(), $this->providerKey, $user->getRoles());
+        $authenticatedToken = new PreAuthenticatedToken($user, $token->getCredentials(), $this->providerKey, $user->getRoles());
+        $authenticatedToken->setAttributes($token->getAttributes());
+
+        return $authenticatedToken;
     }
 
     /**

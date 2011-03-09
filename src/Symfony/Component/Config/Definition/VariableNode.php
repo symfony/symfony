@@ -3,7 +3,7 @@
 /*
  * This file is part of the Symfony package.
  *
- * (c) Fabien Potencier <fabien.potencier@symfony-project.com>
+ * (c) Fabien Potencier <fabien@symfony.com>
  *
  * For the full copyright and license information, please view the LICENSE
  * file that was distributed with this source code.
@@ -16,8 +16,8 @@ use Symfony\Component\Config\Definition\Exception\InvalidConfigurationException;
 /**
  * This node represents a variable value in the config tree.
  *
- * This node is intended for arbitrary variables. It behaves similar to scalar
- * nodes except that any PHP type is accepted as a value.
+ * This node is intended for arbitrary variables.
+ * Any PHP type is accepted as a value.
  *
  * @author Jeremy Mikola <jmikola@gmail.com>
  */

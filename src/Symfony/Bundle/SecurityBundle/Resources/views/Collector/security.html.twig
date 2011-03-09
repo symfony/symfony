@@ -1,29 +1,41 @@
 {% extends 'WebProfilerBundle:Profiler:layout.html.twig' %}
 
 {% block toolbar %}
-<img style="margin: 0 5px 0 10px; vertical-align: middle; height: 24px" width="24" height="24" alt="Security" src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAB8AAAAfCAYAAAAfrhY5AAAAGXRFWHRTb2Z0d2FyZQBBZG9iZSBJbWFnZVJlYWR5ccllPAAAAftJREFUeNpi/P//P8NAASaGAQSjlg8IYEHmMDIyEqMnAYiDgZgHyv8CxGuBeAEhjeiJm4VExybEx8fX29vby3BwcID1/vjx48/Bgwd1Fi5cyECMA1A8i+waAj7nSUhIOOvi4qKGTXLPnj23FixYYAwNCaJ8TnSca2lpGVpaWir9/fuXARsGyYHU0CTBKSoqerOxsbH8+/ePARsGyYHUkJ3g8AFVVVWNP3/+EFRDE8tBvgMFLyE1NLGci4vrHSGfg9TQJM65ubl3gSzHh0FqaOJzTk7OHYR8DlJDE5+XlJR8ePfu3eHfv38zYMMgOZAampXtQJ/14QpykBypZTspJRwY1NXVYW19NDU1EdRMSdluAKpQ8MR7M7SCuUAtn4NqLhsgjldRUdEwNjaWkZOTE8Fm0KNHj96cPXv2yZ07d24AuaBa5gh6OY/uc1yWS4B8Ccy3vpqamvJASxWA2YiDGN98/fr1B9ARD65fv/7w27dvm6Gh8YIYy0E+bRYSErIA+VJZWVmClZWV1GoXDIA54M/du3dfgEIDmBNOAIVqgXZ9wWk5Pz9/iZubW7WoqKgANVssr1+//rBr167Wjx8/9uC03NHR8bGampoMLZpMt27derJ//35ZnKldSUlJhlApRi4AmY23eCW1VqJqA5JQlUltwDjaXRpxlgMEGAA2xSf2HpUp2wAAAABJRU5ErkJggg==" />
-{% if collector.authenticated %}
-    <span style="color: #3a3">{{ collector.user }}</span>
-{% elseif collector.enabled %}
-    <span style="color: #a33">anon.</span>
-{% else %}
-    <span style="color: #a33">disabled</span>
-{% endif %}
+<span style="white-space:nowrap; color:#2f2f2f; display:inline-block; min-height:24px; border-right:1px solid #cdcdcd; padding:5px 10px 5px 6px; ">
+    <img width="21" height="28" alt="Security" style="vertical-align: middle; margin-right: 10px;" src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABUAAAAcCAYAAACOGPReAAAAGXRFWHRTb2Z0d2FyZQBBZG9iZSBJbWFnZVJlYWR5ccllPAAAAp1JREFUeNrkVU2LUmEUfq/eGs1RCFMG/AA/qIUyIpWEA02MCblw0YdLoZ2bdjEQuBb6Af2AwqV9bAMVmgIhqEWOEIToIC5EUUERNfXac2yulfeOUjmL6IXDvfe855z3Oec8573cdDpl614KdgrrVIJyK/Y3sB5oNJrdYwBCr9c7GA6HT/A+/NNDr/r9/veZTGaazWan9KRv0i9zUi7Z2wyFQs9isZi/3W6zTqfDut0u29nZMQHtpWKx+Bw2X+UceYfDIVFOJhOmVqu94XD4Gs/zDOn+cMA36Y+Ojrz9fv+dUinFxXs8HtmgKpVq7ywWUDFBEOZ79E367e3tvcFgIB/UarVKlMRdILKNx2Mmx2M61Gw2z/Y5TtprfklNBXISD5nTBUGO9cJJjrzFYpk1YRGpQqE4hDMyFyRcJqVWqz2ksiwi1el0jPP5fCwajc4CkZAhpYf3iwj8CXYqGTAD2HkQ8AvVFHaz4CTJZPI7+be2tuYIg8EgCwQC1JAzyOANDP0yNc8B0Q0MxQj8Zel0eo64VqtJJ4pOjUQizG63M1Dmtl6vf7lo02w274Byr0qlEkulUr+wY+WYggGX4/H4B7E0YoqJROIK6v3xdyfKC+d7Lpdr3+l0WqnGJISIpNVquRqNxjnYjSjjZRfKBuQW0tp1u913bTablTgsovyZUiSVSoWVy+VKoVB4gTIdYOu1eMlQ0E3IfYPBcB1TchOkPk+No3GEscjJxbLQGM/2qDHVarWdz+czQP8W2085NOIhbp7HRqORJ45RozB+kuLLXsawxTjPbInr9Xp9nMvlHnG4iUrotI1SPGksV17KKAehpycYUeZNJtMFSvNvl1gmisePRiPtOn8lYImWRz0+08iuMW6H+79/0f9O0G8CDAD1sUxLMA6q7wAAAABJRU5ErkJggg==" />
+    <span style="color: #3a3">
+        {% if collector.authenticated %}
+            {{ collector.user }}
+        {% elseif collector.enabled %}
+            anon.
+        {% else %}
+            disabled
+        {% endif %}
+    </span>
+</span>
 {% endblock %}
 
 {% block menu %}
-<img style="margin: 0 5px 0 0; vertical-align: middle; width: 32px" width="32" height="32" alt="Security" src="{{ asset('bundles/webprofiler/images/security.png') }}" />
-Security
+<span class="label">
+    <span class="icon"><img src="{{ asset('bundles/webprofiler/images/profiler/security.png') }}" alt="" /></span>
+    <strong>Security</strong>
+</span>
 {% endblock %}
 
 {% block panel %}
     <h2>Security</h2>
     {% if collector.authenticated %}
-        Username: <strong>{{ collector.user }}</strong><br />
-        Roles: {{ collector.roles|yaml_encode }}
+        <p>
+            Username: <strong>{{ collector.user }}</strong><br />
+            Roles: {{ collector.roles|yaml_encode }}
+        </p>
     {% elseif collector.enabled %}
-        <em>No token</em>
+        <p>
+            <em>No token</em>
+        </p>
     {% else %}
-        <em>The security component is disabled</em>
+        <p>
+            <em>The security component is disabled</em>
+        </p>
     {% endif %}
 {% endblock %}

@@ -3,7 +3,7 @@
 /*
  * This file is part of the Symfony package.
  *
- * (c) Fabien Potencier <fabien.potencier@symfony-project.com>
+ * (c) Fabien Potencier <fabien@symfony.com>
  *
  * For the full copyright and license information, please view the LICENSE
  * file that was distributed with this source code.
@@ -42,7 +42,7 @@ use Symfony\Component\Security\Core\Authentication\Token\TokenInterface;
  * /login_check. If you want to change this behavior, you can overwrite the
  * requiresAuthentication() method.
  *
- * @author Fabien Potencier <fabien.potencier@symfony-project.com>
+ * @author Fabien Potencier <fabien@symfony.com>
  * @author Johannes M. Schmitt <schmittjoh@gmail.com>
  */
 abstract class AbstractAuthenticationListener implements ListenerInterface
@@ -198,15 +198,15 @@ abstract class AbstractAuthenticationListener implements ListenerInterface
             $subRequest->attributes->set(SecurityContextInterface::AUTHENTICATION_ERROR, $failed);
 
             return $event->getSubject()->handle($subRequest, HttpKernelInterface::SUB_REQUEST);
-        } else {
-            if (null !== $this->logger) {
-                $this->logger->debug(sprintf('Redirecting to %s', $this->options['failure_path']));
-            }
-
-            $request->getSession()->set(SecurityContextInterface::AUTHENTICATION_ERROR, $failed);
-
-            return new RedirectResponse(0 !== strpos($this->options['failure_path'], 'http') ? $request->getUriForPath($this->options['failure_path']) : $this->options['failure_path'], 302);
         }
+
+        if (null !== $this->logger) {
+            $this->logger->debug(sprintf('Redirecting to %s', $this->options['failure_path']));
+        }
+
+        $request->getSession()->set(SecurityContextInterface::AUTHENTICATION_ERROR, $failed);
+
+        return new RedirectResponse(0 !== strpos($this->options['failure_path'], 'http') ? $request->getUriForPath($this->options['failure_path']) : $this->options['failure_path'], 302);
     }
 
     protected function onSuccess(EventInterface $event, Request $request, TokenInterface $token)

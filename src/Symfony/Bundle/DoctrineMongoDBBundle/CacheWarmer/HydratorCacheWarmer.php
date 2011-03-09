@@ -3,7 +3,7 @@
 /*
  * This file is part of the Symfony package.
  *
- * (c) Fabien Potencier <fabien.potencier@symfony-project.com>
+ * (c) Fabien Potencier <fabien@symfony.com>
  *
  * For the full copyright and license information, please view the LICENSE
  * file that was distributed with this source code.
@@ -39,7 +39,7 @@ class HydratorCacheWarmer implements CacheWarmerInterface
     }
 
     /**
-     * This cache warmer is not optional, without hydrators fatal error occour!
+     * This cache warmer is not optional, without hydrators fatal error occurs!
      *
      * @return false
      */
@@ -66,7 +66,7 @@ class HydratorCacheWarmer implements CacheWarmerInterface
         }
 
         $documentManagers = $this->container->getParameter('doctrine.odm.mongodb.document_managers');
-        foreach ($documentManagers AS $documentManagerName) {
+        foreach ($documentManagers as $documentManagerName) {
             $dm = $this->container->get(sprintf('doctrine.odm.mongodb.%s_document_manager', $documentManagerName));
             /* @var $dm Doctrine\ODM\MongoDB\DocumentManager */
             $classes = $dm->getMetadataFactory()->getAllMetadata();

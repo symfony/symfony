@@ -3,7 +3,7 @@
 /*
  * This file is part of the Symfony package.
  *
- * (c) Fabien Potencier <fabien.potencier@symfony-project.com>
+ * (c) Fabien Potencier <fabien@symfony.com>
  *
  * For the full copyright and license information, please view the LICENSE
  * file that was distributed with this source code.
@@ -16,7 +16,7 @@ use Symfony\Bundle\DoctrineBundle\CacheWarmer\ProxyCacheWarmer;
 class ProxyCacheWarmerTest extends \Symfony\Bundle\DoctrineBundle\Tests\TestCase
 {
     /**
-     * This is not necessarily a good test, it doesnt generate any proxies
+     * This is not necessarily a good test, it doesn't generate any proxies
      * because there are none in the AnnotationsBundle. However that is
      * rather a task of doctrine to test. We touch the lines here and
      * verify that the container is called correctly for the relevant information.
@@ -37,7 +37,7 @@ class ProxyCacheWarmerTest extends \Symfony\Bundle\DoctrineBundle\Tests\TestCase
         $container->expects($this->at(1))
                   ->method('getParameter')
                   ->with($this->equalTo('doctrine.orm.auto_generate_proxy_classes'))
-                  ->will($this->returnValue( false ));
+                  ->will($this->returnValue(false));
         $container->expects($this->at(2))
                   ->method('getParameter')
                   ->with($this->equalTo('doctrine.orm.entity_managers'))
@@ -69,11 +69,11 @@ class ProxyCacheWarmerTest extends \Symfony\Bundle\DoctrineBundle\Tests\TestCase
         $container->expects($this->at(1))
                   ->method('getParameter')
                   ->with($this->equalTo('doctrine.orm.auto_generate_proxy_classes'))
-                  ->will($this->returnValue( true ));
+                  ->will($this->returnValue(true));
         $container->expects($this->at(2))
                   ->method('getParameter')
                   ->with($this->equalTo('assertion'))
-                  ->will($this->returnValue( true ));
+                  ->will($this->returnValue(true));
 
         $cacheWarmer = new ProxyCacheWarmer($container);
         $cacheWarmer->warmUp(sys_get_temp_dir());

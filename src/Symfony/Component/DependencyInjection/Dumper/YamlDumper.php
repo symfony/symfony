@@ -3,7 +3,7 @@
 /*
  * This file is part of the Symfony package.
  *
- * (c) Fabien Potencier <fabien.potencier@symfony-project.com>
+ * (c) Fabien Potencier <fabien@symfony.com>
  *
  * For the full copyright and license information, please view the LICENSE
  * file that was distributed with this source code.
@@ -19,7 +19,7 @@ use Symfony\Component\DependencyInjection\Reference;
 /**
  * YamlDumper dumps a service container as a YAML string.
  *
- * @author Fabien Potencier <fabien.potencier@symfony-project.com>
+ * @author Fabien Potencier <fabien@symfony.com>
  */
 class YamlDumper extends Dumper
 {
@@ -206,9 +206,9 @@ class YamlDumper extends Dumper
             return $this->getParameterCall((string) $value);
         } elseif (is_object($value) || is_resource($value)) {
             throw new \RuntimeException('Unable to dump a service container if a parameter is an object or a resource.');
-        } else {
-            return $value;
         }
+
+        return $value;
     }
 
     /**
@@ -222,9 +222,9 @@ class YamlDumper extends Dumper
     {
         if (null !== $reference && ContainerInterface::EXCEPTION_ON_INVALID_REFERENCE !== $reference->getInvalidBehavior()) {
             return sprintf('@?%s', $id);
-        } else {
-            return sprintf('@%s', $id);
         }
+
+        return sprintf('@%s', $id);
     }
 
     /**

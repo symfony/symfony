@@ -3,7 +3,7 @@
 /*
  * This file is part of the Symfony package.
  *
- * (c) Fabien Potencier <fabien.potencier@symfony-project.com>
+ * (c) Fabien Potencier <fabien@symfony.com>
  *
  * For the full copyright and license information, please view the LICENSE
  * file that was distributed with this source code.
@@ -16,7 +16,7 @@ use Symfony\Component\DependencyInjection\ContainerInterface;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\DependencyInjection\Reference;
 use Symfony\Component\DependencyInjection\Definition;
-use Symfony\Component\DependencyInjection\Loader\Loader;
+use Symfony\Component\Config\Loader\Loader;
 use Symfony\Component\DependencyInjection\Loader\XmlFileLoader;
 use Symfony\Component\DependencyInjection\Loader\YamlFileLoader;
 use Symfony\Component\DependencyInjection\Loader\IniFileLoader;
@@ -33,7 +33,6 @@ class XmlFileLoaderTest extends \PHPUnit_Framework_TestCase
         require_once self::$fixturesPath.'/includes/foo.php';
         require_once self::$fixturesPath.'/includes/ProjectExtension.php';
         require_once self::$fixturesPath.'/includes/ProjectWithXsdExtension.php';
-        require_once self::$fixturesPath.'/includes/ProjectWithXsdExtensionInPhar.phar';
     }
 
     public function testLoad()
@@ -251,6 +250,12 @@ class XmlFileLoaderTest extends \PHPUnit_Framework_TestCase
 
     public function testExtensionInPhar()
     {
+        if (extension_loaded('suhosin') && false === strpos(ini_get('suhosin.executor.include.whitelist'), 'phar')) {
+            $this->markTestSkipped('To run this test, add "phar" to the "suhosin.executor.include.whitelist" settings in your php.ini file.');
+        }
+
+        require_once self::$fixturesPath.'/includes/ProjectWithXsdExtensionInPhar.phar';
+
         // extension with an XSD in PHAR archive
         $container = new ContainerBuilder();
         $container->registerExtension(new \ProjectWithXsdExtensionInPhar());

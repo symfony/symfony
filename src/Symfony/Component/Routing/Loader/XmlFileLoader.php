@@ -3,7 +3,7 @@
 /*
  * This file is part of the Symfony package.
  *
- * (c) Fabien Potencier <fabien.potencier@symfony-project.com>
+ * (c) Fabien Potencier <fabien@symfony.com>
  *
  * For the full copyright and license information, please view the LICENSE
  * file that was distributed with this source code.
@@ -19,7 +19,7 @@ use Symfony\Component\Config\Loader\FileLoader;
 /**
  * XmlFileLoader loads XML routing files.
  *
- * @author Fabien Potencier <fabien.potencier@symfony-project.com>
+ * @author Fabien Potencier <fabien@symfony.com>
  */
 class XmlFileLoader extends FileLoader
 {
@@ -103,7 +103,7 @@ class XmlFileLoader extends FileLoader
             switch ($node->tagName) {
                 case 'default':
                     $defaults[(string) $node->getAttribute('key')] = trim((string) $node->nodeValue);
-                 break;
+                    break;
                 case 'option':
                     $options[(string) $node->getAttribute('key')] = trim((string) $node->nodeValue);
                     break;

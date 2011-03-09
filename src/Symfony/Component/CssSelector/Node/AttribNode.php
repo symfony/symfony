@@ -3,7 +3,7 @@
 /*
  * This file is part of the Symfony package.
  *
- * (c) Fabien Potencier <fabien.potencier@symfony-project.com>
+ * (c) Fabien Potencier <fabien@symfony.com>
  *
  * For the full copyright and license information, please view the LICENSE
  * file that was distributed with this source code.
@@ -20,7 +20,7 @@ use Symfony\Component\CssSelector\SyntaxError;
  * This component is a port of the Python lxml library,
  * which is copyright Infrae and distributed under the BSD license.
  *
- * @author Fabien Potencier <fabien.potencier@symfony-project.com>
+ * @author Fabien Potencier <fabien@symfony.com>
  */
 class AttribNode implements NodeInterface
 {
@@ -55,9 +55,9 @@ class AttribNode implements NodeInterface
     {
         if ($this->operator == 'exists') {
             return sprintf('%s[%s[%s]]', __CLASS__, $this->selector, $this->formatAttrib());
-        } else {
-            return sprintf('%s[%s[%s %s %s]]', __CLASS__, $this->selector, $this->formatAttrib(), $this->operator, $this->value);
         }
+
+        return sprintf('%s[%s[%s %s %s]]', __CLASS__, $this->selector, $this->formatAttrib(), $this->operator, $this->value);
     }
 
     /**
@@ -118,7 +118,7 @@ class AttribNode implements NodeInterface
     /**
      * Returns a formatted attribute
      *
-     * @return string The formatted attributep
+     * @return string The formatted attribute
      */
     protected function formatAttrib()
     {

@@ -3,7 +3,7 @@
 /*
  * This file is part of the Symfony package.
  *
- * (c) Fabien Potencier <fabien.potencier@symfony-project.com>
+ * (c) Fabien Potencier <fabien@symfony.com>
  *
  * For the full copyright and license information, please view the LICENSE
  * file that was distributed with this source code.
@@ -66,7 +66,7 @@ class PhpDumperTest extends \PHPUnit_Framework_TestCase
             $this->fail('->dump() throws a RuntimeException if the container to be dumped has reference to objects or resources');
         } catch (\Exception $e) {
             $this->assertInstanceOf('\RuntimeException', $e, '->dump() returns a LogicException if the dump() method has not been overriden by a children class');
-            $this->assertEquals('Unable to dump a service container if a parameter is an object or a resource.', $e->getMessage(), '->dump() returns a LogicException if the dump() method has not been overriden by a children class');
+            $this->assertEquals('Unable to dump a service container if a parameter is an object or a resource.', $e->getMessage(), '->dump() returns a LogicException if the dump() method has not been overridden by a children class');
         }
     }
 

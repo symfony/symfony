@@ -141,7 +141,7 @@ class StubNumberFormatter
      * The supported styles to the constructor $styles argument
      * @var array
      */
-    private static $supportedStyles = array(
+    static private $supportedStyles = array(
         'CURRENCY' => self::CURRENCY,
         'DECIMAL'  => self::DECIMAL
     );
@@ -150,7 +150,7 @@ class StubNumberFormatter
      * Supported attributes to the setAttribute() $attr argument
      * @var array
      */
-    private static $supportedAttributes = array(
+    static private $supportedAttributes = array(
         'FRACTION_DIGITS' => self::FRACTION_DIGITS,
         'GROUPING_USED'   => self::GROUPING_USED,
         'ROUNDING_MODE'   => self::ROUNDING_MODE
@@ -163,7 +163,7 @@ class StubNumberFormatter
      *
      * @var array
      */
-    private static $roundingModes = array(
+    static private $roundingModes = array(
         'ROUND_HALFEVEN' => self::ROUND_HALFEVEN,
         'ROUND_HALFDOWN' => self::ROUND_HALFDOWN,
         'ROUND_HALFUP'   => self::ROUND_HALFUP
@@ -176,7 +176,7 @@ class StubNumberFormatter
      * @see http://www.php.net/manual/en/function.round.php
      * @var array
      */
-    private static $phpRoundingMap = array(
+    static private $phpRoundingMap = array(
         self::ROUND_HALFDOWN => \PHP_ROUND_HALF_DOWN,
         self::ROUND_HALFEVEN => \PHP_ROUND_HALF_EVEN,
         self::ROUND_HALFUP   => \PHP_ROUND_HALF_UP
@@ -186,7 +186,7 @@ class StubNumberFormatter
      * The maximum values of the integer type in 32 bit platforms.
      * @var array
      */
-    private static $intRange = array(
+    static private $intRange = array(
         'positive' => 2147483647,
         'negative' => -2147483648
     );
@@ -209,6 +209,7 @@ class StubNumberFormatter
      * @param  string  $pattern  A pattern string in case $style is NumberFormat::PATTERN_DECIMAL or
      *                           NumberFormat::PATTERN_RULEBASED. It must conform to  the syntax
      *                           described in the ICU DecimalFormat or ICU RuleBasedNumberFormat documentation
+     * @see    http://www.php.net/manual/en/numberformatter.create.php
      * @see    http://www.icu-project.org/apiref/icu4c/classDecimalFormat.html#_details
      * @see    http://www.icu-project.org/apiref/icu4c/classRuleBasedNumberFormat.html#_details
      * @throws MethodArgumentValueNotImplementedException  When $locale different than 'en' is passed
@@ -242,13 +243,14 @@ class StubNumberFormatter
      * @param  string  $pattern  A pattern string in case $style is NumberFormat::PATTERN_DECIMAL or
      *                           NumberFormat::PATTERN_RULEBASED. It must conform to  the syntax
      *                           described in the ICU DecimalFormat or ICU RuleBasedNumberFormat documentation
+     * @see    http://www.php.net/manual/en/numberformatter.create.php
      * @see    http://www.icu-project.org/apiref/icu4c/classDecimalFormat.html#_details
      * @see    http://www.icu-project.org/apiref/icu4c/classRuleBasedNumberFormat.html#_details
      * @throws MethodArgumentValueNotImplementedException  When $locale different than 'en' is passed
      * @throws MethodArgumentValueNotImplementedException  When the $style is not supported
      * @throws MethodArgumentNotImplementedException       When the pattern value is different than null
      */
-    public static function create($locale = 'en', $style = null, $pattern = null)
+    static public function create($locale = 'en', $style = null, $pattern = null)
     {
         return new self($locale, $style, $pattern);
     }
@@ -259,6 +261,7 @@ class StubNumberFormatter
      * @param  float   $value     The numeric currency value
      * @param  string  $currency  The 3-letter ISO 4217 currency code indicating the currency to use
      * @return string             The formatted currency value
+     * @see    http://www.php.net/manual/en/numberformatter.formatcurrency.php
      * @see    http://www.iso.org/iso/support/faqs/faqs_widely_used_standards/widely_used_standards_other/currency_codes/currency_codes_list-1.htm
      */
     public function formatCurrency($value, $currency)
@@ -290,6 +293,7 @@ class StubNumberFormatter
      * @param  number      $value                     The value to format
      * @param  int         $type                      Type of the formatting, one of the format type constants
      * @return bool|string                            The formatted value or false on error
+     * @see    http://www.php.net/manual/en/numberformatter.format.php
      * @throws RuntimeException                       If the method is called with the class $style 'CURRENCY'
      * @throws MethodArgumentNotImplementedException  If the $type is different than TYPE_DEFAULT
      */
@@ -324,6 +328,7 @@ class StubNumberFormatter
      *
      * @param  int       $attr   An attribute specifier, one of the numeric attribute constants
      * @return bool|int          The attribute value on success or false on error
+     * @see    http://www.php.net/manual/en/numberformatter.getattribute.php
      */
     public function getAttribute($attr)
     {
@@ -334,6 +339,7 @@ class StubNumberFormatter
      * Returns formatter's last error code. Always returns the U_ZERO_ERROR class constant value
      *
      * @return int  The error code from last formatter call
+     * @see    http://www.php.net/manual/en/numberformatter.geterrorcode.php
      */
     public function getErrorCode()
     {
@@ -344,6 +350,7 @@ class StubNumberFormatter
      * Returns formatter's last error message. Always returns the U_ZERO_ERROR_MESSAGE class constant value
      *
      * @return string  The error message from last formatter call
+     * @see    http://www.php.net/manual/en/numberformatter.geterrormessage.php
      */
     public function getErrorMessage()
     {
@@ -355,6 +362,7 @@ class StubNumberFormatter
      *
      * @param  int      $type     The locale name type to return between valid or actual (StubLocale::VALID_LOCALE or StubLocale::ACTUAL_LOCALE, respectively)
      * @return string             The locale name used to create the formatter
+     * @see    http://www.php.net/manual/en/numberformatter.getlocale.php
      */
     public function getLocale($type = StubLocale::ACTUAL_LOCALE)
     {
@@ -365,6 +373,7 @@ class StubNumberFormatter
      * Returns the formatter's pattern
      *
      * @return bool|string        The pattern string used by the formatter or false on error
+     * @see    http://www.php.net/manual/en/numberformatter.getpattern.php
      * @throws MethodNotImplementedException
      */
     public function getPattern()
@@ -377,6 +386,7 @@ class StubNumberFormatter
      *
      * @param  int           $attr   A symbol specifier, one of the format symbol constants
      * @return bool|string           The symbol value or false on error
+     * @see    http://www.php.net/manual/en/numberformatter.getsymbol.php
      * @throws MethodNotImplementedException
      */
     public function getSymbol($attr)
@@ -389,6 +399,7 @@ class StubNumberFormatter
      *
      * @param  int           $attr   An attribute specifier, one of the text attribute constants
      * @return bool|string           The attribute value or false on error
+     * @see    http://www.php.net/manual/en/numberformatter.gettextattribute.php
      * @throws MethodNotImplementedException
      */
     public function getTextAttribute($attr)
@@ -403,6 +414,7 @@ class StubNumberFormatter
      * @param  string       $currency   Parameter to receive the currency name (reference)
      * @param  int          $position   Offset to begin the parsing on return this value will hold the offset at which the parsing ended
      * @return bool|string              The parsed numeric value of false on error
+     * @see    http://www.php.net/manual/en/numberformatter.parsecurrency.php
      * @throws MethodNotImplementedException
      */
     public function parseCurrency($value, &$currency, &$position = null)
@@ -417,6 +429,7 @@ class StubNumberFormatter
      * @param  string       $type                           Type of the formatting, one of the format type constants. NumberFormatter::TYPE_DOUBLE by default
      * @param  int          $position                       Offset to begin the parsing on return this value will hold the offset at which the parsing ended
      * @return bool|string                                  The parsed value of false on error
+     * @see    http://www.php.net/manual/en/numberformatter.parse.php
      * @throws MethodArgumentValueNotImplementedException   When $type equals to TYPE_INT64, behavior not implemented
      * @throws MethodArgumentNotImplementedException        When $position different than null, behavior not implemented
      */
@@ -456,6 +469,7 @@ class StubNumberFormatter
      * @param  int   $attr                                 An attribute specifier, one of the numeric attribute constants
      * @param  int   $value                                The attribute value
      * @return bool                                        true on success or false on failure
+     * @see    http://www.php.net/manual/en/numberformatter.setattribute.php
      * @throws MethodArgumentValueNotImplementedException  When the $attr is not supported
      * @throws MethodArgumentValueNotImplementedException  When the $value is not supported
      */
@@ -497,6 +511,7 @@ class StubNumberFormatter
      *
      * @param  string  $pattern   A pattern string in conformance with the ICU DecimalFormat documentation
      * @return bool               true on success or false on failure
+     * @see    http://www.php.net/manual/en/numberformatter.setpattern.php
      * @see    http://www.icu-project.org/apiref/icu4c/classDecimalFormat.html#_details
      * @throws MethodNotImplementedException
      */
@@ -511,6 +526,7 @@ class StubNumberFormatter
      * @param  int      $attr    A symbol specifier, one of the format symbol constants
      * @param  string   $value   The value for the symbol
      * @return bool              true on success or false on failure
+     * @see    http://www.php.net/manual/en/numberformatter.setsymbol.php
      * @throws MethodNotImplementedException
      */
     public function setSymbol($attr, $value)
@@ -524,6 +540,7 @@ class StubNumberFormatter
      * @param  int   $attr       An attribute specifier, one of the text attribute constants
      * @param  int   $value      The attribute value
      * @return bool              true on success or false on failure
+     * @see    http://www.php.net/manual/en/numberformatter.settextattribute.php
      * @throws MethodNotImplementedException
      */
     public function setTextAttribute($attr, $value)

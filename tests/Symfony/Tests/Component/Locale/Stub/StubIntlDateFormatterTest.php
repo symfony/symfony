@@ -29,16 +29,35 @@ class StubIntlDateFormatterTest extends LocaleTestCase
 
     public function testConstructor()
     {
-        $formatter = new StubIntlDateFormatter('en', StubIntlDateFormatter::MEDIUM, StubIntlDateFormatter::SHORT, 'UTC', StubIntlDateFormatter::GREGORIAN, 'Y-M-d');
-        $this->assertEquals('Y-M-d', $formatter->getPattern());
+        $formatter = new StubIntlDateFormatter('en', StubIntlDateFormatter::MEDIUM, StubIntlDateFormatter::SHORT, 'UTC', StubIntlDateFormatter::GREGORIAN, 'y-M-d');
+        $this->assertEquals('y-M-d', $formatter->getPattern());
     }
 
     /**
-    * @dataProvider formatProvider
-    */
+     * When a time zone is not specified, it uses the system default however it returns null in the getter method
+     * @covers Symfony\Component\Locale\Stub\StubIntlDateFormatter::getTimeZoneId
+     * @covers Symfony\Component\Locale\Stub\StubIntlDateFormatter::setTimeZoneId
+     * @see StubIntlDateFormatterTest::testDefaultTimeZoneIntl()
+     */
+    public function testConstructorDefaultTimeZoneStub()
+    {
+        $formatter = new StubIntlDateFormatter('en', StubIntlDateFormatter::MEDIUM, StubIntlDateFormatter::SHORT);
+        $this->assertNull($formatter->getTimeZoneId());
+    }
+
+    public function testConstructorDefaultTimeZoneIntl()
+    {
+        $this->skipIfIntlExtensionIsNotLoaded();
+        $formatter = new \IntlDateFormatter('en', StubIntlDateFormatter::MEDIUM, StubIntlDateFormatter::SHORT);
+        $this->assertNull($formatter->getTimeZoneId());
+    }
+
+    /**
+     * @dataProvider formatProvider
+     */
     public function testFormatStub($pattern, $timestamp, $expected)
     {
-        $formatter = new StubIntlDateFormatter('en', StubIntlDateFormatter::MEDIUM, StubIntlDateFormatter::SHORT, 'UTC', StubIntlDateFormatter::GREGORIAN, $pattern);
+        $formatter = $this->createStubFormatter($pattern);
         $this->assertSame($expected, $formatter->format($timestamp));
     }
 
@@ -48,7 +67,7 @@ class StubIntlDateFormatterTest extends LocaleTestCase
     public function testFormatIntl($pattern, $timestamp, $expected)
     {
         $this->skipIfIntlExtensionIsNotLoaded();
-        $formatter = new \IntlDateFormatter('en', \IntlDateFormatter::MEDIUM, \IntlDateFormatter::SHORT, 'UTC', \IntlDateFormatter::GREGORIAN, $pattern);
+        $formatter = $this->createIntlFormatter($pattern);
         $this->assertSame($expected, $formatter->format($timestamp));
     }
 
@@ -57,11 +76,11 @@ class StubIntlDateFormatterTest extends LocaleTestCase
         $formatData = array(
             /* general */
             array('y-M-d', 0, '1970-1-1'),
-            array("yyyy.MM.dd G 'at' HH:mm:ss zzz", 0, '1970.01.01 AD at 00:00:00 GMT+00:00'),
+            array("yyyy.MM.dd 'at' HH:mm:ss zzz", 0, '1970.01.01 at 00:00:00 GMT+00:00'),
             array("EEE, MMM d, ''yy", 0, "Thu, Jan 1, '70"),
             array('h:mm a', 0, '12:00 AM'),
             array('K:mm a, z', 0, '0:00 AM, GMT+00:00'),
-            array('yyyyy.MMMM.dd GGG hh:mm aaa', 0, '01970.January.01 AD 12:00 AM'),
+            array('yyyyy.MMMM.dd hh:mm aaa', 0, '01970.January.01 12:00 AM'),
 
             /* escaping */
             array("'M'", 0, 'M'),
@@ -98,9 +117,6 @@ class StubIntlDateFormatterTest extends LocaleTestCase
             array('d', 0, '1'),
             array('dd', 0, '01'),
             array('ddd', 0, '001'),
-
-            /* era */
-            array('G', 0, 'AD'),
 
             /* quarter */
             array('Q', 0, '1'),
@@ -233,20 +249,12 @@ class StubIntlDateFormatterTest extends LocaleTestCase
             array('zzzzz', 0, 'GMT+00:00'),
         );
 
-        // BC era has huge negative unix timestamp
-        // so testing it requires 64bit
-        if ($this->is64Bit()) {
-            $formatData = array_merge($formatData, array(
-                array('G', -62167222800, 'BC'),
-            ));
-        }
-
         return $formatData;
     }
 
     /**
-    * @dataProvider formatWithTimezoneProvider
-    */
+     * @dataProvider formatWithTimezoneProvider
+     */
     public function testFormatWithTimezoneStub($timestamp, $timezone, $expected)
     {
         $pattern = 'yyyy-MM-dd HH:mm:ss';
@@ -255,8 +263,8 @@ class StubIntlDateFormatterTest extends LocaleTestCase
     }
 
     /**
-    * @dataProvider formatWithTimezoneProvider
-    */
+     * @dataProvider formatWithTimezoneProvider
+     */
     public function testFormatWithTimezoneIntl($timestamp, $timezone, $expected)
     {
         $this->skipIfIntlExtensionIsNotLoaded();
@@ -269,6 +277,9 @@ class StubIntlDateFormatterTest extends LocaleTestCase
     {
         return array(
             array(0, 'UTC', '1970-01-01 00:00:00'),
+            array(0, 'GMT', '1970-01-01 00:00:00'),
+            array(0, 'GMT-03:00', '1969-12-31 21:00:00'),
+            array(0, 'GMT+03:00', '1970-01-01 03:00:00'),
             array(0, 'Europe/Zurich', '1970-01-01 01:00:00'),
             array(0, 'Europe/Paris', '1970-01-01 01:00:00'),
             array(0, 'Africa/Cairo', '1970-01-01 02:00:00'),
@@ -282,13 +293,73 @@ class StubIntlDateFormatterTest extends LocaleTestCase
             array(0, 'Asia/Bangkok', '1970-01-01 07:00:00'),
             array(0, 'Asia/Dubai', '1970-01-01 04:00:00'),
             array(0, 'Australia/Brisbane', '1970-01-01 10:00:00'),
+            array(0, 'Australia/Eucla', '1970-01-01 08:45:00'),
             array(0, 'Australia/Melbourne', '1970-01-01 10:00:00'),
             array(0, 'Europe/Berlin', '1970-01-01 01:00:00'),
             array(0, 'Europe/Dublin', '1970-01-01 01:00:00'),
             array(0, 'Europe/Warsaw', '1970-01-01 01:00:00'),
             array(0, 'Pacific/Fiji', '1970-01-01 12:00:00'),
 
+            // When time zone not exists, uses UTC by default
             array(0, 'Foo/Bar', '1970-01-01 00:00:00'),
+            array(0, 'UTC+04:30', '1970-01-01 00:00:00'),
+            array(0, 'UTC+04:AA', '1970-01-01 00:00:00'),
+        );
+    }
+
+    /**
+     * @expectedException Symfony\Component\Locale\Exception\NotImplementedException
+     */
+    public function testFormatWithTimezoneFormatOptionAndDifferentThanUtcStub()
+    {
+        $formatter = $this->createStubFormatter('zzzz');
+        $formatter->setTimeZoneId('Pacific/Fiji');
+        $formatter->format(0);
+    }
+
+    public function testFormatWithTimezoneFormatOptionAndDifferentThanUtcIntl()
+    {
+        $this->skipIfIntlExtensionIsNotLoaded();
+        $formatter = $this->createIntlFormatter('zzzz');
+        $formatter->setTimeZoneId('Pacific/Fiji');
+        $this->assertEquals('Fiji Time', $formatter->format(0));
+    }
+
+    public function testFormatWithGmtTimezoneStub()
+    {
+        $formatter = $this->createStubFormatter('zzzz');
+        $formatter->setTimeZoneId('GMT+03:00');
+        $this->assertEquals('GMT+03:00', $formatter->format(0));
+    }
+
+    public function testFormatWithGmtTimezoneIntl()
+    {
+        $this->skipIfIntlExtensionIsNotLoaded();
+        $formatter = $this->createIntlFormatter('zzzz');
+        $formatter->setTimeZoneId('GMT+03:00');
+        $this->assertEquals('GMT+03:00', $formatter->format(0));
+    }
+
+    public function testFormatWithDefaultTimezoneStub()
+    {
+        $formatter = new StubIntlDateFormatter('en', StubIntlDateFormatter::MEDIUM, StubIntlDateFormatter::SHORT);
+        $formatter->setPattern('yyyy-MM-dd HH:mm:ss');
+
+        $this->assertEquals(
+            $this->createDateTime(0)->format('Y-m-d H:i:s'),
+            $formatter->format(0)
+        );
+    }
+
+    public function testFormatWithDefaultTimezoneIntl()
+    {
+        $this->skipIfIntlExtensionIsNotLoaded();
+        $formatter = new \IntlDateFormatter('en', StubIntlDateFormatter::MEDIUM, StubIntlDateFormatter::SHORT);
+        $formatter->setPattern('yyyy-MM-dd HH:mm:ss');
+
+        $this->assertEquals(
+            $this->createDateTime(0)->format('Y-m-d H:i:s'),
+            $formatter->format(0)
         );
     }
 
@@ -300,6 +371,15 @@ class StubIntlDateFormatterTest extends LocaleTestCase
         $pattern = 'Y';
         $formatter = new StubIntlDateFormatter('en', StubIntlDateFormatter::MEDIUM, StubIntlDateFormatter::SHORT, 'UTC', StubIntlDateFormatter::GREGORIAN, $pattern);
         $formatter->format(0);
+    }
+
+    /**
+     * @expectedException Symfony\Component\Locale\Exception\NotImplementedException
+     */
+    public function testFormatWithNonIntegerTimestamp()
+    {
+        $formatter = $this->createStubFormatter();
+        $formatter->format(array());
     }
 
     /**
@@ -368,7 +448,7 @@ class StubIntlDateFormatterTest extends LocaleTestCase
 
     public function testGetPattern()
     {
-        $formatter = new StubIntlDateFormatter('en', StubIntlDateFormatter::FULL, StubIntlDateFormatter::NONE, StubIntlDateFormatter::GREGORIAN, 'UTC', 'yyyy-MM-dd');
+        $formatter = new StubIntlDateFormatter('en', StubIntlDateFormatter::FULL, StubIntlDateFormatter::NONE, 'UTC', StubIntlDateFormatter::GREGORIAN, 'yyyy-MM-dd');
         $this->assertEquals('yyyy-MM-dd', $formatter->getPattern());
     }
 
@@ -376,33 +456,6 @@ class StubIntlDateFormatterTest extends LocaleTestCase
     {
         $formatter = new StubIntlDateFormatter('en', StubIntlDateFormatter::NONE, StubIntlDateFormatter::FULL);
         $this->assertEquals(StubIntlDateFormatter::FULL, $formatter->getTimeType());
-    }
-
-    /**
-    * @dataProvider timeZoneIdProvider
-    */
-    public function testGetTimeZoneIdStub($timeZoneId)
-    {
-        $formatter = new StubIntlDateFormatter('en', StubIntlDateFormatter::FULL, StubIntlDateFormatter::NONE, $timeZoneId);
-        $this->assertEquals($timeZoneId, $formatter->getTimeZoneId());
-    }
-
-    /**
-    * @dataProvider timeZoneIdProvider
-    */
-    public function testGetTimeZoneIdIntl($timeZoneId)
-    {
-        $this->skipIfIntlExtensionIsNotLoaded();
-        $formatter = new StubIntlDateFormatter('en', StubIntlDateFormatter::MEDIUM, StubIntlDateFormatter::SHORT, $timeZoneId);
-        $this->assertEquals($timeZoneId, $formatter->getTimeZoneId());
-    }
-
-    public function timeZoneIdProvider()
-    {
-        return array(
-            array('Europe/Zurich'),
-            array('Asia/Dubai'),
-        );
     }
 
     /**
@@ -424,12 +477,259 @@ class StubIntlDateFormatterTest extends LocaleTestCase
     }
 
     /**
-     * @expectedException Symfony\Component\Locale\Exception\MethodNotImplementedException
+     * @dataProvider parseProvider
      */
-    public function testParse()
+    public function testParseIntl($pattern, $value, $expected)
     {
-        $formatter = $this->createStubFormatter();
-        $formatter->parse('Wednesday, December 31, 1969 4:00:00 PM PT');
+        $this->skipIfIntlExtensionIsNotLoaded();
+        $formatter = $this->createIntlFormatter($pattern);
+        $this->assertSame($expected, $formatter->parse($value));
+    }
+
+    /**
+     * @dataProvider parseProvider
+     */
+    public function testParseStub($pattern, $value, $expected)
+    {
+        $formatter = $this->createStubFormatter($pattern);
+        $this->assertSame($expected, $formatter->parse($value));
+    }
+
+    public function parseProvider()
+    {
+        return array(
+            // years
+            array('y-M-d', '1970-1-1', 0),
+            // TODO: review to support or not this variant
+            // array('yy-M-d', '70-1-1', 0),
+
+            // months
+            array('y-M-d', '1970-1-1', 0),
+            array('y-MMM-d', '1970-Jan-1', 0),
+            array('y-MMMM-d', '1970-January-1', 0),
+
+            // 1 char month
+            array('y-MMMMM-d', '1970-J-1', false),
+            array('y-MMMMM-d', '1970-S-1', false),
+
+            // standalone months
+            array('y-L-d', '1970-1-1', 0),
+            array('y-LLL-d', '1970-Jan-1', 0),
+            array('y-LLLL-d', '1970-January-1', 0),
+
+            // standalone 1 char month
+            array('y-LLLLL-d', '1970-J-1', false),
+            array('y-LLLLL-d', '1970-S-1', false),
+
+            // days
+            array('y-M-d', '1970-1-1', 0),
+            array('y-M-dd', '1970-1-01', 0),
+            array('y-M-ddd', '1970-1-001', 0),
+
+            // 12 hours (1-12)
+            array('y-M-d h', '1970-1-1 1', 3600),
+            array('y-M-d h', '1970-1-1 10', 36000),
+            array('y-M-d hh', '1970-1-1 11', 39600),
+            array('y-M-d hh', '1970-1-1 12', 0),
+            array('y-M-d hh a', '1970-1-1 0 AM', 0),
+            array('y-M-d hh a', '1970-1-1 1 AM', 3600),
+            array('y-M-d hh a', '1970-1-1 10 AM', 36000),
+            array('y-M-d hh a', '1970-1-1 11 AM', 39600),
+            array('y-M-d hh a', '1970-1-1 12 AM', 0),
+            array('y-M-d hh a', '1970-1-1 23 AM', 82800),
+            array('y-M-d hh a', '1970-1-1 24 AM', 86400),
+            array('y-M-d hh a', '1970-1-1 0 PM', 43200),
+            array('y-M-d hh a', '1970-1-1 1 PM', 46800),
+            array('y-M-d hh a', '1970-1-1 10 PM', 79200),
+            array('y-M-d hh a', '1970-1-1 11 PM', 82800),
+            array('y-M-d hh a', '1970-1-1 12 PM', 43200),
+            array('y-M-d hh a', '1970-1-1 23 PM', 126000),
+            array('y-M-d hh a', '1970-1-1 24 PM', 129600),
+
+            // 12 hours (0-11)
+            array('y-M-d K', '1970-1-1 1', 3600),
+            array('y-M-d K', '1970-1-1 10', 36000),
+            array('y-M-d KK', '1970-1-1 11', 39600),
+            array('y-M-d KK', '1970-1-1 12', 43200),
+            array('y-M-d KK a', '1970-1-1 0 AM', 0),
+            array('y-M-d KK a', '1970-1-1 1 AM', 3600),
+            array('y-M-d KK a', '1970-1-1 10 AM', 36000),
+            array('y-M-d KK a', '1970-1-1 11 AM', 39600),
+            array('y-M-d KK a', '1970-1-1 12 AM', 43200),
+            array('y-M-d KK a', '1970-1-1 23 AM', 82800),
+            array('y-M-d KK a', '1970-1-1 24 AM', 86400),
+            array('y-M-d KK a', '1970-1-1 0 PM', 43200),
+            array('y-M-d KK a', '1970-1-1 1 PM', 46800),
+            array('y-M-d KK a', '1970-1-1 10 PM', 79200),
+            array('y-M-d KK a', '1970-1-1 11 PM', 82800),
+            array('y-M-d KK a', '1970-1-1 12 PM', 86400),
+            array('y-M-d KK a', '1970-1-1 23 PM', 126000),
+            array('y-M-d KK a', '1970-1-1 24 PM', 129600),
+
+            // 24 hours (0-23)
+            array('y-M-d H', '1970-1-1 0', 0),
+            array('y-M-d H', '1970-1-1 1', 3600),
+            array('y-M-d H', '1970-1-1 10', 36000),
+            array('y-M-d HH', '1970-1-1 11', 39600),
+            array('y-M-d HH', '1970-1-1 12', 43200),
+            array('y-M-d HH', '1970-1-1 23', 82800),
+            array('y-M-d HH a', '1970-1-1 0 AM', 0),
+            array('y-M-d HH a', '1970-1-1 1 AM', 0),
+            array('y-M-d HH a', '1970-1-1 10 AM', 0),
+            array('y-M-d HH a', '1970-1-1 11 AM', 0),
+            array('y-M-d HH a', '1970-1-1 12 AM', 0),
+            array('y-M-d HH a', '1970-1-1 23 AM', 0),
+            array('y-M-d HH a', '1970-1-1 24 AM', 0),
+            array('y-M-d HH a', '1970-1-1 0 PM', 43200),
+            array('y-M-d HH a', '1970-1-1 1 PM', 43200),
+            array('y-M-d HH a', '1970-1-1 10 PM', 43200),
+            array('y-M-d HH a', '1970-1-1 11 PM', 43200),
+            array('y-M-d HH a', '1970-1-1 12 PM', 43200),
+            array('y-M-d HH a', '1970-1-1 23 PM', 43200),
+            array('y-M-d HH a', '1970-1-1 24 PM', 43200),
+
+            // 24 hours (1-24)
+            array('y-M-d k', '1970-1-1 1', 3600),
+            array('y-M-d k', '1970-1-1 10', 36000),
+            array('y-M-d kk', '1970-1-1 11', 39600),
+            array('y-M-d kk', '1970-1-1 12', 43200),
+            array('y-M-d kk', '1970-1-1 23', 82800),
+            array('y-M-d kk', '1970-1-1 24', 0),
+            array('y-M-d kk a', '1970-1-1 0 AM', 0),
+            array('y-M-d kk a', '1970-1-1 1 AM', 0),
+            array('y-M-d kk a', '1970-1-1 10 AM', 0),
+            array('y-M-d kk a', '1970-1-1 11 AM', 0),
+            array('y-M-d kk a', '1970-1-1 12 AM', 0),
+            array('y-M-d kk a', '1970-1-1 23 AM', 0),
+            array('y-M-d kk a', '1970-1-1 24 AM', 0),
+            array('y-M-d kk a', '1970-1-1 0 PM', 43200),
+            array('y-M-d kk a', '1970-1-1 1 PM', 43200),
+            array('y-M-d kk a', '1970-1-1 10 PM', 43200),
+            array('y-M-d kk a', '1970-1-1 11 PM', 43200),
+            array('y-M-d kk a', '1970-1-1 12 PM', 43200),
+            array('y-M-d kk a', '1970-1-1 23 PM', 43200),
+            array('y-M-d kk a', '1970-1-1 24 PM', 43200),
+
+            // minutes
+            array('y-M-d HH:m', '1970-1-1 0:1', 60),
+            array('y-M-d HH:mm', '1970-1-1 0:10', 600),
+
+            // seconds
+            array('y-M-d HH:mm:s', '1970-1-1 00:01:1', 61),
+            array('y-M-d HH:mm:ss', '1970-1-1 00:01:10', 70),
+
+            // timezone
+            array('y-M-d HH:mm:ss zzzz', '1970-1-1 00:00:00 GMT-03:00', 10800),
+            array('y-M-d HH:mm:ss zzzz', '1970-1-1 00:00:00 GMT-04:00', 14400),
+            array('y-M-d HH:mm:ss zzzz', '1970-1-1 00:00:00 GMT-00:00', 0),
+            array('y-M-d HH:mm:ss zzzz', '1970-1-1 00:00:00 GMT+03:00', -10800),
+            array('y-M-d HH:mm:ss zzzz', '1970-1-1 00:00:00 GMT+04:00', -14400),
+            array('y-M-d HH:mm:ss zzzz', '1970-1-1 00:00:00 GMT-0300', 10800),
+            array('y-M-d HH:mm:ss zzzz', '1970-1-1 00:00:00 GMT+0300', -10800),
+
+            // a previous timezoned parsing should not change the timezone for the next parsing
+            array('y-M-d HH:mm:ss', '1970-1-1 00:00:00', 0),
+
+            // AM/PM (already covered by hours tests)
+            array('y-M-d HH:mm:ss a', '1970-1-1 00:00:00 AM', 0),
+            array('y-M-d HH:mm:ss a', '1970-1-1 00:00:00 PM', 43200),
+
+            // regExp metachars in the pattern string
+            array('y[M-d', '1970[1-1', 0),
+            array('y[M/d', '1970[1/1', 0),
+
+            // quote characters
+            array("'M'", 'M', 0),
+            array("'yy'", 'yy', 0),
+            array("'''yy'", "'yy", 0),
+            array("''y", "'1970", 0),
+            array("H 'o'' clock'", "0 o' clock", 0),
+        );
+    }
+
+    /**
+     * Just to document the differences between the stub and the intl implementations. The intl can parse
+     * any of the tested formats alone. The stub does not implement them as it would be needed to add more
+     * abstraction, passing more context to the transformers objects. Any of the formats are ignored alone
+     * or with date/time data (years, months, days, hours, minutes and seconds).
+     *
+     * Also in intl, format like 'ss E' for '10 2' (2nd day of year + 10 seconds) are added, then we have
+     * 86,400 seconds (24h * 60min * 60s) + 10 seconds
+     *
+     * @dataProvider parseDifferences()
+     */
+    public function testParseDifferencesStub($pattern, $value, $stubExpected, $intlExpected)
+    {
+        $formatter = $this->createStubFormatter($pattern);
+        $this->assertSame($stubExpected, $formatter->parse($value));
+    }
+
+    /**
+     * @dataProvider parseDifferences()
+     */
+    public function testParseDifferencesIntl($pattern, $value, $stubExpected, $intlExpected)
+    {
+        $this->skipIfIntlExtensionIsNotLoaded();
+        $formatter = $this->createIntlFormatter($pattern);
+        $this->assertSame($intlExpected, $formatter->parse($value));
+    }
+
+    public function parseDifferences()
+    {
+        return array(
+            // AM/PM, ignored if alone
+            array('a', 'AM', 0, 0),
+            array('a', 'PM', 0, 43200),
+
+            // day of week
+            array('E', 'Thu', 0, 0),
+            array('EE', 'Thu', 0, 0),
+            array('EEE', 'Thu', 0, 0),
+            array('EEEE', 'Thursday', 0, 0),
+            array('EEEEE', 'T', 0, 432000),
+            array('EEEEEE', 'Thu', 0, 0),
+
+            // day of year
+            array('D', '1', 0, 0),
+            array('D', '2', 0, 86400),
+
+            // quarter
+            array('Q', '1', 0, 0),
+            array('QQ', '01', 0, 0),
+            array('QQQ', 'Q1', 0, 0),
+            array('QQQQ', '1st quarter', 0, 0),
+            array('QQQQQ', '1st quarter', 0, 0),
+
+            array('Q', '2', 0, 7776000),
+            array('QQ', '02', 0, 7776000),
+            array('QQQ', 'Q2', 0, 7776000),
+            array('QQQQ', '2nd quarter', 0, 7776000),
+            array('QQQQQ', '2nd quarter', 0, 7776000),
+
+            array('q', '1', 0, 0),
+            array('qq', '01', 0, 0),
+            array('qqq', 'Q1', 0, 0),
+            array('qqqq', '1st quarter', 0, 0),
+            array('qqqqq', '1st quarter', 0, 0),
+        );
+    }
+
+    public function testParseWithNullPositionValueStub()
+    {
+        $position = null;
+        $formatter = $this->createStubFormatter('y');
+        $this->assertSame(0, $formatter->parse('1970', $position));
+        $this->assertNull($position);
+    }
+
+    /**
+     * @expectedException Symfony\Component\Locale\Exception\MethodArgumentNotImplementedException
+     */
+    public function testParseWithNotNullPositionValueStub()
+    {
+        $position = 0;
+        $formatter = $this->createStubFormatter('y');
+        $this->assertSame(0, $formatter->parse('1970', $position));
     }
 
     /**
@@ -457,23 +757,59 @@ class StubIntlDateFormatterTest extends LocaleTestCase
         $this->assertEquals('yyyy-MM-dd', $formatter->getPattern());
     }
 
-    public function testSetTimeZoneIdStub()
+    /**
+     * @covers Symfony\Component\Locale\Stub\StubIntlDateFormatter::getTimeZoneId
+     * @dataProvider setTimeZoneIdProvider()
+     */
+    public function testSetTimeZoneIdStub($timeZoneId)
     {
-        $formatter = new StubIntlDateFormatter('en', StubIntlDateFormatter::MEDIUM, StubIntlDateFormatter::SHORT, 'UTC');
-        $this->assertEquals('UTC', $formatter->getTimeZoneId());
-
-        $formatter->setTimeZoneId('Europe/Zurich');
-        $this->assertEquals('Europe/Zurich', $formatter->getTimeZoneId());
+        $formatter = $this->createStubFormatter();
+        $formatter->setTimeZoneId($timeZoneId);
+        $this->assertEquals($timeZoneId, $formatter->getTimeZoneId());
     }
 
-    public function testSetTimeZoneIdIntl()
+    /**
+     * @dataProvider setTimeZoneIdProvider()
+     */
+    public function testSetTimeZoneIdIntl($timeZoneId)
     {
         $this->skipIfIntlExtensionIsNotLoaded();
-        $formatter = new \IntlDateFormatter('en', \IntlDateFormatter::MEDIUM, \IntlDateFormatter::SHORT, 'UTC');
-        $this->assertEquals('UTC', $formatter->getTimeZoneId());
+        $formatter = $this->createIntlFormatter();
+        $formatter->setTimeZoneId($timeZoneId);
+        $this->assertEquals($timeZoneId, $formatter->getTimeZoneId());
+    }
 
-        $formatter->setTimeZoneId('Europe/Zurich');
-        $this->assertEquals('Europe/Zurich', $formatter->getTimeZoneId());
+    public function setTimeZoneIdProvider()
+    {
+        return array(
+            array('UTC'),
+            array('GMT'),
+            array('GMT-03:00'),
+            array('GMT-0300'),
+            array('Europe/Zurich'),
+
+            // When time zone not exists, uses UTC by default
+            array('Foo/Bar'),
+            array('GMT+00:AA'),
+            array('GMT+00AA'),
+        );
+    }
+
+    /**
+     * @expectedException Symfony\Component\Locale\Exception\NotImplementedException
+     */
+    public function testSetTimeZoneIdWithGmtTimeZoneWithMinutesOffsetStub()
+    {
+        $formatter = $this->createStubFormatter();
+        $formatter->setTimeZoneId('GMT+00:30');
+    }
+
+    public function testSetTimeZoneIdWithGmtTimeZoneWithMinutesOffsetIntl()
+    {
+        $this->skipIfIntlExtensionIsNotLoaded();
+        $formatter = $this->createIntlFormatter();
+        $formatter->setTimeZoneId('GMT+00:30');
+        $this->assertEquals('GMT+00:30', $formatter->getTimeZoneId());
     }
 
     public function testStaticCreate()
@@ -482,8 +818,25 @@ class StubIntlDateFormatterTest extends LocaleTestCase
         $this->assertInstanceOf('Symfony\Component\Locale\Stub\StubIntlDateFormatter', $formatter);
     }
 
-    protected function createStubFormatter()
+    protected function createStubFormatter($pattern = null)
     {
-        return new StubIntlDateFormatter('en', StubIntlDateFormatter::MEDIUM, StubIntlDateFormatter::SHORT);
+        return new StubIntlDateFormatter('en', StubIntlDateFormatter::MEDIUM, StubIntlDateFormatter::SHORT, 'UTC', StubIntlDateFormatter::GREGORIAN, $pattern);
+    }
+
+    protected function createIntlFormatter($pattern = null)
+    {
+        return new \IntlDateFormatter('en', \IntlDateFormatter::MEDIUM, \IntlDateFormatter::SHORT, 'UTC', \IntlDateFormatter::GREGORIAN, $pattern);
+    }
+
+    protected function createDateTime($timestamp = null, $timeZone = null)
+    {
+        $timestamp = is_null($timestamp) ? time() : $timestamp;
+        $timeZone = is_null($timeZone) ? date_default_timezone_get() : $timeZone;
+
+        $dateTime = new \DateTime();
+        $dateTime->setTimestamp($timestamp);
+        $dateTime->setTimeZone(new \DateTimeZone($timeZone));
+
+        return $dateTime;
     }
 }

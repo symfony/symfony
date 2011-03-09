@@ -188,15 +188,11 @@ class StubNumberFormatterTest extends LocaleTestCase
 
     public function formatCurrencyWithCurrencyStyleSwissRoundingProvider()
     {
-        $chf = 'CHF';
-
         // The currency symbol was updated from 4.2 to the 4.4 version. The ICU CLDR data was updated in 2010-03-03,
         // the 4.2 release is from 2009-05-08 and the 4.4 from 2010-03-17. It's ugly we want to compare if the
         // stub implementation is behaving like the intl one
         // http://bugs.icu-project.org/trac/changeset/27776/icu/trunk/source/data/curr/en.txt
-        if ($this->isIntlExtensionLoaded() && $this->isLowerThanIcuVersion('4.4')) {
-            $chf = 'Fr.';
-        }
+        $chf = $this->isIntlExtensionLoaded() && $this->isLowerThanIcuVersion('4.4') ? 'Fr.' : 'CHF';
 
         return array(
             array(100, 'CHF', $chf, '%s100.00'),

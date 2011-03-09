@@ -89,8 +89,7 @@ class UrlMatcher implements UrlMatcherInterface
         $parameters = array_merge($this->defaults, $defaults);
         foreach ($params as $key => $value) {
             if (!is_int($key)) {
-                // / are double-encoded as %2F is not valid in a URL (see UrlGenerator)
-                $parameters[$key] = str_replace('%2F', '/', urldecode($value));
+                $parameters[$key] = urldecode($value);
             }
         }
 

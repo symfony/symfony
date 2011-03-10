@@ -68,7 +68,10 @@ class GraphvizDumper extends Dumper
 
         $this->edges = array();
         foreach ($this->container->getDefinitions() as $id => $definition) {
-            $this->edges[$id] = $this->findEdges($id, $definition->getArguments(), true, '');
+            $this->edges[$id] = array_merge(
+                $this->findEdges($id, $definition->getArguments(), true, ''),
+                $this->findEdges($id, $definition->getProperties(), false, '')
+            );
 
             foreach ($definition->getMethodCalls() as $call) {
                 $this->edges[$id] = array_merge(
@@ -120,8 +123,8 @@ class GraphvizDumper extends Dumper
      *
      * @param string $id The service id used to find edges
      * @param array $arguments An array of arguments
-     * @param boolean $required 
-     * @param string $name 
+     * @param boolean $required
+     * @param string $name
      * @return array An array of edges
      */
     protected function findEdges($id, $arguments, $required, $name)

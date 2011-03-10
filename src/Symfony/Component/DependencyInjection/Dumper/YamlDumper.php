@@ -60,8 +60,8 @@ class YamlDumper extends Dumper
     /**
      * Adds a service
      *
-     * @param string $id 
-     * @param Definition $definition 
+     * @param string $id
+     * @param Definition $definition
      * @return string
      */
     protected function addService($id, $definition)
@@ -103,6 +103,10 @@ class YamlDumper extends Dumper
             $code .= sprintf("    arguments: %s\n", Yaml::dump($this->dumpValue($definition->getArguments()), 0));
         }
 
+        if ($definition->getProperties()) {
+            $code .= sprintf("    properties: %s\n", Yaml::dump($this->dumpValue($definition->getProperties()), 0));
+        }
+
         if ($definition->getMethodCalls()) {
             $code .= sprintf("    calls:\n      %s\n", str_replace("\n", "\n      ", Yaml::dump($this->dumpValue($definition->getMethodCalls()), 1)));
         }
@@ -129,8 +133,8 @@ class YamlDumper extends Dumper
     /**
      * Adds a service alias
      *
-     * @param string $alias 
-     * @param string $id 
+     * @param string $alias
+     * @param string $id
      * @return void
      */
     protected function addServiceAlias($alias, $id)
@@ -214,8 +218,8 @@ class YamlDumper extends Dumper
     /**
      * Gets the service call.
      *
-     * @param string $id 
-     * @param Reference $reference 
+     * @param string $id
+     * @param Reference $reference
      * @return string
      */
     protected function getServiceCall($id, Reference $reference = null)
@@ -230,7 +234,7 @@ class YamlDumper extends Dumper
     /**
      * Gets parameter call.
      *
-     * @param string $id 
+     * @param string $id
      * @return string
      */
     protected function getParameterCall($id)
@@ -241,8 +245,8 @@ class YamlDumper extends Dumper
     /**
      * Prepares parameters
      *
-     * @param string $parameters 
-     * @return array 
+     * @param string $parameters
+     * @return array
      */
     protected function prepareParameters($parameters)
     {
@@ -263,7 +267,7 @@ class YamlDumper extends Dumper
     /**
      * Escapes arguments
      *
-     * @param array $arguments 
+     * @param array $arguments
      * @return array
      */
     protected function escape($arguments)

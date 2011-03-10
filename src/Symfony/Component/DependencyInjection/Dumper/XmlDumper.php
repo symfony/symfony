@@ -60,7 +60,7 @@ class XmlDumper extends Dumper
     /**
      * Adds parameters.
      *
-     * @param DOMElement $parent 
+     * @param DOMElement $parent
      * @return void
      */
     protected function addParameters(\DOMElement $parent)
@@ -82,8 +82,8 @@ class XmlDumper extends Dumper
     /**
      * Adds method calls.
      *
-     * @param array $methodcalls 
-     * @param DOMElement $parent 
+     * @param array $methodcalls
+     * @param DOMElement $parent
      * @return void
      */
     protected function addMethodCalls(array $methodcalls, \DOMElement $parent)
@@ -101,8 +101,8 @@ class XmlDumper extends Dumper
     /**
      * Adds interface injector.
      *
-     * @param InterfaceInjector $injector 
-     * @param DOMElement $parent 
+     * @param InterfaceInjector $injector
+     * @param DOMElement $parent
      * @return void
      */
     protected function addInterfaceInjector(InterfaceInjector $injector, \DOMElement $parent)
@@ -116,7 +116,7 @@ class XmlDumper extends Dumper
     /**
      * Adds interface injectors.
      *
-     * @param DOMElement $parent 
+     * @param DOMElement $parent
      * @return void
      */
     protected function addInterfaceInjectors(\DOMElement $parent)
@@ -135,9 +135,9 @@ class XmlDumper extends Dumper
     /**
      * Adds a service.
      *
-     * @param Definition $definition 
-     * @param string $id 
-     * @param DOMElement $parent 
+     * @param Definition $definition
+     * @param string $id
+     * @param DOMElement $parent
      * @return void
      */
     protected function addService($definition, $id, \DOMElement $parent)
@@ -179,6 +179,10 @@ class XmlDumper extends Dumper
             $this->convertParameters($parameters, 'argument', $service);
         }
 
+        if ($parameters = $definition->getProperties()) {
+            $this->convertParameters($parameters, 'property', $service, 'name');
+        }
+
         $this->addMethodCalls($definition->getMethodCalls(), $service);
 
         if ($callable = $definition->getConfigurator()) {
@@ -198,9 +202,9 @@ class XmlDumper extends Dumper
     /**
      * Adds a service alias.
      *
-     * @param string $alias 
-     * @param string $id 
-     * @param DOMElement $parent 
+     * @param string $alias
+     * @param string $id
+     * @param DOMElement $parent
      * @return void
      */
     protected function addServiceAlias($alias, $id, \DOMElement $parent)
@@ -217,7 +221,7 @@ class XmlDumper extends Dumper
     /**
      * Adds services.
      *
-     * @param DOMElement $parent 
+     * @param DOMElement $parent
      * @return void
      */
     protected function addServices(\DOMElement $parent)
@@ -241,23 +245,23 @@ class XmlDumper extends Dumper
     /**
      * Converts parameters.
      *
-     * @param string $parameters 
-     * @param string $type 
-     * @param DOMElement $parent 
+     * @param string $parameters
+     * @param string $type
+     * @param DOMElement $parent
      * @return void
      */
-    protected function convertParameters($parameters, $type, \DOMElement $parent)
+    protected function convertParameters($parameters, $type, \DOMElement $parent, $keyAttribute = 'key')
     {
         $withKeys = array_keys($parameters) !== range(0, count($parameters) - 1);
         foreach ($parameters as $key => $value) {
             $element = $this->document->createElement($type);
             if ($withKeys) {
-                $element->setAttribute('key', $key);
+                $element->setAttribute($keyAttribute, $key);
             }
 
             if (is_array($value)) {
                 $element->setAttribute('type', 'collection');
-                $this->convertParameters($value, $type, $element);
+                $this->convertParameters($value, $type, $element, 'key');
             } else if (is_object($value) && $value instanceof Reference) {
                 $element->setAttribute('type', 'service');
                 $element->setAttribute('id', (string) $value);
@@ -284,7 +288,7 @@ class XmlDumper extends Dumper
     /**
      * Escapes arguments
      *
-     * @param array $arguments 
+     * @param array $arguments
      * @return array
      */
     protected function escape($arguments)

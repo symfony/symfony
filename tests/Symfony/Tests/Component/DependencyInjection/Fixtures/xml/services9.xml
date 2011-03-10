@@ -17,6 +17,8 @@
       </argument>
       <argument>true</argument>
       <argument type="service" id="service_container"/>
+      <property name="foo">bar</property>
+      <property name="moo" type="service" id="foo.baz"/>
       <call method="setBar">
         <argument type="service" id="bar"/>
       </call>

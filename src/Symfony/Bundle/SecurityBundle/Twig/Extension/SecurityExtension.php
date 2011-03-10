@@ -47,7 +47,7 @@ class SecurityExtension extends \Twig_Extension
     public function getFunctions()
     {
         return array(
-            'has_role' => new \Twig_Function_Method($this, 'isGranted'),
+            'is_granted' => new \Twig_Function_Method($this, 'isGranted'),
         );
     }
 

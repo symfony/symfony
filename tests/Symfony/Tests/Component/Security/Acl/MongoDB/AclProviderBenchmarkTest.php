@@ -2,30 +2,38 @@
 
 namespace Symfony\Tests\Component\Security\Acl\MongoDB;
 
+use Doctrine\MongoDB\Connection;
 use Symfony\Component\Security\Acl\MongoDB\AclProvider;
 use Symfony\Component\Security\Acl\Domain\PermissionGrantingStrategy;
 use Symfony\Component\Security\Acl\Domain\ObjectIdentity;
-use Symfony\Component\Security\Acl\MongoDB\Schema;
-use Doctrine\DBAL\DriverManager;
+use Symfony\Component\Security\Acl\Domain\RoleSecurityIdentity;
+use Symfony\Component\Security\Acl\Domain\UserSecurityIdentity;
+use Symfony\Component\Security\Core\Role\Role;
 
 class AclProviderBenchmarkTest extends \PHPUnit_Framework_TestCase
 {
     protected $con;
-    protected $insertClassStmt;
-    protected $insertSidStmt;
-    protected $insertOidAncestorStmt;
-    protected $insertOidStmt;
-    protected $insertEntryStmt;
-    
+    protected $options;
+
     public function testFindAcls()
     {
-//        $this->generateTestData();
+        $this->generateTestData();
         
         // get some random test object identities from the database
         $oids = array();
-        $stmt = $this->con->executeQuery("SELECT object_identifier, class_type FROM acl_object_identities o INNER JOIN acl_classes c ON c.id = o.class_id ORDER BY RAND() LIMIT 25");
-        foreach ($stmt->fetchAll() as $oid) {
-            $oids[] = new ObjectIdentity($oid['object_identifier'], $oid['class_type']);
+        $randomKeys = array();
+        for($i=0;$i<25;$i++) {
+           $randomKeys[] = rand(0,$this->aclRandomKeyValue);
+        }
+        $criteria = array(
+            'randomKey' => array('$in' => $randomKeys),
+        );
+        $fields = array(
+            'objectIdentity' => true,
+        );
+        $cursor = $this->con->selectCollection($this->options['oid_table_name'])->find($criteria, $fields);
+        foreach ($cursor as $oid) {
+            $oids[] = new ObjectIdentity($oid['objectIdentifier'], $oid['classType']);
         }
         
         $provider = $this->getProvider();
@@ -40,14 +48,15 @@ class AclProviderBenchmarkTest extends \PHPUnit_Framework_TestCase
     protected function setUp()
     {
         // comment the following line, and run only this test, if you need to benchmark
-        $this->markTestSkipped();
+//        $this->markTestSkipped();
 
-        $this->con = DriverManager::getConnection(array(
-            'driver' => 'pdo_mysql',
-            'host' => 'localhost',
-            'user' => 'root',
-            'dbname' => 'testdb',
-        ));
+        if (!class_exists('Doctrine\MongoDB\Connection')) {
+            $this->markTestSkipped('Doctrine2 MongoDB is required for this test');
+        }
+        $database = 'aclBenchmark';
+        $mongo = new \Doctrine\MongoDB\Connection();
+        $this->con = $mongo->selectDatabase($database);
+        $this->options = $this->getOptions();
     }
     
     protected function tearDown()
@@ -61,152 +70,128 @@ class AclProviderBenchmarkTest extends \PHPUnit_Framework_TestCase
      */
     protected function generateTestData()
     {
-        $sm = $this->con->getSchemaManager();
-        $sm->dropAndCreateDatabase('testdb');
-        $this->con->exec("USE testdb");
-        
-        // import the schema
-        $schema = new Schema($options = $this->getOptions());
-        foreach ($schema->toSql($this->con->getDatabasePlatform()) as $sql) {
-            $this->con->exec($sql);
-        }
-
-        // setup prepared statements
-        $this->insertClassStmt = $this->con->prepare('INSERT INTO acl_classes (id, class_type) VALUES (?, ?)');
-        $this->insertSidStmt = $this->con->prepare('INSERT INTO acl_security_identities (id, identifier, username) VALUES (?, ?, ?)');
-        $this->insertOidStmt = $this->con->prepare('INSERT INTO acl_object_identities (id, class_id, object_identifier, parent_object_identity_id, entries_inheriting) VALUES (?, ?, ?, ?, ?)');
-        $this->insertEntryStmt = $this->con->prepare('INSERT INTO acl_entries (id, class_id, object_identity_id, field_name, ace_order, security_identity_id, mask, granting, granting_strategy, audit_success, audit_failure) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)');
-        $this->insertOidAncestorStmt = $this->con->prepare('INSERT INTO acl_object_identity_ancestors (object_identity_id, ancestor_id) VALUES (?, ?)');
-        
         for ($i=0; $i<40000; $i++) {
             $this->generateAclHierarchy();
+            echo "$i ";
         }
     }
     
     protected function generateAclHierarchy()
     {
-        $rootId = $this->generateAcl($this->chooseClassId(), null, array());
+        $root = $this->generateAcl($this->chooseObjectIdentity(), null, array());
         
-        $this->generateAclLevel(rand(1, 15), $rootId, array($rootId));
+        $this->generateAclLevel(rand(1, 15), $root, array($root['_id']));
     }
     
-    protected function generateAclLevel($depth, $parentId, $ancestors)
+    protected function generateAclLevel($depth, $parent, $ancestors)
     {
         $level = count($ancestors);
         for ($i=0,$t=rand(1, 10); $i<$t; $i++) {
-            $id = $this->generateAcl($this->chooseClassId(), $parentId, $ancestors);
+            $acl = $this->generateAcl($this->chooseObjectIdentity(), $parent, $ancestors);
             
             if ($level < $depth) {
-                $this->generateAclLevel($depth, $id, array_merge($ancestors, array($id)));
+                $this->generateAclLevel($depth, $acl, array_merge($ancestors, array($acl['_id'])));
             }
         }
     }
     
-    protected function chooseClassId()
+    protected function chooseObjectIdentity()
     {
-        static $id = 1000;
-        
-        if ($id === 1000 || ($id < 1500 && rand(0, 1))) {
-            $this->insertClassStmt->execute(array($id, $this->getRandomString(rand(20, 100), 'abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789\\_')));
-            $id += 1;
-            
-            return $id-1;
-        }
-        else {
-            return rand(1000, $id-1);
-        }
+        return array(
+            'identifier' =>  $this->getRandomString(rand(20, 50)),
+            'type'       =>  $this->getRandomString(rand(20, 100)),
+        );
     }
     
-    protected function generateAcl($classId, $parentId, $ancestors)
+    protected function generateAcl($objectIdentity, $parent, $ancestors)
     {
-        static $id = 1000;
-        
-        $this->insertOidStmt->execute(array(
-            $id,
-            $classId,
-            $this->getRandomString(rand(20, 50)),
-            $parentId,
-            rand(0, 1),
-        ));
-        
-        $this->insertOidAncestorStmt->execute(array($id, $id));
-        foreach ($ancestors as $ancestor) {
-            $this->insertOidAncestorStmt->execute(array($id, $ancestor));
+        static $aclRandomKeyValue = 0;  // used to retrieve random objects
+
+        $oidCollection = $this->con->selectCollection($this->options['oid_table_name']);
+
+        $acl = array(
+            'objectIdentity' => $objectIdentity,
+            'entriesInheriting' => (boolean)rand(0, 1),
+            'randomKey' => $aclRandomKeyValue,
+        );
+        $aclRandomKeyValue++;
+        if ($parent) {
+            $acl['parent'] = $parent;
+            $acl['ancestors'] = $ancestors;
         }
-        
-        $this->generateAces($classId, $id);
-        $id += 1;
-        
-        return $id-1;
+
+        $oidCollection->insert($acl);
+
+        $this->generateAces($acl);
+
+        return $acl;
     }
     
     protected function chooseSid()
     {
-        static $id = 1000;
-        
-        if ($id === 1000 || ($id < 11000 && rand(0, 1))) {
-            $this->insertSidStmt->execute(array(
-                $id, 
-                $this->getRandomString(rand(5, 30)), 
-                rand(0, 1)
-            ));
-            $id += 1;
-            
-            return $id-1;
-        }
-        else {
-            return rand(1000, $id-1);
+        if (rand(0,1)==0) {
+            return array('role'=>$this->getRandomString(rand(10,20)));
+        } else {
+            return array(
+                'username' => $this->getRandomString(rand(10,20)),
+                'class' => $this->getRandomString(rand(10,20)),
+            );
         }
     }
-    
-    protected function generateAces($classId, $objectId)
+
+    protected function generateAces($acl)
     {
-        static $id = 1000;
-        
         $sids = array();
         $fieldOrder = array();
-        
+
+        $collection = $this->con->selectCollection($this->options['entry_table_name']);
         for ($i=0; $i<=30; $i++) {
+            $query = array();
+
             $fieldName = rand(0, 1) ? null : $this->getRandomString(rand(10, 20));
-            
+
+            if (rand(0,5)!=0) {
+                $query['objectIdentity'] = array(
+                    '$ref' => $this->options['oid_table_name'],
+                    '$id' => $acl['_id'],
+                );
+            }
+
             do {
                 $sid = $this->chooseSid();
+                $sidId  = implode('-', array_values($sid));
             }
-            while (array_key_exists($sid, $sids) && in_array($fieldName, $sids[$sid], true));
-            
+            while (array_key_exists($sidId, $sids) && in_array($fieldName, $sids[$sidId], true));
+
+            if (!isset($sids[$sidId])) {
+                $sids[$sidId] = array();
+            }
+
+            $sids[$sidId][] = $fieldName;
+            $query['securityIdentity'] = $sid;
+
             $fieldOrder[$fieldName] = array_key_exists($fieldName, $fieldOrder) ? $fieldOrder[$fieldName]+1 : 0;
-            if (!isset($sids[$sid])) {
-                $sids[$sid] = array();
-            }
-            $sids[$sid][] = $fieldName;
-            
+
             $strategy = rand(0, 2);
             if ($strategy === 0) {
-                $strategy = PermissionGrantingStrategy::ALL;
+                $query['grantingStrategy'] = PermissionGrantingStrategy::ALL;
             }
             else if ($strategy === 1) {
-                $strategy = PermissionGrantingStrategy::ANY;
+                $query['grantingStrategy'] = PermissionGrantingStrategy::ANY;
             }
             else {
-                $strategy = PermissionGrantingStrategy::EQUAL;
+                $query['grantingStrategy'] = PermissionGrantingStrategy::EQUAL;
             }
-            
-            // id, cid, oid, field, order, sid, mask, granting, strategy, a success, a failure
-            $this->insertEntryStmt->execute(array(
-                $id,
-                $classId,
-                rand(0, 5) ? $objectId : null,
-                $fieldName,
-                $fieldOrder[$fieldName],
-                $sid,
-                $this->generateMask(),
-                rand(0, 1),
-                $strategy,
-                rand(0, 1),
-                rand(0, 1),
-            ));
-            
-            $id += 1;
+
+            $query['fieldName'] = $fieldName;
+            $query['aceOrder'] = $fieldOrder[$fieldName];
+            $query['securityIdentity'] = $sid;
+            $query['mask'] = $this->generateMask();
+            $query['granting'] = (boolean)rand(0,1);
+            $query['auditSuccess'] = (boolean)rand(0,1);
+            $query['auditFailure'] = (boolean)rand(0,1);
+
+            $collection->insert($query);
         }
     }
     
@@ -234,17 +219,14 @@ class AclProviderBenchmarkTest extends \PHPUnit_Framework_TestCase
         
         return $s;
     }
-    
+
     protected function getOptions()
     {
         return array(
-            'oid_table_name' => 'acl_object_identities',
-            'oid_ancestors_table_name' => 'acl_object_identity_ancestors',
-            'class_table_name' => 'acl_classes',
-            'sid_table_name' => 'acl_security_identities',
-            'entry_table_name' => 'acl_entries',
+            'oid_table_name' => 'aclObjectIdentities',
+            'entry_table_name' => 'aclEntries',
         );
-    }    
+    }
     
     protected function getStrategy()
     {

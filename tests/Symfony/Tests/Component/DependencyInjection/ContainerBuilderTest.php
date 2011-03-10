@@ -514,6 +514,25 @@ class ContainerBuilderTest extends \PHPUnit_Framework_TestCase
         $container->setDefinition('a', new Definition());
     }
 
+    public function testParamTokensPassedToExtensionAreReplacedLazily()
+    {
+        $load = function($configs, $container)
+        {
+            $container->setParameter('actual', $configs[0]['foo']);
+        };
+
+        $container = new ContainerBuilder();
+        $container->registerExtension(new CallableExtension($load, 'my_extension'));
+
+        $container->setParameter('foo', 'not_this_one');
+        $container->loadFromExtension('my_extension', array('foo' => '%foo%'));
+        $container->setParameter('foo', 'this_one');
+
+        $container->compile();
+
+        $this->assertEquals('this_one', $container->getParameter('actual'));
+    }
+
     /**
      * @param string $class
      * @param int $methodCallsCount

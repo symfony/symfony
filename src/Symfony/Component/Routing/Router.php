@@ -81,7 +81,7 @@ class Router implements RouterInterface
                 $invalid[]=$key;
             }
         }
-	if ($is_invalid) {
+        if ($is_invalid) {
             throw new \InvalidArgumentException(sprintf('The Router does not support the following options: \'%s\'.', implode('\', \'', $invalid)));
         }
     }

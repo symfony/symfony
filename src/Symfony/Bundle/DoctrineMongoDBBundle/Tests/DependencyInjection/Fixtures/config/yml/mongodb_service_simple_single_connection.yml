@@ -1,10 +1,14 @@
 doctrine_mongo_db:
-  server: mongodb://localhost:27017
+  connections:
+    default:
+      server: mongodb://localhost:27017
+      options: { connect: true }
   default_database: mydb
-  options: { connect: true }
-  metadata_cache_driver:
-    type: memcache
-    class: Doctrine\Common\Cache\MemcacheCache
-    host: localhost
-    port: 11211
-    instance_class: Memcache
+  document_managers:
+    default:
+      metadata_cache_driver:
+        type: memcache
+        class: Doctrine\Common\Cache\MemcacheCache
+        host: localhost
+        port: 11211
+        instance_class: Memcache

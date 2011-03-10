@@ -157,9 +157,17 @@ class EventDispatcher extends BaseEventDispatcher implements EventDispatcherTrac
             $this->logger->debug(sprintf('Notified event "%s" to listener "%s" (%s)', $event->getName(), $listener, $type));
         }
 
+        $caller = null;
+
+        if (is_array($event->getSubject())) {
+            $caller = 'array';
+        } else if (is_object($event->getSubject())) {
+            $caller = get_class($event->getSubject());
+        }
+
         $this->called[$event->getName().'.'.$listener] = array(
             'event'    => $event->getName(),
-            'caller'   => null !== $event->getSubject() ? get_class($event->getSubject()) : null,
+            'caller'   => $caller,
             'listener' => $listener,
         );
     }

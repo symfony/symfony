@@ -1,12 +1,20 @@
-{% set style = '' %}
-{% if status is defined %}
-    {% if 'error' == status %}
-        {% set style = 'background-color: #f66;' %}
-    {% elseif 'warning' == status %}
-        {% set style = 'background-color: #fa2;' %}
-    {% endif %}
+{% if link %}
+    {% set icon %}
+        {% if 'config' == name %}
+            <a href="{{ path('_profiler', { 'token': token}) }}">{{ icon }}</a>
+        {% else %}
+            <a href="{{ path('_profiler_panel', { 'token': token, 'panel': name }) }}">{{ icon }}</a>
+        {% endif %}
+    {% endset %}
+{% endif %}
+{% if 'info' == status|default('info') %}
+    {% set style = '' %}
+{% elseif 'warning' == status %}
+    {% set style = 'background-color: #fa2;' %}
+{% else %}
+    {% set style = 'background-color: #f66;' %}
 {% endif %}
 <span style="{{ style }}white-space:nowrap; color:#2f2f2f; display:inline-block; min-height:24px; border-right:1px solid #cdcdcd; padding:5px 10px 5px 6px; ">
-     {% if icon is defined %}{{ icon }}{% endif %}
-     {% if text is defined %}{{ text }}{% endif %}
+     {{ icon|default('') }}
+     {{ text|default('') }}
 </span>

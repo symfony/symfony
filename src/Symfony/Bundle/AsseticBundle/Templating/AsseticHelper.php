@@ -25,6 +25,8 @@ class AsseticHelper extends Helper
     protected $debug;
     protected $defaultJavascriptsOutput;
     protected $defaultStylesheetsOutput;
+    protected $javascripts = array();
+    protected $stylesheets = array();
 
     /**
      * Constructor.
@@ -40,6 +42,26 @@ class AsseticHelper extends Helper
         $this->debug = $debug;
         $this->defaultJavascriptsOutput = $defaultJavascriptsOutput;
         $this->defaultStylesheetsOutput = $defaultStylesheetsOutput;
+    }
+
+    /**
+     * Adds an asset to javascripts or stylesheets list.
+     */
+    public function addAsset($input, $type = 'javascripts')
+    {
+        switch ($type) {
+            case 'javascripts':
+                if (!in_array($input, $this->javascripts)) {
+                    $this->javascripts[] = $input;
+                }
+                break;
+
+            case 'stylesheets':
+                if (!in_array($input, $this->stylesheets)) {
+                    $this->stylesheets[] = $input;
+                }
+                break;
+        }
     }
 
     /**
@@ -101,6 +123,10 @@ class AsseticHelper extends Helper
      */
     public function javascripts($inputs = array(), $filters = array(), array $options = array())
     {
+        if (count($inputs) === 0) {
+            $inputs = $this->javascripts;
+        }
+
         if (!isset($options['output'])) {
             $options['output'] = $this->defaultJavascriptsOutput;
         }
@@ -116,6 +142,10 @@ class AsseticHelper extends Helper
      */
     public function stylesheets($inputs = array(), $filters = array(), array $options = array())
     {
+        if (count($inputs) === 0) {
+            $inputs = $this->stylesheets;
+        }
+
         if (!isset($options['output'])) {
             $options['output'] = $this->defaultStylesheetsOutput;
         }

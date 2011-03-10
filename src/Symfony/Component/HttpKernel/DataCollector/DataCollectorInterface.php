@@ -22,6 +22,10 @@ use Symfony\Component\HttpFoundation\Response;
  */
 interface DataCollectorInterface
 {
+    const INFO = 'info';
+    const WARNING = 'warning';
+    const ERROR = 'error';
+    
     /**
      * Collects data for the given Request and Response.
      *
@@ -37,4 +41,11 @@ interface DataCollectorInterface
      * @return string The collector name
      */
     function getName();
+
+    /**
+     * Returns the status of the collector.
+     *
+     * @return string The status of the collector
+     */
+    function getStatus();
 }

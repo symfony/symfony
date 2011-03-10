@@ -24,6 +24,16 @@ abstract class DataCollector implements DataCollectorInterface, \Serializable
 {
     protected $data;
 
+    /**
+     * Returns the status of the collector.
+     *
+     * @return integer The status of the collector
+     */
+    public function getStatus()
+    {
+        return self::INFO;
+    }
+
     public function serialize()
     {
         return serialize($this->data);

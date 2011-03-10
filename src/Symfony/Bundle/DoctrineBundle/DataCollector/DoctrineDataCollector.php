@@ -67,4 +67,11 @@ class DoctrineDataCollector extends DataCollector
     {
         return 'db';
     }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function getStatus() {
+        return $this->getQueryCount() < 10 ? self::INFO : self::WARNING;
+    }
 }

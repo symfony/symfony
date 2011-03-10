@@ -15,7 +15,7 @@
             {% endif %}
         </span>
     {% endset %}
-    {% include 'WebProfilerBundle:Profiler:toolbar_item.html.twig' with {'icon' : icon, 'text' : text } only %}
+    {% include 'WebProfilerBundle:Profiler:toolbar_item.html.twig' with {'icon' : icon, 'text' : text, 'status' : collector.status } only %}
 {% endblock %}
 
 {% block menu %}

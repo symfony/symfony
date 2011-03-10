@@ -4,11 +4,11 @@
         <body>
             <trans-unit id="1">
                 <source>This value should be false</source>
-                <target>Vrednost ne sme biti nepravilna</target>
+                <target>Vrednost bi morala biti nepravilna (false)</target>
             </trans-unit>
             <trans-unit id="2">
                 <source>This value should be true</source>
-                <target>Vrednost bi morala biti pravilna</target>
+                <target>Vrednost bi morala biti pravilna (true)</target>
             </trans-unit>
             <trans-unit id="3">
                 <source>This value should be of type {{ type }}</source>
@@ -16,27 +16,27 @@
             </trans-unit>
             <trans-unit id="4">
                 <source>This value should be blank</source>
-                <target>Vrednost ne sme biti prazna.</target>
+                <target>Vrednost mora biti prazna</target>
             </trans-unit>
             <trans-unit id="5">
                 <source>This value should be one of the given choices</source>
-                <target>Vrednost naj bo ena izmed podanih moûnosti</target>
+                <target>Vrednost naj bo ena izmed podanih mo≈ænosti</target>
             </trans-unit>
             <trans-unit id="6">
                 <source>You should select at least {{ limit }} choices</source>
-                <target>Izberite vsaj {{ limit }} moûnosti</target>
+                <target>Izberite vsaj {{ limit }} mo≈ænosti</target>
             </trans-unit>
             <trans-unit id="7">
                 <source>You should select at most {{ limit }} choices</source>
-                <target>Izberete lahko najveË {{ limit }} moûnosti</target>
+                <target>Izberete lahko najveƒç {{ limit }} mo≈ænosti</target>
             </trans-unit>
             <trans-unit id="8">
                 <source>The fields {{ fields }} were not expected</source>
-                <target>Polja {{ fields }} niso bila priËakovana</target>
+                <target>Naslednja polja {{ fields }} niso bila priƒçakovana</target>
             </trans-unit>
             <trans-unit id="9">
                 <source>The fields {{ fields }} are missing</source>
-                <target>Polja {{ fields }} ne obstajajo</target>
+                <target>Naslednja polja {{ fields }} ne obstajajo</target>
             </trans-unit>
             <trans-unit id="10">
                 <source>This value is not a valid date</source>
@@ -44,35 +44,35 @@
             </trans-unit>
             <trans-unit id="11">
                 <source>This value is not a valid datetime</source>
-                <target>Vrednost ne vsebuje veljavnega datuma in Ëasa</target>
+                <target>Vrednost ne vsebuje veljavnega datuma in ƒçasa</target>
             </trans-unit>
             <trans-unit id="12">
                 <source>This value is not a valid email address</source>
-                <target>Vrednost ne vsebuje veljavnega email naslova</target>
+                <target>Vpisana vrednost ni veljaven email naslov</target>
             </trans-unit>
             <trans-unit id="13">
                 <source>The file could not be found</source>
-                <target>Datoteke ni moûno najti</target>
+                <target>Datoteke ni mogoƒçe najti</target>
             </trans-unit>
             <trans-unit id="14">
                 <source>The file is not readable</source>
-                <target>Datoteke ni moûno prebrati</target>
+                <target>Datoteke ni mogoƒçe prebrati</target>
             </trans-unit>
             <trans-unit id="15">
                 <source>The file is too large ({{ size }}). Allowed maximum size is {{ limit }}</source>
-                <target>Datoteka je prevelika ({{ size }}). NajveËja dovoljena velikost je {{ limit }}</target>
+                <target>Datoteka je prevelika ({{ size }}). Najveƒçja dovoljena velikost je {{ limit }}</target>
             </trans-unit>
             <trans-unit id="16">
                 <source>The mime type of the file is invalid ({{ type }}). Allowed mime types are {{ types }}</source>
-                <target>Mime tip v polju je nepravilen ({{ type }}). Dovoljene vrednosti so {{ types }</target>
+                <target>Napaƒçna Mime vrednost datoteke ({{ type }}). Dovoljene mime vrednosti so {{ types }}</target>
             </trans-unit>
             <trans-unit id="17">
                 <source>This value should be {{ limit }} or less</source>
-                <target>Vrednost mora biti {{ limit }} ali manj</target>
+                <target>Vrednost mora biti manj≈°a od {{ limit }}</target>
             </trans-unit>
             <trans-unit id="18">
                 <source>This value is too long. It should have {{ limit }} characters or less</source>
-                <target>Vpisana vrednost je predolga. NajveËja dolûina je {{ limit }} znakov</target>
+                <target>Vpisana vrednost je predolga. Najveƒçja dol≈æina je {{ limit }} znakov</target>
             </trans-unit>
             <trans-unit id="19">
                 <source>This value should be {{ limit }} or more</source>
@@ -80,27 +80,27 @@
             </trans-unit>
             <trans-unit id="20">
                 <source>This value is too short. It should have {{ limit }} characters or more</source>
-                <target>Vpisana vrednost je prekratka. Vsebovati mora vsaj {{ limit }} znakov</target>
+                <target>Vpisana vrednost je prekratka. Vpi≈°ite vsaj {{ limit }} znakov</target>
             </trans-unit>
             <trans-unit id="21">
                 <source>This value should not be blank</source>
-                <target>Vrednost ne sme biti prazna.</target>
+                <target>Vrednost ne sme biti prazna</target>
             </trans-unit>
             <trans-unit id="22">
                 <source>This value should not be null</source>
-                <target>Vrednost ne sme biti enaka niË.</target>
+                <target>Vrednost ne sme biti nedefinirana (null)</target>
             </trans-unit>
             <trans-unit id="23">
                 <source>This value should be null</source>
-                <target>Vrednost mora biti enaka niË.</target>
+                <target>Vrednost mora biti nedefinirana (null)</target>
             </trans-unit>
             <trans-unit id="24">
                 <source>This value is not valid</source>
-                <target>Vrednost ni pravilna.</target>
+                <target>Vrednost ni pravilna</target>
             </trans-unit>
             <trans-unit id="25">
                 <source>This value is not a valid time</source>
-                <target>Vrednost ne vsebuje veljavnega Ëasa.</target>
+                <target>Vrednost ne vsebuje veljavnega ƒçasa</target>
             </trans-unit>
             <trans-unit id="26">
                 <source>This value is not a valid URL</source>
@@ -108,23 +108,23 @@
             </trans-unit>
             <trans-unit id="27">
                 <source>This value should be instance of class {{ class }}</source>
-                <target>Vrednost bi morala biti del razreda {{ class }}</target>
+                <target>Vrednost bi morala biti instanca razreda {{ class }}</target>
             </trans-unit>
             <trans-unit id="28">
                 <source>This field group should not contain extra fields</source>
-                <target>To podroËje ne sme vsebovati dodatnih polj</target>
+                <target>To podroƒçje ne sme vsebovati dodatnih polj</target>
             </trans-unit>
             <trans-unit id="29">
                 <source>The uploaded file was too large. Please try to upload a smaller file</source>
-                <target>Preneöena datoteka je prevelika. Prosim, poskusite naloûiti manjöo datoteko</target>
+                <target>Nalo≈æena datoteka je prevelika. Prosim, poizkusite nalo≈æiti manj≈°o</target>
             </trans-unit>
             <trans-unit id="30">
                 <source>The CSRF token is invalid</source>
-                <target>CSRF vrednost je neveljavena.</target>
+                <target>CSRF vrednost je napaƒçna</target>
             </trans-unit>
             <trans-unit id="31">
                 <source>The two values should be equal</source>
-                <target>Vrednosti bi morale biti enake.</target>
+                <target>Vrednosti morata biti enaki</target>
             </trans-unit>
         </body>
     </file>

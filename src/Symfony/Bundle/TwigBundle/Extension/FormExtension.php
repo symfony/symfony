@@ -174,12 +174,15 @@ class FormExtension extends \Twig_Extension
      * Renders the label of the given field
      *
      * @param FieldInterface $field  The field to render the label for
+     * @param string $label          String to replace the label with
+     * @param array $attributes      HTML attributes passed to the template
      * @param array $params          Additional variables passed to the template
      */
-    public function renderLabel(FieldInterface $field, $label = null, array $parameters = array())
+    public function renderLabel(FieldInterface $field, $label = null, array $attributes = array(), array $parameters = array())
     {
         return $this->render($field, 'label', array(
             'field'  => $field,
+            'attr'   => $attributes,
             'params' => $parameters,
             'label'  => null !== $label ? $label : ucfirst(strtolower(str_replace('_', ' ', $field->getKey()))),
         ));

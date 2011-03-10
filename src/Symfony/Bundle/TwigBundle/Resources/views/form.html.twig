@@ -41,7 +41,7 @@
 
 {% block label %}
 {% spaceless %}
-    <label for="{{ field.id }}">{% trans label %}</label>
+    <label for="{{ field.id }}" {{ block('attributes') }}>{% trans label %}</label>
 {% endspaceless %}
 {% endblock label %}
 

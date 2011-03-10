@@ -64,7 +64,7 @@
             </trans-unit>
             <trans-unit id="16">
                 <source>The mime type of the file is invalid ({{ type }}). Allowed mime types are {{ types }}</source>
-                <target>Миме тип датотеке није валидан ({{ type }}). Дозвољени миме типови су {{ types }</target>
+                <target>Миме тип датотеке није валидан ({{ type }}). Дозвољени миме типови су {{ types }}</target>
             </trans-unit>
             <trans-unit id="17">
                 <source>This value should be {{ limit }} or less</source>
@@ -124,7 +124,7 @@
             </trans-unit>
             <trans-unit id="31">
                 <source>The two values should be equal</source>
-                <target>Две вредности треба да буду једнаке</target>
+                <target>Обе вредности треба да буду једнаке</target>
             </trans-unit>
         </body>
     </file>

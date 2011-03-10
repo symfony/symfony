@@ -25,7 +25,7 @@ use Symfony\Component\Security\Core\User\UserInterface;
  *
  * @author Johannes M. Schmitt <schmittjoh@gmail.com>
  */
-class TokenBasedRememberMeServices extends RememberMeServices
+class TokenBasedRememberMeServices extends AbstractRememberMeServices
 {
     /**
      * {@inheritDoc}
@@ -62,7 +62,7 @@ class TokenBasedRememberMeServices extends RememberMeServices
             throw new AuthenticationException('The cookie has expired.');
         }
 
-        return new RememberMeToken($user, $this->providerKey, $this->key);
+        return $user;
     }
 
     /**
@@ -95,10 +95,6 @@ class TokenBasedRememberMeServices extends RememberMeServices
      */
     protected function onLoginSuccess(Request $request, Response $response, TokenInterface $token)
     {
-        if ($token instanceof RememberMeToken) {
-            return;
-        }
-
         $user = $token->getUser();
         $expires = time() + $this->options['lifetime'];
         $value = $this->generateCookieValue(get_class($user), $user->getUsername(), $expires, $user->getPassword());
@@ -150,6 +146,6 @@ class TokenBasedRememberMeServices extends RememberMeServices
      */
     protected function generateCookieHash($class, $username, $expires, $password)
     {
-        return hash('sha256', $class.$username.$expires.$password.$this->key);
+        return hash('sha256', $class.$username.$expires.$password.$this->getKey());
     }
 }

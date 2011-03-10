@@ -21,11 +21,6 @@ class RememberMeListenerTest extends \PHPUnit_Framework_TestCase
             ->method('connect')
             ->with($this->equalTo('core.security'))
         ;
-        $dispatcher
-            ->expects($this->at(1))
-            ->method('connect')
-            ->with($this->equalTo('core.response'))
-        ;
 
         $listener->register($dispatcher);
     }
@@ -45,9 +40,7 @@ class RememberMeListenerTest extends \PHPUnit_Framework_TestCase
             ->method('setToken')
         ;
 
-        $this->assertNull($this->getLastState($listener));
         $this->assertNull($listener->checkCookies($this->getEvent()));
-        $this->assertNull($this->getLastState($listener));
     }
 
     public function testCheckCookiesDoesNothingWhenNoCookieIsSet()
@@ -74,105 +67,7 @@ class RememberMeListenerTest extends \PHPUnit_Framework_TestCase
             ->will($this->returnValue(new Request()))
         ;
 
-        $this->assertNull($this->getLastState($listener));
         $this->assertNull($listener->checkCookies($event));
-        $this->assertNull($this->getLastState($listener));
-    }
-
-    public function testCheckCookiesIgnoresAuthenticationExceptionThrownByTheRememberMeServicesImplementation()
-    {
-        list($listener, $context, $service,,) = $this->getListener();
-
-        $context
-            ->expects($this->once())
-            ->method('getToken')
-            ->will($this->returnValue(null))
-        ;
-
-        $exception = new AuthenticationException('cookie invalid.');
-        $service
-            ->expects($this->once())
-            ->method('autoLogin')
-            ->will($this->throwException($exception))
-        ;
-
-        $event = $this->getEvent();
-        $event
-            ->expects($this->once())
-            ->method('get')
-            ->with('request')
-            ->will($this->returnValue(new Request()))
-        ;
-
-        $this->assertNull($this->getLastState($listener));
-        $this->assertNull($listener->checkCookies($event));
-        $this->assertSame($exception, $this->getLastState($listener));
-    }
-
-    public function testCheckCookiesThrowsCookieTheftExceptionIfThrownByTheRememberMeServicesImplementation()
-    {
-        list($listener, $context, $service,,) = $this->getListener();
-
-        $context
-            ->expects($this->once())
-            ->method('getToken')
-            ->will($this->returnValue(null))
-        ;
-
-        $exception = new CookieTheftException('cookie was stolen.');
-        $service
-            ->expects($this->once())
-            ->method('autoLogin')
-            ->will($this->throwException($exception))
-        ;
-
-        $event = $this->getEvent();
-        $event
-            ->expects($this->once())
-            ->method('get')
-            ->with('request')
-            ->will($this->returnValue(new Request()))
-        ;
-
-        try {
-            $listener->checkCookies($event);
-        }
-        catch (CookieTheftException $theft) {
-            $this->assertSame($theft, $this->getLastState($listener));
-
-            return;
-        }
-
-        $this->fail('Expected CookieTheftException was not thrown.');
-    }
-
-    public function testCheckCookiesAuthenticationManagerDoesNotChangeListenerStateWhenTokenIsNotSupported()
-    {
-        list($listener, $context, $service, $manager,) = $this->getListener();
-
-        $context
-            ->expects($this->once())
-            ->method('getToken')
-            ->will($this->returnValue(null))
-        ;
-
-        $service
-            ->expects($this->once())
-            ->method('autoLogin')
-            ->will($this->returnValue($this->getMock('Symfony\Component\Security\Core\Authentication\Token\TokenInterface')))
-        ;
-
-        $event = $this->getEvent();
-        $event
-            ->expects($this->once())
-            ->method('get')
-            ->with('request')
-            ->will($this->returnValue(new Request()))
-        ;
-
-        $this->assertNull($this->getLastState($listener));
-        $this->assertNull($listener->checkCookies($event));
-        $this->assertNull($this->getLastState($listener));
     }
 
     public function testCheckCookiesIgnoresAuthenticationExceptionThrownByAuthenticationManagerImplementation()
@@ -191,6 +86,11 @@ class RememberMeListenerTest extends \PHPUnit_Framework_TestCase
             ->will($this->returnValue($this->getMock('Symfony\Component\Security\Core\Authentication\Token\TokenInterface')))
         ;
 
+        $service
+            ->expects($this->once())
+            ->method('loginFail')
+        ;
+
         $exception = new AuthenticationException('Authentication failed.');
         $manager
             ->expects($this->once())
@@ -206,9 +106,7 @@ class RememberMeListenerTest extends \PHPUnit_Framework_TestCase
             ->will($this->returnValue(new Request()))
         ;
 
-        $this->assertNull($this->getLastState($listener));
-        $this->assertNull($listener->checkCookies($event));
-        $this->assertSame($exception, $this->getLastState($listener));
+        $listener->checkCookies($event);
     }
 
     public function testCheckCookies()
@@ -248,111 +146,7 @@ class RememberMeListenerTest extends \PHPUnit_Framework_TestCase
             ->will($this->returnValue(new Request()))
         ;
 
-        $this->assertNull($this->getLastState($listener));
-        $this->assertNull($listener->checkCookies($event));
-        $this->assertSame($token, $this->getLastState($listener));
-    }
-
-    public function testUpdateCookiesIgnoresAnythingButMasterRequests()
-    {
-        list($listener,,,,) = $this->getListener();
-
-        $event = $this->getEvent();
-        $event
-            ->expects($this->once())
-            ->method('get')
-            ->with($this->equalTo('request_type'))
-            ->will($this->returnValue('foo'))
-        ;
-
-        $response = $this->getMock('Symfony\Component\HttpFoundation\Response');
-
-        $this->assertSame($response, $listener->updateCookies($event, $response));
-    }
-
-    public function testUpdateCookiesCallsLoginSuccessOnRememberMeServicesImplementationWhenAuthenticationWasSuccessful()
-    {
-        list($listener,, $service,,) = $this->getListener();
-
-        $request = new Request();
-        $response = new Response();
-
-        $token = $this->getMock('Symfony\Component\Security\Core\Authentication\Token\TokenInterface');
-        $this->setLastState($listener, $token);
-
-        $event = $this->getEvent();
-        $event
-            ->expects($this->at(0))
-            ->method('get')
-            ->with('request_type')
-            ->will($this->returnValue(HttpKernelInterface::MASTER_REQUEST))
-        ;
-        $event
-            ->expects($this->at(1))
-            ->method('get')
-            ->with('request')
-            ->will($this->returnValue($request))
-        ;
-
-        $service
-            ->expects($this->once())
-            ->method('loginSuccess')
-            ->with($this->equalTo($request), $this->equalTo($response), $this->equalTo($token))
-            ->will($this->returnValue(null))
-        ;
-
-        $this->assertSame($response, $listener->updateCookies($event, $response));
-    }
-
-    public function testUpdateCookiesCallsLoginFailOnRememberMeServicesImplementationWhenAuthenticationWasNotSuccessful()
-    {
-        list($listener,, $service,,) = $this->getListener();
-
-        $request = new Request();
-        $response = new Response();
-
-        $exception = new AuthenticationException('foo');
-        $this->setLastState($listener, $exception);
-
-        $event = $this->getEvent();
-        $event
-            ->expects($this->at(0))
-            ->method('get')
-            ->with('request_type')
-            ->will($this->returnValue(HttpKernelInterface::MASTER_REQUEST))
-        ;
-        $event
-            ->expects($this->at(1))
-            ->method('get')
-            ->with('request')
-            ->will($this->returnValue($request))
-        ;
-
-        $service
-            ->expects($this->once())
-            ->method('loginFail')
-            ->with($this->equalTo($request), $this->equalTo($response))
-            ->will($this->returnValue(null))
-        ;
-
-        $this->assertSame($response, $listener->updateCookies($event, $response));
-    }
-
-    protected function setLastState($listener, $state)
-    {
-        $r = new \ReflectionObject($listener);
-        $p = $r->getProperty('lastState');
-        $p->setAccessible(true);
-        $p->setValue($listener, $state);
-    }
-
-    protected function getLastState($listener)
-    {
-        $r = new \ReflectionObject($listener);
-        $p = $r->getProperty('lastState');
-        $p->setAccessible(true);
-
-        return $p->getValue($listener);
+        $listener->checkCookies($event);
     }
 
     protected function getEvent()

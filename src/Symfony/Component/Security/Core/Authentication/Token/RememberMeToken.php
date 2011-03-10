@@ -11,7 +11,6 @@
 
 namespace Symfony\Component\Security\Core\Authentication\Token;
 
-use Symfony\Component\Security\Core\Authentication\RememberMe\PersistentTokenInterface;
 use Symfony\Component\Security\Core\User\UserInterface;
 
 /**
@@ -23,7 +22,6 @@ class RememberMeToken extends AbstractToken
 {
     private $key;
     private $providerKey;
-    private $persistentToken;
 
     /**
      * Constructor.
@@ -32,7 +30,7 @@ class RememberMeToken extends AbstractToken
      * @param string $providerKey
      * @param string $key
      */
-    public function __construct(UserInterface $user, $providerKey, $key, PersistentTokenInterface $persistentToken = null) {
+    public function __construct(UserInterface $user, $providerKey, $key) {
         parent::__construct($user->getRoles());
 
         if (empty($key)) {
@@ -45,7 +43,6 @@ class RememberMeToken extends AbstractToken
 
         $this->providerKey = $providerKey;
         $this->key = $key;
-        $this->persistentToken = $persistentToken;
 
         $this->setUser($user);
         parent::setAuthenticated(true);
@@ -68,11 +65,6 @@ class RememberMeToken extends AbstractToken
     public function getKey()
     {
         return $this->key;
-    }
-
-    public function getPersistentToken()
-    {
-        return $this->persistentToken;
     }
 
     public function getCredentials()

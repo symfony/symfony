@@ -42,7 +42,7 @@
             <argument type="service" id="translator" />
         </service>
 
-        <service id="twig.extension.asset" class="Symfony\Bundle\TwigBundle\Extension\AssetExtension" public="false">
+        <service id="twig.extension.asset" class="Symfony\Bridge\Twig\Extension\AssetExtension" public="false">
             <tag name="twig.extension" />
             <argument type="service" id="templating.helper.assets" />
         </service>

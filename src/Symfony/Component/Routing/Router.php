@@ -71,8 +71,6 @@ class Router implements RouterInterface
         // check option names and live merge, if errors are encountered Exception will be thrown
         $invalid = array();
         $isInvalid = false;
-        // This allows to avoid innefficients array_diff, array_keys, and so on, we only walks one the overriden options
-        // With array_keys, array_diff and array_merge there is 3 full walk of the $this->options array and 2 of $options.
         foreach ($options as $key => $value) {
             if (array_key_exists($key, $this->options)) {
                 $this->options[$key] = $value;

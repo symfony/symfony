@@ -3,26 +3,26 @@
 /*
  * This file is part of the Symfony package.
  *
- * (c) Fabien Potencier <fabien@symfony.com>
+ * (c) Fabien Potencier <fabien.potencier@symfony-project.com>
  *
  * For the full copyright and license information, please view the LICENSE
  * file that was distributed with this source code.
  */
 
-namespace Symfony\Bundle\TwigBundle\Extension;
+namespace Symfony\Bridge\Twig\Extension;
 
 use Symfony\Component\Form\Form;
 use Symfony\Component\Form\FormInterface;
 use Symfony\Component\Form\FieldInterface;
 use Symfony\Component\Form\CollectionField;
 use Symfony\Component\Form\HybridField;
-use Symfony\Bundle\TwigBundle\TokenParser\FormThemeTokenParser;
+use Symfony\Bridge\Twig\TokenParser\FormThemeTokenParser;
 
 /**
  * FormExtension extends Twig with form capabilities.
  *
- * @author Fabien Potencier <fabien@symfony.com>
- * @author Bernhard Schussek <bernhard.schussek@symfony.com>
+ * @author Fabien Potencier <fabien.potencier@symfony-project.com>
+ * @author Bernhard Schussek <bernhard.schussek@symfony-project.com>
  */
 class FormExtension extends \Twig_Extension
 {

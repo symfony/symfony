@@ -47,7 +47,7 @@
             <argument type="service" id="service_container" />
         </service>
 
-        <service id="twig.extension.form" class="Symfony\Bundle\TwigBundle\Extension\FormExtension" public="false">
+        <service id="twig.extension.form" class="Symfony\Bridge\Twig\Extension\FormExtension" public="false">
             <tag name="twig.extension" />
             <argument>%twig.form.resources%</argument>
         </service>

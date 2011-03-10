@@ -11,22 +11,22 @@
 
 namespace Symfony\Tests\Component\Security\Core\User;
 
-use Symfony\Component\Security\Core\User\AccountChecker;
+use Symfony\Component\Security\Core\User\UserChecker;
 
-class AccountCheckerTest extends \PHPUnit_Framework_TestCase
+class UserCheckerTest extends \PHPUnit_Framework_TestCase
 {
-    public function testCheckPreAuthNotAdvancedAccountInterface()
+    public function testCheckPreAuthNotAdvancedUserInterface()
     {
-        $checker = new AccountChecker();
+        $checker = new UserChecker();
 
-        $this->assertNull($checker->checkPreAuth($this->getMock('Symfony\Component\Security\Core\User\AccountInterface')));
+        $this->assertNull($checker->checkPreAuth($this->getMock('Symfony\Component\Security\Core\User\UserInterface')));
     }
 
     public function testCheckPreAuthPass()
     {
-        $checker = new AccountChecker();
+        $checker = new UserChecker();
 
-        $account = $this->getMock('Symfony\Component\Security\Core\User\AdvancedAccountInterface');
+        $account = $this->getMock('Symfony\Component\Security\Core\User\AdvancedUserInterface');
         $account->expects($this->once())->method('isCredentialsNonExpired')->will($this->returnValue(true));
 
         $this->assertNull($checker->checkPreAuth($account));
@@ -37,26 +37,26 @@ class AccountCheckerTest extends \PHPUnit_Framework_TestCase
      */
     public function testCheckPreAuthCredentialsExpired()
     {
-        $checker = new AccountChecker();
+        $checker = new UserChecker();
 
-        $account = $this->getMock('Symfony\Component\Security\Core\User\AdvancedAccountInterface');
+        $account = $this->getMock('Symfony\Component\Security\Core\User\AdvancedUserInterface');
         $account->expects($this->once())->method('isCredentialsNonExpired')->will($this->returnValue(false));
 
         $checker->checkPreAuth($account);
     }
 
-    public function testCheckPostAuthNotAdvancedAccountInterface()
+    public function testCheckPostAuthNotAdvancedUserInterface()
     {
-        $checker = new AccountChecker();
+        $checker = new UserChecker();
 
-        $this->assertNull($checker->checkPostAuth($this->getMock('Symfony\Component\Security\Core\User\AccountInterface')));
+        $this->assertNull($checker->checkPostAuth($this->getMock('Symfony\Component\Security\Core\User\UserInterface')));
     }
 
     public function testCheckPostAuthPass()
     {
-        $checker = new AccountChecker();
+        $checker = new UserChecker();
 
-        $account = $this->getMock('Symfony\Component\Security\Core\User\AdvancedAccountInterface');
+        $account = $this->getMock('Symfony\Component\Security\Core\User\AdvancedUserInterface');
         $account->expects($this->once())->method('isAccountNonLocked')->will($this->returnValue(true));
         $account->expects($this->once())->method('isEnabled')->will($this->returnValue(true));
         $account->expects($this->once())->method('isAccountNonExpired')->will($this->returnValue(true));
@@ -69,9 +69,9 @@ class AccountCheckerTest extends \PHPUnit_Framework_TestCase
      */
     public function testCheckPostAuthAccountLocked()
     {
-        $checker = new AccountChecker();
+        $checker = new UserChecker();
 
-        $account = $this->getMock('Symfony\Component\Security\Core\User\AdvancedAccountInterface');
+        $account = $this->getMock('Symfony\Component\Security\Core\User\AdvancedUserInterface');
         $account->expects($this->once())->method('isAccountNonLocked')->will($this->returnValue(false));
 
         $checker->checkPostAuth($account);
@@ -82,9 +82,9 @@ class AccountCheckerTest extends \PHPUnit_Framework_TestCase
      */
     public function testCheckPostAuthDisabled()
     {
-        $checker = new AccountChecker();
+        $checker = new UserChecker();
 
-        $account = $this->getMock('Symfony\Component\Security\Core\User\AdvancedAccountInterface');
+        $account = $this->getMock('Symfony\Component\Security\Core\User\AdvancedUserInterface');
         $account->expects($this->once())->method('isAccountNonLocked')->will($this->returnValue(true));
         $account->expects($this->once())->method('isEnabled')->will($this->returnValue(false));
 
@@ -96,9 +96,9 @@ class AccountCheckerTest extends \PHPUnit_Framework_TestCase
      */
     public function testCheckPostAuthAccountExpired()
     {
-        $checker = new AccountChecker();
+        $checker = new UserChecker();
 
-        $account = $this->getMock('Symfony\Component\Security\Core\User\AdvancedAccountInterface');
+        $account = $this->getMock('Symfony\Component\Security\Core\User\AdvancedUserInterface');
         $account->expects($this->once())->method('isAccountNonLocked')->will($this->returnValue(true));
         $account->expects($this->once())->method('isEnabled')->will($this->returnValue(true));
         $account->expects($this->once())->method('isAccountNonExpired')->will($this->returnValue(false));

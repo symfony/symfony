@@ -31,12 +31,12 @@ use Symfony\Component\Security\Http\RememberMe\RememberMeServicesInterface;
  */
 class RememberMeListener implements ListenerInterface
 {
-    protected $securityContext;
-    protected $rememberMeServices;
-    protected $authenticationManager;
-    protected $logger;
-    protected $lastState;
-    protected $eventDispatcher;
+    private $securityContext;
+    private $rememberMeServices;
+    private $authenticationManager;
+    private $logger;
+    private $lastState;
+    private $eventDispatcher;
 
     /**
      * Constructor

@@ -20,8 +20,8 @@ use Symfony\Component\Security\Core\Authentication\Token\TokenInterface;
  */
 class AuthenticationTrustResolver implements AuthenticationTrustResolverInterface
 {
-    protected $anonymousClass;
-    protected $rememberMeClass;
+    private $anonymousClass;
+    private $rememberMeClass;
 
     /**
      * Constructor

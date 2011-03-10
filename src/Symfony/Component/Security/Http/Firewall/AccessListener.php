@@ -28,11 +28,11 @@ use Symfony\Component\Security\Core\Exception\AccessDeniedException;
  */
 class AccessListener implements ListenerInterface
 {
-    protected $context;
-    protected $accessDecisionManager;
-    protected $map;
-    protected $authManager;
-    protected $logger;
+    private $context;
+    private $accessDecisionManager;
+    private $map;
+    private $authManager;
+    private $logger;
 
     public function __construct(SecurityContext $context, AccessDecisionManagerInterface $accessDecisionManager, AccessMap $map, AuthenticationManagerInterface $authManager, LoggerInterface $logger = null)
     {
@@ -53,7 +53,7 @@ class AccessListener implements ListenerInterface
     {
         $dispatcher->connect('core.security', array($this, 'handle'), 0);
     }
-    
+
     /**
      * {@inheritDoc}
      */

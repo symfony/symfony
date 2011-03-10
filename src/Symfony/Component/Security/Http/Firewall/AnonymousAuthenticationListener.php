@@ -25,9 +25,9 @@ use Symfony\Component\Security\Core\Authentication\Token\AnonymousToken;
  */
 class AnonymousAuthenticationListener implements ListenerInterface
 {
-    protected $context;
-    protected $key;
-    protected $logger;
+    private $context;
+    private $key;
+    private $logger;
 
     public function __construct(SecurityContextInterface $context, $key, LoggerInterface $logger = null)
     {

@@ -21,7 +21,7 @@ use Symfony\Component\Security\Core\Authentication\Token\TokenInterface;
  */
 class SwitchUserRole extends Role
 {
-    protected $source;
+    private $source;
 
     /**
      * Constructor.

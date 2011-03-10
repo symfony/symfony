@@ -31,9 +31,9 @@ use Symfony\Component\HttpFoundation\Request;
  */
 class Firewall
 {
-    protected $map;
-    protected $dispatcher;
-    protected $currentListeners;
+    private $map;
+    private $dispatcher;
+    private $currentListeners;
 
     /**
      * Constructor.

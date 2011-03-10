@@ -34,7 +34,7 @@ class UserSecurityIdentityTest extends \PHPUnit_Framework_TestCase
 
     public function getCompareData()
     {
-        $account = $this->getMockBuilder('Symfony\Component\Security\Core\User\AccountInterface')
+        $account = $this->getMockBuilder('Symfony\Component\Security\Core\User\UserInterface')
                             ->setMockClassName('USI_AccountImpl')
                             ->getMock();
         $account

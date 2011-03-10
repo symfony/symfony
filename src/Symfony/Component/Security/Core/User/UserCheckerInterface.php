@@ -12,25 +12,25 @@
 namespace Symfony\Component\Security\Core\User;
 
 /**
- * AccountCheckerInterface checks user account when authentication occurs.
+ * UserCheckerInterface checks user account when authentication occurs.
  *
  * This should not be used to make authentication decisions.
  *
  * @author Fabien Potencier <fabien@symfony.com>
  */
-interface AccountCheckerInterface
+interface UserCheckerInterface
 {
     /**
      * Checks the user account before authentication.
      *
-     * @param AccountInterface $account An AccountInterface instance
+     * @param UserInterface $user An UserInterface instance
      */
-    function checkPreAuth(AccountInterface $account);
+    function checkPreAuth(UserInterface $user);
 
     /**
      * Checks the user account after authentication.
      *
-     * @param AccountInterface $account An AccountInterface instance
+     * @param UserInterface $user An UserInterface instance
      */
-    function checkPostAuth(AccountInterface $account);
+    function checkPostAuth(UserInterface $user);
 }

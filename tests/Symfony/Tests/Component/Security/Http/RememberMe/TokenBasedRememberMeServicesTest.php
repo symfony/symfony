@@ -65,7 +65,7 @@ class TokenBasedRememberMeServicesTest extends \PHPUnit_Framework_TestCase
         $request = new Request;
         $request->cookies->set('foo', base64_encode('class:'.base64_encode('foouser').':123456789:fooHash'));
 
-        $user = $this->getMock('Symfony\Component\Security\Core\User\AccountInterface');
+        $user = $this->getMock('Symfony\Component\Security\Core\User\UserInterface');
         $user
             ->expects($this->once())
             ->method('getPassword')
@@ -93,7 +93,7 @@ class TokenBasedRememberMeServicesTest extends \PHPUnit_Framework_TestCase
         $request = new Request;
         $request->cookies->set('foo', $this->getCookie('fooclass', 'foouser', time() - 1, 'foopass'));
 
-        $user = $this->getMock('Symfony\Component\Security\Core\User\AccountInterface');
+        $user = $this->getMock('Symfony\Component\Security\Core\User\UserInterface');
         $user
             ->expects($this->once())
             ->method('getPassword')
@@ -112,7 +112,7 @@ class TokenBasedRememberMeServicesTest extends \PHPUnit_Framework_TestCase
 
     public function testAutoLogin()
     {
-        $user = $this->getMock('Symfony\Component\Security\Core\User\AccountInterface');
+        $user = $this->getMock('Symfony\Component\Security\Core\User\UserInterface');
         $user
             ->expects($this->once())
             ->method('getRoles')
@@ -182,7 +182,7 @@ class TokenBasedRememberMeServicesTest extends \PHPUnit_Framework_TestCase
         $request = new Request;
         $response = new Response;
 
-        $user = $this->getMock('Symfony\Component\Security\Core\User\AccountInterface');
+        $user = $this->getMock('Symfony\Component\Security\Core\User\UserInterface');
         $user
             ->expects($this->once())
             ->method('getRoles')
@@ -198,7 +198,7 @@ class TokenBasedRememberMeServicesTest extends \PHPUnit_Framework_TestCase
         $this->assertFalse($response->headers->hasCookie('foo'));
     }
 
-    public function testLoginSuccessIgnoresTokensWhichDoNotContainAnAccountInterfaceImplementation()
+    public function testLoginSuccessIgnoresTokensWhichDoNotContainAnUserInterfaceImplementation()
     {
         $service = $this->getService(null, array('name' => 'foo', 'always_remember_me' => true));
         $request = new Request;
@@ -224,7 +224,7 @@ class TokenBasedRememberMeServicesTest extends \PHPUnit_Framework_TestCase
         $response = new Response;
 
         $token = $this->getMock('Symfony\Component\Security\Core\Authentication\Token\TokenInterface');
-        $user = $this->getMock('Symfony\Component\Security\Core\User\AccountInterface');
+        $user = $this->getMock('Symfony\Component\Security\Core\User\UserInterface');
         $user
             ->expects($this->once())
             ->method('getPassword')

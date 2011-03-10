@@ -12,11 +12,11 @@
 namespace Symfony\Component\Security\Core\User;
 
 /**
- * AccountInterface is the interface that user classes must implement.
+ * UserInterface is the interface that user classes must implement.
  *
  * @author Fabien Potencier <fabien@symfony.com>
  */
-interface AccountInterface
+interface UserInterface
 {
     /**
      * Returns the roles granted to the user.
@@ -60,8 +60,8 @@ interface AccountInterface
      * However, you do not need to compare every attribute, but only those that
      * are relevant for assessing whether re-authentication is required.
      *
-     * @param AccountInterface $account
+     * @param UserInterface $user
      * @return Boolean
      */
-    function equals(AccountInterface $account);
+    function equals(UserInterface $user);
 }

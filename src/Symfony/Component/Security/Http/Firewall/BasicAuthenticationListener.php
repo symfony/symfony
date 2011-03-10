@@ -27,12 +27,12 @@ use Symfony\Component\Security\Core\Exception\AuthenticationException;
  */
 class BasicAuthenticationListener implements ListenerInterface
 {
-    protected $securityContext;
-    protected $authenticationManager;
-    protected $providerKey;
-    protected $authenticationEntryPoint;
-    protected $logger;
-    protected $ignoreFailure;
+    private $securityContext;
+    private $authenticationManager;
+    private $providerKey;
+    private $authenticationEntryPoint;
+    private $logger;
+    private $ignoreFailure;
 
     public function __construct(SecurityContextInterface $securityContext, AuthenticationManagerInterface $authenticationManager, $providerKey, AuthenticationEntryPointInterface $authenticationEntryPoint, LoggerInterface $logger = null)
     {
@@ -80,11 +80,7 @@ class BasicAuthenticationListener implements ListenerInterface
         }
 
         if (null !== $token = $this->securityContext->getToken()) {
-            if ($token->isImmutable()) {
-                return;
-            }
-
-            if ($token instanceof UsernamePasswordToken && $token->isAuthenticated() && (string) $token === $username) {
+            if ($token instanceof UsernamePasswordToken && $token->isAuthenticated() && $token->getUsername() === $username) {
                 return;
             }
         }

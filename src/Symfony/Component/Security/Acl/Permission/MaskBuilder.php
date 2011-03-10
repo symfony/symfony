@@ -67,7 +67,7 @@ class MaskBuilder
     const OFF               = '.';
     const ON                = '*';
 
-    protected $mask;
+    private $mask;
 
     /**
      * Constructor

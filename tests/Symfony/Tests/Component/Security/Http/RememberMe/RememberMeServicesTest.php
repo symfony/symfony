@@ -86,12 +86,12 @@ class RememberMeServicesTest extends \PHPUnit_Framework_TestCase
         $this->assertTrue($response->headers->getCookie('foo')->isCleared());
     }
 
-    public function testLoginSuccessIsNotProcessedWhenTokenDoesNotContainAccountInterfaceImplementation()
+    public function testLoginSuccessIsNotProcessedWhenTokenDoesNotContainUserInterfaceImplementation()
     {
         $service = $this->getService(null, array('name' => 'foo', 'always_remember_me' => true));
         $request = new Request;
         $response = new Response;
-        $account = $this->getMock('Symfony\Component\Security\Core\User\AccountInterface');
+        $account = $this->getMock('Symfony\Component\Security\Core\User\UserInterface');
         $token = $this->getMock('Symfony\Component\Security\Core\Authentication\Token\TokenInterface');
         $token
             ->expects($this->once())
@@ -114,7 +114,7 @@ class RememberMeServicesTest extends \PHPUnit_Framework_TestCase
         $service = $this->getService(null, array('name' => 'foo', 'always_remember_me' => false, 'remember_me_parameter' => 'foo'));
         $request = new Request;
         $response = new Response;
-        $account = $this->getMock('Symfony\Component\Security\Core\User\AccountInterface');
+        $account = $this->getMock('Symfony\Component\Security\Core\User\UserInterface');
         $token = $this->getMock('Symfony\Component\Security\Core\Authentication\Token\TokenInterface');
         $token
             ->expects($this->once())
@@ -138,7 +138,7 @@ class RememberMeServicesTest extends \PHPUnit_Framework_TestCase
         $service = $this->getService(null, array('name' => 'foo', 'always_remember_me' => true));
         $request = new Request;
         $response = new Response;
-        $account = $this->getMock('Symfony\Component\Security\Core\User\AccountInterface');
+        $account = $this->getMock('Symfony\Component\Security\Core\User\UserInterface');
         $token = $this->getMock('Symfony\Component\Security\Core\Authentication\Token\TokenInterface');
         $token
             ->expects($this->once())
@@ -165,7 +165,7 @@ class RememberMeServicesTest extends \PHPUnit_Framework_TestCase
         $request = new Request;
         $request->request->set('foo', $value);
         $response = new Response;
-        $account = $this->getMock('Symfony\Component\Security\Core\User\AccountInterface');
+        $account = $this->getMock('Symfony\Component\Security\Core\User\UserInterface');
         $token = $this->getMock('Symfony\Component\Security\Core\Authentication\Token\TokenInterface');
         $token
             ->expects($this->once())

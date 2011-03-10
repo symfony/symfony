@@ -18,7 +18,7 @@ namespace Symfony\Component\Security\Core\Exception;
  */
 class AuthenticationException extends \RuntimeException implements \Serializable
 {
-    protected $extraInformation;
+    private $extraInformation;
 
     public function __construct($message, $extraInformation = null, $code = 0, \Exception $previous = null)
     {

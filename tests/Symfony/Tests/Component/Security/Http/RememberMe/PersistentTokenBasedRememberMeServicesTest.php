@@ -142,7 +142,7 @@ class PersistentTokenBasedRememberMeServicesTest extends \PHPUnit_Framework_Test
 
     public function testAutoLogin()
     {
-        $user = $this->getMock('Symfony\Component\Security\Core\User\AccountInterface');
+        $user = $this->getMock('Symfony\Component\Security\Core\User\UserInterface');
         $user
             ->expects($this->once())
             ->method('getRoles')
@@ -269,7 +269,7 @@ class PersistentTokenBasedRememberMeServicesTest extends \PHPUnit_Framework_Test
         $request = new Request;
         $response = new Response;
 
-        $user = $this->getMock('Symfony\Component\Security\Core\User\AccountInterface');
+        $user = $this->getMock('Symfony\Component\Security\Core\User\UserInterface');
         $user
             ->expects($this->once())
             ->method('getRoles')
@@ -315,7 +315,7 @@ class PersistentTokenBasedRememberMeServicesTest extends \PHPUnit_Framework_Test
         $request = new Request;
         $response = new Response;
 
-        $user = $this->getMock('Symfony\Component\Security\Core\User\AccountInterface');
+        $user = $this->getMock('Symfony\Component\Security\Core\User\UserInterface');
         $user
             ->expects($this->once())
             ->method('getRoles')
@@ -338,7 +338,7 @@ class PersistentTokenBasedRememberMeServicesTest extends \PHPUnit_Framework_Test
         $request = new Request;
         $response = new Response;
 
-        $account = $this->getMock('Symfony\Component\Security\Core\User\AccountInterface');
+        $account = $this->getMock('Symfony\Component\Security\Core\User\UserInterface');
         $account
             ->expects($this->once())
             ->method('getUsername')

@@ -2,7 +2,7 @@
 
 namespace Symfony\Component\Security\Core\User;
 
-use Symfony\Component\Security\Core\Exception\UnsupportedAccountException;
+use Symfony\Component\Security\Core\Exception\UnsupportedUserException;
 use Symfony\Component\Security\Core\Exception\UsernameNotFoundException;
 
 /**
@@ -15,7 +15,7 @@ use Symfony\Component\Security\Core\Exception\UsernameNotFoundException;
  */
 class ChainUserProvider implements UserProviderInterface
 {
-    protected $providers;
+    private $providers;
 
     public function __construct(array $providers)
     {
@@ -41,17 +41,17 @@ class ChainUserProvider implements UserProviderInterface
     /**
      * {@inheritDoc}
      */
-    public function loadUserByAccount(AccountInterface $account)
+    public function loadUser(UserInterface $user)
     {
         foreach ($this->providers as $provider) {
             try {
-                return $provider->loadUserByAccount($account);
-            } catch (UnsupportedAccountException $unsupported) {
+                return $provider->loadUser($user);
+            } catch (UnsupportedUserException $unsupported) {
                 // try next one
             }
         }
 
-        throw new UnsupportedAccountException(sprintf('The account "%s" is not supported.', get_class($account)));
+        throw new UnsupportedUserException(sprintf('The account "%s" is not supported.', get_class($user)));
     }
 
     /**

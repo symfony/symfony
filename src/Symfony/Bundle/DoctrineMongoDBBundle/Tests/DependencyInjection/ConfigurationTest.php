@@ -30,11 +30,8 @@ class ConfigurationTest extends \PHPUnit_Framework_TestCase
             'auto_generate_proxy_classes'       => false,
             'default_document_manager'          => 'default',
             'default_database'                  => 'default',
-            'mappings'                          => array(),
             'document_managers'                 => array(),
             'default_connection'                => 'default',
-            'server'                            => null,
-            'options'                           => array(),
             'connections'                       => array(),
             'proxy_namespace'                   => 'Proxies',
             'hydrator_namespace'                => 'Hydrators',
@@ -70,44 +67,40 @@ class ConfigurationTest extends \PHPUnit_Framework_TestCase
             'auto_generate_hydrator_classes'    => true,
             'default_document_manager'          => 'default_dm_name',
             'default_database'                  => 'default_db_name',
-            'metadata_cache_driver' => array(
-                'type'      => 'memcache',
-                'class'     => 'fooClass',
-                'host'      => 'host_val',
-                'port'      => 1234,
-                'instance_class' => 'instance_val',
-            ),
             'default_connection'                => 'conn1',
-            'server'                            => 'http://server',
-            'options'       => array(
-                'connect'   => true,
-                'persist'   => 'persist_val',
-                'timeout'   => 500,
-                'replicaSet' => true,
-                'username'  => 'username_val',
-                'password'  => 'password_val',
-            ),
             'connections'   => array(
                 'conn1'         => array(
-                    'server'    => null,
-                    'options'   => array(),
+                    'server'    => 'http://server',
+                    'options'   => array(
+                        'connect'   => true,
+                        'persist'   => 'persist_val',
+                        'timeout'   => 500,
+                        'replicaSet' => true,
+                        'username'  => 'username_val',
+                        'password'  => 'password_val',
+                    ),
                 ),
                 'conn2'         => array(
                     'server'    => 'http://server2',
                     'options'   => array(),
                 ),
             ),
-            'mappings'      => array(
-                'FooBundle'     => array(
-                    'type' => 'annotations',
-                ),
-            ),
             'document_managers' => array(
                 'dm1' => array(
-                    'mappings' => array(),
+                    'mappings' => array(
+                        'FooBundle'     => array(
+                            'type' => 'annotations',
+                        ),
+                    ),
+                    'metadata_cache_driver' => array(
+                        'type'      => 'memcache',
+                        'class'     => 'fooClass',
+                        'host'      => 'host_val',
+                        'port'      => 1234,
+                        'instance_class' => 'instance_val',
+                    ),
                 ),
                 'dm2' => array(
-                    'default_database' => 'dm2_default_db',
                     'connection' => 'dm2_connection',
                     'database' => 'db1',
                     'mappings' => array(
@@ -188,19 +181,19 @@ class ConfigurationTest extends \PHPUnit_Framework_TestCase
         // the "options" array is totally replaced
         $cases[] = array(
             array(
-                array('options' => array('timeout' => 2000)),
-                array('options' => array('username' => 'foo')),
+                array('connections' => array('default' => array('options' => array('timeout' => 2000)))),
+                array('connections' => array('default' => array('options' => array('username' => 'foo')))),
             ),
-            array('options' => array('username' => 'foo')),
+            array('connections' => array('default' => array('options' => array('username' => 'foo'), 'server' => null))),
         );
 
         // mappings are merged non-recursively.
         $cases[] = array(
             array(
-                array('mappings' => array('foomap' => array('type' => 'val1'), 'barmap' => array('dir' => 'val2'))),
-                array('mappings' => array('barmap' => array('prefix' => 'val3'))),
+                array('document_managers' => array('default' => array('mappings' => array('foomap' => array('type' => 'val1'), 'barmap' => array('dir' => 'val2'))))),
+                array('document_managers' => array('default' => array('mappings' => array('barmap' => array('prefix' => 'val3'))))),
             ),
-            array('mappings' => array('foomap' => array('type' => 'val1'), 'barmap' => array('prefix' => 'val3'))),
+            array('document_managers' => array('default' => array('mappings' => array('foomap' => array('type' => 'val1'), 'barmap' => array('prefix' => 'val3'))))),
         );
 
         // connections are merged non-recursively.
@@ -218,7 +211,7 @@ class ConfigurationTest extends \PHPUnit_Framework_TestCase
         // managers are merged non-recursively.
         $cases[] = array(
             array(
-                array('document_managers' => array('foodm' => array('database' => 'val1'), 'bardm' => array('default_database' => 'val2'))),
+                array('document_managers' => array('foodm' => array('database' => 'val1'), 'bardm' => array('database' => 'val2'))),
                 array('document_managers' => array('bardm' => array('database' => 'val3'))),
             ),
             array('document_managers' => array(
@@ -266,18 +259,6 @@ class ConfigurationTest extends \PHPUnit_Framework_TestCase
                 array(
                     'foo' => array('connection' => 'conn1', 'mappings' => array()),
                     'bar' => array('connection' => 'conn2', 'mappings' => array()),
-                ),
-            ),
-            // mapping versus mappings (name is the identifier)
-            array(
-                array('mapping' => array(
-                    array('type' => 'yml', 'name' => 'foo'),
-                    array('type' => 'xml', 'name' => 'bar'),
-                )),
-                'mappings',
-                array(
-                    'foo' => array('type' => 'yml'),
-                    'bar' => array('type' => 'xml'),
                 ),
             ),
             // mapping configuration that's beneath a specific document manager

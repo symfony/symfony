@@ -77,26 +77,9 @@ class DoctrineMongoDBExtension extends AbstractDoctrineExtension
         // set some options as parameters and unset them
         $config = $this->overrideParameters($config, $container);
 
-        // if no "connections" were given, setup the default connection
-        if (!isset($config['connections']) || !$config['connections']) {
-            $defaultName = $config['default_connection'];
-            $config['connections'] = array($defaultName => array(
-                'server'    => $config['server'],
-                'options'   => $config['options'],
-            ));
-        }
         // load the connections
         $this->loadConnections($config['connections'], $container);
 
-        // if no "document_managers" were given, setup the default manager
-        if (!isset($config['document_managers']) || !$config['document_managers']) {
-            $defaultName = $config['default_document_manager'];
-            $config['document_managers'] = array($defaultName => array(
-                'mappings'          => $config['mappings'],
-                'default_database'  => $config['default_database'],
-                'metadata_cache_driver' => $config['metadata_cache_driver'],
-            ));
-        }
         // load the document managers
         $this->loadDocumentManagers(
             $config['document_managers'],

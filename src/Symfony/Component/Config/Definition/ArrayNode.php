@@ -60,7 +60,6 @@ class ArrayNode extends BaseNode implements PrototypeNodeInterface
      * Sets the xml remappings that should be performed.
      *
      * @param array $remappings an array of the form array(array(string, string))
-     * @return void
      */
     public function setXmlRemappings(array $remappings)
     {
@@ -72,7 +71,6 @@ class ArrayNode extends BaseNode implements PrototypeNodeInterface
      * contain. By default this is zero, meaning no elements.
      *
      * @param integer $number
-     * @return void
      */
     public function setMinNumberOfElements($number)
     {
@@ -80,7 +78,7 @@ class ArrayNode extends BaseNode implements PrototypeNodeInterface
     }
 
     /**
-     * The name of the attribute that should be used as key.
+     * The name of the attribute which value should be used as key.
      *
      * This is only relevant for XML configurations, and only in combination
      * with a prototype based node.
@@ -91,14 +89,13 @@ class ArrayNode extends BaseNode implements PrototypeNodeInterface
      *
      * becomes
      *
-     *     'id' => array('foo' => 'bar')
+     *     'my_name' => array('foo' => 'bar')
      *
      * If $remove is false, the resulting array will still have the
      * "'id' => 'my_name'" item in it.
      *
-     * @param string $attribute The name of the attribute to use as a key
+     * @param string $attribute The name of the attribute which value is to be used as a key
      * @param Boolean $remove Whether or not to remove the key
-     * @return void
      */
     public function setKeyAttribute($attribute, $remove = true)
     {
@@ -111,7 +108,6 @@ class ArrayNode extends BaseNode implements PrototypeNodeInterface
      * defined in any of the configuration files.
      *
      * @param Boolean $boolean
-     * @return void
      */
     public function setAddIfNotSet($boolean)
     {
@@ -123,7 +119,6 @@ class ArrayNode extends BaseNode implements PrototypeNodeInterface
      * be unset.
      *
      * @param Boolean $allow
-     * @return void
      */
     public function setAllowFalse($allow)
     {
@@ -134,7 +129,6 @@ class ArrayNode extends BaseNode implements PrototypeNodeInterface
      * Sets whether new keys can be defined in subsequent configurations.
      *
      * @param Boolean $allow
-     * @return void
      */
     public function setAllowNewKeys($allow)
     {
@@ -237,7 +231,7 @@ class ArrayNode extends BaseNode implements PrototypeNodeInterface
      * Sets the node prototype.
      *
      * @param PrototypeNodeInterface $node
-     * @throws \RuntimeException if the node doesn't have concrete children
+     * @throws \RuntimeException if the node does not have concrete children
      */
     public function setPrototype(PrototypeNodeInterface $node)
     {
@@ -355,10 +349,10 @@ class ArrayNode extends BaseNode implements PrototypeNodeInterface
     }
 
     /**
-     * Normalises the value.
+     * Normalizes the value.
      *
-     * @param mixed $value The value to normalise
-     * @return mixed The normalised value
+     * @param mixed $value The value to normalize
+     * @return mixed The normalized value
      */
     protected function normalizeValue($value)
     {
@@ -377,16 +371,13 @@ class ArrayNode extends BaseNode implements PrototypeNodeInterface
             unset($value[$singular]);
         }
 
-        if (null !== $this->prototype) {
-            $normalized = array();
+        $normalized = array();
+        if (null !== $this->prototype) {            
             foreach ($value as $k => $v) {
                 if (null !== $this->keyAttribute && is_array($v)) {
                     if (!isset($v[$this->keyAttribute]) && is_int($k)) {
-                        throw new InvalidConfigurationException(sprintf(
-                            'You must set a "%s" attribute for path "%s".',
-                            $this->keyAttribute,
-                            $this->getPath()
-                        ));
+                        $msg = sprintf('The attribute "%s" must be set for path "%s".', $this->keyAttribute, $this->getPath());
+                        throw new InvalidConfigurationException($msg);
                     } else if (isset($v[$this->keyAttribute])) {
                         $k = $v[$this->keyAttribute];
 
@@ -397,11 +388,8 @@ class ArrayNode extends BaseNode implements PrototypeNodeInterface
                     }
 
                     if (array_key_exists($k, $normalized)) {
-                        throw new DuplicateKeyException(sprintf(
-                            'Duplicate key "%s" for path "%s".',
-                            $k,
-                            $this->getPath()
-                        ));
+                        $msg = sprintf('Duplicate key "%s" for path "%s".', $k, $this->getPath());
+                        throw new DuplicateKeyException($msg);
                     }
                 }
 
@@ -412,25 +400,19 @@ class ArrayNode extends BaseNode implements PrototypeNodeInterface
                     $normalized[] = $this->prototype->normalize($v);
                 }
             }
-
-            return $normalized;
-        }
-
-        $normalized = array();
-        foreach ($this->children as $name => $child) {
-            if (!array_key_exists($name, $value)) {
-                continue;
+        } else {
+            foreach ($this->children as $name => $child) {
+                if (array_key_exists($name, $value)) {
+                    $normalized[$name] = $child->normalize($value[$name]);
+                    unset($value[$name]);
+                }
             }
 
-            $normalized[$name] = $child->normalize($value[$name]);
-            unset($value[$name]);
-        }
-
-        // if extra fields are present, throw exception
-        if (count($value) && !$this->ignoreExtraKeys) {
-            $msg = sprintf('Unrecognized options "%s" under "%s"', implode(', ', array_keys($value)), $this->getPath());
-
-            throw new InvalidConfigurationException($msg);
+            // if extra fields are present, throw exception
+            if (count($value) && !$this->ignoreExtraKeys) {
+                $msg = sprintf('Unrecognized options "%s" under "%s"', implode(', ', array_keys($value)), $this->getPath());
+                throw new InvalidConfigurationException($msg);
+            }
         }
 
         return $normalized;

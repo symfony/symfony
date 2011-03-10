@@ -16,7 +16,7 @@ namespace Symfony\Component\Config\Definition\Builder;
  *
  * @author Johannes M. Schmitt <schmittjoh@gmail.com>
  */
-class NodeBuilder
+class NodeBuilder implements BuilderInterface
 {
     /************
      * READ-ONLY
@@ -48,11 +48,11 @@ class NodeBuilder
     /**
      * Constructor
      *
-     * @param string      $name   the name of the node
-     * @param string      $type   The type of the node
-     * @param NodeBuilder $parent
+     * @param string            $name   The name of the node
+     * @param string            $type   The type of the node
+     * @param BuilderInterface  $parent A builder instance
      */
-    public function __construct($name, $type, $parent = null)
+    public function __construct($name, $type, BuilderInterface $parent = null)
     {
         $this->name = $name;
         $this->type = $type;
@@ -92,7 +92,7 @@ class NodeBuilder
      * @param string $name The name of the node
      * @param string $type The type of the node
      *
-     * @return Symfony\Component\Config\Definition\Builder\NodeBuilder The builder of the child node
+     * @return NodeBuilder The builder of the child node
      */
     public function node($name, $type)
     {
@@ -129,7 +129,7 @@ class NodeBuilder
      *
      * @param string $name The name of the node
      *
-     * @return Symfony\Component\Config\Definition\Builder\NodeBuilder The builder of the child node
+     * @return NodeBuilder The builder of the child node
      */
     public function arrayNode($name)
     {
@@ -141,7 +141,7 @@ class NodeBuilder
      *
      * @param string $name the name of the node
      *
-     * @return Symfony\Component\Config\Definition\Builder\NodeBuilder The builder of the child node
+     * @return NodeBuilder The builder of the child node
      */
     public function scalarNode($name)
     {
@@ -149,11 +149,11 @@ class NodeBuilder
     }
 
     /**
-     * Creates a child boolean node.
+     * Creates a child Boolean node.
      *
      * @param string $name The name of the node
      *
-     * @return Symfony\Component\Config\Definition\Builder\NodeBuilder The builder of the child node
+     * @return NodeBuilder The builder of the child node
      */
     public function booleanNode($name)
     {
@@ -165,7 +165,7 @@ class NodeBuilder
      *
      * @param string $name The name of the node
      *
-     * @return Symfony\Component\Config\Definition\Builder\NodeBuilder The builder of the child node
+     * @return NodeBuilder The builder of the child node
      */
     public function variableNode($name)
     {
@@ -177,7 +177,7 @@ class NodeBuilder
      *
      * @param mixed $value The default value
      *
-     * @return Symfony\Component\Config\Definition\Builder\NodeBuilder
+     * @return NodeBuilder
      */
     public function defaultValue($value)
     {
@@ -190,7 +190,7 @@ class NodeBuilder
     /**
      * Sets the node as required.
      *
-     * @return Symfony\Component\Config\Definition\Builder\NodeBuilder
+     * @return NodeBuilder
      */
     public function isRequired()
     {
@@ -202,7 +202,7 @@ class NodeBuilder
     /**
      * Requires the node to have at least one element.
      *
-     * @return Symfony\Component\Config\Definition\Builder\NodeBuilder
+     * @return NodeBuilder
      */
     public function requiresAtLeastOneElement()
     {
@@ -216,7 +216,7 @@ class NodeBuilder
      *
      * @param mixed $value
      *
-     * @return Symfony\Component\Config\Definition\Builder\NodeBuilder
+     * @return NodeBuilder
      */
     public function treatNullLike($value)
     {
@@ -230,7 +230,7 @@ class NodeBuilder
      *
      * @param mixed $value
      *
-     * @return Symfony\Component\Config\Definition\Builder\NodeBuilder
+     * @return NodeBuilder
      */
     public function treatTrueLike($value)
     {
@@ -244,7 +244,7 @@ class NodeBuilder
      *
      * @param mixed $value
      *
-     * @return Symfony\Component\Config\Definition\Builder\NodeBuilder
+     * @return NodeBuilder
      */
     public function treatFalseLike($value)
     {
@@ -256,7 +256,7 @@ class NodeBuilder
     /**
      * Sets null as the default value.
      *
-     * @return Symfony\Component\Config\Definition\Builder\NodeBuilder
+     * @return NodeBuilder
      */
     public function defaultNull()
     {
@@ -266,7 +266,7 @@ class NodeBuilder
     /**
      * Sets true as the default value.
      *
-     * @return Symfony\Component\Config\Definition\Builder\NodeBuilder
+     * @return NodeBuilder
      */
     public function defaultTrue()
     {
@@ -276,7 +276,7 @@ class NodeBuilder
     /**
      * Sets false as the default value.
      *
-     * @return Symfony\Component\Config\Definition\Builder\NodeBuilder
+     * @return NodeBuilder
      */
     public function defaultFalse()
     {
@@ -286,7 +286,7 @@ class NodeBuilder
     /**
      * Adds the default value if the node is not set in the configuration.
      *
-     * @return Symfony\Component\Config\Definition\Builder\NodeBuilder
+     * @return NodeBuilder
      */
     public function addDefaultsIfNotSet()
     {
@@ -300,7 +300,7 @@ class NodeBuilder
      *
      * If used all keys have to be defined in the same configuration file.
      *
-     * @return Symfony\Component\Config\Definition\Builder\NodeBuilder
+     * @return NodeBuilder
      */
     public function disallowNewKeysInSubsequentConfigs()
     {
@@ -312,7 +312,7 @@ class NodeBuilder
     /**
      * Gets the builder for normalization rules.
      *
-     * @return Symfony\Component\Config\Definition\Builder\NormalizationBuilder
+     * @return NormalizationBuilder
      */
     protected function normalization()
     {
@@ -326,7 +326,7 @@ class NodeBuilder
     /**
      * Sets an expression to run before the normalization.
      *
-     * @return Symfony\Component\Config\Definition\Builder\ExprBuilder
+     * @return ExprBuilder
      */
     public function beforeNormalization()
     {
@@ -339,7 +339,7 @@ class NodeBuilder
      * @param string $singular The key to remap
      * @param string $plural   The plural of the key for irregular plurals
      *
-     * @return Symfony\Component\Config\Definition\Builder\NodeBuilder
+     * @return NodeBuilder
      */
     public function fixXmlConfig($singular, $plural = null)
     {
@@ -349,7 +349,7 @@ class NodeBuilder
     }
 
     /**
-     * Sets an attribute to use as key.
+     * Set the attribute which value is to be used as key.
      *
      * This is useful when you have an indexed array that should be an
      * associative array. You can select an item from within the array
@@ -363,7 +363,7 @@ class NodeBuilder
      * becomes
      *
      *     array(
-     *         'id' => array('foo' => 'bar'),
+     *         'my_name' => array('foo' => 'bar'),
      *     )
      *
      * If you'd like "'id' => 'my_name'" to still be present in the resulting
@@ -372,7 +372,7 @@ class NodeBuilder
      * @param string $name The name of the key
      * @param Boolean $removeKeyItem Whether or not the key item should be removed.
      *
-     * @return Symfony\Component\Config\Definition\Builder\NodeBuilder
+     * @return NodeBuilder
      */
     public function useAttributeAsKey($name, $removeKeyItem = true)
     {
@@ -385,7 +385,7 @@ class NodeBuilder
     /**
      * Gets the builder for merging rules.
      *
-     * @return Symfony\Component\Config\Definition\Builder\MergeBuilder
+     * @return MergeBuilder
      */
     protected function merge()
     {
@@ -399,9 +399,9 @@ class NodeBuilder
     /**
      * Sets whether the node can be overwritten.
      *
-     * @param boolean $deny Whether the overwriting is forbidden or not
+     * @param Boolean $deny Whether the overwriting is forbidden or not
      *
-     * @return Symfony\Component\Config\Definition\Builder\NodeBuilder
+     * @return NodeBuilder
      */
     public function cannotBeOverwritten($deny = true)
     {
@@ -413,7 +413,7 @@ class NodeBuilder
     /**
      * Denies the node value being empty.
      *
-     * @return Symfony\Component\Config\Definition\Builder\NodeBuilder
+     * @return NodeBuilder
      */
     public function cannotBeEmpty()
     {
@@ -425,9 +425,9 @@ class NodeBuilder
     /**
      * Sets whether the node can be unset.
      *
-     * @param boolean $allow
+     * @param Boolean $allow
      *
-     * @return Symfony\Component\Config\Definition\Builder\NodeBuilder
+     * @return NodeBuilder
      */
     public function canBeUnset($allow = true)
     {
@@ -441,7 +441,7 @@ class NodeBuilder
      *
      * @param string $type the type of node
      *
-     * @return Symfony\Component\Config\Definition\Builder\NodeBuilder
+     * @return NodeBuilder
      */
     public function prototype($type)
     {
@@ -451,7 +451,7 @@ class NodeBuilder
     /**
      * Disables the deep merging of the node.
      *
-     * @return Symfony\Component\Config\Definition\Builder\NodeBuilder
+     * @return NodeBuilder
      */
     public function performNoDeepMerging()
     {
@@ -463,7 +463,7 @@ class NodeBuilder
     /**
      * Gets the builder for validation rules.
      *
-     * @return Symfony\Component\Config\Definition\Builder\ValidationBuilder
+     * @return ValidationBuilder
      */
     protected function validation()
     {
@@ -481,7 +481,7 @@ class NodeBuilder
      * modify it.
      * An exception should be thrown when the node is not valid.
      *
-     * @return Symfony\Component\Config\Definition\Builder\ExprBuilder
+     * @return ExprBuilder
      */
     public function validate()
     {
@@ -491,7 +491,7 @@ class NodeBuilder
     /**
      * Returns the parent node.
      *
-     * @return Symfony\Component\Config\Definition\Builder\NodeBuilder
+     * @return NodeBuilder
      */
     public function end()
     {
@@ -506,7 +506,7 @@ class NodeBuilder
      * in special cases where you want to send an entire configuration
      * array through a special tree that processes only part of the array.
      *
-     * @return Symfony\Component\Config\Definition\Builder\NodeBuilder
+     * @return NodeBuilder
      */
     public function ignoreExtraKeys()
     {

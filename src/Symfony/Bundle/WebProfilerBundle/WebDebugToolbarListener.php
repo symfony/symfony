@@ -86,13 +86,12 @@ class WebDebugToolbarListener
             $substrFunction = 'substr';
         }
 
-        $toolbar = "\n".str_replace("\n", '', $this->templating->render('WebProfilerBundle:Profiler:toolbar_js.html.twig', array('token' => $response->headers->get('X-Debug-Token'))))."\n";
         $content = $response->getContent();
 
         if (false !== $pos = $posrFunction($content, '</body>')) {
+            $toolbar = "\n".str_replace("\n", '', $this->templating->render('WebProfilerBundle:Profiler:toolbar_js.html.twig', array('token' => $response->headers->get('X-Debug-Token'))))."\n";
             $content = $substrFunction($content, 0, $pos).$toolbar.$substrFunction($content, $pos);
+            $response->setContent($content);
         }
-
-        $response->setContent($content);
     }
 }

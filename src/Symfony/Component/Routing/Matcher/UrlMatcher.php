@@ -54,14 +54,12 @@ class UrlMatcher implements UrlMatcherInterface
      *
      * Returns false if no route matches the URL.
      *
-     * @param  string $url URL to be parsed
+     * @param  string $pathinfo The path info to be parsed
      *
      * @return array|false An array of parameters or false if no route matches
      */
-    public function match($url)
+    public function match($pathinfo)
     {
-        $url = $this->normalizeUrl($url);
-
         foreach ($this->routes->all() as $name => $route) {
             $compiledRoute = $route->compile();
 
@@ -72,11 +70,11 @@ class UrlMatcher implements UrlMatcherInterface
             }
 
             // check the static prefix of the URL first. Only use the more expensive preg_match when it matches
-            if ('' !== $compiledRoute->getStaticPrefix() && 0 !== strpos($url, $compiledRoute->getStaticPrefix())) {
+            if ('' !== $compiledRoute->getStaticPrefix() && 0 !== strpos($pathinfo, $compiledRoute->getStaticPrefix())) {
                 continue;
             }
 
-            if (!preg_match($compiledRoute->getRegex(), $url, $matches)) {
+            if (!preg_match($compiledRoute->getRegex(), $pathinfo, $matches)) {
                 continue;
             }
 
@@ -91,22 +89,10 @@ class UrlMatcher implements UrlMatcherInterface
         $parameters = array_merge($this->defaults, $defaults);
         foreach ($params as $key => $value) {
             if (!is_int($key)) {
-                // / are double-encoded as %2F is not valid in a URL (see UrlGenerator)
-                $parameters[$key] = str_replace('%2F', '/', urldecode($value));
+                $parameters[$key] = urldecode($value);
             }
         }
 
         return $parameters;
-    }
-
-    protected function normalizeUrl($url)
-    {
-        // remove the query string
-        if (false !== $pos = strpos($url, '?')) {
-            $url = substr($url, 0, $pos);
-        }
-
-        // remove multiple /
-        return preg_replace('#/+#', '/', $url);
     }
 }

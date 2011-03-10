@@ -24,9 +24,9 @@ class ValidationBuilder
     /**
      * Constructor
      *
-     * @param Symfony\Component\Config\Definition\Builder\NodeBuilder $parent
+     * @param NodeBuilder $parent
      */
-    public function __construct($parent)
+    public function __construct(NodeBuilder $parent)
     {
         $this->parent = $parent;
 
@@ -38,7 +38,7 @@ class ValidationBuilder
      *
      * @param \Closure $closure
      *
-     * @return Symfony\Component\Config\Definition\Builder\ExprBuilder|Symfony\Component\Config\Definition\Builder\ValidationBuilder
+     * @return ExprBuilder|ValidationBuilder
      */
     public function rule(\Closure $closure = null)
     {

@@ -51,11 +51,11 @@ class ApacheUrlMatcher extends UrlMatcher
      *
      * Returns false if no route matches the URL.
      *
-     * @param  string $url URL to be parsed
+     * @param  string $pathinfo The pathinfo to be parsed
      *
      * @return array|false An array of parameters or false if no route matches
      */
-    public function match($url)
+    public function match($pathinfo)
     {
         if (!isset($_SERVER['_ROUTING__route'])) {
             // fall-back to the default UrlMatcher

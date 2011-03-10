@@ -28,10 +28,11 @@ class ClassCollectionLoader
      * @param string  $name       The cache name prefix
      * @param Boolean $autoReload Whether to flush the cache when the cache is stale or not
      * @param Boolean $adaptive   Whether to remove already declared classes or not
+     * @param string  $extension  File extension of the resulting file
      *
      * @throws \InvalidArgumentException When class can't be loaded
      */
-    static public function load($classes, $cacheDir, $name, $autoReload, $adaptive = false)
+    static public function load($classes, $cacheDir, $name, $autoReload, $adaptive = false, $extension = '.php')
     {
         // each $name can only be loaded once per PHP process
         if (isset(self::$loaded[$name])) {
@@ -50,7 +51,7 @@ class ClassCollectionLoader
             $name = $name.'-'.substr(md5(implode('|', $classes)), 0, 5);
         }
 
-        $cache = $cacheDir.'/'.$name.'.php';
+        $cache = $cacheDir.'/'.$name.$extension;
 
         // auto-reload
         $reload = false;

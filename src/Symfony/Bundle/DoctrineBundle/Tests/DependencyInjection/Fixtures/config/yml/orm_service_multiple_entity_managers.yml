@@ -3,6 +3,7 @@ parameters:
 
 doctrine:
     dbal:
+        default_connection: conn1
         connections:
             conn1:
                 driver: pdo_sqlite
@@ -18,13 +19,16 @@ doctrine:
                 memory: true
 
     orm:
-        default_entity_manager: dm2
-        default_connection: conn1
+        default_entity_manager: em2
         auto_generate_proxy_classes: true
         entity_managers:
-            dm1:
+            em1:
                 metadata_cache_driver: xcache
                 connection: conn1
-            dm2:
+                mappings:
+                    YamlBundle: ~
+            em2:
                 metadata_cache_driver: apc
                 connection: conn2
+                mappings:
+                    YamlBundle: ~

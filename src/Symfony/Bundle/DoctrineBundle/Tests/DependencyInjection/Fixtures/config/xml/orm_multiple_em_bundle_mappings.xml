@@ -7,23 +7,17 @@
                         http://symfony.com/schema/dic/doctrine http://symfony.com/schema/dic/doctrine/doctrine-1.0.xsd">
 
     <config>
-        <orm>
-            <entity-managers>
-                <entity-manager name="em1">
-                    <mappings>
-                        <mapping name="AnnotationsBundle" />
-                    </mappings>
-                </entity-manager>
-                <entity-manager name="em2">
-                    <mappings>
-                        <mapping name="YamlBundle" dir="Resources/config/doctrine/metadata" alias="yml" />
-                        <mapping name="manual" type="xml" prefix="Fixtures\Bundles\XmlBundle"
-                            dir="%kernel.root_dir%/../src/Symfony/Bundle/DoctrineBundle/Tests/DependencyInjection/Fixtures/Bundles/XmlBundle/Resources/config/doctrine/metadata"
-                            alias="TestAlias"
-                        />
-                    </mappings>
-                </entity-manager>
-            </entity-managers>
+        <orm default-entity-manager="em2">
+            <entity-manager name="em1">
+                <mapping name="AnnotationsBundle" />
+            </entity-manager>
+            <entity-manager name="em2">
+                <mapping name="YamlBundle" dir="Resources/config/doctrine/metadata" alias="yml" />
+                <mapping name="manual" type="xml" prefix="Fixtures\Bundles\XmlBundle"
+                    dir="%kernel.root_dir%/../src/Symfony/Bundle/DoctrineBundle/Tests/DependencyInjection/Fixtures/Bundles/XmlBundle/Resources/config/doctrine/metadata"
+                    alias="TestAlias"
+                />
+            </entity-manager>
         </orm>
     </config>
 </srv:container>

@@ -7,14 +7,16 @@
     <div id="content">
         {% include 'WebProfilerBundle:Profiler:header.html.twig' only %}
 
-        <div class="resume">
-            <p>
-                <strong><a href="{{ profiler.url }}">{{ profiler.url }}</a></strong>
-                <span class="date">
-                    <strong>by {{ profiler.ip }}</strong> at <strong>{{ profiler.time|date('r') }}</strong>
-                </span>
-            </p>
-        </div>
+        {% if not profiler.isempty %}
+            <div class="resume">
+                <p>
+                    <strong><a href="{{ profiler.url }}">{{ profiler.url }}</a></strong>
+                    <span class="date">
+                        <strong>by {{ profiler.ip }}</strong> at <strong>{{ profiler.time|date('r') }}</strong>
+                    </span>
+                </p>
+            </div>
+        {% endif %}
 
         <div class="main">
     
@@ -35,8 +37,8 @@
                         </ul>
                     {% endif %}
 
-                    {% render 'WebProfilerBundle:Profiler:searchBar' with { 'token': token } %}
-                    
+                    {% render 'WebProfilerBundle:Profiler:searchBar' %}
+
                     {% include 'WebProfilerBundle:Profiler:admin.html.twig' with { 'token': token } only %}
 
                 </div>

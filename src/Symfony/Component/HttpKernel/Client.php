@@ -95,12 +95,7 @@ EOF;
      */
     protected function filterRequest(DomRequest $request)
     {
-        $uri = $request->getUri();
-        if (preg_match('#^https?\://([^/]+)/(.*)$#', $uri, $matches)) {
-            $uri = '/'.$matches[2];
-        }
-
-        return Request::create($uri, $request->getMethod(), $request->getParameters(), $request->getCookies(), $request->getFiles(), $request->getServer(), $request->getContent());
+        return Request::create($request->getUri(), $request->getMethod(), $request->getParameters(), $request->getCookies(), $request->getFiles(), $request->getServer(), $request->getContent());
     }
 
     /**

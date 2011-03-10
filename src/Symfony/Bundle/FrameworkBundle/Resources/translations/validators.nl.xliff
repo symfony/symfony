@@ -64,7 +64,7 @@
             </trans-unit>
             <trans-unit id="16">
                 <source>The mime type of the file is invalid ({{ type }}). Allowed mime types are {{ types }}</source>
-                <target>Het mime type van het bestand is ongeldig ({{ type }}). Toegestane mime types zijn {{ types }}</source>
+                <target>Het mime type van het bestand is ongeldig ({{ type }}). Toegestane mime types zijn {{ types }}</target>
             </trans-unit>
             <trans-unit id="17">
                 <source>This value should be {{ limit }} or less</source>
@@ -80,7 +80,7 @@
             </trans-unit>
             <trans-unit id="20">
                 <source>This value is too short. It should have {{ limit }} characters or more</source>
-                <target>Deze waarde is te kort. Het zou {{ limit }} karakters of meer moeten hebben</source>
+                <target>Deze waarde is te kort. Het zou {{ limit }} karakters of meer moeten hebben</target>
             </trans-unit>
             <trans-unit id="21">
                 <source>This value should not be blank</source>

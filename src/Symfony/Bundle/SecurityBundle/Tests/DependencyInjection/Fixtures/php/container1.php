@@ -5,7 +5,7 @@ $container->loadFromExtension('security', array(
         'JMS\FooBundle\Entity\User1' => 'plaintext',
         'JMS\FooBundle\Entity\User2' => array(
             'algorithm' => 'sha1',
-            'encode_as_base64' => true,
+            'encode_as_base64' => false,
             'iterations' => 5,
         ),
         'JMS\FooBundle\Entity\User3' => array(

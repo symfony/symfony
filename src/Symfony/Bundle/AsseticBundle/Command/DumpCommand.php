@@ -3,7 +3,7 @@
 /*
  * This file is part of the Symfony framework.
  *
- * (c) Fabien Potencier <fabien.potencier@symfony-project.com>
+ * (c) Fabien Potencier <fabien@symfony.com>
  *
  * This source file is subject to the MIT license that is bundled
  * with this source code in the file LICENSE.
@@ -23,7 +23,7 @@ use Symfony\Component\EventDispatcher\Event;
 /**
  * Dumps assets to the filesystem.
  *
- * @author Kris Wallsmith <kris.wallsmith@symfony-project.com>
+ * @author Kris Wallsmith <kris.wallsmith@symfony.com>
  */
 class DumpCommand extends Command
 {
@@ -33,7 +33,7 @@ class DumpCommand extends Command
             ->setName('assetic:dump')
             ->setDescription('Dumps all assets to the filesystem')
             ->addArgument('write_to', InputArgument::OPTIONAL, 'Override the configured asset root')
-            ->addOption('watch', null, InputOption::VALUE_NONE, 'Check for changes every second')
+            ->addOption('watch', null, InputOption::VALUE_NONE, 'Check for changes every second, debug mode only')
         ;
     }
 
@@ -70,6 +70,10 @@ class DumpCommand extends Command
      */
     protected function watch(LazyAssetManager $am, $basePath, OutputInterface $output, $debug = false)
     {
+        if (!$debug) {
+            throw new \RuntimeException('The --watch option is only available in debug mode.');
+        }
+
         $refl = new \ReflectionClass('Assetic\\AssetManager');
         $prop = $refl->getProperty('assets');
         $prop->setAccessible(true);
@@ -92,9 +96,7 @@ class DumpCommand extends Command
 
                 // reset the asset manager
                 $prop->setValue($am, array());
-                if ($debug) {
-                    $am->load();
-                }
+                $am->load();
 
                 file_put_contents($cache, serialize($previously));
                 $error = '';

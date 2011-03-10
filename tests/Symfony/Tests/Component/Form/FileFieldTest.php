@@ -3,7 +3,7 @@
 /*
  * This file is part of the Symfony package.
  *
- * (c) Fabien Potencier <fabien.potencier@symfony-project.com>
+ * (c) Fabien Potencier <fabien@symfony.com>
  *
  * For the full copyright and license information, please view the LICENSE
  * file that was distributed with this source code.
@@ -70,7 +70,7 @@ class FileFieldTest extends \PHPUnit_Framework_TestCase
                 $that->createTmpFile($tmpPath);
              }));
         $file->expects($this->any())
-             ->method('getOriginalName')
+             ->method('getName')
              ->will($this->returnValue('original_name.jpg'));
 
         $this->field->submit(array(
@@ -109,6 +109,18 @@ class FileFieldTest extends \PHPUnit_Framework_TestCase
             'original_name' => 'original_name.jpg',
         ), $this->field->getDisplayedData());
         $this->assertEquals(realpath($tmpPath), realpath($this->field->getData()));
+    }
+
+    /**
+     * @expectedException UnexpectedValueException
+     */
+    public function testSubmitFailsOnMissingMultipart()
+    {
+        $this->field->submit(array(
+            'file' => 'foo.jpg',
+            'token' => '12345',
+            'original_name' => 'original_name.jpg',
+        ));
     }
 
     public function testSubmitKeepsOldFileIfNotOverwritten()

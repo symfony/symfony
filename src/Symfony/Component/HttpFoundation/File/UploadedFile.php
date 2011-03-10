@@ -2,8 +2,8 @@
 
 /*
  * This file is part of the Symfony package.
- * 
- * (c) Fabien Potencier <fabien.potencier@symfony-project.com>
+ *
+ * (c) Fabien Potencier <fabien@symfony.com>
  *
  * For the full copyright and license information, please view the LICENSE
  * file that was distributed with this source code.
@@ -16,7 +16,7 @@ use Symfony\Component\HttpFoundation\File\Exception\FileException;
 /**
  * A file uploaded through a form.
  *
- * @author     Bernhard Schussek <bernhard.schussek@symfony-project.com>
+ * @author     Bernhard Schussek <bernhard.schussek@symfony.com>
  * @author     Florian Eckerstorfer <florian@eckerstorfer.org>
  */
 class UploadedFile extends File
@@ -101,13 +101,18 @@ class UploadedFile extends File
     }
 
     /**
-     * Returns the original file name including its extension.
+     * Returns the absolute file name without dots
      *
-     * @returns string  The file name
+     * Until the uploaded file is moved, it will return the name of the temporary file
+     *
+     * @returns string  The file path
      */
-    public function getOriginalName()
+    public function getName()
     {
-        return $this->originalName;
+        if (!$this->moved) {
+            return $this->originalName;
+        }
+        return parent::getName();
     }
 
     /**

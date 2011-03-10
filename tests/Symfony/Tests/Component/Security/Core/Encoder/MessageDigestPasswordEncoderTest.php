@@ -3,7 +3,7 @@
 /*
  * This file is part of the Symfony package.
  *
- * (c) Fabien Potencier <fabien.potencier@symfony-project.com>
+ * (c) Fabien Potencier <fabien@symfony.com>
  *
  * For the full copyright and license information, please view the LICENSE
  * file that was distributed with this source code.
@@ -17,21 +17,21 @@ class MessageDigestPasswordEncoderTest extends \PHPUnit_Framework_TestCase
 {
     public function testIsPasswordValid()
     {
-        $encoder = new MessageDigestPasswordEncoder();
+        $encoder = new MessageDigestPasswordEncoder('sha256', false, 1);
 
         $this->assertTrue($encoder->isPasswordValid(hash('sha256', 'password'), 'password', ''));
     }
 
     public function testEncodePassword()
     {
-        $encoder = new MessageDigestPasswordEncoder();
+        $encoder = new MessageDigestPasswordEncoder('sha256', false, 1);
         $this->assertSame(hash('sha256', 'password'), $encoder->encodePassword('password', ''));
 
-        $encoder = new MessageDigestPasswordEncoder('sha256', true);
+        $encoder = new MessageDigestPasswordEncoder('sha256', true, 1);
         $this->assertSame(base64_encode(hash('sha256', 'password', true)), $encoder->encodePassword('password', ''));
 
         $encoder = new MessageDigestPasswordEncoder('sha256', false, 2);
-        $this->assertSame(hash('sha256', hash('sha256', 'password', true)), $encoder->encodePassword('password', ''));
+        $this->assertSame(hash('sha256', hash('sha256', 'password', true).'password'), $encoder->encodePassword('password', ''));
     }
 
     /**

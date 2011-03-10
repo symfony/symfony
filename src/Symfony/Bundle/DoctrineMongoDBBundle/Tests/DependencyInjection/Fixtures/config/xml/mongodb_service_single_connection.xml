@@ -1,28 +1,27 @@
 <?xml version="1.0" ?>
 
-<container xmlns="http://www.symfony-project.org/schema/dic/services"
+<container xmlns="http://symfony.com/schema/dic/services"
     xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-    xmlns:doctrine="http://www.symfony-project.org/schema/dic/doctrine/odm/mongodb"
-    xsi:schemaLocation="http://www.symfony-project.org/schema/dic/services http://www.symfony-project.org/schema/dic/services/services-1.0.xsd
-                        http://www.symfony-project.org/schema/dic/doctrine/odm/mongodb http://www.symfony-project.org/schema/dic/doctrine/odm/mongodb/mongodb-1.0.xsd">
+    xmlns:doctrine="http://symfony.com/schema/dic/doctrine/odm/mongodb"
+    xsi:schemaLocation="http://symfony.com/schema/dic/services http://symfony.com/schema/dic/services/services-1.0.xsd
+                        http://symfony.com/schema/dic/doctrine/odm/mongodb http://symfony.com/schema/dic/doctrine/odm/mongodb/mongodb-1.0.xsd">
 
     <doctrine:mongodb>
-        <doctrine:connections>
-            <doctrine:connection id="default" server="mongodb://localhost:27017">
-                <options>
-                    <connect>true</connect>
-                </options>
-            </doctrine:connection>
-        </doctrine:connections>
-        <doctrine:document-managers>
-            <doctrine:document-manager id="default" connection="default">
-                <metadata-cache-driver type="memcache">
-                    <class>Doctrine\Common\Cache\MemcacheCache</class>
-                    <host>localhost</host>
-                    <port>11211</port>
-                    <instance-class>Memcache</instance-class>
-                </metadata-cache-driver>
-            </doctrine:document-manager>
-        </doctrine:document-managers>
+
+        <doctrine:connection id="default" server="mongodb://localhost:27017">
+            <options>
+                <connect>true</connect>
+            </options>
+        </doctrine:connection>
+
+        <doctrine:document-manager id="default" connection="default">
+            <metadata-cache-driver type="memcache">
+                <class>Doctrine\Common\Cache\MemcacheCache</class>
+                <host>localhost</host>
+                <port>11211</port>
+                <instance-class>Memcache</instance-class>
+            </metadata-cache-driver>
+        </doctrine:document-manager>
+
     </doctrine:mongodb>
 </container>

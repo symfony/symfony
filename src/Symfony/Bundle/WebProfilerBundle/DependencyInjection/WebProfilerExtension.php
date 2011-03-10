@@ -3,7 +3,7 @@
 /*
  * This file is part of the Symfony package.
  *
- * (c) Fabien Potencier <fabien.potencier@symfony-project.com>
+ * (c) Fabien Potencier <fabien@symfony.com>
  *
  * For the full copyright and license information, please view the LICENSE
  * file that was distributed with this source code.
@@ -29,7 +29,7 @@ use Symfony\Component\Config\FileLocator;
  *        intercept-redirects="true"
  *    />
  *
- * @author Fabien Potencier <fabien.potencier@symfony-project.com>
+ * @author Fabien Potencier <fabien@symfony.com>
  */
 class WebProfilerExtension extends Extension
 {
@@ -80,6 +80,6 @@ class WebProfilerExtension extends Extension
 
     public function getNamespace()
     {
-        return 'http://www.symfony-project.org/schema/dic/webprofiler';
+        return 'http://symfony.com/schema/dic/webprofiler';
     }
 }

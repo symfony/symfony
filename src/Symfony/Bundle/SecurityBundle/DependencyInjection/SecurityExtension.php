@@ -3,7 +3,7 @@
 /*
  * This file is part of the Symfony package.
  *
- * (c) Fabien Potencier <fabien.potencier@symfony-project.com>
+ * (c) Fabien Potencier <fabien@symfony.com>
  *
  * For the full copyright and license information, please view the LICENSE
  * file that was distributed with this source code.
@@ -29,7 +29,7 @@ use Symfony\Component\HttpFoundation\RequestMatcher;
 /**
  * SecurityExtension.
  *
- * @author Fabien Potencier <fabien.potencier@symfony-project.com>
+ * @author Fabien Potencier <fabien@symfony.com>
  * @author Johannes M. Schmitt <schmittjoh@gmail.com>
  */
 class SecurityExtension extends Extension
@@ -381,11 +381,7 @@ class SecurityExtension extends Extension
 
         // plaintext encoder
         if ('plaintext' === $config['algorithm']) {
-            $arguments = array();
-
-            if (isset($config['ignore_case'])) {
-                $arguments[0] = $config['ignore_case'];
-            }
+            $arguments = array($config['ignore_case']);
 
             return array(
                 'class' => new Parameter('security.encoder.plain.class'),
@@ -394,20 +390,11 @@ class SecurityExtension extends Extension
         }
 
         // message digest encoder
-        $arguments = array($config['algorithm']);
-
-        // add optional arguments
-        if (isset($config['encode_as_base64'])) {
-            $arguments[1] = $config['encode_as_base64'];
-        } else {
-            $arguments[1] = false;
-        }
-
-        if (isset($config['iterations'])) {
-            $arguments[2] = $config['iterations'];
-        } else {
-            $arguments[2] = 1;
-        }
+        $arguments = array(
+            $config['algorithm'],
+            $config['encode_as_base64'],
+            $config['iterations'],
+        );
 
         return array(
             'class' => new Parameter('security.encoder.digest.class'),
@@ -585,6 +572,6 @@ class SecurityExtension extends Extension
 
     public function getNamespace()
     {
-        return 'http://www.symfony-project.org/schema/dic/security';
+        return 'http://symfony.com/schema/dic/security';
     }
 }

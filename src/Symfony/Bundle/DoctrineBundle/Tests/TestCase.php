@@ -3,7 +3,7 @@
 /*
  * This file is part of the Symfony package.
  *
- * (c) Fabien Potencier <fabien.potencier@symfony-project.com>
+ * (c) Fabien Potencier <fabien@symfony.com>
  *
  * For the full copyright and license information, please view the LICENSE
  * file that was distributed with this source code.
@@ -50,31 +50,33 @@ class TestCase extends \PHPUnit_Framework_TestCase
     public function createYamlBundleTestContainer()
     {
         $container = new ContainerBuilder(new ParameterBag(array(
+            'kernel.debug'       => false,
             'kernel.bundles'     => array('YamlBundle' => 'Fixtures\Bundles\YamlBundle\YamlBundle'),
             'kernel.cache_dir'   => sys_get_temp_dir(),
             'kernel.root_dir'    => __DIR__ . "/../../../../" // src dir
         )));
         $loader = new DoctrineExtension();
         $container->registerExtension($loader);
-        $loader->load(array(array('dbal' => array(
-            'connections' => array(
-                'default' => array(
-                    'driver' => 'pdo_mysql',
-                    'charset' => 'UTF-8',
-                    'platform-service' => 'my.platform',
-                )
-            ),
-            'types' => array(
-                'test' => 'Symfony\Bundle\DoctrineBundle\Tests\DependencyInjection\TestType',
-            ),
-        ))), $container);
-        $loader->load(array(
-            array('orm' => array(
+        $loader->load(array(array(
+            'dbal' => array(
+                'connections' => array(
+                    'default' => array(
+                        'driver' => 'pdo_mysql',
+                        'charset' => 'UTF-8',
+                        'platform-service' => 'my.platform',
+                    )
+                ),
+                'default_connection' => 'default',
+                'types' => array(
+                    'test' => 'Symfony\Bundle\DoctrineBundle\Tests\DependencyInjection\TestType',
+                ),
+            ), 'orm' => array(
                 'mappings' => array('YamlBundle' => array(
                     'type' => 'yml',
                     'dir' => __DIR__ . "/DependencyInjection/Fixtures/Bundles/YamlBundle/Resources/config/doctrine/metadata/orm",
                     'prefix' => 'Fixtures\Bundles\YamlBundle',
-            ))))), $container);
+            )))
+        )), $container);
 
         $container->setDefinition('my.platform', new \Symfony\Component\DependencyInjection\Definition('Doctrine\DBAL\Platforms\MySqlPlatform'));
 

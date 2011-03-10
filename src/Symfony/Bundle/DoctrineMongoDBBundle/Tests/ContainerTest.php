@@ -3,7 +3,7 @@
 /*
  * This file is part of the Symfony package.
  *
- * (c) Fabien Potencier <fabien.potencier@symfony-project.com>
+ * (c) Fabien Potencier <fabien@symfony.com>
  *
  * For the full copyright and license information, please view the LICENSE
  * file that was distributed with this source code.
@@ -28,7 +28,10 @@ class ContainerTest extends TestCase
         )));
         $loader = new DoctrineMongoDBExtension();
         $container->registerExtension($loader);
-        $loader->load(array('mappings' => array('YamlBundle' => array())), $container);
+
+        $configs = array();
+        $configs[] = array('mappings' => array('YamlBundle' => array()));
+        $loader->load($configs, $container);
 
         return $container;
     }

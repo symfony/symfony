@@ -29,10 +29,10 @@ Documentation
 Symfony 2.0 is still in the early stages of development, but the
 "[Quick Tour][1]" tutorial can get you started fast.
 
-The "Quick Tour" tutorial barely scratches the surface of Symfony 2.0 but it
+The "Quick Tour" tutorial barely scratches the surface of Symfony 2.0, but it
 gives you a first feeling of the framework. If, like us, you think that
 Symfony2 can help speed up your development and take the quality of your work
 to the next level, visit the official [Symfony2 website][2] to learn more.
 
-[1]: http://symfony-reloaded.org/learn
-[2]: http://symfony-reloaded.org/
+[1]: http://symfony.com/get_started
+[2]: http://symfony.com/

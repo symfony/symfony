@@ -3,7 +3,7 @@
 /*
  * This file is part of the Symfony package.
  *
- * (c) Fabien Potencier <fabien.potencier@symfony-project.com>
+ * (c) Fabien Potencier <fabien@symfony.com>
  *
  * For the full copyright and license information, please view the LICENSE
  * file that was distributed with this source code.
@@ -17,7 +17,7 @@ use Symfony\Component\Routing\RouteCollection;
 /**
  * ApacheUrlMatcher matches URL based on Apache mod_rewrite matching (see ApacheMatcherDumper).
  *
- * @author Fabien Potencier <fabien.potencier@symfony-project.com>
+ * @author Fabien Potencier <fabien@symfony.com>
  */
 class ApacheUrlMatcher extends UrlMatcher
 {
@@ -51,11 +51,11 @@ class ApacheUrlMatcher extends UrlMatcher
      *
      * Returns false if no route matches the URL.
      *
-     * @param  string $url URL to be parsed
+     * @param  string $pathinfo The pathinfo to be parsed
      *
      * @return array|false An array of parameters or false if no route matches
      */
-    public function match($url)
+    public function match($pathinfo)
     {
         if (!isset($_SERVER['_ROUTING__route'])) {
             // fall-back to the default UrlMatcher

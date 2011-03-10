@@ -70,18 +70,18 @@ class Router implements RouterInterface
 
         // check option names and live merge, if errors are encountered Exception will be thrown
         $invalid = array();
-        $is_invalid = false;
+        $isInvalid = false;
         // This allows to avoid innefficients array_diff, array_keys, and so on, we only walks one the overriden options
         // With array_keys, array_diff and array_merge there is 3 full walk of the $this->options array and 2 of $options.
         foreach ($options as $key => $value) {
             if (!isset($this->options[$key])) {
                 $this->options[$key] = $value;
             } else {
-                $is_invalid = true;
+                $isInvalid = true;
                 $invalid[] = $key;
             }
         }
-        if ($is_invalid) {
+        if ($isInvalid) {
             throw new \InvalidArgumentException(sprintf('The Router does not support the following options: \'%s\'.', implode('\', \'', $invalid)));
         }
     }

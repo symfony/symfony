@@ -54,7 +54,7 @@ class DoctrineMongoDBLogger
      *
      * @param array $query A query log array from Doctrine
      */
-    public function logQuery($query)
+    public function logQuery(array $query)
     {
         $this->queries[] = $query;
         $this->processed = false;
@@ -107,6 +107,12 @@ class DoctrineMongoDBLogger
         $grouped = array();
         $ordered = array();
         foreach ($this->queries as $query) {
+            if (!isset($query['query']) || !isset($query['fields'])) {
+                // no grouping necessary
+                $ordered[] = array($query);
+                continue;
+            }
+
             $cursor = serialize($query['query']).serialize($query['fields']);
 
             // append if issued from cursor (currently just "sort")
@@ -180,15 +186,21 @@ class DoctrineMongoDBLogger
                 } elseif (isset($log['execute'])) {
                     $query .= '.execute()';
                 } elseif (isset($log['find'])) {
-                    $query .= '.find('.static::bsonEncode($log['query']);
-                    if (!empty($log['fields'])) {
-                        $query .= ', '.static::bsonEncode($log['fields']);
+                    $query .= '.find(';
+                    if ($log['query'] || $log['fields']) {
+                        $query .= static::bsonEncode($log['query']);
+                        if ($log['fields']) {
+                            $query .= ', '.static::bsonEncode($log['fields']);
+                        }
                     }
                     $query .= ')';
                 } elseif (isset($log['findOne'])) {
-                    $query .= '.findOne('.static::bsonEncode($log['query']);
-                    if (!empty($log['fields'])) {
-                        $query .= ', '.static::bsonEncode($log['fields']);
+                    $query .= '.findOne(';
+                    if ($log['query'] || $log['fields']) {
+                        $query .= static::bsonEncode($log['query']);
+                        if ($log['fields']) {
+                            $query .= ', '.static::bsonEncode($log['fields']);
+                        }
                     }
                     $query .= ')';
                 } elseif (isset($log['getDBRef'])) {
@@ -214,6 +226,15 @@ class DoctrineMongoDBLogger
                     $query .= '.validate()';
                 }
             }
+        }
+
+        if (!empty($query)) {
+            if ('.' == $query[0]) {
+                $query  = 'db'.$query;
+            }
+
+            $this->formattedQueries[$i++] = $query.';';
+            ++$this->nbRealQueries;
         }
     }
 

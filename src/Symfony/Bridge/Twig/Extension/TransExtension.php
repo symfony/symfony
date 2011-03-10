@@ -3,21 +3,21 @@
 /*
  * This file is part of the Symfony package.
  *
- * (c) Fabien Potencier <fabien@symfony.com>
+ * (c) Fabien Potencier <fabien.potencier@symfony-project.com>
  *
  * For the full copyright and license information, please view the LICENSE
  * file that was distributed with this source code.
  */
 
-namespace Symfony\Bundle\TwigBundle\Extension;
+namespace Symfony\Bridge\Twig\Extension;
 
-use Symfony\Bundle\TwigBundle\TokenParser\TransTokenParser;
-use Symfony\Bundle\TwigBundle\TokenParser\TransChoiceTokenParser;
+use Symfony\Bridge\Twig\TokenParser\TransTokenParser;
+use Symfony\Bridge\Twig\TokenParser\TransChoiceTokenParser;
 use Symfony\Component\Translation\TranslatorInterface;
 
 /**
  *
- * @author Fabien Potencier <fabien@symfony.com>
+ * @author Fabien Potencier <fabien.potencier@symfony-project.com>
  */
 class TransExtension extends \Twig_Extension
 {

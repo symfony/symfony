@@ -3,20 +3,20 @@
 /*
  * This file is part of the Symfony package.
  *
- * (c) Fabien Potencier <fabien@symfony.com>
+ * (c) Fabien Potencier <fabien.potencier@symfony-project.com>
  *
  * For the full copyright and license information, please view the LICENSE
  * file that was distributed with this source code.
  */
 
-namespace Symfony\Bundle\TwigBundle\TokenParser;
+namespace Symfony\Bridge\Twig\TokenParser;
 
-use Symfony\Bundle\TwigBundle\Node\TransNode;
+use Symfony\Bridge\Twig\Node\TransNode;
 
 /**
- * 
  *
- * @author Fabien Potencier <fabien@symfony.com>
+ *
+ * @author Fabien Potencier <fabien.potencier@symfony-project.com>
  */
 class TransChoiceTokenParser extends TransTokenParser
 {

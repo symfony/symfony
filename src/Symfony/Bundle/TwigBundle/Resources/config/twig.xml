@@ -37,7 +37,7 @@
             <argument type="service" id="service_container" />
         </service>
 
-        <service id="twig.extension.trans" class="Symfony\Bundle\TwigBundle\Extension\TransExtension" public="false">
+        <service id="twig.extension.trans" class="Symfony\Bridge\Twig\Extension\TransExtension" public="false">
             <tag name="twig.extension" />
             <argument type="service" id="translator" />
         </service>

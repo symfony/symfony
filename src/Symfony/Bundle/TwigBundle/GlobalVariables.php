@@ -65,7 +65,7 @@ class GlobalVariables
     }
 
     /**
-     * Returns the security context service.
+     * Returns the current request.
      *
      * @return Symfony\Component\HttpFoundation\Request|void The http request object
      */
@@ -77,7 +77,7 @@ class GlobalVariables
     }
 
     /**
-     * Returns the security context service.
+     * Returns the current session.
      *
      * @return Symfony\Component\HttpFoundation\Session|void The session
      */

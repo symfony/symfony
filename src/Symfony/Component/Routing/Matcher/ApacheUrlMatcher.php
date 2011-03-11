@@ -59,7 +59,7 @@ class ApacheUrlMatcher extends UrlMatcher
     {
         if (!isset($_SERVER['_ROUTING__route'])) {
             // fall-back to the default UrlMatcher
-            return parent::match($url);
+            return parent::match($pathinfo);
         }
 
         $parameters = array();

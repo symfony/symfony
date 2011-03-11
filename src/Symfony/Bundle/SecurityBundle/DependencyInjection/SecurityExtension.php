@@ -496,8 +496,8 @@ class SecurityExtension extends Extension
         $listener = $container->setDefinition($switchUserListenerId, new DefinitionDecorator('security.authentication.switchuser_listener'));
         $listener->setArgument(1, new Reference($userProvider));
         $listener->setArgument(3, $id);
-        $listener->addArgument($config['parameter']);
-        $listener->addArgument($config['role']);
+        $listener->setArgument(6, $config['parameter']);
+        $listener->setArgument(7, $config['role']);
 
         return $switchUserListenerId;
     }

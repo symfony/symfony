@@ -54,7 +54,10 @@ class PhpGeneratorDumper extends GeneratorDumper
             $compiledRoute = $route->compile();
 
             $variables = str_replace("\n", '', var_export($compiledRoute->getVariables(), true));
-            $defaults = str_replace("\n", '', var_export($route->getDefaults(), true));
+            $defaultsMerge='';
+            foreach ($compiledRoute->getDefaults() as $key => $value) {
+                $defaultsMerge.='        $defaults[\''.$key.'\']='.str_replace("\n", '', var_export($value, true)).';'."\n";
+            }
             $requirements = str_replace("\n", '', var_export($compiledRoute->getRequirements(), true));
             $tokens = str_replace("\n", '', var_export($compiledRoute->getTokens(), true));
 
@@ -63,7 +66,9 @@ class PhpGeneratorDumper extends GeneratorDumper
             $methods[] = <<<EOF
     protected function get{$escapedName}RouteInfo()
     {
-        return array($variables, array_merge(\$this->defaults, $defaults), $requirements, $tokens);
+        \$defaults=\$this->defaults;
+$defaultsMerge
+        return array($variables, \$defaults, $requirements, $tokens);
     }
 
 EOF

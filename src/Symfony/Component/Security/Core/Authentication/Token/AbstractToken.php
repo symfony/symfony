@@ -204,4 +204,9 @@ abstract class AbstractToken implements TokenInterface
     {
         $this->attributes[$name] = $value;
     }
+
+    public function __toString()
+    {
+        return $this->getUserName();
+    }
 }

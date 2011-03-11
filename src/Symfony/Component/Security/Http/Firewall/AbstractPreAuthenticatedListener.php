@@ -55,7 +55,7 @@ abstract class AbstractPreAuthenticatedListener implements ListenerInterface
         $request = $event->get('request');
 
         if (null !== $this->logger) {
-            $this->logger->debug(sprintf('Checking secure context token: %s', $this->securityContext->getToken()));
+            $this->logger->debug(sprintf('Checking secure context token: %s', $this->securityContext->getToken()->getUserName()));
         }
 
         list($user, $credentials) = $this->getPreAuthenticatedData($request);
@@ -74,7 +74,7 @@ abstract class AbstractPreAuthenticatedListener implements ListenerInterface
             $token = $this->authenticationManager->authenticate(new PreAuthenticatedToken($user, $credentials, $this->providerKey));
 
             if (null !== $this->logger) {
-                $this->logger->debug(sprintf('Authentication success: %s', $token));
+                $this->logger->debug(sprintf('Authentication success: %s', $token->getUserName()));
             }
             $this->securityContext->setToken($token);
 

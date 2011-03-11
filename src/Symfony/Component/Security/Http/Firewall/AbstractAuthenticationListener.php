@@ -66,7 +66,7 @@ abstract class AbstractAuthenticationListener implements ListenerInterface
      * @param array                          $options               An array of options for the processing of a successful, or failed authentication attempt
      * @param LoggerInterface                $logger                A LoggerInterface instance
      */
-    public function __construct(SecurityContextInterface $securityContext, AuthenticationManagerInterface $authenticationManager, SessionAuthenticationStrategyInterface $sessionStrategy, $providerKey, array $options = array(), AuthenticationSuccessHandlerInterface $successHandler = null, AuthenticationFailureHandlerInterface $failureHandler = null, LoggerInterface $logger = null)
+    public function __construct(SecurityContextInterface $securityContext, AuthenticationManagerInterface $authenticationManager, SessionAuthenticationStrategyInterface $sessionStrategy, $providerKey, array $options = array(), AuthenticationSuccessHandlerInterface $successHandler = null, AuthenticationFailureHandlerInterface $failureHandler = null, LoggerInterface $logger = null, EventDispatcherInterface $eventDispatcher = null)
     {
         if (empty($providerKey)) {
             throw new \InvalidArgumentException('$providerKey must not be empty.');
@@ -89,6 +89,7 @@ abstract class AbstractAuthenticationListener implements ListenerInterface
             'failure_forward'                => false,
         ), $options);
         $this->logger = $logger;
+        $this->eventDispatcher = $eventDispatcher;
     }
 
     /**
@@ -99,26 +100,6 @@ abstract class AbstractAuthenticationListener implements ListenerInterface
     public function setRememberMeServices(RememberMeServicesInterface $rememberMeServices)
     {
         $this->rememberMeServices = $rememberMeServices;
-    }
-
-    /**
-     * Subscribe to the core.security event
-     *
-     * @param EventDispatcher $dispatcher An EventDispatcher instance
-     * @param integer         $priority   The priority
-     */
-    public function register(EventDispatcherInterface $dispatcher)
-    {
-        $dispatcher->connect('core.security', array($this, 'handle'), 0);
-
-        $this->eventDispatcher = $dispatcher;
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    public function unregister(EventDispatcherInterface $dispatcher)
-    {
     }
 
     /**

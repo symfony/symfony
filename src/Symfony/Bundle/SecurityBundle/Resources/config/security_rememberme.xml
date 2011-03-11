@@ -12,6 +12,8 @@
         
         <parameter key="security.authentication.rememberme.services.persistent.class">Symfony\Component\Security\Http\RememberMe\PersistentTokenBasedRememberMeServices</parameter>
         <parameter key="security.authentication.rememberme.services.simplehash.class">Symfony\Component\Security\Http\RememberMe\TokenBasedRememberMeServices</parameter>
+        
+        <parameter key="security.rememberme.response_listener.class">Symfony\Bundle\SecurityBundle\ResponseListener</parameter>
     </parameters>
     
     <services>
@@ -46,6 +48,10 @@
                  class="%security.authentication.rememberme.services.simplehash.class%" 
                  parent="security.authentication.rememberme.services.abstract"
                  abstract="true">
+        </service>
+        
+        <service id="security.rememberme.response_listener" class="%security.rememberme.response_listener.class%">
+            <tag name="kernel.listener" method="handle" event="core.response"/>
         </service>
     </services>
     

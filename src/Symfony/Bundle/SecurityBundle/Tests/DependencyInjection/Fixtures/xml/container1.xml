@@ -52,8 +52,6 @@
         <role id="ROLE_REMOTE">ROLE_USER,ROLE_ADMIN</role>
 
         <rule path="/blog/524" role="ROLE_USER" requires-channel="https" />
-        <rule role='IS_AUTHENTICATED_ANONYMOUSLY' path="/blog/.*">
-            <attribute key="_controller" pattern=".*\\BlogBundle\\.*" />
-        </rule>
+        <rule role='IS_AUTHENTICATED_ANONYMOUSLY' path="/blog/.*" />
     </config>
 </srv:container>

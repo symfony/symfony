@@ -49,7 +49,7 @@ class SwitchUserListener implements ListenerInterface
     /**
      * Constructor.
      */
-    public function __construct(SecurityContextInterface $securityContext, UserProviderInterface $provider, UserCheckerInterface $userChecker, $providerKey, AccessDecisionManagerInterface $accessDecisionManager, LoggerInterface $logger = null, $usernameParameter = '_switch_user', $role = 'ROLE_ALLOWED_TO_SWITCH')
+    public function __construct(SecurityContextInterface $securityContext, UserProviderInterface $provider, UserCheckerInterface $userChecker, $providerKey, AccessDecisionManagerInterface $accessDecisionManager, LoggerInterface $logger = null, $usernameParameter = '_switch_user', $role = 'ROLE_ALLOWED_TO_SWITCH', EventDispatcherInterface $eventDispatcher = null)
     {
         if (empty($providerKey)) {
             throw new \InvalidArgumentException('$providerKey must not be empty.');
@@ -63,26 +63,7 @@ class SwitchUserListener implements ListenerInterface
         $this->usernameParameter = $usernameParameter;
         $this->role = $role;
         $this->logger = $logger;
-    }
-
-    /**
-     *
-     *
-     * @param EventDispatcherInterface $dispatcher An EventDispatcherInterface instance
-     * @param integer                  $priority   The priority
-     */
-    public function register(EventDispatcherInterface $dispatcher)
-    {
-        $dispatcher->connect('core.security', array($this, 'handle'), 0);
-
-        $this->eventDispatcher = $dispatcher;
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    public function unregister(EventDispatcherInterface $dispatcher)
-    {
+        $this->eventDispatcher = $eventDispatcher;
     }
 
     /**

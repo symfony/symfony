@@ -11,6 +11,8 @@
 
 namespace Symfony\Component\Security\Http\Firewall;
 
+use Symfony\Component\EventDispatcher\EventDispatcherInterface;
+
 use Symfony\Component\Form\CsrfProvider\CsrfProviderInterface;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpKernel\Log\LoggerInterface;
@@ -35,7 +37,7 @@ class UsernamePasswordFormAuthenticationListener extends AbstractAuthenticationL
     /**
      * {@inheritdoc}
      */
-    public function __construct(SecurityContextInterface $securityContext, AuthenticationManagerInterface $authenticationManager, SessionAuthenticationStrategyInterface $sessionStrategy, $providerKey, array $options = array(), AuthenticationSuccessHandlerInterface $successHandler = null, AuthenticationFailureHandlerInterface $failureHandler = null, LoggerInterface $logger = null, CsrfProviderInterface $csrfProvider = null)
+    public function __construct(SecurityContextInterface $securityContext, AuthenticationManagerInterface $authenticationManager, SessionAuthenticationStrategyInterface $sessionStrategy, $providerKey, array $options = array(), AuthenticationSuccessHandlerInterface $successHandler = null, AuthenticationFailureHandlerInterface $failureHandler = null, LoggerInterface $logger = null, EventDispatcherInterface $eventDispatcher = null, CsrfProviderInterface $csrfProvider = null)
     {
         parent::__construct($securityContext, $authenticationManager, $sessionStrategy, $providerKey, array_merge(array(
             'username_parameter' => '_username',
@@ -43,7 +45,7 @@ class UsernamePasswordFormAuthenticationListener extends AbstractAuthenticationL
             'csrf_parameter'     => '_csrf_token',
             'csrf_page_id'       => 'form_login',
             'post_only'          => true,
-        ), $options), $successHandler, $failureHandler, $logger);
+        ), $options), $successHandler, $failureHandler, $logger, $eventDispatcher);
 
         $this->csrfProvider = $csrfProvider;
     }
@@ -77,4 +79,3 @@ class UsernamePasswordFormAuthenticationListener extends AbstractAuthenticationL
         return $this->authenticationManager->authenticate(new UsernamePasswordToken($username, $password, $this->providerKey));
     }
 }
-

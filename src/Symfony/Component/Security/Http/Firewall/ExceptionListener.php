@@ -32,7 +32,7 @@ use Symfony\Component\HttpKernel\HttpKernelInterface;
  *
  * @author Fabien Potencier <fabien@symfony.com>
  */
-class ExceptionListener implements ListenerInterface
+class ExceptionListener
 {
     private $context;
     private $accessDeniedHandler;
@@ -60,14 +60,6 @@ class ExceptionListener implements ListenerInterface
     public function register(EventDispatcherInterface $dispatcher)
     {
         $dispatcher->connect('core.exception', array($this, 'handleException'), 0);
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    public function unregister(EventDispatcherInterface $dispatcher)
-    {
-        $dispatcher->disconnect('core.exception', array($this, 'handleException'));
     }
 
     /**

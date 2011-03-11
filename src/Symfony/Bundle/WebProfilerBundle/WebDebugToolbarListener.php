@@ -50,7 +50,7 @@ class WebDebugToolbarListener
         $request = $event->get('request');
         if ($response->headers->has('X-Debug-Token') && $response->isRedirect() && $this->interceptRedirects) {
             // keep current flashes for one more request
-            $request->setFlashes($request->getFlashes());
+            $request->getSession()->setFlashes($request->getSession()->getFlashes());
 
             $response->setContent(
                 sprintf('<html><head></head><body><h1>This Request redirects to<br /><a href="%1$s">%1$s</a>.</h1><h4>The redirect was intercepted by the web debug toolbar to help debugging.<br/>For more information, see the "intercept-redirects" option of the Profiler.</h4></body></html>',

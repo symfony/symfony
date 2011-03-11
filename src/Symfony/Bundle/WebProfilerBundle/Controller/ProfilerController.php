@@ -128,7 +128,7 @@ class ProfilerController extends ContainerAware
         $request = $this->container->get('request');
 
         // keep current flashes for one more request
-        $request->setFlashes($request->getFlashes());
+        $request->getSession()->setFlashes($request->getSession()->getFlashes());
 
         if (null === $token) {
             return new Response();
